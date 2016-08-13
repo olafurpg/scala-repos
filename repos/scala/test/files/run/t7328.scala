@@ -13,6 +13,7 @@ object Test extends App {
 
   val im = cm.reflect(bar)
   println(im.reflectField(foo).get) // incorrectly gives java.lang.Integer(3) not Foo(3)
-  im.reflectField(foo).set(Foo(5)) // java.lang.IllegalArgumentException: Can not set int field Bar.foo to Foo
+  im.reflectField(foo)
+    .set(Foo(5)) // java.lang.IllegalArgumentException: Can not set int field Bar.foo to Foo
   println(im.reflectMethod(foo)()) // incorrectly gives java.lang.Integer(3) not Foo(3)
 }

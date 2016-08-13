@@ -21,7 +21,10 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd, SparkListenerSQLExecutionStart}
+import org.apache.spark.sql.execution.ui.{
+  SparkListenerSQLExecutionEnd,
+  SparkListenerSQLExecutionStart
+}
 import org.apache.spark.util.Utils
 
 private[sql] object SQLExecution {
@@ -46,19 +49,19 @@ private[sql] object SQLExecution {
       val r = try {
         val callSite = Utils.getCallSite()
         sqlContext.sparkContext.listenerBus.post(
-            SparkListenerSQLExecutionStart(
-                executionId,
-                callSite.shortForm,
-                callSite.longForm,
-                queryExecution.toString,
-                SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
-                System.currentTimeMillis()))
+          SparkListenerSQLExecutionStart(
+            executionId,
+            callSite.shortForm,
+            callSite.longForm,
+            queryExecution.toString,
+            SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
+            System.currentTimeMillis()))
         try {
           body
         } finally {
           sqlContext.sparkContext.listenerBus.post(
-              SparkListenerSQLExecutionEnd(
-                  executionId, System.currentTimeMillis()))
+            SparkListenerSQLExecutionEnd(executionId,
+                                         System.currentTimeMillis()))
         }
       } finally {
         sc.setLocalProperty(EXECUTION_ID_KEY, null)

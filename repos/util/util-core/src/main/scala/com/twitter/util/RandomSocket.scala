@@ -34,7 +34,7 @@ object RandomSocket {
         if (e.getClass == classOf[IOException] ||
             e.getClass == classOf[IllegalArgumentException])
           throw new Exception(
-              "Couldn't find an open port: %s".format(e.getMessage))
+            "Couldn't find an open port: %s".format(e.getMessage))
         else throw e
     } finally {
       s.close()

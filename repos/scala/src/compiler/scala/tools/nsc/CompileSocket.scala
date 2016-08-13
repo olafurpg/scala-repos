@@ -35,7 +35,8 @@ trait HasCompileSocket {
           compileSocket.warn(line)
           loop()
       }
-      try loop() finally sock.close()
+      try loop()
+      finally sock.close()
     }
   }
 }
@@ -67,12 +68,13 @@ class CompileSocket extends CompileOutputCommon {
   protected val serverClass = "scala.tools.nsc.CompileServer"
   protected def serverClassArgs =
     (if (verbose) List("-v") else Nil) :::
-    (if (fixPort > 0) List("-p", fixPort.toString) else Nil)
+      (if (fixPort > 0) List("-p", fixPort.toString) else Nil)
 
   /** A temporary directory to use */
   val tmpDir = {
     val udir = Option(Properties.userName) getOrElse "shared"
-    val f = (Path(Properties.tmpDir) / ("scala-devel" + udir)).createDirectory()
+    val f =
+      (Path(Properties.tmpDir) / ("scala-devel" + udir)).createDirectory()
 
     if (f.isDirectory && f.canWrite) {
       info("[Temp directory: " + f + "]")
@@ -89,7 +91,7 @@ class CompileSocket extends CompileOutputCommon {
     */
   private def serverCommand(vmArgs: Seq[String]): Seq[String] =
     Seq(vmCommand) ++ vmArgs ++ Seq(serverClass) ++ serverClassArgs filterNot
-    (_ == "")
+      (_ == "")
 
   /** Start a new server. */
   private def startNewServer(vmArgs: String) = {
@@ -115,7 +117,8 @@ class CompileSocket extends CompileOutputCommon {
       portsDir.list.toList match {
         case Nil => -1
         case x :: xs =>
-          try x.name.toInt catch {
+          try x.name.toInt
+          catch {
             case e: Exception =>
               x.delete()
               throw e
@@ -134,7 +137,7 @@ class CompileSocket extends CompileOutputCommon {
 
     if (port < 0) {
       info(
-          "No compile server running: starting one with args '" + vmArgs + "'")
+        "No compile server running: starting one with args '" + vmArgs + "'")
       startNewServer(vmArgs)
     }
     while (port < 0 && attempts < maxPolls) {
@@ -144,7 +147,8 @@ class CompileSocket extends CompileOutputCommon {
     }
     info("[Port number: " + port + "]")
     if (port < 0)
-      fatal("Could not connect to compilation daemon after " + attempts +
+      fatal(
+        "Could not connect to compilation daemon after " + attempts +
           " attempts.")
     port
   }
@@ -154,7 +158,8 @@ class CompileSocket extends CompileOutputCommon {
     val file = portFile(port)
     val secret = new SecureRandom().nextInt.toString
 
-    try file writeAll secret catch {
+    try file writeAll secret
+    catch {
       case e @ (_: FileNotFoundException | _: SecurityException) =>
         fatal("Cannot create file: %s".format(file.path))
     }
@@ -189,7 +194,7 @@ class CompileSocket extends CompileOutputCommon {
           case Left(err) =>
             info(err.toString)
             info(
-                "[Connecting to compilation daemon at port %d failed; re-trying...]" format port)
+              "[Connecting to compilation daemon at port %d failed; re-trying...]" format port)
 
             if (attempts % 2 == 0)
               deletePort(port) // 50% chance to stop trying on this port
@@ -206,17 +211,19 @@ class CompileSocket extends CompileOutputCommon {
     try { Some(x.toInt) } catch { case _: NumberFormatException => None }
 
   def getSocket(serverAdr: String): Option[Socket] =
-    (for ((name, portStr) <- splitWhere(
-        serverAdr, _ == ':', doDropIndex = true); port <- parseInt(portStr)) yield
-      getSocket(name, port)) getOrElse fatal(
-        "Malformed server address: %s; exiting" format serverAdr)
+    (for ((name, portStr) <- splitWhere(serverAdr,
+                                        _ == ':',
+                                        doDropIndex = true);
+          port <- parseInt(portStr))
+      yield getSocket(name, port)) getOrElse fatal(
+      "Malformed server address: %s; exiting" format serverAdr)
 
   def getSocket(hostName: String, port: Int): Option[Socket] = {
     val sock = Socket(hostName, port).opt
     if (sock.isEmpty)
       warn(
-          "Unable to establish connection to server %s:%d".format(
-              hostName, port))
+        "Unable to establish connection to server %s:%d".format(hostName,
+                                                                port))
     sock
   }
 

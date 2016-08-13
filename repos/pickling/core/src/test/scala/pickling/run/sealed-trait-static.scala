@@ -40,7 +40,7 @@ class SealedTraitStaticTest extends FunSuite {
       val f =
         JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Fruit]
       throw new Exception(
-          s"Should have thrown on unpickle but instead parsed $f")
+        s"Should have thrown on unpickle but instead parsed $f")
     } catch {
       case PicklingException(message, cause) =>
         if (!message.contains("Cucumber not recognized"))
@@ -58,7 +58,7 @@ class SealedTraitStaticTest extends FunSuite {
     try {
       val a = JSONPickle(bananaString).unpickle[Apple]
       throw new Exception(
-          s"Should have thrown on unpickle but instead parsed $a")
+        s"Should have thrown on unpickle but instead parsed $a")
     } catch {
       case PicklingException(message, cause) =>
         if (!message.contains("No field 'kind'"))

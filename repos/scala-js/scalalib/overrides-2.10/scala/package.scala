@@ -19,8 +19,10 @@ package object scala {
   type NullPointerException = java.lang.NullPointerException
   type ClassCastException = java.lang.ClassCastException
   type IndexOutOfBoundsException = java.lang.IndexOutOfBoundsException
-  type ArrayIndexOutOfBoundsException = java.lang.ArrayIndexOutOfBoundsException
-  type StringIndexOutOfBoundsException = java.lang.StringIndexOutOfBoundsException
+  type ArrayIndexOutOfBoundsException =
+    java.lang.ArrayIndexOutOfBoundsException
+  type StringIndexOutOfBoundsException =
+    java.lang.StringIndexOutOfBoundsException
   type UnsupportedOperationException = java.lang.UnsupportedOperationException
   type IllegalArgumentException = java.lang.IllegalArgumentException
   type NoSuchElementException = java.util.NoSuchElementException
@@ -34,13 +36,13 @@ package object scala {
   }
 
   @deprecated(
-      "instead of `@serializable class C`, use `class C extends Serializable`",
-      "2.9.0")
+    "instead of `@serializable class C`, use `class C extends Serializable`",
+    "2.9.0")
   type serializable = annotation.serializable
 
   @deprecated(
-      "instead of `@cloneable class C`, use `class C extends Cloneable`",
-      "2.10.0")
+    "instead of `@cloneable class C`, use `class C extends Cloneable`",
+    "2.10.0")
   type cloneable = annotation.cloneable
 
   type TraversableOnce[+A] = scala.collection.TraversableOnce[A]
@@ -122,7 +124,7 @@ package object scala {
   val Right = scala.util.Right
 
   // Annotations which we might move to annotation.*
-/*
+  /*
   type SerialVersionUID = annotation.SerialVersionUID
   type cloneable = annotation.cloneable
   type deprecated = annotation.deprecated

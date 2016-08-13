@@ -416,7 +416,7 @@ class TypeableTests {
   def testTypeCase {
     import HList.ListCompat._
 
-    def typeCase[T : Typeable](t: Any): Option[T] = {
+    def typeCase[T: Typeable](t: Any): Option[T] = {
       val T = TypeCase[T]
       val `List[T]` = TypeCase[List[T]]
       val `(String, T)` = TypeCase[(String, T)]

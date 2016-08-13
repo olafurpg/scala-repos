@@ -16,7 +16,9 @@ package distributions
  limitations under the License.
  */
 
-import org.apache.commons.math3.random.{EmpiricalDistribution => ApacheEmpiricalDistribution}
+import org.apache.commons.math3.random.{
+  EmpiricalDistribution => ApacheEmpiricalDistribution
+}
 
 /**
   * The Weibull-distribution - ratio of two scaled chi^2 variables
@@ -34,4 +36,5 @@ class VariableKernelEmpiricalDistribution(
 
 object VariableKernelEmpiricalDistribution
     extends ContinuousDistributionUFuncProvider[
-        Double, VariableKernelEmpiricalDistribution]
+      Double,
+      VariableKernelEmpiricalDistribution]

@@ -36,7 +36,8 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.SparkFunSuite
 
 class ClientDistributedCacheManagerSuite
-    extends SparkFunSuite with MockitoSugar {
+    extends SparkFunSuite
+    with MockitoSugar {
 
   class MockClientDistributedCacheManager
       extends ClientDistributedCacheManager {
@@ -99,7 +100,7 @@ class ClientDistributedCacheManagerSuite
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
-        ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
+      ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
     assert(resource.getTimestamp() === 0)
     assert(resource.getSize() === 0)
     assert(resource.getType() === LocalResourceType.FILE)
@@ -107,12 +108,12 @@ class ClientDistributedCacheManagerSuite
     val env = new HashMap[String, String]()
     distMgr.setDistFilesEnv(env)
     assert(
-        env("SPARK_YARN_CACHE_FILES") === "file:/foo.invalid.com:8080/tmp/testing#link")
+      env("SPARK_YARN_CACHE_FILES") === "file:/foo.invalid.com:8080/tmp/testing#link")
     assert(env("SPARK_YARN_CACHE_FILES_TIME_STAMPS") === "0")
     assert(env("SPARK_YARN_CACHE_FILES_FILE_SIZES") === "0")
     assert(
-        env("SPARK_YARN_CACHE_FILES_VISIBILITIES") === LocalResourceVisibility.PRIVATE
-          .name())
+      env("SPARK_YARN_CACHE_FILES_VISIBILITIES") === LocalResourceVisibility.PRIVATE
+        .name())
 
     distMgr.setDistArchivesEnv(env)
     assert(env.get("SPARK_YARN_CACHE_ARCHIVES") === None)
@@ -144,7 +145,7 @@ class ClientDistributedCacheManagerSuite
     val resource2 = localResources("link2")
     assert(resource2.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
-        ConverterUtils.getPathFromYarnURL(resource2.getResource()) === destPath2)
+      ConverterUtils.getPathFromYarnURL(resource2.getResource()) === destPath2)
     assert(resource2.getTimestamp() === 10)
     assert(resource2.getSize() === 20)
     assert(resource2.getType() === LocalResourceType.FILE)
@@ -219,7 +220,7 @@ class ClientDistributedCacheManagerSuite
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
-        ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
+      ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
     assert(resource.getTimestamp() === 10)
     assert(resource.getSize() === 20)
     assert(resource.getType() === LocalResourceType.ARCHIVE)
@@ -268,7 +269,7 @@ class ClientDistributedCacheManagerSuite
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
-        ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
+      ConverterUtils.getPathFromYarnURL(resource.getResource()) === destPath)
     assert(resource.getTimestamp() === 10)
     assert(resource.getSize() === 20)
     assert(resource.getType() === LocalResourceType.ARCHIVE)
@@ -277,12 +278,12 @@ class ClientDistributedCacheManagerSuite
 
     distMgr.setDistArchivesEnv(env)
     assert(
-        env("SPARK_YARN_CACHE_ARCHIVES") === "file:/foo.invalid.com:8080/tmp/testing#link")
+      env("SPARK_YARN_CACHE_ARCHIVES") === "file:/foo.invalid.com:8080/tmp/testing#link")
     assert(env("SPARK_YARN_CACHE_ARCHIVES_TIME_STAMPS") === "10")
     assert(env("SPARK_YARN_CACHE_ARCHIVES_FILE_SIZES") === "20")
     assert(
-        env("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") === LocalResourceVisibility.PRIVATE
-          .name())
+      env("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") === LocalResourceVisibility.PRIVATE
+        .name())
 
     distMgr.setDistFilesEnv(env)
     assert(env.get("SPARK_YARN_CACHE_FILES") === None)

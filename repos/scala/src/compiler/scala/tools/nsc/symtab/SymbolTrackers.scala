@@ -19,7 +19,7 @@ trait SymbolTrackers {
   private implicit lazy val SymbolOrdering: Ordering[Symbol] =
     Ordering by (x => (x.kindString, x.name.toString))
 
-  private implicit def toList[T : Ordering](xs: Set[T]): List[T] =
+  private implicit def toList[T: Ordering](xs: Set[T]): List[T] =
     xs.toList.sorted
 
   /** Reversing the direction of Symbol's owner arrow. */
@@ -53,7 +53,7 @@ trait SymbolTrackers {
         unit.body filter containsSymbol groupBy (_.symbol) mapValues (_.toSet) toMap
     }
     def apply(unit: CompilationUnit) = new SymbolTracker(
-        () => symbolSnapshot(unit) filterNot { case (k, _) => dropSymbol(k) }
+      () => symbolSnapshot(unit) filterNot { case (k, _) => dropSymbol(k) }
     )
   }
 
@@ -102,9 +102,9 @@ trait SymbolTrackers {
         if (isAdded(root)) "* "
         else
           List(
-              if (isFlagsChange(root)) "F" else "",
-              if (isOwnerChange(root)) "O" else "",
-              "  "
+            if (isFlagsChange(root)) "F" else "",
+            if (isOwnerChange(root)) "O" else "",
+            "  "
           ).mkString take 2
 
       def changedOwnerString = changed.owners get root match {
@@ -121,8 +121,8 @@ trait SymbolTrackers {
               val flag = 1L << bit
               val prefix =
                 (if ((added & flag) != 0L) "+"
-                 else if ((removed & flag) != 0L) "-"
-                 else "")
+                else if ((removed & flag) != 0L) "-"
+                else "")
               if ((all & flag) == 0L) ""
               else prefix + Flags.flagToString(flag)
             }
@@ -134,9 +134,9 @@ trait SymbolTrackers {
       }
       def symString(sym: Symbol) =
         (if (settings.debug && sym.hasCompleteInfo) {
-           val s = sym.defString take 240
-           if (s.length == 240) s + "..." else s
-         } else sym + changedOwnerString + flagSummaryString)
+          val s = sym.defString take 240
+          if (s.length == 240) s + "..." else s
+        } else sym + changedOwnerString + flagSummaryString)
 
       def flatten = children.foldLeft(Set(root))(_ ++ _.flatten)
       def indentString(indent: String): String = {
@@ -144,10 +144,10 @@ trait SymbolTrackers {
           children map (c => c.indentString(indent)) mkString "\n"
         else {
           indicatorString + indent + symString(root) +
-          (if (children.isEmpty) ""
-           else
-             children map (c => c.indentString(indent + "    ")) mkString
-             ("\n", "\n", ""))
+            (if (children.isEmpty) ""
+            else
+              children map (c => c.indentString(indent + "    ")) mkString
+                ("\n", "\n", ""))
         }
       }
     }
@@ -200,10 +200,10 @@ trait SymbolTrackers {
         } mkString "\n"
 
       "" + hierarchy +
-      (if (removed.isEmpty) ""
-       else
-         "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
-         removedString)
+        (if (removed.isEmpty) ""
+        else
+          "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
+            removedString)
     }
   }
 }

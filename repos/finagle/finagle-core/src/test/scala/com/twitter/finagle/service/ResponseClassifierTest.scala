@@ -14,11 +14,13 @@ class ResponseClassifierTest extends FunSuite {
     assert("DefaultResponseClassifier" == ResponseClassifier.Default.toString)
     assert(Success == ResponseClassifier.Default(ReqRep(null, Return("hi"))))
 
-    assert(RetryableFailure == ResponseClassifier.Default(
-            ReqRep(null, Throw(Failure.rejected))))
+    assert(
+      RetryableFailure == ResponseClassifier.Default(
+        ReqRep(null, Throw(Failure.rejected))))
 
-    assert(NonRetryableFailure == ResponseClassifier.Default(
-            ReqRep(null, Throw(Failure("nope")))))
+    assert(
+      NonRetryableFailure == ResponseClassifier.Default(
+        ReqRep(null, Throw(Failure("nope")))))
   }
 
   test("composition") {
@@ -37,7 +39,8 @@ class ResponseClassifierTest extends FunSuite {
     assert(NonRetryableFailure == classifier(ReqRep(1, aThrow)))
 
     assert(!classifier.isDefinedAt(ReqRep(0, aReturn)))
-    assert(Success == classifier.applyOrElse(ReqRep(0, aReturn),
-                                             ResponseClassifier.Default))
+    assert(
+      Success == classifier.applyOrElse(ReqRep(0, aReturn),
+                                        ResponseClassifier.Default))
   }
 }

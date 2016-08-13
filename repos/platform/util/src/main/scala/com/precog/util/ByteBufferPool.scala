@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -22,7 +22,11 @@ package util
 
 import java.nio.ByteBuffer
 
-import java.util.concurrent.{BlockingQueue, ArrayBlockingQueue, LinkedBlockingQueue}
+import java.util.concurrent.{
+  BlockingQueue,
+  ArrayBlockingQueue,
+  LinkedBlockingQueue
+}
 import java.util.concurrent.atomic.AtomicLong
 
 import java.lang.ref.SoftReference
@@ -46,7 +50,7 @@ final class ByteBufferPool(val capacity: Int = 16 * 1024,
   private val _misses = new AtomicLong()
 
   val fixedBufferQueue: BlockingQueue[ByteBuffer] = new ArrayBlockingQueue(
-      fixedBufferCount)
+    fixedBufferCount)
   val flexBufferQueue: BlockingQueue[SoftReference[ByteBuffer]] =
     new LinkedBlockingQueue()
 
@@ -70,8 +74,9 @@ final class ByteBufferPool(val capacity: Int = 16 * 1024,
 
     if (buffer == null) {
       _misses.incrementAndGet()
-      buffer = if (direct) ByteBuffer.allocateDirect(capacity)
-      else ByteBuffer.allocate(capacity)
+      buffer =
+        if (direct) ByteBuffer.allocateDirect(capacity)
+        else ByteBuffer.allocate(capacity)
     } else {
       _hits.incrementAndGet()
     }
@@ -101,15 +106,15 @@ object ByteBufferPool {
   type ByteBufferPoolS[+A] = State[(ByteBufferPool, List[ByteBuffer]), A]
 
   implicit object ByteBufferPoolMonad
-      extends ByteBufferMonad[ByteBufferPoolS] with Monad[ByteBufferPoolS] {
+      extends ByteBufferMonad[ByteBufferPoolS]
+      with Monad[ByteBufferPoolS] {
 
     def point[A](a: => A): ByteBufferPoolS[A] = State.state(a)
 
     def bind[A, B](fa: ByteBufferPoolS[A])(
         f: A => ByteBufferPoolS[B]): ByteBufferPoolS[B] =
-      State(
-          s =>
-            fa(s) match {
+      State(s =>
+        fa(s) match {
           case (s, a) => f(a)(s)
       })
 

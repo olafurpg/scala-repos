@@ -71,7 +71,7 @@ package object math {
   def fib(n: Long): BigInt = {
     if (n < 0) throw new IllegalArgumentException(n.toString)
     var i = 63
-    while ( ((n >>> i) & 1) == 0 && i >= 0) i -= 1
+    while (((n >>> i) & 1) == 0 && i >= 0) i -= 1
     @tailrec def loop(a: BigInt, b: BigInt, i: Int): BigInt = {
       val c = a + b
       if (i < 0) b
@@ -124,8 +124,9 @@ package object math {
   final def exp(k: BigDecimal): BigDecimal = {
     // take a BigDecimal to a BigInt power
     @tailrec
-    def power(
-        result: BigDecimal, base: BigDecimal, exponent: BigInt): BigDecimal =
+    def power(result: BigDecimal,
+              base: BigDecimal,
+              exponent: BigInt): BigDecimal =
       if (exponent.signum == 0) result
       else if (exponent.testBit(0))
         power(result * base, base * base, exponent >> 1)
@@ -413,8 +414,9 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  final def hypot[@sp(Float, Double) A](x: A, y: A)(
-      implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
+  final def hypot[@sp(Float, Double) A](x: A, y: A)(implicit f: Field[A],
+                                                    n: NRoot[A],
+                                                    o: Order[A]): A = {
     import spire.implicits._
     if (x > y) x.abs * (1 + (y / x) ** 2).sqrt
     else y.abs * (1 + (x / y) ** 2).sqrt

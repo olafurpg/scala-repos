@@ -15,10 +15,11 @@ object Test extends ScaladocModelTest {
 
     def isShadowed(mbr: MemberEntity): Boolean =
       mbr.byConversion
-        .map(_.source.implicitsShadowing
-              .get(mbr)
-              .map(_.isShadowed)
-              .getOrElse(false))
+        .map(
+          _.source.implicitsShadowing
+            .get(mbr)
+            .map(_.isShadowed)
+            .getOrElse(false))
         .getOrElse(false)
 
     // SEE THE test/resources/implicits-chaining-res.scala FOR THE EXPLANATION OF WHAT'S CHECKED HERE:

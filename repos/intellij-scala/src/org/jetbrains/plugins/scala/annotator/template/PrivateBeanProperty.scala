@@ -6,7 +6,10 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.MakeNonPrivateQuickFix
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**
@@ -23,11 +26,12 @@ object PrivateBeanProperty extends AnnotatorPart[ScAnnotation] {
     val member = PsiTreeUtil.getParentOfType(element, classOf[ScMember])
     def registerProblem() = {
       val toPublicFix = new MakeNonPrivateQuickFix(member, toProtected = false)
-      val toProtectedFix = new MakeNonPrivateQuickFix(
-          member, toProtected = true)
+      val toProtectedFix =
+        new MakeNonPrivateQuickFix(member, toProtected = true)
       val privateMod = member.getModifierList.accessModifier.get
       val errorAnnotation = holder.createErrorAnnotation(
-          privateMod, "Bean property should not be private")
+        privateMod,
+        "Bean property should not be private")
       errorAnnotation.registerFix(toPublicFix)
       errorAnnotation.registerFix(toProtectedFix)
     }

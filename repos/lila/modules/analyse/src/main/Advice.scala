@@ -17,10 +17,10 @@ sealed trait Advice {
     withEval.??(evalComment ?? { c =>
       s"($c) "
     }) +
-    (this match {
-          case MateAdvice(seq, _, _, _) => seq.desc
-          case CpAdvice(nag, _, _) => nag.toString
-        }) + "." + {
+      (this match {
+        case MateAdvice(seq, _, _, _) => seq.desc
+        case CpAdvice(nag, _, _) => nag.toString
+      }) + "." + {
       withBestMove ?? {
         info.variation.headOption ?? { move =>
           s" Best move was $move."
@@ -62,8 +62,8 @@ private[analyse] object CpAdvice {
   //   nag ← cpNags find { case (d, n) => d <= delta } map (_._2)
   // } yield CpAdvice(nag, info, prev)
 
-  private val cpNags = List(
-      300 -> Nag.Blunder, 100 -> Nag.Mistake, 50 -> Nag.Inaccuracy)
+  private val cpNags =
+    List(300 -> Nag.Blunder, 100 -> Nag.Mistake, 50 -> Nag.Inaccuracy)
 
   def apply(prev: Info, info: Info): Option[CpAdvice] =
     for {
@@ -93,8 +93,10 @@ private[analyse] object MateSequence {
       case (Some(p), Some(n)) if p > 0 && n >= p && p <= 5 => MateDelayed
     }
 }
-private[analyse] case class MateAdvice(
-    sequence: MateSequence, nag: Nag, info: Info, prev: Info)
+private[analyse] case class MateAdvice(sequence: MateSequence,
+                                       nag: Nag,
+                                       info: Info,
+                                       prev: Info)
     extends Advice
 private[analyse] object MateAdvice {
 

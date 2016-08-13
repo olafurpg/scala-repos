@@ -65,8 +65,8 @@ object SwipeEvent {
     */
   val SwipeRight: EventType[jfxsi.SwipeEvent] = jfxsi.SwipeEvent.SWIPE_RIGHT
   @deprecated(
-      "Use SwipeRight; SWIPE_RIGHT will be removed in a future release",
-      "8.0.60-R10")
+    "Use SwipeRight; SWIPE_RIGHT will be removed in a future release",
+    "8.0.60-R10")
   val SWIPE_RIGHT = SwipeRight
 
   /**
@@ -82,7 +82,8 @@ object SwipeEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/SwipeEvent.html]]
   */
 class SwipeEvent(override val delegate: jfxsi.SwipeEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.SwipeEvent] {
+    extends GestureEvent(delegate)
+    with SFXDelegate[jfxsi.SwipeEvent] {
 
   /**
     * Gets number of touch points that caused this event.

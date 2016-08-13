@@ -31,7 +31,8 @@ object TestServer extends App {
           if req.header[UpgradeToWebSocket].isDefined ⇒
         req.header[UpgradeToWebSocket] match {
           case Some(upgrade) ⇒
-            upgrade.handleMessages(echoWebSocketService) // needed for running the autobahn test suite
+            upgrade
+              .handleMessages(echoWebSocketService) // needed for running the autobahn test suite
           case None ⇒
             HttpResponse(400, entity = "Not a valid websocket request!")
         }
@@ -59,8 +60,8 @@ object TestServer extends App {
   ////////////// helpers //////////////
 
   lazy val index = HttpResponse(
-      entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                          """|<html>
+    entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
+                        """|<html>
          | <body>
          |    <h1>Say hello to <i>akka-http-core</i>!</h1>
          |    <p>Defined resources:</p>

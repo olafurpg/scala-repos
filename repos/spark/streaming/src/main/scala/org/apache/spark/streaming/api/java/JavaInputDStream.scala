@@ -35,7 +35,7 @@ object JavaInputDStream {
     * Convert a scala [[org.apache.spark.streaming.dstream.InputDStream]] to a Java-friendly
     * [[org.apache.spark.streaming.api.java.JavaInputDStream]].
     */
-  implicit def fromInputDStream[T : ClassTag](
+  implicit def fromInputDStream[T: ClassTag](
       inputDStream: InputDStream[T]): JavaInputDStream[T] = {
     new JavaInputDStream[T](inputDStream)
   }

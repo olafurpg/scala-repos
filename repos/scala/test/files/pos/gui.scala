@@ -57,7 +57,8 @@ object GUI {
   }
 
   abstract class Button(scr: Screen, p: Geom.Point, name: String)
-      extends Glyph with MouseCtl {
+      extends Glyph
+      with MouseCtl {
     var enabled: Boolean = false
     val label = new Label(scr, p, name)
 

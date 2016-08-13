@@ -59,8 +59,8 @@ import json.JsonAST._
   * @param contextPath The context path for this request. Defaults to "" per the Servlet API.
   *
   */
-class MockHttpServletRequest(
-    val url: String = null, var contextPath: String = "")
+class MockHttpServletRequest(val url: String = null,
+                             var contextPath: String = "")
     extends HttpServletRequest {
   var attributes: Map[String, Object] = Map()
 
@@ -201,19 +201,19 @@ class MockHttpServletRequest(
       q.split('&').foreach { pair =>
         pair.split('=') match {
           case Array(key, value) => {
-              // Append to the current key's value
-              newParams += key -> value
-            }
+            // Append to the current key's value
+            newParams += key -> value
+          }
           case Array("") =>
             throw new IllegalArgumentException(
-                "Invalid query string: \"" + q + "\"")
+              "Invalid query string: \"" + q + "\"")
           case Array(key) => {
-              // Append to the current key's value
-              newParams += key -> ""
-            }
+            // Append to the current key's value
+            newParams += key -> ""
+          }
           case invalid =>
             throw new IllegalArgumentException(
-                "Invalid query string: \"" + q + "\"")
+              "Invalid query string: \"" + q + "\"")
         }
       }
 
@@ -275,7 +275,7 @@ class MockHttpServletRequest(
   if (contextPath.length > 0 &&
       (contextPath(0) != '/' || contextPath.last == '/')) {
     throw new IllegalArgumentException(
-        "Context path must be empty, or must start with a '/' and not end with a '/': " +
+      "Context path must be empty, or must start with a '/' and not end with a '/': " +
         contextPath)
   }
 
@@ -328,7 +328,7 @@ class MockHttpServletRequest(
       }
     } else {
       throw new IllegalArgumentException(
-          "Could not process url: \"%s\"".format(url))
+        "Could not process url: \"%s\"".format(url))
     }
   }
 
@@ -375,8 +375,8 @@ class MockHttpServletRequest(
   def computeRealPath(path: String) = {
     if (!path.startsWith(contextPath)) {
       throw new IllegalArgumentException(
-          "Path \"%s\" doesn't begin with context path \"%s\"!".format(
-              path, contextPath))
+        "Path \"%s\" doesn't begin with context path \"%s\"!"
+          .format(path, contextPath))
     }
 
     path.substring(contextPath.length)
@@ -443,7 +443,7 @@ class MockHttpServletRequest(
 
   def getReader(): BufferedReader =
     new BufferedReader(
-        new InputStreamReader(new ByteArrayInputStream(body), charEncoding))
+      new InputStreamReader(new ByteArrayInputStream(body), charEncoding))
 
   def getRealPath(s: String): String = s
 
@@ -480,11 +480,10 @@ class MockHttpServletRequest(
   def getDateHeader(h: String): Long = {
     val handler: PartialFunction[Throwable, Box[Long]] = {
       case pe: ParseException => {
-          throw new IllegalArgumentException(
-              "Could not parse the date for %s : \"%s\"".format(
-                  h, getHeader(h)))
-          Empty
-        }
+        throw new IllegalArgumentException(
+          "Could not parse the date for %s : \"%s\"".format(h, getHeader(h)))
+        Empty
+      }
     }
 
     Helpers

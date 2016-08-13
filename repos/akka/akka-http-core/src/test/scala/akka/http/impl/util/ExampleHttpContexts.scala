@@ -7,7 +7,12 @@ package akka.http.impl.util
 import java.io.InputStream
 import java.security.{SecureRandom, KeyStore}
 import java.security.cert.{CertificateFactory, Certificate}
-import javax.net.ssl.{SSLParameters, SSLContext, TrustManagerFactory, KeyManagerFactory}
+import javax.net.ssl.{
+  SSLParameters,
+  SSLContext,
+  TrustManagerFactory,
+  KeyManagerFactory
+}
 
 import akka.http.scaladsl.HttpsConnectionContext
 

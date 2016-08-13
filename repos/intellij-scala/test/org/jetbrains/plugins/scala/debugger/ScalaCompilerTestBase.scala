@@ -8,7 +8,12 @@ import com.intellij.ProjectTopics
 import com.intellij.compiler.CompilerTestUtil
 import com.intellij.compiler.server.BuildManager
 import com.intellij.openapi.application.ex.ApplicationManagerEx
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager, CompilerMessageCategory}
+import com.intellij.openapi.compiler.{
+  CompileContext,
+  CompileStatusNotification,
+  CompilerManager,
+  CompilerMessageCategory
+}
 import com.intellij.openapi.projectRoots._
 import com.intellij.openapi.roots._
 import com.intellij.openapi.util.text.StringUtil
@@ -53,7 +58,7 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
       val file = new File(getBaseDir.getCanonicalPath, name)
       if (!file.exists()) file.mkdir()
       LocalFileSystem.getInstance.refreshAndFindFileByPath(
-          file.getCanonicalPath)
+        file.getCanonicalPath)
     }
 
     inWriteAction {
@@ -68,11 +73,11 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
 
   protected def addScalaSdk(loadReflect: Boolean = true) {
     scalaLibraryLoader = new ScalaLibraryLoader(
-        getProject,
-        getModule,
-        getSourceRootDir.getCanonicalPath,
-        loadReflect,
-        Some(getTestProjectJdk))
+      getProject,
+      getModule,
+      getSourceRootDir.getCanonicalPath,
+      loadReflect,
+      Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
   }
@@ -128,8 +133,8 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
       i += 1
     }
     Assert.assertTrue(
-        s"Too long compilation of test data for ${getClass.getSimpleName}.test${getTestName(false)}",
-        i < maxCompileTime)
+      s"Too long compilation of test data for ${getClass.getSimpleName}.test${getTestName(false)}",
+      i < maxCompileTime)
     if (callback.hasError) {
       deleteProjectAtTearDown = true
       callback.throwException()
@@ -183,8 +188,9 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
   }
 
   protected def addFileToProject(relativePath: String, text: String) {
-    VfsTestUtil.createFile(
-        getSourceRootDir, relativePath, StringUtil.convertLineSeparators(text))
+    VfsTestUtil.createFile(getSourceRootDir,
+                           relativePath,
+                           StringUtil.convertLineSeparators(text))
   }
 
   protected def getSourceRootDir: VirtualFile = {

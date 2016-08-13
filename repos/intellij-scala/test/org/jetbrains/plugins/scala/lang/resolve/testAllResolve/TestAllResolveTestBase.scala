@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala.lang.resolve.testAllResolve
 
 import java.io.File
 
-import _root_.org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import _root_.org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile,
+  ScalaRecursiveElementVisitor
+}
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.{CharsetToolkit, LocalFileSystem}
@@ -22,20 +25,20 @@ abstract class TestAllResolveTestBase
 
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     scalaFile.accept(new ScalaRecursiveElementVisitor {
       override def visitReference(ref: ScReferenceElement) {
         val resolve = ref.resolve()
         assertNotNull(
-            "Failed on reference: " + ref.getText +
+          "Failed on reference: " + ref.getText +
             ". Reference Range: (" + ref.getTextRange.getStartOffset + ", " +
             ref.getTextRange.getEndOffset + ")",
-            resolve)
+          resolve)
         super.visitReference(ref)
       }
     })

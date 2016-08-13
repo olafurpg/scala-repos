@@ -41,56 +41,56 @@ object BSONHandlers {
       val variant =
         r.intO("variant").fold[Variant](Variant.default)(Variant.orDefault)
       val position =
-        r.strO("eco").flatMap(StartingPosition.byEco) | StartingPosition.initial
+        r.strO("eco")
+          .flatMap(StartingPosition.byEco) | StartingPosition.initial
       val startsAt = r date "startsAt"
       Tournament(
-          id = r str "_id",
-          name = r str "name",
-          status = r.get[Status]("status"),
-          system = r
-              .intO("system")
-              .fold[System](System.default)(System.orDefault),
-          clock = r.get[TournamentClock]("clock"),
-          minutes = r int "minutes",
-          variant = variant,
-          position = position,
-          mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
-          `private` = r boolD "private",
-          schedule = for {
-            doc <- r.getO[BSONDocument]("schedule")
-            freq <- doc.getAs[String]("freq") flatMap Schedule.Freq.apply
-            speed <- doc.getAs[String]("speed") flatMap Schedule.Speed.apply
-          } yield Schedule(freq, speed, variant, position, startsAt),
-          nbPlayers = r int "nbPlayers",
-          createdAt = r date "createdAt",
-          createdBy = r str "createdBy",
-          startsAt = startsAt,
-          winnerId = r strO "winner",
-          featuredId = r strO "featured",
-          spotlight = r.getO[Spotlight]("spotlight"))
+        id = r str "_id",
+        name = r str "name",
+        status = r.get[Status]("status"),
+        system =
+          r.intO("system").fold[System](System.default)(System.orDefault),
+        clock = r.get[TournamentClock]("clock"),
+        minutes = r int "minutes",
+        variant = variant,
+        position = position,
+        mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
+        `private` = r boolD "private",
+        schedule = for {
+          doc <- r.getO[BSONDocument]("schedule")
+          freq <- doc.getAs[String]("freq") flatMap Schedule.Freq.apply
+          speed <- doc.getAs[String]("speed") flatMap Schedule.Speed.apply
+        } yield Schedule(freq, speed, variant, position, startsAt),
+        nbPlayers = r int "nbPlayers",
+        createdAt = r date "createdAt",
+        createdBy = r str "createdBy",
+        startsAt = startsAt,
+        winnerId = r strO "winner",
+        featuredId = r strO "featured",
+        spotlight = r.getO[Spotlight]("spotlight"))
     }
     def writes(w: BSON.Writer, o: Tournament) =
       BSONDocument(
-          "_id" -> o.id,
-          "name" -> o.name,
-          "status" -> o.status,
-          "system" -> o.system.some.filterNot(_.default).map(_.id),
-          "clock" -> o.clock,
-          "minutes" -> o.minutes,
-          "variant" -> o.variant.some.filterNot(_.standard).map(_.id),
-          "eco" -> o.position.some.filterNot(_.initial).map(_.eco),
-          "mode" -> o.mode.some.filterNot(_.rated).map(_.id),
-          "private" -> w.boolO(o.`private`),
-          "schedule" -> o.schedule.map { s =>
-            BSONDocument("freq" -> s.freq.name, "speed" -> s.speed.name)
-          },
-          "nbPlayers" -> o.nbPlayers,
-          "createdAt" -> w.date(o.createdAt),
-          "createdBy" -> w.str(o.createdBy),
-          "startsAt" -> w.date(o.startsAt),
-          "winner" -> o.winnerId,
-          "featured" -> o.featuredId,
-          "spotlight" -> o.spotlight)
+        "_id" -> o.id,
+        "name" -> o.name,
+        "status" -> o.status,
+        "system" -> o.system.some.filterNot(_.default).map(_.id),
+        "clock" -> o.clock,
+        "minutes" -> o.minutes,
+        "variant" -> o.variant.some.filterNot(_.standard).map(_.id),
+        "eco" -> o.position.some.filterNot(_.initial).map(_.eco),
+        "mode" -> o.mode.some.filterNot(_.rated).map(_.id),
+        "private" -> w.boolO(o.`private`),
+        "schedule" -> o.schedule.map { s =>
+          BSONDocument("freq" -> s.freq.name, "speed" -> s.speed.name)
+        },
+        "nbPlayers" -> o.nbPlayers,
+        "createdAt" -> w.date(o.createdAt),
+        "createdBy" -> w.str(o.createdBy),
+        "startsAt" -> w.date(o.startsAt),
+        "winner" -> o.winnerId,
+        "featured" -> o.featuredId,
+        "spotlight" -> o.spotlight)
   }
 
   implicit val playerBSONHandler = new BSON[Player] {
@@ -149,17 +149,17 @@ object BSONHandlers {
   implicit val leaderboardEntryHandler = new BSON[LeaderboardApi.Entry] {
     def reads(r: BSON.Reader) =
       LeaderboardApi.Entry(
-          id = r str "_id",
-          userId = r str "u",
-          tourId = r str "t",
-          nbGames = r int "g",
-          score = r int "s",
-          rank = r int "r",
-          rankRatio = r.get[LeaderboardApi.Ratio]("w"),
-          freq = r intO "f" flatMap Schedule.Freq.byId,
-          speed = r intO "p" flatMap Schedule.Speed.byId,
-          perf = PerfType.byId get r.int("v") err "Invalid leaderboard perf",
-          date = r date "d")
+        id = r str "_id",
+        userId = r str "u",
+        tourId = r str "t",
+        nbGames = r int "g",
+        score = r int "s",
+        rank = r int "r",
+        rankRatio = r.get[LeaderboardApi.Ratio]("w"),
+        freq = r intO "f" flatMap Schedule.Freq.byId,
+        speed = r intO "p" flatMap Schedule.Speed.byId,
+        perf = PerfType.byId get r.int("v") err "Invalid leaderboard perf",
+        date = r date "d")
 
     def writes(w: BSON.Writer, o: LeaderboardApi.Entry) =
       BSONDocument("_id" -> o.id,

@@ -32,7 +32,7 @@ class FlowFoldSpec extends AkkaSpec {
 
     "work when using Source.runFold" in assertAllStagesStopped {
       Await.result(inputSource.runFold(0)(_ + _), 3.seconds) should be(
-          expected)
+        expected)
     }
 
     "work when using Source.fold" in assertAllStagesStopped {
@@ -44,13 +44,15 @@ class FlowFoldSpec extends AkkaSpec {
     }
 
     "work when using Flow.fold" in assertAllStagesStopped {
-      Await.result(inputSource via foldFlow runWith Sink.head, 3.seconds) should be(
-          expected)
+      Await
+        .result(inputSource via foldFlow runWith Sink.head, 3.seconds) should be(
+        expected)
     }
 
     "work when using Source.fold + Flow.fold + Sink.fold" in assertAllStagesStopped {
-      Await.result(foldSource via foldFlow runWith foldSink, 3.seconds) should be(
-          expected)
+      Await
+        .result(foldSource via foldFlow runWith foldSink, 3.seconds) should be(
+        expected)
     }
 
     "propagate an error" in assertAllStagesStopped {

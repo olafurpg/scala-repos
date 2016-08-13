@@ -26,12 +26,12 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
 
   def createDF(): DataFrame = {
     Seq[(String, java.lang.Integer, java.lang.Double)](
-        ("Bob", 16, 176.5),
-        ("Alice", null, 164.3),
-        ("David", 60, null),
-        ("Nina", 25, Double.NaN),
-        ("Amy", null, null),
-        (null, null, null)
+      ("Bob", 16, 176.5),
+      ("Alice", null, 164.3),
+      ("David", 60, null),
+      ("Nina", 25, Double.NaN),
+      ("Amy", null, null),
+      (null, null, null)
     ).toDF("name", "age", "height")
   }
 
@@ -41,7 +41,7 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(input.na.drop("name" :: Nil).select("name"),
                 Row("Bob") :: Row("Alice") :: Row("David") :: Row("Nina") :: Row(
-                    "Amy") :: Nil)
+                  "Amy") :: Nil)
 
     checkAnswer(input.na.drop("age" :: Nil).select("name"),
                 Row("Bob") :: Row("David") :: Row("Nina") :: Nil)
@@ -64,15 +64,15 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(input.na.drop("all").select("name"),
                 Row("Bob") :: Row("Alice") :: Row("David") :: Row("Nina") :: Row(
-                    "Amy") :: Nil)
+                  "Amy") :: Nil)
 
     checkAnswer(input.na.drop("any"), rows(0) :: Nil)
 
     checkAnswer(input.na.drop("any", Seq("age", "height")), rows(0) :: Nil)
 
     checkAnswer(
-        input.na.drop("all", Seq("age", "height")).select("name"),
-        Row("Bob") :: Row("Alice") :: Row("David") :: Row("Nina") :: Nil)
+      input.na.drop("all", Seq("age", "height")).select("name"),
+      Row("Bob") :: Row("Alice") :: Row("David") :: Row("Nina") :: Nil)
   }
 
   test("drop with threshold") {
@@ -85,17 +85,24 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
 
     // Make sure the columns are properly named.
     assert(
-        input.na.drop(2, Seq("age", "height")).columns.toSeq === input.columns.toSeq)
+      input.na
+        .drop(2, Seq("age", "height"))
+        .columns
+        .toSeq === input.columns.toSeq)
   }
 
   test("fill") {
     val input = createDF()
 
     val fillNumeric = input.na.fill(50.6)
-    checkAnswer(fillNumeric,
-                Row("Bob", 16, 176.5) :: Row("Alice", 50, 164.3) :: Row(
-                    "David", 60, 50.6) :: Row("Nina", 25, 50.6) :: Row(
-                    "Amy", 50, 50.6) :: Row(null, 50, 50.6) :: Nil)
+    checkAnswer(
+      fillNumeric,
+      Row("Bob", 16, 176.5) :: Row("Alice", 50, 164.3) :: Row("David",
+                                                              60,
+                                                              50.6) :: Row(
+        "Nina",
+        25,
+        50.6) :: Row("Amy", 50, 50.6) :: Row(null, 50, 50.6) :: Nil)
 
     // Make sure the columns are properly named.
     assert(fillNumeric.columns.toSeq === input.columns.toSeq)
@@ -103,13 +110,14 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
     // string
     checkAnswer(input.na.fill("unknown").select("name"),
                 Row("Bob") :: Row("Alice") :: Row("David") :: Row("Nina") :: Row(
-                    "Amy") :: Row("unknown") :: Nil)
+                  "Amy") :: Row("unknown") :: Nil)
     assert(input.na.fill("unknown").columns.toSeq === input.columns.toSeq)
 
     // fill double with subset columns
     checkAnswer(input.na.fill(50.6, "age" :: Nil).select("name", "age"),
                 Row("Bob", 16) :: Row("Alice", 50) :: Row("David", 60) :: Row(
-                    "Nina", 25) :: Row("Amy", 50) :: Row(null, 50) :: Nil)
+                  "Nina",
+                  25) :: Row("Amy", 50) :: Row(null, 50) :: Nil)
 
     // fill string with subset columns
     checkAnswer(Seq[(String, String)]((null, null))
@@ -120,24 +128,29 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("fill with map") {
-    val df = Seq[
-        (String, String, java.lang.Long, java.lang.Double, java.lang.Boolean)](
-        (null, null, null, null, null)).toDF("a", "b", "c", "d", "e")
-    checkAnswer(df.na.fill(Map(
-                        "a" -> "test",
-                        "c" -> 1,
-                        "d" -> 2.2,
-                        "e" -> false
-                    )),
+    val df = Seq[(String,
+                  String,
+                  java.lang.Long,
+                  java.lang.Double,
+                  java.lang.Boolean)]((null, null, null, null, null))
+      .toDF("a", "b", "c", "d", "e")
+    checkAnswer(df.na.fill(
+                  Map(
+                    "a" -> "test",
+                    "c" -> 1,
+                    "d" -> 2.2,
+                    "e" -> false
+                  )),
                 Row("test", null, 1, 2.2, false))
 
     // Test Java version
-    checkAnswer(df.na.fill(Map(
-                        "a" -> "test",
-                        "c" -> 1,
-                        "d" -> 2.2,
-                        "e" -> false
-                    ).asJava),
+    checkAnswer(df.na.fill(
+                  Map(
+                    "a" -> "test",
+                    "c" -> 1,
+                    "d" -> 2.2,
+                    "e" -> false
+                  ).asJava),
                 Row("test", null, 1, 2.2, false))
   }
 
@@ -148,9 +161,9 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
     val out = input.na
       .replace(Seq("age", "height"),
                Map(
-                   16 -> 61,
-                   60 -> 6,
-                   164.3 -> 461.3 // Alice is really tall
+                 16 -> 61,
+                 60 -> 6,
+                 164.3 -> 461.3 // Alice is really tall
                ))
       .collect()
 
@@ -165,9 +178,9 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
     val out1 = input.na
       .replace("age",
                Map(
-                   16 -> 61,
-                   60 -> 6,
-                   164.3 -> 461.3 // Alice is really tall
+                 16 -> 61,
+                 60 -> 6,
+                 164.3 -> 461.3 // Alice is really tall
                ))
       .collect()
 

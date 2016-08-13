@@ -14,7 +14,7 @@ trait Types extends Core {
   }
   val Dcl: P0 = {
     P(
-        Pass ~
+      Pass ~
         ((`val` | `var`) ~/ ValVarDef | `def` ~/ FunDef | `type` ~/ TypeDef))
   }
 
@@ -28,7 +28,7 @@ trait Types extends Core {
   // we may need to backtrack and settle for the `*`-postfix rather than
   // an infix type
   val InfixType = P(
-      CompoundType ~~ (NotNewline ~ Id ~~ OneNLMax ~ CompoundType).repX)
+    CompoundType ~~ (NotNewline ~ Id ~~ OneNLMax ~ CompoundType).repX)
 
   val CompoundType = {
     val Refinement = P(OneNLMax ~ `{` ~/ Dcl.repX(sep = Semis) ~ `}`)
@@ -64,7 +64,7 @@ trait Types extends Core {
   }
 
   val Annot: P0 = P(
-      `@` ~/ SimpleType ~ ("(" ~/ (Exprs ~ (`:` ~/ `_*`).?).? ~ ")").rep)
+    `@` ~/ SimpleType ~ ("(" ~/ (Exprs ~ (`:` ~/ `_*`).?).? ~ ")").rep)
 
   val TypeArgList: P0 = {
     val Variant: P0 = P(Annot.rep ~ CharIn("+-").? ~ TypeArg)

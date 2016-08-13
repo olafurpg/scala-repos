@@ -10,8 +10,15 @@ import com.intellij.openapi.ui.{DialogWrapper, Messages}
 import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement}
 import com.intellij.refactoring.move.MoveCallback
 import com.intellij.refactoring.move.moveClassesOrPackages._
-import com.intellij.refactoring.util.{CommonRefactoringUtil, TextOccurrencesUtil}
-import com.intellij.refactoring.{HelpID, JavaRefactoringSettings, MoveDestination}
+import com.intellij.refactoring.util.{
+  CommonRefactoringUtil,
+  TextOccurrencesUtil
+}
+import com.intellij.refactoring.{
+  HelpID,
+  JavaRefactoringSettings,
+  MoveDestination
+}
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
@@ -30,8 +37,8 @@ class ScalaMoveClassesOrPackagesHandler
                       callback: MoveCallback) {
     def refactoringIsNotSupported() {
       Messages.showErrorDialog(
-          ScalaBundle.message("move.to.inner.is.not.supported"),
-          ScalaBundle.message("move.to.inner.is.not.supported.title"))
+        ScalaBundle.message("move.to.inner.is.not.supported"),
+        ScalaBundle.message("move.to.inner.is.not.supported.title"))
     }
     targetContainer match {
       case td: ScTypeDefinition =>
@@ -49,8 +56,8 @@ class ScalaMoveClassesOrPackagesHandler
     }
   }
 
-  override def canMove(
-      elements: Array[PsiElement], targetContainer: PsiElement): Boolean = {
+  override def canMove(elements: Array[PsiElement],
+                       targetContainer: PsiElement): Boolean = {
     //sort of hack to save destinations here, need to be sure that it is called
     val scalaElements =
       elements.filter(_.getLanguage.isInstanceOf[ScalaLanguage])
@@ -71,18 +78,20 @@ class ScalaMoveClassesOrPackagesHandler
 
     import scala.collection.JavaConversions._
     if (!CommonRefactoringUtil.checkReadOnlyStatusRecursively(
-            project, adjustedElements.toSeq, true)) {
+          project,
+          adjustedElements.toSeq,
+          true)) {
       return
     }
     val initialTargetPackageName: String =
-      MoveClassesOrPackagesImpl.getInitialTargetPackageName(
-          initialTargetElement, adjustedElements)
+      MoveClassesOrPackagesImpl
+        .getInitialTargetPackageName(initialTargetElement, adjustedElements)
     val initialTargetDirectory: PsiDirectory =
-      MoveClassesOrPackagesImpl.getInitialTargetDirectory(
-          initialTargetElement, adjustedElements)
+      MoveClassesOrPackagesImpl
+        .getInitialTargetDirectory(initialTargetElement, adjustedElements)
     val isTargetDirectoryFixed: Boolean = initialTargetDirectory == null
     val searchTextOccurences: Boolean = adjustedElements.exists(
-        TextOccurrencesUtil.isSearchTextOccurencesEnabled)
+      TextOccurrencesUtil.isSearchTextOccurencesEnabled)
     val moveDialog: MoveClassesOrPackagesDialog =
       new MoveClassesOrPackagesDialog(project,
                                       searchTextOccurences,
@@ -126,8 +135,9 @@ class ScalaMoveClassesOrPackagesHandler
       @NotNull directory: PsiDirectory,
       elementsToMove: Array[PsiElement],
       moveCallback: MoveCallback): DialogWrapper = {
-    new MoveClassesOrPackagesToNewDirectoryDialog(
-        directory, elementsToMove, moveCallback) {
+    new MoveClassesOrPackagesToNewDirectoryDialog(directory,
+                                                  elementsToMove,
+                                                  moveCallback) {
       protected override def createCenterPanel(): JComponent = {
         addMoveCompanionChb(super.createCenterPanel(), elementsToMove)
       }
@@ -161,13 +171,13 @@ class ScalaMoveClassesOrPackagesHandler
       val result = new JPanel(new BorderLayout())
       if (panel != null) result.add(panel, BorderLayout.NORTH)
       val chbMoveCompanion = new JCheckBox(
-          ScalaBundle.message("move.with.companion"))
+        ScalaBundle.message("move.with.companion"))
       chbMoveCompanion.setSelected(
-          ScalaApplicationSettings.getInstance().MOVE_COMPANION)
-      chbMoveCompanion.addActionListener(
-          new ActionListener {
+        ScalaApplicationSettings.getInstance().MOVE_COMPANION)
+      chbMoveCompanion.addActionListener(new ActionListener {
         def actionPerformed(e: ActionEvent) {
-          ScalaApplicationSettings.getInstance().MOVE_COMPANION = chbMoveCompanion.isSelected
+          ScalaApplicationSettings.getInstance().MOVE_COMPANION =
+            chbMoveCompanion.isSelected
         }
       })
       chbMoveCompanion.setMnemonic('t')

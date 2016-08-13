@@ -31,8 +31,10 @@ private[spark] class StaticMemoryManager(conf: SparkConf,
                                          maxOnHeapExecutionMemory: Long,
                                          override val maxStorageMemory: Long,
                                          numCores: Int)
-    extends MemoryManager(
-        conf, numCores, maxStorageMemory, maxOnHeapExecutionMemory) {
+    extends MemoryManager(conf,
+                          numCores,
+                          maxStorageMemory,
+                          maxOnHeapExecutionMemory) {
 
   def this(conf: SparkConf, numCores: Int) {
     this(conf,
@@ -46,12 +48,12 @@ private[spark] class StaticMemoryManager(conf: SparkConf,
     (maxStorageMemory * conf.getDouble("spark.storage.unrollFraction", 0.2)).toLong
   }
 
-  override def acquireStorageMemory(
-      blockId: BlockId, numBytes: Long): Boolean = synchronized {
+  override def acquireStorageMemory(blockId: BlockId,
+                                    numBytes: Long): Boolean = synchronized {
     if (numBytes > maxStorageMemory) {
       // Fail fast if the block simply won't fit
       logInfo(
-          s"Will not store $blockId as the required space ($numBytes bytes) exceeds our " +
+        s"Will not store $blockId as the required space ($numBytes bytes) exceeds our " +
           s"memory limit ($maxStorageMemory bytes)")
       false
     } else {
@@ -77,7 +79,9 @@ private[spark] class StaticMemoryManager(conf: SparkConf,
     }
 
   private[memory] override def acquireExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Long =
+      numBytes: Long,
+      taskAttemptId: Long,
+      memoryMode: MemoryMode): Long =
     synchronized {
       memoryMode match {
         case MemoryMode.ON_HEAP =>

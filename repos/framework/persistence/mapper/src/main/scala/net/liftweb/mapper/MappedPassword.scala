@@ -115,9 +115,9 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
       case _ if (value.length > 4) =>
         invalidPw = false;
         val bcrypted = BCrypt.hashpw(
-            value,
-            MappedPassword.bcryptStrength.map(BCrypt.gensalt(_)) openOr BCrypt
-              .gensalt())
+          value,
+          MappedPassword.bcryptStrength.map(BCrypt.gensalt(_)) openOr BCrypt
+            .gensalt())
         password.set("b;" + bcrypted.substring(0, 44))
         salt_i.set(bcrypted.substring(44))
       case _ =>
@@ -170,10 +170,9 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
   }
 
   def real_convertToJDBCFriendly(value: String): Object =
-    BCrypt.hashpw(
-        value,
-        MappedPassword.bcryptStrength.map(BCrypt.gensalt(_)) openOr BCrypt
-          .gensalt())
+    BCrypt.hashpw(value,
+                  MappedPassword.bcryptStrength
+                    .map(BCrypt.gensalt(_)) openOr BCrypt.gensalt())
 
   /**
     * Get the JDBC SQL Type for this field
@@ -225,8 +224,8 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     }
   }
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit = {
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit = {
     if (columnName.endsWith("_slt")) {
       { (inst: T, v: Long, isNull: Boolean) =>
         {
@@ -245,8 +244,8 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
       null
     }
   }
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit = {
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit = {
     if (columnName.endsWith("_slt")) {
       { (inst: T, v: String) =>
         {
@@ -265,12 +264,13 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
       null
     }
   }
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit = {
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit = {
     null
   }
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit = {
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit = {
     null
   }
 
@@ -280,30 +280,30 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     if (columnName.endsWith("_slt")) {
       inst match {
         case null => { (inst: T, v: AnyRef) =>
-            {}
-          }
+          {}
+        }
         case _ => { (inst: T, v: AnyRef) =>
-            {
-              val tv =
-                getField(inst, accessor).asInstanceOf[MappedPassword[T]];
-              tv.salt_i() = (if (v == null) null else v.toString);
-              tv.resetDirty
-            }
+          {
+            val tv =
+              getField(inst, accessor).asInstanceOf[MappedPassword[T]];
+            tv.salt_i() = (if (v == null) null else v.toString);
+            tv.resetDirty
           }
+        }
       }
     } else if (columnName.endsWith("_pw")) {
       inst match {
         case null => { (inst: T, v: AnyRef) =>
-            {}
-          }
+          {}
+        }
         case _ => { (inst: T, v: AnyRef) =>
-            {
-              val tv =
-                getField(inst, accessor).asInstanceOf[MappedPassword[T]];
-              tv.password() = (if (v == null) null else v.toString);
-              tv.resetDirty
-            }
+          {
+            val tv =
+              getField(inst, accessor).asInstanceOf[MappedPassword[T]];
+            tv.password() = (if (v == null) null else v.toString);
+            tv.resetDirty
           }
+        }
       }
     } else {
       null
@@ -315,5 +315,5 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     */
   def fieldCreatorString(dbType: DriverType, colName: String): String =
     (if (colName.endsWith("_pw")) colName + " VARCHAR(48)"
-     else colName + " VARCHAR(20)") + notNullAppender()
+    else colName + " VARCHAR(20)") + notNullAppender()
 }

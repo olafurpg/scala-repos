@@ -63,8 +63,9 @@ object StormTestRun {
     InflightTuples.reset()
     try {
       val cluster = new LocalCluster()
-      cluster.submitTopology(
-          "test topology", plannedTopology.config, plannedTopology.topology)
+      cluster.submitTopology("test topology",
+                             plannedTopology.config,
+                             plannedTopology.topology)
       Thread.sleep(4500)
       cluster.killTopology("test topology")
       Thread.sleep(1500)
@@ -81,30 +82,31 @@ object StormTestRun {
     apply(topo)
   }
 
-  def simpleRun[T, K, V : Semigroup](
+  def simpleRun[T, K, V: Semigroup](
       original: List[T],
       mkJob: (Producer[Storm, T],
-      Storm#Store[K, V]) => TailProducer[Storm, Any]): TestStore[K, V] = {
+              Storm#Store[K, V]) => TailProducer[Storm, Any])
+    : TestStore[K, V] = {
 
     implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
 
     val (id, store) = TestStore.createStore[K, V]()
 
     val job = mkJob(
-        Storm.source(TraversableSpout(original)),
-        store
+      Storm.source(TraversableSpout(original)),
+      store
     )
 
     implicit val s = Storm.local(
-        Map(
-            "DEFAULT" -> Options()
-              .set(CacheSize(4))
-              .set(FlushFrequency(Duration.fromMilliseconds(1)))
-          ))
+      Map(
+        "DEFAULT" -> Options()
+          .set(CacheSize(4))
+          .set(FlushFrequency(Duration.fromMilliseconds(1)))
+      ))
 
     apply(job)
     TestStore[K, V](id).getOrElse(
-        sys.error("Error running test, unable to find store at the end"))
+      sys.error("Error running test, unable to find store at the end"))
   }
 
   def apply(plannedTopology: PlannedTopology) {

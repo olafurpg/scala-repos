@@ -39,8 +39,8 @@ class ColorTagger extends WriteEventAdapter {
   val colors = Set("green", "black", "blue")
   override def toJournal(event: Any): Any = event match {
     case s: String ⇒
-      var tags = colors.foldLeft(Set.empty[String])(
-          (acc, c) ⇒ if (s.contains(c)) acc + c else acc)
+      var tags = colors.foldLeft(Set.empty[String])((acc, c) ⇒
+        if (s.contains(c)) acc + c else acc)
       if (tags.isEmpty) event
       else Tagged(event, tags)
     case _ ⇒ event
@@ -50,7 +50,9 @@ class ColorTagger extends WriteEventAdapter {
 }
 
 class EventsByTagSpec
-    extends AkkaSpec(EventsByTagSpec.config) with Cleanup with ImplicitSender {
+    extends AkkaSpec(EventsByTagSpec.config)
+    with Cleanup
+    with ImplicitSender {
 
   implicit val mat = ActorMaterializer()(system)
 

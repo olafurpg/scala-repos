@@ -21,7 +21,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     }
     val title =
       if (withTitle)
-        """data-hint="Rating progression over the last twelve games"""" else ""
+        """data-hint="Rating progression over the last twelve games""""
+      else ""
     val klass = if (withTitle) "progress hint--bottom" else "progress"
     s"""<span $title class="$klass">$span</span>"""
   }
@@ -50,15 +51,15 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                  PerfType.Blitz,
                  PerfType.Classical,
                  PerfType.Correspondence)) ::: best4Of(
-        u,
-        List(PerfType.Crazyhouse,
-             PerfType.Chess960,
-             PerfType.KingOfTheHill,
-             PerfType.ThreeCheck,
-             PerfType.Antichess,
-             PerfType.Atomic,
-             PerfType.Horde,
-             PerfType.RacingKings))
+      u,
+      List(PerfType.Crazyhouse,
+           PerfType.Chess960,
+           PerfType.KingOfTheHill,
+           PerfType.ThreeCheck,
+           PerfType.Antichess,
+           PerfType.Atomic,
+           PerfType.Horde,
+           PerfType.RacingKings))
 
   def showPerfRating(rating: Int,
                      name: String,
@@ -84,8 +85,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                    klass)
 
   def showPerfRating(
-      u: User, perfType: PerfType, klass: String = "hint--bottom")(
-      implicit ctx: Context): Html =
+      u: User,
+      perfType: PerfType,
+      klass: String = "hint--bottom")(implicit ctx: Context): Html =
     showPerfRating(perfType, u perfs perfType, klass)
 
   def showPerfRating(u: User, perfKey: String)(
@@ -270,8 +272,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   private def renderRating(perf: Perf) =
     s"&nbsp;(${perf.intRating}${if (perf.provisional) "?" else ""})"
 
-  private def userRating(
-      user: User, withPerfRating: Option[PerfType], withBestRating: Boolean) =
+  private def userRating(user: User,
+                         withPerfRating: Option[PerfType],
+                         withBestRating: Boolean) =
     withPerfRating match {
       case Some(perfType) => renderRating(user.perfs(perfType))
       case _ if withBestRating =>
@@ -289,9 +292,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                           withOnline: Boolean,
                           withPowerTip: Boolean = true) = {
     "user_link" :: List(
-        cssClass,
-        withPowerTip option "ulpt",
-        withOnline option isOnline(userId).fold("online is-green", "offline")
+      cssClass,
+      withPowerTip option "ulpt",
+      withOnline option isOnline(userId).fold("online is-green", "offline")
     ).flatten
   }.mkString("class=\"", " ", "\"")
 
@@ -299,10 +302,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       implicit ctx: UserContext) =
     splitNumber(userGameFilterTitleNoTag(info, filter))
 
-  def userGameFilterTitleNoTag(
-      info: UserInfo, filter: GameFilter)(implicit ctx: UserContext) =
-    Html(
-        (filter match {
+  def userGameFilterTitleNoTag(info: UserInfo, filter: GameFilter)(
+      implicit ctx: UserContext) =
+    Html((filter match {
       case GameFilter.All => info.user.count.game + " " + trans.gamesPlayed()
       case GameFilter.Me =>
         ctx.me ?? (me => trans.nbGamesWithYou.str(info.nbWithMe))

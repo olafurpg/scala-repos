@@ -61,16 +61,16 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
   /** No-arg constructor for kryo. */
   protected def this() = this(null, false)
 
-  private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+  private[sql] def buildFormattedString(prefix: String,
+                                        builder: StringBuilder): Unit = {
     builder.append(
-        s"$prefix-- element: ${elementType.typeName} (containsNull = $containsNull)\n")
+      s"$prefix-- element: ${elementType.typeName} (containsNull = $containsNull)\n")
     DataType.buildFormattedString(elementType, s"$prefix    |", builder)
   }
 
   override private[sql] def jsonValue =
     ("type" -> typeName) ~ ("elementType" -> elementType.jsonValue) ~
-    ("containsNull" -> containsNull)
+      ("containsNull" -> containsNull)
 
   /**
     * The default size of a value of the ArrayType is 100 * the default size of the element type.
@@ -99,7 +99,7 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
         case s: StructType => s.interpretedOrdering.asInstanceOf[Ordering[Any]]
         case other =>
           throw new IllegalArgumentException(
-              s"Type $other does not support ordered operations")
+            s"Type $other does not support ordered operations")
       }
 
       def compare(x: ArrayData, y: ArrayData): Int = {

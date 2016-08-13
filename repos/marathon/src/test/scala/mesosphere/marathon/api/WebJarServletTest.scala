@@ -2,7 +2,12 @@ package mesosphere.marathon.api
 
 import java.io.ByteArrayOutputStream
 import java.util
-import javax.servlet.{WriteListener, ServletOutputStream, ServletConfig, ServletContext}
+import javax.servlet.{
+  WriteListener,
+  ServletOutputStream,
+  ServletConfig,
+  ServletContext
+}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import mesosphere.marathon.MarathonSpec
@@ -10,7 +15,10 @@ import mesosphere.marathon.test.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class WebJarServletTest
-    extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
 
   test("Get the / will send a redirect") {
     Given("A request response mock")
@@ -22,7 +30,7 @@ class WebJarServletTest
 
     Then("A redirect response is send")
     verify(response, atLeastOnce).setStatus(
-        HttpServletResponse.SC_MOVED_TEMPORARILY)
+      HttpServletResponse.SC_MOVED_TEMPORARILY)
     verify(response, atLeastOnce).setHeader("Location", "ui/")
   }
 
@@ -36,7 +44,7 @@ class WebJarServletTest
 
     Then("A redirect response is send")
     verify(response, atLeastOnce).setStatus(
-        HttpServletResponse.SC_MOVED_TEMPORARILY)
+      HttpServletResponse.SC_MOVED_TEMPORARILY)
     verify(response, atLeastOnce).setHeader("Location", "/some/directory/")
   }
 

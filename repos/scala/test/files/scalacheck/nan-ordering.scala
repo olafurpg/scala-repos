@@ -5,14 +5,14 @@ import Prop._
 object Test extends Properties("NaN-Ordering") {
 
   val specFloats: Gen[Float] = oneOf(
-      Float.MaxValue,
-      Float.MinPositiveValue,
-      Float.MinValue,
-      Float.NaN,
-      Float.NegativeInfinity,
-      Float.PositiveInfinity,
-      -0.0f,
-      +0.0f
+    Float.MaxValue,
+    Float.MinPositiveValue,
+    Float.MinValue,
+    Float.NaN,
+    Float.NegativeInfinity,
+    Float.PositiveInfinity,
+    -0.0f,
+    +0.0f
   )
 
   property("Float min") = forAll(specFloats, specFloats) { (d1, d2) =>
@@ -91,14 +91,14 @@ object Test extends Properties("NaN-Ordering") {
   }
 
   val specDoubles: Gen[Double] = oneOf(
-      Double.MaxValue,
-      Double.MinPositiveValue,
-      Double.MinValue,
-      Double.NaN,
-      Double.NegativeInfinity,
-      Double.PositiveInfinity,
-      -0.0,
-      +0.0
+    Double.MaxValue,
+    Double.MinPositiveValue,
+    Double.MinValue,
+    Double.NaN,
+    Double.NegativeInfinity,
+    Double.PositiveInfinity,
+    -0.0,
+    +0.0
   )
 
   // ticket #5104

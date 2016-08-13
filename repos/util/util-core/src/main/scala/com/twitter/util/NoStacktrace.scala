@@ -8,5 +8,5 @@ trait NoStacktrace extends Exception {
 
 object NoStacktrace {
   val NoStacktraceArray = Array(
-      new StackTraceElement("com.twitter.util", "NoStacktrace", null, -1))
+    new StackTraceElement("com.twitter.util", "NoStacktrace", null, -1))
 }

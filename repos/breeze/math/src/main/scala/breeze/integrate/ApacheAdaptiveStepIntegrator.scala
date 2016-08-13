@@ -1,11 +1,14 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.{AbstractIntegrator, FirstOrderDifferentialEquations}
+import org.apache.commons.math3.ode.{
+  AbstractIntegrator,
+  FirstOrderDifferentialEquations
+}
 import org.apache.commons.math3.ode.nonstiff.AdaptiveStepsizeIntegrator
 
-abstract class ApacheAdaptiveStepIntegrator(
-    relTol: DenseVector[Double] = null, absTol: DenseVector[Double] = null)
+abstract class ApacheAdaptiveStepIntegrator(relTol: DenseVector[Double] = null,
+                                            absTol: DenseVector[Double] = null)
     extends ApacheOdeIntegrator {
 
   type T <: AdaptiveStepsizeIntegrator
@@ -22,10 +25,10 @@ abstract class ApacheAdaptiveStepIntegrator(
     else if (someRelTol.isEmpty)
       (someAbsTol.get.toArray,
        Array.fill(someAbsTol.get.length)(
-           ApacheAdaptiveStepIntegrator.defaultRelTol))
+         ApacheAdaptiveStepIntegrator.defaultRelTol))
     else
       (Array.fill(someRelTol.get.length)(
-           ApacheAdaptiveStepIntegrator.defaultAbsTol),
+         ApacheAdaptiveStepIntegrator.defaultAbsTol),
        someRelTol.get.toArray)
 
   if (!aTol.isEmpty && !rTol.isEmpty)

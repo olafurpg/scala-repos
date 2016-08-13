@@ -31,11 +31,11 @@ class Timer(taskExecutor: ExecutorService,
   private[this] val delayQueue = new DelayQueue[TimerTaskList]()
   private[this] val taskCounter = new AtomicInteger(0)
   private[this] val timingWheel = new TimingWheel(
-      tickMs = tickMs,
-      wheelSize = wheelSize,
-      startMs = startMs,
-      taskCounter = taskCounter,
-      delayQueue
+    tickMs = tickMs,
+    wheelSize = wheelSize,
+    startMs = startMs,
+    taskCounter = taskCounter,
+    delayQueue
   )
 
   // Locks used to protect data structures while ticking

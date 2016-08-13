@@ -1,9 +1,20 @@
 package com.twitter.finagle.http.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.{ChannelClosedException, ClientConnection, Http, ServiceFactory}
+import com.twitter.finagle.{
+  ChannelClosedException,
+  ClientConnection,
+  Http,
+  ServiceFactory
+}
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.http.{Http => HttpCodec, Request, Response, Version, Method}
+import com.twitter.finagle.http.{
+  Http => HttpCodec,
+  Request,
+  Response,
+  Version,
+  Method
+}
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.util.{Await, Throw, Try}
 import java.net.InetSocketAddress
@@ -24,7 +35,8 @@ class ClientTest extends FunSuite {
       .hostConnectionLimit(1)
       .codec(HttpCodec())
 
-    try spec(builder) finally {
+    try spec(builder)
+    finally {
       Await.result(server.close())
     }
   }
@@ -56,7 +68,7 @@ class ClientTest extends FunSuite {
   }
 
   test(
-      "report a closed connection when the server doesn't reply, without retrying") {
+    "report a closed connection when the server doesn't reply, without retrying") {
     withServer(failingFactory) { clientBuilder =>
       counter = 0
       val client = clientBuilder.retries(10).build()

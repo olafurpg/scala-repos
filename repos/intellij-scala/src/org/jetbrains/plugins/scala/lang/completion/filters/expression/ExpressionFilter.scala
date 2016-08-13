@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.parser._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScStableReferenceElementPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * @since 22.05.2008
   */
@@ -25,10 +25,10 @@ class ExpressionFilter extends ElementFilter {
           !parent.getParent.isInstanceOf[ScPostfixExpr] &&
           !parent.getParent.isInstanceOf[ScStableReferenceElementPattern] &&
           (parent.getPrevSibling == null ||
-              parent.getPrevSibling.getPrevSibling == null ||
-              (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
-                  !parent.getPrevSibling.getPrevSibling.getLastChild
-                    .isInstanceOf[PsiErrorElement]))) {
+          parent.getPrevSibling.getPrevSibling == null ||
+          (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
+          !parent.getPrevSibling.getPrevSibling.getLastChild
+            .isInstanceOf[PsiErrorElement]))) {
         return true
       }
     }

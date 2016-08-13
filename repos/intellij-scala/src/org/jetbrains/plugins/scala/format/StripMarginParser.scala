@@ -5,8 +5,15 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions.{Both, childOf}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScMethodCall,
+  ScReferenceExpression
+}
 
 /**
   * Nikolay.Tropin
@@ -38,8 +45,10 @@ object WithStrippedMargin {
 
   def unapply(literal: ScLiteral): Option[(ScExpression, Char)] = {
     literal.getParent match {
-      case MethodRepr(
-          refExpr: ScReferenceExpression, Some(lit: ScLiteral), Some(ref), Nil)
+      case MethodRepr(refExpr: ScReferenceExpression,
+                      Some(lit: ScLiteral),
+                      Some(ref),
+                      Nil)
           if lit.isMultiLineString && ref.refName == STRIP_MARGIN =>
         Some(refExpr, '|')
       case _ childOf(MethodRepr(mc: ScMethodCall,
@@ -47,7 +56,7 @@ object WithStrippedMargin {
                                 Some(ref),
                                 List(argLit: ScLiteral)))
           if lit.isMultiLineString && ref.refName == STRIP_MARGIN &&
-          argLit.getFirstChild.getNode.getElementType == ScalaTokenTypes.tCHAR =>
+            argLit.getFirstChild.getNode.getElementType == ScalaTokenTypes.tCHAR =>
         Some(mc, argLit.getValue.asInstanceOf[Char])
       case _ => None
     }

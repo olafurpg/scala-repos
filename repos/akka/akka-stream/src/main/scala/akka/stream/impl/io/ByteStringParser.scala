@@ -102,7 +102,7 @@ private[akka] object ByteStringParser {
   object FinishedParser extends ParseStep[Nothing] {
     override def parse(reader: ByteReader) =
       throw new IllegalStateException(
-          "no initial parser installed: you must use startWith(...)")
+        "no initial parser installed: you must use startWith(...)")
   }
 
   val NeedMoreData = new Exception with NoStackTrace

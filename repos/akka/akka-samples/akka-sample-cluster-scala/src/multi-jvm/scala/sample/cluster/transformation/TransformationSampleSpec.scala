@@ -41,16 +41,18 @@ object TransformationSampleSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
     """))
 
   nodeConfig(frontend1, frontend2)(
-      ConfigFactory.parseString("akka.cluster.roles =[frontend]"))
+    ConfigFactory.parseString("akka.cluster.roles =[frontend]"))
 
   nodeConfig(backend1, backend2, backend3)(
-      ConfigFactory.parseString("akka.cluster.roles =[backend]"))
+    ConfigFactory.parseString("akka.cluster.roles =[backend]"))
 }
 
 // need one concrete test class per node
@@ -61,8 +63,11 @@ class TransformationSampleSpecMultiJvmNode4 extends TransformationSampleSpec
 class TransformationSampleSpecMultiJvmNode5 extends TransformationSampleSpec
 
 abstract class TransformationSampleSpec
-    extends MultiNodeSpec(TransformationSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(TransformationSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import TransformationSampleSpecConfig._
 

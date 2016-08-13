@@ -10,7 +10,8 @@ import breeze.numerics.{log, round, log1p, expm1}
   * @author dlwh
   */
 case class Logarthmic(p: Double)(implicit rand: RandBasis = Rand)
-    extends DiscreteDistr[Int] with Moments[Double, Double] {
+    extends DiscreteDistr[Int]
+    with Moments[Double, Double] {
   require(p >= 0)
   require(p <= 1)
 

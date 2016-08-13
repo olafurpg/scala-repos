@@ -15,7 +15,11 @@ import slick.dbio._
 import slick.jdbc.meta.{MColumn, MTable}
 import slick.lifted._
 import slick.model.{ForeignKeyAction, Model}
-import slick.relational.{RelationalCapabilities, ResultConverter, RelationalProfile}
+import slick.relational.{
+  RelationalCapabilities,
+  ResultConverter,
+  RelationalProfile
+}
 import slick.basic.Capability
 import slick.util.ConstArray
 import slick.util.MacroSupport.macroSupportInterpolation
@@ -61,8 +65,8 @@ trait OracleProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.foreignKeyActions -
-        JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
-        JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
+      JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
+      JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
@@ -79,8 +83,8 @@ trait OracleProfile extends JdbcProfile {
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
       extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
         override def tpe = meta.sqlType match {
           case 101 => "Double"
@@ -94,8 +98,8 @@ trait OracleProfile extends JdbcProfile {
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
@@ -104,27 +108,28 @@ trait OracleProfile extends JdbcProfile {
     for {
       user <- SimpleJdbcAction(_.session.metaData.getUserName)
       tables <- SQLActionBuilder(
-          Seq("select TABLE_NAME from all_tables where OWNER = ?"),
-          implicitly[SetParameter[String]].applied(user)).as[String]
+                 Seq("select TABLE_NAME from all_tables where OWNER = ?"),
+                 implicitly[SetParameter[String]].applied(user)).as[String]
       mtables <- MTable
-        .getTables(None, None, None, Some(Seq("TABLE")))
-        .map(_.filter(t => tables contains t.name.name)) // FIXME: this should check schema and maybe more
+                  .getTables(None, None, None, Some(Seq("TABLE")))
+                  .map(_.filter(t => tables contains t.name.name)) // FIXME: this should check schema and maybe more
     } yield mtables
   }
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler
-          .addAfter(Phase.removeTakeDrop, Phase.expandSums)
-          .replace(Phase.resolveZipJoinsRownumStyle) -
-        Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
-        new RemoveSubqueryOrdering)
+      .addAfter(Phase.removeTakeDrop, Phase.expandSums)
+      .replace(Phase.resolveZipJoinsRownumStyle) -
+      Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
+      new RemoveSubqueryOrdering)
 
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createSequenceDDLBuilder(
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
@@ -132,21 +137,23 @@ trait OracleProfile extends JdbcProfile {
 
   val blobBufferSize = 4096
 
-  override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.VARCHAR =>
-      val size =
-        sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length])
-      size.fold("VARCHAR2(254)")(l =>
-            if (l.varying) s"VARCHAR2(${l.length})" else s"CHAR(${l.length})")
-    case java.sql.Types.INTEGER => "NUMBER(10)"
-    case java.sql.Types.BIGINT => "NUMBER(19)"
-    case java.sql.Types.SMALLINT => "NUMBER(5)"
-    case java.sql.Types.TINYINT => "NUMBER(3)"
-    case java.sql.Types.DOUBLE => "BINARY_DOUBLE"
-    case java.sql.Types.FLOAT => "BINARY_FLOAT"
-    case _ => super.defaultSqlTypeName(tmd, sym)
-  }
+  override def defaultSqlTypeName(tmd: JdbcType[_],
+                                  sym: Option[FieldSymbol]): String =
+    tmd.sqlType match {
+      case java.sql.Types.VARCHAR =>
+        val size =
+          sym.flatMap(
+            _.findColumnOption[RelationalProfile.ColumnOption.Length])
+        size.fold("VARCHAR2(254)")(l =>
+          if (l.varying) s"VARCHAR2(${l.length})" else s"CHAR(${l.length})")
+      case java.sql.Types.INTEGER => "NUMBER(10)"
+      case java.sql.Types.BIGINT => "NUMBER(19)"
+      case java.sql.Types.SMALLINT => "NUMBER(5)"
+      case java.sql.Types.TINYINT => "NUMBER(3)"
+      case java.sql.Types.DOUBLE => "BINARY_DOUBLE"
+      case java.sql.Types.FLOAT => "BINARY_FLOAT"
+      case _ => super.defaultSqlTypeName(tmd, sym)
+    }
 
   override val scalarFrom = Some("sys.dual")
 
@@ -177,7 +184,7 @@ trait OracleProfile extends JdbcProfile {
         b"\)"
       case Library.==(l, r)
           if (l.nodeType != UnassignedType) &&
-          jdbcTypeFor(l.nodeType).sqlType == Types.BLOB =>
+            jdbcTypeFor(l.nodeType).sqlType == Types.BLOB =>
         b"\(dbms_lob.compare($l, $r) = 0\)"
       case _ => super.expr(c, skipParens)
     }
@@ -201,7 +208,7 @@ trait OracleProfile extends JdbcProfile {
       sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
       addForeignKeyColumnList(fk.linearizedSourceColumns, sb, table.tableName)
       sb append ") references " append quoteIdentifier(
-          fk.targetTable.tableName) append "("
+        fk.targetTable.tableName) append "("
       addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
                               sb,
                               fk.targetTable.tableName)
@@ -223,7 +230,7 @@ trait OracleProfile extends JdbcProfile {
          * CONSTRAINT. */
         val sb =
           new StringBuilder append "ALTER TABLE " append quoteIdentifier(
-              table.tableName) append " ADD "
+            table.tableName) append " ADD "
         sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
         addIndexColumnList(idx.on, sb, idx.table.tableName)
         sb append ")"
@@ -267,15 +274,15 @@ trait OracleProfile extends JdbcProfile {
       else {
         val tab = quoteIdentifier(t.tableName)
         val seq = quoteIdentifier(
-            if (sequenceName eq null) t.tableName + "__" + column.name + "_seq"
-            else sequenceName)
+          if (sequenceName eq null) t.tableName + "__" + column.name + "_seq"
+          else sequenceName)
         val trg = quoteIdentifier(
-            if (triggerName eq null) t.tableName + "__" + column.name + "_trg"
-            else triggerName)
+          if (triggerName eq null) t.tableName + "__" + column.name + "_trg"
+          else triggerName)
         val col = quoteIdentifier(column.name)
         Seq(
-            s"create sequence $seq start with 1 increment by 1",
-            s"create or replace trigger $trg before insert on $tab referencing new as new for each row" +
+          s"create sequence $seq start with 1 increment by 1",
+          s"create or replace trigger $trg before insert on $tab referencing new as new for each row" +
             s" when (new.$col is null) begin select $seq.nextval into :new.$col from sys.dual; end;"
         )
       }
@@ -284,14 +291,14 @@ trait OracleProfile extends JdbcProfile {
       if (!autoIncrement) Nil
       else {
         val seq = quoteIdentifier(
-            if (sequenceName eq null) t.tableName + "__" + column.name + "_seq"
-            else sequenceName)
+          if (sequenceName eq null) t.tableName + "__" + column.name + "_seq"
+          else sequenceName)
         val trg = quoteIdentifier(
-            if (triggerName eq null) t.tableName + "__" + column.name + "_trg"
-            else triggerName)
+          if (triggerName eq null) t.tableName + "__" + column.name + "_trg"
+          else triggerName)
         Seq(
-            s"drop trigger $trg",
-            s"drop sequence $seq"
+          s"drop trigger $trg",
+          s"drop sequence $seq"
         )
       }
   }
@@ -301,7 +308,7 @@ trait OracleProfile extends JdbcProfile {
     override def buildDDL: DDL = {
       val b =
         new StringBuilder append "create sequence " append quoteIdentifier(
-            seq.name)
+          seq.name)
       seq._increment.foreach { b append " increment by " append _ }
       seq._minValue.foreach { b append " minvalue " append _ }
       seq._maxValue.foreach { b append " maxvalue " append _ }
@@ -351,13 +358,13 @@ trait OracleProfile extends JdbcProfile {
       }
       override def updateValue(v: Blob, r: ResultSet, idx: Int) =
         throw new SlickException(
-            "OracleProfile does not support updating Blob values")
+          "OracleProfile does not support updating Blob values")
     }
 
     class ByteArrayJdbcType extends super.ByteArrayJdbcType {
       override def updateValue(v: Array[Byte], r: ResultSet, idx: Int) =
         throw new SlickException(
-            "OracleProfile does not support updating Blob values")
+          "OracleProfile does not support updating Blob values")
     }
 
     class StringJdbcType extends super.StringJdbcType {
@@ -404,14 +411,14 @@ trait OracleProfile extends JdbcProfile {
   class SchemaActionExtensionMethodsImpl(schema: SchemaDescription)
       extends super.SchemaActionExtensionMethodsImpl(schema) {
     override def create: ProfileAction[Unit, NoStream, Effect.Schema] =
-      new SimpleJdbcProfileAction[Unit](
-          "schema.create", schema.createStatements.toVector) {
+      new SimpleJdbcProfileAction[Unit]("schema.create",
+                                        schema.createStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withStatement()(_.execute(s))
       }
     override def drop: ProfileAction[Unit, NoStream, Effect.Schema] =
-      new SimpleJdbcProfileAction[Unit](
-          "schema.drop", schema.dropStatements.toVector) {
+      new SimpleJdbcProfileAction[Unit]("schema.drop",
+                                        schema.dropStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withStatement()(_.execute(s))
       }
@@ -421,8 +428,8 @@ trait OracleProfile extends JdbcProfile {
       ti: JdbcType[T],
       idx: Int): ResultConverter[JdbcResultConverterDomain, Option[T]] =
     if (ti.scalaType == ScalaBaseType.stringType)
-      (new OptionResultConverter[String](
-          ti.asInstanceOf[JdbcType[String]], idx) {
+      (new OptionResultConverter[String](ti.asInstanceOf[JdbcType[String]],
+                                         idx) {
         override def read(pr: ResultSet) = {
           val v = ti.getValue(pr, idx)
           if ((v eq null) || v.length == 0) None else Some(v)

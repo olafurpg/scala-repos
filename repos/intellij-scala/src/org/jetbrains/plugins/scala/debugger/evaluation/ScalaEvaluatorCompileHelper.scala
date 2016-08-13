@@ -12,7 +12,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.Client
-import org.jetbrains.plugins.scala.compiler.{CompileServerLauncher, RemoteServerConnectorBase, RemoteServerRunner, ScalaCompileServerSettings}
+import org.jetbrains.plugins.scala.compiler.{
+  CompileServerLauncher,
+  RemoteServerConnectorBase,
+  RemoteServerRunner,
+  ScalaCompileServerSettings
+}
 import org.jetbrains.plugins.scala.project.ProjectExt
 
 import scala.annotation.tailrec
@@ -24,7 +29,8 @@ import scala.collection.mutable.ListBuffer
   * 2014-10-07
   */
 class ScalaEvaluatorCompileHelper(project: Project)
-    extends AbstractProjectComponent(project) with EvaluatorCompileHelper {
+    extends AbstractProjectComponent(project)
+    with EvaluatorCompileHelper {
 
   private val tempFiles = mutable.Set[File]()
 
@@ -114,8 +120,9 @@ object ScalaEvaluatorCompileHelper {
     project.getComponent(classOf[ScalaEvaluatorCompileHelper])
 }
 
-private class ServerConnector(
-    module: Module, filesToCompile: Seq[File], outputDir: File)
+private class ServerConnector(module: Module,
+                              filesToCompile: Seq[File],
+                              outputDir: File)
     extends RemoteServerConnectorBase(module, filesToCompile, outputDir) {
 
   val errors = ListBuffer[String]()
@@ -138,8 +145,8 @@ private class ServerConnector(
   }
 
   @tailrec
-  private def classfiles(
-      dir: File, namePrefix: String = ""): Array[(File, String)] =
+  private def classfiles(dir: File,
+                         namePrefix: String = ""): Array[(File, String)] =
     dir.listFiles() match {
       case Array(d) if d.isDirectory =>
         classfiles(d, s"$namePrefix${d.getName}.")
@@ -153,10 +160,11 @@ private class ServerConnector(
     val compilationProcess =
       new RemoteServerRunner(project).buildProcess(arguments, client)
     var result: Either[Array[(File, String)], Seq[String]] = Right(
-        Seq("Compilation failed"))
+      Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors)
-      else Left(classfiles(outputDir))
+      result =
+        if (errors.nonEmpty) Right(errors)
+        else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

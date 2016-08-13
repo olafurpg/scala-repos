@@ -108,15 +108,16 @@ trait JQueryArtifacts extends JSArtifacts {
     def toJsCmd = "lift$.formToJSON('" + formId + "')";
   }
 
-  private def toJson(
-      info: AjaxInfo, server: String, path: String => JsExp): String =
+  private def toJson(info: AjaxInfo,
+                     server: String,
+                     path: String => JsExp): String =
     (("url : " + path(server).toJsCmd) :: "data : " + info.data.toJsCmd ::
-        ("type : " + info.action.encJs) ::
+      ("type : " + info.action.encJs) ::
         ("dataType : " + info.dataType.encJs) :: "timeout : " +
-        info.timeout :: "cache : " + info.cache :: Nil) ++ info.successFunc
+          info.timeout :: "cache : " + info.cache :: Nil) ++ info.successFunc
       .map("success : " + _)
       .toList ++ info.failFunc.map("error : " + _).toList mkString
-    ("{ ", ", ", " }")
+      ("{ ", ", ", " }")
 }
 
 case object JQueryArtifacts extends JQueryArtifacts

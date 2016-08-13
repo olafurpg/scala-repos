@@ -10,7 +10,7 @@ trait SymbolTestMacros extends Macro {
   import c.universe._
   val symbols = new IrScalaSymbols[c.universe.type, c.type](c.universe, tools)
 
-  def constructorParamTypes[T : WeakTypeTag]: Seq[String] = {
+  def constructorParamTypes[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.primaryConstructor match {
@@ -22,7 +22,7 @@ trait SymbolTestMacros extends Macro {
     }
   }
 
-  def varTypes[T : WeakTypeTag]: Seq[String] = {
+  def varTypes[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     //System.err.println(s"Vartypes($tpe, ${tpe.key}})")
@@ -34,35 +34,35 @@ trait SymbolTestMacros extends Macro {
     }
   }
 
-  def fieldNames[T : WeakTypeTag]: Seq[String] = {
+  def fieldNames[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.fields.map(_.fieldName)
   }
-  def varNames[T : WeakTypeTag]: Seq[String] = {
+  def varNames[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     val mthds = IrSymbol.allDeclaredMethodIncludingSubclasses(cls)
     mthds.filter(_.isVar).map(_.methodName)
   }
-  def valNames[T : WeakTypeTag]: Seq[String] = {
+  def valNames[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     //System.err.println(s"Checking $tpe members:\n - ${cls.methods.map(x => s"${x}, isVal: ${x.isVal}, isVar: ${x.isVar}, isParam: ${x.isParamAccessor}").mkString("\n - ")}")
     cls.methods.filter(_.isVal).map(_.methodName)
   }
-  def paramNames[T : WeakTypeTag]: Seq[String] = {
+  def paramNames[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.methods.filter(_.isParamAccessor).map(_.methodName)
   }
 
-  def transientFields[T : WeakTypeTag]: Seq[String] = {
+  def transientFields[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.fields.filter(_.isMarkedTransient).map(_.fieldName)
   }
-  def transientVars[T : WeakTypeTag]: Seq[String] = {
+  def transientVars[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.methods.filter { x =>
@@ -74,7 +74,7 @@ trait SymbolTestMacros extends Macro {
     }.map(_.methodName)
   }
 
-  def parentClasses[T : WeakTypeTag]: Seq[String] = {
+  def parentClasses[T: WeakTypeTag]: Seq[String] = {
     val tpe = weakTypeOf[T]
     val cls = symbols.newClass(tpe)
     cls.parentClasses.map(_.tpe[c.universe.type](c.universe).key)
@@ -82,93 +82,93 @@ trait SymbolTestMacros extends Macro {
 }
 
 object Compat {
-  def constructorParamTypes[T]: Seq[String] = macro constructorParamTypes_impl[
-      T]
-  def constructorParamTypes_impl[T : c.WeakTypeTag](
+  def constructorParamTypes[T]: Seq[String] =
+    macro constructorParamTypes_impl[T]
+  def constructorParamTypes_impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.constructorParamTypes[T]})"""
+      q"""Seq[String](..${bundle.constructorParamTypes[T]})"""
     )
   }
   def varTypes[T]: Seq[String] = macro getVarTypes_impl[T]
-  def getVarTypes_impl[T : c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
+  def getVarTypes_impl[T: c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.varTypes[T]})"""
+      q"""Seq[String](..${bundle.varTypes[T]})"""
     )
   }
 
   def parentClassTags[T]: Seq[String] = macro getParentClassTags_impl[T]
-  def getParentClassTags_impl[T : c.WeakTypeTag](
+  def getParentClassTags_impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.parentClasses[T]})"""
+      q"""Seq[String](..${bundle.parentClasses[T]})"""
     )
   }
 
-  def getTransientFieldNames[T]: Seq[String] = macro getTransientFieldNames_Impl[
-      T]
-  def getTransientFieldNames_Impl[T : c.WeakTypeTag](
+  def getTransientFieldNames[T]: Seq[String] =
+    macro getTransientFieldNames_Impl[T]
+  def getTransientFieldNames_Impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.transientFields[T]})"""
+      q"""Seq[String](..${bundle.transientFields[T]})"""
     )
   }
   def getTransientVars[T]: Seq[String] = macro getTransientVars_Impl[T]
-  def getTransientVars_Impl[T : c.WeakTypeTag](
+  def getTransientVars_Impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.transientVars[T]})"""
+      q"""Seq[String](..${bundle.transientVars[T]})"""
     )
   }
   def fieldNames[T]: Seq[String] = macro getFieldNames_Impl[T]
-  def getFieldNames_Impl[T : c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
+  def getFieldNames_Impl[T: c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.fieldNames[T]})"""
+      q"""Seq[String](..${bundle.fieldNames[T]})"""
     )
   }
   def varNames[T]: Seq[String] = macro varNames_impl[T]
-  def varNames_impl[T : c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
+  def varNames_impl[T: c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.varNames[T]})"""
+      q"""Seq[String](..${bundle.varNames[T]})"""
     )
   }
   def valNames[T]: Seq[String] = macro valNames_impl[T]
-  def valNames_impl[T : c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
+  def valNames_impl[T: c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.valNames[T]})"""
+      q"""Seq[String](..${bundle.valNames[T]})"""
     )
   }
   def paramNames[T]: Seq[String] = macro paramNames_impl[T]
-  def paramNames_impl[T : c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
+  def paramNames_impl[T: c.WeakTypeTag](c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with SymbolTestMacros
     import c.universe._
     c.Expr[Seq[String]](
-        q"""Seq[String](..${bundle.paramNames[T]})"""
+      q"""Seq[String](..${bundle.paramNames[T]})"""
     )
   }
 }

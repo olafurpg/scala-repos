@@ -5,7 +5,11 @@
 package akka.http.impl.server
 
 import akka.http.impl.util.JavaMapping
-import akka.http.javadsl.server.values.{PathMatcher, BasicCredentials, OAuth2Credentials}
+import akka.http.javadsl.server.values.{
+  PathMatcher,
+  BasicCredentials,
+  OAuth2Credentials
+}
 import akka.http.scaladsl.model.StatusCodes.Redirection
 import akka.http.scaladsl.server.util.TupleOps.Join
 import scala.language.implicitConversions
@@ -16,7 +20,15 @@ import akka.http.scaladsl.server.directives.{Credentials, ContentTypeResolver}
 import akka.http.scaladsl.server.directives.FileAndResourceDirectives.DirectoryRenderer
 import akka.http.scaladsl.model.HttpHeader
 import akka.http.scaladsl.model.headers.{HttpCookie, CustomHeader}
-import akka.http.scaladsl.server.{Route ⇒ ScalaRoute, Directive ⇒ ScalaDirective, PathMatcher ⇒ ScalaPathMatcher, PathMatcher1, Directive0, Directive1, Directives}
+import akka.http.scaladsl.server.{
+  Route ⇒ ScalaRoute,
+  Directive ⇒ ScalaDirective,
+  PathMatcher ⇒ ScalaPathMatcher,
+  PathMatcher1,
+  Directive0,
+  Directive1,
+  Directives
+}
 import akka.http.impl.util.JavaMapping.Implicits._
 import akka.http.scaladsl.server
 import akka.http.javadsl.server._
@@ -62,7 +74,8 @@ private[http] object ExtractionMap {
   * INTERNAL API
   */
 private[http] object RouteImplementation
-    extends Directives with server.RouteConcatenation {
+    extends Directives
+    with server.RouteConcatenation {
   def apply(route: Route): ScalaRoute = {
     def directiveFor(route: DirectiveRoute): Directive0 = route match {
       case RouteAlternatives() ⇒ ScalaDirective.Empty
@@ -76,17 +89,17 @@ private[http] object RouteImplementation
         pathMatcherDirective[String](elements, pathSuffixTest)
       case RedirectToTrailingSlashIfMissing(code) ⇒
         redirectToTrailingSlashIfMissing(
-            code.asScala.asInstanceOf[Redirection])
+          code.asScala.asInstanceOf[Redirection])
       case RedirectToNoTrailingSlashIfPresent(code) ⇒
         redirectToNoTrailingSlashIfPresent(
-            code.asScala.asInstanceOf[Redirection])
+          code.asScala.asInstanceOf[Redirection])
 
       case MethodFilter(m) ⇒ method(m.asScala)
       case Extract(extractions) ⇒
         extractRequestContext.flatMap { ctx ⇒
           extractions.map { e ⇒
             e.directive.flatMap(
-                addExtraction(e.asInstanceOf[RequestVal[Any]], _))
+              addExtraction(e.asInstanceOf[RequestVal[Any]], _))
           }.reduce(_ & _)
         }
 
@@ -113,7 +126,7 @@ private[http] object RouteImplementation
             .authenticate(javaCreds)
             .toScala
             .map(_.asScala)(
-                akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
         }).flatMap { user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
         }
@@ -170,7 +183,7 @@ private[http] object RouteImplementation
       case SetCookie(cookie) ⇒ setCookie(cookie.asScala)
       case DeleteCookie(name, domain, path) ⇒
         deleteCookie(
-            HttpCookie(name, domain = domain, path = path, value = "deleted"))
+          HttpCookie(name, domain = domain, path = path, value = "deleted"))
     }
 
     route match {
@@ -185,12 +198,11 @@ private[http] object RouteImplementation
       case GetFromDirectory(directory, true, resolver) ⇒
         extractExecutionContext { implicit ec ⇒
           getFromBrowseableDirectory(directory.getPath)(
-              DirectoryRenderer.defaultDirectoryRenderer,
-              scalaResolver(resolver))
+            DirectoryRenderer.defaultDirectoryRenderer,
+            scalaResolver(resolver))
         }
       case FileAndResourceRouteWithDefaultResolver(constructor) ⇒
-        RouteImplementation(
-            constructor(new directives.ContentTypeResolver {
+        RouteImplementation(constructor(new directives.ContentTypeResolver {
           def resolve(fileName: String): ContentType =
             ContentTypeResolver.Default(fileName)
         }))
@@ -203,27 +215,27 @@ private[http] object RouteImplementation
       case dyn: DynamicDirectiveRoute1[t1Type] ⇒
         def runToRoute(t1: t1Type): ScalaRoute =
           apply(
-              dyn
-                .createDirective(t1)
-                .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
+            dyn
+              .createDirective(t1)
+              .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
 
         requestValToDirective(dyn.value1)(runToRoute)
 
       case dyn: DynamicDirectiveRoute2[t1Type, t2Type] ⇒
         def runToRoute(t1: t1Type, t2: t2Type): ScalaRoute =
           apply(
-              dyn
-                .createDirective(t1, t2)
-                .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
+            dyn
+              .createDirective(t1, t2)
+              .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
 
         (requestValToDirective(dyn.value1) & requestValToDirective(
-                dyn.value2))(runToRoute)
+          dyn.value2))(runToRoute)
 
       case o: OpaqueRoute ⇒
         (ctx ⇒
-          o.handle(new RequestContextImpl(ctx))
-            .asInstanceOf[RouteResultImpl]
-            .underlying)
+           o.handle(new RequestContextImpl(ctx))
+             .asInstanceOf[RouteResultImpl]
+             .underlying)
       case p: Product ⇒
         extractExecutionContext { implicit ec ⇒
           complete((500, s"Not implemented: ${p.productPrefix}"))
@@ -233,7 +245,7 @@ private[http] object RouteImplementation
   def pathMatcherDirective[T](
       matchers: immutable.Seq[PathMatcher[_]],
       directive: PathMatcher1[T] ⇒ Directive1[T] // this type is too specific and only a placeholder for a proper polymorphic function
-      ): Directive0 = {
+  ): Directive0 = {
     // Concatenating PathMatchers is a bit complicated as we don't want to build up a tuple
     // but something which we can later split all the separate values and add them to the
     // ExtractionMap.
@@ -254,7 +266,7 @@ private[http] object RouteImplementation
         .transform(_.map(v ⇒ Tuple1(Map(matcher -> v._1))))
     def addExtractions(valMap: T): Directive0 =
       transformExtractionMap(
-          _.addAll(valMap.asInstanceOf[Map[RequestVal[_], Any]]))
+        _.addAll(valMap.asInstanceOf[Map[RequestVal[_], Any]]))
     val reduced: ScalaPathMatcher[ValMap] =
       matchers.map(toScala).reduce(_.~(_)(AddToMapJoin))
     directive(reduced.asInstanceOf[PathMatcher1[T]]).flatMap(addExtractions)

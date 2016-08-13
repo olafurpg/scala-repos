@@ -37,8 +37,8 @@ trait DynamicRuleHandler[P <: Parser, L <: HList]
   * The rule must have type `RuleN[L]`.
   */
 trait DynamicRuleDispatch[P <: Parser, L <: HList] {
-  def apply(
-      handler: DynamicRuleHandler[P, L], ruleName: String): handler.Result
+  def apply(handler: DynamicRuleHandler[P, L],
+            ruleName: String): handler.Result
 }
 
 object DynamicRuleDispatch {
@@ -51,14 +51,14 @@ object DynamicRuleDispatch {
     * does not constitute a method of parser type `P` or has a type different from `RuleN[L]`.
     */
   def apply[P <: Parser, L <: HList](
-      ruleNames: String*): (DynamicRuleDispatch[P, L],
-  immutable.Seq[String]) = macro __create[P, L]
+      ruleNames: String*): (DynamicRuleDispatch[P, L], immutable.Seq[String]) =
+    macro __create[P, L]
 
   ///////////////////// INTERNAL ////////////////////////
 
-  def __create[P <: Parser, L <: HList](
-      c: Context)(ruleNames: c.Expr[String]*)(
-      implicit P: c.WeakTypeTag[P], L: c.WeakTypeTag[L])
+  def __create[P <: Parser, L <: HList](c: Context)(
+      ruleNames: c.Expr[String]*)(implicit P: c.WeakTypeTag[P],
+                                  L: c.WeakTypeTag[L])
     : c.Expr[(DynamicRuleDispatch[P, L], immutable.Seq[String])] = {
     import c.universe._
     val names: Array[String] = ruleNames.map {
@@ -66,8 +66,8 @@ object DynamicRuleDispatch {
         case Literal(Constant(s: String)) ⇒ s
         case x ⇒
           c.abort(
-              x.pos,
-              s"Invalid `String` argument `x`, only `String` literals are supported!")
+            x.pos,
+            s"Invalid `String` argument `x`, only `String` literals are supported!")
       }
     }(collection.breakOut)
     java.util.Arrays.sort(names.asInstanceOf[Array[Object]])

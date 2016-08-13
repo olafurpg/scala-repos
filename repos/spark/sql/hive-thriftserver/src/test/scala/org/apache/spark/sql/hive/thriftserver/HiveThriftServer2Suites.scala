@@ -71,7 +71,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
     val client = new ThriftCLIServiceClient(new Client(protocol))
 
     transport.open()
-    try f(client) finally transport.close()
+    try f(client)
+    finally transport.close()
   }
 
   test("GetInfo Thrift API") {
@@ -102,11 +103,11 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("JDBC query execution") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "SET spark.sql.shuffle.partitions=3",
-          "DROP TABLE IF EXISTS test",
-          "CREATE TABLE test(key INT, val STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
-          "CACHE TABLE test")
+        "SET spark.sql.shuffle.partitions=3",
+        "DROP TABLE IF EXISTS test",
+        "CREATE TABLE test(key INT, val STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
+        "CACHE TABLE test")
 
       queries.foreach(statement.execute)
 
@@ -130,9 +131,9 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-3004 regression: result set containing NULL") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS test_null",
-          "CREATE TABLE test_null(key INT, val STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKvWithNull}' OVERWRITE INTO TABLE test_null")
+        "DROP TABLE IF EXISTS test_null",
+        "CREATE TABLE test_null(key INT, val STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKvWithNull}' OVERWRITE INTO TABLE test_null")
 
       queries.foreach(statement.execute)
 
@@ -152,9 +153,9 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-4292 regression: result set iterator issue") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS test_4292",
-          "CREATE TABLE test_4292(key INT, val STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_4292")
+        "DROP TABLE IF EXISTS test_4292",
+        "CREATE TABLE test_4292(key INT, val STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_4292")
 
       queries.foreach(statement.execute)
 
@@ -172,15 +173,15 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-4309 regression: Date type support") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS test_date",
-          "CREATE TABLE test_date(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_date")
+        "DROP TABLE IF EXISTS test_date",
+        "CREATE TABLE test_date(key INT, value STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_date")
 
       queries.foreach(statement.execute)
 
       assertResult(Date.valueOf("2011-01-01")) {
         val resultSet = statement.executeQuery(
-            "SELECT CAST('2011-01-01' as date) FROM test_date LIMIT 1")
+          "SELECT CAST('2011-01-01' as date) FROM test_date LIMIT 1")
         resultSet.next()
         resultSet.getDate(1)
       }
@@ -190,22 +191,22 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-4407 regression: Complex type support") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS test_map",
-          "CREATE TABLE test_map(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
+        "DROP TABLE IF EXISTS test_map",
+        "CREATE TABLE test_map(key INT, value STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
 
       queries.foreach(statement.execute)
 
       assertResult("""{238:"val_238"}""") {
         val resultSet = statement.executeQuery(
-            "SELECT MAP(key, value) FROM test_map LIMIT 1")
+          "SELECT MAP(key, value) FROM test_map LIMIT 1")
         resultSet.next()
         resultSet.getString(1)
       }
 
       assertResult("""["238","val_238"]""") {
         val resultSet = statement.executeQuery(
-            "SELECT ARRAY(CAST(key AS STRING), value) FROM test_map LIMIT 1")
+          "SELECT ARRAY(CAST(key AS STRING), value) FROM test_map LIMIT 1")
         resultSet.next()
         resultSet.getString(1)
       }
@@ -219,139 +220,138 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
     var data: ArrayBuffer[Int] = null
 
     withMultipleConnectionJdbcStatement(
-        // create table
-        { statement =>
-          val queries = Seq(
-              "DROP TABLE IF EXISTS test_map",
-              "CREATE TABLE test_map(key INT, value STRING)",
-              s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map",
-              "CACHE TABLE test_table AS SELECT key FROM test_map ORDER BY key DESC",
-              "CREATE DATABASE db1")
+      // create table
+      { statement =>
+        val queries = Seq(
+          "DROP TABLE IF EXISTS test_map",
+          "CREATE TABLE test_map(key INT, value STRING)",
+          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map",
+          "CACHE TABLE test_table AS SELECT key FROM test_map ORDER BY key DESC",
+          "CREATE DATABASE db1")
 
-          queries.foreach(statement.execute)
+        queries.foreach(statement.execute)
 
-          val plan = statement.executeQuery("explain select * from test_table")
-          plan.next()
-          plan.next()
-          assert(plan.getString(1).contains("InMemoryColumnarTableScan"))
+        val plan = statement.executeQuery("explain select * from test_table")
+        plan.next()
+        plan.next()
+        assert(plan.getString(1).contains("InMemoryColumnarTableScan"))
 
-          val rs1 = statement.executeQuery(
-              "SELECT key FROM test_table ORDER BY KEY DESC")
-          val buf1 = new collection.mutable.ArrayBuffer[Int]()
-          while (rs1.next()) {
-            buf1 += rs1.getInt(1)
-          }
-          rs1.close()
-
-          val rs2 = statement.executeQuery(
-              "SELECT key FROM test_map ORDER BY KEY DESC")
-          val buf2 = new collection.mutable.ArrayBuffer[Int]()
-          while (rs2.next()) {
-            buf2 += rs2.getInt(1)
-          }
-          rs2.close()
-
-          assert(buf1 === buf2)
-
-          data = buf1
-        },
-        // first session, we get the default value of the session status
-        { statement =>
-          val rs1 =
-            statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
-          rs1.next()
-          defaultV1 = rs1.getString(1)
-          assert(defaultV1 != "200")
-          rs1.close()
-
-          val rs2 = statement.executeQuery("SET hive.cli.print.header")
-          rs2.next()
-
-          defaultV2 = rs2.getString(1)
-          assert(defaultV1 != "true")
-          rs2.close()
-        },
-        // second session, we update the session status
-        { statement =>
-          val queries = Seq(
-              s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}=291",
-              "SET hive.cli.print.header=true"
-          )
-
-          queries.map(statement.execute)
-          val rs1 =
-            statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
-          rs1.next()
-          assert("spark.sql.shuffle.partitions" === rs1.getString(1))
-          assert("291" === rs1.getString(2))
-          rs1.close()
-
-          val rs2 = statement.executeQuery("SET hive.cli.print.header")
-          rs2.next()
-          assert("hive.cli.print.header" === rs2.getString(1))
-          assert("true" === rs2.getString(2))
-          rs2.close()
-        },
-        // third session, we get the latest session status, supposed to be the
-        // default value
-        { statement =>
-          val rs1 =
-            statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
-          rs1.next()
-          assert(defaultV1 === rs1.getString(1))
-          rs1.close()
-
-          val rs2 = statement.executeQuery("SET hive.cli.print.header")
-          rs2.next()
-          assert(defaultV2 === rs2.getString(1))
-          rs2.close()
-        },
-        // try to access the cached data in another session
-        { statement =>
-          // Cached temporary table can't be accessed by other sessions
-          intercept[SQLException] {
-            statement.executeQuery(
-                "SELECT key FROM test_table ORDER BY KEY DESC")
-          }
-
-          val plan = statement.executeQuery(
-              "explain select key from test_map ORDER BY key DESC")
-          plan.next()
-          plan.next()
-          assert(plan.getString(1).contains("InMemoryColumnarTableScan"))
-
-          val rs = statement.executeQuery(
-              "SELECT key FROM test_map ORDER BY KEY DESC")
-          val buf = new collection.mutable.ArrayBuffer[Int]()
-          while (rs.next()) {
-            buf += rs.getInt(1)
-          }
-          rs.close()
-          assert(buf === data)
-        },
-        // switch another database
-        { statement =>
-          statement.execute("USE db1")
-
-          // there is no test_map table in db1
-          intercept[SQLException] {
-            statement.executeQuery(
-                "SELECT key FROM test_map ORDER BY KEY DESC")
-          }
-
-          statement.execute("CREATE TABLE test_map2(key INT, value STRING)")
-        },
-        // access default database
-        { statement =>
-          // current database should still be `default`
-          intercept[SQLException] {
-            statement.executeQuery("SELECT key FROM test_map2")
-          }
-
-          statement.execute("USE db1")
-          // access test_map2
-          statement.executeQuery("SELECT key from test_map2")
+        val rs1 = statement.executeQuery(
+          "SELECT key FROM test_table ORDER BY KEY DESC")
+        val buf1 = new collection.mutable.ArrayBuffer[Int]()
+        while (rs1.next()) {
+          buf1 += rs1.getInt(1)
         }
+        rs1.close()
+
+        val rs2 =
+          statement.executeQuery("SELECT key FROM test_map ORDER BY KEY DESC")
+        val buf2 = new collection.mutable.ArrayBuffer[Int]()
+        while (rs2.next()) {
+          buf2 += rs2.getInt(1)
+        }
+        rs2.close()
+
+        assert(buf1 === buf2)
+
+        data = buf1
+      },
+      // first session, we get the default value of the session status
+      { statement =>
+        val rs1 =
+          statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
+        rs1.next()
+        defaultV1 = rs1.getString(1)
+        assert(defaultV1 != "200")
+        rs1.close()
+
+        val rs2 = statement.executeQuery("SET hive.cli.print.header")
+        rs2.next()
+
+        defaultV2 = rs2.getString(1)
+        assert(defaultV1 != "true")
+        rs2.close()
+      },
+      // second session, we update the session status
+      { statement =>
+        val queries = Seq(
+          s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}=291",
+          "SET hive.cli.print.header=true"
+        )
+
+        queries.map(statement.execute)
+        val rs1 =
+          statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
+        rs1.next()
+        assert("spark.sql.shuffle.partitions" === rs1.getString(1))
+        assert("291" === rs1.getString(2))
+        rs1.close()
+
+        val rs2 = statement.executeQuery("SET hive.cli.print.header")
+        rs2.next()
+        assert("hive.cli.print.header" === rs2.getString(1))
+        assert("true" === rs2.getString(2))
+        rs2.close()
+      },
+      // third session, we get the latest session status, supposed to be the
+      // default value
+      { statement =>
+        val rs1 =
+          statement.executeQuery(s"SET ${SQLConf.SHUFFLE_PARTITIONS.key}")
+        rs1.next()
+        assert(defaultV1 === rs1.getString(1))
+        rs1.close()
+
+        val rs2 = statement.executeQuery("SET hive.cli.print.header")
+        rs2.next()
+        assert(defaultV2 === rs2.getString(1))
+        rs2.close()
+      },
+      // try to access the cached data in another session
+      { statement =>
+        // Cached temporary table can't be accessed by other sessions
+        intercept[SQLException] {
+          statement.executeQuery(
+            "SELECT key FROM test_table ORDER BY KEY DESC")
+        }
+
+        val plan = statement.executeQuery(
+          "explain select key from test_map ORDER BY key DESC")
+        plan.next()
+        plan.next()
+        assert(plan.getString(1).contains("InMemoryColumnarTableScan"))
+
+        val rs =
+          statement.executeQuery("SELECT key FROM test_map ORDER BY KEY DESC")
+        val buf = new collection.mutable.ArrayBuffer[Int]()
+        while (rs.next()) {
+          buf += rs.getInt(1)
+        }
+        rs.close()
+        assert(buf === data)
+      },
+      // switch another database
+      { statement =>
+        statement.execute("USE db1")
+
+        // there is no test_map table in db1
+        intercept[SQLException] {
+          statement.executeQuery("SELECT key FROM test_map ORDER BY KEY DESC")
+        }
+
+        statement.execute("CREATE TABLE test_map2(key INT, value STRING)")
+      },
+      // access default database
+      { statement =>
+        // current database should still be `default`
+        intercept[SQLException] {
+          statement.executeQuery("SELECT key FROM test_map2")
+        }
+
+        statement.execute("USE db1")
+        // access test_map2
+        statement.executeQuery("SELECT key from test_map2")
+      }
     )
   }
 
@@ -360,18 +360,19 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   ignore("test jdbc cancel") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS test_map",
-          "CREATE TABLE test_map(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
+        "DROP TABLE IF EXISTS test_map",
+        "CREATE TABLE test_map(key INT, value STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
 
       queries.foreach(statement.execute)
       implicit val ec = ExecutionContext.fromExecutorService(
-          ThreadUtils.newDaemonSingleThreadExecutor("test-jdbc-cancel"))
+        ThreadUtils.newDaemonSingleThreadExecutor("test-jdbc-cancel"))
       try {
         // Start a very-long-running query that will take hours to finish, then cancel it in order
         // to demonstrate that cancellation works.
         val f = Future {
-          statement.executeQuery("SELECT COUNT(*) FROM test_map " +
+          statement.executeQuery(
+            "SELECT COUNT(*) FROM test_map " +
               List.fill(10)("join test_map").mkString(" "))
         }
         // Note that this is slightly race-prone: if the cancel is issued before the statement
@@ -389,7 +390,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         try {
           val sf = Future {
             statement.executeQuery(
-                "SELECT COUNT(*) FROM test_map " +
+              "SELECT COUNT(*) FROM test_map " +
                 List.fill(4)("join test_map").mkString(" ")
             )
           }
@@ -424,17 +425,18 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       statement.executeQuery(s"ADD JAR $jarFile")
     }, { statement =>
       val queries = Seq(
-          "DROP TABLE IF EXISTS smallKV",
-          "CREATE TABLE smallKV(key INT, val STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE smallKV",
-          "DROP TABLE IF EXISTS addJar",
-          """CREATE TABLE addJar(key string)
+        "DROP TABLE IF EXISTS smallKV",
+        "CREATE TABLE smallKV(key INT, val STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE smallKV",
+        "DROP TABLE IF EXISTS addJar",
+        """CREATE TABLE addJar(key string)
               |ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
             """.stripMargin)
 
       queries.foreach(statement.execute)
 
-      statement.executeQuery("""
+      statement.executeQuery(
+        """
               |INSERT INTO TABLE addJar SELECT 'k1' as key FROM smallKV limit 1
             """.stripMargin)
 
@@ -491,8 +493,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val jarURL = s"file://${System.getProperty("user.dir")}/$jarPath"
 
       Seq(
-          s"ADD JAR $jarURL",
-          s"""CREATE TEMPORARY FUNCTION udtf_count2
+        s"ADD JAR $jarURL",
+        s"""CREATE TEMPORARY FUNCTION udtf_count2
            |AS 'org.apache.spark.sql.hive.execution.GenericUDTFCount2'
          """.stripMargin
       ).foreach(statement.execute)
@@ -504,7 +506,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
 
       assert(rs1.next())
       assertResult(
-          "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
+        "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
         rs1.getString(1)
       }
 
@@ -514,12 +516,12 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val dataPath = "../hive/src/test/resources/data/files/kv1.txt"
 
       Seq(
-          s"CREATE TABLE test_udtf(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '$dataPath' OVERWRITE INTO TABLE test_udtf"
+        s"CREATE TABLE test_udtf(key INT, value STRING)",
+        s"LOAD DATA LOCAL INPATH '$dataPath' OVERWRITE INTO TABLE test_udtf"
       ).foreach(statement.execute)
 
       val rs2 = statement.executeQuery(
-          "SELECT key, cc FROM test_udtf LATERAL VIEW udtf_count2(value) dd AS cc")
+        "SELECT key, cc FROM test_udtf LATERAL VIEW udtf_count2(value) dd AS cc")
 
       assert(rs2.next())
       assert(rs2.getInt(1) === 97)
@@ -534,9 +536,9 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   test("SPARK-11043 check operation log root directory") {
     val expectedLine =
       "Operation log root directory is created: " +
-      operationLogPath.getAbsoluteFile
+        operationLogPath.getAbsoluteFile
     assert(
-        Source.fromFile(logPath).getLines().exists(_.contains(expectedLine)))
+      Source.fromFile(logPath).getLines().exists(_.contains(expectedLine)))
   }
 }
 
@@ -554,9 +556,9 @@ class SingleSessionSuite extends HiveThriftJdbcTest {
       // Configurations and temporary functions added in this session should be visible to all
       // the other sessions.
       Seq(
-          "SET foo=bar",
-          s"ADD JAR $jarURL",
-          s"""CREATE TEMPORARY FUNCTION udtf_count2
+        "SET foo=bar",
+        s"ADD JAR $jarURL",
+        s"""CREATE TEMPORARY FUNCTION udtf_count2
               |AS 'org.apache.spark.sql.hive.execution.GenericUDTFCount2'
            """.stripMargin
       ).foreach(statement.execute)
@@ -574,7 +576,7 @@ class SingleSessionSuite extends HiveThriftJdbcTest {
 
       assert(rs2.next())
       assertResult(
-          "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
+        "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
         rs2.getString(1)
       }
 
@@ -590,11 +592,11 @@ class HiveThriftHttpServerSuite extends HiveThriftJdbcTest {
   test("JDBC query execution") {
     withJdbcStatement { statement =>
       val queries = Seq(
-          "SET spark.sql.shuffle.partitions=3",
-          "DROP TABLE IF EXISTS test",
-          "CREATE TABLE test(key INT, val STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
-          "CACHE TABLE test")
+        "SET spark.sql.shuffle.partitions=3",
+        "DROP TABLE IF EXISTS test",
+        "CREATE TABLE test(key INT, val STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
+        "CACHE TABLE test")
 
       queries.foreach(statement.execute)
 
@@ -655,7 +657,9 @@ abstract class HiveThriftJdbcTest extends HiveThriftServer2Test {
 }
 
 abstract class HiveThriftServer2Test
-    extends SparkFunSuite with BeforeAndAfterAll with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Logging {
   def mode: ServerMode.Value
 
   private val CLASS_NAME =
@@ -699,14 +703,14 @@ abstract class HiveThriftServer2Test
       val tempLog4jConf = Utils.createTempDir().getCanonicalPath
 
       Files.write(
-          """log4j.rootCategory=DEBUG, console
+        """log4j.rootCategory=DEBUG, console
           |log4j.appender.console=org.apache.log4j.ConsoleAppender
           |log4j.appender.console.target=System.err
           |log4j.appender.console.layout=org.apache.log4j.PatternLayout
           |log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
         """.stripMargin,
-          new File(s"$tempLog4jConf/log4j.properties"),
-          StandardCharsets.UTF_8)
+        new File(s"$tempLog4jConf/log4j.properties"),
+        StandardCharsets.UTF_8)
 
       tempLog4jConf
     }
@@ -760,18 +764,18 @@ abstract class HiveThriftServer2Test
        """.stripMargin.split("\n")
 
     logInfo(
-        s"Trying to start HiveThriftServer2: port=$port, mode=$mode, attempt=$attempt")
+      s"Trying to start HiveThriftServer2: port=$port, mode=$mode, attempt=$attempt")
 
     logPath = {
       val lines = Utils.executeAndGetOutput(
-          command = command,
-          extraEnvironment = Map(
-                                 // Disables SPARK_TESTING to exclude log4j.properties in test directories.
-                                 "SPARK_TESTING" -> "0",
-                                 // Points SPARK_PID_DIR to SPARK_HOME, otherwise only 1 Thrift server instance can be
-                                 // started at a time, which is not Jenkins friendly.
-                                 "SPARK_PID_DIR" -> pidDir.getCanonicalPath),
-          redirectStderr = true)
+        command = command,
+        extraEnvironment = Map(
+                               // Disables SPARK_TESTING to exclude log4j.properties in test directories.
+                               "SPARK_TESTING" -> "0",
+                               // Points SPARK_PID_DIR to SPARK_HOME, otherwise only 1 Thrift server instance can be
+                               // started at a time, which is not Jenkins friendly.
+                               "SPARK_PID_DIR" -> pidDir.getCanonicalPath),
+        redirectStderr = true)
 
       lines
         .split("\n")
@@ -781,7 +785,7 @@ abstract class HiveThriftServer2Test
         }
         .getOrElse {
           throw new RuntimeException(
-              "Failed to find HiveThriftServer2 log file.")
+            "Failed to find HiveThriftServer2 log file.")
         }
     }
 
@@ -789,8 +793,8 @@ abstract class HiveThriftServer2Test
 
     // Ensures that the following "tail" command won't fail.
     logPath.createNewFile()
-    val successLines = Seq(
-        THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
+    val successLines =
+      Seq(THRIFT_BINARY_SERVICE_LIVE, THRIFT_HTTP_SERVICE_LIVE)
 
     logTailingProcess = {
       val command =
@@ -821,8 +825,8 @@ abstract class HiveThriftServer2Test
   private def stopThriftServer(): Unit = {
     // The `spark-daemon.sh' script uses kill, which is not synchronous, have to wait for a while.
     Utils.executeAndGetOutput(
-        command = Seq(stopScript),
-        extraEnvironment = Map("SPARK_PID_DIR" -> pidDir.getCanonicalPath))
+      command = Seq(stopScript),
+      extraEnvironment = Map("SPARK_PID_DIR" -> pidDir.getCanonicalPath))
     Thread.sleep(3.seconds.toMillis)
 
     warehousePath.delete()

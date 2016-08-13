@@ -31,7 +31,7 @@ object Test extends ScaladocModelTest {
     val boo = rootPackage._package("a")._trait("Boo")
     val conversions =
       boo._conversions("a.Boo.BooShouldNotAppearIsFoo") ++ boo._conversions(
-          "a.Boo.BooLongIsFoo")
+        "a.Boo.BooLongIsFoo")
     assert(conversions.length == 1, conversions.length + " == 1")
 
     // Assert that the implicit conversion is not "BooShouldNotAppearIsFoo"

@@ -44,7 +44,8 @@ trait RangeDirectives {
         def length = end - start
         def apply(entity: UniversalEntity): UniversalEntity =
           entity.transformDataBytes(
-              length, StreamUtils.sliceBytesTransformer(start, length))
+            length,
+            StreamUtils.sliceBytesTransformer(start, length))
         def distance(other: IndexRange) =
           mergedEnd(other) - mergedStart(other) - (length + other.length)
         def mergeWith(other: IndexRange) =
@@ -63,8 +64,8 @@ trait RangeDirectives {
           case ByteRange.FromOffset(first) ⇒
             new IndexRange(first, entityLength)
           case ByteRange.Suffix(suffixLength) ⇒
-            new IndexRange(
-                math.max(0, entityLength - suffixLength), entityLength)
+            new IndexRange(math.max(0, entityLength - suffixLength),
+                           entityLength)
         }
 
       // See comment of the `range-coalescing-threshold` setting in `reference.conf` for the rationale of this behavior.
@@ -94,8 +95,8 @@ trait RangeDirectives {
               StreamUtils.sliceBytesTransformer(range.start, range.length)
             val bytes = entity.dataBytes.via(flow)
             val part = Multipart.ByteRanges.BodyPart(
-                range.contentRange(length),
-                HttpEntity(entity.contentType, range.length, bytes))
+              range.contentRange(length),
+              HttpEntity(entity.contentType, range.length, bytes))
             Source.single(part)
           case n ⇒
             Source fromGraph GraphDSL.create() { implicit b ⇒
@@ -111,8 +112,8 @@ trait RangeDirectives {
                   .map {
                     case (_, bytes) ⇒
                       Multipart.ByteRanges.BodyPart(
-                          range.contentRange(length),
-                          HttpEntity(entity.contentType, range.length, bytes))
+                        range.contentRange(length),
+                        HttpEntity(entity.contentType, range.length, bytes))
                   } ~> merge
               }
               entity.dataBytes ~> bcast
@@ -155,13 +156,16 @@ trait RangeDirectives {
                     case Nil ⇒
                       ctx.reject(UnsatisfiableRangeRejection(ranges, length))
                     case Seq(satisfiableRange) ⇒
-                      ctx.complete(rangeResponse(
-                              satisfiableRange, entity, length, headers))
+                      ctx.complete(
+                        rangeResponse(satisfiableRange,
+                                      entity,
+                                      length,
+                                      headers))
                     case satisfiableRanges ⇒
                       ctx.complete(
-                          (PartialContent,
-                           headers,
-                           multipartRanges(satisfiableRanges, entity)))
+                        (PartialContent,
+                         headers,
+                         multipartRanges(satisfiableRanges, entity)))
                   }
                 case None ⇒
                   // Ranges not supported for Chunked or CloseDelimited responses

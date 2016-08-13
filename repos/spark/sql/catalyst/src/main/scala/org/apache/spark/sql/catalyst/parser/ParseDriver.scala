@@ -167,8 +167,9 @@ private[parser] class ParseErrorReporter {
     val b = new StringBuilder
     b.append(msg).append("\n")
     errors.foreach(error => error.buildMessage(b).append("\n"))
-    throw new AnalysisException(
-        b.toString, Option(line), Option(startPosition))
+    throw new AnalysisException(b.toString,
+                                Option(line),
+                                Option(startPosition))
   }
 }
 

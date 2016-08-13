@@ -26,14 +26,20 @@ import org.apache.spark.TaskState.TaskState
 import org.apache.spark.executor.{Executor, ExecutorBackend}
 import org.apache.spark.internal.Logging
 import org.apache.spark.launcher.{LauncherBackend, SparkAppHandle}
-import org.apache.spark.rpc.{RpcCallContext, RpcEndpointRef, RpcEnv, ThreadSafeRpcEndpoint}
+import org.apache.spark.rpc.{
+  RpcCallContext,
+  RpcEndpointRef,
+  RpcEnv,
+  ThreadSafeRpcEndpoint
+}
 import org.apache.spark.scheduler._
 import org.apache.spark.scheduler.cluster.ExecutorInfo
 
 private case class ReviveOffers()
 
-private case class StatusUpdate(
-    taskId: Long, state: TaskState, serializedData: ByteBuffer)
+private case class StatusUpdate(taskId: Long,
+                                state: TaskState,
+                                serializedData: ByteBuffer)
 
 private case class KillTask(taskId: Long, interruptThread: Boolean)
 
@@ -49,7 +55,8 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
                                    scheduler: TaskSchedulerImpl,
                                    executorBackend: LocalBackend,
                                    private val totalCores: Int)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   private var freeCores = totalCores
 
@@ -86,7 +93,7 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
 
   def reviveOffers() {
     val offers = Seq(
-        new WorkerOffer(localExecutorId, localExecutorHostname, freeCores))
+      new WorkerOffer(localExecutorId, localExecutorHostname, freeCores))
     for (task <- scheduler.resourceOffers(offers).flatten) {
       freeCores -= scheduler.CPUS_PER_TASK
       executor.launchTask(executorBackend,
@@ -103,9 +110,12 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
   * master all run in the same JVM. It sits behind a TaskSchedulerImpl and handles launching tasks
   * on a single Executor (created by the LocalBackend) running locally.
   */
-private[spark] class LocalBackend(
-    conf: SparkConf, scheduler: TaskSchedulerImpl, val totalCores: Int)
-    extends SchedulerBackend with ExecutorBackend with Logging {
+private[spark] class LocalBackend(conf: SparkConf,
+                                  scheduler: TaskSchedulerImpl,
+                                  val totalCores: Int)
+    extends SchedulerBackend
+    with ExecutorBackend
+    with Logging {
 
   private val appId = "local-" + System.currentTimeMillis
   private var localEndpoint: RpcEndpointRef = null
@@ -133,17 +143,17 @@ private[spark] class LocalBackend(
 
   override def start() {
     val rpcEnv = SparkEnv.get.rpcEnv
-    val executorEndpoint = new LocalEndpoint(
-        rpcEnv, userClassPath, scheduler, this, totalCores)
-    localEndpoint = rpcEnv.setupEndpoint(
-        "LocalBackendEndpoint", executorEndpoint)
+    val executorEndpoint =
+      new LocalEndpoint(rpcEnv, userClassPath, scheduler, this, totalCores)
+    localEndpoint =
+      rpcEnv.setupEndpoint("LocalBackendEndpoint", executorEndpoint)
     listenerBus.post(
-        SparkListenerExecutorAdded(
-            System.currentTimeMillis,
-            executorEndpoint.localExecutorId,
-            new ExecutorInfo(executorEndpoint.localExecutorHostname,
-                             totalCores,
-                             Map.empty)))
+      SparkListenerExecutorAdded(
+        System.currentTimeMillis,
+        executorEndpoint.localExecutorId,
+        new ExecutorInfo(executorEndpoint.localExecutorHostname,
+                         totalCores,
+                         Map.empty)))
     launcherBackend.setAppId(appId)
     launcherBackend.setState(SparkAppHandle.State.RUNNING)
   }
@@ -159,13 +169,15 @@ private[spark] class LocalBackend(
   override def defaultParallelism(): Int =
     scheduler.conf.getInt("spark.default.parallelism", totalCores)
 
-  override def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean) {
+  override def killTask(taskId: Long,
+                        executorId: String,
+                        interruptThread: Boolean) {
     localEndpoint.send(KillTask(taskId, interruptThread))
   }
 
-  override def statusUpdate(
-      taskId: Long, state: TaskState, serializedData: ByteBuffer) {
+  override def statusUpdate(taskId: Long,
+                            state: TaskState,
+                            serializedData: ByteBuffer) {
     localEndpoint.send(StatusUpdate(taskId, state, serializedData))
   }
 

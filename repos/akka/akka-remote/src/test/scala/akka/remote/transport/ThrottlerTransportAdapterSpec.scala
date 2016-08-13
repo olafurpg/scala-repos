@@ -15,7 +15,7 @@ import akka.remote.EndpointException
 object ThrottlerTransportAdapterSpec {
   val configA: Config =
     ConfigFactory parseString
-    ("""
+      ("""
     akka {
       actor.provider = "akka.remote.RemoteActorRefProvider"
 
@@ -69,34 +69,36 @@ object ThrottlerTransportAdapterSpec {
 }
 
 class ThrottlerTransportAdapterSpec
-    extends AkkaSpec(configA) with ImplicitSender with DefaultTimeout {
+    extends AkkaSpec(configA)
+    with ImplicitSender
+    with DefaultTimeout {
 
   val systemB = ActorSystem("systemB", system.settings.config)
   val remote = systemB.actorOf(Props[Echo], "echo")
 
   val rootB = RootActorPath(
-      systemB.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress)
+    systemB.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress)
   val here = {
     system.actorSelection(rootB / "user" / "echo") ! Identify(None)
     expectMsgType[ActorIdentity].ref.get
   }
 
   def throttle(direction: Direction, mode: ThrottleMode): Boolean = {
-    val rootBAddress = Address(
-        "akka", "systemB", "localhost", rootB.address.port.get)
+    val rootBAddress =
+      Address("akka", "systemB", "localhost", rootB.address.port.get)
     val transport = system
       .asInstanceOf[ExtendedActorSystem]
       .provider
       .asInstanceOf[RemoteActorRefProvider]
       .transport
-    Await.result(transport.managementCommand(
-                     SetThrottle(rootBAddress, direction, mode)),
-                 3.seconds)
+    Await.result(
+      transport.managementCommand(SetThrottle(rootBAddress, direction, mode)),
+      3.seconds)
   }
 
   def disassociate(): Boolean = {
-    val rootBAddress = Address(
-        "akka", "systemB", "localhost", rootB.address.port.get)
+    val rootBAddress =
+      Address("akka", "systemB", "localhost", rootB.address.port.get)
     val transport = system
       .asInstanceOf[ExtendedActorSystem]
       .provider
@@ -156,18 +158,17 @@ class ThrottlerTransportAdapterSpec
 
   override def beforeTermination() {
     system.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter.warning(
-                source = "akka://AkkaProtocolStressTest/user/$a",
-                start = "received dead letter"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a",
+                            start = "received dead letter"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter[EndpointException](),
-            EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter[EndpointException](),
+        EventFilter.error(start = "AssociationError"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)
@@ -179,6 +180,6 @@ class ThrottlerTransportAdapterGenericSpec
   def transportName = "ThrottlerTransportAdapter"
   def schemeIdentifier = "akka.trttl"
   def freshTransport(testTransport: TestTransport) =
-    new ThrottlerTransportAdapter(
-        testTransport, system.asInstanceOf[ExtendedActorSystem])
+    new ThrottlerTransportAdapter(testTransport,
+                                  system.asInstanceOf[ExtendedActorSystem])
 }

@@ -26,7 +26,8 @@ import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.types.{IntegerType, NullType, StringType}
 
 case class Dummy(optKey: Option[Expression])
-    extends Expression with CodegenFallback {
+    extends Expression
+    with CodegenFallback {
   override def children: Seq[Expression] = optKey.toSeq
   override def nullable: Boolean = true
   override def dataType: NullType = NullType
@@ -40,7 +41,8 @@ case class ComplexPlan(exprs: Seq[Seq[Expression]])
 }
 
 case class ExpressionInMap(map: Map[String, Expression])
-    extends Expression with Unevaluable {
+    extends Expression
+    with Unevaluable {
   override def children: Seq[Expression] = map.values.toSeq
   override def nullable: Boolean = true
   override def dataType: NullType = NullType
@@ -161,8 +163,7 @@ class TreeNodeSuite extends SparkFunSuite {
       case other => false
     }
     var expected: Option[Expression] = Some(
-        Add(Literal(1),
-            Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
+      Add(Literal(1), Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
     assert(expected === actual)
 
     // Find the first children.
@@ -208,8 +209,8 @@ class TreeNodeSuite extends SparkFunSuite {
         case add: Add => add
       }
       val expected = Some(
-          Add(Literal(1),
-              Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
+        Add(Literal(1),
+            Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
       assert(expected === actual)
     }
 

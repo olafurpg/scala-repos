@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -100,7 +100,7 @@ object JDBCPlatformSpecEngine extends Logging {
   val checkUnused = new Runnable {
     def run = lock.synchronized {
       logger.debug(
-          "Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
+        "Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
       if (refcount == 0) {
         logger.debug("Shutting down DB after final release")
         shutdown()
@@ -118,7 +118,7 @@ object JDBCPlatformSpecEngine extends Logging {
     if (dataDirURL == null || dataDirURL.getProtocol != "file") {
       logger.error("No data dir: " + dataDirURL)
       throw new Exception(
-          "Failed to locate test_data directory. Found: " + dataDirURL)
+        "Failed to locate test_data directory. Found: " + dataDirURL)
     }
 
     logger.debug("Loading from " + dataDirURL)
@@ -142,7 +142,7 @@ object JDBCPlatformSpecEngine extends Logging {
                     jv.flattenWithPath.map {
                       case (p, v) =>
                         (JDBCColumnarTableModule.escapePath(
-                             p.toString.drop(1)),
+                           p.toString.drop(1)),
                          jvToSQL(v))
                     }
                 }
@@ -150,7 +150,7 @@ object JDBCPlatformSpecEngine extends Logging {
                 // Two passes: first one constructs a schema for the table, second inserts data
                 val schema = rows.foldLeft(Set[(String, String)]()) {
                   case (acc, properties) =>
-                    acc ++(properties.map { case (p, (t, _)) => (p, t) }).toSet
+                    acc ++ (properties.map { case (p, (t, _)) => (p, t) }).toSet
                 }
 
                 val ddlCreate =
@@ -171,8 +171,8 @@ object JDBCPlatformSpecEngine extends Logging {
                     val columns = properties.map(_._1).mkString(", ")
                     val values = properties.map(_._2._2).mkString(", ")
 
-                    val insert = "INSERT INTO %s (%s) VALUES (%s);".format(
-                        tableName, columns, values)
+                    val insert = "INSERT INTO %s (%s) VALUES (%s);"
+                      .format(tableName, columns, values)
 
                     logger.debug("Inserting with " + insert)
 
@@ -189,7 +189,7 @@ object JDBCPlatformSpecEngine extends Logging {
                 val stmt2 = conn2.createStatement
 
                 val rs = stmt2.executeQuery(
-                    "SELECT COUNT(*) AS total FROM " + tableName)
+                  "SELECT COUNT(*) AS total FROM " + tableName)
 
                 rs.next
 
@@ -216,13 +216,17 @@ object JDBCPlatformSpecEngine extends Logging {
 }
 
 trait JDBCPlatformSpecs
-    extends ParseEvalStackSpecs[Future] with JDBCColumnarTableModule
-    with Logging with StringIdMemoryDatasetConsumer[Future] {
-  self =>
+    extends ParseEvalStackSpecs[Future]
+    with JDBCColumnarTableModule
+    with Logging
+    with StringIdMemoryDatasetConsumer[Future] { self =>
 
   class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
       with JDBCColumnarTableModuleConfig
 
   object yggConfig extends YggConfig
@@ -231,8 +235,8 @@ trait JDBCPlatformSpecs
     Duration(10, "minutes") // it's just unreasonable to run tests longer than this
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        asyncContext, yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
+                                          yggConfig.maxEvalDuration)
 
   val unescapeColumnNames = true
 
@@ -250,8 +254,9 @@ trait JDBCPlatformSpecs
 
     val databaseMap = Map("test" -> JDBCPlatformSpecEngine.dbURL)
 
-    override def load(
-        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(table: Table,
+                      apiKey: APIKey,
+                      tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
         case orig: StrColumn =>
@@ -283,8 +288,8 @@ trait JDBCPlatformSpecs
   override def map(fs: => Fragments): Fragments =
     Step { startup() } ^ fs ^ Step { shutdown() }
 
-  def Evaluator[N[+ _]](
-      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future) =
     new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]

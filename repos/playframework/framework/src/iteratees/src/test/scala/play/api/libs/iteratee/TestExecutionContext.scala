@@ -28,12 +28,13 @@ class TestExecutionContext(delegate: ExecutionContext)
 
   def preparable[A](body: => A): A = {
     local.set(true)
-    try body finally local.set(null)
+    try body
+    finally local.set(null)
   }
 
   def execute(runnable: Runnable): Unit = {
     throw new RuntimeException(
-        "Cannot execute unprepared TestExecutionContext")
+      "Cannot execute unprepared TestExecutionContext")
   }
 
   def reportFailure(t: Throwable): Unit = {
@@ -44,7 +45,7 @@ class TestExecutionContext(delegate: ExecutionContext)
     val isLocal = Option(local.get()).getOrElse(false: java.lang.Boolean)
     if (!isLocal)
       throw new RuntimeException(
-          "Can only prepare TestExecutionContext within 'preparable' scope")
+        "Can only prepare TestExecutionContext within 'preparable' scope")
     val preparedDelegate = delegate.prepare()
     return new ExecutionContext {
 

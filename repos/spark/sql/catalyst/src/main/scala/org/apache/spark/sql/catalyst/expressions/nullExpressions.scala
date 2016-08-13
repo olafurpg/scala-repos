@@ -19,7 +19,10 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 
@@ -44,10 +47,10 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
   override def checkInputDataTypes(): TypeCheckResult = {
     if (children == Nil) {
       TypeCheckResult.TypeCheckFailure(
-          "input to function coalesce cannot be empty")
+        "input to function coalesce cannot be empty")
     } else {
-      TypeUtils.checkForSameTypeInputExpr(
-          children.map(_.dataType), "function coalesce")
+      TypeUtils.checkForSameTypeInputExpr(children.map(_.dataType),
+                                          "function coalesce")
     }
   }
 
@@ -89,7 +92,9 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
   * Evaluates to `true` iff it's NaN.
   */
 case class IsNaN(child: Expression)
-    extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+    extends UnaryExpression
+    with Predicate
+    with ImplicitCastInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] =
     Seq(TypeCollection(DoubleType, FloatType))
@@ -127,7 +132,8 @@ case class IsNaN(child: Expression)
   * This Expression is useful for mapping NaN values to null.
   */
 case class NaNvl(left: Expression, right: Expression)
-    extends BinaryExpression with ImplicitCastInputTypes {
+    extends BinaryExpression
+    with ImplicitCastInputTypes {
 
   override def dataType: DataType = left.dataType
 
@@ -201,7 +207,8 @@ case class IsNull(child: Expression) extends UnaryExpression with Predicate {
   * An expression that is evaluated to true if the input is not null.
   */
 case class IsNotNull(child: Expression)
-    extends UnaryExpression with Predicate {
+    extends UnaryExpression
+    with Predicate {
   override def nullable: Boolean = false
 
   override def eval(input: InternalRow): Any = {

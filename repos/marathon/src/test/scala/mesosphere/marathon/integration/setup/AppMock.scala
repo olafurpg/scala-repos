@@ -26,7 +26,7 @@ class AppMock(appId: String, version: String, url: String)
     server.start()
     val taskId = System.getenv().getOrDefault("MESOS_TASK_ID", "<UNKNOWN>")
     println(
-        s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
+      s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
     server.join()
     println(s"AppMock[$appId $version]: says goodbye")
   }

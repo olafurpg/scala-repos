@@ -51,9 +51,9 @@ private[streams] object SubscriberIteratee {
 import SubscriberIteratee._
 
 private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
-    extends StateMachine[State](NotSubscribed) with Subscription
-    with Iteratee[T, Unit] {
-  self =>
+    extends StateMachine[State](NotSubscribed)
+    with Subscription
+    with Iteratee[T, Unit] { self =>
 
   def fold[B](folder: (Step[T, Unit]) => Future[B])(
       implicit ec: ExecutionContext): Future[B] = {
@@ -67,7 +67,7 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
         state = awaitDemand(promise, folder, pec)
       case AwaitingDemand(_, _) =>
         throw new IllegalStateException(
-            "fold invoked while already waiting for demand")
+          "fold invoked while already waiting for demand")
       case Demand(n) =>
         if (n == 1) {
           state = NoDemand
@@ -93,8 +93,7 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
                         folder: (Step[T, Unit]) => Future[B],
                         ec: ExecutionContext): Unit = {
     Future {
-      promise.completeWith(
-          folder(Step.Cont[T, Unit] {
+      promise.completeWith(folder(Step.Cont[T, Unit] {
         case Input.EOF =>
           subscriber.onComplete()
           Done(())
@@ -139,6 +138,6 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
     // nop, 3.6 of reactive streams spec
     case NotSubscribed =>
       throw new IllegalStateException(
-          "Demand requested before subscription made")
+        "Demand requested before subscription made")
   }
 }

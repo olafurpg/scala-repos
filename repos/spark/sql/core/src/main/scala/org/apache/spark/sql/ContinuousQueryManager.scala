@@ -20,7 +20,11 @@ package org.apache.spark.sql
 import scala.collection.mutable
 
 import org.apache.spark.annotation.Experimental
-import org.apache.spark.sql.execution.streaming.{ContinuousQueryListenerBus, Sink, StreamExecution}
+import org.apache.spark.sql.execution.streaming.{
+  ContinuousQueryListenerBus,
+  Sink,
+  StreamExecution
+}
 import org.apache.spark.sql.util.ContinuousQueryListener
 
 /**
@@ -34,7 +38,7 @@ import org.apache.spark.sql.util.ContinuousQueryListener
 class ContinuousQueryManager(sqlContext: SQLContext) {
 
   private val listenerBus = new ContinuousQueryListenerBus(
-      sqlContext.sparkContext.listenerBus)
+    sqlContext.sparkContext.listenerBus)
   private val activeQueries = new mutable.HashMap[String, ContinuousQuery]
   private val activeQueriesLock = new Object
   private val awaitTerminationLock = new Object
@@ -58,7 +62,7 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   def get(name: String): ContinuousQuery = activeQueriesLock.synchronized {
     activeQueries.getOrElse(name,
                             throw new IllegalArgumentException(
-                                s"There is no active query with name $name"))
+                              s"There is no active query with name $name"))
   }
 
   /**
@@ -169,12 +173,13 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /** Start a query */
-  private[sql] def startQuery(
-      name: String, df: DataFrame, sink: Sink): ContinuousQuery = {
+  private[sql] def startQuery(name: String,
+                              df: DataFrame,
+                              sink: Sink): ContinuousQuery = {
     activeQueriesLock.synchronized {
       if (activeQueries.contains(name)) {
         throw new IllegalArgumentException(
-            s"Cannot start query with name $name as a query with that name is already active")
+          s"Cannot start query with name $name as a query with that name is already active")
       }
       val query = new StreamExecution(sqlContext, name, df.logicalPlan, sink)
       query.start()

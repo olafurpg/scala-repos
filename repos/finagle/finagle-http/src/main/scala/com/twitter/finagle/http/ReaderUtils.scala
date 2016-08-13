@@ -20,7 +20,7 @@ private[http] object ReaderUtils {
 
     case invalid =>
       val exc = new IllegalArgumentException(
-          "invalid message \"%s\"".format(invalid))
+        "invalid message \"%s\"".format(invalid))
       Future.exception(exc)
   }
 

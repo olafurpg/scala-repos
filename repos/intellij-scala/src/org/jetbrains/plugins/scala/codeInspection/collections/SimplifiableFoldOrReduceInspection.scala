@@ -11,15 +11,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 class SimplifiableFoldOrReduceInspection
     extends OperationOnCollectionInspection {
   val foldSum = new FoldSimplificationType(this, "fold.sum", "0", "+", "sum")
-  val foldProduct = new FoldSimplificationType(
-      this, "fold.product", "1", "*", "product")
+  val foldProduct =
+    new FoldSimplificationType(this, "fold.product", "1", "*", "product")
   val reduceSum = new ReduceSimplificationType(this, "reduce.sum", "+", "sum")
-  val reduceProduct = new ReduceSimplificationType(
-      this, "reduce.product", "*", "product")
-  val reduceMin = new ReduceSimplificationType(
-      this, "reduce.min", "min", "min")
-  val reduceMax = new ReduceSimplificationType(
-      this, "reduce.max", "max", "max")
+  val reduceProduct =
+    new ReduceSimplificationType(this, "reduce.product", "*", "product")
+  val reduceMin =
+    new ReduceSimplificationType(this, "reduce.min", "min", "min")
+  val reduceMax =
+    new ReduceSimplificationType(this, "reduce.max", "max", "max")
 
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(foldSum, foldProduct, reduceSum, reduceProduct, reduceMax, reduceMin)

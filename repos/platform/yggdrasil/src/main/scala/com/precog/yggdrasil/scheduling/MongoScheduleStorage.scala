@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -55,10 +55,10 @@ object MongoScheduleStorage {
   def apply(config: Configuration)(implicit executor: ExecutionContext)
     : (MongoScheduleStorage, Stoppable) = {
     val settings = MongoScheduleStorageSettings(
-        config[String]("mongo.tasks", "tasks"),
-        config[String]("mongo.tasks_deleted", "tasks_deleted"),
-        config[String]("mongo.reports", "reports"),
-        config[Long]("mongo.query_timeout", 10000)
+      config[String]("mongo.tasks", "tasks"),
+      config[String]("mongo.tasks_deleted", "tasks_deleted"),
+      config[String]("mongo.reports", "reports"),
+      config[Long]("mongo.query_timeout", 10000)
     )
 
     val mongo = RealMongo(config.detach("mongo"))
@@ -68,19 +68,23 @@ object MongoScheduleStorage {
 
     val storage = new MongoScheduleStorage(mongo, database, settings)
 
-    val dbStop = Stoppable.fromFuture(
-        database.disconnect.fallbackTo(Future(())) flatMap { _ =>
-      mongo.close
-    })
+    val dbStop =
+      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
+        _ =>
+          mongo.close
+      })
 
     (storage, dbStop)
   }
 }
 
-class MongoScheduleStorage private[MongoScheduleStorage](
-    mongo: Mongo, database: Database, settings: MongoScheduleStorageSettings)(
+class MongoScheduleStorage private[MongoScheduleStorage] (
+    mongo: Mongo,
+    database: Database,
+    settings: MongoScheduleStorageSettings)(
     implicit executor: ExecutionContext)
-    extends ScheduleStorage[Future] with Logging {
+    extends ScheduleStorage[Future]
+    with Logging {
   private implicit val M = new FutureMonad(executor)
 
   private implicit val timeout = new Timeout(settings.timeout)
@@ -95,8 +99,7 @@ class MongoScheduleStorage private[MongoScheduleStorage](
     }
 
   private def insertTask(task: ScheduledTask \/ JObject, collection: String) =
-    database(
-        insert(task.valueOr { st =>
+    database(insert(task.valueOr { st =>
       st.serialize.asInstanceOf[JObject]
     }).into(collection))
 
@@ -106,9 +109,11 @@ class MongoScheduleStorage private[MongoScheduleStorage](
         for {
           _ <- insertTask(\/-(taskjv), settings.deletedTasks)
           _ <- database(
-              remove.from(settings.tasks) where (".id" === id.toString))
+                remove.from(settings.tasks) where (".id" === id.toString))
         } yield {
-          taskjv.validated[ScheduledTask].disjunction leftMap { _.message } map {
+          taskjv
+            .validated[ScheduledTask]
+            .disjunction leftMap { _.message } map {
             Some(_)
           }
         }
@@ -120,8 +125,9 @@ class MongoScheduleStorage private[MongoScheduleStorage](
   }
 
   def reportRun(report: ScheduledRunReport) =
-    database(insert(report.serialize.asInstanceOf[JObject])
-          .into(settings.reports)) map { _ =>
+    database(
+      insert(report.serialize.asInstanceOf[JObject])
+        .into(settings.reports)) map { _ =>
       PrecogUnit
     }
 
@@ -129,13 +135,14 @@ class MongoScheduleStorage private[MongoScheduleStorage](
     database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap {
       taskOpt =>
         database(
-            selectAll.from(settings.reports).where(".id" === id.toString) /* TODO: limit */ ) map {
-          history =>
-            taskOpt map { task =>
-              (task.deserialize[ScheduledTask], history.toSeq map {
-                _.deserialize[ScheduledRunReport]
-              })
-            }
+          selectAll
+            .from(settings.reports)
+            .where(".id" === id.toString) /* TODO: limit */ ) map { history =>
+          taskOpt map { task =>
+            (task.deserialize[ScheduledTask], history.toSeq map {
+              _.deserialize[ScheduledRunReport]
+            })
+          }
         }
     }
   }

@@ -44,16 +44,17 @@ class SerializableResultSpec extends PlaySpecification {
 
     "serialize and deserialize statūs" in {
       checkSerialization(
-          Results.Ok("x").withHeaders(CONTENT_TYPE -> "text/banana"))
+        Results.Ok("x").withHeaders(CONTENT_TYPE -> "text/banana"))
       checkSerialization(Results.NotFound)
     }
     "serialize and deserialize simple Results" in {
       checkSerialization(Results.Ok("hello!"))
       checkSerialization(
-          Results.Ok("hello!").withHeaders(CONTENT_TYPE -> "text/banana"))
-      checkSerialization(Results
-            .Ok("hello!")
-            .withHeaders(CONTENT_TYPE -> "text/banana", "X-Foo" -> "bar"))
+        Results.Ok("hello!").withHeaders(CONTENT_TYPE -> "text/banana"))
+      checkSerialization(
+        Results
+          .Ok("hello!")
+          .withHeaders(CONTENT_TYPE -> "text/banana", "X-Foo" -> "bar"))
     }
   }
 }

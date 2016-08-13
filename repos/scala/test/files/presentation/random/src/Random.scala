@@ -20,10 +20,10 @@ object randomclient {
         case 1 =>
           x: Int =>
             x % 2 != 0
-          case 2 =>
+        case 2 =>
           x: Int =>
             x % 2 == 0
-          case _ =>
+        case _ =>
           x: Int =>
             x != 0
       }
@@ -37,7 +37,7 @@ object randomclient {
       val ia = InetAddress.getByName("localhost")
       val socket = new Socket(ia, 9999)
       val out = new ObjectOutputStream(
-          new DataOutputStream(socket.getOutputStream()))
+        new DataOutputStream(socket.getOutputStream()))
       val in = new DataInputStream(socket.getInputStream())
 
       out.writeObject(filter)
@@ -79,7 +79,7 @@ case class ServerThread(socket: Socket) extends Thread("ServerThread") {
     try {
       val out = new DataOutputStream(socket.getOutputStream());
       val in = new ObjectInputStream(
-          new DataInputStream(socket.getInputStream()));
+        new DataInputStream(socket.getInputStream()));
 
       val filter = in.readObject().asInstanceOf[Int => Boolean];
 

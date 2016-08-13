@@ -8,7 +8,8 @@ object Test extends App {
 
   check(sm"""|ab
          |de
-         |${bar} | ${1}""", "ab\nde\n|\n || | 1")
+         |${bar} | ${1}""",
+        "ab\nde\n|\n || | 1")
 
   check(sm"|", "")
 
@@ -17,7 +18,8 @@ object Test extends App {
   check(sm"${0}", "0")
 
   check(sm"""${0}|${1}
-     |""", "0|1\n")
+     |""",
+        "0|1\n")
 
   check(sm"""   ||""", "|")
 

@@ -28,11 +28,21 @@
 package scalafx.scene
 
 import javafx.scene.{input => jfxsi, layout => jfxsl, paint => jfxsp}
-import javafx.{collections => jfxc, event => jfxe, geometry => jfxg, scene => jfxs, util => jfxu}
+import javafx.{
+  collections => jfxc,
+  event => jfxe,
+  geometry => jfxg,
+  scene => jfxs,
+  util => jfxu
+}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.NodeOrientation
@@ -92,8 +102,10 @@ class Scene(
     * @param height The height of the scene
     * @param depthBuffer The depth buffer flag
     */
-  def this(
-      parent: Parent, width: Double, height: Double, depthBuffer: Boolean) =
+  def this(parent: Parent,
+           width: Double,
+           height: Double,
+           depthBuffer: Boolean) =
     this(new jfxs.Scene(parent, width, height, depthBuffer))
 
   /**
@@ -140,8 +152,11 @@ class Scene(
            depthBuffer: Boolean,
            antiAliasing: SceneAntialiasing) =
     this(
-        new jfxs.Scene(
-            new jfxs.Group(), width, height, depthBuffer, antiAliasing))
+      new jfxs.Scene(new jfxs.Group(),
+                     width,
+                     height,
+                     depthBuffer,
+                     antiAliasing))
 
   /**
     * Creates a Scene for a specific root Node with a specific size and fill.
@@ -180,7 +195,7 @@ class Scene(
     case pane: jfxsl.Pane => pane.getChildren
     case _ =>
       throw new IllegalStateException(
-          "Cannot access children of root: " + root + "\n" +
+        "Cannot access children of root: " + root + "\n" +
           "Use a class that extends Group or Pane, or override the getChildren method.")
   }
 
@@ -550,8 +565,8 @@ class Scene(
   /**
     * Gets the list of mnemonics for this `Scene`.
     */
-  def getMnemonics: jfxc.ObservableMap[
-      jfxsi.KeyCombination, jfxc.ObservableList[jfxsi.Mnemonic]] =
+  def getMnemonics: jfxc.ObservableMap[jfxsi.KeyCombination,
+                                       jfxc.ObservableList[jfxsi.Mnemonic]] =
     delegate.getMnemonics
 
   /**

@@ -29,7 +29,7 @@ trait ResizableParArrayCombiner[T]
       val array = arrayseq.array.asInstanceOf[Array[Any]]
 
       combinerTaskSupport.executeAndWaitResult(
-          new CopyChainToArray(array, 0, size))
+        new CopyChainToArray(array, 0, size))
 
       new ParArray(arrayseq)
     } else {

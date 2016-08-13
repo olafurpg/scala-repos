@@ -64,19 +64,17 @@ class InlineInfoTest extends ClearAfterClass {
       compileClasses(compiler)(code, allowMessage = _ => true) // SD-86 inline warnings
 
     val fromSyms = classes.map(
-        c =>
-          compiler.genBCode.bTypes
-            .classBTypeFromInternalName(c.name)
-            .info
-            .get
-            .inlineInfo)
+      c =>
+        compiler.genBCode.bTypes
+          .classBTypeFromInternalName(c.name)
+          .info
+          .get
+          .inlineInfo)
 
-    val fromAttrs = classes.map(
-        c =>
-          {
-        assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
-               c.attrs)
-        compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
+    val fromAttrs = classes.map(c => {
+      assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
+             c.attrs)
+      compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
     })
 
     assert(fromSyms == fromAttrs)

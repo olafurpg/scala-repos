@@ -29,7 +29,7 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
   import system.dispatcher
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
-      "akka.actor.default-dispatcher")
+    "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
   val timeout = 300.milliseconds
@@ -37,8 +37,8 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
   val byteString = ByteString(bytesArray)
 
   def expectTimeout[T](f: Future[T], timeout: Duration) =
-    the[Exception] thrownBy Await.result(f, timeout) shouldBe a[
-        TimeoutException]
+    the[Exception] thrownBy Await
+      .result(f, timeout) shouldBe a[TimeoutException]
 
   def expectSuccess[T](f: Future[T], value: T) =
     Await.result(f, timeout) should be(value)
@@ -136,7 +136,7 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       outputStream.close()
       probe.expectComplete()
       the[Exception] thrownBy outputStream.write(bytesArray) shouldBe a[
-          IOException]
+        IOException]
     }
 
     "use dedicated default-blocking-io-dispatcher by default" in assertAllStagesStopped {
@@ -161,8 +161,8 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
     "throw IOException when writing to the stream after the subscriber has cancelled the reactive stream" in assertAllStagesStopped {
       val sourceProbe = TestProbe()
       val (outputStream, probe) = TestSourceStage(
-          new OutputStreamSourceStage(timeout),
-          sourceProbe).toMat(TestSink.probe[ByteString])(Keep.both).run
+        new OutputStreamSourceStage(timeout),
+        sourceProbe).toMat(TestSink.probe[ByteString])(Keep.both).run
 
       val s = probe.expectSubscription()
 
@@ -175,7 +175,7 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       s.cancel()
       sourceProbe.expectMsg(GraphStageMessages.DownstreamFinish)
       the[Exception] thrownBy outputStream.write(bytesArray) shouldBe a[
-          IOException]
+        IOException]
     }
 
     "fail to materialize with zero sized input buffer" in {
@@ -210,10 +210,11 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
         ManagementFactory.getThreadMXBean
           .dumpAllThreads(true, true)
           .toSeq
-          .filter(t ⇒
-                t.getThreadName.startsWith("OutputStreamSourceSpec") &&
+          .filter(
+            t ⇒
+              t.getThreadName.startsWith("OutputStreamSourceSpec") &&
                 t.getLockName != null && t.getLockName.startsWith(
-                    "java.util.concurrent.locks.AbstractQueuedSynchronizer"))
+                "java.util.concurrent.locks.AbstractQueuedSynchronizer"))
 
       awaitAssert(threadsBlocked should ===(Seq()), 3.seconds)
     }

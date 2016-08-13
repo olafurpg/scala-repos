@@ -143,23 +143,29 @@ class ComplexTest extends FunSuite {
   test("complex trigonometry") {
     // these are just a spot check to avoid sign errors
 
-    assert(Complex(3.0, 5.0).sin == Complex(10.472508533940392,
-                                            -73.46062169567367))
-    assert(Complex(3.0, -5.0).sin == Complex(10.472508533940392,
-                                             73.46062169567367))
-    assert(Complex(-3.0, 5.0).sin == Complex(-10.472508533940392,
-                                             -73.46062169567367))
-    assert(Complex(-3.0, -5.0).sin == Complex(-10.472508533940392,
-                                              73.46062169567367))
+    assert(
+      Complex(3.0, 5.0).sin == Complex(10.472508533940392, -73.46062169567367))
+    assert(
+      Complex(3.0, -5.0).sin == Complex(10.472508533940392, 73.46062169567367))
+    assert(
+      Complex(-3.0, 5.0).sin == Complex(-10.472508533940392,
+                                        -73.46062169567367))
+    assert(
+      Complex(-3.0, -5.0).sin == Complex(-10.472508533940392,
+                                         73.46062169567367))
 
-    assert(Complex(3.0, 5.0).cos == Complex(-73.46729221264526,
-                                            -10.471557674805572))
-    assert(Complex(3.0, -5.0).cos == Complex(-73.46729221264526,
-                                             10.471557674805572))
-    assert(Complex(-3.0, 5.0).cos == Complex(-73.46729221264526,
-                                             10.471557674805572))
-    assert(Complex(-3.0, -5.0).cos == Complex(-73.46729221264526,
-                                              -10.471557674805572))
+    assert(
+      Complex(3.0, 5.0).cos == Complex(-73.46729221264526,
+                                       -10.471557674805572))
+    assert(
+      Complex(3.0, -5.0).cos == Complex(-73.46729221264526,
+                                        10.471557674805572))
+    assert(
+      Complex(-3.0, 5.0).cos == Complex(-73.46729221264526,
+                                        10.471557674805572))
+    assert(
+      Complex(-3.0, -5.0).cos == Complex(-73.46729221264526,
+                                         -10.471557674805572))
   }
 
   test("complex norm") {

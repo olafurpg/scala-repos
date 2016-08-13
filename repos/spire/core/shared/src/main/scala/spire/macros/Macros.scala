@@ -17,12 +17,14 @@ object Macros {
     }
   }
 
-  def parseContext(
-      c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseContext(c: Context,
+                   lower: BigInt,
+                   upper: BigInt): Either[String, BigInt] =
     parseNumber(LiteralUtil(c).getString, lower, upper)
 
-  def parseNumber(
-      s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseNumber(s: String,
+                  lower: BigInt,
+                  upper: BigInt): Either[String, BigInt] =
     try {
       val n = BigInt(s)
       if (n < lower || n > upper) Left("illegal constant: %s" format s)
@@ -91,7 +93,7 @@ object Macros {
       c.Expr(q"spire.math.Rational(${n.toLong}, ${d.toLong})")
     else
       c.Expr(
-          q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
+        q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
   }
 
   def formatWhole(c: Context, sep: String): String = {
@@ -139,11 +141,11 @@ object Macros {
       val s = formatWhole(c, sep)
       val b = BigInt(s) // make sure it's ok
       c.Expr[BigInt](
-          Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
+        Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException(
-            "illegal %s BigInt constant" format name)
+          "illegal %s BigInt constant" format name)
     }
   }
 
@@ -156,11 +158,11 @@ object Macros {
       val s = formatDecimal(c, sep, dec)
       val b = BigDecimal(s) // make sure it's ok
       c.Expr[BigDecimal](
-          Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
+        Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException(
-            "illegal %s BigInt constant" format name)
+          "illegal %s BigInt constant" format name)
     }
   }
 
@@ -197,20 +199,18 @@ object Macros {
     c.Expr[Int](Literal(Constant(n)))
   }
 
-  def intAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
+  def intAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](
-        c.prefix.tree match {
+    c.Expr[A](c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromInt($n)"
     })
   }
 
-  def dblAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
+  def dblAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](
-        c.prefix.tree match {
+    c.Expr[A](c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0.0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1.0))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromDouble($n)"

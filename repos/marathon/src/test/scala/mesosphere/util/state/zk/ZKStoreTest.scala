@@ -18,7 +18,9 @@ import scala.concurrent.duration._
 import ZKStore._
 
 class ZKStoreTest
-    extends PersistentStoreTest with StartedZookeeper with Matchers {
+    extends PersistentStoreTest
+    with StartedZookeeper
+    with Matchers {
 
   //
   // See PersistentStoreTests for general store tests
@@ -116,10 +118,10 @@ class ZKStoreTest
   lazy val mesosStore: MesosStateStore = {
     val duration = 30.seconds
     val state = new ZooKeeperState(
-        config.zkHostAndPort,
-        duration.toMillis,
-        TimeUnit.MILLISECONDS,
-        config.zkPath
+      config.zkHostAndPort,
+      duration.toMillis,
+      TimeUnit.MILLISECONDS,
+      config.zkPath
     )
     new MesosStateStore(state, duration)
   }

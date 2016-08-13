@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScTypeParamClauseImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTypeParamClauseStubImpl
@@ -16,7 +21,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTypeParamClauseStubImpl
   */
 class ScTypeParamClauseElementType[Func <: ScTypeParamClause]
     extends ScStubElementType[ScTypeParamClauseStub, ScTypeParamClause](
-        "type parameter clause") {
+      "type parameter clause") {
   def serialize(stub: ScTypeParamClauseStub, dataStream: StubOutputStream) {
     dataStream.writeName(stub.getTypeParamClauseText)
   }
@@ -31,13 +36,17 @@ class ScTypeParamClauseElementType[Func <: ScTypeParamClause]
       psi: ScTypeParamClause,
       parentStub: StubElement[ParentPsi]): ScTypeParamClauseStub = {
     new ScTypeParamClauseStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, psi.getText)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      psi.getText)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeParamClauseStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTypeParamClauseStub = {
     val text = dataStream.readName().toString
     new ScTypeParamClauseStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, text)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      text)
   }
 }

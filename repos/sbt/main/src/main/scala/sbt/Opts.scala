@@ -38,8 +38,8 @@ object Opts {
     val sonatypeReleases = Resolver.sonatypeRepo("releases")
     val sonatypeSnapshots = Resolver.sonatypeRepo("snapshots")
     val sonatypeStaging = new MavenRepository(
-        "sonatype-staging",
-        "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+      "sonatype-staging",
+      "https://oss.sonatype.org/service/local/staging/deploy/maven2")
     val mavenLocalFile =
       Resolver.file("Local Repository", userHome / ".m2" / "repository" asFile)
   }
@@ -65,7 +65,8 @@ object DefaultOptions {
   }
   def pluginResolvers(plugin: Boolean, snapshot: Boolean): Seq[Resolver] = {
     if (plugin && snapshot)
-      Seq(Classpaths.typesafeSnapshots, Classpaths.sbtPluginSnapshots) else Nil
+      Seq(Classpaths.typesafeSnapshots, Classpaths.sbtPluginSnapshots)
+    else Nil
   }
   def addResolvers: Setting[_] =
     Keys.resolvers <++= Keys.isSnapshot apply resolvers
@@ -73,13 +74,13 @@ object DefaultOptions {
     Keys.resolvers <++= (Keys.sbtPlugin, Keys.isSnapshot) apply pluginResolvers
 
   @deprecated(
-      "Use `credentials(State)` instead to make use of configuration path dynamically configured via `Keys.globalSettingsDirectory`; relying on ~/.ivy2 is not recommended anymore.",
-      "0.12.0")
+    "Use `credentials(State)` instead to make use of configuration path dynamically configured via `Keys.globalSettingsDirectory`; relying on ~/.ivy2 is not recommended anymore.",
+    "0.12.0")
   def credentials: Credentials =
     Credentials(userHome / ".ivy2" / ".credentials")
   def credentials(state: State): Credentials =
     Credentials(
-        getGlobalSettingsDirectory(state, getGlobalBase(state)) / ".credentials")
+      getGlobalSettingsDirectory(state, getGlobalBase(state)) / ".credentials")
   def addCredentials: Setting[_] =
     Keys.credentials <+= Keys.state map credentials
 

@@ -195,8 +195,9 @@ private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
     * @param version the expected matching version.
     * @return a Future[Data.Stat]
     */
-  def setData(
-      path: String, data: Option[Buf], version: Option[Int]): Future[Data.Stat]
+  def setData(path: String,
+              data: Option[Buf],
+              version: Option[Int]): Future[Data.Stat]
 
   /**
     * Set the ACL for the node of the given path if such a node exists and the
@@ -225,7 +226,9 @@ private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
 }
 
 private[serverset2] trait ZooKeeperRW
-    extends ZooKeeperReader with ZooKeeperWriter
+    extends ZooKeeperReader
+    with ZooKeeperWriter
 
 private[serverset2] trait ZooKeeperRWMulti
-    extends ZooKeeperRW with ZooKeeperMulti
+    extends ZooKeeperRW
+    with ZooKeeperMulti

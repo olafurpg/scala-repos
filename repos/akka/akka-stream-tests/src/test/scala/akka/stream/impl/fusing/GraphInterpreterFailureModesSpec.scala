@@ -5,7 +5,8 @@ import akka.testkit.EventFilter
 import akka.testkit.AkkaSpec
 
 class GraphInterpreterFailureModesSpec
-    extends AkkaSpec with GraphInterpreterSpecKit {
+    extends AkkaSpec
+    with GraphInterpreterSpecKit {
 
   "GraphInterpreter" must {
 
@@ -16,9 +17,10 @@ class GraphInterpreterFailureModesSpec
       failOnNextEvent()
       stepAll()
 
-      lastEvents() should be(Set(Cancel(upstream),
-                                 OnError(downstream, testException),
-                                 PostStop(stage)))
+      lastEvents() should be(
+        Set(Cancel(upstream),
+            OnError(downstream, testException),
+            PostStop(stage)))
     }
 
     "handle failure on onPush" in new FailingStageSetup {
@@ -31,9 +33,10 @@ class GraphInterpreterFailureModesSpec
       failOnNextEvent()
       stepAll()
 
-      lastEvents() should be(Set(Cancel(upstream),
-                                 OnError(downstream, testException),
-                                 PostStop(stage)))
+      lastEvents() should be(
+        Set(Cancel(upstream),
+            OnError(downstream, testException),
+            PostStop(stage)))
     }
 
     "handle failure on onPull while cancel is pending" in new FailingStageSetup {
@@ -59,7 +62,7 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-          Set(OnError(downstream, testException), PostStop(stage)))
+        Set(OnError(downstream, testException), PostStop(stage)))
     }
 
     "handle failure on onUpstreamFinish" in new FailingStageSetup {
@@ -70,7 +73,7 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-          Set(OnError(downstream, testException), PostStop(stage)))
+        Set(OnError(downstream, testException), PostStop(stage)))
     }
 
     "handle failure on onUpstreamFailure" in new FailingStageSetup {
@@ -81,7 +84,7 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-          Set(OnError(downstream, testException), PostStop(stage)))
+        Set(OnError(downstream, testException), PostStop(stage)))
     }
 
     "handle failure on onDownstreamFinish" in new FailingStageSetup {
@@ -95,12 +98,13 @@ class GraphInterpreterFailureModesSpec
     }
 
     "handle failure in preStart" in new FailingStageSetup(
-        initFailOnNextEvent = true) {
+      initFailOnNextEvent = true) {
       stepAll()
 
-      lastEvents() should be(Set(Cancel(upstream),
-                                 OnError(downstream, testException),
-                                 PostStop(stage)))
+      lastEvents() should be(
+        Set(Cancel(upstream),
+            OnError(downstream, testException),
+            PostStop(stage)))
     }
 
     "handle failure in postStop" in new FailingStageSetup {

@@ -42,8 +42,9 @@ class ScalaJsonSpec extends Specification {
     //#sample-model
     case class Location(lat: Double, long: Double)
     case class Resident(name: String, age: Int, role: Option[String])
-    case class Place(
-        name: String, location: Location, residents: Seq[Resident])
+    case class Place(name: String,
+                     location: Location,
+                     residents: Seq[Resident])
     //#sample-model
   }
 
@@ -60,24 +61,26 @@ class ScalaJsonSpec extends Specification {
       import play.api.libs.json._
 
       val json: JsValue = JsObject(
-          Seq(
-              "name" -> JsString("Watership Down"),
-              "location" -> JsObject(Seq("lat" -> JsNumber(51.235685),
-                                         "long" -> JsNumber(-1.309197))),
-              "residents" -> JsArray(
-                  Seq(
-                      JsObject(Seq(
-                              "name" -> JsString("Fiver"),
-                              "age" -> JsNumber(4),
-                              "role" -> JsNull
-                          )),
-                      JsObject(Seq(
-                              "name" -> JsString("Bigwig"),
-                              "age" -> JsNumber(6),
-                              "role" -> JsString("Owsla")
-                          ))
-                  ))
-          ))
+        Seq(
+          "name" -> JsString("Watership Down"),
+          "location" -> JsObject(
+            Seq("lat" -> JsNumber(51.235685), "long" -> JsNumber(-1.309197))),
+          "residents" -> JsArray(
+            Seq(
+              JsObject(
+                Seq(
+                  "name" -> JsString("Fiver"),
+                  "age" -> JsNumber(4),
+                  "role" -> JsNull
+                )),
+              JsObject(
+                Seq(
+                  "name" -> JsString("Bigwig"),
+                  "age" -> JsNumber(6),
+                  "role" -> JsString("Owsla")
+                ))
+            ))
+        ))
       //#convert-from-classes
       (json \ "name").get must_== JsString("Watership Down")
     }
@@ -87,20 +90,20 @@ class ScalaJsonSpec extends Specification {
       import play.api.libs.json.{JsNull, Json, JsString, JsValue}
 
       val json: JsValue = Json.obj(
-          "name" -> "Watership Down",
-          "location" -> Json.obj("lat" -> 51.235685, "long" -> -1.309197),
-          "residents" -> Json.arr(
-              Json.obj(
-                  "name" -> "Fiver",
-                  "age" -> 4,
-                  "role" -> JsNull
-              ),
-              Json.obj(
-                  "name" -> "Bigwig",
-                  "age" -> 6,
-                  "role" -> "Owsla"
-              )
+        "name" -> "Watership Down",
+        "location" -> Json.obj("lat" -> 51.235685, "long" -> -1.309197),
+        "residents" -> Json.arr(
+          Json.obj(
+            "name" -> "Fiver",
+            "age" -> 4,
+            "role" -> JsNull
+          ),
+          Json.obj(
+            "name" -> "Bigwig",
+            "age" -> 6,
+            "role" -> "Owsla"
           )
+        )
       )
       //#convert-from-factory
       (json \ "name").get must_== JsString("Watership Down")
@@ -137,16 +140,16 @@ class ScalaJsonSpec extends Specification {
 
       implicit val locationWrites = new Writes[Location] {
         def writes(location: Location) = Json.obj(
-            "lat" -> location.lat,
-            "long" -> location.long
+          "lat" -> location.lat,
+          "long" -> location.long
         )
       }
 
       implicit val residentWrites = new Writes[Resident] {
         def writes(resident: Resident) = Json.obj(
-            "name" -> resident.name,
-            "age" -> resident.age,
-            "role" -> resident.role
+          "name" -> resident.name,
+          "age" -> resident.age,
+          "role" -> resident.role
         )
       }
 
@@ -158,12 +161,12 @@ class ScalaJsonSpec extends Specification {
       }
 
       val place = Place(
-          "Watership Down",
-          Location(51.235685, -1.309197),
-          Seq(
-              Resident("Fiver", 4, None),
-              Resident("Bigwig", 6, Some("Owsla"))
-          )
+        "Watership Down",
+        Location(51.235685, -1.309197),
+        Seq(
+          Resident("Fiver", 4, None),
+          Resident("Bigwig", 6, Some("Owsla"))
+        )
       )
 
       val json = Json.toJson(place)
@@ -182,24 +185,24 @@ class ScalaJsonSpec extends Specification {
 
       implicit val locationWrites: Writes[Location] =
         ((JsPath \ "lat").write[Double] and (JsPath \ "long").write[Double])(
-            unlift(Location.unapply))
+          unlift(Location.unapply))
 
       implicit val residentWrites: Writes[Resident] =
         ((JsPath \ "name").write[String] and (JsPath \ "age").write[Int] and
-            (JsPath \ "role").writeNullable[String])(unlift(Resident.unapply))
+          (JsPath \ "role").writeNullable[String])(unlift(Resident.unapply))
 
       implicit val placeWrites: Writes[Place] = ((JsPath \ "name")
-            .write[String] and (JsPath \ "location").write[Location] and
-          (JsPath \ "residents").write[Seq[Resident]])(unlift(Place.unapply))
+        .write[String] and (JsPath \ "location").write[Location] and
+        (JsPath \ "residents").write[Seq[Resident]])(unlift(Place.unapply))
       //#convert-from-model-prefwrites
 
       val place = Place(
-          "Watership Down",
-          Location(51.235685, -1.309197),
-          Seq(
-              Resident("Fiver", 4, None),
-              Resident("Bigwig", 6, Some("Owsla"))
-          )
+        "Watership Down",
+        Location(51.235685, -1.309197),
+        Seq(
+          Resident("Fiver", 4, None),
+          Resident("Bigwig", 6, Some("Owsla"))
+        )
       )
 
       val json = Json.toJson(place)
@@ -312,16 +315,15 @@ class ScalaJsonSpec extends Specification {
 
       // fold
       val nameOption: Option[String] = nameResult.fold(
-          invalid = { fieldErrors =>
-            fieldErrors.foreach(x =>
-                  {
-                println("field: " + x._1 + ", errors: " + x._2)
-            })
-            None
-          },
-          valid = { name =>
-            Some(name)
-          }
+        invalid = { fieldErrors =>
+          fieldErrors.foreach(x => {
+            println("field: " + x._1 + ", errors: " + x._2)
+          })
+          None
+        },
+        valid = { name =>
+          Some(name)
+        }
       )
       //#convert-to-type-validate
       nameResult must beLike {
@@ -338,16 +340,16 @@ class ScalaJsonSpec extends Specification {
       import play.api.libs.functional.syntax._
 
       implicit val locationReads: Reads[Location] = ((JsPath \ "lat")
-            .read[Double] and (JsPath \ "long").read[Double])(Location.apply _)
+        .read[Double] and (JsPath \ "long").read[Double])(Location.apply _)
 
       implicit val residentReads: Reads[Resident] =
         ((JsPath \ "name").read[String] and (JsPath \ "age").read[Int] and
-            (JsPath \ "role").readNullable[String])(Resident.apply _)
+          (JsPath \ "role").readNullable[String])(Resident.apply _)
 
       implicit val placeReads: Reads[Place] =
         ((JsPath \ "name").read[String] and (JsPath \ "location")
-              .read[Location] and (JsPath \ "residents").read[Seq[Resident]])(
-            Place.apply _)
+          .read[Location] and (JsPath \ "residents")
+          .read[Seq[Resident]])(Place.apply _)
 
       //###replace: val json = { ... }
       val json = sampleJson

@@ -19,7 +19,10 @@ package org.apache.spark.sql.execution.aggregate
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, AggregateFunction}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression,
+  AggregateFunction
+}
 import org.apache.spark.sql.execution.metric.LongSQLMetric
 
 /**
@@ -35,7 +38,7 @@ class SortBasedAggregationIterator(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => (() => MutableProjection),
+                           Seq[Attribute]) => (() => MutableProjection),
     numOutputRows: LongSQLMetric)
     extends AggregationIterator(groupingExpressions,
                                 valueAttributes,
@@ -91,7 +94,7 @@ class SortBasedAggregationIterator(
   // An SafeProjection to turn UnsafeRow into GenericInternalRow, because UnsafeRow can't be
   // compared to MutableRow (aggregation buffer) directly.
   private[this] val safeProj: Projection = FromUnsafeProjection(
-      valueAttributes.map(_.dataType))
+    valueAttributes.map(_.dataType))
 
   protected def initialize(): Unit = {
     if (inputIterator.hasNext) {
@@ -152,8 +155,8 @@ class SortBasedAggregationIterator(
       // Process the current group.
       processCurrentSortedGroup()
       // Generate output row for the current group.
-      val outputRow = generateOutput(
-          currentGroupingKey, sortBasedAggregationBuffer)
+      val outputRow =
+        generateOutput(currentGroupingKey, sortBasedAggregationBuffer)
       // Initialize buffer values for the next group.
       initializeBuffer(sortBasedAggregationBuffer)
       numOutputRows += 1
@@ -166,7 +169,7 @@ class SortBasedAggregationIterator(
 
   def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow = {
     initializeBuffer(sortBasedAggregationBuffer)
-    generateOutput(
-        UnsafeRow.createFromByteArray(0, 0), sortBasedAggregationBuffer)
+    generateOutput(UnsafeRow.createFromByteArray(0, 0),
+                   sortBasedAggregationBuffer)
   }
 }

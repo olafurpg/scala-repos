@@ -83,25 +83,25 @@ object KryoInstantiator extends Serializable {
   }
 }
 
-case class ServerConfig(
-    batch: String = "",
-    engineInstanceId: String = "",
-    engineId: Option[String] = None,
-    engineVersion: Option[String] = None,
-    engineVariant: String = "",
-    env: Option[String] = None,
-    ip: String = "0.0.0.0",
-    port: Int = 8000,
-    feedback: Boolean = false,
-    eventServerIp: String = "0.0.0.0",
-    eventServerPort: Int = 7070,
-    accessKey: Option[String] = None,
-    logUrl: Option[String] = None,
-    logPrefix: Option[String] = None,
-    logFile: Option[String] = None,
-    verbose: Boolean = false,
-    debug: Boolean = false,
-    jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+case class ServerConfig(batch: String = "",
+                        engineInstanceId: String = "",
+                        engineId: Option[String] = None,
+                        engineVersion: Option[String] = None,
+                        engineVariant: String = "",
+                        env: Option[String] = None,
+                        ip: String = "0.0.0.0",
+                        port: Int = 8000,
+                        feedback: Boolean = false,
+                        eventServerIp: String = "0.0.0.0",
+                        eventServerPort: Int = 7070,
+                        accessKey: Option[String] = None,
+                        logUrl: Option[String] = None,
+                        logPrefix: Option[String] = None,
+                        logFile: Option[String] = None,
+                        verbose: Boolean = false,
+                        debug: Boolean = false,
+                        jsonExtractor: JsonExtractorOption =
+                          JsonExtractorOption.Both)
 
 case class StartServer()
 case class BindServer()
@@ -135,7 +135,7 @@ object CreateServer extends Logging {
       opt[String]("env") action { (x, c) =>
         c.copy(env = Some(x))
       } text
-      ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
+        ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
           "format) to pass to the Spark execution environment.")
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
@@ -184,7 +184,7 @@ object CreateServer extends Logging {
         engineManifests.get(engineId, engineVersion) map { manifest =>
           val engineFactoryName = engineInstance.engineFactory
           val upgrade = actorSystem.actorOf(
-              Props(classOf[UpgradeActor], engineFactoryName))
+            Props(classOf[UpgradeActor], engineFactoryName))
           actorSystem.scheduler.schedule(0.seconds,
                                          1.days,
                                          upgrade,
@@ -237,11 +237,11 @@ object CreateServer extends Logging {
                                        sparkEnv = engineInstance.sparkConf)
 
     val models = engine.prepareDeploy(
-        sparkContext,
-        engineParams,
-        engineInstance.id,
-        modelsFromEngineInstance,
-        params = WorkflowParams()
+      sparkContext,
+      engineParams,
+      engineInstance.id,
+      modelsFromEngineInstance,
+      params = WorkflowParams()
     )
 
     val algorithms = engineParams.algorithmParamsList.map {
@@ -255,19 +255,19 @@ object CreateServer extends Logging {
                        servingParamsWithName._2)
 
     actorSystem.actorOf(
-        Props(classOf[ServerActor[Q, P]],
-              sc,
-              engineInstance,
-              engine,
-              engineLanguage,
-              manifest,
-              engineParams.dataSourceParams._2,
-              engineParams.preparatorParams._2,
-              algorithms,
-              engineParams.algorithmParamsList.map(_._2),
-              models,
-              serving,
-              engineParams.servingParams._2))
+      Props(classOf[ServerActor[Q, P]],
+            sc,
+            engineInstance,
+            engine,
+            engineLanguage,
+            manifest,
+            engineParams.dataSourceParams._2,
+            engineParams.preparatorParams._2,
+            algorithms,
+            engineParams.algorithmParamsList.map(_._2),
+            models,
+            serving,
+            engineParams.servingParams._2))
   }
 }
 
@@ -284,7 +284,9 @@ class MasterActor(sc: ServerConfig,
                   engineInstance: EngineInstance,
                   engineFactoryName: String,
                   manifest: EngineManifest)
-    extends Actor with SSLConfiguration with KeyAuthentication {
+    extends Actor
+    with SSLConfiguration
+    with KeyAuthentication {
   val log = Logging(context.system, this)
   implicit val system = context.system
   var sprayHttpListener: Option[ActorRef] = None
@@ -306,9 +308,10 @@ class MasterActor(sc: ServerConfig,
         case 200 => Unit
         case 404 =>
           log.error(
-              s"Another process is using $serverUrl. Unable to undeploy.")
+            s"Another process is using $serverUrl. Unable to undeploy.")
         case _ =>
-          log.error(s"Another process is using $serverUrl, or an existing " +
+          log.error(
+            s"Another process is using $serverUrl, or an existing " +
               s"engine server is not responding properly (HTTP $code). " +
               "Unable to undeploy.")
       }
@@ -316,26 +319,27 @@ class MasterActor(sc: ServerConfig,
       case e: java.net.ConnectException =>
         log.warning(s"Nothing at $serverUrl")
       case _: Throwable =>
-        log.error("Another process might be occupying " +
+        log.error(
+          "Another process might be occupying " +
             s"$ip:$port. Unable to undeploy.")
     }
   }
 
   def receive: Actor.Receive = {
     case x: StartServer =>
-      val actor = createServerActor(
-          sc, engineInstance, engineFactoryName, manifest)
+      val actor =
+        createServerActor(sc, engineInstance, engineFactoryName, manifest)
       currentServerActor = Some(actor)
       undeploy(sc.ip, sc.port)
       self ! BindServer()
     case x: BindServer =>
       currentServerActor map { actor =>
         val settings = ServerSettings(system)
-        IO(Http) ! Http.Bind(
-            actor,
-            interface = sc.ip,
-            port = sc.port,
-            settings = Some(settings.copy(sslEncryption = true)))
+        IO(Http) ! Http.Bind(actor,
+                             interface = sc.ip,
+                             port = sc.port,
+                             settings =
+                               Some(settings.copy(sslEncryption = true)))
       } getOrElse {
         log.error("Cannot bind a non-existing server backend.")
       }
@@ -352,19 +356,19 @@ class MasterActor(sc: ServerConfig,
       log.info("Reload server command received.")
       val latestEngineInstance =
         CreateServer.engineInstances.getLatestCompleted(
-            manifest.id,
-            manifest.version,
-            engineInstance.engineVariant)
+          manifest.id,
+          manifest.version,
+          engineInstance.engineVariant)
       latestEngineInstance map { lr =>
         val actor = createServerActor(sc, lr, engineFactoryName, manifest)
         sprayHttpListener.map { l =>
           l ! Http.Unbind(5.seconds)
           val settings = ServerSettings(system)
-          IO(Http) ! Http.Bind(
-              actor,
-              interface = sc.ip,
-              port = sc.port,
-              settings = Some(settings.copy(sslEncryption = true)))
+          IO(Http) ! Http.Bind(actor,
+                               interface = sc.ip,
+                               port = sc.port,
+                               settings =
+                                 Some(settings.copy(sslEncryption = true)))
           currentServerActor.get ! Kill
           currentServerActor = Some(actor)
         } getOrElse {
@@ -372,13 +376,13 @@ class MasterActor(sc: ServerConfig,
         }
       } getOrElse {
         log.warning(
-            s"No latest completed engine instance for ${manifest.id} " +
+          s"No latest completed engine instance for ${manifest.id} " +
             s"${manifest.version}. Abort reloading.")
       }
     case x: Http.Bound =>
       val serverUrl = s"https://${sc.ip}:${sc.port}"
       log.info(
-          s"Engine is deployed and running. Engine API is live at ${serverUrl}.")
+        s"Engine is deployed and running. Engine API is live at ${serverUrl}.")
       sprayHttpListener = Some(sender)
     case x: Http.CommandFailed =>
       if (retry > 0) {
@@ -429,7 +433,9 @@ class ServerActor[Q, P](val args: ServerConfig,
                         val models: Seq[Any],
                         val serving: BaseServing[Q, P],
                         val servingParams: Params)
-    extends Actor with HttpService with KeyAuthentication {
+    extends Actor
+    with HttpService
+    with KeyAuthentication {
   val serverStartTime = DateTime.now
   val log = Logging(context.system, this)
 
@@ -441,8 +447,8 @@ class ServerActor[Q, P](val args: ServerConfig,
   def actorRefFactory: ActorContext = context
 
   implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-  val pluginsActorRef = context.actorOf(
-      Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
+  val pluginsActorRef = context
+    .actorOf(Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
   val pluginContext = EngineServerPluginContext(log, args.engineVariant)
 
   def receive: Actor.Receive = runRoute(myRoute)
@@ -451,7 +457,7 @@ class ServerActor[Q, P](val args: ServerConfig,
     if (args.feedback) {
       if (args.accessKey.isEmpty) {
         log.error(
-            "Feedback loop cannot be enabled because accessKey is empty.")
+          "Feedback loop cannot be enabled because accessKey is empty.")
         false
       } else {
         true
@@ -464,7 +470,7 @@ class ServerActor[Q, P](val args: ServerConfig,
       scalaj.http
         .Http(logUrl)
         .postData(logPrefix + write(
-                Map("engineInstance" -> engineInstance, "message" -> message)))
+          Map("engineInstance" -> engineInstance, "message" -> message)))
         .asString
     } catch {
       case e: Throwable =>
@@ -487,22 +493,22 @@ class ServerActor[Q, P](val args: ServerConfig,
             complete {
               html
                 .index(
-                    args,
-                    manifest,
-                    engineInstance,
-                    algorithms.map(_.toString),
-                    algorithmsParams.map(_.toString),
-                    models.map(_.toString),
-                    dataSourceParams.toString,
-                    preparatorParams.toString,
-                    servingParams.toString,
-                    serverStartTime,
-                    feedbackEnabled,
-                    args.eventServerIp,
-                    args.eventServerPort,
-                    requestCount,
-                    avgServingSec,
-                    lastServingSec
+                  args,
+                  manifest,
+                  engineInstance,
+                  algorithms.map(_.toString),
+                  algorithmsParams.map(_.toString),
+                  models.map(_.toString),
+                  dataSourceParams.toString,
+                  preparatorParams.toString,
+                  servingParams.toString,
+                  serverStartTime,
+                  feedbackEnabled,
+                  args.eventServerIp,
+                  args.eventServerPort,
+                  requestCount,
+                  avgServingSec,
+                  lastServingSec
                 )
                 .toString
             }
@@ -519,17 +525,17 @@ class ServerActor[Q, P](val args: ServerConfig,
               val queryTime = DateTime.now
               // Extract Query from Json
               val query = JsonExtractor.extract(
-                  jsonExtractorOption,
-                  queryString,
-                  algorithms.head.queryClass,
-                  algorithms.head.querySerializer,
-                  algorithms.head.gsonTypeAdapterFactories
+                jsonExtractorOption,
+                queryString,
+                algorithms.head.queryClass,
+                algorithms.head.querySerializer,
+                algorithms.head.gsonTypeAdapterFactories
               )
               val queryJValue = JsonExtractor.toJValue(
-                  jsonExtractorOption,
-                  query,
-                  algorithms.head.querySerializer,
-                  algorithms.head.gsonTypeAdapterFactories)
+                jsonExtractorOption,
+                query,
+                algorithms.head.querySerializer,
+                algorithms.head.gsonTypeAdapterFactories)
               // Deploy logic. First call Serving.supplement, then Algo.predict,
               // finally Serving.serve.
               val supplementedQuery = serving.supplementBase(query)
@@ -542,10 +548,10 @@ class ServerActor[Q, P](val args: ServerConfig,
               // *original* query.
               val prediction = serving.serveBase(query, predictions)
               val predictionJValue = JsonExtractor.toJValue(
-                  jsonExtractorOption,
-                  prediction,
-                  algorithms.head.querySerializer,
-                  algorithms.head.gsonTypeAdapterFactories)
+                jsonExtractorOption,
+                prediction,
+                algorithms.head.querySerializer,
+                algorithms.head.gsonTypeAdapterFactories)
 
               /** Handle feedback to Event Server
                 * Send the following back to the Event Server
@@ -587,15 +593,15 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "entityType" -> "pio_pr", // prediction result
                         "entityId" -> newPrId,
                         "properties" -> Map(
-                            "engineInstanceId" -> engineInstance.id,
-                            "query" -> query,
-                            "prediction" -> prediction)) ++ queryPrId
+                          "engineInstanceId" -> engineInstance.id,
+                          "query" -> query,
+                          "prediction" -> prediction)) ++ queryPrId
                   // At this point args.accessKey should be Some(String).
                   val accessKey = args.accessKey.getOrElse("")
                   val f: Future[Int] = future {
                     scalaj.http
                       .Http(
-                          s"http://${args.eventServerIp}:${args.eventServerPort}/" +
+                        s"http://${args.eventServerIp}:${args.eventServerPort}/" +
                           s"events.json?accessKey=$accessKey")
                       .postData(write(data))
                       .header("content-type", "application/json")
@@ -604,15 +610,15 @@ class ServerActor[Q, P](val args: ServerConfig,
                   }
                   f onComplete {
                     case Success(code) => {
-                        if (code != 201) {
-                          log.error(
-                              s"Feedback event failed. Status code: $code." +
-                              s"Data: ${write(data)}.")
-                        }
+                      if (code != 201) {
+                        log.error(
+                          s"Feedback event failed. Status code: $code." +
+                            s"Data: ${write(data)}.")
                       }
+                    }
                     case Failure(t) => {
-                        log.error(s"Feedback event failed: ${t.getMessage}")
-                      }
+                      log.error(s"Feedback event failed: ${t.getMessage}")
+                    }
                   }
                   // overwrite prId in predictedResult
                   // - if it is WithPrId,
@@ -634,9 +640,9 @@ class ServerActor[Q, P](val args: ServerConfig,
               // Bookkeeping
               val servingEndTime = DateTime.now
               lastServingSec =
-              (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
+                (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
               avgServingSec = ((avgServingSec * requestCount) + lastServingSec) /
-              (requestCount + 1)
+                  (requestCount + 1)
               requestCount += 1
 
               respondWithMediaType(`application/json`) {
@@ -645,23 +651,21 @@ class ServerActor[Q, P](val args: ServerConfig,
             } catch {
               case e: MappingException =>
                 log.error(
-                    s"Query '$queryString' is invalid. Reason: ${e.getMessage}")
+                  s"Query '$queryString' is invalid. Reason: ${e.getMessage}")
                 args.logUrl map { url =>
                   remoteLog(url,
                             args.logPrefix.getOrElse(""),
                             s"Query:\n$queryString\n\nStack Trace:\n" +
-                            s"${getStackTraceString(e)}\n\n")
+                              s"${getStackTraceString(e)}\n\n")
                 }
                 complete(StatusCodes.BadRequest, e.getMessage)
               case e: Throwable =>
                 val msg =
                   s"Query:\n$queryString\n\nStack Trace:\n" +
-                  s"${getStackTraceString(e)}\n\n"
+                    s"${getStackTraceString(e)}\n\n"
                 log.error(msg)
                 args.logUrl map { url =>
-                  remoteLog(url,
-                            args.logPrefix.getOrElse(""),
-                            msg)
+                  remoteLog(url, args.logPrefix.getOrElse(""), msg)
                 }
                 complete(StatusCodes.InternalServerError, msg)
             }
@@ -695,24 +699,25 @@ class ServerActor[Q, P](val args: ServerConfig,
       get {
         respondWithMediaType(MediaTypes.`application/json`) {
           complete {
-            Map("plugins" -> Map(
-                    "outputblockers" -> pluginContext.outputBlockers.map {
+            Map(
+              "plugins" -> Map(
+                "outputblockers" -> pluginContext.outputBlockers.map {
                   case (n, p) =>
                     n -> Map(
-                        "name" -> p.pluginName,
-                        "description" -> p.pluginDescription,
-                        "class" -> p.getClass.getName,
-                        "params" -> pluginContext.pluginParams(p.pluginName))
+                      "name" -> p.pluginName,
+                      "description" -> p.pluginDescription,
+                      "class" -> p.getClass.getName,
+                      "params" -> pluginContext.pluginParams(p.pluginName))
                 },
-                    "outputsniffers" -> pluginContext.outputSniffers.map {
+                "outputsniffers" -> pluginContext.outputSniffers.map {
                   case (n, p) =>
                     n -> Map(
-                        "name" -> p.pluginName,
-                        "description" -> p.pluginDescription,
-                        "class" -> p.getClass.getName,
-                        "params" -> pluginContext.pluginParams(p.pluginName))
+                      "name" -> p.pluginName,
+                      "description" -> p.pluginDescription,
+                      "class" -> p.getClass.getName,
+                      "params" -> pluginContext.pluginParams(p.pluginName))
                 }
-                ))
+              ))
           }
         }
       }
@@ -726,9 +731,10 @@ class ServerActor[Q, P](val args: ServerConfig,
             val pluginName = segments(1)
             pluginType match {
               case EngineServerPlugin.outputSniffer =>
-                pluginsActorRef ? PluginsActor.HandleREST(
-                    pluginName = pluginName,
-                    pluginArgs = pluginArgs) map {
+                pluginsActorRef ? PluginsActor.HandleREST(pluginName =
+                                                            pluginName,
+                                                          pluginArgs =
+                                                            pluginArgs) map {
                   _.asInstanceOf[String]
                 }
             }

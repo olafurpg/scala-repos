@@ -34,8 +34,9 @@ trait MarshallingDirectives {
         case Failure(x: IllegalArgumentException) ⇒
           reject(ValidationRejection(x.getMessage.nullAsEmpty, Some(x)))
         case Failure(x) ⇒
-          reject(MalformedRequestContentRejection(x.getMessage.nullAsEmpty,
-                                                  Option(x.getCause)))
+          reject(
+            MalformedRequestContentRejection(x.getMessage.nullAsEmpty,
+                                             Option(x.getCause)))
       }
     } & cancelRejections(RequestEntityExpectedRejection.getClass,
                          classOf[UnsupportedRequestContentTypeRejection])

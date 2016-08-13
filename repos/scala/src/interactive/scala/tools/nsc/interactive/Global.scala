@@ -45,8 +45,9 @@ trait InteractiveAnalyzer extends Analyzer {
   trait InteractiveTyper extends Typer {
     override def canAdaptConstantTypeToLiteral = false
     override def canTranslateEmptyListToNil = false
-    override def missingSelectErrorTree(
-        tree: Tree, qual: Tree, name: Name): Tree = tree match {
+    override def missingSelectErrorTree(tree: Tree,
+                                        qual: Tree,
+                                        name: Name): Tree = tree match {
       case Select(_, _) => treeCopy.Select(tree, qual, name)
       case SelectFromTypeTree(_, _) =>
         treeCopy.SelectFromTypeTree(tree, qual, name)
@@ -77,7 +78,8 @@ trait InteractiveAnalyzer extends Analyzer {
         enterIfNotThere(sym)
         if (sym.isLazy) sym.lazyAccessor andAlso enterIfNotThere
 
-        for (defAtt <- sym.attachments.get[DefaultsOfLocalMethodAttachment]) defAtt.defaultGetters foreach enterIfNotThere
+        for (defAtt <- sym.attachments.get[DefaultsOfLocalMethodAttachment])
+          defAtt.defaultGetters foreach enterIfNotThere
       } else if (sym != null && sym.isClass && sym.isImplicit) {
         val owningInfo = sym.owner.info
         val existingDerivedSym = owningInfo
@@ -139,7 +141,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
   import log.logreplay
   debugLog(
-      s"logger: ${log.getClass} writing to ${(new java.io.File(logName)).getAbsolutePath}")
+    s"logger: ${log.getClass} writing to ${(new java.io.File(logName)).getAbsolutePath}")
   debugLog(s"classpath: $classPath")
 
   private var curTime = System.nanoTime
@@ -167,18 +169,18 @@ with ContextTrees with RichCompilationUnits with Picklers {
   /** A map of all loaded files to the rich compilation units that correspond to them.
     */
   val unitOfFile = mapAsScalaMapConverter(
-      new ConcurrentHashMap[AbstractFile, RichCompilationUnit] {
-    override def put(key: AbstractFile, value: RichCompilationUnit) = {
-      val r = super.put(key, value)
-      if (r == null) debugLog("added unit for " + key)
-      r
-    }
-    override def remove(key: Any) = {
-      val r = super.remove(key)
-      if (r != null) debugLog("removed unit for " + key)
-      r
-    }
-  }).asScala
+    new ConcurrentHashMap[AbstractFile, RichCompilationUnit] {
+      override def put(key: AbstractFile, value: RichCompilationUnit) = {
+        val r = super.put(key, value)
+        if (r == null) debugLog("added unit for " + key)
+        r
+      }
+      override def remove(key: Any) = {
+        val r = super.remove(key)
+        if (r != null) debugLog("removed unit for " + key)
+        r
+      }
+    }).asScala
 
   /** A set containing all those files that need to be removed
     *  Units are removed by getUnit, typically once a unit is finished compiled.
@@ -287,8 +289,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
   def enableIgnoredFile(file: AbstractFile) {
     ignoredFiles -= file
     debugLog(
-        "Removed crashed file %s. Still in the ignored buffer: %s".format(
-            file, ignoredFiles))
+      "Removed crashed file %s. Still in the ignored buffer: %s"
+        .format(file, ignoredFiles))
   }
 
   /** The currently active typer run */
@@ -339,14 +341,15 @@ with ContextTrees with RichCompilationUnits with Picklers {
   override def signalDone(context: Context, old: Tree, result: Tree) {
     val canObserveTree =
       (interruptsEnabled && analyzer.lockedCount == 0 &&
-          !context.bufferErrors // SI-7558 look away during exploratory typing in "silent mode"
-          )
+        !context.bufferErrors // SI-7558 look away during exploratory typing in "silent mode"
+      )
     if (canObserveTree) {
       if (context.unit.exists && result.pos.isOpaqueRange &&
           (result.pos includes context.unit.targetPos)) {
         var located = new TypedLocator(context.unit.targetPos) locateIn result
         if (located == EmptyTree) {
-          println("something's wrong: no " + context.unit + " in " + result +
+          println(
+            "something's wrong: no " + context.unit + " in " + result +
               result.pos)
           located = result
         }
@@ -482,12 +485,13 @@ with ContextTrees with RichCompilationUnits with Picklers {
                 // don't forget to service interrupt requests
                 scheduler.dequeueAllInterrupts(_.execute())
 
-                debugLog("ShutdownReq: cleaning work queue (%d items)".format(
-                        units.size))
                 debugLog(
-                    "Cleanup up responses (%d loadedType pending, %d parsedEntered pending)"
-                      .format(waitLoadedTypeResponses.size,
-                              getParsedEnteredResponses.size))
+                  "ShutdownReq: cleaning work queue (%d items)".format(
+                    units.size))
+                debugLog(
+                  "Cleanup up responses (%d loadedType pending, %d parsedEntered pending)"
+                    .format(waitLoadedTypeResponses.size,
+                            getParsedEnteredResponses.size))
                 checkNoResponsesOutstanding()
 
                 log.flush()
@@ -505,7 +509,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
             case Some(action) =>
               try {
                 debugLog(
-                    "picked up work item at " + pos + ": " + action + timeStep)
+                  "picked up work item at " + pos + ": " + action + timeStep)
                 action()
                 debugLog("done with work item: " + action)
               } finally {
@@ -538,9 +542,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
   @elidable(elidable.WARNING)
   override def assertCorrectThread() {
     assert(
-        initializing || anyThread || onCompilerThread,
-        "Race condition detected: You are running a presentation compiler method outside the PC thread.[phase: %s]"
-          .format(globalPhase) +
+      initializing || anyThread || onCompilerThread,
+      "Race condition detected: You are running a presentation compiler method outside the PC thread.[phase: %s]"
+        .format(globalPhase) +
         " Please file a ticket with the current stack trace at https://www.assembla.com/spaces/scala-ide/support/tickets")
   }
 
@@ -599,8 +603,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
         case ShutdownReq => throw ShutdownReq // propagate a shutdown request
         case ex: ControlThrowable => throw ex
         case ex: Throwable =>
-          println("[%s]: exception during background compile: ".format(
-                  unit.source) + ex)
+          println(
+            "[%s]: exception during background compile: "
+              .format(unit.source) + ex)
           ex.printStackTrace()
           for (r <- waitLoadedTypeResponses(unit.source)) {
             r.raise(ex)
@@ -609,13 +614,14 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
           lastException = Some(ex)
           ignoredFiles += unit.source.file
-          println("[%s] marking unit as crashed (crashedFiles: %s)".format(
-                  unit, ignoredFiles))
+          println(
+            "[%s] marking unit as crashed (crashedFiles: %s)"
+              .format(unit, ignoredFiles))
 
           reporter.error(
-              unit.body.pos,
-              "Presentation compiler crashed while type checking this file: %s"
-                .format(ex.toString()))
+            unit.body.pos,
+            "Presentation compiler crashed while type checking this file: %s"
+              .format(ex.toString()))
       }
     }
 
@@ -775,16 +781,16 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   /** Make sure a set of compilation units is loaded and parsed */
-  private[interactive] def reload(
-      sources: List[SourceFile], response: Response[Unit]) {
+  private[interactive] def reload(sources: List[SourceFile],
+                                  response: Response[Unit]) {
     informIDE("reload: " + sources)
     lastWasReload = true
     respond(response)(reloadSources(sources))
     demandNewCompilerRun()
   }
 
-  private[interactive] def filesDeleted(
-      sources: List[SourceFile], response: Response[Unit]) {
+  private[interactive] def filesDeleted(sources: List[SourceFile],
+                                        response: Response[Unit]) {
     informIDE("files deleted: " + sources)
     val deletedFiles = sources.map(_.file).toSet
     val deletedSyms =
@@ -815,17 +821,19 @@ with ContextTrees with RichCompilationUnits with Picklers {
     getUnit(pos.source) match {
       case None =>
         reloadSources(List(pos.source))
-        try typedTreeAt(pos) finally afterRunRemoveUnitsOf(List(pos.source))
+        try typedTreeAt(pos)
+        finally afterRunRemoveUnitsOf(List(pos.source))
       case Some(unit) =>
         informIDE("typedTreeAt " + pos)
         parseAndEnter(unit)
         val tree = locateTree(pos)
-        debugLog("at pos " + pos + " was found: " + tree.getClass + " " +
+        debugLog(
+          "at pos " + pos + " was found: " + tree.getClass + " " +
             tree.pos.show)
         tree match {
           case Import(expr, _) =>
             debugLog(
-                "import found" + expr.tpe +
+              "import found" + expr.tpe +
                 (if (expr.tpe == null) "" else " " + expr.tpe.members))
           case _ =>
         }
@@ -848,8 +856,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
 
   /** A fully attributed tree corresponding to the entire compilation unit  */
-  private[interactive] def typedTree(
-      source: SourceFile, forceReload: Boolean): Tree = {
+  private[interactive] def typedTree(source: SourceFile,
+                                     forceReload: Boolean): Tree = {
     informIDE("typedTree " + source + " forceReload: " + forceReload)
     val unit = getOrCreateUnitOf(source)
     if (forceReload) reset(unit)
@@ -859,15 +867,16 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   /** Set sync var `response` to a fully attributed tree located at position `pos`  */
-  private[interactive] def getTypedTreeAt(
-      pos: Position, response: Response[Tree]) {
+  private[interactive] def getTypedTreeAt(pos: Position,
+                                          response: Response[Tree]) {
     respond(response)(typedTreeAt(pos))
   }
 
   /** Set sync var `response` to a fully attributed tree corresponding to the
     *  entire compilation unit  */
-  private[interactive] def getTypedTree(
-      source: SourceFile, forceReload: Boolean, response: Response[Tree]) {
+  private[interactive] def getTypedTree(source: SourceFile,
+                                        forceReload: Boolean,
+                                        response: Response[Tree]) {
     respond(response)(typedTree(source, forceReload))
   }
 
@@ -893,8 +902,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
 
   /** Find a 'mirror' of symbol `sym` in unit `unit`. Pre: `unit is loaded. */
-  private def findMirrorSymbol(
-      sym: Symbol, unit: RichCompilationUnit): Symbol = {
+  private def findMirrorSymbol(sym: Symbol,
+                               unit: RichCompilationUnit): Symbol = {
     val originalTypeParams = sym.owner.typeParams
     ensureUpToDate(unit)
     parseAndEnter(unit)
@@ -907,15 +916,15 @@ with ContextTrees with RichCompilationUnits with Picklers {
             val tp1 = pre.memberType(alt) onTypeError NoType
             val tp2 =
               adaptToNewRunMap(sym.tpe) substSym
-              (originalTypeParams, sym.owner.typeParams)
+                (originalTypeParams, sym.owner.typeParams)
             matchesType(tp1, tp2, alwaysMatchSimple = false) || {
               debugLog(s"findMirrorSymbol matchesType($tp1, $tp2) failed")
               val tp3 =
                 adaptToNewRunMap(sym.tpe) substSym
-                (originalTypeParams, alt.owner.typeParams)
+                  (originalTypeParams, alt.owner.typeParams)
               matchesType(tp1, tp3, alwaysMatchSimple = false) || {
                 debugLog(
-                    s"findMirrorSymbol fallback matchesType($tp1, $tp3) failed")
+                  s"findMirrorSymbol fallback matchesType($tp1, $tp3) failed")
                 false
               }
             }
@@ -937,7 +946,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     } else if (newsym.isOverloaded) {
       settings.uniqid.value = true
       debugLog(
-          "mirror ambiguous " + sym + " " + unit.source + " " + pre + " " +
+        "mirror ambiguous " + sym + " " + unit.source + " " + pre + " " +
           newsym.alternatives)
       NoSymbol
     } else {
@@ -947,8 +956,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   /** Implements CompilerControl.askLinkPos */
-  private[interactive] def getLinkPos(
-      sym: Symbol, source: SourceFile, response: Response[Position]) {
+  private[interactive] def getLinkPos(sym: Symbol,
+                                      source: SourceFile,
+                                      response: Response[Position]) {
     informIDE("getLinkPos " + sym + " " + source)
     respond(response) {
       if (sym.owner.isClass) {
@@ -1023,7 +1033,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
   import analyzer.{SearchResult, ImplicitSearch}
 
   private[interactive] def getScopeCompletion(
-      pos: Position, response: Response[List[Member]]) {
+      pos: Position,
+      response: Response[List[Member]]) {
     informIDE("getScopeCompletion" + pos)
     respond(response) { scopeMembers(pos) }
   }
@@ -1036,11 +1047,12 @@ with ContextTrees with RichCompilationUnits with Picklers {
         (m.sym.name == sym.name) && (m.sym.isType || (m.tpe matches symtpe))
       }
 
-    private def keepSecond(
-        m: M, sym: Symbol, implicitlyAdded: Boolean): Boolean =
+    private def keepSecond(m: M,
+                           sym: Symbol,
+                           implicitlyAdded: Boolean): Boolean =
       m.sym.hasFlag(ACCESSOR | PARAMACCESSOR) &&
-      !sym.hasFlag(ACCESSOR | PARAMACCESSOR) &&
-      (!implicitlyAdded || m.implicitlyAdded)
+        !sym.hasFlag(ACCESSOR | PARAMACCESSOR) &&
+        (!implicitlyAdded || m.implicitlyAdded)
 
     def add(sym: Symbol, pre: Type, implicitlyAdded: Boolean)(
         toMember: (Symbol, Type) => M) {
@@ -1063,8 +1075,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
 
     def addNonShadowed(other: Members[M]) = {
-      for ((name, ms) <- other) if (ms.nonEmpty && this(name).isEmpty)
-        this(name) = ms
+      for ((name, ms) <- other)
+        if (ms.nonEmpty && this(name).isEmpty)
+          this(name) = ms
     }
 
     def allMembers: List[M] = values.toList.flatten
@@ -1082,10 +1095,10 @@ with ContextTrees with RichCompilationUnits with Picklers {
         val member =
           if (s.hasGetter)
             new ScopeMember(
-                s,
-                st,
-                context.isAccessible(s.getter, pre, superAccess = false),
-                viaImport)
+              s,
+              st,
+              context.isAccessible(s.getter, pre, superAccess = false),
+              viaImport)
           else
             new ScopeMember(s,
                             st,
@@ -1123,7 +1136,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   private[interactive] def getTypeCompletion(
-      pos: Position, response: Response[List[Member]]) {
+      pos: Position,
+      response: Response[List[Member]]) {
     informIDE("getTypeCompletion " + pos)
     respondGradually(response) { typeMembers(pos) }
     //if (debugIDE) typeMembers(pos)
@@ -1156,18 +1170,20 @@ with ContextTrees with RichCompilationUnits with Picklers {
     val superAccess = tree.isInstanceOf[Super]
     val members = new Members[TypeMember]
 
-    def addTypeMember(
-        sym: Symbol, pre: Type, inherited: Boolean, viaView: Symbol) = {
+    def addTypeMember(sym: Symbol,
+                      pre: Type,
+                      inherited: Boolean,
+                      viaView: Symbol) = {
       val implicitlyAdded = viaView != NoSymbol
       members.add(sym, pre, implicitlyAdded) { (s, st) =>
         val result = new TypeMember(
-            s,
-            st,
-            context.isAccessible(if (s.hasGetter) s.getterIn(s.owner) else s,
-                                 pre,
-                                 superAccess && !implicitlyAdded),
-            inherited,
-            viaView)
+          s,
+          st,
+          context.isAccessible(if (s.hasGetter) s.getterIn(s.owner) else s,
+                               pre,
+                               superAccess && !implicitlyAdded),
+          inherited,
+          viaView)
         result.prefix = pre
         result
       }
@@ -1193,8 +1209,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
 
     //print("add members")
-    for (sym <- ownerTpe.members) addTypeMember(
-        sym, pre, sym.owner != ownerTpe.typeSymbol, NoSymbol)
+    for (sym <- ownerTpe.members)
+      addTypeMember(sym, pre, sym.owner != ownerTpe.typeSymbol, NoSymbol)
     members.allMembers #:: {
       //print("\nadd enrichment")
       val applicableViews: List[SearchResult] =
@@ -1204,7 +1220,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
                              functionType(List(ownerTpe), AnyTpe),
                              isView = true,
                              context0 = context.makeImplicit(
-                                   reportAmbiguousErrors = false)).allImplicits
+                               reportAmbiguousErrors = false)).allImplicits
       for (view <- applicableViews) {
         val vtree = viewApply(view)
         val vpre = stabilizedType(vtree)
@@ -1226,29 +1242,29 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
     /** Cursor Offset - positionDelta == position of the start of the name */
     def positionDelta: Int
-    def matchingResults(
-        nameMatcher: (Name) => Name => Boolean = entered =>
-            candidate => candidate.startsWith(entered)): List[M] = {
+    def matchingResults(nameMatcher: (Name) => Name => Boolean = entered =>
+      candidate => candidate.startsWith(entered)): List[M] = {
       val enteredName = if (name == nme.ERROR) nme.EMPTY else name
       val matcher = nameMatcher(enteredName)
       results filter { (member: Member) =>
         val symbol = member.sym
         def isStable =
           member.tpe.isStable || member.sym.isStable ||
-          member.sym.getterIn(member.sym.owner).isStable
+            member.sym.getterIn(member.sym.owner).isStable
         def isJunk =
           symbol.name.isEmpty ||
-          !isIdentifierStart(member.sym.name.charAt(0)) // e.g. <byname>
+            !isIdentifierStart(member.sym.name.charAt(0)) // e.g. <byname>
         !isJunk && member.accessible && !symbol.isConstructor &&
         (name.isEmpty || matcher(member.sym.name) &&
-            (symbol.name.isTermName == name.isTermName || name.isTypeName &&
-                isStable))
+        (symbol.name.isTermName == name.isTermName || name.isTypeName &&
+        isStable))
       }
     }
   }
   object CompletionResult {
-    final case class ScopeMembers(
-        positionDelta: Int, results: List[ScopeMember], name: Name)
+    final case class ScopeMembers(positionDelta: Int,
+                                  results: List[ScopeMember],
+                                  name: Name)
         extends CompletionResult {
       type M = ScopeMember
     }
@@ -1273,11 +1289,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
     def camelMatch(entered: Name): Name => Boolean = {
       val enteredS = entered.toString
-      val enteredLowercaseSet = enteredS
-        .toLowerCase()
-        .toSet
+      val enteredLowercaseSet = enteredS.toLowerCase().toSet
 
-        (candidate: Name) =>
+      (candidate: Name) =>
         {
           def candidateChunks = camelComponents(candidate.toString)
           // Loosely based on IntelliJ's autocompletion: the user can just write everything in
@@ -1291,12 +1305,14 @@ with ContextTrees with RichCompilationUnits with Picklers {
                 val enteredAlternatives = Set(entered, entered.capitalize)
                 head.inits
                   .filter(_.length <= entered.length)
-                  .exists(init =>
-                        enteredAlternatives.exists(entered =>
-                              lenientMatch(entered.stripPrefix(init),
-                                           tail,
-                                           matchCount +
-                                           (if (init.isEmpty) 0 else 1))))
+                  .exists(
+                    init =>
+                      enteredAlternatives.exists(
+                        entered =>
+                          lenientMatch(entered.stripPrefix(init),
+                                       tail,
+                                       matchCount +
+                                         (if (init.isEmpty) 0 else 1))))
             }
           }
           val containsAllEnteredChars = {
@@ -1320,10 +1336,10 @@ with ContextTrees with RichCompilationUnits with Picklers {
       val positionDelta: Int = pos.start - nameStart
       val subName: Name = name
         .newName(
-            new String(pos.source.content, nameStart, pos.start - nameStart))
+          new String(pos.source.content, nameStart, pos.start - nameStart))
         .encodedName
-      CompletionResult.TypeMembers(
-          positionDelta, qual, tree, allTypeMembers, subName)
+      CompletionResult
+        .TypeMembers(positionDelta, qual, tree, allTypeMembers, subName)
     }
     focus1 match {
       case imp @ Import(i @ Ident(name), head :: Nil)
@@ -1344,8 +1360,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
         def fallback = qualPos.end + 2
         val source = pos.source
         val nameStart: Int = (qualPos.end + 1 until focus1.pos.end)
-          .find(
-              p => source.identifier(source.position(p)).exists(_.length > 0))
+          .find(p =>
+            source.identifier(source.position(p)).exists(_.length > 0))
           .getOrElse(fallback)
         typeCompletions(sel, qual, nameStart, name)
       case Ident(name) =>
@@ -1379,7 +1395,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
         }
       case None =>
         debugLog("load unit and type")
-        try reloadSources(List(source)) finally {
+        try reloadSources(List(source))
+        finally {
           waitLoadedTyped(source, response, onSameThread)
           if (!keepLoaded) removeUnitOf(source)
         }
@@ -1407,8 +1424,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   /** Parses and enters given source file, storing parse tree in response */
-  private def getParsedEnteredNow(
-      source: SourceFile, response: Response[Tree]) {
+  private def getParsedEnteredNow(source: SourceFile,
+                                  response: Response[Tree]) {
     respond(response) {
       onUnitOf(source) { unit =>
         parseAndEnter(unit)

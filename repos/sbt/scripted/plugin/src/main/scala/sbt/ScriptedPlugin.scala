@@ -29,8 +29,8 @@ object ScriptedPlugin extends Plugin {
   val scriptedTests = TaskKey[AnyRef]("scripted-tests")
   val scriptedRun = TaskKey[Method]("scripted-run")
   val scriptedLaunchOpts = SettingKey[Seq[String]](
-      "scripted-launch-opts",
-      "options to pass to jvm launching scripted tasks")
+    "scripted-launch-opts",
+    "options to pass to jvm launching scripted tasks")
   val scriptedDependencies = TaskKey[Unit]("scripted-dependencies")
   val scripted = InputKey[Unit]("scripted")
 
@@ -62,8 +62,8 @@ object ScriptedPlugin extends Plugin {
     val id = charClass(c => !c.isWhitespace && c != '/').+.string
     val groupP = token(id.examples(pairMap.keySet)) <~ token('/')
     def nameP(group: String) = token("*".id | id.examples(pairMap(group)))
-    val testID = for (group <- groupP; name <- nameP(group)) yield
-      (group, name)
+    val testID = for (group <- groupP; name <- nameP(group))
+      yield (group, name)
     (token(Space) ~> matched(testID)).*
   }
 
@@ -83,29 +83,30 @@ object ScriptedPlugin extends Plugin {
   }
 
   val scriptedSettings = Seq(
-      ivyConfigurations ++= Seq(scriptedConf, scriptedLaunchConf),
-      scriptedSbt := sbtVersion.value,
-      sbtLauncher <<= getJars(scriptedLaunchConf).map(_.get.head),
-      sbtTestDirectory := sourceDirectory.value / "sbt-test",
-      libraryDependencies ++= Seq(
-          "org.scala-sbt" % "scripted-sbt" % scriptedSbt.value % scriptedConf.toString,
-          "org.scala-sbt" % "sbt-launch" % scriptedSbt.value % scriptedLaunchConf.toString
-      ),
-      scriptedBufferLog := true,
-      scriptedClasspath := getJars(scriptedConf).value,
-      scriptedTests <<= scriptedTestsTask,
-      scriptedRun <<= scriptedRunTask,
-      scriptedDependencies <<=
-        (compile in Test, publishLocal) map { (analysis, pub) =>
+    ivyConfigurations ++= Seq(scriptedConf, scriptedLaunchConf),
+    scriptedSbt := sbtVersion.value,
+    sbtLauncher <<= getJars(scriptedLaunchConf).map(_.get.head),
+    sbtTestDirectory := sourceDirectory.value / "sbt-test",
+    libraryDependencies ++= Seq(
+      "org.scala-sbt" % "scripted-sbt" % scriptedSbt.value % scriptedConf.toString,
+      "org.scala-sbt" % "sbt-launch" % scriptedSbt.value % scriptedLaunchConf.toString
+    ),
+    scriptedBufferLog := true,
+    scriptedClasspath := getJars(scriptedConf).value,
+    scriptedTests <<= scriptedTestsTask,
+    scriptedRun <<= scriptedRunTask,
+    scriptedDependencies <<=
+      (compile in Test, publishLocal) map { (analysis, pub) =>
         Unit
       },
-      scriptedLaunchOpts := Seq(),
-      scripted <<= scriptedTask
+    scriptedLaunchOpts := Seq(),
+    scripted <<= scriptedTask
   )
   private[this] def getJars(
       config: Configuration): Initialize[Task[PathFinder]] = Def.task {
-    PathFinder(Classpaths
-          .managedJars(config, classpathTypes.value, update.value)
-          .map(_.data))
+    PathFinder(
+      Classpaths
+        .managedJars(config, classpathTypes.value, update.value)
+        .map(_.data))
   }
 }

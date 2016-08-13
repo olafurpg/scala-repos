@@ -4,12 +4,24 @@ package lang.psi.controlFlow.impl
 import _root_.org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause, ScPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScCaseClause,
+  ScPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScParameterOwner, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScParameterOwner,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{Instruction, ScControlFlowPolicy}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  Instruction,
+  ScControlFlowPolicy
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScFunctionType
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
@@ -19,10 +31,10 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author ilyas
   */
-class ScalaControlFlowBuilder(
-    startInScope: ScalaPsiElement,
-    endInsScope: ScalaPsiElement,
-    policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy)
+class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
+                              endInsScope: ScalaPsiElement,
+                              policy: ScControlFlowPolicy =
+                                AllVariablesControlFlowPolicy)
     extends ScalaRecursiveElementVisitor {
   private val myInstructions = new ArrayBuffer[InstructionImpl]
   private val myPending = new ArrayBuffer[(InstructionImpl, ScalaPsiElement)]
@@ -55,7 +67,7 @@ class ScalaControlFlowBuilder(
 
   def emptyNode() {
     startNode(None) { _ =>
-    }
+      }
   }
 
   def startNode(element: Option[ScalaPsiElement])(
@@ -66,9 +78,8 @@ class ScalaControlFlowBuilder(
   /**
     * Process a new node inside the CFG
     */
-  private def startNode(
-      element: Option[ScalaPsiElement], checkPending: Boolean)(
-      body: InstructionImpl => Unit) {
+  private def startNode(element: Option[ScalaPsiElement],
+                        checkPending: Boolean)(body: InstructionImpl => Unit) {
     val instr = new InstructionImpl(inc, element)
     addNode(instr)
     body(instr)
@@ -106,8 +117,8 @@ class ScalaControlFlowBuilder(
     }
   }
 
-  private def addPendingEdge(
-      scopeWhenAdded: ScalaPsiElement, instruction: InstructionImpl) {
+  private def addPendingEdge(scopeWhenAdded: ScalaPsiElement,
+                             instruction: InstructionImpl) {
     if (instruction == null) return
     var index = 0
     if (scopeWhenAdded != null) {
@@ -119,11 +130,11 @@ class ScalaControlFlowBuilder(
       myPending.insert(math.max(index, 0), (instruction, scopeWhenAdded))
   }
 
-  private def advancePendingEdges(
-      fromScope: ScalaPsiElement, toScope: ScalaPsiElement) {
+  private def advancePendingEdges(fromScope: ScalaPsiElement,
+                                  toScope: ScalaPsiElement) {
     for {
       ((instr, scope), idx) <- myPending.zipWithIndex if scope != null &&
-                              PsiTreeUtil.isAncestor(fromScope, scope, false)
+        PsiTreeUtil.isAncestor(fromScope, scope, false)
     } {
       myPending.update(idx, (instr, toScope))
     }
@@ -162,7 +173,10 @@ class ScalaControlFlowBuilder(
     ref.qualifier match {
       case None =>
         val instr = new ReadWriteVariableInstruction(
-            inc, ref, policy.usedVariable(ref), ScalaPsiUtil.isLValue(ref))
+          inc,
+          ref,
+          policy.usedVariable(ref),
+          ScalaPsiUtil.isLValue(ref))
         addNode(instr)
         checkPendingEdges(instr)
       case Some(qual) => qual.accept(this)
@@ -364,10 +378,10 @@ class ScalaControlFlowBuilder(
   override def visitReturnStatement(ret: ScReturnStmt) {
     val isNodeNeeded =
       myHead == null ||
-      (myHead.element match {
-            case Some(e) => e != ret
-            case None => false
-          })
+        (myHead.element match {
+          case Some(e) => e != ret
+          case None => false
+        })
     ret.expr match {
       case Some(e) => e.accept(this)
       case None =>
@@ -443,7 +457,7 @@ class ScalaControlFlowBuilder(
           case p: ScParameter if parameters.contains(p) =>
           case named: PsiNamedElement
               if !PsiTreeUtil.isAncestor(paramOwner, named, false) &&
-              policy.isElementAccepted(named) =>
+                policy.isElementAccepted(named) =>
             collectedRefs += ref
           case _ =>
         }
@@ -453,8 +467,10 @@ class ScalaControlFlowBuilder(
     paramOwner.accept(visitor)
 
     for (ref <- collectedRefs) {
-      val instr = new ReadWriteVariableInstruction(
-          inc, ref, policy.usedVariable(ref), ScalaPsiUtil.isLValue(ref))
+      val instr = new ReadWriteVariableInstruction(inc,
+                                                   ref,
+                                                   policy.usedVariable(ref),
+                                                   ScalaPsiUtil.isLValue(ref))
       addNode(instr)
       checkPendingEdges(instr)
     }
@@ -463,10 +479,10 @@ class ScalaControlFlowBuilder(
   override def visitThrowExpression(throwStmt: ScThrowStmt) {
     val isNodeNeeded =
       myHead == null ||
-      (myHead.element match {
-            case Some(e) => e != throwStmt
-            case None => false
-          })
+        (myHead.element match {
+          case Some(e) => e != throwStmt
+          case None => false
+        })
     throwStmt.body.map(_.accept(this))
     if (isNodeNeeded)
       startNode(Some(throwStmt)) { rs =>
@@ -489,8 +505,8 @@ class ScalaControlFlowBuilder(
       case Some(cb) =>
         cb.expression match {
           case Some(b: ScBlockExpr) if b.hasCaseClauses =>
-            for (t <- b.caseClauses.toSeq.flatMap(_.caseClauses)) yield
-              CatchInfo(t)
+            for (t <- b.caseClauses.toSeq.flatMap(_.caseClauses))
+              yield CatchInfo(t)
           case _ => Nil
         }
     }
@@ -558,10 +574,10 @@ class ScalaControlFlowBuilder(
       } else {
         startNode(Some(fBlock)) { finInstr =>
           for (p @ (instr, info) <- myTransitionInstructions;
-                                       if info.elem eq fBlock) {
-                addEdge(instr, finInstr)
-                myTransitionInstructions -= p
-              }
+               if info.elem eq fBlock) {
+            addEdge(instr, finInstr)
+            myTransitionInstructions -= p
+          }
           processCatch(finInstr)
           myHead = finInstr
           fBlock.accept(this)

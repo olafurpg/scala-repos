@@ -39,17 +39,18 @@ trait ScalacPatternExpanders {
       val seq = repeatedToSeq(tpe)
 
       (typeOfMemberNamedHead(seq) orElse typeOfMemberNamedApply(seq) orElse definitions
-            .elementType(ArrayClass, seq))
+        .elementType(ArrayClass, seq))
     }
     def newExtractor(whole: Type,
                      fixed: List[Type],
                      repeated: Repeated,
                      typeOfSinglePattern: Type): Extractor =
       logResult(
-          s"newExtractor($whole, $fixed, $repeated, $typeOfSinglePattern")(
-          Extractor(whole, fixed, repeated, typeOfSinglePattern))
-    def newExtractor(
-        whole: Type, fixed: List[Type], repeated: Repeated): Extractor =
+        s"newExtractor($whole, $fixed, $repeated, $typeOfSinglePattern")(
+        Extractor(whole, fixed, repeated, typeOfSinglePattern))
+    def newExtractor(whole: Type,
+                     fixed: List[Type],
+                     repeated: Repeated): Extractor =
       newExtractor(whole, fixed, repeated, tupleType(fixed))
 
     // Turn Seq[A] into Repeated(Seq[A], A, A*)
@@ -90,8 +91,8 @@ trait ScalacPatternExpanders {
         def noGetError() = {
           val name = "unapply" + (if (isSeq) "Seq" else "")
           context.error(
-              context.tree.pos,
-              s"The result type of an $name method must contain a member `get` to be used as an extractor pattern, no such member exists in ${result}")
+            context.tree.pos,
+            s"The result type of an $name method must contain a member `get` to be used as an extractor pattern, no such member exists in ${result}")
         }
         val expanded = getResult match {
           case global.NoType => noGetError(); Nil
@@ -107,8 +108,9 @@ trait ScalacPatternExpanders {
     }
   }
   object alignPatterns extends ScalacPatternExpander {
-    private def validateAligned(
-        context: Context, tree: Tree, aligned: Aligned): Aligned = {
+    private def validateAligned(context: Context,
+                                tree: Tree,
+                                aligned: Aligned): Aligned = {
       import aligned._
 
       def owner = tree.symbol.owner
@@ -122,7 +124,8 @@ trait ScalacPatternExpanders {
       def err(msg: String) = context.error(tree.pos, msg)
       def warn(msg: String) = context.warning(tree.pos, msg)
       def arityError(what: String) =
-        err(s"$what patterns for $owner$offerString: expected $arityExpected, found $totalArity")
+        err(
+          s"$what patterns for $owner$offerString: expected $arityExpected, found $totalArity")
 
       if (isStar && !isSeq)
         err("Star pattern must correspond with varargs or unapplySeq")
@@ -150,11 +153,15 @@ trait ScalacPatternExpanders {
 
       val extractor = sel.symbol.name match {
         case nme.unapply =>
-          unapplyMethodTypes(
-              context, firstParamType(fn.tpe), sel.tpe, isSeq = false)
+          unapplyMethodTypes(context,
+                             firstParamType(fn.tpe),
+                             sel.tpe,
+                             isSeq = false)
         case nme.unapplySeq =>
-          unapplyMethodTypes(
-              context, firstParamType(fn.tpe), sel.tpe, isSeq = true)
+          unapplyMethodTypes(context,
+                             firstParamType(fn.tpe),
+                             sel.tpe,
+                             isSeq = true)
         case _ => applyMethodTypes(fn.tpe)
       }
 
@@ -176,9 +183,9 @@ trait ScalacPatternExpanders {
               isTupleType(extractor.typeOfSinglePattern)) {
             val sym = sel.symbol.owner
             currentRun.reporting.deprecationWarning(
-                sel.pos,
-                sym,
-                s"${sym} expects $productArity patterns$acceptMessage but crushing into $productArity-tuple to fit single pattern (SI-6675)")
+              sel.pos,
+              sym,
+              s"${sym} expects $productArity patterns$acceptMessage but crushing into $productArity-tuple to fit single pattern (SI-6675)")
           }
           tupled
         } else extractor

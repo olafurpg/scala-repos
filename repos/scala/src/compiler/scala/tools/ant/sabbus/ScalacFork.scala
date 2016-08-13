@@ -96,13 +96,13 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     val compilerPath =
       this.compilerPath getOrElse sys.error(
-          "Mandatory attribute 'compilerpath' is not set.")
+        "Mandatory attribute 'compilerpath' is not set.")
     val sourceDir =
       this.sourceDir getOrElse sys.error(
-          "Mandatory attribute 'srcdir' is not set.")
+        "Mandatory attribute 'srcdir' is not set.")
     val destinationDir =
       this.destinationDir getOrElse sys.error(
-          "Mandatory attribute 'destdir' is not set.")
+        "Mandatory attribute 'destdir' is not set.")
 
     val settings = new Settings
     settings.d = destinationDir
@@ -116,10 +116,10 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     val includedFiles: Array[File] =
       new SourceFileScanner(this).restrict(
-          getDirectoryScanner(sourceDir).getIncludedFiles,
-          sourceDir,
-          destinationDir,
-          mapper
+        getDirectoryScanner(sourceDir).getIncludedFiles,
+        sourceDir,
+        destinationDir,
+        mapper
       ) map (x => new File(sourceDir, x))
 
     /* Nothing to do. */
@@ -127,9 +127,9 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     if (includedFiles.nonEmpty)
       log(
-          "Compiling %d file%s to %s".format(includedFiles.length,
-                                             plural(includedFiles.length),
-                                             destinationDir))
+        "Compiling %d file%s to %s".format(includedFiles.length,
+                                           plural(includedFiles.length),
+                                           destinationDir))
 
     argfile foreach (x => log("Using argfile file: @" + x))
 
@@ -147,7 +147,7 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
       t map { s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
-          s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
+            s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
         else s
       } mkString "\n"
 
@@ -162,7 +162,7 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     if (failOnError && res != 0)
       throw new BuildException(
-          "Compilation failed because of an internal compiler error;" +
+        "Compilation failed because of an internal compiler error;" +
           " see the error output for details.")
   }
 }

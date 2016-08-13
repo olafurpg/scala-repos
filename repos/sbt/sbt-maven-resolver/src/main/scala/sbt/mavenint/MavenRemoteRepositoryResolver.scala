@@ -7,7 +7,14 @@ import org.apache.ivy.core.settings.IvySettings
 import org.eclipse.aether.artifact.{DefaultArtifact => AetherArtifact}
 import org.eclipse.aether.deployment.{DeployRequest => AetherDeployRequest}
 import org.eclipse.aether.metadata.{DefaultMetadata, Metadata}
-import org.eclipse.aether.resolution.{ArtifactDescriptorRequest => AetherDescriptorRequest, ArtifactDescriptorResult => AetherDescriptorResult, ArtifactRequest => AetherArtifactRequest, MetadataRequest => AetherMetadataRequest, VersionRequest => AetherVersionRequest, VersionRangeRequest => AetherVersionRangeRequest}
+import org.eclipse.aether.resolution.{
+  ArtifactDescriptorRequest => AetherDescriptorRequest,
+  ArtifactDescriptorResult => AetherDescriptorResult,
+  ArtifactRequest => AetherArtifactRequest,
+  MetadataRequest => AetherMetadataRequest,
+  VersionRequest => AetherVersionRequest,
+  VersionRangeRequest => AetherVersionRangeRequest
+}
 
 import sbt.internal.librarymanagement.ivyint.CustomRemoteMavenResolver
 import sbt.librarymanagement.MavenRepository
@@ -20,9 +27,10 @@ import scala.collection.JavaConverters._
   * Note: This creates its *own* local cache directory for cache metadata. using its name.
   *
   */
-class MavenRemoteRepositoryResolver(
-    val repo: MavenRepository, settings: IvySettings)
-    extends MavenRepositoryResolver(settings) with CustomRemoteMavenResolver {
+class MavenRemoteRepositoryResolver(val repo: MavenRepository,
+                                    settings: IvySettings)
+    extends MavenRepositoryResolver(settings)
+    with CustomRemoteMavenResolver {
   setName(repo.name)
   override def toString = s"${repo.name}: ${repo.root}"
   protected val system = MavenRepositorySystemFactory.newRepositorySystemImpl
@@ -36,7 +44,9 @@ class MavenRemoteRepositoryResolver(
     MavenRepositorySystemFactory.newSessionImpl(system, localRepo)
   private val aetherRepository = {
     new org.eclipse.aether.repository.RemoteRepository.Builder(
-        repo.name, SbtRepositoryLayout.LAYOUT_NAME, repo.root).build()
+      repo.name,
+      SbtRepositoryLayout.LAYOUT_NAME,
+      repo.root).build()
   }
   // TODO - Check if isUseCacheOnly is used correctly.
   private def isUseCacheOnly: Boolean =
@@ -68,16 +78,17 @@ class MavenRemoteRepositoryResolver(
   protected def getPublicationTime(mrid: ModuleRevisionId): Option[Long] = {
     val metadataRequest = new AetherMetadataRequest()
     metadataRequest.setMetadata(
-        new DefaultMetadata(mrid.getOrganisation,
-                            mrid.getName,
-                            mrid.getRevision,
-                            MavenRepositoryResolver.MAVEN_METADATA_XML,
-                            Metadata.Nature.RELEASE_OR_SNAPSHOT))
+      new DefaultMetadata(mrid.getOrganisation,
+                          mrid.getName,
+                          mrid.getRevision,
+                          MavenRepositoryResolver.MAVEN_METADATA_XML,
+                          Metadata.Nature.RELEASE_OR_SNAPSHOT))
     if (!isUseCacheOnly) metadataRequest.setRepository(aetherRepository)
     val metadataResultOpt = try system
       .resolveMetadata(session, java.util.Arrays.asList(metadataRequest))
       .asScala
-      .headOption catch {
+      .headOption
+    catch {
       case e: org.eclipse.aether.resolution.ArtifactResolutionException => None
     }
     try metadataResultOpt match {
@@ -86,8 +97,8 @@ class MavenRemoteRepositoryResolver(
         import org.codehaus.plexus.util.ReaderFactory
         val readMetadata = {
           val reader = ReaderFactory.newXmlReader(md.getMetadata.getFile)
-          try new MetadataXpp3Reader().read(reader, false) finally reader
-            .close()
+          try new MetadataXpp3Reader().read(reader, false)
+          finally reader.close()
         }
         val timestampOpt = for {
           v <- Option(readMetadata.getVersioning)

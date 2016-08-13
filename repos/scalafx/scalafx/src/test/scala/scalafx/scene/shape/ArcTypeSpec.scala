@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ArcTypeSpec
     extends SFXEnumDelegateSpec[jfxss.ArcType, ArcType](
-        javaClass = classOf[jfxss.ArcType],
-        scalaClass = classOf[ArcType],
-        companion = ArcType)
+      javaClass = classOf[jfxss.ArcType],
+      scalaClass = classOf[ArcType],
+      companion = ArcType)

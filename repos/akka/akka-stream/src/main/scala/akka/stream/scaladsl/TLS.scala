@@ -66,15 +66,19 @@ object TLS {
             firstSession: NegotiateNewSession,
             role: TLSRole,
             closing: TLSClosing = IgnoreComplete,
-            hostInfo: Option[(String, Int)] = None): scaladsl.BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SslTlsInbound, NotUsed] =
+            hostInfo: Option[(String, Int)] = None)
+    : scaladsl.BidiFlow[SslTlsOutbound,
+                        ByteString,
+                        ByteString,
+                        SslTlsInbound,
+                        NotUsed] =
     new scaladsl.BidiFlow(
-        TlsModule(Attributes.none,
-                  sslContext,
-                  firstSession,
-                  role,
-                  closing,
-                  hostInfo))
+      TlsModule(Attributes.none,
+                sslContext,
+                firstSession,
+                role,
+                closing,
+                hostInfo))
 }
 
 /**
@@ -88,16 +92,21 @@ object TLSPlacebo {
   private[akka] val dummySession =
     SSLContext.getDefault.createSSLEngine.getSession
 
-  def apply(): scaladsl.BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SessionBytes, NotUsed] = instance
+  def apply(): scaladsl.BidiFlow[SslTlsOutbound,
+                                 ByteString,
+                                 ByteString,
+                                 SessionBytes,
+                                 NotUsed] = instance
 
-  private val instance: scaladsl.BidiFlow[
-      SslTlsOutbound, ByteString, ByteString, SessionBytes, NotUsed] =
-    scaladsl.BidiFlow.fromGraph(
-        scaladsl.GraphDSL.create() { implicit b ⇒
-      val top = b.add(scaladsl
-            .Flow[SslTlsOutbound]
-            .collect { case SendBytes(bytes) ⇒ bytes })
+  private val instance: scaladsl.BidiFlow[SslTlsOutbound,
+                                          ByteString,
+                                          ByteString,
+                                          SessionBytes,
+                                          NotUsed] =
+    scaladsl.BidiFlow.fromGraph(scaladsl.GraphDSL.create() { implicit b ⇒
+      val top = b.add(scaladsl.Flow[SslTlsOutbound].collect {
+        case SendBytes(bytes) ⇒ bytes
+      })
       val bottom =
         b.add(scaladsl.Flow[ByteString].map(SessionBytes(dummySession, _)))
       BidiShape.fromFlows(top, bottom)
@@ -136,7 +145,8 @@ trait ScalaSessionAPI {
     * were used.
     */
   def peerCertificates: List[Certificate] =
-    try Option(session.getPeerCertificates).map(_.toList).getOrElse(Nil) catch {
+    try Option(session.getPeerCertificates).map(_.toList).getOrElse(Nil)
+    catch {
       case e: SSLPeerUnverifiedException ⇒ Nil
     }
 
@@ -145,7 +155,8 @@ trait ScalaSessionAPI {
     * this session’s negotiation.
     */
   def peerPrincipal: Option[Principal] =
-    try Option(session.getPeerPrincipal) catch {
+    try Option(session.getPeerPrincipal)
+    catch {
       case e: SSLPeerUnverifiedException ⇒ None
     }
 }

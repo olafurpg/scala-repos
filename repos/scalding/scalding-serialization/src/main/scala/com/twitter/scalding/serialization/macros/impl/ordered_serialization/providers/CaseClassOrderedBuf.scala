@@ -19,7 +19,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
@@ -29,8 +33,8 @@ object CaseClassOrderedBuf {
     : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
     case tpe
         if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass &&
-        !tpe.typeSymbol.asClass.isModuleClass &&
-        !tpe.typeConstructor.takesTypeArgs =>
+          !tpe.typeSymbol.asClass.isModuleClass &&
+          !tpe.typeConstructor.takesTypeArgs =>
       CaseClassOrderedBuf(c)(buildDispatcher, tpe)
   }
 
@@ -53,8 +57,8 @@ object CaseClassOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         ProductLike.compareBinary(c)(inputStreamA, inputStreamB)(elementData)
 
       override def hash(element: ctx.TermName): ctx.Tree =
@@ -80,8 +84,8 @@ object CaseClassOrderedBuf {
        ${outerType.typeSymbol.companionSymbol}(..${getValProcessor.map(_._2)})
         """
       }
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree =
         ProductLike.compare(c)(elementA, elementB)(elementData)
 
       override val lazyOuterVariables: Map[String, ctx.Tree] =

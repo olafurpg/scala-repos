@@ -33,12 +33,12 @@ object ClusterSingletonProxySettings {
     */
   def apply(config: Config): ClusterSingletonProxySettings =
     new ClusterSingletonProxySettings(
-        singletonName = config.getString("singleton-name"),
-        role = roleOption(config.getString("role")),
-        singletonIdentificationInterval = config
-            .getDuration("singleton-identification-interval", MILLISECONDS)
-            .millis,
-        bufferSize = config.getInt("buffer-size"))
+      singletonName = config.getString("singleton-name"),
+      role = roleOption(config.getString("role")),
+      singletonIdentificationInterval = config
+        .getDuration("singleton-identification-interval", MILLISECONDS)
+        .millis,
+      bufferSize = config.getInt("buffer-size"))
 
   /**
     * Java API: Create settings from the default configuration
@@ -99,10 +99,13 @@ final class ClusterSingletonProxySettings(
   private def copy(
       singletonName: String = singletonName,
       role: Option[String] = role,
-      singletonIdentificationInterval: FiniteDuration = singletonIdentificationInterval,
+      singletonIdentificationInterval: FiniteDuration =
+        singletonIdentificationInterval,
       bufferSize: Int = bufferSize): ClusterSingletonProxySettings =
-    new ClusterSingletonProxySettings(
-        singletonName, role, singletonIdentificationInterval, bufferSize)
+    new ClusterSingletonProxySettings(singletonName,
+                                      role,
+                                      singletonIdentificationInterval,
+                                      bufferSize)
 }
 
 object ClusterSingletonProxy {
@@ -140,9 +143,10 @@ object ClusterSingletonProxy {
   * Note that this is a best effort implementation: messages can always be lost due to the distributed nature of the
   * actors involved.
   */
-final class ClusterSingletonProxy(
-    singletonManagerPath: String, settings: ClusterSingletonProxySettings)
-    extends Actor with ActorLogging {
+final class ClusterSingletonProxy(singletonManagerPath: String,
+                                  settings: ClusterSingletonProxySettings)
+    extends Actor
+    with ActorLogging {
   import settings._
   val singletonPath =
     (singletonManagerPath + "/" + settings.singletonName).split("/")
@@ -201,11 +205,11 @@ final class ClusterSingletonProxy(
     singleton = None
     cancelTimer()
     identifyTimer = Some(
-        context.system.scheduler.schedule(
-            0 milliseconds,
-            singletonIdentificationInterval,
-            self,
-            ClusterSingletonProxy.TryToIdentifySingleton))
+      context.system.scheduler.schedule(
+        0 milliseconds,
+        singletonIdentificationInterval,
+        self,
+        ClusterSingletonProxy.TryToIdentifySingleton))
   }
 
   def trackChange(block: () ⇒ Unit): Unit = {
@@ -245,7 +249,7 @@ final class ClusterSingletonProxy(
     case MemberUp(m) ⇒ add(m)
     case mEvent: MemberEvent
         if mEvent.isInstanceOf[MemberExited] ||
-        mEvent.isInstanceOf[MemberRemoved] ⇒
+          mEvent.isInstanceOf[MemberRemoved] ⇒
       remove(mEvent.member)
     case _: MemberEvent ⇒ // do nothing
 
@@ -277,9 +281,9 @@ final class ClusterSingletonProxy(
         case Some(s) ⇒
           if (log.isDebugEnabled)
             log.debug(
-                "Forwarding message of type [{}] to current singleton instance at [{}]: {}",
-                Logging.simpleName(msg.getClass.getName),
-                s.path)
+              "Forwarding message of type [{}] to current singleton instance at [{}]: {}",
+              Logging.simpleName(msg.getClass.getName),
+              s.path)
           s forward msg
         case None ⇒
           buffer(msg)
@@ -289,13 +293,13 @@ final class ClusterSingletonProxy(
   def buffer(msg: Any): Unit =
     if (settings.bufferSize == 0)
       log.debug(
-          "Singleton not available and buffering is disabled, dropping message [{}]",
-          msg.getClass.getName)
+        "Singleton not available and buffering is disabled, dropping message [{}]",
+        msg.getClass.getName)
     else if (buffer.size == settings.bufferSize) {
       val (m, _) = buffer.removeFirst()
       log.debug(
-          "Singleton not available, buffer is full, dropping first message [{}]",
-          m.getClass.getName)
+        "Singleton not available, buffer is full, dropping first message [{}]",
+        m.getClass.getName)
       buffer.addLast((msg, sender()))
     } else {
       log.debug("Singleton not available, buffering message type [{}]",

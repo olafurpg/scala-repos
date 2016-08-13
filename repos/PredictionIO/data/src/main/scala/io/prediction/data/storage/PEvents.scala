@@ -34,19 +34,19 @@ import scala.reflect.ClassTag
 trait PEvents extends Serializable {
   @transient protected lazy val logger = Logger[this.type]
   @deprecated("Use PEventStore.find() instead.", "0.9.2")
-  def getByAppIdAndTimeAndEntity(appId: Int,
-                                 startTime: Option[DateTime],
-                                 untilTime: Option[DateTime],
-                                 entityType: Option[String],
-                                 entityId: Option[String])(
-      sc: SparkContext): RDD[Event] = {
+  def getByAppIdAndTimeAndEntity(
+      appId: Int,
+      startTime: Option[DateTime],
+      untilTime: Option[DateTime],
+      entityType: Option[String],
+      entityId: Option[String])(sc: SparkContext): RDD[Event] = {
     find(
-        appId = appId,
-        startTime = startTime,
-        untilTime = untilTime,
-        entityType = entityType,
-        entityId = entityId,
-        eventNames = None
+      appId = appId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = None
     )(sc)
   }
 
@@ -129,30 +129,29 @@ trait PEvents extends Serializable {
     */
   @deprecated("Use PEventStore.aggregateProperties() instead.", "0.9.2")
   @Experimental
-  def extractEntityMap[A : ClassTag](appId: Int,
-                                     entityType: String,
-                                     startTime: Option[DateTime] = None,
-                                     untilTime: Option[DateTime] = None,
-                                     required: Option[Seq[String]] = None)(
+  def extractEntityMap[A: ClassTag](appId: Int,
+                                    entityType: String,
+                                    startTime: Option[DateTime] = None,
+                                    untilTime: Option[DateTime] = None,
+                                    required: Option[Seq[String]] = None)(
       sc: SparkContext)(extract: DataMap => A): EntityMap[A] = {
     val idToData: Map[String, A] = aggregateProperties(
-        appId = appId,
-        entityType = entityType,
-        startTime = startTime,
-        untilTime = untilTime,
-        required = required
+      appId = appId,
+      entityType = entityType,
+      startTime = startTime,
+      untilTime = untilTime,
+      required = required
     )(sc).map {
       case (id, dm) =>
         try {
           (id, extract(dm))
         } catch {
           case e: Exception => {
-              logger.error(
-                  s"Failed to get extract entity from DataMap $dm of " +
-                  s"entityId $id.",
-                  e)
-              throw e
-            }
+            logger.error(s"Failed to get extract entity from DataMap $dm of " +
+                           s"entityId $id.",
+                         e)
+            throw e
+          }
         }
     }.collectAsMap.toMap
 

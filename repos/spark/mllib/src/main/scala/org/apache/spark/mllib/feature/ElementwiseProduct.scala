@@ -40,8 +40,8 @@ class ElementwiseProduct @Since("1.4.0")(
   @Since("1.4.0")
   override def transform(vector: Vector): Vector = {
     require(
-        vector.size == scalingVec.size,
-        s"vector sizes do not match: Expected ${scalingVec.size} but found ${vector.size}")
+      vector.size == scalingVec.size,
+      s"vector sizes do not match: Expected ${scalingVec.size} but found ${vector.size}")
     vector match {
       case dv: DenseVector =>
         val values: Array[Double] = dv.values.clone()
@@ -63,7 +63,7 @@ class ElementwiseProduct @Since("1.4.0")(
         Vectors.sparse(size, indices, values)
       case v =>
         throw new IllegalArgumentException(
-            "Does not support vector type " + v.getClass)
+          "Does not support vector type " + v.getClass)
     }
   }
 }

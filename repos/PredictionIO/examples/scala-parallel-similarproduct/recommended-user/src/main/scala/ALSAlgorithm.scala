@@ -9,26 +9,27 @@ import org.apache.spark.mllib.recommendation.{ALS, Rating => MLlibRating}
 
 import scala.collection.mutable
 
-case class ALSAlgorithmParams(
-    rank: Int, numIterations: Int, lambda: Double, seed: Option[Long])
+case class ALSAlgorithmParams(rank: Int,
+                              numIterations: Int,
+                              lambda: Double,
+                              seed: Option[Long])
     extends Params
 
 class ALSModel(
     val similarUserFeatures: Map[Int, Array[Double]],
     val similarUserStringIntMap: BiMap[String, Int],
     val similarUsers: Map[Int, User]
-)
-    extends Serializable {
+) extends Serializable {
 
   @transient lazy val similarUserIntStringMap = similarUserStringIntMap.inverse
 
   override def toString = {
     s" similarUserFeatures: [${similarUserFeatures.size}]" +
-    s"(${similarUserFeatures.take(2).toList}...)" +
-    s" similarUserStringIntMap: [${similarUserStringIntMap.size}]" +
-    s"(${similarUserStringIntMap.take(2).toString()}...)]" +
-    s" users: [${similarUsers.size}]" +
-    s"(${similarUsers.take(2).toString()}...)]"
+      s"(${similarUserFeatures.take(2).toList}...)" +
+      s" similarUserStringIntMap: [${similarUserStringIntMap.size}]" +
+      s"(${similarUserStringIntMap.take(2).toString()}...)]" +
+      s" users: [${similarUsers.size}]" +
+      s"(${similarUsers.take(2).toString()}...)]"
   }
 }
 
@@ -43,12 +44,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
     require(data.followEvents.take(1).nonEmpty,
             s"followEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(data.users.take(1).nonEmpty,
             s"users in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create User String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val similarUserStringIntMap = userStringIntMap
@@ -65,12 +66,13 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
 
       if (uindex == -1)
-        logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
+        logger.info(
+          s"Couldn't convert nonexistent user ID ${r.user}" +
             " to Int index.")
 
       if (iindex == -1)
         logger.info(
-            s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
+          s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
             " to Int index.")
 
       ((uindex, iindex), 1)
@@ -86,8 +88,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // MLLib ALS cannot handle empty training data.
     require(
-        mllibRatings.take(1).nonEmpty,
-        s"mllibRatings cannot be empty." +
+      mllibRatings.take(1).nonEmpty,
+      s"mllibRatings cannot be empty." +
         " Please check if your events contain valid user and followedUser ID.")
 
     // seed for MLlib ALS
@@ -102,9 +104,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                               seed = seed)
 
     new ALSModel(
-        similarUserFeatures = m.productFeatures.collectAsMap().toMap,
-        similarUserStringIntMap = similarUserStringIntMap,
-        similarUsers = similarUsers
+      similarUserFeatures = m.productFeatures.collectAsMap().toMap,
+      similarUserStringIntMap = similarUserStringIntMap,
+      similarUsers = similarUsers
     )
   }
 
@@ -122,17 +124,17 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       similarUserFeatures.get(similarUser)
     }.flatten
 
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.similarUserStringIntMap.get).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.similarUserStringIntMap.get).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+      set.map(model.similarUserStringIntMap.get).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+      set.map(model.similarUserStringIntMap.get).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 
     val indexScores: Array[(Int, Double)] =
       if (queryFeatures.isEmpty) {
         logger.info(
-            s"No similarUserFeatures vector for query users ${query.users}.")
+          s"No similarUserFeatures vector for query users ${query.users}.")
         Array[(Int, Double)]()
       } else {
         similarUserFeatures.par // convert to parallel collection
@@ -148,11 +150,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val filteredScore = indexScores.view.filter {
       case (i, v) =>
         isCandidateSimilarUser(
-            i = i,
-            similarUsers = model.similarUsers,
-            queryList = queryList,
-            whiteList = whiteList,
-            blackList = blackList
+          i = i,
+          similarUsers = model.similarUsers,
+          queryList = queryList,
+          whiteList = whiteList,
+          blackList = blackList
         )
     }
 
@@ -161,8 +163,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val similarUserScores = topScores.map {
       case (i, s) =>
         new similarUserScore(
-            user = model.similarUserIntStringMap(i),
-            score = s
+          user = model.similarUserIntStringMap(i),
+          score = s
         )
     }
 

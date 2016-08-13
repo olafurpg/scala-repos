@@ -12,7 +12,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class HeapBalancerTest
-    extends FunSuite with MockitoSugar with AssertionsForJUnit {
+    extends FunSuite
+    with MockitoSugar
+    with AssertionsForJUnit {
   class LoadedFactory(which: String)
       extends ServiceFactory[Unit, LoadedFactory] {
     var load = 0
@@ -56,10 +58,10 @@ class HeapBalancerTest
     val exc = new NoBrokersAvailableException
 
     val b = new HeapBalancer[Unit, LoadedFactory](
-        Activity(group.set map (Activity.Ok(_))),
-        statsReceiver,
-        exc,
-        nonRng)
+      Activity(group.set map (Activity.Ok(_))),
+      statsReceiver,
+      exc,
+      nonRng)
     val newFactory = new LoadedFactory("new")
 
     def assertGauge(name: String, value: Int) =
@@ -71,10 +73,10 @@ class HeapBalancerTest
   test("balancer with empty cluster has Closed status") {
     val emptyCluster = Group.empty[ServiceFactory[Unit, LoadedFactory]]
     val b = new HeapBalancer[Unit, LoadedFactory](
-        Activity(emptyCluster.set.map(Activity.Ok(_))),
-        NullStatsReceiver,
-        new NoBrokersAvailableException,
-        new Random
+      Activity(emptyCluster.set.map(Activity.Ok(_))),
+      NullStatsReceiver,
+      new NoBrokersAvailableException,
+      new Random
     )
     assert(b.status == Status.Closed)
   }
@@ -87,10 +89,10 @@ class HeapBalancerTest
       val cluster = Group.mutable[ServiceFactory[Unit, LoadedFactory]](node)
 
       val b = new HeapBalancer[Unit, LoadedFactory](
-          Activity(cluster.set map (Activity.Ok(_))),
-          NullStatsReceiver,
-          new NoBrokersAvailableException,
-          new Random
+        Activity(cluster.set map (Activity.Ok(_))),
+        NullStatsReceiver,
+        new NoBrokersAvailableException,
+        new Random
       )
       assert(b.status == status)
     }
@@ -219,10 +221,10 @@ class HeapBalancerTest
 
     val heapBalancerEmptyGroup = "HeapBalancerEmptyGroup"
     val b = new HeapBalancer[Unit, LoadedFactory](
-        Activity.value(Set.empty),
-        NullStatsReceiver,
-        new NoBrokersAvailableException(heapBalancerEmptyGroup),
-        new Random
+      Activity.value(Set.empty),
+      NullStatsReceiver,
+      new NoBrokersAvailableException(heapBalancerEmptyGroup),
+      new Random
     )
     val exc = intercept[NoBrokersAvailableException] { Await.result(b()) }
     assert(exc.getMessage.contains(heapBalancerEmptyGroup))
@@ -272,8 +274,8 @@ class HeapBalancerTest
     for (_ <- 0 until 100 * N) b()
     val f0 = factories(0)
     f0.setStatus(Status.Open)
-    for (_ <- 0 until 100) assert(
-        Await.result(Await.result(b()).apply(())) == f0)
+    for (_ <- 0 until 100)
+      assert(Await.result(Await.result(b()).apply(())) == f0)
 
     assert(f0.load == 201)
     for (f <- factories drop 1) assert(f.load == 101)
@@ -328,10 +330,10 @@ class HeapBalancerTest
       Group.mutable[ServiceFactory[Unit, LoadedFactory]](factories: _*)
 
     val b = new HeapBalancer[Unit, LoadedFactory](
-        Activity(group.set map (Activity.Ok(_))),
-        statsReceiver,
-        new NoBrokersAvailableException,
-        new Random
+      Activity(group.set map (Activity.Ok(_))),
+      statsReceiver,
+      new NoBrokersAvailableException,
+      new Random
     )
 
     b(); b(); b(); b()

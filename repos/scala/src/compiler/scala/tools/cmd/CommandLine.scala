@@ -65,7 +65,7 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
           expand(x) foreach (exp => return loop(exp))
           if (isBinaryOption(x) && enforceArity)
             errorFn(
-                "Option '%s' requires argument, found EOF instead.".format(x))
+              "Option '%s' requires argument, found EOF instead.".format(x))
 
           if (isUnaryOption(x)) mapForUnary(x)
           else if (isUnknown(x)) Map()

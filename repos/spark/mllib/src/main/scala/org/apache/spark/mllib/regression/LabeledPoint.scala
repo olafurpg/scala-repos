@@ -32,8 +32,8 @@ import org.apache.spark.SparkException
   */
 @Since("0.8.0")
 @BeanInfo
-case class LabeledPoint @Since("1.0.0")(
-    @Since("0.8.0") label: Double, @Since("1.0.0") features: Vector) {
+case class LabeledPoint @Since("1.0.0")(@Since("0.8.0") label: Double,
+                                        @Since("1.0.0") features: Vector) {
   override def toString: String = {
     s"($label,$features)"
   }
@@ -65,7 +65,7 @@ object LabeledPoint {
       val parts = s.split(',')
       val label = java.lang.Double.parseDouble(parts(0))
       val features = Vectors.dense(
-          parts(1).trim().split(' ').map(java.lang.Double.parseDouble))
+        parts(1).trim().split(' ').map(java.lang.Double.parseDouble))
       LabeledPoint(label, features)
     }
   }

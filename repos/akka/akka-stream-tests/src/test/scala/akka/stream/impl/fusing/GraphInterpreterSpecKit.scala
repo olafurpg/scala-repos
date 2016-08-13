@@ -5,9 +5,20 @@ package akka.stream.impl.fusing
 
 import akka.event.Logging
 import akka.stream._
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, Failed, GraphAssembly, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic,
+  Failed,
+  GraphAssembly,
+  UpstreamBoundaryStageLogic
+}
 import akka.stream.stage.AbstractStage.PushPullGraphStage
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler, _}
+import akka.stream.stage.{
+  GraphStage,
+  GraphStageLogic,
+  InHandler,
+  OutHandler,
+  _
+}
 import akka.testkit.AkkaSpec
 import akka.stream.testkit.Utils.TE
 import akka.stream.impl.fusing.GraphInterpreter.GraphAssembly
@@ -69,22 +80,22 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
         }
 
         new GraphAssembly(
-            stages.toArray,
-            Array.fill(stages.size)(Attributes.none),
-            (ins ++ Vector.fill(downstreams.size)(null)).toArray,
-            (inOwners ++ Vector.fill(downstreams.size)(-1)).toArray,
-            (Vector.fill(upstreams.size)(null) ++ outs).toArray,
-            (Vector.fill(upstreams.size)(-1) ++ outOwners).toArray)
+          stages.toArray,
+          Array.fill(stages.size)(Attributes.none),
+          (ins ++ Vector.fill(downstreams.size)(null)).toArray,
+          (inOwners ++ Vector.fill(downstreams.size)(-1)).toArray,
+          (Vector.fill(upstreams.size)(null) ++ outs).toArray,
+          (Vector.fill(upstreams.size)(-1) ++ outOwners).toArray)
       }
 
       def init(): Unit = {
         val assembly = buildAssembly()
 
         val (inHandlers, outHandlers, logics) = assembly.materialize(
-            Attributes.none,
-            assembly.stages.map(_.module),
-            new java.util.HashMap,
-            _ ⇒ ())
+          Attributes.none,
+          assembly.stages.map(_.module),
+          new java.util.HashMap,
+          _ ⇒ ())
         _interpreter = new GraphInterpreter(assembly,
                                             NoMaterializer,
                                             logger,
@@ -101,7 +112,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
 
         for ((downstream, i) ← downstreams.zipWithIndex) {
           _interpreter.attachDownstreamBoundary(
-              i + upstreams.size + connections.size, downstream._2)
+            i + upstreams.size + connections.size,
+            downstream._2)
         }
 
         _interpreter.init(null)
@@ -110,10 +122,10 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
 
     def manualInit(assembly: GraphAssembly): Unit = {
       val (inHandlers, outHandlers, logics) = assembly.materialize(
-          Attributes.none,
-          assembly.stages.map(_.module),
-          new java.util.HashMap,
-          _ ⇒ ())
+        Attributes.none,
+        assembly.stages.map(_.module),
+        new java.util.HashMap,
+        _ ⇒ ())
       _interpreter = new GraphInterpreter(assembly,
                                           NoMaterializer,
                                           logger,
@@ -345,7 +357,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
     def toGS: PushPullGraphStage[Any, Any, Any] = {
       val s = stage
       new PushPullGraphStage[Any, Any, Any](
-          (_) ⇒ s.asInstanceOf[Stage[Any, Any]], Attributes.none)
+        (_) ⇒ s.asInstanceOf[Stage[Any, Any]],
+        Attributes.none)
     }
   }
 
@@ -399,7 +412,7 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
       }
 
       manualInit(
-          new GraphAssembly(ops, attributes, ins, inOwners, outs, outOwners))
+        new GraphAssembly(ops, attributes, ins, inOwners, outs, outOwners))
       interpreter.attachUpstreamBoundary(0, upstream)
       interpreter.attachDownstreamBoundary(ops.length, downstream)
 

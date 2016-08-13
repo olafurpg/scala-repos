@@ -20,8 +20,9 @@ import scala.util.Try
   *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
   */
 @SerialVersionUID(1L)
-final case class Metric private[metrics](
-    name: String, value: Number, average: Option[EWMA])
+final case class Metric private[metrics] (name: String,
+                                          value: Number,
+                                          average: Option[EWMA])
     extends MetricNumericConverter {
 
   require(defined(value), s"Invalid Metric [$name] value [$value]")
@@ -189,8 +190,8 @@ object StandardMetrics {
       * necessary cpu metrics.
       * @return if possible a tuple matching the Cpu constructor parameters
       */
-    def unapply(nodeMetrics: NodeMetrics): Option[(Address, Long, Option[
-            Double], Option[Double], Option[Double], Int)] = {
+    def unapply(nodeMetrics: NodeMetrics): Option[
+      (Address, Long, Option[Double], Option[Double], Option[Double], Int)] = {
       for {
         processors ← nodeMetrics.metric(Processors)
       } yield
@@ -311,8 +312,8 @@ final case class NodeMetrics(address: Address,
     */
   def merge(that: NodeMetrics): NodeMetrics = {
     require(
-        address == that.address,
-        s"merge only allowed for same address, [$address] != [$that.address]")
+      address == that.address,
+      s"merge only allowed for same address, [$address] != [$that.address]")
     if (timestamp >= that.timestamp) this // that is older
     else {
       // equality is based on the name of the Metric and Set doesn't replace existing element
@@ -325,8 +326,8 @@ final case class NodeMetrics(address: Address,
     */
   def update(that: NodeMetrics): NodeMetrics = {
     require(
-        address == that.address,
-        s"update only allowed for same address, [$address] != [$that.address]")
+      address == that.address,
+      s"update only allowed for same address, [$address] != [$that.address]")
     // Apply sample ordering.
     val (latestNode, currentNode) =
       if (this.timestamp >= that.timestamp) (this, that) else (that, this)
@@ -406,7 +407,8 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
   def :+(newNodeMetrics: NodeMetrics): MetricsGossip =
     nodeMetricsFor(newNodeMetrics.address) match {
       case Some(existingNodeMetrics) ⇒
-        copy(nodes = nodes - existingNodeMetrics +
+        copy(
+          nodes = nodes - existingNodeMetrics +
               (existingNodeMetrics update newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }

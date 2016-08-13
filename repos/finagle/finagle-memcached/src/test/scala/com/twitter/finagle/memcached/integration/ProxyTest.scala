@@ -1,7 +1,11 @@
 package com.twitter.finagle.memcached.integration
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.builder.{ClientBuilder, Server => MServer, ServerBuilder}
+import com.twitter.finagle.builder.{
+  ClientBuilder,
+  Server => MServer,
+  ServerBuilder
+}
 import com.twitter.finagle.memcached.Client
 import com.twitter.finagle.memcached.protocol.text.Memcached
 import com.twitter.finagle.memcached.protocol.{Command, Response}
@@ -49,7 +53,7 @@ class ProxyTest extends FunSuite with BeforeAndAfter {
 
       serverAddress = server.boundAddress.asInstanceOf[InetSocketAddress]
       externalClient = Client(
-          "%s:%d".format(serverAddress.getHostName, serverAddress.getPort))
+        "%s:%d".format(serverAddress.getHostName, serverAddress.getPort))
     }
   }
 

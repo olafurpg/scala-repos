@@ -111,15 +111,17 @@ object string {
         val ch = m.group(1).charAt(0) match {
           // holy crap! this is terrible:
           case 'u' =>
-            Character.valueOf(Integer
-                  .valueOf(m.group(1).substring(1), 16)
-                  .asInstanceOf[Int]
-                  .toChar)
+            Character.valueOf(
+              Integer
+                .valueOf(m.group(1).substring(1), 16)
+                .asInstanceOf[Int]
+                .toChar)
           case 'x' =>
-            Character.valueOf(Integer
-                  .valueOf(m.group(1).substring(1), 16)
-                  .asInstanceOf[Int]
-                  .toChar)
+            Character.valueOf(
+              Integer
+                .valueOf(m.group(1).substring(1), 16)
+                .asInstanceOf[Int]
+                .toChar)
           case 'r' => '\r'
           case 'n' => '\n'
           case 't' => '\t'

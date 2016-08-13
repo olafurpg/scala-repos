@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef
 
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScObject, ScClass}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition,
+  ScObject,
+  ScClass
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScClassParameterImpl
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -29,9 +33,9 @@ class MonocleInjector extends SyntheticMembersInjector {
       .collect({ case (f: ScClassParameterImpl, _) => f })
       .filter(_.isCaseClassVal)
     val prefix = Option(
-        clazz
-          .findAnnotation("monocle.macros.Lenses")
-          .findAttributeValue("value")) match {
+      clazz
+        .findAnnotation("monocle.macros.Lenses")
+        .findAttributeValue("value")) match {
       case Some(literal: ScLiteralImpl) => literal.getValue.toString
       case _ => ""
     }

@@ -191,7 +191,7 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
           // internally uses the configured fileIODispatcher:
           val source = FileIO.fromFile(new File("example.json"))
           HttpResponse(
-              entity = HttpEntity(ContentTypes.`application/json`, source))
+            entity = HttpEntity(ContentTypes.`application/json`, source))
         }
       }
 
@@ -269,8 +269,8 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
           case code if code.isSuccess ⇒ response
           case code ⇒
             log.warning(
-                "Dropping response entity since response status code was: {}",
-                code)
+              "Dropping response entity since response status code was: {}",
+              code)
             response.copy(entity = NullJsonEntity)
         }
 
@@ -397,7 +397,7 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
 
     val route = completeWithInnerException {
       complete(
-          throw new IllegalArgumentException("BLIP! BLOP! Everything broke"))
+        throw new IllegalArgumentException("BLIP! BLOP! Everything broke"))
     }
 
     // tests:
@@ -431,8 +431,9 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
       if (rejections.exists(_.isInstanceOf[AuthenticationFailedRejection]))
         Complete(HttpResponse(entity = "Nothing to see here, move along."))
       else if (rejections == Nil) // see "Empty Rejections" for more details
-        Complete(HttpResponse(StatusCodes.NotFound,
-                              entity = "Literally nothing to see here."))
+        Complete(
+          HttpResponse(StatusCodes.NotFound,
+                       entity = "Literally nothing to see here."))
       else Rejected(rejections)
     }
     val neverAuth: Authenticator[String] = creds => None
@@ -663,7 +664,7 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#extractRequest-example
     val route = extractRequest { request =>
       complete(
-          s"Request method is ${request.method.name} and content-type is ${request.entity.contentType}")
+        s"Request method is ${request.method.name} and content-type is ${request.entity.contentType}")
     }
 
     // tests:
@@ -679,7 +680,7 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#extractSettings-examples
     val route = extractSettings { settings: RoutingSettings =>
       complete(
-          s"RoutingSettings.renderVanityFooter = ${settings.renderVanityFooter}")
+        s"RoutingSettings.renderVanityFooter = ${settings.renderVanityFooter}")
     }
 
     // tests:
@@ -697,7 +698,7 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     val route = tunedSettings {
       extractSettings { settings: RoutingSettings =>
         complete(
-            s"RoutingSettings.fileGetConditional = ${settings.fileGetConditional}")
+          s"RoutingSettings.fileGetConditional = ${settings.fileGetConditional}")
       }
     }
 
@@ -711,10 +712,10 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
     //#extractRequestContext-example
     val route = extractRequestContext { ctx =>
       ctx.log.debug(
-          "Using access to additional context availablethings, like the logger.")
+        "Using access to additional context availablethings, like the logger.")
       val request = ctx.request
       complete(
-          s"Request method is ${request.method.name} and content-type is ${request.entity.contentType}")
+        s"Request method is ${request.method.name} and content-type is ${request.entity.contentType}")
     }
 
     // tests:

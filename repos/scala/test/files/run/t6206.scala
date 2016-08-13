@@ -16,10 +16,10 @@ class Outer1 { self =>
 
     def testMe = {
       List(
-          self.apply(this), // a) this works
-          self(this), // b) this does not work!
-          this apply this,
-          this(this)
+        self.apply(this), // a) this works
+        self(this), // b) this does not work!
+        this apply this,
+        this(this)
       ) foreach println
     }
   }

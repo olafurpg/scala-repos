@@ -39,7 +39,8 @@ object SepiaTone {
 }
 
 class SepiaTone(override val delegate: jfxse.SepiaTone = new jfxse.SepiaTone)
-    extends Effect(delegate) with InputDelegate[jfxse.SepiaTone]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.SepiaTone]
     with SFXDelegate[jfxse.SepiaTone] {
 
   /**

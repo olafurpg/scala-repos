@@ -12,15 +12,21 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
 
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScFunctionDeclarationImpl private (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDeclaration {
+class ScFunctionDeclarationImpl private (stub: StubElement[ScFunction],
+                                         nodeType: IElementType,
+                                         node: ASTNode)
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScFunctionDeclaration {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor =>

@@ -30,8 +30,9 @@ object ProjectTests extends TestSuite {
       } yield
         Future {
           if (filename.endsWith(".scala") && filter(filename)) {
-            val code = new String(java.nio.file.Files
-                  .readAllBytes(java.nio.file.Paths.get(filename)))
+            val code = new String(
+              java.nio.file.Files
+                .readAllBytes(java.nio.file.Paths.get(filename)))
             if (!ScalacParser.checkParseFails(code)) {
               print(".")
               TestUtil.check(code, tag = filename)
@@ -46,7 +47,7 @@ object ProjectTests extends TestSuite {
     'test - {
       val testSource = scala.io.Source
         .fromInputStream(
-            getClass.getResourceAsStream("/scalaparse/Test.scala")
+          getClass.getResourceAsStream("/scalaparse/Test.scala")
         )
         .mkString
       TestUtil.check(testSource)
@@ -74,14 +75,14 @@ object ProjectTests extends TestSuite {
     "PredictionIO/PredictionIO" - checkRepo()
     "apache/spark" - checkRepo()
     "sbt/sbt" - checkRepo(
-        x =>
-          !Seq(
-              // Unicode escapes in weird places
-              "target/repos/sbt/main/settings/src/main/scala/sbt/std/InputWrapper.scala",
-              // uses a package called `macro`
-              "target/repos/sbt/sbt/src/sbt-test/source-dependencies/inherited-macros",
-              "target/repos/sbt/sbt/src/sbt-test/source-dependencies/macro"
-          ).exists(x.startsWith)
+      x =>
+        !Seq(
+          // Unicode escapes in weird places
+          "target/repos/sbt/main/settings/src/main/scala/sbt/std/InputWrapper.scala",
+          // uses a package called `macro`
+          "target/repos/sbt/sbt/src/sbt-test/source-dependencies/inherited-macros",
+          "target/repos/sbt/sbt/src/sbt-test/source-dependencies/macro"
+        ).exists(x.startsWith)
     )
     "non/cats" - checkRepo()
     "twitter/finagle" - checkRepo()
@@ -102,10 +103,10 @@ object ProjectTests extends TestSuite {
     "ensime/ensime-server" - checkRepo()
     "GravityLabs/goose" - checkRepo()
     "ornicar/lila" - checkRepo(
-        x =>
-          !Seq(
-              "target/repos/lila/modules/lobby/src/main/SocketHandler.scala"
-          ).exists(x.startsWith)
+      x =>
+        !Seq(
+          "target/repos/lila/modules/lobby/src/main/SocketHandler.scala"
+        ).exists(x.startsWith)
     )
     "precog/platform" - checkRepo()
     "twitter/util" - checkRepo()
@@ -113,12 +114,12 @@ object ProjectTests extends TestSuite {
     // takes forever to clone on crappy internet =/
     "JetBrains/intellij-scala" - checkRepo()
     "scalatest/scalatest" - checkRepo(
-        x =>
-          !Seq(
-              // Unicode escapes in weird places
-              "target/repos/scalatest/common-test/src/main/scala/org/scalatest/OperatorNames.scala",
-              "target/repos/scalatest/scalatest-test/src/test/scala/org/scalatest/OperatorNames.scala"
-          ).exists(x.startsWith)
+      x =>
+        !Seq(
+          // Unicode escapes in weird places
+          "target/repos/scalatest/common-test/src/main/scala/org/scalatest/OperatorNames.scala",
+          "target/repos/scalatest/scalatest-test/src/test/scala/org/scalatest/OperatorNames.scala"
+        ).exists(x.startsWith)
     )
     "macroid/macroid" - checkRepo()
     // annoyingly uses trailing .s all over the place, needing dozens of
@@ -132,26 +133,26 @@ object ProjectTests extends TestSuite {
     "ucb-bar/chisel" - checkRepo()
     "etorreborre/specs2" - checkRepo()
     "scala/scala" - checkRepo(
-        x =>
-          !Seq(
-              // This fella seems to make the scalac parser hang (???)
-              "target/repos/scala/test/files/neg/t5510.scala",
-              // Unicode escapes in weird places
-              "target/repos/scala/test/files/neg/t8015-ffb.scala",
-              "target/repos/scala/test/files/pos/t389.scala",
-              "target/repos/scala/test/files/run/literals.scala",
-              "target/repos/scala/test/files/run/t3835.scala",
-              // Scalac parser seems to accept this, though it blows up later
-              "target/repos/scala/test/files/neg/t8266-invalid-interp.scala",
-              "target/repos/scala/test/disabled/",
-              "target/repos/scala/test/files/neg/",
-              // trailing . after number
-              "target/repos/scala/test/files/presentation/infix-completion/src/Snippet.scala",
-              // Not sure why this is failing but it's new, and earlier version of Scalaparse fail too
-              "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Entity.scala",
-              "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/HtmlPage.scala",
-              "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Template.scala"
-          ).exists(x.startsWith)
+      x =>
+        !Seq(
+          // This fella seems to make the scalac parser hang (???)
+          "target/repos/scala/test/files/neg/t5510.scala",
+          // Unicode escapes in weird places
+          "target/repos/scala/test/files/neg/t8015-ffb.scala",
+          "target/repos/scala/test/files/pos/t389.scala",
+          "target/repos/scala/test/files/run/literals.scala",
+          "target/repos/scala/test/files/run/t3835.scala",
+          // Scalac parser seems to accept this, though it blows up later
+          "target/repos/scala/test/files/neg/t8266-invalid-interp.scala",
+          "target/repos/scala/test/disabled/",
+          "target/repos/scala/test/files/neg/",
+          // trailing . after number
+          "target/repos/scala/test/files/presentation/infix-completion/src/Snippet.scala",
+          // Not sure why this is failing but it's new, and earlier version of Scalaparse fail too
+          "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Entity.scala",
+          "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/HtmlPage.scala",
+          "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Template.scala"
+        ).exists(x.startsWith)
     )
   }
 }

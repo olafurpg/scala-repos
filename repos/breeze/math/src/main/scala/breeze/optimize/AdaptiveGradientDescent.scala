@@ -2,7 +2,11 @@ package breeze.optimize
 
 import breeze.linalg._
 import breeze.linalg.support.{CanMapValues, CanZipMapValues, CanTraverseValues}
-import breeze.math.{MutableFiniteCoordinateField, MutableVectorRing, MutableVectorField}
+import breeze.math.{
+  MutableFiniteCoordinateField,
+  MutableVectorRing,
+  MutableVectorField
+}
 import breeze.numerics._
 import breeze.stats.distributions.{Rand, RandBasis}
 
@@ -33,8 +37,10 @@ object AdaptiveGradientDescent {
                             minImprovementWindow: Int = 50)(
       implicit vspace: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
-      extends StochasticGradientDescent[T](
-          stepSize, maxIter, tolerance, minImprovementWindow) {
+      extends StochasticGradientDescent[T](stepSize,
+                                           maxIter,
+                                           tolerance,
+                                           minImprovementWindow) {
 
     val delta = 1E-4
     import vspace._
@@ -63,7 +69,7 @@ object AdaptiveGradientDescent {
     override protected def takeStep(state: State, dir: T, stepSize: Double) = {
       import state._
       val s = sqrt(
-          state.history.sumOfSquaredGradients :+ (state.grad :* state.grad))
+        state.history.sumOfSquaredGradients :+ (state.grad :* state.grad))
       val newx = x :* s
       axpy(stepSize, dir, newx)
       s += (delta + regularizationConstant * stepSize)
@@ -71,8 +77,9 @@ object AdaptiveGradientDescent {
       newx
     }
 
-    override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+    override def determineStepSize(state: State,
+                                   f: StochasticDiffFunction[T],
+                                   dir: T) = {
       defaultStepSize
     }
 
@@ -132,7 +139,7 @@ object AdaptiveGradientDescent {
     override protected def takeStep(state: State, dir: T, stepSize: Double) = {
       import state._
       val s: T = sqrt(
-          state.history.sumOfSquaredGradients :+ (grad :* grad) :+ delta)
+        state.history.sumOfSquaredGradients :+ (grad :* grad) :+ delta)
       val res: T = x + (dir :* stepSize :/ s)
       val tlambda = lambda * stepSize
       space.zipMapValues.map(res, s, {
@@ -145,8 +152,9 @@ object AdaptiveGradientDescent {
       })
     }
 
-    override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+    override def determineStepSize(state: State,
+                                   f: StochasticDiffFunction[T],
+                                   dir: T) = {
       defaultStepSize
     }
 

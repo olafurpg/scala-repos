@@ -74,7 +74,8 @@ object HttpClient {
     // use the onFailure callback since we convert HTTP 4xx and 5xx class
     // responses to Exceptions.
     client(unauthorizedRequest) onFailure { error =>
-      println("))) Unauthorized request errored (as desired): " +
+      println(
+        "))) Unauthorized request errored (as desired): " +
           error.getClass.getName)
     }
   }

@@ -21,11 +21,11 @@ import play.filters.csrf.CSRF._
   * @param tokenProvider A token provider to use.
   * @param errorHandler handling failed token error.
   */
-class CSRFFilter(
-    config: => CSRFConfig,
-    tokenSigner: => CSRFTokenSigner,
-    val tokenProvider: TokenProvider = new SignedTokenProvider(Crypto.crypto),
-    val errorHandler: ErrorHandler = CSRF.DefaultErrorHandler)(
+class CSRFFilter(config: => CSRFConfig,
+                 tokenSigner: => CSRFTokenSigner,
+                 val tokenProvider: TokenProvider = new SignedTokenProvider(
+                   Crypto.crypto),
+                 val errorHandler: ErrorHandler = CSRF.DefaultErrorHandler)(
     implicit mat: Materializer)
     extends EssentialFilter {
 
@@ -68,8 +68,8 @@ object CSRFFilter {
   @deprecated("Use dependency injection", "2.5.0")
   def apply(config: => CSRFConfig = CSRFConfig.global,
             tokenSigner: => CSRFTokenSigner = Crypto.crypto,
-            tokenProvider: TokenProvider = new ConfigTokenProvider(
-                  CSRFConfig.global, Crypto.crypto),
+            tokenProvider: TokenProvider =
+              new ConfigTokenProvider(CSRFConfig.global, Crypto.crypto),
             errorHandler: ErrorHandler = DefaultErrorHandler)(
       implicit mat: Materializer): CSRFFilter = {
     new CSRFFilter(config, tokenSigner, tokenProvider, errorHandler)

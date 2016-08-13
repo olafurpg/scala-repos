@@ -22,7 +22,7 @@ import scala.language.existentials
 private[sql] object ObjectType extends AbstractDataType {
   override private[sql] def defaultConcreteType: DataType =
     throw new UnsupportedOperationException(
-        "null literals can't be casted to ObjectType")
+      "null literals can't be casted to ObjectType")
 
   override private[sql] def acceptsType(other: DataType): Boolean =
     other match {
@@ -41,7 +41,7 @@ private[sql] object ObjectType extends AbstractDataType {
 private[sql] case class ObjectType(cls: Class[_]) extends DataType {
   override def defaultSize: Int =
     throw new UnsupportedOperationException(
-        "No size estimation available for objects.")
+      "No size estimation available for objects.")
 
   def asNullable: DataType = this
 }

@@ -31,8 +31,10 @@ class SparseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
     dotProductBench(reps, size, sparsity, sparsity)
   }
 
-  def dotProductBench(
-      reps: Int, size: Int, sparsity1: Double, sparsity2: Double): Double = {
+  def dotProductBench(reps: Int,
+                      size: Int,
+                      sparsity1: Double,
+                      sparsity2: Double): Double = {
     runWith(reps, {
       (randomSparseVector(size, sparsity1),
        randomSparseVector(size, sparsity2))

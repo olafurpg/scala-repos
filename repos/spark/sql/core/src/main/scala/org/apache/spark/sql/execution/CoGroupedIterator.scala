@@ -18,7 +18,11 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, SortOrder}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending,
+  Attribute,
+  SortOrder
+}
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateOrdering
 
 /**
@@ -30,10 +34,10 @@ class CoGroupedIterator(left: Iterator[(InternalRow, Iterator[InternalRow])],
                         right: Iterator[(InternalRow, Iterator[InternalRow])],
                         groupingSchema: Seq[Attribute])
     extends Iterator[
-        (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
+      (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
 
-  private val keyOrdering = GenerateOrdering.generate(
-      groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
+  private val keyOrdering = GenerateOrdering
+    .generate(groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
 
   private var currentLeftData: (InternalRow, Iterator[InternalRow]) = _
   private var currentRightData: (InternalRow, Iterator[InternalRow]) = _

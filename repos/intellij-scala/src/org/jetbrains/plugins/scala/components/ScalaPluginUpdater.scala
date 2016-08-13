@@ -51,21 +51,21 @@ object ScalaPluginUpdater {
   val FOURTEEN_ONE = "14.1"
 
   val knownVersions = Map(
-      CASSIOPEIA_OLD -> Map(
-          Release -> "DUMMY",
-          EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-cassiopeia.xml",
-          Nightly -> "http://www.jetbrains.com/idea/plugins/scala-nightly-cassiopeia.xml"
-      ),
-      FOURTEEN_ONE_OLD -> Map(
-          Release -> "DUMMY",
-          EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-14.1.xml",
-          Nightly -> ""
-      ),
-      FOURTEEN_ONE -> Map(
-          Release -> "DUMMY",
-          EAP -> baseUrl.format("eap"),
-          Nightly -> baseUrl.format("nightly")
-      )
+    CASSIOPEIA_OLD -> Map(
+      Release -> "DUMMY",
+      EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-cassiopeia.xml",
+      Nightly -> "http://www.jetbrains.com/idea/plugins/scala-nightly-cassiopeia.xml"
+    ),
+    FOURTEEN_ONE_OLD -> Map(
+      Release -> "DUMMY",
+      EAP -> "http://www.jetbrains.com/idea/plugins/scala-eap-14.1.xml",
+      Nightly -> ""
+    ),
+    FOURTEEN_ONE -> Map(
+      Release -> "DUMMY",
+      EAP -> baseUrl.format("eap"),
+      Nightly -> baseUrl.format("nightly")
+    )
   )
 
   val currentVersion = FOURTEEN_ONE
@@ -73,8 +73,9 @@ object ScalaPluginUpdater {
   def currentRepo = knownVersions(currentVersion)
 
   val updGroupId = "ScalaPluginUpdate"
-  val GROUP = new NotificationGroup(
-      updGroupId, NotificationDisplayType.STICKY_BALLOON, true)
+  val GROUP = new NotificationGroup(updGroupId,
+                                    NotificationDisplayType.STICKY_BALLOON,
+                                    true)
 
   // save plugin version before patching to restore it when switching back
   var savedPluginVersion = ""
@@ -91,7 +92,7 @@ object ScalaPluginUpdater {
   def doUpdatePluginHosts(branch: ScalaApplicationSettings.pluginBranch) = {
     if (currentRepo(branch).isEmpty)
       throw new InvalidRepoException(
-          s"Branch $branch is unavailable for IDEA version $currentVersion")
+        s"Branch $branch is unavailable for IDEA version $currentVersion")
 
     // update hack - set plugin version to 0 when downgrading
     // also unpatch it back if user changed mind about downgrading
@@ -155,7 +156,7 @@ object ScalaPluginUpdater {
       val pluginIdString: String = pluginId.getIdString
       import scala.collection.JavaConversions._
       while (installedPlugins.exists(
-          _.getPluginId.getIdString == pluginIdString)) {
+               _.getPluginId.getIdString == pluginIdString)) {
         installedPlugins.remove(pluginIdString)
       }
     } catch {
@@ -195,9 +196,8 @@ object ScalaPluginUpdater {
       case Nightly => Some(currentRepo(Nightly))
     }
 
-    url.foreach(
-        u =>
-          invokeLater {
+    url.foreach(u =>
+      invokeLater {
         try {
           val resp = XML.load(u)
           val text =
@@ -223,23 +223,24 @@ object ScalaPluginUpdater {
       val a = ApplicationInfoEx.getInstanceEx.getUpdateUrls.getCheckingUrl
       val info = HttpRequests
         .request(a)
-        .connect(
-            new HttpRequests.RequestProcessor[Option[UpdatesInfo]] {
+        .connect(new HttpRequests.RequestProcessor[Option[UpdatesInfo]] {
           def process(request: HttpRequests.Request) = {
             try {
-              Some(new UpdatesInfo(JDOMUtil
-                        .loadDocument(request.getInputStream)
-                        .detachRootElement))
+              Some(
+                new UpdatesInfo(
+                  JDOMUtil
+                    .loadDocument(request.getInputStream)
+                    .detachRootElement))
             } catch { case e: JDOMException => LOG.info(e); None }
           }
         })
       if (info.isDefined) {
         val strategy = new UpdateStrategy(
-            infoImpl.getMajorVersion.toInt,
-            infoImpl.getBuild,
-            info.get,
-            UpdateSettings.getInstance(),
-            UpdateStrategyCustomization.getInstance())
+          infoImpl.getMajorVersion.toInt,
+          infoImpl.getBuild,
+          info.get,
+          UpdateSettings.getInstance(),
+          UpdateStrategyCustomization.getInstance())
         Some(strategy.checkForUpdates())
       } else None
     }
@@ -250,21 +251,21 @@ object ScalaPluginUpdater {
     val notification = getPlatformUpdateResult match {
       case Some(result)
           if isUpToDatePlatform(result) && !isBetaOrEAPPlatform &&
-          appSettings.ASK_PLATFORM_UPDATE =>
+            appSettings.ASK_PLATFORM_UPDATE =>
         // platform is up to date - suggest eap
         val message =
           s"Your IDEA is outdated to use with $branch branch.<br/>Would you like to switch IDEA channel to EAP?" +
-          s"""<p/><a href="Yes">Yes</a>\n""" +
-          s"""<p/><a href="No">Not now</a>""" +
-          s"""<p/><a href="Ignore">Ignore this update</a>"""
+            s"""<p/><a href="Yes">Yes</a>\n""" +
+            s"""<p/><a href="No">Not now</a>""" +
+            s"""<p/><a href="Ignore">Ignore this update</a>"""
         Some(
-            GROUP.createNotification(
-                "Scala Plugin Update Failed",
-                message,
-                NotificationType.WARNING,
-                new NotificationListener {
-              override def hyperlinkUpdate(
-                  notification: Notification, event: HyperlinkEvent): Unit = {
+          GROUP.createNotification(
+            "Scala Plugin Update Failed",
+            message,
+            NotificationType.WARNING,
+            new NotificationListener {
+              override def hyperlinkUpdate(notification: Notification,
+                                           event: HyperlinkEvent): Unit = {
                 notification.expire()
                 event.getDescription match {
                   case "No" => // do nothing, will ask next time
@@ -274,13 +275,12 @@ object ScalaPluginUpdater {
                 }
               }
             }
-            ))
+          ))
       case Some(result) =>
-        Some(
-            GROUP.createNotification(
-                s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
-                s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
-                NotificationType.WARNING))
+        Some(GROUP.createNotification(
+          s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
+            s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
+          NotificationType.WARNING))
       case None => None
     }
     notification.foreach(Notifications.Bus.notify)
@@ -295,7 +295,7 @@ object ScalaPluginUpdater {
       .getEventMulticaster
       .removeDocumentListener(updateListener)
     if (lastUpdateTime == 0L || System.currentTimeMillis() -
-        lastUpdateTime > TimeUnit.DAYS.toMillis(1)) {
+          lastUpdateTime > TimeUnit.DAYS.toMillis(1)) {
       ApplicationManager.getApplication.executeOnPooledThread(new Runnable {
         override def run() = {
           val buildNumber = ApplicationInfo.getInstance().getBuild.asString()
@@ -369,11 +369,11 @@ object ScalaPluginUpdater {
     } catch {
       case _: NoSuchFieldException | _: IllegalAccessException =>
         Notifications.Bus.notify(
-            new Notification(
-                updGroupId,
-                "Scala Plugin Update",
-                "Please remove and reinstall Scala plugin to finish downgrading",
-                NotificationType.INFORMATION))
+          new Notification(
+            updGroupId,
+            "Scala Plugin Update",
+            "Please remove and reinstall Scala plugin to finish downgrading",
+            NotificationType.INFORMATION))
     }
   }
 
@@ -386,27 +386,27 @@ object ScalaPluginUpdater {
         ScalaPluginUpdater.pluginIsRelease) {
       val message =
         "Please select Scala plugin update channel:" +
-        s"""<p/><a href="EAP">EAP</a>\n""" +
-        s"""<p/><a href="Release">Release</a>"""
+          s"""<p/><a href="EAP">EAP</a>\n""" +
+          s"""<p/><a href="Release">Release</a>"""
       val notification = new Notification(
-          updGroupId,
-          "Scala Plugin Update",
-          message,
-          NotificationType.INFORMATION,
-          new NotificationListener {
-            def hyperlinkUpdate(
-                notification: Notification, event: HyperlinkEvent) {
-              notification.expire()
-              applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = false
-              event.getDescription match {
-                case "EAP" => doUpdatePluginHostsAndCheck(EAP)
-                case "Nightly" => doUpdatePluginHostsAndCheck(Nightly)
-                case "Release" => doUpdatePluginHostsAndCheck(Release)
-                case _ =>
-                  applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = true
-              }
+        updGroupId,
+        "Scala Plugin Update",
+        message,
+        NotificationType.INFORMATION,
+        new NotificationListener {
+          def hyperlinkUpdate(notification: Notification,
+                              event: HyperlinkEvent) {
+            notification.expire()
+            applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = false
+            event.getDescription match {
+              case "EAP" => doUpdatePluginHostsAndCheck(EAP)
+              case "Nightly" => doUpdatePluginHostsAndCheck(Nightly)
+              case "Release" => doUpdatePluginHostsAndCheck(Release)
+              case _ =>
+                applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = true
             }
-          })
+          }
+        })
       Notifications.Bus.notify(notification)
     }
   }

@@ -51,16 +51,16 @@ object DialogsDemo extends JFXApp {
       title = "Dialogs Demo"
       root = new VBox {
         children = Seq(
-            button("Information", informationDialog),
-            button("Without Header Text", withoutHeader),
-            button("Warning", warningDialog),
-            button("Error", errorDialog),
-            button("Exception", exceptionDialog),
-            button("Confirmation", confirmationDialog),
-            button("Confirmation Dialog with Custom Actions",
-                   confirmationWithCustomActions),
-            button("Text Input", textInputDialog),
-            button("Choice", choiceDialog)
+          button("Information", informationDialog),
+          button("Without Header Text", withoutHeader),
+          button("Warning", warningDialog),
+          button("Error", errorDialog),
+          button("Exception", exceptionDialog),
+          button("Confirmation", confirmationDialog),
+          button("Confirmation Dialog with Custom Actions",
+                 confirmationWithCustomActions),
+          button("Text Input", textInputDialog),
+          button("Choice", choiceDialog)
         )
         spacing = 6
         padding = Insets(10)
@@ -177,8 +177,8 @@ object DialogsDemo extends JFXApp {
       contentText = "Choose your option."
       // Note that we override here default dialog buttons, OK and Cancel, with new ones.
       // We could also just add to existing button using `++=`.
-      buttonTypes = Seq(
-          ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
+      buttonTypes =
+        Seq(ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
     }
 
     val result = alert.showAndWait()

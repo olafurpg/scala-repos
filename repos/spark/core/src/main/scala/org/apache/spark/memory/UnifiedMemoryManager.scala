@@ -44,17 +44,19 @@ import org.apache.spark.storage.BlockId
   *                          it if necessary. Cached blocks can be evicted only if actual
   *                          storage memory usage exceeds this region.
   */
-private[spark] class UnifiedMemoryManager private[memory](
+private[spark] class UnifiedMemoryManager private[memory] (
     conf: SparkConf,
     val maxMemory: Long,
     storageRegionSize: Long,
     numCores: Int)
-    extends MemoryManager(
-        conf, numCores, storageRegionSize, maxMemory - storageRegionSize) {
+    extends MemoryManager(conf,
+                          numCores,
+                          storageRegionSize,
+                          maxMemory - storageRegionSize) {
 
   // We always maintain this invariant:
   assert(
-      onHeapExecutionMemoryPool.poolSize +
+    onHeapExecutionMemoryPool.poolSize +
       storageMemoryPool.poolSize == maxMemory)
 
   override def maxStorageMemory: Long = synchronized {
@@ -71,9 +73,12 @@ private[spark] class UnifiedMemoryManager private[memory](
     * but an older task had a lot of memory already.
     */
   override private[memory] def acquireExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Long =
+      numBytes: Long,
+      taskAttemptId: Long,
+      memoryMode: MemoryMode): Long =
     synchronized {
-      assert(onHeapExecutionMemoryPool.poolSize +
+      assert(
+        onHeapExecutionMemoryPool.poolSize +
           storageMemoryPool.poolSize == maxMemory)
       assert(numBytes >= 0)
       memoryMode match {
@@ -97,7 +102,7 @@ private[spark] class UnifiedMemoryManager private[memory](
               if (memoryReclaimableFromStorage > 0) {
                 // Only reclaim as much space as is necessary and available:
                 val spaceReclaimed = storageMemoryPool.shrinkPoolToFreeSpace(
-                    math.min(extraMemoryNeeded, memoryReclaimableFromStorage))
+                  math.min(extraMemoryNeeded, memoryReclaimableFromStorage))
                 onHeapExecutionMemoryPool.incrementPoolSize(spaceReclaimed)
               }
             }
@@ -132,15 +137,16 @@ private[spark] class UnifiedMemoryManager private[memory](
       }
     }
 
-  override def acquireStorageMemory(
-      blockId: BlockId, numBytes: Long): Boolean = synchronized {
-    assert(onHeapExecutionMemoryPool.poolSize +
+  override def acquireStorageMemory(blockId: BlockId,
+                                    numBytes: Long): Boolean = synchronized {
+    assert(
+      onHeapExecutionMemoryPool.poolSize +
         storageMemoryPool.poolSize == maxMemory)
     assert(numBytes >= 0)
     if (numBytes > maxStorageMemory) {
       // Fail fast if the block simply won't fit
       logInfo(
-          s"Will not store $blockId as the required space ($numBytes bytes) exceeds our " +
+        s"Will not store $blockId as the required space ($numBytes bytes) exceeds our " +
           s"memory limit ($maxStorageMemory bytes)")
       return false
     }
@@ -172,11 +178,11 @@ object UnifiedMemoryManager {
   def apply(conf: SparkConf, numCores: Int): UnifiedMemoryManager = {
     val maxMemory = getMaxMemory(conf)
     new UnifiedMemoryManager(
-        conf,
-        maxMemory = maxMemory,
-        storageRegionSize = (maxMemory * conf.getDouble(
-                  "spark.memory.storageFraction", 0.5)).toLong,
-        numCores = numCores)
+      conf,
+      maxMemory = maxMemory,
+      storageRegionSize = (maxMemory * conf
+        .getDouble("spark.memory.storageFraction", 0.5)).toLong,
+      numCores = numCores)
   }
 
   /**
@@ -191,7 +197,7 @@ object UnifiedMemoryManager {
     val minSystemMemory = reservedMemory * 1.5
     if (systemMemory < minSystemMemory) {
       throw new IllegalArgumentException(
-          s"System memory $systemMemory must " +
+        s"System memory $systemMemory must " +
           s"be at least $minSystemMemory. Please increase heap size using the --driver-memory " +
           s"option or spark.driver.memory in Spark configuration.")
     }
@@ -200,7 +206,7 @@ object UnifiedMemoryManager {
       val executorMemory = conf.getSizeAsBytes("spark.executor.memory")
       if (executorMemory < minSystemMemory) {
         throw new IllegalArgumentException(
-            s"Executor memory $executorMemory must be at least " +
+          s"Executor memory $executorMemory must be at least " +
             s"$minSystemMemory. Please increase executor memory using the " +
             s"--executor-memory option or spark.executor.memory in Spark configuration.")
       }

@@ -27,7 +27,7 @@ object ScalaDocPsiCreator {
 
         var parentNode = node
         while (parentNode.getTreeParent != null &&
-        parentNode.getElementType != SCALA_DOC_COMMENT) {
+               parentNode.getElementType != SCALA_DOC_COMMENT) {
           parentNode = parentNode.getTreeParent
           parentNode.getElementType match {
             case a: ScaladocSyntaxElementType =>
@@ -51,7 +51,7 @@ object ScalaDocPsiCreator {
         var parent = node.getTreeParent
 
         while (parent != null && parent.getPsi != null &&
-        !parent.getPsi.isInstanceOf[ScDocTag]) {
+               !parent.getPsi.isInstanceOf[ScDocTag]) {
           parent = parent.getTreeParent
         }
 

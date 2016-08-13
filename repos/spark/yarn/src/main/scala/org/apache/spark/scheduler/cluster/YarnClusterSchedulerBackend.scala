@@ -25,16 +25,16 @@ import org.apache.spark.deploy.yarn.{ApplicationMaster, YarnSparkHadoopUtil}
 import org.apache.spark.scheduler.TaskSchedulerImpl
 import org.apache.spark.util.Utils
 
-private[spark] class YarnClusterSchedulerBackend(
-    scheduler: TaskSchedulerImpl, sc: SparkContext)
+private[spark] class YarnClusterSchedulerBackend(scheduler: TaskSchedulerImpl,
+                                                 sc: SparkContext)
     extends YarnSchedulerBackend(scheduler, sc) {
 
   override def start() {
     val attemptId = ApplicationMaster.getAttemptId
     bindToYarn(attemptId.getApplicationId(), Some(attemptId))
     super.start()
-    totalExpectedExecutors = YarnSparkHadoopUtil
-      .getInitialTargetExecutorNumber(sc.conf)
+    totalExpectedExecutors =
+      YarnSparkHadoopUtil.getInitialTargetExecutorNumber(sc.conf)
   }
 
   override def getDriverLogUrls: Option[Map[String, String]] = {
@@ -45,11 +45,11 @@ private[spark] class YarnClusterSchedulerBackend(
 
       val httpAddress =
         System.getenv(Environment.NM_HOST.name()) + ":" + System.getenv(
-            Environment.NM_HTTP_PORT.name())
+          Environment.NM_HTTP_PORT.name())
       // lookup appropriate http scheme for container log urls
       val yarnHttpPolicy = yarnConf.get(
-          YarnConfiguration.YARN_HTTP_POLICY_KEY,
-          YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
+        YarnConfiguration.YARN_HTTP_POLICY_KEY,
+        YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
       )
       val user = Utils.getCurrentUserName()
       val httpScheme =
@@ -58,12 +58,12 @@ private[spark] class YarnClusterSchedulerBackend(
         s"$httpScheme$httpAddress/node/containerlogs/$containerId/$user"
       logDebug(s"Base URL for logs: $baseUrl")
       driverLogs = Some(
-          Map("stderr" -> s"$baseUrl/stderr?start=-4096",
-              "stdout" -> s"$baseUrl/stdout?start=-4096"))
+        Map("stderr" -> s"$baseUrl/stderr?start=-4096",
+            "stdout" -> s"$baseUrl/stdout?start=-4096"))
     } catch {
       case e: Exception =>
         logInfo("Error while building AM log links, so AM" +
-                " logs link will not appear in application UI",
+                  " logs link will not appear in application UI",
                 e)
     }
     driverLogs

@@ -54,15 +54,15 @@ class EnsemblePagination extends EnsembleExample {
     // Images to load pages
     val images = for (i <- 0 until 7) yield {
       val ipStream = this.getClass.getResourceAsStream(
-          "/scalafx/ensemble/images/animals-200x200/animal" + (i + 1) + ".jpg")
+        "/scalafx/ensemble/images/animals-200x200/animal" + (i + 1) + ".jpg")
       new Image(ipStream)
     }
 
     // Factory function for creating page content
     val createAnimalPage = (index: Int) =>
       new VBox() {
-        children = List(
-            new ImageView(images(index)), new Label("PAGE " + (index + 1)))
+        children =
+          List(new ImageView(images(index)), new Label("PAGE " + (index + 1)))
         alignment = Pos.Center
     }
 
@@ -77,22 +77,18 @@ class EnsemblePagination extends EnsembleExample {
       alignment = Pos.Center
       spacing = 10
       padding = Insets(20)
-      children = List(
-          pagination,
-          new Button {
-            maxWidth = Region.USE_PREF_SIZE
-            maxHeight = Region.USE_PREF_SIZE
-            text = "Toggle Pagination Button"
-            onAction = (ae: ActionEvent) =>
-              {
-                if (pagination.styleClass.contains(
-                        Pagination.STYLE_CLASS_BULLET)) {
-                  pagination.styleClass -= Pagination.STYLE_CLASS_BULLET
-                } else {
-                  pagination.styleClass += Pagination.STYLE_CLASS_BULLET
-                }
-            }
-          })
+      children = List(pagination, new Button {
+        maxWidth = Region.USE_PREF_SIZE
+        maxHeight = Region.USE_PREF_SIZE
+        text = "Toggle Pagination Button"
+        onAction = (ae: ActionEvent) => {
+          if (pagination.styleClass.contains(Pagination.STYLE_CLASS_BULLET)) {
+            pagination.styleClass -= Pagination.STYLE_CLASS_BULLET
+          } else {
+            pagination.styleClass += Pagination.STYLE_CLASS_BULLET
+          }
+        }
+      })
     }
   }
 }

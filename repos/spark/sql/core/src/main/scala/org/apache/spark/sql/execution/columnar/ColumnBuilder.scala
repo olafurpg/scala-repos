@@ -21,7 +21,10 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.columnar.ColumnBuilder._
-import org.apache.spark.sql.execution.columnar.compression.{AllCompressionSchemes, CompressibleColumnBuilder}
+import org.apache.spark.sql.execution.columnar.compression.{
+  AllCompressionSchemes,
+  CompressibleColumnBuilder
+}
 import org.apache.spark.sql.types._
 
 private[columnar] trait ColumnBuilder {
@@ -50,7 +53,8 @@ private[columnar] trait ColumnBuilder {
 }
 
 private[columnar] class BasicColumnBuilder[JvmType](
-    val columnStats: ColumnStats, val columnType: ColumnType[JvmType])
+    val columnStats: ColumnStats,
+    val columnType: ColumnType[JvmType])
     extends ColumnBuilder {
 
   protected var columnName: String = _
@@ -91,7 +95,8 @@ private[columnar] class NullColumnBuilder
     with NullableColumnBuilder
 
 private[columnar] abstract class ComplexColumnBuilder[JvmType](
-    columnStats: ColumnStats, columnType: ColumnType[JvmType])
+    columnStats: ColumnStats,
+    columnType: ColumnType[JvmType])
     extends BasicColumnBuilder[JvmType](columnStats, columnType)
     with NullableColumnBuilder
 
@@ -99,7 +104,8 @@ private[columnar] abstract class NativeColumnBuilder[T <: AtomicType](
     override val columnStats: ColumnStats,
     override val columnType: NativeColumnType[T])
     extends BasicColumnBuilder[T#InternalType](columnStats, columnType)
-    with NullableColumnBuilder with AllCompressionSchemes
+    with NullableColumnBuilder
+    with AllCompressionSchemes
     with CompressibleColumnBuilder[T]
 
 private[columnar] class BooleanColumnBuilder
@@ -130,24 +136,24 @@ private[columnar] class BinaryColumnBuilder
     extends ComplexColumnBuilder(new BinaryColumnStats, BINARY)
 
 private[columnar] class CompactDecimalColumnBuilder(dataType: DecimalType)
-    extends NativeColumnBuilder(
-        new DecimalColumnStats(dataType), COMPACT_DECIMAL(dataType))
+    extends NativeColumnBuilder(new DecimalColumnStats(dataType),
+                                COMPACT_DECIMAL(dataType))
 
 private[columnar] class DecimalColumnBuilder(dataType: DecimalType)
-    extends ComplexColumnBuilder(
-        new DecimalColumnStats(dataType), LARGE_DECIMAL(dataType))
+    extends ComplexColumnBuilder(new DecimalColumnStats(dataType),
+                                 LARGE_DECIMAL(dataType))
 
 private[columnar] class StructColumnBuilder(dataType: StructType)
-    extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), STRUCT(dataType))
+    extends ComplexColumnBuilder(new ObjectColumnStats(dataType),
+                                 STRUCT(dataType))
 
 private[columnar] class ArrayColumnBuilder(dataType: ArrayType)
-    extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), ARRAY(dataType))
+    extends ComplexColumnBuilder(new ObjectColumnStats(dataType),
+                                 ARRAY(dataType))
 
 private[columnar] class MapColumnBuilder(dataType: MapType)
-    extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), MAP(dataType))
+    extends ComplexColumnBuilder(new ObjectColumnStats(dataType),
+                                 MAP(dataType))
 
 private[columnar] object ColumnBuilder {
   val DEFAULT_INITIAL_BUFFER_SIZE = 128 * 1024

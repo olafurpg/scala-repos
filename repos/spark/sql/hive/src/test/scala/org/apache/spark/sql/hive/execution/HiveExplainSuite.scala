@@ -25,7 +25,9 @@ import org.apache.spark.sql.test.SQLTestUtils
   * A set of tests that validates support for Hive Explain command.
   */
 class HiveExplainSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
 
   test("explain extended command") {
     checkExistence(sql(" explain   select * from src where key=123 "),
@@ -46,27 +48,28 @@ class HiveExplainSuite
 
   test("explain create table command") {
     checkExistence(
-        sql("explain create table temp__b as select * from src limit 2"),
-        true,
-        "== Physical Plan ==",
-        "InsertIntoHiveTable",
-        "Limit",
-        "src")
+      sql("explain create table temp__b as select * from src limit 2"),
+      true,
+      "== Physical Plan ==",
+      "InsertIntoHiveTable",
+      "Limit",
+      "src")
 
     checkExistence(
-        sql("explain extended create table temp__b as select * from src limit 2"),
-        true,
-        "== Parsed Logical Plan ==",
-        "== Analyzed Logical Plan ==",
-        "== Optimized Logical Plan ==",
-        "== Physical Plan ==",
-        "CreateTableAsSelect",
-        "InsertIntoHiveTable",
-        "Limit",
-        "src")
+      sql(
+        "explain extended create table temp__b as select * from src limit 2"),
+      true,
+      "== Parsed Logical Plan ==",
+      "== Analyzed Logical Plan ==",
+      "== Optimized Logical Plan ==",
+      "== Physical Plan ==",
+      "CreateTableAsSelect",
+      "InsertIntoHiveTable",
+      "Limit",
+      "src")
 
     checkExistence(
-        sql("""
+      sql("""
         | EXPLAIN EXTENDED CREATE TABLE temp__b
         | ROW FORMAT SERDE "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe"
         | WITH SERDEPROPERTIES("serde_p1"="p1","serde_p2"="p2")
@@ -74,21 +77,21 @@ class HiveExplainSuite
         | TBLPROPERTIES("tbl_p1"="p11", "tbl_p2"="p22")
         | AS SELECT * FROM src LIMIT 2
       """.stripMargin),
-        true,
-        "== Parsed Logical Plan ==",
-        "== Analyzed Logical Plan ==",
-        "== Optimized Logical Plan ==",
-        "== Physical Plan ==",
-        "CreateTableAsSelect",
-        "InsertIntoHiveTable",
-        "Limit",
-        "src")
+      true,
+      "== Parsed Logical Plan ==",
+      "== Analyzed Logical Plan ==",
+      "== Optimized Logical Plan ==",
+      "== Physical Plan ==",
+      "CreateTableAsSelect",
+      "InsertIntoHiveTable",
+      "Limit",
+      "src")
   }
 
   test("SPARK-6212: The EXPLAIN output of CTAS only shows the analyzed plan") {
     withTempTable("jt") {
       val rdd = sparkContext.parallelize(
-          (1 to 10).map(i => s"""{"a":$i, "b":"str$i"}"""))
+        (1 to 10).map(i => s"""{"a":$i, "b":"str$i"}"""))
       hiveContext.read.json(rdd).registerTempTable("jt")
       val outputs = sql(s"""
            |EXPLAIN EXTENDED
@@ -105,8 +108,8 @@ class HiveExplainSuite
 
       val physicalIndex = outputs.indexOf("== Physical Plan ==")
       assert(
-          !outputs.substring(physicalIndex).contains("Subquery"),
-          "Physical Plan should not contain Subquery since it's eliminated by optimizer")
+        !outputs.substring(physicalIndex).contains("Subquery"),
+        "Physical Plan should not contain Subquery since it's eliminated by optimizer")
     }
   }
 }

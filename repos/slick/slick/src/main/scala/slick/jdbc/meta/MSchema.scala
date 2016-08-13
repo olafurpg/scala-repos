@@ -11,7 +11,8 @@ case class MSchema(schema: String, catalog: Option[String]) {
 object MSchema {
   def getSchemas(catalog: Option[String], schemaPattern: Option[String]) = {
     ResultSetAction[MSchema] { s =>
-      try s.metaData.getSchemas(catalog.orNull, schemaPattern.orNull) catch {
+      try s.metaData.getSchemas(catalog.orNull, schemaPattern.orNull)
+      catch {
         case _: AbstractMethodError => null
       }
     } { r =>

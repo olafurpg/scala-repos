@@ -24,7 +24,7 @@ final case class Incomplete(node: Option[AnyRef],
     with sbt.internal.util.UnprintableException {
   override def toString =
     "Incomplete(node=" + node + ", tpe=" + tpe + ", msg=" + message +
-    ", causes=" + causes + ", directCause=" + directCause + ")"
+      ", causes=" + causes + ", directCause=" + directCause + ")"
 }
 
 object Incomplete extends Enumeration {
@@ -41,7 +41,8 @@ object Incomplete extends Enumeration {
       new java.util.IdentityHashMap[Incomplete, Incomplete]
     def visit(inc: Incomplete): Incomplete =
       visited.getOrElseUpdate(
-          inc, if (topDown) visitCauses(f(inc)) else f(visitCauses(inc)))
+        inc,
+        if (topDown) visitCauses(f(inc)) else f(visitCauses(inc)))
     def visitCauses(inc: Incomplete): Incomplete =
       inc.copy(causes = inc.causes.map(visit))
 

@@ -8,8 +8,7 @@ final class MasterRunner(
     args: Array[String],
     remoteArgs: Array[String],
     testClassLoader: ClassLoader
-)
-    extends BaseRunner(args, remoteArgs, testClassLoader) {
+) extends BaseRunner(args, remoteArgs, testClassLoader) {
 
   /** Number of tasks registered in the whole system */
   private[this] val registeredCount = new AtomicInteger(0)
@@ -32,12 +31,12 @@ final class MasterRunner(
 
     if (slaves > 0) {
       throw new IllegalStateException(
-          s"There are still $slaves slaves running")
+        s"There are still $slaves slaves running")
     }
 
     if (registered != done)
       throw new IllegalStateException(
-          s"$registered task(s) were registered, $done were executed")
+        s"$registered task(s) were registered, $done were executed")
     else s"Dummy Test Framework processed $done task(s)"
   }
 

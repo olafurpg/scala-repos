@@ -6,9 +6,10 @@ import scala.collection.mutable
 import scala.annotation.tailrec
 import scala.language.existentials
 
-class PriorityQueue[E] protected (
-    ordering: Ordering[_ >: E], _comparator: Comparator[_ >: E])
-    extends AbstractQueue[E] with Serializable { self =>
+class PriorityQueue[E] protected (ordering: Ordering[_ >: E],
+                                  _comparator: Comparator[_ >: E])
+    extends AbstractQueue[E]
+    with Serializable { self =>
 
   def this(initialCapacity: Int) = {
     this(defaultOrdering[E], null.asInstanceOf[Comparator[_ >: E]])

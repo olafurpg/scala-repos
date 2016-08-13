@@ -147,5 +147,5 @@ object SortedSetFactory {
 }
 
 trait SortedSetFactory extends SetFactory {
-  def empty[E : ClassTag]: ju.SortedSet[E]
+  def empty[E: ClassTag]: ju.SortedSet[E]
 }

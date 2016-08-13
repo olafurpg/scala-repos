@@ -49,12 +49,12 @@ object NettyHeadersWrapperSpec extends Specification {
 
     "return the header value associated with a by case insensitive" in {
       headers.get("a") must beSome("a1") and
-      (headers.get("A") must beSome("a1"))
+        (headers.get("A") must beSome("a1"))
     }
 
     "return the header values associated with b by case insensitive" in {
       (headers.getAll("b") must_== Seq("b1", "b2", "b3")) and
-      (headers.getAll("B") must_== Seq("b1", "b2", "b3"))
+        (headers.getAll("B") must_== Seq("b1", "b2", "b3"))
     }
 
     "not return an empty sequence of values associated with an unknown key" in {
@@ -67,17 +67,17 @@ object NettyHeadersWrapperSpec extends Specification {
 
     "should return a simple map" in {
       headers.toSimpleMap must be_==(
-          Map("a" -> "a1", "b" -> "b1", "c" -> "c1"))
+        Map("a" -> "a1", "b" -> "b1", "c" -> "c1"))
     }
 
     "return the value from a map by case insensitive" in {
       (headers.toMap.get("A") must_== Some(Seq("a1", "a2"))) and
-      (headers.toMap.get("b") must_== Some(Seq("b1", "b2", "b3")))
+        (headers.toMap.get("b") must_== Some(Seq("b1", "b2", "b3")))
     }
 
     "return the value from a simple map by case insensitive" in {
       (headers.toSimpleMap.get("A") must beSome("a1")) and
-      (headers.toSimpleMap.get("b") must beSome("b1"))
+        (headers.toSimpleMap.get("b") must beSome("b1"))
     }
 
     "add headers" in {
@@ -87,7 +87,7 @@ object NettyHeadersWrapperSpec extends Specification {
 
     "remove headers by case insensitive" in {
       headers.remove("a").getAll("a") must beEmpty and
-      (headers.remove("A").getAll("a") must beEmpty)
+        (headers.remove("A").getAll("a") must beEmpty)
     }
 
     "replace headers by case insensitive" in {

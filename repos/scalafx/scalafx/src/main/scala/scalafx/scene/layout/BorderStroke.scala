@@ -91,17 +91,17 @@ class BorderStroke(override val delegate: jfxsl.BorderStroke)
            widths: BorderWidths,
            insets: Insets) =
     this(
-        new jfxsl.BorderStroke(topStroke,
-                               rightStroke,
-                               bottomStroke,
-                               leftStroke,
-                               topStyle,
-                               rightStyle,
-                               bottomStyle,
-                               leftStyle,
-                               radii,
-                               widths,
-                               insets))
+      new jfxsl.BorderStroke(topStroke,
+                             rightStroke,
+                             bottomStroke,
+                             leftStroke,
+                             topStyle,
+                             rightStyle,
+                             bottomStyle,
+                             leftStyle,
+                             radii,
+                             widths,
+                             insets))
 
   /**
     * Defines the fill of bottom side of this border.

@@ -38,13 +38,13 @@ object Env {
     val restArgs = inargs.tail.tail
     mode match {
       case "scalding" => {
-          // Hadoop args must be processed specially:
-          ScaldingEnv(job, restArgs)
-        }
+        // Hadoop args must be processed specially:
+        ScaldingEnv(job, restArgs)
+      }
       case "storm" => {
-          // Skip "storm" and the jobname:
-          StormEnv(job, Args(restArgs))
-        }
+        // Skip "storm" and the jobname:
+        StormEnv(job, Args(restArgs))
+      }
       case _ =>
         sys.error("Unrecognized mode: " + mode + ", try: storm or scalding")
     }

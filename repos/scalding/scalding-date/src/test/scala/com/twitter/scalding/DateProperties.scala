@@ -36,7 +36,8 @@ object DateProperties extends Properties("Date Properties") {
   }
   implicit val dateRangeArb: Arbitrary[DateRange] = Arbitrary {
     for (v1 <- choose(0L, 1L << 33);
-    v2 <- choose(v1, 1L << 33)) yield DateRange(RichDate(v1), RichDate(v2))
+         v2 <- choose(v1, 1L << 33))
+      yield DateRange(RichDate(v1), RichDate(v2))
   }
   implicit val absdur: Arbitrary[AbsoluteDuration] = Arbitrary {
     implicitly[Arbitrary[Long]].arbitrary
@@ -67,7 +68,7 @@ object DateProperties extends Properties("Date Properties") {
 
   property("Before/After works") = forAll { (dr: DateRange, rd: RichDate) =>
     (asInt(dr.contains(rd)) + asInt(dr.isBefore(rd)) +
-        asInt(dr.isAfter(rd)) == 1) &&
+      asInt(dr.isAfter(rd)) == 1) &&
     (dr.isBefore(dr.end + (dr.end - dr.start))) &&
     (dr.isAfter(dr.start - (dr.end - dr.start)))
   }
@@ -98,7 +99,7 @@ object DateProperties extends Properties("Date Properties") {
   property("AbsoluteDuration group properties") = forAll {
     (a: AbsoluteDuration, b: AbsoluteDuration, c: AbsoluteDuration) =>
       (a + b) - c == a + (b - c) && (a + b) + c == a + (b + c) && (a - a) == fromMillisecs(
-          0) && (b - b) == fromMillisecs(0) && (c - c) == fromMillisecs(0) && {
+        0) && (b - b) == fromMillisecs(0) && (c - c) == fromMillisecs(0) && {
         b.toMillisecs == 0 || {
           // Don't divide by zero:
           val (d, rem) = (a / b)

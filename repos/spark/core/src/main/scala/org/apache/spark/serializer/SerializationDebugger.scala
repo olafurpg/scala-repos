@@ -35,11 +35,12 @@ private[spark] object SerializationDebugger extends Logging {
     * `sun.io.serialization.extendedDebugInfo` flag is turned on for the JVM.
     */
   def improveException(
-      obj: Any, e: NotSerializableException): NotSerializableException = {
+      obj: Any,
+      e: NotSerializableException): NotSerializableException = {
     if (enableDebugging && reflect != null) {
       try {
         new NotSerializableException(
-            e.getMessage + "\nSerialization stack:\n" +
+          e.getMessage + "\nSerialization stack:\n" +
             find(obj).map("\t- " + _).mkString("\n"))
       } catch {
         case NonFatal(t) =>
@@ -71,8 +72,9 @@ private[spark] object SerializationDebugger extends Logging {
 
   private[serializer] var enableDebugging: Boolean = {
     !AccessController
-      .doPrivileged(new sun.security.action.GetBooleanAction(
-              "sun.io.serialization.extendedDebugInfo"))
+      .doPrivileged(
+        new sun.security.action.GetBooleanAction(
+          "sun.io.serialization.extendedDebugInfo"))
       .booleanValue()
   }
 
@@ -98,13 +100,13 @@ private[spark] object SerializationDebugger extends Logging {
           case _: String => List.empty
           case _
               if o.getClass.isArray &&
-              o.getClass.getComponentType.isPrimitive =>
+                o.getClass.getComponentType.isPrimitive =>
             List.empty
 
           // Traverse non primitive array.
           case a: Array[_]
               if o.getClass.isArray &&
-              !o.getClass.getComponentType.isPrimitive =>
+                !o.getClass.getComponentType.isPrimitive =>
             val elem = s"array (class ${a.getClass.getName}, size ${a.length})"
             visitArray(o.asInstanceOf[Array[_]], elem :: stack)
 
@@ -142,8 +144,8 @@ private[spark] object SerializationDebugger extends Logging {
       * the only way to capture all the objects it will serialize is by using a
       * dummy ObjectOutput that collects all the relevant objects for further testing.
       */
-    private def visitExternalizable(
-        o: java.io.Externalizable, stack: List[String]): List[String] = {
+    private def visitExternalizable(o: java.io.Externalizable,
+                                    stack: List[String]): List[String] = {
       val fieldList = new ListObjectOutput
       o.writeExternal(fieldList)
       val childObjects = fieldList.outputArray
@@ -158,8 +160,8 @@ private[spark] object SerializationDebugger extends Logging {
       return List.empty
     }
 
-    private def visitSerializable(
-        o: Object, stack: List[String]): List[String] = {
+    private def visitSerializable(o: Object,
+                                  stack: List[String]): List[String] = {
       // An object contains multiple slots in serialization.
       // Get the slots and visit fields in all of them.
       val (finalObj, desc) = findObjectAndDescriptor(o)
@@ -168,8 +170,8 @@ private[spark] object SerializationDebugger extends Logging {
       // then call visit() on it again to test its type again.
       if (!finalObj.eq(o)) {
         return visit(
-            finalObj,
-            s"writeReplace data (class: ${finalObj.getClass.getName})" :: stack)
+          finalObj,
+          s"writeReplace data (class: ${finalObj.getClass.getName})" :: stack)
       }
 
       // Every class is associated with one or more "slots", each slot refers to the parent
@@ -199,8 +201,8 @@ private[spark] object SerializationDebugger extends Logging {
           // then its not obvious which fields of the class will be serialized as the writeObject()
           // can choose arbitrary fields for serialization. This case is handled separately.
           val elem = s"writeObject data (class: ${slotDesc.getName})"
-          val childStack = visitSerializableWithWriteObjectMethod(
-              finalObj, elem :: stack)
+          val childStack =
+            visitSerializableWithWriteObjectMethod(finalObj, elem :: stack)
           if (childStack.nonEmpty) {
             return childStack
           }
@@ -217,8 +219,8 @@ private[spark] object SerializationDebugger extends Logging {
             val fieldDesc = fields(numPrims + j)
             val elem =
               s"field (class: ${slotDesc.getName}" +
-              s", name: ${fieldDesc.getName}" +
-              s", type: ${fieldDesc.getType})"
+                s", name: ${fieldDesc.getName}" +
+                s", type: ${fieldDesc.getType})"
             val childStack = visit(objFieldValues(j), elem :: stack)
             if (childStack.nonEmpty) {
               return childStack
@@ -239,7 +241,8 @@ private[spark] object SerializationDebugger extends Logging {
       * This is similar to how externalizable objects are visited.
       */
     private def visitSerializableWithWriteObjectMethod(
-        o: Object, stack: List[String]): List[String] = {
+        o: Object,
+        stack: List[String]): List[String] = {
       val innerObjectsCatcher = new ListObjectOutputStream
       var notSerializableFound = false
       try {
@@ -409,8 +412,8 @@ private[spark] object SerializationDebugger extends Logging {
 
     /** ObjectStreamClass.invokeWriteReplace */
     val InvokeWriteReplace: Method = {
-      val f = classOf[ObjectStreamClass].getDeclaredMethod(
-          "invokeWriteReplace", classOf[Object])
+      val f = classOf[ObjectStreamClass]
+        .getDeclaredMethod("invokeWriteReplace", classOf[Object])
       f.setAccessible(true)
       f
     }
@@ -425,7 +428,9 @@ private[spark] object SerializationDebugger extends Logging {
     /** ObjectStreamClass.getObjFieldValues */
     val GetObjFieldValues: Method = {
       val f = classOf[ObjectStreamClass].getDeclaredMethod(
-          "getObjFieldValues", classOf[Object], classOf[Array[Object]])
+        "getObjFieldValues",
+        classOf[Object],
+        classOf[Array[Object]])
       f.setAccessible(true)
       f
     }

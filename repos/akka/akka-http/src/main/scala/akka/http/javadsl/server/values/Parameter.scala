@@ -67,11 +67,12 @@ object Parameters {
   def asMap: RequestVal[JMap[String, String]] =
     StandaloneExtractionImpl(ParameterDirectives.parameterMap.map(_.asJava))
   def asMultiMap: RequestVal[JMap[String, JCollection[String]]] =
-    StandaloneExtractionImpl(ParameterDirectives.parameterMultiMap.map(
-            _.mapValues(_.asJavaCollection).asJava))
+    StandaloneExtractionImpl(
+      ParameterDirectives.parameterMultiMap.map(
+        _.mapValues(_.asJavaCollection).asJava))
   def asCollection: RequestVal[JCollection[JMap.Entry[String, String]]] =
-    StandaloneExtractionImpl(ParameterDirectives.parameterSeq.map(_.map(
-                e ⇒ new SimpleEntry(e._1, e._2): JMap.Entry[String, String]).asJavaCollection))
+    StandaloneExtractionImpl(ParameterDirectives.parameterSeq.map(_.map(e ⇒
+      new SimpleEntry(e._1, e._2): JMap.Entry[String, String]).asJavaCollection))
 
   /** Unmarshals the `name` field using the provided `convert` function. */
   def fromString[T](name: String,

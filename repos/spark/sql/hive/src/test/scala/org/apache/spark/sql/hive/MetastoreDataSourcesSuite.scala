@@ -25,7 +25,11 @@ import org.apache.hadoop.fs.Path
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.TableIdentifier
-import org.apache.spark.sql.catalyst.catalog.{CatalogStorageFormat, CatalogTable, CatalogTableType}
+import org.apache.spark.sql.catalyst.catalog.{
+  CatalogStorageFormat,
+  CatalogTable,
+  CatalogTableType
+}
 import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
@@ -38,7 +42,9 @@ import org.apache.spark.util.Utils
   * Tests for persisting tables created though the data sources API into the metastore.
   */
 class MetastoreDataSourcesSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -78,14 +84,15 @@ class MetastoreDataSourcesSuite
       withTempTable("expectedJsonTable") {
         read.json(jsonFilePath).registerTempTable("expectedJsonTable")
         checkAnswer(
-            sql("SELECT a, b, `c_!@(3)`, `<d>`.`d!`, `<d>`.`=` FROM jsonTable"),
-            sql("SELECT a, b, `c_!@(3)`, `<d>`.`d!`, `<d>`.`=` FROM expectedJsonTable"))
+          sql("SELECT a, b, `c_!@(3)`, `<d>`.`d!`, `<d>`.`=` FROM jsonTable"),
+          sql(
+            "SELECT a, b, `c_!@(3)`, `<d>`.`d!`, `<d>`.`=` FROM expectedJsonTable"))
       }
     }
   }
 
   test(
-      "persistent JSON table with a user specified schema with a subset of fields") {
+    "persistent JSON table with a user specified schema with a subset of fields") {
     withTable("jsonTable") {
       // This works because JSON objects are self-describing and JSONRelation can get needed
       // field values based on field names.
@@ -97,13 +104,15 @@ class MetastoreDataSourcesSuite
          """.stripMargin)
 
       val innerStruct = StructType(
-          Seq(StructField("=",
-                          ArrayType(StructType(StructField(
-                                      "Dd2", BooleanType, true) :: Nil)))))
+        Seq(
+          StructField("=",
+                      ArrayType(StructType(
+                        StructField("Dd2", BooleanType, true) :: Nil)))))
 
       val expectedSchema =
-        StructType(Seq(StructField("<d>", innerStruct, true),
-                       StructField("b", StringType, true)))
+        StructType(
+          Seq(StructField("<d>", innerStruct, true),
+              StructField("b", StringType, true)))
 
       assert(expectedSchema === table("jsonTable").schema)
 
@@ -149,8 +158,8 @@ class MetastoreDataSourcesSuite
       }
 
       assert(
-          new File(jsonFilePath).exists(),
-          "The table with specified path is considered as an external table, " +
+        new File(jsonFilePath).exists(),
+        "The table with specified path is considered as an external table, " +
           "its data should not deleted after DROP TABLE.")
     }
   }
@@ -245,15 +254,15 @@ class MetastoreDataSourcesSuite
         read.json(jsonFilePath).registerTempTable("expectedJsonTable")
 
         checkAnswer(
-            sql("SELECT * FROM jsonTable"),
-            sql("SELECT `c_!@(3)` FROM expectedJsonTable").collect().toSeq)
+          sql("SELECT * FROM jsonTable"),
+          sql("SELECT `c_!@(3)` FROM expectedJsonTable").collect().toSeq)
 
         // Discard the cached relation.
         invalidateTable("jsonTable")
 
         checkAnswer(
-            sql("SELECT * FROM jsonTable"),
-            sql("SELECT `c_!@(3)` FROM expectedJsonTable").collect().toSeq)
+          sql("SELECT * FROM jsonTable"),
+          sql("SELECT `c_!@(3)` FROM expectedJsonTable").collect().toSeq)
 
         invalidateTable("jsonTable")
         val expectedSchema =
@@ -357,7 +366,7 @@ class MetastoreDataSourcesSuite
          """.stripMargin)
 
       val expectedPath = sessionState.catalog.hiveDefaultTableFilePath(
-          TableIdentifier("ctasJsonTable"))
+        TableIdentifier("ctasJsonTable"))
       val filesystemPath = new Path(expectedPath)
       val fs = filesystemPath.getFileSystem(sparkContext.hadoopConfiguration)
       if (fs.exists(filesystemPath)) fs.delete(filesystemPath, true)
@@ -391,7 +400,7 @@ class MetastoreDataSourcesSuite
   }
 
   test(
-      "SPARK-5839 HiveMetastoreCatalog does not recognize table aliases of data source tables.") {
+    "SPARK-5839 HiveMetastoreCatalog does not recognize table aliases of data source tables.") {
     withTable("savedJsonTable") {
       // Save the df as a managed table (by not specifying the path).
       (1 to 10)
@@ -402,8 +411,8 @@ class MetastoreDataSourcesSuite
         .saveAsTable("savedJsonTable")
 
       checkAnswer(
-          sql("SELECT * FROM savedJsonTable where savedJsonTable.a < 5"),
-          (1 to 4).map(i => Row(i, s"str$i")))
+        sql("SELECT * FROM savedJsonTable where savedJsonTable.a < 5"),
+        (1 to 4).map(i => Row(i, s"str$i")))
 
       checkAnswer(sql("SELECT * FROM savedJsonTable tmp where tmp.a > 5"),
                   (6 to 10).map(i => Row(i, s"str$i")))
@@ -411,8 +420,8 @@ class MetastoreDataSourcesSuite
       invalidateTable("savedJsonTable")
 
       checkAnswer(
-          sql("SELECT * FROM savedJsonTable where savedJsonTable.a < 5"),
-          (1 to 4).map(i => Row(i, s"str$i")))
+        sql("SELECT * FROM savedJsonTable where savedJsonTable.a < 5"),
+        (1 to 4).map(i => Row(i, s"str$i")))
 
       checkAnswer(sql("SELECT * FROM savedJsonTable tmp where tmp.a > 5"),
                   (6 to 10).map(i => Row(i, s"str$i")))
@@ -450,13 +459,13 @@ class MetastoreDataSourcesSuite
           sql("DROP TABLE savedJsonTable")
           intercept[AnalysisException] {
             read.json(sessionState.catalog.hiveDefaultTableFilePath(
-                    TableIdentifier("savedJsonTable")))
+              TableIdentifier("savedJsonTable")))
           }
         }
 
         // Create an external table by specifying the path.
         withSQLConf(
-            SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
+          SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
           df.write
             .format("org.apache.spark.sql.json")
             .mode(SaveMode.Append)
@@ -481,7 +490,7 @@ class MetastoreDataSourcesSuite
         }))
 
         withSQLConf(
-            SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
+          SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
           df.write
             .format("json")
             .mode(SaveMode.Append)
@@ -495,10 +504,10 @@ class MetastoreDataSourcesSuite
           checkAnswer(sql("SELECT * FROM createdJsonTable"), df)
 
           assert(
-              intercept[AnalysisException] {
-                createExternalTable("createdJsonTable", jsonFilePath.toString)
-              }.getMessage.contains("Table createdJsonTable already exists."),
-              "We should complain that createdJsonTable already exists")
+            intercept[AnalysisException] {
+              createExternalTable("createdJsonTable", jsonFilePath.toString)
+            }.getMessage.contains("Table createdJsonTable already exists."),
+            "We should complain that createdJsonTable already exists")
         }
 
         // Data should not be deleted.
@@ -507,7 +516,7 @@ class MetastoreDataSourcesSuite
 
         // Try to specify the schema.
         withSQLConf(
-            SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
+          SQLConf.DEFAULT_DATA_SOURCE_NAME.key -> "not a source name") {
           val schema = StructType(StructField("b", StringType, true) :: Nil)
           createExternalTable("createdJsonTable",
                               "org.apache.spark.sql.json",
@@ -556,7 +565,7 @@ class MetastoreDataSourcesSuite
             case LogicalRelation(p: HadoopFsRelation, _, _) => // OK
             case _ =>
               fail(
-                  s"test_parquet_ctas should have be converted to ${classOf[HadoopFsRelation]}")
+                s"test_parquet_ctas should have be converted to ${classOf[HadoopFsRelation]}")
           }
         }
       }
@@ -568,9 +577,9 @@ class MetastoreDataSourcesSuite
       {
         val df = (Tuple1(Seq(Int.box(1), null: Integer)) :: Nil).toDF("a")
         val expectedSchema = StructType(
-            StructField("a",
-                        ArrayType(IntegerType, containsNull = true),
-                        nullable = true) :: Nil)
+          StructField("a",
+                      ArrayType(IntegerType, containsNull = true),
+                      nullable = true) :: Nil)
 
         assert(df.schema === expectedSchema)
 
@@ -583,9 +592,9 @@ class MetastoreDataSourcesSuite
       {
         val df = (Tuple1(Seq(2, 3)) :: Nil).toDF("a")
         val expectedSchema = StructType(
-            StructField("a",
-                        ArrayType(IntegerType, containsNull = false),
-                        nullable = true) :: Nil)
+          StructField("a",
+                      ArrayType(IntegerType, containsNull = false),
+                      nullable = true) :: Nil)
 
         assert(df.schema === expectedSchema)
 
@@ -611,7 +620,7 @@ class MetastoreDataSourcesSuite
 
       checkAnswer(sql("SELECT a FROM arrayInParquet"),
                   Row(ArrayBuffer(1, null)) :: Row(ArrayBuffer(2, 3)) :: Row(
-                      ArrayBuffer(4, 5)) :: Row(ArrayBuffer(6, null)) :: Nil)
+                    ArrayBuffer(4, 5)) :: Row(ArrayBuffer(6, null)) :: Nil)
     }
   }
 
@@ -620,10 +629,10 @@ class MetastoreDataSourcesSuite
       {
         val df = (Tuple1(Map(1 -> (null: Integer))) :: Nil).toDF("a")
         val expectedSchema = StructType(
-            StructField(
-                "a",
-                MapType(IntegerType, IntegerType, valueContainsNull = true),
-                nullable = true) :: Nil)
+          StructField(
+            "a",
+            MapType(IntegerType, IntegerType, valueContainsNull = true),
+            nullable = true) :: Nil)
 
         assert(df.schema === expectedSchema)
 
@@ -636,10 +645,10 @@ class MetastoreDataSourcesSuite
       {
         val df = (Tuple1(Map(2 -> 3)) :: Nil).toDF("a")
         val expectedSchema = StructType(
-            StructField(
-                "a",
-                MapType(IntegerType, IntegerType, valueContainsNull = false),
-                nullable = true) :: Nil)
+          StructField(
+            "a",
+            MapType(IntegerType, IntegerType, valueContainsNull = false),
+            nullable = true) :: Nil)
 
         assert(df.schema === expectedSchema)
 
@@ -666,9 +675,9 @@ class MetastoreDataSourcesSuite
       refreshTable("mapInParquet")
 
       checkAnswer(
-          sql("SELECT a FROM mapInParquet"),
-          Row(Map(1 -> null)) :: Row(Map(2 -> 3)) :: Row(Map(4 -> 5)) :: Row(
-              Map(6 -> null)) :: Nil)
+        sql("SELECT a FROM mapInParquet"),
+        Row(Map(1 -> null)) :: Row(Map(2 -> 3)) :: Row(Map(4 -> 5)) :: Row(
+          Map(6 -> null)) :: Nil)
     }
   }
 
@@ -677,17 +686,17 @@ class MetastoreDataSourcesSuite
       withTable("wide_schema") {
         // We will need 80 splits for this schema if the threshold is 4000.
         val schema = StructType(
-            (1 to 5000).map(i => StructField(s"c_$i", StringType, true)))
+          (1 to 5000).map(i => StructField(s"c_$i", StringType, true)))
 
         // Manually create a metastore data source table.
         sessionState.catalog.createDataSourceTable(
-            tableIdent = TableIdentifier("wide_schema"),
-            userSpecifiedSchema = Some(schema),
-            partitionColumns = Array.empty[String],
-            bucketSpec = None,
-            provider = "json",
-            options = Map("path" -> "just a dummy path"),
-            isExternal = false)
+          tableIdent = TableIdentifier("wide_schema"),
+          userSpecifiedSchema = Some(schema),
+          partitionColumns = Array.empty[String],
+          bucketSpec = None,
+          provider = "json",
+          options = Map("path" -> "just a dummy path"),
+          isExternal = false)
 
         invalidateTable("wide_schema")
 
@@ -701,19 +710,20 @@ class MetastoreDataSourcesSuite
     val tableName = "spark6655"
     withTable(tableName) {
       val schema = StructType(StructField("int", IntegerType, true) :: Nil)
-      val hiveTable = CatalogTable(
-          name = TableIdentifier(tableName, Some("default")),
-          tableType = CatalogTableType.MANAGED_TABLE,
-          schema = Seq.empty,
-          storage = CatalogStorageFormat(
-                locationUri = None,
-                inputFormat = None,
-                outputFormat = None,
-                serde = None,
-                serdeProperties = Map("path" -> sessionState.catalog
-                        .hiveDefaultTableFilePath(TableIdentifier(tableName)))
-            ),
-          properties = Map("spark.sql.sources.provider" -> "json",
+      val hiveTable =
+        CatalogTable(name = TableIdentifier(tableName, Some("default")),
+                     tableType = CatalogTableType.MANAGED_TABLE,
+                     schema = Seq.empty,
+                     storage = CatalogStorageFormat(
+                       locationUri = None,
+                       inputFormat = None,
+                       outputFormat = None,
+                       serde = None,
+                       serdeProperties = Map("path" -> sessionState.catalog
+                         .hiveDefaultTableFilePath(TableIdentifier(tableName)))
+                     ),
+                     properties =
+                       Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,
                            "EXTERNAL" -> "FALSE"))
 
@@ -744,15 +754,16 @@ class MetastoreDataSourcesSuite
         metastoreTable.properties("spark.sql.sources.schema.numPartCols").toInt
       assert(numPartCols == 2)
 
-      val actualPartitionColumns = StructType(
-          (0 until numPartCols).map { index =>
-        df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.partCol.$index"))
+      val actualPartitionColumns = StructType((0 until numPartCols).map {
+        index =>
+          df.schema(
+            metastoreTable.properties(
+              s"spark.sql.sources.schema.partCol.$index"))
       })
       // Make sure partition columns are correctly stored in metastore.
       assert(
-          expectedPartitionColumns.sameType(actualPartitionColumns),
-          s"Partitions columns stored in metastore $actualPartitionColumns is not the " +
+        expectedPartitionColumns.sameType(actualPartitionColumns),
+        s"Partitions columns stored in metastore $actualPartitionColumns is not the " +
           s"partition columns defined by the saveAsTable operation $expectedPartitionColumns.")
 
       // Check the content of the saved table.
@@ -793,25 +804,27 @@ class MetastoreDataSourcesSuite
         metastoreTable.properties("spark.sql.sources.schema.numSortCols").toInt
       assert(numSortCols == 1)
 
-      val actualBucketByColumns = StructType(
-          (0 until numBucketCols).map { index =>
-        df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.bucketCol.$index"))
+      val actualBucketByColumns = StructType((0 until numBucketCols).map {
+        index =>
+          df.schema(
+            metastoreTable.properties(
+              s"spark.sql.sources.schema.bucketCol.$index"))
       })
       // Make sure bucketBy columns are correctly stored in metastore.
       assert(
-          expectedBucketByColumns.sameType(actualBucketByColumns),
-          s"Partitions columns stored in metastore $actualBucketByColumns is not the " +
+        expectedBucketByColumns.sameType(actualBucketByColumns),
+        s"Partitions columns stored in metastore $actualBucketByColumns is not the " +
           s"partition columns defined by the saveAsTable operation $expectedBucketByColumns.")
 
       val actualSortByColumns = StructType((0 until numSortCols).map { index =>
-        df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.sortCol.$index"))
+        df.schema(
+          metastoreTable.properties(
+            s"spark.sql.sources.schema.sortCol.$index"))
       })
       // Make sure sortBy columns are correctly stored in metastore.
       assert(
-          expectedSortByColumns.sameType(actualSortByColumns),
-          s"Partitions columns stored in metastore $actualSortByColumns is not the " +
+        expectedSortByColumns.sameType(actualSortByColumns),
+        s"Partitions columns stored in metastore $actualSortByColumns is not the " +
           s"partition columns defined by the saveAsTable operation $expectedSortByColumns.")
 
       // Check the content of the saved table.
@@ -846,8 +859,9 @@ class MetastoreDataSourcesSuite
         .format("parquet")
         .saveAsTable("insertParquet")
       checkAnswer(
-          sql("SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 25"),
-          (6 to 24).map(i => Row(i, s"str$i")))
+        sql(
+          "SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 25"),
+        (6 to 24).map(i => Row(i, s"str$i")))
 
       intercept[AnalysisException] {
         createDF(30, 39).write.saveAsTable("insertParquet")
@@ -855,20 +869,23 @@ class MetastoreDataSourcesSuite
 
       createDF(30, 39).write.mode(SaveMode.Append).saveAsTable("insertParquet")
       checkAnswer(
-          sql("SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 35"),
-          (6 to 34).map(i => Row(i, s"str$i")))
+        sql(
+          "SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 35"),
+        (6 to 34).map(i => Row(i, s"str$i")))
 
       createDF(40, 49).write.mode(SaveMode.Append).insertInto("insertParquet")
       checkAnswer(
-          sql("SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 45"),
-          (6 to 44).map(i => Row(i, s"str$i")))
+        sql(
+          "SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 5 AND p.c1 < 45"),
+        (6 to 44).map(i => Row(i, s"str$i")))
 
       createDF(50, 59).write
         .mode(SaveMode.Overwrite)
         .saveAsTable("insertParquet")
       checkAnswer(
-          sql("SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 51 AND p.c1 < 55"),
-          (52 to 54).map(i => Row(i, s"str$i")))
+        sql(
+          "SELECT p.c1, c2 FROM insertParquet p WHERE p.c1 > 51 AND p.c1 < 55"),
+        (52 to 54).map(i => Row(i, s"str$i")))
       createDF(60, 69).write.mode(SaveMode.Ignore).saveAsTable("insertParquet")
       checkAnswer(sql("SELECT p.c1, c2 FROM insertParquet p"),
                   (50 to 59).map(i => Row(i, s"str$i")))
@@ -888,10 +905,9 @@ class MetastoreDataSourcesSuite
     sqlContext.sql("""use testdb8156""")
     df.write.format("parquet").mode(SaveMode.Overwrite).saveAsTable("ttt3")
 
-    checkAnswer(sqlContext
-                  .sql("show TABLES in testdb8156")
-                  .filter("tableName = 'ttt3'"),
-                Row("ttt3", false))
+    checkAnswer(
+      sqlContext.sql("show TABLES in testdb8156").filter("tableName = 'ttt3'"),
+      Row("ttt3", false))
     sqlContext.sql("""use default""")
     sqlContext.sql("""drop database if exists testdb8156 CASCADE""")
   }
@@ -901,42 +917,42 @@ class MetastoreDataSourcesSuite
       StructType((1 to 5).map(i => StructField(s"c_$i", StringType)))
 
     sessionState.catalog.createDataSourceTable(
-        tableIdent = TableIdentifier("not_skip_hive_metadata"),
-        userSpecifiedSchema = Some(schema),
-        partitionColumns = Array.empty[String],
-        bucketSpec = None,
-        provider = "parquet",
-        options = Map("path" -> "just a dummy path",
-                      "skipHiveMetadata" -> "false"),
-        isExternal = false)
+      tableIdent = TableIdentifier("not_skip_hive_metadata"),
+      userSpecifiedSchema = Some(schema),
+      partitionColumns = Array.empty[String],
+      bucketSpec = None,
+      provider = "parquet",
+      options =
+        Map("path" -> "just a dummy path", "skipHiveMetadata" -> "false"),
+      isExternal = false)
 
     // As a proxy for verifying that the table was stored in Hive compatible format, we verify that
     // each column of the table is of native type StringType.
     assert(
-        sessionState.catalog.client
-          .getTable("default", "not_skip_hive_metadata")
-          .schema
-          .forall(column =>
-                HiveMetastoreTypes.toDataType(column.dataType) == StringType))
+      sessionState.catalog.client
+        .getTable("default", "not_skip_hive_metadata")
+        .schema
+        .forall(column =>
+          HiveMetastoreTypes.toDataType(column.dataType) == StringType))
 
     sessionState.catalog.createDataSourceTable(
-        tableIdent = TableIdentifier("skip_hive_metadata"),
-        userSpecifiedSchema = Some(schema),
-        partitionColumns = Array.empty[String],
-        bucketSpec = None,
-        provider = "parquet",
-        options = Map("path" -> "just a dummy path",
-                      "skipHiveMetadata" -> "true"),
-        isExternal = false)
+      tableIdent = TableIdentifier("skip_hive_metadata"),
+      userSpecifiedSchema = Some(schema),
+      partitionColumns = Array.empty[String],
+      bucketSpec = None,
+      provider = "parquet",
+      options =
+        Map("path" -> "just a dummy path", "skipHiveMetadata" -> "true"),
+      isExternal = false)
 
     // As a proxy for verifying that the table was stored in SparkSQL format, we verify that
     // the table has a column type as array of StringType.
     assert(
-        sessionState.catalog.client
-          .getTable("default", "skip_hive_metadata")
-          .schema
-          .forall(column =>
-                HiveMetastoreTypes.toDataType(column.dataType) == ArrayType(
-                    StringType)))
+      sessionState.catalog.client
+        .getTable("default", "skip_hive_metadata")
+        .schema
+        .forall(column =>
+          HiveMetastoreTypes.toDataType(column.dataType) == ArrayType(
+            StringType)))
   }
 }

@@ -57,7 +57,7 @@ private object StreamingTab {
   def getSparkUI(ssc: StreamingContext): SparkUI = {
     ssc.sc.ui.getOrElse {
       throw new SparkException(
-          "Parent SparkUI to attach this tab to not found!")
+        "Parent SparkUI to attach this tab to not found!")
     }
   }
 }

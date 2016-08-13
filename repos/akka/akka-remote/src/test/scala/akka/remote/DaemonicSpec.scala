@@ -37,8 +37,9 @@ class DaemonicSpec extends AkkaSpec {
         Thread.getAllStackTraces().keySet().asScala.to[Set]
       // create a separate actor system that we can check the threads for
       val daemonicSystem = ActorSystem(
-          "daemonic",
-          ConfigFactory.parseString("""
+        "daemonic",
+        ConfigFactory.parseString(
+          """
         akka.daemonic = on
         akka.actor.provider = "akka.remote.RemoteActorRefProvider"
         akka.remote.netty.tcp.transport-class = "akka.remote.transport.netty.NettyTransport"

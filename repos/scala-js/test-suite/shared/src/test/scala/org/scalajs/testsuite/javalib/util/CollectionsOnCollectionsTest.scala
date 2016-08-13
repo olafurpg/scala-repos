@@ -23,7 +23,9 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   def factory: CollectionFactory
 
   def testMinMax1[T <: AnyRef with Comparable[T]: ClassTag](
-      factory: CollectionFactory, toElem: Int => T, isMin: Boolean): Unit = {
+      factory: CollectionFactory,
+      toElem: Int => T,
+      isMin: Boolean): Unit = {
     val coll = factory.empty[T]
     coll.addAll(range.map(toElem))
 
@@ -44,10 +46,10 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
     }
   }
 
-  def testMinMax2[T : ClassTag](factory: CollectionFactory,
-                                toElem: Int => T,
-                                isMin: Boolean,
-                                cmp: ju.Comparator[T]): Unit = {
+  def testMinMax2[T: ClassTag](factory: CollectionFactory,
+                               toElem: Int => T,
+                               isMin: Boolean,
+                               cmp: ju.Comparator[T]): Unit = {
     val coll = factory.empty[T]
     coll.addAll(range.map(toElem))
 
@@ -79,7 +81,7 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   }
 
   @Test def min_with_comparator(): Unit = {
-    def test[T : ClassTag](toElem: Int => T, cmpFun: (T, T) => Int): Unit = {
+    def test[T: ClassTag](toElem: Int => T, cmpFun: (T, T) => Int): Unit = {
       testMinMax2(factory, toElem, true, new Comparator[T] {
         override def compare(o1: T, o2: T): Int = cmpFun(o1, o2)
       })
@@ -101,7 +103,7 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   }
 
   @Test def max_with_comparator(): Unit = {
-    def test[T : ClassTag](toElem: Int => T, cmpFun: (T, T) => Int): Unit = {
+    def test[T: ClassTag](toElem: Int => T, cmpFun: (T, T) => Int): Unit = {
       testMinMax2(factory, toElem, false, new Comparator[T] {
         override def compare(o1: T, o2: T): Int = cmpFun(o1, o2)
       })
@@ -113,12 +115,12 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   }
 
   @Test def frequency(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val coll = factory.empty[E]
 
       def expectAllFrequenciesToBe(n: Int): Unit = {
-        for (i <- range) assertEquals(
-            n, ju.Collections.frequency(coll, toElem(i)))
+        for (i <- range)
+          assertEquals(n, ju.Collections.frequency(coll, toElem(i)))
       }
 
       expectAllFrequenciesToBe(0)
@@ -139,7 +141,7 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   }
 
   @Test def addAll(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val coll = factory.empty[E]
       assertFalse(ju.Collections.addAll(coll))
       assertTrue(coll.isEmpty)
@@ -154,13 +156,15 @@ trait CollectionsOnCollectionsTest extends CollectionsTestBase {
   }
 
   @Test def unmodifiableCollection(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val coll = factory.empty[E]
       testCollectionUnmodifiability(
-          ju.Collections.unmodifiableCollection(coll), toElem(0))
+        ju.Collections.unmodifiableCollection(coll),
+        toElem(0))
       coll.addAll(range.map(toElem))
       testCollectionUnmodifiability(
-          ju.Collections.unmodifiableCollection(coll), toElem(0))
+        ju.Collections.unmodifiableCollection(coll),
+        toElem(0))
     }
 
     test[jl.Integer](_.toInt)

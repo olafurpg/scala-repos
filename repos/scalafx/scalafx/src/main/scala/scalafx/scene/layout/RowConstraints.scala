@@ -42,7 +42,8 @@ object RowConstraints {
 
 class RowConstraints(
     override val delegate: jfxsl.RowConstraints = new jfxsl.RowConstraints)
-    extends ConstraintsBase(delegate) with SFXDelegate[jfxsl.RowConstraints] {
+    extends ConstraintsBase(delegate)
+    with SFXDelegate[jfxsl.RowConstraints] {
 
   /**
     * Creates a row constraint object with a fixed height.
@@ -56,7 +57,7 @@ class RowConstraints(
     this(new jfxsl.RowConstraints(minHeight, prefHeight, maxHeight))
 
   /**
-    * Creates a row constraint object with a fixed size range, vertical grow priority, vertical 
+    * Creates a row constraint object with a fixed size range, vertical grow priority, vertical
     * alignment, and vertical fill behavior.
     */
   def this(minHeight: Double,
@@ -66,8 +67,12 @@ class RowConstraints(
            valignment: jfxg.VPos,
            fillHeight: Boolean) =
     this(
-        new jfxsl.RowConstraints(
-            minHeight, prefHeight, maxHeight, vgrow, valignment, fillHeight))
+      new jfxsl.RowConstraints(minHeight,
+                               prefHeight,
+                               maxHeight,
+                               vgrow,
+                               valignment,
+                               fillHeight))
 
   /**
     * The vertical fill policy for the row.

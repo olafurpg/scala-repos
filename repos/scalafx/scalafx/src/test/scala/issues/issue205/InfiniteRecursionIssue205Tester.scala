@@ -49,8 +49,8 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
   }
 
   val characters = ObservableBuffer[Person](
-      new Person("Peggy", "Sue"),
-      new Person("Rocky", "Raccoon")
+    new Person("Peggy", "Sue"),
+    new Person("Rocky", "Raccoon")
   )
 
   characters += new Person("Rocky", "Raccoon")
@@ -77,41 +77,39 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
 
   val tableView = new TableView[Person](characters) {
     columns ++= List(
-        new TableColumn[Person, String] {
-          text = "First Name"
-          cellValueFactory = {
-            _.value.firstName
-          }
-          prefWidth = 180
-        },
-        new TableColumn[Person, String]() {
-          text = "Last Name"
-          cellValueFactory = {
-            _.value.lastName
-          }
-          prefWidth = 180
+      new TableColumn[Person, String] {
+        text = "First Name"
+        cellValueFactory = {
+          _.value.firstName
         }
+        prefWidth = 180
+      },
+      new TableColumn[Person, String]() {
+        text = "Last Name"
+        cellValueFactory = {
+          _.value.lastName
+        }
+        prefWidth = 180
+      }
     )
   }
 
   val scrollToButton = new Button {
     text = "scrollTo(item) - #205"
-    onAction = (ae: ActionEvent) =>
-      {
-        // This line would cause infinite recursion before fix
-        tableView.scrollTo(extraRow)
+    onAction = (ae: ActionEvent) => {
+      // This line would cause infinite recursion before fix
+      tableView.scrollTo(extraRow)
     }
   }
 
   val snapshotButton = new Button {
     text = "snapshot  - #214"
-    onAction = (ae: ActionEvent) =>
-      {
-        def callback(result: SnapshotResult): Unit = {
-          println("callback(" + result + ")")
-        }
-        // This line would cause infinite recursion before fix (also issue #214)
-        tableView.snapshot(callback, null, null)
+    onAction = (ae: ActionEvent) => {
+      def callback(result: SnapshotResult): Unit = {
+        println("callback(" + result + ")")
+      }
+      // This line would cause infinite recursion before fix (also issue #214)
+      tableView.snapshot(callback, null, null)
     }
   }
 
@@ -120,9 +118,9 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
     scene = new Scene {
       root = new VBox {
         children = Seq(
-            tableView,
-            scrollToButton,
-            snapshotButton
+          tableView,
+          scrollToButton,
+          snapshotButton
         )
       }
     }

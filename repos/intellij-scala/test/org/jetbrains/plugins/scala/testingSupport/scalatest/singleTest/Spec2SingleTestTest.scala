@@ -30,19 +30,21 @@ trait Spec2SingleTestTest extends ScalaTestTestCase {
     """.stripMargin)
 
     runTestByLocation(
-        8,
-        12,
-        "Spec.scala",
-        checkConfigAndSettings(
-            _, "SpecTest", "A SpecTest When launched should run single test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "SpecTest",
-                                           "A SpecTest",
-                                           "When launched",
-                                           "should run single test") &&
+      8,
+      12,
+      "Spec.scala",
+      checkConfigAndSettings(
+        _,
+        "SpecTest",
+        "A SpecTest When launched should run single test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         "SpecTest",
+                                         "A SpecTest",
+                                         "When launched",
+                                         "should run single test") &&
           checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
-        debug = true)
+      debug = true)
   }
 }

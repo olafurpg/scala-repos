@@ -21,8 +21,8 @@ object ReceivePipeline {
       InnerAndAfter(transformedMsg, (_ ⇒ after))
   }
 
-  private[ReceivePipeline] case class InnerAndAfter(
-      transformedMsg: Any, after: Unit ⇒ Unit)
+  private[ReceivePipeline] case class InnerAndAfter(transformedMsg: Any,
+                                                    after: Unit ⇒ Unit)
       extends Delegation
 
   /**
@@ -74,8 +74,8 @@ trait ReceivePipeline extends Actor {
   }
 
   private def combinedDecorator: Receive ⇒ Receive = { receive ⇒
-    // So that reconstructed Receive PF is undefined only when the actor's 
-    // receive is undefined for a transformed message that reaches it...     
+    // So that reconstructed Receive PF is undefined only when the actor's
+    // receive is undefined for a transformed message that reaches it...
     val innerReceiveHandler: Handler = {
       case msg ⇒ receive.lift(msg).map(_ ⇒ Done).getOrElse(Undefined)
     }
@@ -84,7 +84,9 @@ trait ReceivePipeline extends Actor {
       (outerInterceptor, innerHandler) ⇒
         outerInterceptor.andThen {
           case Inner(msg) ⇒ innerHandler(msg)
-          case InnerAndAfter(msg, after) ⇒ try innerHandler(msg) finally after()
+          case InnerAndAfter(msg, after) ⇒
+            try innerHandler(msg)
+            finally after()
           case HandledCompletely ⇒ Done
         }
     }
@@ -96,8 +98,8 @@ trait ReceivePipeline extends Actor {
     def isDefinedAt(m: Any): Boolean = evaluate(m) != Undefined
     def apply(m: Any): Unit = evaluate(m)
 
-    override def applyOrElse[A1 <: Any, B1 >: Unit](
-        m: A1, default: A1 ⇒ B1): B1 = {
+    override def applyOrElse[A1 <: Any, B1 >: Unit](m: A1,
+                                                    default: A1 ⇒ B1): B1 = {
       val result = handler(m)
 
       if (result == Undefined) default(m)
@@ -109,8 +111,8 @@ trait ReceivePipeline extends Actor {
   /**
     * INTERNAL API.
     */
-  override protected[akka] def aroundReceive(
-      receive: Receive, msg: Any): Unit = {
+  override protected[akka] def aroundReceive(receive: Receive,
+                                             msg: Any): Unit = {
     def withCachedDecoration(decorator: Receive ⇒ Receive): Receive =
       decoratorCache match {
         case Some((`receive`, cached)) ⇒ cached

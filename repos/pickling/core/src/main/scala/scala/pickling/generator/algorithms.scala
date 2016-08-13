@@ -59,7 +59,7 @@ private[pickling] object PicklingAlgorithm {
       case AlgorithmFailure(failures) =>
         val fString = failures.mkString("\n - ", "\n - ", "\n")
         logger.error(
-            s"Unable to generate pickling/unpickling implementation for $tpe.\n$fString")
+          s"Unable to generate pickling/unpickling implementation for $tpe.\n$fString")
         None
     }
   }
@@ -77,8 +77,8 @@ private[pickling] object PicklingAlgorithm {
       /**
         * Attempts to construct pickling logic for a given type.
         */
-      override def generate(
-          tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult =
+      override def generate(tpe: IrClass,
+                            logger: AlgorithmLogger): AlgorithmResult =
         algs.foldLeft(AlgorithmFailure(List()): AlgorithmResult) {
           (prev, next) =>
             prev match {

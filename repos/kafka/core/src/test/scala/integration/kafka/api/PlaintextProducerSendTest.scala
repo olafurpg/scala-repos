@@ -18,7 +18,11 @@ package kafka.api
 
 import java.util.Properties
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{
+  KafkaProducer,
+  ProducerConfig,
+  ProducerRecord
+}
 import org.apache.kafka.common.config.ConfigException
 import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.ByteArraySerializer
@@ -31,7 +35,7 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
     try {
       createNewProducerWithNoSerializer(brokerList)
       fail(
-          "Instantiating a producer without specifying a serializer should cause a ConfigException")
+        "Instantiating a producer without specifying a serializer should cause a ConfigException")
     } catch {
       case ce: ConfigException => // this is ok
     }
@@ -51,8 +55,9 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
       brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    return new KafkaProducer[Array[Byte], Array[Byte]](
-        producerProps, new ByteArraySerializer, new ByteArraySerializer)
+    return new KafkaProducer[Array[Byte], Array[Byte]](producerProps,
+                                                       new ByteArraySerializer,
+                                                       new ByteArraySerializer)
   }
 
   @Test
@@ -61,7 +66,10 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
     try {
       val producer = createProducerWithWrongSerializer(brokerList)
       val record5 = new ProducerRecord[Array[Byte], Array[Byte]](
-          topic, new Integer(0), "key".getBytes, "value".getBytes)
+        topic,
+        new Integer(0),
+        "key".getBytes,
+        "value".getBytes)
       producer.send(record5)
       fail("Should have gotten a SerializationException")
     } catch {

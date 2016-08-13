@@ -23,11 +23,11 @@ case class ApiPullRequest(number: Int,
   //val issue_url           = ApiPath(s"${base.repo.url.path}/issues/${number}")
   val commits_url = ApiPath(s"${base.repo.url.path}/pulls/${number}/commits")
   val review_comments_url = ApiPath(
-      s"${base.repo.url.path}/pulls/${number}/comments")
+    s"${base.repo.url.path}/pulls/${number}/comments")
   val review_comment_url = ApiPath(
-      s"${base.repo.url.path}/pulls/comments/{number}")
+    s"${base.repo.url.path}/pulls/comments/{number}")
   val comments_url = ApiPath(
-      s"${base.repo.url.path}/issues/${number}/comments")
+    s"${base.repo.url.path}/issues/${number}/comments")
   val statuses_url = ApiPath(s"${base.repo.url.path}/statuses/${head.sha}")
 }
 
@@ -37,19 +37,19 @@ object ApiPullRequest {
             headRepo: ApiRepository,
             baseRepo: ApiRepository,
             user: ApiUser): ApiPullRequest = ApiPullRequest(
-      number = issue.issueId,
-      updated_at = issue.updatedDate,
-      created_at = issue.registeredDate,
-      head = Commit(sha = pullRequest.commitIdTo,
-                    ref = pullRequest.requestBranch,
-                    repo = headRepo)(issue.userName),
-      base = Commit(sha = pullRequest.commitIdFrom,
-                    ref = pullRequest.branch,
-                    repo = baseRepo)(issue.userName),
-      mergeable = None, // TODO: need check mergeable.
-      title = issue.title,
-      body = issue.content.getOrElse(""),
-      user = user
+    number = issue.issueId,
+    updated_at = issue.updatedDate,
+    created_at = issue.registeredDate,
+    head = Commit(sha = pullRequest.commitIdTo,
+                  ref = pullRequest.requestBranch,
+                  repo = headRepo)(issue.userName),
+    base = Commit(sha = pullRequest.commitIdFrom,
+                  ref = pullRequest.branch,
+                  repo = baseRepo)(issue.userName),
+    mergeable = None, // TODO: need check mergeable.
+    title = issue.title,
+    body = issue.content.getOrElse(""),
+    user = user
   )
 
   case class Commit(sha: String, ref: String, repo: ApiRepository)(

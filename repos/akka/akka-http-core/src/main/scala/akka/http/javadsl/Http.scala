@@ -9,14 +9,23 @@ import java.util.Optional
 import akka.http.impl.util.JavaMapping
 import akka.http.impl.util.JavaMapping.HttpsConnectionContext
 import akka.http.javadsl.model.ws._
-import akka.http.javadsl.settings.{ConnectionPoolSettings, ClientConnectionSettings, ServerSettings}
+import akka.http.javadsl.settings.{
+  ConnectionPoolSettings,
+  ClientConnectionSettings,
+  ServerSettings
+}
 import akka.{NotUsed, stream}
 import akka.stream.TLSProtocol._
 import scala.concurrent.Future
 import scala.util.Try
 import akka.stream.scaladsl.Keep
 import akka.japi.{Pair, Function}
-import akka.actor.{ExtendedActorSystem, ActorSystem, ExtensionIdProvider, ExtensionId}
+import akka.actor.{
+  ExtendedActorSystem,
+  ActorSystem,
+  ExtensionIdProvider,
+  ExtensionId
+}
 import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.javadsl.{BidiFlow, Flow, Source}
@@ -51,17 +60,23 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     * Constructs a server layer stage using the configured default [[akka.http.javadsl.settings.ServerSettings]]. The returned [[BidiFlow]] isn't
     * reusable and can only be materialized once.
     */
-  def serverLayer(materializer: Materializer): BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed] =
+  def serverLayer(materializer: Materializer): BidiFlow[HttpResponse,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpRequest,
+                                                        NotUsed] =
     adaptServerLayer(delegate.serverLayer()(materializer))
 
   /**
     * Constructs a server layer stage using the given [[akka.http.javadsl.settings.ServerSettings]]. The returned [[BidiFlow]] isn't reusable and
     * can only be materialized once.
     */
-  def serverLayer(
-      settings: ServerSettings, materializer: Materializer): BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed] =
+  def serverLayer(settings: ServerSettings,
+                  materializer: Materializer): BidiFlow[HttpResponse,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpRequest,
+                                                        NotUsed] =
     adaptServerLayer(delegate.serverLayer(settings.asScala)(materializer))
 
   /**
@@ -71,11 +86,14 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     */
   def serverLayer(settings: ServerSettings,
                   remoteAddress: Optional[InetSocketAddress],
-                  materializer: Materializer): BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed] =
+                  materializer: Materializer): BidiFlow[HttpResponse,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpRequest,
+                                                        NotUsed] =
     adaptServerLayer(
-        delegate.serverLayer(settings.asScala, remoteAddress.asScala)(
-            materializer))
+      delegate.serverLayer(settings.asScala, remoteAddress.asScala)(
+        materializer))
 
   /**
     * Constructs a server layer stage using the given [[ServerSettings]]. The returned [[BidiFlow]] isn't reusable and
@@ -85,11 +103,14 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
   def serverLayer(settings: ServerSettings,
                   remoteAddress: Optional[InetSocketAddress],
                   log: LoggingAdapter,
-                  materializer: Materializer): BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed] =
+                  materializer: Materializer): BidiFlow[HttpResponse,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpRequest,
+                                                        NotUsed] =
     adaptServerLayer(
-        delegate.serverLayer(settings.asScala, remoteAddress.asScala, log)(
-            materializer))
+      delegate.serverLayer(settings.asScala, remoteAddress.asScala, log)(
+        materializer))
 
   /**
     * Creates a [[Source]] of [[IncomingConnection]] instances which represents a prospective HTTP server binding
@@ -111,10 +132,10 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     val connectionContext =
       connect.effectiveConnectionContext(defaultServerHttpContext).asScala
     new Source(
-        delegate
-          .bind(connect.host, connect.port, connectionContext)(materializer)
-          .map(new IncomingConnection(_))
-          .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
+      delegate
+        .bind(connect.host, connect.port, connectionContext)(materializer)
+        .map(new IncomingConnection(_))
+        .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
   }
 
   /**
@@ -139,13 +160,13 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     val connectionContext =
       connect.effectiveConnectionContext(defaultServerHttpContext).asScala
     new Source(
-        delegate
-          .bind(connect.host,
-                connect.port,
-                settings = settings.asScala,
-                connectionContext = connectionContext)(materializer)
-          .map(new IncomingConnection(_))
-          .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
+      delegate
+        .bind(connect.host,
+              connect.port,
+              settings = settings.asScala,
+              connectionContext = connectionContext)(materializer)
+        .map(new IncomingConnection(_))
+        .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
   }
 
   /**
@@ -171,14 +192,14 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     val connectionContext =
       connect.effectiveConnectionContext(defaultServerHttpContext).asScala
     new Source(
-        delegate
-          .bind(connect.host,
-                connect.port,
-                connectionContext,
-                settings.asScala,
-                log)(materializer)
-          .map(new IncomingConnection(_))
-          .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
+      delegate
+        .bind(connect.host,
+              connect.port,
+              connectionContext,
+              settings.asScala,
+              log)(materializer)
+        .map(new IncomingConnection(_))
+        .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
   }
 
   /**
@@ -198,12 +219,11 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     val connectionContext =
       connect.effectiveConnectionContext(defaultServerHttpContext).asScala
     delegate
-      .bindAndHandle(handler
-                       .asInstanceOf[Flow[sm.HttpRequest, sm.HttpResponse, _]]
-                       .asScala,
-                     connect.host,
-                     connect.port,
-                     connectionContext)(materializer)
+      .bindAndHandle(
+        handler.asInstanceOf[Flow[sm.HttpRequest, sm.HttpResponse, _]].asScala,
+        connect.host,
+        connect.port,
+        connectionContext)(materializer)
       .map(new ServerBinding(_))(ec)
       .toJava
   }
@@ -227,14 +247,13 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     val connectionContext =
       connect.effectiveConnectionContext(defaultServerHttpContext).asScala
     delegate
-      .bindAndHandle(handler
-                       .asInstanceOf[Flow[sm.HttpRequest, sm.HttpResponse, _]]
-                       .asScala,
-                     connect.host,
-                     connect.port,
-                     connectionContext,
-                     settings.asScala,
-                     log)(materializer)
+      .bindAndHandle(
+        handler.asInstanceOf[Flow[sm.HttpRequest, sm.HttpResponse, _]].asScala,
+        connect.host,
+        connect.port,
+        connectionContext,
+        settings.asScala,
+        log)(materializer)
       .map(new ServerBinding(_))(ec)
       .toJava
   }
@@ -352,29 +371,38 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
   /**
     * Constructs a client layer stage using the configured default [[akka.http.javadsl.settings.ClientConnectionSettings]].
     */
-  def clientLayer(hostHeader: headers.Host): BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed] =
+  def clientLayer(hostHeader: headers.Host): BidiFlow[HttpRequest,
+                                                      SslTlsOutbound,
+                                                      SslTlsInbound,
+                                                      HttpResponse,
+                                                      NotUsed] =
     adaptClientLayer(delegate.clientLayer(JavaMapping.toScala(hostHeader)))
 
   /**
     * Constructs a client layer stage using the given [[akka.http.javadsl.settings.ClientConnectionSettings]].
     */
-  def clientLayer(
-      hostHeader: headers.Host, settings: ClientConnectionSettings): BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed] =
+  def clientLayer(hostHeader: headers.Host,
+                  settings: ClientConnectionSettings): BidiFlow[HttpRequest,
+                                                                SslTlsOutbound,
+                                                                SslTlsInbound,
+                                                                HttpResponse,
+                                                                NotUsed] =
     adaptClientLayer(
-        delegate.clientLayer(
-            JavaMapping.toScala(hostHeader), settings.asScala))
+      delegate.clientLayer(JavaMapping.toScala(hostHeader), settings.asScala))
 
   /**
     * Constructs a client layer stage using the given [[ClientConnectionSettings]].
     */
   def clientLayer(hostHeader: headers.Host,
                   settings: ClientConnectionSettings,
-                  log: LoggingAdapter): BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed] =
-    adaptClientLayer(delegate.clientLayer(
-            JavaMapping.toScala(hostHeader), settings.asScala, log))
+                  log: LoggingAdapter): BidiFlow[HttpRequest,
+                                                 SslTlsOutbound,
+                                                 SslTlsInbound,
+                                                 HttpResponse,
+                                                 NotUsed] =
+    adaptClientLayer(
+      delegate
+        .clientLayer(JavaMapping.toScala(hostHeader), settings.asScala, log))
 
   /**
     * Creates a [[Flow]] representing a prospective HTTP client connection to the given endpoint.
@@ -397,10 +425,10 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     adaptOutgoingFlow {
       if (to.isHttps)
         delegate.outgoingConnectionHttps(
-            to.host,
-            to.port,
-            to.effectiveHttpsConnectionContext(defaultClientHttpsContext)
-              .asScala)
+          to.host,
+          to.port,
+          to.effectiveHttpsConnectionContext(defaultClientHttpsContext)
+            .asScala)
       else delegate.outgoingConnection(to.host, to.port)
     }
 
@@ -416,17 +444,20 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     adaptOutgoingFlow {
       if (to.isHttps)
         delegate.outgoingConnectionHttps(
-            to.host,
-            to.port,
-            to.effectiveConnectionContext(defaultClientHttpsContext)
-              .asInstanceOf[HttpsConnectionContext]
-              .asScala,
-            localAddress.asScala,
-            settings.asScala,
-            log)
+          to.host,
+          to.port,
+          to.effectiveConnectionContext(defaultClientHttpsContext)
+            .asInstanceOf[HttpsConnectionContext]
+            .asScala,
+          localAddress.asScala,
+          settings.asScala,
+          log)
       else
-        delegate.outgoingConnection(
-            to.host, to.port, localAddress.asScala, settings.asScala, log)
+        delegate.outgoingConnection(to.host,
+                                    to.port,
+                                    localAddress.asScala,
+                                    settings.asScala,
+                                    log)
     }
 
   /**
@@ -443,8 +474,11 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     * In order to allow for easy response-to-request association the flow takes in a custom, opaque context
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
-  def newHostConnectionPool[T](host: String, materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+  def newHostConnectionPool[T](
+      host: String,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     newHostConnectionPool[T](ConnectHttp.toHost(host), materializer)
 
   /**
@@ -462,35 +496,41 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
   def newHostConnectionPool[T](
-      to: ConnectHttp, materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+      to: ConnectHttp,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     adaptTupleFlow(
-        delegate
-          .newHostConnectionPool[T](to.host, to.port)(materializer)
-          .mapMaterializedValue(_.toJava))
+      delegate
+        .newHostConnectionPool[T](to.host, to.port)(materializer)
+        .mapMaterializedValue(_.toJava))
 
   /**
     * Same as [[newHostConnectionPool]] but with HTTPS encryption.
     *
     * The given [[ConnectionContext]] will be used for encryption on the connection.
     */
-  def newHostConnectionPool[T](to: ConnectHttp,
-                               settings: ConnectionPoolSettings,
-                               log: LoggingAdapter,
-                               materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+  def newHostConnectionPool[T](
+      to: ConnectHttp,
+      settings: ConnectionPoolSettings,
+      log: LoggingAdapter,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     adaptTupleFlow {
       to.effectiveHttpsConnectionContext(defaultClientHttpsContext) match {
         case https: HttpsConnectionContext ⇒
           delegate
-            .newHostConnectionPoolHttps[T](
-                to.host, to.port, https.asScala, settings.asScala, log)(
-                materializer)
+            .newHostConnectionPoolHttps[T](to.host,
+                                           to.port,
+                                           https.asScala,
+                                           settings.asScala,
+                                           log)(materializer)
             .mapMaterializedValue(_.toJava)
         case _ ⇒
           delegate
             .newHostConnectionPool[T](to.host, to.port, settings.asScala, log)(
-                materializer)
+              materializer)
             .mapMaterializedValue(_.toJava)
       }
     }
@@ -513,8 +553,10 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
   def cachedHostConnectionPool[T](
-      host: String, materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+      host: String,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     cachedHostConnectionPool(ConnectHttp.toHost(host), materializer)
 
   /**
@@ -535,33 +577,37 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
   def cachedHostConnectionPool[T](
-      to: ConnectHttp, materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+      to: ConnectHttp,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     adaptTupleFlow(
-        delegate
-          .cachedHostConnectionPool[T](to.host, to.port)(materializer)
-          .mapMaterializedValue(_.toJava))
+      delegate
+        .cachedHostConnectionPool[T](to.host, to.port)(materializer)
+        .mapMaterializedValue(_.toJava))
 
   /**
     * Same as [[cachedHostConnectionPool]] but with HTTPS encryption.
     *
     * The given [[ConnectionContext]] will be used for encryption on the connection.
     */
-  def cachedHostConnectionPool[T](to: ConnectHttp,
-                                  settings: ConnectionPoolSettings,
-                                  log: LoggingAdapter,
-                                  materializer: Materializer): Flow[
-      Pair[HttpRequest, T], Pair[Try[HttpResponse], T], HostConnectionPool] =
+  def cachedHostConnectionPool[T](
+      to: ConnectHttp,
+      settings: ConnectionPoolSettings,
+      log: LoggingAdapter,
+      materializer: Materializer): Flow[Pair[HttpRequest, T],
+                                        Pair[Try[HttpResponse], T],
+                                        HostConnectionPool] =
     adaptTupleFlow(
-        delegate
-          .cachedHostConnectionPoolHttps[T](
-              to.host,
-              to.port,
-              to.effectiveHttpsConnectionContext(defaultClientHttpsContext)
-                .asScala,
-              settings.asScala,
-              log)(materializer)
-          .mapMaterializedValue(_.toJava))
+      delegate
+        .cachedHostConnectionPoolHttps[T](
+          to.host,
+          to.port,
+          to.effectiveHttpsConnectionContext(defaultClientHttpsContext)
+            .asScala,
+          settings.asScala,
+          log)(materializer)
+        .mapMaterializedValue(_.toJava))
 
   /**
     * Creates a new "super connection pool flow", which routes incoming requests to a (cached) host connection pool
@@ -600,8 +646,8 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
                    materializer: Materializer)
     : Flow[Pair[HttpRequest, T], Pair[Try[HttpResponse], T], NotUsed] =
     adaptTupleFlow(
-        delegate.superPool[T](
-            connectionContext.asScala, settings.asScala, log)(materializer))
+      delegate.superPool[T](connectionContext.asScala, settings.asScala, log)(
+        materializer))
 
   /**
     * Creates a new "super connection pool flow", which routes incoming requests to a (cached) host connection pool
@@ -623,9 +669,9 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
                    materializer: Materializer)
     : Flow[Pair[HttpRequest, T], Pair[Try[HttpResponse], T], NotUsed] =
     adaptTupleFlow(
-        delegate.superPool[T](defaultClientHttpsContext.asScala,
-                              settings.asScala,
-                              log)(materializer))
+      delegate.superPool[T](defaultClientHttpsContext.asScala,
+                            settings.asScala,
+                            log)(materializer))
 
   /**
     * Fires a single [[HttpRequest]] across the (cached) host connection pool for the request's
@@ -674,9 +720,10 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
       log: LoggingAdapter,
       materializer: Materializer): CompletionStage[HttpResponse] =
     delegate
-      .singleRequest(
-          request.asScala, connectionContext.asScala, settings.asScala, log)(
-          materializer)
+      .singleRequest(request.asScala,
+                     connectionContext.asScala,
+                     settings.asScala,
+                     log)(materializer)
       .toJava
 
   /**
@@ -706,7 +753,7 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
                Message,
                CompletionStage[WebSocketUpgradeResponse]] =
     adaptWsBidiFlow(
-        delegate.webSocketClientLayer(request.asScala, settings.asScala))
+      delegate.webSocketClientLayer(request.asScala, settings.asScala))
 
   /**
     * Constructs a WebSocket [[BidiFlow]] using the configured default [[ClientConnectionSettings]],
@@ -723,7 +770,7 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
                Message,
                CompletionStage[WebSocketUpgradeResponse]] =
     adaptWsBidiFlow(
-        delegate.webSocketClientLayer(request.asScala, settings.asScala, log))
+      delegate.webSocketClientLayer(request.asScala, settings.asScala, log))
 
   /**
     * Constructs a flow that once materialized establishes a WebSocket connection to the given Uri.
@@ -838,7 +885,7 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     */
   def setDefaultClientHttpsContext(context: HttpsConnectionContext): Unit =
     delegate.setDefaultClientHttpsContext(
-        context.asInstanceOf[akka.http.scaladsl.HttpsConnectionContext])
+      context.asInstanceOf[akka.http.scaladsl.HttpsConnectionContext])
 
   private def adaptTupleFlow[T, Mat](
       scalaFlow: stream.scaladsl.Flow[(scaladsl.model.HttpRequest, T),
@@ -847,18 +894,18 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     : Flow[Pair[HttpRequest, T], Pair[Try[HttpResponse], T], Mat] = {
     implicit val _ = JavaMapping.identity[T]
     JavaMapping.toJava(scalaFlow)(
-        JavaMapping.flowMapping[Pair[HttpRequest, T],
-                                (scaladsl.model.HttpRequest, T),
-                                Pair[Try[HttpResponse], T],
-                                (Try[scaladsl.model.HttpResponse], T),
-                                Mat])
+      JavaMapping.flowMapping[Pair[HttpRequest, T],
+                              (scaladsl.model.HttpRequest, T),
+                              Pair[Try[HttpResponse], T],
+                              (Try[scaladsl.model.HttpResponse], T),
+                              Mat])
   }
 
   private def adaptOutgoingFlow[T, Mat](
       scalaFlow: stream.scaladsl.Flow[
-          scaladsl.model.HttpRequest,
-          scaladsl.model.HttpResponse,
-          Future[scaladsl.Http.OutgoingConnection]])
+        scaladsl.model.HttpRequest,
+        scaladsl.model.HttpResponse,
+        Future[scaladsl.Http.OutgoingConnection]])
     : Flow[HttpRequest, HttpResponse, CompletionStage[OutgoingConnection]] =
     Flow.fromGraph {
       akka.stream.scaladsl
@@ -869,26 +916,32 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
     }
 
   private def adaptServerLayer(
-      serverLayer: scaladsl.Http.ServerLayer): BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed] =
+      serverLayer: scaladsl.Http.ServerLayer): BidiFlow[HttpResponse,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpRequest,
+                                                        NotUsed] =
     new BidiFlow(
-        JavaMapping
-          .adapterBidiFlow[HttpResponse,
-                           sm.HttpResponse,
-                           sm.HttpRequest,
-                           HttpRequest]
-          .atop(serverLayer))
+      JavaMapping
+        .adapterBidiFlow[HttpResponse,
+                         sm.HttpResponse,
+                         sm.HttpRequest,
+                         HttpRequest]
+        .atop(serverLayer))
 
   private def adaptClientLayer(
-      clientLayer: scaladsl.Http.ClientLayer): BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed] =
+      clientLayer: scaladsl.Http.ClientLayer): BidiFlow[HttpRequest,
+                                                        SslTlsOutbound,
+                                                        SslTlsInbound,
+                                                        HttpResponse,
+                                                        NotUsed] =
     new BidiFlow(
-        JavaMapping
-          .adapterBidiFlow[HttpRequest,
-                           sm.HttpRequest,
-                           sm.HttpResponse,
-                           HttpResponse]
-          .atop(clientLayer))
+      JavaMapping
+        .adapterBidiFlow[HttpRequest,
+                         sm.HttpRequest,
+                         sm.HttpResponse,
+                         HttpResponse]
+        .atop(clientLayer))
 
   private def adaptWsBidiFlow(wsLayer: scaladsl.Http.WebSocketClientLayer)
     : BidiFlow[Message,
@@ -897,25 +950,26 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
                Message,
                CompletionStage[WebSocketUpgradeResponse]] =
     new BidiFlow(
-        JavaMapping
-          .adapterBidiFlow[Message, sm.ws.Message, sm.ws.Message, Message]
-          .atopMat(wsLayer)((_, s) ⇒ adaptWsUpgradeResponse(s)))
+      JavaMapping
+        .adapterBidiFlow[Message, sm.ws.Message, sm.ws.Message, Message]
+        .atopMat(wsLayer)((_, s) ⇒ adaptWsUpgradeResponse(s)))
 
   private def adaptWsFlow(
       wsLayer: stream.scaladsl.Flow[
-          sm.ws.Message,
-          sm.ws.Message,
-          Future[scaladsl.model.ws.WebSocketUpgradeResponse]])
+        sm.ws.Message,
+        sm.ws.Message,
+        Future[scaladsl.model.ws.WebSocketUpgradeResponse]])
     : Flow[Message, Message, CompletionStage[WebSocketUpgradeResponse]] =
     Flow.fromGraph(
-        JavaMapping
-          .adapterBidiFlow[Message, sm.ws.Message, sm.ws.Message, Message]
-          .joinMat(wsLayer)(Keep.right)
-          .mapMaterializedValue(adaptWsUpgradeResponse _))
+      JavaMapping
+        .adapterBidiFlow[Message, sm.ws.Message, sm.ws.Message, Message]
+        .joinMat(wsLayer)(Keep.right)
+        .mapMaterializedValue(adaptWsUpgradeResponse _))
 
-  private def adaptWsFlow[Mat](
-      javaFlow: Flow[Message, Message, Mat]): stream.scaladsl.Flow[
-      scaladsl.model.ws.Message, scaladsl.model.ws.Message, Mat] =
+  private def adaptWsFlow[Mat](javaFlow: Flow[Message, Message, Mat])
+    : stream.scaladsl.Flow[scaladsl.model.ws.Message,
+                           scaladsl.model.ws.Message,
+                           Mat] =
     stream.scaladsl
       .Flow[scaladsl.model.ws.Message]
       .map(Message.adapt)
@@ -923,8 +977,8 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
       .map(_.asScala)
 
   private def adaptWsResultTuple[T](
-      result: (Future[scaladsl.model.ws.WebSocketUpgradeResponse],
-      T)): Pair[CompletionStage[WebSocketUpgradeResponse], T] =
+      result: (Future[scaladsl.model.ws.WebSocketUpgradeResponse], T))
+    : Pair[CompletionStage[WebSocketUpgradeResponse], T] =
     result match {
       case (fut, tMat) ⇒ Pair(adaptWsUpgradeResponse(fut), tMat)
     }

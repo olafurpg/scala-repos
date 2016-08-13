@@ -14,41 +14,41 @@ class ToSetAndBackTest extends OperationsOnCollectionInspectionTest {
 
   def testSeq(): Unit = {
     doTest(
-        s"Seq(1).${START}toSet.toSeq$END",
-        "Seq(1).toSet.toSeq",
-        "Seq(1).distinct"
+      s"Seq(1).${START}toSet.toSeq$END",
+      "Seq(1).toSet.toSeq",
+      "Seq(1).distinct"
     )
   }
 
   def testList(): Unit = {
     doTest(
-        s"List(1).${START}toSet.toList$END",
-        "List(1).toSet.toList",
-        "List(1).distinct"
+      s"List(1).${START}toSet.toList$END",
+      "List(1).toSet.toList",
+      "List(1).distinct"
     )
   }
 
   def testArray(): Unit = {
     doTest(
-        s"Array(1).${START}toSet.toArray[Int]$END",
-        "Array(1).toSet.toArray[Int]",
-        "Array(1).distinct"
+      s"Array(1).${START}toSet.toArray[Int]$END",
+      "Array(1).toSet.toArray[Int]",
+      "Array(1).distinct"
     )
   }
 
   def testPostfix(): Unit = {
     doTest(
-        s"(Seq(1)$START toSet) toSeq$END",
-        "(Seq(1) toSet) toSeq",
-        "Seq(1).distinct"
+      s"(Seq(1)$START toSet) toSeq$END",
+      "(Seq(1) toSet) toSeq",
+      "Seq(1).distinct"
     )
   }
 
   def testTo(): Unit = {
     doTest(
-        s"Seq(1).${START}toSet.to[Seq]$END",
-        "Seq(1).toSet.to[Seq]",
-        "Seq(1).distinct"
+      s"Seq(1).${START}toSet.to[Seq]$END",
+      "Seq(1).toSet.to[Seq]",
+      "Seq(1).distinct"
     )
   }
 

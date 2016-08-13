@@ -37,7 +37,8 @@ object VideoTrack {
 }
 
 class VideoTrack(override val delegate: jfxsm.VideoTrack)
-    extends Track(delegate) with SFXDelegate[jfxsm.VideoTrack] {
+    extends Track(delegate)
+    with SFXDelegate[jfxsm.VideoTrack] {
 
   /**
     * Retrieves the height of the track.

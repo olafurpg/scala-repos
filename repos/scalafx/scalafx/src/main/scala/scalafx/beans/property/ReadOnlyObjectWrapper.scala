@@ -49,8 +49,9 @@ object ReadOnlyObjectWrapper {
     * @param value the initial value.
     * @tparam T type of the value hold by this object property.
     */
-  def apply[T <: Any](
-      bean: Object, name: String, value: T): ReadOnlyObjectWrapper[T] =
+  def apply[T <: Any](bean: Object,
+                      name: String,
+                      value: T): ReadOnlyObjectWrapper[T] =
     new ReadOnlyObjectWrapper[T](bean, name, value)
 
   /** Creates a new ReadOnlyObjectWrapper with a `delegate` as initial value.
@@ -64,7 +65,7 @@ object ReadOnlyObjectWrapper {
     */
   def apply[J <: Object](value: SFXDelegate[J]): ReadOnlyObjectWrapper[J] =
     new ReadOnlyObjectWrapper[J](
-        new jfxbp.ReadOnlyObjectWrapper[J](value.delegate))
+      new jfxbp.ReadOnlyObjectWrapper[J](value.delegate))
 
   /** Creates a new ReadOnlyObjectWrapper with a [[scalafx.delegate.SFXDelegate]] as initial value.
     *

@@ -40,7 +40,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     */
   def unapplyMember(tp: Type): Symbol =
     directUnapplyMember(tp) filter
-    (sym => !hasMultipleNonImplicitParamLists(sym))
+      (sym => !hasMultipleNonImplicitParamLists(sym))
 
   object HasUnapply {
     def unapply(tp: Type): Option[Symbol] = unapplyMember(tp).toOption
@@ -63,8 +63,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
   private def constrTparamsInvariant(cdef: ClassDef): List[TypeDef] = {
     val ClassDef(_, _, tparams, _) = resetAttrs(cdef.duplicate)
     val tparamsInvariant = tparams.map(tparam =>
-          copyTypeDef(tparam)(
-              mods = tparam.mods &~ (COVARIANT | CONTRAVARIANT)))
+      copyTypeDef(tparam)(mods = tparam.mods &~ (COVARIANT | CONTRAVARIANT)))
     tparamsInvariant
   }
 
@@ -103,10 +102,10 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     val params = constrParamss(cdef)
     def inheritFromFun =
       !cdef.mods.hasAbstractFlag && cdef.tparams.isEmpty &&
-      (params match {
-            case List(ps) if ps.length <= MaxFunctionArity => true
-            case _ => false
-          })
+        (params match {
+          case List(ps) if ps.length <= MaxFunctionArity => true
+          case _ => false
+        })
     def createFun = {
       def primaries = params.head map (_.tpt)
       gen.scalaFunctionConstr(primaries, toIdent(cdef), abstractFun = true)
@@ -124,16 +123,20 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     companionModuleDef(cdef, parents, List(toString))
   }
 
-  def companionModuleDef(
-      cdef: ClassDef,
-      parents: List[Tree] = Nil,
-      body: List[Tree] = Nil): ModuleDef = atPos(cdef.pos.focus) {
-    ModuleDef(Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
-                        cdef.mods.privateWithin),
-              cdef.name.toTermName,
-              gen.mkTemplate(
-                  parents, noSelfType, NoMods, Nil, body, cdef.impl.pos.focus))
-  }
+  def companionModuleDef(cdef: ClassDef,
+                         parents: List[Tree] = Nil,
+                         body: List[Tree] = Nil): ModuleDef =
+    atPos(cdef.pos.focus) {
+      ModuleDef(Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
+                          cdef.mods.privateWithin),
+                cdef.name.toTermName,
+                gen.mkTemplate(parents,
+                               noSelfType,
+                               NoMods,
+                               Nil,
+                               body,
+                               cdef.impl.pos.focus))
+    }
 
   /** The apply method corresponding to a case class
     */
@@ -142,12 +145,12 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     val cparamss = constrParamss(cdef)
     def classtpe = classType(cdef, tparams)
     atPos(cdef.pos.focus)(
-        DefDef(mods,
-               name,
-               tparams,
-               cparamss,
-               classtpe,
-               New(classtpe, mmap(cparamss)(gen.paramToArg)))
+      DefDef(mods,
+             name,
+             tparams,
+             cparamss,
+             classtpe,
+             New(classtpe, mmap(cparamss)(gen.paramToArg)))
     )
   }
 
@@ -166,17 +169,17 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
       case _ => nme.unapply
     }
     val cparams = List(
-        ValDef(Modifiers(PARAM | SYNTHETIC),
-               unapplyParamName,
-               classType(cdef, tparams),
-               EmptyTree))
+      ValDef(Modifiers(PARAM | SYNTHETIC),
+             unapplyParamName,
+             classType(cdef, tparams),
+             EmptyTree))
     val resultType =
       if (!settings.isScala212) TypeTree()
       else {
         // fix for SI-6541 under -Xsource:2.12
         def repeatedToSeq(tp: Tree) = tp match {
-          case AppliedTypeTree(
-              Select(_, tpnme.REPEATED_PARAM_CLASS_NAME), tps) =>
+          case AppliedTypeTree(Select(_, tpnme.REPEATED_PARAM_CLASS_NAME),
+                               tps) =>
             AppliedTypeTree(gen.rootScalaDot(tpnme.Seq), tps)
           case _ => tp
         }
@@ -197,7 +200,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     }, ifNull)(Ident(unapplyParamName))
 
     atPos(cdef.pos.focus)(
-        DefDef(caseMods, method, tparams, List(cparams), resultType, body)
+      DefDef(caseMods, method, tparams, List(cparams), resultType, body)
     )
   }
 
@@ -240,7 +243,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
         val rhs = if (putDefault) toIdent(vd) else EmptyTree
         val flags =
           PARAM | (vd.mods.flags & IMPLICIT) |
-          (if (putDefault) DEFAULTPARAM else 0)
+            (if (putDefault) DEFAULTPARAM else 0)
         // empty tpt: see comment above
         val tpt = atPos(vd.pos.focus)(TypeTree() setOriginal vd.tpt)
         treeCopy.ValDef(vd, Modifiers(flags), vd.name, tpt, rhs)
@@ -251,19 +254,19 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
         case Nil => Nil
         case ps :: pss =>
           ps.map(makeCopyParam(_, putDefault = true)) :: mmap(pss)(
-              makeCopyParam(_, putDefault = false))
+            makeCopyParam(_, putDefault = false))
       }
 
       val classTpe = classType(cdef, tparams)
       val argss = mmap(paramss)(toIdent)
       val body: Tree = New(classTpe, argss)
       val copyDefDef = atPos(cdef.pos.focus)(
-          DefDef(Modifiers(SYNTHETIC),
-                 nme.copy,
-                 tparams,
-                 paramss,
-                 TypeTree(),
-                 body)
+        DefDef(Modifiers(SYNTHETIC),
+               nme.copy,
+               tparams,
+               paramss,
+               TypeTree(),
+               body)
       )
       Some(copyDefDef)
     }

@@ -17,7 +17,11 @@ package squerylrecord
 import common.{Box, Full}
 import record.{BaseField, MetaRecord, Record, TypedField, OwnedField}
 import record.field._
-import org.squeryl.internals.{FieldMetaData, PosoMetaData, FieldMetaDataFactory}
+import org.squeryl.internals.{
+  FieldMetaData,
+  PosoMetaData,
+  FieldMetaDataFactory
+}
 import org.squeryl.annotations.Column
 import java.lang.reflect.{Method, Field}
 import java.lang.annotation.Annotation
@@ -41,10 +45,12 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       mr.asInstanceOf[Record[Rec]].fieldByName(name) match {
         case Full(f: BaseField) => f
         case Full(_) =>
-          org.squeryl.internals.Utils.throwError("field " + name +
+          org.squeryl.internals.Utils.throwError(
+            "field " + name +
               " in Record metadata for " + clasz + " is not a TypedField")
         case _ =>
-          org.squeryl.internals.Utils.throwError("failed to find field " +
+          org.squeryl.internals.Utils.throwError(
+            "failed to find field " +
               name + " in Record metadata for " + clasz)
       }
 
@@ -58,8 +64,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           fieldFrom(mr)
         } catch {
           case ex: Exception =>
-            org.squeryl.internals.Utils
-              .throwError("failed to find MetaRecord for " + clasz +
+            org.squeryl.internals.Utils.throwError(
+              "failed to find MetaRecord for " + clasz +
                 " due to exception " + ex.toString)
         }
     }
@@ -68,8 +74,10 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
   /** Build a Squeryl FieldMetaData for a particular field in a Record */
   def build(parentMetaData: PosoMetaData[_],
             name: String,
-            property: (Option[Field], Option[Method], Option[Method],
-            Set[Annotation]),
+            property: (Option[Field],
+                       Option[Method],
+                       Option[Method],
+                       Set[Annotation]),
             sampleInstance4OptionTypeDeduction: AnyRef,
             isOptimisticCounter: Boolean): FieldMetaData = {
     if (!isRecord(parentMetaData.clasz) || isOptimisticCounter) {
@@ -77,15 +85,15 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       //treat it as a normal class in primitive type mode, or the field
       //was mixed in by the Optimisitic trait and is not a Record field.
       return SquerylRecord.posoMetaDataFactory.build(
-          parentMetaData,
-          name,
-          property,
-          sampleInstance4OptionTypeDeduction,
-          isOptimisticCounter)
+        parentMetaData,
+        name,
+        property,
+        sampleInstance4OptionTypeDeduction,
+        isOptimisticCounter)
     }
 
-    val metaField = findMetaField(
-        parentMetaData.clasz.asInstanceOf[Class[Rec]], name)
+    val metaField =
+      findMetaField(parentMetaData.clasz.asInstanceOf[Class[Rec]], name)
 
     val (field, getter, setter, annotations) = property
 
@@ -110,24 +118,24 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       case (_: EnumNameTypedField[_]) => classOf[String]
       case _ =>
         org.squeryl.internals.Utils.throwError(
-            "Unsupported field type. Consider implementing " +
+          "Unsupported field type. Consider implementing " +
             "SquerylRecordField for defining the persistent class." +
             "Field: " + metaField)
     }
 
     new FieldMetaData(
-        parentMetaData,
-        name,
-        fieldsValueType, // if isOption, this fieldType is the type param of Option, i.e. the T in Option[T]
-        fieldsValueType, //in primitive type mode fieldType == wrappedFieldType, in custom type mode wrappedFieldType is the 'real' type, i.e. the (primitive) type that jdbc understands
-        None, //val customTypeFactory: Option[AnyRef=>Product1[Any]],
-        metaField.optional_?,
-        getter,
-        setter,
-        field,
-        colAnnotation,
-        isOptimisticCounter,
-        metaField) {
+      parentMetaData,
+      name,
+      fieldsValueType, // if isOption, this fieldType is the type param of Option, i.e. the T in Option[T]
+      fieldsValueType, //in primitive type mode fieldType == wrappedFieldType, in custom type mode wrappedFieldType is the 'real' type, i.e. the (primitive) type that jdbc understands
+      None, //val customTypeFactory: Option[AnyRef=>Product1[Any]],
+      metaField.optional_?,
+      getter,
+      setter,
+      field,
+      colAnnotation,
+      isOptimisticCounter,
+      metaField) {
 
       override def length = {
         import java.math.MathContext
@@ -135,15 +143,15 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           case (stringTypedField: StringTypedField) =>
             Some(stringTypedField.maxLength)
           case decimalField: DecimalField[_] => {
-              val precision = decimalField.context.getPrecision();
-              if (precision != 0) Some(precision)
-              else None
-            }
+            val precision = decimalField.context.getPrecision();
+            if (precision != 0) Some(precision)
+            else None
+          }
           case decimalField: OptionalDecimalField[_] => {
-              val precision = decimalField.context.getPrecision();
-              if (precision != 0) Some(precision)
-              else None
-            }
+            val precision = decimalField.context.getPrecision();
+            if (precision != 0) Some(precision)
+            else None
+          }
           case _ => None
         }
         fieldLength getOrElse super.length
@@ -163,7 +171,7 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
         case tf: TypedField[_] => tf
         case other =>
           org.squeryl.internals.Utils.throwError(
-              "Field's used with Squeryl must inherit from net.liftweb.record.TypedField : " +
+            "Field's used with Squeryl must inherit from net.liftweb.record.TypedField : " +
               other)
       }
 
@@ -179,12 +187,13 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           }
         case other =>
           org.squeryl.internals.Utils.throwError(
-              "RecordMetaDataFactory can not set fields on non Record objects : " +
+            "RecordMetaDataFactory can not set fields on non Record objects : " +
               other)
       }
 
-      override def setFromResultSet(
-          target: AnyRef, rs: ResultSet, index: Int) =
+      override def setFromResultSet(target: AnyRef,
+                                    rs: ResultSet,
+                                    index: Int) =
         set(target, resultSetHandler(rs, index))
 
       /**
@@ -237,8 +246,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       .get(null)
       .asInstanceOf[MetaRecord[_]]
 
-      () =>
-        metaRecord.createRecord.asInstanceOf[AnyRef]
+    () =>
+      metaRecord.createRecord.asInstanceOf[AnyRef]
   }
 
   /**

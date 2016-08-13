@@ -21,7 +21,8 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetThriftCompatibilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   import ParquetCompatibilityTest._
 
   private val parquetFilePath = Thread
@@ -35,8 +36,8 @@ class ParquetThriftCompatibilitySuite
        """.stripMargin)
 
     checkAnswer(
-        sqlContext.read.parquet(parquetFilePath.toString), (0 until 10).map {
-      i =>
+      sqlContext.read.parquet(parquetFilePath.toString),
+      (0 until 10).map { i =>
         val suits = Array("SPADES", "HEARTS", "DIAMONDS", "CLUBS")
 
         val nonNullablePrimitiveValues = Seq(i % 2 == 0,
@@ -73,8 +74,9 @@ class ParquetThriftCompatibilitySuite
                 }
                 .toMap)
 
-        Row(nonNullablePrimitiveValues ++ nullablePrimitiveValues ++ complexValues: _*)
-    })
+        Row(
+          nonNullablePrimitiveValues ++ nullablePrimitiveValues ++ complexValues: _*)
+      })
   }
 
   test("SPARK-10136 list of primitive list") {

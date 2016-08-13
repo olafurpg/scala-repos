@@ -6,7 +6,9 @@ import java.io.File
 import java.net.URI
 import java.nio.ByteBuffer
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.mapreduce.filecache.{DistributedCache => HDistributedCache}
+import org.apache.hadoop.mapreduce.filecache.{
+  DistributedCache => HDistributedCache
+}
 import org.apache.hadoop.fs.Path
 
 object URIHasher {
@@ -27,7 +29,10 @@ object URIHasher {
   def apply(uri: URI): String = {
     val (h1, h2) = HashFunc(uri.toASCIIString)
     val bytes = ByteBuffer.allocate(16).putLong(h1).putLong(h2).array()
-    bytes.map(deSign).map("%02x".format(_)).reduceLeft(_ + _) // lifted gently from com.twitter.util.U64
+    bytes
+      .map(deSign)
+      .map("%02x".format(_))
+      .reduceLeft(_ + _) // lifted gently from com.twitter.util.U64
   }
 }
 
@@ -85,7 +90,7 @@ object DistributedCacheFile {
             symlinkNameFor(sourceUri))
 }
 
-final case class UncachedFile private[scalding](source: Either[String, URI]) {
+final case class UncachedFile private[scalding] (source: Either[String, URI]) {
 
   import DistributedCacheFile._
 
@@ -116,7 +121,8 @@ final case class UncachedFile private[scalding](source: Either[String, URI]) {
       makeQualified(new Path(uri.toString), conf) // uri.toString because hadoop 0.20.2 doesn't take a URI
 
     def makeQualified(p: Path, conf: Configuration): URI =
-      p.makeQualified(p.getFileSystem(conf)).toUri // make sure we have fully-qualified URI
+      p.makeQualified(p.getFileSystem(conf))
+        .toUri // make sure we have fully-qualified URI
 
     val sourceUri = source match {
       case Left(strPath) => makeQualifiedStr(strPath, conf)
@@ -137,13 +143,13 @@ sealed abstract class CachedFile {
   def file: File
 }
 
-final case class LocallyCachedFile private[scalding](sourcePath: String)
+final case class LocallyCachedFile private[scalding] (sourcePath: String)
     extends CachedFile {
   def path = file.getCanonicalPath
   def file = new File(sourcePath).getCanonicalFile
 }
 
-final case class HadoopCachedFile private[scalding](sourceUri: URI)
+final case class HadoopCachedFile private[scalding] (sourceUri: URI)
     extends CachedFile {
 
   import DistributedCacheFile._

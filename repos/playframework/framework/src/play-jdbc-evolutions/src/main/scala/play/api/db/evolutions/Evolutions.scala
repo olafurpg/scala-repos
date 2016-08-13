@@ -117,9 +117,9 @@ object Evolutions {
                schema: String = ""): Unit = {
     val evolutions = Play.current.injector.instanceOf[EvolutionsApi]
     val scripts = evolutions.scripts(
-        dbName,
-        new EnvironmentEvolutionsReader(Environment.simple(path = path)),
-        schema)
+      dbName,
+      new EnvironmentEvolutionsReader(Environment.simple(path = path)),
+      schema)
     evolutions.evolve(dbName, scripts, autocommit, schema)
   }
 
@@ -167,10 +167,10 @@ object Evolutions {
     val txt = scripts.map {
       case UpScript(ev) =>
         "# --- Rev:" + ev.revision + ",Ups - " + ev.hash.take(7) + "\n" +
-        ev.sql_up + "\n"
+          ev.sql_up + "\n"
       case DownScript(ev) =>
         "# --- Rev:" + ev.revision + ",Downs - " + ev.hash.take(7) + "\n" +
-        ev.sql_down + "\n"
+          ev.sql_down + "\n"
     }.mkString("\n")
 
     val hasDownWarning =
@@ -207,11 +207,11 @@ object Evolutions {
     * @param autocommit Whether to use autocommit or not, evolutions will be manually committed if false.
     * @param schema The schema where all the play evolution tables are saved in
     */
-  def applyEvolutions(
-      database: Database,
-      evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
-      autocommit: Boolean = true,
-      schema: String = ""): Unit = {
+  def applyEvolutions(database: Database,
+                      evolutionsReader: EvolutionsReader =
+                        ThisClassLoaderEvolutionsReader,
+                      autocommit: Boolean = true,
+                      schema: String = ""): Unit = {
     val dbEvolutions = new DatabaseEvolutions(database, schema)
     val evolutions = dbEvolutions.scripts(evolutionsReader)
     dbEvolutions.evolve(evolutions, autocommit)
@@ -244,11 +244,11 @@ object Evolutions {
     * @param block The block to execute
     * @param schema The schema where all the play evolution tables are saved in
     */
-  def withEvolutions[T](
-      database: Database,
-      evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
-      autocommit: Boolean = true,
-      schema: String = "")(block: => T): T = {
+  def withEvolutions[T](database: Database,
+                        evolutionsReader: EvolutionsReader =
+                          ThisClassLoaderEvolutionsReader,
+                        autocommit: Boolean = true,
+                        schema: String = "")(block: => T): T = {
     applyEvolutions(database, evolutionsReader, autocommit, schema)
     try {
       block
@@ -302,10 +302,11 @@ object OfflineEvolutions {
                   autocommit: Boolean = true,
                   schema: String = ""): Unit = {
     val evolutions = getEvolutions(appPath, classloader, dbApi)
-    val scripts = evolutions.evolutionsApi.scripts(
-        dbName, evolutions.evolutionsReader, schema)
+    val scripts = evolutions.evolutionsApi
+      .scripts(dbName, evolutions.evolutionsReader, schema)
     if (!isTest) {
-      logger.warn("Applying evolution scripts for database '" + dbName +
+      logger.warn(
+        "Applying evolution scripts for database '" + dbName +
           "':\n\n" + Evolutions.toHumanReadableScript(scripts))
     }
     evolutions.evolutionsApi.evolve(dbName, scripts, autocommit, schema)
@@ -329,7 +330,8 @@ object OfflineEvolutions {
               schema: String = ""): Unit = {
     val evolutions = getEvolutions(appPath, classloader, dbApi)
     if (!isTest) {
-      logger.warn("Resolving evolution [" + revision + "] for database '" +
+      logger.warn(
+        "Resolving evolution [" + revision + "] for database '" +
           dbName + "'")
     }
     evolutions.evolutionsApi.resolve(dbName, revision, schema)

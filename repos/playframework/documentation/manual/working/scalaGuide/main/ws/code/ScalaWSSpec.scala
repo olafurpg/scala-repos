@@ -79,7 +79,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       })
       .build()
     running(TestServer(testServerPort, app))(
-        block(app.injector.instanceOf[WSClient]))
+      block(app.injector.instanceOf[WSClient]))
   }
 
   /**
@@ -192,8 +192,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
       "post with multipart/form encoded body" in withServer {
         case ("POST", "/") =>
-          Action(BodyParsers.parse.multipartFormData)(
-              r => Ok(r.body.asFormUrlEncoded("key").head))
+          Action(BodyParsers.parse.multipartFormData)(r =>
+            Ok(r.body.asFormUrlEncoded("key").head))
       } { ws =>
         import play.api.mvc.MultipartFormData._
         val response = //#multipart-encoded
@@ -209,8 +209,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
         // #scalaws-post-json
         import play.api.libs.json._
         val data = Json.obj(
-            "key1" -> "value1",
-            "key2" -> "value2"
+          "key1" -> "value1",
+          "key2" -> "value2"
         )
         val futureResponse: Future[WSResponse] = ws.url(url).post(data)
         // #scalaws-post-json
@@ -371,8 +371,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
                 // If there's a content length, send that, otherwise return the body chunked
                 response.headers.get("Content-Length") match {
                   case Some(Seq(length)) =>
-                    Ok.sendEntity(HttpEntity.Streamed(
-                            body, Some(length.toLong), Some(contentType)))
+                    Ok.sendEntity(HttpEntity
+                      .Streamed(body, Some(length.toLong), Some(contentType)))
                   case _ =>
                     Ok.chunked(body).as(contentType)
                 }
@@ -384,8 +384,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
         //#stream-to-result
         val file = File.createTempFile("stream-to-file-", ".txt")
         await(
-            downloadFile(FakeRequest())
-              .flatMap(_.body.dataStream.runFold(0l)((t, b) => t + b.length))
+          downloadFile(FakeRequest())
+            .flatMap(_.body.dataStream.runFold(0l)((t, b) => t + b.length))
         ) must_== 10000l
         file.delete()
       }
@@ -517,7 +517,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       import play.api.libs.ws._
 
       val configuration =
-        Configuration.reference ++ Configuration(ConfigFactory.parseString("""
+        Configuration.reference ++ Configuration(
+          ConfigFactory.parseString("""
           |ws.followRedirects = true
         """.stripMargin))
 
@@ -527,7 +528,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       val logging = new AsyncHttpClientConfig.AdditionalChannelInitializer() {
         override def initChannel(channel: io.netty.channel.Channel): Unit = {
           channel.pipeline.addFirst(
-              "log", new io.netty.handler.logging.LoggingHandler("debug"))
+            "log",
+            new io.netty.handler.logging.LoggingHandler("debug"))
         }
       }
       val ahcBuilder = builder.configure()

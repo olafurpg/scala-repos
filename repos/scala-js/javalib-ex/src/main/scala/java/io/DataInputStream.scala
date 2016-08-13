@@ -6,7 +6,8 @@ import scala.scalajs.js.typedarray._
   *  DataInputStream implementation using JavaScript typed arrays.
   */
 class DataInputStream(in: InputStream)
-    extends FilterInputStream(in) with DataInput {
+    extends FilterInputStream(in)
+    with DataInput {
 
   private var pushedBack: Int = -1
   private var pushedBackMark: Int = -1
@@ -190,7 +191,7 @@ class DataInputStream(in: InputStream)
 
           if ((c & 0xC0) != 0x80) // 10xxxxxx
             badFormat(
-                f"Expected 3 bytes, found: $b%#02x, $c%#02x (init: $a%#02x)")
+              f"Expected 3 bytes, found: $b%#02x, $c%#02x (init: $a%#02x)")
 
           (((a & 0x0F) << 12) | ((b & 0x3F) << 6) | (c & 0x3F)).toChar
         } else {

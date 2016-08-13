@@ -35,10 +35,10 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
 
   private[mapper] lazy val oneToManyFields: List[MappedOneToManyBase[Rec]] = {
     new FieldFinder[MappedOneToManyBase[Rec]](
-        getSingleton,
-        net.liftweb.common.Logger(classOf[OneToMany[K, T]])
+      getSingleton,
+      net.liftweb.common.Logger(classOf[OneToMany[K, T]])
     ).accessorMethods map
-    (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
+      (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
   }
 
   /**
@@ -86,19 +86,18 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
                                         foreign: MappedForeignKey[K, O, T],
                                         qp: QueryParam[O]*)
       extends MappedOneToManyBase[O](
-          () =>
-            {
-              val ret =
-                meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
-              for (child <- ret) {
-                foreign
-                  .actualField(child)
-                  .asInstanceOf[MappedForeignKey[K, O, T]]
-                  .primeObj(net.liftweb.common.Full(OneToMany.this: T))
-              }
-              ret
-          },
-          foreign
+        () => {
+          val ret =
+            meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
+          for (child <- ret) {
+            foreign
+              .actualField(child)
+              .asInstanceOf[MappedForeignKey[K, O, T]]
+              .primeObj(net.liftweb.common.Full(OneToMany.this: T))
+          }
+          ret
+        },
+        foreign
       )
 
   /**
@@ -248,8 +247,8 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     override def toString = {
       val c = getClass.getSimpleName
       val l = c.lastIndexOf("$")
-      c.substring(c.lastIndexOf("$", l - 1) + 1, l) + delegate.mkString(
-          "[", ", ", "]")
+      c.substring(c.lastIndexOf("$", l - 1) + 1, l) + delegate
+        .mkString("[", ", ", "]")
     }
   }
 

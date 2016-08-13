@@ -107,8 +107,9 @@ object copySyntax {
 }
 
 object openCopySyntax {
-  class CopySyntax[T, BaseFields0](
-      t: OpenFamily[T] { type BaseFields = BaseFields0 }) {
+  class CopySyntax[T, BaseFields0](t: OpenFamily[T] {
+    type BaseFields = BaseFields0
+  }) {
     object copy extends RecordArgs {
       def applyRecord[R <: HList](r: R)(
           implicit update: UpdateRepr[BaseFields0, R]): T =

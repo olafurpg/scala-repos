@@ -23,8 +23,8 @@ import kafka.utils.{StaticPartitioner, TestUtils}
 import kafka.serializer.StringEncoder
 
 @deprecated(
-    "This test has been deprecated and it will be removed in a future release",
-    "0.10.0.0")
+  "This test has been deprecated and it will be removed in a future release",
+  "0.10.0.0")
 trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
   val host = "localhost"
   var producer: Producer[String, String] = null
@@ -34,12 +34,12 @@ trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
   override def setUp() {
     super.setUp
     producer = TestUtils.createProducer[String, String](
-        TestUtils.getBrokerListStrFromServers(servers),
-        encoder = classOf[StringEncoder].getName,
-        keyEncoder = classOf[StringEncoder].getName,
-        partitioner = classOf[StaticPartitioner].getName)
-    consumer = new SimpleConsumer(
-        host, servers(0).boundPort(), 1000000, 64 * 1024, "")
+      TestUtils.getBrokerListStrFromServers(servers),
+      encoder = classOf[StringEncoder].getName,
+      keyEncoder = classOf[StringEncoder].getName,
+      partitioner = classOf[StaticPartitioner].getName)
+    consumer =
+      new SimpleConsumer(host, servers(0).boundPort(), 1000000, 64 * 1024, "")
   }
 
   @After

@@ -47,7 +47,7 @@ object JavaScriptReverseRouter {
             routes: JavaScriptReverseRoute*): JavaScript = JavaScript {
     import org.apache.commons.lang3.StringEscapeUtils.{escapeEcmaScript => esc}
     val ajaxField = ajaxMethod.fold("")(m =>
-          s"ajax:function(c){c=c||{};c.url=r.url;c.type=r.method;return $m(c)},")
+      s"ajax:function(c){c=c||{};c.url=r.url;c.type=r.method;return $m(c)},")
     val routesStr = routes.map { route =>
       val nameParts = route.name.split('.')
       val controllerName = nameParts.dropRight(1).mkString(".")
@@ -60,8 +60,8 @@ object JavaScriptReverseRouter {
       |var _qS = function(items){var qs = ''; for(var i=0;i<items.length;i++) {if(items[i]) qs += (qs ? '&' : '') + items[i]}; return qs ? ('?' + qs) : ''}
       |var _s = function(p,s){return p+((s===true||(s&&s.secure))?'s':'')+'://'}
       |var _wA = function(r){return {$ajaxField method:r.method,type:r.method,url:r.url,absoluteURL: function(s){return _s('http',s)+'${esc(
-           host)}'+r.url},webSocketURL: function(s){return _s('ws',s)+'${esc(
-           host)}'+r.url}}}
+         host)}'+r.url},webSocketURL: function(s){return _s('ws',s)+'${esc(
+         host)}'+r.url}}}
       |$routesStr
       |})($name)
     """.stripMargin.trim

@@ -36,7 +36,7 @@ object CommonUtil {
   implicit class CharSequenceOps(val cs: CharSequence) extends AnyVal {
     def startsWith(str: String) =
       cs.length >= str.length &&
-      str.contentEquals(cs.subSequence(0, str.length))
+        str.contentEquals(cs.subSequence(0, str.length))
 
     def charIterator =
       Iterator.range(0, cs.length).map(cs.charAt)
@@ -53,7 +53,7 @@ object CommonUtil {
 
     def hasSingleChild =
       node.getFirstChildNode != null &&
-      node.getFirstChildNode.getTreeNext == null
+        node.getFirstChildNode.getTreeNext == null
   }
 
   implicit class StringOps(val str: String) extends AnyVal {
@@ -92,7 +92,8 @@ object CommonUtil {
                                                 case 't' => "\t"
                                             })
     quotedUnicodePattern.replaceAllIn(
-        result, m => jl.Short.parseShort(m.group(1), 16).toChar.toString)
+      result,
+      m => jl.Short.parseShort(m.group(1), 16).toChar.toString)
   }
 
   def uncaps(str: String) =

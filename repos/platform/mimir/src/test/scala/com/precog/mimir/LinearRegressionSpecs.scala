@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -35,7 +35,8 @@ import java.io.File
 import scalaz._
 
 trait LinearRegressionTestSupport[M[+ _]]
-    extends StdLibEvaluatorStack[M] with RegressionTestSupport[M] {
+    extends StdLibEvaluatorStack[M]
+    with RegressionTestSupport[M] {
 
   import library._
   import dag._
@@ -67,9 +68,9 @@ trait LinearRegressionTestSupport[M[+ _]]
     val testSeqY = {
       testSeqX map {
         case xs => {
-            val yvalue = dotProduct(actualThetas, 1.0 +: xs)
-            yvalue + Random.nextGaussian
-          }
+          val yvalue = dotProduct(actualThetas, 1.0 +: xs)
+          yvalue + Random.nextGaussian
+        }
       }
     }
 
@@ -78,9 +79,10 @@ trait LinearRegressionTestSupport[M[+ _]]
 }
 
 trait LinearRegressionSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LinearRegressionTestSupport[M] with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LinearRegressionTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import dag._
   import instructions._
@@ -174,8 +176,8 @@ trait LinearRegressionSpecs[M[+ _]]
 
     //runs the linear regression function on `loops` sets of data generated from the same distribution
     while (i < loops) {
-      val cpaths = Seq(
-          CPath(CPathIndex(0), CPathIndex(0)), CPath(CPathIndex(1))) sorted
+      val cpaths =
+        Seq(CPath(CPathIndex(0), CPathIndex(0)), CPath(CPathIndex(1))) sorted
 
       val (result, samples) = produceResult(cpaths, num, actualThetas)
 
@@ -368,14 +370,14 @@ trait LinearRegressionSpecs[M[+ _]]
     //runs the linear regression function on `loops` sets of data generated from the same distribution
     while (i < loops) {
       val cpaths = Seq(
-          CPath(CPathIndex(0), CPathField("ack"), CPathIndex(0)),
-          CPath(CPathIndex(0), CPathField("bak"), CPathField("bazoo")),
-          CPath(CPathIndex(0),
-                CPathField("bar"),
-                CPathField("baz"),
-                CPathIndex(0)),
-          CPath(CPathIndex(0), CPathField("foo")),
-          CPath(CPathIndex(1))) sorted
+        CPath(CPathIndex(0), CPathField("ack"), CPathIndex(0)),
+        CPath(CPathIndex(0), CPathField("bak"), CPathField("bazoo")),
+        CPath(CPathIndex(0),
+              CPathField("bar"),
+              CPathField("baz"),
+              CPathIndex(0)),
+        CPath(CPathIndex(0), CPathField("foo")),
+        CPath(CPathIndex(1))) sorted
 
       val samples = {
         val samples0 = createLinearSamplePoints(num, 100, actualThetas)
@@ -458,8 +460,8 @@ trait LinearRegressionSpecs[M[+ _]]
       i += 1
     }
 
-    def getBooleans(
-        actuals: List[Double], values: List[List[Double]]): Array[Boolean] = {
+    def getBooleans(actuals: List[Double],
+                    values: List[List[Double]]): Array[Boolean] = {
       val zipped = actuals zip combineResults(num, values)
       zipped map { case (t, ts) => isOk(t, ts) } toArray
     }
@@ -508,11 +510,11 @@ trait LinearRegressionSpecs[M[+ _]]
 
   "linear regression" should {
     "pass randomly generated test with a single feature" in
-    (testTrivial or testTrivial)
+      (testTrivial or testTrivial)
     "pass randomly generated test with three features inside an object" in
-    (testThreeFeatures or testThreeFeatures)
+      (testThreeFeatures or testThreeFeatures)
     "pass randomly generated test with three distinct schemata" in
-    (testThreeSchemata or testThreeSchemata)
+      (testThreeSchemata or testThreeSchemata)
   }
 
   //more comprehensive linear prediction tests in muspelheim
@@ -526,4 +528,5 @@ trait LinearRegressionSpecs[M[+ _]]
 }
 
 object LinearRegressionSpecs
-    extends LinearRegressionSpecs[test.YId] with test.YIdInstances
+    extends LinearRegressionSpecs[test.YId]
+    with test.YIdInstances

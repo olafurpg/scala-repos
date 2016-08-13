@@ -43,16 +43,17 @@ private[spark] class MesosRestServer(host: String,
                                      scheduler: MesosClusterScheduler)
     extends RestSubmissionServer(host, requestedPort, masterConf) {
 
-  protected override val submitRequestServlet = new MesosSubmitRequestServlet(
-      scheduler, masterConf)
-  protected override val killRequestServlet = new MesosKillRequestServlet(
-      scheduler, masterConf)
-  protected override val statusRequestServlet = new MesosStatusRequestServlet(
-      scheduler, masterConf)
+  protected override val submitRequestServlet =
+    new MesosSubmitRequestServlet(scheduler, masterConf)
+  protected override val killRequestServlet =
+    new MesosKillRequestServlet(scheduler, masterConf)
+  protected override val statusRequestServlet =
+    new MesosStatusRequestServlet(scheduler, masterConf)
 }
 
 private[mesos] class MesosSubmitRequestServlet(
-    scheduler: MesosClusterScheduler, conf: SparkConf)
+    scheduler: MesosClusterScheduler,
+    conf: SparkConf)
     extends SubmitRequestServlet {
 
   private val DEFAULT_SUPERVISE = false
@@ -144,8 +145,8 @@ private[mesos] class MesosSubmitRequestServlet(
         val driverDescription = buildDriverDescription(submitRequest)
         val s = scheduler.submitDriver(driverDescription)
         s.serverSparkVersion = sparkVersion
-        val unknownFields = findUnknownFields(
-            requestMessageJson, requestMessage)
+        val unknownFields =
+          findUnknownFields(requestMessageJson, requestMessage)
         if (unknownFields.nonEmpty) {
           // If there are fields that the server does not know about, warn the client
           s.unknownFields = unknownFields
@@ -154,13 +155,13 @@ private[mesos] class MesosSubmitRequestServlet(
       case unexpected =>
         responseServlet.setStatus(HttpServletResponse.SC_BAD_REQUEST)
         handleError(
-            s"Received message of unexpected type ${unexpected.messageType}.")
+          s"Received message of unexpected type ${unexpected.messageType}.")
     }
   }
 }
 
-private[mesos] class MesosKillRequestServlet(
-    scheduler: MesosClusterScheduler, conf: SparkConf)
+private[mesos] class MesosKillRequestServlet(scheduler: MesosClusterScheduler,
+                                             conf: SparkConf)
     extends KillRequestServlet {
   protected override def handleKill(
       submissionId: String): KillSubmissionResponse = {
@@ -171,7 +172,8 @@ private[mesos] class MesosKillRequestServlet(
 }
 
 private[mesos] class MesosStatusRequestServlet(
-    scheduler: MesosClusterScheduler, conf: SparkConf)
+    scheduler: MesosClusterScheduler,
+    conf: SparkConf)
     extends StatusRequestServlet {
   protected override def handleStatus(
       submissionId: String): SubmissionStatusResponse = {

@@ -36,8 +36,9 @@ class ReflectArrayJSTest {
   }
 
   @inline
-  def testNewInstance(
-      clazz: Class[_], expectedClazz: Class[_], sampleElem: Any): Unit = {
+  def testNewInstance(clazz: Class[_],
+                      expectedClazz: Class[_],
+                      sampleElem: Any): Unit = {
     testNewInstanceNoInline(clazz, length = 2, expectedClazz, sampleElem)
     testBase(clazz, length = 2, expectedClazz, sampleElem)
 
@@ -47,7 +48,8 @@ class ReflectArrayJSTest {
 
   @Test def newInstance(): Unit = {
     testNewInstance(classOf[js.Date], classOf[Array[js.Date]], null)
-    testNewInstance(
-        classOf[js.Dictionary[_]], classOf[Array[js.Dictionary[_]]], null)
+    testNewInstance(classOf[js.Dictionary[_]],
+                    classOf[Array[js.Dictionary[_]]],
+                    null)
   }
 }

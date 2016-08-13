@@ -129,7 +129,7 @@ object OptRange {
   case class RangeOpt(r: Range) extends OptRange {
     override def toString() =
       "OptRange.RangeOpt( " + r.start + ", " + r.end + ", " + r.step +
-      "), isInclusive=" + r.isInclusive
+        "), isInclusive=" + r.isInclusive
   }
 //  case class Single(i: Int) extends OptRange {
 //    override def toString() = "OptRange.Single("+ i +")"

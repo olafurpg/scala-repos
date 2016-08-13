@@ -10,8 +10,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
   */
 class ApparentRefinementOfResultTypeInspection
     extends AbstractMethodSignatureInspection(
-        "ScalaApparentRefinementOfResultType",
-        "Apparent refinement of result type; are you missing an '=' sign?") {
+      "ScalaApparentRefinementOfResultType",
+      "Apparent refinement of result type; are you missing an '=' sign?") {
 
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDeclaration =>

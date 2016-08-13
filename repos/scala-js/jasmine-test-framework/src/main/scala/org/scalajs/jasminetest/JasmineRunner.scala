@@ -18,8 +18,7 @@ final class JasmineRunner(
     val args: Array[String],
     val remoteArgs: Array[String],
     private[jasminetest] val classLoader: ClassLoader
-)
-    extends Runner {
+) extends Runner {
 
   private[this] var isDone = false
 
@@ -78,11 +77,11 @@ object JasmineRunner {
                              "stack",
                              js.Dynamic
                                .literal(
-                                   configurable = false,
-                                   enumerable = false,
-                                   get = { (self: js.Dynamic) =>
-                                     self.stackdata && self.stackdata.stack
-                                   }: js.ThisFunction
+                                 configurable = false,
+                                 enumerable = false,
+                                 get = { (self: js.Dynamic) =>
+                                   self.stackdata && self.stackdata.stack
+                                 }: js.ThisFunction
                                )
                                .asInstanceOf[js.PropertyDescriptor])
   }
@@ -92,7 +91,7 @@ object JasmineRunner {
       if (arg.startsWith("-t")) arg.stripPrefix("-t")
       else
         throw new IllegalArgumentException(
-            s"Unknown argument for JasmineFramework: $arg")
+          s"Unknown argument for JasmineFramework: $arg")
     }
 
     TestSuiteContext.setTags(tags.toSet)

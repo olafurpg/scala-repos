@@ -4,7 +4,17 @@ package tests
 import algebra.laws.{GroupLaws, OrderLaws}
 
 import cats.data.{NonEmptyList, OneAnd}
-import cats.laws.discipline.{ComonadTests, FunctorTests, SemigroupKTests, FoldableTests, MonadTests, SerializableTests, CartesianTests, TraverseTests, ReducibleTests}
+import cats.laws.discipline.{
+  ComonadTests,
+  FunctorTests,
+  SemigroupKTests,
+  FoldableTests,
+  MonadTests,
+  SerializableTests,
+  CartesianTests,
+  TraverseTests,
+  ReducibleTests
+}
 import cats.laws.discipline.arbitrary.oneAndArbitrary
 import cats.laws.discipline.eq._
 
@@ -17,14 +27,14 @@ class OneAndTests extends CatsSuite {
   checkAll("Traverse[OneAnd[List, A]]",
            SerializableTests.serializable(Traverse[OneAnd[List, ?]]))
 
-  checkAll(
-      "OneAnd[List, Int]", ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
+  checkAll("OneAnd[List, Int]",
+           ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
   checkAll("Reducible[OneAnd[List, ?]]",
            SerializableTests.serializable(Reducible[OneAnd[List, ?]]))
 
   implicit val iso =
     CartesianTests.Isomorphisms.invariant[OneAnd[ListWrapper, ?]](
-        OneAnd.oneAndFunctor(ListWrapper.functor))
+      OneAnd.oneAndFunctor(ListWrapper.functor))
 
   // Test instances that have more general constraints
   {
@@ -49,8 +59,8 @@ class OneAndTests extends CatsSuite {
              SemigroupKTests[OneAnd[ListWrapper, ?]].semigroupK[Int])
     checkAll("OneAnd[List, Int]", GroupLaws[OneAnd[List, Int]].semigroup)
     checkAll(
-        "SemigroupK[OneAnd[ListWrapper, A]]",
-        SerializableTests.serializable(SemigroupK[OneAnd[ListWrapper, ?]]))
+      "SemigroupK[OneAnd[ListWrapper, A]]",
+      SerializableTests.serializable(SemigroupK[OneAnd[ListWrapper, ?]]))
     checkAll("Semigroup[NonEmptyList[Int]]",
              SerializableTests.serializable(Semigroup[OneAnd[List, Int]]))
   }
@@ -76,8 +86,8 @@ class OneAndTests extends CatsSuite {
   checkAll("Monad[NonEmptyList[A]]",
            SerializableTests.serializable(Monad[NonEmptyList]))
 
-  checkAll(
-      "NonEmptyList[Int]", ComonadTests[NonEmptyList].comonad[Int, Int, Int])
+  checkAll("NonEmptyList[Int]",
+           ComonadTests[NonEmptyList].comonad[Int, Int, Int])
   checkAll("Comonad[NonEmptyList[A]]",
            SerializableTests.serializable(Comonad[NonEmptyList]))
 

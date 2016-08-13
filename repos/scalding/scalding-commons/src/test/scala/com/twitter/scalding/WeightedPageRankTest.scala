@@ -54,9 +54,9 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
 
           println(pageRank)
           (pageRank(1) + pageRank(2) + pageRank(3)) shouldBe 1.0 +- 0.001
-          pageRank(1) shouldBe(expected(0)) +- 0.001
-          pageRank(2) shouldBe(expected(1)) +- 0.001
-          pageRank(3) shouldBe(expected(2)) +- 0.001
+          pageRank(1) shouldBe (expected(0)) +- 0.001
+          pageRank(2) shouldBe (expected(1)) +- 0.001
+          pageRank(3) shouldBe (expected(2)) +- 0.001
         }
         idx += 1
       }

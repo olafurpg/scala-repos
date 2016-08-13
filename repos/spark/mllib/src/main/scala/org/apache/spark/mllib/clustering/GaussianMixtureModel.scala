@@ -45,7 +45,8 @@ import org.apache.spark.sql.{Row, SQLContext}
 class GaussianMixtureModel @Since("1.3.0")(
     @Since("1.3.0") val weights: Array[Double],
     @Since("1.3.0") val gaussians: Array[MultivariateGaussian])
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
   require(weights.length == gaussians.length,
           "Length of weight and Gaussian arrays must match")
@@ -98,8 +99,10 @@ class GaussianMixtureModel @Since("1.3.0")(
     val bcDists = sc.broadcast(gaussians)
     val bcWeights = sc.broadcast(weights)
     points.map { x =>
-      computeSoftAssignments(
-          x.toBreeze.toDenseVector, bcDists.value, bcWeights.value, k)
+      computeSoftAssignments(x.toBreeze.toDenseVector,
+                             bcDists.value,
+                             bcWeights.value,
+                             k)
     }
   }
 
@@ -150,8 +153,10 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
       import sqlContext.implicits._
 
       // Create JSON metadata.
-      val metadata = compact(render(("class" -> classNameV1_0) ~
-              ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
+      val metadata = compact(
+        render(
+          ("class" -> classNameV1_0) ~
+            ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -187,18 +192,18 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
     val classNameV1_0 = SaveLoadV1_0.classNameV1_0
     (loadedClassName, version) match {
       case (classNameV1_0, "1.0") => {
-          val model = SaveLoadV1_0.load(sc, path)
-          require(model.weights.length == k,
-                  s"GaussianMixtureModel requires weights of length $k " +
+        val model = SaveLoadV1_0.load(sc, path)
+        require(model.weights.length == k,
+                s"GaussianMixtureModel requires weights of length $k " +
                   s"got weights of length ${model.weights.length}")
-          require(model.gaussians.length == k,
-                  s"GaussianMixtureModel requires gaussians of length $k" +
+        require(model.gaussians.length == k,
+                s"GaussianMixtureModel requires gaussians of length $k" +
                   s"got gaussians of length ${model.gaussians.length}")
-          model
-        }
+        model
+      }
       case _ =>
         throw new Exception(
-            s"GaussianMixtureModel.load did not recognize model with (className, format version):" +
+          s"GaussianMixtureModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }

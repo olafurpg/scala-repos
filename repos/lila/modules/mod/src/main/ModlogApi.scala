@@ -60,28 +60,32 @@ final class ModlogApi {
            user,
            Modlog.deletePost,
            details = Some(
-                 author.??(_ + " ") + ip.??(_ + " ") + text.take(140)
-             ))
+             author.??(_ + " ") + ip.??(_ + " ") + text.take(140)
+           ))
   }
 
-  def toggleCloseTopic(
-      mod: String, categ: String, topic: String, closed: Boolean) = add {
+  def toggleCloseTopic(mod: String,
+                       categ: String,
+                       topic: String,
+                       closed: Boolean) = add {
     Modlog(mod,
            none,
            closed ? Modlog.closeTopic | Modlog.openTopic,
            details = Some(
-                 categ + " / " + topic
-             ))
+             categ + " / " + topic
+           ))
   }
 
-  def toggleHideTopic(
-      mod: String, categ: String, topic: String, hidden: Boolean) = add {
+  def toggleHideTopic(mod: String,
+                      categ: String,
+                      topic: String,
+                      hidden: Boolean) = add {
     Modlog(mod,
            none,
            hidden ? Modlog.hideTopic | Modlog.showTopic,
            details = Some(
-                 categ + " / " + topic
-             ))
+             categ + " / " + topic
+           ))
   }
 
   def deleteQaQuestion(mod: String, user: String, title: String) = add {
@@ -92,13 +96,17 @@ final class ModlogApi {
   }
 
   def deleteQaAnswer(mod: String, user: String, text: String) = add {
-    Modlog(
-        mod, user.some, Modlog.deleteQaAnswer, details = Some(text take 140))
+    Modlog(mod,
+           user.some,
+           Modlog.deleteQaAnswer,
+           details = Some(text take 140))
   }
 
   def deleteQaComment(mod: String, user: String, text: String) = add {
-    Modlog(
-        mod, user.some, Modlog.deleteQaComment, details = Some(text take 140))
+    Modlog(mod,
+           user.some,
+           Modlog.deleteQaComment,
+           details = Some(text take 140))
   }
 
   def deleteTeam(mod: String, name: String, desc: String) = add {
@@ -116,17 +124,17 @@ final class ModlogApi {
 
   def wasUnengined(userId: String) =
     $count.exists(
-        Json.obj(
-            "user" -> userId,
-            "action" -> Modlog.unengine
-        ))
+      Json.obj(
+        "user" -> userId,
+        "action" -> Modlog.unengine
+      ))
 
   def wasUnbooster(userId: String) =
     $count.exists(
-        Json.obj(
-            "user" -> userId,
-            "action" -> Modlog.unbooster
-        ))
+      Json.obj(
+        "user" -> userId,
+        "action" -> Modlog.unbooster
+      ))
 
   def userHistory(userId: String): Fu[List[Modlog]] =
     $find($query(Json.obj("user" -> userId)) sort $sort.desc("date"), 100)

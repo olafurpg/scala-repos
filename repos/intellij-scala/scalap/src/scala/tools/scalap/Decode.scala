@@ -14,7 +14,10 @@ import scala.reflect.internal.pickling.ByteCodecs
 import scala.reflect.internal.util.ScalaClassLoader
 import scala.reflect.internal.util.ScalaClassLoader.appLoader
 import scala.tools.scalap.Main.{BYTES_VALUE, SCALA_SIG_ANNOTATION}
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation,
+  ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 
 /** Temporary decoder.  This would be better off in the scala.tools.nsc
@@ -33,8 +36,8 @@ object Decode {
     */
   def scalaSigBytes(name: String): Option[Array[Byte]] =
     scalaSigBytes(name, appLoader)
-  def scalaSigBytes(
-      name: String, classLoader: ScalaClassLoader): Option[Array[Byte]] = {
+  def scalaSigBytes(name: String,
+                    classLoader: ScalaClassLoader): Option[Array[Byte]] = {
     val bytes = classLoader.classBytes(name)
     val reader = new ByteArrayReader(bytes)
     val cf = new Classfile(reader)
@@ -46,7 +49,8 @@ object Decode {
   def scalaSigAnnotationBytes(name: String): Option[Array[Byte]] =
     scalaSigAnnotationBytes(name, appLoader)
   def scalaSigAnnotationBytes(
-      name: String, classLoader: ScalaClassLoader): Option[Array[Byte]] = {
+      name: String,
+      classLoader: ScalaClassLoader): Option[Array[Byte]] = {
     val bytes = classLoader.classBytes(name)
     val byteCode = ByteCode(bytes)
     val classFile = ClassFileParser.parse(byteCode)
@@ -55,7 +59,7 @@ object Decode {
     classFile annotation SCALA_SIG_ANNOTATION map {
       case Annotation(_, els) =>
         val bytesElem = els find
-        (x => constant(x.elementNameIndex) == BYTES_VALUE) get
+          (x => constant(x.elementNameIndex) == BYTES_VALUE) get
         val _bytes = bytesElem.elementValue match {
           case ConstValueIndex(x) => constantWrapped(x)
         }
@@ -86,7 +90,7 @@ object Decode {
           case x: ClassSymbol if x.name == inner =>
             val xs =
               x.children filter
-              (child => child.isCaseAccessor && (child.name endsWith " "))
+                (child => child.isCaseAccessor && (child.name endsWith " "))
             xs.toList map (_.name dropRight 1)
         }
 

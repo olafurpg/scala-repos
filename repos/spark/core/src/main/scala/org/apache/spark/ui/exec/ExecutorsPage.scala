@@ -43,8 +43,8 @@ private[ui] case class ExecutorSummaryInfo(id: String,
                                            maxMemory: Long,
                                            executorLogs: Map[String, String])
 
-private[ui] class ExecutorsPage(
-    parent: ExecutorsTab, threadDumpEnabled: Boolean)
+private[ui] class ExecutorsPage(parent: ExecutorsTab,
+                                threadDumpEnabled: Boolean)
     extends WebUIPage("") {
   private val listener = parent.listener
   // When GCTimePercent is edited change ToolTips.TASK_TIME to match
@@ -55,12 +55,12 @@ private[ui] class ExecutorsPage(
       // The follow codes should be protected by `listener` to make sure no executors will be
       // removed before we query their status. See SPARK-12784.
       val _activeExecutorInfo = {
-        for (statusId <- 0 until listener.activeStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
+        for (statusId <- 0 until listener.activeStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
       }
       val _deadExecutorInfo = {
-        for (statusId <- 0 until listener.deadStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
+        for (statusId <- 0 until listener.deadStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
       }
       (_activeExecutorInfo, _deadExecutorInfo)
     }
@@ -189,8 +189,8 @@ private[ui] class ExecutorsPage(
     </tr>
   }
 
-  private def execSummaryRow(
-      execInfo: Seq[ExecutorSummary], rowName: String): Seq[Node] = {
+  private def execSummaryRow(execInfo: Seq[ExecutorSummary],
+                             rowName: String): Seq[Node] = {
     val maximumMemory = execInfo.map(_.maxMemory).sum
     val memoryUsed = execInfo.map(_.memoryUsed).sum
     val diskUsed = execInfo.map(_.diskUsed).sum
@@ -359,25 +359,25 @@ private[spark] object ExecutorsPage {
     val executorLogs = listener.executorToLogUrls.getOrElse(execId, Map.empty)
 
     new ExecutorSummary(
-        execId,
-        hostPort,
-        isActive,
-        rddBlocks,
-        memUsed,
-        diskUsed,
-        totalCores,
-        maxTasks,
-        activeTasks,
-        failedTasks,
-        completedTasks,
-        totalTasks,
-        totalDuration,
-        totalGCTime,
-        totalInputBytes,
-        totalShuffleRead,
-        totalShuffleWrite,
-        maxMem,
-        executorLogs
+      execId,
+      hostPort,
+      isActive,
+      rddBlocks,
+      memUsed,
+      diskUsed,
+      totalCores,
+      maxTasks,
+      activeTasks,
+      failedTasks,
+      completedTasks,
+      totalTasks,
+      totalDuration,
+      totalGCTime,
+      totalInputBytes,
+      totalShuffleRead,
+      totalShuffleWrite,
+      maxMem,
+      executorLogs
     )
   }
 }

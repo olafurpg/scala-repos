@@ -87,10 +87,10 @@ trait BaseScaldingShell extends MainGenericRunner {
     scaldingREPL = Some(repl)
     replState.mode = mode
     replState.customConfig = replState.customConfig ++
-    (mode match {
-          case _: HadoopMode => cfg
-          case _ => Config.empty
-        })
+        (mode match {
+        case _: HadoopMode => cfg
+        case _ => Config.empty
+      })
 
     // if in Hdfs mode, store the mode to enable switching between Local and Hdfs
     mode match {
@@ -142,8 +142,8 @@ trait BaseScaldingShell extends MainGenericRunner {
     scaldingREPL.map { repl =>
       val virtualDirectory = repl.virtualDirectory
       val tempJar = new File(
-          Files.createTempDir(),
-          "scalding-repl-session-" + System.currentTimeMillis() + ".jar")
+        Files.createTempDir(),
+        "scalding-repl-session-" + System.currentTimeMillis() + ".jar")
       createJar(virtualDirectory.asInstanceOf[VirtualDirectory], tempJar)
     }
   }
@@ -155,8 +155,8 @@ trait BaseScaldingShell extends MainGenericRunner {
     * @param jarFile that will be written.
     * @return the jarFile specified and written.
     */
-  private def createJar(
-      virtualDirectory: VirtualDirectory, jarFile: File): File = {
+  private def createJar(virtualDirectory: VirtualDirectory,
+                        jarFile: File): File = {
     val jarStream = new JarOutputStream(new FileOutputStream(jarFile))
     try {
       addVirtualDirectoryToJar(virtualDirectory, "", jarStream)
@@ -175,8 +175,9 @@ trait BaseScaldingShell extends MainGenericRunner {
     * @param entryPath for classes found in the virtual directory.
     * @param jarStream for writing the jar file.
     */
-  private def addVirtualDirectoryToJar(
-      dir: VirtualDirectory, entryPath: String, jarStream: JarOutputStream) {
+  private def addVirtualDirectoryToJar(dir: VirtualDirectory,
+                                       entryPath: String,
+                                       jarStream: JarOutputStream) {
     dir.foreach { file =>
       if (file.isDirectory) {
         // Recursively descend into subdirectories, adjusting the package name as we do.
@@ -184,8 +185,9 @@ trait BaseScaldingShell extends MainGenericRunner {
         val entry: JarEntry = new JarEntry(dirPath)
         jarStream.putNextEntry(entry)
         jarStream.closeEntry()
-        addVirtualDirectoryToJar(
-            file.asInstanceOf[VirtualDirectory], dirPath, jarStream)
+        addVirtualDirectoryToJar(file.asInstanceOf[VirtualDirectory],
+                                 dirPath,
+                                 jarStream)
       } else if (file.hasExtension("class")) {
         // Add class files as an entry in the jar file and write the class to the jar.
         val entry: JarEntry = new JarEntry(entryPath + file.name)

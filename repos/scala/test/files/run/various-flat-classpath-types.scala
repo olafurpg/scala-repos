@@ -50,7 +50,7 @@ object Test {
         } else {
           val inputStream = new FileInputStream(fileToAdd)
           outputStream.putNextEntry(
-              new ZipEntry(dirPrefix + fileToAdd.getName))
+            new ZipEntry(dirPrefix + fileToAdd.getName))
 
           val buffer = new Array[Byte](1024)
           var count = inputStream.read(buffer)
@@ -173,18 +173,18 @@ object Test {
                            binDir.path,
                            zipsDir.path + "/Bin.zip",
                            jarsDir.path + "/Bin.jar")
-    val sourcePath = mkPath(
-        srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
+    val sourcePath =
+      mkPath(srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
 
     compiler.process(
-        Array(classPathImplFlag,
-              "-cp",
-              classPath,
-              "-sourcepath",
-              sourcePath,
-              "-d",
-              outDir.path,
-              s"${srcDir.path}/Main.scala"))
+      Array(classPathImplFlag,
+            "-cp",
+            classPath,
+            "-sourcepath",
+            sourcePath,
+            "-d",
+            outDir.path,
+            s"${srcDir.path}/Main.scala"))
   }
 
   private def runApp(): Unit = {
@@ -198,16 +198,16 @@ object Test {
 
   private def createStandardSrcHierarchy(baseFileName: String): Unit =
     createSources(
-        RootPackage,
-        srcDir,
-        DirRep("",
-               nestedDirs = Seq(
-                     DirRep("nested",
-                            sourceFiles = Seq("Nested" + baseFileName))),
-               sourceFiles = Seq(baseFileName)))
+      RootPackage,
+      srcDir,
+      DirRep("",
+             nestedDirs = Seq(
+               DirRep("nested", sourceFiles = Seq("Nested" + baseFileName))),
+             sourceFiles = Seq(baseFileName)))
 
-  private def createSources(
-      pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {
+  private def createSources(pkg: String,
+                            dirFile: JFile,
+                            dirRep: DirRep): Unit = {
     dirRep.nestedDirs foreach { rep =>
       val nestedDir = dirFile createDir rep.name
       val nestedPkg = PackageNameUtils.packagePrefix(pkg) + rep.name
@@ -222,17 +222,17 @@ object Test {
     }
   }
 
-  private def compileSrc(
-      baseFileName: String, destination: JFile = outDir): Unit = {
+  private def compileSrc(baseFileName: String,
+                         destination: JFile = outDir): Unit = {
     val srcDirPath = srcDir.path
     compiler.process(
-        Array(classPathImplFlag,
-              "-cp",
-              javaClassPath,
-              "-d",
-              destination.path,
-              s"$srcDirPath/$baseFileName.scala",
-              s"$srcDirPath/nested/Nested$baseFileName.scala"))
+      Array(classPathImplFlag,
+            "-cp",
+            javaClassPath,
+            "-d",
+            destination.path,
+            s"$srcDirPath/$baseFileName.scala",
+            s"$srcDirPath/nested/Nested$baseFileName.scala"))
   }
 
   private def cleanDir(dir: JFile): Unit =

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -51,25 +51,24 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
   class BenchmarkDecomposer[T] extends Decomposer[BenchmarkResults[T]] {
     override def decompose(results: BenchmarkResults[T]): JValue =
       JObject(
-          List(
-              JField(
-                  "timestamp", format.print(new DateTime(DateTimeZone.UTC))),
-              JField("runs", results.testRuns),
-              JField("reps", results.repCount),
-              JField("mean", results.meanRepTime),
-              JField("ptile90", results.ptile(0.9)),
-              JField("baseline", results.baseline),
-              JField("times", results.timings.serialize)
-          ))
+        List(
+          JField("timestamp", format.print(new DateTime(DateTimeZone.UTC))),
+          JField("runs", results.testRuns),
+          JField("reps", results.repCount),
+          JField("mean", results.meanRepTime),
+          JField("ptile90", results.ptile(0.9)),
+          JField("baseline", results.baseline),
+          JField("times", results.timings.serialize)
+        ))
   }
 
-//  class BenchmarkExtractor[T] extends ValidatedExtraction[BenchmarkResults[T]] {    
+//  class BenchmarkExtractor[T] extends ValidatedExtraction[BenchmarkResults[T]] {
 //    override def validated(obj: JValue): Validation[Error, BenchmarkResults[T]] =
 //      ((obj \ "runs").validated[Int] |@|
 //       (obj \ "reps").validated[Int] |@|
 //       (obj \ "baseline").validated[Double] |@|
 //       (obj \ "times").validated[List[Long]].map{ l => Vector(l.toArray:_*) }).apply(BenchmarkResults[T](_,_,_,_))
-//  }  
+//  }
 
   def resultsToJson[T](results: BenchmarkResults[T]): JValue =
     results.serialize(new BenchmarkDecomposer[T]())

@@ -90,7 +90,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
       case filter: Filter => mountFilter(filter, pathMap, name)
       case _ =>
         sys.error(
-            "Don't know how to mount this service to a servletContext: " +
+          "Don't know how to mount this service to a servletContext: " +
             handler.getClass)
     }
   }
@@ -120,7 +120,8 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     } else if (classOf[Filter].isAssignableFrom(handlerClass)) {
       mountFilter(handlerClass.asInstanceOf[Class[Filter]], pathMap, name)
     } else {
-      sys.error("Don't know how to mount this service to a servletContext: " +
+      sys.error(
+        "Don't know how to mount this service to a servletContext: " +
           handlerClass)
     }
   }
@@ -128,8 +129,9 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
   def mount[T](handlerClass: Class[T], urlPattern: String): Unit =
     mount[T](handlerClass, urlPattern, 1)
 
-  def mount[T](
-      handlerClass: Class[T], urlPattern: String, loadOnStartup: Int): Unit = {
+  def mount[T](handlerClass: Class[T],
+               urlPattern: String,
+               loadOnStartup: Int): Unit = {
     mount(handlerClass, urlPattern, handlerClass.getName, loadOnStartup)
   }
 
@@ -172,8 +174,9 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     reg.addMapping(urlPattern)
   }
 
-  private def mountFilter(
-      filter: Filter, urlPattern: String, name: String): Unit = {
+  private def mountFilter(filter: Filter,
+                          urlPattern: String,
+                          name: String): Unit = {
     val reg =
       Option(sc.getFilterRegistration(name)) getOrElse {
         val r = sc.addFilter(name, filter)
@@ -187,8 +190,9 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     reg.addMappingForUrlPatterns(dispatchers, true, urlPattern)
   }
 
-  private def mountFilter(
-      filterClass: Class[Filter], urlPattern: String, name: String): Unit = {
+  private def mountFilter(filterClass: Class[Filter],
+                          urlPattern: String,
+                          name: String): Unit = {
     val reg =
       Option(sc.getFilterRegistration(name)) getOrElse {
         val r = sc.addFilter(name, filterClass)
@@ -210,7 +214,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     */
   def environment: String = {
     sys.props.get(EnvironmentKey) orElse initParameters.get(EnvironmentKey) getOrElse
-    ("DEVELOPMENT")
+      ("DEVELOPMENT")
   }
 
   object initParameters extends mutable.Map[String, String] {

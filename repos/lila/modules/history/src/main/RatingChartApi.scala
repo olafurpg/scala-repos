@@ -18,19 +18,19 @@ final class RatingChartApi(historyApi: HistoryApi,
   }
 
   private val cache = mongoCache[User, String](
-      prefix = "history:rating",
-      f = (user: User) => build(user) map (~_),
-      maxCapacity = 64,
-      timeToLive = cacheTtl,
-      keyToString = _.id)
+    prefix = "history:rating",
+    f = (user: User) => build(user) map (~_),
+    maxCapacity = 64,
+    timeToLive = cacheTtl,
+    keyToString = _.id)
 
   private val columns =
     Json stringify {
       Json.arr(
-          Json.arr("string", "Date"),
-          Json.arr("number", "Standard"),
-          Json.arr("number", "Opponent Rating"),
-          Json.arr("number", "Average")
+        Json.arr("string", "Date"),
+        Json.arr("number", "Standard"),
+        Json.arr("number", "Opponent Rating"),
+        Json.arr("number", "Average")
       )
     }
 
@@ -38,14 +38,14 @@ final class RatingChartApi(historyApi: HistoryApi,
 
     def ratingsMapToJson(perfType: PerfType, ratingsMap: RatingsMap) =
       Json obj
-      ("name" -> perfType.name, "points" -> ratingsMap.map {
-            case (days, rating) =>
-              val date = user.createdAt plusDays days
-              Json.arr(date.getYear,
-                       date.getMonthOfYear - 1,
-                       date.getDayOfMonth,
-                       rating)
-          })
+        ("name" -> perfType.name, "points" -> ratingsMap.map {
+          case (days, rating) =>
+            val date = user.createdAt plusDays days
+            Json.arr(date.getYear,
+                     date.getMonthOfYear - 1,
+                     date.getDayOfMonth,
+                     rating)
+        })
 
     historyApi get user.id map2 { (history: History) =>
       Json stringify {

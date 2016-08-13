@@ -41,7 +41,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ComboBoxBaseSpec[J]
     extends SimpleSFXDelegateSpec[jfxsc.ComboBoxBase[J], ComboBoxBase[J]](
-        classOf[jfxsc.ComboBoxBase[J]], classOf[ComboBoxBase[J]])
+      classOf[jfxsc.ComboBoxBase[J]],
+      classOf[ComboBoxBase[J]])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =

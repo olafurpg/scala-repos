@@ -29,8 +29,9 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
   private[this] var uriBytes: Array[Byte] = _
 
   def createShallowCopy(): HttpRequestParser =
-    new HttpRequestParser(
-        settings, rawRequestUriHeader, headerParser.createShallowCopy())
+    new HttpRequestParser(settings,
+                          rawRequestUriHeader,
+                          headerParser.createShallowCopy())
 
   def parseMessage(input: ByteString, offset: Int): StateResult = {
     var cursor = parseMethod(input, offset)
@@ -53,18 +54,18 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
                 cursor + ix + 1
               case None ⇒
                 throw new ParsingException(
-                    NotImplemented,
-                    ErrorInfo("Unsupported HTTP method", sb.toString))
+                  NotImplemented,
+                  ErrorInfo("Unsupported HTTP method", sb.toString))
             }
           case c ⇒ parseCustomMethod(ix + 1, sb.append(c))
         }
       } else
         throw new ParsingException(
-            BadRequest,
-            ErrorInfo(
-                "Unsupported HTTP method",
-                s"HTTP method too long (started with '${sb.toString}'). " +
-                "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
+          BadRequest,
+          ErrorInfo(
+            "Unsupported HTTP method",
+            s"HTTP method too long (started with '${sb.toString}'). " +
+              "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
 
     @tailrec def parseMethod(meth: HttpMethod, ix: Int = 1): Int =
       if (ix == meth.value.length)
@@ -105,8 +106,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
       else if (ix < uriEndLimit) findUriEnd(ix + 1)
       else
         throw new ParsingException(
-            RequestUriTooLong,
-            s"URI length exceeds the configured limit of $maxUriLength characters")
+          RequestUriTooLong,
+          s"URI length exceeds the configured limit of $maxUriLength characters")
 
     val uriEnd = findUriEnd()
     try {
@@ -139,25 +140,27 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
         val allHeaders0 =
           if (rawRequestUriHeader)
             `Raw-Request-URI`(new String(
-                    uriBytes, HttpCharsets.`US-ASCII`.nioCharset)) :: headers
+              uriBytes,
+              HttpCharsets.`US-ASCII`.nioCharset)) :: headers
           else headers
 
         val allHeaders =
           if (method == HttpMethods.GET) {
-            Handshake.Server.websocketUpgrade(headers, hostHeaderPresent) match {
+            Handshake.Server
+              .websocketUpgrade(headers, hostHeaderPresent) match {
               case Some(upgrade) ⇒ upgrade :: allHeaders0
               case None ⇒ allHeaders0
             }
           } else allHeaders0
 
         emit(
-            RequestStart(method,
-                         uri,
-                         protocol,
-                         allHeaders,
-                         createEntity,
-                         expect100continue,
-                         closeAfterResponseCompletion))
+          RequestStart(method,
+                       uri,
+                       protocol,
+                       allHeaders,
+                       createEntity,
+                       expect100continue,
+                       closeAfterResponseCompletion))
       }
 
       teh match {
@@ -172,8 +175,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
             startNewMessage(input, bodyStart)
           } else if (!method.isEntityAccepted) {
             failMessageStart(
-                UnprocessableEntity,
-                s"${method.name} requests must not have an entity")
+              UnprocessableEntity,
+              s"${method.name} requests must not have an entity")
           } else if (contentLength <= input.size - bodyStart) {
             val cl = contentLength.toInt
             emitRequestStart(strictEntity(cth, input, bodyStart, cl))
@@ -182,7 +185,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           } else {
             emitRequestStart(defaultEntity(cth, contentLength))
             parseFixedLengthBody(contentLength, closeAfterResponseCompletion)(
-                input, bodyStart)
+              input,
+              bodyStart)
           }
 
         case Some(_) if !method.isEntityAccepted ⇒
@@ -190,8 +194,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
                            s"${method.name} requests must not have an entity")
 
         case Some(te) ⇒
-          val completedHeaders = addTransferEncodingWithChunkedPeeled(
-              headers, te)
+          val completedHeaders =
+            addTransferEncodingWithChunkedPeeled(headers, te)
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitRequestStart(chunkedEntity(cth), completedHeaders)
@@ -201,7 +205,7 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
                          totalBytesRead = 0L)
             } else
               failMessageStart(
-                  "A chunked request must not contain a Content-Length header.")
+                "A chunked request must not contain a Content-Length header.")
           } else
             parseEntity(completedHeaders,
                         protocol,

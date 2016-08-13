@@ -10,7 +10,9 @@ import scala.runtime.ScalaRunTime
   * @author dlwh
   **/
 case class ChiSquared(k: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf
     with HasInverseCdf {
   private val innerGamma = Gamma(k / 2, 2)
 
@@ -29,7 +31,7 @@ case class ChiSquared(k: Double)(implicit rand: RandBasis = Rand)
       }
     } else {
       throw new IllegalArgumentException(
-          "Domain of ChiSquared.pdf is [0,Infinity), you tried to apply to " +
+        "Domain of ChiSquared.pdf is [0,Infinity), you tried to apply to " +
           x)
     }
 

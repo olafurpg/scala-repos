@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -47,8 +47,7 @@ import scalaz._
 import scalaz.Id.Id
 
 class InMemoryJobManagerSpec extends Specification {
-  include(
-      new JobManagerSpec[Id] {
+  include(new JobManagerSpec[Id] {
     val validAPIKey = "Anything should work!"
     val jobs = new InMemoryJobManager[Id]
     val M: Monad[Id] with Comonad[Id] = implicitly
@@ -58,8 +57,7 @@ class InMemoryJobManagerSpec extends Specification {
 class FileJobManagerSpec extends Specification {
   val tempDir = IOUtils.createTmpDir("FileJobManagerSpec").unsafePerformIO
 
-  include(
-      new JobManagerSpec[Id] {
+  include(new JobManagerSpec[Id] {
     val validAPIKey = "Anything should work!"
     val jobs = FileJobManager[Id](tempDir, Id.id)
     val M: Monad[Id] with Comonad[Id] = implicitly
@@ -82,8 +80,10 @@ class WebJobManagerSpec extends TestJobService { self =>
       val M = self.M
       protected def withRawClient[A](f: HttpClient[ByteChunk] => A): A =
         f(client.path("/jobs/v1/"))
-    }).withM[Future](
-        ResponseAsFuture(M), FutureAsResponse(M), Monad[Response], M)
+    }).withM[Future](ResponseAsFuture(M),
+                     FutureAsResponse(M),
+                     Monad[Response],
+                     M)
   })
 }
 
@@ -152,10 +152,10 @@ trait JobManagerSpec[M[+ _]] extends Specification {
 
     "create jobs with data" in {
       val data: JValue = JObject(
-          List(
-              JField("a", JArray(JString("a"), JNum(2))),
-              JField("b", JNum(1.675))
-          ))
+        List(
+          JField("a", JArray(JString("a"), JNum(2))),
+          JField("b", JNum(1.675))
+        ))
 
       val job = jobs
         .createJob(validAPIKey, "name", "job type", Some(data), None)
@@ -207,8 +207,12 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       status1 must beLike {
         case Some(Status(`jobId`, id, "1", `s0`, "%", None)) =>
           val status2 = jobs
-            .updateStatus(
-                job.id, Some(id), "2", 5.0, "%", Some(JString("...")))
+            .updateStatus(job.id,
+                          Some(id),
+                          "2",
+                          5.0,
+                          "%",
+                          Some(JString("...")))
             .copoint
             .right
             .toOption
@@ -240,8 +244,12 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       status1 must beLike {
         case Some(Status(`jobId`, id, "1", `s0`, "%", None)) =>
           val status2 = jobs
-            .updateStatus(
-                jobId, Some(id + 1), "2", 5.0, "%", Some(JString("...")))
+            .updateStatus(jobId,
+                          Some(id + 1),
+                          "2",
+                          5.0,
+                          "%",
+                          Some(JString("...")))
             .copoint
           val status2x = jobs.getStatus(jobId).copoint
           status2x must_== status1
@@ -252,16 +260,18 @@ trait JobManagerSpec[M[+ _]] extends Specification {
     "put job statuses in 'status' message channel" in {
       val job =
         jobs.createJob(validAPIKey, "b", "c", None, Some(new DateTime)).copoint
-      val status1 = Status.toMessage(jobs
-            .updateStatus(job.id, None, "1", 0.0, "%", None)
-            .copoint
-            .right getOrElse sys.error("..."))
-      val status2 = Status.toMessage(jobs
-            .updateStatus(job.id, None, "2", 5.0, "%", Some(JString("...")))
-            .copoint
-            .right getOrElse sys.error("..."))
+      val status1 = Status.toMessage(
+        jobs
+          .updateStatus(job.id, None, "1", 0.0, "%", None)
+          .copoint
+          .right getOrElse sys.error("..."))
+      val status2 = Status.toMessage(
+        jobs
+          .updateStatus(job.id, None, "2", 5.0, "%", Some(JString("...")))
+          .copoint
+          .right getOrElse sys.error("..."))
       jobs.listChannels(job.id).copoint must contain(
-          JobManager.channels.Status)
+        JobManager.channels.Status)
       val statuses =
         jobs.listMessages(job.id, JobManager.channels.Status, None).copoint
       statuses must contain(status1, status2).inOrder
@@ -305,10 +315,10 @@ trait JobManagerSpec[M[+ _]] extends Specification {
 
       def say(name: String, message: String): JValue =
         JObject(
-            List(
-                JField("name", JString(name)),
-                JField("message", JString(message))
-            ))
+          List(
+            JField("name", JString(name)),
+            JField("message", JString(message))
+          ))
 
       val m1 = jobs.addMessage(job.id, "chat", say("Tom", "Hello")).copoint
       val m2 = jobs.addMessage(job.id, "chat", say("Bob", "Hi")).copoint
@@ -349,15 +359,18 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       val state = job.state
       val jobId = job.id
 
-      jobs.cancel(job.id, "I didn't like the way it looked at me.").copoint must beLike {
+      jobs
+        .cancel(job.id, "I didn't like the way it looked at me.")
+        .copoint must beLike {
         case Right(
             Job(`jobId`,
                 _,
                 _,
                 _,
                 _,
-                Cancelled(
-                "I didn't like the way it looked at me.", _, `state`))) =>
+                Cancelled("I didn't like the way it looked at me.",
+                          _,
+                          `state`))) =>
           ok
       }
 
@@ -403,8 +416,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
           val job2State = job2.state
 
           jobs.abort(job2.id, "Blagawaga").copoint must beLike {
-            case Right(Job(
-                `job2Id`, _, _, _, _, Aborted("Blagawaga", _, `job2State`))) =>
+            case Right(
+                Job(`job2Id`,
+                    _,
+                    _,
+                    _,
+                    _,
+                    Aborted("Blagawaga", _, `job2State`))) =>
               ok
           }
       }

@@ -98,11 +98,11 @@ class ImportTextCreatorTest extends TestCase {
                           hasWildcard = true,
                           rootUsed = false)
     Assert.assertEquals(
-        "import java.lang.{ Character, Integer, Runtime, Float => JFloat, Long => JLong, System => _, _ }",
-        textCreator.getImportText(info,
-                                  isUnicodeArrow = false,
-                                  spacesInImports = true,
-                                  sortLexicografically = true))
+      "import java.lang.{ Character, Integer, Runtime, Float => JFloat, Long => JLong, System => _, _ }",
+      textCreator.getImportText(info,
+                                isUnicodeArrow = false,
+                                spacesInImports = true,
+                                sortLexicografically = true))
   }
 
   def testGetImportText_No_Sorting(): Unit = {
@@ -115,10 +115,10 @@ class ImportTextCreatorTest extends TestCase {
                           hasWildcard = false,
                           rootUsed = false)
     Assert.assertEquals(
-        "import java.lang.{Long, Integer, Float, Short}",
-        textCreator.getImportText(info,
-                                  isUnicodeArrow = false,
-                                  spacesInImports = false,
-                                  sortLexicografically = false))
+      "import java.lang.{Long, Integer, Float, Short}",
+      textCreator.getImportText(info,
+                                isUnicodeArrow = false,
+                                spacesInImports = false,
+                                sortLexicografically = false))
   }
 }

@@ -24,7 +24,7 @@ class ActorSubscriberOneByOneRequestTest
   override def createSubscriber(): Subscriber[Int] = {
     val props = Props(classOf[StrategySubscriber], OneByOneRequestStrategy)
     ActorSubscriber(
-        system.actorOf(props.withDispatcher("akka.test.stream-dispatcher")))
+      system.actorOf(props.withDispatcher("akka.test.stream-dispatcher")))
   }
 
   override def createElement(element: Int): Int = element

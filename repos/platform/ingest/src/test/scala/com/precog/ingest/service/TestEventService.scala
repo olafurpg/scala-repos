@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -62,7 +62,9 @@ import blueeyes.core.service.test.BlueEyesServiceSpecification
 import blueeyes.json._
 
 trait TestEventService
-    extends BlueEyesServiceSpecification with EventService with AkkaDefaults {
+    extends BlueEyesServiceSpecification
+    with EventService
+    with AkkaDefaults {
   import EventService._
   import Permission._
 
@@ -82,8 +84,8 @@ trait TestEventService
   private val to = Duration(5, "seconds")
 
   val asyncContext = defaultFutureDispatch
-  implicit val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(
-      asyncContext, to)
+  implicit val M: Monad[Future] with Comonad[Future] =
+    new UnsafeFutureComonad(asyncContext, to)
 
   private val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
@@ -100,18 +102,18 @@ trait TestEventService
   } copoint
 
   private val accountFinder = new TestAccountFinder[Future](
-      Map(testAccount.apiKey -> testAccount.accountId),
-      Map(testAccount.accountId -> testAccount))
+    Map(testAccount.apiKey -> testAccount.accountId),
+    Map(testAccount.accountId -> testAccount))
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      0, Duration(1, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(0, Duration(1, "second"))
 
   val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
   val accessTest = Set[Permission](
-      ReadPermission(Path.Root, WrittenByAccount("test")),
-      WritePermission(testAccount.rootPath, WriteAsAny),
-      DeletePermission(testAccount.rootPath, WrittenByAny)
+    ReadPermission(Path.Root, WrittenByAccount("test")),
+    WritePermission(testAccount.rootPath, WriteAsAny),
+    DeletePermission(testAccount.rootPath, WrittenByAny)
   )
 
   val expiredAccount = TestAccounts
@@ -138,8 +140,9 @@ trait TestEventService
 
   def configureEventService(config: Configuration): EventService.State = {
     val apiKeyFinder = new DirectAPIKeyFinder(apiKeyManager)
-    val permissionsFinder = new PermissionsFinder(
-        apiKeyFinder, accountFinder, new Instant(1363327426906L))
+    val permissionsFinder = new PermissionsFinder(apiKeyFinder,
+                                                  accountFinder,
+                                                  new Instant(1363327426906L))
     val eventStore = new EventStore[Future] {
       def save(action: Event, timeout: Timeout) = M.point {
         stored += action; \/-(PrecogUnit)
@@ -176,7 +179,8 @@ trait TestEventService
                ownerAccountId: Option[AccountId],
                sync: Boolean = true,
                batch: Boolean = false)(data: A)(
-      implicit bi: A => Future[JValue], t: AsyncHttpTranscoder[A, ByteChunk])
+      implicit bi: A => Future[JValue],
+      t: AsyncHttpTranscoder[A, ByteChunk])
     : Future[(HttpResponse[JValue], List[Ingest])] = {
     val svc = client
       .contentType[A](contentType)
@@ -192,12 +196,13 @@ trait TestEventService
     stored.clear()
     for {
       response <- svcWithQueries.post[A](path.toString)(data)
-      content <- response.content map (a => bi(a) map (Some(_))) getOrElse Future(
-          None)
+      content <- response.content map (a =>
+                                         bi(a) map (Some(_))) getOrElse Future(
+                  None)
     } yield {
       (
-          response.copy(content = content),
-          stored.toList collect { case in: Ingest => in }
+        response.copy(content = content),
+        stored.toList collect { case in: Ingest => in }
       )
     }
   }

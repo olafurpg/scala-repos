@@ -46,15 +46,16 @@ object ComparingUtil {
 
     val areUnrelatedClasses =
       !areClassesEquivalent(clazz1, clazz2) &&
-      !(clazz1.isInheritor(clazz2, true) || clazz2.isInheritor(clazz1, true))
+        !(clazz1.isInheritor(clazz2, true) || clazz2.isInheritor(clazz1, true))
 
     areUnrelatedClasses &&
     (oneFinal || twoNonTraitsOrInterfaces ||
-        sealedAndAllChildrenAreIrreconcilable)
+    sealedAndAllChildrenAreIrreconcilable)
   }
 
-  def isNeverSubType(
-      tp1: ScType, tp2: ScType, sameType: Boolean = false): Boolean = {
+  def isNeverSubType(tp1: ScType,
+                     tp2: ScType,
+                     sameType: Boolean = false): Boolean = {
     if (tp2.weakConforms(tp1) || tp1.weakConforms(tp2)) return false
 
     val Seq(clazzOpt1, clazzOpt2) = Seq(tp1, tp2)
@@ -97,6 +98,6 @@ object ComparingUtil {
 
     isNeverSubClass(clazz1, clazz2) ||
     ((areClassesEquivalent(clazz1, clazz2) || (!sameType) &&
-            clazz1.isInheritor(clazz2, true)) && neverSubArgs())
+    clazz1.isInheritor(clazz2, true)) && neverSubArgs())
   }
 }

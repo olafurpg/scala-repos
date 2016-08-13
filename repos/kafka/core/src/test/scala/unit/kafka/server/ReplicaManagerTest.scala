@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   * http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -127,16 +127,16 @@ class ReplicaManagerTest {
     try {
       def callback(responseStatus: Map[TopicPartition, PartitionResponse]) = {
         assert(
-            responseStatus.values.head.errorCode == Errors.INVALID_REQUIRED_ACKS.code)
+          responseStatus.values.head.errorCode == Errors.INVALID_REQUIRED_ACKS.code)
       }
       rm.appendMessages(
-          timeout = 0,
-          requiredAcks = 3,
-          internalTopicsAllowed = false,
-          messagesPerPartition = Map(
-                new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
-                    new Message("first message".getBytes))),
-          responseCallback = callback)
+        timeout = 0,
+        requiredAcks = 3,
+        internalTopicsAllowed = false,
+        messagesPerPartition = Map(
+          new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
+            new Message("first message".getBytes))),
+        responseCallback = callback)
     } finally {
       rm.shutdown(checkpointHW = false)
       metrics.close()
@@ -177,16 +177,16 @@ class ReplicaManagerTest {
       }
 
       var fetchCallbackFired = false
-      def fetchCallback(responseStatus: Map[
-              TopicAndPartition, FetchResponsePartitionData]) = {
+      def fetchCallback(responseStatus: Map[TopicAndPartition,
+                                            FetchResponsePartitionData]) = {
         assertEquals("Should give NotLeaderForPartitionException",
                      Errors.NOT_LEADER_FOR_PARTITION.code,
                      responseStatus.values.head.error)
         fetchCallbackFired = true
       }
 
-      val aliveBrokers = Seq(
-          new Broker(0, "host0", 0), new Broker(1, "host1", 1))
+      val aliveBrokers =
+        Seq(new Broker(0, "host0", 0), new Broker(1, "host1", 1))
       val metadataCache = EasyMock.createMock(classOf[MetadataCache])
       EasyMock
         .expect(metadataCache.getAliveBrokers)
@@ -201,50 +201,64 @@ class ReplicaManagerTest {
       partition.getOrCreateReplica(0)
       // Make this replica the leader.
       val leaderAndIsrRequest1 = new LeaderAndIsrRequest(
-          0,
-          0,
-          collection.immutable
-            .Map(new TopicPartition(topic, 0) -> new PartitionState(
-                    0, 0, 0, brokerList, 0, brokerSet))
-            .asJava,
-          Set(new BrokerEndPoint(0, "host1", 0),
-              new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(
-          0, leaderAndIsrRequest1, metadataCache, (_, _) => {})
+        0,
+        0,
+        collection.immutable
+          .Map(
+            new TopicPartition(topic, 0) -> new PartitionState(0,
+                                                               0,
+                                                               0,
+                                                               brokerList,
+                                                               0,
+                                                               brokerSet))
+          .asJava,
+        Set(new BrokerEndPoint(0, "host1", 0),
+            new BrokerEndPoint(1, "host2", 1)).asJava)
+      rm.becomeLeaderOrFollower(0,
+                                leaderAndIsrRequest1,
+                                metadataCache,
+                                (_, _) => {})
       rm.getLeaderReplicaIfLocal(topic, 0)
 
       // Append a message.
       rm.appendMessages(
-          timeout = 1000,
-          requiredAcks = -1,
-          internalTopicsAllowed = false,
-          messagesPerPartition = Map(
-                new TopicPartition(topic, 0) -> new ByteBufferMessageSet(
-                    new Message("first message".getBytes))),
-          responseCallback = produceCallback)
+        timeout = 1000,
+        requiredAcks = -1,
+        internalTopicsAllowed = false,
+        messagesPerPartition = Map(
+          new TopicPartition(topic, 0) -> new ByteBufferMessageSet(
+            new Message("first message".getBytes))),
+        responseCallback = produceCallback)
 
       // Fetch some messages
       rm.fetchMessages(
-          timeout = 1000,
-          replicaId = -1,
-          fetchMinBytes = 100000,
-          fetchInfo = collection.immutable.Map(
-                new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(
-                    0, 100000)),
-          responseCallback = fetchCallback)
+        timeout = 1000,
+        replicaId = -1,
+        fetchMinBytes = 100000,
+        fetchInfo = collection.immutable.Map(
+          new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(0,
+                                                                    100000)),
+        responseCallback = fetchCallback)
 
       // Make this replica the follower
       val leaderAndIsrRequest2 = new LeaderAndIsrRequest(
-          0,
-          0,
-          collection.immutable
-            .Map(new TopicPartition(topic, 0) -> new PartitionState(
-                    0, 1, 1, brokerList, 0, brokerSet))
-            .asJava,
-          Set(new BrokerEndPoint(0, "host1", 0),
-              new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(
-          1, leaderAndIsrRequest2, metadataCache, (_, _) => {})
+        0,
+        0,
+        collection.immutable
+          .Map(
+            new TopicPartition(topic, 0) -> new PartitionState(0,
+                                                               1,
+                                                               1,
+                                                               brokerList,
+                                                               0,
+                                                               brokerSet))
+          .asJava,
+        Set(new BrokerEndPoint(0, "host1", 0),
+            new BrokerEndPoint(1, "host2", 1)).asJava)
+      rm.becomeLeaderOrFollower(1,
+                                leaderAndIsrRequest2,
+                                metadataCache,
+                                (_, _) => {})
 
       assertTrue(produceCallbackFired)
       assertTrue(fetchCallbackFired)

@@ -128,8 +128,8 @@ case object NoScopeGiven extends NoScopeGiven {
 /**
   * Deployer maps actor paths to actor deployments.
   */
-private[akka] class Deployer(
-    val settings: ActorSystem.Settings, val dynamicAccess: DynamicAccess) {
+private[akka] class Deployer(val settings: ActorSystem.Settings,
+                             val dynamicAccess: DynamicAccess) {
 
   import scala.collection.JavaConverters._
 
@@ -168,7 +168,7 @@ private[akka] class Deployer(
       for (i ← 0 until path.length) path(i) match {
         case "" ⇒
           throw new InvalidActorNameException(
-              s"Actor name in deployment [${d.path}] must not be empty")
+            s"Actor name in deployment [${d.path}] must not be empty")
         case el ⇒ ActorPath.validatePathElement(el, fullPath = d.path)
       }
 
@@ -181,8 +181,10 @@ private[akka] class Deployer(
 
   def parseConfig(key: String, config: Config): Option[Deploy] = {
     val deployment = config.withFallback(default)
-    val router = createRouterConfig(
-        deployment.getString("router"), key, config, deployment)
+    val router = createRouterConfig(deployment.getString("router"),
+                                    key,
+                                    config,
+                                    deployment)
     val dispatcher = deployment.getString("dispatcher")
     val mailbox = deployment.getString("mailbox")
     Some(Deploy(key, deployment, router, NoScopeGiven, dispatcher, mailbox))
@@ -210,13 +212,13 @@ private[akka] class Deployer(
 
       val fqn = routerTypeMapping.getOrElse(routerType, routerType)
 
-      def throwCannotInstantiateRouter(
-          args: Seq[(Class[_], AnyRef)], cause: Throwable) =
+      def throwCannotInstantiateRouter(args: Seq[(Class[_], AnyRef)],
+                                       cause: Throwable) =
         throw new IllegalArgumentException(
-            s"Cannot instantiate router [$fqn], defined in [$key], " +
+          s"Cannot instantiate router [$fqn], defined in [$key], " +
             s"make sure it extends [${classOf[RouterConfig]}] and has constructor with " +
             s"[${args(0)._1.getName}] and optional [${args(1)._1.getName}] parameter",
-            cause)
+          cause)
 
       // first try with Config param, and then with Config and DynamicAccess parameters
       val args1 = List(classOf[Config] -> deployment2)

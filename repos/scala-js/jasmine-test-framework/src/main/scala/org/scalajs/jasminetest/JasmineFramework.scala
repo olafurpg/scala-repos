@@ -43,7 +43,7 @@ final class JasmineFramework extends Framework {
   private def acquireRunner(): Unit = {
     if (hasRunner)
       throw new IllegalStateException(
-          "Jasmine doesn't support concurrent runs")
+        "Jasmine doesn't support concurrent runs")
     hasRunner = true
   }
 }

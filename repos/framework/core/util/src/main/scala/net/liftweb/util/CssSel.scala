@@ -62,7 +62,7 @@ private final case class AggregatedCssBindFunc(binds: List[CssBind])
 
   def apply(in: NodeSeq): NodeSeq = bad match {
     case Nil => selectorMap(in)
-    case bv => bad.flatMap(_ (in)) ++ selectorMap(in)
+    case bv => bad.flatMap(_(in)) ++ selectorMap(in)
   }
 }
 
@@ -72,8 +72,8 @@ private final case class AggregatedCssBindFunc(binds: List[CssBind])
   * class="clearable" and this Bind will make them go away
   */
 class ClearClearable
-    extends CssBindImpl(
-        Full(".clearable"), CssSelectorParser.parse(".clearable")) {
+    extends CssBindImpl(Full(".clearable"),
+                        CssSelectorParser.parse(".clearable")) {
 
   def calculate(in: NodeSeq): Seq[NodeSeq] = Nil
 }
@@ -146,11 +146,11 @@ private class SelectorMap(binds: List[CssBind])
         clzMap += (clz -> sortBinds(i :: clzMap.getOrElse(clz, Nil)))
 
       case i @ CssBind(AttrSelector(name, value, _)) => {
-          val oldMap = attrMap.getOrElse(name, Map())
-          attrMap +=
+        val oldMap = attrMap.getOrElse(name, Map())
+        attrMap +=
           (name ->
-              (oldMap + (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
-        }
+            (oldMap + (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
+      }
     }
 
     (idMap, nameMap, clzMap, attrMap, elemMap, starFunc, selThis)
@@ -162,8 +162,8 @@ private class SelectorMap(binds: List[CssBind])
     case ns => ns
   }
 
-  private abstract class SlurpedAttrs(
-      val id: Box[String], val name: Box[String]) {
+  private abstract class SlurpedAttrs(val id: Box[String],
+                                      val name: Box[String]) {
     def attrs: Map[String, String]
 
     def classes: List[String]
@@ -194,127 +194,125 @@ private class SelectorMap(binds: List[CssBind])
           applyRule(xs, realE, onlySelThis, depth)
 
         case bind :: xs => {
-            applyRule(bind, realE, depth) flatMap {
-              case e: Elem => applyRule(xs, e, onlySelThis, depth + 1)
-              case x => x
-            }
+          applyRule(bind, realE, depth) flatMap {
+            case e: Elem => applyRule(xs, e, onlySelThis, depth + 1)
+            case x => x
           }
+        }
       }
 
     final def applyAttributeRules(bindList: List[CssBind], elem: Elem): Elem = {
       bindList
         .map(
-            b =>
-              (b,
-               b.css
-                 .openOrThrowException(
-                     "Guarded with test before calling this method")
-                 .subNodes
-                 .openOrThrowException(
-                     "Guarded with test before calling this method")))
+          b =>
+            (b,
+             b.css
+               .openOrThrowException(
+                 "Guarded with test before calling this method")
+               .subNodes
+               .openOrThrowException(
+                 "Guarded with test before calling this method")))
         .foldLeft(elem) {
           case (elem, (bind, AttrSubNode(attr))) => {
-              val calced = bind.calculate(elem).map(findElemIfThereIsOne _)
+            val calced = bind.calculate(elem).map(findElemIfThereIsOne _)
+            val filtered = elem.attributes.filter {
+              case up: UnprefixedAttribute => up.key != attr
+              case _ => true
+            }
+
+            val newAttr =
+              if (calced.isEmpty) {
+                filtered
+              } else {
+                val flat: NodeSeq = calced.flatMap(a => a)
+                new UnprefixedAttribute(attr, flat, filtered)
+              }
+
+            elem.copy(attributes = newAttr)
+          }
+
+          case (elem, (bind, AttrAppendSubNode(attr))) => {
+            val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
+            val calced =
+              bind.calculate(elem).toList.map(findElemIfThereIsOne _)
+
+            if (calced.isEmpty) {
+              elem
+            } else {
               val filtered = elem.attributes.filter {
                 case up: UnprefixedAttribute => up.key != attr
                 case _ => true
               }
 
-              val newAttr =
-                if (calced.isEmpty) {
-                  filtered
-                } else {
-                  val flat: NodeSeq = calced.flatMap(a => a)
-                  new UnprefixedAttribute(attr, flat, filtered)
-                }
-
-              elem.copy(attributes = newAttr)
-            }
-
-          case (elem, (bind, AttrAppendSubNode(attr))) => {
-              val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
-              val calced =
-                bind.calculate(elem).toList.map(findElemIfThereIsOne _)
-
-              if (calced.isEmpty) {
-                elem
-              } else {
-                val filtered = elem.attributes.filter {
-                  case up: UnprefixedAttribute => up.key != attr
-                  case _ => true
-                }
-
-                val flat: NodeSeq =
-                  if (attr == "class") {
-                    if (org.isEmpty) {
-                      calced.dropRight(1).flatMap(a => a ++ Text(" ")) ++ calced
-                        .takeRight(1)
-                        .head
-                    } else {
-                      org ++ Text(" ") ++ calced
-                        .dropRight(1)
-                        .flatMap(a => a ++ Text(" ")) ++ calced
-                        .takeRight(1)
-                        .head
-                    }
+              val flat: NodeSeq =
+                if (attr == "class") {
+                  if (org.isEmpty) {
+                    calced.dropRight(1).flatMap(a => a ++ Text(" ")) ++ calced
+                      .takeRight(1)
+                      .head
                   } else {
-                    org ++ (calced.flatMap(a => a): NodeSeq)
+                    org ++ Text(" ") ++ calced
+                      .dropRight(1)
+                      .flatMap(a => a ++ Text(" ")) ++ calced.takeRight(1).head
                   }
+                } else {
+                  org ++ (calced.flatMap(a => a): NodeSeq)
+                }
 
-                val newAttr = new UnprefixedAttribute(attr, flat, filtered)
+              val newAttr = new UnprefixedAttribute(attr, flat, filtered)
 
-                new Elem(elem.prefix,
-                         elem.label,
-                         newAttr,
-                         elem.scope,
-                         elem.minimizeEmpty,
-                         elem.child: _*)
-              }
+              new Elem(elem.prefix,
+                       elem.label,
+                       newAttr,
+                       elem.scope,
+                       elem.minimizeEmpty,
+                       elem.child: _*)
             }
+          }
 
           case (elem, (bind, AttrRemoveSubNode(attr))) => {
-              val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
-              val calced =
-                bind.calculate(elem).toList.map(findElemIfThereIsOne _)
+            val org: NodeSeq = elem.attribute(attr).getOrElse(NodeSeq.Empty)
+            val calced =
+              bind.calculate(elem).toList.map(findElemIfThereIsOne _)
 
-              if (calced.isEmpty || org.isEmpty) {
-                // if either is empty, then return the Elem unmodified
-                elem
-              } else {
-                val filtered = elem.attributes.filter {
-                  case up: UnprefixedAttribute => up.key != attr
-                  case _ => true
-                }
-
-                val flat: Box[NodeSeq] =
-                  if (attr == "class") {
-                    val set = Set(calced.map(_.text): _*)
-                    SuperString(org.text)
-                      .charSplit(' ')
-                      .toList
-                      .filter(_.length > 0)
-                      .filter(s => !set.contains(s)) match {
-                      case Nil => Empty
-                      case xs => Full(Text(xs.mkString(" ")))
-                    }
-                  } else {
-                    if (org.text == calced.flatMap(a => a).text) Empty
-                    else Full(org)
-                  }
-
-                val newAttr = flat match {
-                  case Full(a) => new UnprefixedAttribute(attr, a, filtered)
-                  case _ => filtered
-                }
-
-                new Elem(elem.prefix,
-                         elem.label,
-                         newAttr,
-                         elem.scope,
-                         elem.minimizeEmpty,
-                         elem.child: _*)
+            if (calced.isEmpty || org.isEmpty) {
+              // if either is empty, then return the Elem unmodified
+              elem
+            } else {
+              val filtered = elem.attributes.filter {
+                case up: UnprefixedAttribute => up.key != attr
+                case _ => true
               }
+
+              val flat: Box[NodeSeq] =
+                if (attr == "class") {
+                  val set = Set(calced.map(_.text): _*)
+                  SuperString(org.text)
+                    .charSplit(' ')
+                    .toList
+                    .filter(_.length > 0)
+                    .filter(s => !set.contains(s)) match {
+                    case Nil => Empty
+                    case xs => Full(Text(xs.mkString(" ")))
+                  }
+                } else {
+                  if (org.text == calced.flatMap(a => a).text) Empty
+                  else Full(org)
+                }
+
+              val newAttr = flat match {
+                case Full(a) => new UnprefixedAttribute(attr, a, filtered)
+                case _ => filtered
+              }
+
+              new Elem(elem.prefix,
+                       elem.label,
+                       newAttr,
+                       elem.scope,
+                       elem.minimizeEmpty,
+                       elem.child: _*)
             }
+          }
         }
     }
 
@@ -350,30 +348,30 @@ private class SelectorMap(binds: List[CssBind])
             // ignore the id attribute
 
             case up: UnprefixedAttribute if up.key == "class" => {
-                oldAttrs.get("class") match {
-                  case Some(ca) if !skipClassMerge => {
-                      oldAttrs -= "class"
-                      builtMeta = new UnprefixedAttribute(
-                          "class",
-                          uniqueClasses(up.value.text, ca),
-                          builtMeta)
-                    }
-
-                  case _ =>
-                    oldAttrs -= "class"
-                    builtMeta = up.copy(builtMeta)
+              oldAttrs.get("class") match {
+                case Some(ca) if !skipClassMerge => {
+                  oldAttrs -= "class"
+                  builtMeta = new UnprefixedAttribute(
+                    "class",
+                    uniqueClasses(up.value.text, ca),
+                    builtMeta)
                 }
+
+                case _ =>
+                  oldAttrs -= "class"
+                  builtMeta = up.copy(builtMeta)
               }
+            }
 
             case up: UnprefixedAttribute => {
-                oldAttrs -= up.key
-                builtMeta = up.copy(builtMeta)
-              }
+              oldAttrs -= up.key
+              builtMeta = up.copy(builtMeta)
+            }
 
             case pa: PrefixedAttribute => {
-                oldAttrs -= (pa.pre + ":" + pa.key)
-                builtMeta = pa.copy(builtMeta)
-              }
+              oldAttrs -= (pa.pre + ":" + pa.key)
+              builtMeta = pa.copy(builtMeta)
+            }
             case _ =>
           }
 
@@ -401,122 +399,124 @@ private class SelectorMap(binds: List[CssBind])
         .openOrThrowException("Guarded with test before calling this method")
         .subNodes match {
         case Full(SelectThisNode(kids)) => {
-            throw new RetryWithException(if (kids) realE.child else realE)
-          }
+          throw new RetryWithException(if (kids) realE.child else realE)
+        }
 
         case Full(todo: WithKids) => {
-            val calced = bind.calculate(realE.child)
-            calced.length match {
-              case 0 =>
-                new Elem(realE.prefix,
-                         realE.label,
-                         realE.attributes,
-                         realE.scope,
-                         realE.minimizeEmpty)
-              case 1 =>
-                new Elem(realE.prefix,
-                         realE.label,
-                         realE.attributes,
-                         realE.scope,
-                         realE.minimizeEmpty,
-                         todo.transform(realE.child, calced.head): _*)
-              case _ if id.isEmpty =>
-                calced.map(
-                    kids =>
-                      new Elem(realE.prefix,
-                               realE.label,
-                               realE.attributes,
-                               realE.scope,
-                               realE.minimizeEmpty,
-                               todo.transform(realE.child, kids): _*))
+          val calced = bind.calculate(realE.child)
+          calced.length match {
+            case 0 =>
+              new Elem(realE.prefix,
+                       realE.label,
+                       realE.attributes,
+                       realE.scope,
+                       realE.minimizeEmpty)
+            case 1 =>
+              new Elem(realE.prefix,
+                       realE.label,
+                       realE.attributes,
+                       realE.scope,
+                       realE.minimizeEmpty,
+                       todo.transform(realE.child, calced.head): _*)
+            case _ if id.isEmpty =>
+              calced.map(
+                kids =>
+                  new Elem(realE.prefix,
+                           realE.label,
+                           realE.attributes,
+                           realE.scope,
+                           realE.minimizeEmpty,
+                           todo.transform(realE.child, kids): _*))
 
-              case _ => {
-                  val noId = removeId(realE.attributes)
-                  calced.toList.zipWithIndex.map {
-                    case (kids, 0) =>
-                      new Elem(realE.prefix,
-                               realE.label,
-                               realE.attributes,
-                               realE.scope,
-                               realE.minimizeEmpty,
-                               todo.transform(realE.child, kids): _*)
-                    case (kids, _) =>
-                      new Elem(realE.prefix,
-                               realE.label,
-                               noId,
-                               realE.scope,
-                               realE.minimizeEmpty,
-                               todo.transform(realE.child, kids): _*)
-                  }
-                }
+            case _ => {
+              val noId = removeId(realE.attributes)
+              calced.toList.zipWithIndex.map {
+                case (kids, 0) =>
+                  new Elem(realE.prefix,
+                           realE.label,
+                           realE.attributes,
+                           realE.scope,
+                           realE.minimizeEmpty,
+                           todo.transform(realE.child, kids): _*)
+                case (kids, _) =>
+                  new Elem(realE.prefix,
+                           realE.label,
+                           noId,
+                           realE.scope,
+                           realE.minimizeEmpty,
+                           todo.transform(realE.child, kids): _*)
+              }
             }
           }
+        }
 
-        case x if x.isInstanceOf[EmptyBox] || x == Full(DontMergeAttributes) =>
-          {
-            val calced = bind.calculate(realE).map(findElemIfThereIsOne _)
+        case x
+            if x.isInstanceOf[EmptyBox] || x == Full(DontMergeAttributes) => {
+          val calced = bind.calculate(realE).map(findElemIfThereIsOne _)
 
-            calced.length match {
-              case 0 => NodeSeq.Empty
-              case 1 => {
-                  calced.head match {
-                    case Group(g) => g
-                    case e: Elem =>
-                      new Elem(e.prefix,
-                               e.label,
-                               mergeAll(e.attributes,
-                                        false,
-                                        x == Full(DontMergeAttributes)),
-                               e.scope,
-                               e.minimizeEmpty,
-                               e.child: _*)
-                    case x => x
-                  }
-                }
+          calced.length match {
+            case 0 => NodeSeq.Empty
+            case 1 => {
+              calced.head match {
+                case Group(g) => g
+                case e: Elem =>
+                  new Elem(e.prefix,
+                           e.label,
+                           mergeAll(e.attributes,
+                                    false,
+                                    x == Full(DontMergeAttributes)),
+                           e.scope,
+                           e.minimizeEmpty,
+                           e.child: _*)
+                case x => x
+              }
+            }
 
-              case n => {
-                  val calcedList = calced.toList
-                  val availableIds = (attrs.get("id").toList ++ calcedList
-                        .collect({
-                          case e: Elem => e.attribute("id")
-                        })
-                        .flatten
-                        .map(_.toString)).toSet
-                  val merged = calcedList.foldLeft(
-                      (availableIds, Nil: List[Seq[xml.Node]])) {
-                    (idsAndResult, a) =>
-                      val (ids, result) = idsAndResult
-                      a match {
-                        case Group(g) => (ids, g :: result)
-                        case e: Elem => {
-                            val targetId =
-                              e.attribute("id").map(_.toString) orElse
-                              (attrs.get("id"))
-                            val keepId =
-                              targetId map { id =>
-                                ids.contains(id)
-                              } getOrElse (false)
-                            val newIds =
-                              targetId filter (_ => keepId) map (i => ids - i) getOrElse
-                              (ids)
-                            val newElem = new Elem(
-                                e.prefix,
-                                e.label,
-                                mergeAll(e.attributes,
-                                         !keepId,
-                                         x == Full(DontMergeAttributes)),
-                                e.scope,
-                                e.minimizeEmpty,
-                                e.child: _*)
-                            (newIds, newElem :: result)
-                          }
-                        case x => (ids, x :: result)
+            case n => {
+              val calcedList = calced.toList
+              val availableIds = (attrs.get("id").toList ++ calcedList
+                .collect({
+                  case e: Elem => e.attribute("id")
+                })
+                .flatten
+                .map(_.toString)).toSet
+              val merged =
+                calcedList.foldLeft((availableIds, Nil: List[Seq[xml.Node]])) {
+                  (idsAndResult, a) =>
+                    val (ids, result) = idsAndResult
+                    a match {
+                      case Group(g) => (ids, g :: result)
+                      case e: Elem => {
+                        val targetId =
+                          e.attribute("id").map(_.toString) orElse
+                            (attrs.get("id"))
+                        val keepId =
+                          targetId map { id =>
+                            ids.contains(id)
+                          } getOrElse (false)
+                        val newIds =
+                          targetId filter (_ =>
+                                             keepId) map (i =>
+                                                            ids - i) getOrElse
+                            (ids)
+                        val newElem =
+                          new Elem(e.prefix,
+                                   e.label,
+                                   mergeAll(e.attributes,
+                                            !keepId,
+                                            x == Full(DontMergeAttributes)),
+                                   e.scope,
+                                   e.minimizeEmpty,
+                                   e.child: _*)
+                        (newIds, newElem :: result)
                       }
-                  }
-                  merged._2.reverse.flatten
+                      case x => (ids, x :: result)
+                    }
                 }
+              merged._2.reverse.flatten
             }
           }
+        }
       }
     }
 
@@ -537,10 +537,10 @@ private class SelectorMap(binds: List[CssBind])
       for {
         binds <- starFunc
         bind <- binds if (bind match {
-                 case CssBind(StarSelector(_, topOnly)) =>
-                   !topOnly || (depth == 0)
-                 case _ => true
-               })
+          case CssBind(StarSelector(_, topOnly)) =>
+            !topOnly || (depth == 0)
+          case _ => true
+        })
       } buff += bind
     }
 
@@ -555,12 +555,12 @@ private class SelectorMap(binds: List[CssBind])
       clz match {
         case Nil => ()
         case x :: xs => {
-            clzMap.get(x) match {
-              case Some(cb) => buff ++= cb
-              case _ =>
-            }
-            findClass(xs, buff)
+          clzMap.get(x) match {
+            case Some(cb) => buff ++= cb
+            case _ =>
           }
+          findClass(xs, buff)
+        }
       }
     }
 
@@ -590,22 +590,22 @@ private class SelectorMap(binds: List[CssBind])
     while (cur != Null) {
       cur match {
         case up: UnprefixedAttribute if (null ne up.value) => {
-            val key = up.key
-            val value = up.value.text
-            import Helpers._
-            key match {
-              case "id" => id = Full(value)
-              case "name" => name = Full(value)
-              case "class" => clzs = value.charSplit(' ')
-              case _ =>
-            }
-
-            theAttrs += key -> value
+          val key = up.key
+          val value = up.value.text
+          import Helpers._
+          key match {
+            case "id" => id = Full(value)
+            case "name" => name = Full(value)
+            case "class" => clzs = value.charSplit(' ')
+            case _ =>
           }
+
+          theAttrs += key -> value
+        }
 
         case pa: PrefixedAttribute if (null ne pa.value) => {
-            theAttrs += ((pa.pre + ":" + pa.key) -> pa.value.text)
-          }
+          theAttrs += ((pa.pre + ":" + pa.key) -> pa.value.text)
+        }
 
         case _ =>
       }
@@ -634,13 +634,14 @@ private class SelectorMap(binds: List[CssBind])
     if (onlySel) {
       lb.toList.filter(_.selectThis_?) match {
         case Nil => {
-            run(e.child, onlySel, depth + 1)
-            NodeSeq.Empty
-          }
+          run(e.child, onlySel, depth + 1)
+          NodeSeq.Empty
+        }
 
         case csb :: _ =>
-          throw new RetryWithException(if (csb.selectThisChildren_?) e.child
-              else e)
+          throw new RetryWithException(
+            if (csb.selectThisChildren_?) e.child
+            else e)
       }
     } else {
       lb.toList.filterNot(_.selectThis_?) match {
@@ -656,21 +657,21 @@ private class SelectorMap(binds: List[CssBind])
           csb.partition(_.attrSel_?) match {
             case (Nil, rules) => slurp.applyRule(rules, e, onlySel, depth)
             case (attrs, Nil) => {
-                val elem = slurp.applyAttributeRules(attrs, e)
-                new Elem(elem.prefix,
-                         elem.label,
-                         elem.attributes,
-                         elem.scope,
-                         e.minimizeEmpty,
-                         run(elem.child, onlySel, depth + 1): _*)
-              }
+              val elem = slurp.applyAttributeRules(attrs, e)
+              new Elem(elem.prefix,
+                       elem.label,
+                       elem.attributes,
+                       elem.scope,
+                       e.minimizeEmpty,
+                       run(elem.child, onlySel, depth + 1): _*)
+            }
 
             case (attrs, rules) => {
-                slurp.applyRule(rules,
-                                slurp.applyAttributeRules(attrs, e),
-                                onlySel,
-                                depth)
-              }
+              slurp.applyRule(rules,
+                              slurp.applyAttributeRules(attrs, e),
+                              onlySel,
+                              depth)
+            }
           }
         // slurp.applyRule(csb, e, onlySel)
       }
@@ -679,19 +680,20 @@ private class SelectorMap(binds: List[CssBind])
 
   final def apply(in: NodeSeq): NodeSeq = selectThis match {
     case Full(_) => {
-        try {
-          run(in, true, 0)
-        } catch {
-          case RetryWithException(newElem) =>
-            run(newElem, false, 0)
-        }
+      try {
+        run(in, true, 0)
+      } catch {
+        case RetryWithException(newElem) =>
+          run(newElem, false, 0)
       }
+    }
 
     case _ => run(in, false, 0)
   }
 
-  final private def run(
-      in: NodeSeq, onlyRunSel: Boolean, depth: Int): NodeSeq =
+  final private def run(in: NodeSeq,
+                        onlyRunSel: Boolean,
+                        depth: Int): NodeSeq =
     in flatMap {
       case Group(g) => run(g, onlyRunSel, depth)
       case e: Elem => treatElem(e, onlyRunSel, depth)
@@ -702,8 +704,8 @@ private class SelectorMap(binds: List[CssBind])
 private case class RetryWithException(e: NodeSeq) extends Exception()
 
 trait CssBindImplicits {
-  class CssBindPromoter(
-      stringSelector: Box[String], cssSelector: Box[CssSelector]) {
+  class CssBindPromoter(stringSelector: Box[String],
+                        cssSelector: Box[CssSelector]) {
 
     /**
       * Transform a DOM (NodeSeq) based on rules
@@ -741,8 +743,8 @@ trait CssBindImplicits {
     }
   }
   implicit class StringToCssBindPromoter(stringSelector: String)
-      extends CssBindPromoter(
-          Full(stringSelector), CssSelectorParser.parse(stringSelector))
+      extends CssBindPromoter(Full(stringSelector),
+                              CssSelectorParser.parse(stringSelector))
   implicit class CssSelectorToCssBindPromoter(cssSelector: CssSelector)
       extends CssBindPromoter(Empty, Full(cssSelector))
 }
@@ -774,11 +776,11 @@ trait CssBind extends CssSel {
     */
   private[util] def selectThis_? : Boolean = css match {
     case Full(sel) => {
-        sel.subNodes match {
-          case Full(SelectThisNode(_)) => true
-          case _ => false
-        }
+      sel.subNodes match {
+        case Full(SelectThisNode(_)) => true
+        case _ => false
       }
+    }
 
     case _ => false
   }
@@ -788,22 +790,22 @@ trait CssBind extends CssSel {
     */
   private[util] def attrSel_? : Boolean = css match {
     case Full(sel) => {
-        sel.subNodes match {
-          case Full(x: AttributeRule) => true
-          case _ => false
-        }
+      sel.subNodes match {
+        case Full(x: AttributeRule) => true
+        case _ => false
       }
+    }
 
     case _ => false
   }
 
   private[util] def selectThisChildren_? : Boolean = css match {
     case Full(sel) => {
-        sel.subNodes match {
-          case Full(SelectThisNode(children)) => children
-          case _ => false
-        }
+      sel.subNodes match {
+        case Full(SelectThisNode(children)) => children
+        case _ => false
       }
+    }
 
     case _ => false
   }
@@ -817,8 +819,8 @@ trait CssBind extends CssSel {
   * An abstract implementation of CssBind.  You can instantiate
   * this class and create a custom calculate method
   */
-abstract class CssBindImpl(
-    val stringSelector: Box[String], val css: Box[CssSelector])
+abstract class CssBindImpl(val stringSelector: Box[String],
+                           val css: Box[CssSelector])
     extends CssBind {
   def calculate(in: NodeSeq): Seq[NodeSeq]
 }
@@ -980,16 +982,16 @@ object CanBind extends CssBindImplicits {
       implicit f: T[N] => Iterable[N]): CanBind[T[N]] =
     new CanBind[T[N]] {
       def apply(info: => T[N])(ns: NodeSeq): Seq[NodeSeq] =
-        f(info).toSeq
-          .flatMap(a => if (a eq null) Nil else List(Text(a.toString)))
+        f(info).toSeq.flatMap(a =>
+          if (a eq null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableDouble[T[Double]](
       implicit f: T[Double] => Iterable[Double]): CanBind[T[Double]] =
     new CanBind[T[Double]] {
       def apply(info: => T[Double])(ns: NodeSeq): Seq[NodeSeq] =
-        f(info).toSeq
-          .flatMap(a => if (a equals null) Nil else List(Text(a.toString)))
+        f(info).toSeq.flatMap(a =>
+          if (a equals null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableBindableTransform[T[_]](

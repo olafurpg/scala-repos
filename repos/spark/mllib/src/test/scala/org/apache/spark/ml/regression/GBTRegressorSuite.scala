@@ -22,7 +22,10 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, GradientBoostedTrees => OldGBT}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper,
+  GradientBoostedTrees => OldGBT
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
@@ -37,8 +40,8 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
   import GBTRegressorSuite.compareAPIs
 
   // Combinations for estimators, learning rates and subsamplingRate
-  private val testCombinations = Array(
-      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  private val testCombinations =
+    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   private var data: RDD[LabeledPoint] = _
   private var trainData: RDD[LabeledPoint] = _
@@ -47,14 +50,14 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
   override def beforeAll() {
     super.beforeAll()
     data = sc.parallelize(
-        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100),
-        2)
+      EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100),
+      2)
     trainData = sc.parallelize(
-        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 120),
-        2)
+      EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 120),
+      2)
     validationData = sc.parallelize(
-        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80),
-        2)
+      EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80),
+      2)
   }
 
   test("Regression with continuous features: SquaredError") {
@@ -75,14 +78,14 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("GBTRegressor behaves reasonably on toy data") {
     val df = sqlContext.createDataFrame(
-        Seq(
-            LabeledPoint(10, Vectors.dense(1, 2, 3, 4)),
-            LabeledPoint(-5, Vectors.dense(6, 3, 2, 1)),
-            LabeledPoint(11, Vectors.dense(2, 2, 3, 4)),
-            LabeledPoint(-6, Vectors.dense(6, 4, 2, 1)),
-            LabeledPoint(9, Vectors.dense(1, 2, 6, 4)),
-            LabeledPoint(-4, Vectors.dense(6, 3, 2, 2))
-        ))
+      Seq(
+        LabeledPoint(10, Vectors.dense(1, 2, 3, 4)),
+        LabeledPoint(-5, Vectors.dense(6, 3, 2, 1)),
+        LabeledPoint(11, Vectors.dense(2, 2, 3, 4)),
+        LabeledPoint(-6, Vectors.dense(6, 4, 2, 1)),
+        LabeledPoint(9, Vectors.dense(1, 2, 6, 4)),
+        LabeledPoint(-4, Vectors.dense(6, 3, 2, 2))
+      ))
     val gbt = new GBTRegressor().setMaxDepth(2).setMaxIter(2)
     val model = gbt.fit(df)
 
@@ -177,10 +180,10 @@ private object GBTRegressorSuite extends SparkFunSuite {
     val newModel = gbt.fit(newData)
     // Use parent from newTree since this is not checked anyways.
     val oldModelAsNew = GBTRegressionModel.fromOld(
-        oldModel,
-        newModel.parent.asInstanceOf[GBTRegressor],
-        categoricalFeatures,
-        numFeatures)
+      oldModel,
+      newModel.parent.asInstanceOf[GBTRegressor],
+      categoricalFeatures,
+      numFeatures)
     TreeTests.checkEqual(oldModelAsNew, newModel)
     assert(newModel.numFeatures === numFeatures)
     assert(oldModelAsNew.numFeatures === numFeatures)

@@ -28,15 +28,15 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
       new TTwitterClientFilter("service", true, None, protocolFactory)
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(
-        new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
+      new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
     val options = new thrift.ConnectionOptions
     options.write(buffer())
     buffer().writeMessageEnd()
 
     val tracing = new TraceInitializerFilter[ThriftClientRequest, Array[Byte]](
-        tracer,
-        true).andThen(new TracingFilter[ThriftClientRequest, Array[Byte]](
-            "TTwitterClientFilterTest"))
+      tracer,
+      true).andThen(new TracingFilter[ThriftClientRequest, Array[Byte]](
+      "TTwitterClientFilterTest"))
     val service = mock[Service[ThriftClientRequest, Array[Byte]]]
     val _request = ArgumentCaptor.forClass(classOf[ThriftClientRequest])
     when(service(_request.capture)).thenReturn(Future(Array[Byte]()))
@@ -71,8 +71,9 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
       filter(new ThriftClientRequest(buffer.toArray, false), service)
 
       val header = new thrift.RequestHeader
-      InputBuffer.peelMessage(
-          _request.getValue.message, header, protocolFactory)
+      InputBuffer.peelMessage(_request.getValue.message,
+                              header,
+                              protocolFactory)
 
       assert(header.getTrace_id == 1L)
       assert(header.getSpan_id == 2L)
@@ -85,8 +86,10 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
 
   test("TTwitterClientFilter should set ClientId in both header and context") {
     val clientId = ClientId("foo.bar")
-    val filter = new TTwitterClientFilter(
-        "service", true, Some(clientId), protocolFactory)
+    val filter = new TTwitterClientFilter("service",
+                                          true,
+                                          Some(clientId),
+                                          protocolFactory)
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(new TMessage("method", TMessageType.CALL, 0))
 
@@ -115,11 +118,13 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "TTwitterClientFilter should not be overrideable with externally-set ClientIds") {
+    "TTwitterClientFilter should not be overrideable with externally-set ClientIds") {
     val clientId = ClientId("foo.bar")
     val otherClientId = ClientId("other.bar")
-    val filter = new TTwitterClientFilter(
-        "service", true, Some(clientId), protocolFactory)
+    val filter = new TTwitterClientFilter("service",
+                                          true,
+                                          Some(clientId),
+                                          protocolFactory)
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(new TMessage("method", TMessageType.CALL, 0))
 
@@ -146,9 +151,9 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
 
     assert(header.getClient_id.getName == clientId.name)
     assert(
-        clientIdContextWasSet == true,
-        "expected ClientId was not set in the ClientIdContext: expected: %s, actual: %s"
-          .format(clientId.name, header.getClient_id.getName)
+      clientIdContextWasSet == true,
+      "expected ClientId was not set in the ClientIdContext: expected: %s, actual: %s"
+        .format(clientId.name, header.getClient_id.getName)
     )
   }
 }

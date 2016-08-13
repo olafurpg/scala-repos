@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -170,8 +170,7 @@ object Codec {
   def writeToArray[A](a: A)(implicit codec: Codec[A]): Array[Byte] = {
     import ByteBufferPool._
 
-    byteBufferPool.run(
-        for {
+    byteBufferPool.run(for {
       _ <- codec.write(a)
       bytes <- flipBytes
       _ <- release
@@ -208,8 +207,10 @@ object Codec {
       sizePackedInt(n >>> 7, size + 1)
     } else size
 
-  case class CompositeCodec[A, B, C](
-      codecA: Codec[A], codecB: Codec[B], from: C => (A, B), to: (A, B) => C)
+  case class CompositeCodec[A, B, C](codecA: Codec[A],
+                                     codecB: Codec[B],
+                                     from: C => (A, B),
+                                     to: (A, B) => C)
       extends Codec[C] {
     type S = Either[(codecA.S, B), codecB.S]
 
@@ -234,13 +235,13 @@ object Codec {
     def writeInit(c: C, buf: ByteBuffer): Option[S] = {
       val (a, b) = from(c)
       (codecA.writeInit(a, buf) map (s => Left((s, b)))) orElse
-      (codecB.writeInit(b, buf) map (Right(_)))
+        (codecB.writeInit(b, buf) map (Right(_)))
     }
 
     def writeMore(more: S, buf: ByteBuffer) = more match {
       case Left((s, b)) =>
         (codecA.writeMore(s, buf) map (s => Left((s, b)))) orElse
-        (codecB.writeInit(b, buf) map (Right(_)))
+          (codecB.writeInit(b, buf) map (Right(_)))
       case Right(s) => codecB.writeMore(s, buf) map (Right(_))
     }
 
@@ -296,7 +297,8 @@ object Codec {
       case TRUE_VALUE => true
       case FALSE_VALUE => false
       case invalid =>
-        sys.error("Error reading boolean: expecting %d or %d, found %d" format
+        sys.error(
+          "Error reading boolean: expecting %d or %d, found %d" format
             (TRUE_VALUE, FALSE_VALUE, invalid))
     }
   }
@@ -338,8 +340,9 @@ object Codec {
       @inline
       @tailrec
       def loop(n: Long): Unit = if (n != 0) {
-        buf.put(if ((n & ~0x7FL) != 0) (n & 0x7FL | 0x80L).toByte
-            else (n & 0x7FL).toByte)
+        buf.put(
+          if ((n & ~0x7FL) != 0) (n & 0x7FL | 0x80L).toByte
+          else (n & 0x7FL).toByte)
         loop(n >> 7)
       }
 
@@ -374,7 +377,7 @@ object Codec {
     }
 
     override def skip(buf: ByteBuffer) {
-      while ( (buf.get() & ~0x7F) != 0) {
+      while ((buf.get() & ~0x7F) != 0) {
         // Spin.
       }
     }
@@ -493,13 +496,13 @@ object Codec {
   }
 
   implicit val JBigDecimalCodec = CompositeCodec[Array[Byte], Long, BigDec](
-      arrayCodec[Byte],
-      PackedLongCodec,
-      x => (x.unscaledValue.toByteArray, x.scale.toLong),
-      (u, s) => new BigDec(new java.math.BigInteger(u), s.toInt))
+    arrayCodec[Byte],
+    PackedLongCodec,
+    x => (x.unscaledValue.toByteArray, x.scale.toLong),
+    (u, s) => new BigDec(new java.math.BigInteger(u), s.toInt))
 
-  implicit val BigDecimalCodec = JBigDecimalCodec.as[BigDecimal](
-      _.underlying, BigDecimal(_, MathContext.UNLIMITED))
+  implicit val BigDecimalCodec = JBigDecimalCodec
+    .as[BigDecimal](_.underlying, BigDecimal(_, MathContext.UNLIMITED))
 
   final class IndexedSeqCodec[A](val elemCodec: Codec[A])
       extends Codec[IndexedSeq[A]] {
@@ -547,11 +550,13 @@ object Codec {
       case Left(as) => writeInit(as, sink)
       case Right((s, as)) =>
         elemCodec.writeMore(s, sink) map (Right(_, as)) orElse writeArray(
-            as.toList, sink)
+          as.toList,
+          sink)
     }
 
     def read(src: ByteBuffer): IndexedSeq[A] =
-      ((0 until readPackedInt(src)) map (_ => elemCodec.read(src))).toIndexedSeq
+      ((0 until readPackedInt(src)) map (_ =>
+                                           elemCodec.read(src))).toIndexedSeq
 
     override def skip(buf: ByteBuffer) {
       (0 until readPackedInt(buf)) foreach { _ =>
@@ -563,11 +568,11 @@ object Codec {
   implicit def IndexedSeqCodec[A](implicit elemCodec: Codec[A]) =
     new IndexedSeqCodec(elemCodec)
 
-  implicit def arrayCodec[
-      @spec(Boolean, Long, Double) A : Codec : Manifest]: Codec[Array[A]] =
+  implicit def arrayCodec[@spec(Boolean, Long, Double) A: Codec: Manifest]
+    : Codec[Array[A]] =
     ArrayCodec(Codec[A])
 
-  case class ArrayCodec[@spec(Boolean, Long, Double) A : Manifest](
+  case class ArrayCodec[@spec(Boolean, Long, Double) A: Manifest](
       elemCodec: Codec[A])
       extends Codec[Array[A]] {
     type S = Either[Array[A], (elemCodec.S, Array[A], Int)]
@@ -603,8 +608,9 @@ object Codec {
     }
 
     @tailrec
-    private def writeArray(
-        as: Array[A], row: Int, sink: ByteBuffer): Option[S] =
+    private def writeArray(as: Array[A],
+                           row: Int,
+                           sink: ByteBuffer): Option[S] =
       if (row < as.length) {
         elemCodec.writeInit(as(row), sink) match {
           case Some(s) => Some(Right((s, as, row + 1)))
@@ -623,8 +629,11 @@ object Codec {
     def writeMore(more: S, sink: ByteBuffer): Option[S] = more match {
       case Left(as) => writeInit(as, sink)
       case Right((s, as, row)) =>
-        elemCodec.writeMore(s, sink) map (s => Right((s, as, row))) orElse writeArray(
-            as, row, sink)
+        elemCodec
+          .writeMore(s, sink) map (s => Right((s, as, row))) orElse writeArray(
+          as,
+          row,
+          sink)
     }
 
     def read(src: ByteBuffer): Array[A] = {
@@ -727,7 +736,7 @@ object Codec {
 
     override def skip(buf: ByteBuffer) {
       var b = buf.get()
-      while ( (b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
+      while ((b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
         b = buf.get()
       }
     }
@@ -770,7 +779,8 @@ object Codec {
       }
 
       val len = rec(bs.toList, 0, size, 0)
-      java.util.Arrays.copyOf(bytes, (len >>> 3) + 1) // The +1 covers the extra 2 '0' bits.
+      java.util.Arrays
+        .copyOf(bytes, (len >>> 3) + 1) // The +1 covers the extra 2 '0' bits.
     }
 
     def readBitSet(src: ByteBuffer): BitSet = {
@@ -849,7 +859,7 @@ object Codec {
 
     override def skip(buf: ByteBuffer) {
       var b = buf.get()
-      while ( (b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
+      while ((b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
         b = buf.get()
       }
     }
@@ -926,7 +936,8 @@ object Codec {
       }
 
       val len = rec(RawBitSet.toList(bs), 0, size, 0)
-      java.util.Arrays.copyOf(bytes, (len >>> 3) + 1) // The +1 covers the extra 2 '0' bits.
+      java.util.Arrays
+        .copyOf(bytes, (len >>> 3) + 1) // The +1 covers the extra 2 '0' bits.
     }
 
     def readBitSet(src: ByteBuffer): RawBitSet = {

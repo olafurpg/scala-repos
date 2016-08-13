@@ -25,7 +25,7 @@ package object financial {
       val fromPv = presentValue * math.pow(1.0 + rate, numPeriods)
       val fromPayments =
         payment * ((1.0 + rate * when.t) / rate) *
-        (math.pow(1.0 + rate, numPeriods) - 1.0)
+          (math.pow(1.0 + rate, numPeriods) - 1.0)
       -1 * (fromPv + fromPayments)
     }
   }
@@ -42,7 +42,7 @@ package object financial {
       val denominator = math.pow(1.0 + rate, numPeriods)
       val fromPayments =
         payment * ((1.0 + rate * when.t) / rate) *
-        (math.pow(1.0 + rate, numPeriods) - 1.0)
+          (math.pow(1.0 + rate, numPeriods) - 1.0)
       -1 * (futureValue + fromPayments) / denominator
     }
   }
@@ -85,8 +85,9 @@ package object financial {
     } else {
       val denominator =
         ((1.0 + rate * when.t) / rate) *
-        (math.pow(1.0 + rate, numPeriods) - 1.0)
-      -1 * (futureValue + presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
+          (math.pow(1.0 + rate, numPeriods) - 1.0)
+      -1 * (futureValue + presentValue * math
+        .pow(1.0 + rate, numPeriods)) / denominator
     }
   }
 
@@ -98,7 +99,7 @@ package object financial {
     : (DenseVector[Double], DenseVector[Double], DenseVector[Double]) = {
     if (when == Start) {
       throw new IllegalArgumentException(
-          "This method is broken for payment at the start of the period!")
+        "This method is broken for payment at the start of the period!")
     }
     val pmt = payment(rate, numPeriods, presentValue, futureValue, when)
     val interestPayment = DenseVector.zeros[Double](numPeriods)
@@ -106,15 +107,14 @@ package object financial {
     val principalRemaining = DenseVector.zeros[Double](numPeriods)
     var principal = presentValue
     var interest = presentValue * rate
-    cfor(0)(i => i < numPeriods, i => i + 1)(i =>
-          {
-        val ip = -1 * math.max(interest, 0)
-        interest += ip
-        principal += (pmt - ip)
-        principalRemaining(i) = principal
-        interestPayment(i) = ip
-        principalPayment(i) = pmt - ip
-        interest += (principal + interest) * rate
+    cfor(0)(i => i < numPeriods, i => i + 1)(i => {
+      val ip = -1 * math.max(interest, 0)
+      interest += ip
+      principal += (pmt - ip)
+      principalRemaining(i) = principal
+      interestPayment(i) = ip
+      principalPayment(i) = pmt - ip
+      interest += (principal + interest) * rate
     })
     (principalPayment, interestPayment, principalRemaining)
   }
@@ -159,8 +159,8 @@ package object financial {
         val nonZeroEigNum = rootEig.eigenvalues.length;
         val complexEig = DenseVector.zeros[Complex](nonZeroEigNum)
         for (i <- 0 until nonZeroEigNum) {
-          complexEig(i) = Complex(
-              rootEig.eigenvalues(i), rootEig.eigenvaluesComplex(i))
+          complexEig(i) =
+            Complex(rootEig.eigenvalues(i), rootEig.eigenvaluesComplex(i))
         }
 
         complexEig
@@ -170,8 +170,8 @@ package object financial {
     //pading 0 to the end
     val fullRoots =
       if (0 < trailingZeros) {
-        DenseVector.vertcat(
-            complexRoots, DenseVector.zeros[Complex](trailingZeros))
+        DenseVector
+          .vertcat(complexRoots, DenseVector.zeros[Complex](trailingZeros))
       } else {
         complexRoots
       }
@@ -180,14 +180,14 @@ package object financial {
 
   def interalRateReturn(cashflow: DenseVector[Double]): Option[Double] = {
     require(
-        cashflow(0) < 0,
-        "Input cash flows per time period. The cashflow(0) represent the initial invesment which should be negative!")
+      cashflow(0) < 0,
+      "Input cash flows per time period. The cashflow(0) represent the initial invesment which should be negative!")
 
     val res = roots(reverse(cashflow))
 
     val realRes = DenseVector[Double](
-        for (c: Complex <- res.toArray
-                              if ((c.im() == 0) && (0 < c.re()))) yield c.re()
+      for (c: Complex <- res.toArray
+           if ((c.im() == 0) && (0 < c.re()))) yield c.re()
     )
     val rates = realRes.mapValues(v => 1.0 / v - 1.0)
 
@@ -210,14 +210,14 @@ package object financial {
     val negatives = values.mapValues(x => if (x < 0) x else 0)
     if (posCnt == 0 || negCnt == 0) {
       throw new IllegalArgumentException(
-          "The values must has one positive and negative value!")
+        "The values must has one positive and negative value!")
     }
 
     val inflowNPV: Double = netPresentValue(reinvestRate, positives)
     val outflowNPV: Double = netPresentValue(financeRate, negatives)
     val mirr =
       (pow(math.abs(inflowNPV / outflowNPV), (1.0 / (n - 1))) *
-          (1.0 + reinvestRate) - 1.0)
+        (1.0 + reinvestRate) - 1.0)
     mirr
   }
 
@@ -271,8 +271,9 @@ package object financial {
     val annuityF = fv + pv * t1 + pmt * (t1 - 1) * (1.0 + rate * when.t) / rate
     val gradAnnuityF =
       nper * t2 * pv - pmt * (t1 - 1.0) * (1.0 + rate * when.t) / pow(
-          rate, 2.0) + nper * pmt * t2 * (1.0 + rate * when.t) / rate + pmt *
-      (t1 - 1) * when.t / rate
+        rate,
+        2.0) + nper * pmt * t2 * (1.0 + rate * when.t) / rate + pmt *
+        (t1 - 1) * when.t / rate
     val fDivGradF = annuityF / gradAnnuityF
     fDivGradF
   }

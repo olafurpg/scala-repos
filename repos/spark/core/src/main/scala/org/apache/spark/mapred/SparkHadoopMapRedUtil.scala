@@ -19,8 +19,12 @@ package org.apache.spark.mapred
 
 import java.io.IOException
 
-import org.apache.hadoop.mapreduce.{TaskAttemptContext => MapReduceTaskAttemptContext}
-import org.apache.hadoop.mapreduce.{OutputCommitter => MapReduceOutputCommitter}
+import org.apache.hadoop.mapreduce.{
+  TaskAttemptContext => MapReduceTaskAttemptContext
+}
+import org.apache.hadoop.mapreduce.{
+  OutputCommitter => MapReduceOutputCommitter
+}
 
 import org.apache.spark.{SparkEnv, TaskContext}
 import org.apache.spark.executor.CommitDeniedException
@@ -54,8 +58,8 @@ object SparkHadoopMapRedUtil extends Logging {
         logInfo(s"$mrTaskAttemptID: Committed")
       } catch {
         case cause: IOException =>
-          logError(
-              s"Error committing the output of task: $mrTaskAttemptID", cause)
+          logError(s"Error committing the output of task: $mrTaskAttemptID",
+                   cause)
           committer.abortTask(mrTaskContext)
           throw cause
       }
@@ -88,8 +92,10 @@ object SparkHadoopMapRedUtil extends Logging {
           logInfo(message)
           // We need to abort the task so that the driver can reschedule new attempts, if necessary
           committer.abortTask(mrTaskContext)
-          throw new CommitDeniedException(
-              message, jobId, splitId, taskAttemptNumber)
+          throw new CommitDeniedException(message,
+                                          jobId,
+                                          splitId,
+                                          taskAttemptNumber)
         }
       } else {
         // Speculation is disabled or a user has chosen to manually bypass the commit coordination
@@ -98,7 +104,7 @@ object SparkHadoopMapRedUtil extends Logging {
     } else {
       // Some other attempt committed the output, so we do nothing and signal success
       logInfo(
-          s"No need to commit output of task because needsTaskCommit=false: $mrTaskAttemptID")
+        s"No need to commit output of task because needsTaskCommit=false: $mrTaskAttemptID")
     }
   }
 }

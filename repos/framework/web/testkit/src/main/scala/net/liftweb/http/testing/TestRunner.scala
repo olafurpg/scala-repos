@@ -25,14 +25,13 @@ import net.liftweb.common.{Box, Full, Empty, Failure}
 import net.liftweb.util.{Helpers}
 import scala.collection.mutable.ListBuffer
 
-class TestRunner(
-    clearDB: Box[() => Any],
-    setupDB: Box[() => Any],
-    beforeAssertListeners: List[String => Any],
-    afterAssertListeners: List[(String, Boolean) => Any],
-    beforeTestListeners: List[String => Any],
-    afterTestListeners: List[(String, Boolean, Box[Throwable], List[
-            StackTraceElement]) => Any]) {
+class TestRunner(clearDB: Box[() => Any],
+                 setupDB: Box[() => Any],
+                 beforeAssertListeners: List[String => Any],
+                 afterAssertListeners: List[(String, Boolean) => Any],
+                 beforeTestListeners: List[String => Any],
+                 afterTestListeners: List[(String, Boolean, Box[Throwable],
+                                           List[StackTraceElement]) => Any]) {
   implicit def fToItem(f: () => Any): Item = Item(f)
 
   def setup[T](what: List[Item]): (() => TestResults, (String, () => T) => T) = {
@@ -40,12 +39,12 @@ class TestRunner(
 
     def beforeAssert(name: String): Unit = synchronized {
       log += Tracker(name, true, true, true, Empty, Nil)
-      beforeAssertListeners.foreach(_ (name))
+      beforeAssertListeners.foreach(_(name))
     }
 
     def afterAssert(name: String, success: Boolean): Unit = synchronized {
       log += Tracker(name, true, false, success, Empty, Nil)
-      afterAssertListeners.foreach(_ (name, success))
+      afterAssertListeners.foreach(_(name, success))
     }
 
     def applyAssert(name: String, f: () => T): T = synchronized {
@@ -62,7 +61,7 @@ class TestRunner(
 
     def beforeTest(name: String) {
       log += Tracker(name, false, true, true, Empty, Nil)
-      beforeTestListeners.foreach(_ (name))
+      beforeTestListeners.foreach(_(name))
     }
 
     def afterTest(name: String,
@@ -70,14 +69,14 @@ class TestRunner(
                   excp: Box[Throwable],
                   trace: List[StackTraceElement]) {
       log += Tracker(name, false, false, success, excp, trace)
-      afterTestListeners.foreach(_ (name, success, excp, trace))
+      afterTestListeners.foreach(_(name, success, excp, trace))
     }
 
     def run: TestResults = {
 
       def doResetDB {
-        clearDB.foreach(_ ())
-        setupDB.foreach(_ ())
+        clearDB.foreach(_())
+        setupDB.foreach(_())
       }
 
       doResetDB
@@ -106,12 +105,13 @@ class TestRunner(
                   combineStack(ex.getCause, ex.getStackTrace.toList ::: base)
               }
             val trace = combineStack(e, Nil)
-              .takeWhile(e =>
-                    e.getClassName != myTrace.getClassName ||
+              .takeWhile(
+                e =>
+                  e.getClassName != myTrace.getClassName ||
                     e.getFileName != myTrace.getFileName ||
                     e.getMethodName != myTrace.getMethodName)
               .dropRight(2)
-              (false, trace, Full(e))
+            (false, trace, Full(e))
         }
 
         afterTest(testItem.name, success, excp, trace)
@@ -136,20 +136,22 @@ class TestRunner(
               } catch {
                 case e: Throwable =>
                   def combineStack(
-                      ex: Throwable, base: List[StackTraceElement])
-                    : List[StackTraceElement] = ex match {
-                    case null => base
-                    case _ =>
-                      combineStack(
-                          ex.getCause, ex.getStackTrace.toList ::: base)
-                  }
+                      ex: Throwable,
+                      base: List[StackTraceElement]): List[StackTraceElement] =
+                    ex match {
+                      case null => base
+                      case _ =>
+                        combineStack(ex.getCause,
+                                     ex.getStackTrace.toList ::: base)
+                    }
                   val trace = combineStack(e, Nil)
-                    .takeWhile(e =>
-                          e.getClassName != myTrace.getClassName ||
+                    .takeWhile(
+                      e =>
+                        e.getClassName != myTrace.getClassName ||
                           e.getFileName != myTrace.getFileName ||
                           e.getMethodName != myTrace.getMethodName)
                     .dropRight(2)
-                    (false, trace, Full(e))
+                  (false, trace, Full(e))
               }
 
               afterTest(testItem.name + " thread " + n, success, excp, trace)
@@ -198,16 +200,17 @@ case class TestResults(res: List[Tracker]) {
       case (ft, fa) if ft.length == 0 && fa.length == 0 => ""
       case (ft, fa) =>
         "\n" + ft.length + " Failed Tests:\n" + ft
-          .map(v =>
-                v.name + " " + v.exception
-                  .openOrThrowException("This should be safe")
-                  .getMessage + " \n" +
+          .map(
+            v =>
+              v.name + " " + v.exception
+                .openOrThrowException("This should be safe")
+                .getMessage + " \n" +
                 v.trace.map(st => "           " + st.toString).mkString("\n"))
           .mkString("\n")
     }
 
     "Ran " + testCnt + " tests and " + assertCnt + " asserts in " +
-    (end - start) / 1000L + " seconds" + append
+      (end - start) / 1000L + " seconds" + append
   }
 }
 
@@ -224,8 +227,8 @@ class Item(val name: String,
       case (_, Full(cf)) =>
         () =>
           cf(cnt)
-        case _ => () =>
-    }
+      case _ => () =>
+      }
   }
 }
 

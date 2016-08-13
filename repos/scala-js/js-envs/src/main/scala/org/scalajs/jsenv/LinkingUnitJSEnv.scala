@@ -52,7 +52,8 @@ trait LinkingUnitJSEnv extends JSEnv {
     new LoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitLoadedLibs
-      extends LoadedLibs with LinkingUnitJSEnv {
+      extends LoadedLibs
+      with LinkingUnitJSEnv {
     val symbolRequirements: SymbolRequirement =
       LinkingUnitJSEnv.this.symbolRequirements
 
@@ -60,8 +61,8 @@ trait LinkingUnitJSEnv extends JSEnv {
                  linkingUnit: LinkingUnit,
                  postLibs: Seq[ResolvedJSDependency],
                  code: VirtualJSFile): JSRunner = {
-      LinkingUnitJSEnv.this.jsRunner(
-          loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+      LinkingUnitJSEnv.this
+        .jsRunner(loadedLibs ++ preLibs, linkingUnit, postLibs, code)
     }
   }
 
@@ -70,8 +71,8 @@ trait LinkingUnitJSEnv extends JSEnv {
 
     def name: String = LinkingUnitJSEnv.this.name
 
-    def jsRunner(
-        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner =
+    def jsRunner(libs: Seq[ResolvedJSDependency],
+                 code: VirtualJSFile): JSRunner =
       LinkingUnitJSEnv.this.jsRunner(Nil, loadedUnit, libs, code)
   }
 }

@@ -52,8 +52,8 @@ object ActivitySource {
   ): ActivitySource[Buf] =
     new CachingActivitySource(new ClassLoaderActivitySource(cl))
 
-  private[ActivitySource] class OrElse[T, U >: T](
-      primary: ActivitySource[T], failover: ActivitySource[U])
+  private[ActivitySource] class OrElse[T, U >: T](primary: ActivitySource[T],
+                                                  failover: ActivitySource[U])
       extends ActivitySource[U] {
     def get(name: String): Activity[U] = {
       primary.get(name) transform {
@@ -112,7 +112,7 @@ class CachingActivitySource[T](underlying: ActivitySource[T])
 /**
   * An ActivitySource for observing the contents of a file with periodic polling.
   */
-class FilePollingActivitySource private[exp](
+class FilePollingActivitySource private[exp] (
     period: Duration,
     pool: FuturePool
 )(implicit timer: Timer)
@@ -161,8 +161,8 @@ class FilePollingActivitySource private[exp](
 /**
   * An ActivitySource for ClassLoader resources.
   */
-class ClassLoaderActivitySource private[exp](
-    classLoader: ClassLoader, pool: FuturePool)
+class ClassLoaderActivitySource private[exp] (classLoader: ClassLoader,
+                                              pool: FuturePool)
     extends ActivitySource[Buf] {
 
   import com.twitter.io.exp.ActivitySource._
@@ -183,8 +183,10 @@ class ClassLoaderActivitySource private[exp](
           classLoader.getResourceAsStream(name) match {
             case null => p.setValue(Activity.Failed(NotFound))
             case stream =>
-              val reader = new InputStreamReader(
-                  stream, InputStreamReader.DefaultMaxBufferSize, pool)
+              val reader =
+                new InputStreamReader(stream,
+                                      InputStreamReader.DefaultMaxBufferSize,
+                                      pool)
               Reader.readAll(reader) respond {
                 case Return(buf) =>
                   p.setValue(Activity.Ok(buf))

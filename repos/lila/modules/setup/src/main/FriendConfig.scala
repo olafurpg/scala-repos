@@ -13,7 +13,8 @@ case class FriendConfig(variant: chess.variant.Variant,
                         mode: Mode,
                         color: Color,
                         fen: Option[String] = None)
-    extends HumanConfig with Positional {
+    extends HumanConfig
+    with Positional {
 
   val strictFen = false
 
@@ -42,14 +43,14 @@ object FriendConfig extends BaseHumanConfig {
          c: String,
          fen: Option[String]) =
     new FriendConfig(
-        variant = chess.variant.Variant(v) err "Invalid game variant " + v,
-        timeMode = TimeMode(tm) err s"Invalid time mode $tm",
-        time = t,
-        increment = i,
-        days = d,
-        mode = m.fold(Mode.default)(Mode.orDefault),
-        color = Color(c) err "Invalid color " + c,
-        fen = fen)
+      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
+      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      time = t,
+      increment = i,
+      days = d,
+      mode = m.fold(Mode.default)(Mode.orDefault),
+      color = Color(c) err "Invalid color " + c,
+      fen = fen)
 
   val default = FriendConfig(variant = variantDefault,
                              timeMode = TimeMode.Unlimited,

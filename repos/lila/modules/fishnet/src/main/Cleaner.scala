@@ -34,10 +34,11 @@ private final class Cleaner(repo: FishnetRepo,
 
   private def cleanAnalysis: Funit =
     analysisColl
-      .find(BSONDocument(
-              "acquired.date" -> BSONDocument(
-                  "$lt" -> durationAgo(analysisTimeoutBase))
-          ))
+      .find(
+        BSONDocument(
+          "acquired.date" -> BSONDocument(
+            "$lt" -> durationAgo(analysisTimeoutBase))
+        ))
       .sort(BSONDocument("acquired.date" -> 1))
       .cursor[Work.Analysis]()
       .collect[List](100)

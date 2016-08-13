@@ -5,8 +5,14 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{JavaPsiFacade, PsiElement, PsiMethod}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScAnnotationsHolder
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScTypedDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner,
+  ScTypedDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * @author Alefas
@@ -19,15 +25,16 @@ class StaticPsiTypedDefinitionWrapper(
     extends {
   val elementFactory =
     JavaPsiFacade.getInstance(typedDefinition.getProject).getElementFactory
-  val methodText = StaticPsiTypedDefinitionWrapper.methodText(
-      typedDefinition, role, containingClass)
+  val methodText = StaticPsiTypedDefinitionWrapper
+    .methodText(typedDefinition, role, containingClass)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
     } catch {
       case e: Exception =>
         elementFactory.createMethodFromText(
-            "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
+          "public void FAILED_TO_DECOMPILE_METHOD() {}",
+          containingClass)
     }
   }
 } with LightMethodAdapter(typedDefinition.getManager, method, containingClass)
@@ -71,7 +78,7 @@ object StaticPsiTypedDefinitionWrapper {
       case _ if role == SETTER || role == EQ => builder.append("void")
       case Success(tp, _) =>
         builder.append(
-            JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
+          JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
       case _ => builder.append("java.lang.Object")
     }
 
@@ -95,7 +102,7 @@ object StaticPsiTypedDefinitionWrapper {
       result match {
         case Success(tp, _) =>
           builder.append(
-              JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
+            JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
         case _ => builder.append("java.lang.Object")
       }
       builder.append(" ").append(b.getName).append(")")

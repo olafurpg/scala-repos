@@ -70,7 +70,8 @@ object ActorWithStashSpec {
   }
 
   class TerminatedMessageStashingActor(probe: ActorRef)
-      extends Actor with Stash {
+      extends Actor
+      with Stash {
     val watched = context.watch(context.actorOf(Props[WatchedActor]))
     var stashed = false
 
@@ -103,7 +104,8 @@ class JavaActorWithStashSpec extends StashJavaAPI with JUnitSuiteLike
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorWithStashSpec
-    extends AkkaSpec(ActorWithStashSpec.testConf) with DefaultTimeout
+    extends AkkaSpec(ActorWithStashSpec.testConf)
+    with DefaultTimeout
     with BeforeAndAfterEach {
   import ActorWithStashSpec._
 
@@ -144,9 +146,11 @@ class ActorWithStashSpec
     }
 
     "process stashed messages after restart" in {
-      val boss = system.actorOf(Props(new Supervisor(OneForOneStrategy(
-                      maxNrOfRetries = 2, withinTimeRange = 1 second)(List(
-                          classOf[Throwable])))))
+      val boss = system.actorOf(
+        Props(
+          new Supervisor(
+            OneForOneStrategy(maxNrOfRetries = 2, withinTimeRange = 1 second)(
+              List(classOf[Throwable])))))
 
       val restartLatch = new TestLatch
       val hasMsgLatch = new TestLatch
@@ -191,8 +195,7 @@ class ActorWithStashSpec
 
     "allow using whenRestarted" in {
       import ActorDSL._
-      val a = actor(
-          new ActWithStash {
+      val a = actor(new ActWithStash {
         become {
           case "die" ⇒ throw new RuntimeException("dying")
         }
@@ -208,8 +211,7 @@ class ActorWithStashSpec
 
     "allow using whenStopping" in {
       import ActorDSL._
-      val a = actor(
-          new ActWithStash {
+      val a = actor(new ActWithStash {
         whenStopping {
           testActor ! "stopping"
         }

@@ -34,8 +34,8 @@ object Test {
 
       assertFunction(deserializedCollection, expectedSize)
       assert(
-          deserializedCollection.getClass == collection.getClass,
-          "collection class should remain the same after deserialization (" +
+        deserializedCollection.getClass == collection.getClass,
+        "collection class should remain the same after deserialization (" +
           deserializedCollection.getClass + " != " + collection.getClass + ")")
       Foo.hashCodeModifier = 0
     }
@@ -71,8 +71,8 @@ object Test {
            "expected set size: " + expectedSize + ", actual size: " + set.size)
     set.foreach { e =>
       assert(
-          set.contains(e),
-          "contains should return true for element in the set, element: " + e)
+        set.contains(e),
+        "contains should return true for element in the set, element: " + e)
     }
   }
 

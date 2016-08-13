@@ -22,5 +22,5 @@ class SaslSslConsumerTest extends BaseConsumerTest with SaslTestHarness {
   this.serverConfig.setProperty(KafkaConfig.ZkEnableSecureAclsProp, "true")
   override protected def securityProtocol = SecurityProtocol.SASL_SSL
   override protected lazy val trustStoreFile = Some(
-      File.createTempFile("truststore", ".jks"))
+    File.createTempFile("truststore", ".jks"))
 }

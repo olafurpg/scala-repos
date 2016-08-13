@@ -204,7 +204,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
       List(1).? must beTrue
     }
     "provide a replace method to replace one element of the list at a given position (0-based index)." +
-    " If the position is negative, the first element is replaced" in {
+      " If the position is negative, the first element is replaced" in {
       List(1, 2, 3).replace(1, 4) must_== List(1, 4, 3)
       List(1, 2, 3).replace(4, 4) must_== List(1, 2, 3)
       List(1, 2, 3).replace(-1, 4) must_== List(4, 2, 3)

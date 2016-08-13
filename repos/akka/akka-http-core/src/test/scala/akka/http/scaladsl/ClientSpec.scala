@@ -15,7 +15,8 @@ import scala.concurrent.{Await}
 
 class ClientSpec extends WordSpec with Matchers {
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.loggers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.stdout-loglevel = ERROR

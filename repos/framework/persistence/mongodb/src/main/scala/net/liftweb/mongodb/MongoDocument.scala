@@ -52,7 +52,8 @@ trait MongoDocument[BaseDocument] extends JsonObject[BaseDocument] {
  * extend case class companion objects with this trait
  */
 trait MongoDocumentMeta[BaseDocument]
-    extends JsonObjectMeta[BaseDocument] with MongoMeta[BaseDocument] {
+    extends JsonObjectMeta[BaseDocument]
+    with MongoMeta[BaseDocument] {
 
   /**
     * Override this to specify a ConnectionIdentifier.
@@ -78,13 +79,12 @@ trait MongoDocumentMeta[BaseDocument]
     * Find a single row by a qry, using a DBObject.
     */
   def find(qry: DBObject): Option[BaseDocument] = {
-    MongoDB.useCollection(connectionIdentifier, collectionName)(
-        coll =>
-          coll.findOne(qry) match {
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll =>
+      coll.findOne(qry) match {
         case null => None
         case dbo => {
-            Some(create(dbo))
-          }
+          Some(create(dbo))
+        }
     })
   }
 
@@ -125,14 +125,12 @@ trait MongoDocumentMeta[BaseDocument]
   def findAll: List[BaseDocument] = {
     import scala.collection.JavaConversions._
 
-    MongoDB.useCollection(connectionIdentifier, collectionName)(
-        coll =>
-          {
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll => {
 
-        /** Mongo Cursors are both Iterable and Iterator,
-          * so we need to reduce ambiguity for implicits
-          */
-        (coll.find: Iterator[DBObject]).map(create).toList
+      /** Mongo Cursors are both Iterable and Iterator,
+        * so we need to reduce ambiguity for implicits
+        */
+      (coll.find: Iterator[DBObject]).map(create).toList
     })
   }
 
@@ -146,28 +144,21 @@ trait MongoDocumentMeta[BaseDocument]
 
     val findOpts = opts.toList
 
-    MongoDB.useCollection(connectionIdentifier, collectionName)(coll =>
-          {
-        val cur = coll
-          .find(qry)
-          .limit(
-              findOpts
-                .find(_.isInstanceOf[Limit])
-                .map(x => x.value)
-                .getOrElse(0)
-            )
-          .skip(
-              findOpts
-                .find(_.isInstanceOf[Skip])
-                .map(x => x.value)
-                .getOrElse(0)
-            )
-        sort.foreach(s => cur.sort(s))
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll => {
+      val cur = coll
+        .find(qry)
+        .limit(
+          findOpts.find(_.isInstanceOf[Limit]).map(x => x.value).getOrElse(0)
+        )
+        .skip(
+          findOpts.find(_.isInstanceOf[Skip]).map(x => x.value).getOrElse(0)
+        )
+      sort.foreach(s => cur.sort(s))
 
-        /** Mongo Cursors are both Iterable and Iterator,
-          * so we need to reduce ambiguity for implicits
-          */
-        (cur: Iterator[DBObject]).map(create).toList
+      /** Mongo Cursors are both Iterable and Iterator,
+        * so we need to reduce ambiguity for implicits
+        */
+      (cur: Iterator[DBObject]).map(create).toList
     })
   }
 
@@ -180,8 +171,9 @@ trait MongoDocumentMeta[BaseDocument]
   /**
     * Find all documents using a DBObject query with sort
     */
-  def findAll(
-      qry: DBObject, sort: DBObject, opts: FindOption*): List[BaseDocument] =
+  def findAll(qry: DBObject,
+              sort: DBObject,
+              opts: FindOption*): List[BaseDocument] =
     findAll(qry, Some(sort), opts: _*)
 
   /**
@@ -193,10 +185,12 @@ trait MongoDocumentMeta[BaseDocument]
   /**
     * Find all documents using a JObject query with sort
     */
-  def findAll(
-      qry: JObject, sort: JObject, opts: FindOption*): List[BaseDocument] =
-    findAll(
-        JObjectParser.parse(qry), Some(JObjectParser.parse(sort)), opts: _*)
+  def findAll(qry: JObject,
+              sort: JObject,
+              opts: FindOption*): List[BaseDocument] =
+    findAll(JObjectParser.parse(qry),
+            Some(JObjectParser.parse(sort)),
+            opts: _*)
 
   /**
     * Find all documents using a k, v query
@@ -217,10 +211,8 @@ trait MongoDocumentMeta[BaseDocument]
    * Save a document to the db
    */
   def save(in: BaseDocument) {
-    MongoDB.use(connectionIdentifier)(
-        db =>
-          {
-        save(in, db)
+    MongoDB.use(connectionIdentifier)(db => {
+      save(in, db)
     })
   }
 
@@ -242,10 +234,8 @@ trait MongoDocumentMeta[BaseDocument]
    * Update document with a JObject query
    */
   def update(qry: JObject, newbd: BaseDocument, opts: UpdateOption*) {
-    MongoDB.use(connectionIdentifier)(
-        db =>
-          {
-        update(qry, newbd, db, opts: _*)
+    MongoDB.use(connectionIdentifier)(db => {
+      update(qry, newbd, db, opts: _*)
     })
   }
 }

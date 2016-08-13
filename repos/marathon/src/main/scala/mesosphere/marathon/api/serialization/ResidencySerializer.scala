@@ -8,7 +8,7 @@ object ResidencySerializer {
     ResidencyDefinition
       .newBuilder()
       .setRelaunchEscalationTimeoutSeconds(
-          residency.relaunchEscalationTimeoutSeconds)
+        residency.relaunchEscalationTimeoutSeconds)
       .setTaskLostBehavior(residency.taskLostBehavior)
       .build()
 

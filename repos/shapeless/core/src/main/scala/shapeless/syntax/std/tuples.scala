@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-15 Miles Sabin 
+ * Copyright (c) 2013-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ final class TupleOps[T](t: T) extends Serializable {
   /**
     * Returns the first element of type `U` of this tuple plus the remainder of the tuple. An explicit type argument
     * must be provided. Available only if there is evidence that this tuple has an element of type `U`.
-    * 
+    *
     * The `Elem` suffix is here for consistency with the corresponding method name for `HList` and should be
     * removed when the latter is removed.
     */
@@ -176,7 +176,7 @@ final class TupleOps[T](t: T) extends Serializable {
   /**
     * Replaces the first element of type `U` of this tuple with the supplied value, also of type `U`. Available only
     * if there is evidence that this tuple has an element of type `U`.
-    * 
+    *
     * The `Elem` suffix is here for consistency with the corresponding method name for `HList` and should be
     * removed when the latter is removed.
     */
@@ -473,7 +473,7 @@ final class TupleOps[T](t: T) extends Serializable {
   /**
     * Converts this tuple to an `Array` of elements typed as the least upper bound of the types of the elements
     * of this tuple.
-    * 
+    *
     * It is advisable to specify the type parameter explicitly, because for many reference types, case classes in
     * particular, the inferred type will be too precise (ie. `Product with Serializable with CC` for a typical case class
     * `CC`) which interacts badly with the invariance of `Array`s.
@@ -529,7 +529,7 @@ final class TupleOps[T](t: T) extends Serializable {
 
   /**
     *
-    * Produces a new tuple where a slice of this tuple is replaced by another. Available only if there are at least 
+    * Produces a new tuple where a slice of this tuple is replaced by another. Available only if there are at least
     * ``n`` plus ``m`` elements.
     */
   def patch[In](n: Nat, in: In, m: Nat)(

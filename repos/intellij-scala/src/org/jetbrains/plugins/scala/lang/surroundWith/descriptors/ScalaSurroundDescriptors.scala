@@ -12,9 +12,9 @@ import com.intellij.lang.surroundWith.SurroundDescriptor
 
 class ScalaSurroundDescriptors extends SurroundDescriptors {
   private val SURROUND_DESCRIPTORS: Array[SurroundDescriptor] = Array.apply(
-      new ScalaExpressionSurroundDescriptor(),
-      new ScalaDocCommentDataSurroundDescriptor(),
-      new ScalaIgnoreErrorHighlightingSurroundDescriptor()
+    new ScalaExpressionSurroundDescriptor(),
+    new ScalaDocCommentDataSurroundDescriptor(),
+    new ScalaIgnoreErrorHighlightingSurroundDescriptor()
   )
 
   override def getSurroundDescriptors: Array[SurroundDescriptor] =

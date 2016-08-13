@@ -37,7 +37,8 @@ trait Factory extends SimpleInjector {
     */
   abstract class FactoryMaker[T](_default: Vendor[T])(
       implicit man: Manifest[T])
-      extends StackableMaker[T] with Vendor[T] {
+      extends StackableMaker[T]
+      with Vendor[T] {
     registerInjection(this)(man)
 
     /**

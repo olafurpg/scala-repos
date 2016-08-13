@@ -39,7 +39,8 @@ object Test extends DirectTest {
     settings.Xprintpos.value = true
     settings.Yrangepos.value = true
     val command = new CompilerCommand(
-        (CommandLineParser tokenize extraSettings) ++ args.toList, settings)
+      (CommandLineParser tokenize extraSettings) ++ args.toList,
+      settings)
     Global(command.settings, new ConsoleReporter(settings))
   }
 }

@@ -31,10 +31,10 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
   // This doesn't mean you can't have multiple key managers, but that you can't have multiple key managers of
   // the same class, i.e. you can't have two X509KeyManagers in the array.
 
-  def getClientAliases(
-      keyType: String, issuers: Array[Principal]): Array[String] = {
+  def getClientAliases(keyType: String,
+                       issuers: Array[Principal]): Array[String] = {
     logger.debug(
-        s"getClientAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
+      s"getClientAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
 
     val clientAliases = new ArrayBuffer[String]
     withKeyManagers { keyManager =>
@@ -52,13 +52,13 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
                         issuers: Array[Principal],
                         socket: Socket): String = {
     logger.debug(
-        s"chooseClientAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, socket = $socket")
+      s"chooseClientAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, socket = $socket")
 
     withKeyManagers { keyManager =>
       val clientAlias = keyManager.chooseClientAlias(keyType, issuers, socket)
       if (clientAlias != null) {
         logger.debug(
-            s"chooseClientAlias: using clientAlias $clientAlias with keyManager $keyManager")
+          s"chooseClientAlias: using clientAlias $clientAlias with keyManager $keyManager")
         return clientAlias
       }
     }
@@ -69,15 +69,15 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
                                        issuers: Array[Principal],
                                        engine: SSLEngine): String = {
     logger.debug(
-        s"chooseEngineClientAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, engine = $engine")
+      s"chooseEngineClientAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, engine = $engine")
     withKeyManagers { keyManager: X509KeyManager =>
       keyManager match {
         case extendedKeyManager: X509ExtendedKeyManager =>
-          val clientAlias = extendedKeyManager.chooseEngineClientAlias(
-              keyType, issuers, engine)
+          val clientAlias = extendedKeyManager
+            .chooseEngineClientAlias(keyType, issuers, engine)
           if (clientAlias != null) {
             logger.debug(
-                s"chooseEngineClientAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
+              s"chooseEngineClientAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
             return clientAlias
           }
         case _ =>
@@ -91,16 +91,16 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
                                        issuers: Array[Principal],
                                        engine: SSLEngine): String = {
     logger.debug(
-        s"chooseEngineServerAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, engine = $engine")
+      s"chooseEngineServerAlias: keyType = ${keyType.toSeq}, issuers = ${issuers.toSeq}, engine = $engine")
 
     withKeyManagers { keyManager: X509KeyManager =>
       keyManager match {
         case extendedKeyManager: X509ExtendedKeyManager =>
-          val clientAlias = extendedKeyManager.chooseEngineServerAlias(
-              keyType, issuers, engine)
+          val clientAlias = extendedKeyManager
+            .chooseEngineServerAlias(keyType, issuers, engine)
           if (clientAlias != null) {
             logger.debug(
-                s"chooseEngineServerAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
+              s"chooseEngineServerAlias: using clientAlias $clientAlias with keyManager $extendedKeyManager")
             return clientAlias
           }
         case _ =>
@@ -110,10 +110,10 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     null
   }
 
-  def getServerAliases(
-      keyType: String, issuers: Array[Principal]): Array[String] = {
+  def getServerAliases(keyType: String,
+                       issuers: Array[Principal]): Array[String] = {
     logger.debug(
-        s"getServerAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
+      s"getServerAliases: keyType = $keyType, issuers = ${issuers.toSeq}")
 
     val serverAliases = new ArrayBuffer[String]
     withKeyManagers { keyManager =>
@@ -127,15 +127,16 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
     nullIfEmpty(serverAliases.toArray)
   }
 
-  def chooseServerAlias(
-      keyType: String, issuers: Array[Principal], socket: Socket): String = {
+  def chooseServerAlias(keyType: String,
+                        issuers: Array[Principal],
+                        socket: Socket): String = {
     logger.debug(
-        s"chooseServerAlias: keyType = $keyType, issuers = ${issuers.toSeq}, socket = $socket")
+      s"chooseServerAlias: keyType = $keyType, issuers = ${issuers.toSeq}, socket = $socket")
     withKeyManagers { keyManager =>
       val serverAlias = keyManager.chooseServerAlias(keyType, issuers, socket)
       if (serverAlias != null) {
         logger.debug(
-            s"chooseServerAlias: using serverAlias $serverAlias with keyManager $keyManager")
+          s"chooseServerAlias: using serverAlias $serverAlias with keyManager $keyManager")
         return serverAlias
       }
     }
@@ -148,7 +149,7 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
       val chain = keyManager.getCertificateChain(alias)
       if (chain != null && chain.length > 0) {
         logger.debug(
-            s"getCertificateChain: chain ${debugChain(chain)} with keyManager $keyManager")
+          s"getCertificateChain: chain ${debugChain(chain)} with keyManager $keyManager")
         return chain
       }
     }
@@ -161,7 +162,7 @@ class CompositeX509KeyManager(keyManagers: Seq[X509KeyManager])
       val privateKey = keyManager.getPrivateKey(alias)
       if (privateKey != null) {
         logger.debug(
-            s"getPrivateKey: privateKey $privateKey with keyManager $keyManager")
+          s"getPrivateKey: privateKey $privateKey with keyManager $keyManager")
         return privateKey
       }
     }

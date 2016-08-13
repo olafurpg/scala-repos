@@ -26,86 +26,89 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
     checkResultByText(resultText)
   }
 
-  protected def genericCompletionComprasion(
-      initialText: String, finalText: String, preferedLookupString: String) {
+  protected def genericCompletionComprasion(initialText: String,
+                                            finalText: String,
+                                            preferedLookupString: String) {
     genericCompletionComparison(
-        initialText,
-        finalText,
-        (le: LookupElement) => le.getLookupString == preferedLookupString)
+      initialText,
+      finalText,
+      (le: LookupElement) => le.getLookupString == preferedLookupString)
   }
 
   def testTagNameCompletion() {
     genericCompletionComprasion(
-        """
+      """
       | /**
       |  * @par<caret>
       |  */
       | def f(i: Int) { }
       """,
-        """
+      """
       | /**
       |  * @param
       |  */
       | def f(i: Int) { }
       """,
-        "param"
+      "param"
     )
   }
 
   def testTagValueCompletion() {
     genericCompletionComprasion(
-        """
+      """
       | /**
       |  * @param par<caret>
       |  */
       | def f(param: String) {}
       """,
-        """
+      """
       | /**
       |  * @param param
       |  */
       | def f(param: String) {}
       """,
-        "param"
+      "param"
     )
   }
 
   def testLinkCodeCompletion() {
     genericCompletionComparison(
-        """
+      """
       | /**
       |  *
       |  * [[HashM<caret>
       |  */
       """,
-        """
+      """
       | /**
       |  *
       |  * [[java.util.HashMap
       |  */
       """,
-        (al: LookupElement) =>
-          al.getObject.asInstanceOf[PsiClass].qualifiedName == "java.util.HashMap"
+      (al: LookupElement) =>
+        al.getObject
+          .asInstanceOf[PsiClass]
+          .qualifiedName == "java.util.HashMap"
     )
   }
 
   def testTagValueFilteredCompletion() {
     genericCompletionComprasion(
-        """
+      """
       |/**
       | * @param iii
       | * @param i<caret>
       | */
       | def f(iii: Int, ikk: Int) {}
       """,
-        """
+      """
       |/**
       | * @param iii
       | * @param ikk
       | */
       | def f(iii: Int, ikk: Int) {}
       """,
-        "ikk"
+      "ikk"
     )
   }
 }

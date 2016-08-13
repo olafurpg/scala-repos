@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ParallelCameraSpec
     extends SimpleSFXDelegateSpec[jfxs.ParallelCamera, ParallelCamera](
-        classOf[jfxs.ParallelCamera], classOf[ParallelCamera])
+      classOf[jfxs.ParallelCamera],
+      classOf[ParallelCamera])

@@ -9,8 +9,7 @@ import org.objectweb.asm._
 
 import scala.collection.immutable.Queue
 
-trait ClassfileIndexer {
-  this: SLF4JLogging =>
+trait ClassfileIndexer { this: SLF4JLogging =>
 
   /**
     * @param file to index
@@ -44,7 +43,8 @@ trait ClassfileIndexer {
     }
 
   private class AsmCallback
-      extends ClassVisitor(ASM5) with ReferenceInClassHunter {
+      extends ClassVisitor(ASM5)
+      with ReferenceInClassHunter {
     // updated every time we get more info
     var clazz: RawClassfile = _
 
@@ -58,15 +58,15 @@ trait ClassfileIndexer {
     ): Unit = {
 
       clazz = RawClassfile(
-          ClassName.fromInternal(name),
-          Option(signature),
-          Option(superName).map(ClassName.fromInternal),
-          interfaces.toList.map(ClassName.fromInternal),
-          Access(access),
-          (ACC_DEPRECATED & access) > 0,
-          Queue.empty,
-          Queue.empty,
-          RawSource(None, None)
+        ClassName.fromInternal(name),
+        Option(signature),
+        Option(superName).map(ClassName.fromInternal),
+        interfaces.toList.map(ClassName.fromInternal),
+        Access(access),
+        (ACC_DEPRECATED & access) > 0,
+        Queue.empty,
+        Queue.empty,
+        RawSource(None, None)
       )
     }
 
@@ -80,10 +80,10 @@ trait ClassfileIndexer {
                             signature: String,
                             value: AnyRef): FieldVisitor = {
       val field = RawField(
-          MemberName(clazz.name, name),
-          ClassName.fromDescriptor(desc),
-          Option(signature),
-          Access(access)
+        MemberName(clazz.name, name),
+        ClassName.fromDescriptor(desc),
+        Option(signature),
+        Access(access)
       )
       clazz = clazz.copy(fields = clazz.fields :+ field)
       super.visitField(access, name, desc, signature, value)
@@ -111,8 +111,8 @@ trait ClassfileIndexer {
                 case (_, None) =>
                 case (Some(existing), Some(latest)) if existing <= latest =>
                 case _ =>
-                  clazz = clazz.copy(
-                      source = clazz.source.copy(line = firstLine))
+                  clazz =
+                    clazz.copy(source = clazz.source.copy(line = firstLine))
               }
 
             case name =>
@@ -131,8 +131,7 @@ trait ClassfileIndexer {
 
   // factors out much of the verbose code that looks for references to members
   // TODO: we need a classesInSignature (which needs the ability to parse signature)
-  private trait ReferenceInClassHunter {
-    this: ClassVisitor =>
+  private trait ReferenceInClassHunter { this: ClassVisitor =>
 
     def clazz: RawClassfile
 
@@ -181,8 +180,9 @@ trait ClassfileIndexer {
       addRef(ClassName.fromInternal(name))
     }
 
-    override def visitOuterClass(
-        owner: String, name: String, desc: String): Unit = {
+    override def visitOuterClass(owner: String,
+                                 name: String,
+                                 desc: String): Unit = {
       addRef(ClassName.fromInternal(owner))
     }
 
@@ -209,8 +209,7 @@ trait ClassfileIndexer {
     ) = handleAnn(desc)
   }
 
-  private trait ReferenceInMethodHunter {
-    this: MethodVisitor =>
+  private trait ReferenceInMethodHunter { this: MethodVisitor =>
 
     protected var internalRefs = Queue.empty[FullyQualifiedName]
 
@@ -260,8 +259,10 @@ trait ClassfileIndexer {
       internalRefs = internalRefs.enqueue(classesInDescriptor(desc))
     }
 
-    override def visitInvokeDynamicInsn(
-        name: String, desc: String, bsm: Handle, bsmArgs: AnyRef*): Unit = {
+    override def visitInvokeDynamicInsn(name: String,
+                                        desc: String,
+                                        bsm: Handle,
+                                        bsmArgs: AnyRef*): Unit = {
       internalRefs :+= memberOrInit(bsm.getOwner, bsm.getName)
       internalRefs = internalRefs.enqueue(classesInDescriptor(bsm.getDesc))
     }

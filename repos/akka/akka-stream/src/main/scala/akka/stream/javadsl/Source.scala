@@ -48,17 +48,15 @@ object Source {
     * with an empty Optional.
     */
   def maybe[T]: Source[T, CompletableFuture[Optional[T]]] = {
-    new Source(
-        scaladsl.Source
-          .maybe[T]
-          .mapMaterializedValue { scalaOptionPromise: Promise[Option[T]] ⇒
+    new Source(scaladsl.Source.maybe[T].mapMaterializedValue {
+      scalaOptionPromise: Promise[Option[T]] ⇒
         val javaOptionPromise = new CompletableFuture[Optional[T]]()
         scalaOptionPromise.completeWith(
-            javaOptionPromise.toScala.map(_.asScala)(
-                akka.dispatch.ExecutionContexts.sameThreadExecutionContext))
+          javaOptionPromise.toScala.map(_.asScala)(
+            akka.dispatch.ExecutionContexts.sameThreadExecutionContext))
 
         javaOptionPromise
-      })
+    })
   }
 
   /**
@@ -146,10 +144,10 @@ object Source {
     *
     * @see [[scala.collection.immutable.Range.inclusive(Int, Int, Int)]]
     */
-  def range(
-      start: Int, end: Int, step: Int): javadsl.Source[Integer, NotUsed] =
-    fromIterator[Integer](
-        new function.Creator[util.Iterator[Integer]]() {
+  def range(start: Int,
+            end: Int,
+            step: Int): javadsl.Source[Integer, NotUsed] =
+    fromIterator[Integer](new function.Creator[util.Iterator[Integer]]() {
       def create(): util.Iterator[Integer] =
         new Inclusive(start, end, step) {
           override def toString: String =
@@ -209,20 +207,22 @@ object Source {
       s: S,
       f: function.Function[S, Optional[Pair[S, E]]]): Source[E, NotUsed] =
     new Source(
-        scaladsl.Source.unfold(s)((s: S) ⇒ f.apply(s).asScala.map(_.toScala)))
+      scaladsl.Source.unfold(s)((s: S) ⇒ f.apply(s).asScala.map(_.toScala)))
 
   /**
     * Same as [[unfold]], but uses an async function to generate the next state-element tuple.
     */
   def unfoldAsync[S, E](
-      s: S, f: function.Function[S, CompletionStage[Optional[Pair[S, E]]]])
+      s: S,
+      f: function.Function[S, CompletionStage[Optional[Pair[S, E]]]])
     : Source[E, NotUsed] =
     new Source(
-        scaladsl.Source.unfoldAsync(s)((s: S) ⇒
-              f.apply(s)
-                .toScala
-                .map(_.asScala.map(_.toScala))(
-                    akka.dispatch.ExecutionContexts.sameThreadExecutionContext)))
+      scaladsl.Source.unfoldAsync(s)(
+        (s: S) ⇒
+          f.apply(s)
+            .toScala
+            .map(_.asScala.map(_.toScala))(
+              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)))
 
   /**
     * Create a `Source` that immediately ends the stream with the `cause` failure to every connected `Sink`.
@@ -294,13 +294,13 @@ object Source {
       second: Source[T, _ <: Any],
       rest: java.util.List[Source[T, _ <: Any]],
       strategy: function.Function[
-          java.lang.Integer, _ <: Graph[UniformFanInShape[T, U], NotUsed]])
-    : Source[U, NotUsed] = {
+        java.lang.Integer,
+        _ <: Graph[UniformFanInShape[T, U], NotUsed]]): Source[U, NotUsed] = {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Source(
-        scaladsl.Source.combine(first.asScala, second.asScala, seq: _*)(
-            num ⇒ strategy.apply(num)))
+      scaladsl.Source.combine(first.asScala, second.asScala, seq: _*)(num ⇒
+        strategy.apply(num)))
   }
 
   /**
@@ -335,9 +335,9 @@ object Source {
   def queue[T](bufferSize: Int, overflowStrategy: OverflowStrategy)
     : Source[T, SourceQueueWithComplete[T]] =
     new Source(
-        scaladsl.Source
-          .queue[T](bufferSize, overflowStrategy)
-          .mapMaterializedValue(new SourceQueueAdapter(_)))
+      scaladsl.Source
+        .queue[T](bufferSize, overflowStrategy)
+        .mapMaterializedValue(new SourceQueueAdapter(_)))
 }
 
 /**
@@ -459,8 +459,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     * Connect this `Source` to a `Sink` and run it. The returned value is the materialized value
     * of the `Sink`, e.g. the `Publisher` of a `Sink.asPublisher`.
     */
-  def runWith[M](
-      sink: Graph[SinkShape[Out], M], materializer: Materializer): M =
+  def runWith[M](sink: Graph[SinkShape[Out], M],
+                 materializer: Materializer): M =
     delegate.runWith(sink)(materializer)
 
   /**
@@ -648,7 +648,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       segmentSize: Int,
       matF: function.Function2[Mat, M, M2]): javadsl.Source[T, M2] =
     new Source(
-        delegate.interleaveMat(that, segmentSize)(combinerToScala(matF)))
+      delegate.interleaveMat(that, segmentSize)(combinerToScala(matF)))
 
   /**
     * Merge the given [[Source]] to the current one, taking elements as they arrive from input streams,
@@ -716,8 +716,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       comp: util.Comparator[U],
       matF: function.Function2[Mat, Mat2, Mat3]): javadsl.Source[U, Mat3] =
     new Source(
-        delegate.mergeSortedMat(that)(combinerToScala(matF))(
-            Ordering.comparatorToOrdering(comp)))
+      delegate.mergeSortedMat(that)(combinerToScala(matF))(
+        Ordering.comparatorToOrdering(comp)))
 
   /**
     * Combine the elements of current [[Source]] and the given one into a stream of tuples.
@@ -778,8 +778,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       combine: function.Function2[Out, Out2, Out3],
       matF: function.Function2[Mat, M, M2]): javadsl.Source[Out3, M2] =
     new Source(
-        delegate.zipWithMat[Out2, Out3, M, M2](that)(combinerToScala(combine))(
-            combinerToScala(matF)))
+      delegate.zipWithMat[Out2, Out3, M, M2](that)(combinerToScala(combine))(
+        combinerToScala(matF)))
 
   /**
     * Shortcut for running this `Source` with a foreach procedure. The given procedure is invoked
@@ -901,8 +901,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
   def statefulMapConcat[T](
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : javadsl.Source[T, Mat] =
-    new Source(
-        delegate.statefulMapConcat { () ⇒
+    new Source(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
@@ -1200,8 +1199,9 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     *
     * '''Cancels when''' downstream cancels
     */
-  def intersperse[T >: Out](
-      start: T, inject: T, end: T): javadsl.Source[T, Mat] =
+  def intersperse[T >: Out](start: T,
+                            inject: T,
+                            end: T): javadsl.Source[T, Mat] =
     new Source(delegate.intersperse(start, inject, end))
 
   /**
@@ -1276,8 +1276,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     * @param of time to shift all messages
     * @param strategy Strategy that is used when incoming elements cannot fit inside the buffer
     */
-  def delay(
-      of: FiniteDuration, strategy: DelayOverflowStrategy): Source[Out, Mat] =
+  def delay(of: FiniteDuration,
+            strategy: DelayOverflowStrategy): Source[Out, Mat] =
     new Source(delegate.delay(of, strategy))
 
   /**
@@ -1503,7 +1503,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       seed: function.Function[Out, S],
       aggregate: function.Function2[S, Out, S]): javadsl.Source[S, Mat] =
     new Source(
-        delegate.batchWeighted(max, costFn.apply, seed.apply)(aggregate.apply))
+      delegate.batchWeighted(max, costFn.apply, seed.apply)(aggregate.apply))
 
   /**
     * Allows a faster downstream to progress independently of a slower publisher by extrapolating elements from an older
@@ -1588,15 +1588,12 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     * '''Cancels when''' downstream cancels or substream cancels
     */
   def prefixAndTail(n: Int): javadsl.Source[
-      akka.japi.Pair[java.util.List[Out @uncheckedVariance],
-                     javadsl.Source[Out @uncheckedVariance, NotUsed]],
-      Mat] =
-    new Source(
-        delegate
-          .prefixAndTail(n)
-          .map {
-        case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+    akka.japi.Pair[java.util.List[Out @uncheckedVariance],
+                   javadsl.Source[Out @uncheckedVariance, NotUsed]],
+    Mat] =
+    new Source(delegate.prefixAndTail(n).map {
+      case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
+    })
 
   /**
     * This operation demultiplexes the incoming stream into separate output
@@ -1775,7 +1772,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     * '''Cancels when''' downstream cancels
     */
   def flatMapMerge[T, M](
-      breadth: Int, f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
+      breadth: Int,
+      f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
     : Source[T, Mat] =
     new Source(delegate.flatMapMerge(breadth, o ⇒ f(o)))
 
@@ -1906,8 +1904,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
                costCalculation: function.Function[Out, Integer],
                mode: ThrottleMode): javadsl.Source[Out, Mat] =
     new Source(
-        delegate.throttle(
-            cost, per, maximumBurst, costCalculation.apply _, mode))
+      delegate
+        .throttle(cost, per, maximumBurst, costCalculation.apply _, mode))
 
   /**
     * Detaches upstream demand from downstream demand without detaching the
@@ -1933,7 +1931,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       matF: function.Function2[Mat, CompletionStage[Done], M])
     : javadsl.Source[Out, M] =
     new Source(
-        delegate.watchTermination()((left, right) ⇒ matF(left, right.toJava)))
+      delegate.watchTermination()((left, right) ⇒ matF(left, right.toJava)))
 
   /**
     * Delays the initial element by the specified duration.

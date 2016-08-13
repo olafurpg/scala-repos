@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -31,16 +31,16 @@ object Kafka extends Logging {
     val optionParser = new OptionParser
     val overrideOpt = optionParser
       .accepts(
-          "override",
-          "Optional property that should override values set in server.properties file")
+        "override",
+        "Optional property that should override values set in server.properties file")
       .withRequiredArg()
       .ofType(classOf[String])
 
     if (args.length == 0) {
       CommandLineUtils.printUsageAndDie(
-          optionParser,
-          "USAGE: java [options] %s server.properties [--override property=value]*"
-            .format(classOf[KafkaServer].getSimpleName()))
+        optionParser,
+        "USAGE: java [options] %s server.properties [--override property=value]*"
+          .format(classOf[KafkaServer].getSimpleName()))
     }
 
     val props = Utils.loadProps(args(0))
@@ -50,13 +50,13 @@ object Kafka extends Logging {
 
       if (options.nonOptionArguments().size() > 0) {
         CommandLineUtils.printUsageAndDie(
-            optionParser,
-            "Found non argument parameters: " +
+          optionParser,
+          "Found non argument parameters: " +
             options.nonOptionArguments().toArray.mkString(","))
       }
 
       props.putAll(
-          CommandLineUtils.parseKeyValueArgs(options.valuesOf(overrideOpt)))
+        CommandLineUtils.parseKeyValueArgs(options.valuesOf(overrideOpt)))
     }
     props
   }

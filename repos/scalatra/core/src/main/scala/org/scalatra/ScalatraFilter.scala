@@ -62,18 +62,18 @@ trait ScalatraFilter extends Filter with ServletBase {
     request.get("org.scalatra.ScalatraFilter.requestPath") match {
       case Some(uri) => uri.toString
       case _ => {
-          val requestPath = getRequestPath
-          request.setAttribute(
-              "org.scalatra.ScalatraFilter.requestPath", requestPath)
-          requestPath.toString
-        }
+        val requestPath = getRequestPath
+        request
+          .setAttribute("org.scalatra.ScalatraFilter.requestPath", requestPath)
+        requestPath.toString
+      }
     }
   }
 
   protected def routeBasePath(implicit request: HttpServletRequest): String = {
     if (servletContext == null)
       throw new IllegalStateException(
-          "routeBasePath requires an initialized servlet context to determine the context path")
+        "routeBasePath requires an initialized servlet context to determine the context path")
     servletContext.getContextPath
   }
 

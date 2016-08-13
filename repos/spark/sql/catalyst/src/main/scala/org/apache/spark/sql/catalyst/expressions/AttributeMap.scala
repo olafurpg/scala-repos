@@ -37,7 +37,8 @@ object AttributeMap {
 }
 
 class AttributeMap[A](baseMap: Map[ExprId, (Attribute, A)])
-    extends Map[Attribute, A] with Serializable {
+    extends Map[Attribute, A]
+    with Serializable {
 
   override def get(k: Attribute): Option[A] = baseMap.get(k.exprId).map(_._2)
 

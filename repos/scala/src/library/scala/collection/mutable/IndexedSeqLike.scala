@@ -35,7 +35,8 @@ package mutable
   *  @define mayNotTerminateInf
   */
 trait IndexedSeqLike[A, +Repr]
-    extends Any with scala.collection.IndexedSeqLike[A, Repr] { self =>
+    extends Any
+    with scala.collection.IndexedSeqLike[A, Repr] { self =>
 
   override protected[this] def thisCollection: IndexedSeq[A] =
     this.asInstanceOf[IndexedSeq[A]]

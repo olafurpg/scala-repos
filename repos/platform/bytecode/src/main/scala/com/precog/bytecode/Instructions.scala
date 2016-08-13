@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -91,9 +91,11 @@ trait Instructions {
 
     case class Map1(op: UnaryOperation) extends Instruction
     case class Map2Match(op: BinaryOperation)
-        extends Instruction with JoinInstr
+        extends Instruction
+        with JoinInstr
     case class Map2Cross(op: BinaryOperation)
-        extends Instruction with JoinInstr
+        extends Instruction
+        with JoinInstr
 
     case class Reduce(red: BuiltInReduction) extends Instruction
     case class Morph1(m1: BuiltInMorphism1) extends Instruction
@@ -123,7 +125,8 @@ trait Instructions {
     case class Swap(depth: Int) extends Instruction with DataInstr
 
     case class Line(line: Int, col: Int, text: String)
-        extends Instruction with DataInstr {
+        extends Instruction
+        with DataInstr {
       override def toString = "<%d:%d>".format(line, col)
     }
 
@@ -134,9 +137,13 @@ trait Instructions {
     sealed trait RootInstr extends Instruction
 
     case class PushString(str: String)
-        extends Instruction with DataInstr with RootInstr
+        extends Instruction
+        with DataInstr
+        with RootInstr
     case class PushNum(num: String)
-        extends Instruction with DataInstr with RootInstr
+        extends Instruction
+        with DataInstr
+        with RootInstr
     case object PushTrue extends Instruction with RootInstr
     case object PushFalse extends Instruction with RootInstr
     case object PushNull extends Instruction with RootInstr
@@ -190,13 +197,14 @@ trait Instructions {
     }
 
     trait EqualityOperation extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JType.JUniverseT, JBooleanT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JType.JUniverseT, JBooleanT)
     }
 
     trait UnfixedBinaryOperation extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
+      val tpe = BinaryOperationType(JType.JUniverseT,
+                                    JType.JUniverseT,
+                                    JType.JUniverseT)
     }
 
     case class BuiltInFunction1Op(op: Op1) extends UnaryOperation {
@@ -249,12 +257,12 @@ trait Instructions {
     }
 
     case object JoinObject extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JObjectUnfixedT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JObjectUnfixedT, JObjectUnfixedT, JObjectUnfixedT)
     }
     case object JoinArray extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JArrayUnfixedT, JArrayUnfixedT, JArrayUnfixedT)
+      val tpe =
+        BinaryOperationType(JArrayUnfixedT, JArrayUnfixedT, JArrayUnfixedT)
     }
 
     case object ArraySwap extends BinaryOperation {

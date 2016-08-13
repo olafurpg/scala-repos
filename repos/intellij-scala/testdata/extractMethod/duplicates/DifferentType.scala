@@ -5,7 +5,7 @@ object DifferentType {
 
     val x = i
     println(i)
-/*end*/
+    /*end*/
   }
 
   def foofoo(y: Int) {

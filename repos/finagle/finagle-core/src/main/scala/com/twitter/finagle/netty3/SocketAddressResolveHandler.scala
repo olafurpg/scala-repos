@@ -37,10 +37,9 @@ private[finagle] object SocketAddressResolver {
 private[finagle] class SocketAddressResolveHandler(
     resolver: SocketAddressResolver,
     addr: InetSocketAddress
-)
-    extends SimpleChannelHandler {
-  override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+) extends SimpleChannelHandler {
+  override def connectRequested(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent) {
     (e, e.getValue) match {
       case (de: DownstreamChannelStateEvent, socketAddress: InetSocketAddress)
           if socketAddress.isUnresolved =>
@@ -51,13 +50,13 @@ private[finagle] class SocketAddressResolveHandler(
                 val resolvedSocketAddress =
                   new InetSocketAddress(address, socketAddress.getPort)
                 val resolvedEvent = new DownstreamChannelStateEvent(
-                    de.getChannel,
-                    de.getFuture,
-                    de.getState,
-                    resolvedSocketAddress
+                  de.getChannel,
+                  de.getFuture,
+                  de.getState,
+                  resolvedSocketAddress
                 )
-                SocketAddressResolveHandler. super.connectRequested(
-                    ctx, resolvedEvent)
+                SocketAddressResolveHandler. super
+                  .connectRequested(ctx, resolvedEvent)
               case Left(t) =>
                 de.getFuture.setFailure(t)
                 Channels.close(ctx.getChannel)

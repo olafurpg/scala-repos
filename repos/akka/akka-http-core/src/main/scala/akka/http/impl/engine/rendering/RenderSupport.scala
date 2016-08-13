@@ -30,10 +30,9 @@ private object RenderSupport {
 
   val defaultLastChunkBytes: ByteString = renderChunk(HttpEntity.LastChunk)
 
-  def CancelSecond[T, Mat](
-      first: Source[T, Mat], second: Source[T, Any]): Source[T, Mat] = {
-    Source.fromGraph(
-        GraphDSL.create(first) { implicit b ⇒ frst ⇒
+  def CancelSecond[T, Mat](first: Source[T, Mat],
+                           second: Source[T, Any]): Source[T, Mat] = {
+    Source.fromGraph(GraphDSL.create(first) { implicit b ⇒ frst ⇒
       import GraphDSL.Implicits._
       second ~> Sink.cancelled
       SourceShape(frst.out)
@@ -89,12 +88,12 @@ private object RenderSupport {
       extends PushStage[ByteString, ByteString] {
     var sent = 0L
 
-    override def onPush(
-        elem: ByteString, ctx: Context[ByteString]): SyncDirective = {
+    override def onPush(elem: ByteString,
+                        ctx: Context[ByteString]): SyncDirective = {
       sent += elem.length
       if (sent > length)
         ctx fail InvalidContentLengthException(
-            s"HTTP message had declared Content-Length $length but entity data stream amounts to more bytes")
+          s"HTTP message had declared Content-Length $length but entity data stream amounts to more bytes")
       ctx.push(elem)
     }
 
@@ -102,7 +101,7 @@ private object RenderSupport {
         ctx: Context[ByteString]): TerminationDirective = {
       if (sent < length)
         ctx fail InvalidContentLengthException(
-            s"HTTP message had declared Content-Length $length but entity data stream amounts to ${length - sent} bytes less")
+          s"HTTP message had declared Content-Length $length but entity data stream amounts to ${length - sent} bytes less")
       ctx.finish()
     }
   }
@@ -111,8 +110,8 @@ private object RenderSupport {
     import chunk._
     val renderedSize = // buffer space required for rendering (without trailer)
       CharUtils.numberOfHexDigits(data.length) +
-      (if (extension.isEmpty) 0 else extension.length + 1) + data.length + 2 +
-      2
+        (if (extension.isEmpty) 0 else extension.length + 1) + data.length + 2 +
+        2
     val r = new ByteStringRendering(renderedSize)
     r ~~% data.length
     if (extension.nonEmpty) r ~~ ';' ~~ extension

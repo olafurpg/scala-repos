@@ -10,12 +10,13 @@ import org.ensime.fixture._
 import org.ensime.util.EnsimeSpec
 
 class RefactoringHandlerSpec
-    extends EnsimeSpec with IsolatedAnalyzerFixture
+    extends EnsimeSpec
+    with IsolatedAnalyzerFixture
     with RichPresentationCompilerTestUtils {
 
   val encoding = "UTF-16"
   def original = EnsimeConfigFixture.EmptyTestProject.copy(
-      compilerArgs = List("-encoding", encoding)
+    compilerArgs = List("-encoding", encoding)
   )
 
   // transitionary methods
@@ -29,11 +30,11 @@ class RefactoringHandlerSpec
       val file = srcFile(config,
                          "abc.scala",
                          contents(
-                             "package blah",
-                             "   class Something {",
-                             "def f(i:   Int) =1",
-                             " val x = (1\u21922)",
-                             "   }"
+                           "package blah",
+                           "   class Something {",
+                           "def f(i:   Int) =1",
+                           " val x = (1\u21922)",
+                           "   }"
                          ),
                          write = true,
                          encoding = encoding)
@@ -44,11 +45,11 @@ class RefactoringHandlerSpec
       val fileContents = readSrcFile(file, encoding)
 
       val expectedContents = contents(
-          "package blah",
-          "class Something {",
-          "  def f(i: Int) = 1",
-          "  val x = (1 \u2192 2)",
-          "}"
+        "package blah",
+        "class Something {",
+        "  def f(i: Int) = 1",
+        "  val x = (1 \u2192 2)",
+        "}"
       )
       fileContents should ===(expectedContents)
     }
@@ -57,17 +58,17 @@ class RefactoringHandlerSpec
   it should "format files from ContentsSourceFileInfo with handleFormatFile" in {
     withAnalyzer { (dir, analyzerRef) =>
       val content = contents(
-          "package blah",
-          "   class  Something   {}"
+        "package blah",
+        "   class  Something   {}"
       )
       val analyzer = analyzerRef.underlyingActor
 
       val formatted = analyzer.handleFormatFile(
-          ContentsSourceFileInfo(new File("abc.scala"), content))
+        ContentsSourceFileInfo(new File("abc.scala"), content))
       val expectedContents = contents(
-          "package blah",
-          "class Something {}",
-          ""
+        "package blah",
+        "class Something {}",
+        ""
       )
       formatted should ===(expectedContents)
     }
@@ -78,8 +79,8 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "package blah",
-                             "   class  Something   {}"
+                           "package blah",
+                           "   class  Something   {}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -87,11 +88,11 @@ class RefactoringHandlerSpec
       val analyzer = analyzerRef.underlyingActor
 
       val formatted = analyzer.handleFormatFile(
-          ContentsInSourceFileInfo(new File("abc.scala"), new File(file.path)))
+        ContentsInSourceFileInfo(new File("abc.scala"), new File(file.path)))
       val expectedContents = contents(
-          "package blah",
-          "class Something {}",
-          ""
+        "package blah",
+        "class Something {}",
+        ""
       )
       formatted should ===(expectedContents)
     }
@@ -102,8 +103,8 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "abc.scala",
                          contents(
-                             "package blah",
-                             "   class  Something   {}"
+                           "package blah",
+                           "   class  Something   {}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -113,9 +114,9 @@ class RefactoringHandlerSpec
       val formatted =
         analyzer.handleFormatFile(SourceFileInfo(new File(file.path)))
       val expectedContents = contents(
-          "package blah",
-          "class Something {}",
-          ""
+        "package blah",
+        "class Something {}",
+        ""
       )
       formatted === (expectedContents)
     }
@@ -126,8 +127,8 @@ class RefactoringHandlerSpec
       val file = srcFile(config,
                          "abc.scala",
                          contents(
-                             "package blah",
-                             "invalid scala syntax"
+                           "package blah",
+                           "invalid scala syntax"
                          ),
                          write = true,
                          encoding = encoding)
@@ -138,8 +139,8 @@ class RefactoringHandlerSpec
       val fileContents = readSrcFile(file, encoding)
 
       val expectedContents = contents(
-          "package blah",
-          "invalid scala syntax"
+        "package blah",
+        "invalid scala syntax"
       )
       fileContents should ===(expectedContents)
   }
@@ -157,15 +158,15 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "import java.lang.Integer.{valueOf => vo}",
-                             "import java.lang.Integer.toBinaryString",
-                             "import java.lang.String.valueOf",
-                             " ",
-                             "trait Temp {",
-                             "  valueOf(5)",
-                             "  vo(\"5\")",
-                             "  toBinaryString(27)",
-                             "}"
+                           "import java.lang.Integer.{valueOf => vo}",
+                           "import java.lang.Integer.toBinaryString",
+                           "import java.lang.String.valueOf",
+                           " ",
+                           "trait Temp {",
+                           "  valueOf(5)",
+                           "  vo(\"5\")",
+                           "  toBinaryString(27)",
+                           "}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -174,27 +175,27 @@ class RefactoringHandlerSpec
 
       val procId = 1
       analyzer.handleRefactorPrepareRequest(
-          new PrepareRefactorReq(
-              procId,
-              'Ignored,
-              OrganiseImportsRefactorDesc(new File(file.path)),
-              false
-          )
+        new PrepareRefactorReq(
+          procId,
+          'Ignored,
+          OrganiseImportsRefactorDesc(new File(file.path)),
+          false
+        )
       )
       analyzer.handleRefactorExec(
-          new ExecRefactorReq(procId, RefactorType.OrganizeImports)
+        new ExecRefactorReq(procId, RefactorType.OrganizeImports)
       )
 
       val formatted = readSrcFile(file, encoding)
       val expectedContents = contents(
-          "import java.lang.Integer.{valueOf => vo, toBinaryString}",
-          "import java.lang.String.valueOf",
-          " ",
-          "trait Temp {",
-          "  valueOf(5)",
-          "  vo(\"5\")",
-          "  toBinaryString(27)",
-          "}"
+        "import java.lang.Integer.{valueOf => vo, toBinaryString}",
+        "import java.lang.String.valueOf",
+        " ",
+        "trait Temp {",
+        "  valueOf(5)",
+        "  vo(\"5\")",
+        "  toBinaryString(27)",
+        "}"
       )
       formatted should ===(expectedContents)
   }
@@ -204,14 +205,14 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "import java.lang.Integer.toBinaryString",
-                             "import java.lang.String.valueOf",
-                             "",
-                             "trait Temp {",
-                             "  valueOf(5)",
-                             "  vo(\"5\")",
-                             "  toBinaryString(27)",
-                             "}"
+                           "import java.lang.Integer.toBinaryString",
+                           "import java.lang.String.valueOf",
+                           "",
+                           "trait Temp {",
+                           "  valueOf(5)",
+                           "  vo(\"5\")",
+                           "  toBinaryString(27)",
+                           "}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -220,30 +221,30 @@ class RefactoringHandlerSpec
 
       val procId = 1
       analyzer.handleRefactorPrepareRequest(
-          new PrepareRefactorReq(
-              procId,
-              'Ignored,
-              AddImportRefactorDesc("java.lang.Integer.{valueOf => vo}",
-                                    new File(file.path)),
-              false
-          )
+        new PrepareRefactorReq(
+          procId,
+          'Ignored,
+          AddImportRefactorDesc("java.lang.Integer.{valueOf => vo}",
+                                new File(file.path)),
+          false
+        )
       )
       analyzer.handleRefactorExec(
-          new ExecRefactorReq(procId, RefactorType.AddImport)
+        new ExecRefactorReq(procId, RefactorType.AddImport)
       )
 
       val formatted = readSrcFile(file, encoding)
 
       val expectedContents = contents(
-          "import java.lang.Integer.toBinaryString",
-          "import java.lang.String.valueOf",
-          "import java.lang.Integer.{valueOf => vo}",
-          "",
-          "trait Temp {",
-          "  valueOf(5)",
-          "  vo(\"5\")",
-          "  toBinaryString(27)",
-          "}"
+        "import java.lang.Integer.toBinaryString",
+        "import java.lang.String.valueOf",
+        "import java.lang.Integer.{valueOf => vo}",
+        "",
+        "trait Temp {",
+        "  valueOf(5)",
+        "  vo(\"5\")",
+        "  toBinaryString(27)",
+        "}"
       )
 
       formatted should ===(expectedContents)
@@ -254,13 +255,13 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "package org.ensime.testing",
-                             "",
-                             "trait Temp {",
-                             "  valueOf(5)",
-                             "  vo(\"5\")",
-                             "  toBinaryString(27)",
-                             "}"
+                           "package org.ensime.testing",
+                           "",
+                           "trait Temp {",
+                           "  valueOf(5)",
+                           "  vo(\"5\")",
+                           "  toBinaryString(27)",
+                           "}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -269,28 +270,28 @@ class RefactoringHandlerSpec
 
       val procId = 1
       analyzer.handleRefactorPrepareRequest(
-          new PrepareRefactorReq(
-              procId,
-              'Ignored,
-              AddImportRefactorDesc("java.lang.Integer", new File(file.path)),
-              false
-          )
+        new PrepareRefactorReq(
+          procId,
+          'Ignored,
+          AddImportRefactorDesc("java.lang.Integer", new File(file.path)),
+          false
+        )
       )
       analyzer.handleRefactorExec(
-          new ExecRefactorReq(procId, RefactorType.AddImport)
+        new ExecRefactorReq(procId, RefactorType.AddImport)
       )
 
       val formatted = readSrcFile(file, encoding)
 
       val expectedContents = contents(
-          "package org.ensime.testing",
-          "",
-          "import java.lang.Integer",
-          "trait Temp {",
-          "  valueOf(5)",
-          "  vo(\"5\")",
-          "  toBinaryString(27)",
-          "}"
+        "package org.ensime.testing",
+        "",
+        "import java.lang.Integer",
+        "trait Temp {",
+        "  valueOf(5)",
+        "  vo(\"5\")",
+        "  toBinaryString(27)",
+        "}"
       )
 
       formatted should ===(expectedContents)
@@ -302,12 +303,12 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "package org.ensime.testing",
-                             "trait Foo {",
-                             "def doIt(",
-                             ") = \"\"",
-                             "}",
-                             ""
+                           "package org.ensime.testing",
+                           "trait Foo {",
+                           "def doIt(",
+                           ") = \"\"",
+                           "}",
+                           ""
                          ),
                          write = true,
                          encoding = encoding)
@@ -316,24 +317,24 @@ class RefactoringHandlerSpec
 
       val procId = 1
       analyzer.handleRefactorPrepareRequest(
-          new PrepareRefactorReq(
-              procId,
-              'rename,
-              RenameRefactorDesc("doItNow", new File(file.path), 43, 47),
-              false
-          )
+        new PrepareRefactorReq(
+          procId,
+          'rename,
+          RenameRefactorDesc("doItNow", new File(file.path), 43, 47),
+          false
+        )
       )
       analyzer.handleRefactorExec(
-          new ExecRefactorReq(procId, RefactorType.Rename)
+        new ExecRefactorReq(procId, RefactorType.Rename)
       )
       val formatted = readSrcFile(file, encoding)
       val expectedContents = contents(
-          "package org.ensime.testing",
-          "trait Foo {",
-          "def doItNow(",
-          ") = \"\"",
-          "}",
-          ""
+        "package org.ensime.testing",
+        "trait Foo {",
+        "def doItNow(",
+        ") = \"\"",
+        "}",
+        ""
       )
       formatted should ===(expectedContents)
   }
@@ -348,15 +349,15 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "import java.lang.Integer.{valueOf => vo}",
-                             "import java.lang.Integer.toBinaryString",
-                             "import java.lang.String.valueOf",
-                             " ",
-                             "trait Temp {",
-                             "  valueOf(5)",
-                             "  vo(\"5\")",
-                             "  toBinaryString(27)",
-                             "}"
+                           "import java.lang.Integer.{valueOf => vo}",
+                           "import java.lang.Integer.toBinaryString",
+                           "import java.lang.String.valueOf",
+                           " ",
+                           "trait Temp {",
+                           "  valueOf(5)",
+                           "  vo(\"5\")",
+                           "  toBinaryString(27)",
+                           "}"
                          ),
                          write = true,
                          encoding = encoding)
@@ -365,11 +366,11 @@ class RefactoringHandlerSpec
 
       val procId = 1
       val result = analyzer.handleRefactorRequest(
-          new RefactorReq(
-              procId,
-              OrganiseImportsRefactorDesc(new File(file.path)),
-              false
-          )
+        new RefactorReq(
+          procId,
+          OrganiseImportsRefactorDesc(new File(file.path)),
+          false
+        )
       )
       val diffFile = result match {
         case RefactorDiffEffect(_, _, f) => f.canon
@@ -400,16 +401,16 @@ class RefactoringHandlerSpec
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
-                             "import scala._",
-                             "import java.lang.Integer",
-                             "import scala.Int",
-                             "import java._",
-                             " ",
-                             "trait Temp {",
-                             "  def i(): Int",
-                             "  def j(): Integer",
-                             "}",
-                             ""
+                           "import scala._",
+                           "import java.lang.Integer",
+                           "import scala.Int",
+                           "import java._",
+                           " ",
+                           "trait Temp {",
+                           "  def i(): Int",
+                           "  def j(): Integer",
+                           "}",
+                           ""
                          ),
                          write = true,
                          encoding = encoding)
@@ -418,11 +419,11 @@ class RefactoringHandlerSpec
 
       val procId = 1
       val result = analyzer.handleRefactorRequest(
-          new RefactorReq(
-              procId,
-              OrganiseImportsRefactorDesc(new File(file.path)),
-              false
-          )
+        new RefactorReq(
+          procId,
+          OrganiseImportsRefactorDesc(new File(file.path)),
+          false
+        )
       )
       val diffFile = result match {
         case RefactorDiffEffect(_, _, f) => f.canon

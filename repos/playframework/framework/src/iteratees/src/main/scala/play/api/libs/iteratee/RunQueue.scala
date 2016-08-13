@@ -135,7 +135,7 @@ private[play] final class RunQueue {
     val newState = prevState match {
       case null =>
         throw new IllegalStateException(
-            "Can't be inactive, must have a queue of pending elements")
+          "Can't be inactive, must have a queue of pending elements")
       case pending if pending.isEmpty => null
       case pending => pending.tail
     }

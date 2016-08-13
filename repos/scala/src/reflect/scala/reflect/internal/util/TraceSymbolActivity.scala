@@ -53,8 +53,9 @@ trait TraceSymbolActivity {
   }
   private def showSym(sym: Symbol) {
     def prefix = ("  " * (sym.ownerChain.length - 1)) + sym.id
-    try println("%s#%s %s".format(
-            prefix, sym.accurateKindString, sym.name.decode)) catch {
+    try println(
+      "%s#%s %s".format(prefix, sym.accurateKindString, sym.name.decode))
+    catch {
       case x: Throwable => println(prefix + " failed: " + x)
     }
     allChildren(sym.id).sorted foreach showIdAndRemove
@@ -88,8 +89,8 @@ trait TraceSymbolActivity {
     }
     println("\n")
   }
-  private def showFreq[T, U](xs: Traversable[T])(
-      groupFn: T => U, showFn: U => String) = {
+  private def showFreq[T, U](xs: Traversable[T])(groupFn: T => U,
+                                                 showFn: U => String) = {
     showMapFreq(xs.toList groupBy groupFn)(showFn)
   }
 
@@ -127,8 +128,8 @@ trait TraceSymbolActivity {
         val owners = freq(nameFreq(name))(_.owner)
 
         "%4s owners (%s)".format(
-            owners.size,
-            owners.take(3).map({ case (k, v) => v + "/" + k }).mkString(", ") +
+          owners.size,
+          owners.take(3).map({ case (k, v) => v + "/" + k }).mkString(", ") +
             ", ..."
         )
       })

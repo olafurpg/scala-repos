@@ -10,12 +10,12 @@ object TemplatesSpec extends Specification {
   "javascript reverse routes" should {
     "collect parameter names with index appended" in {
       val reverseParams: Seq[(Parameter, Int)] = reverseParametersJavascript(
-          Seq(route("/foobar",
-                    Seq(Parameter("foo", "String", Some("FOO"), None),
-                        Parameter("bar", "String", Some("BAR"), None))),
-              route("/foobar",
-                    Seq(Parameter("foo", "String", None, None),
-                        Parameter("bar", "String", None, None)))))
+        Seq(route("/foobar",
+                  Seq(Parameter("foo", "String", Some("FOO"), None),
+                      Parameter("bar", "String", Some("BAR"), None))),
+            route("/foobar",
+                  Seq(Parameter("foo", "String", None, None),
+                      Parameter("bar", "String", None, None)))))
 
       reverseParams must haveSize(2)
       reverseParams(0)._1.name must_== ("foo0")

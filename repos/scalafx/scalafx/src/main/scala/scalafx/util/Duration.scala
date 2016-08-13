@@ -57,13 +57,13 @@ object Duration {
   def ONE = One
 
   def Unknown = new Duration(jfxu.Duration.UNKNOWN)
-  @deprecated(
-      "Use Unknown; UNKNOWN will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Unknown; UNKNOWN will be removed in a future release",
+              "8.0.60-R10")
   def UNKNOWN = Unknown
 
   def Zero = new Duration(jfxu.Duration.ZERO)
-  @deprecated(
-      "Use Zero; ZERO will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Zero; ZERO will be removed in a future release",
+              "8.0.60-R10")
   def ZERO = Zero
 }
 
@@ -76,7 +76,8 @@ object Duration {
   * @define D `Duration`
   */
 class Duration(override val delegate: jfxu.Duration)
-    extends SFXDelegate[jfxu.Duration] with Ordered[Duration] {
+    extends SFXDelegate[jfxu.Duration]
+    with Ordered[Duration] {
 
   /**
     * The constructor of $D

@@ -57,7 +57,7 @@ class ValidateThriftServiceTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "ValidateThriftService should invalidate connection on bad TApplicationException") {
+    "ValidateThriftService should invalidate connection on bad TApplicationException") {
     val c = ValidateThriftServiceContext()
     import c._
 
@@ -94,7 +94,7 @@ class ValidateThriftServiceTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "ValidateThriftService should not invalidate connection on OK TApplicationException") {
+    "ValidateThriftService should not invalidate connection on OK TApplicationException") {
     val c = ValidateThriftServiceContext()
     import c._
 
@@ -104,7 +104,7 @@ class ValidateThriftServiceTest extends FunSuite with MockitoSugar {
     for (typ <- codes) {
       val buf = new OutputBuffer(protocolFactory)
       buf().writeMessageBegin(
-          new TMessage("foobar", TMessageType.EXCEPTION, 0))
+        new TMessage("foobar", TMessageType.EXCEPTION, 0))
       val exc =
         new TApplicationException(typ, "it's ok, don't worry about it!")
       exc.write(buf())
@@ -118,8 +118,7 @@ class ValidateThriftServiceTest extends FunSuite with MockitoSugar {
       assert(f.isDefined)
       assert(Await.result(f) == arr)
       assert(validate.isAvailable)
-      assert(
-          validate(req).poll match {
+      assert(validate(req).poll match {
         case Some(Return(_)) => true
         case _ => false
       })

@@ -35,10 +35,10 @@ class LatencyHistogramTest extends FunSuite with Matchers {
   }
 
   val tests = Seq(
-      (130827L, 300),
-      (130655L, 200),
-      (127290L, 800),
-      (128163L, 123)
+    (130827L, 300),
+    (130655L, 200),
+    (127290L, 800),
+    (128163L, 123)
   )
 
   Seq(0.0, 0.1, 0.01).foreach { err =>
@@ -49,16 +49,25 @@ class LatencyHistogramTest extends FunSuite with Matchers {
 
   test("constructor checks inputs") {
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          -1L, 0.0, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(-1L,
+                           0.0,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          1L, -0.1, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(1L,
+                           -0.1,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
     intercept[IllegalArgumentException] {
-      new LatencyHistogram(
-          1L, 1.1, 1L, LatencyHistogram.DefaultSlices, Stopwatch.systemMillis)
+      new LatencyHistogram(1L,
+                           1.1,
+                           1L,
+                           LatencyHistogram.DefaultSlices,
+                           Stopwatch.systemMillis)
     }
   }
 

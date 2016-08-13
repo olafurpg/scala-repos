@@ -212,9 +212,8 @@ object Accumulator {
     Sink.asPublisher[E](fanout = false).mapMaterializedValue { publisher =>
       future.recover {
         case error =>
-          new SinkAccumulator(Sink
-                .cancelled[E]
-                .mapMaterializedValue(_ => Future.failed(error)))
+          new SinkAccumulator(
+            Sink.cancelled[E].mapMaterializedValue(_ => Future.failed(error)))
       }.flatMap { accumulator =>
         Source
           .fromPublisher(publisher)
@@ -261,10 +260,10 @@ object Accumulator {
     // If Akka streams ever provides Sink.source(), we should use that instead.
     // https://github.com/akka/akka/issues/18406
     new SinkAccumulator(
-        Sink
-          .asPublisher[E](fanout = false)
-          .mapMaterializedValue(
-              publisher => Future.successful(Source.fromPublisher(publisher))))
+      Sink
+        .asPublisher[E](fanout = false)
+        .mapMaterializedValue(publisher =>
+          Future.successful(Source.fromPublisher(publisher))))
   }
 
   /**

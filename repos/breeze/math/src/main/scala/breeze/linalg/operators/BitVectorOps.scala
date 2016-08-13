@@ -25,38 +25,37 @@ trait BitVectorOps {
 
   @expand
   @expand.valify
-  implicit def bv_bv_UpdateOp[
-      @expand.args(OpAnd, OpOr, OpXor, OpSet) Op <: OpType](
+  implicit def bv_bv_UpdateOp[@expand.args(OpAnd, OpOr, OpXor, OpSet) Op <: OpType](
       implicit @expand.sequence[Op]({ _ and _ }, { _ or _ }, { _ xor _ }, {
-    (a, b) =>
-      a.clear(); a.or(b)
-  }) op: Op.InPlaceImpl2[java.util.BitSet, java.util.BitSet])
+        (a, b) =>
+          a.clear(); a.or(b)
+      }) op: Op.InPlaceImpl2[java.util.BitSet, java.util.BitSet])
     : Op.InPlaceImpl2[BitVector, BitVector] =
     new Op.InPlaceImpl2[BitVector, BitVector] {
       def apply(a: BitVector, b: BitVector) {
         if (!a.lengthsMatch(b))
           throw new IllegalArgumentException(
-              s"Lengths don't match: ${a.length} ${b.length}")
+            s"Lengths don't match: ${a.length} ${b.length}")
         op(a.data, b.data)
       }
     }
 
   @expand
   @expand.valify
-  implicit def bv_bv_Op[
-      @expand.args(OpAnd, OpOr, OpXor) Op <: OpType](implicit @expand.sequence[
-          Op]({ _ and _ }, { _ or _ }, { _ xor _ }) op: Op.InPlaceImpl2[
-          java.util.BitSet, java.util.BitSet])
-    : Op.Impl2[BitVector, BitVector, BitVector] =
+  implicit def bv_bv_Op[@expand.args(OpAnd, OpOr, OpXor) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ and _ }, { _ or _ }, { _ xor _ }) op: Op.InPlaceImpl2[
+        java.util.BitSet,
+        java.util.BitSet]): Op.Impl2[BitVector, BitVector, BitVector] =
     new Op.Impl2[BitVector, BitVector, BitVector] {
       def apply(a: BitVector, b: BitVector) = {
         if (!a.lengthsMatch(b))
           throw new IllegalArgumentException(
-              s"Lengths don't match: ${a.length} ${b.length}")
+            s"Lengths don't match: ${a.length} ${b.length}")
         val result = a.data.clone().asInstanceOf[util.BitSet]
         op(result, b.data)
-        new BitVector(
-            result, a.length max b.length, a.enforceLength && b.enforceLength)
+        new BitVector(result,
+                      a.length max b.length,
+                      a.enforceLength && b.enforceLength)
       }
     }
 
@@ -81,7 +80,7 @@ trait BitVectorOps {
       def apply(a: BitVector, b: BitVector): BitVector = {
         if (!a.lengthsMatch(b))
           throw new IllegalArgumentException(
-              s"Lengths don't match: ${a.length} ${b.length}")
+            s"Lengths don't match: ${a.length} ${b.length}")
         !(a :!= b)
       }
     }

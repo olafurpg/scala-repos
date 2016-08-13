@@ -11,7 +11,12 @@ import mesosphere.marathon.api.v2.json.Formats
 import mesosphere.marathon.api.{AuthResource, MarathonMediaType}
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.launchqueue.LaunchQueue
-import mesosphere.marathon.plugin.auth.{Authenticator, Authorizer, UpdateApp, ViewApp}
+import mesosphere.marathon.plugin.auth.{
+  Authenticator,
+  Authorizer,
+  UpdateApp,
+  ViewApp
+}
 import mesosphere.marathon.state.PathId._
 import play.api.libs.json.Json
 
@@ -39,12 +44,13 @@ class QueueResource @Inject()(clock: Clock,
           case taskCount: LaunchQueue.QueuedTaskInfo =>
             val timeLeft = clock.now() until taskCount.backOffUntil
             Json.obj(
-                "app" -> taskCount.app,
-                "count" -> taskCount.tasksLeftToLaunch,
-                "delay" -> Json.obj(
-                    "timeLeftSeconds" -> math.max(0, timeLeft.toSeconds), //deadlines can be negative
-                    "overdue" -> (timeLeft < 0.seconds)
-                )
+              "app" -> taskCount.app,
+              "count" -> taskCount.tasksLeftToLaunch,
+              "delay" -> Json.obj(
+                "timeLeftSeconds" -> math
+                  .max(0, timeLeft.toSeconds), //deadlines can be negative
+                "overdue" -> (timeLeft < 0.seconds)
+              )
             )
         }
       ok(Json.obj("queue" -> queuedWithDelay).toString())
@@ -58,9 +64,9 @@ class QueueResource @Inject()(clock: Clock,
       val appId = id.toRootPath
       val maybeApp = launchQueue.list.find(_.app.id == appId).map(_.app)
       withAuthorization(
-          UpdateApp,
-          maybeApp,
-          notFound(s"Application $appId not found in tasks queue.")) { app =>
+        UpdateApp,
+        maybeApp,
+        notFound(s"Application $appId not found in tasks queue.")) { app =>
         launchQueue.resetDelay(app)
         noContent
       }

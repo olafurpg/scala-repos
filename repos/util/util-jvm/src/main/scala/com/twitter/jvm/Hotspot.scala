@@ -153,7 +153,7 @@ class Hotspot extends Jvm {
     }
 
     def asSafepointBean(x: AnyRef) = {
-      x.asInstanceOf[ {
+      x.asInstanceOf[{
         def getSafepointSyncTime: Long;
         def getTotalSafepointTime: Long;
         def getSafepointCount: Long

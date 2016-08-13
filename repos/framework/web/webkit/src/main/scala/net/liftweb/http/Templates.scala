@@ -46,8 +46,8 @@ object Templates {
     } else Empty
   }
 
-  private def checkForFunc(
-      whole: List[String], what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
+  private def checkForFunc(whole: List[String],
+                           what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
     if (what.isDefinedAt(whole))
       what(whole) match {
         case Left(func) => func()
@@ -67,8 +67,9 @@ object Templates {
         }
     }
 
-  private[http] def findTopLevelTemplate(
-      places: List[String], locale: Locale, needAutoSurround: Boolean) = {
+  private[http] def findTopLevelTemplate(places: List[String],
+                                         locale: Locale,
+                                         needAutoSurround: Boolean) = {
     findRawTemplate0(places, locale, needAutoSurround).map(checkForContentId)
   }
 
@@ -119,19 +120,19 @@ object Templates {
       case e: Elem if e.label == "html" =>
         e.child.flatMap {
           case e: Elem if e.label == "body" => {
-              e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
-                .attribute("class")
-                .flatMap { ns =>
-                  {
-                    val clz = ns.text.charSplit(' ')
-                    clz.flatMap {
-                      case s if s.startsWith("lift:content_id=") =>
-                        Some(urlDecode(s.substring("lift:content_id=".length)))
-                      case _ => None
-                    }.headOption
-                  }
+            e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
+              .attribute("class")
+              .flatMap { ns =>
+                {
+                  val clz = ns.text.charSplit(' ')
+                  clz.flatMap {
+                    case s if s.startsWith("lift:content_id=") =>
+                      Some(urlDecode(s.substring("lift:content_id=".length)))
+                    case _ => None
+                  }.headOption
                 }
-            }
+              }
+          }
 
           case _ => None
         }
@@ -213,7 +214,7 @@ object Templates {
                   case e: ValidationException
                       if Props.devMode | Props.testMode =>
                     return Helpers.errorDiv(
-                        <div>Error locating template: <b>{name}</b><br/>
+                      <div>Error locating template: <b>{name}</b><br/>
                       Message: <b>{e.getMessage}</b><br/>
                       {
                       <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
@@ -234,7 +235,7 @@ object Templates {
                   val msg = xmlb.asInstanceOf[Failure].msg
                   val e = xmlb.asInstanceOf[Failure].exception
                   return Helpers.errorDiv(
-                      <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
+                    <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
                   {
                     e match {
                       case Full(e) =>
@@ -261,14 +262,15 @@ object Templates {
       case Nil => ("default_template", "index")
     }
     val trans = List[String => String](n => n, n => camelify(n))
-    val toTry = trans.flatMap(f =>
-          (LiftRules.buildPackage("view") ::: ("lift.app.view" :: Nil))
-            .map(_ + "." + f(controller)))
+    val toTry = trans.flatMap(
+      f =>
+        (LiftRules.buildPackage("view") ::: ("lift.app.view" :: Nil))
+          .map(_ + "." + f(controller)))
 
     first(toTry) { clsName =>
       try {
         tryo(List(classOf[ClassNotFoundException]), Empty)(
-            Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap { c =>
+          Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap { c =>
           (c.newInstance match {
             case inst: InsecureLiftView => c.getMethod(action).invoke(inst)
             case inst: LiftView if inst.dispatch.isDefinedAt(action) =>

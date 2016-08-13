@@ -6,7 +6,11 @@ import com.intellij.psi.impl.ConstantExpressionEvaluator
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScParenthesisedExpr, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScParenthesisedExpr,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 
 /**
@@ -22,14 +26,14 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
     }
   }
 
-  def computeConstantExpression(
-      expression: PsiElement, throwExceptionOnOverflow: Boolean): AnyRef = {
+  def computeConstantExpression(expression: PsiElement,
+                                throwExceptionOnOverflow: Boolean): AnyRef = {
     expression match {
       case ref: ScReferenceExpression =>
         computeConstantExpression(ref.resolve(), throwExceptionOnOverflow)
       case refPattern: ScReferencePattern =>
-        computeConstantExpression(
-            ScalaPsiUtil nameContext refPattern, throwExceptionOnOverflow)
+        computeConstantExpression(ScalaPsiUtil nameContext refPattern,
+                                  throwExceptionOnOverflow)
       case deff: ScPatternDefinition =>
         deff.expr.map {
           case e => computeConstantExpression(e, throwExceptionOnOverflow)

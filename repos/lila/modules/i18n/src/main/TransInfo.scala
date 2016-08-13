@@ -41,11 +41,11 @@ private[i18n] object TransInfos {
     LangList.sortedList.filter(_._1 != defaultCode) map {
       case (code, name) =>
         TransInfo(
-            lang = Lang(code),
-            name = name,
-            contributors = Contributors(code),
-            nbTranslated = messages.get(code) ?? (_.size),
-            nbMissing = nbMessages - (messages.get(code) ?? (_.size))
+          lang = Lang(code),
+          name = name,
+          contributors = Contributors(code),
+          nbTranslated = messages.get(code) ?? (_.size),
+          nbMissing = nbMessages - (messages.get(code) ?? (_.size))
         )
     }
   }

@@ -16,7 +16,8 @@ class DocJarReadingSpec extends EnsimeSpec with SharedEnsimeConfigFixture {
       }
 
       val content = reader.docJarContent(
-          "scala-library-" + c.scalaVersion + "-javadoc.jar", "index.html")
+        "scala-library-" + c.scalaVersion + "-javadoc.jar",
+        "index.html")
 
       content should not be 'empty
   }

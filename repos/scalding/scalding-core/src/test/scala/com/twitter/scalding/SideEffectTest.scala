@@ -103,7 +103,9 @@ class ZipBuffer(args: Args) extends Job(args) {
 }
 
 class SideEffectBufferTest
-    extends WordSpec with Matchers with FieldConversions {
+    extends WordSpec
+    with Matchers
+    with FieldConversions {
   "ZipBuffer should do create two zipped sequences, one for even lines and one for odd lines. Coded with side effect" should {
     JobTest("com.twitter.scalding.ZipBuffer")
       .source(Tsv("line", ('line)),

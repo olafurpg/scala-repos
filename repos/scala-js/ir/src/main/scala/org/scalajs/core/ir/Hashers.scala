@@ -27,7 +27,8 @@ object Hashers {
       val hash = hasher.finalizeHash()
 
       MethodDef(static, name, args, resultType, body)(
-          methodDef.optimizerHints, Some(hash))(methodDef.pos)
+        methodDef.optimizerHints,
+        Some(hash))(methodDef.pos)
     }
   }
 
@@ -40,7 +41,7 @@ object Hashers {
   /** Hash the definitions in a ClassDef (where applicable) */
   def hashClassDef(classDef: ClassDef): ClassDef = {
     classDef.copy(defs = hashDefs(classDef.defs))(classDef.optimizerHints)(
-        classDef.pos)
+      classDef.pos)
   }
 
   def hashesEqual(x: TreeHash, y: TreeHash, considerPos: Boolean): Boolean = {
@@ -56,9 +57,8 @@ object Hashers {
     def hexDigit(digit: Int): Char = Character.forDigit(digit, 16)
 
     def append(hash: Array[Byte]): Unit = {
-      for (b <- hash) builder
-        .append(hexDigit(b >> 4))
-        .append(hexDigit(b & 0xF))
+      for (b <- hash)
+        builder.append(hexDigit(b >> 4)).append(hexDigit(b & 0xF))
     }
     append(hash.treeHash)
 

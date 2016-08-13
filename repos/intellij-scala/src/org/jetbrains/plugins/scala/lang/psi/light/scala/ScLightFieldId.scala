@@ -6,14 +6,19 @@ import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alefas
   * @since 04/04/14.
   */
 class ScLightFieldId(rt: ScType, val f: ScFieldId)
-    extends LightElement(f.getManager, f.getLanguage) with ScFieldId {
+    extends LightElement(f.getManager, f.getLanguage)
+    with ScFieldId {
   setNavigationElement(f)
 
   override def nameId: PsiElement = f.nameId

@@ -50,16 +50,16 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
 
   // our fallback analyzer
   class LowercaseAnalyzer extends Analyzer {
-    override protected def createComponents(
-        fieldName: String, reader: Reader) = {
+    override protected def createComponents(fieldName: String,
+                                            reader: Reader) = {
       val source = new KeywordTokenizer(reader)
       val filtered = new LowerCaseFilter(SimpleLucene.LuceneVersion, source)
       new Analyzer.TokenStreamComponents(source, filtered)
     }
   }
   private val analyzer = new PerFieldAnalyzerWrapper(
-      new LowercaseAnalyzer,
-      analyzers.asJava
+    new LowercaseAnalyzer,
+    analyzers.asJava
   )
   private val config = new IndexWriterConfig(LuceneVersion, analyzer)
   //  config.setRAMBufferSizeMB(512)

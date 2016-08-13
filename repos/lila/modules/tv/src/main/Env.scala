@@ -24,8 +24,8 @@ final class Env(config: Config,
   lazy val tv = new Tv(tvActor)
 
   private val tvActor = system.actorOf(
-      Props(classOf[TvActor], hub.actor.renderer, hub.socket.round, lightUser),
-      name = "tv")
+    Props(classOf[TvActor], hub.actor.renderer, hub.socket.round, lightUser),
+    name = "tv")
 
   private lazy val streaming = new Streaming(system = system,
                                              renderer = hub.actor.renderer,
@@ -50,10 +50,10 @@ final class Env(config: Config,
 
   object isStreamer {
     private val cache = lila.memo.MixedCache.single[Set[String]](
-        f = streamerList.lichessIds,
-        timeToLive = 10 seconds,
-        default = Set.empty,
-        logger = logger)
+      f = streamerList.lichessIds,
+      timeToLive = 10 seconds,
+      default = Set.empty,
+      logger = logger)
     def apply(id: String) = cache get true contains id
   }
 

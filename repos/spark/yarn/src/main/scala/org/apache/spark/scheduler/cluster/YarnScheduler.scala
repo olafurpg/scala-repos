@@ -36,6 +36,6 @@ private[spark] class YarnScheduler(sc: SparkContext)
   override def getRackForHost(hostPort: String): Option[String] = {
     val host = Utils.parseHostPort(hostPort)._1
     Option(
-        RackResolver.resolve(sc.hadoopConfiguration, host).getNetworkLocation)
+      RackResolver.resolve(sc.hadoopConfiguration, host).getNetworkLocation)
   }
 }

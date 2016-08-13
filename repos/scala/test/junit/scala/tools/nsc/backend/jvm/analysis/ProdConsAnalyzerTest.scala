@@ -82,15 +82,15 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     // mutates a parameter local (not possible in scala, but in bytecode)
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
-        Label(0),
-        VarOp(ILOAD, 1),
-        Jump(IFNE, Label(1)),
-        Op(ICONST_1),
-        VarOp(ISTORE, 1),
-        Label(1),
-        VarOp(ILOAD, 1),
-        Op(IRETURN),
-        Label(2)
+      Label(0),
+      VarOp(ILOAD, 1),
+      Jump(IFNE, Label(1)),
+      Op(ICONST_1),
+      VarOp(ISTORE, 1),
+      Label(1),
+      VarOp(ILOAD, 1),
+      Op(IRETURN),
+      Label(2)
     )
     m.maxLocals = 2
     m.maxStack = 1
@@ -100,14 +100,14 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.producersForValueAt(ifne, 1), "ParameterProducer")
 
     val ret = findInstr(m, "IRETURN").head
-    testMultiInsns(
-        a.producersForValueAt(ret, 1), List("ParameterProducer", "ISTORE 1"))
+    testMultiInsns(a.producersForValueAt(ret, 1),
+                   List("ParameterProducer", "ISTORE 1"))
   }
 
   @Test
   def branching(): Unit = {
     val List(m) = compileMethods(noOptCompiler)(
-        "def f(x: Int) = { var a = x; if (a == 0) a = 12; a }")
+      "def f(x: Int) = { var a = x; if (a == 0) a = 12; a }")
     val a = new ProdConsAnalyzer(m, "C")
 
     val List(ret) = findInstr(m, "IRETURN")
@@ -123,7 +123,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   @Test
   def checkCast(): Unit = {
     val List(m) = compileMethods(noOptCompiler)(
-        "def f(o: Object) = o.asInstanceOf[String]")
+      "def f(o: Object) = o.asInstanceOf[String]")
     val a = new ProdConsAnalyzer(m, "C")
     assert(findInstr(m, "CHECKCAST java/lang/String").length == 1)
 
@@ -134,7 +134,7 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   @Test
   def instanceOf(): Unit = {
     val List(m) = compileMethods(noOptCompiler)(
-        "def f(o: Object) = o.isInstanceOf[String]")
+      "def f(o: Object) = o.isInstanceOf[String]")
     val a = new ProdConsAnalyzer(m, "C")
     assert(findInstr(m, "INSTANCEOF java/lang/String").length == 1)
 
@@ -145,15 +145,15 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   @Test
   def unInitLocal(): Unit = {
     val List(m) = compileMethods(noOptCompiler)(
-        "def f(b: Boolean) = { if (b) { var a = 0; println(a) }; 1 }")
+      "def f(b: Boolean) = { if (b) { var a = 0; println(a) }; 1 }")
     val a = new ProdConsAnalyzer(m, "C")
 
     val List(store) = findInstr(m, "ISTORE")
     val List(call) = findInstr(m, "INVOKEVIRTUAL")
     val List(ret) = findInstr(m, "IRETURN")
 
-    testSingleInsn(
-        a.producersForValueAt(store, 2), "UninitializedLocalProducer(2)")
+    testSingleInsn(a.producersForValueAt(store, 2),
+                   "UninitializedLocalProducer(2)")
     testSingleInsn(a.producersForValueAt(call, 2), "ISTORE")
     testMultiInsns(a.producersForValueAt(ret, 2),
                    List("UninitializedLocalProducer", "ISTORE"))
@@ -179,13 +179,13 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   def multiProducer(): Unit = {
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
-        VarOp(ILOAD, 1),
-        VarOp(ILOAD, 1),
-        Op(DUP2),
-        Op(IADD),
-        Op(SWAP),
-        VarOp(ISTORE, 1),
-        Op(IRETURN)
+      VarOp(ILOAD, 1),
+      VarOp(ILOAD, 1),
+      Op(DUP2),
+      Op(IADD),
+      Op(SWAP),
+      VarOp(ISTORE, 1),
+      Op(IRETURN)
     )
     m.maxLocals = 2
     m.maxStack = 4
@@ -210,8 +210,8 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testMultiInsns(a.producersForInputsOf(swap), List("IADD", "DUP2"))
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 4), "ISTORE")
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 3), "IRETURN")
-    testSingleInsn(
-        a.initialProducersForInputsOf(store), "ParameterProducer(1)")
+    testSingleInsn(a.initialProducersForInputsOf(store),
+                   "ParameterProducer(1)")
     testSingleInsn(a.initialProducersForInputsOf(ret), "IADD")
   }
 
@@ -219,9 +219,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   def iincProdCons(): Unit = {
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
-        Incr(IINC, 1, 1), // producer and consumer of local variable 1
-        VarOp(ILOAD, 1),
-        Op(IRETURN)
+      Incr(IINC, 1, 1), // producer and consumer of local variable 1
+      VarOp(ILOAD, 1),
+      Op(IRETURN)
     )
     m.maxLocals = 2
     m.maxStack = 1
@@ -266,18 +266,18 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
   def cyclicProdCons(): Unit = {
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
-        Label(1),
-        VarOp(ILOAD, 1),
-        IntOp(BIPUSH, 10),
-        Op(IADD), // consumer of the above ILOAD
-        Op(ICONST_0),
-        Jump(IF_ICMPNE, Label(2)),
-        VarOp(ILOAD, 1),
-        VarOp(ISTORE, 1),
-        Jump(GOTO, Label(1)),
-        Label(2),
-        IntOp(BIPUSH, 9),
-        Op(IRETURN)
+      Label(1),
+      VarOp(ILOAD, 1),
+      IntOp(BIPUSH, 10),
+      Op(IADD), // consumer of the above ILOAD
+      Op(ICONST_0),
+      Jump(IF_ICMPNE, Label(2)),
+      VarOp(ILOAD, 1),
+      VarOp(ISTORE, 1),
+      Jump(GOTO, Label(1)),
+      Label(2),
+      IntOp(BIPUSH, 9),
+      Op(IRETURN)
     )
     m.maxLocals = 2
     m.maxStack = 2
@@ -290,10 +290,10 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     assert(secondLoad.getOpcode == ILOAD)
 
     testSingleInsn(a.producersForValueAt(iadd, 2), "ILOAD")
-    testSingleInsn(
-        a.initialProducersForValueAt(iadd, 2), "ParameterProducer(1)")
-    testMultiInsns(
-        a.producersForInputsOf(firstLoad), List("ParameterProducer", "ISTORE"))
+    testSingleInsn(a.initialProducersForValueAt(iadd, 2),
+                   "ParameterProducer(1)")
+    testMultiInsns(a.producersForInputsOf(firstLoad),
+                   List("ParameterProducer", "ISTORE"))
     testMultiInsns(a.producersForInputsOf(secondLoad),
                    List("ParameterProducer", "ISTORE"))
 

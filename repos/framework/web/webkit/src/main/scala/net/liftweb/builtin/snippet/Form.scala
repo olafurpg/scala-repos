@@ -55,13 +55,13 @@ object Form extends DispatchSnippet {
           (kids(0).prefix eq null) && kids(0).label == "form") {
         val e = kids(0).asInstanceOf[Elem]
         val meta = new UnprefixedAttribute(
-            "method",
-            "post",
-            new UnprefixedAttribute("action", S.uri, e.attributes.filter {
-              case up: UnprefixedAttribute =>
-                up.key != "method" && up.key != "action"
-              case x => true
-            }))
+          "method",
+          "post",
+          new UnprefixedAttribute("action", S.uri, e.attributes.filter {
+            case up: UnprefixedAttribute =>
+              up.key != "method" && up.key != "action"
+            case x => true
+          }))
         new Elem(null, "form", meta, e.scope, e.minimizeEmpty, e.child: _*)
       } else {
         <form method="post" action={S.uri}>{kids}</form>
@@ -89,8 +89,9 @@ object Form extends DispatchSnippet {
   private def addAjaxForm: MetaData = {
     val id = Helpers.nextFuncName
 
-    val attr = S.currentAttrsToMetaData(name =>
-          name != "id" && name != "onsubmit" && name != "action" &&
+    val attr = S.currentAttrsToMetaData(
+      name =>
+        name != "id" && name != "onsubmit" && name != "action" &&
           name != "form")
 
     val pre = S.attr.~("onsubmit").map(_.text + ";") getOrElse ""
@@ -104,11 +105,11 @@ object Form extends DispatchSnippet {
         .toJsCmd + ";" + "return false;"
 
     new UnprefixedAttribute(
-        "id",
-        Text(id),
-        new UnprefixedAttribute(
-            "action",
-            Text("javascript://"),
-            new UnprefixedAttribute("onsubmit", Text(ajax), attr)))
+      "id",
+      Text(id),
+      new UnprefixedAttribute(
+        "action",
+        Text("javascript://"),
+        new UnprefixedAttribute("onsubmit", Text(ajax), attr)))
   }
 }

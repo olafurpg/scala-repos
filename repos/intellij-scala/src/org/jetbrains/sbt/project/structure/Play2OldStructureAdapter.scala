@@ -24,8 +24,8 @@ object Play2OldStructureAdapter {
       .groupBy(_._2)
       .mapValues(_.map({ case (id, _, v) => (id, v) }))
 
-    new Play2ProjectData(
-        SbtProjectSystem.Id, avoidSL7005Bug(oldData.mapValues(_.toMap)))
+    new Play2ProjectData(SbtProjectSystem.Id,
+                         avoidSL7005Bug(oldData.mapValues(_.toMap)))
   }
 
   private def extractProjectKeyValue(
@@ -40,12 +40,12 @@ object Play2OldStructureAdapter {
 
     val keyValues =
       playVersion ++ confDirectory ++ Seq(
-          (TEMPLATES_IMPORT, new SeqStringParsedValue(data.templatesImports)),
-          (ROUTES_IMPORT, new SeqStringParsedValue(data.routesImports)),
-          (SOURCE_DIR,
-           new StringParsedValue(data.sourceDirectory.getCanonicalPath)),
-          (PROJECT_URI,
-           new StringParsedValue(baseDir.getCanonicalFile.toURI.toString))
+        (TEMPLATES_IMPORT, new SeqStringParsedValue(data.templatesImports)),
+        (ROUTES_IMPORT, new SeqStringParsedValue(data.routesImports)),
+        (SOURCE_DIR,
+         new StringParsedValue(data.sourceDirectory.getCanonicalPath)),
+        (PROJECT_URI,
+         new StringParsedValue(baseDir.getCanonicalFile.toURI.toString))
       )
 
     keyValues.map({ case (k, v) => (id, k.name, v) })

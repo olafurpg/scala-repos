@@ -31,9 +31,9 @@ trait JavacOutputParsing extends Logger {
     line match {
       case HeaderPattern(path, row, modifier, message) =>
         header = Some(
-            Header(new File(path),
-                   row.toLong,
-                   if (modifier == null) kind else Kind.WARNING))
+          Header(new File(path),
+                 row.toLong,
+                 if (modifier == null) kind else Kind.WARNING))
         lines :+= message
       case PointerPattern(prefix) if header.isDefined =>
         val text = (lines :+ line).mkString("\n")

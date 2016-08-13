@@ -149,8 +149,8 @@ class AlgebraicTest extends SpireProperties {
   property("root isolation uses inverse transform to map upper-bound") {
     import spire.implicits._
     val roots = List(
-        Rational("16279/50267"),
-        Rational("223/175")
+      Rational("16279/50267"),
+      Rational("223/175")
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
@@ -166,9 +166,9 @@ class AlgebraicTest extends SpireProperties {
     // A failing special case of "algebraic root is zero", where the root is
     // closer to 0 then the approximation required to test.
     val roots = List(
-        Rational("8791167214431305472/8377325351665"),
-        Rational("12785/4238682313717812603653317580032"),
-        Rational("0")
+      Rational("8791167214431305472/8377325351665"),
+      Rational("12785/4238682313717812603653317580032"),
+      Rational("0")
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
@@ -254,12 +254,12 @@ class AlgebraicTest extends SpireProperties {
       } yield RationalAlgebraic(Algebraic(x), Rational(x))
 
     def genLeaf: Gen[RationalAlgebraic] = Gen.oneOf(
-        genRational.map { q =>
-          RationalAlgebraic(Algebraic(q), q)
-        },
-        genBigDecimal,
-        genDouble,
-        genLong
+      genRational.map { q =>
+        RationalAlgebraic(Algebraic(q), q)
+      },
+      genBigDecimal,
+      genDouble,
+      genLong
     )
 
     def genAdd(depth: Int): Gen[RationalAlgebraic] =
@@ -283,8 +283,8 @@ class AlgebraicTest extends SpireProperties {
     def genDiv(depth: Int): Gen[RationalAlgebraic] =
       for {
         RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
-        RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1) if
-                                        (rhsQ.signum != 0)
+        RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+        if (rhsQ.signum != 0)
       } yield RationalAlgebraic(lhsA / rhsA, lhsQ / rhsQ)
 
     def genNeg(depth: Int): Gen[RationalAlgebraic] =

@@ -24,9 +24,8 @@ private[server] object WebSocketHandler {
     * This implements the WebSocket control logic, including handling ping frames and closing the connection in a spec
     * compliant manner.
     */
-  def messageFlowToFrameProcessor(
-      flow: Flow[Message, Message, _], bufferLimit: Int)(
-      implicit mat: Materializer)
+  def messageFlowToFrameProcessor(flow: Flow[Message, Message, _],
+                                  bufferLimit: Int)(implicit mat: Materializer)
     : Processor[WebSocketFrame, WebSocketFrame] = {
 
     // The reason we use a processor is that we *must* release the buffers synchronously, since Akka streams drops

@@ -1,7 +1,13 @@
 package com.twitter.finagle.memcached.unit
 
 import com.twitter.concurrent.Broker
-import com.twitter.finagle.{CancelledRequestException, Group, MutableGroup, Service, ShardNotAvailableException}
+import com.twitter.finagle.{
+  CancelledRequestException,
+  Group,
+  MutableGroup,
+  Service,
+  ShardNotAvailableException
+}
 import com.twitter.finagle.cacheresolver.CacheNode
 import com.twitter.finagle.memcached._
 import com.twitter.finagle.memcached.protocol._
@@ -12,7 +18,13 @@ import scala.collection.{immutable, mutable}
 import _root_.java.io.{BufferedReader, InputStreamReader}
 import org.junit.runner.RunWith
 import org.mockito.Matchers._
-import org.mockito.Mockito.{verify, verifyZeroInteractions, when, times, RETURNS_SMART_NULLS}
+import org.mockito.Mockito.{
+  verify,
+  verifyZeroInteractions,
+  when,
+  times,
+  RETURNS_SMART_NULLS
+}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.FunSuite
@@ -42,14 +54,14 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       s
     }
     val clients = Map(
-        CacheNode("10.0.1.1", 11211, 600) -> newMock(),
-        CacheNode("10.0.1.2", 11211, 300) -> newMock(),
-        CacheNode("10.0.1.3", 11211, 200) -> newMock(),
-        CacheNode("10.0.1.4", 11211, 350) -> newMock(),
-        CacheNode("10.0.1.5", 11211, 1000) -> newMock(),
-        CacheNode("10.0.1.6", 11211, 800) -> newMock(),
-        CacheNode("10.0.1.7", 11211, 950) -> newMock(),
-        CacheNode("10.0.1.8", 11211, 100) -> newMock()
+      CacheNode("10.0.1.1", 11211, 600) -> newMock(),
+      CacheNode("10.0.1.2", 11211, 300) -> newMock(),
+      CacheNode("10.0.1.3", 11211, 200) -> newMock(),
+      CacheNode("10.0.1.4", 11211, 350) -> newMock(),
+      CacheNode("10.0.1.5", 11211, 1000) -> newMock(),
+      CacheNode("10.0.1.6", 11211, 800) -> newMock(),
+      CacheNode("10.0.1.7", 11211, 950) -> newMock(),
+      CacheNode("10.0.1.8", 11211, 100) -> newMock()
     )
 
     def newService(node: CacheNode) = clients.get(node).get
@@ -67,7 +79,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       val randomResponse = Number(rng.nextLong)
 
       when(expectedService.apply(any[Incr])) thenReturn Future.value(
-          randomResponse)
+        randomResponse)
 
       assert(Await.result(mockClient.incr("foo")).get == randomResponse.value)
     }
@@ -118,8 +130,8 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       val nodeKeyA = KetamaClientKey(nodeA.host, nodeA.port, nodeA.weight)
       val nodeKeyB = KetamaClientKey(nodeB.host, nodeB.port, nodeB.weight)
       val services = Map(
-          nodeA -> serviceA,
-          nodeB -> serviceB
+        nodeA -> serviceA,
+        nodeB -> serviceB
       )
       val mutableGroup = Group.mutable(services.keys.toSeq: _*)
 

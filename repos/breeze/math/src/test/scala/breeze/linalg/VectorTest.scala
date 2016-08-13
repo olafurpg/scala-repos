@@ -17,10 +17,18 @@ class VectorTest extends FunSuite {
   //val dmTest = DenseMatrix((1,2,3,4), (5,6,7,8))
 
   test("scan") {
-    assert(dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
-            0, 1, 3, 6, 10))
-    assert(dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
-            10, 9, 7, 4, 0))
+    assert(
+      dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(0,
+                                                                       1,
+                                                                       3,
+                                                                       6,
+                                                                       10))
+    assert(
+      dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(10,
+                                                                        9,
+                                                                        7,
+                                                                        4,
+                                                                        0))
   }
 
   test("fold") {
@@ -70,8 +78,8 @@ class VectorOps_DoubleTest
   val space = Vector.space[Double]
 
   val N = 30
-  implicit def genTriple: Arbitrary[(Vector[Double], Vector[Double], Vector[
-          Double])] = {
+  implicit def genTriple: Arbitrary[
+    (Vector[Double], Vector[Double], Vector[Double])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
@@ -105,8 +113,8 @@ class VectorOps_FloatTest
 
   override val TOL: Double = 1E-2
   val N = 30
-  implicit def genTriple: Arbitrary[(Vector[Float], Vector[Float], Vector[
-          Float])] = {
+  implicit def genTriple: Arbitrary[
+    (Vector[Float], Vector[Float], Vector[Float])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Float].map { _ % 1000f }
@@ -122,15 +130,15 @@ class VectorOps_FloatTest
         (if (bx) DenseVector.fill(N)(math.random * x toFloat)
          else
            SparseVector(N)(
-               xl.map(i => (i % N).abs -> (math.random * x toFloat)): _*),
+             xl.map(i => (i % N).abs -> (math.random * x toFloat)): _*),
          if (by) DenseVector.fill(N)(math.random * y toFloat)
          else
            SparseVector(N)(
-               yl.map(i => (i % N).abs -> (math.random * y toFloat)): _*),
+             yl.map(i => (i % N).abs -> (math.random * y toFloat)): _*),
          if (bz) DenseVector.fill(N)(math.random * z toFloat)
          else
            SparseVector(N)(
-               zl.map(i => (i % N).abs -> (math.random * z toFloat)): _*))
+             zl.map(i => (i % N).abs -> (math.random * z toFloat)): _*))
       }
     }
   }
@@ -160,15 +168,15 @@ class VectorOps_IntTest extends TensorSpaceTestBase[Vector[Int], Int, Int] {
         (if (bx) DenseVector.fill(N)(math.random * x toInt)
          else
            SparseVector(N)(
-               xl.map(i => (i % N).abs -> (math.random * x toInt)): _*),
+             xl.map(i => (i % N).abs -> (math.random * x toInt)): _*),
          if (by) DenseVector.fill(N)(math.random * y toInt)
          else
            SparseVector(N)(
-               yl.map(i => (i % N).abs -> (math.random * y toInt)): _*),
+             yl.map(i => (i % N).abs -> (math.random * y toInt)): _*),
          if (bz) DenseVector.fill(N)(math.random * z toInt)
          else
            SparseVector(N)(
-               zl.map(i => (i % N).abs -> (math.random * z toInt)): _*))
+             zl.map(i => (i % N).abs -> (math.random * z toInt)): _*))
       }
     }
   }
@@ -183,8 +191,8 @@ class VectorOps_ComplexTest
   val space = Vector.space[Complex]
 
   val N = 30
-  implicit def genTriple: Arbitrary[(Vector[Complex], Vector[Complex], Vector[
-          Complex])] = {
+  implicit def genTriple: Arbitrary[
+    (Vector[Complex], Vector[Complex], Vector[Complex])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Complex]
@@ -211,7 +219,7 @@ class VectorOps_ComplexTest
   }
 
   implicit def genScalar: Arbitrary[Complex] = Arbitrary {
-    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double]) yield
-      Complex(r % 100, i % 100)
+    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double])
+      yield Complex(r % 100, i % 100)
   }
 }

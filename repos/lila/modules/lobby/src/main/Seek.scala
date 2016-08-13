@@ -30,9 +30,9 @@ case class Seek(_id: String,
 
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
-    compatibilityProperties == h.compatibilityProperties &&
-    (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
-    h.ratingRangeCompatibleWith(this)
+      compatibilityProperties == h.compatibilityProperties &&
+      (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
+      h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Seek) = realRatingRange.fold(true) {
     range =>
@@ -47,17 +47,17 @@ case class Seek(_id: String,
   def rating = perfType map (_.key) flatMap user.ratingMap.get
 
   def render: JsObject = Json.obj(
-      "id" -> _id,
-      "username" -> user.username,
-      "rating" -> rating,
-      "variant" -> Json.obj("key" -> realVariant.key,
-                            "short" -> realVariant.shortName,
-                            "name" -> realVariant.name),
-      "mode" -> realMode.id,
-      "days" -> daysPerTurn,
-      "color" -> chess.Color(color).??(_.name),
-      "perf" -> Json.obj("icon" -> perfType.map(_.iconChar.toString),
-                         "name" -> perfType.map(_.name))
+    "id" -> _id,
+    "username" -> user.username,
+    "rating" -> rating,
+    "variant" -> Json.obj("key" -> realVariant.key,
+                          "short" -> realVariant.shortName,
+                          "name" -> realVariant.name),
+    "mode" -> realMode.id,
+    "days" -> daysPerTurn,
+    "color" -> chess.Color(color).??(_.name),
+    "perf" -> Json.obj("icon" -> perfType.map(_.iconChar.toString),
+                       "name" -> perfType.map(_.name))
   )
 
   lazy val perfType =

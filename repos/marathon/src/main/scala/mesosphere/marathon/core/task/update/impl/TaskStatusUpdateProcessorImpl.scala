@@ -7,7 +7,10 @@ import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.core.task.update.{TaskStatusUpdateProcessor, TaskStatusUpdateStep}
+import mesosphere.marathon.core.task.update.{
+  TaskStatusUpdateProcessor,
+  TaskStatusUpdateStep
+}
 import mesosphere.marathon.metrics.Metrics.Timer
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import mesosphere.marathon.state.{PathId, Timestamp}
@@ -35,14 +38,14 @@ class TaskStatusUpdateProcessorImpl @Inject()(
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   private[this] val publishFutureTimer: Timer = metrics.timer(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "publishFuture"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "publishFuture"))
 
   private[this] val killUnknownTaskTimer: Timer = metrics.timer(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "killUnknownTask"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "killUnknownTask"))
 
   private[this] val stepTimers: Map[String, Timer] = steps.map { step =>
     step.name -> metrics.timer(
-        metrics.name(MetricPrefixes.SERVICE, getClass, s"step-${step.name}"))
+      metrics.name(MetricPrefixes.SERVICE, getClass, s"step-${step.name}"))
   }.toMap
 
   log.info("Started status update processor with steps:\n{}",
@@ -61,10 +64,10 @@ class TaskStatusUpdateProcessorImpl @Inject()(
 
         case Some(task) if task.launched.isDefined =>
           processUpdate(
-              timestamp = now,
-              appId = taskId.appId,
-              task = task,
-              mesosStatus = status
+            timestamp = now,
+            appId = taskId.appId,
+            task = task,
+            mesosStatus = status
           ).flatMap(_ => acknowledge(status))
         case _ =>
           killUnknownTaskTimer {
@@ -101,8 +104,8 @@ class TaskStatusUpdateProcessorImpl @Inject()(
                                   mesosStatus.getTaskId.getValue): _*)
           nextStep.processUpdate(timestamp, task, mesosStatus).map { _ =>
             log.debug(
-                "Done with executing {} for [{}]",
-                Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*
+              "Done with executing {} for [{}]",
+              Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*
             )
           }
         }

@@ -23,8 +23,10 @@ private[streams] trait EnumeratorSubscriptionFactory[T]
   override def createSubscription[U >: T](
       subr: Subscriber[U],
       onSubscriptionEnded: SubscriptionHandle[U] => Unit) = {
-    new EnumeratorSubscription[T, U](
-        enum, emptyElement, subr, onSubscriptionEnded)
+    new EnumeratorSubscription[T, U](enum,
+                                     emptyElement,
+                                     subr,
+                                     onSubscriptionEnded)
   }
 }
 
@@ -32,8 +34,10 @@ private[streams] trait EnumeratorSubscriptionFactory[T]
   * Adapts an Enumerator to a Publisher.
   */
 private[streams] final class EnumeratorPublisher[T](
-    val enum: Enumerator[T], val emptyElement: Option[T] = None)
-    extends RelaxedPublisher[T] with EnumeratorSubscriptionFactory[T]
+    val enum: Enumerator[T],
+    val emptyElement: Option[T] = None)
+    extends RelaxedPublisher[T]
+    with EnumeratorSubscriptionFactory[T]
 
 private[streams] object EnumeratorSubscription {
 
@@ -91,7 +95,8 @@ private[streams] class EnumeratorSubscription[T, U >: T](
     subr: Subscriber[U],
     onSubscriptionEnded: SubscriptionHandle[U] => Unit)
     extends StateMachine[State[T]](initialState = Requested[T](0, Unattached))
-    with Subscription with SubscriptionHandle[U] {
+    with Subscription
+    with SubscriptionHandle[U] {
 
   // SubscriptionHandle methods
 
@@ -114,7 +119,7 @@ private[streams] class EnumeratorSubscription[T, U >: T](
   override def request(elements: Long): Unit = {
     if (elements <= 0)
       throw new IllegalArgumentException(
-          s"The number of requested elements must be > 0: requested $elements elements")
+        s"The number of requested elements must be > 0: requested $elements elements")
     exclusive {
       case Requested(0, its) =>
         state = Requested(elements, extendIteratee(its))
@@ -156,7 +161,7 @@ private[streams] class EnumeratorSubscription[T, U >: T](
       ()
     case Completed =>
       throw new IllegalStateException(
-          "Shouldn't receive another element once completed")
+        "Shouldn't receive another element once completed")
   }
 
   /**
@@ -170,7 +175,7 @@ private[streams] class EnumeratorSubscription[T, U >: T](
       ()
     case Completed =>
       throw new IllegalStateException(
-          "Shouldn't receive an empty input once completed")
+        "Shouldn't receive an empty input once completed")
   }
 
   /**
@@ -233,7 +238,7 @@ private[streams] class EnumeratorSubscription[T, U >: T](
     its match {
       case Unattached =>
         enum(iteratee).onComplete(enumeratorApplicationComplete)(
-            Execution.trampoline)
+          Execution.trampoline)
       case Attached(link0) =>
         link0.success(iteratee)
     }

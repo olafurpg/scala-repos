@@ -17,7 +17,10 @@
 
 package org.apache.spark.partial
 
-import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
+import org.apache.commons.math3.distribution.{
+  NormalDistribution,
+  TDistribution
+}
 
 import org.apache.spark.util.StatCounter
 
@@ -39,8 +42,10 @@ private[spark] class MeanEvaluator(totalOutputs: Int, confidence: Double)
     if (outputsMerged == totalOutputs) {
       new BoundedDouble(counter.mean, 1.0, counter.mean, counter.mean)
     } else if (outputsMerged == 0) {
-      new BoundedDouble(
-          0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
+      new BoundedDouble(0,
+                        0.0,
+                        Double.NegativeInfinity,
+                        Double.PositiveInfinity)
     } else {
       val mean = counter.mean
       val stdev = math.sqrt(counter.sampleVariance / counter.count)

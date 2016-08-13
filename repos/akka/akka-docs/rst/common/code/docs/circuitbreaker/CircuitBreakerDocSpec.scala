@@ -28,7 +28,7 @@ class DangerousActor extends Actor with ActorLogging {
 
   def notifyMeOnOpen(): Unit =
     log.warning(
-        "My CircuitBreaker is now open, and will not close for one minute")
+      "My CircuitBreaker is now open, and will not close for one minute")
   //#circuit-breaker-initialization
 
   //#circuit-breaker-usage

@@ -25,8 +25,8 @@ import kafka.utils.Logging
 import kafka.client.ClientUtils
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 class BrokerPartitionInfo(producerConfig: ProducerConfig,
                           producerPool: ProducerPool,
                           topicPartitionInfo: HashMap[String, TopicMetadata])
@@ -40,8 +40,8 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
     * @return a sequence of (brokerId, numPartitions). Returns a zero-length
     * sequence if no brokers are available.
     */
-  def getBrokerPartitionInfo(
-      topic: String, correlationId: Int): Seq[PartitionAndLeader] = {
+  def getBrokerPartitionInfo(topic: String,
+                             correlationId: Int): Seq[PartitionAndLeader] = {
     debug("Getting broker partition info for topic %s".format(topic))
     // check if the cache has metadata for this topic
     val topicMetadata = topicPartitionInfo.get(topic)
@@ -55,7 +55,7 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
           case Some(m) => m
           case None =>
             throw new KafkaException(
-                "Failed to fetch topic metadata for topic: " + topic)
+              "Failed to fetch topic metadata for topic: " + topic)
         }
     }
     val partitionMetadata = metadata.partitionsMetadata
@@ -64,19 +64,21 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
         throw new KafkaException(Errors.forCode(metadata.errorCode).exception)
       } else {
         throw new KafkaException(
-            "Topic metadata %s has empty partition metadata and no error code"
-              .format(metadata))
+          "Topic metadata %s has empty partition metadata and no error code"
+            .format(metadata))
       }
     }
     partitionMetadata.map { m =>
       m.leader match {
         case Some(leader) =>
-          debug("Partition [%s,%d] has leader %d".format(
-                  topic, m.partitionId, leader.id))
+          debug(
+            "Partition [%s,%d] has leader %d"
+              .format(topic, m.partitionId, leader.id))
           new PartitionAndLeader(topic, m.partitionId, Some(leader.id))
         case None =>
-          debug("Partition [%s,%d] does not have a leader yet".format(
-                  topic, m.partitionId))
+          debug(
+            "Partition [%s,%d] does not have a leader yet"
+              .format(topic, m.partitionId))
           new PartitionAndLeader(topic, m.partitionId, None)
       }
     }.sortWith((s, t) => s.partitionId < t.partitionId)
@@ -88,39 +90,39 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
     */
   def updateInfo(topics: Set[String], correlationId: Int) {
     var topicsMetadata: Seq[TopicMetadata] = Nil
-    val topicMetadataResponse = ClientUtils.fetchTopicMetadata(
-        topics, brokers, producerConfig, correlationId)
+    val topicMetadataResponse = ClientUtils
+      .fetchTopicMetadata(topics, brokers, producerConfig, correlationId)
     topicsMetadata = topicMetadataResponse.topicsMetadata
     // throw partition specific exception
-    topicsMetadata.foreach(
-        tmd =>
-          {
-        trace("Metadata for topic %s is %s".format(tmd.topic, tmd))
-        if (tmd.errorCode == Errors.NONE.code) {
-          topicPartitionInfo.put(tmd.topic, tmd)
-        } else
-          warn("Error while fetching metadata [%s] for topic [%s]: %s ".format(
-                  tmd,
-                  tmd.topic,
-                  Errors.forCode(tmd.errorCode).exception.getClass))
-        tmd.partitionsMetadata.foreach(pmd =>
-              {
-            if (pmd.errorCode != Errors.NONE.code &&
-                pmd.errorCode == Errors.LEADER_NOT_AVAILABLE.code) {
-              warn("Error while fetching metadata %s for topic partition [%s,%d]: [%s]"
-                    .format(pmd,
-                            tmd.topic,
-                            pmd.partitionId,
-                            Errors.forCode(pmd.errorCode).exception.getClass))
-            } // any other error code (e.g. ReplicaNotAvailable) can be ignored since the producer does not need to access the replica and isr metadata
-        })
+    topicsMetadata.foreach(tmd => {
+      trace("Metadata for topic %s is %s".format(tmd.topic, tmd))
+      if (tmd.errorCode == Errors.NONE.code) {
+        topicPartitionInfo.put(tmd.topic, tmd)
+      } else
+        warn(
+          "Error while fetching metadata [%s] for topic [%s]: %s ".format(
+            tmd,
+            tmd.topic,
+            Errors.forCode(tmd.errorCode).exception.getClass))
+      tmd.partitionsMetadata.foreach(pmd => {
+        if (pmd.errorCode != Errors.NONE.code &&
+            pmd.errorCode == Errors.LEADER_NOT_AVAILABLE.code) {
+          warn(
+            "Error while fetching metadata %s for topic partition [%s,%d]: [%s]"
+              .format(pmd,
+                      tmd.topic,
+                      pmd.partitionId,
+                      Errors.forCode(pmd.errorCode).exception.getClass))
+        } // any other error code (e.g. ReplicaNotAvailable) can be ignored since the producer does not need to access the replica and isr metadata
+      })
     })
     producerPool.updateProducer(topicsMetadata)
   }
 }
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
-case class PartitionAndLeader(
-    topic: String, partitionId: Int, leaderBrokerIdOpt: Option[Int])
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
+case class PartitionAndLeader(topic: String,
+                              partitionId: Int,
+                              leaderBrokerIdOpt: Option[Int])

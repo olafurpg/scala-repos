@@ -43,9 +43,9 @@ object StateChangeLogMerger extends Logging {
 
   val dateFormatString = "yyyy-MM-dd HH:mm:ss,SSS"
   val topicPartitionRegex = new Regex(
-      "\\[(" + Topic.legalChars + "+),( )*([0-9]+)\\]")
+    "\\[(" + Topic.legalChars + "+),( )*([0-9]+)\\]")
   val dateRegex = new Regex(
-      "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}")
+    "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}")
   val dateFormat = new SimpleDateFormat(dateFormatString)
   var files: List[String] = List()
   var topic: String = null
@@ -59,8 +59,8 @@ object StateChangeLogMerger extends Logging {
     val parser = new OptionParser
     val filesOpt = parser
       .accepts(
-          "logs",
-          "Comma separated list of state change logs or a regex for the log file names")
+        "logs",
+        "Comma separated list of state change logs or a regex for the log file names")
       .withRequiredArg
       .describedAs("file1,file2,...")
       .ofType(classOf[String])
@@ -77,15 +77,15 @@ object StateChangeLogMerger extends Logging {
       .ofType(classOf[String])
     val partitionsOpt = parser
       .accepts(
-          "partitions",
-          "Comma separated list of partition ids whose state change logs should be merged")
+        "partitions",
+        "Comma separated list of partition ids whose state change logs should be merged")
       .withRequiredArg
       .describedAs("0,1,2,...")
       .ofType(classOf[String])
     val startTimeOpt = parser
       .accepts(
-          "start-time",
-          "The earliest timestamp of state change log entries to be merged")
+        "start-time",
+        "The earliest timestamp of state change log entries to be merged")
       .withRequiredArg
       .describedAs("start timestamp in the format " + dateFormat)
       .ofType(classOf[String])
@@ -100,20 +100,21 @@ object StateChangeLogMerger extends Logging {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          parser,
-          "A tool for merging the log files from several brokers to reconnstruct a unified history of what happened.")
+        parser,
+        "A tool for merging the log files from several brokers to reconnstruct a unified history of what happened.")
 
     val options = parser.parse(args: _*)
     if ((!options.has(filesOpt) && !options.has(regexOpt)) ||
         (options.has(filesOpt) && options.has(regexOpt))) {
       System.err.println(
-          "Provide arguments to exactly one of the two options \"" + filesOpt +
+        "Provide arguments to exactly one of the two options \"" + filesOpt +
           "\" or \"" + regexOpt + "\"")
       parser.printHelpOn(System.err)
       System.exit(1)
     }
     if (options.has(partitionsOpt) && !options.has(topicOpt)) {
-      System.err.println("The option \"" + topicOpt +
+      System.err.println(
+        "The option \"" + topicOpt +
           "\" needs to be provided an argument when specifying partition ids")
       parser.printHelpOn(System.err)
       System.exit(1)
@@ -137,23 +138,20 @@ object StateChangeLogMerger extends Logging {
       topic = options.valueOf(topicOpt)
     }
     if (options.has(partitionsOpt)) {
-      partitions = options
-        .valueOf(partitionsOpt)
-        .split(",")
-        .toList
-        .map(_.toInt)
+      partitions =
+        options.valueOf(partitionsOpt).split(",").toList.map(_.toInt)
       val duplicatePartitions = CoreUtils.duplicates(partitions)
       if (duplicatePartitions.nonEmpty) {
         System.err.println(
-            "The list of partitions contains repeated entries: %s".format(
-                duplicatePartitions.mkString(",")))
+          "The list of partitions contains repeated entries: %s".format(
+            duplicatePartitions.mkString(",")))
         System.exit(1)
       }
     }
-    startDate = dateFormat.parse(
-        options.valueOf(startTimeOpt).replace('\"', ' ').trim)
-    endDate = dateFormat.parse(
-        options.valueOf(endTimeOpt).replace('\"', ' ').trim)
+    startDate =
+      dateFormat.parse(options.valueOf(startTimeOpt).replace('\"', ' ').trim)
+    endDate =
+      dateFormat.parse(options.valueOf(endTimeOpt).replace('\"', ' ').trim)
 
     /**
       * n-way merge from m input files:
@@ -163,8 +161,8 @@ object StateChangeLogMerger extends Logging {
       * 4. Flush the output buffer at the end. (The buffer will also be automatically flushed every K bytes.)
       */
     val pqueue = new mutable.PriorityQueue[LineIterator]()(dateBasedOrdering)
-    val output: OutputStream = new BufferedOutputStream(
-        System.out, 1024 * 1024)
+    val output: OutputStream =
+      new BufferedOutputStream(System.out, 1024 * 1024)
     val lineIterators = files.map(io.Source.fromFile(_).getLines)
     var lines: List[LineIterator] = List()
 
@@ -202,7 +200,7 @@ object StateChangeLogMerger extends Logging {
               case Some(matcher) =>
                 if ((topic == null || topic == matcher.group(1)) &&
                     (partitions.isEmpty ||
-                        partitions.contains(matcher.group(3).toInt)))
+                    partitions.contains(matcher.group(3).toInt)))
                   return new LineIterator(nextLine, itr)
               case None =>
             }

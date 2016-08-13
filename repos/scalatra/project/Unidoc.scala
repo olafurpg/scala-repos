@@ -16,17 +16,17 @@ object Unidoc extends Plugin {
     TaskKey[File]("unidoc", "Create unified scaladoc for all aggregates")
 
   val unidocSettings = Seq(
-      unidocDirectory <<= crossTarget { _ / "unidoc" },
-      unidocExclude := Seq.empty,
-      unidocAllSources <<=
-        (thisProjectRef, buildStructure, unidocExclude) flatMap allSources,
-      unidocSources <<= unidocAllSources map { _.flatten },
-      unidocAllClasspaths <<=
-        (thisProjectRef, buildStructure, unidocExclude) flatMap allClasspaths,
-      unidocClasspath <<= unidocAllClasspaths map {
-        _.flatten.map(_.data).distinct
-      },
-      unidoc <<= unidocTask
+    unidocDirectory <<= crossTarget { _ / "unidoc" },
+    unidocExclude := Seq.empty,
+    unidocAllSources <<=
+      (thisProjectRef, buildStructure, unidocExclude) flatMap allSources,
+    unidocSources <<= unidocAllSources map { _.flatten },
+    unidocAllClasspaths <<=
+      (thisProjectRef, buildStructure, unidocExclude) flatMap allClasspaths,
+    unidocClasspath <<= unidocAllClasspaths map {
+      _.flatten.map(_.data).distinct
+    },
+    unidoc <<= unidocTask
   )
 
   def allSources(projectRef: ProjectRef,

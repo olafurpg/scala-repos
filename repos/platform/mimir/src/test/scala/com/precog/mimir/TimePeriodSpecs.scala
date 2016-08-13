@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,9 +32,9 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimePeriodSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import Function._
 
@@ -93,7 +93,7 @@ trait TimePeriodSpecs[M[+ _]]
          Cross(None),
          Const(CString(field))(line),
          Operate(BuiltInFunction1Op(op1), Const(CString(value))(line))(line))(
-        line)
+      line)
   }
 
   def joinObject(obj1: DepGraph, obj2: DepGraph, obj3: DepGraph) = {
@@ -117,13 +117,14 @@ trait TimePeriodSpecs[M[+ _]]
       val result = testEval(input)
 
       result mustEqual Set(
-          (Vector(),
-           SArray(Vector(SString("1987-12-09T18:33:02.037Z"),
-                         SString("1991-06-14T07:03:07.037Z"),
-                         SString("1994-12-18T19:33:12.037Z"),
-                         SString("1998-06-23T08:03:17.037Z"),
-                         SString("2001-12-27T20:33:22.037Z"),
-                         SString("2005-07-02T09:03:27.037Z")))))
+        (Vector(),
+         SArray(
+           Vector(SString("1987-12-09T18:33:02.037Z"),
+                  SString("1991-06-14T07:03:07.037Z"),
+                  SString("1994-12-18T19:33:12.037Z"),
+                  SString("1998-06-23T08:03:17.037Z"),
+                  SString("2001-12-27T20:33:22.037Z"),
+                  SString("2005-07-02T09:03:27.037Z")))))
     }
 
     "compute correct range given end earlier than start" in {
@@ -140,15 +141,16 @@ trait TimePeriodSpecs[M[+ _]]
       val result = testEval(input)
 
       result mustEqual Set(
-          (Vector(),
-           SArray(Vector(SString("1987-12-09T18:33:02.037Z")))))
+        (Vector(), SArray(Vector(SString("1987-12-09T18:33:02.037Z")))))
     }
 
     "compute correct range given different timezones" in {
-      val start = createObject(
-          "start", ParseDateTimeFuzzy, "1987-12-09T18:33:02.037+01:00")
-      val end = createObject(
-          "end", ParseDateTimeFuzzy, "1987-12-09T20:33:02.037+03:00")
+      val start = createObject("start",
+                               ParseDateTimeFuzzy,
+                               "1987-12-09T18:33:02.037+01:00")
+      val end = createObject("end",
+                             ParseDateTimeFuzzy,
+                             "1987-12-09T20:33:02.037+03:00")
       val step = createObject("step", ParsePeriod, "PT2H")
 
       val obj = joinObject(start, end, step)
@@ -158,8 +160,7 @@ trait TimePeriodSpecs[M[+ _]]
       val result = testEval(input)
 
       result mustEqual Set(
-          (Vector(),
-           SArray(Vector(SString("1987-12-09T18:33:02.037+01:00")))))
+        (Vector(), SArray(Vector(SString("1987-12-09T18:33:02.037+01:00")))))
     }
 
     "compute correct range given multiple values" in {
@@ -202,17 +203,17 @@ trait TimePeriodSpecs[M[+ _]]
 
       val expected: Map[SValue, SArray] =
         Map(SString("PT1H") -> SArray(
-                Vector(SString("1991-06-14T07:03:07.037Z"),
-                       SString("1991-06-14T08:03:07.037Z"))),
+              Vector(SString("1991-06-14T07:03:07.037Z"),
+                     SString("1991-06-14T08:03:07.037Z"))),
             SString("P1Y") -> SArray(
-                Vector(SString("1991-06-14T07:03:07.037Z"))),
+              Vector(SString("1991-06-14T07:03:07.037Z"))),
             SString("PT5S") -> SArray(
-                Vector(SString("1991-06-14T07:03:07.037Z"),
-                       SString("1991-06-14T07:03:12.037Z"))),
+              Vector(SString("1991-06-14T07:03:07.037Z"),
+                     SString("1991-06-14T07:03:12.037Z"))),
             SString("P2M") -> SArray(
-                Vector(SString("1991-06-14T07:03:07.037Z"),
-                       SString("1991-08-14T07:03:07.037Z"),
-                       SString("1991-10-14T07:03:07.037Z"))))
+              Vector(SString("1991-06-14T07:03:07.037Z"),
+                     SString("1991-08-14T07:03:07.037Z"),
+                     SString("1991-10-14T07:03:07.037Z"))))
 
       result must haveAllElementsLike {
         case (ids, obj) =>

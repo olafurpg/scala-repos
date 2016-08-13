@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -104,14 +104,14 @@ trait CValueGenerators extends ArbitraryBigDecimal {
   }
 
   def ctype: Gen[CType] = oneOf(
-      CString,
-      CBoolean,
-      CLong,
-      CDouble,
-      CNum,
-      CNull,
-      CEmptyObject,
-      CEmptyArray
+    CString,
+    CBoolean,
+    CLong,
+    CDouble,
+    CNum,
+    CNull,
+    CEmptyObject,
+    CEmptyArray
   )
 
   // FIXME: TODO Should this provide some form for CDate?
@@ -154,27 +154,31 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       idCount <- choose(1, 3)
       dataSize <- choose(0, 20)
       ids <- containerOfN[Set, List[Long]](
-          dataSize, containerOfN[List, Long](idCount, posNum[Long]))
+              dataSize,
+              containerOfN[List, Long](idCount, posNum[Long]))
       values <- containerOfN[List, Seq[(JPath, JValue)]](
-          dataSize, Gen.sequence[List, (JPath, JValue)](jschema map {
-        case (jpath, ctype) => jvalue(ctype).map(jpath ->)
-      }))
+                 dataSize,
+                 Gen.sequence[List, (JPath, JValue)](jschema map {
+                   case (jpath, ctype) => jvalue(ctype).map(jpath ->)
+                 }))
 
       falseDepth <- choose(1, 3)
       falseSchema <- schema(falseDepth)
       falseSize <- choose(0, 5)
       falseIds <- containerOfN[Set, List[Long]](
-          falseSize, containerOfN[List, Long](idCount, posNum[Long]))
+                   falseSize,
+                   containerOfN[List, Long](idCount, posNum[Long]))
       falseValues <- containerOfN[List, Seq[(JPath, JValue)]](
-          falseSize, Gen.sequence[List, (JPath, JValue)](falseSchema map {
-        case (jpath, ctype) => jvalue(ctype).map(jpath ->)
-      }))
+                      falseSize,
+                      Gen.sequence[List, (JPath, JValue)](falseSchema map {
+                        case (jpath, ctype) => jvalue(ctype).map(jpath ->)
+                      }))
 
       falseIds2 = falseIds -- ids // distinct ids
     } yield {
       (idCount,
        (ids.map(_.toArray) zip values).toStream ++
-       (falseIds2.map(_.toArray) zip falseValues).toStream)
+         (falseIds2.map(_.toArray) zip falseValues).toStream)
     }
 
   def assemble(parts: Seq[(JPath, JValue)]): JValue = {
@@ -217,14 +221,14 @@ trait SValueGenerators extends ArbitraryBigDecimal {
   }
 
   def sleaf: Gen[SValue] = oneOf(
-      alphaStr map (SString(_: String)),
-      arbitrary[Boolean] map (SBoolean(_: Boolean)),
-      arbitrary[Long] map (l => SDecimal(BigDecimal(l))),
-      arbitrary[Double] map (d => SDecimal(BigDecimal(d))),
-      arbitrary[BigDecimal] map { bd =>
-        SDecimal(bd)
-      }, //scalacheck's BigDecimal gen will overflow at random
-      value(SNull)
+    alphaStr map (SString(_: String)),
+    arbitrary[Boolean] map (SBoolean(_: Boolean)),
+    arbitrary[Long] map (l => SDecimal(BigDecimal(l))),
+    arbitrary[Double] map (d => SDecimal(BigDecimal(d))),
+    arbitrary[BigDecimal] map { bd =>
+      SDecimal(bd)
+    }, //scalacheck's BigDecimal gen will overflow at random
+    value(SNull)
   )
 
   def sevent(idCount: Int, vdepth: Int): Gen[SEvent] = {
@@ -243,7 +247,7 @@ trait SValueGenerators extends ArbitraryBigDecimal {
 case class LimitList[A](values: List[A])
 
 object LimitList {
-  def genLimitList[A : Gen](size: Int): Gen[LimitList[A]] =
+  def genLimitList[A: Gen](size: Int): Gen[LimitList[A]] =
     for {
       i <- choose(0, size)
       l <- listOfN(i, implicitly[Gen[A]])
@@ -273,10 +277,10 @@ trait ArbitraryBigDecimal {
       exponent <- Gen.chooseNum(-MAX_EXPONENT, MAX_EXPONENT)
 
       adjusted = if (exponent.toLong +
-                     mantissa.toString.length >= Int.MaxValue.toLong)
+                       mantissa.toString.length >= Int.MaxValue.toLong)
         exponent - mantissa.toString.length
       else if (exponent.toLong -
-               mantissa.toString.length <= Int.MinValue.toLong)
+                 mantissa.toString.length <= Int.MinValue.toLong)
         exponent + mantissa.toString.length
       else exponent
     } yield BigDecimal(mantissa, adjusted, java.math.MathContext.UNLIMITED))

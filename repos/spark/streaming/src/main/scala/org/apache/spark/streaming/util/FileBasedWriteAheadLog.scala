@@ -53,8 +53,8 @@ private[streaming] class FileBasedWriteAheadLog(
     rollingIntervalSecs: Int,
     maxFailures: Int,
     closeFileAfterWrite: Boolean
-)
-    extends WriteAheadLog with Logging {
+) extends WriteAheadLog
+    with Logging {
 
   import FileBasedWriteAheadLog._
 
@@ -70,7 +70,7 @@ private[streaming] class FileBasedWriteAheadLog(
 
   override protected def logName = {
     getClass.getName.stripSuffix("$") +
-    callerName.map("_" + _).getOrElse("").replaceAll("[ ]", "_")
+      callerName.map("_" + _).getOrElse("").replaceAll("[ ]", "_")
   }
 
   private var currentLogPath: Option[String] = None
@@ -85,8 +85,8 @@ private[streaming] class FileBasedWriteAheadLog(
     * ByteBuffer to HDFS. When this method returns, the data is guaranteed to have been flushed
     * to HDFS, and will be available for readers to read.
     */
-  def write(
-      byteBuffer: ByteBuffer, time: Long): FileBasedWriteAheadLogSegment =
+  def write(byteBuffer: ByteBuffer,
+            time: Long): FileBasedWriteAheadLogSegment =
     synchronized {
       var fileSegment: FileBasedWriteAheadLogSegment = null
       var failures = 0
@@ -109,7 +109,7 @@ private[streaming] class FileBasedWriteAheadLog(
       }
       if (fileSegment == null) {
         logError(
-            s"Failed to write to write ahead log after $failures failures")
+          s"Failed to write to write ahead log after $failures failures")
         throw lastException
       }
       fileSegment
@@ -120,8 +120,8 @@ private[streaming] class FileBasedWriteAheadLog(
     var reader: FileBasedWriteAheadLogRandomReader = null
     var byteBuffer: ByteBuffer = null
     try {
-      reader = new FileBasedWriteAheadLogRandomReader(
-          fileSegment.path, hadoopConf)
+      reader =
+        new FileBasedWriteAheadLogRandomReader(fileSegment.path, hadoopConf)
       byteBuffer = reader.read(fileSegment)
     } finally {
       reader.close()
@@ -144,8 +144,8 @@ private[streaming] class FileBasedWriteAheadLog(
     def readFile(file: String): Iterator[ByteBuffer] = {
       logDebug(s"Creating log reader with $file")
       val reader = new FileBasedWriteAheadLogReader(file, hadoopConf)
-      CompletionIterator[ByteBuffer, Iterator[ByteBuffer]](
-          reader, reader.close _)
+      CompletionIterator[ByteBuffer, Iterator[ByteBuffer]](reader,
+                                                           reader.close _)
     }
     if (!closeFileAfterWrite) {
       logFilesToRead.iterator.map(readFile).flatten.asJava
@@ -175,7 +175,7 @@ private[streaming] class FileBasedWriteAheadLog(
       expiredLogs
     }
     logInfo(
-        s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
+      s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
         s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
 
     def deleteFile(walInfo: LogInfo): Unit = {
@@ -201,9 +201,9 @@ private[streaming] class FileBasedWriteAheadLog(
         } catch {
           case e: RejectedExecutionException =>
             logWarning(
-                "Execution context shutdown before deleting old WriteAheadLogs. " +
+              "Execution context shutdown before deleting old WriteAheadLogs. " +
                 "This would not affect recovery correctness.",
-                e)
+              e)
         }
       }
     }
@@ -230,11 +230,11 @@ private[streaming] class FileBasedWriteAheadLog(
         currentLogWriterStartTime = currentTime
         currentLogWriterStopTime = currentTime + (rollingIntervalSecs * 1000)
         val newLogPath = new Path(
-            logDirectory,
-            timeToLogFile(currentLogWriterStartTime, currentLogWriterStopTime))
+          logDirectory,
+          timeToLogFile(currentLogWriterStartTime, currentLogWriterStopTime))
         currentLogPath = Some(newLogPath.toString)
-        currentLogWriter = new FileBasedWriteAheadLogWriter(
-            currentLogPath.get, hadoopConf)
+        currentLogWriter =
+          new FileBasedWriteAheadLogWriter(currentLogPath.get, hadoopConf)
       }
       currentLogWriter
     }
@@ -248,13 +248,13 @@ private[streaming] class FileBasedWriteAheadLog(
     if (fileSystem.exists(logDirectoryPath) &&
         fileSystem.getFileStatus(logDirectoryPath).isDirectory) {
       val logFileInfo = logFilesTologInfo(
-          fileSystem.listStatus(logDirectoryPath).map { _.getPath })
+        fileSystem.listStatus(logDirectoryPath).map { _.getPath })
       pastLogs.clear()
       pastLogs ++= logFileInfo
       logInfo(
-          s"Recovered ${logFileInfo.size} write ahead log files from $logDirectory")
+        s"Recovered ${logFileInfo.size} write ahead log files from $logDirectory")
       logDebug(
-          s"Recovered files are:\n${logFileInfo.map(_.path).mkString("\n")}")
+        s"Recovered files are:\n${logFileInfo.map(_.path).mkString("\n")}")
     }
   }
 

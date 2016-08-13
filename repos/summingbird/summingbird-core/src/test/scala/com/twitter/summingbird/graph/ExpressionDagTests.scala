@@ -77,8 +77,8 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
     */
   def toLiteral = new GenFunction[Formula, L] {
     def apply[T] = { (form: Formula[T]) =>
-      def recurse[T2](
-          memo: HMap[Formula, L], f: Formula[T2]): (HMap[Formula, L], L[T2]) =
+      def recurse[T2](memo: HMap[Formula, L],
+                      f: Formula[T2]): (HMap[Formula, L], L[T2]) =
         memo.get(f) match {
           case Some(l) => (memo, l)
           case None =>
@@ -102,9 +102,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
                 def makeLit[T1](s: Sum[T1]) = {
                   val (m1, fl) = recurse(memo, s.left)
                   val (m2, fr) = recurse(m1, s.right)
-                  val lit = BinaryLit(
-                      fl, fr, { (f: Formula[T1], g: Formula[T1]) =>
-                    Sum(f, g)
+                  val lit = BinaryLit(fl, fr, {
+                    (f: Formula[T1], g: Formula[T1]) =>
+                      Sum(f, g)
                   })
                   (m2 + (s -> lit), lit)
                 }
@@ -113,9 +113,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
                 def makeLit[T1](p: Product[T1]) = {
                   val (m1, fl) = recurse(memo, p.left)
                   val (m2, fr) = recurse(m1, p.right)
-                  val lit = BinaryLit(
-                      fl, fr, { (f: Formula[T1], g: Formula[T1]) =>
-                    Product(f, g)
+                  val lit = BinaryLit(fl, fr, {
+                    (f: Formula[T1], g: Formula[T1]) =>
+                      Product(f, g)
                   })
                   (m2 + (p -> lit), lit)
                 }
@@ -180,13 +180,13 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
       type BoolT[T] = Boolean // constant type function
       dag.idToExp
         .collect(
-            new GenPartial[HMap[Id, ExpressionDag[Formula]#E]#Pair, BoolT] {
-          def apply[T] = {
-            case (id, expr) =>
-              val node = expr.evaluate(dag.idToExp)
-              dag.idOf(node) == id
-          }
-        })
+          new GenPartial[HMap[Id, ExpressionDag[Formula]#E]#Pair, BoolT] {
+            def apply[T] = {
+              case (id, expr) =>
+                val node = expr.evaluate(dag.idToExp)
+                dag.idOf(node) == id
+            }
+          })
         .forall(identity)
   }
 

@@ -19,7 +19,7 @@ case class Select(index: Int) extends Command {
   def command = Commands.SELECT
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.SELECT, StringToChannelBuffer(index.toString)))
+      Seq(CommandBytes.SELECT, StringToChannelBuffer(index.toString)))
 }
 
 object Select {
@@ -43,8 +43,7 @@ object Auth {
 case class Info(section: ChannelBuffer) extends Command {
   def command = Commands.INFO
   def toChannelBuffer =
-    RedisCodec.toUnifiedFormat(
-        section match {
+    RedisCodec.toUnifiedFormat(section match {
       case ChannelBuffers.EMPTY_BUFFER => Seq(CommandBytes.INFO)
       case _ => Seq(CommandBytes.INFO, section)
     })
@@ -52,9 +51,8 @@ case class Info(section: ChannelBuffer) extends Command {
 
 object Info {
   def apply(section: Seq[Array[Byte]]) = {
-    new Info(
-        section.headOption.map { ChannelBuffers.wrappedBuffer }
-          .getOrElse(ChannelBuffers.EMPTY_BUFFER))
+    new Info(section.headOption.map { ChannelBuffers.wrappedBuffer }
+      .getOrElse(ChannelBuffers.EMPTY_BUFFER))
   }
 }
 
@@ -107,12 +105,12 @@ trait ConfigHelper {
 }
 
 object Config {
-  val subCommands: Seq[ConfigHelper] = Seq(
-      ConfigGet, ConfigSet, ConfigResetStat)
+  val subCommands: Seq[ConfigHelper] =
+    Seq(ConfigGet, ConfigSet, ConfigResetStat)
 
   def apply(args: Seq[Array[Byte]]): Config = {
     val subCommandString = new String(
-        trimList(args.headOption.toList, 1, "CONFIG")(0)).toUpperCase
+      trimList(args.headOption.toList, 1, "CONFIG")(0)).toUpperCase
     val subCommand = subCommands.find { _.command == subCommandString }
       .getOrElse(
         throw ClientError("Invalid Config command " + subCommandString))

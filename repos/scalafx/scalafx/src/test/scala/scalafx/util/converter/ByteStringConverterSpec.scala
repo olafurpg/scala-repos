@@ -40,11 +40,13 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class ByteStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[
-        java.lang.Byte, jfxuc.ByteStringConverter, Byte, ByteStringConverter](
-        classOf[jfxuc.ByteStringConverter],
-        classOf[ByteStringConverter],
-        classOf[Byte]) {
+    extends AbstractStringConverterDelegateSpec[java.lang.Byte,
+                                                jfxuc.ByteStringConverter,
+                                                Byte,
+                                                ByteStringConverter](
+      classOf[jfxuc.ByteStringConverter],
+      classOf[ByteStringConverter],
+      classOf[Byte]) {
 
   val examples = List((0.toByte, "0"),
                       (12.toByte, "12"),

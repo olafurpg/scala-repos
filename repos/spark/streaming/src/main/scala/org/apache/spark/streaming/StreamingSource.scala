@@ -34,19 +34,19 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
                                f: StreamingJobProgressListener => T,
                                defaultValue: T): Unit = {
     registerGaugeWithOption[T](
-        name,
-        (l: StreamingJobProgressListener) => Option(f(streamingListener)),
-        defaultValue)
+      name,
+      (l: StreamingJobProgressListener) => Option(f(streamingListener)),
+      defaultValue)
   }
 
   private def registerGaugeWithOption[T](
       name: String,
       f: StreamingJobProgressListener => Option[T],
       defaultValue: T): Unit = {
-    metricRegistry.register(
-        MetricRegistry.name("streaming", name), new Gauge[T] {
-      override def getValue: T = f(streamingListener).getOrElse(defaultValue)
-    })
+    metricRegistry
+      .register(MetricRegistry.name("streaming", name), new Gauge[T] {
+        override def getValue: T = f(streamingListener).getOrElse(defaultValue)
+      })
   }
 
   // Gauge for number of network receivers
@@ -71,8 +71,9 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
   registerGauge("runningBatches", _.runningBatches.size, 0L)
 
   // Gauge for number of retained completed batches
-  registerGauge(
-      "retainedCompletedBatches", _.retainedCompletedBatches.size, 0L)
+  registerGauge("retainedCompletedBatches",
+                _.retainedCompletedBatches.size,
+                0L)
 
   // Gauge for last completed batch, useful for monitoring the streaming job's running status,
   // displayed data -1 for any abnormal condition.
@@ -110,6 +111,7 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
                           -1L)
 
   // Gauge for last received batch records.
-  registerGauge(
-      "lastReceivedBatch_records", _.lastReceivedBatchRecords.values.sum, 0L)
+  registerGauge("lastReceivedBatch_records",
+                _.lastReceivedBatchRecords.values.sum,
+                0L)
 }

@@ -31,7 +31,11 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 
 object MediaException {
   implicit def sfxMediaException2jfx(
@@ -46,58 +50,58 @@ object MediaException {
       */
     val MediaCorrupted = new Type(jfxsm.MediaException.Type.MEDIA_CORRUPTED)
     @deprecated(
-        "Use MediaCorrupted; MEDIA_CORRUPTED will be removed in a future release",
-        "8.0.60-R10")
+      "Use MediaCorrupted; MEDIA_CORRUPTED will be removed in a future release",
+      "8.0.60-R10")
     val MEDIA_CORRUPTED = MediaCorrupted
 
     /**
       * Indicates an error has occurred: although the media may exist, it is not accessible.
       */
     val MediaInaccessible = new Type(
-        jfxsm.MediaException.Type.MEDIA_INACCESSIBLE)
+      jfxsm.MediaException.Type.MEDIA_INACCESSIBLE)
     @deprecated(
-        "Use MediaInaccessible; MEDIA_INACCESSIBLE will be removed in a future release",
-        "8.0.60-R10")
+      "Use MediaInaccessible; MEDIA_INACCESSIBLE will be removed in a future release",
+      "8.0.60-R10")
     val MEDIA_INACCESSIBLE = MediaInaccessible
 
     /**
       * Indicates an error has occurred: the media does not exist or is otherwise unavailable.
       */
     val MediaUnavailable = new Type(
-        jfxsm.MediaException.Type.MEDIA_UNAVAILABLE)
+      jfxsm.MediaException.Type.MEDIA_UNAVAILABLE)
     @deprecated(
-        "Use MediaUnavailable; MEDIA_UNAVAILABLE will be removed in a future release",
-        "8.0.60-R10")
+      "Use MediaUnavailable; MEDIA_UNAVAILABLE will be removed in a future release",
+      "8.0.60-R10")
     val MEDIA_UNAVAILABLE = MediaUnavailable
 
     /**
       * Indicates that the media has not been specified.
       */
     val MediaUnspecified = new Type(
-        jfxsm.MediaException.Type.MEDIA_UNSPECIFIED)
+      jfxsm.MediaException.Type.MEDIA_UNSPECIFIED)
     @deprecated(
-        "Use MediaUnspecified; MEDIA_UNSPECIFIED will be removed in a future release",
-        "8.0.60-R10")
+      "Use MediaUnspecified; MEDIA_UNSPECIFIED will be removed in a future release",
+      "8.0.60-R10")
     val MEDIA_UNSPECIFIED = MediaUnspecified
 
     /**
       * Indicates that this media type is not supported by this platform.
       */
     val MediaUnsupported = new Type(
-        jfxsm.MediaException.Type.MEDIA_UNSUPPORTED)
+      jfxsm.MediaException.Type.MEDIA_UNSUPPORTED)
     @deprecated(
-        "Use MediaUnsupported; MEDIA_UNSUPPORTED will be removed in a future release",
-        "8.0.60-R10")
+      "Use MediaUnsupported; MEDIA_UNSUPPORTED will be removed in a future release",
+      "8.0.60-R10")
     val MEDIA_UNSUPPORTED = MediaUnsupported
 
     /**
       * Indicates that an operation performed on the media is not supported by this platform.
       */
     val OperationUnsupported = new Type(
-        jfxsm.MediaException.Type.OPERATION_UNSUPPORTED)
+      jfxsm.MediaException.Type.OPERATION_UNSUPPORTED)
     @deprecated(
-        "Use OperationUnsupported; OPERATION_UNSUPPORTED will be removed in a future release",
-        "8.0.60-R10")
+      "Use OperationUnsupported; OPERATION_UNSUPPORTED will be removed in a future release",
+      "8.0.60-R10")
     val OPERATION_UNSUPPORTED = OperationUnsupported
 
     /**
@@ -105,8 +109,8 @@ object MediaException {
       */
     val PlaybackError = new Type(jfxsm.MediaException.Type.PLAYBACK_ERROR)
     @deprecated(
-        "Use PlaybackError; PLAYBACK_ERROR will be removed in a future release",
-        "8.0.60-R10")
+      "Use PlaybackError; PLAYBACK_ERROR will be removed in a future release",
+      "8.0.60-R10")
     val PLAYBACK_ERROR = PlaybackError
 
     /**
@@ -114,8 +118,8 @@ object MediaException {
       */
     val PlaybackHalted = new Type(jfxsm.MediaException.Type.PLAYBACK_HALTED)
     @deprecated(
-        "Use PlaybackHalted; PLAYBACK_HALTED will be removed in a future release",
-        "8.0.60-R10")
+      "Use PlaybackHalted; PLAYBACK_HALTED will be removed in a future release",
+      "8.0.60-R10")
     val PLAYBACK_HALTED = PlaybackHalted
 
     /**
@@ -146,7 +150,8 @@ object MediaException {
 }
 
 class MediaException(override val delegate: jfxsm.MediaException)
-    extends Exception(delegate) with SFXDelegate[jfxsm.MediaException] {
+    extends Exception(delegate)
+    with SFXDelegate[jfxsm.MediaException] {
 
   /**
     * Retrieves the category into which this error falls.

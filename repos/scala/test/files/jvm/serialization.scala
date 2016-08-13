@@ -38,9 +38,9 @@ object Test1_scala {
 
   private def arrayEquals[A, B](a1: Array[A], a2: Array[B]): Boolean =
     (a1.length == a2.length) &&
-    (Iterator.range(0, a1.length) forall { i =>
-          a1(i) == a2(i)
-        })
+      (Iterator.range(0, a1.length) forall { i =>
+        a1(i) == a2(i)
+      })
 
   object WeekDay extends Enumeration {
     type WeekDay = Value
@@ -64,7 +64,8 @@ object Test1_scala {
     println("e1 = " + e1)
     println("_e1 = " + _e1)
     println("e1 eq _e1: " + (e1 eq _e1) + ", _e1 eq e1: " + (_e1 eq e1))
-    println("e1 equals _e1: " + (e1 equals _e1) + ", _e1 equals e1: " +
+    println(
+      "e1 equals _e1: " + (e1 equals _e1) + ", _e1 equals e1: " +
         (_e1 equals e1))
     println()
 
@@ -74,7 +75,8 @@ object Test1_scala {
     println("x7 = " + x7)
     println("y7 = " + y7)
     println("x7 eq y7: " + (x7 eq y7) + ", y7 eq x7: " + (y7 eq x7))
-    println("x7 equals y7: " + (x7 equals y7) + ", y7 equals x7: " +
+    println(
+      "x7 equals y7: " + (x7 equals y7) + ", y7 equals x7: " +
         (y7 equals x7))
     println()
 
@@ -83,7 +85,8 @@ object Test1_scala {
     println("x8 = " + x8)
     println("y8 = " + y8)
     println("x8 eq y8: " + (x8 eq y8) + ", y8 eq x8: " + (y8 eq x8))
-    println("x8 equals y8: " + (x8 equals y8) + ", y8 equals x8: " +
+    println(
+      "x8 equals y8: " + (x8 equals y8) + ", y8 equals x8: " +
         (y8 equals x8))
     println()
 
@@ -92,7 +95,8 @@ object Test1_scala {
     println("x9 = " + x9)
     println("y9 = " + y9)
     println("x9 eq y9: " + (x9 eq y9) + ", y9 eq x9: " + (y9 eq x9))
-    println("x9 equals y9: " + (x9 equals y9) + ", y9 equals x9: " +
+    println(
+      "x9 equals y9: " + (x9 equals y9) + ", y9 equals x9: " +
         (y9 equals x9))
     println()
 
@@ -102,15 +106,17 @@ object Test1_scala {
     println("y10 = " + y10)
     println("x10 eq y10: " + (x10 eq y10) + ", y10 eq x10: " + (y10 eq x10))
     println(
-        "x10 equals y10: " + (x10 equals y10) + ", y10 equals x10: " +
+      "x10 equals y10: " + (x10 equals y10) + ", y10 equals x10: " +
         (y10 equals x10))
     println()
 
     println("x9 eq x10: " + (x9 eq x10) + ", x10 eq x9: " + (x10 eq x9))
-    println("x9 equals x10: " + (x9 equals x10) + ", x10 equals x9: " +
+    println(
+      "x9 equals x10: " + (x9 equals x10) + ", x10 equals x9: " +
         (x10 equals x9))
     println("x9 eq y10: " + (x9 eq y10) + ", y10 eq x9: " + (y10 eq x9))
-    println("x9 equals y10: " + (x9 equals y10) + ", y10 equals x9: " +
+    println(
+      "x9 equals y10: " + (x9 equals y10) + ", y10 equals x9: " +
         (y10 equals x9))
     println()
 
@@ -130,9 +136,9 @@ object Test1_scala {
     println("xs0 = " + xs0)
     println("_xs0 = " + _xs0)
     println(
-        "xs0 eq _xs0: " + (xs0 eq _xs0) + ", _xs0 eq xs0: " + (_xs0 eq xs0))
+      "xs0 eq _xs0: " + (xs0 eq _xs0) + ", _xs0 eq xs0: " + (_xs0 eq xs0))
     println(
-        "xs0 equals _xs0: " + (xs0 equals _xs0) + ", _xs0 equals xs0: " +
+      "xs0 equals _xs0: " + (xs0 equals _xs0) + ", _xs0 equals xs0: " +
         (_xs0 equals xs0))
     println()
 
@@ -141,7 +147,7 @@ object Test1_scala {
     println("xs1 = " + xs1)
     println("_xs1 = " + _xs1)
     println(
-        "xs1 eq _xs1: " + (xs1 eq _xs1) + ", _xs1 eq xs1: " + (_xs1 eq xs1))
+      "xs1 eq _xs1: " + (xs1 eq _xs1) + ", _xs1 eq xs1: " + (_xs1 eq xs1))
     println()
 
     // Option
@@ -157,7 +163,8 @@ object Test1_scala {
     println("o2 = " + o2)
     println("_o2 = " + _o2)
     println("o2 eq _o2: " + (o2 eq _o2) + ", _o2 eq o2: " + (_o2 eq o2))
-    println("o2 equals _o2: " + (o2 equals _o2) + ", _o2 equals o2: " +
+    println(
+      "o2 equals _o2: " + (o2 equals _o2) + ", _o2 equals o2: " +
         (_o2 equals o2))
     println()
     /*
@@ -172,7 +179,8 @@ object Test1_scala {
     println("s1 = " + s1)
     println("_s1 = " + _s1)
     println("s1 eq _s1: " + (s1 eq _s1) + ", _s1 eq s1: " + (_s1 eq s1))
-    println("s1 equals _s1: " + (s1 equals _s1) + ", _s1 equals s1: " +
+    println(
+      "s1 equals _s1: " + (s1 equals _s1) + ", _s1 equals s1: " +
         (_s1 equals s1))
     println()
 
@@ -182,7 +190,8 @@ object Test1_scala {
     println("t1 = " + t1)
     println("_t1 = " + _t1)
     println("t1 eq _t1: " + (t1 eq _t1) + ", _t1 eq t1: " + (_t1 eq t1))
-    println("t1 equals _t1: " + (t1 equals _t1) + ", _t1 equals t1: " +
+    println(
+      "t1 equals _t1: " + (t1 equals _t1) + ", _t1 equals t1: " +
         (_t1 equals t1))
     println()
   } catch {
@@ -196,7 +205,22 @@ object Test1_scala {
 // Test classes in package "scala.collection.immutable"
 
 object Test2_immutable {
-  import scala.collection.immutable.{BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap, SortedSet, Stack, Stream, TreeMap, TreeSet, Vector}
+  import scala.collection.immutable.{
+    BitSet,
+    HashMap,
+    HashSet,
+    ListMap,
+    ListSet,
+    Queue,
+    Range,
+    SortedMap,
+    SortedSet,
+    Stack,
+    Stream,
+    TreeMap,
+    TreeSet,
+    Vector
+  }
 
   // in alphabetic order
   try {
@@ -300,7 +324,27 @@ object Test2_immutable {
 @deprecated("Suppress warnings", since = "2.11")
 object Test3_mutable {
   import scala.reflect.ClassManifest
-  import scala.collection.mutable.{ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList, HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList, ListBuffer, Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet}
+  import scala.collection.mutable.{
+    ArrayBuffer,
+    ArrayBuilder,
+    ArraySeq,
+    ArrayStack,
+    BitSet,
+    DoubleLinkedList,
+    HashMap,
+    HashSet,
+    History,
+    LinkedHashMap,
+    LinkedHashSet,
+    LinkedList,
+    ListBuffer,
+    Publisher,
+    Queue,
+    Stack,
+    StringBuilder,
+    WrappedArray,
+    TreeSet
+  }
   import scala.collection.concurrent.TrieMap
 
   // in alphabetic order

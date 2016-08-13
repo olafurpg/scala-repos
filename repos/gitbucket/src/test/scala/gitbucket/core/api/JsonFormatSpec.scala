@@ -64,14 +64,14 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiCommitStatus = ApiCommitStatus(
-      created_at = date1,
-      updated_at = date1,
-      state = "success",
-      target_url = Some("https://ci.example.com/1000/output"),
-      description = Some("Build has completed successfully"),
-      id = 1,
-      context = "Default",
-      creator = apiUser
+    created_at = date1,
+    updated_at = date1,
+    state = "success",
+    target_url = Some("https://ci.example.com/1000/output"),
+    description = Some("Build has completed successfully"),
+    id = 1,
+    context = "Default",
+    creator = apiUser
   )(sha1, repo1Name)
   val apiCommitStatusJson = s"""{
     "created_at":"2011-04-14T16:00:49Z",
@@ -85,20 +85,21 @@ class JsonFormatSpec extends FunSuite {
     "url": "http://gitbucket.exmple.com/api/v3/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e/statuses"
   }"""
 
-  val apiPushCommit = ApiCommit(
-      id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
-      message = "Update README.md",
-      timestamp = date1,
-      added = Nil,
-      removed = Nil,
-      modified = List("README.md"),
-      author = ApiPersonIdent("baxterthehacker",
-                              "baxterthehacker@users.noreply.github.com",
-                              date1),
-      committer = ApiPersonIdent(
-            "baxterthehacker",
-            "baxterthehacker@users.noreply.github.com",
-            date1))(RepositoryName("baxterthehacker", "public-repo"), true)
+  val apiPushCommit =
+    ApiCommit(id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
+              message = "Update README.md",
+              timestamp = date1,
+              added = Nil,
+              removed = Nil,
+              modified = List("README.md"),
+              author =
+                ApiPersonIdent("baxterthehacker",
+                               "baxterthehacker@users.noreply.github.com",
+                               date1),
+              committer = ApiPersonIdent(
+                "baxterthehacker",
+                "baxterthehacker@users.noreply.github.com",
+                date1))(RepositoryName("baxterthehacker", "public-repo"), true)
   val apiPushCommitJson = s"""{
       "id": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
       // "distinct": true,
@@ -129,11 +130,11 @@ class JsonFormatSpec extends FunSuite {
     }"""
 
   val apiComment = ApiComment(
-      id = 1,
-      user = apiUser,
-      body = "Me too",
-      created_at = date1,
-      updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, false)
+    id = 1,
+    user = apiUser,
+    body = "Me too",
+    created_at = date1,
+    updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, false)
   val apiCommentJson = s"""{
     "id": 1,
     "body": "Me too",
@@ -144,11 +145,11 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiCommentPR = ApiComment(
-      id = 1,
-      user = apiUser,
-      body = "Me too",
-      created_at = date1,
-      updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, true)
+    id = 1,
+    user = apiUser,
+    body = "Me too",
+    created_at = date1,
+    updated_at = date1)(RepositoryName("octocat", "Hello-World"), 100, true)
   val apiCommentPRJson = s"""{
     "id": 1,
     "body": "Me too",
@@ -158,8 +159,8 @@ class JsonFormatSpec extends FunSuite {
     "updated_at": "2011-04-14T16:00:49Z"
   }"""
 
-  val apiPersonIdent = ApiPersonIdent(
-      "Monalisa Octocat", "support@example.com", date1)
+  val apiPersonIdent =
+    ApiPersonIdent("Monalisa Octocat", "support@example.com", date1)
   val apiPersonIdentJson = """ {
     "name": "Monalisa Octocat",
     "email": "support@example.com",
@@ -167,17 +168,17 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiCommitListItem = ApiCommitListItem(
-      sha = sha1,
-      commit = ApiCommitListItem.Commit(
-            message = "Fix all the bugs",
-            author = apiPersonIdent,
-            committer = apiPersonIdent
-        )(sha1, repo1Name),
-      author = Some(apiUser),
-      committer = Some(apiUser),
-      parents = Seq(ApiCommitListItem.Parent(
-                "6dcb09b5b57875f334f61aebed695e2e4193db5e")(repo1Name)))(
-      repo1Name)
+    sha = sha1,
+    commit = ApiCommitListItem.Commit(
+      message = "Fix all the bugs",
+      author = apiPersonIdent,
+      committer = apiPersonIdent
+    )(sha1, repo1Name),
+    author = Some(apiUser),
+    committer = Some(apiUser),
+    parents = Seq(
+      ApiCommitListItem.Parent("6dcb09b5b57875f334f61aebed695e2e4193db5e")(
+        repo1Name)))(repo1Name)
   val apiCommitListItemJson = s"""{
     "url": "${context.baseUrl}/api/v3/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
     "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
@@ -198,11 +199,11 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiCombinedCommitStatus = ApiCombinedCommitStatus(
-      state = "success",
-      sha = sha1,
-      total_count = 2,
-      statuses = List(apiCommitStatus),
-      repository = repository)
+    state = "success",
+    sha = sha1,
+    total_count = 2,
+    statuses = List(apiCommitStatus),
+    repository = repository)
   val apiCombinedCommitStatusJson = s"""{
     "state": "success",
     "sha": "$sha1",
@@ -213,7 +214,7 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiLabel = ApiLabel(name = "bug", color = "f29513")(
-      RepositoryName("octocat", "Hello-World"))
+    RepositoryName("octocat", "Hello-World"))
   val apiLabelJson = s"""{
     "name": "bug",
     "color": "f29513",
@@ -221,13 +222,13 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiIssue = ApiIssue(
-      number = 1347,
-      title = "Found a bug",
-      user = apiUser,
-      state = "open",
-      body = "I'm having a problem with this.",
-      created_at = date1,
-      updated_at = date1)(RepositoryName("octocat", "Hello-World"), false)
+    number = 1347,
+    title = "Found a bug",
+    user = apiUser,
+    state = "open",
+    body = "I'm having a problem with this.",
+    created_at = date1,
+    updated_at = date1)(RepositoryName("octocat", "Hello-World"), false)
   val apiIssueJson = s"""{
     "number": 1347,
     "state": "open",
@@ -241,13 +242,13 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiIssuePR = ApiIssue(
-      number = 1347,
-      title = "Found a bug",
-      user = apiUser,
-      state = "open",
-      body = "I'm having a problem with this.",
-      created_at = date1,
-      updated_at = date1)(RepositoryName("octocat", "Hello-World"), true)
+    number = 1347,
+    title = "Found a bug",
+    user = apiUser,
+    state = "open",
+    body = "I'm having a problem with this.",
+    created_at = date1,
+    updated_at = date1)(RepositoryName("octocat", "Hello-World"), true)
   val apiIssuePRJson = s"""{
     "number": 1347,
     "state": "open",
@@ -267,19 +268,19 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiPullRequest = ApiPullRequest(
-      number = 1347,
-      updated_at = date1,
-      created_at = date1,
-      head = ApiPullRequest.Commit(sha = sha1,
-                                   ref = "new-topic",
-                                   repo = repository)("octocat"),
-      base = ApiPullRequest.Commit(sha = sha1,
-                                   ref = "master",
-                                   repo = repository)("octocat"),
-      mergeable = None,
-      title = "new-feature",
-      body = "Please pull these awesome changes",
-      user = apiUser
+    number = 1347,
+    updated_at = date1,
+    created_at = date1,
+    head =
+      ApiPullRequest.Commit(sha = sha1, ref = "new-topic", repo = repository)(
+        "octocat"),
+    base =
+      ApiPullRequest.Commit(sha = sha1, ref = "master", repo = repository)(
+        "octocat"),
+    mergeable = None,
+    title = "new-feature",
+    body = "Please pull these awesome changes",
+    user = apiUser
   )
   val apiPullRequestJson = s"""{
     "url": "${context.baseUrl}/api/v3/repos/octocat/Hello-World/pulls/1347",
@@ -328,17 +329,17 @@ class JsonFormatSpec extends FunSuite {
 
   // https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent
   val apiPullRequestReviewComment = ApiPullRequestReviewComment(
-      id = 29724692,
-      // "diff_hunk": "@@ -1 +1 @@\n-# public-repo",
-      path = "README.md",
-      // "position": 1,
-      // "original_position": 1,
-      commit_id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
-      // "original_commit_id": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
-      user = apiUser,
-      body = "Maybe you should use more emojji on this line.",
-      created_at = date("2015-05-05T23:40:27Z"),
-      updated_at = date("2015-05-05T23:40:27Z")
+    id = 29724692,
+    // "diff_hunk": "@@ -1 +1 @@\n-# public-repo",
+    path = "README.md",
+    // "position": 1,
+    // "original_position": 1,
+    commit_id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
+    // "original_commit_id": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
+    user = apiUser,
+    body = "Maybe you should use more emojji on this line.",
+    created_at = date("2015-05-05T23:40:27Z"),
+    updated_at = date("2015-05-05T23:40:27Z")
   )(RepositoryName("baxterthehacker/public-repo"), 1)
   val apiPullRequestReviewCommentJson = s"""{
     "url": "http://gitbucket.exmple.com/api/v3/repos/baxterthehacker/public-repo/pulls/comments/29724692",
@@ -369,10 +370,10 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiBranchProtection = ApiBranchProtection(
-      true,
-      Some(
-          ApiBranchProtection.Status(ApiBranchProtection.Everyone,
-                                     Seq("continuous-integration/travis-ci"))))
+    true,
+    Some(
+      ApiBranchProtection.Status(ApiBranchProtection.Everyone,
+                                 Seq("continuous-integration/travis-ci"))))
   val apiBranchProtectionJson = """{
     "enabled": true,
     "required_status_checks": {
@@ -393,13 +394,14 @@ class JsonFormatSpec extends FunSuite {
       parse(json2)
     } catch {
       case e: com.fasterxml.jackson.core.JsonParseException => {
-          val p =
-            java.lang.Math.max(e.getLocation.getCharOffset() - 10, 0).toInt
-          val message =
-            json2.substring(p, java.lang.Math.min(p + 100, json2.length))
-          throw new com.fasterxml.jackson.core.JsonParseException(
-              message + e.getMessage, e.getLocation)
-        }
+        val p =
+          java.lang.Math.max(e.getLocation.getCharOffset() - 10, 0).toInt
+        val message =
+          json2.substring(p, java.lang.Math.min(p + 100, json2.length))
+        throw new com.fasterxml.jackson.core.JsonParseException(
+          message + e.getMessage,
+          e.getLocation)
+      }
     }
     val js1 = parse(resultJson)
     assert(js1 === js2)
@@ -425,8 +427,8 @@ class JsonFormatSpec extends FunSuite {
     assertJson(JsonFormat(apiCommitStatus), apiCommitStatusJson)
   }
   test("apiCombinedCommitStatus") {
-    assertJson(
-        JsonFormat(apiCombinedCommitStatus), apiCombinedCommitStatusJson)
+    assertJson(JsonFormat(apiCombinedCommitStatus),
+               apiCombinedCommitStatusJson)
   }
   test("apiLabel") {
     assertJson(JsonFormat(apiLabel), apiLabelJson)

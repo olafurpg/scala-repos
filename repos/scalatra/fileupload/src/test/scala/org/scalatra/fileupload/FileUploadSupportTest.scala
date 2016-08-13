@@ -8,7 +8,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
 class FileUploadSupportTestServlet
-    extends ScalatraServlet with FileUploadSupport {
+    extends ScalatraServlet
+    with FileUploadSupport {
   post("""/multipart.*""".r) {
     multiParams.get("string") foreach { ps: Seq[String] =>
       response.setHeader("string", ps.mkString(";"))
@@ -75,17 +76,18 @@ class FileUploadSupportTest extends ScalatraFunSuite {
 
   def multipartResponse(path: String = "/multipart") = {
     val reqBody = new String(
-        IOUtils
-          .toString(getClass.getResourceAsStream("multipart_request.txt"))
-          .getBytes,
-        "iso-8859-1").getBytes("iso-8859-1")
+      IOUtils
+        .toString(getClass.getResourceAsStream("multipart_request.txt"))
+        .getBytes,
+      "iso-8859-1").getBytes("iso-8859-1")
 
     val boundary = "---------------------------3924013385056820061124200860"
 
-    post(path,
-         headers = Map("Content-Type" -> "multipart/form-data; boundary=%s"
-                 .format(boundary)),
-         body = reqBody) {
+    post(
+      path,
+      headers = Map(
+        "Content-Type" -> "multipart/form-data; boundary=%s".format(boundary)),
+      body = reqBody) {
       response
     }
   }
@@ -111,12 +113,12 @@ class FileUploadSupportTest extends ScalatraFunSuite {
 
   test("sets multiple file params") {
     multipartResponse().getHeader("file-two-with-brackets") should equal(
-        "twothree")
+      "twothree")
   }
 
   test("looks for params with [] suffix, Ruby style") {
     multipartResponse().getHeader("file-two-without-brackets") should equal(
-        "twothree")
+      "twothree")
   }
 
   test("fileParams returns first input for multiple file params") {
@@ -129,7 +131,7 @@ class FileUploadSupportTest extends ScalatraFunSuite {
 
   test("keeps input params on pass") {
     multipartResponse("/multipart-pass").getHeader("string") should equal(
-        "foo")
+      "foo")
   }
 
   test("keeps file params on pass") {
@@ -144,12 +146,12 @@ class FileUploadSupportTest extends ScalatraFunSuite {
 
   test("keeps query parameters") {
     multipartResponse("/multipart-param?queryParam=foo").getHeader(
-        "Query-Param") should equal("foo")
+      "Query-Param") should equal("foo")
   }
 
   test("query parameters don't shadow post parameters") {
     multipartResponse("/multipart-param?string=bar").getHeader("string") should equal(
-        "bar;foo")
+      "bar;foo")
   }
 
   test("max size is respected") {

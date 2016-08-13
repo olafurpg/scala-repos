@@ -9,7 +9,7 @@ import org.jboss.netty.buffer.ChannelBuffers
 @RunWith(classOf[JUnitRunner])
 class BufTest extends FunSuite {
   test(
-      "ChannelBufferBuf.slice: slices according to the underlying ChannelBuffer") {
+    "ChannelBufferBuf.slice: slices according to the underlying ChannelBuffer") {
     val cb = ChannelBuffers.buffer(128)
     cb.writeBytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8, 9))
     val buf = ChannelBufferBuf.Owned(cb)
@@ -76,8 +76,9 @@ class BufTest extends FunSuite {
   }
 
   test("ByteArray.coerce(ChannelBufferBuf)") {
-    val orig = ChannelBufferBuf.Owned(ChannelBuffers.wrappedBuffer(
-            Array[Byte](1, 2, 3, 4, 5, 6, 7, 8, 9), 2, 4))
+    val orig = ChannelBufferBuf.Owned(
+      ChannelBuffers
+        .wrappedBuffer(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8, 9), 2, 4))
     val coerced = Buf.ByteArray.coerce(orig)
     assert(coerced == orig)
     val Buf.ByteArray.Owned(bytes, begin, end) = coerced

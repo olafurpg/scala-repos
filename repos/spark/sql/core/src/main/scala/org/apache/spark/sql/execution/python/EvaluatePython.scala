@@ -31,7 +31,12 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, ArrayData, GenericArrayData, MapData}
+import org.apache.spark.sql.catalyst.util.{
+  ArrayBasedMapData,
+  ArrayData,
+  GenericArrayData,
+  MapData
+}
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
@@ -51,17 +56,15 @@ case class EvaluatePython(udf: PythonUDF,
 
 object EvaluatePython {
   def apply(udf: PythonUDF, child: LogicalPlan): EvaluatePython =
-    new EvaluatePython(
-        udf, child, AttributeReference("pythonUDF", udf.dataType)())
+    new EvaluatePython(udf,
+                       child,
+                       AttributeReference("pythonUDF", udf.dataType)())
 
   def takeAndServe(df: DataFrame, n: Int): Int = {
     registerPicklers()
     df.withNewExecutionId {
       val iter = new SerDeUtil.AutoBatchedPickler(
-          df.queryExecution.executedPlan
-            .executeTake(n)
-            .iterator
-            .map { row =>
+        df.queryExecution.executedPlan.executeTake(n).iterator.map { row =>
           EvaluatePython.toJava(row, df.schema)
         })
       PythonRDD.serveIterator(iter, s"serve-DataFrame")
@@ -78,29 +81,24 @@ object EvaluatePython {
       val values = new Array[Any](row.numFields)
       var i = 0
       while (i < row.numFields) {
-        values(i) = toJava(
-            row.get(i, struct.fields(i).dataType), struct.fields(i).dataType)
+        values(i) = toJava(row.get(i, struct.fields(i).dataType),
+                           struct.fields(i).dataType)
         i += 1
       }
       new GenericRowWithSchema(values, struct)
 
     case (a: ArrayData, array: ArrayType) =>
       val values = new java.util.ArrayList[Any](a.numElements())
-      a.foreach(array.elementType,
-                (_, e) =>
-                  {
-                    values.add(toJava(e, array.elementType))
-                })
+      a.foreach(array.elementType, (_, e) => {
+        values.add(toJava(e, array.elementType))
+      })
       values
 
     case (map: MapData, mt: MapType) =>
       val jmap = new java.util.HashMap[Any, Any](map.numElements())
-      map.foreach(mt.keyType,
-                  mt.valueType,
-                  (k, v) =>
-                    {
-                      jmap.put(toJava(k, mt.keyType), toJava(v, mt.valueType))
-                  })
+      map.foreach(mt.keyType, mt.valueType, (k, v) => {
+        jmap.put(toJava(k, mt.keyType), toJava(v, mt.valueType))
+      })
       jmap
 
     case (ud, udt: UserDefinedType[_]) => toJava(ud, udt.sqlType)
@@ -149,18 +147,17 @@ object EvaluatePython {
     case (c: String, BinaryType) => c.getBytes(StandardCharsets.UTF_8)
     case (c, BinaryType)
         if c.getClass.isArray &&
-        c.getClass.getComponentType.getName == "byte" =>
+          c.getClass.getComponentType.getName == "byte" =>
       c
 
     case (c: java.util.List[_], ArrayType(elementType, _)) =>
-      new GenericArrayData(
-          c.asScala.map { e =>
+      new GenericArrayData(c.asScala.map { e =>
         fromJava(e, elementType)
       }.toArray)
 
     case (c, ArrayType(elementType, _)) if c.getClass.isArray =>
       new GenericArrayData(
-          c.asInstanceOf[Array[_]].map(e => fromJava(e, elementType)))
+        c.asInstanceOf[Array[_]].map(e => fromJava(e, elementType)))
 
     case (c: java.util.Map[_, _], MapType(keyType, valueType, _)) =>
       val keyValues = c.asScala.toSeq
@@ -172,16 +169,13 @@ object EvaluatePython {
       val array = c.asInstanceOf[Array[_]]
       if (array.length != fields.length) {
         throw new IllegalStateException(
-            s"Input row doesn't have expected number of values required by the schema. " +
+          s"Input row doesn't have expected number of values required by the schema. " +
             s"${fields.length} fields are required while ${array.length} values are provided."
         )
       }
-      new GenericInternalRow(
-          array
-            .zip(fields)
-            .map {
-          case (e, f) => fromJava(e, f.dataType)
-        })
+      new GenericInternalRow(array.zip(fields).map {
+        case (e, f) => fromJava(e, f.dataType)
+      })
 
     case (_, udt: UserDefinedType[_]) => fromJava(obj, udt.sqlType)
 
@@ -205,8 +199,9 @@ object EvaluatePython {
 
     def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
       out.write(Opcodes.GLOBAL)
-      out.write((module + "\n" + "_parse_datatype_json_string" +
-              "\n").getBytes(StandardCharsets.UTF_8))
+      out.write(
+        (module + "\n" + "_parse_datatype_json_string" +
+          "\n").getBytes(StandardCharsets.UTF_8))
       val schema = obj.asInstanceOf[StructType]
       pickler.save(schema.json)
       out.write(Opcodes.TUPLE1)
@@ -230,8 +225,9 @@ object EvaluatePython {
     def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
       if (obj == this) {
         out.write(Opcodes.GLOBAL)
-        out.write((module + "\n" + "_create_row_inbound_converter" +
-                "\n").getBytes(StandardCharsets.UTF_8))
+        out.write(
+          (module + "\n" + "_create_row_inbound_converter" +
+            "\n").getBytes(StandardCharsets.UTF_8))
       } else {
         // it will be memorized by Pickler to save some bytes
         pickler.save(this)

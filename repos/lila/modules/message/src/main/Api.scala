@@ -19,12 +19,12 @@ final class Api(unreadCache: UnreadCache,
                 bus: lila.common.Bus) {
 
   def inbox(me: User, page: Int): Fu[Paginator[Thread]] = Paginator(
-      adapter = new Adapter(
-            selector = ThreadRepo visibleByUserQuery me.id,
-            sort = Seq(ThreadRepo.recentSort)
-        ),
-      currentPage = page,
-      maxPerPage = maxPerPage
+    adapter = new Adapter(
+      selector = ThreadRepo visibleByUserQuery me.id,
+      sort = Seq(ThreadRepo.recentSort)
+    ),
+    currentPage = page,
+    maxPerPage = maxPerPage
   )
 
   def preview(userId: String): Fu[List[Thread]] = unreadCache(userId) flatMap {
@@ -36,8 +36,8 @@ final class Api(unreadCache: UnreadCache,
     for {
       threadOption ← $find.byId(id) map (_ filter (_ hasUser me))
       _ ← threadOption
-        .filter(_ isUnReadBy me)
-        .??(thread => (ThreadRepo setRead thread) >>- updateUser(me))
+           .filter(_ isUnReadBy me)
+           .??(thread => (ThreadRepo setRead thread) >>- updateUser(me))
     } yield threadOption
 
   def markThreadAsRead(id: String, me: User): Funit = thread(id, me).void
@@ -102,7 +102,7 @@ final class Api(unreadCache: UnreadCache,
   def deleteThread(id: String, me: User): Funit =
     thread(id, me) flatMap { threadOption =>
       (threadOption.map(_.id) ?? (ThreadRepo deleteFor me.id)) >>- updateUser(
-          me)
+        me)
     }
 
   val unreadIds = unreadCache apply _

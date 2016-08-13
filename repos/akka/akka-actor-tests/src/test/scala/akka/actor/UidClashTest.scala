@@ -13,7 +13,7 @@ object UidClashTest {
 
   class TerminatedForNonWatchedActor
       extends Exception(
-          "Received Terminated for actor that was not actually watched")
+        "Received Terminated for actor that was not actually watched")
       with NoStackTrace
 
   @volatile var oldActor: ActorRef = _

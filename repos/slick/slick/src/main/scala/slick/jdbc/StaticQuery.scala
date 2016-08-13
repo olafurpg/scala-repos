@@ -14,7 +14,11 @@ import scala.reflect.macros.{blackbox, whitebox}
 import scala.collection.mutable.ArrayBuffer
 
 import slick.SlickException
-import slick.basic.{DatabaseConfig, StaticDatabaseConfigMacros, StaticDatabaseConfig}
+import slick.basic.{
+  DatabaseConfig,
+  StaticDatabaseConfigMacros,
+  StaticDatabaseConfig
+}
 import slick.dbio.{NoStream, Effect}
 import slick.sql.{SqlAction, SqlStreamingAction}
 import slick.util.ClassLoaderUtil
@@ -29,7 +33,8 @@ class ActionBasedSQLInterpolation(val s: StringContext) extends AnyVal {
   def sqlu(param: Any*): SqlAction[Int, NoStream, Effect] = macro sqluImpl
 
   /** Build an Invoker for a statement with computed types via string interpolation */
-  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] = macro tsqlImpl
+  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] =
+    macro tsqlImpl
 }
 
 object ActionBasedSQLInterpolation {
@@ -39,8 +44,8 @@ object ActionBasedSQLInterpolation {
     val macroTreeBuilder = new MacroTreeBuilder[ctxt.type](ctxt)(param.toList)
     reify {
       SQLActionBuilder(
-          ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
-          ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
+        ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
+        ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
       )
     }
   }
@@ -51,8 +56,8 @@ object ActionBasedSQLInterpolation {
     val macroTreeBuilder = new MacroTreeBuilder[ctxt.type](ctxt)(param.toList)
     reify {
       val res: SQLActionBuilder = SQLActionBuilder(
-          ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
-          ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
+        ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
+        ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
       )
       res.asUpdate
     }
@@ -64,12 +69,13 @@ object ActionBasedSQLInterpolation {
 
     val uri = StaticDatabaseConfigMacros.getURI(ctxt)
     //TODO The database configuration and connection should be cached for subsequent macro invocations
-    val dc = try DatabaseConfig.forURI[JdbcProfile](
-        new URI(uri), ClassLoaderUtil.defaultClassLoader) catch {
+    val dc = try DatabaseConfig
+      .forURI[JdbcProfile](new URI(uri), ClassLoaderUtil.defaultClassLoader)
+    catch {
       case ex @ (_: ConfigException | _: SlickException) =>
         ctxt.abort(
-            ctxt.enclosingPosition,
-            s"""Cannot load @StaticDatabaseConfig("$uri"): ${ex.getMessage}""")
+          ctxt.enclosingPosition,
+          s"""Cannot load @StaticDatabaseConfig("$uri"): ${ex.getMessage}""")
     }
     val rTypes = try {
       val a = SimpleJdbcAction { ctx =>
@@ -79,10 +85,10 @@ object ActionBasedSQLInterpolation {
             case resultMeta =>
               Vector.tabulate(resultMeta.getColumnCount) { i =>
                 val modelBuilder = dc.profile.createModelBuilder(Nil, true)(
-                    scala.concurrent.ExecutionContext.global)
+                  scala.concurrent.ExecutionContext.global)
                 modelBuilder.jdbcTypeToScala(
-                    resultMeta.getColumnType(i + 1),
-                    resultMeta.getColumnTypeName(i + 1))
+                  resultMeta.getColumnType(i + 1),
+                  resultMeta.getColumnTypeName(i + 1))
               }
           }
         }
@@ -94,16 +100,16 @@ object ActionBasedSQLInterpolation {
       val rconv =
         ctxt.Expr[GetResult[Any]](macroTreeBuilder.rconvTree(rTypes)).splice
       val res: SQLActionBuilder = SQLActionBuilder(
-          ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
-          ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
+        ctxt.Expr[Seq[Any]](macroTreeBuilder.queryParts).splice,
+        ctxt.Expr[SetParameter[Unit]](macroTreeBuilder.pconvTree).splice
       )
       res.as(rconv)
     }
   }
 }
 
-case class SQLActionBuilder(
-    queryParts: Seq[Any], unitPConv: SetParameter[Unit]) {
+case class SQLActionBuilder(queryParts: Seq[Any],
+                            unitPConv: SetParameter[Unit]) {
   def as[R](implicit rconv: GetResult[R])
     : SqlStreamingAction[Vector[R], R, Effect] = {
     val query =

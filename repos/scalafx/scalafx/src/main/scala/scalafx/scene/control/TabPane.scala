@@ -32,7 +32,11 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty}
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.geometry.Side
 
 object TabPane {
@@ -41,8 +45,8 @@ object TabPane {
     if (v != null) v.delegate else null
 
   object TabClosingPolicy
-      extends SFXEnumDelegateCompanion[
-          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy] {
+      extends SFXEnumDelegateCompanion[jfxsc.TabPane.TabClosingPolicy,
+                                       TabClosingPolicy] {
 
     /**
       * All tabs will have the option to be closed.
@@ -57,20 +61,20 @@ object TabPane {
       * shown.
       */
     val SelectedTab = new TabClosingPolicy(
-        jfxsc.TabPane.TabClosingPolicy.SELECTED_TAB)
+      jfxsc.TabPane.TabClosingPolicy.SELECTED_TAB)
     @deprecated(
-        "Use SelectedTab; SELECTED_TAB will be removed in a future release",
-        "8.0.60-R10")
+      "Use SelectedTab; SELECTED_TAB will be removed in a future release",
+      "8.0.60-R10")
     val SELECTED_TAB = SelectedTab
 
     /**
       * Tabs can not be closed by the user.
       */
     val Unavailable = new TabClosingPolicy(
-        jfxsc.TabPane.TabClosingPolicy.UNAVAILABLE)
+      jfxsc.TabPane.TabClosingPolicy.UNAVAILABLE)
     @deprecated(
-        "Use Unavailable; UNAVAILABLE will be removed in a future release",
-        "8.0.60-R10")
+      "Use Unavailable; UNAVAILABLE will be removed in a future release",
+      "8.0.60-R10")
     val UNAVAILABLE = Unavailable
 
     protected override def unsortedValues: Array[TabClosingPolicy] =
@@ -89,7 +93,8 @@ object TabPane {
 }
 
 class TabPane(override val delegate: jfxsc.TabPane = new jfxsc.TabPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.TabPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TabPane] {
 
   /**
     * The rotatedGraphic state of the tabs in the TabPane.

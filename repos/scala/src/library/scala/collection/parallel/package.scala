@@ -150,12 +150,12 @@ package parallel {
   @deprecated("This class will be removed.", "2.11.0")
   final case class CompositeThrowable(throwables: Set[Throwable])
       extends Exception(
-          "Multiple exceptions thrown during a parallel computation: " +
+        "Multiple exceptions thrown during a parallel computation: " +
           throwables
             .map(t =>
-                  t + "\n" + t.getStackTrace.take(10).++("...").mkString("\n"))
+              t + "\n" + t.getStackTrace.take(10).++("...").mkString("\n"))
             .mkString("\n\n")
-        )
+      )
 
   /** A helper iterator for iterating very small array buffers.
     *  Automatically forwards the signal delegate when splitting.
@@ -179,8 +179,8 @@ package parallel {
       if (remaining > 1) {
         val divsz = (until - index) / 2
         Seq(
-            new BufferSplitter(buffer, index, index + divsz, signalDelegate),
-            new BufferSplitter(buffer, index + divsz, until, signalDelegate)
+          new BufferSplitter(buffer, index, index + divsz, signalDelegate),
+          new BufferSplitter(buffer, index + divsz, until, signalDelegate)
         )
       } else Seq(this)
     private[parallel] override def debugInformation = {
@@ -219,9 +219,9 @@ package parallel {
     *  They can be overridden in subclasses to provide custom behaviour by modifying
     *  the receiver (which will be the return value).
     */
-  private[parallel] abstract class BucketCombiner[
-      -Elem, +To, Buck, +CombinerType <: BucketCombiner[
-          Elem, To, Buck, CombinerType]](private val bucketnumber: Int)
+  private[parallel] abstract class BucketCombiner[-Elem, +To, Buck,
+  +CombinerType <: BucketCombiner[Elem, To, Buck, CombinerType]](
+      private val bucketnumber: Int)
       extends Combiner[Elem, To] {
     //self: EnvironmentPassingCombiner[Elem, To] =>
     protected var buckets: Array[UnrolledBuffer[Buck]] @uncheckedVariance =

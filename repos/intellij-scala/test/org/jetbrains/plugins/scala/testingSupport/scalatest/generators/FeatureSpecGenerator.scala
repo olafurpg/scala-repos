@@ -13,8 +13,8 @@ trait FeatureSpecGenerator extends ScalaTestTestCase {
 
   def addFeatureSpec() {
     addFileToProject(
-        featureSpecFileName,
-        """
+      featureSpecFileName,
+      """
         |import org.scalatest._
         |
         |class FeatureSpecTest extends FeatureSpec with GivenWhenThen {

@@ -27,8 +27,8 @@ class LBFGSBTest extends OptimizeTestBase {
   val EPS = 1E-4;
 
   test("L-BFGS-B should solve with bound constraint") {
-    val solver = new LBFGSB(
-        DenseVector[Double](-100, -100), DenseVector[Double](1200, 100))
+    val solver = new LBFGSB(DenseVector[Double](-100, -100),
+                            DenseVector[Double](1200, 100))
     val nearX0 = DenseVector[Double](-1.2, 1.0)
 
     val f = new DiffFunction[DenseVector[Double]] {
@@ -36,8 +36,8 @@ class LBFGSBTest extends OptimizeTestBase {
           x: DenseVector[Double]): (Double, DenseVector[Double]) = {
         val cost = (1 - x(0)) * (1 - x(0)) + 100 * pow(x(1) - x(0) * x(0), 2)
         val grad = DenseVector(
-            -2.0 * (1 - x(0)) + 200 * (x(1) - x(0) * x(0)) * (-2.0 * x(0)),
-            200 * (x(1) - x(0) * x(0))
+          -2.0 * (1 - x(0)) + 200 * (x(1) - x(0) * x(0)) * (-2.0 * x(0)),
+          200 * (x(1) - x(0) * x(0))
         )
         (cost, grad)
       }
@@ -64,8 +64,8 @@ class LBFGSBTest extends OptimizeTestBase {
         val cost =
           pow(x(0) - x(1) * x(1), 2) / 2.0 + (x(1) - 2.0) * (x(1) - 2.0) / 2.0
         val grad = DenseVector(
-            x(0) - x(1) * x(1),
-            -2.0 * x(1) * (x(0) - x(1) * x(1)) + x(1) - 2.0
+          x(0) - x(1) * x(1),
+          -2.0 * x(1) * (x(0) - x(1) * x(1)) + x(1) - 2.0
         )
         (cost, grad)
       }
@@ -87,8 +87,8 @@ class LBFGSBTest extends OptimizeTestBase {
           x: DenseVector[Double]): (Double, DenseVector[Double]) = {
         val func = 100 * math.pow(x(0) + 3, 4) + math.pow(x(1) - 3, 4)
         val grad = DenseVector(
-            400 * math.pow(x(0) + 3, 3),
-            4 * math.pow(x(1) - 3, 3)
+          400 * math.pow(x(0) + 3, 3),
+          4 * math.pow(x(1) - 3, 3)
         )
         func -> grad
       }

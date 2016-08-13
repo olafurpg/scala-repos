@@ -53,7 +53,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
                                     val taskSet: TaskSet,
                                     val maxTaskFailures: Int,
                                     clock: Clock = new SystemClock())
-    extends Schedulable with Logging {
+    extends Schedulable
+    with Logging {
 
   val conf = sched.sc.conf
 
@@ -190,25 +191,26 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     for (loc <- tasks(index).preferredLocations) {
       loc match {
         case e: ExecutorCacheTaskLocation =>
-          pendingTasksForExecutor.getOrElseUpdate(
-              e.executorId, new ArrayBuffer) += index
+          pendingTasksForExecutor.getOrElseUpdate(e.executorId,
+                                                  new ArrayBuffer) += index
         case e: HDFSCacheTaskLocation => {
-            val exe = sched.getExecutorsAliveOnHost(loc.host)
-            exe match {
-              case Some(set) => {
-                  for (e <- set) {
-                    pendingTasksForExecutor.getOrElseUpdate(e, new ArrayBuffer) += index
-                  }
-                  logInfo(
-                      s"Pending task $index has a cached location at ${e.host} " +
-                      ", where there are executors " + set.mkString(","))
-                }
-              case None =>
-                logDebug(
-                    s"Pending task $index has a cached location at ${e.host} " +
-                    ", but there are no executors alive there.")
+          val exe = sched.getExecutorsAliveOnHost(loc.host)
+          exe match {
+            case Some(set) => {
+              for (e <- set) {
+                pendingTasksForExecutor
+                  .getOrElseUpdate(e, new ArrayBuffer) += index
+              }
+              logInfo(
+                s"Pending task $index has a cached location at ${e.host} " +
+                  ", where there are executors " + set.mkString(","))
             }
+            case None =>
+              logDebug(
+                s"Pending task $index has a cached location at ${e.host} " +
+                  ", but there are no executors alive there.")
           }
+        }
         case _ =>
       }
       pendingTasksForHost.getOrElseUpdate(loc.host, new ArrayBuffer) += index
@@ -255,8 +257,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     * This method also cleans up any tasks in the list that have already
     * been launched, since we want that to happen lazily.
     */
-  private def dequeueTaskFromList(
-      execId: String, list: ArrayBuffer[Int]): Option[Int] = {
+  private def dequeueTaskFromList(execId: String,
+                                  list: ArrayBuffer[Int]): Option[Int] = {
     var indexOffset = list.size
     while (indexOffset > 0) {
       indexOffset -= 1
@@ -286,7 +288,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       val failed = failedExecutors.get(taskId).get
 
       return failed.contains(execId) && clock.getTimeMillis() -
-      failed.get(execId).get < EXECUTOR_TASK_BLACKLIST_TIMEOUT
+        failed.get(execId).get < EXECUTOR_TASK_BLACKLIST_TIMEOUT
     }
 
     false
@@ -312,8 +314,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       // on multiple nodes when we replicate cached blocks, as in Spark Streaming
       for (index <- speculatableTasks if canRunOnHost(index)) {
         val prefs = tasks(index).preferredLocations
-        val executors = prefs.flatMap(
-            _ match {
+        val executors = prefs.flatMap(_ match {
           case e: ExecutorCacheTaskLocation => Some(e.executorId)
           case _ => None
         });
@@ -378,11 +379,12 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     *
     * @return An option containing (task index within the task set, locality, is speculative?)
     */
-  private def dequeueTask(
-      execId: String, host: String, maxLocality: TaskLocality.Value)
+  private def dequeueTask(execId: String,
+                          host: String,
+                          maxLocality: TaskLocality.Value)
     : Option[(Int, TaskLocality.Value, Boolean)] = {
-    for (index <- dequeueTaskFromList(
-        execId, getPendingTasksForExecutor(execId))) {
+    for (index <- dequeueTaskFromList(execId,
+                                      getPendingTasksForExecutor(execId))) {
       return Some((index, TaskLocality.PROCESS_LOCAL, false))
     }
 
@@ -451,70 +453,72 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
 
       dequeueTask(execId, host, allowedLocality) match {
         case Some((index, taskLocality, speculative)) => {
-            // Found a task; do some bookkeeping and return a task description
-            val task = tasks(index)
-            val taskId = sched.newTaskId()
-            // Do various bookkeeping
-            copiesRunning(index) += 1
-            val attemptNum = taskAttempts(index).size
-            val info = new TaskInfo(taskId,
-                                    index,
-                                    attemptNum,
-                                    curTime,
-                                    execId,
-                                    host,
-                                    taskLocality,
-                                    speculative)
-            taskInfos(taskId) = info
-            taskAttempts(index) = info :: taskAttempts(index)
-            // Update our locality level for delay scheduling
-            // NO_PREF will not affect the variables related to delay scheduling
-            if (maxLocality != TaskLocality.NO_PREF) {
-              currentLocalityIndex = getLocalityIndex(taskLocality)
-              lastLaunchTime = curTime
-            }
-            // Serialize and return the task
-            val startTime = clock.getTimeMillis()
-            val serializedTask: ByteBuffer = try {
-              Task.serializeWithDependencies(
-                  task, sched.sc.addedFiles, sched.sc.addedJars, ser)
-            } catch {
-              // If the task cannot be serialized, then there's no point to re-attempt the task,
-              // as it will always fail. So just abort the whole task-set.
-              case NonFatal(e) =>
-                val msg =
-                  s"Failed to serialize task $taskId, not attempting to retry it."
-                logError(msg, e)
-                abort(s"$msg Exception during serialization: $e")
-                throw new TaskNotSerializableException(e)
-            }
-            if (serializedTask.limit > TaskSetManager.TASK_SIZE_TO_WARN_KB * 1024 &&
-                !emittedTaskSizeWarning) {
-              emittedTaskSizeWarning = true
-              logWarning(
-                  s"Stage ${task.stageId} contains a task of very large size " +
-                  s"(${serializedTask.limit / 1024} KB). The maximum recommended task size is " +
-                  s"${TaskSetManager.TASK_SIZE_TO_WARN_KB} KB.")
-            }
-            addRunningTask(taskId)
-
-            // We used to log the time it takes to serialize the task, but task size is already
-            // a good proxy to task serialization time.
-            // val timeTaken = clock.getTime() - startTime
-            val taskName = s"task ${info.id} in stage ${taskSet.id}"
-            logInfo(
-                s"Starting $taskName (TID $taskId, $host, partition ${task.partitionId}," +
-                s"$taskLocality, ${serializedTask.limit} bytes)")
-
-            sched.dagScheduler.taskStarted(task, info)
-            return Some(
-                new TaskDescription(taskId = taskId,
-                                    attemptNumber = attemptNum,
-                                    execId,
-                                    taskName,
-                                    index,
-                                    serializedTask))
+          // Found a task; do some bookkeeping and return a task description
+          val task = tasks(index)
+          val taskId = sched.newTaskId()
+          // Do various bookkeeping
+          copiesRunning(index) += 1
+          val attemptNum = taskAttempts(index).size
+          val info = new TaskInfo(taskId,
+                                  index,
+                                  attemptNum,
+                                  curTime,
+                                  execId,
+                                  host,
+                                  taskLocality,
+                                  speculative)
+          taskInfos(taskId) = info
+          taskAttempts(index) = info :: taskAttempts(index)
+          // Update our locality level for delay scheduling
+          // NO_PREF will not affect the variables related to delay scheduling
+          if (maxLocality != TaskLocality.NO_PREF) {
+            currentLocalityIndex = getLocalityIndex(taskLocality)
+            lastLaunchTime = curTime
           }
+          // Serialize and return the task
+          val startTime = clock.getTimeMillis()
+          val serializedTask: ByteBuffer = try {
+            Task.serializeWithDependencies(task,
+                                           sched.sc.addedFiles,
+                                           sched.sc.addedJars,
+                                           ser)
+          } catch {
+            // If the task cannot be serialized, then there's no point to re-attempt the task,
+            // as it will always fail. So just abort the whole task-set.
+            case NonFatal(e) =>
+              val msg =
+                s"Failed to serialize task $taskId, not attempting to retry it."
+              logError(msg, e)
+              abort(s"$msg Exception during serialization: $e")
+              throw new TaskNotSerializableException(e)
+          }
+          if (serializedTask.limit > TaskSetManager.TASK_SIZE_TO_WARN_KB * 1024 &&
+              !emittedTaskSizeWarning) {
+            emittedTaskSizeWarning = true
+            logWarning(
+              s"Stage ${task.stageId} contains a task of very large size " +
+                s"(${serializedTask.limit / 1024} KB). The maximum recommended task size is " +
+                s"${TaskSetManager.TASK_SIZE_TO_WARN_KB} KB.")
+          }
+          addRunningTask(taskId)
+
+          // We used to log the time it takes to serialize the task, but task size is already
+          // a good proxy to task serialization time.
+          // val timeTaken = clock.getTime() - startTime
+          val taskName = s"task ${info.id} in stage ${taskSet.id}"
+          logInfo(
+            s"Starting $taskName (TID $taskId, $host, partition ${task.partitionId}," +
+              s"$taskLocality, ${serializedTask.limit} bytes)")
+
+          sched.dagScheduler.taskStarted(task, info)
+          return Some(
+            new TaskDescription(taskId = taskId,
+                                attemptNumber = attemptNum,
+                                execId,
+                                taskName,
+                                index,
+                                serializedTask))
+        }
         case _ =>
       }
     }
@@ -580,16 +584,16 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         // for the locality wait timeout (SPARK-4939).
         lastLaunchTime = curTime
         logDebug(
-            s"No tasks for locality level ${myLocalityLevels(currentLocalityIndex)}, " +
+          s"No tasks for locality level ${myLocalityLevels(currentLocalityIndex)}, " +
             s"so moving to locality level ${myLocalityLevels(currentLocalityIndex + 1)}")
         currentLocalityIndex += 1
       } else if (curTime - lastLaunchTime >= localityWaits(
-                     currentLocalityIndex)) {
+                   currentLocalityIndex)) {
         // Jump to the next locality level, and reset lastLaunchTime so that the next locality
         // wait timer doesn't immediately expire
         lastLaunchTime += localityWaits(currentLocalityIndex)
         logDebug(
-            s"Moving to ${myLocalityLevels(currentLocalityIndex + 1)} after waiting for " +
+          s"Moving to ${myLocalityLevels(currentLocalityIndex + 1)} after waiting for " +
             s"${localityWaits(currentLocalityIndex)}ms")
         currentLocalityIndex += 1
       } else {
@@ -630,8 +634,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     if (maxResultSize > 0 && totalResultSize > maxResultSize) {
       val msg =
         s"Total size of serialized results of ${calculatedTasks} tasks " +
-        s"(${Utils.bytesToString(totalResultSize)}) is bigger than spark.driver.maxResultSize " +
-        s"(${Utils.bytesToString(maxResultSize)})"
+          s"(${Utils.bytesToString(totalResultSize)}) is bigger than spark.driver.maxResultSize " +
+          s"(${Utils.bytesToString(maxResultSize)})"
       logError(msg)
       abort(msg)
       false
@@ -654,19 +658,22 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     // "result.value()" in "TaskResultGetter.enqueueSuccessfulTask" before reaching here.
     // Note: "result.value()" only deserializes the value when it's called at the first time, so
     // here "result.value()" just returns the value and won't block other threads.
-    sched.dagScheduler.taskEnded(
-        tasks(index), Success, result.value(), result.accumUpdates, info)
+    sched.dagScheduler.taskEnded(tasks(index),
+                                 Success,
+                                 result.value(),
+                                 result.accumUpdates,
+                                 info)
     if (!successful(index)) {
       tasksSuccessful += 1
       logInfo(
-          "Finished task %s in stage %s (TID %d) in %d ms on %s (%d/%d)"
-            .format(info.id,
-                    taskSet.id,
-                    info.taskId,
-                    info.duration,
-                    info.host,
-                    tasksSuccessful,
-                    numTasks))
+        "Finished task %s in stage %s (TID %d) in %d ms on %s (%d/%d)".format(
+          info.id,
+          taskSet.id,
+          info.taskId,
+          info.duration,
+          info.host,
+          tasksSuccessful,
+          numTasks))
       // Mark successful and stop if all the tasks have succeeded.
       successful(index) = true
       if (tasksSuccessful == numTasks) {
@@ -674,7 +681,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       }
     } else {
       logInfo(
-          "Ignoring task-finished event for " + info.id +
+        "Ignoring task-finished event for " + info.id +
           " in stage " + taskSet.id + " because task " + index +
           " has already completed successfully")
     }
@@ -698,7 +705,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     var accumUpdates: Seq[AccumulableInfo] = Seq.empty[AccumulableInfo]
     val failureReason =
       s"Lost task ${info.id} in stage ${taskSet.id} (TID $tid, ${info.host}): " +
-      reason.asInstanceOf[TaskFailedReason].toErrorString
+        reason.asInstanceOf[TaskFailedReason].toErrorString
     val failureException: Option[Throwable] = reason match {
       case fetchFailed: FetchFailed =>
         logWarning(failureReason)
@@ -716,11 +723,11 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         if (ef.className == classOf[NotSerializableException].getName) {
           // If the task result wasn't serializable, there's no point in trying to re-execute it.
           logError(
-              "Task %s in stage %s (TID %d) had a not serializable result: %s; not retrying"
-                .format(info.id, taskSet.id, tid, ef.description))
+            "Task %s in stage %s (TID %d) had a not serializable result: %s; not retrying"
+              .format(info.id, taskSet.id, tid, ef.description))
           abort(
-              "Task %s in stage %s (TID %d) had a not serializable result: %s"
-                .format(info.id, taskSet.id, tid, ef.description))
+            "Task %s in stage %s (TID %d) had a not serializable result: %s"
+              .format(info.id, taskSet.id, tid, ef.description))
           return
         }
         val key = ef.description
@@ -744,14 +751,14 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
           logWarning(failureReason)
         } else {
           logInfo(
-              s"Lost task ${info.id} in stage ${taskSet.id} (TID $tid) on executor ${info.host}: " +
+            s"Lost task ${info.id} in stage ${taskSet.id} (TID $tid) on executor ${info.host}: " +
               s"${ef.className} (${ef.description}) [duplicate $dupCount]")
         }
         ef.exception
 
       case e: ExecutorLostFailure if !e.exitCausedByApp =>
         logInfo(
-            s"Task $tid failed because while it was being computed, its executor " +
+          s"Task $tid failed because while it was being computed, its executor " +
             "exited for a reason unrelated to the task. Not counting this failure towards the " +
             "maximum number of failures for the task.")
         None
@@ -768,8 +775,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     failedExecutors
       .getOrElseUpdate(index, new HashMap[String, Long]())
       .put(info.executorId, clock.getTimeMillis())
-    sched.dagScheduler.taskEnded(
-        tasks(index), reason, null, accumUpdates, info)
+    sched.dagScheduler
+      .taskEnded(tasks(index), reason, null, accumUpdates, info)
     addPendingTask(index)
     if (!isZombie && state != TaskState.KILLED &&
         reason.isInstanceOf[TaskFailedReason] &&
@@ -778,12 +785,12 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       numFailures(index) += 1
       if (numFailures(index) >= maxTaskFailures) {
         logError(
-            "Task %d in stage %s failed %d times; aborting job".format(
-                index, taskSet.id, maxTaskFailures))
+          "Task %d in stage %s failed %d times; aborting job"
+            .format(index, taskSet.id, maxTaskFailures))
         abort(
-            "Task %d in stage %s failed %d times, most recent failure: %s\nDriver stacktrace:"
-              .format(index, taskSet.id, maxTaskFailures, failureReason),
-            failureException)
+          "Task %d in stage %s failed %d times, most recent failure: %s\nDriver stacktrace:"
+            .format(index, taskSet.id, maxTaskFailures, failureReason),
+          failureException)
         return
       }
     }
@@ -830,8 +837,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
   }
 
   /** Called by TaskScheduler when an executor is lost so we can re-enqueue our tasks */
-  override def executorLost(
-      execId: String, host: String, reason: ExecutorLossReason) {
+  override def executorLost(execId: String,
+                            host: String,
+                            reason: ExecutorLossReason) {
     // Re-enqueue any tasks that ran on the failed executor if this is a shuffle map stage,
     // and we are not using an external shuffle server which could serve the shuffle outputs.
     // The reason is the next stage wouldn't be able to fetch the data from this dead executor
@@ -856,17 +864,17 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       }
     }
     for ((tid, info) <- taskInfos if info.running &&
-                       info.executorId == execId) {
+           info.executorId == execId) {
       val exitCausedByApp: Boolean = reason match {
         case exited: ExecutorExited => exited.exitCausedByApp
         case ExecutorKilled => false
         case _ => true
       }
-      handleFailedTask(
-          tid,
-          TaskState.FAILED,
-          ExecutorLostFailure(
-              info.executorId, exitCausedByApp, Some(reason.toString)))
+      handleFailedTask(tid,
+                       TaskState.FAILED,
+                       ExecutorLostFailure(info.executorId,
+                                           exitCausedByApp,
+                                           Some(reason.toString)))
     }
     // recalculate valid locality levels and waits when executor is lost
     recomputeLocality()
@@ -888,7 +896,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     var foundTasks = false
     val minFinishedForSpeculation =
       (SPECULATION_QUANTILE * numTasks).floor.toInt
-    logDebug("Checking for speculative tasks: minFinished = " +
+    logDebug(
+      "Checking for speculative tasks: minFinished = " +
         minFinishedForSpeculation)
     if (tasksSuccessful >= minFinishedForSpeculation && tasksSuccessful > 0) {
       val time = clock.getTimeMillis()
@@ -896,7 +905,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         taskInfos.values.filter(_.successful).map(_.duration).toArray
       Arrays.sort(durations)
       val medianDuration = durations(
-          min((0.5 * tasksSuccessful).round.toInt, durations.length - 1))
+        min((0.5 * tasksSuccessful).round.toInt, durations.length - 1))
       val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)
       // TODO: Threshold should also look at standard deviation of task durations and have a lower
       // bound based on that.
@@ -907,8 +916,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
             info.timeRunning(time) > threshold &&
             !speculatableTasks.contains(index)) {
           logInfo(
-              "Marking task %d in stage %s (on %s) as speculatable because it ran more than %.0f ms"
-                .format(index, taskSet.id, info.host, threshold))
+            "Marking task %d in stage %s (on %s) as speculatable because it ran more than %.0f ms"
+              .format(index, taskSet.id, info.host, threshold))
           speculatableTasks += index
           foundTasks = true
         }
@@ -938,7 +947,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     * added to queues using addPendingTask.
     *
     */
-  private def computeValidLocalityLevels(): Array[TaskLocality.TaskLocality] = {
+  private def computeValidLocalityLevels()
+    : Array[TaskLocality.TaskLocality] = {
     import TaskLocality.{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}
     val levels = new ArrayBuffer[TaskLocality.TaskLocality]
     if (!pendingTasksForExecutor.isEmpty &&
@@ -959,7 +969,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     }
     levels += ANY
     logDebug(
-        "Valid locality levels for " + taskSet + ": " + levels.mkString(", "))
+      "Valid locality levels for " + taskSet + ": " + levels.mkString(", "))
     levels.toArray
   }
 

@@ -80,7 +80,8 @@ object Dialog {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Dialog[R](override val delegate: jfxsc.Dialog[R] = new jfxsc.Dialog[R]())
-    extends EventTarget(delegate) with SFXDelegate[jfxsc.Dialog[R]] {
+    extends EventTarget(delegate)
+    with SFXDelegate[jfxsc.Dialog[R]] {
 
   /**
     * Shows the dialog and waits for the user response (in other words, brings
@@ -244,10 +245,9 @@ class Dialog[R](override val delegate: jfxsc.Dialog[R] = new jfxsc.Dialog[R]())
     */
   def resultConverter: ObjectProperty[ButtonType => R] =
     ObjectProperty(
-        (bt: ButtonType) => delegate.resultConverterProperty.getValue.call(bt))
+      (bt: ButtonType) => delegate.resultConverterProperty.getValue.call(bt))
   def resultConverter_=(f: ButtonType => R): Unit = {
-    delegate.setResultConverter(
-        new jfxu.Callback[jfxsc.ButtonType, R] {
+    delegate.setResultConverter(new jfxu.Callback[jfxsc.ButtonType, R] {
       override def call(param: jfxsc.ButtonType): R = f(param)
     })
   }

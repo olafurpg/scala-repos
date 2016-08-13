@@ -22,13 +22,13 @@ import scala.collection.parallel.Combiner
 trait ParSet[T]
     extends scala.collection /*.immutable*/ .GenSet[T]
     with GenericParTemplate[T, ParSet]
-    with parallel.ParSet[T] with ParIterable[T]
-    with ParSetLike[T, ParSet[T], scala.collection.immutable.Set[T]] {
-  self =>
+    with parallel.ParSet[T]
+    with ParIterable[T]
+    with ParSetLike[T, ParSet[T], scala.collection.immutable.Set[T]] { self =>
   override def empty: ParSet[T] = ParHashSet[T]()
 
   override def companion: GenericCompanion[ParSet] with GenericParCompanion[
-      ParSet] = ParSet
+    ParSet] = ParSet
 
   override def stringPrefix = "ParSet"
 

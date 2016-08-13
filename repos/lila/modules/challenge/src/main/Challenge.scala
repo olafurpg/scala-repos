@@ -103,8 +103,8 @@ object Challenge {
     case _ => Speed.Correspondence
   }
 
-  private def perfTypeOf(
-      variant: Variant, timeControl: TimeControl): PerfType =
+  private def perfTypeOf(variant: Variant,
+                         timeControl: TimeControl): PerfType =
     PerfPicker
       .perfType(speedOf(timeControl), variant, timeControl match {
         case TimeControl.Correspondence(d) => d.some
@@ -139,25 +139,25 @@ object Challenge {
         ColorChoice.Random -> chess.Color(scala.util.Random.nextBoolean)
     }
     new Challenge(
-        _id = randomId,
-        status = Status.Created,
-        variant = variant,
-        initialFen = (variant == FromPosition).fold(
-              initialFen,
-              Some(variant.initialFen).ifFalse(variant.standardInitialPosition)
-          ),
-        timeControl = timeControl,
-        mode = mode,
-        colorChoice = colorChoice,
-        finalColor = finalColor,
-        challenger = challenger.fold[EitherChallenger](
-              sid => Left(Anonymous(sid)),
-              u => Right(toRegistered(variant, timeControl)(u))
-          ),
-        destUser = destUser map toRegistered(variant, timeControl),
-        rematchOf = rematchOf,
-        createdAt = DateTime.now,
-        seenAt = DateTime.now,
-        expiresAt = inTwoWeeks)
+      _id = randomId,
+      status = Status.Created,
+      variant = variant,
+      initialFen = (variant == FromPosition).fold(
+        initialFen,
+        Some(variant.initialFen).ifFalse(variant.standardInitialPosition)
+      ),
+      timeControl = timeControl,
+      mode = mode,
+      colorChoice = colorChoice,
+      finalColor = finalColor,
+      challenger = challenger.fold[EitherChallenger](
+        sid => Left(Anonymous(sid)),
+        u => Right(toRegistered(variant, timeControl)(u))
+      ),
+      destUser = destUser map toRegistered(variant, timeControl),
+      rematchOf = rematchOf,
+      createdAt = DateTime.now,
+      seenAt = DateTime.now,
+      expiresAt = inTwoWeeks)
   }
 }

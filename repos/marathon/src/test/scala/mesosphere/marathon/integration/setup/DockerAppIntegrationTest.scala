@@ -8,8 +8,11 @@ import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 import scala.concurrent.duration._
 
 class DockerAppIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
   //clean up state before running the test case
   before(cleanUp())
 
@@ -18,17 +21,18 @@ class DockerAppIntegrationTest
     test("deploy a simple Docker app") {
       Given("a new Docker app")
       val app = AppDefinition(
-          id = testBasePath / "dockerapp",
-          cmd = Some("sleep 600"),
-          container = Some(
-                Container(
-                    docker = Some(mesosphere.marathon.state.Container.Docker(
-                              image = "busybox"
-                          )))
-            ),
-          cpus = 0.2,
-          mem = 16.0,
-          instances = 1
+        id = testBasePath / "dockerapp",
+        cmd = Some("sleep 600"),
+        container = Some(
+          Container(
+            docker = Some(
+              mesosphere.marathon.state.Container.Docker(
+                image = "busybox"
+              )))
+        ),
+        cpus = 0.2,
+        mem = 16.0,
+        instances = 1
       )
 
       When("The app is deployed")
@@ -42,7 +46,7 @@ class DockerAppIntegrationTest
     }
 
     test(
-        "create a simple docker app using http health checks with HOST networking") {
+      "create a simple docker app using http health checks with HOST networking") {
       Given("a new app")
       val app = dockerAppProxy(testBasePath / "docker-http-app",
                                "v1",

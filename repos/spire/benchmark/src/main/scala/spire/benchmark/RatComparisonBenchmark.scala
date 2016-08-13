@@ -40,8 +40,8 @@ class RatComparisonBenchmarks extends MyBenchmark {
       spires(i) = Rational(nums(i), denoms(i))
       aps(i) = new Aprational(new Apint(nums(i)), new Apint(denoms(i)))
       jscis(i) = number.Rational.valueOf(
-          number.LargeInteger.valueOf(nums(i)),
-          number.LargeInteger.valueOf(denoms(i))
+        number.LargeInteger.valueOf(nums(i)),
+        number.LargeInteger.valueOf(denoms(i))
       )
     }
 
@@ -50,13 +50,13 @@ class RatComparisonBenchmarks extends MyBenchmark {
   }
 
   def spireToAp(r: Rational) = new Aprational(
-      new Apint(r.numerator.toBigInt.bigInteger),
-      new Apint(r.denominator.toBigInt.bigInteger)
+    new Apint(r.numerator.toBigInt.bigInteger),
+    new Apint(r.denominator.toBigInt.bigInteger)
   )
 
   def spireToJsci(r: Rational) = number.Rational.valueOf(
-      number.LargeInteger.valueOf(r.numerator.toBigInt.bigInteger),
-      number.LargeInteger.valueOf(r.denominator.toBigInt.bigInteger)
+    number.LargeInteger.valueOf(r.numerator.toBigInt.bigInteger),
+    number.LargeInteger.valueOf(r.denominator.toBigInt.bigInteger)
   )
 
   // this is slow... it probably takes as long as one full run of the benchmark
@@ -67,8 +67,8 @@ class RatComparisonBenchmarks extends MyBenchmark {
     var t1 = Rational(0, 1)
     var t2 = new Aprational(new Apint(0), new Apint(1))
     val t3 = number.Rational.valueOf(
-        number.LargeInteger.valueOf(0),
-        number.LargeInteger.valueOf(1)
+      number.LargeInteger.valueOf(0),
+      number.LargeInteger.valueOf(1)
     )
 
     while (i < len) {
@@ -123,8 +123,8 @@ class RatComparisonBenchmarks extends MyBenchmark {
     var i = 0
     while (i < len) {
       ns(i) = number.Rational.valueOf(
-          number.LargeInteger.valueOf(nums(i)),
-          number.LargeInteger.valueOf(denoms(i))
+        number.LargeInteger.valueOf(nums(i)),
+        number.LargeInteger.valueOf(denoms(i))
       )
       i += 1
     }

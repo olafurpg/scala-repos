@@ -36,8 +36,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val n = 100
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
-        data.sample(withReplacement = true, 0.05, seed = 13),
-        Seq(5, 10, 52, 73).map(Row(_))
+      data.sample(withReplacement = true, 0.05, seed = 13),
+      Seq(5, 10, 52, 73).map(Row(_))
     )
   }
 
@@ -45,8 +45,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val n = 100
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
-        data.sample(withReplacement = false, 0.05, seed = 13),
-        Seq(3, 17, 27, 58, 62).map(Row(_))
+      data.sample(withReplacement = false, 0.05, seed = 13),
+      Seq(3, 17, 27, 58, 62).map(Row(_))
     )
   }
 
@@ -57,11 +57,12 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
       val splits = data.randomSplit(Array[Double](1, 2, 3), seed)
       assert(splits.length == 3, "wrong number of splits")
 
-      assert(
-          splits.reduce((a, b) => a.unionAll(b)).sort("id").collect().toList == data
-            .collect()
-            .toList,
-          "incomplete or wrong split")
+      assert(splits
+               .reduce((a, b) => a.unionAll(b))
+               .sort("id")
+               .collect()
+               .toList == data.collect().toList,
+             "incomplete or wrong split")
 
       val s = splits.map(_.count())
       assert(math.abs(s(0) - 100) < 50) // std =  9.13
@@ -128,7 +129,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val results = df.stat.cov("singles", "doubles")
     assert(math.abs(results - 55.0 / 3) < 1e-12)
     intercept[IllegalArgumentException] {
-      df.stat.cov("singles", "letters") // doesn't accept non-numerical dataTypes
+      df.stat
+        .cov("singles", "letters") // doesn't accept non-numerical dataTypes
     }
     val decimalData = Seq
       .tabulate(6)(i => (BigDecimal(i % 3), BigDecimal(i % 2)))
@@ -189,11 +191,11 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
 
   test("special crosstab elements (., '', null, ``)") {
     val data = Seq(
-        ("a", Double.NaN, "ho"),
-        (null, 2.0, "ho"),
-        ("a.b", Double.NegativeInfinity, ""),
-        ("b", Double.PositiveInfinity, "`ha`"),
-        ("a", 1.0, null)
+      ("a", Double.NaN, "ho"),
+      (null, 2.0, "ho"),
+      ("a.b", Double.NegativeInfinity, ""),
+      ("b", Double.PositiveInfinity, "`ha`"),
+      ("a", 1.0, null)
     )
     val df = data.toDF("1", "2", "3")
     val ct1 = df.stat.crosstab("1", "2")
@@ -320,7 +322,9 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
 }
 
 class DataFrameStatPerfSuite
-    extends QueryTest with SharedSQLContext with Logging {
+    extends QueryTest
+    with SharedSQLContext
+    with Logging {
 
   // Turn on this test if you want to test the performance of approximate quantiles.
   ignore("computing quantiles should not take much longer than describe()") {
@@ -349,8 +353,10 @@ class DataFrameStatPerfSuite
     logDebug(s"T1 = $t1")
     logDebug("*** Just quantiles ***")
     val t2 = seconds {
-      StatFunctions.multipleApproxQuantiles(
-          df, Seq("col1"), Seq(0.1, 0.25, 0.5, 0.75, 0.9), 0.01)
+      StatFunctions.multipleApproxQuantiles(df,
+                                            Seq("col1"),
+                                            Seq(0.1, 0.25, 0.5, 0.75, 0.9),
+                                            0.01)
     }
     logDebug(s"T1 = $t1, T2 = $t2")
   }

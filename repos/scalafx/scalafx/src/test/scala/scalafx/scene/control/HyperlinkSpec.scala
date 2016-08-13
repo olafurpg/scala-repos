@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class HyperlinkSpec
     extends SimpleSFXDelegateSpec[jfxsc.Hyperlink, Hyperlink](
-        classOf[jfxsc.Hyperlink], classOf[Hyperlink])
+      classOf[jfxsc.Hyperlink],
+      classOf[Hyperlink])
     with RunOnApplicationThread

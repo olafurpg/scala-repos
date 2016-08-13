@@ -30,6 +30,6 @@ class ArrayListFactory extends AbstractListFactory {
   override def implementationName: String =
     "java.util.ArrayList"
 
-  override def empty[E : ClassTag]: ju.ArrayList[E] =
+  override def empty[E: ClassTag]: ju.ArrayList[E] =
     new ju.ArrayList[E]
 }

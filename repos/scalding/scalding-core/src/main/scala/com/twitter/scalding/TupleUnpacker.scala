@@ -35,7 +35,7 @@ trait TupleUnpacker[T] extends java.io.Serializable {
 }
 
 trait LowPriorityTupleUnpackers {
-  implicit def genericUnpacker[T : Manifest] = new ReflectionTupleUnpacker[T]
+  implicit def genericUnpacker[T: Manifest] = new ReflectionTupleUnpacker[T]
 }
 
 /**
@@ -75,7 +75,7 @@ class ReflectionTupleUnpacker[T](implicit m: Manifest[T])
   // fields, in the declared field order.
   // Lazy because we need this twice or not at all.
   lazy val allFields = new Fields(
-      ReflectionUtils.fieldsOf(m.runtimeClass).toSeq: _*)
+    ReflectionUtils.fieldsOf(m.runtimeClass).toSeq: _*)
 
   /**
     * A helper to check the passed-in
@@ -140,7 +140,7 @@ class ReflectionSetter[T](fields: Fields)(implicit m: Manifest[T])
       .orElse(getValueFromMethod(fieldName))
       .orElse(getValueFromField(fieldName))
       .getOrElse(throw new TupleUnpackerException("Unrecognized field: " +
-              fieldName + " for class: " + m.runtimeClass.getName))
+        fieldName + " for class: " + m.runtimeClass.getName))
   }
 
   private def getValueFromField(fieldName: String): Option[(T => AnyRef)] = {

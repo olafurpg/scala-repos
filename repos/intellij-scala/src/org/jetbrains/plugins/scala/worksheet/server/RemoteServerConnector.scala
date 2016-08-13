@@ -6,7 +6,11 @@ import java.net._
 
 import com.intellij.compiler.CompilerMessageImpl
 import com.intellij.compiler.progress.CompilerTask
-import com.intellij.notification.{Notification, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification,
+  NotificationType,
+  Notifications
+}
 import com.intellij.openapi.compiler.{CompilerMessageCategory, CompilerPaths}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager}
@@ -19,20 +23,34 @@ import org.jetbrains.jps.incremental.messages.BuildMessage
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.DummyClient
 import org.jetbrains.jps.incremental.scala.remote._
-import org.jetbrains.plugins.scala.compiler.{ErrorHandler, NonServerRunner, RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  ErrorHandler,
+  NonServerRunner,
+  RemoteServerConnectorBase,
+  RemoteServerRunner
+}
 import org.jetbrains.plugins.scala.worksheet.actions.WorksheetFileHook
-import org.jetbrains.plugins.scala.worksheet.processor.{WorksheetCompiler, WorksheetSourceProcessor}
-import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{MyTranslatingClient, OuterCompilerInterface}
+import org.jetbrains.plugins.scala.worksheet.processor.{
+  WorksheetCompiler,
+  WorksheetSourceProcessor
+}
+import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{
+  MyTranslatingClient,
+  OuterCompilerInterface
+}
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * User: Dmitry Naydanov
   * Date: 1/28/14
   */
-class RemoteServerConnector(
-    module: Module, worksheet: File, output: File, worksheetClassName: String)
-    extends RemoteServerConnectorBase(
-        module: Module, worksheet: File, output: File) {
+class RemoteServerConnector(module: Module,
+                            worksheet: File,
+                            output: File,
+                            worksheetClassName: String)
+    extends RemoteServerConnectorBase(module: Module,
+                                      worksheet: File,
+                                      output: File) {
 
   val runType = WorksheetCompiler.getRunType(module.getProject)
 
@@ -50,8 +68,8 @@ class RemoteServerConnector(
     val project = module.getProject
     val worksheetHook = WorksheetFileHook.instance(project)
 
-    val client = new MyTranslatingClient(
-        callback, project, originalFile, consumer)
+    val client =
+      new MyTranslatingClient(callback, project, originalFile, consumer)
 
     try {
       val worksheetProcess = runType match {
@@ -70,22 +88,20 @@ class RemoteServerConnector(
             override def error(message: String): Unit =
               Notifications.Bus notify {
                 new Notification(
-                    "scala",
-                    "Cannot run worksheet",
-                    s"<html><body>${message.replace("\n", "<br>")}</body></html>",
-                    NotificationType.ERROR
+                  "scala",
+                  "Cannot run worksheet",
+                  s"<html><body>${message.replace("\n", "<br>")}</body></html>",
+                  NotificationType.ERROR
                 )
               }
           }
 
-          new NonServerRunner(project, Some(errorHandler)).buildProcess(
-              encodedArgs,
-              (text: String) =>
-                {
-                  val event = Event.fromBytes(
-                      Base64Converter.decode(text.getBytes("UTF-8")))
-                  eventClient.process(event)
-              })
+          new NonServerRunner(project, Some(errorHandler))
+            .buildProcess(encodedArgs, (text: String) => {
+              val event =
+                Event.fromBytes(Base64Converter.decode(text.getBytes("UTF-8")))
+              eventClient.process(event)
+            })
       }
 
       if (worksheetProcess == null) return ExitCode.ABORT
@@ -152,12 +168,14 @@ object RemoteServerConnector {
         else {
           val buffer = new StringBuilder
 
-          for (j <- 0 until (linesLength - 2)) buffer append lines(j) append "\n"
+          for (j <- 0 until (linesLength - 2))
+            buffer append lines(j) append "\n"
 
           val lines1 = lines(linesLength - 1)
 
-          buffer append lines(linesLength - 2).substring(differ) append "\n" append
-          (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
+          buffer append lines(linesLength - 2)
+            .substring(differ) append "\n" append
+            (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
           buffer.toString()
         }
 
@@ -174,13 +192,13 @@ object RemoteServerConnector {
       }
 
       consumer.message(
-          new CompilerMessageImpl(project,
-                                  category,
-                                  finalText,
-                                  worksheet,
-                                  line1 getOrElse -1,
-                                  column1 getOrElse -1,
-                                  null)
+        new CompilerMessageImpl(project,
+                                category,
+                                finalText,
+                                worksheet,
+                                line1 getOrElse -1,
+                                column1 getOrElse -1,
+                                null)
       )
     }
 

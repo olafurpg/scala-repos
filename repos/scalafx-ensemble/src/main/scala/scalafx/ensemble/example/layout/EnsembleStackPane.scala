@@ -47,20 +47,21 @@ class EnsembleStackPane extends EnsembleExample {
     new StackPane {
       padding = Insets(20)
       children = List(
-          new Rectangle {
-            width = 200
-            height = 70
-            fill = Color.Bisque
-            stroke = Color.Burlywood
-          },
-          new Label {
-            text = "I am in a stack pane"
-            contentDisplay = ContentDisplay.Left
-            graphic = new ImageView {
-              image = new Image(this.getClass.getResourceAsStream(
-                      "/scalafx/ensemble/images/icon-48x48.png"))
-            }
+        new Rectangle {
+          width = 200
+          height = 70
+          fill = Color.Bisque
+          stroke = Color.Burlywood
+        },
+        new Label {
+          text = "I am in a stack pane"
+          contentDisplay = ContentDisplay.Left
+          graphic = new ImageView {
+            image = new Image(
+              this.getClass.getResourceAsStream(
+                "/scalafx/ensemble/images/icon-48x48.png"))
           }
+        }
       )
     }
   }

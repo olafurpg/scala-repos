@@ -56,7 +56,7 @@ object Test extends App {
     for (x <- it if x % 2 == 0) print(x + " "); println
     for { x <- it if x % 2 == 0 } print(x + " "); println
     for (x <- it;
-    y = 2 if x % y == 0) print(x + " "); println
+         y = 2 if x % y == 0) print(x + " "); println
     for {
       x <- it
       y = 2 if x % y == 0

@@ -73,8 +73,7 @@ object Platform {
     * }}}
     */
   def runLater[R](op: => R) {
-    runLater(
-        new Runnable {
+    runLater(new Runnable {
       def run() {
         op
       }

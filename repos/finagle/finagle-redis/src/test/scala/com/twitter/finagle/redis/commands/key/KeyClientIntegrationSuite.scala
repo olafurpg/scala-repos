@@ -28,9 +28,10 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
         Array(0, -64, 10, 6, 0, -8, 114, 63, -59, -5, -5, 95, 40)
 
       Await.result(client.set(k, v))
-      assert(Await
-            .result(client.dump(k))
-            .fold(fail("Expected result for DUMP"))(_.array) == expectedBytes)
+      assert(
+        Await
+          .result(client.dump(k))
+          .fold(fail("Expected result for DUMP"))(_.array) == expectedBytes)
       Await.result(client.del(Seq(foo)))
       assert(Await.result(client.dump(foo)) == None)
     }
@@ -43,7 +44,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
       Await.result(client.set(foo, bar))
       Await.result(client.set(baz, boo))
       assert(
-          CBToString(Await.result(client.scan(0, None, None)).apply(1)) == "baz")
+        CBToString(Await.result(client.scan(0, None, None)).apply(1)) == "baz")
 
       val withCount = Await.result(client.scan(0, Some(10), None))
       assert(CBToString(withCount(0)) == "0")
@@ -110,7 +111,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       Await.result(client.set(foo, bar))
       assert(Await.result(
-              client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
+        client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
 
       Await.result(client.del(Seq(foo))) // clean up
     }

@@ -18,8 +18,8 @@ final class Env(config: Config,
   }
   import settings._
 
-  lazy val api = new ShutupApi(
-      coll = coll, follows = follows, reporter = reporter)
+  lazy val api =
+    new ShutupApi(coll = coll, follows = follows, reporter = reporter)
 
   private lazy val coll = db(CollectionShutup)
 
@@ -44,10 +44,10 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "shutup" boot new Env(
-        config = lila.common.PlayApp loadConfig "shutup",
-        reporter = lila.hub.Env.current.actor.report,
-        system = lila.common.PlayApp.system,
-        follows = lila.relation.Env.current.api.fetchFollows _,
-        db = lila.db.Env.current)
+    "shutup" boot new Env(config = lila.common.PlayApp loadConfig "shutup",
+                          reporter = lila.hub.Env.current.actor.report,
+                          system = lila.common.PlayApp.system,
+                          follows =
+                            lila.relation.Env.current.api.fetchFollows _,
+                          db = lila.db.Env.current)
 }

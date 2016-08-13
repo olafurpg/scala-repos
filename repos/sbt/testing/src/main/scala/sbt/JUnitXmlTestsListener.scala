@@ -7,7 +7,12 @@ import java.util.Hashtable
 import scala.collection.mutable.ListBuffer
 import scala.util.DynamicVariable
 import scala.xml.{Elem, Node => XNode, XML}
-import testing.{Event => TEvent, Status => TStatus, OptionalThrowable, TestSelector}
+import testing.{
+  Event => TEvent,
+  Status => TStatus,
+  OptionalThrowable,
+  TestSelector
+}
 
 /**
   * A tests listener that outputs the results it receives in junit xml
@@ -17,7 +22,8 @@ import testing.{Event => TEvent, Status => TStatus, OptionalThrowable, TestSelec
 class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
 
   /**Current hostname so we know which machine executed the tests*/
-  val hostname = try InetAddress.getLocalHost.getHostName catch {
+  val hostname = try InetAddress.getLocalHost.getHostName
+  catch {
     case x: IOException => "localhost"
   }
 
@@ -172,8 +178,8 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
 
   private def writeSuite() = {
     val file = new File(
-        targetDir,
-        s"${normalizeName(testSuite.value.name)}.xml").getAbsolutePath
+      targetDir,
+      s"${normalizeName(testSuite.value.name)}.xml").getAbsolutePath
     // TODO would be nice to have a logger and log this with level debug
     // System.err.println("Writing JUnit XML test report: " + file)
     XML.save(file, testSuite.value.stop(), "UTF-8", true, null)

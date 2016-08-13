@@ -11,7 +11,8 @@ class ALSModel(val productFeatures: RDD[(Int, Array[Double])],
                val itemStringIntMap: BiMap[String, Int],
                // HOWTO: added a map of `generatedItemIntId -> Item` to the algo data model.
                val items: Map[Int, Item])
-    extends IPersistentModel[ALSAlgorithmParams] with Serializable {
+    extends IPersistentModel[ALSAlgorithmParams]
+    with Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
@@ -27,20 +28,20 @@ class ALSModel(val productFeatures: RDD[(Int, Array[Double])],
 
   override def toString = {
     s" productFeatures: [${productFeatures.count()}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
+      s"(${productFeatures.take(2).toList}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]" +
+      s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
   }
 }
 
 object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
   def apply(id: String, params: ALSAlgorithmParams, sc: Option[SparkContext]) =
     new ALSModel(
-        productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
-        itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
-        // HOWTO: read items too as part of algo model
-        items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
+      productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
+      itemStringIntMap = sc.get
+        .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+        .first,
+      // HOWTO: read items too as part of algo model
+      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
 }

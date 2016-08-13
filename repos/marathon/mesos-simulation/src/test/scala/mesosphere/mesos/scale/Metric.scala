@@ -75,12 +75,12 @@ case class MetricsSample(version: String,
                          timers: Seq[Timer]) {
 
   def all: Map[String, Seq[Metric]] = Map(
-      "gauges" -> gauges,
-      "counters" -> counters,
-      "gauges" -> gauges,
-      "histograms" -> histograms,
-      "meters" -> meters,
-      "timers" -> timers
+    "gauges" -> gauges,
+    "counters" -> counters,
+    "gauges" -> gauges,
+    "histograms" -> histograms,
+    "meters" -> meters,
+    "timers" -> timers
   )
 }
 
@@ -94,15 +94,12 @@ object MetricsFormat {
     */
   def objectRead[T](t: Reads[T]): Reads[Seq[T]] = new Reads[Seq[T]] {
     override def reads(js: JsValue): JsResult[Seq[T]] = {
-      JsSuccess(
-          js.as[JsObject]
-            .fields
-            .map {
-          case (name, value) =>
-            val obj =
-              JsObject(value.as[JsObject].fields :+ ("name" -> JsString(name)))
-            t.reads(obj).get
-        })
+      JsSuccess(js.as[JsObject].fields.map {
+        case (name, value) =>
+          val obj =
+            JsObject(value.as[JsObject].fields :+ ("name" -> JsString(name)))
+          t.reads(obj).get
+      })
     }
   }
 

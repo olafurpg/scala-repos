@@ -25,8 +25,8 @@ import org.apache.spark.util.ListenerBus
 private[spark] trait SparkListenerBus
     extends ListenerBus[SparkListener, SparkListenerEvent] {
 
-  protected override def doPostEvent(
-      listener: SparkListener, event: SparkListenerEvent): Unit = {
+  protected override def doPostEvent(listener: SparkListener,
+                                     event: SparkListenerEvent): Unit = {
     event match {
       case stageSubmitted: SparkListenerStageSubmitted =>
         listener.onStageSubmitted(stageSubmitted)

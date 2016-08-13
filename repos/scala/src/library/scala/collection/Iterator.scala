@@ -204,8 +204,8 @@ object Iterator {
       new ConcatIterator(current, queue :+ (() => that.toIterator))
   }
 
-  private[scala] final class JoinIterator[+A](
-      lhs: Iterator[A], that: => GenTraversableOnce[A])
+  private[scala] final class JoinIterator[+A](lhs: Iterator[A],
+                                              that: => GenTraversableOnce[A])
       extends Iterator[A] {
     private[this] var state =
       0 // 0: lhs not checked, 1: lhs has next, 2: switched to rhs
@@ -243,8 +243,9 @@ object Iterator {
   /** Creates a delegating iterator capped by a limit count. Negative limit means unbounded.
     *  Lazily skip to start on first evaluation.  Avoids daisy-chained iterators due to slicing.
     */
-  private[scala] final class SliceIterator[A](
-      val underlying: Iterator[A], start: Int, limit: Int)
+  private[scala] final class SliceIterator[A](val underlying: Iterator[A],
+                                              start: Int,
+                                              limit: Int)
       extends AbstractIterator[A] {
     private var remaining = limit
     private var dropping = start
@@ -563,8 +564,8 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  @note     Reuse: $consumesAndProducesIterator
     */
   @migration(
-      "`collect` has changed. The previous behavior can be reproduced with `toSeq`.",
-      "2.8.0")
+    "`collect` has changed. The previous behavior can be reproduced with `toSeq`.",
+    "2.8.0")
   def collect[B](pf: PartialFunction[A, B]): Iterator[B] =
     new AbstractIterator[B] {
       // Manually buffer to avoid extra layer of wrapping with buffered
@@ -911,8 +912,9 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  @usecase def zipAll[B](that: Iterator[B], thisElem: A, thatElem: B): Iterator[(A, B)]
     *    @inheritdoc
     */
-  def zipAll[B, A1 >: A, B1 >: B](
-      that: Iterator[B], thisElem: A1, thatElem: B1): Iterator[(A1, B1)] =
+  def zipAll[B, A1 >: A, B1 >: B](that: Iterator[B],
+                                  thisElem: A1,
+                                  thatElem: B1): Iterator[(A1, B1)] =
     new AbstractIterator[(A1, B1)] {
       def hasNext = self.hasNext || that.hasNext
       def next(): (A1, B1) =
@@ -1103,11 +1105,12 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  Typical uses can be achieved via methods `grouped` and `sliding`.
     */
   class GroupedIterator[B >: A](self: Iterator[A], size: Int, step: Int)
-      extends AbstractIterator[Seq[B]] with Iterator[Seq[B]] {
+      extends AbstractIterator[Seq[B]]
+      with Iterator[Seq[B]] {
 
     require(
-        size >= 1 && step >= 1,
-        "size=%d and step=%d, but both must be positive".format(size, step))
+      size >= 1 && step >= 1,
+      "size=%d and step=%d, but both must be positive".format(size, step))
 
     private[this] var buffer: ArrayBuffer[B] = ArrayBuffer() // the buffer
     private[this] var filled = false // whether the buffer is "hot"
@@ -1326,8 +1329,9 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  @param replaced   The number of values in the original iterator that are replaced by the patch.
     *  @note           Reuse: $consumesTwoAndProducesOneIterator
     */
-  def patch[B >: A](
-      from: Int, patchElems: Iterator[B], replaced: Int): Iterator[B] =
+  def patch[B >: A](from: Int,
+                    patchElems: Iterator[B],
+                    replaced: Int): Iterator[B] =
     new AbstractIterator[B] {
       private var origElems = self
       private var i =

@@ -53,8 +53,8 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
 
-    completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "z").get, ',')
+    completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get,
+                       ',')
     checkResultByText(resultText)
   }
 
@@ -106,7 +106,7 @@ class TUI {
 
     if (activeLookup != null) {
       completeLookupItem(
-          activeLookup.find(le => le.getLookupString == "z").get)
+        activeLookup.find(le => le.getLookupString == "z").get)
     }
 
     checkResultByText(resultText)
@@ -135,7 +135,7 @@ class TUI {
 
     if (activeLookup != null) {
       completeLookupItem(
-          activeLookup.find(le => le.getLookupString == "z").get)
+        activeLookup.find(le => le.getLookupString == "z").get)
     }
 
     checkResultByText(resultText)
@@ -162,7 +162,8 @@ class TUI {
 
     if (activeLookup != null)
       completeLookupItem(
-          activeLookup.find(le => le.getLookupString == "TT.this").get, '\t')
+        activeLookup.find(le => le.getLookupString == "TT.this").get,
+        '\t')
     checkResultByText(resultText)
   }
 
@@ -187,7 +188,8 @@ class TUI {
 
     if (activeLookup != null)
       completeLookupItem(
-          activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
+        activeLookup.find(le => le.getLookupString == "aaa").get,
+        '\t')
     checkResultByText(resultText)
   }
 }

@@ -14,7 +14,8 @@ import akka.http.scaladsl.util.FastFuture._
 
 class FastFutureSpec extends FreeSpec with Matchers {
   object TheException
-      extends RuntimeException("Expected exception") with NoStackTrace
+      extends RuntimeException("Expected exception")
+      with NoStackTrace
 
   "FastFuture should implement" - {
     "transformWith(Try => Future)" - {
@@ -59,8 +60,9 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Success -> Failure" in {
-        test(Success(23),
-             _.transformWith(_ ⇒ FastFuture.failed(TheException), neverCalled)) {
+        test(
+          Success(23),
+          _.transformWith(_ ⇒ FastFuture.failed(TheException), neverCalled)) {
           _ shouldEqual Failure(TheException)
         }
       }
@@ -71,8 +73,9 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Failure -> Failure" in {
-        test(Failure(TheException),
-             _.transformWith(neverCalled, _ ⇒ FastFuture.failed(TheException))) {
+        test(
+          Failure(TheException),
+          _.transformWith(neverCalled, _ ⇒ FastFuture.failed(TheException))) {
           _ shouldEqual Failure(TheException)
         }
       }

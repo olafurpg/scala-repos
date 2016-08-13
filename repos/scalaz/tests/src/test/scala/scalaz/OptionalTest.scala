@@ -5,13 +5,14 @@ import std.AllInstances._
 
 object OptionalTest extends SpecLite {
 
-  def definedTests[F[_], A](
-      context: F[A], value: A, default: => A, alternative: => F[A])(
-      implicit O: Optional[F],
-      EA: Equal[A],
-      EFA: Equal[F[A]],
-      SA: Show[A],
-      SFA: Show[F[A]]) = {
+  def definedTests[F[_], A](context: F[A],
+                            value: A,
+                            default: => A,
+                            alternative: => F[A])(implicit O: Optional[F],
+                                                  EA: Equal[A],
+                                                  EFA: Equal[F[A]],
+                                                  SA: Show[A],
+                                                  SFA: Show[F[A]]) = {
     O.getOrElse(context)(default) must_=== (value)
     O.isDefined(context) must_=== (true)
     O.orElse(context)(alternative) must_=== (context)
@@ -22,12 +23,12 @@ object OptionalTest extends SpecLite {
     O.toMaybe(context) must_=== (Maybe.just(value))
   }
 
-  def undefinedTests[F[_], A](
-      context: F[A], default: A, alternative: F[A])(implicit O: Optional[F],
-                                                    EA: Equal[A],
-                                                    EFA: Equal[F[A]],
-                                                    SA: Show[A],
-                                                    SFA: Show[F[A]]) = {
+  def undefinedTests[F[_], A](context: F[A], default: A, alternative: F[A])(
+      implicit O: Optional[F],
+      EA: Equal[A],
+      EFA: Equal[F[A]],
+      SA: Show[A],
+      SFA: Show[F[A]]) = {
     O.getOrElse(context)(default) must_=== (default)
     O.isDefined(context) must_=== (false)
     O.orElse(context)(alternative) must_=== (alternative)

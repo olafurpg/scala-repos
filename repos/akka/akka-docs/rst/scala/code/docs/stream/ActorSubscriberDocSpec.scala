@@ -43,7 +43,7 @@ object ActorSubscriberDocSpec {
     }
 
     override val requestStrategy = new MaxInFlightRequestStrategy(
-        max = MaxQueueSize) {
+      max = MaxQueueSize) {
       override def inFlightInternally: Int = queue.size
     }
 

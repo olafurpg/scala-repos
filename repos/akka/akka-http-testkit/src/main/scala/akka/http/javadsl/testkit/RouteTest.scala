@@ -46,8 +46,9 @@ abstract class RouteTest extends AllDirectives {
   def runRoute(route: Route,
                request: HttpRequest,
                defaultHostInfo: DefaultHostInfo): TestResponse =
-    runScalaRoute(
-        ScalaRoute.seal(RouteImplementation(route)), request, defaultHostInfo)
+    runScalaRoute(ScalaRoute.seal(RouteImplementation(route)),
+                  request,
+                  defaultHostInfo)
 
   def runRouteUnSealed(route: Route, request: HttpRequest): TestResponse =
     runRouteUnSealed(route, request, defaultHostInfo)
@@ -61,12 +62,13 @@ abstract class RouteTest extends AllDirectives {
                             request: HttpRequest,
                             defaultHostInfo: DefaultHostInfo): TestResponse = {
     val effectiveRequest = request.asScala.withEffectiveUri(
-        securedConnection = defaultHostInfo.isSecuredConnection(),
-        defaultHostHeader = defaultHostInfo.getHost().asScala)
+      securedConnection = defaultHostInfo.isSecuredConnection(),
+      defaultHostHeader = defaultHostInfo.getHost().asScala)
 
     val result = scalaRoute(
-        new server.RequestContextImpl(
-            effectiveRequest, NoLogging, RoutingSettings(system)))
+      new server.RequestContextImpl(effectiveRequest,
+                                    NoLogging,
+                                    RoutingSettings(system)))
 
     result.awaitResult(awaitDuration) match {
       case RouteResult.Complete(response) ⇒ createTestResponse(response)

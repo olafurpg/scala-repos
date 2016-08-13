@@ -11,8 +11,9 @@ import breeze.util.Implicits._
   * @author dlwh
   */
 trait OptimizationPackage[Function, Vector] {
-  def minimize(
-      fn: Function, init: Vector, options: OptimizationOption*): Vector
+  def minimize(fn: Function,
+               init: Vector,
+               options: OptimizationOption*): Vector
 }
 
 trait IterableOptimizationPackage[Function, Vector, State]
@@ -51,10 +52,10 @@ object OptimizationPackage {
   class SecondOrderOptimizationPackage[Vector, Hessian](
       )(implicit space: MutableFiniteCoordinateField[Vector, _, Double],
         mult: OpMulMatrix.Impl2[Hessian, Vector, Vector])
-      extends IterableOptimizationPackage[SecondOrderFunction[Vector, Hessian],
-                                          Vector,
-                                          TruncatedNewtonMinimizer[
-                                              Vector, Hessian]#State] {
+      extends IterableOptimizationPackage[
+        SecondOrderFunction[Vector, Hessian],
+        Vector,
+        TruncatedNewtonMinimizer[Vector, Hessian]#State] {
     def minimize(fn: SecondOrderFunction[Vector, Hessian],
                  init: Vector,
                  options: OptimizationOption*): Vector = {
@@ -68,9 +69,11 @@ object OptimizationPackage {
       val params = options.foldLeft(OptParams())((a, b) => b apply a)
       if (params.useL1)
         throw new UnsupportedOperationException(
-            "Can't use L1 with second order optimizer right now")
+          "Can't use L1 with second order optimizer right now")
       val minimizer = new TruncatedNewtonMinimizer[Vector, Hessian](
-          params.maxIterations, params.tolerance, params.regularization)
+        params.maxIterations,
+        params.tolerance,
+        params.regularization)
       minimizer.iterations(fn, init)
     }
   }
@@ -83,9 +86,9 @@ object OptimizationPackage {
   class FirstOrderStochasticOptimizationPackage[Vector]()(
       implicit space: MutableFiniteCoordinateField[Vector, _, Double])
       extends IterableOptimizationPackage[
-          StochasticDiffFunction[Vector],
-          Vector,
-          FirstOrderMinimizer[Vector, StochasticDiffFunction[Vector]]#State] {
+        StochasticDiffFunction[Vector],
+        Vector,
+        FirstOrderMinimizer[Vector, StochasticDiffFunction[Vector]]#State] {
     def minimize(fn: StochasticDiffFunction[Vector],
                  init: Vector,
                  options: OptimizationOption*): Vector = {
@@ -95,7 +98,7 @@ object OptimizationPackage {
     override def iterations(fn: StochasticDiffFunction[Vector],
                             init: Vector,
                             options: OptimizationOption*): Iterator[
-        FirstOrderMinimizer[Vector, StochasticDiffFunction[Vector]]#State] = {
+      FirstOrderMinimizer[Vector, StochasticDiffFunction[Vector]]#State] = {
       options.foldLeft(OptParams())((a, b) => b apply a).iterations(fn, init)
     }
   }
@@ -107,9 +110,9 @@ object OptimizationPackage {
   class FirstOrderBatchOptimizationPackage[Vector]()(
       implicit space: MutableFiniteCoordinateField[Vector, _, Double])
       extends IterableOptimizationPackage[
-          BatchDiffFunction[Vector],
-          Vector,
-          FirstOrderMinimizer[Vector, BatchDiffFunction[Vector]]#State] {
+        BatchDiffFunction[Vector],
+        Vector,
+        FirstOrderMinimizer[Vector, BatchDiffFunction[Vector]]#State] {
     def minimize(fn: BatchDiffFunction[Vector],
                  init: Vector,
                  options: OptimizationOption*): Vector = {
@@ -119,7 +122,7 @@ object OptimizationPackage {
     override def iterations(fn: BatchDiffFunction[Vector],
                             init: Vector,
                             options: OptimizationOption*): Iterator[
-        FirstOrderMinimizer[Vector, BatchDiffFunction[Vector]]#State] = {
+      FirstOrderMinimizer[Vector, BatchDiffFunction[Vector]]#State] = {
       options
         .foldLeft(OptParams())((a, b) => b apply a)
         .iterations(new CachedBatchDiffFunction(fn)(space.copy), init)
@@ -151,10 +154,11 @@ trait OptimizationPackageLowPriority {
       require(!params.useL1,
               "Sorry, we can't use L1 with immutable objects right now...")
       val lbfgs: LBFGS[Wrapper] = new LBFGS[Wrapper](
-          tolerance = params.tolerance, maxIter = params.maxIterations)
+        tolerance = params.tolerance,
+        maxIter = params.maxIterations)
       val res = lbfgs.minimize(
-          DiffFunction.withL2Regularization(wrapped, params.regularization),
-          wrap(init))
+        DiffFunction.withL2Regularization(wrapped, params.regularization),
+        wrap(init))
       unwrap(res)
     }
   }

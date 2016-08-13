@@ -21,7 +21,7 @@ trait IntegrationClient {
   }
 
   val propFile = new File(
-      System.getProperty("user.home") +
+    System.getProperty("user.home") +
       "/.finagle-mysql/integration-test.properties")
 
   val p = new Properties
@@ -33,8 +33,8 @@ trait IntegrationClient {
   } catch {
     case NonFatal(e) =>
       logger.log(
-          Level.WARNING,
-          "Error loading integration.properties, skipping integration test")
+        Level.WARNING,
+        "Error loading integration.properties, skipping integration test")
       false
   }
 
@@ -46,16 +46,16 @@ trait IntegrationClient {
 
   val client: Option[Client] =
     if (isAvailable) {
-      logger.log(
-          Level.INFO, "Attempting to connect to mysqld @ localhost:3306")
+      logger
+        .log(Level.INFO, "Attempting to connect to mysqld @ localhost:3306")
       val username = p.getProperty("username", "<user>")
       val password = p.getProperty("password", null)
       val db = p.getProperty("db", "test")
       Some(
-          Mysql.client
-            .withCredentials(username, password)
-            .withDatabase(db)
-            .newRichClient("localhost:3306"))
+        Mysql.client
+          .withCredentials(username, password)
+          .withDatabase(db)
+          .newRichClient("localhost:3306"))
     } else {
       None
     }

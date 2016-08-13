@@ -25,7 +25,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     "make a global thread pool available" in new WithApplication() {
       val controller = app.injector.instanceOf[Samples]
       contentAsString(controller.someAsyncAction(FakeRequest())) must startWith(
-          "The response code was")
+        "The response code was")
     }
 
     "have a global configuration" in {
@@ -92,7 +92,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "allow configuring a custom thread pool" in runningWithConfig(
-        """#my-context-config
+      """#my-context-config
         my-context {
           fork-join-executor {
             parallelism-factor = 20.0
@@ -107,7 +107,7 @@ object ThreadPoolsSpec extends PlaySpecification {
         akkaSystem.dispatchers.lookup("my-context")
       //#my-context-usage
       await(Future(Thread.currentThread().getName)(myExecutionContext)) must startWith(
-          "application-my-context")
+        "application-my-context")
 
       //#my-context-explicit
       Future {
@@ -136,7 +136,8 @@ object ThreadPoolsSpec extends PlaySpecification {
 
     "allow a synchronous thread pool" in {
       val config =
-        ConfigFactory.parseString("""#highly-synchronous
+        ConfigFactory.parseString(
+          """#highly-synchronous
       akka {
         actor {
           default-dispatcher {
@@ -156,7 +157,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "allow configuring many custom thread pools" in runningWithConfig(
-        """ #many-specific-config
+      """ #many-specific-config
       contexts {
         simple-db-lookups {
           executor = "thread-pool-executor"
@@ -202,7 +203,7 @@ object ThreadPoolsSpec extends PlaySpecification {
       //#many-specific-contexts
       def test(context: ExecutionContext, name: String) = {
         await(Future(Thread.currentThread().getName)(context)) must startWith(
-            "application-contexts." + name)
+          "application-contexts." + name)
       }
       test(Contexts.simpleDbLookups, "simple-db-lookups")
       test(Contexts.expensiveDbLookups, "expensive-db-lookups")
@@ -211,12 +212,11 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
   }
 
-  def runningWithConfig[T : AsResult](config: String)(
-      block: Application => T) = {
+  def runningWithConfig[T: AsResult](config: String)(block: Application => T) = {
     val parsed: java.util.Map[String, Object] =
       ConfigFactory.parseString(config).root.unwrapped
     running(_.configure(Configuration(ConfigFactory.parseString(config))))(
-        block)
+      block)
   }
 }
 

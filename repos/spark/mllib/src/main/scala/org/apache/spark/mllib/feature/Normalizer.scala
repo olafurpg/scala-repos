@@ -18,7 +18,12 @@
 package org.apache.spark.mllib.feature
 
 import org.apache.spark.annotation.Since
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 
 /**
   * Normalizes samples individually to unit L^p^ norm
@@ -73,7 +78,7 @@ class Normalizer @Since("1.1.0")(p: Double) extends VectorTransformer {
           Vectors.sparse(size, ids, values)
         case v =>
           throw new IllegalArgumentException(
-              "Do not support vector type " + v.getClass)
+            "Do not support vector type " + v.getClass)
       }
     } else {
       // Since the norm is zero, return the input vector object itself.

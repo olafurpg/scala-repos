@@ -6,11 +6,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-case class Tabby(
-    width: Int = 80, isAcross: Boolean = false, marginSize: Int = 3)
+case class Tabby(width: Int = 80,
+                 isAcross: Boolean = false,
+                 marginSize: Int = 3)
     extends Tabulator
-case class VTabby(
-    width: Int = 80, isAcross: Boolean = false, marginSize: Int = 3)
+case class VTabby(width: Int = 80,
+                  isAcross: Boolean = false,
+                  marginSize: Int = 3)
     extends VariColumnTabulator
 
 @RunWith(classOf[JUnit4])
@@ -118,31 +120,31 @@ class TabulatorTest {
   @Test def badFitter() = {
     val sut = VTabby(isAcross = true)
     val items = List(
-        "%",
-        "&",
-        "*",
-        "+",
-        "-",
-        "/",
-        ">",
-        ">=",
-        ">>",
-        ">>>",
-        "^",
-        "asInstanceOf",
-        "isInstanceOf",
-        "toByte",
-        "toChar",
-        "toDouble",
-        "toFloat",
-        "toInt",
-        "toLong",
-        "toShort",
-        "toString",
-        "unary_+",
-        "unary_-",
-        "unary_~",
-        "|"
+      "%",
+      "&",
+      "*",
+      "+",
+      "-",
+      "/",
+      ">",
+      ">=",
+      ">>",
+      ">>>",
+      "^",
+      "asInstanceOf",
+      "isInstanceOf",
+      "toByte",
+      "toChar",
+      "toDouble",
+      "toFloat",
+      "toInt",
+      "toLong",
+      "toShort",
+      "toString",
+      "unary_+",
+      "unary_-",
+      "unary_~",
+      "|"
     )
     val rows = sut tabulate items
     assert(rows.size == 4)

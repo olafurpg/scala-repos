@@ -101,17 +101,17 @@ class ConsoleConsumerTest extends JUnitSuite {
     propsStream.write("consumer.timeout.ms=1000".getBytes())
     propsStream.close()
     val args: Array[String] = Array(
-        "--zookeeper",
-        "localhost:2181",
-        "--topic",
-        "test",
-        "--consumer.config",
-        propsFile.getAbsolutePath
+      "--zookeeper",
+      "localhost:2181",
+      "--topic",
+      "test",
+      "--consumer.config",
+      propsFile.getAbsolutePath
     )
 
     val config = new ConsoleConsumer.ConsumerConfig(args)
 
-    assertEquals(
-        "1000", config.consumerProps.getProperty("consumer.timeout.ms"))
+    assertEquals("1000",
+                 config.consumerProps.getProperty("consumer.timeout.ms"))
   }
 }

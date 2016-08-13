@@ -66,7 +66,8 @@ object FillTransition extends AnimationStatics {
   */
 class FillTransition(
     override val delegate: jfxa.FillTransition = new jfxa.FillTransition())
-    extends Transition(delegate) with SFXDelegate[jfxa.FillTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.FillTransition] {
 
   /**
     * The constructor of $FT
@@ -76,8 +77,10 @@ class FillTransition(
     * @param fromValue The start value of the color-animation
     * @param toValue The end value of the color-animation
     */
-  def this(
-      duration: Duration, shape: Shape, fromValue: Color, toValue: Color) =
+  def this(duration: Duration,
+           shape: Shape,
+           fromValue: Color,
+           toValue: Color) =
     this(new jfxa.FillTransition(duration, shape, fromValue, toValue))
 
   /**

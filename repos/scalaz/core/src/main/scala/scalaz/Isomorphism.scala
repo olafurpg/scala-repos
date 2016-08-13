@@ -43,7 +43,7 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0 {
   }
 
   /**Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
-  trait Iso2[Arr[_ [_], _ [_]], F[_], G[_]] { self =>
+  trait Iso2[Arr[_[_], _[_]], F[_], G[_]] { self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip: Iso2[Arr, G, F] = new Iso2[Arr, G, F] {
@@ -69,7 +69,7 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0 {
   }
 
   /**Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */
-  trait Iso3[Arr[_ [_, _], _ [_, _]], F[_, _], G[_, _]] { self =>
+  trait Iso3[Arr[_[_, _], _[_, _]], F[_, _], G[_, _]] { self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip: Iso3[Arr, G, F] = new Iso3[Arr, G, F] {
@@ -175,7 +175,8 @@ trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
 }
 
 trait IsomorphismMonoid[F, G]
-    extends Monoid[F] with IsomorphismSemigroup[F, G] {
+    extends Monoid[F]
+    with IsomorphismSemigroup[F, G] {
   implicit def G: Monoid[G]
 
   def iso: F <=> G
@@ -226,7 +227,8 @@ trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
 }
 
 trait IsomorphismApply[F[_], G[_]]
-    extends Apply[F] with IsomorphismFunctor[F, G] {
+    extends Apply[F]
+    with IsomorphismFunctor[F, G] {
   implicit def G: Apply[G]
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
@@ -234,7 +236,8 @@ trait IsomorphismApply[F[_], G[_]]
 }
 
 trait IsomorphismApplicative[F[_], G[_]]
-    extends Applicative[F] with IsomorphismApply[F, G] {
+    extends Applicative[F]
+    with IsomorphismApply[F, G] {
   implicit def G: Applicative[G]
 
   def point[A](a: => A): F[A] = iso.from(G.point(a))
@@ -251,7 +254,8 @@ trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
 }
 
 trait IsomorphismBindRec[F[_], G[_]]
-    extends BindRec[F] with IsomorphismBind[F, G] {
+    extends BindRec[F]
+    with IsomorphismBind[F, G] {
   implicit def G: BindRec[G]
 
   def tailrecM[A, B](f: A => F[A \/ B])(a: A): F[B] =
@@ -259,13 +263,15 @@ trait IsomorphismBindRec[F[_], G[_]]
 }
 
 trait IsomorphismMonad[F[_], G[_]]
-    extends Monad[F] with IsomorphismApplicative[F, G]
+    extends Monad[F]
+    with IsomorphismApplicative[F, G]
     with IsomorphismBind[F, G] {
   implicit def G: Monad[G]
 }
 
 trait IsomorphismCobind[F[_], G[_]]
-    extends Cobind[F] with IsomorphismFunctor[F, G] {
+    extends Cobind[F]
+    with IsomorphismFunctor[F, G] {
   implicit def G: Cobind[G]
 
   def iso: F <~> G
@@ -278,7 +284,8 @@ trait IsomorphismCobind[F[_], G[_]]
 }
 
 trait IsomorphismComonad[F[_], G[_]]
-    extends Comonad[F] with IsomorphismCobind[F, G] {
+    extends Comonad[F]
+    with IsomorphismCobind[F, G] {
   implicit def G: Comonad[G]
 
   def copoint[A](p: F[A]): A = G.copoint(iso.to(p))
@@ -294,20 +301,23 @@ trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
 }
 
 trait IsomorphismEmpty[F[_], G[_]]
-    extends PlusEmpty[F] with IsomorphismPlus[F, G] {
+    extends PlusEmpty[F]
+    with IsomorphismPlus[F, G] {
   implicit def G: PlusEmpty[G]
 
   def empty[A]: F[A] = iso.from(G.empty[A])
 }
 
 trait IsomorphismApplicativePlus[F[_], G[_]]
-    extends ApplicativePlus[F] with IsomorphismEmpty[F, G]
+    extends ApplicativePlus[F]
+    with IsomorphismEmpty[F, G]
     with IsomorphismApplicative[F, G] {
   implicit def G: ApplicativePlus[G]
 }
 
 trait IsomorphismMonadPlus[F[_], G[_]]
-    extends MonadPlus[F] with IsomorphismEmpty[F, G]
+    extends MonadPlus[F]
+    with IsomorphismEmpty[F, G]
     with IsomorphismMonad[F, G] {
   implicit def G: MonadPlus[G]
 }
@@ -328,7 +338,8 @@ trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
 }
 
 trait IsomorphismTraverse[F[_], G[_]]
-    extends Traverse[F] with IsomorphismFoldable[F, G]
+    extends Traverse[F]
+    with IsomorphismFoldable[F, G]
     with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
 
@@ -342,10 +353,11 @@ trait IsomorphismTraverse[F[_], G[_]]
 }
 
 trait IsomorphismFoldable1[F[_], G[_]]
-    extends Foldable1[F] with IsomorphismFoldable[F, G] {
+    extends Foldable1[F]
+    with IsomorphismFoldable[F, G] {
   implicit def G: Foldable1[G]
 
-  override final def foldMap1[A, B : Semigroup](fa: F[A])(f: A => B): B =
+  override final def foldMap1[A, B: Semigroup](fa: F[A])(f: A => B): B =
     G.foldMap1(naturalTrans(fa))(f)
 
   override final def foldMapLeft1[A, B](fa: F[A])(z: A => B)(
@@ -356,7 +368,8 @@ trait IsomorphismFoldable1[F[_], G[_]]
 }
 
 trait IsomorphismTraverse1[F[_], G[_]]
-    extends Traverse1[F] with IsomorphismTraverse[F, G]
+    extends Traverse1[F]
+    with IsomorphismTraverse[F, G]
     with IsomorphismFoldable1[F, G] {
   implicit def G: Traverse1[G]
 
@@ -388,7 +401,7 @@ trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
 
   implicit def G: Bifoldable[G]
 
-  override final def bifoldMap[A, B, M : Monoid](fab: F[A, B])(f: A => M)(
+  override final def bifoldMap[A, B, M: Monoid](fab: F[A, B])(f: A => M)(
       g: B => M): M =
     G.bifoldMap(biNaturalTrans(fab))(f)(g)
 
@@ -402,13 +415,14 @@ trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
 }
 
 trait IsomorphismBitraverse[F[_, _], G[_, _]]
-    extends Bitraverse[F] with IsomorphismBifunctor[F, G]
+    extends Bitraverse[F]
+    with IsomorphismBifunctor[F, G]
     with IsomorphismBifoldable[F, G] {
   override final protected[this] def biNaturalTrans: F ~~> G = iso.to
 
   implicit def G: Bitraverse[G]
 
-  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(
-      f: A => H[C], g: B => H[D]): H[F[C, D]] =
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](
+      fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
 }

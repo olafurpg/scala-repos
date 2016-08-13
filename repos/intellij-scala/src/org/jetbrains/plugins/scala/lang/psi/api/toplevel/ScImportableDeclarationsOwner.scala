@@ -22,7 +22,10 @@ trait ScImportableDeclarationsOwner extends ScalaPsiElement {
                                    lastParent: PsiElement,
                                    place: PsiElement) =
     if (isStable) {
-      ScalaPsiUtil.processImportLastParent(
-          processor, state, place, lastParent, getType(TypingContext.empty))
+      ScalaPsiUtil.processImportLastParent(processor,
+                                           state,
+                                           place,
+                                           lastParent,
+                                           getType(TypingContext.empty))
     } else true
 }

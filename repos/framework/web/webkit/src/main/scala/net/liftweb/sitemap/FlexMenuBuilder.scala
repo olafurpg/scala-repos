@@ -24,8 +24,9 @@ import net.liftweb.util.Helpers
 trait FlexMenuBuilder {
   // a hack to use structural typing to get around the private[http] on Loc.buildItem
   type StructBuildItem = {
-    def buildItem(
-        kids: List[MenuItem], current: Boolean, path: Boolean): Box[MenuItem]
+    def buildItem(kids: List[MenuItem],
+                  current: Boolean,
+                  path: Boolean): Box[MenuItem]
   }
 
   /**
@@ -116,26 +117,28 @@ trait FlexMenuBuilder {
   /**
     * By default, create an li for a menu item
     */
-  protected def buildInnerTag(
-      contents: NodeSeq, path: Boolean, current: Boolean): Elem =
+  protected def buildInnerTag(contents: NodeSeq,
+                              path: Boolean,
+                              current: Boolean): Elem =
     updateForCurrent(updateForPath(<li>{contents}</li>, path), current)
 
   /**
     * Render a placeholder
     */
   protected def renderPlaceholder(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem = {
+      item: MenuItem,
+      renderInner: Seq[MenuItem] => NodeSeq): Elem = {
     buildInnerTag(
-        <xml:group><span>{item.text}</span>{renderInner(item.kids)}</xml:group>,
-        item.path,
-        item.current)
+      <xml:group><span>{item.text}</span>{renderInner(item.kids)}</xml:group>,
+      item.path,
+      item.current)
   }
 
   /**
     * Render a link that's the current link, but the "link to self" flag is set to true
     */
-  protected def renderSelfLinked(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
+  protected def renderSelfLinked(item: MenuItem,
+                                 renderInner: Seq[MenuItem] => NodeSeq): Elem =
     buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
       item.current)}{renderInner(item.kids)}</xml:group>,
                   item.path,
@@ -145,11 +148,12 @@ trait FlexMenuBuilder {
     * Render the currently selected menu item, but with no a link back to self
     */
   protected def renderSelfNotLinked(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
+      item: MenuItem,
+      renderInner: Seq[MenuItem] => NodeSeq): Elem =
     buildInnerTag(
-        <xml:group>{renderSelf(item)}{renderInner(item.kids)}</xml:group>,
-        item.path,
-        item.current)
+      <xml:group>{renderSelf(item)}{renderInner(item.kids)}</xml:group>,
+      item.path,
+      item.current)
 
   /**
     * Render the currently selected menu item
@@ -159,15 +163,17 @@ trait FlexMenuBuilder {
   /**
     * Render a generic link
     */
-  protected def renderLink(
-      uri: NodeSeq, text: NodeSeq, path: Boolean, current: Boolean): NodeSeq =
+  protected def renderLink(uri: NodeSeq,
+                           text: NodeSeq,
+                           path: Boolean,
+                           current: Boolean): NodeSeq =
     <a href={uri}>{text}</a>
 
   /**
     * Render an item in the current path
     */
-  protected def renderItemInPath(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
+  protected def renderItemInPath(item: MenuItem,
+                                 renderInner: Seq[MenuItem] => NodeSeq): Elem =
     buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
       item.current)}{renderInner(item.kids)}</xml:group>,
                   item.path,
@@ -176,8 +182,8 @@ trait FlexMenuBuilder {
   /**
     * Render a menu item that's neither in the path nor
     */
-  protected def renderItem(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
+  protected def renderItem(item: MenuItem,
+                           renderInner: Seq[MenuItem] => NodeSeq): Elem =
     buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
       item.current)}{renderInner(item.kids)}</xml:group>,
                   item.path,
@@ -194,16 +200,16 @@ trait FlexMenuBuilder {
     */
   protected def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-       for {
-         sm <- LiftRules.siteMap;
-         req <- S.request
-       } yield sm.buildMenu(req.location).lines
-     else S.request.map(_.buildMenu.lines)) openOr Nil
+      for {
+        sm <- LiftRules.siteMap;
+        req <- S.request
+      } yield sm.buildMenu(req.location).lines
+    else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def render: NodeSeq = {
 
-    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield
-      i
+    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs))
+      yield i
 
     val toRender: Seq[MenuItem] = this.toRender
 

@@ -25,16 +25,16 @@ object ComparingDiffCollectionKinds extends SimplificationType {
             if (leftSide) (rightKind, left, "left")
             else (leftKind, right, "right")
           if (otherKind == "Array") return Seq.empty
-          val convertText = partConvertedExprText(
-              expr, exprToConvert, "to" + otherKind)
+          val convertText =
+            partConvertedExprText(expr, exprToConvert, "to" + otherKind)
           Seq(
-              replace(expr)
-                .withText(convertText)
-                .withHint(convertHint(side, otherKind))
-                .highlightRef)
+            replace(expr)
+              .withText(convertText)
+              .withHint(convertHint(side, otherKind))
+              .highlightRef)
         }
         convertSimplification(leftSide = true) ++ convertSimplification(
-            leftSide = false)
+          leftSide = false)
       case _ => Seq.empty
     }
 
@@ -61,8 +61,9 @@ object ComparingDiffCollectionKinds extends SimplificationType {
     }
   }
 
-  private def partConvertedExprText(
-      expr: ScExpression, subExpr: ScExpression, conversion: String) = {
+  private def partConvertedExprText(expr: ScExpression,
+                                    subExpr: ScExpression,
+                                    conversion: String) = {
     val subExprConvertedText = subExpr match {
       case _: ScMethodCall | _: ScReferenceExpression |
           _: ScParenthesisedExpr | _: ScTuple =>

@@ -82,7 +82,7 @@ class ApplicationMasterArguments(val args: Array[String]) {
     if (primaryPyFile != null && primaryRFile != null) {
       // scalastyle:off println
       System.err.println(
-          "Cannot have primary-py-file and primary-r-file at the same time")
+        "Cannot have primary-py-file and primary-r-file at the same time")
       // scalastyle:on println
       System.exit(-1)
     }
@@ -95,7 +95,8 @@ class ApplicationMasterArguments(val args: Array[String]) {
     if (unknownParam != null) {
       System.err.println("Unknown/unsupported param " + unknownParam)
     }
-    System.err.println("""
+    System.err.println(
+      """
       |Usage: org.apache.spark.deploy.yarn.ApplicationMaster [options]
       |Options:
       |  --jar JAR_PATH       Path to your application's JAR file

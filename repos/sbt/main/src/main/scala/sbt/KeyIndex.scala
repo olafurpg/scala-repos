@@ -38,8 +38,9 @@ object KeyIndex {
     def configs(proj: Option[ResolvedReference]) = concat(_.configs(proj))
     def tasks(proj: Option[ResolvedReference], conf: Option[String]) =
       concat(_.tasks(proj, conf))
-    def tasks(
-        proj: Option[ResolvedReference], conf: Option[String], key: String) =
+    def tasks(proj: Option[ResolvedReference],
+              conf: Option[String],
+              key: String) =
       concat(_.tasks(proj, conf, key))
     def keys(proj: Option[ResolvedReference]) = concat(_.keys(proj))
     def keys(proj: Option[ResolvedReference], conf: Option[String]) =
@@ -87,8 +88,8 @@ trait KeyIndex {
 }
 trait ExtendableKeyIndex extends KeyIndex {
   def add(scoped: ScopedKey[_]): ExtendableKeyIndex
-  def addAggregated(
-      scoped: ScopedKey[_], extra: BuildUtil[_]): ExtendableKeyIndex
+  def addAggregated(scoped: ScopedKey[_],
+                    extra: BuildUtil[_]): ExtendableKeyIndex
 }
 // task axis <-> key
 private final class AKeyIndex(
@@ -126,7 +127,8 @@ private final class BuildIndex(val data: Map[Option[URI], ProjectIndex]) {
           config: Option[String],
           task: Option[AttributeKey[_]],
           key: AttributeKey[_]): BuildIndex =
-    new BuildIndex(data updated
+    new BuildIndex(
+      data updated
         (build, projectIndex(build).add(project, config, task, key)))
   def projectIndex(build: Option[URI]): ProjectIndex =
     getOr(data, build, emptyProjectIndex)
@@ -153,16 +155,16 @@ private final class KeyIndex0(val data: BuildIndex)
     (Set.empty[String] /: optConfigs(proj)) { (s, c) =>
       s ++ keys(proj, c)
     }
-  def keys(
-      proj: Option[ResolvedReference], conf: Option[String]): Set[String] =
+  def keys(proj: Option[ResolvedReference],
+           conf: Option[String]): Set[String] =
     keyIndex(proj, conf).allKeys
   def keys(proj: Option[ResolvedReference],
            conf: Option[String],
            task: Option[AttributeKey[_]]): Set[String] =
     keyIndex(proj, conf).keys(task)
 
-  def keyIndex(
-      proj: Option[ResolvedReference], conf: Option[String]): AKeyIndex =
+  def keyIndex(proj: Option[ResolvedReference],
+               conf: Option[String]): AKeyIndex =
     confIndex(proj).keyIndex(conf)
   def confIndex(proj: Option[ResolvedReference]): ConfigIndex = {
     val (build, project) = parts(proj)
@@ -178,8 +180,8 @@ private final class KeyIndex0(val data: BuildIndex)
       project: Option[ResolvedReference]): Seq[Option[String]] =
     None +: (configs(project).toSeq map some.fn)
 
-  def addAggregated(
-      scoped: ScopedKey[_], extra: BuildUtil[_]): ExtendableKeyIndex =
+  def addAggregated(scoped: ScopedKey[_],
+                    extra: BuildUtil[_]): ExtendableKeyIndex =
     if (validID(scoped.key.label)) {
       val aggregateProjects =
         Aggregation.aggregate(scoped, ScopeMask(), extra, reverse = true)
@@ -198,5 +200,5 @@ private final class KeyIndex0(val data: BuildIndex)
                          task: ScopeAxis[AttributeKey[_]],
                          key: AttributeKey[_]): ExtendableKeyIndex =
     new KeyIndex0(
-        data.add(uri, id, config.toOption.map(_.name), task.toOption, key))
+      data.add(uri, id, config.toOption.map(_.name), task.toOption, key))
 }

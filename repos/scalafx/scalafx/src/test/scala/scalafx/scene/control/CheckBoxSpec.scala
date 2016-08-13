@@ -41,4 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class CheckBoxSpec
     extends SimpleSFXDelegateSpec[jfxsc.CheckBox, CheckBox](
-        classOf[jfxsc.CheckBox], classOf[CheckBox]) with RunOnApplicationThread
+      classOf[jfxsc.CheckBox],
+      classOf[CheckBox])
+    with RunOnApplicationThread

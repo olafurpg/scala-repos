@@ -1,7 +1,11 @@
 package cats
 package tests
 
-import cats.laws.discipline.{CartesianTests, MonadStateTests, SerializableTests}
+import cats.laws.discipline.{
+  CartesianTests,
+  MonadStateTests,
+  SerializableTests
+}
 import cats.data.{State, StateT}
 import cats.laws.discipline.eq._
 import cats.laws.discipline.arbitrary._
@@ -36,7 +40,7 @@ class StateTTests extends CatsSuite {
   test("Singleton and instance inspect are consistent") {
     forAll { (s: String, i: Int) =>
       State.inspect[Int, String](_.toString).run(i) should ===(
-          State.pure[Int, Unit](()).inspect(_.toString).run(i))
+        State.pure[Int, Unit](()).inspect(_.toString).run(i))
     }
   }
 
@@ -112,11 +116,11 @@ class StateTTests extends CatsSuite {
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[StateT[Option, Int, ?]]
     checkAll(
-        "StateT[Option, Int, Int]",
-        MonadStateTests[StateT[Option, Int, ?], Int].monadState[Int, Int, Int])
-    checkAll("MonadState[StateT[Option, ?, ?], Int]",
-             SerializableTests.serializable(
-                 MonadState[StateT[Option, Int, ?], Int]))
+      "StateT[Option, Int, Int]",
+      MonadStateTests[StateT[Option, Int, ?], Int].monadState[Int, Int, Int])
+    checkAll(
+      "MonadState[StateT[Option, ?, ?], Int]",
+      SerializableTests.serializable(MonadState[StateT[Option, Int, ?], Int]))
   }
 
   {
@@ -129,11 +133,11 @@ class StateTTests extends CatsSuite {
 }
 
 object StateTTests extends StateTTestsInstances {
-  implicit def stateEq[S : Eq : Arbitrary, A : Eq]: Eq[State[S, A]] =
+  implicit def stateEq[S: Eq: Arbitrary, A: Eq]: Eq[State[S, A]] =
     stateTEq[Eval, S, A]
 
-  implicit def stateArbitrary[S : Arbitrary, A : Arbitrary]: Arbitrary[State[
-          S, A]] =
+  implicit def stateArbitrary[S: Arbitrary, A: Arbitrary]
+    : Arbitrary[State[S, A]] =
     stateTArbitrary[Eval, S, A]
 
   val add1: State[Int, Int] = State(n => (n + 1, n))

@@ -5,8 +5,8 @@ object Impls {
     import c.universe._
     val sum = Apply(Select(x.tree, TermName("$plus")), List(y.tree))
     val body = Apply(
-        Select(Ident(definitions.PredefModule), TermName("println")),
-        List(sum))
+      Select(Ident(definitions.PredefModule), TermName("println")),
+      List(sum))
     c.Expr[Unit](body)
   }
 }

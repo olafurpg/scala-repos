@@ -343,7 +343,7 @@ trait Row extends Serializable {
     */
   def fieldIndex(name: String): Int = {
     throw new UnsupportedOperationException(
-        "fieldIndex on a Row without schema is undefined.")
+      "fieldIndex on a Row without schema is undefined.")
   }
 
   /**

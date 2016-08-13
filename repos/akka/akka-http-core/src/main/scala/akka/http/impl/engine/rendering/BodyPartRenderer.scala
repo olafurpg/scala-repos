@@ -35,8 +35,8 @@ private[http] object BodyPartRenderer {
       override def onPush(
           bodyPart: Multipart.BodyPart,
           ctx: Context[Source[ChunkStreamPart, Any]]): SyncDirective = {
-        val r = new CustomCharsetByteStringRendering(
-            nioCharset, partHeadersSizeHint)
+        val r =
+          new CustomCharsetByteStringRendering(nioCharset, partHeadersSizeHint)
 
         def bodyPartChunks(
             data: Source[ByteString, Any]): Source[ChunkStreamPart, Any] = {
@@ -52,8 +52,9 @@ private[http] object BodyPartRenderer {
             case IndefiniteLength(_, data) ⇒ bodyPartChunks(data)
           }
 
-        renderBoundary(
-            r, boundary, suppressInitialCrLf = !firstBoundaryRendered)
+        renderBoundary(r,
+                       boundary,
+                       suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
         renderEntityContentType(r, bodyPart.entity)
         renderHeaders(r, bodyPart.headers, log)
@@ -85,8 +86,8 @@ private[http] object BodyPartRenderer {
              nioCharset: Charset,
              partHeadersSizeHint: Int,
              log: LoggingAdapter): ByteString = {
-    val r = new CustomCharsetByteStringRendering(
-        nioCharset, partHeadersSizeHint)
+    val r =
+      new CustomCharsetByteStringRendering(nioCharset, partHeadersSizeHint)
     if (parts.nonEmpty) {
       for (part ← parts) {
         renderBoundary(r, boundary, suppressInitialCrLf = part eq parts.head)
@@ -99,8 +100,9 @@ private[http] object BodyPartRenderer {
     r.get
   }
 
-  private def renderBoundary(
-      r: Rendering, boundary: String, suppressInitialCrLf: Boolean): Unit = {
+  private def renderBoundary(r: Rendering,
+                             boundary: String,
+                             suppressInitialCrLf: Boolean): Unit = {
     if (!suppressInitialCrLf) r ~~ CrLf
     r ~~ '-' ~~ '-' ~~ boundary ~~ CrLf
   }
@@ -115,19 +117,19 @@ private[http] object BodyPartRenderer {
     r ~~ CrLf
   }
 
-  private def renderHeader(
-      r: Rendering, log: LoggingAdapter): HttpHeader ⇒ Unit = {
+  private def renderHeader(r: Rendering,
+                           log: LoggingAdapter): HttpHeader ⇒ Unit = {
     case x: `Content-Length` ⇒
       suppressionWarning(
-          log,
-          x,
-          "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
+        log,
+        x,
+        "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
 
     case x: `Content-Type` ⇒
       suppressionWarning(
-          log,
-          x,
-          "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
+        log,
+        x,
+        "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
 
     case x: RawHeader if (x is "content-type") || (x is "content-length") ⇒
       suppressionWarning(log, x, "illegal RawHeader")

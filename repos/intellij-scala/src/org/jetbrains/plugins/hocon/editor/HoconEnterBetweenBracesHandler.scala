@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.hocon.editor
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate.Result
-import com.intellij.codeInsight.editorActions.enter.{EnterBetweenBracesHandler, EnterHandlerDelegate}
+import com.intellij.codeInsight.editorActions.enter.{
+  EnterBetweenBracesHandler,
+  EnterHandlerDelegate
+}
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler

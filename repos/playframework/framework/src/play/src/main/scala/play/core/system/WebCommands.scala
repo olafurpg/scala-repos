@@ -22,8 +22,9 @@ trait WebCommands {
     * Call handleWebCommand on the handlers.
     * @return the result from the first Some-returning handler
     */
-  def handleWebCommand(
-      request: RequestHeader, buildLink: BuildLink, path: File): Option[Result]
+  def handleWebCommand(request: RequestHeader,
+                       buildLink: BuildLink,
+                       path: File): Option[Result]
 }
 
 /**
@@ -41,7 +42,7 @@ class DefaultWebCommands extends WebCommands {
                        buildLink: BuildLink,
                        path: File): Option[Result] = synchronized {
     (handlers.toStream flatMap {
-          _.handleWebCommand(request, buildLink, path).toSeq
-        }).headOption
+      _.handleWebCommand(request, buildLink, path).toSeq
+    }).headOption
   }
 }

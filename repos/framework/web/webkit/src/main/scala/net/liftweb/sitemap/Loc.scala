@@ -51,7 +51,7 @@ trait Loc[T] {
     * When the menu item is displayed, what CSS class do we add to the
     * node?
     */
-  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_ ())
+  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_())
 
   /**
     * By default, this lazy val looks for the MenuCssClass LocParam and
@@ -67,8 +67,7 @@ trait Loc[T] {
     * Given a value calculate the HREF to this item
     */
   def calcHref(in: T): String =
-    appendQueryParameters(link.createPath(in),
-                          Full(in))
+    appendQueryParameters(link.createPath(in), Full(in))
 
   /**
     * Calculate HREF to this item using currentValue
@@ -105,7 +104,7 @@ trait Loc[T] {
     * Calculate the Query parameters
     */
   def queryParameters(what: Box[T]): List[(String, String)] =
-    addlQueryParams.flatMap(_ ()) ::: calcQueryParams.flatMap(_ (what))
+    addlQueryParams.flatMap(_()) ::: calcQueryParams.flatMap(_(what))
 
   protected def appendQueryParams(what: T)(nodeSeq: NodeSeq): NodeSeq =
     Text(appendQueryParameters(nodeSeq.text, Full(what)))
@@ -130,7 +129,8 @@ trait Loc[T] {
   def params: List[Loc.LocParam[T]]
 
   def allParams: List[Loc.AnyLocParam] =
-    (params.asInstanceOf[List[Loc.AnyLocParam]]) ::: parentParams ::: siteMap.globalParams
+    (params
+      .asInstanceOf[List[Loc.AnyLocParam]]) ::: parentParams ::: siteMap.globalParams
 
   private def parentParams: List[Loc.AnyLocParam] =
     _menu match {
@@ -172,27 +172,27 @@ trait Loc[T] {
   override def toString =
     "Loc(" + name + ", " + link + ", " + text + ", " + params + ")"
 
-  type LocRewrite = Box[PartialFunction[
-          RewriteRequest, (RewriteResponse, Box[T])]]
+  type LocRewrite =
+    Box[PartialFunction[RewriteRequest, (RewriteResponse, Box[T])]]
 
   def rewrite: LocRewrite = Empty
 
   def rewritePF: Box[LiftRules.RewritePF] = rewrite.map(
-      rw =>
-        new NamedPartialFunction[RewriteRequest, RewriteResponse] {
-          def functionName = rw match {
-            case rw: NamedPartialFunction[_, _] => rw.functionName
-            case _ => "Unnamed"
-          }
+    rw =>
+      new NamedPartialFunction[RewriteRequest, RewriteResponse] {
+        def functionName = rw match {
+          case rw: NamedPartialFunction[_, _] => rw.functionName
+          case _ => "Unnamed"
+        }
 
-          def isDefinedAt(in: RewriteRequest) = rw.isDefinedAt(in)
+        def isDefinedAt(in: RewriteRequest) = rw.isDefinedAt(in)
 
-          def apply(in: RewriteRequest): RewriteResponse = {
-            val (ret, param) = rw.apply(in)
-            requestValue.set(param)
-            ret
-          }
-      }
+        def apply(in: RewriteRequest): RewriteResponse = {
+          val (ret, param) = rw.apply(in)
+          requestValue.set(param)
+          ret
+        }
+    }
   )
 
   /**
@@ -235,7 +235,7 @@ trait Loc[T] {
     * Find the stateless calculation Loc params
     */
   protected def findStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+                                    Box[Loc.CalcParamStateless[T]]) =
     (allParams.collect {
       case v @ Loc.CalcStateless(_) => v
     }.headOption, allParams.collect {
@@ -246,10 +246,11 @@ trait Loc[T] {
     * The cached Loc params
     */
   protected lazy val _foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) = findStatelessCalc
+                                           Box[Loc.CalcParamStateless[T]]) =
+    findStatelessCalc
 
   protected def foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+                                     Box[Loc.CalcParamStateless[T]]) =
     if (Props.devMode) findStatelessCalc else _foundStatelessCalc
 
   /**
@@ -423,44 +424,45 @@ trait Loc[T] {
       l <- link.createLink(p).map(appendQueryParams(p))
     } yield
       MenuItem(
-          text.text(p),
-          l,
-          Nil,
-          false,
-          false,
-          allParams.flatMap {
-            case v: Loc.LocInfo[_] => List(v())
-            case _ => Nil
-          }
+        text.text(p),
+        l,
+        Nil,
+        false,
+        false,
+        allParams.flatMap {
+          case v: Loc.LocInfo[_] => List(v())
+          case _ => Nil
+        }
       )
 
   def buildMenu: CompleteMenu = {
     CompleteMenu(
-        _menu.buildUpperLines(_menu, _menu, buildKidMenuItems(_menu.kids)))
+      _menu.buildUpperLines(_menu, _menu, buildKidMenuItems(_menu.kids)))
   }
 
-  private[liftweb] def buildItem(
-      kids: List[MenuItem], current: Boolean, path: Boolean): Box[MenuItem] =
+  private[liftweb] def buildItem(kids: List[MenuItem],
+                                 current: Boolean,
+                                 path: Boolean): Box[MenuItem] =
     (calcHidden(kids), testAccess) match {
       case (false, Left(true)) => {
-          for {
-            p <- currentValue
-            t <- link.createLink(p).map(appendQueryParams(p))
-          } yield
-            new MenuItem(
-                text.text(p),
-                t,
-                kids,
-                current,
-                path,
-                allParams.flatMap {
-                  case v: Loc.LocInfo[_] => List(v())
-                  case _ => Nil
-                },
-                placeHolder_?,
-                this
-            )
-        }
+        for {
+          p <- currentValue
+          t <- link.createLink(p).map(appendQueryParams(p))
+        } yield
+          new MenuItem(
+            text.text(p),
+            t,
+            kids,
+            current,
+            path,
+            allParams.flatMap {
+              case v: Loc.LocInfo[_] => List(v())
+              case _ => Nil
+            },
+            placeHolder_?,
+            this
+          )
+      }
 
       case _ => Empty
     }
@@ -472,8 +474,7 @@ trait Loc[T] {
 
   def hidden = _hidden
 
-  private lazy val groupSet: Set[String] = Set(
-      allParams.flatMap {
+  private lazy val groupSet: Set[String] = Set(allParams.flatMap {
     case s: Loc.LocGroup => s.group
     case _ => Nil
   }: _*)
@@ -525,8 +526,7 @@ object Loc {
       override val link: Link[Unit],
       override val text: LinkText[Unit],
       override val params: List[LocParam[Unit]]
-  )
-      extends Loc[Unit] {
+  ) extends Loc[Unit] {
     override def defaultValue: Box[Unit] = Full(())
 
     init()
@@ -538,8 +538,7 @@ object Loc {
       override val text: LinkText[T],
       override val defaultValue: Box[T],
       xparams: LocParam[T]*
-  )
-      extends Loc[T] {
+  ) extends Loc[T] {
     override val params = xparams.toList
 
     init()
@@ -567,10 +566,10 @@ object Loc {
 
     override def onCreate(loc: Loc[_]) {
       LiftRules.httpAuthProtectedResource.append(
-          new LiftRules.HttpAuthProtectedResourcePF() {
-            def isDefinedAt(in: Req) = in.path.partPath == loc.link.uriList
-            def apply(in: Req): Box[Role] = role(in)
-          }
+        new LiftRules.HttpAuthProtectedResourcePF() {
+          def isDefinedAt(in: Req) = in.path.partPath == loc.link.uriList
+          def apply(in: Req): Box[Role] = role(in)
+        }
       )
     }
   }
@@ -721,10 +720,11 @@ object Loc {
     * the function is invoked.
     */
   class Snippet(val name: String, _func: => NodeSeq => NodeSeq)
-      extends ValueSnippets[Any] with AnyLocParam {
+      extends ValueSnippets[Any]
+      with AnyLocParam {
 
     /**
-      * The NodeSeq => NodeSeq function 
+      * The NodeSeq => NodeSeq function
       */
     def func: NodeSeq => NodeSeq = _func
 
@@ -759,7 +759,8 @@ object Loc {
     */
   trait LocSnippets
       extends PartialFunction[String, NodeSeq => NodeSeq]
-      with ValueSnippets[Any] with AnyLocParam {
+      with ValueSnippets[Any]
+      with AnyLocParam {
     def snippets = {
       case (s, _) if isDefinedAt(s) => apply(s)
     }
@@ -957,12 +958,11 @@ object Loc {
   }
 
   implicit def strToFailMsg(in: => String): FailMsg =
-    () =>
-      {
-        RedirectWithState(
-            LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
-            RedirectState(Empty, in -> NoticeType.Error)
-        )
+    () => {
+      RedirectWithState(
+        LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
+        RedirectState(Empty, in -> NoticeType.Error)
+      )
     }
 
   implicit def strFuncToFailMsg(in: () => String): FailMsg = strToFailMsg(in())

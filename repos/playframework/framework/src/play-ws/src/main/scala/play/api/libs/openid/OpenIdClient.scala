@@ -20,8 +20,9 @@ import xml.Node
 //TODO do not use Play's internal execution context in libs
 import play.core.Execution.Implicits.internalContext
 
-case class OpenIDServer(
-    protocolVersion: String, url: String, delegate: Option[String])
+case class OpenIDServer(protocolVersion: String,
+                        url: String,
+                        delegate: Option[String])
 
 case class UserInfo(id: String, attributes: Map[String, String] = Map.empty)
 
@@ -51,7 +52,7 @@ object UserInfo {
 
     private lazy val signedFields =
       params.get("openid.signed") flatMap { _.headOption map { _.split(",") } } getOrElse
-      (Array())
+        (Array())
 
     def id =
       params
@@ -94,8 +95,8 @@ object OpenID {
     * From a request corresponding to the callback from the OpenID server, check the identity of the current user
     */
   @deprecated("Inject OpenIdClient into your component", "2.5.0")
-  def verifiedId(
-      implicit request: Request[_], app: Application): Future[UserInfo] =
+  def verifiedId(implicit request: Request[_],
+                 app: Application): Future[UserInfo] =
     app.injector.instanceOf[OpenIdClient].verifiedId(request)
 }
 
@@ -147,11 +148,11 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
              "http://specs.openid.net/auth/2.0/identifier_select")
         val parameters =
           Seq(
-              "openid.ns" -> "http://specs.openid.net/auth/2.0",
-              "openid.mode" -> "checkid_setup",
-              "openid.claimed_id" -> claimedId,
-              "openid.identity" -> identity,
-              "openid.return_to" -> callbackURL
+            "openid.ns" -> "http://specs.openid.net/auth/2.0",
+            "openid.mode" -> "checkid_setup",
+            "openid.claimed_id" -> claimedId,
+            "openid.identity" -> identity,
+            "openid.return_to" -> callbackURL
           ) ++ axParameters(axRequired, axOptional) ++ realm
             .map("openid.realm" -> _)
             .toList
@@ -183,10 +184,10 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
      queryString.get("openid.claimed_id").flatMap(_.headOption)) match {
       // The Claimed Identifier. "openid.claimed_id" and "openid.identity" SHALL be either both present or both absent.
       case (Some("id_res"), Some(id)) => {
-          // MUST perform discovery on the claimedId to resolve the op_endpoint.
-          val server: Future[OpenIDServer] = discovery.discoverServer(id)
-          server.flatMap(directVerification(queryString))
-        }
+        // MUST perform discovery on the claimedId to resolve the op_endpoint.
+        val server: Future[OpenIDServer] = discovery.discoverServer(id)
+        server.flatMap(directVerification(queryString))
+      }
       case (Some("cancel"), _) => Future.failed(Errors.AUTH_CANCEL)
       case _ => Future.failed(Errors.BAD_RESPONSE)
     }
@@ -199,15 +200,14 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
       server: OpenIDServer) = {
     val fields =
       (queryString - "openid.mode" +
-          ("openid.mode" -> Seq("check_authentication")))
+        ("openid.mode" -> Seq("check_authentication")))
     ws.url(server.url)
       .post(fields)
-      .map(response =>
-            {
-          if (response.status == 200 &&
-              response.body.contains("is_valid:true")) {
-            UserInfo(queryString)
-          } else throw Errors.AUTH_ERROR
+      .map(response => {
+        if (response.status == 200 &&
+            response.body.contains("is_valid:true")) {
+          UserInfo(queryString)
+        } else throw Errors.AUTH_ERROR
       })
   }
 
@@ -225,11 +225,12 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
         else
           Seq("openid.ax.if_available" -> axOptional.map(_._1).mkString(","))
 
-      val definitions = (axRequired ++ axOptional).map(
-          attribute => ("openid.ax.type." + attribute._1 -> attribute._2))
+      val definitions = (axRequired ++ axOptional).map(attribute =>
+        ("openid.ax.type." + attribute._1 -> attribute._2))
 
-      Seq("openid.ns.ax" -> "http://openid.net/srv/ax/1.0",
-          "openid.ax.mode" -> "fetch_request") ++ axRequiredParams ++ axOptionalParams ++ definitions
+      Seq(
+        "openid.ns.ax" -> "http://openid.net/srv/ax/1.0",
+        "openid.ax.mode" -> "fetch_request") ++ axRequiredParams ++ axOptionalParams ++ definitions
     }
   }
 }
@@ -275,7 +276,7 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
           if (null == path || path.isEmpty) "/" else path
 
         val uri = (if (url.matches("^(http|HTTP)(s|S)?:.*")) new URI(url)
-                   else new URI("http://" + url)).normalize()
+        else new URI("http://" + url)).normalize()
         new URI(scheme(uri),
                 uri.getUserInfo,
                 uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
@@ -298,12 +299,11 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
     val discoveryUrl = normalizeIdentifier(openID)
     ws.url(discoveryUrl)
       .get()
-      .map(response =>
-            {
-          val maybeOpenIdServer =
-            new XrdsResolver().resolve(response) orElse new HtmlResolver()
-              .resolve(response)
-          maybeOpenIdServer.getOrElse(throw Errors.NETWORK_ERROR)
+      .map(response => {
+        val maybeOpenIdServer =
+          new XrdsResolver().resolve(response) orElse new HtmlResolver()
+            .resolve(response)
+        maybeOpenIdServer.getOrElse(throw Errors.NETWORK_ERROR)
       })
   }
 }
@@ -326,29 +326,30 @@ private[openid] object Discovery {
     def resolve(response: WSResponse) =
       for {
         _ <- response
-          .header(HeaderNames.CONTENT_TYPE)
-          .filter(_.contains("application/xrds+xml"))
+              .header(HeaderNames.CONTENT_TYPE)
+              .filter(_.contains("application/xrds+xml"))
         findInXml = findUriWithType(response.xml) _
         (typeId, uri) <- serviceTypeId.flatMap(findInXml(_)).headOption
       } yield OpenIDServer(typeId, uri, None)
 
     private def findUriWithType(xml: Node)(typeId: String) =
       (xml \ "XRD" \ "Service" find
-          (node =>
-                (node \ "Type").find(inner => inner.text == typeId).isDefined)).map {
-        node =>
-          (typeId, (node \ "URI").text.trim)
+        (node =>
+           (node \ "Type")
+             .find(inner => inner.text == typeId)
+             .isDefined)).map { node =>
+        (typeId, (node \ "URI").text.trim)
       }
   }
 
   class HtmlResolver extends Resolver {
     private val providerRegex = new Regex(
-        """<link[^>]+openid2[.]provider[^>]+>""")
+      """<link[^>]+openid2[.]provider[^>]+>""")
     private val serverRegex = new Regex("""<link[^>]+openid[.]server[^>]+>""")
     private val localidRegex = new Regex(
-        """<link[^>]+openid2[.]local_id[^>]+>""")
+      """<link[^>]+openid2[.]local_id[^>]+>""")
     private val delegateRegex = new Regex(
-        """<link[^>]+openid[.]delegate[^>]+>""")
+      """<link[^>]+openid[.]delegate[^>]+>""")
 
     def resolve(response: WSResponse) = {
       val serverUrl: Option[String] = providerRegex
@@ -356,26 +357,26 @@ private[openid] object Discovery {
         .orElse(serverRegex.findFirstIn(response.body))
         .flatMap(extractHref(_))
       serverUrl.map(
-          url =>
-            {
+        url => {
           val delegate: Option[String] = localidRegex
             .findFirstIn(response.body)
             .orElse(delegateRegex.findFirstIn(response.body))
             .flatMap(extractHref(_))
           OpenIDServer(
-              "http://specs.openid.net/auth/2.0/signon",
-              url,
-              delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
-      })
+            "http://specs.openid.net/auth/2.0/signon",
+            url,
+            delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
+        })
     }
 
     private def extractHref(link: String): Option[String] =
       new Regex("""href="([^"]*)"""")
         .findFirstMatchIn(link)
         .map(_.group(1).trim)
-        .orElse(new Regex("""href='([^']*)'""")
-              .findFirstMatchIn(link)
-              .map(_.group(1).trim))
+        .orElse(
+          new Regex("""href='([^']*)'""")
+            .findFirstMatchIn(link)
+            .map(_.group(1).trim))
   }
 }
 
@@ -385,8 +386,8 @@ private[openid] object Discovery {
 class OpenIDModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[OpenIdClient].to[WsOpenIdClient],
-        bind[Discovery].to[WsDiscovery]
+      bind[OpenIdClient].to[WsOpenIdClient],
+      bind[Discovery].to[WsDiscovery]
     )
   }
 }
@@ -398,6 +399,6 @@ trait OpenIDComponents {
   def wsClient: WSClient
 
   lazy val openIdDiscovery: Discovery = new WsDiscovery(wsClient)
-  lazy val openIdClient: OpenIdClient = new WsOpenIdClient(
-      wsClient, openIdDiscovery)
+  lazy val openIdClient: OpenIdClient =
+    new WsOpenIdClient(wsClient, openIdDiscovery)
 }

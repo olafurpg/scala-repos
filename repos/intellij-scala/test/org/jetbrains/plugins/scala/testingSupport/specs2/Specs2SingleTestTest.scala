@@ -34,49 +34,49 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
       """.stripMargin)
 
     runTestByLocation(
-        5,
-        10,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run single test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run single test") &&
+      5,
+      10,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run single test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         specsTestClassName,
+                                         "The 'SpecificationTest' should",
+                                         "run single test") &&
           checkResultTreeDoesNotHaveNodes(root,
                                           "ignore other test",
                                           "run greater test",
                                           "run exclamation test"),
-        debug = true)
+      debug = true)
 
     runTestByLocation(
-        10,
-        35,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run exclamation test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run exclamation test") &&
+      10,
+      35,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run exclamation test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         specsTestClassName,
+                                         "The 'SpecificationTest' should",
+                                         "run exclamation test") &&
           checkResultTreeDoesNotHaveNodes(root,
                                           "ignore other test",
                                           "run single test",
                                           "run greater test"))
 
     runTestByLocation(
-        12,
-        10,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run greater test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run greater test") &&
+      12,
+      10,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run greater test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         specsTestClassName,
+                                         "The 'SpecificationTest' should",
+                                         "run greater test") &&
           checkResultTreeDoesNotHaveNodes(root,
                                           "ignore other test",
                                           "run single test",

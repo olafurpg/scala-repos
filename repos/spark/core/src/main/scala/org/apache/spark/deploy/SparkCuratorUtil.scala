@@ -38,10 +38,10 @@ private[spark] object SparkCuratorUtil extends Logging {
       zkUrlConf: String = "spark.deploy.zookeeper.url"): CuratorFramework = {
     val ZK_URL = conf.get(zkUrlConf)
     val zk = CuratorFrameworkFactory.newClient(
-        ZK_URL,
-        ZK_SESSION_TIMEOUT_MILLIS,
-        ZK_CONNECTION_TIMEOUT_MILLIS,
-        new ExponentialBackoffRetry(RETRY_WAIT_MILLIS, MAX_RECONNECT_ATTEMPTS))
+      ZK_URL,
+      ZK_SESSION_TIMEOUT_MILLIS,
+      ZK_CONNECTION_TIMEOUT_MILLIS,
+      new ExponentialBackoffRetry(RETRY_WAIT_MILLIS, MAX_RECONNECT_ATTEMPTS))
     zk.start()
     zk
   }

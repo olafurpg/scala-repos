@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.NestedSameNamesTest
   * @since 17.01.2015.
   */
 class Scalatest2_10_2_1_7_NestedSameNamesTest
-    extends Scalatest2_10_2_1_7_Base with NestedSameNamesTest {}
+    extends Scalatest2_10_2_1_7_Base
+    with NestedSameNamesTest {}

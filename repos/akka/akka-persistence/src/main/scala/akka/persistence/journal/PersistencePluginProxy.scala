@@ -7,7 +7,17 @@ import java.net.URISyntaxException
 import java.util.concurrent.TimeoutException
 
 import akka.actor._
-import akka.persistence.{AtomicWrite, DeleteMessagesFailure, DeleteSnapshotFailure, DeleteSnapshotsFailure, JournalProtocol, NonPersistentRepr, Persistence, SaveSnapshotFailure, SnapshotProtocol}
+import akka.persistence.{
+  AtomicWrite,
+  DeleteMessagesFailure,
+  DeleteSnapshotFailure,
+  DeleteSnapshotsFailure,
+  JournalProtocol,
+  NonPersistentRepr,
+  Persistence,
+  SaveSnapshotFailure,
+  SnapshotProtocol
+}
 import akka.util.Helpers.Requiring
 import com.typesafe.config.Config
 
@@ -20,14 +30,14 @@ object PersistencePluginProxy {
   def setTargetLocation(system: ActorSystem, address: Address): Unit = {
     Persistence(system).journalFor(null) ! TargetLocation(address)
     if (system.settings.config.getString(
-            "akka.persistence.snapshot-store.plugin") != "")
+          "akka.persistence.snapshot-store.plugin") != "")
       Persistence(system).snapshotStoreFor(null) ! TargetLocation(address)
   }
 
   def start(system: ActorSystem): Unit = {
     Persistence(system).journalFor(null)
     if (system.settings.config.getString(
-            "akka.persistence.snapshot-store.plugin") != "")
+          "akka.persistence.snapshot-store.plugin") != "")
       Persistence(system).snapshotStoreFor(null)
   }
 
@@ -65,7 +75,9 @@ object PersistencePluginProxyExtension
 }
 
 final class PersistencePluginProxy(config: Config)
-    extends Actor with Stash with ActorLogging {
+    extends Actor
+    with Stash
+    with ActorLogging {
   import PersistencePluginProxy._
   import JournalProtocol._
   import SnapshotProtocol._
@@ -107,7 +119,8 @@ final class PersistencePluginProxy(config: Config)
                    pluginType.qualifier,
                    targetAddress)
           PersistencePluginProxy.setTargetLocation(
-              context.system, AddressFromURIString(targetAddress))
+            context.system,
+            AddressFromURIString(targetAddress))
         } catch {
           case _: URISyntaxException ⇒
             log.warning("Invalid URL provided for target {} address: {}",
@@ -126,7 +139,7 @@ final class PersistencePluginProxy(config: Config)
 
   private def timeoutException() =
     new TimeoutException(s"Target ${pluginType.qualifier} not initialized. " +
-        s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
+      s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
 
   def receive = init
 
@@ -136,9 +149,9 @@ final class PersistencePluginProxy(config: Config)
       context.become(identifying(address))
     case InitTimeout ⇒
       log.info(
-          "Initialization timed-out (after {}), Use `PersistencePluginProxy.setTargetLocation` or set `target-{}-address`",
-          initTimeout,
-          pluginType.qualifier)
+        "Initialization timed-out (after {}), Use `PersistencePluginProxy.setTargetLocation` or set `target-{}-address`",
+        initTimeout,
+        pluginType.qualifier)
       context.become(initTimedOut)
       unstashAll() // will trigger appropriate failures
     case Terminated(_) ⇒
@@ -154,7 +167,7 @@ final class PersistencePluginProxy(config: Config)
 
   def sendIdentify(address: Address): Unit = {
     val sel = context.actorSelection(
-        RootActorPath(address) / "system" / targetPluginId)
+      RootActorPath(address) / "system" / targetPluginId)
     log.info("Trying to identify target {} at {}", pluginType.qualifier, sel)
     sel ! Identify(targetPluginId)
   }
@@ -210,8 +223,8 @@ final class PersistencePluginProxy(config: Config)
                             persistentActor) ⇒
           persistentActor ! ReplayMessagesFailure(timeoutException)
         case DeleteMessagesTo(persistenceId, toSequenceNr, persistentActor) ⇒
-          persistentActor ! DeleteMessagesFailure(
-              timeoutException, toSequenceNr)
+          persistentActor ! DeleteMessagesFailure(timeoutException,
+                                                  toSequenceNr)
       }
 
     case req: SnapshotProtocol.Request ⇒

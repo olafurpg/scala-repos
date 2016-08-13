@@ -25,8 +25,7 @@ trait MomentsTestBase[T] extends FunSuite with Checkers {
   def numFailures: Int = 2
 
   test("mean") {
-    check(
-        Prop.forAll { (distr: Distr) =>
+    check(Prop.forAll { (distr: Distr) =>
       val sample = distr.sample(numSamples).map(asDouble _)
       val m = mean(sample)
       if ((m - distr.mean).abs / (m.abs max 1) > 1E-1) {
@@ -56,8 +55,7 @@ trait MomentsTestBase[T] extends FunSuite with Checkers {
   }
 
   test("mode") {
-    check(
-        Prop.forAll { (distr: Distr) =>
+    check(Prop.forAll { (distr: Distr) =>
       val sample = distr.sample(40)
       val probMode = distr(fromDouble(distr.mode))
 //      if(distr.isInstanceOf[Poisson])
@@ -65,7 +63,8 @@ trait MomentsTestBase[T] extends FunSuite with Checkers {
       sample.find(x => probMode < distr(x) - 1E-4) match {
         case Some(x) =>
           println(
-              s"$x has higher prob (${distr(x)}) than mode ${distr.mode} ($probMode)"); false
+            s"$x has higher prob (${distr(x)}) than mode ${distr.mode} ($probMode)");
+          false
         case None => true
       }
     })

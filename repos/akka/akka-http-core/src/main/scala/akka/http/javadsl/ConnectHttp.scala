@@ -36,8 +36,8 @@ object ConnectHttp {
   def toHost(uriHost: Uri): ConnectHttp = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
     if (s == "https")
-      new ConnectHttpsImpl(
-          uriHost.host.address, effectivePort(s, uriHost.port))
+      new ConnectHttpsImpl(uriHost.host.address,
+                           effectivePort(s, uriHost.port))
     else
       new ConnectHttpImpl(uriHost.host.address, effectivePort(s, uriHost.port))
   }
@@ -94,7 +94,7 @@ object ConnectHttp {
     else if (s == "http" || s == "ws") 80
     else
       throw new IllegalArgumentException(
-          "Scheme is not http/https/ws/wss and no port given!")
+        "Scheme is not http/https/ws/wss and no port given!")
   }
 }
 
@@ -111,10 +111,10 @@ final class ConnectHttpImpl(val host: String, val port: Int)
   def connectionContext: Optional[HttpsConnectionContext] = Optional.empty()
 }
 
-final class ConnectHttpsImpl(
-    val host: String,
-    val port: Int,
-    val context: Optional[HttpsConnectionContext] = Optional.empty())
+final class ConnectHttpsImpl(val host: String,
+                             val port: Int,
+                             val context: Optional[HttpsConnectionContext] =
+                               Optional.empty())
     extends ConnectWithHttps {
 
   override def isHttps: Boolean = true

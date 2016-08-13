@@ -26,10 +26,10 @@ object SbtOpts {
     "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address="
 
   private val sbtToJdkOpts: Map[String, String] = Map(
-      "-sbt-boot" -> "-Dsbt.boot.directory=",
-      "-sbt-dir" -> "-Dsbt.global.base=",
-      "-ivy" -> "-Dsbt.ivy.home=",
-      "-jvm-debug" -> debuggerOpts
+    "-sbt-boot" -> "-Dsbt.boot.directory=",
+    "-sbt-dir" -> "-Dsbt.global.base=",
+    "-ivy" -> "-Dsbt.ivy.home=",
+    "-jvm-debug" -> debuggerOpts
   )
 
   private def process(opts: Seq[String]): Seq[String] = {

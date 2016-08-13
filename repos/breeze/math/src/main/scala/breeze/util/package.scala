@@ -22,7 +22,7 @@ package object util {
     */
   def readObject[T](loc: File, ignoreSerialVersionUID: Boolean) = {
     val stream = new BufferedInputStream(
-        new GZIPInputStream(new FileInputStream(loc)))
+      new GZIPInputStream(new FileInputStream(loc)))
     val oin = nonstupidObjectInputStream(stream, ignoreSerialVersionUID)
     try {
       oin.readObject().asInstanceOf[T]
@@ -69,7 +69,8 @@ package object util {
           } catch {
             case e: ClassNotFoundException =>
               logger.error(
-                  "No local class for " + resultClassDescriptor.getName, e)
+                "No local class for " + resultClassDescriptor.getName,
+                e)
               return resultClassDescriptor
           }
 
@@ -81,7 +82,7 @@ package object util {
             if (streamSUID != localSUID) {
               // check for serialVersionUID mismatch.
               val s = new StringBuffer(
-                  "Overriding serialized class version mismatch: ")
+                "Overriding serialized class version mismatch: ")
               s.append("local serialVersionUID = ").append(localSUID)
               s.append(" stream serialVersionUID = ").append(streamSUID)
               val e = new InvalidClassException(s.toString())
@@ -100,8 +101,8 @@ package object util {
     */
   def writeObject[T](out: File, parser: T): Unit = {
     val stream = new ObjectOutputStream(
-        new BufferedOutputStream(
-            new GZIPOutputStream(new FileOutputStream(out))))
+      new BufferedOutputStream(
+        new GZIPOutputStream(new FileOutputStream(out))))
     stream.writeObject(parser)
     stream.close()
   }

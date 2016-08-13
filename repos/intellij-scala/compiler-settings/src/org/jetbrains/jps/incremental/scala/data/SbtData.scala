@@ -45,7 +45,8 @@ object SbtData {
               .flatMap { interfaceJar =>
                 files
                   .find(_.getName == "compiler-interface-sources.jar")
-                  .toRight("No 'compiler-interface-sources.jar' in SBT home directory")
+                  .toRight(
+                    "No 'compiler-interface-sources.jar' in SBT home directory")
                   .flatMap { sourceJar =>
                     readSbtVersionFrom(classLoader)
                       .toRight("Unable to read SBT version from JVM classpath")

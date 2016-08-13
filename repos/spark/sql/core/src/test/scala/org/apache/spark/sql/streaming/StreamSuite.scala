@@ -49,10 +49,10 @@ class StreamSuite extends StreamTest with SharedSQLContext {
       inputData.toDS().toDF().join(smallTable, $"value" === $"number")
 
     testStream(joined)(
-        AddData(inputData, 1, 2, 3),
-        CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two")),
-        AddData(inputData, 4),
-        CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two"), Row(4, 4, "four")))
+      AddData(inputData, 1, 2, 3),
+      CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two")),
+      AddData(inputData, 4),
+      CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two"), Row(4, 4, "four")))
   }
 
   test("union two streams") {

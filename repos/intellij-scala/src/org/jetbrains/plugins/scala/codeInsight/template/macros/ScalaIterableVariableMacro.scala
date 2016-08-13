@@ -3,7 +3,11 @@ package org.jetbrains.plugins.scala.codeInsight.template.macros
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.template.impl.TextExpression
-import com.intellij.codeInsight.template.{Result, Expression, ExpressionContext}
+import com.intellij.codeInsight.template.{
+  Result,
+  Expression,
+  ExpressionContext
+}
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
@@ -21,7 +25,7 @@ class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro {
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.iterable.variable")
+      "macro.iterable.variable")
 
   override def addLookupItems(exprs: Array[String],
                               context: ExpressionContext,
@@ -42,11 +46,11 @@ class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro {
                          scType: ScType,
                          project: Project): Option[Result] =
     super.getResult(
-        Array(new TextExpression(ScalaVariableOfTypeMacro.iterableId)),
-        context,
-        variant,
-        scType,
-        project)
+      Array(new TextExpression(ScalaVariableOfTypeMacro.iterableId)),
+      context,
+      variant,
+      scType,
+      project)
 
   override def validExprsCount(exprsCount: Int): Boolean = exprsCount == 0
 }

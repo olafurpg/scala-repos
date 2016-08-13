@@ -29,19 +29,19 @@ final class Env(config: Config,
   lazy val finisher = new Finisher(api = api, puzzleColl = puzzleColl)
 
   lazy val selector = new Selector(
-      puzzleColl = puzzleColl,
-      api = api,
-      anonMinRating = config getInt "selector.anon_min_rating",
-      maxAttempts = config getInt "selector.max_attempts")
+    puzzleColl = puzzleColl,
+    api = api,
+    anonMinRating = config getInt "selector.anon_min_rating",
+    maxAttempts = config getInt "selector.max_attempts")
 
   lazy val userInfos = UserInfos(attemptColl = attemptColl)
 
   lazy val forms = DataForm
 
   lazy val daily = new Daily(
-      puzzleColl,
-      renderer,
-      system.scheduler
+    puzzleColl,
+    renderer,
+    system.scheduler
   ).apply _
 
   lazy val pngExport = PngExport(PngExecPath) _

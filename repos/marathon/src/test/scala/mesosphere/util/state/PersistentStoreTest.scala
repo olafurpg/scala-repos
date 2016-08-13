@@ -10,7 +10,9 @@ import org.scalatest.{BeforeAndAfter, Matchers}
   * Common  tests for all persistent stores.
   */
 trait PersistentStoreTest
-    extends IntegrationFunSuite with Matchers with BeforeAndAfter {
+    extends IntegrationFunSuite
+    with Matchers
+    with BeforeAndAfter {
 
   //this parameter is used for futureValue timeouts
   implicit val patienceConfig = PatienceConfig(Span(10, Seconds))
@@ -37,8 +39,10 @@ trait PersistentStoreTest
   test("Multiple creates should create only the first time") {
     val entity = fetch("foo2")
     entity should be('empty)
-    persistentStore.create("foo", "Hello".getBytes).futureValue.bytes should be(
-        "Hello".getBytes)
+    persistentStore
+      .create("foo", "Hello".getBytes)
+      .futureValue
+      .bytes should be("Hello".getBytes)
     whenReady(persistentStore.create("foo", "Hello again".getBytes).failed) {
       _ shouldBe a[StoreCommandFailedException]
     }
@@ -71,9 +75,10 @@ trait PersistentStoreTest
       .update(read.get.withNewContent("Hello again".getBytes))
       .futureValue
       .bytes should be("Hello again".getBytes)
-    whenReady(persistentStore
-          .update(read2.get.withNewContent("Will be None".getBytes))
-          .failed) { _ shouldBe a[StoreCommandFailedException] }
+    whenReady(
+      persistentStore
+        .update(read2.get.withNewContent("Will be None".getBytes))
+        .failed) { _ shouldBe a[StoreCommandFailedException] }
     val readAgain = fetch("foo")
     readAgain.get.bytes should be("Hello again".getBytes)
   }

@@ -50,9 +50,9 @@ object VarDef {
             case ScalaTokenTypes.tUNDER => builder.advanceLexer
             //Ate _
             case _ => {
-                valDefMarker.rollbackTo
-                return false
-              }
+              valDefMarker.rollbackTo
+              return false
+            }
           }
           valDefMarker.drop
           return true

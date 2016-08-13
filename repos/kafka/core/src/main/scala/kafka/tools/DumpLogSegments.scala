@@ -36,19 +36,19 @@ object DumpLogSegments {
   def main(args: Array[String]) {
     val parser = new OptionParser
     val printOpt = parser.accepts(
-        "print-data-log",
-        "if set, printing the messages content when dumping data logs")
+      "print-data-log",
+      "if set, printing the messages content when dumping data logs")
     val verifyOpt = parser.accepts(
-        "verify-index-only",
-        "if set, just verify the index log without printing its content")
+      "verify-index-only",
+      "if set, just verify the index log without printing its content")
     val indexSanityOpt = parser.accepts(
-        "index-sanity-check",
-        "if set, just checks the index sanity without printing its content. " +
+      "index-sanity-check",
+      "if set, just checks the index sanity without printing its content. " +
         "This is the same check that is executed on broker startup to determine if an index needs rebuilding or not.")
     val filesOpt = parser
       .accepts(
-          "files",
-          "REQUIRED: The comma separated list of data and index log files to be dumped")
+        "files",
+        "REQUIRED: The comma separated list of data and index log files to be dumped")
       .withRequiredArg
       .describedAs("file1, file2, ...")
       .ofType(classOf[String])
@@ -59,29 +59,30 @@ object DumpLogSegments {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(5 * 1024 * 1024)
     val deepIterationOpt = parser.accepts(
-        "deep-iteration", "if set, uses deep instead of shallow iteration")
+      "deep-iteration",
+      "if set, uses deep instead of shallow iteration")
     val valueDecoderOpt = parser
       .accepts(
-          "value-decoder-class",
-          "if set, used to deserialize the messages. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
+        "value-decoder-class",
+        "if set, used to deserialize the messages. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
       .withOptionalArg()
       .ofType(classOf[java.lang.String])
       .defaultsTo("kafka.serializer.StringDecoder")
     val keyDecoderOpt = parser
       .accepts(
-          "key-decoder-class",
-          "if set, used to deserialize the keys. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
+        "key-decoder-class",
+        "if set, used to deserialize the keys. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
       .withOptionalArg()
       .ofType(classOf[java.lang.String])
       .defaultsTo("kafka.serializer.StringDecoder")
     val offsetsOpt = parser.accepts(
-        "offsets-decoder",
-        "if set, log data will be parsed as offset data from __consumer_offsets topic")
+      "offsets-decoder",
+      "if set, log data will be parsed as offset data from __consumer_offsets topic")
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          parser,
-          "Parse a log file and dump its contents to the console, useful for debugging a seemingly corrupt log segment.")
+        parser,
+        "Parse a log file and dump its contents to the console, useful for debugging a seemingly corrupt log segment.")
 
     val options = parser.parse(args: _*)
 
@@ -100,9 +101,11 @@ object DumpLogSegments {
         new OffsetsMessageParser
       } else {
         val valueDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
-            options.valueOf(valueDecoderOpt), new VerifiableProperties)
+          options.valueOf(valueDecoderOpt),
+          new VerifiableProperties)
         val keyDecoder: Decoder[_] = CoreUtils.createObject[Decoder[_]](
-            options.valueOf(keyDecoderOpt), new VerifiableProperties)
+          options.valueOf(keyDecoderOpt),
+          new VerifiableProperties)
         new DecoderMessageParser(keyDecoder, valueDecoder)
       }
 
@@ -132,24 +135,20 @@ object DumpLogSegments {
     }
     misMatchesForIndexFilesMap.foreach {
       case (fileName, listOfMismatches) => {
-          System.err.println("Mismatches in :" + fileName)
-          listOfMismatches.foreach(
-              m =>
-                {
-              System.err.println(
-                  "  Index offset: %d, log offset: %d".format(m._1, m._2))
-          })
-        }
+        System.err.println("Mismatches in :" + fileName)
+        listOfMismatches.foreach(m => {
+          System.err.println(
+            "  Index offset: %d, log offset: %d".format(m._1, m._2))
+        })
+      }
     }
     nonConsecutivePairsForLogFilesMap.foreach {
       case (fileName, listOfNonConsecutivePairs) => {
-          System.err.println("Non-secutive offsets in :" + fileName)
-          listOfNonConsecutivePairs.foreach(
-              m =>
-                {
-              System.err.println("  %d is followed by %d".format(m._1, m._2))
-          })
-        }
+        System.err.println("Non-secutive offsets in :" + fileName)
+        listOfNonConsecutivePairs.foreach(m => {
+          System.err.println("  %d is followed by %d".format(m._1, m._2))
+        })
+      }
     }
   }
 
@@ -180,18 +179,18 @@ object DumpLogSegments {
       val messageAndOffset =
         getIterator(partialFileMessageSet.head, isDeepIteration = true).next()
       if (messageAndOffset.offset != entry.offset + index.baseOffset) {
-        var misMatchesSeq = misMatchesForIndexFilesMap.getOrElse(
-            file.getAbsolutePath, List[(Long, Long)]())
+        var misMatchesSeq = misMatchesForIndexFilesMap
+          .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
         misMatchesSeq ::=
-        (entry.offset + index.baseOffset, messageAndOffset.offset)
+          (entry.offset + index.baseOffset, messageAndOffset.offset)
         misMatchesForIndexFilesMap.put(file.getAbsolutePath, misMatchesSeq)
       }
       // since it is a sparse file, in the event of a crash there may be many zero entries, stop if we see one
       if (entry.offset == 0 && i > 0) return
       if (!verifyOnly)
         println(
-            "offset: %d position: %d".format(
-                entry.offset + index.baseOffset, entry.position))
+          "offset: %d position: %d".format(entry.offset + index.baseOffset,
+                                           entry.position))
     }
   }
 
@@ -199,8 +198,8 @@ object DumpLogSegments {
     def parse(message: Message): (Option[K], Option[V])
   }
 
-  private class DecoderMessageParser[K, V](
-      keyDecoder: Decoder[K], valueDecoder: Decoder[V])
+  private class DecoderMessageParser[K, V](keyDecoder: Decoder[K],
+                                           valueDecoder: Decoder[V])
       extends MessageParser[K, V] {
     override def parse(message: Message): (Option[K], Option[V]) = {
       if (message.isNull) {
@@ -212,7 +211,7 @@ object DumpLogSegments {
           else None
 
         val payload = Some(
-            valueDecoder.fromBytes(Utils.readBytes(message.payload)))
+          valueDecoder.fromBytes(Utils.readBytes(message.payload)))
 
         (key, payload)
       }
@@ -239,8 +238,8 @@ object DumpLogSegments {
       (Some(keyString), Some(valueString))
     }
 
-    private def parseGroupMetadata(
-        groupMetadataKey: GroupMetadataKey, payload: ByteBuffer) = {
+    private def parseGroupMetadata(groupMetadataKey: GroupMetadataKey,
+                                   payload: ByteBuffer) = {
       val groupId = groupMetadataKey.key
       val group = GroupMetadataManager.readGroupMessageValue(groupId, payload)
       val protocolType = group.protocolType
@@ -248,7 +247,7 @@ object DumpLogSegments {
       val assignment = group.allMemberMetadata.map { member =>
         if (protocolType == ConsumerProtocol.PROTOCOL_TYPE) {
           val partitionAssignment = ConsumerProtocol.deserializeAssignment(
-              ByteBuffer.wrap(member.assignment))
+            ByteBuffer.wrap(member.assignment))
           val userData = hex(Utils.toArray(partitionAssignment.userData()))
 
           if (userData.isEmpty)
@@ -271,7 +270,7 @@ object DumpLogSegments {
       if (message.isNull) (None, None)
       else if (!message.hasKey) {
         throw new KafkaException(
-            "Failed to decode message using offset topic decoder (message had a missing key)")
+          "Failed to decode message using offset topic decoder (message had a missing key)")
       } else {
         GroupMetadataManager.readMessageKey(message.key) match {
           case offsetKey: OffsetKey => parseOffsets(offsetKey, message.payload)
@@ -279,20 +278,21 @@ object DumpLogSegments {
             parseGroupMetadata(groupMetadataKey, message.payload)
           case _ =>
             throw new KafkaException(
-                "Failed to decode message using offset topic decoder (message had an invalid key)")
+              "Failed to decode message using offset topic decoder (message had an invalid key)")
         }
       }
     }
   }
 
   /* print out the contents of the log */
-  private def dumpLog(file: File,
-                      printContents: Boolean,
-                      nonConsecutivePairsForLogFilesMap: mutable.HashMap[
-                          String, List[(Long, Long)]],
-                      isDeepIteration: Boolean,
-                      maxMessageSize: Int,
-                      parser: MessageParser[_, _]) {
+  private def dumpLog(
+      file: File,
+      printContents: Boolean,
+      nonConsecutivePairsForLogFilesMap: mutable.HashMap[String,
+                                                         List[(Long, Long)]],
+      isDeepIteration: Boolean,
+      maxMessageSize: Int,
+      parser: MessageParser[_, _]) {
     val startOffset = file.getName().split("\\.")(0).toLong
     println("Starting offset: " + startOffset)
     val messageSet = new FileMessageSet(file, false)
@@ -310,16 +310,16 @@ object DumpLogSegments {
         else if (msg.compressionCodec == NoCompressionCodec &&
                  messageAndOffset.offset != lastOffset + 1) {
           var nonConsecutivePairsSeq =
-            nonConsecutivePairsForLogFilesMap.getOrElse(
-                file.getAbsolutePath, List[(Long, Long)]())
+            nonConsecutivePairsForLogFilesMap
+              .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
           nonConsecutivePairsSeq ::= (lastOffset, messageAndOffset.offset)
-          nonConsecutivePairsForLogFilesMap.put(
-              file.getAbsolutePath, nonConsecutivePairsSeq)
+          nonConsecutivePairsForLogFilesMap
+            .put(file.getAbsolutePath, nonConsecutivePairsSeq)
         }
         lastOffset = messageAndOffset.offset
 
         print(
-            "offset: " + messageAndOffset.offset + " position: " + validBytes +
+          "offset: " + messageAndOffset.offset + " position: " + validBytes +
             " isvalid: " + msg.isValid + " payloadsize: " + msg.payloadSize +
             " magic: " + msg.magic + " compresscodec: " +
             msg.compressionCodec + " crc: " + msg.checksum)
@@ -336,12 +336,12 @@ object DumpLogSegments {
     val trailingBytes = messageSet.sizeInBytes - validBytes
     if (trailingBytes > 0)
       println(
-          "Found %d invalid bytes at the end of %s".format(
-              trailingBytes, file.getName))
+        "Found %d invalid bytes at the end of %s".format(trailingBytes,
+                                                         file.getName))
   }
 
-  private def getIterator(
-      messageAndOffset: MessageAndOffset, isDeepIteration: Boolean) = {
+  private def getIterator(messageAndOffset: MessageAndOffset,
+                          isDeepIteration: Boolean) = {
     if (isDeepIteration) {
       val message = messageAndOffset.message
       message.compressionCodec match {

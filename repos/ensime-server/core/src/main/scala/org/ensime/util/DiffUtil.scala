@@ -17,15 +17,18 @@ object DiffUtil {
     val diff = difflib.DiffUtils.diff(original.asJava, revised.asJava)
     val originalInfo =
       originalFile.getAbsolutePath() + "\t" + fileModificationTimeOrEpoch(
-          originalFile)
+        originalFile)
     val revisedInfo =
       revisedFile.getAbsolutePath() + "\t" + fileModificationTimeOrEpoch(
-          revisedFile)
+        revisedFile)
     if (diff.getDeltas.isEmpty) ""
     else
       difflib.DiffUtils
-        .generateUnifiedDiff(
-            originalInfo, revisedInfo, original.asJava, diff, 1)
+        .generateUnifiedDiff(originalInfo,
+                             revisedInfo,
+                             original.asJava,
+                             diff,
+                             1)
         .asScala
         .mkString("", "\n", "\n")
   }

@@ -36,8 +36,8 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     Configuration.setConfiguration(null)
     System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile)
     System.setProperty(
-        authProvider,
-        "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
+      authProvider,
+      "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
     super.setUp()
   }
 
@@ -61,17 +61,17 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     assertFalse(JaasUtils.isZkSecurityEnabled())
     try {
       Configuration.setConfiguration(null)
-      System.setProperty(
-          JaasUtils.JAVA_LOGIN_CONFIG_PARAM, "no-such-file-exists.conf")
+      System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM,
+                         "no-such-file-exists.conf")
       JaasUtils.isZkSecurityEnabled()
       fail("Should have thrown an exception")
     } catch {
       case e: KafkaException => {
-          // Expected
-        }
+        // Expected
+      }
       case e: Exception => {
-          fail(e.toString)
-        }
+        fail(e.toString)
+      }
     }
   }
 
@@ -149,12 +149,12 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
   def testDelete() {
     info(s"zkConnect string: $zkConnect")
     ZkSecurityMigrator.run(
-        Array("--zookeeper.acl=secure", s"--zookeeper.connect=$zkConnect"))
+      Array("--zookeeper.acl=secure", s"--zookeeper.connect=$zkConnect"))
     deleteAllUnsecure()
   }
 
   /**
-    * Tests that znodes cannot be deleted when the 
+    * Tests that znodes cannot be deleted when the
     * persistent paths have children.
     */
   @Test
@@ -190,8 +190,9 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     * Exercises the migration tool. It is used in these test cases:
     * testZkMigration, testZkAntiMigration, testChroot.
     */
-  private def testMigration(
-      zkUrl: String, firstZk: ZkUtils, secondZk: ZkUtils) {
+  private def testMigration(zkUrl: String,
+                            firstZk: ZkUtils,
+                            secondZk: ZkUtils) {
     info(s"zkConnect string: $zkUrl")
     for (path <- firstZk.securePersistentZkPaths) {
       info(s"Creating $path")
@@ -213,7 +214,7 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
         "unsecure"
     }
     ZkSecurityMigrator.run(
-        Array(s"--zookeeper.acl=$secureOpt", s"--zookeeper.connect=$zkUrl"))
+      Array(s"--zookeeper.acl=$secureOpt", s"--zookeeper.connect=$zkUrl"))
     info("Done with migration")
     for (path <- secondZk.securePersistentZkPaths) {
       val listParent = (secondZk.zkConnection.getAcl(path)).getKey
@@ -240,8 +241,8 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
   /**
     * Verifies ACL.
     */
-  private def isAclCorrect(
-      list: java.util.List[ACL], secure: Boolean): Boolean = {
+  private def isAclCorrect(list: java.util.List[ACL],
+                           secure: Boolean): Boolean = {
     val isListSizeCorrect = secure match {
       case true => list.size == 2
       case false => list.size == 1
@@ -254,21 +255,21 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
 
   /**
     * Verifies that this ACL is the secure one. The
-    * values are based on the constants used in the 
+    * values are based on the constants used in the
     * ZooKeeper code base.
     */
   private def isAclSecure(acl: ACL): Boolean = {
     info(s"ACL $acl")
     acl.getPerms match {
       case 1 => {
-          acl.getId.getScheme.equals("world")
-        }
+        acl.getId.getScheme.equals("world")
+      }
       case 31 => {
-          acl.getId.getScheme.equals("sasl")
-        }
+        acl.getId.getScheme.equals("sasl")
+      }
       case _: Int => {
-          false
-        }
+        false
+      }
     }
   }
 
@@ -279,11 +280,11 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     info(s"ACL $acl")
     acl.getPerms match {
       case 31 => {
-          acl.getId.getScheme.equals("world")
-        }
+        acl.getId.getScheme.equals("world")
+      }
       case _: Int => {
-          false
-        }
+        false
+      }
     }
   }
 

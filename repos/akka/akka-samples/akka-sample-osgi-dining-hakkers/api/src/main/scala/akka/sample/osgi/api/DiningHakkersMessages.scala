@@ -26,8 +26,9 @@ final case class Identification(name: String, busyWith: String)
 
 case object SubscribeToHakkerStateChanges extends DiningHakkerMessage
 
-final case class HakkerStateChange(
-    hakkerName: String, from: String, to: String)
+final case class HakkerStateChange(hakkerName: String,
+                                   from: String,
+                                   to: String)
 
 final case class TrackHakker(hakker: ActorRef) extends DiningHakkerMessage
 

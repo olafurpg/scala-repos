@@ -44,11 +44,14 @@ import parallel.mutable.ParArray
   */
 @SerialVersionUID(1529165946227428979L)
 class ArrayBuffer[A](override protected val initialSize: Int)
-    extends AbstractBuffer[A] with Buffer[A]
+    extends AbstractBuffer[A]
+    with Buffer[A]
     with GenericTraversableTemplate[A, ArrayBuffer]
     with BufferLike[A, ArrayBuffer[A]]
-    with IndexedSeqOptimized[A, ArrayBuffer[A]] with Builder[A, ArrayBuffer[A]]
-    with ResizableArray[A] with CustomParallelizable[A, ParArray[A]]
+    with IndexedSeqOptimized[A, ArrayBuffer[A]]
+    with Builder[A, ArrayBuffer[A]]
+    with ResizableArray[A]
+    with CustomParallelizable[A, ParArray[A]]
     with Serializable {
 
   override def companion: GenericCompanion[ArrayBuffer] = ArrayBuffer
@@ -155,11 +158,11 @@ class ArrayBuffer[A](override protected val initialSize: Int)
   override def remove(n: Int, count: Int) {
     if (count < 0)
       throw new IllegalArgumentException(
-          "removing negative number of elements: " + count.toString)
+        "removing negative number of elements: " + count.toString)
     else if (count == 0) return // Did nothing
     if (n < 0 || n > size0 - count)
       throw new IndexOutOfBoundsException(
-          "at " + n.toString + " deleting " + count.toString)
+        "at " + n.toString + " deleting " + count.toString)
     copy(n + count, n, size0 - (n + count))
     reduceToSize(size0 - count)
   }

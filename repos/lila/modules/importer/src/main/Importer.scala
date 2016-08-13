@@ -24,8 +24,9 @@ final class Importer(roundMap: ActorRef,
     def gameExists(processing: => Fu[Game]): Fu[Game] =
       GameRepo.findPgnImport(data.pgn) flatMap { _.fold(processing)(fuccess) }
 
-    def applyResult(
-        game: Game, result: Option[Result], situation: Situation): Game =
+    def applyResult(game: Game,
+                    result: Option[Result],
+                    situation: Situation): Game =
       if (game.finished) game
       else
         situation.status match {

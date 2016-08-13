@@ -8,11 +8,11 @@ trait SymbolTables { self: Utils =>
 
   import global._
 
-  class SymbolTable private[SymbolTable](
-      private[SymbolTable] val symtab: immutable.ListMap[Symbol, Tree] = immutable
-          .ListMap[Symbol, Tree](),
-      private[SymbolTable] val aliases: List[(Symbol, TermName)] = List[
-            (Symbol, TermName)](),
+  class SymbolTable private[SymbolTable] (
+      private[SymbolTable] val symtab: immutable.ListMap[Symbol, Tree] =
+        immutable.ListMap[Symbol, Tree](),
+      private[SymbolTable] val aliases: List[(Symbol, TermName)] =
+        List[(Symbol, TermName)](),
       private[SymbolTable] val original: Option[List[Tree]] = None) {
 
     def syms: List[Symbol] = symtab.keys.toList
@@ -39,7 +39,7 @@ trait SymbolTables { self: Utils =>
         case Some(FreeDef(_, _, binding, _, _)) => binding
         case Some(SymDef(_, _, _, _)) =>
           throw new UnsupportedOperationException(
-              s"${symtab(sym)} is a symdef, hence it doesn't have a binding")
+            s"${symtab(sym)} is a symdef, hence it doesn't have a binding")
         case None => EmptyTree
       }
 
@@ -92,8 +92,9 @@ trait SymbolTables { self: Utils =>
       new SymbolTable(newSymtab, newAliases)
     }
 
-    private def add(
-        sym: Symbol, name0: TermName, reification: Tree): SymbolTable = {
+    private def add(sym: Symbol,
+                    name0: TermName,
+                    reification: Tree): SymbolTable = {
       def freshName(name0: TermName): TermName = {
         var name = name0.toString
         name = name.replace(".type", "$type")
@@ -103,7 +104,8 @@ trait SymbolTables { self: Utils =>
       }
       val bindingAttachment =
         reification.attachments.get[ReifyBindingAttachment].get
-      add(ValDef(NoMods, freshName(name0), TypeTree(), reification) updateAttachment bindingAttachment)
+      add(
+        ValDef(NoMods, freshName(name0), TypeTree(), reification) updateAttachment bindingAttachment)
     }
 
     private def remove(sym: Symbol): SymbolTable = {
@@ -143,7 +145,8 @@ trait SymbolTables { self: Utils =>
         .map(entry => s"${symName(entry._1)} -> ${entry._2}")
         .mkString(", ")
       s"""symtab = [$symtabString], aliases = [$aliasesString]${if (original.isDefined)
-        ", has original" else ""}"""
+        ", has original"
+      else ""}"""
     }
 
     def debugString: String = {
@@ -164,16 +167,16 @@ trait SymbolTables { self: Utils =>
     def apply(encoded: List[Tree]): SymbolTable = {
       var result = new SymbolTable(original = Some(encoded))
       encoded foreach
-      (entry =>
-            (entry.attachments.get[ReifyBindingAttachment],
-             entry.attachments.get[ReifyAliasAttachment]) match {
-              case (Some(ReifyBindingAttachment(_)), _) => result += entry
-              case (_, Some(ReifyAliasAttachment(sym, alias))) =>
-                result = new SymbolTable(
-                    result.symtab, result.aliases :+ ((sym, alias)))
-              case _ =>
-              // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
-          })
+        (entry =>
+           (entry.attachments.get[ReifyBindingAttachment],
+            entry.attachments.get[ReifyAliasAttachment]) match {
+             case (Some(ReifyBindingAttachment(_)), _) => result += entry
+             case (_, Some(ReifyAliasAttachment(sym, alias))) =>
+               result = new SymbolTable(result.symtab,
+                                        result.aliases :+ ((sym, alias)))
+             case _ =>
+             // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
+           })
       result
     }
 
@@ -204,18 +207,18 @@ trait SymbolTables { self: Utils =>
               else if (isFreeTerm) sym.tpe
               else sym.info
             } else NoType
-          val rset = reifier.mirrorBuildCall(
-              nme.setInfo, currtab.symRef(sym), reifier.reify(signature))
+          val rset = reifier.mirrorBuildCall(nme.setInfo,
+                                             currtab.symRef(sym),
+                                             reifier.reify(signature))
           // `Symbol.annotations` doesn't initialize the symbol, so we don't need to do anything special here
           // also since we call `sym.info` a few lines above, by now the symbol will be initialized (if possible)
           // so the annotations will be filled in and will be waiting to be reified (unless symbol initialization is prohibited as described above)
           if (sym.annotations.isEmpty) rset
           else
             reifier.mirrorBuildCall(
-                nme.setAnnotations,
-                rset,
-                reifier.mkList(
-                    sym.annotations map reifier.reifyAnnotationInfo))
+              nme.setAnnotations,
+              rset,
+              reifier.mkList(sym.annotations map reifier.reifyAnnotationInfo))
         }
 
         // `fillInSymbol` might add symbols to `symtab`, that's why this is done iteratively
@@ -235,29 +238,28 @@ trait SymbolTables { self: Utils =>
 
         val withAliases =
           cumulativeSymtab flatMap
-          (entry =>
-                {
-                  val result = mutable.ListBuffer[Tree]()
-                  result += entry
-                  val sym = reifyBinding(entry).symbol
-                  if (sym != NoSymbol)
-                    result ++= cumulativeAliases.distinct filter
-                    (alias =>
-                          alias._1 == sym &&
-                          alias._2 != currtab.symName(sym)) map
-                    (alias =>
-                          {
-                            val canonicalName = currtab.symName(sym)
-                            val aliasName = alias._2
-                            ValDef(
-                                NoMods,
-                                aliasName,
-                                TypeTree(),
-                                Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
-                                sym, aliasName)
-                        })
-                  result.toList
-              })
+            (entry => {
+               val result = mutable.ListBuffer[Tree]()
+               result += entry
+               val sym = reifyBinding(entry).symbol
+               if (sym != NoSymbol)
+                 result ++= cumulativeAliases.distinct filter
+                   (alias =>
+                      alias._1 == sym &&
+                        alias._2 != currtab.symName(sym)) map
+                   (alias => {
+                      val canonicalName = currtab.symName(sym)
+                      val aliasName = alias._2
+                      ValDef(
+                        NoMods,
+                        aliasName,
+                        TypeTree(),
+                        Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
+                        sym,
+                        aliasName)
+                    })
+               result.toList
+             })
 
         withAliases.toList
       } finally {

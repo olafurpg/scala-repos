@@ -49,7 +49,7 @@ class EventSource0[T] {
     events :+= (() => e)
   }
 
-  def run(): Unit = events.map(_ ())
+  def run(): Unit = events.map(_())
 
   def clear(): Unit = events = Vector()
 }
@@ -61,7 +61,7 @@ class EventSource1[Arg1, Ret] {
     events :+= e
   }
 
-  def run(arg: Arg1): Unit = events.map(_ (arg))
+  def run(arg: Arg1): Unit = events.map(_(arg))
 
   def clear(): Unit = events = Vector()
 }
@@ -73,7 +73,7 @@ class EventSource2[Arg1, Arg2, Ret] {
     events :+= e
   }
 
-  def run(arg1: Arg1, arg2: Arg2): Unit = events.map(_ (arg1, arg2))
+  def run(arg1: Arg1, arg2: Arg2): Unit = events.map(_(arg1, arg2))
 
   def clear(): Unit = events = Vector()
 }
@@ -266,43 +266,42 @@ trait TraitContext[This <: android.content.Context] {
     basis.getWallpaperDesiredMinimumWidth
 
   @inline
-  def bindService[T : ClassTag](
-      p1: android.content.ServiceConnection, p2: Int)(
+  def bindService[T: ClassTag](p1: android.content.ServiceConnection, p2: Int)(
       implicit context: Context): Boolean =
     basis.bindService(SIntent[T], p1, p2)
 
   @inline
-  def removeStickyBroadcast[T : ClassTag](implicit context: Context): Unit =
+  def removeStickyBroadcast[T: ClassTag](implicit context: Context): Unit =
     basis.removeStickyBroadcast(SIntent[T])
 
-  @inline def sendBroadcast[T : ClassTag](implicit context: Context): Unit =
+  @inline def sendBroadcast[T: ClassTag](implicit context: Context): Unit =
     basis.sendBroadcast(SIntent[T])
 
   @inline
-  def sendBroadcast[T : ClassTag](p: java.lang.String)(
+  def sendBroadcast[T: ClassTag](p: java.lang.String)(
       implicit context: Context): Unit = basis.sendBroadcast(SIntent[T], p)
 
   @inline
-  def sendOrderedBroadcast[T : ClassTag](p: java.lang.String)(
+  def sendOrderedBroadcast[T: ClassTag](p: java.lang.String)(
       implicit context: Context): Unit =
     basis.sendOrderedBroadcast(SIntent[T], p)
 
   @inline
-  def sendOrderedBroadcast[T : ClassTag](p1: java.lang.String,
-                                         p2: android.content.BroadcastReceiver,
-                                         p3: android.os.Handler,
-                                         p4: Int,
-                                         p5: java.lang.String,
-                                         p6: android.os.Bundle)(
-      implicit context: Context): Unit =
+  def sendOrderedBroadcast[T: ClassTag](
+      p1: java.lang.String,
+      p2: android.content.BroadcastReceiver,
+      p3: android.os.Handler,
+      p4: Int,
+      p5: java.lang.String,
+      p6: android.os.Bundle)(implicit context: Context): Unit =
     basis.sendOrderedBroadcast(SIntent[T], p1, p2, p3, p4, p5, p6)
 
   @inline
-  def sendStickyBroadcast[T : ClassTag](implicit context: Context): Unit =
+  def sendStickyBroadcast[T: ClassTag](implicit context: Context): Unit =
     basis.sendStickyBroadcast(SIntent[T])
 
   @inline
-  def sendStickyOrderedBroadcast[T : ClassTag](
+  def sendStickyOrderedBroadcast[T: ClassTag](
       p1: android.content.BroadcastReceiver,
       p2: android.os.Handler,
       p3: Int,
@@ -310,19 +309,19 @@ trait TraitContext[This <: android.content.Context] {
       p5: android.os.Bundle)(implicit context: Context): Unit =
     basis.sendStickyOrderedBroadcast(SIntent[T], p1, p2, p3, p4, p5)
 
-  @inline def startActivity[T : ClassTag](implicit context: Context): Unit =
+  @inline def startActivity[T: ClassTag](implicit context: Context): Unit =
     basis.startActivity(SIntent[T])
 
   @inline
-  def startActivity[T : ClassTag](p: android.os.Bundle)(
+  def startActivity[T: ClassTag](p: android.os.Bundle)(
       implicit context: Context): Unit = basis.startActivity(SIntent[T], p)
 
   @inline
-  def startService[T : ClassTag](
+  def startService[T: ClassTag](
       implicit context: Context): android.content.ComponentName =
     basis.startService(SIntent[T])
 
-  @inline def stopService[T : ClassTag](implicit context: Context): Boolean =
+  @inline def stopService[T: ClassTag](implicit context: Context): Boolean =
     basis.stopService(SIntent[T])
 }
 
@@ -428,8 +427,8 @@ object SIntent {
     new Intent(context, mt.runtimeClass)
 
   @inline
-  def apply[T](action: String)(
-      implicit context: Context, mt: ClassTag[T]): Intent =
+  def apply[T](action: String)(implicit context: Context,
+                               mt: ClassTag[T]): Intent =
     SIntent[T].setAction(action)
 }
 
@@ -457,8 +456,9 @@ class RichIntent(val intent: Intent) {
   * [[http://blog.scaloid.org/2013/03/introducing-localservice.html]]
   */
 class LocalServiceConnection[S <: LocalService](
-    bindFlag: Int = Context.BIND_AUTO_CREATE)(
-    implicit ctx: Context, reg: Registerable, mf: ClassTag[S])
+    bindFlag: Int = Context.BIND_AUTO_CREATE)(implicit ctx: Context,
+                                              reg: Registerable,
+                                              mf: ClassTag[S])
     extends ServiceConnection {
   var service: Option[S] = None
   var componentName: ComponentName = _

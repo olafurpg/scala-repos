@@ -8,7 +8,12 @@ import org.asynchttpclient._
 import play.api._
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.ws._
-import play.api.libs.ws.ahc.{AhcWSClientConfigParser, AhcWSAPI, AhcWSClient, AhcWSRequest}
+import play.api.libs.ws.ahc.{
+  AhcWSClientConfigParser,
+  AhcWSAPI,
+  AhcWSClient,
+  AhcWSRequest
+}
 import play.api.libs.ws.ssl._
 
 /**
@@ -19,8 +24,8 @@ import play.api.libs.ws.ssl._
   * @param config a client configuration object
   */
 @deprecated("Use AhcWSClient instead", "2.5")
-case class NingWSClient(
-    config: AsyncHttpClientConfig)(implicit materializer: Materializer)
+case class NingWSClient(config: AsyncHttpClientConfig)(
+    implicit materializer: Materializer)
     extends WSClient {
 
   private val ahcWsClient = AhcWSClient(config)
@@ -28,7 +33,8 @@ case class NingWSClient(
   def underlying[T]: T = ahcWsClient.underlying
 
   private[libs] def executeRequest[T](
-      request: Request, handler: AsyncHandler[T]): ListenableFuture[T] =
+      request: Request,
+      handler: AsyncHandler[T]): ListenableFuture[T] =
     ahcWsClient.executeRequest(request, handler)
 
   def close(): Unit = ahcWsClient.close()
@@ -71,7 +77,7 @@ object NingWSClient {
   def apply(config: NingWSClientConfig = NingWSClientConfig())(
       implicit materializer: Materializer): NingWSClient = {
     val client = new NingWSClient(
-        new NingAsyncHttpClientConfigBuilder(config).build())
+      new NingAsyncHttpClientConfigBuilder(config).build())
     new SystemConfiguration().configure(config.wsClientConfig)
     client
   }
@@ -90,21 +96,23 @@ trait NingWSComponents {
 
   lazy val wsClientConfig: WSClientConfig =
     new WSConfigParser(configuration, environment).parse()
-  private lazy val ahcWsClientConfig = new AhcWSClientConfigParser(
-      wsClientConfig, configuration, environment).parse()
+  private lazy val ahcWsClientConfig =
+    new AhcWSClientConfigParser(wsClientConfig, configuration, environment)
+      .parse()
   lazy val ningWsClientConfig: NingWSClientConfig = NingWSClientConfig(
-      wsClientConfig = wsClientConfig,
-      maxConnectionsPerHost = ahcWsClientConfig.maxConnectionsPerHost,
-      maxConnectionsTotal = ahcWsClientConfig.maxConnectionsTotal,
-      maxConnectionLifetime = ahcWsClientConfig.maxConnectionLifetime,
-      idleConnectionInPoolTimeout = ahcWsClientConfig.idleConnectionInPoolTimeout,
-      maxNumberOfRedirects = ahcWsClientConfig.maxNumberOfRedirects,
-      maxRequestRetry = ahcWsClientConfig.maxRequestRetry,
-      disableUrlEncoding = ahcWsClientConfig.disableUrlEncoding,
-      keepAlive = ahcWsClientConfig.keepAlive
+    wsClientConfig = wsClientConfig,
+    maxConnectionsPerHost = ahcWsClientConfig.maxConnectionsPerHost,
+    maxConnectionsTotal = ahcWsClientConfig.maxConnectionsTotal,
+    maxConnectionLifetime = ahcWsClientConfig.maxConnectionLifetime,
+    idleConnectionInPoolTimeout = ahcWsClientConfig.idleConnectionInPoolTimeout,
+    maxNumberOfRedirects = ahcWsClientConfig.maxNumberOfRedirects,
+    maxRequestRetry = ahcWsClientConfig.maxRequestRetry,
+    disableUrlEncoding = ahcWsClientConfig.disableUrlEncoding,
+    keepAlive = ahcWsClientConfig.keepAlive
   )
 
-  lazy val wsApi: WSAPI = new AhcWSAPI(
-      environment, ahcWsClientConfig, applicationLifecycle)(materializer)
+  lazy val wsApi: WSAPI =
+    new AhcWSAPI(environment, ahcWsClientConfig, applicationLifecycle)(
+      materializer)
   lazy val wsClient: WSClient = wsApi.client
 }

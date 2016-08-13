@@ -3,7 +3,10 @@ package findUsages
 
 import com.intellij.openapi.application.QueryExecutorBase
 import com.intellij.psi._
-import com.intellij.psi.search.searches.{MethodReferencesSearch, ReferencesSearch}
+import com.intellij.psi.search.searches.{
+  MethodReferencesSearch,
+  ReferencesSearch
+}
 import com.intellij.psi.search.{SearchRequestCollector, SearchScope}
 import com.intellij.util.Processor
 import org.jetbrains.annotations.NotNull
@@ -13,8 +16,8 @@ import org.jetbrains.annotations.NotNull
   * These are not considered by [[com.intellij.psi.impl.search.MethodUsagesSearcher]]
   */
 class NonMemberMethodUsagesSearcher
-    extends QueryExecutorBase[
-        PsiReference, MethodReferencesSearch.SearchParameters] {
+    extends QueryExecutorBase[PsiReference,
+                              MethodReferencesSearch.SearchParameters] {
   def processQuery(@NotNull p: MethodReferencesSearch.SearchParameters,
                    @NotNull consumer: Processor[PsiReference]) {
     extensions.inReadAction {
@@ -27,8 +30,8 @@ class NonMemberMethodUsagesSearcher
           consumer.process(t)
         }
       }
-      ReferencesSearch.searchOptimized(
-          method, searchScope, false, collector, newConsumer)
+      ReferencesSearch
+        .searchOptimized(method, searchScope, false, collector, newConsumer)
     }
   }
 }

@@ -114,15 +114,17 @@ package sexp.ast {
     val text = like.map(_.text).getOrElse("")
     val field = term.field
   }
-  case class PreferToken(
-      tree: TokenTree, before: Option[Prefer], after: Option[Prefer])
+  case class PreferToken(tree: TokenTree,
+                         before: Option[Prefer],
+                         after: Option[Prefer])
       extends TokenTree {
     val text = before.getOrElse("") + tree.text + after.getOrElse("")
   }
   case class InTerm(field: DatabaseField, value: String, text: String = "")
       extends CompressedToken
   case class QualifierToken(text: String, field: DatabaseField)
-      extends ContextualToken with Term
+      extends ContextualToken
+      with Term
 }
 
 /** Example AST with performance problems */
@@ -191,26 +193,25 @@ object SexpExamples extends App {
   // example instances and expected forms
   val foo = Foo(13)
   val fooSexp = SexpCons(
-      SexpAtom("Foo"),
-      SexpProp("i", SexpAtom("13"))
+    SexpAtom("Foo"),
+    SexpProp("i", SexpAtom("13"))
   )
   val bar = Bar("blah")
   val barSexp = SexpCons(
-      SexpAtom("Bar"),
-      SexpProp("s", SexpAtom("blah"))
+    SexpAtom("Bar"),
+    SexpProp("s", SexpAtom("blah"))
   )
   val baz = Baz(13, "blah")
   val bazSexp = SexpCons(SexpAtom("Baz"),
                          SexpCons(
-                             // order is important --- how can we address this?
-                             SexpProp("i", SexpAtom("13")),
-                             SexpProp("s", SexpAtom("blah"))
+                           // order is important --- how can we address this?
+                           SexpProp("i", SexpAtom("13")),
+                           SexpProp("s", SexpAtom("blah"))
                          ))
   val wibble = Wibble(Foo(13))
   val wibbleSexp = SexpCons(
-      SexpAtom("Wibble"),
-      SexpProp(
-          "foo", SexpCons(SexpAtom("Foo"), SexpProp("i", SexpAtom("13")))))
+    SexpAtom("Wibble"),
+    SexpProp("foo", SexpCons(SexpAtom("Foo"), SexpProp("i", SexpAtom("13")))))
 
   // SETUP
   val creator = SexpConvert[Super]
@@ -234,10 +235,9 @@ object SexpExamples extends App {
 
   val token = QualifierToken("thing", DatabaseField("Source.THING"))
   val tokenSexp = SexpCons(
-      SexpAtom("QualifierToken"),
-      SexpCons(
-          SexpProp("text", SexpAtom("thing")),
-          SexpProp("field", SexpProp("column", SexpAtom("Source.THING")))))
+    SexpAtom("QualifierToken"),
+    SexpCons(SexpProp("text", SexpAtom("thing")),
+             SexpProp("field", SexpProp("column", SexpAtom("Source.THING")))))
 
   assert(complex.deser(tokenSexp) == Some(token))
   assert(complex.ser(token) == tokenSexp)

@@ -31,8 +31,9 @@ class CubicInterpolatorTest extends FunSuite {
 
   test("ufunc") {
     assert(equal(f(DenseVector(1.0, 2.0)), DenseVector(1.0, 5.0)))
-    assert(equal(f(DenseMatrix((1.0, 2.0), (3.0, 5.0))),
-                 DenseMatrix((1.0, 5.0), (3.0, 7.0))))
+    assert(
+      equal(f(DenseMatrix((1.0, 2.0), (3.0, 5.0))),
+            DenseMatrix((1.0, 5.0), (3.0, 7.0))))
   }
 
   test("extrapolation") {

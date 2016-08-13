@@ -33,8 +33,8 @@ import org.apache.spark.util.StatCounter
   */
 @Since("1.6.0")
 @BeanInfo
-case class BinarySample @Since("1.6.0")(
-    @Since("1.6.0") isExperiment: Boolean, @Since("1.6.0") value: Double) {
+case class BinarySample @Since("1.6.0")(@Since("1.6.0") isExperiment: Boolean,
+                                        @Since("1.6.0") value: Double) {
   override def toString: String = {
     s"($isExperiment, $value)"
   }
@@ -148,12 +148,11 @@ class StreamingTest @Since("1.6.0")() extends Logging with Serializable {
       data.map(sample => (sample.isExperiment, sample.value))
     if (this.windowSize == 0) {
       categoryValuePair.updateStateByKey[StatCounter](
-          (newValues: Seq[Double], oldSummary: Option[StatCounter]) =>
-            {
+        (newValues: Seq[Double], oldSummary: Option[StatCounter]) => {
           val newSummary = oldSummary.getOrElse(new StatCounter())
           newSummary.merge(newValues)
           Some(newSummary)
-      })
+        })
     } else {
       val windowDuration = data.slideDuration * this.windowSize
       categoryValuePair.groupByKeyAndWindow(windowDuration).mapValues {

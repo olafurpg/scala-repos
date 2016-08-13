@@ -58,10 +58,13 @@ class OneVsRestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
-    rdd = sc.parallelize(
-        generateMultinomialLogisticInput(
-            coefficients, xMean, xVariance, true, nPoints, 42),
-        2)
+    rdd = sc.parallelize(generateMultinomialLogisticInput(coefficients,
+                                                          xMean,
+                                                          xVariance,
+                                                          true,
+                                                          nPoints,
+                                                          42),
+                         2)
     dataset = sqlContext.createDataFrame(rdd)
   }
 
@@ -106,8 +109,9 @@ class OneVsRestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // bound how much error we allow compared to multinomial logistic regression.
     val expectedMetrics = new MulticlassMetrics(results)
     val ovaMetrics = new MulticlassMetrics(ovaResults)
-    assert(expectedMetrics.confusionMatrix ~==
-          ovaMetrics.confusionMatrix absTol 400)
+    assert(
+      expectedMetrics.confusionMatrix ~==
+        ovaMetrics.confusionMatrix absTol 400)
   }
 
   test("one-vs-rest: pass label metadata correctly during train") {
@@ -125,7 +129,7 @@ class OneVsRestSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test(
-      "SPARK-8092: ensure label features and prediction cols are configurable") {
+    "SPARK-8092: ensure label features and prediction cols are configurable") {
     val labelIndexer =
       new StringIndexer().setInputCol("label").setOutputCol("indexed")
 
@@ -152,8 +156,10 @@ class OneVsRestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val logReg = new LogisticRegression().setMaxIter(1)
     val ovr = new OneVsRest().setClassifier(logReg)
     val output = ovr.fit(dataset).transform(dataset)
-    assert(output.schema.fieldNames.toSet === Set(
-            "label", "features", "prediction"))
+    assert(
+      output.schema.fieldNames.toSet === Set("label",
+                                             "features",
+                                             "prediction"))
   }
 
   test("OneVsRest.copy and OneVsRestModel.copy") {

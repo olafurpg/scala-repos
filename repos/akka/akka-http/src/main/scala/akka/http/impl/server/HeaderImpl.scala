@@ -23,8 +23,8 @@ import scala.reflect.ClassTag
 private[http] object HeaderImpl {
   def apply[T <: HttpHeader](name: String,
                              optionalDirective: ClassTag[
-                                 T with scaladsl.model.HttpHeader] ⇒ Directive1[
-                                 Option[T with scaladsl.model.HttpHeader]],
+                               T with scaladsl.model.HttpHeader] ⇒ Directive1[
+                               Option[T with scaladsl.model.HttpHeader]],
                              tClassTag: ClassTag[T]): Header[T] = {
     type U = T with scaladsl.model.HttpHeader
 

@@ -48,39 +48,38 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
     addFreeSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(8, 7, freeSpecFileName),
-                               freeSpecClassName,
-                               "A FreeSpecTest should work with sum"))
+      checkConfigAndSettings(createTestFromLocation(8, 7, freeSpecFileName),
+                             freeSpecClassName,
+                             "A FreeSpecTest should work with sum"))
   }
 
   def testFreeSpecVal() = {
     addFreeSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(16, 7, freeSpecFileName),
-                               freeSpecClassName,
-                               "Const name innerNonConst"))
+      checkConfigAndSettings(createTestFromLocation(16, 7, freeSpecFileName),
+                             freeSpecClassName,
+                             "Const name innerNonConst"))
     assert(
-        checkConfigAndSettings(createTestFromLocation(19, 7, freeSpecFileName),
-                               freeSpecClassName,
-                               "Const name InnerConst"))
+      checkConfigAndSettings(createTestFromLocation(19, 7, freeSpecFileName),
+                             freeSpecClassName,
+                             "Const name InnerConst"))
   }
 
   def testFreeSpecValSum() = {
     addFreeSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(11, 7, freeSpecFileName),
-            freeSpecClassName,
-            "A FreeSpecTest should work with sum of consts"))
+      checkConfigAndSettings(createTestFromLocation(11, 7, freeSpecFileName),
+                             freeSpecClassName,
+                             "A FreeSpecTest should work with sum of consts"))
   }
 
   def testFreeSpecNonConst() = {
     addFreeSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(24, 7, freeSpecFileName),
-                               freeSpecClassName))
+      checkConfigAndSettings(createTestFromLocation(24, 7, freeSpecFileName),
+                             freeSpecClassName))
   }
 }

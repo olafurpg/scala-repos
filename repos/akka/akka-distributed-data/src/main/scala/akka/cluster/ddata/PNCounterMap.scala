@@ -28,9 +28,10 @@ object PNCounterMap {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class PNCounterMap private[akka](
+final class PNCounterMap private[akka] (
     private[akka] val underlying: ORMap[PNCounter])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = PNCounterMap
@@ -81,10 +82,11 @@ final class PNCounterMap private[akka](
   /**
     * INTERNAL API
     */
-  private[akka] def increment(
-      node: UniqueAddress, key: String, delta: Long): PNCounterMap =
+  private[akka] def increment(node: UniqueAddress,
+                              key: String,
+                              delta: Long): PNCounterMap =
     new PNCounterMap(
-        underlying.updated(node, key, PNCounter())(_.increment(node, delta)))
+      underlying.updated(node, key, PNCounter())(_.increment(node, delta)))
 
   /**
     * Decrement the counter with the delta specified.
@@ -104,10 +106,11 @@ final class PNCounterMap private[akka](
   /**
     * INTERNAL API
     */
-  private[akka] def decrement(
-      node: UniqueAddress, key: String, delta: Long): PNCounterMap = {
+  private[akka] def decrement(node: UniqueAddress,
+                              key: String,
+                              delta: Long): PNCounterMap = {
     new PNCounterMap(
-        underlying.updated(node, key, PNCounter())(_.decrement(node, delta)))
+      underlying.updated(node, key, PNCounter())(_.decrement(node, delta)))
   }
 
   /**
@@ -137,8 +140,8 @@ final class PNCounterMap private[akka](
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     underlying.needPruningFrom(removedNode)
 
-  override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): PNCounterMap =
+  override def prune(removedNode: UniqueAddress,
+                     collapseInto: UniqueAddress): PNCounterMap =
     new PNCounterMap(underlying.prune(removedNode, collapseInto))
 
   override def pruningCleanup(removedNode: UniqueAddress): PNCounterMap =
@@ -162,4 +165,5 @@ object PNCounterMapKey {
 
 @SerialVersionUID(1L)
 final case class PNCounterMapKey(_id: String)
-    extends Key[PNCounterMap](_id) with ReplicatedDataSerialization
+    extends Key[PNCounterMap](_id)
+    with ReplicatedDataSerialization

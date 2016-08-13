@@ -19,22 +19,22 @@ class CamelConfigSpec extends WordSpec with Matchers {
   "CamelConfigSpec" must {
     "have correct activationTimeout config" in {
       settings.ActivationTimeout should ===(
-          config.getMillisDuration("akka.camel.consumer.activation-timeout"))
+        config.getMillisDuration("akka.camel.consumer.activation-timeout"))
     }
 
     "have correct autoAck config" in {
       settings.AutoAck should ===(
-          config.getBoolean("akka.camel.consumer.auto-ack"))
+        config.getBoolean("akka.camel.consumer.auto-ack"))
     }
 
     "have correct replyTimeout config" in {
       settings.ReplyTimeout should ===(
-          config.getMillisDuration("akka.camel.consumer.reply-timeout"))
+        config.getMillisDuration("akka.camel.consumer.reply-timeout"))
     }
 
     "have correct streamingCache config" in {
       settings.StreamingCache should ===(
-          config.getBoolean("akka.camel.streamingCache"))
+        config.getBoolean("akka.camel.streamingCache"))
     }
 
     "have correct jmxStatistics config" in {
@@ -50,7 +50,7 @@ class CamelConfigSpec extends WordSpec with Matchers {
 
     "have correct Context Provider" in {
       settings.ContextProvider.isInstanceOf[DefaultContextProvider] should ===(
-          true)
+        true)
     }
   }
 }

@@ -22,8 +22,8 @@ import kafka.utils.Pool
 import kafka.common.{ClientIdAllBrokers, ClientIdBroker, ClientIdAndBroker}
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 class ProducerRequestMetrics(metricId: ClientIdBroker)
     extends KafkaMetricsGroup {
   val tags = metricId match {
@@ -35,12 +35,12 @@ class ProducerRequestMetrics(metricId: ClientIdBroker)
   }
 
   val requestTimer = new KafkaTimer(
-      newTimer("ProducerRequestRateAndTimeMs",
-               TimeUnit.MILLISECONDS,
-               TimeUnit.SECONDS,
-               tags))
-  val requestSizeHist = newHistogram(
-      "ProducerRequestSize", biased = true, tags)
+    newTimer("ProducerRequestRateAndTimeMs",
+             TimeUnit.MILLISECONDS,
+             TimeUnit.SECONDS,
+             tags))
+  val requestSizeHist =
+    newHistogram("ProducerRequestSize", biased = true, tags)
   val throttleTimeStats = newTimer("ProducerRequestThrottleRateAndTimeMs",
                                    TimeUnit.MILLISECONDS,
                                    TimeUnit.SECONDS,
@@ -52,23 +52,23 @@ class ProducerRequestMetrics(metricId: ClientIdBroker)
   * @param clientId ClientId of the given producer
   */
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 class ProducerRequestStats(clientId: String) {
   private val valueFactory = (k: ClientIdBroker) =>
     new ProducerRequestMetrics(k)
   private val stats =
     new Pool[ClientIdBroker, ProducerRequestMetrics](Some(valueFactory))
   private val allBrokersStats = new ProducerRequestMetrics(
-      new ClientIdAllBrokers(clientId))
+    new ClientIdAllBrokers(clientId))
 
   def getProducerRequestAllBrokersStats(): ProducerRequestMetrics =
     allBrokersStats
 
-  def getProducerRequestStats(
-      brokerHost: String, brokerPort: Int): ProducerRequestMetrics = {
+  def getProducerRequestStats(brokerHost: String,
+                              brokerPort: Int): ProducerRequestMetrics = {
     stats.getAndMaybePut(
-        new ClientIdAndBroker(clientId, brokerHost, brokerPort))
+      new ClientIdAndBroker(clientId, brokerHost, brokerPort))
   }
 }
 
@@ -76,8 +76,8 @@ class ProducerRequestStats(clientId: String) {
   * Stores the request stats information of each producer client in a (clientId -> ProducerRequestStats) map.
   */
 @deprecated(
-    "This object has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This object has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 object ProducerRequestStatsRegistry {
   private val valueFactory = (k: String) => new ProducerRequestStats(k)
   private val globalStats =

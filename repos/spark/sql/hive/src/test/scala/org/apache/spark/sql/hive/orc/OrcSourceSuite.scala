@@ -28,7 +28,9 @@ import org.apache.spark.sql.sources._
 case class OrcData(intField: Int, stringField: String)
 
 abstract class OrcSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext._
 
   var orcTableDir: File = null
@@ -81,8 +83,9 @@ abstract class OrcSuite
                 (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
-        sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
-        (1 to 10).map(i => Row(1, s"part-$i")))
+      sql(
+        "SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
+      (1 to 10).map(i => Row(1, s"part-$i")))
   }
 
   test("create temporary orc table as") {
@@ -95,12 +98,14 @@ abstract class OrcSuite
                 (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
-        sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
-        (1 to 10).map(i => Row(1, s"part-$i")))
+      sql(
+        "SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
+      (1 to 10).map(i => Row(1, s"part-$i")))
   }
 
   test("appending insert") {
-    sql("INSERT INTO TABLE normal_orc_source SELECT * FROM orc_temp_table WHERE intField > 5")
+    sql(
+      "INSERT INTO TABLE normal_orc_source SELECT * FROM orc_temp_table WHERE intField > 5")
 
     checkAnswer(sql("SELECT * FROM normal_orc_source"),
                 (1 to 5).map(i => Row(i, s"part-$i")) ++ (6 to 10).flatMap {
@@ -139,8 +144,8 @@ abstract class OrcSuite
 
     df.write.format("orc").saveAsTable("orcNullValues")
 
-    checkAnswer(
-        sql("SELECT * FROM orcNullValues"), Row.fromSeq(Seq.fill(11)(null)))
+    checkAnswer(sql("SELECT * FROM orcNullValues"),
+                Row.fromSeq(Seq.fill(11)(null)))
 
     sql("DROP TABLE IF EXISTS orcNullValues")
   }
@@ -168,34 +173,36 @@ class OrcSourceSuite extends OrcSuite {
   test("SPARK-12218 Converting conjunctions into ORC SearchArguments") {
     // The `LessThan` should be converted while the `StringContains` shouldn't
     assertResult(
-        """leaf-0 = (LESS_THAN a 10)
+      """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
       """.stripMargin.trim
     ) {
       OrcFilters
-        .createFilter(Array(
-                LessThan("a", 10),
-                StringContains("b", "prefix")
-            ))
+        .createFilter(
+          Array(
+            LessThan("a", 10),
+            StringContains("b", "prefix")
+          ))
         .get
         .toString
     }
 
     // The `LessThan` should be converted while the whole inner `And` shouldn't
     assertResult(
-        """leaf-0 = (LESS_THAN a 10)
+      """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
       """.stripMargin.trim
     ) {
       OrcFilters
         .createFilter(
-            Array(
-                LessThan("a", 10),
-                Not(And(
-                        GreaterThan("a", 1),
-                        StringContains("b", "prefix")
-                    ))
-            ))
+          Array(
+            LessThan("a", 10),
+            Not(
+              And(
+                GreaterThan("a", 1),
+                StringContains("b", "prefix")
+              ))
+          ))
         .get
         .toString
     }

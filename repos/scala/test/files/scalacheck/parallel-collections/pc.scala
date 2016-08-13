@@ -40,7 +40,7 @@ package scala {
     includeAllTestsWith(defaultTaskSupport)
 
     val ec = scala.concurrent.ExecutionContext.fromExecutorService(
-        java.util.concurrent.Executors.newFixedThreadPool(5))
+      java.util.concurrent.Executors.newFixedThreadPool(5))
     val ectasks = new collection.parallel.ExecutionContextTaskSupport(ec)
     includeAllTestsWith(ectasks)
 

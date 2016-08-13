@@ -17,14 +17,14 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
     atomicExistentialIds.incrementAndGet()
 
   private lazy val _recursionTable = mkThreadLocalStorage(
-      immutable.Map.empty[Symbol, Int])
+    immutable.Map.empty[Symbol, Int])
   override def recursionTable = _recursionTable.get
   override def recursionTable_=(value: immutable.Map[Symbol, Int]) =
     _recursionTable.set(value)
 
   // Set the fields which point companions at one another.  Returns the module.
-  override def connectModuleToClass(
-      m: ModuleSymbol, moduleClass: ClassSymbol): ModuleSymbol =
+  override def connectModuleToClass(m: ModuleSymbol,
+                                    moduleClass: ClassSymbol): ModuleSymbol =
     gilSynchronized { super.connectModuleToClass(m, moduleClass) }
 
   override def newFreeTermSymbol(name: TermName,
@@ -180,12 +180,16 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
 // ------ creators -------------------------------------------------------------------
 
     override protected def createAbstractTypeSymbol(
-        name: TypeName, pos: Position, newFlags: Long): AbstractTypeSymbol =
+        name: TypeName,
+        pos: Position,
+        newFlags: Long): AbstractTypeSymbol =
       new AbstractTypeSymbol(this, pos, name)
       with SynchronizedTypeSymbol initFlags newFlags
 
     override protected def createAliasTypeSymbol(
-        name: TypeName, pos: Position, newFlags: Long): AliasTypeSymbol =
+        name: TypeName,
+        pos: Position,
+        newFlags: Long): AliasTypeSymbol =
       new AliasTypeSymbol(this, pos, name)
       with SynchronizedTypeSymbol initFlags newFlags
 
@@ -196,52 +200,64 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
       new TypeSkolem(this, pos, name, origin)
       with SynchronizedTypeSymbol initFlags newFlags
 
-    override protected def createClassSymbol(
-        name: TypeName, pos: Position, newFlags: Long): ClassSymbol =
+    override protected def createClassSymbol(name: TypeName,
+                                             pos: Position,
+                                             newFlags: Long): ClassSymbol =
       new ClassSymbol(this, pos, name)
       with SynchronizedClassSymbol initFlags newFlags
 
     override protected def createModuleClassSymbol(
-        name: TypeName, pos: Position, newFlags: Long): ModuleClassSymbol =
+        name: TypeName,
+        pos: Position,
+        newFlags: Long): ModuleClassSymbol =
       new ModuleClassSymbol(this, pos, name)
       with SynchronizedModuleClassSymbol initFlags newFlags
 
     override protected def createPackageClassSymbol(
-        name: TypeName, pos: Position, newFlags: Long): PackageClassSymbol =
+        name: TypeName,
+        pos: Position,
+        newFlags: Long): PackageClassSymbol =
       new PackageClassSymbol(this, pos, name)
       with SynchronizedModuleClassSymbol initFlags newFlags
 
     override protected def createRefinementClassSymbol(
-        pos: Position, newFlags: Long): RefinementClassSymbol =
+        pos: Position,
+        newFlags: Long): RefinementClassSymbol =
       new RefinementClassSymbol(this, pos)
       with SynchronizedClassSymbol initFlags newFlags
 
     override protected def createPackageObjectClassSymbol(
-        pos: Position, newFlags: Long): PackageObjectClassSymbol =
+        pos: Position,
+        newFlags: Long): PackageObjectClassSymbol =
       new PackageObjectClassSymbol(this, pos)
       with SynchronizedClassSymbol initFlags newFlags
 
-    override protected def createMethodSymbol(
-        name: TermName, pos: Position, newFlags: Long): MethodSymbol =
+    override protected def createMethodSymbol(name: TermName,
+                                              pos: Position,
+                                              newFlags: Long): MethodSymbol =
       new MethodSymbol(this, pos, name)
       with SynchronizedMethodSymbol initFlags newFlags
 
-    override protected def createModuleSymbol(
-        name: TermName, pos: Position, newFlags: Long): ModuleSymbol =
+    override protected def createModuleSymbol(name: TermName,
+                                              pos: Position,
+                                              newFlags: Long): ModuleSymbol =
       new ModuleSymbol(this, pos, name)
       with SynchronizedTermSymbol initFlags newFlags
 
-    override protected def createPackageSymbol(
-        name: TermName, pos: Position, newFlags: Long): ModuleSymbol =
+    override protected def createPackageSymbol(name: TermName,
+                                               pos: Position,
+                                               newFlags: Long): ModuleSymbol =
       createModuleSymbol(name, pos, newFlags)
 
-    override protected def createValueParameterSymbol(
-        name: TermName, pos: Position, newFlags: Long) =
+    override protected def createValueParameterSymbol(name: TermName,
+                                                      pos: Position,
+                                                      newFlags: Long) =
       new TermSymbol(this, pos, name)
       with SynchronizedTermSymbol initFlags newFlags
 
-    override protected def createValueMemberSymbol(
-        name: TermName, pos: Position, newFlags: Long) =
+    override protected def createValueMemberSymbol(name: TermName,
+                                                   pos: Position,
+                                                   newFlags: Long) =
       new TermSymbol(this, pos, name)
       with SynchronizedTermSymbol initFlags newFlags
   }
@@ -251,7 +267,8 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
   trait SynchronizedTermSymbol extends SynchronizedSymbol
 
   trait SynchronizedMethodSymbol
-      extends MethodSymbol with SynchronizedTermSymbol {
+      extends MethodSymbol
+      with SynchronizedTermSymbol {
     // we can keep this lock fine-grained, because it's just a cache over asSeenFrom, which makes deadlocks impossible
     // unfortunately we cannot elide this lock, because the cache depends on `pre`
     private lazy val typeAsMemberOfLock = new Object
@@ -262,7 +279,8 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
   }
 
   trait SynchronizedModuleSymbol
-      extends ModuleSymbol with SynchronizedTermSymbol
+      extends ModuleSymbol
+      with SynchronizedTermSymbol
 
   trait SynchronizedTypeSymbol extends TypeSymbol with SynchronizedSymbol {
     // unlike with typeConstructor, a lock is necessary here, because tpe calculation relies on
@@ -276,5 +294,6 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
   trait SynchronizedClassSymbol extends ClassSymbol with SynchronizedTypeSymbol
 
   trait SynchronizedModuleClassSymbol
-      extends ModuleClassSymbol with SynchronizedClassSymbol
+      extends ModuleClassSymbol
+      with SynchronizedClassSymbol
 }

@@ -30,10 +30,12 @@ import scala.collection.parallel.Task
   *  section on Parallel Hash Tables for more information.
   */
 @SerialVersionUID(1L)
-class ParHashSet[T] private[collection](contents: FlatHashTable.Contents[T])
-    extends ParSet[T] with GenericParTemplate[T, ParHashSet]
+class ParHashSet[T] private[collection] (contents: FlatHashTable.Contents[T])
+    extends ParSet[T]
+    with GenericParTemplate[T, ParHashSet]
     with ParSetLike[T, ParHashSet[T], scala.collection.mutable.HashSet[T]]
-    with ParFlatHashTable[T] with Serializable {
+    with ParFlatHashTable[T]
+    with Serializable {
   initWithContents(contents)
   // println("----> new par hash set!")
   // java.lang.Thread.dumpStack
@@ -111,9 +113,11 @@ object ParHashSet extends ParSetFactory[ParHashSet] {
 
 private[mutable] abstract class ParHashSetCombiner[T](
     private val tableLoadFactor: Int)
-    extends scala.collection.parallel.BucketCombiner[
-        T, ParHashSet[T], AnyRef, ParHashSetCombiner[T]](
-        ParHashSetCombiner.numblocks)
+    extends scala.collection.parallel.BucketCombiner[T,
+                                                     ParHashSet[T],
+                                                     AnyRef,
+                                                     ParHashSetCombiner[T]](
+      ParHashSetCombiner.numblocks)
     with scala.collection.mutable.FlatHashTable.HashUtils[T] {
 //self: EnvironmentPassingCombiner[T, ParHashSet[T]] =>
   private val nonmasklen = ParHashSetCombiner.nonmasklength
@@ -144,10 +148,11 @@ private[mutable] abstract class ParHashSetCombiner[T](
     // construct it in parallel
     val table = new AddingFlatHashTable(size, tableLoadFactor, seedvalue)
     val (inserted, leftovers) = combinerTaskSupport.executeAndWaitResult(
-        new FillBlocks(buckets, table, 0, buckets.length))
+      new FillBlocks(buckets, table, 0, buckets.length))
     var leftinserts = 0
-    for (entry <- leftovers) leftinserts +=
-      table.insertEntry(0, table.tableLength, entry)
+    for (entry <- leftovers)
+      leftinserts +=
+        table.insertEntry(0, table.tableLength, entry)
     table.setSize(leftinserts + inserted)
     table.hashTableContents
   }
@@ -177,7 +182,7 @@ private[mutable] abstract class ParHashSetCombiner[T](
       extends FlatHashTable[T] {
     _loadFactor = lf
     table = new Array[AnyRef](
-        capacity(FlatHashTable.sizeForThreshold(numelems, _loadFactor)))
+      capacity(FlatHashTable.sizeForThreshold(numelems, _loadFactor)))
     tableSize = 0
     threshold = FlatHashTable.newThreshold(_loadFactor, table.length)
     seedvalue = inseedvalue
@@ -214,7 +219,7 @@ private[mutable] abstract class ParHashSetCombiner[T](
       while (null != curEntry) {
         if (curEntry == newEntry) return 0
         h = h +
-        1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
+            1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
         if (h >= comesBefore) return -1
         curEntry = table(h)
       }
@@ -270,8 +275,8 @@ private[mutable] abstract class ParHashSetCombiner[T](
         else (0, UnrolledBuffer[AnyRef]())
 
       // store the leftovers
-      val (leftoversIn, leftoversLeft) = insertAll(
-          blockStart(block), beforePos, leftovers)
+      val (leftoversIn, leftoversLeft) =
+        insertAll(blockStart(block), beforePos, leftovers)
 
       // return the no. of stored elements tupled with leftovers
       (elemsIn + leftoversIn, elemsLeft concat leftoversLeft)
@@ -320,8 +325,8 @@ private[mutable] abstract class ParHashSetCombiner[T](
       // take the leftovers from the left task, store them into the block of the right task
       val atPos = blockStart(that.offset)
       val beforePos = blockStart(that.offset + that.howmany)
-      val (inserted, remainingLeftovers) = insertAll(
-          atPos, beforePos, this.result._2)
+      val (inserted, remainingLeftovers) =
+        insertAll(atPos, beforePos, this.result._2)
 
       // anything left after trying the store the left leftovers is added to the right task leftovers
       // and a new leftovers set is produced in this way
@@ -331,7 +336,8 @@ private[mutable] abstract class ParHashSetCombiner[T](
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel.thresholdFromSize(
-          ParHashMapCombiner.numblocks, combinerTaskSupport.parallelismLevel)
+        ParHashMapCombiner.numblocks,
+        combinerTaskSupport.parallelismLevel)
   }
 }
 

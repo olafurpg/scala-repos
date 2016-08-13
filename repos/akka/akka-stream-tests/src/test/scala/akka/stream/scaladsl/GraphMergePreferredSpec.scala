@@ -32,8 +32,7 @@ class GraphMergePreferredSpec extends TwoStreamsSetup {
       val aux = Source(Stream.fill(numElements)(2))
 
       val result = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ sink ⇒
+        .fromGraph(GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ sink ⇒
           val merge = b.add(MergePreferred[Int](3))
           preferred ~> merge.preferred
 
@@ -46,13 +45,12 @@ class GraphMergePreferredSpec extends TwoStreamsSetup {
         .run()
 
       Await.result(result, 3.seconds).filter(_ == 1).size should be(
-          numElements)
+        numElements)
     }
 
     "eventually pass through all elements" in {
       val result = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ sink ⇒
+        .fromGraph(GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ sink ⇒
           val merge = b.add(MergePreferred[Int](3))
           Source(1 to 100) ~> merge.preferred
 
@@ -71,19 +69,18 @@ class GraphMergePreferredSpec extends TwoStreamsSetup {
       val s = Source(0 to 3)
 
       (the[IllegalArgumentException] thrownBy {
-            val g = RunnableGraph.fromGraph(
-                GraphDSL.create() { implicit b ⇒
-              val merge = b.add(MergePreferred[Int](1))
+        val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
+          val merge = b.add(MergePreferred[Int](1))
 
-              s ~> merge.preferred
-              s ~> merge.preferred
-              s ~> merge.in(0)
+          s ~> merge.preferred
+          s ~> merge.preferred
+          s ~> merge.in(0)
 
-              merge.out ~> Sink.head[Int]
-              ClosedShape
-            })
-          }).getMessage should include(
-          "[MergePreferred.preferred] is already connected")
+          merge.out ~> Sink.head[Int]
+          ClosedShape
+        })
+      }).getMessage should include(
+        "[MergePreferred.preferred] is already connected")
     }
   }
 }

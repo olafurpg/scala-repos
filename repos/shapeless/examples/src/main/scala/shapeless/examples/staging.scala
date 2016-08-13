@@ -84,14 +84,14 @@ object ReflectionUtils {
     case other => tq"${other.getClass.getName}"
   }
 
-  def mkExpr[T : TypeTag](tree: Tree): Expr[T] =
+  def mkExpr[T: TypeTag](tree: Tree): Expr[T] =
     Expr[T](currentMirror, new TreeCreator {
       def apply[U <: Universe with Singleton](m: Mirror[U]): U#Tree =
         if (m eq currentMirror) tree.asInstanceOf[U#Tree]
         else
           throw new IllegalArgumentException(
-              s"Expr defined in $currentMirror cannot be migrated to other mirrors.")
+            s"Expr defined in $currentMirror cannot be migrated to other mirrors.")
     })
 
-  def evalTree[T : TypeTag](tree: Tree) = mkExpr[T](tree).eval
+  def evalTree[T: TypeTag](tree: Tree) = mkExpr[T](tree).eval
 }

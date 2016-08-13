@@ -14,16 +14,18 @@ class AdaDeltaGradientDescent[T](rho: Double,
                                  minImprovementWindow: Int = 50)(
     implicit vspace: MutableFiniteCoordinateField[T, _, Double],
     rand: RandBasis = Rand)
-    extends StochasticGradientDescent[T](
-        1d, maxIter, tolerance, minImprovementWindow) {
+    extends StochasticGradientDescent[T](1d,
+                                         maxIter,
+                                         tolerance,
+                                         minImprovementWindow) {
 
   val epsilon = 1e-6
   import vspace._
 
   case class History(avgSqGradient: T, avgSqDelta: T)
 
-  override protected def initialHistory(
-      f: StochasticDiffFunction[T], init: T): History = {
+  override protected def initialHistory(f: StochasticDiffFunction[T],
+                                        init: T): History = {
     History(zeroLike(init), zeroLike(init))
   }
 
@@ -46,15 +48,16 @@ class AdaDeltaGradientDescent[T](rho: Double,
   override protected def takeStep(state: State, dir: T, stepSize: Double): T = {
     val newAvgSqGradient =
       (state.history.avgSqGradient * rho) :+
-      ((state.grad :* state.grad) * (1 - rho))
+        ((state.grad :* state.grad) * (1 - rho))
     val rmsGradient = sqrt(newAvgSqGradient + epsilon)
     val rmsDelta = sqrt(state.history.avgSqDelta + epsilon)
     val delta = dir :* rmsDelta :/ rmsGradient
     state.x + delta
   }
 
-  override def determineStepSize(
-      state: State, f: StochasticDiffFunction[T], dir: T) = {
+  override def determineStepSize(state: State,
+                                 f: StochasticDiffFunction[T],
+                                 dir: T) = {
     defaultStepSize
   }
 

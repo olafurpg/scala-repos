@@ -20,8 +20,8 @@ class TestResultListener(private val testConfigurationName: String)
 
     assert(terminated,
            "test " + testConfigurationName +
-           " did not terminate correctly; captured outputs:\n" +
-           builder.toString())
+             " did not terminate correctly; captured outputs:\n" +
+             builder.toString())
     builder.toString()
   }
 
@@ -41,8 +41,8 @@ class TestResultListener(private val testConfigurationName: String)
     }
   }
 
-  override def processWillTerminate(
-      event: ProcessEvent, willBeDestroyed: Boolean): Unit = {
+  override def processWillTerminate(event: ProcessEvent,
+                                    willBeDestroyed: Boolean): Unit = {
     //TODO: implement me
   }
 

@@ -1,7 +1,16 @@
 package com.twitter.finagle.mdns
 
 import com.twitter.finagle.{Announcement, Announcer, Addr, Address, Resolver}
-import com.twitter.util.{Closable, Future, Promise, Return, Throw, Time, Try, Var}
+import com.twitter.util.{
+  Closable,
+  Future,
+  Promise,
+  Return,
+  Throw,
+  Time,
+  Try,
+  Var
+}
 import java.lang.reflect.{InvocationHandler, Method, Proxy}
 import java.net.InetSocketAddress
 import scala.collection.mutable
@@ -12,8 +21,11 @@ private case class Record(flags: Int,
                           regType: String,
                           domain: String)
 
-private case class ResolvedRecord(
-    flags: Int, ifIndex: Int, fullName: String, hostName: String, port: Int)
+private case class ResolvedRecord(flags: Int,
+                                  ifIndex: Int,
+                                  fullName: String,
+                                  hostName: String,
+                                  port: Int)
 
 private class Listener(f: PartialFunction[(String, Array[Object]), Unit])
     extends InvocationHandler {
@@ -113,11 +125,11 @@ private class DNSSD {
     val proxy = newProxy(ResolveListenerClass) {
       case ("serviceResolved", args) =>
         reply.setValue(
-            ResolvedRecord(flags = args(1).asInstanceOf[Int],
-                           ifIndex = args(2).asInstanceOf[Int],
-                           fullName = args(3).asInstanceOf[String],
-                           hostName = args(4).asInstanceOf[String],
-                           port = args(5).asInstanceOf[Int]))
+          ResolvedRecord(flags = args(1).asInstanceOf[Int],
+                         ifIndex = args(2).asInstanceOf[Int],
+                         fullName = args(3).asInstanceOf[String],
+                         hostName = args(4).asInstanceOf[String],
+                         port = args(5).asInstanceOf[Int]))
 
       case ("operationFailed", _) =>
         reply.setException(new Exception("Resolve failed"))
@@ -161,12 +173,11 @@ private object DNSSD {
       case ("serviceFound", args) =>
         val record = mkRecord(args)
         instance.resolve(record) foreach { resolved =>
-          val metadata = MdnsAddrMetadata(record.serviceName,
-                                          record.regType,
-                                          record.domain)
-          val addr = Address.Inet(
-              new InetSocketAddress(resolved.hostName, resolved.port),
-              MdnsAddrMetadata.toAddrMetadata(metadata))
+          val metadata =
+            MdnsAddrMetadata(record.serviceName, record.regType, record.domain)
+          val addr = Address.Inet(new InetSocketAddress(resolved.hostName,
+                                                        resolved.port),
+                                  MdnsAddrMetadata.toAddrMetadata(metadata))
 
           synchronized {
             services.put(record.serviceName, addr)
@@ -198,8 +209,10 @@ private class DNSSDAnnouncer extends MDNSAnnouncerIface {
 
   private[this] val dnssd = DNSSD.instance
 
-  def announce(
-      addr: InetSocketAddress, name: String, regType: String, domain: String) =
+  def announce(addr: InetSocketAddress,
+               name: String,
+               regType: String,
+               domain: String) =
     dnssd.register(name, regType, domain, addr.getHostName, addr.getPort)
 }
 

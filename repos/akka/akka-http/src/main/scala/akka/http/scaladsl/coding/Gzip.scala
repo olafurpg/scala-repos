@@ -14,7 +14,8 @@ import ByteStringParser.{ParseResult, ParseStep}
 import akka.util.ByteString
 
 class Gzip(val messageFilter: HttpMessage ⇒ Boolean)
-    extends Coder with StreamDecoder {
+    extends Coder
+    with StreamDecoder {
   val encoding = HttpEncodings.gzip
   def newCompressor = new GzipCompressor
   def newDecompressorStage(maxBytesPerChunk: Int) =
@@ -29,14 +30,15 @@ object Gzip extends Gzip(Encoder.DefaultFilter) {
 }
 
 class GzipCompressor extends DeflateCompressor {
-  override protected lazy val deflater = new Deflater(
-      Deflater.BEST_COMPRESSION, true)
+  override protected lazy val deflater =
+    new Deflater(Deflater.BEST_COMPRESSION, true)
   private val checkSum = new CRC32 // CRC32 of uncompressed data
   private var headerSent = false
   private var bytesRead = 0L
 
   override protected def compressWithBuffer(
-      input: ByteString, buffer: Array[Byte]): ByteString = {
+      input: ByteString,
+      buffer: Array[Byte]): ByteString = {
     updateCrc(input)
     header() ++ super.compressWithBuffer(input, buffer)
   }
@@ -71,8 +73,9 @@ class GzipDecompressor(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
   override def createLogic(attr: Attributes) = new DecompressorParsingLogic {
     override val inflater: Inflater = new Inflater(true)
     override def afterInflate: ParseStep[ByteString] = ReadTrailer
-    override def afterBytesRead(
-        buffer: Array[Byte], offset: Int, length: Int): Unit =
+    override def afterBytesRead(buffer: Array[Byte],
+                                offset: Int,
+                                length: Int): Unit =
       crc32.update(buffer, offset, length)
 
     trait Step extends ParseStep[ByteString] {
@@ -133,15 +136,15 @@ class GzipDecompressor(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
 private[http] object GzipDecompressor {
   // RFC 1952: http://tools.ietf.org/html/rfc1952 section 2.2
   val Header = ByteString(
-      0x1F, // ID1
-      0x8B, // ID2
-      8, // CM = Deflate
-      0, // FLG
-      0, // MTIME 1
-      0, // MTIME 2
-      0, // MTIME 3
-      0, // MTIME 4
-      0, // XFL
-      0 // OS
+    0x1F, // ID1
+    0x8B, // ID2
+    8, // CM = Deflate
+    0, // FLG
+    0, // MTIME 1
+    0, // MTIME 2
+    0, // MTIME 3
+    0, // MTIME 4
+    0, // XFL
+    0 // OS
   )
 }

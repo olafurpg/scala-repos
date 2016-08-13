@@ -9,10 +9,10 @@ object JsonView {
     OWrites[Related] { r =>
       Json
         .obj(
-            "user" -> r.user,
-            "nbGames" -> r.nbGames,
-            "followable" -> r.followable,
-            "relation" -> r.relation
+          "user" -> r.user,
+          "nbGames" -> r.nbGames,
+          "followable" -> r.followable,
+          "relation" -> r.relation
         )
         .noNull
     }

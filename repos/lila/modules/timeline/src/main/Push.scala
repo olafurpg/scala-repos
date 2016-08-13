@@ -33,9 +33,9 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
       } foreach { users =>
         if (users.nonEmpty)
           makeEntry(users, data) >>-
-          (users foreach { u =>
-                lobbySocket ! ReloadTimeline(u)
-              })
+            (users foreach { u =>
+              lobbySocket ! ReloadTimeline(u)
+            })
         lila.mon.timeline.notification(users.size)
       }
   }
@@ -61,13 +61,13 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
     Entry
       .make(users, data)
       .fold(
-          fufail[Entry]("[timeline] invalid entry data " + data)
+        fufail[Entry]("[timeline] invalid entry data " + data)
       ) { entry =>
         entryRepo.findRecent(entry.typ, DateTime.now minusMinutes 50) flatMap {
           entries =>
             entries.exists(_ similarTo entry) fold
-            (fufail[Entry]("[timeline] a similar entry already exists"),
-                entryRepo insert entry inject entry)
+              (fufail[Entry]("[timeline] a similar entry already exists"),
+              entryRepo insert entry inject entry)
         }
       }
 }

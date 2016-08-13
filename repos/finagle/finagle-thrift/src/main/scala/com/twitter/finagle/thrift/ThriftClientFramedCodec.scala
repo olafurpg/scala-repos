@@ -3,7 +3,12 @@ package com.twitter.finagle.thrift
 import com.twitter.finagle._
 import com.twitter.finagle.filter.PayloadSizeFilter
 import com.twitter.util.{Future, Stopwatch}
-import org.apache.thrift.protocol.{TBinaryProtocol, TMessage, TMessageType, TProtocolFactory}
+import org.apache.thrift.protocol.{
+  TBinaryProtocol,
+  TMessage,
+  TMessageType,
+  TProtocolFactory
+}
 import org.apache.thrift.transport.TMemoryInputTransport
 import org.jboss.netty.buffer.ChannelBuffers
 import org.jboss.netty.channel._
@@ -51,8 +56,10 @@ class ThriftClientFramedCodecFactory(clientId: Option[ClientId],
     * with a default TBinaryProtocol.
     */
   def apply(config: ClientCodecConfig) =
-    new ThriftClientFramedCodec(
-        _protocolFactory, config, clientId, _useCallerSeqIds)
+    new ThriftClientFramedCodec(_protocolFactory,
+                                config,
+                                clientId,
+                                _useCallerSeqIds)
 }
 
 class ThriftClientFramedCodec(
@@ -60,11 +67,12 @@ class ThriftClientFramedCodec(
     config: ClientCodecConfig,
     clientId: Option[ClientId] = None,
     useCallerSeqIds: Boolean = false
-)
-    extends Codec[ThriftClientRequest, Array[Byte]] {
+) extends Codec[ThriftClientRequest, Array[Byte]] {
 
-  private[this] val preparer = ThriftClientPreparer(
-      protocolFactory, config.serviceName, clientId, useCallerSeqIds)
+  private[this] val preparer = ThriftClientPreparer(protocolFactory,
+                                                    config.serviceName,
+                                                    clientId,
+                                                    useCallerSeqIds)
 
   def pipelineFactory: ChannelPipelineFactory =
     ThriftClientFramedPipelineFactory
@@ -87,8 +95,9 @@ private[thrift] class ThriftClientChannelBufferEncoder
   override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) =
     e.getMessage match {
       case request: ThriftClientRequest =>
-        Channels.write(
-            ctx, e.getFuture, ChannelBuffers.wrappedBuffer(request.message))
+        Channels.write(ctx,
+                       e.getFuture,
+                       ChannelBuffers.wrappedBuffer(request.message))
         if (request.oneway) {
           // oneway RPCs are satisfied when the write is complete.
           e.getFuture.addListener(new ChannelFutureListener {
@@ -96,8 +105,8 @@ private[thrift] class ThriftClientChannelBufferEncoder
               if (f.isSuccess) {
                 Channels.fireMessageReceived(ctx, ChannelBuffers.EMPTY_BUFFER)
               } else if (f.isCancelled) {
-                Channels.fireExceptionCaught(
-                    ctx, new CancelledRequestException)
+                Channels.fireExceptionCaught(ctx,
+                                             new CancelledRequestException)
               } else {
                 Channels.fireExceptionCaught(ctx, f.getCause)
               }
@@ -106,7 +115,7 @@ private[thrift] class ThriftClientChannelBufferEncoder
 
       case _ =>
         throw new IllegalArgumentException(
-            "No ThriftClientRequest on the wire")
+          "No ThriftClientRequest on the wire")
     }
 }
 
@@ -127,9 +136,9 @@ private[finagle] case class ThriftClientPreparer(
       service: Service[ThriftClientRequest, Array[Byte]]
   ): Future[Service[ThriftClientRequest, Array[Byte]]] = {
     val payloadSize = new PayloadSizeFilter[ThriftClientRequest, Array[Byte]](
-        params[param.Stats].statsReceiver,
-        _.message.length,
-        _.length
+      params[param.Stats].statsReceiver,
+      _.message.length,
+      _.length
     )
     val Thrift.param.AttemptTTwitterUpgrade(attemptUpgrade) =
       params[Thrift.param.AttemptTTwitterUpgrade]
@@ -177,7 +186,7 @@ private[finagle] case class ThriftClientPreparer(
     // sending a magic method invocation.
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(
-        new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
+      new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
 
     val options = new thrift.ConnectionOptions
     options.write(buffer())

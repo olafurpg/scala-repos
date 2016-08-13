@@ -29,7 +29,7 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
         ifStatement.condition.foreach {
           case cond =>
             if (cond.getTextRange.containsOffset(
-                    editor.getCaretModel.getOffset))
+                  editor.getCaretModel.getOffset))
               return placeInWholeBlock(block, editor)
         }
         return NoOperation

@@ -29,66 +29,66 @@ class WindowOperationsSuite extends TestSuiteBase {
     Seconds(1) // making sure its visible in this class
 
   val largerSlideInput = Seq(
-      Seq(("a", 1)),
-      Seq(("a", 2)), // 1st window from here
-      Seq(("a", 3)),
-      Seq(("a", 4)), // 2nd window from here
-      Seq(("a", 5)),
-      Seq(("a", 6)), // 3rd window from here
-      Seq(),
-      Seq() // 4th window from here
+    Seq(("a", 1)),
+    Seq(("a", 2)), // 1st window from here
+    Seq(("a", 3)),
+    Seq(("a", 4)), // 2nd window from here
+    Seq(("a", 5)),
+    Seq(("a", 6)), // 3rd window from here
+    Seq(),
+    Seq() // 4th window from here
   )
 
   val largerSlideReduceOutput = Seq(
-      Seq(("a", 3)),
-      Seq(("a", 10)),
-      Seq(("a", 18)),
-      Seq(("a", 11))
+    Seq(("a", 3)),
+    Seq(("a", 10)),
+    Seq(("a", 18)),
+    Seq(("a", 11))
   )
 
   val bigInput = Seq(
-      Seq(("a", 1)),
-      Seq(("a", 1), ("b", 1)),
-      Seq(("a", 1), ("b", 1), ("c", 1)),
-      Seq(("a", 1), ("b", 1)),
-      Seq(("a", 1)),
-      Seq(),
-      Seq(("a", 1)),
-      Seq(("a", 1), ("b", 1)),
-      Seq(("a", 1), ("b", 1), ("c", 1)),
-      Seq(("a", 1), ("b", 1)),
-      Seq(("a", 1)),
-      Seq()
+    Seq(("a", 1)),
+    Seq(("a", 1), ("b", 1)),
+    Seq(("a", 1), ("b", 1), ("c", 1)),
+    Seq(("a", 1), ("b", 1)),
+    Seq(("a", 1)),
+    Seq(),
+    Seq(("a", 1)),
+    Seq(("a", 1), ("b", 1)),
+    Seq(("a", 1), ("b", 1), ("c", 1)),
+    Seq(("a", 1), ("b", 1)),
+    Seq(("a", 1)),
+    Seq()
   )
 
   val bigGroupByOutput = Seq(
-      Seq(("a", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1))),
-      Seq(("a", Seq(1))),
-      Seq(("a", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
-      Seq(("a", Seq(1, 1)), ("b", Seq(1))),
-      Seq(("a", Seq(1)))
+    Seq(("a", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1))),
+    Seq(("a", Seq(1))),
+    Seq(("a", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1, 1)), ("c", Seq(1))),
+    Seq(("a", Seq(1, 1)), ("b", Seq(1))),
+    Seq(("a", Seq(1)))
   )
 
   val bigReduceOutput = Seq(
-      Seq(("a", 1)),
-      Seq(("a", 2), ("b", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 1)),
-      Seq(("a", 1)),
-      Seq(("a", 1)),
-      Seq(("a", 2), ("b", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 1)),
-      Seq(("a", 1))
+    Seq(("a", 1)),
+    Seq(("a", 2), ("b", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 1)),
+    Seq(("a", 1)),
+    Seq(("a", 1)),
+    Seq(("a", 2), ("b", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 1)),
+    Seq(("a", 1))
   )
 
   /*
@@ -98,50 +98,50 @@ class WindowOperationsSuite extends TestSuiteBase {
    */
 
   val bigReduceInvOutput = Seq(
-      Seq(("a", 1)),
-      Seq(("a", 2), ("b", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 1), ("c", 0)),
-      Seq(("a", 1), ("b", 0), ("c", 0)),
-      Seq(("a", 1), ("b", 0), ("c", 0)),
-      Seq(("a", 2), ("b", 1), ("c", 0)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 2), ("c", 1)),
-      Seq(("a", 2), ("b", 1), ("c", 0)),
-      Seq(("a", 1), ("b", 0), ("c", 0))
+    Seq(("a", 1)),
+    Seq(("a", 2), ("b", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 1), ("c", 0)),
+    Seq(("a", 1), ("b", 0), ("c", 0)),
+    Seq(("a", 1), ("b", 0), ("c", 0)),
+    Seq(("a", 2), ("b", 1), ("c", 0)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 2), ("c", 1)),
+    Seq(("a", 2), ("b", 1), ("c", 0)),
+    Seq(("a", 1), ("b", 0), ("c", 0))
   )
 
   // Testing window operation
 
   testWindow(
-      "basic window",
-      Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
-      Seq(Seq(0), Seq(0, 1), Seq(1, 2), Seq(2, 3), Seq(3, 4), Seq(4, 5))
+    "basic window",
+    Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
+    Seq(Seq(0), Seq(0, 1), Seq(1, 2), Seq(2, 3), Seq(3, 4), Seq(4, 5))
   )
 
   testWindow(
-      "tumbling window",
-      Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
-      Seq(Seq(0, 1), Seq(2, 3), Seq(4, 5)),
-      Seconds(2),
-      Seconds(2)
+    "tumbling window",
+    Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
+    Seq(Seq(0, 1), Seq(2, 3), Seq(4, 5)),
+    Seconds(2),
+    Seconds(2)
   )
 
   testWindow(
-      "larger window",
-      Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
-      Seq(Seq(0, 1), Seq(0, 1, 2, 3), Seq(2, 3, 4, 5), Seq(4, 5)),
-      Seconds(4),
-      Seconds(2)
+    "larger window",
+    Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
+    Seq(Seq(0, 1), Seq(0, 1, 2, 3), Seq(2, 3, 4, 5), Seq(4, 5)),
+    Seconds(4),
+    Seconds(2)
   )
 
   testWindow(
-      "non-overlapping window",
-      Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
-      Seq(Seq(1, 2), Seq(4, 5)),
-      Seconds(2),
-      Seconds(3)
+    "non-overlapping window",
+    Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5)),
+    Seq(Seq(1, 2), Seq(4, 5)),
+    Seconds(2),
+    Seconds(3)
   )
 
   test("window - persistence level") {
@@ -160,35 +160,35 @@ class WindowOperationsSuite extends TestSuiteBase {
   // Testing naive reduceByKeyAndWindow (without invertible function)
 
   testReduceByKeyAndWindow(
-      "basic reduction",
-      Seq(Seq(("a", 1), ("a", 3))),
-      Seq(Seq(("a", 4)))
+    "basic reduction",
+    Seq(Seq(("a", 1), ("a", 3))),
+    Seq(Seq(("a", 4)))
   )
 
   testReduceByKeyAndWindow(
-      "key already in window and new value added into window",
-      Seq(Seq(("a", 1)), Seq(("a", 1))),
-      Seq(Seq(("a", 1)), Seq(("a", 2)))
+    "key already in window and new value added into window",
+    Seq(Seq(("a", 1)), Seq(("a", 1))),
+    Seq(Seq(("a", 1)), Seq(("a", 2)))
   )
 
   testReduceByKeyAndWindow(
-      "new key added into window",
-      Seq(Seq(("a", 1)), Seq(("a", 1), ("b", 1))),
-      Seq(Seq(("a", 1)), Seq(("a", 2), ("b", 1)))
+    "new key added into window",
+    Seq(Seq(("a", 1)), Seq(("a", 1), ("b", 1))),
+    Seq(Seq(("a", 1)), Seq(("a", 2), ("b", 1)))
   )
 
   testReduceByKeyAndWindow(
-      "key removed from window",
-      Seq(Seq(("a", 1)), Seq(("a", 1)), Seq(), Seq()),
-      Seq(Seq(("a", 1)), Seq(("a", 2)), Seq(("a", 1)), Seq())
+    "key removed from window",
+    Seq(Seq(("a", 1)), Seq(("a", 1)), Seq(), Seq()),
+    Seq(Seq(("a", 1)), Seq(("a", 2)), Seq(("a", 1)), Seq())
   )
 
   testReduceByKeyAndWindow(
-      "larger slide time",
-      largerSlideInput,
-      largerSlideReduceOutput,
-      Seconds(4),
-      Seconds(2)
+    "larger slide time",
+    largerSlideInput,
+    largerSlideReduceOutput,
+    Seconds(4),
+    Seconds(2)
   )
 
   testReduceByKeyAndWindow("big test", bigInput, bigReduceOutput)
@@ -196,41 +196,42 @@ class WindowOperationsSuite extends TestSuiteBase {
   // Testing reduceByKeyAndWindow (with invertible reduce function)
 
   testReduceByKeyAndWindowWithInverse(
-      "basic reduction",
-      Seq(Seq(("a", 1), ("a", 3))),
-      Seq(Seq(("a", 4)))
+    "basic reduction",
+    Seq(Seq(("a", 1), ("a", 3))),
+    Seq(Seq(("a", 4)))
   )
 
   testReduceByKeyAndWindowWithInverse(
-      "key already in window and new value added into window",
-      Seq(Seq(("a", 1)), Seq(("a", 1))),
-      Seq(Seq(("a", 1)), Seq(("a", 2)))
+    "key already in window and new value added into window",
+    Seq(Seq(("a", 1)), Seq(("a", 1))),
+    Seq(Seq(("a", 1)), Seq(("a", 2)))
   )
 
   testReduceByKeyAndWindowWithInverse(
-      "new key added into window",
-      Seq(Seq(("a", 1)), Seq(("a", 1), ("b", 1))),
-      Seq(Seq(("a", 1)), Seq(("a", 2), ("b", 1)))
+    "new key added into window",
+    Seq(Seq(("a", 1)), Seq(("a", 1), ("b", 1))),
+    Seq(Seq(("a", 1)), Seq(("a", 2), ("b", 1)))
   )
 
   testReduceByKeyAndWindowWithInverse(
-      "key removed from window",
-      Seq(Seq(("a", 1)), Seq(("a", 1)), Seq(), Seq()),
-      Seq(Seq(("a", 1)), Seq(("a", 2)), Seq(("a", 1)), Seq(("a", 0)))
+    "key removed from window",
+    Seq(Seq(("a", 1)), Seq(("a", 1)), Seq(), Seq()),
+    Seq(Seq(("a", 1)), Seq(("a", 2)), Seq(("a", 1)), Seq(("a", 0)))
   )
 
   testReduceByKeyAndWindowWithInverse(
-      "larger slide time",
-      largerSlideInput,
-      largerSlideReduceOutput,
-      Seconds(4),
-      Seconds(2)
+    "larger slide time",
+    largerSlideInput,
+    largerSlideReduceOutput,
+    Seconds(4),
+    Seconds(2)
   )
 
   testReduceByKeyAndWindowWithInverse("big test", bigInput, bigReduceInvOutput)
 
-  testReduceByKeyAndWindowWithFilteredInverse(
-      "big test", bigInput, bigReduceOutput)
+  testReduceByKeyAndWindowWithFilteredInverse("big test",
+                                              bigInput,
+                                              bigReduceOutput)
 
   test("groupByKeyAndWindow") {
     val input = bigInput
@@ -239,10 +240,9 @@ class WindowOperationsSuite extends TestSuiteBase {
     val slideDuration = Seconds(1)
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
-    val operation = (s: DStream[(String, Int)]) =>
-      {
-        s.groupByKeyAndWindow(windowDuration, slideDuration)
-          .map(x => (x._1, x._2.toSet))
+    val operation = (s: DStream[(String, Int)]) => {
+      s.groupByKeyAndWindow(windowDuration, slideDuration)
+        .map(x => (x._1, x._2.toSet))
     }
     testOperation(input, operation, expectedOutput, numBatches, true)
   }
@@ -254,9 +254,8 @@ class WindowOperationsSuite extends TestSuiteBase {
     val slideDuration = Seconds(1)
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
-    val operation = (s: DStream[Int]) =>
-      {
-        s.countByWindow(windowDuration, slideDuration).map(_.toInt)
+    val operation = (s: DStream[Int]) => {
+      s.countByWindow(windowDuration, slideDuration).map(_.toInt)
     }
     testOperation(input, operation, expectedOutput, numBatches, true)
   }
@@ -269,10 +268,9 @@ class WindowOperationsSuite extends TestSuiteBase {
     val slideDuration = Seconds(1)
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
-    val operation = (s: DStream[String]) =>
-      {
-        s.countByValueAndWindow(windowDuration, slideDuration)
-          .map(x => (x._1, x._2.toInt))
+    val operation = (s: DStream[String]) => {
+      s.countByValueAndWindow(windowDuration, slideDuration)
+        .map(x => (x._1, x._2.toInt))
     }
     testOperation(input, operation, expectedOutput, numBatches, true)
   }
@@ -306,10 +304,10 @@ class WindowOperationsSuite extends TestSuiteBase {
       logInfo("reduceByKeyAndWindow - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
-      val operation = (s: DStream[(String, Int)]) =>
-        {
-          s.reduceByKeyAndWindow(
-              (x: Int, y: Int) => x + y, windowDuration, slideDuration)
+      val operation = (s: DStream[(String, Int)]) => {
+        s.reduceByKeyAndWindow((x: Int, y: Int) => x + y,
+                               windowDuration,
+                               slideDuration)
       }
       testOperation(input, operation, expectedOutput, numBatches, true)
     }
@@ -326,10 +324,9 @@ class WindowOperationsSuite extends TestSuiteBase {
       logInfo("reduceByKeyAndWindow with inverse function - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
-      val operation = (s: DStream[(String, Int)]) =>
-        {
-          s.reduceByKeyAndWindow(_ + _, _ - _, windowDuration, slideDuration)
-            .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
+      val operation = (s: DStream[(String, Int)]) => {
+        s.reduceByKeyAndWindow(_ + _, _ - _, windowDuration, slideDuration)
+          .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
       }
       testOperation(input, operation, expectedOutput, numBatches, true)
     }
@@ -344,19 +341,18 @@ class WindowOperationsSuite extends TestSuiteBase {
   ) {
     test("reduceByKeyAndWindow with inverse and filter functions - " + name) {
       logInfo(
-          "reduceByKeyAndWindow with inverse and filter functions - " + name)
+        "reduceByKeyAndWindow with inverse and filter functions - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val filterFunc = (p: (String, Int)) => p._2 != 0
-      val operation = (s: DStream[(String, Int)]) =>
-        {
-          s.reduceByKeyAndWindow(_ + _,
-                                  _ - _,
-                                  windowDuration,
-                                  slideDuration,
-                                  filterFunc = filterFunc)
-            .persist()
-            .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
+      val operation = (s: DStream[(String, Int)]) => {
+        s.reduceByKeyAndWindow(_ + _,
+                                _ - _,
+                                windowDuration,
+                                slideDuration,
+                                filterFunc = filterFunc)
+          .persist()
+          .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
       }
       testOperation(input, operation, expectedOutput, numBatches, true)
     }

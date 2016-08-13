@@ -10,8 +10,9 @@ import gitbucket.core.service.SystemSettingsService.SystemSettings
   * @param localPath the string to assemble local file path of repository (e.g. "gist/$1/$2")
   * @param filter the filter for request to the Git repository which is defined by this routing
   */
-case class GitRepositoryRouting(
-    urlPattern: String, localPath: String, filter: GitRepositoryFilter) {
+case class GitRepositoryRouting(urlPattern: String,
+                                localPath: String,
+                                filter: GitRepositoryFilter) {
 
   def this(urlPattern: String, localPath: String) = {
     this(urlPattern, localPath, new GitRepositoryFilter() {

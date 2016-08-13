@@ -41,25 +41,25 @@ final class Env(config: Config,
                             lilaBus = system.lilaBus)
 
   private lazy val boosting = new BoostingApi(
-      modApi = api,
-      collBoosting = db(CollectionBoosting),
-      nbGamesToMark = NbGamesToMark,
-      ratioGamesToMark = RatioGamesToMark)
+    modApi = api,
+    collBoosting = db(CollectionBoosting),
+    nbGamesToMark = NbGamesToMark,
+    ratioGamesToMark = RatioGamesToMark)
 
   lazy val assessApi = new AssessApi(
-      collAssessments = db(CollectionPlayerAssessment),
-      logApi = logApi,
-      modApi = api,
-      reporter = hub.actor.report,
-      fishnet = hub.actor.fishnet,
-      userIdsSharingIp = securityApi.userIdsSharingIp)
+    collAssessments = db(CollectionPlayerAssessment),
+    logApi = logApi,
+    modApi = api,
+    reporter = hub.actor.report,
+    fishnet = hub.actor.fishnet,
+    userIdsSharingIp = securityApi.userIdsSharingIp)
 
   lazy val gamify = new Gamify(logColl = logColl,
                                reportColl = reportColl,
                                historyColl = db(CollectionGamingHistory))
 
-  lazy val search = new UserSearch(
-      securityApi = securityApi, emailAddress = emailAddress)
+  lazy val search =
+    new UserSearch(securityApi = securityApi, emailAddress = emailAddress)
 
   // api actor
   private val actorApi = system.actorOf(Props(new Actor {

@@ -34,20 +34,21 @@ abstract class AutoImportTestBase
     import org.junit.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     val offset = fileText.indexOf(refMarker)
     fileText = fileText.replace(refMarker, "")
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     assert(
-        offset != -1,
-        "Not specified ref marker in test case. Use /*ref*/ in scala file for this.")
+      offset != -1,
+      "Not specified ref marker in test case. Use /*ref*/ in scala file for this.")
     val ref: ScReferenceElement = PsiTreeUtil.getParentOfType(
-        scalaFile.findElementAt(offset), classOf[ScReferenceElement])
+      scalaFile.findElementAt(offset),
+      classOf[ScReferenceElement])
     assert(ref != null, "Not specified reference at marker.")
 
     ref.resolve() match {
@@ -85,8 +86,8 @@ abstract class AutoImportTestBase
     } catch {
       case e: Exception =>
         println(e)
-        assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(assertion = false,
+               message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

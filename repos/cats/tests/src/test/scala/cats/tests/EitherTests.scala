@@ -1,7 +1,13 @@
 package cats
 package tests
 
-import cats.laws.discipline.{BitraverseTests, TraverseTests, MonadTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BitraverseTests,
+  TraverseTests,
+  MonadTests,
+  SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq._
 import algebra.laws.OrderLaws
 
@@ -18,17 +24,17 @@ class EitherTests extends CatsSuite {
   checkAll("Monad[Either[Int, ?]]",
            SerializableTests.serializable(Monad[Either[Int, ?]]))
 
-  checkAll("Either[Int, Int] with Option",
-           TraverseTests[Either[Int, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Either[Int, Int] with Option",
+    TraverseTests[Either[Int, ?]].traverse[Int, Int, Int, Int, Option, Option])
   checkAll("Traverse[Either[Int, ?]",
            SerializableTests.serializable(Traverse[Either[Int, ?]]))
 
   checkAll("Either[?, ?]",
            BitraverseTests[Either]
              .bitraverse[Option, Int, Int, Int, String, String, String])
-  checkAll(
-      "Bitraverse[Either]", SerializableTests.serializable(Bitraverse[Either]))
+  checkAll("Bitraverse[Either]",
+           SerializableTests.serializable(Bitraverse[Either]))
 
   val partialOrder = eitherPartialOrder[Int, String]
   val order = implicitly[Order[Either[Int, String]]]
@@ -42,7 +48,7 @@ class EitherTests extends CatsSuite {
              OrderLaws[Either[ListWrapper[String], ListWrapper[Int]]].eqv)
     checkAll("Eq[Either[ListWrapper[String], ListWrapper[Int]]]",
              SerializableTests.serializable(
-                 Eq[Either[ListWrapper[String], ListWrapper[Int]]]))
+               Eq[Either[ListWrapper[String], ListWrapper[Int]]]))
   }
 
   val orderLaws = OrderLaws[Either[Int, String]]

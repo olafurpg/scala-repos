@@ -44,12 +44,12 @@ class EnsembleTilePane extends EnsembleExample {
   def getContent = {
     // Image for buttons
     val image = new Image(
-        this.getClass
-          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+      this.getClass
+        .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
 
     // Create buttons
-    val buttons = for (i <- 1 to 17) yield
-      new Button("Button " + i, new ImageView(image))
+    val buttons = for (i <- 1 to 17)
+      yield new Button("Button " + i, new ImageView(image))
 
     new TilePane {
       hgap = 3

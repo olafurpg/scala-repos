@@ -4,10 +4,19 @@ import javax.inject.Inject
 
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.plugin.auth.{Identity, UpdateApp, Authenticator, Authorizer}
+import mesosphere.marathon.plugin.auth.{
+  Identity,
+  UpdateApp,
+  Authenticator,
+  Authorizer
+}
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  MarathonConf,
+  MarathonSchedulerService,
+  UnknownAppException
+}
 
 import scala.concurrent.Future
 
@@ -34,13 +43,13 @@ class TaskKiller @Inject()(taskTracker: TaskTracker,
     }
   }
 
-  def killAndScale(appId: PathId,
-                   findToKill: (Iterable[Task] => Iterable[Task]),
-                   force: Boolean)(
-      implicit identity: Identity): Future[DeploymentPlan] = {
+  def killAndScale(
+      appId: PathId,
+      findToKill: (Iterable[Task] => Iterable[Task]),
+      force: Boolean)(implicit identity: Identity): Future[DeploymentPlan] = {
     killAndScale(
-        Map(appId -> findToKill(taskTracker.appTasksLaunchedSync(appId))),
-        force)
+      Map(appId -> findToKill(taskTracker.appTasksLaunchedSync(appId))),
+      force)
   }
 
   def killAndScale(appTasks: Map[PathId, Iterable[Task]], force: Boolean)(
@@ -58,11 +67,11 @@ class TaskKiller @Inject()(taskTracker: TaskTracker,
     }
 
     def killTasks = groupManager.update(
-        PathId.empty,
-        updateGroup,
-        Timestamp.now(),
-        force = force,
-        toKill = appTasks
+      PathId.empty,
+      updateGroup,
+      Timestamp.now(),
+      force = force,
+      toKill = appTasks
     )
 
     appTasks.keys

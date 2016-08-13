@@ -27,10 +27,10 @@ case class MAttribute(typeName: MQName,
 object MAttribute {
   def getAttributes(typePattern: MQName, attributeNamePattern: String = "%") =
     ResultSetAction[MAttribute](
-        _.metaData.getAttributes(typePattern.catalog_?,
-                                 typePattern.schema_?,
-                                 typePattern.name,
-                                 attributeNamePattern)) { r =>
+      _.metaData.getAttributes(typePattern.catalog_?,
+                               typePattern.schema_?,
+                               typePattern.name,
+                               attributeNamePattern)) { r =>
       MAttribute(MQName.from(r),
                  r.<<,
                  r.<<,

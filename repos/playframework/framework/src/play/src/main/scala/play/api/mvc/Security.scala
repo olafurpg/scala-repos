@@ -58,7 +58,7 @@ object Security {
     */
   lazy val username: String =
     Play.privateMaybeApplication.flatMap(
-        _.configuration.getString("session.username")) getOrElse ("username")
+      _.configuration.getString("session.username")) getOrElse ("username")
 
   /**
     * Wraps another action, allowing only authenticated HTTP requests.
@@ -84,8 +84,8 @@ object Security {
     */
   def Authenticated(action: String => EssentialAction): EssentialAction =
     Authenticated(
-        req => req.session.get(username),
-        _ => Unauthorized(views.html.defaultpages.unauthorized()))(action)
+      req => req.session.get(username),
+      _ => Unauthorized(views.html.defaultpages.unauthorized()))(action)
 
   /**
     * An authenticated request
@@ -131,10 +131,10 @@ object Security {
     * @param userinfo The function that looks up the user info.
     * @param onUnauthorized The function to get the result for when no authenticated user can be found.
     */
-  class AuthenticatedBuilder[U](
-      userinfo: RequestHeader => Option[U],
-      onUnauthorized: RequestHeader => Result = _ =>
-          Unauthorized(views.html.defaultpages.unauthorized()))
+  class AuthenticatedBuilder[U](userinfo: RequestHeader => Option[U],
+                                onUnauthorized: RequestHeader => Result = _ =>
+                                  Unauthorized(
+                                    views.html.defaultpages.unauthorized()))
       extends ActionBuilder[({ type R[A] = AuthenticatedRequest[A, U] })#R] {
 
     def invokeBlock[A](request: Request[A],
@@ -198,7 +198,7 @@ object Security {
       */
     def apply[U](userinfo: RequestHeader => Option[U],
                  onUnauthorized: RequestHeader => Result = _ =>
-                     Unauthorized(views.html.defaultpages.unauthorized()))
+                   Unauthorized(views.html.defaultpages.unauthorized()))
       : AuthenticatedBuilder[U] =
       new AuthenticatedBuilder(userinfo, onUnauthorized)
 

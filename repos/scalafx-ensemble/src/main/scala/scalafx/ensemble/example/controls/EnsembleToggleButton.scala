@@ -44,11 +44,10 @@ class EnsembleToggleButton extends EnsembleExample {
   // Radio Button Toggle Group
   val tog = new ToggleGroup {
     selectedToggle.onChange(
-        (_, oldValue, newValue) =>
-          {
-            toggleLabel.text = "You selected : " +
+      (_, oldValue, newValue) => {
+        toggleLabel.text = "You selected : " +
             newValue.asInstanceOf[JfxToggleBtn].getText
-        }
+      }
     )
   }
 
@@ -59,23 +58,23 @@ class EnsembleToggleButton extends EnsembleExample {
       spacing = 10
       padding = Insets(20)
       children = List(
-          new HBox {
-            spacing = 10
-            children = List(new ToggleButton {
-              minWidth = 100
-              text = "Hi"
-              toggleGroup = tog
-            }, new ToggleButton {
-              minWidth = 100
-              text = "ScalaFX"
-              toggleGroup = tog
-            }, new ToggleButton {
-              minWidth = 100
-              text = "Ensemble"
-              toggleGroup = tog
-            })
-          },
-          toggleLabel
+        new HBox {
+          spacing = 10
+          children = List(new ToggleButton {
+            minWidth = 100
+            text = "Hi"
+            toggleGroup = tog
+          }, new ToggleButton {
+            minWidth = 100
+            text = "ScalaFX"
+            toggleGroup = tog
+          }, new ToggleButton {
+            minWidth = 100
+            text = "Ensemble"
+            toggleGroup = tog
+          })
+        },
+        toggleLabel
       )
     }
   }

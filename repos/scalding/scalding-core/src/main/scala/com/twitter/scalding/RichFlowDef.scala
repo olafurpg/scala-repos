@@ -82,8 +82,8 @@ class RichFlowDef(val fd: FlowDef) {
       FlowStateMap.mutate(fd) { current =>
         // overwrite the items from o with current
         (current.copy(
-             sourceMap = oFS.sourceMap ++ current.sourceMap,
-             flowConfigUpdates = oFS.flowConfigUpdates ++ current.flowConfigUpdates),
+           sourceMap = oFS.sourceMap ++ current.sourceMap,
+           flowConfigUpdates = oFS.flowConfigUpdates ++ current.flowConfigUpdates),
          ())
       }
     }
@@ -147,8 +147,8 @@ class RichFlowDef(val fd: FlowDef) {
       }
       FlowStateMap.mutate(newFd) { oldFS =>
         (oldFS.copy(
-             sourceMap = subFlowState,
-             flowConfigUpdates = thisFS.flowConfigUpdates ++ oldFS.flowConfigUpdates),
+           sourceMap = subFlowState,
+           flowConfigUpdates = thisFS.flowConfigUpdates ++ oldFS.flowConfigUpdates),
          ())
       }
     }

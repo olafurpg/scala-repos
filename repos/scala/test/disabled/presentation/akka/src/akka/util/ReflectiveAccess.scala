@@ -32,18 +32,18 @@ object ReflectiveAccess {
     * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
     */
   object Remote {
-    val TRANSPORT = Config.config.getString(
-        "akka.remote.layer", "akka.remote.netty.NettyRemoteSupport")
+    val TRANSPORT = Config.config
+      .getString("akka.remote.layer", "akka.remote.netty.NettyRemoteSupport")
 
     private[akka] val configDefaultAddress = new InetSocketAddress(
-        Config.config.getString("akka.remote.server.hostname", "localhost"),
-        Config.config.getInt("akka.remote.server.port", 2552))
+      Config.config.getString("akka.remote.server.hostname", "localhost"),
+      Config.config.getInt("akka.remote.server.port", 2552))
 
     lazy val isEnabled = remoteSupportClass.isDefined
 
     def ensureEnabled = if (!isEnabled) {
       val e = new ModuleNotAvailableException(
-          "Can't load the remoting module, make sure that akka-remote.jar is on the classpath")
+        "Can't load the remoting module, make sure that akka-remote.jar is on the classpath")
       EventHandler.debug(this, e.toString)
       throw e
     }
@@ -56,14 +56,15 @@ object ReflectiveAccess {
 
     protected[akka] val defaultRemoteSupport: Option[() => RemoteSupport] =
       remoteSupportClass map { remoteClass => () =>
-        createInstance[RemoteSupport](
-            remoteClass, Array[Class[_]](), Array[AnyRef]()) match {
+        createInstance[RemoteSupport](remoteClass,
+                                      Array[Class[_]](),
+                                      Array[AnyRef]()) match {
           case Right(value) => value
           case Left(exception) =>
             val e = new ModuleNotAvailableException(
-                "Can't instantiate [%s] - make sure that akka-remote.jar is on the classpath"
-                  .format(remoteClass.getName),
-                exception)
+              "Can't instantiate [%s] - make sure that akka-remote.jar is on the classpath"
+                .format(remoteClass.getName),
+              exception)
             EventHandler.debug(this, e.toString)
             throw e
         }
@@ -90,7 +91,7 @@ object ReflectiveAccess {
     def ensureEnabled =
       if (!isTypedActorEnabled)
         throw new ModuleNotAvailableException(
-            "Can't load the typed actor module, make sure that akka-typed-actor.jar is on the classpath")
+          "Can't load the typed actor module, make sure that akka-typed-actor.jar is on the classpath")
 
     val typedActorObjectInstance: Option[TypedActorObject] =
       getObjectFor[TypedActorObject]("akka.actor.TypedActor$") match {
@@ -100,8 +101,8 @@ object ReflectiveAccess {
           None
       }
 
-    def resolveFutureIfMessageIsJoinPoint(
-        message: Any, future: Future[_]): Boolean = {
+    def resolveFutureIfMessageIsJoinPoint(message: Any,
+                                          future: Future[_]): Boolean = {
       ensureEnabled
       if (typedActorObjectInstance.get.isJoinPointAndOneWay(message)) {
         future
@@ -135,7 +136,7 @@ object ReflectiveAccess {
       }
 
     val serializerClass: Option[Class[_]] = getClassFor(
-        "akka.serialization.Serializer") match {
+      "akka.serialization.Serializer") match {
       case Right(value) => Some(value)
       case Left(exception) =>
         EventHandler.debug(this, exception.toString)
@@ -145,7 +146,7 @@ object ReflectiveAccess {
     def ensureEnabled =
       if (!isEnabled)
         throw new ModuleNotAvailableException(
-            "Feature is only available in Akka Cloud")
+          "Feature is only available in Akka Cloud")
   }
 
   val noParams = Array[Class[_]]()
@@ -188,7 +189,8 @@ object ReflectiveAccess {
 
   //Obtains a reference to fqn.MODULE$
   def getObjectFor[T](
-      fqn: String, classloader: ClassLoader = loader): Either[Exception, T] =
+      fqn: String,
+      classloader: ClassLoader = loader): Either[Exception, T] =
     try {
       getClassFor(fqn) match {
         case Right(value) =>
@@ -223,9 +225,9 @@ object ReflectiveAccess {
         // Second option is to use the ContextClassLoader
         val second = try {
           Right(
-              Thread.currentThread.getContextClassLoader
-                .loadClass(fqn)
-                .asInstanceOf[Class[T]])
+            Thread.currentThread.getContextClassLoader
+              .loadClass(fqn)
+              .asInstanceOf[Class[T]])
         } catch {
           case c: ClassNotFoundException => Left(c)
         }

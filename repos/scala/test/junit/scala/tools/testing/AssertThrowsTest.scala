@@ -39,6 +39,6 @@ class AssertThrowsTest {
       case e: AssertionError => return
     }
     fail(
-        "assertThrows should error if the tested expression does not throw anything")
+      "assertThrows should error if the tested expression does not throw anything")
   }
 }

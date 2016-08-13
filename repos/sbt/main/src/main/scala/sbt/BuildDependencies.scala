@@ -12,20 +12,20 @@ final class BuildDependencies private (
   def classpathTransitiveRefs(ref: ProjectRef): Seq[ProjectRef] =
     classpathTransitive(ref)
 
-  lazy val classpathTransitive: DependencyMap[ProjectRef] = transitive(
-      classpath, getID)
-  lazy val aggregateTransitive: DependencyMap[ProjectRef] = transitive(
-      aggregate, idFun[ProjectRef])
+  lazy val classpathTransitive: DependencyMap[ProjectRef] =
+    transitive(classpath, getID)
+  lazy val aggregateTransitive: DependencyMap[ProjectRef] =
+    transitive(aggregate, idFun[ProjectRef])
 
-  def addClasspath(
-      ref: ProjectRef, deps: ClasspathDep[ProjectRef]*): BuildDependencies =
+  def addClasspath(ref: ProjectRef,
+                   deps: ClasspathDep[ProjectRef]*): BuildDependencies =
     new BuildDependencies(
-        classpath.updated(ref, deps ++ classpath.getOrElse(ref, Nil)),
-        aggregate)
+      classpath.updated(ref, deps ++ classpath.getOrElse(ref, Nil)),
+      aggregate)
   def addAggregate(ref: ProjectRef, deps: ProjectRef*): BuildDependencies =
     new BuildDependencies(
-        classpath,
-        aggregate.updated(ref, deps ++ aggregate.getOrElse(ref, Nil)))
+      classpath,
+      aggregate.updated(ref, deps ++ aggregate.getOrElse(ref, Nil)))
 }
 object BuildDependencies {
   def apply(classpath: DependencyMap[ClasspathDep[ProjectRef]],

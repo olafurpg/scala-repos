@@ -51,7 +51,8 @@ private[spark] class EventLoggingListener(appId: String,
                                           logBaseDir: URI,
                                           sparkConf: SparkConf,
                                           hadoopConf: Configuration)
-    extends SparkListener with Logging {
+    extends SparkListener
+    with Logging {
 
   import EventLoggingListener._
 
@@ -92,8 +93,8 @@ private[spark] class EventLoggingListener(appId: String,
   private[scheduler] val loggedEvents = new ArrayBuffer[JValue]
 
   // Visible for tests only.
-  private[scheduler] val logPath = getLogPath(
-      logBaseDir, appId, appAttemptId, compressionCodecName)
+  private[scheduler] val logPath =
+    getLogPath(logBaseDir, appId, appAttemptId, compressionCodecName)
 
   /**
     * Creates the log file in the configured log directory.
@@ -101,7 +102,7 @@ private[spark] class EventLoggingListener(appId: String,
   def start() {
     if (!fileSystem.getFileStatus(new Path(logBaseDir)).isDirectory) {
       throw new IllegalArgumentException(
-          s"Log directory $logBaseDir does not exist.")
+        s"Log directory $logBaseDir does not exist.")
     }
 
     val workingPath = logPath + IN_PROGRESS
@@ -146,8 +147,8 @@ private[spark] class EventLoggingListener(appId: String,
   }
 
   /** Log the event as JSON. */
-  private def logEvent(
-      event: SparkListenerEvent, flushLogger: Boolean = false) {
+  private def logEvent(event: SparkListenerEvent,
+                       flushLogger: Boolean = false) {
     val eventJson = JsonProtocol.sparkEventToJson(event)
     // scalastyle:off println
     writer.foreach(_.println(compact(render(eventJson))))
@@ -245,7 +246,7 @@ private[spark] class EventLoggingListener(appId: String,
         }
       } else {
         throw new IOException(
-            "Target log file already exists (%s)".format(logPath))
+          "Target log file already exists (%s)".format(logPath))
       }
     }
     fileSystem.rename(new Path(logPath + IN_PROGRESS), target)
@@ -265,7 +266,7 @@ private[spark] object EventLoggingListener extends Logging {
   val DEFAULT_LOG_DIR = "/tmp/spark-events"
 
   private val LOG_FILE_PERMISSIONS = new FsPermission(
-      Integer.parseInt("770", 8).toShort)
+    Integer.parseInt("770", 8).toShort)
 
   // A cache for compression codecs to avoid creating the same codec many times
   private val codecMap = new mutable.HashMap[String, CompressionCodec]
@@ -337,8 +338,8 @@ private[spark] object EventLoggingListener extends Logging {
     val logName = log.getName.stripSuffix(IN_PROGRESS)
     val codecName: Option[String] = logName.split("\\.").tail.lastOption
     val codec = codecName.map { c =>
-      codecMap.getOrElseUpdate(
-          c, CompressionCodec.createCodec(new SparkConf, c))
+      codecMap.getOrElseUpdate(c,
+                               CompressionCodec.createCodec(new SparkConf, c))
     }
 
     try {

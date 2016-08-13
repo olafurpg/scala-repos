@@ -69,8 +69,8 @@ class EnsembleBorderPane extends EnsembleExample {
     val centerLabel = Label("We're in the center area.")
     val imageButton = new ImageView {
       image = new Image(
-          this.getClass
-            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+        this.getClass
+          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
     }
     AnchorPane.setTopAnchor(centerLabel, 10.0)
     AnchorPane.setTopAnchor(imageButton, 40.0)

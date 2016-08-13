@@ -43,7 +43,7 @@ class StringLiteralProcessor extends CopyPastePreProcessor {
       val elementType =
         if (e.getNode == null) null else e.getNode.getElementType
       if ((elementType == ScalaTokenTypes.tSTRING ||
-              elementType == ScalaTokenTypes.tCHAR) && rawText != null &&
+          elementType == ScalaTokenTypes.tCHAR) && rawText != null &&
           rawText.rawText != null) {
         rawText.rawText
       } else if (elementType == ScalaTokenTypes.tSTRING) {

@@ -111,8 +111,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * e.g. the timeout for the future returned by the call to '!!' and '!!!'.
     */
   @deprecated(
-      "Will be replaced by implicit-scoped timeout on all methods that needs it, will default to timeout specified in config",
-      "1.1")
+    "Will be replaced by implicit-scoped timeout on all methods that needs it, will default to timeout specified in config",
+    "1.1")
   @BeanProperty
   @volatile
   var timeout: Long = Actor.TIMEOUT
@@ -260,8 +260,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Is the actor able to handle the message passed in as arguments?
     */
   @deprecated(
-      "Will be removed without replacement, it's just not reliable in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, it's just not reliable in the face of `become` and `unbecome`",
+    "1.1")
   def isDefinedAt(message: Any): Boolean = actor.isDefinedAt(message)
 
   /**
@@ -324,13 +324,16 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * If you are sending messages using <code>sendRequestReply</code> then you <b>have to</b> use <code>getContext().reply(..)</code>
     * to send a reply message to the original sender. If not then the sender will block until the timeout expires.
     */
-  def sendRequestReply(
-      message: AnyRef, timeout: Long, sender: ActorRef): AnyRef = {
+  def sendRequestReply(message: AnyRef,
+                       timeout: Long,
+                       sender: ActorRef): AnyRef = {
     !!(message, timeout)(Option(sender))
-      .getOrElse(throw new ActorTimeoutException("Message [" + message +
-              "]\n\tsent to [" + actorClassName + "]\n\tfrom [" +
-              (if (sender ne null) sender.actorClassName else "nowhere") +
-              "]\n\twith timeout [" + timeout + "]\n\ttimed out."))
+      .getOrElse(
+        throw new ActorTimeoutException(
+          "Message [" + message +
+            "]\n\tsent to [" + actorClassName + "]\n\tfrom [" +
+            (if (sender ne null) sender.actorClassName else "nowhere") +
+            "]\n\twith timeout [" + timeout + "]\n\ttimed out."))
       .asInstanceOf[AnyRef]
   }
 
@@ -347,8 +350,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * @see sendRequestReplyFuture(message: AnyRef, sender: ActorRef): Future[_]
     * Uses the Actors default timeout (setTimeout())
     */
-  def sendRequestReplyFuture[T <: AnyRef](
-      message: AnyRef, sender: ActorRef): Future[T] =
+  def sendRequestReplyFuture[T <: AnyRef](message: AnyRef,
+                                          sender: ActorRef): Future[T] =
     sendRequestReplyFuture(message, timeout, sender).asInstanceOf[Future[T]]
 
   /**
@@ -362,8 +365,9 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * If you are sending messages using <code>sendRequestReplyFuture</code> then you <b>have to</b> use <code>getContext().reply(..)</code>
     * to send a reply message to the original sender. If not then the sender will block until the timeout expires.
     */
-  def sendRequestReplyFuture[T <: AnyRef](
-      message: AnyRef, timeout: Long, sender: ActorRef): Future[T] =
+  def sendRequestReplyFuture[T <: AnyRef](message: AnyRef,
+                                          timeout: Long,
+                                          sender: ActorRef): Future[T] =
     !!!(message, timeout)(Option(sender)).asInstanceOf[Future[T]]
 
   /**
@@ -373,7 +377,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   def forward(message: AnyRef, sender: ActorRef): Unit =
     if (sender eq null)
       throw new IllegalArgumentException(
-          "The 'sender' argument to 'forward' can't be null")
+        "The 'sender' argument to 'forward' can't be null")
     else forward(message)(Some(sender))
 
   /**
@@ -398,8 +402,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Returns the class for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def actorClass: Class[_ <: Actor]
 
   /**
@@ -407,16 +411,16 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Returns the class for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def getActorClass(): Class[_ <: Actor] = actorClass
 
   /**
     * Returns the class name for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def actorClassName: String
 
   /**
@@ -424,8 +428,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Returns the class name for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def getActorClassName(): String = actorClassName
 
   /**
@@ -488,8 +492,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * To be invoked from within the actor itself.
     */
   @deprecated(
-      "Will be removed after 1.1, client managed actors will be removed",
-      "1.1")
+    "Will be removed after 1.1, client managed actors will be removed",
+    "1.1")
   def spawnRemote(clazz: Class[_ <: Actor],
                   hostname: String,
                   port: Int,
@@ -501,8 +505,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * To be invoked from within the actor itself.
     */
   @deprecated(
-      "Will be removed after 1.1, use Actor.remote.actorOf instead and then link on success",
-      "1.1")
+    "Will be removed after 1.1, use Actor.remote.actorOf instead and then link on success",
+    "1.1")
   def spawnLink(clazz: Class[_ <: Actor]): ActorRef
 
   /**
@@ -511,8 +515,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * To be invoked from within the actor itself.
     */
   @deprecated(
-      "Will be removed after 1.1, client managed actors will be removed",
-      "1.1")
+    "Will be removed after 1.1, client managed actors will be removed",
+    "1.1")
   def spawnLinkRemote(clazz: Class[_ <: Actor],
                       hostname: String,
                       port: Int,
@@ -580,7 +584,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   protected[akka] def invoke(messageHandle: MessageInvocation): Unit
 
   protected[akka] def postMessageToMailbox(
-      message: Any, senderOption: Option[ActorRef]): Unit
+      message: Any,
+      senderOption: Option[ActorRef]): Unit
 
   protected[akka] def postMessageToMailboxAndCreateFutureResultWithTimeout[T](
       message: Any,
@@ -623,10 +628,11 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
-                                  val homeAddress: Option[InetSocketAddress],
-                                  val clientManaged: Boolean = false)
-    extends ActorRef with ScalaActorRef {
+class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
+                                   val homeAddress: Option[InetSocketAddress],
+                                   val clientManaged: Boolean = false)
+    extends ActorRef
+    with ScalaActorRef {
   protected[akka] val guard = new ReentrantGuard
 
   @volatile
@@ -686,8 +692,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     * Returns the class for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def actorClass: Class[_ <: Actor] =
     actor.getClass.asInstanceOf[Class[_ <: Actor]]
 
@@ -695,8 +701,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     * Returns the class name for the Actor instance that is managed by the ActorRef.
     */
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def actorClassName: String = actorClass.getName
 
   /**
@@ -706,7 +712,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     if (!isBeingRestarted) {
       if (!isRunning) _dispatcher = md
       else
-        throw new ActorInitializationException("Can not swap dispatcher for " +
+        throw new ActorInitializationException(
+          "Can not swap dispatcher for " +
             toString + " after it has been started")
     }
   }
@@ -722,7 +729,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   def start(): ActorRef = guard.withGuard {
     if (isShutdown)
       throw new ActorStartException(
-          "Can't restart an actor that has been shut down with 'stop' or 'exit'")
+        "Can't restart an actor that has been shut down with 'stop' or 'exit'")
     if (!isRunning) {
       dispatcher.attach(this)
 
@@ -734,9 +741,9 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
 
       if (isClientManaged_?)
         Actor.remote.registerClientManagedActor(
-            homeAddress.get.getAddress.getHostAddress,
-            homeAddress.get.getPort,
-            uuid)
+          homeAddress.get.getAddress.getHostAddress,
+          homeAddress.get.getPort,
+          uuid)
 
       checkReceiveTimeout //Schedule the initial Receive timeout
     }
@@ -760,9 +767,9 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
         if (isRemotingEnabled) {
           if (isClientManaged_?)
             Actor.remote.unregisterClientManagedActor(
-                homeAddress.get.getAddress.getHostAddress,
-                homeAddress.get.getPort,
-                uuid)
+              homeAddress.get.getAddress.getHostAddress,
+              homeAddress.get.getPort,
+              uuid)
           Actor.remote.unregister(this)
         }
         setActorSelfFields(actorInstance.get, null)
@@ -787,7 +794,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       return // we already supervise this guy
     else if (hasSupervisorAlready)
       throw new IllegalActorStateException(
-          "Actor can only have one supervisor [" + actorRef +
+        "Actor can only have one supervisor [" + actorRef +
           "], e.g. link(actor) fails")
     else {
       _linkedActors.put(actorRef.uuid, actorRef)
@@ -803,7 +810,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   def unlink(actorRef: ActorRef) = guard.withGuard {
     if (_linkedActors.remove(actorRef.uuid) eq null)
       throw new IllegalActorStateException(
-          "Actor [" + actorRef + "] is not a linked actor, can't unlink")
+        "Actor [" + actorRef + "] is not a linked actor, can't unlink")
 
     actorRef.supervisor = None
   }
@@ -890,7 +897,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     _supervisor = sup
 
   protected[akka] def postMessageToMailbox(
-      message: Any, senderOption: Option[ActorRef]): Unit =
+      message: Any,
+      senderOption: Option[ActorRef]): Unit =
     if (isClientManaged_?) {
       Actor.remote.send[Any](message,
                              senderOption,
@@ -903,8 +911,10 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                              ActorType.ScalaActor,
                              None)
     } else
-      dispatcher dispatchMessage new MessageInvocation(
-          this, message, senderOption, None)
+      dispatcher dispatchMessage new MessageInvocation(this,
+                                                       message,
+                                                       senderOption,
+                                                       None)
 
   protected[akka] def postMessageToMailboxAndCreateFutureResultWithTimeout[T](
       message: Any,
@@ -925,16 +935,16 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       if (future.isDefined) future.get
       else
         throw new IllegalActorStateException(
-            "Expected a future from remote call to actor " + toString)
+          "Expected a future from remote call to actor " + toString)
     } else {
       val future =
         if (senderFuture.isDefined) senderFuture
         else Some(new DefaultCompletableFuture[T](timeout))
       dispatcher dispatchMessage new MessageInvocation(
-          this,
-          message,
-          senderOption,
-          future.asInstanceOf[Some[CompletableFuture[Any]]])
+        this,
+        message,
+        senderOption,
+        future.asInstanceOf[Some[CompletableFuture[Any]]])
       future.get
     }
   }
@@ -987,7 +997,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   }
 
   private def requestRestartPermission(
-      maxNrOfRetries: Option[Int], withinTimeRange: Option[Int]): Boolean = {
+      maxNrOfRetries: Option[Int],
+      withinTimeRange: Option[Int]): Boolean = {
     val denied =
       if (maxNrOfRetries.isEmpty && withinTimeRange.isEmpty) {
         //Immortal
@@ -1048,8 +1059,11 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     def tooManyRestarts() {
       _supervisor.foreach { sup =>
         // can supervisor handle the notification?
-        val notification = MaximumNumberOfRestartsWithinTimeRangeReached(
-            this, maxNrOfRetries, withinTimeRange, reason)
+        val notification =
+          MaximumNumberOfRestartsWithinTimeRangeReached(this,
+                                                        maxNrOfRetries,
+                                                        withinTimeRange,
+                                                        reason)
         if (sup.isDefinedAt(notification))
           notifySupervisorWithMessage(notification)
       }
@@ -1075,9 +1089,9 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                 } catch {
                   case e =>
                     EventHandler.error(
-                        e,
-                        this,
-                        "Exception in restart of Actor [%s]".format(toString))
+                      e,
+                      this,
+                      "Exception in restart of Actor [%s]".format(toString))
                     false // an error or exception here should trigger a retry
                 } finally {
                   currentMessage = null
@@ -1137,7 +1151,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       val a = actorFactory()
       if (a eq null)
         throw new ActorInitializationException(
-            "Actor instance passed to ActorRef can not be 'null'")
+          "Actor instance passed to ActorRef can not be 'null'")
       a
     } finally {
       Actor.actorRefInCreation.set(None)
@@ -1191,8 +1205,9 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   private def setActorSelfFields(actor: Actor, value: ActorRef) {
 
     @tailrec
-    def lookupAndSetSelfFields(
-        clazz: Class[_], actor: Actor, value: ActorRef): Boolean = {
+    def lookupAndSetSelfFields(clazz: Class[_],
+                               actor: Actor,
+                               value: ActorRef): Boolean = {
       val success = try {
         val selfField = clazz.getDeclaredField("self")
         val someSelfField = clazz.getDeclaredField("someSelf")
@@ -1209,7 +1224,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       else {
         val parent = clazz.getSuperclass
         if (parent eq null)
-          throw new IllegalActorStateException(toString +
+          throw new IllegalActorStateException(
+            toString +
               " is not an Actor since it have not mixed in the 'Actor' trait")
         lookupAndSetSelfFields(parent, actor, value)
       }
@@ -1228,8 +1244,10 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     if (receiveTimeout.isDefined && dispatcher.mailboxSize(this) <= 0) {
       //Only reschedule if desired and there are currently no more messages to be processed
       _futureTimeout = Some(
-          Scheduler.scheduleOnce(
-              this, ReceiveTimeout, receiveTimeout.get, TimeUnit.MILLISECONDS))
+        Scheduler.scheduleOnce(this,
+                               ReceiveTimeout,
+                               receiveTimeout.get,
+                               TimeUnit.MILLISECONDS))
     }
   }
 
@@ -1256,7 +1274,7 @@ object RemoteActorSystemMessage {
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-private[akka] case class RemoteActorRef private[akka](
+private[akka] case class RemoteActorRef private[akka] (
     classOrServiceName: String,
     val actorClassName: String,
     val hostname: String,
@@ -1264,7 +1282,8 @@ private[akka] case class RemoteActorRef private[akka](
     _timeout: Long,
     loader: Option[ClassLoader],
     val actorType: ActorType = ActorType.ScalaActor)
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef
+    with ScalaActorRef {
 
   ensureRemotingEnabled
 
@@ -1278,8 +1297,8 @@ private[akka] case class RemoteActorRef private[akka](
 
   start
 
-  def postMessageToMailbox(
-      message: Any, senderOption: Option[ActorRef]): Unit =
+  def postMessageToMailbox(message: Any,
+                           senderOption: Option[ActorRef]): Unit =
     Actor.remote.send[Any](message,
                            senderOption,
                            None,
@@ -1309,7 +1328,7 @@ private[akka] case class RemoteActorRef private[akka](
     if (future.isDefined) future.get
     else
       throw new IllegalActorStateException(
-          "Expected a future from remote call to actor " + toString)
+        "Expected a future from remote call to actor " + toString)
   }
 
   def start: ActorRef = synchronized {
@@ -1328,8 +1347,8 @@ private[akka] case class RemoteActorRef private[akka](
 
   // ==== NOT SUPPORTED ====
   @deprecated(
-      "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
-      "1.1")
+    "Will be removed without replacement, doesn't make any sense to have in the face of `become` and `unbecome`",
+    "1.1")
   def actorClass: Class[_ <: Actor] = unsupported
   def dispatcher_=(md: MessageDispatcher): Unit = unsupported
   def dispatcher: MessageDispatcher = unsupported
@@ -1469,7 +1488,7 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     if (isRunning) postMessageToMailbox(message, sender)
     else
       throw new ActorInitializationException(
-          "Actor has not been started, you need to invoke 'actor.start()' before using it")
+        "Actor has not been started, you need to invoke 'actor.start()' before using it")
   }
 
   /**
@@ -1488,7 +1507,10 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
       implicit sender: Option[ActorRef] = None): Option[Any] = {
     if (isRunning) {
       val future = postMessageToMailboxAndCreateFutureResultWithTimeout[Any](
-          message, timeout, sender, None)
+        message,
+        timeout,
+        sender,
+        None)
       val isMessageJoinPoint =
         if (isTypedActorEnabled)
           TypedActorModule.resolveFutureIfMessageIsJoinPoint(message, future)
@@ -1505,7 +1527,7 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
       future.resultOrException
     } else
       throw new ActorInitializationException(
-          "Actor has not been started, you need to invoke 'actor.start()' before using it")
+        "Actor has not been started, you need to invoke 'actor.start()' before using it")
   }
 
   /**
@@ -1520,11 +1542,13 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   def !!![T](message: Any, timeout: Long = this.timeout)(
       implicit sender: Option[ActorRef] = None): Future[T] = {
     if (isRunning)
-      postMessageToMailboxAndCreateFutureResultWithTimeout[T](
-          message, timeout, sender, None)
+      postMessageToMailboxAndCreateFutureResultWithTimeout[T](message,
+                                                              timeout,
+                                                              sender,
+                                                              None)
     else
       throw new ActorInitializationException(
-          "Actor has not been started, you need to invoke 'actor.start()' before using it")
+        "Actor has not been started, you need to invoke 'actor.start()' before using it")
   }
 
   /**
@@ -1536,11 +1560,14 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     if (isRunning) {
       if (sender.get.senderFuture.isDefined)
         postMessageToMailboxAndCreateFutureResultWithTimeout(
-            message, timeout, sender.get.sender, sender.get.senderFuture)
+          message,
+          timeout,
+          sender.get.sender,
+          sender.get.senderFuture)
       else postMessageToMailbox(message, sender.get.sender)
     } else
       throw new ActorInitializationException(
-          "Actor has not been started, you need to invoke 'actor.start()' before using it")
+        "Actor has not been started, you need to invoke 'actor.start()' before using it")
   }
 
   /**
@@ -1552,7 +1579,7 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   def reply(message: Any) =
     if (!reply_?(message))
       throw new IllegalActorStateException(
-          "\n\tNo sender in scope, can't reply. " + "\n\tYou have probably: " +
+        "\n\tNo sender in scope, can't reply. " + "\n\tYou have probably: " +
           "\n\t\t1. Sent a message to an Actor from an instance that is NOT an Actor." +
           "\n\t\t2. Invoked a method on an TypedActor from an instance NOT an TypedActor." +
           "\n\tElse you might want to use 'reply_?' which returns Boolean(true) if success and Boolean(false) if no sender in scope")
@@ -1577,14 +1604,15 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   /**
     * Atomically create (from actor class) and start an actor.
     */
-  def spawn[T <: Actor : ClassTag]: ActorRef =
+  def spawn[T <: Actor: ClassTag]: ActorRef =
     spawn(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]])
 
   /**
     * Atomically create (from actor class), start and make an actor remote.
     */
-  def spawnRemote[T <: Actor : ClassTag](
-      hostname: String, port: Int, timeout: Long): ActorRef = {
+  def spawnRemote[T <: Actor: ClassTag](hostname: String,
+                                        port: Int,
+                                        timeout: Long): ActorRef = {
     ensureRemotingEnabled
     spawnRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
                 hostname,
@@ -1595,14 +1623,15 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   /**
     * Atomically create (from actor class), start and link an actor.
     */
-  def spawnLink[T <: Actor : ClassTag]: ActorRef =
+  def spawnLink[T <: Actor: ClassTag]: ActorRef =
     spawnLink(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]])
 
   /**
     * Atomically create (from actor class), start, link and make an actor remote.
     */
-  def spawnLinkRemote[T <: Actor : ClassTag](
-      hostname: String, port: Int, timeout: Long): ActorRef = {
+  def spawnLinkRemote[T <: Actor: ClassTag](hostname: String,
+                                            port: Int,
+                                            timeout: Long): ActorRef = {
     ensureRemotingEnabled
     spawnLinkRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
                     hostname,

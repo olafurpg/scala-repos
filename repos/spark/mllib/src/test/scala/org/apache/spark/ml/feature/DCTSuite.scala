@@ -31,7 +31,8 @@ import org.apache.spark.sql.Row
 case class DCTTestData(vec: Vector, wantedVec: Vector)
 
 class DCTSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("forward transform of discrete cosine matches jTransforms result") {
@@ -68,9 +69,9 @@ class DCTSuite
     val expectedResult = Vectors.dense(expectedResultBuffer)
 
     val dataset = sqlContext.createDataFrame(
-        Seq(
-            DCTTestData(data, expectedResult)
-        ))
+      Seq(
+        DCTTestData(data, expectedResult)
+      ))
 
     val transformer = new DCT()
       .setInputCol("vec")

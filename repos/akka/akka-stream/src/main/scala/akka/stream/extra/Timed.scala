@@ -133,15 +133,15 @@ object Timed extends TimedOps with TimedIntervalBetweenOps {
     }
   }
 
-  final class StopTimed[T](
-      timedContext: TimedFlowContext, _onComplete: FiniteDuration ⇒ Unit)
+  final class StopTimed[T](timedContext: TimedFlowContext,
+                           _onComplete: FiniteDuration ⇒ Unit)
       extends PushStage[T, T] {
 
     override def onPush(elem: T, ctx: Context[T]): SyncDirective =
       ctx.push(elem)
 
-    override def onUpstreamFailure(
-        cause: Throwable, ctx: Context[T]): TerminationDirective = {
+    override def onUpstreamFailure(cause: Throwable,
+                                   ctx: Context[T]): TerminationDirective = {
       stopTime()
       ctx.fail(cause)
     }
@@ -155,8 +155,8 @@ object Timed extends TimedOps with TimedIntervalBetweenOps {
     }
   }
 
-  final class TimedInterval[T](
-      matching: T ⇒ Boolean, onInterval: FiniteDuration ⇒ Unit)
+  final class TimedInterval[T](matching: T ⇒ Boolean,
+                               onInterval: FiniteDuration ⇒ Unit)
       extends PushStage[T, T] {
     private var prevNanos = 0L
     private var matched = 0L

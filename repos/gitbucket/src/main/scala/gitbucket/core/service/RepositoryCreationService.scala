@@ -11,7 +11,11 @@ import org.eclipse.jgit.lib.{FileMode, Constants}
 import profile.simple._
 
 trait RepositoryCreationService {
-  self: AccountService with RepositoryService with LabelsService with WikiService with ActivityService =>
+  self: AccountService
+    with RepositoryService
+    with LabelsService
+    with WikiService
+    with ActivityService =>
 
   def createRepository(loginAccount: Account,
                        owner: String,
@@ -52,11 +56,10 @@ trait RepositoryCreationService {
           }
 
         builder.add(
-            JGitUtil.createDirCacheEntry(
-                "README.md",
-                FileMode.REGULAR_FILE,
-                inserter.insert(Constants.OBJ_BLOB,
-                                content.getBytes("UTF-8"))))
+          JGitUtil.createDirCacheEntry(
+            "README.md",
+            FileMode.REGULAR_FILE,
+            inserter.insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
         builder.finish()
 
         JGitUtil.createNewCommit(git,

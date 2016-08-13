@@ -38,7 +38,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 @Since("0.8.0")
 class KMeansModel @Since("1.1.0")(
     @Since("1.0.0") val clusterCenters: Array[Vector])
-    extends Saveable with Serializable with PMMLExportable {
+    extends Saveable
+    with Serializable
+    with PMMLExportable {
 
   /**
     * A Java-friendly constructor that takes an Iterable of Vectors.
@@ -67,11 +69,8 @@ class KMeansModel @Since("1.1.0")(
   def predict(points: RDD[Vector]): RDD[Int] = {
     val centersWithNorm = clusterCentersWithNorm
     val bcCentersWithNorm = points.context.broadcast(centersWithNorm)
-    points.map(
-        p =>
-          KMeans
-            .findClosest(bcCentersWithNorm.value, new VectorWithNorm(p))
-            ._1)
+    points.map(p =>
+      KMeans.findClosest(bcCentersWithNorm.value, new VectorWithNorm(p))._1)
   }
 
   /**
@@ -91,7 +90,7 @@ class KMeansModel @Since("1.1.0")(
     val bcCentersWithNorm = data.context.broadcast(centersWithNorm)
     data
       .map(p =>
-            KMeans.pointCost(bcCentersWithNorm.value, new VectorWithNorm(p)))
+        KMeans.pointCost(bcCentersWithNorm.value, new VectorWithNorm(p)))
       .sum()
   }
 
@@ -132,8 +131,10 @@ object KMeansModel extends Loader[KMeansModel] {
     def save(sc: SparkContext, model: KMeansModel, path: String): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
+      val metadata = compact(
+        render(
+          ("class" -> thisClassName) ~
+            ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
       val dataRDD = sc

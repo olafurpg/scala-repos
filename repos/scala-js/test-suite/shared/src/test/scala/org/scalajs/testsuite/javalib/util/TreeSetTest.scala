@@ -52,7 +52,9 @@ class TreeSetWithNullTest extends TreeSetTest(new TreeSetWithNullFactory) {
 }
 
 abstract class TreeSetTest(val factory: TreeSetFactory)
-    extends AbstractSetTest with SortedSetTest with NavigableSetTest {
+    extends AbstractSetTest
+    with SortedSetTest
+    with NavigableSetTest {
 
   @Test def should_store_and_remove_ordered_integers(): Unit = {
     val ts = factory.empty[Int]
@@ -205,7 +207,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     assertEquals(6, ts.size())
   }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test
+  def should_check_contained_values_even_in_double_corner_cases(): Unit = {
     val ts = factory.empty[Double]
 
     assertTrue(ts.add(11111.0))
@@ -257,7 +260,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     }
   }
 
-  @Test def should_not_put_a_whole_Collection_with_null_elements_into(): Unit = {
+  @Test
+  def should_not_put_a_whole_Collection_with_null_elements_into(): Unit = {
     val l = List[String]("ONE", "TWO", (null: String))
     val ts1 = factory.empty[String]
 
@@ -284,7 +288,8 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     expectThrows(classOf[ClassCastException], ts1.add(new TestObj(111)))
   }
 
-  @Test def should_throw_exceptions_on_access_outside_bound_on_views(): Unit = {
+  @Test
+  def should_throw_exceptions_on_access_outside_bound_on_views(): Unit = {
     assumeTrue("Needs compliant as instanceOf.", hasCompliantAsInstanceOfs)
 
     val l = asJavaCollection(Set(2, 3, 6))
@@ -344,11 +349,13 @@ object TreeSetFactory extends TreeSetFactory {
 }
 
 class TreeSetFactory
-    extends AbstractSetFactory with NavigableSetFactory with SortedSetFactory {
+    extends AbstractSetFactory
+    with NavigableSetFactory
+    with SortedSetFactory {
   def implementationName: String =
     "java.util.TreeSet"
 
-  def empty[E : ClassTag]: ju.TreeSet[E] =
+  def empty[E: ClassTag]: ju.TreeSet[E] =
     new TreeSet[E]
 
   def empty[E](cmp: ju.Comparator[E]): ju.TreeSet[E] =
@@ -378,7 +385,7 @@ class TreeSetWithNullFactory extends TreeSetFactory {
       }
   }
 
-  override def empty[E : ClassTag]: ju.TreeSet[E] =
+  override def empty[E: ClassTag]: ju.TreeSet[E] =
     new TreeSet[E](EvenNullComp[E]())
 
   override def allowsNullElement: Boolean = true

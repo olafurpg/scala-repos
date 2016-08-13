@@ -175,9 +175,8 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     new Ctx(s => s.withFilter(_ => true))
     new Ctx(s => s.take(2))
     new Ctx(s => s.takeWhile(_ => true))
-    new Ctx(
-        s =>
-          s.scanLeft(Future.Done) { (_, _) =>
+    new Ctx(s =>
+      s.scanLeft(Future.Done) { (_, _) =>
         Future.Done
     })
     new Ctx(s => s ++ s)
@@ -485,7 +484,7 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("mapConcurrent preserves items") {
     forAll(Arbitrary.arbitrary[List[Int]], Gen.choose(1, 10)) { (xs, conc) =>
       assert(
-          toSeq(AsyncStream.fromSeq(xs).mapConcurrent(conc)(Future.value)).sorted == xs.sorted)
+        toSeq(AsyncStream.fromSeq(xs).mapConcurrent(conc)(Future.value)).sorted == xs.sorted)
     }
   }
 
@@ -575,11 +574,11 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   test(
-      "mapConcurrent makes progress, even with blocking streams and blocking work") {
+    "mapConcurrent makes progress, even with blocking streams and blocking work") {
     val gen = Gen.zip(
-        Gen.choose(0, 10).label("numActions"),
-        Gen.choose(0, 10).flatMap(Gen.listOfN(_, Arbitrary.arbitrary[Int])),
-        Gen.choose(1, 11).label("concurrency")
+      Gen.choose(0, 10).label("numActions"),
+      Gen.choose(0, 10).flatMap(Gen.listOfN(_, Arbitrary.arbitrary[Int])),
+      Gen.choose(1, 11).label("concurrency")
     )
 
     forAll(gen) {

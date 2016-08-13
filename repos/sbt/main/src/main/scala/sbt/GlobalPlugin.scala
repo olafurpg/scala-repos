@@ -1,6 +1,13 @@
 package sbt
 
-import sbt.librarymanagement.{Configuration, Configurations, ModuleID, Resolver, SbtArtifacts, UpdateReport}
+import sbt.librarymanagement.{
+  Configuration,
+  Configurations,
+  ModuleID,
+  Resolver,
+  SbtArtifacts,
+  UpdateReport
+}
 import sbt.internal.util.Attributed
 
 import Load.{BuildStructure => _, _}
@@ -18,18 +25,19 @@ object GlobalPlugin {
   //  static here meaning that the relevant tasks for the global plugin have already been evaluated
   def inject(gp: GlobalPluginData): Seq[Setting[_]] =
     Seq[Setting[_]](
-        projectDescriptors ~= { _ ++ gp.descriptors },
-        projectDependencies ++= gp.projectID +: gp.dependencies,
-        resolvers <<= resolvers { rs =>
-          (rs ++ gp.resolvers).distinct
-        },
-        globalPluginUpdate := gp.updateReport,
-        // TODO: these shouldn't be required (but are): the project* settings above should take care of this
-        injectInternalClasspath(Runtime, gp.internalClasspath),
-        injectInternalClasspath(Compile, gp.internalClasspath)
+      projectDescriptors ~= { _ ++ gp.descriptors },
+      projectDependencies ++= gp.projectID +: gp.dependencies,
+      resolvers <<= resolvers { rs =>
+        (rs ++ gp.resolvers).distinct
+      },
+      globalPluginUpdate := gp.updateReport,
+      // TODO: these shouldn't be required (but are): the project* settings above should take care of this
+      injectInternalClasspath(Runtime, gp.internalClasspath),
+      injectInternalClasspath(Compile, gp.internalClasspath)
     )
   private[this] def injectInternalClasspath(
-      config: Configuration, cp: Seq[Attributed[File]]): Setting[_] =
+      config: Configuration,
+      cp: Seq[Attributed[File]]): Setting[_] =
     internalDependencyClasspath in config ~= { prev =>
       (prev ++ cp).distinct
     }
@@ -38,23 +46,24 @@ object GlobalPlugin {
             s: State,
             config: LoadBuildConfiguration): (BuildStructure, State) = {
     val newInject = config.injectSettings.copy(
-        global = config.injectSettings.global ++ globalPluginSettings)
-    val globalConfig = config.copy(
-        injectSettings = newInject,
-        pluginManagement = config.pluginManagement.forGlobalPlugin)
+      global = config.injectSettings.global ++ globalPluginSettings)
+    val globalConfig = config.copy(injectSettings = newInject,
+                                   pluginManagement =
+                                     config.pluginManagement.forGlobalPlugin)
     val (eval, structure) = Load(base, s, globalConfig)
     val session = Load.initialSession(structure, eval)
     (structure, Project.setProject(session, structure, s))
   }
-  def load(
-      base: File, s: State, config: LoadBuildConfiguration): GlobalPlugin = {
+  def load(base: File,
+           s: State,
+           config: LoadBuildConfiguration): GlobalPlugin = {
     val (structure, state) = build(base, s, config)
     val (newS, data) = extract(state, structure)
     Project.runUnloadHooks(newS) // discard state
     GlobalPlugin(data, structure, inject(data), base)
   }
-  def extract(
-      state: State, structure: BuildStructure): (State, GlobalPluginData) = {
+  def extract(state: State,
+              structure: BuildStructure): (State, GlobalPluginData) = {
     import structure.{data, root, rootProject}
     val p: Scope = Scope.GlobalScope in ProjectRef(root, rootProject(root))
 
@@ -86,8 +95,8 @@ object GlobalPlugin {
     import EvaluateTask._
     withStreams(structure, state) { str =>
       val nv = nodeView(state, str, roots)
-      val config = EvaluateTask.extractedTaskConfig(
-          Project.extract(state), structure, state)
+      val config = EvaluateTask
+        .extractedTaskConfig(Project.extract(state), structure, state)
       val (newS, result) =
         runTask(t, state, str, structure.index.triggers, config)(nv)
       (newS, processResult(result, newS.log))
@@ -95,14 +104,14 @@ object GlobalPlugin {
   }
   val globalPluginSettings =
     Project.inScope(Scope.GlobalScope in LocalRootProject)(
-        Seq(
-            organization := SbtArtifacts.Organization,
-            onLoadMessage <<=
-              Keys.baseDirectory("Loading global plugins from " + _),
-            name := "global-plugin",
-            sbtPlugin := true,
-            version := "0.0"
-        ))
+      Seq(
+        organization := SbtArtifacts.Organization,
+        onLoadMessage <<=
+          Keys.baseDirectory("Loading global plugins from " + _),
+        name := "global-plugin",
+        sbtPlugin := true,
+        version := "0.0"
+      ))
 }
 final case class GlobalPluginData(
     projectID: ModuleID,

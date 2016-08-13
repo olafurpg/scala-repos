@@ -57,13 +57,13 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                 case _: Exception => socket ! Resync(uid)
               }
               send(
-                  HumanPlay(
-                      playerId,
-                      move,
-                      blur,
-                      lag.millis,
-                      promise.some
-                  ))
+                HumanPlay(
+                  playerId,
+                  move,
+                  blur,
+                  lag.millis,
+                  promise.some
+                ))
               member push ackEvent
           }
         case ("drop", o) =>
@@ -75,13 +75,13 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                 case _: Exception => socket ! Resync(uid)
               }
               send(
-                  HumanPlay(
-                      playerId,
-                      drop,
-                      blur,
-                      lag.millis,
-                      promise.some
-                  ))
+                HumanPlay(
+                  playerId,
+                  drop,
+                  blur,
+                  lag.millis,
+                  promise.some
+                ))
           }
         case ("rematch-yes", _) => send(RematchYes(playerId))
         case ("rematch-no", _) => send(RematchNo(playerId))

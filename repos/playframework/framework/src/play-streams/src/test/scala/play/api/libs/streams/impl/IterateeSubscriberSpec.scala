@@ -5,7 +5,10 @@ package play.api.libs.streams.impl
 
 import org.specs2.mutable.Specification
 import play.api.libs.iteratee._
-import scala.concurrent.duration.{FiniteDuration => ScalaFiniteDuration, SECONDS}
+import scala.concurrent.duration.{
+  FiniteDuration => ScalaFiniteDuration,
+  SECONDS
+}
 import scala.concurrent.{Await, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success, Try}
@@ -35,8 +38,7 @@ class IterateeSubscriberSpec extends Specification {
     def contStep(): Unit = {
       val oldPromise = nextIterateePromise
       nextIterateePromise = Promise[Iteratee[T, T]]()
-      oldPromise.success(
-          Cont { input =>
+      oldPromise.success(Cont { input =>
         record(ContInput(input))
         nextIteratee
       })
@@ -58,7 +60,8 @@ class IterateeSubscriberSpec extends Specification {
       val iter = Iteratee.getChunks[Int]
       val subr = new IterateeSubscriber(iter)
       pubr.subscribe(subr)
-      Await.result(subr.result.unflatten, ScalaFiniteDuration(2, SECONDS)) must_==
+      Await
+        .result(subr.result.unflatten, ScalaFiniteDuration(2, SECONDS)) must_==
         Done(List(1, 2, 3), Input.EOF)
     }
 

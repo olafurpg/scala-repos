@@ -34,8 +34,9 @@ object PlayerRepo {
       .cursor[Player]()
       .collect[List](nb)
 
-  def bestByTourWithRank(
-      tourId: String, nb: Int, skip: Int = 0): Fu[RankedPlayers] =
+  def bestByTourWithRank(tourId: String,
+                         nb: Int,
+                         skip: Int = 0): Fu[RankedPlayers] =
     bestByTour(tourId, nb, skip).map { res =>
       res
         .foldRight(List.empty[RankedPlayer] -> (res.size + skip)) {
@@ -44,8 +45,9 @@ object PlayerRepo {
         ._1
     }
 
-  def bestByTourWithRankByPage(
-      tourId: String, nb: Int, page: Int): Fu[RankedPlayers] =
+  def bestByTourWithRankByPage(tourId: String,
+                               nb: Int,
+                               page: Int): Fu[RankedPlayers] =
     bestByTourWithRank(tourId, nb, (page - 1) * nb)
 
   def countActive(tourId: String): Fu[Int] =
@@ -62,9 +64,10 @@ object PlayerRepo {
     coll.count(selectTourUser(tourId, userId).some) map (0 !=)
 
   def existsActive(tourId: String, userId: String) =
-    coll.count(Some(
-            selectTourUser(tourId, userId) ++ selectActive
-        )) map (0 !=)
+    coll.count(
+      Some(
+        selectTourUser(tourId, userId) ++ selectActive
+      )) map (0 !=)
 
   def unWithdraw(tourId: String) =
     coll
@@ -85,10 +88,10 @@ object PlayerRepo {
   def playerInfo(tourId: String, userId: String): Fu[Option[PlayerInfo]] =
     find(tourId, userId) flatMap {
       _ ?? { player =>
-        coll.count(Some(selectTour(tourId) ++ BSONDocument(
-                    "m" -> BSONDocument("$gt" -> player.magicScore)))) map {
-          n =>
-            PlayerInfo((n + 1), player.withdraw).some
+        coll.count(
+          Some(selectTour(tourId) ++ BSONDocument(
+            "m" -> BSONDocument("$gt" -> player.magicScore)))) map { n =>
+          PlayerInfo((n + 1), player.withdraw).some
         }
       }
     }
@@ -111,7 +114,7 @@ object PlayerRepo {
   def withPoints(tourId: String): Fu[List[Player]] =
     coll
       .find(
-          selectTour(tourId) ++ BSONDocument("m" -> BSONDocument("$gt" -> 0))
+        selectTour(tourId) ++ BSONDocument("m" -> BSONDocument("$gt" -> 0))
       )
       .cursor[Player]()
       .collect[List]()
@@ -119,13 +122,20 @@ object PlayerRepo {
   private def aggregationUserIdList(res: Stream[BSONDocument]): List[String] =
     res.headOption flatMap { _.getAs[List[String]]("uids") } getOrElse Nil
 
-  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Descending, Group, Match, Push, Sort}
+  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+    Descending,
+    Group,
+    Match,
+    Push,
+    Sort
+  }
 
   def userIds(tourId: String): Fu[List[String]] =
     coll.distinct("uid", selectTour(tourId).some) map lila.db.BSON.asStrings
 
   def activeUserIds(tourId: String): Fu[List[String]] =
-    coll.distinct("uid", (selectTour(tourId) ++ selectActive).some) map lila.db.BSON.asStrings
+    coll
+      .distinct("uid", (selectTour(tourId) ++ selectActive).some) map lila.db.BSON.asStrings
 
   def winner(tourId: String): Fu[Option[Player]] =
     coll.find(selectTour(tourId)).sort(bestSort).one[Player]
@@ -151,12 +161,13 @@ object PlayerRepo {
       }
     }
 
-  def byTourAndUserIds(
-      tourId: String, userIds: Iterable[String]): Fu[List[Player]] =
+  def byTourAndUserIds(tourId: String,
+                       userIds: Iterable[String]): Fu[List[Player]] =
     coll
-      .find(selectTour(tourId) ++ BSONDocument(
-              "uid" -> BSONDocument("$in" -> userIds)
-          ))
+      .find(
+        selectTour(tourId) ++ BSONDocument(
+          "uid" -> BSONDocument("$in" -> userIds)
+        ))
       .cursor[Player]()
       .collect[List]()
       .chronometer
@@ -165,8 +176,9 @@ object PlayerRepo {
       }
       .result
 
-  def pairByTourAndUserIds(
-      tourId: String, id1: String, id2: String): Fu[Option[(Player, Player)]] =
+  def pairByTourAndUserIds(tourId: String,
+                           id1: String,
+                           id2: String): Fu[Option[(Player, Player)]] =
     byTourAndUserIds(tourId, List(id1, id2)) map {
       case List(p1, p2) if p1.is(id1) && p2.is(id2) => Some(p1 -> p2)
       case List(p1, p2) if p1.is(id2) && p2.is(id1) => Some(p2 -> p1)
@@ -179,8 +191,8 @@ object PlayerRepo {
               BSONDocument("$set" -> BSONDocument("e" -> performance)))
       .void
 
-  private def rankPlayers(
-      players: List[Player], ranking: Ranking): RankedPlayers =
+  private def rankPlayers(players: List[Player],
+                          ranking: Ranking): RankedPlayers =
     players.flatMap { p =>
       ranking get p.userId map { RankedPlayer(_, p) }
     }.sortBy(_.rank)

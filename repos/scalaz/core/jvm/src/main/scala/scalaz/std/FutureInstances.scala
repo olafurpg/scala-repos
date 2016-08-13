@@ -15,7 +15,7 @@ trait FutureInstances extends FutureInstances1 {
       def copoint[A](f: Future[A]): A = Await.result(f, duration)
     }
 
-  implicit def futureMonoid[A](
-      implicit g: Monoid[A], ec: ExecutionContext): Monoid[Future[A]] =
+  implicit def futureMonoid[A](implicit g: Monoid[A],
+                               ec: ExecutionContext): Monoid[Future[A]] =
     Monoid.liftMonoid[Future, A]
 }

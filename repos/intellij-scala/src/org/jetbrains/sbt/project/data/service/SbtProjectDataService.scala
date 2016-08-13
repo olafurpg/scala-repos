@@ -7,10 +7,16 @@ import com.intellij.compiler.{CompilerConfiguration, CompilerConfigurationImpl}
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
-import com.intellij.openapi.externalSystem.util.{ExternalSystemApiUtil, ExternalSystemUtil}
+import com.intellij.openapi.externalSystem.util.{
+  ExternalSystemApiUtil,
+  ExternalSystemUtil
+}
 import com.intellij.openapi.module.{ModuleManager, ModuleUtil}
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.{LanguageLevelProjectExtension, ProjectRootManager}
+import com.intellij.openapi.roots.{
+  LanguageLevelProjectExtension,
+  ProjectRootManager
+}
 import org.jetbrains.plugins.scala.project.IncrementalityType
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
@@ -29,8 +35,10 @@ class SbtProjectDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[SbtProjectData] =
-    new SbtProjectDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new SbtProjectDataService.Importer(toImport,
+                                       projectData,
+                                       project,
+                                       modelsProvider)
 }
 
 object SbtProjectDataService {
@@ -39,8 +47,10 @@ object SbtProjectDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[SbtProjectData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[SbtProjectData](dataToImport,
+                                               projectData,
+                                               project,
+                                               modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(node => doImport(node.getData))
@@ -65,11 +75,11 @@ object SbtProjectDataService {
           .orElse(existingJdk)
           .orElse(SdkUtils.allJdks.headOption)
         projectJdk.foreach(
-            ProjectRootManager.getInstance(project).setProjectSdk)
+          ProjectRootManager.getInstance(project).setProjectSdk)
       }
 
-    private def setLanguageLevel(
-        project: Project, data: SbtProjectData): Unit =
+    private def setLanguageLevel(project: Project,
+                                 data: SbtProjectData): Unit =
       executeProjectChangeAction {
         val projectJdk =
           Option(ProjectRootManager.getInstance(project).getProjectSdk)
@@ -85,19 +95,20 @@ object SbtProjectDataService {
 
     private def setSbtVersion(project: Project, data: SbtProjectData): Unit =
       Option(
-          SbtSystemSettings
-            .getInstance(project)
-            .getLinkedProjectSettings(data.projectPath))
-        .foreach(s => s.sbtVersion = data.sbtVersion)
+        SbtSystemSettings
+          .getInstance(project)
+          .getLinkedProjectSettings(data.projectPath)).foreach(s =>
+        s.sbtVersion = data.sbtVersion)
 
     private def updateIncrementalityType(project: Project): Unit = {
       if (getModules.exists(it =>
-                ModuleUtil.getModuleType(it) == SharedSourcesModuleType.instance))
-        ScalaCompilerConfiguration.instanceIn(project).incrementalityType = IncrementalityType.SBT
+            ModuleUtil.getModuleType(it) == SharedSourcesModuleType.instance))
+        ScalaCompilerConfiguration.instanceIn(project).incrementalityType =
+          IncrementalityType.SBT
     }
 
-    private def updateJavaCompilerOptionsIn(
-        project: Project, options: Seq[String]): Unit =
+    private def updateJavaCompilerOptionsIn(project: Project,
+                                            options: Seq[String]): Unit =
       executeProjectChangeAction {
         val settings =
           JavacConfiguration.getOptions(project, classOf[JavacConfiguration])
@@ -151,8 +162,8 @@ object SbtProjectDataService {
       }
 
       removePair(
-          "-source",
-          removePair("-target", options.filterNot(handledOptions.contains)))
+        "-source",
+        removePair("-target", options.filterNot(handledOptions.contains)))
     }
   }
 }

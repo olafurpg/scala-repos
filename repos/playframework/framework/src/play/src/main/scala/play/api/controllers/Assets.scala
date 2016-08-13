@@ -20,7 +20,12 @@ import scala.util.{Success, Failure}
 import java.util.Date
 import java.util.regex.Pattern
 import play.api.libs.iteratee.Execution.Implicits
-import play.api.http.{HttpEntity, LazyHttpErrorHandler, HttpErrorHandler, ContentTypes}
+import play.api.http.{
+  HttpEntity,
+  LazyHttpErrorHandler,
+  HttpErrorHandler,
+  ContentTypes
+}
 import scala.collection.concurrent.TrieMap
 import play.core.routing.ReverseRouteContext
 import scala.io.Source
@@ -123,7 +128,7 @@ private[controllers] object AssetInfo {
     * - "Wed Jan 07 2015 22:54:20 GMT-0800" uses the second matcher.
     */
   private val dateRecognizer = Pattern.compile(
-      """^(((\w\w\w, \d\d \w\w\w \d\d\d\d \d\d:\d\d:\d\d)(( GMT)?))|""" +
+    """^(((\w\w\w, \d\d \w\w\w \d\d\d\d \d\d:\d\d:\d\d)(( GMT)?))|""" +
       """(\w\w\w \w\w\w \d\d \d\d\d\d \d\d:\d\d:\d\d GMT.\d\d\d\d))(\b.*)""")
 
   /*
@@ -140,14 +145,14 @@ private[controllers] object AssetInfo {
           val alternativeDate =
             matcher.group(6) // Cannot be null otherwise match would have failed
           Some(
-              alternativeDateFormatWithTZOffset
-                .parseDateTime(alternativeDate)
-                .toDate)
+            alternativeDateFormatWithTZOffset
+              .parseDateTime(alternativeDate)
+              .toDate)
         }
       } catch {
         case e: IllegalArgumentException =>
-          Logger.debug(
-              s"An invalid date was received: couldn't parse: $date", e)
+          Logger
+            .debug(s"An invalid date was received: couldn't parse: $date", e)
           None
       }
     } else {
@@ -173,7 +178,7 @@ private[controllers] class AssetInfo(val name: String,
     else mimeType
 
   val configuredCacheControl = config(
-      _.getString("\"assets.cache." + name + "\""))
+    _.getString("\"assets.cache." + name + "\""))
 
   def cacheControl(aggressiveCaching: Boolean): String = {
     configuredCacheControl.getOrElse {
@@ -325,7 +330,7 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
       Future.successful(assetInfoFromResource(name))
     } else {
       assetInfoCache.putIfAbsent(name)(assetInfoFromResource)(
-          Implicits.trampoline)
+        Implicits.trampoline)
     }
   }
 
@@ -353,9 +358,9 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
     private def pathFromParams(rrc: ReverseRouteContext): String = {
       rrc.fixedParams
         .getOrElse(
-            "path",
-            throw new RuntimeException(
-                "Asset path bindable must be used in combination with an action that accepts a path parameter"))
+          "path",
+          throw new RuntimeException(
+            "Asset path bindable must be used in combination with an action that accepts a path parameter"))
         .toString
     }
 
@@ -372,7 +377,7 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
               .fold(minPath) { dgst =>
                 val lastSep = minPath.lastIndexOf("/")
                 minPath.take(lastSep + 1) + dgst + "-" +
-                minPath.drop(lastSep + 1)
+                  minPath.drop(lastSep + 1)
               }
               .drop(base.size + 1)
           }
@@ -402,25 +407,26 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
         assetInfo.etag
           .filter(someEtag => etags.split(',').exists(_.trim == someEtag))
           .flatMap(_ =>
-                Some(cacheableResult(
-                        assetInfo, aggressiveCaching, NotModified)))
+            Some(cacheableResult(assetInfo, aggressiveCaching, NotModified)))
       case None =>
         for {
           ifModifiedSinceStr <- request.headers.get(IF_MODIFIED_SINCE)
           ifModifiedSince <- parseModifiedDate(ifModifiedSinceStr)
           lastModified <- assetInfo.parsedLastModified
-                             if !lastModified.after(ifModifiedSince)
+          if !lastModified.after(ifModifiedSince)
         } yield {
           NotModified
         }
     }
   }
 
-  private def cacheableResult[A <: Result](
-      assetInfo: AssetInfo, aggressiveCaching: Boolean, r: A): Result = {
+  private def cacheableResult[A <: Result](assetInfo: AssetInfo,
+                                           aggressiveCaching: Boolean,
+                                           r: A): Result = {
 
-    def addHeaderIfValue(
-        name: String, maybeValue: Option[String], response: Result): Result = {
+    def addHeaderIfValue(name: String,
+                         maybeValue: Option[String],
+                         response: Result): Result = {
       maybeValue.fold(response)(v => response.withHeaders(name -> v))
     }
 
@@ -440,13 +446,13 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
     val response =
       if (length > 0) {
         Ok.sendEntity(
-            HttpEntity.Streamed(
-                akka.stream.scaladsl.Source
-                  .fromPublisher(Streams.enumeratorToPublisher(resourceData))
-                  .map(ByteString.apply),
-                Some(length),
-                Some(mimeType)
-            ))
+          HttpEntity.Streamed(
+            akka.stream.scaladsl.Source
+              .fromPublisher(Streams.enumeratorToPublisher(resourceData))
+              .map(ByteString.apply),
+            Some(length),
+            Some(mimeType)
+          ))
       } else {
         Ok.sendEntity(HttpEntity.Strict(ByteString.empty, Some(mimeType)))
       }
@@ -470,8 +476,8 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
       val requestedDigest = f.getName.takeWhile(_ != '-')
       if (!requestedDigest.isEmpty) {
         val bareFile = new File(
-            f.getParent, f.getName.drop(requestedDigest.size + 1)).getPath
-          .replace('\\', '/')
+          f.getParent,
+          f.getName.drop(requestedDigest.size + 1)).getPath.replace('\\', '/')
         val bareFullPath = path + "/" + bareFile
         blocking(digest(bareFullPath)) match {
           case Some(`requestedDigest`) =>
@@ -507,8 +513,9 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
       } getOrElse Future.successful(None)
 
     def notFound =
-      errorHandler.onClientError(
-          request, NOT_FOUND, "Resource not found by Assets controller")
+      errorHandler.onClientError(request,
+                                 NOT_FOUND,
+                                 "Resource not found by Assets controller")
 
     val pendingResult: Future[Result] = assetInfoFuture.flatMap {
       case Some((assetInfo, gzipRequested)) =>
@@ -523,9 +530,9 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
           val resourceData =
             Enumerator.fromStream(stream)(Implicits.defaultExecutionContext)
 
-          Future.successful(maybeNotModified(
-                  request, assetInfo, aggressiveCaching).getOrElse {
-            cacheableResult(
+          Future.successful(
+            maybeNotModified(request, assetInfo, aggressiveCaching).getOrElse {
+              cacheableResult(
                 assetInfo,
                 aggressiveCaching,
                 result(file,
@@ -534,8 +541,8 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
                        resourceData,
                        gzipRequested,
                        assetInfo.gzipUrl.isDefined)
-            )
-          })
+              )
+            })
         }
       case None => notFound
     }
@@ -543,17 +550,17 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
     pendingResult.recoverWith {
       case e: InvalidUriEncodingException =>
         errorHandler.onClientError(
-            request,
-            BAD_REQUEST,
-            s"Invalid URI encoding for $file at $path: " + e.getMessage)
+          request,
+          BAD_REQUEST,
+          s"Invalid URI encoding for $file at $path: " + e.getMessage)
       case NonFatal(e) =>
         // Add a bit more information to the exception for better error reporting later
         errorHandler.onServerError(
-            request,
-            new RuntimeException(
-                s"Unexpected error while serving $file at $path: " +
-                e.getMessage,
-                e))
+          request,
+          new RuntimeException(
+            s"Unexpected error while serving $file at $path: " +
+              e.getMessage,
+            e))
     }
   }
 
@@ -563,8 +570,8 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
     * @param path the root folder for searching the static resource files, such as `"/public"`. Not URL encoded.
     * @param file the file part extracted from the URL. May be URL encoded (note that %2F decodes to literal /).
     */
-  private[controllers] def resourceNameAt(
-      path: String, file: String): Option[String] = {
+  private[controllers] def resourceNameAt(path: String,
+                                          file: String): Option[String] = {
     val decodedFile = UriEncoding.decodePath(file, "utf-8")
     def dblSlashRemover(input: String): String =
       dblSlashPattern.replaceAllIn(input, "/")

@@ -10,8 +10,12 @@ import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import scala.concurrent.Future
 
 class TaskLoaderImplTest
-    extends FunSuite with MarathonSpec with Mockito with GivenWhenThen
-    with ScalaFutures with Matchers {
+    extends FunSuite
+    with MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with ScalaFutures
+    with Matchers {
   test("loading no tasks") {
     val f = new Fixture
 

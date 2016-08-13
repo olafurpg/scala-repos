@@ -62,7 +62,7 @@ object OutputMode {
 
   // Not binary compatible, but source compatible with deprecation
   @deprecated(
-      "Support for ES6 Strong Mode was removed. Use ECMAScript6 instead.",
-      "0.6.8")
+    "Support for ES6 Strong Mode was removed. Use ECMAScript6 instead.",
+    "0.6.8")
   lazy val ECMAScript6StrongMode: ECMAScript6.type = ECMAScript6
 }

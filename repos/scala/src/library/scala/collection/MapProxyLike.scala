@@ -19,10 +19,11 @@ package collection
   *  @since   2.8
   */
 @deprecated(
-    "Proxying is deprecated due to lack of use and compiler-level support.",
-    "2.11.0")
+  "Proxying is deprecated due to lack of use and compiler-level support.",
+  "2.11.0")
 trait MapProxyLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
-    extends MapLike[A, B, This] with IterableProxyLike[(A, B), This] {
+    extends MapLike[A, B, This]
+    with IterableProxyLike[(A, B), This] {
   override def get(key: A): Option[B] = self.get(key)
   override def iterator: Iterator[(A, B)] = self.iterator
   override def +[B1 >: B](kv: (A, B1)): Map[A, B1] = self.+(kv)
@@ -43,8 +44,9 @@ trait MapProxyLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   override def mapValues[C](f: B => C) = self.mapValues(f)
   override def updated[B1 >: B](key: A, value: B1): Map[A, B1] =
     self.updated(key, value)
-  override def +[B1 >: B](
-      kv1: (A, B1), kv2: (A, B1), kvs: (A, B1)*): Map[A, B1] =
+  override def +[B1 >: B](kv1: (A, B1),
+                          kv2: (A, B1),
+                          kvs: (A, B1)*): Map[A, B1] =
     self.+(kv1, kv2, kvs: _*)
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): Map[A, B1] =
     self.++(xs)

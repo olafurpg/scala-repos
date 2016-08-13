@@ -16,16 +16,18 @@ import grizzled.slf4j.Logger
 
 import scala.collection.mutable.PriorityQueue
 
-case class ALSAlgorithmParams(
-    rank: Int, numIterations: Int, lambda: Double, seed: Option[Long])
+case class ALSAlgorithmParams(rank: Int,
+                              numIterations: Int,
+                              lambda: Double,
+                              seed: Option[Long])
     extends Params
 
 class ALSModel(
     val productFeatures: RDD[(Int, Array[Double])],
     val itemStringIntMap: BiMap[String, Int],
     val items: Map[Int, Item]
-)
-    extends IPersistentModel[ALSAlgorithmParams] with Serializable {
+) extends IPersistentModel[ALSAlgorithmParams]
+    with Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
@@ -40,21 +42,21 @@ class ALSModel(
 
   override def toString = {
     s" productFeatures: [${productFeatures.count()}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
+      s"(${productFeatures.take(2).toList}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]" +
+      s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
   }
 }
 
 object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
   def apply(id: String, params: ALSAlgorithmParams, sc: Option[SparkContext]) = {
     new ALSModel(
-        productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
-        itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
-        items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
+      productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
+      itemStringIntMap = sc.get
+        .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+        .first,
+      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
   }
 }
 
@@ -69,16 +71,16 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
     require(!data.viewEvents.take(1).isEmpty,
             s"viewEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.users.take(1).isEmpty,
             s"users in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.items.take(1).isEmpty,
             s"items in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
@@ -96,11 +98,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+          " to Int index.")
 
       ((uindex, iindex), 1)
     }.filter {
@@ -118,7 +120,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
             s"mllibRatings cannot be empty." +
-            " Please check if your events contain valid user and item ID.")
+              " Please check if your events contain valid user and item ID.")
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
@@ -132,9 +134,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                               seed = seed)
 
     new ALSModel(
-        productFeatures = m.productFeatures,
-        itemStringIntMap = itemStringIntMap,
-        items = items
+      productFeatures = m.productFeatures,
+      itemStringIntMap = itemStringIntMap,
+      items = items
     )
   }
 
@@ -152,17 +154,17 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         qf
     }.seq.flatten
 
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+      set.map(model.itemStringIntMap.get(_)).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+      set.map(model.itemStringIntMap.get(_)).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 
     val indexScores: Array[(Int, Double)] =
       if (queryFeatures.isEmpty) {
         logger.info(
-            s"No productFeatures vector for query items ${query.items}.")
+          s"No productFeatures vector for query items ${query.items}.")
         Array[(Int, Double)]()
       } else {
         model.productFeatures.mapValues { f =>
@@ -176,12 +178,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val filteredScore = indexScores.view.filter {
       case (i, v) =>
         isCandidateItem(
-            i = i,
-            items = model.items,
-            categories = query.categories,
-            queryList = queryList,
-            whiteList = whiteList,
-            blackList = blackList
+          i = i,
+          items = model.items,
+          categories = query.categories,
+          queryList = queryList,
+          whiteList = whiteList,
+          blackList = blackList
         )
     }
 
@@ -190,8 +192,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val itemScores = topScores.map {
       case (i, s) =>
         new ItemScore(
-            item = model.itemIntStringMap(i),
-            score = s
+          item = model.itemIntStringMap(i),
+          score = s
         )
     }
 

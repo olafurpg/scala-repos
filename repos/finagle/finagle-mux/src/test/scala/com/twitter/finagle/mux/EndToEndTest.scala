@@ -22,8 +22,11 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Tag}
 
 @RunWith(classOf[JUnitRunner])
 class EndToEndTest
-    extends FunSuite with Eventually with IntegrationPatience
-    with BeforeAndAfter with AssertionsForJUnit {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with BeforeAndAfter
+    with AssertionsForJUnit {
 
   var saveBase: Dtab = Dtab.empty
 
@@ -58,8 +61,10 @@ class EndToEndTest
     val serverTrans = new QueueTransport[Message, Message](q1, q0)
 
     val server = ServerDispatcher.newRequestResponse(serverTrans, svc)
-    val session = new ClientSession(
-        clientTrans, FailureDetector.NullConfig, "test", NullStatsReceiver)
+    val session = new ClientSession(clientTrans,
+                                    FailureDetector.NullConfig,
+                                    "test",
+                                    NullStatsReceiver)
     val client = ClientDispatcher.newRequestResponse(session)
 
     val f = client(Request(Path.empty, Buf.Empty))
@@ -86,7 +91,7 @@ class EndToEndTest
           Await.result(client(Request(Path.empty, Buf.Empty)), 30.seconds)
         val Buf.Utf8(str) = rsp.body
         assert(
-            str == "Dtab(2)\n\t/foo => /bar\n\t/web => /$/inet/twitter.com/80\n")
+          str == "Dtab(2)\n\t/foo => /bar\n\t/web => /$/inet/twitter.com/80\n")
       }
     }
     Await.result(server.close())
@@ -112,8 +117,7 @@ class EndToEndTest
   }
 
   def assertAnnotationsInOrder(tracer: Seq[Record], annos: Seq[Annotation]) {
-    assert(
-        tracer.collect {
+    assert(tracer.collect {
       case Record(_, _, ann, _) if annos.contains(ann) => ann
     } == annos)
   }
@@ -143,17 +147,17 @@ class EndToEndTest
     Await.result(client(Request.empty), 30.seconds)
 
     assertAnnotationsInOrder(
-        tracer.toSeq,
-        Seq(
-            Annotation.ServiceName("theClient"),
-            Annotation.ClientSend(),
-            Annotation.BinaryAnnotation("clnt/mux/enabled", true),
-            Annotation.ServiceName("theServer"),
-            Annotation.ServerRecv(),
-            Annotation.BinaryAnnotation("srv/mux/enabled", true),
-            Annotation.ServerSend(),
-            Annotation.ClientRecv()
-        ))
+      tracer.toSeq,
+      Seq(
+        Annotation.ServiceName("theClient"),
+        Annotation.ClientSend(),
+        Annotation.BinaryAnnotation("clnt/mux/enabled", true),
+        Annotation.ServiceName("theServer"),
+        Annotation.ServerRecv(),
+        Annotation.BinaryAnnotation("srv/mux/enabled", true),
+        Annotation.ServerSend(),
+        Annotation.ClientRecv()
+      ))
 
     Await.result(server.close(), 30.seconds)
     Await.result(client.close(), 30.seconds)
@@ -172,9 +176,9 @@ class EndToEndTest
 
     val a, b = Mux.serve("localhost:*", service)
     val client = Mux.newService(
-        Name.bound(Address(a.boundAddress.asInstanceOf[InetSocketAddress]),
-                   Address(b.boundAddress.asInstanceOf[InetSocketAddress])),
-        "client")
+      Name.bound(Address(a.boundAddress.asInstanceOf[InetSocketAddress]),
+                 Address(b.boundAddress.asInstanceOf[InetSocketAddress])),
+      "client")
 
     assert(n.get == 0)
     assert(Await.result(client(Request.empty), 30.seconds).body.isEmpty)

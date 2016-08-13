@@ -55,16 +55,16 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingMethod: Tree
 
   /** Tree that corresponds to the enclosing class, or EmptyTree if not applicable.
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingClass: Tree
 
   /** Tree that corresponds to the enclosing DefDef tree.
@@ -72,8 +72,8 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingDef: universe.DefDef
 
   /** Tree that corresponds to the enclosing Template tree.
@@ -81,8 +81,8 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingTemplate: universe.Template
 
   /** Tree that corresponds to the enclosing ImplDef tree (i.e. either ClassDef or ModuleDef).
@@ -90,8 +90,8 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingImpl: universe.ImplDef
 
   /** Tree that corresponds to the enclosing PackageDef tree.
@@ -99,24 +99,24 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingPackage: universe.PackageDef
 
   /** Compilation unit that contains this macro application.
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingUnit: CompilationUnit
 
   /** Compilation run that contains this macro application.
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   def enclosingRun: Run
 
   /** Indicates than one of the enclosure methods failed to find a tree
@@ -124,9 +124,9 @@ trait Enclosures { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   case class EnclosureException(expected: Class[_], enclosingTrees: List[Tree])
       extends Exception(
-          s"Couldn't find a tree of type $expected among enclosing trees $enclosingTrees")
+        s"Couldn't find a tree of type $expected among enclosing trees $enclosingTrees")
 }

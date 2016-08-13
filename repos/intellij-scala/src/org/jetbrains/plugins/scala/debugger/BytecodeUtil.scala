@@ -7,44 +7,44 @@ private[debugger] object BytecodeUtil {
   import org.jetbrains.plugins.scala.decompiler.DecompilerUtil.Opcodes._
 
   private val oneByteCodes = Map(
-      istore_0 -> iload_0,
-      istore_1 -> iload_1,
-      istore_2 -> iload_2,
-      istore_3 -> iload_3,
-      astore_0 -> aload_0,
-      astore_1 -> aload_1,
-      astore_2 -> aload_2,
-      astore_3 -> aload_3,
-      dstore_0 -> dload_0,
-      dstore_1 -> dload_1,
-      dstore_2 -> dload_2,
-      dstore_3 -> dload_3,
-      fstore_0 -> fload_0,
-      fstore_1 -> fload_1,
-      fstore_2 -> fload_2,
-      fstore_3 -> fload_3,
-      lstore_0 -> lload_0,
-      lstore_1 -> lload_1,
-      lstore_2 -> lload_2,
-      lstore_3 -> lload_3
+    istore_0 -> iload_0,
+    istore_1 -> iload_1,
+    istore_2 -> iload_2,
+    istore_3 -> iload_3,
+    astore_0 -> aload_0,
+    astore_1 -> aload_1,
+    astore_2 -> aload_2,
+    astore_3 -> aload_3,
+    dstore_0 -> dload_0,
+    dstore_1 -> dload_1,
+    dstore_2 -> dload_2,
+    dstore_3 -> dload_3,
+    fstore_0 -> fload_0,
+    fstore_1 -> fload_1,
+    fstore_2 -> fload_2,
+    fstore_3 -> fload_3,
+    lstore_0 -> lload_0,
+    lstore_1 -> lload_1,
+    lstore_2 -> lload_2,
+    lstore_3 -> lload_3
   )
 
   val oneByteLoadCodes = oneByteCodes.values.toSet
   val oneByteStoreCodes = oneByteCodes.keySet
 
   private val twoBytesCodes = Map(
-      istore -> iload,
-      astore -> aload,
-      dstore -> dload,
-      fstore -> fload,
-      lstore -> lload
+    istore -> iload,
+    astore -> aload,
+    dstore -> dload,
+    fstore -> fload,
+    lstore -> lload
   )
 
   val twoBytesLoadCodes = twoBytesCodes.values.toSet
   val twoBytesStoreCodes = twoBytesCodes.keySet
 
-  val returnCodes = Set(
-      areturn, dreturn, freturn, ireturn, lreturn, voidReturn)
+  val returnCodes =
+    Set(areturn, dreturn, freturn, ireturn, lreturn, voidReturn)
 
   def iloadCode(istoreCode: Seq[Byte]): Seq[Byte] = {
     istoreCode match {

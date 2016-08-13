@@ -5,10 +5,18 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParenthesisedTypeElement, ScSimpleTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParenthesisedTypeElement,
+  ScSimpleTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScAnnotationImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScAnnotationStubImpl
@@ -59,12 +67,14 @@ class ScAnnotationElementType[Func <: ScAnnotation]
     new ScAnnotationStubImpl(parentStub, this, nameRef, typeTextRef)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAnnotationStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAnnotationStub = {
     val name = dataStream.readName
     val typeText = dataStream.readName
-    new ScAnnotationStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, name, typeText)
+    new ScAnnotationStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                             this,
+                             name,
+                             typeText)
   }
 
   def indexStub(stub: ScAnnotationStub, sink: IndexSink): Unit = {

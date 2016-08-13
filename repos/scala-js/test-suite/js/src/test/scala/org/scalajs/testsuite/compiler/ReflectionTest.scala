@@ -28,7 +28,7 @@ import org.scalajs.testsuite.utils.Platform._
 class ReflectionTest {
   import ReflectionTest._
 
-  def implicitClassTagTest[A : ClassTag](x: Any): Boolean = x match {
+  def implicitClassTagTest[A: ClassTag](x: Any): Boolean = x match {
     case x: A => true
     case _ => false
   }
@@ -83,8 +83,8 @@ class ReflectionTest {
   }
 
   @Test def isInstance_for_raw_JS_traits_should_fail(): Unit = {
-    assertThrows(
-        classOf[Exception], classOf[ReflectionTestRawJSTrait].isInstance(5))
+    assertThrows(classOf[Exception],
+                 classOf[ReflectionTestRawJSTrait].isInstance(5))
 
     val ct = classTag[ReflectionTestRawJSTrait]
     assertThrows(classOf[Exception], ct.unapply(new AnyRef))
@@ -129,15 +129,15 @@ class ReflectionTest {
   }
 
   @Test def getSuperclass_issue_1489(): Unit = {
-    assertEquals(
-        classOf[SomeParentClass], classOf[SomeChildClass].getSuperclass)
+    assertEquals(classOf[SomeParentClass],
+                 classOf[SomeChildClass].getSuperclass)
     assertNull(classOf[AnyRef].getSuperclass)
     assertEquals(classOf[AnyRef], classOf[String].getSuperclass)
     assertEquals(classOf[Number], classOf[Integer].getSuperclass)
 
     assertEquals(
-        "org.scalajs.testsuite.compiler.ReflectionTest$ParentClassWhoseDataIsNotAccessedDirectly",
-        classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName)
+      "org.scalajs.testsuite.compiler.ReflectionTest$ParentClassWhoseDataIsNotAccessedDirectly",
+      classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName)
   }
 
   @Test def cast_positive(): Unit = {

@@ -33,39 +33,39 @@ import scalafx.delegate._
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/ConditionalFeature.html javafx.application.ConditionalFeature]] */
 object ConditionalFeature
-    extends SFXEnumDelegateCompanion[
-        jfxa.ConditionalFeature, ConditionalFeature] {
+    extends SFXEnumDelegateCompanion[jfxa.ConditionalFeature,
+                                     ConditionalFeature] {
 
   val Controls = new ConditionalFeature(jfxa.ConditionalFeature.CONTROLS)
-  @deprecated(
-      "Use Controls; CONTROLS will be removed in a future release", "8.0.5")
+  @deprecated("Use Controls; CONTROLS will be removed in a future release",
+              "8.0.5")
   val CONTROLS = Controls
   val Graphics = new ConditionalFeature(jfxa.ConditionalFeature.GRAPHICS)
-  @deprecated(
-      "Use Graphics; GRAPHICS will be removed in a future releas", "8.0.5")
+  @deprecated("Use Graphics; GRAPHICS will be removed in a future releas",
+              "8.0.5")
   val GRAPHICS = Graphics
   val Effect = new ConditionalFeature(jfxa.ConditionalFeature.EFFECT)
-  @deprecated(
-      "Use Effect; EFFECT will be removed in a future release", "2.2.60")
+  @deprecated("Use Effect; EFFECT will be removed in a future release",
+              "2.2.60")
   val EFFECT = Effect
   val FXML = new ConditionalFeature(jfxa.ConditionalFeature.FXML)
   val InputMethod = new ConditionalFeature(
-      jfxa.ConditionalFeature.INPUT_METHOD)
+    jfxa.ConditionalFeature.INPUT_METHOD)
   @deprecated(
-      "Use InputMethod; INPUT_METHOD will be removed in a future release",
-      "2.2.60")
+    "Use InputMethod; INPUT_METHOD will be removed in a future release",
+    "2.2.60")
   val INPUT_METHOD = InputMethod
   val InputMultitouch = new ConditionalFeature(
-      jfxa.ConditionalFeature.INPUT_MULTITOUCH)
+    jfxa.ConditionalFeature.INPUT_MULTITOUCH)
   @deprecated(
-      "Use InputMultitouch; INPUT_MULTITOUCH will be removed in a future releas",
-      "8.0.5")
+    "Use InputMultitouch; INPUT_MULTITOUCH will be removed in a future releas",
+    "8.0.5")
   val INPUT_MULTITOUCH = InputMultitouch
   val InputPointer = new ConditionalFeature(
-      jfxa.ConditionalFeature.INPUT_POINTER)
+    jfxa.ConditionalFeature.INPUT_POINTER)
   @deprecated(
-      "Use InputPointer; INPUT_POINTER will be removed in a future releas",
-      "8.0.5")
+    "Use InputPointer; INPUT_POINTER will be removed in a future releas",
+    "8.0.5")
   val INPUT_POINTER = InputPointer
   val InputTouch = new ConditionalFeature(jfxa.ConditionalFeature.INPUT_TOUCH)
   @deprecated("Use InputTouch; INPUT_TOUCH will be removed in a future releas",
@@ -75,8 +75,8 @@ object ConditionalFeature
   @deprecated("Use Media; MEDIA will be removed in a future releas", "8.0.5")
   val MEDIA = Media
   val Scene3D = new ConditionalFeature(jfxa.ConditionalFeature.SCENE3D)
-  @deprecated(
-      "Use Scene3D; SCENE3D will be removed in a future release", "2.2.60")
+  @deprecated("Use Scene3D; SCENE3D will be removed in a future release",
+              "2.2.60")
   val SCENE3D = Scene3D
   val ShapeClip = new ConditionalFeature(jfxa.ConditionalFeature.SHAPE_CLIP)
   @deprecated("Use ShapeClip; SHAPE_CLIP will be removed in a future release",
@@ -87,52 +87,52 @@ object ConditionalFeature
   val SWING = Swing
   val SWT = new ConditionalFeature(jfxa.ConditionalFeature.SWT)
   val TransparentWindow = new ConditionalFeature(
-      jfxa.ConditionalFeature.TRANSPARENT_WINDOW)
+    jfxa.ConditionalFeature.TRANSPARENT_WINDOW)
   @deprecated(
-      "Use TransparentWindow; TRANSPARENT_WINDOW will be removed in a future release",
-      "2.2.60")
+    "Use TransparentWindow; TRANSPARENT_WINDOW will be removed in a future release",
+    "2.2.60")
   val TRANSPARENT_WINDOW = TransparentWindow
   val TwoLevelFocus = new ConditionalFeature(
-      jfxa.ConditionalFeature.TWO_LEVEL_FOCUS)
+    jfxa.ConditionalFeature.TWO_LEVEL_FOCUS)
   @deprecated(
-      "Use TwoLevelFocus; TWO_LEVEL_FOCUS will be removed in a future releas",
-      "8.0.5")
+    "Use TwoLevelFocus; TWO_LEVEL_FOCUS will be removed in a future releas",
+    "8.0.5")
   val TWO_LEVEL_FOCUS = TwoLevelFocus
   val UnifiedWindow = new ConditionalFeature(
-      jfxa.ConditionalFeature.UNIFIED_WINDOW)
+    jfxa.ConditionalFeature.UNIFIED_WINDOW)
   @deprecated(
-      "Use UnifiedWindow; UNIFIED_WINDOW will be removed in a future releas",
-      "8.0.5")
+    "Use UnifiedWindow; UNIFIED_WINDOW will be removed in a future releas",
+    "8.0.5")
   val UNIFIED_WINDOW = UnifiedWindow
   val VirtualKeyboard = new ConditionalFeature(
-      jfxa.ConditionalFeature.VIRTUAL_KEYBOARD)
+    jfxa.ConditionalFeature.VIRTUAL_KEYBOARD)
   @deprecated(
-      "Use VirtualKeyboard; VIRTUAL_KEYBOARD will be removed in a future releas",
-      "8.0.5")
+    "Use VirtualKeyboard; VIRTUAL_KEYBOARD will be removed in a future releas",
+    "8.0.5")
   val VIRTUAL_KEYBOARD = VirtualKeyboard
   val Web = new ConditionalFeature(jfxa.ConditionalFeature.WEB)
   @deprecated("Use Web; WEB will be removed in a future releas", "8.0.5")
   val WEB = Web
 
   protected override def unsortedValues: Array[ConditionalFeature] = Array(
-      Graphics,
-      Controls,
-      Media,
-      Web,
-      SWT,
-      Swing,
-      FXML,
-      Scene3D,
-      Effect,
-      ShapeClip,
-      InputMethod,
-      TransparentWindow,
-      UnifiedWindow,
-      TwoLevelFocus,
-      VirtualKeyboard,
-      InputTouch,
-      InputMultitouch,
-      InputPointer
+    Graphics,
+    Controls,
+    Media,
+    Web,
+    SWT,
+    Swing,
+    FXML,
+    Scene3D,
+    Effect,
+    ShapeClip,
+    InputMethod,
+    TransparentWindow,
+    UnifiedWindow,
+    TwoLevelFocus,
+    VirtualKeyboard,
+    InputTouch,
+    InputMultitouch,
+    InputPointer
   )
 }
 

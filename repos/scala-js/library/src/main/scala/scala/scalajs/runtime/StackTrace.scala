@@ -115,17 +115,20 @@ object StackTrace {
         if (mtch1 ne null) {
           val (className, methodName) = extractClassMethod(mtch1(1).get)
           trace.push(
-              JSStackTraceElem(className,
-                               methodName,
-                               mtch1(2).get,
-                               mtch1(3).get.toInt,
-                               mtch1(4).get.toInt))
+            JSStackTraceElem(className,
+                             methodName,
+                             mtch1(2).get,
+                             mtch1(3).get.toInt,
+                             mtch1(4).get.toInt))
         } else {
           val mtch2 = NormalizedFrameLine.exec(line)
           if (mtch2 ne null) {
             val (className, methodName) = extractClassMethod(mtch2(1).get)
-            trace.push(JSStackTraceElem(
-                    className, methodName, mtch2(2).get, mtch2(3).get.toInt))
+            trace.push(
+              JSStackTraceElem(className,
+                               methodName,
+                               mtch2(2).get,
+                               mtch2(3).get.toInt))
           } else {
             // just in case
             trace.push(JSStackTraceElem("<jscode>", line, null, -1))
@@ -243,17 +246,17 @@ object StackTrace {
   private lazy val decompressedClasses: js.Dictionary[String] = {
     val dict = js.Dynamic
       .literal(
-          O = "java_lang_Object",
-          T = "java_lang_String",
-          V = "scala_Unit",
-          Z = "scala_Boolean",
-          C = "scala_Char",
-          B = "scala_Byte",
-          S = "scala_Short",
-          I = "scala_Int",
-          J = "scala_Long",
-          F = "scala_Float",
-          D = "scala_Double"
+        O = "java_lang_Object",
+        T = "java_lang_String",
+        V = "scala_Unit",
+        Z = "scala_Boolean",
+        C = "scala_Char",
+        B = "scala_Byte",
+        S = "scala_Short",
+        I = "scala_Int",
+        J = "scala_Long",
+        F = "scala_Float",
+        D = "scala_Double"
       )
       .asInstanceOf[js.Dictionary[String]]
 
@@ -269,16 +272,16 @@ object StackTrace {
 
   private lazy val decompressedPrefixes = js.Dynamic
     .literal(
-        sjsr_ = "scala_scalajs_runtime_",
-        sjs_ = "scala_scalajs_",
-        sci_ = "scala_collection_immutable_",
-        scm_ = "scala_collection_mutable_",
-        scg_ = "scala_collection_generic_",
-        sc_ = "scala_collection_",
-        sr_ = "scala_runtime_",
-        s_ = "scala_",
-        jl_ = "java_lang_",
-        ju_ = "java_util_"
+      sjsr_ = "scala_scalajs_runtime_",
+      sjs_ = "scala_scalajs_",
+      sci_ = "scala_collection_immutable_",
+      scm_ = "scala_collection_mutable_",
+      scg_ = "scala_collection_generic_",
+      sc_ = "scala_collection_",
+      sr_ = "scala_runtime_",
+      s_ = "scala_",
+      jl_ = "java_lang_",
+      ju_ = "java_util_"
     )
     .asInstanceOf[js.Dictionary[String]]
 
@@ -445,8 +448,9 @@ object StackTrace {
     while (i < len) {
       val mtch = lineRE.exec(lines(i))
       if (mtch ne null) {
-        result.push("{anonymous}()@" + mtch(2).get + ":" + mtch(1).get
-            /* + " -- " + lines(i+1).replace("""^\s+""".re, "") */ )
+        result.push(
+          "{anonymous}()@" + mtch(2).get + ":" + mtch(1).get
+          /* + " -- " + lines(i+1).replace("""^\s+""".re, "") */ )
       }
       i += 2
     }
@@ -468,8 +472,9 @@ object StackTrace {
       val mtch = lineRE.exec(lines(i))
       if (mtch ne null) {
         val fnName = mtch(3).getOrElse("{anonymous}")
-        result.push(fnName + "()@" + mtch(2).get + ":" + mtch(1).get
-            /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
+        result.push(
+          fnName + "()@" + mtch(2).get + ":" + mtch(1).get
+          /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
       }
       i += 2
     }
@@ -514,8 +519,9 @@ object StackTrace {
         val fnName = fnName0
           .jsReplace("""<anonymous function: (\S+)>""".re, "$1")
           .jsReplace("""<anonymous function>""".re, "{anonymous}")
-        result.push(fnName + "@" + location
-            /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
+        result.push(
+          fnName + "@" + location
+          /* + " -- " + lines(i+1).replace("""^\s+""".re, "")*/ )
       }
       i += 2
     }
@@ -554,11 +560,11 @@ object StackTrace {
         columnNumber: js.UndefOr[Int] = js.undefined): JSStackTraceElem = {
       js.Dynamic
         .literal(
-            declaringClass = declaringClass,
-            methodName = methodName,
-            fileName = fileName,
-            lineNumber = lineNumber,
-            columnNumber = columnNumber
+          declaringClass = declaringClass,
+          methodName = methodName,
+          fileName = fileName,
+          lineNumber = lineNumber,
+          columnNumber = columnNumber
         )
         .asInstanceOf[JSStackTraceElem]
     }

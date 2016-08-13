@@ -11,7 +11,11 @@ import org.jboss.netty.buffer.ChannelBuffers
 import org.jboss.netty.handler.codec.http._
 import org.jboss.netty.handler.codec.http.HttpResponseStatus.OK
 import org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1
-import org.jboss.netty.handler.codec.http.{DefaultHttpChunk, DefaultHttpResponse, HttpChunk}
+import org.jboss.netty.handler.codec.http.{
+  DefaultHttpChunk,
+  DefaultHttpResponse,
+  HttpChunk
+}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -83,7 +87,7 @@ class HttpClientDispatcherTest extends FunSuite {
 
   def chunk(content: String) =
     new DefaultHttpChunk(
-        ChannelBuffers.wrappedBuffer(content.getBytes("UTF-8")))
+      ChannelBuffers.wrappedBuffer(content.getBytes("UTF-8")))
 
   private val timeout = Duration.fromSeconds(2)
 
@@ -194,8 +198,8 @@ class HttpClientDispatcherTest extends FunSuite {
     import OpTransport._
 
     val writep = new Promise[Unit]
-    val transport = OpTransport[Any, Any](
-        Write(Function.const(true), writep), Close(Future.Done))
+    val transport = OpTransport[Any, Any](Write(Function.const(true), writep),
+                                          Close(Future.Done))
 
     val disp = new HttpClientDispatcher(transport)
     val req = Request()

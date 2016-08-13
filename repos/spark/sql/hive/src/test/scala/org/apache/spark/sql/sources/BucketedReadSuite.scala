@@ -23,7 +23,10 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.physical.HashPartitioning
 import org.apache.spark.sql.execution.DataSourceScan
-import org.apache.spark.sql.execution.datasources.{BucketSpec, DataSourceStrategy}
+import org.apache.spark.sql.execution.datasources.{
+  BucketSpec,
+  DataSourceStrategy
+}
 import org.apache.spark.sql.execution.exchange.ShuffleExchange
 import org.apache.spark.sql.execution.joins.SortMergeJoin
 import org.apache.spark.sql.functions._
@@ -34,7 +37,9 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.collection.BitSet
 
 class BucketedReadSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   private val df =
@@ -61,13 +66,11 @@ class BucketedReadSuite
         assert(rdd.partitions.length == 8)
 
         val attrs = table.select("j", "k").queryExecution.analyzed.output
-        val checkBucketId = rdd.mapPartitionsWithIndex(
-            (index, rows) =>
-              {
-            val getBucketId = UnsafeProjection.create(
-                HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
-                output)
-            rows.map(row => getBucketId(row).getInt(0) -> index)
+        val checkBucketId = rdd.mapPartitionsWithIndex((index, rows) => {
+          val getBucketId = UnsafeProjection.create(
+            HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
+            output)
+          rows.map(row => getBucketId(row).getInt(0) -> index)
         })
         checkBucketId.collect().foreach(r => assert(r._1 == r._2))
       }
@@ -95,7 +98,7 @@ class BucketedReadSuite
       val matchedBuckets = new BitSet(numBuckets)
       bucketValues.foreach { value =>
         matchedBuckets.set(
-            DataSourceStrategy.getBucketId(bucketColumn, numBuckets, value))
+          DataSourceStrategy.getBucketId(bucketColumn, numBuckets, value))
       }
 
       // Filter could hide the bug in bucket pruning. Thus, skipping all the filters
@@ -107,7 +110,8 @@ class BucketedReadSuite
       val checkedResult = rdd.get.execute().mapPartitionsWithIndex {
         case (index, iter) =>
           if (matchedBuckets.get(index % numBuckets) && iter.nonEmpty)
-            Iterator(index) else Iterator()
+            Iterator(index)
+          else Iterator()
       }
       // TODO: These tests are not testing the right columns.
 //      // checking if all the pruned buckets are empty
@@ -117,8 +121,8 @@ class BucketedReadSuite
 //      }
 
       checkAnswer(
-          bucketedDataFrame.filter(filterCondition).orderBy("i", "j", "k"),
-          originalDataFrame.filter(filterCondition).orderBy("i", "j", "k"))
+        bucketedDataFrame.filter(filterCondition).orderBy("i", "j", "k"),
+        originalDataFrame.filter(filterCondition).orderBy("i", "j", "k"))
     }
   }
 
@@ -275,20 +279,23 @@ class BucketedReadSuite
         val joinOperator =
           joined.queryExecution.executedPlan.asInstanceOf[SortMergeJoin]
 
-        assert(joinOperator.left
-                 .find(_.isInstanceOf[ShuffleExchange])
-                 .isDefined == shuffleLeft,
-               s"expected shuffle in plan to be $shuffleLeft but found\n${joinOperator.left}")
-        assert(joinOperator.right
-                 .find(_.isInstanceOf[ShuffleExchange])
-                 .isDefined == shuffleRight,
-               s"expected shuffle in plan to be $shuffleRight but found\n${joinOperator.right}")
+        assert(
+          joinOperator.left
+            .find(_.isInstanceOf[ShuffleExchange])
+            .isDefined == shuffleLeft,
+          s"expected shuffle in plan to be $shuffleLeft but found\n${joinOperator.left}")
+        assert(
+          joinOperator.right
+            .find(_.isInstanceOf[ShuffleExchange])
+            .isDefined == shuffleRight,
+          s"expected shuffle in plan to be $shuffleRight but found\n${joinOperator.right}")
       }
     }
   }
 
-  private def joinCondition(
-      left: DataFrame, right: DataFrame, joinCols: Seq[String]): Column = {
+  private def joinCondition(left: DataFrame,
+                            right: DataFrame,
+                            joinCols: Seq[String]): Column = {
     joinCols.map(col => left(col) === right(col)).reduce(_ && _)
   }
 
@@ -321,7 +328,7 @@ class BucketedReadSuite
   }
 
   test(
-      "only shuffle one side when 2 bucketed tables have different bucket number") {
+    "only shuffle one side when 2 bucketed tables have different bucket number") {
     val bucketSpec1 = Some(BucketSpec(8, Seq("i", "j"), Nil))
     val bucketSpec2 = Some(BucketSpec(5, Seq("i", "j"), Nil))
     testBucketing(bucketSpec1,
@@ -332,7 +339,7 @@ class BucketedReadSuite
   }
 
   test(
-      "only shuffle one side when 2 bucketed tables have different bucket keys") {
+    "only shuffle one side when 2 bucketed tables have different bucket keys") {
     val bucketSpec1 = Some(BucketSpec(8, Seq("i"), Nil))
     val bucketSpec2 = Some(BucketSpec(8, Seq("j"), Nil))
     testBucketing(bucketSpec1,
@@ -374,9 +381,10 @@ class BucketedReadSuite
       checkAnswer(agged.sort("i", "j"),
                   df1.groupBy("i", "j").agg(max("k")).sort("i", "j"))
 
-      assert(agged.queryExecution.executedPlan
-            .find(_.isInstanceOf[ShuffleExchange])
-            .isEmpty)
+      assert(
+        agged.queryExecution.executedPlan
+          .find(_.isInstanceOf[ShuffleExchange])
+          .isEmpty)
     }
   }
 
@@ -392,9 +400,10 @@ class BucketedReadSuite
       checkAnswer(agged.sort("i", "j"),
                   df1.groupBy("i", "j").agg(max("k")).sort("i", "j"))
 
-      assert(agged.queryExecution.executedPlan
-            .find(_.isInstanceOf[ShuffleExchange])
-            .isEmpty)
+      assert(
+        agged.queryExecution.executedPlan
+          .find(_.isInstanceOf[ShuffleExchange])
+          .isEmpty)
     }
   }
 

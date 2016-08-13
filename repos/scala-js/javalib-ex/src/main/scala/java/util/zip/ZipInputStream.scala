@@ -67,7 +67,7 @@ class ZipInputStream(in: InputStream) extends InflaterInputStream(in) {
       res.setComment(jsEntry.comment.asInstanceOf[String])
 
       inner = new ArrayBufferInputStream(
-          jsEntry.asArrayBuffer().asInstanceOf[ArrayBuffer])
+        jsEntry.asArrayBuffer().asInstanceOf[ArrayBuffer])
 
       res
     } else null

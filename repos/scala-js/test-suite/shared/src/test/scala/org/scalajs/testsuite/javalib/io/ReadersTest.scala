@@ -36,8 +36,8 @@ class StringReaderTest {
     val buf = new Array[Char](10)
 
     assertEquals(4, r.read(buf, 2, 8))
-    assertArrayEquals(
-        buf.map(_.toInt), Array[Int](0, 0, 'a', 's', 'd', 'f', 0, 0, 0, 0))
+    assertArrayEquals(buf.map(_.toInt),
+                      Array[Int](0, 0, 'a', 's', 'd', 'f', 0, 0, 0, 0))
     assertEquals(-1, r.read(buf, 2, 8)) // #1560
   }
 
@@ -299,8 +299,8 @@ class InputStreamReaderTest {
     // Do it twice to check for a regression where this used to throw
     assertEquals(-1, streamReader.read(bytes))
     assertEquals(-1, streamReader.read(bytes))
-    expectThrows(
-        classOf[IndexOutOfBoundsException], streamReader.read(bytes, 10, 3))
+    expectThrows(classOf[IndexOutOfBoundsException],
+                 streamReader.read(bytes, 10, 3))
     assertEquals(0, streamReader.read(new Array[Char](0)))
   }
 }

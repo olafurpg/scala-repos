@@ -28,8 +28,8 @@ class SourceReader(decoder: CharsetDecoder, reporter: Reporter) {
 
   private def reportEncodingError(filename: String) = {
     reporter.error(
-        scala.reflect.internal.util.NoPosition,
-        "IO error while decoding " + filename + " with " + decoder.charset() +
+      scala.reflect.internal.util.NoPosition,
+      "IO error while decoding " + filename + " with " + decoder.charset() +
         "\n" + "Please try specifying another one using the -encoding option")
   }
 
@@ -37,7 +37,8 @@ class SourceReader(decoder: CharsetDecoder, reporter: Reporter) {
   def read(file: JFile): Array[Char] = {
     val c = new FileInputStream(file).getChannel
 
-    try read(c) catch {
+    try read(c)
+    catch {
       case e: Exception => reportEncodingError("" + file); Array()
     } finally c.close()
   }

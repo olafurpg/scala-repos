@@ -43,8 +43,8 @@ class AkkaHttpServer(config: ServerConfig,
   import AkkaHttpServer._
 
   assert(
-      config.port.isDefined || config.sslPort.isDefined,
-      "AkkaHttpServer must be given at least one of an HTTP and an HTTPS port")
+    config.port.isDefined || config.sslPort.isDefined,
+    "AkkaHttpServer must be given at least one of an HTTP and an HTTPS port")
 
   def mode = config.mode
 
@@ -54,20 +54,23 @@ class AkkaHttpServer(config: ServerConfig,
   implicit val mat = materializer
 
   private def createServerBinding(
-      port: Int, connectionContext: ConnectionContext): Http.ServerBinding = {
+      port: Int,
+      connectionContext: ConnectionContext): Http.ServerBinding = {
     // Listen for incoming connections and handle them with the `handleRequest` method.
 
     // TODO: pass in Inet.SocketOption, ServerSettings and LoggerAdapter params?
-    val serverSource: Source[
-        Http.IncomingConnection, Future[Http.ServerBinding]] = Http().bind(
-        interface = config.address,
-        port = port,
-        connectionContext = connectionContext)
+    val serverSource: Source[Http.IncomingConnection,
+                             Future[Http.ServerBinding]] = Http().bind(
+      interface = config.address,
+      port = port,
+      connectionContext = connectionContext)
 
     val connectionSink: Sink[Http.IncomingConnection, _] = Sink.foreach {
       connection: Http.IncomingConnection =>
-        connection.handleWithAsyncHandler(handleRequest(
-                connection.remoteAddress, _, connectionContext.isSecure))
+        connection.handleWithAsyncHandler(
+          handleRequest(connection.remoteAddress,
+                        _,
+                        connectionContext.isSecure))
     }
 
     val bindingFuture: Future[Http.ServerBinding] =
@@ -78,8 +81,8 @@ class AkkaHttpServer(config: ServerConfig,
     Await.result(bindingFuture, bindTimeout)
   }
 
-  private val httpServerBinding = config.port.map(
-      port => createServerBinding(port, ConnectionContext.noEncryption()))
+  private val httpServerBinding = config.port.map(port =>
+    createServerBinding(port, ConnectionContext.noEncryption()))
 
   private val httpsServerBinding = config.sslPort.map { port =>
     val connectionContext = try {
@@ -107,8 +110,8 @@ class AkkaHttpServer(config: ServerConfig,
   // until we have an Application available before we can read any configuration. :(
   private lazy val modelConversion: ModelConversion = {
     val forwardedHeaderHandler = new ForwardedHeaderHandler(
-        ForwardedHeaderHandler.ForwardedHeaderHandlerConfig(
-            applicationProvider.get.toOption.map(_.configuration)))
+      ForwardedHeaderHandler.ForwardedHeaderHandlerConfig(
+        applicationProvider.get.toOption.map(_.configuration)))
     new ModelConversion(forwardedHeaderHandler)
   }
 
@@ -122,13 +125,13 @@ class AkkaHttpServer(config: ServerConfig,
                                      secureProtocol = secure,
                                      request = request)
     val (taggedRequestHeader, handler, newTryApp) = getHandler(
-        convertedRequestHeader)
+      convertedRequestHeader)
     val responseFuture = executeHandler(
-        newTryApp,
-        request,
-        taggedRequestHeader,
-        requestBodySource,
-        handler
+      newTryApp,
+      request,
+      taggedRequestHeader,
+      requestBodySource,
+      handler
     )
     responseFuture
   }
@@ -138,17 +141,16 @@ class AkkaHttpServer(config: ServerConfig,
     getHandlerFor(requestHeader) match {
       case Left(futureResult) =>
         (
-            requestHeader,
-            EssentialAction(_ => Accumulator.done(futureResult)),
-            Failure(
-                new Exception(
-                    "getHandler returned Result, but not Application"))
+          requestHeader,
+          EssentialAction(_ => Accumulator.done(futureResult)),
+          Failure(
+            new Exception("getHandler returned Result, but not Application"))
         )
       case Right((newRequestHeader, handler, newApp)) =>
         (
-            newRequestHeader,
-            handler,
-            Success(newApp) // TODO: Change getHandlerFor to use the app that we already had
+          newRequestHeader,
+          handler,
+          Success(newApp) // TODO: Change getHandlerFor to use the app that we already had
         )
     }
   }
@@ -182,8 +184,8 @@ class AkkaHttpServer(config: ServerConfig,
 
         websocket(taggedRequestHeader).map {
           case Left(result) =>
-            modelConversion.convertResult(
-                taggedRequestHeader, result, request.protocol)
+            modelConversion
+              .convertResult(taggedRequestHeader, result, request.protocol)
           case Right(flow) =>
             WebSocketHandler.handleWebSocket(upgrade, flow, 16384)
         }
@@ -193,7 +195,7 @@ class AkkaHttpServer(config: ServerConfig,
         sys.error(s"WebSocket returned for non WebSocket request")
       case (unhandled, _) =>
         sys.error(
-            s"AkkaHttpServer doesn't handle Handlers of this type: $unhandled")
+          s"AkkaHttpServer doesn't handle Handlers of this type: $unhandled")
     }
   }
 
@@ -215,7 +217,7 @@ class AkkaHttpServer(config: ServerConfig,
 
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     val actionAccumulator: Accumulator[ByteString, Result] = action(
-        taggedRequestHeader)
+      taggedRequestHeader)
 
     val source =
       if (request.header[Expect].contains(Expect.`100-continue`)) {
@@ -225,7 +227,7 @@ class AkkaHttpServer(config: ServerConfig,
         // https://github.com/akka/akka/issues/17782 for more details.
         requestBodySource
           .map(source =>
-                Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
+            Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
           .orElse(Some(Source.empty))
       } else {
         requestBodySource
@@ -238,8 +240,8 @@ class AkkaHttpServer(config: ServerConfig,
     val responseFuture: Future[HttpResponse] = resultFuture.map { result =>
       val cleanedResult: Result =
         ServerResultUtils.cleanFlashCookie(taggedRequestHeader, result)
-      modelConversion.convertResult(
-          taggedRequestHeader, cleanedResult, request.protocol)
+      modelConversion
+        .convertResult(taggedRequestHeader, cleanedResult, request.protocol)
     }
     responseFuture
   }
@@ -301,29 +303,29 @@ class AkkaHttpServer(config: ServerConfig,
   private def mockSslContext(
       sslEngineProvider: SSLEngineProvider): SSLContext = {
     new SSLContext(
-        new SSLContextSpi() {
-          def engineCreateSSLEngine() = sslEngineProvider.createSSLEngine()
-          def engineCreateSSLEngine(s: String, i: Int) =
-            engineCreateSSLEngine()
+      new SSLContextSpi() {
+        def engineCreateSSLEngine() = sslEngineProvider.createSSLEngine()
+        def engineCreateSSLEngine(s: String, i: Int) =
+          engineCreateSSLEngine()
 
-          def engineInit(keyManagers: Array[KeyManager],
-                         trustManagers: Array[TrustManager],
-                         secureRandom: SecureRandom) = ()
-          def engineGetClientSessionContext() =
-            SSLContext.getDefault.getClientSessionContext
-          def engineGetServerSessionContext() =
-            SSLContext.getDefault.getServerSessionContext
-          def engineGetSocketFactory() =
-            SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory]
-          def engineGetServerSocketFactory() =
-            SSLServerSocketFactory.getDefault
-              .asInstanceOf[SSLServerSocketFactory]
-        },
-        new Provider(
-            "Play SSlEngineProvider delegate",
-            1d,
-            "A provider that only implements the creation of SSL engines, and delegates to Play's SSLEngineProvider") {},
-        "Play SSLEngineProvider delegate") {}
+        def engineInit(keyManagers: Array[KeyManager],
+                       trustManagers: Array[TrustManager],
+                       secureRandom: SecureRandom) = ()
+        def engineGetClientSessionContext() =
+          SSLContext.getDefault.getClientSessionContext
+        def engineGetServerSessionContext() =
+          SSLContext.getDefault.getServerSessionContext
+        def engineGetSocketFactory() =
+          SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory]
+        def engineGetServerSocketFactory() =
+          SSLServerSocketFactory.getDefault
+            .asInstanceOf[SSLServerSocketFactory]
+      },
+      new Provider(
+        "Play SSlEngineProvider delegate",
+        1d,
+        "A provider that only implements the creation of SSL engines, and delegates to Play's SSLEngineProvider") {},
+      "Play SSLEngineProvider delegate") {}
   }
 }
 

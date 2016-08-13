@@ -28,8 +28,8 @@ private[tournament] final class Reminder(renderer: ActorSelection)
           bus.publish(SendTos(userIds.toSet,
                               Json.obj("t" -> "tournamentReminder",
                                        "d" -> Json.obj(
-                                           "id" -> tour.id,
-                                           "html" -> html.toString
+                                         "id" -> tour.id,
+                                         "html" -> html.toString
                                        ))),
                       'users)
       }

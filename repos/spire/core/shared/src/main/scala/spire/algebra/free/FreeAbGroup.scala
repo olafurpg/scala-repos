@@ -125,7 +125,7 @@ object FreeAbGroup { companion =>
       def id: FreeAbGroup[A] = companion.id
       def op(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
       def inverse(a: FreeAbGroup[A]): FreeAbGroup[A] = a.inverse
-      override def opInverse(
-          a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
+      override def opInverse(a: FreeAbGroup[A],
+                             b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
     }
 }

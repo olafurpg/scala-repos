@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -45,7 +45,7 @@ trait SegmentFormatSupport {
   import Arbitrary.arbitrary
 
   implicit lazy val arbBigDecimal: Arbitrary[BigDecimal] = Arbitrary(
-      Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
+    Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
       (BigDecimal(_)))
 
   def genCPath: Gen[CPath] =
@@ -78,16 +78,16 @@ trait SegmentFormatSupport {
 
   def genCValueType(maxDepth: Int = 2): Gen[CValueType[_]] = {
     val basic: Gen[CValueType[_]] = oneOf(
-        Seq(CBoolean, CString, CLong, CDouble, CNum, CDate))
+      Seq(CBoolean, CString, CLong, CDouble, CNum, CDate))
     if (maxDepth > 0) {
-      frequency(
-          6 -> basic, 1 -> (genCValueType(maxDepth - 1) map (CArrayType(_))))
+      frequency(6 -> basic,
+                1 -> (genCValueType(maxDepth - 1) map (CArrayType(_))))
     } else {
       basic
     }
   }
 
-  def genArray[A : Manifest](length: Int, g: Gen[A]): Gen[Array[A]] =
+  def genArray[A: Manifest](length: Int, g: Gen[A]): Gen[Array[A]] =
     for {
       values <- listOfN(length, g)
     } yield {
@@ -99,8 +99,8 @@ trait SegmentFormatSupport {
       array
     }
 
-  def genArraySegmentForCType[A](
-      ctype: CValueType[A], length: Int): Gen[ArraySegment[_]] = {
+  def genArraySegmentForCType[A](ctype: CValueType[A],
+                                 length: Int): Gen[ArraySegment[_]] = {
     val g = genForCType(ctype)
     for {
       blockId <- arbitrary[Long]
@@ -170,7 +170,7 @@ trait SegmentFormatMatchers { self: Specification with ScalaCheck =>
       case Success(_) =>
         format.reader.readSegment(new InMemoryReadableByteChannel(out.toArray)) must beLike {
           case Success(segment1) =>
-            // 
+            //
             areEqual(segment0, segment1)
         }
     }
@@ -178,8 +178,8 @@ trait SegmentFormatMatchers { self: Specification with ScalaCheck =>
 }
 
 final class StubSegmentFormat extends SegmentFormat {
-  val TheOneSegment = NullSegment(
-      42L, CPath("w.t.f"), CNull, BitSetUtil.create(), 100)
+  val TheOneSegment =
+    NullSegment(42L, CPath("w.t.f"), CNull, BitSetUtil.create(), 100)
 
   object reader extends SegmentReader {
     def readSegmentId(

@@ -45,7 +45,7 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     assert(getParam(DISK_BYTES_SPILLED) === LongAccumulatorParam)
     assert(getParam(PEAK_EXECUTION_MEMORY) === LongAccumulatorParam)
     assert(
-        getParam(UPDATED_BLOCK_STATUSES) === UpdatedBlockStatusesAccumulatorParam)
+      getParam(UPDATED_BLOCK_STATUSES) === UpdatedBlockStatusesAccumulatorParam)
     assert(getParam(TEST_ACCUM) === LongAccumulatorParam)
     // shuffle read
     assert(getParam(shuffleRead.REMOTE_BLOCKS_FETCHED) === IntAccumulatorParam)
@@ -80,8 +80,8 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     val inputReadMethod = create(input.READ_METHOD)
     assert(executorRunTime.name === Some(EXECUTOR_RUN_TIME))
     assert(updatedBlockStatuses.name === Some(UPDATED_BLOCK_STATUSES))
-    assert(shuffleRemoteBlocksRead.name === Some(
-            shuffleRead.REMOTE_BLOCKS_FETCHED))
+    assert(
+      shuffleRemoteBlocksRead.name === Some(shuffleRead.REMOTE_BLOCKS_FETCHED))
     assert(inputReadMethod.name === Some(input.READ_METHOD))
     assert(executorRunTime.value.isInstanceOf[Long])
     assert(updatedBlockStatuses.value.isInstanceOf[Seq[_]])
@@ -144,10 +144,12 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     assert(OUTPUT_METRICS_PREFIX.startsWith(METRICS_PREFIX))
     assert(accums.forall(_.name.get.startsWith(METRICS_PREFIX)))
     // assert they all start with the expected prefixes
-    assert(shuffleReadAccums.forall(
-            _.name.get.startsWith(SHUFFLE_READ_METRICS_PREFIX)))
-    assert(shuffleWriteAccums.forall(
-            _.name.get.startsWith(SHUFFLE_WRITE_METRICS_PREFIX)))
+    assert(
+      shuffleReadAccums.forall(
+        _.name.get.startsWith(SHUFFLE_READ_METRICS_PREFIX)))
+    assert(
+      shuffleWriteAccums.forall(
+        _.name.get.startsWith(SHUFFLE_WRITE_METRICS_PREFIX)))
     assert(inputAccums.forall(_.name.get.startsWith(INPUT_METRICS_PREFIX)))
     assert(outputAccums.forall(_.name.get.startsWith(OUTPUT_METRICS_PREFIX)))
   }
@@ -231,9 +233,10 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
          findTestAccum(stageInfos(2).accumulables.values))
       assert(firstStageAccum.value.get.asInstanceOf[Long] === numPartitions)
       assert(
-          secondStageAccum.value.get.asInstanceOf[Long] === numPartitions * 10)
+        secondStageAccum.value.get.asInstanceOf[Long] === numPartitions * 10)
       assert(
-          thirdStageAccum.value.get.asInstanceOf[Long] === numPartitions * 2 * 100)
+        thirdStageAccum.value.get
+          .asInstanceOf[Long] === numPartitions * 2 * 100)
     }
     rdd.count()
   }
@@ -268,11 +271,11 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
           taskContext.taskAttemptId() < numPartitions * 2
         if (isFirstStageAttempt) {
           throw new FetchFailedException(
-              SparkEnv.get.blockManager.blockManagerId,
-              sid,
-              taskContext.partitionId(),
-              taskContext.partitionId(),
-              "simulated fetch failure")
+            SparkEnv.get.blockManager.blockManagerId,
+            sid,
+            taskContext.partitionId(),
+            taskContext.partitionId(),
+            "simulated fetch failure")
         } else {
           iter
         }
@@ -297,9 +300,9 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
       // result stage, not the map stage. This means we should get the accumulator updates
       // from all partitions.
       assert(
-          stageAccum1stAttempt.value.get.asInstanceOf[Long] === numPartitions)
+        stageAccum1stAttempt.value.get.asInstanceOf[Long] === numPartitions)
       assert(
-          stageAccum2ndAttempt.value.get.asInstanceOf[Long] === numPartitions)
+        stageAccum2ndAttempt.value.get.asInstanceOf[Long] === numPartitions)
       // Because this test resubmitted the map stage with all missing partitions, we should have
       // created a fresh set of internal accumulators in the 2nd stage attempt. Assert this is
       // the case by comparing the accumulator IDs between the two attempts.

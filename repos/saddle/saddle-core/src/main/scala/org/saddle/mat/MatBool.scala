@@ -33,8 +33,8 @@ class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean] {
 
   def toVec = scalarTag.makeVec(toArray)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](
-      f: (Boolean) => B): Mat[B] = MatImpl.map(this)(f)
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: (Boolean) => B): Mat[B] =
+    MatImpl.map(this)(f)
 
   // Cache the transpose: it's much faster to transpose and slice a continuous
   // bound than to take large strides, especially on large matrices where it
@@ -85,13 +85,13 @@ class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean] {
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {
           eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
-              rv.scalarTag.isMissing(rv(i)))
+            (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+            rv.scalarTag.isMissing(rv(i)))
           i += 1
         }
         eq

@@ -58,13 +58,15 @@ class DefaultPromiseTest {
     /** Get the chain for a given promise */
     private def promiseChain(p: PromiseId): Option[(ChainId, Chain)] = {
       val found: Iterable[(ChainId, Chain)] = for ((cid, c) <- chains;
-      p0 <- c.promises; if (p0 == p)) yield ((cid, c))
+                                                   p0 <- c.promises;
+                                                   if (p0 == p))
+        yield ((cid, c))
       found.toList match {
         case Nil => None
         case x :: Nil => Some(x)
         case _ =>
           throw new IllegalStateException(
-              s"Promise $p found in more than one chain")
+            s"Promise $p found in more than one chain")
       }
     }
 
@@ -182,13 +184,14 @@ class DefaultPromiseTest {
       val (newCidA, newCidB) = mergeOp match {
         case NoMerge => (cidA, cidB)
         case Merge(newState) => {
-            chains = chains - cidA
-            chains = chains - cidB
-            val newCid = freshId()
-            chains = chains.updated(
-                newCid, Chain(chainA.promises ++ chainB.promises, newState))
-            (newCid, newCid)
-          }
+          chains = chains - cidA
+          chains = chains - cidB
+          val newCid = freshId()
+          chains = chains.updated(
+            newCid,
+            Chain(chainA.promises ++ chainB.promises, newState))
+          (newCid, newCid)
+        }
       }
       assertPromiseValues()
       (newCidA, newCidB)
@@ -324,8 +327,7 @@ class DefaultPromiseTest {
       val doneLatch = new CountDownLatch(flatMapCount + 1)
       def execute(f: => Unit) {
         val ec = ExecutionContext.global
-        ec.execute(
-            new Runnable {
+        ec.execute(new Runnable {
           def run() {
             try {
               startLatch.await()

@@ -67,7 +67,7 @@ object Parameter {
       // Unsupported type. Write the error to log, and write the type as null.
       // This allows us to safely skip writing the parameter without corrupting the buffer.
       log.warning(
-          s"Unknown parameter ${v.getClass.getName} will be treated as SQL NULL.")
+        s"Unknown parameter ${v.getClass.getName} will be treated as SQL NULL.")
       Parameter.NullParameter
   }
 

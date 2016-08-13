@@ -113,7 +113,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
     assert(thrown.getClass === classOf[SparkException])
     assert(thrown.getMessage.contains("serializable") ||
-           thrown.getCause.getClass === classOf[NotSerializableException],
+             thrown.getCause.getClass === classOf[NotSerializableException],
            "Exception does not contain \"serializable\": " + thrown.getMessage)
 
     FailureSuiteState.clear()
@@ -128,7 +128,8 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
       sc.parallelize(1 to 10, 2).map(x => a).count()
     }
     assert(thrown.getClass === classOf[SparkException])
-    assert(thrown.getMessage.contains("NotSerializableException") ||
+    assert(
+      thrown.getMessage.contains("NotSerializableException") ||
         thrown.getCause.getClass === classOf[NotSerializableException])
 
     // Non-serializable closure in an earlier stage
@@ -139,7 +140,8 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
         .count()
     }
     assert(thrown1.getClass === classOf[SparkException])
-    assert(thrown1.getMessage.contains("NotSerializableException") ||
+    assert(
+      thrown1.getMessage.contains("NotSerializableException") ||
         thrown1.getCause.getClass === classOf[NotSerializableException])
 
     // Non-serializable closure in foreach function
@@ -149,7 +151,8 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
       // scalastyle:on println
     }
     assert(thrown2.getClass === classOf[SparkException])
-    assert(thrown2.getMessage.contains("NotSerializableException") ||
+    assert(
+      thrown2.getMessage.contains("NotSerializableException") ||
         thrown2.getCause.getClass === classOf[NotSerializableException])
 
     FailureSuiteState.clear()
@@ -172,7 +175,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
         .count()
     }
     assert(
-        thrownDueToTaskFailure.getMessage.contains("intentional task failure"))
+      thrownDueToTaskFailure.getMessage.contains("intentional task failure"))
 
     // If the task succeeded but memory was leaked, then the task should fail due to that leak
     val thrownDueToMemoryLeak = intercept[SparkException] {
@@ -197,7 +200,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
           FailureSuiteState.tasksFailed += 1
           throw new UserException("oops",
                                   new IllegalArgumentException("failed=" +
-                                      FailureSuiteState.tasksFailed))
+                                    FailureSuiteState.tasksFailed))
         }
       }
       x * x
@@ -211,14 +214,14 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     assert(thrown.getClass === classOf[SparkException])
     assert(thrown.getCause.getClass === classOf[UserException])
     assert(thrown.getCause.getMessage === "oops")
-    assert(thrown.getCause.getCause.getClass === classOf[
-            IllegalArgumentException])
+    assert(
+      thrown.getCause.getCause.getClass === classOf[IllegalArgumentException])
     assert(thrown.getCause.getCause.getMessage === "failed=2")
     FailureSuiteState.clear()
   }
 
   test(
-      "failure cause stacktrace is sent back to driver if exception is not serializable") {
+    "failure cause stacktrace is sent back to driver if exception is not serializable") {
     sc = new SparkContext("local", "test")
     val thrown = intercept[SparkException] {
       sc.makeRDD(1 to 3).foreach { _ =>
@@ -232,7 +235,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test(
-      "failure cause stacktrace is sent back to driver if exception is not deserializable") {
+    "failure cause stacktrace is sent back to driver if exception is not deserializable") {
     sc = new SparkContext("local", "test")
     val thrown = intercept[SparkException] {
       sc.makeRDD(1 to 3).foreach { _ =>

@@ -64,7 +64,7 @@ class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
       (1 + 2 * 2) * precision2 * recall2 / (2 * 2 * precision2 + recall2)
 
     assert(
-        metrics.confusionMatrix.toArray.sameElements(confusionMatrix.toArray))
+      metrics.confusionMatrix.toArray.sameElements(confusionMatrix.toArray))
     assert(math.abs(metrics.falsePositiveRate(0.0) - fpRate0) < delta)
     assert(math.abs(metrics.falsePositiveRate(1.0) - fpRate1) < delta)
     assert(math.abs(metrics.falsePositiveRate(2.0) - fpRate2) < delta)
@@ -81,21 +81,24 @@ class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(math.abs(metrics.fMeasure(1.0, 2.0) - f2measure1) < delta)
     assert(math.abs(metrics.fMeasure(2.0, 2.0) - f2measure2) < delta)
 
-    assert(math.abs(metrics.recall - (2.0 + 3.0 + 1.0) /
-            ((2 + 3 + 1) + (1 + 1 + 1))) < delta)
+    assert(
+      math.abs(metrics.recall - (2.0 + 3.0 + 1.0) /
+        ((2 + 3 + 1) + (1 + 1 + 1))) < delta)
     assert(math.abs(metrics.recall - metrics.precision) < delta)
     assert(math.abs(metrics.recall - metrics.fMeasure) < delta)
     assert(math.abs(metrics.recall - metrics.weightedRecall) < delta)
-    assert(math.abs(metrics.weightedFalsePositiveRate -
-            ((4.0 / 9) * fpRate0 + (4.0 / 9) * fpRate1 + (1.0 / 9) * fpRate2)) < delta)
+    assert(
+      math.abs(metrics.weightedFalsePositiveRate -
+        ((4.0 / 9) * fpRate0 + (4.0 / 9) * fpRate1 + (1.0 / 9) * fpRate2)) < delta)
     assert(math.abs(metrics.weightedPrecision -
-            ((4.0 / 9) * precision0 + (4.0 / 9) * precision1 + (1.0 / 9) * precision2)) < delta)
-    assert(math.abs(metrics.weightedRecall -
-            ((4.0 / 9) * recall0 + (4.0 / 9) * recall1 + (1.0 / 9) * recall2)) < delta)
+      ((4.0 / 9) * precision0 + (4.0 / 9) * precision1 + (1.0 / 9) * precision2)) < delta)
+    assert(
+      math.abs(metrics.weightedRecall -
+        ((4.0 / 9) * recall0 + (4.0 / 9) * recall1 + (1.0 / 9) * recall2)) < delta)
     assert(math.abs(metrics.weightedFMeasure -
-            ((4.0 / 9) * f1measure0 + (4.0 / 9) * f1measure1 + (1.0 / 9) * f1measure2)) < delta)
+      ((4.0 / 9) * f1measure0 + (4.0 / 9) * f1measure1 + (1.0 / 9) * f1measure2)) < delta)
     assert(math.abs(metrics.weightedFMeasure(2.0) -
-            ((4.0 / 9) * f2measure0 + (4.0 / 9) * f2measure1 + (1.0 / 9) * f2measure2)) < delta)
+      ((4.0 / 9) * f2measure0 + (4.0 / 9) * f2measure1 + (1.0 / 9) * f2measure2)) < delta)
     assert(metrics.labels.sameElements(labels))
   }
 }

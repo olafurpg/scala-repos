@@ -9,7 +9,13 @@ import akka.util.{ReflectiveAccess, Switch}
 
 import java.util.Queue
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{TimeUnit, ExecutorService, RejectedExecutionException, ConcurrentLinkedQueue, LinkedBlockingQueue}
+import java.util.concurrent.{
+  TimeUnit,
+  ExecutorService,
+  RejectedExecutionException,
+  ConcurrentLinkedQueue,
+  LinkedBlockingQueue
+}
 
 /**
   * Default settings are:
@@ -67,7 +73,8 @@ import java.util.concurrent.{TimeUnit, ExecutorService, RejectedExecutionExcepti
 class ExecutorBasedEventDrivenDispatcher(
     _name: String,
     val throughput: Int = Dispatchers.THROUGHPUT,
-    val throughputDeadlineTime: Int = Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
+    val throughputDeadlineTime: Int =
+      Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
     val mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     val config: ThreadPoolConfig = ThreadPoolConfig())
     extends MessageDispatcher {
@@ -111,7 +118,7 @@ class ExecutorBasedEventDrivenDispatcher(
 
   private[akka] val threadFactory = new MonitorableThreadFactory(name)
   private[akka] val executorService = new AtomicReference[ExecutorService](
-      config.createLazyExecutorService(threadFactory))
+    config.createLazyExecutorService(threadFactory))
 
   private[akka] def dispatch(invocation: MessageInvocation) = {
     val mbox = getMailbox(invocation.receiver)
@@ -121,7 +128,8 @@ class ExecutorBasedEventDrivenDispatcher(
 
   private[akka] def executeFuture(invocation: FutureInvocation[_]): Unit =
     if (active.isOn) {
-      try executorService.get() execute invocation catch {
+      try executorService.get() execute invocation
+      catch {
         case e: RejectedExecutionException =>
           EventHandler.warning(this, e.toString)
           throw e
@@ -159,7 +167,7 @@ class ExecutorBasedEventDrivenDispatcher(
 
   private[akka] def shutdown {
     val old = executorService.getAndSet(
-        config.createLazyExecutorService(threadFactory))
+      config.createLazyExecutorService(threadFactory))
     if (old ne null) {
       old.shutdownNow()
     }
@@ -179,7 +187,8 @@ class ExecutorBasedEventDrivenDispatcher(
             throw e
         }
       } else {
-        mbox.dispatcherLock.unlock() //If the dispatcher isn't active or if the actor is suspended, unlock the dispatcher lock
+        mbox.dispatcherLock
+          .unlock() //If the dispatcher isn't active or if the actor is suspended, unlock the dispatcher lock
       }
     }
   }
@@ -238,7 +247,8 @@ trait ExecutableMailbox extends Runnable { self: MessageQueue =>
           val deadlineNs =
             if (isDeadlineEnabled)
               System.nanoTime +
-              TimeUnit.MILLISECONDS.toNanos(dispatcher.throughputDeadlineTime)
+                TimeUnit.MILLISECONDS.toNanos(
+                  dispatcher.throughputDeadlineTime)
             else 0
           do {
             nextMessage.invoke
@@ -249,7 +259,7 @@ trait ExecutableMailbox extends Runnable { self: MessageQueue =>
               processedMessages += 1
               if ((processedMessages >= dispatcher.throughput) ||
                   (isDeadlineEnabled &&
-                      System.nanoTime >= deadlineNs)) // If we're throttled, break out
+                  System.nanoTime >= deadlineNs)) // If we're throttled, break out
                 null //We reached our boundaries, abort
               else self.dequeue //Dequeue the next message
             }
@@ -279,8 +289,8 @@ abstract class PriorityGenerator
     extends java.util.Comparator[MessageInvocation] {
   def gen(message: Any): Int
 
-  final def compare(
-      thisMessage: MessageInvocation, thatMessage: MessageInvocation): Int =
+  final def compare(thisMessage: MessageInvocation,
+                    thatMessage: MessageInvocation): Int =
     gen(thisMessage.message) - gen(thatMessage.message)
 }
 
@@ -297,8 +307,11 @@ class PriorityExecutorBasedEventDrivenDispatcher(
     throughputDeadlineTime: Int = Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
     mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     config: ThreadPoolConfig = ThreadPoolConfig())
-    extends ExecutorBasedEventDrivenDispatcher(
-        name, throughput, throughputDeadlineTime, mailboxType, config)
+    extends ExecutorBasedEventDrivenDispatcher(name,
+                                               throughput,
+                                               throughputDeadlineTime,
+                                               mailboxType,
+                                               config)
     with PriorityMailbox {
 
   def this(name: String,

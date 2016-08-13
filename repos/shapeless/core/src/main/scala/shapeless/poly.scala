@@ -50,11 +50,11 @@ object PolyDefns extends Cases {
       val value = v
     }
 
-    implicit def materializeFromValue1[P, F[_], T]: Case[P, F[T] :: HNil] = macro PolyMacros
-      .materializeFromValueImpl[P, F[T], T]
+    implicit def materializeFromValue1[P, F[_], T]: Case[P, F[T] :: HNil] =
+      macro PolyMacros.materializeFromValueImpl[P, F[T], T]
 
-    implicit def materializeFromValue2[P, T]: Case[P, T :: HNil] = macro PolyMacros
-      .materializeFromValueImpl[P, T, T]
+    implicit def materializeFromValue2[P, T]: Case[P, T :: HNil] =
+      macro PolyMacros.materializeFromValueImpl[P, T, T]
   }
 
   type Case0[P] = Case[P, HNil]
@@ -91,8 +91,12 @@ object PolyDefns extends Cases {
   class RotateLeft[P, N](p: P) extends Poly
 
   object RotateLeft {
-    implicit def rotateLeftCase[
-        C, P <: Poly, N <: Nat, L <: HList, LOut, RL <: HList](
+    implicit def rotateLeftCase[C,
+                                P <: Poly,
+                                N <: Nat,
+                                L <: HList,
+                                LOut,
+                                RL <: HList](
         implicit unpack: Unpack2[C, RotateLeft, P, N],
         cP: Case.Aux[P, L, LOut],
         rotateRight: hl.RotateRight.Aux[RL, N, L]): Case.Aux[C, RL, LOut] =
@@ -111,8 +115,12 @@ object PolyDefns extends Cases {
   class RotateRight[P, N](p: P) extends Poly
 
   object RotateRight {
-    implicit def rotateLeftCase[
-        C, P <: Poly, N <: Nat, L <: HList, LOut, RL <: HList](
+    implicit def rotateLeftCase[C,
+                                P <: Poly,
+                                N <: Nat,
+                                L <: HList,
+                                LOut,
+                                RL <: HList](
         implicit unpack: Unpack2[C, RotateRight, P, N],
         cP: Case.Aux[P, L, LOut],
         rotateLeft: hl.RotateLeft.Aux[RL, N, L]): Case.Aux[C, RL, LOut] =
@@ -280,8 +288,8 @@ class PolyMacros(val c: whitebox.Context) {
 
   import PolyDefns.Case
 
-  def materializeFromValueImpl[
-      P : WeakTypeTag, FT : WeakTypeTag, T : WeakTypeTag]: Tree = {
+  def materializeFromValueImpl[P: WeakTypeTag, FT: WeakTypeTag, T: WeakTypeTag]
+    : Tree = {
     val pTpe = weakTypeOf[P]
     val ftTpe = weakTypeOf[FT]
     val tTpe = weakTypeOf[T]
@@ -289,8 +297,8 @@ class PolyMacros(val c: whitebox.Context) {
     val recTpe = weakTypeOf[Case[P, FT :: HNil]]
     if (c.openImplicits.tail.exists(_.pt =:= recTpe))
       c.abort(
-          c.enclosingPosition,
-          s"Diverging implicit expansion for Case.Aux[$pTpe, $ftTpe :: HNil]")
+        c.enclosingPosition,
+        s"Diverging implicit expansion for Case.Aux[$pTpe, $ftTpe :: HNil]")
 
     val value = pTpe match {
       case SingleType(_, f) => f

@@ -20,5 +20,5 @@ trait PrivateWithin { self: SymbolTable =>
   // it apparently occurs when processing v45.3 bytecode.
   def setPackageAccessBoundary(sym: Symbol): Symbol =
     (if (sym.enclosingTopLevelClass eq NoSymbol) sym
-     else sym setPrivateWithin sym.enclosingTopLevelClass.owner)
+    else sym setPrivateWithin sym.enclosingTopLevelClass.owner)
 }

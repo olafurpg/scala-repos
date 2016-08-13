@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
   * A "stack" with a bounded size.  If you push a new element on the top
   * when the stack is full, the oldest element gets dropped off the bottom.
   */
-class BoundedStack[A : ClassTag](val maxSize: Int) extends Seq[A] {
+class BoundedStack[A: ClassTag](val maxSize: Int) extends Seq[A] {
   private val array = new Array[A](maxSize)
   private var top = 0
   private var count_ = 0

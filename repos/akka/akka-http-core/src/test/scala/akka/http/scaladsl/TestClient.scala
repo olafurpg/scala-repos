@@ -32,7 +32,7 @@ object TestClient extends App {
 
   def fetchServerVersion1(): Unit = {
     println(
-        s"Fetching HTTPS server version of host `$host` via a direct low-level connection ...")
+      s"Fetching HTTPS server version of host `$host` via a direct low-level connection ...")
 
     val connection = Http().outgoingConnectionHttps(host)
     val result =
@@ -52,7 +52,7 @@ object TestClient extends App {
 
   def fetchServerVersion2(): Unit = {
     println(
-        s"Fetching HTTP server version of host `$host` via the high-level API ...")
+      s"Fetching HTTP server version of host `$host` via the high-level API ...")
     val result = Http().singleRequest(HttpRequest(uri = s"https://$host/"))
     result.map(_.header[headers.Server]) onComplete {
       case Success(res) ⇒

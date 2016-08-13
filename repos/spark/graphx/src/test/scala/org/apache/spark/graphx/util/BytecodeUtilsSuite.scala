@@ -87,7 +87,7 @@ class BytecodeUtilsSuite extends SparkFunSuite {
   }
 
   test(
-      "closure calling a function that invokes a method which uses another closure") {
+    "closure calling a function that invokes a method which uses another closure") {
     val c2 = { e: TestClass =>
       println(e.baz)
     }

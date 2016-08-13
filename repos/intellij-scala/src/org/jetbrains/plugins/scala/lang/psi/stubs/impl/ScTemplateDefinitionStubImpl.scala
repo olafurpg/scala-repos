@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
   */
 class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScTemplateDefinition](parent, elemType)
     with ScTemplateDefinitionStub {
 
@@ -36,8 +36,8 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
   private var visibleInJava: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: String,
            qualName: String,
            javaQualName: String,
@@ -53,9 +53,9 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
            isLocal: Boolean,
            visibleInJava: Boolean) {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     mySourceFileName = sourceFileName
     myName = name
     myQualName = qualName
@@ -73,8 +73,8 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
   }
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: StringRef,
            qualName: StringRef,
            javaQualName: StringRef,
@@ -90,9 +90,9 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
            isLocal: Boolean,
            visibleInJava: Boolean) {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     mySourceFileName = StringRef.toString(sourceFileName)
     myName = StringRef.toString(name)
     myQualName = StringRef.toString(qualName)

@@ -24,12 +24,14 @@ abstract class JUnitRouteTestBase extends RouteTest {
 
   protected def createTestResponse(response: HttpResponse): TestResponse =
     new TestResponse(response, awaitDuration)(system.dispatcher, materializer) {
-      protected def assertEquals(
-          expected: AnyRef, actual: AnyRef, message: String): Unit =
+      protected def assertEquals(expected: AnyRef,
+                                 actual: AnyRef,
+                                 message: String): Unit =
         Assert.assertEquals(message, expected, actual)
 
-      protected def assertEquals(
-          expected: Int, actual: Int, message: String): Unit =
+      protected def assertEquals(expected: Int,
+                                 actual: Int,
+                                 message: String): Unit =
         Assert.assertEquals(message, expected, actual)
 
       protected def assertTrue(predicate: Boolean, message: String): Unit =

@@ -18,14 +18,15 @@ trait FeatureSpecSingleTestTest extends FeatureSpecGenerator {
     addFeatureSpec()
 
     runTestByLocation(
-        5,
-        7,
-        featureSpecFileName,
-        checkConfigAndSettings(
-            _, featureSpecClassName, featureSpecConfigTestName),
-        root =>
-          checkResultTreeHasExactNamedPath(root, featureSpecTestPath: _*) &&
+      5,
+      7,
+      featureSpecFileName,
+      checkConfigAndSettings(_,
+                             featureSpecClassName,
+                             featureSpecConfigTestName),
+      root =>
+        checkResultTreeHasExactNamedPath(root, featureSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "Scenario: Scenario B"),
-        debug = true)
+      debug = true)
   }
 }

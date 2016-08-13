@@ -17,8 +17,8 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author Nikolay.Tropin
   */
-class ScalaChangeSignatureRowEditor(
-    item: ScalaParameterTableModelItem, dialog: ScalaChangeSignatureDialog)
+class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem,
+                                    dialog: ScalaChangeSignatureDialog)
     extends JBTableRowEditor {
 
   private val project = dialog.project
@@ -30,17 +30,17 @@ class ScalaChangeSignatureRowEditor(
   private val table = dialog.parametersTable
   val typeDoc =
     PsiDocumentManager.getInstance(project).getDocument(item.typeCodeFragment)
-  val myTypeEditor: EditorTextField = new EditorTextField(
-      typeDoc, project, fileType)
+  val myTypeEditor: EditorTextField =
+    new EditorTextField(typeDoc, project, fileType)
 
-  val myNameEditor: EditorTextField = new EditorTextField(
-      item.parameter.getName, project, fileType)
+  val myNameEditor: EditorTextField =
+    new EditorTextField(item.parameter.getName, project, fileType)
   val defaultValueDoc = PsiDocumentManager
     .getInstance(project)
     .getDocument(item.defaultValueCodeFragment)
 
-  val myDefaultValueEditor = new EditorTextField(
-      defaultValueDoc, project, fileType)
+  val myDefaultValueEditor =
+    new EditorTextField(defaultValueDoc, project, fileType)
 
   def prepareEditor(table: JTable, row: Int) {
     setLayout(new BorderLayout)
@@ -65,8 +65,7 @@ class ScalaChangeSignatureRowEditor(
 
   def addTypeEditor() {
     myTypeEditor.addDocumentListener(signatureUpdater)
-    myTypeEditor.addDocumentListener(
-        new DocumentAdapter {
+    myTypeEditor.addDocumentListener(new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
         item.typeText = myTypeEditor.getText
       }
@@ -90,16 +89,15 @@ class ScalaChangeSignatureRowEditor(
   def addDefaultValueEditor(additionalPanel: JPanel) {
     myDefaultValueEditor.setPreferredWidth(table.getWidth / 2)
     myDefaultValueEditor.addDocumentListener(
-        new this.RowEditorChangeListener(2))
-    myDefaultValueEditor.addDocumentListener(
-        new DocumentAdapter {
+      new this.RowEditorChangeListener(2))
+    myDefaultValueEditor.addDocumentListener(new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
         item.parameter.defaultValue = myDefaultValueEditor.getText.trim
       }
     })
     additionalPanel.add(
-        createLabeledPanel("Default value:", myDefaultValueEditor),
-        BorderLayout.WEST)
+      createLabeledPanel("Default value:", myDefaultValueEditor),
+      BorderLayout.WEST)
   }
 
   def getValue: JBTableRow = {

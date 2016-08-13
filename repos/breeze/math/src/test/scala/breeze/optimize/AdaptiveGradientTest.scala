@@ -2,18 +2,18 @@ package breeze.optimize
 
 /*
  Copyright 2009 David Hall, Daniel Ramage
- 
+
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
- You may obtain a copy of the License at 
- 
+ You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License. 
+ limitations under the License.
  */
 
 import org.scalatest._
@@ -33,7 +33,9 @@ class AdaptiveGradientTest extends OptimizeTestBase {
       val init = init2 % 100.0
       val sgd =
         new AdaptiveGradientDescent.L2Regularization[DenseVector[Double]](
-            reg % 1E3 abs, 1, 1000)
+          reg % 1E3 abs,
+          1,
+          1000)
       val f = new BatchDiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double], r: IndexedSeq[Int]) = {
           (sum((x - 3.0) :^ 2.0), (x * 2.0) - 6.0)
@@ -46,7 +48,8 @@ class AdaptiveGradientTest extends OptimizeTestBase {
       val ok =
         norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 2E-3
       if (!ok) {
-        sys.error("min " + init + " with reg: " + sgd.regularizationConstant +
+        sys.error(
+          "min " + init + " with reg: " + sgd.regularizationConstant +
             "gives " + result + " should be " + targetValue)
       }
       ok
@@ -61,7 +64,10 @@ class AdaptiveGradientTest extends OptimizeTestBase {
       val init = init2 % 100.0
       val sgd =
         new AdaptiveGradientDescent.L1Regularization[DenseVector[Double]](
-            reg.abs % 10, 1E-7, 1, 600)
+          reg.abs % 10,
+          1E-7,
+          1,
+          600)
       val f = new BatchDiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double], r: IndexedSeq[Int]) = {
           (sum((x - 3.0) :^ 2.0), (x * 2.0) - 6.0)
@@ -75,7 +81,7 @@ class AdaptiveGradientTest extends OptimizeTestBase {
         norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 1E-2
       if (!ok) {
         sys.error(
-            s"min $init with reg: ${sgd.lambda} gives $result should be $targetValue")
+          s"min $init with reg: ${sgd.lambda} gives $result should be $targetValue")
       }
       ok
     }

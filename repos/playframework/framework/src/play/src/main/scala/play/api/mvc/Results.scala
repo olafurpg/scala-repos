@@ -97,8 +97,7 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @return the new result.
     */
   def withDateHeaders(headers: (String, DateTime)*): Result = {
-    copy(
-        header = header.copy(headers = header.headers ++ headers.map {
+    copy(header = header.copy(headers = header.headers ++ headers.map {
       case (name, dateTime) =>
         (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
     }))
@@ -120,8 +119,9 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     if (cookies.isEmpty) this
     else {
       withHeaders(
-          SET_COOKIE -> Cookies.mergeSetCookieHeader(
-              header.headers.getOrElse(SET_COOKIE, ""), cookies))
+        SET_COOKIE -> Cookies.mergeSetCookieHeader(
+          header.headers.getOrElse(SET_COOKIE, ""),
+          cookies))
     }
   }
 
@@ -138,8 +138,9 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     */
   def discardingCookies(cookies: DiscardingCookie*): Result = {
     withHeaders(
-        SET_COOKIE -> Cookies.mergeSetCookieHeader(
-            header.headers.getOrElse(SET_COOKIE, ""), cookies.map(_.toCookie)))
+      SET_COOKIE -> Cookies.mergeSetCookieHeader(
+        header.headers.getOrElse(SET_COOKIE, ""),
+        cookies.map(_.toCookie)))
   }
 
   /**
@@ -275,8 +276,9 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * Returns true if the status code is not 3xx and the application is in Dev mode.
     */
   private def shouldWarnIfNotRedirect(flash: Flash): Boolean = {
-    play.api.Play.privateMaybeApplication.exists(app =>
-          (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
+    play.api.Play.privateMaybeApplication.exists(
+      app =>
+        (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
           (header.status < 300 || header.status > 399))
   }
 
@@ -287,7 +289,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     val status = header.status
     play.api
       .Logger("play")
-      .warn(s"You are using status code '$status' with $methodName, which should only be used with a redirect status!")
+      .warn(
+        s"You are using status code '$status' with $methodName, which should only be used with a redirect status!")
   }
 
   /**
@@ -302,8 +305,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   * @param charset The charset to be sent to the client.
   * @param encode The transformation function.
   */
-case class Codec(charset: String)(
-    val encode: String => ByteString, val decode: ByteString => String)
+case class Codec(charset: String)(val encode: String => ByteString,
+                                  val decode: ByteString => String)
 
 /**
   * Default Codec support.
@@ -386,8 +389,8 @@ trait Results {
     * @param status the HTTP response status, e.g ‘200 OK’
     */
   class Status(status: Int)
-      extends Result(
-          header = ResponseHeader(status), body = HttpEntity.NoEntity) {
+      extends Result(header = ResponseHeader(status),
+                     body = HttpEntity.NoEntity) {
 
     /**
       * Set the result's content.
@@ -396,8 +399,8 @@ trait Results {
       */
     def apply[C](content: C)(implicit writeable: Writeable[C]): Result = {
       Result(
-          header,
-          writeable.toEntity(content)
+        header,
+        writeable.toEntity(content)
       )
     }
 
@@ -406,22 +409,22 @@ trait Results {
                            length: Long,
                            inline: Boolean): Result = {
       Result(
-          ResponseHeader(status,
-                         Map(
-                             CONTENT_DISPOSITION -> {
-                               val dispositionType =
-                                 if (inline) "inline" else "attachment"
-                               dispositionType + "; filename=\"" + name + "\""
-                             }
-                         )),
-          HttpEntity.Streamed(
-              file,
-              Some(length),
-              play.api.libs.MimeTypes
-                .forFileName(name)
-                .orElse(Some(play.api.http.ContentTypes.BINARY))
-            )
+        ResponseHeader(status,
+                       Map(
+                         CONTENT_DISPOSITION -> {
+                           val dispositionType =
+                             if (inline) "inline" else "attachment"
+                           dispositionType + "; filename=\"" + name + "\""
+                         }
+                       )),
+        HttpEntity.Streamed(
+          file,
+          Some(length),
+          play.api.libs.MimeTypes
+            .forFileName(name)
+            .orElse(Some(play.api.http.ContentTypes.BINARY))
         )
+      )
     }
 
     /**
@@ -435,8 +438,8 @@ trait Results {
                  inline: Boolean = false,
                  fileName: java.io.File => String = _.getName,
                  onClose: () => Unit = () => ()): Result = {
-      streamFile(StreamConverters.fromInputStream(
-                     () => Files.newInputStream(content.toPath)),
+      streamFile(StreamConverters.fromInputStream(() =>
+                   Files.newInputStream(content.toPath)),
                  fileName(content),
                  content.length,
                  inline)
@@ -453,11 +456,11 @@ trait Results {
                  inline: Boolean = false,
                  fileName: Path => String = _.getFileName.toString,
                  onClose: () => Unit = () => ()): Result = {
-      streamFile(StreamConverters.fromInputStream(
-                     () => Files.newInputStream(content)),
-                 fileName(content),
-                 Files.size(content),
-                 inline)
+      streamFile(
+        StreamConverters.fromInputStream(() => Files.newInputStream(content)),
+        fileName(content),
+        Files.size(content),
+        inline)
     }
 
     /**
@@ -493,10 +496,10 @@ trait Results {
     def chunked[C](content: Source[C, _])(
         implicit writeable: Writeable[C]): Result = {
       Result(
-          header = header,
-          body = HttpEntity.Chunked(
-                content.map(c => HttpChunk.Chunk(writeable.transform(c))),
-                writeable.contentType)
+        header = header,
+        body = HttpEntity.Chunked(
+          content.map(c => HttpChunk.Chunk(writeable.transform(c))),
+          writeable.contentType)
       )
     }
 
@@ -526,13 +529,13 @@ trait Results {
     def feed[C](content: Enumerator[C])(
         implicit writeable: Writeable[C]): Result = {
       Result(
-          header = header,
-          body = HttpEntity.Streamed(
-                Source
-                  .fromPublisher(Streams.enumeratorToPublisher(content))
-                  .map(writeable.transform),
-                None,
-                writeable.contentType)
+        header = header,
+        body = HttpEntity.Streamed(
+          Source
+            .fromPublisher(Streams.enumeratorToPublisher(content))
+            .map(writeable.transform),
+          None,
+          writeable.contentType)
       )
     }
 
@@ -541,8 +544,8 @@ trait Results {
       */
     def sendEntity(entity: HttpEntity): Result = {
       Result(
-          header = header,
-          body = entity
+        header = header,
+        body = entity
       )
     }
   }
@@ -560,12 +563,12 @@ trait Results {
   val NonAuthoritativeInformation = new Status(NON_AUTHORITATIVE_INFORMATION)
 
   /** Generates a ‘204 NO_CONTENT’ result. */
-  val NoContent = Result(
-      header = ResponseHeader(NO_CONTENT), body = HttpEntity.NoEntity)
+  val NoContent =
+    Result(header = ResponseHeader(NO_CONTENT), body = HttpEntity.NoEntity)
 
   /** Generates a ‘205 RESET_CONTENT’ result. */
-  val ResetContent = Result(
-      header = ResponseHeader(RESET_CONTENT), body = HttpEntity.NoEntity)
+  val ResetContent =
+    Result(header = ResponseHeader(RESET_CONTENT), body = HttpEntity.NoEntity)
 
   /** Generates a ‘206 PARTIAL_CONTENT’ result. */
   val PartialContent = new Status(PARTIAL_CONTENT)
@@ -595,8 +598,8 @@ trait Results {
   def SeeOther(url: String): Result = Redirect(url, SEE_OTHER)
 
   /** Generates a ‘304 NOT_MODIFIED’ result. */
-  val NotModified = Result(
-      header = ResponseHeader(NOT_MODIFIED), body = HttpEntity.NoEntity)
+  val NotModified =
+    Result(header = ResponseHeader(NOT_MODIFIED), body = HttpEntity.NoEntity)
 
   /**
     * Generates a ‘307 TEMPORARY_REDIRECT’ simple result.
@@ -729,8 +732,8 @@ trait Results {
         .map { params =>
           (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap {
             pair =>
-              pair._2.map(
-                  value => (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
+              pair._2.map(value =>
+                (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
           }.mkString("&")
         }
         .getOrElse("")

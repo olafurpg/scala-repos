@@ -19,7 +19,7 @@ object Script {
   lazy val command = Command.command(Name) { state =>
     val scriptArg =
       state.remainingCommands.headOption getOrElse sys.error(
-          "No script file specified")
+        "No script file specified")
     val script = new File(scriptArg).getAbsoluteFile
     val hash = Hash.halve(Hash.toHex(Hash(script.getAbsolutePath)))
     val base = new File(CommandUtil.bootDirectory(state), hash)
@@ -53,7 +53,7 @@ object Script {
     val arguments = state.remainingCommands.drop(1)
     val newState =
       arguments.mkString("run ", " ", "") :: state.copy(
-          remainingCommands = Nil)
+        remainingCommands = Nil)
     Project.setProject(session, newStructure, newState)
   }
 

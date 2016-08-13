@@ -32,7 +32,7 @@ class PathTest extends FunSuite with GeneratorDrivenPropertyChecks {
     forAll(pathParts) { (parts: List[String]) =>
       val p = Path(parts)
       assert(
-          /:.unapply(p) == util.Try(parts.head -> Path(parts.tail)).toOption)
+        /:.unapply(p) == util.Try(parts.head -> Path(parts.tail)).toOption)
     }
   }
 

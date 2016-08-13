@@ -8,26 +8,26 @@ import concurrent.duration.Duration.fromNanos
 object Test extends Properties("Division of Duration by Long") {
 
   val weightedLong = frequency(
-      1 -> choose(-128L, 127L),
-      1 -> (arbitrary[Byte] map (_.toLong << 8)),
-      1 -> (arbitrary[Byte] map (_.toLong << 16)),
-      1 -> (arbitrary[Byte] map (_.toLong << 24)),
-      1 -> (arbitrary[Byte] map (_.toLong << 32)),
-      1 -> (arbitrary[Byte] map (_.toLong << 40)),
-      1 -> (arbitrary[Byte] map (_.toLong << 48)),
-      1 -> (choose(-127L, 127L) map (_ << 56))
+    1 -> choose(-128L, 127L),
+    1 -> (arbitrary[Byte] map (_.toLong << 8)),
+    1 -> (arbitrary[Byte] map (_.toLong << 16)),
+    1 -> (arbitrary[Byte] map (_.toLong << 24)),
+    1 -> (arbitrary[Byte] map (_.toLong << 32)),
+    1 -> (arbitrary[Byte] map (_.toLong << 40)),
+    1 -> (arbitrary[Byte] map (_.toLong << 48)),
+    1 -> (choose(-127L, 127L) map (_ << 56))
   )
 
   val genTwoSmall = for {
     a <- weightedLong
-    b <- choose(
-        -(Long.MaxValue / max(1, abs(a))), Long.MaxValue / max(1, abs(a)))
+    b <- choose(-(Long.MaxValue / max(1, abs(a))),
+                Long.MaxValue / max(1, abs(a)))
   } yield (a, b)
 
   val genTwoLarge = for {
     a <- weightedLong
     b <- arbitrary[Long] suchThat
-    (b => (abs(b) > Long.MaxValue / max(1, abs(a))))
+          (b => (abs(b) > Long.MaxValue / max(1, abs(a))))
   } yield (a, b)
 
   val genClose = for {
@@ -36,13 +36,13 @@ object Test extends Properties("Division of Duration by Long") {
   } yield (a, b)
 
   val genBorderline = frequency(
-      1 -> (Long.MinValue, 0L),
-      1 -> (Long.MinValue, 1L),
-      1 -> (Long.MinValue, -1L),
-      1 -> (0L, Long.MinValue),
-      1 -> (1L, Long.MinValue),
-      1 -> (-1L, Long.MinValue),
-      90 -> genClose
+    1 -> (Long.MinValue, 0L),
+    1 -> (Long.MinValue, 1L),
+    1 -> (Long.MinValue, -1L),
+    1 -> (0L, Long.MinValue),
+    1 -> (1L, Long.MinValue),
+    1 -> (-1L, Long.MinValue),
+    90 -> genClose
   )
 
   def mul(a: Long, b: Long): Long = {
@@ -65,9 +65,9 @@ object Test extends Properties("Division of Duration by Long") {
     case (a, b) =>
       val shouldFit =
         a != Long.MinValue && // must fail due to illegal duration length
-        (b != Long.MinValue || a == 0) &&
-        // Long factor may only be MinValue if the duration is zero, otherwise the result will be illegal
-        (abs(b) <= Long.MaxValue / max(1, abs(a))) // check the rest against the “safe” division method
+          (b != Long.MinValue || a == 0) &&
+          // Long factor may only be MinValue if the duration is zero, otherwise the result will be illegal
+          (abs(b) <= Long.MaxValue / max(1, abs(a))) // check the rest against the “safe” division method
       try { mul(a, b); shouldFit } catch {
         case _: IllegalArgumentException => !shouldFit
       }

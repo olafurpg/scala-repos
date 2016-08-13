@@ -20,7 +20,7 @@ class GroupRepository(val store: EntityStore[Group],
   }
   def rootGroupOrEmpty(): Future[Group] =
     rootGroup().map(_.getOrElse(Group.empty))(
-        ExecutionContext.Implicits.global)
+      ExecutionContext.Implicits.global)
 
   def group(id: String, version: Timestamp): Future[Option[Group]] =
     entity(id, version)

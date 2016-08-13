@@ -58,8 +58,8 @@ object StringConverter {
     * @param fromStringFunction Function that converts a String to a new T instance
     * @param toStringFunction Function that converts a T instance to a new String
     */
-  def apply[T](
-      fromStringFunction: String => T, toStringFunction: T => String) =
+  def apply[T](fromStringFunction: String => T,
+               toStringFunction: T => String) =
     new StringConverter[T] {
 
       def fromString(string: String): T = fromStringFunction(string)
@@ -81,7 +81,7 @@ object StringConverter {
 
       def fromString(string: String): T =
         throw new UnsupportedOperationException(
-            "Conversion from String not supported. Consider create a new StringConverter implementation that support it.")
+          "Conversion from String not supported. Consider create a new StringConverter implementation that support it.")
 
       def toString(t: T): String = toStringFunction(t)
     }
@@ -102,7 +102,7 @@ object StringConverter {
 
       def toString(t: T): String =
         throw new UnsupportedOperationException(
-            "Conversion to String not supported. Consider create a new StringConverter implementation that support it.")
+          "Conversion to String not supported. Consider create a new StringConverter implementation that support it.")
     }
 }
 

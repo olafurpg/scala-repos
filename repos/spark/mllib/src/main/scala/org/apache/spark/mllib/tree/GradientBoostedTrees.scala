@@ -26,7 +26,10 @@ import org.apache.spark.mllib.tree.configuration.Algo._
 import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 import org.apache.spark.mllib.tree.impl.TimeTracker
 import org.apache.spark.mllib.tree.impurity.Variance
-import org.apache.spark.mllib.tree.model.{DecisionTreeModel, GradientBoostedTreesModel}
+import org.apache.spark.mllib.tree.model.{
+  DecisionTreeModel,
+  GradientBoostedTreesModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 
@@ -51,7 +54,8 @@ import org.apache.spark.storage.StorageLevel
 @Since("1.2.0")
 class GradientBoostedTrees @Since("1.2.0")(
     private val boostingStrategy: BoostingStrategy)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Method to train a gradient boosting model
@@ -64,17 +68,19 @@ class GradientBoostedTrees @Since("1.2.0")(
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case Regression =>
-        GradientBoostedTrees.boost(
-            input, input, boostingStrategy, validate = false)
+        GradientBoostedTrees
+          .boost(input, input, boostingStrategy, validate = false)
       case Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        GradientBoostedTrees.boost(
-            remappedInput, remappedInput, boostingStrategy, validate = false)
+        GradientBoostedTrees.boost(remappedInput,
+                                   remappedInput,
+                                   boostingStrategy,
+                                   validate = false)
       case _ =>
         throw new IllegalArgumentException(
-            s"$algo is not supported by the gradient boosting.")
+          s"$algo is not supported by the gradient boosting.")
     }
   }
 
@@ -104,21 +110,21 @@ class GradientBoostedTrees @Since("1.2.0")(
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case Regression =>
-        GradientBoostedTrees.boost(
-            input, validationInput, boostingStrategy, validate = true)
+        GradientBoostedTrees
+          .boost(input, validationInput, boostingStrategy, validate = true)
       case Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        val remappedValidationInput = validationInput.map(
-            x => new LabeledPoint((x.label * 2) - 1, x.features))
+        val remappedValidationInput = validationInput.map(x =>
+          new LabeledPoint((x.label * 2) - 1, x.features))
         GradientBoostedTrees.boost(remappedInput,
                                    remappedValidationInput,
                                    boostingStrategy,
                                    validate = true)
       case _ =>
         throw new IllegalArgumentException(
-            s"$algo is not supported by the gradient boosting.")
+          s"$algo is not supported by the gradient boosting.")
     }
   }
 
@@ -202,10 +208,12 @@ object GradientBoostedTrees extends Logging {
 
     // Prepare periodic checkpointers
     val predErrorCheckpointer = new PeriodicRDDCheckpointer[(Double, Double)](
-        treeStrategy.getCheckpointInterval, input.sparkContext)
+      treeStrategy.getCheckpointInterval,
+      input.sparkContext)
     val validatePredErrorCheckpointer =
       new PeriodicRDDCheckpointer[(Double, Double)](
-          treeStrategy.getCheckpointInterval, input.sparkContext)
+        treeStrategy.getCheckpointInterval,
+        input.sparkContext)
 
     timer.stop("init")
 
@@ -222,7 +230,10 @@ object GradientBoostedTrees extends Logging {
 
     var predError: RDD[(Double, Double)] =
       GradientBoostedTreesModel.computeInitialPredictionAndError(
-          input, firstTreeWeight, firstTreeModel, loss)
+        input,
+        firstTreeWeight,
+        firstTreeModel,
+        loss)
     predErrorCheckpointer.update(predError)
     logDebug("error of gbt = " + predError.values.mean())
 
@@ -231,7 +242,10 @@ object GradientBoostedTrees extends Logging {
 
     var validatePredError: RDD[(Double, Double)] =
       GradientBoostedTreesModel.computeInitialPredictionAndError(
-          validationInput, firstTreeWeight, firstTreeModel, loss)
+        validationInput,
+        firstTreeWeight,
+        firstTreeModel,
+        loss)
     if (validate) validatePredErrorCheckpointer.update(validatePredError)
     var bestValidateError =
       if (validate) validatePredError.values.mean() else 0.0
@@ -260,7 +274,11 @@ object GradientBoostedTrees extends Logging {
       baseLearnerWeights(m) = learningRate
 
       predError = GradientBoostedTreesModel.updatePredictionError(
-          input, predError, baseLearnerWeights(m), baseLearners(m), loss)
+        input,
+        predError,
+        baseLearnerWeights(m),
+        baseLearners(m),
+        loss)
       predErrorCheckpointer.update(predError)
       logDebug("error of gbt = " + predError.values.mean())
 
@@ -271,11 +289,11 @@ object GradientBoostedTrees extends Logging {
         // We want the model returned corresponding to the best validation error.
 
         validatePredError = GradientBoostedTreesModel.updatePredictionError(
-            validationInput,
-            validatePredError,
-            baseLearnerWeights(m),
-            baseLearners(m),
-            loss)
+          validationInput,
+          validatePredError,
+          baseLearnerWeights(m),
+          baseLearners(m),
+          loss)
         validatePredErrorCheckpointer.update(validatePredError)
         val currentValidateError = validatePredError.values.mean()
         if (bestValidateError - currentValidateError < validationTol * Math
@@ -303,8 +321,9 @@ object GradientBoostedTrees extends Logging {
                                     baseLearners.slice(0, bestM),
                                     baseLearnerWeights.slice(0, bestM))
     } else {
-      new GradientBoostedTreesModel(
-          boostingStrategy.treeStrategy.algo, baseLearners, baseLearnerWeights)
+      new GradientBoostedTreesModel(boostingStrategy.treeStrategy.algo,
+                                    baseLearners,
+                                    baseLearnerWeights)
     }
   }
 }

@@ -36,8 +36,11 @@ import org.apache.spark.rdd.RDD
 @Since("0.8.0")
 class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
                                @Since("0.8.0") override val intercept: Double)
-    extends GeneralizedLinearModel(weights, intercept) with ClassificationModel
-    with Serializable with Saveable with PMMLExportable {
+    extends GeneralizedLinearModel(weights, intercept)
+    with ClassificationModel
+    with Serializable
+    with Saveable
+    with PMMLExportable {
 
   private var threshold: Option[Double] = Some(0.0)
 
@@ -67,8 +70,9 @@ class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
     this
   }
 
-  override protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double) = {
+  override protected def predictPoint(dataMatrix: Vector,
+                                      weightMatrix: Vector,
+                                      intercept: Double) = {
     val margin = weightMatrix.toBreeze.dot(dataMatrix.toBreeze) + intercept
     threshold match {
       case Some(t) => if (margin > t) 1.0 else 0.0
@@ -111,12 +115,12 @@ object SVMModel extends Loader[SVMModel] {
           GLMClassificationModel.SaveLoadV1_0.loadData(sc, path, classNameV1_0)
         val model = new SVMModel(data.weights, data.intercept)
         assert(
-            model.weights.size == numFeatures,
-            s"SVMModel.load with numFeatures=$numFeatures" +
+          model.weights.size == numFeatures,
+          s"SVMModel.load with numFeatures=$numFeatures" +
             s" was given non-matching weights vector of size ${model.weights.size}")
         assert(
-            numClasses == 2,
-            s"SVMModel.load was given numClasses=$numClasses but only supports 2 classes")
+          numClasses == 2,
+          s"SVMModel.load was given numClasses=$numClasses but only supports 2 classes")
         data.threshold match {
           case Some(t) => model.setThreshold(t)
           case None => model.clearThreshold()
@@ -124,7 +128,7 @@ object SVMModel extends Loader[SVMModel] {
         model
       case _ =>
         throw new Exception(
-            s"SVMModel.load did not recognize model with (className, format version):" +
+          s"SVMModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }
@@ -141,7 +145,8 @@ class SVMWithSGD private (private var stepSize: Double,
                           private var numIterations: Int,
                           private var regParam: Double,
                           private var miniBatchFraction: Double)
-    extends GeneralizedLinearAlgorithm[SVMModel] with Serializable {
+    extends GeneralizedLinearAlgorithm[SVMModel]
+    with Serializable {
 
   private val gradient = new HingeGradient()
   private val updater = new SquaredL2Updater()

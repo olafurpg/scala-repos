@@ -65,13 +65,13 @@ object Streamable {
           }
         }
       }
-      try loop() finally in.close()
+      try loop()
+      finally in.close()
 
       if (offset == arr.length) arr
       else
         fail(
-            "Could not read entire source (%d of %d bytes)".format(
-                offset, len))
+          "Could not read entire source (%d of %d bytes)".format(offset, len))
     }
   }
 
@@ -113,7 +113,8 @@ object Streamable {
       */
     def applyReader[T](f: BufferedReader => T): T = {
       val in = bufferedReader()
-      try f(in) finally in.close()
+      try f(in)
+      finally in.close()
     }
 
     /** Convenience function to import entire file into a String.
@@ -121,13 +122,15 @@ object Streamable {
     def slurp(): String = slurp(creationCodec)
     def slurp(codec: Codec) = {
       val src = chars(codec)
-      try src.mkString finally src.close() // Always Be Closing
+      try src.mkString
+      finally src.close() // Always Be Closing
     }
   }
 
   /** Call a function on something Closeable, finally closing it. */
   def closing[T <: JCloseable, U](stream: T)(f: T => U): U =
-    try f(stream) finally stream.close()
+    try f(stream)
+    finally stream.close()
 
   def bytes(is: => InputStream): Array[Byte] =
     (new Bytes {

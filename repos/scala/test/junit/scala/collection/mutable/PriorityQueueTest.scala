@@ -4,7 +4,12 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
 import scala.collection.mutable
-import java.io.{ObjectInputStream, ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{
+  ObjectInputStream,
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectOutputStream
+}
 
 @RunWith(classOf[JUnit4])
 /* Test for SI-7568  */
@@ -26,7 +31,7 @@ class PriorityQueueTest {
     val bytes = outputStream.toByteArray
 
     val objectInputStream = new ObjectInputStream(
-        new ByteArrayInputStream(bytes))
+      new ByteArrayInputStream(bytes))
     val deserializedPriorityQueue =
       objectInputStream.readObject().asInstanceOf[PriorityQueue[Int]]
     assert(deserializedPriorityQueue.dequeueAll == elements.sorted.reverse)

@@ -25,7 +25,7 @@ private[setup] final class Processor(lobby: ActorSelection,
   def ai(config: AiConfig)(implicit ctx: UserContext): Fu[Pov] = {
     val pov = blamePov(config.pov, ctx.me)
     saveConfig(_ withAi config) >> (GameRepo insertDenormalized pov.game) >>- onStart(
-        pov.game.id) >> {
+      pov.game.id) >> {
       pov.game.player.isAi ?? fishnetPlayer(pov.game)
     } inject pov
   }
@@ -33,8 +33,8 @@ private[setup] final class Processor(lobby: ActorSelection,
   private def blamePov(pov: Pov, user: Option[User]): Pov = pov withGame {
     user.fold(pov.game) { u =>
       pov.game.updatePlayer(
-          pov.color,
-          _.withUser(u.id, PerfPicker.mainOrDefault(pov.game)(u.perfs)))
+        pov.color,
+        _.withUser(u.id, PerfPicker.mainOrDefault(pov.game)(u.perfs)))
     }
   }
 
@@ -67,6 +67,6 @@ private[setup] final class Processor(lobby: ActorSelection,
 
   private def saveConfig(map: UserConfig => UserConfig)(
       implicit ctx: UserContext): Funit =
-    ctx.me.fold(AnonConfigRepo.update(ctx.req) _)(
-        user => UserConfigRepo.update(user) _)(map)
+    ctx.me.fold(AnonConfigRepo.update(ctx.req) _)(user =>
+      UserConfigRepo.update(user) _)(map)
 }

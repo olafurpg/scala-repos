@@ -24,20 +24,23 @@ object ScalaEvaluatorBuilder extends EvaluatorBuilder {
   def build(codeFragment: PsiElement,
             position: SourcePosition): ExpressionEvaluator = {
     if (codeFragment.getLanguage.isInstanceOf[JavaLanguage])
-      return EvaluatorBuilderImpl.getInstance().build(codeFragment, position) //java builder (e.g. SCL-6117)
+      return EvaluatorBuilderImpl
+        .getInstance()
+        .build(codeFragment, position) //java builder (e.g. SCL-6117)
 
     val scalaFragment = codeFragment match {
       case sf: ScalaCodeFragment => sf
       case _ =>
         throw EvaluationException(
-            ScalaBundle.message("non-scala.code.fragment"))
+          ScalaBundle.message("non-scala.code.fragment"))
     }
 
     val project = codeFragment.getProject
 
     val cache = ScalaEvaluatorCache.getInstance(project)
     val cached: Option[Evaluator] = {
-      try cache.get(position, codeFragment) catch {
+      try cache.get(position, codeFragment)
+      catch {
         case e: Exception =>
           cache.clear()
           None
@@ -53,8 +56,8 @@ object ScalaEvaluatorBuilder extends EvaluatorBuilder {
     }
 
     def buildCompilingEvaluator: ScalaCompilingEvaluator = {
-      val compilingEvaluator = new ScalaCompilingEvaluator(
-          position.getElementAt, scalaFragment)
+      val compilingEvaluator =
+        new ScalaCompilingEvaluator(position.getElementAt, scalaFragment)
       cache
         .add(position, scalaFragment, compilingEvaluator)
         .asInstanceOf[ScalaCompilingEvaluator]
@@ -74,8 +77,10 @@ private[evaluation] class NeedCompilationException(message: String)
     extends EvaluateException(message)
 
 private[evaluation] class ScalaEvaluatorBuilder(
-    val codeFragment: ScalaCodeFragment, val position: SourcePosition)
-    extends ScalaEvaluatorBuilderUtil with SyntheticVariablesHelper {
+    val codeFragment: ScalaCodeFragment,
+    val position: SourcePosition)
+    extends ScalaEvaluatorBuilderUtil
+    with SyntheticVariablesHelper {
 
   import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil._
 
@@ -117,14 +122,14 @@ private[evaluation] class ScalaEvaluatorBuilder(
           case stmt: ScTypedStmt => evaluatorFor(stmt.expr)
           case e =>
             throw EvaluationException(
-                s"This type of expression is not supported: ${e.getText}")
+              s"This type of expression is not supported: ${e.getText}")
         }
         postProcessExpressionEvaluator(expr, innerEval)
       case pd: ScPatternDefinition => patternDefinitionEvaluator(pd)
       case vd: ScVariableDefinition => variableDefinitionEvaluator(vd)
       case e =>
         throw EvaluationException(
-            s"This type of element is not supported: ${e.getText}")
+          s"This type of element is not supported: ${e.getText}")
     }
   }
 

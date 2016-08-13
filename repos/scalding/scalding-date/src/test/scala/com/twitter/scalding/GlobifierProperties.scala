@@ -53,7 +53,7 @@ object GlobifierProperties extends Properties("Globifier Properties") {
 
     val res =
       globifierOps.normalizeHrDr(dr) == globifierOps.normalizeHrDr(resultantDR) &&
-      globifierOps.normalizeHrDr(dr) == globifierOps.normalizeHrDr(
+        globifierOps.normalizeHrDr(dr) == globifierOps.normalizeHrDr(
           resultantWithNormalized)
 
     if (!res) {
@@ -92,8 +92,8 @@ object GlobifierProperties extends Properties("Globifier Properties") {
 
     val res =
       globifierOps.normalizeDayDr(dr) == globifierOps.normalizeDayDr(
-          resultantDR) &&
-      globifierOps.normalizeDayDr(dr) == globifierOps.normalizeDayDr(
+        resultantDR) &&
+        globifierOps.normalizeDayDr(dr) == globifierOps.normalizeDayDr(
           resultantWithNormalized)
 
     if (!res) {

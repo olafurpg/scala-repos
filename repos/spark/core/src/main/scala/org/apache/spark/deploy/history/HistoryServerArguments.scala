@@ -26,8 +26,8 @@ import org.apache.spark.util.Utils
 /**
   * Command-line parser for the master.
   */
-private[history] class HistoryServerArguments(
-    conf: SparkConf, args: Array[String])
+private[history] class HistoryServerArguments(conf: SparkConf,
+                                              args: Array[String])
     extends Logging {
   private var propertiesFile: String = null
 
@@ -59,7 +59,7 @@ private[history] class HistoryServerArguments(
 
   private def setLogDirectory(value: String): Unit = {
     logWarning(
-        "Setting log directory through the command line is deprecated as of " +
+      "Setting log directory through the command line is deprecated as of " +
         "Spark 1.1.0. Please set this through spark.history.fs.logDirectory instead.")
     conf.set("spark.history.fs.logDirectory", value)
   }
@@ -69,7 +69,8 @@ private[history] class HistoryServerArguments(
 
   private def printUsageAndExit(exitCode: Int) {
     // scalastyle:off println
-    System.err.println("""
+    System.err.println(
+      """
       |Usage: HistoryServer [options]
       |
       |Options:

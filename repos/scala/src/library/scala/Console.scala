@@ -8,7 +8,14 @@
 
 package scala
 
-import java.io.{BufferedReader, InputStream, InputStreamReader, OutputStream, PrintStream, Reader}
+import java.io.{
+  BufferedReader,
+  InputStream,
+  InputStreamReader,
+  OutputStream,
+  PrintStream,
+  Reader
+}
 import scala.io.{AnsiColor, StdIn}
 import scala.util.DynamicVariable
 
@@ -23,7 +30,7 @@ object Console extends DeprecatedConsole with AnsiColor {
   private val outVar = new DynamicVariable[PrintStream](java.lang.System.out)
   private val errVar = new DynamicVariable[PrintStream](java.lang.System.err)
   private val inVar = new DynamicVariable[BufferedReader](
-      new BufferedReader(new InputStreamReader(java.lang.System.in)))
+    new BufferedReader(new InputStreamReader(java.lang.System.in)))
 
   protected def setOutDirect(out: PrintStream): Unit = outVar.value = out
   protected def setErrDirect(err: PrintStream): Unit = errVar.value = err

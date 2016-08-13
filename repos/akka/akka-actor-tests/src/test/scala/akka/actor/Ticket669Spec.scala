@@ -16,7 +16,9 @@ import scala.concurrent.duration._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class Ticket669Spec
-    extends AkkaSpec with BeforeAndAfterAll with ImplicitSender
+    extends AkkaSpec
+    with BeforeAndAfterAll
+    with ImplicitSender
     with DefaultTimeout {
   import Ticket669Spec._
 
@@ -28,8 +30,9 @@ class Ticket669Spec
   "A supervised actor with lifecycle PERMANENT" should {
     "be able to reply on failure during preRestart" in {
       filterEvents(EventFilter[Exception]("test", occurrences = 1)) {
-        val supervisor = system.actorOf(Props(new Supervisor(AllForOneStrategy(
-                        5, 10 seconds)(List(classOf[Exception])))))
+        val supervisor = system.actorOf(
+          Props(new Supervisor(
+            AllForOneStrategy(5, 10 seconds)(List(classOf[Exception])))))
         val supervised =
           Await.result((supervisor ? Props[Supervised]).mapTo[ActorRef],
                        timeout.duration)
@@ -42,8 +45,9 @@ class Ticket669Spec
 
     "be able to reply on failure during postStop" in {
       filterEvents(EventFilter[Exception]("test", occurrences = 1)) {
-        val supervisor = system.actorOf(Props(new Supervisor(AllForOneStrategy(
-                        maxNrOfRetries = 0)(List(classOf[Exception])))))
+        val supervisor = system.actorOf(
+          Props(new Supervisor(
+            AllForOneStrategy(maxNrOfRetries = 0)(List(classOf[Exception])))))
         val supervised =
           Await.result((supervisor ? Props[Supervised]).mapTo[ActorRef],
                        timeout.duration)

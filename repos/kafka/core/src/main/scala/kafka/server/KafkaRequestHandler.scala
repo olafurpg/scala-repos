@@ -32,9 +32,10 @@ class KafkaRequestHandler(id: Int,
                           val totalHandlerThreads: Int,
                           val requestChannel: RequestChannel,
                           apis: KafkaApis)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
   this.logIdent = "[Kafka Request Handler " + id + " on Broker " + brokerId +
-  "], "
+      "], "
 
   def run() {
     while (true) {
@@ -53,14 +54,14 @@ class KafkaRequestHandler(id: Int,
 
         if (req eq RequestChannel.AllDone) {
           debug(
-              "Kafka request handler %d on broker %d received shut down command"
-                .format(id, brokerId))
+            "Kafka request handler %d on broker %d received shut down command"
+              .format(id, brokerId))
           return
         }
         req.requestDequeueTimeMs = SystemTime.milliseconds
         trace(
-            "Kafka request handler %d on broker %d handling request %s".format(
-                id, brokerId, req))
+          "Kafka request handler %d on broker %d handling request %s"
+            .format(id, brokerId, req))
         apis.handle(req)
       } catch {
         case e: Throwable => error("Exception when handling request", e)
@@ -75,18 +76,23 @@ class KafkaRequestHandlerPool(val brokerId: Int,
                               val requestChannel: RequestChannel,
                               val apis: KafkaApis,
                               numThreads: Int)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   /* a meter to track the average free capacity of the request handlers */
-  private val aggregateIdleMeter = newMeter(
-      "RequestHandlerAvgIdlePercent", "percent", TimeUnit.NANOSECONDS)
+  private val aggregateIdleMeter =
+    newMeter("RequestHandlerAvgIdlePercent", "percent", TimeUnit.NANOSECONDS)
 
   this.logIdent = "[Kafka Request Handler on Broker " + brokerId + "], "
   val threads = new Array[Thread](numThreads)
   val runnables = new Array[KafkaRequestHandler](numThreads)
   for (i <- 0 until numThreads) {
-    runnables(i) = new KafkaRequestHandler(
-        i, brokerId, aggregateIdleMeter, numThreads, requestChannel, apis)
+    runnables(i) = new KafkaRequestHandler(i,
+                                           brokerId,
+                                           aggregateIdleMeter,
+                                           numThreads,
+                                           requestChannel,
+                                           apis)
     threads(i) = Utils.daemonThread("kafka-request-handler-" + i, runnables(i))
     threads(i).start()
   }
@@ -105,21 +111,21 @@ class BrokerTopicMetrics(name: Option[String]) extends KafkaMetricsGroup {
     case Some(topic) => Map("topic" -> topic)
   }
 
-  val messagesInRate = newMeter(
-      "MessagesInPerSec", "messages", TimeUnit.SECONDS, tags)
+  val messagesInRate =
+    newMeter("MessagesInPerSec", "messages", TimeUnit.SECONDS, tags)
   val bytesInRate = newMeter("BytesInPerSec", "bytes", TimeUnit.SECONDS, tags)
-  val bytesOutRate = newMeter(
-      "BytesOutPerSec", "bytes", TimeUnit.SECONDS, tags)
-  val bytesRejectedRate = newMeter(
-      "BytesRejectedPerSec", "bytes", TimeUnit.SECONDS, tags)
-  val failedProduceRequestRate = newMeter(
-      "FailedProduceRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
-  val failedFetchRequestRate = newMeter(
-      "FailedFetchRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
-  val totalProduceRequestRate = newMeter(
-      "TotalProduceRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
-  val totalFetchRequestRate = newMeter(
-      "TotalFetchRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val bytesOutRate =
+    newMeter("BytesOutPerSec", "bytes", TimeUnit.SECONDS, tags)
+  val bytesRejectedRate =
+    newMeter("BytesRejectedPerSec", "bytes", TimeUnit.SECONDS, tags)
+  val failedProduceRequestRate =
+    newMeter("FailedProduceRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val failedFetchRequestRate =
+    newMeter("FailedFetchRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val totalProduceRequestRate =
+    newMeter("TotalProduceRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val totalFetchRequestRate =
+    newMeter("TotalFetchRequestsPerSec", "requests", TimeUnit.SECONDS, tags)
 }
 
 object BrokerTopicStats extends Logging {

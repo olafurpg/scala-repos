@@ -31,9 +31,10 @@ import scala.reflect.ClassTag
   *
   * @since 1.2
   */
-class TestFSMRef[S, D, T <: Actor](
-    system: ActorSystem, props: Props, supervisor: ActorRef, name: String)(
-    implicit ev: T <:< FSM[S, D])
+class TestFSMRef[S, D, T <: Actor](system: ActorSystem,
+                                   props: Props,
+                                   supervisor: ActorRef,
+                                   name: String)(implicit ev: T <:< FSM[S, D])
     extends TestActorRef[T](system, props, supervisor, name) {
 
   private def fsm: T = underlyingActor
@@ -59,7 +60,7 @@ class TestFSMRef[S, D, T <: Actor](
                timeout: FiniteDuration = null,
                stopReason: Option[FSM.Reason] = None) {
     fsm.applyState(
-        FSM.State(stateName, stateData, Option(timeout), stopReason))
+      FSM.State(stateName, stateData, Option(timeout), stopReason))
   }
 
   /**
@@ -90,7 +91,7 @@ class TestFSMRef[S, D, T <: Actor](
 
 object TestFSMRef {
 
-  def apply[S, D, T <: Actor : ClassTag](factory: ⇒ T)(
+  def apply[S, D, T <: Actor: ClassTag](factory: ⇒ T)(
       implicit ev: T <:< FSM[S, D],
       system: ActorSystem): TestFSMRef[S, D, T] = {
     val impl = system.asInstanceOf[ActorSystemImpl]
@@ -100,9 +101,9 @@ object TestFSMRef {
                    TestActorRef.randomName)
   }
 
-  def apply[S, D, T <: Actor : ClassTag](
-      factory: ⇒ T, name: String)(implicit ev: T <:< FSM[S, D],
-                                  system: ActorSystem): TestFSMRef[S, D, T] = {
+  def apply[S, D, T <: Actor: ClassTag](factory: ⇒ T, name: String)(
+      implicit ev: T <:< FSM[S, D],
+      system: ActorSystem): TestFSMRef[S, D, T] = {
     val impl = system.asInstanceOf[ActorSystemImpl]
     new TestFSMRef(impl,
                    Props(factory),
@@ -110,16 +111,19 @@ object TestFSMRef {
                    name)
   }
 
-  def apply[S, D, T <: Actor : ClassTag](
-      factory: ⇒ T, supervisor: ActorRef, name: String)(
+  def apply[S, D, T <: Actor: ClassTag](factory: ⇒ T,
+                                        supervisor: ActorRef,
+                                        name: String)(
       implicit ev: T <:< FSM[S, D],
       system: ActorSystem): TestFSMRef[S, D, T] = {
     val impl = system.asInstanceOf[ActorSystemImpl]
-    new TestFSMRef(
-        impl, Props(factory), supervisor.asInstanceOf[InternalActorRef], name)
+    new TestFSMRef(impl,
+                   Props(factory),
+                   supervisor.asInstanceOf[InternalActorRef],
+                   name)
   }
 
-  def apply[S, D, T <: Actor : ClassTag](factory: ⇒ T, supervisor: ActorRef)(
+  def apply[S, D, T <: Actor: ClassTag](factory: ⇒ T, supervisor: ActorRef)(
       implicit ev: T <:< FSM[S, D],
       system: ActorSystem): TestFSMRef[S, D, T] = {
     val impl = system.asInstanceOf[ActorSystemImpl]

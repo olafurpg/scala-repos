@@ -19,7 +19,7 @@ case class TreePrinter(name: String = "",
 
   def print(n: Dumpable,
             out: PrintWriter = new PrintWriter(
-                  new OutputStreamWriter(System.out))) {
+              new OutputStreamWriter(System.out))) {
     def dump(baseValue: Dumpable,
              prefix1: String,
              prefix2: String,
@@ -34,7 +34,7 @@ case class TreePrinter(name: String = "",
       val marked = mark(value)
       val markedDiName = if (marked) "< " + di.name + " >" else di.name
       out.print(
-          prefix1 + cCyan + (if (name.nonEmpty) name + ": " else "") +
+        prefix1 + cCyan + (if (name.nonEmpty) name + ": " else "") +
           (if (marked) cNormal + bYellow + cBlack else cYellow) +
           (if (multiLine) multi1 else "") + markedDiName + cNormal +
           (if (di.name.nonEmpty && di.mainInfo.nonEmpty) " " else "")
@@ -42,7 +42,7 @@ case class TreePrinter(name: String = "",
       if (multiLine) {
         val lines = di.mainInfo.replace("\r", "").split('\n')
         out.println(
-            if (di.attrInfo.isEmpty) "" else cBlue + di.attrInfo + cNormal)
+          if (di.attrInfo.isEmpty) "" else cBlue + di.attrInfo + cNormal)
         val p =
           prefix2 + Iterator
             .fill(name.length + (if (name.length == 0) 0 else 2))(' ')
@@ -51,9 +51,10 @@ case class TreePrinter(name: String = "",
           out.println(p + l)
         }
       } else {
-        out.println(di.mainInfo +
+        out.println(
+          di.mainInfo +
             (if (di.attrInfo.isEmpty) ""
-             else " " + cBlue + di.attrInfo + cNormal))
+            else " " + cBlue + di.attrInfo + cNormal))
       }
       val children = di.children.toIndexedSeq
       children.zipWithIndex.foreach {
@@ -133,13 +134,10 @@ object Ellipsis {
       if (poss.isEmpty) parent
       else if (poss contains Nil) DumpInfo("...")
       else
-        parent.copy(
-            children = parent.children.zipWithIndex.map {
+        parent.copy(children = parent.children.zipWithIndex.map {
           case ((name, ch), idx) =>
-            val chposs = poss
-              .filter(_.head == idx)
-              .map(_.tail)
-              (name, apply(ch, chposs: _*))
+            val chposs = poss.filter(_.head == idx).map(_.tail)
+            (name, apply(ch, chposs: _*))
         })
     }
   }

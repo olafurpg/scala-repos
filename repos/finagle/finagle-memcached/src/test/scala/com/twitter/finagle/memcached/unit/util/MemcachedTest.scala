@@ -19,7 +19,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MemcachedTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
   test("Memcached.Client has expected stack and params") {
     val markDeadFor = Backoff.const(1.second)
@@ -42,14 +44,16 @@ class MemcachedTest
       params[FailureAccrualFactory.Param]
     assert(policy() == failureAccrualPolicy)
     assert(
-        markDeadFor.take(10).force.toSeq ===
+      markDeadFor.take(10).force.toSeq ===
         (0 until 10 map { _ =>
           1.second
         }))
-    assert(params[Transporter.ConnectTimeout] == Transporter.ConnectTimeout(
-            100.milliseconds))
-    assert(params[Memcached.param.EjectFailedHost] == Memcached.param
-          .EjectFailedHost(false))
+    assert(
+      params[Transporter.ConnectTimeout] == Transporter.ConnectTimeout(
+        100.milliseconds))
+    assert(
+      params[Memcached.param.EjectFailedHost] == Memcached.param
+        .EjectFailedHost(false))
     assert(params[FailFastFactory.FailFast] == FailFastFactory.FailFast(false))
   }
 
@@ -66,14 +70,14 @@ class MemcachedTest
 
     val numberRequests = 10
     Time.withCurrentTimeFrozen { _ =>
-      for (i <- 0 until numberRequests) intercept[WriteException](
-          Await.result(client.get("foo"), 3.seconds))
+      for (i <- 0 until numberRequests)
+        intercept[WriteException](Await.result(client.get("foo"), 3.seconds))
       // Since FactoryToService is enabled, number of requeues should be
       // limited by leaky bucket until it exhausts retries, instead of
       // retrying 25 times on service acquisition.
       // number of requeues = maxRetriesPerReq * numRequests
       assert(
-          st.counters(Seq("memcache", "retries", "requeues")) > numberRequests)
+        st.counters(Seq("memcache", "retries", "requeues")) > numberRequests)
     }
   }
 }

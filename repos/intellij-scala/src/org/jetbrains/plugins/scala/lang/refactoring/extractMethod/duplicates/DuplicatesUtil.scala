@@ -5,10 +5,18 @@ import java.util
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.find.FindManager
-import com.intellij.openapi.application.{ApplicationManager, ApplicationNamesInfo}
+import com.intellij.openapi.application.{
+  ApplicationManager,
+  ApplicationNamesInfo
+}
 import com.intellij.openapi.editor.colors.{EditorColors, EditorColorsManager}
 import com.intellij.openapi.editor.markup.{RangeHighlighter, TextAttributes}
-import com.intellij.openapi.editor.{Editor, FoldRegion, LogicalPosition, ScrollType}
+import com.intellij.openapi.editor.{
+  Editor,
+  FoldRegion,
+  LogicalPosition,
+  ScrollType
+}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.TextRange
@@ -18,8 +26,14 @@ import com.intellij.refactoring.RefactoringBundle
 import com.intellij.ui.ReplacePromptDialog
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{ScalaExtractMethodSettings, ScalaExtractMethodUtils}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{
+  ScalaExtractMethodSettings,
+  ScalaExtractMethodUtils
+}
 
 /**
   * Nikolay.Tropin
@@ -54,8 +68,8 @@ object DuplicatesUtil {
     }
   }
 
-  def withFilteredForwardSiblings(
-      element: PsiElement, size: Int): Option[Seq[PsiElement]] = {
+  def withFilteredForwardSiblings(element: PsiElement,
+                                  size: Int): Option[Seq[PsiElement]] = {
     val siblingIterator = element.nextSiblings
     val siblings =
       element +: siblingIterator.withFilter(isSignificant).take(size - 1).toSeq
@@ -65,14 +79,14 @@ object DuplicatesUtil {
 
   def findDuplicates(
       settings: ScalaExtractMethodSettings): Seq[DuplicateMatch] = {
-    val pattern = new DuplicatePattern(
-        filtered(settings.elements), settings.parameters)
+    val pattern =
+      new DuplicatePattern(filtered(settings.elements), settings.parameters)
     pattern.findDuplicates(settings.nextSibling.getParent)
   }
 
-  def previewDuplicate(
-      project: Project, editor: Editor, duplicate: DuplicateMatch)(
-      work: => Unit) {
+  def previewDuplicate(project: Project,
+                       editor: Editor,
+                       duplicate: DuplicateMatch)(work: => Unit) {
     val highlighter = new util.ArrayList[RangeHighlighter](1)
     highlightDuplicate(project, editor, duplicate, highlighter)
     val range = duplicate.textRange
@@ -97,8 +111,10 @@ object DuplicatesUtil {
     for ((d, idx) <- duplicates.zipWithIndex) {
       if (!replaceAll) {
         previewDuplicate(project, editor, d) {
-          val dialog = showPromptDialog(
-              settings.methodName, idx + 1, duplicates.size, project)
+          val dialog = showPromptDialog(settings.methodName,
+                                        idx + 1,
+                                        duplicates.size,
+                                        project)
           dialog.getExitCode match {
             case FindManager.PromptResult.ALL =>
               replaceDuplicate(project, settings, d)
@@ -122,14 +138,16 @@ object DuplicatesUtil {
       ScalaExtractMethodUtils.replaceWithMethodCall(settings, d)
     }
 
-  private def showPromptDialog(
-      methodName: String, idx: Int, size: Int, project: Project) = {
+  private def showPromptDialog(methodName: String,
+                               idx: Int,
+                               size: Int,
+                               project: Project) = {
     val title = RefactoringBundle.message("process.methods.duplicates.title",
                                           Int.box(idx),
                                           Int.box(size),
                                           methodName)
-    val dialog: ReplacePromptDialog = new ReplacePromptDialog(
-        false, title, project)
+    val dialog: ReplacePromptDialog =
+      new ReplacePromptDialog(false, title, project)
     dialog.show()
     dialog
   }
@@ -140,11 +158,13 @@ object DuplicatesUtil {
                         editor: Editor) {
     def showDuplicatesDialog(): Int = {
       val message = RefactoringBundle.message(
-          "0.has.detected.1.code.fragments.in.this.file.that.can.be.replaced.with.a.call.to.extracted.method",
-          ApplicationNamesInfo.getInstance.getProductName,
-          Int.box(duplicates.size))
-      Messages.showYesNoDialog(
-          project, message, "Process Duplicates", Messages.getQuestionIcon)
+        "0.has.detected.1.code.fragments.in.this.file.that.can.be.replaced.with.a.call.to.extracted.method",
+        ApplicationNamesInfo.getInstance.getProductName,
+        Int.box(duplicates.size))
+      Messages.showYesNoDialog(project,
+                               message,
+                               "Process Duplicates",
+                               Messages.getQuestionIcon)
     }
 
     if (ApplicationManager.getApplication.isUnitTestMode) {
@@ -165,8 +185,9 @@ object DuplicatesUtil {
     }
   }
 
-  private def expandAllRegionsCoveringRange(
-      project: Project, editor: Editor, textRange: TextRange) {
+  private def expandAllRegionsCoveringRange(project: Project,
+                                            editor: Editor,
+                                            textRange: TextRange) {
     val foldRegions: Array[FoldRegion] = CodeFoldingManager
       .getInstance(project)
       .getFoldRegionsAtOffset(editor, textRange.getStartOffset)

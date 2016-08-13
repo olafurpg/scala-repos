@@ -75,21 +75,21 @@ object SBTProjectBuilder {
 
     // Write sample Scala code
     val samplePath = new File(
-        projectDir,
-        sampleSubDir + "/" + sampleInfo.classSimpleName + ".scala").toPath
+      projectDir,
+      sampleSubDir + "/" + sampleInfo.classSimpleName + ".scala").toPath
     Files.createDirectories(samplePath.getParent)
     Files.write(samplePath, sampleInfo.sourceCode.getBytes)
 
     // Copy resources, if used by the sample.
     sampleInfo.resources.foreach(resource =>
-          copyResource(new File(projectDir, resourceSubDir), resource))
+      copyResource(new File(projectDir, resourceSubDir), resource))
 
     // Copy project files
     copyText(projectDir,
              "build.sbt",
              filters = List("@name@" -> projectName,
                             "@mainClass@" ->
-                            (sampleInfo.packageName + "." +
+                              (sampleInfo.packageName + "." +
                                 sampleInfo.classSimpleName)))
     copyText(projectDir, "project/build.properties")
     copyText(projectDir, "project/plugins.sbt")
@@ -121,9 +121,9 @@ object SBTProjectBuilder {
     } catch {
       case t: Throwable =>
         throw new IOException(
-            "Error while creating SBT project. Failed to copy text file: " +
+          "Error while creating SBT project. Failed to copy text file: " +
             fileName,
-            t)
+          t)
     }
   }
 
@@ -138,9 +138,9 @@ object SBTProjectBuilder {
     } catch {
       case t: Throwable =>
         throw new IOException(
-            "Error while creating SBT project. Failed to copy resource: " +
+          "Error while creating SBT project. Failed to copy resource: " +
             fileName,
-            t)
+          t)
     }
   }
 }

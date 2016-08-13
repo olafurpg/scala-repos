@@ -81,20 +81,20 @@ case class Perfs(standard: Perf,
   }
 
   lazy val perfsMap: Map[String, Perf] = Map(
-      "chess960" -> chess960,
-      "kingOfTheHill" -> kingOfTheHill,
-      "threeCheck" -> threeCheck,
-      "antichess" -> antichess,
-      "atomic" -> atomic,
-      "horde" -> horde,
-      "racingKings" -> racingKings,
-      "crazyhouse" -> crazyhouse,
-      "bullet" -> bullet,
-      "blitz" -> blitz,
-      "classical" -> classical,
-      "correspondence" -> correspondence,
-      "puzzle" -> puzzle,
-      "opening" -> opening)
+    "chess960" -> chess960,
+    "kingOfTheHill" -> kingOfTheHill,
+    "threeCheck" -> threeCheck,
+    "antichess" -> antichess,
+    "atomic" -> atomic,
+    "horde" -> horde,
+    "racingKings" -> racingKings,
+    "crazyhouse" -> crazyhouse,
+    "bullet" -> bullet,
+    "blitz" -> blitz,
+    "classical" -> classical,
+    "correspondence" -> correspondence,
+    "puzzle" -> puzzle,
+    "opening" -> opening)
 
   def ratingMap: Map[String, Int] = perfsMap mapValues (_.intRating)
 
@@ -126,27 +126,22 @@ case class Perfs(standard: Perf,
     } mkString ", "
 
   def updateStandard = copy(
-      standard = {
-        val subs = List(bullet, blitz, classical, correspondence)
-        subs.maxBy(_.latest.fold(0l)(_.getMillis)).latest.fold(standard) {
-          date =>
-            val nb = subs.map(_.nb).sum
-            val glicko =
-              Glicko(rating = subs
-                         .map(s => s.glicko.rating * (s.nb / nb.toDouble))
-                         .sum,
-                     deviation = subs
-                         .map(s => s.glicko.deviation * (s.nb / nb.toDouble))
-                         .sum,
-                     volatility = subs
-                         .map(s => s.glicko.volatility * (s.nb / nb.toDouble))
-                         .sum)
-            Perf(glicko = glicko,
-                 nb = nb,
-                 recent = Nil,
-                 latest = date.some)
-        }
+    standard = {
+      val subs = List(bullet, blitz, classical, correspondence)
+      subs.maxBy(_.latest.fold(0l)(_.getMillis)).latest.fold(standard) {
+        date =>
+          val nb = subs.map(_.nb).sum
+          val glicko =
+            Glicko(
+              rating =
+                subs.map(s => s.glicko.rating * (s.nb / nb.toDouble)).sum,
+              deviation =
+                subs.map(s => s.glicko.deviation * (s.nb / nb.toDouble)).sum,
+              volatility =
+                subs.map(s => s.glicko.volatility * (s.nb / nb.toDouble)).sum)
+          Perf(glicko = glicko, nb = nb, recent = Nil, latest = date.some)
       }
+    }
   )
 }
 
@@ -175,13 +170,13 @@ case object Perfs {
     case Speed.Bullet =>
       perfs =>
         perfs.bullet
-      case Speed.Blitz =>
+    case Speed.Blitz =>
       perfs =>
         perfs.blitz
-      case Speed.Classical =>
+    case Speed.Classical =>
       perfs =>
         perfs.classical
-      case Speed.Correspondence =>
+    case Speed.Correspondence =>
       perfs =>
         perfs.correspondence
   }

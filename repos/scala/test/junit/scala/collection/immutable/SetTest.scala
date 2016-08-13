@@ -34,8 +34,8 @@ class SetTest {
 
     // Make sure BitSet correctly rebuilds itself on widening with toSet
     // Need to cover empty, values 0-63, values 0-127 as special cases
-    val bitsets = Seq(
-        BitSet.empty, BitSet(23), BitSet(23, 99), BitSet(23, 99, 141))
+    val bitsets =
+      Seq(BitSet.empty, BitSet(23), BitSet(23, 99), BitSet(23, 99, 141))
     bitsets.foreach { b =>
       val ba = any(b)
       assert(b ne ba)
@@ -57,10 +57,10 @@ class SetTest {
     // Make sure SortedSets correctly rebuild themselves on widening with toSet
     // Covers TreeSet and keySet of SortedMap also
     val sortedsets = Seq(
-        SortedSet.empty[Int],
-        SortedSet(5),
-        SortedSet(1, 2, 3, 5, 4),
-        SortedMap(1 -> "cod", 2 -> "herring").keySet
+      SortedSet.empty[Int],
+      SortedSet(5),
+      SortedSet(1, 2, 3, 5, 4),
+      SortedMap(1 -> "cod", 2 -> "herring").keySet
     )
     sortedsets.foreach { set =>
       val seta = any(set)

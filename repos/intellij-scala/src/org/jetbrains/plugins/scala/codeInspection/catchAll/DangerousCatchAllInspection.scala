@@ -1,11 +1,22 @@
 package org.jetbrains.plugins.scala.codeInspection.catchAll
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool,
+  ProblemHighlightType,
+  ProblemsHolder
+}
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScReferencePattern, ScWildcardPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScCatchBlock}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScReferencePattern,
+  ScWildcardPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr,
+  ScCatchBlock
+}
 
 /**
   * @author Ksenia.Sautina
@@ -14,8 +25,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScCatchBlock}
 class DangerousCatchAllInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitCatchBlock(catchBlock: ScCatchBlock) {
         val expr = catchBlock.expression.orNull
@@ -42,13 +53,13 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
           val endElement = isInspection._2.pattern.orNull
           if (startElement == null || endElement == null) return
           holder.registerProblem(
-              holder.getManager.createProblemDescriptor(
-                  startElement,
-                  endElement,
-                  InspectionBundle.message("catch.all"),
-                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                  isOnTheFly,
-                  new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
+            holder.getManager.createProblemDescriptor(
+              startElement,
+              endElement,
+              InspectionBundle.message("catch.all"),
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+              isOnTheFly,
+              new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
         }
       }
     }

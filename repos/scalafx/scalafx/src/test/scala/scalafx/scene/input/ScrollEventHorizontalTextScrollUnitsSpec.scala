@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 class ScrollEventHorizontalTextScrollUnitsSpec
     extends SFXEnumDelegateSpec[jfxsi.ScrollEvent.HorizontalTextScrollUnits,
                                 ScrollEvent.HorizontalTextScrollUnits](
-        classOf[jfxsi.ScrollEvent.HorizontalTextScrollUnits],
-        classOf[ScrollEvent.HorizontalTextScrollUnits],
-        ScrollEvent.HorizontalTextScrollUnits)
+      classOf[jfxsi.ScrollEvent.HorizontalTextScrollUnits],
+      classOf[ScrollEvent.HorizontalTextScrollUnits],
+      ScrollEvent.HorizontalTextScrollUnits)

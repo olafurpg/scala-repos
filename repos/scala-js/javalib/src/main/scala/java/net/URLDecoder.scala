@@ -31,7 +31,7 @@ object URLDecoder {
 
     def throwIllegalHex() = {
       throw new IllegalArgumentException(
-          "URLDecoder: Illegal hex characters in escape (%) pattern")
+        "URLDecoder: Illegal hex characters in escape (%) pattern")
     }
 
     var i = 0

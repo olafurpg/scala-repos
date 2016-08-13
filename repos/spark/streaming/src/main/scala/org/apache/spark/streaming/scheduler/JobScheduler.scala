@@ -49,8 +49,8 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     new ConcurrentHashMap[Time, JobSet]
   private val numConcurrentJobs =
     ssc.conf.getInt("spark.streaming.concurrentJobs", 1)
-  private val jobExecutor = ThreadUtils.newDaemonFixedThreadPool(
-      numConcurrentJobs, "streaming-job-executor")
+  private val jobExecutor = ThreadUtils
+    .newDaemonFixedThreadPool(numConcurrentJobs, "streaming-job-executor")
   private val jobGenerator = new JobGenerator(this)
   val clock = jobGenerator.clock
   val listenerBus = new StreamingListenerBus(ssc.sparkContext.listenerBus)
@@ -110,7 +110,8 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     // Wait for the queued jobs to complete if indicated
     val terminated =
       if (processAllReceivedData) {
-        jobExecutor.awaitTermination(1, TimeUnit.HOURS) // just a very large period of time
+        jobExecutor
+          .awaitTermination(1, TimeUnit.HOURS) // just a very large period of time
       } else {
         jobExecutor.awaitTermination(2, TimeUnit.SECONDS)
       }
@@ -174,7 +175,7 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     }
     job.setStartTime(startTime)
     listenerBus.post(
-        StreamingListenerOutputOperationStarted(job.toOutputOperationInfo))
+      StreamingListenerOutputOperationStarted(job.toOutputOperationInfo))
     logInfo("Starting job " + job.id + " from job set of time " + jobSet.time)
   }
 
@@ -183,17 +184,17 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     jobSet.handleJobCompletion(job)
     job.setEndTime(completedTime)
     listenerBus.post(
-        StreamingListenerOutputOperationCompleted(job.toOutputOperationInfo))
+      StreamingListenerOutputOperationCompleted(job.toOutputOperationInfo))
     logInfo("Finished job " + job.id + " from job set of time " + jobSet.time)
     if (jobSet.hasCompleted) {
       jobSets.remove(jobSet.time)
       jobGenerator.onBatchCompletion(jobSet.time)
       logInfo(
-          "Total delay: %.3f s for time %s (execution: %.3f s)".format(
-              jobSet.totalDelay / 1000.0,
-              jobSet.time.toString,
-              jobSet.processingDelay / 1000.0
-          ))
+        "Total delay: %.3f s for time %s (execution: %.3f s)".format(
+          jobSet.totalDelay / 1000.0,
+          jobSet.time.toString,
+          jobSet.processingDelay / 1000.0
+        ))
       listenerBus.post(StreamingListenerBatchCompleted(jobSet.toBatchInfo))
     }
     job.result match {
@@ -214,23 +215,23 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     def run() {
       try {
         val formattedTime = UIUtils.formatBatchTime(
-            job.time.milliseconds,
-            ssc.graph.batchDuration.milliseconds,
-            showYYYYMMSS = false)
+          job.time.milliseconds,
+          ssc.graph.batchDuration.milliseconds,
+          showYYYYMMSS = false)
         val batchUrl = s"/streaming/batch/?id=${job.time.milliseconds}"
         val batchLinkText =
           s"[output operation ${job.outputOpId}, batch time ${formattedTime}]"
 
         ssc.sc.setJobDescription(
-            s"""Streaming job from <a href="$batchUrl">$batchLinkText</a>""")
-        ssc.sc.setLocalProperty(
-            BATCH_TIME_PROPERTY_KEY, job.time.milliseconds.toString)
-        ssc.sc.setLocalProperty(
-            OUTPUT_OP_ID_PROPERTY_KEY, job.outputOpId.toString)
+          s"""Streaming job from <a href="$batchUrl">$batchLinkText</a>""")
+        ssc.sc.setLocalProperty(BATCH_TIME_PROPERTY_KEY,
+                                job.time.milliseconds.toString)
+        ssc.sc
+          .setLocalProperty(OUTPUT_OP_ID_PROPERTY_KEY, job.outputOpId.toString)
         // Checkpoint all RDDs marked for checkpointing to ensure their lineages are
         // truncated periodically. Otherwise, we may run into stack overflows (SPARK-6847).
-        ssc.sparkContext.setLocalProperty(
-            RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
+        ssc.sparkContext
+          .setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
 
         // We need to assign `eventLoop` to a temp variable. Otherwise, because
         // `JobScheduler.stop(false)` may set `eventLoop` to null when this method is running, then

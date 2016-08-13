@@ -82,7 +82,7 @@ object SynthBenchmark {
     }
 
     val conf = new SparkConf().setAppName(
-        s"GraphX Synth Benchmark (nverts = $numVertices, app = $app)")
+      s"GraphX Synth Benchmark (nverts = $numVertices, app = $app)")
     GraphXUtils.registerKryoClasses(conf)
 
     val sc = new SparkContext(conf)
@@ -90,12 +90,12 @@ object SynthBenchmark {
     // Create the graph
     println(s"Creating graph...")
     val unpartitionedGraph = GraphGenerators.logNormalGraph(
-        sc,
-        numVertices,
-        numEPart.getOrElse(sc.defaultParallelism),
-        mu,
-        sigma,
-        seed)
+      sc,
+      numVertices,
+      numEPart.getOrElse(sc.defaultParallelism),
+      mu,
+      sigma,
+      seed)
     // Repartition the graph
     val graph =
       partitionStrategy.foldLeft(unpartitionedGraph)(_.partitionBy(_)).cache()
@@ -103,7 +103,7 @@ object SynthBenchmark {
     var startTime = System.currentTimeMillis()
     val numEdges = graph.edges.count()
     println(
-        s"Done creating graph. Num Vertices = $numVertices, Num Edges = $numEdges")
+      s"Done creating graph. Num Vertices = $numVertices, Num Edges = $numEdges")
     val loadTime = System.currentTimeMillis() - startTime
 
     // Collect the degree distribution (if desired)

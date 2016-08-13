@@ -7,7 +7,7 @@ object SCL4576 {
     /*start*/
     //some text
     print(x + zz)
-/*end*/
+    /*end*/
   }
 }
 /*

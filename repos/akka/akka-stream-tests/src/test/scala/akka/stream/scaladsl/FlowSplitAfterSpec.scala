@@ -30,8 +30,10 @@ class FlowSplitAfterSpec extends AkkaSpec {
 
   val settings = ActorMaterializerSettings(system)
     .withInputBuffer(initialSize = 2, maxSize = 2)
-    .withSubscriptionTimeoutSettings(StreamSubscriptionTimeoutSettings(
-            StreamSubscriptionTimeoutTerminationMode.cancel, 1.second))
+    .withSubscriptionTimeoutSettings(
+      StreamSubscriptionTimeoutSettings(
+        StreamSubscriptionTimeoutTerminationMode.cancel,
+        1.second))
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -48,10 +50,10 @@ class FlowSplitAfterSpec extends AkkaSpec {
     def cancel(): Unit = subscription.cancel()
   }
 
-  class SubstreamsSupport(
-      splitAfter: Int = 3,
-      elementCount: Int = 6,
-      substreamCancelStrategy: SubstreamCancelStrategy = SubstreamCancelStrategy.drain) {
+  class SubstreamsSupport(splitAfter: Int = 3,
+                          elementCount: Int = 6,
+                          substreamCancelStrategy: SubstreamCancelStrategy =
+                            SubstreamCancelStrategy.drain) {
 
     val source = Source(1 to elementCount)
     val groupStream = source
@@ -124,13 +126,13 @@ class FlowSplitAfterSpec extends AkkaSpec {
 
     "work with single elem splits" in assertAllStagesStopped {
       Await.result(
-          Source(1 to 10)
-            .splitAfter(_ ⇒ true)
-            .lift
-            .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
-            .grouped(10)
-            .runWith(Sink.head),
-          3.second) should ===(1 to 10)
+        Source(1 to 10)
+          .splitAfter(_ ⇒ true)
+          .lift
+          .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
+          .grouped(10)
+          .runWith(Sink.head),
+        3.second) should ===(1 to 10)
     }
 
     "support cancelling substreams" in assertAllStagesStopped {

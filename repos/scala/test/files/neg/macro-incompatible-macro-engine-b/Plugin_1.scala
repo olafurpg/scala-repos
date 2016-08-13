@@ -27,19 +27,19 @@ class Plugin(val global: Global) extends NscPlugin {
         }
       }.transform(tree)
 
-    override def pluginsTypedMacroBody(
-        typer: Typer, ddef: DefDef): Option[Tree] = {
+    override def pluginsTypedMacroBody(typer: Typer,
+                                       ddef: DefDef): Option[Tree] = {
       val result = standardTypedMacroBody(typer, ddef)
       val List(AnnotationInfo(atp, List(Apply(nucleus, _ :: others)), Nil)) =
         ddef.symbol.annotations
       val updatedBinding = Apply(
-          nucleus,
-          Assign(
-              Literal(Constant("macroEngine")),
-              Literal(Constant(
-                      "vxxx (implemented in the incompatibleMacroEngine plugin)"))) :: others)
+        nucleus,
+        Assign(
+          Literal(Constant("macroEngine")),
+          Literal(Constant(
+            "vxxx (implemented in the incompatibleMacroEngine plugin)"))) :: others)
       ddef.symbol.setAnnotations(
-          List(AnnotationInfo(atp, List(fixupBinding(updatedBinding)), Nil)))
+        List(AnnotationInfo(atp, List(fixupBinding(updatedBinding)), Nil)))
       Some(result)
     }
   }

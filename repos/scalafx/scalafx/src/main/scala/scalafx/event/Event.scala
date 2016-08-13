@@ -56,8 +56,8 @@ object Event {
     */
   val NullSourceTarget: jfxe.EventTarget = jfxe.Event.NULL_SOURCE_TARGET
   @deprecated(
-      "Use NullSourceTarget; NULL_SOURCE_TARGET will be removed in a future release",
-      "8.0.60-R10")
+    "Use NullSourceTarget; NULL_SOURCE_TARGET will be removed in a future release",
+    "8.0.60-R10")
   val NULL_SOURCE_TARGET = NullSourceTarget
 }
 

@@ -18,7 +18,8 @@ trait MayVerb {
   def mayVerbStacktraceContextFrames = 3
 
   def optional(whenSkippedMessage: String)(body: ⇒ Unit): Unit =
-    try body catch {
+    try body
+    catch {
       case cause: Throwable ⇒
         val shortTrace =
           cause.getStackTrace.take(mayVerbStacktraceContextFrames)
@@ -56,8 +57,8 @@ trait MayVerb {
 }
 
 object MayVerb {
-  case class TestCanceledByFailure(
-      msg: String, specialStackTrace: Array[StackTraceElement])
+  case class TestCanceledByFailure(msg: String,
+                                   specialStackTrace: Array[StackTraceElement])
       extends TestCanceledException(Some(msg), None, 2) {
     override def getStackTrace = specialStackTrace
   }

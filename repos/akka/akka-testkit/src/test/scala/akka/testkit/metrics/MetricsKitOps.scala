@@ -13,8 +13,7 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet
   *
   * Extracted to give easy overview of user-API detached from MetricsKit internals.
   */
-private[akka] trait MetricsKitOps extends MetricKeyDSL {
-  this: MetricsKit ⇒
+private[akka] trait MetricsKitOps extends MetricKeyDSL { this: MetricsKit ⇒
 
   type MetricKey = MetricKeyDSL#MetricKey
 
@@ -32,9 +31,10 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     * Do not use for short running pieces of code.
     */
   def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T = {
-    val c = getOrRegister(
-        key.toString, new KnownOpsInTimespanTimer(expectedOps = ops))
-    try run finally c.stop()
+    val c = getOrRegister(key.toString,
+                          new KnownOpsInTimespanTimer(expectedOps = ops))
+    try run
+    finally c.stop()
   }
 
   /**
@@ -48,10 +48,10 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
                    highestTrackableValue: Long,
                    numberOfSignificantValueDigits: Int,
                    unitString: String = ""): HdrHistogram =
-    getOrRegister(
-        (key / "hdr-histogram").toString,
-        new HdrHistogram(
-            highestTrackableValue, numberOfSignificantValueDigits, unitString))
+    getOrRegister((key / "hdr-histogram").toString,
+                  new HdrHistogram(highestTrackableValue,
+                                   numberOfSignificantValueDigits,
+                                   unitString))
 
   /**
     * Use when measuring for 9x'th percentiles as well as min / max / mean values.
@@ -87,14 +87,13 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
   /** Enable GC measurements */
   def measureGc(key: MetricKey) =
     registry.registerAll(
-        new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
-      val prefix = key / "gc"
-    })
+      new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
+        val prefix = key / "gc"
+      })
 
   /** Enable File Descriptor measurements */
   def measureFileDescriptors(key: MetricKey) =
-    registry.registerAll(
-        new FileDescriptorMetricSet() with MetricsPrefix {
+    registry.registerAll(new FileDescriptorMetricSet() with MetricsPrefix {
       val prefix = key / "file-descriptors"
     })
 }

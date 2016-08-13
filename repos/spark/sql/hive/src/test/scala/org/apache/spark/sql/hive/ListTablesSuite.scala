@@ -25,7 +25,9 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
 class ListTablesSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -35,16 +37,17 @@ class ListTablesSuite
 
   override def beforeAll(): Unit = {
     // The catalog in HiveContext is a case insensitive one.
-    sessionState.catalog.registerTable(
-        TableIdentifier("ListTablesSuiteTable"), df.logicalPlan)
+    sessionState.catalog
+      .registerTable(TableIdentifier("ListTablesSuiteTable"), df.logicalPlan)
     sql("CREATE TABLE HiveListTablesSuiteTable (key int, value string)")
     sql("CREATE DATABASE IF NOT EXISTS ListTablesSuiteDB")
-    sql("CREATE TABLE ListTablesSuiteDB.HiveInDBListTablesSuiteTable (key int, value string)")
+    sql(
+      "CREATE TABLE ListTablesSuiteDB.HiveInDBListTablesSuiteTable (key int, value string)")
   }
 
   override def afterAll(): Unit = {
     sessionState.catalog.unregisterTable(
-        TableIdentifier("ListTablesSuiteTable"))
+      TableIdentifier("ListTablesSuiteTable"))
     sql("DROP TABLE IF EXISTS HiveListTablesSuiteTable")
     sql("DROP TABLE IF EXISTS ListTablesSuiteDB.HiveInDBListTablesSuiteTable")
     sql("DROP DATABASE IF EXISTS ListTablesSuiteDB")
@@ -58,9 +61,10 @@ class ListTablesSuite
                     Row("listtablessuitetable", true))
         checkAnswer(allTables.filter("tableName = 'hivelisttablessuitetable'"),
                     Row("hivelisttablessuitetable", false))
-        assert(allTables
-              .filter("tableName = 'hiveindblisttablessuitetable'")
-              .count() === 0)
+        assert(
+          allTables
+            .filter("tableName = 'hiveindblisttablessuitetable'")
+            .count() === 0)
     }
   }
 
@@ -69,12 +73,13 @@ class ListTablesSuite
       case allTables =>
         checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
                     Row("listtablessuitetable", true))
-        assert(allTables
-              .filter("tableName = 'hivelisttablessuitetable'")
-              .count() === 0)
+        assert(
+          allTables
+            .filter("tableName = 'hivelisttablessuitetable'")
+            .count() === 0)
         checkAnswer(
-            allTables.filter("tableName = 'hiveindblisttablessuitetable'"),
-            Row("hiveindblisttablessuitetable", false))
+          allTables.filter("tableName = 'hiveindblisttablessuitetable'"),
+          Row("hiveindblisttablessuitetable", false))
     }
   }
 }

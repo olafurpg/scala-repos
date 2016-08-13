@@ -5,7 +5,11 @@ import java.util
 
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScFinallyBlock, ScTryBlock, ScTryStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScFinallyBlock,
+  ScTryBlock,
+  ScTryStmt
+}
 
 /**
   * Nikolay.Tropin
@@ -36,11 +40,12 @@ class ScalaTryOrFinallyUnwrapper extends ScalaUnwrapper {
     case _ => ""
   }
 
-  override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e.getParent match {
-    case _: ScTryStmt =>
-      super.collectAffectedElements(e, toExtract)
-      e
-    case _ => e
-  }
+  override def collectAffectedElements(e: PsiElement,
+                                       toExtract: util.List[PsiElement]) =
+    e.getParent match {
+      case _: ScTryStmt =>
+        super.collectAffectedElements(e, toExtract)
+        e
+      case _ => e
+    }
 }

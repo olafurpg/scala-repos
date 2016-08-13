@@ -19,8 +19,8 @@ package mutable
   *  @since   1
   */
 @deprecated(
-    "Proxying is deprecated due to lack of use and compiler-level support.",
-    "2.11.0")
+  "Proxying is deprecated due to lack of use and compiler-level support.",
+  "2.11.0")
 trait SetProxy[A] extends Set[A] with SetProxyLike[A, Set[A]] {
   override def repr = this
   override def empty = new SetProxy[A] { val self = SetProxy.this.self.empty }

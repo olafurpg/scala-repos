@@ -11,7 +11,7 @@ object Test {
   import scala.collection.{mutable, immutable}
   import scala.collection.immutable.{Vector}
   import scala.reflect.runtime.universe._
-  def what[T : TypeTag](x: T) = println(typeTag[T])
+  def what[T: TypeTag](x: T) = println(typeTag[T])
 
   def main(args: Array[String]): Unit = {
     what(List(List(new C), Stream(new D)))

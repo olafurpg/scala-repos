@@ -63,9 +63,9 @@ trait MergeService {
     using(Git.open(getRepositoryDir(userName, repositoryName))) { git =>
       git.fetch
         .setRemote(
-            getRepositoryDir(requestUserName, requestRepositoryName).toURI.toString)
+          getRepositoryDir(requestUserName, requestRepositoryName).toURI.toString)
         .setRefSpecs(new RefSpec(
-                s"refs/heads/${requestBranch}:refs/pull/${issueId}/head"))
+          s"refs/heads/${requestBranch}:refs/pull/${issueId}/head"))
         .call
     }
   }
@@ -91,7 +91,7 @@ trait MergeService {
           // fetch objects from origin repository branch
           git.fetch
             .setRemote(
-                getRepositoryDir(remoteUserName, remoteRepositoryName).toURI.toString)
+              getRepositoryDir(remoteUserName, remoteRepositoryName).toURI.toString)
             .setRefSpecs(refSpec)
             .call
           // merge conflict check
@@ -273,15 +273,16 @@ object MergeService {
     def merge(message: String, committer: PersonIdent) = {
       if (checkConflict()) {
         throw new RuntimeException(
-            "This pull request can't merge automatically.")
+          "This pull request can't merge automatically.")
       }
       val mergeResultCommit = parseCommit(
-          Option(repository.resolve(mergedBranchName))
-            .getOrElse(throw new RuntimeException(
-                  s"not found branch ${mergedBranchName}")))
+        Option(repository.resolve(mergedBranchName)).getOrElse(
+          throw new RuntimeException(s"not found branch ${mergedBranchName}")))
       // creates merge commit
       val mergeCommitId = createMergeCommit(
-          mergeResultCommit.getTree().getId(), committer, message)
+        mergeResultCommit.getTree().getId(),
+        committer,
+        message)
       // update refs
       Util.updateRefs(repository,
                       s"refs/heads/${branch}",
@@ -291,8 +292,9 @@ object MergeService {
                       Some("merged"))
     }
     // return treeId
-    private def createMergeCommit(
-        treeId: ObjectId, committer: PersonIdent, message: String) =
+    private def createMergeCommit(treeId: ObjectId,
+                                  committer: PersonIdent,
+                                  message: String) =
       Util.createMergeCommit(repository,
                              treeId,
                              committer,

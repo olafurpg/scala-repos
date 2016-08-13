@@ -32,15 +32,16 @@ import javafx.{collections => jfxc}
   * Companion Object for [[scalafx.collections.ObservableIntegerArray]].
   */
 object ObservableIntegerArray
-    extends ObservableArrayCompanionBase[
-        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray] {
+    extends ObservableArrayCompanionBase[Int,
+                                         ObservableIntegerArray,
+                                         jfxc.ObservableIntegerArray] {
 
   /**
     * @inheritdoc
     */
   override def apply(v: Int*) =
     new ObservableIntegerArray(
-        jfxc.FXCollections.observableIntegerArray(v: _*))
+      jfxc.FXCollections.observableIntegerArray(v: _*))
 
   /**
     * Returns an array containing equally spaced values in some integer interval.
@@ -69,10 +70,11 @@ object ObservableIntegerArray
   * @define ARY `Array`
   */
 class ObservableIntegerArray(
-    delegate: jfxc.ObservableIntegerArray = jfxc.FXCollections
-        .observableIntegerArray())
-    extends ObservableArray[
-        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray](delegate) {
+    delegate: jfxc.ObservableIntegerArray =
+      jfxc.FXCollections.observableIntegerArray())
+    extends ObservableArray[Int,
+                            ObservableIntegerArray,
+                            jfxc.ObservableIntegerArray](delegate) {
 
   /**
     * Create $OIA with specified capacity.
@@ -90,16 +92,20 @@ class ObservableIntegerArray(
   /**
     * @inheritdoc
     */
-  override def copyTo(
-      srcIdx: Int, dest: Array[Int], destIdx: Int, length: Int) {
+  override def copyTo(srcIdx: Int,
+                      dest: Array[Int],
+                      destIdx: Int,
+                      length: Int) {
     delegate.copyTo(srcIdx, dest, destIdx, length)
   }
 
   /**
     * @inheritdoc
     */
-  override def copyTo(
-      srcIdx: Int, dest: ObservableIntegerArray, destIdx: Int, length: Int) {
+  override def copyTo(srcIdx: Int,
+                      dest: ObservableIntegerArray,
+                      destIdx: Int,
+                      length: Int) {
     delegate.copyTo(srcIdx, dest.delegate, destIdx, length)
   }
 
@@ -181,8 +187,10 @@ class ObservableIntegerArray(
   /**
     * @inheritdoc
     */
-  override def set(
-      destIdx: Int, src: ObservableIntegerArray, srcIdx: Int, length: Int) {
+  override def set(destIdx: Int,
+                   src: ObservableIntegerArray,
+                   srcIdx: Int,
+                   length: Int) {
     delegate.set(destIdx, src.delegate, srcIdx, length)
   }
 

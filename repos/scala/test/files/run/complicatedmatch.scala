@@ -21,11 +21,11 @@ object Test extends App {
   }
 
   List(
-      2 -> "bar",
-      2 -> "foo",
-      3 -> "foo",
-      7 -> "flob",
-      3 -> "bar",
-      12 -> LongWord
+    2 -> "bar",
+    2 -> "foo",
+    3 -> "foo",
+    7 -> "flob",
+    3 -> "bar",
+    12 -> LongWord
   ).foreach({ case (x, y) => println(foo(x, y)) });
 }

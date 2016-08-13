@@ -365,10 +365,10 @@ class ColumnarBatchSuite extends SparkFunSuite {
 
         // Just put llo
         val offset = column.putByteArray(
-            idx,
-            values(0).getBytes(StandardCharsets.UTF_8),
-            2,
-            values(0).getBytes(StandardCharsets.UTF_8).length - 2)
+          idx,
+          values(0).getBytes(StandardCharsets.UTF_8),
+          2,
+          values(0).getBytes(StandardCharsets.UTF_8).length - 2)
         reference += "llo"
         idx += 1
         assert(column.arrayData().elementsAppended == 11)
@@ -459,9 +459,10 @@ class ColumnarBatchSuite extends SparkFunSuite {
         assert(data.capacity == array.length * 2)
         data.putInts(0, array.length, array, 0)
         column.putArray(0, 0, array.length)
-        assert(ColumnVectorUtils
-              .toPrimitiveJavaArray(column.getArray(0))
-              .asInstanceOf[Array[Int]] === array)
+        assert(
+          ColumnVectorUtils
+            .toPrimitiveJavaArray(column.getArray(0))
+            .asInstanceOf[Array[Int]] === array)
       }
     }
   }
@@ -631,16 +632,18 @@ class ColumnarBatchSuite extends SparkFunSuite {
     }
   }
 
-  private def compareStruct(
-      fields: Seq[StructField], r1: InternalRow, r2: Row, seed: Long) {
+  private def compareStruct(fields: Seq[StructField],
+                            r1: InternalRow,
+                            r2: Row,
+                            seed: Long) {
     fields.zipWithIndex.foreach { v =>
       {
         assert(r1.isNullAt(v._2) == r2.isNullAt(v._2), "Seed = " + seed)
         if (!r1.isNullAt(v._2)) {
           v._1.dataType match {
             case BooleanType =>
-              assert(
-                  r1.getBoolean(v._2) == r2.getBoolean(v._2), "Seed = " + seed)
+              assert(r1.getBoolean(v._2) == r2.getBoolean(v._2),
+                     "Seed = " + seed)
             case ByteType =>
               assert(r1.getByte(v._2) == r2.getByte(v._2), "Seed = " + seed)
             case ShortType =>
@@ -660,41 +663,42 @@ class ColumnarBatchSuite extends SparkFunSuite {
               val d2 = r2.getDecimal(v._2)
               assert(d1.compare(d2) == 0, "Seed = " + seed)
             case StringType =>
-              assert(
-                  r1.getString(v._2) == r2.getString(v._2), "Seed = " + seed)
+              assert(r1.getString(v._2) == r2.getString(v._2),
+                     "Seed = " + seed)
             case CalendarIntervalType =>
-              assert(r1.getInterval(v._2) === r2
-                    .get(v._2)
-                    .asInstanceOf[CalendarInterval])
+              assert(
+                r1.getInterval(v._2) === r2
+                  .get(v._2)
+                  .asInstanceOf[CalendarInterval])
             case ArrayType(childType, n) =>
               val a1 = r1.getArray(v._2).array
               val a2 = r2.getList(v._2).toArray
               assert(a1.length == a2.length, "Seed = " + seed)
               childType match {
                 case DoubleType => {
-                    var i = 0
-                    while (i < a1.length) {
-                      assert(doubleEquals(a1(i).asInstanceOf[Double],
-                                          a2(i).asInstanceOf[Double]),
-                             "Seed = " + seed)
-                      i += 1
-                    }
+                  var i = 0
+                  while (i < a1.length) {
+                    assert(doubleEquals(a1(i).asInstanceOf[Double],
+                                        a2(i).asInstanceOf[Double]),
+                           "Seed = " + seed)
+                    i += 1
                   }
+                }
                 case FloatType => {
-                    var i = 0
-                    while (i < a1.length) {
-                      assert(doubleEquals(a1(i).asInstanceOf[Float],
-                                          a2(i).asInstanceOf[Float]),
-                             "Seed = " + seed)
-                      i += 1
-                    }
+                  var i = 0
+                  while (i < a1.length) {
+                    assert(doubleEquals(a1(i).asInstanceOf[Float],
+                                        a2(i).asInstanceOf[Float]),
+                           "Seed = " + seed)
+                    i += 1
                   }
+                }
 
                 case t: DecimalType =>
                   var i = 0
                   while (i < a1.length) {
-                    assert(
-                        (a1(i) == null) == (a2(i) == null), "Seed = " + seed)
+                    assert((a1(i) == null) == (a2(i) == null),
+                           "Seed = " + seed)
                     if (a1(i) != null) {
                       val d1 = a1(i).asInstanceOf[Decimal].toBigDecimal
                       val d2 = a2(i).asInstanceOf[java.math.BigDecimal]

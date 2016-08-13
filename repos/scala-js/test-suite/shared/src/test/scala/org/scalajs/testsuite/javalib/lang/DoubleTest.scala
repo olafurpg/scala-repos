@@ -172,8 +172,8 @@ class DoubleTest {
     def isZero(v: Double, neg: Boolean): Boolean = {
       (v == 0.0) &&
       (1 / v ==
-          (if (neg) Double.NegativeInfinity
-           else Double.PositiveInfinity))
+        (if (neg) Double.NegativeInfinity
+        else Double.PositiveInfinity))
     }
 
     import JDouble.{longBitsToDouble => f}

@@ -26,13 +26,13 @@ object inv extends UFunc {
         val work = Array.ofDim[Double](lwork)
         val info = new intW(0)
         lapack.dgetri(
-            N,
-            m.data,
-            scala.math.max(1, N) /* LDA */,
-            ipiv,
-            work /* workspace */,
-            lwork /* workspace size */,
-            info
+          N,
+          m.data,
+          scala.math.max(1, N) /* LDA */,
+          ipiv,
+          work /* workspace */,
+          lwork /* workspace size */,
+          info
         )
         assert(info.`val` >= 0,
                "Malformed argument %d (LAPACK)".format(-info.`val`))
@@ -56,13 +56,13 @@ object inv extends UFunc {
         val work = Array.ofDim[Float](lwork)
         val info = new intW(0)
         lapack.sgetri(
-            N,
-            m.data,
-            scala.math.max(1, N) /* LDA */,
-            ipiv,
-            work /* workspace */,
-            lwork /* workspace size */,
-            info
+          N,
+          m.data,
+          scala.math.max(1, N) /* LDA */,
+          ipiv,
+          work /* workspace */,
+          lwork /* workspace size */,
+          info
         )
         assert(info.`val` >= 0,
                "Malformed argument %d (LAPACK)".format(-info.`val`))
@@ -89,8 +89,8 @@ object pinv extends UFunc with pinvLowPrio {
 
   @expand
   @expand.valify
-  implicit def pinvFromSVD[@expand.args(Float, Double) T]: Impl[
-      DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def pinvFromSVD[@expand.args(Float, Double) T]
+    : Impl[DenseMatrix[T], DenseMatrix[T]] = {
     new Impl[DenseMatrix[T], DenseMatrix[T]] {
       // http://en.wikipedia.org/wiki/Singular_value_decomposition#Applications_of_the_SVD
       override def apply(v: DenseMatrix[T]): DenseMatrix[T] = {
@@ -110,8 +110,7 @@ object pinv extends UFunc with pinvLowPrio {
   }
 }
 
-trait pinvLowPrio {
-  this: pinv.type =>
+trait pinvLowPrio { this: pinv.type =>
 
   /**
     * pinv for anything that can be transposed, multiplied with that transposed, and then solved.

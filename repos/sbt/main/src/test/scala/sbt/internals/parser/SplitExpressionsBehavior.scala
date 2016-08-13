@@ -56,7 +56,7 @@ trait SplitExpressionsBehavior extends SplitExpression {
 
     "parse a config containgn a lazy val" in {
       val (imports, settingsAndDefs) = split(
-          """lazy val root = (project in file(".")).enablePlugins­(PlayScala)""")
+        """lazy val root = (project in file(".")).enablePlugins­(PlayScala)""")
       imports.isEmpty should beTrue
       settingsAndDefs.isEmpty should beFalse
     }
@@ -75,7 +75,8 @@ scalaVersion := "2.10.4"""")
 
     "parse a setting and val without intervening blank line" in {
       val (imports, settings) =
-        split("""version := "1.0"
+        split(
+          """version := "1.0"
 lazy val root = (project in file(".")).enablePlugins­(PlayScala)""")
 
       imports.isEmpty should beTrue

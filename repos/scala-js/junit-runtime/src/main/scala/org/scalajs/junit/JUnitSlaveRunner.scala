@@ -16,14 +16,14 @@ final class JUnitSlaveRunner(args: Array[String],
 
   def done(): String = {
     send(
-        "d" + JUnitBaseRunner
-          .Done(doneCount,
-                passedCount,
-                failedCount,
-                ignoredCount,
-                skippedCount,
-                totalCount)
-          .serialize)
+      "d" + JUnitBaseRunner
+        .Done(doneCount,
+              passedCount,
+              failedCount,
+              ignoredCount,
+              skippedCount,
+              totalCount)
+        .serialize)
     ""
   }
 

@@ -7,7 +7,11 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi._
 import com.intellij.psi.search.LocalSearchScope
-import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, MemberInplaceRenameHandler, MemberInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  InplaceRefactoring,
+  MemberInplaceRenameHandler,
+  MemberInplaceRenamer
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 
@@ -16,10 +20,12 @@ import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
   * 6/20/13
   */
 class ScalaMemberInplaceRenameHandler
-    extends MemberInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends MemberInplaceRenameHandler
+    with ScalaInplaceRenameHandler {
 
-  override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+  override def isAvailable(element: PsiElement,
+                           editor: Editor,
+                           file: PsiFile): Boolean = {
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
@@ -43,13 +49,14 @@ class ScalaMemberInplaceRenameHandler
         new ScalaMemberInplaceRenamer(elementToRename, clazz, editor)
       case clazz: PsiClass =>
         val companion = ScalaPsiUtil.getBaseCompanionModule(clazz)
-        new ScalaMemberInplaceRenamer(
-            clazz, companion.getOrElse(clazz), editor)
+        new ScalaMemberInplaceRenamer(clazz,
+                                      companion.getOrElse(clazz),
+                                      editor)
       case subst: PsiNamedElement =>
         new ScalaMemberInplaceRenamer(elementToRename, subst, editor)
       case _ =>
         throw new IllegalArgumentException(
-            "Substituted element for renaming has no name")
+          "Substituted element for renaming has no name")
     }
   }
 

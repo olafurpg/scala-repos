@@ -61,18 +61,18 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
       Json.obj("message" -> s"URI not found: ${e.getNotFoundUri.getRawPath}")
     case e: AppLockedException =>
       Json.obj(
-          "message" -> e.getMessage,
-          "deployments" -> e.deploymentIds.map(id => Json.obj("id" -> id))
+        "message" -> e.getMessage,
+        "deployments" -> e.deploymentIds.map(id => Json.obj("id" -> id))
       )
     case e: JsonParseException =>
       Json.obj(
-          "message" -> "Invalid JSON",
-          "details" -> e.getOriginalMessage
+        "message" -> "Invalid JSON",
+        "details" -> e.getOriginalMessage
       )
     case e: JsonMappingException =>
       Json.obj(
-          "message" -> "Please specify data in JSON format",
-          "details" -> e.getMessage
+        "message" -> "Please specify data in JSON format",
+        "details" -> e.getMessage
       )
     case e: JsResultException =>
       val errors = e.errors.map {
@@ -80,16 +80,17 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
           Json.obj("path" -> path.toString(), "errors" -> errs.map(_.message))
       }
       Json.obj(
-          "message" -> s"Invalid JSON",
-          "details" -> errors
+        "message" -> s"Invalid JSON",
+        "details" -> errors
       )
     case ValidationFailedException(obj, failure) => Json.toJson(failure)
     case e: WebApplicationException =>
       //scalastyle:off null
       if (Status.fromStatusCode(e.getResponse.getStatus) != null) {
-        Json.obj("message" -> Status
-              .fromStatusCode(e.getResponse.getStatus)
-              .getReasonPhrase)
+        Json.obj(
+          "message" -> Status
+            .fromStatusCode(e.getResponse.getStatus)
+            .getReasonPhrase)
       } else {
         Json.obj("message" -> e.getMessage)
       }

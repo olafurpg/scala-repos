@@ -43,7 +43,7 @@ object TransformationFrontend {
     val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.port=$port")
       .withFallback(
-          ConfigFactory.parseString("akka.cluster.roles = [frontend]"))
+        ConfigFactory.parseString("akka.cluster.roles = [frontend]"))
       .withFallback(ConfigFactory.load())
 
     val system = ActorSystem("ClusterSystem", config)

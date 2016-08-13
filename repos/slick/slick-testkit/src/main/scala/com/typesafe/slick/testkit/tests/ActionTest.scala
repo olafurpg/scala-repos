@@ -1,6 +1,10 @@
 package com.typesafe.slick.testkit.tests
 
-import com.typesafe.slick.testkit.util.{StandardTestDBs, RelationalTestDB, AsyncTest}
+import com.typesafe.slick.testkit.util.{
+  StandardTestDBs,
+  RelationalTestDB,
+  AsyncTest
+}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -17,8 +21,8 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
 
     for {
       _ <- db.run {
-        ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
-      }
+            ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
+          }
       q1 = ts.sortBy(_.a).map(_.a)
       f1 = db.run(q1.result)
       r1 <- f1: Future[Seq[Int]]
@@ -95,23 +99,25 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
     if (tdb == StandardTestDBs.H2Disk) {
       val a1 =
         DBIO.sequence((1 to 5000).toSeq.map(i => LiteralColumn(i).result))
-      val a2 = DBIO.sequence((1 to 20).toSeq.map(i =>
-                if (i % 2 == 0) LiteralColumn(i).result
-                else DBIO.from(Future.successful(i))))
-      val a3 = DBIO.sequence((1 to 20).toSeq.map(i =>
-                if ((i / 4) % 2 == 0) LiteralColumn(i).result
-                else DBIO.from(Future.successful(i))))
+      val a2 = DBIO.sequence(
+        (1 to 20).toSeq.map(i =>
+          if (i % 2 == 0) LiteralColumn(i).result
+          else DBIO.from(Future.successful(i))))
+      val a3 = DBIO.sequence(
+        (1 to 20).toSeq.map(i =>
+          if ((i / 4) % 2 == 0) LiteralColumn(i).result
+          else DBIO.from(Future.successful(i))))
       val a4 = DBIO.seq((1 to 50000).toSeq.map(i => DBIO.successful("a4")): _*)
       val a5 = (1 to 50000).toSeq
         .map(i => DBIO.successful("a5"))
         .reduceLeft(_ andThen _)
 
       DBIO.seq(
-          a1.map(_ shouldBe (1 to 5000).toSeq),
-          a2.map(_ shouldBe (1 to 20).toSeq),
-          a3.map(_ shouldBe (1 to 20).toSeq),
-          a4.map(_ shouldBe (())),
-          a5.map(_ shouldBe "a5")
+        a1.map(_ shouldBe (1 to 5000).toSeq),
+        a2.map(_ shouldBe (1 to 20).toSeq),
+        a3.map(_ shouldBe (1 to 20).toSeq),
+        a4.map(_ shouldBe (())),
+        a5.map(_ shouldBe "a5")
       )
     } else DBIO.successful(())
 
@@ -123,8 +129,8 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
     for {
       _ <- db.run {
-        ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
-      }
+            ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
+          }
       needFlatten = for (_ <- ts.result) yield ts.result
       result <- db.run(needFlatten.flatten)
       _ = result shouldBe Seq(2, 3, 1, 5, 4)
@@ -140,11 +146,12 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
 
     for {
       _ <- db.run {
-        ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
-      }
+            ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
+          }
       q1 = ts.sortBy(_.a).map(_.a).take(1)
-      result <- db.run(
-          q1.result.head.zipWith(q1.result.head)({ case (a, b) => a + b }))
+      result <- db.run(q1.result.head.zipWith(q1.result.head)({
+                 case (a, b) => a + b
+               }))
       _ = result shouldBe 2
     } yield ()
   }
@@ -158,13 +165,12 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
     for {
       _ <- db.run {
-        ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
-      }
+            ts.schema.create >> (ts ++= Seq(2, 3, 1, 5, 4))
+          }
       q1 = ts.sortBy(_.a).map(_.a).take(1)
-      result <- db.run(
-          q1.result.headOption.collect {
-        case Some(a) => a
-      })
+      result <- db.run(q1.result.headOption.collect {
+                 case Some(a) => a
+               })
       _ = result shouldBe 1
       _ = result shouldFail { _ =>
         val future = db.run(q1.result.headOption.collect {

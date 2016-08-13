@@ -36,7 +36,11 @@ import org.scalatest.junit.JUnitRunner
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.testutil.{BootstrapApplication, RunOnApplicationThread, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  BootstrapApplication,
+  RunOnApplicationThread,
+  SimpleSFXDelegateSpec
+}
 
 /**
   *
@@ -44,9 +48,10 @@ import scalafx.testutil.{BootstrapApplication, RunOnApplicationThread, SimpleSFX
   */
 @RunWith(classOf[JUnitRunner])
 class TextFormatterChangeSpec
-    extends SimpleSFXDelegateSpec[
-        jfxsc.TextFormatter.Change, TextFormatter.Change](
-        classOf[jfxsc.TextFormatter.Change], classOf[TextFormatter.Change])
+    extends SimpleSFXDelegateSpec[jfxsc.TextFormatter.Change,
+                                  TextFormatter.Change](
+      classOf[jfxsc.TextFormatter.Change],
+      classOf[TextFormatter.Change])
     with RunOnApplicationThread {
 
   // A bit elaborated way of creating an instance of TextFormatter.Change that cannot be created directly.

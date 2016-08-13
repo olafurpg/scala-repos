@@ -23,13 +23,13 @@ case class OpenGraph(title: String,
 
     def str =
       List(
-          "title" -> title,
-          "description" -> description,
-          "url" -> url,
-          "type" -> `type`,
-          "site_name" -> siteName
+        "title" -> title,
+        "description" -> description,
+        "url" -> url,
+        "type" -> `type`,
+        "site_name" -> siteName
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 
   object twitter {
@@ -41,11 +41,11 @@ case class OpenGraph(title: String,
 
     def str =
       List(
-          "card" -> "summary",
-          "title" -> title,
-          "description" -> description,
-          "site" -> "@lichessorg"
+        "card" -> "summary",
+        "title" -> title,
+        "description" -> description,
+        "site" -> "@lichessorg"
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 }

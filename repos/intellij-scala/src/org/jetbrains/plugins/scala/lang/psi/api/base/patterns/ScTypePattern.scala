@@ -7,7 +7,7 @@ package patterns
 
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

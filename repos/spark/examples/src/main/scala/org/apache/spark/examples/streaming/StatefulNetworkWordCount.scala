@@ -60,16 +60,15 @@ object StatefulNetworkWordCount {
 
     // Update the cumulative count using mapWithState
     // This will give a DStream made of state (which is the cumulative count of the words)
-    val mappingFunc = (word: String, one: Option[Int], state: State[Int]) =>
-      {
-        val sum = one.getOrElse(0) + state.getOption.getOrElse(0)
-        val output = (word, sum)
-        state.update(sum)
-        output
+    val mappingFunc = (word: String, one: Option[Int], state: State[Int]) => {
+      val sum = one.getOrElse(0) + state.getOption.getOrElse(0)
+      val output = (word, sum)
+      state.update(sum)
+      output
     }
 
     val stateDstream = wordDstream.mapWithState(
-        StateSpec.function(mappingFunc).initialState(initialRDD))
+      StateSpec.function(mappingFunc).initialState(initialRDD))
     stateDstream.print()
     ssc.start()
     ssc.awaitTermination()

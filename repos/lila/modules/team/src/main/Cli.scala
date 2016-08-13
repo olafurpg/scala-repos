@@ -33,10 +33,9 @@ private[team] final class Cli(api: TeamApi) extends lila.common.Cli {
       _.fold(fufail[String]("Team not found")) { team =>
         UserRepo nameds userIds flatMap { users =>
           users
-            .map(user =>
-                  {
-                logger.info(user.username)
-                op(team, user.id)
+            .map(user => {
+              logger.info(user.username)
+              op(team, user.id)
             })
             .sequenceFu
         } inject "Success"

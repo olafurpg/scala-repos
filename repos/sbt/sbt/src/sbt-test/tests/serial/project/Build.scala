@@ -4,10 +4,10 @@ import Import._
 
 object SomeBuild extends Build {
   val buildSettings = Seq(
-      organization := "com.softwaremill",
-      version := "0.0.1-SNAPSHOT",
-      scalaVersion := "2.10.0",
-      libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    organization := "com.softwaremill",
+    version := "0.0.1-SNAPSHOT",
+    scalaVersion := "2.10.0",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
   )
 
   lazy val parent: Project =

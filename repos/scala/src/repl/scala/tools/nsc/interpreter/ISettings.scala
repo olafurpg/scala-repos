@@ -39,10 +39,10 @@ class ISettings(intp: IMain) {
   def deprecation: Boolean = intp.settings.deprecation.value
 
   def allSettings = Map[String, Any](
-      "maxPrintString" -> maxPrintString,
-      "maxAutoprintCompletion" -> maxAutoprintCompletion,
-      "unwrapStrings" -> unwrapStrings,
-      "deprecation" -> deprecation
+    "maxPrintString" -> maxPrintString,
+    "maxAutoprintCompletion" -> maxAutoprintCompletion,
+    "unwrapStrings" -> unwrapStrings,
+    "deprecation" -> deprecation
   )
 
   private def allSettingsString =

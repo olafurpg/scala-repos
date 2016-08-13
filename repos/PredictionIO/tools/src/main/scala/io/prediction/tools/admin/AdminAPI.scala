@@ -103,15 +103,15 @@ class AdminServiceActor(val commandClient: CommandClient)
 
 class AdminServerActor(val commandClient: CommandClient) extends Actor {
   val log = Logging(context.system, this)
-  val child = context.actorOf(
-      Props(classOf[AdminServiceActor], commandClient), "AdminServiceActor")
+  val child = context.actorOf(Props(classOf[AdminServiceActor], commandClient),
+                              "AdminServiceActor")
 
   implicit val system = context.system
 
   def receive: PartialFunction[Any, Unit] = {
     case StartServer(host, portNum) => {
-        IO(Http) ! Http.Bind(child, interface = host, port = portNum)
-      }
+      IO(Http) ! Http.Bind(child, interface = host, port = portNum)
+    }
     case m: Http.Bound => log.info("Bound received. AdminServer is ready.")
     case m: Http.CommandFailed => log.error("Command failed.")
     case _ => log.error("Unknown message.")
@@ -128,13 +128,14 @@ object AdminServer {
     implicit val system = ActorSystem("AdminServerSystem")
 
     val commandClient = new CommandClient(
-        appClient = Storage.getMetaDataApps,
-        accessKeyClient = Storage.getMetaDataAccessKeys,
-        eventClient = Storage.getLEvents()
+      appClient = Storage.getMetaDataApps,
+      accessKeyClient = Storage.getMetaDataAccessKeys,
+      eventClient = Storage.getLEvents()
     )
 
     val serverActor = system.actorOf(
-        Props(classOf[AdminServerActor], commandClient), "AdminServerActor")
+      Props(classOf[AdminServerActor], commandClient),
+      "AdminServerActor")
     serverActor ! StartServer(config.ip, config.port)
     system.awaitTermination
   }
@@ -143,6 +144,6 @@ object AdminServer {
 object AdminRun {
   def main(args: Array[String]) {
     AdminServer.createAdminServer(
-        AdminServerConfig(ip = "localhost", port = 7071))
+      AdminServerConfig(ip = "localhost", port = 7071))
   }
 }

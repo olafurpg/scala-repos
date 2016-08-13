@@ -51,7 +51,7 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
 
   private class ProcessListener(consumer: MessageConsumer, p: Process) {
     private val streamReader = new BufferedReader(
-        new InputStreamReader(p.getInputStream))
+      new InputStreamReader(p.getInputStream))
 
     @volatile private var stop = false
 
@@ -99,13 +99,12 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
 
   private def createDescriptor(process: Process, consumer: MessageConsumer) =
     new MyProcessDescriptor(
-        process,
-        myExecutor.submit(
-            new Runnable {
-          override def run() {
-            process.waitFor()
-          }
-        }),
-        new ProcessListener(consumer, process)
+      process,
+      myExecutor.submit(new Runnable {
+        override def run() {
+          process.waitFor()
+        }
+      }),
+      new ProcessListener(consumer, process)
     )
 }

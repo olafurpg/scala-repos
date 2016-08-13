@@ -58,8 +58,8 @@ object svdr extends UFunc {
                             nIter: Int = 0): DenseSVD = {
 
     require(
-        k <= (M.rows min M.cols),
-        "Number of singular values should be less than min(M.rows, M.cols)")
+      k <= (M.rows min M.cols),
+      "Number of singular values should be less than min(M.rows, M.cols)")
 
     val nRandom = k + nOversamples
 
@@ -116,11 +116,9 @@ object svdr extends UFunc {
     val abs_u = abs(u)
     val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
     val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(
-        s =>
-          {
-        u(::, s._2) :*= s._1
-        v(s._2, ::) :*= s._1
+    signs.zipWithIndex.foreach(s => {
+      u(::, s._2) :*= s._1
+      v(s._2, ::) :*= s._1
     })
     (u, v)
   }

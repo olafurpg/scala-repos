@@ -86,7 +86,7 @@ private[runtime] object RuntimeString {
   def compareTo(thiz: String, anotherString: String): Int = {
     if (thiz.equals(anotherString)) 0
     else if ((thiz.asInstanceOf[js.Dynamic] < anotherString
-                   .asInstanceOf[js.Dynamic]).asInstanceOf[Boolean]) -1
+               .asInstanceOf[js.Dynamic]).asInstanceOf[Boolean]) -1
     else 1
   }
 
@@ -229,8 +229,9 @@ private[runtime] object RuntimeString {
     thiz.replace(oldChar.toString, newChar.toString)
 
   @inline
-  def replace(
-      thiz: String, target: CharSequence, replacement: CharSequence): String =
+  def replace(thiz: String,
+              target: CharSequence,
+              replacement: CharSequence): String =
     thiz.jsSplit(target.toString).join(replacement.toString)
 
   def replaceAll(thiz: String, regex: String, replacement: String): String = {
@@ -259,7 +260,7 @@ private[runtime] object RuntimeString {
   @inline
   def startsWith(thiz: String, prefix: String, toffset: Int): Boolean = {
     (toffset <= thiz.length && toffset >= 0 &&
-        thiz.jsSubstring(toffset, toffset + prefix.length) == prefix)
+    thiz.jsSubstring(toffset, toffset + prefix.length) == prefix)
   }
 
   @inline
@@ -336,8 +337,10 @@ private[runtime] object RuntimeString {
                 charsetName: String): String =
     newString(bytes, offset, length, Charset.forName(charsetName))
 
-  def newString(
-      bytes: Array[Byte], offset: Int, length: Int, charset: Charset): String =
+  def newString(bytes: Array[Byte],
+                offset: Int,
+                length: Int,
+                charset: Charset): String =
     charset.decode(ByteBuffer.wrap(bytes, offset, length)).toString()
 
   def newString(codePoints: Array[Int], offset: Int, count: Int): String = {

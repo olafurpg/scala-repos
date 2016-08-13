@@ -19,7 +19,7 @@ object ExampleEssentialActionSpec extends PlaySpecification {
       }
 
       val request = FakeRequest(POST, "/").withJsonBody(
-          Json.parse("""{ "field": "value" }"""))
+        Json.parse("""{ "field": "value" }"""))
 
       val result = call(action, request)
 

@@ -22,11 +22,10 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class FilteredDStream[T : ClassTag](
+private[streaming] class FilteredDStream[T: ClassTag](
     parent: DStream[T],
     filterFunc: T => Boolean
-)
-    extends DStream[T](parent.ssc) {
+) extends DStream[T](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 

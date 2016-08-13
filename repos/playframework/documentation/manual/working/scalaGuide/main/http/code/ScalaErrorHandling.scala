@@ -22,7 +22,7 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
 
   "scala error handling" should {
     "allow providing a custom error handler" in new WithServer(
-        fakeApp[root.ErrorHandler]) {
+      fakeApp[root.ErrorHandler]) {
       await(wsUrl("/error").get()).body must_== "A server error occurred: foo"
     }
 
@@ -31,14 +31,15 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
       import play.api.routing._
       import javax.inject.Provider
       def errorHandler(mode: Mode.Mode) = new default.ErrorHandler(
-          Environment.simple(mode = mode),
-          Configuration.empty,
-          new OptionalSourceMapper(None),
-          new Provider[Router] { def get = Router.empty }
+        Environment.simple(mode = mode),
+        Configuration.empty,
+        new OptionalSourceMapper(None),
+        new Provider[Router] { def get = Router.empty }
       )
       def errorContent(mode: Mode.Mode) =
-        contentAsString(errorHandler(mode).onServerError(
-                FakeRequest(), new RuntimeException("foo")))
+        contentAsString(
+          errorHandler(mode).onServerError(FakeRequest(),
+                                           new RuntimeException("foo")))
 
       errorContent(Mode.Prod) must startWith("A server error occurred: ")
       errorContent(Mode.Dev) must not startWith ("A server error occurred: ")
@@ -55,17 +56,17 @@ package root {
 
   class ErrorHandler extends HttpErrorHandler {
 
-    def onClientError(
-        request: RequestHeader, statusCode: Int, message: String) = {
+    def onClientError(request: RequestHeader,
+                      statusCode: Int,
+                      message: String) = {
       Future.successful(
-          Status(statusCode)("A client error occurred: " + message)
+        Status(statusCode)("A client error occurred: " + message)
       )
     }
 
     def onServerError(request: RequestHeader, exception: Throwable) = {
       Future.successful(
-          InternalServerError(
-              "A server error occurred: " + exception.getMessage)
+        InternalServerError("A server error occurred: " + exception.getMessage)
       )
     }
   }
@@ -88,20 +89,18 @@ package default {
       config: Configuration,
       sourceMapper: OptionalSourceMapper,
       router: Provider[Router]
-  )
-      extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+  ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
-    override def onProdServerError(
-        request: RequestHeader, exception: UsefulException) = {
+    override def onProdServerError(request: RequestHeader,
+                                   exception: UsefulException) = {
       Future.successful(
-          InternalServerError(
-              "A server error occurred: " + exception.getMessage)
+        InternalServerError("A server error occurred: " + exception.getMessage)
       )
     }
 
     override def onForbidden(request: RequestHeader, message: String) = {
       Future.successful(
-          Forbidden("You're not allowed to access this resource.")
+        Forbidden("You're not allowed to access this resource.")
       )
     }
   }

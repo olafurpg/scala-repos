@@ -45,11 +45,12 @@ object BinaryOp {
 // This trait could reuse code from Multimethod2, but not doing so allows us to reduce code size a lot
 // because we don't need BinaryOp's to inherit from Function2, which has a lot of @specialzied cruft.
 trait BinaryRegistry[A, B, Op, +R]
-    extends UFunc.UImpl2[Op, A, B, R] with MMRegistry2[
-        UFunc.UImpl2[Op, _ <: A, _ <: B, _ <: (R @uncheckedVariance)]] {
+    extends UFunc.UImpl2[Op, A, B, R]
+    with MMRegistry2[
+      UFunc.UImpl2[Op, _ <: A, _ <: B, _ <: (R @uncheckedVariance)]] {
   protected def bindingMissing(a: A, b: B): R =
     throw new UnsupportedOperationException(
-        "Types not found!" + a + b + " " + ops)
+      "Types not found!" + a + b + " " + ops)
 
   protected def multipleOptions(
       a: A,
@@ -59,10 +60,11 @@ trait BinaryRegistry[A, B, Op, +R]
     throw new RuntimeException("Multiple bindings for method: " + m)
   }
 
-  private val l1cache: ThreadLocal[((Class[_], Class[_]), Option[UImpl2[
-              Op, _ <: A, _ <: B, _ <: R @uncheckedVariance]])] = {
-    new ThreadLocal[((Class[_], Class[_]), Option[UImpl2[
-                Op, _ <: A, _ <: B, _ <: R]])]
+  private val l1cache: ThreadLocal[
+    ((Class[_], Class[_]),
+     Option[UImpl2[Op, _ <: A, _ <: B, _ <: R @uncheckedVariance]])] = {
+    new ThreadLocal[((Class[_], Class[_]),
+                     Option[UImpl2[Op, _ <: A, _ <: B, _ <: R]])]
   }
 
   def apply(a: A, b: B): R = {
@@ -123,7 +125,8 @@ trait BinaryRegistry[A, B, Op, +R]
 
   def register[AA <: A, BB <: B](
       op: UImpl2[Op, AA, BB, _ <: R @uncheckedVariance])(
-      implicit cA: ClassTag[AA], cB: ClassTag[BB]) = {
+      implicit cA: ClassTag[AA],
+      cB: ClassTag[BB]) = {
     super.register(cA.runtimeClass, cB.runtimeClass, op)
     op
   }

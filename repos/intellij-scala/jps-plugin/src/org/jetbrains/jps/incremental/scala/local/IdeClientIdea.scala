@@ -47,13 +47,13 @@ class IdeClientIdea(compilerName: String,
         if (!isTemp) {
           try {
             if (isClassFile)
-              consumer.registerCompiledClass(
-                  rootDescriptor.target, compiledClass)
+              consumer
+                .registerCompiledClass(rootDescriptor.target, compiledClass)
             else
               consumer.registerOutputFile(
-                  rootDescriptor.target,
-                  outputFile,
-                  Collections.singleton[String](sourcePath))
+                rootDescriptor.target,
+                outputFile,
+                Collections.singleton[String](sourcePath))
           } catch {
             case e: IOException =>
               context.processMessage(new CompilerMessage(compilerName, e))
@@ -62,24 +62,25 @@ class IdeClientIdea(compilerName: String,
       }
       if (!isTemp && isClassFile && !Utils.errorsDetected(context)) {
         try {
-          val reader: ClassReader = new ClassReader(
-              content.getBuffer, content.getOffset, content.getLength)
+          val reader: ClassReader = new ClassReader(content.getBuffer,
+                                                    content.getOffset,
+                                                    content.getLength)
           mappingsCallback.associate(
-              FileUtil.toSystemIndependentName(outputFile.getPath),
-              sourcePath,
-              reader)
+            FileUtil.toSystemIndependentName(outputFile.getPath),
+            sourcePath,
+            reader)
           handlePackageObject(source, outputFile, reader)
         } catch {
           case e: Throwable =>
             val message: String =
               "Class dependency information may be incomplete! Error parsing generated class " +
-              outputFile.getPath
+                outputFile.getPath
             context.processMessage(
-                new CompilerMessage(
-                    compilerName,
-                    BuildMessage.Kind.WARNING,
-                    message + "\n" + CompilerMessage.getTextFromThrowable(e),
-                    sourcePath))
+              new CompilerMessage(
+                compilerName,
+                BuildMessage.Kind.WARNING,
+                message + "\n" + CompilerMessage.getTextFromThrowable(e),
+                sourcePath))
         }
       }
     }
@@ -100,8 +101,9 @@ class IdeClientIdea(compilerName: String,
     persistPackageObjectData()
   }
 
-  private def handlePackageObject(
-      source: File, outputFile: File, reader: ClassReader): Any = {
+  private def handlePackageObject(source: File,
+                                  outputFile: File,
+                                  reader: ClassReader): Any = {
     if (outputFile.getName == s"$packageObjectClassName.class") {
       packageObjectsBaseClasses ++=
         collectPackageObjectBaseClasses(source, reader)
@@ -109,7 +111,8 @@ class IdeClientIdea(compilerName: String,
   }
 
   private def collectPackageObjectBaseClasses(
-      source: File, reader: ClassReader): Seq[PackageObjectBaseClass] = {
+      source: File,
+      reader: ClassReader): Seq[PackageObjectBaseClass] = {
     val baseTypes: Seq[String] = {
       val superClass =
         Option(reader.getSuperName).filterNot(_ == "java/lang/Object")
@@ -121,9 +124,10 @@ class IdeClientIdea(compilerName: String,
       className.stripSuffix(packageObjectClassName).replace("/", ".")
     for {
       typeName <- baseTypes.map(_.replace('/', '.'))
-      packObjectBaseClass = PackageObjectBaseClass(
-          source, packageName, typeName)
-          if !packageObjectsBaseClasses.contains(packObjectBaseClass)
+      packObjectBaseClass = PackageObjectBaseClass(source,
+                                                   packageName,
+                                                   typeName)
+      if !packageObjectsBaseClasses.contains(packObjectBaseClass)
     } yield {
       packObjectBaseClass
     }
@@ -133,9 +137,9 @@ class IdeClientIdea(compilerName: String,
     val compiledClasses = consumer.getCompiledClasses
 
     for (item <- packageObjectsBaseClasses;
-    cc <- Option(compiledClasses.get(item.baseClassName));
-    className <- Option(cc.getClassName)
-                    if className.startsWith(item.packageName)) {
+         cc <- Option(compiledClasses.get(item.baseClassName));
+         className <- Option(cc.getClassName)
+         if className.startsWith(item.packageName)) {
 
       packageObjectsData.add(cc.getSourceFile, item.packObjectSrc)
     }
@@ -143,6 +147,7 @@ class IdeClientIdea(compilerName: String,
     packageObjectsData.save(context)
   }
 
-  private case class PackageObjectBaseClass(
-      packObjectSrc: File, packageName: String, baseClassName: String)
+  private case class PackageObjectBaseClass(packObjectSrc: File,
+                                            packageName: String,
+                                            baseClassName: String)
 }

@@ -73,16 +73,16 @@ object Msg extends DispatchSnippet {
   def render(styles: NodeSeq): NodeSeq = {
     attr("id") match {
       case Full(id) => {
-          // Extract the currently set CSS
-          (attr("errorClass") or attr("errorclass"))
-            .map(cls => MsgErrorMeta += (id -> cls))
-          (attr("warningClass") or attr("warningclass"))
-            .map(cls => MsgWarningMeta += (id -> cls))
-          (attr("noticeClass") or attr("noticeclass"))
-            .map(cls => MsgNoticeMeta += (id -> cls))
+        // Extract the currently set CSS
+        (attr("errorClass") or attr("errorclass")).map(cls =>
+          MsgErrorMeta += (id -> cls))
+        (attr("warningClass") or attr("warningclass")).map(cls =>
+          MsgWarningMeta += (id -> cls))
+        (attr("noticeClass") or attr("noticeclass")).map(cls =>
+          MsgNoticeMeta += (id -> cls))
 
-          <span id={id}>{renderIdMsgs(id)}</span> ++ effects(id)
-        }
+        <span id={id}>{renderIdMsgs(id)}</span> ++ effects(id)
+      }
       case _ => NodeSeq.Empty
     }
   }
@@ -97,9 +97,9 @@ object Msg extends DispatchSnippet {
     */
   def renderIdMsgs(id: String): NodeSeq = {
     val msgs: List[NodeSeq] = List(
-        (S.messagesById(id)(S.errors), MsgErrorMeta.get.get(id)),
-        (S.messagesById(id)(S.warnings), MsgWarningMeta.get.get(id)),
-        (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))).flatMap {
+      (S.messagesById(id)(S.errors), MsgErrorMeta.get.get(id)),
+      (S.messagesById(id)(S.warnings), MsgWarningMeta.get.get(id)),
+      (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))).flatMap {
       case (msg, style) =>
         msg.toList match {
           case Nil => Nil
@@ -122,8 +122,8 @@ object Msg extends DispatchSnippet {
     }
   }
 
-  /** 
-    * This method produces and appends a script element to lift's page script 
+  /**
+    * This method produces and appends a script element to lift's page script
     * to render effects on a element with the given id.
     *
     * @see net.liftweb.builtin.snippet.Msgs#effects[T](Box[NoticeType.Value],String,T,Box[JsCmd => T])

@@ -18,8 +18,8 @@ object RedisClientPipelineFactory extends ChannelPipelineFactory {
     val commandCodec = new CommandCodec
     val replyCodec = new ReplyCodec
 
-    pipeline.addLast(
-        "codec", new NaggatiCodec(replyCodec.decode, commandCodec.encode))
+    pipeline.addLast("codec",
+                     new NaggatiCodec(replyCodec.decode, commandCodec.encode))
 
     pipeline
   }
@@ -37,8 +37,8 @@ class Redis extends CodecFactory[Command, Reply] {
             val replyCodec = new ReplyCodec
 
             pipeline.addLast(
-                "codec",
-                new NaggatiCodec(commandCodec.decode, replyCodec.encode))
+              "codec",
+              new NaggatiCodec(commandCodec.decode, replyCodec.encode))
 
             pipeline
           }

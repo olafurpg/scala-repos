@@ -30,8 +30,8 @@ object ProtobufSerializer {
     * from Akka's protobuf representation in the supplied
     * [[akka.actor.ActorSystem]].
     */
-  def deserializeActorRef(
-      system: ExtendedActorSystem, refProtocol: ActorRefData): ActorRef =
+  def deserializeActorRef(system: ExtendedActorSystem,
+                          refProtocol: ActorRefData): ActorRef =
     system.provider.resolveActorRef(refProtocol.getPath)
 }
 
@@ -61,8 +61,8 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
 
   override def includeManifest: Boolean = true
 
-  override def fromBinary(
-      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+  override def fromBinary(bytes: Array[Byte],
+                          manifest: Option[Class[_]]): AnyRef = {
     manifest match {
       case Some(clazz) ⇒
         @tailrec
@@ -74,12 +74,14 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
               val unCachedParsingMethod =
                 if (method eq null)
                   clazz.getDeclaredMethod(
-                      "parseFrom", ProtobufSerializer.ARRAY_OF_BYTE_ARRAY: _*)
+                    "parseFrom",
+                    ProtobufSerializer.ARRAY_OF_BYTE_ARRAY: _*)
                 else method
               if (parsingMethodBindingRef.compareAndSet(
-                      parsingMethodBinding,
-                      parsingMethodBinding.updated(
-                          clazz, unCachedParsingMethod))) unCachedParsingMethod
+                    parsingMethodBinding,
+                    parsingMethodBinding.updated(clazz,
+                                                 unCachedParsingMethod)))
+                unCachedParsingMethod
               else parsingMethod(unCachedParsingMethod)
           }
         }
@@ -87,7 +89,7 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
 
       case None ⇒
         throw new IllegalArgumentException(
-            "Need a protobuf message class to be able to serialize bytes using protobuf")
+          "Need a protobuf message class to be able to serialize bytes using protobuf")
     }
   }
 
@@ -103,9 +105,9 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
             if (method eq null) clazz.getMethod("toByteArray")
             else method
           if (toByteArrayMethodBindingRef.compareAndSet(
-                  toByteArrayMethodBinding,
-                  toByteArrayMethodBinding.updated(
-                      clazz, unCachedtoByteArrayMethod)))
+                toByteArrayMethodBinding,
+                toByteArrayMethodBinding.updated(clazz,
+                                                 unCachedtoByteArrayMethod)))
             unCachedtoByteArrayMethod
           else toByteArrayMethod(unCachedtoByteArrayMethod)
       }

@@ -21,8 +21,7 @@ final class ScalaJSFramework(
     private[testadapter] val libEnv: ComJSEnv,
     private[testadapter] val logger: Logger,
     private[testadapter] val jsConsole: JSConsole
-)
-    extends Framework {
+) extends Framework {
 
   private[this] val frameworkInfo = fetchFrameworkInfo()
 
@@ -38,7 +37,7 @@ final class ScalaJSFramework(
 
     if (_isRunning) {
       throw new IllegalStateException(
-          "Scala.js test frameworks do not support concurrent runs")
+        "Scala.js test frameworks do not support concurrent runs")
     }
 
     _isRunning = true

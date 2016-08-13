@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package codeInsight
 
-import com.intellij.codeInsight.completion.{CodeCompletionHandlerBase, CompletionType}
+import com.intellij.codeInsight.completion.{
+  CodeCompletionHandlerBase,
+  CompletionType
+}
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.lookup.{LookupElement, LookupManager}
 import com.intellij.openapi.actionSystem.IdeActions
@@ -26,18 +29,22 @@ abstract class ScalaCodeInsightTestBase
   }
 
   protected def complete(
-      time: Int = 1, completionType: CompletionType = CompletionType.BASIC) = {
+      time: Int = 1,
+      completionType: CompletionType = CompletionType.BASIC) = {
     new CodeCompletionHandlerBase(completionType, false, false, true)
-      .invokeCompletion(
-        getProjectAdapter, getEditorAdapter, time, false, false)
+      .invokeCompletion(getProjectAdapter,
+                        getEditorAdapter,
+                        time,
+                        false,
+                        false)
     val lookup: LookupImpl = getActiveLookup
     (if (lookup == null) null
      else lookup.getItems.toArray(LookupElement.EMPTY_ARRAY),
      if (lookup == null) null else lookup.itemPattern(lookup.getItems.get(0)))
   }
 
-  protected def completeLookupItem(
-      item: LookupElement = null, completionChar: Char = '\t') {
+  protected def completeLookupItem(item: LookupElement = null,
+                                   completionChar: Char = '\t') {
     val lookup: LookupImpl = getActiveLookup
     if (item == null) lookup.finishLookup(completionChar)
     else lookup.finishLookup(completionChar, item)

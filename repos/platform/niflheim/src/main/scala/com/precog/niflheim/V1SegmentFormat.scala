@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -97,24 +97,28 @@ object V1SegmentFormat extends SegmentFormat {
       for {
         header <- readSegmentId(channel)
         segment <- header match {
-          case SegmentId(blockid, cpath, CBoolean) =>
-            readBoolean() map {
-              case (defined, length, values) =>
-                BooleanSegment(blockid, cpath, defined, values, length)
-            }
+                    case SegmentId(blockid, cpath, CBoolean) =>
+                      readBoolean() map {
+                        case (defined, length, values) =>
+                          BooleanSegment(blockid,
+                                         cpath,
+                                         defined,
+                                         values,
+                                         length)
+                      }
 
-          case SegmentId(blockid, cpath, ctype: CValueType[a]) =>
-            readArray(ctype) map {
-              case (defined, values) =>
-                ArraySegment(blockid, cpath, ctype, defined, values)
-            }
+                    case SegmentId(blockid, cpath, ctype: CValueType[a]) =>
+                      readArray(ctype) map {
+                        case (defined, values) =>
+                          ArraySegment(blockid, cpath, ctype, defined, values)
+                      }
 
-          case SegmentId(blockid, cpath, ctype: CNullType) =>
-            readNull(ctype) map {
-              case (defined, length) =>
-                NullSegment(blockid, cpath, ctype, defined, length)
-            }
-        }
+                    case SegmentId(blockid, cpath, ctype: CNullType) =>
+                      readNull(ctype) map {
+                        case (defined, length) =>
+                          NullSegment(blockid, cpath, ctype, defined, length)
+                      }
+                  }
       } yield segment
     }
   }
@@ -125,13 +129,13 @@ object V1SegmentFormat extends SegmentFormat {
       for {
         _ <- writeSegmentId(channel, segment)
         _ <- segment match {
-          case seg: ArraySegment[a] =>
-            writeArraySegment(channel, seg, getCodecFor(seg.ctype))
-          case seg: BooleanSegment =>
-            writeBooleanSegment(channel, seg)
-          case seg: NullSegment =>
-            writeNullSegment(channel, seg)
-        }
+              case seg: ArraySegment[a] =>
+                writeArraySegment(channel, seg, getCodecFor(seg.ctype))
+              case seg: BooleanSegment =>
+                writeBooleanSegment(channel, seg)
+              case seg: NullSegment =>
+                writeNullSegment(channel, seg)
+            }
       } yield PrecogUnit
     }
 
@@ -169,11 +173,11 @@ object V1SegmentFormat extends SegmentFormat {
       }
     }
 
-    private def writeBooleanSegment(
-        channel: WritableByteChannel, segment: BooleanSegment) = {
+    private def writeBooleanSegment(channel: WritableByteChannel,
+                                    segment: BooleanSegment) = {
       val maxSize =
         Codec.BitSetCodec.maxSize(segment.defined) +
-        Codec.BitSetCodec.maxSize(segment.values) + 4
+          Codec.BitSetCodec.maxSize(segment.values) + 4
       writeChunk(channel, maxSize) { buffer =>
         buffer.putInt(segment.length)
         Codec.BitSetCodec.writeUnsafe(segment.defined, buffer)
@@ -182,8 +186,8 @@ object V1SegmentFormat extends SegmentFormat {
       }
     }
 
-    private def writeNullSegment(
-        channel: WritableByteChannel, segment: NullSegment) = {
+    private def writeNullSegment(channel: WritableByteChannel,
+                                 segment: NullSegment) = {
       val maxSize = Codec.BitSetCodec.maxSize(segment.defined) + 4
       writeChunk(channel, maxSize) { buffer =>
         buffer.putInt(segment.length)

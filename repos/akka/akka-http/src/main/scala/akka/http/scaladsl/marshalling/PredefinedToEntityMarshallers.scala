@@ -58,7 +58,7 @@ trait PredefinedToEntityMarshallers extends MultipartMarshallers {
     }
 
   implicit val StringMarshaller: ToEntityMarshaller[String] = stringMarshaller(
-      `text/plain`)
+    `text/plain`)
   def stringMarshaller(
       mediaType: MediaType.WithOpenCharset): ToEntityMarshaller[String] =
     Marshaller.withOpenCharset(mediaType) { (s, cs) ⇒

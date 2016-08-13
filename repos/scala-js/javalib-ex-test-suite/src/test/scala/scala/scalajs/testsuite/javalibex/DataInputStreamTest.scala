@@ -35,29 +35,29 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readChar`") {
         val stream = newStream(
-            0x00,
-            0x48, // H
-            0x00,
-            0xF6, // ö
-            0x00,
-            0x6C, // l
-            0x00,
-            0x6C, // l
-            0x00,
-            0xF6, // ö
-            0x00,
-            0x20, // [space]
-            0x00,
-            0x57, // W
-            0x01,
-            0x03, // ă
-            0x00,
-            0x72, // r
-            0x02,
-            0x34, // ȴ
-            0x01,
-            0x11, // đ
-            0x56 // dangling
+          0x00,
+          0x48, // H
+          0x00,
+          0xF6, // ö
+          0x00,
+          0x6C, // l
+          0x00,
+          0x6C, // l
+          0x00,
+          0xF6, // ö
+          0x00,
+          0x20, // [space]
+          0x00,
+          0x57, // W
+          0x01,
+          0x03, // ă
+          0x00,
+          0x72, // r
+          0x02,
+          0x34, // ȴ
+          0x01,
+          0x11, // đ
+          0x56 // dangling
         )
         var res = ""
 
@@ -70,73 +70,73 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readDouble`") {
         val stream = newStream(
-            0x3f,
-            0xe6,
-            0x66,
-            0x66,
-            0x66,
-            0x66,
-            0x66,
-            0x66,
-            0x41,
-            0x15,
-            0x19,
-            0x20,
-            0x45,
-            0x8d,
-            0x9b,
-            0x5f,
-            0xc0,
-            0xab,
-            0x20,
-            0x22,
-            0x75,
-            0x25,
-            0x46,
-            0x0b,
-            0x7f,
-            0xf8,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x7f,
-            0xf0,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0xc0,
-            0x1c,
-            0x0d,
-            0xca,
-            0x65,
-            0xea,
-            0x3f,
-            0xa4,
-            0xff,
-            0xf0,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x01 // dangling
+          0x3f,
+          0xe6,
+          0x66,
+          0x66,
+          0x66,
+          0x66,
+          0x66,
+          0x66,
+          0x41,
+          0x15,
+          0x19,
+          0x20,
+          0x45,
+          0x8d,
+          0x9b,
+          0x5f,
+          0xc0,
+          0xab,
+          0x20,
+          0x22,
+          0x75,
+          0x25,
+          0x46,
+          0x0b,
+          0x7f,
+          0xf8,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x7f,
+          0xf0,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0xc0,
+          0x1c,
+          0x0d,
+          0xca,
+          0x65,
+          0xea,
+          0x3f,
+          0xa4,
+          0xff,
+          0xf0,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x01 // dangling
         )
 
         expect(stream.readDouble()).toBe(0.7)
@@ -152,39 +152,39 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readFloat`") {
         val stream = newStream(
-            0xbf,
-            0x80,
-            0x00,
-            0x00,
-            0x45,
-            0x8e,
-            0x9c,
-            0x83,
-            0x80,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x7f,
-            0xc0,
-            0x00,
-            0x00,
-            0x7f,
-            0x80,
-            0x00,
-            0x00,
-            0xbb,
-            0x03,
-            0x12,
-            0x6f,
-            0xff,
-            0x80,
-            0x00,
-            0x00,
-            0xff // dangling
+          0xbf,
+          0x80,
+          0x00,
+          0x00,
+          0x45,
+          0x8e,
+          0x9c,
+          0x83,
+          0x80,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x7f,
+          0xc0,
+          0x00,
+          0x00,
+          0x7f,
+          0x80,
+          0x00,
+          0x00,
+          0xbb,
+          0x03,
+          0x12,
+          0x6f,
+          0xff,
+          0x80,
+          0x00,
+          0x00,
+          0xff // dangling
         )
 
         expect(stream.readFloat()).toBeCloseTo(-1.0f, 6)
@@ -322,23 +322,23 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readShort`") {
         val stream = newStream(
-            0x01,
-            0xc5,
-            0xff,
-            0xd5,
-            0x7f,
-            0xff,
-            0x18,
-            0xb0,
-            0x00,
-            0x00,
-            0x80,
-            0x00,
-            0xfe,
-            0xa6,
-            0x00,
-            0x22,
-            0x01 // dangling
+          0x01,
+          0xc5,
+          0xff,
+          0xd5,
+          0x7f,
+          0xff,
+          0x18,
+          0xb0,
+          0x00,
+          0x00,
+          0x80,
+          0x00,
+          0xfe,
+          0xa6,
+          0x00,
+          0x22,
+          0x01 // dangling
         )
 
         expect(stream.readShort()).toBe(453)
@@ -363,23 +363,23 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readUnsignedShort`") {
         val stream = newStream(
-            0xfe,
-            0x4c,
-            0x00,
-            0x00,
-            0x18,
-            0xee,
-            0x0d,
-            0xed,
-            0x00,
-            0x2b,
-            0x01,
-            0xce,
-            0x01,
-            0x56,
-            0x64,
-            0x2b,
-            0x01 // dangling
+          0xfe,
+          0x4c,
+          0x00,
+          0x00,
+          0x18,
+          0xee,
+          0x0d,
+          0xed,
+          0x00,
+          0x2b,
+          0x01,
+          0xce,
+          0x01,
+          0x56,
+          0x64,
+          0x2b,
+          0x01 // dangling
         )
 
         expect(stream.readUnsignedShort()).toBe(65100)
@@ -501,7 +501,7 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should provide `readLine`") {
         val stream = newStream(
-            "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
+          "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
 
         expect(stream.readLine()).toEqual("Hello World")
         expect(stream.readLine()).toEqual("UNIX")
@@ -513,7 +513,7 @@ object DataInputStreamTest extends JasmineTest {
 
       it("should allow marking even when `readLine` has to push back") {
         val stream = newStream(
-            "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
+          "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
 
         expect(stream.readLine()).toEqual("Hello World")
         stream.mark(1000)
@@ -531,14 +531,14 @@ object DataInputStreamTest extends JasmineTest {
     }
   }
 
-  tests("java.io.DataInputStream - generic case")(
-      bytes => new ByteArrayInputStream(bytes.toArray))
+  tests("java.io.DataInputStream - generic case")(bytes =>
+    new ByteArrayInputStream(bytes.toArray))
 
   tests("java.io.DataInputStream - ArrayBufferInputStream case")(bytes =>
-        new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))
+    new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))
 
   tests(
-      "java.io.DataInputStream - partially consumed ArrayBufferInputStream case") {
+    "java.io.DataInputStream - partially consumed ArrayBufferInputStream case") {
     bytes =>
       val addBytes = Seq[Byte](0, 0, 0, 0)
       val allBytes = addBytes ++ bytes

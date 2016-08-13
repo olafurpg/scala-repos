@@ -40,14 +40,14 @@ object ColorPicker {
 
   val StyleClassButton = jfxsc.ColorPicker.STYLE_CLASS_BUTTON
   @deprecated(
-      "Use StyleClassButton; STYLE_CLASS_BUTTON will be removed in a future release",
-      "8.0.60-R10")
+    "Use StyleClassButton; STYLE_CLASS_BUTTON will be removed in a future release",
+    "8.0.60-R10")
   val STYLE_CLASS_BUTTON = StyleClassButton
 
   val StyleClassSplitButton = jfxsc.ColorPicker.STYLE_CLASS_SPLIT_BUTTON
   @deprecated(
-      "Use StyleClassSplitButton; STYLE_CLASS_SPLIT_BUTTON will be removed in a future release",
-      "8.0.60-R10")
+    "Use StyleClassSplitButton; STYLE_CLASS_SPLIT_BUTTON will be removed in a future release",
+    "8.0.60-R10")
   val STYLE_CLASS_SPLIT_BUTTON = StyleClassSplitButton
 }
 

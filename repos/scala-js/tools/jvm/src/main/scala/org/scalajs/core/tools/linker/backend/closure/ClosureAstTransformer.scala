@@ -65,8 +65,9 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case DoWhile(body, cond, Some(label)) =>
         val doNode =
           new Node(Token.DO, transformBlock(body), transformExpr(cond))
-        new Node(
-            Token.LABEL, transformLabel(label), setNodePosition(doNode, pos))
+        new Node(Token.LABEL,
+                 transformLabel(label),
+                 setNodePosition(doNode, pos))
       case Try(block, errVar, handler, EmptyTree) =>
         val catchPos = handler.pos orElse pos
         val catchNode =
@@ -111,7 +112,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.CASE, transformExpr(expr), bodyNode)
           switchNode.addChildToBack(
-              setNodePosition(caseNode, expr.pos orElse pos))
+            setNodePosition(caseNode, expr.pos orElse pos))
         }
 
         if (default != EmptyTree) {
@@ -119,7 +120,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.DEFAULT_CASE, bodyNode)
           switchNode.addChildToBack(
-              setNodePosition(caseNode, default.pos orElse pos))
+            setNodePosition(caseNode, default.pos orElse pos))
         }
 
         switchNode
@@ -162,8 +163,9 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
         args.foreach(arg => node.addChildToBack(transformExpr(arg)))
         node
       case DotSelect(qualifier, item) =>
-        new Node(
-            Token.GETPROP, transformExpr(qualifier), transformString(item))
+        new Node(Token.GETPROP,
+                 transformExpr(qualifier),
+                 transformString(item))
       case BracketSelect(qualifier, item) =>
         new Node(Token.GETELEM, transformExpr(qualifier), transformExpr(item))
 
@@ -223,7 +225,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
       case _ =>
         throw new TransformException(
-            s"Unknown tree of class ${tree.getClass()}")
+          s"Unknown tree of class ${tree.getClass()}")
     }
   }
 
@@ -241,8 +243,8 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
     transformName(param.name)
 
   def transformName(ident: Ident)(implicit parentPos: Position): Node =
-    setNodePosition(
-        Node.newString(Token.NAME, ident.name), ident.pos orElse parentPos)
+    setNodePosition(Node.newString(Token.NAME, ident.name),
+                    ident.pos orElse parentPos)
 
   def transformLabel(ident: Ident)(implicit parentPos: Position): Node =
     setNodePosition(Node.newString(Token.LABEL_NAME, ident.name),
@@ -415,7 +417,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
     private def mkMsg(tree: Tree): String = {
       "Exception while translating Scala.js JS tree to GCC IR at tree:\n" +
-      tree.show
+        tree.show
     }
   }
 }

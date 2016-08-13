@@ -19,8 +19,9 @@ final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean)
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(
+    debugConfig(on = false)
+      .withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
 class LeaderElectionWithFailureDetectorPuppetMultiJvmNode1
@@ -47,7 +48,8 @@ class LeaderElectionWithAccrualFailureDetectorMultiJvmNode5
 
 abstract class LeaderElectionSpec(
     multiNodeConfig: LeaderElectionMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(LeaderElectionMultiNodeConfig(failureDetectorPuppet))
@@ -100,15 +102,15 @@ abstract class LeaderElectionSpec(
           // detect failure
           markNodeAsUnavailable(leaderAddress)
           awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should contain(
-                  leaderAddress))
+            clusterView.unreachableMembers.map(_.address) should contain(
+              leaderAddress))
           enterBarrier("after-unavailable" + n)
 
           // user marks the shutdown leader as DOWN
           cluster.down(leaderAddress)
           // removed
           awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should not contain
+            clusterView.unreachableMembers.map(_.address) should not contain
               (leaderAddress))
           enterBarrier("after-down" + n, "completed" + n)
 
@@ -118,8 +120,8 @@ abstract class LeaderElectionSpec(
           enterBarrier("before-shutdown" + n, "after-shutdown" + n)
 
           awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should contain(
-                  leaderAddress))
+            clusterView.unreachableMembers.map(_.address) should contain(
+              leaderAddress))
           enterBarrier("after-unavailable" + n)
 
           enterBarrier("after-down" + n)
@@ -133,13 +135,13 @@ abstract class LeaderElectionSpec(
     }
 
     "be able to 're-elect' a single leader after leader has left" taggedAs LongRunningTest in within(
-        30 seconds) {
+      30 seconds) {
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 0)
       enterBarrier("after-2")
     }
 
     "be able to 're-elect' a single leader after leader has left (again)" taggedAs LongRunningTest in within(
-        30 seconds) {
+      30 seconds) {
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 1)
       enterBarrier("after-3")
     }

@@ -18,8 +18,8 @@ class OsgiActorSystemFactory(val context: BundleContext,
   /*
    * Classloader that delegates to the bundle for which the factory is creating an ActorSystem
    */
-  private val classloader = BundleDelegatingClassLoader(
-      context, fallbackClassLoader)
+  private val classloader =
+    BundleDelegatingClassLoader(context, fallbackClassLoader)
 
   /**
     * Creates the [[akka.actor.ActorSystem]], using the name specified
@@ -42,10 +42,10 @@ class OsgiActorSystemFactory(val context: BundleContext,
     */
   def actorSystemConfig(context: BundleContext): Config = {
     config.withFallback(
-        ConfigFactory
-          .load(classloader)
-          .withFallback(ConfigFactory.defaultReference(
-                  OsgiActorSystemFactory.akkaActorClassLoader)))
+      ConfigFactory
+        .load(classloader)
+        .withFallback(ConfigFactory.defaultReference(
+          OsgiActorSystemFactory.akkaActorClassLoader)))
   }
 
   /**
@@ -54,7 +54,7 @@ class OsgiActorSystemFactory(val context: BundleContext,
     */
   def actorSystemName(name: Option[String]): String =
     name.getOrElse(
-        "bundle-%s-ActorSystem".format(context.getBundle.getBundleId))
+      "bundle-%s-ActorSystem".format(context.getBundle.getBundleId))
 }
 
 object OsgiActorSystemFactory {

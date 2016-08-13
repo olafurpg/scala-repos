@@ -35,7 +35,9 @@ import scala.runtime.ScalaRunTime.arrayElementClass
   */
 @scala.annotation.implicitNotFound(msg = "No ClassTag available for ${T}")
 trait ClassTag[T]
-    extends ClassManifestDeprecatedApis[T] with Equals with Serializable {
+    extends ClassManifestDeprecatedApis[T]
+    with Equals
+    with Serializable {
   // please, don't add any APIs here, like it was with `newWrappedArray` and `newArrayBuilder`
   // class tags, and all tags in general, should be as minimalistic as possible
 
@@ -79,24 +81,24 @@ trait ClassTag[T]
   def unapply(x: Any): Option[T] =
     if (null != x &&
         ((runtimeClass.isInstance(x)) ||
-            (x.isInstanceOf[Byte] &&
-                runtimeClass.isAssignableFrom(classOf[Byte])) ||
-            (x.isInstanceOf[Short] &&
-                runtimeClass.isAssignableFrom(classOf[Short])) ||
-            (x.isInstanceOf[Char] &&
-                runtimeClass.isAssignableFrom(classOf[Char])) ||
-            (x.isInstanceOf[Int] &&
-                runtimeClass.isAssignableFrom(classOf[Int])) ||
-            (x.isInstanceOf[Long] &&
-                runtimeClass.isAssignableFrom(classOf[Long])) ||
-            (x.isInstanceOf[Float] &&
-                runtimeClass.isAssignableFrom(classOf[Float])) ||
-            (x.isInstanceOf[Double] &&
-                runtimeClass.isAssignableFrom(classOf[Double])) ||
-            (x.isInstanceOf[Boolean] &&
-                runtimeClass.isAssignableFrom(classOf[Boolean])) ||
-            (x.isInstanceOf[Unit] &&
-                runtimeClass.isAssignableFrom(classOf[Unit]))))
+        (x.isInstanceOf[Byte] &&
+        runtimeClass.isAssignableFrom(classOf[Byte])) ||
+        (x.isInstanceOf[Short] &&
+        runtimeClass.isAssignableFrom(classOf[Short])) ||
+        (x.isInstanceOf[Char] &&
+        runtimeClass.isAssignableFrom(classOf[Char])) ||
+        (x.isInstanceOf[Int] &&
+        runtimeClass.isAssignableFrom(classOf[Int])) ||
+        (x.isInstanceOf[Long] &&
+        runtimeClass.isAssignableFrom(classOf[Long])) ||
+        (x.isInstanceOf[Float] &&
+        runtimeClass.isAssignableFrom(classOf[Float])) ||
+        (x.isInstanceOf[Double] &&
+        runtimeClass.isAssignableFrom(classOf[Double])) ||
+        (x.isInstanceOf[Boolean] &&
+        runtimeClass.isAssignableFrom(classOf[Boolean])) ||
+        (x.isInstanceOf[Unit] &&
+        runtimeClass.isAssignableFrom(classOf[Unit]))))
       Some(x.asInstanceOf[T])
     else None
 
@@ -111,8 +113,8 @@ trait ClassTag[T]
   def unapply(x: Boolean): Option[T] = unapplyImpl(x, classOf[Boolean])
   def unapply(x: Unit): Option[T] = unapplyImpl(x, classOf[Unit])
 
-  private[this] def unapplyImpl(
-      x: Any, primitiveCls: java.lang.Class[_]): Option[T] =
+  private[this] def unapplyImpl(x: Any,
+                                primitiveCls: java.lang.Class[_]): Option[T] =
     if (runtimeClass.isInstance(x) ||
         runtimeClass.isAssignableFrom(primitiveCls)) Some(x.asInstanceOf[T])
     else None
@@ -121,7 +123,7 @@ trait ClassTag[T]
   override def canEqual(x: Any) = x.isInstanceOf[ClassTag[_]]
   override def equals(x: Any) =
     x.isInstanceOf[ClassTag[_]] &&
-    this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
+      this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
   override def hashCode = scala.runtime.ScalaRunTime.hash(runtimeClass)
   override def toString = {
     def prettyprint(clazz: jClass[_]): String =

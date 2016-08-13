@@ -10,8 +10,8 @@ import com.google.common.io.Resources
 //scalastyle:off magic.number
 abstract class HttpRequestHandlerBase extends HttpRequestHandler {
 
-  protected[this] def serveResource(
-      path: String, response: HttpResponse): Unit = {
+  protected[this] def serveResource(path: String,
+                                    response: HttpResponse): Unit = {
     val content = withResource(path) { url =>
       response.body(mediaMime(url), Resources.toByteArray(url))
       response.status(200)
@@ -33,10 +33,10 @@ abstract class HttpRequestHandlerBase extends HttpRequestHandler {
   }
 
   protected[this] val wellKnownMimes = Map(
-      "css" -> "text/css",
-      "js" -> "application/javascript",
-      "eot" -> "application/vnd.ms-fontobject",
-      "svg" -> "image/svg+xml",
-      "ttf" -> "application/font-ttf"
+    "css" -> "text/css",
+    "js" -> "application/javascript",
+    "eot" -> "application/vnd.ms-fontobject",
+    "svg" -> "image/svg+xml",
+    "ttf" -> "application/font-ttf"
   )
 }

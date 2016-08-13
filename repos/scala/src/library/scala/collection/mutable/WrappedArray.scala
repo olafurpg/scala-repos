@@ -31,7 +31,8 @@ import scala.collection.parallel.mutable.ParArray
   *  @define willNotTerminateInf
   */
 abstract class WrappedArray[T]
-    extends AbstractSeq[T] with IndexedSeq[T]
+    extends AbstractSeq[T]
+    with IndexedSeq[T]
     with ArrayLike[T, WrappedArray[T]]
     with CustomParallelizable[T, ParArray[T]] {
 
@@ -45,7 +46,7 @@ abstract class WrappedArray[T]
   @deprecated("use elemTag instead", "2.10.0")
   def elemManifest: ClassManifest[T] =
     ClassManifest.fromClass[T](
-        arrayElementClass(elemTag).asInstanceOf[Class[T]])
+      arrayElementClass(elemTag).asInstanceOf[Class[T]])
 
   /** The length of the array */
   def length: Int
@@ -64,7 +65,7 @@ abstract class WrappedArray[T]
   private def elementClass: Class[_] =
     arrayElementClass(array.getClass)
 
-  override def toArray[U >: T : ClassTag]: Array[U] = {
+  override def toArray[U >: T: ClassTag]: Array[U] = {
     val thatElementClass = arrayElementClass(implicitly[ClassTag[U]])
     if (elementClass eq thatElementClass) array.asInstanceOf[Array[U]]
     else super.toArray[U]
@@ -121,7 +122,8 @@ object WrappedArray {
   def newBuilder[A]: Builder[A, IndexedSeq[A]] = new ArrayBuffer
 
   final class ofRef[T <: AnyRef](val array: Array[T])
-      extends WrappedArray[T] with Serializable {
+      extends WrappedArray[T]
+      with Serializable {
     lazy val elemTag = ClassTag[T](arrayElementClass(array.getClass))
     def length: Int = array.length
     def apply(index: Int): T = array(index).asInstanceOf[T]
@@ -129,7 +131,8 @@ object WrappedArray {
   }
 
   final class ofByte(val array: Array[Byte])
-      extends WrappedArray[Byte] with Serializable {
+      extends WrappedArray[Byte]
+      with Serializable {
     def elemTag = ClassTag.Byte
     def length: Int = array.length
     def apply(index: Int): Byte = array(index)
@@ -137,7 +140,8 @@ object WrappedArray {
   }
 
   final class ofShort(val array: Array[Short])
-      extends WrappedArray[Short] with Serializable {
+      extends WrappedArray[Short]
+      with Serializable {
     def elemTag = ClassTag.Short
     def length: Int = array.length
     def apply(index: Int): Short = array(index)
@@ -145,7 +149,8 @@ object WrappedArray {
   }
 
   final class ofChar(val array: Array[Char])
-      extends WrappedArray[Char] with Serializable {
+      extends WrappedArray[Char]
+      with Serializable {
     def elemTag = ClassTag.Char
     def length: Int = array.length
     def apply(index: Int): Char = array(index)
@@ -153,7 +158,8 @@ object WrappedArray {
   }
 
   final class ofInt(val array: Array[Int])
-      extends WrappedArray[Int] with Serializable {
+      extends WrappedArray[Int]
+      with Serializable {
     def elemTag = ClassTag.Int
     def length: Int = array.length
     def apply(index: Int): Int = array(index)
@@ -161,7 +167,8 @@ object WrappedArray {
   }
 
   final class ofLong(val array: Array[Long])
-      extends WrappedArray[Long] with Serializable {
+      extends WrappedArray[Long]
+      with Serializable {
     def elemTag = ClassTag.Long
     def length: Int = array.length
     def apply(index: Int): Long = array(index)
@@ -169,7 +176,8 @@ object WrappedArray {
   }
 
   final class ofFloat(val array: Array[Float])
-      extends WrappedArray[Float] with Serializable {
+      extends WrappedArray[Float]
+      with Serializable {
     def elemTag = ClassTag.Float
     def length: Int = array.length
     def apply(index: Int): Float = array(index)
@@ -177,7 +185,8 @@ object WrappedArray {
   }
 
   final class ofDouble(val array: Array[Double])
-      extends WrappedArray[Double] with Serializable {
+      extends WrappedArray[Double]
+      with Serializable {
     def elemTag = ClassTag.Double
     def length: Int = array.length
     def apply(index: Int): Double = array(index)
@@ -185,7 +194,8 @@ object WrappedArray {
   }
 
   final class ofBoolean(val array: Array[Boolean])
-      extends WrappedArray[Boolean] with Serializable {
+      extends WrappedArray[Boolean]
+      with Serializable {
     def elemTag = ClassTag.Boolean
     def length: Int = array.length
     def apply(index: Int): Boolean = array(index)
@@ -193,7 +203,8 @@ object WrappedArray {
   }
 
   final class ofUnit(val array: Array[Unit])
-      extends WrappedArray[Unit] with Serializable {
+      extends WrappedArray[Unit]
+      with Serializable {
     def elemTag = ClassTag.Unit
     def length: Int = array.length
     def apply(index: Int): Unit = array(index)

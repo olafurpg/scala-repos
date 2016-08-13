@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class EllipseSpec
     extends SimpleSFXDelegateSpec[jfxss.Ellipse, Ellipse](
-        classOf[jfxss.Ellipse], classOf[Ellipse])
+      classOf[jfxss.Ellipse],
+      classOf[Ellipse])

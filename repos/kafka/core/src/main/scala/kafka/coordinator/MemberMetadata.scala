@@ -91,13 +91,19 @@ private[coordinator] class MemberMetadata(
   }
 
   def summary(protocol: String): MemberSummary = {
-    MemberSummary(
-        memberId, clientId, clientHost, metadata(protocol), assignment)
+    MemberSummary(memberId,
+                  clientId,
+                  clientHost,
+                  metadata(protocol),
+                  assignment)
   }
 
   def summaryNoMetadata(): MemberSummary = {
-    MemberSummary(
-        memberId, clientId, clientHost, Array.empty[Byte], Array.empty[Byte])
+    MemberSummary(memberId,
+                  clientId,
+                  clientHost,
+                  Array.empty[Byte],
+                  Array.empty[Byte])
   }
 
   /**
@@ -111,7 +117,7 @@ private[coordinator] class MemberMetadata(
       case Some((protocol, _)) => protocol
       case None =>
         throw new IllegalArgumentException(
-            "Member does not support any of the candidate protocols")
+          "Member does not support any of the candidate protocols")
     }
   }
 

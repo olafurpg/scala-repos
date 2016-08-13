@@ -24,49 +24,53 @@ class AppUpdateTest extends MarathonSpec {
   import mesosphere.marathon.integration.setup.V2TestFormats._
 
   test("Validation") {
-    def shouldViolate(
-        update: AppUpdate, path: String, template: String): Unit = {
+    def shouldViolate(update: AppUpdate,
+                      path: String,
+                      template: String): Unit = {
       val violations = validate(update)
       assert(violations.isFailure)
       assert(
-          ValidationHelper
-            .getAllRuleConstrains(violations)
-            .exists(
-                v => v.path.getOrElse(false) == path && v.message == template))
+        ValidationHelper
+          .getAllRuleConstrains(violations)
+          .exists(v =>
+            v.path.getOrElse(false) == path && v.message == template))
     }
 
-    def shouldNotViolate(
-        update: AppUpdate, path: String, template: String): Unit = {
+    def shouldNotViolate(update: AppUpdate,
+                         path: String,
+                         template: String): Unit = {
       val violations = validate(update)
       assert(
-          !ValidationHelper
-            .getAllRuleConstrains(violations)
-            .exists(
-                v => v.path.getOrElse(false) == path && v.message == template))
+        !ValidationHelper
+          .getAllRuleConstrains(violations)
+          .exists(v =>
+            v.path.getOrElse(false) == path && v.message == template))
     }
 
     val update = AppUpdate()
 
     shouldViolate(
-        update.copy(portDefinitions = Some(PortDefinitions(9000, 8080, 9000))),
-        "/portDefinitions",
-        "Ports must be unique."
+      update.copy(portDefinitions = Some(PortDefinitions(9000, 8080, 9000))),
+      "/portDefinitions",
+      "Ports must be unique."
     )
 
     shouldViolate(
-        update.copy(portDefinitions = Some(
-                  Seq(PortDefinition(port = 9000, name = Some("foo")),
-                      PortDefinition(port = 9001, name = Some("foo"))))),
-        "/portDefinitions",
-        "Port names must be unique."
+      update.copy(
+        portDefinitions = Some(
+          Seq(PortDefinition(port = 9000, name = Some("foo")),
+              PortDefinition(port = 9001, name = Some("foo"))))),
+      "/portDefinitions",
+      "Port names must be unique."
     )
 
     shouldNotViolate(
-        update.copy(portDefinitions = Some(
-                  Seq(PortDefinition(port = 9000, name = Some("foo")),
-                      PortDefinition(port = 9001, name = Some("bar"))))),
-        "/portDefinitions",
-        "Port names must be unique."
+      update.copy(
+        portDefinitions = Some(
+          Seq(PortDefinition(port = 9000, name = Some("foo")),
+              PortDefinition(port = 9001, name = Some("bar"))))),
+      "/portDefinitions",
+      "Port names must be unique."
     )
 
     shouldViolate(update.copy(mem = Some(-3.0)),
@@ -94,51 +98,48 @@ class AppUpdateTest extends MarathonSpec {
 
   ignore("SerializationRoundtrip for extended definition") {
     val update1 = AppUpdate(
-        cmd = Some("sleep 60"),
-        args = None,
-        user = Some("nobody"),
-        env = Some(Map("LANG" -> "en-US")),
-        instances = Some(16),
-        cpus = Some(2.0),
-        mem = Some(256.0),
-        disk = Some(1024.0),
-        executor = Some("/opt/executors/bin/some.executor"),
-        constraints = Some(Set()),
-        fetch = Some(
-              Seq(FetchUri(uri = "http://dl.corp.org/prodX-1.2.3.tgz"))),
-        backoff = Some(2.seconds),
-        backoffFactor = Some(1.2),
-        maxLaunchDelay = Some(1.minutes),
-        container = Some(
-              Container(
-                  `type` = mesos.ContainerInfo.Type.DOCKER,
-                  volumes = Nil,
-                  docker = Some(Docker(image = "docker:///group/image"))
-              )
+      cmd = Some("sleep 60"),
+      args = None,
+      user = Some("nobody"),
+      env = Some(Map("LANG" -> "en-US")),
+      instances = Some(16),
+      cpus = Some(2.0),
+      mem = Some(256.0),
+      disk = Some(1024.0),
+      executor = Some("/opt/executors/bin/some.executor"),
+      constraints = Some(Set()),
+      fetch = Some(Seq(FetchUri(uri = "http://dl.corp.org/prodX-1.2.3.tgz"))),
+      backoff = Some(2.seconds),
+      backoffFactor = Some(1.2),
+      maxLaunchDelay = Some(1.minutes),
+      container = Some(
+        Container(
+          `type` = mesos.ContainerInfo.Type.DOCKER,
+          volumes = Nil,
+          docker = Some(Docker(image = "docker:///group/image"))
+        )
+      ),
+      healthChecks = Some(Set[HealthCheck]()),
+      dependencies = Some(Set[PathId]()),
+      upgradeStrategy = Some(UpgradeStrategy.empty),
+      labels = Some(
+        Map(
+          "one" -> "aaa",
+          "two" -> "bbb",
+          "three" -> "ccc"
+        )
+      ),
+      ipAddress = Some(
+        IpAddress(
+          groups = Seq("a", "b", "c"),
+          labels = Map(
+            "foo" -> "bar",
+            "baz" -> "buzz"
           ),
-        healthChecks = Some(Set[HealthCheck]()),
-        dependencies = Some(Set[PathId]()),
-        upgradeStrategy = Some(UpgradeStrategy.empty),
-        labels = Some(
-              Map(
-                  "one" -> "aaa",
-                  "two" -> "bbb",
-                  "three" -> "ccc"
-              )
-          ),
-        ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo(
-                        ports = Seq(Port(name = "http",
-                                         number = 80,
-                                         protocol = "tcp"))
-                    )
-              ))
+          discoveryInfo = DiscoveryInfo(
+            ports = Seq(Port(name = "http", number = 80, protocol = "tcp"))
+          )
+        ))
     )
     JsonTestHelper.assertSerializationRoundtripWorks(update1)
   }
@@ -216,7 +217,7 @@ class AppUpdateTest extends MarathonSpec {
     assert(AppUpdate(version = Some(Timestamp.now())).onlyVersionOrIdSet)
 
     assert(
-        AppUpdate(id = Some("foo".toPath), version = Some(Timestamp.now())).onlyVersionOrIdSet)
+      AppUpdate(id = Some("foo".toPath), version = Some(Timestamp.now())).onlyVersionOrIdSet)
 
     intercept[Exception] {
       AppUpdate(cmd = Some("foo"), version = Some(Timestamp.now()))
@@ -238,9 +239,9 @@ class AppUpdateTest extends MarathonSpec {
 
   test("AppUpdate does not change existing versionInfo") {
     val app = AppDefinition(
-        id = PathId("test"),
-        cmd = Some("sleep 1"),
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1))
+      id = PathId("test"),
+      cmd = Some("sleep 1"),
+      versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(1))
     )
 
     val updateCmd = AppUpdate(cmd = Some("sleep 2"))
@@ -249,11 +250,12 @@ class AppUpdateTest extends MarathonSpec {
 
   test("AppUpdate with a version and other changes are not allowed") {
     val attempt = Try(
-        AppUpdate(id = Some(PathId("/test")),
-                  cmd = Some("sleep 2"),
-                  version = Some(Timestamp(2))))
-    assert(attempt.failed.get.getMessage.contains(
-            "The 'version' field may only be combined with the 'id' field."))
+      AppUpdate(id = Some(PathId("/test")),
+                cmd = Some("sleep 2"),
+                version = Some(Timestamp(2))))
+    assert(
+      attempt.failed.get.getMessage.contains(
+        "The 'version' field may only be combined with the 'id' field."))
   }
 
   test("update may not have both uris and fetch") {
@@ -267,8 +269,9 @@ class AppUpdateTest extends MarathonSpec {
 
     import Formats._
     val result = Json.fromJson[AppUpdate](Json.parse(json))
-    assert(result == JsError(
-            ValidationError("You cannot specify both uris and fetch fields")))
+    assert(
+      result == JsError(
+        ValidationError("You cannot specify both uris and fetch fields")))
   }
 
   test("update may not have both ports and portDefinitions") {
@@ -282,8 +285,9 @@ class AppUpdateTest extends MarathonSpec {
 
     import Formats._
     val result = Json.fromJson[AppUpdate](Json.parse(json))
-    assert(result == JsError(ValidationError(
-                "You cannot specify both ports and port definitions")))
+    assert(
+      result == JsError(
+        ValidationError("You cannot specify both ports and port definitions")))
   }
 
   test("update may not have duplicated ports") {
@@ -296,7 +300,8 @@ class AppUpdateTest extends MarathonSpec {
 
     import Formats._
     val result = Json.fromJson[AppUpdate](Json.parse(json))
-    assert(result == JsError(JsPath \ "ports",
-                             ValidationError("Ports must be unique.")))
+    assert(
+      result == JsError(JsPath \ "ports",
+                        ValidationError("Ports must be unique.")))
   }
 }

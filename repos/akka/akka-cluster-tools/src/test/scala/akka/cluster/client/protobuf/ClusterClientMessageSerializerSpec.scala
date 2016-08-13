@@ -10,7 +10,7 @@ import akka.cluster.client.ClusterReceptionist.Internal._
 class ClusterClientMessageSerializerSpec extends AkkaSpec {
 
   val serializer = new ClusterClientMessageSerializer(
-      system.asInstanceOf[ExtendedActorSystem])
+    system.asInstanceOf[ExtendedActorSystem])
 
   def checkSerialization(obj: AnyRef): Unit = {
     val blob = serializer.toBinary(obj)

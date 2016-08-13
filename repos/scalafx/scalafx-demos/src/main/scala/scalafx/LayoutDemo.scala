@@ -40,9 +40,9 @@ import scalafx.scene.text.{Font, Text}
 object LayoutDemo extends JFXApp {
   val hello = new Accordion {
     panes = List(
-        new TitledPane {
-          content = new Label { text = "Hello" }
-        }
+      new TitledPane {
+        content = new Label { text = "Hello" }
+      }
     )
   }
 

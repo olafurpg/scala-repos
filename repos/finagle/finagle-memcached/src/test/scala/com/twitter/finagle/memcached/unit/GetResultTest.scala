@@ -40,11 +40,11 @@ class GetResultTest extends FunSuite with MockitoSugar {
 
     info("non-empty left, non-empty right")
     assert(
-        left ++ right == GetResult(
-            hits = Map("h1" -> value1, "h2" -> value2),
-            misses = immutable.Set("m1", "m2"),
-            failures = Map("f1" -> ex1, "f2" -> ex2)
-        ))
+      left ++ right == GetResult(
+        hits = Map("h1" -> value1, "h2" -> value2),
+        misses = immutable.Set("m1", "m2"),
+        failures = Map("f1" -> ex1, "f2" -> ex2)
+      ))
   }
 
   test("merged of empty seq produces empty GetResult") {

@@ -282,13 +282,13 @@ private[math] object Conversion {
 
           val delta = 9 - previous + currentChar
           var i = 0
-          while ( (i < delta) && (currentChar > 0)) {
+          while ((i < delta) && (currentChar > 0)) {
             currentChar -= 1
             result = '0' + result
             i += 1
           }
           var j = tempLen - 1
-          while ( (temp(j) == 0) && (j != 0)) {
+          while ((temp(j) == 0) && (j != 0)) {
             j -= 1
           }
           tempLen = j + 1
@@ -361,9 +361,10 @@ private[math] object Conversion {
         if (exponent > 0) result1 = '+' + result1
         result1 = 'E' + result1
 
-        result = if (resLengthInChars - currentChar > 1)
-          result(0) + "." + result.substring(1) + result1
-        else result + result1
+        result =
+          if (resLengthInChars - currentChar > 1)
+            result(0) + "." + result.substring(1) + result1
+          else result + result1
       }
 
       if (negNumber) '-' + result

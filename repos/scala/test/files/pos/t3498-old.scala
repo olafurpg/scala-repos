@@ -1,4 +1,4 @@
-abstract class A[T, @specialized(scala.Int) U : Manifest] {
+abstract class A[T, @specialized(scala.Int) U: Manifest] {
   def f(state: T): Array[U]
 }
 

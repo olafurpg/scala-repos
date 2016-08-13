@@ -42,13 +42,13 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
             buffer: Seq[LocalQuickFix]): Seq[ProblemDescriptor] = ranges.map {
           range =>
             manager.createProblemDescriptor(
-                file,
-                range,
-                "Package names doesn't correspond to directories structure, this may cause " +
+              file,
+              range,
+              "Package names doesn't correspond to directories structure, this may cause " +
                 "problems with resolve to classes from this file",
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                isOnTheFly,
-                buffer: _*)
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+              isOnTheFly,
+              buffer: _*)
         }
 
         val expectedPackageName = file.typeDefinitions.head match {
@@ -60,13 +60,13 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
 
         if (packName == null) {
           val fixes = Seq(
-              new EnablePerformanceProblemsQuickFix(file.getProject))
+            new EnablePerformanceProblemsQuickFix(file.getProject))
           problemDescriptors(fixes).toArray
         } else if (packName != expectedPackageName) {
           val fixes = Seq(
-              new ScalaRenamePackageQuickFix(file, expectedPackageName),
-              new ScalaMoveToPackageQuickFix(file, packName),
-              new EnablePerformanceProblemsQuickFix(file.getProject))
+            new ScalaRenamePackageQuickFix(file, expectedPackageName),
+            new ScalaMoveToPackageQuickFix(file, packName),
+            new EnablePerformanceProblemsQuickFix(file.getProject))
 
           problemDescriptors(fixes).toArray
         } else null

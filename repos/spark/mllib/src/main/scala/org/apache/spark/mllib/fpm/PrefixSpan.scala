@@ -55,7 +55,8 @@ import org.apache.spark.storage.StorageLevel
 class PrefixSpan private (private var minSupport: Double,
                           private var maxPatternLength: Int,
                           private var maxLocalProjDBSize: Long)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   import PrefixSpan._
 
   /**
@@ -78,8 +79,8 @@ class PrefixSpan private (private var minSupport: Double,
   @Since("1.5.0")
   def setMinSupport(minSupport: Double): this.type = {
     require(
-        minSupport >= 0 && minSupport <= 1,
-        s"The minimum support value must be in [0, 1], but got $minSupport.")
+      minSupport >= 0 && minSupport <= 1,
+      s"The minimum support value must be in [0, 1], but got $minSupport.")
     this.minSupport = minSupport
     this
   }
@@ -97,8 +98,8 @@ class PrefixSpan private (private var minSupport: Double,
   def setMaxPatternLength(maxPatternLength: Int): this.type = {
     // TODO: support unbounded pattern length when maxPatternLength = 0
     require(
-        maxPatternLength >= 1,
-        s"The maximum pattern length value must be greater than 0, but got $maxPatternLength.")
+      maxPatternLength >= 1,
+      s"The maximum pattern length value must be greater than 0, but got $maxPatternLength.")
     this.maxPatternLength = maxPatternLength
     this
   }
@@ -116,8 +117,8 @@ class PrefixSpan private (private var minSupport: Double,
   @Since("1.5.0")
   def setMaxLocalProjDBSize(maxLocalProjDBSize: Long): this.type = {
     require(
-        maxLocalProjDBSize >= 0L,
-        s"The maximum local projected database size must be nonnegative, but got $maxLocalProjDBSize")
+      maxLocalProjDBSize >= 0L,
+      s"The maximum local projected database size must be nonnegative, but got $maxLocalProjDBSize")
     this.maxLocalProjDBSize = maxLocalProjDBSize
     this
   }
@@ -128,7 +129,7 @@ class PrefixSpan private (private var minSupport: Double,
     * @return a [[PrefixSpanModel]] that contains the frequent patterns
     */
   @Since("1.5.0")
-  def run[Item : ClassTag](
+  def run[Item: ClassTag](
       data: RDD[Array[Array[Item]]]): PrefixSpanModel[Item] = {
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning("Input data is not cached.")
@@ -184,8 +185,10 @@ class PrefixSpan private (private var minSupport: Double,
       }
     }.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val results = genFreqPatterns(
-        dataInternalRepr, minCount, maxPatternLength, maxLocalProjDBSize)
+    val results = genFreqPatterns(dataInternalRepr,
+                                  minCount,
+                                  maxPatternLength,
+                                  maxLocalProjDBSize)
 
     def toPublicRepr(pattern: Array[Int]): Array[Array[Item]] = {
       val sequenceBuilder = mutable.ArrayBuilder.make[Array[Item]]
@@ -222,8 +225,9 @@ class PrefixSpan private (private var minSupport: Double,
     * @return a [[PrefixSpanModel]] that contains the frequent sequential patterns
     */
   @Since("1.5.0")
-  def run[
-      Item, Itemset <: jl.Iterable[Item], Sequence <: jl.Iterable[Itemset]](
+  def run[Item,
+          Itemset <: jl.Iterable[Item],
+          Sequence <: jl.Iterable[Itemset]](
       data: JavaRDD[Sequence]): PrefixSpanModel[Item] = {
     implicit val tag = fakeClassTag[Item]
     run(data.rdd.map(_.asScala.map(_.asScala.toArray).toArray))
@@ -308,7 +312,7 @@ object PrefixSpan extends Logging {
 
     val numSmallPrefixes = smallPrefixes.size
     logInfo(
-        s"number of small prefixes for local processing: $numSmallPrefixes")
+      s"number of small prefixes for local processing: $numSmallPrefixes")
     if (numSmallPrefixes > 0) {
       // Switch to local processing.
       val bcSmallPrefixes = sc.broadcast(smallPrefixes)
@@ -399,8 +403,8 @@ object PrefixSpan extends Logging {
             s"The last item in a postfix must be zero, but got ${items.last}.")
     if (partialStarts.nonEmpty) {
       require(
-          partialStarts.head >= start,
-          "The first partial start cannot be smaller than the start index," +
+        partialStarts.head >= start,
+        "The first partial start cannot be smaller than the start index," +
           s"but got partialStarts.head = ${partialStarts.head} < start = $start.")
     }
 
@@ -552,8 +556,9 @@ object PrefixSpan extends Logging {
       */
     def compressed: Postfix = {
       if (start > 0) {
-        new Postfix(
-            items.slice(start, items.length), 0, partialStarts.map(_ - start))
+        new Postfix(items.slice(start, items.length),
+                    0,
+                    partialStarts.map(_ - start))
       } else {
         this
       }

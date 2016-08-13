@@ -22,8 +22,7 @@ class ExpandTables extends Phase {
         path: Node,
         tpe: Type): Node = tpe match {
       case p: ProductType =>
-        ProductNode(
-            p.elements.zipWithIndex.map {
+        ProductNode(p.elements.zipWithIndex.map {
           case (t, i) =>
             createResult(expansions, Select(path, ElementSymbol(i + 1)), t)
         })
@@ -34,8 +33,9 @@ class ExpandTables extends Phase {
       case tpe: NominalType =>
         createResult(expansions, path, tpe.structuralView)
       case m: MappedScalaType =>
-        TypeMapping(
-            createResult(expansions, path, m.baseType), m.mapper, m.classTag)
+        TypeMapping(createResult(expansions, path, m.baseType),
+                    m.mapper,
+                    m.classTag)
       case OptionType(el) =>
         val gen = new AnonSymbol
         createdOption = true
@@ -62,7 +62,7 @@ class ExpandTables extends Phase {
                NominalType(ts, StructType(ConstArray.from(v.map(_._2).toMap))))
           }
         logger.debug(
-            "Found Selects for NominalTypes: " + structs.keySet.mkString(", "))
+          "Found Selects for NominalTypes: " + structs.keySet.mkString(", "))
 
         val tables =
           new mutable.HashMap[TableIdentitySymbol, (TermSymbol, Node)]
@@ -111,17 +111,17 @@ class ExpandTables extends Phase {
             createResult(tables,
                          Ref(sym),
                          tree3.nodeType.asCollectionType.elementType).infer(
-                Type.Scope(sym -> tree3.nodeType.asCollectionType.elementType))
+              Type.Scope(sym -> tree3.nodeType.asCollectionType.elementType))
           Bind(sym, tree3, Pure(mapping)).infer()
         }
       }
     }.withWellTyped(true)
     if (createdOption)
       s2 +
-      (Phase.assignUniqueSymbols -> state
-            .get(Phase.assignUniqueSymbols)
-            .get
-            .copy(nonPrimitiveOption = true))
+        (Phase.assignUniqueSymbols -> state
+          .get(Phase.assignUniqueSymbols)
+          .get
+          .copy(nonPrimitiveOption = true))
     else s2
   }
 }

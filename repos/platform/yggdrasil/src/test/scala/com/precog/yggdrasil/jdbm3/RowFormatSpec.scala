@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -37,7 +37,9 @@ import org.scalacheck.{Shrink, Arbitrary, Gen, Pretty}
 import scala.annotation.tailrec
 
 class RowFormatSpec
-    extends Specification with ScalaCheck with CValueGenerators {
+    extends Specification
+    with ScalaCheck
+    with CValueGenerators {
   import Arbitrary._
   import ByteBufferPool._
 
@@ -75,14 +77,12 @@ class RowFormatSpec
   def genCValuesForColumnRefs(refs: List[ColumnRef]): Gen[List[CValue]] =
     Gen.sequence[List, List[CValue]](groupConsecutive(refs)(_.selector) map {
       case refs =>
-        Gen.choose(0, refs.size - 1) flatMap {
-          i =>
-            Gen.sequence[List, CValue](refs.zipWithIndex map {
-              case (ColumnRef(_, cType), `i`) =>
-                Gen.frequency(5 -> genCValue(cType),
-                              1 -> Gen.value(CUndefined))
-              case (_, _) => Gen.value(CUndefined)
-            })
+        Gen.choose(0, refs.size - 1) flatMap { i =>
+          Gen.sequence[List, CValue](refs.zipWithIndex map {
+            case (ColumnRef(_, cType), `i`) =>
+              Gen.frequency(5 -> genCValue(cType), 1 -> Gen.value(CUndefined))
+            case (_, _) => Gen.value(CUndefined)
+          })
         }
     }) map (_.flatten)
 
@@ -93,22 +93,22 @@ class RowFormatSpec
     rows.zipWithIndex foreach {
       case (values, row) =>
         (values zip cols) foreach
-        (_ must beLike {
-              case (CUndefined, col) if !col.isDefinedAt(row) => ok
-              case (_, col) if !col.isDefinedAt(row) => ko
-              case (CString(s), col: StrColumn) => col(row) must_== s
-              case (CBoolean(x), col: BoolColumn) => col(row) must_== x
-              case (CLong(x), col: LongColumn) => col(row) must_== x
-              case (CDouble(x), col: DoubleColumn) => col(row) must_== x
-              case (CNum(x), col: NumColumn) => col(row) must_== x
-              case (CDate(x), col: DateColumn) => col(row) must_== x
-              case (CNull, col: NullColumn) => ok
-              case (CEmptyObject, col: EmptyObjectColumn) => ok
-              case (CEmptyArray, col: EmptyArrayColumn) => ok
-              case (CArray(xs, cType), col: HomogeneousArrayColumn[_])
-                  if cType == col.tpe =>
-                col(row) must_== xs
-            })
+          (_ must beLike {
+            case (CUndefined, col) if !col.isDefinedAt(row) => ok
+            case (_, col) if !col.isDefinedAt(row) => ko
+            case (CString(s), col: StrColumn) => col(row) must_== s
+            case (CBoolean(x), col: BoolColumn) => col(row) must_== x
+            case (CLong(x), col: LongColumn) => col(row) must_== x
+            case (CDouble(x), col: DoubleColumn) => col(row) must_== x
+            case (CNum(x), col: NumColumn) => col(row) must_== x
+            case (CDate(x), col: DateColumn) => col(row) must_== x
+            case (CNull, col: NullColumn) => ok
+            case (CEmptyObject, col: EmptyObjectColumn) => ok
+            case (CEmptyArray, col: EmptyArrayColumn) => ok
+            case (CArray(xs, cType), col: HomogeneousArrayColumn[_])
+                if cType == col.tpe =>
+              col(row) must_== xs
+          })
     }
   }
 

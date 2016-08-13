@@ -26,7 +26,7 @@ case class LongOffset(offset: Long) extends Offset {
     case l: LongOffset => offset.compareTo(l.offset)
     case _ =>
       throw new IllegalArgumentException(
-          s"Invalid comparison of $getClass with ${other.getClass}")
+        s"Invalid comparison of $getClass with ${other.getClass}")
   }
 
   def +(increment: Long): LongOffset = new LongOffset(offset + increment)

@@ -21,14 +21,18 @@ import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 
 import kafka.common.{AppInfo, QueueFullException}
 import kafka.metrics._
-import kafka.producer.async.{DefaultEventHandler, EventHandler, ProducerSendThread}
+import kafka.producer.async.{
+  DefaultEventHandler,
+  EventHandler,
+  ProducerSendThread
+}
 import kafka.serializer.Encoder
 import kafka.utils._
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release. " +
+  "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-    "0.10.0.0")
+  "0.10.0.0")
 class Producer[K, V](
     val config: ProducerConfig,
     private val eventHandler: EventHandler[K, V]) // only for unit testing
@@ -36,7 +40,7 @@ class Producer[K, V](
 
   private val hasShutdown = new AtomicBoolean(false)
   private val queue = new LinkedBlockingQueue[KeyedMessage[K, V]](
-      config.queueBufferingMaxMessages)
+    config.queueBufferingMaxMessages)
 
   private var sync: Boolean = true
   private var producerSendThread: ProducerSendThread[K, V] = null
@@ -47,12 +51,12 @@ class Producer[K, V](
     case "async" =>
       sync = false
       producerSendThread = new ProducerSendThread[K, V](
-          "ProducerSendThread-" + config.clientId,
-          queue,
-          eventHandler,
-          config.queueBufferingMaxMs,
-          config.batchNumMessages,
-          config.clientId)
+        "ProducerSendThread-" + config.clientId,
+        queue,
+        eventHandler,
+        config.queueBufferingMaxMs,
+        config.batchNumMessages,
+        config.clientId)
       producerSendThread.start()
   }
 
@@ -65,14 +69,14 @@ class Producer[K, V](
   def this(config: ProducerConfig) =
     this(config,
          new DefaultEventHandler[K, V](
-             config,
-             CoreUtils.createObject[Partitioner](
-                 config.partitionerClass, config.props),
-             CoreUtils.createObject[Encoder[V]](config.serializerClass,
-                                                config.props),
-             CoreUtils.createObject[Encoder[K]](
-                 config.keySerializerClass, config.props),
-             new ProducerPool(config)))
+           config,
+           CoreUtils.createObject[Partitioner](config.partitionerClass,
+                                               config.props),
+           CoreUtils.createObject[Encoder[V]](config.serializerClass,
+                                              config.props),
+           CoreUtils.createObject[Encoder[K]](config.keySerializerClass,
+                                              config.props),
+           new ProducerPool(config)))
 
   /**
     * Sends the data, partitioned by key to the topic using either the
@@ -92,7 +96,10 @@ class Producer[K, V](
 
   private def recordStats(messages: Seq[KeyedMessage[K, V]]) {
     for (message <- messages) {
-      producerTopicStats.getProducerTopicStats(message.topic).messageRate.mark()
+      producerTopicStats
+        .getProducerTopicStats(message.topic)
+        .messageRate
+        .mark()
       producerTopicStats.getProducerAllTopicsStats.messageRate.mark()
     }
   }
@@ -125,7 +132,7 @@ class Producer[K, V](
           .mark()
         producerTopicStats.getProducerAllTopicsStats.droppedMessageRate.mark()
         throw new QueueFullException(
-            "Event queue is full of unsent messages, could not send event: " +
+          "Event queue is full of unsent messages, could not send event: " +
             message.toString)
       } else {
         trace("Added to send queue an event: " + message.toString)
@@ -147,7 +154,8 @@ class Producer[K, V](
         KafkaMetricsGroup.removeAllProducerMetrics(config.clientId)
         if (producerSendThread != null) producerSendThread.shutdown
         eventHandler.close
-        info("Producer shutdown completed in " +
+        info(
+          "Producer shutdown completed in " +
             (System.nanoTime() - startTime) / 1000000 + " ms")
       }
     }

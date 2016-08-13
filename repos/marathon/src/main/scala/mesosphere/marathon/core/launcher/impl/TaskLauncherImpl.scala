@@ -20,9 +20,9 @@ private[launcher] class TaskLauncherImpl(
   private[this] val usedOffersMeter =
     metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "usedOffers"))
   private[this] val launchedTasksMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "launchedTasks"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "launchedTasks"))
   private[this] val declinedOffersMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "declinedOffers"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "declinedOffers"))
 
   override def acceptOffer(offerID: OfferID, taskOps: Seq[TaskOp]): Boolean = {
     val accepted = withDriver(s"launchTasks($offerID)") { driver =>
@@ -35,8 +35,9 @@ private[launcher] class TaskLauncherImpl(
       if (log.isDebugEnabled()) {
         log.debug(s"Operations on $offerID:\n${operations.mkString("\n")}")
       }
-      driver.acceptOffers(
-          Collections.singleton(offerID), operations.asJava, noFilter)
+      driver.acceptOffers(Collections.singleton(offerID),
+                          operations.asJava,
+                          noFilter)
     }
     if (accepted) {
       usedOffersMeter.mark()
@@ -49,15 +50,16 @@ private[launcher] class TaskLauncherImpl(
     accepted
   }
 
-  override def declineOffer(
-      offerID: OfferID, refuseMilliseconds: Option[Long]): Unit = {
+  override def declineOffer(offerID: OfferID,
+                            refuseMilliseconds: Option[Long]): Unit = {
     val declined = withDriver(s"declineOffer(${offerID.getValue})") {
       val filters = refuseMilliseconds
-        .map(seconds =>
-              Protos.Filters
-                .newBuilder()
-                .setRefuseSeconds(seconds / 1000.0)
-                .build())
+        .map(
+          seconds =>
+            Protos.Filters
+              .newBuilder()
+              .setRefuseSeconds(seconds / 1000.0)
+              .build())
         .getOrElse(Protos.Filters.getDefaultInstance)
       _.declineOffer(offerID, filters)
     }

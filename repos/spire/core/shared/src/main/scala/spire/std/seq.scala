@@ -9,9 +9,10 @@ import spire.algebra._
 import spire.NoImplicit
 
 @SerialVersionUID(0L)
-class SeqModule[A, SA <: SeqLike[A, SA]](
-    implicit val scalar: Ring[A], cbf: CanBuildFrom[SA, A, SA])
-    extends Module[SA, A] with Serializable {
+class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A],
+                                         cbf: CanBuildFrom[SA, A, SA])
+    extends Module[SA, A]
+    with Serializable {
   def zero: SA = cbf().result
 
   def negate(sa: SA): SA = sa map (scalar.negate)
@@ -80,13 +81,17 @@ class SeqModule[A, SA <: SeqLike[A, SA]](
 
 @SerialVersionUID(0L)
 class SeqVectorSpace[A, SA <: SeqLike[A, SA]](
-    implicit override val scalar: Field[A], cbf: CanBuildFrom[SA, A, SA])
-    extends SeqModule[A, SA] with VectorSpace[SA, A] with Serializable
+    implicit override val scalar: Field[A],
+    cbf: CanBuildFrom[SA, A, SA])
+    extends SeqModule[A, SA]
+    with VectorSpace[SA, A]
+    with Serializable
 
 @SerialVersionUID(0L)
-class SeqInnerProductSpace[A : Field, SA <: SeqLike[A, SA]](
+class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](
     implicit cbf: CanBuildFrom[SA, A, SA])
-    extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A]
+    extends SeqVectorSpace[A, SA]
+    with InnerProductSpace[SA, A]
     with Serializable {
   def dot(x: SA, y: SA): A = {
     @tailrec
@@ -103,13 +108,14 @@ class SeqInnerProductSpace[A : Field, SA <: SeqLike[A, SA]](
 }
 
 @SerialVersionUID(0L)
-class SeqCoordinateSpace[A : Field, SA <: SeqLike[A, SA]](val dimensions: Int)(
+class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(
     implicit cbf: CanBuildFrom[SA, A, SA])
     extends SeqInnerProductSpace[A, SA]
-    with CoordinateSpace[SA, A] with Serializable {
+    with CoordinateSpace[SA, A]
+    with Serializable {
   def coord(v: SA, i: Int): A = v(i)
 
-  override def dot(v: SA, w: SA): A = super [SeqInnerProductSpace].dot(v, w)
+  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
 
   def axis(i: Int): SA = {
     val b = cbf()
@@ -131,9 +137,10 @@ class SeqCoordinateSpace[A : Field, SA <: SeqLike[A, SA]](val dimensions: Int)(
   * `InnerProductSpace` instead.
   */
 @SerialVersionUID(0L)
-class SeqLpNormedVectorSpace[A : Field : NRoot : Signed, SA <: SeqLike[A, SA]](
+class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](
     val p: Int)(implicit cbf: CanBuildFrom[SA, A, SA])
-    extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A]
+    extends SeqVectorSpace[A, SA]
+    with NormedVectorSpace[SA, A]
     with Serializable {
   require(p > 0, "p must be > 0")
 
@@ -156,10 +163,10 @@ class SeqLpNormedVectorSpace[A : Field : NRoot : Signed, SA <: SeqLike[A, SA]](
   * norm).
   */
 @SerialVersionUID(0L)
-class SeqMaxNormedVectorSpace[
-    A : Field : Order : Signed, SA <: SeqLike[A, SA]](
+class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](
     implicit cbf: CanBuildFrom[SA, A, SA])
-    extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A]
+    extends SeqVectorSpace[A, SA]
+    with NormedVectorSpace[SA, A]
     with Serializable {
   def norm(v: SA): A = {
     @tailrec
@@ -179,7 +186,8 @@ class SeqMaxNormedVectorSpace[
 private object SeqSupport {
   @tailrec
   final def forall[A](x: Iterator[A], y: Iterator[A])(
-      f: (A, A) => Boolean, g: A => Boolean): Boolean = {
+      f: (A, A) => Boolean,
+      g: A => Boolean): Boolean = {
     if (x.hasNext && y.hasNext) {
       f(x.next(), y.next()) && forall(x, y)(f, g)
     } else if (x.hasNext) {
@@ -194,7 +202,8 @@ private object SeqSupport {
   private val falsef: Any => Boolean = _ => false
 
   @inline final def forall[A, SA <: SeqLike[A, SA]](x: SA, y: SA)(
-      f: (A, A) => Boolean, g: A => Boolean = falsef): Boolean = {
+      f: (A, A) => Boolean,
+      g: A => Boolean = falsef): Boolean = {
     forall(x.toIterator, y.toIterator)(f, g)
   }
 }
@@ -202,14 +211,16 @@ private object SeqSupport {
 import SeqSupport._
 
 @SerialVersionUID(0L)
-class SeqEq[A : Eq, SA <: SeqLike[A, SA]] extends Eq[SA] with Serializable {
+class SeqEq[A: Eq, SA <: SeqLike[A, SA]] extends Eq[SA] with Serializable {
   def eqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Eq[A].eqv(_, _))
 }
 
 @SerialVersionUID(0L)
-class SeqOrder[A : Order, SA <: SeqLike[A, SA]]
-    extends SeqEq[A, SA] with Order[SA] with Serializable {
-  override def eqv(x: SA, y: SA): Boolean = super [SeqEq].eqv(x, y)
+class SeqOrder[A: Order, SA <: SeqLike[A, SA]]
+    extends SeqEq[A, SA]
+    with Order[SA]
+    with Serializable {
+  override def eqv(x: SA, y: SA): Boolean = super[SeqEq].eqv(x, y)
 
   def compare(x: SA, y: SA): Int = {
     @tailrec
@@ -231,18 +242,21 @@ class SeqOrder[A : Order, SA <: SeqLike[A, SA]]
 }
 
 @SerialVersionUID(0L)
-class SeqVectorEq[A : Eq, SA <: SeqLike[A, SA]](
+class SeqVectorEq[A: Eq, SA <: SeqLike[A, SA]](
     implicit scalar: AdditiveMonoid[A])
-    extends Eq[SA] with Serializable {
+    extends Eq[SA]
+    with Serializable {
   def eqv(x: SA, y: SA): Boolean =
     forall[A, SA](x, y)(Eq[A].eqv(_, _), Eq[A].eqv(_, scalar.zero))
 }
 
 @SerialVersionUID(0L)
-class SeqVectorOrder[A : Order, SA <: SeqLike[A, SA]](
+class SeqVectorOrder[A: Order, SA <: SeqLike[A, SA]](
     implicit scalar: AdditiveMonoid[A])
-    extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
-  override def eqv(x: SA, y: SA): Boolean = super [SeqVectorEq].eqv(x, y)
+    extends SeqVectorEq[A, SA]
+    with Order[SA]
+    with Serializable {
+  override def eqv(x: SA, y: SA): Boolean = super[SeqVectorEq].eqv(x, y)
 
   def compare(x: SA, y: SA): Int = {
     @tailrec

@@ -337,8 +337,8 @@ class Flags extends ModifierFlags {
   /** These flags are pickled */
   final val PickledFlags =
     ((InitialFlags & ~FlagsNotPickled) | notPRIVATE // for value class constructors (SI-6601), and private members referenced
-        // in @inline-marked methods publicized in SuperAccessors (see SI-6608, e6b4204604)
-        )
+    // in @inline-marked methods publicized in SuperAccessors (see SI-6608, e6b4204604)
+    )
 
   /** If we have a top-level class or module
     *  and someone asks us for a flag not in TopLevelPickledFlags,
@@ -352,8 +352,8 @@ class Flags extends ModifierFlags {
 
   def getterFlags(fieldFlags: Long): Long =
     ACCESSOR +
-    (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
-     else fieldFlags & ~PRESUPER | STABLE)
+      (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
+      else fieldFlags & ~PRESUPER | STABLE)
 
   def setterFlags(fieldFlags: Long): Long =
     getterFlags(fieldFlags) & ~STABLE & ~CASEACCESSOR
@@ -380,18 +380,18 @@ class Flags extends ModifierFlags {
 
   /** Pickler correspondence, ordered roughly by frequency of occurrence */
   private def rawPickledCorrespondence = Array[(Long, Long)](
-      (METHOD, METHOD_PKL),
-      (PRIVATE, PRIVATE_PKL),
-      (FINAL, FINAL_PKL),
-      (PROTECTED, PROTECTED_PKL),
-      (CASE, CASE_PKL),
-      (DEFERRED, DEFERRED_PKL),
-      (MODULE, MODULE_PKL),
-      (OVERRIDE, OVERRIDE_PKL),
-      (INTERFACE, INTERFACE_PKL),
-      (IMPLICIT, IMPLICIT_PKL),
-      (SEALED, SEALED_PKL),
-      (ABSTRACT, ABSTRACT_PKL)
+    (METHOD, METHOD_PKL),
+    (PRIVATE, PRIVATE_PKL),
+    (FINAL, FINAL_PKL),
+    (PROTECTED, PROTECTED_PKL),
+    (CASE, CASE_PKL),
+    (DEFERRED, DEFERRED_PKL),
+    (MODULE, MODULE_PKL),
+    (OVERRIDE, OVERRIDE_PKL),
+    (INTERFACE, INTERFACE_PKL),
+    (IMPLICIT, IMPLICIT_PKL),
+    (SEALED, SEALED_PKL),
+    (ABSTRACT, ABSTRACT_PKL)
   )
 
   private val mappedRawFlags = rawPickledCorrespondence map (_._1)
@@ -416,10 +416,10 @@ class Flags extends ModifierFlags {
     }
   }
 
-  val rawToPickledFlags: Long => Long = new MapFlags(
-      mappedRawFlags, mappedPickledFlags)
-  val pickledToRawFlags: Long => Long = new MapFlags(
-      mappedPickledFlags, mappedRawFlags)
+  val rawToPickledFlags: Long => Long =
+    new MapFlags(mappedRawFlags, mappedPickledFlags)
+  val pickledToRawFlags: Long => Long =
+    new MapFlags(mappedPickledFlags, mappedRawFlags)
 
   // ------ displaying flags --------------------------------------------------------
 
@@ -495,17 +495,17 @@ class Flags extends ModifierFlags {
 
   private def accessString(flags: Long, privateWithin: String) =
     (if (privateWithin == "") {
-       if ((flags & PrivateLocal) == PrivateLocal) "private[this]"
-       else if ((flags & ProtectedLocal) == ProtectedLocal) "protected[this]"
-       else if ((flags & PRIVATE) != 0) "private"
-       else if ((flags & PROTECTED) != 0) "protected"
-       else ""
-     } else if ((flags & PROTECTED) != 0) "protected[" + privateWithin + "]"
-     else "private[" + privateWithin + "]")
+      if ((flags & PrivateLocal) == PrivateLocal) "private[this]"
+      else if ((flags & ProtectedLocal) == ProtectedLocal) "protected[this]"
+      else if ((flags & PRIVATE) != 0) "private"
+      else if ((flags & PROTECTED) != 0) "protected"
+      else ""
+    } else if ((flags & PROTECTED) != 0) "protected[" + privateWithin + "]"
+    else "private[" + privateWithin + "]")
 
   @deprecated("Use flagString on the flag-carrying member", "2.10.0")
-  private[scala] def flagsToString(
-      flags: Long, privateWithin: String): String = {
+  private[scala] def flagsToString(flags: Long,
+                                   privateWithin: String): String = {
     val access = accessString(flags, privateWithin)
     val nonAccess = flagsToString(flags & ~AccessFlags)
 

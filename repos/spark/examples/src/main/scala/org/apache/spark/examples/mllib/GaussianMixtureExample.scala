@@ -20,7 +20,10 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
+import org.apache.spark.mllib.clustering.{
+  GaussianMixture,
+  GaussianMixtureModel
+}
 import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 
@@ -42,16 +45,16 @@ object GaussianMixtureExample {
 
     // Save and load model
     gmm.save(
-        sc,
-        "target/org/apache/spark/GaussianMixtureExample/GaussianMixtureModel")
+      sc,
+      "target/org/apache/spark/GaussianMixtureExample/GaussianMixtureModel")
     val sameModel = GaussianMixtureModel.load(
-        sc,
-        "target/org/apache/spark/GaussianMixtureExample/GaussianMixtureModel")
+      sc,
+      "target/org/apache/spark/GaussianMixtureExample/GaussianMixtureModel")
 
     // output parameters of max-likelihood model
     for (i <- 0 until gmm.k) {
       println(
-          "weight=%f\nmu=%s\nsigma=\n%s\n" format
+        "weight=%f\nmu=%s\nsigma=\n%s\n" format
           (gmm.weights(i), gmm.gaussians(i).mu, gmm.gaussians(i).sigma))
     }
     // $example off$

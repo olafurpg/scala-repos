@@ -55,7 +55,7 @@ class TableConstraintsTest {
 
     val indexes = ts.baseTableRow.indexes.map(_.name)
     assertTrue(
-        "indexes should be sorted by name",
-        indexes == Seq("idx_bar_id", "idx_code", "idx_foo_id", "idx_id"))
+      "indexes should be sorted by name",
+      indexes == Seq("idx_bar_id", "idx_code", "idx_foo_id", "idx_id"))
   }
 }

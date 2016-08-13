@@ -14,15 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.base._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScValueStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   * Time: 9:55:28
   */
-class ScValueDeclarationImpl private (
-    stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
+class ScValueDeclarationImpl private (stub: StubElement[ScValue],
+                                      nodeType: IElementType,
+                                      node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScValueDeclaration {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -38,8 +42,8 @@ class ScValueDeclarationImpl private (
 
   override def getType(ctx: TypingContext) = typeElement match {
     case None =>
-      Failure(
-          ScalaBundle.message("no.type.element.found", getText), Some(this))
+      Failure(ScalaBundle.message("no.type.element.found", getText),
+              Some(this))
     case Some(te) => te.getType(ctx)
   }
 

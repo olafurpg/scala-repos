@@ -29,8 +29,8 @@ import http._
 object WizardSpec extends Specification {
   "Wizard Specification".title
 
-  val session: LiftSession = new LiftSession(
-      "", Helpers.randomString(20), Empty)
+  val session: LiftSession =
+    new LiftSession("", Helpers.randomString(20), Empty)
 
   class WizardForTesting extends Wizard {
     object completeInfo extends WizardVar(false)
@@ -41,8 +41,8 @@ object WizardSpec extends Specification {
     }
 
     class NameAndAgeScreen extends Screen {
-      val name = field(
-          S ? "First Name", "", valMinLen(2, S ? "Name Too Short"))
+      val name =
+        field(S ? "First Name", "", valMinLen(2, S ? "Name Too Short"))
 
       val age = field(S ? "Age",
                       0,

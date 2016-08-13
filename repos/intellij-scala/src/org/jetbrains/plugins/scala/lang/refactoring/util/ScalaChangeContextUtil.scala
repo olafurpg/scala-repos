@@ -3,7 +3,10 @@ package lang.refactoring.util
 
 import com.intellij.openapi.util.{Key, TextRange}
 import com.intellij.psi._
-import org.jetbrains.plugins.scala.conversion.copy.{Associations, ScalaCopyPastePostProcessor}
+import org.jetbrains.plugins.scala.conversion.copy.{
+  Associations,
+  ScalaCopyPastePostProcessor
+}
 
 /**
   * Nikolay.Tropin
@@ -18,10 +21,10 @@ object ScalaChangeContextUtil {
     def collectDataForElement(elem: PsiElement) = {
       val range: TextRange = elem.getTextRange
       val associations = processor.collectTransferableData(
-          elem.getContainingFile,
-          null,
-          Array[Int](range.getStartOffset),
-          Array[Int](range.getEndOffset))
+        elem.getContainingFile,
+        null,
+        Array[Int](range.getStartOffset),
+        Array[Int](range.getEndOffset))
       elem.putCopyableUserData(ASSOCIATIONS_KEY,
                                if (associations.isEmpty) null
                                else associations.get(0))
@@ -51,8 +54,8 @@ object ScalaChangeContextUtil {
     elem.getCopyableUserData(ASSOCIATIONS_KEY) match {
       case null =>
       case as: Associations =>
-        as.associations.foreach(
-            a => a.range = a.range.shiftRight(offsetChange))
+        as.associations.foreach(a =>
+          a.range = a.range.shiftRight(offsetChange))
     }
   }
 }

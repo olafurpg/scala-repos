@@ -42,7 +42,7 @@ object JdbcDataSource extends Logging {
           loadFactory("slick.jdbc.hikaricp.HikariCPJdbcDataSource$")
         case "slick.jdbc.HikariCPJdbcDataSource" =>
           logger.warn(
-              "connectionPool class 'slick.jdbc.HikariCPJdbcDataSource$' has been renamed to 'slick.jdbc.hikaricp.HikariCPJdbcDataSource$'")
+            "connectionPool class 'slick.jdbc.HikariCPJdbcDataSource$' has been renamed to 'slick.jdbc.hikaricp.HikariCPJdbcDataSource$'")
           loadFactory("slick.jdbc.hikaricp.HikariCPJdbcDataSource$")
         case name => loadFactory(name)
       }
@@ -61,10 +61,10 @@ trait JdbcDataSourceFactory {
 }
 
 /** A JdbcDataSource for a `DataSource` */
-class DataSourceJdbcDataSource(
-    val ds: DataSource,
-    val keepAliveConnection: Boolean,
-    val connectionPreparer: ConnectionPreparer = null)
+class DataSourceJdbcDataSource(val ds: DataSource,
+                               val keepAliveConnection: Boolean,
+                               val connectionPreparer: ConnectionPreparer =
+                                 null)
     extends JdbcDataSource {
   private[this] var openedKeepAliveConnection: Connection = null
 
@@ -82,7 +82,8 @@ class DataSourceJdbcDataSource(
 
   def close(): Unit = {
     try if (keepAliveConnection && (openedKeepAliveConnection ne null))
-      openedKeepAliveConnection.close() finally ds match {
+      openedKeepAliveConnection.close()
+    finally ds match {
       case ds: Closeable => ds.close()
       case _ =>
     }
@@ -103,8 +104,8 @@ object DataSourceJdbcDataSource extends JdbcDataSourceFactory {
           ds
         } catch {
           case ex: Exception =>
-            throw new SlickException(
-                "Error configuring DataSource " + dsClass, ex)
+            throw new SlickException("Error configuring DataSource " + dsClass,
+                                     ex)
         }
       case None =>
         val ds = new DriverDataSource
@@ -120,20 +121,22 @@ object DataSourceJdbcDataSource extends JdbcDataSourceFactory {
                                        "driverClassName"))
         ds
     }
-    new DataSourceJdbcDataSource(
-        ds, c.getBooleanOr("keepAliveConnection"), new ConnectionPreparer(c))
+    new DataSourceJdbcDataSource(ds,
+                                 c.getBooleanOr("keepAliveConnection"),
+                                 new ConnectionPreparer(c))
   }
 }
 
 /** A JdbcDataSource which can load a JDBC `Driver` from a class name */
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 trait DriverBasedJdbcDataSource extends JdbcDataSource {
   private[this] var registeredDriver: Driver = null
 
   protected[this] def registerDriver(driverName: String, url: String): Unit =
     if (driverName ne null) {
-      val oldDriver = try DriverManager.getDriver(url) catch {
+      val oldDriver = try DriverManager.getDriver(url)
+      catch {
         case ex: SQLException if "08001" == ex.getSQLState => null
       }
       if (oldDriver eq null) {
@@ -151,8 +154,8 @@ trait DriverBasedJdbcDataSource extends JdbcDataSource {
 }
 
 /** A JdbcDataSource for lookup via a `Driver` or the `DriverManager` */
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 class DriverJdbcDataSource(url: String,
                            user: String,
                            password: String,
@@ -188,14 +191,14 @@ class DriverJdbcDataSource(url: String,
   protected[this] def internalCreateConnection(): Connection = {
     val conn =
       (if (driver eq null) DriverManager.getConnection(url, connectionProps)
-       else {
-         val conn = driver.connect(url, connectionProps)
-         if (conn eq null)
-           throw new SQLException(
-               "Driver " + driver + " does not know how to handle URL " + url,
-               "08001")
-         conn
-       })
+      else {
+        val conn = driver.connect(url, connectionProps)
+        if (conn eq null)
+          throw new SQLException(
+            "Driver " + driver + " does not know how to handle URL " + url,
+            "08001")
+        conn
+      })
     if (connectionPreparer ne null) connectionPreparer(conn)
     conn
   }
@@ -205,8 +208,8 @@ class DriverJdbcDataSource(url: String,
   }
 }
 
-@deprecated(
-    "Use DataSourceJdbcDataSource with DriverDataSource instead", "3.1")
+@deprecated("Use DataSourceJdbcDataSource with DriverDataSource instead",
+            "3.1")
 object DriverJdbcDataSource extends JdbcDataSourceFactory {
   def forConfig(c: Config,
                 driver: Driver,
@@ -214,14 +217,14 @@ object DriverJdbcDataSource extends JdbcDataSourceFactory {
                 classLoader: ClassLoader): DriverJdbcDataSource = {
     val cp = new ConnectionPreparer(c)
     new DriverJdbcDataSource(
-        c.getStringOr("url"),
-        c.getStringOr("user"),
-        c.getStringOr("password"),
-        c.getPropertiesOr("properties"),
-        c.getStringOr("driver", c.getStringOr("driverClassName")),
-        driver,
-        if (cp.isLive) cp else null,
-        c.getBooleanOr("keepAliveConnection"))
+      c.getStringOr("url"),
+      c.getStringOr("user"),
+      c.getStringOr("password"),
+      c.getPropertiesOr("properties"),
+      c.getStringOr("driver", c.getStringOr("driverClassName")),
+      driver,
+      if (cp.isLive) cp else null,
+      c.getBooleanOr("keepAliveConnection"))
   }
 }
 
@@ -235,7 +238,7 @@ class ConnectionPreparer(c: Config) extends (Connection => Unit) {
     case "SERIALIZABLE" => Connection.TRANSACTION_SERIALIZABLE
     case unknown =>
       throw new SlickException(
-          s"Unknown transaction isolation level [$unknown]")
+        s"Unknown transaction isolation level [$unknown]")
   }
   val catalog =
     c.getStringOpt("catalog").orElse(c.getStringOpt("defaultCatalog"))

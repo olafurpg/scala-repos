@@ -99,7 +99,7 @@ object ExternalSystemDataDsl {
           module.getModuleDependencies.foreach { dependency =>
             moduleToNode.get(dependency).foreach { dependencyModuleNode =>
               moduleNode.add(
-                  new ModuleDependencyNode(moduleNode, dependencyModuleNode))
+                new ModuleDependencyNode(moduleNode, dependencyModuleNode))
             }
           }
       }
@@ -111,15 +111,17 @@ object ExternalSystemDataDsl {
         case (module, moduleNode) =>
           module.getLibraryDependencies.foreach { dependency =>
             libraryToNode.get(dependency).foreach { libraryNode =>
-              moduleNode.add(new LibraryDependencyNode(
-                      moduleNode, libraryNode, LibraryLevel.PROJECT))
+              moduleNode.add(
+                new LibraryDependencyNode(moduleNode,
+                                          libraryNode,
+                                          LibraryLevel.PROJECT))
             }
           }
       }
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ProjectAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -141,7 +143,7 @@ object ExternalSystemDataDsl {
         libs.map(_.build).foreach { libNode =>
           node.add(libNode)
           node.add(
-              new LibraryDependencyNode(node, libNode, LibraryLevel.MODULE))
+            new LibraryDependencyNode(node, libNode, LibraryLevel.MODULE))
         }
       }
       attributes.get(arbitraryNodes).foreach(node.addAll)
@@ -156,7 +158,7 @@ object ExternalSystemDataDsl {
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ModuleAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -178,7 +180,7 @@ object ExternalSystemDataDsl {
 
     private val attributes = new AttributeMap
 
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with LibraryAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](

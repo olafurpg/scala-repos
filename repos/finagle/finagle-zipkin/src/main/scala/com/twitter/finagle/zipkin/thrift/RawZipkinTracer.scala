@@ -4,7 +4,11 @@ import com.google.common.io.BaseEncoding
 import com.twitter.conversions.storage._
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.thrift.{Protocols, ThriftClientFramedCodec, thrift}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.util.DefaultTimer
@@ -38,8 +42,8 @@ object RawZipkinTracer {
       .daemon(true)
       .build()
 
-    new Scribe.FinagledClient(
-        new TracelessFilter andThen transport, Protocols.binaryFactory())
+    new Scribe.FinagledClient(new TracelessFilter andThen transport,
+                              Protocols.binaryFactory())
   }
 
   // to make sure we only create one instance of the tracer per host and port
@@ -58,8 +62,8 @@ object RawZipkinTracer {
       timer: Timer = DefaultTimer.twitter
   ): RawZipkinTracer = synchronized {
     map.getOrElseUpdate(
-        scribeHost + ":" + scribePort,
-        apply(newClient(scribeHost, scribePort), statsReceiver, timer))
+      scribeHost + ":" + scribePort,
+      apply(newClient(scribeHost, scribePort), statsReceiver, timer))
   }
 
   def apply(client: Scribe.FutureIface,
@@ -103,15 +107,14 @@ private[thrift] class RawZipkinTracer(
     poolSize: Int = 10,
     initialBufferSize: StorageUnit = 512.bytes,
     maxBufferSize: StorageUnit = 1.megabyte
-)
-    extends Tracer {
+) extends Tracer {
   private[this] val TraceCategory = "zipkin" // scribe category
 
   private[this] val ErrorAnnotation = "%s: %s" // annotation: errorMessage
 
   // this sends off spans after the deadline is hit, no matter if it ended naturally or not.
-  private[this] val spanMap: DeadlineSpanMap = new DeadlineSpanMap(
-      logSpans(_), 120.seconds, statsReceiver, timer)
+  private[this] val spanMap: DeadlineSpanMap =
+    new DeadlineSpanMap(logSpans(_), 120.seconds, statsReceiver, timer)
 
   private[this] val scopedReceiver = statsReceiver.scope("log_span")
   private[this] val okCounter = scopedReceiver.counter("ok")
@@ -186,8 +189,9 @@ private[thrift] class RawZipkinTracer(
       val transport = bufferPool.take()
       try {
         span.toThrift.write(transport.protocol)
-        entries.append(LogEntry(category = TraceCategory,
-                                message = transport.toBase64Line()))
+        entries.append(
+          LogEntry(category = TraceCategory,
+                   message = transport.toBase64Line()))
       } catch {
         case NonFatal(e) => errorReceiver.counter(e.getClass.getName).incr()
       } finally {
@@ -232,24 +236,24 @@ private[thrift] class RawZipkinTracer(
         annotate(record, thrift.Constants.WIRE_RECV)
       case tracing.Annotation.WireRecvError(error: String) =>
         annotate(
-            record,
-            ErrorAnnotation.format(thrift.Constants.WIRE_RECV_ERROR, error))
+          record,
+          ErrorAnnotation.format(thrift.Constants.WIRE_RECV_ERROR, error))
       case tracing.Annotation.ClientSend() =>
         annotate(record, thrift.Constants.CLIENT_SEND)
       case tracing.Annotation.ClientRecv() =>
         annotate(record, thrift.Constants.CLIENT_RECV)
       case tracing.Annotation.ClientRecvError(error: String) =>
         annotate(
-            record,
-            ErrorAnnotation.format(thrift.Constants.CLIENT_RECV_ERROR, error))
+          record,
+          ErrorAnnotation.format(thrift.Constants.CLIENT_RECV_ERROR, error))
       case tracing.Annotation.ServerSend() =>
         annotate(record, thrift.Constants.SERVER_SEND)
       case tracing.Annotation.ServerRecv() =>
         annotate(record, thrift.Constants.SERVER_RECV)
       case tracing.Annotation.ServerSendError(error: String) =>
         annotate(
-            record,
-            ErrorAnnotation.format(thrift.Constants.SERVER_SEND_ERROR, error))
+          record,
+          ErrorAnnotation.format(thrift.Constants.SERVER_SEND_ERROR, error))
       case tracing.Annotation.ClientSendFragment() =>
         annotate(record, thrift.Constants.CLIENT_SEND_FRAGMENT)
       case tracing.Annotation.ClientRecvFragment() =>
@@ -273,8 +277,10 @@ private[thrift] class RawZipkinTracer(
                          thrift.AnnotationType.BOOL)
       case tracing.Annotation
             .BinaryAnnotation(key: String, value: Array[Byte]) =>
-        binaryAnnotation(
-            record, key, ByteBuffer.wrap(value), thrift.AnnotationType.BYTES)
+        binaryAnnotation(record,
+                         key,
+                         ByteBuffer.wrap(value),
+                         thrift.AnnotationType.BYTES)
       case tracing.Annotation
             .BinaryAnnotation(key: String, value: ByteBuffer) =>
         binaryAnnotation(record, key, value, thrift.AnnotationType.BYTES)
@@ -311,18 +317,18 @@ private[thrift] class RawZipkinTracer(
         // use a binary annotation over a regular annotation to avoid a misleading timestamp
         spanMap.update(record.traceId) {
           _.addBinaryAnnotation(
-              BinaryAnnotation(thrift.Constants.CLIENT_ADDR,
-                               TrueBB.duplicate(),
-                               thrift.AnnotationType.BOOL,
-                               Endpoint.fromSocketAddress(ia)))
+            BinaryAnnotation(thrift.Constants.CLIENT_ADDR,
+                             TrueBB.duplicate(),
+                             thrift.AnnotationType.BOOL,
+                             Endpoint.fromSocketAddress(ia)))
         }
       case tracing.Annotation.ServerAddr(ia: InetSocketAddress) =>
         spanMap.update(record.traceId) {
           _.addBinaryAnnotation(
-              BinaryAnnotation(thrift.Constants.SERVER_ADDR,
-                               TrueBB.duplicate(),
-                               thrift.AnnotationType.BOOL,
-                               Endpoint.fromSocketAddress(ia)))
+            BinaryAnnotation(thrift.Constants.SERVER_ADDR,
+                             TrueBB.duplicate(),
+                             thrift.AnnotationType.BOOL,
+                             Endpoint.fromSocketAddress(ia)))
         }
     }
   }
@@ -333,7 +339,7 @@ private[thrift] class RawZipkinTracer(
     */
   protected def setEndpoint(record: Record, ia: InetSocketAddress) {
     spanMap.update(record.traceId)(
-        _.setEndpoint(Endpoint.fromSocketAddress(ia).boundEndpoint))
+      _.setEndpoint(Endpoint.fromSocketAddress(ia).boundEndpoint))
   }
 
   protected def binaryAnnotation(
@@ -344,7 +350,7 @@ private[thrift] class RawZipkinTracer(
   ) {
     spanMap.update(record.traceId) { span =>
       span.addBinaryAnnotation(
-          BinaryAnnotation(key, value, annotationType, span.endpoint))
+        BinaryAnnotation(key, value, annotationType, span.endpoint))
     }
   }
 
@@ -354,7 +360,7 @@ private[thrift] class RawZipkinTracer(
   protected def annotate(record: Record, value: String) {
     spanMap.update(record.traceId) { span =>
       span.addAnnotation(
-          ZipkinAnnotation(record.timestamp, value, span.endpoint))
+        ZipkinAnnotation(record.timestamp, value, span.endpoint))
     }
   }
 }

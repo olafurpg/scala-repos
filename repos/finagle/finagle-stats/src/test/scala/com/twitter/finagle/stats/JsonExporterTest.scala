@@ -13,7 +13,9 @@ import scala.util.matching.Regex
 
 @RunWith(classOf[JUnitRunner])
 class JsonExporterTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   // 2015-02-05 20:05:00 +0000
   private val zeroSecs = Time.fromSeconds(1423166700)
@@ -24,8 +26,9 @@ class JsonExporterTest
 
     def assertParam(r: Request, expected: Boolean, default: Boolean): Unit =
       withClue(s"params=${r.params}") {
-        assert(expected == exporter.readBooleanParam(
-                new RequestParamMap(r), "hi", default))
+        assert(
+          expected == exporter
+            .readBooleanParam(new RequestParamMap(r), "hi", default))
       }
 
     // param doesn't exist so uses default
@@ -35,14 +38,16 @@ class JsonExporterTest
     // param exists but value not true, so always false
     assertParam(Request(("hi", "")), expected = false, default = false)
     assertParam(Request(("hi", "")), expected = false, default = true)
-    assertParam(
-        Request(("hi", ""), ("hi", "nope")), expected = false, default = true)
+    assertParam(Request(("hi", ""), ("hi", "nope")),
+                expected = false,
+                default = true)
 
     // param exists and value is true, so always true
     assertParam(Request(("hi", "1")), expected = true, default = false)
     assertParam(Request(("hi", "true")), expected = true, default = true)
-    assertParam(
-        Request(("hi", "no"), ("hi", "true")), expected = true, default = true)
+    assertParam(Request(("hi", "no"), ("hi", "true")),
+                expected = true,
+                default = true)
   }
 
   test("samples can be filtered") {
@@ -52,14 +57,14 @@ class JsonExporterTest
         mkRegex("abc,ill_be_partially_matched.*")
     }
     val sample = Map[String, Number](
-        "jvm_uptime" -> 15.0,
-        "abc" -> 42,
-        "ill_be_partially_matched" -> 1
+      "jvm_uptime" -> 15.0,
+      "abc" -> 42,
+      "ill_be_partially_matched" -> 1
     )
     val filteredSample = exporter.filterSample(sample)
     assert(filteredSample.size == 1,
            "Expected 1 metric to pass through the filter. Found: " +
-           filteredSample.size)
+             filteredSample.size)
     assert(filteredSample.contains("jvm_uptime"),
            "Expected to find jvm_uptime metric in unfiltered samples")
   }
@@ -93,7 +98,7 @@ class JsonExporterTest
     tFile1.deleteOnExit()
 
     val writer1 = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(tFile1), "UTF-8"))
+      new OutputStreamWriter(new FileOutputStream(tFile1), "UTF-8"))
     writer1.write("abc123\r\n")
     writer1.close()
 
@@ -101,7 +106,7 @@ class JsonExporterTest
     tFile2.deleteOnExit()
 
     val writer2 = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(tFile2), "UTF-8"))
+      new OutputStreamWriter(new FileOutputStream(tFile2), "UTF-8"))
     writer2.write("def456\r\n")
     writer2.write("ghi789\r\n")
     writer2.close()
@@ -123,7 +128,7 @@ class JsonExporterTest
     tFile.deleteOnExit()
 
     val writer = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(tFile), "UTF-8"))
+      new OutputStreamWriter(new FileOutputStream(tFile), "UTF-8"))
     writer.write("abc123\r\n")
     writer.close()
 

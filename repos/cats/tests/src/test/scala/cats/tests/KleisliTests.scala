@@ -12,8 +12,8 @@ import algebra.laws.GroupLaws
 import cats.laws.discipline.{SemigroupKTests, MonoidKTests}
 
 class KleisliTests extends CatsSuite {
-  implicit def kleisliEq[F[_], A, B](
-      implicit A: Arbitrary[A], FB: Eq[F[B]]): Eq[Kleisli[F, A, B]] =
+  implicit def kleisliEq[F[_], A, B](implicit A: Arbitrary[A],
+                                     FB: Eq[F[B]]): Eq[Kleisli[F, A, B]] =
     Eq.by[Kleisli[F, A, B], A => F[B]](_.run)
 
   implicit val iso =
@@ -27,8 +27,8 @@ class KleisliTests extends CatsSuite {
   {
     implicit val kleisliArrow = Kleisli.kleisliArrow[Option]
     checkAll(
-        "Kleisli[Option, Int, Int]",
-        ArrowTests[Kleisli[Option, ?, ?]].arrow[Int, Int, Int, Int, Int, Int])
+      "Kleisli[Option, Int, Int]",
+      ArrowTests[Kleisli[Option, ?, ?]].arrow[Int, Int, Int, Int, Int, Int])
     checkAll("Arrow[Kleisli[Option, ?, ?]]",
              SerializableTests.serializable(Arrow[Kleisli[Option, ?, ?]]))
   }
@@ -48,23 +48,23 @@ class KleisliTests extends CatsSuite {
                .monadReader[Int, Int, Int])
     checkAll("MonadReader[Kleisli[Option, ?, ?], Int]",
              SerializableTests.serializable(
-                 MonadReader[Kleisli[Option, Int, ?], Int]))
+               MonadReader[Kleisli[Option, Int, ?], Int]))
   }
 
   {
     implicit val kleisliSplit = Kleisli.kleisliSplit[Option]
     checkAll(
-        "Kleisli[Option, Int, Int]",
-        SplitTests[Kleisli[Option, ?, ?]].split[Int, Int, Int, Int, Int, Int])
+      "Kleisli[Option, Int, Int]",
+      SplitTests[Kleisli[Option, ?, ?]].split[Int, Int, Int, Int, Int, Int])
     checkAll("Split[Kleisli[Option, Int, ?]]",
              SerializableTests.serializable(Split[Kleisli[Option, ?, ?]]))
   }
 
   {
     implicit val kleisliStrong = Kleisli.kleisliStrong[Option]
-    checkAll("Kleisli[Option, Int, Int]",
-             StrongTests[Kleisli[Option, ?, ?]]
-               .strong[Int, Int, Int, Int, Int, Int])
+    checkAll(
+      "Kleisli[Option, Int, Int]",
+      StrongTests[Kleisli[Option, ?, ?]].strong[Int, Int, Int, Int, Int, Int])
     checkAll("Strong[Kleisli[Option, ?, ?]]",
              SerializableTests.serializable(Strong[Kleisli[Option, ?, ?]]))
   }
@@ -80,11 +80,11 @@ class KleisliTests extends CatsSuite {
   {
     implicit val kleisliApplicative = Kleisli.kleisliApplicative[Option, Int]
     checkAll(
-        "Kleisli[Option, Int, Int]",
-        ApplicativeTests[Kleisli[Option, Int, ?]].applicative[Int, Int, Int])
+      "Kleisli[Option, Int, Int]",
+      ApplicativeTests[Kleisli[Option, Int, ?]].applicative[Int, Int, Int])
     checkAll(
-        "Applicative[Kleisli[Option, Int, ?]]",
-        SerializableTests.serializable(Applicative[Kleisli[Option, Int, ?]]))
+      "Applicative[Kleisli[Option, Int, ?]]",
+      SerializableTests.serializable(Applicative[Kleisli[Option, Int, ?]]))
   }
 
   {
@@ -131,30 +131,30 @@ class KleisliTests extends CatsSuite {
   {
     implicit val kleisliSemigroupK = Kleisli.kleisliSemigroupK[Option]
     checkAll(
-        "Kleisli[Option, Int, Int]",
-        SemigroupKTests[Lambda[A => Kleisli[Option, A, A]]].semigroupK[Int])
+      "Kleisli[Option, Int, Int]",
+      SemigroupKTests[Lambda[A => Kleisli[Option, A, A]]].semigroupK[Int])
     checkAll("SemigroupK[Lambda[A => Kleisli[Option, A, A]]]",
              SerializableTests.serializable(kleisliSemigroupK))
   }
 
   checkAll(
-      "Kleisli[Option, ?, Int]",
-      ContravariantTests[Kleisli[Option, ?, Int]].contravariant[Int, Int, Int])
+    "Kleisli[Option, ?, Int]",
+    ContravariantTests[Kleisli[Option, ?, Int]].contravariant[Int, Int, Int])
   checkAll(
-      "Contravariant[Kleisli[Option, ?, Int]]",
-      SerializableTests.serializable(Contravariant[Kleisli[Option, ?, Int]]))
+    "Contravariant[Kleisli[Option, ?, Int]]",
+    SerializableTests.serializable(Contravariant[Kleisli[Option, ?, Int]]))
 
   test("local composes functions") {
     forAll { (f: Int => Option[String], g: Int => Int, i: Int) =>
       f(g(i)) should ===(
-          Kleisli.local[Option, String, Int](g)(Kleisli(f)).run(i))
+        Kleisli.local[Option, String, Int](g)(Kleisli(f)).run(i))
     }
   }
 
   test("pure consistent with ask") {
     forAll { (i: Int) =>
       Kleisli.pure[Option, Int, Int](i).run(i) should ===(
-          Kleisli.ask[Option, Int].run(i))
+        Kleisli.ask[Option, Int].run(i))
     }
   }
 

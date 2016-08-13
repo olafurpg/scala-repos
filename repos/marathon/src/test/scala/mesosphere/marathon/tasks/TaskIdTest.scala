@@ -15,19 +15,19 @@ class TaskIdTest extends FunSuite with Matchers {
 
   test("Old TaskIds can be converted") {
     val taskId = Task.Id(
-        TaskID
-          .newBuilder()
-          .setValue("app_682ebe64-0771-11e4-b05d-e0f84720c54e")
-          .build)
+      TaskID
+        .newBuilder()
+        .setValue("app_682ebe64-0771-11e4-b05d-e0f84720c54e")
+        .build)
     taskId.appId should equal("app".toRootPath)
   }
 
   test("Old TaskIds can be converted even if they have dots in them") {
     val taskId = Task.Id(
-        TaskID
-          .newBuilder()
-          .setValue("app.foo.bar_682ebe64-0771-11e4-b05d-e0f84720c54e")
-          .build)
+      TaskID
+        .newBuilder()
+        .setValue("app.foo.bar_682ebe64-0771-11e4-b05d-e0f84720c54e")
+        .build)
     taskId.appId should equal("app.foo.bar".toRootPath)
   }
 

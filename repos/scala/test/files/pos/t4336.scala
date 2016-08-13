@@ -10,10 +10,10 @@ object Main {
   def nonGeneric(parent: Composite): NonGeneric = new NonGeneric
 
   new Composite().contains(
-      nonGeneric // should have type Composite => NonGeneric
+    nonGeneric // should have type Composite => NonGeneric
   )
 
   new Composite().contains(
-      generic[Int] // should have type Composite => Generic[Int]
+    generic[Int] // should have type Composite => Generic[Int]
   )
 }

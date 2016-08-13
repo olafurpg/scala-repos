@@ -32,9 +32,9 @@ object ResourceServerSpec extends Specification {
 
     "default json to json2 minified version" in {
       (ResourceServer.pathRewriter("json.js" :: Nil) must_==
-            List("json2-min.js")) and
-      (ResourceServer.pathRewriter("json2.js" :: Nil) must_==
-            List("json2-min.js"))
+        List("json2-min.js")) and
+        (ResourceServer.pathRewriter("json2.js" :: Nil) must_==
+          List("json2-min.js"))
     }
   }
 }

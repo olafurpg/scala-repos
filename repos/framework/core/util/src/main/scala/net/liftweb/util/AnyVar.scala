@@ -56,10 +56,10 @@ trait MemoizeVar[K, V] {
     coreVar.is.get(key) match {
       case Full(x) => x
       case _ => {
-          val ret = defaultFunction(key)
-          coreVar.is.update(key, ret)
-          ret
-        }
+        val ret = defaultFunction(key)
+        coreVar.is.update(key, ret)
+        ret
+      }
     }
   }
 
@@ -98,8 +98,8 @@ abstract class AnyVar[T, MyType <: AnyVar[T, MyType]](dflt: => T)
   * Abstract a request or a session scoped variable.
   */
 trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
-    extends PSettableValueHolder[T] with HasCalcDefaultValue[T] {
-  self: MyType =>
+    extends PSettableValueHolder[T]
+    with HasCalcDefaultValue[T] { self: MyType =>
   protected lazy val name =
     VarConstants.varPrefix + getClass.getName + "_" + __nameSalt
   private lazy val initedKey = name + VarConstants.initedSuffix

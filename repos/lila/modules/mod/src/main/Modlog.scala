@@ -71,10 +71,10 @@ object Modlog {
   import play.api.libs.json._
 
   private[mod] lazy val tube = JsTube[Modlog](
-      (__.json update (merge(defaults) andThen readDate('date))) andThen Json
-        .reads[Modlog],
-      Json.writes[Modlog] andThen (__.json update writeDate('date)),
-      flags = Seq(_.NoId)
+    (__.json update (merge(defaults) andThen readDate('date))) andThen Json
+      .reads[Modlog],
+    Json.writes[Modlog] andThen (__.json update writeDate('date)),
+    flags = Seq(_.NoId)
   )
 
   private def defaults = Json.obj("details" -> none[String])

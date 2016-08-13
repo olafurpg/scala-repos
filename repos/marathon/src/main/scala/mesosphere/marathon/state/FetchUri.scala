@@ -27,10 +27,10 @@ object FetchUri {
 
   def fromProto(uri: mesos.CommandInfo.URI): FetchUri =
     FetchUri(
-        uri = uri.getValue,
-        executable = uri.getExecutable,
-        extract = uri.getExtract,
-        cache = uri.getCache
+      uri = uri.getValue,
+      executable = uri.getExecutable,
+      extract = uri.getExtract,
+      cache = uri.getCache
     )
 
   def isExtract(uri: String): Boolean = {

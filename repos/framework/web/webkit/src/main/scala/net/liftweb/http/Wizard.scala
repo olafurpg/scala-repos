@@ -35,8 +35,8 @@ object WizardRules extends Factory with FormVendor {
   private def m[T](implicit man: Manifest[T]): Manifest[T] = man
 
   val allTemplatePath: FactoryMaker[List[String]] =
-    new FactoryMaker[List[String]](
-        () => List("templates-hidden", "wizard-all")) {}
+    new FactoryMaker[List[String]](() =>
+      List("templates-hidden", "wizard-all")) {}
 
   private object currentWizards extends SessionVar[Set[String]](Set())
 
@@ -158,7 +158,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
   def noticeTypeToAttr(
       screen: AbstractScreen): Box[NoticeType.Value => MetaData] = {
     screen.inject[NoticeType.Value => MetaData] or inject[
-        NoticeType.Value => MetaData] or WizardRules
+      NoticeType.Value => MetaData] or WizardRules
       .inject[NoticeType.Value => MetaData] or screen.noticeTypeToAttr(screen)
   }
 
@@ -185,12 +185,10 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       if (!ajaxForms_?) {
         val localSnapshot = createSnapshot
         // val notices = S.getAllNotices
-        S.seeOther(S.uri,
-                   () =>
-                     {
-                       // S.appendNotices(notices)
-                       localSnapshot.restore
-                   })
+        S.seeOther(S.uri, () => {
+          // S.appendNotices(notices)
+          localSnapshot.restore
+        })
       }
     }
 
@@ -200,10 +198,10 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
   protected def submitOrAjax(id: String): String =
     (if (ajaxForms_?) {
-       SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id)).toJsCmd
-     } else {
-       "document.getElementById(" + id.encJs + ").submit()"
-     })
+      SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id)).toJsCmd
+    } else {
+      "document.getElementById(" + id.encJs + ").submit()"
+    })
 
   protected def renderHtml(): NodeSeq = {
     val nextId = Helpers.nextFuncName
@@ -246,40 +244,39 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       } else Nil
 
     renderAll(
-        CurrentScreen.is.map(s => Text((s.myScreenNum + 1).toString)), //currentScreenNumber: Box[NodeSeq],
-        Full(Text(screenCount.toString)), //screenCount: Box[NodeSeq],
-        wizardTop, // wizardTop: Box[Elem],
-        theScreen.screenTop, //screenTop: Box[Elem],
-        extraFields ::: theScreen.screenFields.flatMap(f =>
-              if (f.show_?)
-                List(ScreenFieldInfo(f, f.displayHtml, f.helpAsHtml, f.toForm))
-              else Nil), //fields: List[ScreenFieldInfo],
-        prevButton, // prev: Box[Elem],
-        Full(cancelButton), // cancel: Box[Elem],
-        nextButton, // next: Box[Elem],
-        finishButton, //finish: Box[Elem],
-        theScreen.screenBottom, // screenBottom: Box[Elem],
-        wizardBottom, //wizardBottom: Box[Elem],
-        nextId ->
-        (() =>
-              {
-                this.nextScreen()
-                // if (currentScreen.isEmpty) S.seeOther(Referer.is)
-            }), // nextId: (String, () => Unit),
-        Full(
-            prevId ->
-            (() =>
-                  {
-                this.prevScreen
-            })), // prevId: Box[(String, () => Unit)],
-        cancelId ->
-        (() =>
-              {
-                WizardRules.deregisterWizardSession(CurrentSession.is);
-                redirectBack()
-            }), //cancelId: (String, () => Unit),
-        theScreen,
-        ajaxForms_?)
+      CurrentScreen.is
+        .map(s => Text((s.myScreenNum + 1).toString)), //currentScreenNumber: Box[NodeSeq],
+      Full(Text(screenCount.toString)), //screenCount: Box[NodeSeq],
+      wizardTop, // wizardTop: Box[Elem],
+      theScreen.screenTop, //screenTop: Box[Elem],
+      extraFields ::: theScreen.screenFields.flatMap(
+        f =>
+          if (f.show_?)
+            List(ScreenFieldInfo(f, f.displayHtml, f.helpAsHtml, f.toForm))
+          else Nil), //fields: List[ScreenFieldInfo],
+      prevButton, // prev: Box[Elem],
+      Full(cancelButton), // cancel: Box[Elem],
+      nextButton, // next: Box[Elem],
+      finishButton, //finish: Box[Elem],
+      theScreen.screenBottom, // screenBottom: Box[Elem],
+      wizardBottom, //wizardBottom: Box[Elem],
+      nextId ->
+        (() => {
+           this.nextScreen()
+           // if (currentScreen.isEmpty) S.seeOther(Referer.is)
+         }), // nextId: (String, () => Unit),
+      Full(
+        prevId ->
+          (() => {
+             this.prevScreen
+           })), // prevId: Box[(String, () => Unit)],
+      cancelId ->
+        (() => {
+           WizardRules.deregisterWizardSession(CurrentSession.is);
+           redirectBack()
+         }), //cancelId: (String, () => Unit),
+      theScreen,
+      ajaxForms_?)
   }
 
   protected def allTemplatePath: List[String] =
@@ -302,12 +299,12 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
     (from, to) match {
       case (Full(old), Full(cur)) if old eq cur => {
-          /* do nothing */
-        }
+        /* do nothing */
+      }
       case (Full(old), Full(cur)) => {
-          old.transitionOutOfTo(Full(cur))
-          cur.transitionIntoFrom(Full(old))
-        }
+        old.transitionOutOfTo(Full(cur))
+        cur.transitionIntoFrom(Full(old))
+      }
 
       case (Full(old), _) => old.transitionOutOfTo(Empty)
       case (_, Full(cur)) => cur.transitionIntoFrom(Empty)
@@ -404,51 +401,51 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     } yield {
       screen.validate match {
         case Nil => {
-            val snapshot = createSnapshot
-            PrevSnapshot.set(Full(snapshot))
-            val nextScreen = screen.nextScreen
-            CurrentScreen.is.foreach { s =>
-              VisitedScreens.set(VisitedScreens :+ s)
-            }
-            doTransition(CurrentScreen.get, nextScreen)
-            CurrentScreen.set(nextScreen)
-            OnFirstScreen.set(false)
+          val snapshot = createSnapshot
+          PrevSnapshot.set(Full(snapshot))
+          val nextScreen = screen.nextScreen
+          CurrentScreen.is.foreach { s =>
+            VisitedScreens.set(VisitedScreens :+ s)
+          }
+          doTransition(CurrentScreen.get, nextScreen)
+          CurrentScreen.set(nextScreen)
+          OnFirstScreen.set(false)
 
-            nextScreen match {
-              case Empty =>
-                def useAndFinish(in: List[LoanWrapper]) {
-                  in match {
-                    case Nil => {
-                        WizardRules.deregisterWizardSession(CurrentSession.is)
-                        VisitedScreens.foreach { s =>
-                          s.finish()
-                        }
-                        finish()
-                        VisitedScreens.foreach { s =>
-                          s.postFinish()
-                        }
-                      }
-
-                    case x :: xs =>
-                      x.apply {
-                        useAndFinish(xs)
-                      }
+          nextScreen match {
+            case Empty =>
+              def useAndFinish(in: List[LoanWrapper]) {
+                in match {
+                  case Nil => {
+                    WizardRules.deregisterWizardSession(CurrentSession.is)
+                    VisitedScreens.foreach { s =>
+                      s.finish()
+                    }
+                    finish()
+                    VisitedScreens.foreach { s =>
+                      s.postFinish()
+                    }
                   }
-                }
-                useAndFinish(dbConnections)
-                if (ajaxForms_?) {
-                  AjaxOnDone.is
-                } else {
-                  Noop
-                }
 
-              case _ => SetHtml(FormGUID, renderHtml())
-            }
+                  case x :: xs =>
+                    x.apply {
+                      useAndFinish(xs)
+                    }
+                }
+              }
+              useAndFinish(dbConnections)
+              if (ajaxForms_?) {
+                AjaxOnDone.is
+              } else {
+                Noop
+              }
+
+            case _ => SetHtml(FormGUID, renderHtml())
           }
+        }
         case xs => {
-            S.error(xs)
-            SetHtml(FormGUID, renderHtml())
-          }
+          S.error(xs)
+          SetHtml(FormGUID, renderHtml())
+        }
       }
     }) openOr AjaxOnDone.is
   }

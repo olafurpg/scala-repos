@@ -19,8 +19,11 @@ object ExportGraphics {
     * the given dpi (for rasterized formats only).  The extension of the file
     * determines its format, with options png, eps, svg, and pdf.
     */
-  def writeFile(
-      file: File, draw: Drawable, width: Int, height: Int, dpi: Int = 72) = {
+  def writeFile(file: File,
+                draw: Drawable,
+                width: Int,
+                height: Int,
+                dpi: Int = 72) = {
     lazy val fos = new FileOutputStream(file)
     if (file.getName.toLowerCase.endsWith(".png")) {
       try {
@@ -48,7 +51,7 @@ object ExportGraphics {
 //      }
     } else {
       throw new IOException(
-          "Unrecognized file extension: should be png, svg, eps, or pdf")
+        "Unrecognized file extension: should be png, svg, eps, or pdf")
     }
   }
 

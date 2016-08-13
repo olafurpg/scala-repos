@@ -47,7 +47,8 @@ private[akka] final case class ErrorPublisher(t: Throwable, name: String)
   * INTERNAL API
   */
 private[akka] final case class MaybePublisher[T](
-    promise: Promise[Option[T]], name: String)(implicit ec: ExecutionContext)
+    promise: Promise[Option[T]],
+    name: String)(implicit ec: ExecutionContext)
     extends Publisher[T] {
   import ReactiveStreamsCompliance._
 
@@ -113,7 +114,8 @@ private[akka] case object RejectAdditionalSubscribers
     extends Publisher[Nothing] {
   import ReactiveStreamsCompliance._
   override def subscribe(subscriber: Subscriber[_ >: Nothing]): Unit =
-    try rejectAdditionalSubscriber(subscriber, "Publisher") catch {
+    try rejectAdditionalSubscriber(subscriber, "Publisher")
+    catch {
       case _: SpecViolation ⇒ // nothing we can do
     }
   def apply[T]: Publisher[T] = this.asInstanceOf[Publisher[T]]

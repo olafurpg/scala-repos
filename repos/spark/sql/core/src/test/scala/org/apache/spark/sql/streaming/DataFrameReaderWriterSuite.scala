@@ -19,7 +19,12 @@ package org.apache.spark.sql.streaming.test
 
 import org.scalatest.BeforeAndAfter
 
-import org.apache.spark.sql.{AnalysisException, ContinuousQuery, SQLContext, StreamTest}
+import org.apache.spark.sql.{
+  AnalysisException,
+  ContinuousQuery,
+  SQLContext,
+  StreamTest
+}
 import org.apache.spark.sql.execution.streaming.{Batch, Offset, Sink, Source}
 import org.apache.spark.sql.sources.{StreamSinkProvider, StreamSourceProvider}
 import org.apache.spark.sql.test.SharedSQLContext
@@ -59,7 +64,9 @@ class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
 }
 
 class DataFrameReaderWriterSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
   import testImplicits._
 
   after {

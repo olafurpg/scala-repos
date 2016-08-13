@@ -10,23 +10,36 @@ import std.Transform
 import Def.ScopedKey
 import Scope.GlobalScope
 import BasicKeys.explicitGlobalLogLevels
-import Keys.{logLevel, logManager, persistLogLevel, persistTraceLevel, sLog, state, traceLevel}
+import Keys.{
+  logLevel,
+  logManager,
+  persistLogLevel,
+  persistTraceLevel,
+  sLog,
+  state,
+  traceLevel
+}
 import scala.Console.{BLUE, RESET}
-import sbt.internal.util.{AttributeKey, ConsoleOut, MultiLoggerConfig, Settings, SuppressedTraceContext}
+import sbt.internal.util.{
+  AttributeKey,
+  ConsoleOut,
+  MultiLoggerConfig,
+  Settings,
+  SuppressedTraceContext
+}
 import sbt.internal.util.MainLogging._
 import sbt.util.{AbstractLogger, Level, Logger}
 
 object LogManager {
   def construct(data: Settings[Scope], state: State) =
-    (task: ScopedKey[_], to: PrintWriter) =>
-      {
-        val manager =
-          logManager in task.scope get data getOrElse defaultManager(
-              state.globalLogging.console)
-        manager(data, state, task, to)
+    (task: ScopedKey[_], to: PrintWriter) => {
+      val manager =
+        logManager in task.scope get data getOrElse defaultManager(
+          state.globalLogging.console)
+      manager(data, state, task, to)
     }
-  @deprecated(
-      "Use defaultManager to explicitly specify standard out.", "0.13.0")
+  @deprecated("Use defaultManager to explicitly specify standard out.",
+              "0.13.0")
   lazy val default: LogManager = defaultManager(StandardMain.console)
 
   def defaultManager(console: ConsoleOut): LogManager =
@@ -39,30 +52,30 @@ object LogManager {
   def defaults(extra: ScopedKey[_] => Seq[AbstractLogger],
                console: ConsoleOut): LogManager =
     withLoggers(
-        (task,
-        state) => defaultScreen(console, suppressedMessage(task, state)),
-        extra = extra)
+      (task, state) => defaultScreen(console, suppressedMessage(task, state)),
+      extra = extra)
 
   def withScreenLogger(
       mk: (ScopedKey[_], State) => AbstractLogger): LogManager =
     withLoggers(screen = mk)
 
-  def withLoggers(screen: (ScopedKey[_], State) => AbstractLogger = (sk, s) =>
-                      defaultScreen(s.globalLogging.console),
-                  backed: PrintWriter => AbstractLogger = defaultBacked(),
-                  extra: ScopedKey[_] => Seq[AbstractLogger] = _ =>
-                      Nil): LogManager = new LogManager {
-    def apply(data: Settings[Scope],
-              state: State,
-              task: ScopedKey[_],
-              to: PrintWriter): Logger =
-      defaultLogger(data,
-                    state,
-                    task,
-                    screen(task, state),
-                    backed(to),
-                    extra(task).toList)
-  }
+  def withLoggers(
+      screen: (ScopedKey[_], State) => AbstractLogger = (sk, s) =>
+        defaultScreen(s.globalLogging.console),
+      backed: PrintWriter => AbstractLogger = defaultBacked(),
+      extra: ScopedKey[_] => Seq[AbstractLogger] = _ => Nil): LogManager =
+    new LogManager {
+      def apply(data: Settings[Scope],
+                state: State,
+                task: ScopedKey[_],
+                to: PrintWriter): Logger =
+        defaultLogger(data,
+                      state,
+                      task,
+                      screen(task, state),
+                      backed(to),
+                      extra(task).toList)
+    }
 
   def defaultLogger(data: Settings[Scope],
                     state: State,
@@ -80,13 +93,13 @@ object LogManager {
     val backingTrace = getOr(persistTraceLevel.key, Int.MaxValue)
     val extraBacked = state.globalLogging.backed :: Nil
     multiLogger(
-        new MultiLoggerConfig(console,
-                              backed,
-                              extraBacked ::: extra,
-                              screenLevel,
-                              backingLevel,
-                              screenTrace,
-                              backingTrace))
+      new MultiLoggerConfig(console,
+                            backed,
+                            extraBacked ::: extra,
+                            screenLevel,
+                            backingLevel,
+                            screenTrace,
+                            backingTrace))
   }
   def defaultTraceLevel(state: State): Int =
     if (state.interactive) -1 else Int.MaxValue
@@ -99,8 +112,8 @@ object LogManager {
       if (useColor) BLUE + commandBase + RESET else "'" + commandBase + "'"
     context =>
       Some(
-          "Stack trace suppressed: run %s for the full output.".format(
-              command(context.useColor)))
+        "Stack trace suppressed: run %s for the full output.".format(
+          command(context.useColor)))
   }
   def unwrapStreamsKey(key: ScopedKey[_]): ScopedKey[_] =
     key.scope.task match {
@@ -137,8 +150,8 @@ object LogManager {
       .put(Keys.logLevel.key, level)
   }
 
-  private[this] def setExplicitGlobalLogLevels(
-      s: State, flag: Boolean): State =
+  private[this] def setExplicitGlobalLogLevels(s: State,
+                                               flag: Boolean): State =
     s.put(BasicKeys.explicitGlobalLogLevels, flag)
   private[this] def hasExplicitGlobalLogLevels(s: State): Boolean =
     State.getBoolean(s, BasicKeys.explicitGlobalLogLevels, default = false)
@@ -155,7 +168,7 @@ object LogManager {
         new java.lang.ref.WeakReference(s.globalLogging.full)
       private[this] def slog: Logger =
         Option(ref.get) getOrElse sys.error(
-            "Settings logger used after project was loaded.")
+          "Settings logger used after project was loaded.")
 
       override val ansiCodesSupported = slog.ansiCodesSupported
       override def trace(t: => Throwable) = slog.trace(t)

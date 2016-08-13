@@ -8,7 +8,7 @@ import java.net.InetSocketAddress
 
 import akka.http.scaladsl
 
-class OutgoingConnection private[http](
+class OutgoingConnection private[http] (
     delegate: scaladsl.Http.OutgoingConnection) {
 
   /**

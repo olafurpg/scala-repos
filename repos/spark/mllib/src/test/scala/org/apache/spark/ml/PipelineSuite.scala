@@ -35,7 +35,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class PipelineSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   abstract class MyModel extends Model[MyModel]
@@ -132,7 +133,7 @@ class PipelineSuite
     val unWritableStage = new UnWritableStage("unwritableStage")
     val unWritablePipeline = new Pipeline().setStages(Array(unWritableStage))
     withClue(
-        "Pipeline.write should fail when Pipeline contains non-Writable stage") {
+      "Pipeline.write should fail when Pipeline contains non-Writable stage") {
       intercept[UnsupportedOperationException] {
         unWritablePipeline.write
       }
@@ -141,8 +142,9 @@ class PipelineSuite
 
   test("PipelineModel read/write") {
     val writableStage = new WritableStage("writableStage").setIntParam(56)
-    val pipeline = new PipelineModel(
-        "pipeline_89329327", Array(writableStage.asInstanceOf[Transformer]))
+    val pipeline =
+      new PipelineModel("pipeline_89329327",
+                        Array(writableStage.asInstanceOf[Transformer]))
 
     val pipeline2 = testDefaultReadWrite(pipeline, testParams = false)
     assert(pipeline2.stages.length === 1)
@@ -154,8 +156,9 @@ class PipelineSuite
   test("PipelineModel read/write: getStagePath") {
     val stageUid = "myStage"
     val stagesDir = new Path("pipeline", "stages").toString
-    def testStage(
-        stageIdx: Int, numStages: Int, expectedPrefix: String): Unit = {
+    def testStage(stageIdx: Int,
+                  numStages: Int,
+                  expectedPrefix: String): Unit = {
       val path =
         SharedReadWrite.getStagePath(stageUid, stageIdx, numStages, stagesDir)
       val expected =
@@ -171,10 +174,11 @@ class PipelineSuite
 
   test("PipelineModel read/write with non-Writable stage") {
     val unWritableStage = new UnWritableStage("unwritableStage")
-    val unWritablePipeline = new PipelineModel(
-        "pipeline_328957", Array(unWritableStage.asInstanceOf[Transformer]))
+    val unWritablePipeline =
+      new PipelineModel("pipeline_328957",
+                        Array(unWritableStage.asInstanceOf[Transformer]))
     withClue(
-        "PipelineModel.write should fail when PipelineModel contains non-Writable stage") {
+      "PipelineModel.write should fail when PipelineModel contains non-Writable stage") {
       intercept[UnsupportedOperationException] {
         unWritablePipeline.write
       }
@@ -184,10 +188,10 @@ class PipelineSuite
   test("pipeline validateParams") {
     val df = sqlContext
       .createDataFrame(
-          Seq((1, Vectors.dense(0.0, 1.0, 4.0), 1.0),
-              (2, Vectors.dense(1.0, 0.0, 4.0), 2.0),
-              (3, Vectors.dense(1.0, 0.0, 5.0), 3.0),
-              (4, Vectors.dense(0.0, 0.0, 5.0), 4.0))
+        Seq((1, Vectors.dense(0.0, 1.0, 4.0), 1.0),
+            (2, Vectors.dense(1.0, 0.0, 4.0), 2.0),
+            (3, Vectors.dense(1.0, 0.0, 5.0), 3.0),
+            (4, Vectors.dense(0.0, 0.0, 5.0), 4.0))
       )
       .toDF("id", "features", "label")
 
@@ -205,7 +209,8 @@ class PipelineSuite
 
 /** Used to test [[Pipeline]] with [[MLWritable]] stages */
 class WritableStage(override val uid: String)
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   final val intParam: IntParam = new IntParam(this, "intParam", "doc")
 

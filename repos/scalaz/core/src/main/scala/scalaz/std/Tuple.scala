@@ -17,13 +17,14 @@ sealed trait TupleInstances0 {
     new Tuple4Functor[A1, A2, A3] {}
   implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[(A1, A2, A3, A4, ?)] =
     new Tuple5Functor[A1, A2, A3, A4] {}
-  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[
-      (A1, A2, A3, A4, A5, ?)] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Functor[
-      A1, A2, A3, A4, A5, A6]: Traverse[(A1, A2, A3, A4, A5, A6, ?)] =
+  implicit def tuple6Functor[A1, A2, A3, A4, A5]
+    : Traverse[(A1, A2, A3, A4, A5, ?)] =
+    new Tuple6Functor[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]
+    : Traverse[(A1, A2, A3, A4, A5, A6, ?)] =
     new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[
-      (A1, A2, A3, A4, A5, A6, A7, ?)] =
+  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]
+    : Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] =
     new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
 }
 
@@ -31,8 +32,8 @@ sealed trait TupleInstances1 extends TupleInstances0 {
   implicit val tuple2Bitraverse: Bitraverse[Tuple2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
-    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(
-        f: A => G[C], g: B => G[D]) =
+    def bitraverseImpl[G[_]: Applicative, A, B, C, D](
+        fab: (A, B))(f: A => G[C], g: B => G[D]) =
       Applicative[G].tuple2(f(fab._1), g(fab._2))
   }
 
@@ -50,7 +51,8 @@ sealed trait TupleInstances1 extends TupleInstances0 {
       implicit def _1: Semigroup[A1] = A1
     }
   implicit def tuple2Semigroup[A1, A2](
-      implicit A1: Semigroup[A1], A2: Semigroup[A2]): Semigroup[(A1, A2)] =
+      implicit A1: Semigroup[A1],
+      A2: Semigroup[A2]): Semigroup[(A1, A2)] =
     new Tuple2Semigroup[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -142,44 +144,44 @@ sealed trait TupleInstances1 extends TupleInstances0 {
 
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
   implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[
-      Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+    Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
   /** Product BindRec */
-  implicit def tuple2BindRec[A1 : Semigroup]: BindRec[(A1, ?)] =
+  implicit def tuple2BindRec[A1: Semigroup]: BindRec[(A1, ?)] =
     new Tuple2BindRec[A1] {
       def _1 = implicitly
     }
-  implicit def tuple3BindRec[A1 : Semigroup, A2 : Semigroup]: BindRec[
-      (A1, A2, ?)] = new Tuple3BindRec[A1, A2] {
+  implicit def tuple3BindRec[A1: Semigroup, A2: Semigroup]
+    : BindRec[(A1, A2, ?)] = new Tuple3BindRec[A1, A2] {
     def _1 = implicitly
     def _2 = implicitly
   }
-  implicit def tuple4BindRec[A1 : Semigroup,
-                             A2 : Semigroup,
-                             A3 : Semigroup]: BindRec[(A1, A2, A3, ?)] =
+  implicit def tuple4BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup]
+    : BindRec[(A1, A2, A3, ?)] =
     new Tuple4BindRec[A1, A2, A3] {
       def _1 = implicitly
       def _2 = implicitly
       def _3 = implicitly
     }
-  implicit def tuple5BindRec[
-      A1 : Semigroup, A2 : Semigroup, A3 : Semigroup, A4 : Semigroup]: BindRec[
-      (A1, A2, A3, A4, ?)] = new Tuple5BindRec[A1, A2, A3, A4] {
-    def _1 = implicitly
-    def _2 = implicitly
-    def _3 = implicitly
-    def _4 = implicitly
-  }
-  implicit def tuple6BindRec[
-      A1 : Semigroup,
-      A2 : Semigroup,
-      A3 : Semigroup,
-      A4 : Semigroup,
-      A5 : Semigroup]: BindRec[(A1, A2, A3, A4, A5, ?)] =
+  implicit def tuple5BindRec[A1: Semigroup,
+                             A2: Semigroup,
+                             A3: Semigroup,
+                             A4: Semigroup]: BindRec[(A1, A2, A3, A4, ?)] =
+    new Tuple5BindRec[A1, A2, A3, A4] {
+      def _1 = implicitly
+      def _2 = implicitly
+      def _3 = implicitly
+      def _4 = implicitly
+    }
+  implicit def tuple6BindRec[A1: Semigroup,
+                             A2: Semigroup,
+                             A3: Semigroup,
+                             A4: Semigroup,
+                             A5: Semigroup]: BindRec[(A1, A2, A3, A4, A5, ?)] =
     new Tuple6BindRec[A1, A2, A3, A4, A5] {
       def _1 = implicitly
       def _2 = implicitly
@@ -187,13 +189,13 @@ sealed trait TupleInstances1 extends TupleInstances0 {
       def _4 = implicitly
       def _5 = implicitly
     }
-  implicit def tuple7BindRec[A1 : Semigroup,
-                             A2 : Semigroup,
-                             A3 : Semigroup,
-                             A4 : Semigroup,
-                             A5 : Semigroup,
-                             A6 : Semigroup]: BindRec[
-      (A1, A2, A3, A4, A5, A6, ?)] =
+  implicit def tuple7BindRec[A1: Semigroup,
+                             A2: Semigroup,
+                             A3: Semigroup,
+                             A4: Semigroup,
+                             A5: Semigroup,
+                             A6: Semigroup]
+    : BindRec[(A1, A2, A3, A4, A5, A6, ?)] =
     new Tuple7BindRec[A1, A2, A3, A4, A5, A6] {
       def _1 = implicitly
       def _2 = implicitly
@@ -202,14 +204,14 @@ sealed trait TupleInstances1 extends TupleInstances0 {
       def _5 = implicitly
       def _6 = implicitly
     }
-  implicit def tuple8BindRec[A1 : Semigroup,
-                             A2 : Semigroup,
-                             A3 : Semigroup,
-                             A4 : Semigroup,
-                             A5 : Semigroup,
-                             A6 : Semigroup,
-                             A7 : Semigroup]: BindRec[
-      (A1, A2, A3, A4, A5, A6, A7, ?)] =
+  implicit def tuple8BindRec[A1: Semigroup,
+                             A2: Semigroup,
+                             A3: Semigroup,
+                             A4: Semigroup,
+                             A5: Semigroup,
+                             A6: Semigroup,
+                             A7: Semigroup]
+    : BindRec[(A1, A2, A3, A4, A5, A6, A7, ?)] =
     new Tuple8BindRec[A1, A2, A3, A4, A5, A6, A7] {
       def _1 = implicitly
       def _2 = implicitly
@@ -224,8 +226,8 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     new Tuple1Equal[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Equal[A1, A2](
-      implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] =
+  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1],
+                                   A2: Equal[A2]): Equal[(A1, A2)] =
     new Tuple2Equal[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -320,14 +322,15 @@ sealed trait TupleInstances2 extends TupleInstances1 {
     new Tuple1Show[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Show[A1, A2](
-      implicit A1: Show[A1], A2: Show[A2]): Show[(A1, A2)] =
+  implicit def tuple2Show[A1, A2](implicit A1: Show[A1],
+                                  A2: Show[A2]): Show[(A1, A2)] =
     new Tuple2Show[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
     }
-  implicit def tuple3Show[A1, A2, A3](
-      implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]): Show[(A1, A2, A3)] =
+  implicit def tuple3Show[A1, A2, A3](implicit A1: Show[A1],
+                                      A2: Show[A2],
+                                      A3: Show[A3]): Show[(A1, A2, A3)] =
     new Tuple3Show[A1, A2, A3] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -413,8 +416,8 @@ sealed trait TupleInstances2 extends TupleInstances1 {
     new Tuple1Order[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Order[A1, A2](
-      implicit A1: Order[A1], A2: Order[A2]): Order[(A1, A2)] =
+  implicit def tuple2Order[A1, A2](implicit A1: Order[A1],
+                                   A2: Order[A2]): Order[(A1, A2)] =
     new Tuple2Order[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -506,8 +509,8 @@ sealed trait TupleInstances2 extends TupleInstances1 {
     new Tuple1Monoid[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Monoid[A1, A2](
-      implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] =
+  implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1],
+                                    A2: Monoid[A2]): Monoid[(A1, A2)] =
     new Tuple2Monoid[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -604,21 +607,22 @@ sealed trait TupleInstances2 extends TupleInstances1 {
     new Tuple4Cozip[A1, A2, A3] {}
   implicit def tuple5Cozip[A1, A2, A3, A4]: Cozip[(A1, A2, A3, A4, ?)] =
     new Tuple5Cozip[A1, A2, A3, A4] {}
-  implicit def tuple6Cozip[
-      A1, A2, A3, A4, A5]: Cozip[(A1, A2, A3, A4, A5, ?)] =
+  implicit def tuple6Cozip[A1, A2, A3, A4, A5]
+    : Cozip[(A1, A2, A3, A4, A5, ?)] =
     new Tuple6Cozip[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[
-      (A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Cozip[
-      A1, A2, A3, A4, A5, A6, A7]: Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] =
+  implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]
+    : Cozip[(A1, A2, A3, A4, A5, A6, ?)] =
+    new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]
+    : Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] =
     new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
 
   implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] =
     new Tuple2Monad[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple3Monad[A1, A2](
-      implicit A1: Monoid[A1], A2: Monoid[A2]): Monad[(A1, A2, ?)] =
+  implicit def tuple3Monad[A1, A2](implicit A1: Monoid[A1],
+                                   A2: Monoid[A2]): Monad[(A1, A2, ?)] =
     new Tuple3Monad[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -699,7 +703,7 @@ object tuple extends TupleInstances {
 private trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {
   implicit def _1: Semigroup[A1]
   def append(f1: Tuple1[A1], f2: => Tuple1[A1]) = (
-      Tuple1(Semigroup[A1].append(f1._1, f2._1))
+    Tuple1(Semigroup[A1].append(f1._1, f2._1))
   )
 }
 
@@ -709,8 +713,8 @@ private trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
   def append(f1: (A1, A2), _f2: => (A1, A2)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2)
     )
   }
 }
@@ -721,9 +725,9 @@ private trait Tuple3Semigroup[A1, A2, A3] extends Semigroup[(A1, A2, A3)] {
   def append(f1: (A1, A2, A3), _f2: => (A1, A2, A3)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3)
     )
   }
 }
@@ -736,10 +740,10 @@ private trait Tuple4Semigroup[A1, A2, A3, A4]
   def append(f1: (A1, A2, A3, A4), _f2: => (A1, A2, A3, A4)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3),
+      _4.append(f1._4, f2._4)
     )
   }
 }
@@ -753,11 +757,11 @@ private trait Tuple5Semigroup[A1, A2, A3, A4, A5]
   def append(f1: (A1, A2, A3, A4, A5), _f2: => (A1, A2, A3, A4, A5)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4),
-        _5.append(f1._5, f2._5)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3),
+      _4.append(f1._4, f2._4),
+      _5.append(f1._5, f2._5)
     )
   }
 }
@@ -772,12 +776,12 @@ private trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6]
   def append(f1: (A1, A2, A3, A4, A5, A6), _f2: => (A1, A2, A3, A4, A5, A6)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4),
-        _5.append(f1._5, f2._5),
-        _6.append(f1._6, f2._6)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3),
+      _4.append(f1._4, f2._4),
+      _5.append(f1._5, f2._5),
+      _6.append(f1._6, f2._6)
     )
   }
 }
@@ -794,13 +798,13 @@ private trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7]
              _f2: => (A1, A2, A3, A4, A5, A6, A7)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4),
-        _5.append(f1._5, f2._5),
-        _6.append(f1._6, f2._6),
-        _7.append(f1._7, f2._7)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3),
+      _4.append(f1._4, f2._4),
+      _5.append(f1._5, f2._5),
+      _6.append(f1._6, f2._6),
+      _7.append(f1._7, f2._7)
     )
   }
 }
@@ -818,14 +822,14 @@ private trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8]
              _f2: => (A1, A2, A3, A4, A5, A6, A7, A8)) = {
     lazy val f2 = _f2
     (
-        _1.append(f1._1, f2._1),
-        _2.append(f1._2, f2._2),
-        _3.append(f1._3, f2._3),
-        _4.append(f1._4, f2._4),
-        _5.append(f1._5, f2._5),
-        _6.append(f1._6, f2._6),
-        _7.append(f1._7, f2._7),
-        _8.append(f1._8, f2._8)
+      _1.append(f1._1, f2._1),
+      _2.append(f1._2, f2._2),
+      _3.append(f1._3, f2._3),
+      _4.append(f1._4, f2._4),
+      _5.append(f1._5, f2._5),
+      _6.append(f1._6, f2._6),
+      _7.append(f1._7, f2._7),
+      _8.append(f1._8, f2._8)
     )
   }
 }
@@ -860,8 +864,8 @@ private trait Tuple5Cozip[A1, A2, A3, A4] extends Cozip[(A1, A2, A3, A4, ?)] {
 private trait Tuple6Cozip[A1, A2, A3, A4, A5]
     extends Cozip[(A1, A2, A3, A4, A5, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A \/ B)) =
-    x._6.bimap(
-        (x._1, x._2, x._3, x._4, x._5, _), (x._1, x._2, x._3, x._4, x._5, _))
+    x._6.bimap((x._1, x._2, x._3, x._4, x._5, _),
+               (x._1, x._2, x._3, x._4, x._5, _))
 }
 private trait Tuple7Cozip[A1, A2, A3, A4, A5, A6]
     extends Cozip[(A1, A2, A3, A4, A5, A6, ?)] {
@@ -904,10 +908,10 @@ private trait Tuple4Equal[A1, A2, A3, A4] extends Equal[(A1, A2, A3, A4)] {
   implicit def _4: Equal[A4]
   override def equal(f1: (A1, A2, A3, A4), f2: (A1, A2, A3, A4)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
-    _4.equalIsNatural
+      _4.equalIsNatural
 }
 private trait Tuple5Equal[A1, A2, A3, A4, A5]
     extends Equal[(A1, A2, A3, A4, A5)] {
@@ -918,10 +922,11 @@ private trait Tuple5Equal[A1, A2, A3, A4, A5]
   implicit def _5: Equal[A5]
   override def equal(f1: (A1, A2, A3, A4, A5), f2: (A1, A2, A3, A4, A5)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5,
+                                                                   f2._5)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
-    _4.equalIsNatural && _5.equalIsNatural
+      _4.equalIsNatural && _5.equalIsNatural
 }
 private trait Tuple6Equal[A1, A2, A3, A4, A5, A6]
     extends Equal[(A1, A2, A3, A4, A5, A6)] {
@@ -931,14 +936,14 @@ private trait Tuple6Equal[A1, A2, A3, A4, A5, A6]
   implicit def _4: Equal[A4]
   implicit def _5: Equal[A5]
   implicit def _6: Equal[A6]
-  override def equal(
-      f1: (A1, A2, A3, A4, A5, A6), f2: (A1, A2, A3, A4, A5, A6)) =
+  override def equal(f1: (A1, A2, A3, A4, A5, A6),
+                     f2: (A1, A2, A3, A4, A5, A6)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
-    _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
+      _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
-    _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural
+      _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural
 }
 private trait Tuple7Equal[A1, A2, A3, A4, A5, A6, A7]
     extends Equal[(A1, A2, A3, A4, A5, A6, A7)] {
@@ -949,15 +954,16 @@ private trait Tuple7Equal[A1, A2, A3, A4, A5, A6, A7]
   implicit def _5: Equal[A5]
   implicit def _6: Equal[A6]
   implicit def _7: Equal[A7]
-  override def equal(
-      f1: (A1, A2, A3, A4, A5, A6, A7), f2: (A1, A2, A3, A4, A5, A6, A7)) =
+  override def equal(f1: (A1, A2, A3, A4, A5, A6, A7),
+                     f2: (A1, A2, A3, A4, A5, A6, A7)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
-    _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7, f2._7)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
+      _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7,
+                                                                   f2._7)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
-    _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural &&
-    _7.equalIsNatural
+      _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural &&
+      _7.equalIsNatural
 }
 private trait Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8]
     extends Equal[(A1, A2, A3, A4, A5, A6, A7, A8)] {
@@ -972,13 +978,13 @@ private trait Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8]
   override def equal(f1: (A1, A2, A3, A4, A5, A6, A7, A8),
                      f2: (A1, A2, A3, A4, A5, A6, A7, A8)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-    _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
-    _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) &&
-    _7.equal(f1._7, f2._7) && _8.equal(f1._8, f2._8)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
+      _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) &&
+      _7.equal(f1._7, f2._7) && _8.equal(f1._8, f2._8)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
-    _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural &&
-    _7.equalIsNatural && _8.equalIsNatural
+      _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural &&
+      _7.equalIsNatural && _8.equalIsNatural
 }
 private trait Tuple1Show[A1] extends Show[Tuple1[A1]] {
   implicit def _1: Show[A1]
@@ -1118,7 +1124,8 @@ private trait Tuple1Order[A1] extends Order[Tuple1[A1]] with Tuple1Equal[A1] {
   def order(f1: Tuple1[A1], f2: Tuple1[A1]) = _1.order(f1._1, f2._1)
 }
 private trait Tuple2Order[A1, A2]
-    extends Order[(A1, A2)] with Tuple2Equal[A1, A2] {
+    extends Order[(A1, A2)]
+    with Tuple2Equal[A1, A2] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   import Ordering.EQ
@@ -1129,7 +1136,8 @@ private trait Tuple2Order[A1, A2]
     }
 }
 private trait Tuple3Order[A1, A2, A3]
-    extends Order[(A1, A2, A3)] with Tuple3Equal[A1, A2, A3] {
+    extends Order[(A1, A2, A3)]
+    with Tuple3Equal[A1, A2, A3] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   implicit def _3: Order[A3]
@@ -1142,7 +1150,8 @@ private trait Tuple3Order[A1, A2, A3]
     }
 }
 private trait Tuple4Order[A1, A2, A3, A4]
-    extends Order[(A1, A2, A3, A4)] with Tuple4Equal[A1, A2, A3, A4] {
+    extends Order[(A1, A2, A3, A4)]
+    with Tuple4Equal[A1, A2, A3, A4] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   implicit def _3: Order[A3]
@@ -1160,7 +1169,8 @@ private trait Tuple4Order[A1, A2, A3, A4]
     }
 }
 private trait Tuple5Order[A1, A2, A3, A4, A5]
-    extends Order[(A1, A2, A3, A4, A5)] with Tuple5Equal[A1, A2, A3, A4, A5] {
+    extends Order[(A1, A2, A3, A4, A5)]
+    with Tuple5Equal[A1, A2, A3, A4, A5] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   implicit def _3: Order[A3]
@@ -1216,8 +1226,8 @@ private trait Tuple7Order[A1, A2, A3, A4, A5, A6, A7]
   implicit def _6: Order[A6]
   implicit def _7: Order[A7]
   import Ordering.EQ
-  def order(
-      f1: (A1, A2, A3, A4, A5, A6, A7), f2: (A1, A2, A3, A4, A5, A6, A7)) =
+  def order(f1: (A1, A2, A3, A4, A5, A6, A7),
+            f2: (A1, A2, A3, A4, A5, A6, A7)) =
     (_1.order(f1._1, f2._1),
      _2.order(f1._2, f2._2),
      _3.order(f1._3, f2._3),
@@ -1268,25 +1278,29 @@ private trait Tuple8Order[A1, A2, A3, A4, A5, A6, A7, A8]
 }
 
 private trait Tuple1Monoid[A1]
-    extends Monoid[Tuple1[A1]] with Tuple1Semigroup[A1] {
+    extends Monoid[Tuple1[A1]]
+    with Tuple1Semigroup[A1] {
   implicit def _1: Monoid[A1]
   def zero: Tuple1[A1] = Tuple1(_1.zero)
 }
 private trait Tuple2Monoid[A1, A2]
-    extends Monoid[(A1, A2)] with Tuple2Semigroup[A1, A2] {
+    extends Monoid[(A1, A2)]
+    with Tuple2Semigroup[A1, A2] {
   implicit def _1: Monoid[A1]
   implicit def _2: Monoid[A2]
   def zero: (A1, A2) = (_1.zero, _2.zero)
 }
 private trait Tuple3Monoid[A1, A2, A3]
-    extends Monoid[(A1, A2, A3)] with Tuple3Semigroup[A1, A2, A3] {
+    extends Monoid[(A1, A2, A3)]
+    with Tuple3Semigroup[A1, A2, A3] {
   implicit def _1: Monoid[A1]
   implicit def _2: Monoid[A2]
   implicit def _3: Monoid[A3]
   def zero: (A1, A2, A3) = (_1.zero, _2.zero, _3.zero)
 }
 private trait Tuple4Monoid[A1, A2, A3, A4]
-    extends Monoid[(A1, A2, A3, A4)] with Tuple4Semigroup[A1, A2, A3, A4] {
+    extends Monoid[(A1, A2, A3, A4)]
+    with Tuple4Semigroup[A1, A2, A3, A4] {
   implicit def _1: Monoid[A1]
   implicit def _2: Monoid[A2]
   implicit def _3: Monoid[A3]

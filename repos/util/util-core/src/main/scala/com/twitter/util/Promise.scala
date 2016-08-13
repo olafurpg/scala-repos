@@ -25,8 +25,7 @@ object Promise {
     * A template trait for [[com.twitter.util.Promise Promises]] that are derived
     * and capable of being detached from other Promises.
     */
-  trait Detachable {
-    _: Promise[_] =>
+  trait Detachable { _: Promise[_] =>
 
     /**
       * Returns true if successfully detached, will return true at most once.
@@ -41,7 +40,9 @@ object Promise {
     * A detachable [[com.twitter.util.Promise]].
     */
   private class DetachablePromise[A](underlying: Promise[_ <: A])
-      extends Promise[A] with Promise.K[A] with Detachable {
+      extends Promise[A]
+      with Promise.K[A]
+      with Detachable {
     underlying.continue(this)
 
     def detach(): Boolean = underlying.detach(this)
@@ -53,7 +54,8 @@ object Promise {
   }
 
   private class DetachableFuture[A]
-      extends Promise[A] with Promise.Detachable {
+      extends Promise[A]
+      with Promise.Detachable {
     private[this] var detached: Boolean = false
 
     def detach(): Boolean = synchronized {
@@ -77,13 +79,16 @@ object Promise {
     * @param depth a tag used to store the chain depth of this context
     * for scheduling purposes.
     */
-  private class Monitored[A](
-      saved: Local.Context, k: Try[A] => Unit, val depth: Short)
+  private class Monitored[A](saved: Local.Context,
+                             k: Try[A] => Unit,
+                             val depth: Short)
       extends K[A] {
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result) catch Monitor.catcher finally Local.restore(current)
+      try k(result)
+      catch Monitor.catcher
+      finally Local.restore(current)
     }
   }
 
@@ -106,18 +111,20 @@ object Promise {
       extends K[A] {
     private[this] def k(r: Try[A]) = {
       promise.become(
-          try f(r) catch {
-            case e: NonLocalReturnControl[_] =>
-              Future.exception(new FutureNonLocalReturnControl(e))
-            case NonFatal(e) => Future.exception(e)
-          }
+        try f(r)
+        catch {
+          case e: NonLocalReturnControl[_] =>
+            Future.exception(new FutureNonLocalReturnControl(e))
+          case NonFatal(e) => Future.exception(e)
+        }
       )
     }
 
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result) catch {
+      try k(result)
+      catch {
         case t: Throwable =>
           Monitor.handle(t)
           throw t
@@ -151,7 +158,8 @@ object Promise {
   private sealed trait State[A]
   private case class Waiting[A](first: K[A], rest: List[K[A]]) extends State[A]
   private case class Interruptible[A](
-      waitq: List[K[A]], handler: PartialFunction[Throwable, Unit])
+      waitq: List[K[A]],
+      handler: PartialFunction[Throwable, Unit])
       extends State[A]
   private case class Transforming[A](waitq: List[K[A]], other: Future[_])
       extends State[A]
@@ -167,8 +175,7 @@ object Promise {
     unsafe.objectFieldOffset(classOf[Promise[_]].getDeclaredField("state"))
   private val AlwaysUnit: Any => Unit = scala.Function.const(()) _
 
-  sealed trait Responder[A] {
-    this: Future[A] =>
+  sealed trait Responder[A] { this: Future[A] =>
     protected[util] def depth: Short
     protected def parent: Promise[A]
     protected[util] def continue(k: K[A])
@@ -195,7 +202,8 @@ object Promise {
 
   /** A future that is chained from a parent promise with a certain depth. */
   private class Chained[A](val parent: Promise[A], val depth: Short)
-      extends Future[A] with Responder[A] {
+      extends Future[A]
+      with Responder[A] {
     if (depth == Short.MaxValue)
       throw new AssertionError("Future chains cannot be longer than 32766!")
 
@@ -325,7 +333,9 @@ object Promise {
   * for details.
   */
 class Promise[A]
-    extends Future[A] with Promise.Responder[A] with Updatable[Try[A]] {
+    extends Future[A]
+    with Promise.Responder[A]
+    with Updatable[Try[A]] {
   import Promise._
 
   protected[util] final def depth = 0
@@ -346,8 +356,8 @@ class Promise[A]
 
   override def toString = "Promise@%s(state=%s)".format(hashCode, state)
 
-  @inline private[this] def cas(
-      oldState: State[A], newState: State[A]): Boolean =
+  @inline private[this] def cas(oldState: State[A],
+                                newState: State[A]): Boolean =
     unsafe.compareAndSwapObject(this, stateOff, oldState, newState)
 
   private[this] def runq(first: K[A], rest: List[K[A]], result: Try[A]) =
@@ -638,7 +648,7 @@ class Promise[A]
     if (isDefined) {
       val current = Await.result(liftToTry)
       throw new IllegalStateException(
-          s"cannot become() on an already satisfied promise: $current")
+        s"cannot become() on an already satisfied promise: $current")
     }
     if (other.isInstanceOf[Promise[_]]) {
       val that = other.asInstanceOf[Promise[A]]
@@ -681,7 +691,7 @@ class Promise[A]
     updateIfEmpty(result) || {
       val current = Await.result(liftToTry)
       throw new ImmutableResult(
-          s"Result set multiple times. Value='$current', New='$result'")
+        s"Result set multiple times. Value='$current', New='$result'")
     }
   }
 
@@ -730,8 +740,7 @@ class Promise[A]
   protected[util] final def continue(k: K[A]): Unit = {
     state match {
       case Done(v) =>
-        Scheduler.submit(
-            new Runnable {
+        Scheduler.submit(new Runnable {
           def run() {
             k(v)
           }
@@ -778,7 +787,7 @@ class Promise[A]
       case s @ Done(value) =>
         if (!target.updateIfEmpty(value) && value != Await.result(target)) {
           throw new IllegalArgumentException(
-              "Cannot link two Done Promises with differing values")
+            "Cannot link two Done Promises with differing values")
         }
 
       case s @ Waiting(first, rest) =>
@@ -830,8 +839,8 @@ class Promise[A]
   def poll: Option[Try[A]] = state match {
     case Linked(p) => p.poll
     case Done(res) => Some(res)
-    case Waiting(_, _) | Interruptible(_, _) |
-        Interrupted(_, _) | Transforming(_, _) =>
+    case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) |
+        Transforming(_, _) =>
       None
   }
 
@@ -840,8 +849,8 @@ class Promise[A]
     // object allocations for `Some`s when the caller does not need the result.
     case Linked(p) => p.isDefined
     case Done(res) => true
-    case Waiting(_, _) | Interruptible(_, _) |
-        Interrupted(_, _) | Transforming(_, _) =>
+    case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) |
+        Transforming(_, _) =>
       false
   }
 }

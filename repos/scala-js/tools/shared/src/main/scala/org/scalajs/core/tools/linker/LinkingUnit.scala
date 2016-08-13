@@ -24,8 +24,9 @@ final class LinkingUnit(
       } { classClassDef =>
         val methodNames =
           classClassDef.memberMethods.map(_.info.encodedName).toSet
-        GlobalInfo(isParentDataAccessed = methodNames.contains(
-                  "getSuperclass__jl_Class"))
+        GlobalInfo(
+          isParentDataAccessed =
+            methodNames.contains("getSuperclass__jl_Class"))
       }
   }
 

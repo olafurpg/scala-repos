@@ -4,7 +4,10 @@ package parser
 package parsing
 package xml
 
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaTokenTypes, ScalaTokenTypesEx}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaTokenTypes,
+  ScalaTokenTypesEx
+}
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
 

@@ -3,11 +3,20 @@ package resolvers
 
 import java.io.{IOException, File}
 
-import com.intellij.notification.{Notification, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification,
+  NotificationType,
+  Notifications
+}
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.progress.{ProcessCanceledException, ProgressIndicator, ProgressManager, Task}
+import com.intellij.openapi.progress.{
+  ProcessCanceledException,
+  ProgressIndicator,
+  ProgressManager,
+  Task
+}
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.PersistentEnumeratorBase
 import org.apache.lucene.store.LockReleaseFailedException
@@ -36,8 +45,8 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
   def add(resolver: SbtResolver) = find(resolver) match {
     case Some(index) => index
     case None =>
-      val newIndex = SbtResolverIndex.create(
-          resolver.kind, resolver.root, getIndexDirectory(resolver.root))
+      val newIndex = SbtResolverIndex
+        .create(resolver.kind, resolver.root, getIndexDirectory(resolver.root))
       indexes.add(newIndex)
       newIndex
   }
@@ -75,8 +84,8 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
                   notifyWarning(exc.getMessage)
                 case exc: LockReleaseFailedException =>
                   notifyWarning(
-                      SbtBundle("sbt.resolverIndexer.luceneLockException",
-                                exc.getMessage))
+                    SbtBundle("sbt.resolverIndexer.luceneLockException",
+                              exc.getMessage))
               } finally {
                 updatingIndexes synchronized {
                   updatingIndexes -= index
@@ -90,8 +99,8 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
     indexesDir.mkdirs()
     if (!indexesDir.exists || !indexesDir.isDirectory) {
       notifyWarning(
-          SbtBundle("sbt.resolverIndexer.cantCreateIndexesDir",
-                    indexesDir.absolutePath))
+        SbtBundle("sbt.resolverIndexer.cantCreateIndexesDir",
+                  indexesDir.absolutePath))
       return
     }
 
@@ -117,13 +126,13 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
     try {
       FileUtil.delete(indexDir)
       notifyWarning(
-          SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedAndRemoved",
-                    indexDir.getAbsolutePath))
+        SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedAndRemoved",
+                  indexDir.getAbsolutePath))
     } catch {
       case _: Throwable =>
         notifyWarning(
-            SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedCantBeRemoved",
-                      indexDir.getAbsolutePath))
+          SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedCantBeRemoved",
+                    indexDir.getAbsolutePath))
     }
   }
 

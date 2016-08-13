@@ -31,8 +31,7 @@ object Mux
   private[finagle] abstract class ProtoTracing(
       process: String,
       val role: Stack.Role
-  )
-      extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
+  ) extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
     val description = s"Mux specific $process traces"
 
     private[this] val tracingFilter =
@@ -76,7 +75,7 @@ object Mux
   case class Client(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Client.stack,
       params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
-            "mux"))
+          "mux"))
       extends StdStackClient[mux.Request, mux.Response, Client]
       with WithDefaultLoadBalancer[Client] {
 
@@ -100,10 +99,10 @@ object Mux
       val FailureDetector.Param(detectorConfig) = params[FailureDetector.Param]
 
       val negotiatedTrans = mux.Handshake.client(
-          trans = transport,
-          version = LatestVersion,
-          headers = Nil,
-          negotiate = mux.Handshake.NoopNegotiator)
+        trans = transport,
+        version = LatestVersion,
+        headers = Nil,
+        negotiate = mux.Handshake.NoopNegotiator)
 
       val session = new mux.ClientSession(negotiatedTrans,
                                           detectorConfig,
@@ -116,12 +115,12 @@ object Mux
 
   val client = Client()
 
-  def newService(
-      dest: Name, label: String): Service[mux.Request, mux.Response] =
+  def newService(dest: Name,
+                 label: String): Service[mux.Request, mux.Response] =
     client.newService(dest, label)
 
-  def newClient(
-      dest: Name, label: String): ServiceFactory[mux.Request, mux.Response] =
+  def newClient(dest: Name,
+                label: String): ServiceFactory[mux.Request, mux.Response] =
     client.newClient(dest, label)
 
   private[finagle] class ServerProtoTracing
@@ -138,7 +137,7 @@ object Mux
   case class Server(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Server.stack,
       params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
-            "mux"))
+          "mux"))
       extends StdStackServer[mux.Request, mux.Response, Server] {
 
     protected def copy1(
@@ -165,10 +164,10 @@ object Mux
       val Lessor.Param(lessor) = params[Lessor.Param]
 
       val negotiatedTrans = mux.Handshake.server(
-          trans = transport,
-          version = LatestVersion,
-          headers = _ => Nil,
-          negotiate = mux.Handshake.NoopNegotiator)
+        trans = transport,
+        version = LatestVersion,
+        headers = _ => Nil,
+        negotiate = mux.Handshake.NoopNegotiator)
 
       mux.ServerDispatcher.newRequestResponse(negotiatedTrans,
                                               service,

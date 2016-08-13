@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 
 /**
-  * @author kfeodorov 
+  * @author kfeodorov
   * @since 15.03.14.
   */
 class ScInterpolatedStringPartReference(node: ASTNode)

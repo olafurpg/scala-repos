@@ -25,11 +25,11 @@ class ScalaWithParenthesisSurrounder extends ScalaExpressionSurrounder {
       case _: ScBlockExpr => true
       case _: ScBlock => false
       case _: ScExpression | _: PsiWhiteSpace => {
-          true
-        }
+        true
+      }
       case e => {
-          ScalaPsiUtil.isLineTerminator(e)
-        }
+        ScalaPsiUtil.isLineTerminator(e)
+      }
     }
   }
 

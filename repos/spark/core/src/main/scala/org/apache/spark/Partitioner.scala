@@ -58,7 +58,7 @@ object Partitioner {
   def defaultPartitioner(rdd: RDD[_], others: RDD[_]*): Partitioner = {
     val bySize = (Seq(rdd) ++ others).sortBy(_.partitions.length).reverse
     for (r <- bySize if r.partitioner.isDefined &&
-             r.partitioner.get.numPartitions > 0) {
+           r.partitioner.get.numPartitions > 0) {
       return r.partitioner.get
     }
     if (rdd.context.conf.contains("spark.default.parallelism")) {
@@ -106,7 +106,7 @@ class HashPartitioner(partitions: Int) extends Partitioner {
   * as the `partitions` parameter, in the case where the number of sampled records is less than
   * the value of `partitions`.
   */
-class RangePartitioner[K : Ordering : ClassTag, V](
+class RangePartitioner[K: Ordering: ClassTag, V](
     partitions: Int,
     rdd: RDD[_ <: Product2[K, V]],
     private var ascending: Boolean = true)
@@ -153,7 +153,8 @@ class RangePartitioner[K : Ordering : ClassTag, V](
         if (imbalancedPartitions.nonEmpty) {
           // Re-sample imbalanced partitions with the desired sampling probability.
           val imbalanced = new PartitionPruningRDD(
-              rdd.map(_._1), imbalancedPartitions.contains)
+            rdd.map(_._1),
+            imbalancedPartitions.contains)
           val seed = byteswap32(-rdd.id - 1)
           val reSampled = imbalanced
             .sample(withReplacement = false, fraction, seed)
@@ -177,7 +178,7 @@ class RangePartitioner[K : Ordering : ClassTag, V](
     if (rangeBounds.length <= 128) {
       // If we have less than 128 partitions naive search
       while (partition < rangeBounds.length &&
-      ordering.gt(k, rangeBounds(partition))) {
+             ordering.gt(k, rangeBounds(partition))) {
         partition += 1
       }
     } else {
@@ -265,21 +266,21 @@ private[spark] object RangePartitioner {
     * @param sampleSizePerPartition max sample size per partition
     * @return (total number of items, an array of (partitionId, number of items, sample))
     */
-  def sketch[K : ClassTag](
+  def sketch[K: ClassTag](
       rdd: RDD[K],
       sampleSizePerPartition: Int): (Long, Array[(Int, Long, Array[K])]) = {
     val shift = rdd.id
     // val classTagK = classTag[K] // to avoid serializing the entire partitioner object
     val sketched = rdd.mapPartitionsWithIndex { (idx, iter) =>
       val seed = byteswap32(idx ^ (shift << 16))
-      val (sample, n) = SamplingUtils.reservoirSampleAndCount(
-          iter, sampleSizePerPartition, seed)
+      val (sample, n) =
+        SamplingUtils.reservoirSampleAndCount(iter,
+                                              sampleSizePerPartition,
+                                              seed)
       Iterator((idx, n, sample))
     }.collect()
-    val numItems = sketched
-      .map(_._2)
-      .sum
-      (numItems, sketched)
+    val numItems = sketched.map(_._2).sum
+    (numItems, sketched)
   }
 
   /**
@@ -290,8 +291,9 @@ private[spark] object RangePartitioner {
     * @param partitions number of partitions
     * @return selected bounds
     */
-  def determineBounds[K : Ordering : ClassTag](
-      candidates: ArrayBuffer[(K, Float)], partitions: Int): Array[K] = {
+  def determineBounds[K: Ordering: ClassTag](
+      candidates: ArrayBuffer[(K, Float)],
+      partitions: Int): Array[K] = {
     val ordering = implicitly[Ordering[K]]
     val ordered = candidates.sortBy(_._1)
     val numCandidates = ordered.size
@@ -303,7 +305,7 @@ private[spark] object RangePartitioner {
     var i = 0
     var j = 0
     var previousBound = Option.empty[K]
-    while ( (i < numCandidates) && (j < partitions - 1)) {
+    while ((i < numCandidates) && (j < partitions - 1)) {
       val (key, weight) = ordered(i)
       cumWeight += weight
       if (cumWeight >= target) {

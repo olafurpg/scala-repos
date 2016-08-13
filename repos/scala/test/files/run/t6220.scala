@@ -80,9 +80,9 @@ package scala.collection.immutable {
       x match {
         case m: HashSet.HashTrieSet[_] =>
           require(
-              m.elems.size > 1 ||
+            m.elems.size > 1 ||
               (m.elems.size == 1 &&
-                  m.elems(0).isInstanceOf[HashSet.HashTrieSet[_]]))
+                m.elems(0).isInstanceOf[HashSet.HashTrieSet[_]]))
           m.elems.foreach(validate _)
         case m: HashSet.HashSetCollision1[_] =>
           require(m.ks.size > 1)

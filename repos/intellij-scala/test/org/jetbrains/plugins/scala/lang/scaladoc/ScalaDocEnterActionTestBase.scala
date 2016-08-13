@@ -19,8 +19,9 @@ abstract class ScalaDocEnterActionTestBase
       .USE_SCALADOC2_FORMATTING = false
   }
 
-  protected def checkGeneratedTextFromString(
-      header: String, footer: String, assumedStub: String) {
+  protected def checkGeneratedTextFromString(header: String,
+                                             footer: String,
+                                             assumedStub: String) {
     checkGeneratedTextFromString(header, footer, assumedStub, a => a)
   }
 
@@ -35,17 +36,17 @@ abstract class ScalaDocEnterActionTestBase
       .getActionHandler(IdeActions.ACTION_EDITOR_ENTER)
 
     enterHandler.execute(
-        getEditorAdapter,
-        getEditorAdapter.getCaretModel.getCurrentCaret,
-        new DataContext {
-          def getData(dataId: String): AnyRef = {
-            dataId match {
-              case "Language" | "language" => getFileAdapter.getLanguage
-              case "Project" | "project" => getFileAdapter.getProject
-              case _ => null
-            }
+      getEditorAdapter,
+      getEditorAdapter.getCaretModel.getCurrentCaret,
+      new DataContext {
+        def getData(dataId: String): AnyRef = {
+          dataId match {
+            case "Language" | "language" => getFileAdapter.getLanguage
+            case "Project" | "project" => getFileAdapter.getProject
+            case _ => null
           }
-        })
+        }
+      })
 
     assert(transform(getFileAdapter.getText).equals(assumedStub))
   }

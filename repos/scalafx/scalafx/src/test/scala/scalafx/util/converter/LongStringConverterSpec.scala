@@ -40,11 +40,13 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class LongStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[
-        java.lang.Long, jfxuc.LongStringConverter, Long, LongStringConverter](
-        classOf[jfxuc.LongStringConverter],
-        classOf[LongStringConverter],
-        classOf[Long]) {
+    extends AbstractStringConverterDelegateSpec[java.lang.Long,
+                                                jfxuc.LongStringConverter,
+                                                Long,
+                                                LongStringConverter](
+      classOf[jfxuc.LongStringConverter],
+      classOf[LongStringConverter],
+      classOf[Long]) {
 
   val examples = List((0L, "0"),
                       (123L, "123"),

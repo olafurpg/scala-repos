@@ -21,7 +21,11 @@ import cascading.flow.{Flow, FlowDef}
 import com.twitter.algebird._
 import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
-import com.twitter.summingbird.option.{Commutative, NonCommutative, Commutativity}
+import com.twitter.summingbird.option.{
+  Commutative,
+  NonCommutative,
+  Commutativity
+}
 import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
 
 import org.scalacheck._
@@ -33,8 +37,8 @@ import org.scalacheck.Properties
   */
 object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
-  implicit def intersectionArb[T : Arbitrary : Ordering]: Arbitrary[
-      Intersection[InclusiveLower, ExclusiveUpper, T]] =
+  implicit def intersectionArb[T: Arbitrary: Ordering]
+    : Arbitrary[Intersection[InclusiveLower, ExclusiveUpper, T]] =
     Arbitrary {
       for {
         l <- Arbitrary.arbitrary[T]
@@ -68,8 +72,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   implicit def timeExtractor[T <: (Long, Any)] =
     TestUtil.simpleTimeExtractor[T]
 
-  implicit val arbitraryInputWithTimeStampAndBatcher: Arbitrary[(List[
-          (Long, Int)], Batcher, TestStore[Int, Int])] = Arbitrary {
+  implicit val arbitraryInputWithTimeStampAndBatcher: Arbitrary[
+    (List[(Long, Int)], Batcher, TestStore[Int, Int])] = Arbitrary {
     for {
       arbInt <- Arbitrary.arbitrary[List[Int]]
       in = arbInt.zipWithIndex.map {
@@ -90,12 +94,14 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   }
 
   property(
-      "readAfterLastBatch should return interval starting from the last batch written") = {
+    "readAfterLastBatch should return interval starting from the last batch written") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val result =
@@ -103,15 +109,15 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(
-                InclusiveLower(readIntervalLower), ExclusiveUpper(_)),
+              ((Intersection(InclusiveLower(readIntervalLower),
+                             ExclusiveUpper(_)),
                 _),
                _)) => {
-              //readInterval should start from the last written interval in the store
-              val start: Timestamp =
-                batcher.earliestTimeOf(testStore.initBatch.next)
-              implicitly[Ordering[Timestamp]].equiv(readIntervalLower, start)
-            }
+            //readInterval should start from the last written interval in the store
+            val start: Timestamp =
+              batcher.earliestTimeOf(testStore.initBatch.next)
+            implicitly[Ordering[Timestamp]].equiv(readIntervalLower, start)
+          }
           case Right(_) => false
           case Left(_) => interval == Empty()
         }
@@ -119,12 +125,14 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   }
 
   property(
-      "readAfterLastBatch should not extend the end of interval requested") = {
+    "readAfterLastBatch should not extend the end of interval requested") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val result =
@@ -132,14 +140,14 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(
-                InclusiveLower(_), ExclusiveUpper(readIntervalUpper)),
+              ((Intersection(InclusiveLower(_),
+                             ExclusiveUpper(readIntervalUpper)),
                 _),
                _)) => {
-              //readInterval should start from the last written interval in the store
-              implicitly[Ordering[Timestamp]]
-                .lteq(readIntervalUpper, interval.upper.upper)
-            }
+            //readInterval should start from the last written interval in the store
+            implicitly[Ordering[Timestamp]]
+              .lteq(readIntervalUpper, interval.upper.upper)
+          }
           case Right(_) => false
           case Left(_) => interval == Empty()
         }
@@ -149,9 +157,11 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   property("the end of merged interval is never extended") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), commutativity: Commutativity, mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       commutativity: Commutativity, mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val mergeResult = testStore.merge(diskPipeFactory,
@@ -172,7 +182,7 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   }
 
   property(
-      "should not merge if the time interval on disk(from diskPipeFactory) is smaller than one batch") = {
+    "should not merge if the time interval on disk(from diskPipeFactory) is smaller than one batch") = {
     //To test this property, it requires the length of the batcher is at least 2 millis, since we want
     //to create data that fits a batch partially
     def atLeast2MsBatcher(batcher: Batcher): Boolean = {
@@ -183,8 +193,10 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
     }
     forAll {
       (interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), commutativity: Commutativity, mode: Mode) =>
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       commutativity: Commutativity, mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         (atLeast2MsBatcher(batcher)) ==> {
@@ -216,7 +228,7 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
                 val flowToPipe: FlowToPipe[(Int, Int)] = Reader {
                   (fdM: (FlowDef, Mode)) =>
                     TypedPipe.from[(Timestamp, (Int, Int))](
-                        Seq((Timestamp(10), (2, 3))))
+                      Seq((Timestamp(10), (2, 3))))
                 }
                 Right(((readTime, mode), flowToPipe))
               }
@@ -229,13 +241,13 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
           mergeResult match {
             case Left(l) => {
-                l.mkString
-                  .contains("readTimespan is not convering at least one batch")
-                  .label("fail with right reason")
-              }
+              l.mkString
+                .contains("readTimespan is not convering at least one batch")
+                .label("fail with right reason")
+            }
             case Right(_) =>
               false.label(
-                  "should fail when readTimespan is not covering at least one batch")
+                "should fail when readTimespan is not covering at least one batch")
           }
         }
     }

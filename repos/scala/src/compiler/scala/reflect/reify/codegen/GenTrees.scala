@@ -94,12 +94,12 @@ trait GenTrees { self: Reifier =>
         // and about how we deal with splices that contain them
         val isMetalevelBreach =
           splicee exists
-          (sub =>
-                sub.hasSymbolField && sub.symbol != NoSymbol &&
-                sub.symbol.metalevel > 0)
+            (sub =>
+               sub.hasSymbolField && sub.symbol != NoSymbol &&
+                 sub.symbol.metalevel > 0)
         val isRuntimeEval =
           splicee exists
-          (sub => sub.hasSymbolField && sub.symbol == ExprSplice)
+            (sub => sub.hasSymbolField && sub.symbol == ExprSplice)
         if (isMetalevelBreach || isRuntimeEval) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments in `Metalevels`
@@ -113,14 +113,15 @@ trait GenTrees { self: Reifier =>
             case ReifiedTree(_, _, inlinedSymtab, rtree, _, _, _) =>
               if (reifyDebug) println("inlining the splicee")
               // all free vars local to the enclosing reifee should've already been inlined by `Metalevels`
-              for (sym <- inlinedSymtab.syms if sym.isLocalToReifee) abort(
+              for (sym <- inlinedSymtab.syms if sym.isLocalToReifee)
+                abort(
                   "free var local to the reifee, should have already been inlined by Metalevels: " +
-                  inlinedSymtab.symDef(sym))
+                    inlinedSymtab.symDef(sym))
               state.symtab ++= inlinedSymtab
               rtree
             case tree =>
-              val migrated = Apply(
-                  Select(splicee, nme.in), List(Ident(nme.MIRROR_SHORT)))
+              val migrated =
+                Apply(Select(splicee, nme.in), List(Ident(nme.MIRROR_SHORT)))
               Select(migrated, nme.tree)
           }
         }
@@ -139,7 +140,7 @@ trait GenTrees { self: Reifier =>
       case This(qual) =>
         assert(sym != NoSymbol,
                "unexpected: bound term that doesn't have a symbol: " + showRaw(
-                   tree))
+                 tree))
         if (sym.isLocalToReifee) mirrorCall(nme.This, reify(qual))
         else if (sym.isClass && !sym.isModuleClass) {
           if (reifyDebug)
@@ -177,8 +178,8 @@ trait GenTrees { self: Reifier =>
 
       case _ =>
         throw new Error(
-            "internal error: %s (%s, %s) is not supported".format(
-                tree, tree.productPrefix, tree.getClass))
+          "internal error: %s (%s, %s) is not supported"
+            .format(tree, tree.productPrefix, tree.getClass))
     }
   }
 
@@ -188,8 +189,8 @@ trait GenTrees { self: Reifier =>
 
     def reifyBoundType(tree: RefTree): Tree = {
       assert(
-          tpe != null,
-          "unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
+        tpe != null,
+        "unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
 
       // if a symbol or a type of the scrutinee are local to reifee
       // (e.g. point to a locally declared class or to a path-dependent thingie that depends on a variable defined within the reifee)
@@ -201,8 +202,7 @@ trait GenTrees { self: Reifier =>
       else {
         if (reifyDebug)
           println(
-              "reifying bound type %s (underlying type is %s)".format(
-                  sym, tpe))
+            "reifying bound type %s (underlying type is %s)".format(sym, tpe))
 
         if (tpe.isSpliceable) {
           val spliced = spliceType(tpe)
@@ -250,8 +250,8 @@ trait GenTrees { self: Reifier =>
 
       case _ =>
         throw new Error(
-            "internal error: %s (%s, %s) is not supported".format(
-                tree, tree.productPrefix, tree.getClass))
+          "internal error: %s (%s, %s) is not supported"
+            .format(tree, tree.productPrefix, tree.getClass))
     }
   }
 

@@ -28,8 +28,8 @@ import org.apache.hadoop.yarn.util.RackResolver
 import org.apache.spark.SparkConf
 import org.apache.spark.internal.config._
 
-private[yarn] case class ContainerLocalityPreferences(
-    nodes: Array[String], racks: Array[String])
+private[yarn] case class ContainerLocalityPreferences(nodes: Array[String],
+                                                      racks: Array[String])
 
 /**
   * This strategy is calculating the optimal locality preferences of YARN containers by considering
@@ -108,10 +108,10 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
       localityMatchedPendingAllocations: Seq[ContainerRequest]
   ): Array[ContainerLocalityPreferences] = {
     val updatedHostToContainerCount = expectedHostToContainerCount(
-        numLocalityAwareTasks,
-        hostToLocalTaskCount,
-        allocatedHostToContainersMap,
-        localityMatchedPendingAllocations)
+      numLocalityAwareTasks,
+      hostToLocalTaskCount,
+      allocatedHostToContainersMap,
+      localityMatchedPendingAllocations)
     val updatedLocalityAwareContainerNum =
       updatedHostToContainerCount.values.sum
 
@@ -127,7 +127,8 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
     if (requiredLocalityFreeContainerNum > 0) {
       for (i <- 0 until requiredLocalityFreeContainerNum) {
         containerLocalityPreferences += ContainerLocalityPreferences(
-            null.asInstanceOf[Array[String]], null.asInstanceOf[Array[String]])
+          null.asInstanceOf[Array[String]],
+          null.asInstanceOf[Array[String]])
       }
     }
 
@@ -189,7 +190,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
   ): Map[String, Int] = {
     val totalLocalTaskNum = hostToLocalTaskCount.values.sum
     val pendingHostToContainersMap = pendingHostToContainerCount(
-        localityMatchedPendingAllocations)
+      localityMatchedPendingAllocations)
 
     hostToLocalTaskCount.map {
       case (host, count) =>
@@ -198,7 +199,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
         // Take the locality of pending containers into consideration
         val existedCount =
           allocatedHostToContainersMap.get(host).map(_.size).getOrElse(0) +
-          pendingHostToContainersMap.getOrElse(host, 0.0)
+            pendingHostToContainersMap.getOrElse(host, 0.0)
 
         // If existing container can not fully satisfy the expected number of container,
         // the required container number is expected count minus existed count. Otherwise the

@@ -43,7 +43,8 @@ class Parquet346TBaseScheme[T <: TBase[_, _]](
 
     // Use the fixed record converter instead of the one set in super
     ThriftReadSupport.setRecordConverterClass(
-        jobConf, classOf[Parquet346TBaseRecordConverter[_]])
+      jobConf,
+      classOf[Parquet346TBaseRecordConverter[_]])
   }
 }
 
@@ -59,30 +60,32 @@ class Parquet346TBaseRecordConverter[T <: TBase[_, _]](
     requestedParquetSchema: MessageType,
     thriftType: ThriftType.StructType)
     extends ThriftRecordConverter[T](
-        // this is a little confusing because it's all being passed to the super constructor
+      // this is a little confusing because it's all being passed to the super constructor
 
-        // this thrift reader is the same as what's in ScroogeRecordConverter's constructor
-        new ThriftReader[T] {
-          override def readOneRecord(protocol: TProtocol): T = {
-            try {
-              val thriftObject: T = thriftClass.newInstance
-              thriftObject.read(protocol)
-              thriftObject
-            } catch {
-              case e: InstantiationException =>
-                throw new ParquetDecodingException(
-                    "Could not instantiate Thrift " + thriftClass, e)
-              case e: IllegalAccessException =>
-                throw new ParquetDecodingException(
-                    "Thrift class or constructor not public " + thriftClass, e)
-            }
+      // this thrift reader is the same as what's in ScroogeRecordConverter's constructor
+      new ThriftReader[T] {
+        override def readOneRecord(protocol: TProtocol): T = {
+          try {
+            val thriftObject: T = thriftClass.newInstance
+            thriftObject.read(protocol)
+            thriftObject
+          } catch {
+            case e: InstantiationException =>
+              throw new ParquetDecodingException(
+                "Could not instantiate Thrift " + thriftClass,
+                e)
+            case e: IllegalAccessException =>
+              throw new ParquetDecodingException(
+                "Thrift class or constructor not public " + thriftClass,
+                e)
           }
-        },
-        thriftClass.getSimpleName,
-        requestedParquetSchema,
-        // this is the fix -- we add in the missing structOrUnionType metadata
-        // before passing it along
-        Parquet346StructTypeRepairer.repair(thriftType))
+        }
+      },
+      thriftClass.getSimpleName,
+      requestedParquetSchema,
+      // this is the fix -- we add in the missing structOrUnionType metadata
+      // before passing it along
+      Parquet346StructTypeRepairer.repair(thriftType))
 
 /**
   * Takes a ThriftType with potentially missing structOrUnionType metadata,

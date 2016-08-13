@@ -20,8 +20,8 @@ abstract class ComparisonCriteria {
       val header = if (message == null) "" else s"$message: "
 
       val exceptionMessage = if (outer) header else ""
-      val expectedsLength = assertArraysAreSameLength(
-          expecteds, actuals, exceptionMessage)
+      val expectedsLength =
+        assertArraysAreSameLength(expecteds, actuals, exceptionMessage)
 
       for (i <- 0 until expectedsLength) {
         val expected = get(expecteds, i)
@@ -52,14 +52,16 @@ abstract class ComparisonCriteria {
   private def isArray(expected: AnyRef): Boolean =
     expected.isInstanceOf[Array[_]]
 
-  private def assertArraysAreSameLength(
-      expecteds: AnyRef, actuals: AnyRef, header: String): Int = {
+  private def assertArraysAreSameLength(expecteds: AnyRef,
+                                        actuals: AnyRef,
+                                        header: String): Int = {
     if (expecteds == null) Assert.fail(header + "expected array was null")
     if (actuals == null) Assert.fail(header + "actual array was null")
     val actualsLength = actuals.asInstanceOf[Array[_]].length
     val expectedsLength = expecteds.asInstanceOf[Array[_]].length
     if (actualsLength != expectedsLength) {
-      Assert.fail(header + "array lengths differed, expected.length=" +
+      Assert.fail(
+        header + "array lengths differed, expected.length=" +
           expectedsLength + " actual.length=" + actualsLength)
     }
     expectedsLength

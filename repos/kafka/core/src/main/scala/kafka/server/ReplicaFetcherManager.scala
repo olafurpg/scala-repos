@@ -26,12 +26,13 @@ class ReplicaFetcherManager(brokerConfig: KafkaConfig,
                             time: Time,
                             threadNamePrefix: Option[String] = None)
     extends AbstractFetcherManager(
-        "ReplicaFetcherManager on broker " + brokerConfig.brokerId,
-        "Replica",
-        brokerConfig.numReplicaFetchers) {
+      "ReplicaFetcherManager on broker " + brokerConfig.brokerId,
+      "Replica",
+      brokerConfig.numReplicaFetchers) {
 
   override def createFetcherThread(
-      fetcherId: Int, sourceBroker: BrokerEndPoint): AbstractFetcherThread = {
+      fetcherId: Int,
+      sourceBroker: BrokerEndPoint): AbstractFetcherThread = {
     val threadName = threadNamePrefix match {
       case None =>
         "ReplicaFetcherThread-%d-%d".format(fetcherId, sourceBroker.id)

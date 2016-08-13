@@ -12,7 +12,7 @@ object Test extends App {
     @ann(bar = List("1b"))
     class C[@ann(bar = List("2a")) @ann(bar = List("2b")) T](
         @ann(bar = List("3a")) @ann(bar = List("3b")) x: T @ann(
-            bar = List("4a")) @ann(bar = List("4b"))) {
+          bar = List("4a")) @ann(bar = List("4b"))) {
       @ann(bar = List("5a"))
       @ann(bar = List("5b"))
       def f(x: Int @ann(bar = List("6a")) @ann(bar = List("6b"))) = {

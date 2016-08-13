@@ -29,10 +29,10 @@ case class MColumn(table: MQName,
 object MColumn {
   def getColumns(tablePattern: MQName, columnPattern: String) =
     ResultSetAction[MColumn](
-        _.metaData.getColumns(tablePattern.catalog_?,
-                              tablePattern.schema_?,
-                              tablePattern.name,
-                              columnPattern)) { r =>
+      _.metaData.getColumns(tablePattern.catalog_?,
+                            tablePattern.schema_?,
+                            tablePattern.name,
+                            columnPattern)) { r =>
       MColumn(MQName.from(r),
               r.<<,
               r.<<,

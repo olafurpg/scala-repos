@@ -13,7 +13,8 @@ import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsGossipSpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with ImplicitSender
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with ImplicitSender
     with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
@@ -63,12 +64,12 @@ class MetricsGossipSpec
 
       val m2Updated =
         m2 copy
-        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
       val g2 = g1 :+ m2Updated // merge peers
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(
-          Some(m2Updated.metrics))
+        Some(m2Updated.metrics))
       g2.nodes collect {
         case peer if peer.address == m2.address ⇒
           peer.timestamp should ===(m2Updated.timestamp)
@@ -87,7 +88,7 @@ class MetricsGossipSpec
                            collector.sample.metrics)
       val m2Updated =
         m2 copy
-        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       val g2 = MetricsGossip.empty :+ m3 :+ m2Updated
@@ -97,16 +98,16 @@ class MetricsGossipSpec
       // should contain nodes 1,3, and the most recent version of 2
       val mergedGossip = g1 merge g2
       mergedGossip.nodes.map(_.address) should ===(
-          Set(m1.address, m2.address, m3.address))
+        Set(m1.address, m2.address, m3.address))
       mergedGossip.nodeMetricsFor(m1.address).map(_.metrics) should ===(
-          Some(m1.metrics))
+        Some(m1.metrics))
       mergedGossip.nodeMetricsFor(m2.address).map(_.metrics) should ===(
-          Some(m2Updated.metrics))
+        Some(m2Updated.metrics))
       mergedGossip.nodeMetricsFor(m3.address).map(_.metrics) should ===(
-          Some(m3.metrics))
+        Some(m3.metrics))
       mergedGossip.nodes.foreach(_.metrics.size should be > (3))
       mergedGossip.nodeMetricsFor(m2.address).map(_.timestamp) should ===(
-          Some(m2Updated.timestamp))
+        Some(m2Updated.timestamp))
     }
 
     "get the current NodeMetrics if it exists in the local nodes" in {

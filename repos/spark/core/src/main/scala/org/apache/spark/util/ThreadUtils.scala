@@ -20,7 +20,10 @@ package org.apache.spark.util
 import java.util.concurrent._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import scala.concurrent.forkjoin.{ForkJoinPool => SForkJoinPool, ForkJoinWorkerThread => SForkJoinWorkerThread}
+import scala.concurrent.forkjoin.{
+  ForkJoinPool => SForkJoinPool,
+  ForkJoinWorkerThread => SForkJoinWorkerThread
+}
 import scala.util.control.NonFatal
 
 import com.google.common.util.concurrent.{MoreExecutors, ThreadFactoryBuilder}
@@ -68,12 +71,12 @@ private[spark] object ThreadUtils {
       keepAliveSeconds: Int = 60): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
     val threadPool = new ThreadPoolExecutor(
-        maxThreadNumber, // corePoolSize: the max number of threads to create before queuing the tasks
-        maxThreadNumber, // maximumPoolSize: because we use LinkedBlockingDeque, this one is not used
-        keepAliveSeconds,
-        TimeUnit.SECONDS,
-        new LinkedBlockingQueue[Runnable],
-        threadFactory)
+      maxThreadNumber, // corePoolSize: the max number of threads to create before queuing the tasks
+      maxThreadNumber, // maximumPoolSize: because we use LinkedBlockingDeque, this one is not used
+      keepAliveSeconds,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue[Runnable],
+      threadFactory)
     threadPool.allowCoreThreadTimeOut(true)
     threadPool
   }
@@ -82,8 +85,8 @@ private[spark] object ThreadUtils {
     * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
     * unique, sequentially assigned integer.
     */
-  def newDaemonFixedThreadPool(
-      nThreads: Int, prefix: String): ThreadPoolExecutor = {
+  def newDaemonFixedThreadPool(nThreads: Int,
+                               prefix: String): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
     Executors
       .newFixedThreadPool(nThreads, threadFactory)
@@ -160,15 +163,15 @@ private[spark] object ThreadUtils {
 
         // Remove the part of the new thread stack that shows methods call from this helper method
         val extraStackTrace = realException.getStackTrace.takeWhile(
-            !_.getClassName.contains(this.getClass.getSimpleName))
+          !_.getClassName.contains(this.getClass.getSimpleName))
 
         // Combine the two stack traces, with a place holder just specifying that there
         // was a helper method used, without any further details of the helper
         val placeHolderStackElem = new StackTraceElement(
-            s"... run in separate thread using ${ThreadUtils.getClass.getName.stripSuffix("$")} ..",
-            " ",
-            "",
-            -1)
+          s"... run in separate thread using ${ThreadUtils.getClass.getName.stripSuffix("$")} ..",
+          " ",
+          "",
+          -1)
         val finalStackTrace =
           extraStackTrace ++ Seq(placeHolderStackElem) ++ baseStackTrace
 

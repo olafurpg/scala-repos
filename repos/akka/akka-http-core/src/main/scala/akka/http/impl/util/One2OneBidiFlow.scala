@@ -16,10 +16,11 @@ import akka.stream.stage.{OutHandler, InHandler, GraphStageLogic, GraphStage}
 private[http] object One2OneBidiFlow {
 
   case class UnexpectedOutputException(element: Any)
-      extends RuntimeException(element.toString) with NoStackTrace
+      extends RuntimeException(element.toString)
+      with NoStackTrace
   case object OutputTruncationException
       extends RuntimeException(
-          "Inner stream finished before inputs completed. Outputs might have been truncated.")
+        "Inner stream finished before inputs completed. Outputs might have been truncated.")
       with NoStackTrace
 
   /**

@@ -19,15 +19,18 @@ class ConstraintTest extends MarathonSpec with Matchers {
       assert(value == constraint.getValue)
     }
 
-    shouldMatch(
-        """["hostname","UNIQUE"]""", "hostname", Constraint.Operator.UNIQUE)
+    shouldMatch("""["hostname","UNIQUE"]""",
+                "hostname",
+                Constraint.Operator.UNIQUE)
     shouldMatch("""["rackid","GROUP_BY","1"]""",
                 "rackid",
                 Constraint.Operator.GROUP_BY,
                 "1")
     shouldMatch("""["jdk","LIKE","7"]""", "jdk", Constraint.Operator.LIKE, "7")
-    shouldMatch(
-        """["jdk","UNLIKE","7"]""", "jdk", Constraint.Operator.UNLIKE, "7")
+    shouldMatch("""["jdk","UNLIKE","7"]""",
+                "jdk",
+                Constraint.Operator.UNLIKE,
+                "7")
   }
 
   test("Read should allow only valid Constraints (regression for #2951)") {
@@ -35,28 +38,29 @@ class ConstraintTest extends MarathonSpec with Matchers {
     Json.parse("""[]""").asOpt[Constraint] should be(empty)
     Json.parse("""["foo", "UNKNOWN"]""").asOpt[Constraint] should be(empty)
     Json.parse("""["foo", "UNKNOWN", "bla"]""").asOpt[Constraint] should be(
-        empty)
+      empty)
     Json.parse("""["foo", "CLUSTER", "bla"]""").asOpt[Constraint] should be(
-        defined)
-    Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").asOpt[Constraint] should be(
-        empty)
+      defined)
+    Json
+      .parse("""["foo", "CLUSTER", "bla", "bla2"]""")
+      .asOpt[Constraint] should be(empty)
     val ex = intercept[JsResultException](
-        Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").as[Constraint])
+      Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").as[Constraint])
     ex.errors should have size 1
     ex.errors.head._2 should have size 1
     ex.errors.head._2.head.messages.head should startWith(
-        "Constraint definition must be an array of string")
+      "Constraint definition must be an array of string")
   }
 
   test(
-      "Read should give a nice validation error for unknown operators (regression for #3161)") {
+    "Read should give a nice validation error for unknown operators (regression for #3161)") {
     import mesosphere.marathon.api.v2.json.Formats._
     val ex = intercept[JsResultException](
-        Json.parse("""["foo", "unique"]""").as[Constraint])
+      Json.parse("""["foo", "unique"]""").as[Constraint])
     ex.errors should have size 1
     ex.errors.head._2 should have size 1
     ex.errors.head._2.head.messages.head should startWith(
-        "Constraint operator must be one of the following")
+      "Constraint operator must be one of the following")
   }
 
   test("Serialize") {

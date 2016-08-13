@@ -42,18 +42,18 @@ class TraversableOnceTest {
   }
 
   // Ensure that it always returns the first match if more than one element have the same largest/smallest f(x).
-  // Note that this behavior is not explicitly stated before. 
+  // Note that this behavior is not explicitly stated before.
   // To make it compatible with the previous implementation, I add this behavior to docs.
   @Test
   def testReturnTheFirstMatch() = {
     val d = List(1, 2, 3, 4, 5, 6, 7, 8)
     def f(x: Int) = x % 3;
     assert(
-        d.maxBy(f) == 2,
-        "If multiple elements evaluated to the largest value, maxBy should return the first one.")
+      d.maxBy(f) == 2,
+      "If multiple elements evaluated to the largest value, maxBy should return the first one.")
     assert(
-        d.minBy(f) == 3,
-        "If multiple elements evaluated to the largest value, minBy should return the first one.")
+      d.minBy(f) == 3,
+      "If multiple elements evaluated to the largest value, minBy should return the first one.")
   }
 
   // Make sure it evaluates f no more than list.length times.
@@ -61,26 +61,22 @@ class TraversableOnceTest {
   def testOnlyEvaluateOnce() = {
     var evaluatedCountOfMaxBy = 0
 
-    val max = list.maxBy(
-        x =>
-          {
-        evaluatedCountOfMaxBy += 1
-        x * 10
+    val max = list.maxBy(x => {
+      evaluatedCountOfMaxBy += 1
+      x * 10
     })
     assert(
-        evaluatedCountOfMaxBy == list.length,
-        s"maxBy: should evaluate f only ${list.length} times, but it evaluated $evaluatedCountOfMaxBy times.")
+      evaluatedCountOfMaxBy == list.length,
+      s"maxBy: should evaluate f only ${list.length} times, but it evaluated $evaluatedCountOfMaxBy times.")
 
     var evaluatedCountOfMinBy = 0
 
-    val min = list.minBy(
-        x =>
-          {
-        evaluatedCountOfMinBy += 1
-        x * 10
+    val min = list.minBy(x => {
+      evaluatedCountOfMinBy += 1
+      x * 10
     })
     assert(
-        evaluatedCountOfMinBy == list.length,
-        s"minBy: should evaluate f only ${list.length} times, but it evaluated $evaluatedCountOfMinBy times.")
+      evaluatedCountOfMinBy == list.length,
+      s"minBy: should evaluate f only ${list.length} times, but it evaluated $evaluatedCountOfMinBy times.")
   }
 }

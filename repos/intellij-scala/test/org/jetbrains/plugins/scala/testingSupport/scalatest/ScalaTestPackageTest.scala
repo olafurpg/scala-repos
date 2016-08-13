@@ -51,10 +51,10 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
   def testPackageTestRun(): Unit = {
     addFiles()
     runTestByConfig(
-        createTestFromPackage(packageName),
-        checkPackageConfigAndSettings(_, packageName),
-        root =>
-          checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
+      createTestFromPackage(packageName),
+      checkPackageConfigAndSettings(_, packageName),
+      root =>
+        checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
           checkResultTreeHasExactNamedPath(root, "[root]", "Test2", "Test2") &&
           checkResultTreeDoesNotHaveNodes(root, "SecondTest"))
   }
@@ -62,13 +62,14 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
   def testModuleTestRun(): Unit = {
     addFiles()
     runTestByConfig(
-        createTestFromModule(testClassName),
-        checkPackageConfigAndSettings(
-            _, generatedName = "ScalaTests in 'src'"),
-        root =>
-          checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
+      createTestFromModule(testClassName),
+      checkPackageConfigAndSettings(_, generatedName = "ScalaTests in 'src'"),
+      root =>
+        checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
           checkResultTreeHasExactNamedPath(root, "[root]", "Test2", "Test2") &&
-          checkResultTreeHasExactNamedPath(
-              root, "[root]", "Test1", "SecondTest"))
+          checkResultTreeHasExactNamedPath(root,
+                                           "[root]",
+                                           "Test1",
+                                           "SecondTest"))
   }
 }

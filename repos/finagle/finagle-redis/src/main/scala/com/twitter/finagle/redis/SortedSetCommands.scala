@@ -12,8 +12,8 @@ trait SortedSets { self: BaseClient =>
   private[this] def parseMBulkReply(
       withScores: JBoolean
   ): PartialFunction[Reply, Future[Either[ZRangeResults, Seq[ChannelBuffer]]]] = {
-    val parse: PartialFunction[
-        Reply, Either[ZRangeResults, Seq[ChannelBuffer]]] = {
+    val parse: PartialFunction[Reply,
+                               Either[ZRangeResults, Seq[ChannelBuffer]]] = {
       case MBulkReply(messages) => withScoresHelper(withScores)(messages)
       case EmptyMBulkReply() => withScoresHelper(withScores)(Nil)
     }
@@ -75,8 +75,9 @@ trait SortedSets { self: BaseClient =>
     * @param max
     * @return Number of elements between min and max in sorted set
     */
-  def zCount(
-      key: ChannelBuffer, min: ZInterval, max: ZInterval): Future[JLong] =
+  def zCount(key: ChannelBuffer,
+             min: ZInterval,
+             max: ZInterval): Future[JLong] =
     doRequest(ZCount(key, min, max)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -95,7 +96,7 @@ trait SortedSets { self: BaseClient =>
       limit: Option[Limit]
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(
-        ZRangeByScore(key, min, max, WithScores.option(withScores), limit)
+      ZRangeByScore(key, min, max, WithScores.option(withScores), limit)
     )(parseMBulkReply(withScores))
 
   /**
@@ -122,7 +123,7 @@ trait SortedSets { self: BaseClient =>
       withScores: JBoolean
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(ZRevRange(key, start, stop, WithScores.option(withScores)))(
-        parseMBulkReply(withScores)
+      parseMBulkReply(withScores)
     )
 
   /**
@@ -140,8 +141,8 @@ trait SortedSets { self: BaseClient =>
       limit: Option[Limit]
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
     doRequest(
-        ZRevRangeByScore(key, max, min, WithScores.option(withScores), limit))(
-        parseMBulkReply(withScores)
+      ZRevRangeByScore(key, max, min, WithScores.option(withScores), limit))(
+      parseMBulkReply(withScores)
     )
 
   /**
@@ -149,8 +150,8 @@ trait SortedSets { self: BaseClient =>
     * @param key, member
     * @return Score of member
     */
-  def zScore(
-      key: ChannelBuffer, member: ChannelBuffer): Future[Option[JDouble]] =
+  def zScore(key: ChannelBuffer,
+             member: ChannelBuffer): Future[Option[JDouble]] =
     doRequest(ZScore(key, member)) {
       case BulkReply(message) =>
         Future.value(Some(NumberFormat.toDouble(BytesToString(message.array))))
@@ -163,8 +164,8 @@ trait SortedSets { self: BaseClient =>
     * @param member
     * @return the rank of the member
     */
-  def zRevRank(
-      key: ChannelBuffer, member: ChannelBuffer): Future[Option[JLong]] =
+  def zRevRank(key: ChannelBuffer,
+               member: ChannelBuffer): Future[Option[JLong]] =
     doRequest(ZRevRank(key, member)) {
       case IntegerReply(n) => Future.value(Some(n))
       case EmptyBulkReply() => Future.value(None)
@@ -207,8 +208,9 @@ trait SortedSets { self: BaseClient =>
     * @param stop
     * @return Number of members removed from sorted set.
     */
-  def zRemRangeByRank(
-      key: ChannelBuffer, start: JLong, stop: JLong): Future[JLong] =
+  def zRemRangeByRank(key: ChannelBuffer,
+                      start: JLong,
+                      stop: JLong): Future[JLong] =
     doRequest(ZRemRangeByRank(key, start, stop)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -220,8 +222,9 @@ trait SortedSets { self: BaseClient =>
     * @param max
     * @return Number of members removed from sorted set.
     */
-  def zRemRangeByScore(
-      key: ChannelBuffer, min: ZInterval, max: ZInterval): Future[JLong] =
+  def zRemRangeByScore(key: ChannelBuffer,
+                       min: ZInterval,
+                       max: ZInterval): Future[JLong] =
     doRequest(ZRemRangeByScore(key, min, max)) {
       case IntegerReply(n) => Future.value(n)
     }

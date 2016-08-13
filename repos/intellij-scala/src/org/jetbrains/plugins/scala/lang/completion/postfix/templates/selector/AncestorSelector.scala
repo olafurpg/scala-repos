@@ -10,7 +10,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockExpr, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScBlockExpr,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 
 /**
@@ -34,12 +38,12 @@ class AncestorSelector(val condition: Condition[PsiElement],
         val result = ContainerUtil.newLinkedList[PsiElement](element)
         var current: PsiElement = element.getParent
         while (current != null && current.getTextRange != null &&
-        current.getTextRange.getEndOffset <= offset &&
-        (selectorType match {
-              case All => true
-              case Topmost => current.isInstanceOf[ScExpression]
-              case First => false
-            })) {
+               current.getTextRange.getEndOffset <= offset &&
+               (selectorType match {
+                 case All => true
+                 case Topmost => current.isInstanceOf[ScExpression]
+                 case First => false
+               })) {
           result.add(current)
           current = current.getParent
         }

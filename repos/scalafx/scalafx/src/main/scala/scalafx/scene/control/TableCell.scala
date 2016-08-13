@@ -44,7 +44,8 @@ object TableCell {
   */
 class TableCell[S, T](
     override val delegate: jfxsc.TableCell[S, T] = new jfxsc.TableCell[S, T]())
-    extends IndexedCell[T] with SFXDelegate[jfxsc.TableCell[S, T]] {
+    extends IndexedCell[T]
+    with SFXDelegate[jfxsc.TableCell[S, T]] {
 
   /**
     * The TableColumn instance that backs this TableCell.

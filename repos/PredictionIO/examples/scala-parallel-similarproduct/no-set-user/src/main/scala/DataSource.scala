@@ -16,8 +16,10 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -27,8 +29,8 @@ class DataSource(val dsp: DataSourceParams)
     // create a RDD of (entityID, Item)
     val itemsRDD: RDD[(String, Item)] = eventsDb
       .aggregateProperties(
-          appId = dsp.appId,
-          entityType = "item"
+        appId = dsp.appId,
+        entityType = "item"
       )(sc)
       .map {
         case (entityId, properties) =>
@@ -37,10 +39,11 @@ class DataSource(val dsp: DataSourceParams)
             Item(categories = properties.getOpt[List[String]]("categories"))
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" item ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(
+                s"Failed to get properties ${properties} of" +
+                  s" item ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
           (entityId, item)
       }
@@ -66,18 +69,19 @@ class DataSource(val dsp: DataSourceParams)
           }
         } catch {
           case e: Exception => {
-              logger.error(s"Cannot convert ${event} to ViewEvent." +
-                  s" Exception: ${e}.")
-              throw e
-            }
+            logger.error(
+              s"Cannot convert ${event} to ViewEvent." +
+                s" Exception: ${e}.")
+            throw e
+          }
         }
         viewEvent
       }
       .cache()
 
     new TrainingData(
-        items = itemsRDD,
-        viewEvents = viewEventsRDD
+      items = itemsRDD,
+      viewEvents = viewEventsRDD
     )
   }
 }
@@ -89,10 +93,9 @@ case class ViewEvent(user: String, item: String, t: Long)
 class TrainingData(
     val items: RDD[(String, Item)],
     val viewEvents: RDD[ViewEvent]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"items: [${items.count()} (${items.take(2).toList}...)]" +
-    s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
+      s"viewEvents: [${viewEvents.count()}] (${viewEvents.take(2).toList}...)"
   }
 }

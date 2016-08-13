@@ -1,11 +1,19 @@
 package org.jetbrains.plugins.scala
 package debugger.ui
 
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContext, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException,
+  EvaluationContext,
+  EvaluationContextImpl
+}
 import com.intellij.debugger.engine.{DebugProcess, DebugProcessImpl}
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptor, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode,
+  NodeDescriptor,
+  ValueDescriptor
+}
 import com.intellij.debugger.{DebuggerBundle, DebuggerContext}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
@@ -51,10 +59,11 @@ class RuntimeRefRenderer extends NodeRendererImpl {
   }
 
   override def getChildValueExpression(
-      node: DebuggerTreeNode, context: DebuggerContext): PsiElement = {
+      node: DebuggerTreeNode,
+      context: DebuggerContext): PsiElement = {
     val descr = unwrappedDescriptor(
-        node.getParent.asInstanceOf[ValueDescriptor].getValue,
-        context.getProject)
+      node.getParent.asInstanceOf[ValueDescriptor].getValue,
+      context.getProject)
     val renderer = autoRenderer(context.getDebugProcess, descr)
     renderer.getChildValueExpression(node, context)
   }
@@ -62,15 +71,15 @@ class RuntimeRefRenderer extends NodeRendererImpl {
   override def calcLabel(descriptor: ValueDescriptor,
                          evaluationContext: EvaluationContext,
                          listener: DescriptorLabelListener): String = {
-    val unwrapped = unwrappedDescriptor(
-        descriptor.getValue, evaluationContext.getProject)
+    val unwrapped =
+      unwrappedDescriptor(descriptor.getValue, evaluationContext.getProject)
     autoRenderer(evaluationContext.getDebugProcess, unwrapped) match {
       case toStr: ToStringRenderer =>
         calcToStringLabel(
-            descriptor,
-            unwrapped.getValue,
-            evaluationContext.createEvaluationContext(unwrapped.getValue),
-            listener)
+          descriptor,
+          unwrapped.getValue,
+          evaluationContext.createEvaluationContext(unwrapped.getValue),
+          listener)
       case r =>
         r.calcLabel(unwrapped, evaluationContext, listener)
     }
@@ -81,8 +90,8 @@ class RuntimeRefRenderer extends NodeRendererImpl {
     autoRenderer(process, descr).getIdLabel(descr.getValue, process)
   }
 
-  private def autoRenderer(
-      debugProcess: DebugProcess, valueDescriptor: ValueDescriptor) = {
+  private def autoRenderer(debugProcess: DebugProcess,
+                           valueDescriptor: ValueDescriptor) = {
     debugProcess
       .asInstanceOf[DebugProcessImpl]
       .getAutoRenderer(valueDescriptor)
@@ -127,8 +136,8 @@ class RuntimeRefRenderer extends NodeRendererImpl {
           val msg: String =
             if (value != null)
               message + " " + DebuggerBundle.message(
-                  "evaluation.error.cannot.evaluate.tostring",
-                  value.`type`.name)
+                "evaluation.error.cannot.evaluate.tostring",
+                value.`type`.name)
             else message
           valueDescriptor.setValueLabelFailed(new EvaluateException(msg, null))
           labelListener.labelChanged()

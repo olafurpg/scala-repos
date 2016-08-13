@@ -89,8 +89,9 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
           if (noMoreData) ReadFrameHeader
           else new ReadData(length - thisFrameData.length)
 
-        ParseResult(
-            Some(FrameStart(header, thisFrameData.compact)), nextState, true)
+        ParseResult(Some(FrameStart(header, thisFrameData.compact)),
+                    nextState,
+                    true)
       }
     }
 
@@ -100,13 +101,14 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
       override def parse(reader: ByteReader): ParseResult[FrameEvent] =
         if (reader.remainingSize < remaining) {
           remaining -= reader.remainingSize
-          ParseResult(
-              Some(FrameData(reader.takeAll(), lastPart = false)), this, true)
+          ParseResult(Some(FrameData(reader.takeAll(), lastPart = false)),
+                      this,
+                      true)
         } else {
           ParseResult(
-              Some(FrameData(reader.take(remaining.toInt), lastPart = true)),
-              ReadFrameHeader,
-              true)
+            Some(FrameData(reader.take(remaining.toInt), lastPart = true)),
+            ReadFrameHeader,
+            true)
         }
     }
   }
@@ -135,8 +137,8 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
   def parseCloseCode(data: ByteString): Option[(Int, String)] = {
     def invalid(reason: String) =
       Some(
-          (Protocol.CloseCodes.ProtocolError,
-           s"Peer sent illegal close frame ($reason)."))
+        (Protocol.CloseCodes.ProtocolError,
+         s"Peer sent illegal close frame ($reason)."))
 
     if (data.length >= 2) {
       val code = ((data(0) & 0xff) << 8) | (data(1) & 0xff)

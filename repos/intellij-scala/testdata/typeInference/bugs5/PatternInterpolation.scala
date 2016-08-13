@@ -7,7 +7,8 @@ class TestRegex {
 
   "text" match {
     case g"$a + $b + ${ c: String }" =>
-      /*start*/ (a, b, c) /*end*/
+      /*start*/
+      (a, b, c) /*end*/
   }
 }
 //(String, String, String)

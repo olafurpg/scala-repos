@@ -89,32 +89,38 @@ class HoconLexer extends LexerBase {
   val notSubstitution = isAnyOf(Initial, Value)
 
   val matchers = List(
-      WhitespaceMatcher,
-      new RegexTokenMatcher("""\$""".r, Dollar, always, onDollar),
-      new LiteralTokenMatcher(
-          "{", SubLBrace, isAnyOf(SubStarting), forceState(SubStarted)),
-      new LiteralTokenMatcher(
-          "?", QMark, isAnyOf(SubStarted), forceState(Substitution)),
-      new LiteralTokenMatcher("}",
-                              SubRBrace,
-                              isAnyOf(SubStarted, Substitution),
-                              forceState(Value)),
-      new LiteralTokenMatcher("{", LBrace, always, forceState(Initial)),
-      new LiteralTokenMatcher("}", RBrace, always, forceState(Value)),
-      new LiteralTokenMatcher("[", LBracket, always, forceState(Initial)),
-      new LiteralTokenMatcher("]", RBracket, always, forceState(Value)),
-      new LiteralTokenMatcher(":", Colon, always, forceState(Initial)),
-      new LiteralTokenMatcher(",", Comma, always, forceState(Initial)),
-      new LiteralTokenMatcher("=", Equals, always, forceState(Initial)),
-      new LiteralTokenMatcher("+=", PlusEquals, always, forceState(Initial)),
-      new LiteralTokenMatcher(".", Period, always, onContents),
-      new RegexTokenMatcher("""#[^\n]*""".r, HashComment, always, identity),
-      new RegexTokenMatcher(
-          """//[^\n]*""".r, DoubleSlashComment, always, identity),
-      UnquotedCharsMatcher,
-      MultilineStringMatcher,
-      QuotedStringMatcher,
-      new RegexTokenMatcher(".".r, BadCharacter, always, identity)
+    WhitespaceMatcher,
+    new RegexTokenMatcher("""\$""".r, Dollar, always, onDollar),
+    new LiteralTokenMatcher("{",
+                            SubLBrace,
+                            isAnyOf(SubStarting),
+                            forceState(SubStarted)),
+    new LiteralTokenMatcher("?",
+                            QMark,
+                            isAnyOf(SubStarted),
+                            forceState(Substitution)),
+    new LiteralTokenMatcher("}",
+                            SubRBrace,
+                            isAnyOf(SubStarted, Substitution),
+                            forceState(Value)),
+    new LiteralTokenMatcher("{", LBrace, always, forceState(Initial)),
+    new LiteralTokenMatcher("}", RBrace, always, forceState(Value)),
+    new LiteralTokenMatcher("[", LBracket, always, forceState(Initial)),
+    new LiteralTokenMatcher("]", RBracket, always, forceState(Value)),
+    new LiteralTokenMatcher(":", Colon, always, forceState(Initial)),
+    new LiteralTokenMatcher(",", Comma, always, forceState(Initial)),
+    new LiteralTokenMatcher("=", Equals, always, forceState(Initial)),
+    new LiteralTokenMatcher("+=", PlusEquals, always, forceState(Initial)),
+    new LiteralTokenMatcher(".", Period, always, onContents),
+    new RegexTokenMatcher("""#[^\n]*""".r, HashComment, always, identity),
+    new RegexTokenMatcher("""//[^\n]*""".r,
+                          DoubleSlashComment,
+                          always,
+                          identity),
+    UnquotedCharsMatcher,
+    MultilineStringMatcher,
+    QuotedStringMatcher,
+    new RegexTokenMatcher(".".r, BadCharacter, always, identity)
   )
 
   def isHoconWhitespace(char: Char) =
@@ -143,8 +149,10 @@ class HoconLexer extends LexerBase {
               case _ => drain(offset + 1, escaping = false)
             }
           } else offset
-        Some(TokenMatch(
-                QuotedString, drain(1, escaping = false), onContents(state)))
+        Some(
+          TokenMatch(QuotedString,
+                     drain(1, escaping = false),
+                     onContents(state)))
       } else None
   }
 

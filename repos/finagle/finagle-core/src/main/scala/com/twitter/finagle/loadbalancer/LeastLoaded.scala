@@ -1,6 +1,12 @@
 package com.twitter.finagle.loadbalancer
 
-import com.twitter.finagle.{ClientConnection, Service, ServiceFactory, ServiceFactoryProxy, ServiceProxy}
+import com.twitter.finagle.{
+  ClientConnection,
+  Service,
+  ServiceFactory,
+  ServiceFactoryProxy,
+  ServiceProxy
+}
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.Rng
@@ -17,7 +23,8 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
   protected case class Node(factory: ServiceFactory[Req, Rep],
                             counter: AtomicInteger,
                             token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+      extends ServiceFactoryProxy[Req, Rep](factory)
+      with NodeT[Req, Rep] {
 
     type This = Node
 
@@ -28,8 +35,7 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
       counter.incrementAndGet()
       super.apply(conn).transform {
         case Return(svc) =>
-          Future.value(
-              new ServiceProxy(svc) {
+          Future.value(new ServiceProxy(svc) {
             override def close(deadline: Time) =
               super.close(deadline).ensure {
                 counter.decrementAndGet()
@@ -43,8 +49,8 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
     }
   }
 
-  protected def newNode(
-      factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver) =
+  protected def newNode(factory: ServiceFactory[Req, Rep],
+                        statsReceiver: StatsReceiver) =
     Node(factory, new AtomicInteger(0), rng.nextInt())
 
   private[this] val failingLoad = new AtomicInteger(0)

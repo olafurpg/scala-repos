@@ -20,16 +20,16 @@ object NegativeCompilation {
 
   implicit class listops(list: List[String]) {
     def mustStartWith(prefixes: List[String]) = {
-      assert(list.length == prefixes.size,
-             ("expected = " + prefixes.length + ", actual = " + list.length,
-              list))
+      assert(
+        list.length == prefixes.size,
+        ("expected = " + prefixes.length + ", actual = " + list.length, list))
       list.zip(prefixes).foreach {
         case (el, prefix) => el mustStartWith prefix
       }
     }
   }
 
-  def intercept[T <: Throwable : ClassTag](body: => Any): T = {
+  def intercept[T <: Throwable: ClassTag](body: => Any): T = {
     try {
       body
       throw new Exception(s"Exception of type ${classTag[T]} was not thrown")
@@ -69,7 +69,7 @@ object NegativeCompilation {
     val f0 =
       new java.io.File(s"core/target/scala-${scalaBinaryVersion}/classes")
     val f1 = new java.io.File(
-        s"test-util/target/scala-${scalaBinaryVersion}/test-classes")
+      s"test-util/target/scala-${scalaBinaryVersion}/test-classes")
     val fs = Vector(f0, f1)
     fs foreach { f =>
       if (!f.exists)
@@ -85,10 +85,10 @@ object NegativeCompilation {
     else ""
   }
 
-  def expectError(
-      errorSnippet: String,
-      compileOptions: String = "",
-      baseCompileOptions: String = s"-cp ${toolboxClasspath}${quasiquotesJar}")(
+  def expectError(errorSnippet: String,
+                  compileOptions: String = "",
+                  baseCompileOptions: String =
+                    s"-cp ${toolboxClasspath}${quasiquotesJar}")(
       code: String) {
     intercept[ToolBoxError] {
       eval(code, compileOptions + " " + baseCompileOptions)

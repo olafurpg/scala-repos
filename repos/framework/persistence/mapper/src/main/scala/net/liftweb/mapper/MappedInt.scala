@@ -35,8 +35,8 @@ import js._
   * See https://issues.scala-lang.org/browse/SI-3687 for details
   */
 abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
-    val fieldOwner: T, val enum: ENUM)(
-    implicit val manifest: TypeTag[ENUM#Value])
+    val fieldOwner: T,
+    val enum: ENUM)(implicit val manifest: TypeTag[ENUM#Value])
     extends MappedField[ENUM#Value, T] {
   private var data: ENUM#Value = defaultValue
   private var orgData: ENUM#Value = defaultValue
@@ -154,36 +154,37 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
-          f.st(if (v eq null) defaultValue
-              else fromInt(Helpers.toInt(v.toString)))
+          f.st(
+            if (v eq null) defaultValue
+            else fromInt(Helpers.toInt(v.toString)))
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
           f.st(if (isNull) defaultValue else fromInt(v.toInt))
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
           f.st(if (v eq null) defaultValue else fromInt(Helpers.toInt(v)))
       })
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
           f.st(if (v eq null) defaultValue else fromInt(Helpers.toInt(v)))
       })
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] => f.st(defaultValue)
@@ -223,13 +224,14 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     else
      */
     Full(
-        SHtml.selectObj[Int](buildDisplayList,
-                             Full(toInt),
-                             v => this.set(fromInt(v))))
+      SHtml.selectObj[Int](buildDisplayList,
+                           Full(toInt),
+                           v => this.set(fromInt(v))))
 }
 
 abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
-    extends MappedInt[T](owner) with IndexedField[Int] {
+    extends MappedInt[T](owner)
+    with IndexedField[Int] {
 
   override def writePermission_? = false // not writable
 
@@ -276,8 +278,8 @@ abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
     }
   }
 
-  override def fieldCreatorString(
-      dbType: DriverType, colName: String): String =
+  override def fieldCreatorString(dbType: DriverType,
+                                  colName: String): String =
     colName + " " + dbType.integerIndexColumnType + notNullAppender()
 }
 
@@ -393,30 +395,31 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
     orgData = in
   }
 
-  def buildSetActualValue(
-      accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
+  def buildSetActualValue(accessor: Method,
+                          v: AnyRef,
+                          columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedInt[T] => f.st(if (isNull) 0 else v.toInt)
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedInt[T] => f.st(if (isNull || !v) 0 else 1)

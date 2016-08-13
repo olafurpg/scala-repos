@@ -42,21 +42,21 @@ object Play {
    * declaring a factory in order to yield a parser of a specific type.
    */
   private[play] val xercesSaxParserFactory = SAXParserFactory.newInstance(
-      "org.apache.xerces.jaxp.SAXParserFactoryImpl",
-      Play.getClass.getClassLoader)
+    "org.apache.xerces.jaxp.SAXParserFactoryImpl",
+    Play.getClass.getClassLoader)
   xercesSaxParserFactory.setFeature(
-      Constants.SAX_FEATURE_PREFIX +
+    Constants.SAX_FEATURE_PREFIX +
       Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
-      false)
+    false)
   xercesSaxParserFactory.setFeature(
-      Constants.SAX_FEATURE_PREFIX +
+    Constants.SAX_FEATURE_PREFIX +
       Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
-      false)
+    false)
   xercesSaxParserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                                    Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                                      Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
                                     true)
-  xercesSaxParserFactory.setFeature(
-      XMLConstants.FEATURE_SECURE_PROCESSING, true)
+  xercesSaxParserFactory
+    .setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 
   /*
    * A parser to be used that is configured to ensure that no schemas are loaded.
@@ -77,8 +77,8 @@ object Play {
     *
     * @deprecated This is a static reference to application, use DI, since 2.5.0
     */
-  @deprecated(
-      "This is a static reference to application, use DI instead", "2.5.0")
+  @deprecated("This is a static reference to application, use DI instead",
+              "2.5.0")
   def maybeApplication: Option[Application] = Option(_currentApp)
 
   private[play] def privateMaybeApplication: Option[Application] =
@@ -95,11 +95,11 @@ object Play {
     *
     * @deprecated This is a static reference to application, use DI, since 2.5.0
     */
-  @deprecated(
-      "This is a static reference to application, use DI instead", "2.5.0")
+  @deprecated("This is a static reference to application, use DI instead",
+              "2.5.0")
   implicit def current: Application =
     privateMaybeApplication.getOrElse(
-        sys.error("There is no started application"))
+      sys.error("There is no started application"))
 
   @volatile private[play] var _currentApp: Application = _
 

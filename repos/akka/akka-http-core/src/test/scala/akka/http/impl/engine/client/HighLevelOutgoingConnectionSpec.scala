@@ -18,7 +18,7 @@ import org.scalatest.concurrent.ScalaFutures
 
 class HighLevelOutgoingConnectionSpec extends AkkaSpec {
   implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system).withFuzzing(true))
+    ActorMaterializerSettings(system).withFuzzing(true))
 
   "The connection-level client implementation" should {
 
@@ -27,12 +27,13 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         TestUtils.temporaryServerHostnameAndPort()
 
       val binding =
-        Http().bindAndHandleSync(r ⇒
-                                   HttpResponse(entity = r.uri.toString.reverse
-                                           .takeWhile(Character.isDigit)
-                                           .reverse),
-                                 serverHostName,
-                                 serverPort)
+        Http().bindAndHandleSync(
+          r ⇒
+            HttpResponse(
+              entity =
+                r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+          serverHostName,
+          serverPort)
 
       val N = 100
       val result = Source
@@ -55,18 +56,18 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         TestUtils.temporaryServerHostnameAndPort()
 
       val binding =
-        Http().bindAndHandleSync(r ⇒
-                                   HttpResponse(entity = r.uri.toString.reverse
-                                           .takeWhile(Character.isDigit)
-                                           .reverse),
-                                 serverHostName,
-                                 serverPort)
+        Http().bindAndHandleSync(
+          r ⇒
+            HttpResponse(
+              entity =
+                r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+          serverHostName,
+          serverPort)
 
       val connFlow = Http().outgoingConnection(serverHostName, serverPort)
 
       val C = 4
-      val doubleConnection = Flow.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      val doubleConnection = Flow.fromGraph(GraphDSL.create() { implicit b ⇒
         import GraphDSL.Implicits._
 
         val bcast = b.add(Broadcast[HttpRequest](C))
@@ -89,7 +90,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         .runFold(0)(_ + _)
 
       result.futureValue(PatienceConfig(10.seconds)) shouldEqual C * N *
-      (N + 1) / 2
+        (N + 1) / 2
       binding.futureValue.unbind()
     }
 

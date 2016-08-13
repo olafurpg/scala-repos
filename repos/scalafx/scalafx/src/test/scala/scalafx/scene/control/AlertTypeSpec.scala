@@ -44,6 +44,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AlertTypeSpec
     extends SFXEnumDelegateSpec[jfxsc.Alert.AlertType, AlertType](
-        javaClass = classOf[jfxsc.Alert.AlertType],
-        scalaClass = classOf[AlertType],
-        companion = Alert.AlertType)
+      javaClass = classOf[jfxsc.Alert.AlertType],
+      scalaClass = classOf[AlertType],
+      companion = Alert.AlertType)

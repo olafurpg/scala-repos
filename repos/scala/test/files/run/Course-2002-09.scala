@@ -260,7 +260,7 @@ object M2 {
 
   def show(x: Option[Int], y: Option[Int], z: Option[Int]) = {
     Console.print(
-        "a = " + set(a, x) + ", b = " + set(b, y) + ", c = " + set(c, z));
+      "a = " + set(a, x) + ", b = " + set(b, y) + ", c = " + set(c, z));
     Console.println(" => " + a.str + " * " + b.str + " = " + c.str);
     a.forgetValue; b.forgetValue; c.forgetValue;
   }

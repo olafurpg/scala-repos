@@ -39,8 +39,8 @@ object Ran {
   def fromRan[G[_], H[_], K[_], B](k: K[G[B]])(s: K ~> Ran[G, H, ?]): H[B] =
     s(k)(x => x)
 
-  def adjointToRan[F[_], G[_], A](
-      f: F[A])(implicit A: Adjunction[F, G]): Ran[G, Id, A] =
+  def adjointToRan[F[_], G[_], A](f: F[A])(
+      implicit A: Adjunction[F, G]): Ran[G, Id, A] =
     new Ran[G, Id, A] {
       def apply[B](a: A => G[B]) = A.rightAdjunct(f)(a)
     }
@@ -93,8 +93,8 @@ trait Lan[G[_], H[_], A] { lan =>
 object Lan extends LanInstances {
   import Id._
 
-  implicit def lanApplicative[G[_]: Functor, H[_]: Applicative]: Applicative[
-      Lan[G, H, ?]] =
+  implicit def lanApplicative[G[_]: Functor, H[_]: Applicative]
+    : Applicative[Lan[G, H, ?]] =
     new Applicative[Lan[G, H, ?]] with LanApply[G, H] {
       def G = implicitly
       def H = implicitly
@@ -119,8 +119,8 @@ object Lan extends LanInstances {
       def f(gi: G[I]) = gi
     }
 
-  def adjointToLan[F[_], G[_], A](
-      ga: G[A])(implicit A: Adjunction[F, G]): Lan[F, Id, A] =
+  def adjointToLan[F[_], G[_], A](ga: G[A])(
+      implicit A: Adjunction[F, G]): Lan[F, Id, A] =
     new Lan[F, Id, A] {
       type I = G[A]
       lazy val v = ga
@@ -157,7 +157,8 @@ private trait LanFunctor[G[_], H[_]] extends Functor[Lan[G, H, ?]] {
 }
 
 private trait LanApply[G[_], H[_]]
-    extends Apply[Lan[G, H, ?]] with LanFunctor[G, H] {
+    extends Apply[Lan[G, H, ?]]
+    with LanFunctor[G, H] {
   def G: Functor[G]
   def H: Apply[H]
 

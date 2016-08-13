@@ -5,8 +5,9 @@ import scala.concurrent.duration._
 import akka.actor._
 import ornicar.scalalib.Random.{approximatly, nextString}
 
-final class Scheduler(
-    scheduler: akka.actor.Scheduler, enabled: Boolean, debug: Boolean) {
+final class Scheduler(scheduler: akka.actor.Scheduler,
+                      enabled: Boolean,
+                      debug: Boolean) {
 
   def throttle[A](delay: FiniteDuration)(batch: Seq[A])(op: A => Unit) {
     batch.zipWithIndex foreach {
@@ -44,9 +45,9 @@ final class Scheduler(
         doDebug ! logger.info(tagged)
         val start = nowMillis
         op effectFold
-        (e => logger.error("(%s) %s".format(tagged, e.getMessage), e), _ =>
-              doDebug ! logger.info(
-                  tagged + " - %d ms".format(nowMillis - start)))
+          (e => logger.error("(%s) %s".format(tagged, e.getMessage), e), _ =>
+            doDebug ! logger.info(
+              tagged + " - %d ms".format(nowMillis - start)))
       }
     }
   }
@@ -60,7 +61,7 @@ final class Scheduler(
 
   private def logger = lila.log("scheduler")
 
-  private def randomize(
-      d: FiniteDuration, ratio: Float = 0.05f): FiniteDuration =
+  private def randomize(d: FiniteDuration,
+                        ratio: Float = 0.05f): FiniteDuration =
     approximatly(ratio)(d.toMillis) millis
 }

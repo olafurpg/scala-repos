@@ -1,7 +1,11 @@
 package scala.pickling
 package internal
 
-import scala.pickling.spi.{RefRegistry, RefUnpicklingRegistry, RefPicklingRegistry}
+import scala.pickling.spi.{
+  RefRegistry,
+  RefUnpicklingRegistry,
+  RefPicklingRegistry
+}
 
 /**
   * An implementation of ref sharing that ensures no references are created while pickling and none are looked
@@ -37,7 +41,7 @@ final class NoSharingRefUnpicklingRegistry extends RefUnpicklingRegistry {
   /** Looks up an unpicklee by its object id. Throws an exception if oid is not valid. */
   override def lookupUnpicklee(oid: Int): Any =
     sys.error(
-        s"Runtime reference sharing is disabled.  Your pickled object is trying to reference previously pickled value #$oid.")
+      s"Runtime reference sharing is disabled.  Your pickled object is trying to reference previously pickled value #$oid.")
 }
 
 /** An implementation of the RefRegistry which ensures NO sharing during pickling. */

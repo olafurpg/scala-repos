@@ -44,7 +44,7 @@ class BufferTest extends FunSuite {
   test("read Signed Int") {
     val n = 0xfffff6ff
     val br = BufferReader(
-        Array[Byte](0xff.toByte, 0xf6.toByte, 0xff.toByte, 0xff.toByte))
+      Array[Byte](0xff.toByte, 0xf6.toByte, 0xff.toByte, 0xff.toByte))
     assert(n == br.readInt())
   }
 

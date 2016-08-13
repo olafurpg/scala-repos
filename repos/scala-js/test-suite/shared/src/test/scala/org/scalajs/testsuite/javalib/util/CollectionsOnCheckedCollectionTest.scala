@@ -33,7 +33,8 @@ trait CollectionsCheckedCollectionTest extends CollectionsOnCollectionsTest {
 
       override def empty[E](implicit ct: ClassTag[E]): ju.Collection[E] = {
         ju.Collections.checkedCollection(
-            originalFactory.empty[E], ct.runtimeClass.asInstanceOf[Class[E]])
+          originalFactory.empty[E],
+          ct.runtimeClass.asInstanceOf[Class[E]])
       }
     }
   }

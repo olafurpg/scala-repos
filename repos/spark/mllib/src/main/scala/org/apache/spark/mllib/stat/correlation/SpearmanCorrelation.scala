@@ -60,14 +60,13 @@ private[stat] object SpearmanCorrelation extends Correlation with Logging {
       var preVal = Double.NaN
       var startRank = -1.0
       var cachedUids = ArrayBuffer.empty[Long]
-      val flush: () => Iterable[(Long, (Int, Double))] = () =>
-        {
-          val averageRank = startRank + (cachedUids.size - 1) / 2.0
-          val output = cachedUids.map { uid =>
-            (uid, (preCol, averageRank))
-          }
-          cachedUids.clear()
-          output
+      val flush: () => Iterable[(Long, (Int, Double))] = () => {
+        val averageRank = startRank + (cachedUids.size - 1) / 2.0
+        val output = cachedUids.map { uid =>
+          (uid, (preCol, averageRank))
+        }
+        cachedUids.clear()
+        output
       }
       iter.flatMap {
         case (((j, v), uid), rank) =>

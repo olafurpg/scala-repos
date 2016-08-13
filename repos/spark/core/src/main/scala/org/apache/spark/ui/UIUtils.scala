@@ -96,12 +96,12 @@ private[spark] object UIUtils extends Logging {
       val yearString = toString(ms / year, "year")
 
       Seq(
-          second -> millisecondsString,
-          minute -> s"$secondString $millisecondsString",
-          hour -> s"$minuteString $secondString",
-          day -> s"$hourString $minuteString $secondString",
-          week -> s"$dayString $hourString $minuteString",
-          year -> s"$weekString $dayString $hourString"
+        second -> millisecondsString,
+        minute -> s"$secondString $millisecondsString",
+        hour -> s"$minuteString $secondString",
+        day -> s"$hourString $minuteString $secondString",
+        week -> s"$dayString $hourString $minuteString",
+        year -> s"$weekString $dayString $hourString"
       ).foreach {
         case (durationLimit, durationString) =>
           if (ms < durationLimit) {
@@ -360,8 +360,8 @@ private[spark] object UIUtils extends Logging {
   }
 
   /** Return a "DAG visualization" DOM element that expands into a visualization for a stage. */
-  def showDagVizForStage(
-      stageId: Int, graph: Option[RDDOperationGraph]): Seq[Node] = {
+  def showDagVizForStage(stageId: Int,
+                         graph: Option[RDDOperationGraph]): Seq[Node] = {
     showDagViz(graph.toSeq, forJob = false)
   }
 
@@ -377,8 +377,8 @@ private[spark] object UIUtils extends Logging {
     * a format that is expected by spark-dag-viz.js. Any changes in the format here must be
     * reflected there.
     */
-  private def showDagViz(
-      graphs: Seq[RDDOperationGraph], forJob: Boolean): Seq[Node] = {
+  private def showDagViz(graphs: Seq[RDDOperationGraph],
+                         forJob: Boolean): Seq[Node] = {
     <div>
       <span id={if (forJob) "job-dag-viz" else "stage-dag-viz"}
             class="expand-dag-viz" onclick={s"toggleDagViz($forJob);"}>
@@ -444,10 +444,10 @@ private[spark] object UIUtils extends Logging {
         }
       if (illegalNodes.nonEmpty) {
         throw new IllegalArgumentException(
-            "Only HTML anchors allowed in job descriptions\n" +
+          "Only HTML anchors allowed in job descriptions\n" +
             illegalNodes.map { n =>
-          s"${n.label} in $n"
-        }.mkString("\n\t"))
+              s"${n.label} in $n"
+            }.mkString("\n\t"))
       }
 
       // Verify that all links are relative links starting with "/"
@@ -457,7 +457,7 @@ private[spark] object UIUtils extends Logging {
         }
       if (allLinks.exists { !_.startsWith("/") }) {
         throw new IllegalArgumentException(
-            "Links in job descriptions must be root-relative:\n" +
+          "Links in job descriptions must be root-relative:\n" +
             allLinks.mkString("\n\t"))
       }
 

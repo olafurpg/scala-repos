@@ -40,9 +40,9 @@ object Test extends App {
   val c = cm.staticClass("C")
   val cc = typeOf[C].member(TypeName("C")).asClass
   println(
-      cm.reflectClass(c)
-        .reflectConstructor(c.info.member(termNames.CONSTRUCTOR).asMethod))
+    cm.reflectClass(c)
+      .reflectConstructor(c.info.member(termNames.CONSTRUCTOR).asMethod))
   println(
-      im.reflectClass(cc)
-        .reflectConstructor(cc.info.member(termNames.CONSTRUCTOR).asMethod))
+    im.reflectClass(cc)
+      .reflectConstructor(cc.info.member(termNames.CONSTRUCTOR).asMethod))
 }

@@ -42,8 +42,8 @@ object PickResult {
   /** An undefined face. This value is used for the intersected face if the picked node has no user-specified faces. */
   val FaceUndefined: Int = jfxsi.PickResult.FACE_UNDEFINED
   @deprecated(
-      "Use FaceUndefined; FACE_UNDEFINED will be removed in a future release",
-      "8.0.60-R10")
+    "Use FaceUndefined; FACE_UNDEFINED will be removed in a future release",
+    "8.0.60-R10")
   val FACE_UNDEFINED = FaceUndefined
 }
 

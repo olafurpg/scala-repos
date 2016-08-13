@@ -63,14 +63,16 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     if (isClusterMode) DRIVER_MEMORY_OVERHEAD else AM_MEMORY_OVERHEAD
   val amMemoryOverhead = sparkConf
     .get(amMemoryOverheadEntry)
-    .getOrElse(math.max(
-            (MEMORY_OVERHEAD_FACTOR * amMemory).toLong, MEMORY_OVERHEAD_MIN))
+    .getOrElse(
+      math.max((MEMORY_OVERHEAD_FACTOR * amMemory).toLong,
+               MEMORY_OVERHEAD_MIN))
     .toInt
 
   val executorMemoryOverhead = sparkConf
     .get(EXECUTOR_MEMORY_OVERHEAD)
-    .getOrElse(math.max((MEMORY_OVERHEAD_FACTOR * executorMemory).toLong,
-                        MEMORY_OVERHEAD_MIN))
+    .getOrElse(
+      math.max((MEMORY_OVERHEAD_FACTOR * executorMemory).toLong,
+               MEMORY_OVERHEAD_MIN))
     .toInt
 
   /** Load any default arguments provided through environment variables and Spark properties. */
@@ -79,18 +81,18 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     // while spark.yarn.dist.{archives/files} should be resolved to file:// (SPARK-2051).
     files = Option(files)
       .orElse(
-          sparkConf.get(FILES_TO_DISTRIBUTE).map(p => Utils.resolveURIs(p)))
+        sparkConf.get(FILES_TO_DISTRIBUTE).map(p => Utils.resolveURIs(p)))
       .orElse(sys.env.get("SPARK_YARN_DIST_FILES"))
       .orNull
     archives = Option(archives)
       .orElse(
-          sparkConf.get(ARCHIVES_TO_DISTRIBUTE).map(p => Utils.resolveURIs(p)))
+        sparkConf.get(ARCHIVES_TO_DISTRIBUTE).map(p => Utils.resolveURIs(p)))
       .orElse(sys.env.get("SPARK_YARN_DIST_ARCHIVES"))
       .orNull
     // If dynamic allocation is enabled, start at the configured initial number of executors.
     // Default to minExecutors if no initialExecutors is set.
-    numExecutors = YarnSparkHadoopUtil.getInitialTargetExecutorNumber(
-        sparkConf, numExecutors)
+    numExecutors = YarnSparkHadoopUtil
+      .getInitialTargetExecutorNumber(sparkConf, numExecutors)
     principal = Option(principal).orElse(sparkConf.get(PRINCIPAL)).orNull
     keytab = Option(keytab).orElse(sparkConf.get(KEYTAB)).orNull
   }
@@ -109,7 +111,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     }
     if (executorCores < sparkConf.get(CPUS_PER_TASK)) {
       throw new SparkException(
-          s"Executor cores must not be less than ${CPUS_PER_TASK.key}.")
+        s"Executor cores must not be less than ${CPUS_PER_TASK.key}.")
     }
     // scalastyle:off println
     if (isClusterMode) {
@@ -168,7 +170,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
         case ("--master-memory" | "--driver-memory") :: MemoryParam(value) :: tail =>
           if (args(0) == "--master-memory") {
             println(
-                "--master-memory is deprecated. Use --driver-memory instead.")
+              "--master-memory is deprecated. Use --driver-memory instead.")
           }
           driverMemory = value
           args = tail
@@ -180,7 +182,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
         case ("--num-workers" | "--num-executors") :: IntParam(value) :: tail =>
           if (args(0) == "--num-workers") {
             println(
-                "--num-workers is deprecated. Use --num-executors instead.")
+              "--num-workers is deprecated. Use --num-executors instead.")
           }
           numExecutors = value
           args = tail
@@ -188,7 +190,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
         case ("--worker-memory" | "--executor-memory") :: MemoryParam(value) :: tail =>
           if (args(0) == "--worker-memory") {
             println(
-                "--worker-memory is deprecated. Use --executor-memory instead.")
+              "--worker-memory is deprecated. Use --executor-memory instead.")
           }
           executorMemory = value
           args = tail
@@ -196,7 +198,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
         case ("--worker-cores" | "--executor-cores") :: IntParam(value) :: tail =>
           if (args(0) == "--worker-cores") {
             println(
-                "--worker-cores is deprecated. Use --executor-cores instead.")
+              "--worker-cores is deprecated. Use --executor-cores instead.")
           }
           executorCores = value
           args = tail
@@ -242,7 +244,7 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
 
     if (primaryPyFile != null && primaryRFile != null) {
       throw new IllegalArgumentException(
-          "Cannot have primary-py-file and primary-r-file" +
+        "Cannot have primary-py-file and primary-r-file" +
           " at the same time")
     }
   }

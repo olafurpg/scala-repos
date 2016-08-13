@@ -19,7 +19,8 @@ import generic._
   */
 trait SortedMap[A, B]
     extends Map[A, B]
-    with collection.SortedMap[A, B] with MapLike[A, B, SortedMap[A, B]]
+    with collection.SortedMap[A, B]
+    with MapLike[A, B, SortedMap[A, B]]
     with SortedMapLike[A, B, SortedMap[A, B]] {
 
   override protected[this] def newBuilder: Builder[(A, B), SortedMap[A, B]] =
@@ -33,8 +34,9 @@ trait SortedMap[A, B]
   override def +[B1 >: B](kv: (A, B1)): SortedMap[A, B1] =
     clone().asInstanceOf[SortedMap[A, B1]] += kv
 
-  override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): SortedMap[A, B1] =
+  override def +[B1 >: B](elem1: (A, B1),
+                          elem2: (A, B1),
+                          elems: (A, B1)*): SortedMap[A, B1] =
     clone().asInstanceOf[SortedMap[A, B1]] += elem1 += elem2 ++= elems
 
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): SortedMap[A, B1] =
@@ -60,4 +62,5 @@ object SortedMap extends MutableSortedMapFactory[SortedMap] {
 
 /** Explicit instantiation of the `SortedMap` trait to reduce class file size in subclasses. */
 abstract class AbstractSortedMap[A, B]
-    extends scala.collection.mutable.AbstractMap[A, B] with SortedMap[A, B]
+    extends scala.collection.mutable.AbstractMap[A, B]
+    with SortedMap[A, B]

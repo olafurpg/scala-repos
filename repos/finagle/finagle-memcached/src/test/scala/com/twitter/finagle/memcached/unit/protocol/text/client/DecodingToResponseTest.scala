@@ -47,11 +47,11 @@ class DecodingToResponseTest extends FunSuite {
 
     val buffer = Tokens(Seq(Buf.Utf8("ERROR")))
     assert(
-        decodingToResponse
-          .decode(null, null, buffer)
-          .asInstanceOf[protocol.Error]
-          .cause
-          .getClass == classOf[NonexistentCommand])
+      decodingToResponse
+        .decode(null, null, buffer)
+        .asInstanceOf[protocol.Error]
+        .cause
+        .getClass == classOf[NonexistentCommand])
   }
 
   test("parseResponse STATS") {

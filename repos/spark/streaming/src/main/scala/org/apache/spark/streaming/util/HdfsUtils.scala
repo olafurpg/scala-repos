@@ -34,7 +34,7 @@ private[streaming] object HdfsUtils {
           dfs.append(dfsPath)
         } else {
           throw new IllegalStateException(
-              "File exists and there is no append support!")
+            "File exists and there is no append support!")
         }
       } else {
         dfs.create(dfsPath)
@@ -76,7 +76,7 @@ private[streaming] object HdfsUtils {
     val dfs = getFileSystemForPath(dfsPath, conf)
     val fileStatus = dfs.getFileStatus(dfsPath)
     val blockLocs = Option(
-        dfs.getFileBlockLocations(fileStatus, offset, length))
+      dfs.getFileBlockLocations(fileStatus, offset, length))
     blockLocs.map(_.flatMap(_.getHosts)).getOrElse(Array.empty)
   }
 

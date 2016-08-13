@@ -66,7 +66,7 @@ class CumulativeSumTest1 extends WordSpec {
     JobTest("com.twitter.scalding.AddRankingWithCumulativeSum")
       .source(TypedTsv[(String, Double)]("input1"), sampleInput1)
       .sink[(String, Double, Long)](
-          TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
+        TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
         "produce correct number of records when filtering out null values" in {
           assert(outBuf1.size === 10)
         }
@@ -82,7 +82,7 @@ class CumulativeSumTest1 extends WordSpec {
     JobTest("com.twitter.scalding.AddRankingWithPartitionedCumulativeSum")
       .source(TypedTsv[(String, Double)]("input1"), sampleInput1)
       .sink[(String, Double, Long)](
-          TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
+        TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
         "produce correct number of records when filtering out null values" in {
           assert(outBuf1.size === 10)
         }

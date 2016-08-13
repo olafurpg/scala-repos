@@ -80,13 +80,13 @@ object Duration {
     hd :: rest.flatMap(s => List(s, s + "s"))
   }
   private[this] val timeUnitLabels = List(
-      DAYS -> "d day",
-      HOURS -> "h hour",
-      MINUTES -> "min minute",
-      SECONDS -> "s sec second",
-      MILLISECONDS -> "ms milli millisecond",
-      MICROSECONDS -> "µs micro microsecond",
-      NANOSECONDS -> "ns nano nanosecond"
+    DAYS -> "d day",
+    HOURS -> "h hour",
+    MINUTES -> "min minute",
+    SECONDS -> "s sec second",
+    MILLISECONDS -> "ms milli millisecond",
+    MICROSECONDS -> "µs micro microsecond",
+    NANOSECONDS -> "ns nano nanosecond"
   )
 
   // TimeUnit => standard label
@@ -104,7 +104,8 @@ object Duration {
     * The extractor will not match for malformed strings or non-finite durations.
     */
   def unapply(s: String): Option[(Long, TimeUnit)] =
-    (try Some(apply(s)) catch { case _: RuntimeException => None }) flatMap unapply
+    (try Some(apply(s))
+    catch { case _: RuntimeException => None }) flatMap unapply
 
   /**
     * Extract length and time unit out of a duration, if it is finite.
@@ -130,7 +131,7 @@ object Duration {
     else if (nanos.isNaN) Undefined
     else if (nanos > Long.MaxValue || nanos < Long.MinValue)
       throw new IllegalArgumentException(
-          "trying to construct too large duration with " + nanos + "ns")
+        "trying to construct too large duration with " + nanos + "ns")
     else fromNanos((nanos + 0.5).toLong)
   }
 
@@ -214,14 +215,14 @@ object Duration {
       case _: Infinite => Double.NaN
       case x =>
         Double.PositiveInfinity *
-        (if ((this > Zero) ^ (divisor >= Zero)) -1 else 1)
+          (if ((this > Zero) ^ (divisor >= Zero)) -1 else 1)
     }
 
     final def isFinite() = false
 
     private[this] def fail(what: String) =
       throw new IllegalArgumentException(
-          s"$what not allowed on infinite Durations")
+        s"$what not allowed on infinite Durations")
     final def length: Long = fail("length")
     final def unit: TimeUnit = fail("unit")
     final def toNanos: Long = fail("toNanos")
@@ -656,8 +657,8 @@ final class FiniteDuration(val length: Long, val unit: TimeUnit)
       throw new IllegalArgumentException("integer overflow")
     a + b
   }
-  private[this] def add(
-      otherLength: Long, otherUnit: TimeUnit): FiniteDuration = {
+  private[this] def add(otherLength: Long,
+                        otherUnit: TimeUnit): FiniteDuration = {
     val commonUnit = if (otherUnit.convert(1, unit) == 0) unit else otherUnit
     val totalLength = safeAdd(commonUnit.convert(length, unit),
                               commonUnit.convert(otherLength, otherUnit))

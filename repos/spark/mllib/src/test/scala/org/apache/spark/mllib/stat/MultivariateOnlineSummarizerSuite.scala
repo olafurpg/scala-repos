@@ -29,7 +29,7 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
     assert(summarizer.count === 0, "should be zero since nothing is added.")
 
     withClue(
-        "Getting numNonzeros from empty summarizer should throw exception.") {
+      "Getting numNonzeros from empty summarizer should throw exception.") {
       intercept[IllegalArgumentException] {
         summarizer.numNonzeros
       }
@@ -64,14 +64,14 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
       .add(Vectors.sparse(3, Seq((0, -2.0), (1, 6.0))))
 
     withClue(
-        "Adding a new dense sample with different array size should throw exception.") {
+      "Adding a new dense sample with different array size should throw exception.") {
       intercept[IllegalArgumentException] {
         summarizer.add(Vectors.dense(3.0, 1.0))
       }
     }
 
     withClue(
-        "Adding a new sparse sample with different array size should throw exception.") {
+      "Adding a new sparse sample with different array size should throw exception.") {
       intercept[IllegalArgumentException] {
         summarizer.add(Vectors.sparse(5, Seq((0, -2.0), (1, 6.0))))
       }
@@ -80,7 +80,7 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
     val summarizer2 = (new MultivariateOnlineSummarizer)
       .add(Vectors.dense(1.0, -2.0, 0.0, 4.0))
     withClue(
-        "Merging a new summarizer with different dimensions should throw exception.") {
+      "Merging a new summarizer with different dimensions should throw exception.") {
       intercept[IllegalArgumentException] {
         summarizer.merge(summarizer2)
       }
@@ -211,7 +211,7 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
     assert(summarizer1.count === 1)
 
     val summarizer2 = (new MultivariateOnlineSummarizer).merge(
-        (new MultivariateOnlineSummarizer).add(Vectors.dense(0.0, -1.0, -3.0)))
+      (new MultivariateOnlineSummarizer).add(Vectors.dense(0.0, -1.0, -3.0)))
     assert(summarizer2.count === 1)
 
     val summarizer3 = (new MultivariateOnlineSummarizer)
@@ -265,9 +265,10 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
       .add(instance = Vectors.sparse(3, Seq((0, -0.8), (1, 1.7))),
            weight = 0.1)
       .add(Vectors.dense(0.0, -1.2, -1.7), 0.2)
-      .merge((new MultivariateOnlineSummarizer)
-            .add(Vectors.sparse(3, Seq((0, -0.7), (1, 0.01), (2, 1.3))), 0.15)
-            .add(Vectors.dense(-0.5, 0.3, -1.5), 0.05))
+      .merge(
+        (new MultivariateOnlineSummarizer)
+          .add(Vectors.sparse(3, Seq((0, -0.7), (1, 0.01), (2, 1.3))), 0.15)
+          .add(Vectors.dense(-0.5, 0.3, -1.5), 0.05))
 
     assert(summarizer.count === 4)
 
@@ -279,7 +280,7 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
              Vectors.dense(Array(-0.42, -0.107, -0.44)) absTol 1E-10,
            "mean mismatch")
     assert(summarizer.variance ~== Vectors.dense(
-               Array(0.17657142857, 1.645115714, 2.42057142857)) absTol 1E-8,
+             Array(0.17657142857, 1.645115714, 2.42057142857)) absTol 1E-8,
            "variance mismatch")
     assert(summarizer.numNonzeros ~==
              Vectors.dense(Array(0.3, 0.5, 0.4)) absTol 1E-10,
@@ -294,7 +295,7 @@ class MultivariateOnlineSummarizerSuite extends SparkFunSuite {
                                                0.9715966241192) absTol 1E-8,
            "normL2 mismatch")
     assert(
-        summarizer.normL1 ~== Vectors.dense(0.21, 0.4265, 0.61) absTol 1E-10,
-        "normL1 mismatch")
+      summarizer.normL1 ~== Vectors.dense(0.21, 0.4265, 0.61) absTol 1E-10,
+      "normL1 mismatch")
   }
 }

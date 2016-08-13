@@ -28,7 +28,8 @@ private[streams] trait FutureSubscriptionFactory[T]
   * Adapts an Future to a Publisher.
   */
 private[streams] final class FuturePublisher[T](val fut: Future[T])
-    extends RelaxedPublisher[T] with FutureSubscriptionFactory[T]
+    extends RelaxedPublisher[T]
+    with FutureSubscriptionFactory[T]
 
 private[streams] object FutureSubscription {
 
@@ -67,7 +68,8 @@ private[streams] class FutureSubscription[T, U >: T](
     subr: Subscriber[U],
     onSubscriptionEnded: SubscriptionHandle[U] => Unit)
     extends StateMachine[State](initialState = AwaitingRequest)
-    with Subscription with SubscriptionHandle[U] {
+    with Subscription
+    with SubscriptionHandle[U] {
 
   // SubscriptionHandle methods
 
@@ -93,7 +95,7 @@ private[streams] class FutureSubscription[T, U >: T](
   override def request(elements: Long): Unit = {
     if (elements <= 0)
       throw new IllegalArgumentException(
-          s"The number of requested elements must be > 0: requested $elements elements")
+        s"The number of requested elements must be > 0: requested $elements elements")
     exclusive {
       case AwaitingRequest =>
         state = Requested
@@ -128,13 +130,13 @@ private[streams] class FutureSubscription[T, U >: T](
   private def onFutureCompleted(result: Try[T]): Unit = exclusive {
     case AwaitingRequest =>
       throw new IllegalStateException(
-          "onFutureCompleted shouldn't be called when in state AwaitingRequest")
+        "onFutureCompleted shouldn't be called when in state AwaitingRequest")
     case Requested =>
       state = Completed
       result match {
         case Success(null) =>
           subr.onError(new NullPointerException(
-                  "Future completed with a null value that cannot be sent by a Publisher"))
+            "Future completed with a null value that cannot be sent by a Publisher"))
         case Success(value) =>
           subr.onNext(value)
           subr.onComplete()
@@ -146,6 +148,6 @@ private[streams] class FutureSubscription[T, U >: T](
       ()
     case Completed =>
       throw new IllegalStateException(
-          "onFutureCompleted shouldn't be called when already in state Completed")
+        "onFutureCompleted shouldn't be called when already in state Completed")
   }
 }

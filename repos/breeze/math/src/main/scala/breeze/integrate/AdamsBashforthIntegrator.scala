@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{AdamsBashforthIntegrator => ApacheAdamsBashforthIntegrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  AdamsBashforthIntegrator => ApacheAdamsBashforthIntegrator
+}
 
 class AdamsBashforthIntegrator(order: Int,
                                minStep: Double,
@@ -14,9 +16,9 @@ class AdamsBashforthIntegrator(order: Int,
 
   protected final def create: ApacheAdamsBashforthIntegrator =
     new ApacheAdamsBashforthIntegrator(
-        order,
-        minStep,
-        maxStep,
-        ApacheAdaptiveStepIntegrator.defaultAbsTol,
-        ApacheAdaptiveStepIntegrator.defaultRelTol)
+      order,
+      minStep,
+      maxStep,
+      ApacheAdaptiveStepIntegrator.defaultAbsTol,
+      ApacheAdaptiveStepIntegrator.defaultRelTol)
 }

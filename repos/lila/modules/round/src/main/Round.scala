@@ -80,18 +80,18 @@ private[round] final class Round(gameId: String,
 
     case Resign(playerId) =>
       handle(playerId) { pov =>
-        pov.game.resignable ?? finisher.other(
-            pov.game, _.Resign, Some(!pov.color))
+        pov.game.resignable ?? finisher.other(pov.game,
+                                              _.Resign,
+                                              Some(!pov.color))
       }
 
     case GoBerserk(color) =>
       handle(color) { pov =>
         pov.game.goBerserk(color) ?? { progress =>
-          messenger.system(
-              pov.game,
-              (_.untranslated(
-                  s"${pov.color.name.capitalize} is going berserk!"
-              )))
+          messenger.system(pov.game,
+                           (_.untranslated(
+                             s"${pov.color.name.capitalize} is going berserk!"
+                           )))
           GameRepo.save(progress) >> GameRepo.goBerserk(pov) inject progress.events
         }
       }
@@ -166,7 +166,7 @@ private[round] final class Round(gameId: String,
           lila
             .log("cheat")
             .info(
-                s"hold alert $ip http://lichess.org/${pov.gameId}/${pov.color.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd")
+              s"hold alert $ip http://lichess.org/${pov.gameId}/${pov.color.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd")
           lila.mon.cheat.holdAlert()
           GameRepo.setHoldAlert(pov, mean, sd) inject List[Event]()
         }
@@ -183,11 +183,11 @@ private[round] final class Round(gameId: String,
         pov.game.clock.ifTrue(pov.game moretimeable !pov.color) ?? { clock =>
           val newClock = clock.giveTime(!pov.color, moretimeDuration.toSeconds)
           val progress = (pov.game withClock newClock) + Event.Clock(newClock)
-          messenger.system(pov.game,
-                           (_.untranslated(
-                               "%s + %d seconds".format(
-                                   !pov.color, moretimeDuration.toSeconds)
-                           )))
+          messenger.system(
+            pov.game,
+            (_.untranslated(
+              "%s + %d seconds".format(!pov.color, moretimeDuration.toSeconds)
+            )))
           GameRepo save progress inject progress.events
         }
       }
@@ -224,9 +224,10 @@ private[round] final class Round(gameId: String,
     case AbortForMaintenance =>
       handle { game =>
         messenger.system(
-            game, (_.untranslated("Game aborted for server maintenance")))
-        messenger.system(
-            game, (_.untranslated("Sorry for the inconvenience!")))
+          game,
+          (_.untranslated("Game aborted for server maintenance")))
+        messenger.system(game,
+                         (_.untranslated("Sorry for the inconvenience!")))
         game.playable ?? finisher.other(game, _.Aborted)
       }
   }
@@ -248,8 +249,9 @@ private[round] final class Round(gameId: String,
     handleGame(GameRepo game gameId)(op)
 
   protected def handle(playerId: String)(op: Pov => Fu[Events]): Funit =
-    handlePov((GameRepo pov PlayerRef(gameId, playerId))
-          .mon(_.round.move.segment.fetch))(op)
+    handlePov(
+      (GameRepo pov PlayerRef(gameId, playerId))
+        .mon(_.round.move.segment.fetch))(op)
 
   protected def handle(color: Color)(op: Pov => Fu[Events]): Funit =
     handlePov(GameRepo pov PovRef(gameId, color))(op)
@@ -261,8 +263,8 @@ private[round] final class Round(gameId: String,
       }
     } recover errorHandler("handlePov")
 
-  private def handleGame(
-      game: Fu[Option[Game]])(op: Game => Fu[Events]): Funit =
+  private def handleGame(game: Fu[Option[Game]])(
+      op: Game => Fu[Events]): Funit =
     publish {
       game flatten "game not found" flatMap op
     } recover errorHandler("handleGame")

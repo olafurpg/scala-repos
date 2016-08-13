@@ -40,11 +40,11 @@ class ErrorSpec extends AbstractSpec with ScalaCheck {
           |}
         """.stripMargin
       MissingBracketHandler.findMissingText(
-          buildSbt,
-          buildSbt.length,
-          2,
-          "fake.txt",
-          new MessageOnlyException("fake")) must throwA[MessageOnlyException]
+        buildSbt,
+        buildSbt.length,
+        2,
+        "fake.txt",
+        new MessageOnlyException("fake")) must throwA[MessageOnlyException]
     }
 
     "handle xml error " in {
@@ -53,7 +53,7 @@ class ErrorSpec extends AbstractSpec with ScalaCheck {
           |val s = '
         """.stripMargin
       SbtParser(SbtParser.FAKE_FILE, buildSbt.lines.toSeq) must throwA[
-          MessageOnlyException].like {
+        MessageOnlyException].like {
         case exp =>
           val message = exp.getMessage
           println(s"${exp.getMessage}")
@@ -66,7 +66,7 @@ class ErrorSpec extends AbstractSpec with ScalaCheck {
     try {
       split(buildSbt)
       throw new IllegalStateException(
-          s"${classOf[MessageOnlyException].getName} expected")
+        s"${classOf[MessageOnlyException].getName} expected")
     } catch {
       case exception: MessageOnlyException =>
         val error = exception.getMessage

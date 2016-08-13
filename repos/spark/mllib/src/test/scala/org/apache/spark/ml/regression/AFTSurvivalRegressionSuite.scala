@@ -29,7 +29,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class AFTSurvivalRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var datasetUnivariate: DataFrame = _
@@ -38,17 +39,18 @@ class AFTSurvivalRegressionSuite
   override def beforeAll(): Unit = {
     super.beforeAll()
     datasetUnivariate = sqlContext.createDataFrame(
-        sc.parallelize(generateAFTInput(
-                1, Array(5.5), Array(0.8), 1000, 42, 1.0, 2.0, 2.0)))
+      sc.parallelize(
+        generateAFTInput(1, Array(5.5), Array(0.8), 1000, 42, 1.0, 2.0, 2.0)))
     datasetMultivariate = sqlContext.createDataFrame(
-        sc.parallelize(generateAFTInput(2,
-                                        Array(0.9, -1.3),
-                                        Array(0.7, 1.2),
-                                        1000,
-                                        42,
-                                        1.5,
-                                        2.5,
-                                        2.0)))
+      sc.parallelize(
+        generateAFTInput(2,
+                         Array(0.9, -1.3),
+                         Array(0.7, 1.2),
+                         1000,
+                         42,
+                         1.5,
+                         2.5,
+                         2.0)))
   }
 
   /**
@@ -61,19 +63,21 @@ class AFTSurvivalRegressionSuite
         features.toArray.mkString(",") + "," + censor + "," + label
     }.repartition(1)
       .saveAsTextFile(
-          "target/tmp/AFTSurvivalRegressionSuite/datasetUnivariate")
+        "target/tmp/AFTSurvivalRegressionSuite/datasetUnivariate")
     datasetMultivariate.rdd.map {
       case Row(features: Vector, label: Double, censor: Double) =>
         features.toArray.mkString(",") + "," + censor + "," + label
     }.repartition(1)
       .saveAsTextFile(
-          "target/tmp/AFTSurvivalRegressionSuite/datasetMultivariate")
+        "target/tmp/AFTSurvivalRegressionSuite/datasetMultivariate")
   }
 
   test("params") {
     ParamsSuite.checkParams(new AFTSurvivalRegression)
-    val model = new AFTSurvivalRegressionModel(
-        "aftSurvReg", Vectors.dense(0.0), 0.0, 0.0)
+    val model = new AFTSurvivalRegressionModel("aftSurvReg",
+                                               Vectors.dense(0.0),
+                                               0.0,
+                                               0.0)
     ParamsSuite.checkParams(model)
   }
 
@@ -125,7 +129,7 @@ class AFTSurvivalRegressionSuite
 
     val rnd = new Random(seed)
     val x = Array.fill[Array[Double]](nPoints)(
-        Array.fill[Double](numFeatures)(rnd.nextDouble()))
+      Array.fill[Double](numFeatures)(rnd.nextDouble()))
 
     x.foreach { v =>
       var i = 0
@@ -398,9 +402,9 @@ object AFTSurvivalRegressionSuite {
     * This excludes input columns to simplify some tests.
     */
   val allParamSettings: Map[String, Any] = Map(
-      "predictionCol" -> "myPrediction",
-      "fitIntercept" -> true,
-      "maxIter" -> 2,
-      "tol" -> 0.01
+    "predictionCol" -> "myPrediction",
+    "fitIntercept" -> true,
+    "maxIter" -> 2,
+    "tol" -> 0.01
   )
 }

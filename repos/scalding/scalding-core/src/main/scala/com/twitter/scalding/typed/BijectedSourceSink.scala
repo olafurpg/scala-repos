@@ -32,7 +32,8 @@ object BijectedSourceSink {
 
 class BijectedSourceSink[T, U](parent: BijectedSourceSink.SourceSink[T])(
     implicit @transient transformer: ImplicitBijection[T, U])
-    extends TypedSource[U] with TypedSink[U] {
+    extends TypedSource[U]
+    with TypedSink[U] {
 
   val lockedBij = Externalizer(transformer)
 

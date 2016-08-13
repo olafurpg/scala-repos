@@ -80,7 +80,7 @@ class ForkJoinActorBenchmark {
     val penultimate =
       system.actorOf(Props(classOf[ForkJoinActorBenchmark.Pipe], Some(middle)))
     val beginning = system.actorOf(
-        Props(classOf[ForkJoinActorBenchmark.Pipe], Some(penultimate)))
+      Props(classOf[ForkJoinActorBenchmark.Pipe], Some(penultimate)))
 
     val p = TestProbe()
     p.watch(end)

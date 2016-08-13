@@ -21,7 +21,9 @@ import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 
 class ReassignPartitionsCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness
+    with Logging
+    with RackAwareTest {
 
   @Test
   def testRackAwareReassign() {
@@ -38,13 +40,13 @@ class ReassignPartitionsCommandTest
 
     // create a non rack aware assignment topic first
     val createOpts = new kafka.admin.TopicCommand.TopicCommandOptions(
-        Array("--partitions",
-              numPartitions.toString,
-              "--replication-factor",
-              replicationFactor.toString,
-              "--disable-rack-aware",
-              "--topic",
-              "foo"))
+      Array("--partitions",
+            numPartitions.toString,
+            "--replication-factor",
+            replicationFactor.toString,
+            "--disable-rack-aware",
+            "--topic",
+            "foo"))
     kafka.admin.TopicCommand.createTopic(zkUtils, createOpts)
 
     val topicJson = """{"topics": [{"topic": "foo"}], "version":1}"""
@@ -59,7 +61,10 @@ class ReassignPartitionsCommandTest
         case (topicPartition, replicas) =>
           (topicPartition.partition, replicas)
       }
-    checkReplicaDistribution(
-        assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
+    checkReplicaDistribution(assignment,
+                             rackInfo,
+                             rackInfo.size,
+                             numPartitions,
+                             replicationFactor)
   }
 }

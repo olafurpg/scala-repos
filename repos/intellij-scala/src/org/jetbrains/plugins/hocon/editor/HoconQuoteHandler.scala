@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.hocon.editor
 
-import com.intellij.codeInsight.editorActions.{JavaLikeQuoteHandler, SimpleTokenSetQuoteHandler}
+import com.intellij.codeInsight.editorActions.{
+  JavaLikeQuoteHandler,
+  SimpleTokenSetQuoteHandler
+}
 import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.{IElementType, TokenSet}
@@ -10,10 +13,10 @@ class HoconQuoteHandler
     extends SimpleTokenSetQuoteHandler(HoconTokenType.QuotedString)
     with JavaLikeQuoteHandler {
 
-  override protected def isNonClosedLiteral(
-      iterator: HighlighterIterator, chars: CharSequence) =
+  override protected def isNonClosedLiteral(iterator: HighlighterIterator,
+                                            chars: CharSequence) =
     iterator.getStart >= iterator.getEnd - 1 ||
-    chars.charAt(iterator.getEnd - 1) != '\"'
+      chars.charAt(iterator.getEnd - 1) != '\"'
 
   def getConcatenatableStringTokenTypes = TokenSet.EMPTY
 

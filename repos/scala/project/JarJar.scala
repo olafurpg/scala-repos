@@ -79,8 +79,8 @@ object JarJar {
           } catch {
             case ex: Exception =>
               throw new IOException(
-                  s"Failed to write ${e.name} / ${f.getParentFile} / ${f.getParentFile.exists}",
-                  ex)
+                s"Failed to write ${e.name} / ${f.getParentFile} / ${f.getParentFile.exists}",
+                ex)
           }
           Some(f)
         }

@@ -11,8 +11,8 @@ import java.util.logging.{Level, Logger}
 
 object perHostStats
     extends GlobalFlag(
-        false,
-        "enable/default per-host stats.\n" +
+      false,
+      "enable/default per-host stats.\n" +
         "\tWhen enabled,the configured stats receiver will be used,\n" +
         "\tor the loaded stats receiver if none given.\n" +
         "\tWhen disabled, the configured stats receiver will be used,\n" +
@@ -175,7 +175,7 @@ object LoadBalancerFactory {
               if (isClosed) return Future.exception(new ServiceClosedException)
               if (underlying == null)
                 underlying = next.make(
-                    params + Transporter.EndpointAddr(addr) +
+                  params + Transporter.EndpointAddr(addr) +
                     param.Stats(stats) + param.Monitor(composite))
             }
             underlying(conn)
@@ -205,13 +205,13 @@ object LoadBalancerFactory {
           Activity.Ok(set)
         case Addr.Neg =>
           log.info(
-              s"$label: name resolution is negative (local dtab: ${Dtab.local})")
+            s"$label: name resolution is negative (local dtab: ${Dtab.local})")
           Activity.Ok(Set.empty)
         case Addr.Failed(e) =>
           log.log(
-              Level.INFO,
-              s"$label: name resolution failed  (local dtab: ${Dtab.local})",
-              e)
+            Level.INFO,
+            s"$label: name resolution failed  (local dtab: ${Dtab.local})",
+            e)
           Activity.Failed(e)
         case Addr.Pending =>
           if (log.isLoggable(Level.FINE)) {
@@ -224,11 +224,11 @@ object LoadBalancerFactory {
       // traffic distributor to interpret weighted `Addresses`.
       Stack.Leaf(role,
                  new TrafficDistributor[Req, Rep](
-                     dest = destActivity,
-                     newEndpoint = newEndpoint,
-                     newBalancer = newBalancer,
-                     eagerEviction = !probationEnabled,
-                     statsReceiver = balancerStats
+                   dest = destActivity,
+                   newEndpoint = newEndpoint,
+                   newBalancer = newBalancer,
+                   eagerEviction = !probationEnabled,
+                   statsReceiver = balancerStats
                  ))
     }
   }
@@ -255,8 +255,8 @@ object ConcurrentLoadBalancerFactory {
   // package private for testing
   private[finagle] def replicate(num: Int): Address => Set[Address] = {
     case Address.Inet(ia, metadata) =>
-      for (i: Int <- (0 until num).toSet) yield
-        Address.Inet(ia, metadata + (ReplicaKey -> i))
+      for (i: Int <- (0 until num).toSet)
+        yield Address.Inet(ia, metadata + (ReplicaKey -> i))
     case addr => Set(addr)
   }
 
@@ -275,10 +275,10 @@ object ConcurrentLoadBalancerFactory {
     new StackModule[Req, Rep] {
       val description =
         "Balance requests across multiple connections on a single " +
-        "endpoint, used for pipelining protocols"
+          "endpoint, used for pipelining protocols"
 
-      override def make(
-          params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+      override def make(params: Stack.Params,
+                        next: Stack[ServiceFactory[Req, Rep]]) = {
         val Param(numConnections) = params[Param]
         val Dest(dest) = params[Dest]
         val newDest = dest.map {
@@ -334,15 +334,15 @@ abstract class LoadBalancerFactory {
   *    Protocol.configured(LoadBalancerFactory.Param(balancer))
   * }}
   */
-@deprecated(
-    "Use com.twitter.finagle.loadbalancer.Balancers per-client.", "2015-06-15")
+@deprecated("Use com.twitter.finagle.loadbalancer.Balancers per-client.",
+            "2015-06-15")
 object defaultBalancer extends GlobalFlag("choice", "Default load balancer")
 
 package exp {
   object loadMetric
       extends GlobalFlag(
-          "leastReq",
-          "Metric used to measure load across endpoints (leastReq | ewma)")
+        "leastReq",
+        "Metric used to measure load across endpoints (leastReq | ewma)")
 }
 
 object DefaultBalancerFactory extends LoadBalancerFactory {

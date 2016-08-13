@@ -43,7 +43,7 @@ object AttributeSet {
   /** Constructs a new [[AttributeSet]] given a sequence of [[Expression Expressions]]. */
   def apply(baseSet: Iterable[Expression]): AttributeSet = {
     new AttributeSet(
-        baseSet.flatMap(_.references).map(new AttributeEquals(_)).toSet)
+      baseSet.flatMap(_.references).map(new AttributeEquals(_)).toSet)
   }
 }
 
@@ -59,13 +59,14 @@ object AttributeSet {
   * when the transformation was a no-op).
   */
 class AttributeSet private (val baseSet: Set[AttributeEquals])
-    extends Traversable[Attribute] with Serializable {
+    extends Traversable[Attribute]
+    with Serializable {
 
   /** Returns true if the members of this AttributeSet and other are the same. */
   override def equals(other: Any): Boolean = other match {
     case otherSet: AttributeSet =>
       otherSet.size == baseSet.size &&
-      baseSet.map(_.a).forall(otherSet.contains)
+        baseSet.map(_.a).forall(otherSet.contains)
     case _ => false
   }
 
@@ -97,7 +98,7 @@ class AttributeSet private (val baseSet: Set[AttributeEquals])
     */
   def --(other: Traversable[NamedExpression]): AttributeSet =
     new AttributeSet(
-        baseSet -- other.map(a => new AttributeEquals(a.toAttribute)))
+      baseSet -- other.map(a => new AttributeEquals(a.toAttribute)))
 
   /**
     * Returns a new [[AttributeSet]] that contains all of the [[Attribute Attributes]] found

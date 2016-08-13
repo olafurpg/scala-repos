@@ -4,7 +4,12 @@
 package akka.dispatch.sysmsg
 
 import scala.annotation.tailrec
-import akka.actor.{ActorInitializationException, InternalActorRef, ActorRef, PossiblyHarmful}
+import akka.actor.{
+  ActorInitializationException,
+  InternalActorRef,
+  ActorRef,
+  PossiblyHarmful
+}
 import akka.actor.DeadLetterSuppression
 
 /**
@@ -24,8 +29,8 @@ private[akka] object SystemMessageList {
     if (head eq null) acc else sizeInner(head.next, acc + 1)
 
   @tailrec
-  private[sysmsg] def reverseInner(
-      head: SystemMessage, acc: SystemMessage): SystemMessage = {
+  private[sysmsg] def reverseInner(head: SystemMessage,
+                                   acc: SystemMessage): SystemMessage = {
     if (head eq null) acc
     else {
       val next = head.next
@@ -195,7 +200,8 @@ private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
   * <b>NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS</b>
   */
 private[akka] sealed trait SystemMessage
-    extends PossiblyHarmful with Serializable {
+    extends PossiblyHarmful
+    with Serializable {
   // Next fields are only modifiable via the SystemMessageList value class
   @transient
   private[sysmsg] var next: SystemMessage = _
@@ -261,8 +267,8 @@ private[akka] final case class Supervise(child: ActorRef, async: Boolean)
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class Watch(
-    watchee: InternalActorRef, watcher: InternalActorRef)
+private[akka] final case class Watch(watchee: InternalActorRef,
+                                     watcher: InternalActorRef)
     extends SystemMessage // sent to establish a DeathWatch
 /**
   * INTERNAL API
@@ -280,11 +286,17 @@ private[akka] case object NoMessage extends SystemMessage // switched into the m
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class Failed(
-    child: ActorRef, cause: Throwable, uid: Int)
-    extends SystemMessage with StashWhenFailed with StashWhenWaitingForChildren
+private[akka] final case class Failed(child: ActorRef,
+                                      cause: Throwable,
+                                      uid: Int)
+    extends SystemMessage
+    with StashWhenFailed
+    with StashWhenWaitingForChildren
 
 @SerialVersionUID(1L)
 private[akka] final case class DeathWatchNotification(
-    actor: ActorRef, existenceConfirmed: Boolean, addressTerminated: Boolean)
-    extends SystemMessage with DeadLetterSuppression
+    actor: ActorRef,
+    existenceConfirmed: Boolean,
+    addressTerminated: Boolean)
+    extends SystemMessage
+    with DeadLetterSuppression

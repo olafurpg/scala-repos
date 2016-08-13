@@ -137,7 +137,8 @@ import akka.dispatch.Dispatchers
   *
   */
 object ClusterSharding
-    extends ExtensionId[ClusterSharding] with ExtensionIdProvider {
+    extends ExtensionId[ClusterSharding]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): ClusterSharding = super.get(system)
 
   override def lookup = ClusterSharding
@@ -167,14 +168,14 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
       case id ⇒ id
     }
     system.systemActorOf(
-        Props[ClusterShardingGuardian].withDispatcher(dispatcher),
-        guardianName)
+      Props[ClusterShardingGuardian].withDispatcher(dispatcher),
+      guardianName)
   }
 
   private[akka] def requireClusterRole(role: Option[String]): Unit =
     require(
-        role.forall(cluster.selfRoles.contains),
-        s"This cluster member [${cluster.selfAddress}] doesn't have the role [$role]")
+      role.forall(cluster.selfRoles.contains),
+      s"This cluster member [${cluster.selfAddress}] doesn't have the role [$role]")
 
   /**
     * Scala API: Register a named entity type by defining the [[akka.actor.Props]] of the entity actor
@@ -249,8 +250,8 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
             extractShardId: ShardRegion.ExtractShardId): ActorRef = {
 
     val allocationStrategy = new LeastShardAllocationStrategy(
-        settings.tuningParameters.leastShardAllocationRebalanceThreshold,
-        settings.tuningParameters.leastShardAllocationMaxSimultaneousRebalance)
+      settings.tuningParameters.leastShardAllocationRebalanceThreshold,
+      settings.tuningParameters.leastShardAllocationMaxSimultaneousRebalance)
 
     start(typeName,
           entityProps,
@@ -287,17 +288,17 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
             allocationStrategy: ShardAllocationStrategy,
             handOffStopMessage: Any): ActorRef = {
 
-    start(typeName,
-          entityProps,
-          settings,
-          extractEntityId = {
-            case msg if messageExtractor.entityId(msg) ne null ⇒
-              (messageExtractor.entityId(msg),
-               messageExtractor.entityMessage(msg))
-          },
-          extractShardId = msg ⇒ messageExtractor.shardId(msg),
-          allocationStrategy = allocationStrategy,
-          handOffStopMessage = handOffStopMessage)
+    start(
+      typeName,
+      entityProps,
+      settings,
+      extractEntityId = {
+        case msg if messageExtractor.entityId(msg) ne null ⇒
+          (messageExtractor.entityId(msg), messageExtractor.entityMessage(msg))
+      },
+      extractShardId = msg ⇒ messageExtractor.shardId(msg),
+      allocationStrategy = allocationStrategy,
+      handOffStopMessage = handOffStopMessage)
   }
 
   /**
@@ -324,8 +325,8 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
             messageExtractor: ShardRegion.MessageExtractor): ActorRef = {
 
     val allocationStrategy = new LeastShardAllocationStrategy(
-        settings.tuningParameters.leastShardAllocationRebalanceThreshold,
-        settings.tuningParameters.leastShardAllocationMaxSimultaneousRebalance)
+      settings.tuningParameters.leastShardAllocationRebalanceThreshold,
+      settings.tuningParameters.leastShardAllocationMaxSimultaneousRebalance)
 
     start(typeName,
           entityProps,
@@ -361,8 +362,8 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
 
     implicit val timeout = system.settings.CreationTimeout
     val settings = ClusterShardingSettings(system).withRole(role)
-    val startMsg = StartProxy(
-        typeName, settings, extractEntityId, extractShardId)
+    val startMsg =
+      StartProxy(typeName, settings, extractEntityId, extractShardId)
     val Started(shardRegion) =
       Await.result(guardian ? startMsg, timeout.duration)
     regions.put(typeName, shardRegion)
@@ -403,7 +404,7 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
   def shardRegion(typeName: String): ActorRef = regions.get(typeName) match {
     case null ⇒
       throw new IllegalArgumentException(
-          s"Shard type [$typeName] must be started first")
+        s"Shard type [$typeName] must be started first")
     case ref ⇒ ref
   }
 }
@@ -467,8 +468,8 @@ private[akka] class ClusterShardingGuardian extends Actor {
             if (settings.stateStoreMode == "persistence")
               ShardCoordinator.props(typeName, settings, allocationStrategy)
             else
-              ShardCoordinator.props(
-                  typeName, settings, allocationStrategy, replicator)
+              ShardCoordinator
+                .props(typeName, settings, allocationStrategy, replicator)
           val singletonProps = BackoffSupervisor
             .props(childProps = coordinatorProps,
                    childName = "coordinator",

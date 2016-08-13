@@ -21,7 +21,11 @@ import java.sql.{Date, Timestamp}
 
 import scala.language.implicitConversions
 
-import org.apache.spark.sql.catalyst.analysis.{EliminateSubqueryAliases, UnresolvedAttribute, UnresolvedExtractValue}
+import org.apache.spark.sql.catalyst.analysis.{
+  EliminateSubqueryAliases,
+  UnresolvedAttribute,
+  UnresolvedExtractValue
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.plans.{Inner, JoinType}
@@ -92,11 +96,11 @@ package object dsl {
     def contains(other: Expression): Expression = Contains(expr, other)
     def startsWith(other: Expression): Expression = StartsWith(expr, other)
     def endsWith(other: Expression): Expression = EndsWith(expr, other)
-    def substr(
-        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+    def substr(pos: Expression,
+               len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
-    def substring(
-        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+    def substring(pos: Expression,
+                  len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
 
     def isNull: Predicate = IsNull(expr)
@@ -324,14 +328,14 @@ package object dsl {
                  outputNames.map(UnresolvedAttribute(_)),
                  logicalPlan)
 
-      def insertInto(
-          tableName: String, overwrite: Boolean = false): LogicalPlan =
+      def insertInto(tableName: String,
+                     overwrite: Boolean = false): LogicalPlan =
         InsertIntoTable(
-            analysis.UnresolvedRelation(TableIdentifier(tableName)),
-            Map.empty,
-            logicalPlan,
-            overwrite,
-            false)
+          analysis.UnresolvedRelation(TableIdentifier(tableName)),
+          Map.empty,
+          logicalPlan,
+          overwrite,
+          false)
 
       def analyze: LogicalPlan =
         EliminateSubqueryAliases(analysis.SimpleAnalyzer.execute(logicalPlan))

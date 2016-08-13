@@ -15,7 +15,7 @@ class StreamTest {
   def t6727_and_t6440_and_8627(): Unit = {
     assertTrue(Stream.continually(()).filter(_ => true).take(2) == Seq((), ()))
     assertTrue(
-        Stream.continually(()).filterNot(_ => false).take(2) == Seq((), ()))
+      Stream.continually(()).filterNot(_ => false).take(2) == Seq((), ()))
     assertTrue(Stream(1, 2, 3, 4, 5).filter(_ < 4) == Seq(1, 2, 3))
     assertTrue(Stream(1, 2, 3, 4, 5).filterNot(_ > 4) == Seq(1, 2, 3, 4))
     assertTrue(Stream.from(1).filter(_ > 4).take(3) == Seq(5, 6, 7))
@@ -25,8 +25,8 @@ class StreamTest {
   /** Test helper to verify that the given Stream operation allows
     * GC of the head during processing of the tail.
     */
-  def assertStreamOpAllowsGC(
-      op: (=> Stream[Int], Int => Unit) => Any, f: Int => Unit): Unit = {
+  def assertStreamOpAllowsGC(op: (=> Stream[Int], Int => Unit) => Any,
+                             f: Int => Unit): Unit = {
     val msgSuccessGC = "GC success"
     val msgFailureGC = "GC failure"
 
@@ -45,7 +45,9 @@ class StreamTest {
 
     val res = Try { op(ref(), gcAndThrowIfCollected) }.failed // success is indicated by an
     val msg =
-      res.map(_.getMessage).getOrElse(msgFailureGC) // exception with expected message 
+      res
+        .map(_.getMessage)
+        .getOrElse(msgFailureGC) // exception with expected message
     // failure is indicated by no
     assertTrue(msg == msgSuccessGC) // exception, or one with different message
   }
@@ -67,8 +69,8 @@ class StreamTest {
 
   @Test // SI-8990
   def withFilter_after_first_withFilter_foreach_allows_GC: Unit = {
-    assertStreamOpAllowsGC(
-        _.withFilter(_ > 1).withFilter(_ < 100).foreach(_), _ => ())
+    assertStreamOpAllowsGC(_.withFilter(_ > 1).withFilter(_ < 100).foreach(_),
+                           _ => ())
   }
 
   @Test // SI-8990
@@ -114,8 +116,8 @@ class StreamTest {
 
   @Test // SI-9134
   def withFilter_map_properly_lazy_in_tail: Unit = {
-    assertStreamOpLazyInTail(
-        _.withFilter(_ % 2 == 0).map(identity), List(1, 2))
+    assertStreamOpLazyInTail(_.withFilter(_ % 2 == 0).map(identity),
+                             List(1, 2))
   }
 
   @Test

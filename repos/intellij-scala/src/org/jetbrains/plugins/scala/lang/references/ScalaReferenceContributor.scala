@@ -12,13 +12,19 @@ import com.intellij.openapi.util.{Condition, TextRange}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi._
-import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReference, FileReferenceSet}
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.{
+  FileReference,
+  FileReferenceSet
+}
 import com.intellij.util.ProcessingContext
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScInterpolationPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScInterpolatedStringPartReference
@@ -28,23 +34,24 @@ import scala.collection.JavaConversions
 class ScalaReferenceContributor extends PsiReferenceContributor {
   def registerReferenceProviders(registrar: PsiReferenceRegistrar) {
     registrar.registerReferenceProvider(
-        PlatformPatterns.psiElement(classOf[ScLiteral]),
-        new FilePathReferenceProvider())
+      PlatformPatterns.psiElement(classOf[ScLiteral]),
+      new FilePathReferenceProvider())
     registrar.registerReferenceProvider(
-        PlatformPatterns.psiElement(classOf[ScLiteral]),
-        new InterpolatedStringReferenceProvider())
+      PlatformPatterns.psiElement(classOf[ScLiteral]),
+      new InterpolatedStringReferenceProvider())
   }
 }
 
 class InterpolatedStringReferenceProvider extends PsiReferenceProvider {
   override def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     element match {
       case s: ScInterpolatedStringLiteral => Array.empty
       case l: ScLiteral
           if (l.isString || l.isMultiLineString) && l.getText.contains("$") =>
-        val interpolated = ScalaPsiElementFactory.createExpressionFromText(
-            "s" + l.getText, l.getContext)
+        val interpolated = ScalaPsiElementFactory
+          .createExpressionFromText("s" + l.getText, l.getContext)
         interpolated.getChildren.filter {
           case r: ScInterpolatedStringPartReference => false
           case ref: ScReferenceExpression => true
@@ -86,7 +93,7 @@ class InterpolatedStringReferenceProvider extends PsiReferenceProvider {
 // todo: Copy of the corresponding class from IDEA, changed to use ScLiteral rather than PsiLiteralExpr
 class FilePathReferenceProvider extends PsiReferenceProvider {
   private val LOG: Logger = Logger.getInstance(
-      "#org.jetbrains.plugins.scala.lang.references.FilePathReferenceProvider")
+    "#org.jetbrains.plugins.scala.lang.references.FilePathReferenceProvider")
 
   @NotNull
   def getRoots(
@@ -123,7 +130,7 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
             try {
               val createMethod = Class
                 .forName(
-                    "com.intellij.psi.impl.source.resolve.reference.impl.providers.PackagePrefixFileSystemItemImpl")
+                  "com.intellij.psi.impl.source.resolve.reference.impl.providers.PackagePrefixFileSystemItemImpl")
                 .getMethod("create", classOf[PsiDirectory])
               createMethod.setAccessible(true)
               createMethod.invoke(directory)
@@ -144,8 +151,12 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
                              text: String,
                              offset: Int,
                              soft: Boolean): Array[PsiReference] = {
-    new FileReferenceSet(
-        text, element, offset, this, true, myEndingSlashNotAllowed) {
+    new FileReferenceSet(text,
+                         element,
+                         offset,
+                         this,
+                         true,
+                         myEndingSlashNotAllowed) {
       protected override def isSoft: Boolean = soft
 
       override def isAbsolutePathReference: Boolean = true
@@ -158,19 +169,22 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
       }
 
       @NotNull override def computeDefaultContexts: java.util.Collection[
-          PsiFileSystemItem] = {
+        PsiFileSystemItem] = {
         val module: Module = ModuleUtilCore.findModuleForPsiElement(getElement)
         getRoots(module, includingClasses = true)
       }
 
-      override def createFileReference(
-          range: TextRange, index: Int, text: String): FileReference = {
-        FilePathReferenceProvider.this.createFileReference(
-            this, range, index, text)
+      override def createFileReference(range: TextRange,
+                                       index: Int,
+                                       text: String): FileReference = {
+        FilePathReferenceProvider.this.createFileReference(this,
+                                                           range,
+                                                           index,
+                                                           text)
       }
 
       protected override def getReferenceCompletionFilter: Condition[
-          PsiFileSystemItem] = {
+        PsiFileSystemItem] = {
         new Condition[PsiFileSystemItem] {
           def value(element: PsiFileSystemItem): Boolean = {
             isPsiElementAccepted(element)
@@ -186,7 +200,7 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
 
   protected def isPsiElementAccepted(element: PsiElement): Boolean = {
     !(element.isInstanceOf[PsiJavaFile] &&
-        element.isInstanceOf[PsiCompiledElement])
+      element.isInstanceOf[PsiCompiledElement])
   }
 
   protected def createFileReference(referenceSet: FileReferenceSet,
@@ -197,23 +211,28 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
   }
 
   def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     element match {
       case interpolated: ScInterpolationPattern =>
         val refs = interpolated.getReferencesToStringParts
         val start: Int = interpolated.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(
-              r.getElement, r.getElement.getText, offset, soft = true)
+          getReferencesByElement(r.getElement,
+                                 r.getElement.getText,
+                                 offset,
+                                 soft = true)
         }
       case interpolatedString: ScInterpolatedStringLiteral =>
         val refs = interpolatedString.getReferencesToStringParts
         val start: Int = interpolatedString.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(
-              r.getElement, r.getElement.getText, offset, soft = true)
+          getReferencesByElement(r.getElement,
+                                 r.getElement.getText,
+                                 offset,
+                                 soft = true)
         }
       case literal: ScLiteral =>
         literal.getValue match {

@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PageOrientationSpec
     extends SFXEnumDelegateSpec[jfxp.PageOrientation, PageOrientation](
-        javaClass = classOf[jfxp.PageOrientation],
-        scalaClass = classOf[PageOrientation],
-        companion = PageOrientation)
+      javaClass = classOf[jfxp.PageOrientation],
+      scalaClass = classOf[PageOrientation],
+      companion = PageOrientation)

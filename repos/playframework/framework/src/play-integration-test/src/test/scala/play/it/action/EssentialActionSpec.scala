@@ -25,14 +25,14 @@ object EssentialActionSpec extends PlaySpecification {
       // start fake application with its own classloader
       val applicationClassLoader = new ClassLoader() {}
 
-      running(_.in(Environment
-                .simple()
-                .copy(classLoader = applicationClassLoader))) { app =>
-        import app.materializer
-        // run the test with the classloader of the current thread
-        Thread.currentThread.getContextClassLoader must not be applicationClassLoader
-        call(action, FakeRequest())
-        await(actionClassLoader.future) must be equalTo applicationClassLoader
+      running(_.in(
+        Environment.simple().copy(classLoader = applicationClassLoader))) {
+        app =>
+          import app.materializer
+          // run the test with the classloader of the current thread
+          Thread.currentThread.getContextClassLoader must not be applicationClassLoader
+          call(action, FakeRequest())
+          await(actionClassLoader.future) must be equalTo applicationClassLoader
       }
     }
   }

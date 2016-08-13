@@ -60,10 +60,10 @@ private[prediction] trait StatsMetricHelper[EI, Q, P, A] {
   def calculateStats(sc: SparkContext,
                      evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): StatCounter = {
     val doubleRDD = sc.union(
-        evalDataSet.map {
-          case (_, qpaRDD) =>
-            qpaRDD.map { case (q, p, a) => calculate(q, p, a) }
-        }
+      evalDataSet.map {
+        case (_, qpaRDD) =>
+          qpaRDD.map { case (q, p, a) => calculate(q, p, a) }
+      }
     )
 
     doubleRDD.stats()
@@ -76,10 +76,10 @@ private[prediction] trait StatsOptionMetricHelper[EI, Q, P, A] {
   def calculateStats(sc: SparkContext,
                      evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): StatCounter = {
     val doubleRDD = sc.union(
-        evalDataSet.map {
-          case (_, qpaRDD) =>
-            qpaRDD.flatMap { case (q, p, a) => calculate(q, p, a) }
-        }
+      evalDataSet.map {
+        case (_, qpaRDD) =>
+          qpaRDD.flatMap { case (q, p, a) => calculate(q, p, a) }
+      }
     )
 
     doubleRDD.stats()
@@ -96,7 +96,8 @@ private[prediction] trait StatsOptionMetricHelper[EI, Q, P, A] {
   * @group Evaluation
   */
 abstract class AverageMetric[EI, Q, P, A]
-    extends Metric[EI, Q, P, A, Double] with StatsMetricHelper[EI, Q, P, A]
+    extends Metric[EI, Q, P, A, Double]
+    with StatsMetricHelper[EI, Q, P, A]
     with QPAMetric[Q, P, A, Double] {
 
   /** Implement this method to return a score that will be used for averaging
@@ -104,8 +105,8 @@ abstract class AverageMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Double
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).mean
   }
 }
@@ -130,8 +131,8 @@ abstract class OptionAverageMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Option[Double]
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).mean
   }
 }
@@ -149,7 +150,8 @@ abstract class OptionAverageMetric[EI, Q, P, A]
   * @group Evaluation
   */
 abstract class StdevMetric[EI, Q, P, A]
-    extends Metric[EI, Q, P, A, Double] with StatsMetricHelper[EI, Q, P, A]
+    extends Metric[EI, Q, P, A, Double]
+    with StatsMetricHelper[EI, Q, P, A]
     with QPAMetric[Q, P, A, Double] {
 
   /** Implement this method to return a score that will be used for calculating
@@ -158,8 +160,8 @@ abstract class StdevMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Double
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).stdev
   }
 }
@@ -187,13 +189,13 @@ abstract class OptionStdevMetric[EI, Q, P, A]
     */
   def calculate(q: Q, p: P, a: A): Option[Double]
 
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = {
     calculateStats(sc, evalDataSet).stdev
   }
 }
 
-/** Returns the sum of the score returned by the calculate method. 
+/** Returns the sum of the score returned by the calculate method.
   *
   * @tparam EI Evaluation information
   * @tparam Q Query
@@ -203,8 +205,9 @@ abstract class OptionStdevMetric[EI, Q, P, A]
   *
   * @group Evaluation
   */
-abstract class SumMetric[EI, Q, P, A, R : ClassTag](implicit num: Numeric[R])
-    extends Metric[EI, Q, P, A, R]()(num) with QPAMetric[Q, P, A, R] {
+abstract class SumMetric[EI, Q, P, A, R: ClassTag](implicit num: Numeric[R])
+    extends Metric[EI, Q, P, A, R]()(num)
+    with QPAMetric[Q, P, A, R] {
 
   /** Implement this method to return a score that will be used for summing
     * across all QPA tuples.
@@ -213,10 +216,10 @@ abstract class SumMetric[EI, Q, P, A, R : ClassTag](implicit num: Numeric[R])
 
   def calculate(sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): R = {
     val union: RDD[R] = sc.union(
-        evalDataSet.map {
-          case (_, qpaRDD) =>
-            qpaRDD.map { case (q, p, a) => calculate(q, p, a) }
-        }
+      evalDataSet.map {
+        case (_, qpaRDD) =>
+          qpaRDD.map { case (q, p, a) => calculate(q, p, a) }
+      }
     )
 
     union.aggregate[R](num.zero)(_ + _, _ + _)
@@ -233,8 +236,8 @@ abstract class SumMetric[EI, Q, P, A, R : ClassTag](implicit num: Numeric[R])
   * @group Evaluation
   */
 class ZeroMetric[EI, Q, P, A] extends Metric[EI, Q, P, A, Double]() {
-  def calculate(
-      sc: SparkContext, evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = 0.0
+  def calculate(sc: SparkContext,
+                evalDataSet: Seq[(EI, RDD[(Q, P, A)])]): Double = 0.0
 }
 
 /** Companion object of [[ZeroMetric]]

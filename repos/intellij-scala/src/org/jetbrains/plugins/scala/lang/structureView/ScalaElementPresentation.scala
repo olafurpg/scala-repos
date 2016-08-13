@@ -41,7 +41,7 @@ object ScalaElementPresentation {
     presentableText.append("this")
     if (constructor.parameters != null)
       presentableText.append(
-          StructureViewUtil.getParametersAsString(constructor.parameterList))
+        StructureViewUtil.getParametersAsString(constructor.parameterList))
     presentableText.toString
   }
 
@@ -51,14 +51,15 @@ object ScalaElementPresentation {
       subst: ScSubstitutor = ScSubstitutor.empty): String = {
     val presentableText: StringBuffer = new StringBuffer
     presentableText.append(
-        if (!function.isConstructor) function.name else "this")
+      if (!function.isConstructor) function.name else "this")
 
-    function.typeParametersClause.foreach(
-        clause => presentableText.append(clause.getText))
+    function.typeParametersClause.foreach(clause =>
+      presentableText.append(clause.getText))
 
     if (function.paramClauses != null)
-      presentableText.append(StructureViewUtil.getParametersAsString(
-              function.paramClauses, fast, subst))
+      presentableText.append(
+        StructureViewUtil
+          .getParametersAsString(function.paramClauses, fast, subst))
 
     if (fast) {
       function.returnTypeElement match {

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -47,7 +47,9 @@ import scalaz._
 import scalaz.syntax.monad._
 
 trait PerfTestRunnerConfig
-    extends BaseConfig with IdSourceConfig with ColumnarTableModuleConfig {
+    extends BaseConfig
+    with IdSourceConfig
+    with ColumnarTableModuleConfig {
 
   def optimize: Boolean
   def apiKey: APIKey
@@ -67,7 +69,8 @@ trait EvaluatingPerfTestRunnerConfig extends PerfTestRunnerConfig {
 }
 
 trait EvaluatingPerfTestRunner[M[+ _], T]
-    extends ParseEvalStack[M] with IdSourceScannerModule
+    extends ParseEvalStack[M]
+    with IdSourceScannerModule
     with PerfTestRunner[M, T] {
 
   type Result = Int
@@ -75,8 +78,8 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
   type YggConfig <: PerfTestRunnerConfig
 
   private implicit val nt = NaturalTransformation.refl[M]
-  def Evaluator[N[+ _]](N0: Monad[N])(
-      implicit mn: M ~> N, nm: N ~> M): EvaluatorLike[N]
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: M ~> N,
+                                      nm: N ~> M): EvaluatorLike[N]
 
   val dummyAccount = AccountDetails("dummyAccount",
                                     "nobody@precog.com",
@@ -85,8 +88,11 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
                                     Path.Root,
                                     AccountPlan.Free)
   def dummyEvaluationContext =
-    EvaluationContext(
-        yggConfig.apiKey, dummyAccount, Path.Root, Path.Root, new DateTime)
+    EvaluationContext(yggConfig.apiKey,
+                      dummyAccount,
+                      Path.Root,
+                      Path.Root,
+                      new DateTime)
 
   def eval(query: String): M[Result] =
     try {
@@ -94,7 +100,8 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
       val valid = forest filter { _.errors forall isWarning }
 
       if (valid.isEmpty) {
-        sys.error("Error parsing query:\n" +
+        sys.error(
+          "Error parsing query:\n" +
             (forest flatMap { _.errors } map { _.toString } mkString "\n"))
       } else if (valid.size > 1) {
         sys.error("Ambiguous parse tree.")
@@ -110,16 +117,16 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
 
         case Right(dag) =>
           for {
-            table <- Evaluator(M).eval(
-                dag, dummyEvaluationContext, yggConfig.optimize)
+            table <- Evaluator(M)
+                      .eval(dag, dummyEvaluationContext, yggConfig.optimize)
             size <- Timing.timeM("Counting stream")(
-                countStream(table.renderJson("", ",", "")))
+                     countStream(table.renderJson("", ",", "")))
           } yield size
       }
     } catch {
       case e: com.precog.quirrel.parser.Parser$ParseException =>
         sys.error(
-            "Error parsing query:\n\n%s\n\n%s" format (query, e.getMessage()))
+          "Error parsing query:\n\n%s\n\n%s" format (query, e.getMessage()))
     }
 
   private def countStream[A](str: StreamT[M, A]): M[Int] = {

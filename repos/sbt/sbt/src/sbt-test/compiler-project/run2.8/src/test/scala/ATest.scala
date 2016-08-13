@@ -8,7 +8,7 @@ class ATest extends Specification {
       val foo = new Foo
       val numbers = List[Any](1, 2, 5, 19)
       numbers.map(i => foo.eval(i.toString)) must haveTheSameElementsAs(
-          numbers)
+        numbers)
     }
   }
 }

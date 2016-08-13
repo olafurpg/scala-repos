@@ -19,7 +19,11 @@ package org.apache.spark.rdd
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude, JsonPropertyOrder}
+import com.fasterxml.jackson.annotation.{
+  JsonIgnore,
+  JsonInclude,
+  JsonPropertyOrder
+}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -98,7 +102,8 @@ private[spark] object RDDOperationScope extends Logging {
     * Note: Return statements are NOT allowed in body.
     */
   private[spark] def withScope[T](
-      sc: SparkContext, allowNesting: Boolean = false)(body: => T): T = {
+      sc: SparkContext,
+      allowNesting: Boolean = false)(body: => T): T = {
     val ourMethodName = "withScope"
     val callerMethodName = Thread.currentThread
       .getStackTrace()
@@ -111,7 +116,7 @@ private[spark] object RDDOperationScope extends Logging {
         "N/A"
       }
     withScope[T](sc, callerMethodName, allowNesting, ignoreParent = false)(
-        body)
+      body)
   }
 
   /**
@@ -143,8 +148,8 @@ private[spark] object RDDOperationScope extends Logging {
         sc.setLocalProperty(scopeKey, new RDDOperationScope(name).toJson)
       } else if (sc.getLocalProperty(noOverrideKey) == null) {
         // Otherwise, set the scope only if the higher level caller allows us to do so
-        sc.setLocalProperty(
-            scopeKey, new RDDOperationScope(name, oldScope).toJson)
+        sc.setLocalProperty(scopeKey,
+                            new RDDOperationScope(name, oldScope).toJson)
       }
       // Optionally disallow the child body to override our scope
       if (!allowNesting) {

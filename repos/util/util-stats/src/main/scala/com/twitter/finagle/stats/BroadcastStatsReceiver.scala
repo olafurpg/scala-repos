@@ -27,12 +27,13 @@ object BroadcastStatsReceiver {
     }
 
   private class Two(first: StatsReceiver, second: StatsReceiver)
-      extends StatsReceiver with BroadcastStatsReceiver {
+      extends StatsReceiver
+      with BroadcastStatsReceiver {
     val repr = this
 
     def counter(names: String*): Counter =
-      new BroadcastCounter.Two(
-          first.counter(names: _*), second.counter(names: _*))
+      new BroadcastCounter.Two(first.counter(names: _*),
+                               second.counter(names: _*))
 
     def stat(names: String*): Stat =
       new BroadcastStat.Two(first.stat(names: _*), second.stat(names: _*))
@@ -53,7 +54,8 @@ object BroadcastStatsReceiver {
   }
 
   private class N(srs: Seq[StatsReceiver])
-      extends StatsReceiver with BroadcastStatsReceiver {
+      extends StatsReceiver
+      with BroadcastStatsReceiver {
     val repr = this
 
     def counter(names: String*): Counter =

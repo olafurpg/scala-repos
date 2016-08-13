@@ -14,7 +14,10 @@ import mesosphere.mesos.protos.SlaveID
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskOpFactoryImplTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("Copy SlaveID from Offer to Task") {
     val f = new Fixture
@@ -26,7 +29,7 @@ class TaskOpFactoryImplTest
       .build()
     val app: AppDefinition = AppDefinition(portDefinitions = List())
     val runningTasks: Set[Task] = Set(
-        MarathonTestHelper.mininimalTask("some task ID")
+      MarathonTestHelper.mininimalTask("some task ID")
     )
 
     val request =
@@ -34,17 +37,17 @@ class TaskOpFactoryImplTest
     val inferredTaskOp = f.taskOpFactory.buildTaskOp(request)
 
     val expectedTask = Task.LaunchedEphemeral(
-        taskId = inferredTaskOp.fold(Task.Id("failure"))(_.taskId),
-        agentInfo = Task.AgentInfo(
-              host = "some_host",
-              agentId = Some(offer.getSlaveId.getValue),
-              attributes = List.empty
-          ),
-        appVersion = app.version,
-        status = Task.Status(
-              stagedAt = f.clock.now()
-          ),
-        networking = Task.HostPorts(List.empty)
+      taskId = inferredTaskOp.fold(Task.Id("failure"))(_.taskId),
+      agentInfo = Task.AgentInfo(
+        host = "some_host",
+        agentId = Some(offer.getSlaveId.getValue),
+        attributes = List.empty
+      ),
+      appVersion = app.version,
+      status = Task.Status(
+        stagedAt = f.clock.now()
+      ),
+      networking = Task.HostPorts(List.empty)
     )
     assert(inferredTaskOp.isDefined, "task op is not empty")
     assert(inferredTaskOp.get.maybeNewTask.get == expectedTask)
@@ -99,7 +102,7 @@ class TaskOpFactoryImplTest
   }
 
   test(
-      "Resident app -> ReserveAndCreateVolumes fails because of insufficient disk resources") {
+    "Resident app -> ReserveAndCreateVolumes fails because of insufficient disk resources") {
     Given("A resident app, an insufficient offer and no tasks")
     val f = new Fixture
     val app = f.residentApp
@@ -133,7 +136,7 @@ class TaskOpFactoryImplTest
 
   test("Resident app -> Launch succeeds") {
     Given(
-        "A resident app, an offer with persistent volumes and a matching task")
+      "A resident app, an offer with persistent volumes and a matching task")
     val f = new Fixture
     val app = f.residentApp.copy(instances = 2)
     val localVolumeIdLaunched =
@@ -144,10 +147,10 @@ class TaskOpFactoryImplTest
       LocalVolumeId(app.id, "persistent-volume", "uuidMatch")
     val reservedTask = f.residentReservedTask(app.id, localVolumeIdMatch)
     val offer = f.offerWithVolumes(
-        reservedTask.taskId.idString,
-        localVolumeIdLaunched,
-        localVolumeIdUnwanted,
-        localVolumeIdMatch
+      reservedTask.taskId.idString,
+      localVolumeIdLaunched,
+      localVolumeIdUnwanted,
+      localVolumeIdMatch
     )
     val runningTasks =
       Seq(f.residentLaunchedTask(app.id, localVolumeIdLaunched), reservedTask)
@@ -175,7 +178,7 @@ class TaskOpFactoryImplTest
 
   test("Resident app -> None (enough launched tasks)") {
     Given(
-        "A resident app, a matching offer with persistent volumes but already enough launched tasks")
+      "A resident app, a matching offer with persistent volumes but already enough launched tasks")
     val f = new Fixture
     val app = f.residentApp
     val usedVolumeId =
@@ -198,8 +201,8 @@ class TaskOpFactoryImplTest
   class Fixture {
     import mesosphere.marathon.{MarathonTestHelper => MTH}
     val taskTracker = mock[TaskTracker]
-    val config: MarathonConf = MTH.defaultConfig(
-        mesosRole = Some("test"), principal = Some("principal"))
+    val config: MarathonConf = MTH
+      .defaultConfig(mesosRole = Some("test"), principal = Some("principal"))
     val clock = ConstantClock()
     val taskOpFactory: TaskOpFactory = new TaskOpFactoryImpl(config, clock)
 

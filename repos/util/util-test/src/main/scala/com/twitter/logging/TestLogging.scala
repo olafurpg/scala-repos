@@ -25,7 +25,7 @@ import org.scalatest.{BeforeAndAfter, WordSpec}
   */
 trait TestLogging extends BeforeAndAfter { self: WordSpec =>
   val logLevel = Logger.levelNames(
-      Option[String](System.getenv("log")).getOrElse("FATAL").toUpperCase)
+    Option[String](System.getenv("log")).getOrElse("FATAL").toUpperCase)
 
   private val logger = Logger.get("")
   private var oldLevel: jlogging.Level = _

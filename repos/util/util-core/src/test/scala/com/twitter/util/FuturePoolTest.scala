@@ -13,7 +13,8 @@ import scala.runtime.NonLocalReturnControl
 class FuturePoolTest extends FunSuite with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(
-      timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
+    timeout = scaled(Span(15, Seconds)),
+    interval = scaled(Span(5, Millis)))
 
   test("FuturePool should dispatch to another thread") {
     val executor = Executors.newFixedThreadPool(1)
@@ -105,8 +106,11 @@ class FuturePoolTest extends FunSuite with Eventually {
   }
 
   test("returns exceptions that result from submitting a task to the pool") {
-    val executor = new ThreadPoolExecutor(
-        1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue(1))
+    val executor = new ThreadPoolExecutor(1,
+                                          1,
+                                          60,
+                                          TimeUnit.SECONDS,
+                                          new LinkedBlockingQueue(1))
     val pool = FuturePool(executor)
 
     val source = new Promise[Int]

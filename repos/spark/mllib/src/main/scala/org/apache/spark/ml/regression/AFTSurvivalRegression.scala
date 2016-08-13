@@ -41,8 +41,14 @@ import org.apache.spark.storage.StorageLevel
   * Params for accelerated failure time (AFT) regression.
   */
 private[regression] trait AFTSurvivalRegressionParams
-    extends Params with HasFeaturesCol with HasLabelCol with HasPredictionCol
-    with HasMaxIter with HasTol with HasFitIntercept with Logging {
+    extends Params
+    with HasFeaturesCol
+    with HasLabelCol
+    with HasPredictionCol
+    with HasMaxIter
+    with HasTol
+    with HasFitIntercept
+    with Logging {
 
   /**
     * Param for censor column name.
@@ -51,8 +57,8 @@ private[regression] trait AFTSurvivalRegressionParams
     * @group param
     */
   @Since("1.6.0")
-  final val censorCol: Param[String] = new Param(
-      this, "censorCol", "censor column name")
+  final val censorCol: Param[String] =
+    new Param(this, "censorCol", "censor column name")
 
   /** @group getParam */
   @Since("1.6.0")
@@ -67,17 +73,25 @@ private[regression] trait AFTSurvivalRegressionParams
     */
   @Since("1.6.0")
   final val quantileProbabilities: DoubleArrayParam = new DoubleArrayParam(
-      this,
-      "quantileProbabilities",
-      "quantile probabilities array",
-      (t: Array[Double]) =>
-        t.forall(ParamValidators.inRange(0, 1, false, false)) && t.length > 0)
+    this,
+    "quantileProbabilities",
+    "quantile probabilities array",
+    (t: Array[Double]) =>
+      t.forall(ParamValidators.inRange(0, 1, false, false)) && t.length > 0)
 
   /** @group getParam */
   @Since("1.6.0")
   def getQuantileProbabilities: Array[Double] = $(quantileProbabilities)
-  setDefault(quantileProbabilities -> Array(
-          0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99))
+  setDefault(
+    quantileProbabilities -> Array(0.01,
+                                   0.05,
+                                   0.1,
+                                   0.25,
+                                   0.5,
+                                   0.75,
+                                   0.9,
+                                   0.95,
+                                   0.99))
 
   /**
     * Param for quantiles column name.
@@ -85,8 +99,8 @@ private[regression] trait AFTSurvivalRegressionParams
     * @group param
     */
   @Since("1.6.0")
-  final val quantilesCol: Param[String] = new Param(
-      this, "quantilesCol", "quantiles column name")
+  final val quantilesCol: Param[String] =
+    new Param(this, "quantilesCol", "quantiles column name")
 
   /** @group getParam */
   @Since("1.6.0")
@@ -103,8 +117,8 @@ private[regression] trait AFTSurvivalRegressionParams
     * @param fitting whether this is in fitting or prediction
     * @return output schema
     */
-  protected def validateAndTransformSchema(
-      schema: StructType, fitting: Boolean): StructType = {
+  protected def validateAndTransformSchema(schema: StructType,
+                                           fitting: Boolean): StructType = {
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
     if (fitting) {
       SchemaUtils.checkColumnType(schema, $(censorCol), DoubleType)
@@ -128,7 +142,9 @@ private[regression] trait AFTSurvivalRegressionParams
 class AFTSurvivalRegression @Since("1.6.0")(
     @Since("1.6.0") override val uid: String)
     extends Estimator[AFTSurvivalRegressionModel]
-    with AFTSurvivalRegressionParams with DefaultParamsWritable with Logging {
+    with AFTSurvivalRegressionParams
+    with DefaultParamsWritable
+    with Logging {
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("aftSurvReg"))
@@ -240,8 +256,8 @@ class AFTSurvivalRegression @Since("1.6.0")(
     val coefficients = Vectors.dense(parameters.slice(2, parameters.length))
     val intercept = parameters(1)
     val scale = math.exp(parameters(0))
-    val model = new AFTSurvivalRegressionModel(
-        uid, coefficients, intercept, scale)
+    val model =
+      new AFTSurvivalRegressionModel(uid, coefficients, intercept, scale)
     copyValues(model.setParent(this))
   }
 
@@ -269,12 +285,13 @@ object AFTSurvivalRegression
   */
 @Experimental
 @Since("1.6.0")
-class AFTSurvivalRegressionModel private[ml](
+class AFTSurvivalRegressionModel private[ml] (
     @Since("1.6.0") override val uid: String,
     @Since("1.6.0") val coefficients: Vector,
     @Since("1.6.0") val intercept: Double,
     @Since("1.6.0") val scale: Double)
-    extends Model[AFTSurvivalRegressionModel] with AFTSurvivalRegressionParams
+    extends Model[AFTSurvivalRegressionModel]
+    with AFTSurvivalRegressionParams
     with MLWritable {
 
   /** @group setParam */
@@ -337,8 +354,8 @@ class AFTSurvivalRegressionModel private[ml](
   @Since("1.6.0")
   override def copy(extra: ParamMap): AFTSurvivalRegressionModel = {
     copyValues(
-        new AFTSurvivalRegressionModel(uid, coefficients, intercept, scale),
-        extra).setParent(parent)
+      new AFTSurvivalRegressionModel(uid, coefficients, intercept, scale),
+      extra).setParent(parent)
   }
 
   @Since("1.6.0")
@@ -361,18 +378,19 @@ object AFTSurvivalRegressionModel
   /** [[MLWriter]] instance for [[AFTSurvivalRegressionModel]] */
   private[AFTSurvivalRegressionModel] class AFTSurvivalRegressionModelWriter(
       instance: AFTSurvivalRegressionModel
-  )
-      extends MLWriter with Logging {
+  ) extends MLWriter
+      with Logging {
 
-    private case class Data(
-        coefficients: Vector, intercept: Double, scale: Double)
+    private case class Data(coefficients: Vector,
+                            intercept: Double,
+                            scale: Double)
 
     override protected def saveImpl(path: String): Unit = {
       // Save metadata and Params
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       // Save model data: coefficients, intercept, scale
-      val data = Data(
-          instance.coefficients, instance.intercept, instance.scale)
+      val data =
+        Data(instance.coefficients, instance.intercept, instance.scale)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))
@@ -399,8 +417,10 @@ object AFTSurvivalRegressionModel
       val coefficients = data.getAs[Vector](0)
       val intercept = data.getDouble(1)
       val scale = data.getDouble(2)
-      val model = new AFTSurvivalRegressionModel(
-          metadata.uid, coefficients, intercept, scale)
+      val model = new AFTSurvivalRegressionModel(metadata.uid,
+                                                 coefficients,
+                                                 intercept,
+                                                 scale)
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
@@ -558,14 +578,14 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
 
     val aftAggregator =
       data.treeAggregate(new AFTAggregator(parameters, fitIntercept))(
-          seqOp = (c, v) =>
-              (c, v) match {
-              case (aggregator, instance) => aggregator.add(instance)
-          },
-          combOp = (c1, c2) =>
-              (c1, c2) match {
-              case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
-          })
+        seqOp = (c, v) =>
+          (c, v) match {
+            case (aggregator, instance) => aggregator.add(instance)
+        },
+        combOp = (c1, c2) =>
+          (c1, c2) match {
+            case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
+        })
 
     (aftAggregator.loss, aftAggregator.gradient)
   }
@@ -579,8 +599,9 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
   * @param censor Indicator of the event has occurred or not. If the value is 1, it means
   *                 the event has occurred i.e. uncensored; otherwise censored.
   */
-private[regression] case class AFTPoint(
-    features: Vector, label: Double, censor: Double) {
+private[regression] case class AFTPoint(features: Vector,
+                                        label: Double,
+                                        censor: Double) {
   require(censor == 1.0 || censor == 0.0,
           "censor of class AFTPoint must be 1.0 or 0.0")
 }

@@ -57,7 +57,8 @@ class ReplTest extends WordSpec {
         // shallow verification that the snapshot was created correctly without
         // actually running a new flow to check the contents (just check that
         // it's a TypedPipe from a MemorySink or SequenceFile)
-        assert(s.toString.contains("IterablePipe") ||
+        assert(
+          s.toString.contains("IterablePipe") ||
             s.toString.contains("TypedPipeFactory"))
 
         val pipeName = mode match {
@@ -88,9 +89,10 @@ class ReplTest extends WordSpec {
           .snapshot
 
         val output = s.toList
-        assert(output === helloRef
-              .flatMap(_.split("\\s+"))
-              .map(w => (w.toLowerCase, w.length)))
+        assert(
+          output === helloRef
+            .flatMap(_.split("\\s+"))
+            .map(w => (w.toLowerCase, w.length)))
       }
 
       "grouped -- Grouped[String,String]" which {
@@ -168,7 +170,7 @@ class ReplTest extends WordSpec {
       "support toIterator" in {
         hello.toIterator.foreach { line: String =>
           assert(
-              line.contains("Hello world") || line.contains("Goodbye world"))
+            line.contains("Hello world") || line.contains("Goodbye world"))
         }
       }
       "support toList" in {
@@ -183,8 +185,8 @@ class ReplTest extends WordSpec {
         assert(out === helloRef.flatMap(_.split("\\s+")))
       }
       "tuple" in {
-        assert(hello.map(l => (l, l.length)).toList === helloRef.map(
-                l => (l, l.length)))
+        assert(hello.map(l => (l, l.length)).toList === helloRef.map(l =>
+          (l, l.length)))
       }
     }
   }
@@ -213,7 +215,7 @@ class ReplTest extends WordSpec {
       root.setReadable(true)
 
       val actual = ScaldingILoop.findAllUpPath(
-          currentDirectory.getAbsolutePath)("this_matches")
+        currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List(matchingFile))
     }
 
@@ -221,7 +223,7 @@ class ReplTest extends WordSpec {
       root.setReadable(false)
 
       val actual = ScaldingILoop.findAllUpPath(
-          currentDirectory.getAbsolutePath)("this_matches")
+        currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List.empty)
     }
   }

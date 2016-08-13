@@ -51,14 +51,14 @@ private[spark] object CompressionCodec {
   private[spark] def supportsConcatenationOfSerializedStreams(
       codec: CompressionCodec): Boolean = {
     (codec.isInstanceOf[SnappyCompressionCodec] ||
-        codec.isInstanceOf[LZFCompressionCodec] ||
-        codec.isInstanceOf[LZ4CompressionCodec])
+    codec.isInstanceOf[LZFCompressionCodec] ||
+    codec.isInstanceOf[LZ4CompressionCodec])
   }
 
   private val shortCompressionCodecNames = Map(
-      "lz4" -> classOf[LZ4CompressionCodec].getName,
-      "lzf" -> classOf[LZFCompressionCodec].getName,
-      "snappy" -> classOf[SnappyCompressionCodec].getName)
+    "lz4" -> classOf[LZ4CompressionCodec].getName,
+    "lzf" -> classOf[LZFCompressionCodec].getName,
+    "snappy" -> classOf[SnappyCompressionCodec].getName)
 
   def getCodecName(conf: SparkConf): String = {
     conf.get(configKey, DEFAULT_COMPRESSION_CODEC)
@@ -79,9 +79,10 @@ private[spark] object CompressionCodec {
       case e: ClassNotFoundException => None
       case e: IllegalArgumentException => None
     }
-    codec.getOrElse(throw new IllegalArgumentException(
-            s"Codec [$codecName] is not available. " +
-            s"Consider setting $configKey=$FALLBACK_COMPRESSION_CODEC"))
+    codec.getOrElse(
+      throw new IllegalArgumentException(
+        s"Codec [$codecName] is not available. " +
+          s"Consider setting $configKey=$FALLBACK_COMPRESSION_CODEC"))
   }
 
   /**
@@ -96,7 +97,7 @@ private[spark] object CompressionCodec {
         case (k, v) if v == codecName => k
       }.getOrElse {
         throw new IllegalArgumentException(
-            s"No short name for codec $codecName.")
+          s"No short name for codec $codecName.")
       }
     }
   }

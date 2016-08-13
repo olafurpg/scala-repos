@@ -30,14 +30,14 @@ object Metric {
 
   case object MeanCpl
       extends Metric(
-          "acpl",
-          "Average centipawn loss",
-          F moves "c",
-          Move,
-          Move,
-          Average,
-          Html(
-              """Precision of your moves. Lower is better. <a href="http://lichess.org/qa/103/what-is-average-centipawn-loss">More info</a>"""))
+        "acpl",
+        "Average centipawn loss",
+        F moves "c",
+        Move,
+        Move,
+        Average,
+        Html(
+          """Precision of your moves. Lower is better. <a href="http://lichess.org/qa/103/what-is-average-centipawn-loss">More info</a>"""))
 
   case object Movetime
       extends Metric("movetime",
@@ -68,36 +68,35 @@ object Metric {
 
   case object RatingDiff
       extends Metric(
-          "ratingDiff",
-          "Rating gain",
-          F.ratingDiff,
-          Game,
-          Game,
-          Average,
-          Html(
-              "The amount of rating points you win or lose when the game ends."))
+        "ratingDiff",
+        "Rating gain",
+        F.ratingDiff,
+        Game,
+        Game,
+        Average,
+        Html(
+          "The amount of rating points you win or lose when the game ends."))
 
   case object OpponentRating
       extends Metric(
-          "opponentRating",
-          "Opponent rating",
-          F.opponentRating,
-          Game,
-          Game,
-          Average,
-          Html(
-              "The average rating of your opponent for the relevant variant."))
+        "opponentRating",
+        "Opponent rating",
+        F.opponentRating,
+        Game,
+        Game,
+        Average,
+        Html("The average rating of your opponent for the relevant variant."))
 
   case object NbMoves
       extends Metric(
-          "nbMoves",
-          "Moves per game",
-          F moves "r",
-          Move,
-          Game,
-          Average,
-          Html(
-              "Number of moves you play in the game. Doesn't count the opponent moves."))
+        "nbMoves",
+        "Moves per game",
+        F moves "r",
+        Move,
+        Game,
+        Average,
+        Html(
+          "Number of moves you play in the game. Doesn't count the opponent moves."))
 
   case object PieceRole
       extends Metric("piece",
@@ -110,25 +109,25 @@ object Metric {
 
   case object Opportunism
       extends Metric(
-          "opportunism",
-          "Opportunism",
-          F moves "o",
-          Move,
-          Move,
-          Percent,
-          Html(
-              "How often you take advantage of your opponent blunders. 100% means you punish them all, 0% means you counter-blunder them all."))
+        "opportunism",
+        "Opportunism",
+        F moves "o",
+        Move,
+        Move,
+        Percent,
+        Html(
+          "How often you take advantage of your opponent blunders. 100% means you punish them all, 0% means you counter-blunder them all."))
 
   case object Luck
       extends Metric(
-          "luck",
-          "Luck",
-          F moves "l",
-          Move,
-          Move,
-          Percent,
-          Html(
-              "How often your opponent fails to punish your blunders. 100% means they miss all your blunders, 0% means they spot them all."))
+        "luck",
+        "Luck",
+        F moves "l",
+        Move,
+        Move,
+        Percent,
+        Html(
+          "How often your opponent fails to punish your blunders. 100% means they miss all your blunders, 0% means they spot them all."))
 
   case object Material
       extends Metric("material",
@@ -183,8 +182,8 @@ object Metric {
       }
     case PieceRole =>
       chess.Role.all.reverse.map { r =>
-        MetricValue(
-            BSONString(r.forsyth.toString), MetricValueName(r.toString))
+        MetricValue(BSONString(r.forsyth.toString),
+                    MetricValueName(r.toString))
       }
     case _ => Nil
   }

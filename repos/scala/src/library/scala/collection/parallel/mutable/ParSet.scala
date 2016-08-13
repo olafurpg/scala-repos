@@ -17,12 +17,13 @@ import scala.collection.parallel.Combiner
   *  @author Aleksandar Prokopec
   */
 trait ParSet[T]
-    extends scala.collection /*.mutable*/ .GenSet[T] with ParIterable[T]
-    with scala.collection.parallel.ParSet[T] with GenericParTemplate[T, ParSet]
-    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]] {
-  self =>
+    extends scala.collection /*.mutable*/ .GenSet[T]
+    with ParIterable[T]
+    with scala.collection.parallel.ParSet[T]
+    with GenericParTemplate[T, ParSet]
+    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]] { self =>
   override def companion: GenericCompanion[ParSet] with GenericParCompanion[
-      ParSet] = ParSet
+    ParSet] = ParSet
   override def empty: ParSet[T] = ParHashSet()
   def seq: scala.collection.mutable.Set[T]
 }

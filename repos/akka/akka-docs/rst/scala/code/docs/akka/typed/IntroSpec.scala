@@ -32,13 +32,13 @@ object IntroSpec {
   object ChatRoom {
     //#chatroom-protocol
     sealed trait Command
-    final case class GetSession(
-        screenName: String, replyTo: ActorRef[SessionEvent])
+    final case class GetSession(screenName: String,
+                                replyTo: ActorRef[SessionEvent])
         extends Command
     //#chatroom-protocol
     //#chatroom-behavior
-    private final case class PostSessionMessage(
-        screenName: String, message: String)
+    private final case class PostSessionMessage(screenName: String,
+                                                message: String)
         extends Command
     //#chatroom-behavior
     //#chatroom-protocol

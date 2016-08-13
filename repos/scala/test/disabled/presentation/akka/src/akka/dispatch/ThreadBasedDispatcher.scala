@@ -8,7 +8,12 @@ import akka.config.Config.config
 import akka.util.Duration
 
 import java.util.Queue
-import java.util.concurrent.{ConcurrentLinkedQueue, BlockingQueue, TimeUnit, LinkedBlockingQueue}
+import java.util.concurrent.{
+  ConcurrentLinkedQueue,
+  BlockingQueue,
+  TimeUnit,
+  LinkedBlockingQueue
+}
 import akka.actor
 import java.util.concurrent.atomic.AtomicReference
 
@@ -19,11 +24,11 @@ import java.util.concurrent.atomic.AtomicReference
   */
 class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
     extends ExecutorBasedEventDrivenDispatcher(
-        _actor.uuid.toString,
-        Dispatchers.THROUGHPUT,
-        -1,
-        _mailboxType,
-        ThreadBasedDispatcher.oneThread) {
+      _actor.uuid.toString,
+      Dispatchers.THROUGHPUT,
+      -1,
+      _mailboxType,
+      ThreadBasedDispatcher.oneThread) {
 
   private[akka] val owner = new AtomicReference[ActorRef](_actor)
 
@@ -41,7 +46,7 @@ class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
     val actor = owner.get()
     if ((actor ne null) && actorRef != actor)
       throw new IllegalArgumentException(
-          "Cannot register to anyone but " + actor)
+        "Cannot register to anyone but " + actor)
     owner.compareAndSet(null, actorRef) //Register if unregistered
     super.register(actorRef)
   }
@@ -53,6 +58,8 @@ class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
 }
 
 object ThreadBasedDispatcher {
-  val oneThread: ThreadPoolConfig = ThreadPoolConfig(
-      allowCorePoolTimeout = true, corePoolSize = 1, maxPoolSize = 1)
+  val oneThread: ThreadPoolConfig = ThreadPoolConfig(allowCorePoolTimeout =
+                                                       true,
+                                                     corePoolSize = 1,
+                                                     maxPoolSize = 1)
 }

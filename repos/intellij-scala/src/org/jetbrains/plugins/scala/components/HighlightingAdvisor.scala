@@ -20,8 +20,8 @@ import org.jetbrains.plugins.scala.project._
 import scala.collection.JavaConversions._
 
 @State(
-    name = "HighlightingAdvisor",
-    storages = Array(new Storage("highlighting.xml"))
+  name = "HighlightingAdvisor",
+  storages = Array(new Storage("highlighting.xml"))
 )
 class HighlightingAdvisor(project: Project)
     extends ProjectComponent
@@ -114,9 +114,11 @@ class HighlightingAdvisor(project: Project)
     }
   }
 
-  private def notify(
-      title: String, message: String, notificationType: NotificationType) {
-    NotificationUtil.builder(project, message) setNotificationType notificationType setTitle title setHandler {
+  private def notify(title: String,
+                     message: String,
+                     notificationType: NotificationType) {
+    NotificationUtil
+      .builder(project, message) setNotificationType notificationType setTitle title setHandler {
       case "enable" => enabled = true
       case "disable" => enabled = false
       case _ =>
@@ -152,7 +154,7 @@ class HighlightingAdvisor(project: Project)
 
   private def status =
     "Scala type-aware highlighting: %s".format(
-        if (enabled) "enabled" else "disabled")
+      if (enabled) "enabled" else "disabled")
 
   private def updateWidget(bar: StatusBar) {
     bar.updateWidget(Widget.ID)
@@ -164,8 +166,8 @@ class HighlightingAdvisor(project: Project)
       override def consume(dataContext: DataContext): Unit = {
         CommonDataKeys.EDITOR_EVEN_IF_INACTIVE.getData(dataContext) match {
           case editor: EditorEx =>
-            FileContentUtil.reparseFiles(
-                project, Seq(editor.getVirtualFile), true)
+            FileContentUtil
+              .reparseFiles(project, Seq(editor.getVirtualFile), true)
           case _ => // do nothing
         }
       }
@@ -190,8 +192,8 @@ class HighlightingAdvisor(project: Project)
       def getClickConsumer = ClickConsumer
 
       def getTooltipText =
-        "%s (click to %s, or press Ctrl+Shift+Alt+E)".format(
-            status, if (enabled) "disable" else "enable")
+        "%s (click to %s, or press Ctrl+Shift+Alt+E)"
+          .format(status, if (enabled) "disable" else "enable")
 
       object ClickConsumer extends Consumer[MouseEvent] {
         def consume(t: MouseEvent) {

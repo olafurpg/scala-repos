@@ -29,63 +29,66 @@ class TopicFilterTest extends JUnitSuite {
 
     val topicFilter1 = new Whitelist("white1,white2")
     assertTrue(
-        topicFilter1.isTopicAllowed("white2", excludeInternalTopics = true))
+      topicFilter1.isTopicAllowed("white2", excludeInternalTopics = true))
     assertTrue(
-        topicFilter1.isTopicAllowed("white2", excludeInternalTopics = false))
+      topicFilter1.isTopicAllowed("white2", excludeInternalTopics = false))
     assertFalse(
-        topicFilter1.isTopicAllowed("black1", excludeInternalTopics = true))
+      topicFilter1.isTopicAllowed("black1", excludeInternalTopics = true))
     assertFalse(
-        topicFilter1.isTopicAllowed("black1", excludeInternalTopics = false))
+      topicFilter1.isTopicAllowed("black1", excludeInternalTopics = false))
 
     val topicFilter2 = new Whitelist(".+")
     assertTrue(
-        topicFilter2.isTopicAllowed("alltopics", excludeInternalTopics = true))
+      topicFilter2.isTopicAllowed("alltopics", excludeInternalTopics = true))
     assertFalse(
-        topicFilter2.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
-                                    excludeInternalTopics = true))
+      topicFilter2.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
+                                  excludeInternalTopics = true))
     assertTrue(
-        topicFilter2.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
-                                    excludeInternalTopics = false))
+      topicFilter2.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
+                                  excludeInternalTopics = false))
 
     val topicFilter3 = new Whitelist("white_listed-topic.+")
     assertTrue(
-        topicFilter3.isTopicAllowed(
-            "white_listed-topic1", excludeInternalTopics = true))
+      topicFilter3.isTopicAllowed("white_listed-topic1",
+                                  excludeInternalTopics = true))
     assertFalse(
-        topicFilter3.isTopicAllowed("black1", excludeInternalTopics = true))
+      topicFilter3.isTopicAllowed("black1", excludeInternalTopics = true))
 
     val topicFilter4 = new Whitelist("test-(?!bad\\b)[\\w]+")
     assertTrue(
-        topicFilter4.isTopicAllowed("test-good", excludeInternalTopics = true))
+      topicFilter4.isTopicAllowed("test-good", excludeInternalTopics = true))
     assertFalse(
-        topicFilter4.isTopicAllowed("test-bad", excludeInternalTopics = true))
+      topicFilter4.isTopicAllowed("test-bad", excludeInternalTopics = true))
   }
 
   @Test
   def testBlacklists() {
     val topicFilter1 = new Blacklist("black1")
     assertTrue(
-        topicFilter1.isTopicAllowed("white2", excludeInternalTopics = true))
+      topicFilter1.isTopicAllowed("white2", excludeInternalTopics = true))
     assertTrue(
-        topicFilter1.isTopicAllowed("white2", excludeInternalTopics = false))
+      topicFilter1.isTopicAllowed("white2", excludeInternalTopics = false))
     assertFalse(
-        topicFilter1.isTopicAllowed("black1", excludeInternalTopics = true))
+      topicFilter1.isTopicAllowed("black1", excludeInternalTopics = true))
     assertFalse(
-        topicFilter1.isTopicAllowed("black1", excludeInternalTopics = false))
+      topicFilter1.isTopicAllowed("black1", excludeInternalTopics = false))
 
     assertFalse(
-        topicFilter1.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
-                                    excludeInternalTopics = true))
+      topicFilter1.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
+                                  excludeInternalTopics = true))
     assertTrue(
-        topicFilter1.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
-                                    excludeInternalTopics = false))
+      topicFilter1.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
+                                  excludeInternalTopics = false))
   }
 
   @Test
   def testWildcardTopicCountGetTopicCountMapEscapeJson() {
     def getTopicCountMapKey(regex: String): String = {
-      val topicCount = new WildcardTopicCount(
-          null, "consumerId", new Whitelist(regex), 1, true)
+      val topicCount = new WildcardTopicCount(null,
+                                              "consumerId",
+                                              new Whitelist(regex),
+                                              1,
+                                              true)
       topicCount.getTopicCountMap.head._1
     }
     //lets make sure that the JSON strings are escaping as we expect

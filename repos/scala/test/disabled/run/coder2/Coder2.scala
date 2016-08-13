@@ -14,13 +14,14 @@ class SeqCoder(words: List[String]) {
 
   /** Invert the mnemonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-  letter <- letters) yield letter -> digit
+                                               letter <- letters)
+    yield letter -> digit
 
-  /** Maps a word to the digit string it represents, 
+  /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
   private def wordCode(word: String): String = word.toUpperCase map charCode
 
-  /** A map from digit strings to the words that represent 
+  /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, Seq[String]] =
@@ -42,24 +43,21 @@ class SeqCoder(words: List[String]) {
       //   rest <- encode(number drop split)
       // } yield word :: rest
       val r =
-        splits.flatMap(
-            split =>
-              {
-            val wfn = wordsForNum(number take split).flatMap(word =>
-                  {
-                val subs = encode(number drop split)
-                val subsmapped = subs.map(rest => word +: rest)
-                subsmemo += (number, number drop split, word) -> subsmapped
-                subsmapped
-            })
-            wfnmemo += (number, number take split) -> wfn.toSet
-            wfn
+        splits.flatMap(split => {
+          val wfn = wordsForNum(number take split).flatMap(word => {
+            val subs = encode(number drop split)
+            val subsmapped = subs.map(rest => word +: rest)
+            subsmemo += (number, number drop split, word) -> subsmapped
+            subsmapped
+          })
+          wfnmemo += (number, number take split) -> wfn.toSet
+          wfn
         })
       memo += number -> r
       r
     }
 
-  /** Maps a number to a list of all word phrases that can 
+  /** Maps a number to a list of all word phrases that can
     *  represent it */
   def translate(number: String): Set[String] =
     encode(number) map (_ mkString " ")
@@ -80,13 +78,14 @@ class ParCoder(words: List[String]) {
 
   /** Invert the mnemnonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-  letter <- letters) yield letter -> digit
+                                               letter <- letters)
+    yield letter -> digit
 
-  /** Maps a word to the digit string it represents, 
+  /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
   private def wordCode(word: String): String = word.toUpperCase map charCode
 
-  /** A map from digit strings to the words that represent 
+  /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, ParSeq[String]] =
@@ -105,29 +104,29 @@ class ParCoder(words: List[String]) {
       //   rest <- encode(number drop split)
       // } yield word :: rest
       val r =
-        splits.flatMap(
-            split =>
-              {
-            val wfn = wordsForNum(number take split).flatMap(word =>
-                  {
-                val subs = encode(number drop split)
-                assertNumber(number drop split, subs)
-                val subsmapped = subs.map(rest => word +: rest)
-                assertSubs(number, number drop split, word, subsmapped)
-                subsmapped
-            })
-            assertWfn(number, number take split, number drop split, wfn)
-            wfn
+        splits.flatMap(split => {
+          val wfn = wordsForNum(number take split).flatMap(word => {
+            val subs = encode(number drop split)
+            assertNumber(number drop split, subs)
+            val subsmapped = subs.map(rest => word +: rest)
+            assertSubs(number, number drop split, word, subsmapped)
+            subsmapped
+          })
+          assertWfn(number, number take split, number drop split, wfn)
+          wfn
         })
       assertNumber(number, r)
       r
     }
 
-  def assertSubs(
-      num: String, subsfrom: String, word: String, r: ParSet[ParSeq[String]]) {
+  def assertSubs(num: String,
+                 subsfrom: String,
+                 word: String,
+                 r: ParSet[ParSeq[String]]) {
     val m = comparison.subsmemo((num, subsfrom, word))
     if (r != m) {
-      println("map for number from subs and word: " + num + ", " + subsfrom +
+      println(
+        "map for number from subs and word: " + num + ", " + subsfrom +
           ", " + word)
       println("parset: " + r.size)
       println("memoed: " + m.size)
@@ -135,8 +134,10 @@ class ParCoder(words: List[String]) {
     }
   }
 
-  def assertWfn(
-      num: String, split: String, dropped: String, r: ParSeq[ParSeq[String]]) {
+  def assertWfn(num: String,
+                split: String,
+                dropped: String,
+                r: ParSeq[ParSeq[String]]) {
     val m = comparison.wfnmemo((num, split))
     val rs = r.toSet.par
     val words: ParSeq[String] = wordsForNum(split)
@@ -148,15 +149,13 @@ class ParCoder(words: List[String]) {
       println("retrying...")
       for (i <- 0 until 30) {
         val r2: ParSeq[ParSeq[String]] =
-          words.flatMap(
-              word =>
-                {
-              val subs: ParSet[ParSeq[String]] = encode(dropped)
-              println("subs size for '" + dropped + "': " + subs.size)
-              val subsmapped: ParSet[ParSeq[String]] =
-                subs.map(rest => word +: rest)
-              println("map size: " + subsmapped.size)
-              subsmapped.toList
+          words.flatMap(word => {
+            val subs: ParSet[ParSeq[String]] = encode(dropped)
+            println("subs size for '" + dropped + "': " + subs.size)
+            val subsmapped: ParSet[ParSeq[String]] =
+              subs.map(rest => word +: rest)
+            println("map size: " + subsmapped.size)
+            subsmapped.toList
           })
         println(i + ") retry size: " + r2.size)
       }
@@ -174,7 +173,7 @@ class ParCoder(words: List[String]) {
     }
   }
 
-  /** Maps a number to a list of all word phrases that can 
+  /** Maps a number to a list of all word phrases that can
     *  represent it */
   def translate(number: String): ParSet[String] = {
     comparison.translate(number)

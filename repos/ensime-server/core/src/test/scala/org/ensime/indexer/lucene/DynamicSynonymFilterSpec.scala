@@ -12,23 +12,23 @@ import scala.collection.mutable
 class DynamicSynonymFilterSpec extends EnsimeSpec {
 
   val cleese = Set(
-      "resting",
-      "stunned",
-      "deceased",
-      "passed on",
-      "no more",
-      "ceased to be",
-      "expired and gone to meet his maker",
-      "stiff",
-      "bereft of life",
-      "rests in peace",
-      "pushing up the daisies",
-      "metabolic processes are history",
-      "off the twig",
-      "kicked the bucket",
-      "shuffled off his mortal coil",
-      "run down the curtain and joined the bleedin choir invisible",
-      "ex-parrot"
+    "resting",
+    "stunned",
+    "deceased",
+    "passed on",
+    "no more",
+    "ceased to be",
+    "expired and gone to meet his maker",
+    "stiff",
+    "bereft of life",
+    "rests in peace",
+    "pushing up the daisies",
+    "metabolic processes are history",
+    "off the twig",
+    "kicked the bucket",
+    "shuffled off his mortal coil",
+    "run down the curtain and joined the bleedin choir invisible",
+    "ex-parrot"
   )
   val engine = new SynonymEngine {
     def synonyms(term: String) =
@@ -36,8 +36,8 @@ class DynamicSynonymFilterSpec extends EnsimeSpec {
       else cleese
   }
 
-  private def applyEngineToTerm(
-      term: String, engine: SynonymEngine): List[String] = {
+  private def applyEngineToTerm(term: String,
+                                engine: SynonymEngine): List[String] = {
     val reader = new StringReader(term)
     val source = new KeywordTokenizer(reader)
     val filter = new DynamicSynonymFilter(source, engine)

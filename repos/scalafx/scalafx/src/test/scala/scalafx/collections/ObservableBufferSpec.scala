@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableBufferSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableList[T], ObservableBuffer[T]](
-        classOf[jfxc.ObservableList[T]], classOf[ObservableBuffer[T]]) {
+      classOf[jfxc.ObservableList[T]],
+      classOf[ObservableBuffer[T]]) {
 
   /**
     * Verifies if a generated Buffer is the same instance than a original Buffer. If it should not be,
@@ -502,7 +503,7 @@ class ObservableBufferSpec[T]
       {
         list.toList should equal(List("c", "d"))
         changes.toList should equal(
-            List(Remove(0, Buffer("a", "b")), Remove(2, Buffer("e"))))
+          List(Remove(0, Buffer("a", "b")), Remove(2, Buffer("e"))))
       }
     }
 
@@ -519,9 +520,10 @@ class ObservableBufferSpec[T]
     buffer onChange { (list, changes) =>
       {
         list.toList should equal(List("b", "d"))
-        changes.toList should equal(List(Remove(0, Buffer("a")),
-                                         Remove(1, Buffer("c")),
-                                         Remove(2, Buffer("e"))))
+        changes.toList should equal(
+          List(Remove(0, Buffer("a")),
+               Remove(1, Buffer("c")),
+               Remove(2, Buffer("e"))))
       }
     }
 
@@ -550,8 +552,9 @@ class ObservableBufferSpec[T]
       {
         changesDetected += 1
         list.toList should equal(List(5, 4, 3, 2, 1))
-        changes.toList should equal(List(Remove(0, Buffer(1, 2, 3, 4, 5)),
-                                         Add(0, Buffer(5, 4, 3, 2, 1))))
+        changes.toList should equal(
+          List(Remove(0, Buffer(1, 2, 3, 4, 5)),
+               Add(0, Buffer(5, 4, 3, 2, 1))))
       }
     }
 
@@ -568,8 +571,9 @@ class ObservableBufferSpec[T]
       {
         changesDetected += 1
         list.toList should equal(List(0, 2, 3, 0, 5))
-        changes.toList should equal(List(Remove(0, Buffer(1, 2, 3, 1, 5)),
-                                         Add(0, Buffer(0, 2, 3, 0, 5))))
+        changes.toList should equal(
+          List(Remove(0, Buffer(1, 2, 3, 1, 5)),
+               Add(0, Buffer(0, 2, 3, 0, 5))))
       }
     }
 
@@ -586,8 +590,9 @@ class ObservableBufferSpec[T]
       {
         changesDetected += 1
         list.toList should equal(List(-1, -1, -1, -1, -1))
-        changes.toList should equal(List(Remove(0, Buffer(1, 2, 3, 4, 5)),
-                                         Add(0, Buffer(-1, -1, -1, -1, -1))))
+        changes.toList should equal(
+          List(Remove(0, Buffer(1, 2, 3, 4, 5)),
+               Add(0, Buffer(-1, -1, -1, -1, -1))))
       }
     }
 
@@ -630,11 +635,11 @@ class ObservableBufferSpec[T]
     // Verification
     buffer.toList should equal(List('e', 'h', 'j', 'r', 't', 'z'))
     addedValues.toList should equal(
-        List('e', 'a', 't', 'r', 'j', 'd', 'z', 'h'))
+      List('e', 'a', 't', 'r', 'j', 'd', 'z', 'h'))
     removedValues.toList should equal(List('d', 'a'))
     permutations should have size 1
     permutations(0).toList should equal(
-        List((0, 3), (1, 2), (2, 5), (3, 0), (4, 1), (5, 4)))
+      List((0, 3), (1, 2), (2, 5), (3, 0), (4, 1), (5, 4)))
   }
 
   it should "not ignore updates (Issue #169)" in {
@@ -642,23 +647,22 @@ class ObservableBufferSpec[T]
     type ElementType = jfxc.ObservableList[String]
 
     val items = new ObservableBuffer(
-        jfxc.FXCollections.observableArrayList[ElementType](
-            (elem: ElementType) => Array[jfxb.Observable](elem)))
+      jfxc.FXCollections.observableArrayList[ElementType](
+        (elem: ElementType) => Array[jfxb.Observable](elem)))
 
     items.append(jfxc.FXCollections.observableArrayList("test"))
 
     var actualFrom = -1
     var actualTo = -1
     var changed = false
-    items.onChange((obs, changes) =>
-          {
-        changed = true
-        for (change <- changes) change match {
-          case ObservableBuffer.Update(from, to) =>
-            actualFrom = from
-            actualTo = to
-          case _ @otherChange => fail("Wrong change: " + otherChange.toString)
-        }
+    items.onChange((obs, changes) => {
+      changed = true
+      for (change <- changes) change match {
+        case ObservableBuffer.Update(from, to) =>
+          actualFrom = from
+          actualTo = to
+        case _ @otherChange => fail("Wrong change: " + otherChange.toString)
+      }
     })
 
     items(0) += "update"

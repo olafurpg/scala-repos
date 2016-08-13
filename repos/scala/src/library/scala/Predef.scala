@@ -374,49 +374,49 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
 
   // TODO: when we remove, these should we drop the underscores from the new generation below? (For source compatibility in case someone was shadowing these.)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def booleanArrayOps(xs: Array[Boolean]): ArrayOps[Boolean] =
     new ArrayOps.ofBoolean(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def byteArrayOps(xs: Array[Byte]): ArrayOps[Byte] = new ArrayOps.ofByte(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def charArrayOps(xs: Array[Char]): ArrayOps[Char] = new ArrayOps.ofChar(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def doubleArrayOps(xs: Array[Double]): ArrayOps[Double] =
     new ArrayOps.ofDouble(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def floatArrayOps(xs: Array[Float]): ArrayOps[Float] =
     new ArrayOps.ofFloat(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def intArrayOps(xs: Array[Int]): ArrayOps[Int] = new ArrayOps.ofInt(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def longArrayOps(xs: Array[Long]): ArrayOps[Long] = new ArrayOps.ofLong(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def refArrayOps[T <: AnyRef](xs: Array[T]): ArrayOps[T] =
     new ArrayOps.ofRef[T](xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def shortArrayOps(xs: Array[Short]): ArrayOps[Short] =
     new ArrayOps.ofShort(xs)
   @deprecated(
-      "For binary compatibility only. Release new partest and remove in M3.",
-      "2.12.0-M2")
+    "For binary compatibility only. Release new partest and remove in M3.",
+    "2.12.0-M2")
   def unitArrayOps(xs: Array[Unit]): ArrayOps[Unit] = new ArrayOps.ofUnit(xs)
 
   implicit def _booleanArrayOps(xs: Array[Boolean]): ArrayOps.ofBoolean =
@@ -649,8 +649,8 @@ private[scala] abstract class LowPriorityImplicits {
   implicit def unwrapString(ws: WrappedString): String =
     if (ws ne null) ws.self else null
 
-  implicit def fallbackStringCanBuildFrom[T]: CanBuildFrom[
-      String, T, immutable.IndexedSeq[T]] =
+  implicit def fallbackStringCanBuildFrom[T]
+    : CanBuildFrom[String, T, immutable.IndexedSeq[T]] =
     new CanBuildFrom[String, T, immutable.IndexedSeq[T]] {
       def apply(from: String) = immutable.IndexedSeq.newBuilder[T]
       def apply() = immutable.IndexedSeq.newBuilder[T]

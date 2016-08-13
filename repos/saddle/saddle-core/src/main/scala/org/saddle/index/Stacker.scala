@@ -73,11 +73,11 @@ trait Stacker[I, J, O] {
   * Companion object which houses implicit Stacker instances.
   */
 object Stacker extends StackerLowPriority {
-  implicit def stack3rd[T1 : ST : ORD, T2 : ST : ORD, T3 : ST : ORD] =
+  implicit def stack3rd[T1: ST: ORD, T2: ST: ORD, T3: ST: ORD] =
     new Stacker[(T1, T2), T3, (T1, T2, T3)] {
       def apply(ix1: Index[(T1, T2)], ix2: Index[T3]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, y)
         Index(data)
       }
 
@@ -85,12 +85,11 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3)]]
     }
 
-  implicit def stack4th[
-      T1 : ST : ORD, T2 : ST : ORD, T3 : ST : ORD, T4 : ST : ORD] =
+  implicit def stack4th[T1: ST: ORD, T2: ST: ORD, T3: ST: ORD, T4: ST: ORD] =
     new Stacker[(T1, T2, T3), T4, (T1, T2, T3, T4)] {
       def apply(ix1: Index[(T1, T2, T3)], ix2: Index[T4]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, y)
         Index(data)
       }
 
@@ -98,15 +97,15 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3, T4)]]
     }
 
-  implicit def stack5th[T1 : ST : ORD,
-                        T2 : ST : ORD,
-                        T3 : ST : ORD,
-                        T4 : ST : ORD,
-                        T5 : ST : ORD] =
+  implicit def stack5th[T1: ST: ORD,
+                        T2: ST: ORD,
+                        T3: ST: ORD,
+                        T4: ST: ORD,
+                        T5: ST: ORD] =
     new Stacker[(T1, T2, T3, T4), T5, (T1, T2, T3, T4, T5)] {
       def apply(ix1: Index[(T1, T2, T3, T4)], ix2: Index[T5]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, x._4, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, x._4, y)
         Index(data)
       }
 
@@ -114,16 +113,16 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3, T4, T5)]]
     }
 
-  implicit def stack6th[T1 : ST : ORD,
-                        T2 : ST : ORD,
-                        T3 : ST : ORD,
-                        T4 : ST : ORD,
-                        T5 : ST : ORD,
-                        T6 : ST : ORD] =
+  implicit def stack6th[T1: ST: ORD,
+                        T2: ST: ORD,
+                        T3: ST: ORD,
+                        T4: ST: ORD,
+                        T5: ST: ORD,
+                        T6: ST: ORD] =
     new Stacker[(T1, T2, T3, T4, T5), T6, (T1, T2, T3, T4, T5, T6)] {
       def apply(ix1: Index[(T1, T2, T3, T4, T5)], ix2: Index[T6]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, x._4, x._5, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, x._4, x._5, y)
         Index(data)
       }
 
@@ -131,17 +130,17 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3, T4, T5, T6)]]
     }
 
-  implicit def stack7th[T1 : ST : ORD,
-                        T2 : ST : ORD,
-                        T3 : ST : ORD,
-                        T4 : ST : ORD,
-                        T5 : ST : ORD,
-                        T6 : ST : ORD,
-                        T7 : ST : ORD] =
+  implicit def stack7th[T1: ST: ORD,
+                        T2: ST: ORD,
+                        T3: ST: ORD,
+                        T4: ST: ORD,
+                        T5: ST: ORD,
+                        T6: ST: ORD,
+                        T7: ST: ORD] =
     new Stacker[(T1, T2, T3, T4, T5, T6), T7, (T1, T2, T3, T4, T5, T6, T7)] {
       def apply(ix1: Index[(T1, T2, T3, T4, T5, T6)], ix2: Index[T7]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, x._4, x._5, x._6, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, x._4, x._5, x._6, y)
         Index(data)
       }
 
@@ -149,19 +148,20 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3, T4, T5, T6, T7)]]
     }
 
-  implicit def stack8th[T1 : ST : ORD,
-                        T2 : ST : ORD,
-                        T3 : ST : ORD,
-                        T4 : ST : ORD,
-                        T5 : ST : ORD,
-                        T6 : ST : ORD,
-                        T7 : ST : ORD,
-                        T8 : ST : ORD] =
-    new Stacker[
-        (T1, T2, T3, T4, T5, T6, T7), T8, (T1, T2, T3, T4, T5, T6, T7, T8)] {
+  implicit def stack8th[T1: ST: ORD,
+                        T2: ST: ORD,
+                        T3: ST: ORD,
+                        T4: ST: ORD,
+                        T5: ST: ORD,
+                        T6: ST: ORD,
+                        T7: ST: ORD,
+                        T8: ST: ORD] =
+    new Stacker[(T1, T2, T3, T4, T5, T6, T7),
+                T8,
+                (T1, T2, T3, T4, T5, T6, T7, T8)] {
       def apply(ix1: Index[(T1, T2, T3, T4, T5, T6, T7)], ix2: Index[T8]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, x._4, x._5, x._6, x._7, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, x._4, x._5, x._6, x._7, y)
         Index(data)
       }
 
@@ -169,21 +169,21 @@ object Stacker extends StackerLowPriority {
       def tag = implicitly[ST[(T1, T2, T3, T4, T5, T6, T7, T8)]]
     }
 
-  implicit def stack9th[T1 : ST : ORD,
-                        T2 : ST : ORD,
-                        T3 : ST : ORD,
-                        T4 : ST : ORD,
-                        T5 : ST : ORD,
-                        T6 : ST : ORD,
-                        T7 : ST : ORD,
-                        T8 : ST : ORD,
-                        T9 : ST : ORD] =
+  implicit def stack9th[T1: ST: ORD,
+                        T2: ST: ORD,
+                        T3: ST: ORD,
+                        T4: ST: ORD,
+                        T5: ST: ORD,
+                        T6: ST: ORD,
+                        T7: ST: ORD,
+                        T8: ST: ORD,
+                        T9: ST: ORD] =
     new Stacker[(T1, T2, T3, T4, T5, T6, T7, T8),
                 T9,
                 (T1, T2, T3, T4, T5, T6, T7, T8, T9)] {
       def apply(ix1: Index[(T1, T2, T3, T4, T5, T6, T7, T8)], ix2: Index[T9]) = {
-        val data = for (x <- ix1.toArray; y <- ix2.toArray) yield
-          (x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, y)
+        val data = for (x <- ix1.toArray; y <- ix2.toArray)
+          yield (x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, y)
         Index(data)
       }
 
@@ -198,7 +198,7 @@ object Stacker extends StackerLowPriority {
   * to specialize the case when the left index is composed of Tuples.
   */
 trait StackerLowPriority {
-  implicit def stack2nd[T1 : ST : ORD, T2 : ST : ORD] =
+  implicit def stack2nd[T1: ST: ORD, T2: ST: ORD] =
     new Stacker[T1, T2, (T1, T2)] {
       def apply(ix1: Index[T1], ix2: Index[T2]) = {
         val data = for (x <- ix1.toArray; y <- ix2.toArray) yield (x, y)

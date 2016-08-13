@@ -1,7 +1,10 @@
 package akka.remote.transport
 
 import akka.testkit.AkkaSpec
-import akka.remote.transport.ThrottlerTransportAdapter.{TokenBucket, Unthrottled}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  TokenBucket,
+  Unthrottled
+}
 import java.util.concurrent.TimeUnit
 
 class ThrottleModeSpec extends AkkaSpec {

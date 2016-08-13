@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrioritySpec
     extends SFXEnumDelegateSpec[jfxsl.Priority, Priority](
-        javaClass = classOf[jfxsl.Priority],
-        scalaClass = classOf[Priority],
-        companion = Priority)
+      javaClass = classOf[jfxsl.Priority],
+      scalaClass = classOf[Priority],
+      companion = Priority)

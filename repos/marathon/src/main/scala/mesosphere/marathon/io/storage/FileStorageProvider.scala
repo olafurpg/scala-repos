@@ -10,8 +10,10 @@ import mesosphere.marathon.io.IO
   * @param file the underlying file
   * @param path the relative path, this item is identified with.
   */
-case class FileStorageItem(
-    file: File, basePath: File, path: String, baseUrl: String)
+case class FileStorageItem(file: File,
+                           basePath: File,
+                           path: String,
+                           baseUrl: String)
     extends StorageItem {
 
   def store(fn: OutputStream => Unit): FileStorageItem = {
@@ -55,7 +57,7 @@ class FileStorageProvider(val url: String, val basePath: File)
     extends StorageProvider {
   require(basePath.exists(),
           "Base path does not exist: %s. Configuration error?".format(
-              basePath.getAbsolutePath))
+            basePath.getAbsolutePath))
 
   def item(path: String): FileStorageItem = {
     val file: File = new File(basePath, path)

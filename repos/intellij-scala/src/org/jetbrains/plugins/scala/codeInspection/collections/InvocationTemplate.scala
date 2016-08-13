@@ -41,16 +41,16 @@ class InvocationTemplate(nameCondition: String => Boolean) {
         Some(qualOpt.orNull, args)
       case MethodRepr(call: ScMethodCall, Some(qual), None, args)
           if nameCondition("apply") && call.isApplyOrUpdateCall &&
-          !call.isUpdateCall =>
+            !call.isUpdateCall =>
         val text = qual match {
           case _: ScReferenceExpression | _: ScMethodCall | _: ScGenericCall =>
             s"${qual.getText}.apply"
           case _ => s"(${qual.getText}).apply"
         }
         val ref = Try(
-            ScalaPsiElementFactory
-              .createExpressionFromText(text, call)
-              .asInstanceOf[ScReferenceExpression]).toOption
+          ScalaPsiElementFactory
+            .createExpressionFromText(text, call)
+            .asInstanceOf[ScReferenceExpression]).toOption
         if (ref.isDefined && refCondition(ref.get)) Some(qual, args)
         else None
       case MethodRepr(_,

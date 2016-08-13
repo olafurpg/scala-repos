@@ -3,7 +3,10 @@ package org.jetbrains.plugins.scala.lang.refactoring.extractMethod
 import _root_.org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 
 /**
@@ -33,11 +36,11 @@ object ExtractMethodParameter {
   def from(variableData: ScalaVariableData): ExtractMethodParameter = {
     val element = variableData.element
     ExtractMethodParameter(
-        oldName = element.name,
-        newName = variableData.name,
-        fromElement = element,
-        tp = variableData.scType,
-        passAsParameter = variableData.passAsParameter
+      oldName = element.name,
+      newName = variableData.name,
+      fromElement = element,
+      tp = variableData.scType,
+      passAsParameter = variableData.passAsParameter
     )
   }
 }

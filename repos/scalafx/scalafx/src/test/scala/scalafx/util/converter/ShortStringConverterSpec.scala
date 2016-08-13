@@ -44,9 +44,9 @@ class ShortStringConverterSpec
                                                 jfxuc.ShortStringConverter,
                                                 Short,
                                                 ShortStringConverter](
-        classOf[jfxuc.ShortStringConverter],
-        classOf[ShortStringConverter],
-        classOf[Short]) {
+      classOf[jfxuc.ShortStringConverter],
+      classOf[ShortStringConverter],
+      classOf[Short]) {
 
   val examples = List((0.toShort, "0"),
                       (123.toShort, "123"),

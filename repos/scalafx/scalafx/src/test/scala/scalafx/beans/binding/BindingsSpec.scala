@@ -201,8 +201,9 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
       val width: DoubleProperty = delegate.widthProperty
     }
 
-    val dp1 = new ObjectProperty[DoubleHolderJFX](
-        this, "level 2 property", new DoubleHolderJFX())
+    val dp1 = new ObjectProperty[DoubleHolderJFX](this,
+                                                  "level 2 property",
+                                                  new DoubleHolderJFX())
     val prop2 = new DoubleProperty(this, "prop2", 0.0)
     prop2() should equal(0.0)
 
@@ -220,7 +221,7 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
   it should "support implicit upconversions to expressions..." is (pending)
 
   it should "support raw javafx mixing (make sure all the implicits are in place)" is
-  (pending)
+    (pending)
 
   it should "test the SFX 'any' special cases" is (pending)
 }

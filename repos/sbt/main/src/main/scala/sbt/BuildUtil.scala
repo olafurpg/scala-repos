@@ -88,8 +88,8 @@ object BuildUtil {
     unit.plugins.detected.imports ++ unit.definitions.dslDefinitions.imports
 
   @deprecated("Use getImports(Seq[String]).", "0.13.2")
-  def getImports(
-      pluginNames: Seq[String], buildNames: Seq[String]): Seq[String] =
+  def getImports(pluginNames: Seq[String],
+                 buildNames: Seq[String]): Seq[String] =
     getImports(pluginNames ++ buildNames)
 
   /** `import sbt._, Keys._`, and wildcard import `._` for all names. */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Miles Sabin 
+ * Copyright (c) 2013 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ object BooleanInduction extends App {
   // bool-induction P pt pf true = pt
   // bool-induction P pt pf false = pf
 
-  def boolInduction[P <: { type Case [_ <: Boolean] <: { type T } }, PT, PF](
+  def boolInduction[P <: { type Case[_ <: Boolean] <: { type T } }, PT, PF](
       p: P)(t: PT)(f: PF)(x: Witness.Lt[Boolean])(implicit pt: p.Case[True] {
     type T = PT
   }, pf: p.Case[False] { type T = PF }, sel: If[x.T, PT, PF]): sel.T =

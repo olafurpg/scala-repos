@@ -1,7 +1,11 @@
 package breeze.optimize
 
 import breeze.linalg.norm
-import breeze.math.{MutableEnumeratedCoordinateField, MutableFiniteCoordinateField, NormedModule}
+import breeze.math.{
+  MutableEnumeratedCoordinateField,
+  MutableFiniteCoordinateField,
+  NormedModule
+}
 import breeze.optimize.FirstOrderMinimizer.ConvergenceReason
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
 import breeze.util.Implicits._
@@ -16,7 +20,8 @@ import FirstOrderMinimizer.ConvergenceCheck
 abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
     val convergenceCheck: ConvergenceCheck[T])(
     implicit space: NormedModule[T, Double])
-    extends Minimizer[T, DF] with SerializableLogging {
+    extends Minimizer[T, DF]
+    with SerializableLogging {
 
   def this(maxIter: Int = -1,
            tolerance: Double = 1E-6,
@@ -24,8 +29,10 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
            relativeTolerance: Boolean = true)(
       implicit space: NormedModule[T, Double]) =
     this(
-        FirstOrderMinimizer.defaultConvergenceCheck[T](
-            maxIter, tolerance, relativeTolerance, fvalMemory))
+      FirstOrderMinimizer.defaultConvergenceCheck[T](maxIter,
+                                                     tolerance,
+                                                     relativeTolerance,
+                                                     fvalMemory))
 
   /**
     * Any history the derived minimization function needs to do its updates. typically an approximation
@@ -43,8 +50,11 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
   protected def chooseDescentDirection(state: State, f: DF): T
   protected def determineStepSize(state: State, f: DF, direction: T): Double
   protected def takeStep(state: State, dir: T, stepSize: Double): T
-  protected def updateHistory(
-      newX: T, newGrad: T, newVal: Double, f: DF, oldState: State): History
+  protected def updateHistory(newX: T,
+                              newGrad: T,
+                              newVal: Double,
+                              f: DF,
+                              oldState: State): History
 
   protected def initialState(f: DF, init: T): State = {
     val x = init
@@ -62,8 +72,9 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
                               convergenceCheck.initialInfo)
   }
 
-  protected def calculateObjective(
-      f: DF, x: T, history: History): (Double, T) = {
+  protected def calculateObjective(f: DF,
+                                   x: T,
+                                   history: History): (Double, T) = {
     f.calculate(x)
   }
 
@@ -81,9 +92,9 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
         val (adjValue, adjGrad) = adjust(x, grad, value)
         val oneOffImprovement =
           (state.adjustedValue - adjValue) /
-          (state.adjustedValue.abs max adjValue.abs max 1E-6 * state.initialAdjVal.abs)
+            (state.adjustedValue.abs max adjValue.abs max 1E-6 * state.initialAdjVal.abs)
         logger.info(
-            f"Val and Grad Norm: $adjValue%.6g (rel: $oneOffImprovement%.3g) ${norm(adjGrad)}%.6g")
+          f"Val and Grad Norm: $adjValue%.6g (rel: $oneOffImprovement%.3g) ${norm(adjGrad)}%.6g")
         val history = updateHistory(x, grad, value, adjustedFun, state)
         val newCInfo =
           convergenceCheck.update(x, grad, value, state, state.convergenceInfo)
@@ -104,7 +115,7 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
           state.copy(history = initialHistory(adjustedFun, state.x))
         case x: FirstOrderException =>
           logger.error(
-              "Failure again! Giving up and returning. Maybe the objective is just poorly behaved?")
+            "Failure again! Giving up and returning. Maybe the objective is just poorly behaved?")
           state.copy(searchFailed = true)
       }
     }
@@ -139,7 +150,7 @@ class StepSizeUnderflow extends FirstOrderException
 class StepSizeOverflow extends FirstOrderException
 class LineSearchFailed(gradNorm: Double, dirNorm: Double)
     extends FirstOrderException(
-        "Grad norm: %.4f Dir Norm: %.4f".format(gradNorm, dirNorm))
+      "Grad norm: %.4f Dir Norm: %.4f".format(gradNorm, dirNorm))
 
 object FirstOrderMinimizer {
 
@@ -199,8 +210,8 @@ object FirstOrderMinimizer {
                  oldState: State[T, _, _],
                  oldInfo: Info): Info = oldInfo
 
-      override def apply(
-          state: State[T, _, _], info: Info): Option[ConvergenceReason] =
+      override def apply(state: State[T, _, _],
+                         info: Info): Option[ConvergenceReason] =
         pf.lift(state)
 
       override def initialInfo: Info = ()
@@ -227,8 +238,8 @@ object FirstOrderMinimizer {
       }
     }
 
-    override def apply(
-        state: State[T, _, _], info: IndexedSeq[ConvergenceCheck[T]#Info])
+    override def apply(state: State[T, _, _],
+                       info: IndexedSeq[ConvergenceCheck[T]#Info])
       : Option[ConvergenceReason] = {
       (checks zip info).iterator.flatMap {
         case (c, i) => c(state, i.asInstanceOf[c.Info])
@@ -273,8 +284,9 @@ object FirstOrderMinimizer {
     new FunctionValuesConverged[T](tolerance, relative, historyLength)
   }
 
-  case class FunctionValuesConverged[T](
-      tolerance: Double, relative: Boolean, historyLength: Int)
+  case class FunctionValuesConverged[T](tolerance: Double,
+                                        relative: Boolean,
+                                        historyLength: Int)
       extends ConvergenceCheck[T] {
     override type Info = IndexedSeq[Double]
 
@@ -289,7 +301,7 @@ object FirstOrderMinimizer {
     override def apply(state: State[T, _, _],
                        info: IndexedSeq[Double]): Option[ConvergenceReason] = {
       if (info.length >= 2 && (state.adjustedValue - info.max).abs <= tolerance *
-          (if (relative) state.initialAdjVal else 1.0)) {
+            (if (relative) state.initialAdjVal else 1.0)) {
         Some(FunctionValuesConverged)
       } else {
         None
@@ -304,11 +316,11 @@ object FirstOrderMinimizer {
     import space.normImpl
     ConvergenceCheck.fromPartialFunction[T] {
       case s: State[T, _, _]
-          if
-          (norm(s.adjustedGradient) <= math.max(tolerance *
-                                                (if (relative) s.adjustedValue
-                                                 else 1.0),
-                                                1E-8)) =>
+          if (norm(s.adjustedGradient) <= math.max(tolerance *
+                                                     (if (relative)
+                                                       s.adjustedValue
+                                                     else 1.0),
+                                                   1E-8)) =>
         GradientConverged
     }
   }
@@ -331,14 +343,17 @@ object FirstOrderMinimizer {
                                numFailures: Int = 5,
                                improvementRequirement: Double = 1E-2,
                                evalFrequency: Int = 10): ConvergenceCheck[T] =
-    new MonitorFunctionValuesCheck(
-        f, numFailures, improvementRequirement, evalFrequency)
+    new MonitorFunctionValuesCheck(f,
+                                   numFailures,
+                                   improvementRequirement,
+                                   evalFrequency)
 
   case class MonitorFunctionValuesCheck[T](f: T => Double,
                                            numFailures: Int,
                                            improvementRequirement: Double,
                                            evalFrequency: Int)
-      extends ConvergenceCheck[T] with SerializableLogging {
+      extends ConvergenceCheck[T]
+      with SerializableLogging {
     case class Info(bestValue: Double, numFailures: Int)
 
     override def update(newX: T,
@@ -350,11 +365,11 @@ object FirstOrderMinimizer {
         val newValue = f(newX)
         if (newValue <= oldInfo.bestValue * (1 - improvementRequirement)) {
           logger.info(
-              f"External function improved: current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
+            f"External function improved: current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
           Info(numFailures = 0, bestValue = newValue)
         } else {
           logger.info(
-              f"External function failed to improve sufficiently! current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
+            f"External function failed to improve sufficiently! current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
           oldInfo.copy(numFailures = oldInfo.numFailures + 1)
         }
       } else {
@@ -362,8 +377,8 @@ object FirstOrderMinimizer {
       }
     }
 
-    override def apply(
-        state: State[T, _, _], info: Info): Option[ConvergenceReason] = {
+    override def apply(state: State[T, _, _],
+                       info: Info): Option[ConvergenceReason] = {
       if (info.numFailures >= numFailures) {
         Some(MonitorFunctionNotImproving)
       } else {
@@ -380,8 +395,8 @@ object FirstOrderMinimizer {
                                  fvalMemory: Int = 20)(
       implicit space: NormedModule[T, Double]): ConvergenceCheck[T] =
     (maxIterationsReached[T](maxIter) ||
-        functionValuesConverged(tolerance, relative, fvalMemory) ||
-        gradientConverged[T](tolerance, relative) || searchFailed)
+      functionValuesConverged(tolerance, relative, fvalMemory) ||
+      gradientConverged[T](tolerance, relative) || searchFailed)
 
   /**
     * OptParams is a Configuration-compatible case class that can be used to select optimization
@@ -411,24 +426,24 @@ object FirstOrderMinimizer {
                        useStochastic: Boolean = false,
                        randomSeed: Int = 0) {
     private implicit val random = new RandBasis(
-        new ThreadLocalRandomGenerator(new MersenneTwister(randomSeed)))
+      new ThreadLocalRandomGenerator(new MersenneTwister(randomSeed)))
 
-    @deprecated(
-        "Use breeze.optimize.minimize(f, init, params) instead.", "0.10")
+    @deprecated("Use breeze.optimize.minimize(f, init, params) instead.",
+                "0.10")
     def minimize[T](f: BatchDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double]): T = {
       this.iterations(f, init).last.x
     }
 
-    @deprecated(
-        "Use breeze.optimize.minimize(f, init, params) instead.", "0.10")
+    @deprecated("Use breeze.optimize.minimize(f, init, params) instead.",
+                "0.10")
     def minimize[T](f: DiffFunction[T], init: T)(
         implicit space: MutableEnumeratedCoordinateField[T, _, Double]): T = {
       this.iterations(f, init).last.x
     }
 
-    @deprecated(
-        "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
+    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
+                "0.10")
     def iterations[T](f: BatchDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
       : Iterator[FirstOrderMinimizer[T, BatchDiffFunction[T]]#State] = {
@@ -440,29 +455,32 @@ object FirstOrderMinimizer {
         }
 
       it.asInstanceOf[Iterator[
-              FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
+        FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
     }
 
-    @deprecated(
-        "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
+    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
+                "0.10")
     def iterations[T](f: StochasticDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
       : Iterator[FirstOrderMinimizer[T, StochasticDiffFunction[T]]#State] = {
       val r =
         if (useL1) {
           new AdaptiveGradientDescent.L1Regularization[T](
-              regularization, eta = alpha, maxIter = maxIterations)(
-              space, random)
+            regularization,
+            eta = alpha,
+            maxIter = maxIterations)(space, random)
         } else {
           // L2
           new AdaptiveGradientDescent.L2Regularization[T](
-              regularization, alpha, maxIterations)(space, random)
+            regularization,
+            alpha,
+            maxIterations)(space, random)
         }
       r.iterations(f, init)
     }
 
-    @deprecated(
-        "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
+    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
+                "0.10")
     def iterations[T, K](f: DiffFunction[T], init: T)(
         implicit space: MutableEnumeratedCoordinateField[T, K, Double])
       : Iterator[LBFGS[T]#State] = {
@@ -471,8 +489,8 @@ object FirstOrderMinimizer {
           .iterations(f, init)
       else
         (new LBFGS[T](maxIterations, 5, tolerance = tolerance)(space))
-          .iterations(
-            DiffFunction.withL2Regularization(f, regularization), init)
+          .iterations(DiffFunction.withL2Regularization(f, regularization),
+                      init)
     }
   }
 }

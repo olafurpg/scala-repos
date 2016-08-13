@@ -20,24 +20,24 @@ object ScaloidBuild extends Build {
   import Dependencies._
 
   lazy val basicSettings = Seq(
-      organization := "org.scaloid",
-      organizationHomepage := Some(new URL("http://blog.scaloid.org")),
-      description := "Less Painful Android Development with Scala",
-      startYear := Some(2012),
-      scalaVersion := "2.11.7",
-      crossScalaVersions := Seq("2.11.7"), // only 2.11.x for now
-      version := scaloidVersion,
-      publishMavenStyle := true,
-      publishTo <<= version { (v: String) =>
-        val nexus = "https://oss.sonatype.org/"
-        if (v.trim.endsWith("SNAPSHOT"))
-          Some("snapshots" at nexus + "content/repositories/snapshots")
-        else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
-      pomIncludeRepository := { _ =>
-        false
-      },
-      pomExtra := <url>http://scaloid.org</url>
+    organization := "org.scaloid",
+    organizationHomepage := Some(new URL("http://blog.scaloid.org")),
+    description := "Less Painful Android Development with Scala",
+    startYear := Some(2012),
+    scalaVersion := "2.11.7",
+    crossScalaVersions := Seq("2.11.7"), // only 2.11.x for now
+    version := scaloidVersion,
+    publishMavenStyle := true,
+    publishTo <<= version { (v: String) =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    },
+    pomIncludeRepository := { _ =>
+      false
+    },
+    pomExtra := <url>http://scaloid.org</url>
         <licenses>
           <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -57,16 +57,16 @@ object ScaloidBuild extends Build {
             <email>pocorall@gmail.com</email>
           </developer>
         </developers>,
-      scalacOptions := Seq(
-          "-target:jvm-1.6",
-          "-deprecation",
-          "-feature"
-      ),
-      javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
-      resolvers += "Android Repository" at
+    scalacOptions := Seq(
+      "-target:jvm-1.6",
+      "-deprecation",
+      "-feature"
+    ),
+    javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+    resolvers += "Android Repository" at
       (new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository").getCanonicalFile.toURI.toString,
-      addCompilerPlugin(
-          "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+    addCompilerPlugin(
+      "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
   )
 
   // configure prompt to show current project

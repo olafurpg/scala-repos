@@ -9,13 +9,30 @@ package nsc
 
 import java.io.{File, IOException, FileNotFoundException}
 import java.net.URL
-import java.nio.charset.{Charset, CharsetDecoder, IllegalCharsetNameException, UnsupportedCharsetException}
+import java.nio.charset.{
+  Charset,
+  CharsetDecoder,
+  IllegalCharsetNameException,
+  UnsupportedCharsetException
+}
 import scala.collection.{mutable, immutable}
 import io.{SourceReader, AbstractFile, Path}
 import reporters.Reporter
-import util.{ClassFileLookup, ClassPath, MergedClassPath, StatisticsInfo, returning}
+import util.{
+  ClassFileLookup,
+  ClassPath,
+  MergedClassPath,
+  StatisticsInfo,
+  returning
+}
 import scala.reflect.ClassTag
-import scala.reflect.internal.util.{ScalaClassLoader, SourceFile, NoSourceFile, BatchSourceFile, ScriptSourceFile}
+import scala.reflect.internal.util.{
+  ScalaClassLoader,
+  SourceFile,
+  NoSourceFile,
+  BatchSourceFile,
+  ScriptSourceFile
+}
 import scala.reflect.internal.pickling.PickleBuffer
 import symtab.{Flags, SymbolTable, SymbolTrackers}
 import symtab.classfile.Pickler
@@ -33,10 +50,16 @@ import scala.tools.nsc.classpath.FlatClassPath
 import scala.tools.nsc.settings.ClassPathRepresentationType
 
 class Global(var currentSettings: Settings, var reporter: Reporter)
-    extends SymbolTable with CompilationUnits with Plugins with PhaseAssembly
-    with Trees with Printers with DocComments with Positions with Reporting
-    with Parsing {
-  self =>
+    extends SymbolTable
+    with CompilationUnits
+    with Plugins
+    with PhaseAssembly
+    with Trees
+    with Printers
+    with DocComments
+    with Positions
+    with Reporting
+    with Parsing { self =>
 
   // the mirror --------------------------------------------------
 
@@ -53,7 +76,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       settings.YclasspathImpl.value match {
         case ClassPathRepresentationType.Flat =>
           new loaders.PackageLoaderUsingFlatClassPath(
-              FlatClassPath.RootPackage, flatClassPath)
+            FlatClassPath.RootPackage,
+            flatClassPath)
         case ClassPathRepresentationType.Recursive =>
           new loaders.PackageLoader(recursiveClassPath)
       }
@@ -248,7 +272,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     // calling Predef.assert would send a freshly allocated closure wrapping the one received as argument.
     if (!assertion)
       throw new java.lang.AssertionError(
-          "assertion failed: " + supplementErrorMessage("" + message))
+        "assertion failed: " + supplementErrorMessage("" + message))
   }
   @inline final def assert(assertion: Boolean) {
     assert(assertion, "")
@@ -257,7 +281,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     // calling Predef.require would send a freshly allocated closure wrapping the one received as argument.
     if (!requirement)
       throw new IllegalArgumentException(
-          "requirement failed: " + supplementErrorMessage("" + message))
+        "requirement failed: " + supplementErrorMessage("" + message))
   }
   @inline final def require(requirement: Boolean) {
     require(requirement, "")
@@ -287,7 +311,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   override def shouldLogAtThisPhase =
     settings.log.isSetByUser &&
-    ((settings.log containsPhase globalPhase) ||
+      ((settings.log containsPhase globalPhase) ||
         (settings.log containsPhase phase))
   // Over 200 closure objects are eliminated by inlining this.
   @inline final def log(msg: => AnyRef) {
@@ -310,7 +334,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     val defaultEncoding = Properties.sourceEncoding
 
     def loadCharset(name: String) =
-      try Some(Charset.forName(name)) catch {
+      try Some(Charset.forName(name))
+      catch {
         case _: IllegalCharsetNameException =>
           globalError("illegal charset name '" + name + "'")
           None
@@ -332,12 +357,13 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           .getConstructor(classOf[CharsetDecoder], classOf[Reporter])
 
       try Some(
-          ccon
-            .newInstance(charset.newDecoder(), reporter)
-            .asInstanceOf[SourceReader]) catch {
+        ccon
+          .newInstance(charset.newDecoder(), reporter)
+          .asInstanceOf[SourceReader])
+      catch {
         case ex: Throwable =>
           globalError(
-              "exception while trying to instantiate source reader '" + name +
+            "exception while trying to instantiate source reader '" + name +
               "'")
           None
       }
@@ -350,7 +376,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   if (settings.verbose || settings.Ylogcp)
     reporter.echo(
-        s"[search path for source files: ${classPath.asSourcePathString}]\n" +
+      s"[search path for source files: ${classPath.asSourcePathString}]\n" +
         s"[search path for class files: ${classPath.asClassPathString}]"
     )
 
@@ -370,7 +396,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     val f = AbstractFile.getFile(name)
     if (f eq null)
       throw new FileNotFoundException(
-          "source file '" + name + "' could not be found")
+        "source file '" + name + "' could not be found")
     getSourceFile(f)
   }
 
@@ -619,7 +645,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   object typer
       extends analyzer.Typer(
-          analyzer.NoContext.make(EmptyTree, RootClass, newScope)
+        analyzer.NoContext.make(EmptyTree, RootClass, newScope)
       )
 
   /** Add the internal compiler phases to the phases set.
@@ -629,28 +655,28 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     // Note: this fits -Xshow-phases into 80 column width, which it is
     // desirable to preserve.
     val phs = List(
-        syntaxAnalyzer -> "parse source into ASTs, perform simple desugaring",
-        analyzer.namerFactory -> "resolve names, attach symbols to named trees",
-        analyzer.packageObjects -> "load package objects",
-        analyzer.typerFactory -> "the meat and potatoes: type the trees",
-        patmat -> "translate match expressions",
-        superAccessors -> "add super accessors in traits and nested classes",
-        extensionMethods -> "add extension methods for inline classes",
-        pickler -> "serialize symbol tables",
-        refChecks -> "reference/override checking, translate nested objects",
-        uncurry -> "uncurry, translate function values to anonymous classes",
-        tailCalls -> "replace tail calls by jumps",
-        specializeTypes -> "@specialized-driven class and method specialization",
-        explicitOuter -> "this refs to outer pointers",
-        erasure -> "erase types, add interfaces for traits",
-        postErasure -> "clean up erased inline classes",
-        lazyVals -> "allocate bitmaps, translate lazy vals into lazified defs",
-        lambdaLift -> "move nested functions to top level",
-        constructors -> "move field definitions into constructors",
-        mixer -> "mixin composition",
-        delambdafy -> "remove lambdas",
-        cleanup -> "platform-specific cleanups, generate reflective calls",
-        terminal -> "the last phase during a compilation run"
+      syntaxAnalyzer -> "parse source into ASTs, perform simple desugaring",
+      analyzer.namerFactory -> "resolve names, attach symbols to named trees",
+      analyzer.packageObjects -> "load package objects",
+      analyzer.typerFactory -> "the meat and potatoes: type the trees",
+      patmat -> "translate match expressions",
+      superAccessors -> "add super accessors in traits and nested classes",
+      extensionMethods -> "add extension methods for inline classes",
+      pickler -> "serialize symbol tables",
+      refChecks -> "reference/override checking, translate nested objects",
+      uncurry -> "uncurry, translate function values to anonymous classes",
+      tailCalls -> "replace tail calls by jumps",
+      specializeTypes -> "@specialized-driven class and method specialization",
+      explicitOuter -> "this refs to outer pointers",
+      erasure -> "erase types, add interfaces for traits",
+      postErasure -> "clean up erased inline classes",
+      lazyVals -> "allocate bitmaps, translate lazy vals into lazified defs",
+      lambdaLift -> "move nested functions to top level",
+      constructors -> "move field definitions into constructors",
+      mixer -> "mixin composition",
+      delambdafy -> "remove lambdas",
+      cleanup -> "platform-specific cleanups, generate reflective calls",
+      terminal -> "the last phase during a compilation run"
     )
 
     phs foreach (addToPhasesSet _).tupled
@@ -659,8 +685,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   // and attractive -Xshow-phases output is unlikely if the descs span 20 files anyway.
   private val otherPhaseDescriptions =
     Map(
-        "flatten" -> "eliminate inner classes",
-        "jvm" -> "generate JVM bytecode"
+      "flatten" -> "eliminate inner classes",
+      "jvm" -> "generate JVM bytecode"
     ) withDefaultValue ""
 
   protected def computePlatformPhases() = platform.platformPhases foreach {
@@ -680,9 +706,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       val (satisfied, unhappy) =
         enabled partition (_.requires forall isEnabled)
       unhappy foreach
-      (u =>
-            globalError(
-                s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
+        (u =>
+           globalError(
+             s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
       satisfied // they're happy now, but they may need an unhappy phase that was booted
     }
     computeInternalPhases() // Global.scala
@@ -760,10 +786,12 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     def dotfmt(s: String) = new Formattable {
       def elliptically(s: String, max: Int) =
         (if (max < 0 || s.length <= max) s
-         else if (max < 4) s.take(max)
-         else s.take(max - 3) + "...")
-      override def formatTo(
-          formatter: Formatter, flags: Int, width: Int, precision: Int) {
+        else if (max < 4) s.take(max)
+        else s.take(max - 3) + "...")
+      override def formatTo(formatter: Formatter,
+                            flags: Int,
+                            width: Int,
+                            precision: Int) {
         val p = elliptically(s, precision)
         val w =
           if (width > 0 && p.length < width) {
@@ -781,10 +809,11 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     }
 
     // phase id in run, or suitable icon
-    def idOf(p: SubComponent) = (if (settings.skip contains p.phaseName)
-                                   "oo" // (currentRun skipPhase p.phaseName)
-                                 else if (!p.enabled) "xx"
-                                 else p.ownPhase.id.toString)
+    def idOf(p: SubComponent) =
+      (if (settings.skip contains p.phaseName)
+        "oo" // (currentRun skipPhase p.phaseName)
+      else if (!p.enabled) "xx"
+      else p.ownPhase.id.toString)
     def mkText(p: SubComponent) = {
       val (name, text) =
         if (elliptically) (dotfmt(p.phaseName), dotfmt(describe(p)))
@@ -815,7 +844,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   def extendCompilerClassPath(urls: URL*): Unit = {
     if (settings.YclasspathImpl.value == ClassPathRepresentationType.Flat)
       throw new UnsupportedOperationException(
-          "Flat classpath doesn't support extending the compiler classpath")
+        "Flat classpath doesn't support extending the compiler classpath")
 
     val newClassPath = platform.classPath.mergeUrlsIntoClassPath(urls: _*)
     platform.currentClassPath = Some(newClassPath)
@@ -829,8 +858,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     */
   private def isSystemPackageClass(pkg: Symbol) =
     pkg == RootClass ||
-    (pkg.hasTransOwner(definitions.ScalaPackageClass) && !pkg.hasTransOwner(
-            this.rootMirror.staticPackage("scala.tools").moduleClass.asClass))
+      (pkg.hasTransOwner(definitions.ScalaPackageClass) && !pkg.hasTransOwner(
+        this.rootMirror.staticPackage("scala.tools").moduleClass.asClass))
 
   /** Invalidates packages that contain classes defined in a classpath entry, and
     *  rescans that entry.
@@ -856,7 +885,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   def invalidateClassPathEntries(paths: String*): Unit = {
     if (settings.YclasspathImpl.value == ClassPathRepresentationType.Flat)
       throw new UnsupportedOperationException(
-          "Flat classpath doesn't support the classpath invalidation")
+        "Flat classpath doesn't support the classpath invalidation")
 
     implicit object ClassPathOrdering extends Ordering[PlatformClassPath] {
       def compare(a: PlatformClassPath, b: PlatformClassPath) =
@@ -879,7 +908,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
               List(oldEntry -> cp.context.newClassPath(dir))
             case None =>
               error(
-                  s"Error adding entry to classpath. During invalidation, no entry named $path in classpath $classPath")
+                s"Error adding entry to classpath. During invalidation, no entry named $path in classpath $classPath")
               List()
           }
         }
@@ -887,7 +916,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         if (subst.nonEmpty) {
           platform updateClassPath subst
           informProgress(
-              s"classpath updated on entries [${subst.keys mkString ","}]")
+            s"classpath updated on entries [${subst.keys mkString ","}]")
           def mkClassPath(
               elems: Iterable[PlatformClassPath]): PlatformClassPath =
             if (elems.size == 1) elems.head
@@ -967,8 +996,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
             (root.info decl pname) orElse {
               // package does not exist in symbol table, create symbol to track it
               assert(!subPackage(oldEntries.get, pstr).isDefined)
-              loaders.enterPackage(
-                  root, pstr, new loaders.PackageLoader(allEntries.get))
+              loaders.enterPackage(root,
+                                   pstr,
+                                   new loaders.PackageLoader(allEntries.get))
             }
           mergeNewEntries(subPackage(newEntries, pstr).get,
                           pkg.moduleClass.asClass,
@@ -1010,9 +1040,11 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     if (currentUnit.exists) currentUnit.source else lastSeenSourceFile
   def currentFreshNameCreator = currentUnit.fresh
 
-  def isGlobalInitialized = (definitions.isDefinitionsInitialized &&
+  def isGlobalInitialized =
+    (definitions.isDefinitionsInitialized &&
       rootMirror.isMirrorInitialized)
-  override def isPastTyper = ((curRun ne null) &&
+  override def isPastTyper =
+    ((curRun ne null) &&
       isGlobalInitialized // defense against init order issues
       && (globalPhase.id > currentRun.typerPhase.id))
 
@@ -1061,15 +1093,16 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     enteringPhase(currentRun.uncurryPhase)(op)
 
   // Owners which aren't package classes.
-  private def ownerChainString(sym: Symbol): String = (if (sym == null) ""
-                                                       else
-                                                         sym.ownerChain takeWhile
-                                                         (!_.isPackageClass) mkString " -> ")
+  private def ownerChainString(sym: Symbol): String =
+    (if (sym == null) ""
+    else
+      sym.ownerChain takeWhile
+        (!_.isPackageClass) mkString " -> ")
 
   private def formatExplain(pairs: (String, Any)*): String =
     (pairs.toList collect {
-          case (k, v) if v != null => "%20s: %s".format(k, v)
-        } mkString "\n")
+      case (k, v) if v != null => "%20s: %s".format(k, v)
+    } mkString "\n")
 
   /** Don't want to introduce new errors trying to report errors,
     *  so swallow exceptions.
@@ -1082,45 +1115,49 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       val site = lastSeenContext.enclClassOrMethod.owner
       val pos_s =
         if (tree.pos.isDefined)
-          s"line ${tree.pos.line} of ${tree.pos.source.file}" else "<unknown>"
+          s"line ${tree.pos.line} of ${tree.pos.source.file}"
+        else "<unknown>"
       val context_s = try {
         // Taking 3 before, 3 after the fingered line.
         val start = 0 max (tree.pos.line - 3)
         val xs =
-          scala.reflect.io.File(tree.pos.source.file.file).lines drop start take 7
+          scala.reflect.io
+            .File(tree.pos.source.file.file)
+            .lines drop start take 7
         val strs =
           xs.zipWithIndex map {
             case (line, idx) => f"${start + idx}%6d $line"
           }
-        strs.mkString(
-            "== Source file context for tree position ==\n\n", "\n", "")
+        strs.mkString("== Source file context for tree position ==\n\n",
+                      "\n",
+                      "")
       } catch {
         case t: Exception => devWarning("" + t); "<Cannot read source file>"
       }
 
       val info1 = formatExplain(
-          "while compiling" -> currentSource.path,
-          "during phase" ->
+        "while compiling" -> currentSource.path,
+        "during phase" ->
           (if (globalPhase eq phase) phase
-           else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
-          "library version" -> scala.util.Properties.versionString,
-          "compiler version" -> Properties.versionString,
-          "reconstructed args" -> settings.recreateArgs.mkString(" ")
+          else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
+        "library version" -> scala.util.Properties.versionString,
+        "compiler version" -> Properties.versionString,
+        "reconstructed args" -> settings.recreateArgs.mkString(" ")
       )
       val info2 = formatExplain(
-          "last tree to typer" -> tree.summaryString,
-          "tree position" -> pos_s,
-          "tree tpe" -> tpe,
-          "symbol" -> Option(sym).fold("null")(_.debugLocationString),
-          "symbol definition" -> Option(sym)
-            .fold("null")(s => s.defString + s" (a ${s.shortSymbolClass})"),
-          "symbol package" -> sym.enclosingPackage.fullName,
-          "symbol owners" -> ownerChainString(sym),
-          "call site" ->
+        "last tree to typer" -> tree.summaryString,
+        "tree position" -> pos_s,
+        "tree tpe" -> tpe,
+        "symbol" -> Option(sym).fold("null")(_.debugLocationString),
+        "symbol definition" -> Option(sym).fold("null")(s =>
+          s.defString + s" (a ${s.shortSymbolClass})"),
+        "symbol package" -> sym.enclosingPackage.fullName,
+        "symbol owners" -> ownerChainString(sym),
+        "call site" ->
           (site.fullLocationString + " in " + site.enclosingPackage)
       )
       ("\n  " + errorMessage + "\n" +
-          info1) :: info2 :: context_s :: Nil mkString "\n\n"
+        info1) :: info2 :: context_s :: Nil mkString "\n\n"
     } catch { case _: Exception | _: TypeError => errorMessage }
 
   /** The id of the currently active run
@@ -1130,7 +1167,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   def echoPhaseSummary(ph: Phase) = {
     /* Only output a summary message under debug if we aren't echoing each file. */
     if (settings.debug && !(settings.verbose || currentRun.size < 5))
-      inform("[running phase " + ph.name + " on " + currentRun.size +
+      inform(
+        "[running phase " + ph.name + " on " + currentRun.size +
           " compilation units]")
   }
 
@@ -1250,7 +1288,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           val skippable = skipPhase(pd.phaseName)
           if (skippable && (pd.initial || pd.terminal)) {
             globalError(
-                s"Cannot skip an initial or terminal phase '${pd.phaseName}'.")
+              s"Cannot skip an initial or terminal phase '${pd.phaseName}'.")
             false
           } else skippable || !pd.enabled
         }
@@ -1281,7 +1319,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           setting.value = List(p)
           val count =
             (if (including) first.iterator count (setting containsPhase _)
-             else phaseDescriptors count (setting contains _.phaseName))
+            else phaseDescriptors count (setting contains _.phaseName))
           if (count == 0) warning(s"'$p' specifies no phase")
           if (count > 1 && !isSpecial(p))
             warning(s"'$p' selects $count phases")
@@ -1392,13 +1430,14 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // issue warnings for any usage of deprecated settings
       settings.userSetSettings filter (_.isDeprecated) foreach { s =>
         currentRun.reporting.deprecationWarning(
-            NoPosition, s.name + " is deprecated: " + s.deprecationMessage.get)
+          NoPosition,
+          s.name + " is deprecated: " + s.deprecationMessage.get)
       }
       val supportedTarget = "jvm-1.8"
       if (settings.target.value != supportedTarget) {
         currentRun.reporting.deprecationWarning(
-            NoPosition,
-            settings.target.name + ":" + settings.target.value +
+          NoPosition,
+          settings.target.name + ":" + settings.target.value +
             " is deprecated and has no effect, setting to " + supportedTarget)
         settings.target.value = supportedTarget
       }
@@ -1479,8 +1518,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         exitingPhase(phase) {
           trackers foreach { t =>
             t.snapshot()
-            inform(t.show(
-                    "Heading from " + phase.prev.name + " to " + phase.name))
+            inform(
+              t.show("Heading from " + phase.prev.name + " to " + phase.name))
           }
         }
       }
@@ -1513,8 +1552,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     def compileUnits(units: List[CompilationUnit], fromPhase: Phase): Unit =
       compileUnitsInternal(units, fromPhase)
 
-    private def compileUnitsInternal(
-        units: List[CompilationUnit], fromPhase: Phase) {
+    private def compileUnitsInternal(units: List[CompilationUnit],
+                                     fromPhase: Phase) {
       def currentTime =
         java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime())
 
@@ -1586,7 +1625,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
     /** Compile list of abstract files. */
     def compileFiles(files: List[AbstractFile]) {
-      try compileSources(files map getSourceFile) catch {
+      try compileSources(files map getSourceFile)
+      catch {
         case ex: IOException => globalError(ex.getMessage())
       }
     }
@@ -1596,8 +1636,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       try {
         val sources: List[SourceFile] =
           if (settings.script.isSetByUser && filenames.size > 1)
-            returning(Nil)(
-                _ => globalError("can only compile one script at a time"))
+            returning(Nil)(_ =>
+              globalError("can only compile one script at a time"))
           else filenames map getSourceFile
 
         compileSources(sources)
@@ -1628,7 +1668,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         // we might get here during initialization, is a source is newer than the binary
         val maxId = math.max(globalPhase.id, typerPhase.id)
         firstPhase.iterator takeWhile (_.id < maxId) foreach
-        (ph => enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
+          (ph =>
+             enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
         refreshProgress()
       }
     }
@@ -1654,8 +1695,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   /** We resolve the class/object ambiguity by passing a type/term name.
     */
   def showDef(fullName: Name, declsOnly: Boolean, ph: Phase) = {
-    val boringOwners = Set[Symbol](
-        definitions.AnyClass, definitions.AnyRefClass, definitions.ObjectClass)
+    val boringOwners = Set[Symbol](definitions.AnyClass,
+                                   definitions.AnyRefClass,
+                                   definitions.ObjectClass)
     def phased[T](body: => T): T = exitingPhase(ph)(body)
     def boringMember(sym: Symbol) = boringOwners(sym.owner)
     def symString(sym: Symbol) =
@@ -1672,36 +1714,37 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(
-            currentRun.symSource.keys map
-            (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+        phased(currentRun.symSource.keys map
+          (sym =>
+             findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }
 
     syms foreach { sym =>
-      val name = "\n<<-- %s %s after phase '%s' -->>".format(
-          sym.kindString, sym.fullName, ph.name)
+      val name = "\n<<-- %s %s after phase '%s' -->>"
+        .format(sym.kindString, sym.fullName, ph.name)
       val baseClasses = bases(sym).mkString("Base classes:\n  ", "\n  ", "")
       val contents =
         if (declsOnly) decls(sym).mkString("Declarations:\n  ", "\n  ", "")
         else
           members(sym).mkString(
-              "Members (excluding Any/AnyRef unless overridden):\n  ",
-              "\n  ",
-              "")
+            "Members (excluding Any/AnyRef unless overridden):\n  ",
+            "\n  ",
+            "")
 
       inform(List(name, baseClasses, contents) mkString "\n\n")
     }
   }
 
-  def getFile(
-      source: AbstractFile, segments: Array[String], suffix: String): File = {
+  def getFile(source: AbstractFile,
+              segments: Array[String],
+              suffix: String): File = {
     val outDir = Path(
-        settings.outputDirs.outputDirFor(source).path match {
-          case "" => "."
-          case path => path
-        }
+      settings.outputDirs.outputDirFor(source).path match {
+        case "" => "."
+        case path => path
+      }
     )
     val dir = segments.init.foldLeft(outDir)(_ / _).createDirectory()
     new File(dir.path, segments.last + suffix)
@@ -1725,6 +1768,6 @@ object Global {
     //val loader = ScalaClassLoader(getClass.getClassLoader)  // apply does not make delegate
     val loader = new ClassLoader(getClass.getClassLoader) with ScalaClassLoader
     loader.create[Reporter](settings.reporter.value, settings.errorFn)(
-        settings)
+      settings)
   }
 }

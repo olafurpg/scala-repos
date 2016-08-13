@@ -104,7 +104,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         Real({ p =>
           val s = findNonzero(0)
           roundUp(
-              Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
+            Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
         })
     }
   }
@@ -307,7 +307,7 @@ object Real extends RealInstances {
 
   lazy val pi: Real =
     Real(16) * atan(Real(Rational(1, 5))) - Real.four * atan(
-        Real(Rational(1, 239)))
+      Real(Rational(1, 239)))
 
   lazy val e: Real = exp(Real.one)
 
@@ -459,9 +459,9 @@ object Real extends RealInstances {
 
   def div2n(x: Real, n: Int): Real =
     Real(
-        p =>
-          if (p >= n) x(p - n)
-          else roundUp(Rational(x(p), SafeLong.two.pow(n))))
+      p =>
+        if (p >= n) x(p - n)
+        else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
   def mul2n(x: Real, n: Int): Real =
     Real(p => x(p + n))
@@ -486,8 +486,9 @@ object Real extends RealInstances {
     }
   }
 
-  private[spire] def powerSeries(
-      ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+  private[spire] def powerSeries(ps: Stream[Rational],
+                                 terms: Int => Int,
+                                 x: Real): Real = {
     Real({ p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
@@ -522,12 +523,14 @@ object Real extends RealInstances {
   }
 
   def sinDr(x: Real): Real =
-    x * powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))), n => n, x * x)
+    x * powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))),
+                    n => n,
+                    x * x)
 
   def cosDr(x: Real): Real =
-    powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n => n, x * x)
+    powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))),
+                n => n,
+                x * x)
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)
@@ -566,8 +569,10 @@ trait RealInstances {
 class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional
-    extends Fractional[Real] with Order[Real]
-    with Signed[Real] with Trig[Real] {
+    extends Fractional[Real]
+    with Order[Real]
+    with Signed[Real]
+    with Trig[Real] {
   def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 

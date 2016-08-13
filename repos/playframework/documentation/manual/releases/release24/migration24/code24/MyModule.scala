@@ -15,7 +15,7 @@ package scaladoc {
       def bindings(environment: Environment,
                    configuration: Configuration): Seq[Binding[_]] = {
         Seq(
-            bind[MyComponent].to[MyComponentImpl]
+          bind[MyComponent].to[MyComponentImpl]
         )
       }
     }
@@ -27,7 +27,7 @@ package scaladoc {
     trait MyComponents {
       def applicationLifecycle: ApplicationLifecycle
       lazy val component: MyComponent = new MyComponentImpl(
-          applicationLifecycle)
+        applicationLifecycle)
     }
 //#components-decl
   }

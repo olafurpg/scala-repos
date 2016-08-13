@@ -1,6 +1,11 @@
 package com.twitter.finagle.stats
 
-import com.twitter.common.metrics.{Histogram, HistogramInterface, Percentile, Snapshot}
+import com.twitter.common.metrics.{
+  Histogram,
+  HistogramInterface,
+  Percentile,
+  Snapshot
+}
 import com.twitter.conversions.time._
 import com.twitter.util.{Duration, Time}
 import java.util.concurrent.atomic.AtomicReference
@@ -45,8 +50,8 @@ private[stats] class MetricsBucketedHistogram(
     // requests for the snapshot will return values from the previous `latchPeriod`.
 
     if (Time.Undefined eq nextSnapAfter.get) {
-      nextSnapAfter.compareAndSet(
-          Time.Undefined, JsonExporter.startOfNextMinute)
+      nextSnapAfter
+        .compareAndSet(Time.Undefined, JsonExporter.startOfNextMinute)
     }
 
     current.synchronized {
@@ -67,11 +72,11 @@ private[stats] class MetricsBucketedHistogram(
         val _min = snap.min
         val _avg = snap.avg
         val ps = new Array[Percentile](
-            MetricsBucketedHistogram.this.percentiles.length)
+          MetricsBucketedHistogram.this.percentiles.length)
         var i = 0
         while (i < ps.length) {
-          ps(i) = new Percentile(
-              MetricsBucketedHistogram.this.percentiles(i), snap.quantiles(i))
+          ps(i) = new Percentile(MetricsBucketedHistogram.this.percentiles(i),
+                                 snap.quantiles(i))
           i += 1
         }
         override def count(): Long = _count

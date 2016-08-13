@@ -2,7 +2,8 @@ trait Parallel
 trait Parallelizable[+ParRepr <: Parallel]
 
 trait PIterableLike[+T, +Repr <: Parallel]
-    extends Parallel with Parallelizable[PIterableLike[T, Repr]]
+    extends Parallel
+    with Parallelizable[PIterableLike[T, Repr]]
 
 trait PMap[K, V] extends PIterableLike[(K, V), PMap[K, V]]
 trait PSet[T] extends PIterableLike[T, PSet[T]]
@@ -12,7 +13,8 @@ trait CIterableLike[+T, +Repr]
 trait CSet[T] extends CIterableLike[T, CSet[T]] with Parallelizable[PSet[T]]
 
 trait CMap[K, V]
-    extends CIterableLike[(K, V), CMap[K, V]] with Parallelizable[PMap[K, V]]
+    extends CIterableLike[(K, V), CMap[K, V]]
+    with Parallelizable[PMap[K, V]]
 
 object Test {
   var x = 0

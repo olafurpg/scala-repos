@@ -86,8 +86,8 @@ object Multipart {
     require(request.method == Method.Post)
 
     val decoder = new multipart.HttpPostRequestDecoder(
-        new multipart.DefaultHttpDataFactory(MaxInMemoryFileSize.inBytes),
-        request.httpRequest)
+      new multipart.DefaultHttpDataFactory(MaxInMemoryFileSize.inBytes),
+      request.httpRequest)
     val attrs = new mutable.HashMap[String, mutable.ListBuffer[String]]()
     val files = new mutable.HashMap[String, mutable.ListBuffer[FileUpload]]()
 
@@ -102,17 +102,17 @@ object Multipart {
           files.getOrElseUpdate(fu.getName, mutable.ListBuffer[FileUpload]())
         if (fu.isInMemory) {
           buf += InMemoryFileUpload(
-              Buf.ByteArray.Owned(fu.get()),
-              fu.getContentType,
-              fu.getFilename,
-              fu.getContentTransferEncoding
+            Buf.ByteArray.Owned(fu.get()),
+            fu.getContentType,
+            fu.getFilename,
+            fu.getContentTransferEncoding
           )
         } else {
           buf += OnDiskFileUpload(
-              fu.getFile,
-              fu.getContentType,
-              fu.getFilename,
-              fu.getContentTransferEncoding
+            fu.getFile,
+            fu.getContentType,
+            fu.getFilename,
+            fu.getContentTransferEncoding
           )
         }
 

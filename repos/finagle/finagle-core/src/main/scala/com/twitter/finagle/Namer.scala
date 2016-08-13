@@ -39,7 +39,8 @@ object Namer {
   import NameTree._
 
   private[finagle] val namerOfKind: (String => Namer) = Memoize { kind =>
-    try Class.forName(kind).newInstance().asInstanceOf[Namer] catch {
+    try Class.forName(kind).newInstance().asInstanceOf[Namer]
+    catch {
       case NonFatal(exc) => FailingNamer(exc)
     }
   }
@@ -71,11 +72,11 @@ object Namer {
 
     private[this] object InetPath {
       def unapply(path: Path): Option[(Address, Path)] = path match {
-        case Path.Utf8(
-            "$", "inet", host, IntegerString(port), residual @ _ *) =>
+        case Path
+              .Utf8("$", "inet", host, IntegerString(port), residual @ _ *) =>
           Some(
-              (Address(new InetSocketAddress(host, port)),
-               Path.Utf8(residual: _*)))
+            (Address(new InetSocketAddress(host, port)),
+             Path.Utf8(residual: _*)))
         case Path.Utf8("$", "inet", IntegerString(port), residual @ _ *) =>
           Some((Address(new InetSocketAddress(port)), Path.Utf8(residual: _*)))
         case _ => None
@@ -110,7 +111,7 @@ object Namer {
       case InetPath(addr, residual) =>
         val id = path.take(path.size - residual.size)
         Activity.value(
-            Leaf(Name.Bound(Var.value(Addr.Bound(addr)), id, residual)))
+          Leaf(Name.Bound(Var.value(Addr.Bound(addr)), id, residual)))
 
       case FailPath() => Activity.value(Fail)
       case NilPath() => Activity.value(Empty)
@@ -177,8 +178,8 @@ object Namer {
       trees: Seq[Weighted[Name]]
   ): Activity[NameTree[Name.Bound]] = {
 
-    val weightedTreeVars: Seq[Var[
-            Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map {
+    val weightedTreeVars: Seq[
+      Var[Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map {
       case Weighted(w, t) =>
         val treesAct: Activity[NameTree[Name.Bound]] =
           bind(lookup, depth, Some(w))(t)
@@ -213,7 +214,7 @@ object Namer {
       tree: NameTree[Name]): Activity[NameTree[Name.Bound]] =
     if (depth > MaxDepth)
       Activity.exception(
-          new IllegalArgumentException("Max recursion level reached."))
+        new IllegalArgumentException("Max recursion level reached."))
     else
       tree match {
         case Leaf(Name.Path(path)) =>
@@ -229,7 +230,7 @@ object Namer {
             }
           }
           Activity.value(
-              Leaf(Name.Bound(addrWithWeight, bound.id, bound.path)))
+            Leaf(Name.Bound(addrWithWeight, bound.id, bound.path)))
 
         case Fail => Activity.value(Fail)
         case Neg => Activity.value(Neg)

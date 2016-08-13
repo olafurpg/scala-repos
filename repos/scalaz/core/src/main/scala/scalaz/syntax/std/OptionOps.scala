@@ -92,7 +92,7 @@ final class OptionOps[A](self: Option[A]) {
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_]: Applicative : PlusEmpty]: M[A] =
+  final def orEmpty[M[_]: Applicative: PlusEmpty]: M[A] =
     o.orEmpty[A, M](self)
 
   final def foldLift[F[_]: Applicative, B](b: => B, k: F[A] => B): B =

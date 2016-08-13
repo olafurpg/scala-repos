@@ -7,7 +7,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScWhileStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScWhileStmt
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
@@ -23,11 +26,13 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = ReplaceWhileWithDoWhileIntention.familyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     for {
       whileStmt <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
+                    PsiTreeUtil
+                      .getParentOfType(element, classOf[ScWhileStmt], false))
       condition <- whileStmt.condition
       body <- whileStmt.body
     } {
@@ -54,8 +59,8 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
       val newStmtText = s"if ($condText) {\n do $bodyText while ($condText)\n}"
 
       val newStmt: ScExpression =
-        ScalaPsiElementFactory.createExpressionFromText(
-            newStmtText, element.getManager)
+        ScalaPsiElementFactory
+          .createExpressionFromText(newStmtText, element.getManager)
 
       inWriteAction {
         whileStmt.replaceExpression(newStmt, removeParenthesis = true)

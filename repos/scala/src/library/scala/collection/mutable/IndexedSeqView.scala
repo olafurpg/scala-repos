@@ -27,23 +27,26 @@ import scala.language.implicitConversions
   *  @tparam Coll the type of the underlying collection containing the elements.
   */
 trait IndexedSeqView[A, +Coll]
-    extends IndexedSeq[A] with IndexedSeqOptimized[A, IndexedSeqView[A, Coll]]
-    with SeqView[A, Coll] with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]] {
-  self =>
+    extends IndexedSeq[A]
+    with IndexedSeqOptimized[A, IndexedSeqView[A, Coll]]
+    with SeqView[A, Coll]
+    with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]] { self =>
 
   private[this] type This = IndexedSeqView[A, Coll]
 
   def update(idx: Int, elem: A): Unit
 
   trait Transformed[B]
-      extends IndexedSeqView[B, Coll] with super.Transformed[B] {
+      extends IndexedSeqView[B, Coll]
+      with super.Transformed[B] {
     def update(idx: Int, elem: B): Unit
     override def toString = viewToString
   }
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[B]
-      extends super.AbstractTransformed[B] with Transformed[B]
+      extends super.AbstractTransformed[B]
+      with Transformed[B]
 
   // pre: until <= self.length
   trait Sliced extends super.Sliced with Transformed[A] {
@@ -119,8 +122,8 @@ object IndexedSeqView {
       def apply(from: Coll) = new NoBuilder
       def apply() = new NoBuilder
     }
-  implicit def arrCanBuildFrom[A]: CanBuildFrom[
-      TraversableView[_, Array[_]], A, SeqView[A, Array[A]]] =
+  implicit def arrCanBuildFrom[A]
+    : CanBuildFrom[TraversableView[_, Array[_]], A, SeqView[A, Array[A]]] =
     new CanBuildFrom[TraversableView[_, Array[_]], A, SeqView[A, Array[A]]] {
       def apply(from: TraversableView[_, Array[_]]) = new NoBuilder
       def apply() = new NoBuilder

@@ -16,20 +16,21 @@ import com.intellij.util.containers.MultiMap
   * @author Alexander Podkhalyuzin
   */
 trait ConflictsReporter {
-  def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean
+  def reportConflicts(project: Project,
+                      conflicts: MultiMap[PsiElement, String]): Boolean
 }
 
 trait EmptyConflictsReporter extends ConflictsReporter {
-  override def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]) = false
+  override def reportConflicts(project: Project,
+                               conflicts: MultiMap[PsiElement, String]) = false
 }
 
 trait DialogConflictsReporter extends ConflictsReporter {
   override def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean = {
-    val conflictsDialog = new ConflictsDialog(
-        project, conflicts, null, true, false)
+      project: Project,
+      conflicts: MultiMap[PsiElement, String]): Boolean = {
+    val conflictsDialog =
+      new ConflictsDialog(project, conflicts, null, true, false)
     conflictsDialog.show()
     conflictsDialog.isOK
   }
@@ -37,8 +38,8 @@ trait DialogConflictsReporter extends ConflictsReporter {
 
 class BalloonConflictsReporter(editor: Editor) extends ConflictsReporter {
 
-  def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean = {
+  def reportConflicts(project: Project,
+                      conflicts: MultiMap[PsiElement, String]): Boolean = {
     val messages = conflicts.values().toArray.toSet
     createWarningBalloon(messages.mkString("\n"))
     true //this means that we do nothing, only show balloon
@@ -52,7 +53,10 @@ class BalloonConflictsReporter(editor: Editor) extends ConflictsReporter {
         val screenPoint: Point = bestLocation.getScreenPoint
         val y: Int = screenPoint.y - editor.getLineHeight * 2
         val builder = popupFactory.createHtmlTextBalloonBuilder(
-            message, null, MessageType.WARNING.getPopupBackground, null)
+          message,
+          null,
+          MessageType.WARNING.getPopupBackground,
+          null)
         val balloon: Balloon =
           builder.setFadeoutTime(-1).setShowCallout(false).createBalloon
         balloon.show(new RelativePoint(new Point(screenPoint.x, y)),

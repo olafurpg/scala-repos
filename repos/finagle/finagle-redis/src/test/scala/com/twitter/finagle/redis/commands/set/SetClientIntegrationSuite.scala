@@ -80,9 +80,9 @@ final class SetClientIntegrationSuite extends RedisClientTest {
   }
 
   test(
-      "Correctly add, examine members of a set, then pop them off and reexamine",
-      RedisTest,
-      ClientTest) {
+    "Correctly add, examine members of a set, then pop them off and reexamine",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       assert(Await.result(client.sAdd(key, List(moo))) == oneElemAdded,
              oneElemAddErrorMessage)
@@ -126,10 +126,9 @@ final class SetClientIntegrationSuite extends RedisClientTest {
       val empty = Await.result(client.sRandMember(key))
       assert(empty.size == 0, "The empty set was not empty!")
 
-      allMembers.foreach(m =>
-            {
-          assert(Await.result(client.sAdd(key, List(m))) == oneElemAdded,
-                 oneElemAddErrorMessage)
+      allMembers.foreach(m => {
+        assert(Await.result(client.sAdd(key, List(m))) == oneElemAdded,
+               oneElemAddErrorMessage)
       })
 
       val oneMember = Await.result(client.sRandMember(key))
@@ -169,7 +168,7 @@ final class SetClientIntegrationSuite extends RedisClientTest {
 
       // Should intersect a single value
       assert(
-          Await.result(client.sInter(Seq(foo, boo, baz))) == CollectionSet(c))
+        Await.result(client.sInter(Seq(foo, boo, baz))) == CollectionSet(c))
 
       // Has no intersection
       assert(Await.result(client.sInter(Seq(boo, moo))) == CollectionSet.empty)

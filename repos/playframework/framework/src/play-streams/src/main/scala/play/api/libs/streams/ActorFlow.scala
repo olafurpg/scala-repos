@@ -29,10 +29,10 @@ object ActorFlow {
     * @param bufferSize The maximum number of elements to buffer.
     * @param overflowStrategy The strategy for how to handle a buffer overflow.
     */
-  def actorRef[In, Out](
-      props: ActorRef => Props,
-      bufferSize: Int = 16,
-      overflowStrategy: OverflowStrategy = OverflowStrategy.dropNew)(
+  def actorRef[In, Out](props: ActorRef => Props,
+                        bufferSize: Int = 16,
+                        overflowStrategy: OverflowStrategy =
+                          OverflowStrategy.dropNew)(
       implicit factory: ActorRefFactory,
       mat: Materializer): Flow[In, Out, _] = {
 
@@ -42,26 +42,26 @@ object ActorFlow {
       .run()
 
     Flow.fromSinkAndSource(
-        Sink.actorRef(factory.actorOf(Props(new Actor {
-          val flowActor =
-            context.watch(context.actorOf(props(outActor), "flowActor"))
+      Sink.actorRef(factory.actorOf(Props(new Actor {
+        val flowActor =
+          context.watch(context.actorOf(props(outActor), "flowActor"))
 
-          def receive = {
-            case Status.Success(_) | Status.Failure(_) =>
-              flowActor ! PoisonPill
-            case Terminated =>
-              println("Child terminated, stopping")
-              context.stop(self)
-            case other => flowActor ! other
-          }
+        def receive = {
+          case Status.Success(_) | Status.Failure(_) =>
+            flowActor ! PoisonPill
+          case Terminated =>
+            println("Child terminated, stopping")
+            context.stop(self)
+          case other => flowActor ! other
+        }
 
-          override def supervisorStrategy = OneForOneStrategy() {
-            case _ =>
-              println("Stopping actor due to exception")
-              SupervisorStrategy.Stop
-          }
-        })), Status.Success(())),
-        Source.fromPublisher(publisher)
+        override def supervisorStrategy = OneForOneStrategy() {
+          case _ =>
+            println("Stopping actor due to exception")
+            SupervisorStrategy.Stop
+        }
+      })), Status.Success(())),
+      Source.fromPublisher(publisher)
     )
   }
 }

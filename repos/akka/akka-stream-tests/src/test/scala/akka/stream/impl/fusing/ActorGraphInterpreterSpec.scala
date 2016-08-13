@@ -23,8 +23,8 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
       val identity = GraphStages.identity[Int]
 
       Await.result(
-          Source(1 to 100).via(identity).grouped(200).runWith(Sink.head),
-          3.seconds) should ===(1 to 100)
+        Source(1 to 100).via(identity).grouped(200).runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "be able to reuse a simple identity graph stage" in assertAllStagesStopped {
@@ -81,8 +81,8 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
         })
 
       Await.result(
-          Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
-          3.seconds) should ===(1 to 10)
+        Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
+        3.seconds) should ===(1 to 10)
     }
 
     "be able to interpret and reuse a simple bidi stage" in assertAllStagesStopped {
@@ -127,12 +127,12 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
       val identityBidiF = BidiFlow.fromGraph(identityBidi)
       val identity = (identityBidiF atop identityBidiF atop identityBidiF)
         .join(Flow[Int].map { x ⇒
-        x
-      })
+          x
+        })
 
       Await.result(
-          Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
-          3.seconds) should ===(1 to 10)
+        Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
+        3.seconds) should ===(1 to 10)
     }
 
     "be able to interpret and resuse a simple bidi stage" in assertAllStagesStopped {
@@ -177,12 +177,12 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
       val identityBidiF = BidiFlow.fromGraph(identityBidi)
       val identity = (identityBidiF atop identityBidiF atop identityBidiF)
         .join(Flow[Int].map { x ⇒
-        x
-      })
+          x
+        })
 
       Await.result(
-          Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
-          3.seconds) should ===(1 to 10)
+        Source(1 to 10).via(identity).grouped(100).runWith(Sink.head),
+        3.seconds) should ===(1 to 10)
     }
 
     "be able to interpret a rotated identity bidi stage" in assertAllStagesStopped {

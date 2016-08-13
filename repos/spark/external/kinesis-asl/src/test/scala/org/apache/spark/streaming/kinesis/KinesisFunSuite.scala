@@ -32,8 +32,8 @@ trait KinesisFunSuite extends SparkFunSuite {
       test(testName)(testBody)
     } else {
       ignore(
-          s"$testName [enable by setting env var $envVarNameForEnablingTests=1]")(
-          testBody)
+        s"$testName [enable by setting env var $envVarNameForEnablingTests=1]")(
+        testBody)
     }
   }
 
@@ -43,8 +43,8 @@ trait KinesisFunSuite extends SparkFunSuite {
       body
     } else {
       ignore(
-          s"$message [enable by setting env var $envVarNameForEnablingTests=1]")(
-          ())
+        s"$message [enable by setting env var $envVarNameForEnablingTests=1]")(
+        ())
     }
   }
 }

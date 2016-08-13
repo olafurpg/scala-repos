@@ -138,43 +138,37 @@ trait StringValidators { self: FieldIdentifier =>
   def maxLen: Int
 
   def crop(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in).map {
+    boxStrToValType(valueTypeToBoxString(in).map {
       case null => null
       case s => s.substring(0, math.min(s.length, maxLen))
     })
 
   def removeRegExChars(regEx: String)(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in).map {
+    boxStrToValType(valueTypeToBoxString(in).map {
       case null => null
       case s => s.replaceAll(regEx, "")
     })
 
   def toLower(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in).map {
+    boxStrToValType(valueTypeToBoxString(in).map {
       case null => null
       case s => s.toLowerCase
     })
 
   def toUpper(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in).map {
+    boxStrToValType(valueTypeToBoxString(in).map {
       case null => null
       case s => s.toUpperCase
     })
 
   def trim(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in).map {
+    boxStrToValType(valueTypeToBoxString(in).map {
       case null => null
       case s => s.trim
     })
 
   def notNull(in: ValueType): ValueType =
-    boxStrToValType(
-        valueTypeToBoxString(in) match {
+    boxStrToValType(valueTypeToBoxString(in) match {
       case Full(str) if null ne str => Full(str)
       case _ => Full("")
     })

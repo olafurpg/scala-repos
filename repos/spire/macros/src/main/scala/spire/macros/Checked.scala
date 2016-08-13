@@ -51,27 +51,27 @@ object Checked {
     */
   def tryOrReturn[A](n: A)(orElse: A): A = macro tryOrReturnImpl[A]
 
-  def tryOrElseImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A])(
+  def tryOrElseImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(
       orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, orElse.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
   }
 
-  def checkedImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
+  def checkedImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     import c.universe._
     tryOrElseImpl[A](c)(n)(
-        c.Expr[A](q"throw new spire.macros.ArithmeticOverflowException()"))
+      c.Expr[A](q"throw new spire.macros.ArithmeticOverflowException()"))
   }
 
-  def optionImpl[A : c.WeakTypeTag](c: Context)(
+  def optionImpl[A: c.WeakTypeTag](c: Context)(
       n: c.Expr[A]): c.Expr[Option[A]] = {
     import c.universe._
     tryOrElseImpl[Option[A]](c)(c.Expr[Option[A]](q"Option(${n.tree})"))(
-        c.Expr[Option[A]](q"None"))
+      c.Expr[Option[A]](q"None"))
   }
 
-  def tryOrReturnImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A])(
+  def tryOrReturnImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(
       orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteFast[A](n.tree, orElse.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
@@ -82,7 +82,7 @@ object Checked {
 private[macros] case class CheckedRewriter[C <: Context](c: C) {
   import c.universe._
 
-  def rewriteSafe[A : c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
+  def rewriteSafe[A: c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
     warnOnSimpleTree(tree)
     val A = weakTypeOf[A]
     val aname = freshTermName(c)("checked$attempt$")
@@ -91,7 +91,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     q"""{ def $fname: $A = $fallback; def $aname: $A = $attempt; $aname }"""
   }
 
-  def rewriteFast[A : c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
+  def rewriteFast[A: c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
     warnOnSimpleTree(tree)
     val A = weakTypeOf[A]
     val fname = freshTermName(c)("checked$fallback$")

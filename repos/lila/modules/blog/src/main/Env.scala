@@ -17,17 +17,17 @@ final class Env(config: Config,
 
   val RssEmail = config getString "rss.email"
 
-  lazy val api = new BlogApi(
-      prismicUrl = PrismicApiUrl, collection = PrismicCollection)
+  lazy val api =
+    new BlogApi(prismicUrl = PrismicApiUrl, collection = PrismicCollection)
 
-  lazy val lastPostCache = new LastPostCache(
-      api, LastPostCacheTtl, PrismicCollection)
+  lazy val lastPostCache =
+    new LastPostCache(api, LastPostCacheTtl, PrismicCollection)
 
   private implicit lazy val notifier = new Notifier(
-      blogApi = api,
-      messageApi = messageApi,
-      lastPostCache = lastPostCache,
-      lichessUserId = NotifySender)
+    blogApi = api,
+    messageApi = messageApi,
+    lastPostCache = lastPostCache,
+    lichessUserId = NotifySender)
 
   {
     import scala.concurrent.duration._

@@ -49,7 +49,7 @@ trait HashJoin { self: SparkPlan =>
         left.output
       case x =>
         throw new IllegalArgumentException(
-            s"HashJoin should not take $x as the JoinType")
+          s"HashJoin should not take $x as the JoinType")
     }
   }
 
@@ -95,8 +95,8 @@ trait HashJoin { self: SparkPlan =>
                 e
               }
             keyExpr = BitwiseOr(
-                ShiftLeft(keyExpr, Literal(bits)),
-                BitwiseAnd(Cast(rotated, LongType), Literal((1L << bits) - 1)))
+              ShiftLeft(keyExpr, Literal(bits)),
+              BitwiseAnd(Cast(rotated, LongType), Literal((1L << bits) - 1)))
             width -= bits
           }
         // TODO: support BooleanType, DateType and TimestampType
@@ -121,8 +121,8 @@ trait HashJoin { self: SparkPlan =>
 
   @transient private[this] lazy val boundCondition =
     if (condition.isDefined) {
-      newPredicate(
-          condition.getOrElse(Literal(true)), left.output ++ right.output)
+      newPredicate(condition.getOrElse(Literal(true)),
+                   left.output ++ right.output)
     } else { (r: InternalRow) =>
       true
     }
@@ -172,11 +172,11 @@ trait HashJoin { self: SparkPlan =>
           // found some matches
           buildSide match {
             case BuildRight =>
-              joinRow(
-                  currentStreamedRow, currentHashMatches(currentMatchPosition))
+              joinRow(currentStreamedRow,
+                      currentHashMatches(currentMatchPosition))
             case BuildLeft =>
-              joinRow(
-                  currentHashMatches(currentMatchPosition), currentStreamedRow)
+              joinRow(currentHashMatches(currentMatchPosition),
+                      currentStreamedRow)
           }
           if (boundCondition(joinRow)) {
             return true
@@ -203,9 +203,9 @@ trait HashJoin { self: SparkPlan =>
   @transient protected[this] lazy val EMPTY_LIST = CompactBuffer[InternalRow]()
 
   @transient private[this] lazy val leftNullRow = new GenericInternalRow(
-      left.output.length)
+    left.output.length)
   @transient private[this] lazy val rightNullRow = new GenericInternalRow(
-      right.output.length)
+    right.output.length)
 
   protected[this] def leftOuterIterator(
       key: InternalRow,
@@ -219,9 +219,9 @@ trait HashJoin { self: SparkPlan =>
           if (rightIter != null) {
             rightIter.collect {
               case r if boundCondition(joinedRow.withRight(r)) => {
-                  numOutputRows += 1
-                  resultProjection(joinedRow).copy()
-                }
+                numOutputRows += 1
+                resultProjection(joinedRow).copy()
+              }
             }
           } else {
             List.empty
@@ -252,9 +252,9 @@ trait HashJoin { self: SparkPlan =>
           if (leftIter != null) {
             leftIter.collect {
               case l if boundCondition(joinedRow.withLeft(l)) => {
-                  numOutputRows += 1
-                  resultProjection(joinedRow).copy()
-                }
+                numOutputRows += 1
+                resultProjection(joinedRow).copy()
+              }
             }
           } else {
             List.empty
@@ -284,9 +284,9 @@ trait HashJoin { self: SparkPlan =>
       lazy val rowBuffer = hashedRelation.get(key)
       val r =
         !key.anyNull && rowBuffer != null &&
-        (condition.isEmpty || rowBuffer.exists { (row: InternalRow) =>
-              boundCondition(joinedRow(current, row))
-            })
+          (condition.isEmpty || rowBuffer.exists { (row: InternalRow) =>
+            boundCondition(joinedRow(current, row))
+          })
       if (r) numOutputRows += 1
       r
     }

@@ -11,12 +11,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiDocumentManager, PsiFile, PsiFileFactory}
 import org.jetbrains.plugins.scala.actions.ScalaActionUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, TopComponentAction}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction,
+  TopComponentAction
+}
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 10/17/12
   */
 class RunMacrosheetAction extends AnAction with TopComponentAction {
@@ -24,12 +27,13 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
                         defaultText: String = "",
                         lang: Language = StdLanguages.TEXT): Editor = {
     val editor = EditorFactory.getInstance.createViewer(
-        PsiDocumentManager
-          .getInstance(project)
-          .getDocument(PsiFileFactory
-                .getInstance(project)
-                .createFileFromText("dummy", lang, defaultText)),
-        project)
+      PsiDocumentManager
+        .getInstance(project)
+        .getDocument(
+          PsiFileFactory
+            .getInstance(project)
+            .createFileFromText("dummy", lang, defaultText)),
+      project)
     editor setBorder null
     editor
   }
@@ -55,8 +59,8 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
             override def run() {
               extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
-                CleanWorksheetAction.cleanWorksheet(
-                    file.getNode, editor, viewer, project)
+                CleanWorksheetAction
+                  .cleanWorksheet(file.getNode, editor, viewer, project)
               }
             }
           }, ModalityState.any())
@@ -64,7 +68,7 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
 
         ScalaMacroDebuggingUtil.macrosToExpand.clear()
         ScalaMacroDebuggingUtil.allMacroCalls.foreach(
-            ScalaMacroDebuggingUtil.macrosToExpand.add)
+          ScalaMacroDebuggingUtil.macrosToExpand.add)
         ScalaMacroDebuggingUtil.expandMacros(project)
 
       case _ =>

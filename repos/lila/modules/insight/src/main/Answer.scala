@@ -2,8 +2,9 @@ package lila.insight
 
 import lila.game.{Game, Pov}
 
-case class Answer[X](
-    question: Question[X], clusters: List[Cluster[X]], povs: List[Pov])
+case class Answer[X](question: Question[X],
+                     clusters: List[Cluster[X]],
+                     povs: List[Pov])
 
 // a row per dimension value
 case class Cluster[X](x: X, // dimension value

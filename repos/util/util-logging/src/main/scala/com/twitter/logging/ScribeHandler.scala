@@ -20,7 +20,12 @@ import java.io.IOException
 import java.net._
 import java.nio.{ByteBuffer, ByteOrder}
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.{ArrayBlockingQueue, LinkedBlockingQueue, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  LinkedBlockingQueue,
+  TimeUnit,
+  ThreadPoolExecutor
+}
 import java.util.{Arrays, logging => javalog}
 
 import com.twitter.concurrent.NamedPoolThreadFactory
@@ -169,8 +174,8 @@ class ScribeHandler(hostname: String,
   // Could be rewritten using a simple Condition (await/notify) or producer/consumer
   // with timed batching
   private[logging] val flusher = {
-    val threadFactory = new NamedPoolThreadFactory(
-        "ScribeFlusher-" + category, true)
+    val threadFactory =
+      new NamedPoolThreadFactory("ScribeFlusher-" + category, true)
     // should be 1, but this is a crude form of retry
     val queue = new ArrayBlockingQueue[Runnable](5)
     val rejectionHandler = new ThreadPoolExecutor.DiscardPolicy()
@@ -219,32 +224,32 @@ class ScribeHandler(hostname: String,
       serverType = socket match {
         case None => Unknown
         case Some(s) => {
-            val outStream = s.getOutputStream()
+          val outStream = s.getOutputStream()
 
-            try {
-              val fakeMessageWithOldScribePrefix: Array[Byte] = {
-                val prefix = OLD_SCRIBE_PREFIX
-                val messageSize = prefix.length + 5
-                val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
-                buffer.order(ByteOrder.BIG_ENDIAN)
-                buffer.putInt(messageSize)
-                buffer.put(prefix)
-                buffer.putInt(0)
-                buffer.put(0: Byte)
-                buffer.array
-              }
-
-              outStream.write(fakeMessageWithOldScribePrefix)
-              readResponseExpecting(s, OLD_SCRIBE_REPLY)
-
-              // Didn't get exception, so the server must be archaic.
-              log.debug(
-                  "Scribe server is archaic; changing to old protocol for future requests.")
-              Archaic
-            } catch {
-              case NonFatal(_) => Modern
+          try {
+            val fakeMessageWithOldScribePrefix: Array[Byte] = {
+              val prefix = OLD_SCRIBE_PREFIX
+              val messageSize = prefix.length + 5
+              val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
+              buffer.order(ByteOrder.BIG_ENDIAN)
+              buffer.putInt(messageSize)
+              buffer.put(prefix)
+              buffer.putInt(0)
+              buffer.put(0: Byte)
+              buffer.array
             }
+
+            outStream.write(fakeMessageWithOldScribePrefix)
+            readResponseExpecting(s, OLD_SCRIBE_REPLY)
+
+            // Didn't get exception, so the server must be archaic.
+            log.debug(
+              "Scribe server is archaic; changing to old protocol for future requests.")
+            Archaic
+          } catch {
+            case NonFatal(_) => Modern
           }
+        }
       }
     }
 
@@ -276,12 +281,12 @@ class ScribeHandler(hostname: String,
               case e: Exception =>
                 stats.incrDroppedRecords(count)
                 log.error(
-                    e,
-                    "Failed to send %s %d log entries to scribe server at %s:%d",
-                    category,
-                    count,
-                    hostname,
-                    port)
+                  e,
+                  "Failed to send %s %d log entries to scribe server at %s:%d",
+                  category,
+                  count,
+                  hostname,
+                  port)
                 closeSocket()
             }
           }
@@ -291,8 +296,8 @@ class ScribeHandler(hostname: String,
       }
     }
 
-    def readResponseExpecting(
-        socket: Socket, expectedReply: Array[Byte]): Unit = {
+    def readResponseExpecting(socket: Socket,
+                              expectedReply: Array[Byte]): Unit = {
       var offset = 0
 
       val inStream = socket.getInputStream()
@@ -308,12 +313,11 @@ class ScribeHandler(hostname: String,
       }
       if (!Arrays.equals(response, expectedReply)) {
         throw new IOException(
-            "Error response from scribe server: " + response.hexlify)
+          "Error response from scribe server: " + response.hexlify)
       }
     }
 
-    flusher.execute(
-        new Runnable {
+    flusher.execute(new Runnable {
       def run() { sendBatch() }
     })
   }
@@ -386,115 +390,115 @@ class ScribeHandler(hostname: String,
 
   override def toString = {
     ("<%s level=%s hostname=%s port=%d scribe_buffer=%s " +
-        "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
-        getClass.getName,
-        getLevel,
-        hostname,
-        port,
-        bufferTime,
-        connectBackoff,
-        maxMessagesPerTransaction,
-        formatter.toString)
+      "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
+      getClass.getName,
+      getLevel,
+      hostname,
+      port,
+      bufferTime,
+      connectBackoff,
+      maxMessagesPerTransaction,
+      formatter.toString)
   }
 
   private[this] val SCRIBE_PREFIX: Array[Byte] = Array[Byte](
-      // version 1, call, "Log", reqid=0
-      0x80.toByte,
-      1,
-      0,
-      1,
-      0,
-      0,
-      0,
-      3,
-      'L'.toByte,
-      'o'.toByte,
-      'g'.toByte,
-      0,
-      0,
-      0,
-      0,
-      // list of structs
-      15,
-      0,
-      1,
-      12
+    // version 1, call, "Log", reqid=0
+    0x80.toByte,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    3,
+    'L'.toByte,
+    'o'.toByte,
+    'g'.toByte,
+    0,
+    0,
+    0,
+    0,
+    // list of structs
+    15,
+    0,
+    1,
+    12
   )
   private[this] val OLD_SCRIBE_PREFIX: Array[Byte] = Array[Byte](
-      // (no version), "Log", reply, reqid=0
-      0,
-      0,
-      0,
-      3,
-      'L'.toByte,
-      'o'.toByte,
-      'g'.toByte,
-      1,
-      0,
-      0,
-      0,
-      0,
-      // list of structs
-      15,
-      0,
-      1,
-      12
+    // (no version), "Log", reply, reqid=0
+    0,
+    0,
+    0,
+    3,
+    'L'.toByte,
+    'o'.toByte,
+    'g'.toByte,
+    1,
+    0,
+    0,
+    0,
+    0,
+    // list of structs
+    15,
+    0,
+    1,
+    12
   )
 
   private[this] val SCRIBE_REPLY: Array[Byte] = Array[Byte](
-      // version 1, reply, "Log", reqid=0
-      0x80.toByte,
-      1,
-      0,
-      2,
-      0,
-      0,
-      0,
-      3,
-      'L'.toByte,
-      'o'.toByte,
-      'g'.toByte,
-      0,
-      0,
-      0,
-      0,
-      // int, fid 0, 0=ok
-      8,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+    // version 1, reply, "Log", reqid=0
+    0x80.toByte,
+    1,
+    0,
+    2,
+    0,
+    0,
+    0,
+    3,
+    'L'.toByte,
+    'o'.toByte,
+    'g'.toByte,
+    0,
+    0,
+    0,
+    0,
+    // int, fid 0, 0=ok
+    8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
   )
   private[this] val OLD_SCRIBE_REPLY: Array[Byte] = Array[Byte](
-      0,
-      0,
-      0,
-      20,
-      // (no version), "Log", reply, reqid=0
-      0,
-      0,
-      0,
-      3,
-      'L'.toByte,
-      'o'.toByte,
-      'g'.toByte,
-      2,
-      0,
-      0,
-      0,
-      0,
-      // int, fid 0, 0=ok
-      8,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+    0,
+    0,
+    0,
+    20,
+    // (no version), "Log", reply, reqid=0
+    0,
+    0,
+    0,
+    3,
+    'L'.toByte,
+    'o'.toByte,
+    'g'.toByte,
+    2,
+    0,
+    0,
+    0,
+    0,
+    // int, fid 0, 0=ok
+    8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
   )
 
   private class ScribeHandlerStats(statsReceiver: StatsReceiver) {
@@ -550,12 +554,12 @@ class ScribeHandler(hostname: String,
           val failed = connectionFailure.getAndSet(0)
           val skipped = connectionSkipped.getAndSet(0)
           ScribeHandler.log.info(
-              "sent records: %d, per second: %d, dropped records: %d, reconnection failures: %d, reconnection skipped: %d",
-              sent,
-              sent / period.inSeconds,
-              dropped,
-              failed,
-              skipped)
+            "sent records: %d, per second: %d, dropped records: %d, reconnection failures: %d, reconnection skipped: %d",
+            sent,
+            sent / period.inSeconds,
+            dropped,
+            failed,
+            skipped)
 
           _lastLogStats = Time.now
         }

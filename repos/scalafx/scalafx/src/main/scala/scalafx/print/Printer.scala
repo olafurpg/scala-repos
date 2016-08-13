@@ -32,7 +32,11 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.collections.ObservableSet
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 
 /**
   * Companion Object for [[scalafx.print.Printer]].
@@ -54,8 +58,8 @@ object Printer {
     * Companion Object for [[scalafx.print.Printer.MarginType]].
     */
   object MarginType
-      extends SFXEnumDelegateCompanion[
-          jfxp.Printer.MarginType, Printer.MarginType] {
+      extends SFXEnumDelegateCompanion[jfxp.Printer.MarginType,
+                                       Printer.MarginType] {
 
     /**
       * This requests a default 0.75 inch margin on all sides.
@@ -74,13 +78,13 @@ object Printer {
       * and the left and right margins are equal.
       */
     val EqualOpposites = new MarginType(
-        jfxp.Printer.MarginType.EQUAL_OPPOSITES)
+      jfxp.Printer.MarginType.EQUAL_OPPOSITES)
 
     /**
       * Request margins are set to be the smallest on each side that the hardware allows.
       */
     val HardwareMinimum = new MarginType(
-        jfxp.Printer.MarginType.HARDWARE_MINIMUM)
+      jfxp.Printer.MarginType.HARDWARE_MINIMUM)
 
     protected override def unsortedValues: Array[Printer.MarginType] =
       Array(Default, Equal, EqualOpposites, HardwareMinimum)
@@ -156,8 +160,8 @@ final class Printer(override val delegate: jfxp.Printer)
                        rMargin: Double,
                        tMargin: Double,
                        bMargin: Double): PageLayout =
-    delegate.createPageLayout(
-        paper, orient, lMargin, rMargin, tMargin, bMargin)
+    delegate
+      .createPageLayout(paper, orient, lMargin, rMargin, tMargin, bMargin)
 
   /**
     * Obtain a new PageLayout instance for this printer using the specified parameters.

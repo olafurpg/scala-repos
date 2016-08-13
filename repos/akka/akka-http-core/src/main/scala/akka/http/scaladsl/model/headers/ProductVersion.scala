@@ -10,9 +10,11 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.model.parser.HeaderParser
 import akka.http.impl.util._
 
-final case class ProductVersion(
-    product: String = "", version: String = "", comment: String = "")
-    extends jm.headers.ProductVersion with ValueRenderable {
+final case class ProductVersion(product: String = "",
+                                version: String = "",
+                                comment: String = "")
+    extends jm.headers.ProductVersion
+    with ValueRenderable {
   def render[R <: Rendering](r: R): r.type = {
     r ~~ product
     if (!version.isEmpty) r ~~ '/' ~~ version
@@ -33,7 +35,7 @@ object ProductVersion {
     val parser = new HeaderParser(string)
     def fail(msg: String) =
       throw new IllegalArgumentException(
-          s"'$string' is not a legal sequence of ProductVersions: $msg")
+        s"'$string' is not a legal sequence of ProductVersions: $msg")
     parser.products.run() match {
       case Success(x) ⇒ immutable.Seq(x: _*)
       case Failure(e: ParseError) ⇒ fail(parser.formatError(e))

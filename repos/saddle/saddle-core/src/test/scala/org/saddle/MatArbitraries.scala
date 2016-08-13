@@ -33,7 +33,7 @@ object MatArbitraries {
       r <- Gen.choose(0, 10)
       c <- Gen.choose(0, 10)
       lst <- Gen.listOfN(
-          r * c,
-          Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
+              r * c,
+              Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
     } yield Mat(r, c, lst.toArray)
 }

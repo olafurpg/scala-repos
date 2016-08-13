@@ -41,5 +41,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ProgressIndicatorSpec
     extends SimpleSFXDelegateSpec[jfxsc.ProgressIndicator, ProgressIndicator](
-        classOf[jfxsc.ProgressIndicator], classOf[ProgressIndicator])
+      classOf[jfxsc.ProgressIndicator],
+      classOf[ProgressIndicator])
     with RunOnApplicationThread

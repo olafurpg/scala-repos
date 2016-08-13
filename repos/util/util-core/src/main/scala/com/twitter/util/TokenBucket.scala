@@ -83,8 +83,9 @@ object TokenBucket {
 
     * @param nowMs The current time in milliseconds
     */
-  def newLeakyBucket(
-      ttl: Duration, reserve: Int, nowMs: () => Long): TokenBucket =
+  def newLeakyBucket(ttl: Duration,
+                     reserve: Int,
+                     nowMs: () => Long): TokenBucket =
     new TokenBucket {
       private[this] val w = WindowedAdder(ttl.inMilliseconds, 10, nowMs)
 

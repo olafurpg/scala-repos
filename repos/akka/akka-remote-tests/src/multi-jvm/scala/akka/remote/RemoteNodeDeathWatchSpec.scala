@@ -24,7 +24,9 @@ object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+    debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = off
       ## Use a tighter setting than the default, otherwise it takes 20s for DeathWatch to trigger
@@ -81,7 +83,8 @@ abstract class RemoteNodeDeathWatchSlowSpec extends RemoteNodeDeathWatchSpec {
 
 abstract class RemoteNodeDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeDeathWatchMultiJvmSpec._
   import RemoteWatcher._
@@ -101,7 +104,7 @@ abstract class RemoteNodeDeathWatchSpec
 
   def identify(role: RoleName, actorName: String): ActorRef = {
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
-        actorName)
+      actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -399,7 +402,7 @@ abstract class RemoteNodeDeathWatchSpec
         log.info("exit second")
         testConductor.exit(second, 0).await
         expectMsgType[WrappedTerminated](15 seconds).t.actor should ===(
-            subject)
+          subject)
 
         // verify that things are cleaned up, and heartbeating is stopped
         assertCleanup()

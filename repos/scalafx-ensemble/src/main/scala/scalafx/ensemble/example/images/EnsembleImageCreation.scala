@@ -49,16 +49,17 @@ class EnsembleImageCreation extends EnsembleExample {
     spacing = 10
     padding = Insets(20)
     children = List(new ImageView {
-      image = new Image(this.getClass
-            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+      image = new Image(
+        this.getClass
+          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
       fitHeight = 50
       fitWidth = 150
       preserveRatio = true
       smooth = true
     }, new ImageView {
       // image = new Image("/scalafx/ensemble/images/scala-logo.png")
-      image = new Image(
-          "http://www.scala-lang.org/resources/img/scala-logo.png")
+      image =
+        new Image("http://www.scala-lang.org/resources/img/scala-logo.png")
     })
   }
 }

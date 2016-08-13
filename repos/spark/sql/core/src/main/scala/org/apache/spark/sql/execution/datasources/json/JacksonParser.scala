@@ -73,8 +73,9 @@ object JacksonParser extends Logging {
     }
   }
 
-  private def convertField(
-      factory: JsonFactory, parser: JsonParser, schema: DataType): Any = {
+  private def convertField(factory: JsonFactory,
+                           parser: JsonParser,
+                           schema: DataType): Any = {
     import com.fasterxml.jackson.core.JsonToken._
     (parser.getCurrentToken, schema) match {
       case (null | VALUE_NULL, _) =>
@@ -99,7 +100,7 @@ object JacksonParser extends Logging {
         if (stringValue.contains("-")) {
           // The format of this string will probably be "yyyy-mm-dd".
           DateTimeUtils.millisToDays(
-              DateTimeUtils.stringToTime(parser.getText).getTime)
+            DateTimeUtils.stringToTime(parser.getText).getTime)
         } else {
           // In Spark 1.5.0, we store the data as number of days since epoch in string.
           // So, we just convert it to Int.
@@ -117,7 +118,7 @@ object JacksonParser extends Logging {
       case (_, StringType) =>
         val writer = new ByteArrayOutputStream()
         Utils.tryWithResource(
-            factory.createGenerator(writer, JsonEncoding.UTF8)) { generator =>
+          factory.createGenerator(writer, JsonEncoding.UTF8)) { generator =>
           generator.copyCurrentStructure(parser)
         }
         UTF8String.fromBytes(writer.toByteArray)
@@ -136,7 +137,7 @@ object JacksonParser extends Logging {
           value.toFloat
         } else {
           throw new SparkSQLJsonProcessingException(
-              s"Cannot parse $value as FloatType.")
+            s"Cannot parse $value as FloatType.")
         }
 
       case (VALUE_NUMBER_INT | VALUE_NUMBER_FLOAT, DoubleType) =>
@@ -153,7 +154,7 @@ object JacksonParser extends Logging {
           value.toDouble
         } else {
           throw new SparkSQLJsonProcessingException(
-              s"Cannot parse $value as DoubleType.")
+            s"Cannot parse $value as DoubleType.")
         }
 
       case (VALUE_NUMBER_INT | VALUE_NUMBER_FLOAT, dt: DecimalType) =>
@@ -194,7 +195,7 @@ object JacksonParser extends Logging {
         // SparkSQLJsonProcessingException and this exception will be caught by
         // parseJson method.
         throw new SparkSQLJsonProcessingException(
-            s"Failed to parse a value for data type $dataType (current token: $token).")
+          s"Failed to parse a value for data type $dataType (current token: $token).")
     }
   }
 
@@ -210,8 +211,8 @@ object JacksonParser extends Logging {
     while (nextUntil(parser, JsonToken.END_OBJECT)) {
       schema.getFieldIndex(parser.getCurrentName) match {
         case Some(index) =>
-          row.update(
-              index, convertField(factory, parser, schema(index).dataType))
+          row.update(index,
+                     convertField(factory, parser, schema(index).dataType))
 
         case None =>
           parser.skipChildren()

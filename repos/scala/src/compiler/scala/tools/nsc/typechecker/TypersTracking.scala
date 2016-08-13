@@ -20,22 +20,24 @@ trait TypersTracking { self: Analyzer =>
   var lastTreeToTyper: Tree = EmptyTree
 
   def fullSiteString(context: Context): String = {
-    def owner_long_s = (if (settings.debug.value) {
-                          def flags_s = context.owner.debugFlagString match {
-                            case "" => ""
-                            case s => " with flags " + inLightMagenta(s)
-                          }
-                          s", a ${context.owner.shortSymbolClass}$flags_s"
-                        } else "")
+    def owner_long_s =
+      (if (settings.debug.value) {
+        def flags_s = context.owner.debugFlagString match {
+          case "" => ""
+          case s => " with flags " + inLightMagenta(s)
+        }
+        s", a ${context.owner.shortSymbolClass}$flags_s"
+      } else "")
     def marker = if (context.bufferErrors) "silent" else "site"
     def undet_s = context.undetparams match {
       case Nil => ""
       case ps => ps.mkString(" solving: ", ",", "")
     }
-    def implicits_s = (if (context.enrichmentEnabled)
-                         if (context.implicitsEnabled) ""
-                         else inLightRed("enrichment only")
-                       else inLightRed("implicits disabled"))
+    def implicits_s =
+      (if (context.enrichmentEnabled)
+        if (context.implicitsEnabled) ""
+        else inLightRed("enrichment only")
+      else inLightRed("implicits disabled"))
 
     s"($marker$undet_s: ${context.siteString}$owner_long_s) $implicits_s"
   }
@@ -51,7 +53,8 @@ trait TypersTracking { self: Analyzer =>
     private var depth = 0
     private def atLowerIndent[T](body: => T): T = {
       depth -= 1
-      try body finally depth += 1
+      try body
+      finally depth += 1
     }
     private def resetIfEmpty(s: String) =
       if (trees.isEmpty) resetColor(s) else s
@@ -76,7 +79,8 @@ trait TypersTracking { self: Analyzer =>
 
     @inline final def runWith[T](t: Tree)(body: => T): T = {
       push(t)
-      try body finally pop(t)
+      try body
+      finally pop(t)
     }
     def push(t: Tree): Unit = {
       trees ::= new Frame(t)
@@ -136,7 +140,7 @@ trait TypersTracking { self: Analyzer =>
 
     def nextTypedInternal(tree: Tree, pushFn: => Unit)(body: => Tree): Tree =
       (if (noPrintTyping(tree)) body
-       else runWith(tree) { pushFn; showPop(body) })
+      else runWith(tree) { pushFn; showPop(body) })
 
     @inline final def printTyping(tree: Tree, s: => String) = {
       if (printTypings && !noPrintTyping(tree)) show(indented(s))
@@ -160,5 +164,5 @@ trait TypersTracking { self: Analyzer =>
   def noPrintTyping(t: Tree) = (t.tpe ne null) || !printingOk(t)
   def noPrintAdapt(tree1: Tree, tree2: Tree) =
     !printingOk(tree1) ||
-    ((tree1.tpe == tree2.tpe) && (tree1.symbol == tree2.symbol))
+      ((tree1.tpe == tree2.tpe) && (tree1.symbol == tree2.symbol))
 }

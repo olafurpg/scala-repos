@@ -31,14 +31,14 @@ object Runner extends Logging {
     env
       .split(',')
       .flatMap(p =>
-            p.split('=') match {
+        p.split('=') match {
           case Array(k, v) => List(k -> v)
           case _ => Nil
       })
       .toMap
 
-  def argumentValue(
-      arguments: Seq[String], argumentName: String): Option[String] = {
+  def argumentValue(arguments: Seq[String],
+                    argumentName: String): Option[String] = {
     val argumentIndex = arguments.indexOf(argumentName)
     try {
       arguments(argumentIndex) // just to make it error out if index is -1
@@ -55,7 +55,7 @@ object Runner extends Logging {
     (fileSystem, uri) match {
       case (Some(fs), Some(u)) =>
         val dest = fs.makeQualified(
-            Path.mergePaths(new Path(u), new Path(localFilePath)))
+          Path.mergePaths(new Path(u), new Path(localFilePath)))
         info(s"Copying $localFile to ${dest.toString}")
         fs.copyFromLocalFile(new Path(localFilePath), dest)
         dest.toUri.toString
@@ -104,7 +104,7 @@ object Runner extends Logging {
         return 1
       case (_, "cluster", m) if m.startsWith("spark://") =>
         error(
-            "Using cluster deploy mode with Spark standalone cluster is not supported")
+          "Using cluster deploy mode with Spark standalone cluster is not supported")
         return 1
       case _ => Unit
     }
@@ -127,9 +127,9 @@ object Runner extends Logging {
 
     // Local path to PredictionIO assembly JAR
     val mainJar = handleScratchFile(
-        fs,
-        ca.common.scratchUri,
-        console.Console.coreAssembly(ca.common.pioHome.get))
+      fs,
+      ca.common.scratchUri,
+      console.Console.coreAssembly(ca.common.pioHome.get))
 
     // Extra JARs that are needed by the driver
     val driverClassPathPrefix =
@@ -155,7 +155,7 @@ object Runner extends Logging {
       }
 
     val sparkSubmitCommand = Seq(
-        Seq(sparkHome, "bin", "spark-submit").mkString(File.separator))
+      Seq(sparkHome, "bin", "spark-submit").mkString(File.separator))
 
     val sparkSubmitJars =
       if (extraJars.nonEmpty) {
@@ -204,8 +204,7 @@ object Runner extends Logging {
                        None,
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
-    Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
+    Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         cleanup(fs, ca.common.scratchUri)
         proc.destroy()

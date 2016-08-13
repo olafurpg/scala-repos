@@ -51,7 +51,7 @@ object RankingMetricsExample {
     val numUsers = ratings.map(_.user).distinct().count()
     val numMovies = ratings.map(_.product).distinct().count()
     println(
-        s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
+      s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
 
     // Build the model
     val numIterations = 10

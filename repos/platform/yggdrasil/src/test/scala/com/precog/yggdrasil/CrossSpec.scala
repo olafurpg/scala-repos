@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -26,7 +26,9 @@ import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
 trait CrossSpec[M[+ _]]
-    extends TableModuleTestSupport[M] with Specification with ScalaCheck {
+    extends TableModuleTestSupport[M]
+    with Specification
+    with ScalaCheck {
   import SampleData._
   import trans._
   import trans.constants._
@@ -37,13 +39,11 @@ trait CrossSpec[M[+ _]]
 
     def removeUndefined(jv: JValue): JValue = jv match {
       case JObject(jfields) =>
-        JObject(
-            jfields collect {
+        JObject(jfields collect {
           case JField(s, v) if v != JUndefined => JField(s, removeUndefined(v))
         })
       case JArray(jvs) =>
-        JArray(
-            jvs map { jv =>
+        JArray(jvs map { jv =>
           removeUndefined(jv)
         })
       case v => v
@@ -53,13 +53,15 @@ trait CrossSpec[M[+ _]]
       lv <- l.data
       rv <- r.data
     } yield {
-      JObject(JField("left", removeUndefined(lv)) :: JField(
-              "right", removeUndefined(rv)) :: Nil)
+      JObject(
+        JField("left", removeUndefined(lv)) :: JField(
+          "right",
+          removeUndefined(rv)) :: Nil)
     }
 
     val result = ltable.cross(rtable)(
-        InnerObjectConcat(WrapObject(Leaf(SourceLeft), "left"),
-                          WrapObject(Leaf(SourceRight), "right"))
+      InnerObjectConcat(WrapObject(Leaf(SourceLeft), "left"),
+                        WrapObject(Leaf(SourceRight), "right"))
     )
 
     val jsonResult: M[Stream[JValue]] = toJson(result)
@@ -68,34 +70,34 @@ trait CrossSpec[M[+ _]]
 
   def testSimpleCross = {
     val s1 = SampleData(
-        Stream(toRecord(Array(1), JParser.parseUnsafe("""{"a":[]}""")),
-               toRecord(Array(2), JParser.parseUnsafe("""{"a":[]}"""))))
+      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"a":[]}""")),
+             toRecord(Array(2), JParser.parseUnsafe("""{"a":[]}"""))))
     val s2 = SampleData(
-        Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":0}""")),
-               toRecord(Array(2), JParser.parseUnsafe("""{"b":1}"""))))
+      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":0}""")),
+             toRecord(Array(2), JParser.parseUnsafe("""{"b":1}"""))))
 
     testCross(s1, s2)
   }
 
   def testCrossSingles = {
     val s1 = SampleData(
-        Stream(
-            toRecord(Array(1), JParser.parseUnsafe("""{ "a": 1 }""")),
-            toRecord(Array(2), JParser.parseUnsafe("""{ "a": 2 }""")),
-            toRecord(Array(3), JParser.parseUnsafe("""{ "a": 3 }""")),
-            toRecord(Array(4), JParser.parseUnsafe("""{ "a": 4 }""")),
-            toRecord(Array(5), JParser.parseUnsafe("""{ "a": 5 }""")),
-            toRecord(Array(6), JParser.parseUnsafe("""{ "a": 6 }""")),
-            toRecord(Array(7), JParser.parseUnsafe("""{ "a": 7 }""")),
-            toRecord(Array(8), JParser.parseUnsafe("""{ "a": 8 }""")),
-            toRecord(Array(9), JParser.parseUnsafe("""{ "a": 9 }""")),
-            toRecord(Array(10), JParser.parseUnsafe("""{ "a": 10 }""")),
-            toRecord(Array(11), JParser.parseUnsafe("""{ "a": 11 }"""))
-        ))
+      Stream(
+        toRecord(Array(1), JParser.parseUnsafe("""{ "a": 1 }""")),
+        toRecord(Array(2), JParser.parseUnsafe("""{ "a": 2 }""")),
+        toRecord(Array(3), JParser.parseUnsafe("""{ "a": 3 }""")),
+        toRecord(Array(4), JParser.parseUnsafe("""{ "a": 4 }""")),
+        toRecord(Array(5), JParser.parseUnsafe("""{ "a": 5 }""")),
+        toRecord(Array(6), JParser.parseUnsafe("""{ "a": 6 }""")),
+        toRecord(Array(7), JParser.parseUnsafe("""{ "a": 7 }""")),
+        toRecord(Array(8), JParser.parseUnsafe("""{ "a": 8 }""")),
+        toRecord(Array(9), JParser.parseUnsafe("""{ "a": 9 }""")),
+        toRecord(Array(10), JParser.parseUnsafe("""{ "a": 10 }""")),
+        toRecord(Array(11), JParser.parseUnsafe("""{ "a": 11 }"""))
+      ))
 
     val s2 = SampleData(
-        Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":1}""")),
-               toRecord(Array(2), JParser.parseUnsafe("""{"b":2}"""))))
+      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":1}""")),
+             toRecord(Array(2), JParser.parseUnsafe("""{"b":2}"""))))
 
     testCross(s1, s2)
     testCross(s2, s1)

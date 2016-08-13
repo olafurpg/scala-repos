@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * @since 25.09.2015.
   */
 class ScalaIterableComponentTypeMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     if (params.length != 1) return null
     Option(params(0).calculateResult(context))
       .flatMap(MacroUtil.resultToScExpr(_, context))
@@ -38,10 +38,10 @@ class ScalaIterableComponentTypeMacro extends Macro {
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.iterable.component.type")
+      "macro.iterable.component.type")
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result =
     calculateResult(params, context)
 
   override def getDefaultValue = "a"

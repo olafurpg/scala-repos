@@ -36,13 +36,13 @@ object FileIO {
     * @param f         the File to read from
     * @param chunkSize the size of each read operation, defaults to 8192
     */
-  def fromFile(
-      f: File, chunkSize: Int = 8192): Source[ByteString, Future[IOResult]] =
+  def fromFile(f: File,
+               chunkSize: Int = 8192): Source[ByteString, Future[IOResult]] =
     new Source(
-        new FileSource(f,
-                       chunkSize,
-                       DefaultAttributes.fileSource,
-                       sourceShape("FileSource")))
+      new FileSource(f,
+                     chunkSize,
+                     DefaultAttributes.fileSource,
+                     sourceShape("FileSource")))
 
   /**
     * Creates a Sink which writes incoming [[ByteString]] elements to the given file. Overwrites existing files by default.
@@ -58,6 +58,9 @@ object FileIO {
     */
   def toFile(f: File, options: Set[StandardOpenOption] = Set(WRITE, CREATE))
     : Sink[ByteString, Future[IOResult]] =
-    new Sink(new FileSink(
-            f, options, DefaultAttributes.fileSink, sinkShape("FileSink")))
+    new Sink(
+      new FileSink(f,
+                   options,
+                   DefaultAttributes.fileSink,
+                   sinkShape("FileSink")))
 }

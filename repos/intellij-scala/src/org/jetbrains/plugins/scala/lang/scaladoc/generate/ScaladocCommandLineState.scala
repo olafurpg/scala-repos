@@ -8,7 +8,11 @@ import com.intellij.analysis.AnalysisScope
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations._
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler,
+  ProcessAdapter,
+  ProcessEvent
+}
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.module.{Module, ModuleManager}
@@ -32,7 +36,7 @@ import scala.collection.mutable.ListBuffer
 class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     extends JavaCommandLineState(env) {
   setConsoleBuilder(
-      TextConsoleBuilderFactory.getInstance.createBuilder(project))
+    TextConsoleBuilderFactory.getInstance.createBuilder(project))
   private val MAIN_CLASS = "scala.tools.nsc.ScalaDoc"
   private val classpathDelimeter = File.pathSeparator
   private var outputDir: String = ""
@@ -87,16 +91,17 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     handler
   }
 
-  private def visitAll(file: VirtualFile,
-                       scope: AnalysisScope,
-                       acc: mutable.MutableList[VirtualFile] = mutable
-                           .MutableList[VirtualFile]()): List[VirtualFile] = {
+  private def visitAll(
+      file: VirtualFile,
+      scope: AnalysisScope,
+      acc: mutable.MutableList[VirtualFile] =
+        mutable.MutableList[VirtualFile]()): List[VirtualFile] = {
 
     def visitInner(
         file: VirtualFile,
         scope: AnalysisScope,
         acc: mutable.MutableList[VirtualFile] = mutable
-            .MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
+          .MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
       if (file == null) return acc
       if (file.isDirectory) {
         for (c <- file.getChildren) {
@@ -127,11 +132,11 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
       case (true, _) => false
       case (_, param: String)
           if ScaladocCommandLineState.generatedParamsWithArgs.contains(
-              param) =>
+            param) =>
         true
       case (_, param: String) =>
         if (!ScaladocCommandLineState.generatedParamsWithoutArgs.contains(
-                param)) result += param
+              param)) result += param
         false
     }
 
@@ -167,8 +172,9 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     val jp = new JavaParameters
     val jdk: Sdk = PathUtilEx.getAnyJdk(project)
     assert(jdk != null, "JDK IS NULL")
-    jp.configureByProject(
-        project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
+    jp.configureByProject(project,
+                          JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+                          jdk)
     jp.setWorkingDirectory(project.getBaseDir.getPath)
 
     val scalaModule = project.anyScalaModule.getOrElse {
@@ -214,9 +220,10 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
           sourcesCollector -> target.sources()).foreach { entry =>
         entry._1 ++= entry._2.withoutSelfModuleOutput().getRoots.map {
           virtualFile =>
-            virtualFile.getPath.replaceAll(Pattern.quote(".") +
-                                           "(\\S{2,6})" + Pattern.quote("!/"),
-                                           ".$1/")
+            virtualFile.getPath.replaceAll(
+              Pattern.quote(".") +
+                "(\\S{2,6})" + Pattern.quote("!/"),
+              ".$1/")
         }
       }
     }
@@ -303,7 +310,7 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
         val tempParamsFile: File =
           File.createTempFile("scaladocfileargs", ".tmp")
         val pw: PrintStream = new PrintStream(
-            new FileOutputStream(tempParamsFile))
+          new FileOutputStream(tempParamsFile))
 
         for (param <- paramListSimple) {
           var paramEsc = param

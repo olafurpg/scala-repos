@@ -100,13 +100,14 @@ private[deploy] class ExecutorRunner(val appId: String,
       }
       exitCode = Utils.terminateProcess(process, EXECUTOR_TERMINATE_TIMEOUT_MS)
       if (exitCode.isEmpty) {
-        logWarning("Failed to terminate process: " + process +
+        logWarning(
+          "Failed to terminate process: " + process +
             ". This process will likely be orphaned.")
       }
     }
     try {
       worker.send(
-          ExecutorStateChanged(appId, execId, state, message, exitCode))
+        ExecutorStateChanged(appId, execId, state, message, exitCode))
     } catch {
       case e: IllegalStateException => logWarning(e.getMessage(), e)
     }
@@ -154,8 +155,8 @@ private[deploy] class ExecutorRunner(val appId: String,
       logInfo(s"Launch command: $formattedCommand")
 
       builder.directory(executorDir)
-      builder.environment.put(
-          "SPARK_EXECUTOR_DIRS", appLocalDirs.mkString(File.pathSeparator))
+      builder.environment
+        .put("SPARK_EXECUTOR_DIRS", appLocalDirs.mkString(File.pathSeparator))
       // In case we are running this from within the Spark Shell, avoid creating a "scala"
       // parent process for the executor command
       builder.environment.put("SPARK_LAUNCH_WITH_SCALA", "0")
@@ -183,19 +184,23 @@ private[deploy] class ExecutorRunner(val appId: String,
       val exitCode = process.waitFor()
       state = ExecutorState.EXITED
       val message = "Command exited with code " + exitCode
-      worker.send(ExecutorStateChanged(
-              appId, execId, state, Some(message), Some(exitCode)))
+      worker.send(
+        ExecutorStateChanged(appId,
+                             execId,
+                             state,
+                             Some(message),
+                             Some(exitCode)))
     } catch {
       case interrupted: InterruptedException => {
-          logInfo("Runner thread for executor " + fullId + " interrupted")
-          state = ExecutorState.KILLED
-          killProcess(None)
-        }
+        logInfo("Runner thread for executor " + fullId + " interrupted")
+        state = ExecutorState.KILLED
+        killProcess(None)
+      }
       case e: Exception => {
-          logError("Error running executor", e)
-          state = ExecutorState.FAILED
-          killProcess(Some(e.toString))
-        }
+        logError("Error running executor", e)
+        state = ExecutorState.FAILED
+        killProcess(Some(e.toString))
+      }
     }
   }
 }

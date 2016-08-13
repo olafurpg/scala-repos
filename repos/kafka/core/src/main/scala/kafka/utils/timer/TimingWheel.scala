@@ -119,11 +119,11 @@ private[timer] class TimingWheel(tickMs: Long,
     synchronized {
       if (overflowWheel == null) {
         overflowWheel = new TimingWheel(
-            tickMs = interval,
-            wheelSize = wheelSize,
-            startMs = currentTime,
-            taskCounter = taskCounter,
-            queue
+          tickMs = interval,
+          wheelSize = wheelSize,
+          startMs = currentTime,
+          taskCounter = taskCounter,
+          queue
         )
       }
     }

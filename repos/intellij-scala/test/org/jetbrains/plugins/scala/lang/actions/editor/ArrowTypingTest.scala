@@ -66,10 +66,12 @@ class ArrowTypingTest extends ScalaLightCodeInsightFixtureTestAdapter {
   def testReplaceLambdaArrow() {
     settings.REPLACE_CASE_ARROW_WITH_UNICODE_CHAR = true
 
-    val before1 = convertLoadedString(FileUtil.loadFile(
-            new File(getTestDataPath + s"/${getTestName(true)}Before.test")))
-    val after1 = convertLoadedString(FileUtil.loadFile(
-            new File(getTestDataPath + s"/${getTestName(true)}After.test")))
+    val before1 = convertLoadedString(
+      FileUtil.loadFile(
+        new File(getTestDataPath + s"/${getTestName(true)}Before.test")))
+    val after1 = convertLoadedString(
+      FileUtil.loadFile(
+        new File(getTestDataPath + s"/${getTestName(true)}After.test")))
 
     checkGeneratedTextAfterTyping(before1, after1, '>')
   }

@@ -8,7 +8,7 @@ object Test extends CompilerTest {
   override lazy val units: List[CompilationUnit] = {
     // This test itself does not depend on JDK8.
     javaCompilationUnits(global)(staticMethodInInterface) ++ compilationUnits(
-        global)(scalaClient)
+      global)(scalaClient)
   }
 
   private def staticMethodInInterface = """

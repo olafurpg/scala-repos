@@ -2,18 +2,18 @@ package breeze.util
 
 /*
  Copyright 2009 David Hall, Daniel Ramage
- 
+
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
- You may obtain a copy of the License at 
- 
+ You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License. 
+ limitations under the License.
  */
 
 import collection.{mutable, IterableProxy}
@@ -29,7 +29,7 @@ import java.util
   * vector space mappings for strings.  The methods in this trait do not mutate
   * the underlying index.  Use either a MutableIndex or one of the companion
   * object constructor methods to build an index.
-  * 
+  *
   * @author dlwh, dramage
   */
 @SerialVersionUID(1L)
@@ -134,14 +134,15 @@ trait MutableIndex[T] extends Index[T] {
   * @author dramage
   */
 trait SynchronizedMutableIndex[T]
-    extends MutableIndex[T] with SynchronizedIndex[T] {
+    extends MutableIndex[T]
+    with SynchronizedIndex[T] {
   abstract override def index(t: T) = this synchronized super.index(t)
 }
 
 /**
   * Class that builds a 1-to-1 mapping between Ints and T's, which
   * is very useful for efficiency concerns.
-  * 
+  *
   * Two extra views are provided: the index.synchronized view
   * enables threadsafe access and the index.immutable view keeps
   * prevents the (view) from being updated.
@@ -234,13 +235,13 @@ object Index {
   /** Constructs an empty index. */
   import scala.reflect.ClassTag.{Char => MChar}
   import scala.reflect.OptManifest
-  def apply[T : OptManifest](): MutableIndex[T] =
+  def apply[T: OptManifest](): MutableIndex[T] =
     implicitly[OptManifest[T]] match {
       case _ => new HashIndex[T];
     }
 
   /** Constructs an Index from some iterator. */
-  def apply[T : OptManifest](iterator: Iterator[T]): Index[T] = {
+  def apply[T: OptManifest](iterator: Iterator[T]): Index[T] = {
     val index = Index[T]()
     // read through all iterator now -- don't lazily defer evaluation
     for (element <- iterator) {
@@ -329,7 +330,7 @@ class OptionIndex[T](inner: Index[T]) extends Index[Option[T]] {
 
   def pairs =
     inner.pairs.map { case (l, i) => Some(l) -> i } ++ Iterator(
-        None -> inner.size)
+      None -> inner.size)
 
   def iterator = inner.iterator.map { Some(_) } ++ Iterator(None)
 

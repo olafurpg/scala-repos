@@ -62,24 +62,21 @@ object LazyLoad extends DispatchSnippet {
     val placeholderId = Helpers.nextFuncName
 
     handleMarkupBox(
-        AsyncRenderComet
-          .asyncRender(() => renderer(placeholderId))
-          .map { _ =>
-            ("^ [id]" #> placeholderId).apply(
-                placeholderTemplate or {
-                  for {
-                    templatePath <- S.attr("template")
-                    renderedTemplate <- S.eval(
-                        <lift:embed what={templatePath} />)
-                  } yield {
-                    renderedTemplate
-                  }
-                } openOr {
-                  <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
-                }
-            )
+      AsyncRenderComet.asyncRender(() => renderer(placeholderId)).map { _ =>
+        ("^ [id]" #> placeholderId).apply(
+          placeholderTemplate or {
+            for {
+              templatePath <- S.attr("template")
+              renderedTemplate <- S.eval(<lift:embed what={templatePath} />)
+            } yield {
+              renderedTemplate
+            }
+          } openOr {
+            <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
           }
-      )
+        )
+      }
+    )
   }
 
   /**
@@ -122,7 +119,7 @@ object LazyLoad extends DispatchSnippet {
       case Failure(msg, _, _) => Comment(msg)
       case Empty =>
         Comment(
-            "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
+          "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
     }
   }
 }

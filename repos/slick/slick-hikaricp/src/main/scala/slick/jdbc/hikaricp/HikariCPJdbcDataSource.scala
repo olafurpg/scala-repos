@@ -24,7 +24,7 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
                 classLoader: ClassLoader): HikariCPJdbcDataSource = {
     if (driver ne null)
       throw new SlickException(
-          "An explicit Driver object is not supported by HikariCPJdbcDataSource")
+        "An explicit Driver object is not supported by HikariCPJdbcDataSource")
     val hconf = new HikariConfig()
 
     // Connection settings
@@ -45,9 +45,9 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
     hconf.setIdleTimeout(c.getMillisecondsOr("idleTimeout", 600000))
     hconf.setMaxLifetime(c.getMillisecondsOr("maxLifetime", 1800000))
     hconf.setLeakDetectionThreshold(
-        c.getMillisecondsOr("leakDetectionThreshold", 0))
+      c.getMillisecondsOr("leakDetectionThreshold", 0))
     hconf.setInitializationFailFast(
-        c.getBooleanOr("initializationFailFast", false))
+      c.getBooleanOr("initializationFailFast", false))
     c.getStringOpt("connectionTestQuery").foreach(hconf.setConnectionTestQuery)
     c.getStringOpt("connectionInitSql").foreach(hconf.setConnectionInitSql)
     val numThreads = c.getIntOr("numThreads", 20)

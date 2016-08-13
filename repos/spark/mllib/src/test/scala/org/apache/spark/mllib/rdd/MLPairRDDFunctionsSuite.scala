@@ -22,7 +22,8 @@ import org.apache.spark.mllib.rdd.MLPairRDDFunctions._
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class MLPairRDDFunctionsSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
   test("topByKey") {
     val topMap = sc
       .parallelize(Array((1, 7),

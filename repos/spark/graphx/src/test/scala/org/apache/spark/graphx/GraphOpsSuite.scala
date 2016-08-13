@@ -25,7 +25,8 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
   test("joinVertices") {
     withSpark { sc =>
       val vertices = sc.parallelize(
-          Seq[(VertexId, String)]((1, "one"), (2, "two"), (3, "three")), 2)
+        Seq[(VertexId, String)]((1, "one"), (2, "two"), (3, "three")),
+        2)
       val edges = sc.parallelize((Seq(Edge(1, 2, "onetwo"))))
       val g: Graph[String, String] = Graph(vertices, edges)
 
@@ -78,14 +79,13 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
       val graph: Graph[Int, Int] = Graph(vertices, edges).cache()
       val filteredGraph = graph
         .filter(
-            graph =>
-              {
-                val degrees: VertexRDD[Int] = graph.outDegrees
-                graph.outerJoinVertices(degrees) { (vid, data, deg) =>
-                  deg.getOrElse(0)
-                }
-            },
-            vpred = (vid: VertexId, deg: Int) => deg > 0
+          graph => {
+            val degrees: VertexRDD[Int] = graph.outDegrees
+            graph.outerJoinVertices(degrees) { (vid, data, deg) =>
+              deg.getOrElse(0)
+            }
+          },
+          vpred = (vid: VertexId, deg: Int) => deg > 0
         )
         .cache()
 
@@ -104,7 +104,8 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
   test("convertToCanonicalEdges") {
     withSpark { sc =>
       val vertices = sc.parallelize(
-          Seq[(VertexId, String)]((1, "one"), (2, "two"), (3, "three")), 2)
+        Seq[(VertexId, String)]((1, "one"), (2, "two"), (3, "three")),
+        2)
       val edges =
         sc.parallelize(Seq(Edge(1, 2, 1), Edge(2, 1, 1), Edge(3, 2, 2)))
       val g: Graph[String, Int] = Graph(vertices, edges)
@@ -223,20 +224,21 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
     }
   }
 
-  private def getCycleGraph(
-      sc: SparkContext, numVertices: Int): Graph[Double, Int] = {
+  private def getCycleGraph(sc: SparkContext,
+                            numVertices: Int): Graph[Double, Int] = {
     val cycle = (0 until numVertices).map(x => (x, (x + 1) % numVertices))
     getGraphFromSeq(sc, cycle)
   }
 
-  private def getChainGraph(
-      sc: SparkContext, numVertices: Int): Graph[Double, Int] = {
+  private def getChainGraph(sc: SparkContext,
+                            numVertices: Int): Graph[Double, Int] = {
     val chain = (0 until numVertices - 1).map(x => (x, (x + 1)))
     getGraphFromSeq(sc, chain)
   }
 
   private def getGraphFromSeq(
-      sc: SparkContext, seq: IndexedSeq[(Int, Int)]): Graph[Double, Int] = {
+      sc: SparkContext,
+      seq: IndexedSeq[(Int, Int)]): Graph[Double, Int] = {
     val rawEdges =
       sc.parallelize(seq, 3).map { case (s, d) => (s.toLong, d.toLong) }
     Graph.fromEdgeTuples(rawEdges, 1.0).cache()

@@ -47,16 +47,14 @@ final case class ListT[M[_], A](run: M[List[A]]) {
     new ListT(M.map(run)(_.takeWhile(p)))
 
   def ++(bs: => ListT[M, A])(implicit M: Bind[M]): ListT[M, A] =
-    new ListT(
-        M.bind(run) { list1 =>
+    new ListT(M.bind(run) { list1 =>
       M.map(bs.run) { list2 =>
         list1 ++ list2
       }
     })
 
   def flatMap[B](f: A => ListT[M, B])(implicit M: Monad[M]): ListT[M, B] =
-    new ListT(
-        M.bind(run) { list =>
+    new ListT(M.bind(run) { list =>
       list match {
         case Nil => M.point(Nil)
         case nonEmpty => nonEmpty.map(f).reduce(_ ++ _).run
@@ -161,14 +159,16 @@ private trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
 }
 
 private trait ListTMonoid[F[_], A]
-    extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
+    extends Monoid[ListT[F, A]]
+    with ListTSemigroup[F, A] {
   implicit def F: Monad[F]
 
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
 private trait ListTMonadPlus[F[_]]
-    extends MonadPlus[ListT[F, ?]] with ListTFunctor[F] {
+    extends MonadPlus[ListT[F, ?]]
+    with ListTFunctor[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] =
@@ -190,8 +190,8 @@ private trait ListTHoist extends Hoist[ListT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromList(G.map(a)(entry => entry :: Nil))
 
-  def hoist[M[_], N[_]](
-      f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
+  def hoist[M[_], N[_]](f: M ~> N)(
+      implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
     new (ListT[M, ?] ~> ListT[N, ?]) {
       def apply[A](a: ListT[M, A]): ListT[N, A] = fromList(f(a.run))
     }

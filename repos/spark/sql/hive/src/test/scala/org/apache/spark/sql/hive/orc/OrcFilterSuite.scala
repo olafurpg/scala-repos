@@ -27,7 +27,10 @@ import org.apache.spark.sql.{Column, DataFrame, QueryTest}
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.planning.PhysicalOperation
-import org.apache.spark.sql.execution.datasources.{DataSourceStrategy, LogicalRelation}
+import org.apache.spark.sql.execution.datasources.{
+  DataSourceStrategy,
+  LogicalRelation
+}
 import org.apache.spark.sql.sources.HadoopFsRelation
 
 /**
@@ -44,15 +47,17 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     var maybeRelation: Option[HadoopFsRelation] = None
     val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan.collect {
       case PhysicalOperation(
-          _, filters, LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
+          _,
+          filters,
+          LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
         maybeRelation = Some(orcRelation)
         filters
     }.flatten.reduceLeftOption(_ && _)
     assert(maybeAnalyzedPredicate.isDefined,
            "No filter is analyzed from the given query")
 
-    val (_, selectedFilters) = DataSourceStrategy.selectFilters(
-        maybeRelation.get, maybeAnalyzedPredicate.toSeq)
+    val (_, selectedFilters) = DataSourceStrategy
+      .selectFilters(maybeRelation.get, maybeAnalyzedPredicate.toSeq)
     assert(selectedFilters.nonEmpty, "No filter is pushed down")
 
     val maybeFilter = OrcFilters.createFilter(selectedFilters.toArray)
@@ -62,8 +67,8 @@ class OrcFilterSuite extends QueryTest with OrcTest {
   }
 
   private def checkFilterPredicate(
-      predicate: Predicate, filterOperator: PredicateLeaf.Operator)(
-      implicit df: DataFrame): Unit = {
+      predicate: Predicate,
+      filterOperator: PredicateLeaf.Operator)(implicit df: DataFrame): Unit = {
     def checkComparisonOperator(filter: SearchArgument) = {
       val operator = filter.getLeaves.asScala
       assert(operator.map(_.getOperator).contains(filterOperator))
@@ -239,31 +244,31 @@ class OrcFilterSuite extends QueryTest with OrcTest {
       // to produce string expression and then compare it to given string expression below.
       // This might have to be changed after Hive version is upgraded.
       checkFilterPredicate(
-          '_1.isNotNull,
-          """leaf-0 = (IS_NULL _1)
+        '_1.isNotNull,
+        """leaf-0 = (IS_NULL _1)
           |expr = (not leaf-0)""".stripMargin.trim
       )
       checkFilterPredicate(
-          '_1 =!= 1,
-          """leaf-0 = (IS_NULL _1)
+        '_1 =!= 1,
+        """leaf-0 = (IS_NULL _1)
           |leaf-1 = (EQUALS _1 1)
           |expr = (and (not leaf-0) (not leaf-1))""".stripMargin.trim
       )
       checkFilterPredicate(
-          !('_1 < 4),
-          """leaf-0 = (IS_NULL _1)
+        !('_1 < 4),
+        """leaf-0 = (IS_NULL _1)
           |leaf-1 = (LESS_THAN _1 4)
           |expr = (and (not leaf-0) (not leaf-1))""".stripMargin.trim
       )
       checkFilterPredicate(
-          '_1 < 2 || '_1 > 3,
-          """leaf-0 = (LESS_THAN _1 2)
+        '_1 < 2 || '_1 > 3,
+        """leaf-0 = (LESS_THAN _1 2)
           |leaf-1 = (LESS_THAN_EQUALS _1 3)
           |expr = (or leaf-0 (not leaf-1))""".stripMargin.trim
       )
       checkFilterPredicate(
-          '_1 < 2 && '_1 > 3,
-          """leaf-0 = (IS_NULL _1)
+        '_1 < 2 && '_1 > 3,
+        """leaf-0 = (IS_NULL _1)
           |leaf-1 = (LESS_THAN _1 2)
           |leaf-2 = (LESS_THAN_EQUALS _1 3)
           |expr = (and (not leaf-0) leaf-1 (not leaf-2))""".stripMargin.trim

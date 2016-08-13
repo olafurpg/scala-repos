@@ -34,8 +34,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
                                nodeType: IElementType,
                                node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScPackaging
-    with ScImportsHolder with ScDeclarationSequenceHolder {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScPackaging
+    with ScImportsHolder
+    with ScDeclarationSequenceHolder {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScPackageContainerStub) = {
@@ -102,9 +104,9 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     val stub = getStub
     if (stub != null) {
       stub.getChildrenByType(TokenSet.create(
-                                 ScalaElementTypes.OBJECT_DEF,
-                                 ScalaElementTypes.CLASS_DEF,
-                                 ScalaElementTypes.TRAIT_DEF
+                               ScalaElementTypes.OBJECT_DEF,
+                               ScalaElementTypes.CLASS_DEF,
+                               ScalaElementTypes.TRAIT_DEF
                              ),
                              JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else {
@@ -132,7 +134,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     val top =
       if (_prefix.length > 0) _prefix + "." + topRefName else topRefName
     val p = ScPackageImpl(
-        JavaPsiFacade.getInstance(getProject).findPackage(top))
+      JavaPsiFacade.getInstance(getProject).findPackage(top))
     if (p == null) Seq.empty else Seq(p)
   }
 
@@ -148,7 +150,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
         (if (prefix.length == 0) "" else prefix + ".") + getPackageName
       ProgressManager.checkCanceled()
       val p = ScPackageImpl(
-          JavaPsiFacade.getInstance(getProject).findPackage(pName))
+        JavaPsiFacade.getInstance(getProject).findPackage(pName))
       if (p != null &&
           !p.processDeclarations(processor, state, lastParent, place)) {
         return false
@@ -168,12 +170,14 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     }
 
     if (lastParent != null && lastParent.getContext == this) {
-      if (!super [ScImportsHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+      if (!super[ScImportsHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
 
       if (ScalaFileImpl.isProcessLocalClasses(lastParent) &&
-          !super [ScDeclarationSequenceHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+          !super[ScDeclarationSequenceHolder]
+            .processDeclarations(processor, state, lastParent, place))
+        return false
     }
 
     true
@@ -181,16 +185,16 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
 
   def findPackageObject(scope: GlobalSearchScope): Option[ScTypeDefinition] = {
     Option(
-        ScalaShortNamesCacheManager
-          .getInstance(getProject)
-          .getPackageObjectByName(getPackageName, scope))
+      ScalaShortNamesCacheManager
+        .getInstance(getProject)
+        .getPackageObjectByName(getPackageName, scope))
   }
 
   def getBodyText: String = {
     if (isExplicit) {
       val startOffset =
         findChildByType[PsiElement](ScalaTokenTypes.tLBRACE).getTextRange.getEndOffset -
-        getTextRange.getStartOffset
+          getTextRange.getStartOffset
       val text = getText
       val endOffset =
         if (text.apply(text.length - 1) == '}') { text.length - 1 } else

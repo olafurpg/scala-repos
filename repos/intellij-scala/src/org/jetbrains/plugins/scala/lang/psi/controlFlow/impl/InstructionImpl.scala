@@ -13,7 +13,8 @@ import scala.collection.mutable.ArrayBuffer
   */
 sealed class InstructionImpl(override val num: Int,
                              val element: Option[ScalaPsiElement])
-    extends Instruction with Cloneable {
+    extends Instruction
+    with Cloneable {
   private val mySucc = new ArrayBuffer[Instruction]
   private val myPred = new ArrayBuffer[Instruction]
 
@@ -43,10 +44,10 @@ sealed class InstructionImpl(override val num: Int,
 
   protected def getPresentation =
     "element: " +
-    (element match {
-          case Some(x) => x
-          case z => z
-        })
+      (element match {
+        case Some(x) => x
+        case z => z
+      })
 }
 
 case class DefinitionInstruction(override val num: Int,

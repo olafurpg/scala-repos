@@ -1,10 +1,17 @@
 package mesosphere.marathon.integration
 
 import mesosphere.marathon.api.v2.json.AppUpdate
-import mesosphere.marathon.integration.facades.MesosFacade.{ITResources, ITMesosState}
+import mesosphere.marathon.integration.facades.MesosFacade.{
+  ITResources,
+  ITMesosState
+}
 import mesosphere.marathon.integration.facades.{ITEnrichedTask, MarathonFacade}
 import MarathonFacade._
-import mesosphere.marathon.integration.setup.{RestResult, IntegrationFunSuite, SingleMarathonIntegrationTest}
+import mesosphere.marathon.integration.setup.{
+  RestResult,
+  IntegrationFunSuite,
+  SingleMarathonIntegrationTest
+}
 import mesosphere.marathon.state._
 import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{Tag, BeforeAndAfter, GivenWhenThen, Matchers}
@@ -14,8 +21,11 @@ import scala.util.Try
 import scala.concurrent.duration._
 
 class ResidentTaskIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   import Fixture._
 
@@ -59,20 +69,20 @@ class ResidentTaskIntegrationTest
 
     marathon
       .updateApp(
-          app.id,
-          AppUpdate(
-              instances = Some(1),
-              cmd = Some(s"""test -e $containerPath/data"""),
-              // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
-              // probably related to our recycling of the task ID (but unconfirmed)
-              backoff = Some(300.milliseconds)
-          )
+        app.id,
+        AppUpdate(
+          instances = Some(1),
+          cmd = Some(s"""test -e $containerPath/data"""),
+          // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
+          // probably related to our recycling of the task ID (but unconfirmed)
+          backoff = Some(300.milliseconds)
+        )
       )
       .code shouldBe 200
     // we do not wait for the deployment to finish here to get the task events
 
     Then(
-        "the new task verifies that the persistent volume file is still there")
+      "the new task verifies that the persistent volume file is still there")
     waitForStatusUpdates(StatusUpdate.TASK_RUNNING)
     waitForEvent(Event.DEPLOYMENT_SUCCESS)
     waitForStatusUpdates(StatusUpdate.TASK_FINISHED)
@@ -81,7 +91,7 @@ class ResidentTaskIntegrationTest
   test("resident task is launched completely on reserved resources") { f =>
     Given("A resident app")
     val app = f.residentApp(
-        portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
+      portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
 
     When("A task is launched")
     f.createSuccessfully(app)
@@ -94,13 +104,14 @@ class ResidentTaskIntegrationTest
     }
     withClue("reserved_resources") {
       state.value.agents.head.reservedResourcesByRole.get("foo") should equal(
-          Some(f.itMesosResources))
+        Some(f.itMesosResources))
     }
 
     When("the app is suspended")
     f.suspendSuccessfully(app.id)
 
-    Then("there are no used resources anymore but there are the same reserved resources")
+    Then(
+      "there are no used resources anymore but there are the same reserved resources")
     val state2: RestResult[ITMesosState] = mesos.state
 
     withClue("used_resources") {
@@ -108,7 +119,7 @@ class ResidentTaskIntegrationTest
     }
     withClue("reserved_resources") {
       state2.value.agents.head.reservedResourcesByRole.get("foo") should equal(
-          Some(f.itMesosResources))
+        Some(f.itMesosResources))
     }
 
   // we check for a blank slate of mesos reservations after each test
@@ -144,12 +155,12 @@ class ResidentTaskIntegrationTest
   test("Restart") { f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(
-        f.residentApp(
-            instances = 5,
-            // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
-            // probably related to our recycling of the task ID (but unconfirmed)
-            backoffDuration = 300.milliseconds
-        )
+      f.residentApp(
+        instances = 5,
+        // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
+        // probably related to our recycling of the task ID (but unconfirmed)
+        backoffDuration = 300.milliseconds
+      )
     )
 
     When("we restart the app")
@@ -169,12 +180,12 @@ class ResidentTaskIntegrationTest
   test("Config Change") { f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(
-        f.residentApp(
-            instances = 5,
-            // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
-            // probably related to our recycling of the task ID (but unconfirmed)
-            backoffDuration = 300.milliseconds
-        )
+      f.residentApp(
+        instances = 5,
+        // FIXME: we need to retry starting tasks since there is a race-condition in Mesos,
+        // probably related to our recycling of the task ID (but unconfirmed)
+        backoffDuration = 300.milliseconds
+      )
     )
 
     When("we change the config")
@@ -240,8 +251,9 @@ class ResidentTaskIntegrationTest
     val disk: Double = 1.0
     val persistentVolumeSize: Long = 2
 
-    val itMesosResources = ITResources(
-        "mem" -> mem, "cpus" -> cpus, "disk" -> (disk + persistentVolumeSize))
+    val itMesosResources = ITResources("mem" -> mem,
+                                       "cpus" -> cpus,
+                                       "disk" -> (disk + persistentVolumeSize))
 
     def residentApp(containerPath: String = "persistent-volume",
                     cmd: String = "sleep 1000",
@@ -251,36 +263,36 @@ class ResidentTaskIntegrationTest
       : AppDefinition = {
 
       val appId: PathId = PathId(
-          s"/$testBasePath/app-${IdGenerator.generate()}")
+        s"/$testBasePath/app-${IdGenerator.generate()}")
 
       val persistentVolume: Volume = PersistentVolume(
-          containerPath = containerPath,
-          persistent = PersistentVolumeInfo(size = persistentVolumeSize),
-          mode = Mesos.Volume.Mode.RW
+        containerPath = containerPath,
+        persistent = PersistentVolumeInfo(size = persistentVolumeSize),
+        mode = Mesos.Volume.Mode.RW
       )
 
       val app = AppDefinition(
-          appId,
-          instances = instances,
-          residency = Some(
-                Residency(
-                    Residency.defaultRelaunchEscalationTimeoutSeconds,
-                    Residency.defaultTaskLostBehaviour
-                )),
-          container = Some(
-                Container(
-                    `type` = Mesos.ContainerInfo.Type.MESOS,
-                    volumes = Seq(persistentVolume)
-                )),
-          cmd = Some(cmd),
-          executor = "",
-          // cpus, mem and disk are really small because otherwise we'll soon run out of reservable resources
-          cpus = cpus,
-          mem = mem,
-          disk = disk,
-          portDefinitions = portDefinitions,
-          backoff = backoffDuration,
-          upgradeStrategy = UpgradeStrategy(0.5, 0.0)
+        appId,
+        instances = instances,
+        residency = Some(
+          Residency(
+            Residency.defaultRelaunchEscalationTimeoutSeconds,
+            Residency.defaultTaskLostBehaviour
+          )),
+        container = Some(
+          Container(
+            `type` = Mesos.ContainerInfo.Type.MESOS,
+            volumes = Seq(persistentVolume)
+          )),
+        cmd = Some(cmd),
+        executor = "",
+        // cpus, mem and disk are really small because otherwise we'll soon run out of reservable resources
+        cpus = cpus,
+        mem = mem,
+        disk = disk,
+        portDefinitions = portDefinitions,
+        backoff = backoffDuration,
+        upgradeStrategy = UpgradeStrategy(0.5, 0.0)
       )
 
       app
@@ -299,8 +311,8 @@ class ResidentTaskIntegrationTest
       app
     }
 
-    def scaleToSuccessfully(
-        appId: PathId, instances: Int): Iterable[ITEnrichedTask] = {
+    def scaleToSuccessfully(appId: PathId,
+                            instances: Int): Iterable[ITEnrichedTask] = {
       val result =
         marathon.updateApp(appId, AppUpdate(instances = Some(instances)))
       result.code should be(200) // OK

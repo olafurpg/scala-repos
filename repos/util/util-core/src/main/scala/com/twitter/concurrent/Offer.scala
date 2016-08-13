@@ -222,8 +222,8 @@ object Offer {
     *
     * Package-exposed for testing.
     */
-  private[concurrent] def choose[T](
-      random: Option[Random], evs: Seq[Offer[T]]): Offer[T] = {
+  private[concurrent] def choose[T](random: Option[Random],
+                                    evs: Seq[Offer[T]]): Offer[T] = {
     if (evs.isEmpty) Offer.never
     else
       new Offer[T] {
@@ -259,8 +259,8 @@ object Offer {
             i += 1
           }
 
-          def updateLosers(
-              winPos: Int, prepd: Array[Future[Tx[T]]]): Future[Tx[T]] = {
+          def updateLosers(winPos: Int,
+                           prepd: Array[Future[Tx[T]]]): Future[Tx[T]] = {
             val winner = prepd(winPos)
             var j = 0
             while (j < prepd.length) {

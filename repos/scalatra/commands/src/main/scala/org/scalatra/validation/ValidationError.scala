@@ -79,8 +79,7 @@ object ValidationError {
   */
 class ErrorCodeSerializer(knownCodes: ErrorCode*)
     extends Serializer[ErrorCode] {
-  val ecs = Map(
-      knownCodes map { c ⇒
+  val ecs = Map(knownCodes map { c ⇒
     c.getClass.getSimpleName.replaceAll("\\$$", "").toUpperCase -> c
   }: _*)
   val Class = classOf[ErrorCode]
@@ -116,11 +115,10 @@ class ErrorCodeSerializer(knownCodes: ErrorCode*)
   * @param includeCode Include the code field if an error code is provided
   * @param includeArgs Include the args field when args are provided
   */
-class ValidationErrorSerializer(
-    includeCode: Boolean = true, includeArgs: Boolean = true)
-    extends CustomSerializer[ValidationError](
-        (formats: Formats) ⇒
-          ({
+class ValidationErrorSerializer(includeCode: Boolean = true,
+                                includeArgs: Boolean = true)
+    extends CustomSerializer[ValidationError]((formats: Formats) ⇒
+      ({
         case jo @ JObject(JField("message", _) :: _) ⇒
           implicit val fmts = formats
           new ValidationError((jo \ "message").extractOrElse(""),
@@ -132,13 +130,15 @@ class ValidationErrorSerializer(
           implicit val fmts = formats
           val jv: JValue = ("message" -> message)
           val wf: JValue =
-            fieldName map (fn ⇒ ("field" -> fn.name): JValue) getOrElse JNothing
+            fieldName map (fn ⇒
+                             ("field" -> fn.name): JValue) getOrElse JNothing
           val ec: JValue =
             if (includeCode && code.isDefined)
               ("code" -> (code map (Extraction.decompose(_)(formats))))
             else JNothing
           val arg: JValue =
             if (includeArgs && args.nonEmpty)
-              ("args" -> Extraction.decompose(args)(formats)) else JNothing
+              ("args" -> Extraction.decompose(args)(formats))
+            else JNothing
           jv merge wf merge ec merge arg
       }))

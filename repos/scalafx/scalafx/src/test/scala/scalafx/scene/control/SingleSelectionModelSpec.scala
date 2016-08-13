@@ -40,10 +40,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class SingleSelectionModelSpec[T]
-    extends SimpleSFXDelegateSpec[
-        jfxsc.SingleSelectionModel[T], SingleSelectionModel[T]](
-        classOf[jfxsc.SingleSelectionModel[T]],
-        classOf[SingleSelectionModel[T]]) {
+    extends SimpleSFXDelegateSpec[jfxsc.SingleSelectionModel[T],
+                                  SingleSelectionModel[T]](
+      classOf[jfxsc.SingleSelectionModel[T]],
+      classOf[SingleSelectionModel[T]]) {
 
   override protected def getScalaClassInstance =
     new SingleSelectionModel[T](getJavaClassInstance) {}

@@ -109,7 +109,7 @@ abstract class ArrayData extends SpecializedGetters with Serializable {
   def toObjectArray(elementType: DataType): Array[AnyRef] =
     toArray[AnyRef](elementType: DataType)
 
-  def toArray[T : ClassTag](elementType: DataType): Array[T] = {
+  def toArray[T: ClassTag](elementType: DataType): Array[T] = {
     val size = numElements()
     val values = new Array[T](size)
     var i = 0

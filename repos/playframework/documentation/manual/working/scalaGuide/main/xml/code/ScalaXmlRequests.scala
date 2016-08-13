@@ -66,7 +66,7 @@ package scalaguide.xml.scalaxmlrequests {
             }
             .getOrElse {
               BadRequest(
-                  <message status="KO">Missing parameter [name]</message>)
+                <message status="KO">Missing parameter [name]</message>)
             }
         }
         //#xml-request-body-parser-xml-response

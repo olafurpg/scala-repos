@@ -7,7 +7,13 @@ import java.util.concurrent.{TimeUnit, TimeoutException}
 
 import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
 import akka.stream._
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler, TimerGraphStageLogic}
+import akka.stream.stage.{
+  GraphStage,
+  GraphStageLogic,
+  InHandler,
+  OutHandler,
+  TimerGraphStageLogic
+}
 
 import scala.concurrent.duration.{Duration, Deadline, FiniteDuration}
 
@@ -51,8 +57,9 @@ private[stream] object Timers {
 
         final override protected def onTimer(key: Any): Unit =
           if (!initialHasPassed)
-            failStage(new TimeoutException(
-                    s"The first element has not yet passed through in $timeout."))
+            failStage(
+              new TimeoutException(
+                s"The first element has not yet passed through in $timeout."))
 
         override def preStart(): Unit = scheduleOnce("InitialTimeout", timeout)
       }
@@ -76,8 +83,8 @@ private[stream] object Timers {
 
         final override protected def onTimer(key: Any): Unit =
           failStage(
-              new TimeoutException(
-                  s"The stream has not been completed in $timeout."))
+            new TimeoutException(
+              s"The stream has not been completed in $timeout."))
 
         override def preStart(): Unit =
           scheduleOnce("CompletionTimeoutTimer", timeout)
@@ -107,8 +114,8 @@ private[stream] object Timers {
         final override protected def onTimer(key: Any): Unit =
           if (nextDeadline.isOverdue())
             failStage(
-                new TimeoutException(
-                    s"No elements passed in the last $timeout."))
+              new TimeoutException(
+                s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
           schedulePeriodically("IdleTimeoutCheckTimer",
@@ -166,12 +173,12 @@ private[stream] object Timers {
         final override def onTimer(key: Any): Unit =
           if (nextDeadline.isOverdue())
             failStage(
-                new TimeoutException(
-                    s"No elements passed in the last $timeout."))
+              new TimeoutException(
+                s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
-          schedulePeriodically(
-              "IdleTimeoutCheckTimer", idleTimeoutCheckInterval(timeout))
+          schedulePeriodically("IdleTimeoutCheckTimer",
+                               idleTimeoutCheckInterval(timeout))
       }
   }
 
@@ -209,8 +216,8 @@ private[stream] object Timers {
       }
   }
 
-  final class IdleInject[I, O >: I](
-      val timeout: FiniteDuration, inject: () ⇒ O)
+  final class IdleInject[I, O >: I](val timeout: FiniteDuration,
+                                    inject: () ⇒ O)
       extends GraphStage[FlowShape[I, O]] {
     val in: Inlet[I] = Inlet("IdleInject.in")
     val out: Outlet[O] = Outlet("IdleInject.out")

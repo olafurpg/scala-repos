@@ -8,8 +8,7 @@ import slick.util.ConstArray
 /**
   * An operation which is expected to be run on the client side.
   */
-trait ClientSideOp {
-  this: Node =>
+trait ClientSideOp { this: Node =>
   def nodeMapServerSide(keepType: Boolean, r: Node => Node): Self
 }
 
@@ -28,15 +27,17 @@ object ClientSideOp {
       f: ResultSetMapping => Node): Node = n match {
     case r: ResultSetMapping => f(r)
     case n: ClientSideOp =>
-      n.nodeMapServerSide(
-          keepType, (ch => mapResultSetMapping(ch, keepType)(f)))
+      n.nodeMapServerSide(keepType,
+                          (ch => mapResultSetMapping(ch, keepType)(f)))
     case n => throw new SlickException("No ResultSetMapping found in tree")
   }
 }
 
 /** Get the first element of a collection. For client-side operations only. */
 final case class First(val child: Node)
-    extends UnaryNode with SimplyTypedNode with ClientSideOp {
+    extends UnaryNode
+    with SimplyTypedNode
+    with ClientSideOp {
   type Self = First
   protected[this] def rebuild(ch: Node) = copy(child = ch)
   protected def buildType = child.nodeType.asCollectionType.elementType
@@ -51,7 +52,9 @@ final case class First(val child: Node)
   * a type of ``(t, u) => u`` where ``t`` and ``u`` are primitive or Option
   * types. */
 final case class ResultSetMapping(generator: TermSymbol, from: Node, map: Node)
-    extends BinaryNode with DefNode with ClientSideOp {
+    extends BinaryNode
+    with DefNode
+    with ClientSideOp {
   type Self = ResultSetMapping
   def left = from
   def right = map
@@ -73,7 +76,7 @@ final case class ResultSetMapping(generator: TermSymbol, from: Node, map: Node)
         (map2, map2.nodeType)
     }
     withChildren(ConstArray[Node](from2, map2)) :@
-    (if (!hasType) newType else nodeType)
+      (if (!hasType) newType else nodeType)
   }
   def nodeMapServerSide(keepType: Boolean, r: Node => Node) = {
     val this2 = mapScopedChildren {
@@ -87,9 +90,10 @@ final case class ResultSetMapping(generator: TermSymbol, from: Node, map: Node)
 
 /** A switch for special-cased parameters that needs to be interpreted in order
   * to find the correct query string for the query arguments. */
-final case class ParameterSwitch(
-    cases: ConstArray[((Any => Boolean), Node)], default: Node)
-    extends SimplyTypedNode with ClientSideOp {
+final case class ParameterSwitch(cases: ConstArray[((Any => Boolean), Node)],
+                                 default: Node)
+    extends SimplyTypedNode
+    with ClientSideOp {
   type Self = ParameterSwitch
   def children = cases.map(_._2) :+ default
   override def childNames = cases.map("[" + _._1 + "]").toSeq :+ "default"

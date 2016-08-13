@@ -42,10 +42,11 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         header[`Set-Cookie`] shouldEqual Some(
-            `Set-Cookie`(HttpCookie("myCookie",
-                                    "deleted",
-                                    expires = deletedTimeStamp,
-                                    domain = Some("test.com"))))
+          `Set-Cookie`(
+            HttpCookie("myCookie",
+                       "deleted",
+                       expires = deletedTimeStamp,
+                       domain = Some("test.com"))))
       }
     }
 
@@ -56,8 +57,8 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(
-            HttpCookie("myCookie", "deleted", expires = deletedTimeStamp),
-            HttpCookie("myCookie2", "deleted", expires = deletedTimeStamp))
+          HttpCookie("myCookie", "deleted", expires = deletedTimeStamp),
+          HttpCookie("myCookie2", "deleted", expires = deletedTimeStamp))
       }
     }
   }
@@ -89,7 +90,7 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         header[`Set-Cookie`] shouldEqual Some(
-            `Set-Cookie`(HttpCookie("myCookie", "test.com")))
+          `Set-Cookie`(HttpCookie("myCookie", "test.com")))
       }
     }
 
@@ -100,8 +101,8 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(
-            HttpCookie("myCookie", "test.com"),
-            HttpCookie("myCookie2", "foobar.com"))
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com"))
       }
     }
   }

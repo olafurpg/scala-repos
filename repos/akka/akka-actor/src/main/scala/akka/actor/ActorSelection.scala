@@ -37,9 +37,9 @@ abstract class ActorSelection extends Serializable {
     */
   def tell(msg: Any, sender: ActorRef): Unit =
     ActorSelection.deliverSelection(
-        anchor.asInstanceOf[InternalActorRef],
-        sender,
-        ActorSelectionMessage(msg, path, wildcardFanOut = false))
+      anchor.asInstanceOf[InternalActorRef],
+      sender,
+      ActorSelectionMessage(msg, path, wildcardFanOut = false))
 
   /**
     * Forwards the message and passes the original sender actor as the sender.
@@ -193,9 +193,9 @@ object ActorSelection {
           case refWithCell: ActorRefWithCell ⇒
             def emptyRef =
               new EmptyLocalActorRef(
-                  refWithCell.provider,
-                  anchor.path / sel.elements.map(_.toString),
-                  refWithCell.underlying.system.eventStream)
+                refWithCell.provider,
+                anchor.path / sel.elements.map(_.toString),
+                refWithCell.underlying.system.eventStream)
 
             iter.next() match {
               case SelectParent ⇒
@@ -222,16 +222,18 @@ object ActorSelection {
                 } else {
                   val matchingChildren =
                     chldr.filter(c ⇒ p.pattern.matcher(c.path.name).matches)
-                  // don't send to emptyRef after wildcard fan-out 
+                  // don't send to emptyRef after wildcard fan-out
                   if (matchingChildren.isEmpty && !sel.wildcardFanOut)
                     emptyRef.tell(sel, sender)
                   else {
                     val m = sel.copy(elements = iter.toVector,
                                      wildcardFanOut = sel.wildcardFanOut ||
-                                       matchingChildren.size > 1)
-                    matchingChildren.foreach(c ⇒
-                          deliverSelection(
-                              c.asInstanceOf[InternalActorRef], sender, m))
+                                         matchingChildren.size > 1)
+                    matchingChildren.foreach(
+                      c ⇒
+                        deliverSelection(c.asInstanceOf[InternalActorRef],
+                                         sender,
+                                         m))
                   }
                 }
             }
@@ -250,8 +252,7 @@ object ActorSelection {
   * Contains the Scala API (!-method) for ActorSelections) which provides automatic tracking of the sender,
   * as per the usual implicit ActorRef pattern.
   */
-trait ScalaActorSelection {
-  this: ActorSelection ⇒
+trait ScalaActorSelection { this: ActorSelection ⇒
 
   def !(msg: Any)(implicit sender: ActorRef = Actor.noSender) =
     tell(msg, sender)
@@ -268,7 +269,8 @@ private[akka] final case class ActorSelectionMessage(
     msg: Any,
     elements: immutable.Iterable[SelectionPathElement],
     wildcardFanOut: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful {
+    extends AutoReceivedMessage
+    with PossiblyHarmful {
 
   def identifyRequest: Option[Identify] = msg match {
     case x: Identify ⇒ Some(x)

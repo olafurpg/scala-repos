@@ -26,17 +26,19 @@ trait ScalaDocWithSyntaxSurrounder extends Surrounder {
 
     def getNewExprText(expr: String): String =
       expr.substring(0, startOffset - offset) + getSyntaxTag +
-      expr.substring(startOffset - offset, endOffset - offset) + getSyntaxTag +
-      expr.substring(endOffset - offset)
+        expr
+          .substring(startOffset - offset, endOffset - offset) + getSyntaxTag +
+        expr.substring(endOffset - offset)
 
     val surroundedText = new StringBuilder()
     elements.foreach(surroundedText append _.getText)
 
     var newExpr = ScalaPsiElementFactory.createDocSimpleData(
-        getNewExprText(surroundedText.toString()), elements(0).getManager)
+      getNewExprText(surroundedText.toString()),
+      elements(0).getManager)
 
     while (newExpr != null &&
-    newExpr.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
+           newExpr.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
       elements(0).getParent.addBefore(newExpr, elements(0))
       newExpr = newExpr.getNextSibling
     }

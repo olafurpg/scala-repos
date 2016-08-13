@@ -45,9 +45,9 @@ class CurrencyStringConverterSpec
                                                 jfxuc.CurrencyStringConverter,
                                                 Number,
                                                 CurrencyStringConverter](
-        classOf[jfxuc.CurrencyStringConverter],
-        classOf[CurrencyStringConverter],
-        classOf[Number]) {
+      classOf[jfxuc.CurrencyStringConverter],
+      classOf[CurrencyStringConverter],
+      classOf[Number]) {
 
   override protected def getConverterForExample =
     new CurrencyStringConverter(Locale.US)

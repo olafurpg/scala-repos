@@ -10,8 +10,9 @@ import rx.lang.scala.Observer
   * The internally used eventStream for [[mesosphere.marathon.core.task.bus.TaskStatusObservables]]
   */
 private[bus] class InternalTaskStatusEventStream
-    extends SubchannelEventBus[
-        TaskStatusUpdate, Observer[TaskStatusUpdate], PathId] {
+    extends SubchannelEventBus[TaskStatusUpdate,
+                               Observer[TaskStatusUpdate],
+                               PathId] {
 
   override val subclassification: Subclassification[PathId] =
     new Subclassification[PathId] {
@@ -24,7 +25,8 @@ private[bus] class InternalTaskStatusEventStream
     }
 
   override protected def publish(
-      event: TaskStatusUpdate, subscriber: Observer[TaskStatusUpdate]): Unit =
+      event: TaskStatusUpdate,
+      subscriber: Observer[TaskStatusUpdate]): Unit =
     subscriber.onNext(event)
   override protected def classify(event: TaskStatusUpdate): PathId =
     event.appId

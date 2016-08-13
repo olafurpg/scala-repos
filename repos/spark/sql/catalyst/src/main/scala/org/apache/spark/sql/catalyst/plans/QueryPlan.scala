@@ -36,8 +36,8 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       .union(inferAdditionalConstraints(constraints))
       .union(constructIsNotNullConstraints(constraints))
       .filter(constraint =>
-            constraint.references.nonEmpty &&
-            constraint.references.subsetOf(outputSet))
+        constraint.references.nonEmpty &&
+          constraint.references.subsetOf(outputSet))
   }
 
   /**
@@ -94,7 +94,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * evaluate to `true` for all rows produced.
     */
   lazy val constraints: ExpressionSet = ExpressionSet(
-      getRelevantConstraints(validConstraints))
+    getRelevantConstraints(validConstraints))
 
   /**
     * This method can be overridden by any child class of QueryPlan to specify a set of constraints
@@ -269,8 +269,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * All the subqueries of current plan.
     */
   def subqueries: Seq[PlanType] = {
-    expressions.flatMap(
-        _.collect {
+    expressions.flatMap(_.collect {
       case e: SubqueryExpression => e.plan.asInstanceOf[PlanType]
     })
   }
@@ -313,10 +312,11 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     case a: Alias =>
       // As the root of the expression, Alias will always take an arbitrary exprId, we need
       // to erase that for equality testing.
-      val cleanedExprId = Alias(a.child, a.name)(
-          ExprId(-1), a.qualifiers, isGenerated = a.isGenerated)
-      BindReferences.bindReference(
-          cleanedExprId, allAttributes, allowFailures = true)
+      val cleanedExprId = Alias(a.child, a.name)(ExprId(-1),
+                                                 a.qualifiers,
+                                                 isGenerated = a.isGenerated)
+      BindReferences
+        .bindReference(cleanedExprId, allAttributes, allowFailures = true)
     case other =>
       BindReferences.bindReference(other, allAttributes, allowFailures = true)
   }

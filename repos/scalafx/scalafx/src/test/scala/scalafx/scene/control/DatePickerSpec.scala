@@ -40,5 +40,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class DatePickerSpec
     extends SimpleSFXDelegateSpec[jfxsc.DatePicker, DatePicker](
-        classOf[jfxsc.DatePicker], classOf[DatePicker])
+      classOf[jfxsc.DatePicker],
+      classOf[DatePicker])
     with RunOnApplicationThread

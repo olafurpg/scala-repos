@@ -62,8 +62,11 @@ object GenerateUnsafeProjection
       if ($input instanceof UnsafeRow) {
         ${writeUnsafeData(ctx, s"((UnsafeRow) $input)", bufferHolder)}
       } else {
-        ${writeExpressionsToBuffer(
-        ctx, input, fieldEvals, fieldTypes, bufferHolder)}
+        ${writeExpressionsToBuffer(ctx,
+                                   input,
+                                   fieldEvals,
+                                   fieldTypes,
+                                   bufferHolder)}
       }
     """
   }
@@ -77,9 +80,9 @@ object GenerateUnsafeProjection
     val rowWriterClass = classOf[UnsafeRowWriter].getName
     val rowWriter = ctx.freshName("rowWriter")
     ctx.addMutableState(
-        rowWriterClass,
-        rowWriter,
-        s"this.$rowWriter = new $rowWriterClass($bufferHolder, ${inputs.length});")
+      rowWriterClass,
+      rowWriter,
+      s"this.$rowWriter = new $rowWriterClass($bufferHolder, ${inputs.length});")
 
     val resetWriter =
       if (isTopLevel) {
@@ -118,8 +121,10 @@ object GenerateUnsafeProjection
               // Remember the current cursor so that we can calculate how many bytes are
               // written later.
               final int $tmpCursor = $bufferHolder.cursor;
-              ${writeStructToBuffer(
-                ctx, input.value, t.map(_.dataType), bufferHolder)}
+              ${writeStructToBuffer(ctx,
+                                    input.value,
+                                    t.map(_.dataType),
+                                    bufferHolder)}
               $rowWriter.setOffsetAndSize($index, $tmpCursor, $bufferHolder.cursor - $tmpCursor);
             """
 
@@ -285,8 +290,9 @@ object GenerateUnsafeProjection
     * If the input is already in unsafe format, we don't need to go through all elements/fields,
     * we can directly write it.
     */
-  private def writeUnsafeData(
-      ctx: CodegenContext, input: String, bufferHolder: String) = {
+  private def writeUnsafeData(ctx: CodegenContext,
+                              input: String,
+                              bufferHolder: String) = {
     val sizeInBytes = ctx.freshName("sizeInBytes")
     s"""
       final int $sizeInBytes = $input.getSizeInBytes();
@@ -317,9 +323,9 @@ object GenerateUnsafeProjection
     val holder = ctx.freshName("holder")
     val holderClass = classOf[BufferHolder].getName
     ctx.addMutableState(
-        holderClass,
-        holder,
-        s"this.$holder = new $holderClass($result, ${numVarLenFields * 32});")
+      holderClass,
+      holder,
+      s"this.$holder = new $holderClass($result, ${numVarLenFields * 32});")
 
     val resetBufferHolder =
       if (numVarLenFields == 0) {
@@ -337,8 +343,12 @@ object GenerateUnsafeProjection
     // Evaluate all the subexpression.
     val evalSubexpr = ctx.subexprFunctions.mkString("\n")
 
-    val writeExpressions = writeExpressionsToBuffer(
-        ctx, ctx.INPUT_ROW, exprEvals, exprTypes, holder, isTopLevel = true)
+    val writeExpressions = writeExpressionsToBuffer(ctx,
+                                                    ctx.INPUT_ROW,
+                                                    exprEvals,
+                                                    exprTypes,
+                                                    holder,
+                                                    isTopLevel = true)
 
     val code = s"""
         $resetBufferHolder
@@ -352,8 +362,8 @@ object GenerateUnsafeProjection
   protected def canonicalize(in: Seq[Expression]): Seq[Expression] =
     in.map(ExpressionCanonicalizer.execute)
 
-  protected def bind(
-      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+  protected def bind(in: Seq[Expression],
+                     inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
   def generate(expressions: Seq[Expression],
@@ -400,7 +410,7 @@ object GenerateUnsafeProjection
       """
 
     logDebug(
-        s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
+      s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
 
     val c = CodeGenerator.compile(code)
     c.generate(ctx.references.toArray).asInstanceOf[UnsafeProjection]

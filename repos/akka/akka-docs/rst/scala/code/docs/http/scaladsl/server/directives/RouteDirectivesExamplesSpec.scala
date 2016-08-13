@@ -79,8 +79,8 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "failwith-examples" in EventFilter[RuntimeException](
-      start = "Error during processing of request",
-      occurrences = 1).intercept {
+    start = "Error during processing of request",
+    occurrences = 1).intercept {
     val route = path("foo") {
       failWith(new RuntimeException("Oops."))
     }

@@ -28,7 +28,9 @@ import org.apache.spark.scheduler.cluster.ExecutorInfo
   * Unit tests for SparkListener that require a local cluster.
   */
 class SparkListenerWithClusterSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfter
     with BeforeAndAfterAll {
 
   /** Length of time to wait while draining listener events. */

@@ -8,6 +8,6 @@ import scala.language.experimental.macros
   */
 trait GenPicklers {
   //implicit def genPickler[T]: Pickler[T] = macro Compat.PicklerMacros_impl[T]
-  implicit def genPickler[T]: Pickler[T] = macro generator.Compat
-    .genPickler_impl[T]
+  implicit def genPickler[T]: Pickler[T] =
+    macro generator.Compat.genPickler_impl[T]
 }

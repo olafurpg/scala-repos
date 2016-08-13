@@ -57,8 +57,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
         """
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString.contains("intValue")).get,
-        '\t')
+      activeLookup.find(le => le.getLookupString.contains("intValue")).get,
+      '\t')
     checkResultByText(handleText(baseText + outText))
   }
 
@@ -78,10 +78,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
         """
 
     completeLookupItem(
-        activeLookup
-          .find(le => le.getLookupString.contains("intVariable"))
-          .get,
-        '\t')
+      activeLookup.find(le => le.getLookupString.contains("intVariable")).get,
+      '\t')
     checkResultByText(handleText(baseText + outText))
   }
 
@@ -102,8 +100,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
         """
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString.contains("equals")).get,
-        '\t')
+      activeLookup.find(le => le.getLookupString.contains("equals")).get,
+      '\t')
     checkResultByText(handleText(baseText + outText))
   }
 
@@ -123,7 +121,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
       """
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString.contains("foo")).get, '\t')
+      activeLookup.find(le => le.getLookupString.contains("foo")).get,
+      '\t')
     checkResultByText(handleText(baseText + outText))
   }
 }

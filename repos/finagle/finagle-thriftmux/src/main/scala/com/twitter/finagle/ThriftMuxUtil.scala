@@ -15,10 +15,11 @@ private object ThriftMuxUtil {
     }
 
   def classForName(name: String) =
-    try Class.forName(name) catch {
+    try Class.forName(name)
+    catch {
       case cause: ClassNotFoundException =>
-        throw new IllegalArgumentException(
-            "Iface is not a valid thrift iface", cause)
+        throw new IllegalArgumentException("Iface is not a valid thrift iface",
+                                           cause)
     }
 
   val protocolRecorder: Stackable[ServiceFactory[mux.Request, mux.Response]] =

@@ -20,7 +20,10 @@ import com.intellij.psi.search.{FileTypeIndex, GlobalSearchScope}
 import com.intellij.psi.{PsiElement, PsiManager}
 import com.intellij.testFramework.IdeaTestUtil
 import org.jetbrains.SbtStructureSetup
-import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, ScalaAnnotator}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorHolderMock,
+  ScalaAnnotator
+}
 import org.jetbrains.plugins.scala.finder.SourceFilterScope
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
@@ -37,7 +40,8 @@ import org.junit.experimental.categories.Category
   */
 @Category(Array(classOf[SlowTests]))
 class AllProjectHighlightingTest
-    extends ExternalSystemImportingTestCase with SbtStructureSetup {
+    extends ExternalSystemImportingTestCase
+    with SbtStructureSetup {
   override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
@@ -95,11 +99,11 @@ class AllProjectHighlightingTest
       .asInstanceOf[InspectionManagerEx]
 
     val searchScope = new SourceFilterScope(
-        GlobalSearchScope.getScopeRestrictedByFileTypes(
-            GlobalSearchScope.projectScope(myProject),
-            ScalaFileType.SCALA_FILE_TYPE,
-            JavaFileType.INSTANCE),
-        myProject)
+      GlobalSearchScope.getScopeRestrictedByFileTypes(
+        GlobalSearchScope.projectScope(myProject),
+        ScalaFileType.SCALA_FILE_TYPE,
+        JavaFileType.INSTANCE),
+      myProject)
 
     val files: util.Collection[VirtualFile] =
       FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
@@ -120,25 +124,25 @@ class AllProjectHighlightingTest
 
     for ((file, index) <- files.zipWithIndex) {
       val mock = new AnnotatorHolderMock {
-        override def createErrorAnnotation(
-            range: TextRange, message: String): Annotation = {
+        override def createErrorAnnotation(range: TextRange,
+                                           message: String): Annotation = {
           errorCount += 1
           println(
-              s"Error in ${file.getName}. Range: $range. Message: $message.")
+            s"Error in ${file.getName}. Range: $range. Message: $message.")
           super.createErrorAnnotation(range, message)
         }
 
-        override def createErrorAnnotation(
-            elt: PsiElement, message: String): Annotation = {
+        override def createErrorAnnotation(elt: PsiElement,
+                                           message: String): Annotation = {
           errorCount += 1
           println(
-              s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")
+            s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")
           super.createErrorAnnotation(elt, message)
         }
       }
 
       if ((index + 1) * 100 >= (percent + 1) * size) {
-        while ( (index + 1) * 100 >= (percent + 1) * size) percent += 1
+        while ((index + 1) * 100 >= (percent + 1) * size) percent += 1
         println(s"Analyzing... $percent%")
       }
 
@@ -167,8 +171,8 @@ class AllProjectHighlightingTest
     super.setUpInWriteAction()
     val projectDir: File = new File(getRootDir, getTestName(false))
     if (!projectDir.exists()) return
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
-        projectDir)
+    myProjectRoot =
+      LocalFileSystem.getInstance.refreshAndFindFileByIoFile(projectDir)
     setUpSbtLauncherAndStructure(myProject)
   }
 }

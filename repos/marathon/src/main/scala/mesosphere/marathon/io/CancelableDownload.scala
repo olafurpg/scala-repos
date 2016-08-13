@@ -17,8 +17,9 @@ import scala.concurrent.Future
   * @param provider the storage provider
   * @param path the path inside the storage, to store the content of the url stream.
   */
-final class CancelableDownload(
-    val url: URL, val provider: StorageProvider, val path: String)
+final class CancelableDownload(val url: URL,
+                               val provider: StorageProvider,
+                               val path: String)
     extends Logging {
 
   val tempItem = provider.item(path + UUID.randomUUID().toString)
@@ -37,10 +38,10 @@ final class CancelableDownload(
       tempItem.moveTo(path)
     } else {
       log.info(
-          s"Cancel download of $url. Remove temporary storage item $tempItem")
+        s"Cancel download of $url. Remove temporary storage item $tempItem")
       tempItem.delete()
       throw new CanceledActionException(
-          s"Download of $path from $url has been canceled")
+        s"Download of $path from $url has been canceled")
     }
     this
   }(ThreadPoolContext.ioContext)

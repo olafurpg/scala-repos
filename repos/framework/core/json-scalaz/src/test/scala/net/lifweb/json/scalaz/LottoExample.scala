@@ -15,7 +15,7 @@ object LottoExample extends Specification {
                    drawDate: Option[String])
 
   val json = parse(
-      """{"id":5,"winning-numbers":[2,45,34,23,7,5],"winners":[{"winner-id":23,"numbers":[2,45,34,23,3,5]},{"winner-id":54,"numbers":[52,3,12,11,18,22]}]}""")
+    """{"id":5,"winning-numbers":[2,45,34,23,7,5],"winners":[{"winner-id":23,"numbers":[2,45,34,23,3,5]},{"winner-id":54,"numbers":[52,3,12,11,18,22]}]}""")
 
   // Lotto line must have exactly 6 numbers
   def len(x: Int) =
@@ -23,7 +23,7 @@ object LottoExample extends Specification {
       if (xs.length != x) Fail("len", xs.length + " != " + x) else xs.success
 
   // FIXME enable when 2.8 no longer supported, 2.9 needs: import Validation.Monad._
-/*
+  /*
   // Note 'apply _' is not needed on Scala 2.8.1 >=
   implicit def winnerJSON: JSONR[Winner] =
     Winner.applyJSON(field("winner-id"), validate[List[Int]]("numbers") >=> len(6) apply _)
@@ -33,7 +33,7 @@ object LottoExample extends Specification {
                   , validate[List[Int]]("winning-numbers") >=> len(6) apply _
                   , field("winners")
                   , field("draw-date"))
-  
+
   val winners = List(Winner(23, List(2, 45, 34, 23, 3, 5)), Winner(54, List(52, 3, 12, 11, 18, 22)))
   val lotto = Lotto(5, List(2, 45, 34, 23, 7, 5), winners, None)
 

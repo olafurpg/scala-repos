@@ -10,7 +10,7 @@ class GenericsSimpleTest extends FunSuite {
     val c = C(2)
     val p = c.pickle
     assert(
-        p.toString === """
+      p.toString === """
       |JSONPickle({
       |  "$type": "scala.pickling.generics.simple.C[scala.Int]",
       |  "x": 2

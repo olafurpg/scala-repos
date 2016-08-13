@@ -12,7 +12,11 @@ import com.typesafe.config.Config
 import java.util
 import scala.util.matching.Regex
 import scala.collection.mutable
-import akka.testkit.metrics.reporter.{GraphiteClient, AkkaGraphiteReporter, AkkaConsoleReporter}
+import akka.testkit.metrics.reporter.{
+  GraphiteClient,
+  AkkaGraphiteReporter,
+  AkkaConsoleReporter
+}
 import org.scalatest.Notifying
 import scala.reflect.ClassTag
 
@@ -26,8 +30,7 @@ import scala.reflect.ClassTag
   * Reporting defaults to `ConsoleReporter`.
   * In order to send registry to Graphite run sbt with the following property: `-Dakka.registry.reporting.0=graphite`.
   */
-private[akka] trait MetricsKit extends MetricsKitOps {
-  this: Notifying ⇒
+private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
 
   import MetricsKit._
   import collection.JavaConverters._
@@ -52,13 +55,13 @@ private[akka] trait MetricsKit extends MetricsKitOps {
 
     def configureConsoleReporter() {
       if (settings.Reporters.contains("console")) {
-        val akkaConsoleReporter = new AkkaConsoleReporter(
-            registry, settings.ConsoleReporter.Verbose)
+        val akkaConsoleReporter =
+          new AkkaConsoleReporter(registry, settings.ConsoleReporter.Verbose)
 
         if (settings.ConsoleReporter.ScheduledReportInterval > Duration.Zero)
           akkaConsoleReporter.start(
-              settings.ConsoleReporter.ScheduledReportInterval.toMillis,
-              TimeUnit.MILLISECONDS)
+            settings.ConsoleReporter.ScheduledReportInterval.toMillis,
+            TimeUnit.MILLISECONDS)
 
         reporters ::= akkaConsoleReporter
       }
@@ -67,20 +70,20 @@ private[akka] trait MetricsKit extends MetricsKitOps {
     def configureGraphiteReporter() {
       if (settings.Reporters.contains("graphite")) {
         note(
-            s"MetricsKit: Graphite reporter enabled, sending metrics to: ${settings.GraphiteReporter.Host}:${settings.GraphiteReporter.Port}")
-        val address = new InetSocketAddress(
-            settings.GraphiteReporter.Host, settings.GraphiteReporter.Port)
+          s"MetricsKit: Graphite reporter enabled, sending metrics to: ${settings.GraphiteReporter.Host}:${settings.GraphiteReporter.Port}")
+        val address = new InetSocketAddress(settings.GraphiteReporter.Host,
+                                            settings.GraphiteReporter.Port)
         val graphite = new GraphiteClient(address)
         val akkaGraphiteReporter = new AkkaGraphiteReporter(
-            registry,
-            settings.GraphiteReporter.Prefix,
-            graphite,
-            settings.GraphiteReporter.Verbose)
+          registry,
+          settings.GraphiteReporter.Prefix,
+          graphite,
+          settings.GraphiteReporter.Verbose)
 
         if (settings.GraphiteReporter.ScheduledReportInterval > Duration.Zero) {
           akkaGraphiteReporter.start(
-              settings.GraphiteReporter.ScheduledReportInterval.toMillis,
-              TimeUnit.MILLISECONDS)
+            settings.GraphiteReporter.ScheduledReportInterval.toMillis,
+            TimeUnit.MILLISECONDS)
         }
 
         reporters ::= akkaGraphiteReporter
@@ -179,10 +182,10 @@ private[akka] trait MetricsKit extends MetricsKitOps {
       case Some(existing: M) ⇒ existing
       case Some(existing) ⇒
         throw new IllegalArgumentException(
-            "Key: [%s] is already for different kind of metric! Was [%s], expected [%s]"
-              .format(key,
-                      metric.getClass.getSimpleName,
-                      tag.runtimeClass.getSimpleName))
+          "Key: [%s] is already for different kind of metric! Was [%s], expected [%s]"
+            .format(key,
+                    metric.getClass.getSimpleName,
+                    tag.runtimeClass.getSimpleName))
       case _ ⇒ registry.register(key, metric)
     }
   }
@@ -201,7 +204,7 @@ private[akka] object MetricsKit {
   val MemMetricsFilter = new RegexMetricFilter(""".*\.mem\..*""".r)
 
   val FileDescriptorMetricsFilter = new RegexMetricFilter(
-      """.*\.file-descriptors\..*""".r)
+    """.*\.file-descriptors\..*""".r)
 
   val KnownOpsInTimespanCounterFilter = new MetricFilter {
     override def matches(name: String, metric: Metric) =
@@ -217,8 +220,7 @@ private[akka] object MetricsKit {
 }
 
 /** Provides access to custom Akka `com.codahale.metrics.Metric`, with named methods. */
-trait AkkaMetricRegistry {
-  this: MetricRegistry ⇒
+trait AkkaMetricRegistry { this: MetricRegistry ⇒
 
   def getKnownOpsInTimespanCounters =
     filterFor(classOf[KnownOpsInTimespanTimer])
@@ -243,19 +245,19 @@ private[akka] class MetricsKitSettings(config: Config) {
     lazy val Host = config
       .getString("akka.test.metrics.reporter.graphite.host")
       .requiring(
-          v ⇒ !v.trim.isEmpty,
-          "akka.test.metrics.reporter.graphite.host was used but was empty!")
+        v ⇒ !v.trim.isEmpty,
+        "akka.test.metrics.reporter.graphite.host was used but was empty!")
     val Port = config.getInt("akka.test.metrics.reporter.graphite.port")
     val Verbose =
       config.getBoolean("akka.test.metrics.reporter.graphite.verbose")
 
     val ScheduledReportInterval = config.getMillisDuration(
-        "akka.test.metrics.reporter.graphite.scheduled-report-interval")
+      "akka.test.metrics.reporter.graphite.scheduled-report-interval")
   }
 
   object ConsoleReporter {
     val ScheduledReportInterval = config.getMillisDuration(
-        "akka.test.metrics.reporter.console.scheduled-report-interval")
+      "akka.test.metrics.reporter.console.scheduled-report-interval")
     val Verbose =
       config.getBoolean("akka.test.metrics.reporter.console.verbose")
   }

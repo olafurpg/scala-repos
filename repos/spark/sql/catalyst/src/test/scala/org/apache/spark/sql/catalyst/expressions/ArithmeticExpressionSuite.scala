@@ -22,7 +22,8 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types._
 
 class ArithmeticExpressionSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite
+    with ExpressionEvalHelper {
 
   import IntegralLiteralTestUtils._
 
@@ -94,8 +95,8 @@ class ArithmeticExpressionSuite
     }
     checkEvaluation(Subtract(positiveShortLit, negativeShortLit),
                     (positiveShort - negativeShort).toShort)
-    checkEvaluation(
-        Subtract(positiveIntLit, negativeIntLit), positiveInt - negativeInt)
+    checkEvaluation(Subtract(positiveIntLit, negativeIntLit),
+                    positiveInt - negativeInt)
     checkEvaluation(Subtract(positiveLongLit, negativeLongLit),
                     positiveLong - negativeLong)
 
@@ -116,8 +117,8 @@ class ArithmeticExpressionSuite
     }
     checkEvaluation(Multiply(positiveShortLit, negativeShortLit),
                     (positiveShort * negativeShort).toShort)
-    checkEvaluation(
-        Multiply(positiveIntLit, negativeIntLit), positiveInt * negativeInt)
+    checkEvaluation(Multiply(positiveIntLit, negativeIntLit),
+                    positiveInt * negativeInt)
     checkEvaluation(Multiply(positiveLongLit, negativeLongLit),
                     positiveLong * negativeLong)
 
@@ -155,8 +156,8 @@ class ArithmeticExpressionSuite
   test("/ (Divide) for floating point") {
     checkEvaluation(Divide(Literal(1.0f), Literal(2.0f)), 0.5f)
     checkEvaluation(Divide(Literal(1.0), Literal(2.0)), 0.5)
-    checkEvaluation(
-        Divide(Literal(Decimal(1.0)), Literal(Decimal(2.0))), Decimal(0.5))
+    checkEvaluation(Divide(Literal(Decimal(1.0)), Literal(Decimal(2.0))),
+                    Decimal(0.5))
   }
 
   test("% (Remainder)") {
@@ -216,8 +217,8 @@ class ArithmeticExpressionSuite
       checkEvaluation(MaxOf(large, Literal.create(null, small.dataType)),
                       convert(2))
     }
-    checkEvaluation(
-        MaxOf(positiveShortLit, negativeShortLit), (positiveShort).toShort)
+    checkEvaluation(MaxOf(positiveShortLit, negativeShortLit),
+                    (positiveShort).toShort)
     checkEvaluation(MaxOf(positiveIntLit, negativeIntLit), positiveInt)
     checkEvaluation(MaxOf(positiveLongLit, negativeLongLit), positiveLong)
 
@@ -230,8 +231,8 @@ class ArithmeticExpressionSuite
     checkEvaluation(MaxOf(true, false), true)
     checkEvaluation(MaxOf("abc", "bcd"), "bcd")
     checkEvaluation(
-        MaxOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
-        Array(1.toByte, 3.toByte))
+      MaxOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
+      Array(1.toByte, 3.toByte))
   }
 
   test("MinOf basic") {
@@ -245,8 +246,8 @@ class ArithmeticExpressionSuite
       checkEvaluation(MinOf(small, Literal.create(null, small.dataType)),
                       convert(1))
     }
-    checkEvaluation(
-        MinOf(positiveShortLit, negativeShortLit), (negativeShort).toShort)
+    checkEvaluation(MinOf(positiveShortLit, negativeShortLit),
+                    (negativeShort).toShort)
     checkEvaluation(MinOf(positiveIntLit, negativeIntLit), negativeInt)
     checkEvaluation(MinOf(positiveLongLit, negativeLongLit), negativeLong)
 
@@ -259,8 +260,8 @@ class ArithmeticExpressionSuite
     checkEvaluation(MinOf(true, false), false)
     checkEvaluation(MinOf("abc", "bcd"), "abc")
     checkEvaluation(
-        MinOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
-        Array(1.toByte, 2.toByte))
+      MinOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
+      Array(1.toByte, 2.toByte))
   }
 
   test("pmod") {
@@ -274,8 +275,8 @@ class ArithmeticExpressionSuite
     }
     checkEvaluation(Pmod(Literal(-7), Literal(3)), 2)
     checkEvaluation(Pmod(Literal(7.2D), Literal(4.1D)), 3.1000000000000005)
-    checkEvaluation(
-        Pmod(Literal(Decimal(0.7)), Literal(Decimal(0.2))), Decimal(0.1))
+    checkEvaluation(Pmod(Literal(Decimal(0.7)), Literal(Decimal(0.2))),
+                    Decimal(0.1))
     checkEvaluation(Pmod(Literal(2L), Literal(Long.MaxValue)), 2L)
     checkEvaluation(Pmod(positiveShort, negativeShort), positiveShort.toShort)
     checkEvaluation(Pmod(positiveInt, negativeInt), positiveInt)

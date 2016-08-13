@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -28,7 +28,8 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
 trait StaticInlinerSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification
+    with EvaluatorTestSupport[M] {
 
   import dag._
   import instructions._
@@ -152,7 +153,7 @@ trait StaticInlinerSpecs[M[+ _]]
                  Const(CBoolean(false))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CUndefined)(line)
+          CUndefined)(line)
       }
     }
 
@@ -163,7 +164,7 @@ trait StaticInlinerSpecs[M[+ _]]
         val input = Operate(WrapArray, Const(CBoolean(false))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            RArray(CBoolean(false)))(line)
+          RArray(CBoolean(false)))(line)
       }
 
       "deref" >> {
@@ -173,7 +174,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Const(CNum(1))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(CTrue)(
-            line)
+          line)
       }
 
       "join" >> {
@@ -183,7 +184,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Const(RArray(CBoolean(false)))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            RArray(CTrue, CBoolean(false)))(line)
+          RArray(CTrue, CBoolean(false)))(line)
       }
 
       "swap" >> {
@@ -194,7 +195,7 @@ trait StaticInlinerSpecs[M[+ _]]
                Const(CNum(1))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            RArray(CBoolean(false), CTrue, CString("TEST")))(line)
+          RArray(CBoolean(false), CTrue, CString("TEST")))(line)
       }
     }
 
@@ -208,7 +209,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Const(CTrue)(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            RObject("k" -> CTrue))(line)
+          RObject("k" -> CTrue))(line)
       }
 
       "deref" >> {
@@ -218,7 +219,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Const(CString("k"))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CBoolean(false))(line)
+          CBoolean(false))(line)
       }
 
       "join" >> {
@@ -228,7 +229,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Const(RObject("l" -> CBoolean(false)))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            RObject("k" -> CTrue, "l" -> CBoolean(false)))(line)
+          RObject("k" -> CTrue, "l" -> CBoolean(false)))(line)
       }
     }
 
@@ -243,7 +244,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Cross(None))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CString("j"))(line)
+          CString("j"))(line)
       }
 
       "const false" >> {
@@ -254,7 +255,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Cross(None))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CString("k"))(line)
+          CString("k"))(line)
       }
 
       "invalid const" >> {
@@ -265,7 +266,7 @@ trait StaticInlinerSpecs[M[+ _]]
                          Cross(None))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Undefined(
-            line)
+          line)
       }
     }
 
@@ -295,7 +296,7 @@ trait StaticInlinerSpecs[M[+ _]]
                            Const(CString("j"))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CUndefined)(line)
+          CUndefined)(line)
       }
 
       "predicate" >> {
@@ -305,11 +306,12 @@ trait StaticInlinerSpecs[M[+ _]]
                            Const(CUndefined)(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
-            CUndefined)(line)
+          CUndefined)(line)
       }
     }
   }
 }
 
 object StaticInlinerSpecs
-    extends StaticInlinerSpecs[YId] with test.YIdInstances
+    extends StaticInlinerSpecs[YId]
+    with test.YIdInstances

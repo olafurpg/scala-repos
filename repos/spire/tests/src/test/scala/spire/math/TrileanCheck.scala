@@ -9,7 +9,9 @@ import prop._
 import spire.laws.arb._
 
 class TrileanCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   property("associativity") {
     forAll { (x: Trilean, y: Trilean, z: Trilean) =>

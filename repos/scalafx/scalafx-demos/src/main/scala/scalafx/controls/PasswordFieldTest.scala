@@ -30,7 +30,12 @@ package scalafx.controls
 import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
-import scalafx.controls.controls.{ControlControls, PropertiesNodes, TextFieldControls, TextInputControlControls}
+import scalafx.controls.controls.{
+  ControlControls,
+  PropertiesNodes,
+  TextFieldControls,
+  TextInputControlControls
+}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, PasswordField}

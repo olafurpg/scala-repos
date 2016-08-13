@@ -38,37 +38,39 @@ object PovToEntry {
     false
   }
 
-  private def enrich(
-      game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
+  private def enrich(game: Game,
+                     userId: String,
+                     provisional: Boolean): Fu[Option[RichPov]] =
     if (removeWrongAnalysis(game)) fuccess(none)
     else
       lila.game.Pov.ofUserId(game, userId) ?? { pov =>
         lila.game.GameRepo.initialFen(game) zip
-        (game.metadata.analysed ?? lila.analyse.AnalysisRepo.byId(game.id)) map {
+          (game.metadata.analysed ?? lila.analyse.AnalysisRepo
+            .byId(game.id)) map {
           case (fen, an) =>
             for {
               boards <- chess.Replay
-                .boards(moveStrs = game.pgnMoves,
-                        initialFen = fen,
-                        variant = game.variant)
-                .toOption
-                .flatMap(_.toNel)
+                         .boards(moveStrs = game.pgnMoves,
+                                 initialFen = fen,
+                                 variant = game.variant)
+                         .toOption
+                         .flatMap(_.toNel)
               movetimes <- game.moveTimes(pov.color).toNel
             } yield
               RichPov(
-                  pov = pov,
-                  provisional = provisional,
-                  initialFen = fen,
-                  analysis = an,
-                  division = chess.Divider(boards.list),
-                  moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
-                  boards = boards,
-                  movetimes = movetimes,
-                  advices = an.?? {
-                    _.advices.map { a =>
-                      a.info.ply -> a
-                    }.toMap
-                  }
+                pov = pov,
+                provisional = provisional,
+                initialFen = fen,
+                analysis = an,
+                division = chess.Divider(boards.list),
+                moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
+                boards = boards,
+                movetimes = movetimes,
+                advices = an.?? {
+                  _.advices.map { a =>
+                    a.info.ply -> a
+                  }.toMap
+                }
               )
         }
       }
@@ -132,7 +134,8 @@ object PovToEntry {
   }
 
   private def queenTrade(from: RichPov) = QueenTrade {
-    from.division.end.fold(from.boards.last.some)(from.boards.list.lift) match {
+    from.division.end
+      .fold(from.boards.last.some)(from.boards.list.lift) match {
       case Some(board) =>
         chess.Color.all.forall { color =>
           !board.hasPiece(chess.Piece(color, chess.Queen))
@@ -152,27 +155,27 @@ object PovToEntry {
       perfType <- pov.game.perfType
     } yield
       Entry(
-          id = Entry povToId pov,
-          number = 0, // temporary :-/ the Indexer will set it
-          userId = myId,
-          color = pov.color,
-          perf = perfType,
-          eco = Ecopening fromGame pov.game,
-          myCastling = Castling.fromMoves(pov.game pgnMoves pov.color),
-          opponentRating = opRating,
-          opponentStrength = RelativeStrength(opRating - myRating),
-          opponentCastling = Castling.fromMoves(pov.game pgnMoves !pov.color),
-          moves = makeMoves(from),
-          queenTrade = queenTrade(from),
-          result = pov.game.winnerUserId match {
-            case None => Result.Draw
-            case Some(u) if u == myId => Result.Win
-            case _ => Result.Loss
-          },
-          termination = Termination fromStatus pov.game.status,
-          ratingDiff = ~pov.player.ratingDiff,
-          analysed = analysis.isDefined,
-          provisional = provisional,
-          date = pov.game.createdAt)
+        id = Entry povToId pov,
+        number = 0, // temporary :-/ the Indexer will set it
+        userId = myId,
+        color = pov.color,
+        perf = perfType,
+        eco = Ecopening fromGame pov.game,
+        myCastling = Castling.fromMoves(pov.game pgnMoves pov.color),
+        opponentRating = opRating,
+        opponentStrength = RelativeStrength(opRating - myRating),
+        opponentCastling = Castling.fromMoves(pov.game pgnMoves !pov.color),
+        moves = makeMoves(from),
+        queenTrade = queenTrade(from),
+        result = pov.game.winnerUserId match {
+          case None => Result.Draw
+          case Some(u) if u == myId => Result.Win
+          case _ => Result.Loss
+        },
+        termination = Termination fromStatus pov.game.status,
+        ratingDiff = ~pov.player.ratingDiff,
+        analysed = analysis.isDefined,
+        provisional = provisional,
+        date = pov.game.createdAt)
   }
 }

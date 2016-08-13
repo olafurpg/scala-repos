@@ -37,7 +37,7 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
     override def zip(toDir: File): File = {
       val file = new File(toDir, LIBRARY_NAME)
       val zfs = new ZipOutputStream(
-          new BufferedOutputStream(new FileOutputStream(file)))
+        new BufferedOutputStream(new FileOutputStream(file)))
       def doZip(zipable: Zipable): Unit = {
         zipable match {
           case ZDir(zname, zfiles) =>
@@ -70,16 +70,17 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
 
   override def setUpModule(): Unit = {
     super.setUpModule()
-    scalaLibraryLoader = new ScalaLibraryLoader(
-        getProject,
-        getModule,
-        myProject.getBasePath,
-        isIncludeReflectLibrary = true,
-        javaSdk = Some(getTestProjectJdk))
+    scalaLibraryLoader = new ScalaLibraryLoader(getProject,
+                                                getModule,
+                                                myProject.getBasePath,
+                                                isIncludeReflectLibrary = true,
+                                                javaSdk =
+                                                  Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
-    addLibrary(testData(getTestName(false))
-          .zip(ScalaUtil.createTmpDir("injectorTestLib", "")))
+    addLibrary(
+      testData(getTestName(false))
+        .zip(ScalaUtil.createTmpDir("injectorTestLib", "")))
   }
 
   protected override def tearDown() {
@@ -132,9 +133,9 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
 
     ZDir("META-INF",
          Seq(
-             ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
-             ZFile("Implementation.scala", implementationClass),
-             ZFile("Foo.scala", fooClass)
+           ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
+           ZFile("Implementation.scala", implementationClass),
+           ZFile("Foo.scala", fooClass)
          ))
   }
 
@@ -146,10 +147,10 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
     assert(
-        LibraryInjectorLoader
-          .getInstance(myProject)
-          .getInjectorClasses(classOf[SyntheticMembersInjector])
-          .nonEmpty)
+      LibraryInjectorLoader
+        .getInstance(myProject)
+        .getInjectorClasses(classOf[SyntheticMembersInjector])
+        .nonEmpty)
   }
 
   override protected def scalaSdkVersion: ScalaSdkVersion =

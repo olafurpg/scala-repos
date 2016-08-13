@@ -52,12 +52,12 @@ case class Player(id: String,
   def goBerserk = copy(berserk = true)
 
   def finish(winner: Boolean) = copy(
-      isWinner = if (winner) Some(true) else None
+    isWinner = if (winner) Some(true) else None
   )
 
   def offerDraw(turn: Int) = copy(
-      isOfferingDraw = true,
-      lastDrawOffer = Some(turn)
+    isOfferingDraw = true,
+    lastDrawOffer = Some(turn)
   )
 
   def removeDrawOffer = copy(isOfferingDraw = false)
@@ -143,7 +143,7 @@ object Player {
     if (range contains v) Some(v)
     else {
       logger.warn(
-          s"Player $userId $name=$v (range: ${range.min}-${range.max})")
+        s"Player $userId $name=$v (range: ${range.min}-${range.max})")
       None
     }
 
@@ -159,23 +159,23 @@ object Player {
         id =>
           userId =>
             win =>
-              Player(id = id,
-                     color = color,
-                     aiLevel = r intO aiLevel,
-                     isWinner = win,
-                     isOfferingDraw = r boolD isOfferingDraw,
-                     isOfferingRematch = r boolD isOfferingRematch,
-                     lastDrawOffer = r intO lastDrawOffer,
-                     proposeTakebackAt = r intD proposeTakebackAt,
-                     userId = userId,
-                     rating = r intO rating flatMap ratingRange(userId),
-                     ratingDiff = r intO ratingDiff flatMap ratingDiffRange(
-                           userId),
-                     provisional = r boolD provisional,
-                     blurs = r intD blurs,
-                     holdAlert = r.getO[HoldAlert](holdAlert),
-                     berserk = r boolD berserk,
-                     name = r strO name)
+              Player(
+                id = id,
+                color = color,
+                aiLevel = r intO aiLevel,
+                isWinner = win,
+                isOfferingDraw = r boolD isOfferingDraw,
+                isOfferingRematch = r boolD isOfferingRematch,
+                lastDrawOffer = r intO lastDrawOffer,
+                proposeTakebackAt = r intD proposeTakebackAt,
+                userId = userId,
+                rating = r intO rating flatMap ratingRange(userId),
+                ratingDiff = r intO ratingDiff flatMap ratingDiffRange(userId),
+                provisional = r boolD provisional,
+                blurs = r intD blurs,
+                holdAlert = r.getO[HoldAlert](holdAlert),
+                berserk = r boolD berserk,
+                name = r strO name)
 
     def writes(w: BSON.Writer, o: Builder) =
       o(chess.White)("0000")(none)(none) |> { p =>

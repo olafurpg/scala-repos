@@ -4,7 +4,11 @@ import org.apache.parquet.filter2.predicate.FilterPredicate
 import cascading.scheme.Scheme
 import com.twitter.scalding._
 import com.twitter.scalding.parquet.HasFilterPredicate
-import com.twitter.scalding.parquet.tuple.scheme.{ParquetReadSupport, ParquetWriteSupport, TypedParquetTupleScheme}
+import com.twitter.scalding.parquet.tuple.scheme.{
+  ParquetReadSupport,
+  ParquetWriteSupport,
+  TypedParquetTupleScheme
+}
 
 /**
   * Typed parquet tuple
@@ -69,8 +73,10 @@ object TypedParquetSink {
   * Typed Parquet tuple source/sink.
   */
 trait TypedParquet[T]
-    extends FileSource with Mappable[T]
-    with TypedSink[T] with HasFilterPredicate {
+    extends FileSource
+    with Mappable[T]
+    with TypedSink[T]
+    with HasFilterPredicate {
 
   def readSupport: ParquetReadSupport[T]
   def writeSupport: ParquetWriteSupport[T]
@@ -91,4 +97,5 @@ trait TypedParquet[T]
 class TypedFixedPathParquetTuple[T](val paths: Seq[String],
                                     val readSupport: ParquetReadSupport[T],
                                     val writeSupport: ParquetWriteSupport[T])
-    extends FixedPathSource(paths: _*) with TypedParquet[T]
+    extends FixedPathSource(paths: _*)
+    with TypedParquet[T]

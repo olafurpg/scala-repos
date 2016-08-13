@@ -6,7 +6,8 @@ import com.twitter.finagle.redis.util._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 case class ZAdd(key: ChannelBuffer, members: Seq[ZMember])
-    extends StrictKeyCommand with StrictZMembersCommand {
+    extends StrictKeyCommand
+    with StrictZMembersCommand {
   def command = Commands.ZADD
   def toChannelBuffer = {
     val cmds = Seq(CommandBytes.ZADD, key)
@@ -39,12 +40,12 @@ case class ZCount(key: ChannelBuffer, min: ZInterval, max: ZInterval)
   def command = Commands.ZCOUNT
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(
-            CommandBytes.ZCOUNT,
-            key,
-            StringToChannelBuffer(min.toString),
-            StringToChannelBuffer(max.toString)
-        ))
+      Seq(
+        CommandBytes.ZCOUNT,
+        key,
+        StringToChannelBuffer(min.toString),
+        StringToChannelBuffer(max.toString)
+      ))
 }
 object ZCount {
   def apply(args: Seq[Array[Byte]]) = {
@@ -56,14 +57,15 @@ object ZCount {
 }
 
 case class ZIncrBy(key: ChannelBuffer, amount: Double, member: ChannelBuffer)
-    extends StrictKeyCommand with StrictMemberCommand {
+    extends StrictKeyCommand
+    with StrictMemberCommand {
   def command = Commands.ZINCRBY
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.ZINCRBY,
-            key,
-            StringToChannelBuffer(amount.toString),
-            member))
+      Seq(CommandBytes.ZINCRBY,
+          key,
+          StringToChannelBuffer(amount.toString),
+          member))
 }
 object ZIncrBy {
   def apply(args: Seq[Array[Byte]]) = {
@@ -172,8 +174,8 @@ case class ZRem(key: ChannelBuffer, members: Seq[ChannelBuffer])
 }
 object ZRem {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(
-        args != null && args.length > 1, "ZREM requires at least one member")
+    RequireClientProtocol(args != null && args.length > 1,
+                          "ZREM requires at least one member")
     val key = ChannelBuffers.wrappedBuffer(args(0))
     val remaining = args.drop(1).map(ChannelBuffers.wrappedBuffer(_))
     new ZRem(key, remaining)
@@ -185,14 +187,14 @@ case class ZRemRangeByRank(key: ChannelBuffer, start: Long, stop: Long)
   def command = Commands.ZREMRANGEBYRANK
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.ZREMRANGEBYRANK, key) ++ Seq(
-            StringToChannelBuffer(start.toString),
-            StringToChannelBuffer(stop.toString)))
+      Seq(CommandBytes.ZREMRANGEBYRANK, key) ++ Seq(
+        StringToChannelBuffer(start.toString),
+        StringToChannelBuffer(stop.toString)))
 }
 object ZRemRangeByRank {
   def apply(args: Seq[Array[Byte]]) = {
     val list = BytesToString.fromList(
-        trimList(args, 3, "ZREMRANGEBYRANK requires 3 arguments"))
+      trimList(args, 3, "ZREMRANGEBYRANK requires 3 arguments"))
     val key = ChannelBuffers.wrappedBuffer(args(0))
     val start = RequireClientProtocol.safe { NumberFormat.toInt(list(1)) }
     val stop = RequireClientProtocol.safe { NumberFormat.toInt(list(2)) }
@@ -205,14 +207,14 @@ case class ZRemRangeByScore(key: ChannelBuffer, min: ZInterval, max: ZInterval)
   def command = Commands.ZREMRANGEBYSCORE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.ZREMRANGEBYSCORE, key) ++ Seq(
-            StringToChannelBuffer(min.toString),
-            StringToChannelBuffer(max.toString)))
+      Seq(CommandBytes.ZREMRANGEBYSCORE, key) ++ Seq(
+        StringToChannelBuffer(min.toString),
+        StringToChannelBuffer(max.toString)))
 }
 object ZRemRangeByScore {
   def apply(args: Seq[Array[Byte]]) = {
     val list = BytesToString.fromList(
-        trimList(args, 3, "ZREMRANGEBYSCORE requires 3 arguments"))
+      trimList(args, 3, "ZREMRANGEBYSCORE requires 3 arguments"))
     val key = ChannelBuffers.wrappedBuffer(args(0))
     val min = ZInterval(list(1))
     val max = ZInterval(list(2))
@@ -283,7 +285,8 @@ object ZRevRank extends ZRankCmdCompanion {
 }
 
 case class ZScore(key: ChannelBuffer, member: ChannelBuffer)
-    extends StrictKeyCommand with StrictMemberCommand {
+    extends StrictKeyCommand
+    with StrictMemberCommand {
   def command = Commands.ZSCORE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.ZSCORE, key, member))
@@ -379,7 +382,8 @@ object ZInterval {
 }
 
 case class ZMember(score: Double, member: ChannelBuffer)
-    extends StrictScoreCommand with StrictMemberCommand {
+    extends StrictScoreCommand
+    with StrictMemberCommand {
   def command = "ZMEMBER"
   override def toChannelBuffer = member
 }
@@ -395,16 +399,16 @@ sealed trait StrictZMembersCommand extends ZMembersCommand {
   def membersByteArray: Seq[Array[Byte]] = {
     members.map { member =>
       Seq(
-          StringToBytes(member.score.toString),
-          member.member.array
+        StringToBytes(member.score.toString),
+        member.member.array
       )
     }.flatten
   }
   def membersChannelBuffers: Seq[ChannelBuffer] = {
     members.map { member =>
       Seq(
-          StringToChannelBuffer(member.score.toString),
-          member.member
+        StringToChannelBuffer(member.score.toString),
+        member.member
       )
     }.flatten
   }
@@ -413,8 +417,8 @@ sealed trait StrictZMembersCommand extends ZMembersCommand {
 object ZMembers {
   def apply(args: Seq[Array[Byte]]): Seq[ZMember] = {
     val size = args.length
-    RequireClientProtocol(
-        size % 2 == 0 && size > 0, "Unexpected uneven pair of elements")
+    RequireClientProtocol(size % 2 == 0 && size > 0,
+                          "Unexpected uneven pair of elements")
 
     args
       .grouped(2)
@@ -443,11 +447,11 @@ abstract class ZStore extends KeysCommand {
 
   override protected def validate() {
     super.validate()
-    RequireClientProtocol(
-        destination.readableBytes > 0, "destination must not be empty")
+    RequireClientProtocol(destination.readableBytes > 0,
+                          "destination must not be empty")
     RequireClientProtocol(numkeys > 0, "numkeys must be > 0")
-    RequireClientProtocol(
-        keys.size == numkeys, "must supply the same number of keys as numkeys")
+    RequireClientProtocol(keys.size == numkeys,
+                          "must supply the same number of keys as numkeys")
     // ensure if weights are specified they are equal to the size of numkeys
     weights match {
       case Some(list) =>
@@ -479,8 +483,10 @@ trait ZStoreCompanion {
   }
   def apply(dest: String, keys: Seq[String], agg: Aggregate) =
     get(dest, keys.length, keys, None, Some(agg))
-  def apply(
-      dest: String, keys: Seq[String], weights: Weights, agg: Aggregate) =
+  def apply(dest: String,
+            keys: Seq[String],
+            weights: Weights,
+            agg: Aggregate) =
     get(dest, keys.length, keys, Some(weights), Some(agg))
 
   /** get a new instance of the appropriate storage class
@@ -520,27 +526,27 @@ trait ZStoreCompanion {
         get(dest, numkeys, keys, None, None)
       case false =>
         val (args0, args1) = findArgs(args, numkeys)
-        RequireClientProtocol(
-            args0.length > 1, "Length of arguments must be > 1")
+        RequireClientProtocol(args0.length > 1,
+                              "Length of arguments must be > 1")
         val weights = findWeights(args0, args1)
         val aggregate = findAggregate(args0, args1)
         weights.foreach { w =>
-          RequireClientProtocol(
-              w.size == numkeys, "WEIGHTS length must equal keys length")
+          RequireClientProtocol(w.size == numkeys,
+                                "WEIGHTS length must equal keys length")
         }
         get(dest, numkeys, keys, weights, aggregate)
     }
   }
 
   protected def findArgs(args: Seq[String], numkeys: Int) = {
-    RequireClientProtocol(
-        args != null && !args.isEmpty, "Args list must not be empty")
+    RequireClientProtocol(args != null && !args.isEmpty,
+                          "Args list must not be empty")
     args.head.toUpperCase match {
       case Weights.WEIGHTS => args.splitAt(numkeys + 1)
       case Aggregate.AGGREGATE => args.splitAt(2)
       case s =>
         throw ClientError(
-            "AGGREGATE or WEIGHTS argument expected, found %s".format(s))
+          "AGGREGATE or WEIGHTS argument expected, found %s".format(s))
     }
   }
 
@@ -552,7 +558,7 @@ trait ZStoreCompanion {
             Weights(args1) match {
               case None =>
                 throw ClientError(
-                    "Have additional arguments but unable to process")
+                  "Have additional arguments but unable to process")
               case w => w
             }
           case false => None
@@ -568,7 +574,7 @@ trait ZStoreCompanion {
             Aggregate(args1) match {
               case None =>
                 throw ClientError(
-                    "Have additional arguments but unable to process")
+                  "Have additional arguments but unable to process")
               case agg => agg
             }
           case false => None
@@ -625,7 +631,7 @@ trait ZScoredRangeCompanion { self =>
                 tail)
     case _ =>
       throw ClientError(
-          "Expected either 3, 4 or 5 args for ZRANGEBYSCORE/ZREVRANGEBYSCORE")
+        "Expected either 3, 4 or 5 args for ZRANGEBYSCORE/ZREVRANGEBYSCORE")
   }
 
   def apply(key: ChannelBuffer,
@@ -660,8 +666,8 @@ trait ZScoredRangeCompanion { self =>
                           min: ZInterval,
                           max: ZInterval,
                           args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(
-        args != null && !args.isEmpty, "Expected arguments for command")
+    RequireClientProtocol(args != null && !args.isEmpty,
+                          "Expected arguments for command")
     val sArgs = BytesToString.fromList(args)
     val (arg0, remaining) = doParse(sArgs)
 
@@ -764,8 +770,10 @@ trait ZRangeCmdCompanion {
     }
   }
 
-  def apply(
-      key: ChannelBuffer, start: Long, stop: Long, scored: CommandArgument) =
+  def apply(key: ChannelBuffer,
+            start: Long,
+            stop: Long,
+            scored: CommandArgument) =
     scored match {
       case WithScores => get(key, start, stop, Some(scored))
       case _ => throw ClientError("Only WithScores is supported")

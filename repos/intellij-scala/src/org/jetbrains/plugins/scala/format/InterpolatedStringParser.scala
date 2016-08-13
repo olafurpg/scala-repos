@@ -5,7 +5,10 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr,
+  ScExpression
+}
 
 /**
   * Pavel Fatin
@@ -49,7 +52,7 @@ object InterpolatedStringParser extends StringParser {
                     FormatSpecifierPattern
                       .findFirstIn(textIn(e))
                       .map(format =>
-                            Specifier(Span(e, 0, format.length), format))
+                        Specifier(Span(e, 0, format.length), format))
                   case _ => None
                 }
             Injection(actualExpression, specifier)

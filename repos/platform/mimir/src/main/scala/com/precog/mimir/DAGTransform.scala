@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -26,7 +26,14 @@ import com.precog.util.IdGen
 
 trait DAGTransform extends DAG {
   import dag._
-  import instructions.{DerefObject, Eq, JoinObject, Line, PushString, WrapObject}
+  import instructions.{
+    DerefObject,
+    Eq,
+    JoinObject,
+    Line,
+    PushString,
+    WrapObject
+  }
 
   def transformBottomUp(graph: DepGraph)(f: DepGraph => DepGraph): DepGraph = {
 
@@ -78,19 +85,19 @@ trait DAGTransform extends DAG {
 
         case graph @ Join(op, joinSort, left, right) =>
           f(
-              Join(op, joinSort, transformAux(left), transformAux(right))(
-                  graph.loc))
+            Join(op, joinSort, transformAux(left), transformAux(right))(
+              graph.loc))
 
         case graph @ Assert(pred, child) =>
           f(Assert(transformAux(pred), transformAux(child))(graph.loc))
 
         case graph @ Cond(pred, left, leftJoin, right, rightJoin) =>
           f(
-              Cond(transformAux(pred),
-                   transformAux(left),
-                   leftJoin,
-                   transformAux(right),
-                   rightJoin)(graph.loc))
+            Cond(transformAux(pred),
+                 transformAux(left),
+                 leftJoin,
+                 transformAux(right),
+                 rightJoin)(graph.loc))
 
         case graph @ Observe(data, samples) =>
           f(Observe(transformAux(data), transformAux(samples))(graph.loc))
@@ -103,8 +110,8 @@ trait DAGTransform extends DAG {
 
         case graph @ Filter(cross, target, boolean) =>
           f(
-              Filter(cross, transformAux(target), transformAux(boolean))(
-                  graph.loc))
+            Filter(cross, transformAux(target), transformAux(boolean))(
+              graph.loc))
 
         case AddSortKey(parent, sortField, valueField, id) =>
           f(AddSortKey(transformAux(parent), sortField, valueField, id))
@@ -116,10 +123,10 @@ trait DAGTransform extends DAG {
           f(Distinct(transformAux(parent))(graph.loc))
 
         case s @ Split(spec, child, id) => {
-            val spec2 = transformSpec(spec)
-            val child2 = transformAux(child)
-            f(Split(spec2, child2, id)(s.loc))
-          }
+          val spec2 = transformSpec(spec)
+          val child2 = transformAux(child)
+          f(Split(spec2, child2, id)(s.loc))
+        }
 
         // not using extractors due to bug
         case s: SplitGroup =>

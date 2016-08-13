@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.imports.ScImportExprImpl
@@ -17,13 +22,13 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScImportExprStubImpl
   */
 class ScImportExprElementType[Func <: ScImportExpr]
     extends ScStubElementType[ScImportExprStub, ScImportExpr](
-        "import expression") {
+      "import expression") {
   def serialize(stub: ScImportExprStub, dataStream: StubOutputStream): Unit = {
     dataStream.writeName(
-        stub
-          .asInstanceOf[ScImportExprStubImpl[_ <: PsiElement]]
-          .referenceText
-          .toString)
+      stub
+        .asInstanceOf[ScImportExprStubImpl[_ <: PsiElement]]
+        .referenceText
+        .toString)
     dataStream.writeBoolean(stub.isSingleWildcard)
   }
 
@@ -38,8 +43,8 @@ class ScImportExprElementType[Func <: ScImportExpr]
     new ScImportExprStubImpl(parentStub, this, refText, singleW)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScImportExprStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScImportExprStub = {
     val refText: String = StringRef.toString(dataStream.readName)
     val singleW: Boolean = dataStream.readBoolean
     new ScImportExprStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],

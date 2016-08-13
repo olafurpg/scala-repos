@@ -8,10 +8,10 @@ import play.api.data._, Forms._
 object Cli extends LilaController {
 
   private lazy val form = Form(
-      tuple(
-          "command" -> nonEmptyText,
-          "password" -> nonEmptyText
-      ))
+    tuple(
+      "command" -> nonEmptyText,
+      "password" -> nonEmptyText
+    ))
 
   def command = OpenBody { implicit ctx =>
     implicit val req = ctx.body
@@ -26,7 +26,8 @@ object Cli extends LilaController {
   }
 
   private def CliAuth(password: String)(op: => Fu[Result]): Fu[Result] =
-    lila.user.UserRepo.checkPasswordById(Env.api.CliUsername, password) flatMap {
+    lila.user.UserRepo
+      .checkPasswordById(Env.api.CliUsername, password) flatMap {
       _.fold(op, fuccess(Unauthorized))
     }
 }

@@ -22,14 +22,16 @@ trait AsyncCallbackPromise[T] extends Promise[T] {
 }
 
 class StringCallbackPromise
-    extends AsyncCallbackPromise[String] with AsyncCallback.StringCallback {
+    extends AsyncCallbackPromise[String]
+    with AsyncCallback.StringCallback {
   def processResult(rc: Int, path: String, ctx: AnyRef, name: String) {
     process(rc, path) { name }
   }
 }
 
 class UnitCallbackPromise
-    extends AsyncCallbackPromise[Unit] with AsyncCallback.VoidCallback {
+    extends AsyncCallbackPromise[Unit]
+    with AsyncCallback.VoidCallback {
   def processResult(rc: Int, path: String, ctx: AnyRef) {
     process(rc, path) { Unit }
   }
@@ -60,9 +62,13 @@ class ChildrenCallbackPromise(znode: ZNode)
 }
 
 class DataCallbackPromise(znode: ZNode)
-    extends AsyncCallbackPromise[ZNode.Data] with AsyncCallback.DataCallback {
-  def processResult(
-      rc: Int, path: String, ctx: AnyRef, bytes: Array[Byte], stat: Stat) {
+    extends AsyncCallbackPromise[ZNode.Data]
+    with AsyncCallback.DataCallback {
+  def processResult(rc: Int,
+                    path: String,
+                    ctx: AnyRef,
+                    bytes: Array[Byte],
+                    stat: Stat) {
     process(rc, path) {
       znode(stat, bytes)
     }

@@ -6,15 +6,24 @@ import java.net.URL
 import com.intellij.openapi.module.{Module, ModuleManager, ModuleUtilCore}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots._
-import com.intellij.openapi.roots.impl.libraries.{LibraryEx, ProjectLibraryTable}
+import com.intellij.openapi.roots.impl.libraries.{
+  LibraryEx,
+  ProjectLibraryTable
+}
 import com.intellij.openapi.roots.libraries.Library
-import com.intellij.openapi.roots.ui.configuration.libraryEditor.{ExistingLibraryEditor, NewLibraryEditor}
+import com.intellij.openapi.roots.ui.configuration.libraryEditor.{
+  ExistingLibraryEditor,
+  NewLibraryEditor
+}
 import com.intellij.openapi.vfs.{VfsUtil, VfsUtilCore}
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.CommonProcessors.CollectProcessor
 import com.intellij.util.Processor
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.project.settings.{ScalaCompilerConfiguration, ScalaCompilerSettings}
+import org.jetbrains.plugins.scala.project.settings.{
+  ScalaCompilerConfiguration,
+  ScalaCompilerSettings
+}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -81,8 +90,7 @@ package object project {
         .librariesOnly()
         .exportedOnly()
 
-      enumerator.forEachLibrary(
-          new Processor[Library] {
+      enumerator.forEachLibrary(new Processor[Library] {
         override def process(library: Library) = {
           if (library.isScalaSdk) {
             result = Some(new ScalaSdk(library))
@@ -139,8 +147,8 @@ package object project {
     def scalaCompilerSettings: ScalaCompilerSettings =
       compilerConfiguration.getSettingsForModule(module)
 
-    def configureScalaCompilerSettingsFrom(
-        source: String, options: Seq[String]) {
+    def configureScalaCompilerSettingsFrom(source: String,
+                                           options: Seq[String]) {
       compilerConfiguration.configureSettingsForModule(module, source, options)
     }
 
@@ -189,7 +197,7 @@ package object project {
 
       def addRoots(files: Seq[File], rootType: OrderRootType) {
         files.foreach(file =>
-              editor.addRoot(VfsUtil.findFileByIoFile(file, false), rootType))
+          editor.addRoot(VfsUtil.findFileByIoFile(file, false), rootType))
       }
 
       addRoots(classes, OrderRootType.CLASSES)
@@ -218,7 +226,7 @@ package object project {
   class ScalaModule(val module: Module) {
     def sdk: ScalaSdk = module.scalaSdk.map(new ScalaSdk(_)).getOrElse {
       throw new IllegalStateException(
-          "Module has no Scala SDK: " + module.getName)
+        "Module has no Scala SDK: " + module.getName)
     }
   }
 
@@ -230,7 +238,7 @@ package object project {
     private def properties: ScalaLibraryProperties =
       library.scalaProperties.getOrElse {
         throw new IllegalStateException(
-            "Library is not Scala SDK: " + library.getName)
+          "Library is not Scala SDK: " + library.getName)
       }
 
     def compilerVersion: Option[String] =
@@ -248,7 +256,7 @@ package object project {
 
     def documentationUrlFor(version: Option[Version]): String =
       "http://www.scala-lang.org/api/" +
-      version.map(_.number).getOrElse("current") + "/"
+        version.map(_.number).getOrElse("current") + "/"
   }
 
   implicit class ProjectPsiElementExt(element: PsiElement) {

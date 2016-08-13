@@ -35,10 +35,11 @@ private[akka] class OutputStreamSubscriber(
     completionPromise: Promise[IOResult],
     bufSize: Int,
     autoFlush: Boolean)
-    extends akka.stream.actor.ActorSubscriber with ActorLogging {
+    extends akka.stream.actor.ActorSubscriber
+    with ActorLogging {
 
   override protected val requestStrategy = WatermarkRequestStrategy(
-      highWatermark = bufSize)
+    highWatermark = bufSize)
 
   private var bytesWritten: Long = 0
 
@@ -57,9 +58,9 @@ private[akka] class OutputStreamSubscriber(
 
     case ActorSubscriberMessage.OnError(ex) ⇒
       log.error(
-          ex,
-          "Tearing down OutputStreamSink due to upstream error, wrote bytes: {}",
-          bytesWritten)
+        ex,
+        "Tearing down OutputStreamSink due to upstream error, wrote bytes: {}",
+        bytesWritten)
       completionPromise.success(IOResult(bytesWritten, Failure(ex)))
       context.stop(self)
 

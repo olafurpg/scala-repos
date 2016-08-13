@@ -1,7 +1,13 @@
 package com.twitter.finagle.client
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.{param, ServiceFactory, Stack, Stackable, StackBuilder}
+import com.twitter.finagle.{
+  param,
+  ServiceFactory,
+  Stack,
+  Stackable,
+  StackBuilder
+}
 import com.twitter.finagle.pool.{WatermarkPool, CachingPool, BufferingPool}
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.DefaultTimer
@@ -59,7 +65,11 @@ object DefaultPool {
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module[ServiceFactory[Req, Rep]] {
-      import com.twitter.finagle.pool.{CachingPool, WatermarkPool, BufferingPool}
+      import com.twitter.finagle.pool.{
+        CachingPool,
+        WatermarkPool,
+        BufferingPool
+      }
       val role = DefaultPool.Role
       val description = "Control client connection pool"
       val parameters = Seq(implicitly[Stack.Param[Param]],
@@ -73,16 +83,16 @@ object DefaultPool {
         val stack = new StackBuilder[ServiceFactory[Req, Rep]](next)
 
         if (idleTime > 0.seconds && high > low) {
-          stack.push(Role.cachingPool,
-                     (sf: ServiceFactory[Req, Rep]) =>
-                       new CachingPool(
-                           sf, high - low, idleTime, timer, statsReceiver))
+          stack.push(
+            Role.cachingPool,
+            (sf: ServiceFactory[Req, Rep]) =>
+              new CachingPool(sf, high - low, idleTime, timer, statsReceiver))
         }
 
         stack.push(
-            Role.watermarkPool,
-            (sf: ServiceFactory[Req, Rep]) =>
-              new WatermarkPool(sf, low, high, statsReceiver, maxWaiters))
+          Role.watermarkPool,
+          (sf: ServiceFactory[Req, Rep]) =>
+            new WatermarkPool(sf, low, high, statsReceiver, maxWaiters))
 
         if (bufferSize > 0) {
           stack.push(Role.bufferingPool,
@@ -124,22 +134,23 @@ case class DefaultPool[Req, Rep](
     idleTime: Duration = Duration.Top,
     maxWaiters: Int = Int.MaxValue,
     timer: Timer = DefaultTimer.twitter
-)
-    extends (StatsReceiver => Transformer[Req, Rep]) {
+) extends (StatsReceiver => Transformer[Req, Rep]) {
   def apply(statsReceiver: StatsReceiver) =
-    inputFactory =>
-      {
-        val factory =
-          if (idleTime <= 0.seconds || high <= low) inputFactory
-          else
-            new CachingPool(
-                inputFactory, high - low, idleTime, timer, statsReceiver)
+    inputFactory => {
+      val factory =
+        if (idleTime <= 0.seconds || high <= low) inputFactory
+        else
+          new CachingPool(inputFactory,
+                          high - low,
+                          idleTime,
+                          timer,
+                          statsReceiver)
 
-        // NB: WatermarkPool conceals the first "low" closes from CachingPool, so that
-        // CachingPool only caches the last "high - low", and WatermarkPool caches the first
-        // "low".
-        val pool = new WatermarkPool(
-            factory, low, high, statsReceiver, maxWaiters)
-        if (bufferSize <= 0) pool else new BufferingPool(pool, bufferSize)
+      // NB: WatermarkPool conceals the first "low" closes from CachingPool, so that
+      // CachingPool only caches the last "high - low", and WatermarkPool caches the first
+      // "low".
+      val pool =
+        new WatermarkPool(factory, low, high, statsReceiver, maxWaiters)
+      if (bufferSize <= 0) pool else new BufferingPool(pool, bufferSize)
     }
 }

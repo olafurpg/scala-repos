@@ -7,8 +7,8 @@ import scala.util.matching.Regex
 
 object format
     extends GlobalFlag[String](
-        "commonsmetrics",
-        "Format style for metric names (ostrich|commonsmetrics|commonsstats)"
+      "commonsmetrics",
+      "Format style for metric names (ostrich|commonsmetrics|commonsstats)"
     ) {
   private[stats] val Ostrich = "ostrich"
   private[stats] val CommonsMetrics = "commonsmetrics"

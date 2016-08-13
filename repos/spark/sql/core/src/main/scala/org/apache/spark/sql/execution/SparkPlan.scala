@@ -17,7 +17,12 @@
 
 package org.apache.spark.sql.execution
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +47,9 @@ import org.apache.spark.util.ThreadUtils
   * The base class for physical operators.
   */
 abstract class SparkPlan
-    extends QueryPlan[SparkPlan] with Logging with Serializable {
+    extends QueryPlan[SparkPlan]
+    with Logging
+    with Serializable {
 
   /**
     * A handle to the SQL Context that was used to create this plan.   Since many operators need
@@ -176,12 +183,12 @@ abstract class SparkPlan
         val rows = Await.result(futureResult, Duration.Inf)
         if (rows.length > 1) {
           sys.error(
-              s"more than one row returned by a subquery used as an expression:\n${e.plan}")
+            s"more than one row returned by a subquery used as an expression:\n${e.plan}")
         }
         if (rows.length == 1) {
           assert(
-              rows(0).numFields == 1,
-              s"Expects 1 field, but got ${rows(0).numFields}; something went wrong in analysis")
+            rows(0).numFields == 1,
+            s"Expects 1 field, but got ${rows(0).numFields}; something went wrong in analysis")
           e.updateResult(rows(0).get(0, e.dataType))
         } else {
           // If there is no rows returned, the result should be null.
@@ -224,7 +231,7 @@ abstract class SparkPlan
     */
   protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
     throw new UnsupportedOperationException(
-        s"$nodeName does not implement doExecuteBroadcast")
+      s"$nodeName does not implement doExecuteBroadcast")
   }
 
   /**
@@ -258,8 +265,8 @@ abstract class SparkPlan
   /**
     * Decode the byte arrays back to UnsafeRows and put them into buffer.
     */
-  private def decodeUnsafeRows(
-      bytes: Array[Byte], buffer: ArrayBuffer[InternalRow]): Unit = {
+  private def decodeUnsafeRows(bytes: Array[Byte],
+                               buffer: ArrayBuffer[InternalRow]): Unit = {
     val nFields = schema.length
 
     val codec = CompressionCodec.createCodec(SparkEnv.get.conf)
@@ -330,7 +337,7 @@ abstract class SparkPlan
 
       val left = n - buf.size
       val p = partsScanned.until(
-          math.min(partsScanned + numPartsToTry, totalParts).toInt)
+        math.min(partsScanned + numPartsToTry, totalParts).toInt)
       val sc = sqlContext.sparkContext
       val res = sc.runJob(childRDD,
                           (it: Iterator[Array[Byte]]) =>
@@ -358,8 +365,8 @@ abstract class SparkPlan
       inputSchema: Seq[Attribute],
       useSubexprElimination: Boolean = false): () => MutableProjection = {
     log.debug(s"Creating MutableProj: $expressions, inputSchema: $inputSchema")
-    GenerateMutableProjection.generate(
-        expressions, inputSchema, useSubexprElimination)
+    GenerateMutableProjection
+      .generate(expressions, inputSchema, useSubexprElimination)
   }
 
   protected def newPredicate(
@@ -390,7 +397,7 @@ abstract class SparkPlan
 object SparkPlan {
   private[execution] val subqueryExecutionContext =
     ExecutionContext.fromExecutorService(
-        ThreadUtils.newDaemonCachedThreadPool("subquery", 16))
+      ThreadUtils.newDaemonCachedThreadPool("subquery", 16))
 }
 
 private[sql] trait LeafNode extends SparkPlan {

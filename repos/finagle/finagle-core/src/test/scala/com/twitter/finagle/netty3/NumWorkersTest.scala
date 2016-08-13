@@ -8,7 +8,8 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class NumWorkersTest extends FunSpec {
   describe("numWorkers") {
-    it("should have 2 * the number of available processors according to the runtime by default") {
+    it(
+      "should have 2 * the number of available processors according to the runtime by default") {
       assert(System.getProperty("com.twitter.jvm.numProcs") == null)
       assert(numWorkers() == Runtime.getRuntime().availableProcessors() * 2)
     }

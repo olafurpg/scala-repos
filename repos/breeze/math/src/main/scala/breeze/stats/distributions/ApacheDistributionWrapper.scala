@@ -17,10 +17,16 @@ package distributions
  limitations under the License.
  */
 
-import org.apache.commons.math3.distribution.{AbstractIntegerDistribution => ApacheIntegerDistribution, AbstractRealDistribution => ApacheRealDistribution, FDistribution => ApacheFDistribution}
+import org.apache.commons.math3.distribution.{
+  AbstractIntegerDistribution => ApacheIntegerDistribution,
+  AbstractRealDistribution => ApacheRealDistribution,
+  FDistribution => ApacheFDistribution
+}
 
 trait ApacheContinuousDistribution
-    extends ContinuousDistr[Double] with HasCdf with HasInverseCdf {
+    extends ContinuousDistr[Double]
+    with HasCdf
+    with HasInverseCdf {
   protected val inner: ApacheRealDistribution
 
   def unnormalizedLogPdf(x: Double) = math.log(inner.density(x))

@@ -36,8 +36,12 @@ import BitSetLike.{LogWL, MaxSize}
   */
 @SerialVersionUID(8483111450368547763L)
 class BitSet(protected final var elems: Array[Long])
-    extends AbstractSet[Int] with SortedSet[Int] with scala.collection.BitSet
-    with BitSetLike[BitSet] with SetLike[Int, BitSet] with Serializable {
+    extends AbstractSet[Int]
+    with SortedSet[Int]
+    with scala.collection.BitSet
+    with BitSetLike[BitSet]
+    with SetLike[Int, BitSet]
+    with Serializable {
 
   override def empty = BitSet.empty
 
@@ -50,13 +54,13 @@ class BitSet(protected final var elems: Array[Long])
   def this() = this(0)
 
   @deprecatedOverriding(
-      "Internal implementation does not admit sensible overriding of this method.",
-      "2.11.0")
+    "Internal implementation does not admit sensible overriding of this method.",
+    "2.11.0")
   protected def nwords = elems.length
 
   @deprecatedOverriding(
-      "Internal implementation does not admit sensible overriding of this method.",
-      "2.11.0")
+    "Internal implementation does not admit sensible overriding of this method.",
+    "2.11.0")
   protected def word(idx: Int): Long =
     if (idx < nwords) elems(idx) else 0L
 
@@ -99,13 +103,13 @@ class BitSet(protected final var elems: Array[Long])
   }
 
   @deprecatedOverriding(
-      "Override add to prevent += and add from exhibiting different behavior.",
-      "2.11.0")
+    "Override add to prevent += and add from exhibiting different behavior.",
+    "2.11.0")
   def +=(elem: Int): this.type = { add(elem); this }
 
   @deprecatedOverriding(
-      "Override add to prevent += and add from exhibiting different behavior.",
-      "2.11.0")
+    "Override add to prevent += and add from exhibiting different behavior.",
+    "2.11.0")
   def -=(elem: Int): this.type = { remove(elem); this }
 
   /** Updates this bitset to the union with another bitset by performing a bitwise "or".
@@ -166,10 +170,10 @@ class BitSet(protected final var elems: Array[Long])
     *  @return an immutable set containing all the elements of this set.
     */
   @deprecated(
-      "If this BitSet contains a value that is 128 or greater, the result of this method is an 'immutable' " +
+    "If this BitSet contains a value that is 128 or greater, the result of this method is an 'immutable' " +
       "BitSet that shares state with this mutable BitSet. Thus, if the mutable BitSet is modified, it will violate the " +
       "immutability of the result.",
-      "2.11.6")
+    "2.11.6")
   def toImmutable = immutable.BitSet.fromBitMaskNoCopy(elems)
 
   override def clone(): BitSet = {

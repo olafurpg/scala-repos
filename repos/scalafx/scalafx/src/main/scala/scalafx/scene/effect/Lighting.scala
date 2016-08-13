@@ -39,7 +39,8 @@ object Lighting {
 }
 
 class Lighting(override val delegate: jfxse.Lighting = new jfxse.Lighting)
-    extends Effect(delegate) with SFXDelegate[jfxse.Lighting] {
+    extends Effect(delegate)
+    with SFXDelegate[jfxse.Lighting] {
 
   /**
     * Creates a new instance of Lighting with the specified light.

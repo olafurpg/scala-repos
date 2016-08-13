@@ -10,12 +10,13 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
 class ScTuplePatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTuplePattern {
+    extends ScalaPsiElementImpl(node)
+    with ScTuplePattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

@@ -2,7 +2,11 @@ package com.twitter.concurrent
 
 import com.twitter.conversions.time._
 import com.twitter.util._
-import java.util.concurrent.{ArrayBlockingQueue, CancellationException, RejectedExecutionException}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  CancellationException,
+  RejectedExecutionException
+}
 import scala.annotation.tailrec
 
 // implicitly a rate of 1 token / `interval`
@@ -112,15 +116,15 @@ object AsyncMeter {
   * }
   * }}}
   */
-class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
-                                     burstDuration: Duration,
-                                     maxWaiters: Int)(implicit timer: Timer) {
+class AsyncMeter private[concurrent] (private[concurrent] val burstSize: Int,
+                                      burstDuration: Duration,
+                                      maxWaiters: Int)(implicit timer: Timer) {
 
   require(burstSize > 0,
           s"burst size of $burstSize, which is <= 0 doesn't make sense")
   require(
-      burstDuration > Duration.Zero,
-      s"burst duration of $burstDuration, which is <= 0 nanoseconds doesn't make sense")
+    burstDuration > Duration.Zero,
+    s"burst duration of $burstDuration, which is <= 0 nanoseconds doesn't make sense")
   require(maxWaiters > 0,
           s"max waiters of $maxWaiters, which is <= 0 doesn't make sense")
 
@@ -182,7 +186,7 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
   def await(permits: Int): Future[Unit] = {
     if (permits > burstSize)
       return Future.exception(new IllegalArgumentException(
-              s"Tried to await on $permits permits, but the maximum burst size was $burstSize"))
+        s"Tried to await on $permits permits, but the maximum burst size was $burstSize"))
 
     // don't jump the queue-this is racy, but the race here is indistinguishable
     // from the synchronized behavior
@@ -212,7 +216,7 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
       p
     } else {
       Future.exception(new RejectedExecutionException(
-              "Tried to wait when there were already the maximum number of waiters."))
+        "Tried to wait when there were already the maximum number of waiters."))
     }
   }
 
@@ -224,8 +228,7 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
   // we refresh the bucket with as many tokens as we have accrued since we last
   // refreshed.
   private[this] def refreshTokens(): Unit =
-    bucket.put(
-        synchronized {
+    bucket.put(synchronized {
       val newTokens = period.numPeriods(elapsed())
       elapsed = Stopwatch.start()
       val num = newTokens + remainder

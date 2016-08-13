@@ -1,6 +1,11 @@
 package com.twitter.finagle.util
 
-import java.net.{InetAddress, InetSocketAddress, SocketAddress, UnknownHostException}
+import java.net.{
+  InetAddress,
+  InetSocketAddress,
+  SocketAddress,
+  UnknownHostException
+}
 
 object InetSocketAddressUtil {
 
@@ -14,7 +19,8 @@ object InetSocketAddressUtil {
   def toPublic(bound: SocketAddress): SocketAddress = {
     bound match {
       case addr: InetSocketAddress if addr.getAddress().isAnyLocalAddress() =>
-        val host = try InetAddress.getLocalHost() catch {
+        val host = try InetAddress.getLocalHost()
+        catch {
           case _: UnknownHostException => InetAddress.getLoopbackAddress
         }
         new InetSocketAddress(host, addr.getPort())
@@ -41,7 +47,7 @@ object InetSocketAddressUtil {
           case Array(host, portStr) => (host, portStr.toInt)
           case _ =>
             throw new IllegalArgumentException(
-                "Malformed host/port specification: " + hosts)
+              "Malformed host/port specification: " + hosts)
         }
     }
 
@@ -61,8 +67,8 @@ object InetSocketAddressUtil {
     hostPorts map {
       case (host, port) =>
         (InetAddress.getAllByName(host) map { addr =>
-              new InetSocketAddress(addr, port)
-            }).toSeq
+          new InetSocketAddress(addr, port)
+        }).toSeq
     }
 
   /**
@@ -79,9 +85,9 @@ object InetSocketAddressUtil {
     if (hosts == ":*") return Seq(new InetSocketAddress(0))
 
     (parseHostPorts(hosts) map {
-          case (host, port) =>
-            if (host == "") new InetSocketAddress(port)
-            else new InetSocketAddress(host, port)
-        }).toList
+      case (host, port) =>
+        if (host == "") new InetSocketAddress(port)
+        else new InetSocketAddress(host, port)
+    }).toList
   }
 }

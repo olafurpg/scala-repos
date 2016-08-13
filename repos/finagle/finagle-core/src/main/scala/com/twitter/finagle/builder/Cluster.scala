@@ -82,7 +82,7 @@ trait Cluster[T] { self =>
                       Logger
                         .getLogger("")
                         .warning(
-                            "cluster does not have removed key, regenerating")
+                          "cluster does not have removed key, regenerating")
                       Cluster.Rem(f(t))
                   }
               }

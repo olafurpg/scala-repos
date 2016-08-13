@@ -32,7 +32,7 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
   def render(request: HttpServletRequest): Seq[Node] = {
     val content =
       rddTable(listener.rddInfoList) ++ receiverBlockTables(
-          listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
+        listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
     UIUtils.headerSparkPage("Storage", content, parent)
   }
 
@@ -148,11 +148,8 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     }
   }
 
-  private val streamBlockTableHeader = Seq("Block ID",
-                                           "Replication Level",
-                                           "Location",
-                                           "Storage Level",
-                                           "Size")
+  private val streamBlockTableHeader =
+    Seq("Block ID", "Replication Level", "Location", "Storage Level", "Size")
 
   /** Render a stream block */
   private def streamBlockTableRow(
@@ -160,14 +157,16 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     val replications = block._2
     assert(replications.size > 0) // This must be true because it's the result of "groupBy"
     if (replications.size == 1) {
-      streamBlockTableSubrow(
-          block._1, replications.head, replications.size, true)
+      streamBlockTableSubrow(block._1,
+                             replications.head,
+                             replications.size,
+                             true)
     } else {
       streamBlockTableSubrow(block._1,
                              replications.head,
                              replications.size,
                              true) ++ replications.tail.flatMap(
-          streamBlockTableSubrow(block._1, _, replications.size, false))
+        streamBlockTableSubrow(block._1, _, replications.size, false))
     }
   }
 
@@ -206,7 +205,7 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
       ("Memory Serialized", block.memSize)
     } else {
       throw new IllegalStateException(
-          s"Invalid Storage Level: ${block.storageLevel}")
+        s"Invalid Storage Level: ${block.storageLevel}")
     }
   }
 }

@@ -19,7 +19,7 @@ import scala.compat.java8.OptionConverters
 /**
   * Public API but not intended for subclassing
   */
-abstract class ParserSettings private[akka]()
+abstract class ParserSettings private[akka] ()
     extends akka.http.javadsl.settings.ParserSettings {
   self: ParserSettingsImpl ⇒
   def maxUriLength: Int
@@ -146,7 +146,7 @@ object ParserSettings extends SettingsCompanion[ParserSettings] {
         case "full" ⇒ Full
         case x ⇒
           throw new IllegalArgumentException(
-              s"[$x] is not a legal `error-logging-verbosity` setting")
+            s"[$x] is not a legal `error-logging-verbosity` setting")
       }
   }
 

@@ -66,13 +66,14 @@ private[akka] class GroupByProcessorImpl(settings: ActorMaterializerSettings,
   }
 
   private def tryKeyFor(elem: Any): Any =
-    try keyFor(elem) catch {
+    try keyFor(elem)
+    catch {
       case NonFatal(e) if decider(e) != Supervision.Stop ⇒
         if (settings.debugLogging)
           log.debug(
-              "Dropped element [{}] due to exception from groupBy function: {}",
-              elem,
-              e.getMessage)
+            "Dropped element [{}] due to exception from groupBy function: {}",
+            elem,
+            e.getMessage)
         Drop
     }
 
@@ -84,7 +85,7 @@ private[akka] class GroupByProcessorImpl(settings: ActorMaterializerSettings,
       } else {
         if (keyToSubstreamOutput.size == maxSubstreams)
           throw new IllegalStateException(
-              s"cannot open substream for key '$key': too many substreams open")
+            s"cannot open substream for key '$key': too many substreams open")
         val substreamOutput = createSubstreamOutput()
         val substreamFlow = Source.fromPublisher[Any](substreamOutput)
         primaryOutputs.enqueueOutputElement(substreamFlow)
@@ -93,8 +94,8 @@ private[akka] class GroupByProcessorImpl(settings: ActorMaterializerSettings,
       }
     }
 
-  def dispatchToSubstream(
-      elem: Any, substream: SubstreamOutput): TransferPhase = {
+  def dispatchToSubstream(elem: Any,
+                          substream: SubstreamOutput): TransferPhase = {
     pendingSubstreamOutput = substream
     TransferPhase(substream.NeedsDemand) { () ⇒
       substream.enqueueOutputElement(elem)

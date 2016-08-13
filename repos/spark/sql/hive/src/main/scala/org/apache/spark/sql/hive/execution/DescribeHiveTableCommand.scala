@@ -25,7 +25,10 @@ import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import org.apache.spark.sql.execution.command.{DescribeCommand, RunnableCommand}
+import org.apache.spark.sql.execution.command.{
+  DescribeCommand,
+  RunnableCommand
+}
 import org.apache.spark.sql.hive.MetastoreRelation
 
 /**
@@ -51,23 +54,21 @@ private[hive] case class DescribeHiveTableCommand(
         val columns: Seq[FieldSchema] = table.hiveQlTable.getCols.asScala
         val partitionColumns: Seq[FieldSchema] =
           table.hiveQlTable.getPartCols.asScala
-        results ++= columns.map(
-            field => (field.getName, field.getType, field.getComment))
+        results ++= columns.map(field =>
+          (field.getName, field.getType, field.getComment))
         if (partitionColumns.nonEmpty) {
-          val partColumnInfo = partitionColumns.map(
-              field => (field.getName, field.getType, field.getComment))
+          val partColumnInfo = partitionColumns.map(field =>
+            (field.getName, field.getType, field.getComment))
           results ++=
-            partColumnInfo ++ Seq(("# Partition Information", "", "")) ++ Seq((
-                  s"# ${output(0).name}",
-                  output(1).name,
-                  output(2).name)) ++ partColumnInfo
+            partColumnInfo ++ Seq(("# Partition Information", "", "")) ++ Seq(
+              (s"# ${output(0).name}", output(1).name, output(2).name)) ++ partColumnInfo
         }
 
         if (isExtended) {
           results ++= Seq(
-              ("Detailed Table Information",
-               table.hiveQlTable.getTTable.toString,
-               ""))
+            ("Detailed Table Information",
+             table.hiveQlTable.getTTable.toString,
+             ""))
         }
 
         results.map {

@@ -30,8 +30,7 @@ private[spark] class CartesianPartition(
     @transient private val rdd2: RDD[_],
     s1Index: Int,
     s2Index: Int
-)
-    extends Partition {
+) extends Partition {
   var s1 = rdd1.partitions(s1Index)
   var s2 = rdd2.partitions(s2Index)
   override val index: Int = idx
@@ -46,9 +45,11 @@ private[spark] class CartesianPartition(
     }
 }
 
-private[spark] class CartesianRDD[T : ClassTag, U : ClassTag](
-    sc: SparkContext, var rdd1: RDD[T], var rdd2: RDD[U])
-    extends RDD[(T, U)](sc, Nil) with Serializable {
+private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](sc: SparkContext,
+                                                            var rdd1: RDD[T],
+                                                            var rdd2: RDD[U])
+    extends RDD[(T, U)](sc, Nil)
+    with Serializable {
 
   val numPartitionsInRdd2 = rdd2.partitions.length
 
@@ -66,23 +67,23 @@ private[spark] class CartesianRDD[T : ClassTag, U : ClassTag](
   override def getPreferredLocations(split: Partition): Seq[String] = {
     val currSplit = split.asInstanceOf[CartesianPartition]
     (rdd1.preferredLocations(currSplit.s1) ++ rdd2.preferredLocations(
-            currSplit.s2)).distinct
+      currSplit.s2)).distinct
   }
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[(T, U)] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[(T, U)] = {
     val currSplit = split.asInstanceOf[CartesianPartition]
     for (x <- rdd1.iterator(currSplit.s1, context);
-    y <- rdd2.iterator(currSplit.s2, context)) yield (x, y)
+         y <- rdd2.iterator(currSplit.s2, context)) yield (x, y)
   }
 
   override def getDependencies: Seq[Dependency[_]] = List(
-      new NarrowDependency(rdd1) {
-        def getParents(id: Int): Seq[Int] = List(id / numPartitionsInRdd2)
-      },
-      new NarrowDependency(rdd2) {
-        def getParents(id: Int): Seq[Int] = List(id % numPartitionsInRdd2)
-      }
+    new NarrowDependency(rdd1) {
+      def getParents(id: Int): Seq[Int] = List(id / numPartitionsInRdd2)
+    },
+    new NarrowDependency(rdd2) {
+      def getParents(id: Int): Seq[Int] = List(id % numPartitionsInRdd2)
+    }
   )
 
   override def clearDependencies() {

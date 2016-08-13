@@ -11,7 +11,7 @@ import com.intellij.openapi.module.Module
   */
 object EvaluatorCompileHelper {
   val EP_NAME = ExtensionPointName.create[EvaluatorCompileHelper](
-      "org.intellij.scala.evaluatorCompileHelper")
+    "org.intellij.scala.evaluatorCompileHelper")
 
   def needCompileServer = EP_NAME.getExtensions.isEmpty
 }

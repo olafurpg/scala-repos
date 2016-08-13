@@ -1,7 +1,7 @@
 package scalaz
 
 /** A singly-linked list that is guaranteed to be non-empty. */
-final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
+final class NonEmptyList[A] private[scalaz] (val head: A, val tail: IList[A]) {
   import NonEmptyList._
   import Zipper._
   import scalaz.Liskov._
@@ -160,14 +160,14 @@ object NonEmptyList extends NonEmptyListInstances {
 }
 
 sealed abstract class NonEmptyListInstances0 {
-  implicit def nonEmptyListEqual[A : Equal]: Equal[NonEmptyList[A]] =
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] =
     Equal.equalBy[NonEmptyList[A], IList[A]](_.list)(IList.equal[A])
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[
-      NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[
-      NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
+    NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[
+    NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList]
     with BindRec[NonEmptyList] with Plus[NonEmptyList]
     with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList]
@@ -195,8 +195,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       }
 
       // would otherwise use traverse1Impl
-      override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(
-          f: (B, A) => B): B =
+      override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B,
+                                                                 A) => B): B =
         fa.tail.foldLeft(f(z, fa.head))(f)
 
       def bind[A, B](fa: NonEmptyList[A])(
@@ -220,10 +220,9 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
       def alignWith[A, B, C](f: A \&/ B => C) =
-        (a, b) =>
-          {
-            NonEmptyList.nel(f(\&/.Both(a.head, b.head)),
-                             Align[IList].alignWith(f)(a.tail, b.tail))
+        (a, b) => {
+          NonEmptyList.nel(f(\&/.Both(a.head, b.head)),
+                           Align[IList].alignWith(f)(a.tail, b.tail))
         }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
@@ -249,9 +248,9 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
     }
 
-  implicit def nonEmptyListShow[A : Show]: Show[NonEmptyList[A]] =
+  implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     Contravariant[Show].contramap(IList.show[A])(_.list)
 
-  implicit def nonEmptyListOrder[A : Order]: Order[NonEmptyList[A]] =
+  implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
 }

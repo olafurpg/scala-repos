@@ -117,7 +117,7 @@ class ModeledCustomHeaderSpec extends RoutingSpec {
       }
 
       ex.getMessage should ===(
-          "Unable to construct custom header by parsing: 'Hello world'")
+        "Unable to construct custom header by parsing: 'Hello world'")
       ex.getCause.getMessage should include("whitespace")
     }
   }

@@ -41,11 +41,11 @@ class OffsetFetchRequest(groupId: String,
       requestInfo: mutable.Buffer[TopicAndPartition]
     }
     kafka.api.OffsetFetchRequest(
-        groupId = groupId,
-        requestInfo = scalaSeq,
-        versionId = versionId,
-        correlationId = correlationId,
-        clientId = clientId
+      groupId = groupId,
+      requestInfo = scalaSeq,
+      versionId = versionId,
+      correlationId = correlationId,
+      clientId = clientId
     )
   }
 

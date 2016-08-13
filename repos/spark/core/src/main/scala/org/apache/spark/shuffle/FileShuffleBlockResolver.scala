@@ -24,7 +24,10 @@ import scala.collection.JavaConverters._
 import org.apache.spark.{SparkConf, SparkEnv}
 import org.apache.spark.executor.ShuffleWriteMetrics
 import org.apache.spark.internal.Logging
-import org.apache.spark.network.buffer.{FileSegmentManagedBuffer, ManagedBuffer}
+import org.apache.spark.network.buffer.{
+  FileSegmentManagedBuffer,
+  ManagedBuffer
+}
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.serializer.Serializer
 import org.apache.spark.storage._
@@ -45,7 +48,8 @@ private[spark] trait ShuffleWriterGroup {
 // Note: Changes to the format in this file should be kept in sync with
 // org.apache.spark.network.shuffle.ExternalShuffleBlockResolver#getHashBasedShuffleBlockData().
 private[spark] class FileShuffleBlockResolver(conf: SparkConf)
-    extends ShuffleBlockResolver with Logging {
+    extends ShuffleBlockResolver
+    with Logging {
 
   private val transportConf = SparkTransportConf.fromSparkConf(conf, "shuffle")
 
@@ -91,8 +95,11 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
           val blockId = ShuffleBlockId(shuffleId, mapId, bucketId)
           val blockFile = blockManager.diskBlockManager.getFile(blockId)
           val tmp = Utils.tempFileWith(blockFile)
-          blockManager.getDiskWriter(
-              blockId, tmp, serializerInstance, bufferSize, writeMetrics)
+          blockManager.getDiskWriter(blockId,
+                                     tmp,
+                                     serializerInstance,
+                                     bufferSize,
+                                     writeMetrics)
         }
       }
       // Creating the file to write to and creating a disk writer both involve interacting with
@@ -124,7 +131,7 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
     Option(shuffleStates.get(shuffleId)) match {
       case Some(state) =>
         for (mapId <- state.completedMapTasks.asScala;
-        reduceId <- 0 until state.numReducers) {
+             reduceId <- 0 until state.numReducers) {
           val blockId = new ShuffleBlockId(shuffleId, mapId, reduceId)
           val file = blockManager.diskBlockManager.getFile(blockId)
           if (!file.delete()) {
@@ -135,7 +142,7 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
         true
       case None =>
         logInfo(
-            "Could not find files for shuffle " + shuffleId + " for deleting")
+          "Could not find files for shuffle " + shuffleId + " for deleting")
         false
     }
   }

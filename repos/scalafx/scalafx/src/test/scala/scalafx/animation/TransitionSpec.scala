@@ -42,11 +42,11 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TransitionSpec
     extends SimpleSFXDelegateSpec[jfxa.Transition, Transition](
-        classOf[jfxa.Transition], classOf[Transition]) {
+      classOf[jfxa.Transition],
+      classOf[Transition]) {
 
   override protected def getScalaClassInstance =
-    new Transition(
-        new jfxa.Transition() {
+    new Transition(new jfxa.Transition() {
       def interpolate(p1: Double) {}
     }) {}
 

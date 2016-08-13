@@ -3,7 +3,11 @@ package com.twitter.finagle.memcached.protocol.text
 import com.twitter.finagle.memcached.protocol.ClientError
 import com.twitter.finagle.memcached.util.ChannelBufferUtils._
 import com.twitter.io.Charsets
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBufferIndexFinder, ChannelBuffers}
+import org.jboss.netty.buffer.{
+  ChannelBuffer,
+  ChannelBufferIndexFinder,
+  ChannelBuffers
+}
 import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 
@@ -25,14 +29,14 @@ object AbstractDecoder {
 abstract class AbstractDecoder extends FrameDecoder {
   import AbstractDecoder._
 
-  override def channelOpen(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelOpen(ctx: ChannelHandlerContext,
+                           e: ChannelStateEvent): Unit = {
     start()
     super.channelOpen(ctx, e)
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               e: ExceptionEvent): Unit = {
     start()
     super.exceptionCaught(ctx, e)
   }
@@ -83,6 +87,6 @@ abstract class AbstractDecoder extends FrameDecoder {
   }
 
   protected[memcached] def start(): Unit
-  protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int): Unit
+  protected[memcached] def awaitData(tokens: Seq[ChannelBuffer],
+                                     bytesNeeded: Int): Unit
 }

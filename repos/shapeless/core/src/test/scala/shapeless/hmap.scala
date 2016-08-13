@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,13 +68,15 @@ class HMapTests {
 
   @Test
   def testNatTrans {
-    val nt = HMap[(Set ~?> Option)#λ](
-        Set("foo") -> Option("bar"), Set(23) -> Option(13))
+    val nt = HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"),
+                                      Set(23) -> Option(13))
 
-    illTyped("""
+    illTyped(
+      """
       val nt2 = HMap[(Set ~?> Option)#λ](Set("foo") -> Option(13), Set(23) -> Option(13))
     """)
-    illTyped("""
+    illTyped(
+      """
       val nt3 = HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"), "foo" -> 23)
     """)
 
@@ -94,8 +96,8 @@ class HMapTests {
 
   @Test
   def testPolyNatTrans {
-    val nt = HMap[(Set ~?> Option)#λ](
-        Set("foo") -> Option("bar"), Set(23) -> Option(13))
+    val nt = HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"),
+                                      Set(23) -> Option(13))
     import nt._
 
     // Needed to allow V to be inferred in Case1 resolution (ie. map and pairApply)
@@ -108,8 +110,8 @@ class HMapTests {
     assertEquals(Some("bar") :: Some(13) :: HNil, l2)
 
     // Use as an argument to a HoF
-    def pairApply(f: Poly1)(
-        implicit cs: f.Case[Set[String]], ci: f.Case[Set[Int]]) =
+    def pairApply(f: Poly1)(implicit cs: f.Case[Set[String]],
+                            ci: f.Case[Set[Int]]) =
       (f(Set("foo")), f(Set(23)))
 
     val a1 = pairApply(nt)
@@ -121,10 +123,12 @@ class HMapTests {
   def testIdKeyNatTrans {
     val nt = HMap[(Id ~?> Option)#λ]("foo" -> Option("bar"), 23 -> Option(13))
 
-    illTyped("""
+    illTyped(
+      """
       val nt2 = HMap[(Id ~?> Option)#λ]("foo" -> Option(13), 23 -> Option(13))
     """)
-    illTyped("""
+    illTyped(
+      """
       val nt3 = HMap[(Id ~?> Option)#λ]("foo" -> Option("bar"), Set(23) -> Option(13))
     """)
 
@@ -146,10 +150,12 @@ class HMapTests {
   def testIdValueNatTrans {
     val nt = HMap[(Option ~?> Id)#λ](Option("foo") -> "bar", Option(23) -> 13)
 
-    illTyped("""
+    illTyped(
+      """
       val nt2 = HMap[(Option ~?> Id)#λ](Option("foo") -> 13, Option(23) -> 13)
     """)
-    illTyped("""
+    illTyped(
+      """
       val nt3 = HMap[(Option ~?> Id)#λ](Option("foo") -> "bar", Option(23) -> Set(13))
     """)
 

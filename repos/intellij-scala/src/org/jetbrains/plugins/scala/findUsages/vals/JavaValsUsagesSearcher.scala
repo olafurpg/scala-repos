@@ -2,16 +2,26 @@ package org.jetbrains.plugins.scala
 package findUsages.vals
 
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.search.{PsiSearchHelper, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  PsiSearchHelper,
+  TextOccurenceProcessor,
+  UsageSearchContext
+}
 import com.intellij.psi.{PsiElement, PsiReference, PsiReferenceExpression}
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, StaticPsiTypedDefinitionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiTypedDefinitionWrapper,
+  StaticPsiTypedDefinitionWrapper
+}
 
 /**
   * User: Alexander Podkhalyuzin
@@ -55,8 +65,11 @@ class JavaValsUsagesSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case wrapper: PsiTypedDefinitionWrapper =>
         //only this is added for find usages factory
         val name: String = wrapper.getName
@@ -71,11 +84,11 @@ class JavaValsUsagesSearcher
                     refElement.resolve match {
                       case t: PsiTypedDefinitionWrapper
                           if t.typedDefinition == wrapper.typedDefinition &&
-                          t.getName == wrapper.getName =>
+                            t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
                       case t: StaticPsiTypedDefinitionWrapper
                           if t.typedDefinition == wrapper.typedDefinition &&
-                          t.getName == wrapper.getName =>
+                            t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
                       case _ =>
                     }
@@ -88,8 +101,11 @@ class JavaValsUsagesSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case _ => true
     }
   }

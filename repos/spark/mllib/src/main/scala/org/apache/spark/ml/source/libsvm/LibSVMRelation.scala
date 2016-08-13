@@ -37,16 +37,17 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.util.collection.BitSet
 
-private[libsvm] class LibSVMOutputWriter(
-    path: String, dataSchema: StructType, context: TaskAttemptContext)
+private[libsvm] class LibSVMOutputWriter(path: String,
+                                         dataSchema: StructType,
+                                         context: TaskAttemptContext)
     extends OutputWriter {
 
   private[this] val buffer = new Text()
 
   private val recordWriter: RecordWriter[NullWritable, Text] = {
     new TextOutputFormat[NullWritable, Text]() {
-      override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+      override def getDefaultWorkFile(context: TaskAttemptContext,
+                                      extension: String): Path = {
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")
@@ -114,18 +115,20 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   private def verifySchema(dataSchema: StructType): Unit = {
     if (dataSchema.size != 2 ||
         (!dataSchema(0).dataType.sameType(DataTypes.DoubleType) ||
-            !dataSchema(1).dataType.sameType(new VectorUDT()))) {
+        !dataSchema(1).dataType.sameType(new VectorUDT()))) {
       throw new IOException(
-          s"Illegal schema for libsvm data, schema=${dataSchema}")
+        s"Illegal schema for libsvm data, schema=${dataSchema}")
     }
   }
   override def inferSchema(sqlContext: SQLContext,
                            options: Map[String, String],
                            files: Seq[FileStatus]): Option[StructType] = {
     Some(
-        StructType(
-            StructField("label", DoubleType, nullable = false) :: StructField(
-                "features", new VectorUDT(), nullable = false) :: Nil))
+      StructType(
+        StructField("label", DoubleType, nullable = false) :: StructField(
+          "features",
+          new VectorUDT(),
+          nullable = false) :: Nil))
   }
 
   override def prepareWrite(sqlContext: SQLContext,
@@ -165,7 +168,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
         throw new IOException("No input path specified for libsvm data")
       else
         throw new IOException(
-            "Multiple input paths are not supported for libsvm data.")
+          "Multiple input paths are not supported for libsvm data.")
 
     val numFeatures = options.getOrElse("numFeatures", "-1").toInt
     val vectorType = options.getOrElse("vectorType", "sparse")

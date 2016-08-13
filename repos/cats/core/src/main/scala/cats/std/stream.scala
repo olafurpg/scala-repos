@@ -6,7 +6,7 @@ import cats.syntax.show._
 
 trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadCombine[Stream] with CoflatMap[
-      Stream] = new Traverse[Stream] with MonadCombine[Stream]
+    Stream] = new Traverse[Stream] with MonadCombine[Stream]
   with CoflatMap[Stream] {
 
     def empty[A]: Stream[A] = Stream.Empty
@@ -31,8 +31,8 @@ trait StreamInstances {
     def foldLeft[A, B](fa: Stream[A], b: B)(f: (B, A) => B): B =
       fa.foldLeft(b)(f)
 
-    def foldRight[A, B](
-        fa: Stream[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](fa: Stream[A], lb: Eval[B])(
+        f: (A, Eval[B]) => Eval[B]): Eval[B] =
       Now(fa).flatMap { s =>
         // Note that we don't use pattern matching to deconstruct the
         // stream, since that would needlessly force the tail.
@@ -63,7 +63,7 @@ trait StreamInstances {
     override def isEmpty[A](fa: Stream[A]): Boolean = fa.isEmpty
   }
 
-  implicit def streamShow[A : Show]: Show[Stream[A]] =
+  implicit def streamShow[A: Show]: Show[Stream[A]] =
     new Show[Stream[A]] {
       def show(fa: Stream[A]): String =
         if (fa.isEmpty) "Stream()" else s"Stream(${fa.head.show}, ?)"

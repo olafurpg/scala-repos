@@ -61,7 +61,8 @@ import nsc._
   *  @author Nicolas Stucki
   */
 abstract class PreTyperComponent
-    extends plugins.PluginComponent with transform.Transform
+    extends plugins.PluginComponent
+    with transform.Transform
     with PluginComponent210Compat {
 
   import global._
@@ -95,8 +96,8 @@ abstract class PreTyperComponent
 
           case member => transform(member)
         }
-        val newImpl = treeCopy.Template(
-            tree.impl, tree.impl.parents, tree.impl.self, newBody)
+        val newImpl = treeCopy
+          .Template(tree.impl, tree.impl.parents, tree.impl.self, newBody)
         treeCopy.ClassDef(tree, tree.mods, tree.name, tree.tparams, newImpl)
 
       case tree: Template =>
@@ -136,8 +137,8 @@ abstract class PreTyperComponent
 
   private def anonymousClassMethodWasPublicAnnotation: Tree = {
     val runtimePackage = Select(
-        Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), scalajs), js),
-        nme.annotation)
+      Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), scalajs), js),
+      nme.annotation)
     val cls = Select(runtimePackage, wasPublicBeforeTyper)
     Apply(Select(New(cls), nme.CONSTRUCTOR), Nil)
   }

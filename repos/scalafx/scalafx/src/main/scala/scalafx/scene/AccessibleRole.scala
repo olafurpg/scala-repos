@@ -153,7 +153,7 @@ object AccessibleRole
     * </ul>
     */
   val DecrementButton = new AccessibleRole(
-      jfxs.AccessibleRole.DECREMENT_BUTTON)
+    jfxs.AccessibleRole.DECREMENT_BUTTON)
 
   /**
     * Hyperlink role.
@@ -182,7 +182,7 @@ object AccessibleRole
     * </ul>
     */
   val IncrementButton = new AccessibleRole(
-      jfxs.AccessibleRole.INCREMENT_BUTTON)
+    jfxs.AccessibleRole.INCREMENT_BUTTON)
 
   /**
     * Image View role.
@@ -402,7 +402,7 @@ object AccessibleRole
     * </ul>
     */
   val ProgressIndicator = new AccessibleRole(
-      jfxs.AccessibleRole.PROGRESS_INDICATOR)
+    jfxs.AccessibleRole.PROGRESS_INDICATOR)
 
   /**
     * Radio Button role.
@@ -612,7 +612,7 @@ object AccessibleRole
     * </ul>
     */
   val SplitMenuButton = new AccessibleRole(
-      jfxs.AccessibleRole.SPLIT_MENU_BUTTON)
+    jfxs.AccessibleRole.SPLIT_MENU_BUTTON)
 
   /**
     * Tab Item role.

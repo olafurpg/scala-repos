@@ -6,7 +6,11 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
-import org.jetbrains.plugins.scala.lang.psi.types.{Boolean => BooleanType, ScType, ValType}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Boolean => BooleanType,
+  ScType,
+  ValType
+}
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 import scala.language.implicitConversions
 
@@ -39,7 +43,7 @@ object SelectorConditions {
                                        GlobalSearchScope.allScope(project),
                                        ClassCategory.ALL)
               (psiClass != null && base != null &&
-                  ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
+              ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
               manager.cachedDeepIsInheritor(psiClass, base)
             }
           }

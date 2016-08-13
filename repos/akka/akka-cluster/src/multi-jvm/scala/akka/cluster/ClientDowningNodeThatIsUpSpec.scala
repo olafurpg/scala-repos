@@ -19,8 +19,9 @@ final case class ClientDowningNodeThatIsUpMultiNodeConfig(
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(
+    debugConfig(on = false)
+      .withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
 class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode1
@@ -43,7 +44,8 @@ class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode4
 
 abstract class ClientDowningNodeThatIsUpSpec(
     multiNodeConfig: ClientDowningNodeThatIsUpMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(ClientDowningNodeThatIsUpMultiNodeConfig(failureDetectorPuppet))

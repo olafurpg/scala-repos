@@ -33,7 +33,9 @@ class TruncatedNewtonMinimizerTest extends OptimizeTestBase {
       val lbfgs =
         new TruncatedNewtonMinimizer[DenseVector[Double],
                                      EmpiricalHessian[DenseVector[Double]]](
-            100, tolerance = 1E-8, l2Regularization = reg)
+          100,
+          tolerance = 1E-8,
+          l2Regularization = reg)
       val f = new DiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double]) = {
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
@@ -57,7 +59,7 @@ class TruncatedNewtonMinimizerTest extends OptimizeTestBase {
     val lbfgs =
       new TruncatedNewtonMinimizer[Counter[String, Double],
                                    EmpiricalHessian[Counter[String, Double]]](
-          100)
+        100)
 
     def optimizeThis(init: Counter[String, Double]) = {
       val f = new DiffFunction[Counter[String, Double]] {

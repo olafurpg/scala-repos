@@ -24,8 +24,8 @@ private[sbt] object Execute {
   def config(checkCycles: Boolean,
              overwriteNode: Incomplete => Boolean = const(false)): Config =
     new Config(checkCycles, overwriteNode)
-  final class Config private[sbt](
-      val checkCycles: Boolean, val overwriteNode: Incomplete => Boolean)
+  final class Config private[sbt] (val checkCycles: Boolean,
+                                   val overwriteNode: Incomplete => Boolean)
 
   final val checkPreAndPostConditions = sys.props
     .get("sbt.execute.extrachecks")
@@ -43,8 +43,9 @@ final class Triggers[A[_]](val runBefore: collection.Map[A[_], Seq[A[_]]],
                            val onComplete: RMap[A, Result] => RMap[A, Result])
 
 private[sbt] final class Execute[A[_] <: AnyRef](
-    config: Config, triggers: Triggers[A], progress: ExecuteProgress[A])(
-    implicit view: NodeView[A]) {
+    config: Config,
+    triggers: Triggers[A],
+    progress: ExecuteProgress[A])(implicit view: NodeView[A]) {
   type Strategy = CompletionService[A[_], Completed]
 
   private[this] val forward = idMap[A[_], IDSet[A[_]]]
@@ -70,7 +71,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
 
   def dump: String =
     "State: " + state.toString + "\n\nResults: " + results + "\n\nCalls: " +
-    callers + "\n\n"
+      callers + "\n\n"
 
   def run[T](root: A[T])(implicit strategy: Strategy): Result[T] =
     try { runKeep(root)(strategy)(root) } catch {
@@ -94,8 +95,8 @@ private[sbt] final class Execute[A[_] <: AnyRef](
         if (!state.values.exists(_ == Running)) {
           snapshotCycleCheck()
           assert(
-              false,
-              "Internal task engine error: nothing running.  This usually indicates a cycle in tasks.\n  Calling tasks (internal task engine state):\n" +
+            false,
+            "Internal task engine error: nothing running.  This usually indicates a cycle in tasks.\n  Calling tasks (internal task engine state):\n" +
               dumpCalling)
         }
       }
@@ -206,10 +207,10 @@ private[sbt] final class Execute[A[_] <: AnyRef](
     val deps = dependencies(v) ++ runBefore(node)
     val active = IDSet[A[_]](deps filter notDone)
     progressState = progress.registered(
-        progressState,
-        node,
-        deps,
-        active.toList /** active is mutable, so take a snapshot */ )
+      progressState,
+      node,
+      deps,
+      active.toList /** active is mutable, so take a snapshot */ )
 
     if (active.isEmpty) ready(node)
     else {
@@ -362,8 +363,8 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   // cyclic reference checking
 
   def snapshotCycleCheck(): Unit =
-    for ((called: A[c], callers) <- callers.toSeq; caller <- callers) cycleCheck(
-        caller.asInstanceOf[A[c]], called)
+    for ((called: A[c], callers) <- callers.toSeq; caller <- callers)
+      cycleCheck(caller.asInstanceOf[A[c]], called)
 
   def cycleCheck[T](node: A[T], target: A[T]): Unit = {
     if (node eq target) cyclic(node, target, "Cannot call self")
@@ -375,12 +376,13 @@ private[sbt] final class Execute[A[_] <: AnyRef](
     if (all contains target) cyclic(node, target, "Cyclic reference")
   }
   def cyclic[T](caller: A[T], target: A[T], msg: String) =
-    throw new Incomplete(
-        Some(caller),
-        message = Some(msg),
-        directCause = Some(new CyclicException(caller, target, msg)))
-  final class CyclicException[T](
-      val caller: A[T], val target: A[T], msg: String)
+    throw new Incomplete(Some(caller),
+                         message = Some(msg),
+                         directCause =
+                           Some(new CyclicException(caller, target, msg)))
+  final class CyclicException[T](val caller: A[T],
+                                 val target: A[T],
+                                 msg: String)
       extends Exception(msg)
 
   // state testing

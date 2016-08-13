@@ -31,14 +31,14 @@ class ServersetNamerTest extends FunSuite with AssertionsForJUnit {
         assert(bound.addr.sample() == addr)
         assert(bound.path == Path.empty)
         assert(
-            bound.id == Path.Utf8("$",
-                                  "com.twitter.serverset",
-                                  "hosts",
-                                  "twitter",
-                                  "service",
-                                  "role",
-                                  "env",
-                                  "job:endpoint"))
+          bound.id == Path.Utf8("$",
+                                "com.twitter.serverset",
+                                "hosts",
+                                "twitter",
+                                "service",
+                                "role",
+                                "env",
+                                "job:endpoint"))
 
       case _ => fail(s"invalid name: ${path.show}")
     }

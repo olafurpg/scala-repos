@@ -14,22 +14,23 @@ trait QaController extends LilaController {
   protected def forms = Env.qa.forms
 
   protected def renderQuestion(
-      q: Question, answerForm: Option[Form[_]] = None)(
-      implicit ctx: Context): Fu[Result] =
+      q: Question,
+      answerForm: Option[Form[_]] = None)(implicit ctx: Context): Fu[Result] =
     (api.answer popular q.id) zip fetchPopular zip api.relation
       .questions(q, 10) zip
-    (QaAuth.canAsk ?? { forms.anyCaptcha map (_.some) }) flatMap {
+      (QaAuth.canAsk ?? { forms.anyCaptcha map (_.some) }) flatMap {
       case (((answers, popular), related), captcha) =>
         fuccess {
           Ok(
-              views.html.qa.questionShow(
-                  q,
-                  answers,
-                  popular,
-                  related,
-                  answerForm = if (QaAuth canAnswer q)
-                      answerForm orElse Some(forms.answer) else None,
-                  captcha = captcha))
+            views.html.qa.questionShow(q,
+                                       answers,
+                                       popular,
+                                       related,
+                                       answerForm =
+                                         if (QaAuth canAnswer q)
+                                           answerForm orElse Some(forms.answer)
+                                         else None,
+                                       captcha = captcha))
         }
       case _ => notFound
     }
@@ -39,8 +40,8 @@ trait QaController extends LilaController {
       Forbidden(views.html.qa.n00b(popular))
   }
 
-  protected def WithQuestion(id: QuestionId)(
-      block: Question => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  protected def WithQuestion(id: QuestionId)(block: Question => Fu[Result])(
+      implicit ctx: Context): Fu[Result] =
     OptionFuResult(api.question findById id)(block)
 
   protected def WithQuestion(id: QuestionId, slug: String)(

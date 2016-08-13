@@ -12,34 +12,34 @@ object Util {
 
   def crossBuild: Seq[Setting[_]] =
     Seq(
-        crossPaths :=
+      crossPaths :=
         (scalaBinaryVersion.value match {
-              case "2.11" => true
-              case _ => false
-            })
+          case "2.11" => true
+          case _ => false
+        })
     )
 
   lazy val javaOnlySettings =
     Seq[Setting[_]](
-        /*crossPaths := false, */ compileOrder := CompileOrder.JavaThenScala,
-        unmanagedSourceDirectories in Compile <<=
-          Seq(javaSource in Compile).join)
+      /*crossPaths := false, */ compileOrder := CompileOrder.JavaThenScala,
+      unmanagedSourceDirectories in Compile <<=
+        Seq(javaSource in Compile).join)
   lazy val baseScalacOptions = Seq(
-      scalacOptions ++= Seq("-Xelide-below", "0"),
-      scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
-        case Some((2, 9)) | Some((2, 8)) =>
-          Nil // support 2.9 for some subprojects for the Scala Eclipse IDE
-        case _ =>
-          Seq("-feature",
-              "-language:implicitConversions",
-              "-language:postfixOps",
-              "-language:higherKinds",
-              "-language:existentials")
-      },
-      scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
-        case Some((2, 10)) => Seq("-deprecation", "-Xlint")
-        case _ => Seq()
-      }
+    scalacOptions ++= Seq("-Xelide-below", "0"),
+    scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
+      case Some((2, 9)) | Some((2, 8)) =>
+        Nil // support 2.9 for some subprojects for the Scala Eclipse IDE
+      case _ =>
+        Seq("-feature",
+            "-language:implicitConversions",
+            "-language:postfixOps",
+            "-language:higherKinds",
+            "-language:existentials")
+    },
+    scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
+      case Some((2, 10)) => Seq("-deprecation", "-Xlint")
+      case _ => Seq()
+    }
   )
 
   def projectComponent = projectID <<= (projectID, componentID) { (pid, cid) =>
@@ -107,8 +107,8 @@ object Util {
   def srcID = "compiler-interface-src"
 
   def publishPomSettings: Seq[Setting[_]] = Seq(
-      publishArtifact in makePom := false,
-      pomPostProcess := cleanPom _
+    publishArtifact in makePom := false,
+    pomPostProcess := cleanPom _
   )
 
   def cleanPom(pomNode: scala.xml.Node) = {
@@ -139,7 +139,7 @@ object Util {
 
   def excludePomArtifact(artifactId: String) =
     (artifactId == "compiler-interface") ||
-    (artifactId startsWith "precompiled")
+      (artifactId startsWith "precompiled")
 
   val testExclusive = tags in test += ((ExclusiveTest, 1))
 
@@ -169,12 +169,12 @@ object %s {
   }
   def keywordsSettings: Seq[Setting[_]] =
     inConfig(Compile)(
-        Seq(
-            scalaKeywords := getScalaKeywords,
-            generateKeywords <<=
-              (sourceManaged, scalaKeywords) map writeScalaKeywords,
-            sourceGenerators <+= generateKeywords map (x => Seq(x))
-        ))
+      Seq(
+        scalaKeywords := getScalaKeywords,
+        generateKeywords <<=
+          (sourceManaged, scalaKeywords) map writeScalaKeywords,
+        sourceGenerators <+= generateKeywords map (x => Seq(x))
+      ))
 }
 
 object Licensed {
@@ -195,12 +195,12 @@ object Licensed {
       .toList
 
   def settings: Seq[Setting[_]] = Seq(
-      notice <<= baseDirectory(_ / "NOTICE"),
-      unmanagedResources in Compile <++= (notice, extractLicenses) map {
-        _ +: _
-      },
-      extractLicenses <<=
-        (baseDirectory in ThisBuild, notice, streams) map extractLicenses0
+    notice <<= baseDirectory(_ / "NOTICE"),
+    unmanagedResources in Compile <++= (notice, extractLicenses) map {
+      _ +: _
+    },
+    extractLicenses <<=
+      (baseDirectory in ThisBuild, notice, streams) map extractLicenses0
   )
   def extractLicenses0(base: File, note: File, s: TaskStreams): Seq[File] =
     if (!note.exists) Nil

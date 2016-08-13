@@ -44,9 +44,11 @@ object InnerShadow {
   */
 class InnerShadow(
     override val delegate: jfxse.InnerShadow = new jfxse.InnerShadow)
-    extends Effect(delegate) with ColorDelegate[jfxse.InnerShadow]
+    extends Effect(delegate)
+    with ColorDelegate[jfxse.InnerShadow]
     with DimensionDelegate[jfxse.InnerShadow]
-    with InputDelegate[jfxse.InnerShadow] with SFXDelegate[jfxse.InnerShadow] {
+    with InputDelegate[jfxse.InnerShadow]
+    with SFXDelegate[jfxse.InnerShadow] {
 
   /**
     * Creates a new instance of InnerShadow with the specified blurType, color, radius, spread, offsetX and offsetY.
@@ -58,8 +60,7 @@ class InnerShadow(
            offsetX: Double,
            offsetY: Double) =
     this(
-        new jfxse.InnerShadow(
-            blurType, color, radius, choke, offsetX, offsetY))
+      new jfxse.InnerShadow(blurType, color, radius, choke, offsetX, offsetY))
 
   /**
     * Creates a new instance of InnerShadow with specified radius and color.

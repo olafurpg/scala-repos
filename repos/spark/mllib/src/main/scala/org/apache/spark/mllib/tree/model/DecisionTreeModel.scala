@@ -42,9 +42,10 @@ import org.apache.spark.util.Utils
   * @param algo algorithm type -- classification or regression
   */
 @Since("1.0.0")
-class DecisionTreeModel @Since("1.0.0")(
-    @Since("1.0.0") val topNode: Node, @Since("1.0.0") val algo: Algo)
-    extends Serializable with Saveable {
+class DecisionTreeModel @Since("1.0.0")(@Since("1.0.0") val topNode: Node,
+                                        @Since("1.0.0") val algo: Algo)
+    extends Serializable
+    with Saveable {
 
   /**
     * Predict values for a single data point using the model trained.
@@ -106,7 +107,7 @@ class DecisionTreeModel @Since("1.0.0")(
       s"DecisionTreeModel regressor of depth $depth with $numNodes nodes"
     case _ =>
       throw new IllegalArgumentException(
-          s"DecisionTreeModel given unknown algo parameter: $algo.")
+        s"DecisionTreeModel given unknown algo parameter: $algo.")
   }
 
   /**
@@ -161,8 +162,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
                          categories: Seq[Double]) {
       // TODO: Change to List once SPARK-3365 is fixed
       def toSplit: Split = {
-        new Split(
-            feature, threshold, FeatureType(featureType), categories.toList)
+        new Split(feature,
+                  threshold,
+                  FeatureType(featureType),
+                  categories.toList)
       }
     }
 
@@ -172,8 +175,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       }
 
       def apply(r: Row): SplitData = {
-        SplitData(
-            r.getInt(0), r.getDouble(1), r.getInt(2), r.getAs[Seq[Double]](3))
+        SplitData(r.getInt(0),
+                  r.getDouble(1),
+                  r.getInt(2),
+                  r.getAs[Seq[Double]](3))
       }
     }
 
@@ -235,14 +240,14 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
           .getOrElse(Utils.DEFAULT_DRIVER_MEM_MB)
         if (driverMemory <= memThreshold) {
           logWarning(
-              s"$thisClassName.save() was called, but it may fail because of too little" +
+            s"$thisClassName.save() was called, but it may fail because of too little" +
               s" driver memory (${driverMemory}m)." +
               s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
         }
       } else {
         if (sc.executorMemory <= memThreshold) {
           logWarning(
-              s"$thisClassName.save() was called, but it may fail because of too little" +
+            s"$thisClassName.save() was called, but it may fail because of too little" +
               s" executor memory (${sc.executorMemory}m)." +
               s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
         }
@@ -251,10 +256,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       // Create JSON metadata.
       val metadata =
         compact(
-            render(
-                ("class" -> thisClassName) ~ ("version" -> thisFormatVersion) ~
-                ("algo" -> model.algo.toString) ~
-                ("numNodes" -> model.numNodes)))
+          render(
+            ("class" -> thisClassName) ~ ("version" -> thisFormatVersion) ~
+              ("algo" -> model.algo.toString) ~
+              ("numNodes" -> model.numNodes)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -279,12 +284,12 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       // Build node data into a tree.
       val trees = constructTrees(nodes)
       assert(
-          trees.length == 1,
-          "Decision tree should contain exactly one tree but got ${trees.size} trees.")
+        trees.length == 1,
+        "Decision tree should contain exactly one tree but got ${trees.size} trees.")
       val model = new DecisionTreeModel(trees(0), Algo.fromString(algo))
       assert(model.numNodes == numNodes,
              s"Unable to load DecisionTreeModel data from: $datapath." +
-             s" Expected $numNodes nodes but found ${model.numNodes}")
+               s" Expected $numNodes nodes but found ${model.numNodes}")
       model
     }
 
@@ -301,8 +306,8 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       val numTrees = trees.length
       val treeIndices = trees.map(_._1).toSeq
       assert(
-          treeIndices == (0 until numTrees),
-          s"Tree indices must start from 0 and increment by 1, but we found $treeIndices.")
+        treeIndices == (0 until numTrees),
+        s"Tree indices must start from 0 and increment by 1, but we found $treeIndices.")
       trees.map(_._2)
     }
 
@@ -370,7 +375,7 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         SaveLoadV1_0.load(sc, path, algo, numNodes)
       case _ =>
         throw new Exception(
-            s"DecisionTreeModel.load did not recognize model with (className, format version):" +
+          s"DecisionTreeModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }

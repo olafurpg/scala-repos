@@ -6,7 +6,10 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.RemoveCallParentheses
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScMethodCall,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CollectMethodsProcessor
 
 /**
@@ -14,8 +17,8 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.CollectMethodsProcesso
   */
 class JavaAccessorMethodCalledAsEmptyParenInspection
     extends AbstractMethodSignatureInspection(
-        "ScalaJavaAccessorMethodCalledAsEmptyParen",
-        "Java accessor method called as empty-paren") {
+      "ScalaJavaAccessorMethodCalledAsEmptyParen",
+      "Java accessor method called as empty-paren") {
 
   def actionFor(holder: ProblemsHolder) = {
     case e: ScReferenceExpression =>
@@ -29,7 +32,7 @@ class JavaAccessorMethodCalledAsEmptyParenInspection
                   case _: ScalaPsiElement => // do nothing
                   case (m: PsiMethod)
                       if m.isAccessor && !isOverloadedMethod(e) &&
-                      hasSameType(call, e) =>
+                        hasSameType(call, e) =>
                     holder.registerProblem(e.nameId,
                                            getDisplayName,
                                            new RemoveCallParentheses(call))
@@ -49,10 +52,8 @@ class JavaAccessorMethodCalledAsEmptyParenInspection
 
   private def hasSameType(call: ScMethodCall, ref: ScReferenceExpression) = {
     val callType = call.getType().toOption
-    val refType = ref
-      .getType()
-      .toOption
-      (callType, refType) match {
+    val refType = ref.getType().toOption
+    (callType, refType) match {
       case (Some(t1), Some(t2)) => t1.equiv(t2)
       case _ => false
     }

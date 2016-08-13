@@ -11,14 +11,14 @@ import scalaz.syntax.either._
 trait Timeout
 object Timeout extends Timeout
 
-case class Timer(
-    timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
+case class Timer(timeoutTickMs: Int = 100,
+                 workerName: String = "TimeoutContextWorker") {
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]
   @volatile private[this] var continueRunning: Boolean = true
   @volatile private[this] var lastNow: Long = alignTimeResolution(
-      System.currentTimeMillis)
+    System.currentTimeMillis)
   private[this] val lock = new ReentrantReadWriteLock()
   private[this] var futures: SortedMap[Long, List[() => Unit]] = SortedMap()
   private[this] val workerRunnable = new Runnable() {
@@ -29,14 +29,14 @@ case class Timer(
         // Deal with stuff to expire.
         futures.headOption match {
           case Some((time, _)) if (time <= lastNow) => {
-              val expiredFutures: SortedMap[Long, List[() => Unit]] =
-                withWrite {
-                  val (past, future) = futures.span(pair => pair._1 < lastNow)
-                  futures = future
-                  past
-                }
-              expireFutures(expiredFutures)
-            }
+            val expiredFutures: SortedMap[Long, List[() => Unit]] =
+              withWrite {
+                val (past, future) = futures.span(pair => pair._1 < lastNow)
+                futures = future
+                past
+              }
+            expireFutures(expiredFutures)
+          }
           case _ => ()
         }
         // Should we keep running?
@@ -96,9 +96,9 @@ case class Timer(
             val timedCallback = () => callback(value)
             // Lazy implementation for now.
             futures = futures + futures
-              .get(waitTime)
-              .map(current => (waitTime, timedCallback :: current))
-              .getOrElse((waitTime, List(timedCallback)))
+                .get(waitTime)
+                .map(current => (waitTime, timedCallback :: current))
+                .getOrElse((waitTime, List(timedCallback)))
         }
         Future.async(listen)
       } else {
@@ -116,7 +116,7 @@ case class Timer(
 
   def withTimeout[T](task: Task[T], timeout: Long): Task[Timeout \/ T] = {
     val timeoutTask = new Task(
-        valueWait(Timeout, timeout).map(_.right[Throwable]))
+      valueWait(Timeout, timeout).map(_.right[Throwable]))
     taskNondeterminism
       .choose(timeoutTask, task)
       .map(_.fold(_._1.left, _._2.right))

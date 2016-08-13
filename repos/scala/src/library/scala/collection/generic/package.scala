@@ -9,13 +9,14 @@ package object generic {
   @deprecated("use ClassTagTraversableFactory instead", "2.10.0")
   type ClassManifestTraversableFactory[
       CC[X] <: Traversable[X] with GenericClassManifestTraversableTemplate[
-          X, CC]] = ClassTagTraversableFactory[CC]
+        X,
+        CC]] = ClassTagTraversableFactory[CC]
 
   @deprecated("use GenericClassTagCompanion instead", "2.10.0")
-  type GenericClassManifestCompanion[+CC[X] <: Traversable[X]] = GenericClassTagCompanion[
-      CC]
+  type GenericClassManifestCompanion[+CC[X] <: Traversable[X]] =
+    GenericClassTagCompanion[CC]
 
   @deprecated("use GenericClassTagTraversableTemplate instead", "2.10.0")
-  type GenericClassManifestTraversableTemplate[+A, +CC[X] <: Traversable[X]] = GenericClassTagTraversableTemplate[
-      A, CC]
+  type GenericClassManifestTraversableTemplate[+A, +CC[X] <: Traversable[X]] =
+    GenericClassTagTraversableTemplate[A, CC]
 }

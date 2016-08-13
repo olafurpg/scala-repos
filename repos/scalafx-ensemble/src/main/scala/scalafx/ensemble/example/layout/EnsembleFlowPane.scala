@@ -49,17 +49,17 @@ class EnsembleFlowPane extends EnsembleExample {
 
   def getContent = {
     val image = new Image(
-        this.getClass
-          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+      this.getClass
+        .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
 
     val flowPane = new FlowPane(2, 4) {
       prefWrapLength = 200
       padding = Insets(20)
       for (i <- 1 to 5) {
         children ++= Seq(
-            new Label("Short label"),
-            new Label("I am a slightly longer label."),
-            new ImageView(image)
+          new Label("Short label"),
+          new Label("I am a slightly longer label."),
+          new ImageView(image)
         )
       }
     }

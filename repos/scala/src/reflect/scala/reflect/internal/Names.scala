@@ -47,16 +47,18 @@ trait Names extends api.Names {
   private def hashValue(cs: Array[Char], offset: Int, len: Int): Int =
     if (len > 0)
       (len * (41 * 41 * 41) + cs(offset) * (41 * 41) +
-          cs(offset + len - 1) * 41 + cs(offset + (len >> 1)))
+        cs(offset + len - 1) * 41 + cs(offset + (len >> 1)))
     else 0
 
   /** Is (the ASCII representation of) name at given index equal to
     *  cs[offset..offset+len-1]?
     */
-  private def equals(
-      index: Int, cs: Array[Char], offset: Int, len: Int): Boolean = {
+  private def equals(index: Int,
+                     cs: Array[Char],
+                     offset: Int,
+                     len: Int): Boolean = {
     var i = 0
-    while ( (i < len) && (chrs(index + i) == cs(offset + i))) i += 1
+    while ((i < len) && (chrs(index + i) == cs(offset + i))) i += 1
     i == len
   }
 
@@ -102,8 +104,8 @@ trait Names extends api.Names {
       val len = math.max(len0, 0)
       val h = hashValue(cs, offset, len) & HASH_MASK
       var n = termHashtable(h)
-      while ( (n ne null) &&
-      (n.length != len || !equals(n.start, cs, offset, len))) n = n.next
+      while ((n ne null) &&
+             (n.length != len || !equals(n.start, cs, offset, len))) n = n.next
 
       if (n ne null) n
       else {
@@ -131,21 +133,23 @@ trait Names extends api.Names {
     if (synchronizeNames) nameLock.synchronized(body) else body
   }
 
-  final def newTypeName(
-      cs: Array[Char], offset: Int, len: Int, cachedString: String): TypeName =
+  final def newTypeName(cs: Array[Char],
+                        offset: Int,
+                        len: Int,
+                        cachedString: String): TypeName =
     newTermName(cs, offset, len, cachedString).toTypeName
 
   /** Create a term name from string. */
   @deprecatedOverriding(
-      "To synchronize, use `override def synchronizeNames = true`",
-      "2.11.0") // overridden in https://github.com/scala-ide/scala-ide/blob/master/org.scala-ide.sdt.core/src/scala/tools/eclipse/ScalaPresentationCompiler.scala
+    "To synchronize, use `override def synchronizeNames = true`",
+    "2.11.0") // overridden in https://github.com/scala-ide/scala-ide/blob/master/org.scala-ide.sdt.core/src/scala/tools/eclipse/ScalaPresentationCompiler.scala
   def newTermName(s: String): TermName =
     newTermName(s.toCharArray(), 0, s.length(), null)
 
   /** Create a type name from string. */
   @deprecatedOverriding(
-      "To synchronize, use `override def synchronizeNames = true`",
-      "2.11.0") // overridden in https://github.com/scala-ide/scala-ide/blob/master/org.scala-ide.sdt.core/src/scala/tools/eclipse/ScalaPresentationCompiler.scala
+    "To synchronize, use `override def synchronizeNames = true`",
+    "2.11.0") // overridden in https://github.com/scala-ide/scala-ide/blob/master/org.scala-ide.sdt.core/src/scala/tools/eclipse/ScalaPresentationCompiler.scala
   def newTypeName(s: String): TypeName = newTermName(s).toTypeName
 
   /** Create a term name from the UTF8 encoded bytes in bs[offset..offset+len-1]. */
@@ -178,9 +182,9 @@ trait Names extends api.Names {
     val hash = hashValue(cs, 0, cs.length) & HASH_MASK
     var typeName = typeHashtable(hash)
 
-    while ( (typeName ne null) &&
-    (typeName.length != cs.length ||
-        !equals(typeName.start, cs, 0, cs.length))) {
+    while ((typeName ne null) &&
+           (typeName.length != cs.length ||
+           !equals(typeName.start, cs, 0, cs.length))) {
       typeName = typeName.next
     }
     assert(typeName != null, s"TypeName ${new String(cs)} not yet created.")
@@ -350,13 +354,13 @@ trait Names extends api.Names {
     final def startsWith(prefix: Name, start: Int): Boolean = {
       var i = 0
       while (i < prefix.length && start + i < len &&
-      chrs(index + start + i) == chrs(prefix.start + i)) i += 1
+             chrs(index + start + i) == chrs(prefix.start + i)) i += 1
       i == prefix.length
     }
     final def startsWith(prefix: String, start: Int): Boolean = {
       var i = 0
       while (i < prefix.length && start + i < len &&
-      chrs(index + start + i) == prefix.charAt(i)) i += 1
+             chrs(index + start + i) == prefix.charAt(i)) i += 1
       i == prefix.length
     }
 
@@ -367,13 +371,13 @@ trait Names extends api.Names {
     final def endsWith(suffix: Name, end: Int): Boolean = {
       var i = 1
       while (i <= suffix.length && i <= end &&
-      chrs(index + end - i) == chrs(suffix.start + suffix.length - i)) i += 1
+             chrs(index + end - i) == chrs(suffix.start + suffix.length - i)) i += 1
       i > suffix.length
     }
     final def endsWith(suffix: String, end: Int): Boolean = {
       var i = 1
       while (i <= suffix.length && i <= end &&
-      chrs(index + end - i) == suffix.charAt(suffix.length - i)) i += 1
+             chrs(index + end - i) == suffix.charAt(suffix.length - i)) i += 1
       i > suffix.length
     }
 
@@ -525,15 +529,19 @@ trait Names extends api.Names {
   /** TermName_S and TypeName_S have fields containing the string version of the name.
     *  TermName_R and TypeName_R recreate it each time toString is called.
     */
-  private final class TermName_S(
-      index0: Int, len0: Int, next0: TermName, override val toString: String)
+  private final class TermName_S(index0: Int,
+                                 len0: Int,
+                                 next0: TermName,
+                                 override val toString: String)
       extends TermName(index0, len0, next0) {
     protected def createCompanionName(next: TypeName): TypeName =
       new TypeName_S(index, len, next, toString)
     override def newName(str: String): TermName = newTermNameCached(str)
   }
-  private final class TypeName_S(
-      index0: Int, len0: Int, next0: TypeName, override val toString: String)
+  private final class TypeName_S(index0: Int,
+                                 len0: Int,
+                                 next0: TypeName,
+                                 override val toString: String)
       extends TypeName(index0, len0, next0) {
     override def newName(str: String): TypeName = newTypeNameCached(str)
   }
@@ -552,7 +560,8 @@ trait Names extends api.Names {
 
   // SYNCNOTE: caller to constructor must synchronize if `synchronizeNames` is enabled
   sealed abstract class TermName(index0: Int, len0: Int, val next: TermName)
-      extends Name(index0, len0) with TermNameApi {
+      extends Name(index0, len0)
+      with TermNameApi {
     type ThisNameType = TermName
     protected[this] def thisName: TermName = this
 
@@ -564,7 +573,7 @@ trait Names extends api.Names {
         // Re-computing the hash saves a field for storing it in the TermName
         val h = hashValue(chrs, index, len) & HASH_MASK
         var n = typeHashtable(h)
-        while ( (n ne null) && n.start != index) n = n.next
+        while ((n ne null) && n.start != index) n = n.next
 
         if (n ne null) n
         else {
@@ -596,7 +605,8 @@ trait Names extends api.Names {
   }
 
   sealed abstract class TypeName(index0: Int, len0: Int, val next: TypeName)
-      extends Name(index0, len0) with TypeNameApi {
+      extends Name(index0, len0)
+      with TypeNameApi {
     type ThisNameType = TypeName
     protected[this] def thisName: TypeName = this
 
@@ -607,7 +617,7 @@ trait Names extends api.Names {
         // Re-computing the hash saves a field for storing it in the TypeName
         val h = hashValue(chrs, index, len) & HASH_MASK
         var n = termHashtable(h)
-        while ( (n ne null) && n.start != index) n = n.next
+        while ((n ne null) && n.start != index) n = n.next
 
         assert(n ne null, s"TypeName $this is missing its correspondent")
         n

@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AnimationStatusSpec
     extends SFXEnumDelegateSpec[jfxa.Animation.Status, Animation.Status](
-        classOf[jfxa.Animation.Status],
-        classOf[Animation.Status],
-        Animation.Status)
+      classOf[jfxa.Animation.Status],
+      classOf[Animation.Status],
+      Animation.Status)

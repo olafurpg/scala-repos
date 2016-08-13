@@ -18,7 +18,8 @@ import play.api.mvc.{ActionBuilder, Request, Result}
   * @see [[http://www.w3.org/TR/cors/ CORS specification]]
   */
 trait CORSActionBuilder
-    extends ActionBuilder[Request] with AbstractCORSPolicy {
+    extends ActionBuilder[Request]
+    with AbstractCORSPolicy {
 
   override protected val logger = Logger.apply(classOf[CORSActionBuilder])
 
@@ -71,7 +72,7 @@ object CORSActionBuilder {
         val config = PlayConfig(configuration)
         val prototype = config.get[Config]("play.filters.cors")
         val corsConfig = PlayConfig(
-            config.get[Config](configPath).withFallback(prototype))
+          config.get[Config](configPath).withFallback(prototype))
         CORSConfig.fromUnprefixedConfiguration(corsConfig)
       }
       override protected val errorHandler = eh

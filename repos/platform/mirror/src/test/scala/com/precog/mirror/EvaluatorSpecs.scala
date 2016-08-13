@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -156,7 +156,7 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
 
     "evaluate a simple object concatenation" in {
       "{a:1} with {b:2}" must evalTo(
-          JObject(Map("a" -> JNum(1), "b" -> JNum(2))))
+        JObject(Map("a" -> JNum(1), "b" -> JNum(2))))
     }
 
     "evaluate a simple object deref" in {
@@ -299,17 +299,18 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
     def message(q: String): String = {
       val actual = doEval(q)
 
-      "evaluates to [%s], not [%s]".format(
-          actual map { _.renderCompact } mkString ",", expect map {
-        _.renderCompact
-      } mkString ",")
+      "evaluates to [%s], not [%s]"
+        .format(actual map { _.renderCompact } mkString ",", expect map {
+          _.renderCompact
+        } mkString ",")
     }
 
     (inner _, message _)
   }
 
   private def evalAndThrow[E <: Throwable](
-      implicit fs: FS, evidence: ClassManifest[E]): Matcher[String] = {
+      implicit fs: FS,
+      evidence: ClassManifest[E]): Matcher[String] = {
     def inner(q: String): Boolean =
       eval(compileSingle(q))(fs.map) must throwA[E]
     (inner _, "unused error message")

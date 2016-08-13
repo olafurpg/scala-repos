@@ -10,10 +10,25 @@ import scala.language.reflectiveCalls
 
 import java.lang.{Iterable => JIterable}
 import scala.reflect.internal.util.ScalaClassLoader
-import java.io.{ByteArrayInputStream, CharArrayWriter, FileNotFoundException, PrintWriter, StringWriter, Writer}
+import java.io.{
+  ByteArrayInputStream,
+  CharArrayWriter,
+  FileNotFoundException,
+  PrintWriter,
+  StringWriter,
+  Writer
+}
 import java.util.{Locale}
 import java.util.concurrent.ConcurrentLinkedQueue
-import javax.tools.{Diagnostic, DiagnosticListener, ForwardingJavaFileManager, JavaFileManager, JavaFileObject, SimpleJavaFileObject, StandardLocation}
+import javax.tools.{
+  Diagnostic,
+  DiagnosticListener,
+  ForwardingJavaFileManager,
+  JavaFileManager,
+  JavaFileObject,
+  SimpleJavaFileObject,
+  StandardLocation
+}
 import scala.reflect.io.File
 import scala.io.Source
 import scala.util.{Try, Success, Failure}
@@ -29,8 +44,7 @@ class JavapClass(
     val loader: ScalaClassLoader,
     val printWriter: PrintWriter,
     intp: IMain
-)
-    extends Javap {
+) extends Javap {
   import JavapClass._
 
   lazy val tool = JavapTool()
@@ -68,7 +82,7 @@ class JavapClass(
     (path, findBytes(req)) match {
       case (_, bytes) if bytes.isEmpty =>
         throw new FileNotFoundException(
-            s"Could not find class bytes for '$path'")
+          s"Could not find class bytes for '$path'")
       case ok => ok
     }
   }
@@ -118,15 +132,15 @@ class JavapClass(
     // instead of translatePath and then asking did I get a class back)
     val q =
       (// only simple names get the scope treatment
-          Some(p) filter (_ contains '.')
-          // take path as a Name in scope
-          orElse (intp translatePath p filter loadable)
-          // take path as a Name in scope and find its enclosing class
-          orElse (intp translateEnclosingClass p filter loadable)
-          // take path as a synthetic derived from some Name in scope
-          orElse desynthesize(p)
-          // just try it plain
-          getOrElse p)
+      Some(p) filter (_ contains '.')
+      // take path as a Name in scope
+        orElse (intp translatePath p filter loadable)
+      // take path as a Name in scope and find its enclosing class
+        orElse (intp translateEnclosingClass p filter loadable)
+      // take path as a synthetic derived from some Name in scope
+        orElse desynthesize(p)
+      // just try it plain
+        getOrElse p)
     load(q)
   }
 
@@ -139,7 +153,7 @@ class JavapClass(
     }
     protected def noToolError =
       new JpError(
-          s"No javap tool available: ${getClass.getName} failed to initialize.")
+        s"No javap tool available: ${getClass.getName} failed to initialize.")
 
     // output filtering support
     val writer = new CharArrayWriter
@@ -175,7 +189,7 @@ class JavapClass(
           else {
             val method = line.substring(blank + 1, lparen)
             (method == pattern || isSpecialized(method) ||
-                isAnonymized(method))
+            isAnonymized(method))
           }
         }
         filtering = if (filtering) {
@@ -215,15 +229,16 @@ class JavapClass(
 
     val TaskCtor =
       TaskClass.getConstructor(
-          classOf[Writer],
-          classOf[JavaFileManager],
-          classOf[DiagnosticListener[_]],
-          classOf[JIterable[String]],
-          classOf[JIterable[String]]
+        classOf[Writer],
+        classOf[JavaFileManager],
+        classOf[DiagnosticListener[_]],
+        classOf[JIterable[String]],
+        classOf[JIterable[String]]
       ) orFailed null
 
     class JavaReporter
-        extends DiagnosticListener[JavaFileObject] with Clearable {
+        extends DiagnosticListener[JavaFileObject]
+        with Clearable {
       type D = Diagnostic[_ <: JavaFileObject]
       val diagnostics = new ConcurrentLinkedQueue[D]
       override def report(d: Diagnostic[_ <: JavaFileObject]) {
@@ -247,17 +262,17 @@ class JavapClass(
     // DisassemblerTool.getStandardFileManager(reporter,locale,charset)
     val defaultFileManager: JavaFileManager =
       (loader
-            .tryToLoadClass[JavaFileManager](
-                "com.sun.tools.javap.JavapFileManager")
-            .get getMethod
-          ("create", classOf[DiagnosticListener[_]],
-              classOf[PrintWriter]) invoke
-          (null, reporter, new PrintWriter(System.err, true)))
+        .tryToLoadClass[JavaFileManager](
+          "com.sun.tools.javap.JavapFileManager")
+        .get getMethod
+        ("create", classOf[DiagnosticListener[_]],
+        classOf[PrintWriter]) invoke
+        (null, reporter, new PrintWriter(System.err, true)))
         .asInstanceOf[JavaFileManager] orFailed null
 
     // manages named arrays of bytes, which might have failed to load
-    class JavapFileManager(val managed: Seq[Input])(
-        delegate: JavaFileManager = defaultFileManager)
+    class JavapFileManager(val managed: Seq[Input])(delegate: JavaFileManager =
+                                                      defaultFileManager)
         extends ForwardingJavaFileManager[JavaFileManager](delegate) {
       import JavaFileObject.Kind
       import Kind._
@@ -277,8 +292,9 @@ class JavapClass(
         case _ => null
       }
       // todo: just wrap it as scala abstractfile and adapt it uniformly
-      def fileObjectForInput(
-          name: String, bytes: Try[ByteAry], kind: Kind): JavaFileObject =
+      def fileObjectForInput(name: String,
+                             bytes: Try[ByteAry],
+                             kind: Kind): JavaFileObject =
         new SimpleJavaFileObject(uri(name), kind) {
           override def openInputStream(): InputStream =
             new ByteArrayInputStream(bytes.get)
@@ -288,8 +304,9 @@ class JavapClass(
           // suppress
           override def getLastModified: Long = -1L
         }
-      override def getJavaFileForInput(
-          location: Location, className: String, kind: Kind): JavaFileObject =
+      override def getJavaFileForInput(location: Location,
+                                       className: String,
+                                       kind: Kind): JavaFileObject =
         location match {
           case CLASS_PATH => managedFile(className, kind)
           case _ => null
@@ -355,10 +372,10 @@ class JavapClass(
     def apply(options: Seq[String], filter: Boolean)(
         inputs: Seq[Input]): List[JpResult] =
       (inputs map {
-            case (klass, Success(_)) =>
-              applyOne(options, filter, klass, inputs).get
-            case (_, Failure(e)) => JpResult(e.toString)
-          }).toList orFailed List(noToolError)
+        case (klass, Success(_)) =>
+          applyOne(options, filter, klass, inputs).get
+        case (_, Failure(e)) => JpResult(e.toString)
+      }).toList orFailed List(noToolError)
   }
 
   object JavapTool {
@@ -475,19 +492,19 @@ object Javap {
   }
 
   val helps = List(
-      "usage" -> ":javap [opts] [path or class or -]...",
-      "-help" -> "Prints this help message",
-      "-verbose/-v" -> "Stack size, number of locals, method args",
-      "-private/-p" -> "Private classes and members",
-      "-package" -> "Package-private classes and members",
-      "-protected" -> "Protected classes and members",
-      "-public" -> "Public classes and members",
-      "-l" -> "Line and local variable tables",
-      "-c" -> "Disassembled code",
-      "-s" -> "Internal type signatures",
-      "-sysinfo" -> "System info of class",
-      "-constants" -> "Static final constants",
-      "-filter" -> "Filter REPL machinery from output"
+    "usage" -> ":javap [opts] [path or class or -]...",
+    "-help" -> "Prints this help message",
+    "-verbose/-v" -> "Stack size, number of locals, method args",
+    "-private/-p" -> "Private classes and members",
+    "-package" -> "Package-private classes and members",
+    "-protected" -> "Protected classes and members",
+    "-public" -> "Public classes and members",
+    "-l" -> "Line and local variable tables",
+    "-c" -> "Disassembled code",
+    "-s" -> "Internal type signatures",
+    "-sysinfo" -> "System info of class",
+    "-constants" -> "Static final constants",
+    "-filter" -> "Filter REPL machinery from output"
   )
 
   // match prefixes and unpack opts, or -help on failure

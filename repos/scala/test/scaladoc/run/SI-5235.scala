@@ -64,18 +64,18 @@ object Test extends ScaladocModelTest {
 
     // check comment text
     val gcComment = extractCommentText(
-        GenericColl._method("reverse").comment.get)
+      GenericColl._method("reverse").comment.get)
     val scComment = extractCommentText(
-        SpecificColl._method("reverse").comment.get)
+      SpecificColl._method("reverse").comment.get)
     val mcComment = extractCommentText(
-        MyCollection._method("reverse").comment.get)
+      MyCollection._method("reverse").comment.get)
     assert(gcComment.contains("Returns the reversed GenericColl."),
            gcComment + ".contains(\"Returns the reversed GenericColl.\")")
     assert(scComment.contains("Returns the reversed BullSh."),
            scComment + ".contains(\"Returns the reversed BullSh.\")")
     assert(
-        mcComment.contains("Returns the reversed mycoll.MyCollection."),
-        mcComment + ".contains(\"Returns the reversed mycoll.MyCollection.\")")
+      mcComment.contains("Returns the reversed mycoll.MyCollection."),
+      mcComment + ".contains(\"Returns the reversed mycoll.MyCollection.\")")
 
     // check signatures
     val gcReverse = GenericColl._method("reverse")
@@ -91,11 +91,11 @@ object Test extends ScaladocModelTest {
            mcReverseType.name + " == MyCollection")
     assert(gcReverseType.refEntity(0)._1 == LinkToTpl(GenericColl),
            gcReverse.qualifiedName + "'s return type has a link to " +
-           GenericColl.qualifiedName)
+             GenericColl.qualifiedName)
     assert(scReverseType.refEntity(0)._1 == Tooltip("BullSh"),
            scReverseType.refEntity(0)._1 + " == Tooltip(\"BullSh\")")
     assert(mcReverseType.refEntity(0)._1 == LinkToTpl(MyCollection),
            mcReverse.qualifiedName + "'s return type has a link to " +
-           MyCollection.qualifiedName)
+             MyCollection.qualifiedName)
   }
 }

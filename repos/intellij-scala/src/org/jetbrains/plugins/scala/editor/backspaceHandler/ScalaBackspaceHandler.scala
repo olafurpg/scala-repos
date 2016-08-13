@@ -36,17 +36,18 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
           val tagToDelete = element.getParent.getLastChild
 
           if (ScaladocSyntaxElementType.canClose(
-                  element.getNode.getElementType,
-                  tagToDelete.getNode.getElementType)) {
+                element.getNode.getElementType,
+                tagToDelete.getNode.getElementType)) {
             val textLength =
               if (tagToDelete.getNode.getElementType != ScalaDocTokenType.DOC_BOLD_TAG)
-                tagToDelete.getTextLength else 1
+                tagToDelete.getTextLength
+              else 1
             document.deleteString(tagToDelete.getTextOffset,
                                   tagToDelete.getTextOffset + textLength)
           }
         } else {
-          document.deleteString(
-              element.getTextOffset, element.getTextOffset + 2)
+          document.deleteString(element.getTextOffset,
+                                element.getTextOffset + 2)
           editor.getCaretModel.moveCaretRelatively(1, 0, false, false, false)
         }
 
@@ -66,8 +67,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
           val offsetInName =
             editor.getCaretModel.getOffset - element.getTextOffset + 1
           editor.getDocument.deleteString(
-              closingTag.getTextOffset + offsetInName,
-              closingTag.getTextOffset + offsetInName + 1)
+            closingTag.getTextOffset + offsetInName,
+            closingTag.getTextOffset + offsetInName + 1)
           PsiDocumentManager
             .getInstance(file.getProject)
             .commitDocument(editor.getDocument)
@@ -80,8 +81,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
                element.getNextSibling != null &&
                element.getNextSibling.getNode.getElementType == ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_END_DELIMITER) {
       extensions.inWriteAction {
-        editor.getDocument.deleteString(
-            element.getTextOffset + 1, element.getTextOffset + 2)
+        editor.getDocument
+          .deleteString(element.getTextOffset + 1, element.getTextOffset + 2)
         PsiDocumentManager
           .getInstance(file.getProject)
           .commitDocument(editor.getDocument)
@@ -91,7 +92,7 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
                element.getParent.getLastChild.getNode.getElementType == ScalaTokenTypes.tINTERPOLATED_STRING_END &&
                element.getPrevSibling != null &&
                isMultilineInterpolatedStringPrefix(
-                   element.getPrevSibling.getNode.getElementType)) {
+                 element.getPrevSibling.getNode.getElementType)) {
       correctMultilineString(element.getParent.getLastChild.getTextOffset)
     }
 
@@ -102,8 +103,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
 
     def correctMultilineString(closingQuotesOffset: Int) {
       extensions.inWriteAction {
-        editor.getDocument.deleteString(
-            closingQuotesOffset, closingQuotesOffset + 3)
+        editor.getDocument
+          .deleteString(closingQuotesOffset, closingQuotesOffset + 3)
 //        editor.getCaretModel.moveCaretRelatively(-1, 0, false, false, false) //http://youtrack.jetbrains.com/issue/SCL-6490
         PsiDocumentManager
           .getInstance(file.getProject)
@@ -112,15 +113,16 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
     }
 
     def needCorrecrWiki(element: PsiElement) =
-      (element.getNode.getElementType.isInstanceOf[ScaladocSyntaxElementType] ||
-          element.getText == "{{{") &&
-      (element.getParent.getLastChild != element || element.getText == "'''" &&
+      (element.getNode.getElementType
+        .isInstanceOf[ScaladocSyntaxElementType] ||
+        element.getText == "{{{") &&
+        (element.getParent.getLastChild != element || element.getText == "'''" &&
           element.getPrevSibling != null &&
           element.getPrevSibling.getText == "'")
   }
 
   /*
-    In some cases with nested braces (like '{()}' ) IDEA can't properly handle backspace action due to 
+    In some cases with nested braces (like '{()}' ) IDEA can't properly handle backspace action due to
     bag in BraceMatchingUtil (it looks for every lbrace/rbrace token regardless of they are a pair or not)
     So we have to fix it in our handler
    */

@@ -19,9 +19,9 @@ object PairingRepo {
   private def selectTourUser(tourId: String, userId: String) =
     BSONDocument("tid" -> tourId, "u" -> userId)
   private val selectPlaying = BSONDocument(
-      "s" -> BSONDocument("$lt" -> chess.Status.Mate.id))
+    "s" -> BSONDocument("$lt" -> chess.Status.Mate.id))
   private val selectFinished = BSONDocument(
-      "s" -> BSONDocument("$gte" -> chess.Status.Mate.id))
+    "s" -> BSONDocument("$gte" -> chess.Status.Mate.id))
   private val recentSort = BSONDocument("d" -> -1)
   private val chronoSort = BSONDocument("d" -> 1)
 
@@ -40,14 +40,14 @@ object PairingRepo {
                     nb: Int): Fu[Pairing.LastOpponents] =
     coll
       .find(
-          selectTour(tourId) ++ BSONDocument(
-              "u" -> BSONDocument("$in" -> userIds)),
-          BSONDocument("_id" -> false, "u" -> true)
+        selectTour(tourId) ++ BSONDocument(
+          "u" -> BSONDocument("$in" -> userIds)),
+        BSONDocument("_id" -> false, "u" -> true)
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
       .enumerate(nb) |>>> Iteratee.fold(
-        scala.collection.immutable.Map.empty[String, String]) { (acc, doc) =>
+      scala.collection.immutable.Map.empty[String, String]) { (acc, doc) =>
       ~doc.getAs[List[String]]("u") match {
         case List(u1, u2) =>
           val acc1 = acc.contains(u1).fold(acc, acc.updated(u1, u2))
@@ -58,8 +58,8 @@ object PairingRepo {
   def opponentsOf(tourId: String, userId: String): Fu[Set[String]] =
     coll
       .find(
-          selectTourUser(tourId, userId),
-          BSONDocument("_id" -> false, "u" -> true)
+        selectTourUser(tourId, userId),
+        BSONDocument("_id" -> false, "u" -> true)
       )
       .cursor[BSONDocument]()
       .collect[List]()
@@ -69,12 +69,13 @@ object PairingRepo {
         }.toSet
       }
 
-  def recentIdsByTourAndUserId(
-      tourId: String, userId: String, nb: Int): Fu[List[String]] =
+  def recentIdsByTourAndUserId(tourId: String,
+                               userId: String,
+                               nb: Int): Fu[List[String]] =
     coll
       .find(
-          selectTourUser(tourId, userId),
-          BSONDocument("_id" -> true)
+        selectTourUser(tourId, userId),
+        BSONDocument("_id" -> true)
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
@@ -83,11 +84,12 @@ object PairingRepo {
         _.flatMap(_.getAs[String]("_id"))
       }
 
-  def byTourUserNb(
-      tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
+  def byTourUserNb(tourId: String,
+                   userId: String,
+                   nb: Int): Fu[Option[Pairing]] =
     (nb > 0) ?? coll
       .find(
-          selectTourUser(tourId, userId)
+        selectTourUser(tourId, userId)
       )
       .sort(chronoSort)
       .skip(nb - 1)
@@ -106,9 +108,9 @@ object PairingRepo {
     coll
       .aggregate(Match(selectTour(tourId)),
                  List(
-                     Project(BSONDocument("u" -> true, "_id" -> false)),
-                     Unwind("u"),
-                     GroupField("u")("nb" -> SumValue(1))
+                   Project(BSONDocument("u" -> true, "_id" -> false)),
+                   Unwind("u"),
+                   GroupField("u")("nb" -> SumValue(1))
                  ))
       .map {
         _.documents.flatMap { doc =>
@@ -131,11 +133,11 @@ object PairingRepo {
   def findPlaying(tourId: String, userId: String): Fu[Option[Pairing]] =
     coll.find(selectTourUser(tourId, userId) ++ selectPlaying).one[Pairing]
 
-  def finishedByPlayerChronological(
-      tourId: String, userId: String): Fu[Pairings] =
+  def finishedByPlayerChronological(tourId: String,
+                                    userId: String): Fu[Pairings] =
     coll
       .find(
-          selectTourUser(tourId, userId) ++ selectFinished
+        selectTourUser(tourId, userId) ++ selectFinished
       )
       .sort(chronoSort)
       .cursor[Pairing]()
@@ -150,9 +152,9 @@ object PairingRepo {
     coll
       .update(selectId(g.id),
               BSONDocument(
-                  "$set" -> BSONDocument("s" -> g.status.id,
-                                         "w" -> g.winnerColor.map(_.white),
-                                         "t" -> g.turns)))
+                "$set" -> BSONDocument("s" -> g.status.id,
+                                       "w" -> g.winnerColor.map(_.white),
+                                       "t" -> g.turns)))
       .void
 
   def setBerserk(pairing: Pairing, userId: String, value: Int) =
@@ -173,19 +175,22 @@ object PairingRepo {
   def playingUserIds(tour: Tournament): Fu[Set[String]] =
     coll
       .aggregate(Match(selectTour(tour.id) ++ selectPlaying),
-                 List(Project(BSONDocument("u" -> BSONBoolean(true),
-                                           "_id" -> BSONBoolean(false))),
+                 List(Project(
+                        BSONDocument("u" -> BSONBoolean(true),
+                                     "_id" -> BSONBoolean(false))),
                       Unwind("u"),
                       Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
-      .map(_.documents.headOption
-            .flatMap(_.getAs[Set[String]]("ids"))
-            .getOrElse(Set.empty[String]))
+      .map(
+        _.documents.headOption
+          .flatMap(_.getAs[Set[String]]("ids"))
+          .getOrElse(Set.empty[String]))
 
   def playingGameIds(tourId: String): Fu[List[String]] =
     coll
       .aggregate(Match(selectTour(tourId) ++ selectPlaying),
                  List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
-      .map(_.documents.headOption
-            .flatMap(_.getAs[List[String]]("ids"))
-            .getOrElse(List.empty[String]))
+      .map(
+        _.documents.headOption
+          .flatMap(_.getAs[List[String]]("ids"))
+          .getOrElse(List.empty[String]))
 }

@@ -63,15 +63,22 @@ private[lobby] case class RemoveSeek(seekId: String)
 private[lobby] case class RemoveHooks(hooks: Set[Hook])
 private[lobby] case class CancelHook(uid: String)
 private[lobby] case class CancelSeek(seekId: String, user: LobbyUser)
-private[lobby] case class BiteHook(
-    hookId: String, uid: String, user: Option[LobbyUser])
+private[lobby] case class BiteHook(hookId: String,
+                                   uid: String,
+                                   user: Option[LobbyUser])
 private[lobby] case class BiteSeek(seekId: String, user: LobbyUser)
-private[lobby] case class JoinHook(
-    uid: String, hook: Hook, game: Game, creatorColor: chess.Color)
-private[lobby] case class JoinSeek(
-    userId: String, seek: Seek, game: Game, creatorColor: chess.Color)
-private[lobby] case class Join(
-    uid: String, user: Option[User], blocking: Set[String], mobile: Boolean)
+private[lobby] case class JoinHook(uid: String,
+                                   hook: Hook,
+                                   game: Game,
+                                   creatorColor: chess.Color)
+private[lobby] case class JoinSeek(userId: String,
+                                   seek: Seek,
+                                   game: Game,
+                                   creatorColor: chess.Color)
+private[lobby] case class Join(uid: String,
+                               user: Option[User],
+                               blocking: Set[String],
+                               mobile: Boolean)
 private[lobby] case object Resync
 private[lobby] case class HookIds(ids: Vector[String])
 

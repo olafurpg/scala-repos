@@ -24,7 +24,12 @@ import scala.collection.JavaConverters._
 import org.apache.spark.{SecurityManager, SparkConf, SparkContext}
 import org.apache.spark.internal.Logging
 import org.apache.spark.scheduler._
-import org.apache.spark.status.api.v1.{ApiRootResource, ApplicationAttemptInfo, ApplicationInfo, UIRoot}
+import org.apache.spark.status.api.v1.{
+  ApiRootResource,
+  ApplicationAttemptInfo,
+  ApplicationInfo,
+  UIRoot
+}
 import org.apache.spark.storage.StorageStatusListener
 import org.apache.spark.ui.JettyUtils._
 import org.apache.spark.ui.env.{EnvironmentListener, EnvironmentTab}
@@ -55,7 +60,9 @@ private[spark] class SparkUI private (
                   SparkUI.getUIPort(conf),
                   conf,
                   basePath,
-                  "SparkUI") with Logging with UIRoot {
+                  "SparkUI")
+    with Logging
+    with UIRoot {
 
   val killEnabled =
     sc.map(_.conf.getBoolean("spark.ui.killEnabled", true)).getOrElse(false)
@@ -76,10 +83,10 @@ private[spark] class SparkUI private (
     attachHandler(ApiRootResource.getServletHandler(this))
     // This should be POST only, but, the YARN AM proxy won't proxy POSTs
     attachHandler(
-        createRedirectHandler("/stages/stage/kill",
-                              "/stages/",
-                              stagesTab.handleKillRequest,
-                              httpMethods = Set("GET", "POST")))
+      createRedirectHandler("/stages/stage/kill",
+                            "/stages/",
+                            stagesTab.handleKillRequest,
+                            httpMethods = Set("GET", "POST")))
   }
   initialize()
 
@@ -108,24 +115,24 @@ private[spark] class SparkUI private (
 
   def getApplicationInfoList: Iterator[ApplicationInfo] = {
     Iterator(
-        new ApplicationInfo(
-            id = appId,
-            name = appName,
-            coresGranted = None,
-            maxCores = None,
-            coresPerExecutor = None,
-            memoryPerExecutorMB = None,
-            attempts = Seq(
-                  new ApplicationAttemptInfo(
-                      attemptId = None,
-                      startTime = new Date(startTime),
-                      endTime = new Date(-1),
-                      duration = 0,
-                      lastUpdated = new Date(startTime),
-                      sparkUser = "",
-                      completed = false
-                  ))
-        ))
+      new ApplicationInfo(
+        id = appId,
+        name = appName,
+        coresGranted = None,
+        maxCores = None,
+        coresPerExecutor = None,
+        memoryPerExecutorMB = None,
+        attempts = Seq(
+          new ApplicationAttemptInfo(
+            attemptId = None,
+            startTime = new Date(startTime),
+            endTime = new Date(-1),
+            duration = 0,
+            lastUpdated = new Date(startTime),
+            sparkUser = "",
+            completed = false
+          ))
+      ))
   }
 }
 

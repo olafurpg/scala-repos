@@ -85,9 +85,9 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
   def decompress(schemaBytes: ByteBuffer): Schema =
     decompressCache.getOrElseUpdate(schemaBytes, {
       val bis = new ByteArrayInputStream(
-          schemaBytes.array(),
-          schemaBytes.arrayOffset() + schemaBytes.position(),
-          schemaBytes.remaining())
+        schemaBytes.array(),
+        schemaBytes.arrayOffset() + schemaBytes.position(),
+        schemaBytes.remaining())
       val bytes = IOUtils.toByteArray(codec.compressedInputStream(bis))
       new Schema.Parser().parse(new String(bytes, StandardCharsets.UTF_8))
     })
@@ -133,7 +133,7 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
             case Some(s) => new Schema.Parser().parse(s)
             case None =>
               throw new SparkException(
-                  "Error reading attempting to read avro data -- encountered an unknown " +
+                "Error reading attempting to read avro data -- encountered an unknown " +
                   s"fingerprint: $fingerprint, not sure what schema to use.  This could happen " +
                   "if you registered additional schemas after starting your spark context.")
           }
@@ -150,8 +150,9 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
       .read(null, decoder)
   }
 
-  override def write(
-      kryo: Kryo, output: KryoOutput, datum: GenericRecord): Unit =
+  override def write(kryo: Kryo,
+                     output: KryoOutput,
+                     datum: GenericRecord): Unit =
     serializeDatum(datum, output)
 
   override def read(kryo: Kryo,

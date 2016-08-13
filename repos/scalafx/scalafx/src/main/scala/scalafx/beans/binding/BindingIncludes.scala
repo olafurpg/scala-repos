@@ -26,7 +26,12 @@
  */
 package scalafx.beans.binding
 
-import javafx.beans.binding.{DoubleBinding, FloatBinding, IntegerBinding, LongBinding}
+import javafx.beans.binding.{
+  DoubleBinding,
+  FloatBinding,
+  IntegerBinding,
+  LongBinding
+}
 import javafx.beans.value.ChangeListener
 import javafx.beans.{InvalidationListener, binding => jfxbb, value => jfxbv}
 import javafx.{beans => jfxb}

@@ -41,13 +41,14 @@ object MediaErrorEvent {
   val MediaError: EventType[jfxsm.MediaErrorEvent] =
     jfxsm.MediaErrorEvent.MEDIA_ERROR
   @deprecated(
-      "Use MediaError; MEDIA_ERROR will be removed in a future release",
-      "8.0.60-R10")
+    "Use MediaError; MEDIA_ERROR will be removed in a future release",
+    "8.0.60-R10")
   val MEDIA_ERROR = MediaError
 }
 
 class MediaErrorEvent(override val delegate: jfxsm.MediaErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsm.MediaErrorEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsm.MediaErrorEvent] {
 
   /**
     * Retrieve the error associated with this event.

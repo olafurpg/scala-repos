@@ -23,7 +23,7 @@ import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
   * Wrapper for a collection type witnessing that it has the statically specified length. Can be
   * applied to any type which can be viewed as a `GenTraversableLike`, ie. standard collections,
   * `Array`s, `String`s etc.
-  * 
+  *
   * @author Miles Sabin
   */
 final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
@@ -33,14 +33,15 @@ final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
 
 /**
   * Carrier for `Sized` operations.
-  * 
+  *
   * These operations are implemented here as extension methods of the minimal `Sized` type to avoid issues that would
   * otherwise be caused by its covariance.
-  * 
+  *
   * @author Miles Sabin
   */
-class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
-    s: Sized[Repr, L], itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
+class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
+    s: Sized[Repr, L],
+    itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
   import nat._
   import ops.nat._
   import LT._
@@ -108,7 +109,7 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
 
   /**
     * Returns all but the  first ''m'' elements of this collection. An explicit type argument must be provided. Available
-    * only if there is evidence that this collection has at least ''m'' elements. The resulting collection will be 
+    * only if there is evidence that this collection has at least ''m'' elements. The resulting collection will be
     * statically known to have ''m'' less elements than this collection.
     */
   def drop[M <: Nat](implicit diff: Diff[L, M], ev: ToInt[M]) =
@@ -164,11 +165,11 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
     * Append the argument collection to this collection. The resulting collection will be statically known to have
     * ''m+n'' elements.
     */
-  def ++[B >: A0, That, M <: Nat](
-      that: Sized[That, M])(implicit sum: Sum[L, M],
-                            cbf: CanBuildFrom[Repr, B, That],
-                            convThat: That => GenTraversableLike[B, That],
-                            ev: AdditiveCollection[That]) =
+  def ++[B >: A0, That, M <: Nat](that: Sized[That, M])(
+      implicit sum: Sum[L, M],
+      cbf: CanBuildFrom[Repr, B, That],
+      convThat: That => GenTraversableLike[B, That],
+      ev: AdditiveCollection[That]) =
     wrap[That, sum.Out](s.unsized ++ that.unsized)
 
   /**
@@ -180,15 +181,15 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
     wrap[That, L](s.unsized map f)
 
   /**
-    * Converts this `Sized` to an `HList` whose elements have the same type as in `Repr`. 
+    * Converts this `Sized` to an `HList` whose elements have the same type as in `Repr`.
     */
   def toHList(implicit hl: ToHList[Repr, L]): hl.Out = hl(s)
 
   /**
     * Converts this `Sized` to a tuple whose elements have the same type as in `Repr`.
     */
-  def tupled[L0 <: HList, T](
-      implicit hl: ToHList.Aux[Repr, L, L0], t: Tupler.Aux[L0, T]): T =
+  def tupled[L0 <: HList, T](implicit hl: ToHList.Aux[Repr, L, L0],
+                             t: Tupler.Aux[L0, T]): T =
     t(hl(s))
 }
 
@@ -227,8 +228,8 @@ object AdditiveCollection {
   import scala.collection.immutable.Queue
   import scala.collection.LinearSeq
 
-  implicit def linearSeqAdditiveCollection[
-      T]: AdditiveCollection[LinearSeq[T]] =
+  implicit def linearSeqAdditiveCollection[T]
+    : AdditiveCollection[LinearSeq[T]] =
     new AdditiveCollection[LinearSeq[T]] {}
 
   implicit def vectorAdditiveCollection[T]: AdditiveCollection[Vector[T]] =
@@ -249,11 +250,11 @@ object AdditiveCollection {
   implicit def queueAdditiveCollection[T]: AdditiveCollection[Queue[T]] =
     new AdditiveCollection[Queue[T]] {}
 
-  implicit def indexedSeqAdditiveCollection[T]: AdditiveCollection[
-      IndexedSeq[T]] =
+  implicit def indexedSeqAdditiveCollection[T]
+    : AdditiveCollection[IndexedSeq[T]] =
     new AdditiveCollection[IndexedSeq[T]] {}
 
-  implicit def defaultAdditiveCollection[T]: AdditiveCollection[
-      collection.immutable.IndexedSeq[T]] =
+  implicit def defaultAdditiveCollection[T]
+    : AdditiveCollection[collection.immutable.IndexedSeq[T]] =
     new AdditiveCollection[collection.immutable.IndexedSeq[T]] {}
 }

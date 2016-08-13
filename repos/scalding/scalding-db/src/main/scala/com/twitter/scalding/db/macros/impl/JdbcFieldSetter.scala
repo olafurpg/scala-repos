@@ -31,8 +31,9 @@ private[macros] object JdbcFieldSetter extends CaseClassFieldSetter {
     q"""$container.setObject($idx + 1, null)"""
   }
 
-  override def default(c: Context)(
-      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+  override def default(c: Context)(idx: Int,
+                                   container: c.TermName,
+                                   fieldValue: c.Tree): c.Tree = {
     import c.universe._
     q"""$container.setObject($idx + 1, $fieldValue)"""
   }

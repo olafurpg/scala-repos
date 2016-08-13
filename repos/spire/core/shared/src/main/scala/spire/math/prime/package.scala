@@ -137,8 +137,10 @@ package object prime {
       @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
 
       @tailrec
-      def fastRho(
-          x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
+      def fastRho(x: SafeLong,
+                  q0: SafeLong,
+                  r: SafeLong,
+                  m: SafeLong): SafeLong = {
         var y = x
         var q = q0
         cfor(0)(r > _, _ + 1)(_ => y = f(y))
@@ -158,7 +160,8 @@ package object prime {
         }
 
         if (g == 1) fastRho(y, q, r * 2, m)
-        else if (g == n) slowRho(x, ys) else g
+        else if (g == n) slowRho(x, ys)
+        else g
       }
 
       @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {

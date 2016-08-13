@@ -46,14 +46,14 @@ object StackedBarChart {
                   yAxis: Axis[Y],
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new StackedBarChart[X, Y](
-        new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data))
+      new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data))
 
   def apply[X, Y](xAxis: Axis[X],
                   yAxis: Axis[Y],
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
                   categoryGap: Double) =
     new StackedBarChart[X, Y](
-        new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data, categoryGap))
+      new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data, categoryGap))
 }
 
 class StackedBarChart[X, Y](override val delegate: jfxsc.StackedBarChart[X, Y])

@@ -1,4 +1,9 @@
-import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ObjectInputStream,
+  ObjectOutputStream,
+  ByteArrayOutputStream
+}
 
 object Test {
   def main(args: Array[String]): Unit = {
@@ -21,8 +26,9 @@ object Test {
 
     val specializedLambda = (p: Int) => List(p, c).length
     assert(serializeDeserialize(specializedLambda).apply(42) == 2)
-    assert(serializeDeserialize(serializeDeserialize(specializedLambda))
-          .apply(42) == 2)
+    assert(
+      serializeDeserialize(serializeDeserialize(specializedLambda))
+        .apply(42) == 2)
   }
 
   def serializeDeserialize[T <: AnyRef](obj: T) = {
@@ -30,7 +36,7 @@ object Test {
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj)
     val in = new ObjectInputStream(
-        new ByteArrayInputStream(buffer.toByteArray))
+      new ByteArrayInputStream(buffer.toByteArray))
     in.readObject.asInstanceOf[T]
   }
 }

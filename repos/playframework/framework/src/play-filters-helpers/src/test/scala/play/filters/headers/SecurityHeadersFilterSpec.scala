@@ -34,12 +34,12 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
 
   def withApplication[T](result: Result, config: String)(block: => T): T = {
     running(
-        _.configure(configure(config)).overrides(
-            bind[Router].to(Router.from {
+      _.configure(configure(config)).overrides(
+        bind[Router].to(Router.from {
           case _ => Action(result)
         }),
-            bind[HttpFilters].to[Filters]
-        ))(_ => block)
+        bind[HttpFilters].to[Filters]
+      ))(_ => block)
   }
 
   "security headers" should {
@@ -55,9 +55,9 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
       header(X_XSS_PROTECTION_HEADER, result) must beSome("1; mode=block")
       header(X_CONTENT_TYPE_OPTIONS_HEADER, result) must beSome("nosniff")
       header(X_PERMITTED_CROSS_DOMAIN_POLICIES_HEADER, result) must beSome(
-          "master-only")
+        "master-only")
       header(CONTENT_SECURITY_POLICY_HEADER, result) must beSome(
-          "default-src 'self'")
+        "default-src 'self'")
     }
 
     "work with singleton apply method using configuration" in new WithApplication() {
@@ -70,16 +70,16 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
       header(X_XSS_PROTECTION_HEADER, result) must beSome("1; mode=block")
       header(X_CONTENT_TYPE_OPTIONS_HEADER, result) must beSome("nosniff")
       header(X_PERMITTED_CROSS_DOMAIN_POLICIES_HEADER, result) must beSome(
-          "master-only")
+        "master-only")
       header(CONTENT_SECURITY_POLICY_HEADER, result) must beSome(
-          "default-src 'self'")
+        "default-src 'self'")
     }
 
     "frame options" should {
 
       "work with custom frame options" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.frameOptions=some frame option
         """.stripMargin) {
         val result = route(FakeRequest()).get
@@ -88,8 +88,8 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
       }
 
       "work with no frame options" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.frameOptions=null
         """.stripMargin) {
 
@@ -102,19 +102,19 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
     "xss protection" should {
 
       "work with custom xss protection" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.xssProtection=some xss protection
         """.stripMargin) {
         val result = route(FakeRequest()).get
 
         header(X_XSS_PROTECTION_HEADER, result) must beSome(
-            "some xss protection")
+          "some xss protection")
       }
 
       "work with no xss protection" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.xssProtection=null
         """.stripMargin) {
         val result = route(FakeRequest()).get
@@ -126,19 +126,19 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
     "content type options protection" should {
 
       "work with custom content type options protection" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.contentTypeOptions="some content type option"
         """.stripMargin) {
         val result = route(FakeRequest()).get
 
         header(X_CONTENT_TYPE_OPTIONS_HEADER, result) must beSome(
-            "some content type option")
+          "some content type option")
       }
 
       "work with no content type options protection" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.contentTypeOptions=null
         """.stripMargin) {
         val result = route(FakeRequest()).get
@@ -150,19 +150,19 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
     "permitted cross domain policies" should {
 
       "work with custom" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.permittedCrossDomainPolicies="some very long word"
         """.stripMargin) {
         val result = route(FakeRequest()).get
 
         header(X_PERMITTED_CROSS_DOMAIN_POLICIES_HEADER, result) must beSome(
-            "some very long word")
+          "some very long word")
       }
 
       "work with none" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.permittedCrossDomainPolicies=null
         """.stripMargin) {
         val result = route(FakeRequest()).get
@@ -174,19 +174,19 @@ object SecurityHeadersFilterSpec extends PlaySpecification {
     "content security policy protection" should {
 
       "work with custom" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.contentSecurityPolicy="some content security policy"
         """.stripMargin) {
         val result = route(FakeRequest()).get
 
         header(CONTENT_SECURITY_POLICY_HEADER, result) must beSome(
-            "some content security policy")
+          "some content security policy")
       }
 
       "work with none" in withApplication(
-          Ok("hello"),
-          """
+        Ok("hello"),
+        """
           |play.filters.headers.contentSecurityPolicy=null
         """.stripMargin) {
         val result = route(FakeRequest()).get

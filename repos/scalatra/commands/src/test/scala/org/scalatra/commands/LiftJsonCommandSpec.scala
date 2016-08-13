@@ -11,7 +11,9 @@ class NativeJsonTestForm extends JsonCommand {
 }
 
 class NativeJsonCommandSpecServlet
-    extends ScalatraServlet with NativeJsonSupport with NativeJsonParsing {
+    extends ScalatraServlet
+    with NativeJsonSupport
+    with NativeJsonParsing {
 
   implicit val jsonFormats: Formats = DefaultFormats
 

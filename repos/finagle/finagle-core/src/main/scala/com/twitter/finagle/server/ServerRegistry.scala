@@ -21,8 +21,8 @@ private[twitter] object ServerRegistry extends StackRegistry {
       case Array(name, addr) =>
         log.log(Level.WARNING,
                 "Labeling servers with the <label>=<addr>" +
-                " syntax is deprecated! Configure your server with a" +
-                " com.twitter.finagle.param.Label instead.")
+                  " syntax is deprecated! Configure your server with a" +
+                  " com.twitter.finagle.param.Label instead.")
         val Seq(ia) = InetSocketAddressUtil.parseHosts(addr)
         addrNames += (ia -> name)
         ia

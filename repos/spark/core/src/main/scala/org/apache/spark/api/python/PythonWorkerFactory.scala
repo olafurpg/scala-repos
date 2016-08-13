@@ -17,7 +17,12 @@
 
 package org.apache.spark.api.python
 
-import java.io.{DataInputStream, DataOutputStream, InputStream, OutputStreamWriter}
+import java.io.{
+  DataInputStream,
+  DataOutputStream,
+  InputStream,
+  OutputStreamWriter
+}
 import java.net.{InetAddress, ServerSocket, Socket, SocketException}
 import java.nio.charset.StandardCharsets
 import java.util.Arrays
@@ -29,8 +34,8 @@ import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.util.{RedirectThread, Utils}
 
-private[spark] class PythonWorkerFactory(
-    pythonExec: String, envVars: Map[String, String])
+private[spark] class PythonWorkerFactory(pythonExec: String,
+                                         envVars: Map[String, String])
     extends Logging {
 
   import PythonWorkerFactory._
@@ -52,9 +57,9 @@ private[spark] class PythonWorkerFactory(
   var simpleWorkers = new mutable.WeakHashMap[Socket, Process]()
 
   val pythonPath = PythonUtils.mergePythonPaths(
-      PythonUtils.sparkPythonPath,
-      envVars.getOrElse("PYTHONPATH", ""),
-      sys.env.getOrElse("PYTHONPATH", ""))
+    PythonUtils.sparkPythonPath,
+    envVars.getOrElse("PYTHONPATH", ""),
+    sys.env.getOrElse("PYTHONPATH", ""))
 
   def create(): Socket = {
     if (useDaemon) {
@@ -80,7 +85,7 @@ private[spark] class PythonWorkerFactory(
       val pid = new DataInputStream(socket.getInputStream).readInt()
       if (pid < 0) {
         throw new IllegalStateException(
-            "Python daemon failed to launch worker with code " + pid)
+          "Python daemon failed to launch worker with code " + pid)
       }
       daemonWorkers.put(socket, pid)
       socket
@@ -97,7 +102,7 @@ private[spark] class PythonWorkerFactory(
         case exc: SocketException =>
           logWarning("Failed to open socket to Python daemon:", exc)
           logWarning(
-              "Assuming that daemon unexpectedly quit, attempting to restart")
+            "Assuming that daemon unexpectedly quit, attempting to restart")
           stopDaemon()
           startDaemon()
           createSocket()
@@ -111,12 +116,12 @@ private[spark] class PythonWorkerFactory(
   private def createSimpleWorker(): Socket = {
     var serverSocket: ServerSocket = null
     try {
-      serverSocket = new ServerSocket(
-          0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
+      serverSocket =
+        new ServerSocket(0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
 
       // Create and start the worker
       val pb = new ProcessBuilder(
-          Arrays.asList(pythonExec, "-m", "pyspark.worker"))
+        Arrays.asList(pythonExec, "-m", "pyspark.worker"))
       val workerEnv = pb.environment()
       workerEnv.putAll(envVars.asJava)
       workerEnv.put("PYTHONPATH", pythonPath)
@@ -128,8 +133,8 @@ private[spark] class PythonWorkerFactory(
       redirectStreamsToStderr(worker.getInputStream, worker.getErrorStream)
 
       // Tell the worker our port
-      val out = new OutputStreamWriter(
-          worker.getOutputStream, StandardCharsets.UTF_8)
+      val out =
+        new OutputStreamWriter(worker.getOutputStream, StandardCharsets.UTF_8)
       out.write(serverSocket.getLocalPort + "\n")
       out.flush()
 
@@ -142,7 +147,8 @@ private[spark] class PythonWorkerFactory(
       } catch {
         case e: Exception =>
           throw new SparkException(
-              "Python worker did not connect back in time", e)
+            "Python worker did not connect back in time",
+            e)
       }
     } finally {
       if (serverSocket != null) {
@@ -210,8 +216,8 @@ private[spark] class PythonWorkerFactory(
   /**
     * Redirect the given streams to our stderr in separate threads.
     */
-  private def redirectStreamsToStderr(
-      stdout: InputStream, stderr: InputStream) {
+  private def redirectStreamsToStderr(stdout: InputStream,
+                                      stderr: InputStream) {
     try {
       new RedirectThread(stdout, System.err, "stdout reader for " + pythonExec)
         .start()
@@ -235,7 +241,7 @@ private[spark] class PythonWorkerFactory(
       while (true) {
         synchronized {
           if (lastActivity + IDLE_WORKER_TIMEOUT_MS < System.currentTimeMillis(
-                  )) {
+                )) {
             cleanupIdleWorkers()
             lastActivity = System.currentTimeMillis()
           }

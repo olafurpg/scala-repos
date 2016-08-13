@@ -20,8 +20,9 @@ import scala.util.parsing.json.{JSON, JSONObject}
   * User: jim
   * Date: 9/22/11
   */
-class UpgradedImageIExtractor(
-    httpClient: HttpClient, article: Article, config: Configuration)
+class UpgradedImageIExtractor(httpClient: HttpClient,
+                              article: Article,
+                              config: Configuration)
     extends ImageExtractor {
 
   import UpgradedImageIExtractor._
@@ -48,7 +49,7 @@ class UpgradedImageIExtractor(
     val sb = new StringBuilder
     // create negative elements
     sb.append(
-        ".html|.gif|.ico|button|twitter.jpg|facebook.jpg|ap_buy_photo|digg.jpg|digg.png|delicious.png|facebook.png|reddit.jpg|doubleclick|diggthis|diggThis|adserver|/ads/|ec.atdmt.com")
+      ".html|.gif|.ico|button|twitter.jpg|facebook.jpg|ap_buy_photo|digg.jpg|digg.png|delicious.png|facebook.png|reddit.jpg|doubleclick|diggthis|diggThis|adserver|/ads/|ec.atdmt.com")
     sb.append("|mediaplex.com|adsatt|view.atdmt")
     Pattern.compile(sb.toString()).matcher(string.empty)
   }
@@ -58,15 +59,15 @@ class UpgradedImageIExtractor(
     checkForKnownElements() match {
       case Some(image) => return image
       case None => {
-          trace("No known images found")
-        }
+        trace("No known images found")
+      }
     }
 
     checkForLargeImages(topNode, 0, 0) match {
       case Some(image) => return image
       case None => {
-          trace("No big images found")
-        }
+        trace("No big images found")
+      }
     }
 
     checkForMetaTag match {
@@ -86,7 +87,7 @@ class UpgradedImageIExtractor(
     // This DOM path may be too restrictive but it's performing quite well at time of writing.
     val dataConfig: String = article.rawDoc
       .select(
-          "div#maincontent div#main div.primary-playback-region div.wcvideoplayer[data-metadata]")
+        "div#maincontent div#main div.primary-playback-region div.wcvideoplayer[data-metadata]")
       .attr("data-metadata")
 
     JSON.parseRaw(dataConfig) match {
@@ -95,7 +96,7 @@ class UpgradedImageIExtractor(
           case Some(JSONObject(headlineImageMap)) =>
             val imgOpt = headlineImageMap.get("url").map(_.toString)
             imgOpt.foreach(imgUrl =>
-                  trace("Got Known MSN Video Headline Image: " + imgUrl))
+              trace("Got Known MSN Video Headline Image: " + imgUrl))
             imgOpt
 
           case _ => None
@@ -133,53 +134,57 @@ class UpgradedImageIExtractor(
   private def checkForLargeImages(node: Element,
                                   parentDepthLevel: Int,
                                   siblingDepthLevel: Int): Option[Image] = {
-    trace("Checking for large images - parent depth " + parentDepthLevel +
+    trace(
+      "Checking for large images - parent depth " + parentDepthLevel +
         " sibling depth: " + siblingDepthLevel)
 
     getImageCandidates(node) match {
       case Some(goodImages) => {
-          trace(
-              "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
-              goodImages.size + " at parent depth: " + parentDepthLevel)
-          val scoredImages = downloadImagesAndGetResults(
-              goodImages, parentDepthLevel)
-          // get the high score image in a tuple
-          scoredImages.sortBy(-_._2).take(1).headOption match {
-            case Some(highScoreImage) => {
-                val mainImage = new Image
-                // mainImage.topImageNode = highScoreImage
-                mainImage.imageSrc = highScoreImage._1.imgSrc
-                mainImage.imageExtractionType = "bigimage"
-                mainImage.bytes = highScoreImage._1.bytes
-                mainImage.confidenceScore = if (scoredImages.size > 0)
-                  (100 / scoredImages.size) else 0
-                trace(
-                    "IMAGE COMPLETE: High Score Image is: " +
-                    mainImage.imageSrc + " Score is: " + highScoreImage._2)
-                return Some(mainImage)
+        trace(
+          "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
+            goodImages.size + " at parent depth: " + parentDepthLevel)
+        val scoredImages =
+          downloadImagesAndGetResults(goodImages, parentDepthLevel)
+        // get the high score image in a tuple
+        scoredImages.sortBy(-_._2).take(1).headOption match {
+          case Some(highScoreImage) => {
+            val mainImage = new Image
+            // mainImage.topImageNode = highScoreImage
+            mainImage.imageSrc = highScoreImage._1.imgSrc
+            mainImage.imageExtractionType = "bigimage"
+            mainImage.bytes = highScoreImage._1.bytes
+            mainImage.confidenceScore =
+              if (scoredImages.size > 0)
+                (100 / scoredImages.size)
+              else 0
+            trace(
+              "IMAGE COMPLETE: High Score Image is: " +
+                mainImage.imageSrc + " Score is: " + highScoreImage._2)
+            return Some(mainImage)
+          }
+          case None => {
+            trace("No good images found after filtering")
+            getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
+              case Some(depthObj) => {
+                return checkForLargeImages(depthObj.node,
+                                           depthObj.parentDepth,
+                                           depthObj.siblingDepth)
               }
-            case None => {
-                trace("No good images found after filtering")
-                getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
-                  case Some(depthObj) => {
-                      return checkForLargeImages(depthObj.node,
-                                                 depthObj.parentDepth,
-                                                 depthObj.siblingDepth)
-                    }
-                  case None => trace("Image iteration is over!")
-                }
-              }
+              case None => trace("Image iteration is over!")
+            }
           }
         }
+      }
       case None => {
-          getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
-            case Some(depthObj) => {
-                return checkForLargeImages(
-                    depthObj.node, depthObj.parentDepth, depthObj.siblingDepth)
-              }
-            case None => trace("Image iteration is over!")
+        getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
+          case Some(depthObj) => {
+            return checkForLargeImages(depthObj.node,
+                                       depthObj.parentDepth,
+                                       depthObj.siblingDepth)
           }
+          case None => trace("Image iteration is over!")
         }
+      }
     }
 
     None
@@ -192,7 +197,8 @@ class UpgradedImageIExtractor(
 
     val MAX_PARENT_DEPTH = 2
     if (parentDepth > MAX_PARENT_DEPTH) {
-      trace("ParentDepth is greater than " + MAX_PARENT_DEPTH +
+      trace(
+        "ParentDepth is greater than " + MAX_PARENT_DEPTH +
           ", aborting depth traversal")
       None
     } else {
@@ -227,39 +233,39 @@ class UpgradedImageIExtractor(
 
     images
       .take(30)
-      .foreach((image: Element) =>
-            {
-          for {
-            locallyStoredImage <- getLocallyStoredImage(
-                buildImagePath(image.attr("src")))
-            width = locallyStoredImage.width if (width > MIN_WIDTH)
-            height = locallyStoredImage.height if (height > MIN_HEIGHT)
-            fileExtension = locallyStoredImage.fileExtension if
-            (fileExtension != ".gif" && fileExtension != "NA")
-            imageSrc = locallyStoredImage.imgSrc if
-            ((depthLevel >= 1 && locallyStoredImage.width > 300) ||
-                depthLevel < 1)
-            if (!isBannerDimensions(width, height))
-          } {
-            val sequenceScore: Float = 1.0f / cnt
-            val area: Float = width * height
-            var totalScore: Float = 0
-            if (initialArea == 0) {
-              // give the initial image a little area boost as well
-              initialArea = area * 1.48f
-              totalScore = 1
-            } else {
-              val areaDifference: Float = area / initialArea
-              totalScore = sequenceScore * areaDifference
-            }
-            trace("IMG: " + imageSrc + " Area is: " +
-                area + " sequence score: " + sequenceScore + " totalScore: " +
-                totalScore)
-            cnt += 1
-
-            imageResults += locallyStoredImage -> totalScore
-            cnt += 1
+      .foreach((image: Element) => {
+        for {
+          locallyStoredImage <- getLocallyStoredImage(
+                                 buildImagePath(image.attr("src")))
+          width = locallyStoredImage.width if (width > MIN_WIDTH)
+          height = locallyStoredImage.height if (height > MIN_HEIGHT)
+          fileExtension = locallyStoredImage.fileExtension
+          if (fileExtension != ".gif" && fileExtension != "NA")
+          imageSrc = locallyStoredImage.imgSrc
+          if ((depthLevel >= 1 && locallyStoredImage.width > 300) ||
+            depthLevel < 1)
+          if (!isBannerDimensions(width, height))
+        } {
+          val sequenceScore: Float = 1.0f / cnt
+          val area: Float = width * height
+          var totalScore: Float = 0
+          if (initialArea == 0) {
+            // give the initial image a little area boost as well
+            initialArea = area * 1.48f
+            totalScore = 1
+          } else {
+            val areaDifference: Float = area / initialArea
+            totalScore = sequenceScore * areaDifference
           }
+          trace(
+            "IMG: " + imageSrc + " Area is: " +
+              area + " sequence score: " + sequenceScore + " totalScore: " +
+              totalScore)
+          cnt += 1
+
+          imageResults += locallyStoredImage -> totalScore
+          cnt += 1
+        }
       })
 
     imageResults
@@ -368,35 +374,34 @@ class UpgradedImageIExtractor(
     var cnt: Int = 0
     val MAX_BYTES_SIZE: Int = 15728640
     val goodImages: ArrayList[Element] = new ArrayList[Element]
-    images.foreach(
-        image =>
-          {
-        try {
-          if (cnt > 30) {
-            trace("Abort! they have over 30 images near the top node: ")
-            return Some(goodImages)
-          }
-          val imageSrc = image.attr("src")
-          getLocallyStoredImage(buildImagePath(imageSrc)) match {
-            case Some(locallyStoredImage) => {
-
-                val bytes = locallyStoredImage.bytes
-                if ((bytes == 0 || bytes > minBytesForImages) &&
-                    bytes < MAX_BYTES_SIZE) {
-                  trace("findImagesThatPassByteSizeTest: Found potential image - size: " +
-                      bytes + " src: " + image.attr("src"))
-                  goodImages.add(image)
-                } else {
-                  trace("Removing image: " + image.attr("src"))
-                  image.remove()
-                }
-              }
-            case None => trace(imageSrc + " unable to fetch")
-          }
-        } catch {
-          case e: Exception => warn(e, e.toString)
+    images.foreach(image => {
+      try {
+        if (cnt > 30) {
+          trace("Abort! they have over 30 images near the top node: ")
+          return Some(goodImages)
         }
-        cnt += 1
+        val imageSrc = image.attr("src")
+        getLocallyStoredImage(buildImagePath(imageSrc)) match {
+          case Some(locallyStoredImage) => {
+
+            val bytes = locallyStoredImage.bytes
+            if ((bytes == 0 || bytes > minBytesForImages) &&
+                bytes < MAX_BYTES_SIZE) {
+              trace(
+                "findImagesThatPassByteSizeTest: Found potential image - size: " +
+                  bytes + " src: " + image.attr("src"))
+              goodImages.add(image)
+            } else {
+              trace("Removing image: " + image.attr("src"))
+              image.remove()
+            }
+          }
+          case None => trace(imageSrc + " unable to fetch")
+        }
+      } catch {
+        case e: Exception => warn(e, e.toString)
+      }
+      cnt += 1
     })
 
     trace(" Now leaving findImagesThatPassByteSizeTest")
@@ -429,10 +434,10 @@ class UpgradedImageIExtractor(
 
         getLocallyStoredImage(mainImage.imageSrc) match {
           case Some(locallyStoredImage) => {
-              mainImage.bytes = locallyStoredImage.bytes
-              mainImage.height = locallyStoredImage.height
-              mainImage.width = locallyStoredImage.width
-            }
+            mainImage.bytes = locallyStoredImage.bytes
+            mainImage.height = locallyStoredImage.height
+            mainImage.width = locallyStoredImage.width
+          }
           case None =>
         }
         trace("link tag found, using it")
@@ -442,11 +447,11 @@ class UpgradedImageIExtractor(
       None
     } catch {
       case e: Exception => {
-          warn(
-              "Unexpected exception caught in checkForLinkTag. Handled by returning None.",
-              e)
-          None
-        }
+        warn(
+          "Unexpected exception caught in checkForLinkTag. Handled by returning None.",
+          e)
+        None
+      }
     }
   }
 
@@ -470,10 +475,10 @@ class UpgradedImageIExtractor(
         mainImage.confidenceScore = 100
         getLocallyStoredImage(mainImage.imageSrc) match {
           case Some(locallyStoredImage) => {
-              mainImage.bytes = locallyStoredImage.bytes
-              mainImage.height = locallyStoredImage.height
-              mainImage.width = locallyStoredImage.width
-            }
+            mainImage.bytes = locallyStoredImage.bytes
+            mainImage.height = locallyStoredImage.height
+            mainImage.width = locallyStoredImage.width
+          }
           case None =>
         }
         trace("open graph tag found, using it: %s".format(imagePath))
@@ -483,9 +488,9 @@ class UpgradedImageIExtractor(
       None
     } catch {
       case e: Exception => {
-          warn(e, e.toString)
-          None
-        }
+        warn(e, e.toString)
+        None
+      }
     }
   }
 
@@ -511,9 +516,8 @@ class UpgradedImageIExtractor(
     val domain = getCleanDomain
     customSiteMapping
       .get(domain)
-      .foreach(classes =>
-            {
-          subDelimRegex.split(classes).foreach(c => KNOWN_IMG_DOM_NAMES += c)
+      .foreach(classes => {
+        subDelimRegex.split(classes).foreach(c => KNOWN_IMG_DOM_NAMES += c)
       })
 
     var knownImageElem: Element = null
@@ -545,13 +549,12 @@ class UpgradedImageIExtractor(
         mainImage.imageExtractionType = "known"
         mainImage.confidenceScore = 90
 
-        getLocallyStoredImage(buildImagePath(mainImage.imageSrc)).foreach(
-            locallyStoredImage =>
-              {
+        getLocallyStoredImage(buildImagePath(mainImage.imageSrc))
+          .foreach(locallyStoredImage => {
             mainImage.bytes = locallyStoredImage.bytes
             mainImage.height = locallyStoredImage.height
             mainImage.width = locallyStoredImage.width
-        })
+          })
 
         Some(mainImage)
 
@@ -574,8 +577,8 @@ class UpgradedImageIExtractor(
       return new URL(pageURL, ImageUtils.cleanImageSrcString(imageSrc)).toString
     } catch {
       case e: MalformedURLException => {
-          warn("Unable to get Image Path: " + imageSrc)
-        }
+        warn("Unable to get Image Path: " + imageSrc)
+      }
     }
 
     imageSrc
@@ -591,13 +594,14 @@ object UpgradedImageIExtractor {
   // place images into, allows for higher accuracy of image extraction
   lazy val customSiteMapping = {
     val lines = Source
-      .fromInputStream(getClass.getResourceAsStream(
-              "/com/gravity/goose/images/known-image-css.txt"))
+      .fromInputStream(
+        getClass.getResourceAsStream(
+          "/com/gravity/goose/images/known-image-css.txt"))
       .getLines()
-      (for (line <- lines) yield {
-        val Array(domain, css) = delimRegex.split(line)
-        domain -> css
-      }).toMap
+    (for (line <- lines) yield {
+      val Array(domain, css) = delimRegex.split(line)
+      domain -> css
+    }).toMap
   }
 
   val KNOWN_IMG_DOM_NAMES = ListBuffer("yn-story-related-media",

@@ -2,7 +2,11 @@ package com.twitter.finagle.loadbalancer
 
 import com.twitter.conversions.time._
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{StatsReceiver, SummarizingStatsReceiver, Stat}
+import com.twitter.finagle.stats.{
+  StatsReceiver,
+  SummarizingStatsReceiver,
+  Stat
+}
 import com.twitter.finagle.util.{Drv, Rng, DefaultTimer}
 import com.twitter.util.{Function => _, _}
 import java.util.concurrent.atomic.AtomicInteger
@@ -50,12 +54,12 @@ private object LatencyProfile {
       p9999: Duration
   ): () => Duration = {
     val dist = Seq(
-        0.5 -> between(min, p50),
-        0.4 -> between(p50, p90),
-        0.05 -> between(p90, p95),
-        0.04 -> between(p95, p99),
-        0.009 -> between(p99, p999),
-        0.0009 -> between(p999, p9999)
+      0.5 -> between(min, p50),
+      0.4 -> between(p50, p90),
+      0.05 -> between(p90, p95),
+      0.04 -> between(p95, p99),
+      0.009 -> between(p99, p999),
+      0.0009 -> between(p999, p9999)
     )
     val (d, l) = dist.unzip
     apply(d, l.toIndexedSeq)
@@ -86,10 +90,9 @@ private[finagle] class LatencyProfile(stopWatch: () => Duration) {
     */
   def slowWithin(start: Duration, end: Duration, factor: Long)(
       next: () => Duration) =
-    () =>
-      {
-        val time = stopWatch()
-        if (time >= start && time <= end) next() * factor else next()
+    () => {
+      val time = stopWatch()
+      if (time >= start && time <= end) next() * factor else next()
     }
 
   /**
@@ -97,14 +100,13 @@ private[finagle] class LatencyProfile(stopWatch: () => Duration) {
     * within the window terminated at `end`.
     */
   def warmup(end: Duration, maxFactor: Double = 5.0)(next: () => Duration) =
-    () =>
-      {
-        val time = stopWatch()
-        val factor =
-          if (time < end) (1.0 / time.inNanoseconds) * (end.inNanoseconds)
-          else 1.0
-        Duration.fromNanoseconds(
-            (next().inNanoseconds * factor.min(maxFactor)).toLong)
+    () => {
+      val time = stopWatch()
+      val factor =
+        if (time < end) (1.0 / time.inNanoseconds) * (end.inNanoseconds)
+        else 1.0
+      Duration.fromNanoseconds(
+        (next().inNanoseconds * factor.min(maxFactor)).toLong)
     }
 }
 
@@ -124,8 +126,8 @@ private[finagle] class LatencyFactory(sr: StatsReceiver) {
       val load = new AtomicInteger(0)
       val maxload = new AtomicInteger(0)
       val gauges = Seq(
-          sr.scope("load").addGauge("" + name) { load.get() },
-          sr.scope("maxload").addGauge("" + name) { maxload.get() }
+        sr.scope("load").addGauge("" + name) { load.get() },
+        sr.scope("maxload").addGauge("" + name) { maxload.get() }
       )
       val count = sr.scope("count").counter("" + name)
 
@@ -172,9 +174,9 @@ private[finagle] object Simulation extends com.twitter.app.App {
 
     val underlying = Var(stable)
     val activity: Activity[Set[ServiceFactory[Unit, Unit]]] = Activity(
-        underlying.map { facs =>
-      Activity.Ok(facs)
-    })
+      underlying.map { facs =>
+        Activity.Ok(facs)
+      })
 
     val factory = bal() match {
       case "p2c" =>
@@ -228,8 +230,8 @@ private[finagle] object Simulation extends com.twitter.app.App {
         println("-" * 100)
         println("Requests at %s".format(stopWatch()))
 
-        val lines = for ((name, fn) <- stats.gauges.toSeq) yield
-          (name.mkString("/"), fn())
+        val lines = for ((name, fn) <- stats.gauges.toSeq)
+          yield (name.mkString("/"), fn())
         for ((name, value) <- lines.sortBy(_._1)) println(name + " " + value)
       }
     }

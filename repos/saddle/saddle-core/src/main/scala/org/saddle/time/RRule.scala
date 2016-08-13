@@ -232,7 +232,7 @@ case class RRule private (
       def from(dt: DateTime): DateTime = {
         if (i == 0)
           throw new IllegalArgumentException(
-              "argument to occurrence must not equal 0")
+            "argument to occurrence must not equal 0")
         else if (i > 0)
           // counting occurrences forward
           outer.from(dt).toStream.drop(i - 1).head
@@ -279,22 +279,22 @@ case class RRule private (
     * provided DateTime instance.
     */
   def from(dt: DateTime): Iterator[DateTime] = {
-    val riter = RecurrenceIteratorFactory.createRecurrenceIterator(
-        toICal, dt2dtv(dt), inzone.toTimeZone)
+    val riter = RecurrenceIteratorFactory
+      .createRecurrenceIterator(toICal, dt2dtv(dt), inzone.toTimeZone)
 
     val iterWithJoins = joins.foldLeft(riter) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.join(i1, tmpiter)
     }
 
     val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.except(i1, tmpiter)
     }
 

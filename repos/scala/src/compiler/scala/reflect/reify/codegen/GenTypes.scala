@@ -6,7 +6,11 @@ trait GenTypes { self: Reifier =>
   import global._
   import definitions._
   private val runDefinitions = currentRun.runDefinitions
-  import runDefinitions.{ReflectRuntimeUniverse, ReflectRuntimeCurrentMirror, _}
+  import runDefinitions.{
+    ReflectRuntimeUniverse,
+    ReflectRuntimeCurrentMirror,
+    _
+  }
 
   /**
     *  Reify a type.
@@ -37,12 +41,12 @@ trait GenTypes { self: Reifier =>
         case tpe @ ThisType(root) if root.isRoot =>
           mirrorBuildCall(nme.thisPrefix, mirrorMirrorSelect(nme.RootClass))
         case tpe @ ThisType(empty) if empty.isEmptyPackageClass =>
-          mirrorBuildCall(
-              nme.thisPrefix, mirrorMirrorSelect(nme.EmptyPackageClass))
+          mirrorBuildCall(nme.thisPrefix,
+                          mirrorMirrorSelect(nme.EmptyPackageClass))
         case tpe @ ThisType(clazz) if clazz.isModuleClass && clazz.isStatic =>
           val module = reify(clazz.sourceModule)
-          val moduleClass = Select(
-              Select(module, nme.asModule), nme.moduleClass)
+          val moduleClass =
+            Select(Select(module, nme.asModule), nme.moduleClass)
           mirrorBuildCall(nme.ThisType, moduleClass)
         case tpe @ ThisType(sym) =>
           reifyBuildCall(nme.ThisType, sym)
@@ -79,8 +83,8 @@ trait GenTypes { self: Reifier =>
       // to find out the whereabouts of the error run scalac with -Ydebug
       if (reifyDebug)
         println(
-            "launching implicit search for %s.%s[%s]".format(
-                universe, tagFlavor, tpe))
+          "launching implicit search for %s.%s[%s]"
+            .format(universe, tagFlavor, tpe))
       val result = typer.resolveTypeTag(defaultErrorPosition,
                                         universe.tpe,
                                         tpe,
@@ -116,19 +120,19 @@ trait GenTypes { self: Reifier =>
   private def spliceAsManifest(tpe: Type): Tree = {
     def isSynthetic(manifest: Tree) =
       manifest exists
-      (sub =>
-            sub.symbol != null &&
-            (sub.symbol == FullManifestModule ||
-                sub.symbol.owner == FullManifestModule))
+        (sub =>
+           sub.symbol != null &&
+             (sub.symbol == FullManifestModule ||
+               sub.symbol.owner == FullManifestModule))
     def searchForManifest(typer: analyzer.Typer): Tree =
       analyzer.inferImplicit(
-          EmptyTree,
-          appliedType(FullManifestClass.toTypeConstructor, List(tpe)),
-          reportAmbiguous = false,
-          isView = false,
-          context = typer.context,
-          saveAmbiguousDivergent = false,
-          pos = defaultErrorPosition) match {
+        EmptyTree,
+        appliedType(FullManifestClass.toTypeConstructor, List(tpe)),
+        reportAmbiguous = false,
+        isView = false,
+        context = typer.context,
+        saveAmbiguousDivergent = false,
+        pos = defaultErrorPosition) match {
         case success if !success.tree.isEmpty && !isSynthetic(success.tree) =>
           val manifestInScope = success.tree
           // todo. write a test for this
@@ -136,19 +140,19 @@ trait GenTypes { self: Reifier =>
             CannotConvertManifestToTagWithoutScalaReflect(tpe, manifestInScope)
           val cm = typer.typed(Ident(ReflectRuntimeCurrentMirror))
           val internal = gen.mkAttributedSelect(
-              gen.mkAttributedRef(ReflectRuntimeUniverse), UniverseInternal)
+            gen.mkAttributedRef(ReflectRuntimeUniverse),
+            UniverseInternal)
           val tagTree = gen.mkMethodCall(
-              Select(internal, nme.manifestToTypeTag),
-              List(tpe),
-              List(cm, manifestInScope))
+            Select(internal, nme.manifestToTypeTag),
+            List(tpe),
+            List(cm, manifestInScope))
           Select(Apply(Select(tagTree, nme.in), List(Ident(nme.MIRROR_SHORT))),
                  nme.tpe)
         case _ =>
           EmptyTree
       }
     val result = typer.silent(silentTyper =>
-          silentTyper.context.withMacrosDisabled(
-              searchForManifest(silentTyper)))
+      silentTyper.context.withMacrosDisabled(searchForManifest(silentTyper)))
     result match {
       case analyzer.SilentResultValue(result) => result
       case analyzer.SilentTypeError(_) => EmptyTree
@@ -182,12 +186,12 @@ trait GenTypes { self: Reifier =>
   private def reifySemiConcreteTypeMember(tpe: Type): Tree = tpe match {
     case tpe @ TypeRef(pre @ SingleType(prepre, presym), sym, args)
         if sym.isAbstractType && !sym.isExistential =>
-      mirrorBuildCall(
-          nme.TypeRef,
-          reify(pre),
-          mirrorBuildCall(
-              nme.selectType, reify(sym.owner), reify(sym.name.toString)),
-          reify(args))
+      mirrorBuildCall(nme.TypeRef,
+                      reify(pre),
+                      mirrorBuildCall(nme.selectType,
+                                      reify(sym.owner),
+                                      reify(sym.name.toString)),
+                      reify(args))
   }
 
   /** Reify an annotated type, i.e. the one that makes us deal with AnnotationInfos */
@@ -231,7 +235,7 @@ trait GenTypes { self: Reifier =>
         reifyBuildCall(nme.PolyType, tparams, underlying)
       case _ =>
         throw new Error(
-            "internal error: %s (%s) is not supported".format(tpe, tpe.kind))
+          "internal error: %s (%s) is not supported".format(tpe, tpe.kind))
     }
   }
 }

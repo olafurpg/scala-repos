@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 class ScalaDocParserErrorInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
 
     new ScalaElementVisitor {
       override def visitDocComment(s: ScDocComment) {
@@ -38,12 +38,12 @@ class ScalaDocParserErrorInspection extends LocalInspectionTool {
                   a.getParent
                 }
               holder.registerProblem(
-                  holder.getManager.createProblemDescriptor(
-                      startElement,
-                      endElement,
-                      a.getErrorDescription,
-                      ProblemHighlightType.GENERIC_ERROR,
-                      isOnTheFly));
+                holder.getManager.createProblemDescriptor(
+                  startElement,
+                  endElement,
+                  a.getErrorDescription,
+                  ProblemHighlightType.GENERIC_ERROR,
+                  isOnTheFly));
             case b: ScalaPsiElement if b.getChildren.nonEmpty =>
               visitScaladocElement(b)
             case _ => //do nothing

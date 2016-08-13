@@ -19,7 +19,10 @@ package org.apache.spark.sql.execution.datasources
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.TableIdentifier
-import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeReference}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  AttributeReference
+}
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.command.RunnableCommand
@@ -33,31 +36,32 @@ import org.apache.spark.sql.types._
   *                   It is effective only when the table is a Hive table.
   */
 case class DescribeCommand(table: TableIdentifier, isExtended: Boolean)
-    extends LogicalPlan with logical.Command {
+    extends LogicalPlan
+    with logical.Command {
 
   override def children: Seq[LogicalPlan] = Seq.empty
 
   override val output: Seq[Attribute] = Seq(
-      // Column names are based on Hive.
-      AttributeReference("col_name",
-                         StringType,
-                         nullable = false,
-                         new MetadataBuilder()
-                           .putString("comment", "name of the column")
-                           .build())(),
-      AttributeReference("data_type",
-                         StringType,
-                         nullable = false,
-                         new MetadataBuilder()
-                           .putString("comment", "data type of the column")
-                           .build())(),
-      AttributeReference("comment",
-                         StringType,
-                         nullable = true,
-                         new MetadataBuilder()
-                           .putString("comment", "comment of the column")
-                           .build())()
-    )
+    // Column names are based on Hive.
+    AttributeReference("col_name",
+                       StringType,
+                       nullable = false,
+                       new MetadataBuilder()
+                         .putString("comment", "name of the column")
+                         .build())(),
+    AttributeReference("data_type",
+                       StringType,
+                       nullable = false,
+                       new MetadataBuilder()
+                         .putString("comment", "data type of the column")
+                         .build())(),
+    AttributeReference("comment",
+                       StringType,
+                       nullable = true,
+                       new MetadataBuilder()
+                         .putString("comment", "comment of the column")
+                         .build())()
+  )
 }
 
 /**
@@ -73,7 +77,8 @@ case class CreateTableUsing(tableIdent: TableIdentifier,
                             options: Map[String, String],
                             allowExisting: Boolean,
                             managedIfNoPath: Boolean)
-    extends LogicalPlan with logical.Command {
+    extends LogicalPlan
+    with logical.Command {
 
   override def output: Seq[Attribute] = Seq.empty
   override def children: Seq[LogicalPlan] = Seq.empty
@@ -109,11 +114,11 @@ case class CreateTempTableUsing(tableIdent: TableIdentifier,
                                 className = provider,
                                 options = options)
     sqlContext.sessionState.catalog.registerTable(
-        tableIdent,
-        Dataset
-          .newDataFrame(
-              sqlContext, LogicalRelation(dataSource.resolveRelation()))
-          .logicalPlan)
+      tableIdent,
+      Dataset
+        .newDataFrame(sqlContext,
+                      LogicalRelation(dataSource.resolveRelation()))
+        .logicalPlan)
 
     Seq.empty[Row]
   }
@@ -136,8 +141,8 @@ case class CreateTempTableUsingAsSelect(tableIdent: TableIdentifier,
                                 options = options)
     val result = dataSource.write(mode, df)
     sqlContext.sessionState.catalog.registerTable(
-        tableIdent,
-        Dataset.newDataFrame(sqlContext, LogicalRelation(result)).logicalPlan)
+      tableIdent,
+      Dataset.newDataFrame(sqlContext, LogicalRelation(result)).logicalPlan)
 
     Seq.empty[Row]
   }
@@ -174,7 +179,8 @@ case class RefreshTable(tableIdent: TableIdentifier) extends RunnableCommand {
   * Builds a map in which keys are case insensitive
   */
 class CaseInsensitiveMap(map: Map[String, String])
-    extends Map[String, String] with Serializable {
+    extends Map[String, String]
+    with Serializable {
 
   val baseMap = map.map(kv => kv.copy(_1 = kv._1.toLowerCase))
 

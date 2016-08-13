@@ -19,14 +19,26 @@ package org.apache.spark.mllib.clustering
 
 import java.util.Random
 
-import breeze.linalg.{all, normalize, sum, DenseMatrix => BDM, DenseVector => BDV}
+import breeze.linalg.{
+  all,
+  normalize,
+  sum,
+  DenseMatrix => BDM,
+  DenseVector => BDV
+}
 import breeze.numerics.{abs, exp, trigamma}
 import breeze.stats.distributions.{Gamma, RandBasis}
 
 import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.graphx._
 import org.apache.spark.mllib.impl.PeriodicGraphCheckpointer
-import org.apache.spark.mllib.linalg.{DenseVector, Matrices, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  Matrices,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -51,8 +63,8 @@ sealed trait LDAOptimizer {
     * Initializer for the optimizer. LDA passes the common parameters to the optimizer and
     * the internal structure can be initialized properly.
     */
-  private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): LDAOptimizer
+  private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                     lda: LDA): LDAOptimizer
 
   private[clustering] def next(): LDAOptimizer
 
@@ -90,14 +102,14 @@ final class EMLDAOptimizer extends LDAOptimizer {
   private[clustering] var docConcentration: Double = 0
   private[clustering] var topicConcentration: Double = 0
   private[clustering] var checkpointInterval: Int = 10
-  private var graphCheckpointer: PeriodicGraphCheckpointer[
-      TopicCounts, TokenCount] = null
+  private var graphCheckpointer: PeriodicGraphCheckpointer[TopicCounts,
+                                                           TokenCount] = null
 
   /**
     * Compute bipartite term/doc graph.
     */
-  override private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): EMLDAOptimizer = {
+  override private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                              lda: LDA): EMLDAOptimizer = {
     // EMLDAOptimizer currently only supports symmetric document-topic priors
     val docConcentration = lda.getDocConcentration
 
@@ -107,18 +119,20 @@ final class EMLDAOptimizer extends LDAOptimizer {
     // Note: The restriction > 1.0 may be relaxed in the future (allowing sparse solutions),
     // but values in (0,1) are not yet supported.
     require(
-        docConcentration > 1.0 || docConcentration == -1.0,
-        s"LDA docConcentration must be" +
+      docConcentration > 1.0 || docConcentration == -1.0,
+      s"LDA docConcentration must be" +
         s" > 1.0 (or -1 for auto) for EM Optimizer, but was set to $docConcentration")
     require(
-        topicConcentration > 1.0 || topicConcentration == -1.0,
-        s"LDA topicConcentration " +
+      topicConcentration > 1.0 || topicConcentration == -1.0,
+      s"LDA topicConcentration " +
         s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration")
 
-    this.docConcentration = if (docConcentration == -1) (50.0 / k) + 1.0
-    else docConcentration
-    this.topicConcentration = if (topicConcentration == -1) 1.1
-    else topicConcentration
+    this.docConcentration =
+      if (docConcentration == -1) (50.0 / k) + 1.0
+      else docConcentration
+    this.topicConcentration =
+      if (topicConcentration == -1) 1.1
+      else topicConcentration
     val randomSeed = lda.getSeed
 
     // For each document, create an edge (Document -> Term) for each unique term in the document.
@@ -150,13 +164,14 @@ final class EMLDAOptimizer extends LDAOptimizer {
 
     // Partition such that edges are grouped by document
     this.graph = Graph(docTermVertices, edges).partitionBy(
-        PartitionStrategy.EdgePartition1D)
+      PartitionStrategy.EdgePartition1D)
     this.k = k
     this.vocabSize = docs.take(1).head._2.size
     this.checkpointInterval = lda.getCheckpointInterval
-    this.graphCheckpointer = new PeriodicGraphCheckpointer[
-        TopicCounts, TokenCount](
-        checkpointInterval, graph.vertices.sparkContext)
+    this.graphCheckpointer =
+      new PeriodicGraphCheckpointer[TopicCounts, TokenCount](
+        checkpointInterval,
+        graph.vertices.sparkContext)
     this.graphCheckpointer.update(this.graph)
     this.globalTopicTotals = computeGlobalTopicTotals()
     this
@@ -170,28 +185,29 @@ final class EMLDAOptimizer extends LDAOptimizer {
     val alpha = docConcentration
 
     val N_k = globalTopicTotals
-    val sendMsg: EdgeContext[TopicCounts, TokenCount, (Boolean, TopicCounts)] => Unit =
-      (edgeContext) =>
-        {
-          // Compute N_{wj} gamma_{wjk}
-          val N_wj = edgeContext.attr
-          // E-STEP: Compute gamma_{wjk} (smoothed topic distributions), scaled by token count
-          // N_{wj}.
-          val scaledTopicDistribution: TopicCounts =
-            computePTopic(edgeContext.srcAttr,
-                          edgeContext.dstAttr,
-                          N_k,
-                          W,
-                          eta,
-                          alpha) *= N_wj
-          edgeContext.sendToDst((false, scaledTopicDistribution))
-          edgeContext.sendToSrc((false, scaledTopicDistribution))
+    val sendMsg: EdgeContext[TopicCounts,
+                             TokenCount,
+                             (Boolean, TopicCounts)] => Unit =
+      (edgeContext) => {
+        // Compute N_{wj} gamma_{wjk}
+        val N_wj = edgeContext.attr
+        // E-STEP: Compute gamma_{wjk} (smoothed topic distributions), scaled by token count
+        // N_{wj}.
+        val scaledTopicDistribution: TopicCounts =
+          computePTopic(edgeContext.srcAttr,
+                        edgeContext.dstAttr,
+                        N_k,
+                        W,
+                        eta,
+                        alpha) *= N_wj
+        edgeContext.sendToDst((false, scaledTopicDistribution))
+        edgeContext.sendToSrc((false, scaledTopicDistribution))
       }
     // The Boolean is a hack to detect whether we could modify the values in-place.
     // TODO: Add zero/seqOp/combOp option to aggregateMessages. (SPARK-5438)
-    val mergeMsg: ((Boolean, TopicCounts), (Boolean, TopicCounts)) => (Boolean,
-    TopicCounts) = (m0, m1) =>
-      {
+    val mergeMsg: ((Boolean, TopicCounts),
+                   (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
+      (m0, m1) => {
         val sum =
           if (m0._1) {
             m0._2 += m1._2
@@ -201,7 +217,7 @@ final class EMLDAOptimizer extends LDAOptimizer {
             m0._2 + m1._2
           }
         (true, sum)
-    }
+      }
     // M-STEP: Aggregation computes new N_{kj}, N_{wk} counts.
     val docTopicDistributions: VertexRDD[TopicCounts] = graph
       .aggregateMessages[(Boolean, TopicCounts)](sendMsg, mergeMsg)
@@ -236,13 +252,13 @@ final class EMLDAOptimizer extends LDAOptimizer {
     // The constructor's default arguments assume gammaShape = 100 to ensure equivalence in
     // LDAModel.toLocal conversion
     new DistributedLDAModel(
-        this.graph,
-        this.globalTopicTotals,
-        this.k,
-        this.vocabSize,
-        Vectors.dense(Array.fill(this.k)(this.docConcentration)),
-        this.topicConcentration,
-        iterationTimes)
+      this.graph,
+      this.globalTopicTotals,
+      this.k,
+      this.vocabSize,
+      Vectors.dense(Array.fill(this.k)(this.docConcentration)),
+      this.topicConcentration,
+      iterationTimes)
   }
 }
 
@@ -359,8 +375,8 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
   @Since("1.4.0")
   def setMiniBatchFraction(miniBatchFraction: Double): this.type = {
     require(
-        miniBatchFraction > 0.0 && miniBatchFraction <= 1.0,
-        s"Online LDA miniBatchFraction must be in range (0,1], but was set to $miniBatchFraction")
+      miniBatchFraction > 0.0 && miniBatchFraction <= 1.0,
+      s"Online LDA miniBatchFraction must be in range (0,1], but was set to $miniBatchFraction")
     this.miniBatchFraction = miniBatchFraction
     this
   }
@@ -413,8 +429,8 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
     this
   }
 
-  override private[clustering] def initialize(
-      docs: RDD[(Long, Vector)], lda: LDA): OnlineLDAOptimizer = {
+  override private[clustering] def initialize(docs: RDD[(Long, Vector)],
+                                              lda: LDA): OnlineLDAOptimizer = {
     this.k = lda.getK
     this.corpusSize = docs.count()
     this.vocabSize = docs.first()._2.size
@@ -435,8 +451,9 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
       }
       lda.getAsymmetricDocConcentration
     }
-    this.eta = if (lda.getTopicConcentration == -1) 1.0 / k
-    else lda.getTopicConcentration
+    this.eta =
+      if (lda.getTopicConcentration == -1) 1.0 / k
+      else lda.getTopicConcentration
     this.randomGenerator = new Random(lda.getSeed)
 
     this.docs = docs
@@ -483,8 +500,11 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
               case v: SparseVector => v.indices.toList
             }
             val (gammad, sstats) =
-              OnlineLDAOptimizer.variationalTopicInference(
-                  termCounts, expElogbetaBc.value, alpha, gammaShape, k)
+              OnlineLDAOptimizer.variationalTopicInference(termCounts,
+                                                           expElogbetaBc.value,
+                                                           alpha,
+                                                           gammaShape,
+                                                           k)
             stat(::, ids) := stat(::, ids).toDenseMatrix + sstats
             gammaPart = gammad :: gammaPart
         }
@@ -511,7 +531,7 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
 
     // Update lambda based on documents.
     lambda := (1 - weight) * lambda + weight *
-    (stat * (corpusSize.toDouble / batchSize.toDouble) + eta)
+      (stat * (corpusSize.toDouble / batchSize.toDouble) + eta)
   }
 
   /**
@@ -551,8 +571,8 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
     */
   private def getGammaMatrix(row: Int, col: Int): BDM[Double] = {
     val randBasis = new RandBasis(
-        new org.apache.commons.math3.random.MersenneTwister(
-            randomGenerator.nextLong()))
+      new org.apache.commons.math3.random.MersenneTwister(
+        randomGenerator.nextLong()))
     val gammaRandomGenerator =
       new Gamma(gammaShape, 1.0 / gammaShape)(randBasis)
     val temp = gammaRandomGenerator.sample(row * col).toArray
@@ -561,8 +581,10 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
 
   override private[clustering] def getLDAModel(
       iterationTimes: Array[Double]): LDAModel = {
-    new LocalLDAModel(
-        Matrices.fromBreeze(lambda).transpose, alpha, eta, gammaShape)
+    new LocalLDAModel(Matrices.fromBreeze(lambda).transpose,
+                      alpha,
+                      eta,
+                      gammaShape)
   }
 }
 

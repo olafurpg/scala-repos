@@ -44,8 +44,7 @@ package mongodocumentspecs {
       jlb: java.lang.Byte,
       jlbool: java.lang.Boolean,
       jlsh: java.lang.Short
-  )
-      extends MongoDocument[Primitives] {
+  ) extends MongoDocument[Primitives] {
 
     def meta = Primitives
   }
@@ -62,8 +61,9 @@ package mongodocumentspecs {
     override def formats = super.formats + new ObjectIdSerializer
   }
 
-  case class OptionTestDoc(
-      _id: ObjectId, optNone: Option[String], optSome: Option[String])
+  case class OptionTestDoc(_id: ObjectId,
+                           optNone: Option[String],
+                           optSome: Option[String])
       extends MongoDocument[OptionTestDoc] {
     def meta = OptionTestDoc
   }
@@ -116,8 +116,8 @@ package mongodocumentspecs {
 class MongoDocumentSpec extends Specification with MongoTestKit {
   "MongoDocument Specification".title
 
-  def passSaveAndRetrieveTests(
-      obj: MongoDocument[_], meta: MongoDocumentMeta[_]): Result = {
+  def passSaveAndRetrieveTests(obj: MongoDocument[_],
+                               meta: MongoDocumentMeta[_]): Result = {
     obj.save
     val objFromDb = meta.find(obj._id.asInstanceOf[ObjectId])
     objFromDb.isDefined must_== true
@@ -131,23 +131,23 @@ class MongoDocumentSpec extends Specification with MongoTestKit {
       import mongodocumentspecs._
 
       val primitives = Primitives(
-          ObjectId.get,
-          "This is a String",
-          123,
-          124L,
-          (125.5).toDouble,
-          (126.5).toFloat,
-          (127).toByte,
-          BigInt(128999),
-          true,
-          (129).toShort,
-          new java.lang.Integer(130),
-          new java.lang.Long(131L),
-          new java.lang.Double(132.5),
-          new java.lang.Float(133.5),
-          new java.lang.Byte("12"),
-          java.lang.Boolean.TRUE,
-          new java.lang.Short("135")
+        ObjectId.get,
+        "This is a String",
+        123,
+        124L,
+        (125.5).toDouble,
+        (126.5).toFloat,
+        (127).toByte,
+        BigInt(128999),
+        true,
+        (129).toShort,
+        new java.lang.Integer(130),
+        new java.lang.Long(131L),
+        new java.lang.Double(132.5),
+        new java.lang.Float(133.5),
+        new java.lang.Byte("12"),
+        java.lang.Boolean.TRUE,
+        new java.lang.Short("135")
       )
       passSaveAndRetrieveTests(primitives, Primitives)
     }

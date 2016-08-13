@@ -4,7 +4,11 @@ package project.data
 import java.io.File
 
 import com.intellij.openapi.externalSystem.model.project.AbstractExternalEntityData
-import com.intellij.openapi.externalSystem.model.{Key, ProjectKeys, ProjectSystemId}
+import com.intellij.openapi.externalSystem.model.{
+  Key,
+  ProjectKeys,
+  ProjectSystemId
+}
 
 /**
   * @author Nikolay Obedin
@@ -24,6 +28,6 @@ class AndroidFacetData(val owner: ProjectSystemId,
 
 object AndroidFacetData {
   val Key: Key[AndroidFacetData] = new Key(
-      classOf[AndroidFacetData].getName,
-      ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
+    classOf[AndroidFacetData].getName,
+    ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
 }

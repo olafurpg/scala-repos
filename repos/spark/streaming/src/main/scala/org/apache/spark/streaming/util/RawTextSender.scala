@@ -37,7 +37,7 @@ private[streaming] object RawTextSender extends Logging {
     if (args.length != 4) {
       // scalastyle:off println
       System.err.println(
-          "Usage: RawTextSender <port> <file> <blockSize> <bytesPerSec>")
+        "Usage: RawTextSender <port> <file> <blockSize> <bytesPerSec>")
       // scalastyle:on println
       System.exit(1)
     }
@@ -67,8 +67,8 @@ private[streaming] object RawTextSender extends Logging {
     while (true) {
       val socket = serverSocket.accept()
       logInfo("Got a new connection")
-      val out = new RateLimitedOutputStream(
-          socket.getOutputStream, bytesPerSec)
+      val out =
+        new RateLimitedOutputStream(socket.getOutputStream, bytesPerSec)
       try {
         while (true) {
           out.write(countBuf.array)

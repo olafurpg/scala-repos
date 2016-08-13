@@ -4,8 +4,9 @@ import scala.annotation.switch
 
 import scala.scalajs.js
 
-final class Pattern private (
-    jsRegExp: js.RegExp, _pattern: String, _flags: Int)
+final class Pattern private (jsRegExp: js.RegExp,
+                             _pattern: String,
+                             _flags: Int)
     extends Serializable {
 
   import Pattern._
@@ -29,8 +30,8 @@ final class Pattern private (
        */
       val jsFlags = {
         (if (jsRegExp.global) "g" else "") +
-        (if (jsRegExp.ignoreCase) "i" else "") +
-        (if (jsRegExp.multiline) "m" else "")
+          (if (jsRegExp.ignoreCase) "i" else "") +
+          (if (jsRegExp.multiline) "m" else "")
       }
       new js.RegExp(jsRegExp.source, jsFlags)
     }
@@ -51,7 +52,7 @@ final class Pattern private (
     var prevEnd = 0
 
     // Actually split original string
-    while ( (result.length < lim - 1) && matcher.find()) {
+    while ((result.length < lim - 1) && matcher.find()) {
       result.push(inputStr.substring(prevEnd, matcher.start))
       prevEnd = matcher.end
     }
@@ -91,13 +92,13 @@ object Pattern {
         (quote(regex), flags)
       } else {
         trySplitHack(regex, flags) orElse tryFlagHack(regex, flags) getOrElse
-        (regex, flags)
+          (regex, flags)
       }
     }
 
     val jsFlags = {
       "g" + (if ((flags1 & CASE_INSENSITIVE) != 0) "i" else "") +
-      (if ((flags1 & MULTILINE) != 0) "m" else "")
+        (if ((flags1 & MULTILINE) != 0) "m" else "")
     }
 
     val jsRegExp = new js.RegExp(jsPattern, jsFlags)
@@ -117,12 +118,12 @@ object Pattern {
     while (i < s.length) {
       val c = s.charAt(i)
       result +=
-      ((c: @switch) match {
-            case '\\' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '|' | '?' |
-                '*' | '+' | '^' | '$' =>
-              "\\" + c
-            case _ => c
-          })
+        ((c: @switch) match {
+          case '\\' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '|' | '?' |
+              '*' | '+' | '^' | '$' =>
+            "\\" + c
+          case _ => c
+        })
       i += 1
     }
     result

@@ -22,7 +22,7 @@ object MacroPrinter {
 
   def printGeneric[T](toPrint: T): String = macro printGenericImpl[T]
 
-  def printDefImpl[T : c.WeakTypeTag](c: blackbox.Context)(
+  def printDefImpl[T: c.WeakTypeTag](c: blackbox.Context)(
       toPrint: c.Expr[T]): c.universe.Tree = {
     import c.universe._
 
@@ -36,7 +36,7 @@ object MacroPrinter {
     q"${ev.tpe.toString}"
   }
 
-  def printImportInfoImpl[T : c.WeakTypeTag](c: blackbox.Context)(
+  def printImportInfoImpl[T: c.WeakTypeTag](c: blackbox.Context)(
       toPrint: c.Expr[T]): c.universe.Tree = {
     import c.universe._
 
@@ -45,7 +45,7 @@ object MacroPrinter {
     }
   }
 
-  def printGenericImpl[T : c.WeakTypeTag](c: blackbox.Context)(
+  def printGenericImpl[T: c.WeakTypeTag](c: blackbox.Context)(
       toPrint: c.Expr[T]): c.universe.Tree = {
     import c.universe._
 

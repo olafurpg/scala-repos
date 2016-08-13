@@ -27,8 +27,9 @@ import scala.reflect.ClassTag
   * entries than that. This makes it more efficient for operations like groupBy where we expect
   * some keys to have very few elements.
   */
-private[spark] class CompactBuffer[T : ClassTag]
-    extends Seq[T] with Serializable {
+private[spark] class CompactBuffer[T: ClassTag]
+    extends Seq[T]
+    with Serializable {
   // First two elements
   private var element0: T = _
   private var element1: T = _
@@ -129,7 +130,7 @@ private[spark] class CompactBuffer[T : ClassTag]
   private def growToSize(newSize: Int): Unit = {
     if (newSize < 0) {
       throw new UnsupportedOperationException(
-          "Can't grow buffer past Int.MaxValue elements")
+        "Can't grow buffer past Int.MaxValue elements")
     }
     val capacity = if (otherElements != null) otherElements.length + 2 else 2
     if (newSize > capacity) {
@@ -154,9 +155,9 @@ private[spark] class CompactBuffer[T : ClassTag]
 }
 
 private[spark] object CompactBuffer {
-  def apply[T : ClassTag](): CompactBuffer[T] = new CompactBuffer[T]
+  def apply[T: ClassTag](): CompactBuffer[T] = new CompactBuffer[T]
 
-  def apply[T : ClassTag](value: T): CompactBuffer[T] = {
+  def apply[T: ClassTag](value: T): CompactBuffer[T] = {
     val buf = new CompactBuffer[T]
     buf += value
   }

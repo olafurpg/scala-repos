@@ -45,9 +45,9 @@ private[evaluation] object AreaUnderCurve {
     curve
       .sliding(2)
       .aggregate(0.0)(
-          seqOp = (auc: Double,
-            points: Array[(Double, Double)]) => auc + trapezoid(points),
-          combOp = _ + _
+        seqOp = (auc: Double,
+                 points: Array[(Double, Double)]) => auc + trapezoid(points),
+        combOp = _ + _
       )
   }
 
@@ -61,9 +61,9 @@ private[evaluation] object AreaUnderCurve {
       .sliding(2)
       .withPartial(false)
       .aggregate(0.0)(
-          seqop = (auc: Double,
-            points: Seq[(Double, Double)]) => auc + trapezoid(points),
-          combop = _ + _
+        seqop = (auc: Double,
+                 points: Seq[(Double, Double)]) => auc + trapezoid(points),
+        combop = _ + _
       )
   }
 }

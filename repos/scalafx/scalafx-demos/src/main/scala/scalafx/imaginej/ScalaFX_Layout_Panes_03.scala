@@ -70,22 +70,22 @@ object ScalaFX_Layout_Panes_03 extends JFXApp {
     prefHeight = 20
   }
   val data = List(
-      new Text {
-        text = "Data"
-        font = Font.font("Amble CN", FontWeight.Bold, 14)
-      },
-      new Text {
-        text = "  Sales"
-      },
-      new Text {
-        text = "  Marketing"
-      },
-      new Text {
-        text = "  Distribution"
-      },
-      new Text {
-        text = "  Costs"
-      }
+    new Text {
+      text = "Data"
+      font = Font.font("Amble CN", FontWeight.Bold, 14)
+    },
+    new Text {
+      text = "  Sales"
+    },
+    new Text {
+      text = "  Marketing"
+    },
+    new Text {
+      text = "  Distribution"
+    },
+    new Text {
+      text = "  Costs"
+    }
   )
   stage = new PrimaryStage {
     title = "ScalaFX Layout Panes 03"

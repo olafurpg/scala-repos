@@ -24,8 +24,9 @@ import org.ensime.util.FileUtils
 class Project(
     broadcaster: ActorRef,
     implicit val config: EnsimeConfig
-)
-    extends Actor with ActorLogging with Stash {
+) extends Actor
+    with ActorLogging
+    with Stash {
   import context.{dispatcher, system}
 
   import FileUtils._
@@ -54,8 +55,8 @@ class Project(
     override def baseReCreated(f: FileObject): Unit = reTypeCheck()
   }
   private val classfileWatcher = context.actorOf(
-      Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
-      "classFileWatcher")
+    Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
+    "classFileWatcher")
 
   def receive: Receive = awaitingConnectionInfoReq
 
@@ -98,16 +99,16 @@ class Project(
         }
       }))
 
-      scalac = context.actorOf(
-          Analyzer(merger, indexer, searchService), "scalac")
-      javac = context.actorOf(
-          JavaAnalyzer(merger, indexer, searchService), "javac")
+      scalac =
+        context.actorOf(Analyzer(merger, indexer, searchService), "scalac")
+      javac =
+        context.actorOf(JavaAnalyzer(merger, indexer, searchService), "javac")
     } else {
       log.warning(
-          "Detected a pure Java project. Scala queries are not available.")
+        "Detected a pure Java project. Scala queries are not available.")
       scalac = system.deadLetters
-      javac = context.actorOf(
-          JavaAnalyzer(broadcaster, indexer, searchService), "javac")
+      javac = context
+        .actorOf(JavaAnalyzer(broadcaster, indexer, searchService), "javac")
     }
     debugger = context.actorOf(DebugManager(broadcaster), "debugging")
     docs = context.actorOf(DocResolver(), "docs")
@@ -127,9 +128,9 @@ class Project(
     case AskReTypecheck =>
       Option(rechecking).foreach(_.cancel())
       rechecking = system.scheduler.scheduleOnce(
-          5 seconds,
-          scalac,
-          ReloadExistingFilesEvent
+        5 seconds,
+        scalac,
+        ReloadExistingFilesEvent
       )
     // HACK: to expedite initial dev, Java requests use the Scala API
     case m @ TypecheckFileReq(sfi) if sfi.file.isJava => javac forward m

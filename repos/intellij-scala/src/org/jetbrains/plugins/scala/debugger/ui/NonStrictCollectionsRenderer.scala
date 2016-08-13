@@ -4,26 +4,49 @@ import java.util
 
 import com.intellij.debugger.DebuggerContext
 import com.intellij.debugger.engine.DebuggerUtils
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContext, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException,
+  EvaluationContext,
+  EvaluationContextImpl
+}
 import com.intellij.debugger.impl.PositionUtil
-import com.intellij.debugger.ui.impl.watch.{ValueDescriptorImpl, WatchItemDescriptor}
+import com.intellij.debugger.ui.impl.watch.{
+  ValueDescriptorImpl,
+  WatchItemDescriptor
+}
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptor, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode,
+  NodeDescriptor,
+  ValueDescriptor
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{JavaPsiFacade, PsiExpression}
-import com.intellij.util.{IncorrectOperationException, StringBuilderSpinAllocator}
+import com.intellij.util.{
+  IncorrectOperationException,
+  StringBuilderSpinAllocator
+}
 import com.sun.jdi._
 import com.sun.tools.jdi.ObjectReferenceImpl
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
-import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{CollectionElementNodeDescriptor, Fail, SimpleMethodInvocationResult}
+import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{
+  CollectionElementNodeDescriptor,
+  Fail,
+  SimpleMethodInvocationResult
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 9/3/12
   */
 class NonStrictCollectionsRenderer extends NodeRendererImpl {
-  import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{MethodNotFound, Success}
-  import org.jetbrains.plugins.scala.debugger.ui.{NonStrictCollectionsRenderer => companionObject}
+  import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{
+    MethodNotFound,
+    Success
+  }
+  import org.jetbrains.plugins.scala.debugger.ui.{
+    NonStrictCollectionsRenderer => companionObject
+  }
 
   def getStartIndex =
     ScalaDebuggerSettings.getInstance().COLLECTION_START_INDEX.intValue()
@@ -52,8 +75,8 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     val suitableMethods =
       objectRef.referenceType().methodsByName(methodName, "()" + signature)
     if (suitableMethods.size() > 0) {
-      companionObject.invokeEmptyArgsMethod(
-          objectRef, suitableMethods get 0, context)
+      companionObject
+        .invokeEmptyArgsMethod(objectRef, suitableMethods get 0, context)
     } else {
       MethodNotFound()
     }
@@ -89,10 +112,10 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
 
       try {
         evaluationContext.getDebugProcess.invokeMethod(
-            evaluationContext,
-            obj,
-            suitableMethods get 0,
-            companionObject.EMPTY_ARGS)
+          evaluationContext,
+          obj,
+          suitableMethods get 0,
+          companionObject.EMPTY_ARGS)
       } catch {
         case (_: EvaluateException | _: InvocationException |
             _: InvalidTypeException | _: IncompatibleThreadStateException |
@@ -132,11 +155,11 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
           getAll(currentTail, currentTail.referenceType()) match {
             case (newHead: ObjectReference, newTail: ObjectReference) =>
               val newNode = builder.getNodeManager.createNode(
-                  new CollectionElementNodeDescriptor(
-                      indexCount.toString,
-                      evaluationContext.getProject,
-                      newHead),
-                  evaluationContext)
+                new CollectionElementNodeDescriptor(
+                  indexCount.toString,
+                  evaluationContext.getProject,
+                  newHead),
+                evaluationContext)
               myChildren add newNode
               currentTail = newTail
               indexCount += 1
@@ -150,8 +173,8 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     returnChildren()
   }
 
-  def getChildValueExpression(
-      node: DebuggerTreeNode, context: DebuggerContext): PsiExpression = {
+  def getChildValueExpression(node: DebuggerTreeNode,
+                              context: DebuggerContext): PsiExpression = {
     node.getDescriptor match {
       case watch: WatchItemDescriptor =>
         JavaPsiFacade
@@ -197,15 +220,15 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
         val tpe = obj.referenceType()
         val sizeString =
           " size = " +
-          (tryToGetSize(obj, context) match {
-                case Success(value: Int) => value
-                case _ => "?"
-              })
+            (tryToGetSize(obj, context) match {
+              case Success(value: Int) => value
+              case _ => "?"
+            })
 
         stringBuilder append
-        (if (tpe != null)
-           ScalaCollectionRenderer.transformName(tpe.name) + sizeString
-         else "{...}")
+          (if (tpe != null)
+            ScalaCollectionRenderer.transformName(tpe.name) + sizeString
+          else "{...}")
       case _ => stringBuilder append "{...}"
     }
 
@@ -219,13 +242,14 @@ object NonStrictCollectionsRenderer {
   private val EMPTY_ARGS =
     util.Collections.unmodifiableList(new util.ArrayList[Value]())
 
-  //it considers only part of cases so it is not intended to be used outside 
+  //it considers only part of cases so it is not intended to be used outside
   private def invokeEmptyArgsMethod(
       obj: ObjectReference,
       method: Method,
       context: EvaluationContext): SimpleMethodInvocationResult[_] = {
     try {
-      context.getDebugProcess.invokeMethod(context, obj, method, EMPTY_ARGS) match {
+      context.getDebugProcess
+        .invokeMethod(context, obj, method, EMPTY_ARGS) match {
         case intValue: IntegerValue => Success[Int](intValue.intValue())
         case boolValue: BooleanValue =>
           Success[Boolean](boolValue.booleanValue())
@@ -256,8 +280,9 @@ object NonStrictCollectionsRenderer {
   private case class Fail[E <: Throwable](exc: E)
       extends SimpleMethodInvocationResult[E]
 
-  private class CollectionElementNodeDescriptor(
-      name: String, project: Project, value: Value)
+  private class CollectionElementNodeDescriptor(name: String,
+                                                project: Project,
+                                                value: Value)
       extends ValueDescriptorImpl(project, value) {
     def calcValue(evaluationContext: EvaluationContextImpl) = value
 
@@ -266,8 +291,8 @@ object NonStrictCollectionsRenderer {
         JavaPsiFacade
           .getInstance(project)
           .getElementFactory
-          .createExpressionFromText(
-              name, PositionUtil getContextElement context)
+          .createExpressionFromText(name,
+                                    PositionUtil getContextElement context)
       } catch {
         case e: IncorrectOperationException => null
       }

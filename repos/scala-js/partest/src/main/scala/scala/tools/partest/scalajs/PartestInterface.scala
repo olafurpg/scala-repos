@@ -86,21 +86,20 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
   val scalaVersion = taskDef.fullyQualifiedName.stripPrefix("partest-")
 
   /** Executes this task, possibly returning to the client new tasks to execute. */
-  def execute(
-      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] = {
+  def execute(eventHandler: EventHandler,
+              loggers: Array[Logger]): Array[Task] = {
     val forkedCp = scala.util.Properties.javaClassPath
     val classLoader = new URLClassLoader(
-        forkedCp
-          .split(java.io.File.pathSeparator)
-          .map(new File(_).toURI.toURL))
+      forkedCp.split(java.io.File.pathSeparator).map(new File(_).toURI.toURL))
 
     if (Runtime.getRuntime().maxMemory() / (1024 * 1024) < 800)
       loggers foreach
-      (_.warn(s"""Low heap size detected (~ ${Runtime.getRuntime().maxMemory() /
-          (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
+        (_.warn(
+          s"""Low heap size detected (~ ${Runtime.getRuntime().maxMemory() /
+            (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
 
-    val maybeOptions = ScalaJSPartestOptions(
-        args, str => loggers.foreach(_.error(str)))
+    val maybeOptions =
+      ScalaJSPartestOptions(args, str => loggers.foreach(_.error(str)))
 
     maybeOptions foreach { options =>
       val runner =
@@ -115,11 +114,12 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
                   options,
                   scalaVersion)
 
-      try runner execute Array("run", "pos", "neg") catch {
+      try runner execute Array("run", "pos", "neg")
+      catch {
         case ex: ClassNotFoundException =>
           loggers foreach { l =>
             l.error(
-                "Please make sure partest is running in a forked VM by including the following line in build.sbt:\nfork in Test := true")
+              "Please make sure partest is running in a forked VM by including the following line in build.sbt:\nfork in Test := true")
           }
           throw ex
       }

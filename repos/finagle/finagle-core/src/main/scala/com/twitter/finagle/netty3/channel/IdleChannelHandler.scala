@@ -2,7 +2,11 @@ package com.twitter.finagle.netty3.channel
 
 import com.twitter.finagle.stats.StatsReceiver
 import org.jboss.netty.channel.ChannelHandlerContext
-import org.jboss.netty.handler.timeout.{IdleState, IdleStateAwareChannelHandler, IdleStateEvent}
+import org.jboss.netty.handler.timeout.{
+  IdleState,
+  IdleStateAwareChannelHandler,
+  IdleStateEvent
+}
 
 /**
   * This handler closes a channel if it receives an IDLE event.

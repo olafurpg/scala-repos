@@ -19,14 +19,17 @@ import akka.http.scaladsl.model._
 import MediaTypes._
 
 class ScalaXmlSupportSpec
-    extends FreeSpec with Matchers with ScalatestRouteTest with Inside {
+    extends FreeSpec
+    with Matchers
+    with ScalatestRouteTest
+    with Inside {
   import ScalaXmlSupport._
 
   "NodeSeqMarshaller should" - {
     "marshal xml snippets to `text/xml` content in UTF-8" in {
       marshal(<employee><nr>Ha“llo</nr></employee>) shouldEqual HttpEntity(
-          ContentTypes.`text/xml(UTF-8)`,
-          "<employee><nr>Ha“llo</nr></employee>")
+        ContentTypes.`text/xml(UTF-8)`,
+        "<employee><nr>Ha“llo</nr></employee>")
     }
     "unmarshal `text/xml` content in UTF-8 to NodeSeqs" in {
       Unmarshal(HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>Hällö</int>"))
@@ -34,11 +37,12 @@ class ScalaXmlSupportSpec
         .map(_.text) should evaluateTo("Hällö")
     }
     "reject `application/octet-stream`" in {
-      Unmarshal(HttpEntity(`application/octet-stream`,
-                           ByteString("<int>Hällö</int>")))
+      Unmarshal(
+        HttpEntity(`application/octet-stream`, ByteString("<int>Hällö</int>")))
         .to[NodeSeq]
-        .map(_.text) should haveFailedWith(Unmarshaller
-            .UnsupportedContentTypeException(nodeSeqContentTypeRanges: _*))
+        .map(_.text) should haveFailedWith(
+        Unmarshaller.UnsupportedContentTypeException(
+          nodeSeqContentTypeRanges: _*))
     }
 
     "don't be vulnerable to XXE attacks" - {
@@ -49,8 +53,9 @@ class ScalaXmlSupportSpec
                      |   <!ELEMENT foo ANY >
                      |   <!ENTITY xxe SYSTEM "${f.toURI}">]><foo>hello&xxe;</foo>""".stripMargin
 
-          shouldHaveFailedWithSAXParseException(Unmarshal(
-                  HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml)).to[NodeSeq])
+          shouldHaveFailedWithSAXParseException(
+            Unmarshal(HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml))
+              .to[NodeSeq])
         }
       }
       "parse XML bodies without loading in a related schema from a parameter" in {
@@ -65,16 +70,16 @@ class ScalaXmlSupportSpec
                        |   %xpe;
                        |   %pe;
                        |   ]><foo>hello&xxe;</foo>""".stripMargin
-            shouldHaveFailedWithSAXParseException(
-                Unmarshal(HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml))
-                  .to[NodeSeq])
+            shouldHaveFailedWithSAXParseException(Unmarshal(
+              HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml)).to[NodeSeq])
           }
         }
       }
       "gracefully fail when there are too many nested entities" in {
-        val nested = for (x ← 1 to 30) yield
-          "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
-          ";\">"
+        val nested = for (x ← 1 to 30)
+          yield
+            "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
+              ";\">"
         val xml = s"""<?xml version="1.0"?>
            | <!DOCTYPE billion [
            | <!ELEMENT billion (#PCDATA)>
@@ -83,8 +88,9 @@ class ScalaXmlSupportSpec
            | ]>
            | <billion>&laugh30;</billion>""".stripMargin
 
-        shouldHaveFailedWithSAXParseException(Unmarshal(
-                HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml)).to[NodeSeq])
+        shouldHaveFailedWithSAXParseException(
+          Unmarshal(HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml))
+            .to[NodeSeq])
       }
       "gracefully fail when an entity expands to be very large" in {
         val as = "a" * 50000
@@ -94,8 +100,9 @@ class ScalaXmlSupportSpec
                   | <!ENTITY a "$as">
                   | ]>
                   | <kaboom>$entities</kaboom>""".stripMargin
-        shouldHaveFailedWithSAXParseException(Unmarshal(
-                HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml)).to[NodeSeq])
+        shouldHaveFailedWithSAXParseException(
+          Unmarshal(HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml))
+            .to[NodeSeq])
       }
     }
   }

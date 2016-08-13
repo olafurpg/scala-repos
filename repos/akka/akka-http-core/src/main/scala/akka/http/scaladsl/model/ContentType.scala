@@ -9,9 +9,10 @@ import java.util.Optional
 import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
-final case class ContentTypeRange(
-    mediaRange: MediaRange, charsetRange: HttpCharsetRange)
-    extends jm.ContentTypeRange with ValueRenderable {
+final case class ContentTypeRange(mediaRange: MediaRange,
+                                  charsetRange: HttpCharsetRange)
+    extends jm.ContentTypeRange
+    with ValueRenderable {
   def matches(contentType: jm.ContentType) =
     contentType match {
       case ContentType.Binary(mt) ⇒ mediaRange.matches(mt)
@@ -58,7 +59,8 @@ sealed trait ContentType extends jm.ContentType with ValueRenderable {
 
 object ContentType {
   final case class Binary(mediaType: MediaType.Binary)
-      extends jm.ContentType.Binary with ContentType {
+      extends jm.ContentType.Binary
+      with ContentType {
     def binary = true
     def charsetOption = None
   }
@@ -70,13 +72,15 @@ object ContentType {
   }
 
   final case class WithFixedCharset(val mediaType: MediaType.WithFixedCharset)
-      extends jm.ContentType.WithFixedCharset with NonBinary {
+      extends jm.ContentType.WithFixedCharset
+      with NonBinary {
     def charset = mediaType.charset
   }
 
-  final case class WithCharset(
-      val mediaType: MediaType.WithOpenCharset, val charset: HttpCharset)
-      extends jm.ContentType.WithCharset with NonBinary {
+  final case class WithCharset(val mediaType: MediaType.WithOpenCharset,
+                               val charset: HttpCharset)
+      extends jm.ContentType.WithCharset
+      with NonBinary {
 
     private[http] override def render[R <: Rendering](r: R): r.type =
       super.render(r) ~~ ContentType.`; charset=` ~~ charset
@@ -112,7 +116,7 @@ object ContentType {
 object ContentTypes {
   val `application/json` = ContentType(MediaTypes.`application/json`)
   val `application/octet-stream` = ContentType(
-      MediaTypes.`application/octet-stream`)
+    MediaTypes.`application/octet-stream`)
   val `text/plain(UTF-8)` =
     MediaTypes.`text/plain` withCharset HttpCharsets.`UTF-8`
   val `text/html(UTF-8)` =

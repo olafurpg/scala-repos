@@ -572,8 +572,8 @@ package object numerics {
   object isOdd extends UFunc with MappingUFunc {
     @expand
     @expand.valify
-    implicit def isOddImpl[@expand.args(Int, Double, Float, Long) T]: Impl[
-        T, Boolean] = {
+    implicit def isOddImpl[@expand.args(Int, Double, Float, Long) T]
+      : Impl[T, Boolean] = {
       new Impl[T, Boolean] {
         def apply(v: T) = { v % 2 == 1 }
       }
@@ -586,8 +586,8 @@ package object numerics {
   object isEven extends UFunc with MappingUFunc {
     @expand
     @expand.valify
-    implicit def isEvenImpl[@expand.args(Int, Double, Float, Long) T]: Impl[
-        T, Boolean] = {
+    implicit def isEvenImpl[@expand.args(Int, Double, Float, Long) T]
+      : Impl[T, Boolean] = {
       new Impl[T, Boolean] {
         def apply(v: T) = { v % 2 == 0 }
       }
@@ -600,8 +600,8 @@ package object numerics {
   object isNonfinite extends UFunc with MappingUFunc {
     @expand
     @expand.valify
-    implicit def isNonfiniteImpl[@expand.args(Double, Float) T]: Impl[
-        T, Boolean] = {
+    implicit def isNonfiniteImpl[@expand.args(Double, Float) T]
+      : Impl[T, Boolean] = {
       new Impl[T, Boolean] {
         override def apply(v: T): Boolean = {
           // TODO: only in Java 8
@@ -615,8 +615,8 @@ package object numerics {
   object isFinite extends UFunc with MappingUFunc {
     @expand
     @expand.valify
-    implicit def isFiniteImpl[
-        @expand.args(Double, Float) T]: Impl[T, Boolean] = {
+    implicit def isFiniteImpl[@expand.args(Double, Float) T]
+      : Impl[T, Boolean] = {
       new Impl[T, Boolean] {
         override def apply(v: T): Boolean = {
           m.abs(v) <= Double.MaxValue
@@ -913,8 +913,8 @@ package object numerics {
     */
   def closeTo(a: Double, b: Double, relDiff: Double = 1E-4) = {
     a == b ||
-    (scala.math.abs(a - b) < scala.math.max(
-            scala.math.max(scala.math.abs(a), scala.math.abs(b)), 1) * relDiff)
+    (scala.math.abs(a - b) < scala.math
+      .max(scala.math.max(scala.math.abs(a), scala.math.abs(b)), 1) * relDiff)
   }
 
   /**
@@ -926,7 +926,7 @@ package object numerics {
       def apply(b: Boolean) = if (b) 1.0 else 0.0
     }
 
-    implicit def vImpl[V : Semiring]: Impl[V, Double] = new Impl[V, Double] {
+    implicit def vImpl[V: Semiring]: Impl[V, Double] = new Impl[V, Double] {
       def apply(b: V) = if (b != implicitly[Semiring[V]].zero) 1.0 else 0.0
     }
   }

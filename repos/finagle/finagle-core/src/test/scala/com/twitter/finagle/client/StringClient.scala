@@ -6,7 +6,13 @@ import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.{Name, Service, ServiceFactory, Stack}
 import com.twitter.io.Charsets
 import com.twitter.util.Future
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext,
+  ChannelPipelineFactory,
+  Channels,
+  MessageEvent,
+  SimpleChannelHandler
+}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 
 private class DelimEncoder(delim: Char) extends SimpleChannelHandler {
@@ -41,10 +47,11 @@ private[finagle] trait StringClient {
       RichClient(newService(dest, label))
   }
 
-  case class Client(
-      stack: Stack[ServiceFactory[String, String]] = StackClient.newStack,
-      params: Stack.Params = Stack.Params.empty)
-      extends StdStackClient[String, String, Client] with StringRichClient {
+  case class Client(stack: Stack[ServiceFactory[String, String]] =
+                      StackClient.newStack,
+                    params: Stack.Params = Stack.Params.empty)
+      extends StdStackClient[String, String, Client]
+      with StringRichClient {
     protected def copy1(
         stack: Stack[ServiceFactory[String, String]] = this.stack,
         params: Stack.Params = this.params

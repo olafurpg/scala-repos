@@ -11,17 +11,17 @@ trait FreeSpecScopeTest extends FreeSpecGenerator {
     addComplexFreeSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(31, 7, "ComplexFreeSpec.scala"),
-            "ComplexFreeSpec"))
+      checkConfigAndSettings(
+        createTestFromLocation(31, 7, "ComplexFreeSpec.scala"),
+        "ComplexFreeSpec"))
   }
 
   def testFreeSpecScope() {
     addComplexFreeSpec()
 
     val testNames = Seq(
-        "A ComplexFreeSpec Outer scope 2 Inner scope 2 Another innermost scope",
-        "A ComplexFreeSpec Outer scope 2 Inner test")
+      "A ComplexFreeSpec Outer scope 2 Inner scope 2 Another innermost scope",
+      "A ComplexFreeSpec Outer scope 2 Inner test")
     val path1 = List("[root]",
                      "ComplexFreeSpec",
                      "A ComplexFreeSpec",
@@ -34,14 +34,15 @@ trait FreeSpecScopeTest extends FreeSpecGenerator {
                      "Outer scope 2",
                      "Inner test")
     runTestByLocation(
-        10,
-        10,
-        "ComplexFreeSpec.scala",
-        checkConfigAndSettings(_, "ComplexFreeSpec", testNames: _*),
-        root =>
-          checkResultTreeHasExactNamedPath(root, path1: _*) &&
+      10,
+      10,
+      "ComplexFreeSpec.scala",
+      checkConfigAndSettings(_, "ComplexFreeSpec", testNames: _*),
+      root =>
+        checkResultTreeHasExactNamedPath(root, path1: _*) &&
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
-          checkResultTreeDoesNotHaveNodes(
-              root, "Innermost scope", "Outer scope 3"))
+          checkResultTreeDoesNotHaveNodes(root,
+                                          "Innermost scope",
+                                          "Outer scope 3"))
   }
 }

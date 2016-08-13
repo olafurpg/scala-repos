@@ -42,7 +42,7 @@ class SystemProperties
 
   def names: Iterator[String] =
     wrapAccess(
-        System.getProperties().stringPropertyNames().asScala.iterator
+      System.getProperties().stringPropertyNames().asScala.iterator
     ) getOrElse Iterator.empty
 
   def get(key: String) =
@@ -58,7 +58,8 @@ class SystemProperties
   }
 
   def wrapAccess[T](body: => T): Option[T] =
-    try Some(body) catch { case _: AccessControlException => None }
+    try Some(body)
+    catch { case _: AccessControlException => None }
 }
 
 /** The values in SystemProperties can be used to access and manipulate

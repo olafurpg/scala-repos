@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
   */
 class UnitMethodDeclaredWithTypeAnnotationInspection
     extends AbstractMethodSignatureInspection(
-        "ScalaUnitMethodDeclaredWithTypeAnnotation",
-        "Redundant Unit result type annotation") {
+      "ScalaUnitMethodDeclaredWithTypeAnnotation",
+      "Redundant Unit result type annotation") {
 
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDeclaration if f.hasUnitResultType =>

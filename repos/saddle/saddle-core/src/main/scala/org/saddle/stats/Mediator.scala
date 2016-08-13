@@ -301,7 +301,7 @@ class Mediator(winSz: Int) {
       val star1 = if (i == idx) "*" else " "
       val star2 = if (i == naIdx) " *" else "  "
       println(
-          "%s%3d|%12.6f|%12d|%12d |%5s%s|" format
+        "%s%3d|%12.6f|%12d|%12d |%5s%s|" format
           (star1, i, data(i), heap(i), loc(i), sawNa(i), star2))
     }
     println("-----------------------------------------------------")

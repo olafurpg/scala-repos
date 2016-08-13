@@ -7,7 +7,11 @@ import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.launcher.{TaskOp, TaskLauncher}
 import mesosphere.marathon.metrics.Metrics
-import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonSchedulerDriverHolder,
+  MarathonSpec,
+  MarathonTestHelper
+}
 import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.OfferID
 import org.apache.mesos.Protos.{Offer, TaskInfo}
@@ -27,9 +31,9 @@ class TaskLauncherImplTest extends MarathonSpec {
       .launch(taskInfo, MarathonTestHelper.makeTaskFromTaskInfo(taskInfo))
   }
   private[this] val launch1 = launch(
-      MarathonTestHelper.makeOneCPUTask("task1"))
+    MarathonTestHelper.makeOneCPUTask("task1"))
   private[this] val launch2 = launch(
-      MarathonTestHelper.makeOneCPUTask("task2"))
+    MarathonTestHelper.makeOneCPUTask("task2"))
   private[this] val ops = Seq(launch1, launch2)
   private[this] val opsAsJava: util.List[Offer.Operation] =
     ops.flatMap(_.offerOperations).asJava
@@ -44,7 +48,7 @@ class TaskLauncherImplTest extends MarathonSpec {
 
   test("unsuccessful launchTasks") {
     when(
-        driverHolder.driver.get.acceptOffers(offerIdAsJava, opsAsJava, filter))
+      driverHolder.driver.get.acceptOffers(offerIdAsJava, opsAsJava, filter))
       .thenReturn(Protos.Status.DRIVER_ABORTED)
 
     assert(!launcher.acceptOffer(offerId, ops))
@@ -55,7 +59,7 @@ class TaskLauncherImplTest extends MarathonSpec {
 
   test("successful launchTasks") {
     when(
-        driverHolder.driver.get.acceptOffers(offerIdAsJava, opsAsJava, filter))
+      driverHolder.driver.get.acceptOffers(offerIdAsJava, opsAsJava, filter))
       .thenReturn(Protos.Status.DRIVER_RUNNING)
 
     assert(launcher.acceptOffer(offerId, ops))

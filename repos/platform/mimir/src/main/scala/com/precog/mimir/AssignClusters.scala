@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,13 +42,14 @@ import scalaz.syntax.traverse._
 import spire.implicits._
 
 trait AssignClusterModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ModelLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ModelLibModule[M] {
   import trans._
 
   trait AssignClusterSupport extends ColumnarTableLib with ModelSupport {
     trait AssignClusterBase extends ModelBase { self: Morphism2 =>
-      case class ModelCluster(
-          name: ClusterId, featureValues: Map[CPath, Double])
+      case class ModelCluster(name: ClusterId,
+                              featureValues: Map[CPath, Double])
       case class Model(name: ModelId, clusters: Array[ModelCluster])
       object Model extends ModelCompanion
 
@@ -65,7 +66,8 @@ trait AssignClusterModule[M[+ _]]
 
           val rowModels: Int => Set[Model] = {
             val modelTuples: Map[
-                ModelId, Set[(ModelId, ClusterId, CPath, DoubleColumn)]] = {
+              ModelId,
+              Set[(ModelId, ClusterId, CPath, DoubleColumn)]] = {
               schema.columnRefs.flatMap {
                 case ref @ ColumnRef(CPath(TableModule.paths.Value,
                                            CPathField(modelName),
@@ -291,8 +293,9 @@ trait AssignClusterModule[M[+ _]]
                                          CPathField(model.name),
                                          CPathField("clusterId"))
                       val centerId = Map(
-                          ColumnRef(idPath, CString) -> ArrayStrColumn(
-                              definedModel, resultArray))
+                        ColumnRef(idPath, CString) -> ArrayStrColumn(
+                          definedModel,
+                          resultArray))
 
                       centers ++ centerId
                   }
@@ -323,8 +326,8 @@ trait AssignClusterModule[M[+ _]]
             val forcedTable = table.transform(spec).force
             val tables0 =
               (0 until scanners.size) map { i =>
-                forcedTable.map(_.transform(
-                        DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
+                forcedTable.map(
+                  _.transform(DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
               }
             val tables: M[Seq[Table]] = (tables0.toList).sequence
 

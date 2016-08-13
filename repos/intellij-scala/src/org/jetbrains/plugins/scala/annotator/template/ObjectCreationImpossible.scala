@@ -4,8 +4,14 @@ import com.intellij.lang.annotation.AnnotationHolder
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.annotator.quickfix.ImplementMethodsQuickFix
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.overrideImplement.{ScAliasMember, ScalaOIUtil}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition
+}
+import org.jetbrains.plugins.scala.overrideImplement.{
+  ScAliasMember,
+  ScalaOIUtil
+}
 
 /**
   * Pavel Fatin
@@ -34,7 +40,7 @@ object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
 
           val undefined = for {
             member <- getMembersToImplement(definition)
-                         if !member.isInstanceOf[ScAliasMember] // See SCL-2887
+            if !member.isInstanceOf[ScAliasMember] // See SCL-2887
           } yield {
             try {
               (member.getText, member.getParentNodeDelegate.getText)
@@ -48,8 +54,8 @@ object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
             val element =
               if (isNew) refElement
               else definition.asInstanceOf[ScObject].nameId
-            val annotation = holder.createErrorAnnotation(
-                element, message(undefined.toSeq: _*))
+            val annotation = holder
+              .createErrorAnnotation(element, message(undefined.toSeq: _*))
             annotation.registerFix(new ImplementMethodsQuickFix(definition))
           }
         case _ =>
@@ -58,8 +64,9 @@ object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
   }
 
   def message(members: (String, String)*) = {
-    "Object creation impossible, since %s".format(members
-          .map(p => " member %s in %s is not defined".format(p._1, p._2))
-          .mkString("; "))
+    "Object creation impossible, since %s".format(
+      members
+        .map(p => " member %s in %s is not defined".format(p._1, p._2))
+        .mkString("; "))
   }
 }

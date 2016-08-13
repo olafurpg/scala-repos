@@ -56,9 +56,10 @@ import parallel.ParSet
   *  @define mayNotTerminateInf
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends IterableLike[A, This] with GenSetLike[A, This]
-    with Subtractable[A, This] with Parallelizable[A, ParSet[A]] {
-  self =>
+    extends IterableLike[A, This]
+    with GenSetLike[A, This]
+    with Subtractable[A, This]
+    with Parallelizable[A, ParSet[A]] { self =>
 
   /** The empty set of the same type as this set
     * @return  an empty set of type `This`.
@@ -252,5 +253,5 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *           Unless overridden this is simply `"Set"`.
     */
   override def stringPrefix: String = "Set"
-  override def toString = super [IterableLike].toString
+  override def toString = super[IterableLike].toString
 }

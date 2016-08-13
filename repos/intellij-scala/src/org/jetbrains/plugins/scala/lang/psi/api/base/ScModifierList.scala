@@ -7,7 +7,7 @@ package base
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.tree.IElementType
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

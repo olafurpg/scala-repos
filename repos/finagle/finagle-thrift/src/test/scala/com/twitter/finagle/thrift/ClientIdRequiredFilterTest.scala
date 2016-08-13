@@ -33,7 +33,7 @@ class ClientIdRequiredFilterTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "ClientIdRequiredFilter throws NoClientIdSpecifiedException when ClientId does not exist") {
+    "ClientIdRequiredFilter throws NoClientIdSpecifiedException when ClientId does not exist") {
     val c = ClientIdRequiredFilterContext(mock[Service[String, String]])
     import c._
 

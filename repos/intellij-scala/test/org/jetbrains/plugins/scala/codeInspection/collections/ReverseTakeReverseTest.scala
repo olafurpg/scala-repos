@@ -14,9 +14,9 @@ class ReverseTakeReverseTest extends OperationsOnCollectionInspectionTest {
 
   def test1(): Unit = {
     doTest(
-        s"val n = 2; Seq().${START}reverse.take(n).reverse$END",
-        "val n = 2; Seq().reverse.take(n).reverse",
-        "val n = 2; Seq().takeRight(n)"
+      s"val n = 2; Seq().${START}reverse.take(n).reverse$END",
+      "val n = 2; Seq().reverse.take(n).reverse",
+      "val n = 2; Seq().takeRight(n)"
     )
   }
 }

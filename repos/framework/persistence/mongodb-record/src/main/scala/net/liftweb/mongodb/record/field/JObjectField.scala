@@ -30,7 +30,8 @@ import scala.xml.NodeSeq
 import com.mongodb._
 
 class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[JObject, OwnerType] with MandatoryTypedField[JObject]
+    extends Field[JObject, OwnerType]
+    with MandatoryTypedField[JObject]
     with MongoFieldFlavor[JObject] {
 
   def owner = rec
@@ -73,5 +74,5 @@ class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 
   def setFromDBObject(obj: DBObject): Box[JObject] =
     Full(
-        JObjectParser.serialize(obj)(owner.meta.formats).asInstanceOf[JObject])
+      JObjectParser.serialize(obj)(owner.meta.formats).asInstanceOf[JObject])
 }

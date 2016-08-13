@@ -40,7 +40,14 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.{Font, Text}
 import scalafx.scene.transform.Rotate
-import scalafx.scene.{DepthTest, Group, Node, PerspectiveCamera, Scene, SceneAntialiasing}
+import scalafx.scene.{
+  DepthTest,
+  Group,
+  Node,
+  PerspectiveCamera,
+  Scene,
+  SceneAntialiasing
+}
 
 /**
   * The type VideoCubeDemo a demonstration of the JavaOne 2011 key note with
@@ -75,27 +82,27 @@ object VideoCubeDemo extends JFXApp {
 
   val folder = folderOption match {
     case Some(folderName) => {
-        val file = new File(folderName)
-        if (file.exists() && file.isDirectory) file
-        else
-          throw new IllegalArgumentException(
-              "System property `" + folderSysProperty + " = " + folderName +
-              "` " + "has to point to an existing directory.")
-      }
+      val file = new File(folderName)
+      if (file.exists() && file.isDirectory) file
+      else
+        throw new IllegalArgumentException(
+          "System property `" + folderSysProperty + " = " + folderName +
+            "` " + "has to point to an existing directory.")
+    }
     case None =>
       throw new IllegalArgumentException(
-          "System property `" + folderSysProperty + "` is not defined.")
+        "System property `" + folderSysProperty + "` is not defined.")
   }
 
   // You need your video files ;-) Cannot redistribute MOVIE FILES!!!
   // Substitute, for example, with your own family and vacation pictures
   val vidFiles = List(
-      "FLIGHT Trailer 2012 Denzel Washington Movie - Official [HD].mp4",
-      "LOOPER Trailer 2012 Bruce Willis Movie - Official [HD].mp4",
-      "PROMETHEUS Trailer 2 - 2012 Movie - Official [HD].mp4",
-      "RESIDENT EVIL 5 Retribution Trailer 2 - 2012 Movie - Official.mp4",
-      "TED Movie Trailer 2012 - Official [HD].mp4",
-      "THE HOBBIT Trailer - 2012 Movie - Official [HD].mp4")
+    "FLIGHT Trailer 2012 Denzel Washington Movie - Official [HD].mp4",
+    "LOOPER Trailer 2012 Bruce Willis Movie - Official [HD].mp4",
+    "PROMETHEUS Trailer 2 - 2012 Movie - Official [HD].mp4",
+    "RESIDENT EVIL 5 Retribution Trailer 2 - 2012 Movie - Official.mp4",
+    "TED Movie Trailer 2012 - Official [HD].mp4",
+    "THE HOBBIT Trailer - 2012 Movie - Official [HD].mp4")
 
   val mediaPlayers = vidFiles.map { filename =>
     {
@@ -122,7 +129,7 @@ object VideoCubeDemo extends JFXApp {
   val highY = 700
   val starryBackground = new Group {
     val stars = (1 to 500).map(x =>
-          new Rectangle {
+      new Rectangle {
         x = lowX + scala.math.random * (highX - lowX)
         y = lowY + scala.math.random * (highY - lowY)
         //      printf("x=%5.1f, y=%5.1f\n", x.get(), y.get() )
@@ -148,11 +155,11 @@ object VideoCubeDemo extends JFXApp {
     animation = new Timeline {
       cycleCount = Timeline.Indefinite
       keyFrames = Seq(
-          at(0 s) { c1.ry.angle -> 0d; c1.rx.angle -> 0d; c1.rz.angle -> 0d },
-          at(4 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d; },
-          //        at (4 s) { c1.rz.angle -> 0d ; c1.ry.angle -> 720d; }
-          at(7 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d },
-          at(10 s) { c1.rz.angle -> 1080d }
+        at(0 s) { c1.ry.angle -> 0d; c1.rx.angle -> 0d; c1.rz.angle -> 0d },
+        at(4 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d; },
+        //        at (4 s) { c1.rz.angle -> 0d ; c1.ry.angle -> 720d; }
+        at(7 s) { c1.rx.angle -> 360d; c1.ry.angle -> 520d },
+        at(10 s) { c1.rz.angle -> 1080d }
       )
     }
 
@@ -181,67 +188,67 @@ class VideoCube(val mediaPlayers: List[MediaPlayer], size: Double)
   transforms = Seq(rz, ry, rx)
 
   children = Seq(
-      new MediaViewCubeFace(mediaPlayers(0)) {
-        // back face
-        fitWidth = size
-        fitHeight = size
-        translateX = -0.5 * size
-        translateY = -0.5 * size
-        translateZ = 0.5 * size
-        //      preserveRatio = false
-        text = "0"
-      },
-      new MediaViewCubeFace(mediaPlayers(1), 0.01) {
-        // bottom face
-        fitWidth = size
-        fitHeight = size
-        translateX = -0.5 * size
-        translateY = 0
-        rotationAxis = Rotate.XAxis
-        rotate = 90
-        //      preserveRatio = false
-        text = "1"
-      },
-      new MediaViewCubeFace(mediaPlayers(2), 0.01) {
-        // right face
-        fitWidth = size
-        fitHeight = size
-        translateX = -1 * size
-        translateY = -0.5 * size
-        rotationAxis = Rotate.YAxis
-        rotate = 90
-        //      preserveRatio = false
-        text = "2"
-      },
-      new MediaViewCubeFace(mediaPlayers(3)) {
-        // left face
-        fitWidth = size
-        fitHeight = size
-        translateX = 0
-        translateY = -0.5 * size
-        rotationAxis = Rotate.YAxis
-        rotate = 90
-        text = "3"
-      },
-      new MediaViewCubeFace(mediaPlayers(4)) {
-        // top face
-        fitWidth = size
-        fitHeight = size
-        translateX = -0.5 * size
-        translateY = -1 * size
-        rotationAxis = Rotate.XAxis
-        rotate = 90
-        text = "4"
-      },
-      new MediaViewCubeFace(mediaPlayers(5), 0.01) {
-        // top face
-        fitWidth = size
-        fitHeight = size
-        translateX = -0.5 * size
-        translateY = -0.5 * size
-        translateZ = -0.5 * size
-        text = "5"
-      }
+    new MediaViewCubeFace(mediaPlayers(0)) {
+      // back face
+      fitWidth = size
+      fitHeight = size
+      translateX = -0.5 * size
+      translateY = -0.5 * size
+      translateZ = 0.5 * size
+      //      preserveRatio = false
+      text = "0"
+    },
+    new MediaViewCubeFace(mediaPlayers(1), 0.01) {
+      // bottom face
+      fitWidth = size
+      fitHeight = size
+      translateX = -0.5 * size
+      translateY = 0
+      rotationAxis = Rotate.XAxis
+      rotate = 90
+      //      preserveRatio = false
+      text = "1"
+    },
+    new MediaViewCubeFace(mediaPlayers(2), 0.01) {
+      // right face
+      fitWidth = size
+      fitHeight = size
+      translateX = -1 * size
+      translateY = -0.5 * size
+      rotationAxis = Rotate.YAxis
+      rotate = 90
+      //      preserveRatio = false
+      text = "2"
+    },
+    new MediaViewCubeFace(mediaPlayers(3)) {
+      // left face
+      fitWidth = size
+      fitHeight = size
+      translateX = 0
+      translateY = -0.5 * size
+      rotationAxis = Rotate.YAxis
+      rotate = 90
+      text = "3"
+    },
+    new MediaViewCubeFace(mediaPlayers(4)) {
+      // top face
+      fitWidth = size
+      fitHeight = size
+      translateX = -0.5 * size
+      translateY = -1 * size
+      rotationAxis = Rotate.XAxis
+      rotate = 90
+      text = "4"
+    },
+    new MediaViewCubeFace(mediaPlayers(5), 0.01) {
+      // top face
+      fitWidth = size
+      fitHeight = size
+      translateX = -0.5 * size
+      translateY = -0.5 * size
+      translateZ = -0.5 * size
+      text = "5"
+    }
   )
 
   /**

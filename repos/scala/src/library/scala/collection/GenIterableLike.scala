@@ -143,6 +143,7 @@ trait GenIterableLike[+A, +Repr] extends Any with GenTraversableLike[A, Repr] {
     *                   If `that` is shorter than this $coll, `thatElem` values are used to pad the result.
     */
   def zipAll[B, A1 >: A, That](
-      that: GenIterable[B], thisElem: A1, thatElem: B)(
-      implicit bf: CBF[Repr, (A1, B), That]): That
+      that: GenIterable[B],
+      thisElem: A1,
+      thatElem: B)(implicit bf: CBF[Repr, (A1, B), That]): That
 }

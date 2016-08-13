@@ -15,10 +15,12 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val seq = Seq(1, 2)
          |seq.${START}apply(seq.size - 1)$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.apply(seq.size - 1)
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.last
       """.stripMargin)
@@ -87,9 +89,9 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
                          hint,
                          inspectionClass)
     checkTextHasNoErrors(
-        """val buf = scala.collection.mutable.ArrayBuffer(1, 2)
+      """val buf = scala.collection.mutable.ArrayBuffer(1, 2)
         |buf(buf.size - 1)""".stripMargin,
-        hint,
-        inspectionClass)
+      hint,
+      inspectionClass)
   }
 }

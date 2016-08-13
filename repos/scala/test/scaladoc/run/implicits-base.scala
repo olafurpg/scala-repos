@@ -16,10 +16,11 @@ object Test extends ScaladocModelTest {
 
     def isShadowed(mbr: MemberEntity): Boolean =
       mbr.byConversion
-        .map(_.source.implicitsShadowing
-              .get(mbr)
-              .map(_.isShadowed)
-              .getOrElse(false))
+        .map(
+          _.source.implicitsShadowing
+            .get(mbr)
+            .map(_.isShadowed)
+            .getOrElse(false))
         .getOrElse(false)
 
     // SEE THE test/resources/implicits-base-res.scala FOR THE EXPLANATION OF WHAT'S CHECKED HERE:
@@ -87,11 +88,12 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 2)
     assert(conv._member("convToManifestA").resultType.name == "T")
     assert(conv._member("convToTraversableOps").resultType.name == "T")
-    assert(conv
-          ._member("convToTraversableOps")
-          .flags
-          .toString
-          .indexOf("abstract") == -1)
+    assert(
+      conv
+        ._member("convToTraversableOps")
+        .flags
+        .toString
+        .indexOf("abstract") == -1)
 
 //// class B ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -126,7 +128,7 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 0)
     assert(isShadowed(conv._member("convToEnrichedA")))
     assert(
-        conv._member("convToEnrichedA").resultType.name == "Bar[Foo[Double]]")
+      conv._member("convToEnrichedA").resultType.name == "Bar[Foo[Double]]")
 
     // def convToMyNumericA: Double        // enrichA6: (if showAll is set) with a constraint that there is x: MyNumeric[Double] implicit in scope
     conv = B._conversion(A.qualifiedName + ".enrichA6")
@@ -142,11 +144,12 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 0)
     assert(conv._member("convToManifestA").resultType.name == "Double")
     assert(conv._member("convToTraversableOps").resultType.name == "Double")
-    assert(conv
-          ._member("convToTraversableOps")
-          .flags
-          .toString
-          .indexOf("abstract") == -1)
+    assert(
+      conv
+        ._member("convToTraversableOps")
+        .flags
+        .toString
+        .indexOf("abstract") == -1)
 
 //// class C ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -218,7 +221,7 @@ object Test extends ScaladocModelTest {
     assert(conv.constraints.length == 0)
     assert(isShadowed(conv._member("convToEnrichedA")))
     assert(
-        conv._member("convToEnrichedA").resultType.name == "Bar[Foo[String]]")
+      conv._member("convToEnrichedA").resultType.name == "Bar[Foo[String]]")
 
     // def convToMyNumericA: String        // enrichA6: (if showAll is set) with a constraint that there is x: MyNumeric[String] implicit in scope
     conv = D._conversion(A.qualifiedName + ".enrichA6")

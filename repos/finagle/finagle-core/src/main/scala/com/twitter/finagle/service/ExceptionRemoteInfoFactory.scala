@@ -18,20 +18,20 @@ private[finagle] object ExceptionRemoteInfoFactory {
       label: String): PartialFunction[Throwable, Future[T]] = {
     case e: HasRemoteInfo =>
       e.setRemoteInfo(
-          RemoteInfo.Available(Upstream.addr,
-                               ClientId.current,
-                               Some(endpointAddr),
-                               Some(ClientId(label)),
-                               Trace.id))
+        RemoteInfo.Available(Upstream.addr,
+                             ClientId.current,
+                             Some(endpointAddr),
+                             Some(ClientId(label)),
+                             Trace.id))
       Future.exception(e)
     case f: Failure =>
       Future.exception(
-          f.withSource(Failure.Source.RemoteInfo,
-                       RemoteInfo.Available(Upstream.addr,
-                                            ClientId.current,
-                                            Some(endpointAddr),
-                                            Some(ClientId(label)),
-                                            Trace.id)))
+        f.withSource(Failure.Source.RemoteInfo,
+                     RemoteInfo.Available(Upstream.addr,
+                                          ClientId.current,
+                                          Some(endpointAddr),
+                                          Some(ClientId(label)),
+                                          Trace.id)))
   }
 
   /**
@@ -71,12 +71,13 @@ private[finagle] class ExceptionRemoteInfoFactory[Req, Rep](
     endpointAddr: SocketAddress,
     label: String)
     extends ServiceFactoryProxy[Req, Rep](underlying) {
-  private[this] val requestAddRemoteInfo: PartialFunction[
-      Throwable, Future[Rep]] =
+  private[this] val requestAddRemoteInfo: PartialFunction[Throwable,
+                                                          Future[Rep]] =
     ExceptionRemoteInfoFactory.addRemoteInfo(endpointAddr, label)
 
   private[this] val connectionAddRemoteInfo: PartialFunction[
-      Throwable, Future[Service[Req, Rep]]] =
+    Throwable,
+    Future[Service[Req, Rep]]] =
     ExceptionRemoteInfoFactory.addRemoteInfo(endpointAddr, label)
 
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] =

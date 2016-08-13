@@ -29,7 +29,9 @@ import org.apache.spark.network.shuffle.{BlockFetchingListener, ShuffleClient}
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
 private[spark] abstract class BlockTransferService
-    extends ShuffleClient with Closeable with Logging {
+    extends ShuffleClient
+    with Closeable
+    with Logging {
 
   /**
     * Initialize the transfer service by giving it the BlockDataManager that can be used to fetch
@@ -88,12 +90,12 @@ private[spark] abstract class BlockTransferService
     // A monitor for the thread to wait on.
     val result = Promise[ManagedBuffer]()
     fetchBlocks(host, port, execId, Array(blockId), new BlockFetchingListener {
-      override def onBlockFetchFailure(
-          blockId: String, exception: Throwable): Unit = {
+      override def onBlockFetchFailure(blockId: String,
+                                       exception: Throwable): Unit = {
         result.failure(exception)
       }
-      override def onBlockFetchSuccess(
-          blockId: String, data: ManagedBuffer): Unit = {
+      override def onBlockFetchSuccess(blockId: String,
+                                       data: ManagedBuffer): Unit = {
         val ret = ByteBuffer.allocate(data.size.toInt)
         ret.put(data.nioByteBuffer())
         ret.flip()
@@ -117,7 +119,7 @@ private[spark] abstract class BlockTransferService
                       blockData: ManagedBuffer,
                       level: StorageLevel): Unit = {
     Await.result(
-        uploadBlock(hostname, port, execId, blockId, blockData, level),
-        Duration.Inf)
+      uploadBlock(hostname, port, execId, blockId, blockData, level),
+      Duration.Inf)
   }
 }

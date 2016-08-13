@@ -7,8 +7,8 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
 trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase {
   def testDuplicateConfig() {
     addFileToProject(
-        "DuplicateConfigTest.scala",
-        """
+      "DuplicateConfigTest.scala",
+      """
         |import org.scalatest._
         |
         |class DuplicateConfigTest extends FlatSpec {
@@ -19,12 +19,12 @@ trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase {
       """.stripMargin.trim())
 
     runDuplicateConfigTest(
-        4,
-        10,
-        "DuplicateConfigTest.scala",
-        checkConfigAndSettings(
-            _,
-            "DuplicateConfigTest",
-            "A DuplicateConfigTest should create only one run configuration"))
+      4,
+      10,
+      "DuplicateConfigTest.scala",
+      checkConfigAndSettings(
+        _,
+        "DuplicateConfigTest",
+        "A DuplicateConfigTest should create only one run configuration"))
   }
 }

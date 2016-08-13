@@ -26,15 +26,15 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
     "convert userAction to Event JSON" in {
       // webhooks input
       val userAction = Map(
-          "type" -> "userAction",
-          "userId" -> "as34smg4",
-          "event" -> "do_something",
-          "context[ip]" -> "24.5.68.47", // optional
-          "context[prop1]" -> "2.345", // optional
-          "context[prop2]" -> "value1", // optional
-          "anotherProperty1" -> "100",
-          "anotherProperty2" -> "optional1", // optional
-          "timestamp" -> "2015-01-02T00:30:12.984Z"
+        "type" -> "userAction",
+        "userId" -> "as34smg4",
+        "event" -> "do_something",
+        "context[ip]" -> "24.5.68.47", // optional
+        "context[prop1]" -> "2.345", // optional
+        "context[prop2]" -> "value1", // optional
+        "anotherProperty1" -> "100",
+        "anotherProperty2" -> "optional1", // optional
+        "timestamp" -> "2015-01-02T00:30:12.984Z"
       )
 
       // expected converted Event JSON
@@ -62,11 +62,11 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
     "convert userAction without optional fields to Event JSON" in {
       // webhooks input
       val userAction = Map(
-          "type" -> "userAction",
-          "userId" -> "as34smg4",
-          "event" -> "do_something",
-          "anotherProperty1" -> "100",
-          "timestamp" -> "2015-01-02T00:30:12.984Z"
+        "type" -> "userAction",
+        "userId" -> "as34smg4",
+        "event" -> "do_something",
+        "anotherProperty1" -> "100",
+        "timestamp" -> "2015-01-02T00:30:12.984Z"
       )
 
       // expected converted Event JSON
@@ -88,16 +88,16 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
     "convert userActionItem to Event JSON" in {
       // webhooks input
       val userActionItem = Map(
-          "type" -> "userActionItem",
-          "userId" -> "as34smg4",
-          "event" -> "do_something_on",
-          "itemId" -> "kfjd312bc",
-          "context[ip]" -> "1.23.4.56",
-          "context[prop1]" -> "2.345",
-          "context[prop2]" -> "value1",
-          "anotherPropertyA" -> "4.567", // optional
-          "anotherPropertyB" -> "false", // optional
-          "timestamp" -> "2015-01-15T04:20:23.567Z"
+        "type" -> "userActionItem",
+        "userId" -> "as34smg4",
+        "event" -> "do_something_on",
+        "itemId" -> "kfjd312bc",
+        "context[ip]" -> "1.23.4.56",
+        "context[prop1]" -> "2.345",
+        "context[prop2]" -> "value1",
+        "anotherPropertyA" -> "4.567", // optional
+        "anotherPropertyB" -> "false", // optional
+        "timestamp" -> "2015-01-15T04:20:23.567Z"
       )
 
       // expected converted Event JSON
@@ -127,14 +127,14 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
     "convert userActionItem without optional fields to Event JSON" in {
       // webhooks input
       val userActionItem = Map(
-          "type" -> "userActionItem",
-          "userId" -> "as34smg4",
-          "event" -> "do_something_on",
-          "itemId" -> "kfjd312bc",
-          "context[ip]" -> "1.23.4.56",
-          "context[prop1]" -> "2.345",
-          "context[prop2]" -> "value1",
-          "timestamp" -> "2015-01-15T04:20:23.567Z"
+        "type" -> "userActionItem",
+        "userId" -> "as34smg4",
+        "event" -> "do_something_on",
+        "itemId" -> "kfjd312bc",
+        "context[ip]" -> "1.23.4.56",
+        "context[prop1]" -> "2.345",
+        "context[prop2]" -> "value1",
+        "timestamp" -> "2015-01-15T04:20:23.567Z"
       )
 
       // expected converted Event JSON

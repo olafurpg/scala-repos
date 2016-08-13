@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -86,8 +86,8 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     val path = Path("/%s/".format(accountId))
     val grantName = name.map(_ + "-grant")
     val grantDescription = name.map(_ + " account grant")
-    val grant = newStandardAccountGrant(
-        accountId, path, grantName, grantDescription)
+    val grant =
+      newStandardAccountGrant(accountId, path, grantName, grantDescription)
     for {
       rk <- rootAPIKey
       ng <- grant
@@ -122,14 +122,14 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
   def findDeletedGrantChildren(gid: GrantId): M[Set[Grant]]
 
   def addGrants(apiKey: APIKey, grants: Set[GrantId]): M[Option[APIKeyRecord]]
-  def removeGrants(
-      apiKey: APIKey, grants: Set[GrantId]): M[Option[APIKeyRecord]]
+  def removeGrants(apiKey: APIKey,
+                   grants: Set[GrantId]): M[Option[APIKeyRecord]]
 
   def deleteAPIKey(apiKey: APIKey): M[Option[APIKeyRecord]]
   def deleteGrant(apiKey: GrantId): M[Set[Grant]]
 
-  def findValidGrant(
-      grantId: GrantId, at: Option[DateTime] = None): M[Option[Grant]] =
+  def findValidGrant(grantId: GrantId,
+                     at: Option[DateTime] = None): M[Option[Grant]] =
     findGrant(grantId) flatMap { grantOpt =>
       grantOpt map { (grant: Grant) =>
         if (grant.isExpired(at)) None.point[M]
@@ -173,8 +173,12 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         if (minimized.isEmpty) {
           none[Grant].point[M]
         } else {
-          createGrant(
-              name, description, issuerKey, minimized, perms, expiration) map {
+          createGrant(name,
+                      description,
+                      issuerKey,
+                      minimized,
+                      perms,
+                      expiration) map {
             some
           }
         }
@@ -228,22 +232,22 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
       grants: Set[v1.NewGrantRequest]): M[Option[APIKeyRecord]] = {
     val grantList = grants.toList
     grantList.traverse(grant =>
-          hasCapability(issuerKey, grant.permissions, grant.expirationDate)) flatMap {
+      hasCapability(issuerKey, grant.permissions, grant.expirationDate)) flatMap {
       checks =>
         if (checks.forall(_ == true)) {
           for {
             newGrants <- grantList traverse { g =>
-              deriveGrant(g.name,
-                          g.description,
-                          issuerKey,
-                          g.permissions,
-                          g.expirationDate)
-            }
-            newKey <- createAPIKey(
-                name,
-                description,
-                issuerKey,
-                newGrants.flatMap(_.map(_.grantId))(collection.breakOut))
+                          deriveGrant(g.name,
+                                      g.description,
+                                      issuerKey,
+                                      g.permissions,
+                                      g.expirationDate)
+                        }
+            newKey <- createAPIKey(name,
+                                   description,
+                                   issuerKey,
+                                   newGrants.flatMap(_.map(_.grantId))(
+                                     collection.breakOut))
           } yield some(newKey)
         } else {
           none[APIKeyRecord].point[M]

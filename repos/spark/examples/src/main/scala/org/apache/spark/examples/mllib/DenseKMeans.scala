@@ -61,10 +61,10 @@ object DenseKMeans {
         .action((x, c) => c.copy(numIterations = x))
       opt[String]("initMode")
         .text(
-            s"initialization mode (${InitializationMode.values.mkString(",")}), " +
+          s"initialization mode (${InitializationMode.values.mkString(",")}), " +
             s"default: ${defaultParams.initializationMode}")
-        .action((x,
-            c) => c.copy(initializationMode = InitializationMode.withName(x)))
+        .action((x, c) =>
+          c.copy(initializationMode = InitializationMode.withName(x)))
       arg[String]("<input>")
         .text("input paths to examples")
         .required()

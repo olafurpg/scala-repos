@@ -20,7 +20,12 @@ import kafka.common.KafkaException
 import kafka.coordinator.{GroupOverview, GroupSummary, MemberSummary}
 import kafka.utils.Logging
 import org.apache.kafka.clients._
-import org.apache.kafka.clients.consumer.internals.{ConsumerNetworkClient, ConsumerProtocol, RequestFuture, SendFailedException}
+import org.apache.kafka.clients.consumer.internals.{
+  ConsumerNetworkClient,
+  ConsumerProtocol,
+  RequestFuture,
+  SendFailedException
+}
 import org.apache.kafka.common.config.ConfigDef.{Importance, Type}
 import org.apache.kafka.common.config.{AbstractConfig, ConfigDef}
 import org.apache.kafka.common.errors.DisconnectException
@@ -56,7 +61,7 @@ class AdminClient(val time: Time,
 
       now = time.milliseconds()
     } while (now < deadline &&
-    future.exception().isInstanceOf[SendFailedException])
+      future.exception().isInstanceOf[SendFailedException])
 
     throw future.exception()
   }
@@ -72,7 +77,7 @@ class AdminClient(val time: Time,
         }
     }
     throw new RuntimeException(
-        s"Request ${api} failed on brokers ${bootstrapBrokers}")
+      s"Request ${api} failed on brokers ${bootstrapBrokers}")
   }
 
   private def findCoordinator(groupId: String): Node = {
@@ -129,7 +134,7 @@ class AdminClient(val time: Time,
 
   def listAllConsumerGroupsFlattened(): List[GroupOverview] = {
     listAllGroupsFlattened.filter(
-        _.protocolType == ConsumerProtocol.PROTOCOL_TYPE)
+      _.protocolType == ConsumerProtocol.PROTOCOL_TYPE)
   }
 
   def describeGroup(groupId: String): GroupSummary = {
@@ -141,7 +146,7 @@ class AdminClient(val time: Time,
     val metadata = response.groups().get(groupId)
     if (metadata == null)
       throw new KafkaException(
-          s"Response from broker contained no metadata for group ${groupId}")
+        s"Response from broker contained no metadata for group ${groupId}")
 
     Errors.forCode(metadata.errorCode()).maybeThrow()
     val members = metadata
@@ -173,12 +178,12 @@ class AdminClient(val time: Time,
 
     if (group.protocolType != ConsumerProtocol.PROTOCOL_TYPE)
       throw new IllegalArgumentException(
-          s"Group ${groupId} with protocol type '${group.protocolType}' is not a valid consumer group")
+        s"Group ${groupId} with protocol type '${group.protocolType}' is not a valid consumer group")
 
     if (group.state == "Stable") {
       group.members.map { member =>
         val assignment = ConsumerProtocol.deserializeAssignment(
-            ByteBuffer.wrap(member.assignment))
+          ByteBuffer.wrap(member.assignment))
         new ConsumerSummary(member.memberId,
                             member.clientId,
                             member.clientHost,
@@ -251,18 +256,20 @@ object AdminClient {
                                 channelBuilder)
 
     val networkClient = new NetworkClient(
-        selector,
-        metadata,
-        "admin-" + AdminClientIdSequence.getAndIncrement(),
-        DefaultMaxInFlightRequestsPerConnection,
-        DefaultReconnectBackoffMs,
-        DefaultSendBufferBytes,
-        DefaultReceiveBufferBytes,
-        DefaultRequestTimeoutMs,
-        time)
+      selector,
+      metadata,
+      "admin-" + AdminClientIdSequence.getAndIncrement(),
+      DefaultMaxInFlightRequestsPerConnection,
+      DefaultReconnectBackoffMs,
+      DefaultSendBufferBytes,
+      DefaultReceiveBufferBytes,
+      DefaultRequestTimeoutMs,
+      time)
 
-    val highLevelClient = new ConsumerNetworkClient(
-        networkClient, metadata, time, DefaultRetryBackoffMs)
+    val highLevelClient = new ConsumerNetworkClient(networkClient,
+                                                    metadata,
+                                                    time,
+                                                    DefaultRetryBackoffMs)
 
     new AdminClient(time,
                     DefaultRequestTimeoutMs,

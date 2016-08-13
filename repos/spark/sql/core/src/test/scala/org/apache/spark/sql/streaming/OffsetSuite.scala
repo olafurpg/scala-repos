@@ -18,7 +18,11 @@
 package org.apache.spark.sql.streaming
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, Offset}
+import org.apache.spark.sql.execution.streaming.{
+  CompositeOffset,
+  LongOffset,
+  Offset
+}
 
 trait OffsetSuite extends SparkFunSuite {
 
@@ -89,6 +93,6 @@ class CompositeOffsetSuite extends OffsetSuite {
           two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
 
   compareInvalid(
-      one = CompositeOffset.fill(LongOffset(2), LongOffset(1)), // vector time inconsistent
-      two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
+    one = CompositeOffset.fill(LongOffset(2), LongOffset(1)), // vector time inconsistent
+    two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
 }

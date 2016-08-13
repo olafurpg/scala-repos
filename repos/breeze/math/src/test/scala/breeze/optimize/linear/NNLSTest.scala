@@ -24,7 +24,7 @@ class NNLSTest extends OptimizeTestBase {
 
     // About 15% of random 20x20 [-1,1]-matrices have a singular value less than 1e-3.  NNLS
     // can legitimately fail to solve these anywhere close to exactly.  So we grab a considerable
-    // sample of these matrices and make sure that we solved a substantial fraction of them.    
+    // sample of these matrices and make sure that we solved a substantial fraction of them.
     for (k <- 0 until 100) {
       val (ata, atb) = genOnesData(n)
       val x = nnls.minimize(ata, atb)
@@ -109,8 +109,11 @@ class NNLSTest extends OptimizeTestBase {
                                             -253747.03819,
                                             1310939.40814))
 
-    val atb = DenseVector(
-        -31755.05710, 13047.14813, -20191.24443, 25993.77580, 11963.55017)
+    val atb = DenseVector(-31755.05710,
+                          13047.14813,
+                          -20191.24443,
+                          25993.77580,
+                          11963.55017)
 
     /** reference solution obtained from matlab function quadprog */
     val refx = DenseVector(34.90751, 103.96254, 0.00000, 27.82094, 58.79627)

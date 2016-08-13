@@ -21,9 +21,9 @@ object FilterSize extends SimplificationType {
     expr match {
       case qual `.filter` (cond) `.sizeOrLength` () =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "count", cond))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "count", cond))
+            .highlightFrom(qual))
       case _ => None
     }
   }

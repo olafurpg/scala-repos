@@ -87,9 +87,9 @@ object svd extends UFunc {
     val iwork = new Array[Int](8 * (m min n))
     val workSize =
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
-              scala.math.max(m, n),
-              4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+        scala.math.max(m, n),
+        4 * scala.math.min(m, n) * scala.math.min(m, n) +
+          4 * scala.math.min(m, n)))
     val work = new Array[Double](workSize)
     val info = new intW(0)
     val cm = copy(mat)
@@ -145,9 +145,9 @@ object svd extends UFunc {
     val iwork = new Array[Int](8 * (m min n))
     val workSize =
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
-              scala.math.max(m, n),
-              4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+        scala.math.max(m, n),
+        4 * scala.math.min(m, n) * scala.math.min(m, n) +
+          4 * scala.math.min(m, n)))
     val work = new Array[Float](workSize)
     val info = new intW(0)
     val cm = copy(mat)
@@ -179,8 +179,8 @@ object svd extends UFunc {
     SVD(U, S, Vt)
   }
 
-  type OpMulMatrixDenseVector[Mat] = OpMulMatrix.Impl2[
-      Mat, DenseVector[Double], DenseVector[Double]]
+  type OpMulMatrixDenseVector[Mat] =
+    OpMulMatrix.Impl2[Mat, DenseVector[Double], DenseVector[Double]]
 
   /**
     * Implementation of svds for a sparse matrix. The caller provides two operations: mul - matrix
@@ -240,7 +240,7 @@ object svd extends UFunc {
         val z = mulTrans(matTrans, x)
         if (z.length <= k)
           throw new IllegalArgumentException(
-              "The number of rows or columns " + "should be bigger than k.")
+            "The number of rows or columns " + "should be bigger than k.")
         y := mul(mat, z)
       }
 
@@ -259,7 +259,7 @@ object svd extends UFunc {
         val n = dim(mt)._1
         if (n <= k)
           throw new IllegalArgumentException(
-              "The number of rows or columns should be bigger than k.")
+            "The number of rows or columns should be bigger than k.")
 
         val mtTrans = trans.apply(mt)
 
@@ -362,7 +362,7 @@ object svd extends UFunc {
           val eigenVal = d(i)
           if (eigenVal < 0.0)
             throw new IllegalStateException(
-                "encountered negative eigenvalue, " +
+              "encountered negative eigenvalue, " +
                 "please make sure your multiplication operators are applied to the same matrix.")
           val eigenVec = eigenVectors(i * n until i * n + n)
           mp(i) = (scala.math.sqrt(eigenVal), eigenVec)
@@ -373,13 +373,13 @@ object svd extends UFunc {
 
         val s = DenseVector(sp.toArray)
         val siMatrix: DenseMatrix[Double] = diag(
-            DenseVector(sp.map(u => 1 / u).toArray))
+          DenseVector(sp.map(u => 1 / u).toArray))
 
         val va = mp.map { case (ek, ev) => ev }
         val uOutput = DenseMatrix(va.map(r => r.toArray).toSeq: _*).t
         val vtOutput =
           siMatrix * DenseMatrix(
-              va.map(r => mulTrans(mtTrans, r).toArray).toSeq: _*)
+            va.map(r => mulTrans(mtTrans, r).toArray).toSeq: _*)
         SVD(uOutput, s, vtOutput)
       }
     }
@@ -402,7 +402,7 @@ object svd extends UFunc {
       val tol = 1e-6
       if (k >= mt.cols || k >= mt.rows) {
         throw new IllegalArgumentException(
-            "The desired number of singular values is greater " +
+          "The desired number of singular values is greater " +
             "than or equal to min(mt.cols, mt.rows). Please use the full svd.")
       }
 

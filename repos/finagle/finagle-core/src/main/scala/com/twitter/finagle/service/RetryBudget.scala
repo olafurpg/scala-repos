@@ -144,8 +144,8 @@ object RetryBudget {
     require(percentCanRetry >= 0.0,
             s"percentCanRetry must be non-negative: $percentCanRetry")
     require(
-        percentCanRetry <= TokenRetryBudget.ScaleFactor,
-        s"percentCanRetry must not be greater than ${TokenRetryBudget.ScaleFactor}: $percentCanRetry")
+      percentCanRetry <= TokenRetryBudget.ScaleFactor,
+      s"percentCanRetry must not be greater than ${TokenRetryBudget.ScaleFactor}: $percentCanRetry")
 
     if (minRetriesPerSec == 0 && percentCanRetry == 0.0) return Empty
 

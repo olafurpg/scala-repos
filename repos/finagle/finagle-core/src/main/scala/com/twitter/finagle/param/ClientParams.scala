@@ -40,5 +40,5 @@ trait ClientParams[A <: Stack.Parameterized[A]] {
     */
   def withRetryBackoff(backoff: Stream[Duration]): A =
     self.configured(
-        self.params[Retries.Budget].copy(requeueBackoffs = backoff))
+      self.params[Retries.Budget].copy(requeueBackoffs = backoff))
 }

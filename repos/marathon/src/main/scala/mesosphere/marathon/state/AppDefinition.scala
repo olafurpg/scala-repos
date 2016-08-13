@@ -5,11 +5,18 @@ import mesosphere.marathon.Protos
 import mesosphere.marathon.Protos.Constraint
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.api.v2.Validation._
-import mesosphere.marathon.api.serialization.{ContainerSerializer, PortDefinitionSerializer, ResidencySerializer}
+import mesosphere.marathon.api.serialization.{
+  ContainerSerializer,
+  PortDefinitionSerializer,
+  ResidencySerializer
+}
 import mesosphere.marathon.health.HealthCheck
 import mesosphere.marathon.plugin
 import mesosphere.marathon.state.AppDefinition.VersionInfo
-import mesosphere.marathon.state.AppDefinition.VersionInfo.{FullVersionInfo, OnlyVersion}
+import mesosphere.marathon.state.AppDefinition.VersionInfo.{
+  FullVersionInfo,
+  OnlyVersion
+}
 import mesosphere.marathon.state.Container.Docker.PortMapping
 import mesosphere.mesos.TaskBuilder
 import mesosphere.mesos.protos.{Resource, ScalarResource}
@@ -90,11 +97,11 @@ case class AppDefinition(
   //scalastyle:off method.length
   def toProto: Protos.ServiceDefinition = {
     val commandInfo = TaskBuilder.commandInfo(
-        app = this,
-        taskId = None,
-        host = None,
-        ports = Seq.empty,
-        envPrefix = None
+      app = this,
+      taskId = None,
+      host = None,
+      ports = Seq.empty,
+      envPrefix = None
     )
     val cpusResource = ScalarResource(Resource.CPUS, cpus)
     val memResource = ScalarResource(Resource.MEM, mem)
@@ -109,7 +116,7 @@ case class AppDefinition(
       .setCmd(commandInfo)
       .setInstances(instances)
       .addAllPortDefinitions(
-          portDefinitions.map(PortDefinitionSerializer.toProto).asJava)
+        portDefinitions.map(PortDefinitionSerializer.toProto).asJava)
       .setRequirePorts(requirePorts)
       .setBackoff(backoff.toMillis)
       .setBackoffFactor(backoffFactor)
@@ -144,7 +151,7 @@ case class AppDefinition(
       case fullInfo: FullVersionInfo =>
         builder.setLastScalingAt(fullInfo.lastScalingAt.toDateTime.getMillis)
         builder.setLastConfigChangeAt(
-            fullInfo.lastConfigChangeAt.toDateTime.getMillis)
+          fullInfo.lastConfigChangeAt.toDateTime.getMillis)
       case _ => // ignore
     }
 
@@ -181,7 +188,8 @@ case class AppDefinition(
 
     val containerOption =
       if (proto.hasContainer)
-        Some(ContainerSerializer.fromProto(proto.getContainer)) else None
+        Some(ContainerSerializer.fromProto(proto.getContainer))
+      else None
 
     val acceptedResourceRoles: Option[Set[String]] =
       if (proto.hasAcceptedResourceRoles)
@@ -191,9 +199,9 @@ case class AppDefinition(
     val versionInfoFromProto =
       if (proto.hasLastScalingAt)
         FullVersionInfo(
-            version = Timestamp(proto.getVersion),
-            lastScalingAt = Timestamp(proto.getLastScalingAt),
-            lastConfigChangeAt = Timestamp(proto.getLastConfigChangeAt)
+          version = Timestamp(proto.getVersion),
+          lastScalingAt = Timestamp(proto.getLastScalingAt),
+          lastConfigChangeAt = Timestamp(proto.getLastConfigChangeAt)
         )
       else OnlyVersion(Timestamp(proto.getVersion))
 
@@ -203,7 +211,8 @@ case class AppDefinition(
 
     val residencyOption =
       if (proto.hasResidency)
-        Some(ResidencySerializer.fromProto(proto.getResidency)) else None
+        Some(ResidencySerializer.fromProto(proto.getResidency))
+      else None
 
     // TODO (gkleiman): we have to be able to read the ports from the deprecated field in order to perform migrations
     // until the deprecation cycle is complete.
@@ -216,43 +225,40 @@ case class AppDefinition(
           .to[Seq]
 
     AppDefinition(
-        id = PathId(proto.getId),
-        user = if (proto.getCmd.hasUser) Some(proto.getCmd.getUser) else None,
-        cmd = commandOption,
-        args = argsOption,
-        executor = proto.getExecutor,
-        instances = proto.getInstances,
-        portDefinitions = portDefinitions,
-        requirePorts = proto.getRequirePorts,
-        backoff = proto.getBackoff.milliseconds,
-        backoffFactor = proto.getBackoffFactor,
-        maxLaunchDelay = proto.getMaxLaunchDelay.milliseconds,
-        constraints = proto.getConstraintsList.asScala.toSet,
-        acceptedResourceRoles = acceptedResourceRoles,
-        cpus = resourcesMap.getOrElse(Resource.CPUS, this.cpus),
-        mem = resourcesMap.getOrElse(Resource.MEM, this.mem),
-        disk = resourcesMap.getOrElse(Resource.DISK, this.disk),
-        env = envMap,
-        fetch = proto.getCmd.getUrisList.asScala
-            .map(FetchUri.fromProto)
-            .to[Seq],
-        storeUrls = proto.getStoreUrlsList.asScala.to[Seq],
-        container = containerOption,
-        healthChecks = proto.getHealthChecksList.asScala
-            .map(new HealthCheck().mergeFromProto)
-            .toSet,
-        labels = proto.getLabelsList.asScala.map { p =>
-          p.getKey -> p.getValue
-        }.toMap,
-        versionInfo = versionInfoFromProto,
-        upgradeStrategy = if (proto.hasUpgradeStrategy)
-            UpgradeStrategy.fromProto(proto.getUpgradeStrategy)
-          else UpgradeStrategy.empty,
-        dependencies = proto.getDependenciesList.asScala
-            .map(PathId.apply)
-            .toSet,
-        ipAddress = ipAddressOption,
-        residency = residencyOption
+      id = PathId(proto.getId),
+      user = if (proto.getCmd.hasUser) Some(proto.getCmd.getUser) else None,
+      cmd = commandOption,
+      args = argsOption,
+      executor = proto.getExecutor,
+      instances = proto.getInstances,
+      portDefinitions = portDefinitions,
+      requirePorts = proto.getRequirePorts,
+      backoff = proto.getBackoff.milliseconds,
+      backoffFactor = proto.getBackoffFactor,
+      maxLaunchDelay = proto.getMaxLaunchDelay.milliseconds,
+      constraints = proto.getConstraintsList.asScala.toSet,
+      acceptedResourceRoles = acceptedResourceRoles,
+      cpus = resourcesMap.getOrElse(Resource.CPUS, this.cpus),
+      mem = resourcesMap.getOrElse(Resource.MEM, this.mem),
+      disk = resourcesMap.getOrElse(Resource.DISK, this.disk),
+      env = envMap,
+      fetch = proto.getCmd.getUrisList.asScala.map(FetchUri.fromProto).to[Seq],
+      storeUrls = proto.getStoreUrlsList.asScala.to[Seq],
+      container = containerOption,
+      healthChecks = proto.getHealthChecksList.asScala
+        .map(new HealthCheck().mergeFromProto)
+        .toSet,
+      labels = proto.getLabelsList.asScala.map { p =>
+        p.getKey -> p.getValue
+      }.toMap,
+      versionInfo = versionInfoFromProto,
+      upgradeStrategy =
+        if (proto.hasUpgradeStrategy)
+          UpgradeStrategy.fromProto(proto.getUpgradeStrategy)
+        else UpgradeStrategy.empty,
+      dependencies = proto.getDependenciesList.asScala.map(PathId.apply).toSet,
+      ipAddress = ipAddressOption,
+      residency = residencyOption
     )
   }
 
@@ -405,15 +411,15 @@ object AppDefinition {
     }
 
     def forNewConfig(newVersion: Timestamp): FullVersionInfo = FullVersionInfo(
-        version = newVersion,
-        lastScalingAt = newVersion,
-        lastConfigChangeAt = newVersion
+      version = newVersion,
+      lastScalingAt = newVersion,
+      lastConfigChangeAt = newVersion
     )
   }
 
   val RandomPortValue: Int = 0
-  val RandomPortDefinition: PortDefinition = PortDefinition(
-      RandomPortValue, "tcp", None, Map.empty[String, String])
+  val RandomPortDefinition: PortDefinition =
+    PortDefinition(RandomPortValue, "tcp", None, Map.empty[String, String])
 
   // App defaults
   val DefaultId: PathId = PathId.empty
@@ -490,7 +496,7 @@ object AppDefinition {
     appDef.disk should be >= 0.0
     appDef must definesCorrectResidencyCombination
     (appDef.isResident is false) or
-    (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
+      (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
   }
 
   /**
@@ -520,13 +526,13 @@ object AppDefinition {
 
   private val definesCorrectResidencyCombination: Validator[AppDefinition] =
     isTrue(
-        "AppDefinition must contain persistent volumes and define residency") {
+      "AppDefinition must contain persistent volumes and define residency") {
       app =>
         !(app.residency.isDefined ^ app.persistentVolumes.nonEmpty)
     }
 
   private val containsCmdArgsOrContainer: Validator[AppDefinition] = isTrue(
-      "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.") {
+    "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.") {
     app =>
       val cmd = app.cmd.nonEmpty
       val args = app.args.nonEmpty
@@ -537,14 +543,14 @@ object AppDefinition {
   private def portIndexIsValid(
       hostPortsIndices: Range): Validator[HealthCheck] =
     isTrue(
-        "Health check port indices must address an element of the ports array or container port mappings.") {
+      "Health check port indices must address an element of the ports array or container port mappings.") {
       hc =>
         hc.protocol == Protocol.COMMAND ||
         (hc.portIndex match {
-              case Some(idx) => hostPortsIndices contains idx
-              case None =>
-                hostPortsIndices.length == 1 && hostPortsIndices.head == 0
-            })
+          case Some(idx) => hostPortsIndices contains idx
+          case None =>
+            hostPortsIndices.length == 1 && hostPortsIndices.head == 0
+        })
     }
 
   def residentUpdateIsValid(from: AppDefinition): Validator[AppDefinition] = {
@@ -562,7 +568,7 @@ object AppDefinition {
       }
 
     val changeNoResources = isTrue[AppDefinition](
-        "Resident Tasks may not change resource requirements!") { to =>
+      "Resident Tasks may not change resource requirements!") { to =>
       from.cpus == to.cpus && from.mem == to.mem && from.disk == to.disk &&
       from.portDefinitions == to.portDefinitions
     }

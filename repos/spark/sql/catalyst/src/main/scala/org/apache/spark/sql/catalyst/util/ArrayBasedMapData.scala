@@ -56,8 +56,8 @@ object ArrayBasedMapData {
   }
 
   def apply(keys: Array[Any], values: Array[Any]): ArrayBasedMapData = {
-    new ArrayBasedMapData(
-        new GenericArrayData(keys), new GenericArrayData(values))
+    new ArrayBasedMapData(new GenericArrayData(keys),
+                          new GenericArrayData(values))
   }
 
   def toScalaMap(map: ArrayBasedMapData): Map[Any, Any] = {
@@ -74,8 +74,8 @@ object ArrayBasedMapData {
     keys.zip(values).toMap
   }
 
-  def toJavaMap(
-      keys: Array[Any], values: Array[Any]): java.util.Map[Any, Any] = {
+  def toJavaMap(keys: Array[Any],
+                values: Array[Any]): java.util.Map[Any, Any] = {
     import scala.collection.JavaConverters._
     keys.zip(values).toMap.asJava
   }

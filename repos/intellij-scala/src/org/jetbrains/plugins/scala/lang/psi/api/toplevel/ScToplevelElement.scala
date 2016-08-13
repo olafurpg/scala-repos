@@ -42,8 +42,8 @@ trait ScToplevelElement extends ScalaPsiElement {
     }
     if (stub != null) {
       stub.getChildrenByType[ScTypeDefinition](
-          TokenSets.TMPL_DEF_BIT_SET,
-          JavaArrayFactoryUtil.ScTypeDefinitionFactory)
+        TokenSets.TMPL_DEF_BIT_SET,
+        JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else findChildrenByClassScala(classOf[ScTypeDefinition]).toSeq
   }
 
@@ -55,7 +55,8 @@ trait ScToplevelElement extends ScalaPsiElement {
     }
     if (stub != null) {
       stub.getChildrenByType[ScPackaging](
-          ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
+        ScalaElementTypes.PACKAGING,
+        JavaArrayFactoryUtil.ScPackagingFactory)
     } else {
       val buffer = new ArrayBuffer[ScPackaging]
       var curr = getFirstChild

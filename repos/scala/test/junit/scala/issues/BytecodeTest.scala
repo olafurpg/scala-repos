@@ -40,11 +40,12 @@ class BytecodeTest extends ClearAfterClass {
 
     val List(c) = compileClasses(compiler)(code)
 
-    assertTrue(getSingleMethod(c, "f").instructions
-          .count(_.isInstanceOf[TableSwitch]) == 1)
     assertTrue(
-        getSingleMethod(c, "g").instructions
-          .count(_.isInstanceOf[LookupSwitch]) == 1)
+      getSingleMethod(c, "f").instructions
+        .count(_.isInstanceOf[TableSwitch]) == 1)
+    assertTrue(
+      getSingleMethod(c, "g").instructions
+        .count(_.isInstanceOf[LookupSwitch]) == 1)
   }
 
   @Test
@@ -68,17 +69,17 @@ class BytecodeTest extends ClearAfterClass {
 
     val run = new compiler.Run()
     run.compileSources(
-        List(new BatchSourceFile("AnnotA.java", annotA),
-             new BatchSourceFile("AnnotB.java", annotB),
-             new BatchSourceFile("Test.scala", scalaSrc)))
+      List(new BatchSourceFile("AnnotA.java", annotA),
+           new BatchSourceFile("AnnotB.java", annotB),
+           new BatchSourceFile("Test.scala", scalaSrc)))
     val outDir = compiler.settings.outputDirs.getSingleOutput.get
-    val outfiles = (for (f <- outDir.iterator if !f.isDirectory) yield
-      (f.name, f.toByteArray)).toList
+    val outfiles = (for (f <- outDir.iterator if !f.isDirectory)
+      yield (f.name, f.toByteArray)).toList
 
     def check(classfile: String, annotName: String) = {
       val f = (outfiles collect {
-            case (`classfile`, bytes) => AsmUtils.readClass(bytes)
-          }).head
+        case (`classfile`, bytes) => AsmUtils.readClass(bytes)
+      }).head
       val descs = f.visibleAnnotations.asScala.map(_.desc).toList
       assertTrue(descs.toString, descs exists (_ contains annotName))
     }
@@ -114,31 +115,31 @@ class BytecodeTest extends ClearAfterClass {
            unapplyLineNumbers)
 
     val expected = List(
-        LineNumber(4, Label(0)),
-        LineNumber(5, Label(5)),
-        Jump(IFEQ, Label(20)),
-        LineNumber(6, Label(11)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false),
-        Jump(GOTO, Label(33)),
-        LineNumber(5, Label(20)),
-        Jump(GOTO, Label(24)),
-        LineNumber(8, Label(24)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false),
-        Jump(GOTO, Label(33)),
-        LineNumber(10, Label(33)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false)
+      LineNumber(4, Label(0)),
+      LineNumber(5, Label(5)),
+      Jump(IFEQ, Label(20)),
+      LineNumber(6, Label(11)),
+      Invoke(INVOKEVIRTUAL,
+             "scala/Predef$",
+             "println",
+             "(Ljava/lang/Object;)V",
+             false),
+      Jump(GOTO, Label(33)),
+      LineNumber(5, Label(20)),
+      Jump(GOTO, Label(24)),
+      LineNumber(8, Label(24)),
+      Invoke(INVOKEVIRTUAL,
+             "scala/Predef$",
+             "println",
+             "(Ljava/lang/Object;)V",
+             false),
+      Jump(GOTO, Label(33)),
+      LineNumber(10, Label(33)),
+      Invoke(INVOKEVIRTUAL,
+             "scala/Predef$",
+             "println",
+             "(Ljava/lang/Object;)V",
+             false)
     )
 
     val mainIns =
@@ -260,8 +261,9 @@ class BytecodeTest extends ClearAfterClass {
                         Op(IRETURN)))
 
     // t7: universal equality
-    assertInvoke(
-        getSingleMethod(c, "t7"), "scala/runtime/BoxesRunTime", "equals")
+    assertInvoke(getSingleMethod(c, "t7"),
+                 "scala/runtime/BoxesRunTime",
+                 "equals")
 
     // t8: no null checks invoking equals on modules and constants
     assertSameCode(getSingleMethod(c, "t8"),

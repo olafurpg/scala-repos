@@ -20,7 +20,13 @@ package org.apache.spark.ml.attribute
 import scala.annotation.varargs
 
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.sql.types.{DoubleType, Metadata, MetadataBuilder, NumericType, StructField}
+import org.apache.spark.sql.types.{
+  DoubleType,
+  Metadata,
+  MetadataBuilder,
+  NumericType,
+  StructField
+}
 
 /**
   * :: DeveloperApi ::
@@ -104,8 +110,8 @@ sealed abstract class Attribute extends Serializable {
   def toStructField(existingMetadata: Metadata): StructField = {
     val newMetadata = new MetadataBuilder()
       .withMetadata(existingMetadata)
-      .putMetadata(
-          AttributeKeys.ML_ATTR, withoutName.withoutIndex.toMetadataImpl())
+      .putMetadata(AttributeKeys.ML_ATTR,
+                   withoutName.withoutIndex.toMetadataImpl())
       .build()
     StructField(name.get, DoubleType, nullable = false, newMetadata)
   }
@@ -127,8 +133,8 @@ private[attribute] trait AttributeFactory {
   /**
     * Creates an [[Attribute]] from a [[StructField]] instance, optionally preserving name.
     */
-  private[ml] def decodeStructField(
-      field: StructField, preserveName: Boolean): Attribute = {
+  private[ml] def decodeStructField(field: StructField,
+                                    preserveName: Boolean): Attribute = {
     require(field.dataType.isInstanceOf[NumericType])
     val metadata = field.metadata
     val mlAttr = AttributeKeys.ML_ATTR
@@ -193,12 +199,12 @@ object Attribute extends AttributeFactory {
   * @param sparsity optional sparsity (ratio of zeros)
   */
 @DeveloperApi
-class NumericAttribute private[ml](override val name: Option[String] = None,
-                                   override val index: Option[Int] = None,
-                                   val min: Option[Double] = None,
-                                   val max: Option[Double] = None,
-                                   val std: Option[Double] = None,
-                                   val sparsity: Option[Double] = None)
+class NumericAttribute private[ml] (override val name: Option[String] = None,
+                                    override val index: Option[Int] = None,
+                                    val min: Option[Double] = None,
+                                    val max: Option[Double] = None,
+                                    val std: Option[Double] = None,
+                                    val sparsity: Option[Double] = None)
     extends Attribute {
 
   std.foreach { s =>
@@ -279,7 +285,7 @@ class NumericAttribute private[ml](override val name: Option[String] = None,
     other match {
       case o: NumericAttribute =>
         (name == o.name) && (index == o.index) && (min == o.min) &&
-        (max == o.max) && (std == o.std) && (sparsity == o.sparsity)
+          (max == o.max) && (std == o.std) && (sparsity == o.sparsity)
       case _ =>
         false
     }
@@ -339,11 +345,11 @@ object NumericAttribute extends AttributeFactory {
   * @param values optional values. At most one of `numValues` and `values` can be defined.
   */
 @DeveloperApi
-class NominalAttribute private[ml](override val name: Option[String] = None,
-                                   override val index: Option[Int] = None,
-                                   val isOrdinal: Option[Boolean] = None,
-                                   val numValues: Option[Int] = None,
-                                   val values: Option[Array[String]] = None)
+class NominalAttribute private[ml] (override val name: Option[String] = None,
+                                    override val index: Option[Int] = None,
+                                    val isOrdinal: Option[Boolean] = None,
+                                    val numValues: Option[Int] = None,
+                                    val values: Option[Array[String]] = None)
     extends Attribute {
 
   numValues.foreach { n =>
@@ -445,8 +451,8 @@ class NominalAttribute private[ml](override val name: Option[String] = None,
     other match {
       case o: NominalAttribute =>
         (name == o.name) && (index == o.index) && (isOrdinal == o.isOrdinal) &&
-        (numValues == o.numValues) &&
-        (values.map(_.toSeq) == o.values.map(_.toSeq))
+          (numValues == o.numValues) &&
+          (values.map(_.toSeq) == o.values.map(_.toSeq))
       case _ =>
         false
     }
@@ -486,7 +492,8 @@ object NominalAttribute extends AttributeFactory {
       else None
     val numValues =
       if (metadata.contains(NUM_VALUES))
-        Some(metadata.getLong(NUM_VALUES).toInt) else None
+        Some(metadata.getLong(NUM_VALUES).toInt)
+      else None
     val values =
       if (metadata.contains(VALUES)) Some(metadata.getStringArray(VALUES))
       else None
@@ -502,15 +509,15 @@ object NominalAttribute extends AttributeFactory {
   * @param values optional values. If set, its size must be 2.
   */
 @DeveloperApi
-class BinaryAttribute private[ml](override val name: Option[String] = None,
-                                  override val index: Option[Int] = None,
-                                  val values: Option[Array[String]] = None)
+class BinaryAttribute private[ml] (override val name: Option[String] = None,
+                                   override val index: Option[Int] = None,
+                                   val values: Option[Array[String]] = None)
     extends Attribute {
 
   values.foreach { v =>
     require(
-        v.length == 2,
-        s"Number of values must be 2 for a binary attribute but got ${v.toSeq}.")
+      v.length == 2,
+      s"Number of values must be 2 for a binary attribute but got ${v.toSeq}.")
   }
 
   override def attrType: AttributeType = AttributeType.Binary
@@ -559,7 +566,7 @@ class BinaryAttribute private[ml](override val name: Option[String] = None,
     other match {
       case o: BinaryAttribute =>
         (name == o.name) && (index == o.index) &&
-        (values.map(_.toSeq) == o.values.map(_.toSeq))
+          (values.map(_.toSeq) == o.values.map(_.toSeq))
       case _ =>
         false
     }

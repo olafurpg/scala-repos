@@ -7,7 +7,12 @@ package docs.http.scaladsl.server.directives
 import akka.http.scaladsl.coding._
 import docs.http.scaladsl.server.RoutingSpec
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.model.headers.{HttpEncodings, HttpEncoding, `Accept-Encoding`, `Content-Encoding`}
+import akka.http.scaladsl.model.headers.{
+  HttpEncodings,
+  HttpEncoding,
+  `Accept-Encoding`,
+  `Content-Encoding`
+}
 import akka.http.scaladsl.model.headers.HttpEncodings._
 import akka.http.scaladsl.server._
 import akka.util.ByteString
@@ -110,8 +115,8 @@ class CodingDirectivesExamplesSpec extends RoutingSpec {
     }
     Post("/", helloDeflated) ~> `Content-Encoding`(deflate) ~> route ~> check {
       rejections shouldEqual List(
-          UnsupportedRequestEncodingRejection(gzip),
-          UnsupportedRequestEncodingRejection(identity))
+        UnsupportedRequestEncodingRejection(gzip),
+        UnsupportedRequestEncodingRejection(identity))
     }
     Post("/", "hello uncompressed") ~> `Content-Encoding`(identity) ~> route ~> check {
       responseAs[String] shouldEqual "Request content: 'hello uncompressed'"

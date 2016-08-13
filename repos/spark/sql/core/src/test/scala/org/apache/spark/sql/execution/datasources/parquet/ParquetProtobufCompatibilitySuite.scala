@@ -21,30 +21,35 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetProtobufCompatibilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   test("unannotated array of primitive type") {
-    checkAnswer(
-        readResourceParquetFile("old-repeated-int.parquet"), Row(Seq(1, 2, 3)))
+    checkAnswer(readResourceParquetFile("old-repeated-int.parquet"),
+                Row(Seq(1, 2, 3)))
   }
 
   test("unannotated array of struct") {
     checkAnswer(readResourceParquetFile("old-repeated-message.parquet"),
-                Row(Seq(Row("First inner", null, null),
-                        Row(null, "Second inner", null),
-                        Row(null, null, "Third inner"))))
-
-    checkAnswer(readResourceParquetFile("proto-repeated-struct.parquet"),
-                Row(Seq(Row("0 - 1", "0 - 2", "0 - 3"),
-                        Row("1 - 1", "1 - 2", "1 - 3"))))
+                Row(
+                  Seq(Row("First inner", null, null),
+                      Row(null, "Second inner", null),
+                      Row(null, null, "Third inner"))))
 
     checkAnswer(
-        readResourceParquetFile("proto-struct-with-array-many.parquet"),
-        Seq(Row(Seq(Row("0 - 0 - 1", "0 - 0 - 2", "0 - 0 - 3"),
-                    Row("0 - 1 - 1", "0 - 1 - 2", "0 - 1 - 3"))),
-            Row(Seq(Row("1 - 0 - 1", "1 - 0 - 2", "1 - 0 - 3"),
-                    Row("1 - 1 - 1", "1 - 1 - 2", "1 - 1 - 3"))),
-            Row(Seq(Row("2 - 0 - 1", "2 - 0 - 2", "2 - 0 - 3"),
-                    Row("2 - 1 - 1", "2 - 1 - 2", "2 - 1 - 3")))))
+      readResourceParquetFile("proto-repeated-struct.parquet"),
+      Row(Seq(Row("0 - 1", "0 - 2", "0 - 3"), Row("1 - 1", "1 - 2", "1 - 3"))))
+
+    checkAnswer(
+      readResourceParquetFile("proto-struct-with-array-many.parquet"),
+      Seq(Row(
+            Seq(Row("0 - 0 - 1", "0 - 0 - 2", "0 - 0 - 3"),
+                Row("0 - 1 - 1", "0 - 1 - 2", "0 - 1 - 3"))),
+          Row(
+            Seq(Row("1 - 0 - 1", "1 - 0 - 2", "1 - 0 - 3"),
+                Row("1 - 1 - 1", "1 - 1 - 2", "1 - 1 - 3"))),
+          Row(
+            Seq(Row("2 - 0 - 1", "2 - 0 - 2", "2 - 0 - 3"),
+                Row("2 - 1 - 1", "2 - 1 - 2", "2 - 1 - 3")))))
   }
 
   test("struct with unannotated array") {

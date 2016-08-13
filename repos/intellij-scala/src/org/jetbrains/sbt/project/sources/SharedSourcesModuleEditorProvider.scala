@@ -14,8 +14,8 @@ class SharedSourcesModuleEditorProvider
     ModuleType.get(module) match {
       case _: SharedSourcesModuleType =>
         Array(
-            new ContentEntriesEditor(module.getName, state),
-            new ClasspathEditor(state)
+          new ContentEntriesEditor(module.getName, state),
+          new ClasspathEditor(state)
         )
       case _ =>
         ModuleConfigurationEditor.EMPTY

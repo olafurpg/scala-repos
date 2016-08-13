@@ -10,7 +10,8 @@ import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.channel._
 
 class Decoder(storageCommands: collection.Set[ChannelBuffer])
-    extends AbstractDecoder with StateMachine {
+    extends AbstractDecoder
+    with StateMachine {
 
   case class AwaitingCommand() extends State
   case class AwaitingData(tokens: Seq[ChannelBuffer], bytesNeeded: Int)
@@ -40,8 +41,8 @@ class Decoder(storageCommands: collection.Set[ChannelBuffer])
     }
   }
 
-  final protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int) {
+  final protected[memcached] def awaitData(tokens: Seq[ChannelBuffer],
+                                           bytesNeeded: Int) {
     state = AwaitingData(tokens, bytesNeeded)
   }
 

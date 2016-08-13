@@ -48,9 +48,15 @@ object SceneIncludes extends SceneIncludes
   * Classes/Traits to their ScalaFX counterparts.
   */
 trait SceneIncludes
-    extends ChartIncludes with LayoutIncludes with PaintIncludes
-    with ShapeIncludes with TextIncludes with ImageIncludes with EffectIncludes
-    with LowerPriorityIncludes with ControlIncludes
+    extends ChartIncludes
+    with LayoutIncludes
+    with PaintIncludes
+    with ShapeIncludes
+    with TextIncludes
+    with ImageIncludes
+    with EffectIncludes
+    with LowerPriorityIncludes
+    with ControlIncludes
 
 /**
   * Contains implicit methods to convert from

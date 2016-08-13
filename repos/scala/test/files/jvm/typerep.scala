@@ -191,8 +191,8 @@ object TypeRep {
   implicit def arrayRep[A](implicit elemrep: TypeRep[A]): TypeRep[Array[A]] =
     ArrayRep(elemrep)
 
-  implicit def tuple2Rep[A1, A2](
-      implicit _1: TypeRep[A1], _2: TypeRep[A2]): TypeRep[(A1, A2)] =
+  implicit def tuple2Rep[A1, A2](implicit _1: TypeRep[A1],
+                                 _2: TypeRep[A2]): TypeRep[(A1, A2)] =
     Tuple2Rep(_1, _2)
 
   implicit def tuple3Rep[A1, A2, A3](implicit _1: TypeRep[A1],
@@ -251,8 +251,8 @@ object TypeRep {
       _9: TypeRep[A9]): TypeRep[Tuple9[A1, A2, A3, A4, A5, A6, A7, A8, A9]] =
     Tuple9Rep(_1, _2, _3, _4, _5, _6, _7, _8, _9)
 
-  implicit def func1Rep[A1, B](
-      implicit a1: TypeRep[A1], b: TypeRep[B]): TypeRep[Function1[A1, B]] =
+  implicit def func1Rep[A1, B](implicit a1: TypeRep[A1],
+                               b: TypeRep[B]): TypeRep[Function1[A1, B]] =
     Function1Rep(a1, b)
   implicit def func2Rep[A1, A2, B](
       implicit a1: TypeRep[A1],
@@ -394,13 +394,16 @@ object TypeRep {
       extends TypeRep[(A1, A2)] {
     override def toString = "Tuple2[" + _1 + ", " + _2 + "]"
   }
-  case class Tuple3Rep[A1, A2, A3](
-      _1: TypeRep[A1], _2: TypeRep[A2], _3: TypeRep[A3])
+  case class Tuple3Rep[A1, A2, A3](_1: TypeRep[A1],
+                                   _2: TypeRep[A2],
+                                   _3: TypeRep[A3])
       extends TypeRep[Tuple3[A1, A2, A3]] {
     override def toString = "Tuple3[" + _1 + ", " + _2 + ", " + _3 + "]"
   }
-  case class Tuple4Rep[A1, A2, A3, A4](
-      _1: TypeRep[A1], _2: TypeRep[A2], _3: TypeRep[A3], _4: TypeRep[A4])
+  case class Tuple4Rep[A1, A2, A3, A4](_1: TypeRep[A1],
+                                       _2: TypeRep[A2],
+                                       _3: TypeRep[A3],
+                                       _4: TypeRep[A4])
       extends TypeRep[Tuple4[A1, A2, A3, A4]] {
     override def toString =
       "Tuple4[" + _1 + ", " + _2 + ", " + _3 + ", " + _4 + "]"
@@ -423,7 +426,7 @@ object TypeRep {
       extends TypeRep[Tuple6[A1, A2, A3, A4, A5, A6]] {
     override def toString =
       "Tuple6[" + _1 + ", " + _2 + ", " + _3 + ", " + _4 + ", " + _5 + ", " +
-      _6 + "]"
+        _6 + "]"
   }
   case class Tuple7Rep[A1, A2, A3, A4, A5, A6, A7](val _1: TypeRep[A1],
                                                    val _2: TypeRep[A2],
@@ -435,7 +438,7 @@ object TypeRep {
       extends TypeRep[Tuple7[A1, A2, A3, A4, A5, A6, A7]] {
     override def toString =
       "Tuple7[" + _1 + ", " + _2 + ", " + _3 + ", " + _4 + ", " + _5 + ", " +
-      _6 + ", " + _7 + "]"
+        _6 + ", " + _7 + "]"
   }
   case class Tuple8Rep[A1, A2, A3, A4, A5, A6, A7, A8](val _1: TypeRep[A1],
                                                        val _2: TypeRep[A2],
@@ -448,7 +451,7 @@ object TypeRep {
       extends TypeRep[Tuple8[A1, A2, A3, A4, A5, A6, A7, A8]] {
     override def toString =
       "Tuple8[" + _1 + ", " + _2 + ", " + _3 + ", " + _4 + ", " + _5 + ", " +
-      _6 + ", " + _7 + ", " + _8 + "]"
+        _6 + ", " + _7 + ", " + _8 + "]"
   }
   case class Tuple9Rep[A1, A2, A3, A4, A5, A6, A7, A8, A9](val _1: TypeRep[A1],
                                                            val _2: TypeRep[A2],
@@ -462,20 +465,23 @@ object TypeRep {
       extends TypeRep[Tuple9[A1, A2, A3, A4, A5, A6, A7, A8, A9]] {
     override def toString =
       "Tuple9[" + _1 + ", " + _2 + ", " + _3 + ", " + _4 + ", " + _5 + ", " +
-      _6 + ", " + _7 + ", " + _8 + ", " + _9 + "]"
+        _6 + ", " + _7 + ", " + _8 + ", " + _9 + "]"
   }
 
   case class Function1Rep[A1, B](a1: TypeRep[A1], b: TypeRep[B])
       extends TypeRep[Function1[A1, B]] {
     override def toString = "Function1[" + a1 + ", " + b + "]"
   }
-  case class Function2Rep[A1, A2, B](
-      a1: TypeRep[A1], a2: TypeRep[A2], b: TypeRep[B])
+  case class Function2Rep[A1, A2, B](a1: TypeRep[A1],
+                                     a2: TypeRep[A2],
+                                     b: TypeRep[B])
       extends TypeRep[Function2[A1, A2, B]] {
     override def toString = "Function2[" + a1 + ", " + a2 + ", " + b + "]"
   }
-  case class Function3Rep[A1, A2, A3, B](
-      a1: TypeRep[A1], a2: TypeRep[A2], a3: TypeRep[A3], b: TypeRep[B])
+  case class Function3Rep[A1, A2, A3, B](a1: TypeRep[A1],
+                                         a2: TypeRep[A2],
+                                         a3: TypeRep[A3],
+                                         b: TypeRep[B])
       extends TypeRep[Function3[A1, A2, A3, B]] {
     override def toString =
       "Function3[" + a1 + ", " + a2 + ", " + a3 + ", " + b + "]"
@@ -498,7 +504,7 @@ object TypeRep {
       extends TypeRep[Function5[A1, A2, A3, A4, A5, B]] {
     override def toString =
       "Function5[" + a1 + ", " + a2 + ", " + a3 + ", " + a4 + ", " + a5 +
-      ", " + b + "]"
+        ", " + b + "]"
   }
   case class Function6Rep[A1, A2, A3, A4, A5, A6, B](a1: TypeRep[A1],
                                                      a2: TypeRep[A2],
@@ -510,7 +516,7 @@ object TypeRep {
       extends TypeRep[Function6[A1, A2, A3, A4, A5, A6, B]] {
     override def toString =
       "Function6[" + a1 + ", " + a2 + ", " + a3 + ", " + a4 + ", " + a5 +
-      ", " + a6 + ", " + b + "]"
+        ", " + a6 + ", " + b + "]"
   }
   case class Function7Rep[A1, A2, A3, A4, A5, A6, A7, B](a1: TypeRep[A1],
                                                          a2: TypeRep[A2],
@@ -523,7 +529,7 @@ object TypeRep {
       extends TypeRep[Function7[A1, A2, A3, A4, A5, A6, A7, B]] {
     override def toString =
       "Function7[" + a1 + ", " + a2 + ", " + a3 + ", " + a4 + ", " + a5 +
-      ", " + a6 + ", " + a7 + ", " + b + "]"
+        ", " + a6 + ", " + a7 + ", " + b + "]"
   }
   case class Function8Rep[A1, A2, A3, A4, A5, A6, A7, A8, B](a1: TypeRep[A1],
                                                              a2: TypeRep[A2],
@@ -537,7 +543,7 @@ object TypeRep {
       extends TypeRep[Function8[A1, A2, A3, A4, A5, A6, A7, A8, B]] {
     override def toString =
       "Function8[" + a1 + ", " + a2 + ", " + a3 + ", " + a4 + ", " + a5 +
-      ", " + a6 + ", " + a7 + ", " + a8 + b + "]"
+        ", " + a6 + ", " + a7 + ", " + a8 + b + "]"
   }
   case class Function9Rep[A1, A2, A3, A4, A5, A6, A7, A8, A9, B](
       a1: TypeRep[A1],
@@ -553,9 +559,9 @@ object TypeRep {
       extends TypeRep[Function9[A1, A2, A3, A4, A5, A6, A7, A8, A9, B]] {
     override def toString =
       "Function9[" + a1 + ", " + a2 + ", " + a3 + ", " + a4 + ", " + a5 +
-      ", " + a6 + ", " + a7 + ", " + a8 + ", " + b + "]"
+        ", " + a6 + ", " + a7 + ", " + a8 + ", " + b + "]"
   }
-/*
+  /*
   case class ObjectRep[A](c: Class) extends TypeRep[A] {
     override def toString = c.getName
   }

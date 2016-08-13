@@ -14,8 +14,8 @@ import akka.testkit.AkkaSpec
 
 class FlowPrefixAndTailSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -101,7 +101,7 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
       val subscriber2 = TestSubscriber.probe[Int]()
       tail.to(Sink.fromSubscriber(subscriber2)).run()
       subscriber2.expectSubscriptionAndError().getMessage should ===(
-          "Substream Source cannot be materialized more than once")
+        "Substream Source cannot be materialized more than once")
 
       subscriber1.requestNext(2).expectComplete()
     }
@@ -110,10 +110,10 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
       val ms = 300
 
       val tightTimeoutMaterializer = ActorMaterializer(
-          ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
-              StreamSubscriptionTimeoutSettings(
-                  StreamSubscriptionTimeoutTerminationMode.cancel,
-                  ms.millisecond)))
+        ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
+          StreamSubscriptionTimeoutSettings(
+            StreamSubscriptionTimeoutTerminationMode.cancel,
+            ms.millisecond)))
 
       val futureSink = newHeadSink
       val fut = Source(1 to 2)
@@ -127,14 +127,14 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
       tail.to(Sink.fromSubscriber(subscriber)).run()(tightTimeoutMaterializer)
       subscriber.expectSubscriptionAndError().getMessage should ===(
-          s"Substream Source has not been materialized in ${ms} milliseconds")
+        s"Substream Source has not been materialized in ${ms} milliseconds")
     }
     "not fail the stream if substream has not been subscribed in time and configured subscription timeout is noop" in assertAllStagesStopped {
       val tightTimeoutMaterializer = ActorMaterializer(
-          ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
-              StreamSubscriptionTimeoutSettings(
-                  StreamSubscriptionTimeoutTerminationMode.noop,
-                  1.millisecond)))
+        ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
+          StreamSubscriptionTimeoutSettings(
+            StreamSubscriptionTimeoutTerminationMode.noop,
+            1.millisecond)))
 
       val futureSink = newHeadSink
       val fut = Source(1 to 2)

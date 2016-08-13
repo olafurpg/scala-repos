@@ -25,7 +25,7 @@ class SessionPoolingParams[A <: Stack.Parameterized[A]](
     */
   def maxSize(sessionsPerHost: Int): A =
     self.configured(
-        self.params[DefaultPool.Param].copy(high = sessionsPerHost))
+      self.params[DefaultPool.Param].copy(high = sessionsPerHost))
 
   /**
     * Configures the number of per-host persistent (remain open during the
@@ -48,5 +48,5 @@ class SessionPoolingParams[A <: Stack.Parameterized[A]](
     */
   def maxWaiters(maxWaitersPerHost: Int): A =
     self.configured(
-        self.params[DefaultPool.Param].copy(maxWaiters = maxWaitersPerHost))
+      self.params[DefaultPool.Param].copy(maxWaiters = maxWaitersPerHost))
 }

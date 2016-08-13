@@ -106,7 +106,7 @@ abstract class Pickler extends SubComponent {
         // however, they would suddenly be considered by asSeenFrom if their localized owner became a class (causing the crashes of #4079, #2741)
         (if ((sym.isTypeParameter || sym.isValueParameter) &&
              !sym.owner.isClass) nonClassRoot
-         else root)
+        else root)
       else sym.owner
 
     /** Is root in symbol.owner*, or should it be treated as a local symbol
@@ -115,7 +115,7 @@ abstract class Pickler extends SubComponent {
       */
     private def isLocalToPickle(sym: Symbol): Boolean =
       (sym != NoSymbol) && !sym.isPackageClass &&
-      (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
+        (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
           sym.hasFlag(EXISTENTIAL) // existential param
           || sym.isParameter || isLocalToPickle(sym.owner))
     private def isExternalSymbol(sym: Symbol): Boolean =
@@ -195,16 +195,18 @@ abstract class Pickler extends SubComponent {
                 // compilation. See test neg/aladdin1055.
                 val parents =
                   (if (sym.isTrait) List(definitions.ObjectTpe) else Nil) ::: List(
-                      sym.tpe)
-                globals + sym.newClassWithInfo(
-                    tpnme.LOCAL_CHILD, parents, EmptyScope, pos = sym.pos)
+                    sym.tpe)
+                globals + sym.newClassWithInfo(tpnme.LOCAL_CHILD,
+                                               parents,
+                                               EmptyScope,
+                                               pos = sym.pos)
               }
 
             putChildren(sym, children.toList sortBy (_.sealedSortName))
           }
-          for (annot <-
-          (sym.annotations filter (ann => ann.isStatic && !ann.isErroneous)).reverse) putAnnotation(
-              sym, annot)
+          for (annot <- (sym.annotations filter (ann =>
+                                                   ann.isStatic && !ann.isErroneous)).reverse)
+            putAnnotation(sym, annot)
         } else if (sym != NoSymbol) {
           putEntry(if (sym.isModuleClass) sym.name.toTermName else sym.name)
           if (!sym.owner.isRoot) putSymbol(sym.owner)
@@ -397,7 +399,8 @@ abstract class Pickler extends SubComponent {
       @inline private def asRefs[T](body: => T): T = {
         val saved = refs
         refs = true
-        try body finally refs = saved
+        try body
+        finally refs = saved
       }
       override def traverseModifiers(mods: Modifiers): Unit =
         if (refs) writeRef(mods) else super.traverseModifiers(mods)
@@ -514,7 +517,7 @@ abstract class Pickler extends SubComponent {
         case ArrayAnnotArg(args) => args foreach writeClassfileAnnotArg
         case _ =>
           devWarning(
-              s"Unexpected entry to pickler ${shortClassOfInstance(entry)} $entry")
+            s"Unexpected entry to pickler ${shortClassOfInstance(entry)} $entry")
       }
 
       // begin writeEntry

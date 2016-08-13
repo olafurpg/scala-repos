@@ -23,14 +23,18 @@ trait Transforms { self: SymbolTable =>
     }
   }
 
-  private val refChecksLazy = new Lazy(
-      new { val global: Transforms.this.type = self } with RefChecks)
-  private val uncurryLazy = new Lazy(
-      new { val global: Transforms.this.type = self } with UnCurry)
-  private val erasureLazy = new Lazy(
-      new { val global: Transforms.this.type = self } with Erasure)
-  private val postErasureLazy = new Lazy(
-      new { val global: Transforms.this.type = self } with PostErasure)
+  private val refChecksLazy = new Lazy(new {
+    val global: Transforms.this.type = self
+  } with RefChecks)
+  private val uncurryLazy = new Lazy(new {
+    val global: Transforms.this.type = self
+  } with UnCurry)
+  private val erasureLazy = new Lazy(new {
+    val global: Transforms.this.type = self
+  } with Erasure)
+  private val postErasureLazy = new Lazy(new {
+    val global: Transforms.this.type = self
+  } with PostErasure)
 
   def refChecks = refChecksLazy.force
   def uncurry = uncurryLazy.force
@@ -39,11 +43,10 @@ trait Transforms { self: SymbolTable =>
 
   def transformedType(sym: Symbol) =
     postErasure.transformInfo(
+      sym,
+      erasure.transformInfo(
         sym,
-        erasure.transformInfo(
-            sym,
-            uncurry.transformInfo(sym,
-                                  refChecks.transformInfo(sym, sym.info))))
+        uncurry.transformInfo(sym, refChecks.transformInfo(sym, sym.info))))
 
   def transformedType(tpe: Type) =
     postErasure.elimErasedValueType(erasure.scalaErasure(uncurry.uncurry(tpe)))

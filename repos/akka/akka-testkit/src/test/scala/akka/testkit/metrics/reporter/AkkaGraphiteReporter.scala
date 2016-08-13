@@ -47,9 +47,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
 
     val metricsCount =
       List(gauges, counters, histograms, meters, timers).map(_.size).sum +
-      List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
+        List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
     sendWithBanner("== AkkaGraphiteReporter @ " + dateTime + " == (" +
-                   metricsCount + " metrics)",
+                     metricsCount + " metrics)",
                    '=')
 
     try {
@@ -64,8 +64,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
       sendMetrics(now, meters.asScala, sendMetered)
       sendMetrics(now, timers.asScala, sendTimer)
 
-      sendMetrics(
-          now, knownOpsInTimespanCounters, sendKnownOpsInTimespanCounter)
+      sendMetrics(now,
+                  knownOpsInTimespanCounters,
+                  sendKnownOpsInTimespanCounter)
       sendMetrics(now, hdrHistograms, sendHdrHistogram)
       sendMetrics(now, averagingGauges, sendAveragingGauge)
     } catch {
@@ -129,8 +130,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     sendNumericOrIgnore(key + ".count", counter.getCount, now)
   }
 
-  private def sendKnownOpsInTimespanCounter(
-      now: Long, key: String, counter: KnownOpsInTimespanTimer) {
+  private def sendKnownOpsInTimespanCounter(now: Long,
+                                            key: String,
+                                            counter: KnownOpsInTimespanTimer) {
     send(key + ".ops", counter.getCount, now)
     send(key + ".time", counter.elapsedTime, now)
     send(key + ".opsPerSec", counter.opsPerSecond, now)
@@ -150,8 +152,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     send(key + ".p999", snapshot.getValueAtPercentile(99.9), now)
   }
 
-  private def sendAveragingGauge(
-      now: Long, key: String, gauge: AveragingGauge) {
+  private def sendAveragingGauge(now: Long,
+                                 key: String,
+                                 gauge: AveragingGauge) {
     sendNumericOrIgnore(key + ".avg-gauge", gauge.getValue, now)
   }
 
@@ -162,7 +165,7 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     } catch {
       case ex: Exception ⇒
         System.err.println(
-            "Was unable to close Graphite connection: " + ex.getMessage)
+          "Was unable to close Graphite connection: " + ex.getMessage)
     }
 
   private def sendNumericOrIgnore(key: String, value: Any, now: Long) {

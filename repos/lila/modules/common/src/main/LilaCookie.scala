@@ -26,8 +26,8 @@ object LilaCookie {
 
   def withSession(op: Session => Session)(
       implicit req: RequestHeader): Cookie = cookie(
-      Session.COOKIE_NAME,
-      Session.encode(Session.serialize(op(req.session)))
+    Session.COOKIE_NAME,
+    Session.encode(Session.serialize(op(req.session)))
   )
 
   def cookie(

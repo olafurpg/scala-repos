@@ -51,31 +51,34 @@ package object util {
     new EnhancedByteStringSource(byteStrings)
 
   private[http] def printEvent[T](marker: String): Flow[T, T, NotUsed] =
-    Flow[T].transform(() ⇒
-          new PushPullStage[T, T] {
-        override def onPush(element: T, ctx: Context[T]): SyncDirective = {
-          println(s"$marker: $element")
-          ctx.push(element)
-        }
-        override def onPull(ctx: Context[T]): SyncDirective = {
-          println(s"$marker: PULL")
-          ctx.pull()
-        }
-        override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
-          println(s"$marker: Error $cause")
-          super.onUpstreamFailure(cause, ctx)
-        }
-        override def onUpstreamFinish(ctx: Context[T]): TerminationDirective = {
-          println(s"$marker: Complete")
-          super.onUpstreamFinish(ctx)
-        }
-        override def onDownstreamFinish(
-            ctx: Context[T]): TerminationDirective = {
-          println(s"$marker: Cancel")
-          super.onDownstreamFinish(ctx)
-        }
-    })
+    Flow[T].transform(
+      () ⇒
+        new PushPullStage[T, T] {
+          override def onPush(element: T, ctx: Context[T]): SyncDirective = {
+            println(s"$marker: $element")
+            ctx.push(element)
+          }
+          override def onPull(ctx: Context[T]): SyncDirective = {
+            println(s"$marker: PULL")
+            ctx.pull()
+          }
+          override def onUpstreamFailure(
+              cause: Throwable,
+              ctx: Context[T]): TerminationDirective = {
+            println(s"$marker: Error $cause")
+            super.onUpstreamFailure(cause, ctx)
+          }
+          override def onUpstreamFinish(
+              ctx: Context[T]): TerminationDirective = {
+            println(s"$marker: Complete")
+            super.onUpstreamFinish(ctx)
+          }
+          override def onDownstreamFinish(
+              ctx: Context[T]): TerminationDirective = {
+            println(s"$marker: Cancel")
+            super.onDownstreamFinish(ctx)
+          }
+      })
 
   private[this] var eventStreamLogger: ActorRef = _
   private[http] def installEventStreamLoggerFor(channel: Class[_])(
@@ -83,13 +86,13 @@ package object util {
     synchronized {
       if (eventStreamLogger == null)
         eventStreamLogger = system.actorOf(
-            Props[util.EventStreamLogger]().withDeploy(Deploy.local),
-            name = "event-stream-logger")
+          Props[util.EventStreamLogger]().withDeploy(Deploy.local),
+          name = "event-stream-logger")
     }
     system.eventStream.subscribe(eventStreamLogger, channel)
   }
-  private[http] def installEventStreamLoggerFor[T](
-      implicit ct: ClassTag[T], system: ActorSystem): Unit =
+  private[http] def installEventStreamLoggerFor[T](implicit ct: ClassTag[T],
+                                                   system: ActorSystem): Unit =
     installEventStreamLoggerFor(ct.runtimeClass)
 
   private[http] implicit class AddFutureAwaitResult[T](future: Future[T]) {
@@ -101,8 +104,8 @@ package object util {
         case Success(t) ⇒ t
         case Failure(ex) ⇒
           throw new RuntimeException(
-              "Trying to await result of failed Future, see the cause for the original problem.",
-              ex)
+            "Trying to await result of failed Future, see the cause for the original problem.",
+            ex)
       }
     }
   }
@@ -146,8 +149,8 @@ package util {
       }
   }
 
-  private[http] class ToStrict(
-      timeout: FiniteDuration, contentType: ContentType)
+  private[http] class ToStrict(timeout: FiniteDuration,
+                               contentType: ContentType)
       extends GraphStage[FlowShape[ByteString, HttpEntity.Strict]] {
 
     val in = Inlet[ByteString]("in")
@@ -189,9 +192,8 @@ package util {
         })
 
         override def onTimer(key: Any): Unit =
-          failStage(
-              new java.util.concurrent.TimeoutException(
-                  s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
+          failStage(new java.util.concurrent.TimeoutException(
+            s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
       }
 
     override def toString = "ToStrict"
@@ -201,8 +203,7 @@ package util {
     def receive = { case x ⇒ log.warning(x.toString) }
   }
 
-  private[http] trait LogMessages extends ActorLogging {
-    this: Actor ⇒
+  private[http] trait LogMessages extends ActorLogging { this: Actor ⇒
     def logMessages(mark: String = "")(r: Receive): Receive =
       new Receive {
         def isDefinedAt(x: Any): Boolean = r.isDefinedAt(x)

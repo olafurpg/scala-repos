@@ -38,7 +38,7 @@ class FilterTest extends FunSuite {
   }
 
   test(
-      "filters should compose when synchronous exceptions are thrown with simple composition") {
+    "filters should compose when synchronous exceptions are thrown with simple composition") {
     val h = new FilterHelper
     import h._
 
@@ -50,12 +50,13 @@ class FilterTest extends FunSuite {
       }
     }
 
-    assert(Try(Await.result(intToString.andThen(exceptionThrowingService)("1"),
-                            1.second)) == Throw(e))
+    assert(
+      Try(Await.result(intToString.andThen(exceptionThrowingService)("1"),
+                       1.second)) == Throw(e))
   }
 
   test(
-      "filters should compose when synchronous exceptions are thrown with transitive composition") {
+    "filters should compose when synchronous exceptions are thrown with transitive composition") {
     val h = new FilterHelper
     import h._
 
@@ -68,13 +69,13 @@ class FilterTest extends FunSuite {
     }
 
     assert(
-        Try(Await.result(stringToInt.andThen(
-                             intToString.andThen(exceptionThrowingService))(1),
-                         1.second)) == Throw(e))
+      Try(
+        Await.result(stringToInt.andThen(
+                       intToString.andThen(exceptionThrowingService))(1),
+                     1.second)) == Throw(e))
     assert(
-        Try(Await.result(stringToInt
-                           .andThen(intToString)
-                           .andThen(exceptionThrowingService)(1),
-                         1.second)) == Throw(e))
+      Try(Await.result(
+        stringToInt.andThen(intToString).andThen(exceptionThrowingService)(1),
+        1.second)) == Throw(e))
   }
 }

@@ -21,10 +21,10 @@ class FormFieldDirectivesSpec extends RoutingSpec {
   val nodeSeq: xml.NodeSeq = <b>yes</b>
   val urlEncodedForm = FormData(Map("firstName" -> "Mike", "age" -> "42"))
   val urlEncodedFormWithVip = FormData(
-      Map("firstName" -> "Mike",
-          "age" -> "42",
-          "VIP" -> "true",
-          "super" -> "<b>no</b>"))
+    Map("firstName" -> "Mike",
+        "age" -> "42",
+        "VIP" -> "true",
+        "super" -> "<b>no</b>"))
   val multipartForm = Multipart.FormData {
     Map("firstName" -> HttpEntity("Mike"),
         "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
@@ -37,10 +37,10 @@ class FormFieldDirectivesSpec extends RoutingSpec {
         "super" -> HttpEntity("no"))
   }
   val multipartFormWithFile = Multipart.FormData(
-      Multipart.FormData.BodyPart.Strict(
-          "file",
-          HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
-          Map("filename" -> "age.xml")))
+    Multipart.FormData.BodyPart.Strict(
+      "file",
+      HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
+      Map("filename" -> "age.xml")))
 
   "The 'formFields' extraction directive" should {
     "properly extract the value of www-urlencoded form fields" in {
@@ -74,7 +74,7 @@ class FormFieldDirectivesSpec extends RoutingSpec {
         formFields('file.as[StrictForm.FileData]) {
           case StrictForm.FileData(name, HttpEntity.Strict(ct, data)) ⇒
             complete(
-                s"type ${ct.mediaType} length ${data.length} filename ${name.get}")
+              s"type ${ct.mediaType} length ${data.length} filename ${name.get}")
         }
       } ~> check {
         responseAs[String] shouldEqual "type text/xml length 13 filename age.xml"
@@ -89,7 +89,7 @@ class FormFieldDirectivesSpec extends RoutingSpec {
       } ~> check { rejection shouldEqual MissingFormFieldRejection("sex") }
     }
     "properly extract the value if only a urlencoded deserializer is available for a multipart field that comes without a" +
-    "Content-Type (or text/plain)" in {
+      "Content-Type (or text/plain)" in {
       Post("/", multipartForm) ~> {
         formFields('firstName, "age", 'sex.?, "VIPBoolean" ? false) {
           (firstName, age, sex, vip) ⇒
@@ -163,8 +163,9 @@ class FormFieldDirectivesSpec extends RoutingSpec {
       } ~> check { responseAs[String] === "List()" }
     }
     "extract all occurrences into an Iterable when parameter is present" in {
-      Post("/",
-           FormData("age" -> "42", "hobby" -> "cooking", "hobby" -> "reading")) ~> {
+      Post(
+        "/",
+        FormData("age" -> "42", "hobby" -> "cooking", "hobby" -> "reading")) ~> {
         formField('hobby.*) { echoComplete }
       } ~> check { responseAs[String] === "List(cooking, reading)" }
     }

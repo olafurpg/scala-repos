@@ -33,7 +33,13 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.{HPos, Pos, VPos}
 import scalafx.scene.Scene
 import scalafx.scene.control.{CheckBox, Label, TextField}
-import scalafx.scene.layout.{AnchorPane, ColumnConstraints, GridPane, Priority, VBox}
+import scalafx.scene.layout.{
+  AnchorPane,
+  ColumnConstraints,
+  GridPane,
+  Priority,
+  VBox
+}
 import scalafx.scene.paint.Color
 
 object SliderControlDemo extends JFXApp {

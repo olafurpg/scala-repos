@@ -69,8 +69,8 @@ private[cluster] object VectorClock {
   */
 @SerialVersionUID(1L)
 final case class VectorClock(
-    versions: TreeMap[VectorClock.Node, Long] = TreeMap
-        .empty[VectorClock.Node, Long]) {
+    versions: TreeMap[VectorClock.Node, Long] =
+      TreeMap.empty[VectorClock.Node, Long]) {
 
   import VectorClock._
 
@@ -114,8 +114,8 @@ final case class VectorClock(
     *
     * If you send in the ordering FullOrder, you will get a full comparison.
     */
-  private final def compareOnlyTo(
-      that: VectorClock, order: Ordering): Ordering = {
+  private final def compareOnlyTo(that: VectorClock,
+                                  order: Ordering): Ordering = {
     def nextOrElse[T](iter: Iterator[T], default: T): T =
       if (iter.hasNext) iter.next() else default
 
@@ -172,8 +172,9 @@ final case class VectorClock(
           }
         }
 
-      compareNext(
-          nextOrElse(i1, cmpEndMarker), nextOrElse(i2, cmpEndMarker), Same)
+      compareNext(nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  Same)
     }
 
     if ((this eq that) || (this.versions eq that.versions)) Same

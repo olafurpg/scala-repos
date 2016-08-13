@@ -15,7 +15,16 @@ import org.scalajs.testsuite.utils.Platform._
 
 import java.util._
 
-import java.lang.{Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong, Byte => JByte, Short => JShort, Boolean => JBoolean, String => JString}
+import java.lang.{
+  Double => JDouble,
+  Float => JFloat,
+  Integer => JInteger,
+  Long => JLong,
+  Byte => JByte,
+  Short => JShort,
+  Boolean => JBoolean,
+  String => JString
+}
 
 class FormatterTest {
 
@@ -27,8 +36,10 @@ class FormatterTest {
     var precision: Int = _
     var calls = 0
 
-    def formatTo(
-        frm: Formatter, flags: Int, width: Int, precision: Int): Unit = {
+    def formatTo(frm: Formatter,
+                 flags: Int,
+                 width: Int,
+                 precision: Int): Unit = {
       this.calls += 1
       this.flags = flags
       this.width = width
@@ -36,8 +47,10 @@ class FormatterTest {
       frm.out().append("foobar")
     }
 
-    def expectCalled(
-        times: Int, flags: Int, width: Int, precision: Int): Unit = {
+    def expectCalled(times: Int,
+                     flags: Int,
+                     width: Int,
+                     precision: Int): Unit = {
       assertEquals(times, this.calls)
       assertEquals(flags, this.flags)
       assertEquals(width, this.width)
@@ -62,8 +75,9 @@ class FormatterTest {
     fc.expectCalled(1, flags, width, precision)
   }
 
-  def expectFormatterThrows[T <: Throwable](
-      exeption: Class[T], format: String, args: AnyRef*): Unit = {
+  def expectFormatterThrows[T <: Throwable](exeption: Class[T],
+                                            format: String,
+                                            args: AnyRef*): Unit = {
     val fmt = new Formatter()
     assertThrows(exeption, fmt.format(format, args: _*))
   }
@@ -256,7 +270,8 @@ class FormatterTest {
                           "%d%d%d",
                           new JInteger(1),
                           new JInteger(1))
-    expectFormatterThrows(
-        classOf[MissingFormatArgumentException], "%10$d", new JInteger(1))
+    expectFormatterThrows(classOf[MissingFormatArgumentException],
+                          "%10$d",
+                          new JInteger(1))
   }
 }

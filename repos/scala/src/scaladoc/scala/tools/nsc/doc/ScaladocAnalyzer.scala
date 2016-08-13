@@ -10,7 +10,12 @@ import scala.tools.nsc.ast.parser.{SyntaxAnalyzer, BracePatch}
 import typechecker.Analyzer
 import scala.reflect.internal.Chars._
 import scala.reflect.internal.util.{BatchSourceFile, Position}
-import scala.tools.nsc.doc.base.{CommentFactoryBase, MemberLookupBase, LinkTo, LinkToExternal}
+import scala.tools.nsc.doc.base.{
+  CommentFactoryBase,
+  MemberLookupBase,
+  LinkTo,
+  LinkToExternal
+}
 
 trait ScaladocAnalyzer extends Analyzer {
   val global: Global // generally, a ScaladocGlobal
@@ -25,7 +30,8 @@ trait ScaladocAnalyzer extends Analyzer {
     override def canAdaptConstantTypeToLiteral = false
 
     override protected def macroImplementationNotFoundMessage(
-        name: Name): String = (super.macroImplementationNotFoundMessage(name) +
+        name: Name): String =
+      (super.macroImplementationNotFoundMessage(name) +
         "\nWhen generating scaladocs for multiple projects at once, consider using -Ymacro-no-expand to disable macro expansions altogether.")
 
     override def typedDocDef(docDef: DocDef, mode: Mode, pt: Type): Tree = {
@@ -45,8 +51,8 @@ trait ScaladocAnalyzer extends Analyzer {
           for (useCaseSym <- useCase.defined) {
             if (sym.name != useCaseSym.name)
               reporter.warning(
-                  useCase.pos,
-                  "@usecase " + useCaseSym.name.decode +
+                useCase.pos,
+                "@usecase " + useCaseSym.name.decode +
                   " does not match commented symbol: " + sym.name.decode)
           }
         }
@@ -70,21 +76,22 @@ trait ScaladocAnalyzer extends Analyzer {
 
       def defineAlias(name: Name) =
         (if (context.scope.lookup(name) == NoSymbol) {
-           lookupVariable(name.toString.substring(1), enclClass) foreach {
-             repl =>
-               silent(_.typedTypeConstructor(stringParser(repl).typ())) map {
-                 tpt =>
-                   val alias =
-                     enclClass.newAliasType(name.toTypeName, useCase.pos)
-                   val tparams =
-                     cloneSymbolsAtOwner(tpt.tpe.typeSymbol.typeParams, alias)
-                   val newInfo = genPolyType(
-                       tparams, appliedType(tpt.tpe, tparams map (_.tpe)))
-                   alias setInfo newInfo
-                   context.scope.enter(alias)
-               }
-           }
-         })
+          lookupVariable(name.toString.substring(1), enclClass) foreach {
+            repl =>
+              silent(_.typedTypeConstructor(stringParser(repl).typ())) map {
+                tpt =>
+                  val alias =
+                    enclClass.newAliasType(name.toTypeName, useCase.pos)
+                  val tparams =
+                    cloneSymbolsAtOwner(tpt.tpe.typeSymbol.typeParams, alias)
+                  val newInfo =
+                    genPolyType(tparams,
+                                appliedType(tpt.tpe, tparams map (_.tpe)))
+                  alias setInfo newInfo
+                  context.scope.enter(alias)
+              }
+          }
+        })
 
       for (tree <- trees; t <- tree) t match {
         case Ident(name) if name startsWith '$' => defineAlias(name)
@@ -95,11 +102,11 @@ trait ScaladocAnalyzer extends Analyzer {
       namer.enterSyms(trees)
       typedStats(trees, NoSymbol)
       useCase.defined = context.scope.toList filterNot
-      (useCase.aliases contains _)
+          (useCase.aliases contains _)
 
       if (settings.debug)
         useCase.defined foreach
-        (sym => println("defined use cases: %s:%s".format(sym, sym.tpe)))
+          (sym => println("defined use cases: %s:%s".format(sym, sym.tpe)))
 
       useCase.defined
     }
@@ -131,7 +138,7 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       if (in.ch == '/') {
         do {
           in.next
-        } while ( (in.ch != CR) && (in.ch != LF) && (in.ch != SU))
+        } while ((in.ch != CR) && (in.ch != LF) && (in.ch != SU))
         true
       } else if (in.ch == '*') {
         docBuffer = null
@@ -175,7 +182,8 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       def parseComment(comment: DocComment) = {
         val nowarnings = settings.nowarn.value
         settings.nowarn.value = true
-        try parseAtSymbol(comment.raw, comment.raw, comment.pos) finally settings.nowarn.value = nowarnings
+        try parseAtSymbol(comment.raw, comment.raw, comment.pos)
+        finally settings.nowarn.value = nowarnings
       }
 
       override def internalLink(sym: Symbol, site: Symbol): Option[LinkTo] =
@@ -183,8 +191,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       override def chooseLink(links: List[LinkTo]): LinkTo =
         links.headOption.orNull
       override def toString(link: LinkTo): String = "No link"
-      override def findExternalLink(
-          sym: Symbol, name: String): Option[LinkToExternal] = None
+      override def findExternalLink(sym: Symbol,
+                                    name: String): Option[LinkToExternal] =
+        None
       override def warnNoLink: Boolean = false
     }
 
@@ -211,7 +220,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
         reporter.warning(doc.pos, "discarding unmoored doc comment")
     }
 
-    override def flushDoc(): DocComment = (try lastDoc finally lastDoc = null)
+    override def flushDoc(): DocComment =
+      (try lastDoc
+      finally lastDoc = null)
 
     override protected def putCommentChar() {
       if (inDocComment) docBuffer append ch

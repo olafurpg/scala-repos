@@ -52,7 +52,8 @@ object FileVirtualFile extends (File => FileVirtualFile) {
 
 /** A [[VirtualTextFile]] implemented by an actual file on the file system. */
 class FileVirtualTextFile(f: File)
-    extends FileVirtualFile(f) with VirtualTextFile {
+    extends FileVirtualFile(f)
+    with VirtualTextFile {
   import FileVirtualTextFile._
 
   override def content: String = readFileToString(file)
@@ -66,15 +67,17 @@ object FileVirtualTextFile extends (File => FileVirtualTextFile) {
   /** Reads the entire content of a file as a UTF-8 string. */
   def readFileToString(file: File): String = {
     val stream = new FileInputStream(file)
-    try IO.readInputStreamToString(stream) finally stream.close()
+    try IO.readInputStreamToString(stream)
+    finally stream.close()
   }
 }
 
 trait WritableFileVirtualTextFile
-    extends FileVirtualTextFile with WritableVirtualTextFile {
+    extends FileVirtualTextFile
+    with WritableVirtualTextFile {
   override def contentWriter: Writer = {
     new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))
+      new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))
   }
 }
 
@@ -85,7 +88,8 @@ object WritableFileVirtualTextFile {
 
 /** A [[VirtualBinaryFile]] implemented by an actual file on the file system. */
 class FileVirtualBinaryFile(f: File)
-    extends FileVirtualFile(f) with VirtualBinaryFile {
+    extends FileVirtualFile(f)
+    with VirtualBinaryFile {
   import FileVirtualBinaryFile._
 
   override def inputStream: InputStream =
@@ -102,12 +106,14 @@ object FileVirtualBinaryFile extends (File => FileVirtualBinaryFile) {
   /** Reads the entire content of a file as byte array. */
   def readFileToByteArray(file: File): Array[Byte] = {
     val stream = new FileInputStream(file)
-    try IO.readInputStreamToByteArray(stream) finally stream.close()
+    try IO.readInputStreamToByteArray(stream)
+    finally stream.close()
   }
 }
 
 trait WritableFileVirtualBinaryFile
-    extends FileVirtualBinaryFile with WritableVirtualBinaryFile {
+    extends FileVirtualBinaryFile
+    with WritableVirtualBinaryFile {
   override def outputStream: OutputStream =
     new BufferedOutputStream(new FileOutputStream(file))
 }
@@ -118,7 +124,8 @@ object WritableFileVirtualBinaryFile {
 }
 
 class FileVirtualJSFile(f: File)
-    extends FileVirtualTextFile(f) with VirtualJSFile {
+    extends FileVirtualTextFile(f)
+    with VirtualJSFile {
   import FileVirtualFile._
   import FileVirtualTextFile._
 
@@ -134,8 +141,8 @@ object FileVirtualJSFile extends (File => FileVirtualJSFile) {
   def apply(f: File): FileVirtualJSFile =
     new FileVirtualJSFile(f)
 
-  def relative(
-      f: File, relPath: String): FileVirtualJSFile with RelativeVirtualFile = {
+  def relative(f: File,
+               relPath: String): FileVirtualJSFile with RelativeVirtualFile = {
     new FileVirtualJSFile(f) with RelativeVirtualFile {
       def relativePath: String = relPath
     }
@@ -143,12 +150,13 @@ object FileVirtualJSFile extends (File => FileVirtualJSFile) {
 }
 
 trait WritableFileVirtualJSFile
-    extends FileVirtualJSFile with WritableFileVirtualTextFile
+    extends FileVirtualJSFile
+    with WritableFileVirtualTextFile
     with WritableVirtualJSFile {
 
   override def sourceMapWriter: Writer = {
     new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(sourceMapFile), "UTF-8"))
+      new OutputStreamWriter(new FileOutputStream(sourceMapFile), "UTF-8"))
   }
 }
 
@@ -158,7 +166,8 @@ object WritableFileVirtualJSFile {
 }
 
 class FileVirtualScalaJSIRFile(f: File)
-    extends FileVirtualBinaryFile(f) with VirtualSerializedScalaJSIRFile
+    extends FileVirtualBinaryFile(f)
+    with VirtualSerializedScalaJSIRFile
 
 object FileVirtualScalaJSIRFile extends (File => FileVirtualScalaJSIRFile) {
   import FileVirtualFile._

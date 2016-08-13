@@ -17,20 +17,20 @@ import akka.util.Timeout
 import akka.testkit.{TestKit, AkkaSpec}
 
 private[camel] object TestSupport {
-  def start(actor: ⇒ Actor, name: String)(
-      implicit system: ActorSystem, timeout: Timeout): ActorRef =
+  def start(actor: ⇒ Actor, name: String)(implicit system: ActorSystem,
+                                          timeout: Timeout): ActorRef =
     Await.result(
-        CamelExtension(system).activationFutureFor(system.actorOf(Props(actor),
-                                                                  name))(
-            timeout, system.dispatcher),
-        timeout.duration)
+      CamelExtension(system).activationFutureFor(
+        system.actorOf(Props(actor), name))(timeout, system.dispatcher),
+      timeout.duration)
 
-  def stop(actorRef: ActorRef)(
-      implicit system: ActorSystem, timeout: Timeout) {
+  def stop(actorRef: ActorRef)(implicit system: ActorSystem,
+                               timeout: Timeout) {
     system.stop(actorRef)
-    Await.result(CamelExtension(system).deactivationFutureFor(actorRef)(
-                     timeout, system.dispatcher),
-                 timeout.duration)
+    Await.result(
+      CamelExtension(system)
+        .deactivationFutureFor(actorRef)(timeout, system.dispatcher),
+      timeout.duration)
   }
 
   private[camel] implicit def camelToTestWrapper(camel: Camel) =
@@ -52,8 +52,8 @@ private[camel] object TestSupport {
         case e: ExecutionException ⇒ throw e.getCause
         case e: TimeoutException ⇒
           throw new AssertionError(
-              "Failed to get response to message [%s], send to endpoint [%s], within [%s]"
-                .format(msg, to, timeout))
+            "Failed to get response to message [%s], send to endpoint [%s], within [%s]"
+              .format(msg, to, timeout))
       }
     }
 
@@ -61,8 +61,7 @@ private[camel] object TestSupport {
     def routes = camel.context.getRoutes
   }
 
-  trait SharedCamelSystem extends BeforeAndAfterAll {
-    this: Suite ⇒
+  trait SharedCamelSystem extends BeforeAndAfterAll { this: Suite ⇒
     implicit lazy val system = ActorSystem("test", AkkaSpec.testConf)
     implicit lazy val camel = CamelExtension(system)
 
@@ -72,8 +71,7 @@ private[camel] object TestSupport {
     }
   }
 
-  trait NonSharedCamelSystem extends BeforeAndAfterEach {
-    this: Suite ⇒
+  trait NonSharedCamelSystem extends BeforeAndAfterEach { this: Suite ⇒
     implicit var system: ActorSystem = _
     implicit var camel: Camel = _
 

@@ -45,7 +45,7 @@ abstract class Plugin {
     // Process plugin options of form plugin:option
     def namec = name + ":"
     global.settings.pluginOptions.value filter (_ startsWith namec) map
-    (_ stripPrefix namec)
+      (_ stripPrefix namec)
   }
 
   /** Handle any plugin-specific options.
@@ -103,8 +103,8 @@ object Plugin {
     // XXX Return to this once we have more ARM support
     def read(is: Option[InputStream]) = is match {
       case None =>
-        throw new PluginLoadException(
-            jarp.path, s"Missing $PluginXML in $jarp")
+        throw new PluginLoadException(jarp.path,
+                                      s"Missing $PluginXML in $jarp")
       case Some(is) => PluginDescription.fromXML(is)
     }
     Try(new Jar(jarp.jfile).withEntryStream(PluginXML)(read))
@@ -123,13 +123,14 @@ object Plugin {
       Success[AnyClass](loader loadClass classname)
     } catch {
       case NonFatal(e) =>
-        Failure(new PluginLoadException(
-                classname, s"Error: unable to load class: $classname"))
+        Failure(
+          new PluginLoadException(classname,
+                                  s"Error: unable to load class: $classname"))
       case e: NoClassDefFoundError =>
         Failure(
-            new PluginLoadException(
-                classname,
-                s"Error: class not found: ${e.getMessage} required by $classname"))
+          new PluginLoadException(
+            classname,
+            s"Error: class not found: ${e.getMessage} required by $classname"))
     }
   }
 
@@ -146,7 +147,7 @@ object Plugin {
     // List[(jar, Try(descriptor))] in dir
     def scan(d: Directory) =
       d.files.toList sortBy (_.name) filter (Jar isJarOrZip _) map
-      (j => (j, loadDescriptionFromJar(j)))
+        (j => (j, loadDescriptionFromJar(j)))
 
     type PDResults = List[Try[(PluginDescription, ScalaClassLoader)]]
 
@@ -166,7 +167,7 @@ object Plugin {
         case p :: rest =>
           if (p.isDirectory)
             loadDescriptionFromFile(p.toDirectory / PluginXML) orElse loop(
-                rest)
+              rest)
           else if (p.isFile) loadDescriptionFromJar(p.toFile) orElse loop(rest)
           else loop(rest)
       }
@@ -183,12 +184,13 @@ object Plugin {
       (fromPaths ::: fromDirs) map {
         case Success((pd, loader)) if seen(pd.classname) =>
           // a nod to SI-7494, take the plugin classes distinctly
-          Failure(new PluginLoadException(
-                  pd.name,
-                  s"Ignoring duplicate plugin ${pd.name} (${pd.classname})"))
+          Failure(
+            new PluginLoadException(
+              pd.name,
+              s"Ignoring duplicate plugin ${pd.name} (${pd.classname})"))
         case Success((pd, loader)) if ignoring contains pd.name =>
           Failure(
-              new PluginLoadException(pd.name, s"Disabling plugin ${pd.name}"))
+            new PluginLoadException(pd.name, s"Disabling plugin ${pd.name}"))
         case Success((pd, loader)) =>
           seen += pd.classname
           Plugin.load(pd.classname, loader)

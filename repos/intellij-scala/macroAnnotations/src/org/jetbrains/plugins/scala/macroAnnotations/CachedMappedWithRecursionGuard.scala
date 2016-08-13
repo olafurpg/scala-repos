@@ -14,10 +14,12 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/23/15.
   */
-class CachedMappedWithRecursionGuard(
-    psiElement: Any, defaultValue: => Any, dependencyItem: Object)
+class CachedMappedWithRecursionGuard(psiElement: Any,
+                                     defaultValue: => Any,
+                                     dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
 }
 
 object CachedMappedWithRecursionGuard {
@@ -55,7 +57,7 @@ object CachedMappedWithRecursionGuard {
         val keyId: String = c.freshName(name + "cacheKey")
         val key: c.universe.TermName = generateTermName(name + "Key")
         val cacheStatsName: c.universe.TermName = generateTermName(
-            name + "cacheStats")
+          name + "cacheStats")
         val defdefFQN = thisFunctionFQN(name.toString)
         val analyzeCaches = analyzeCachesEnabled(c)
 
@@ -177,8 +179,8 @@ object CachedMappedWithRecursionGuard {
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           } else EmptyTree
 
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$mappedKeyTypeFQN[(..$parameterTypes), $retTp]]($keyId)
           ..$cacheStatsField

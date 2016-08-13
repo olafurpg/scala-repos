@@ -8,7 +8,11 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.{FileViewProvider, PsiClass, PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScDeclarationSequenceHolder
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl,
+  ScalaPsiElementFactory,
+  ScalaPsiManager
+}
 import org.jetbrains.sbt.project.module.SbtModule
 
 import scala.collection.JavaConverters._
@@ -29,11 +33,11 @@ class SbtFileImpl(provider: FileViewProvider)
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean =
-    super [ScalaFileImpl]
+    super[ScalaFileImpl]
       .processDeclarations(processor, state, lastParent, place) &&
-    super [ScDeclarationSequenceHolder].processDeclarations(
-        processor, state, lastParent, place) &&
-    processImplicitImports(processor, state, lastParent, place)
+      super[ScDeclarationSequenceHolder]
+        .processDeclarations(processor, state, lastParent, place) &&
+      processImplicitImports(processor, state, lastParent, place)
 
   private def processImplicitImports(processor: PsiScopeProcessor,
                                      state: ResolveState,
@@ -41,7 +45,7 @@ class SbtFileImpl(provider: FileViewProvider)
                                      place: PsiElement): Boolean = {
     val expressions =
       implicitImportExpressions ++ localObjectsWithDefinitions.map(
-          _.qualifiedName + "._")
+        _.qualifiedName + "._")
 
     // TODO this is a workaround, we need to find out why references stopped resolving via the chained imports
     val expressions0 = expressions.map {
@@ -76,19 +80,20 @@ class SbtFileImpl(provider: FileViewProvider)
       Sbt.DefinitionHolderClasses
         .flatMap(manager.getCachedClasses(moduleWithLibrariesScope, _))
         .flatMap(
-            ClassInheritorsSearch.search(_, moduleScope, true).findAll.asScala)
+          ClassInheritorsSearch.search(_, moduleScope, true).findAll.asScala)
     }
   }
 
   override def getFileResolveScope: GlobalSearchScope =
     projectDefinitionModule.fold(super.getFileResolveScope)(
-        _.getModuleWithLibrariesScope)
+      _.getModuleWithLibrariesScope)
 
   private def projectDefinitionModule: Option[Module] = fileModule.flatMap {
     module =>
-      Option(ModuleManager
-            .getInstance(getProject)
-            .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
+      Option(
+        ModuleManager
+          .getInstance(getProject)
+          .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
   }
 
   private def fileModule: Option[Module] =

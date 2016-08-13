@@ -22,21 +22,27 @@ import breeze.linalg.{DenseMatrix => BDM, Matrix => BM}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.internal.Logging
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.stat.correlation.{Correlations, PearsonCorrelation, SpearmanCorrelation}
+import org.apache.spark.mllib.stat.correlation.{
+  Correlations,
+  PearsonCorrelation,
+  SpearmanCorrelation
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class CorrelationSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Logging {
 
   // test input data
   val xData = Array(1.0, 0.0, -2.0)
   val yData = Array(4.0, 5.0, 3.0)
   val zeros = new Array[Double](3)
   val data = Seq(
-      Vectors.dense(1.0, 0.0, 0.0, -2.0),
-      Vectors.dense(4.0, 5.0, 0.0, 3.0),
-      Vectors.dense(6.0, 7.0, 0.0, 8.0),
-      Vectors.dense(9.0, 0.0, 0.0, 1.0)
+    Vectors.dense(1.0, 0.0, 0.0, -2.0),
+    Vectors.dense(4.0, 5.0, 0.0, 3.0),
+    Vectors.dense(6.0, 7.0, 0.0, 8.0),
+    Vectors.dense(9.0, 0.0, 0.0, 1.0)
   )
 
   test("corr(x, y) pearson, 1 value in data") {
@@ -142,12 +148,13 @@ class CorrelationSuite
     }
   }
 
-  def matrixApproxEqual(
-      A: BM[Double], B: BM[Double], threshold: Double = 1e-6): Boolean = {
+  def matrixApproxEqual(A: BM[Double],
+                        B: BM[Double],
+                        threshold: Double = 1e-6): Boolean = {
     for (i <- 0 until A.rows; j <- 0 until A.cols) {
       if (!approxEqual(A(i, j), B(i, j), threshold)) {
         logInfo(
-            "i, j = " + i + ", " + j + " actual: " + A(i, j) + " expected:" +
+          "i, j = " + i + ", " + j + " actual: " + A(i, j) + " expected:" +
             B(i, j))
         return false
       }

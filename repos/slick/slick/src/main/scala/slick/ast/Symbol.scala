@@ -19,8 +19,8 @@ trait TypeSymbol extends Symbol
 trait TermSymbol extends Symbol
 
 /** A named symbol which refers to an (aliased or unaliased) field. */
-case class FieldSymbol(
-    name: String)(val options: Seq[ColumnOption[_]], val tpe: Type)
+case class FieldSymbol(name: String)(val options: Seq[ColumnOption[_]],
+                                     val tpe: Type)
     extends TermSymbol {
   def findColumnOption[T <: ColumnOption[_]](
       implicit ct: ClassTag[T]): Option[T] =
@@ -103,8 +103,7 @@ class SymbolNamer(treeSymbolPrefix: String,
     map.get(s) orElse parent.flatMap(_.get(s))
 
   def apply(s: Symbol): String =
-    get(s).getOrElse(
-        s match {
+    get(s).getOrElse(s match {
       case a: AnonSymbol =>
         val n = create(treeSymbolPrefix)
         update(a, n)

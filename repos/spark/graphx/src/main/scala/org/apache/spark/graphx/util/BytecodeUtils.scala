@@ -44,7 +44,7 @@ private[graphx] object BytecodeUtils {
     } else {
       // look at closures enclosed in this closure
       for (f <- closure.getClass.getDeclaredFields
-                   if f.getType.getName.startsWith("scala.Function")) {
+           if f.getType.getName.startsWith("scala.Function")) {
         f.setAccessible(true)
         if (invokedMethod(f.get(closure), targetClass, targetMethod)) {
           return true
@@ -133,7 +133,7 @@ private[graphx] object BytecodeUtils {
                 op == INVOKESTATIC) {
               if (!skipClass(owner)) {
                 methodsInvoked.add(
-                    (Utils.classForName(owner.replace("/", ".")), name))
+                  (Utils.classForName(owner.replace("/", ".")), name))
               }
             }
           }

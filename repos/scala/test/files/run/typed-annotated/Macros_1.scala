@@ -8,16 +8,14 @@ object Macros {
     import c.universe._
     // val tpt = Annotated(Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR), List()), Ident(newTypeName("Int")))
     val tpt = Annotated(
-        Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR),
-              List()),
-        TypeTree(weakTypeOf[Int]))
+      Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR),
+            List()),
+      TypeTree(weakTypeOf[Int]))
     c.Expr[Unit](
-        Block(List(ValDef(Modifiers(),
-                          newTermName("x"),
-                          tpt,
-                          Literal(Constant(42)))),
-              Apply(Ident(newTermName("println")),
-                    List(Ident(newTermName("x"))))))
+      Block(
+        List(
+          ValDef(Modifiers(), newTermName("x"), tpt, Literal(Constant(42)))),
+        Apply(Ident(newTermName("println")), List(Ident(newTermName("x"))))))
   }
 
   def foo = macro impl

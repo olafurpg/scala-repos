@@ -27,7 +27,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class PCASuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -41,9 +42,9 @@ class PCASuite
 
   test("pca") {
     val data = Array(
-        Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
-        Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
-        Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0)
+      Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
+      Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
+      Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0)
     )
 
     val dataRDD = sc.parallelize(data, 2)

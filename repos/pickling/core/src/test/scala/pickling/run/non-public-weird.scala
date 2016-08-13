@@ -16,12 +16,13 @@ final class Hobby(var name: String,
 
 class NonPublicWeirdTest extends FunSuite {
   test("main") {
-    val person = new Person(
-        "Eugene", 25, new Hobby("hacking", "mostly Scala", "loving it"))
+    val person = new Person("Eugene",
+                            25,
+                            new Hobby("hacking", "mostly Scala", "loving it"))
     val personPickle = person.pickle
     System.err.println(personPickle.toString)
     assert(
-        personPickle.toString === """
+      personPickle.toString === """
       |JSONPickle({
       |  "$type": "scala.pickling.non.public.weird.Person",
       |  "hobby": {
@@ -39,7 +40,7 @@ class NonPublicWeirdTest extends FunSuite {
     // Once we do so these JSON pickles should change.
     val anyPickle = (person: Any).pickle
     assert(
-        anyPickle.toString === """
+      anyPickle.toString === """
       |JSONPickle({
       |  "$type": "scala.pickling.non.public.weird.Person",
       |  "name": "Eugene",

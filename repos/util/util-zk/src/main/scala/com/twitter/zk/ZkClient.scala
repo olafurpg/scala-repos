@@ -68,16 +68,16 @@ trait ZkClient {
   }
 
   /** Create a new ZkClient, possibly overriding configuration. */
-  protected[this] def transform(
-      _connector: Connector = connector,
-      _acl: Seq[ACL] = acl,
-      _mode: CreateMode = mode,
-      _retryPolicy: RetryPolicy = retryPolicy) = new ZkClient {
-    val connector = _connector
-    override val acl = _acl
-    override val mode = _mode
-    override val retryPolicy = _retryPolicy
-  }
+  protected[this] def transform(_connector: Connector = connector,
+                                _acl: Seq[ACL] = acl,
+                                _mode: CreateMode = mode,
+                                _retryPolicy: RetryPolicy = retryPolicy) =
+    new ZkClient {
+      val connector = _connector
+      override val acl = _acl
+      override val mode = _mode
+      override val retryPolicy = _retryPolicy
+    }
 }
 
 object ZkClient {
@@ -92,7 +92,7 @@ object ZkClient {
             connectTimeout: Option[Duration],
             sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
     apply(
-        NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
+      NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
   }
 
   /** Build a ZkClient with a NativeConnector */

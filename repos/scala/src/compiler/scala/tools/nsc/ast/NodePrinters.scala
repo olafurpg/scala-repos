@@ -113,9 +113,9 @@ abstract class NodePrinters {
       if (settings.XshowtreesStringified) buf.append(tree.toString + EOL)
       if (settings.XshowtreesCompact) {
         buf.append(
-            showRaw(tree,
-                    printIds = settings.uniqid,
-                    printTypes = settings.printtypes))
+          showRaw(tree,
+                  printIds = settings.uniqid,
+                  printTypes = settings.printtypes))
       } else {
         level = 0
         traverse(tree)
@@ -197,7 +197,8 @@ abstract class NodePrinters {
 
     @inline private def indent[T](body: => T): T = {
       level += 1
-      try body finally level -= 1
+      try body
+      finally level -= 1
     }
 
     def traverseList(ifEmpty: String, what: String)(trees: List[Tree]) {
@@ -211,7 +212,7 @@ abstract class NodePrinters {
 
     def printSingle(tree: Tree, name: Name) {
       println(
-          treePrefix(tree) + "(" + showName(name) + ")" + showAttributes(tree))
+        treePrefix(tree) + "(" + showName(name) + ")" + showAttributes(tree))
     }
 
     def traverse(tree: Tree) {
@@ -368,7 +369,7 @@ abstract class NodePrinters {
   def printUnit(unit: CompilationUnit) {
     print("// Scala source: " + unit.source + "\n")
     println(
-        Option(unit.body) map (x => nodeToString(x) + "\n") getOrElse "<null>")
+      Option(unit.body) map (x => nodeToString(x) + "\n") getOrElse "<null>")
   }
 
   def printAll() {

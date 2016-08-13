@@ -21,22 +21,20 @@ object MForeignKey {
 
   def getImportedKeys(table: MQName) =
     createAction(
-        _.metaData.getImportedKeys(
-            table.catalog_?, table.schema_?, table.name))
+      _.metaData.getImportedKeys(table.catalog_?, table.schema_?, table.name))
 
   def getExportedKeys(table: MQName) =
     createAction(
-        _.metaData.getExportedKeys(
-            table.catalog_?, table.schema_?, table.name))
+      _.metaData.getExportedKeys(table.catalog_?, table.schema_?, table.name))
 
   def getCrossReference(parentTable: MQName, foreignTable: MQName) =
     createAction(
-        _.metaData.getCrossReference(parentTable.catalog_?,
-                                     parentTable.schema_?,
-                                     parentTable.name,
-                                     foreignTable.catalog_?,
-                                     foreignTable.schema_?,
-                                     foreignTable.name))
+      _.metaData.getCrossReference(parentTable.catalog_?,
+                                   parentTable.schema_?,
+                                   parentTable.name,
+                                   foreignTable.catalog_?,
+                                   foreignTable.schema_?,
+                                   foreignTable.name))
 
   private[this] def createAction(f: JdbcBackend#Session => ResultSet) =
     ResultSetAction[MForeignKey](f) { r =>

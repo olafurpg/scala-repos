@@ -20,7 +20,8 @@ import akka.routing.RouterEnvelope
   * as max size of different message types.
   */
 private[akka] object RemoteMetricsExtension
-    extends ExtensionId[RemoteMetrics] with ExtensionIdProvider {
+    extends ExtensionId[RemoteMetrics]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): RemoteMetrics = super.get(system)
 
   override def lookup = RemoteMetricsExtension

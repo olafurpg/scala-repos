@@ -51,10 +51,10 @@ class IntroduceTypeAliasData {
 
   def getNamedElement: ScTypeAlias = {
     val element = PsiTreeUtil.findElementOfClassAtOffset(
-        typeAliasInfo._1,
-        typeAliasInfo._2.getStartOffset,
-        classOf[ScTypeAlias],
-        false)
+      typeAliasInfo._1,
+      typeAliasInfo._2.getStartOffset,
+      classOf[ScTypeAlias],
+      false)
 
     element match {
       case typeAlias: ScTypeAlias =>

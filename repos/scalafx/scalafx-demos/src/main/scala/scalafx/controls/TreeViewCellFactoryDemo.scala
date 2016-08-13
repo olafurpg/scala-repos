@@ -40,11 +40,11 @@ object TreeViewCellFactoryDemo extends JFXApp {
   case class Person(firstName: String, lastName: String)
 
   val characters = ObservableBuffer[Person](
-      Person("Bungalow ", "Bill"),
-      Person("Dennis", "O’Dell"),
-      Person("Eleanor", "Rigby"),
-      Person("Rocky", "Raccoon"),
-      Person("Peggy", "Sue")
+    Person("Bungalow ", "Bill"),
+    Person("Dennis", "O’Dell"),
+    Person("Eleanor", "Rigby"),
+    Person("Rocky", "Raccoon"),
+    Person("Peggy", "Sue")
   )
 
   stage = new PrimaryStage {
@@ -56,17 +56,19 @@ object TreeViewCellFactoryDemo extends JFXApp {
         showRoot = false
         root = new TreeItem[Person] {
           expanded = true
-          children = ObservableBuffer(
-              characters.map { p =>
+          children = ObservableBuffer(characters.map { p =>
             new TreeItem(p)
           })
         }
         // Use CellFactory to do custom rendering of a TreeCell
         cellFactory = (v: TreeView[Person]) =>
           new TreeCell[Person] {
-            treeItem.onChange((_, _, p) =>
-                  text = if (p != null)
-                    p.value().firstName + " " + p.value().lastName else "?")
+            treeItem.onChange(
+              (_, _, p) =>
+                text =
+                  if (p != null)
+                    p.value().firstName + " " + p.value().lastName
+                  else "?")
         }
       }
     }

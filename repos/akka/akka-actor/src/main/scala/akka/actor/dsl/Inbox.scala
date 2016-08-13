@@ -44,13 +44,11 @@ private[akka] object Inbox {
   private case object Kick
 }
 
-trait Inbox {
-  this: ActorDSL.type ⇒
+trait Inbox { this: ActorDSL.type ⇒
 
   import Inbox._
 
-  protected trait InboxExtension {
-    this: Extension ⇒
+  protected trait InboxExtension { this: Extension ⇒
     val DSLInboxQueueSize = config.getInt("inbox-size")
 
     val inboxNr = new AtomicInteger
@@ -82,7 +80,7 @@ trait Inbox {
       else {
         if (!printedWarning) {
           log.warning(
-              "dropping message: either your program is buggy or you might want to increase akka.actor.dsl.inbox-size, current value is " +
+            "dropping message: either your program is buggy or you might want to increase akka.actor.dsl.inbox-size, current value is " +
               size)
           printedWarning = true
         }
@@ -125,7 +123,7 @@ trait Inbox {
           while (overdue.hasNext) {
             val toKick = overdue.next()
             toKick.client ! Status.Failure(
-                new TimeoutException("deadline passed"))
+              new TimeoutException("deadline passed"))
           }
           clients = clients.filterNot(pred)
           clientsByTimeout = clientsByTimeout.from(Get(now))
@@ -150,16 +148,16 @@ trait Inbox {
           import context.dispatcher
           if (currentDeadline.isEmpty) {
             currentDeadline = Some(
-                (next,
-                 context.system.scheduler
-                   .scheduleOnce(next.timeLeft, self, Kick)))
+              (next,
+               context.system.scheduler
+                 .scheduleOnce(next.timeLeft, self, Kick)))
           } else {
             // must not rely on the Scheduler to not fire early (for robustness)
             currentDeadline.get._2.cancel()
             currentDeadline = Some(
-                (next,
-                 context.system.scheduler
-                   .scheduleOnce(next.timeLeft, self, Kick)))
+              (next,
+               context.system.scheduler
+                 .scheduleOnce(next.timeLeft, self, Kick)))
           }
         }
       }
@@ -222,8 +220,8 @@ trait Inbox {
         predicate: PartialFunction[Any, T]): T = {
       implicit val t = Timeout(timeout + extraTime)
       predicate(
-          Await.result(receiver ? Select(Deadline.now + timeout, predicate),
-                       Duration.Inf))
+        Await.result(receiver ? Select(Deadline.now + timeout, predicate),
+                     Duration.Inf))
     }
 
     /**

@@ -26,8 +26,8 @@ object UnionLike {
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-  def compareBinary(c: Context)(
-      inputStreamA: c.TermName, inputStreamB: c.TermName)(
+  def compareBinary(c: Context)(inputStreamA: c.TermName,
+                                inputStreamB: c.TermName)(
       subData: List[(Int, c.Type, Option[TreeOrderedBuf[c.type]])]): c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
@@ -182,7 +182,7 @@ object UnionLike {
                 sys.error("unexpected input to union length code of " + e)
             }
           }.getOrElse(
-              q"_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(1)")
+            q"_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(1)")
           val tmpPreLen = freshT("tmpPreLen")
 
           val lenT = q"""
@@ -269,8 +269,8 @@ object UnionLike {
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-  def compare(c: Context)(
-      cmpType: c.Type, elementA: c.TermName, elementB: c.TermName)(
+  def compare(
+      c: Context)(cmpType: c.Type, elementA: c.TermName, elementB: c.TermName)(
       subData: List[(Int, c.Type, Option[TreeOrderedBuf[c.type]])]): c.Tree = {
     import c.universe._
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import poly._
 /**
   * Heterogenous map with type-level key/value associations that are fixed by an arbitrary
   * relation `R`.
-  * 
+  *
   * `HMap`s extend `Poly` and hence are also polymorphic function values with type-specific
-  * cases corresponding to the map's type-level key/value associations. 
+  * cases corresponding to the map's type-level key/value associations.
   */
 class HMap[R[_, _]](underlying: Map[Any, Any] = Map.empty) extends Poly1 {
   def get[K, V](k: K)(implicit ev: R[K, V]): Option[V] =
@@ -48,7 +48,7 @@ object HMap {
   * Type class witnessing the existence of a natural transformation between `K[_]` and `V[_]`.
   *
   * Use this trait to represent an `HMap` relation of the form `K[T]` maps to `V[T]`.
-  * 
+  *
   * @author Miles Sabin
   */
 class ~?>[K[_], V[_]] extends Serializable {

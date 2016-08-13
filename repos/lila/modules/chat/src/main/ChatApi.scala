@@ -29,10 +29,9 @@ final class ChatApi(coll: Coll,
       makeLine(userId, text) flatMap {
         _ ?? { line =>
           pushLine(chatId, line) >>- {
-            shutup ! public.fold(lila.hub.actorApi.shutup
-                                   .RecordPublicChat(chatId, userId, text),
-                                 lila.hub.actorApi.shutup
-                                   .RecordPrivateChat(chatId, userId, text))
+            shutup ! public.fold(
+              lila.hub.actorApi.shutup.RecordPublicChat(chatId, userId, text),
+              lila.hub.actorApi.shutup.RecordPrivateChat(chatId, userId, text))
           } inject line.some
         }
       }
@@ -42,13 +41,15 @@ final class ChatApi(coll: Coll,
       pushLine(chatId, line) inject line.some
     }
 
-    private[ChatApi] def makeLine(
-        userId: String, t1: String): Fu[Option[UserLine]] =
+    private[ChatApi] def makeLine(userId: String,
+                                  t1: String): Fu[Option[UserLine]] =
       UserRepo byId userId map {
         _ flatMap { user =>
           Writer cut t1 ifFalse user.disabled flatMap { t2 =>
             flood.allowMessage(user.id, t2) option UserLine(
-                user.username, Writer preprocessUserInput t2, user.troll)
+              user.username,
+              Writer preprocessUserInput t2,
+              user.troll)
           }
         }
       }
@@ -70,22 +71,25 @@ final class ChatApi(coll: Coll,
         pushLine(chatId, line) inject line.some
       }
 
-    private def makeLine(
-        chatId: ChatId, color: Color, t1: String): Option[Line] =
+    private def makeLine(chatId: ChatId,
+                         color: Color,
+                         t1: String): Option[Line] =
       Writer cut t1 flatMap { t2 =>
         flood.allowMessage(s"$chatId/${color.letter}", t2) option PlayerLine(
-            color, Writer preprocessUserInput t2)
+          color,
+          Writer preprocessUserInput t2)
       }
   }
 
   private def pushLine(chatId: ChatId, line: Line) =
     coll.update(
-        BSONDocument("_id" -> chatId),
-        BSONDocument("$push" -> BSONDocument(
-                Chat.BSONFields.lines -> BSONDocument(
-                    "$each" -> List(line), "$slice" -> -maxLinesPerChat)
-            )),
-        upsert = true) >>- lila.mon.chat.message()
+      BSONDocument("_id" -> chatId),
+      BSONDocument(
+        "$push" -> BSONDocument(
+          Chat.BSONFields.lines -> BSONDocument("$each" -> List(line),
+                                                "$slice" -> -maxLinesPerChat)
+        )),
+      upsert = true) >>- lila.mon.chat.message()
 
   private object Writer {
 
@@ -101,6 +105,7 @@ final class ChatApi(coll: Coll,
     val gameUrlRegex = (domainRegex + """\b/([\w]{8})[\w]{4}\b""").r
     def noPrivateUrl(str: String): String =
       gameUrlRegex.replaceAllIn(
-          str, m => quoteReplacement(netDomain + "/" + (m group 1)))
+        str,
+        m => quoteReplacement(netDomain + "/" + (m group 1)))
   }
 }

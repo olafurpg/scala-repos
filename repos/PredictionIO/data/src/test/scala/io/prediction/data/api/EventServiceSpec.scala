@@ -36,14 +36,14 @@ class EventServiceSpec extends Specification {
   val channelsClient = Storage.getMetaDataChannels()
 
   val eventServiceActor = system.actorOf(
-      Props(
-          new EventServiceActor(
-              eventClient,
-              accessKeysClient,
-              channelsClient,
-              EventServerConfig()
-          )
+    Props(
+      new EventServiceActor(
+        eventClient,
+        accessKeysClient,
+        channelsClient,
+        EventServerConfig()
       )
+    )
   )
 
   "GET / request" should {
@@ -51,13 +51,13 @@ class EventServiceSpec extends Specification {
       val probe = TestProbe()(system)
       probe.send(eventServiceActor, Get("/"))
       probe.expectMsg(
-          HttpResponse(
-              200,
-              HttpEntity(
-                  contentType = ContentTypes.`application/json`,
-                  string = """{"status":"alive"}"""
-              )
+        HttpResponse(
+          200,
+          HttpEntity(
+            contentType = ContentTypes.`application/json`,
+            string = """{"status":"alive"}"""
           )
+        )
       )
       success
     }

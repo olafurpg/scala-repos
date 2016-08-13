@@ -54,7 +54,8 @@ import scala.util.Try
   * knowing that only that library's network operations will be affected.
   * Application callback execution can be configured separately.
   */
-@implicitNotFound("""Cannot find an implicit ExecutionContext. You might pass
+@implicitNotFound(
+  """Cannot find an implicit ExecutionContext. You might pass
 an (implicit ec: ExecutionContext) parameter to your method
 or import scala.concurrent.ExecutionContext.Implicits.global.""")
 trait ExecutionContext {
@@ -74,7 +75,7 @@ trait ExecutionContext {
   /** Prepares for the execution of a task. Returns the prepared
     *  execution context. The recommended implementation of
     *  `prepare` is to return `this`.
-    * 
+    *
     *  This method should no longer be overridden or called. It was
     *  originally expected that `prepare` would be called by
     *  all libraries that consume ExecutionContexts, in order to
@@ -102,7 +103,8 @@ trait ExecutionContextExecutor extends ExecutionContext with Executor
   * Java [[http://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html ExecutorService]].
   */
 trait ExecutionContextExecutorService
-    extends ExecutionContextExecutor with ExecutorService
+    extends ExecutionContextExecutor
+    with ExecutorService
 
 /** Contains factory methods for creating execution contexts.
   */
@@ -169,8 +171,8 @@ object ExecutionContext {
     *  @param reporter  a function for error reporting
     *  @return          the `ExecutionContext` using the given `Executor`
     */
-  def fromExecutor(
-      e: Executor, reporter: Throwable => Unit): ExecutionContextExecutor =
+  def fromExecutor(e: Executor,
+                   reporter: Throwable => Unit): ExecutionContextExecutor =
     impl.ExecutionContextImpl.fromExecutor(e, reporter)
 
   /** Creates an `ExecutionContext` from the given `Executor` with the [[scala.concurrent.ExecutionContext$.defaultReporter default reporter]].

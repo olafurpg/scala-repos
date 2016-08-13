@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScTemplateBodyImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTemplateBodyStubImpl
@@ -16,7 +21,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTemplateBodyStubImpl
   */
 class ScTemplateBodyElementType[Func <: ScTemplateBody]
     extends ScStubElementType[ScTemplateBodyStub, ScTemplateBody](
-        "template body") {
+      "template body") {
   def serialize(stub: ScTemplateBodyStub, dataStream: StubOutputStream): Unit = {}
 
   def createPsi(stub: ScTemplateBodyStub): ScTemplateBody = {
@@ -29,10 +34,11 @@ class ScTemplateBodyElementType[Func <: ScTemplateBody]
     new ScTemplateBodyStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTemplateBodyStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTemplateBodyStub = {
     new ScTemplateBodyStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this)
   }
 
   def indexStub(stub: ScTemplateBodyStub, sink: IndexSink): Unit = {}

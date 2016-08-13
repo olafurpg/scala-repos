@@ -55,12 +55,12 @@ trait FileAndResourceDirectives {
               settings ⇒
                 complete {
                   HttpEntity.Default(
-                      contentType,
-                      file.length,
-                      FileIO
-                        .fromFile(file)
-                        .withAttributes(ActorAttributes.dispatcher(
-                                settings.fileIODispatcher)))
+                    contentType,
+                    file.length,
+                    FileIO
+                      .fromFile(file)
+                      .withAttributes(
+                        ActorAttributes.dispatcher(settings.fileIODispatcher)))
                 }
             }
           } else complete(HttpEntity.Empty)
@@ -68,9 +68,8 @@ trait FileAndResourceDirectives {
     }
 
   private def conditionalFor(length: Long, lastModified: Long): Directive0 =
-    extractSettings.flatMap(
-        settings ⇒
-          if (settings.fileGetConditional) {
+    extractSettings.flatMap(settings ⇒
+      if (settings.fileGetConditional) {
         val tag = java.lang.Long
           .toHexString(lastModified ^ java.lang.Long.reverse(length))
         val lastModifiedDateTime =
@@ -103,12 +102,12 @@ trait FileAndResourceDirectives {
                   settings ⇒
                     complete {
                       HttpEntity.Default(
-                          contentType,
-                          length,
-                          StreamConverters
-                            .fromInputStream(() ⇒ url.openStream())
-                            .withAttributes(ActorAttributes.dispatcher(
-                                    settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
+                        contentType,
+                        length,
+                        StreamConverters
+                          .fromInputStream(() ⇒ url.openStream())
+                          .withAttributes(ActorAttributes.dispatcher(
+                            settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
                     }
                 }
               } else complete(HttpEntity.Empty)
@@ -163,9 +162,10 @@ trait FileAndResourceDirectives {
 
         if (dirs.isEmpty) reject
         else
-          complete(DirectoryListing(pathPrefix + pathString,
-                                    isRoot = pathString == "/",
-                                    dirs.flatMap(_.listFiles)))
+          complete(
+            DirectoryListing(pathPrefix + pathString,
+                             isRoot = pathString == "/",
+                             dirs.flatMap(_.listFiles)))
       }
     }
 
@@ -184,8 +184,9 @@ trait FileAndResourceDirectives {
   def getFromBrowseableDirectories(directories: String*)(
       implicit renderer: DirectoryRenderer,
       resolver: ContentTypeResolver): Route = {
-    directories.map(getFromDirectory).reduceLeft(_ ~ _) ~ listDirectoryContents(
-        directories: _*)
+    directories
+      .map(getFromDirectory)
+      .reduceLeft(_ ~ _) ~ listDirectoryContents(directories: _*)
   }
 
   /**
@@ -193,8 +194,8 @@ trait FileAndResourceDirectives {
     * "resource directory".
     * If the requested resource is itself a directory or cannot be found or read the Route rejects the request.
     */
-  def getFromResourceDirectory(
-      directoryName: String, classLoader: ClassLoader = defaultClassLoader)(
+  def getFromResourceDirectory(directoryName: String,
+                               classLoader: ClassLoader = defaultClassLoader)(
       implicit resolver: ContentTypeResolver): Route = {
     val base =
       if (directoryName.isEmpty) "" else withTrailingSlash(directoryName)
@@ -233,11 +234,11 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
         case Uri.Path.Segment(head, tail) ⇒
           if (head.indexOf('/') >= 0 || head == "..") {
             log.warning(
-                "File-system path for base [{}] and Uri.Path [{}] contains suspicious path segment [{}], " +
+              "File-system path for base [{}] and Uri.Path [{}] contains suspicious path segment [{}], " +
                 "GET access was disallowed",
-                base,
-                path,
-                head)
+              base,
+              path,
+              head)
             ""
           } else rec(tail, result.append(head))
       }
@@ -310,7 +311,7 @@ object ContentTypeResolver {
     * registry of all defined media-types. By default all non-binary file content is assumed to be UTF-8 encoded.
     */
   implicit val Default: ContentTypeResolver = withDefaultCharset(
-      HttpCharsets.`UTF-8`)
+    HttpCharsets.`UTF-8`)
 
   def withDefaultCharset(charset: HttpCharset): ContentTypeResolver =
     new ContentTypeResolver {
@@ -386,8 +387,9 @@ object DirectoryListing {
         if (!isRoot) {
           val secondToLastSlash =
             path.lastIndexOf('/', path.lastIndexOf('/', path.length - 1) - 1)
-          sb.append("<a href=\"%s/\">../</a>\n" format path.substring(
-                  0, secondToLastSlash))
+          sb.append(
+            "<a href=\"%s/\">../</a>\n" format path
+              .substring(0, secondToLastSlash))
         }
         def lastModified(file: File) =
           DateTime(file.lastModified).toIsoLikeDateTimeString

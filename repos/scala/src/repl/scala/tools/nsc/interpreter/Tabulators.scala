@@ -10,11 +10,12 @@ trait Tabulator {
   def width: Int
   def marginSize: Int
 
-  protected def fits(items: Seq[String], width: Int): Boolean = ((items map
-          (_.length)).sum + (items.length - 1) * marginSize < width)
+  protected def fits(items: Seq[String], width: Int): Boolean =
+    ((items map
+      (_.length)).sum + (items.length - 1) * marginSize < width)
   def tabulate(items: Seq[String]): Seq[Seq[String]] =
     (if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
-     else printMultiLineColumns(items))
+    else printMultiLineColumns(items))
   protected def columnize(ss: Seq[String]): Seq[Seq[String]] =
     ss map (s => Seq(s))
   protected def printMultiLineColumns(items: Seq[String]): Seq[Seq[String]] = {
@@ -23,8 +24,8 @@ trait Tabulator {
     val columnWidth = longest + marginSize
     val maxcols =
       (if (columnWidth >= width) 1
-       else 1 max (width / columnWidth) // make sure it doesn't divide to 0
-       )
+      else 1 max (width / columnWidth) // make sure it doesn't divide to 0
+      )
     val nrows = items.size /% maxcols
     val ncols = items.size /% nrows
     val groupSize = ncols
@@ -36,9 +37,10 @@ trait Tabulator {
       else {
         val h = 1 max padded.size /% groupSize
         val cols = (padded grouped h).toList
-        for (i <- 0 until h) yield
-          for (j <- 0 until groupSize) yield
-            if (i < cols(j).size) cols(j)(i) else ""
+        for (i <- 0 until h)
+          yield
+            for (j <- 0 until groupSize)
+              yield if (i < cols(j).size) cols(j)(i) else ""
       }
     grouped
   }
@@ -75,9 +77,10 @@ trait VariColumnTabulator extends Tabulator {
       else if (xwise) resulting((items grouped ncols).toSeq)
       else {
         val cols = (items grouped nrows).toList
-        val rows = for (i <- 0 until nrows) yield
-          for (j <- 0 until ncols) yield
-            if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
+        val rows = for (i <- 0 until nrows)
+          yield
+            for (j <- 0 until ncols)
+              yield if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
         resulting(rows)
       }
     }
@@ -97,10 +100,10 @@ trait VariColumnTabulator extends Tabulator {
 
       // format to column width
       sss map
-      (ss =>
-            ss.zipWithIndex map {
-              case (s, i) => s"%-${columnWidths(i)}s" format s
-          })
+        (ss =>
+           ss.zipWithIndex map {
+             case (s, i) => s"%-${columnWidths(i)}s" format s
+           })
     }
   }
 }

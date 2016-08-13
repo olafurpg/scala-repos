@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
 class SbtReferenceContributor extends PsiReferenceContributor {
   def registerReferenceProviders(registrar: PsiReferenceRegistrar) {
     registrar.registerReferenceProvider(
-        PlatformPatterns.psiElement(classOf[ScReferencePattern]),
-        new SbtSubprojectReferenceProvider())
+      PlatformPatterns.psiElement(classOf[ScReferencePattern]),
+      new SbtSubprojectReferenceProvider())
   }
 }

@@ -113,15 +113,15 @@ trait Exprs { self: Universe =>
       * }}}
       */
     @compileTimeOnly(
-        "cannot use value except for signatures of macro implementations")
+      "cannot use value except for signatures of macro implementations")
     val value: T
 
     override def canEqual(x: Any) = x.isInstanceOf[Expr[_]]
 
     override def equals(x: Any) =
       x.isInstanceOf[Expr[_]] &&
-      this.mirror == x.asInstanceOf[Expr[_]].mirror &&
-      this.tree == x.asInstanceOf[Expr[_]].tree
+        this.mirror == x.asInstanceOf[Expr[_]].mirror &&
+        this.tree == x.asInstanceOf[Expr[_]].tree
 
     override def hashCode = mirror.hashCode * 31 + tree.hashCode
 
@@ -138,14 +138,14 @@ trait Exprs { self: Universe =>
     *  @group Expressions
     */
   object Expr {
-    def apply[T : WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
-                               treec: TreeCreator): Expr[T] =
+    def apply[T: WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
+                              treec: TreeCreator): Expr[T] =
       new ExprImpl[T](mirror.asInstanceOf[Mirror], treec)
     def unapply[T](expr: Expr[T]): Option[Tree] = Some(expr.tree)
   }
 
-  private class ExprImpl[+T : WeakTypeTag](
-      val mirror: Mirror, val treec: TreeCreator)
+  private class ExprImpl[+T: WeakTypeTag](val mirror: Mirror,
+                                          val treec: TreeCreator)
       extends Expr[T] {
     def in[U <: Universe with Singleton](
         otherMirror: scala.reflect.api.Mirror[U]): U#Expr[T] = {
@@ -162,13 +162,13 @@ trait Exprs { self: Universe =>
 
     def splice: T =
       throw new UnsupportedOperationException(
-          """
+        """
       |the function you're calling has not been spliced by the compiler.
       |this means there is a cross-stage evaluation involved, and it needs to be invoked explicitly.
       |if you're sure this is not an oversight, add scala-compiler.jar to the classpath,
       |import `scala.tools.reflect.Eval` and call `<your expr>.eval` instead.""".trim.stripMargin)
     lazy val value: T = throw new UnsupportedOperationException(
-        """
+      """
       |the value you're calling is only meant to be used in cross-stage path-dependent types.
       |if you want to splice the underlying expression, use `<your expr>.splice`.
       |if you want to get a value of the underlying expression, add scala-compiler.jar to the classpath,
@@ -181,8 +181,8 @@ trait Exprs { self: Universe =>
 }
 
 @SerialVersionUID(1L)
-private[scala] class SerializedExpr(
-    var treec: TreeCreator, var tag: ru.WeakTypeTag[_])
+private[scala] class SerializedExpr(var treec: TreeCreator,
+                                    var tag: ru.WeakTypeTag[_])
     extends Serializable {
   import scala.reflect.runtime.universe.{Expr, runtimeMirror}
 

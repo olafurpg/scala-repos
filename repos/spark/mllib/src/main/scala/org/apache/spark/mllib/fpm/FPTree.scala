@@ -102,9 +102,9 @@ private[fpm] class FPTree[T] extends Serializable {
   }
 
   /** Extracts all patterns with valid suffix and minimum count. */
-  def extract(minCount: Long,
-              validateSuffix: T => Boolean = _ =>
-                  true): Iterator[(List[T], Long)] = {
+  def extract(
+      minCount: Long,
+      validateSuffix: T => Boolean = _ => true): Iterator[(List[T], Long)] = {
     summaries.iterator.flatMap {
       case (item, summary) =>
         if (validateSuffix(item) && summary.count >= minCount) {

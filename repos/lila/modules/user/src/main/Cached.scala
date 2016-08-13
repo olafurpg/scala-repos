@@ -24,9 +24,9 @@ final class Cached(nbTtl: FiniteDuration,
   private def oneMonthAgo = DateTime.now minusMonths 1
 
   private val countCache = mongoCache.single[Int](
-      prefix = "user:nb",
-      f = $count(UserRepo.enabledSelect),
-      timeToLive = nbTtl)
+    prefix = "user:nb",
+    f = $count(UserRepo.enabledSelect),
+    timeToLive = nbTtl)
 
   def countEnabled: Fu[Int] = countCache(true)
 
@@ -64,30 +64,32 @@ final class Cached(nbTtl: FiniteDuration,
                          racingKings = racingKings)
 
   val top10Perf = mongoCache[Perf.ID, List[LightPerf]](
-      prefix = "user:top10:perf",
-      f = (perf: Perf.ID) => rankingApi.topPerf(perf, 10),
-      timeToLive = 10 seconds)
+    prefix = "user:top10:perf",
+    f = (perf: Perf.ID) => rankingApi.topPerf(perf, 10),
+    timeToLive = 10 seconds)
 
   val top200Perf = mongoCache[Perf.ID, List[User.LightPerf]](
-      prefix = "user:top200:perf",
-      f = (perf: Perf.ID) => rankingApi.topPerf(perf, 200),
-      timeToLive = 10 minutes)
+    prefix = "user:top200:perf",
+    f = (perf: Perf.ID) => rankingApi.topPerf(perf, 200),
+    timeToLive = 10 minutes)
 
   private val topWeekCache = mongoCache.single[List[User.LightPerf]](
-      prefix = "user:top:week", f = PerfType.leaderboardable.map { perf =>
-    rankingApi.topPerf(perf.id, 1)
-  }.sequenceFu.map(_.flatten), timeToLive = 9 minutes)
+    prefix = "user:top:week",
+    f = PerfType.leaderboardable.map { perf =>
+      rankingApi.topPerf(perf.id, 1)
+    }.sequenceFu.map(_.flatten),
+    timeToLive = 9 minutes)
 
   def topWeek = topWeekCache.apply _
 
   val topNbGame = mongoCache[Int, List[User.LightCount]](
-      prefix = "user:top:nbGame",
-      f = nb => UserRepo topNbGame nb map { _ map (_.lightCount) },
-      timeToLive = 34 minutes)
+    prefix = "user:top:nbGame",
+    f = nb => UserRepo topNbGame nb map { _ map (_.lightCount) },
+    timeToLive = 34 minutes)
 
   val top50Online = lila.memo.AsyncCache.single[List[User]](
-      f = UserRepo.byIdsSortRating(onlineUserIdMemo.keys, 50),
-      timeToLive = 10 seconds)
+    f = UserRepo.byIdsSortRating(onlineUserIdMemo.keys, 50),
+    timeToLive = 10 seconds)
 
   object ranking {
 

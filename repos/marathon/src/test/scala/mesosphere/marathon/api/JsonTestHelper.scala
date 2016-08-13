@@ -2,7 +2,15 @@ package mesosphere.marathon.api
 
 import gnieh.diffson.{Operation, JsonDiff, Add, Copy}
 import org.scalatest.{Matchers, Assertions}
-import play.api.libs.json.{JsArray, JsObject, JsNull, JsValue, Format, Json, Writes}
+import play.api.libs.json.{
+  JsArray,
+  JsObject,
+  JsNull,
+  JsValue,
+  Format,
+  Json,
+  Writes
+}
 
 import scala.collection.Map
 
@@ -51,9 +59,9 @@ object JsonTestHelper extends Assertions with Matchers {
     def containsEverythingInJsonString(expected: String): Unit = {
       val diff = JsonDiff.diff(expected, actual)
       require(
-          diff.ops.forall(isAddition),
-          s"unexpected differences in actual json:\n$actual\nexpected:\n$expected\n${diff.ops
-            .filter(!isAddition(_))}")
+        diff.ops.forall(isAddition),
+        s"unexpected differences in actual json:\n$actual\nexpected:\n$expected\n${diff.ops
+          .filter(!isAddition(_))}")
     }
 
     def containsEverythingInJsonOf[T](expected: T)(
@@ -64,8 +72,8 @@ object JsonTestHelper extends Assertions with Matchers {
     def correspondsToJsonString(expected: String): Unit = {
       val diff = JsonDiff.diff(expected, actual)
       require(
-          diff.ops.isEmpty,
-          s"unexpected differences in actual json:\n$actual\nexpected:\n$expected\n$diff")
+        diff.ops.isEmpty,
+        s"unexpected differences in actual json:\n$actual\nexpected:\n$expected\n$diff")
     }
 
     def correspondsToJsonOf[T](expected: T)(implicit writes: Writes[T]): Unit = {

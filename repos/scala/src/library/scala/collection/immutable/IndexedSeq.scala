@@ -18,18 +18,19 @@ import mutable.{ArrayBuffer, Builder}
   *  $indexedSeqInfo
   */
 trait IndexedSeq[+A]
-    extends Seq[A] with scala.collection.IndexedSeq[A]
+    extends Seq[A]
+    with scala.collection.IndexedSeq[A]
     with GenericTraversableTemplate[A, IndexedSeq]
     with IndexedSeqLike[A, IndexedSeq[A]] {
   override def companion: GenericCompanion[IndexedSeq] = IndexedSeq
 
   /** Returns this $coll as an indexed sequence.
-    *  
+    *
     *  A new indexed sequence will not be built; lazy collections will stay lazy.
     */
   @deprecatedOverriding(
-      "Immutable indexed sequences should do nothing on toIndexedSeq except cast themselves as an indexed sequence.",
-      "2.11.0")
+    "Immutable indexed sequences should do nothing on toIndexedSeq except cast themselves as an indexed sequence.",
+    "2.11.0")
   override def toIndexedSeq: IndexedSeq[A] = this
   override def seq: IndexedSeq[A] = this
 }
@@ -41,7 +42,9 @@ trait IndexedSeq[+A]
   */
 object IndexedSeq extends IndexedSeqFactory[IndexedSeq] {
   class Impl[A](buf: ArrayBuffer[A])
-      extends AbstractSeq[A] with IndexedSeq[A] with Serializable {
+      extends AbstractSeq[A]
+      with IndexedSeq[A]
+      with Serializable {
     def length = buf.length
     def apply(idx: Int) = buf.apply(idx)
   }

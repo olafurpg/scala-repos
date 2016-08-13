@@ -55,8 +55,9 @@ trait SequentialActor extends Actor {
         futureTimeout
           .fold(future) { timeout =>
             future.withTimeout(
-                timeout, LilaException(s"Sequential actor timeout: $timeout"))(
-                context.system)
+              timeout,
+              LilaException(s"Sequential actor timeout: $timeout"))(
+              context.system)
           }
           .addFailureEffect(onFailure)
           .andThenAnyway { self ! Done }

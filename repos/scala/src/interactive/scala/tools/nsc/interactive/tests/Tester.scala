@@ -83,13 +83,14 @@ class Tester(ntests: Int, inputs: Array[SourceFile], settings: Settings) {
 
     override def toString =
       "In " + inputs(sfidx) + " at " + start + " take " + nchars + " to " +
-      (if (toLeft) "left" else "right")
+        (if (toLeft) "left" else "right")
 
     def deleteOne() {
       val sf = inputs(sfidx)
       deleted = sf.content(pos) :: deleted
       val sf1 = new BatchSourceFile(
-          sf.file, sf.content.take(pos) ++ sf.content.drop(pos + 1))
+        sf.file,
+        sf.content.take(pos) ++ sf.content.drop(pos + 1))
       inputs(sfidx) = sf1
       askReload(sf1)
     }
@@ -187,8 +188,8 @@ class Tester(ntests: Int, inputs: Array[SourceFile], settings: Settings) {
                         content: Array[Char]) {
     override def toString =
       "Sourcefile: " + inputs(sfidx) + "\nChanges:\n  " +
-      changes.mkString("\n  ") + "\nErrors:\n  " + infos.mkString("\n  ") +
-      "\nContents:\n" + content.mkString
+        changes.mkString("\n  ") + "\nErrors:\n  " + infos.mkString("\n  ") +
+        "\nContents:\n" + content.mkString
   }
 
   def minimize(etrace: ErrorTrace) {}
@@ -218,7 +219,7 @@ object Tester {
     println("filenames = " + filenames)
     val files =
       filenames.toArray map
-      (str => new BatchSourceFile(AbstractFile.getFile(str)): SourceFile)
+        (str => new BatchSourceFile(AbstractFile.getFile(str)): SourceFile)
     new Tester(args(0).toInt, files, settings).run()
     sys.exit(0)
   }

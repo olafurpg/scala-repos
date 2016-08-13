@@ -8,7 +8,7 @@ package patterns
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, ScTupleType}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
@@ -17,6 +17,6 @@ trait ScTuplePattern extends ScPattern {
 
   override def getType(ctx: TypingContext) = wrap(patternList) flatMap { l =>
     collectFailures(l.patterns.map(_.getType(ctx)), Any)(
-        ScTupleType(_)(getProject, getResolveScope))
+      ScTupleType(_)(getProject, getResolveScope))
   }
 }

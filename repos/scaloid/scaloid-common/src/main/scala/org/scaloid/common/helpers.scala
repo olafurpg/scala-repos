@@ -56,9 +56,9 @@ trait AppHelpers {
     * @param clickCallback This callback is run when the button is clicked. Does nothing by default.
     */
   @inline
-  def alert(
-      title: CharSequence, text: CharSequence, clickCallback: => Unit = {})(
-      implicit context: Context) {
+  def alert(title: CharSequence,
+            text: CharSequence,
+            clickCallback: => Unit = {})(implicit context: Context) {
     new AlertDialogBuilder(title, text) {
       neutralButton(android.R.string.ok, clickCallback)
     }.show()
@@ -112,9 +112,9 @@ trait ContentHelpers {
     * }
     * }}}
     */
-  def broadcastReceiver(
-      filter: IntentFilter)(onReceiveBody: (Context, Intent) => Any)(
-      implicit ctx: Context, reg: Registerable) {
+  def broadcastReceiver(filter: IntentFilter)(
+      onReceiveBody: (Context, Intent) => Any)(implicit ctx: Context,
+                                               reg: Registerable) {
     val receiver = new BroadcastReceiver {
       def onReceive(context: Context, intent: Intent) {
         onReceiveBody(context, intent)
@@ -272,8 +272,8 @@ trait PreferenceHelpers {
 
   import scala.language.experimental.macros
 
-  def preferenceVar[T](defaultVal: T): PreferenceVar[T] = macro PreferenceHelpers
-    .preferenceVarImpl[T]
+  def preferenceVar[T](defaultVal: T): PreferenceVar[T] =
+    macro PreferenceHelpers.preferenceVarImpl[T]
 }
 
 object PreferenceHelpers extends PreferenceHelpers {
@@ -301,9 +301,10 @@ object PreferenceHelpers extends PreferenceHelpers {
   * Contains helper methods that displaying some UI elements.
   */
 trait WidgetHelpers {
-  @inline private[this] def _toast(
-      message: CharSequence, duration: Int, gravity: Int, view: View)(
-      implicit context: Context) {
+  @inline private[this] def _toast(message: CharSequence,
+                                   duration: Int,
+                                   gravity: Int,
+                                   view: View)(implicit context: Context) {
     runOnUiThread {
       val toast = Toast.makeText(context, message, duration)
       toast.setGravity(gravity, 0, 0)
@@ -349,8 +350,11 @@ object WidgetHelpers extends WidgetHelpers
   * Aggregate trait for helpers.
   */
 trait Helpers
-    extends AppHelpers with ContentHelpers with MediaHelpers
-    with PreferenceHelpers with WidgetHelpers
+    extends AppHelpers
+    with ContentHelpers
+    with MediaHelpers
+    with PreferenceHelpers
+    with WidgetHelpers
 
 /**
   * Aggregate object for helpers.

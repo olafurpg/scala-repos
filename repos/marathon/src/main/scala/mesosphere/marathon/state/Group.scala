@@ -18,7 +18,8 @@ case class Group(id: PathId,
                  groups: Set[Group] = defaultGroups,
                  dependencies: Set[PathId] = defaultDependencies,
                  version: Timestamp = defaultVersion)
-    extends MarathonState[GroupDefinition, Group] with IGroup {
+    extends MarathonState[GroupDefinition, Group]
+    with IGroup {
 
   override def mergeFromProto(msg: GroupDefinition): Group =
     Group.fromProto(msg)
@@ -61,7 +62,8 @@ case class Group(id: PathId,
     val groupId = path.parent
     makeGroup(groupId).update(timestamp) { group =>
       if (group.id == groupId)
-        group.putApplication(fn(group.apps.find(_.id == path))) else group
+        group.putApplication(fn(group.apps.find(_.id == path)))
+      else group
     }
   }
 
@@ -104,13 +106,13 @@ case class Group(id: PathId,
     */
   private def putApplication(appDef: AppDefinition): Group = {
     copy(
-        // If there is a group with a conflicting id which contains no app definitions,
-        // replace it. Otherwise do not replace it. Validation will catch conflicting app/group IDs later.
-        groups = groups.filter { group =>
-          group.id != appDef.id || group.containsApps
-        },
-        // replace potentially existing app definition
-        apps = apps.filter(_.id != appDef.id) + appDef
+      // If there is a group with a conflicting id which contains no app definitions,
+      // replace it. Otherwise do not replace it. Validation will catch conflicting app/group IDs later.
+      groups = groups.filter { group =>
+        group.id != appDef.id || group.containsApps
+      },
+      // replace potentially existing app definition
+      apps = apps.filter(_.id != appDef.id) + appDef
     )
   }
 
@@ -128,7 +130,7 @@ case class Group(id: PathId,
       val (change, remaining) =
         groups.partition(_.id.restOf(id).root == gid.root)
       val toUpdate = change.headOption.getOrElse(
-          Group.empty.copy(id = id.append(gid.rootPath)))
+        Group.empty.copy(id = id.append(gid.rootPath)))
       this.copy(groups = remaining + toUpdate.makeGroup(gid.child))
     }
   }
@@ -171,10 +173,10 @@ case class Group(id: PathId,
 
   def dependencyGraph: DirectedGraph[AppDefinition, DefaultEdge] = {
     val graph = new DefaultDirectedGraph[AppDefinition, DefaultEdge](
-        classOf[DefaultEdge])
+      classOf[DefaultEdge])
     for (app <- transitiveApps) graph.addVertex(app)
-    for ((app, dependent) <- applicationDependencies) graph.addEdge(
-        app, dependent)
+    for ((app, dependent) <- applicationDependencies)
+      graph.addEdge(app, dependent)
     new UnmodifiableDirectedGraph(graph)
   }
 
@@ -224,11 +226,11 @@ object Group {
 
   def fromProto(msg: GroupDefinition): Group = {
     Group(
-        id = msg.getId.toPath,
-        apps = msg.getAppsList.map(AppDefinition.fromProto).toSet,
-        groups = msg.getGroupsList.map(fromProto).toSet,
-        dependencies = msg.getDependenciesList.map(PathId.apply).toSet,
-        version = Timestamp(msg.getVersion)
+      id = msg.getId.toPath,
+      apps = msg.getAppsList.map(AppDefinition.fromProto).toSet,
+      groups = msg.getGroupsList.map(fromProto).toSet,
+      dependencies = msg.getDependenciesList.map(PathId.apply).toSet,
+      version = Timestamp(msg.getVersion)
     )
   }
 
@@ -243,7 +245,7 @@ object Group {
       group.apps is every(AppDefinition.validNestedAppDefinition(base))
       group is noAppsAndGroupsWithSameName
       (group.id.isRoot is false) or
-      (group.dependencies is noCyclicDependencies(group))
+        (group.dependencies is noCyclicDependencies(group))
       group is validPorts
 
       group.dependencies is every(validPathWithBase(base))
@@ -261,11 +263,13 @@ object Group {
     new Validator[Group] {
       override def apply(group: Group): Result = {
         maxApps.filter(group.transitiveApps.size > _).map { num =>
-          Failure(Set(RuleViolation(
-                      group,
-                      s"""This Marathon instance may only handle up to $num Apps!
+          Failure(
+            Set(
+              RuleViolation(
+                group,
+                s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,
-                      None)))
+                None)))
         } getOrElse Success
       } and validator(group)
     }
@@ -292,25 +296,25 @@ object Group {
             servicePorts =>
               for {
                 existingApp <- group.transitiveApps.toList
-                                  if existingApp.id != app.id // in case of an update, do not compare the app against itself
+                if existingApp.id != app.id // in case of an update, do not compare the app against itself
                 existingServicePort <- existingApp.portMappings.toList.flatten
                                         .map(_.servicePort)
-                                          if existingServicePort != 0 // ignore zero ports, which will be chosen at random
-                                      if servicePorts contains existingServicePort
+                if existingServicePort != 0 // ignore zero ports, which will be chosen at random
+                if servicePorts contains existingServicePort
               } yield
                 RuleViolation(
-                    app.id,
-                    s"Requested service port $existingServicePort conflicts with a service port in app ${existingApp.id}",
-                    None)
+                  app.id,
+                  s"Requested service port $existingServicePort conflicts with a service port in app ${existingApp.id}",
+                  None)
           }
 
           if (ruleViolations.isEmpty) None
           else
             Some(
-                GroupViolation(app,
-                               "app contains conflicting ports",
-                               None,
-                               ruleViolations.toSet))
+              GroupViolation(app,
+                             "app contains conflicting ports",
+                             None,
+                             ruleViolations.toSet))
         }
 
         if (groupViolations.isEmpty) Success

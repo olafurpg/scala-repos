@@ -22,7 +22,7 @@ class RecipeFlattenSeq extends RecipeSpec {
       //#flattening-seqs
 
       Await.result(flattened.limit(8).runWith(Sink.seq), 3.seconds) should be(
-          List("1", "2", "3", "4", "5", "6", "7"))
+        List("1", "2", "3", "4", "5", "6", "7"))
     }
   }
 }

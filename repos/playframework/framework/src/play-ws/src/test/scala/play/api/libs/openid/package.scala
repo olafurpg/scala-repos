@@ -40,17 +40,18 @@ package object openid {
   def createDefaultResponse(
       claimedId: String,
       identity: String,
-      defaultSigned: String = "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle")
+      defaultSigned: String =
+        "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle")
     : Map[String, Seq[String]] = Map(
-      "openid.ns" -> "http://specs.openid.net/auth/2.0",
-      "openid.mode" -> "id_res",
-      "openid.op_endpoint" -> "https://www.google.com/a/example.com/o8/ud?be=o8",
-      "openid.claimed_id" -> claimedId,
-      "openid.identity" -> identity,
-      "openid.return_to" -> "https://example.com/openid?abc=false",
-      "openid.response_nonce" -> "2012-05-25T06:47:55ZEJvRv76xQcWbTG",
-      "openid.assoc_handle" -> "AMlYA9VC8_UIj4-y4K_X2E_mdv-123-ABC",
-      "openid.signed" -> defaultSigned,
-      "openid.sig" -> "MWRsJZ/9AOMQt9gH6zTZIfIjk6g="
+    "openid.ns" -> "http://specs.openid.net/auth/2.0",
+    "openid.mode" -> "id_res",
+    "openid.op_endpoint" -> "https://www.google.com/a/example.com/o8/ud?be=o8",
+    "openid.claimed_id" -> claimedId,
+    "openid.identity" -> identity,
+    "openid.return_to" -> "https://example.com/openid?abc=false",
+    "openid.response_nonce" -> "2012-05-25T06:47:55ZEJvRv76xQcWbTG",
+    "openid.assoc_handle" -> "AMlYA9VC8_UIj4-y4K_X2E_mdv-123-ABC",
+    "openid.signed" -> defaultSigned,
+    "openid.sig" -> "MWRsJZ/9AOMQt9gH6zTZIfIjk6g="
   )
 }

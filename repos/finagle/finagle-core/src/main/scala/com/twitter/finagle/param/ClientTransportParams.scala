@@ -84,8 +84,8 @@ class ClientTransportParams[A <: Stack.Parameterized[A]](
       credentials: Option[Transporter.Credentials]
   ): A =
     self.configured(
-        Transporter.SocksProxy(
-            Some(socketAddress),
-            credentials.map(c => (c.username, c.password))
-        ))
+      Transporter.SocksProxy(
+        Some(socketAddress),
+        credentials.map(c => (c.username, c.password))
+      ))
 }

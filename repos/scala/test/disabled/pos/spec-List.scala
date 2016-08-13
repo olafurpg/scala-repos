@@ -23,7 +23,9 @@ import annotation.tailrec
   *  @version 2.8
   */
 sealed trait List[@specialized +A]
-    extends LinearSeq[A] with Product with GenericTraversableTemplate[A, List]
+    extends LinearSeq[A]
+    with Product
+    with GenericTraversableTemplate[A, List]
     with LinearSeqOptimized[A, List[A]] {
   override def companion: GenericCompanion[List] = List
 
@@ -63,7 +65,7 @@ sealed trait List[@specialized +A]
 
   /** <p>
     *    Returns a list resulting from the concatenation of the given
-    *    list <code>prefix</code> and this list. 
+    *    list <code>prefix</code> and this list.
     *  </p>
     *
     *  @param prefix the list to concatenate at the beginning of this list.
@@ -155,7 +157,7 @@ sealed trait List[@specialized +A]
     */
   override def toList: List[A] = this
 
-  /** Returns the <code>n</code> first elements of this list, or else the whole 
+  /** Returns the <code>n</code> first elements of this list, or else the whole
     *  list, if it has less than <code>n</code> elements.
 
     *  @param n the number of elements to take.
@@ -447,8 +449,8 @@ case object Nil extends List[Nothing] {
   *  @version 1.0, 15/07/2003
   */
 @SerialVersionUID(0L - 8476791151983527571L)
-final case class ::[@specialized B](
-    private var hd: B, private[scala] var tl: List[B])
+final case class ::[@specialized B](private var hd: B,
+                                    private[scala] var tl: List[B])
     extends List[B] {
   override def head: B = hd
   override def tail: List[B] = tl
@@ -517,12 +519,12 @@ object List extends SeqFactory[List] {
     val down = step(start) < start
     val b = new ListBuffer[Int]
     var i = start
-    while ( (!up || i < end) && (!down || i > end)) {
+    while ((!up || i < end) && (!down || i > end)) {
       b += i
       val next = step(i)
       if (i == next)
         throw new IllegalArgumentException(
-            "the step function did not make any progress on " + i)
+          "the step function did not make any progress on " + i)
       i = next
     }
     b.toList
@@ -599,7 +601,7 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.lefts' instead")
   def lefts[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[A]](Nil)((e, as) =>
-          e match {
+      e match {
         case Left(a) => a :: as
         case Right(_) => as
     })
@@ -610,7 +612,7 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.rights' instead")
   def rights[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[B]](Nil)((e, bs) =>
-          e match {
+      e match {
         case Left(_) => bs
         case Right(b) => b :: bs
     })
@@ -739,7 +741,7 @@ object List extends SeqFactory[List] {
   /** Returns the list resulting from applying the given function <code>f</code>
     *  to corresponding elements of the argument lists.
     *  @param f function to apply to each pair of elements.
-    *  @return <code>[f(a0,b0), ..., f(an,bn)]</code> if the lists are 
+    *  @return <code>[f(a0,b0), ..., f(an,bn)]</code> if the lists are
     *          <code>[a0, ..., ak]</code>, <code>[b0, ..., bl]</code> and
     *          <code>n = min(k,l)</code>
     */
@@ -783,7 +785,7 @@ object List extends SeqFactory[List] {
     b.toList
   }
 
-  /** Tests whether the given predicate <code>p</code> holds 
+  /** Tests whether the given predicate <code>p</code> holds
     *  for all corresponding elements of the argument lists.
     *
     *  @param p function to apply to each pair of elements.

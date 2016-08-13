@@ -19,14 +19,14 @@ class LoggingFilter @Inject()(implicit ec: ExecutionContext)
       val startTime = System.currentTimeMillis
 
       val accumulator: Accumulator[ByteString, Result] = nextFilter(
-          requestHeader)
+        requestHeader)
 
       accumulator.map { result =>
         val endTime = System.currentTimeMillis
         val requestTime = endTime - startTime
 
         Logger.info(
-            s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
+          s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
         result.withHeaders("Request-Time" -> requestTime.toString)
       }
     }

@@ -31,7 +31,8 @@ class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
 }
 
 class FlashMapSupportSecondTestServlet
-    extends ScalatraServlet with FlashMapSupport {
+    extends ScalatraServlet
+    with FlashMapSupport {
   post("/redirect") {
     flash("message") = "redirected"
     redirect("/first/message")
@@ -89,7 +90,7 @@ class FlashMapSupportTest extends ScalatraFunSuite {
   }
 
   test(
-      "messages should be available in outer filter when flash map supports are nested") {
+    "messages should be available in outer filter when flash map supports are nested") {
     session {
       post("/message") {}
       get("/filter") {

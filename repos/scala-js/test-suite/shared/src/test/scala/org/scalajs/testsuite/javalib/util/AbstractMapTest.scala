@@ -18,5 +18,5 @@ abstract class AbstractMapTest extends MapTest {
 abstract class AbstractMapFactory extends MapFactory {
   def implementationName: String
 
-  def empty[K : ClassTag, V : ClassTag]: ju.AbstractMap[K, V]
+  def empty[K: ClassTag, V: ClassTag]: ju.AbstractMap[K, V]
 }

@@ -4,7 +4,12 @@ import java.io.File
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.{DependencyScope, LibraryOrderEntry, ModuleRootManager, OrderRootType}
+import com.intellij.openapi.roots.{
+  DependencyScope,
+  LibraryOrderEntry,
+  ModuleRootManager,
+  OrderRootType
+}
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
@@ -17,7 +22,8 @@ import org.jetbrains.plugins.scala.extensions._
   * @author ghik
   */
 class HoconMultiModuleIncludeResolutionTest
-    extends UsefulTestCase with HoconIncludeResolutionTest {
+    extends UsefulTestCase
+    with HoconIncludeResolutionTest {
   private var fixture: CodeInsightTestFixture = null
   private var modules: Map[String, Module] = null
   private val testdataPath = "testdata/hocon/includes/multimodule"
@@ -40,7 +46,7 @@ class HoconMultiModuleIncludeResolutionTest
       baseDir.listFiles.sortBy(_.getName).iterator.filter(_.isDirectory)
     val moduleFixtures = moduleDirs.map { dir =>
       val builder = fixtureBuilder.addModule(
-          classOf[JavaModuleFixtureBuilder[ModuleFixture]])
+        classOf[JavaModuleFixtureBuilder[ModuleFixture]])
       builder.addContentRoot(dir.getPath)
 
       def subpath(name: String) = new File(dir, name).getPath
@@ -79,8 +85,8 @@ class HoconMultiModuleIncludeResolutionTest
         model.commit()
       }
 
-      def addDependency(
-          dependingModule: Module, dependencyModule: Module): Unit = {
+      def addDependency(dependingModule: Module,
+                        dependencyModule: Module): Unit = {
         val model =
           ModuleRootManager.getInstance(dependingModule).getModifiableModel
         model.addModuleOrderEntry(dependencyModule).setExported(true)

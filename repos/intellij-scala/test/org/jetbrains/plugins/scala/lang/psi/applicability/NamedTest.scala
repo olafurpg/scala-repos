@@ -26,7 +26,7 @@ class NamedTest extends ApplicabilityTestBase {
     assertProblems("(a: A, b: B)", "(A, b = B)") {
       case Nil =>
     }
-    //TODO compiler allows such calls, they seem to be OK 
+    //TODO compiler allows such calls, they seem to be OK
     //    assertProblems("(a: A, b: B)", "(a = A, b)") {
     //      case Nil =>
     //    }
@@ -122,7 +122,8 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(a = B, b = A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"), Type("B")) :: Nil =>
+          Expression("A"),
+          Type("B")) :: Nil =>
     }
   }
 }

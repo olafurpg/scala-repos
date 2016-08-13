@@ -26,11 +26,11 @@ object RichXHandler {
 
   val BinaryProblem =
     "GUESS: This may be a problem with the binary version of a dependency. " +
-    "Check which versions of dependencies you're pulling in."
+      "Check which versions of dependencies you're pulling in."
 
   val RequiredCascadingFabricNotInClassPath =
     "GUESS: Required Cascading fabric is not supplied in the classpath." +
-    "Check which versions and variants of dependencies you're pulling in."
+      "Check which versions and variants of dependencies you're pulling in."
 
   val DataIsMissing = "GUESS: Data is missing from the path you provided."
 
@@ -38,12 +38,12 @@ object RichXHandler {
     "GUESS: Cascading requires all sources to have final sinks on disk."
 
   val mapping: Map[Class[_ <: Throwable], String] = Map(
-      classOf[ModeLoadException] -> RequiredCascadingFabricNotInClassPath,
-      classOf[NoClassDefFoundError] -> BinaryProblem,
-      classOf[AbstractMethodError] -> BinaryProblem,
-      classOf[NoSuchMethodError] -> BinaryProblem,
-      classOf[InvalidSourceException] -> DataIsMissing,
-      classOf[PlannerException] -> RequireSinks)
+    classOf[ModeLoadException] -> RequiredCascadingFabricNotInClassPath,
+    classOf[NoClassDefFoundError] -> BinaryProblem,
+    classOf[AbstractMethodError] -> BinaryProblem,
+    classOf[NoSuchMethodError] -> BinaryProblem,
+    classOf[InvalidSourceException] -> DataIsMissing,
+    classOf[PlannerException] -> RequireSinks)
 
   val gitHubUrl =
     "https://github.com/twitter/scalding/wiki/Common-Exceptions-and-possible-reasons#"
@@ -74,6 +74,6 @@ object RichXHandler {
 
   def apply(t: Throwable): String =
     mapping.get(peelUntilMappable(t)).map(_ + "\n").getOrElse("") +
-    "If you know what exactly caused this error, please consider contributing to GitHub via following link.\n" +
-    createXUrl(t)
+      "If you know what exactly caused this error, please consider contributing to GitHub via following link.\n" +
+      createXUrl(t)
 }

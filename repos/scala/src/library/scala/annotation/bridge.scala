@@ -11,6 +11,6 @@ package scala.annotation
 /** If this annotation is present on a method, it will be treated as a bridge method.
   */
 @deprecated(
-    "Reconsider whether using this annotation will accomplish anything",
-    "2.10.0")
+  "Reconsider whether using this annotation will accomplish anything",
+  "2.10.0")
 private[scala] class bridge extends scala.annotation.StaticAnnotation

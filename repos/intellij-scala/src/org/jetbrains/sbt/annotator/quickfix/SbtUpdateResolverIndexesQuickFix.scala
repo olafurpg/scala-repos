@@ -5,7 +5,10 @@ import com.intellij.codeInsight.intention.AbstractIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import org.jetbrains.sbt.resolvers.{SbtResolverIndexesManager, SbtResolverUtils}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolverIndexesManager,
+  SbtResolverUtils
+}
 
 /**
   * @author Nikolay Obedin

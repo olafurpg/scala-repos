@@ -18,8 +18,9 @@ abstract class HostDirectives extends FileAndResourceDirectives {
     * Rejects all requests with a host name different from the given one.
     */
   @varargs
-  def host(
-      hostName: String, innerRoute: Route, moreInnerRoutes: Route*): Route =
+  def host(hostName: String,
+           innerRoute: Route,
+           moreInnerRoutes: Route*): Route =
     HostNameFilter(hostName :: Nil)(innerRoute, moreInnerRoutes.toList)
 
   /**
@@ -29,8 +30,8 @@ abstract class HostDirectives extends FileAndResourceDirectives {
   def host(hostNames: JIterable[String],
            innerRoute: Route,
            moreInnerRoutes: Route*): Route =
-    HostNameFilter(hostNames.asScala.toList)(
-        innerRoute, moreInnerRoutes.toList)
+    HostNameFilter(hostNames.asScala.toList)(innerRoute,
+                                             moreInnerRoutes.toList)
 
   /**
     * Rejects all requests for whose host name the given predicate function returns false.

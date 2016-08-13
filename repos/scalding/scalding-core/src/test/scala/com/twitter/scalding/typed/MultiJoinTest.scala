@@ -44,23 +44,29 @@ class MultiJoinTest extends WordSpec {
   "The flatten methods" should {
     "actually match the outputs of joins" in {
 
-      val joinedFlat: CoGrouped[Int,
-                                (Double, Long, String, Set[Int],
-                                Map[Int, Int])] = joined.mapValues { x =>
-        flattenNestedTuple(x)
+      val joinedFlat: CoGrouped[
+        Int,
+        (Double, Long, String, Set[Int], Map[Int, Int])] = joined.mapValues {
+        x =>
+          flattenNestedTuple(x)
       }
 
       val leftJoinedFlat: CoGrouped[Int,
-                                    (Double, Option[Long], Option[String],
-                                    Option[Set[Int]], Option[Map[Int, Int]])] =
+                                    (Double,
+                                     Option[Long],
+                                     Option[String],
+                                     Option[Set[Int]],
+                                     Option[Map[Int, Int]])] =
         leftJoined.mapValues { x =>
           flattenNestedTuple(x)
         }
 
       val outerJoinedFlat: CoGrouped[Int,
-                                     (Option[Double], Option[Long],
-                                     Option[String], Option[Set[Int]],
-                                     Option[Map[Int, Int]])] =
+                                     (Option[Double],
+                                      Option[Long],
+                                      Option[String],
+                                      Option[Set[Int]],
+                                      Option[Map[Int, Int]])] =
         outerJoined.mapValues { x =>
           flattenNestedOptionTuple(x)
         }
@@ -68,19 +74,25 @@ class MultiJoinTest extends WordSpec {
 
     "Have implicit flattenValueTuple methods for low arity" in {
 
-      val joinedFlat: CoGrouped[Int,
-                                (Double, Long, String, Set[Int],
-                                Map[Int, Int])] = joined.flattenValueTuple
+      val joinedFlat: CoGrouped[
+        Int,
+        (Double, Long, String, Set[Int], Map[Int, Int])] =
+        joined.flattenValueTuple
 
       val leftJoinedFlat: CoGrouped[Int,
-                                    (Double, Option[Long], Option[String],
-                                    Option[Set[Int]], Option[Map[Int, Int]])] =
+                                    (Double,
+                                     Option[Long],
+                                     Option[String],
+                                     Option[Set[Int]],
+                                     Option[Map[Int, Int]])] =
         leftJoined.flattenValueTuple
 
       val outerJoinedFlat: CoGrouped[Int,
-                                     (Option[Double], Option[Long],
-                                     Option[String], Option[Set[Int]],
-                                     Option[Map[Int, Int]])] =
+                                     (Option[Double],
+                                      Option[Long],
+                                      Option[String],
+                                      Option[Set[Int]],
+                                      Option[Map[Int, Int]])] =
         outerJoined.flattenValueTuple
     }
   }

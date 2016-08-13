@@ -102,9 +102,11 @@ class FlowConcatSpec extends BaseTwoStreamsSetup {
       val subscriber = setup(nonemptyPublisher(1 to 4), failedPublisher)
       subscriber.expectSubscription().request(5)
 
-      val errorSignalled = (1 to 4).foldLeft(false)((errorSignalled, e) ⇒
-            if (!errorSignalled)
-              subscriber.expectNextOrError(e, TestException).isLeft else true)
+      val errorSignalled = (1 to 4).foldLeft(false)(
+        (errorSignalled, e) ⇒
+          if (!errorSignalled)
+            subscriber.expectNextOrError(e, TestException).isLeft
+          else true)
       if (!errorSignalled) subscriber.expectSubscriptionAndError(TestException)
     }
 
@@ -117,9 +119,11 @@ class FlowConcatSpec extends BaseTwoStreamsSetup {
       val subscriber = setup(nonemptyPublisher(1 to 4), soonToFailPublisher)
       subscriber.expectSubscription().request(5)
 
-      val errorSignalled = (1 to 4).foldLeft(false)((errorSignalled, e) ⇒
-            if (!errorSignalled)
-              subscriber.expectNextOrError(e, TestException).isLeft else true)
+      val errorSignalled = (1 to 4).foldLeft(false)(
+        (errorSignalled, e) ⇒
+          if (!errorSignalled)
+            subscriber.expectNextOrError(e, TestException).isLeft
+          else true)
       if (!errorSignalled) subscriber.expectSubscriptionAndError(TestException)
     }
 
@@ -141,7 +145,7 @@ class FlowConcatSpec extends BaseTwoStreamsSetup {
       val testSource =
         Source(1 to 5).concatMat(Source(6 to 10))(Keep.both).grouped(1000)
       Await.result(testSource.runWith(Sink.head), 3.seconds) should ===(
-          1 to 10)
+        1 to 10)
 
       val runnable = testSource.toMat(Sink.ignore)(Keep.left)
       val (m1, m2) = runnable.run()
@@ -155,8 +159,8 @@ class FlowConcatSpec extends BaseTwoStreamsSetup {
       val testFlow: Flow[Int, Seq[Int], (NotUsed, NotUsed)] =
         Flow[Int].concatMat(Source(6 to 10))(Keep.both).grouped(1000)
       Await.result(
-          Source(1 to 5).viaMat(testFlow)(Keep.both).runWith(Sink.head),
-          3.seconds) should ===(1 to 10)
+        Source(1 to 5).viaMat(testFlow)(Keep.both).runWith(Sink.head),
+        3.seconds) should ===(1 to 10)
 
       val runnable = Source(1 to 5).viaMat(testFlow)(Keep.both).to(Sink.ignore)
       val x = runnable.run()
@@ -172,8 +176,8 @@ class FlowConcatSpec extends BaseTwoStreamsSetup {
       val testFlow =
         Flow[Int].concatMat(Source(6 to 10))(Keep.both).grouped(1000)
       Await.result(
-          Source(1 to 5).viaMat(testFlow)(Keep.both).runWith(Sink.head),
-          3.seconds) should ===(1 to 10)
+        Source(1 to 5).viaMat(testFlow)(Keep.both).runWith(Sink.head),
+        3.seconds) should ===(1 to 10)
 
       val sink = testFlow
         .concatMat(Source(1 to 5))(Keep.both)

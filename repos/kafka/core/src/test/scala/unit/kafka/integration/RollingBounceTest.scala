@@ -37,8 +37,8 @@ class RollingBounceTest extends ZooKeeperTestHarness {
     configs(3).put("controlled.shutdown.retry.backoff.ms", "100")
 
     // start all the servers
-    servers = configs.map(
-        c => TestUtils.createServer(KafkaConfig.fromProps(c)))
+    servers =
+      configs.map(c => TestUtils.createServer(KafkaConfig.fromProps(c)))
   }
 
   @After
@@ -98,12 +98,12 @@ class RollingBounceTest extends ZooKeeperTestHarness {
       servers((startIndex + 1) % 4).shutdown()
       prevLeader = (startIndex + 1) % 4
     }
-    var newleader = waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId)
+    var newleader =
+      waitUntilLeaderIsElectedOrChanged(zkUtils, topic, partitionId)
     // Ensure the new leader is different from the old
     assertTrue("Leader transition did not happen for " + topic,
                newleader.getOrElse(-1) != -1 &&
-               (newleader.getOrElse(-1) != prevLeader))
+                 (newleader.getOrElse(-1) != prevLeader))
     // Start the server back up again
     servers(prevLeader).startup()
   }

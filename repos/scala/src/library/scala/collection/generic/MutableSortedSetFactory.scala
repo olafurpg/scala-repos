@@ -22,7 +22,7 @@ import scala.language.higherKinds
   */
 abstract class MutableSortedSetFactory[
     CC[A] <: mutable.SortedSet[A] with SortedSetLike[A, CC[A]] with mutable.Set[
-        A] with mutable.SetLike[A, CC[A]]]
+      A] with mutable.SetLike[A, CC[A]]]
     extends SortedSetFactory[CC] {
 
   /**

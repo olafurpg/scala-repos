@@ -37,7 +37,7 @@ private[mllib] class RandomRDDPartition[T](
 }
 
 // These two classes are necessary since Range objects in Scala cannot have size > Int.MaxValue
-private[mllib] class RandomRDD[T : ClassTag](
+private[mllib] class RandomRDD[T: ClassTag](
     sc: SparkContext,
     size: Long,
     numPartitions: Int,
@@ -75,8 +75,8 @@ private[mllib] class RandomVectorRDD(
   require(math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
           "Partition size cannot exceed Int.MaxValue")
 
-  override def compute(
-      splitIn: Partition, context: TaskContext): Iterator[Vector] = {
+  override def compute(splitIn: Partition,
+                       context: TaskContext): Iterator[Vector] = {
     val split = splitIn.asInstanceOf[RandomRDDPartition[Double]]
     RandomRDD.getVectorIterator(split, vectorSize)
   }
@@ -100,8 +100,8 @@ private[mllib] object RandomRDD {
     val random = new Random(seed)
     while (i < numPartitions) {
       end = ((i + 1) * size) / numPartitions
-      partitions(i) = new RandomRDDPartition(
-          i, (end - start).toInt, rng, random.nextLong())
+      partitions(i) =
+        new RandomRDDPartition(i, (end - start).toInt, rng, random.nextLong())
       start = end
       i += 1
     }
@@ -110,7 +110,7 @@ private[mllib] object RandomRDD {
 
   // The RNG has to be reset every time the iterator is requested to guarantee same data
   // every time the content of the RDD is examined.
-  def getPointIterator[T : ClassTag](
+  def getPointIterator[T: ClassTag](
       partition: RandomRDDPartition[T]): Iterator[T] = {
     val generator = partition.generator.copy()
     generator.setSeed(partition.seed)
@@ -124,6 +124,6 @@ private[mllib] object RandomRDD {
     val generator = partition.generator.copy()
     generator.setSeed(partition.seed)
     Iterator.fill(partition.size)(
-        new DenseVector(Array.fill(vectorSize)(generator.nextValue())))
+      new DenseVector(Array.fill(vectorSize)(generator.nextValue())))
   }
 }

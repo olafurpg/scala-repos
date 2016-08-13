@@ -2,7 +2,11 @@ package com.twitter.finagle.factory
 
 import com.twitter.finagle._
 import com.twitter.finagle.addr.WeightedAddress
-import com.twitter.finagle.service.{DelayedFactory, FailingFactory, ServiceFactoryRef}
+import com.twitter.finagle.service.{
+  DelayedFactory,
+  FailingFactory,
+  ServiceFactoryRef
+}
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.util.{Drv, Rng}
 import com.twitter.util._
@@ -21,9 +25,9 @@ private[finagle] object TrafficDistributor {
     * An intermediate representation of the endpoints that a load balancer
     * operates over, capable of being updated.
     */
-  type BalancerEndpoints[Req, Rep] = Var[Activity.State[Set[ServiceFactory[
-                  Req, Rep]]]] with Updatable[Activity.State[Set[
-              ServiceFactory[Req, Rep]]]]
+  type BalancerEndpoints[Req, Rep] =
+    Var[Activity.State[Set[ServiceFactory[Req, Rep]]]] with Updatable[
+      Activity.State[Set[ServiceFactory[Req, Rep]]]]
 
   /**
     * Represents cache entries for load balancer instances. Stores both
@@ -39,8 +43,9 @@ private[finagle] object TrafficDistributor {
     * size of the balancers backing collection. The [[Distributor]]
     * operates over these.
     */
-  case class WeightClass[Req, Rep](
-      balancer: ServiceFactory[Req, Rep], weight: Double, size: Int)
+  case class WeightClass[Req, Rep](balancer: ServiceFactory[Req, Rep],
+                                   weight: Double,
+                                   size: Int)
 
   /**
     * Folds and accumulates over an [[Activity]] based event `stream` while biasing
@@ -74,12 +79,12 @@ private[finagle] object TrafficDistributor {
   /**
     * Distributes requests to `classes` according to their weight and size.
     */
-  private class Distributor[Req, Rep](
-      classes: Iterable[WeightClass[Req, Rep]], rng: Rng = Rng.threadLocal)
+  private class Distributor[Req, Rep](classes: Iterable[WeightClass[Req, Rep]],
+                                      rng: Rng = Rng.threadLocal)
       extends ServiceFactory[Req, Rep] {
 
     private[this] val (balancers, drv): (IndexedSeq[ServiceFactory[Req, Rep]],
-    Drv) = {
+                                         Drv) = {
       val tupled = classes.map {
         case WeightClass(b, weight, size) => (b, weight * size)
       }
@@ -126,7 +131,8 @@ private[finagle] class TrafficDistributor[Req, Rep](
     dest: Activity[Set[Address]],
     newEndpoint: Address => ServiceFactory[Req, Rep],
     newBalancer: Activity[Set[ServiceFactory[Req, Rep]]] => ServiceFactory[
-        Req, Rep],
+      Req,
+      Rep],
     eagerEviction: Boolean,
     rng: Rng = Rng.threadLocal,
     statsReceiver: StatsReceiver = NullStatsReceiver)
@@ -262,7 +268,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
   private[this] val weightClasses = partition(weightEndpoints(dest.states))
   private[this] val pending = new Promise[ServiceFactory[Req, Rep]]
   private[this] val init: ServiceFactory[Req, Rep] = new DelayedFactory(
-      pending)
+    pending)
 
   @volatile
   private[this] var meanWeight = 0.0f
@@ -274,11 +280,12 @@ private[finagle] class TrafficDistributor[Req, Rep](
   private[this] def updateMeanWeight(
       classes: Iterable[WeightClass[Req, Rep]]): Unit = {
     val size = classes.map(_.size).sum
-    meanWeight = if (size != 0)
-      classes.map { c =>
-        c.weight * c.size
-      }.sum.toFloat / size
-    else 0.0F
+    meanWeight =
+      if (size != 0)
+        classes.map { c =>
+          c.weight * c.size
+        }.sum.toFloat / size
+      else 0.0F
   }
 
   // Translate the stream of weightClasses into a stream of underlying
@@ -288,7 +295,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
       case (_, Activity.Ok(wcs)) if wcs.isEmpty =>
         // Defer the handling of an empty destination set to `newBalancer`
         val emptyBal = newBalancer(
-            Activity(Var(Activity.Ok(Set.empty[ServiceFactory[Req, Rep]]))))
+          Activity(Var(Activity.Ok(Set.empty[ServiceFactory[Req, Rep]]))))
         updateMeanWeight(wcs)
         pending.updateIfEmpty(Return(emptyBal))
         emptyBal

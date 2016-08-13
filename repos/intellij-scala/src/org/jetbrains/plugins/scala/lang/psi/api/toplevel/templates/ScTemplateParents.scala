@@ -8,16 +8,23 @@ package templates
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement,
+  ScTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.macroAnnotations.{ModCount, Cached}
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   * Time: 9:23:53
@@ -41,8 +48,8 @@ trait ScTemplateParents extends ScalaPsiElement {
 }
 
 object ScTemplateParents {
-  def extractSupers(
-      typeElements: Seq[ScTypeElement], project: Project): Seq[PsiClass] = {
+  def extractSupers(typeElements: Seq[ScTypeElement],
+                    project: Project): Seq[PsiClass] = {
     typeElements.map {
       case element: ScTypeElement =>
         def tail(): PsiClass = {

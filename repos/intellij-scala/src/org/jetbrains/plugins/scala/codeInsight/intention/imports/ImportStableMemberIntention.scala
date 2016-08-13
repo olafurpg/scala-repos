@@ -18,8 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
   * 2014-03-17
   */
 class ImportStableMemberIntention extends PsiElementBaseIntentionAction {
-  override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement): Boolean = {
     val refAtCaret =
       PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (refAtCaret == null) return false
@@ -27,8 +28,9 @@ class ImportStableMemberIntention extends PsiElementBaseIntentionAction {
     checkReference(refAtCaret)
   }
 
-  override def invoke(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
+  override def invoke(project: Project,
+                      editor: Editor,
+                      element: PsiElement): Unit = {
     val refAtCaret =
       PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (refAtCaret == null || !checkReference(refAtCaret)) return

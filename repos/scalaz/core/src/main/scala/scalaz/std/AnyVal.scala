@@ -67,7 +67,7 @@ trait AnyValInstances {
   import Tags.{Conjunction, Disjunction}
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[
-      Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] =
+    Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] =
     new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] {
       def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) =
         Disjunction(Tag.unwrap(f1) || Tag.unwrap(f2))
@@ -95,7 +95,7 @@ trait AnyValInstances {
     }
 
   implicit val booleanConjunctionNewTypeInstance: Monoid[
-      Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] =
+    Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] =
     new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
       def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) =
         Conjunction(Tag.unwrap(f1) && Tag.unwrap(f2))
@@ -146,7 +146,7 @@ trait AnyValInstances {
   import Tags.{Multiplication}
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[
-      Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication]
+    Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication]
   with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toByte)
@@ -197,7 +197,7 @@ trait AnyValInstances {
     }
 
   implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[
-      Char @@ Multiplication] = new Monoid[Char @@ Multiplication]
+    Char @@ Multiplication] = new Monoid[Char @@ Multiplication]
   with Enum[Char @@ Multiplication] {
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toChar)
@@ -248,7 +248,7 @@ trait AnyValInstances {
     }
 
   implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[
-      Short @@ Multiplication] = new Monoid[Short @@ Multiplication]
+    Short @@ Multiplication] = new Monoid[Short @@ Multiplication]
   with Enum[Short @@ Multiplication] {
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toShort)
@@ -297,7 +297,7 @@ trait AnyValInstances {
     }
 
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[
-      Int @@ Multiplication] = new Monoid[Int @@ Multiplication]
+    Int @@ Multiplication] = new Monoid[Int @@ Multiplication]
   with Enum[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) =
       Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
@@ -346,7 +346,7 @@ trait AnyValInstances {
     }
 
   implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[
-      Long @@ Multiplication] = new Monoid[Long @@ Multiplication]
+    Long @@ Multiplication] = new Monoid[Long @@ Multiplication]
   with Enum[Long @@ Multiplication] {
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) =
       Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
@@ -517,8 +517,8 @@ trait BooleanFunctions {
       implicit M: Applicative[M]): M[Unit] = M.unlessM(cond)(f)
 
   /** A version of `unlessM` that infers the type constructor `M`. */
-  final def unlessMU[MA](cond: Boolean)(
-      f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] =
+  final def unlessMU[MA](cond: Boolean)(f: => MA)(
+      implicit M: Unapply[Applicative, MA]): M.M[Unit] =
     M.TC.unlessM(cond)(M(f))
 
   /**
@@ -563,26 +563,26 @@ trait BooleanFunctions {
     * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
     * for `M`.
     */
-  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(
-      implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+  final def pointOrEmpty[M[_], A](cond: Boolean)(
+      a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (cond) M.point(a) else M0.empty
 
   /**
     * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
     * for `M`.
     */
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(
-      implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+  final def emptyOrPure[M[_], A](cond: Boolean)(
+      a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](
-      cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M],
+                                                M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
     }
 
-  final def emptyOrPureNT[M[_]](
-      cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M],
+                                               M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
     }

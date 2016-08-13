@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Apps]] */
 class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
-    extends Apps with Logging {
+    extends Apps
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "apps")
@@ -50,30 +51,33 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
 
   def get(id: Int): Option[App] = DB readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName WHERE id = ${id}"
-      .map(rs =>
-            App(id = rs.int("id"),
-                name = rs.string("name"),
-                description = rs.stringOpt("description")))
+      .map(
+        rs =>
+          App(id = rs.int("id"),
+              name = rs.string("name"),
+              description = rs.stringOpt("description")))
       .single()
       .apply()
   }
 
   def getByName(name: String): Option[App] = DB readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName WHERE name = ${name}"
-      .map(rs =>
-            App(id = rs.int("id"),
-                name = rs.string("name"),
-                description = rs.stringOpt("description")))
+      .map(
+        rs =>
+          App(id = rs.int("id"),
+              name = rs.string("name"),
+              description = rs.stringOpt("description")))
       .single()
       .apply()
   }
 
   def getAll(): Seq[App] = DB readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName"
-      .map(rs =>
-            App(id = rs.int("id"),
-                name = rs.string("name"),
-                description = rs.stringOpt("description")))
+      .map(
+        rs =>
+          App(id = rs.int("id"),
+              name = rs.string("name"),
+              description = rs.stringOpt("description")))
       .list()
       .apply()
   }

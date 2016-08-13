@@ -16,7 +16,12 @@
   */
 package kafka.utils.timer
 
-import java.util.concurrent.{CountDownLatch, ExecutorService, Executors, TimeUnit}
+import java.util.concurrent.{
+  CountDownLatch,
+  ExecutorService,
+  Executors,
+  TimeUnit
+}
 
 import org.junit.Assert._
 import java.util.concurrent.atomic._

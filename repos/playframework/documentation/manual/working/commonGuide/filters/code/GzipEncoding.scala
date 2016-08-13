@@ -30,12 +30,12 @@ object GzipEncoding extends PlaySpecification {
 
         val filter = //#should-gzip
         new GzipFilter(shouldGzip = (request, response) =>
-                response.body.contentType.exists(_.startsWith("text/html")))
+          response.body.contentType.exists(_.startsWith("text/html")))
         //#should-gzip
 
         header(
-            CONTENT_ENCODING,
-            filter(Action(Results.Ok("foo")))(gzipRequest).run()) must beNone
+          CONTENT_ENCODING,
+          filter(Action(Results.Ok("foo")))(gzipRequest).run()) must beNone
       }
     }
 
@@ -49,8 +49,8 @@ object GzipEncoding extends PlaySpecification {
         val filter = (new CustomFilters).gzipFilter
 
         header(
-            CONTENT_ENCODING,
-            filter(Action(Results.Ok("foo")))(gzipRequest).run()) must beNone
+          CONTENT_ENCODING,
+          filter(Action(Results.Ok("foo")))(gzipRequest).run()) must beNone
       }
     }
   }

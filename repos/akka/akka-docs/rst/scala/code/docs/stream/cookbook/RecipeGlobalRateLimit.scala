@@ -23,8 +23,10 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       def props(maxAvailableTokens: Int,
                 tokenRefreshPeriod: FiniteDuration,
                 tokenRefreshAmount: Int): Props =
-        Props(new Limiter(
-                maxAvailableTokens, tokenRefreshPeriod, tokenRefreshAmount))
+        Props(
+          new Limiter(maxAvailableTokens,
+                      tokenRefreshPeriod,
+                      tokenRefreshAmount))
     }
 
     class Limiter(val maxAvailableTokens: Int,
@@ -47,8 +49,8 @@ class RecipeGlobalRateLimit extends RecipeSpec {
 
       val open: Receive = {
         case ReplenishTokens =>
-          permitTokens = math.min(
-              permitTokens + tokenRefreshAmount, maxAvailableTokens)
+          permitTokens =
+            math.min(permitTokens + tokenRefreshAmount, maxAvailableTokens)
         case WantToPass =>
           permitTokens -= 1
           sender() ! MayPass
@@ -57,8 +59,8 @@ class RecipeGlobalRateLimit extends RecipeSpec {
 
       val closed: Receive = {
         case ReplenishTokens =>
-          permitTokens = math.min(
-              permitTokens + tokenRefreshAmount, maxAvailableTokens)
+          permitTokens =
+            math.min(permitTokens + tokenRefreshAmount, maxAvailableTokens)
           releaseWaiting()
         case WantToPass =>
           waitQueue = waitQueue.enqueue(sender())
@@ -75,7 +77,7 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       override def postStop(): Unit = {
         replenishTimer.cancel()
         waitQueue foreach
-        (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
+          (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
       }
     }
     //#global-limiter-actor
@@ -88,12 +90,11 @@ class RecipeGlobalRateLimit extends RecipeSpec {
           maxAllowedWait: FiniteDuration): Flow[T, T, NotUsed] = {
         import akka.pattern.ask
         import akka.util.Timeout
-        Flow[T].mapAsync(4)((element: T) =>
-              {
-            import system.dispatcher
-            implicit val triggerTimeout = Timeout(maxAllowedWait)
-            val limiterTriggerFuture = limiter ? Limiter.WantToPass
-            limiterTriggerFuture.map((_) => element)
+        Flow[T].mapAsync(4)((element: T) => {
+          import system.dispatcher
+          implicit val triggerTimeout = Timeout(maxAllowedWait)
+          val limiterTriggerFuture = limiter ? Limiter.WantToPass
+          limiterTriggerFuture.map((_) => element)
         })
       }
       //#global-limiter-flow

@@ -78,7 +78,7 @@ case class JsLookup(result: JsLookupResult) extends AnyVal {
         .get(fieldName)
         .map(JsDefined.apply)
         .getOrElse(
-            JsUndefined("'" + fieldName + "' is undefined on object: " + obj))
+          JsUndefined("'" + fieldName + "' is undefined on object: " + obj))
     case JsDefined(o) =>
       JsUndefined(o + " is not an object")
     case undef => undef
@@ -91,9 +91,8 @@ case class JsLookup(result: JsLookupResult) extends AnyVal {
     */
   def \\(fieldName: String): Seq[JsValue] = result match {
     case JsDefined(obj: JsObject) =>
-      obj.value.foldLeft(Seq[JsValue]())(
-          (o, pair) =>
-            pair match {
+      obj.value.foldLeft(Seq[JsValue]())((o, pair) =>
+        pair match {
           case (key, value) if key == fieldName =>
             o ++ (value +: (value \\ fieldName))
           case (_, value) => o ++ (value \\ fieldName)

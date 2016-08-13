@@ -20,37 +20,37 @@ object DevModeBuild {
   }
 
   def settings: Seq[Setting[_]] = Seq(
-      DevModeKeys.writeRunProperties := {
-        IO.write(file("run.properties"),
-                 s"project.version=${play.core.PlayVersion.current}")
-      },
-      DevModeKeys.waitForServer := {
-        DevModeBuild.waitForServer()
-      },
-      DevModeKeys.resetReloads := {
-        (target.value / "reload.log").delete()
-      },
-      DevModeKeys.verifyReloads := {
-        val expected = Def.spaceDelimited().parsed.head.toInt
-        val actual = try IO
-          .readLines(target.value / "reload.log")
-          .count(_.nonEmpty) catch {
+    DevModeKeys.writeRunProperties := {
+      IO.write(file("run.properties"),
+               s"project.version=${play.core.PlayVersion.current}")
+    },
+    DevModeKeys.waitForServer := {
+      DevModeBuild.waitForServer()
+    },
+    DevModeKeys.resetReloads := {
+      (target.value / "reload.log").delete()
+    },
+    DevModeKeys.verifyReloads := {
+      val expected = Def.spaceDelimited().parsed.head.toInt
+      val actual =
+        try IO.readLines(target.value / "reload.log").count(_.nonEmpty)
+        catch {
           case _: java.io.IOException => 0
         }
-        if (expected == actual) {
-          println(s"Expected and got $expected reloads")
-        } else {
-          throw new RuntimeException(
-              s"Expected $expected reloads but got $actual")
-        }
-      },
-      DevModeKeys.verifyResourceContains := {
-        val args = Def.spaceDelimited("<path> <status> <words> ...").parsed
-        val path = args.head
-        val status = args.tail.head.toInt
-        val assertions = args.tail.tail
-        DevModeBuild.verifyResourceContains(path, status, assertions, 0)
+      if (expected == actual) {
+        println(s"Expected and got $expected reloads")
+      } else {
+        throw new RuntimeException(
+          s"Expected $expected reloads but got $actual")
       }
+    },
+    DevModeKeys.verifyResourceContains := {
+      val args = Def.spaceDelimited("<path> <status> <words> ...").parsed
+      val path = args.head
+      val status = args.tail.head.toInt
+      val assertions = args.tail.tail
+      DevModeBuild.verifyResourceContains(path, status, assertions, 0)
+    }
   )
 
   val ServerMaxAttempts = 3 * 60
@@ -67,10 +67,10 @@ object DevModeBuild {
       connection match {
         case h: java.net.HttpURLConnection =>
           println(
-              s"Server gave us status ${h.getResponseCode} ${h.getResponseMessage}")
+            s"Server gave us status ${h.getResponseCode} ${h.getResponseMessage}")
           if (h.getResponseCode != 200)
             throw new Exception(
-                s"Bad response code ${h.getResponseCode} from server")
+              s"Bad response code ${h.getResponseCode} from server")
         case _ =>
           println(s"Not an HttpURLConnection? ${connection.getClass.getName}")
       }
@@ -109,7 +109,7 @@ object DevModeBuild {
         messages += s"Resource at $path returned $status as expected"
       } else {
         throw new RuntimeException(
-            s"Resource at $path returned ${conn.getResponseCode} instead of $status")
+          s"Resource at $path returned ${conn.getResponseCode} instead of $status")
       }
 
       val is =
@@ -133,7 +133,7 @@ object DevModeBuild {
           messages += s"Resource at $path contained $assertion"
         } else {
           throw new RuntimeException(
-              s"Resource at $path didn't contain '$assertion':\n$contents")
+            s"Resource at $path didn't contain '$assertion':\n$contents")
         }
       }
 

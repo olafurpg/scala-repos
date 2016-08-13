@@ -2,9 +2,22 @@ package com.twitter.finagle.client
 
 import com.twitter.finagle._
 import com.twitter.finagle.factory.TimeoutFactory
-import com.twitter.finagle.loadbalancer.{DefaultBalancerFactory, LoadBalancerFactory}
-import com.twitter.finagle.service.{ExpiringService, FailFastFactory, FailureAccrualFactory, TimeoutFilter, ResponseClassifier}
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.loadbalancer.{
+  DefaultBalancerFactory,
+  LoadBalancerFactory
+}
+import com.twitter.finagle.service.{
+  ExpiringService,
+  FailFastFactory,
+  FailureAccrualFactory,
+  TimeoutFilter,
+  ResponseClassifier
+}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util._
@@ -66,10 +79,11 @@ case class DefaultClient[Req, Rep](
     maxLifetime: Duration = Duration.Top,
     requestTimeout: Duration = Duration.Top,
     failFast: Boolean = true,
-    failureAccrual: Transformer[Req, Rep] = new DefaultClient.UninitializedFailureAccrual
+    failureAccrual: Transformer[Req, Rep] =
+      new DefaultClient.UninitializedFailureAccrual
       with Transformer[Req, Rep] {
-      def apply(f: ServiceFactory[Req, Rep]) = f
-    },
+        def apply(f: ServiceFactory[Req, Rep]) = f
+      },
     serviceTimeout: Duration = Duration.Top,
     timer: Timer = DefaultTimer.twitter,
     statsReceiver: StatsReceiver = ClientStatsReceiver,
@@ -78,10 +92,9 @@ case class DefaultClient[Req, Rep](
     monitor: Monitor = DefaultMonitor,
     reporter: ReporterFactory = LoadedReporterFactory,
     loadBalancer: LoadBalancerFactory = DefaultBalancerFactory,
-    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
-        .clientModule[Req, Rep]
-)
-    extends Client[Req, Rep] { outer =>
+    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] =
+      TraceInitializerFilter.clientModule[Req, Rep]
+) extends Client[Req, Rep] { outer =>
 
   private[this] def transform(stack: Stack[ServiceFactory[Req, Rep]]) = {
     val failureAccrualTransform: Transformer[Req, Rep] = failureAccrual match {
@@ -94,7 +107,7 @@ case class DefaultClient[Req, Rep](
               .defaultFailureAccrual(statsReceiver, classifier)
               .andThen(factory)
           }
-        case _ => failureAccrual
+      case _ => failureAccrual
     }
 
     val stk = stack
@@ -107,20 +120,20 @@ case class DefaultClient[Req, Rep](
 
   private[this] val clientStack = transform(StackClient.newStack[Req, Rep])
   private[this] val endpointStack = transform(
-      StackClient.endpointStack[Req, Rep])
+    StackClient.endpointStack[Req, Rep])
 
   private[this] val params =
     Stack.Params.empty + param.Label(name) + param.Timer(timer) +
-    param.Monitor(monitor) + param.Stats(statsReceiver) +
-    param.Tracer(tracer) + param.Reporter(reporter) +
-    LoadBalancerFactory.HostStats(hostStatsReceiver) +
-    LoadBalancerFactory.Param(loadBalancer) + TimeoutFactory.Param(
-        serviceTimeout) + TimeoutFilter.Param(requestTimeout) +
-    ExpiringService.Param(maxIdletime, maxLifetime)
+      param.Monitor(monitor) + param.Stats(statsReceiver) +
+      param.Tracer(tracer) + param.Reporter(reporter) +
+      LoadBalancerFactory.HostStats(hostStatsReceiver) +
+      LoadBalancerFactory.Param(loadBalancer) + TimeoutFactory.Param(
+      serviceTimeout) + TimeoutFilter.Param(requestTimeout) +
+      ExpiringService.Param(maxIdletime, maxLifetime)
 
-  private[this] case class Client(
-      stack: Stack[ServiceFactory[Req, Rep]] = clientStack,
-      params: Stack.Params = params)
+  private[this] case class Client(stack: Stack[ServiceFactory[Req, Rep]] =
+                                    clientStack,
+                                  params: Stack.Params = params)
       extends StdStackClient[Req, Rep, Client] {
 
     protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
@@ -137,8 +150,9 @@ case class DefaultClient[Req, Rep](
     protected def newDispatcher(transport: Transport[In, Out]) = throw unimpl
 
     override protected val endpointer: Stackable[ServiceFactory[Req, Rep]] =
-      new Stack.Module2[
-          Transporter.EndpointAddr, param.Stats, ServiceFactory[Req, Rep]] {
+      new Stack.Module2[Transporter.EndpointAddr,
+                        param.Stats,
+                        ServiceFactory[Req, Rep]] {
         val role = com.twitter.finagle.stack.Endpoint
         val description = "Send requests over the wire"
         def make(_addr: Transporter.EndpointAddr,
@@ -162,12 +176,10 @@ case class DefaultClient[Req, Rep](
   // These are kept around to not break the API. They probably should
   // have been private[finagle] to begin with.
   val newStack: Name => ServiceFactory[Req, Rep] = newClient(_, name)
-  val newStack0: Var[Addr] => ServiceFactory[Req, Rep] = va =>
-    {
-      clientStack.make(params + LoadBalancerFactory.Dest(va))
+  val newStack0: Var[Addr] => ServiceFactory[Req, Rep] = va => {
+    clientStack.make(params + LoadBalancerFactory.Dest(va))
   }
-  val bindStack: Address => ServiceFactory[Req, Rep] = addr =>
-    {
-      endpointStack.make(params + Transporter.EndpointAddr(addr))
+  val bindStack: Address => ServiceFactory[Req, Rep] = addr => {
+    endpointStack.make(params + Transporter.EndpointAddr(addr))
   }
 }

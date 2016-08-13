@@ -51,7 +51,7 @@ class ExecutionDirectivesSpec extends RoutingSpec {
       }
     }
     "not interfere with alternative routes" in EventFilter[MyException.type](
-        occurrences = 1).intercept {
+      occurrences = 1).intercept {
       Get("/abc") ~> get {
         handleExceptions(handler)(reject) ~ { ctx ⇒
           throw MyException
@@ -62,7 +62,8 @@ class ExecutionDirectivesSpec extends RoutingSpec {
       }
     }
     "not handle other exceptions" in EventFilter[RuntimeException](
-        occurrences = 1, message = "buh").intercept {
+      occurrences = 1,
+      message = "buh").intercept {
       Get("/abc") ~> get {
         handleExceptions(handler) {
           throw new RuntimeException("buh")
@@ -73,7 +74,7 @@ class ExecutionDirectivesSpec extends RoutingSpec {
       }
     }
     "always fall back to a default content type" in EventFilter[
-        RuntimeException](occurrences = 2, message = "buh2").intercept {
+      RuntimeException](occurrences = 2, message = "buh2").intercept {
       Get("/abc") ~> Accept(MediaTypes.`application/json`) ~> get {
         handleExceptions(handler) {
           throw new RuntimeException("buh2")

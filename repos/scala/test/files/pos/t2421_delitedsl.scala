@@ -34,7 +34,7 @@ trait DeliteDSL {
     // inferred: val x: Forcible[Int] = new DeliteCollection[Int](List.apply[Int](1, 2, 3)).headProxy[Forcible[Int]](forcibleInt);
 
     val xAlready = new DeliteCollection(
-        List(DeliteInt(1), DeliteInt(2), DeliteInt(3))).headProxy
+      List(DeliteInt(1), DeliteInt(2), DeliteInt(3))).headProxy
     // inferred: val xAlready: DeliteInt = new DeliteCollection[DeliteInt](List.apply[DeliteInt](DeliteInt(1), DeliteInt(2), DeliteInt(3))).headProxy[DeliteInt](trivial[DeliteInt]);
   }
 }

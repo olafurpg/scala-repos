@@ -22,9 +22,9 @@ class SerializabilitySpec extends WordSpec with Matchers {
         HttpRequest(uri = Uri("/test?blub=28&x=5+3")) should beSerializable
       }
       "with content type" in {
-        HttpRequest()
-          .withEntity(HttpEntity(ContentTypes.`application/json`,
-                                 ByteString.empty)) should beSerializable
+        HttpRequest().withEntity(HttpEntity(
+          ContentTypes.`application/json`,
+          ByteString.empty)) should beSerializable
       }
       "with accepted media types" in {
         HttpRequest().withHeaders(Accept(MediaTypes.`application/json`)) should beSerializable
@@ -35,8 +35,8 @@ class SerializabilitySpec extends WordSpec with Matchers {
       }
       "with accepted encodings" in {
         HttpRequest().withHeaders(`Accept-Encoding`(HttpEncodings.chunked)) should beSerializable
-        HttpRequest().withHeaders(`Accept-Encoding`(
-                HttpEncoding.custom("test"))) should beSerializable
+        HttpRequest().withHeaders(
+          `Accept-Encoding`(HttpEncoding.custom("test"))) should beSerializable
       }
     }
   }

@@ -1,6 +1,5 @@
 object T1027 extends App {
-  trait Comparable[T <: Comparable[T]] {
-    this: T =>
+  trait Comparable[T <: Comparable[T]] { this: T =>
     def <(that: T): Boolean
     def <=(that: T): Boolean = this < that || this == that
     def >(that: T): Boolean = that < this

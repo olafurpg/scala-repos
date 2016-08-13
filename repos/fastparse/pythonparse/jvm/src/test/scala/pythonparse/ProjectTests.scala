@@ -32,7 +32,7 @@ object ProjectTests extends TestSuite {
 
     val pythonFiles: Seq[String] = listFiles(new java.io.File(path.toString))
       .filter(path =>
-            path.toString.endsWith(".py") && !ignored.exists(path.endsWith))
+        path.toString.endsWith(".py") && !ignored.exists(path.endsWith))
       .map(_.toString)
       .toSeq
 
@@ -65,7 +65,7 @@ object ProjectTests extends TestSuite {
   val tests = TestSuite {
     "dropbox/changes" - check()
     "django/django" - check(
-        ignored = Seq("tests/i18n/test_compilation.py")
+      ignored = Seq("tests/i18n/test_compilation.py")
     )
     "mitsuhiko/flask" - check()
     "zulip/zulip" - check()

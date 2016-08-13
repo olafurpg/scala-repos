@@ -50,7 +50,7 @@ object StreamingLogisticRegression {
 
     if (args.length != 4) {
       System.err.println(
-          "Usage: StreamingLogisticRegression <trainingDir> <testDir> <batchDuration> <numFeatures>")
+        "Usage: StreamingLogisticRegression <trainingDir> <testDir> <batchDuration> <numFeatures>")
       System.exit(1)
     }
 

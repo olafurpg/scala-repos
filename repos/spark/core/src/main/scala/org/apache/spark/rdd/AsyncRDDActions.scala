@@ -30,8 +30,9 @@ import org.apache.spark.util.ThreadUtils
 /**
   * A set of asynchronous RDD actions available through an implicit conversion.
   */
-class AsyncRDDActions[T : ClassTag](self: RDD[T])
-    extends Serializable with Logging {
+class AsyncRDDActions[T: ClassTag](self: RDD[T])
+    extends Serializable
+    with Logging {
 
   /**
     * Returns a future for counting the number of elements in the RDD.
@@ -39,18 +40,17 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
   def countAsync(): FutureAction[Long] = self.withScope {
     val totalCount = new AtomicLong
     self.context.submitJob(self,
-                           (iter: Iterator[T]) =>
-                             {
-                               var result = 0L
-                               while (iter.hasNext) {
-                                 result += 1L
-                                 iter.next()
-                               }
-                               result
+                           (iter: Iterator[T]) => {
+                             var result = 0L
+                             while (iter.hasNext) {
+                               result += 1L
+                               iter.next()
+                             }
+                             result
                            },
                            Range(0, self.partitions.length),
                            (index: Int,
-                           data: Long) => totalCount.addAndGet(data),
+                            data: Long) => totalCount.addAndGet(data),
                            totalCount.get())
   }
 
@@ -60,11 +60,11 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
   def collectAsync(): FutureAction[Seq[T]] = self.withScope {
     val results = new Array[Array[T]](self.partitions.length)
     self.context.submitJob[T, Array[T], Seq[T]](
-        self,
-        _.toArray,
-        Range(0, self.partitions.length),
-        (index, data) => results(index) = data,
-        results.flatten.toSeq)
+      self,
+      _.toArray,
+      Range(0, self.partitions.length),
+      (index, data) => results(index) = data,
+      results.flatten.toSeq)
   }
 
   /**
@@ -101,25 +101,26 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
           } else {
             // the left side of max is >=1 whenever partsScanned >= 2
             numPartsToTry = Math.max(
-                1,
-                (1.5 * num * partsScanned / results.size).toInt - partsScanned)
+              1,
+              (1.5 * num * partsScanned / results.size).toInt - partsScanned)
             numPartsToTry = Math.min(numPartsToTry, partsScanned * 4)
           }
         }
 
         val left = num - results.size
         val p = partsScanned.until(
-            math.min(partsScanned + numPartsToTry, totalParts).toInt)
+          math.min(partsScanned + numPartsToTry, totalParts).toInt)
 
         val buf = new Array[Array[T]](p.size)
         self.context.setCallSite(callSite)
         self.context.setLocalProperties(localProperties)
-        val job = jobSubmitter.submitJob(
-            self,
-            (it: Iterator[T]) => it.take(left).toArray,
-            p,
-            (index: Int, data: Array[T]) => buf(index) = data,
-            Unit)
+        val job =
+          jobSubmitter.submitJob(self,
+                                 (it: Iterator[T]) => it.take(left).toArray,
+                                 p,
+                                 (index: Int,
+                                  data: Array[T]) => buf(index) = data,
+                                 Unit)
         job.flatMap { _ =>
           buf.foreach(results ++= _.take(num - results.size))
           continue(partsScanned + p.size)
@@ -156,5 +157,5 @@ class AsyncRDDActions[T : ClassTag](self: RDD[T])
 
 private object AsyncRDDActions {
   val futureExecutionContext = ExecutionContext.fromExecutorService(
-      ThreadUtils.newDaemonCachedThreadPool("AsyncRDDActions-future", 128))
+    ThreadUtils.newDaemonCachedThreadPool("AsyncRDDActions-future", 128))
 }

@@ -45,12 +45,12 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
     */
   private[metrics] val strategy = system.dynamicAccess
     .createInstanceFor[SupervisorStrategy](
-        SupervisorStrategyProvider,
-        immutable.Seq(classOf[Config] -> SupervisorStrategyConfiguration))
+      SupervisorStrategyProvider,
+      immutable.Seq(classOf[Config] -> SupervisorStrategyConfiguration))
     .getOrElse {
       val log: LoggingAdapter = Logging(system, getClass.getName)
       log.error(
-          s"Configured strategy provider ${SupervisorStrategyProvider} failed to load, using default ${classOf[
+        s"Configured strategy provider ${SupervisorStrategyProvider} failed to load, using default ${classOf[
           ClusterMetricsStrategy].getName}.")
       new ClusterMetricsStrategy(SupervisorStrategyConfiguration)
     }
@@ -60,10 +60,10 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
     * Accepts subtypes of [[CollectionControlMessage]]s to manage metrics collection at runtime.
     */
   val supervisor = system.systemActorOf(
-      Props(classOf[ClusterMetricsSupervisor])
-        .withDispatcher(MetricsDispatcher)
-        .withDeploy(Deploy.local),
-      SupervisorName)
+    Props(classOf[ClusterMetricsSupervisor])
+      .withDispatcher(MetricsDispatcher)
+      .withDeploy(Deploy.local),
+    SupervisorName)
 
   /**
     * Subscribe user metrics listener actor unto [[ClusterMetricsEvent]]
@@ -78,8 +78,8 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
     * events published by extension on the system event bus.
     */
   def unsubscribe(metricsListenter: ActorRef): Unit = {
-    system.eventStream.unsubscribe(
-        metricsListenter, classOf[ClusterMetricsEvent])
+    system.eventStream
+      .unsubscribe(metricsListenter, classOf[ClusterMetricsEvent])
   }
 }
 
@@ -87,7 +87,8 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
   * Cluster metrics extension provider.
   */
 object ClusterMetricsExtension
-    extends ExtensionId[ClusterMetricsExtension] with ExtensionIdProvider {
+    extends ExtensionId[ClusterMetricsExtension]
+    with ExtensionIdProvider {
   override def lookup = ClusterMetricsExtension
   override def get(system: ActorSystem): ClusterMetricsExtension =
     super.get(system)

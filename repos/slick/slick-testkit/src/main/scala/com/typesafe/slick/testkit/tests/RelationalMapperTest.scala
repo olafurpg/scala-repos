@@ -29,20 +29,20 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
 
     seq(
-        ts.schema.create,
-        ts.map(t => (t.b, t.c)) ++= Seq((False, None), (True, Some(True))),
-        ts.to[Set]
-          .result
-          .map(_ shouldBe Set((1, False, None), (2, True, Some(True)))),
-        ts.filter(_.b === (True: Bool))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((2, True, Some(True)))),
-        ts.filter(_.b === (False: Bool))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((1, False, None)))
-      )
+      ts.schema.create,
+      ts.map(t => (t.b, t.c)) ++= Seq((False, None), (True, Some(True))),
+      ts.to[Set]
+        .result
+        .map(_ shouldBe Set((1, False, None), (2, True, Some(True)))),
+      ts.filter(_.b === (True: Bool))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((2, True, Some(True)))),
+      ts.filter(_.b === (False: Bool))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((1, False, None)))
+    )
   }
 
   def testMappedType2 = {
@@ -77,25 +77,26 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
 
     seq(
-        ts.schema.create,
-        ts.map(t => (t.b, t.c)) ++= Seq((EnumValue1, None),
-                                        (EnumValue1, Some(EnumValue2)),
-                                        (EnumValue2, Some(EnumValue3))),
-        ts.to[Set]
-          .result
-          .map(_ shouldBe Set((1, EnumValue1, None),
-                              (2, EnumValue1, Some(EnumValue2)),
-                              (3, EnumValue2, Some(EnumValue3)))),
-        ts.filter(_.b === (EnumValue1: EnumType))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((1, EnumValue1, None),
-                              (2, EnumValue1, Some(EnumValue2)))),
-        ts.filter(_.b === (EnumValue2: EnumType))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((3, EnumValue2, Some(EnumValue3))))
-      )
+      ts.schema.create,
+      ts.map(t => (t.b, t.c)) ++= Seq((EnumValue1, None),
+                                      (EnumValue1, Some(EnumValue2)),
+                                      (EnumValue2, Some(EnumValue3))),
+      ts.to[Set]
+        .result
+        .map(
+          _ shouldBe Set((1, EnumValue1, None),
+                         (2, EnumValue1, Some(EnumValue2)),
+                         (3, EnumValue2, Some(EnumValue3)))),
+      ts.filter(_.b === (EnumValue1: EnumType))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((1, EnumValue1, None),
+                            (2, EnumValue1, Some(EnumValue2)))),
+      ts.filter(_.b === (EnumValue2: EnumType))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((3, EnumValue2, Some(EnumValue3))))
+    )
   }
 
   def testMappedRefType = {
@@ -120,20 +121,20 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
 
     seq(
-        ts.schema.create,
-        ts.map(t => (t.b, t.c)) ++= Seq((False, None), (True, Some(True))),
-        ts.to[Set]
-          .result
-          .map(_ shouldBe Set((1, False, None), (2, True, Some(True)))),
-        ts.filter(_.b === (True: Bool))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((2, True, Some(True)))),
-        ts.filter(_.b === (False: Bool))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((1, False, None)))
-      )
+      ts.schema.create,
+      ts.map(t => (t.b, t.c)) ++= Seq((False, None), (True, Some(True))),
+      ts.to[Set]
+        .result
+        .map(_ shouldBe Set((1, False, None), (2, True, Some(True)))),
+      ts.filter(_.b === (True: Bool))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((2, True, Some(True)))),
+      ts.filter(_.b === (False: Bool))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((1, False, None)))
+    )
   }
 
   def testAutoMapped = {
@@ -146,16 +147,16 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
     val ts = TableQuery[T]
 
     seq(
-        ts.schema.create,
-        ts ++= Seq((MyMappedID(1), 2), (MyMappedID(3), 4)),
-        ts.to[Set]
-          .result
-          .map(_ shouldBe Set((MyMappedID(1), 2), (MyMappedID(3), 4))),
-        ts.filter(_.id === MyMappedID(1))
-          .to[Set]
-          .result
-          .map(_ shouldBe Set((MyMappedID(1), 2)))
-      )
+      ts.schema.create,
+      ts ++= Seq((MyMappedID(1), 2), (MyMappedID(3), 4)),
+      ts.to[Set]
+        .result
+        .map(_ shouldBe Set((MyMappedID(1), 2), (MyMappedID(3), 4))),
+      ts.filter(_.id === MyMappedID(1))
+        .to[Set]
+        .result
+        .map(_ shouldBe Set((MyMappedID(1), 2)))
+    )
   }
 
   def mappedToMacroCompilerBug = {
@@ -171,4 +172,5 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
 }
 
 case class MyMappedID(value: Int)
-    extends AnyVal with slick.lifted.MappedTo[Int]
+    extends AnyVal
+    with slick.lifted.MappedTo[Int]

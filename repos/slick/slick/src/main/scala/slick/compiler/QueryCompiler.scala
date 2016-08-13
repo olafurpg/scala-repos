@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 /** An immutable, stateless query compiler consisting of a series of phases */
 class QueryCompiler(val phases: Vector[Phase]) extends Logging {
   protected[this] lazy val benchmarkLogger = new SlickLogger(
-      LoggerFactory.getLogger(getClass.getName + "Benchmark"))
+    LoggerFactory.getLogger(getClass.getName + "Benchmark"))
 
   /** Return a new compiler with the new phase added at the end. */
   def +(p: Phase) = new QueryCompiler(phases :+ p)
@@ -34,7 +34,7 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
       val i = phases.indexWhere(_.name == before.name)
       if (i == -1)
         throw new SlickException(
-            "Following phase " + before.name + " not found")
+          "Following phase " + before.name + " not found")
       else phases.patch(i, Seq(p), 0)
     })
 
@@ -64,8 +64,8 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
   def runBefore(before: Phase, state: CompilerState): CompilerState =
     runPhases(phases.iterator.takeWhile(_.name != before.name), state)
 
-  protected[this] def runPhases(
-      it: Iterator[Phase], state: CompilerState): CompilerState = {
+  protected[this] def runPhases(it: Iterator[Phase],
+                                state: CompilerState): CompilerState = {
     if (logger.isDebugEnabled)
       state.symbolNamer.use { logger.debug("Source:", state.tree) }
     if (benchmarkLogger.isDebugEnabled) {
@@ -94,9 +94,9 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
           if (GlobalConfig.detectRebuild && s2.tree == state.tree) {
             val rebuilt = detectRebuiltLeafs(state.tree, s2.tree)
             logger.debug(
-                "After phase " + p.name + ": (no change but not identical)",
-                s2.tree,
-                (d => rebuilt.contains(RefId(d))))
+              "After phase " + p.name + ": (no change but not identical)",
+              s2.tree,
+              (d => rebuilt.contains(RefId(d))))
           } else logger.debug("After phase " + p.name + ":", s2.tree)
         }
         if (GlobalConfig.verifyTypes && s2.wellTyped)
@@ -105,8 +105,8 @@ class QueryCompiler(val phases: Vector[Phase]) extends Logging {
       s2
     }
 
-  protected[this] def detectRebuiltLeafs(
-      n1: Node, n2: Node): Set[RefId[Dumpable]] = {
+  protected[this] def detectRebuiltLeafs(n1: Node,
+                                         n2: Node): Set[RefId[Dumpable]] = {
     if (n1 eq n2) Set.empty
     else {
       val chres = n1.children.iterator
@@ -122,48 +122,48 @@ object QueryCompiler {
 
   /** The standard phases of the query compiler */
   val standardPhases = Vector(
-      /* Clean up trees from the lifted embedding */
-      Phase.assignUniqueSymbols,
-      /* Distribute and normalize */
-      Phase.inferTypes,
-      Phase.expandTables,
-      Phase.forceOuterBinds,
-      Phase.removeMappedTypes,
-      /* Convert to column form */
-      Phase.expandSums,
-      // optional removeTakeDrop goes here
-      // optional emulateOuterJoins goes here
-      Phase.expandRecords,
-      Phase.flattenProjections,
-      /* Optimize for SQL */
-      Phase.rewriteJoins,
-      Phase.verifySymbols,
-      Phase.relabelUnions
+    /* Clean up trees from the lifted embedding */
+    Phase.assignUniqueSymbols,
+    /* Distribute and normalize */
+    Phase.inferTypes,
+    Phase.expandTables,
+    Phase.forceOuterBinds,
+    Phase.removeMappedTypes,
+    /* Convert to column form */
+    Phase.expandSums,
+    // optional removeTakeDrop goes here
+    // optional emulateOuterJoins goes here
+    Phase.expandRecords,
+    Phase.flattenProjections,
+    /* Optimize for SQL */
+    Phase.rewriteJoins,
+    Phase.verifySymbols,
+    Phase.relabelUnions
   )
 
   /** Extra phases for translation to SQL comprehensions */
   val sqlPhases = Vector(
-      // optional access:existsToCount goes here
-      Phase.createAggregates,
-      Phase.resolveZipJoins,
-      Phase.pruneProjections,
-      Phase.rewriteDistinct,
-      Phase.createResultSetMapping,
-      Phase.hoistClientOps,
-      Phase.reorderOperations,
-      Phase.mergeToComprehensions,
-      Phase.optimizeScalar,
-      Phase.fixRowNumberOrdering,
-      Phase.removeFieldNames
-      // optional rewriteBooleans goes here
-      // optional specializeParameters goes here
+    // optional access:existsToCount goes here
+    Phase.createAggregates,
+    Phase.resolveZipJoins,
+    Phase.pruneProjections,
+    Phase.rewriteDistinct,
+    Phase.createResultSetMapping,
+    Phase.hoistClientOps,
+    Phase.reorderOperations,
+    Phase.mergeToComprehensions,
+    Phase.optimizeScalar,
+    Phase.fixRowNumberOrdering,
+    Phase.removeFieldNames
+    // optional rewriteBooleans goes here
+    // optional specializeParameters goes here
   )
 
   /** Extra phases needed for the QueryInterpreter */
   val interpreterPhases = Vector(
-      Phase.pruneProjections,
-      Phase.createResultSetMapping,
-      Phase.removeFieldNames
+    Phase.pruneProjections,
+    Phase.createResultSetMapping,
+    Phase.removeFieldNames
   )
 
   /** The default compiler */
@@ -238,8 +238,11 @@ class CompilerState private (val compiler: QueryCompiler,
 
   /** Return a new `CompilerState` with the given mapping of phase to phase state */
   def +[S, P <: Phase { type State = S }](t: (P, S)) =
-    new CompilerState(
-        compiler, symbolNamer, tree, state + (t._1.name -> t._2), wellTyped)
+    new CompilerState(compiler,
+                      symbolNamer,
+                      tree,
+                      state + (t._1.name -> t._2),
+                      wellTyped)
 
   /** Return a new `CompilerState` which encapsulates the specified AST */
   def withNode(tree: Node) =

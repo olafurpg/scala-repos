@@ -14,7 +14,12 @@ import akka.http.scaladsl.testkit.WSProbe
 import akka.http.scaladsl.model.headers.`Sec-WebSocket-Protocol`
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ws._
-import akka.http.scaladsl.server.{UnsupportedWebSocketSubprotocolRejection, ExpectedWebSocketRequestRejection, Route, RoutingSpec}
+import akka.http.scaladsl.server.{
+  UnsupportedWebSocketSubprotocolRejection,
+  ExpectedWebSocketRequestRejection,
+  Route,
+  RoutingSpec
+}
 
 class WebSocketDirectivesSpec extends RoutingSpec {
   "the handleWebSocketMessages directive" should {
@@ -65,11 +70,12 @@ class WebSocketDirectivesSpec extends RoutingSpec {
       }
 
       WS("http://localhost/", Flow[Message], List("other")) ~> Route.seal(
-          websocketMultipleProtocolRoute) ~> check {
+        websocketMultipleProtocolRoute) ~> check {
         status shouldEqual StatusCodes.BadRequest
         responseAs[String] shouldEqual "None of the websocket subprotocols offered in the request are supported. Supported are 'echo','greeter'."
         header[`Sec-WebSocket-Protocol`].get.protocols.toSet shouldEqual Set(
-            "greeter", "echo")
+          "greeter",
+          "echo")
       }
     }
     "reject non-websocket requests" in {
@@ -87,18 +93,21 @@ class WebSocketDirectivesSpec extends RoutingSpec {
   def websocketRoute = handleWebSocketMessages(greeter)
   def websocketMultipleProtocolRoute =
     handleWebSocketMessagesForProtocol(echo, "echo") ~ handleWebSocketMessagesForProtocol(
-        greeter, "greeter")
+      greeter,
+      "greeter")
 
   def greeter: Flow[Message, Message, Any] =
     Flow[Message].mapConcat {
       case tm: TextMessage ⇒
-        TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source.single(
-                "!")) :: Nil
+        TextMessage(
+          Source.single("Hello ") ++ tm.textStream ++ Source
+            .single("!")) :: Nil
       case bm: BinaryMessage ⇒ // ignore binary messages
         bm.dataStream.runWith(Sink.ignore)
         Nil
     }
 
   def echo: Flow[Message, Message, Any] =
-    Flow[Message].buffer(1, OverflowStrategy.backpressure) // needed because a noop flow hasn't any buffer that would start processing
+    Flow[Message]
+      .buffer(1, OverflowStrategy.backpressure) // needed because a noop flow hasn't any buffer that would start processing
 }

@@ -6,8 +6,8 @@ import lila.team.Team
 
 import play.api.libs.json._
 
-final class TeamSearchApi(
-    client: ESClient, fetcher: Seq[String] => Fu[List[Team]])
+final class TeamSearchApi(client: ESClient,
+                          fetcher: Seq[String] => Fu[List[Team]])
     extends SearchReadApi[Team, Query] {
 
   def search(query: Query, from: From, size: Size) =
@@ -31,10 +31,11 @@ final class TeamSearchApi(
         lila.log("teamSearch").info(s"Index to ${c.index.name}")
         import lila.db.api._
         import lila.team.tube.teamTube
-        $enumerate.bulk[Option[Team]](
-            $query[Team](Json.obj("enabled" -> true)), 300) { teamOptions =>
-          c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
-        }
+        $enumerate
+          .bulk[Option[Team]]($query[Team](Json.obj("enabled" -> true)), 300) {
+            teamOptions =>
+              c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
+          }
       }
     case _ => funit
   }

@@ -104,7 +104,8 @@ object WSProbe {
     * @param maxChunkCollectionMills The maximum time in milliseconds to collect chunks for streamed messages.
     */
   def apply(maxChunks: Int = 1000, maxChunkCollectionMills: Long = 5000)(
-      implicit system: ActorSystem, materializer: Materializer): WSProbe =
+      implicit system: ActorSystem,
+      materializer: Materializer): WSProbe =
     new WSProbe {
       val subscriber = TestSubscriber.probe[Message]()
       val publisher = TestPublisher.probe[Message]()
@@ -124,21 +125,21 @@ object WSProbe {
         case t: TextMessage ⇒
           val collectedMessage = collect(t.textStream)(_ + _)
           assert(
-              collectedMessage == text,
-              s"""Expected TextMessage("$text") but got TextMessage("$collectedMessage")""")
+            collectedMessage == text,
+            s"""Expected TextMessage("$text") but got TextMessage("$collectedMessage")""")
         case _ ⇒
           throw new AssertionError(
-              s"""Expected TextMessage("$text") but got BinaryMessage""")
+            s"""Expected TextMessage("$text") but got BinaryMessage""")
       }
       def expectMessage(bytes: ByteString): Unit = expectMessage() match {
         case t: BinaryMessage ⇒
           val collectedMessage = collect(t.dataStream)(_ ++ _)
           assert(
-              collectedMessage == bytes,
-              s"""Expected BinaryMessage("$bytes") but got BinaryMessage("$collectedMessage")""")
+            collectedMessage == bytes,
+            s"""Expected BinaryMessage("$bytes") but got BinaryMessage("$collectedMessage")""")
         case _ ⇒
           throw new AssertionError(
-              s"""Expected BinaryMessage("$bytes") but got TextMessage""")
+            s"""Expected BinaryMessage("$bytes") but got TextMessage""")
       }
 
       def expectNoMessage(): Unit = subscriber.expectNoMsg()

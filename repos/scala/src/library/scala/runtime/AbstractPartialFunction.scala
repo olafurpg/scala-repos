@@ -33,7 +33,8 @@ abstract class AbstractPartialFunction[@specialized(scala.Int,
                                                     scala.Float,
                                                     scala.Long,
                                                     scala.Double) +R]
-    extends Function1[T1, R] with PartialFunction[T1, R] { self =>
+    extends Function1[T1, R]
+    with PartialFunction[T1, R] { self =>
   // this method must be overridden for better performance,
   // for backwards compatibility, fall back to the one inherited from PartialFunction
   // this assumes the old-school partial functions override the apply method, though

@@ -54,7 +54,9 @@ final class InsightApi(storage: Storage,
     }
 
   def indexAll(user: User) =
-    indexer.all(user).mon(_.insight.index.time) >> userCacheApi.remove(user.id) >>- lila.mon.insight.index
+    indexer
+      .all(user)
+      .mon(_.insight.index.time) >> userCacheApi.remove(user.id) >>- lila.mon.insight.index
       .count()
 
   def updateGame(g: Game) =

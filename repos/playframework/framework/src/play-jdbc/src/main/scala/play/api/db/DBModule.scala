@@ -24,7 +24,7 @@ final class DBModule extends Module {
     val dbs =
       configuration.getConfig(dbKey).getOrElse(Configuration.empty).subKeys
     Seq(
-        bind[DBApi].toProvider[DBApiProvider]
+      bind[DBApi].toProvider[DBApiProvider]
     ) ++ namedDatabaseBindings(dbs) ++ defaultDatabaseBinding(default, dbs)
   }
 
@@ -37,8 +37,8 @@ final class DBModule extends Module {
       bindNamed(db).to(new NamedDatabaseProvider(db))
     }
 
-  private def defaultDatabaseBinding(
-      default: String, dbs: Set[String]): Seq[Binding[_]] = {
+  private def defaultDatabaseBinding(default: String,
+                                     dbs: Set[String]): Seq[Binding[_]] = {
     if (dbs.contains(default)) Seq(bind[Database].to(bindNamed(default)))
     else Nil
   }
@@ -53,8 +53,10 @@ trait DBComponents {
   def connectionPool: ConnectionPool
   def applicationLifecycle: ApplicationLifecycle
 
-  lazy val dbApi: DBApi = new DBApiProvider(
-      environment, configuration, connectionPool, applicationLifecycle).get
+  lazy val dbApi: DBApi = new DBApiProvider(environment,
+                                            configuration,
+                                            connectionPool,
+                                            applicationLifecycle).get
 }
 
 /**

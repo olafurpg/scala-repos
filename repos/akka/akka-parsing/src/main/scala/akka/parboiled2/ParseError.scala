@@ -65,8 +65,8 @@ object Position {
   }
 }
 
-case class RuleTrace(
-    prefix: List[RuleTrace.NonTerminal], terminal: RuleTrace.Terminal) {
+case class RuleTrace(prefix: List[RuleTrace.NonTerminal],
+                     terminal: RuleTrace.Terminal) {
   import RuleTrace._
 
   /**
@@ -97,8 +97,8 @@ case class RuleTrace(
     * Wraps this trace with a [[RuleTrace.Named]] wrapper if the given name is non-empty.
     */
   def named(name: String): RuleTrace = {
-    val newHead = NonTerminal(
-        Named(name), if (prefix.isEmpty) 0 else prefix.head.offset)
+    val newHead =
+      NonTerminal(Named(name), if (prefix.isEmpty) 0 else prefix.head.offset)
     if (name.isEmpty) this else copy(prefix = newHead :: prefix)
   }
 }

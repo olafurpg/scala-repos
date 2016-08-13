@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package testingSupport.test.utest
 
-import com.intellij.execution.configurations.{ConfigurationType, RunConfiguration}
+import com.intellij.execution.configurations.{
+  ConfigurationType,
+  RunConfiguration
+}
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.testingSupport.test.AbstractTestRunConfigurationFactory
 

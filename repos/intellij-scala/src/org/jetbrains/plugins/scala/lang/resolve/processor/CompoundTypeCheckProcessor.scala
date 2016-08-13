@@ -4,9 +4,20 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScTypeAliasDeclaration, ScTypeAliasDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScTypeParametersOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScTypeAliasDeclaration,
+  ScTypeAliasDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScTypeParametersOwner,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -147,9 +158,9 @@ class CompoundTypeCheckSignatureProcessor(s: Signature,
                             Array.empty,
                             rt)) return false
         if (isVar && !checkSignature(
-                new Signature(dcl.name + "_=", Seq(() => rt), 1, subst, dcl),
-                Array.empty,
-                Unit)) return false
+              new Signature(dcl.name + "_=", Seq(() => rt), 1, subst, dcl),
+              Array.empty,
+              Unit)) return false
       case method: PsiMethod =>
         val sign1 = new PhysicalSignature(method, subst)
         if (!checkSignature(sign1, method.getTypeParameters, method match {
@@ -253,10 +264,10 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature,
       sign.ta match {
         case _: ScTypeAliasDeclaration =>
           var t = Conformance.conformsInner(
-              subst.subst(tp.lowerBound.getOrNothing),
-              substitutor.subst(sign.lowerBound),
-              Set.empty,
-              undef)
+            subst.subst(tp.lowerBound.getOrNothing),
+            substitutor.subst(sign.lowerBound),
+            Set.empty,
+            undef)
           if (t._1) {
             t = Conformance.conformsInner(substitutor.subst(sign.upperBound),
                                           subst.subst(tp.upperBound.getOrAny),
@@ -279,10 +290,10 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature,
         sign.ta match {
           case _: ScTypeAliasDefinition =>
             val t = Equivalence.equivInner(
-                subst.subst(tp.aliasedType.getOrNothing),
-                substitutor.subst(sign.lowerBound),
-                undef,
-                falseUndef = false)
+              subst.subst(tp.aliasedType.getOrNothing),
+              substitutor.subst(sign.lowerBound),
+              undef,
+              falseUndef = false)
             if (t._1) {
               undef = t._2
               trueResult = true

@@ -36,7 +36,11 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.event.Event
 
 object TableColumn {
@@ -60,11 +64,11 @@ object TableColumn {
     /**
       * Instantiates a CellDataFeatures instance with the given properties set as read-only values of this instance.
       */
-    def this(
-        tableView: TableView[S], tableColumn: TableColumn[S, T], value: S) =
+    def this(tableView: TableView[S],
+             tableColumn: TableColumn[S, T],
+             value: S) =
       this(
-          new jfxsc.TableColumn.CellDataFeatures(
-              tableView, tableColumn, value))
+        new jfxsc.TableColumn.CellDataFeatures(tableView, tableColumn, value))
 
     /**
       * Returns the TableColumn passed in to the constructor.
@@ -104,7 +108,7 @@ object TableColumn {
              eventType: jfxe.EventType[jfxsc.TableColumn.CellEditEvent[S, T]],
              newValue: T) =
       this(
-          new jfxsc.TableColumn.CellEditEvent(table, pos, eventType, newValue))
+        new jfxsc.TableColumn.CellEditEvent(table, pos, eventType, newValue))
 
     /**
       * Returns the new value input by the end user.
@@ -150,8 +154,8 @@ object TableColumn {
     /** Column will be sorted in a descending order. */
     val Descending = new SortType(jfxsc.TableColumn.SortType.DESCENDING)
     @deprecated(
-        "Use Descending; DESCENDING will be removed in a future release",
-        "8.0.60-R10")
+      "Use Descending; DESCENDING will be removed in a future release",
+      "8.0.60-R10")
     val DESCENDING = Descending
 
     protected override def unsortedValues: Array[SortType] =
@@ -169,8 +173,8 @@ object TableColumn {
     (column: TableColumn[_, _]) =>
       jfxsc.TableColumn.DEFAULT_CELL_FACTORY.call(column)
   @deprecated(
-      "Use DefaultCellFactory; DEFAULT_CELL_FACTORY will be removed in a future release",
-      "8.0.60-R10")
+    "Use DefaultCellFactory; DEFAULT_CELL_FACTORY will be removed in a future release",
+    "8.0.60-R10")
   val DEFAULT_CELL_FACTORY = DefaultCellFactory
 
   /**
@@ -200,8 +204,8 @@ object TableColumn {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html]].
   */
 class TableColumn[S, T](
-    override val delegate: jfxsc.TableColumn[S, T] = new jfxsc.TableColumn[
-          S, T]())
+    override val delegate: jfxsc.TableColumn[S, T] =
+      new jfxsc.TableColumn[S, T]())
     extends TableColumnBase[S, T](delegate)
     with SFXDelegate[jfxsc.TableColumn[S, T]] {
 
@@ -215,19 +219,18 @@ class TableColumn[S, T](
     * The cell factory for all cells in this column.
     */
   def cellFactory: ObjectProperty[TableColumn[S, T] => TableCell[S, T]] =
-    ObjectProperty(
-        (column: TableColumn[S, T]) =>
-          new TableCell(delegate.cellFactoryProperty.getValue.call(column)))
+    ObjectProperty((column: TableColumn[S, T]) =>
+      new TableCell(delegate.cellFactoryProperty.getValue.call(column)))
   def cellFactory_=(f: TableColumn[S, T] => TableCell[S, T]) {
     delegate.cellFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.TableColumn[S, T], jfxsc.TableCell[S, T]] {
-      def call(v: jfxsc.TableColumn[S, T]): jfxsc.TableCell[S, T] = {
-        f(v)
-      }
-    })
+      new jfxu.Callback[jfxsc.TableColumn[S, T], jfxsc.TableCell[S, T]] {
+        def call(v: jfxsc.TableColumn[S, T]): jfxsc.TableCell[S, T] = {
+          f(v)
+        }
+      })
   }
-  def cellFactory_=(callback: jfxu.Callback[
-          jfxsc.TableColumn[S, T], jfxsc.TableCell[S, T]]) {
+  def cellFactory_=(callback: jfxu.Callback[jfxsc.TableColumn[S, T],
+                                            jfxsc.TableCell[S, T]]) {
     delegate.cellFactoryProperty.setValue(callback)
   }
 
@@ -257,19 +260,19 @@ class TableColumn[S, T](
     * }}}
     */
   def cellValueFactory: ObjectProperty[
-      TableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
+    TableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
     ObjectProperty((features: TableColumn.CellDataFeatures[S, T]) =>
-          delegate.cellValueFactoryProperty.getValue.call(features))
+      delegate.cellValueFactoryProperty.getValue.call(features))
   def cellValueFactory_=(
       f: TableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]) {
     delegate.cellValueFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.TableColumn.CellDataFeatures[S, T],
-                          jfxbv.ObservableValue[T]] {
-      def call(v: jfxsc.TableColumn.CellDataFeatures[S, T])
-        : jfxbv.ObservableValue[T] = {
-        f(v).delegate
-      }
-    })
+      new jfxu.Callback[jfxsc.TableColumn.CellDataFeatures[S, T],
+                        jfxbv.ObservableValue[T]] {
+        def call(v: jfxsc.TableColumn.CellDataFeatures[S, T])
+          : jfxbv.ObservableValue[T] = {
+          f(v).delegate
+        }
+      })
   }
 
   /**

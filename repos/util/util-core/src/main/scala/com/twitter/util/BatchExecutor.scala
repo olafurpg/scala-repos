@@ -32,8 +32,7 @@ private[util] class BatchExecutor[In, Out](
     f: Seq[In] => Future[Seq[Out]]
 )(
     implicit timer: Timer
-)
-    extends Function1[In, Future[Out]] { batcher =>
+) extends Function1[In, Future[Out]] { batcher =>
   import java.util.logging.Level.WARNING
 
   class ScheduledFlush(after: Duration, timer: Timer) {
@@ -70,9 +69,9 @@ private[util] class BatchExecutor[In, Out](
 
     case tooLow if tooLow < 0.0f =>
       log.log(
-          WARNING,
-          "value returned for sizePercentile (%f) was negative, using 0.0f",
-          tooLow)
+        WARNING,
+        "value returned for sizePercentile (%f) was negative, using 0.0f",
+        tooLow)
       0.0f
 
     case p => p
@@ -133,7 +132,7 @@ private[util] class BatchExecutor[In, Out](
         case e: Throwable =>
           log.log(WARNING,
                   "unhandled exception caught in Future.batched: %s".format(
-                      e.toString),
+                    e.toString),
                   e)
       }
   }
@@ -166,7 +165,7 @@ private[util] class BatchExecutor[In, Out](
 
       case Throw(e) =>
         val t = Throw(e)
-        promises foreach { _ () = t }
+        promises foreach { _() = t }
     }
   }
 }

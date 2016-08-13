@@ -29,23 +29,24 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.joda.time.DateTime
 
-class HBPEvents(
-    client: HBClient, config: StorageClientConfig, namespace: String)
+class HBPEvents(client: HBClient,
+                config: StorageClientConfig,
+                namespace: String)
     extends PEvents {
 
   def checkTableExists(appId: Int, channelId: Option[Int]): Unit = {
     if (!client.admin.tableExists(
-            HBEventsUtil.tableName(namespace, appId, channelId))) {
+          HBEventsUtil.tableName(namespace, appId, channelId))) {
       if (channelId.nonEmpty) {
         logger.error(
-            s"The appId $appId with channelId $channelId does not exist." +
+          s"The appId $appId with channelId $channelId does not exist." +
             s" Please use valid appId and channelId.")
         throw new Exception(
-            s"HBase table not found for appId $appId" +
+          s"HBase table not found for appId $appId" +
             s" with channelId $channelId.")
       } else {
         logger.error(
-            s"The appId $appId does not exist. Please use valid appId.")
+          s"The appId $appId does not exist. Please use valid appId.")
         throw new Exception(s"HBase table not found for appId $appId.")
       }
     }

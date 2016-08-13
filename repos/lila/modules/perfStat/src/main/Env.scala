@@ -21,12 +21,12 @@ final class Env(config: Config,
 
   lazy val indexer = new PerfStatIndexer(storage = storage,
                                          sequencer = system.actorOf(
-                                               Props(
-                                                   classOf[lila.hub.Sequencer],
-                                                   None,
-                                                   None,
-                                                   lila.log("perfStat")
-                                               )))
+                                           Props(
+                                             classOf[lila.hub.Sequencer],
+                                             None,
+                                             None,
+                                             lila.log("perfStat")
+                                           )))
 
   lazy val jsonView = new JsonView(lightUser)
 
@@ -35,8 +35,7 @@ final class Env(config: Config,
       indexer.userPerf(user, perfType) >> storage.find(user.id, perfType)
     } map (_ | PerfStat.init(user.id, perfType))
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     context.system.lilaBus.subscribe(self, 'finishGame)
     def receive = {
       case lila.game.actorApi.FinishGame(game, _, _) => indexer addGame game

@@ -65,7 +65,7 @@ private class DeadlineSpanMap(logSpans: Seq[Span] => Future[Unit],
       if (span.started <= deadline) {
         spanMap.remove(kv.getKey, span)
         span.addAnnotation(
-            ZipkinAnnotation(deadline, "finagle.flush", span.endpoint))
+          ZipkinAnnotation(deadline, "finagle.flush", span.endpoint))
         ss.append(span.toSpan)
       }
     }
@@ -107,8 +107,8 @@ private final class MutableSpan(val traceId: TraceId, val started: Time) {
   def addAnnotation(ann: ZipkinAnnotation): MutableSpan = synchronized {
     if (!_isComplete &&
         (ann.value.equals(Constants.CLIENT_RECV) ||
-            ann.value.equals(Constants.SERVER_SEND) ||
-            ann.value.equals(TimeoutFilter.TimeoutAnnotation)))
+        ann.value.equals(Constants.SERVER_SEND) ||
+        ann.value.equals(TimeoutFilter.TimeoutAnnotation)))
       _isComplete = true
 
     annotations.append(ann)

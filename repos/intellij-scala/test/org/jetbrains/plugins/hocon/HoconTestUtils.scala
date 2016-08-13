@@ -14,8 +14,11 @@ object HoconTestUtils {
     val fileType = FileTypeManager.getInstance.getFileTypeByFileName(tempFile)
     PsiFileFactory
       .getInstance(project)
-      .createFileFromText(
-          tempFile, fileType, text, LocalTimeCounter.currentTime(), true)
+      .createFileFromText(tempFile,
+                          fileType,
+                          text,
+                          LocalTimeCounter.currentTime(),
+                          true)
       .asInstanceOf[HoconPsiFile]
   }
 

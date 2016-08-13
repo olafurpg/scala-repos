@@ -6,7 +6,13 @@ import org.apache.ivy.core.settings.IvySettings
 import org.eclipse.aether.artifact.{DefaultArtifact => AetherArtifact}
 import org.eclipse.aether.installation.{InstallRequest => AetherInstallRequest}
 import org.eclipse.aether.metadata.{DefaultMetadata, Metadata}
-import org.eclipse.aether.resolution.{ArtifactDescriptorRequest => AetherDescriptorRequest, ArtifactRequest => AetherArtifactRequest, MetadataRequest => AetherMetadataRequest, VersionRequest => AetherVersionRequest, VersionRangeRequest => AetherVersionRangeRequest}
+import org.eclipse.aether.resolution.{
+  ArtifactDescriptorRequest => AetherDescriptorRequest,
+  ArtifactRequest => AetherArtifactRequest,
+  MetadataRequest => AetherMetadataRequest,
+  VersionRequest => AetherVersionRequest,
+  VersionRangeRequest => AetherVersionRangeRequest
+}
 
 import sbt.internal.librarymanagement.ivyint.CustomMavenResolver
 import sbt.librarymanagement.MavenCache
@@ -21,7 +27,8 @@ import sbt.io.IO
   * Note: This should never hit somethign remote, as it just looks in the maven cache for things already resolved.
   */
 class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
-    extends MavenRepositoryResolver(settings) with CustomMavenResolver {
+    extends MavenRepositoryResolver(settings)
+    with CustomMavenResolver {
   setName(repo.name)
   protected val system = MavenRepositorySystemFactory.newRepositorySystemImpl
   IO.createDirectory(repo.rootFile)
@@ -46,15 +53,16 @@ class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
   protected def getPublicationTime(mrid: ModuleRevisionId): Option[Long] = {
     val metadataRequest = new AetherMetadataRequest()
     metadataRequest.setMetadata(
-        new DefaultMetadata(mrid.getOrganisation,
-                            mrid.getName,
-                            mrid.getRevision,
-                            MavenRepositoryResolver.MAVEN_METADATA_XML,
-                            Metadata.Nature.RELEASE_OR_SNAPSHOT))
+      new DefaultMetadata(mrid.getOrganisation,
+                          mrid.getName,
+                          mrid.getRevision,
+                          MavenRepositoryResolver.MAVEN_METADATA_XML,
+                          Metadata.Nature.RELEASE_OR_SNAPSHOT))
     val metadataResultOpt = try system
       .resolveMetadata(session, java.util.Arrays.asList(metadataRequest))
       .asScala
-      .headOption catch {
+      .headOption
+    catch {
       case e: org.eclipse.aether.resolution.ArtifactResolutionException => None
     }
     try metadataResultOpt match {
@@ -63,8 +71,8 @@ class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
         import org.codehaus.plexus.util.ReaderFactory
         val readMetadata = {
           val reader = ReaderFactory.newXmlReader(md.getMetadata.getFile)
-          try new MetadataXpp3Reader().read(reader, false) finally reader
-            .close()
+          try new MetadataXpp3Reader().read(reader, false)
+          finally reader.close()
         }
         val timestampOpt = for {
           v <- Option(readMetadata.getVersioning)

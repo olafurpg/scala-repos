@@ -124,7 +124,8 @@ class PostScript(filename: String, _width: Double, _height: Double)
   }
 
   def plotLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = {
-    Console.println(round(x1) + " " + round(y1) + " m " + round(x2) + " " +
+    Console.println(
+      round(x1) + " " + round(y1) + " m " + round(x2) + " " +
         round(y2) + " l");
   }
 
@@ -132,7 +133,7 @@ class PostScript(filename: String, _width: Double, _height: Double)
   Console.println("%!PS-Adobe-3.0 EPSF-3.0\n%%Title: ProgrammationIV");
   Console.println("%%Creator: LAMP");
   Console.println(
-      "%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
+    "%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
   Console.println("%%EndComments\n");
   Console.println("/m {moveto} bind def\n/l {lineto} bind def\n");
   Console.println(mm2ps(line_thickness) + " setlinewidth\nnewpath");
@@ -218,15 +219,15 @@ object M0 {
   // A small test painter.
   def house(canvas: Graphics)(frame: Frame): Unit = {
     canvas.drawPolySegment(frame)(
-        List(new Vector(0.0, 0.0),
-             new Vector(1.0, 0.0),
-             new Vector(1.0, 2.0 / 3.0),
-             new Vector(0.0, 2.0 / 3.0),
-             new Vector(0.5, 1.0),
-             new Vector(1.0, 2.0 / 3.0),
-             new Vector(0.0, 0.0),
-             new Vector(0.0, 2.0 / 3.0),
-             new Vector(1.0, 0.0)));
+      List(new Vector(0.0, 0.0),
+           new Vector(1.0, 0.0),
+           new Vector(1.0, 2.0 / 3.0),
+           new Vector(0.0, 2.0 / 3.0),
+           new Vector(0.5, 1.0),
+           new Vector(1.0, 2.0 / 3.0),
+           new Vector(0.0, 0.0),
+           new Vector(0.0, 2.0 / 3.0),
+           new Vector(1.0, 0.0)));
     canvas.repaint
   }
 

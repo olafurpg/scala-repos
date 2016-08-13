@@ -151,24 +151,24 @@ class GroupMetadataTest extends JUnitSuite {
 
     val memberId = "memberId"
     val member = new MemberMetadata(
-        memberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     group.add(memberId, member)
     assertEquals("range", group.selectProtocol)
 
     val otherMemberId = "otherMemberId"
     val otherMember = new MemberMetadata(
-        otherMemberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
 
     group.add(otherMemberId, otherMember)
     // now could be either range or robin since there is no majority preference
@@ -176,12 +176,12 @@ class GroupMetadataTest extends JUnitSuite {
 
     val lastMemberId = "lastMemberId"
     val lastMember = new MemberMetadata(
-        lastMemberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
+      lastMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
 
     group.add(lastMemberId, lastMember)
     // now we should prefer 'roundrobin'
@@ -203,21 +203,21 @@ class GroupMetadataTest extends JUnitSuite {
 
     val memberId = "memberId"
     val member = new MemberMetadata(
-        memberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     val otherMemberId = "otherMemberId"
     val otherMember = new MemberMetadata(
-        otherMemberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
 
     group.add(memberId, member)
     group.add(otherMemberId, otherMember)
@@ -236,12 +236,12 @@ class GroupMetadataTest extends JUnitSuite {
 
     val memberId = "memberId"
     val member = new MemberMetadata(
-        memberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     group.add(memberId, member)
     assertTrue(group.supportsProtocols(Set("roundrobin", "foo")))
@@ -250,12 +250,12 @@ class GroupMetadataTest extends JUnitSuite {
 
     val otherMemberId = "otherMemberId"
     val otherMember = new MemberMetadata(
-        otherMemberId,
-        groupId,
-        clientId,
-        clientHost,
-        sessionTimeoutMs,
-        List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
+      List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
 
     group.add(otherMemberId, otherMember)
 
@@ -264,8 +264,8 @@ class GroupMetadataTest extends JUnitSuite {
   }
 
   private def assertState(group: GroupMetadata, targetState: GroupState) {
-    val states: Set[GroupState] = Set(
-        Stable, PreparingRebalance, AwaitingSync, Dead)
+    val states: Set[GroupState] =
+      Set(Stable, PreparingRebalance, AwaitingSync, Dead)
     val otherStates = states - targetState
     otherStates.foreach { otherState =>
       assertFalse(group.is(otherState))

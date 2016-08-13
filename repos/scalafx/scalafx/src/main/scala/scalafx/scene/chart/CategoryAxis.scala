@@ -30,7 +30,11 @@ import javafx.scene.{chart => jfxsc}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ReadOnlyDoubleProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
@@ -53,7 +57,8 @@ object CategoryAxis {
 
 class CategoryAxis(
     override val delegate: jfxsc.CategoryAxis = new jfxsc.CategoryAxis)
-    extends Axis[String](delegate) with SFXDelegate[jfxsc.CategoryAxis] {
+    extends Axis[String](delegate)
+    with SFXDelegate[jfxsc.CategoryAxis] {
 
   def categorySpacing: ReadOnlyDoubleProperty =
     delegate.categorySpacingProperty

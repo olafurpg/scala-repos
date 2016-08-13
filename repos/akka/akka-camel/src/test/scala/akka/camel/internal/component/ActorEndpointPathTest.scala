@@ -10,7 +10,10 @@ import org.scalatest.WordSpec
 import akka.actor.{Actor, Props}
 
 class ActorEndpointPathTest
-    extends WordSpec with SharedCamelSystem with Matchers with MockitoSugar {
+    extends WordSpec
+    with SharedCamelSystem
+    with Matchers
+    with MockitoSugar {
 
   def find(path: String) =
     ActorEndpointPath.fromCamelPath(path).findActorIn(system)

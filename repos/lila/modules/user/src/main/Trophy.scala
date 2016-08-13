@@ -19,19 +19,20 @@ object Trophy {
 
     object ZugMiracle
         extends Kind(
-            key = "zugMiracle",
-            name = "Zug miracle",
-            icon = none,
-            url = "http://lichess.org/qa/259/how-do-you-get-a-zug-miracle-trophy".some,
-            none)
+          key = "zugMiracle",
+          name = "Zug miracle",
+          icon = none,
+          url =
+            "http://lichess.org/qa/259/how-do-you-get-a-zug-miracle-trophy".some,
+          none)
 
     object WayOfBerserk
-        extends Kind(
-            key = "wayOfBerserk",
-            name = "The way of Berserk",
-            icon = "`".some,
-            url = "http://lichess.org/qa/340/way-of-berserk-trophy".some,
-            "fire_trophy".some)
+        extends Kind(key = "wayOfBerserk",
+                     name = "The way of Berserk",
+                     icon = "`".some,
+                     url =
+                       "http://lichess.org/qa/340/way-of-berserk-trophy".some,
+                     "fire_trophy".some)
 
     object MarathonWinner
         extends Kind(key = "marathonWinner",
@@ -63,27 +64,29 @@ object Trophy {
 
     object MarathonSurvivor
         extends Kind(
-            key = "marathonSurvivor",
-            name = "Marathon #1 survivor",
-            icon = ",".some,
-            url = "http://lichess.org/blog/VXF45yYAAPQgLH4d/chess-marathon-1".some,
-            "fire_trophy".some)
+          key = "marathonSurvivor",
+          name = "Marathon #1 survivor",
+          icon = ",".some,
+          url =
+            "http://lichess.org/blog/VXF45yYAAPQgLH4d/chess-marathon-1".some,
+          "fire_trophy".some)
 
     object BongcloudWarrior
         extends Kind(
-            key = "bongcloudWarrior",
-            name = "Bongcloud Warrior",
-            icon = "~".some,
-            url = "http://lichess.org/forum/lichess-feedback/bongcloud-trophy".some,
-            "fire_trophy".some)
+          key = "bongcloudWarrior",
+          name = "Bongcloud Warrior",
+          icon = "~".some,
+          url =
+            "http://lichess.org/forum/lichess-feedback/bongcloud-trophy".some,
+          "fire_trophy".some)
 
     object Developer
         extends Kind(
-            key = "developer",
-            name = "Lichess developer",
-            icon = "&#xe000;".some,
-            url = "https://github.com/ornicar/lila/graphs/contributors".some,
-            "icon3d".some)
+          key = "developer",
+          name = "Lichess developer",
+          icon = "&#xe000;".some,
+          url = "https://github.com/ornicar/lila/graphs/contributors".some,
+          "icon3d".some)
 
     object Moderator
         extends Kind(key = "moderator",

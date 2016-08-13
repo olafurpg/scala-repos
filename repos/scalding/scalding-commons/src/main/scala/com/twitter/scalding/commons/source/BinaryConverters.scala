@@ -17,7 +17,11 @@ limitations under the License.
 package com.twitter.scalding.commons.source
 
 import com.twitter.elephantbird.mapreduce.io.BinaryConverter
-import com.twitter.scrooge.{BinaryThriftStructSerializer, ThriftStructCodec, ThriftStruct}
+import com.twitter.scrooge.{
+  BinaryThriftStructSerializer,
+  ThriftStructCodec,
+  ThriftStruct
+}
 import scala.reflect.ClassTag
 import scala.util.Try
 
@@ -36,20 +40,20 @@ object ScroogeBinaryConverter {
   private[this] def codecForNormal[T <: ThriftStruct](
       thriftStructClass: Class[T]): Try[ThriftStructCodec[T]] =
     Try(
-        Class
-          .forName(thriftStructClass.getName + "$")
-          .getField("MODULE$")
-          .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
+      Class
+        .forName(thriftStructClass.getName + "$")
+        .getField("MODULE$")
+        .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
 
   private[this] def codecForUnion[T <: ThriftStruct](
       maybeUnion: Class[T]): Try[ThriftStructCodec[T]] =
     Try(
-        Class
-          .forName(maybeUnion.getName.reverse.dropWhile(_ != '$').reverse)
-          .getField("MODULE$")
-          .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
+      Class
+        .forName(maybeUnion.getName.reverse.dropWhile(_ != '$').reverse)
+        .getField("MODULE$")
+        .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
 
-  def apply[T <: ThriftStruct : ClassTag]: BinaryConverter[T] = {
+  def apply[T <: ThriftStruct: ClassTag]: BinaryConverter[T] = {
     val ct = implicitly[ClassTag[T]]
     new BinaryConverter[T] {
       val serializer = BinaryThriftStructSerializer[T] {

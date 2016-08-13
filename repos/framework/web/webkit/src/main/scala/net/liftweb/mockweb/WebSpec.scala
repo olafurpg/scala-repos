@@ -44,7 +44,8 @@ import mocks.MockHttpServletRequest
   * is to just point this at your Boostrap.boot method.
   */
 abstract class WebSpec(boot: () => Any = () => {})
-    extends Specification with XmlMatchers {
+    extends Specification
+    with XmlMatchers {
 
   /**
     * This is our private spec instance of Liftrules. Everything we run will
@@ -185,7 +186,7 @@ abstract class WebSpec(boot: () => Any = () => {})
       case r: MockHttpServletRequest => f(r); this
       case _ =>
         throw new IllegalArgumentException(
-            "We can only mutate MockHttpServletRequest instances")
+          "We can only mutate MockHttpServletRequest instances")
     }
   }
 
@@ -206,15 +207,15 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     def in(expectations: => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testS(req, session) {
-                  expectations
-                }
+        fragmentFactory.example(description, {
+          LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+            MockWeb.useLiftRules.doWith(true) {
+              MockWeb.testS(req, session) {
+                expectations
               }
             }
-          }) ^ fragmentFactory.break
+          }
+        }) ^ fragmentFactory.break
       )
     }
   }
@@ -230,13 +231,13 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     def in(expectations: Req => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testReq(req)(expectations)
-              }
+        fragmentFactory.example(description, {
+          LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+            MockWeb.useLiftRules.doWith(true) {
+              MockWeb.testReq(req)(expectations)
             }
-          }) ^ fragmentFactory.break
+          }
+        }) ^ fragmentFactory.break
       )
     }
   }
@@ -257,22 +258,21 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     def in(expectations: Box[NodeSeq] => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testS(req, session) {
-                  S.request match {
-                    case Full(sReq) =>
-                      expectations(S.runTemplate(sReq.path.partPath))
-                    case other =>
-                      failure(
-                          "Error: withTemplateFor call did not result in " +
-                          "request initialization (S.request = " + other + ")")
-                  }
+        fragmentFactory.example(description, {
+          LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+            MockWeb.useLiftRules.doWith(true) {
+              MockWeb.testS(req, session) {
+                S.request match {
+                  case Full(sReq) =>
+                    expectations(S.runTemplate(sReq.path.partPath))
+                  case other =>
+                    failure("Error: withTemplateFor call did not result in " +
+                      "request initialization (S.request = " + other + ")")
                 }
               }
             }
-          }) ^ fragmentFactory.break
+          }
+        }) ^ fragmentFactory.break
       )
     }
   }

@@ -23,11 +23,11 @@ object Route {
   /**
     * "Seals" a route by wrapping it with exception handling and rejection conversion.
     */
-  def seal(route: Route)(
-      implicit routingSettings: RoutingSettings,
-      parserSettings: ParserSettings = null,
-      rejectionHandler: RejectionHandler = RejectionHandler.default,
-      exceptionHandler: ExceptionHandler = null): Route = {
+  def seal(route: Route)(implicit routingSettings: RoutingSettings,
+                         parserSettings: ParserSettings = null,
+                         rejectionHandler: RejectionHandler =
+                           RejectionHandler.default,
+                         exceptionHandler: ExceptionHandler = null): Route = {
     import directives.ExecutionDirectives._
     handleExceptions(ExceptionHandler.seal(exceptionHandler)) {
       handleRejections(rejectionHandler.seal) {
@@ -77,14 +77,14 @@ object Route {
       val sealedRoute = seal(route)
       request ⇒
         sealedRoute(
-            new RequestContextImpl(request,
-                                   routingLog.requestLog(request),
-                                   routingSettings,
-                                   effectiveParserSettings)).fast.map {
+          new RequestContextImpl(request,
+                                 routingLog.requestLog(request),
+                                 routingSettings,
+                                 effectiveParserSettings)).fast.map {
           case RouteResult.Complete(response) ⇒ response
           case RouteResult.Rejected(rejected) ⇒
             throw new IllegalStateException(
-                s"Unhandled rejections '$rejected', unsealed RejectionHandler?!")
+              s"Unhandled rejections '$rejected', unsealed RejectionHandler?!")
         }
     }
   }

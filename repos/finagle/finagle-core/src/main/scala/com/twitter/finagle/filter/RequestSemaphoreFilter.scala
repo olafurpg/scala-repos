@@ -26,8 +26,9 @@ object RequestSemaphoreFilter {
     new Stack.Module2[Param, param.Stats, ServiceFactory[Req, Rep]] {
       val role = RequestSemaphoreFilter.role
       val description = "Restrict number of concurrent requests"
-      def make(
-          _param: Param, _stats: param.Stats, next: ServiceFactory[Req, Rep]) =
+      def make(_param: Param,
+               _stats: param.Stats,
+               next: ServiceFactory[Req, Rep]) =
         _param match {
           case Param(None) => next
           case Param(Some(sem)) =>
@@ -38,10 +39,10 @@ object RequestSemaphoreFilter {
               // itself.
               val max = sem.numInitialPermits
               val gauges = Seq(
-                  sr.addGauge("request_concurrency") {
-                    max - sem.numPermitsAvailable
-                  },
-                  sr.addGauge("request_queue_size") { sem.numWaiters }
+                sr.addGauge("request_concurrency") {
+                  max - sem.numPermitsAvailable
+                },
+                sr.addGauge("request_queue_size") { sem.numWaiters }
               )
             }
             filter andThen next

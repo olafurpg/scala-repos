@@ -28,32 +28,32 @@ class HoconHighlightUsagesTest
   }
 
   def testSimple() = testUsages(
-      (0, 0, 3),
-      (1, 0, 3),
-      (2, 0, 3),
-      (3, 0, 3),
-      (6, 0, 3),
-      (7, 0, 3),
-      (9, 12, 3)
+    (0, 0, 3),
+    (1, 0, 3),
+    (2, 0, 3),
+    (3, 0, 3),
+    (6, 0, 3),
+    (7, 0, 3),
+    (9, 12, 3)
   )
 
   def testNested() = testUsages(
-      (4, 2, 3),
-      (7, 4, 3),
-      (10, 16, 3)
+    (4, 2, 3),
+    (7, 4, 3),
+    (10, 16, 3)
   )
 
   def testInArrayElement() = testUsages(
-      (6, 3, 3),
-      (6, 13, 3)
+    (6, 3, 3),
+    (6, 13, 3)
   )
 
   def testDifferentTexts() = testUsages(
-      (0, 0, 3),
-      (1, 0, 5),
-      (2, 0, 5),
-      (3, 0, 9),
-      (4, 10, 7)
+    (0, 0, 3),
+    (1, 0, 5),
+    (2, 0, 5),
+    (3, 0, 9),
+    (4, 10, 7)
   )
 
   def testSingle() = testUsages()

@@ -119,13 +119,16 @@ trait CheckpointState[T] extends WaitingState[Interval[Timestamp]] {
       available match {
         case intersection @ Intersection(low, high)
             if checkInterval(intersection) &&
-            hasStarted.compareAndSet(false, true) =>
+              hasStarted.compareAndSet(false, true) =>
           intersection.toLeftClosedRightOpen match {
             case Some(leftClosedRightOpenIntersection) =>
               val batchToken: T = checkpointStore.checkpointBatchStart(
-                  leftClosedRightOpenIntersection)
-              Right(new CheckpointRunningState(
-                      this, intersection, hasStarted, batchToken))
+                leftClosedRightOpenIntersection)
+              Right(
+                new CheckpointRunningState(this,
+                                           intersection,
+                                           hasStarted,
+                                           batchToken))
             case _ => Left(waitingState)
           }
         case _ => Left(waitingState)
@@ -144,8 +147,8 @@ trait CheckpointState[T] extends WaitingState[Interval[Timestamp]] {
       val batchToken: T)
       extends RunningState[Interval[Timestamp]] {
     private def setStopped() = require(
-        isRunning.compareAndSet(true, false),
-        "Concurrent modification of HDFSState!"
+      isRunning.compareAndSet(true, false),
+      "Concurrent modification of HDFSState!"
     )
 
     /**
@@ -172,12 +175,12 @@ trait CheckpointState[T] extends WaitingState[Interval[Timestamp]] {
     * Returns true if each timestamp represents the first
     * millisecond of a batch.
     */
-  private def alignedToBatchBoundaries(
-      low: Lower[Timestamp], high: Upper[Timestamp]): Boolean =
+  private def alignedToBatchBoundaries(low: Lower[Timestamp],
+                                       high: Upper[Timestamp]): Boolean =
     (for {
       lowerBound <- low.least
       upperBound <- high.strictUpperBound
     } yield
       checkpointStore.batcher.isLowerBatchEdge(lowerBound) &&
-      checkpointStore.batcher.isLowerBatchEdge(upperBound)).getOrElse(false)
+        checkpointStore.batcher.isLowerBatchEdge(upperBound)).getOrElse(false)
 }

@@ -42,12 +42,13 @@ import scala.collection.mutable.ArrayBuffer
   * @param isSlice Should the start and end parameters be used for slicing?
   */
 @nonthreadsafe
-class FileMessageSet private[kafka](@volatile var file: File,
-                                    private[log] val channel: FileChannel,
-                                    private[log] val start: Int,
-                                    private[log] val end: Int,
-                                    isSlice: Boolean)
-    extends MessageSet with Logging {
+class FileMessageSet private[kafka] (@volatile var file: File,
+                                     private[log] val channel: FileChannel,
+                                     private[log] val start: Int,
+                                     private[log] val end: Int,
+                                     isSlice: Boolean)
+    extends MessageSet
+    with Logging {
 
   /* the size of the message set in bytes */
   private val _size =
@@ -120,11 +121,11 @@ class FileMessageSet private[kafka](@volatile var file: File,
     if (position < 0)
       throw new IllegalArgumentException("Invalid position: " + position)
     if (size < 0) throw new IllegalArgumentException("Invalid size: " + size)
-    new FileMessageSet(
-        file,
-        channel,
-        start = this.start + position,
-        end = math.min(this.start + position + size, sizeInBytes()))
+    new FileMessageSet(file,
+                       channel,
+                       start = this.start + position,
+                       end =
+                         math.min(this.start + position + size, sizeInBytes()))
   }
 
   /**
@@ -142,8 +143,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
       channel.read(buffer, position)
       if (buffer.hasRemaining)
         throw new IllegalStateException(
-            "Failed to read complete buffer for targetOffset %d startPosition %d in %s"
-              .format(targetOffset, startingPosition, file.getAbsolutePath))
+          "Failed to read complete buffer for targetOffset %d startPosition %d in %s"
+            .format(targetOffset, startingPosition, file.getAbsolutePath))
       buffer.rewind()
       val offset = buffer.getLong()
       if (offset >= targetOffset) return OffsetPosition(offset, position)
@@ -169,8 +170,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
     val newSize = math.min(channel.size().toInt, end) - start
     if (newSize < _size.get()) {
       throw new KafkaException(
-          "Size of FileMessageSet %s has been truncated during write: old size %d, new size %d"
-            .format(file.getAbsolutePath, _size.get(), newSize))
+        "Size of FileMessageSet %s has been truncated during write: old size %d, new size %d"
+          .format(file.getAbsolutePath, _size.get(), newSize))
     }
     val position = start + writePosition
     val count = math.min(size, sizeInBytes)
@@ -179,7 +180,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
       case dc => channel.transferTo(position, count, dc)
     }).toInt
     trace(
-        "FileMessageSet " + file.getAbsolutePath + " : bytes transferred : " +
+      "FileMessageSet " + file.getAbsolutePath + " : bytes transferred : " +
         bytesTransferred + " bytes requested for transfer : " +
         math.min(size, sizeInBytes))
     bytesTransferred
@@ -240,8 +241,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
 
     // We use the offset seq to assign offsets so the offset of the messages does not change.
     new ByteBufferMessageSet(compressionCodec = this.headOption
-                                 .map(_.message.compressionCodec)
-                                 .getOrElse(NoCompressionCodec),
+                               .map(_.message.compressionCodec)
+                               .getOrElse(NoCompressionCodec),
                              offsetSeq = offsets,
                              newMessages: _*)
   }
@@ -276,8 +277,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
         if (size < Message.MinMessageOverhead) return allDone()
         if (size > maxMessageSize)
           throw new CorruptRecordException(
-              "Message size exceeds the largest allowable message size (%d)."
-                .format(maxMessageSize))
+            "Message size exceeds the largest allowable message size (%d)."
+              .format(maxMessageSize))
 
         // read the item itself
         val buffer = ByteBuffer.allocate(size)
@@ -347,7 +348,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
     val originalSize = sizeInBytes
     if (targetSize > originalSize || targetSize < 0)
       throw new KafkaException(
-          "Attempt to truncate log segment to " + targetSize +
+        "Attempt to truncate log segment to " + targetSize +
           " bytes failed, " + " size of this log segment is " + originalSize +
           " bytes.")
     channel.truncate(targetSize)
@@ -370,7 +371,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * @throws IOException if rename fails.
     */
   def renameTo(f: File) {
-    try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file = f
+    try Utils.atomicMoveWithFallback(file.toPath, f.toPath)
+    finally this.file = f
   }
 }
 
@@ -406,6 +408,5 @@ object FileMessageSet {
 
 object LogFlushStats extends KafkaMetricsGroup {
   val logFlushTimer = new KafkaTimer(
-      newTimer(
-          "LogFlushRateAndTimeMs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS))
+    newTimer("LogFlushRateAndTimeMs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS))
 }

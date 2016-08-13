@@ -55,7 +55,8 @@ private[yarn] class ExecutorRunnable(container: Container,
                                      executorCores: Int,
                                      appId: String,
                                      securityMgr: SecurityManager)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
 
   var rpc: YarnRPC = YarnRPC.create(conf)
   var nmClient: NMClient = _
@@ -107,7 +108,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     ctx.setCommands(commands.asJava)
     ctx.setApplicationACLs(
-        YarnSparkHadoopUtil.getApplicationAclsForYarn(securityMgr).asJava)
+      YarnSparkHadoopUtil.getApplicationAclsForYarn(securityMgr).asJava)
 
     // If external shuffle service is enabled, register with the Yarn shuffle service already
     // started on the NodeManager and, if authentication is enabled, provide it with our secret
@@ -123,7 +124,7 @@ private[yarn] class ExecutorRunnable(container: Container,
           ByteBuffer.allocate(0)
         }
       ctx.setServiceData(
-          Collections.singletonMap("spark_shuffle", secretBytes))
+        Collections.singletonMap("spark_shuffle", secretBytes))
     }
 
     // Send the start request to the ContainerManager
@@ -132,9 +133,9 @@ private[yarn] class ExecutorRunnable(container: Container,
     } catch {
       case ex: Exception =>
         throw new SparkException(
-            s"Exception while starting container ${container.getId}" +
+          s"Exception while starting container ${container.getId}" +
             s" on host $hostname",
-            ex)
+          ex)
     }
   }
 
@@ -169,12 +170,12 @@ private[yarn] class ExecutorRunnable(container: Container,
     }
     sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach { p =>
       prefixEnv = Some(
-          Client.getClusterPath(sparkConf, Utils.libraryPathEnvPrefix(Seq(p))))
+        Client.getClusterPath(sparkConf, Utils.libraryPathEnvPrefix(Seq(p))))
     }
 
     javaOpts += "-Djava.io.tmpdir=" + new Path(
-        YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
+      YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
+      YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
     )
 
     // Certain configs need to be passed here because they are needed before the Executor
@@ -215,7 +216,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // For log4j configuration to reference
     javaOpts +=
-    ("-Dspark.yarn.app.container.log.dir=" +
+      ("-Dspark.yarn.app.container.log.dir=" +
         ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
@@ -234,30 +235,30 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     val commands =
       prefixEnv ++ Seq(
-          YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
+        YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
           "/bin/java",
-          "-server",
-          // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
-          // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in
-          // an inconsistent state.
-          // TODO: If the OOM is not recoverable by rescheduling it on different node, then do
-          // 'something' to fail job ... akin to blacklisting trackers in mapred ?
-          YarnSparkHadoopUtil.getOutOfMemoryErrorArgument) ++ javaOpts ++ Seq(
-          "org.apache.spark.executor.CoarseGrainedExecutorBackend",
-          "--driver-url",
-          masterAddress.toString,
-          "--executor-id",
-          slaveId.toString,
-          "--hostname",
-          hostname.toString,
-          "--cores",
-          executorCores.toString,
-          "--app-id",
-          appId) ++ userClassPath ++ Seq(
-          "1>",
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
-          "2>",
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")
+        "-server",
+        // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
+        // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in
+        // an inconsistent state.
+        // TODO: If the OOM is not recoverable by rescheduling it on different node, then do
+        // 'something' to fail job ... akin to blacklisting trackers in mapred ?
+        YarnSparkHadoopUtil.getOutOfMemoryErrorArgument) ++ javaOpts ++ Seq(
+        "org.apache.spark.executor.CoarseGrainedExecutorBackend",
+        "--driver-url",
+        masterAddress.toString,
+        "--executor-id",
+        slaveId.toString,
+        "--hostname",
+        hostname.toString,
+        "--cores",
+        executorCores.toString,
+        "--app-id",
+        appId) ++ userClassPath ++ Seq(
+        "1>",
+        ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
+        "2>",
+        ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")
 
     // TODO: it would be nicer to just make sure there are no null commands here
     commands.map(s => if (s == null) "null" else s).toList
@@ -348,8 +349,8 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // lookup appropriate http scheme for container log urls
     val yarnHttpPolicy = yarnConf.get(
-        YarnConfiguration.YARN_HTTP_POLICY_KEY,
-        YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
+      YarnConfiguration.YARN_HTTP_POLICY_KEY,
+      YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
     )
     val httpScheme =
       if (yarnHttpPolicy == "HTTPS_ONLY") "https://" else "http://"

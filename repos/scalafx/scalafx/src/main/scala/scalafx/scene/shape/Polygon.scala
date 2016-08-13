@@ -39,7 +39,8 @@ object Polygon {
 }
 
 class Polygon(override val delegate: jfxss.Polygon = new jfxss.Polygon)
-    extends Shape(delegate) with SFXDelegate[jfxss.Polygon] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Polygon] {
 
   /**
     * Gets the coordinates of the PolyLine segments.

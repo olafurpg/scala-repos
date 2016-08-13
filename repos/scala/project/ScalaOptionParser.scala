@@ -19,51 +19,54 @@ object ScalaOptionParser {
     }
     def MultiStringSetting(name: String): Parser[String] =
       concat(
-          concat(token(name ~ ":")) ~ repsep(
-              token(StringBasicNotStartingWithDash,
-                    TokenCompletions.displayOnly("<value>")),
-              token(",")).map(_.mkString))
+        concat(token(name ~ ":")) ~ repsep(
+          token(StringBasicNotStartingWithDash,
+                TokenCompletions.displayOnly("<value>")),
+          token(",")).map(_.mkString))
     def IntSetting(name: String): Parser[String] =
       concat(
-          concat(token(name ~ ":")) ~ token(
-              IntBasic.map(_.toString),
-              TokenCompletions.displayOnly("<integer>")))
+        concat(token(name ~ ":")) ~ token(
+          IntBasic.map(_.toString),
+          TokenCompletions.displayOnly("<integer>")))
     def ChoiceSetting(name: String, choices: List[String]): Parser[String] =
-      concat(token(concat(name ~ ":")) ~ token(
-              StringBasic.examples(choices: _*)).map(_.mkString))
-    def MultiChoiceSetting(
-        name: String, choices: List[String]): Parser[String] =
       concat(
-          token(concat(name ~ ":")) ~ rep1sep(
-              token(StringBasic.examples(choices: _*)),
-              token(",")).map(_.mkString))
+        token(concat(name ~ ":")) ~ token(StringBasic.examples(choices: _*))
+          .map(_.mkString))
+    def MultiChoiceSetting(name: String,
+                           choices: List[String]): Parser[String] =
+      concat(
+        token(concat(name ~ ":")) ~ rep1sep(
+          token(StringBasic.examples(choices: _*)),
+          token(",")).map(_.mkString))
     def PathSetting(name: String): Parser[String] = {
       concat(
-          concat(token(name) ~ Space.string) ~ rep1sep(
-              JarOrDirectoryParser.filter(!_.contains(":"), x => x),
-              token(java.io.File.pathSeparator)).map(_.mkString))
+        concat(token(name) ~ Space.string) ~ rep1sep(
+          JarOrDirectoryParser.filter(!_.contains(":"), x => x),
+          token(java.io.File.pathSeparator)).map(_.mkString))
     }
     def FileSetting(name: String): Parser[String] = {
       concat(
-          concat(token(name) ~ Space.string) ~ rep1sep(
-              JarOrDirectoryParser.filter(!_.contains(":"), x => x),
-              token(java.io.File.pathSeparator)).map(_.mkString))
+        concat(token(name) ~ Space.string) ~ rep1sep(
+          JarOrDirectoryParser.filter(!_.contains(":"), x => x),
+          token(java.io.File.pathSeparator)).map(_.mkString))
     }
     val Phase = token(NotSpace.examples(phases: _*))
     def PhaseSettingParser(name: String): Parser[String] = {
       MultiChoiceSetting(name, phases)
     }
     def ScalaVersionSetting(name: String): Parser[String] = {
-      concat(concat(token(name ~ Space.string)) ~ token(
-              StringBasic, TokenCompletions.displayOnly("<scala version>")))
+      concat(
+        concat(token(name ~ Space.string)) ~ token(
+          StringBasic,
+          TokenCompletions.displayOnly("<scala version>")))
     }
     val Property: Parser[String] = {
       val PropName = concat(
-          token("-D" ~ oneOrMore(NotSpaceClass & not('=', "not =")).string,
-                TokenCompletions.displayOnly("-D<property name>")))
+        token("-D" ~ oneOrMore(NotSpaceClass & not('=', "not =")).string,
+              TokenCompletions.displayOnly("-D<property name>")))
       val EqualsValue = concat(
-          "=" ~ token(OptNotSpace,
-                      TokenCompletions.displayOnly("<property value>")))
+        "=" ~ token(OptNotSpace,
+                    TokenCompletions.displayOnly("<property value>")))
       concat(PropName ~ EqualsValue.?.map(_.getOrElse("")))
     }
 
@@ -72,29 +75,34 @@ object ScalaOptionParser {
     // TODO Allow JVM settings via -J-... and temporarily add them to the ForkOptions
     val UniversalOpt =
       Property | oneOf(
-          pathSettingNames.map(PathSetting) ++ phaseSettings.map(
-              PhaseSettingParser) ++ booleanSettingNames.map(BooleanSetting) ++ stringSettingNames
-            .map(StringSetting) ++ multiStringSettingNames.map(MultiStringSetting) ++ intSettingNames
-            .map(IntSetting) ++ choiceSettingNames.map {
-        case (k, v) => ChoiceSetting(k, v)
-      } ++ multiChoiceSettingNames.map {
-        case (k, v) => MultiChoiceSetting(k, v)
-      } ++ scalaVersionSettings.map(ScalaVersionSetting))
+        pathSettingNames.map(PathSetting) ++ phaseSettings.map(
+          PhaseSettingParser) ++ booleanSettingNames
+          .map(BooleanSetting) ++ stringSettingNames
+          .map(StringSetting) ++ multiStringSettingNames.map(
+          MultiStringSetting) ++ intSettingNames
+          .map(IntSetting) ++ choiceSettingNames.map {
+          case (k, v) => ChoiceSetting(k, v)
+        } ++ multiChoiceSettingNames.map {
+          case (k, v) => MultiChoiceSetting(k, v)
+        } ++ scalaVersionSettings.map(ScalaVersionSetting))
     val ScalacOpt = sourceFile | UniversalOpt
 
-    val ScalaExtraSettings = oneOf(scalaChoiceSettingNames.map {
-      case (k, v) => ChoiceSetting(k, v)
-    }.toList ++ scalaStringSettingNames.map(StringSetting) ++ scalaBooleanSettingNames
-          .map(BooleanSetting))
+    val ScalaExtraSettings = oneOf(
+      scalaChoiceSettingNames.map {
+        case (k, v) => ChoiceSetting(k, v)
+      }.toList ++ scalaStringSettingNames
+        .map(StringSetting) ++ scalaBooleanSettingNames.map(BooleanSetting))
     val ScalaOpt = UniversalOpt | ScalaExtraSettings
 
     val ScalaDocExtraSettings = oneOf(
-        scalaDocBooleanSettingNames.map(BooleanSetting) ++ scalaDocIntSettingNames
-          .map(IntSetting) ++ scalaDocChoiceSettingNames.map {
-          case (k, v) => ChoiceSetting(k, v)
-        } ++ scaladocStringSettingNames.map(StringSetting) ++ scaladocPathSettingNames
-          .map(PathSetting) ++ scaladocMultiStringSettingNames.map(
-            MultiStringSetting)
+      scalaDocBooleanSettingNames
+        .map(BooleanSetting) ++ scalaDocIntSettingNames
+        .map(IntSetting) ++ scalaDocChoiceSettingNames.map {
+        case (k, v) => ChoiceSetting(k, v)
+      } ++ scaladocStringSettingNames
+        .map(StringSetting) ++ scaladocPathSettingNames
+        .map(PathSetting) ++ scaladocMultiStringSettingNames.map(
+        MultiStringSetting)
     )
     val ScalaDocOpt = ScalacOpt | ScalaDocExtraSettings
 
@@ -105,16 +113,14 @@ object ScalaOptionParser {
                 TokenCompletions.displayOnly("<script|class|object|jar>"))
             .filter(!_.startsWith("-"), x => x)
         val runnableAndArgs = concat(
-            runnable ~ Opt(concat(Space.string ~ repsep(token(StringBasic,
-                                                              TokenCompletions
-                                                                .displayOnly(
-                                                                  "<arg>")),
-                                                        Space)
-                      .map(_.mkString(" ")))))
+          runnable ~ Opt(
+            concat(
+              Space.string ~ repsep(
+                token(StringBasic, TokenCompletions.displayOnly("<arg>")),
+                Space).map(_.mkString(" ")))))
         val options = rep1sep(ScalaOpt, Space).map(_.mkString(" "))
-        Opt(
-            Space ~>
-            (options | concat(concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
+        Opt(Space ~>
+          (options | concat(concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
       case "scaladoc" =>
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))
       case "scalac" =>
@@ -275,8 +281,10 @@ object ScalaOptionParser {
                                    "-Ycheck",
                                    "-Xprint")
   private def multiStringSettingNames =
-    List(
-        "-Xmacro-settings", "-Xplugin", "-Xplugin-disable", "-Xplugin-require")
+    List("-Xmacro-settings",
+         "-Xplugin",
+         "-Xplugin-disable",
+         "-Xplugin-require")
   private def intSettingNames =
     List("-Xmax-classfile-name",
          "-Xelide-below",
@@ -285,54 +293,58 @@ object ScalaOptionParser {
          "-Yrecursion")
   private def choiceSettingNames =
     Map[String, List[String]](
-        "-YclasspathImpl" -> List("flat", "recursive"),
-        "-Ydelambdafy" -> List("inline", "method"),
-        "-Ymacro-expand" -> List("discard", "none"),
-        "-Yresolve-term-conflict" -> List("error", "object", "package"),
-        "-g" -> List("line", "none", "notailcails", "source", "vars"),
-        "-target" -> List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"))
+      "-YclasspathImpl" -> List("flat", "recursive"),
+      "-Ydelambdafy" -> List("inline", "method"),
+      "-Ymacro-expand" -> List("discard", "none"),
+      "-Yresolve-term-conflict" -> List("error", "object", "package"),
+      "-g" -> List("line", "none", "notailcails", "source", "vars"),
+      "-target" -> List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"))
   private def multiChoiceSettingNames = Map[String, List[String]](
-      "-Xlint" -> List("adapted-args",
-                       "nullary-unit",
-                       "inaccessible",
-                       "nullary-override",
-                       "infer-any",
-                       "missing-interpolator",
-                       "doc-detached",
-                       "private-shadow",
-                       "type-parameter-shadow",
-                       "poly-implicit-overload",
-                       "option-implicit",
-                       "delayedinit-select",
-                       "by-name-right-associative",
-                       "package-object-classes",
-                       "unsound-match",
-                       "stars-align"),
-      "-language" -> List("help",
-                          "_",
-                          "dynamics",
-                          "postfixOps",
-                          "reflectiveCalls",
-                          "implicitConversions",
-                          "higherKinds",
-                          "existentials",
-                          "experimental.macros"),
-      "-Yopt" -> List("l:none",
-                      "l:default",
-                      "l:method",
-                      "l:project",
-                      "l:classpath",
-                      "unreachable-code",
-                      "simplify-jumps",
-                      "empty-line-numbers",
-                      "empty-labels",
-                      "compact-locals",
-                      "nullness-tracking",
-                      "closure-elimination",
-                      "inline-project",
-                      "inline-global"),
-      "-Ystatistics" -> List(
-          "parser", "typer", "patmat", "erasure", "cleanup", "jvm")
+    "-Xlint" -> List("adapted-args",
+                     "nullary-unit",
+                     "inaccessible",
+                     "nullary-override",
+                     "infer-any",
+                     "missing-interpolator",
+                     "doc-detached",
+                     "private-shadow",
+                     "type-parameter-shadow",
+                     "poly-implicit-overload",
+                     "option-implicit",
+                     "delayedinit-select",
+                     "by-name-right-associative",
+                     "package-object-classes",
+                     "unsound-match",
+                     "stars-align"),
+    "-language" -> List("help",
+                        "_",
+                        "dynamics",
+                        "postfixOps",
+                        "reflectiveCalls",
+                        "implicitConversions",
+                        "higherKinds",
+                        "existentials",
+                        "experimental.macros"),
+    "-Yopt" -> List("l:none",
+                    "l:default",
+                    "l:method",
+                    "l:project",
+                    "l:classpath",
+                    "unreachable-code",
+                    "simplify-jumps",
+                    "empty-line-numbers",
+                    "empty-labels",
+                    "compact-locals",
+                    "nullness-tracking",
+                    "closure-elimination",
+                    "inline-project",
+                    "inline-global"),
+    "-Ystatistics" -> List("parser",
+                           "typer",
+                           "patmat",
+                           "erasure",
+                           "cleanup",
+                           "jvm")
   )
   private def scalaVersionSettings = List("-Xmigration", "-Xsource")
 

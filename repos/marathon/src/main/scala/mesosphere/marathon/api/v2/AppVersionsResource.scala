@@ -10,7 +10,11 @@ import mesosphere.marathon.api.{AuthResource, MarathonMediaType}
 import mesosphere.marathon.plugin.auth.{Authenticator, Authorizer, ViewApp}
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{GroupManager, Timestamp}
-import mesosphere.marathon.{UnknownAppException, MarathonConf, MarathonSchedulerService}
+import mesosphere.marathon.{
+  UnknownAppException,
+  MarathonConf,
+  MarathonSchedulerService
+}
 import org.slf4j.LoggerFactory
 
 @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))

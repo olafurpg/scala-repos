@@ -5,9 +5,15 @@ import algebra.CommutativeGroup
 import algebra.ring.AdditiveCommutativeGroup
 
 trait AnyValInstances
-    extends IntInstances with ByteInstances with CharInstances
-    with LongInstances with ShortInstances with FloatInstances
-    with DoubleInstances with BooleanInstances with UnitInstances
+    extends IntInstances
+    with ByteInstances
+    with CharInstances
+    with LongInstances
+    with ShortInstances
+    with FloatInstances
+    with DoubleInstances
+    with BooleanInstances
+    with UnitInstances
 
 trait IntInstances extends algebra.std.IntInstances {
 

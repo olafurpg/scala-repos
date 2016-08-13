@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Type-level encoding of GCD.
-  * 
+  *
   * @author George Leontiev
   */
 object GCDExamples {
@@ -30,8 +30,8 @@ object GCDExamples {
   trait GCD[X <: Nat, Y <: Nat] { type Out <: Nat }
 
   object GCD {
-    def gcd[N <: Nat](x: Nat, y: Nat)(
-        implicit gcd: Aux[x.N, y.N, N], wn: Witness.Aux[N]): N = wn.value
+    def gcd[N <: Nat](x: Nat, y: Nat)(implicit gcd: Aux[x.N, y.N, N],
+                                      wn: Witness.Aux[N]): N = wn.value
 
     type Aux[X <: Nat, Y <: Nat, Z <: Nat] = GCD[X, Y] { type Out = Z }
 
@@ -42,7 +42,8 @@ object GCDExamples {
         ev2: Aux[X, Z, Out0]): Aux[X, Y, Out0] =
       new GCD[X, Y] { type Out = Out0 }
     implicit def gcd2[X <: Nat, Y <: Nat, Out0 <: Nat](
-        implicit ev0: LT[Y, X], ev1: Aux[Y, X, Out0]): Aux[X, Y, Out0] =
+        implicit ev0: LT[Y, X],
+        ev1: Aux[Y, X, Out0]): Aux[X, Y, Out0] =
       new GCD[X, Y] { type Out = Out0 }
   }
 

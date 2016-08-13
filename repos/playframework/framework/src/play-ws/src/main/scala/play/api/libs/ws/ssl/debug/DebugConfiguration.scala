@@ -5,7 +5,11 @@
  */
 package play.api.libs.ws.ssl.debug
 
-import play.api.libs.ws.ssl.{JavaxNetDebugBuilder, JavaSecurityDebugBuilder, SSLDebugConfig}
+import play.api.libs.ws.ssl.{
+  JavaxNetDebugBuilder,
+  JavaSecurityDebugBuilder,
+  SSLDebugConfig
+}
 
 class DebugConfiguration {
 
@@ -19,14 +23,14 @@ class DebugConfiguration {
   def configureJavaxNetDebug(d: SSLDebugConfig) {
     val netDebugOptions = new JavaxNetDebugBuilder(d).build()
     logger.debug(
-        s"configureJavaxNetDebug: d = $d, netDebugOptions = $netDebugOptions")
+      s"configureJavaxNetDebug: d = $d, netDebugOptions = $netDebugOptions")
     FixInternalDebugLogging(netDebugOptions)
   }
 
   def configureJavaSecurityDebug(d: SSLDebugConfig) {
     val securityOptions = new JavaSecurityDebugBuilder(d).build()
     logger.debug(
-        s"configureJavaSecurityDebug: d = $d, securityOptions = $securityOptions")
+      s"configureJavaSecurityDebug: d = $d, securityOptions = $securityOptions")
     System.setProperty("java.security.debug", securityOptions)
     FixCertpathDebugLogging(securityOptions)
   }

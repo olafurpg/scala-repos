@@ -69,7 +69,7 @@ object ScalaFX_Scene_Graph_App_03 extends JFXApp {
     scene = new Scene(500, 500) {
       fill = Color.Black
       content = List(
-          rectangle
+        rectangle
       )
     }
     val parallelTransition = new ParallelTransition {
@@ -78,33 +78,33 @@ object ScalaFX_Scene_Graph_App_03 extends JFXApp {
       autoReverse = true
       interpolator = Interpolator.EaseBoth
       children = Seq(
-          new TranslateTransition {
-            duration = (2 s)
-            toX = 390
-            toY = 390
-          },
-          new FillTransition {
-            duration = (2 s)
-            toValue = Color.Red
-          },
-          new RotateTransition {
-            duration = (2 s)
-            toAngle = 360
-          },
-          new SequentialTransition {
-            children = Seq(
-                new ScaleTransition {
-                  duration = (1 s)
-                  toX = 0.1
-                  toY = 0.1
-                },
-                new ScaleTransition {
-                  duration = (1 s)
-                  toX = 1
-                  toY = 1
-                }
-            )
-          }
+        new TranslateTransition {
+          duration = (2 s)
+          toX = 390
+          toY = 390
+        },
+        new FillTransition {
+          duration = (2 s)
+          toValue = Color.Red
+        },
+        new RotateTransition {
+          duration = (2 s)
+          toAngle = 360
+        },
+        new SequentialTransition {
+          children = Seq(
+            new ScaleTransition {
+              duration = (1 s)
+              toX = 0.1
+              toY = 0.1
+            },
+            new ScaleTransition {
+              duration = (1 s)
+              toX = 1
+              toY = 1
+            }
+          )
+        }
       )
     }
     parallelTransition.play()

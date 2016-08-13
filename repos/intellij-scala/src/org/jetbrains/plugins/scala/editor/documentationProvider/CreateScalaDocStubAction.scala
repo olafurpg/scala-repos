@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala
 package editor.documentationProvider
 
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction,
+  AnActionEvent,
+  CommonDataKeys
+}
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
@@ -10,9 +14,16 @@ import com.intellij.psi.util.PsiUtilBase
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.actions.ScalaActionUtil
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScDocCommentOwner, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScDocCommentOwner,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 
@@ -33,8 +44,8 @@ class CreateScalaDocStubAction
     val editor = CommonDataKeys.EDITOR.getData(context)
 
     if (editor == null) return
-    val file = PsiUtilBase.getPsiFileInEditor(
-        editor, CommonDataKeys.PROJECT.getData(context))
+    val file = PsiUtilBase
+      .getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     file findElementAt editor.getCaretModel.getOffset match {
@@ -54,8 +65,8 @@ class CreateScalaDocStubAction
 
   private def createStub(docOwner: ScDocCommentOwner, psiDocument: Document) {
     val newComment = ScalaPsiElementFactory.createDocCommentFromText(
-        ScalaDocumentationProvider createScalaDocStub docOwner trim (),
-        docOwner.getManager)
+      ScalaDocumentationProvider createScalaDocStub docOwner trim (),
+      docOwner.getManager)
     val project = docOwner.getProject
     val docCommentEnd = docOwner.getTextRange.getStartOffset - 1
 
@@ -71,15 +82,15 @@ class CreateScalaDocStubAction
           val docRange = docOwner.getDocComment.getTextRange
           extensions inWriteAction {
             CodeStyleManager getInstance project reformatText
-            (docOwner.getContainingFile, docRange.getStartOffset,
-                docRange.getEndOffset + 2)
+              (docOwner.getContainingFile, docRange.getStartOffset,
+              docRange.getEndOffset + 2)
           }
         }
       }, "Create ScalaDoc stub", null, psiDocument)
   }
 
-  private def recreateStub(
-      docOwner: ScDocCommentOwner, psiDocument: Document) {
+  private def recreateStub(docOwner: ScDocCommentOwner,
+                           psiDocument: Document) {
     val oldComment = docOwner.getDocComment.asInstanceOf[ScDocComment]
     val oldTags = oldComment findTagsByName (_ => true)
 
@@ -97,8 +108,8 @@ class CreateScalaDocStubAction
     @inline def convertToParamMap[T <: ScNamedElement](params: Seq[T]) =
       mutable.HashMap(params map (p => (p.getName, p)): _*)
 
-    def processParams[T <: ScNamedElement](
-        groupNames: List[String], params: List[Seq[T]]) {
+    def processParams[T <: ScNamedElement](groupNames: List[String],
+                                           params: List[Seq[T]]) {
       val paramMaps =
         groupNames zip params map {
           case (name, param) =>
@@ -117,8 +128,8 @@ class CreateScalaDocStubAction
           (anchor /: paramMap) {
             case (currentAnchor, param) =>
               val newTagText =
-                if (psiDocument.getText(new TextRange(currentAnchor - 1,
-                                                      currentAnchor)) == "*")
+                if (psiDocument.getText(
+                      new TextRange(currentAnchor - 1, currentAnchor)) == "*")
                   s"$name ${param._2.getName} \n"
                 else s"* $name ${param._2.getName} \n"
               psiDocument.insertString(currentAnchor, newTagText)
@@ -150,8 +161,8 @@ class CreateScalaDocStubAction
             PsiDocumentManager getInstance project commitDocument psiDocument
             val range = docOwner.getDocComment.getTextRange
             CodeStyleManager getInstance project reformatText
-            (docOwner.getContainingFile, range.getStartOffset,
-                range.getEndOffset)
+              (docOwner.getContainingFile, range.getStartOffset,
+              range.getEndOffset)
           }
         }
       }, "Create ScalaDoc Stub", null, psiDocument)

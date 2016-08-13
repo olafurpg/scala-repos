@@ -40,8 +40,10 @@ object PerspectiveTransform {
 }
 
 class PerspectiveTransform(
-    override val delegate: jfxse.PerspectiveTransform = new jfxse.PerspectiveTransform)
-    extends Effect(delegate) with InputDelegate[jfxse.PerspectiveTransform]
+    override val delegate: jfxse.PerspectiveTransform =
+      new jfxse.PerspectiveTransform)
+    extends Effect(delegate)
+    with InputDelegate[jfxse.PerspectiveTransform]
     with SFXDelegate[jfxse.PerspectiveTransform] {
 
   /**
@@ -56,7 +58,7 @@ class PerspectiveTransform(
            llx: Double,
            lly: Double) =
     this(
-        new jfxse.PerspectiveTransform(ulx, uly, urx, ury, lrx, lry, llx, lly))
+      new jfxse.PerspectiveTransform(ulx, uly, urx, ury, lrx, lry, llx, lly))
 
   /**
     * The x coordinate of the output location onto which the lower left corner of the source is mapped.

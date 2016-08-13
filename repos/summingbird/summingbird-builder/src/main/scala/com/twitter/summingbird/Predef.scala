@@ -49,8 +49,11 @@ object Predef {
   val CompoundStore = com.twitter.summingbird.store.CompoundStore
 
   // Offline stores
-  type VersionedStore[K, V] = com.twitter.summingbird.scalding.store.VersionedBatchStore[
-      K, V, K, (BatchID, V)]
+  type VersionedStore[K, V] =
+    com.twitter.summingbird.scalding.store.VersionedBatchStore[K,
+                                                               V,
+                                                               K,
+                                                               (BatchID, V)]
   val VersionedStore = com.twitter.summingbird.scalding.store.VersionedStore
 
   // Common options

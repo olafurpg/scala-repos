@@ -19,12 +19,12 @@ object SymbolRequirement {
   def factory(originatingComponent: String): Factory =
     new Factory(originatingComponent)
 
-  final class Factory private[SymbolRequirement](origin: String) {
+  final class Factory private[SymbolRequirement] (origin: String) {
     def accessModule(moduleName: String): SymbolRequirement =
       AccessModule(origin, moduleName)
 
-    def callOnModule(
-        moduleName: String, methodName: String): SymbolRequirement =
+    def callOnModule(moduleName: String,
+                     methodName: String): SymbolRequirement =
       multiple(accessModule(moduleName), callMethod(moduleName, methodName))
 
     def callOnModule(moduleName: String,
@@ -33,8 +33,8 @@ object SymbolRequirement {
       multipleInternal(accessModule(moduleName) :: methodCalls)
     }
 
-    def instantiateClass(
-        className: String, constructor: String): SymbolRequirement = {
+    def instantiateClass(className: String,
+                         constructor: String): SymbolRequirement = {
       InstantiateClass(origin, className, constructor)
     }
 
@@ -58,12 +58,12 @@ object SymbolRequirement {
       multipleInternal(methodNames.toList.map(callMethod(className, _)))
     }
 
-    def callMethodStatically(
-        className: String, methodName: String): SymbolRequirement =
+    def callMethodStatically(className: String,
+                             methodName: String): SymbolRequirement =
       CallMethod(origin, className, methodName, statically = true)
 
-    def callStaticMethod(
-        className: String, methodName: String): SymbolRequirement =
+    def callStaticMethod(className: String,
+                         methodName: String): SymbolRequirement =
       CallStaticMethod(origin, className, methodName)
 
     def optional(requirement: SymbolRequirement): SymbolRequirement = {
@@ -97,8 +97,9 @@ object SymbolRequirement {
   private[analyzer] object Nodes {
     case class AccessModule(origin: String, moduleName: String)
         extends SymbolRequirement
-    case class InstantiateClass(
-        origin: String, className: String, constructor: String)
+    case class InstantiateClass(origin: String,
+                                className: String,
+                                constructor: String)
         extends SymbolRequirement
     case class InstanceTests(origin: String, className: String)
         extends SymbolRequirement
@@ -109,8 +110,9 @@ object SymbolRequirement {
                           methodName: String,
                           statically: Boolean)
         extends SymbolRequirement
-    case class CallStaticMethod(
-        origin: String, className: String, methodName: String)
+    case class CallStaticMethod(origin: String,
+                                className: String,
+                                methodName: String)
         extends SymbolRequirement
     case class Optional(requirement: SymbolRequirement)
         extends SymbolRequirement

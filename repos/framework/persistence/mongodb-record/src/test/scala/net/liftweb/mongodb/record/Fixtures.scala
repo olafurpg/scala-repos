@@ -178,7 +178,8 @@ class FieldTypeTestRecord private ()
 }
 
 object FieldTypeTestRecord
-    extends FieldTypeTestRecord with MongoMetaRecord[FieldTypeTestRecord]
+    extends FieldTypeTestRecord
+    with MongoMetaRecord[FieldTypeTestRecord]
 
 class BinaryFieldTestRecord
     extends MongoRecord[BinaryFieldTestRecord]
@@ -224,32 +225,34 @@ class BinaryFieldTestRecord
   override def equals(other: Any): Boolean = other match {
     case that: BinaryFieldTestRecord =>
       this.id.value == that.id.value &&
-      this.mandatoryBinaryField == that.mandatoryBinaryField &&
-      this.legacyOptionalBinaryField == that.legacyOptionalBinaryField &&
-      this.optionalBinaryField == that.optionalBinaryField
+        this.mandatoryBinaryField == that.mandatoryBinaryField &&
+        this.legacyOptionalBinaryField == that.legacyOptionalBinaryField &&
+        this.optionalBinaryField == that.optionalBinaryField
     case _ => false
   }
 }
 object BinaryFieldTestRecord
-    extends BinaryFieldTestRecord with MongoMetaRecord[BinaryFieldTestRecord]
+    extends BinaryFieldTestRecord
+    with MongoMetaRecord[BinaryFieldTestRecord]
 
 case class TypeTestJsonObject(
     intField: Int,
     stringField: String,
     mapField: Map[String, String]
-)
-    extends JsonObject[TypeTestJsonObject] {
+) extends JsonObject[TypeTestJsonObject] {
   // TODO: Add more types
   def meta = TypeTestJsonObject
 }
 object TypeTestJsonObject extends JsonObjectMeta[TypeTestJsonObject]
 
 class DBRefTestRecord private ()
-    extends MongoRecord[DBRefTestRecord] with ObjectIdPk[DBRefTestRecord] {
+    extends MongoRecord[DBRefTestRecord]
+    with ObjectIdPk[DBRefTestRecord] {
   def meta = DBRefTestRecord
 }
 object DBRefTestRecord
-    extends DBRefTestRecord with MongoMetaRecord[DBRefTestRecord]
+    extends DBRefTestRecord
+    with MongoMetaRecord[DBRefTestRecord]
 
 class MongoFieldTypeTestRecord private ()
     extends MongoRecord[MongoFieldTypeTestRecord]
@@ -282,8 +285,8 @@ class MongoFieldTypeTestRecord private ()
   }
 
   object mandatoryMongoCaseClassField
-      extends MongoCaseClassField[
-          MongoFieldTypeTestRecord, MongoCaseClassTestObject](this) {
+      extends MongoCaseClassField[MongoFieldTypeTestRecord,
+                                  MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
@@ -323,13 +326,16 @@ class PasswordTestRecord private ()
   object password extends MongoPasswordField(this, 3)
 }
 object PasswordTestRecord
-    extends PasswordTestRecord with MongoMetaRecord[PasswordTestRecord]
+    extends PasswordTestRecord
+    with MongoMetaRecord[PasswordTestRecord]
 
-case class MongoCaseClassTestObject(
-    intField: Int, stringField: String, enum: MyTestEnum.Value)
+case class MongoCaseClassTestObject(intField: Int,
+                                    stringField: String,
+                                    enum: MyTestEnum.Value)
 
 class ListTestRecord private ()
-    extends MongoRecord[ListTestRecord] with UUIDPk[ListTestRecord] {
+    extends MongoRecord[ListTestRecord]
+    with UUIDPk[ListTestRecord] {
   def meta = ListTestRecord
 
   object mandatoryStringListField
@@ -341,18 +347,20 @@ class ListTestRecord private ()
   object mandatoryMongoJsonObjectListField
       extends MongoJsonObjectListField(this, TypeTestJsonObject)
   object mongoCaseClassListField
-      extends MongoCaseClassListField[
-          ListTestRecord, MongoCaseClassTestObject](this) {
+      extends MongoCaseClassListField[ListTestRecord,
+                                      MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
 object ListTestRecord
-    extends ListTestRecord with MongoMetaRecord[ListTestRecord] {
+    extends ListTestRecord
+    with MongoMetaRecord[ListTestRecord] {
   override def formats = allFormats + new EnumSerializer(MyTestEnum)
 }
 
 class MongoListTestRecord private ()
-    extends MongoRecord[MongoListTestRecord] with UUIDPk[MongoListTestRecord] {
+    extends MongoRecord[MongoListTestRecord]
+    with UUIDPk[MongoListTestRecord] {
   def meta = MongoListTestRecord
 
   object objectIdRefListField
@@ -363,10 +371,11 @@ class MongoListTestRecord private ()
   object uuidListField extends MongoListField[MongoListTestRecord, UUID](this)
 }
 object MongoListTestRecord
-    extends MongoListTestRecord with MongoMetaRecord[MongoListTestRecord] {
+    extends MongoListTestRecord
+    with MongoMetaRecord[MongoListTestRecord] {
   override def formats =
     DefaultFormats.lossless + new ObjectIdSerializer + new PatternSerializer +
-    new DateSerializer
+      new DateSerializer
 }
 
 class MongoJodaListTestRecord private ()
@@ -384,7 +393,8 @@ object MongoJodaListTestRecord
 }
 
 class MapTestRecord private ()
-    extends MongoRecord[MapTestRecord] with StringPk[MapTestRecord] {
+    extends MongoRecord[MapTestRecord]
+    with StringPk[MapTestRecord] {
   def meta = MapTestRecord
 
   object mandatoryStringMapField
@@ -394,7 +404,8 @@ class MapTestRecord private ()
   // TODO: More Map types, including JsonObject (will require a new Field type)
 }
 object MapTestRecord
-    extends MapTestRecord with MongoMetaRecord[MapTestRecord] {
+    extends MapTestRecord
+    with MongoMetaRecord[MapTestRecord] {
   override def formats = allFormats
 }
 
@@ -407,11 +418,13 @@ class LifecycleTestRecord private ()
     meta.foreachCallback(this, f)
 
   object stringFieldWithCallbacks
-      extends StringField(this, 100) with HarnessedLifecycleCallbacks
+      extends StringField(this, 100)
+      with HarnessedLifecycleCallbacks
 }
 
 object LifecycleTestRecord
-    extends LifecycleTestRecord with MongoMetaRecord[LifecycleTestRecord]
+    extends LifecycleTestRecord
+    with MongoMetaRecord[LifecycleTestRecord]
 
 /*
  * SubRecord fields
@@ -463,7 +476,8 @@ class SubRecordTestRecord private ()
   }
 }
 object SubRecordTestRecord
-    extends SubRecordTestRecord with MongoMetaRecord[SubRecordTestRecord] {
+    extends SubRecordTestRecord
+    with MongoMetaRecord[SubRecordTestRecord] {
   override def formats = allFormats
 }
 
@@ -473,7 +487,8 @@ case class JsonObj(id: String, name: String) extends JsonObject[JsonObj] {
 object JsonObj extends JsonObjectMeta[JsonObj]
 
 class NullTestRecord private ()
-    extends MongoRecord[NullTestRecord] with IntPk[NullTestRecord] {
+    extends MongoRecord[NullTestRecord]
+    with IntPk[NullTestRecord] {
 
   def meta = NullTestRecord
 
@@ -490,7 +505,8 @@ class NullTestRecord private ()
 }
 
 object NullTestRecord
-    extends NullTestRecord with MongoMetaRecord[NullTestRecord]
+    extends NullTestRecord
+    with MongoMetaRecord[NullTestRecord]
 
 case class BoxTestJsonObj(id: String,
                           boxEmpty: Box[String],
@@ -502,21 +518,24 @@ case class BoxTestJsonObj(id: String,
 object BoxTestJsonObj extends JsonObjectMeta[BoxTestJsonObj]
 
 class BoxTestRecord private ()
-    extends MongoRecord[BoxTestRecord] with LongPk[BoxTestRecord] {
+    extends MongoRecord[BoxTestRecord]
+    with LongPk[BoxTestRecord] {
   def meta = BoxTestRecord
 
   object jsonobj
-      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](
-          this, BoxTestJsonObj) {
+      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](this,
+                                                             BoxTestJsonObj) {
     def defaultValue =
       BoxTestJsonObj("0", Empty, Full("Full String"), Failure("Failure"))
   }
   object jsonobjlist
       extends MongoJsonObjectListField[BoxTestRecord, BoxTestJsonObj](
-          this, BoxTestJsonObj)
+        this,
+        BoxTestJsonObj)
 }
 object BoxTestRecord
-    extends BoxTestRecord with MongoMetaRecord[BoxTestRecord] {
+    extends BoxTestRecord
+    with MongoMetaRecord[BoxTestRecord] {
   override def formats = super.formats + new JsonBoxSerializer
 }
 
@@ -548,7 +567,8 @@ class RefFieldTestRecord private ()
 }
 
 object RefFieldTestRecord
-    extends RefFieldTestRecord with MongoMetaRecord[RefFieldTestRecord] {
+    extends RefFieldTestRecord
+    with MongoMetaRecord[RefFieldTestRecord] {
   override def formats = allFormats
 }
 
@@ -567,11 +587,13 @@ object JObjectFieldTestRecord
 }
 
 class CustomFieldName private ()
-    extends MongoRecord[CustomFieldName] with ObjectIdPk[CustomFieldName] {
+    extends MongoRecord[CustomFieldName]
+    with ObjectIdPk[CustomFieldName] {
   def meta = CustomFieldName
 
   object customField extends StringField(this, 256)
 }
 
 object CustomFieldName
-    extends CustomFieldName with MongoMetaRecord[CustomFieldName]
+    extends CustomFieldName
+    with MongoMetaRecord[CustomFieldName]

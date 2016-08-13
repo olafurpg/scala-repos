@@ -33,12 +33,16 @@ import org.apache.spark.util.Utils
 case class OrcParData(intField: Int, stringField: String)
 
 // The data that also includes the partitioning key
-case class OrcParDataWithKey(
-    intField: Int, pi: Int, stringField: String, ps: String)
+case class OrcParDataWithKey(intField: Int,
+                             pi: Int,
+                             stringField: String,
+                             ps: String)
 
 // TODO This test suite duplicates ParquetPartitionDiscoverySuite a lot
 class OrcPartitionDiscoverySuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -46,21 +50,23 @@ class OrcPartitionDiscoverySuite
 
   def withTempDir(f: File => Unit): Unit = {
     val dir = Utils.createTempDir().getCanonicalFile
-    try f(dir) finally Utils.deleteRecursively(dir)
+    try f(dir)
+    finally Utils.deleteRecursively(dir)
   }
 
-  def makeOrcFile[T <: Product : ClassTag : TypeTag](
-      data: Seq[T], path: File): Unit = {
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](data: Seq[T],
+                                                   path: File): Unit = {
     data.toDF().write.mode("overwrite").orc(path.getCanonicalPath)
   }
 
-  def makeOrcFile[T <: Product : ClassTag : TypeTag](
-      df: DataFrame, path: File): Unit = {
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](df: DataFrame,
+                                                   path: File): Unit = {
     df.write.mode("overwrite").orc(path.getCanonicalPath)
   }
 
   protected def withTempTable(tableName: String)(f: => Unit): Unit = {
-    try f finally hiveContext.dropTempTable(tableName)
+    try f
+    finally hiveContext.dropTempTable(tableName)
   }
 
   protected def makePartitionDir(basePath: File,
@@ -87,9 +93,9 @@ class OrcPartitionDiscoverySuite
         pi <- Seq(1, 2)
         ps <- Seq("foo", "bar")
       } {
-        makeOrcFile((1 to 10).map(i => OrcParData(i, i.toString)),
-                    makePartitionDir(
-                        base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+        makeOrcFile(
+          (1 to 10).map(i => OrcParData(i, i.toString)),
+          makePartitionDir(base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
       }
 
       read.orc(base.getCanonicalPath).registerTempTable("t")
@@ -127,9 +133,8 @@ class OrcPartitionDiscoverySuite
         ps <- Seq("foo", "bar")
       } {
         makeOrcFile(
-            (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
-            makePartitionDir(
-                base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+          (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
+          makePartitionDir(base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
       }
 
       read.orc(base.getCanonicalPath).registerTempTable("t")
@@ -167,9 +172,9 @@ class OrcPartitionDiscoverySuite
         pi <- Seq(1, null.asInstanceOf[Integer])
         ps <- Seq("foo", null.asInstanceOf[String])
       } {
-        makeOrcFile((1 to 10).map(i => OrcParData(i, i.toString)),
-                    makePartitionDir(
-                        base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+        makeOrcFile(
+          (1 to 10).map(i => OrcParData(i, i.toString)),
+          makePartitionDir(base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
       }
 
       read
@@ -198,16 +203,15 @@ class OrcPartitionDiscoverySuite
   }
 
   test(
-      "read partitioned table - with nulls and partition keys are included in Orc file") {
+    "read partitioned table - with nulls and partition keys are included in Orc file") {
     withTempDir { base =>
       for {
         pi <- Seq(1, 2)
         ps <- Seq("foo", null.asInstanceOf[String])
       } {
         makeOrcFile(
-            (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
-            makePartitionDir(
-                base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
+          (1 to 10).map(i => OrcParDataWithKey(i, pi, i.toString, ps)),
+          makePartitionDir(base, defaultPartitionName, "pi" -> pi, "ps" -> ps))
       }
 
       read

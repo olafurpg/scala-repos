@@ -8,19 +8,18 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
 
   def run(r: R, s: S1)(implicit F: Monad[F]): F[(W, A, S2)] =
     F.join(
-        F.map[(R, S1) => F[(W, A, S2)], F[(W, A, S2)]](getF(F))(f => f(r, s)))
+      F.map[(R, S1) => F[(W, A, S2)], F[(W, A, S2)]](getF(F))(f => f(r, s)))
 
   /** Discards the writer component. */
   def state(r: R)(implicit F: Monad[F]): IndexedStateT[F, S1, S2, A] =
-    IndexedStateT(
-        (s: S1) =>
-          F.map(run(r, s)) {
+    IndexedStateT((s: S1) =>
+      F.map(run(r, s)) {
         case (w, a, s1) => (s1, a)
     })
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZero[S <: S1](r: R)(
-      implicit F: Monad[F], S: Monoid[S]): F[(W, A, S2)] =
+  def runZero[S <: S1](r: R)(implicit F: Monad[F],
+                             S: Monoid[S]): F[(W, A, S2)] =
     run(r, S.zero)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
@@ -42,39 +41,40 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   def map[B](f: A => B)(
       implicit F: Functor[F]): IndexedReaderWriterStateT[F, R, W, S1, S2, B] =
     IndexedReaderWriterStateT.create[F, R, W, S1, S2, B]((G: Monad[F]) =>
-          (r: R,
-          s: S1) => F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
+      (r: R, s: S1) => F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
 
   def flatMap[B, RR <: R, S3](
       f: A => IndexedReaderWriterStateT[F, RR, W, S2, S3, B])(
       implicit F: Bind[F],
       W: Semigroup[W]): IndexedReaderWriterStateT[F, RR, W, S1, S3, B] =
-    IndexedReaderWriterStateT.create[F, RR, W, S1, S3, B](
-        (G: Monad[F]) =>
-          (r: RR, s1: S1) =>
-            F.bind(self.run(r, s1)(G)) {
+    IndexedReaderWriterStateT.create[F, RR, W, S1, S3, B]((G: Monad[F]) =>
+      (r: RR, s1: S1) =>
+        F.bind(self.run(r, s1)(G)) {
           case (w1, a, s2) => {
-              F.map(f(a).run(r, s2)(G)) {
-                case (w2, b, s3) => (W.append(w1, w2), b, s3)
-              }
+            F.map(f(a).run(r, s2)(G)) {
+              case (w2, b, s3) => (W.append(w1, w2), b, s3)
             }
+          }
     })
 }
 
 object IndexedReaderWriterStateT
-    extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-  def apply[F[_], R, W, S1, S2, A](f: (R,
-      S1) => F[(W, A, S2)]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] =
+    extends ReaderWriterStateTInstances
+    with ReaderWriterStateTFunctions {
+  def apply[F[_], R, W, S1, S2, A](f: (R, S1) => F[(W, A, S2)])
+    : IndexedReaderWriterStateT[F, R, W, S1, S2, A] =
     new IndexedReaderWriterStateT[F, R, W, S1, S2, A] {
-      override def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[
-              (W, A, S2)]] = (F: Monad[F]) => F.point((r: R, s: S) => f(r, s))
+      override def getF[S <: S1, RR <: R]
+        : Monad[F] => F[(RR, S) => F[(W, A, S2)]] =
+        (F: Monad[F]) => F.point((r: R, s: S) => f(r, s))
     }
 
-  def create[F[_], R, W, S1, S2, A](f: Monad[F] => (R,
-      S1) => F[(W, A, S2)]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] =
+  def create[F[_], R, W, S1, S2, A](f: Monad[F] => (R, S1) => F[(W, A, S2)])
+    : IndexedReaderWriterStateT[F, R, W, S1, S2, A] =
     new IndexedReaderWriterStateT[F, R, W, S1, S2, A] {
-      override def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[
-              (W, A, S2)]] = (F: Monad[F]) => F.point(f(F))
+      override def getF[S <: S1, RR <: R]
+        : Monad[F] => F[(RR, S) => F[(W, A, S2)]] =
+        (F: Monad[F]) => F.point(f(F))
     }
 }
 
@@ -128,8 +128,8 @@ sealed abstract class ReaderWriterStateTInstances0
 
   implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F])
     : MonadReader[ReaderWriterStateT[F, R, W, S, ?], R] with MonadState[
-        ReaderWriterStateT[F, R, W, S, ?], S] with MonadListen[
-        ReaderWriterStateT[F, R, W, S, ?], W] =
+      ReaderWriterStateT[F, R, W, S, ?],
+      S] with MonadListen[ReaderWriterStateT[F, R, W, S, ?], W] =
     new ReaderWriterStateTMonad[F, R, W, S] {
       implicit def F = F0
       implicit def W = W0
@@ -157,10 +157,10 @@ private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2]
     extends Plus[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] {
   def F: Plus[F]
 
-  override final def plus[A](
-      a: IRWST[F, R, W, S1, S2, A], b: => IRWST[F, R, W, S1, S2, A]) =
+  override final def plus[A](a: IRWST[F, R, W, S1, S2, A],
+                             b: => IRWST[F, R, W, S1, S2, A]) =
     IRWST.create((G: Monad[F]) =>
-          (r: R, s: S1) => F.plus(a.run(r, s)(G), b.run(r, s)(G)))
+      (r: R, s: S1) => F.plus(a.run(r, s)(G), b.run(r, s)(G)))
 }
 
 private trait IndexedReaderWriterStateTPlusEmpty[F[_], R, W, S1, S2]
@@ -206,9 +206,8 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S]
           e.bimap((w1, _, s0), (w1, _, s0))
       }
 
-    ReaderWriterStateT(
-        (r, s) =>
-          F.bind(f(a).run(r, s)) {
+    ReaderWriterStateT((r, s) =>
+      F.bind(f(a).run(r, s)) {
         case (w, -\/(a0), s0) => F.tailrecM(go(r))(w, a0, s0)
         case (w, \/-(b), s0) => A.point((w, b, s0))
     })
@@ -258,7 +257,7 @@ private trait ReaderWriterStateTMonad[F[_], R, W, S]
   def listen[A](ma: ReaderWriterStateT[F, R, W, S, A])
     : ReaderWriterStateT[F, R, W, S, (A, W)] =
     ReaderWriterStateT(
-        (r, s) => F.map(ma.run(r, s)) { case (w, a, s1) => (w, (a, w), s1) })
+      (r, s) => F.map(ma.run(r, s)) { case (w, a, s1) => (w, (a, w), s1) })
 }
 
 private trait ReaderWriterStateTHoist[R, W, S]
@@ -266,7 +265,11 @@ private trait ReaderWriterStateTHoist[R, W, S]
   implicit def W: Monoid[W]
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    new (ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N, R, W, S, ?]) {
+    new (ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N,
+                                                                 R,
+                                                                 W,
+                                                                 S,
+                                                                 ?]) {
       def apply[A](ma: ReaderWriterStateT[M, R, W, S, A])
         : ReaderWriterStateT[N, R, W, S, A] = ReaderWriterStateT {
         case (r, s) => f.apply(ma.run(r, s))

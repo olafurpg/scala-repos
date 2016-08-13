@@ -32,7 +32,10 @@ import org.apache.spark.sql.types.{DataType, DoubleType, StructType}
   * (private[ml])  Trait for parameters for prediction (regression and classification).
   */
 private[ml] trait PredictorParams
-    extends Params with HasLabelCol with HasFeaturesCol with HasPredictionCol {
+    extends Params
+    with HasLabelCol
+    with HasFeaturesCol
+    with HasPredictionCol {
 
   /**
     * Validates and transforms the input schema with the provided param map.
@@ -71,7 +74,8 @@ private[ml] trait PredictorParams
 abstract class Predictor[FeaturesType,
                          Learner <: Predictor[FeaturesType, Learner, M],
                          M <: PredictionModel[FeaturesType, M]]
-    extends Estimator[M] with PredictorParams {
+    extends Estimator[M]
+    with PredictorParams {
 
   /** @group setParam */
   def setLabelCol(value: String): Learner =
@@ -142,7 +146,8 @@ abstract class Predictor[FeaturesType,
 @DeveloperApi
 abstract class PredictionModel[
     FeaturesType, M <: PredictionModel[FeaturesType, M]]
-    extends Model[M] with PredictorParams {
+    extends Model[M]
+    with PredictorParams {
 
   /** @group setParam */
   def setFeaturesCol(value: String): M =
@@ -182,7 +187,8 @@ abstract class PredictionModel[
     if ($(predictionCol).nonEmpty) {
       transformImpl(dataset)
     } else {
-      this.logWarning(s"$uid: Predictor.transform() was called as NOOP" +
+      this.logWarning(
+        s"$uid: Predictor.transform() was called as NOOP" +
           " since no output columns were set.")
       dataset
     }

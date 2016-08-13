@@ -30,7 +30,7 @@ package object foo {
     }
     println("============")
     println(
-        s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
+      s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
     println(s"isPrivate = ${sym.isPrivate}")
     println(s"isProtected = ${sym.isProtected}")
     println(s"isPublic = ${sym.isPublic}")

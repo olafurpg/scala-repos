@@ -6,7 +6,11 @@ import javax.swing.Icon
 import com.intellij.ide.IdeView
 import com.intellij.ide.actions.CreateTemplateInPackageAction
 import com.intellij.ide.fileTemplates.{FileTemplateManager, JavaTemplateUtil}
-import com.intellij.openapi.actionSystem.{CommonDataKeys, DataContext, LangDataKeys}
+import com.intellij.openapi.actionSystem.{
+  CommonDataKeys,
+  DataContext,
+  LangDataKeys
+}
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -21,9 +25,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
   * Date: 27.03.15.
   */
 abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
-    txt: String, description: String, icon: Icon)
+    txt: String,
+    description: String,
+    icon: Icon)
     extends CreateTemplateInPackageAction[T](
-        txt, description, icon, JavaModuleSourceRootTypes.SOURCES) {
+      txt,
+      description,
+      icon,
+      JavaModuleSourceRootTypes.SOURCES) {
   override def checkPackageExists(psiDirectory: PsiDirectory) =
     JavaDirectoryService.getInstance.getPackage(psiDirectory) != null
 
@@ -45,8 +54,8 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
     JavaTemplateUtil.setPackageNameAttribute(properties, directory)
     properties.setProperty(NewTypeDefinitionBase.NAME_TEMPLATE_PROPERTY, name)
     properties.setProperty(
-        NewTypeDefinitionBase.LOW_CASE_NAME_TEMPLATE_PROPERTY,
-        name.substring(0, 1).toLowerCase + name.substring(1))
+      NewTypeDefinitionBase.LOW_CASE_NAME_TEMPLATE_PROPERTY,
+      name.substring(0, 1).toLowerCase + name.substring(1))
 
     for (j <- 0.until(parameters.length, 2)) {
       properties.setProperty(parameters(j), parameters(j + 1))
@@ -54,12 +63,13 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
 
     var text: String = null
 
-    try text = template getText properties catch {
+    try text = template getText properties
+    catch {
       case e: Exception =>
         throw new RuntimeException(
-            "Unable to load template for " +
+          "Unable to load template for " +
             templateManager.internalTemplateToSubject(templateName),
-            e)
+          e)
     }
 
     val file = createFile(fileName, text, project)
@@ -92,8 +102,9 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
 
   protected def getFileType: FileType
 
-  protected def createFile(
-      name: String, text: String, project: Project): PsiFile =
+  protected def createFile(name: String,
+                           text: String,
+                           project: Project): PsiFile =
     PsiFileFactory
       .getInstance(project)
       .createFileFromText(name, getFileType, text)

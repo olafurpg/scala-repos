@@ -10,8 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * @since 18/12/14.
   */
 class ScalaCommentContextType
-    extends TemplateContextType(
-        "SCALA_COMMENT", "Comment", classOf[ScalaLiveTemplateContextType]) {
+    extends TemplateContextType("SCALA_COMMENT",
+                                "Comment",
+                                classOf[ScalaLiveTemplateContextType]) {
   override def isInContext(file: PsiFile, offset: Int): Boolean =
     ScalaCommentContextType.isInContext(file, offset)
 }

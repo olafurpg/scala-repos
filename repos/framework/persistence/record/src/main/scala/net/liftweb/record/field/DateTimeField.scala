@@ -42,7 +42,7 @@ trait DateTimeTypedField extends TypedField[Calendar] {
 
   def setFromAny(in: Any): Box[Calendar] =
     toDate(in).flatMap(d => setBox(Full(dateToCal(d)))) or genericSetFromAny(
-        in)
+      in)
 
   def setFromString(s: String): Box[Calendar] = s match {
     case null | "" if optional_? => setBox(Empty)
@@ -71,17 +71,17 @@ trait DateTimeTypedField extends TypedField[Calendar] {
   def setFromJValue(jvalue: JValue) = setFromJString(jvalue) { v =>
     formats.dateFormat
       .parse(v)
-      .map(d =>
-            {
-          val cal = Calendar.getInstance
-          cal.setTime(d)
-          cal
+      .map(d => {
+        val cal = Calendar.getInstance
+        cal.setTime(d)
+        cal
       })
   }
 }
 
 class DateTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Calendar, OwnerType] with MandatoryTypedField[Calendar]
+    extends Field[Calendar, OwnerType]
+    with MandatoryTypedField[Calendar]
     with DateTimeTypedField {
 
   def owner = rec
@@ -95,7 +95,8 @@ class DateTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalDateTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Calendar, OwnerType] with OptionalTypedField[Calendar]
+    extends Field[Calendar, OwnerType]
+    with OptionalTypedField[Calendar]
     with DateTimeTypedField {
 
   def owner = rec

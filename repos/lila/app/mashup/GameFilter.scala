@@ -36,8 +36,8 @@ object GameFilterMenu {
   import lila.db.Implicits.docId
 
   val all = NonEmptyList.nel(
-      All,
-      List(Me, Rated, Win, Loss, Draw, Playing, Bookmark, Imported, Search))
+    All,
+    List(Me, Rated, Win, Loss, Draw, Playing, Bookmark, Imported, Search))
 
   def apply(info: UserInfo,
             me: Option[User],
@@ -47,22 +47,22 @@ object GameFilterMenu {
 
     val filters = NonEmptyList.nel(All,
                                    List(
-                                       (info.nbWithMe > 0) option Me,
-                                       (info.nbRated > 0) option Rated,
-                                       (info.user.count.win > 0) option Win,
-                                       (info.user.count.loss > 0) option Loss,
-                                       (info.user.count.draw > 0) option Draw,
-                                       (info.nbPlaying > 0) option Playing,
-                                       (info.nbBookmark > 0) option Bookmark,
-                                       (info.nbImported > 0) option Imported,
-                                       (info.user.count.game > 0) option Search
+                                     (info.nbWithMe > 0) option Me,
+                                     (info.nbRated > 0) option Rated,
+                                     (info.user.count.win > 0) option Win,
+                                     (info.user.count.loss > 0) option Loss,
+                                     (info.user.count.draw > 0) option Draw,
+                                     (info.nbPlaying > 0) option Playing,
+                                     (info.nbBookmark > 0) option Bookmark,
+                                     (info.nbImported > 0) option Imported,
+                                     (info.user.count.game > 0) option Search
                                    ).flatten)
 
     val currentName =
       currentNameOption | info.hasSimul
         .fold(
-            Playing,
-            if (!info.user.hasGames && info.nbImported > 0) Imported else All
+          Playing,
+          if (!info.user.hasGames && info.nbImported > 0) Imported else All
         )
         .name
 
@@ -74,8 +74,9 @@ object GameFilterMenu {
   def currentOf(filters: NonEmptyList[GameFilter], name: String) =
     (filters.list find (_.name == name)) | filters.head
 
-  private def cachedNbOf(
-      user: User, info: Option[UserInfo], filter: GameFilter): Option[Int] =
+  private def cachedNbOf(user: User,
+                         info: Option[UserInfo],
+                         filter: GameFilter): Option[Int] =
     filter match {
       case Bookmark => info.map(_.nbBookmark)
       case Imported => info.map(_.nbImported)
@@ -111,19 +112,19 @@ object GameFilterMenu {
       case Loss => std(Query loss user)
       case Draw => std(Query draw user)
       case Playing =>
-        pag(selector = Query nowPlaying user.id,
-            sort = Seq(),
-            nb = nb)(page) addEffect { p =>
-          p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
+        pag(selector = Query nowPlaying user.id, sort = Seq(), nb = nb)(page) addEffect {
+          p =>
+            p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
         }
       case Search => userGameSearch(user, page)
     }
   }
 
   def searchForm(
-      userGameSearch: lila.gameSearch.UserGameSearch, filter: GameFilter)(
-      implicit req: Request[_]): play.api.data.Form[_] = filter match {
-    case Search => userGameSearch.requestForm
-    case _ => userGameSearch.defaultForm
-  }
+      userGameSearch: lila.gameSearch.UserGameSearch,
+      filter: GameFilter)(implicit req: Request[_]): play.api.data.Form[_] =
+    filter match {
+      case Search => userGameSearch.requestForm
+      case _ => userGameSearch.defaultForm
+    }
 }

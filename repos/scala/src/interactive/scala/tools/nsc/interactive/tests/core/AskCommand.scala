@@ -50,8 +50,8 @@ trait AskParse extends AskCommand {
     responses.foreach(_.get) // force source files parsing
   }
 
-  private def askParse(
-      src: SourceFile, keepLoaded: Boolean = true): Response[Tree] = {
+  private def askParse(src: SourceFile,
+                       keepLoaded: Boolean = true): Response[Tree] = {
     ask {
       compiler.askParsedEntered(src, keepLoaded, _)
     }
@@ -79,7 +79,8 @@ trait AskTypeCompletionAt extends AskCommand {
 
   private[tests] def askTypeCompletionAt(pos: Position)(
       implicit reporter: Reporter): Response[List[Member]] = {
-    reporter.println("\naskTypeCompletion at " + pos.source.file.name +
+    reporter.println(
+      "\naskTypeCompletion at " + pos.source.file.name +
         ((pos.line, pos.column)))
 
     ask {
@@ -94,7 +95,8 @@ trait AskScopeCompletionAt extends AskCommand {
 
   private[tests] def askScopeCompletionAt(pos: Position)(
       implicit reporter: Reporter): Response[List[Member]] = {
-    reporter.println("\naskScopeCompletion at " + pos.source.file.name +
+    reporter.println(
+      "\naskScopeCompletion at " + pos.source.file.name +
         ((pos.line, pos.column)))
 
     ask {
@@ -110,7 +112,7 @@ trait AskTypeAt extends AskCommand {
   private[tests] def askTypeAt(pos: Position)(
       implicit reporter: Reporter): Response[Tree] = {
     reporter.println(
-        "\naskType at " + pos.source.file.name + ((pos.line, pos.column)))
+      "\naskType at " + pos.source.file.name + ((pos.line, pos.column)))
 
     ask {
       compiler.askTypeAt(pos, _)
@@ -121,8 +123,8 @@ trait AskTypeAt extends AskCommand {
 trait AskLoadedTyped extends AskCommand {
   import compiler.Tree
 
-  protected def askLoadedTyped(
-      source: SourceFile, keepLoaded: Boolean = false)(
+  protected def askLoadedTyped(source: SourceFile,
+                               keepLoaded: Boolean = false)(
       implicit reporter: Reporter): Response[Tree] = {
     ask {
       compiler.askLoadedTyped(source, keepLoaded, _)

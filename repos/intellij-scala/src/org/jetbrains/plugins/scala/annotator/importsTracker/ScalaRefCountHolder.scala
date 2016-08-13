@@ -5,7 +5,12 @@ import java.util.concurrent.atomic.AtomicReference
 import com.intellij.openapi.util.{Key, TextRange, UserDataHolderEx}
 import com.intellij.psi._
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportUsed, ReadValueUsed, ValueUsed, WriteValueUsed}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportUsed,
+  ReadValueUsed,
+  ValueUsed,
+  WriteValueUsed
+}
 import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 
 /**
@@ -81,8 +86,9 @@ class ScalaRefCountHolder private () {
     }
   }
 
-  def analyze(
-      analyze: Runnable, dirtyScope: TextRange, file: PsiFile): Boolean = {
+  def analyze(analyze: Runnable,
+              dirtyScope: TextRange,
+              file: PsiFile): Boolean = {
     myState.compareAndSet(State.READY, State.VIRGIN)
     if (!myState.compareAndSet(State.VIRGIN, State.WRITE)) return false
     try {
@@ -131,11 +137,11 @@ object ScalaRefCountHolder {
     val myFile =
       /*Option(file.getViewProvider getPsi ScalaFileType.SCALA_LANGUAGE) getOrElse file
     val file2 = */ Option(
-          ScalaLanguageDerivative getScalaFileOnDerivative file) getOrElse file
+        ScalaLanguageDerivative getScalaFileOnDerivative file) getOrElse file
 
     Option(myFile getUserData SCALA_REF_COUNT_HOLDER_IN_FILE_KEY) getOrElse {
       myFile.asInstanceOf[UserDataHolderEx] putUserDataIfAbsent
-      (SCALA_REF_COUNT_HOLDER_IN_FILE_KEY, new ScalaRefCountHolder)
+        (SCALA_REF_COUNT_HOLDER_IN_FILE_KEY, new ScalaRefCountHolder)
     }
   }
 }

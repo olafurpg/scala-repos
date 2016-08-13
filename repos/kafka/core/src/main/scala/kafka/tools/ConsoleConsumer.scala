@@ -73,8 +73,10 @@ object ConsoleConsumer extends Logging {
     addShutdownHook(consumer, conf)
 
     try {
-      process(
-          conf.maxMessages, conf.formatter, consumer, conf.skipMessageOnError)
+      process(conf.maxMessages,
+              conf.formatter,
+              consumer,
+              conf.skipMessageOnError)
     } finally {
       consumer.cleanup()
       reportRecordCount()
@@ -82,16 +84,16 @@ object ConsoleConsumer extends Logging {
       // if we generated a random group id (as none specified explicitly) then avoid polluting zookeeper with persistent group data, this is a hack
       if (!conf.groupIdPassed)
         ZkUtils.maybeDeletePath(
-            conf.options.valueOf(conf.zkConnectOpt),
-            "/consumers/" + conf.consumerProps.get("group.id"))
+          conf.options.valueOf(conf.zkConnectOpt),
+          "/consumers/" + conf.consumerProps.get("group.id"))
 
       shutdownLatch.countDown()
     }
   }
 
   def checkZk(config: ConsumerConfig) {
-    if (!checkZkPathExists(
-            config.options.valueOf(config.zkConnectOpt), "/brokers/ids")) {
+    if (!checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
+                           "/brokers/ids")) {
       System.err.println("No brokers found in ZK.")
       System.exit(1)
     }
@@ -100,8 +102,9 @@ object ConsoleConsumer extends Logging {
         config.options.has(config.resetBeginningOpt) &&
         checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
                           "/consumers/" + config.consumerProps.getProperty(
-                              "group.id") + "/offsets")) {
-      System.err.println("Found previous offset information for this group " +
+                            "group.id") + "/offsets")) {
+      System.err.println(
+        "Found previous offset information for this group " +
           config.consumerProps.getProperty("group.id") +
           ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
@@ -109,8 +112,7 @@ object ConsoleConsumer extends Logging {
   }
 
   def addShutdownHook(consumer: BaseConsumer, conf: ConsumerConfig) {
-    Runtime.getRuntime.addShutdownHook(
-        new Thread() {
+    Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {
         consumer.stop()
 
@@ -129,12 +131,12 @@ object ConsoleConsumer extends Logging {
       } catch {
         case nse: StreamEndException =>
           trace(
-              "Caught StreamEndException because consumer is shutdown, ignore and terminate.")
+            "Caught StreamEndException because consumer is shutdown, ignore and terminate.")
           // Consumer is already closed
           return
         case nse: WakeupException =>
           trace(
-              "Caught WakeupException because consumer is shutdown, ignore and terminate.")
+            "Caught WakeupException because consumer is shutdown, ignore and terminate.")
           // Consumer will be closed
           return
         case e: Throwable =>
@@ -191,9 +193,10 @@ object ConsoleConsumer extends Logging {
 
     if (!config.options.has(config.deleteConsumerOffsetsOpt) &&
         config.options.has(config.resetBeginningOpt) && checkZkPathExists(
-            config.options.valueOf(config.zkConnectOpt),
-            "/consumers/" + props.getProperty("group.id") + "/offsets")) {
-      System.err.println("Found previous offset information for this group " +
+          config.options.valueOf(config.zkConnectOpt),
+          "/consumers/" + props.getProperty("group.id") + "/offsets")) {
+      System.err.println(
+        "Found previous offset information for this group " +
           props.getProperty("group.id") +
           ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
@@ -201,8 +204,8 @@ object ConsoleConsumer extends Logging {
 
     if (config.options.has(config.deleteConsumerOffsetsOpt))
       ZkUtils.maybeDeletePath(
-          config.options.valueOf(config.zkConnectOpt),
-          "/consumers/" + config.consumerProps.getProperty("group.id"))
+        config.options.valueOf(config.zkConnectOpt),
+        "/consumers/" + config.consumerProps.getProperty("group.id"))
     if (config.timeoutMs >= 0)
       props.put("consumer.timeout.ms", config.timeoutMs.toString)
 
@@ -248,8 +251,8 @@ object ConsoleConsumer extends Logging {
       .ofType(classOf[String])
     val zkConnectOpt = parser
       .accepts(
-          "zookeeper",
-          "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
+        "zookeeper",
+        "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
           "Multiple URLS can be given to allow fail-over.")
       .withRequiredArg
       .describedAs("urls")
@@ -261,50 +264,50 @@ object ConsoleConsumer extends Logging {
       .ofType(classOf[String])
     val messageFormatterOpt = parser
       .accepts(
-          "formatter",
-          "The name of a class to use for formatting kafka messages for display.")
+        "formatter",
+        "The name of a class to use for formatting kafka messages for display.")
       .withRequiredArg
       .describedAs("class")
       .ofType(classOf[String])
       .defaultsTo(classOf[DefaultMessageFormatter].getName)
     val messageFormatterArgOpt = parser
-      .accepts(
-          "property", "The properties to initialize the message formatter.")
+      .accepts("property",
+               "The properties to initialize the message formatter.")
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])
     val deleteConsumerOffsetsOpt = parser.accepts(
-        "delete-consumer-offsets",
-        "If specified, the consumer path in zookeeper is deleted when starting up")
+      "delete-consumer-offsets",
+      "If specified, the consumer path in zookeeper is deleted when starting up")
     val resetBeginningOpt = parser.accepts(
-        "from-beginning",
-        "If the consumer does not already have an established offset to consume from, " +
+      "from-beginning",
+      "If the consumer does not already have an established offset to consume from, " +
         "start with the earliest message present in the log rather than the latest message.")
     val maxMessagesOpt = parser
       .accepts(
-          "max-messages",
-          "The maximum number of messages to consume before exiting. If not set, consumption is continual.")
+        "max-messages",
+        "The maximum number of messages to consume before exiting. If not set, consumption is continual.")
       .withRequiredArg
       .describedAs("num_messages")
       .ofType(classOf[java.lang.Integer])
     val timeoutMsOpt = parser
       .accepts(
-          "timeout-ms",
-          "If specified, exit if no message is available for consumption for the specified interval.")
+        "timeout-ms",
+        "If specified, exit if no message is available for consumption for the specified interval.")
       .withRequiredArg
       .describedAs("timeout_ms")
       .ofType(classOf[java.lang.Integer])
     val skipMessageOnErrorOpt = parser.accepts(
-        "skip-message-on-error",
-        "If there is an error when processing a message, " +
+      "skip-message-on-error",
+      "If there is an error when processing a message, " +
         "skip it instead of halt.")
     val csvMetricsReporterEnabledOpt = parser.accepts(
-        "csv-reporter-enabled",
-        "If set, the CSV metrics reporter will be enabled")
+      "csv-reporter-enabled",
+      "If set, the CSV metrics reporter will be enabled")
     val metricsDirectoryOpt = parser
       .accepts("metrics-dir",
                "If csv-reporter-enable is set, and this parameter is" +
-               "set, the csv metrics will be outputed here")
+                 "set, the csv metrics will be outputed here")
       .withRequiredArg
       .describedAs("metrics directory")
       .ofType(classOf[java.lang.String])
@@ -328,8 +331,8 @@ object ConsoleConsumer extends Logging {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          parser,
-          "The console consumer is a tool that reads data from Kafka and outputs it to standard output.")
+        parser,
+        "The console consumer is a tool that reads data from Kafka and outputs it to standard output.")
 
     var groupIdPassed = true
     val options: OptionSet = tryParse(parser, args)
@@ -344,7 +347,8 @@ object ConsoleConsumer extends Logging {
       val topicOrFilterOpt = List(topicIdOpt, whitelistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
         CommandLineUtils.printUsageAndDie(
-            parser, "Exactly one of whitelist/topic is required.")
+          parser,
+          "Exactly one of whitelist/topic is required.")
       topicArg = options.valueOf(topicIdOpt)
       whitelistArg = options.valueOf(whitelistOpt)
     } else {
@@ -352,10 +356,12 @@ object ConsoleConsumer extends Logging {
         List(topicIdOpt, whitelistOpt, blacklistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
         CommandLineUtils.printUsageAndDie(
-            parser, "Exactly one of whitelist/blacklist/topic is required.")
+          parser,
+          "Exactly one of whitelist/blacklist/topic is required.")
       topicArg = options.valueOf(topicOrFilterOpt.head)
-      filterSpec = if (options.has(blacklistOpt)) new Blacklist(topicArg)
-      else new Whitelist(topicArg)
+      filterSpec =
+        if (options.has(blacklistOpt)) new Blacklist(topicArg)
+        else new Whitelist(topicArg)
     }
     val consumerProps =
       if (options.has(consumerConfigOpt))
@@ -368,7 +374,7 @@ object ConsoleConsumer extends Logging {
     val messageFormatterClass =
       Class.forName(options.valueOf(messageFormatterOpt))
     val formatterArgs = CommandLineUtils.parseKeyValueArgs(
-        options.valuesOf(messageFormatterArgOpt).asScala)
+      options.valuesOf(messageFormatterArgOpt).asScala)
     val maxMessages =
       if (options.has(maxMessagesOpt)) options.valueOf(maxMessagesOpt).intValue
       else -1
@@ -390,11 +396,11 @@ object ConsoleConsumer extends Logging {
     if (options.has(csvMetricsReporterEnabledOpt)) {
       val csvReporterProps = new Properties()
       csvReporterProps.put("kafka.metrics.polling.interval.secs", "5")
-      csvReporterProps.put(
-          "kafka.metrics.reporters", "kafka.metrics.KafkaCSVMetricsReporter")
+      csvReporterProps.put("kafka.metrics.reporters",
+                           "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
-        csvReporterProps.put(
-            "kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
+        csvReporterProps
+          .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
       else csvReporterProps.put("kafka.csv.metrics.dir", "kafka_metrics")
       csvReporterProps.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(csvReporterProps)
@@ -409,7 +415,8 @@ object ConsoleConsumer extends Logging {
     }
 
     def tryParse(parser: OptionParser, args: Array[String]) = {
-      try parser.parse(args: _*) catch {
+      try parser.parse(args: _*)
+      catch {
         case e: OptionException =>
           Utils.croak(e.getMessage)
           null
@@ -438,11 +445,8 @@ class DefaultMessageFormatter extends MessageFormatter {
 
   override def init(props: Properties) {
     if (props.containsKey("print.timestamp"))
-      printTimestamp = props
-        .getProperty("print.timestamp")
-        .trim
-        .toLowerCase
-        .equals("true")
+      printTimestamp =
+        props.getProperty("print.timestamp").trim.toLowerCase.equals("true")
     if (props.containsKey("print.key"))
       printKey = props.getProperty("print.key").trim.toLowerCase.equals("true")
     if (props.containsKey("key.separator"))
@@ -452,17 +456,17 @@ class DefaultMessageFormatter extends MessageFormatter {
     // Note that `toString` will be called on the instance returned by `Deserializer.deserialize`
     if (props.containsKey("key.deserializer"))
       keyDeserializer = Some(
-          Class
-            .forName(props.getProperty("key.deserializer"))
-            .newInstance()
-            .asInstanceOf[Deserializer[_]])
+        Class
+          .forName(props.getProperty("key.deserializer"))
+          .newInstance()
+          .asInstanceOf[Deserializer[_]])
     // Note that `toString` will be called on the instance returned by `Deserializer.deserialize`
     if (props.containsKey("value.deserializer"))
       valueDeserializer = Some(
-          Class
-            .forName(props.getProperty("value.deserializer"))
-            .newInstance()
-            .asInstanceOf[Deserializer[_]])
+        Class
+          .forName(props.getProperty("value.deserializer"))
+          .newInstance()
+          .asInstanceOf[Deserializer[_]])
   }
 
   def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
@@ -504,10 +508,11 @@ class LoggingMessageFormatter extends MessageFormatter {
     defaultWriter.writeTo(consumerRecord, output)
     if (logger.isInfoEnabled)
       logger.info({
-        if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
-          s"$timestampType:$timestamp, " else ""
-      } + s"key:${if (key == null) "null" else new String(key)}, " +
-      s"value:${if (value == null) "null" else new String(value)}")
+          if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
+            s"$timestampType:$timestamp, "
+          else ""
+        } + s"key:${if (key == null) "null" else new String(key)}, " +
+          s"value:${if (value == null) "null" else new String(value)}")
   }
 }
 

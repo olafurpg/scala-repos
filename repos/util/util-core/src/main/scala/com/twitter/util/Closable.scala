@@ -86,8 +86,8 @@ object Closable {
     * resource ''n+1'' is not closed until resource ''n'' is.
     */
   def sequence(closables: Closable*): Closable = new Closable {
-    private final def closeSeq(
-        deadline: Time, closables: Seq[Closable]): Future[Unit] =
+    private final def closeSeq(deadline: Time,
+                               closables: Seq[Closable]): Future[Unit] =
       closables match {
         case Seq() => Future.Done
         case Seq(hd, tl @ _ *) =>
@@ -132,20 +132,20 @@ object Closable {
             // threads shouldn't be interrupted explicitly on `System.exit`, but
             // SBT does it anyway.
             logger.log(
-                Level.FINE,
-                "com.twitter.util.Closable collector thread caught InterruptedException")
+              Level.FINE,
+              "com.twitter.util.Closable collector thread caught InterruptedException")
 
           case NonFatal(exc) =>
             logger.log(
-                Level.SEVERE,
-                "com.twitter.util.Closable collector thread caught exception",
-                exc)
+              Level.SEVERE,
+              "com.twitter.util.Closable collector thread caught exception",
+              exc)
 
           case fatal: Throwable =>
             logger.log(
-                Level.SEVERE,
-                "com.twitter.util.Closable collector thread threw fatal exception",
-                fatal)
+              Level.SEVERE,
+              "com.twitter.util.Closable collector thread threw fatal exception",
+              fatal)
             throw fatal
         }
       }

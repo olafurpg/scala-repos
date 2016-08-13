@@ -1,9 +1,16 @@
 package com.twitter.finagle.zipkin.thrift
 
 import com.twitter.finagle.NoStacktrace
-import com.twitter.finagle.stats.{DefaultStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  DefaultStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.tracing.{TraceId, Record, Tracer, Annotation, Trace}
-import com.twitter.finagle.zipkin.{host => Host, initialSampleRate => sampleRateFlag}
+import com.twitter.finagle.zipkin.{
+  host => Host,
+  initialSampleRate => sampleRateFlag
+}
 import com.twitter.io.Buf
 import com.twitter.util.events.{Event, Sink}
 import com.twitter.util.{Time, Throw, Try}
@@ -30,9 +37,9 @@ private object Json {
       // deserialized with a runtime type of int.
       // See: https://github.com/FasterXML/jackson-module-scala/issues/106.
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) traceId: Option[
-          Long],
+        Long],
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) spanId: Option[
-          Long],
+        Long],
       data: Annotation)
 
   val mapper = new ObjectMapper()
@@ -41,25 +48,26 @@ private object Json {
   // Configures the mapper to include class information for Annotation.
   object TypeResolverBuilder
       extends ObjectMapper.DefaultTypeResolverBuilder(
-          ObjectMapper.DefaultTyping.NON_FINAL) {
+        ObjectMapper.DefaultTyping.NON_FINAL) {
     override def useForType(typ: JavaType) =
       // Note: getRawClass would be an Object if not for `Envelope`.
       typ.getRawClass == classOf[Annotation]
   }
 
-  mapper.setDefaultTyping(TypeResolverBuilder
-        .init(JsonTypeInfo.Id.CLASS, null)
-        .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
+  mapper.setDefaultTyping(
+    TypeResolverBuilder
+      .init(JsonTypeInfo.Id.CLASS, null)
+      .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
 
   def serialize(o: AnyRef): String = mapper.writeValueAsString(o)
 
-  def deserialize[T : Manifest](value: String): T =
+  def deserialize[T: Manifest](value: String): T =
     mapper.readValue(value, typeReference[T])
 
-  def deserialize[T : Manifest](node: JsonNode): T =
+  def deserialize[T: Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 
@@ -90,8 +98,8 @@ object ZipkinTracer {
         case Event(etype, _, _, _: Annotation.BinaryAnnotation, _, _, _)
             if etype eq this =>
           Throw(
-              new IllegalArgumentException("unsupported format: " + event)
-              with NoStacktrace)
+            new IllegalArgumentException("unsupported format: " + event)
+            with NoStacktrace)
 
         case Event(etype, when, _, ann: Annotation, _, tid, sid)
             if etype eq this =>
@@ -179,8 +187,9 @@ object ZipkinTracer {
   * @param initialSampleRate Start off with this sample rate. Can be changed later.
   * @param sink where to send sampled trace events to.
   */
-class SamplingTracer(
-    underlyingTracer: Tracer, initialSampleRate: Float, sink: Sink)
+class SamplingTracer(underlyingTracer: Tracer,
+                     initialSampleRate: Float,
+                     sink: Sink)
     extends Tracer {
 
   /**

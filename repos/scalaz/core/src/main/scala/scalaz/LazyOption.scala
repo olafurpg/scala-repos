@@ -80,14 +80,14 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
 
   def traverse[G[_]: Applicative, B](f: (=> A) => G[B]): G[LazyOption[B]] =
     fold(
-        some = x => Applicative[G].map(f(x))(b => lazySome(b)),
-        none = Applicative[G].point(lazyNone[B])
+      some = x => Applicative[G].map(f(x))(b => lazySome(b)),
+      none = Applicative[G].point(lazyNone[B])
     )
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     fold(
-        some = a => f(a, z),
-        none = z
+      some = a => f(a, z),
+      none = z
     )
 
   def zip[B](b: => LazyOption[B]): LazyOption[(A, B)] =
@@ -108,9 +108,9 @@ sealed abstract class LazyOptionInstances {
   import LazyOption._
 
   implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[
-      LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[
-      LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[
-      LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
+    LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[
+    LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[
+    LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
     new Traverse[LazyOption] with MonadPlus[LazyOption]
     with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption]
     with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption]
@@ -144,8 +144,8 @@ sealed abstract class LazyOptionInstances {
       def alignWith[A, B, C](f: A \&/ B => C) =
         (a, b) =>
           a.fold(
-              aa => lazySome(f(b.fold(bb => \&/.Both(aa, bb), \&/.This(aa)))),
-              b.fold(bb => lazySome(f(\&/.That(bb))), lazyNone))
+            aa => lazySome(f(b.fold(bb => \&/.Both(aa, bb), \&/.This(aa)))),
+            b.fold(bb => lazySome(f(\&/.That(bb))), lazyNone))
 
       def pextract[B, A](fa: LazyOption[A]): LazyOption[B] \/ A =
         fa.fold(a => \/-(a), -\/(lazyNone))
@@ -163,12 +163,12 @@ sealed abstract class LazyOptionInstances {
         }
     }
 
-  implicit def lazyOptionEqual[A : Equal]: Equal[LazyOption[A]] = {
+  implicit def lazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = {
     import std.option._
     Equal.equalBy(_.toOption)
   }
 
-  implicit def lazyOptionMonoid[A : Semigroup]: Monoid[LazyOption[A]] =
+  implicit def lazyOptionMonoid[A: Semigroup]: Monoid[LazyOption[A]] =
     new Monoid[LazyOption[A]] {
       def zero = LazyNone
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Contravariant` */
-final class ContravariantOps[F[_], A] private[syntax](val self: F[A])(
+final class ContravariantOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Contravariant[F])
     extends Ops[F[A]] {
   ////
@@ -18,7 +18,8 @@ sealed trait ToContravariantOps0 {
 }
 
 trait ToContravariantOps
-    extends ToContravariantOps0 with ToInvariantFunctorOps {
+    extends ToContravariantOps0
+    with ToInvariantFunctorOps {
   implicit def ToContravariantOps[F[_], A](v: F[A])(
       implicit F0: Contravariant[F]) =
     new ContravariantOps[F, A](v)

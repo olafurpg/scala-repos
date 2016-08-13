@@ -44,9 +44,9 @@ class IntStringConverterSpec
                                                 jfxuc.IntegerStringConverter,
                                                 Int,
                                                 IntStringConverter](
-        classOf[jfxuc.IntegerStringConverter],
-        classOf[IntStringConverter],
-        classOf[Int]) {
+      classOf[jfxuc.IntegerStringConverter],
+      classOf[IntStringConverter],
+      classOf[Int]) {
 
   val examples = List((0, "0"),
                       (123, "123"),

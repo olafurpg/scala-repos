@@ -55,7 +55,7 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "RateLimitingFilter should Execute different categories of requests and keep a window per category") {
+    "RateLimitingFilter should Execute different categories of requests and keep a window per category") {
     val h = new RateLimitingFilterHelper
     import h._
 

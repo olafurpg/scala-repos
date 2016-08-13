@@ -67,35 +67,37 @@ class UnsafeRowSuite extends SparkFunSuite {
   }
 
   test("writeToStream") {
-    val row = InternalRow.apply(
-        UTF8String.fromString("hello"), UTF8String.fromString("world"), 123)
+    val row = InternalRow.apply(UTF8String.fromString("hello"),
+                                UTF8String.fromString("world"),
+                                123)
     val arrayBackedUnsafeRow: UnsafeRow = UnsafeProjection
       .create(Array[DataType](StringType, StringType, IntegerType))
       .apply(row)
     assert(arrayBackedUnsafeRow.getBaseObject.isInstanceOf[Array[Byte]])
-    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[Byte],
-    String) = {
+    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[
+                                                                      Byte],
+                                                                    String) = {
       val baos = new ByteArrayOutputStream()
       arrayBackedUnsafeRow.writeToStream(baos, null)
       (baos.toByteArray, arrayBackedUnsafeRow.getString(0))
     }
     val (bytesFromOffheapRow, field0StringFromOffheapRow): (Array[Byte],
-    String) = {
+                                                            String) = {
       val offheapRowPage =
         MemoryAllocator.UNSAFE.allocate(arrayBackedUnsafeRow.getSizeInBytes)
       try {
         Platform.copyMemory(
-            arrayBackedUnsafeRow.getBaseObject,
-            arrayBackedUnsafeRow.getBaseOffset,
-            offheapRowPage.getBaseObject,
-            offheapRowPage.getBaseOffset,
-            arrayBackedUnsafeRow.getSizeInBytes
+          arrayBackedUnsafeRow.getBaseObject,
+          arrayBackedUnsafeRow.getBaseOffset,
+          offheapRowPage.getBaseObject,
+          offheapRowPage.getBaseOffset,
+          arrayBackedUnsafeRow.getSizeInBytes
         )
         val offheapUnsafeRow: UnsafeRow = new UnsafeRow(3)
         offheapUnsafeRow.pointTo(
-            offheapRowPage.getBaseObject,
-            offheapRowPage.getBaseOffset,
-            arrayBackedUnsafeRow.getSizeInBytes
+          offheapRowPage.getBaseObject,
+          offheapRowPage.getBaseOffset,
+          arrayBackedUnsafeRow.getSizeInBytes
         )
         assert(offheapUnsafeRow.getBaseObject === null)
         val baos = new ByteArrayOutputStream()

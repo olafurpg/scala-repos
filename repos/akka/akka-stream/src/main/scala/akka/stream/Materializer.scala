@@ -63,20 +63,20 @@ private[akka] object NoMaterializer extends Materializer {
     throw new UnsupportedOperationException("NoMaterializer cannot be named")
   override def materialize[Mat](runnable: Graph[ClosedShape, Mat]): Mat =
     throw new UnsupportedOperationException(
-        "NoMaterializer cannot materialize")
+      "NoMaterializer cannot materialize")
   override def executionContext: ExecutionContextExecutor =
     throw new UnsupportedOperationException(
-        "NoMaterializer does not provide an ExecutionContext")
+      "NoMaterializer does not provide an ExecutionContext")
 
   def scheduleOnce(delay: FiniteDuration, task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer cannot schedule a single event")
+      "NoMaterializer cannot schedule a single event")
 
   def schedulePeriodically(initialDelay: FiniteDuration,
                            interval: FiniteDuration,
                            task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer cannot schedule a repeated event")
+      "NoMaterializer cannot schedule a repeated event")
 }
 
 /**

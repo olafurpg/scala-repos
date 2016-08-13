@@ -31,13 +31,14 @@ final class BackendReportingImpl(val global: Global) extends BackendReporting {
   * errors).
   */
 object BackendReporting {
-  def methodSignature(
-      classInternalName: InternalName, name: String, desc: String) = {
+  def methodSignature(classInternalName: InternalName,
+                      name: String,
+                      desc: String) = {
     classInternalName + "::" + name + desc
   }
 
-  def methodSignature(
-      classInternalName: InternalName, method: MethodNode): String = {
+  def methodSignature(classInternalName: InternalName,
+                      method: MethodNode): String = {
     methodSignature(classInternalName, method.name, method.desc)
   }
 
@@ -109,30 +110,32 @@ object BackendReporting {
           else ""
         }
 
-      case MethodNotFound(
-          name, descriptor, ownerInternalName, missingClasses) =>
+      case MethodNotFound(name,
+                          descriptor,
+                          ownerInternalName,
+                          missingClasses) =>
         val (javaDef, others) = missingClasses.partition(_.definedInJavaSource)
         s"The method $name$descriptor could not be found in the class $ownerInternalName or any of its parents." +
-        (if (others.isEmpty) ""
-         else
-           others
-             .map(_.internalName)
-             .mkString(
-                 "\nNote that the following parent classes could not be found on the classpath: ",
-                 ", ",
-                 "")) +
-        (if (javaDef.isEmpty) ""
-         else
-           javaDef
-             .map(_.internalName)
-             .mkString(
-                 "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
-                 ",",
-                 ""))
+          (if (others.isEmpty) ""
+          else
+            others
+              .map(_.internalName)
+              .mkString(
+                "\nNote that the following parent classes could not be found on the classpath: ",
+                ", ",
+                "")) +
+          (if (javaDef.isEmpty) ""
+          else
+            javaDef
+              .map(_.internalName)
+              .mkString(
+                "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
+                ",",
+                ""))
 
       case FieldNotFound(name, descriptor, ownerInternalName, missingClass) =>
         s"The field node $name$descriptor could not be found because the classfile $ownerInternalName cannot be found on the classpath." +
-        missingClass.map(c => s" Reason:\n$c").getOrElse("")
+          missingClass.map(c => s" Reason:\n$c").getOrElse("")
     }
 
     def emitWarning(settings: ScalaSettings): Boolean = this match {
@@ -148,12 +151,12 @@ object BackendReporting {
 
       case FieldNotFound(_, _, _, missing) =>
         settings.YoptWarningNoInlineMissingBytecode ||
-        missing.exists(_.emitWarning(settings))
+          missing.exists(_.emitWarning(settings))
     }
   }
 
-  case class ClassNotFound(
-      internalName: InternalName, definedInJavaSource: Boolean)
+  case class ClassNotFound(internalName: InternalName,
+                           definedInJavaSource: Boolean)
       extends MissingBytecodeWarning
   case class MethodNotFound(name: String,
                             descriptor: String,
@@ -204,15 +207,15 @@ object BackendReporting {
     override def toString = this match {
       case MethodInlineInfoIncomplete(_, _, _, cause) =>
         s"The inline information for $warningMessageSignature may be incomplete:\n" +
-        cause
+          cause
 
       case MethodInlineInfoMissing(_, _, _, cause) =>
         s"No inline information for method $warningMessageSignature could be found." +
-        cause.map(" Possible reason:\n" + _).getOrElse("")
+          cause.map(" Possible reason:\n" + _).getOrElse("")
 
       case MethodInlineInfoError(_, _, _, cause) =>
         s"Error while computing the inline information for method $warningMessageSignature:\n" +
-        cause
+          cause
 
       case RewriteTraitCallToStaticImplMethodFailed(_, _, _, cause) =>
         cause.toString
@@ -262,21 +265,29 @@ object BackendReporting {
     def descriptor: String
 
     def calleeMethodSig =
-      BackendReporting.methodSignature(
-          calleeDeclarationClass, name, descriptor)
+      BackendReporting
+        .methodSignature(calleeDeclarationClass, name, descriptor)
 
     override def toString = this match {
       case IllegalAccessInstruction(_, _, _, callsiteClass, instruction) =>
         s"The callee $calleeMethodSig contains the instruction ${AsmUtils.textify(instruction)}" +
-        s"\nthat would cause an IllegalAccessError when inlined into class $callsiteClass."
+          s"\nthat would cause an IllegalAccessError when inlined into class $callsiteClass."
 
-      case IllegalAccessCheckFailed(
-          _, _, _, callsiteClass, instruction, cause) =>
+      case IllegalAccessCheckFailed(_,
+                                    _,
+                                    _,
+                                    callsiteClass,
+                                    instruction,
+                                    cause) =>
         s"Failed to check if $calleeMethodSig can be safely inlined to $callsiteClass without causing an IllegalAccessError. Checking instruction ${AsmUtils
           .textify(instruction)} failed:\n" + cause
 
-      case MethodWithHandlerCalledOnNonEmptyStack(
-          _, _, _, callsiteClass, callsiteName, callsiteDesc) =>
+      case MethodWithHandlerCalledOnNonEmptyStack(_,
+                                                  _,
+                                                  _,
+                                                  callsiteClass,
+                                                  callsiteName,
+                                                  callsiteDesc) =>
         s"""The operand stack at the callsite in ${BackendReporting
              .methodSignature(callsiteClass, callsiteName, callsiteDesc)} contains more values than the
            |arguments expected by the callee $calleeMethodSig. These values would be discarded
@@ -285,17 +296,25 @@ object BackendReporting {
       case SynchronizedMethod(_, _, _) =>
         s"Method $calleeMethodSig cannot be inlined because it is synchronized."
 
-      case StrictfpMismatch(
-          _, _, _, callsiteClass, callsiteName, callsiteDesc) =>
-        s"""The callsite method ${BackendReporting.methodSignature(
-               callsiteClass, callsiteName, callsiteDesc)}
+      case StrictfpMismatch(_,
+                            _,
+                            _,
+                            callsiteClass,
+                            callsiteName,
+                            callsiteDesc) =>
+        s"""The callsite method ${BackendReporting
+             .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
            |does not have the same strictfp mode as the callee $calleeMethodSig.
          """.stripMargin
 
-      case ResultingMethodTooLarge(
-          _, _, _, callsiteClass, callsiteName, callsiteDesc) =>
-        s"""The size of the callsite method ${BackendReporting.methodSignature(
-               callsiteClass, callsiteName, callsiteDesc)}
+      case ResultingMethodTooLarge(_,
+                                   _,
+                                   _,
+                                   callsiteClass,
+                                   callsiteName,
+                                   callsiteDesc) =>
+        s"""The size of the callsite method ${BackendReporting
+             .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
            |would exceed the JVM method size limit after inlining $calleeMethodSig.
          """.stripMargin
     }
@@ -305,7 +324,7 @@ object BackendReporting {
           _: MethodWithHandlerCalledOnNonEmptyStack | _: SynchronizedMethod |
           _: StrictfpMismatch | _: ResultingMethodTooLarge =>
         settings.YoptWarnings.contains(
-            settings.YoptWarningsChoices.anyInlineFailed)
+          settings.YoptWarningsChoices.anyInlineFailed)
 
       case IllegalAccessCheckFailed(_, _, _, _, _, cause) =>
         cause.emitWarning(settings)
@@ -332,8 +351,9 @@ object BackendReporting {
       callsiteName: String,
       callsiteDesc: String)
       extends CannotInlineWarning
-  case class SynchronizedMethod(
-      calleeDeclarationClass: InternalName, name: String, descriptor: String)
+  case class SynchronizedMethod(calleeDeclarationClass: InternalName,
+                                name: String,
+                                descriptor: String)
       extends CannotInlineWarning
   case class StrictfpMismatch(calleeDeclarationClass: InternalName,
                               name: String,
@@ -357,7 +377,7 @@ object BackendReporting {
       "The callee contains an InvokeDynamic instruction with an unknown bootstrap method (not a LambdaMetaFactory)."
     def emitWarning(settings: ScalaSettings): Boolean =
       settings.YoptWarnings.contains(
-          settings.YoptWarningsChoices.anyInlineFailed)
+        settings.YoptWarningsChoices.anyInlineFailed)
   }
 
   /**
@@ -373,22 +393,22 @@ object BackendReporting {
         cause.emitWarning(settings)
       case RewriteClosureIllegalAccess(_, _) =>
         settings.YoptWarnings.contains(
-            settings.YoptWarningsChoices.anyInlineFailed)
+          settings.YoptWarningsChoices.anyInlineFailed)
     }
 
     override def toString: String = this match {
       case RewriteClosureAccessCheckFailed(_, cause) =>
         s"Failed to rewrite the closure invocation to its implementation method:\n" +
-        cause
+          cause
       case RewriteClosureIllegalAccess(_, callsiteClass) =>
         s"The closure body invocation cannot be rewritten because the target method is not accessible in class $callsiteClass."
     }
   }
-  case class RewriteClosureAccessCheckFailed(
-      pos: Position, cause: OptimizerWarning)
+  case class RewriteClosureAccessCheckFailed(pos: Position,
+                                             cause: OptimizerWarning)
       extends RewriteClosureApplyToClosureBodyFailed
-  case class RewriteClosureIllegalAccess(
-      pos: Position, callsiteClass: InternalName)
+  case class RewriteClosureIllegalAccess(pos: Position,
+                                         callsiteClass: InternalName)
       extends RewriteClosureApplyToClosureBodyFailed
 
   /**
@@ -428,7 +448,7 @@ object BackendReporting {
   case class ClassNotFoundWhenBuildingInlineInfoFromSymbol(
       missingClass: ClassNotFound)
       extends ClassInlineInfoWarning
-  case class UnknownScalaInlineInfoVersion(
-      internalName: InternalName, version: Int)
+  case class UnknownScalaInlineInfoVersion(internalName: InternalName,
+                                           version: Int)
       extends ClassInlineInfoWarning
 }

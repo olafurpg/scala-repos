@@ -15,7 +15,8 @@ import scala.reflect.ClassTag
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class PersistentFSMSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentFSMSpec._
 
   //Dummy report actor, for tests that don't need it
@@ -25,7 +26,7 @@ abstract class PersistentFSMSpec(config: Config)
     "function as a regular FSM " in {
       val persistenceId = name
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
 
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
@@ -62,7 +63,7 @@ abstract class PersistentFSMSpec(config: Config)
     "function as a regular FSM on state timeout" taggedAs TimingTest in {
       val persistenceId = name
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
 
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
@@ -85,7 +86,7 @@ abstract class PersistentFSMSpec(config: Config)
       val persistenceId = name
 
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -110,7 +111,7 @@ abstract class PersistentFSMSpec(config: Config)
       expectTerminated(fsmRef)
 
       val recoveredFsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(recoveredFsmRef)
       recoveredFsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -139,7 +140,7 @@ abstract class PersistentFSMSpec(config: Config)
 
       val reportActorProbe = TestProbe()
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, reportActorProbe.ref))
+        WebStoreCustomerFSM.props(persistenceId, reportActorProbe.ref))
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -165,7 +166,7 @@ abstract class PersistentFSMSpec(config: Config)
 
       val reportActorProbe = TestProbe()
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, reportActorProbe.ref))
+        WebStoreCustomerFSM.props(persistenceId, reportActorProbe.ref))
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -187,7 +188,7 @@ abstract class PersistentFSMSpec(config: Config)
     "recover successfully with correct state timeout" taggedAs TimingTest in {
       val persistenceId = name
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
 
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
@@ -204,7 +205,7 @@ abstract class PersistentFSMSpec(config: Config)
       expectTerminated(fsmRef)
 
       var recoveredFsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(recoveredFsmRef)
       recoveredFsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -212,7 +213,7 @@ abstract class PersistentFSMSpec(config: Config)
 
       within(0.9 seconds, 1.9 seconds) {
         expectMsg(
-            Transition(recoveredFsmRef, Shopping, Inactive, Some(2 seconds)))
+          Transition(recoveredFsmRef, Shopping, Inactive, Some(2 seconds)))
       }
 
       expectNoMsg(0.6 seconds) // arbitrarily chosen delay, less than the timeout, before stopping the FSM
@@ -220,7 +221,7 @@ abstract class PersistentFSMSpec(config: Config)
       expectTerminated(recoveredFsmRef)
 
       recoveredFsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(recoveredFsmRef)
       recoveredFsmRef ! SubscribeTransitionCallBack(testActor)
 
@@ -247,7 +248,7 @@ abstract class PersistentFSMSpec(config: Config)
       val persistenceId = name
 
       val fsmRef = system.actorOf(
-          WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
+        WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(fsmRef)
 
       val shirt = Item("1", "Shirt", 59.99F)
@@ -276,7 +277,7 @@ abstract class PersistentFSMSpec(config: Config)
       expectTerminated(fsmRef)
 
       val persistentEventsStreamer = system.actorOf(
-          PersistentEventsStreamer.props(persistenceId, testActor))
+        PersistentEventsStreamer.props(persistenceId, testActor))
 
       expectMsg(ItemAdded(Item("1", "Shirt", 59.99F)))
       expectMsgType[StateChangeEvent] //because a timeout is defined, State Change is persisted
@@ -367,8 +368,8 @@ object PersistentFSMSpec {
       case (from, to) ⇒ reportActor ! s"$from -> $to"
     }
 
-    override def applyEvent(
-        domainEvent: DomainEvent, currentData: ShoppingCart): ShoppingCart =
+    override def applyEvent(domainEvent: DomainEvent,
+                            currentData: ShoppingCart): ShoppingCart =
       currentData
   }
   object SimpleTransitionFSM {
@@ -434,8 +435,8 @@ object PersistentFSMSpec {
       * @param cartBeforeEvent state data of the previous state
       */
     //#customer-apply-event
-    override def applyEvent(
-        event: DomainEvent, cartBeforeEvent: ShoppingCart): ShoppingCart = {
+    override def applyEvent(event: DomainEvent,
+                            cartBeforeEvent: ShoppingCart): ShoppingCart = {
       event match {
         case ItemAdded(item) ⇒ cartBeforeEvent.addItem(item)
         case OrderExecuted ⇒ cartBeforeEvent
@@ -472,7 +473,7 @@ object PersistentFSMSpec {
 
 class LeveldbPersistentFSMSpec
     extends PersistentFSMSpec(
-        PersistenceSpec.config("leveldb", "PersistentFSMSpec"))
+      PersistenceSpec.config("leveldb", "PersistentFSMSpec"))
 class InmemPersistentFSMSpec
     extends PersistentFSMSpec(
-        PersistenceSpec.config("inmem", "PersistentFSMSpec"))
+      PersistenceSpec.config("inmem", "PersistentFSMSpec"))

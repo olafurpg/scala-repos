@@ -1,7 +1,16 @@
 package mesosphere.marathon.core.launchqueue.impl
 
 import akka.actor.SupervisorStrategy.Stop
-import akka.actor.{PoisonPill, Terminated, Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy}
+import akka.actor.{
+  PoisonPill,
+  Terminated,
+  Actor,
+  ActorLogging,
+  ActorRef,
+  OneForOneStrategy,
+  Props,
+  SupervisorStrategy
+}
 import akka.event.LoggingReceive
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
@@ -30,8 +39,9 @@ private[launchqueue] object LaunchQueueActor {
   */
 private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
                                      appActorProps: (AppDefinition,
-                                     Int) => Props)
-    extends Actor with ActorLogging {
+                                                     Int) => Props)
+    extends Actor
+    with ActorLogging {
   import LaunchQueueDelegate._
 
   /** Currently active actors by pathId. */
@@ -60,11 +70,11 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
   override def receive: Receive = LoggingReceive {
     Seq(
-        receiveHandlePurging,
-        receiveTaskUpdateToSuspendedActor,
-        receiveMessagesToSuspendedActor,
-        receiveTaskUpdate,
-        receiveHandleNormalCommands
+      receiveHandlePurging,
+      receiveTaskUpdateToSuspendedActor,
+      receiveMessagesToSuspendedActor,
+      receiveTaskUpdate,
+      receiveHandleNormalCommands
     ).reduce(_.orElse[Any, Unit](_))
   }
 
@@ -85,7 +95,8 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
         case Some(actorRef) =>
           val deferredMessages: Vector[DeferredMessage] =
             suspendedLaunchersMessages(actorRef) :+ DeferredMessage(
-                sender(), ConfirmPurge)
+              sender(),
+              ConfirmPurge)
           suspendedLaunchersMessages += actorRef -> deferredMessages
           suspendedLauncherPathIds += appId
           actorRef ! AppTaskLauncherActor.Stop
@@ -102,18 +113,19 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
           suspendedLaunchersMessages.get(actorRef) match {
             case None =>
-              log.warning(
-                  "Got unexpected terminated for app {}: {}", pathId, actorRef)
+              log.warning("Got unexpected terminated for app {}: {}",
+                          pathId,
+                          actorRef)
             case Some(deferredMessages) =>
-              deferredMessages.foreach(
-                  msg => self.tell(msg.message, msg.sender))
+              deferredMessages.foreach(msg =>
+                self.tell(msg.message, msg.sender))
 
               suspendedLauncherPathIds -= pathId
               suspendedLaunchersMessages -= actorRef
           }
         case None =>
-          log.warning(
-              "Don't know anything about terminated actor: {}", actorRef)
+          log.warning("Don't know anything about terminated actor: {}",
+                      actorRef)
       }
   }
 
@@ -134,8 +146,8 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
       deferMessageToSuspendedActor(msg, app.id)
   }
 
-  private[this] def deferMessageToSuspendedActor(
-      msg: Any, appId: PathId): Unit = {
+  private[this] def deferMessageToSuspendedActor(msg: Any,
+                                                 appId: PathId): Unit = {
     val actorRef = launchers(appId)
     val deferredMessages: Vector[DeferredMessage] =
       suspendedLaunchersMessages(actorRef) :+ DeferredMessage(sender(), msg)
@@ -157,8 +169,8 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
   private[this] def receiveHandleNormalCommands: Receive = {
     case List =>
       import context.dispatcher
-      val scatter = launchers.keys.map(
-          appId => (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
+      val scatter = launchers.keys.map(appId =>
+        (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
       val gather: Future[Seq[QueuedTaskInfo]] =
         Future.sequence(scatter).map(_.flatten.to[Seq])
       gather.pipeTo(sender())
@@ -194,10 +206,10 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
       launchers.get(app.id).foreach(_.forward(msg))
   }
 
-  private[this] def createAppTaskLauncher(
-      app: AppDefinition, initialCount: Int): ActorRef = {
-    val actorRef = context.actorOf(
-        appActorProps(app, initialCount), s"$childSerial-${app.id.safePath}")
+  private[this] def createAppTaskLauncher(app: AppDefinition,
+                                          initialCount: Int): ActorRef = {
+    val actorRef = context.actorOf(appActorProps(app, initialCount),
+                                   s"$childSerial-${app.id.safePath}")
     childSerial += 1
     launchers += app.id -> actorRef
     launcherRefs += actorRef -> app.id

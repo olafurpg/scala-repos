@@ -45,9 +45,10 @@ object RoutesFileParserSpec extends Specification {
 
     "parse a path with dynamic parts and it should be encodeable" in {
       parseRoute("GET /s/:d/s p.c.m(d)").path must_==
-        PathPattern(Seq(StaticPart("s/"),
-                        DynamicPart("d", "[^/]+", true),
-                        StaticPart("/s")))
+        PathPattern(
+          Seq(StaticPart("s/"),
+              DynamicPart("d", "[^/]+", true),
+              StaticPart("/s")))
     }
 
     "parse a path with multiple dynamic parts and it should not be encodeable" in {
@@ -86,13 +87,14 @@ object RoutesFileParserSpec extends Specification {
 
     "parse method with arguments" in {
       parseRoute("GET /s p.c.m(s1, s2)").call.parameters must_==
-        Some(Seq(Parameter("s1", "String", None, None),
-                 Parameter("s2", "String", None, None)))
+        Some(
+          Seq(Parameter("s1", "String", None, None),
+              Parameter("s2", "String", None, None)))
     }
 
     "parse method with more than 22 arguments" in {
       parseRoute(
-          "GET /s p.c.m(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int, i: Int, j: Int, k: String, l: String, m: String, n: String, " +
+        "GET /s p.c.m(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int, i: Int, j: Int, k: String, l: String, m: String, n: String, " +
           "o: String, p: String, q: Option[Int], r: Option[Int], s: Option[Int], t: Option[Int], u: Option[String], v: Float, w: Float, x: Int)").call.parameters must_==
         Some(
           Seq(Parameter("a", "Int", None, None),
@@ -127,12 +129,12 @@ object RoutesFileParserSpec extends Specification {
 
     "parse argument default value" in {
       parseRoute("GET /s p.c.m(i: Int ?= 3)").call.parameters.get.head.default must beSome(
-          "3")
+        "3")
     }
 
     "parse argument fixed value" in {
       parseRoute("GET /s p.c.m(i: Int = 3)").call.parameters.get.head.fixed must beSome(
-          "3")
+        "3")
     }
 
     "parse argument with complex name" in {
@@ -157,7 +159,7 @@ object RoutesFileParserSpec extends Specification {
 
     "parse a comment with a route" in {
       parseRoute("# some comment\nGET /s p.c.m").comments must containTheSameElementsAs(
-          Seq(Comment(" some comment")))
+        Seq(Comment(" some comment")))
     }
 
     "throw an error for an unexpected line" in parseError("foo")

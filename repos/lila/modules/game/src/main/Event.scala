@@ -6,7 +6,16 @@ import play.api.libs.json._
 import chess.Pos
 import chess.Pos.{piotr, allPiotrs}
 import chess.variant.Crazyhouse
-import chess.{PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop, Clock => ChessClock, Status}
+import chess.{
+  PromotableRole,
+  Pos,
+  Color,
+  Situation,
+  Move => ChessMove,
+  Drop => ChessDrop,
+  Clock => ChessClock,
+  Status
+}
 import JsonView._
 import lila.chat.{Line, UserLine, PlayerLine}
 import lila.common.Maths.truncateAt
@@ -30,9 +39,8 @@ object Event {
     def typ = "start"
   }
 
-  private def withCrazyData(
-      data: Option[Crazyhouse.Data], drops: Option[List[Pos]])(
-      js: JsObject): JsObject =
+  private def withCrazyData(data: Option[Crazyhouse.Data],
+                            drops: Option[List[Pos]])(js: JsObject): JsObject =
     data.fold(js) { d =>
       val js1 = js + ("crazyhouse" -> crazyhouseDataWriter.writes(d))
       drops.fold(js1) { squares =>
@@ -185,9 +193,9 @@ object Event {
       extends Event {
     def typ = "castling"
     def data = Json.obj(
-        "king" -> Json.arr(king._1.key, king._2.key),
-        "rook" -> Json.arr(rook._1.key, rook._2.key),
-        "color" -> color
+      "king" -> Json.arr(king._1.key, king._2.key),
+      "rook" -> Json.arr(rook._1.key, rook._2.key),
+      "color" -> color
     )
   }
 
@@ -197,9 +205,9 @@ object Event {
     def data =
       Json
         .obj(
-            "id" -> id,
-            "url" -> s"/$id",
-            "cookie" -> cookie
+          "id" -> id,
+          "url" -> s"/$id",
+          "cookie" -> cookie
         )
         .noNull
     override def only = Some(color)
@@ -209,8 +217,8 @@ object Event {
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
     def typ = "promotion"
     def data = Json.obj(
-        "key" -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase
+      "key" -> pos.key,
+      "pieceClass" -> role.toString.toLowerCase
     )
   }
 
@@ -251,8 +259,8 @@ object Event {
   case class Clock(white: Float, black: Float) extends Event {
     def typ = "clock"
     def data =
-      Json.obj(
-          "white" -> truncateAt(white, 2), "black" -> truncateAt(black, 2))
+      Json
+        .obj("white" -> truncateAt(white, 2), "black" -> truncateAt(black, 2))
   }
   object Clock {
     def apply(clock: ChessClock): Clock =
@@ -278,8 +286,8 @@ object Event {
   case class CheckCount(white: Int, black: Int) extends Event {
     def typ = "checkCount"
     def data = Json.obj(
-        "white" -> white,
-        "black" -> black
+      "white" -> white,
+      "black" -> black
     )
   }
 
@@ -294,12 +302,12 @@ object Event {
     def data =
       Json
         .obj(
-            "color" -> color,
-            "turns" -> turns,
-            "status" -> status,
-            "winner" -> winner,
-            "wDraw" -> whiteOffersDraw.option(true),
-            "bDraw" -> blackOffersDraw.option(true)
+          "color" -> color,
+          "turns" -> turns,
+          "status" -> status,
+          "winner" -> winner,
+          "wDraw" -> whiteOffersDraw.option(true),
+          "bDraw" -> blackOffersDraw.option(true)
         )
         .noNull
   }
@@ -309,8 +317,8 @@ object Event {
     def data =
       Json
         .obj(
-            "white" -> white.option(true),
-            "black" -> black.option(true)
+          "white" -> white.option(true),
+          "black" -> black.option(true)
         )
         .noNull
     override def owner = true

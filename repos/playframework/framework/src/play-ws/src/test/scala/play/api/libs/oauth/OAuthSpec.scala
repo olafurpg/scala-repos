@@ -16,10 +16,10 @@ class OAuthSpec extends PlaySpecification {
 
   sequential
 
-  val consumerKey = ConsumerKey(
-      "someConsumerKey", "someVerySecretConsumerSecret")
-  val requestToken = RequestToken(
-      "someRequestToken", "someVerySecretRequestSecret")
+  val consumerKey =
+    ConsumerKey("someConsumerKey", "someVerySecretConsumerSecret")
+  val requestToken =
+    RequestToken("someRequestToken", "someVerySecretRequestSecret")
   val oauthCalculator = OAuthCalculator(consumerKey, requestToken)
 
   "OAuth" should {
@@ -29,8 +29,8 @@ class OAuthSpec extends PlaySpecification {
         implicit app => hostUrl =>
           WS.url(hostUrl + "/foo").sign(oauthCalculator).get()
       }
-      OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier
+        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
     }
 
     "sign a get request with query parameters" in {
@@ -41,8 +41,8 @@ class OAuthSpec extends PlaySpecification {
             .sign(oauthCalculator)
             .get()
       }
-      OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier
+        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
     }
 
     "sign a post request with a body" in {
@@ -52,8 +52,8 @@ class OAuthSpec extends PlaySpecification {
             .sign(oauthCalculator)
             .post(Map("param" -> Seq("paramValue")))
       }
-      OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier
+        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
     }
   }
 
@@ -65,7 +65,7 @@ class OAuthSpec extends PlaySpecification {
       case _ =>
         Action(BodyParsers.parse.raw) { request =>
           promise.success(
-              (request, request.body.asBytes().getOrElse(ByteString.empty)))
+            (request, request.body.asBytes().getOrElse(ByteString.empty)))
           Results.Ok
         }
     }.build()

@@ -9,10 +9,16 @@ import com.intellij.psi.{PsiElement, PsiFile, PsiMethod}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScSelfInvocation}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScSelfInvocation
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceElement
 
 /**
@@ -70,7 +76,7 @@ class ScalaGoToDeclarationHandler extends GotoDeclarationHandler {
                 */
               val all =
                 Seq(x.getActualElement, x.element) ++ x.innerResolveResult.map(
-                    _.getElement)
+                  _.getElement)
               x.element match {
                 case f: ScFunction if f.isSynthetic =>
                   Seq(x.getActualElement).flatMap(goToTargets)

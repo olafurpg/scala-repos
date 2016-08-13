@@ -20,8 +20,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * 2014-03-19
   */
 class ImportAllMembersIntention extends PsiElementBaseIntentionAction {
-  override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement): Boolean = {
     val qualAtCaret =
       PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (qualAtCaret == null) return false
@@ -29,8 +30,9 @@ class ImportAllMembersIntention extends PsiElementBaseIntentionAction {
     checkQualifier(qualAtCaret)
   }
 
-  override def invoke(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
+  override def invoke(project: Project,
+                      editor: Editor,
+                      element: PsiElement): Unit = {
     val qualAtCaret =
       PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (qualAtCaret == null || !checkQualifier(qualAtCaret)) return

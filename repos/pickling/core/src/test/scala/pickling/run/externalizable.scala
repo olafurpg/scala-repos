@@ -29,20 +29,22 @@ class StorageLevel private (private var useDisk_ : Boolean,
   def replication = replication_
 
   override def clone(): StorageLevel =
-    new StorageLevel(
-        this.useDisk, this.useMemory, this.deserialized, this.replication)
+    new StorageLevel(this.useDisk,
+                     this.useMemory,
+                     this.deserialized,
+                     this.replication)
 
   override def equals(other: Any): Boolean = other match {
     case s: StorageLevel =>
       s.useDisk == useDisk && s.useMemory == useMemory &&
-      s.deserialized == deserialized && s.replication == replication
+        s.deserialized == deserialized && s.replication == replication
     case _ =>
       false
   }
 
   override def toString: String =
-    "StorageLevel(%b, %b, %b, %d)".format(
-        useDisk, useMemory, deserialized, replication)
+    "StorageLevel(%b, %b, %b, %d)"
+      .format(useDisk, useMemory, deserialized, replication)
 
   def toInt: Int = {
     var ret = 0
@@ -91,7 +93,7 @@ object StorageLevel {
             deserialized: Boolean,
             replication: Int = 1) =
     getCachedStorageLevel(
-        new StorageLevel(useDisk, useMemory, deserialized, replication))
+      new StorageLevel(useDisk, useMemory, deserialized, replication))
 
   /** Create a new StorageLevel object from its integer representation */
   def apply(flags: Int, replication: Int) =

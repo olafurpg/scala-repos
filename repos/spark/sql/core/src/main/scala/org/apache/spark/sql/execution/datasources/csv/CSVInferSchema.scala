@@ -60,7 +60,8 @@ private[csv] object CSVInferSchema {
   }
 
   private def inferRowType(nullValue: String)(
-      rowSoFar: Array[DataType], next: Array[String]): Array[DataType] = {
+      rowSoFar: Array[DataType],
+      next: Array[String]): Array[DataType] = {
     var i = 0
     while (i < math.min(rowSoFar.length, next.length)) {
       // May have columns on right missing.
@@ -70,8 +71,8 @@ private[csv] object CSVInferSchema {
     rowSoFar
   }
 
-  def mergeRowTypes(
-      first: Array[DataType], second: Array[DataType]): Array[DataType] = {
+  def mergeRowTypes(first: Array[DataType],
+                    second: Array[DataType]): Array[DataType] = {
     first.zipAll(second, NullType, NullType).map {
       case (a, b) =>
         findTightestCommonType(a, b).getOrElse(NullType)
@@ -82,8 +83,9 @@ private[csv] object CSVInferSchema {
     * Infer type of string field. Given known type Double, and a string "1", there is no
     * point checking if it is an Int, as the final type must be Double or higher.
     */
-  def inferField(
-      typeSoFar: DataType, field: String, nullValue: String = ""): DataType = {
+  def inferField(typeSoFar: DataType,
+                 field: String,
+                 nullValue: String = ""): DataType = {
     if (field == null || field.isEmpty || field == nullValue) {
       typeSoFar
     } else {
@@ -97,7 +99,7 @@ private[csv] object CSVInferSchema {
         case StringType => StringType
         case other: DataType =>
           throw new UnsupportedOperationException(
-              s"Unexpected data type $other")
+            s"Unexpected data type $other")
       }
     }
   }
@@ -187,7 +189,8 @@ private[csv] object CSVTypeCast {
              nullable: Boolean = true,
              nullValue: String = ""): Any = {
 
-    if (datum == nullValue && nullable && (!castType.isInstanceOf[StringType])) {
+    if (datum == nullValue && nullable && (!castType
+          .isInstanceOf[StringType])) {
       null
     } else {
       castType match {
@@ -196,15 +199,17 @@ private[csv] object CSVTypeCast {
         case _: IntegerType => datum.toInt
         case _: LongType => datum.toLong
         case _: FloatType =>
-          Try(datum.toFloat).getOrElse(NumberFormat
-                .getInstance(Locale.getDefault)
-                .parse(datum)
-                .floatValue())
+          Try(datum.toFloat).getOrElse(
+            NumberFormat
+              .getInstance(Locale.getDefault)
+              .parse(datum)
+              .floatValue())
         case _: DoubleType =>
-          Try(datum.toDouble).getOrElse(NumberFormat
-                .getInstance(Locale.getDefault)
-                .parse(datum)
-                .doubleValue())
+          Try(datum.toDouble).getOrElse(
+            NumberFormat
+              .getInstance(Locale.getDefault)
+              .parse(datum)
+              .doubleValue())
         case _: BooleanType => datum.toBoolean
         case dt: DecimalType =>
           val value = new BigDecimal(datum.replaceAll(",", ""))
@@ -243,13 +248,13 @@ private[csv] object CSVTypeCast {
         case 'u' if str == """\u0000""" => '\u0000'
         case _ =>
           throw new IllegalArgumentException(
-              s"Unsupported special character for delimiter: $str")
+            s"Unsupported special character for delimiter: $str")
       }
     } else if (str.length == 1) {
       str.charAt(0)
     } else {
       throw new IllegalArgumentException(
-          s"Delimiter cannot be more than one character: $str")
+        s"Delimiter cannot be more than one character: $str")
     }
   }
 }

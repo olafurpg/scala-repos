@@ -20,8 +20,9 @@ object Validators {
         subject: TResult): FieldValidation[TResult]
   }
 
-  class PredicateValidator[TValue](
-      fieldName: String, isValid: TValue ⇒ Boolean, messageFormat: String)
+  class PredicateValidator[TValue](fieldName: String,
+                                   isValid: TValue ⇒ Boolean,
+                                   messageFormat: String)
       extends Validator[TValue] {
     def validate[TResult >: TValue <: TValue](
         value: TResult): FieldValidation[TResult] = {
@@ -68,17 +69,18 @@ object Validators {
   def validEmail(
       fieldName: String,
       messageFormat: String = "%s must be a valid email."): Validator[String] =
-    new PredicateValidator[String](
-        fieldName, EmailValidator.getInstance.isValid(_), messageFormat)
+    new PredicateValidator[String](fieldName,
+                                   EmailValidator.getInstance.isValid(_),
+                                   messageFormat)
 
   /**
     * Must be a valid absolute URL, parseable by the Apache Commons URI class.
     */
-  def validAbsoluteUrl(
-      fieldName: String,
-      allowLocalHost: Boolean,
-      messageFormat: String = "%s must be a valid absolute url.",
-      schemes: Seq[String] = Seq("http", "https")) =
+  def validAbsoluteUrl(fieldName: String,
+                       allowLocalHost: Boolean,
+                       messageFormat: String =
+                         "%s must be a valid absolute url.",
+                       schemes: Seq[String] = Seq("http", "https")) =
     buildUrlValidator(fieldName,
                       absolute = true,
                       allowLocalHost = allowLocalHost,
@@ -105,8 +107,9 @@ object Validators {
       fieldName: String,
       regex: Regex,
       messageFormat: String = "%s is invalid."): Validator[String] =
-    new PredicateValidator[String](
-        fieldName, regex.findFirstIn(_).isDefined, messageFormat)
+    new PredicateValidator[String](fieldName,
+                                   regex.findFirstIn(_).isDefined,
+                                   messageFormat)
 
   /**
     * The confirmation fieldName must have a true value.
@@ -117,10 +120,10 @@ object Validators {
       confirmationValue: => String,
       messageFormat: String = "%%s must match %s."): Validator[String] =
     new PredicateValidator[String](
-        fieldName,
-        _ == confirmationValue,
-        messageFormat.format(
-            confirmationFieldName.underscore.humanize.toLowerCase(ENGLISH)))
+      fieldName,
+      _ == confirmationValue,
+      messageFormat.format(
+        confirmationFieldName.underscore.humanize.toLowerCase(ENGLISH)))
 
   /**
     * Must be greater than the min param.
@@ -129,18 +132,20 @@ object Validators {
       fieldName: String,
       min: T,
       messageFormat: String = "%%s must be greater than %s."): Validator[T] =
-    new PredicateValidator[T](
-        fieldName, _ > min, messageFormat format min.toString)
+    new PredicateValidator[T](fieldName,
+                              _ > min,
+                              messageFormat format min.toString)
 
   /**
     * Must be less than the max param.
     */
-  def lessThan[T <% Ordered[T]](
-      fieldName: String,
-      max: T,
-      messageFormat: String = "%%s must be less than %s."): Validator[T] =
-    new PredicateValidator[T](
-        fieldName, _ < max, messageFormat format max.toString)
+  def lessThan[T <% Ordered[T]](fieldName: String,
+                                max: T,
+                                messageFormat: String =
+                                  "%%s must be less than %s."): Validator[T] =
+    new PredicateValidator[T](fieldName,
+                              _ < max,
+                              messageFormat format max.toString)
 
   /**
     * Must be greater than or equal to the min param.
@@ -165,13 +170,14 @@ object Validators {
   /**
     * Must have a minimum length of min.
     */
-  def minLength(
-      fieldName: String,
-      min: Int,
-      messageFormat: String = "%%s must be at least %s characters long.")
+  def minLength(fieldName: String,
+                min: Int,
+                messageFormat: String =
+                  "%%s must be at least %s characters long.")
     : Validator[String] =
-    new PredicateValidator[String](
-        fieldName, _.size >= min, messageFormat.format(min))
+    new PredicateValidator[String](fieldName,
+                                   _.size >= min,
+                                   messageFormat.format(min))
 
   /**
     * Must be included in the expected collection.
@@ -180,9 +186,9 @@ object Validators {
                      messageFormat: String = "%%s must be one of %s.",
                      expected: Seq[TResult]): Validator[TResult] =
     new PredicateValidator[TResult](
-        fieldName,
-        expected.contains,
-        messageFormat format expected.mkString("[", ", ", "]"))
+      fieldName,
+      expected.contains,
+      messageFormat format expected.mkString("[", ", ", "]"))
 
   /**
     * Checks if the value of the data is a value of the specified enum.
@@ -193,19 +199,18 @@ object Validators {
       messageFormat: String = "%%s must be one of %s."): Validator[String] =
     oneOf(fieldName, messageFormat, enum.values.map(_.toString).toSeq)
 
-  private def buildUrlValidator(
-      fieldName: String,
-      absolute: Boolean,
-      allowLocalHost: Boolean,
-      messageFormat: String = "%s must be a valid url.",
-      schemes: Seq[String]): Validator[String] = {
-    val validator = (url: String) ⇒
-      {
-        (allCatch opt {
-              val u = URI.create(url).normalize()
-              !absolute || u.isAbsolute
-            }).isDefined &&
-        (allowLocalHost || UrlValidator.getInstance().isValid(url))
+  private def buildUrlValidator(fieldName: String,
+                                absolute: Boolean,
+                                allowLocalHost: Boolean,
+                                messageFormat: String =
+                                  "%s must be a valid url.",
+                                schemes: Seq[String]): Validator[String] = {
+    val validator = (url: String) ⇒ {
+      (allCatch opt {
+        val u = URI.create(url).normalize()
+        !absolute || u.isAbsolute
+      }).isDefined &&
+      (allowLocalHost || UrlValidator.getInstance().isValid(url))
     }
     new PredicateValidator[String](fieldName, validator, messageFormat)
   }

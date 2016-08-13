@@ -27,8 +27,8 @@ class InterpolatedStringsAnnotatorTest
   private def messageExists(text: String, message: String) {
     val annotatorMessages = collectAnnotatorMessages(text)
     if (!annotatorMessages.exists(_.toString == message)) {
-      Assert.assertTrue(
-          "annotator messages is empty", annotatorMessages.nonEmpty)
+      Assert
+        .assertTrue("annotator messages is empty", annotatorMessages.nonEmpty)
       Assert.assertEquals(message, annotatorMessages.head)
     }
   }
@@ -64,8 +64,8 @@ class InterpolatedStringsAnnotatorTest
 
   def testMultiResolve() {
     messageExists(
-        header + "d\"blah $s1 blah $s2 blah\"",
-        "ErrorWithRange((445,446),Value 'd' is not a member of StringContext)")
+      header + "d\"blah $s1 blah $s2 blah\"",
+      "ErrorWithRange((445,446),Value 'd' is not a member of StringContext)")
   }
 
   def testMultipleResolve() {

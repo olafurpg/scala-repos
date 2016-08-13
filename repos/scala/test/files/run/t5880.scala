@@ -22,8 +22,10 @@ object Test {
       diffs.sum.toDouble / expected
     }
     def ChiSquare = {
-      val diffs = for (i <- 0 until groups) yield (hits(i) - expected) *
-      (hits(i) - expected)
+      val diffs = for (i <- 0 until groups)
+        yield
+          (hits(i) - expected) *
+            (hits(i) - expected)
       diffs.sum.toDouble / expected
     }
 

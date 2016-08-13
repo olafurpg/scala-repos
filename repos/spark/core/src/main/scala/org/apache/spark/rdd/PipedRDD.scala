@@ -38,7 +38,7 @@ import org.apache.spark.util.Utils
   * An RDD that pipes the contents of each parent partition through an external command
   * (printing them one per line) and returns the output as a collection of strings.
   */
-private[spark] class PipedRDD[T : ClassTag](
+private[spark] class PipedRDD[T: ClassTag](
     prev: RDD[T],
     command: Seq[String],
     envVars: Map[String, String],
@@ -74,8 +74,8 @@ private[spark] class PipedRDD[T : ClassTag](
     }
   }
 
-  override def compute(
-      split: Partition, context: TaskContext): Iterator[String] = {
+  override def compute(split: Partition,
+                       context: TaskContext): Iterator[String] = {
     val pb = new ProcessBuilder(command.asJava)
     // Add the environmental variables to the process.
     val currentEnvVars = pb.environment()
@@ -113,15 +113,15 @@ private[spark] class PipedRDD[T : ClassTag](
         for (file <- currentDir.list(tasksDirFilter)) {
           val fileWithDir = new File(currentDir, file)
           Utils.symlink(
-              new File(fileWithDir.getAbsolutePath()),
-              new File(taskDirectory + File.separator + fileWithDir.getName()))
+            new File(fileWithDir.getAbsolutePath()),
+            new File(taskDirectory + File.separator + fileWithDir.getName()))
         }
         pb.directory(taskDirFile)
         workInTaskDirectory = true
       } catch {
         case e: Exception =>
           logError("Unable to setup task working directory: " + e.getMessage +
-                   " (" + taskDirectory + ")",
+                     " (" + taskDirectory + ")",
                    e)
       }
     }
@@ -194,7 +194,7 @@ private[spark] class PipedRDD[T : ClassTag](
             cleanup()
             if (exitStatus != 0) {
               throw new IllegalStateException(
-                  s"Subprocess exited with status $exitStatus")
+                s"Subprocess exited with status $exitStatus")
             }
             false
           }

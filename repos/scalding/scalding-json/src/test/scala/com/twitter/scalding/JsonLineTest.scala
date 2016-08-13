@@ -96,7 +96,7 @@ class JsonLineTest extends WordSpec {
         val json = buf.head
         "not stringify lists or numbers and not escape single quotes" in {
           assert(
-              json === """{"query":"doctor's mask","queryStats":[42.1,17.1]}""")
+            json === """{"query":"doctor's mask","queryStats":[42.1,17.1]}""")
         }
       }
       .run

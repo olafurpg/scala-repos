@@ -14,7 +14,7 @@ object SprayHttpResponse {
         case JsSuccess(value, _) => value
         case JsError(errors) =>
           throw new IllegalArgumentException(
-              s"could not parse as $classTag:\n${Json.prettyPrint(
+            s"could not parse as $classTag:\n${Json.prettyPrint(
               result.entityJson)}\nErrors:\n${errors.mkString("\n")}")
       }
     }

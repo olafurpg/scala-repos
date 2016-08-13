@@ -55,7 +55,7 @@ object StackServer {
 
     stk.push(Role.serverDestTracing,
              ((next: ServiceFactory[Req, Rep]) =>
-               new ServerDestTracingProxy[Req, Rep](next)))
+                new ServerDestTracingProxy[Req, Rep](next)))
     stk.push(TimeoutFilter.serverModule)
     // The DeadlineFilter is pushed after the stats filters so stats are
     // recorded for the request. If a server processing deadline is set in
@@ -74,7 +74,7 @@ object StackServer {
     stk.push(ExceptionSourceFilter.module)
     stk.push(Role.jvmTracing,
              ((next: ServiceFactory[Req, Rep]) =>
-               newJvmFilter[Req, Rep]() andThen next))
+                newJvmFilter[Req, Rep]() andThen next))
     stk.push(ServerStatsFilter.module)
     stk.push(Role.protoTracing, identity[ServiceFactory[Req, Rep]](_))
     stk.push(ServerTracingFilter.module)
@@ -121,7 +121,7 @@ trait StackServer[Req, Rep]
 
   def withParams(ps: Stack.Params): StackServer[Req, Rep]
 
-  override def configured[P : Param](p: P): StackServer[Req, Rep]
+  override def configured[P: Param](p: P): StackServer[Req, Rep]
 
   override def configured[P](psp: (P, Param[P])): StackServer[Req, Rep]
 }
@@ -137,10 +137,11 @@ trait StackServer[Req, Rep]
   *      servers.
   */
 trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
-    extends StackServer[Req, Rep] with Stack.Parameterized[This]
-    with CommonParams[This] with WithServerTransport[This]
-    with WithServerAdmissionControl[This] {
-  self =>
+    extends StackServer[Req, Rep]
+    with Stack.Parameterized[This]
+    with CommonParams[This]
+    with WithServerTransport[This]
+    with WithServerAdmissionControl[This] { self =>
 
   /**
     * The type we write into the transport.
@@ -166,13 +167,13 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
     *
     * @see [[com.twitter.finagle.dispatch.GenSerialServerDispatcher]]
     */
-  protected def newDispatcher(
-      transport: Transport[In, Out], service: Service[Req, Rep]): Closable
+  protected def newDispatcher(transport: Transport[In, Out],
+                              service: Service[Req, Rep]): Closable
 
   /**
     * Creates a new StackServer with parameter `p`.
     */
-  override def configured[P : Stack.Param](p: P): This =
+  override def configured[P: Stack.Param](p: P): This =
     withParams(params + p)
 
   /**
@@ -222,7 +223,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
       // in-flight requests is expected to be managed by `newDispatcher`,
       // so we can simply `close` all connections here.
       val connections = Collections.newSetFromMap(
-          new ConcurrentHashMap[Closable, java.lang.Boolean])
+        new ConcurrentHashMap[Closable, java.lang.Boolean])
 
       // Hydrates a new ClientConnection with connection information from the
       // given `transport`. ClientConnection instances are used to
@@ -240,7 +241,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
 
       val serverParams =
         params + Label(serverLabel) + Stats(statsReceiver) + Monitor(
-            reporter(label, None) andThen monitor)
+          reporter(label, None) andThen monitor)
 
       val serviceFactory =
         (stack ++ Stack.Leaf(Endpoint, factory)).make(serverParams)
@@ -262,9 +263,11 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
             // away. This allows protocols that support graceful shutdown to
             // also gracefully deny new sessions.
             val d = server.newDispatcher(
-                transport,
-                Service.const(Future.exception(Failure.rejected(
-                            "Terminating session and ignoring request", exc)))
+              transport,
+              Service.const(
+                Future.exception(
+                  Failure.rejected("Terminating session and ignoring request",
+                                   exc)))
             )
             connections.add(d)
             transport.onClose ensure connections.remove(d)
@@ -274,8 +277,9 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
         }
       }
 
-      ServerRegistry.register(
-          underlying.boundAddress.toString, server.stack, server.params)
+      ServerRegistry.register(underlying.boundAddress.toString,
+                              server.stack,
+                              server.params)
 
       protected def closeServer(deadline: Time) = closeAwaitably {
         // Here be dragons

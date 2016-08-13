@@ -20,7 +20,10 @@ import org.apache.spark.sql.{AnalysisException, SaveMode}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.UnresolvedRelation
 import org.apache.spark.sql.catalyst.parser._
-import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, OneRowRelation}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LogicalPlan,
+  OneRowRelation
+}
 import org.apache.spark.sql.execution.command._
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.types.StructType
@@ -51,8 +54,8 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
     *   :- 'k3'
     *   +- 'v3'
     */
-  private def extractProps(
-      props: Seq[ASTNode], expectedNodeText: String): Seq[(String, String)] = {
+  private def extractProps(props: Seq[ASTNode],
+                           expectedNodeText: String): Seq[(String, String)] = {
     props.map {
       case Token(x, keysAndValue) if x == expectedNodeText =>
         val key = keysAndValue.init.map { x =>
@@ -87,13 +90,14 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
       case Token("TOK_EXPLAIN", explainArgs)
           if "TOK_CREATETABLE" == explainArgs.head.text =>
         val Some(crtTbl) :: _ :: extended :: Nil = getClauses(
-            Seq("TOK_CREATETABLE", "FORMATTED", "EXTENDED"), explainArgs)
+          Seq("TOK_CREATETABLE", "FORMATTED", "EXTENDED"),
+          explainArgs)
         ExplainCommand(nodeToPlan(crtTbl), extended = extended.isDefined)
 
       case Token("TOK_EXPLAIN", explainArgs) =>
         // Ignore FORMATTED if present.
-        val Some(query) :: _ :: extended :: Nil = getClauses(
-            Seq("TOK_QUERY", "FORMATTED", "EXTENDED"), explainArgs)
+        val Some(query) :: _ :: extended :: Nil =
+          getClauses(Seq("TOK_QUERY", "FORMATTED", "EXTENDED"), explainArgs)
         ExplainCommand(nodeToPlan(query), extended = extended.isDefined)
 
       case Token("TOK_REFRESHTABLE", nameParts :: Nil) =>
@@ -135,9 +139,11 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
             extractProps(propList, "TOK_TABLEPROPERTY")
           case _ => parseFailed("Invalid CREATE DATABASE command", node)
         }.toMap
-        CreateDatabase(
-            databaseName, ifNotExists.isDefined, location, comment, props)(
-            node.source)
+        CreateDatabase(databaseName,
+                       ifNotExists.isDefined,
+                       location,
+                       comment,
+                       props)(node.source)
 
       // CREATE [TEMPORARY] FUNCTION [db_name.]function_name AS class_name
       // [USING JAR|FILE|ARCHIVE 'file_uri' [, JAR|FILE|ARCHIVE 'file_uri'] ];
@@ -172,8 +178,8 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
             parseFailed("Invalid CREATE FUNCTION command", node)
         }
         // Extract other keywords, if they exist
-        val Seq(rList, temp) = getClauses(
-            Seq("TOK_RESOURCE_LIST", "TOK_TEMPORARY"), otherArgs)
+        val Seq(rList, temp) =
+          getClauses(Seq("TOK_RESOURCE_LIST", "TOK_TEMPORARY"), otherArgs)
         val resources: Seq[(String, String)] = rList.toSeq.flatMap {
           case Token("TOK_RESOURCE_LIST", resList) =>
             resList.map {
@@ -230,13 +236,13 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
 
         if (temp.isDefined && ifNotExists.isDefined) {
           throw new AnalysisException(
-              "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause.")
+            "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause.")
         }
 
         if (asClause.isDefined) {
           if (columns.isDefined) {
             throw new AnalysisException(
-                "a CREATE TABLE AS SELECT statement does not allow column definitions.")
+              "a CREATE TABLE AS SELECT statement does not allow column definitions.")
           }
 
           val mode =
@@ -280,27 +286,28 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
           nodeToDescribeFallback(node)
         } else {
           tableType match {
-            case Token(
-                "TOK_TABTYPE", Token("TOK_TABNAME", nameParts) :: Nil) =>
+            case Token("TOK_TABTYPE",
+                       Token("TOK_TABNAME", nameParts) :: Nil) =>
               nameParts match {
                 case Token(dbName, Nil) :: Token(tableName, Nil) :: Nil =>
                   // It is describing a table with the format like "describe db.table".
                   // TODO: Actually, a user may mean tableName.columnName. Need to resolve this
                   // issue.
                   val tableIdent = TableIdentifier(
-                      cleanIdentifier(tableName),
-                      Some(cleanIdentifier(dbName)))
-                  datasources.DescribeCommand(
-                      tableIdent, isExtended = extended.isDefined)
+                    cleanIdentifier(tableName),
+                    Some(cleanIdentifier(dbName)))
+                  datasources.DescribeCommand(tableIdent,
+                                              isExtended = extended.isDefined)
                 case Token(dbName, Nil) :: Token(tableName, Nil) :: Token(
-                    colName, Nil) :: Nil =>
+                    colName,
+                    Nil) :: Nil =>
                   // It is describing a column with the format like "describe db.table column".
                   nodeToDescribeFallback(node)
                 case tableName :: Nil =>
                   // It is describing a table with the format like "describe table".
                   datasources.DescribeCommand(
-                      TableIdentifier(cleanIdentifier(tableName.text)),
-                      isExtended = extended.isDefined)
+                    TableIdentifier(cleanIdentifier(tableName.text)),
+                    isExtended = extended.isDefined)
                 case _ =>
                   nodeToDescribeFallback(node)
               }

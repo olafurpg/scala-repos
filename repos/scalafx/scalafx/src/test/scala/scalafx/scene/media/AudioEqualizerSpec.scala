@@ -42,7 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AudioEqualizerSpec
     extends SimpleSFXDelegateSpec[jfxsm.AudioEqualizer, AudioEqualizer](
-        classOf[jfxsm.AudioEqualizer], classOf[AudioEqualizer]) with UrlMedia {
+      classOf[jfxsm.AudioEqualizer],
+      classOf[AudioEqualizer])
+    with UrlMedia {
 
   override protected def getJavaClassInstance =
     new jfxsm.MediaPlayer(new jfxsm.Media(url)).getAudioEqualizer

@@ -28,8 +28,8 @@ object MetricsReporterService {
 }
 
 //scalastyle:off magic.number
-class MetricsReporterService @Inject()(
-    config: MetricsReporterConf, registry: MetricRegistry)
+class MetricsReporterService @Inject()(config: MetricsReporterConf,
+                                       registry: MetricRegistry)
     extends AbstractIdleService {
 
   private val log = Logger.getLogger(getClass.getName)
@@ -59,7 +59,7 @@ class MetricsReporterService @Inject()(
       .toMap
 
     val graphite = new Graphite(
-        new InetSocketAddress(url.getHost, url.getPort))
+      new InetSocketAddress(url.getHost, url.getPort))
     val builder = GraphiteReporter
       .forRegistry(registry)
       .convertRatesTo(TimeUnit.SECONDS)
@@ -69,7 +69,7 @@ class MetricsReporterService @Inject()(
     val interval = params.get("interval").map(_.toLong).getOrElse(10L)
 
     log.info(
-        s"Graphite reporter configured $reporter with $interval seconds interval (url: $graphUrl)")
+      s"Graphite reporter configured $reporter with $interval seconds interval (url: $graphUrl)")
     reporter.start(interval, TimeUnit.SECONDS)
     reporter
   }
@@ -115,28 +115,28 @@ class MetricsReporterService @Inject()(
         transport.build()
       case unknown: String =>
         throw new WrongConfigurationException(
-            s"Datadog: Unknown protocol $unknown")
+          s"Datadog: Unknown protocol $unknown")
     }
 
     val expansions = params
       .get("expansions")
       .map(_.split(",").toSeq)
       .getOrElse(
-          Seq("count",
-              "meanRate",
-              "1MinuteRate",
-              "5MinuteRate",
-              "15MinuteRate",
-              "min",
-              "mean",
-              "max",
-              "stddev",
-              "median",
-              "p75",
-              "p95",
-              "p98",
-              "p99",
-              "p999"))
+        Seq("count",
+            "meanRate",
+            "1MinuteRate",
+            "5MinuteRate",
+            "15MinuteRate",
+            "min",
+            "mean",
+            "max",
+            "stddev",
+            "median",
+            "p75",
+            "p95",
+            "p98",
+            "p99",
+            "p999"))
 
     val interval = params.get("interval").map(_.toLong).getOrElse(10L)
     val prefix = params.getOrElse("prefix", "marathon_test")
@@ -150,13 +150,13 @@ class MetricsReporterService @Inject()(
       .withHost(InetAddress.getLocalHost.getHostName)
       .withPrefix(prefix)
       .withExpansions(util.EnumSet.copyOf(expansions
-                .flatMap(e => Expansion.values().find(_.toString == e))
-                .asJava))
+        .flatMap(e => Expansion.values().find(_.toString == e))
+        .asJava))
       .withTags(tags.asJava)
       .build()
 
     log.info(
-        s"Datadog reporter configured $reporter with $interval seconds interval (url: $dataDog)")
+      s"Datadog reporter configured $reporter with $interval seconds interval (url: $dataDog)")
     reporter.start(interval, TimeUnit.SECONDS)
     reporter
   }

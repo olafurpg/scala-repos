@@ -37,12 +37,14 @@ import mutable.{Builder, ListBuffer}
   */
 @SerialVersionUID(-7622936493364270175L)
 @deprecatedInheritance(
-    "The implementation details of immutable queues make inheriting from them unwise.",
-    "2.11.0")
-class Queue[+A] protected (
-    protected val in: List[A], protected val out: List[A])
-    extends AbstractSeq[A] with LinearSeq[A]
-    with GenericTraversableTemplate[A, Queue] with LinearSeqLike[A, Queue[A]]
+  "The implementation details of immutable queues make inheriting from them unwise.",
+  "2.11.0")
+class Queue[+A] protected (protected val in: List[A],
+                           protected val out: List[A])
+    extends AbstractSeq[A]
+    with LinearSeq[A]
+    with GenericTraversableTemplate[A, Queue]
+    with LinearSeqLike[A, Queue[A]]
     with Serializable {
 
   override def companion: GenericCompanion[Queue] = Queue

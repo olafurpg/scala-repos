@@ -175,8 +175,8 @@ private[math] object BitLevel {
     if (!(count == 0 || bi.signum() == 0)) {
       val intCount = count >> 5 // count of integers
       bi.numberLength -= intCount
-      val shift = shiftRight(
-          bi.digits, bi.numberLength, bi.digits, intCount, count & 31)
+      val shift =
+        shiftRight(bi.digits, bi.numberLength, bi.digits, intCount, count & 31)
 
       if (!shift && sign < 0) {
         // remainder not zero: add one to the result
@@ -278,8 +278,9 @@ private[math] object BitLevel {
     *                {@link BigInteger#digits}.
     *  @param srcLen the length of {@code source}; may be less than {@code source.length}
     */
-  def shiftLeftOneBit(
-      result: Array[Int], source: Array[Int], srcLen: Int): Unit = {
+  def shiftLeftOneBit(result: Array[Int],
+                      source: Array[Int],
+                      srcLen: Int): Unit = {
     var carry = 0
     for (i <- 0 until srcLen) {
       val iVal = source(i)
@@ -310,7 +311,7 @@ private[math] object BitLevel {
       if (source.sign < 0) {
         // Checking if the dropped bits are zeros (the remainder equals to 0)
         var i: Int = 0
-        while ( (i < intCount) && (source.digits(i) == 0)) {
+        while ((i < intCount) && (source.digits(i) == 0)) {
           i += 1
         }
         // If the remainder is not zero, add 1 to the result
@@ -361,7 +362,7 @@ private[math] object BitLevel {
       i = 0
       while (i < resultLen - 1) {
         result(i) = (source(i + intCount) >>> count) |
-        (source(i + intCount + 1) << leftShiftCount)
+            (source(i + intCount + 1) << leftShiftCount)
         i += 1
       }
       result(i) = source(i + intCount) >>> count

@@ -21,7 +21,8 @@ import generic._
 trait Map[A, B]
     extends Iterable[(A, B)]
 //     with GenMap[A, B]
-    with scala.collection.Map[A, B] with MapLike[A, B, Map[A, B]] {
+    with scala.collection.Map[A, B]
+    with MapLike[A, B, Map[A, B]] {
 
   override def empty: Map[A, B] = Map.empty
 
@@ -62,7 +63,8 @@ object Map extends MutableMapFactory[Map] {
   def empty[A, B]: Map[A, B] = new HashMap[A, B]
 
   class WithDefault[A, B](underlying: Map[A, B], d: A => B)
-      extends scala.collection.Map.WithDefault(underlying, d) with Map[A, B] {
+      extends scala.collection.Map.WithDefault(underlying, d)
+      with Map[A, B] {
     override def +=(kv: (A, B)) = { underlying += kv; this }
     def -=(key: A) = { underlying -= key; this }
     override def empty = new WithDefault(underlying.empty, d)
@@ -85,4 +87,5 @@ object Map extends MutableMapFactory[Map] {
 
 /** Explicit instantiation of the `Map` trait to reduce class file size in subclasses. */
 abstract class AbstractMap[A, B]
-    extends scala.collection.AbstractMap[A, B] with Map[A, B]
+    extends scala.collection.AbstractMap[A, B]
+    with Map[A, B]

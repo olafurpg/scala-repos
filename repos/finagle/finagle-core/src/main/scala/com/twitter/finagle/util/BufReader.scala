@@ -81,7 +81,7 @@ private class BufReaderImpl(underlying: Buf) extends BufReader {
   def readByte(): Int = {
     if (remaining < 1) {
       throw new UnderflowException(
-          s"tried to read a byte when remaining bytes=${remaining}")
+        s"tried to read a byte when remaining bytes=${remaining}")
     }
 
     readBytes(1).write(nums, 0)
@@ -91,7 +91,7 @@ private class BufReaderImpl(underlying: Buf) extends BufReader {
   def readShortBE(): Int = {
     if (remaining < 2) {
       throw new UnderflowException(
-          s"tried to read 2 bytes when remaining bytes=${remaining}")
+        s"tried to read 2 bytes when remaining bytes=${remaining}")
     }
 
     readBytes(2).write(nums, 0)
@@ -101,25 +101,25 @@ private class BufReaderImpl(underlying: Buf) extends BufReader {
   def readIntBE(): Int = {
     if (remaining < 4) {
       throw new UnderflowException(
-          s"tried to read 4 bytes when remaining bytes=${remaining}")
+        s"tried to read 4 bytes when remaining bytes=${remaining}")
     }
 
     readBytes(4).write(nums, 0)
     ((nums(0) & 0xff) << 24) | ((nums(1) & 0xff) << 16) |
-    ((nums(2) & 0xff) << 8) | ((nums(3) & 0xff))
+      ((nums(2) & 0xff) << 8) | ((nums(3) & 0xff))
   }
 
   def readLongBE(): Long = {
     if (remaining < 8) {
       throw new UnderflowException(
-          s"tried to read 8 bytes when remaining bytes=${remaining}")
+        s"tried to read 8 bytes when remaining bytes=${remaining}")
     }
 
     readBytes(8).write(nums, 0)
     ((nums(0) & 0xff).toLong << 56) | ((nums(1) & 0xff).toLong << 48) |
-    ((nums(2) & 0xff).toLong << 40) | ((nums(3) & 0xff).toLong << 32) |
-    ((nums(4) & 0xff).toLong << 24) | ((nums(5) & 0xff).toLong << 16) |
-    ((nums(6) & 0xff).toLong << 8) | ((nums(7) & 0xff).toLong)
+      ((nums(2) & 0xff).toLong << 40) | ((nums(3) & 0xff).toLong << 32) |
+      ((nums(4) & 0xff).toLong << 24) | ((nums(5) & 0xff).toLong << 16) |
+      ((nums(6) & 0xff).toLong << 8) | ((nums(7) & 0xff).toLong)
   }
 
   def readBytes(n: Int): Buf = {

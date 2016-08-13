@@ -17,7 +17,12 @@
 
 package org.apache.spark.repl
 
-import java.io.{ByteArrayOutputStream, FilterInputStream, InputStream, IOException}
+import java.io.{
+  ByteArrayOutputStream,
+  FilterInputStream,
+  InputStream,
+  IOException
+}
 import java.net.{HttpURLConnection, URI, URL, URLEncoder}
 import java.nio.channels.Channels
 
@@ -44,7 +49,8 @@ class ExecutorClassLoader(conf: SparkConf,
                           classUri: String,
                           parent: ClassLoader,
                           userClassPathFirst: Boolean)
-    extends ClassLoader with Logging {
+    extends ClassLoader
+    with Logging {
   val uri = new URI(classUri)
   val directory = uri.getPath
 
@@ -75,24 +81,24 @@ class ExecutorClassLoader(conf: SparkConf,
       case true =>
         findClassLocally(name).getOrElse(parentLoader.loadClass(name))
       case false => {
-          try {
-            parentLoader.loadClass(name)
-          } catch {
-            case e: ClassNotFoundException => {
-                val classOption = findClassLocally(name)
-                classOption match {
-                  case None =>
-                    // If this class has a cause, it will break the internal assumption of Janino
-                    // (the compiler used for Spark SQL code-gen).
-                    // See org.codehaus.janino.ClassLoaderIClassLoader's findIClass, you will see
-                    // its behavior will be changed if there is a cause and the compilation
-                    // of generated class will fail.
-                    throw new ClassNotFoundException(name)
-                  case Some(a) => a
-                }
-              }
+        try {
+          parentLoader.loadClass(name)
+        } catch {
+          case e: ClassNotFoundException => {
+            val classOption = findClassLocally(name)
+            classOption match {
+              case None =>
+                // If this class has a cause, it will break the internal assumption of Janino
+                // (the compiler used for Spark SQL code-gen).
+                // See org.codehaus.janino.ClassLoaderIClassLoader's findIClass, you will see
+                // its behavior will be changed if there is a cause and the compilation
+                // of generated class will fail.
+                throw new ClassNotFoundException(name)
+              case Some(a) => a
+            }
           }
         }
+      }
     }
   }
 
@@ -123,15 +129,15 @@ class ExecutorClassLoader(conf: SparkConf,
     val url =
       if (SparkEnv.get.securityManager.isAuthenticationEnabled()) {
         val uri = new URI(classUri + "/" + urlEncode(pathInDirectory))
-        val newuri = Utils.constructURIForAuthentication(
-            uri, SparkEnv.get.securityManager)
+        val newuri = Utils
+          .constructURIForAuthentication(uri, SparkEnv.get.securityManager)
         newuri.toURL
       } else {
         new URL(classUri + "/" + urlEncode(pathInDirectory))
       }
     val connection: HttpURLConnection = Utils
-      .setupSecureURLConnection(
-          url.openConnection(), SparkEnv.get.securityManager)
+      .setupSecureURLConnection(url.openConnection(),
+                                SparkEnv.get.securityManager)
       .asInstanceOf[HttpURLConnection]
     // Set the connection timeouts (for testing purposes)
     if (httpUrlConnectionTimeoutMillis != -1) {
@@ -184,8 +190,8 @@ class ExecutorClassLoader(conf: SparkConf,
       case e: Exception =>
         // Something bad happened while checking if the class exists
         logError(
-            s"Failed to check existence of class $name on REPL class server at $uri",
-            e)
+          s"Failed to check existence of class $name on REPL class server at $uri",
+          e)
         None
     } finally {
       if (inputStream != null) {
@@ -207,7 +213,7 @@ class ExecutorClassLoader(conf: SparkConf,
       // be initialized later through reflection when it is used in a task.
       val cr = new ClassReader(in)
       val cw = new ClassWriter(
-          ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
+        ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
       val cleaner = new ConstructorCleaner(name, cw)
       cr.accept(cleaner, 0)
       return cw.toByteArray
@@ -250,8 +256,11 @@ class ConstructorCleaner(className: String, cv: ClassVisitor)
       // field in the class to point to it, but do nothing otherwise.
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0) // load this
-      mv.visitMethodInsn(
-          INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+      mv.visitMethodInsn(INVOKESPECIAL,
+                         "java/lang/Object",
+                         "<init>",
+                         "()V",
+                         false)
       mv.visitVarInsn(ALOAD, 0) // load this
       // val classType = className.replace('.', '/')
       // mv.visitFieldInsn(PUTSTATIC, classType, "MODULE$", "L" + classType + ";")

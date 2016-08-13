@@ -14,14 +14,18 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.ScTypePolymorphicType
 import org.jetbrains.plugins.scala.lang.psi.types.result._
 import org.jetbrains.plugins.scala.lang.resolve.processor._
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScGenericCallImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScGenericCall {
+    extends ScalaPsiElementImpl(node)
+    with ScGenericCall {
   override def toString: String = "GenericCall"
 
   /**
@@ -34,7 +38,7 @@ class ScGenericCallImpl(node: ASTNode)
     }
     val isUpdate =
       curr.getContext.isInstanceOf[ScAssignStmt] &&
-      curr.getContext.asInstanceOf[ScAssignStmt].getLExpression == curr
+        curr.getContext.asInstanceOf[ScAssignStmt].getLExpression == curr
     val methodName = if (isUpdate) "update" else "apply"
     val args: List[Seq[ScExpression]] =
       if (curr == this && !isUpdate) List.empty
@@ -43,15 +47,15 @@ class ScGenericCallImpl(node: ASTNode)
           case call: ScMethodCall => call.args.exprs
           case _ => Seq.empty[ScExpression]
         }) ++
-        (if (isUpdate)
-           curr.getContext.asInstanceOf[ScAssignStmt].getRExpression match {
-             case Some(x) => Seq[ScExpression](x)
-             case None =>
-               Seq[ScExpression](
-                   ScalaPsiElementFactory.createExpressionFromText(
-                       "{val x: Nothing = null; x}",
-                       getManager)) //we can't to not add something => add Nothing expression
-           } else Seq.empty) :: Nil
+          (if (isUpdate)
+            curr.getContext.asInstanceOf[ScAssignStmt].getRExpression match {
+              case Some(x) => Seq[ScExpression](x)
+              case None =>
+                Seq[ScExpression](
+                  ScalaPsiElementFactory.createExpressionFromText(
+                    "{val x: Nothing = null; x}",
+                    getManager)) //we can't to not add something => add Nothing expression
+            } else Seq.empty) :: Nil
       }
     val typeArgs: Seq[ScTypeElement] = this.arguments
     import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression._
@@ -87,7 +91,8 @@ class ScGenericCallImpl(node: ASTNode)
     refType match {
       case ScTypePolymorphicType(int, tps) =>
         val subst = ScalaPsiUtil.genericCallSubstitutor(
-            tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
+          tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))),
+          this)
         Success(subst.subst(int), Some(this))
       case _ => Success(refType, Some(this))
     }
@@ -100,7 +105,8 @@ class ScGenericCallImpl(node: ASTNode)
     refType match {
       case ScTypePolymorphicType(int, tps) =>
         val subst = ScalaPsiUtil.genericCallSubstitutor(
-            tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
+          tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))),
+          this)
         Success(subst.subst(int), Some(this))
       case _ => Success(refType, Some(this))
     }

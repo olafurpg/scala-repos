@@ -24,9 +24,13 @@ import scala.util.Try
   * Provides generic features for controller implementations.
   */
 abstract class ControllerBase
-    extends ScalatraFilter with ClientSideValidationFormSupport
-    with JacksonJsonSupport with I18nSupport with FlashMapSupport
-    with Validations with SystemSettingsService {
+    extends ScalatraFilter
+    with ClientSideValidationFormSupport
+    with JacksonJsonSupport
+    with I18nSupport
+    with FlashMapSupport
+    with Validations
+    with SystemSettingsService {
 
   implicit val jsonFormats = gitbucket.core.api.JsonFormat.jsonFormats
 
@@ -55,7 +59,7 @@ abstract class ControllerBase
         if (account == null) {
           // Redirect to login form
           httpResponse.sendRedirect(
-              baseUrl + "/signin?redirect=" + StringUtil.urlEncode(path))
+            baseUrl + "/signin?redirect=" + StringUtil.urlEncode(path))
         } else if (account.isAdmin) {
           // H2 Console (administrators only)
           chain.doFilter(request, response)
@@ -85,10 +89,10 @@ abstract class ControllerBase
   implicit def context: Context = {
     contextCache.get match {
       case null => {
-          val context = Context(loadSystemSettings(), LoginAccount, request)
-          contextCache.set(context)
-          context
-        }
+        val context = Context(loadSystemSettings(), LoginAccount, request)
+        contextCache.set(context)
+        context
+      }
       case context => context
     }
   }
@@ -104,8 +108,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxGet[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxGet[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxGet(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -117,8 +121,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxPost[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxPost[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxPost(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -148,12 +152,14 @@ abstract class ControllerBase
           org.scalatra.Unauthorized(redirect("/signin"))
         } else {
           org.scalatra.Unauthorized(
-              redirect("/signin?redirect=" + StringUtil.urlEncode(
-                      defining(request.getQueryString) { queryString =>
-                request.getRequestURI.substring(request.getContextPath.length) +
-                (if (queryString != null) "?" + queryString else "")
-              }
-                  )))
+            redirect(
+              "/signin?redirect=" + StringUtil.urlEncode(
+                defining(request.getQueryString) { queryString =>
+                  request.getRequestURI.substring(
+                    request.getContextPath.length) +
+                    (if (queryString != null) "?" + queryString else "")
+                }
+              )))
         }
       }
     }
@@ -184,8 +190,8 @@ abstract class ControllerBase
   }
 
   // jenkins send message as 'application/x-www-form-urlencoded' but scalatra already parsed as multi-part-request.
-  def extractFromJsonBody[A](
-      implicit request: HttpServletRequest, mf: Manifest[A]): Option[A] = {
+  def extractFromJsonBody[A](implicit request: HttpServletRequest,
+                             mf: Manifest[A]): Option[A] = {
     (request.contentType.map(_.split(";").head.toLowerCase) match {
       case Some("application/x-www-form-urlencoded") =>
         multiParams.keys.headOption.map(parse(_))
@@ -236,8 +242,9 @@ case class Context(settings: SystemSettingsService.SystemSettings,
 trait AccountManagementControllerBase extends ControllerBase {
   self: AccountService =>
 
-  protected def updateImage(
-      userName: String, fileId: Option[String], clearImage: Boolean): Unit =
+  protected def updateImage(userName: String,
+                            fileId: Option[String],
+                            clearImage: Boolean): Unit =
     if (clearImage) {
       getAccountByUserName(userName).flatMap(_.image).map { image =>
         new java.io.File(getUserUploadDir(userName), image).delete()
@@ -247,18 +254,19 @@ trait AccountManagementControllerBase extends ControllerBase {
       fileId.map { fileId =>
         val filename =
           "avatar." + FileUtil.getExtension(
-              session.getAndRemove(Keys.Session.Upload(fileId)).get)
+            session.getAndRemove(Keys.Session.Upload(fileId)).get)
         FileUtils.moveFile(
-            new java.io.File(getTemporaryDir(session.getId), fileId),
-            new java.io.File(getUserUploadDir(userName), filename)
+          new java.io.File(getTemporaryDir(session.getId), fileId),
+          new java.io.File(getUserUploadDir(userName), filename)
         )
         updateAvatarImage(userName, Some(filename))
       }
     }
 
   protected def uniqueUserName: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       getAccountByUserName(value, true).map { _ =>
         "User already exists."
       }

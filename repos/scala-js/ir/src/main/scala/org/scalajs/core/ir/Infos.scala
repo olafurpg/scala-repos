@@ -32,8 +32,12 @@ object Infos {
               superClass: Option[String] = None,
               interfaces: List[String] = Nil,
               methods: List[MethodInfo] = Nil): ClassInfo = {
-      new ClassInfo(
-          encodedName, isExported, kind, superClass, interfaces, methods)
+      new ClassInfo(encodedName,
+                    isExported,
+                    kind,
+                    superClass,
+                    interfaces,
+                    methods)
     }
   }
 
@@ -187,7 +191,7 @@ object Infos {
 
         case NoType | RecordType(_) =>
           throw new IllegalArgumentException(
-              s"Illegal receiver type: $receiverTpe")
+            s"Illegal receiver type: $receiverTpe")
       }
 
       this
@@ -244,18 +248,18 @@ object Infos {
 
     def result(): MethodInfo = {
       MethodInfo(
-          encodedName = encodedName,
-          isStatic = isStatic,
-          isAbstract = isAbstract,
-          isExported = isExported,
-          methodsCalled = methodsCalled.toMap.mapValues(_.toList),
-          methodsCalledStatically = methodsCalledStatically.toMap.mapValues(
-                _.toList),
-          staticMethodsCalled = staticMethodsCalled.toMap.mapValues(_.toList),
-          instantiatedClasses = instantiatedClasses.toList,
-          accessedModules = accessedModules.toList,
-          usedInstanceTests = usedInstanceTests.toList,
-          accessedClassData = accessedClassData.toList
+        encodedName = encodedName,
+        isStatic = isStatic,
+        isAbstract = isAbstract,
+        isExported = isExported,
+        methodsCalled = methodsCalled.toMap.mapValues(_.toList),
+        methodsCalledStatically =
+          methodsCalledStatically.toMap.mapValues(_.toList),
+        staticMethodsCalled = staticMethodsCalled.toMap.mapValues(_.toList),
+        instantiatedClasses = instantiatedClasses.toList,
+        accessedModules = accessedModules.toList,
+        usedInstanceTests = usedInstanceTests.toList,
+        accessedClassData = accessedClassData.toList
       )
     }
   }

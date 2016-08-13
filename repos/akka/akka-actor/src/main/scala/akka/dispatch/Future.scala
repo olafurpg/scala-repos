@@ -5,7 +5,13 @@ package akka.dispatch
 
 import scala.runtime.{BoxedUnit, AbstractPartialFunction}
 import akka.japi.{Function ⇒ JFunc, Option ⇒ JOption, Procedure}
-import scala.concurrent.{Future, Promise, ExecutionContext, ExecutionContextExecutor, ExecutionContextExecutorService}
+import scala.concurrent.{
+  Future,
+  Promise,
+  ExecutionContext,
+  ExecutionContextExecutor,
+  ExecutionContextExecutorService
+}
 import java.lang.{Iterable ⇒ JIterable}
 import java.util.{LinkedList ⇒ JLinkedList}
 import java.util.concurrent.{Executor, ExecutorService, Callable}
@@ -78,14 +84,16 @@ object ExecutionContexts {
     * non-throwing in order to save a round-trip to the thread pool.
     */
   private[akka] object sameThreadExecutionContext
-      extends ExecutionContext with BatchingExecutor {
+      extends ExecutionContext
+      with BatchingExecutor {
     override protected def unbatchedExecute(runnable: Runnable): Unit =
       runnable.run()
     override protected def resubmitOnBlock: Boolean =
       false // No point since we execute on same thread
     override def reportFailure(t: Throwable): Unit =
       throw new IllegalStateException(
-          "exception in sameThreadExecutionContext", t)
+        "exception in sameThreadExecutionContext",
+        t)
   }
 }
 
@@ -146,8 +154,8 @@ object Futures {
   /**
     * Returns a Future to the result of the first future in the list that is completed
     */
-  def firstCompletedOf[T <: AnyRef](
-      futures: JIterable[Future[T]], executor: ExecutionContext): Future[T] =
+  def firstCompletedOf[T <: AnyRef](futures: JIterable[Future[T]],
+                                    executor: ExecutionContext): Future[T] =
     Future.firstCompletedOf(futures.asScala)(executor)
 
   /**
@@ -401,5 +409,5 @@ abstract class Mapper[-T, +R] extends scala.runtime.AbstractFunction1[T, R] {
   @throws(classOf[Throwable])
   def checkedApply(parameter: T): R =
     throw new UnsupportedOperationException(
-        "Mapper.checkedApply has not been implemented")
+      "Mapper.checkedApply has not been implemented")
 }

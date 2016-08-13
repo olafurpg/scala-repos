@@ -1,9 +1,17 @@
 package org.jetbrains.plugins.scala.format
 
 import com.intellij.psi.{PsiClass, PsiElement, PsiMethod}
-import org.jetbrains.plugins.scala.extensions.{&&, ContainingClass, PsiClassExt, PsiReferenceEx}
+import org.jetbrains.plugins.scala.extensions.{
+  &&,
+  ContainingClass,
+  PsiClassExt,
+  PsiReferenceEx
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{MethodInvocation, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  MethodInvocation,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
@@ -12,8 +20,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
   */
 object PrintStringParser extends StringParser {
   def parse(element: PsiElement) = {
-    extractPrintCall(element).map(
-        p => FormattedStringParser.parseFormatCall(p._1, p._2))
+    extractPrintCall(element).map(p =>
+      FormattedStringParser.parseFormatCall(p._1, p._2))
   }
 
   def extractPrintCall(
@@ -33,7 +41,7 @@ object PrintStringParser extends StringParser {
           (f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
-          isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>
+            isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>
         (literal, args)
     }
 

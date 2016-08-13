@@ -162,7 +162,7 @@ object ClassFileParser extends ByteCodeReader {
       case bootstrapMethodAttrIndex ~ nameAndTypeIndex =>
         pool =>
           "InvokeDynamic: " + "bootstrapMethodAttrIndex = " +
-          bootstrapMethodAttrIndex + ", " + pool(nameAndTypeIndex)
+            bootstrapMethodAttrIndex + ", " + pool(nameAndTypeIndex)
     }
 
   val constantPoolEntry =
@@ -192,14 +192,14 @@ object ClassFileParser extends ByteCodeReader {
 
   // parse runtime-visible annotations
   abstract class ElementValue
-  case class AnnotationElement(
-      elementNameIndex: Int, elementValue: ElementValue)
+  case class AnnotationElement(elementNameIndex: Int,
+                               elementValue: ElementValue)
   case class ConstValueIndex(index: Int) extends ElementValue
   case class EnumConstValue(typeNameIndex: Int, constNameIndex: Int)
       extends ElementValue
   case class ClassInfoIndex(index: Int) extends ElementValue
-  case class Annotation(
-      typeIndex: Int, elementValuePairs: Seq[AnnotationElement])
+  case class Annotation(typeIndex: Int,
+                        elementValuePairs: Seq[AnnotationElement])
       extends ElementValue
   case class ArrayValue(values: Seq[ElementValue]) extends ElementValue
 
@@ -272,8 +272,8 @@ case class ClassFile(header: ClassFileHeader,
       .map(attr => ClassFileParser.parseAnnotations(attr.byteCode)))
 
   def annotation(name: String) =
-    annotations.flatMap(
-        seq => seq.find(annot => constant(annot.typeIndex) == name))
+    annotations.flatMap(seq =>
+      seq.find(annot => constant(annot.typeIndex) == name))
 }
 
 case class Attribute(nameIndex: Int, byteCode: ByteCode)

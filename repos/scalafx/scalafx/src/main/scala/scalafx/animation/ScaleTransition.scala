@@ -67,7 +67,8 @@ object ScaleTransition extends AnimationStatics {
   */
 class ScaleTransition(
     override val delegate: jfxa.ScaleTransition = new jfxa.ScaleTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.ScaleTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.ScaleTransition] {
 
   // CONSTRUCTORS
 

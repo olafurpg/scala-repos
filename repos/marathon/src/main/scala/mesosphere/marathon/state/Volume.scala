@@ -20,62 +20,64 @@ object Volume {
     persistent match {
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
-            containerPath = containerPath,
-            persistent = persistentVolumeInfo,
-            mode = mode
+          containerPath = containerPath,
+          persistent = persistentVolumeInfo,
+          mode = mode
         )
       case None =>
         DockerVolume(
-            containerPath = containerPath,
-            hostPath = hostPath.getOrElse(""),
-            mode = mode
+          containerPath = containerPath,
+          hostPath = hostPath.getOrElse(""),
+          mode = mode
         )
     }
 
   def apply(proto: Protos.Volume): Volume = {
     val persistent: Option[PersistentVolumeInfo] =
       if (proto.hasPersistent)
-        Some(PersistentVolumeInfo(proto.getPersistent.getSize)) else None
+        Some(PersistentVolumeInfo(proto.getPersistent.getSize))
+      else None
 
     persistent match {
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
-            containerPath = proto.getContainerPath,
-            persistent = persistentVolumeInfo,
-            mode = proto.getMode
+          containerPath = proto.getContainerPath,
+          persistent = persistentVolumeInfo,
+          mode = proto.getMode
         )
       case None =>
         DockerVolume(
-            containerPath = proto.getContainerPath,
-            hostPath = proto.getHostPath,
-            mode = proto.getMode
+          containerPath = proto.getContainerPath,
+          hostPath = proto.getHostPath,
+          mode = proto.getMode
         )
     }
   }
 
   def apply(proto: Mesos.Volume): Volume =
     DockerVolume(
-        containerPath = proto.getContainerPath,
-        hostPath = proto.getHostPath,
-        mode = proto.getMode
+      containerPath = proto.getContainerPath,
+      hostPath = proto.getHostPath,
+      mode = proto.getMode
     )
 
-  def unapply(volume: Volume)
-    : Option[(String, Option[String], Mesos.Volume.Mode, Option[
-            PersistentVolumeInfo])] =
+  def unapply(volume: Volume): Option[(String,
+                                       Option[String],
+                                       Mesos.Volume.Mode,
+                                       Option[PersistentVolumeInfo])] =
     volume match {
       case persistentVolume: PersistentVolume =>
         Some(
-            (persistentVolume.containerPath,
-             None,
-             persistentVolume.mode,
-             Some(persistentVolume.persistent)))
+          (persistentVolume.containerPath,
+           None,
+           persistentVolume.mode,
+           Some(persistentVolume.persistent)))
       case dockerVolume: DockerVolume =>
         Some(
-            (dockerVolume.containerPath,
-             Some(dockerVolume.hostPath),
-             dockerVolume.mode,
-             None))
+          (dockerVolume.containerPath,
+           Some(dockerVolume.hostPath),
+           dockerVolume.mode,
+           None))
     }
 
   implicit val validVolume: Validator[Volume] = new Validator[Volume] {
@@ -92,8 +94,9 @@ object Volume {
   * Both paths can either refer to a directory or a file.  Paths must be
   * absolute.
   */
-case class DockerVolume(
-    containerPath: String, hostPath: String, mode: Mesos.Volume.Mode)
+case class DockerVolume(containerPath: String,
+                        hostPath: String,
+                        mode: Mesos.Volume.Mode)
     extends Volume
 
 object DockerVolume {

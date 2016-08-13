@@ -28,7 +28,12 @@ import com.twitter.summingbird.chill._
 import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp}
 import com.twitter.summingbird.storm.option.{AckOnEntry, AnchorTuples}
 import com.twitter.summingbird.online.executor.InputState
-import com.twitter.summingbird.online.option.{IncludeSuccessHandler, MaxWaitingFutures, MaxFutureWaitTime, SummerBuilder}
+import com.twitter.summingbird.online.option.{
+  IncludeSuccessHandler,
+  MaxWaitingFutures,
+  MaxFutureWaitTime,
+  SummerBuilder
+}
 import com.twitter.summingbird.option.{CacheSize, JobId}
 import com.twitter.summingbird.planner._
 import com.twitter.summingbird.online.executor
@@ -70,13 +75,15 @@ object FlatMapBoltProvider {
 }
 
 case class FlatMapBoltProvider(
-    storm: Storm, jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-    implicit topologyBuilder: TopologyBuilder) {
+    storm: Storm,
+    jobID: JobId,
+    stormDag: Dag[Storm],
+    node: StormNode)(implicit topologyBuilder: TopologyBuilder) {
   import FlatMapBoltProvider._
   import Producer2FlatMapOperation._
 
-  def getOrElse[T <: AnyRef : Manifest](
-      default: T, queryNode: StormNode = node) =
+  def getOrElse[T <: AnyRef: Manifest](default: T,
+                                       queryNode: StormNode = node) =
     storm.getOrElse(stormDag, queryNode, default)
 
   // Boilerplate extracting of the options from the DAG
@@ -114,12 +121,12 @@ case class FlatMapBoltProvider(
     // Query to get the summer paralellism of the summer down stream of us we are emitting to
     // to ensure no edge case between what we might see for its parallelism and what it would see/pass to storm.
     val summerParalellism = getOrElse(DEFAULT_SUMMER_PARALLELISM, summer)
-    val summerBatchMultiplier = getOrElse(
-        DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
+    val summerBatchMultiplier =
+      getOrElse(DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
 
     // This option we report its value here, but its not user settable.
     val keyValueShards = executor.KeyValueShards(
-        summerParalellism.parHint * summerBatchMultiplier.get)
+      summerParalellism.parHint * summerBatchMultiplier.get)
     logger.info(s"[$nodeName] keyValueShards : ${keyValueShards.get}")
 
     val operation = foldOperations[T, (K, V)](node.members.reverse)
@@ -128,23 +135,23 @@ case class FlatMapBoltProvider(
     val builder = BuildSummer(storm, stormDag, node, jobID)
 
     BaseBolt(
-        jobID,
-        metrics.metrics,
-        anchorTuples,
-        true,
-        new Fields(AGG_KEY, AGG_VALUE),
-        ackOnEntry,
-        maxExecutePerSec,
-        new executor.FinalFlatMap(
-            wrappedOperation,
-            builder,
-            maxWaiting,
-            maxWaitTime,
-            maxEmitPerExecute,
-            keyValueShards,
-            new SingleItemInjection[ExecutorInput],
-            new KeyValueInjection[ExecutorKey, ExecutorValue]
-        )(implicitly[Semigroup[InnerValue]])
+      jobID,
+      metrics.metrics,
+      anchorTuples,
+      true,
+      new Fields(AGG_KEY, AGG_VALUE),
+      ackOnEntry,
+      maxExecutePerSec,
+      new executor.FinalFlatMap(
+        wrappedOperation,
+        builder,
+        maxWaiting,
+        maxWaitTime,
+        maxEmitPerExecute,
+        keyValueShards,
+        new SingleItemInjection[ExecutorInput],
+        new KeyValueInjection[ExecutorKey, ExecutorValue]
+      )(implicitly[Semigroup[InnerValue]])
     )
   }
 
@@ -156,21 +163,21 @@ case class FlatMapBoltProvider(
     val wrappedOperation = wrapTime(operation)
 
     BaseBolt(
-        jobID,
-        metrics.metrics,
-        anchorTuples,
-        stormDag.dependantsOf(node).size > 0,
-        new Fields(VALUE_FIELD),
-        ackOnEntry,
-        maxExecutePerSec,
-        new executor.IntermediateFlatMap(
-            wrappedOperation,
-            maxWaiting,
-            maxWaitTime,
-            maxEmitPerExecute,
-            new SingleItemInjection[ExecutorInput],
-            new SingleItemInjection[ExecutorOutput]
-        )
+      jobID,
+      metrics.metrics,
+      anchorTuples,
+      stormDag.dependantsOf(node).size > 0,
+      new Fields(VALUE_FIELD),
+      ackOnEntry,
+      maxExecutePerSec,
+      new executor.IntermediateFlatMap(
+        wrappedOperation,
+        maxWaiting,
+        maxWaitTime,
+        maxEmitPerExecute,
+        new SingleItemInjection[ExecutorInput],
+        new SingleItemInjection[ExecutorOutput]
+      )
     )
   }
 

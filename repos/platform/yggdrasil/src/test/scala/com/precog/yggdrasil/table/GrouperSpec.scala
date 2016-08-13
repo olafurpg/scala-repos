@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -38,7 +38,7 @@ import scalaz.syntax.comonad._
 import scalaz.syntax.monad._
 
 /*
-Here are a number of motivating examples that are not reflected in the tests below, but are representative of solves that need to be 
+Here are a number of motivating examples that are not reflected in the tests below, but are representative of solves that need to be
 evaluated by the merge algorithm.
 
 solve 'a = foo.a, 'b = foo.b
@@ -65,13 +65,14 @@ solve 'a, 'b, 'c
 solve 'a, 'b
   foo' := foo where foo.a = 'a | foo.b = 'b | foo.a = 'a & foo.b = 'b
   bar' := bar wehre bar.a = 'a & bar.b = 'b
-  
+
   ...
  */
 
 trait GrouperSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
-  self =>
+    extends BlockStoreTestSupport[M]
+    with Specification
+    with ScalaCheck { self =>
   def tic_a = CPathField("tic_a")
   def tic_b = CPathField("tic_b")
 
@@ -98,7 +99,7 @@ trait GrouperSpec[M[+ _]]
   def augmentWithIdentities(json: Stream[JValue]) = json.zipWithIndex map {
     case (v, i) =>
       JObject(
-          JField("key", JArray(JNum(i) :: Nil)) :: JField("value", v) :: Nil)
+        JField("key", JArray(JNum(i) :: Nil)) :: JField("value", v) :: Nil)
   }
 
   def testHistogramByValue(set: Stream[Int]) = {
@@ -174,9 +175,9 @@ trait GrouperSpec[M[+ _]]
     val groupId = module.newGroupId
 
     val valueTrans = InnerObjectConcat(
-        WrapObject(SourceKey.Single, TableModule.paths.Key.name),
-        WrapObject(
-            Map1(SourceValue.Single, doubleF1), TableModule.paths.Value.name))
+      WrapObject(SourceKey.Single, TableModule.paths.Key.name),
+      WrapObject(Map1(SourceValue.Single, doubleF1),
+                 TableModule.paths.Value.name))
 
     val spec = GroupingSource(fromJson(data),
                               SourceKey.Single,
@@ -240,11 +241,11 @@ trait GrouperSpec[M[+ _]]
     val groupId = module.newGroupId
 
     val spec = GroupingSource(
-        fromJson(data),
-        SourceKey.Single,
-        Some(TransSpec1.Id),
-        groupId,
-        GroupKeySpecSource(tic_a, Map1(SourceValue.Single, mod2)))
+      fromJson(data),
+      SourceKey.Single,
+      Some(TransSpec1.Id),
+      groupId,
+      GroupKeySpecSource(tic_a, Map1(SourceValue.Single, mod2)))
 
     val result = Table.merge(spec) { (key: RValue, map: GroupId => M[Table]) =>
       for {
@@ -286,7 +287,8 @@ trait GrouperSpec[M[+ _]]
 
   def simpleMultiKeyData = {
     val JArray(elements) =
-      JParser.parseUnsafe("""[
+      JParser.parseUnsafe(
+        """[
       { "key": [0], "value": {"a": 12, "b": 7} },
       { "key": [1], "value": {"a": 42} },
       { "key": [2], "value": {"a": 11, "c": true} },
@@ -311,16 +313,16 @@ trait GrouperSpec[M[+ _]]
     val groupId = newGroupId
 
     val spec = GroupingSource(
-        table,
-        SourceKey.Single,
-        Some(TransSpec1.Id),
-        groupId,
-        GroupKeySpecAnd(
-            GroupKeySpecSource(
-                tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))),
-            GroupKeySpecSource(tic_b,
-                               DerefObjectStatic(SourceValue.Single,
-                                                 CPathField("b")))))
+      table,
+      SourceKey.Single,
+      Some(TransSpec1.Id),
+      groupId,
+      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("a"))),
+                      GroupKeySpecSource(tic_b,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("b")))))
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -329,23 +331,23 @@ trait GrouperSpec[M[+ _]]
       } yield {
         key.toJValue must beLike {
           case obj: JObject => {
-              val a = obj(tic_aj)
-              val b = obj(tic_bj)
+            val a = obj(tic_aj)
+            val b = obj(tic_bj)
 
-              a must beLike {
-                case JNum(i) if i == 12 => {
-                    b must beLike {
-                      case JNum(i) if i == 7 => ok
-                    }
-                  }
+            a must beLike {
+              case JNum(i) if i == 12 => {
+                b must beLike {
+                  case JNum(i) if i == 7 => ok
+                }
+              }
 
-                case JNum(i) if i == -7 => {
-                    b must beLike {
-                      case JNum(i) if i == 3 => ok
-                    }
-                  }
+              case JNum(i) if i == -7 => {
+                b must beLike {
+                  case JNum(i) if i == 3 => ok
+                }
               }
             }
+          }
         }
 
         gs1Json must haveSize(1)
@@ -375,16 +377,16 @@ trait GrouperSpec[M[+ _]]
     val groupId = newGroupId
 
     val spec = GroupingSource(
-        table,
-        SourceKey.Single,
-        Some(TransSpec1.Id),
-        groupId,
-        GroupKeySpecOr(
-            GroupKeySpecSource(
-                tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))),
-            GroupKeySpecSource(tic_b,
-                               DerefObjectStatic(SourceValue.Single,
-                                                 CPathField("b")))))
+      table,
+      SourceKey.Single,
+      Some(TransSpec1.Id),
+      groupId,
+      GroupKeySpecOr(GroupKeySpecSource(tic_a,
+                                        DerefObjectStatic(SourceValue.Single,
+                                                          CPathField("a"))),
+                     GroupKeySpecSource(tic_b,
+                                        DerefObjectStatic(SourceValue.Single,
+                                                          CPathField("b")))))
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -393,41 +395,41 @@ trait GrouperSpec[M[+ _]]
       } yield {
         key.toJValue must beLike {
           case obj: JObject => {
-              val a = obj(tic_aj)
-              val b = obj(tic_bj)
+            val a = obj(tic_aj)
+            val b = obj(tic_bj)
 
-              if (a == JUndefined) {
-                b must beLike {
-                  case JNum(i) if i == 7 => gs1Json must haveSize(2)
-                  case JNum(i) if i == 15 => gs1Json must haveSize(1)
-                  case JNum(i) if i == -1 => gs1Json must haveSize(1)
-                  case JNum(i) if i == 3 => gs1Json must haveSize(1)
-                }
-              } else if (b == JUndefined) {
-                a must beLike {
-                  case JNum(i) if i == 12 => gs1Json must haveSize(2)
-                  case JNum(i) if i == 42 => gs1Json must haveSize(1)
-                  case JNum(i) if i == 11 => gs1Json must haveSize(1)
-                  case JNum(i) if i == -7 => gs1Json must haveSize(1)
-                }
-              } else {
-                a must beLike {
-                  case JNum(i) if i == 12 => {
-                      b must beLike {
-                        case JNum(i) if i == 7 => ok
-                      }
-                    }
-
-                  case JNum(i) if i == -7 => {
-                      b must beLike {
-                        case JNum(i) if i == 3 => ok
-                      }
-                    }
-                }
-
-                gs1Json must haveSize(1)
+            if (a == JUndefined) {
+              b must beLike {
+                case JNum(i) if i == 7 => gs1Json must haveSize(2)
+                case JNum(i) if i == 15 => gs1Json must haveSize(1)
+                case JNum(i) if i == -1 => gs1Json must haveSize(1)
+                case JNum(i) if i == 3 => gs1Json must haveSize(1)
               }
+            } else if (b == JUndefined) {
+              a must beLike {
+                case JNum(i) if i == 12 => gs1Json must haveSize(2)
+                case JNum(i) if i == 42 => gs1Json must haveSize(1)
+                case JNum(i) if i == 11 => gs1Json must haveSize(1)
+                case JNum(i) if i == -7 => gs1Json must haveSize(1)
+              }
+            } else {
+              a must beLike {
+                case JNum(i) if i == 12 => {
+                  b must beLike {
+                    case JNum(i) if i == 7 => ok
+                  }
+                }
+
+                case JNum(i) if i == -7 => {
+                  b must beLike {
+                    case JNum(i) if i == 3 => ok
+                  }
+                }
+              }
+
+              gs1Json must haveSize(1)
             }
+          }
         }
 
         fromJson(Stream(JNum(gs1Json.size)))
@@ -455,23 +457,20 @@ trait GrouperSpec[M[+ _]]
 
     val spec =
       GroupingSource(
-          table,
-          SourceKey.Single,
-          Some(TransSpec1.Id),
-          groupId,
-          GroupKeySpecAnd(
-              GroupKeySpecSource(CPathField("extra"),
-                                 Filter(
-                                     Map1(DerefObjectStatic(
-                                              SourceValue.Single,
-                                              CPathField("a")),
-                                          eq12F1),
-                                     Map1(DerefObjectStatic(SourceValue.Single,
-                                                            CPathField("a")),
-                                          eq12F1))),
-              GroupKeySpecSource(tic_b,
-                                 DerefObjectStatic(SourceValue.Single,
-                                                   CPathField("b")))))
+        table,
+        SourceKey.Single,
+        Some(TransSpec1.Id),
+        groupId,
+        GroupKeySpecAnd(
+          GroupKeySpecSource(
+            CPathField("extra"),
+            Filter(Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
+                        eq12F1),
+                   Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
+                        eq12F1))),
+          GroupKeySpecSource(tic_b,
+                             DerefObjectStatic(SourceValue.Single,
+                                               CPathField("b")))))
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -509,21 +508,20 @@ trait GrouperSpec[M[+ _]]
 
     // data where data.b = 'b | data.a = 12
     val spec = GroupingSource(
-        table,
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        groupId,
-        GroupKeySpecOr(GroupKeySpecSource(
-                           CPathField("extra"),
-                           Filter(Map1(DerefObjectStatic(SourceValue.Single,
-                                                         CPathField("a")),
-                                       eq12F1),
-                                  Map1(DerefObjectStatic(SourceValue.Single,
-                                                         CPathField("a")),
-                                       eq12F1))),
-                       GroupKeySpecSource(tic_b,
-                                          DerefObjectStatic(SourceValue.Single,
-                                                            CPathField("b")))))
+      table,
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      groupId,
+      GroupKeySpecOr(
+        GroupKeySpecSource(
+          CPathField("extra"),
+          Filter(Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
+                      eq12F1),
+                 Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
+                      eq12F1))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))))
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -614,8 +612,12 @@ trait GrouperSpec[M[+ _]]
         gs1Json must haveSize(rawData1.count(_ == keyBigInt.toInt))
         gs2Json must haveSize(rawData2.count(_ == keyBigInt.toInt))
 
-        fromJson(Stream(JObject(JField("key", key.toJValue(tic_aj)) :: JField(
-                        "value", JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+        fromJson(
+          Stream(
+            JObject(
+              JField("key", key.toJValue(tic_aj)) :: JField(
+                "value",
+                JNum(gs1Json.size + gs2Json.size)) :: Nil)))
       }
     }
 
@@ -631,22 +633,20 @@ trait GrouperSpec[M[+ _]]
     }
   }
 
-  def testCtrPartialJoinAnd(
-      rawData1: Stream[(Int, Option[Int])], rawData2: Stream[Int]) = {
+  def testCtrPartialJoinAnd(rawData1: Stream[(Int, Option[Int])],
+                            rawData2: Stream[Int]) = {
     val module = emptyTestModule
     import module._
     import trans._
     import constants._
 
-    val data1 = augmentWithIdentities(
-        rawData1 map {
+    val data1 = augmentWithIdentities(rawData1 map {
       case (a, b0) =>
         JObject(
-            JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
+          JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
     })
 
-    val data2 = augmentWithIdentities(
-        rawData2 map { v =>
+    val data2 = augmentWithIdentities(rawData2 map { v =>
       JObject(JField("a", JNum(v)) :: Nil)
     })
 
@@ -657,31 +657,32 @@ trait GrouperSpec[M[+ _]]
     val groupId2 = newGroupId
 
     val spec1 = GroupingSource(
-        table1,
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        groupId1,
-        GroupKeySpecAnd(
-            GroupKeySpecSource(
-                tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))),
-            GroupKeySpecSource(tic_b,
-                               DerefObjectStatic(SourceValue.Single,
-                                                 CPathField("b")))))
+      table1,
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      groupId1,
+      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("a"))),
+                      GroupKeySpecSource(tic_b,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("b")))))
 
     val spec2 = GroupingSource(
-        table2,
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        groupId2,
-        GroupKeySpecSource(
-            tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))))
+      table2,
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      groupId2,
+      GroupKeySpecSource(
+        tic_a,
+        DerefObjectStatic(SourceValue.Single, CPathField("a"))))
 
     val intersection = GroupingAlignment(
-        DerefObjectStatic(Leaf(Source), tic_a),
-        DerefObjectStatic(Leaf(Source), tic_a),
-        spec1,
-        spec2,
-        GroupingSpec.Intersection)
+      DerefObjectStatic(Leaf(Source), tic_a),
+      DerefObjectStatic(Leaf(Source), tic_a),
+      spec1,
+      spec2,
+      GroupingSpec.Intersection)
 
     val result = Table.merge(intersection) { (key, map) =>
       for {
@@ -711,10 +712,13 @@ trait GrouperSpec[M[+ _]]
         }
 
         fromJson(
-            Stream(JObject(JField("key",
-                                  JArray(key.toJValue(tic_aj) :: key.toJValue(
-                                          tic_bj) :: Nil)) :: JField(
-                        "value", JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+          Stream(
+            JObject(
+              JField("key",
+                     JArray(key.toJValue(tic_aj) :: key
+                       .toJValue(tic_bj) :: Nil)) :: JField(
+                "value",
+                JNum(gs1Json.size + gs2Json.size)) :: Nil)))
       }
     }
 
@@ -729,38 +733,36 @@ trait GrouperSpec[M[+ _]]
     // in order to get a binding for both 'a and 'b, values must come from
     // rawData1 and 'a must be in the join keys.
     resultJson must haveSize(
-        rawData1.filter({ case (a, b) => joinKeys(a) }).distinct.size)
+      rawData1.filter({ case (a, b) => joinKeys(a) }).distinct.size)
 
     val grouped1ab = grouped1.mapValues(_.groupBy(_._2.get))
     forall(resultJson) { v =>
       v must beLike {
         case obj: JObject => {
-            val JArray(JNum(ka) :: JNum(kb) :: Nil) = obj \ "key"
-            val JNum(v) = obj \ "value"
+          val JArray(JNum(ka) :: JNum(kb) :: Nil) = obj \ "key"
+          val JNum(v) = obj \ "value"
 
-            v must_==
+          v must_==
             (grouped1ab(ka.toInt)(kb.toInt).size + grouped2(ka.toInt).size)
-          }
+        }
       }
     }
   }
 
-  def testCtrPartialJoinOr(
-      rawData1: Stream[(Int, Option[Int])], rawData2: Stream[Int]) = {
+  def testCtrPartialJoinOr(rawData1: Stream[(Int, Option[Int])],
+                           rawData2: Stream[Int]) = {
     val module = emptyTestModule
     import module._
     import trans._
     import constants._
 
-    val data1 = augmentWithIdentities(
-        rawData1 map {
+    val data1 = augmentWithIdentities(rawData1 map {
       case (a, b0) =>
         JObject(
-            JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
+          JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
     })
 
-    val data2 = augmentWithIdentities(
-        rawData2 map { v =>
+    val data2 = augmentWithIdentities(rawData2 map { v =>
       JObject(JField("a", JNum(v)) :: Nil)
     })
 
@@ -773,31 +775,32 @@ trait GrouperSpec[M[+ _]]
     // spec1' := spec1 where spec1.a = 'a | spec1.b = 'b
     // spec2' := spec2 where spec2.a = 'a
     val spec1 = GroupingSource(
-        table1,
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        groupId1,
-        GroupKeySpecOr(
-            GroupKeySpecSource(
-                tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))),
-            GroupKeySpecSource(tic_b,
-                               DerefObjectStatic(SourceValue.Single,
-                                                 CPathField("b")))))
+      table1,
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      groupId1,
+      GroupKeySpecOr(GroupKeySpecSource(tic_a,
+                                        DerefObjectStatic(SourceValue.Single,
+                                                          CPathField("a"))),
+                     GroupKeySpecSource(tic_b,
+                                        DerefObjectStatic(SourceValue.Single,
+                                                          CPathField("b")))))
 
     val spec2 = GroupingSource(
-        table2,
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        groupId2,
-        GroupKeySpecSource(
-            tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))))
+      table2,
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      groupId2,
+      GroupKeySpecSource(
+        tic_a,
+        DerefObjectStatic(SourceValue.Single, CPathField("a"))))
 
     val intersection = GroupingAlignment(
-        DerefObjectStatic(Leaf(Source), tic_a),
-        DerefObjectStatic(Leaf(Source), tic_a),
-        spec1,
-        spec2,
-        GroupingSpec.Intersection)
+      DerefObjectStatic(Leaf(Source), tic_a),
+      DerefObjectStatic(Leaf(Source), tic_a),
+      spec1,
+      spec2,
+      GroupingSpec.Intersection)
 
     var elapsed = 0L
     var firstMerge = 0L
@@ -828,8 +831,11 @@ trait GrouperSpec[M[+ _]]
         }
 
         val result = fromJson(
-            Stream(JObject(JField("key", key.toJValue(tic_aj)) :: JField(
-                        "value", JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+          Stream(
+            JObject(
+              JField("key", key.toJValue(tic_aj)) :: JField(
+                "value",
+                JNum(gs1Json.size + gs2Json.size)) :: Nil)))
 
         elapsed += (System.currentTimeMillis - start)
         result
@@ -852,7 +858,7 @@ trait GrouperSpec[M[+ _]]
     }
 
     resultJson must haveSize(
-        joinRows.map(_._1).distinct.size + crossRows.distinct.size)
+      joinRows.map(_._1).distinct.size + crossRows.distinct.size)
   }
 
   def testNonTrivial = {
@@ -861,7 +867,7 @@ trait GrouperSpec[M[+ _]]
     //   foo where foo.a = 'a & foo.b = 'b
     //   bar where bar.a = 'a
     //   baz where baz.b = 'b
-    //   
+    //
     //   { a: 'a, b: 'b, foo: count(foo'), bar: count(bar'), baz: count(baz') }
     //
 
@@ -924,43 +930,45 @@ trait GrouperSpec[M[+ _]]
     val bazGroup = newGroupId
 
     val fooSpec = GroupingSource(
-        fromJson(foo.toStream),
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        fooGroup,
-        GroupKeySpecAnd(
-            GroupKeySpecSource(
-                tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))),
-            GroupKeySpecSource(tic_b,
-                               DerefObjectStatic(SourceValue.Single,
-                                                 CPathField("b")))))
+      fromJson(foo.toStream),
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      fooGroup,
+      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("a"))),
+                      GroupKeySpecSource(tic_b,
+                                         DerefObjectStatic(SourceValue.Single,
+                                                           CPathField("b")))))
 
     val barSpec = GroupingSource(
-        fromJson(bar.toStream),
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        barGroup,
-        GroupKeySpecSource(
-            tic_a, DerefObjectStatic(SourceValue.Single, CPathField("a"))))
+      fromJson(bar.toStream),
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      barGroup,
+      GroupKeySpecSource(
+        tic_a,
+        DerefObjectStatic(SourceValue.Single, CPathField("a"))))
 
     val bazSpec = GroupingSource(
-        fromJson(baz.toStream),
-        SourceKey.Single,
-        Some(SourceValue.Single),
-        bazGroup,
-        GroupKeySpecSource(
-            tic_b, DerefObjectStatic(SourceValue.Single, CPathField("b"))))
+      fromJson(baz.toStream),
+      SourceKey.Single,
+      Some(SourceValue.Single),
+      bazGroup,
+      GroupKeySpecSource(
+        tic_b,
+        DerefObjectStatic(SourceValue.Single, CPathField("b"))))
 
     val spec = GroupingAlignment(
-        DerefObjectStatic(Leaf(Source), tic_b),
-        DerefObjectStatic(Leaf(Source), tic_b),
-        GroupingAlignment(DerefObjectStatic(Leaf(Source), tic_a),
-                          DerefObjectStatic(Leaf(Source), tic_a),
-                          fooSpec,
-                          barSpec,
-                          GroupingSpec.Intersection),
-        bazSpec,
-        GroupingSpec.Intersection)
+      DerefObjectStatic(Leaf(Source), tic_b),
+      DerefObjectStatic(Leaf(Source), tic_b),
+      GroupingAlignment(DerefObjectStatic(Leaf(Source), tic_a),
+                        DerefObjectStatic(Leaf(Source), tic_a),
+                        fooSpec,
+                        barSpec,
+                        GroupingSpec.Intersection),
+      bazSpec,
+      GroupingSpec.Intersection)
 
     val forallResult = Table.merge(spec) { (key, map) =>
       val a = key.toJValue(tic_aj)
@@ -981,11 +989,11 @@ trait GrouperSpec[M[+ _]]
         barPJson must not(beEmpty)
         bazPJson must not(beEmpty)
 
-        val result = Stream(
-            JObject(JField("a", a) :: JField("b", b) :: JField(
-                    "foo", JNum(fooPJson.size)) :: JField(
-                    "bar", JNum(barPJson.size)) :: JField(
-                    "baz", JNum(bazPJson.size)) :: Nil))
+        val result = Stream(JObject(JField("a", a) :: JField("b", b) :: JField(
+          "foo",
+          JNum(fooPJson.size)) :: JField("bar", JNum(barPJson.size)) :: JField(
+          "baz",
+          JNum(bazPJson.size)) :: Nil))
 
         fromJson(result)
       }
@@ -1026,16 +1034,16 @@ trait GrouperSpec[M[+ _]]
   "simple single-key grouping" should {
     "scalacheck a histogram by value" in check1NoShrink(testHistogramByValue _)
     "histogram for two of the same value" in testHistogramByValue(
-        Stream(2147483647, 2147483647))
+      Stream(2147483647, 2147483647))
     "histogram when observing spans of equal values" in testHistogramByValue(
-        Stream(24, -10, 0, -1, -1, 0, 24, 0, 0, 24, -1, 0, 0, 24))
+      Stream(24, -10, 0, -1, -1, 0, 24, 0, 0, 24, -1, 0, 0, 24))
     "compute a histogram by value (mapping target)" in check(
-        testHistogramByValueMapped _)
+      testHistogramByValueMapped _)
     "compute a histogram by value (mapping target) trivial example" in testHistogramByValueMapped(
-        Stream(0))
+      Stream(0))
     "compute a histogram by even/odd" in check(testHistogramEvenOdd _)
     "compute a histogram by even/odd trivial example" in testHistogramEvenOdd(
-        Stream(0))
+      Stream(0))
   }
 
   "simple multi-key grouping" should {
@@ -1056,78 +1064,79 @@ trait GrouperSpec[M[+ _]]
     "compute ctr with simple datasets with repeats" in testCtr(Stream(1, 1, 1),
                                                                Stream(1))
     "compute ctr with simple datasets" in testCtr(
-        Stream(-565998477, 1911906594, 1), Stream(1948335811, -528723320, 1))
+      Stream(-565998477, 1911906594, 1),
+      Stream(1948335811, -528723320, 1))
     "compute ctr with simple datasets" in testCtr(
-        Stream(1, 2147483647, 2126441435, -1, 0, 0),
-        Stream(2006322377,
-               -2147483648,
-               -1456034303,
-               2147483647,
-               0,
-               2147483647,
-               -1904025337))
+      Stream(1, 2147483647, 2126441435, -1, 0, 0),
+      Stream(2006322377,
+             -2147483648,
+             -1456034303,
+             2147483647,
+             0,
+             2147483647,
+             -1904025337))
 
     "compute ctr on one field of a composite value" >> {
       "and" >> propNoShrink(testCtrPartialJoinAnd _)
       "and with un-joinable datasets" >> testCtrPartialJoinAnd(
-          Stream((0, Some(1)), (1123021019, Some(-2147483648))),
-          Stream(-1675865668,
-                 889796884,
-                 2147483647,
-                 -1099860336,
-                 -2147483648,
-                 -2147483648,
-                 1,
-                 1496400141)
+        Stream((0, Some(1)), (1123021019, Some(-2147483648))),
+        Stream(-1675865668,
+               889796884,
+               2147483647,
+               -1099860336,
+               -2147483648,
+               -2147483648,
+               1,
+               1496400141)
       )
       "and with joinable datasets" >> testCtrPartialJoinAnd(
-          Stream((-1, Some(-1771882715)),
-                 (-2091150211, Some(1)),
-                 (1, Some(-1161386492)),
-                 (0, Some(-1)),
-                 (-1, Some(-1)),
-                 (-2147483648, Some(-2147483648)),
-                 (-1, Some(1)),
-                 (0, Some(391541906)),
-                 (-2147483648, Some(725820706)),
-                 (0, Some(-2147483648)),
-                 (1286585203, Some(560695941))),
-          Stream(0,
-                 -297579588,
-                 -1,
-                 2147483647,
-                 -1,
-                 -1536865491,
-                 1049246142,
-                 -2147483648,
-                 -2147483648,
-                 766980226,
-                 -1047565460)
+        Stream((-1, Some(-1771882715)),
+               (-2091150211, Some(1)),
+               (1, Some(-1161386492)),
+               (0, Some(-1)),
+               (-1, Some(-1)),
+               (-2147483648, Some(-2147483648)),
+               (-1, Some(1)),
+               (0, Some(391541906)),
+               (-2147483648, Some(725820706)),
+               (0, Some(-2147483648)),
+               (1286585203, Some(560695941))),
+        Stream(0,
+               -297579588,
+               -1,
+               2147483647,
+               -1,
+               -1536865491,
+               1049246142,
+               -2147483648,
+               -2147483648,
+               766980226,
+               -1047565460)
       )
       "and with repeated group keys in joinable datasets" >> testCtrPartialJoinAnd(
-          Stream((1, Some(-421523375)),
-                 (1381663801, Some(2145939312)),
-                 (975603510, Some(-456843566)),
-                 (-260964705, Some(-811947401)),
-                 (-1643830562, Some(0)),
-                 (382901678, Some(-2147483648)),
-                 (-1770905652, Some(-1)),
-                 (1172197808, Some(1)),
-                 (-206421051, Some(307500840)),
-                 (2147483647, Some(-1)),
-                 (2147483647, Some(-1)),
-                 (-1775980054, Some(2147483647))),
-          Stream(1,
-                 -1,
-                 -2005746103,
-                 720318134,
-                 852618110,
-                 1813748094,
-                 -1,
-                 -1676020815,
-                 -627348537,
-                 2147483647,
-                 -2147483648)
+        Stream((1, Some(-421523375)),
+               (1381663801, Some(2145939312)),
+               (975603510, Some(-456843566)),
+               (-260964705, Some(-811947401)),
+               (-1643830562, Some(0)),
+               (382901678, Some(-2147483648)),
+               (-1770905652, Some(-1)),
+               (1172197808, Some(1)),
+               (-206421051, Some(307500840)),
+               (2147483647, Some(-1)),
+               (2147483647, Some(-1)),
+               (-1775980054, Some(2147483647))),
+        Stream(1,
+               -1,
+               -2005746103,
+               720318134,
+               852618110,
+               1813748094,
+               -1,
+               -1676020815,
+               -627348537,
+               2147483647,
+               -2147483648)
       )
 
       // TODO: the performance of the following is too awful to run under scalacheck, even with a minimal
@@ -1137,12 +1146,12 @@ trait GrouperSpec[M[+ _]]
       "or with empty 2nd dataset" >> testCtrPartialJoinOr(Stream((1, Some(2))),
                                                           Stream())
       "or with un-joinable datasets" >> testCtrPartialJoinOr(
-          Stream((-2, Some(1))),
-          Stream(-1)
+        Stream((-2, Some(1))),
+        Stream(-1)
       )
       "or with a join in datasets" >> testCtrPartialJoinOr(
-          Stream((2, Some(-1)), (1, Some(-1)), (3, Some(4)), (1, Some(-1))),
-          Stream(-2, 1, 1, 5, 0, 6)
+        Stream((2, Some(-1)), (1, Some(-1)), (3, Some(4)), (1, Some(-1))),
+        Stream(-2, 1, 1, 5, 0, 6)
       )
 
       // runs a bit long
@@ -1293,18 +1302,18 @@ trait GrouperSpec[M[+ _]]
       }
 
       "or with a simple join in datasets" >> testCtrPartialJoinOr(
-          Stream((436413513, Some(-477784155)),
-                 (1693516917, Some(1537597532)),
-                 (-33300192, Some(1)),
-                 (-1, Some(417911606)),
-                 (941828761, Some(-1)),
-                 (-116426729, Some(0)),
-                 (0, Some(1)),
-                 (-1, Some(175860194)),
-                 (-2147483648, Some(-2014951990)),
-                 (2147483647, Some(293027634)),
-                 (-1964286008, Some(132426726))),
-          Stream(-1)
+        Stream((436413513, Some(-477784155)),
+               (1693516917, Some(1537597532)),
+               (-33300192, Some(1)),
+               (-1, Some(417911606)),
+               (941828761, Some(-1)),
+               (-116426729, Some(0)),
+               (0, Some(1)),
+               (-1, Some(175860194)),
+               (-2147483648, Some(-2014951990)),
+               (2147483647, Some(293027634)),
+               (-1964286008, Some(132426726))),
+        Stream(-1)
       )
     }
   }
@@ -1313,7 +1322,9 @@ trait GrouperSpec[M[+ _]]
 }
 
 object GrouperSpec
-    extends TableModuleSpec[YId] with GrouperSpec[YId] with YIdInstances {
+    extends TableModuleSpec[YId]
+    with GrouperSpec[YId]
+    with YIdInstances {
   type YggConfig = IdSourceConfig
   val yggConfig = new IdSourceConfig {
     val idSource = new FreshAtomicIdSource

@@ -66,8 +66,8 @@ final class Refiner {
     }
   }
 
-  private def refineClassDef(
-      classDef: LinkedClass, info: Analysis.ClassInfo): LinkedClass = {
+  private def refineClassDef(classDef: LinkedClass,
+                             info: Analysis.ClassInfo): LinkedClass = {
 
     val fields =
       if (info.isAnySubclassInstantiated) classDef.fields

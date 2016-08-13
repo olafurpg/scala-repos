@@ -12,7 +12,8 @@ trait CommitStatusComponent extends TemplateComponent { self: Profile =>
 
   lazy val CommitStatuses = TableQuery[CommitStatuses]
   class CommitStatuses(tag: Tag)
-      extends Table[CommitStatus](tag, "COMMIT_STATUS") with CommitTemplate {
+      extends Table[CommitStatus](tag, "COMMIT_STATUS")
+      with CommitTemplate {
     val commitStatusId = column[Int]("COMMIT_STATUS_ID", O AutoInc)
     val context = column[String]("CONTEXT")
     val state = column[CommitState]("STATE")
@@ -104,7 +105,7 @@ object CommitState {
   }
 
   implicit val getResult: GetResult[CommitState] = GetResult(
-      r => CommitState(r.<<))
+    r => CommitState(r.<<))
   implicit val getResultOpt: GetResult[Option[CommitState]] = GetResult(
-      r => r.<<?[String].map(CommitState(_)))
+    r => r.<<?[String].map(CommitState(_)))
 }

@@ -67,30 +67,29 @@ object ServerSettingsImpl
 
   def fromSubConfig(root: Config, c: Config) =
     new ServerSettingsImpl(
-        c.getString("server-header").toOption.map(Server(_)),
-        new Timeouts(c getPotentiallyInfiniteDuration "idle-timeout",
-                     c getPotentiallyInfiniteDuration "request-timeout",
-                     c getFiniteDuration "bind-timeout"),
-        c getInt "max-connections",
-        c getInt "pipelining-limit",
-        c getBoolean "remote-address-header",
-        c getBoolean "raw-request-uri-header",
-        c getBoolean "transparent-head-requests",
-        c getBoolean "verbose-error-messages",
-        c getIntBytes "response-header-size-hint",
-        c getInt "backlog",
-        SocketOptionSettings.fromSubConfig(
-            root, c.getConfig("socket-options")),
-        defaultHostHeader = HttpHeader.parse(
-              "Host", c getString "default-host-header") match {
+      c.getString("server-header").toOption.map(Server(_)),
+      new Timeouts(c getPotentiallyInfiniteDuration "idle-timeout",
+                   c getPotentiallyInfiniteDuration "request-timeout",
+                   c getFiniteDuration "bind-timeout"),
+      c getInt "max-connections",
+      c getInt "pipelining-limit",
+      c getBoolean "remote-address-header",
+      c getBoolean "raw-request-uri-header",
+      c getBoolean "transparent-head-requests",
+      c getBoolean "verbose-error-messages",
+      c getIntBytes "response-header-size-hint",
+      c getInt "backlog",
+      SocketOptionSettings.fromSubConfig(root, c.getConfig("socket-options")),
+      defaultHostHeader =
+        HttpHeader.parse("Host", c getString "default-host-header") match {
           case HttpHeader.ParsingResult.Ok(x: Host, Nil) ⇒ x
           case result ⇒
             val info = result.errors.head
               .withSummary("Configured `default-host-header` is illegal")
             throw new ConfigurationException(info.formatPretty)
         },
-        Randoms.SecureRandomInstances, // can currently only be overridden from code
-        ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
+      Randoms.SecureRandomInstances, // can currently only be overridden from code
+      ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
 
   //  def apply(optionalSettings: Option[ServerSettings])(implicit actorRefFactory: ActorRefFactory): ServerSettings =
   //    optionalSettings getOrElse apply(actorSystem)

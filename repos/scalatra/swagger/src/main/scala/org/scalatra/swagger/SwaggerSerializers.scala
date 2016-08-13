@@ -33,7 +33,8 @@ object SwaggerSerializers {
   private[swagger] def dontAddOnEmpty(key: String, value: List[String])(
       json: JValue) = {
     if (value.nonEmpty)
-      json merge JObject(List(key -> JArray(value map (JString(_))))) else json
+      json merge JObject(List(key -> JArray(value map (JString(_)))))
+    else json
   }
 
   lazy val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
@@ -194,13 +195,13 @@ object SwaggerSerializers {
   private[swagger] val formats: SwaggerFormats = new SwaggerFormats {}
 
   val defaultFormats: SwaggerFormats =
-    formats ++ Seq(
-        new OperationSerializer, new EndpointSerializer, new ApiSerializer)
+    formats ++ Seq(new OperationSerializer,
+                   new EndpointSerializer,
+                   new ApiSerializer)
 
   class HttpMethodSerializer
-      extends CustomSerializer[HttpMethod](
-          implicit formats =>
-            ({
+      extends CustomSerializer[HttpMethod](implicit formats =>
+        ({
           case JString(method) => HttpMethod(method)
         }, {
           case method: HttpMethod => JString(method.toString)
@@ -222,7 +223,7 @@ object SwaggerSerializers {
       ("type" -> "array") ~ ("format" -> None)
     case DataType.ContainerDataType("Set", Some(dt), _) =>
       ("type" -> "array") ~ ("items" -> writeDataType(dt, "$ref")) ~
-      ("uniqueItems" -> true)
+        ("uniqueItems" -> true)
     case DataType.ContainerDataType("Set", _, _) =>
       ("type" -> "array") ~ ("uniqueItems" -> true)
     case DataType.ValueDataType(name, _, qualifiedName) =>
@@ -232,10 +233,10 @@ object SwaggerSerializers {
   def readDataType(value: JValue)(implicit formats: Formats): DataType = {
     def karmaIsABitch =
       throw new MappingException(
-          "Couldn't determine the type for this data type from " + value)
+        "Couldn't determine the type for this data type from " + value)
     val t =
       str(value \ "format") orElse str(value \ "type") orElse str(
-          value \ "$ref") getOrElse karmaIsABitch
+        value \ "$ref") getOrElse karmaIsABitch
     if (isSimpleType(t)) {
       if (t == "array") {
         val items = value \ "items" match {
@@ -258,7 +259,7 @@ object SwaggerSerializers {
 
   class AllowableValuesSerializer
       extends CustomSerializer[AllowableValues](implicit formats =>
-            ({
+        ({
           case value @ JObject(flds) if flds.exists(_._1 == "enum") =>
             value \ "enum" match {
               case JArray(entries) =>
@@ -279,9 +280,9 @@ object SwaggerSerializers {
             }
           case value @ JObject(flds)
               if flds.exists(_._1 == "minimum") &&
-              flds.exists(_._1 == "maximum") =>
+                flds.exists(_._1 == "maximum") =>
             AllowableRangeValues(
-                (value \ "minimum").as[Int] to (value \ "maximum").as[Int])
+              (value \ "minimum").as[Int] to (value \ "maximum").as[Int])
           case _ => AnyValue
         }, {
           case AnyValue => JNothing
@@ -293,7 +294,7 @@ object SwaggerSerializers {
 
   class ModelPropertySerializer
       extends CustomSerializer[ModelProperty](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             ModelProperty(`type` = readDataType(json),
                           position = (json \ "position").getAsOrElse(0),
@@ -303,8 +304,8 @@ object SwaggerSerializers {
                             case _ => false
                           },
                           description = (json \ "description")
-                              .getAs[String]
-                              .flatMap(_.blankOption),
+                            .getAs[String]
+                            .flatMap(_.blankOption),
                           allowableValues = json.extract[AllowableValues],
                           items = None)
         }, {
@@ -317,48 +318,47 @@ object SwaggerSerializers {
 
   class ModelSerializer
       extends CustomSerializer[Model](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             val properties = json \ "properties" match {
               case JObject(entries) => {
-                  for ((key, value) <- entries) yield
-                    key -> value.extract[ModelProperty]
-                }
+                for ((key, value) <- entries)
+                  yield key -> value.extract[ModelProperty]
+              }
               case _ => Nil
             }
 
             Model(
-                (json \ "id").getAsOrElse(""),
-                (json \ "name").getAsOrElse((json \ "id").as[String]),
-                (json \ "qualifiedType").getAs[String].flatMap(_.blankOption),
-                (json \ "description").getAs[String].flatMap(_.blankOption),
-                properties,
-                (json \ "extends").getAs[String].flatMap(_.blankOption),
-                (json \ "discriminator").getAs[String].flatMap(_.blankOption)
+              (json \ "id").getAsOrElse(""),
+              (json \ "name").getAsOrElse((json \ "id").as[String]),
+              (json \ "qualifiedType").getAs[String].flatMap(_.blankOption),
+              (json \ "description").getAs[String].flatMap(_.blankOption),
+              properties,
+              (json \ "extends").getAs[String].flatMap(_.blankOption),
+              (json \ "discriminator").getAs[String].flatMap(_.blankOption)
             )
         }, {
           case x: Model =>
             val required = for ((key, value) <- x.properties
-                                                   if value.required) yield key
+                                if value.required) yield key
             ("id" -> x.id) ~ ("name" -> x.name) ~
-            ("qualifiedType" -> x.qualifiedName) ~
-            ("description" -> x.description) ~ ("required" -> required) ~
-            ("extends" -> x.baseModel.filter(
-                    s => s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
-            ("discriminator" -> x.discriminator) ~
-            ("properties" ->
+              ("qualifiedType" -> x.qualifiedName) ~
+              ("description" -> x.description) ~ ("required" -> required) ~
+              ("extends" -> x.baseModel.filter(s =>
+                s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
+              ("discriminator" -> x.discriminator) ~
+              ("properties" ->
                 (x.properties.sortBy { case (_, p) ⇒ p.position } map {
-                      case (k, v) => k -> Extraction.decompose(v)
-                    }))
+                  case (k, v) => k -> Extraction.decompose(v)
+                }))
         }))
 
   class ResponseMessageSerializer
-      extends CustomSerializer[ResponseMessage[_]](
-          implicit formats =>
-            ({
+      extends CustomSerializer[ResponseMessage[_]](implicit formats =>
+        ({
           case value: JObject =>
-            StringResponseMessage(
-                (value \ "code").as[Int], (value \ "message").as[String])
+            StringResponseMessage((value \ "code").as[Int],
+                                  (value \ "message").as[String])
         }, {
           case StringResponseMessage(code, message) =>
             ("code" -> code) ~ ("message" -> message)
@@ -366,79 +366,79 @@ object SwaggerSerializers {
 
   class ParameterSerializer
       extends CustomSerializer[Parameter](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             val t = readDataType(json)
             Parameter(
-                (json \ "name").getAsOrElse(""),
-                t,
-                (json \ "description").getAs[String].flatMap(_.blankOption),
-                (json \ "notes").getAs[String].flatMap(_.blankOption),
-                (json \ "paramType")
-                  .getAs[String]
-                  .flatMap(_.blankOption)
-                  .map(ParamType.withName)
-                  .getOrElse(ParamType.Query),
-                json \ "defaultValue" match {
-                  case JInt(num) => Some(num.toString)
-                  case JBool(value) => Some(value.toString)
-                  case JString(s) => Some(s)
-                  case JDouble(num) => Some(num.toString)
-                  case JDecimal(num) => Some(num.toString)
-                  case _ => None
-                },
-                (json \ "allowableValues").extract[AllowableValues],
-                json \ "required" match {
-                  case JString(s) => s.toBoolean
-                  case JBool(value) => value
-                  case _ => false
-                },
-                (json \ "paramAccess").getAs[String].flatMap(_.blankOption)
+              (json \ "name").getAsOrElse(""),
+              t,
+              (json \ "description").getAs[String].flatMap(_.blankOption),
+              (json \ "notes").getAs[String].flatMap(_.blankOption),
+              (json \ "paramType")
+                .getAs[String]
+                .flatMap(_.blankOption)
+                .map(ParamType.withName)
+                .getOrElse(ParamType.Query),
+              json \ "defaultValue" match {
+                case JInt(num) => Some(num.toString)
+                case JBool(value) => Some(value.toString)
+                case JString(s) => Some(s)
+                case JDouble(num) => Some(num.toString)
+                case JDecimal(num) => Some(num.toString)
+                case _ => None
+              },
+              (json \ "allowableValues").extract[AllowableValues],
+              json \ "required" match {
+                case JString(s) => s.toBoolean
+                case JBool(value) => value
+                case _ => false
+              },
+              (json \ "paramAccess").getAs[String].flatMap(_.blankOption)
             )
         }, {
           case x: Parameter =>
             val output =
               ("name" -> x.name) ~ ("description" -> x.description) ~
-              ("defaultValue" -> x.defaultValue) ~ ("required" -> x.required) ~
-              ("paramType" -> x.paramType.toString) ~
-              ("paramAccess" -> x.paramAccess)
+                ("defaultValue" -> x.defaultValue) ~ ("required" -> x.required) ~
+                ("paramType" -> x.paramType.toString) ~
+                ("paramAccess" -> x.paramAccess)
 
             (output merge writeDataType(x.`type`)) merge Extraction.decompose(
-                x.allowableValues)
+              x.allowableValues)
         }))
 
   class OperationSerializer
       extends CustomSerializer[Operation](implicit formats =>
-            ({
+        ({
           case value =>
             Operation(
-                (value \ "method").extract[HttpMethod],
-                readDataType(value),
-                (value \ "summary").extract[String],
-                (value \ "position").extract[Int],
-                (value \ "notes").extractOpt[String].flatMap(_.blankOption),
-                (value \ "deprecated").extractOpt[Boolean] getOrElse false,
-                (value \ "nickname").extractOpt[String].flatMap(_.blankOption),
-                (value \ "parameters").extract[List[Parameter]],
-                (value \ "responseMessages").extract[List[ResponseMessage[_]]],
-                (value \ "consumes").extract[List[String]],
-                (value \ "produces").extract[List[String]],
-                (value \ "protocols").extract[List[String]],
-                (value \ "authorizations").extract[List[String]]
+              (value \ "method").extract[HttpMethod],
+              readDataType(value),
+              (value \ "summary").extract[String],
+              (value \ "position").extract[Int],
+              (value \ "notes").extractOpt[String].flatMap(_.blankOption),
+              (value \ "deprecated").extractOpt[Boolean] getOrElse false,
+              (value \ "nickname").extractOpt[String].flatMap(_.blankOption),
+              (value \ "parameters").extract[List[Parameter]],
+              (value \ "responseMessages").extract[List[ResponseMessage[_]]],
+              (value \ "consumes").extract[List[String]],
+              (value \ "produces").extract[List[String]],
+              (value \ "protocols").extract[List[String]],
+              (value \ "authorizations").extract[List[String]]
             )
         }, {
           case obj: Operation =>
             val json =
               ("method" -> Extraction.decompose(obj.method)) ~
-              ("summary" -> obj.summary) ~ ("position" -> obj.position) ~
-              ("notes" -> obj.notes.flatMap(_.blankOption).getOrElse("")) ~
-              ("deprecated" -> obj.deprecated) ~ ("nickname" -> obj.nickname) ~
-              ("parameters" -> Extraction.decompose(
-                      obj.parameters.sortBy(_.position))) ~
-              ("responseMessages" ->
+                ("summary" -> obj.summary) ~ ("position" -> obj.position) ~
+                ("notes" -> obj.notes.flatMap(_.blankOption).getOrElse("")) ~
+                ("deprecated" -> obj.deprecated) ~ ("nickname" -> obj.nickname) ~
+                ("parameters" -> Extraction.decompose(
+                  obj.parameters.sortBy(_.position))) ~
+                ("responseMessages" ->
                   (if (obj.responseMessages.nonEmpty)
-                     Some(Extraction.decompose(obj.responseMessages))
-                   else None))
+                    Some(Extraction.decompose(obj.responseMessages))
+                  else None))
 
             val consumes = dontAddOnEmpty("consumes", obj.consumes) _
             val produces = dontAddOnEmpty("produces", obj.produces) _
@@ -447,14 +447,13 @@ object SwaggerSerializers {
               dontAddOnEmpty("authorizations", obj.authorizations) _
             val r =
               (consumes andThen produces andThen authorizations andThen protocols)(
-                  json)
+                json)
             r merge writeDataType(obj.responseClass)
         }))
 
   class EndpointSerializer
-      extends CustomSerializer[Endpoint](
-          implicit formats =>
-            ({
+      extends CustomSerializer[Endpoint](implicit formats =>
+        ({
           case value =>
             Endpoint((value \ "path").extract[String],
                      (value \ "description")
@@ -464,105 +463,102 @@ object SwaggerSerializers {
         }, {
           case obj: Endpoint =>
             ("path" -> obj.path) ~ ("description" -> obj.description) ~
-            ("operations" -> Extraction.decompose(obj.operations))
+              ("operations" -> Extraction.decompose(obj.operations))
         }))
 
   class ApiSerializer
       extends CustomSerializer[Api](implicit formats =>
-            ({
+        ({
           case json =>
             Api(
-                (json \ "apiVersion").extractOrElse(""),
-                (json \ "swaggerVersion").extractOrElse(""),
-                (json \ "resourcePath").extractOrElse(""),
-                (json \ "description")
-                  .extractOpt[String]
-                  .flatMap(_.blankOption),
-                (json \ "produces").extractOrElse(List.empty[String]),
-                (json \ "consumes").extractOrElse(List.empty[String]),
-                (json \ "protocols").extractOrElse(List.empty[String]),
-                (json \ "apis").extractOrElse(List.empty[Endpoint]),
-                (json \ "models")
-                  .extractOpt[Map[String, Model]]
-                  .getOrElse(Map.empty),
-                (json \ "authorizations").extractOrElse(List.empty[String]),
-                (json \ "position").extractOrElse(0)
+              (json \ "apiVersion").extractOrElse(""),
+              (json \ "swaggerVersion").extractOrElse(""),
+              (json \ "resourcePath").extractOrElse(""),
+              (json \ "description").extractOpt[String].flatMap(_.blankOption),
+              (json \ "produces").extractOrElse(List.empty[String]),
+              (json \ "consumes").extractOrElse(List.empty[String]),
+              (json \ "protocols").extractOrElse(List.empty[String]),
+              (json \ "apis").extractOrElse(List.empty[Endpoint]),
+              (json \ "models")
+                .extractOpt[Map[String, Model]]
+                .getOrElse(Map.empty),
+              (json \ "authorizations").extractOrElse(List.empty[String]),
+              (json \ "position").extractOrElse(0)
             )
         }, {
           case x: Api =>
             ("apiVersion" -> x.apiVersion) ~
-            ("swaggerVersion" -> x.swaggerVersion) ~
-            ("resourcePath" -> x.resourcePath) ~
-            ("produces" ->
+              ("swaggerVersion" -> x.swaggerVersion) ~
+              ("resourcePath" -> x.resourcePath) ~
+              ("produces" ->
                 (x.produces match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("consumes" ->
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
+              ("consumes" ->
                 (x.consumes match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("protocols" ->
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
+              ("protocols" ->
                 (x.protocols match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("authorizations" ->
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
+              ("authorizations" ->
                 (x.authorizations match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("apis" ->
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
+              ("apis" ->
                 (x.apis match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
-            ("models" ->
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
+              ("models" ->
                 (x.models match {
-                      case x if x.isEmpty => JNothing
-                      case e => Extraction.decompose(e)
-                    }))
+                  case x if x.isEmpty => JNothing
+                  case e => Extraction.decompose(e)
+                }))
         }))
 
   class GrantTypeSerializer
       extends CustomSerializer[GrantType](implicit formats =>
-            ({
+        ({
           case value if value \ "type" == JString("implicit") =>
             ImplicitGrant(
-                LoginEndpoint((value \ "loginEndpoint" \ "url").as[String]),
-                (value \ "tokenName").as[String])
+              LoginEndpoint((value \ "loginEndpoint" \ "url").as[String]),
+              (value \ "tokenName").as[String])
           case value if value \ "type" == JString("authorization_code") =>
             AuthorizationCodeGrant(
-                TokenRequestEndpoint(
-                    (value \ "tokenRequestEndpoint" \ "url").as[String],
-                    (value \ "tokenRequestEndpoint" \ "clientIdName")
-                      .as[String],
-                    (value \ "tokenRequestEndpoint" \ "clientSecretName")
-                      .as[String]
-                ),
-                TokenEndpoint(
-                    (value \ "tokenEndpoint" \ "url").as[String],
-                    (value \ "tokenEndpoint" \ "tokenName").as[String]))
+              TokenRequestEndpoint(
+                (value \ "tokenRequestEndpoint" \ "url").as[String],
+                (value \ "tokenRequestEndpoint" \ "clientIdName").as[String],
+                (value \ "tokenRequestEndpoint" \ "clientSecretName")
+                  .as[String]
+              ),
+              TokenEndpoint(
+                (value \ "tokenEndpoint" \ "url").as[String],
+                (value \ "tokenEndpoint" \ "tokenName").as[String]))
         }, {
           case ImplicitGrant(login, tokenName) =>
             ("type" -> "implicit") ~
-            ("loginEndpoint" -> (("url" -> login.url): JValue)) ~
-            ("tokenName" -> tokenName)
+              ("loginEndpoint" -> (("url" -> login.url): JValue)) ~
+              ("tokenName" -> tokenName)
           case AuthorizationCodeGrant(tokenRequest, tokenEndpoint) =>
             ("type" -> "authorization_code") ~
-            ("tokenRequestEndpoint" ->
+              ("tokenRequestEndpoint" ->
                 (("url" -> tokenRequest.url) ~
-                    ("clientIdName" -> tokenRequest.clientIdName) ~
-                    ("clientSecretName" -> tokenRequest.clientSecretName))) ~
-            ("tokenEndpoint" ->
+                  ("clientIdName" -> tokenRequest.clientIdName) ~
+                  ("clientSecretName" -> tokenRequest.clientSecretName))) ~
+              ("tokenEndpoint" ->
                 (("url" -> tokenEndpoint.url) ~
-                    ("tokenName" -> tokenEndpoint.tokenName)))
+                  ("tokenName" -> tokenEndpoint.tokenName)))
         }))
 
   class AuthorizationTypeSerializer
       extends CustomSerializer[AuthorizationType](implicit formats =>
-            ({
+        ({
           case value if value \ "type" == JString("apiKey") =>
             ApiKey((value \ "keyname")
                      .extractOpt[String]
@@ -575,11 +571,11 @@ object SwaggerSerializers {
         }, {
           case obj @ OAuth(scopes, grantTypes) =>
             ("type" -> obj.`type`) ~ ("scopes" -> scopes) ~
-            ("grantTypes" -> (for (t <- grantTypes) yield {
-                  (t.`type`, Extraction.decompose(t))
-                }).toMap)
+              ("grantTypes" -> (for (t <- grantTypes) yield {
+                (t.`type`, Extraction.decompose(t))
+              }).toMap)
           case obj @ ApiKey(keyname, passAs) =>
             ("type" -> obj.`type`) ~ ("passAs" -> passAs) ~
-            ("keyname" -> keyname)
+              ("keyname" -> keyname)
         }))
 }

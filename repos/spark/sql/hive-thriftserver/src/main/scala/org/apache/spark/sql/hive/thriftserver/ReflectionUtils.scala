@@ -22,8 +22,10 @@ private[hive] object ReflectionUtils {
     setAncestorField(obj, 1, fieldName, fieldValue)
   }
 
-  def setAncestorField(
-      obj: AnyRef, level: Int, fieldName: String, fieldValue: AnyRef) {
+  def setAncestorField(obj: AnyRef,
+                       level: Int,
+                       fieldName: String,
+                       fieldValue: AnyRef) {
     val ancestor = Iterator
       .iterate[Class[_]](obj.getClass)(_.getSuperclass)
       .drop(level)

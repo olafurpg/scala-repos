@@ -68,7 +68,7 @@ trait Filter extends EssentialFilter { self =>
           // Therefore, as a fallback, we try to redeem the bodyAccumulator Promise here with an iteratee that consumes
           // the request body.
           bodyAccumulator.tryComplete(
-              resultTry.map(simpleResult => Accumulator.done(simpleResult)))
+            resultTry.map(simpleResult => Accumulator.done(simpleResult)))
         })
 
         Accumulator.flatten(bodyAccumulator.future.map { it =>
@@ -93,7 +93,7 @@ trait Filter extends EssentialFilter { self =>
 
 object Filter {
   def apply(filter: (RequestHeader => Future[Result],
-            RequestHeader) => Future[Result])(
+                     RequestHeader) => Future[Result])(
       implicit m: Materializer): Filter = new Filter {
     implicit def mat = m
     def apply(f: RequestHeader => Future[Result])(
@@ -122,14 +122,14 @@ class WithFilters(filters: EssentialFilter*) extends GlobalSettings {
   * Compose the action and the Filters to create a new Action
   */
 object FilterChain {
-  def apply[A](
-      action: EssentialAction,
-      filters: List[EssentialFilter]): EssentialAction = new EssentialAction {
-    def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
-      val chain = filters.reverse.foldLeft(action) { (a, i) =>
-        i(a)
+  def apply[A](action: EssentialAction,
+               filters: List[EssentialFilter]): EssentialAction =
+    new EssentialAction {
+      def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
+        val chain = filters.reverse.foldLeft(action) { (a, i) =>
+          i(a)
+        }
+        chain(rh)
       }
-      chain(rh)
     }
-  }
 }

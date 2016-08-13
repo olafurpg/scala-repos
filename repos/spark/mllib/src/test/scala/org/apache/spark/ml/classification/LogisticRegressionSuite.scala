@@ -33,7 +33,8 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.lit
 
 class LogisticRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var dataset: DataFrame = _
@@ -44,17 +45,21 @@ class LogisticRegressionSuite
     super.beforeAll()
 
     dataset = sqlContext.createDataFrame(
-        generateLogisticInput(1.0, 1.0, nPoints = 100, seed = 42))
+      generateLogisticInput(1.0, 1.0, nPoints = 100, seed = 42))
 
     binaryDataset = {
       val nPoints = 10000
-      val coefficients = Array(
-          -0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
+      val coefficients =
+        Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
-      val testData = generateMultinomialLogisticInput(
-          coefficients, xMean, xVariance, addIntercept = true, nPoints, 42)
+      val testData = generateMultinomialLogisticInput(coefficients,
+                                                      xMean,
+                                                      xVariance,
+                                                      addIntercept = true,
+                                                      nPoints,
+                                                      42)
 
       sqlContext.createDataFrame(sc.parallelize(testData, 4))
     }
@@ -145,7 +150,7 @@ class LogisticRegressionSuite
     }
     // thresholds and threshold must be consistent: values
     withClue(
-        "fit with ParamMap should throw error if threshold, thresholds do not match.") {
+      "fit with ParamMap should throw error if threshold, thresholds do not match.") {
       intercept[IllegalArgumentException] {
         val lr2model = lr2.fit(dataset,
                                lr2.thresholds -> Array(0.3, 0.7),
@@ -188,11 +193,12 @@ class LogisticRegressionSuite
       .map { case Row(pred: Double, prob: Vector) => pred }
     assert(predAllZero.forall(_ === 0),
            s"With threshold=1.0, expected predictions to be all 0, but only" +
-           s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
+             s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
     // Call transform with params, and check that the params worked.
     val predNotAllZero = model
-      .transform(
-          dataset, model.threshold -> 0.0, model.probabilityCol -> "myProb")
+      .transform(dataset,
+                 model.threshold -> 0.0,
+                 model.probabilityCol -> "myProb")
       .select("prediction", "myProb")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
@@ -302,8 +308,9 @@ class LogisticRegressionSuite
       .add(4.0, 3.2)
       .add(3.0, 1.3)
       .add(6.0, 3.1)
-    assert(Vectors.dense(summarizer1.histogram) ~==
-          Vectors.dense(Array(0.2, 0, 0, 2.1, 3.2, 0, 3.1)) absTol 1E-10)
+    assert(
+      Vectors.dense(summarizer1.histogram) ~==
+        Vectors.dense(Array(0.2, 0, 0, 2.1, 3.2, 0, 3.1)) absTol 1E-10)
     assert(summarizer1.countInvalid === 0)
     assert(summarizer1.numClasses === 7)
 
@@ -315,14 +322,16 @@ class LogisticRegressionSuite
       .add(4.0)
       .add(1.0)
       .add(2, 0.0)
-    assert(Vectors.dense(summarizer2.histogram) ~==
-          Vectors.dense(Array[Double](1.0, 2.1, 0.0, 1, 1, 2.3)) absTol 1E-10)
+    assert(
+      Vectors.dense(summarizer2.histogram) ~==
+        Vectors.dense(Array[Double](1.0, 2.1, 0.0, 1, 1, 2.3)) absTol 1E-10)
     assert(summarizer2.countInvalid === 0)
     assert(summarizer2.numClasses === 6)
 
     val summarizer = summarizer1.merge(summarizer2)
-    assert(Vectors.dense(summarizer.histogram) ~==
-          Vectors.dense(Array(1.2, 2.1, 0.0, 3.1, 4.2, 2.3, 3.1)) absTol 1E-10)
+    assert(
+      Vectors.dense(summarizer.histogram) ~==
+        Vectors.dense(Array(1.2, 2.1, 0.0, 3.1, 4.2, 2.3, 3.1)) absTol 1E-10)
     assert(summarizer.countInvalid === 0)
     assert(summarizer.numClasses === 7)
   }
@@ -673,7 +682,7 @@ class LogisticRegressionSuite
   }
 
   test(
-      "binary logistic regression with intercept with ElasticNet regularization") {
+    "binary logistic regression with intercept with ElasticNet regularization") {
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(0.38)
@@ -740,7 +749,7 @@ class LogisticRegressionSuite
   }
 
   test(
-      "binary logistic regression without intercept with ElasticNet regularization") {
+    "binary logistic regression without intercept with ElasticNet regularization") {
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(false)
       .setElasticNetParam(0.38)
@@ -808,7 +817,7 @@ class LogisticRegressionSuite
   }
 
   test(
-      "binary logistic regression with intercept with strong L1 regularization") {
+    "binary logistic regression with intercept with strong L1 regularization") {
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(1.0)
@@ -826,17 +835,17 @@ class LogisticRegressionSuite
     val histogram = binaryDataset.rdd.map {
       case Row(label: Double, features: Vector) => label
     }.treeAggregate(new MultiClassSummarizer)(
-          seqOp = (c, v) =>
-              (c, v) match {
-              case (classSummarizer: MultiClassSummarizer, label: Double) =>
-                classSummarizer.add(label)
-          },
-          combOp = (c1, c2) =>
-              (c1, c2) match {
-              case (classSummarizer1: MultiClassSummarizer,
-                    classSummarizer2: MultiClassSummarizer) =>
-                classSummarizer1.merge(classSummarizer2)
-          })
+        seqOp = (c, v) =>
+          (c, v) match {
+            case (classSummarizer: MultiClassSummarizer, label: Double) =>
+              classSummarizer.add(label)
+        },
+        combOp = (c1, c2) =>
+          (c1, c2) match {
+            case (classSummarizer1: MultiClassSummarizer,
+                  classSummarizer2: MultiClassSummarizer) =>
+              classSummarizer1.merge(classSummarizer2)
+        })
       .histogram
 
     /*
@@ -899,14 +908,14 @@ class LogisticRegressionSuite
     assert(summary.roc.collect() === sameSummary.roc.collect())
     assert(summary.pr.collect === sameSummary.pr.collect())
     assert(
-        summary.fMeasureByThreshold.collect() === sameSummary.fMeasureByThreshold
-          .collect())
+      summary.fMeasureByThreshold.collect() === sameSummary.fMeasureByThreshold
+        .collect())
     assert(
-        summary.recallByThreshold.collect() === sameSummary.recallByThreshold
-          .collect())
+      summary.recallByThreshold.collect() === sameSummary.recallByThreshold
+        .collect())
     assert(
-        summary.precisionByThreshold.collect() === sameSummary.precisionByThreshold
-          .collect())
+      summary.precisionByThreshold
+        .collect() === sameSummary.precisionByThreshold.collect())
   }
 
   test("statistics on training data") {
@@ -926,8 +935,12 @@ class LogisticRegressionSuite
         Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
-      val testData = generateMultinomialLogisticInput(
-          coefficients, xMean, xVariance, true, nPoints, 42)
+      val testData = generateMultinomialLogisticInput(coefficients,
+                                                      xMean,
+                                                      xVariance,
+                                                      true,
+                                                      nPoints,
+                                                      42)
 
       // Let's over-sample the positive samples twice.
       val data1 = testData.flatMap {
@@ -996,14 +1009,14 @@ class LogisticRegressionSuite
     val allZeroInterceptModel =
       lrIntercept.setLabelCol("zeroLabel").fit(sameLabels)
     assert(
-        allZeroInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
+      allZeroInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
     assert(allZeroInterceptModel.intercept === Double.NegativeInfinity)
     assert(allZeroInterceptModel.summary.totalIterations === 0)
 
     val allOneInterceptModel =
       lrIntercept.setLabelCol("oneLabel").fit(sameLabels)
     assert(
-        allOneInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
+      allOneInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
     assert(allOneInterceptModel.intercept === Double.PositiveInfinity)
     assert(allOneInterceptModel.summary.totalIterations === 0)
 
@@ -1031,8 +1044,10 @@ class LogisticRegressionSuite
       assert(model.numFeatures === model2.numFeatures)
     }
     val lr = new LogisticRegression()
-    testEstimatorAndModelReadWrite(
-        lr, dataset, LogisticRegressionSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(lr,
+                                   dataset,
+                                   LogisticRegressionSuite.allParamSettings,
+                                   checkModelData)
   }
 }
 
@@ -1045,14 +1060,14 @@ object LogisticRegressionSuite {
     */
   val allParamSettings: Map[String, Any] =
     ProbabilisticClassifierSuite.allParamSettings ++ Map(
-        "probabilityCol" -> "myProbability",
-        "thresholds" -> Array(0.4, 0.6),
-        "regParam" -> 0.01,
-        "elasticNetParam" -> 0.1,
-        "maxIter" -> 2, // intentionally small
-        "fitIntercept" -> true,
-        "tol" -> 0.8,
-        "standardization" -> false,
-        "threshold" -> 0.6
+      "probabilityCol" -> "myProbability",
+      "thresholds" -> Array(0.4, 0.6),
+      "regParam" -> 0.01,
+      "elasticNetParam" -> 0.1,
+      "maxIter" -> 2, // intentionally small
+      "fitIntercept" -> true,
+      "tol" -> 0.8,
+      "standardization" -> false,
+      "threshold" -> 0.6
     )
 }

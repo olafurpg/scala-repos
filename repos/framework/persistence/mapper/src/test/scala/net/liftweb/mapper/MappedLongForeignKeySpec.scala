@@ -26,7 +26,8 @@ import util._
   * Systems under specification for MappedLongForeignKey.
   */
 object MappedLongForeignKeySpec
-    extends Specification with org.specs2.specification.BeforeExample {
+    extends Specification
+    with org.specs2.specification.BeforeExample {
   "MappedLongForeignKey Specification".title
   sequential
 
@@ -43,7 +44,7 @@ object MappedLongForeignKeySpec
     } catch {
       case e if !provider.required_? =>
         1 must be_==(2).orSkip(
-            "Provider %s not available: %s".format(provider, e))
+          "Provider %s not available: %s".format(provider, e))
     }) must not(throwA[Exception]).orSkip
 
     "Not allow comparison to another FK" in {

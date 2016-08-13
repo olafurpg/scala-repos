@@ -19,14 +19,14 @@ trait IterateeSpecification { self: org.specs2.mutable.SpecificationLike =>
 
   def mustTransformTo[E, A](in: E*)(out: A*)(e: Enumeratee[E, A]) = {
     val f = Future(Enumerator(in: _*) |>>> e &>> Iteratee.getChunks[A])(
-        Execution.defaultExecutionContext)
+      Execution.defaultExecutionContext)
       .flatMap[List[A]](x => x)(Execution.defaultExecutionContext)
     Await.result(f, Duration.Inf) must equalTo(List(out: _*))
   }
 
   def enumeratorChunks[E](e: Enumerator[E]): Future[List[E]] = {
     executeFuture(e |>>> Iteratee.getChunks[E])(
-        Execution.defaultExecutionContext)
+      Execution.defaultExecutionContext)
   }
 
   def mustEnumerateTo[E, A](out: A*)(e: Enumerator[E]) = {
@@ -35,10 +35,10 @@ trait IterateeSpecification { self: org.specs2.mutable.SpecificationLike =>
 
   def mustPropagateFailure[E](e: Enumerator[E]) = {
     Try(
-        Await.result(
-            e(Cont { case _ => throw new RuntimeException() }),
-            Duration.Inf
-        )) must beAFailedTry
+      Await.result(
+        e(Cont { case _ => throw new RuntimeException() }),
+        Duration.Inf
+      )) must beAFailedTry
   }
 
   /**
@@ -61,7 +61,7 @@ trait IterateeSpecification { self: org.specs2.mutable.SpecificationLike =>
       case Input.El(input: String) => f(input)
       case unrecognized =>
         throw new IllegalArgumentException(
-            s"Unexpected input for Cont iteratee: $unrecognized")
+          s"Unexpected input for Cont iteratee: $unrecognized")
     })
   }
 

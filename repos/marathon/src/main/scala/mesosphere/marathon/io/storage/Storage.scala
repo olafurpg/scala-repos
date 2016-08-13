@@ -103,15 +103,15 @@ object StorageProvider {
     config.artifactStore.get.getOrElse("") match {
       case HDFS(uri, base) =>
         new HDFSStorageProvider(
-            new URI(uri),
-            if (base.isEmpty) "/" else base,
-            new Configuration()
+          new URI(uri),
+          if (base.isEmpty) "/" else base,
+          new Configuration()
         )
 
       case FILE(base) =>
         new FileStorageProvider(
-            s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts",
-            new File(base)
+          s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts",
+          new File(base)
         )
 
       case _ =>
@@ -125,7 +125,7 @@ object StorageProvider {
   }
 
   def examples: Map[String, String] = Map(
-      "hdfs" -> "hdfs://localhost:54310/path/to/store",
-      "file" -> "file:///var/log/store"
+    "hdfs" -> "hdfs://localhost:54310/path/to/store",
+    "file" -> "file:///var/log/store"
   )
 }

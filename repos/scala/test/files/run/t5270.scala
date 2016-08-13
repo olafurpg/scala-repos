@@ -7,8 +7,7 @@ object Test extends App {
       def y = 100
     }
 
-    trait Z {
-      this: Y =>
+    trait Z { this: Y =>
       val z = 2 * y
     }
 

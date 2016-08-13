@@ -16,7 +16,12 @@
 
 package com.twitter.summingbird.scalding.service
 
-import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp, Milliseconds}
+import com.twitter.summingbird.batch.{
+  BatchID,
+  Batcher,
+  Timestamp,
+  Milliseconds
+}
 import com.twitter.summingbird.scalding._
 import com.twitter.scalding.{Mode, TypedPipe, AbsoluteDuration}
 import com.twitter.scalding.typed.LookupJoin

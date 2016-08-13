@@ -6,7 +6,10 @@ package akka.http.javadsl.server
 package directives
 
 import akka.http.impl.server.RouteStructure
-import akka.http.impl.server.RouteStructure.{RedirectToNoTrailingSlashIfPresent, RedirectToTrailingSlashIfMissing}
+import akka.http.impl.server.RouteStructure.{
+  RedirectToNoTrailingSlashIfPresent,
+  RedirectToTrailingSlashIfMissing
+}
 import akka.http.javadsl.model.StatusCode
 import akka.http.javadsl.server.values.{PathMatchers, PathMatcher}
 
@@ -26,7 +29,7 @@ abstract class PathDirectives extends MiscDirectives {
   @varargs
   def path(matchers: AnyRef*): Directive =
     RawPathPrefixForMatchers(
-        joinWithSlash(convertMatchers(matchers)) :+ PathMatchers.END)
+      joinWithSlash(convertMatchers(matchers)) :+ PathMatchers.END)
 
   /**
     * Applies the given PathMatchers to a prefix of the remaining unmatched path after consuming a leading slash.
@@ -139,7 +142,7 @@ abstract class PathDirectives extends MiscDirectives {
     */
   def pathEndOrSingleSlash: Directive =
     RawPathPrefixForMatchers(
-        List(PathMatchers.SLASH.optional, PathMatchers.END))
+      List(PathMatchers.SLASH.optional, PathMatchers.END))
 
   /**
     * Only passes on the request to its inner route if the request path
@@ -158,7 +161,8 @@ abstract class PathDirectives extends MiscDirectives {
                                        innerRoute: Route,
                                        moreInnerRoutes: Route*): Route =
     RedirectToTrailingSlashIfMissing(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 
   /**
     * If the request path ends with a slash, redirect to the same uri without trailing slash in the path.
@@ -170,7 +174,8 @@ abstract class PathDirectives extends MiscDirectives {
                                          innerRoute: Route,
                                          moreInnerRoutes: Route*): Route =
     RedirectToNoTrailingSlashIfPresent(redirectionStatusCode)(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 
   private def RawPathPrefixForMatchers(
       matchers: immutable.Seq[PathMatcher[_]]): Directive =
@@ -196,7 +201,7 @@ abstract class PathDirectives extends MiscDirectives {
       case name: String ⇒ PathMatchers.segment(name)
       case x ⇒
         throw new IllegalArgumentException(
-            s"Matcher of class ${x.getClass} is unsupported for PathDirectives")
+          s"Matcher of class ${x.getClass} is unsupported for PathDirectives")
     }
 
     matchers.map(parse).toVector

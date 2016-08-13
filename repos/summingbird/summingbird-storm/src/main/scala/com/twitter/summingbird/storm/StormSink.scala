@@ -39,7 +39,8 @@ class WritableStoreSink[K, V](writable: => WritableStore[K, V])
   * Used to do leftJoins of streams against other streams
   */
 class StormBuffer[K, V](supplier: => Store[K, V])
-    extends StormSink[(K, V)] with OnlineServiceFactory[K, V] {
+    extends StormSink[(K, V)]
+    with OnlineServiceFactory[K, V] {
   private lazy val constructed = supplier // only construct it once
   def toFn = { (kv: (K, V)) =>
     constructed.put((kv._1, Some(kv._2)))

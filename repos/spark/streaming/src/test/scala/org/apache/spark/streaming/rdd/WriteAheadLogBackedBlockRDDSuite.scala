@@ -23,13 +23,28 @@ import scala.util.Random
 import org.apache.hadoop.conf.Configuration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
-import org.apache.spark.{SparkConf, SparkContext, SparkException, SparkFunSuite}
-import org.apache.spark.storage.{BlockId, BlockManager, StorageLevel, StreamBlockId}
-import org.apache.spark.streaming.util.{FileBasedWriteAheadLogSegment, FileBasedWriteAheadLogWriter}
+import org.apache.spark.{
+  SparkConf,
+  SparkContext,
+  SparkException,
+  SparkFunSuite
+}
+import org.apache.spark.storage.{
+  BlockId,
+  BlockManager,
+  StorageLevel,
+  StreamBlockId
+}
+import org.apache.spark.streaming.util.{
+  FileBasedWriteAheadLogSegment,
+  FileBasedWriteAheadLogWriter
+}
 import org.apache.spark.util.Utils
 
 class WriteAheadLogBackedBlockRDDSuite
-    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
 
   val conf = new SparkConf()
     .setMaster("local[2]")
@@ -83,7 +98,7 @@ class WriteAheadLogBackedBlockRDDSuite
   }
 
   test(
-      "Read data with partially available in block manager, and rest in write ahead log") {
+    "Read data with partially available in block manager, and rest in write ahead log") {
     testRDD(numPartitions = 5, numPartitionsInBM = 3, numPartitionsInWAL = 2)
   }
 
@@ -102,7 +117,7 @@ class WriteAheadLogBackedBlockRDDSuite
   }
 
   test(
-      "Test storing of blocks recovered from write ahead log back into block manager") {
+    "Test storing of blocks recovered from write ahead log back into block manager") {
     testRDD(numPartitions = 5,
             numPartitionsInBM = 0,
             numPartitionsInWAL = 5,
@@ -154,51 +169,51 @@ class WriteAheadLogBackedBlockRDDSuite
 
     // Put the necessary blocks in the block manager
     val blockIds = Array.fill(numPartitions)(
-        StreamBlockId(Random.nextInt(), Random.nextInt()))
+      StreamBlockId(Random.nextInt(), Random.nextInt()))
     data.zip(blockIds).take(numPartitionsInBM).foreach {
       case (block, blockId) =>
-        blockManager.putIterator(
-            blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
+        blockManager
+          .putIterator(blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
     }
 
     // Generate write ahead log record handles
     val recordHandles =
       generateFakeRecordHandles(numPartitions - numPartitionsInWAL) ++ generateWALRecordHandles(
-          data.takeRight(numPartitionsInWAL),
-          blockIds.takeRight(numPartitionsInWAL))
+        data.takeRight(numPartitionsInWAL),
+        blockIds.takeRight(numPartitionsInWAL))
 
     // Make sure that the left `numPartitionsInBM` blocks are in block manager, and others are not
     require(
-        blockIds.take(numPartitionsInBM).forall(blockManager.get(_).nonEmpty),
-        "Expected blocks not in BlockManager"
+      blockIds.take(numPartitionsInBM).forall(blockManager.get(_).nonEmpty),
+      "Expected blocks not in BlockManager"
     )
     require(
-        blockIds
-          .takeRight(numPartitions - numPartitionsInBM)
-          .forall(blockManager.get(_).isEmpty),
-        "Unexpected blocks in BlockManager"
+      blockIds
+        .takeRight(numPartitions - numPartitionsInBM)
+        .forall(blockManager.get(_).isEmpty),
+      "Unexpected blocks in BlockManager"
     )
 
     // Make sure that the right `numPartitionsInWAL` blocks are in WALs, and other are not
     require(
-        recordHandles
-          .takeRight(numPartitionsInWAL)
-          .forall(s => new File(s.path.stripPrefix("file://")).exists()),
-        "Expected blocks not in write ahead log"
+      recordHandles
+        .takeRight(numPartitionsInWAL)
+        .forall(s => new File(s.path.stripPrefix("file://")).exists()),
+      "Expected blocks not in write ahead log"
     )
     require(
-        recordHandles
-          .take(numPartitions - numPartitionsInWAL)
-          .forall(s => !new File(s.path.stripPrefix("file://")).exists()),
-        "Unexpected blocks in write ahead log"
+      recordHandles
+        .take(numPartitions - numPartitionsInWAL)
+        .forall(s => !new File(s.path.stripPrefix("file://")).exists()),
+      "Unexpected blocks in write ahead log"
     )
 
     // Create the RDD and verify whether the returned data is correct
-    val rdd = new WriteAheadLogBackedBlockRDD[String](
-        sparkContext,
-        blockIds.toArray,
-        recordHandles.toArray,
-        storeInBlockManager = false)
+    val rdd = new WriteAheadLogBackedBlockRDD[String](sparkContext,
+                                                      blockIds.toArray,
+                                                      recordHandles.toArray,
+                                                      storeInBlockManager =
+                                                        false)
     assert(rdd.collect() === data.flatten)
 
     // Verify that the block fetching is skipped when isBlockValid is set to false.
@@ -210,10 +225,10 @@ class WriteAheadLogBackedBlockRDDSuite
               "All partitions must be in BlockManager")
       require(numPartitionsInWAL === 0, "No partitions must be in WAL")
       val rdd2 = new WriteAheadLogBackedBlockRDD[String](
-          sparkContext,
-          blockIds.toArray,
-          recordHandles.toArray,
-          isBlockIdValid = Array.fill(blockIds.length)(false))
+        sparkContext,
+        blockIds.toArray,
+        recordHandles.toArray,
+        isBlockIdValid = Array.fill(blockIds.length)(false))
       intercept[SparkException] {
         rdd2.collect()
       }
@@ -232,15 +247,15 @@ class WriteAheadLogBackedBlockRDDSuite
 
     if (testStoreInBM) {
       val rdd2 = new WriteAheadLogBackedBlockRDD[String](
-          sparkContext,
-          blockIds.toArray,
-          recordHandles.toArray,
-          storeInBlockManager = true,
-          storageLevel = StorageLevel.MEMORY_ONLY)
+        sparkContext,
+        blockIds.toArray,
+        recordHandles.toArray,
+        storeInBlockManager = true,
+        storageLevel = StorageLevel.MEMORY_ONLY)
       assert(rdd2.collect() === data.flatten)
       assert(
-          blockIds.forall(blockManager.get(_).nonEmpty),
-          "All blocks not found in block manager"
+        blockIds.forall(blockManager.get(_).nonEmpty),
+        "All blocks not found in block manager"
       )
     }
   }
@@ -251,11 +266,12 @@ class WriteAheadLogBackedBlockRDDSuite
   ): Seq[FileBasedWriteAheadLogSegment] = {
     require(blockData.size === blockIds.size)
     val writer = new FileBasedWriteAheadLogWriter(
-        new File(dir, "logFile").toString, hadoopConf)
+      new File(dir, "logFile").toString,
+      hadoopConf)
     val segments = blockData.zip(blockIds).map {
       case (data, id) =>
         writer.write(
-            blockManager.dataSerialize(id, data.iterator).toByteBuffer)
+          blockManager.dataSerialize(id, data.iterator).toByteBuffer)
     }
     writer.close()
     segments

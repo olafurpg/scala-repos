@@ -8,7 +8,11 @@ import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.CompileContext
 import org.jetbrains.jps.incremental.ModuleLevelBuilder.OutputConsumer
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
-import org.jetbrains.jps.incremental.messages.{CompilerMessage, FileDeletedEvent, ProgressMessage}
+import org.jetbrains.jps.incremental.messages.{
+  CompilerMessage,
+  FileDeletedEvent,
+  ProgressMessage
+}
 
 /**
   * Nikolay.Tropin
@@ -46,15 +50,15 @@ abstract class IdeClient(compilerName: String,
           lines.filterNot(_.trim == "^").mkString("\n")
         } else text
       context.processMessage(
-          new CompilerMessage(name,
-                              kind,
-                              withoutPointer,
-                              sourcePath.orNull,
-                              -1L,
-                              -1L,
-                              -1L,
-                              line.getOrElse(-1L),
-                              column.getOrElse(-1L)))
+        new CompilerMessage(name,
+                            kind,
+                            withoutPointer,
+                            sourcePath.orNull,
+                            -1L,
+                            -1L,
+                            -1L,
+                            line.getOrElse(-1L),
+                            column.getOrElse(-1L)))
     }
   }
 
@@ -68,11 +72,11 @@ abstract class IdeClient(compilerName: String,
       else {
         val decapitalizedText =
           text.charAt(0).toLower.toString + text.substring(1)
-        "%s: %s [%s]".format(
-            compilerName, decapitalizedText, modules.mkString(", "))
+        "%s: %s [%s]"
+          .format(compilerName, decapitalizedText, modules.mkString(", "))
       }
     context.processMessage(
-        new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
+      new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
   }
 
   def debug(text: String) {

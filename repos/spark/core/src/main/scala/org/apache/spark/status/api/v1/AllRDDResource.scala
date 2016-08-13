@@ -31,8 +31,10 @@ private[v1] class AllRDDResource(ui: SparkUI) {
     val storageStatusList = ui.storageListener.activeStorageStatusList
     val rddInfos = ui.storageListener.rddInfoList
     rddInfos.map { rddInfo =>
-      AllRDDResource.getRDDStorageInfo(
-          rddInfo.id, rddInfo, storageStatusList, includeDetails = false)
+      AllRDDResource.getRDDStorageInfo(rddInfo.id,
+                                       rddInfo,
+                                       storageStatusList,
+                                       includeDetails = false)
     }
   }
 }
@@ -66,13 +68,12 @@ private[spark] object AllRDDResource {
 
     val dataDistribution =
       if (includeDetails) {
-        Some(
-            storageStatusList.map { status =>
+        Some(storageStatusList.map { status =>
           new RDDDataDistribution(
-              address = status.blockManagerId.hostPort,
-              memoryUsed = status.memUsedByRdd(rddId),
-              memoryRemaining = status.memRemaining,
-              diskUsed = status.diskUsedByRdd(rddId)
+            address = status.blockManagerId.hostPort,
+            memoryUsed = status.memUsedByRdd(rddId),
+            memoryRemaining = status.memRemaining,
+            diskUsed = status.diskUsedByRdd(rddId)
           )
         })
       } else {
@@ -83,11 +84,11 @@ private[spark] object AllRDDResource {
         Some(blocks.map {
           case (id, block, locations) =>
             new RDDPartitionInfo(
-                blockName = id.name,
-                storageLevel = block.storageLevel.description,
-                memoryUsed = block.memSize,
-                diskUsed = block.diskSize,
-                executors = locations
+              blockName = id.name,
+              storageLevel = block.storageLevel.description,
+              memoryUsed = block.memSize,
+              diskUsed = block.diskSize,
+              executors = locations
             )
         })
       } else {
@@ -95,15 +96,15 @@ private[spark] object AllRDDResource {
       }
 
     new RDDStorageInfo(
-        id = rddId,
-        name = rddInfo.name,
-        numPartitions = rddInfo.numPartitions,
-        numCachedPartitions = rddInfo.numCachedPartitions,
-        storageLevel = rddInfo.storageLevel.description,
-        memoryUsed = rddInfo.memSize,
-        diskUsed = rddInfo.diskSize,
-        dataDistribution = dataDistribution,
-        partitions = partitions
+      id = rddId,
+      name = rddInfo.name,
+      numPartitions = rddInfo.numPartitions,
+      numCachedPartitions = rddInfo.numCachedPartitions,
+      storageLevel = rddInfo.storageLevel.description,
+      memoryUsed = rddInfo.memSize,
+      diskUsed = rddInfo.diskSize,
+      dataDistribution = dataDistribution,
+      partitions = partitions
     )
   }
 }

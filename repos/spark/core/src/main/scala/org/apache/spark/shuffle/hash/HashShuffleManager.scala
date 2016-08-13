@@ -26,11 +26,12 @@ import org.apache.spark.shuffle._
   * mapper (possibly reusing these across waves of tasks).
   */
 private[spark] class HashShuffleManager(conf: SparkConf)
-    extends ShuffleManager with Logging {
+    extends ShuffleManager
+    with Logging {
 
   if (!conf.getBoolean("spark.shuffle.spill", true)) {
     logWarning(
-        "spark.shuffle.spill was set to false, but this configuration is ignored as of Spark 1.6+." +
+      "spark.shuffle.spill was set to false, but this configuration is ignored as of Spark 1.6+." +
         " Shuffle will continue to spill to disk when necessary.")
   }
 
@@ -55,10 +56,10 @@ private[spark] class HashShuffleManager(conf: SparkConf)
                                endPartition: Int,
                                context: TaskContext): ShuffleReader[K, C] = {
     new BlockStoreShuffleReader(
-        handle.asInstanceOf[BaseShuffleHandle[K, _, C]],
-        startPartition,
-        endPartition,
-        context)
+      handle.asInstanceOf[BaseShuffleHandle[K, _, C]],
+      startPartition,
+      endPartition,
+      context)
   }
 
   /** Get a writer for a given partition. Called on executors by map tasks. */

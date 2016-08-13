@@ -24,7 +24,7 @@ object DisplayHelpers {
 
     val maxColumnLengths: IndexedSeq[Int] = for {
       column <- 0 until columns
-    } yield rows.iterator.map(_ (column).length).max
+    } yield rows.iterator.map(_(column).length).max
 
     for (row <- rows) {
       val formatted = columnFormats.zipWithIndex.zip(row).map {
@@ -37,10 +37,10 @@ object DisplayHelpers {
 
   def withUnderline(header: IndexedSeq[String]): Seq[IndexedSeq[String]] = {
     IndexedSeq(
-        header,
-        header.map { str =>
-          "-" * str.length
-        }
+      header,
+      header.map { str =>
+        "-" * str.length
+      }
     )
   }
 }

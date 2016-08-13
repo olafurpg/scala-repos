@@ -30,19 +30,19 @@ case class Analysis(id: String,
   // ply -> UCI
   def bestMoves: Map[Int, String] =
     (infos map { i =>
-          i.best map { b =>
-            i.ply -> b.keys
-          }
-        }).flatten.toMap
+      i.best map { b =>
+        i.ply -> b.keys
+      }
+    }).flatten.toMap
 
   def summary: List[(Color, List[(Nag, Int)])] = Color.all map { color =>
     color ->
-    (Nag.badOnes map { nag =>
-          nag ->
+      (Nag.badOnes map { nag =>
+        nag ->
           (advices count { adv =>
-                adv.color == color && adv.nag == nag
-              })
-        })
+            adv.color == color && adv.nag == nag
+          })
+      })
   }
 
   def valid = infos.nonEmpty
@@ -62,12 +62,13 @@ object Analysis {
       val startPly = r intD "ply"
       val raw = r str "data"
       Analysis(
-          id = r str "_id",
-          infos = Info.decodeList(raw, startPly) err s"Invalid analysis data $raw",
-          startPly = startPly,
-          uid = r strO "uid",
-          by = r strO "by",
-          date = r date "date")
+        id = r str "_id",
+        infos = Info
+            .decodeList(raw, startPly) err s"Invalid analysis data $raw",
+        startPly = startPly,
+        uid = r strO "uid",
+        by = r strO "by",
+        date = r date "date")
     }
     def writes(w: BSON.Writer, o: Analysis) =
       BSONDocument("_id" -> o.id,

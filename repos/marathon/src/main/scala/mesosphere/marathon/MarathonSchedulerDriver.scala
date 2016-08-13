@@ -39,11 +39,11 @@ object MarathonSchedulerDriver {
     } else if (httpConfig.sslKeystorePath.isDefined) {
       // ssl enabled, use https
       frameworkInfoBuilder.setWebuiUrl(
-          s"https://${config.hostname()}:${httpConfig.httpsPort()}")
+        s"https://${config.hostname()}:${httpConfig.httpsPort()}")
     } else {
       // ssl disabled, use http
       frameworkInfoBuilder.setWebuiUrl(
-          s"http://${config.hostname()}:${httpConfig.httpPort()}")
+        s"http://${config.hostname()}:${httpConfig.httpPort()}")
     }
 
     // set the authentication principal, if provided
@@ -62,8 +62,8 @@ object MarathonSchedulerDriver {
           } catch {
             case cause: Throwable =>
               throw new IOException(
-                  s"Error reading authentication secret from file [$secretFile]",
-                  cause)
+                s"Error reading authentication secret from file [$secretFile]",
+                cause)
           }
         }
 

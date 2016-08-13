@@ -6,5 +6,5 @@ object Test extends App {
 
   val decls = typeOf[JavaClassWithCheckedExceptions_1[_]].decls.toList
   decls sortBy (_.name.toString) foreach
-  (decl => println(s"${decl.name}: ${decl.annotations}"))
+    (decl => println(s"${decl.name}: ${decl.annotations}"))
 }

@@ -15,7 +15,9 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FreeSpec, Matchers}
 
 class Utf8CodingSpecs
-    extends FreeSpec with Matchers with PropertyChecks
+    extends FreeSpec
+    with Matchers
+    with PropertyChecks
     with WithMaterializerSpec {
   "Utf8 decoding/encoding" - {
     "work for all codepoints" in {

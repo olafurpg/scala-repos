@@ -36,38 +36,38 @@ class DDLScanSource extends RelationProvider {
 
 case class SimpleDDLScan(from: Int, to: Int, table: String)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+    extends BaseRelation
+    with TableScan {
 
   override def schema: StructType =
     StructType(
-        Seq(
-            StructField("intType",
-                        IntegerType,
-                        nullable = false,
-                        new MetadataBuilder()
-                          .putString("comment", s"test comment $table")
-                          .build()),
-            StructField("stringType", StringType, nullable = false),
-            StructField("dateType", DateType, nullable = false),
-            StructField("timestampType", TimestampType, nullable = false),
-            StructField("doubleType", DoubleType, nullable = false),
-            StructField("bigintType", LongType, nullable = false),
-            StructField("tinyintType", ByteType, nullable = false),
-            StructField(
-                "decimalType", DecimalType.USER_DEFAULT, nullable = false),
-            StructField(
-                "fixedDecimalType", DecimalType(5, 1), nullable = false),
-            StructField("binaryType", BinaryType, nullable = false),
-            StructField("booleanType", BooleanType, nullable = false),
-            StructField("smallIntType", ShortType, nullable = false),
-            StructField("floatType", FloatType, nullable = false),
-            StructField("mapType", MapType(StringType, StringType)),
-            StructField("arrayType", ArrayType(StringType)),
-            StructField("structType",
-                        StructType(
-                            StructField("f1", StringType) :: StructField(
-                                "f2", IntegerType) :: Nil))
-        ))
+      Seq(
+        StructField("intType",
+                    IntegerType,
+                    nullable = false,
+                    new MetadataBuilder()
+                      .putString("comment", s"test comment $table")
+                      .build()),
+        StructField("stringType", StringType, nullable = false),
+        StructField("dateType", DateType, nullable = false),
+        StructField("timestampType", TimestampType, nullable = false),
+        StructField("doubleType", DoubleType, nullable = false),
+        StructField("bigintType", LongType, nullable = false),
+        StructField("tinyintType", ByteType, nullable = false),
+        StructField("decimalType", DecimalType.USER_DEFAULT, nullable = false),
+        StructField("fixedDecimalType", DecimalType(5, 1), nullable = false),
+        StructField("binaryType", BinaryType, nullable = false),
+        StructField("booleanType", BooleanType, nullable = false),
+        StructField("smallIntType", ShortType, nullable = false),
+        StructField("floatType", FloatType, nullable = false),
+        StructField("mapType", MapType(StringType, StringType)),
+        StructField("arrayType", ArrayType(StringType)),
+        StructField("structType",
+                    StructType(
+                      StructField("f1", StringType) :: StructField(
+                        "f2",
+                        IntegerType) :: Nil))
+      ))
 
   override def needConversion: Boolean = false
 
@@ -100,26 +100,26 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
 
   sqlTest("describe ddlPeople",
           Seq(
-              Row("intType", "int", "test comment test1"),
-              Row("stringType", "string", ""),
-              Row("dateType", "date", ""),
-              Row("timestampType", "timestamp", ""),
-              Row("doubleType", "double", ""),
-              Row("bigintType", "bigint", ""),
-              Row("tinyintType", "tinyint", ""),
-              Row("decimalType", "decimal(10,0)", ""),
-              Row("fixedDecimalType", "decimal(5,1)", ""),
-              Row("binaryType", "binary", ""),
-              Row("booleanType", "boolean", ""),
-              Row("smallIntType", "smallint", ""),
-              Row("floatType", "float", ""),
-              Row("mapType", "map<string,string>", ""),
-              Row("arrayType", "array<string>", ""),
-              Row("structType", "struct<f1:string,f2:int>", "")
+            Row("intType", "int", "test comment test1"),
+            Row("stringType", "string", ""),
+            Row("dateType", "date", ""),
+            Row("timestampType", "timestamp", ""),
+            Row("doubleType", "double", ""),
+            Row("bigintType", "bigint", ""),
+            Row("tinyintType", "tinyint", ""),
+            Row("decimalType", "decimal(10,0)", ""),
+            Row("fixedDecimalType", "decimal(5,1)", ""),
+            Row("binaryType", "binary", ""),
+            Row("booleanType", "boolean", ""),
+            Row("smallIntType", "smallint", ""),
+            Row("floatType", "float", ""),
+            Row("mapType", "map<string,string>", ""),
+            Row("arrayType", "array<string>", ""),
+            Row("structType", "struct<f1:string,f2:int>", "")
           ))
 
   test(
-      "SPARK-7686 DescribeCommand should have correct physical plan output attributes") {
+    "SPARK-7686 DescribeCommand should have correct physical plan output attributes") {
     val attributes =
       sql("describe ddlPeople").queryExecution.executedPlan.output
     assert(attributes.map(_.name) === Seq("col_name", "data_type", "comment"))

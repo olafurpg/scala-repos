@@ -44,12 +44,12 @@ object Executor {
   def buildHadoopConf(inArgs: Array[String]): (Configuration, Args) = {
     val baseConfig = new Configuration
     val args = Args(
-        new GenericOptionsParser(baseConfig, inArgs).getRemainingArgs)
+      new GenericOptionsParser(baseConfig, inArgs).getRemainingArgs)
     (baseConfig, args)
   }
 
-  def apply(
-      inArgs: Array[String], generator: (Args => ScaldingExecutionConfig)) {
+  def apply(inArgs: Array[String],
+            generator: (Args => ScaldingExecutionConfig)) {
 
     val (hadoopConf, args) = buildHadoopConf(inArgs)
 
@@ -65,7 +65,7 @@ object Executor {
       args
         .optional("start-time")
         .map(
-            RichDate(_)(TimeZone.getTimeZone("UTC"), DateParser.default).value)
+          RichDate(_)(TimeZone.getTimeZone("UTC"), DateParser.default).value)
 
     // The number of batches to process in this particular run. Imagine
     // a batch size of one hour; For big recomputations, one might want
@@ -81,9 +81,10 @@ object Executor {
     def shards: Int = args.getOrElse("shards", "0").toInt
 
     val options =
-      Map("DEFAULT" -> Options()
-            .set(Reducers(reducers))
-            .set(FlatMapShards(shards))) ++ config.getNamedOptions
+      Map(
+        "DEFAULT" -> Options()
+          .set(Reducers(reducers))
+          .set(FlatMapShards(shards))) ++ config.getNamedOptions
 
     val scaldPlatform = Scalding(config.name, options)
       .withRegistrars(config.registrars)
@@ -104,7 +105,7 @@ object Executor {
         /* This is generally due to data not being ready, don't give a failed error code */
         if (!args.boolean("scalding.nothrowplan")) {
           logger.error(
-              "use: --scalding.nothrowplan to not give a failing error code in this case")
+            "use: --scalding.nothrowplan to not give a failing error code in this case")
           throw f
         } else {
           logger.info("[ERROR]: ========== FlowPlanException =========")

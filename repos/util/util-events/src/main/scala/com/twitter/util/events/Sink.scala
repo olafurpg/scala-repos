@@ -8,13 +8,13 @@ import com.twitter.util.events.Event.Type
 // lifecycle.
 private[events] object sinkEnabled
     extends GlobalFlag[Boolean](
-        true,
-        "Whether or not event capture is enabled. Prefer setting via System properties.")
+      true,
+      "Whether or not event capture is enabled. Prefer setting via System properties.")
 
 private[events] object approxNumEvents
     extends GlobalFlag[Int](
-        10000,
-        "Approximate number of events to keep in memory. Prefer setting via System properties.")
+      10000,
+      "Approximate number of events to keep in memory. Prefer setting via System properties.")
 
 /**
   * Where runtime events such as logging, stats and tracing can be
@@ -119,8 +119,12 @@ object Sink {
   def of(buffer: scala.collection.mutable.Buffer[Event]): Sink =
     new Sink {
       def events = buffer.iterator
-      def event(
-          e: Event.Type, l: Long, o: Object, d: Double, t: Long, s: Long) =
+      def event(e: Event.Type,
+                l: Long,
+                o: Object,
+                d: Double,
+                t: Long,
+                s: Long) =
         buffer += Event(e, com.twitter.util.Time.now, l, o, d, t, s)
     }
 

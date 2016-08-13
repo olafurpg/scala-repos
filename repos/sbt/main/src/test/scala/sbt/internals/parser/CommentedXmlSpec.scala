@@ -3,7 +3,7 @@ package sbt.internals.parser
 class CommentedXmlSpec extends CheckIfParsedSpec {
 
   override protected val files = Seq(
-      (s"""|
+    (s"""|
          |val pom = "</scm>"
          |
          |val aaa= <scm><url>git@a.com:a/a.git</url>
@@ -13,10 +13,10 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
          |val tra = "</scm>"
          |
        """.stripMargin,
-       "Xml in string",
-       false,
-       true),
-      ("""
+     "Xml in string",
+     false,
+     true),
+    ("""
         |val scmpom = taskKey[xml.NodeBuffer]("Node buffer")
         |
         |scmpom := <scm>
@@ -36,10 +36,10 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
         |publishMavenStyle := true
         |
       """.stripMargin,
-       "Wrong Commented xml ",
-       false,
-       true),
-      ("""
+     "Wrong Commented xml ",
+     false,
+     true),
+    ("""
         |val scmpom = taskKey[xml.NodeBuffer]("Node buffer")
         |
         |scmpom := <scm>
@@ -59,19 +59,22 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
         |publishMavenStyle := true
         |
       """.stripMargin,
-       "Commented xml ",
-       false,
-       true),
-      ("""
+     "Commented xml ",
+     false,
+     true),
+    ("""
         |import sbt._
         |
         |// </a
       """.stripMargin,
-       "Xml in comment",
-       true,
-       false),
-      ("""
+     "Xml in comment",
+     true,
+     false),
+    ("""
         |// a/>
-      """.stripMargin, "Xml in comment2", false, false)
+      """.stripMargin,
+     "Xml in comment2",
+     false,
+     false)
   )
 }

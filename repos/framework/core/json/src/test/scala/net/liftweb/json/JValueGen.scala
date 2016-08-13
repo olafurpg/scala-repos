@@ -37,8 +37,8 @@ trait JValueGen {
   def genList = Gen.containerOfN[List, JValue](listSize, genJValue)
   def genFieldList = Gen.containerOfN[List, JField](listSize, genField)
   def genField =
-    for (name <- identifier; value <- genJValue; id <- choose(0, 1000000)) yield
-      JField(name + id, value)
+    for (name <- identifier; value <- genJValue; id <- choose(0, 1000000))
+      yield JField(name + id, value)
 
   def genJValueClass: Gen[Class[_ <: JValue]] =
     oneOf(JNull.getClass.asInstanceOf[Class[JValue]],
@@ -63,8 +63,8 @@ trait NodeGen {
     for {
       name <- genName
       node <- Gen.containerOfN[List, Node](children, genXml) map { seq =>
-        new XmlNode(name, seq)
-      }
+               new XmlNode(name, seq)
+             }
     } yield node
 
   def genElem =

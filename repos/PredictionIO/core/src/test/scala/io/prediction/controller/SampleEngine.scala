@@ -200,7 +200,8 @@ object Engine0 {
       PAlgo0.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo0.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo0.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -219,7 +220,8 @@ object Engine0 {
       PAlgo1.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo1.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo1.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -241,7 +243,8 @@ object Engine0 {
       PAlgo2.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo2.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo2.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -267,7 +270,8 @@ object Engine0 {
       PAlgo3.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo3.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo3.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -436,8 +440,10 @@ object Engine1 {
 }
 
 class Engine1
-    extends BaseEngine[
-        Engine1.EvalInfo, Engine1.Query, Engine1.Prediction, Engine1.Actual] {
+    extends BaseEngine[Engine1.EvalInfo,
+                       Engine1.Query,
+                       Engine1.Prediction,
+                       Engine1.Actual] {
 
   def train(sc: SparkContext,
             engineParams: EngineParams,
@@ -446,11 +452,13 @@ class Engine1
 
   def eval(sc: SparkContext,
            engineParams: EngineParams,
-           params: WorkflowParams): Seq[(Engine1.EvalInfo, RDD[
-          (Engine1.Query, Engine1.Prediction, Engine1.Actual)])] = {
+           params: WorkflowParams)
+    : Seq[(Engine1.EvalInfo,
+           RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])] = {
     val dsp = engineParams.dataSourceParams._2.asInstanceOf[Engine1.DSP]
-    Seq((Engine1.EvalInfo(dsp.v),
-         sc.emptyRDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)]))
+    Seq(
+      (Engine1.EvalInfo(dsp.v),
+       sc.emptyRDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)]))
   }
 }
 
@@ -463,8 +471,9 @@ class Metric0
   override def header: String = "Metric0"
 
   def calculate(sc: SparkContext,
-                evalDataSet: Seq[(Engine1.EvalInfo, RDD[
-                        (Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
+                evalDataSet: Seq[
+                  (Engine1.EvalInfo,
+                   RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
     : Double = {
     evalDataSet.head._1.v
   }
@@ -476,16 +485,17 @@ object Metric1 {
 
 class Metric1
     extends Metric[
-        Engine1.EvalInfo,
-        Engine1.Query,
-        Engine1.Prediction,
-        Engine1.Actual,
-        Metric1.Result]()(Ordering.by[Metric1.Result, Double](_.v)) {
+      Engine1.EvalInfo,
+      Engine1.Query,
+      Engine1.Prediction,
+      Engine1.Actual,
+      Metric1.Result]()(Ordering.by[Metric1.Result, Double](_.v)) {
   override def header: String = "Metric1"
 
   def calculate(sc: SparkContext,
-                evalDataSet: Seq[(Engine1.EvalInfo, RDD[
-                        (Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
+                evalDataSet: Seq[
+                  (Engine1.EvalInfo,
+                   RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
     : Metric1.Result = {
     Metric1.Result(0, evalDataSet.head._1.v)
   }

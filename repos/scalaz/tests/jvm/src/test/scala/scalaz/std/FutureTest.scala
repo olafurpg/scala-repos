@@ -24,13 +24,13 @@ class FutureTest extends SpecLite {
   {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap {
+    implicit def futureEqual[A: Equal] = Equal[Throwable \/ A] contramap {
       future: Future[A] =>
         val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
         Await.result(futureWithError, duration)
     }
 
-    implicit def futureShow[A : Show]: Show[Future[A]] =
+    implicit def futureShow[A: Show]: Show[Future[A]] =
       Contravariant[Show].contramap(Show[String \/ A]) { future: Future[A] =>
         val futureWithError =
           future.map(\/-(_)).recover { case e => -\/(e.toString) }
@@ -42,18 +42,18 @@ class FutureTest extends SpecLite {
     }
 
     implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(
-        arbitrary[Int].map(SomeFailure))
+      arbitrary[Int].map(SomeFailure))
 
     checkAll(monoid.laws[Future[Int]])
     checkAll(monoid.laws[Future[Int @@ Multiplication]])
 
     // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
     checkAll(
-        monadError.laws[Future, Throwable](implicitly,
-                                           implicitly,
-                                           implicitly,
-                                           implicitly,
-                                           ArbitraryThrowable))
+      monadError.laws[Future, Throwable](implicitly,
+                                         implicitly,
+                                         implicitly,
+                                         implicitly,
+                                         ArbitraryThrowable))
 
     // Scope these away from the rest as Comonad[Future] is a little evil.
     // Should fail to compile by default: implicitly[Comonad[Future]]

@@ -37,26 +37,29 @@ abstract class KindProjectorTestBase
 
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
     val startOffset = offset + startExprMarker.length
 
     assert(
-        offset != -1,
-        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+      offset != -1,
+      "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endExprMarker)
     assert(
-        endOffset != -1,
-        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+      endOffset != -1,
+      "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
-    val expr: ScParameterizedTypeElement = PsiTreeUtil
-      .findElementOfClassAtRange(
-        scalaFile, startOffset, endOffset, classOf[ScParameterizedTypeElement])
+    val expr: ScParameterizedTypeElement =
+      PsiTreeUtil.findElementOfClassAtRange(
+        scalaFile,
+        startOffset,
+        endOffset,
+        classOf[ScParameterizedTypeElement])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.computeDesugarizedType
     typez match {

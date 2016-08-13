@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.ScEarlyDefinitionsImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScEarlyDefinitionsStubImpl
@@ -16,9 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScEarlyDefinitionsStubImp
   */
 class ScEarlyDefinitionsElementType[Func <: ScEarlyDefinitions]
     extends ScStubElementType[ScEarlyDefinitionsStub, ScEarlyDefinitions](
-        "early definitions") {
-  def serialize(
-      stub: ScEarlyDefinitionsStub, dataStream: StubOutputStream): Unit = {}
+      "early definitions") {
+  def serialize(stub: ScEarlyDefinitionsStub,
+                dataStream: StubOutputStream): Unit = {}
 
   def createPsi(stub: ScEarlyDefinitionsStub): ScEarlyDefinitions = {
     new ScEarlyDefinitionsImpl(stub)
@@ -30,10 +35,11 @@ class ScEarlyDefinitionsElementType[Func <: ScEarlyDefinitions]
     new ScEarlyDefinitionsStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScEarlyDefinitionsStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScEarlyDefinitionsStub = {
     new ScEarlyDefinitionsStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this)
   }
 
   def indexStub(stub: ScEarlyDefinitionsStub, sink: IndexSink): Unit = {}

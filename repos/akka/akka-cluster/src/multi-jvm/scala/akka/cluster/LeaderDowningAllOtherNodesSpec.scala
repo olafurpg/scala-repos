@@ -18,12 +18,13 @@ object LeaderDowningAllOtherNodesMultiJvmSpec extends MultiNodeConfig {
   val sixth = role("sixth")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        """
       akka.cluster.failure-detector.monitored-by-nr-of-members = 2
       akka.cluster.auto-down-unreachable-after = 1s
       """))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class LeaderDowningAllOtherNodesMultiJvmNode1

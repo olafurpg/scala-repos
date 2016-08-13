@@ -17,8 +17,9 @@ private[jobs] object KillOverdueTasksActor {
             taskTracker: TaskTracker,
             driverHolder: MarathonSchedulerDriverHolder,
             clock: Clock): Props = {
-    Props(new KillOverdueTasksActor(
-            new Support(config, taskTracker, driverHolder, clock)))
+    Props(
+      new KillOverdueTasksActor(
+        new Support(config, taskTracker, driverHolder, clock)))
   }
 
   /**
@@ -54,13 +55,13 @@ private[jobs] object KillOverdueTasksActor {
             case None | Some(TaskState.TASK_STARTING)
                 if launched.status.stagedAt < unconfirmedExpire =>
               log.warn(s"Should kill: ${task.taskId} was launched " +
-                  s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
+                s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
               true
 
             case Some(TaskState.TASK_STAGING)
                 if launched.status.stagedAt < stagedExpire =>
               log.warn(
-                  s"Should kill: ${task.taskId} was staged ${(launched.status.stagedAt.until(now).toSeconds)}s" +
+                s"Should kill: ${task.taskId} was staged ${(launched.status.stagedAt.until(now).toSeconds)}s" +
                   s" ago and has not yet started")
               true
 
@@ -79,16 +80,17 @@ private[jobs] object KillOverdueTasksActor {
 }
 
 private class KillOverdueTasksActor(support: KillOverdueTasksActor.Support)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var checkTicker: Cancellable = _
 
   override def preStart(): Unit = {
     import context.dispatcher
     checkTicker = context.system.scheduler.schedule(
-        30.seconds,
-        5.seconds,
-        self,
-        KillOverdueTasksActor.Check(maybeAck = None)
+      30.seconds,
+      5.seconds,
+      self,
+      KillOverdueTasksActor.Check(maybeAck = None)
     )
   }
 

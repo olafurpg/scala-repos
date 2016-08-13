@@ -49,8 +49,7 @@ object Macros {
         else ttag0
       }
       reify(
-          C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString)))
-                .splice))
+        C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString))).splice))
     }
   }
 }

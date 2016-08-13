@@ -45,13 +45,13 @@ object OrmToSlick extends App {
   val db = Database.forConfig("h2mem1")
   try {
     val setup = DBIO.seq(
-        addresses.schema.create,
-        people.schema.create,
-        sql"ALTER TABLE PERSON ALTER COLUMN NAME VARCHAR(255) DEFAULT('')"
-          .as[Int],
-        sql"ALTER TABLE PERSON ALTER COLUMN AGE INT DEFAULT(-1)".as[Int],
-        sql"ALTER TABLE PERSON ALTER COLUMN ADDRESS_ID INT DEFAULT(1)".as[Int],
-        SqlToSlick.inserts
+      addresses.schema.create,
+      people.schema.create,
+      sql"ALTER TABLE PERSON ALTER COLUMN NAME VARCHAR(255) DEFAULT('')"
+        .as[Int],
+      sql"ALTER TABLE PERSON ALTER COLUMN AGE INT DEFAULT(-1)".as[Int],
+      sql"ALTER TABLE PERSON ALTER COLUMN ADDRESS_ID INT DEFAULT(1)".as[Int],
+      SqlToSlick.inserts
     )
     Await.result(db.run(setup), Duration.Inf);
     {
@@ -100,8 +100,8 @@ object OrmToSlick extends App {
       def byIds(c: Criteria, ids: Array[Int]) = c.add(id in ids)
 
       val c = byIds(
-          session.createCriteria(classOf[Person]),
-          Array(2, 99, 17, 234)
+        session.createCriteria(classOf[Person]),
+        Array(2, 99, 17, 234)
       )
       //#criteriaQueryComposition
     };
@@ -111,7 +111,7 @@ object OrmToSlick extends App {
       val q = session
         .createCriteria(classOf[Person])
         .add(
-            Restrictions.disjunction.add(age lt 5).add(age gt 65)
+          Restrictions.disjunction.add(age lt 5).add(age gt 65)
         )
       //#criteriaComposition
     };
@@ -123,7 +123,7 @@ object OrmToSlick extends App {
     {
       //#slickQueryWithTypes
       val q = (people: Query[People, Person, Seq]).filter(
-          (p: People) => ( ((p.age: Rep[Int]) < 5 || p.age > 65): Rep[Boolean])
+        (p: People) => (((p.age: Rep[Int]) < 5 || p.age > 65): Rep[Boolean])
       )
       //#slickQueryWithTypes
     };

@@ -15,7 +15,7 @@ object DottyVersions extends Versions {
 
   private object Dotty
       extends Entity(
-          s"$RepositoryUrl/${GroupId.replace('.', '/')}/$ArtifactId",
-          Version(DefaultRevision),
-          Seq(DefaultRevision))
+        s"$RepositoryUrl/${GroupId.replace('.', '/')}/$ArtifactId",
+        Version(DefaultRevision),
+        Seq(DefaultRevision))
 }

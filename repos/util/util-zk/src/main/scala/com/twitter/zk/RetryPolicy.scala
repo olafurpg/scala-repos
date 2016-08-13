@@ -57,7 +57,8 @@ object RetryPolicy {
           case KeeperConnectionException(_) =>
             timer
               .doLater(delay) {
-                retry((delay.inNanoseconds * factor).toLong.nanoseconds min maximum)
+                retry(
+                  (delay.inNanoseconds * factor).toLong.nanoseconds min maximum)
               }
               .flatten
         }

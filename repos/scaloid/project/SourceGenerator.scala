@@ -25,7 +25,7 @@ object SourceGenerator {
      scalaVersion,
      streams) map {
       (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion,
-      s) =>
+       s) =>
         import NameFilter._
 
         if (mName == "parent") Nil
@@ -33,8 +33,9 @@ object SourceGenerator {
           val stGroupsDir = baseDir / ".." / "project" / "st"
           val templateDir = srcDir / "st"
           val relativePath = Path.relativeTo(templateDir)
-          val scalaTemplates = recursiveListFiles(
-              templateDir, (s: String) => s.endsWith(".scala"))
+          val scalaTemplates =
+            recursiveListFiles(templateDir,
+                               (s: String) => s.endsWith(".scala"))
 
           scalaTemplates.map { (file: File) =>
             val outFile = srcDir / "scala" / relativePath(file).get
@@ -71,9 +72,9 @@ object SourceGenerator {
 
   private def formatCode(code: String, scalaVersion: String): String = {
     ScalaFormatter.format(
-        code,
-        scalariformPreferences,
-        scalaVersion = pureScalaVersion(scalaVersion)
+      code,
+      scalariformPreferences,
+      scalaVersion = pureScalaVersion(scalaVersion)
     )
   }
 

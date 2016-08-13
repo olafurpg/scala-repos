@@ -45,11 +45,11 @@ class JavaGlobalSettingsAdapter(val underlying: play.GlobalSettings)
       .getOrElse(super.onHandlerNotFound(request))
   }
 
-  override def onBadRequest(
-      request: RequestHeader, error: String): Future[Result] = {
+  override def onBadRequest(request: RequestHeader,
+                            error: String): Future[Result] = {
     JavaHelpers
-      .invokeWithContextOpt(
-          request, req => underlying.onBadRequest(req, error))
+      .invokeWithContextOpt(request,
+                            req => underlying.onBadRequest(req, error))
       .getOrElse(super.onBadRequest(request, error))
   }
 
@@ -57,11 +57,11 @@ class JavaGlobalSettingsAdapter(val underlying: play.GlobalSettings)
     try {
       Filters(super.doFilter(a),
               underlying.filters.map(
-                  _.newInstance: play.api.mvc.EssentialFilter): _*)
+                _.newInstance: play.api.mvc.EssentialFilter): _*)
     } catch {
       case NonFatal(e) => {
-          EssentialAction(req => Accumulator.done(onError(req, e)))
-        }
+        EssentialAction(req => Accumulator.done(onError(req, e)))
+      }
     }
   }
 }

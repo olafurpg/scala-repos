@@ -10,8 +10,8 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   * @since 22.09.2015.
   */
 class ScalaExpressionTypeMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     if (params.length != 1) return null
     MacroUtil
       .resultToScExpr(params.head.calculateResult(context), context)
@@ -24,7 +24,7 @@ class ScalaExpressionTypeMacro extends Macro {
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.expression.type")
+      "macro.expression.type")
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]

@@ -102,7 +102,8 @@ object LocalALS {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of ALS and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of ALS and is given as an example!
         |Please use the ALS method found in org.apache.spark.mllib.recommendation
         |for more conventional use.
       """.stripMargin)
@@ -112,15 +113,15 @@ object LocalALS {
 
     args match {
       case Array(m, u, f, iters) => {
-          M = m.toInt
-          U = u.toInt
-          F = f.toInt
-          ITERATIONS = iters.toInt
-        }
+        M = m.toInt
+        U = u.toInt
+        F = f.toInt
+        ITERATIONS = iters.toInt
+      }
       case _ => {
-          System.err.println("Usage: LocalALS <M> <U> <F> <iters>")
-          System.exit(1)
-        }
+        System.err.println("Usage: LocalALS <M> <U> <F> <iters>")
+        System.exit(1)
+      }
     }
 
     showWarning()

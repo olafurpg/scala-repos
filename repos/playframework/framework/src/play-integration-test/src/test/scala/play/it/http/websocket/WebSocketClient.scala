@@ -133,12 +133,16 @@ object WebSocketClient {
         .toScala
         .map { channel =>
           val handshaker = WebSocketClientHandshakerFactory.newHandshaker(
-              tgt, version, null, false, new DefaultHttpHeaders())
+            tgt,
+            version,
+            null,
+            false,
+            new DefaultHttpHeaders())
           channel
             .pipeline()
             .addLast(
-                "supervisor",
-                new WebSocketSupervisor(disconnected, handshaker, onConnected))
+              "supervisor",
+              new WebSocketSupervisor(disconnected, handshaker, onConnected))
           handshaker.handshake(channel)
           channel.read()
         }
@@ -161,16 +165,18 @@ object WebSocketClient {
       msg match {
         case resp: HttpResponse if handshaker.isHandshakeComplete =>
           throw new WebSocketException(
-              "Unexpected HttpResponse (status=" + resp.getStatus + ")")
+            "Unexpected HttpResponse (status=" + resp.getStatus + ")")
         case resp: FullHttpResponse =>
           // Setup the pipeline
-          val publisher = new HandlerPublisher(
-              ctx.executor, classOf[WebSocketFrame])
+          val publisher =
+            new HandlerPublisher(ctx.executor, classOf[WebSocketFrame])
           val subscriber = new HandlerSubscriber[WebSocketFrame](ctx.executor)
-          ctx.pipeline.addAfter(
-              ctx.executor, ctx.name, "websocket-subscriber", subscriber)
-          ctx.pipeline.addAfter(
-              ctx.executor, ctx.name, "websocket-publisher", publisher)
+          ctx.pipeline.addAfter(ctx.executor,
+                                ctx.name,
+                                "websocket-subscriber",
+                                subscriber)
+          ctx.pipeline
+            .addAfter(ctx.executor, ctx.name, "websocket-publisher", publisher)
 
           // Now remove ourselves from the chain
           ctx.pipeline.remove(ctx.name)
@@ -178,7 +184,8 @@ object WebSocketClient {
           handshaker.finishHandshake(ctx.channel(), resp)
 
           val clientConnection = Flow.fromSinkAndSource(
-              Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
+            Sink.fromSubscriber(subscriber),
+            Source.fromPublisher(publisher))
 
           onConnected(webSocketProtocol(clientConnection))
 
@@ -194,7 +201,7 @@ object WebSocketClient {
       val clientInitiatedClose = new AtomicBoolean
 
       val captureClientClose = Flow[WebSocketFrame].transform(() =>
-            new PushStage[WebSocketFrame, WebSocketFrame] {
+        new PushStage[WebSocketFrame, WebSocketFrame] {
           def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
             elem match {
               case close: CloseWebSocketFrame =>
@@ -209,14 +216,17 @@ object WebSocketClient {
         case SimpleMessage(TextMessage(data), finalFragment) =>
           new TextWebSocketFrame(finalFragment, 0, data)
         case SimpleMessage(BinaryMessage(data), finalFragment) =>
-          new BinaryWebSocketFrame(
-              finalFragment, 0, Unpooled.wrappedBuffer(data.asByteBuffer))
+          new BinaryWebSocketFrame(finalFragment,
+                                   0,
+                                   Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(PingMessage(data), finalFragment) =>
-          new PingWebSocketFrame(
-              finalFragment, 0, Unpooled.wrappedBuffer(data.asByteBuffer))
+          new PingWebSocketFrame(finalFragment,
+                                 0,
+                                 Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(PongMessage(data), finalFragment) =>
-          new PongWebSocketFrame(
-              finalFragment, 0, Unpooled.wrappedBuffer(data.asByteBuffer))
+          new PongWebSocketFrame(finalFragment,
+                                 0,
+                                 Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(CloseMessage(statusCode, reason), finalFragment) =>
           new CloseWebSocketFrame(finalFragment,
                                   0,
@@ -224,7 +234,9 @@ object WebSocketClient {
                                   reason)
         case ContinuationMessage(data, finalFragment) =>
           new ContinuationWebSocketFrame(
-              finalFragment, 0, Unpooled.wrappedBuffer(data.asByteBuffer))
+            finalFragment,
+            0,
+            Unpooled.wrappedBuffer(data.asByteBuffer))
       }
 
       val framesToMessages = Flow[WebSocketFrame].map { frame =>
@@ -232,80 +244,84 @@ object WebSocketClient {
           case text: TextWebSocketFrame =>
             SimpleMessage(TextMessage(text.text()), text.isFinalFragment)
           case binary: BinaryWebSocketFrame =>
-            SimpleMessage(
-                BinaryMessage(toByteString(binary)), binary.isFinalFragment)
+            SimpleMessage(BinaryMessage(toByteString(binary)),
+                          binary.isFinalFragment)
           case ping: PingWebSocketFrame =>
-            SimpleMessage(
-                PingMessage(toByteString(ping)), ping.isFinalFragment)
+            SimpleMessage(PingMessage(toByteString(ping)),
+                          ping.isFinalFragment)
           case pong: PongWebSocketFrame =>
-            SimpleMessage(
-                PongMessage(toByteString(pong)), pong.isFinalFragment)
+            SimpleMessage(PongMessage(toByteString(pong)),
+                          pong.isFinalFragment)
           case close: CloseWebSocketFrame =>
             SimpleMessage(
-                CloseMessage(Some(close.statusCode()), close.reasonText()),
-                close.isFinalFragment)
+              CloseMessage(Some(close.statusCode()), close.reasonText()),
+              close.isFinalFragment)
           case continuation: ContinuationWebSocketFrame =>
-            ContinuationMessage(
-                toByteString(continuation), continuation.isFinalFragment)
+            ContinuationMessage(toByteString(continuation),
+                                continuation.isFinalFragment)
         }
         ReferenceCountUtil.release(frame)
         message
       }
 
       messagesToFrames via captureClientClose via Flow.fromGraph(
-          GraphDSL.create[FlowShape[WebSocketFrame, WebSocketFrame]]() {
-        implicit b =>
-          import GraphDSL.Implicits._
+        GraphDSL
+          .create[FlowShape[WebSocketFrame, WebSocketFrame]]() {
+            implicit b =>
+              import GraphDSL.Implicits._
 
-          val broadcast = b.add(Broadcast[WebSocketFrame](2))
-          val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
+              val broadcast = b.add(Broadcast[WebSocketFrame](2))
+              val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
 
-          val handleServerClose = Flow[WebSocketFrame].filter {
-            frame =>
-              if (frame.isInstanceOf[CloseWebSocketFrame] &&
-                  !clientInitiatedClose.get()) {
-                serverInitiatedClose.set(true)
-                true
-              } else {
-                // If we're going to drop it, we need to release it first
-                ReferenceCountUtil.release(frame)
-                false
-              }
-          }
-
-          val handleConnectionTerminated = Flow[WebSocketFrame].transform(() =>
-                new PushStage[WebSocketFrame, WebSocketFrame] {
-              def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
-                ctx.push(elem)
-              override def onUpstreamFinish(ctx: Context[WebSocketFrame]) = {
-                disconnected.trySuccess(())
-                super.onUpstreamFinish(ctx)
-              }
-              override def onUpstreamFailure(cause: Throwable,
-                                             ctx: Context[WebSocketFrame]) = {
-                if (serverInitiatedClose.get()) {
-                  disconnected.trySuccess(())
-                  ctx.finish()
+              val handleServerClose = Flow[WebSocketFrame].filter { frame =>
+                if (frame.isInstanceOf[CloseWebSocketFrame] &&
+                    !clientInitiatedClose.get()) {
+                  serverInitiatedClose.set(true)
+                  true
                 } else {
-                  disconnected.tryFailure(cause)
-                  ctx.fail(cause)
+                  // If we're going to drop it, we need to release it first
+                  ReferenceCountUtil.release(frame)
+                  false
                 }
               }
-          })
 
-          /**
-            * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.
-            */
-          val retainForBroadcast = Flow[WebSocketFrame].map { frame =>
-            ReferenceCountUtil.retain(frame)
-            frame
-          }
+              val handleConnectionTerminated =
+                Flow[WebSocketFrame].transform(() =>
+                  new PushStage[WebSocketFrame, WebSocketFrame] {
+                    def onPush(elem: WebSocketFrame,
+                               ctx: Context[WebSocketFrame]) =
+                      ctx.push(elem)
+                    override def onUpstreamFinish(
+                        ctx: Context[WebSocketFrame]) = {
+                      disconnected.trySuccess(())
+                      super.onUpstreamFinish(ctx)
+                    }
+                    override def onUpstreamFailure(
+                        cause: Throwable,
+                        ctx: Context[WebSocketFrame]) = {
+                      if (serverInitiatedClose.get()) {
+                        disconnected.trySuccess(())
+                        ctx.finish()
+                      } else {
+                        disconnected.tryFailure(cause)
+                        ctx.fail(cause)
+                      }
+                    }
+                })
 
-          merge.out ~> clientConnection ~> handleConnectionTerminated ~> retainForBroadcast ~> broadcast.in
-          merge.in(0) <~ handleServerClose <~ broadcast.out(0)
+              /**
+                * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.
+                */
+              val retainForBroadcast = Flow[WebSocketFrame].map { frame =>
+                ReferenceCountUtil.retain(frame)
+                frame
+              }
 
-          FlowShape(merge.in(1), broadcast.out(1))
-      }) via framesToMessages
+              merge.out ~> clientConnection ~> handleConnectionTerminated ~> retainForBroadcast ~> broadcast.in
+              merge.in(0) <~ handleServerClose <~ broadcast.out(0)
+
+              FlowShape(merge.in(1), broadcast.out(1))
+          }) via framesToMessages
     }
 
     def toByteString(data: ByteBufHolder) = {

@@ -25,8 +25,8 @@ object ExitGuard {
   }
 
   private def updateName() {
-    for ((t, gs) <- guards) t.setName(
-        "Finagle ExitGuard count=%d".format(gs.size))
+    for ((t, gs) <- guards)
+      t.setName("Finagle ExitGuard count=%d".format(gs.size))
   }
 
   /**
@@ -60,7 +60,7 @@ object ExitGuard {
       "There are no active guards."
     } else {
       s"${snap.size} active guard(s):" +
-      snap.map(_.reason).mkString(start = "\n", sep = "\n", end = "")
+        snap.map(_.reason).mkString(start = "\n", sep = "\n", end = "")
     }
   }
 
@@ -71,7 +71,8 @@ object ExitGuard {
 
       override def run() {
         while (true) {
-          try Thread.sleep(Long.MaxValue) catch {
+          try Thread.sleep(Long.MaxValue)
+          catch {
             case _: InterruptedException => return
           }
         }

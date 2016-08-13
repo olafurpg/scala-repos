@@ -21,13 +21,15 @@ object LoadJournalSpec {
 
 class LoadJournalSpec
     extends PersistenceSpec(
-        PersistenceSpec.config(
-            "inmem",
-            "LoadJournalSpec",
-            extraConfig = Some("""
+      PersistenceSpec.config(
+        "inmem",
+        "LoadJournalSpec",
+        extraConfig = Some(
+          """
   akka.persistence.journal.inmem.class = "akka.persistence.LoadJournalSpec$JournalWithConfig"
   akka.persistence.journal.inmem.extra-property = 17
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
   import LoadJournalSpec._
 
   "A journal with config parameter" must {

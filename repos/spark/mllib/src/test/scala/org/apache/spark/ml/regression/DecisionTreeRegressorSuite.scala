@@ -22,13 +22,17 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.{DefaultReadWriteTest, MLTestingUtils}
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{DecisionTree => OldDecisionTree, DecisionTreeSuite => OldDecisionTreeSuite}
+import org.apache.spark.mllib.tree.{
+  DecisionTree => OldDecisionTree,
+  DecisionTreeSuite => OldDecisionTreeSuite
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 
 class DecisionTreeRegressorSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import DecisionTreeRegressorSuite.compareAPIs
@@ -37,8 +41,8 @@ class DecisionTreeRegressorSuite
 
   override def beforeAll() {
     super.beforeAll()
-    categoricalDataPointsRDD = sc.parallelize(
-        OldDecisionTreeSuite.generateCategoricalDataPoints())
+    categoricalDataPointsRDD =
+      sc.parallelize(OldDecisionTreeSuite.generateCategoricalDataPoints())
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -66,8 +70,9 @@ class DecisionTreeRegressorSuite
 
   test("copied model must have the same parent") {
     val categoricalFeatures = Map(0 -> 2, 1 -> 2)
-    val df = TreeTests.setMetadata(
-        categoricalDataPointsRDD, categoricalFeatures, numClasses = 0)
+    val df = TreeTests.setMetadata(categoricalDataPointsRDD,
+                                   categoricalFeatures,
+                                   numClasses = 0)
     val model = new DecisionTreeRegressor()
       .setImpurity("variance")
       .setMaxDepth(2)
@@ -85,8 +90,9 @@ class DecisionTreeRegressorSuite
       .setVarianceCol("variance")
     val categoricalFeatures = Map(0 -> 2, 1 -> 2)
 
-    val df = TreeTests.setMetadata(
-        categoricalDataPointsRDD, categoricalFeatures, numClasses = 0)
+    val df = TreeTests.setMetadata(categoricalDataPointsRDD,
+                                   categoricalFeatures,
+                                   numClasses = 0)
     val model = dt.fit(df)
 
     val predictions = model
@@ -140,21 +146,25 @@ class DecisionTreeRegressorSuite
     // Categorical splits with tree depth 2
     val categoricalData: DataFrame =
       TreeTests.setMetadata(rdd, Map(0 -> 2, 1 -> 3), numClasses = 0)
-    testEstimatorAndModelReadWrite(
-        dt, categoricalData, TreeTests.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(dt,
+                                   categoricalData,
+                                   TreeTests.allParamSettings,
+                                   checkModelData)
 
     // Continuous splits with tree depth 2
     val continuousData: DataFrame =
       TreeTests.setMetadata(rdd, Map.empty[Int, Int], numClasses = 0)
-    testEstimatorAndModelReadWrite(
-        dt, continuousData, TreeTests.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(dt,
+                                   continuousData,
+                                   TreeTests.allParamSettings,
+                                   checkModelData)
 
     // Continuous splits with tree depth 0
     testEstimatorAndModelReadWrite(
-        dt,
-        continuousData,
-        TreeTests.allParamSettings ++ Map("maxDepth" -> 0),
-        checkModelData)
+      dt,
+      continuousData,
+      TreeTests.allParamSettings ++ Map("maxDepth" -> 0),
+      checkModelData)
   }
 }
 
@@ -175,9 +185,9 @@ private[ml] object DecisionTreeRegressorSuite extends SparkFunSuite {
     val newTree = dt.fit(newData)
     // Use parent from newTree since this is not checked anyways.
     val oldTreeAsNew = DecisionTreeRegressionModel.fromOld(
-        oldTree,
-        newTree.parent.asInstanceOf[DecisionTreeRegressor],
-        categoricalFeatures)
+      oldTree,
+      newTree.parent.asInstanceOf[DecisionTreeRegressor],
+      categoricalFeatures)
     TreeTests.checkEqual(oldTreeAsNew, newTree)
     assert(newTree.numFeatures === numFeatures)
   }

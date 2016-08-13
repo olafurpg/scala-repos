@@ -66,7 +66,7 @@ abstract class NarrowDependency[T](_rdd: RDD[T]) extends Dependency[T] {
   * @param mapSideCombine whether to perform partial aggregation (also known as map-side combine)
   */
 @DeveloperApi
-class ShuffleDependency[K : ClassTag, V : ClassTag, C : ClassTag](
+class ShuffleDependency[K: ClassTag, V: ClassTag, C: ClassTag](
     @transient private val _rdd: RDD[_ <: Product2[K, V]],
     val partitioner: Partitioner,
     val serializer: Serializer = SparkEnv.get.serializer,

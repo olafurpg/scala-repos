@@ -40,15 +40,15 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val warnings = inline(request)
       for (warning <- warnings) {
         if ((callee.annotatedInline &&
-                btypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
+            btypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
             warning.emitWarning(compilerSettings)) {
           val annotWarn =
             if (callee.annotatedInline) " is annotated @inline but" else ""
           val msg =
             s"${BackendReporting.methodSignature(callee.calleeDeclarationClass.internalName,
                                                  callee.callee)}$annotWarn could not be inlined:\n$warning"
-          backendReporting.inlinerWarning(
-              request.callsite.callsitePosition, msg)
+          backendReporting
+            .inlinerWarning(request.callsite.callsitePosition, msg)
         }
       }
     }
@@ -85,8 +85,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     // `callsties` map while iterating it.
     val toRewrite = mutable.ArrayBuffer.empty[Callsite]
     for (css <- callsites.valuesIterator; cs <- css.valuesIterator
-                                                   if doRewriteTraitCallsite(
-                                                   cs)) toRewrite += cs
+         if doRewriteTraitCallsite(cs)) toRewrite += cs
     toRewrite foreach rewriteFinalTraitMethodInvocation
   }
 
@@ -107,8 +106,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     */
   def rewriteFinalTraitMethodInvocation(callsite: Callsite): Unit = {
     // The analyzer used below needs to have a non-null frame for the callsite instruction
-    localOpt.minimalRemoveUnreachableCode(
-        callsite.callsiteMethod, callsite.callsiteClass.internalName)
+    localOpt.minimalRemoveUnreachableCode(callsite.callsiteMethod,
+                                          callsite.callsiteClass.internalName)
 
     // If the callsite was eliminated by DCE, do nothing.
     if (!callGraph.containsCallsite(callsite)) return
@@ -130,10 +129,11 @@ class Inliner[BT <: BTypes](val btypes: BT) {
 
     val selfParamTypeV: Either[OptimizerWarning, ClassBType] =
       calleeDeclarationClass.info.map(
-          _.inlineInfo.traitImplClassSelfType match {
-        case Some(internalName) => classBTypeFromParsedClassfile(internalName)
-        case None => calleeDeclarationClass
-      })
+        _.inlineInfo.traitImplClassSelfType match {
+          case Some(internalName) =>
+            classBTypeFromParsedClassfile(internalName)
+          case None => calleeDeclarationClass
+        })
 
     def implClassMethodV(
         implMethodDescriptor: String): Either[OptimizerWarning, MethodNode] = {
@@ -147,8 +147,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     val res = for {
       selfParamType <- selfParamTypeV
       implMethodDescriptor = asm.Type.getMethodDescriptor(
-          asm.Type.getReturnType(callee.desc),
-          selfParamType.toASMType +: traitMethodArgumentTypes: _*)
+        asm.Type.getReturnType(callee.desc),
+        selfParamType.toASMType +: traitMethodArgumentTypes: _*)
       implClassMethod <- implClassMethodV(implMethodDescriptor)
       implClassBType = classBTypeFromParsedClassfile(implClassInternalName)
       selfTypeOk <- calleeDeclarationClass.isSubtypeOf(selfParamType)
@@ -184,24 +184,24 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         .insert(callsite.callsiteInstruction, newCallsiteInstruction)
       callsite.callsiteMethod.instructions.remove(callsite.callsiteInstruction)
 
-      callGraph.removeCallsite(
-          callsite.callsiteInstruction, callsite.callsiteMethod)
+      callGraph
+        .removeCallsite(callsite.callsiteInstruction, callsite.callsiteMethod)
       val staticCallSamParamTypes = {
         if (selfParamType.info.get.inlineInfo.sam.isEmpty) samParamTypes - 0
         else samParamTypes.updated(0, selfParamType)
       }
       val staticCallsite = callsite.copy(
-          callsiteInstruction = newCallsiteInstruction,
-          callee = Right(
-                Callee(callee = implClassMethod,
-                       calleeDeclarationClass = implClassBType,
-                       safeToInline = true,
-                       safeToRewrite = false,
-                       canInlineFromSource = canInlineFromSource,
-                       annotatedInline = annotatedInline,
-                       annotatedNoInline = annotatedNoInline,
-                       samParamTypes = staticCallSamParamTypes,
-                       calleeInfoWarning = infoWarning))
+        callsiteInstruction = newCallsiteInstruction,
+        callee = Right(
+          Callee(callee = implClassMethod,
+                 calleeDeclarationClass = implClassBType,
+                 safeToInline = true,
+                 safeToRewrite = false,
+                 canInlineFromSource = canInlineFromSource,
+                 annotatedInline = annotatedInline,
+                 annotatedNoInline = annotatedNoInline,
+                 samParamTypes = staticCallSamParamTypes,
+                 calleeInfoWarning = infoWarning))
       )
       callGraph.addCallsite(staticCallsite)
     }
@@ -209,11 +209,12 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     for (warning <- res.left) {
       val Right(callee) = callsite.callee
       val newCallee = callee.copy(
-          calleeInfoWarning = Some(RewriteTraitCallToStaticImplMethodFailed(
-                    calleeDeclarationClass.internalName,
-                    callee.callee.name,
-                    callee.callee.desc,
-                    warning)))
+        calleeInfoWarning = Some(
+          RewriteTraitCallToStaticImplMethodFailed(
+            calleeDeclarationClass.internalName,
+            callee.callee.name,
+            callee.callee.desc,
+            warning)))
       callGraph.addCallsite(callsite.copy(callee = Right(newCallee)))
     }
   }
@@ -243,8 +244,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       // is there a path of inline requests from start to goal?
       def isReachable(start: MethodNode, goal: MethodNode): Boolean = {
         @tailrec
-        def reachableImpl(
-            check: List[MethodNode], visited: Set[MethodNode]): Boolean =
+        def reachableImpl(check: List[MethodNode],
+                          visited: Set[MethodNode]): Boolean =
           check match {
             case x :: xs =>
               if (x == goal) true
@@ -267,8 +268,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       java.util.Arrays.sort(requests, callsiteOrdering)
       for (r <- requests) {
         // is there a chain of inlining requests that would inline the callsite method into the callee?
-        if (isReachable(
-                r.callsite.callee.get.callee, r.callsite.callsiteMethod))
+        if (isReachable(r.callsite.callee.get.callee,
+                        r.callsite.callsiteMethod))
           elided += r
         else result += r
       }
@@ -282,12 +283,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         visited: Set[InlineRequest] = Set.empty): List[InlineRequest] = {
       if (requests.isEmpty) Nil
       else {
-        val (leaves, others) = requests.partition(
-            r =>
-              {
-            val inlineRequestsForCallee =
-              nonElidedRequests(r.callsite.callee.get.callee)
-            inlineRequestsForCallee.forall(visited)
+        val (leaves, others) = requests.partition(r => {
+          val inlineRequestsForCallee =
+            nonElidedRequests(r.callsite.callee.get.callee)
+          inlineRequestsForCallee.forall(visited)
         })
         assert(leaves.nonEmpty, requests)
         leaves ::: leavesFirst(others, visited ++ leaves)
@@ -343,7 +342,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     *     - so we create an inline request for c1''
     */
   def adaptPostRequestForMainCallsite(
-      post: InlineRequest, mainCallsite: Callsite): List[InlineRequest] = {
+      post: InlineRequest,
+      mainCallsite: Callsite): List[InlineRequest] = {
     def impl(post: InlineRequest, at: Callsite): List[InlineRequest] = {
       post.callsite.inlinedClones.find(_.clonedWhenInlining == at) match {
         case Some(clonedCallsite) =>
@@ -366,7 +366,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       case None =>
         inlineCallsite(request.callsite)
         val postRequests = request.post.flatMap(
-            adaptPostRequestForMainCallsite(_, request.callsite))
+          adaptPostRequestForMainCallsite(_, request.callsite))
         postRequests flatMap inline
     }
 
@@ -381,7 +381,13 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     *         instruction in the callsite method.
     */
   def inlineCallsite(callsite: Callsite): Unit = {
-    import callsite.{callsiteClass, callsiteMethod, callsiteInstruction, receiverKnownNotNull, callsiteStackHeight}
+    import callsite.{
+      callsiteClass,
+      callsiteMethod,
+      callsiteInstruction,
+      receiverKnownNotNull,
+      callsiteStackHeight
+    }
     val Right(callsiteCallee) = callsite.callee
     import callsiteCallee.{callee, calleeDeclarationClass}
 
@@ -391,16 +397,17 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     //   def g = f; println() // println is unreachable after inlining f
     // If we have an inline request for a call to g, and f has been already inlined into g, we
     // need to run DCE on g's body before inlining g.
-    localOpt.minimalRemoveUnreachableCode(
-        callee, calleeDeclarationClass.internalName)
+    localOpt.minimalRemoveUnreachableCode(callee,
+                                          calleeDeclarationClass.internalName)
 
     // If the callsite was eliminated by DCE, do nothing.
     if (!callGraph.containsCallsite(callsite)) return
 
     // New labels for the cloned instructions
     val labelsMap = cloneLabels(callee)
-    val (
-    clonedInstructions, instructionMap, hasSerializableClosureInstantiation) =
+    val (clonedInstructions,
+         instructionMap,
+         hasSerializableClosureInstantiation) =
       cloneInstructions(callee, labelsMap)
     val keepLineNumbers = callsiteClass == calleeDeclarationClass
     if (!keepLineNumbers) {
@@ -477,7 +484,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     val analyzer = new AsmAnalyzer(callee, calleeDeclarationClass.internalName)
 
     for (originalReturn <- callee.instructions.iterator().asScala if isReturn(
-                              originalReturn)) {
+           originalReturn)) {
       val frame = analyzer.frameAt(originalReturn)
       var stackHeight = frame.getStackSize
 
@@ -513,14 +520,17 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     callsiteMethod.instructions.insert(callsiteInstruction, clonedInstructions)
     callsiteMethod.instructions.remove(callsiteInstruction)
 
-    callsiteMethod.localVariables.addAll(cloneLocalVariableNodes(
-            callee, labelsMap, callee.name + "_", localVarShift).asJava)
+    callsiteMethod.localVariables.addAll(
+      cloneLocalVariableNodes(callee,
+                              labelsMap,
+                              callee.name + "_",
+                              localVarShift).asJava)
     // prepend the handlers of the callee. the order of handlers matters: when an exception is thrown
     // at some instruction, the first handler guarding that instruction and having a matching exception
     // type is executed. prepending the callee's handlers makes sure to test those handlers first if
     // an exception is thrown in the inlined code.
-    callsiteMethod.tryCatchBlocks.addAll(
-        0, cloneTryCatchBlockNodes(callee, labelsMap).asJava)
+    callsiteMethod.tryCatchBlocks
+      .addAll(0, cloneTryCatchBlockNodes(callee, labelsMap).asJava)
 
     callsiteMethod.maxLocals += returnType.getSize + callee.maxLocals
     val maxStackOfInlinedCode = {
@@ -535,19 +545,20 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       // and stored into locals before the null check, so in that case the maxStack doesn't grow.
       val stackSlotForNullCheck =
         if (!isStaticMethod(callee) && !receiverKnownNotNull &&
-            calleeParamTypes.isEmpty) 1 else 0
+            calleeParamTypes.isEmpty) 1
+        else 0
       callsiteStackHeight + stackSlotForNullCheck
     }
 
     callsiteMethod.maxStack = math.max(
-        callsiteMethod.maxStack,
-        math.max(stackHeightAtNullCheck, maxStackOfInlinedCode))
+      callsiteMethod.maxStack,
+      math.max(stackHeightAtNullCheck, maxStackOfInlinedCode))
 
     if (hasSerializableClosureInstantiation &&
         !indyLambdaHosts(callsiteClass.internalName)) {
       indyLambdaHosts += callsiteClass.internalName
       addLambdaDeserialize(
-          byteCodeRepository.classNode(callsiteClass.internalName).get)
+        byteCodeRepository.classNode(callsiteClass.internalName).get)
     }
 
     callGraph.addIfMissing(callee, calleeDeclarationClass)
@@ -565,11 +576,11 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         .asInstanceOf[MethodInsnNode]
       val argInfos = originalCallsite.argInfos flatMap mapArgInfo
       val newCallsite = originalCallsite.copy(
-          callsiteInstruction = newCallsiteIns,
-          callsiteMethod = callsiteMethod,
-          callsiteClass = callsiteClass,
-          argInfos = argInfos,
-          callsiteStackHeight = callsiteStackHeight +
+        callsiteInstruction = newCallsiteIns,
+        callsiteMethod = callsiteMethod,
+        callsiteClass = callsiteClass,
+        argInfos = argInfos,
+        callsiteStackHeight = callsiteStackHeight +
             originalCallsite.callsiteStackHeight
       )
       originalCallsite.inlinedClones += ClonedCallsite(newCallsite, callsite)
@@ -584,10 +595,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         val capturedArgInfos =
           originalClosureInit.capturedArgInfos flatMap mapArgInfo
         val newClosureInit = ClosureInstantiation(
-            originalClosureInit.lambdaMetaFactoryCall.copy(indy = newIndy),
-            callsiteMethod,
-            callsiteClass,
-            capturedArgInfos)
+          originalClosureInit.lambdaMetaFactoryCall.copy(indy = newIndy),
+          callsiteMethod,
+          callsiteClass,
+          capturedArgInfos)
         originalClosureInit.inlinedClones += newClosureInit
         callGraph.addClosureInstantiation(newClosureInit)
     }
@@ -617,16 +628,18 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     if (isSynchronizedMethod(callee)) {
       // Could be done by locking on the receiver, wrapping the inlined code in a try and unlocking
       // in finally. But it's probably not worth the effort, scala never emits synchronized methods.
-      Some(SynchronizedMethod(
-              calleeDeclarationClass.internalName, callee.name, callee.desc))
+      Some(
+        SynchronizedMethod(calleeDeclarationClass.internalName,
+                           callee.name,
+                           callee.desc))
     } else if (isStrictfpMethod(callsiteMethod) != isStrictfpMethod(callee)) {
       Some(
-          StrictfpMismatch(calleeDeclarationClass.internalName,
-                           callee.name,
-                           callee.desc,
-                           callsiteClass.internalName,
-                           callsiteMethod.name,
-                           callsiteMethod.desc))
+        StrictfpMismatch(calleeDeclarationClass.internalName,
+                         callee.name,
+                         callee.desc,
+                         callsiteClass.internalName,
+                         callsiteMethod.name,
+                         callsiteMethod.desc))
     } else None
   }
 
@@ -643,7 +656,12 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     * @return `Some(message)` if inlining cannot be performed, `None` otherwise
     */
   def canInlineBody(callsite: Callsite): Option[CannotInlineWarning] = {
-    import callsite.{callsiteInstruction, callsiteMethod, callsiteClass, callsiteStackHeight}
+    import callsite.{
+      callsiteInstruction,
+      callsiteMethod,
+      callsiteClass,
+      callsiteStackHeight
+    }
     val Right(callsiteCallee) = callsite.callee
     import callsiteCallee.{callee, calleeDeclarationClass}
 
@@ -653,13 +671,13 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       s"Wrong method node for inlining ${textify(callsiteInstruction)}: $calleeDesc"
     assert(callsiteInstruction.name == callee.name, methodMismatch)
     assert(callsiteInstruction.desc == callee.desc, methodMismatch)
-    assert(
-        !isConstructor(callee), s"Constructors cannot be inlined: $calleeDesc")
+    assert(!isConstructor(callee),
+           s"Constructors cannot be inlined: $calleeDesc")
     assert(!BytecodeUtils.isAbstractMethod(callee),
            s"Callee is abstract: $calleeDesc")
     assert(
-        callsiteMethod.instructions.contains(callsiteInstruction),
-        s"Callsite ${textify(callsiteInstruction)} is not an instruction of $calleeDesc")
+      callsiteMethod.instructions.contains(callsiteInstruction),
+      s"Callsite ${textify(callsiteInstruction)} is not an instruction of $calleeDesc")
 
     // When an exception is thrown, the stack is cleared before jumping to the handler. When
     // inlining a method that catches an exception, all values that were on the stack before the
@@ -671,36 +689,37 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     def stackHasNonParameters: Boolean = {
       val expectedArgs =
         asm.Type.getArgumentTypes(callsiteInstruction.desc).length +
-        (callsiteInstruction.getOpcode match {
-              case INVOKEVIRTUAL | INVOKESPECIAL | INVOKEINTERFACE => 1
-              case INVOKESTATIC => 0
-              case INVOKEDYNAMIC =>
-                assertionError(
-                    s"Unexpected opcode, cannot inline ${textify(callsiteInstruction)}")
-            })
+          (callsiteInstruction.getOpcode match {
+            case INVOKEVIRTUAL | INVOKESPECIAL | INVOKEINTERFACE => 1
+            case INVOKESTATIC => 0
+            case INVOKEDYNAMIC =>
+              assertionError(
+                s"Unexpected opcode, cannot inline ${textify(callsiteInstruction)}")
+          })
       callsiteStackHeight > expectedArgs
     }
 
     if (codeSizeOKForInlining(callsiteMethod, callee)) {
       Some(
-          ResultingMethodTooLarge(calleeDeclarationClass.internalName,
-                                  callee.name,
-                                  callee.desc,
-                                  callsiteClass.internalName,
-                                  callsiteMethod.name,
-                                  callsiteMethod.desc))
+        ResultingMethodTooLarge(calleeDeclarationClass.internalName,
+                                callee.name,
+                                callee.desc,
+                                callsiteClass.internalName,
+                                callsiteMethod.name,
+                                callsiteMethod.desc))
     } else if (!callee.tryCatchBlocks.isEmpty && stackHasNonParameters) {
       Some(
-          MethodWithHandlerCalledOnNonEmptyStack(
-              calleeDeclarationClass.internalName,
-              callee.name,
-              callee.desc,
-              callsiteClass.internalName,
-              callsiteMethod.name,
-              callsiteMethod.desc))
+        MethodWithHandlerCalledOnNonEmptyStack(
+          calleeDeclarationClass.internalName,
+          callee.name,
+          callee.desc,
+          callsiteClass.internalName,
+          callsiteMethod.name,
+          callsiteMethod.desc))
     } else
-      findIllegalAccess(
-          callee.instructions, calleeDeclarationClass, callsiteClass) map {
+      findIllegalAccess(callee.instructions,
+                        calleeDeclarationClass,
+                        callsiteClass) map {
         case (illegalAccessIns, None) =>
           IllegalAccessInstruction(calleeDeclarationClass.internalName,
                                    callee.name,
@@ -723,8 +742,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     *  (A1) C is public
     *  (A2) C and D are members of the same run-time package
     */
-  def classIsAccessible(
-      accessed: BType, from: ClassBType): Either[OptimizerWarning, Boolean] =
+  def classIsAccessible(accessed: BType,
+                        from: ClassBType): Either[OptimizerWarning, Boolean] =
     (accessed: @unchecked) match {
       // TODO: A2 requires "same run-time package", which seems to be package + classloader (JMVS 5.3.). is the below ok?
       case c: ClassBType =>
@@ -794,7 +813,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
                 from.isSubtypeOf(memberRefClass).orThrow
               }
             Right(
-                (condB2 || samePackageAsDestination /* B3 (protected) */ ) &&
+              (condB2 || samePackageAsDestination /* B3 (protected) */ ) &&
                 (isStatic || targetObjectConformsToDestinationClass) // (P)
             )
           }
@@ -845,22 +864,24 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           // "must be a symbolic reference to a class, array, or interface type" (JVMS 6), so
           // it can be an internal name, or a full array descriptor.
           classIsAccessible(
-              bTypeForDescriptorOrInternalNameFromClassfile(ti.desc),
-              destinationClass)
+            bTypeForDescriptorOrInternalNameFromClassfile(ti.desc),
+            destinationClass)
 
         case ma: MultiANewArrayInsnNode =>
           // "a symbolic reference to a class, array, or interface type"
           classIsAccessible(
-              bTypeForDescriptorOrInternalNameFromClassfile(ma.desc),
-              destinationClass)
+            bTypeForDescriptorOrInternalNameFromClassfile(ma.desc),
+            destinationClass)
 
         case fi: FieldInsnNode =>
           val fieldRefClass = classBTypeFromParsedClassfile(fi.owner)
           for {
             (fieldNode, fieldDeclClassNode) <- byteCodeRepository.fieldNode(
-                fieldRefClass.internalName,
-                fi.name,
-                fi.desc): Either[OptimizerWarning, (FieldNode, InternalName)]
+                                                fieldRefClass.internalName,
+                                                fi.name,
+                                                fi.desc): Either[
+                                                OptimizerWarning,
+                                                (FieldNode, InternalName)]
             fieldDeclClass = classBTypeFromParsedClassfile(fieldDeclClassNode)
             res <- memberIsAccessible(fieldNode.access,
                                       fieldDeclClass,
@@ -897,11 +918,15 @@ class Inliner[BT <: BTypes](val btypes: BT) {
 
             val methodRefClass = classBTypeFromParsedClassfile(mi.owner)
             for {
-              (methodNode, methodDeclClassNode) <- byteCodeRepository.methodNode(
-                  methodRefClass.internalName, mi.name, mi.desc): Either[
-                  OptimizerWarning, (MethodNode, InternalName)]
+              (methodNode, methodDeclClassNode) <- byteCodeRepository
+                                                    .methodNode(
+                                                      methodRefClass.internalName,
+                                                      mi.name,
+                                                      mi.desc): Either[
+                                                    OptimizerWarning,
+                                                    (MethodNode, InternalName)]
               methodDeclClass = classBTypeFromParsedClassfile(
-                  methodDeclClassNode)
+                methodDeclClassNode)
               res <- canInlineCall(mi.getOpcode,
                                    methodNode.access,
                                    methodDeclClass,
@@ -964,15 +989,16 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           // capability, and we can safely inline the instruction into a different class.
 
           val methodRefClass = classBTypeFromParsedClassfile(
-              implMethod.getOwner)
+            implMethod.getOwner)
           for {
             (methodNode, methodDeclClassNode) <- byteCodeRepository.methodNode(
-                methodRefClass.internalName,
-                implMethod.getName,
-                implMethod.getDesc): Either[
-                OptimizerWarning, (MethodNode, InternalName)]
+                                                  methodRefClass.internalName,
+                                                  implMethod.getName,
+                                                  implMethod.getDesc): Either[
+                                                  OptimizerWarning,
+                                                  (MethodNode, InternalName)]
             methodDeclClass = classBTypeFromParsedClassfile(
-                methodDeclClassNode)
+              methodDeclClassNode)
             res <- memberIsAccessible(methodNode.access,
                                       methodDeclClass,
                                       methodRefClass,
@@ -987,7 +1013,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           ci.cst match {
             case t: asm.Type =>
               classIsAccessible(bTypeForDescriptorOrInternalNameFromClassfile(
-                                    t.getInternalName),
+                                  t.getInternalName),
                                 destinationClass)
             case _ => Right(true)
           }

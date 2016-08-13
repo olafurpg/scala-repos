@@ -30,12 +30,12 @@ object LU extends UFunc {
       val ipiv = Array.ofDim[Int](scala.math.min(M, N))
       val info = new intW(0)
       lapack.dgetrf(
-          M /* rows */,
-          N /* cols */,
-          Y.data,
-          scala.math.max(1, M) /* LDA */,
-          ipiv /* pivot indices */,
-          info
+        M /* rows */,
+        N /* cols */,
+        Y.data,
+        scala.math.max(1, M) /* LDA */,
+        ipiv /* pivot indices */,
+        info
       )
       // A value of info.`val` < 0 would tell us that the i-th argument
       // of the call to dsyev was erroneous (where i == |info.`val`|).
@@ -64,12 +64,12 @@ object LU extends UFunc {
       val ipiv = Array.ofDim[Int](scala.math.min(M, N))
       val info = new intW(0)
       lapack.sgetrf(
-          M /* rows */,
-          N /* cols */,
-          Y.data,
-          scala.math.max(1, M) /* LDA */,
-          ipiv /* pivot indices */,
-          info
+        M /* rows */,
+        N /* cols */,
+        Y.data,
+        scala.math.max(1, M) /* LDA */,
+        ipiv /* pivot indices */,
+        info
       )
       // A value of info.`val` < 0 would tell us that the i-th argument
       // of the call to dsyev was erroneous (where i == |info.`val`|).

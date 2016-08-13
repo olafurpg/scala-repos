@@ -3,8 +3,9 @@ package lila.round
 import lila.game.{GameRepo, Game, UciMemo, Pov, Rewind, Event, Progress}
 import lila.pref.{Pref, PrefApi}
 
-private[round] final class Takebacker(
-    messenger: Messenger, uciMemo: UciMemo, prefApi: PrefApi) {
+private[round] final class Takebacker(messenger: Messenger,
+                                      uciMemo: UciMemo,
+                                      prefApi: PrefApi) {
 
   def yes(pov: Pov): Fu[Events] = IfAllowed(pov.game) {
     pov match {
@@ -19,7 +20,7 @@ private[round] final class Takebacker(
             g.updatePlayer(color, _ proposeTakeback g.turns)
           }
         GameRepo save progress inject List(
-            Event.TakebackOffers(color.white, color.black))
+          Event.TakebackOffers(color.white, color.black))
       case _ => fufail(ClientError("[takebacker] invalid yes " + pov))
     }
   }
@@ -61,9 +62,10 @@ private[round] final class Takebacker(
       fufail(ClientError("[takebacker] game is over " + game.id))
     else
       isAllowedByPrefs(game) flatMap {
-        _.fold(f,
-               fufail(ClientError(
-                       "[takebacker] disallowed by preferences " + game.id)))
+        _.fold(
+          f,
+          fufail(
+            ClientError("[takebacker] disallowed by preferences " + game.id)))
       }
 
   private def single(game: Game): Fu[Events] =
@@ -79,8 +81,8 @@ private[round] final class Takebacker(
       fen ← GameRepo initialFen game
       prog1 ← Rewind(game, fen).future
       prog2 ← Rewind(prog1.game, fen).future map { progress =>
-        prog1 withGame progress.game
-      }
+               prog1 withGame progress.game
+             }
       _ ← fuccess { uciMemo.drop(game, 2) }
       events ← save(prog2)
     } yield events

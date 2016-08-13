@@ -20,7 +20,12 @@ package org.apache.spark.ml.evaluation
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.ml.param.shared.{HasLabelCol, HasPredictionCol}
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable, SchemaUtils}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable,
+  DefaultParamsWritable,
+  Identifiable,
+  SchemaUtils
+}
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.DoubleType
@@ -33,7 +38,9 @@ import org.apache.spark.sql.types.DoubleType
 @Experimental
 class MulticlassClassificationEvaluator @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
-    extends Evaluator with HasPredictionCol with HasLabelCol
+    extends Evaluator
+    with HasPredictionCol
+    with HasLabelCol
     with DefaultParamsWritable {
 
   @Since("1.5.0")
@@ -47,15 +54,15 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
   @Since("1.5.0")
   val metricName: Param[String] = {
     val allowedParams = ParamValidators.inArray(
-        Array("f1",
-              "precision",
-              "recall",
-              "weightedPrecision",
-              "weightedRecall"))
+      Array("f1",
+            "precision",
+            "recall",
+            "weightedPrecision",
+            "weightedRecall"))
     new Param(this,
               "metricName",
               "metric name in evaluation " +
-              "(f1|precision|recall|weightedPrecision|weightedRecall)",
+                "(f1|precision|recall|weightedPrecision|weightedRecall)",
               allowedParams)
   }
 

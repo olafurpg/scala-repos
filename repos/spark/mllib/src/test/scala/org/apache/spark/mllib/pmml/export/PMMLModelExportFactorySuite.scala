@@ -18,16 +18,23 @@
 package org.apache.spark.mllib.pmml.export
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.classification.{LogisticRegressionModel, SVMModel}
+import org.apache.spark.mllib.classification.{
+  LogisticRegressionModel,
+  SVMModel
+}
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.regression.{LassoModel, LinearRegressionModel, RidgeRegressionModel}
+import org.apache.spark.mllib.regression.{
+  LassoModel,
+  LinearRegressionModel,
+  RidgeRegressionModel
+}
 import org.apache.spark.mllib.util.LinearDataGenerator
 
 class PMMLModelExportFactorySuite extends SparkFunSuite {
 
   test(
-      "PMMLModelExportFactory create KMeansPMMLModelExport when passing a KMeansModel") {
+    "PMMLModelExportFactory create KMeansPMMLModelExport when passing a KMeansModel") {
     val clusterCenters = Array(Vectors.dense(1.0, 2.0, 6.0),
                                Vectors.dense(1.0, 3.0, 0.0),
                                Vectors.dense(1.0, 4.0, 6.0))
@@ -39,7 +46,7 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
   }
 
   test(
-      "PMMLModelExportFactory create GeneralizedLinearPMMLModelExport when passing a " +
+    "PMMLModelExportFactory create GeneralizedLinearPMMLModelExport when passing a " +
       "LinearRegressionModel, RidgeRegressionModel or LassoModel") {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
@@ -63,24 +70,28 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
     assert(lassoModelExport.isInstanceOf[GeneralizedLinearPMMLModelExport])
   }
 
-  test("PMMLModelExportFactory create BinaryClassificationPMMLModelExport " +
+  test(
+    "PMMLModelExportFactory create BinaryClassificationPMMLModelExport " +
       "when passing a LogisticRegressionModel or SVMModel") {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
 
-    val logisticRegressionModel = new LogisticRegressionModel(
-        linearInput(0).features, linearInput(0).label)
+    val logisticRegressionModel =
+      new LogisticRegressionModel(linearInput(0).features,
+                                  linearInput(0).label)
     val logisticRegressionModelExport =
       PMMLModelExportFactory.createPMMLModelExport(logisticRegressionModel)
-    assert(logisticRegressionModelExport
-          .isInstanceOf[BinaryClassificationPMMLModelExport])
+    assert(
+      logisticRegressionModelExport
+        .isInstanceOf[BinaryClassificationPMMLModelExport])
 
     val svmModel = new SVMModel(linearInput(0).features, linearInput(0).label)
     val svmModelExport = PMMLModelExportFactory.createPMMLModelExport(svmModel)
     assert(svmModelExport.isInstanceOf[BinaryClassificationPMMLModelExport])
   }
 
-  test("PMMLModelExportFactory throw IllegalArgumentException " +
+  test(
+    "PMMLModelExportFactory throw IllegalArgumentException " +
       "when passing a Multinomial Logistic Regression") {
 
     /** 3 classes, 2 features */
@@ -92,12 +103,12 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
 
     intercept[IllegalArgumentException] {
       PMMLModelExportFactory.createPMMLModelExport(
-          multiclassLogisticRegressionModel)
+        multiclassLogisticRegressionModel)
     }
   }
 
   test(
-      "PMMLModelExportFactory throw IllegalArgumentException when passing an unsupported model") {
+    "PMMLModelExportFactory throw IllegalArgumentException when passing an unsupported model") {
     val invalidModel = new Object
 
     intercept[IllegalArgumentException] {

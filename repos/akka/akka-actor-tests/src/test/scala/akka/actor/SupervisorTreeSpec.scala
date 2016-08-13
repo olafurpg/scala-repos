@@ -12,7 +12,8 @@ import akka.pattern.ask
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SupervisorTreeSpec
-    extends AkkaSpec("akka.actor.serialize-messages = off") with ImplicitSender
+    extends AkkaSpec("akka.actor.serialize-messages = off")
+    with ImplicitSender
     with DefaultTimeout {
 
   "In a 3 levels deep supervisor tree (linked in the constructor) we" must {
@@ -22,8 +23,8 @@ class SupervisorTreeSpec
         within(5 seconds) {
           val p = Props(new Actor {
             override val supervisorStrategy = OneForOneStrategy(
-                maxNrOfRetries = 3,
-                withinTimeRange = 1 second)(List(classOf[Exception]))
+              maxNrOfRetries = 3,
+              withinTimeRange = 1 second)(List(classOf[Exception]))
             def receive = {
               case p: Props ⇒ sender() ! context.actorOf(p)
             }

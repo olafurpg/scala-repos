@@ -10,16 +10,25 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScThisReferenceImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScThisReference {
+    extends ScalaPsiElementImpl(node)
+    with ScThisReference {
   override def toString: String = "ThisReference"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] =
@@ -38,13 +47,14 @@ class ScThisReferenceImpl(node: ASTNode)
         case _ => None
       }
     case None => {
-        val encl =
-          PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
-        if (encl != null)
-          Some(
-              PsiTreeUtil.getContextOfType(
-                  encl, false, classOf[ScTemplateDefinition])) else None
-      }
+      val encl =
+        PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
+      if (encl != null)
+        Some(
+          PsiTreeUtil
+            .getContextOfType(encl, false, classOf[ScTemplateDefinition]))
+      else None
+    }
   }
 
   override def accept(visitor: ScalaElementVisitor) {
@@ -60,12 +70,12 @@ class ScThisReferenceImpl(node: ASTNode)
 }
 
 object ScThisReferenceImpl {
-  def getThisTypeForTypeDefinition(
-      td: ScTemplateDefinition, expr: ScExpression): TypeResult[ScType] = {
+  def getThisTypeForTypeDefinition(td: ScTemplateDefinition,
+                                   expr: ScExpression): TypeResult[ScType] = {
     lazy val selfTypeOfClass = td
       .getTypeWithProjections(TypingContext.empty, thisProjections = true)
       .map(tp =>
-            td.selfType match {
+        td.selfType match {
           case Some(selfType) => Bounds.glb(tp, selfType)
           case _ => tp
       })
@@ -82,7 +92,7 @@ object ScThisReferenceImpl {
             Success(ScThisType(td), Some(expr))
           case _ =>
             Success(selfTypeOfClass.getOrElse(
-                        return Failure("No clazz type found", Some(expr))),
+                      return Failure("No clazz type found", Some(expr))),
                     Some(expr))
         }
     }

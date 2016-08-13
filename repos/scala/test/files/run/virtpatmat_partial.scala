@@ -128,13 +128,14 @@ object Test extends App {
     final val ASSIGN = 7
 
     def acceptClosingAngle(in: Int) {
-      val closers: PartialFunction[Int, Int] = x =>
-        { println("hai!"); (x + 1) } match {
-          case GTGTGTEQ => GTGTEQ
-          case GTGTGT => GTGT
-          case GTGTEQ => GTEQ
-          case GTGT => GT
-          case GTEQ => ASSIGN
+      val closers: PartialFunction[Int, Int] = x => {
+        println("hai!"); (x + 1)
+      } match {
+        case GTGTGTEQ => GTGTEQ
+        case GTGTGT => GTGT
+        case GTGTEQ => GTEQ
+        case GTGT => GT
+        case GTEQ => ASSIGN
       }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")

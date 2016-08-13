@@ -71,7 +71,7 @@ class InterpretedOrdering(ordering: Seq[SortOrder])
               .compare(left, right)
           case other =>
             throw new IllegalArgumentException(
-                s"Type $other does not support ordered operations")
+              s"Type $other does not support ordered operations")
         }
         if (comparison != 0) {
           return comparison
@@ -89,8 +89,7 @@ object InterpretedOrdering {
     * Creates a [[InterpretedOrdering]] for the given schema, in natural ascending order.
     */
   def forSchema(dataTypes: Seq[DataType]): InterpretedOrdering = {
-    new InterpretedOrdering(
-        dataTypes.zipWithIndex.map {
+    new InterpretedOrdering(dataTypes.zipWithIndex.map {
       case (dt, index) =>
         new SortOrder(BoundReference(index, dt, nullable = true), Ascending)
     })

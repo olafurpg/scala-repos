@@ -9,7 +9,11 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import akka.http.impl.server.PathMatcherImpl
 import akka.http.javadsl.server.RequestVal
-import akka.http.scaladsl.server.{PathMatcher0, PathMatcher1, PathMatchers ⇒ ScalaPathMatchers}
+import akka.http.scaladsl.server.{
+  PathMatcher0,
+  PathMatcher1,
+  PathMatchers ⇒ ScalaPathMatchers
+}
 import akka.japi.function.Function
 
 import scala.collection.JavaConverters._
@@ -130,15 +134,15 @@ object PathMatchers {
     */
   def rest: PathMatcher[String] = matcher(_.Rest)
 
-  def segmentFromString[T](
-      convert: Function[String, T], clazz: Class[T]): PathMatcher[T] =
+  def segmentFromString[T](convert: Function[String, T],
+                           clazz: Class[T]): PathMatcher[T] =
     matcher(_ ⇒ ScalaPathMatchers.Segment.map(convert(_)))(ClassTag(clazz))
 
-  private def matcher[T : ClassTag](
+  private def matcher[T: ClassTag](
       scalaMatcher: ScalaPathMatchers.type ⇒ PathMatcher1[T]): PathMatcher[T] =
     new PathMatcherImpl[T](scalaMatcher(ScalaPathMatchers))
   private def matcher0(
       scalaMatcher: ScalaPathMatchers.type ⇒ PathMatcher0): PathMatcher[Void] =
     new PathMatcherImpl[Void](
-        scalaMatcher(ScalaPathMatchers).tmap(_ ⇒ Tuple1(null)))
+      scalaMatcher(ScalaPathMatchers).tmap(_ ⇒ Tuple1(null)))
 }

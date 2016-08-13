@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
 
 class ScalaAliasedImportedElementSearcher
     extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
-        true) {
+      true) {
 
   def processQuery(parameters: ReferencesSearch.SearchParameters,
                    consumer: Processor[PsiReference]) {
@@ -56,28 +56,31 @@ class ScalaAliasedImportedElementSearcher
       importStatement.importedName
     }
 
-    def processTextOccurrence(
-        element: PsiElement,
-        offsetInElement: Int,
-        consumer: Processor[PsiReference]): Boolean = inReadAction {
-      val alias: String = getAlias(element)
-      if (alias == null) return true
-      val reference: PsiReference = element.getReference
-      if (reference == null) {
-        return true
+    def processTextOccurrence(element: PsiElement,
+                              offsetInElement: Int,
+                              consumer: Processor[PsiReference]): Boolean =
+      inReadAction {
+        val alias: String = getAlias(element)
+        if (alias == null) return true
+        val reference: PsiReference = element.getReference
+        if (reference == null) {
+          return true
+        }
+        if (!reference.isReferenceTo(myTarget)) {
+          return true
+        }
+        val collector: SearchRequestCollector =
+          new SearchRequestCollector(mySession)
+        val fileScope: SearchScope =
+          new LocalSearchScope(element.getContainingFile)
+        collector.searchWord(alias,
+                             fileScope,
+                             UsageSearchContext.IN_CODE,
+                             true,
+                             myTarget)
+        PsiSearchHelper.SERVICE
+          .getInstance(element.getProject)
+          .processRequests(collector, consumer)
       }
-      if (!reference.isReferenceTo(myTarget)) {
-        return true
-      }
-      val collector: SearchRequestCollector =
-        new SearchRequestCollector(mySession)
-      val fileScope: SearchScope =
-        new LocalSearchScope(element.getContainingFile)
-      collector.searchWord(
-          alias, fileScope, UsageSearchContext.IN_CODE, true, myTarget)
-      PsiSearchHelper.SERVICE
-        .getInstance(element.getProject)
-        .processRequests(collector, consumer)
-    }
   }
 }

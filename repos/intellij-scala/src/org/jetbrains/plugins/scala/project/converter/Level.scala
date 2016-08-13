@@ -8,8 +8,8 @@ import collection.JavaConverters._
 /**
   * @author Pavel Fatin
   */
-private sealed abstract class Level(
-    val title: String, private val facetTitle: String) {
+private sealed abstract class Level(val title: String,
+                                    private val facetTitle: String) {
   def librariesIn(context: ConversionContext): Seq[LibraryData]
 }
 
@@ -25,8 +25,8 @@ private object Level {
 
   def fromFacetTitle(title: String): Level =
     FacetTitleToLevel.getOrElse(
-        title,
-        throw new IllegalArgumentException("Unknown level title: " + title))
+      title,
+      throw new IllegalArgumentException("Unknown level title: " + title))
 }
 
 private object ProjectLevel extends Level("project", "Project") {
@@ -46,11 +46,11 @@ private object ApplicationLevel extends Level("application", "Global") {
 private object ModuleLevel extends Level("module", "Module") {
   def librariesIn(context: ConversionContext) =
     throw new IllegalArgumentException(
-        "Module-level libraries are not supported")
+      "Module-level libraries are not supported")
 }
 
 private class CustomLevel(title: String) extends Level(title, title) {
   def librariesIn(context: ConversionContext) =
     throw new IllegalArgumentException(
-        "Custom-level libraries are not supported: " + title)
+      "Custom-level libraries are not supported: " + title)
 }

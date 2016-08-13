@@ -32,21 +32,28 @@ private[http] object WebSocket {
             log: LoggingAdapter)
     : BidiFlow[FrameEvent, Message, Message, FrameEvent, NotUsed] =
     masking(serverSide, maskingRandomFactory) atop frameHandling(
-        serverSide, closeTimeout, log) atop messageAPI(
-        serverSide, closeTimeout)
+      serverSide,
+      closeTimeout,
+      log) atop messageAPI(serverSide, closeTimeout)
 
   /** The lowest layer that implements the binary protocol */
-  def framing: BidiFlow[
-      ByteString, FrameEvent, FrameEvent, ByteString, NotUsed] =
+  def framing: BidiFlow[ByteString,
+                        FrameEvent,
+                        FrameEvent,
+                        ByteString,
+                        NotUsed] =
     BidiFlow
       .fromFlows(Flow[ByteString].via(FrameEventParser),
                  Flow[FrameEvent].transform(() ⇒ new FrameEventRenderer))
       .named("ws-framing")
 
   /** The layer that handles masking using the rules defined in the specification */
-  def masking(
-      serverSide: Boolean, maskingRandomFactory: () ⇒ Random): BidiFlow[
-      FrameEvent, FrameEventOrError, FrameEvent, FrameEvent, NotUsed] =
+  def masking(serverSide: Boolean,
+              maskingRandomFactory: () ⇒ Random): BidiFlow[FrameEvent,
+                                                           FrameEventOrError,
+                                                           FrameEvent,
+                                                           FrameEvent,
+                                                           NotUsed] =
     Masking(serverSide, maskingRandomFactory).named("ws-masking")
 
   /**
@@ -84,15 +91,17 @@ private[http] object WebSocket {
               ctx.fail(new PeerClosedConnectionException(code.get, reason))
             else if (inMessage)
               ctx.fail(new ProtocolException(
-                      s"Truncated message, peer closed connection in the middle of message."))
+                s"Truncated message, peer closed connection in the middle of message."))
             else ctx.finish()
           case ActivelyCloseWithCode(code, reason) ⇒
             if (code.exists(Protocol.CloseCodes.isError))
-              ctx.fail(new ProtocolException(
-                      s"Closing connection with error code $code"))
+              ctx.fail(
+                new ProtocolException(
+                  s"Closing connection with error code $code"))
             else
-              ctx.fail(new IllegalStateException(
-                      "Regular close from FrameHandler is unexpected"))
+              ctx.fail(
+                new IllegalStateException(
+                  "Regular close from FrameHandler is unexpected"))
           case x: MessageDataPart ⇒
             inMessage = !x.last
             ctx.push(x)
@@ -139,32 +148,33 @@ private[http] object WebSocket {
     def renderMessages: Flow[Message, FrameStart, NotUsed] =
       MessageToFrameRenderer.create(serverSide).named("ws-render-messages")
 
-    BidiFlow.fromGraph(GraphDSL
-          .create() { implicit b ⇒
-        import GraphDSL.Implicits._
+    BidiFlow.fromGraph(
+      GraphDSL
+        .create() { implicit b ⇒
+          import GraphDSL.Implicits._
 
-        val split = b.add(BypassRouter)
-        val tick = Source.tick(closeTimeout, closeTimeout, Tick)
-        val merge = b.add(BypassMerge)
-        val messagePreparation = b.add(prepareMessages)
-        val messageRendering = b.add(renderMessages.via(LiftCompletions))
+          val split = b.add(BypassRouter)
+          val tick = Source.tick(closeTimeout, closeTimeout, Tick)
+          val merge = b.add(BypassMerge)
+          val messagePreparation = b.add(prepareMessages)
+          val messageRendering = b.add(renderMessages.via(LiftCompletions))
 
-        // user handler
-        split.out1 ~> messagePreparation
-        messageRendering.outlet ~> merge.in1
+          // user handler
+          split.out1 ~> messagePreparation
+          messageRendering.outlet ~> merge.in1
 
-        // bypass
-        split.out0 ~> merge.in0
+          // bypass
+          split.out0 ~> merge.in0
 
-        // timeout support
-        tick ~> merge.in2
+          // timeout support
+          tick ~> merge.in2
 
-        BidiShape(split.in,
-                  messagePreparation.out,
-                  messageRendering.in,
-                  merge.out)
-      }
-          .named("ws-message-api"))
+          BidiShape(split.in,
+                    messagePreparation.out,
+                    messageRendering.in,
+                    merge.out)
+        }
+        .named("ws-message-api"))
   }
 
   private case object BypassRouter
@@ -216,7 +226,8 @@ private[http] object WebSocket {
       new GraphStageLogic(shape) {
 
         class PassAlong[T <: AnyRef](from: Inlet[T])
-            extends InHandler with (() ⇒ Unit) {
+            extends InHandler
+            with (() ⇒ Unit) {
           override def apply(): Unit = tryPull(from)
           override def onPush(): Unit = emit(out, grab(from), this)
           override def onUpstreamFinish(): Unit =

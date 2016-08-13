@@ -10,7 +10,12 @@ import org.apache.lucene.document.Field.Store
 import org.apache.lucene.document.{Document, TextField}
 import org.apache.lucene.index.Term
 import org.apache.lucene.search.BooleanClause.Occur
-import org.apache.lucene.search.{BooleanQuery, DisjunctionMaxQuery, PrefixQuery, TermQuery}
+import org.apache.lucene.search.{
+  BooleanQuery,
+  DisjunctionMaxQuery,
+  PrefixQuery,
+  TermQuery
+}
 import org.ensime.indexer.DatabaseService._
 import org.ensime.indexer.lucene._
 
@@ -45,8 +50,7 @@ object IndexService extends SLF4JLogging {
   abstract class AFqnIndexS[T <: FqnIndex](
       clazz: Class[T],
       cons: (String, Option[FileCheck]) => T
-  )
-      extends EntityS(clazz) {
+  ) extends EntityS(clazz) {
     def addFields(doc: Document, i: T): Unit = {
       doc.add(new TextField("file", i.file.get.filename, Store.NO))
       doc.add(new TextField("fqn", i.fqn, Store.YES))
@@ -68,11 +72,11 @@ object IndexService extends SLF4JLogging {
     }
   }
   private val ClassIndexT = new TermQuery(
-      new Term("TYPE", classOf[ClassIndex].getSimpleName))
+    new Term("TYPE", classOf[ClassIndex].getSimpleName))
   private val MethodIndexT = new TermQuery(
-      new Term("TYPE", classOf[MethodIndex].getSimpleName))
+    new Term("TYPE", classOf[MethodIndex].getSimpleName))
   private val FieldIndexT = new TermQuery(
-      new Term("TYPE", classOf[FieldIndex].getSimpleName))
+    new Term("TYPE", classOf[FieldIndex].getSimpleName))
 
   /**
     * Like `PrefixQuery` but gives a higher value to exact matches.
@@ -91,8 +95,9 @@ class IndexService(path: File) {
 
   private val lucene = new SimpleLucene(path, analyzers)
 
-  def persist(
-      check: FileCheck, symbols: List[FqnSymbol], commit: Boolean): Unit = {
+  def persist(check: FileCheck,
+              symbols: List[FqnSymbol],
+              commit: Boolean): Unit = {
     val f = Some(check)
     val fqns: List[Document] = symbols.map {
       case FqnSymbol(_, _, _, fqn, Some(_), _, _, _, _) =>
@@ -106,7 +111,8 @@ class IndexService(path: File) {
   }
 
   def commit(): Unit = {
-    try lucene.commit() catch {
+    try lucene.commit()
+    catch {
       case e: FileNotFoundException =>
         // one of those useless exceptions that is either harmless
         // (testing, commits are happening after we're interested) or
@@ -132,8 +138,8 @@ class IndexService(path: File) {
 
   def searchClassesMethods(terms: List[String], max: Int): List[FqnIndex] = {
     val query = new DisjunctionMaxQuery(
-        terms.map(buildTermClassMethodQuery),
-        0f
+      terms.map(buildTermClassMethodQuery),
+      0f
     )
     lucene.search(query, max).map(_.toEntity[ClassIndex]).distinct
   }

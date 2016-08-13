@@ -61,7 +61,7 @@ class Decoder extends AbstractDecoder with StateMachine {
             StatLines(linesSoFar)
           } else if (isStats(tokens)) {
             awaitStatsOrEnd(
-                linesSoFar :+ Tokens(tokens.map(ChannelBufferBuf.Owned(_))))
+              linesSoFar :+ Tokens(tokens.map(ChannelBufferBuf.Owned(_))))
             NeedMoreData
           } else {
             throw new ServerError("Invalid reply from STATS command")
@@ -70,9 +70,9 @@ class Decoder extends AbstractDecoder with StateMachine {
       case AwaitingData(valuesSoFar, tokens, bytesNeeded) =>
         decodeData(bytesNeeded, buffer) { data =>
           awaitResponseOrEnd(
-              valuesSoFar :+ TokensWithData(
-                  tokens.map(ChannelBufferBuf.Owned(_)),
-                  ChannelBufferBuf.Owned(data))
+            valuesSoFar :+ TokensWithData(
+              tokens.map(ChannelBufferBuf.Owned(_)),
+              ChannelBufferBuf.Owned(data))
           )
           NeedMoreData
         }
@@ -85,8 +85,8 @@ class Decoder extends AbstractDecoder with StateMachine {
     }
   }
 
-  final protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int): Unit = {
+  final protected[memcached] def awaitData(tokens: Seq[ChannelBuffer],
+                                           bytesNeeded: Int): Unit = {
     state match {
       case AwaitingResponse =>
         awaitData(Nil, tokens, bytesNeeded)

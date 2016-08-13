@@ -1,19 +1,29 @@
 package akka.remote.transport
 
 import akka.actor.{ExtendedActorSystem, Address}
-import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  ActorHandleEventListener,
+  Disassociated,
+  InboundPayload
+}
 import akka.remote.transport.TestTransport._
 import akka.remote.transport.Transport._
 import akka.testkit.{ImplicitSender, DefaultTimeout, AkkaSpec}
 import akka.util.ByteString
 import scala.concurrent.{Future, Await}
 import akka.remote.RemoteActorRefProvider
-import akka.remote.transport.TestTransport.{DisassociateAttempt, WriteAttempt, ListenAttempt, AssociateAttempt}
+import akka.remote.transport.TestTransport.{
+  DisassociateAttempt,
+  WriteAttempt,
+  ListenAttempt,
+  AssociateAttempt
+}
 
 abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
     extends AkkaSpec(
-        """akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
-    with DefaultTimeout with ImplicitSender {
+      """akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
+    with DefaultTimeout
+    with ImplicitSender {
 
   def transportName: String
   def schemeIdentifier: String
@@ -25,8 +35,8 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
     addressATest.copy(protocol = s"$schemeIdentifier.${addressATest.protocol}")
   val addressB: Address =
     addressBTest.copy(protocol = s"$schemeIdentifier.${addressATest.protocol}")
-  val nonExistingAddress = Address(
-      schemeIdentifier + ".test", "nosystem", "nohost", 0)
+  val nonExistingAddress =
+    Address(schemeIdentifier + ".test", "nosystem", "nohost", 0)
 
   def freshTransport(testTransport: TestTransport): Transport
   def wrapTransport(transport: Transport): Transport =
@@ -36,10 +46,10 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
         .provider
         .asInstanceOf[RemoteActorRefProvider]
       new AkkaProtocolTransport(
-          transport,
-          system,
-          new AkkaProtocolSettings(provider.remoteSettings.config),
-          AkkaPduProtobufCodec)
+        transport,
+        system,
+        new AkkaProtocolSettings(provider.remoteSettings.config),
+        AkkaPduProtobufCodec)
     } else transport
 
   def newTransportA(registry: AssociationRegistry): Transport =
@@ -87,7 +97,7 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       }
 
       registry.logSnapshot.contains(
-          AssociateAttempt(addressATest, addressBTest)) should ===(true)
+        AssociateAttempt(addressATest, addressBTest)) should ===(true)
       awaitCond(registry.existsAssociation(addressATest, addressBTest))
     }
 

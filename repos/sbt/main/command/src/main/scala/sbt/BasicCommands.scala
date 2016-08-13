@@ -1,7 +1,15 @@
 package sbt
 
 import sbt.internal.util.{AttributeKey, FullReader}
-import sbt.internal.util.complete.{Completion, Completions, DefaultParsers, History => CHistory, HistoryCommands, Parser, TokenCompletions}
+import sbt.internal.util.complete.{
+  Completion,
+  Completions,
+  DefaultParsers,
+  History => CHistory,
+  HistoryCommands,
+  Parser,
+  TokenCompletions
+}
 import sbt.internal.util.Types.{const, idFun}
 import sbt.internal.inc.classpath.ClasspathUtilities.toLoader
 import sbt.internal.inc.ModuleUtilities
@@ -56,7 +64,8 @@ object BasicCommands {
 
   def helpParser(s: State) = {
     val h = (Help.empty /: s.definedCommands) { (a, b) =>
-      a ++ (try b.help(s) catch { case NonFatal(ex) => Help.empty })
+      a ++ (try b.help(s)
+      catch { case NonFatal(ex) => Help.empty })
     }
     val helpCommands = h.detail.keySet
     val spacedArg = singleArgument(helpCommands).?
@@ -64,7 +73,8 @@ object BasicCommands {
   }
 
   def runHelp(s: State, h: Help)(arg: Option[String]): State = {
-    val message = try Help.message(h, arg) catch {
+    val message = try Help.message(h, arg)
+    catch {
       case NonFatal(ex) =>
         ex.toString
     }
@@ -76,7 +86,7 @@ object BasicCommands {
 
   def completionsCommand =
     Command.make(CompletionsCommand, CompletionsBrief, CompletionsDetailed)(
-        completionsParser)
+      completionsParser)
   def completionsParser(state: State) = {
     val notQuoted =
       (NotQuoted ~ any.*) map { case (nq, s) => (nq +: s).mkString }
@@ -84,8 +94,8 @@ object BasicCommands {
       Space ~> (StringVerbatim | StringEscapable | notQuoted)
 
     applyEffect(
-        token(quotedOrUnquotedSingleArgument ?? "" examples ("", " ")))(
-        runCompletions(state))
+      token(quotedOrUnquotedSingleArgument ?? "" examples ("", " ")))(
+      runCompletions(state))
   }
   def runCompletions(state: State)(input: String): State = {
     Parser.completions(state.combinedParser, input, 9).get map { c =>
@@ -99,8 +109,8 @@ object BasicCommands {
   def multiParser(s: State): Parser[Seq[String]] = {
     val nonSemi = token(charClass(_ != ';').+, hide = const(true))
     (token(';' ~> OptSpace) flatMap { _ =>
-          matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
-        } map (_.trim)).+
+      matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
+    } map (_.trim)).+
   }
 
   def multiApplied(s: State) =
@@ -121,38 +131,39 @@ object BasicCommands {
     }
   def append =
     Command(AppendCommand, Help.more(AppendCommand, AppendLastDetailed))(
-        otherCommandParser) { (s, arg) =>
+      otherCommandParser) { (s, arg) =>
       s.copy(remainingCommands = s.remainingCommands :+ arg)
     }
 
   def setOnFailure =
     Command(OnFailure, Help.more(OnFailure, OnFailureDetailed))(
-        otherCommandParser) { (s, arg) =>
+      otherCommandParser) { (s, arg) =>
       s.copy(onFailure = Some(arg))
     }
   private[sbt] def compatCommands = Seq(
-      Command.command(Compat.ClearOnFailure) { s =>
-        s.log.warn(Compat.ClearOnFailureDeprecated)
-        s.copy(onFailure = None)
-      },
-      Command.arb(s =>
-            token(Compat.OnFailure, hide = const(true))
-              .flatMap(x => otherCommandParser(s))) { (s, arg) =>
-        s.log.warn(Compat.OnFailureDeprecated)
-        s.copy(onFailure = Some(arg))
-      },
-      Command.command(Compat.FailureWall) { s =>
-        s.log.warn(Compat.FailureWallDeprecated)
-        s
-      }
+    Command.command(Compat.ClearOnFailure) { s =>
+      s.log.warn(Compat.ClearOnFailureDeprecated)
+      s.copy(onFailure = None)
+    },
+    Command.arb(s =>
+      token(Compat.OnFailure, hide = const(true)).flatMap(x =>
+        otherCommandParser(s))) { (s, arg) =>
+      s.log.warn(Compat.OnFailureDeprecated)
+      s.copy(onFailure = Some(arg))
+    },
+    Command.command(Compat.FailureWall) { s =>
+      s.log.warn(Compat.FailureWallDeprecated)
+      s
+    }
   )
 
   def clearOnFailure =
     Command.command(ClearOnFailure)(s => s.copy(onFailure = None))
   def stashOnFailure =
-    Command.command(StashOnFailure)(s =>
-          s.copy(onFailure = None)
-            .update(OnFailureStack)(s.onFailure :: _.toList.flatten))
+    Command.command(StashOnFailure)(
+      s =>
+        s.copy(onFailure = None)
+          .update(OnFailureStack)(s.onFailure :: _.toList.flatten))
   def popOnFailure = Command.command(PopOnFailure) { s =>
     val stack = s.get(OnFailureStack).getOrElse(Nil)
     val updated =
@@ -163,39 +174,38 @@ object BasicCommands {
 
   def reboot =
     Command(RebootCommand, Help.more(RebootCommand, RebootDetailed))(
-        rebootParser) { (s, full) =>
+      rebootParser) { (s, full) =>
       s.reboot(full)
     }
   def rebootParser(s: State) = token(Space ~> "full" ^^^ true) ?? false
 
   def call =
-    Command(ApplyCommand, Help.more(ApplyCommand, ApplyDetailed))(
-        _ => callParser) {
+    Command(ApplyCommand, Help.more(ApplyCommand, ApplyDetailed))(_ =>
+      callParser) {
       case (state, (cp, args)) =>
         val parentLoader = getClass.getClassLoader
         state.log.info(
-            "Applying State transformations " + args.mkString(", ") +
+          "Applying State transformations " + args.mkString(", ") +
             (if (cp.isEmpty) ""
-             else " from " + cp.mkString(File.pathSeparator)))
+            else " from " + cp.mkString(File.pathSeparator)))
         val loader =
           if (cp.isEmpty) parentLoader
           else toLoader(cp.map(f => new File(f)), parentLoader)
         val loaded = args.map(arg =>
-              ModuleUtilities
-                .getObject(arg, loader)
-                .asInstanceOf[State => State])
+          ModuleUtilities.getObject(arg, loader).asInstanceOf[State => State])
         (state /: loaded)((s, obj) => obj(s))
     }
   def callParser: Parser[(Seq[String], Seq[String])] =
     token(Space) ~>
-    ((classpathOptionParser ?? Nil) ~ rep1sep(className, token(Space)))
+      ((classpathOptionParser ?? Nil) ~ rep1sep(className, token(Space)))
   private[this] def className: Parser[String] = {
     val base =
       StringBasic & not('-' ~> any.*, "Class name cannot start with '-'.")
     def single(s: String) = Completions.single(Completion.displayOnly(s))
-    val compl = TokenCompletions.fixed((seen, level) =>
-          if (seen.startsWith("-")) Completions.nil
-          else single("<class name>"))
+    val compl = TokenCompletions.fixed(
+      (seen, level) =>
+        if (seen.startsWith("-")) Completions.nil
+        else single("<class name>"))
     token(base, compl)
   }
   private[this] def classpathOptionParser: Parser[Seq[String]] =
@@ -208,14 +218,14 @@ object BasicCommands {
 
   def continuous =
     Command(ContinuousExecutePrefix, continuousBriefHelp, continuousDetail)(
-        otherCommandParser) { (s, arg) =>
-      withAttribute(
-          s, Watched.Configuration, "Continuous execution not configured.") {
-        w =>
-          val repeat =
-            ContinuousExecutePrefix +
+      otherCommandParser) { (s, arg) =>
+      withAttribute(s,
+                    Watched.Configuration,
+                    "Continuous execution not configured.") { w =>
+        val repeat =
+          ContinuousExecutePrefix +
             (if (arg.startsWith(" ")) arg else " " + arg)
-          Watched.executeContinuously(w, s, arg, repeat)
+        Watched.executeContinuously(w, s, arg, repeat)
       }
     }
 
@@ -253,8 +263,8 @@ object BasicCommands {
   }
 
   def read =
-    Command.make(ReadCommand, Help.more(ReadCommand, ReadDetailed))(
-        s => applyEffect(readParser(s))(doRead(s)))
+    Command.make(ReadCommand, Help.more(ReadCommand, ReadDetailed))(s =>
+      applyEffect(readParser(s))(doRead(s)))
   def readParser(s: State) = {
     val files = (token(Space) ~> fileParser(s.baseDir)).+
     val portAndSuccess = token(OptSpace) ~> Port
@@ -279,12 +289,12 @@ object BasicCommands {
           readLines(from) ::: s // this means that all commands from all files are loaded, parsed, and inserted before any are executed
         else {
           s.log.error(
-              "Command file(s) not readable: \n\t" + notFound.mkString("\n\t"))
+            "Command file(s) not readable: \n\t" + notFound.mkString("\n\t"))
           s
         }
     }
-  private def readMessage(
-      port: Int, previousSuccess: Boolean): Option[String] = {
+  private def readMessage(port: Int,
+                          previousSuccess: Boolean): Option[String] = {
     // split into two connections because this first connection ends the previous communication
     xsbt.IPC.client(port) { _.send(previousSuccess.toString) }
     //   and this second connection starts the next communication
@@ -305,8 +315,8 @@ object BasicCommands {
       applyEffect(base)(t => runAlias(s, t))
     }
 
-  def runAlias(
-      s: State, args: Option[(String, Option[Option[String]])]): State =
+  def runAlias(s: State,
+               args: Option[(String, Option[Option[String]])]): State =
     args match {
       case None =>
         printAliases(s); s
@@ -328,8 +338,8 @@ object BasicCommands {
 
   def removeAliases(s: State): State = removeTagged(s, CommandAliasKey)
   def removeAlias(s: State, name: String): State =
-    s.copy(definedCommands = s.definedCommands.filter(
-              c => !isAliasNamed(name, c)))
+    s.copy(
+      definedCommands = s.definedCommands.filter(c => !isAliasNamed(name, c)))
 
   def removeTagged(s: State, tag: AttributeKey[_]): State =
     s.copy(definedCommands = removeTagged(s.definedCommands, tag))
@@ -351,21 +361,21 @@ object BasicCommands {
 
   def aliasNames(s: State): Seq[String] = allAliases(s).map(_._1)
   def allAliases(s: State): Seq[(String, String)] = aliases(s, (n, v) => true)
-  def aliases(
-      s: State, pred: (String, String) => Boolean): Seq[(String, String)] =
+  def aliases(s: State,
+              pred: (String, String) => Boolean): Seq[(String, String)] =
     s.definedCommands.flatMap(c => getAlias(c).filter(tupled(pred)))
 
   def newAlias(name: String, value: String): Command =
     Command
       .make(name, (name, "'" + value + "'"), "Alias of '" + value + "'")(
-          aliasBody(name, value))
+        aliasBody(name, value))
       .tag(CommandAliasKey, (name, value))
   def aliasBody(name: String, value: String)(
       state: State): Parser[() => State] = {
     val aliasRemoved = removeAlias(state, name)
     // apply the alias value to the commands of `state` except for the alias to avoid recursion (#933)
     val partiallyApplied = Parser(
-        Command.combine(aliasRemoved.definedCommands)(aliasRemoved))(value)
+      Command.combine(aliasRemoved.definedCommands)(aliasRemoved))(value)
     val arg = matched(partiallyApplied & (success(()) | (SpaceClass ~ any.*)))
     // by scheduling the expanded alias instead of directly executing, we get errors on the expanded string (#598)
     arg.map(str => () => (value + str) :: state)
@@ -379,6 +389,6 @@ object BasicCommands {
     }
 
   val CommandAliasKey = AttributeKey[(String, String)](
-      "is-command-alias",
-      "Internal: marker for Commands created as aliases for another command.")
+    "is-command-alias",
+    "Internal: marker for Commands created as aliases for another command.")
 }

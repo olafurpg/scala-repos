@@ -32,8 +32,8 @@ object Test extends ScaladocModelTest {
       assert(conversion.constraints.length == 1,
              conversion.constraints.length + " == 1 (in " + conversion + ")")
       assert(
-          conversion.constraints.head.isInstanceOf[KnownTypeClassConstraint],
-          conversion.constraints.head +
+        conversion.constraints.head.isInstanceOf[KnownTypeClassConstraint],
+        conversion.constraints.head +
           " is not a known type class constraint!")
     }
   }

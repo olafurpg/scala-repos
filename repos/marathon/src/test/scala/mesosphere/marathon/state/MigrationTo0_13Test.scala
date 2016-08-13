@@ -15,7 +15,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class MigrationTo0_13Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("migrate tasks in zk") {
     val f = new Fixture
@@ -60,7 +62,7 @@ class MigrationTo0_13Test
   }
 
   test(
-      "Already migrated tasks will be excluded from a subsequent migration attempt") {
+    "Already migrated tasks will be excluded from a subsequent migration attempt") {
     val f = new Fixture
     Given("some tasks that are stored in old path style")
     val appId = "/test/app1".toRootPath
@@ -82,12 +84,13 @@ class MigrationTo0_13Test
     val task2 = MarathonTestHelper.dummyTaskProto(appId)
     f.legacyTaskStore.store(appId, task2).futureValue
     f.entityStore.names().futureValue should contain(
-        appId.safePath + ":" + task2.getId)
+      appId.safePath + ":" + task2.getId)
 
     And("we run the migration again")
     f.migration.migrateTasks().futureValue
 
-    Then("Only the second task is considered and the first one does not crash the migration")
+    Then(
+      "Only the second task is considered and the first one does not crash the migration")
     val taskKeys2 = f.taskRepo.tasksKeys(appId).futureValue
     taskKeys2 should have size 2
     taskKeys2 should contain(task1.getId)
@@ -159,24 +162,21 @@ class MigrationTo0_13Test
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val legacyTaskStore = new LegacyTaskStore(state)
     lazy val entityStore = new MarathonStore[MarathonTaskState](
-        store = state,
-        metrics = metrics,
-        newState = () =>
-            MarathonTaskState(
-                MarathonTask
-                  .newBuilder()
-                  .setId(UUID.randomUUID().toString)
-                  .build()),
-        prefix = TaskRepository.storePrefix)
+      store = state,
+      metrics = metrics,
+      newState = () =>
+        MarathonTaskState(
+          MarathonTask.newBuilder().setId(UUID.randomUUID().toString).build()),
+      prefix = TaskRepository.storePrefix)
     lazy val taskRepo = {
       val metrics = new Metrics(new MetricRegistry)
       new TaskRepository(entityStore, metrics)
     }
     lazy val frameworkIdStore = new MarathonStore[FrameworkId](
-        store = state,
-        metrics = metrics,
-        newState = () => new FrameworkId(UUID.randomUUID().toString),
-        prefix = "" // don't set the prefix so we don't have to use PersistentStore for testing
+      store = state,
+      metrics = metrics,
+      newState = () => new FrameworkId(UUID.randomUUID().toString),
+      prefix = "" // don't set the prefix so we don't have to use PersistentStore for testing
     )
 
     lazy val migration = new MigrationTo0_13(taskRepo, state)
@@ -206,8 +206,8 @@ private[state] class LegacyTaskStore(store: PersistentStore) {
     PREFIX + appId.safePath + ID_DELIMITER + taskId
   }
 
-  private[this] def serialize(
-      task: MarathonTask, sink: ObjectOutputStream): Unit = {
+  private[this] def serialize(task: MarathonTask,
+                              sink: ObjectOutputStream): Unit = {
     val size = task.getSerializedSize
     sink.writeInt(size)
     sink.write(task.toByteArray)

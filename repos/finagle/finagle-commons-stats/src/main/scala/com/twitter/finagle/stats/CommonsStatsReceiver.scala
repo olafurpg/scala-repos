@@ -5,8 +5,8 @@ import com.twitter.common.stats.{Percentile, Stats}
 import com.twitter.util.registry.GlobalRegistry
 
 class CommonsStatsReceiver extends StatsReceiverWithCumulativeGauges {
-  GlobalRegistry.get.put(
-      Seq("stats", "commons_stats", "counters_latched"), "false")
+  GlobalRegistry.get
+    .put(Seq("stats", "commons_stats", "counters_latched"), "false")
 
   val repr = Stats.STATS_PROVIDER
 
@@ -18,10 +18,10 @@ class CommonsStatsReceiver extends StatsReceiverWithCumulativeGauges {
   private[this] def variableName(name: Seq[String]) = name mkString "_"
 
   protected[this] def registerGauge(name: Seq[String], f: => Float): Unit = {
-    Stats.STATS_PROVIDER.makeGauge(
-        variableName(name), new Supplier[java.lang.Float] {
-      def get = new java.lang.Float(f)
-    })
+    Stats.STATS_PROVIDER
+      .makeGauge(variableName(name), new Supplier[java.lang.Float] {
+        def get = new java.lang.Float(f)
+      })
   }
 
   protected[this] def deregisterGauge(name: Seq[String]): Unit = {
@@ -49,8 +49,12 @@ class CommonsStatsReceiver extends StatsReceiverWithCumulativeGauges {
       synchronized {
         if (!stats.contains(name)) {
           val stat = new Stat {
-            val percentile = new Percentile[java.lang.Float](
-                variableName(name), 100.0f, 50, 95, 99)
+            val percentile =
+              new Percentile[java.lang.Float](variableName(name),
+                                              100.0f,
+                                              50,
+                                              95,
+                                              99)
             def add(value: Float): Unit = percentile.record(value)
           }
 

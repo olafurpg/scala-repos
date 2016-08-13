@@ -2,7 +2,7 @@ package lila.pref
 
 import scalaz.NonEmptyList
 
-sealed class PieceSet private[pref](val name: String) {
+sealed class PieceSet private[pref] (val name: String) {
 
   override def toString = name
 
@@ -32,17 +32,17 @@ object PieceSet extends PieceSetObject {
 
   val all =
     NonEmptyList(
-        "cburnett",
-        "merida",
-        "alpha",
-        "pirouetti",
-        "chessnut",
-        "chess7",
-        "reillycraig",
-        "companion",
-        "fantasy",
-        "spatial",
-        "shapes"
+      "cburnett",
+      "merida",
+      "alpha",
+      "pirouetti",
+      "chessnut",
+      "chess7",
+      "reillycraig",
+      "companion",
+      "fantasy",
+      "spatial",
+      "shapes"
     ) map { name =>
       new PieceSet(name)
     }

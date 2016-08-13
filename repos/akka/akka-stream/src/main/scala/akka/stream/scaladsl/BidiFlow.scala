@@ -65,11 +65,11 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     val ins = copy.shape.inlets
     val outs = copy.shape.outlets
     new BidiFlow(
-        module
-          .compose(copy, combine)
-          .wire(shape.out1, ins(0))
-          .wire(outs(1), shape.in2)
-          .replaceShape(BidiShape(shape.in1, outs(0), ins(1), shape.out2)))
+      module
+        .compose(copy, combine)
+        .wire(shape.out1, ins(0))
+        .wire(outs(1), shape.in2)
+        .replaceShape(BidiShape(shape.in1, outs(0), ins(1), shape.out2)))
   }
 
   /**
@@ -118,11 +118,11 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     val in = copy.shape.inlets.head
     val out = copy.shape.outlets.head
     new Flow(
-        module
-          .compose(copy, combine)
-          .wire(shape.out1, in)
-          .wire(out, shape.in2)
-          .replaceShape(FlowShape(shape.in1, shape.out2)))
+      module
+        .compose(copy, combine)
+        .wire(shape.out1, in)
+        .wire(out, shape.in2)
+        .replaceShape(FlowShape(shape.in1, shape.out2)))
   }
 
   /**
@@ -130,8 +130,8 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     */
   def reversed: BidiFlow[I2, O2, I1, O1, Mat] =
     new BidiFlow(
-        module.replaceShape(
-            BidiShape(shape.in2, shape.out2, shape.in1, shape.out1)))
+      module.replaceShape(
+        BidiShape(shape.in2, shape.out2, shape.in1, shape.out1)))
 
   /**
     * Transform only the materialized value of this BidiFlow, leaving all other properties as they were.
@@ -213,8 +213,7 @@ object BidiFlow {
       flow1: Graph[FlowShape[I1, O1], M1],
       flow2: Graph[FlowShape[I2, O2], M2])(
       combine: (M1, M2) ⇒ M): BidiFlow[I1, O1, I2, O2, M] =
-    fromGraph(
-        GraphDSL.create(flow1, flow2)(combine) { implicit b ⇒ (f1, f2) ⇒
+    fromGraph(GraphDSL.create(flow1, flow2)(combine) { implicit b ⇒ (f1, f2) ⇒
       BidiShape(f1.in, f1.out, f2.in, f2.out)
     })
 
@@ -246,7 +245,8 @@ object BidiFlow {
     * stage each, expressed by the two functions.
     */
   def fromFunctions[I1, O1, I2, O2](
-      outbound: I1 ⇒ O1, inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
+      outbound: I1 ⇒ O1,
+      inbound: I2 ⇒ O2): BidiFlow[I1, O1, I2, O2, NotUsed] =
     fromFlows(Flow[I1].map(outbound), Flow[I2].map(inbound))
 
   /**

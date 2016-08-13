@@ -177,12 +177,12 @@ private[spark] object ApiRootResource {
 
   def getServletHandler(uiRoot: UIRoot): ServletContextHandler = {
     val jerseyContext = new ServletContextHandler(
-        ServletContextHandler.NO_SESSIONS)
+      ServletContextHandler.NO_SESSIONS)
     jerseyContext.setContextPath("/api")
     val holder: ServletHolder = new ServletHolder(classOf[ServletContainer])
     holder.setInitParameter(
-        "com.sun.jersey.config.property.resourceConfigClass",
-        "com.sun.jersey.api.core.PackagesResourceConfig")
+      "com.sun.jersey.config.property.resourceConfigClass",
+      "com.sun.jersey.api.core.PackagesResourceConfig")
     holder.setInitParameter("com.sun.jersey.config.property.packages",
                             "org.apache.spark.status.api.v1")
     holder.setInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
@@ -254,24 +254,24 @@ private[v1] trait UIRootFromServletContext {
 
 private[v1] class NotFoundException(msg: String)
     extends WebApplicationException(
-        new NoSuchElementException(msg),
-        Response
-          .status(Response.Status.NOT_FOUND)
-          .entity(ErrorWrapper(msg))
-          .build()
-      )
+      new NoSuchElementException(msg),
+      Response
+        .status(Response.Status.NOT_FOUND)
+        .entity(ErrorWrapper(msg))
+        .build()
+    )
 
 private[v1] class BadParameterException(msg: String)
     extends WebApplicationException(
-        new IllegalArgumentException(msg),
-        Response
-          .status(Response.Status.BAD_REQUEST)
-          .entity(ErrorWrapper(msg))
-          .build()
-      ) {
+      new IllegalArgumentException(msg),
+      Response
+        .status(Response.Status.BAD_REQUEST)
+        .entity(ErrorWrapper(msg))
+        .build()
+    ) {
   def this(param: String, exp: String, actual: String) = {
     this(
-        raw"""Bad value for parameter "$param".  Expected a $exp, got "$actual"""")
+      raw"""Bad value for parameter "$param".  Expected a $exp, got "$actual"""")
   }
 }
 

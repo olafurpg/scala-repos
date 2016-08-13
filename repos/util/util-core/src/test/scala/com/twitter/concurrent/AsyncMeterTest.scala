@@ -17,7 +17,7 @@ class AsyncMeterTest extends FunSuite {
   }
 
   test(
-      "AsyncMeter should allow more than one waiter and allow them on the schedule.") {
+    "AsyncMeter should allow more than one waiter and allow them on the schedule.") {
     val timer = new MockTimer
     Time.withCurrentTimeFrozen { ctl =>
       val meter = new AsyncMeter(1, 1.second, 100)(timer)
@@ -33,7 +33,7 @@ class AsyncMeterTest extends FunSuite {
   }
 
   test(
-      "AsyncMeter shouldn't allow a waiter until interval has passed since the last allowance.") {
+    "AsyncMeter shouldn't allow a waiter until interval has passed since the last allowance.") {
     val timer = new MockTimer
     Time.withCurrentTimeFrozen { ctl =>
       val meter = new AsyncMeter(1, 1.second, 100)(timer)
@@ -53,7 +53,7 @@ class AsyncMeterTest extends FunSuite {
   }
 
   test(
-      "AsyncMeter should fail waiters that wait over the limit, but still allow the rest") {
+    "AsyncMeter should fail waiters that wait over the limit, but still allow the rest") {
     val timer = new MockTimer
     Time.withCurrentTimeFrozen { ctl =>
       val meter = new AsyncMeter(1, 1.second, 1)(timer)
@@ -75,7 +75,7 @@ class AsyncMeterTest extends FunSuite {
   }
 
   test(
-      "AsyncMeter should allow a waiter to be removed from the queue on interruption.") {
+    "AsyncMeter should allow a waiter to be removed from the queue on interruption.") {
     val timer = new MockTimer
     Time.withCurrentTimeFrozen { ctl =>
       val meter = new AsyncMeter(1, 1.second, 100)(timer)

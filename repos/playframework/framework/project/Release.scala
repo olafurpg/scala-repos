@@ -12,24 +12,25 @@ import bintray.BintrayPlugin.autoImport._
 object Release {
 
   val branchVersion = SettingKey[String](
-      "branch-version", "The version to use if Play is on a branch.")
+    "branch-version",
+    "The version to use if Play is on a branch.")
 
   def settings: Seq[Setting[_]] = Seq(
-      // Disable cross building because we're using sbt-doge cross building
-      releaseCrossBuild := false,
-      releaseProcess := Seq[ReleaseStep](
-          checkSnapshotDependencies,
-          inquireVersions,
-          setReleaseVersion,
-          commitReleaseVersion,
-          tagRelease,
-          releaseStepCommandAndRemaining("+publishSigned"),
-          releaseStepTask(bintrayRelease in thisProjectRef.value),
-          releaseStepCommand("sonatypeRelease"),
-          setNextVersion,
-          commitNextVersion,
-          pushChanges
-      )
+    // Disable cross building because we're using sbt-doge cross building
+    releaseCrossBuild := false,
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      releaseStepCommandAndRemaining("+publishSigned"),
+      releaseStepTask(bintrayRelease in thisProjectRef.value),
+      releaseStepCommand("sonatypeRelease"),
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
   )
 
   /**
@@ -49,9 +50,9 @@ object Release {
         if (newState.remainingCommands.isEmpty) {
           newState
         } else {
-          runCommand(newState.remainingCommands.head,
-                     newState.copy(
-                         remainingCommands = newState.remainingCommands.tail))
+          runCommand(
+            newState.remainingCommands.head,
+            newState.copy(remainingCommands = newState.remainingCommands.tail))
         }
       }
 

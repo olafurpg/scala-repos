@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Miles Sabin 
+ * Copyright (c) 2012 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,16 @@ object TyApp {
     new TyApp[TC[A, B], TC[Arbitrary, Arbitrary], A :: B :: HNil]
 
   implicit def tyApp3[TC[_, _, _], A, B, C] =
-    new TyApp[
-        TC[A, B, C], TC[Arbitrary, Arbitrary, Arbitrary], A :: B :: C :: HNil]
+    new TyApp[TC[A, B, C],
+              TC[Arbitrary, Arbitrary, Arbitrary],
+              A :: B :: C :: HNil]
 }
 
 object KindPolyExamples {
 
   def sameTypeArgs[T, ET, U, EU, A <: HList](t: T, u: U)(
-      implicit evt: TyApp[T, ET, A], evu: TyApp[U, EU, A]) = {}
+      implicit evt: TyApp[T, ET, A],
+      evu: TyApp[U, EU, A]) = {}
 
   sameTypeArgs(List(23), Set(13))
   sameTypeArgs(Map(23 -> "foo"), (13, "bar"))
@@ -45,8 +47,8 @@ object KindPolyExamples {
   // sameTypeArgs(List(23), List("foo"))              // Does not compile
   // sameTypeArgs(Map(23 -> "foo"), Map("bar" -> 13)) // Does not compile
 
-  def sameTypeCtor[T, U, TC](t: T, u: U)(
-      implicit evt: TyApp[T, TC, _], evu: TyApp[U, TC, _]) = {}
+  def sameTypeCtor[T, U, TC](t: T, u: U)(implicit evt: TyApp[T, TC, _],
+                                         evu: TyApp[U, TC, _]) = {}
 
   sameTypeCtor(List(23), List("foo"))
   sameTypeCtor(Map(23 -> "foo"), Map(true -> ((): Unit)))

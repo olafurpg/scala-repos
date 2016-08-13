@@ -84,7 +84,7 @@ object DataFlow {
             while (dataFlow.blockedReaders.peek ne null) dataFlow.blockedReaders.poll ! s
           } else
             throw new DataFlowVariableException(
-                "Attempt to change data flow variable (from [" +
+              "Attempt to change data flow variable (from [" +
                 dataFlow.value.get + "] to [" + v + "])")
         case Exit => self.stop()
       }
@@ -113,7 +113,7 @@ object DataFlow {
       if (this.value.get.isEmpty) in ! Set(ref())
       else
         throw new DataFlowVariableException(
-            "Attempt to change data flow variable (from [" + this.value.get +
+          "Attempt to change data flow variable (from [" + this.value.get +
             "] to [" + ref() + "])")
     }
 
@@ -130,7 +130,7 @@ object DataFlow {
       if (this.value.get.isEmpty) in ! Set(value)
       else
         throw new DataFlowVariableException(
-            "Attempt to change data flow variable (from [" + this.value.get +
+          "Attempt to change data flow variable (from [" + this.value.get +
             "] to [" + value + "])")
     }
 
@@ -163,8 +163,8 @@ object DataFlow {
         }
 
         result.getOrElse(
-            throw new DataFlowVariableException("Timed out (after " +
-                timeoutMs + " milliseconds) while waiting for result"))
+          throw new DataFlowVariableException("Timed out (after " +
+            timeoutMs + " milliseconds) while waiting for result"))
       }
     }
 

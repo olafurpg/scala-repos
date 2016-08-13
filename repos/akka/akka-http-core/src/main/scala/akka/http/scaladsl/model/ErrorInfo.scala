@@ -19,7 +19,8 @@ final case class ErrorInfo(summary: String = "", detail: String = "") {
     if (summary.isEmpty) withSummary(fallbackSummary) else this
   def formatPretty =
     if (summary.isEmpty) detail
-    else if (detail.isEmpty) summary else summary + ": " + detail
+    else if (detail.isEmpty) summary
+    else summary + ": " + detail
   def format(withDetail: Boolean): String =
     if (withDetail) formatPretty else summary
 }
@@ -59,8 +60,8 @@ object IllegalHeaderException {
 case class InvalidContentLengthException(info: ErrorInfo)
     extends ExceptionWithErrorInfo(info)
 object InvalidContentLengthException {
-  def apply(
-      summary: String, detail: String = ""): InvalidContentLengthException =
+  def apply(summary: String,
+            detail: String = ""): InvalidContentLengthException =
     apply(ErrorInfo(summary, detail))
 }
 
@@ -104,16 +105,16 @@ object EntityStreamException {
   * The limit can also be configured in code, by calling [[HttpEntity#withSizeLimit]]
   * on the entity before materializing its `dataBytes` stream.
   */
-final case class EntityStreamSizeException(
-    limit: Long, actualSize: Option[Long] = None)
+final case class EntityStreamSizeException(limit: Long,
+                                           actualSize: Option[Long] = None)
     extends RuntimeException {
 
   override def getMessage = toString
 
   override def toString =
     s"EntityStreamSizeException: actual entity size ($actualSize) exceeded content length limit ($limit bytes)! " +
-    s"You can configure this by setting `akka.http.[server|client].parsing.max-content-length` or calling `HttpEntity.withSizeLimit` " +
-    s"before materializing the dataBytes stream."
+      s"You can configure this by setting `akka.http.[server|client].parsing.max-content-length` or calling `HttpEntity.withSizeLimit` " +
+      s"before materializing the dataBytes stream."
 }
 
 case class RequestTimeoutException(request: HttpRequest, message: String)

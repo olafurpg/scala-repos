@@ -31,7 +31,9 @@ import org.apache.karaf.tooling.exam.options.LogLevelOption
   */
 @RunWith(classOf[JUnit4TestRunner])
 class HakkerStatusTest
-    extends JUnitSuite with Matchers with AssertionsForJUnit {
+    extends JUnitSuite
+    with Matchers
+    with AssertionsForJUnit {
 
   @Inject
   @Filter(timeout = 30000)
@@ -45,8 +47,8 @@ class HakkerStatusTest
 
   @Configuration
   def config: Array[PaxOption] = Array[PaxOption](
-      karafOptionsWithTestBundles(),
-      featureDiningHakkers() //, debugOptions(level = LogLevelOption.LogLevel.DEBUG)
+    karafOptionsWithTestBundles(),
+    featureDiningHakkers() //, debugOptions(level = LogLevelOption.LogLevel.DEBUG)
   )
 
   // Junit @Before and @After can be used as well
@@ -60,9 +62,9 @@ class HakkerStatusTest
   def verifyObtainingAHakkerViaTheTheDiningHakkersService() {
 
     val name = "TestHakker"
-    val hakker = Option(service.getHakker(name, 2))
-      .getOrElse(throw new IllegalStateException(
-            "No Hakker was created via DiningHakkerService"))
+    val hakker = Option(service.getHakker(name, 2)).getOrElse(
+      throw new IllegalStateException(
+        "No Hakker was created via DiningHakkerService"))
 
     // takes some time for the first message to get through
     testProbe.within(10.seconds) {
@@ -71,7 +73,7 @@ class HakkerStatusTest
         testProbe.expectMsgType[Identification]
 
       println(
-          "---------------> %s is busy with %s.".format(fromHakker, busyWith))
+        "---------------> %s is busy with %s.".format(fromHakker, busyWith))
       fromHakker should be("TestHakker")
       busyWith should not be (null)
     }

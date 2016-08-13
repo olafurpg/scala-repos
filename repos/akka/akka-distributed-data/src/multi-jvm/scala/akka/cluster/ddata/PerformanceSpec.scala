@@ -23,7 +23,9 @@ object PerformanceSpec extends MultiNodeConfig {
   val n4 = role("n4")
   val n5 = role("n5")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = ERROR
     akka.stdout-loglevel = ERROR
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
@@ -55,7 +57,8 @@ class PerformanceSpecMultiJvmNode4 extends PerformanceSpec
 class PerformanceSpecMultiJvmNode5 extends PerformanceSpec
 
 class PerformanceSpec
-    extends MultiNodeSpec(PerformanceSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(PerformanceSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import PerformanceSpec._
   import Replicator._
@@ -112,8 +115,8 @@ class PerformanceSpec
     }
   }
 
-  def awaitReplicated(
-      keys: Iterable[ORSetKey[Int]], expectedData: Set[Int]): Unit =
+  def awaitReplicated(keys: Iterable[ORSetKey[Int]],
+                      expectedData: Set[Int]): Unit =
     keys.foreach { key ⇒
       awaitReplicated(key, expectedData)
     }
@@ -206,8 +209,8 @@ class PerformanceSpec
       runOn(n1, n2, n3) {
         val latch = TestLatch(n)
         val replyTo = system.actorOf(countDownProps(latch))
-        for (_ ← 0 until n) replicator.tell(
-            Update(key, GCounter(), WriteLocal)(_ + 1), replyTo)
+        for (_ ← 0 until n)
+          replicator.tell(Update(key, GCounter(), WriteLocal)(_ + 1), replyTo)
         Await.ready(latch, 5.seconds + (1.second * factor))
         enterBarrier("update-done-6")
         runOn(n1) {
@@ -237,7 +240,7 @@ class PerformanceSpec
         val durationMs = (endTime - startTime).nanos.toMillis
         val tps = (n * 1000.0 / durationMs).toInt
         println(
-            s"## $n GCounter Update + gossip took $durationMs ms, $tps TPS")
+          s"## $n GCounter Update + gossip took $durationMs ms, $tps TPS")
       }
 
       enterBarrier("after-6")

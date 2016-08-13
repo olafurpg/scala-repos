@@ -9,16 +9,16 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
     extends lila.hub.CaptchedForm {
 
   lazy val question = Form(
-      mapping(
-          "title" -> nonEmptyText(minLength = 10, maxLength = 150)
-            .verifying(languageMessage, validateLanguage _),
-          "body" -> nonEmptyText(minLength = 10, maxLength = 10000).verifying(
-              languageMessage, validateLanguage _),
-          "hidden-tags" -> text,
-          "gameId" -> text,
-          "move" -> text
-      )(QuestionData.apply)(QuestionData.unapply)
-        .verifying(captchaFailMessage, validateCaptcha _))
+    mapping(
+      "title" -> nonEmptyText(minLength = 10, maxLength = 150)
+        .verifying(languageMessage, validateLanguage _),
+      "body" -> nonEmptyText(minLength = 10, maxLength = 10000)
+        .verifying(languageMessage, validateLanguage _),
+      "hidden-tags" -> text,
+      "gameId" -> text,
+      "move" -> text
+    )(QuestionData.apply)(QuestionData.unapply)
+      .verifying(captchaFailMessage, validateCaptcha _))
 
   def editQuestion(q: Question) =
     question fill QuestionData(title = q.title,
@@ -28,36 +28,36 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
                                move = "")
 
   lazy val answer = Form(
-      mapping(
-          "body" -> nonEmptyText(minLength = 30).verifying(languageMessage,
-                                                           validateLanguage _),
-          "gameId" -> text,
-          "move" -> text
-      )(AnswerData.apply)(AnswerData.unapply)
-        .verifying(captchaFailMessage, validateCaptcha _))
+    mapping(
+      "body" -> nonEmptyText(minLength = 30).verifying(languageMessage,
+                                                       validateLanguage _),
+      "gameId" -> text,
+      "move" -> text
+    )(AnswerData.apply)(AnswerData.unapply)
+      .verifying(captchaFailMessage, validateCaptcha _))
 
   lazy val editAnswer = Form(
-      single(
-          "body" -> nonEmptyText(minLength = 30)
-            .verifying(languageMessage, validateLanguage _)
-      ))
+    single(
+      "body" -> nonEmptyText(minLength = 30).verifying(languageMessage,
+                                                       validateLanguage _)
+    ))
 
   lazy val moveAnswer = Form(
-      single(
-          "to" -> nonEmptyText
-      ))
+    single(
+      "to" -> nonEmptyText
+    ))
 
   lazy val comment = Form(
-      mapping(
-          "body" -> nonEmptyText(minLength = 20).verifying(languageMessage,
-                                                           validateLanguage _)
-      )(CommentData.apply)(CommentData.unapply)
+    mapping(
+      "body" -> nonEmptyText(minLength = 20).verifying(languageMessage,
+                                                       validateLanguage _)
+    )(CommentData.apply)(CommentData.unapply)
   )
 
   val vote = Form(
-      single(
-          "vote" -> number
-      ))
+    single(
+      "vote" -> number
+    ))
 
   private val languageMessage =
     "I didn't understand that. Is it written in English?"

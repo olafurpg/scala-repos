@@ -82,8 +82,9 @@ object FieldsProviderImpl {
       implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] =
     toFieldsCommonImpl(c, Indexed, true)(T)
 
-  def toFieldsCommonImpl[T](
-      c: Context, namingScheme: NamingScheme, allowUnknownTypes: Boolean)(
+  def toFieldsCommonImpl[T](c: Context,
+                            namingScheme: NamingScheme,
+                            allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] = {
     import c.universe._
 
@@ -131,8 +132,8 @@ object FieldsProviderImpl {
     case class OptionBuilder(of: FieldBuilder) extends FieldBuilder {
       // Options just use Object as the type, due to the way cascading works on number types
       def columnTypes =
-        of.columnTypes.map(
-            _ => q"""_root_.scala.Predef.classOf[_root_.java.lang.Object]""")
+        of.columnTypes.map(_ =>
+          q"""_root_.scala.Predef.classOf[_root_.java.lang.Object]""")
       def names = of.names
     }
     case class CaseClassBuilder(prefix: String, members: Vector[FieldBuilder])
@@ -144,7 +145,8 @@ object FieldsProviderImpl {
           name <- member.names
         } yield
           if (namingScheme == NamedWithPrefix && prefix.nonEmpty)
-            s"$prefix.$name" else name
+            s"$prefix.$name"
+          else name
     }
 
     /**
@@ -177,16 +179,16 @@ object FieldsProviderImpl {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
         val fieldName = accessorMethod.name.toTermName.toString
-        val fieldType = accessorMethod.returnType.asSeenFrom(
-            outerTpe, outerTpe.typeSymbol.asClass)
+        val fieldType = accessorMethod.returnType
+          .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass)
         (fieldType, fieldName)
       }.toVector
 
     val builder = matchField(T.tpe, "")
     if (builder.columnTypes.isEmpty)
       c.abort(
-          c.enclosingPosition,
-          s"Case class ${T.tpe} has no primitive types we were able to extract")
+        c.enclosingPosition,
+        s"Case class ${T.tpe} has no primitive types we were able to extract")
     val scheme = if (isNumbered(T.tpe)) Indexed else namingScheme
     val tree = FieldBuilder.toFieldsTree(builder, scheme)
     c.Expr[cascading.tuple.Fields](tree)

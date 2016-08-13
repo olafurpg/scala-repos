@@ -24,7 +24,7 @@ trait FollowParentBackButton extends SActivity {
 trait ScreenOnActivity extends SActivity {
   onCreate {
     getWindow.addFlags(
-        FLAG_DISMISS_KEYGUARD | FLAG_SHOW_WHEN_LOCKED | FLAG_TURN_SCREEN_ON)
+      FLAG_DISMISS_KEYGUARD | FLAG_SHOW_WHEN_LOCKED | FLAG_TURN_SCREEN_ON)
   }
 }
 
@@ -33,8 +33,10 @@ trait ScreenOnActivity extends SActivity {
   */
 trait PreventRotateActivity extends SActivity {
   onResume {
-    setRequestedOrientation(if (Configuration.portrait)
-          SCREEN_ORIENTATION_PORTRAIT else SCREEN_ORIENTATION_LANDSCAPE)
+    setRequestedOrientation(
+      if (Configuration.portrait)
+        SCREEN_ORIENTATION_PORTRAIT
+      else SCREEN_ORIENTATION_LANDSCAPE)
   }
 
   onPause {

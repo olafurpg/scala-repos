@@ -8,7 +8,7 @@ object Test extends App {
     override def hashCode = value / 5
   }
 
-  def testCorrectness[T : Ordering](n: Int, mkKey: Int => T) {
+  def testCorrectness[T: Ordering](n: Int, mkKey: Int => T) {
     val o = implicitly[Ordering[T]]
     val s = HashSet.empty[T] ++ (0 until n).map(mkKey)
     for (i <- 0 until n) {

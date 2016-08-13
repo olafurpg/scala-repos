@@ -50,8 +50,8 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents a prospective outgoing TCP connection.
     */
-  final case class OutgoingConnection(
-      remoteAddress: InetSocketAddress, localAddress: InetSocketAddress)
+  final case class OutgoingConnection(remoteAddress: InetSocketAddress,
+                                      localAddress: InetSocketAddress)
 
   def apply()(implicit system: ActorSystem): Tcp = super.apply(system)
 
@@ -98,13 +98,13 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
            idleTimeout: Duration = Duration.Inf)
     : Source[IncomingConnection, Future[ServerBinding]] =
     Source.fromGraph(
-        new ConnectionSourceStage(IO(IoTcp)(system),
-                                  new InetSocketAddress(interface, port),
-                                  backlog,
-                                  options,
-                                  halfClose,
-                                  idleTimeout,
-                                  bindShutdownTimeout))
+      new ConnectionSourceStage(IO(IoTcp)(system),
+                                new InetSocketAddress(interface, port),
+                                backlog,
+                                options,
+                                halfClose,
+                                idleTimeout,
+                                bindShutdownTimeout))
 
   /**
     * Creates a [[Tcp.ServerBinding]] instance which represents a prospective TCP server binding on the given `endpoint`
@@ -170,18 +170,18 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
 
     val tcpFlow = Flow
       .fromGraph(
-          new OutgoingConnectionStage(IO(IoTcp)(system),
-                                      remoteAddress,
-                                      localAddress,
-                                      options,
-                                      halfClose,
-                                      connectTimeout))
+        new OutgoingConnectionStage(IO(IoTcp)(system),
+                                    remoteAddress,
+                                    localAddress,
+                                    options,
+                                    halfClose,
+                                    connectTimeout))
       .via(detacher[ByteString]) // must read ahead for proper completions
 
     idleTimeout match {
       case d: FiniteDuration ⇒
         tcpFlow.join(
-            BidiFlow.bidirectionalIdleTimeout[ByteString, ByteString](d))
+          BidiFlow.bidirectionalIdleTimeout[ByteString, ByteString](d))
       case _ ⇒ tcpFlow
     }
   }

@@ -31,8 +31,20 @@ import javafx.{event => jfxe, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyIntegerProperty, ReadOnlyObjectProperty}
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyIntegerProperty,
+  ReadOnlyObjectProperty
+}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.util.Duration
 
 object MediaPlayer {
@@ -57,16 +69,16 @@ object MediaPlayer {
       * State of the player when a critical error has occurred.
       */
     val Halted = new Status(jfxsm.MediaPlayer.Status.HALTED)
-    @deprecated(
-        "Use Halted; HALTED will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Halted; HALTED will be removed in a future release",
+                "8.0.60-R10")
     val HALTED = Halted
 
     /**
       * State of the player when playback is paused.
       */
     val Paused = new Status(jfxsm.MediaPlayer.Status.PAUSED)
-    @deprecated(
-        "Use Paused; PAUSED will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Paused; PAUSED will be removed in a future release",
+                "8.0.60-R10")
     val PAUSED = Paused
 
     /**
@@ -81,8 +93,8 @@ object MediaPlayer {
       * State of the player once it is prepared to play.
       */
     val Ready = new Status(jfxsm.MediaPlayer.Status.READY)
-    @deprecated(
-        "Use Ready; READY will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Ready; READY will be removed in a future release",
+                "8.0.60-R10")
     val READY = Ready
 
     /**
@@ -111,8 +123,14 @@ object MediaPlayer {
     val UNKNOWN = Unknown
 
     protected override def unsortedValues: Array[Status] =
-      Array(
-          Disposed, Halted, Paused, Playing, Ready, Stalled, Stopped, Unknown)
+      Array(Disposed,
+            Halted,
+            Paused,
+            Playing,
+            Ready,
+            Stalled,
+            Stopped,
+            Unknown)
   }
 
   /**

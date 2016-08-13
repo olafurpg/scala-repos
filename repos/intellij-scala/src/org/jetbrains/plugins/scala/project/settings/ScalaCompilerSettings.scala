@@ -67,11 +67,11 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
         ("-P:continuations:enable", () => continuations, continuations = _))
 
   private val DebuggingOptions: Map[String, DebuggingInfoLevel] = Map(
-      "-g:none" -> DebuggingInfoLevel.None,
-      "-g:source" -> DebuggingInfoLevel.Source,
-      "-g:line" -> DebuggingInfoLevel.Line,
-      "-g:vars" -> DebuggingInfoLevel.Vars,
-      "-g:notailcalls" -> DebuggingInfoLevel.Notailcalls)
+    "-g:none" -> DebuggingInfoLevel.None,
+    "-g:source" -> DebuggingInfoLevel.Source,
+    "-g:line" -> DebuggingInfoLevel.Line,
+    "-g:vars" -> DebuggingInfoLevel.Vars,
+    "-g:notailcalls" -> DebuggingInfoLevel.Notailcalls)
 
   private val PluginOptionPattern = "-Xplugin:(.+)".r
 
@@ -94,8 +94,10 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
   }
 
   def sbtIncOptions =
-    SbtIncrementalOptions(
-        nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction)
+    SbtIncrementalOptions(nameHashing,
+                          recompileOnMacroDef,
+                          transitiveStep,
+                          recompileAllFraction)
 
   private def initFrom0(options: Seq[String]) {
     val optionToSetter = ToggleOptions.map(it => (it._1, it._3)).toMap

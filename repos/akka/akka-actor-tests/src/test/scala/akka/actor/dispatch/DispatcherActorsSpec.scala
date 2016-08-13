@@ -13,17 +13,17 @@ class DispatcherActorsSpec extends AkkaSpec {
 
     def receive = {
       case x: Int ⇒ {
-          Thread.sleep(50) // slow actor
-          finishedCounter.countDown()
-        }
+        Thread.sleep(50) // slow actor
+        finishedCounter.countDown()
+      }
     }
   }
 
   class FastActor(finishedCounter: CountDownLatch) extends Actor {
     def receive = {
       case x: Int ⇒ {
-          finishedCounter.countDown()
-        }
+        finishedCounter.countDown()
+      }
     }
   }
 

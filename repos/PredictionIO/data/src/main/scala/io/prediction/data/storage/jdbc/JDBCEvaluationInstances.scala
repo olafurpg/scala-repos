@@ -21,9 +21,11 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementations of [[EvaluationInstances]] */
-class JDBCEvaluationInstances(
-    client: String, config: StorageClientConfig, prefix: String)
-    extends EvaluationInstances with Logging {
+class JDBCEvaluationInstances(client: String,
+                              config: StorageClientConfig,
+                              prefix: String)
+    extends EvaluationInstances
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "evaluationinstances")
@@ -148,17 +150,17 @@ class JDBCEvaluationInstances(
   /** Convert JDBC results to [[EvaluationInstance]] */
   def resultToEvaluationInstance(rs: WrappedResultSet): EvaluationInstance = {
     EvaluationInstance(
-        id = rs.string("id"),
-        status = rs.string("status"),
-        startTime = rs.jodaDateTime("startTime"),
-        endTime = rs.jodaDateTime("endTime"),
-        evaluationClass = rs.string("evaluationClass"),
-        engineParamsGeneratorClass = rs.string("engineParamsGeneratorClass"),
-        batch = rs.string("batch"),
-        env = JDBCUtils.stringToMap(rs.string("env")),
-        sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
-        evaluatorResults = rs.string("evaluatorResults"),
-        evaluatorResultsHTML = rs.string("evaluatorResultsHTML"),
-        evaluatorResultsJSON = rs.string("evaluatorResultsJSON"))
+      id = rs.string("id"),
+      status = rs.string("status"),
+      startTime = rs.jodaDateTime("startTime"),
+      endTime = rs.jodaDateTime("endTime"),
+      evaluationClass = rs.string("evaluationClass"),
+      engineParamsGeneratorClass = rs.string("engineParamsGeneratorClass"),
+      batch = rs.string("batch"),
+      env = JDBCUtils.stringToMap(rs.string("env")),
+      sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
+      evaluatorResults = rs.string("evaluatorResults"),
+      evaluatorResultsHTML = rs.string("evaluatorResultsHTML"),
+      evaluatorResultsJSON = rs.string("evaluatorResultsJSON"))
   }
 }

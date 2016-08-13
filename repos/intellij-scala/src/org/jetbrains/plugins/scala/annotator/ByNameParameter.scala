@@ -20,8 +20,9 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
 
   def kind = classOf[ScExpression]
 
-  def annotate(
-      exp: ScExpression, holder: AnnotationHolder, typeAware: Boolean) {
+  def annotate(exp: ScExpression,
+               holder: AnnotationHolder,
+               typeAware: Boolean) {
     if (!ScalaProjectSettings
           .getInstance(exp.getProject)
           .isShowArgumentsToByNameParams) return

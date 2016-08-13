@@ -23,10 +23,10 @@ trait EventSubscriber[C <: ScallopConf, M <: AbstractModule] {
 trait EventConfiguration extends ScallopConf {
 
   lazy val eventSubscriber = opt[String](
-      "event_subscriber",
-      descr = "The event subscription module to use. E.g. http_callback.",
-      required = false,
-      noshort = true)
+    "event_subscriber",
+    descr = "The event subscription module to use. E.g. http_callback.",
+    required = false,
+    noshort = true)
 }
 
 class EventModule(conf: EventConfiguration) extends AbstractModule {
@@ -139,13 +139,13 @@ case class FailedHealthCheck(appId: PathId,
                              timestamp: String = Timestamp.now().toString)
     extends MarathonHealthCheckEvent
 
-case class HealthStatusChanged(
-    appId: PathId,
-    taskId: Task.Id,
-    version: Timestamp,
-    alive: Boolean,
-    eventType: String = "health_status_changed_event",
-    timestamp: String = Timestamp.now().toString)
+case class HealthStatusChanged(appId: PathId,
+                               taskId: Task.Id,
+                               version: Timestamp,
+                               alive: Boolean,
+                               eventType: String =
+                                 "health_status_changed_event",
+                               timestamp: String = Timestamp.now().toString)
     extends MarathonHealthCheckEvent
 
 // upgrade messages

@@ -28,7 +28,7 @@ final class PersistenceSettings(config: Config) {
       config.getMillisDuration("view.auto-update-interval")
 
     val autoUpdateReplayMax: Long = posMax(
-        config.getLong("view.auto-update-replay-max"))
+      config.getLong("view.auto-update-replay-max"))
 
     private def posMax(v: Long) =
       if (v < 0) Long.MaxValue else v
@@ -43,7 +43,7 @@ final class PersistenceSettings(config: Config) {
       config.getInt("at-least-once-delivery.redelivery-burst-limit")
 
     val warnAfterNumberOfUnconfirmedAttempts: Int = config.getInt(
-        "at-least-once-delivery.warn-after-number-of-unconfirmed-attempts")
+      "at-least-once-delivery.warn-after-number-of-unconfirmed-attempts")
 
     val maxUnconfirmedMessages: Int =
       config.getInt("at-least-once-delivery.max-unconfirmed-messages")
@@ -127,8 +127,9 @@ object Persistence extends ExtensionId[Persistence] with ExtensionIdProvider {
   def lookup() = Persistence
 
   /** INTERNAL API. */
-  private[persistence] case class PluginHolder(
-      actor: ActorRef, adapters: EventAdapters, config: Config)
+  private[persistence] case class PluginHolder(actor: ActorRef,
+                                               adapters: EventAdapters,
+                                               config: Config)
       extends Extension
 }
 
@@ -157,7 +158,8 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     val configPath = config.getString("snapshot-store.plugin")
 
     if (isEmpty(configPath)) {
-      log.warning("No default snapshot store configured! " +
+      log.warning(
+        "No default snapshot store configured! " +
           "To configure a default snapshot-store plugin set the `akka.persistence.snapshot-store.plugin` key. " +
           "For details see 'reference.conf'")
       NoSnapshotStorePluginId
@@ -168,8 +170,8 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
   lazy val defaultInternalStashOverflowStrategy: StashOverflowStrategy =
     system.dynamicAccess
       .createInstanceFor[StashOverflowStrategyConfigurator](
-          config.getString("internal-stash-overflow-strategy"),
-          EmptyImmutableSeq)
+        config.getString("internal-stash-overflow-strategy"),
+        EmptyImmutableSeq)
       .map(_.create(system.settings.config))
       .get
 
@@ -253,7 +255,7 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
       case Some(conf) ⇒ conf
       case None ⇒
         throw new IllegalArgumentException(
-            s"Unknown plugin actor $journalPluginActor")
+          s"Unknown plugin actor $journalPluginActor")
     }
 
   /**
@@ -285,8 +287,8 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     pluginHolderFor(configPath, snapshotStoreFallbackConfigPath).actor
   }
 
-  @tailrec private def pluginHolderFor(
-      configPath: String, fallbackPath: String): PluginHolder = {
+  @tailrec private def pluginHolderFor(configPath: String,
+                                       fallbackPath: String): PluginHolder = {
     val extensionIdMap = pluginExtensionId.get
     extensionIdMap.get(configPath) match {
       case Some(extensionId) ⇒
@@ -294,18 +296,19 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
       case None ⇒
         val extensionId = new PluginHolderExtensionId(configPath, fallbackPath)
         pluginExtensionId.compareAndSet(
-            extensionIdMap, extensionIdMap.updated(configPath, extensionId))
+          extensionIdMap,
+          extensionIdMap.updated(configPath, extensionId))
         pluginHolderFor(configPath, fallbackPath) // Recursive invocation.
     }
   }
 
-  private def createPlugin(
-      configPath: String, pluginConfig: Config): ActorRef = {
+  private def createPlugin(configPath: String,
+                           pluginConfig: Config): ActorRef = {
     val pluginActorName = configPath
     val pluginClassName = pluginConfig.getString("class") match {
       case "" ⇒
         throw new IllegalArgumentException(
-            "Plugin class name must be defined in config property " +
+          "Plugin class name must be defined in config property " +
             s"[$configPath.class]")
       case className ⇒ className
     }
@@ -314,11 +317,13 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
       system.dynamicAccess.getClassFor[Any](pluginClassName).get
     val pluginDispatcherId = pluginConfig.getString("plugin-dispatcher")
     val pluginActorArgs = try {
-      Reflect.findConstructor(pluginClass, List(pluginConfig)) // will throw if not found
+      Reflect
+        .findConstructor(pluginClass, List(pluginConfig)) // will throw if not found
       List(pluginConfig)
     } catch { case NonFatal(_) ⇒ Nil } // otherwise use empty constructor
-    val pluginActorProps = Props(
-        Deploy(dispatcher = pluginDispatcherId), pluginClass, pluginActorArgs)
+    val pluginActorProps = Props(Deploy(dispatcher = pluginDispatcherId),
+                                 pluginClass,
+                                 pluginActorArgs)
     system.systemActorOf(pluginActorProps, pluginActorName)
   }
 
@@ -332,13 +337,13 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
 
   private def id(ref: ActorRef) = ref.path.toStringWithoutAddress
 
-  private class PluginHolderExtensionId(
-      configPath: String, fallbackPath: String)
+  private class PluginHolderExtensionId(configPath: String,
+                                        fallbackPath: String)
       extends ExtensionId[PluginHolder] {
     override def createExtension(system: ExtendedActorSystem): PluginHolder = {
       require(
-          !isEmpty(configPath) && system.settings.config.hasPath(configPath),
-          s"'reference.conf' is missing persistence plugin config path: '$configPath'")
+        !isEmpty(configPath) && system.settings.config.hasPath(configPath),
+        s"'reference.conf' is missing persistence plugin config path: '$configPath'")
       val config: Config = system.settings.config
         .getConfig(configPath)
         .withFallback(system.settings.config.getConfig(fallbackPath))

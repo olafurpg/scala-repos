@@ -66,13 +66,13 @@ object JObjectParser extends SimpleInjector {
       case x: BasicDBList => JArray(x.toList.map(x => serialize(x, formats)))
       case x: BasicDBObject =>
         JObject(
-            x.keySet.toList.map { f =>
-              JField(f.toString, serialize(x.get(f.toString), formats))
-            }
+          x.keySet.toList.map { f =>
+            JField(f.toString, serialize(x.get(f.toString), formats))
+          }
         )
       case x => {
-          JNothing
-        }
+        JNothing
+      }
     }
   }
 

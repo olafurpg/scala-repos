@@ -40,15 +40,15 @@ object Test extends Properties("IndexScript") {
 
   property("allPackages") = {
     createIndexScript(
-        "src/scaladoc/scala/tools/nsc/doc/html/page/IndexScript.scala") match {
+      "src/scaladoc/scala/tools/nsc/doc/html/page/IndexScript.scala") match {
       case Some(index) =>
         index.allPackages.map(_.toString) == List(
-            "scala",
-            "scala.tools",
-            "scala.tools.nsc",
-            "scala.tools.nsc.doc",
-            "scala.tools.nsc.doc.html",
-            "scala.tools.nsc.doc.html.page"
+          "scala",
+          "scala.tools",
+          "scala.tools.nsc",
+          "scala.tools.nsc.doc",
+          "scala.tools.nsc.doc.html",
+          "scala.tools.nsc.doc.html.page"
         )
       case None =>
         false

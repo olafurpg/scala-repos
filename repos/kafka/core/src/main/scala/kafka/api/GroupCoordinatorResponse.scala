@@ -24,7 +24,7 @@ object GroupCoordinatorResponse {
   val CurrentVersion = 0
 
   private val NoBrokerEndpointOpt = Some(
-      BrokerEndPoint(id = -1, host = "", port = -1))
+    BrokerEndPoint(id = -1, host = "", port = -1))
 
   def readFrom(buffer: ByteBuffer) = {
     val correlationId = buffer.getInt

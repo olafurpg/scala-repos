@@ -10,7 +10,10 @@ import akka.actor._
 import akka.cluster.Cluster
 import akka.cluster.sharding.ShardRegion.GracefulShutdown
 import akka.persistence.Persistence
-import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
+import akka.persistence.journal.leveldb.{
+  SharedLeveldbJournal,
+  SharedLeveldbStore
+}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
 import akka.testkit._
@@ -96,10 +99,10 @@ object DDataClusterShardingGracefulShutdownSpecConfig
 
 class PersistentClusterShardingGracefulShutdownSpec
     extends ClusterShardingGracefulShutdownSpec(
-        PersistentClusterShardingGracefulShutdownSpecConfig)
+      PersistentClusterShardingGracefulShutdownSpecConfig)
 class DDataClusterShardingGracefulShutdownSpec
     extends ClusterShardingGracefulShutdownSpec(
-        DDataClusterShardingGracefulShutdownSpecConfig)
+      DDataClusterShardingGracefulShutdownSpecConfig)
 
 class PersistentClusterShardingGracefulShutdownMultiJvmNode1
     extends PersistentClusterShardingGracefulShutdownSpec
@@ -113,7 +116,9 @@ class DDataClusterShardingGracefulShutdownMultiJvmNode2
 
 abstract class ClusterShardingGracefulShutdownSpec(
     config: ClusterShardingGracefulShutdownSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config)
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterShardingGracefulShutdownSpec._
   import config._
 
@@ -122,20 +127,20 @@ abstract class ClusterShardingGracefulShutdownSpec(
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
@@ -149,7 +154,8 @@ abstract class ClusterShardingGracefulShutdownSpec(
 
   def startSharding(): Unit = {
     val allocationStrategy = new ShardCoordinator.LeastShardAllocationStrategy(
-        rebalanceThreshold = 2, maxSimultaneousRebalance = 1)
+      rebalanceThreshold = 2,
+      maxSimultaneousRebalance = 1)
     ClusterSharding(system).start(typeName = "Entity",
                                   entityProps = Props[Entity],
                                   settings = ClusterShardingSettings(system),
@@ -225,15 +231,17 @@ abstract class ClusterShardingGracefulShutdownSpec(
       runOn(first) {
         val allocationStrategy =
           new ShardCoordinator.LeastShardAllocationStrategy(
-              rebalanceThreshold = 2, maxSimultaneousRebalance = 1)
-        val regionEmpty = ClusterSharding(system).start(
-            typeName = "EntityEmpty",
-            entityProps = Props[Entity],
-            settings = ClusterShardingSettings(system),
-            extractEntityId = extractEntityId,
-            extractShardId = extractShardId,
-            allocationStrategy,
-            handOffStopMessage = StopEntity)
+            rebalanceThreshold = 2,
+            maxSimultaneousRebalance = 1)
+        val regionEmpty =
+          ClusterSharding(system).start(typeName = "EntityEmpty",
+                                        entityProps = Props[Entity],
+                                        settings =
+                                          ClusterShardingSettings(system),
+                                        extractEntityId = extractEntityId,
+                                        extractShardId = extractShardId,
+                                        allocationStrategy,
+                                        handOffStopMessage = StopEntity)
 
         watch(regionEmpty)
         regionEmpty ! GracefulShutdown

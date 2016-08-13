@@ -67,12 +67,13 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
   override def launchTasks(offerId: OfferID,
                            tasks: util.Collection[TaskInfo],
                            filters: Filters): Status = ???
-  override def launchTasks(
-      offerId: OfferID, tasks: util.Collection[TaskInfo]): Status = ???
+  override def launchTasks(offerId: OfferID,
+                           tasks: util.Collection[TaskInfo]): Status = ???
   override def requestResources(requests: util.Collection[Request]): Status =
     ???
-  override def sendFrameworkMessage(
-      executorId: ExecutorID, slaveId: SlaveID, data: Array[Byte]): Status =
+  override def sendFrameworkMessage(executorId: ExecutorID,
+                                    slaveId: SlaveID,
+                                    data: Array[Byte]): Status =
     ???
   override def acknowledgeStatusUpdate(ackStatus: TaskStatus): Status = status
 

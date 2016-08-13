@@ -5,7 +5,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScUnderscoreSection}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList,
+  ScUnderscoreSection
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
@@ -21,12 +24,12 @@ class ArgumentToBlockExpressionIntention
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
     IntentionAvailabilityChecker.checkIntention(this, element) &&
     (element match {
-          case Parent(list: ScArgumentExprList)
-              if list.exprs.size == 1 &&
-              !list.exprs(0).isInstanceOf[ScUnderscoreSection] =>
-            true
-          case _ => false
-        })
+      case Parent(list: ScArgumentExprList)
+          if list.exprs.size == 1 &&
+            !list.exprs(0).isInstanceOf[ScUnderscoreSection] =>
+        true
+      case _ => false
+    })
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {

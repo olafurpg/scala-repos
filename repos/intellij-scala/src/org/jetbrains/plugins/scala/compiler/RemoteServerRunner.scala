@@ -42,17 +42,17 @@ class RemoteServerRunner(project: Project) extends RemoteResourceOwner {
           send(serverAlias, arguments, client)
         } catch {
           case e: ConnectException =>
-            val message = "Cannot connect to compile server at %s:%s".format(
-                address.toString, port)
+            val message = "Cannot connect to compile server at %s:%s"
+              .format(address.toString, port)
             client.error(message)
             client.debug(
-                s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
+              s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
           case e: UnknownHostException =>
             val message =
               "Unknown IP address of compile server host: " + address.toString
             client.error(message)
             client.debug(
-                s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
+              s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
         } finally {
           callbacks.foreach(a => a())
         }

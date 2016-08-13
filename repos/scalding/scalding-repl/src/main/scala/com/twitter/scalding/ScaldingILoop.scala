@@ -32,12 +32,12 @@ object ScaldingILoop {
       filename: String): List[File] = {
     val matchingFiles = for {
       ancestor <- Iterator
-        .iterate(currentDir)(new File(_).getParent)
-        .takeWhile(_ != "/")
+                   .iterate(currentDir)(new File(_).getParent)
+                   .takeWhile(_ != "/")
 
       children: Array[File] = Option(new File(ancestor).listFiles).getOrElse {
         println(
-            s"The directory '$ancestor' could not be accessed while looking for '$filename'")
+          s"The directory '$ancestor' could not be accessed while looking for '$filename'")
         Array.empty
       }
 
@@ -64,12 +64,12 @@ class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
     val wc = Console.RED
     def wrapFlames(s: String) = s.replaceAll("[()]+", fc + "$0" + wc)
     echo(
-        fc + " (                                           \n" +
+      fc + " (                                           \n" +
         " )\\ )            (   (                       \n" +
         "(()/(         )  )\\  )\\ )  (          (  (   \n" +
         " /(_)) (   ( /( ((_)(()/( )\\   (     )\\))(  \n" +
-        "(_))   )\\  )( )) _   ((_)(( )  )\\ ) (( ))\\  \n".replaceAll(
-            "_", wc + "_" + fc) + wc +
+        "(_))   )\\  )( )) _   ((_)(( )  )\\ ) (( ))\\  \n"
+          .replaceAll("_", wc + "_" + fc) + wc +
         wrapFlames("/ __|((_) ((_)_ | |  _| | (_) _(_(( (_()_) \n") +
         wrapFlames("\\__ \\/ _| / _` || |/ _` | | || ' \\))/ _` \\  \n") +
         "|___/\\__| \\__,_||_|\\__,_| |_||_||_| \\__, |  \n" +

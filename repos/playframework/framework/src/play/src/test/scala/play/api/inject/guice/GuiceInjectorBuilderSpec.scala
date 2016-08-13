@@ -103,9 +103,9 @@ object GuiceInjectorBuilderSpec extends Specification {
         .injector
 
       injector.instanceOf[Environment] must throwA[
-          com.google.inject.ConfigurationException]
-      injector.instanceOf[A] must throwA[
-          com.google.inject.ConfigurationException]
+        com.google.inject.ConfigurationException]
+      injector
+        .instanceOf[A] must throwA[com.google.inject.ConfigurationException]
 
       injector.instanceOf[Configuration] must beAnInstanceOf[Configuration]
       injector.instanceOf[B] must beAnInstanceOf[B1]
@@ -117,28 +117,28 @@ object GuiceInjectorBuilderSpec extends Specification {
       val injector = new GuiceInjectorBuilder()
         .requireExplicitBindings()
         .bindings(
-            bind[A].to[A1],
-            bind[B].to[B1]
+          bind[A].to[A1],
+          bind[B].to[B1]
         )
         .injector
       injector.instanceOf[A] must beAnInstanceOf[A1]
       injector.instanceOf[B] must beAnInstanceOf[B1]
-      injector.instanceOf[B1] must throwA[
-          com.google.inject.ConfigurationException]
-      injector.instanceOf[C1] must throwA[
-          com.google.inject.ConfigurationException]
+      injector
+        .instanceOf[B1] must throwA[com.google.inject.ConfigurationException]
+      injector
+        .instanceOf[C1] must throwA[com.google.inject.ConfigurationException]
     }
   }
 
   class EnvironmentModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[Environment] to env
+      bind[Environment] to env
     )
   }
 
   class ConfigurationModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[Configuration] to conf
+      bind[Configuration] to conf
     )
   }
 

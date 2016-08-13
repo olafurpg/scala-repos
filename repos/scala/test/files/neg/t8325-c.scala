@@ -1,3 +1,3 @@
 trait Test {
-  def k(xx: Int `*`) = ???
+  def k(xx: Int`*`) = ???
 }

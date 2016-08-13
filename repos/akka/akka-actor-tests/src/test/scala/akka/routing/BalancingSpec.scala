@@ -26,8 +26,9 @@ object BalancingSpec {
   }
 
   class Parent extends Actor {
-    val pool = context.actorOf(BalancingPool(2).props(routeeProps = Props(
-                  classOf[Worker], TestLatch(0)(context.system))))
+    val pool = context.actorOf(
+      BalancingPool(2).props(
+        routeeProps = Props(classOf[Worker], TestLatch(0)(context.system))))
 
     def receive = {
       case msg ⇒ pool.forward(msg)
@@ -89,7 +90,7 @@ class BalancingSpec extends AkkaSpec("""
       val latch = TestLatch(1)
       val pool =
         system.actorOf(BalancingPool(poolSize).props(
-                           routeeProps = Props(classOf[Worker], latch)),
+                         routeeProps = Props(classOf[Worker], latch)),
                        name = "balancingPool-1")
       test(pool, latch)
     }
@@ -97,16 +98,16 @@ class BalancingSpec extends AkkaSpec("""
     "deliver messages in a balancing fashion when defined in config" in {
       val latch = TestLatch(1)
       val pool = system.actorOf(
-          FromConfig().props(routeeProps = Props(classOf[Worker], latch)),
-          name = "balancingPool-2")
+        FromConfig().props(routeeProps = Props(classOf[Worker], latch)),
+        name = "balancingPool-2")
       test(pool, latch)
     }
 
     "deliver messages in a balancing fashion when overridden in config" in {
       val latch = TestLatch(1)
       val pool = system.actorOf(
-          BalancingPool(1).props(routeeProps = Props(classOf[Worker], latch)),
-          name = "balancingPool-3")
+        BalancingPool(1).props(routeeProps = Props(classOf[Worker], latch)),
+        name = "balancingPool-3")
       test(pool, latch)
     }
 

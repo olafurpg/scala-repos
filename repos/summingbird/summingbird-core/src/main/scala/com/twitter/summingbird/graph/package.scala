@@ -82,12 +82,12 @@ package object graph {
         }
 
         acc ++=
-        (doneThisStep.flatten.map { n =>
-              val depth =
-                nf(n) //n is done now, so all it's neighbors must be too.
-                .map { acc(_) + 1 }.reduceOption { _ max _ }.getOrElse(0)
-              n -> depth
-            })
+          (doneThisStep.flatten.map { n =>
+            val depth =
+              nf(n) //n is done now, so all it's neighbors must be too.
+              .map { acc(_) + 1 }.reduceOption { _ max _ }.getOrElse(0)
+            n -> depth
+          })
         computeDepth(rest.flatten)
       }
 

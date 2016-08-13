@@ -1,11 +1,17 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation,
+  CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
-import org.jetbrains.plugins.scala.lang.completion.{ScalaAfterNewCompletionUtil, ScalaCompletionUtil}
+import org.jetbrains.plugins.scala.lang.completion.{
+  ScalaAfterNewCompletionUtil,
+  ScalaCompletionUtil
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
@@ -16,12 +22,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   */
 class ScalaByTypeWeigher extends CompletionWeigher {
 
-  override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  override def weigh(element: LookupElement,
+                     location: CompletionLocation): Comparable[_] = {
     import KindWeights._
 
     val position = ScalaCompletionUtil.positionFromParameters(
-        location.getCompletionParameters)
+      location.getCompletionParameters)
     val context = location.getProcessingContext
 
     val isAfterNew = ScalaAfterNewCompletionUtil.isAfterNew(position, context)

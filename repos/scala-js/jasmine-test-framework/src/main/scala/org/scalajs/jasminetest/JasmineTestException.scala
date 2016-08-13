@@ -12,7 +12,6 @@ package org.scalajs.jasminetest
 class JasmineTestException(
     message: String,
     stackTrace: Array[StackTraceElement]
-)
-    extends Exception(message) {
+) extends Exception(message) {
   override def getStackTrace(): Array[StackTraceElement] = stackTrace
 }

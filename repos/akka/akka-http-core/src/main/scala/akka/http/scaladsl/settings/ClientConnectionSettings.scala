@@ -22,7 +22,7 @@ import scala.collection.JavaConverters._
 /**
   * Public API but not intended for subclassing
   */
-abstract class ClientConnectionSettings private[akka]()
+abstract class ClientConnectionSettings private[akka] ()
     extends akka.http.javadsl.settings.ClientConnectionSettings {
   self: ClientConnectionSettingsImpl ⇒
   def userAgentHeader: Option[`User-Agent`]

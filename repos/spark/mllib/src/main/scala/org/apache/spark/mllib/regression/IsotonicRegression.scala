@@ -51,7 +51,8 @@ class IsotonicRegressionModel @Since("1.3.0")(
     @Since("1.3.0") val boundaries: Array[Double],
     @Since("1.3.0") val predictions: Array[Double],
     @Since("1.3.0") val isotonic: Boolean)
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
   private val predictionOrd =
     if (isotonic) Ordering[Double] else Ordering[Double].reverse
@@ -106,7 +107,7 @@ class IsotonicRegressionModel @Since("1.3.0")(
   @Since("1.3.0")
   def predict(testData: JavaDoubleRDD): JavaDoubleRDD = {
     JavaDoubleRDD.fromRDD(
-        predict(testData.rdd.retag.asInstanceOf[RDD[Double]]))
+      predict(testData.rdd.retag.asInstanceOf[RDD[Double]]))
   }
 
   /**
@@ -129,8 +130,11 @@ class IsotonicRegressionModel @Since("1.3.0")(
   @Since("1.3.0")
   def predict(testData: Double): Double = {
 
-    def linearInterpolation(
-        x1: Double, y1: Double, x2: Double, y2: Double, x: Double): Double = {
+    def linearInterpolation(x1: Double,
+                            y1: Double,
+                            x2: Double,
+                            y2: Double,
+                            x: Double): Double = {
       y1 + (y2 - y1) * (x - x1) / (x2 - x1)
     }
 
@@ -162,8 +166,8 @@ class IsotonicRegressionModel @Since("1.3.0")(
 
   @Since("1.4.0")
   override def save(sc: SparkContext, path: String): Unit = {
-    IsotonicRegressionModel.SaveLoadV1_0.save(
-        sc, path, boundaries, predictions, isotonic)
+    IsotonicRegressionModel.SaveLoadV1_0
+      .save(sc, path, boundaries, predictions, isotonic)
   }
 
   override protected def formatVersion: String = "1.0"
@@ -192,13 +196,15 @@ object IsotonicRegressionModel extends Loader[IsotonicRegressionModel] {
              isotonic: Boolean): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
 
-      val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("isotonic" -> isotonic)))
+      val metadata = compact(
+        render(
+          ("class" -> thisClassName) ~
+            ("version" -> thisFormatVersion) ~ ("isotonic" -> isotonic)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
 
       sqlContext
         .createDataFrame(
-            boundaries.toSeq.zip(predictions).map { case (b, p) => Data(b, p) }
+          boundaries.toSeq.zip(predictions).map { case (b, p) => Data(b, p) }
         )
         .write
         .parquet(dataPath(path))
@@ -212,10 +218,8 @@ object IsotonicRegressionModel extends Loader[IsotonicRegressionModel] {
       val dataArray = dataRDD.select("boundary", "prediction").collect()
       val (boundaries, predictions) = dataArray.map { x =>
         (x.getDouble(0), x.getDouble(1))
-      }.toList
-        .sortBy(_._1)
-        .unzip
-        (boundaries.toArray, predictions.toArray)
+      }.toList.sortBy(_._1).unzip
+      (boundaries.toArray, predictions.toArray)
     }
   }
 
@@ -231,7 +235,7 @@ object IsotonicRegressionModel extends Loader[IsotonicRegressionModel] {
         new IsotonicRegressionModel(boundaries, predictions, isotonic)
       case _ =>
         throw new Exception(
-            s"IsotonicRegressionModel.load did not recognize model with (className, format version):" +
+          s"IsotonicRegressionModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)"
         )
@@ -342,8 +346,9 @@ class IsotonicRegression private (private var isotonic: Boolean)
     }
 
     // Pools sub array within given bounds assigning weighted average value to all elements.
-    def pool(
-        input: Array[(Double, Double, Double)], start: Int, end: Int): Unit = {
+    def pool(input: Array[(Double, Double, Double)],
+             start: Int,
+             end: Int): Unit = {
       val poolSubArray = input.slice(start, end + 1)
 
       val weightedSum = poolSubArray.map(lp => lp._1 * lp._3).sum

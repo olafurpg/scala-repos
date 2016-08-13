@@ -27,10 +27,11 @@ private[http] object HttpClientDispatcher {
   *
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
-class HttpClientDispatcher(
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+class HttpClientDispatcher(trans: Transport[Any, Any],
+                           statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Request, Response, Any, Any](
-        trans, statsReceiver) {
+      trans,
+      statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException
   import HttpClientDispatcher._
@@ -46,7 +47,7 @@ class HttpClientDispatcher(
       val headersString =
         dtabHeaders.map({ case (k, v) => s"[$k: $v]" }).mkString(", ")
       log.error(
-          s"discarding manually set dtab headers in request: $headersString\n" +
+        s"discarding manually set dtab headers in request: $headersString\n" +
           s"set Dtab.local instead to send Dtab information.")
     }
 
@@ -70,31 +71,32 @@ class HttpClientDispatcher(
         // Do these concurrently:
         Future
           .join(
-              // 1. Drain the Request body into the Transport.
-              if (req.isChunked) streamChunks(trans, req.reader)
-              else Future.Done,
-              // 2. Drain the Transport into Response body.
-              trans.read() flatMap {
-                case res: HttpResponse if HttpNackFilter.isNack(res) =>
-                  p.updateIfEmpty(Throw(NackFailure))
-                  Future.Done
+            // 1. Drain the Request body into the Transport.
+            if (req.isChunked) streamChunks(trans, req.reader)
+            else Future.Done,
+            // 2. Drain the Transport into Response body.
+            trans.read() flatMap {
+              case res: HttpResponse if HttpNackFilter.isNack(res) =>
+                p.updateIfEmpty(Throw(NackFailure))
+                Future.Done
 
-                case res: HttpResponse if !res.isChunked =>
-                  val response = Response(
-                      res, BufReader(ChannelBufferBuf.Owned(res.getContent)))
-                  p.updateIfEmpty(Return(response))
-                  Future.Done
+              case res: HttpResponse if !res.isChunked =>
+                val response =
+                  Response(res,
+                           BufReader(ChannelBufferBuf.Owned(res.getContent)))
+                p.updateIfEmpty(Return(response))
+                Future.Done
 
-                case res: HttpResponse =>
-                  val coll = Transport.collate(trans, readChunk)
-                  p.updateIfEmpty(Return(Response(res, coll)))
-                  coll
+              case res: HttpResponse =>
+                val coll = Transport.collate(trans, readChunk)
+                p.updateIfEmpty(Return(Response(res, coll)))
+                coll
 
-                case invalid =>
-                  // We rely on the base class to satisfy p.
-                  Future.exception(new IllegalArgumentException(
-                          s"invalid message '$invalid'"))
-              }
+              case invalid =>
+                // We rely on the base class to satisfy p.
+                Future.exception(
+                  new IllegalArgumentException(s"invalid message '$invalid'"))
+            }
           )
           .unit
       } onFailure { _ =>

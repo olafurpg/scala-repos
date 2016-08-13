@@ -14,7 +14,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class BackupRequestFilterTest
-    extends FunSuite with MockitoSugar with Matchers {
+    extends FunSuite
+    with MockitoSugar
+    with Matchers {
   def quantile(ds: Seq[Duration], which: Int) = {
     val sorted = ds.sorted
     sorted(which * sorted.size / 100)
@@ -67,7 +69,7 @@ class BackupRequestFilterTest
           case error =>
             val epsilon = maxDuration.inMillis * error
             actual.inMillis.toDouble should be(
-                ideal.inMillis.toDouble +- epsilon)
+              ideal.inMillis.toDouble +- epsilon)
         }
       }
     }
@@ -217,7 +219,7 @@ class BackupRequestFilterTest
   }
 
   test(
-      "return backup request response when original fails after backup is issued") {
+    "return backup request response when original fails after backup is issued") {
     Time.withCurrentTimeFrozen { tc =>
       val ctx = newCtx()
       import ctx._

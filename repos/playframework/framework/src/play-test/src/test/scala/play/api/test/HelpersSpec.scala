@@ -21,7 +21,7 @@ class HelpersSpec extends Specification {
     "change database with a name argument" in {
       val inMemoryDatabaseConfiguration = inMemoryDatabase("test")
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
-          "org.h2.Driver")
+        "org.h2.Driver")
       inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {
         url =>
           url.startsWith("jdbc:h2:mem:play-test-")
@@ -29,10 +29,11 @@ class HelpersSpec extends Specification {
     }
 
     "add options" in {
-      val inMemoryDatabaseConfiguration = inMemoryDatabase(
-          "test", Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
+      val inMemoryDatabaseConfiguration =
+        inMemoryDatabase("test",
+                         Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
-          "org.h2.Driver")
+        "org.h2.Driver")
       inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {
         url =>
           """^jdbc:h2:mem:play-test([0-9-]+);MODE=PostgreSQL;DB_CLOSE_DELAY=-1$""".r
@@ -69,7 +70,7 @@ class HelpersSpec extends Specification {
       try {
         implicit val mat = ActorMaterializer()
         contentAsBytes(
-            Future.successful(Ok.chunked(Source(List("a", "b", "c"))))) must_==
+          Future.successful(Ok.chunked(Source(List("a", "b", "c"))))) must_==
           ByteString(97, 98, 99)
       } finally {
         system.terminate()
@@ -88,9 +89,10 @@ class HelpersSpec extends Specification {
   "contentAsJson" should {
 
     "extract the content from Result as Json" in {
-      val jsonResult = Ok("""{"play":["java","scala"]}""").as(
-          "application/json")
-      (contentAsJson(Future.successful(jsonResult)) \ "play").as[List[String]] must_==
+      val jsonResult =
+        Ok("""{"play":["java","scala"]}""").as("application/json")
+      (contentAsJson(Future.successful(jsonResult)) \ "play")
+        .as[List[String]] must_==
         List("java", "scala")
     }
 

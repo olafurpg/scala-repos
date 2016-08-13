@@ -29,7 +29,7 @@ object MultiNodeClusterSpec {
   def clusterConfigWithFailureDetectorPuppet: Config =
     ConfigFactory
       .parseString(
-          "akka.cluster.failure-detector.implementation-class = akka.cluster.FailureDetectorPuppet")
+        "akka.cluster.failure-detector.implementation-class = akka.cluster.FailureDetectorPuppet")
       .withFallback(clusterConfig)
 
   def clusterConfig(failureDetectorPuppet: Boolean): Config =
@@ -37,7 +37,8 @@ object MultiNodeClusterSpec {
     else clusterConfig
 
   def clusterConfig: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.cluster {
       jmx.enabled                         = off
@@ -82,8 +83,9 @@ object MultiNodeClusterSpec {
 }
 
 trait MultiNodeClusterSpec
-    extends Suite with STMultiNodeSpec with WatchedByCoroner {
-  self: MultiNodeSpec ⇒
+    extends Suite
+    with STMultiNodeSpec
+    with WatchedByCoroner { self: MultiNodeSpec ⇒
 
   override def initialParticipants = roles.size
 
@@ -113,32 +115,33 @@ trait MultiNodeClusterSpec
       }
 
       muteDeadLetters(
-          classOf[ClusterHeartbeatSender.Heartbeat],
-          classOf[ClusterHeartbeatSender.HeartbeatRsp],
-          classOf[GossipEnvelope],
-          classOf[GossipStatus],
-          classOf[MetricsGossipEnvelope],
-          classOf[ClusterEvent.ClusterMetricsChanged],
-          classOf[InternalClusterAction.Tick],
-          classOf[akka.actor.PoisonPill],
-          classOf[akka.dispatch.sysmsg.DeathWatchNotification],
-          classOf[akka.remote.transport.AssociationHandle.Disassociated],
-          //        akka.remote.transport.AssociationHandle.Disassociated.getClass,
-          classOf[akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying],
-          //        akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying.getClass,
-          classOf[akka.remote.transport.AssociationHandle.InboundPayload])(sys)
+        classOf[ClusterHeartbeatSender.Heartbeat],
+        classOf[ClusterHeartbeatSender.HeartbeatRsp],
+        classOf[GossipEnvelope],
+        classOf[GossipStatus],
+        classOf[MetricsGossipEnvelope],
+        classOf[ClusterEvent.ClusterMetricsChanged],
+        classOf[InternalClusterAction.Tick],
+        classOf[akka.actor.PoisonPill],
+        classOf[akka.dispatch.sysmsg.DeathWatchNotification],
+        classOf[akka.remote.transport.AssociationHandle.Disassociated],
+        //        akka.remote.transport.AssociationHandle.Disassociated.getClass,
+        classOf[
+          akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying],
+        //        akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying.getClass,
+        classOf[akka.remote.transport.AssociationHandle.InboundPayload])(sys)
     }
   }
 
   def muteMarkingAsUnreachable(sys: ActorSystem = system): Unit =
     if (!sys.log.isDebugEnabled)
       sys.eventStream.publish(
-          Mute(EventFilter.error(pattern = ".*Marking.* as UNREACHABLE.*")))
+        Mute(EventFilter.error(pattern = ".*Marking.* as UNREACHABLE.*")))
 
   def muteMarkingAsReachable(sys: ActorSystem = system): Unit =
     if (!sys.log.isDebugEnabled)
       sys.eventStream.publish(
-          Mute(EventFilter.info(pattern = ".*Marking.* as REACHABLE.*")))
+        Mute(EventFilter.info(pattern = ".*Marking.* as REACHABLE.*")))
 
   override def afterAll(): Unit = {
     if (!log.isDebugEnabled) {
@@ -194,7 +197,7 @@ trait MultiNodeClusterSpec
     if (clusterView.members.isEmpty) {
       cluster join myself
       awaitAssert(
-          clusterView.members.map(_.address) should contain(address(myself)))
+        clusterView.members.map(_.address) should contain(address(myself)))
     } else clusterView.self
   }
 
@@ -248,8 +251,8 @@ trait MultiNodeClusterSpec
     * Assert that the member addresses match the expected addresses in the
     * sort order used by the cluster.
     */
-  def assertMembers(
-      gotMembers: Iterable[Member], expectedAddresses: Address*): Unit = {
+  def assertMembers(gotMembers: Iterable[Member],
+                    expectedAddresses: Address*): Unit = {
     import Member.addressOrdering
     val members = gotMembers.toIndexedSeq
     members.size should ===(expectedAddresses.length)
@@ -287,10 +290,10 @@ trait MultiNodeClusterSpec
       val leader = clusterView.leader
       val isLeader = leader == Some(clusterView.selfAddress)
       assert(isLeader == isNode(expectedLeader),
-             "expectedLeader [%s], got leader [%s], members [%s]".format(
-                 expectedLeader, leader, clusterView.members))
+             "expectedLeader [%s], got leader [%s], members [%s]"
+               .format(expectedLeader, leader, clusterView.members))
       clusterView.status should
-      (be(MemberStatus.Up) or be(MemberStatus.Leaving))
+        (be(MemberStatus.Up) or be(MemberStatus.Leaving))
     }
 
   /**
@@ -302,11 +305,12 @@ trait MultiNodeClusterSpec
                      timeout: FiniteDuration = 25.seconds): Unit = {
     within(timeout) {
       if (!canNotBePartOfMemberRing.isEmpty) // don't run this on an empty set
-        awaitAssert(canNotBePartOfMemberRing foreach
+        awaitAssert(
+          canNotBePartOfMemberRing foreach
             (a ⇒ clusterView.members.map(_.address) should not contain (a)))
       awaitAssert(clusterView.members.size should ===(numberOfMembers))
       awaitAssert(
-          clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
+        clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
       // clusterView.leader is updated by LeaderChanged, await that to be updated also
       val expectedLeader = clusterView.members.headOption.map(_.address)
       awaitAssert(clusterView.leader should ===(expectedLeader))
@@ -321,7 +325,7 @@ trait MultiNodeClusterSpec
     */
   def awaitSeenSameState(addresses: Address*): Unit =
     awaitAssert(
-        (addresses.toSet diff clusterView.seenBy) should ===(Set.empty))
+      (addresses.toSet diff clusterView.seenBy) should ===(Set.empty))
 
   /**
     * Leader according to the address ordering of the roles.
@@ -372,7 +376,7 @@ trait MultiNodeClusterSpec
 
   private def isFailureDetectorPuppet: Boolean =
     cluster.settings.FailureDetectorImplementationClass == classOf[
-        FailureDetectorPuppet].getName
+      FailureDetectorPuppet].getName
 
   private def failureDetectorPuppet(
       address: Address): Option[FailureDetectorPuppet] =

@@ -71,7 +71,7 @@ private[spark] class Benchmark(name: String,
            "Per Row(ns)",
            "Relative")
     println(
-        "-----------------------------------------------------------------------------------" +
+      "-----------------------------------------------------------------------------------" +
         "--------")
     results.zip(benchmarks).foreach {
       case (result, benchmark) =>
@@ -98,12 +98,12 @@ private[spark] object Benchmark {
   def getProcessorName(): String = {
     if (SystemUtils.IS_OS_MAC_OSX) {
       Utils.executeAndGetOutput(
-          Seq("/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"))
+        Seq("/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"))
     } else if (SystemUtils.IS_OS_LINUX) {
       Try {
         val grepPath = Utils.executeAndGetOutput(Seq("which", "grep"))
         Utils.executeAndGetOutput(
-            Seq(grepPath, "-m", "1", "model name", "/proc/cpuinfo"))
+          Seq(grepPath, "-m", "1", "model name", "/proc/cpuinfo"))
       }.getOrElse("Unknown processor")
     } else {
       System.getenv("PROCESSOR_IDENTIFIER")

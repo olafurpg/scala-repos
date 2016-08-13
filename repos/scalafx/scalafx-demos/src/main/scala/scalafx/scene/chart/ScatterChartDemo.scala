@@ -37,11 +37,11 @@ object ScatterChartDemo extends JFXApp {
   stage = new JFXApp.PrimaryStage {
     title = "ScatterChartDemo"
     scene = new Scene {
-      root = new ScatterChart(
-          NumberAxis("X", 0, 6, 1), NumberAxis("Y", 0, 6, 1)) {
-        title = "Scatter Chart"
-        legendSide = Side.Right
-        data = ObservableBuffer(
+      root =
+        new ScatterChart(NumberAxis("X", 0, 6, 1), NumberAxis("Y", 0, 6, 1)) {
+          title = "Scatter Chart"
+          legendSide = Side.Right
+          data = ObservableBuffer(
             xySeries("Series 1",
                      Seq((0.1, 0.2),
                          (1.1, 0.8),
@@ -50,20 +50,21 @@ object ScatterChartDemo extends JFXApp {
                          (3.9, 3.5),
                          (5.1, 5.4))),
             xySeries(
-                "Series 2",
-                Seq((0, 4), (1, 1), (2, 4.5), (3, 3.5), (4, 4.25), (5, 4.5))),
+              "Series 2",
+              Seq((0, 4), (1, 1), (2, 4.5), (3, 3.5), (4, 4.25), (5, 4.5))),
             xySeries(
-                "Series 3",
-                Seq((0, 1), (1, 2.55), (2, 4), (3, 3), (4, 4.5), (5, 5.5))))
-      }
+              "Series 3",
+              Seq((0, 1), (1, 2.55), (2, 4), (3, 3), (4, 4.5), (5, 5.5))))
+        }
     }
   }
 
   /** Create XYChart.Series from a sequence of number pairs. */
   def xySeries(name: String, data: Seq[(Double, Double)]) =
     XYChart.Series[Number, Number](
-        name,
-        ObservableBuffer(
-            data.map { case (x, y) => XYChart.Data[Number, Number](x, y) })
+      name,
+      ObservableBuffer(data.map {
+        case (x, y) => XYChart.Data[Number, Number](x, y)
+      })
     )
 }

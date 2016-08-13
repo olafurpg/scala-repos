@@ -6,7 +6,13 @@ package play.core.server.ssl
 import play.core.server.ServerConfig
 import play.server.api.SSLEngineProvider
 import play.core.ApplicationProvider
-import javax.net.ssl.{TrustManager, KeyManagerFactory, SSLEngine, SSLContext, X509TrustManager}
+import javax.net.ssl.{
+  TrustManager,
+  KeyManagerFactory,
+  SSLEngine,
+  SSLContext,
+  X509TrustManager
+}
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.io.{FileInputStream, File}
@@ -17,8 +23,8 @@ import play.utils.PlayIO
 /**
   * This class calls sslContext.createSSLEngine() with no parameters and returns the result.
   */
-class DefaultSSLEngineProvider(
-    serverConfig: ServerConfig, appProvider: ApplicationProvider)
+class DefaultSSLEngineProvider(serverConfig: ServerConfig,
+                               appProvider: ApplicationProvider)
     extends SSLEngineProvider {
 
   import DefaultSSLEngineProvider._
@@ -54,22 +60,22 @@ class DefaultSSLEngineProvider(
             kmf
           } catch {
             case NonFatal(e) => {
-                throw new Exception("Error loading HTTPS keystore from " +
+              throw new Exception("Error loading HTTPS keystore from " +
                                     file.getAbsolutePath,
-                                    e)
-              }
+                                  e)
+            }
           } finally {
             PlayIO.closeQuietly(in)
           }
         } else {
           throw new Exception(
-              "Unable to find HTTPS keystore at \"" + file.getAbsolutePath +
+            "Unable to find HTTPS keystore at \"" + file.getAbsolutePath +
               "\"")
         }
       } else {
         // Load a generated key store
         logger.warn(
-            "Using generated key with self signed certificate for HTTPS. This should not be used in production.")
+          "Using generated key with self signed certificate for HTTPS. This should not be used in production.")
         FakeKeyStore.keyManagerFactory(serverConfig.rootDir)
       }
 
@@ -77,12 +83,13 @@ class DefaultSSLEngineProvider(
     val trustStoreConfig = httpsConfig.getConfig("trustStore")
     val tm =
       if (trustStoreConfig.getBoolean("noCaVerification")) {
-        logger.warn("HTTPS configured with no client " +
+        logger.warn(
+          "HTTPS configured with no client " +
             "side CA verification. Requires http://webid.info/ for client certificate verification.")
         Array[TrustManager](noCATrustManager)
       } else {
         logger.debug(
-            "Using default trust store for client side CA verification")
+          "Using default trust store for client side CA verification")
         null
       }
 

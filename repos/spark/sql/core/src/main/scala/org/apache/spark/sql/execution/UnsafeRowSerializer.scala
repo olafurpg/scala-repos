@@ -24,7 +24,12 @@ import scala.reflect.ClassTag
 
 import com.google.common.io.ByteStreams
 
-import org.apache.spark.serializer.{DeserializationStream, SerializationStream, Serializer, SerializerInstance}
+import org.apache.spark.serializer.{
+  DeserializationStream,
+  SerializationStream,
+  Serializer,
+  SerializerInstance
+}
 import org.apache.spark.sql.catalyst.expressions.UnsafeRow
 import org.apache.spark.unsafe.Platform
 
@@ -40,7 +45,8 @@ import org.apache.spark.unsafe.Platform
   * @param numFields the number of fields in the row being serialized.
   */
 private[sql] class UnsafeRowSerializer(numFields: Int)
-    extends Serializer with Serializable {
+    extends Serializer
+    with Serializable {
   override def newInstance(): SerializerInstance =
     new UnsafeRowSerializerInstance(numFields)
   override private[spark] def supportsRelocationOfSerializedObjects: Boolean =
@@ -58,9 +64,9 @@ private class UnsafeRowSerializerInstance(numFields: Int)
     new SerializationStream {
       private[this] var writeBuffer: Array[Byte] = new Array[Byte](4096)
       private[this] val dOut: DataOutputStream = new DataOutputStream(
-          new BufferedOutputStream(out))
+        new BufferedOutputStream(out))
 
-      override def writeValue[T : ClassTag](value: T): SerializationStream = {
+      override def writeValue[T: ClassTag](value: T): SerializationStream = {
         val row = value.asInstanceOf[UnsafeRow]
 
         dOut.writeInt(row.getSizeInBytes)
@@ -68,20 +74,20 @@ private class UnsafeRowSerializerInstance(numFields: Int)
         this
       }
 
-      override def writeKey[T : ClassTag](key: T): SerializationStream = {
+      override def writeKey[T: ClassTag](key: T): SerializationStream = {
         // The key is only needed on the map side when computing partition ids. It does not need to
         // be shuffled.
         assert(null == key || key.isInstanceOf[Int])
         this
       }
 
-      override def writeAll[T : ClassTag](
+      override def writeAll[T: ClassTag](
           iter: Iterator[T]): SerializationStream = {
         // This method is never called by shuffle code.
         throw new UnsupportedOperationException
       }
 
-      override def writeObject[T : ClassTag](t: T): SerializationStream = {
+      override def writeObject[T: ClassTag](t: T): SerializationStream = {
         // This method is never called by shuffle code.
         throw new UnsupportedOperationException
       }
@@ -99,7 +105,7 @@ private class UnsafeRowSerializerInstance(numFields: Int)
   override def deserializeStream(in: InputStream): DeserializationStream = {
     new DeserializationStream {
       private[this] val dIn: DataInputStream = new DataInputStream(
-          new BufferedInputStream(in))
+        new BufferedInputStream(in))
       // 1024 is a default buffer size; this buffer will grow to accommodate larger rows
       private[this] var rowBuffer: Array[Byte] = new Array[Byte](1024)
       private[this] var row: UnsafeRow = new UnsafeRow(numFields)
@@ -150,13 +156,13 @@ private class UnsafeRowSerializerInstance(numFields: Int)
         throw new UnsupportedOperationException
       }
 
-      override def readKey[T : ClassTag](): T = {
+      override def readKey[T: ClassTag](): T = {
         // We skipped serialization of the key in writeKey(), so just return a dummy value since
         // this is going to be discarded anyways.
         null.asInstanceOf[T]
       }
 
-      override def readValue[T : ClassTag](): T = {
+      override def readValue[T: ClassTag](): T = {
         val rowSize = dIn.readInt()
         if (rowBuffer.length < rowSize) {
           rowBuffer = new Array[Byte](rowSize)
@@ -166,7 +172,7 @@ private class UnsafeRowSerializerInstance(numFields: Int)
         row.asInstanceOf[T]
       }
 
-      override def readObject[T : ClassTag](): T = {
+      override def readObject[T: ClassTag](): T = {
         // This method is never called by shuffle code.
         throw new UnsupportedOperationException
       }
@@ -178,11 +184,11 @@ private class UnsafeRowSerializerInstance(numFields: Int)
   }
 
   // These methods are never called by shuffle code.
-  override def serialize[T : ClassTag](t: T): ByteBuffer =
+  override def serialize[T: ClassTag](t: T): ByteBuffer =
     throw new UnsupportedOperationException
-  override def deserialize[T : ClassTag](bytes: ByteBuffer): T =
+  override def deserialize[T: ClassTag](bytes: ByteBuffer): T =
     throw new UnsupportedOperationException
-  override def deserialize[T : ClassTag](
-      bytes: ByteBuffer, loader: ClassLoader): T =
+  override def deserialize[T: ClassTag](bytes: ByteBuffer,
+                                        loader: ClassLoader): T =
     throw new UnsupportedOperationException
 }

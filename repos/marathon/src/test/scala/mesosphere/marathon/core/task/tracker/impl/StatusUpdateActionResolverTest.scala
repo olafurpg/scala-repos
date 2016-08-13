@@ -18,7 +18,10 @@ import scala.concurrent.Future
   * More tests are in [[mesosphere.marathon.tasks.TaskTrackerImplTest]]
   */
 class StatusUpdateActionResolverTest
-    extends FunSuite with Mockito with GivenWhenThen with ScalaFutures
+    extends FunSuite
+    with Mockito
+    with GivenWhenThen
+    with ScalaFutures
     with Matchers {
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,8 +42,10 @@ class StatusUpdateActionResolverTest
 
     And("a fail action is returned")
     action.getClass should be(classOf[TaskOpProcessor.Action.Fail])
-    action.asInstanceOf[TaskOpProcessor.Action.Fail].cause.getMessage should equal(
-        s"$taskId of app [$appId] does not exist")
+    action
+      .asInstanceOf[TaskOpProcessor.Action.Fail]
+      .cause
+      .getMessage should equal(s"$taskId of app [$appId] does not exist")
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()

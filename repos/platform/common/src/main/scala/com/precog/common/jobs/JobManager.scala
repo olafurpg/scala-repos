@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -109,8 +109,8 @@ trait JobManager[M[+ _]] { self =>
     * Starts a job if it is in the `NotStarted` state, otherwise an error string
     * is returned.
     */
-  def start(
-      job: JobId, startedAt: DateTime = new DateTime): M[Either[String, Job]]
+  def start(job: JobId,
+            startedAt: DateTime = new DateTime): M[Either[String, Job]]
 
   /**
     * Cancels a job. This doesn't necessarily mean the job has actually stopped,
@@ -136,14 +136,14 @@ trait JobManager[M[+ _]] { self =>
     * Moves the job to the `Finished` terminal state, with the given value as
     * the result.
     */
-  def finish(
-      job: JobId, finishedAt: DateTime = new DateTime): M[Either[String, Job]]
+  def finish(job: JobId,
+             finishedAt: DateTime = new DateTime): M[Either[String, Job]]
 
   /**
     * Moves the job to the `Expired` terminal state.
     */
-  def expire(
-      job: JobId, expiredAt: DateTime = new DateTime): M[Either[String, Job]]
+  def expire(job: JobId,
+             expiredAt: DateTime = new DateTime): M[Either[String, Job]]
 
   def setResult(job: JobId,
                 mimeType: Option[MimeType],
@@ -183,8 +183,9 @@ trait JobManager[M[+ _]] { self =>
       def listChannels(job: JobId): N[Seq[ChannelId]] =
         t(self.listChannels(job))
 
-      def addMessage(
-          job: JobId, channel: ChannelId, value: JValue): N[Message] =
+      def addMessage(job: JobId,
+                     channel: ChannelId,
+                     value: JValue): N[Message] =
         t(self.addMessage(job, channel, value))
 
       def listMessages(job: JobId,
@@ -263,28 +264,31 @@ trait JobStateManager[M[+ _]] { self: JobManager[M] =>
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Aborted(reason, abortedAt, prev))
       case badState =>
-        Left("Job already in terminal state. %s" format JobState.describe(
-                badState))
+        Left(
+          "Job already in terminal state. %s" format JobState.describe(
+            badState))
     }
 
-  def finish(
-      id: JobId, finishedAt: DateTime = new DateTime): M[Either[String, Job]] =
+  def finish(id: JobId,
+             finishedAt: DateTime = new DateTime): M[Either[String, Job]] =
     transition(id) {
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Finished(finishedAt, prev))
       case badState =>
-        Left("Job already in terminal state. %s" format JobState.describe(
-                badState))
+        Left(
+          "Job already in terminal state. %s" format JobState.describe(
+            badState))
     }
 
-  def expire(
-      id: JobId, expiredAt: DateTime = new DateTime): M[Either[String, Job]] =
+  def expire(id: JobId,
+             expiredAt: DateTime = new DateTime): M[Either[String, Job]] =
     transition(id) {
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Expired(expiredAt, prev))
       case badState =>
-        Left("Job already in terminal state. %s" format JobState.describe(
-                badState))
+        Left(
+          "Job already in terminal state. %s" format JobState.describe(
+            badState))
     }
 }
 
@@ -298,19 +302,19 @@ trait JobResultManager[M[+ _]] { self: JobManager[M] =>
                 mimeType: Option[MimeType],
                 data: StreamT[M, Array[Byte]]): M[Either[String, Unit]] = {
     findJob(id) flatMap
-    (_ map { job =>
-          fs.save(job.id, FileData(mimeType, data)) map (Right(_))
-        } getOrElse M.point(Left("Invalid job id: " + id)))
+      (_ map { job =>
+        fs.save(job.id, FileData(mimeType, data)) map (Right(_))
+      } getOrElse M.point(Left("Invalid job id: " + id)))
   }
 
   def getResult(job: JobId)
     : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]] = {
     fs.load(job) map
-    (_ map {
-          case FileData(mimeType, data) =>
-            Right((mimeType, data))
-        } getOrElse {
-          Left("No results exist for job " + job)
-        })
+      (_ map {
+        case FileData(mimeType, data) =>
+          Right((mimeType, data))
+      } getOrElse {
+        Left("No results exist for job " + job)
+      })
   }
 }

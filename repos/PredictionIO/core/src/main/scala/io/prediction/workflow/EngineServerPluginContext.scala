@@ -48,8 +48,8 @@ object EngineServerPluginContext extends Logging {
   def apply(log: LoggingAdapter,
             engineVariant: String): EngineServerPluginContext = {
     val plugins = mutable.Map[String, mutable.Map[String, EngineServerPlugin]](
-        EngineServerPlugin.outputBlocker -> mutable.Map(),
-        EngineServerPlugin.outputSniffer -> mutable.Map())
+      EngineServerPlugin.outputBlocker -> mutable.Map(),
+      EngineServerPlugin.outputSniffer -> mutable.Map())
     val pluginParams = mutable.Map[String, JValue]()
     val serviceLoader = ServiceLoader.load(classOf[EngineServerPlugin])
     val variantJson = parse(stringFromFile(engineVariant))

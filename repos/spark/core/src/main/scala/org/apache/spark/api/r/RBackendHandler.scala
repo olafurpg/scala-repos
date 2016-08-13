@@ -17,7 +17,12 @@
 
 package org.apache.spark.api.r
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 
 import scala.collection.mutable.HashMap
 import scala.language.existentials
@@ -36,10 +41,11 @@ import org.apache.spark.util.Utils
   */
 @Sharable
 private[r] class RBackendHandler(server: RBackend)
-    extends SimpleChannelInboundHandler[Array[Byte]] with Logging {
+    extends SimpleChannelInboundHandler[Array[Byte]]
+    with Logging {
 
-  override def channelRead0(
-      ctx: ChannelHandlerContext, msg: Array[Byte]): Unit = {
+  override def channelRead0(ctx: ChannelHandlerContext,
+                            msg: Array[Byte]): Unit = {
     val bis = new ByteArrayInputStream(msg)
     val dis = new DataInputStream(bis)
 
@@ -95,8 +101,8 @@ private[r] class RBackendHandler(server: RBackend)
     ctx.flush()
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               cause: Throwable): Unit = {
     // Close the connection when an exception is raised.
     cause.printStackTrace()
     ctx.close()
@@ -128,16 +134,16 @@ private[r] class RBackendHandler(server: RBackend)
       val methods = cls.getMethods
       val selectedMethods = methods.filter(m => m.getName == methodName)
       if (selectedMethods.length > 0) {
-        val index = findMatchedSignature(
-            selectedMethods.map(_.getParameterTypes), args)
+        val index =
+          findMatchedSignature(selectedMethods.map(_.getParameterTypes), args)
 
         if (index.isEmpty) {
           logWarning(
-              s"cannot find matching method ${cls}.$methodName. " +
+            s"cannot find matching method ${cls}.$methodName. " +
               s"Candidates are:")
           selectedMethods.foreach { method =>
             logWarning(
-                s"$methodName(${method.getParameterTypes.mkString(",")})")
+              s"$methodName(${method.getParameterTypes.mkString(",")})")
           }
           throw new Exception(s"No matched method found for $cls.$methodName")
         }
@@ -154,7 +160,7 @@ private[r] class RBackendHandler(server: RBackend)
 
         if (index.isEmpty) {
           logWarning(
-              s"cannot find matching constructor for ${cls}. " +
+            s"cannot find matching constructor for ${cls}. " +
               s"Candidates are:")
           ctors.foreach { ctor =>
             logWarning(s"$cls(${ctor.getParameterTypes.mkString(",")})")
@@ -168,7 +174,7 @@ private[r] class RBackendHandler(server: RBackend)
         writeObject(dos, obj.asInstanceOf[AnyRef])
       } else {
         throw new IllegalArgumentException(
-            "invalid method " + methodName + " for object " + objId)
+          "invalid method " + methodName + " for object " + objId)
       }
     } catch {
       case e: Exception =>

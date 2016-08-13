@@ -31,8 +31,7 @@ import javafx.application.Platform
 
 import org.scalatest.{Outcome, Suite, SuiteMixin}
 
-trait RunOnApplicationThread extends SuiteMixin {
-  this: Suite =>
+trait RunOnApplicationThread extends SuiteMixin { this: Suite =>
   abstract override def withFixture(test: NoArgTest): Outcome = {
     BootstrapApplication.launch()
     val appThreadLatch = new CountDownLatch(1)
@@ -40,8 +39,7 @@ trait RunOnApplicationThread extends SuiteMixin {
       super.withFixture _ // required to access to super withFixture method from within runnable for a trait
     var testException: Exception = null
     var outcome: Outcome = null
-    Platform.runLater(
-        new Runnable() {
+    Platform.runLater(new Runnable() {
       override def run() {
         try {
           outcome = superWith(test)

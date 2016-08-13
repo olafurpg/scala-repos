@@ -46,8 +46,8 @@ package record {
     def apply[L <: HList, K](
         implicit selector: Selector[L, K]): Aux[L, K, selector.Out] = selector
 
-    implicit def mkSelector[L <: HList, K, O]: Aux[L, K, O] = macro SelectorMacros
-      .applyImpl[L, K]
+    implicit def mkSelector[L <: HList, K, O]: Aux[L, K, O] =
+      macro SelectorMacros.applyImpl[L, K]
   }
 
   class UnsafeSelector(i: Int) extends Selector[HList, Any] {
@@ -59,8 +59,8 @@ package record {
   class SelectorMacros(val c: whitebox.Context) extends CaseClassMacros {
     import c.universe._
 
-    def applyImpl[L <: HList, K](
-        implicit lTag: WeakTypeTag[L], kTag: WeakTypeTag[K]): Tree = {
+    def applyImpl[L <: HList, K](implicit lTag: WeakTypeTag[L],
+                                 kTag: WeakTypeTag[K]): Tree = {
       val lTpe = lTag.tpe.dealias
       val kTpe = kTag.tpe.dealias
       if (!(lTpe <:< hlistTpe)) abort(s"$lTpe is not a record type")
@@ -130,8 +130,8 @@ package record {
     def apply[L <: HList, F](
         implicit updater: Updater[L, F]): Aux[L, F, updater.Out] = updater
 
-    implicit def mkUpdater[L <: HList, F, O]: Aux[L, F, O] = macro UpdaterMacros
-      .applyImpl[L, F]
+    implicit def mkUpdater[L <: HList, F, O]: Aux[L, F, O] =
+      macro UpdaterMacros.applyImpl[L, F]
   }
 
   class UnsafeUpdater(i: Int) extends Updater[HList, Any] {
@@ -143,8 +143,8 @@ package record {
   class UpdaterMacros(val c: whitebox.Context) extends CaseClassMacros {
     import c.universe._
 
-    def applyImpl[L <: HList, F](
-        implicit lTag: WeakTypeTag[L], fTag: WeakTypeTag[F]): Tree = {
+    def applyImpl[L <: HList, F](implicit lTag: WeakTypeTag[L],
+                                 fTag: WeakTypeTag[F]): Tree = {
       val lTpe = lTag.tpe.dealias
       val fTpe = fTag.tpe.dealias
       if (!(lTpe <:< hlistTpe)) abort(s"$lTpe is not a record type")
@@ -196,7 +196,8 @@ package record {
       }
 
     implicit def hlistMerger2[K, V, T <: HList, M <: HList, MT <: HList](
-        implicit rm: Remover.Aux[M, K, (V, MT)], mt: Merger[T, MT])
+        implicit rm: Remover.Aux[M, K, (V, MT)],
+        mt: Merger[T, MT])
       : Aux[FieldType[K, V] :: T, M, FieldType[K, V] :: mt.Out] =
       new Merger[FieldType[K, V] :: T, M] {
         type Out = FieldType[K, V] :: mt.Out
@@ -214,9 +215,12 @@ package record {
     * @author Joni Freeman
     */
   @annotation.implicitNotFound(
-      msg = "No field ${F} with value of type ${A} in record ${L}")
+    msg = "No field ${F} with value of type ${A} in record ${L}")
   trait Modifier[L <: HList, F, A, B]
-      extends DepFn2[L, A => B] with Serializable { type Out <: HList }
+      extends DepFn2[L, A => B]
+      with Serializable {
+    type Out <: HList
+  }
 
   object Modifier {
     def apply[L <: HList, F, A, B](implicit modifier: Modifier[L, F, A, B])
@@ -226,8 +230,8 @@ package record {
       type Out = Out0
     }
 
-    implicit def hlistModify1[F, A, B, T <: HList]: Aux[
-        FieldType[F, A] :: T, F, A, B, FieldType[F, B] :: T] =
+    implicit def hlistModify1[F, A, B, T <: HList]
+      : Aux[FieldType[F, A] :: T, F, A, B, FieldType[F, B] :: T] =
       new Modifier[FieldType[F, A] :: T, F, A, B] {
         type Out = FieldType[F, B] :: T
         def apply(l: FieldType[F, A] :: T, f: A => B): Out =
@@ -268,8 +272,8 @@ package record {
     def apply[L <: HList, K](
         implicit remover: Remover[L, K]): Aux[L, K, remover.Out] = remover
 
-    implicit def hlistRemove1[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, K, (V, T)] =
+    implicit def hlistRemove1[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, K, (V, T)] =
       new Remover[FieldType[K, V] :: T, K] {
         type Out = (V, T)
         def apply(l: FieldType[K, V] :: T): Out = (l.head, l.tail)
@@ -282,7 +286,7 @@ package record {
     * @author Travis Brown
     */
   @annotation.implicitNotFound(
-      msg = "No field or element type ${E} in record ${L}")
+    msg = "No field or element type ${E} in record ${L}")
   trait Remove[L, E] extends DepFn1[L] with Serializable {
     def reinsert(out: Out): L
   }
@@ -309,8 +313,8 @@ package record {
     def apply[L <: HList, E](
         implicit remove: Remove[L, E]): Aux[L, E, remove.Out] = remove
 
-    implicit def removeHead[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, FieldType[K, V], (FieldType[K, V], T)] =
+    implicit def removeHead[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, FieldType[K, V], (FieldType[K, V], T)] =
       new Remove[FieldType[K, V] :: T, FieldType[K, V]] {
         type Out = (FieldType[K, V], T)
 
@@ -318,8 +322,8 @@ package record {
         def reinsert(out: Out): FieldType[K, V] :: T = out._1 :: out._2
       }
 
-    implicit def removeUnlabelledHead[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, V, (V, T)] =
+    implicit def removeUnlabelledHead[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, V, (V, T)] =
       new Remove[FieldType[K, V] :: T, V] {
         type Out = (V, T)
 
@@ -335,7 +339,7 @@ package record {
     * @author Travis Brown
     */
   @annotation.implicitNotFound(
-      msg = "Not all of the field or element types ${A} are in record ${L}")
+    msg = "Not all of the field or element types ${A} are in record ${L}")
   trait RemoveAll[L <: HList, A <: HList] extends DepFn1[L] {
     def reinsert(out: Out): L
   }
@@ -401,8 +405,8 @@ package record {
       type Out = Out0
     }
 
-    implicit def hlistRenamer1[T <: HList, K1, K2, V]: Aux[
-        FieldType[K1, V] :: T, K1, K2, FieldType[K2, V] :: T] =
+    implicit def hlistRenamer1[T <: HList, K1, K2, V]
+      : Aux[FieldType[K1, V] :: T, K1, K2, FieldType[K2, V] :: T] =
       new Renamer[FieldType[K1, V] :: T, K1, K2] {
         type Out = FieldType[K2, V] :: T
         def apply(l: FieldType[K1, V] :: T): Out =
@@ -493,8 +497,8 @@ package record {
         def apply(): Out = HNil
       }
 
-    implicit def hlistSwapRecord[K, V, T <: HList](
-        implicit wk: Witness.Aux[K], kt: SwapRecord[T])
+    implicit def hlistSwapRecord[K, V, T <: HList](implicit wk: Witness.Aux[K],
+                                                   kt: SwapRecord[T])
       : Aux[FieldType[K, V] :: T, FieldType[V, K] :: kt.Out] =
       new SwapRecord[FieldType[K, V] :: T] {
         type Out = FieldType[V, K] :: kt.Out
@@ -523,8 +527,8 @@ package record {
         def apply(l: L) = l
       }
 
-    implicit def hconsFields[K, V, T <: HList](
-        implicit key: Witness.Aux[K], tailFields: Fields[T])
+    implicit def hconsFields[K, V, T <: HList](implicit key: Witness.Aux[K],
+                                               tailFields: Fields[T])
       : Aux[FieldType[K, V] :: T, (K, V) :: tailFields.Out] =
       new Fields[FieldType[K, V] :: T] {
         type Out = (K, V) :: tailFields.Out
@@ -611,7 +615,8 @@ package record {
       }
 
     implicit def hconsMapValues[HF, K, V, T <: HList](
-        implicit hc: Case1[HF, V], mapValuesTail: MapValues[HF, T])
+        implicit hc: Case1[HF, V],
+        mapValuesTail: MapValues[HF, T])
       : Aux[HF,
             FieldType[K, V] :: T,
             FieldType[K, hc.Result] :: mapValuesTail.Out] =

@@ -6,11 +6,11 @@ import mesosphere.marathon.api.v2.Validation._
 
 import scala.collection.immutable.Seq
 
-case class PortDefinition(
-    port: Int,
-    protocol: String = "tcp",
-    name: Option[String] = None,
-    labels: Map[String, String] = Map.empty[String, String])
+case class PortDefinition(port: Int,
+                          protocol: String = "tcp",
+                          name: Option[String] = None,
+                          labels: Map[String, String] =
+                            Map.empty[String, String])
 
 object PortDefinition {
   implicit val portDefinitionValidator = validator[PortDefinition] {
@@ -29,10 +29,13 @@ object PortDefinitions {
     validator[Seq[PortDefinition]] { portDefinitions =>
       portDefinitions is every(valid)
       portDefinitions is elementsAreUniqueByOptional(
-          _.name, "Port names must be unique.")
+        _.name,
+        "Port names must be unique.")
       portDefinitions is elementsAreUniqueBy(
-          _.port, "Ports must be unique.", filter = { port: Int =>
-        port != AppDefinition.RandomPortValue
-      })
+        _.port,
+        "Ports must be unique.",
+        filter = { port: Int =>
+          port != AppDefinition.RandomPortValue
+        })
     }
 }

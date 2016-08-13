@@ -6,7 +6,14 @@
 package scala.tools.nsc
 package interpreter
 
-import Properties.{javaVersion, javaVmName, shellPromptString, shellWelcomeString, versionString, versionNumberString}
+import Properties.{
+  javaVersion,
+  javaVmName,
+  shellPromptString,
+  shellWelcomeString,
+  versionString,
+  versionNumberString
+}
 import scala.sys._
 import Prop._
 import java.util.{Formattable, FormattableFlags, Formatter}
@@ -26,8 +33,10 @@ class ReplProps {
   def enversion(s: String) = {
     import FormattableFlags._
     val v = new Formattable {
-      override def formatTo(
-          formatter: Formatter, flags: Int, width: Int, precision: Int) = {
+      override def formatTo(formatter: Formatter,
+                            flags: Int,
+                            width: Int,
+                            precision: Int) = {
         val version =
           if ((flags & ALTERNATE) != 0) versionNumberString else versionString
         val left = if ((flags & LEFT_JUSTIFY) != 0) "-" else ""
@@ -47,7 +56,7 @@ class ReplProps {
   // Handy system prop for shell prompt, or else pick it up from compiler.properties
   val promptString =
     Prop[String]("scala.repl.prompt").option getOrElse
-    (if (info) "%nscala %#s> " else shellPromptString)
+      (if (info) "%nscala %#s> " else shellPromptString)
   val promptText = enversion(promptString)
   val prompt = encolor(promptText)
 

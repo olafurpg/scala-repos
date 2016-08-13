@@ -108,8 +108,8 @@ class BisectingKMeans private (private var k: Int,
   @Since("1.6.0")
   def setMinDivisibleClusterSize(minDivisibleClusterSize: Double): this.type = {
     require(
-        minDivisibleClusterSize > 0.0,
-        s"minDivisibleClusterSize must be positive but got $minDivisibleClusterSize.")
+      minDivisibleClusterSize > 0.0,
+      s"minDivisibleClusterSize must be positive but got $minDivisibleClusterSize.")
     this.minDivisibleClusterSize = minDivisibleClusterSize
     this
   }
@@ -145,7 +145,7 @@ class BisectingKMeans private (private var k: Int,
   def run(input: RDD[Vector]): BisectingKMeansModel = {
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
-          s"The input RDD ${input.id} is not directly cached, which may hurt performance if" +
+        s"The input RDD ${input.id} is not directly cached, which may hurt performance if" +
           " its parent RDDs are also not cached.")
     }
     val d = input.map(_.size).first()
@@ -169,18 +169,18 @@ class BisectingKMeans private (private var k: Int,
         math.ceil(minDivisibleClusterSize * n).toLong
       }
     logInfo(
-        s"The minimum number of points of a divisible cluster is $minSize.")
+      s"The minimum number of points of a divisible cluster is $minSize.")
     var inactiveClusters = mutable.Seq.empty[(Long, ClusterSummary)]
     val random = new Random(seed)
     var numLeafClustersNeeded = k - 1
     var level = 1
     while (activeClusters.nonEmpty && numLeafClustersNeeded > 0 &&
-    level < LEVEL_LIMIT) {
+           level < LEVEL_LIMIT) {
       // Divisible clusters are sufficiently large and have non-trivial cost.
       var divisibleClusters = activeClusters.filter {
         case (_, summary) =>
           (summary.size >= minSize) &&
-          (summary.cost > MLUtils.EPSILON * summary.size)
+            (summary.cost > MLUtils.EPSILON * summary.size)
       }
       // If we don't need all divisible clusters, take the larger ones.
       if (divisibleClusters.size > numLeafClustersNeeded) {
@@ -201,8 +201,9 @@ class BisectingKMeans private (private var k: Int,
         var newClusters: Map[Long, ClusterSummary] = null
         var newAssignments: RDD[(Long, VectorWithNorm)] = null
         for (iter <- 0 until maxIterations) {
-          newAssignments = updateAssignments(
-              assignments, divisibleIndices, newClusterCenters).filter {
+          newAssignments = updateAssignments(assignments,
+                                             divisibleIndices,
+                                             newClusterCenters).filter {
             case (index, _) =>
               divisibleIndices.contains(parentIndex(index))
           }
@@ -211,15 +212,16 @@ class BisectingKMeans private (private var k: Int,
         }
         // TODO: Unpersist old indices.
         val indices = updateAssignments(
-            assignments, divisibleIndices, newClusterCenters).keys
-          .persist(StorageLevel.MEMORY_AND_DISK)
+          assignments,
+          divisibleIndices,
+          newClusterCenters).keys.persist(StorageLevel.MEMORY_AND_DISK)
         assignments = indices.zip(vectors)
         inactiveClusters ++= activeClusters
         activeClusters = newClusters
         numLeafClustersNeeded -= divisibleClusters.size
       } else {
         logInfo(
-            s"None active and divisible clusters left on level $level. Stop iterations.")
+          s"None active and divisible clusters left on level $level. Stop iterations.")
         inactiveClusters ++= activeClusters
         activeClusters = Map.empty
       }
@@ -275,8 +277,8 @@ private object BisectingKMeans extends Serializable {
       assignments: RDD[(Long, VectorWithNorm)]): Map[Long, ClusterSummary] = {
     assignments
       .aggregateByKey(new ClusterSummaryAggregator(d))(
-          seqOp = (agg, v) => agg.add(v),
-          combOp = (agg1, agg2) => agg1.merge(agg2)
+        seqOp = (agg, v) => agg.add(v),
+        combOp = (agg1, agg2) => agg1.merge(agg2)
       )
       .mapValues(_.summary)
       .collect()
@@ -395,8 +397,12 @@ private object BisectingKMeans extends Serializable {
         }.max)
         val left = buildSubTree(leftIndex)
         val right = buildSubTree(rightIndex)
-        new ClusteringTreeNode(
-            index, size, center, cost, height, Array(left, right))
+        new ClusteringTreeNode(index,
+                               size,
+                               center,
+                               cost,
+                               height,
+                               Array(left, right))
       } else {
         val index = leafIndex
         leafIndex += 1
@@ -415,8 +421,9 @@ private object BisectingKMeans extends Serializable {
     * @param center the center of the points within this cluster
     * @param cost the sum of squared distances to the center
     */
-  private case class ClusterSummary(
-      size: Long, center: VectorWithNorm, cost: Double)
+  private case class ClusterSummary(size: Long,
+                                    center: VectorWithNorm,
+                                    cost: Double)
 }
 
 /**
@@ -432,7 +439,7 @@ private object BisectingKMeans extends Serializable {
   */
 @Since("1.6.0")
 @Experimental
-private[clustering] class ClusteringTreeNode private[clustering](
+private[clustering] class ClusteringTreeNode private[clustering] (
     val index: Int,
     val size: Long,
     private val centerWithNorm: VectorWithNorm,
@@ -496,8 +503,8 @@ private[clustering] class ClusteringTreeNode private[clustering](
     * @return (predicted leaf cluster index, cost)
     */
   @tailrec
-  private def predict(
-      pointWithNorm: VectorWithNorm, cost: Double): (Int, Double) = {
+  private def predict(pointWithNorm: VectorWithNorm,
+                      cost: Double): (Int, Double) = {
     if (isLeaf) {
       (index, cost)
     } else {

@@ -23,7 +23,14 @@ import java.io.{ByteArrayInputStream => BIS}
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.HashMap
 
-import com.twitter.algebird.{AveragedValue, DecayedValue, HyperLogLog, HyperLogLogMonoid, Moments, Monoid}
+import com.twitter.algebird.{
+  AveragedValue,
+  DecayedValue,
+  HyperLogLog,
+  HyperLogLogMonoid,
+  Moments,
+  Monoid
+}
 
 import com.twitter.chill.config.ConfiguredInstantiator
 import com.twitter.chill.hadoop.HadoopConfig
@@ -48,8 +55,8 @@ class KryoTest extends WordSpec with Matchers {
   def getSerialization = {
     val conf = new Configuration
     val chillConf = new HadoopConfig(conf)
-    ConfiguredInstantiator.setReflect(
-        chillConf, classOf[serialization.KryoHadoop])
+    ConfiguredInstantiator
+      .setReflect(chillConf, classOf[serialization.KryoHadoop])
     new KryoSerialization(conf)
   }
 
@@ -111,13 +118,13 @@ class KryoTest extends WordSpec with Matchers {
                       HashMap("good" -> 0.5, "bad" -> -1.0),
                       TestCaseClassForSerialization("case classes are: ", 10),
                       TestValMap(
-                          Map("you" -> 1.0,
-                              "every" -> 2.0,
-                              "body" -> 3.0,
-                              "a" -> 1.0,
-                              "b" -> 2.0,
-                              "c" -> 3.0,
-                              "d" -> 4.0)),
+                        Map("you" -> 1.0,
+                            "every" -> 2.0,
+                            "body" -> 3.0,
+                            "a" -> 1.0,
+                            "b" -> 2.0,
+                            "c" -> 3.0,
+                            "d" -> 4.0)),
                       TestValHashMap(HashMap("you" -> 1.0)),
                       Vector(1, 2, 3, 4, 5),
                       TestValMap(null),
@@ -137,7 +144,7 @@ class KryoTest extends WordSpec with Matchers {
     "handle arrays" in {
       def arrayRT[T](arr: Array[T]) {
         serializationRT(List(arr))(0).asInstanceOf[Array[T]].toList shouldBe
-        (arr.toList)
+          (arr.toList)
       }
       arrayRT(Array(0))
       arrayRT(Array(0.1))

@@ -16,12 +16,12 @@ final case class FormData(fields: Uri.Query) {
 
   def toEntity(charset: HttpCharset): akka.http.scaladsl.model.RequestEntity = {
     val render: StringRendering = UriRendering.renderQuery(
-        new StringRendering,
-        this.fields,
-        charset.nioCharset,
-        CharacterClasses.unreserved)
-    HttpEntity(
-        `application/x-www-form-urlencoded` withCharset charset, render.get)
+      new StringRendering,
+      this.fields,
+      charset.nioCharset,
+      CharacterClasses.unreserved)
+    HttpEntity(`application/x-www-form-urlencoded` withCharset charset,
+               render.get)
   }
 }
 

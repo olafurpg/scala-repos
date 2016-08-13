@@ -17,7 +17,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ThriftClientFinagleServerTest
-    extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+    extends FunSuite
+    with BeforeAndAfter
+    with OneInstancePerTest {
 
   val somewayPromise = new Promise[Unit]
   val processor = new B.ServiceIface {
@@ -48,8 +50,8 @@ class ThriftClientFinagleServerTest
   val serverAddr = server.boundAddress.asInstanceOf[InetSocketAddress]
 
   val (client, transport) = {
-    val socket = new TSocket(
-        serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
+    val socket =
+      new TSocket(serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
     val transport = new TFramedTransport(socket)
     val protocol = new TBinaryProtocol(transport)
     (new B.Client(protocol), transport)
@@ -78,7 +80,7 @@ class ThriftClientFinagleServerTest
       client.multiply(1, 0 /*div by zero*/ )
     }
     assert(
-        exc.getMessage() == "Internal error processing multiply: 'java.lang.ArithmeticException: / by zero'")
+      exc.getMessage() == "Internal error processing multiply: 'java.lang.ArithmeticException: / by zero'")
   }
 
   test("treat synchronous exceptions as transport exceptions") {
@@ -86,7 +88,7 @@ class ThriftClientFinagleServerTest
       client.complex_return("throwAnException")
     }
     assert(
-        exc.getMessage() == "Internal error processing complex_return: 'java.lang.Exception: msg'")
+      exc.getMessage() == "Internal error processing complex_return: 'java.lang.Exception: msg'")
   }
 
   test("handle one-way calls") {

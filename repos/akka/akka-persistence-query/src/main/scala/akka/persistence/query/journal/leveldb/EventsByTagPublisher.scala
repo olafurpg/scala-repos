@@ -30,15 +30,19 @@ private[akka] object EventsByTagPublisher {
     refreshInterval match {
       case Some(interval) ⇒
         Props(
-            new LiveEventsByTagPublisher(tag,
-                                         fromOffset,
-                                         toOffset,
-                                         interval,
-                                         maxBufSize,
-                                         writeJournalPluginId))
+          new LiveEventsByTagPublisher(tag,
+                                       fromOffset,
+                                       toOffset,
+                                       interval,
+                                       maxBufSize,
+                                       writeJournalPluginId))
       case None ⇒
-        Props(new CurrentEventsByTagPublisher(
-                tag, fromOffset, toOffset, maxBufSize, writeJournalPluginId))
+        Props(
+          new CurrentEventsByTagPublisher(tag,
+                                          fromOffset,
+                                          toOffset,
+                                          maxBufSize,
+                                          writeJournalPluginId))
     }
   }
 
@@ -56,7 +60,8 @@ private[akka] abstract class AbstractEventsByTagPublisher(
     val fromOffset: Long,
     val maxBufSize: Int,
     val writeJournalPluginId: String)
-    extends ActorPublisher[EventEnvelope] with DeliveryBuffer[EventEnvelope]
+    extends ActorPublisher[EventEnvelope]
+    with DeliveryBuffer[EventEnvelope]
     with ActorLogging {
   import EventsByTagPublisher._
 
@@ -114,13 +119,15 @@ private[akka] abstract class AbstractEventsByTagPublisher(
       deliverBuf()
 
     case RecoverySuccess(highestSeqNr) ⇒
-      log.debug(
-          "replay completed for tag [{}], currOffset [{}]", tag, currOffset)
+      log.debug("replay completed for tag [{}], currOffset [{}]",
+                tag,
+                currOffset)
       receiveRecoverySuccess(highestSeqNr)
 
     case ReplayMessagesFailure(cause) ⇒
-      log.debug(
-          "replay failed for tag [{}], due to [{}]", tag, cause.getMessage)
+      log.debug("replay failed for tag [{}], due to [{}]",
+                tag,
+                cause.getMessage)
       deliverBuf()
       onErrorThenStop(cause)
 
@@ -146,12 +153,15 @@ private[akka] class LiveEventsByTagPublisher(tag: String,
                                              refreshInterval: FiniteDuration,
                                              maxBufSize: Int,
                                              writeJournalPluginId: String)
-    extends AbstractEventsByTagPublisher(
-        tag, fromOffset, maxBufSize, writeJournalPluginId) {
+    extends AbstractEventsByTagPublisher(tag,
+                                         fromOffset,
+                                         maxBufSize,
+                                         writeJournalPluginId) {
   import EventsByTagPublisher._
 
-  val tickTask = context.system.scheduler.schedule(
-      refreshInterval, refreshInterval, self, Continue)(context.dispatcher)
+  val tickTask = context.system.scheduler
+    .schedule(refreshInterval, refreshInterval, self, Continue)(
+      context.dispatcher)
 
   override def postStop(): Unit =
     tickTask.cancel()
@@ -181,8 +191,10 @@ private[akka] class CurrentEventsByTagPublisher(tag: String,
                                                 var _toOffset: Long,
                                                 maxBufSize: Int,
                                                 writeJournalPluginId: String)
-    extends AbstractEventsByTagPublisher(
-        tag, fromOffset, maxBufSize, writeJournalPluginId) {
+    extends AbstractEventsByTagPublisher(tag,
+                                         fromOffset,
+                                         maxBufSize,
+                                         writeJournalPluginId) {
   import EventsByTagPublisher._
 
   override def toOffset: Long = _toOffset

@@ -26,16 +26,16 @@ object TaskStatsByVersion {
     }
 
     TaskStatsByVersion(
-        maybeTotalSummary = TaskStats.forSomeTasks(tasks),
-        maybeStartedAfterLastScaling = maybeFullVersionInfo.flatMap { vi =>
-          statsForVersion(_ >= vi.lastScalingAt)
-        },
-        maybeWithLatestConfig = maybeFullVersionInfo.flatMap { vi =>
-          statsForVersion(_ >= vi.lastConfigChangeAt)
-        },
-        maybeWithOutdatedConfig = maybeFullVersionInfo.flatMap { vi =>
-          statsForVersion(_ < vi.lastConfigChangeAt)
-        }
+      maybeTotalSummary = TaskStats.forSomeTasks(tasks),
+      maybeStartedAfterLastScaling = maybeFullVersionInfo.flatMap { vi =>
+        statsForVersion(_ >= vi.lastScalingAt)
+      },
+      maybeWithLatestConfig = maybeFullVersionInfo.flatMap { vi =>
+        statsForVersion(_ >= vi.lastConfigChangeAt)
+      },
+      maybeWithOutdatedConfig = maybeFullVersionInfo.flatMap { vi =>
+        statsForVersion(_ < vi.lastConfigChangeAt)
+      }
     )
   }
 
@@ -43,8 +43,8 @@ object TaskStatsByVersion {
             versionInfo: VersionInfo,
             tasks: Iterable[Task],
             statuses: Map[Task.Id, Seq[Health]]): TaskStatsByVersion = {
-    TaskStatsByVersion(
-        versionInfo, TaskForStatistics.forTasks(now, tasks, statuses))
+    TaskStatsByVersion(versionInfo,
+                       TaskForStatistics.forTasks(now, tasks, statuses))
   }
 }
 
@@ -62,10 +62,10 @@ object TaskStats {
       None
     } else {
       Some(
-          TaskStats(
-              counts = TaskCounts(tasks),
-              maybeLifeTime = TaskLifeTime.forSomeTasks(tasks)
-          )
+        TaskStats(
+          counts = TaskCounts(tasks),
+          maybeLifeTime = TaskLifeTime.forSomeTasks(tasks)
+        )
       )
     }
   }

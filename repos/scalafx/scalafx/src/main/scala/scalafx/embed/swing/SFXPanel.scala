@@ -51,8 +51,8 @@ object SFXPanel {
 }
 
 /**
-  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/embed/swing/JFXPanel.html JavaFX 
-  * JFXPanel]]. To use methods and properties from JComponent, use its delegate. 
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/embed/swing/JFXPanel.html JavaFX
+  * JFXPanel]]. To use methods and properties from JComponent, use its delegate.
   *
   * @constructor Creates a new SFXPanel from its JavaFX counterpart.
   * @param delegate JavaFX JFXPanel. Its defaul value is a new JFXPanel

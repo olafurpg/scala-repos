@@ -63,13 +63,13 @@ abstract class Page { thisPage =>
       case v: Val if (v.isVar) => "var"
       case _ =>
         sys.error(
-            "Cannot create kind for: " + mbr + " of class " + mbr.getClass)
+          "Cannot create kind for: " + mbr + " of class " + mbr.getClass)
     }
 
   def templateToPath(tpl: TemplateEntity): List[String] = {
     def doName(tpl: TemplateEntity): String =
       (if (tpl.inPackageObject) "package$$" else "") +
-      NameTransformer.encode(tpl.name) + (if (tpl.isObject) "$" else "")
+        NameTransformer.encode(tpl.name) + (if (tpl.isObject) "$" else "")
     def downPacks(pack: Package): List[String] =
       if (pack.isRootPackage) Nil
       else (doName(pack) :: downPacks(pack.inTemplate))

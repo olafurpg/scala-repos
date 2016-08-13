@@ -30,14 +30,14 @@ private[twitter] object BucketedHistogram {
       .map(_.toInt + 1) // this ensures that the smallest value is 2 (below we prepend `1`)
       .distinct
       .force
-      (Seq(1) ++ values).toArray
+    (Seq(1) ++ values).toArray
   }
 
   // 0.5% error => 1797 buckets, 7188 bytes, max 11 compares on binary search
   private[stats] val DefaultErrorPercent = 0.005
 
   private[this] val DefaultLimits: Array[Int] = makeLimitsFor(
-      DefaultErrorPercent)
+    DefaultErrorPercent)
 
   /** check all the limits are non-negative and increasing in value. */
   private def assertLimits(limits: Array[Int]): Unit = {
@@ -155,7 +155,7 @@ private[stats] class BucketedHistogram(limits: Array[Int])
   def percentile(p: Double): Long = {
     if (p < 0.0 || p > 1.0)
       throw new AssertionError(
-          s"percentile must be within 0.0 to 1.0 inclusive: $p")
+        s"percentile must be within 0.0 to 1.0 inclusive: $p")
 
     val target = Math.round(p * num)
     var total = 0L

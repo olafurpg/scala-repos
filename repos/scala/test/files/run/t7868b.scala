@@ -4,8 +4,7 @@ object A {
 
 object Test extends App {
   import reflect.runtime.universe._
-  println(
-      reify {
+  println(reify {
     val A(x) = (0: Short)
     x
   })

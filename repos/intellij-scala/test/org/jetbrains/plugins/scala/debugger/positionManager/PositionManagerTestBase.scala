@@ -4,7 +4,11 @@ import com.intellij.debugger.SourcePosition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.{PsiFile, PsiManager}
 import com.sun.jdi.Location
-import org.jetbrains.plugins.scala.debugger.{Loc, ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  Loc,
+  ScalaDebuggerTestCase,
+  ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions
 import org.junit.Assert
 
@@ -32,9 +36,9 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
         }
         val classNames = classes.asScala.map(_.name())
         Assert.assertTrue(
-            s"Wrong classes are found at ${position.toString} (found: ${classNames
-              .mkString(", ")}, expected: $className",
-            classNames.contains(className))
+          s"Wrong classes are found at ${position.toString} (found: ${classNames
+            .mkString(", ")}, expected: $className",
+          classNames.contains(className))
       }
     }
   }
@@ -49,8 +53,8 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
       waitForBreakpoint()
       val posManager = new ScalaPositionManager(getDebugProcess)
 
-      def checkSourcePosition(
-          initialPosition: SourcePosition, location: Location) = {
+      def checkSourcePosition(initialPosition: SourcePosition,
+                              location: Location) = {
         extensions.inReadAction {
           val newPosition = posManager.getSourcePosition(location)
           Assert.assertEquals(initialPosition.getFile, newPosition.getFile)
@@ -61,14 +65,14 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
       for ((position, locationSet) <- sourcePositions.zip(expectedLocations)) {
         val foundLocations: Set[Loc] = managed {
           val classes = posManager.getAllClasses(position)
-          val locations = classes.asScala.flatMap(
-              refType => posManager.locationsOfLine(refType, position).asScala)
+          val locations = classes.asScala.flatMap(refType =>
+            posManager.locationsOfLine(refType, position).asScala)
           locations.foreach(checkSourcePosition(position, _))
           locations.map(toSimpleLocation).toSet
         }
         Assert.assertTrue(
-            s"Wrong locations are found at ${position.toString} (found: $foundLocations, expected: $locationSet",
-            locationSet.subsetOf(foundLocations))
+          s"Wrong locations are found at ${position.toString} (found: $foundLocations, expected: $locationSet",
+          locationSet.subsetOf(foundLocations))
       }
     }
   }
@@ -91,8 +95,8 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
     }
 
     assert(
-        offsets.nonEmpty,
-        s"Not specified offset marker in test case. Use $offsetMarker in provided text of the file.")
+      offsets.nonEmpty,
+      s"Not specified offset marker in test case. Use $offsetMarker in provided text of the file.")
     sourcePositionsOffsets += (fileName -> offsets)
     addSourceFile(fileName, cleanedText)
 

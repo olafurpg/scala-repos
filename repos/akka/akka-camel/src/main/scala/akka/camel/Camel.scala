@@ -58,8 +58,8 @@ trait Camel extends Extension with Activation {
   * Settings for the Camel Extension
   * @param config the config
   */
-class CamelSettings private[camel](
-    config: Config, dynamicAccess: DynamicAccess) {
+class CamelSettings private[camel] (config: Config,
+                                    dynamicAccess: DynamicAccess) {
   import akka.util.Helpers.ConfigOps
 
   /**
@@ -107,9 +107,9 @@ class CamelSettings private[camel](
                       .recover {
                         case e ⇒
                           throw new ConfigurationException(
-                              "Could not find/load Camel Converter class [" +
+                            "Could not find/load Camel Converter class [" +
                               fqcn + "]",
-                              e)
+                            e)
                       }
                       .get)
       }
@@ -128,7 +128,8 @@ class CamelSettings private[camel](
       .recover {
         case e ⇒
           throw new ConfigurationException(
-              "Could not find/load Context Provider class [" + fqcn + "]", e)
+            "Could not find/load Context Provider class [" + fqcn + "]",
+            e)
       }
       .get
   }

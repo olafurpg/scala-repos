@@ -82,7 +82,7 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
   override def withFallback(other: RouterConfig): RouterConfig = other match {
     case RemoteRouterConfig(local: RemoteRouterConfig, nodes) ⇒
       throw new IllegalStateException(
-          "RemoteRouterConfig is not allowed to wrap a RemoteRouterConfig")
+        "RemoteRouterConfig is not allowed to wrap a RemoteRouterConfig")
     case RemoteRouterConfig(local: Pool, nodes) ⇒
       copy(local = this.local.withFallback(local).asInstanceOf[Pool])
     case _ ⇒ copy(local = this.local.withFallback(other).asInstanceOf[Pool])

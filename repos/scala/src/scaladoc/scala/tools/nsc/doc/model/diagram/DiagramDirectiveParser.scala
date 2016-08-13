@@ -13,7 +13,10 @@ import scala.util.matching.Regex
   *  @author Vlad Ureche
   */
 trait DiagramDirectiveParser {
-  this: ModelFactory with DiagramFactory with CommentFactory with TreeFactory =>
+  this: ModelFactory
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory =>
 
   import this.global.definitions.AnyRefClass
 
@@ -135,12 +138,11 @@ trait DiagramDirectiveParser {
 
     def hideNode(clazz: Node): Boolean = {
       val qualifiedName = getName(clazz)
-      for (hideFilter <- hideNodesFilter) if (hideFilter
-                                                .matcher(qualifiedName)
-                                                .matches) {
-        // println(hideFilter + ".matcher(" + qualifiedName + ").matches = " + hideFilter.matcher(qualifiedName).matches)
-        return true
-      }
+      for (hideFilter <- hideNodesFilter)
+        if (hideFilter.matcher(qualifiedName).matches) {
+          // println(hideFilter + ".matcher(" + qualifiedName + ").matches = " + hideFilter.matcher(qualifiedName).matches)
+          return true
+        }
       false
     }
 
@@ -166,9 +168,9 @@ trait DiagramDirectiveParser {
     "\\(" + NodeSpecRegex + "\\s*\\->\\s*" + NodeSpecRegex + "\\)"
   // And the composed regexes:
   private val HideNodesRegex = new Regex(
-      "^hideNodes(\\s*" + NodeSpecRegex + ")+$")
+    "^hideNodes(\\s*" + NodeSpecRegex + ")+$")
   private val HideEdgesRegex = new Regex(
-      "^hideEdges(\\s*" + EdgeSpecRegex + ")+$")
+    "^hideEdges(\\s*" + EdgeSpecRegex + ")+$")
 
   private def makeDiagramFilter(template: DocTemplateImpl,
                                 directives: List[String],
@@ -198,7 +200,7 @@ trait DiagramDirectiveParser {
             if (template.sym.hasPackageFlag) template.sym.packageObject
             else template.sym
           assert(
-              (sym != global.NoSymbol) ||
+            (sym != global.NoSymbol) ||
               (sym == global.rootMirror.RootPackage))
           global.reporter.warning(sym.pos, message)
         }
@@ -247,7 +249,7 @@ trait DiagramDirectiveParser {
           // don't need to do anything about it
           case _ =>
             warning(
-                "Could not understand diagram annotation in " + template.kind +
+              "Could not understand diagram annotation in " + template.kind +
                 " " + template.qualifiedName + ": unmatched entry \"" + entry +
                 "\".\n" + "  This could be because:\n" +
                 "   - you forgot to separate entries by commas\n" +
@@ -264,18 +266,19 @@ trait DiagramDirectiveParser {
             FullDiagram
           else
             AnnotationDiagramFilter(
-                hideDiagram = hideDiagram0,
-                hideIncomingImplicits = hideIncomingImplicits0,
-                hideOutgoingImplicits = hideOutgoingImplicits0,
-                hideSuperclasses = hideSuperclasses0,
-                hideSubclasses = hideSubclasses0,
-                hideInheritedNodes = hideInheritedNodes0,
-                hideNodesFilter = hideNodesFilter0,
-                hideEdgesFilter = hideEdgesFilter0)
+              hideDiagram = hideDiagram0,
+              hideIncomingImplicits = hideIncomingImplicits0,
+              hideOutgoingImplicits = hideOutgoingImplicits0,
+              hideSuperclasses = hideSuperclasses0,
+              hideSubclasses = hideSubclasses0,
+              hideInheritedNodes = hideInheritedNodes0,
+              hideNodesFilter = hideNodesFilter0,
+              hideEdgesFilter = hideEdgesFilter0)
 
         if (settings.docDiagramsDebug && result != NoDiagramAtAll &&
             result != FullDiagram)
-          settings.printMsg(template.kind + " " + template.qualifiedName +
+          settings.printMsg(
+            template.kind + " " + template.qualifiedName +
               " filter: " + result)
         tFilter += System.currentTimeMillis
 

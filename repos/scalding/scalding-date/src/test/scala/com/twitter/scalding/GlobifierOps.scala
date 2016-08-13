@@ -64,7 +64,7 @@ case class GlobifierOps(implicit tz: TimeZone, dp: DateParser) {
                   val dur: Duration = curMapping match {
                     case Years(_) =>
                       sys.error(
-                          "Current is " + current + ", parsed as all years?")
+                        "Current is " + current + ", parsed as all years?")
                     case Months(_) => Years(1)
                     case Days(_) => Months(1)
                     case Hours(_) => Days(1)
@@ -100,7 +100,7 @@ case class GlobifierOps(implicit tz: TimeZone, dp: DateParser) {
     def combineDR(existing: DateRange, next: DateRange): DateRange = {
       require(existing.end == next.start - Millisecs(1),
               "Not contigious range: \n" + existing + "\n" + next +
-              "...From:\n" + p.mkString(",\n"))
+                "...From:\n" + p.mkString(",\n"))
       DateRange(existing.start, next.end)
     }
 

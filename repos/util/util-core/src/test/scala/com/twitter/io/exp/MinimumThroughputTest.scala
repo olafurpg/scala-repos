@@ -148,9 +148,9 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
     val buf = Buf.UsAscii("0")
 
     val writer = MinimumThroughput.writer(
-        Writer.fromOutputStream(new ByteArrayOutputStream()),
-        0d,
-        Timer.Nil)
+      Writer.fromOutputStream(new ByteArrayOutputStream()),
+      0d,
+      Timer.Nil)
 
     val w1 = writer.write(buf)
     Await.ready(w1)

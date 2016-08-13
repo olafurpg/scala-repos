@@ -134,12 +134,12 @@ package object sbt {
       if (opt.isEmpty) None else Option(f(opt.get))
   }
 
-  def jarWith[T : ClassTag]: File = {
+  def jarWith[T: ClassTag]: File = {
     val tClass = implicitly[ClassTag[T]].runtimeClass
 
     Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse {
       throw new RuntimeException(
-          "Jar file not found for class " + tClass.getName)
+        "Jar file not found for class " + tClass.getName)
     }
   }
 

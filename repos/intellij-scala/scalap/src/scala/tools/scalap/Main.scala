@@ -14,7 +14,10 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.util.{JavaClassPath, ClassPath}
 import scala.tools.nsc.Settings
 import scala.tools.nsc.util.ClassPath.{JavaContext, DefaultJavaContext}
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation,
+  ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 import scala.tools.util.PathResolver
 
@@ -29,7 +32,7 @@ object Main {
 
   val versionMsg =
     "Scala classfile decoder " + Properties.versionString + " -- " +
-    Properties.copyrightString + "\n"
+      Properties.copyrightString + "\n"
 
   /**Verbose program run?
     */
@@ -41,17 +44,17 @@ object Main {
   def usage {
     Console.println("usage: scalap {<option>} <name>")
     Console.println(
-        "where <name> is fully-qualified class name or <package_name>.package for package objects")
+      "where <name> is fully-qualified class name or <package_name>.package for package objects")
     Console.println("and <option> is")
     Console.println("  -private           print private definitions")
     Console.println("  -verbose           print out additional information")
     Console.println(
-        "  -version           print out the version number of scalap")
+      "  -version           print out the version number of scalap")
     Console.println("  -help              display this usage message")
     Console.println(
-        "  -classpath <path>  specify where to find user class files")
+      "  -classpath <path>  specify where to find user class files")
     Console.println(
-        "  -cp <path>         specify where to find user class files")
+      "  -cp <path>         specify where to find user class files")
   }
 
   def isScalaFile(bytes: Array[Byte]): Boolean = {
@@ -83,20 +86,20 @@ object Main {
     syms.head.parent match {
       //Partial match
       case Some(p) if (p.name != "<empty>") => {
-          val path = p.path
-          if (!isPackageObject) {
+        val path = p.path
+        if (!isPackageObject) {
+          stream.print("package ")
+          stream.print(path)
+          stream.print("\n")
+        } else {
+          val i = path.lastIndexOf(".")
+          if (i > 0) {
             stream.print("package ")
-            stream.print(path)
+            stream.print(path.substring(0, i))
             stream.print("\n")
-          } else {
-            val i = path.lastIndexOf(".")
-            if (i > 0) {
-              stream.print("package ")
-              stream.print(path.substring(0, i))
-              stream.print("\n")
-            }
           }
         }
+      }
       case _ =>
     }
     // Print classes
@@ -122,8 +125,8 @@ object Main {
     }
   }
 
-  def unpickleFromAnnotation(
-      classFile: ClassFile, isPackageObject: Boolean): String = {
+  def unpickleFromAnnotation(classFile: ClassFile,
+                             isPackageObject: Boolean): String = {
     import classFile._
     classFile.annotation(SCALA_SIG_ANNOTATION) match {
       case None => ""
@@ -152,14 +155,14 @@ object Main {
       classname: String) {
     // find the classfile
     val encName = Names.encode(
-        if (classname == "scala.AnyRef") "java.lang.Object"
-        else classname)
+      if (classname == "scala.AnyRef") "java.lang.Object"
+      else classname)
     val cls = path.findClass(encName)
     if (cls.isDefined && cls.get.binary.isDefined) {
       val cfile = cls.get.binary.get
       if (verbose) {
         Console.println(
-            Console.BOLD + "FILENAME" + Console.RESET + " = " + cfile.path)
+          Console.BOLD + "FILENAME" + Console.RESET + " = " + cfile.path)
       }
       val bytes = cfile.toByteArray
       if (isScalaFile(bytes)) {
@@ -201,19 +204,19 @@ object Main {
       Console.println("package scala")
       Console.println("sealed abstract class Boolean extends AnyVal {")
       Console.println(
-          "  def &&(p: => scala.Boolean): scala.Boolean  // boolean and")
+        "  def &&(p: => scala.Boolean): scala.Boolean  // boolean and")
       Console.println(
-          "  def ||(p: => scala.Boolean): scala.Boolean  // boolean or")
+        "  def ||(p: => scala.Boolean): scala.Boolean  // boolean or")
       Console.println(
-          "  def & (x: scala.Boolean): scala.Boolean     // boolean strict and")
+        "  def & (x: scala.Boolean): scala.Boolean     // boolean strict and")
       Console.println(
-          "  def | (x: scala.Boolean): scala.Boolean     // boolean stric or")
+        "  def | (x: scala.Boolean): scala.Boolean     // boolean stric or")
       Console.println(
-          "  def ==(x: scala.Boolean): scala.Boolean     // boolean equality")
+        "  def ==(x: scala.Boolean): scala.Boolean     // boolean equality")
       Console.println(
-          "  def !=(x: scala.Boolean): scala.Boolean     // boolean inequality")
+        "  def !=(x: scala.Boolean): scala.Boolean     // boolean inequality")
       Console.println(
-          "  def !: scala.Boolean                        // boolean negation")
+        "  def !: scala.Boolean                        // boolean negation")
       Console.println("}")
       // if the class corresponds to the artificial class scala.Int.
     } else if (classname == "scala.Int") {
@@ -229,60 +232,60 @@ object Main {
       Console.println("  /* analogous for !=, <, >, <=, >= */")
       Console.println
       Console.println(
-          "  def + (that: scala.Double): scala.Double // double addition")
+        "  def + (that: scala.Double): scala.Double // double addition")
       Console.println(
-          "  def + (that: scala.Float): scala.Float   // float addition")
+        "  def + (that: scala.Float): scala.Float   // float addition")
       Console.println(
-          "  def + (that: scala.Long): scala.Long     // long addition")
+        "  def + (that: scala.Long): scala.Long     // long addition")
       Console.println(
-          "  def + (that: scala.Int): scala.Int       // int addition")
+        "  def + (that: scala.Int): scala.Int       // int addition")
       Console.println(
-          "  def + (that: scala.Short): scala.Int     // int addition")
+        "  def + (that: scala.Short): scala.Int     // int addition")
       Console.println(
-          "  def + (that: scala.Byte): scala.Int      // int addition")
+        "  def + (that: scala.Byte): scala.Int      // int addition")
       Console.println(
-          "  def + (that: scala.Char): scala.Int      // int addition")
+        "  def + (that: scala.Char): scala.Int      // int addition")
       Console.println("  /* analogous for -, *, /, % */")
       Console.println
       Console.println(
-          "  def & (that: scala.Long): scala.Long     // long bitwise and")
+        "  def & (that: scala.Long): scala.Long     // long bitwise and")
       Console.println(
-          "  def & (that: scala.Int): scala.Int       // int bitwise and")
+        "  def & (that: scala.Int): scala.Int       // int bitwise and")
       Console.println(
-          "  def & (that: scala.Short): scala.Int     // int bitwise and")
+        "  def & (that: scala.Short): scala.Int     // int bitwise and")
       Console.println(
-          "  def & (that: scala.Byte): scala.Int      // int bitwise and")
+        "  def & (that: scala.Byte): scala.Int      // int bitwise and")
       Console.println(
-          "  def & (that: scala.Char): scala.Int      // int bitwise and")
+        "  def & (that: scala.Char): scala.Int      // int bitwise and")
       Console.println("  /* analogous for |, ^ */")
       Console.println
       Console.println(
-          "  def <<(cnt: scala.Int): scala.Int        // int left shift")
+        "  def <<(cnt: scala.Int): scala.Int        // int left shift")
       Console.println(
-          "  def <<(cnt: scala.Long): scala.Int       // long left shift")
+        "  def <<(cnt: scala.Long): scala.Int       // long left shift")
       Console.println("  /* analogous for >>, >>> */")
       Console.println
       Console.println(
-          "  def + : scala.Int                        // int identity")
+        "  def + : scala.Int                        // int identity")
       Console.println(
-          "  def - : scala.Int                        // int negation")
+        "  def - : scala.Int                        // int negation")
       Console.println(
-          "  def ~ : scala.Int                        // int bitwise negation")
+        "  def ~ : scala.Int                        // int bitwise negation")
       Console.println
       Console.println(
-          "  def toByte: scala.Byte                   // convert to Byte")
+        "  def toByte: scala.Byte                   // convert to Byte")
       Console.println(
-          "  def toShort: scala.Short                 // convert to Short")
+        "  def toShort: scala.Short                 // convert to Short")
       Console.println(
-          "  def toChar: scala.Char                   // convert to Char")
+        "  def toChar: scala.Char                   // convert to Char")
       Console.println(
-          "  def toInt: scala.Int                     // convert to Int")
+        "  def toInt: scala.Int                     // convert to Int")
       Console.println(
-          "  def toLong: scala.Long                   // convert to Long")
+        "  def toLong: scala.Long                   // convert to Long")
       Console.println(
-          "  def toFloat: scala.Float                 // convert to Float")
+        "  def toFloat: scala.Float                 // convert to Float")
       Console.println(
-          "  def toDouble: scala.Double               // convert to Double")
+        "  def toDouble: scala.Double               // convert to Double")
       Console.println("}")
       // if the class corresponds to the artificial class scala.Nothing.
     } else if (classname == "scala.Nothing") {
@@ -326,12 +329,12 @@ object Main {
       // construct a custom class path
       def cparg =
         List("-classpath", "-cp") map (arguments getArgument _) reduceLeft
-        (_ orElse _)
+          (_ orElse _)
       val path = cparg map (fromPathString(_)) getOrElse EmptyClasspath
       // print the classpath if output is verbose
       if (verbose) {
         Console.println(
-            Console.BOLD + "CLASSPATH" + Console.RESET + " = " + path)
+          Console.BOLD + "CLASSPATH" + Console.RESET + " = " + path)
       }
       // process all given classes
       arguments.getOthers.foreach(process(arguments, path))

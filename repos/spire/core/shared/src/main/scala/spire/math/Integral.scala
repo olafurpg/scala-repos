@@ -5,8 +5,11 @@ import spire.algebra.{EuclideanRing, IsReal}
 import spire.std._
 
 trait Integral[@sp(Int, Long) A]
-    extends Any with EuclideanRing[A] with ConvertableFrom[A]
-    with ConvertableTo[A] with IsReal[A]
+    extends Any
+    with EuclideanRing[A]
+    with ConvertableFrom[A]
+    with ConvertableTo[A]
+    with IsReal[A]
 
 object Integral {
   implicit final val IntIsIntegral = new IntIsIntegral
@@ -35,57 +38,71 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
 
 @SerialVersionUID(0L)
 private[math] class IntIsIntegral
-    extends Integral[Int] with IntIsEuclideanRing with ConvertableFromInt
-    with ConvertableToInt with IntIsReal with Serializable {
+    extends Integral[Int]
+    with IntIsEuclideanRing
+    with ConvertableFromInt
+    with ConvertableToInt
+    with IntIsReal
+    with Serializable {
   override def fromInt(n: Int): Int = n
   override def toDouble(n: Int): Double = n.toDouble
-  override def toRational(n: Int): Rational = super [IntIsReal].toRational(n)
+  override def toRational(n: Int): Rational = super[IntIsReal].toRational(n)
   override def toAlgebraic(n: Int): Algebraic =
-    super [IntIsReal].toAlgebraic(n)
-  override def toReal(n: Int): Real = super [IntIsReal].toReal(n)
-  override def toBigInt(n: Int): BigInt = super [IntIsReal].toBigInt(n)
+    super[IntIsReal].toAlgebraic(n)
+  override def toReal(n: Int): Real = super[IntIsReal].toReal(n)
+  override def toBigInt(n: Int): BigInt = super[IntIsReal].toBigInt(n)
 }
 
 @SerialVersionUID(0L)
 private[math] class LongIsIntegral
-    extends Integral[Long] with LongIsEuclideanRing with ConvertableFromLong
-    with ConvertableToLong with LongIsReal with Serializable {
+    extends Integral[Long]
+    with LongIsEuclideanRing
+    with ConvertableFromLong
+    with ConvertableToLong
+    with LongIsReal
+    with Serializable {
   override def fromInt(n: Int): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
-  override def toRational(n: Long): Rational = super [LongIsReal].toRational(n)
+  override def toRational(n: Long): Rational = super[LongIsReal].toRational(n)
   override def toAlgebraic(n: Long): Algebraic =
-    super [LongIsReal].toAlgebraic(n)
-  override def toReal(n: Long): Real = super [LongIsReal].toReal(n)
+    super[LongIsReal].toAlgebraic(n)
+  override def toReal(n: Long): Real = super[LongIsReal].toReal(n)
   override def toBigInt(n: Long): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
 private[math] class BigIntIsIntegral
-    extends Integral[BigInt] with BigIntIsEuclideanRing
-    with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal
+    extends Integral[BigInt]
+    with BigIntIsEuclideanRing
+    with ConvertableFromBigInt
+    with ConvertableToBigInt
+    with BigIntIsReal
     with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def toDouble(n: BigInt): Double = n.toDouble
   override def toRational(n: BigInt): Rational =
-    super [BigIntIsReal].toRational(n)
+    super[BigIntIsReal].toRational(n)
   override def toAlgebraic(n: BigInt): Algebraic =
-    super [BigIntIsReal].toAlgebraic(n)
-  override def toReal(n: BigInt): Real = super [BigIntIsReal].toReal(n)
-  override def toBigInt(n: BigInt): BigInt = super [BigIntIsReal].toBigInt(n)
+    super[BigIntIsReal].toAlgebraic(n)
+  override def toReal(n: BigInt): Real = super[BigIntIsReal].toReal(n)
+  override def toBigInt(n: BigInt): BigInt = super[BigIntIsReal].toBigInt(n)
 }
 
 @SerialVersionUID(0L)
 private[math] class SafeLongIsIntegral
-    extends Integral[SafeLong] with SafeLongIsEuclideanRing
-    with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal
+    extends Integral[SafeLong]
+    with SafeLongIsEuclideanRing
+    with ConvertableFromSafeLong
+    with ConvertableToSafeLong
+    with SafeLongIsReal
     with Serializable {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
   override def toDouble(n: SafeLong): Double = n.toDouble
   override def toRational(n: SafeLong): Rational =
-    super [SafeLongIsReal].toRational(n)
+    super[SafeLongIsReal].toRational(n)
   override def toAlgebraic(n: SafeLong): Algebraic =
-    super [SafeLongIsReal].toAlgebraic(n)
-  override def toReal(n: SafeLong): Real = super [SafeLongIsReal].toReal(n)
+    super[SafeLongIsReal].toAlgebraic(n)
+  override def toReal(n: SafeLong): Real = super[SafeLongIsReal].toReal(n)
   override def toBigInt(n: SafeLong): BigInt =
-    super [SafeLongIsReal].toBigInt(n)
+    super[SafeLongIsReal].toBigInt(n)
 }

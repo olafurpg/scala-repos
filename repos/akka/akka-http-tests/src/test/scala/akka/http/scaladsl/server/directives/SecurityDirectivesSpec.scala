@@ -8,7 +8,10 @@ package directives
 import scala.concurrent.Future
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsRejected, CredentialsMissing}
+import akka.http.scaladsl.server.AuthenticationFailedRejection.{
+  CredentialsRejected,
+  CredentialsMissing
+}
 import akka.testkit.EventFilter
 
 class SecurityDirectivesSpec extends RoutingSpec {
@@ -40,7 +43,8 @@ class SecurityDirectivesSpec extends RoutingSpec {
         dontBasicAuth { echoComplete }
       } ~> check {
         rejection shouldEqual AuthenticationFailedRejection(
-            CredentialsRejected, challenge)
+          CredentialsRejected,
+          challenge)
       }
     }
     "reject requests with an OAuth2 Bearer Token Authorization header with 401" in {
@@ -50,7 +54,7 @@ class SecurityDirectivesSpec extends RoutingSpec {
         status shouldEqual StatusCodes.Unauthorized
         responseAs[String] shouldEqual "The supplied authentication is invalid"
         header[`WWW-Authenticate`] shouldEqual Some(
-            `WWW-Authenticate`(challenge))
+          `WWW-Authenticate`(challenge))
       }
     }
     "reject requests with illegal Authorization header with 401" in {
@@ -60,7 +64,7 @@ class SecurityDirectivesSpec extends RoutingSpec {
         status shouldEqual StatusCodes.Unauthorized
         responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
         header[`WWW-Authenticate`] shouldEqual Some(
-            `WWW-Authenticate`(challenge))
+          `WWW-Authenticate`(challenge))
       }
     }
     "extract the object representing the user identity created by successful authentication" in {
@@ -100,7 +104,8 @@ class SecurityDirectivesSpec extends RoutingSpec {
         dontOAuth2Auth { echoComplete }
       } ~> check {
         rejection shouldEqual AuthenticationFailedRejection(
-            CredentialsRejected, challenge)
+          CredentialsRejected,
+          challenge)
       }
     }
     "reject requests with a Basic Authorization header with 401" in {
@@ -110,7 +115,7 @@ class SecurityDirectivesSpec extends RoutingSpec {
         status shouldEqual StatusCodes.Unauthorized
         responseAs[String] shouldEqual "The supplied authentication is invalid"
         header[`WWW-Authenticate`] shouldEqual Some(
-            `WWW-Authenticate`(challenge))
+          `WWW-Authenticate`(challenge))
       }
     }
     "reject requests with illegal Authorization header with 401" in {
@@ -120,7 +125,7 @@ class SecurityDirectivesSpec extends RoutingSpec {
         status shouldEqual StatusCodes.Unauthorized
         responseAs[String] shouldEqual "The resource requires authentication, which was not supplied with the request"
         header[`WWW-Authenticate`] shouldEqual Some(
-            `WWW-Authenticate`(challenge))
+          `WWW-Authenticate`(challenge))
       }
     }
     "extract the object representing the user identity created by successful authentication" in {

@@ -31,8 +31,8 @@ import org.apache.kafka.common.utils.Time
   * @param quotaSensor @Sensor that tracks the quota
   * @param throttleTimeSensor @Sensor that tracks the throttle time
   */
-private case class ClientSensors(
-    quotaSensor: Sensor, throttleTimeSensor: Sensor)
+private case class ClientSensors(quotaSensor: Sensor,
+                                 throttleTimeSensor: Sensor)
 
 /**
   * Configuration settings for quota management
@@ -42,9 +42,11 @@ private case class ClientSensors(
   *
   */
 case class ClientQuotaManagerConfig(
-    quotaBytesPerSecondDefault: Long = ClientQuotaManagerConfig.QuotaBytesPerSecondDefault,
+    quotaBytesPerSecondDefault: Long =
+      ClientQuotaManagerConfig.QuotaBytesPerSecondDefault,
     numQuotaSamples: Int = ClientQuotaManagerConfig.DefaultNumQuotaSamples,
-    quotaWindowSizeSeconds: Int = ClientQuotaManagerConfig.DefaultQuotaWindowSizeSeconds)
+    quotaWindowSizeSeconds: Int =
+      ClientQuotaManagerConfig.DefaultQuotaWindowSizeSeconds)
 
 object ClientQuotaManagerConfig {
   val QuotaBytesPerSecondDefault = Long.MaxValue
@@ -78,18 +80,17 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
 
   private val delayQueueSensor = metrics.sensor(apiKey + "-delayQueue")
   delayQueueSensor.add(
-      metrics.metricName("queue-size",
-                         apiKey,
-                         "Tracks the size of the delay queue"),
-      new Total())
+    metrics
+      .metricName("queue-size", apiKey, "Tracks the size of the delay queue"),
+    new Total())
 
   /**
     * Reaper thread that triggers callbacks on all throttled requests
     * @param delayQueue DelayQueue to dequeue from
     */
   class ThrottledRequestReaper(delayQueue: DelayQueue[ThrottledResponse])
-      extends ShutdownableThread(
-          "ThrottledRequestReaper-%s".format(apiKey), false) {
+      extends ShutdownableThread("ThrottledRequestReaper-%s".format(apiKey),
+                                 false) {
 
     override def doWork(): Unit = {
       val response: ThrottledResponse = delayQueue.poll(1, TimeUnit.SECONDS)
@@ -111,8 +112,9 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
     * @return Number of milliseconds to delay the response in case of Quota violation.
     *         Zero otherwise
     */
-  def recordAndMaybeThrottle(
-      clientId: String, value: Int, callback: Int => Unit): Int = {
+  def recordAndMaybeThrottle(clientId: String,
+                             value: Int,
+                             callback: Int => Unit): Int = {
     val clientSensors = getOrCreateQuotaSensors(clientId)
     var throttleTimeMs = 0
     try {
@@ -124,14 +126,15 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
         // Compute the delay
         val clientMetric =
           metrics.metrics().get(clientRateMetricName(clientId))
-        throttleTimeMs = throttleTime(
-            clientMetric, getQuotaMetricConfig(quota(clientId)))
+        throttleTimeMs =
+          throttleTime(clientMetric, getQuotaMetricConfig(quota(clientId)))
         clientSensors.throttleTimeSensor.record(throttleTimeMs)
         // If delayed, add the element to the delayQueue
         delayQueue.add(new ThrottledResponse(time, throttleTimeMs, callback))
         delayQueueSensor.record()
-        logger.debug("Quota violated for sensor (%s). Delay time: (%d)".format(
-                clientSensors.quotaSensor.name(), throttleTimeMs))
+        logger.debug(
+          "Quota violated for sensor (%s). Delay time: (%d)"
+            .format(clientSensors.quotaSensor.name(), throttleTimeMs))
     }
     throttleTimeMs
   }
@@ -144,27 +147,27 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
    * we need to add a delay of X to W such that O * W / (W + X) = T.
    * Solving for X, we get X = (O - T)/T * W.
    */
-  private def throttleTime(
-      clientMetric: KafkaMetric, config: MetricConfig): Int = {
-    val rateMetric: Rate = measurableAsRate(
-        clientMetric.metricName(), clientMetric.measurable())
+  private def throttleTime(clientMetric: KafkaMetric,
+                           config: MetricConfig): Int = {
+    val rateMetric: Rate =
+      measurableAsRate(clientMetric.metricName(), clientMetric.measurable())
     val quota = config.quota()
     val difference = clientMetric.value() - quota.bound
     // Use the precise window used by the rate calculation
     val throttleTimeMs =
-      difference / quota.bound * rateMetric.windowSize(
-          config, time.milliseconds())
+      difference / quota.bound * rateMetric.windowSize(config,
+                                                       time.milliseconds())
     throttleTimeMs.round.toInt
   }
 
   // Casting to Rate because we only use Rate in Quota computation
-  private def measurableAsRate(
-      name: MetricName, measurable: Measurable): Rate = {
+  private def measurableAsRate(name: MetricName,
+                               measurable: Measurable): Rate = {
     measurable match {
       case r: Rate => r
       case _ =>
         throw new IllegalArgumentException(
-            s"Metric $name is not a Rate metric, value $measurable")
+          s"Metric $name is not a Rate metric, value $measurable")
     }
   }
 
@@ -222,23 +225,23 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
         if (throttleTimeSensor == null) {
           // create the throttle time sensor also. Use default metric config
           throttleTimeSensor = metrics.sensor(
-              throttleTimeSensorName,
-              null,
-              ClientQuotaManagerConfig.InactiveSensorExpirationTimeSeconds)
+            throttleTimeSensorName,
+            null,
+            ClientQuotaManagerConfig.InactiveSensorExpirationTimeSeconds)
           throttleTimeSensor.add(
-              metrics.metricName("throttle-time",
-                                 apiKey,
-                                 "Tracking average throttle-time per client",
-                                 "client-id",
-                                 clientId),
-              new Avg())
+            metrics.metricName("throttle-time",
+                               apiKey,
+                               "Tracking average throttle-time per client",
+                               "client-id",
+                               clientId),
+            new Avg())
         }
 
         if (quotaSensor == null) {
           quotaSensor = metrics.sensor(
-              quotaSensorName,
-              getQuotaMetricConfig(quota(clientId)),
-              ClientQuotaManagerConfig.InactiveSensorExpirationTimeSeconds)
+            quotaSensorName,
+            getQuotaMetricConfig(quota(clientId)),
+            ClientQuotaManagerConfig.InactiveSensorExpirationTimeSeconds)
           quotaSensor.add(clientRateMetricName(clientId), new Rate())
         }
       } finally {
@@ -287,7 +290,7 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
       val quotaMetricName = clientRateMetricName(clientId)
       if (allMetrics.containsKey(quotaMetricName)) {
         logger.info(
-            s"Sensor for clientId $clientId already exists. Changing quota to ${quota.bound()} in MetricConfig")
+          s"Sensor for clientId $clientId already exists. Changing quota to ${quota.bound()} in MetricConfig")
         allMetrics.get(quotaMetricName).config(getQuotaMetricConfig(quota))
       }
     } finally {

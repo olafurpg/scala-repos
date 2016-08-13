@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -91,10 +91,10 @@ trait CrossOrdering extends DAG {
           dag.MegaReduce(reds, memoized(parent))
 
         case s @ dag.Split(spec, child, id) => {
-            val spec2 = memoizedSpec(spec)
-            val child2 = memoized(child)
-            dag.Split(spec2, child2, id)(s.loc)
-          }
+          val spec2 = memoizedSpec(spec)
+          val child2 = memoized(child)
+          dag.Split(spec2, child2, id)(s.loc)
+        }
 
         case node @ dag.Assert(pred, child) =>
           dag.Assert(memoized(pred), memoized(child))(node.loc)
@@ -116,30 +116,26 @@ trait CrossOrdering extends DAG {
           Diff(memoized(left), memoized(right))(node.loc)
 
         case node @ Join(op, Cross(hint), left, right) => {
-            import CrossOrder._
-            if (right.isSingleton)
-              Join(op,
-                   Cross(Some(CrossLeft)),
-                   memoized(left),
-                   memoized(right))(node.loc)
-            else if (left.isSingleton)
-              Join(op,
-                   Cross(Some(CrossRight)),
-                   memoized(left),
-                   memoized(right))(node.loc)
-            else {
-              val right2 = memoized(right)
+          import CrossOrder._
+          if (right.isSingleton)
+            Join(op, Cross(Some(CrossLeft)), memoized(left), memoized(right))(
+              node.loc)
+          else if (left.isSingleton)
+            Join(op, Cross(Some(CrossRight)), memoized(left), memoized(right))(
+              node.loc)
+          else {
+            val right2 = memoized(right)
 
-              right2 match {
-                case _: Memoize | _: AddSortKey | _: AbsoluteLoad =>
-                  Join(op, Cross(hint), memoized(left), right2)(node.loc)
+            right2 match {
+              case _: Memoize | _: AddSortKey | _: AbsoluteLoad =>
+                Join(op, Cross(hint), memoized(left), right2)(node.loc)
 
-                case _ =>
-                  Join(op, Cross(hint), memoized(left), Memoize(right2, 100))(
-                      node.loc)
-              }
+              case _ =>
+                Join(op, Cross(hint), memoized(left), Memoize(right2, 100))(
+                  node.loc)
             }
           }
+        }
 
         case node @ Join(op, joinSort, left, right) =>
           Join(op, joinSort, memoized(left), memoized(right))(node.loc)

@@ -17,8 +17,8 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   def tournamentJsData(tour: Tournament, version: Int, user: Option[User]) = {
 
     val data = Json.obj(
-        "tournament" -> Json.obj("id" -> tour.id),
-        "version" -> version
+      "tournament" -> Json.obj("id" -> tour.id),
+      "version" -> version
     )
     Json stringify {
       user.fold(data) { u =>
@@ -45,9 +45,9 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements =
       List(
-          "Lichess " -> "",
-          "Marathon" -> icon('\\'),
-          "SuperBlitz" -> icon(lila.rating.PerfType.Blitz.iconChar)
+        "Lichess " -> "",
+        "Marathon" -> icon('\\'),
+        "SuperBlitz" -> icon(lila.rating.PerfType.Blitz.iconChar)
       ) ::: lila.rating.PerfType.leaderboardable.map { pt =>
         pt.name -> icon(pt.iconChar)
       }
@@ -71,14 +71,15 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
 
   private def longTournamentDescription(tour: Tournament) =
     s"${tour.nbPlayers} players compete in the ${showEnglishDate(tour.startsAt)} ${tour.fullName}. " +
-    s"${tour.clock.show} ${tour.mode.name} games are played during ${tour.minutes} minutes. " +
-    tour.winnerId.fold("Winner is not yet decided.") { winnerId =>
-      s"${usernameOrId(winnerId)} takes the prize home!"
-    }
+      s"${tour.clock.show} ${tour.mode.name} games are played during ${tour.minutes} minutes. " +
+      tour.winnerId.fold("Winner is not yet decided.") { winnerId =>
+        s"${usernameOrId(winnerId)} takes the prize home!"
+      }
 
   def tournamentOpenGraph(tour: Tournament) =
     lila.app.ui.OpenGraph(
-        title = s"${tour.fullName}: ${tour.variant.name} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
-        url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
-        description = longTournamentDescription(tour))
+      title =
+        s"${tour.fullName}: ${tour.variant.name} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
+      url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
+      description = longTournamentDescription(tour))
 }

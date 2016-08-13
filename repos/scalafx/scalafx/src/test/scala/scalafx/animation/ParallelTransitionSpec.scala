@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ParallelTransitionSpec
     extends SimpleSFXDelegateSpec[jfxa.ParallelTransition, ParallelTransition](
-        classOf[jfxa.ParallelTransition], classOf[ParallelTransition])
+      classOf[jfxa.ParallelTransition],
+      classOf[ParallelTransition])

@@ -225,11 +225,11 @@ object ClosedShape extends ClosedShape {
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape = {
     require(
-        inlets.isEmpty,
-        s"proposed inlets [${inlets.mkString(", ")}] do not fit ClosedShape")
+      inlets.isEmpty,
+      s"proposed inlets [${inlets.mkString(", ")}] do not fit ClosedShape")
     require(
-        outlets.isEmpty,
-        s"proposed outlets [${outlets.mkString(", ")}] do not fit ClosedShape")
+      outlets.isEmpty,
+      s"proposed outlets [${outlets.mkString(", ")}] do not fit ClosedShape")
     this
   }
 
@@ -247,8 +247,8 @@ object ClosedShape extends ClosedShape {
   * implementation of the [[Graph]] builders and typically replaced by a more
   * meaningful type of Shape when the building is finished.
   */
-case class AmorphousShape(
-    inlets: immutable.Seq[Inlet[_]], outlets: immutable.Seq[Outlet[_]])
+case class AmorphousShape(inlets: immutable.Seq[Inlet[_]],
+                          outlets: immutable.Seq[Outlet[_]])
     extends Shape {
   override def deepCopy() =
     AmorphousShape(inlets.map(_.carbonCopy()), outlets.map(_.carbonCopy()))
@@ -270,11 +270,11 @@ final case class SourceShape[+T](out: Outlet[T @uncheckedVariance])
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape = {
     require(
-        inlets.isEmpty,
-        s"proposed inlets [${inlets.mkString(", ")}] do not fit SourceShape")
+      inlets.isEmpty,
+      s"proposed inlets [${inlets.mkString(", ")}] do not fit SourceShape")
     require(
-        outlets.size == 1,
-        s"proposed outlets [${outlets.mkString(", ")}] do not fit SourceShape")
+      outlets.size == 1,
+      s"proposed outlets [${outlets.mkString(", ")}] do not fit SourceShape")
     SourceShape(outlets.head)
   }
 }
@@ -290,8 +290,8 @@ object SourceShape {
   * outside like a pipe (but it can be a complex topology of streams within of
   * course).
   */
-final case class FlowShape[-I, +O](
-    in: Inlet[I @uncheckedVariance], out: Outlet[O @uncheckedVariance])
+final case class FlowShape[-I, +O](in: Inlet[I @uncheckedVariance],
+                                   out: Outlet[O @uncheckedVariance])
     extends Shape {
   override val inlets: immutable.Seq[Inlet[_]] = List(in)
   override val outlets: immutable.Seq[Outlet[_]] = List(out)
@@ -303,8 +303,8 @@ final case class FlowShape[-I, +O](
     require(inlets.size == 1,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit FlowShape")
     require(
-        outlets.size == 1,
-        s"proposed outlets [${outlets.mkString(", ")}] do not fit FlowShape")
+      outlets.size == 1,
+      s"proposed outlets [${outlets.mkString(", ")}] do not fit FlowShape")
     FlowShape(inlets.head, outlets.head)
   }
 }
@@ -329,8 +329,8 @@ final case class SinkShape[-T](in: Inlet[T @uncheckedVariance]) extends Shape {
     require(inlets.size == 1,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit SinkShape")
     require(
-        outlets.isEmpty,
-        s"proposed outlets [${outlets.mkString(", ")}] do not fit SinkShape")
+      outlets.isEmpty,
+      s"proposed outlets [${outlets.mkString(", ")}] do not fit SinkShape")
     SinkShape(inlets.head)
   }
 }
@@ -380,8 +380,8 @@ final case class BidiShape[-In1, +Out1, -In2, +Out2](
     require(inlets.size == 2,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit BidiShape")
     require(
-        outlets.size == 2,
-        s"proposed outlets [${outlets.mkString(", ")}] do not fit BidiShape")
+      outlets.size == 2,
+      s"proposed outlets [${outlets.mkString(", ")}] do not fit BidiShape")
     BidiShape(inlets(0), outlets(0), inlets(1), outlets(1))
   }
   def reversed: Shape = copyFromPorts(inlets.reverse, outlets.reverse)

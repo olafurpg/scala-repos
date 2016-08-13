@@ -17,9 +17,7 @@ private[setup] object AnonConfigRepo {
     configOption(req) flatMap {
       _ ?? { config =>
         anonConfigTube.coll
-          .update(BSONDocument("_id" -> config.id),
-                  f(config),
-                  upsert = true)
+          .update(BSONDocument("_id" -> config.id), f(config), upsert = true)
           .void
       }
     }
@@ -30,9 +28,9 @@ private[setup] object AnonConfigRepo {
   def config(sid: String): Fu[UserConfig] =
     $find byId sid recover {
       case e: LilaException => {
-          logger.warn("Can't load config", e)
-          none[UserConfig]
-        }
+        logger.warn("Can't load config", e)
+        none[UserConfig]
+      }
     } map (_ | UserConfig.default(sid))
 
   private def configOption(req: RequestHeader): Fu[Option[UserConfig]] =
@@ -42,8 +40,8 @@ private[setup] object AnonConfigRepo {
     sessionId(req) ?? { sid =>
       anonConfigTube.coll
         .find(
-            BSONDocument("_id" -> sid),
-            BSONDocument("filter" -> true)
+          BSONDocument("_id" -> sid),
+          BSONDocument("filter" -> true)
         )
         .one[BSONDocument] map {
         _ flatMap (_.getAs[FilterConfig]("filter"))

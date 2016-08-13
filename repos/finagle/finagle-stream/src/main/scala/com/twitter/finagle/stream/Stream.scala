@@ -44,11 +44,11 @@ private[stream] class DelayedReleaseService[Req](
 }
 
 object Stream {
-  def apply[Req : RequestType](): Stream[Req] = new Stream()
-  def get[Req : RequestType](): Stream[Req] = apply()
+  def apply[Req: RequestType](): Stream[Req] = new Stream()
+  def get[Req: RequestType](): Stream[Req] = apply()
 }
 
-class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
+class Stream[Req: RequestType] extends CodecFactory[Req, StreamResponse] {
   def server: Server = Function.const {
     new Codec[Req, StreamResponse] {
       def pipelineFactory = new ChannelPipelineFactory {
@@ -81,9 +81,9 @@ class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
           params: Stack.Params
       ): Service[Req, StreamResponse] =
         new StreamClientDispatcher(
-            trans,
-            params[param.Stats].statsReceiver
-              .scope(GenSerialClientDispatcher.StatsScope)
+          trans,
+          params[param.Stats].statsReceiver
+            .scope(GenSerialClientDispatcher.StatsScope)
         )
 
       // TODO: remove when the Meta[_] patch lands.
@@ -94,7 +94,8 @@ class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
 
       // TODO: remove when ChannelTransport is the default for clients.
       override def newClientTransport(
-          ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+          ch: Channel,
+          statsReceiver: StatsReceiver): Transport[Any, Any] =
         new ChannelTransport(ch)
     }
   }

@@ -17,7 +17,7 @@ class JUnitSubClassTestCheck {
 
   @Test def testSubClass0(): Unit = {
     val boot = JUnitUtil.loadBootstrapper(
-        "org.scalajs.testsuite.junit.JUnitSubClassTest")
+      "org.scalajs.testsuite.junit.JUnitSubClassTest")
     try {
       boot.invoke(boot.newInstance(), "test1")
     } catch {
@@ -28,7 +28,7 @@ class JUnitSubClassTestCheck {
 
   @Test def testSubClass1(): Unit = {
     val boot = JUnitUtil.loadBootstrapper(
-        "org.scalajs.testsuite.junit.JUnitSubClassExtended1Test")
+      "org.scalajs.testsuite.junit.JUnitSubClassExtended1Test")
     try {
       boot.invoke(boot.newInstance(), "test1")
     } catch {
@@ -39,7 +39,7 @@ class JUnitSubClassTestCheck {
 
   @Test def testSubClass2(): Unit = {
     val boot = JUnitUtil.loadBootstrapper(
-        "org.scalajs.testsuite.junit.JUnitSubClassExtended2Test")
+      "org.scalajs.testsuite.junit.JUnitSubClassExtended2Test")
     try {
       boot.invoke(boot.newInstance(), "test1")
       boot.invoke(boot.newInstance(), "test2")

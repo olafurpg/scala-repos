@@ -20,7 +20,10 @@ package org.apache.spark.examples.ml
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.ml.classification.{BinaryLogisticRegressionSummary, LogisticRegression}
+import org.apache.spark.ml.classification.{
+  BinaryLogisticRegressionSummary,
+  LogisticRegression
+}
 // $example off$
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions.max

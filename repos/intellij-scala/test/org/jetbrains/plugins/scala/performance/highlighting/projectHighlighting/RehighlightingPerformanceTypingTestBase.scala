@@ -45,9 +45,9 @@ abstract class RehighlightingPerformanceTypingTestBase
     myCodeInsightTestFixture.setUp()
 
     libLoader = ScalaLibraryLoader.withMockJdk(
-        myCodeInsightTestFixture.getProject,
-        myCodeInsightTestFixture.getModule,
-        TestUtils.getTestDataPath + "/")
+      myCodeInsightTestFixture.getProject,
+      myCodeInsightTestFixture.getModule,
+      TestUtils.getTestDataPath + "/")
     libLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
 

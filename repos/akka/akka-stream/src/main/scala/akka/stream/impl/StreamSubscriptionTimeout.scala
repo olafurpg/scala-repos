@@ -4,7 +4,11 @@
 package akka.stream.impl
 
 import akka.actor._
-import akka.stream.StreamSubscriptionTimeoutTerminationMode.{CancelTermination, NoopTermination, WarnTermination}
+import akka.stream.StreamSubscriptionTimeoutTerminationMode.{
+  CancelTermination,
+  NoopTermination,
+  WarnTermination
+}
 import akka.stream.StreamSubscriptionTimeoutSettings
 import org.reactivestreams._
 import scala.concurrent.duration.FiniteDuration
@@ -64,8 +68,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
     * Schedules a Subscription timeout.
     * The actor will receive the message created by the provided block if the timeout triggers.
     */
-  protected def scheduleSubscriptionTimeout(
-      actor: ActorRef, message: Any): Cancellable =
+  protected def scheduleSubscriptionTimeout(actor: ActorRef,
+                                            message: Any): Cancellable =
     subscriptionTimeoutSettings.mode match {
       case NoopTermination ⇒
         NoopSubscriptionTimeout
@@ -81,32 +85,32 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
     target match {
       case p: Processor[_, _] ⇒
         log.debug(
-            "Cancelling {} Processor's publisher and subscriber sides (after {} ms)",
-            p,
-            millis)
+          "Cancelling {} Processor's publisher and subscriber sides (after {} ms)",
+          p,
+          millis)
         handleSubscriptionTimeout(
-            target,
-            new SubscriptionTimeoutException(
-                s"Publisher was not attached to upstream within deadline ($millis) ms")
-            with NoStackTrace)
+          target,
+          new SubscriptionTimeoutException(
+            s"Publisher was not attached to upstream within deadline ($millis) ms")
+          with NoStackTrace)
 
       case p: Publisher[_] ⇒
         log.debug("Cancelling {} (after: {} ms)", p, millis)
         handleSubscriptionTimeout(
-            target,
-            new SubscriptionTimeoutException(
-                s"Publisher ($p) you are trying to subscribe to has been shut-down " +
-                s"because exceeding it's subscription-timeout.")
-            with NoStackTrace)
+          target,
+          new SubscriptionTimeoutException(
+            s"Publisher ($p) you are trying to subscribe to has been shut-down " +
+              s"because exceeding it's subscription-timeout.")
+          with NoStackTrace)
     }
   }
 
   private def warn(target: Publisher[_], timeout: FiniteDuration): Unit = {
     log.warning(
-        "Timed out {} detected (after {} ms)! You should investigate if you either cancel or consume all {} instances",
-        target,
-        timeout.toMillis,
-        target.getClass.getCanonicalName)
+      "Timed out {} detected (after {} ms)! You should investigate if you either cancel or consume all {} instances",
+      target,
+      timeout.toMillis,
+      target.getClass.getCanonicalName)
   }
 
   /**
@@ -123,8 +127,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
   /**
     * Callback that should ensure that the target is canceled with the given cause.
     */
-  protected def handleSubscriptionTimeout(
-      target: Publisher[_], cause: Exception): Unit
+  protected def handleSubscriptionTimeout(target: Publisher[_],
+                                          cause: Exception): Unit
 }
 
 /**

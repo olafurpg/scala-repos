@@ -5,7 +5,9 @@ import java.lang.Double.{isInfinite, isNaN, doubleToLongBits}
 import java.lang.Long.{numberOfTrailingZeros}
 
 trait Field[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with EuclideanRing[A] with MultiplicativeAbGroup[A] {
+    extends Any
+    with EuclideanRing[A]
+    with MultiplicativeAbGroup[A] {
 
   /**
     * This is implemented in terms of basic Field ops. However, this is

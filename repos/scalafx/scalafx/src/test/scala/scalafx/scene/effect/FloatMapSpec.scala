@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class FloatMapSpec
     extends SimpleSFXDelegateSpec[jfxse.FloatMap, FloatMap](
-        classOf[jfxse.FloatMap], classOf[FloatMap])
+      classOf[jfxse.FloatMap],
+      classOf[FloatMap])

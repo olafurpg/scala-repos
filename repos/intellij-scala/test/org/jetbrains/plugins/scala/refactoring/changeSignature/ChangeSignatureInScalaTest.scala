@@ -2,11 +2,17 @@ package org.jetbrains.plugins.scala
 package refactoring.changeSignature
 
 import com.intellij.psi.PsiMember
-import com.intellij.refactoring.changeSignature.{ChangeSignatureProcessorBase, ParameterInfo}
+import com.intellij.refactoring.changeSignature.{
+  ChangeSignatureProcessorBase,
+  ParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureHandler, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureHandler,
+  ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**
@@ -18,8 +24,8 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
   override def findTargetElement: PsiMember = {
     val element = new ScalaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
-    assertTrue(
-        "<caret> is not on method name", element.isInstanceOf[ScMethodLike])
+    assertTrue("<caret> is not on method name",
+               element.isInstanceOf[ScMethodLike])
     element.asInstanceOf[ScMethodLike]
   }
 
@@ -30,8 +36,11 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
       newName: String,
       newReturnType: String,
       newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
-    scalaProcessor(
-        newVisibility, newName, newReturnType, newParams, isAddDefaultValue)
+    scalaProcessor(newVisibility,
+                   newName,
+                   newReturnType,
+                   newParams,
+                   isAddDefaultValue)
   }
 
   override def mainFileName(testName: String): String = testName + ".scala"
@@ -46,8 +55,13 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
                             defVal: String = "",
                             isRep: Boolean = false,
                             isByName: Boolean = false) = {
-    new ScalaParameterInfo(
-        name, oldIdx, tpe, getProjectAdapter, isRep, isByName, defVal)
+    new ScalaParameterInfo(name,
+                           oldIdx,
+                           tpe,
+                           getProjectAdapter,
+                           isRep,
+                           isByName,
+                           defVal)
   }
 
   def testVisibility(): Unit = {
@@ -59,9 +73,9 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
   def testAddRepeatedParam(): Unit = {
     isAddDefaultValue = false
     val params = Seq(
-        parameterInfo("i", 0, types.Int),
-        parameterInfo("b", 1, types.Boolean),
-        parameterInfo("xs", -1, types.Int, isRep = true, defVal = "1"))
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", 1, types.Boolean),
+      parameterInfo("xs", -1, types.Int, isRep = true, defVal = "1"))
     doTest(null, "foo", null, Seq(params))
   }
 
@@ -81,22 +95,22 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
 
   def testRemoveRepeatedParam(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("b", 1, types.Boolean))
+    val params = Seq(parameterInfo("i", 0, types.Int),
+                     parameterInfo("b", 1, types.Boolean))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testNoDefaultArg(): Unit = {
     isAddDefaultValue = true
-    val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
+    val params =
+      Seq(parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testNoDefaultArg2(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
+    val params =
+      Seq(parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
     doTest(null, "foo", null, Seq(params))
   }
 
@@ -146,10 +160,10 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
   def testCaseClass(): Unit = {
     isAddDefaultValue = true
     val params = Seq(
-        Seq(parameterInfo("ii", 0, types.Int),
-            parameterInfo("argss", 2, types.Int, isRep = true)),
-        Seq(parameterInfo("cc", 1, types.Char),
-            parameterInfo("b", -1, types.Boolean, "true"))
+      Seq(parameterInfo("ii", 0, types.Int),
+          parameterInfo("argss", 2, types.Int, isRep = true)),
+      Seq(parameterInfo("cc", 1, types.Char),
+          parameterInfo("b", -1, types.Boolean, "true"))
     )
     doTest(null, "CClass", null, params)
   }

@@ -75,10 +75,10 @@ trait Internals { self: Universe =>
       * }}}
       * @group TagInterop
       */
-    def typeTagToManifest[T : ClassTag](
-        mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
+    def typeTagToManifest[T: ClassTag](mirror: Any,
+                                       tag: Universe#TypeTag[T]): Manifest[T] =
       throw new UnsupportedOperationException(
-          "This universe does not support tag -> manifest conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
+        "This universe does not support tag -> manifest conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
 
     /**
       * Convert a [[scala.reflect.Manifest]] to a [[scala.reflect.api.TypeTags#TypeTag]].
@@ -91,10 +91,10 @@ trait Internals { self: Universe =>
       * }}}
       * @group TagInterop
       */
-    def manifestToTypeTag[T](
-        mirror: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
+    def manifestToTypeTag[T](mirror: Any,
+                             manifest: Manifest[T]): Universe#TypeTag[T] =
       throw new UnsupportedOperationException(
-          "This universe does not support manifest -> tag conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
+        "This universe does not support manifest -> tag conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
 
     /** Create a new scope with the given initial elements.
       */
@@ -111,8 +111,9 @@ trait Internals { self: Universe =>
     /** Substitute symbols in `to` for corresponding occurrences of references to
       *  symbols `from` in this type.
       */
-    def substituteSymbols(
-        tree: Tree, from: List[Symbol], to: List[Symbol]): Tree
+    def substituteSymbols(tree: Tree,
+                          from: List[Symbol],
+                          to: List[Symbol]): Tree
 
     /** Substitute types in `to` for corresponding occurrences of references to
       *  symbols `from` in this tree.
@@ -310,8 +311,9 @@ trait Internals { self: Universe =>
 
     /** A creator for `RefinedType` types.
       */
-    def refinedType(
-        parents: List[Type], decls: Scope, clazz: Symbol): RefinedType
+    def refinedType(parents: List[Type],
+                    decls: Scope,
+                    clazz: Symbol): RefinedType
 
     /** A creator for `RefinedType` types.
       */
@@ -323,8 +325,10 @@ trait Internals { self: Universe =>
 
     /** A creator for `RefinedType` types.
       */
-    def refinedType(
-        parents: List[Type], owner: Symbol, decls: Scope, pos: Position): Type
+    def refinedType(parents: List[Type],
+                    owner: Symbol,
+                    decls: Scope,
+                    pos: Position): Type
 
     /** A creator for intersection type where intersections of a single type are
       *  replaced by the type itself.
@@ -341,8 +345,9 @@ trait Internals { self: Universe =>
 
     /** A creator for `ClassInfoType` types.
       */
-    def classInfoType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): ClassInfoType
+    def classInfoType(parents: List[Type],
+                      decls: Scope,
+                      typeSymbol: Symbol): ClassInfoType
 
     /** A creator for `MethodType` types.
       */
@@ -360,8 +365,8 @@ trait Internals { self: Universe =>
 
     /** A creator for `ExistentialType` types.
       */
-    def existentialType(
-        quantified: List[Symbol], underlying: Type): ExistentialType
+    def existentialType(quantified: List[Symbol],
+                        underlying: Type): ExistentialType
 
     /** A creator for existential types. This generates:
       *
@@ -386,8 +391,8 @@ trait Internals { self: Universe =>
 
     /** A creator for `AnnotatedType` types.
       */
-    def annotatedType(
-        annotations: List[Annotation], underlying: Type): AnnotatedType
+    def annotatedType(annotations: List[Annotation],
+                      underlying: Type): AnnotatedType
 
     /** A creator for `TypeBounds` types.
       */
@@ -407,7 +412,7 @@ trait Internals { self: Universe =>
     trait DecoratorApi {
 
       /** Extension methods for trees */
-      type TreeDecorator [T <: Tree] <: TreeDecoratorApi[T]
+      type TreeDecorator[T <: Tree] <: TreeDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       implicit def treeDecorator[T <: Tree](tree: T): TreeDecorator[T]
@@ -435,7 +440,7 @@ trait Internals { self: Universe =>
       }
 
       /** Extension methods for symbols */
-      type SymbolDecorator [T <: Symbol] <: SymbolDecoratorApi[T]
+      type SymbolDecorator[T <: Symbol] <: SymbolDecoratorApi[T]
 
       /** @see [[SymbolDecorator]] */
       implicit def symbolDecorator[T <: Symbol](symbol: T): SymbolDecorator[T]
@@ -506,7 +511,7 @@ trait Internals { self: Universe =>
       }
 
       /** Extension methods for types */
-      type TypeDecorator [T <: Type] <: TypeDecoratorApi[T]
+      type TypeDecorator[T <: Type] <: TypeDecoratorApi[T]
 
       /** @see [[TypeDecorator]] */
       implicit def typeDecorator[T <: Type](tp: T): TypeDecorator[T]
@@ -538,8 +543,9 @@ trait Internals { self: Universe =>
 
     /** Selects overloaded method symbol with given name and index
       */
-    def selectOverloadedMethod(
-        owner: Symbol, name: String, index: Int): MethodSymbol
+    def selectOverloadedMethod(owner: Symbol,
+                               name: String,
+                               index: Int): MethodSymbol
 
     /** A fresh symbol with given name `name`, position `pos` and flags `flags` that has
       *  the current symbol as its owner.
@@ -599,11 +605,13 @@ trait Internals { self: Universe =>
 
     def TypeRef(pre: Type, sym: Symbol, args: List[Type]): Type
 
-    def RefinedType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): RefinedType
+    def RefinedType(parents: List[Type],
+                    decls: Scope,
+                    typeSymbol: Symbol): RefinedType
 
-    def ClassInfoType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): ClassInfoType
+    def ClassInfoType(parents: List[Type],
+                      decls: Scope,
+                      typeSymbol: Symbol): ClassInfoType
 
     def MethodType(params: List[Symbol], resultType: Type): MethodType
 
@@ -611,11 +619,11 @@ trait Internals { self: Universe =>
 
     def PolyType(typeParams: List[Symbol], resultType: Type): PolyType
 
-    def ExistentialType(
-        quantified: List[Symbol], underlying: Type): ExistentialType
+    def ExistentialType(quantified: List[Symbol],
+                        underlying: Type): ExistentialType
 
-    def AnnotatedType(
-        annotations: List[Annotation], underlying: Type): AnnotatedType
+    def AnnotatedType(annotations: List[Annotation],
+                      underlying: Type): AnnotatedType
 
     def TypeBounds(lo: Type, hi: Type): TypeBounds
 
@@ -654,8 +662,8 @@ trait Internals { self: Universe =>
     val ImplicitParams: ImplicitParamsExtractor
 
     trait ImplicitParamsExtractor {
-      def apply(
-          paramss: List[List[Tree]], implparams: List[Tree]): List[List[Tree]]
+      def apply(paramss: List[List[Tree]],
+                implparams: List[Tree]): List[List[Tree]]
       def unapply(vparamss: List[List[ValDef]])
         : Some[(List[List[ValDef]], List[ValDef])]
     }
@@ -701,9 +709,16 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ClassDef
-      def unapply(tree: Tree)
-        : Option[(Modifiers, TypeName, List[TypeDef], Modifiers, List[List[
-                    ValDef]], List[Tree], List[Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[
+        (Modifiers,
+         TypeName,
+         List[TypeDef],
+         Modifiers,
+         List[List[ValDef]],
+         List[Tree],
+         List[Tree],
+         ValDef,
+         List[Tree])]
     }
 
     val SyntacticTraitDef: SyntacticTraitDefExtractor
@@ -716,8 +731,13 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ClassDef
-      def unapply(tree: Tree): Option[(Modifiers, TypeName, List[TypeDef], List[
-              Tree], List[Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TypeName,
+                                       List[TypeDef],
+                                       List[Tree],
+                                       List[Tree],
+                                       ValDef,
+                                       List[Tree])]
     }
 
     val SyntacticObjectDef: SyntacticObjectDefExtractor
@@ -729,8 +749,8 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ModuleDef
-      def unapply(tree: Tree): Option[(Modifiers, TermName, List[Tree], List[
-              Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[
+        (Modifiers, TermName, List[Tree], List[Tree], ValDef, List[Tree])]
     }
 
     val SyntacticPackageObjectDef: SyntacticPackageObjectDefExtractor
@@ -797,7 +817,7 @@ trait Internals { self: Universe =>
                 rhs: Tree): DefDef
 
       def unapply(tree: Tree): Option[
-          (Modifiers, TermName, List[TypeDef], List[List[ValDef]], Tree, Tree)]
+        (Modifiers, TermName, List[TypeDef], List[List[ValDef]], Tree, Tree)]
     }
 
     val SyntacticValDef: SyntacticValDefExtractor
@@ -1091,8 +1111,7 @@ trait Internals { self: Universe =>
   /** The API that all references support
     *  @group Internal
     */
-  trait ReferenceToBoxedApi extends TermTreeApi {
-    this: ReferenceToBoxed =>
+  trait ReferenceToBoxedApi extends TermTreeApi { this: ReferenceToBoxed =>
 
     /** The underlying reference. */
     def ident: Tree
@@ -1116,8 +1135,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTermSymbolApi extends TermSymbolApi {
-    this: FreeTermSymbol =>
+  trait FreeTermSymbolApi extends TermSymbolApi { this: FreeTermSymbol =>
 
     /** The place where this symbol has been spawned
       *
@@ -1150,8 +1168,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTypeSymbolApi extends TypeSymbolApi {
-    this: FreeTypeSymbol =>
+  trait FreeTypeSymbolApi extends TypeSymbolApi { this: FreeTypeSymbol =>
 
     /** The place where this symbol has been spawned
       *
@@ -1183,7 +1200,7 @@ trait Internals { self: Universe =>
     *  @group Internal
     */
   @scala.annotation.implicitNotFound(
-      "This method has been removed from the public API. Import compat._ or migrate away.")
+    "This method has been removed from the public API. Import compat._ or migrate away.")
   class CompatToken
 
   /** @see [[compat]]
@@ -1196,14 +1213,14 @@ trait Internals { self: Universe =>
 
     /** @see [[InternalApi.typeTagToManifest]] */
     @deprecated("Use `internal.typeTagToManifest` instead", "2.11.0")
-    def typeTagToManifest[T : ClassTag](
-        mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
+    def typeTagToManifest[T: ClassTag](mirror: Any,
+                                       tag: Universe#TypeTag[T]): Manifest[T] =
       internal.typeTagToManifest(mirror, tag)
 
     /** @see [[InternalApi.manifestToTypeTag]] */
     @deprecated("Use `internal.manifestToTypeTag` instead", "2.11.0")
-    def manifestToTypeTag[T](
-        mirror: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
+    def manifestToTypeTag[T](mirror: Any,
+                             manifest: Manifest[T]): Universe#TypeTag[T] =
       internal.manifestToTypeTag(mirror, manifest)
 
     /** @see [[InternalApi.newScopeWith]] */
@@ -1215,14 +1232,14 @@ trait Internals { self: Universe =>
     implicit class CompatibleBuildApi(api: BuildApi) {
 
       /** @see [[BuildApi.setInfo]] */
-      @deprecated(
-          "Use `internal.reificationSupport.setInfo` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.setInfo` instead",
+                  "2.11.0")
       def setTypeSignature[S <: Symbol](sym: S, tpe: Type): S =
         internal.reificationSupport.setInfo(sym, tpe)
 
       /** @see [[BuildApi.FlagsRepr]] */
-      @deprecated(
-          "Use `internal.reificationSupport.FlagsRepr` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.FlagsRepr` instead",
+                  "2.11.0")
       def flagsFromBits(bits: Long): FlagSet =
         internal.reificationSupport.FlagsRepr(bits)
 
@@ -1235,19 +1252,19 @@ trait Internals { self: Universe =>
       def This(sym: Symbol): Tree = internal.reificationSupport.mkThis(sym)
 
       /** @see [[BuildApi.mkSelect]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkSelect` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkSelect` instead",
+                  "2.11.0")
       def Select(qualifier: Tree, sym: Symbol): Select =
         internal.reificationSupport.mkSelect(qualifier, sym)
 
       /** @see [[BuildApi.mkIdent]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkIdent` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkIdent` instead",
+                  "2.11.0")
       def Ident(sym: Symbol): Ident = internal.reificationSupport.mkIdent(sym)
 
       /** @see [[BuildApi.mkTypeTree]] */
-      @deprecated(
-          "Use `internal.reificationSupport.mkTypeTree` instead", "2.11.0")
+      @deprecated("Use `internal.reificationSupport.mkTypeTree` instead",
+                  "2.11.0")
       def TypeTree(tp: Type): TypeTree =
         internal.reificationSupport.mkTypeTree(tp)
     }
@@ -1257,34 +1274,34 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.freeTerms]] */
       @deprecated(
-          "Use `internal.freeTerms` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.freeTerms` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def freeTerms: List[FreeTermSymbol] = internal.freeTerms(tree)
 
       /** @see [[InternalApi.freeTypes]] */
       @deprecated(
-          "Use `internal.freeTerms` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.freeTerms` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def freeTypes: List[FreeTypeSymbol] = internal.freeTypes(tree)
 
       /** @see [[InternalApi.substituteSymbols]] */
       @deprecated(
-          "Use `internal.substituteSymbols` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.substituteSymbols` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def substituteSymbols(from: List[Symbol], to: List[Symbol]): Tree =
         internal.substituteSymbols(tree, from, to)
 
       /** @see [[InternalApi.substituteTypes]] */
       @deprecated(
-          "Use `internal.substituteTypes` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.substituteTypes` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def substituteTypes(from: List[Symbol], to: List[Type]): Tree =
         internal.substituteTypes(tree, from, to)
 
       /** @see [[InternalApi.substituteThis]] */
       @deprecated(
-          "Use `internal.substituteThis` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.substituteThis` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def substituteThis(clazz: Symbol, to: Tree): Tree =
         internal.substituteThis(tree, clazz, to)
     }
@@ -1292,44 +1309,44 @@ trait Internals { self: Universe =>
     /** Scala 2.10 compatibility enrichments for Tree. */
     implicit class CompatibleSymbol(symbol: Symbol) {
       @deprecated(
-          "This API is unreliable. Use `isPrivateThis` or `isProtectedThis` instead",
-          "2.11.0")
+        "This API is unreliable. Use `isPrivateThis` or `isProtectedThis` instead",
+        "2.11.0")
       def isLocal: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isLocal
 
-      @deprecated(
-          "This API is unreliable. Use `overrides.nonEmpty` instead", "2.11.0")
+      @deprecated("This API is unreliable. Use `overrides.nonEmpty` instead",
+                  "2.11.0")
       def isOverride: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isOverride
 
       /** @see [[InternalApi.isFreeTerm]] */
       @deprecated(
-          "Use `internal.isFreeTerm` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.isFreeTerm` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def isFreeTerm: Boolean = internal.isFreeTerm(symbol)
 
       /** @see [[InternalApi.asFreeTerm]] */
       @deprecated(
-          "Use `internal.asFreeTerm` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.asFreeTerm` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def asFreeTerm: FreeTermSymbol = internal.asFreeTerm(symbol)
 
       /** @see [[InternalApi.isFreeType]] */
       @deprecated(
-          "Use `internal.isFreeType` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.isFreeType` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def isFreeType: Boolean = internal.isFreeType(symbol)
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.asFreeType` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.asFreeType` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def asFreeType: FreeTypeSymbol = internal.asFreeType(symbol)
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.newTermSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.newTermSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def newTermSymbol(name: TermName,
                         pos: Position = NoPosition,
                         flags: FlagSet = NoFlags): TermSymbol =
@@ -1337,8 +1354,8 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.newModuleAndClassSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.newModuleAndClassSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def newModuleAndClassSymbol(
           name: Name,
           pos: Position = NoPosition,
@@ -1347,8 +1364,8 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.newMethodSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.newMethodSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def newMethodSymbol(name: TermName,
                           pos: Position = NoPosition,
                           flags: FlagSet = NoFlags): MethodSymbol =
@@ -1356,8 +1373,8 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.newTypeSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.newTypeSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def newTypeSymbol(name: TypeName,
                         pos: Position = NoPosition,
                         flags: FlagSet = NoFlags): TypeSymbol =
@@ -1365,8 +1382,8 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.newClassSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.newClassSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def newClassSymbol(name: TypeName,
                          pos: Position = NoPosition,
                          flags: FlagSet = NoFlags): ClassSymbol =
@@ -1374,20 +1391,20 @@ trait Internals { self: Universe =>
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.isErroneous` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.isErroneous` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def isErroneous: Boolean = internal.isErroneous(symbol)
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.isSkolem` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.isSkolem` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def isSkolem: Boolean = internal.isSkolem(symbol)
 
       /** @see [[InternalApi.asFreeType]] */
       @deprecated(
-          "Use `internal.deSkolemize` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.deSkolemize` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def deSkolemize: Symbol = internal.deSkolemize(symbol)
     }
 

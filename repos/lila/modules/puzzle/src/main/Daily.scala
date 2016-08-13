@@ -10,8 +10,9 @@ import reactivemongo.bson.BSONDocument
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types.Coll
 
-private[puzzle] final class Daily(
-    coll: Coll, renderer: ActorSelection, scheduler: Scheduler) {
+private[puzzle] final class Daily(coll: Coll,
+                                  renderer: ActorSelection,
+                                  scheduler: Scheduler) {
 
   private val cache = lila.memo.AsyncCache
     .single[Option[DailyPuzzle]](f = find, timeToLive = 30 minutes)
@@ -47,22 +48,23 @@ private[puzzle] final class Daily(
   private def findCurrent =
     coll
       .find(
-          BSONDocument("day" -> BSONDocument(
-                  "$gt" -> DateTime.now.minusMinutes(24 * 60 - 15)))
+        BSONDocument(
+          "day" -> BSONDocument(
+            "$gt" -> DateTime.now.minusMinutes(24 * 60 - 15)))
       )
       .one[Puzzle]
 
   private def findNew =
     coll
       .find(
-          BSONDocument("day" -> BSONDocument("$exists" -> false))
+        BSONDocument("day" -> BSONDocument("$exists" -> false))
       )
       .sort(BSONDocument("vote.sum" -> -1))
       .one[Puzzle] flatMap {
       case Some(puzzle) =>
         coll.update(
-            BSONDocument("_id" -> puzzle.id),
-            BSONDocument("$set" -> BSONDocument("day" -> DateTime.now))
+          BSONDocument("_id" -> puzzle.id),
+          BSONDocument("$set" -> BSONDocument("day" -> DateTime.now))
         ) inject puzzle.some
       case None => fuccess(none)
     }

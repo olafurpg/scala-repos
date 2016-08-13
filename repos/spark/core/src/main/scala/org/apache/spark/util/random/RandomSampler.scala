@@ -37,7 +37,9 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 trait RandomSampler[T, U]
-    extends Pseudorandom with Cloneable with Serializable {
+    extends Pseudorandom
+    with Cloneable
+    with Serializable {
 
   /** take a random sample */
   def sample(items: Iterator[T]): Iterator[U]
@@ -90,8 +92,9 @@ private[spark] object RandomSampler {
   * @tparam T item type
   */
 @DeveloperApi
-class BernoulliCellSampler[T](
-    lb: Double, ub: Double, complement: Boolean = false)
+class BernoulliCellSampler[T](lb: Double,
+                              ub: Double,
+                              complement: Boolean = false)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter. */
@@ -146,12 +149,12 @@ class BernoulliCellSampler[T](
   * @tparam T item type
   */
 @DeveloperApi
-class BernoulliSampler[T : ClassTag](fraction: Double)
+class BernoulliSampler[T: ClassTag](fraction: Double)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter */
   require(fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
-          fraction <= (1.0 + RandomSampler.roundingEpsilon),
+            fraction <= (1.0 + RandomSampler.roundingEpsilon),
           s"Sampling fraction ($fraction) must be on interval [0, 1]")
 
   private val rng: Random = RandomSampler.newDefaultRNG
@@ -184,8 +187,8 @@ class BernoulliSampler[T : ClassTag](fraction: Double)
   * @tparam T item type
   */
 @DeveloperApi
-class PoissonSampler[T : ClassTag](
-    fraction: Double, useGapSamplingIfPossible: Boolean)
+class PoissonSampler[T: ClassTag](fraction: Double,
+                                  useGapSamplingIfPossible: Boolean)
     extends RandomSampler[T, T] {
 
   def this(fraction: Double) = this(fraction, useGapSamplingIfPossible = true)
@@ -197,7 +200,7 @@ class PoissonSampler[T : ClassTag](
   // PoissonDistribution throws an exception when fraction <= 0
   // If fraction is <= 0, Iterator.empty is used below, so we can use any placeholder value.
   private val rng = new PoissonDistribution(
-      if (fraction > 0.0) fraction else 1.0)
+    if (fraction > 0.0) fraction else 1.0)
   private val rngGap = RandomSampler.newDefaultRNG
 
   override def setSeed(seed: Long) {
@@ -210,8 +213,10 @@ class PoissonSampler[T : ClassTag](
       Iterator.empty
     } else if (useGapSamplingIfPossible &&
                fraction <= RandomSampler.defaultMaxGapSamplingFraction) {
-      new GapSamplingReplacementIterator(
-          items, fraction, rngGap, RandomSampler.rngEpsilon)
+      new GapSamplingReplacementIterator(items,
+                                         fraction,
+                                         rngGap,
+                                         RandomSampler.rngEpsilon)
     } else {
       items.flatMap { item =>
         val count = rng.sample()
@@ -224,7 +229,7 @@ class PoissonSampler[T : ClassTag](
     new PoissonSampler[T](fraction, useGapSamplingIfPossible)
 }
 
-private[spark] class GapSamplingIterator[T : ClassTag](
+private[spark] class GapSamplingIterator[T: ClassTag](
     var data: Iterator[T],
     f: Double,
     rng: Random = RandomSampler.newDefaultRNG,
@@ -243,10 +248,10 @@ private[spark] class GapSamplingIterator[T : ClassTag](
       case `arrayClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case `arrayBufferClass` =>
+      case `arrayBufferClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case _ =>
+      case _ =>
         (n: Int) =>
           {
             var j = 0
@@ -282,7 +287,7 @@ private[spark] class GapSamplingIterator[T : ClassTag](
   // work reliably.
 }
 
-private[spark] class GapSamplingReplacementIterator[T : ClassTag](
+private[spark] class GapSamplingReplacementIterator[T: ClassTag](
     var data: Iterator[T],
     f: Double,
     rng: Random = RandomSampler.newDefaultRNG,
@@ -300,10 +305,10 @@ private[spark] class GapSamplingReplacementIterator[T : ClassTag](
       case `arrayClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case `arrayBufferClass` =>
+      case `arrayBufferClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case _ =>
+      case _ =>
         (n: Int) =>
           {
             var j = 0

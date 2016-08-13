@@ -7,7 +7,8 @@ trait RepositoryComponent extends TemplateComponent { self: Profile =>
   lazy val Repositories = TableQuery[Repositories]
 
   class Repositories(tag: Tag)
-      extends Table[Repository](tag, "REPOSITORY") with BasicTemplate {
+      extends Table[Repository](tag, "REPOSITORY")
+      with BasicTemplate {
     val isPrivate = column[Boolean]("PRIVATE")
     val description = column[String]("DESCRIPTION")
     val defaultBranch = column[String]("DEFAULT_BRANCH")

@@ -16,14 +16,15 @@ case class MIndexInfo(table: MQName,
                       filterCondition: Option[String])
 
 object MIndexInfo {
-  def getIndexInfo(
-      table: MQName, unique: Boolean = false, approximate: Boolean = false) =
+  def getIndexInfo(table: MQName,
+                   unique: Boolean = false,
+                   approximate: Boolean = false) =
     ResultSetAction[MIndexInfo](
-        _.metaData.getIndexInfo(table.catalog_?,
-                                table.schema_?,
-                                table.name,
-                                unique,
-                                approximate)) { r =>
+      _.metaData.getIndexInfo(table.catalog_?,
+                              table.schema_?,
+                              table.name,
+                              unique,
+                              approximate)) { r =>
       MIndexInfo(MQName.from(r),
                  r.<<,
                  r.<<,

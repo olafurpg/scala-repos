@@ -4,7 +4,10 @@ import com.intellij.lang.properties.IProperty
 import com.intellij.lang.properties.references.PropertyReference
 import com.intellij.psi._
 import com.intellij.util.ProcessingContext
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
 
 /**
   * @author Ksenia.Sautina
@@ -16,7 +19,8 @@ class ScalaPropertiesReferenceProvider extends PsiReferenceProvider {
   }
 
   def getReferencesByElement(
-      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+      element: PsiElement,
+      context: ProcessingContext): Array[PsiReference] = {
     object PossibleKey {
       def unapply(lit: ScLiteral): Option[String] = {
         if (!lit.isString || lit.isMultiLineString ||

@@ -23,8 +23,9 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Remove redundant 'else'"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -37,7 +38,7 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
 
     val offset = editor.getCaretModel.getOffset
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-            offset <= elseBranch.getTextRange.getStartOffset)) return false
+          offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     thenBranch match {
       case tb: ScBlockExpr =>
@@ -70,7 +71,7 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       .find(_.getNode.getElementType != ScalaTokenTypes.tLBRACE)
       .getOrElse(return )
     if (ScalaTokenTypes.WHITES_SPACES_TOKEN_SET.contains(
-            from.getNode.getElementType)) from = from.getNextSibling
+          from.getNode.getElementType)) from = from.getNextSibling
     val to = children.reverse
       .find(_.getNode.getElementType != ScalaTokenTypes.tRBRACE)
       .getOrElse(return )
@@ -79,8 +80,8 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       elseKeyWord.delete()
       elseBranch.delete()
       ifStmt.getParent.addRangeAfter(from, to, ifStmt)
-      ifStmt.getParent.addAfter(
-          ScalaPsiElementFactory.createNewLine(manager), ifStmt)
+      ifStmt.getParent
+        .addAfter(ScalaPsiElementFactory.createNewLine(manager), ifStmt)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)

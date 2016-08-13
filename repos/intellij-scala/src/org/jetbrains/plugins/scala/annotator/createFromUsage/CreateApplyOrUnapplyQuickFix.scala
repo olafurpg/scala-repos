@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package annotator.createFromUsage
 
 import com.intellij.codeInsight.intention.IntentionAction
-import com.intellij.codeInsight.template.{TemplateBuilder, TemplateBuilderImpl, TemplateManager}
+import com.intellij.codeInsight.template.{
+  TemplateBuilder,
+  TemplateBuilderImpl,
+  TemplateManager
+}
 import com.intellij.codeInsight.{CodeInsightUtilCore, FileModificationService}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
@@ -63,8 +67,8 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
 
   protected def methodText: String
 
-  protected def addElementsToTemplate(
-      method: ScFunction, builder: TemplateBuilder): Unit
+  protected def addElementsToTemplate(method: ScFunction,
+                                      builder: TemplateBuilder): Unit
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     PsiDocumentManager.getInstance(project).commitAllDocuments()
@@ -89,8 +93,8 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
 
       val newEditor = CreateFromUsageUtil.positionCursor(entity.getLastChild)
       val range = entity.getTextRange
-      newEditor.getDocument.deleteString(
-          range.getStartOffset, range.getEndOffset)
+      newEditor.getDocument
+        .deleteString(range.getStartOffset, range.getEndOffset)
       TemplateManager.getInstance(project).startTemplate(newEditor, template)
     }
   }

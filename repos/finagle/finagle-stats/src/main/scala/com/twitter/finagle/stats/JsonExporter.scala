@@ -7,7 +7,13 @@ import com.twitter.app.GlobalFlag
 import com.twitter.common.metrics.Metrics
 import com.twitter.conversions.time._
 import com.twitter.finagle.Service
-import com.twitter.finagle.http.{MediaType, RequestParamMap, Response, Request, Status}
+import com.twitter.finagle.http.{
+  MediaType,
+  RequestParamMap,
+  Response,
+  Request,
+  Status
+}
 import com.twitter.finagle.util.DefaultTimer
 import com.twitter.io.Buf
 import com.twitter.logging.Logger
@@ -28,8 +34,8 @@ import scala.util.matching.Regex
   */
 object statsFilter
     extends GlobalFlag[String](
-        "",
-        "Comma-separated regexes that indicate which metrics to filter out")
+      "",
+      "Comma-separated regexes that indicate which metrics to filter out")
 
 /**
   * Comma-separated blacklist of files. Each file may have multiple filters,
@@ -39,13 +45,13 @@ object statsFilter
   */
 object statsFilterFile
     extends GlobalFlag[Set[File]](
-        Set.empty[File],
-        "Comma separated files of newline separated regexes that indicate which metrics to filter out")
+      Set.empty[File],
+      "Comma separated files of newline separated regexes that indicate which metrics to filter out")
 
 object useCounterDeltas
     extends GlobalFlag[Boolean](
-        false,
-        "Return deltas for counters instead of absolute values. " +
+      false,
+      "Return deltas for counters instead of absolute values. " +
         "Provides compatibility with the behavior from 'Ostrich'"
     )
 
@@ -93,8 +99,8 @@ class JsonExporter(registry: Metrics, timer: Timer)
   def apply(request: Request): Future[Response] = {
     if (registryLoaded.compareAndSet(false, true)) {
       GlobalRegistry.get.put(
-          Seq("stats", "commons_metrics", "counters_latched"),
-          useCounterDeltas().toString)
+        Seq("stats", "commons_metrics", "counters_latched"),
+        useCounterDeltas().toString)
     }
 
     val response = Response()
@@ -111,8 +117,8 @@ class JsonExporter(registry: Metrics, timer: Timer)
         if (vals.exists(_ == "60")) true
         else {
           log.warning(
-              s"${getClass.getName} request ignored due to unsupported period: '${vals
-            .mkString(",")}'")
+            s"${getClass.getName} request ignored due to unsupported period: '${vals
+              .mkString(",")}'")
           false
         }
       }
@@ -155,7 +161,8 @@ class JsonExporter(registry: Metrics, timer: Timer)
       filtered: Boolean,
       counterDeltasOn: Boolean = false
   ): String = {
-    val gauges = try registry.sampleGauges().asScala catch {
+    val gauges = try registry.sampleGauges().asScala
+    catch {
       case NonFatal(e) =>
         // because gauges run arbitrary user code, we want to protect ourselves here.
         // while the underlying registry should protect against individual misbehaving

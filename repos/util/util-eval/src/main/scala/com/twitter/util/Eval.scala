@@ -76,8 +76,8 @@ class Eval(target: Option[File]) {
   } catch {
     case e: Throwable =>
       throw new RuntimeException(
-          "Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)",
-          e)
+        "Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)",
+        e)
   }
 
   private lazy val libPath = try {
@@ -85,8 +85,8 @@ class Eval(target: Option[File]) {
   } catch {
     case e: Throwable =>
       throw new RuntimeException(
-          "Unable to load scala base object from classpath (scala-library jar is missing?)",
-          e)
+        "Unable to load scala base object from classpath (scala-library jar is missing?)",
+        e)
   }
 
   /**
@@ -97,17 +97,17 @@ class Eval(target: Option[File]) {
     * }
     */
   protected lazy val preprocessors: Seq[Preprocessor] = Seq(
-      new IncludePreprocessor(
-          Seq(
-              new ClassScopedResolver(getClass),
-              new FilesystemResolver(new File(".")),
-              new FilesystemResolver(new File("." + File.separator + "config"))
-          ) ++
-          (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
-                path =>
-                  new FilesystemResolver(new File(path))
-              })
-      )
+    new IncludePreprocessor(
+      Seq(
+        new ClassScopedResolver(getClass),
+        new FilesystemResolver(new File(".")),
+        new FilesystemResolver(new File("." + File.separator + "config"))
+      ) ++
+        (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+          path =>
+            new FilesystemResolver(new File(path))
+        })
+    )
   )
 
   // For derived classes to provide an alternate compiler message handler.
@@ -117,8 +117,10 @@ class Eval(target: Option[File]) {
   protected lazy val compilerSettings: Settings = new EvalSettings(target)
 
   // Primary encapsulation around native Scala compiler
-  private[this] lazy val compiler = new StringCompiler(
-      codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
+  private[this] lazy val compiler = new StringCompiler(codeWrapperLineOffset,
+                                                       target,
+                                                       compilerSettings,
+                                                       compilerMessageHandler)
 
   /**
     * run preprocessors on our string, returning a String that is the processed source
@@ -206,8 +208,9 @@ class Eval(target: Option[File]) {
   /**
     * same as apply[T], but does not run preprocessors.
     */
-  def applyProcessed[T](
-      className: String, code: String, resetState: Boolean): T = {
+  def applyProcessed[T](className: String,
+                        code: String,
+                        resetState: Boolean): T = {
     val cls = compiler(wrapCodeInClass(className, code), className, resetState)
     cls
       .getConstructor()
@@ -282,8 +285,8 @@ class Eval(target: Option[File]) {
     }
   }
 
-  private[util] def uniqueId(
-      code: String, idOpt: Option[Int] = Some(jvmId)): String = {
+  private[util] def uniqueId(code: String,
+                             idOpt: Option[Int] = Some(jvmId)): String = {
     val digest = MessageDigest.getInstance("SHA-1").digest(code.getBytes())
     val sha = new BigInteger(1, digest).toString(16)
     idOpt match {
@@ -317,7 +320,7 @@ class Eval(target: Option[File]) {
    */
   private[this] def wrapCodeInClass(className: String, code: String) = {
     "class " + className + " extends (() => Any) {\n" + "  def apply() = {\n" +
-    code + "\n" + "  }\n" + "}\n"
+      code + "\n" + "  }\n" + "}\n"
   }
 
   /*
@@ -371,25 +374,25 @@ class Eval(target: Option[File]) {
     // if there's just one thing in the classpath, and it's a jar, assume an executable jar.
     currentClassPath ::: (if (currentClassPath.size == 1 &&
                               currentClassPath(0).endsWith(".jar")) {
-                            val jarFile = currentClassPath(0)
-                            val relativeRoot =
-                              new File(jarFile).getParentFile()
-                            val nestedClassPath =
-                              new JarFile(jarFile).getManifest.getMainAttributes
-                                .getValue("Class-Path")
-                            if (nestedClassPath eq null) {
-                              Nil
-                            } else {
-                              nestedClassPath
-                                .split(" ")
-                                .map { f =>
-                                  new File(relativeRoot, f).getAbsolutePath
-                                }
-                                .toList
-                            }
-                          } else {
-                            Nil
-                          }) ::: classPath.tail.flatten
+      val jarFile = currentClassPath(0)
+      val relativeRoot =
+        new File(jarFile).getParentFile()
+      val nestedClassPath =
+        new JarFile(jarFile).getManifest.getMainAttributes
+          .getValue("Class-Path")
+      if (nestedClassPath eq null) {
+        Nil
+      } else {
+        nestedClassPath
+          .split(" ")
+          .map { f =>
+            new File(relativeRoot, f).getAbsolutePath
+          }
+          .toList
+      }
+    } else {
+      Nil
+    }) ::: classPath.tail.flatten
   }
 
   trait Preprocessor {
@@ -453,17 +456,17 @@ class Eval(target: Option[File]) {
               resolver.resolvable(path)
             } match {
               case Some(r: Resolver) => {
-                  // recursively process includes
-                  if (maxDepth == 0) {
-                    throw new IllegalStateException(
-                        "Exceeded maximum recusion depth")
-                  } else {
-                    apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
-                  }
+                // recursively process includes
+                if (maxDepth == 0) {
+                  throw new IllegalStateException(
+                    "Exceeded maximum recusion depth")
+                } else {
+                  apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
                 }
+              }
               case _ =>
                 throw new IllegalStateException(
-                    "No resolver could find '%s'".format(path))
+                  "No resolver could find '%s'".format(path))
             }
           } else {
             line
@@ -483,8 +486,8 @@ class Eval(target: Option[File]) {
     outputDirs.setSingleOutput(compilerOutputDir)
     private[this] val pathList = compilerPath ::: libPath
     bootclasspath.value = pathList.mkString(File.pathSeparator)
-    classpath.value = (pathList ::: impliedClassPath).mkString(
-        File.pathSeparator)
+    classpath.value =
+      (pathList ::: impliedClassPath).mkString(File.pathSeparator)
   }
 
   /**
@@ -522,12 +525,12 @@ class Eval(target: Option[File]) {
             case _: Throwable => ""
           }
           messages += (severityName + lineMessage + ": " + message) ::
-          (if (pos.isDefined) {
-             pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-             (" " * (pos.column - 1) + "^") :: Nil
-           } else {
-             Nil
-           })
+            (if (pos.isDefined) {
+              pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+                (" " * (pos.column - 1) + "^") :: Nil
+            } else {
+              Nil
+            })
         }
 
         def displayPrompt {
@@ -546,27 +549,27 @@ class Eval(target: Option[File]) {
      * Class loader for finding classes compiled by this StringCompiler.
      * After each reset, this class loader will not be able to find old compiled classes.
      */
-    var classLoader = new AbstractFileClassLoader(
-        target, this.getClass.getClassLoader)
+    var classLoader =
+      new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
     def reset() {
       targetDir match {
         case None => {
-            target.asInstanceOf[VirtualDirectory].clear()
-          }
+          target.asInstanceOf[VirtualDirectory].clear()
+        }
         case Some(t) => {
-            target.foreach { abstractFile =>
-              if (abstractFile.file == null ||
-                  abstractFile.file.getName.endsWith(".class")) {
-                abstractFile.delete()
-              }
+          target.foreach { abstractFile =>
+            if (abstractFile.file == null ||
+                abstractFile.file.getName.endsWith(".class")) {
+              abstractFile.delete()
             }
           }
+        }
       }
       cache.clear()
       reporter.reset()
-      classLoader = new AbstractFileClassLoader(
-          target, this.getClass.getClassLoader)
+      classLoader =
+        new AbstractFileClassLoader(target, this.getClass.getClassLoader)
     }
 
     object Debug {
@@ -638,6 +641,6 @@ class Eval(target: Option[File]) {
 
   class CompilerException(val messages: List[List[String]])
       extends Exception(
-          "Compiler exception " +
+        "Compiler exception " +
           messages.map(_.mkString("\n")).mkString("\n"))
 }

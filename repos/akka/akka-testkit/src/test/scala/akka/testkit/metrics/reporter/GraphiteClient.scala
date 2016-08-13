@@ -20,14 +20,14 @@ class GraphiteClient(address: InetSocketAddress) extends Closeable {
   private final val charset: Charset = Charset.forName("UTF-8")
 
   private lazy val socket = {
-    val s = SocketFactory.getDefault.createSocket(
-        address.getAddress, address.getPort)
+    val s = SocketFactory.getDefault
+      .createSocket(address.getAddress, address.getPort)
     s.setKeepAlive(true)
     s
   }
 
   private lazy val writer = new BufferedWriter(
-      new OutputStreamWriter(socket.getOutputStream, charset))
+    new OutputStreamWriter(socket.getOutputStream, charset))
 
   /** Send measurement carbon server. Thread-safe. */
   def send(name: String, value: String, timestamp: Long) {
@@ -48,7 +48,8 @@ class GraphiteClient(address: InetSocketAddress) extends Closeable {
 
   /** Closes underlying connection. */
   def close() {
-    try socket.close() finally writer.close()
+    try socket.close()
+    finally writer.close()
   }
 
   protected def sanitize(s: String): String = {

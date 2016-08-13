@@ -134,7 +134,8 @@ sealed abstract class Try[+T] extends Product with Serializable {
     *  collection with max size 1.
     */
   @deprecatedInheritance(
-      "You were never supposed to be able to extend this class.", "2.12")
+    "You were never supposed to be able to extend this class.",
+    "2.12")
   class WithFilter(p: T => Boolean) {
     def map[U](f: T => U): Try[U] = Try.this filter p map f
     def flatMap[U](f: T => Try[U]): Try[U] = Try.this filter p flatMap f
@@ -211,7 +212,8 @@ object Try {
     * `Failure` object is returned.
     */
   def apply[T](r: => T): Try[T] =
-    try Success(r) catch {
+    try Success(r)
+    catch {
       case NonFatal(e) => Failure(e)
     }
 }
@@ -222,13 +224,15 @@ final case class Failure[+T](exception: Throwable) extends Try[T] {
   override def get: T = throw exception
   override def getOrElse[U >: T](default: => U): U = default
   override def orElse[U >: T](default: => Try[U]): Try[U] =
-    try default catch { case NonFatal(e) => Failure(e) }
+    try default
+    catch { case NonFatal(e) => Failure(e) }
   override def flatMap[U](f: T => Try[U]): Try[U] = this.asInstanceOf[Try[U]]
   override def flatten[U](implicit ev: T <:< Try[U]): Try[U] =
     this.asInstanceOf[Try[U]]
   override def foreach[U](f: T => U): Unit = ()
   override def transform[U](s: T => Try[U], f: Throwable => Try[U]): Try[U] =
-    try f(exception) catch { case NonFatal(e) => Failure(e) }
+    try f(exception)
+    catch { case NonFatal(e) => Failure(e) }
   override def map[U](f: T => U): Try[U] = this.asInstanceOf[Try[U]]
   override def collect[U](pf: PartialFunction[T, U]): Try[U] =
     this.asInstanceOf[Try[U]]
@@ -257,7 +261,8 @@ final case class Success[+T](value: T) extends Try[T] {
   override def getOrElse[U >: T](default: => U): U = get
   override def orElse[U >: T](default: => Try[U]): Try[U] = this
   override def flatMap[U](f: T => Try[U]): Try[U] =
-    try f(value) catch { case NonFatal(e) => Failure(e) }
+    try f(value)
+    catch { case NonFatal(e) => Failure(e) }
   override def flatten[U](implicit ev: T <:< Try[U]): Try[U] = value
   override def foreach[U](f: T => U): Unit = f(value)
   override def transform[U](s: T => Try[U], f: Throwable => Try[U]): Try[U] =
@@ -268,14 +273,14 @@ final case class Success[+T](value: T) extends Try[T] {
       if (pf isDefinedAt value) Success(pf(value))
       else
         Failure(
-            new NoSuchElementException("Predicate does not hold for " + value))
+          new NoSuchElementException("Predicate does not hold for " + value))
     } catch { case NonFatal(e) => Failure(e) }
   override def filter(p: T => Boolean): Try[T] =
     try {
       if (p(value)) this
       else
         Failure(
-            new NoSuchElementException("Predicate does not hold for " + value))
+          new NoSuchElementException("Predicate does not hold for " + value))
     } catch { case NonFatal(e) => Failure(e) }
   override def recover[U >: T](
       @deprecatedName('rescueException) pf: PartialFunction[Throwable, U])

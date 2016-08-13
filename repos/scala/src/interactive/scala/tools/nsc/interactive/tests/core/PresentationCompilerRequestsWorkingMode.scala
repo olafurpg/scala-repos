@@ -35,8 +35,8 @@ trait PresentationCompilerRequestsWorkingMode extends TestResources {
   }
 
   /** All positions of the given string in all source files. */
-  private def allPositionsOf(
-      srcs: Seq[SourceFile] = sourceFiles, str: String): Seq[Position] =
+  private def allPositionsOf(srcs: Seq[SourceFile] = sourceFiles,
+                             str: String): Seq[Position] =
     for (s <- srcs; p <- positionsOf(s, str)) yield p
 
   /** Return all positions of the given str in the given source file. */

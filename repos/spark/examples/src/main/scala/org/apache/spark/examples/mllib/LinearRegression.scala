@@ -22,7 +22,11 @@ import org.apache.log4j.{Level, Logger}
 import scopt.OptionParser
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.optimization.{L1Updater, SimpleUpdater, SquaredL2Updater}
+import org.apache.spark.mllib.optimization.{
+  L1Updater,
+  SimpleUpdater,
+  SquaredL2Updater
+}
 import org.apache.spark.mllib.regression.LinearRegressionWithSGD
 import org.apache.spark.mllib.util.MLUtils
 
@@ -63,7 +67,7 @@ object LinearRegression {
         .action((x, c) => c.copy(stepSize = x))
       opt[String]("regType")
         .text(s"regularization type (${RegType.values.mkString(",")}), " +
-            s"default: ${defaultParams.regType}")
+          s"default: ${defaultParams.regType}")
         .action((x, c) => c.copy(regType = RegType.withName(x)))
       opt[Double]("regParam")
         .text(s"regularization parameter, default: ${defaultParams.regParam}")
@@ -71,7 +75,8 @@ object LinearRegression {
         .required()
         .text("input paths to labeled examples in LIBSVM format")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+        """
           |For example, the following command runs this app on a synthetic dataset:
           |
           | bin/spark-submit --class org.apache.spark.examples.mllib.LinearRegression \

@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.utest.UTestStaticStringTest
   * @since 04.09.2015.
   */
 class UTestStaticStringTest_2_11
-    extends UTestTestBase_2_11 with UTestStaticStringTest {}
+    extends UTestTestBase_2_11
+    with UTestStaticStringTest {}

@@ -20,11 +20,15 @@ package org.apache.spark.streaming.ui
 import scala.collection.mutable
 
 import org.apache.spark.streaming.Time
-import org.apache.spark.streaming.scheduler.{BatchInfo, OutputOperationInfo, StreamInputInfo}
+import org.apache.spark.streaming.scheduler.{
+  BatchInfo,
+  OutputOperationInfo,
+  StreamInputInfo
+}
 import org.apache.spark.streaming.ui.StreamingJobProgressListener._
 
-private[ui] case class OutputOpIdAndSparkJobId(
-    outputOpId: OutputOpId, sparkJobId: SparkJobId)
+private[ui] case class OutputOpIdAndSparkJobId(outputOpId: OutputOpId,
+                                               sparkJobId: SparkJobId)
 
 private[ui] case class BatchUIData(
     val batchTime: Time,
@@ -32,9 +36,10 @@ private[ui] case class BatchUIData(
     val submissionTime: Long,
     val processingStartTime: Option[Long],
     val processingEndTime: Option[Long],
-    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] = mutable
-        .HashMap(),
-    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] = Seq.empty) {
+    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] =
+      mutable.HashMap(),
+    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] =
+      Seq.empty) {
 
   /**
     * Time taken for the first job of this batch to start processing from the time this batch
@@ -50,7 +55,7 @@ private[ui] case class BatchUIData(
     */
   def processingDelay: Option[Long] = {
     for (start <- processingStartTime;
-    end <- processingEndTime) yield end - start
+         end <- processingEndTime) yield end - start
   }
 
   /**
@@ -71,7 +76,7 @@ private[ui] case class BatchUIData(
       outputOperationInfo: OutputOperationInfo): Unit = {
     assert(batchTime == outputOperationInfo.batchTime)
     outputOperations(outputOperationInfo.id) = OutputOperationUIData(
-        outputOperationInfo)
+      outputOperationInfo)
   }
 
   /**
@@ -105,12 +110,12 @@ private[ui] object BatchUIData {
     outputOperations ++=
       batchInfo.outputOperationInfos.mapValues(OutputOperationUIData.apply)
     new BatchUIData(
-        batchInfo.batchTime,
-        batchInfo.streamIdToInputInfo,
-        batchInfo.submissionTime,
-        batchInfo.processingStartTime,
-        batchInfo.processingEndTime,
-        outputOperations
+      batchInfo.batchTime,
+      batchInfo.streamIdToInputInfo,
+      batchInfo.submissionTime,
+      batchInfo.processingStartTime,
+      batchInfo.processingEndTime,
+      outputOperations
     )
   }
 }
@@ -129,12 +134,12 @@ private[ui] object OutputOperationUIData {
 
   def apply(outputOperationInfo: OutputOperationInfo): OutputOperationUIData = {
     OutputOperationUIData(
-        outputOperationInfo.id,
-        outputOperationInfo.name,
-        outputOperationInfo.description,
-        outputOperationInfo.startTime,
-        outputOperationInfo.endTime,
-        outputOperationInfo.failureReason
+      outputOperationInfo.id,
+      outputOperationInfo.name,
+      outputOperationInfo.description,
+      outputOperationInfo.startTime,
+      outputOperationInfo.endTime,
+      outputOperationInfo.failureReason
     )
   }
 }

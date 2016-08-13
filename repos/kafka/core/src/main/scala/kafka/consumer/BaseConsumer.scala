@@ -36,14 +36,14 @@ trait BaseConsumer {
   def commit()
 }
 
-case class BaseConsumerRecord(
-    topic: String,
-    partition: Int,
-    offset: Long,
-    timestamp: Long = Message.NoTimestamp,
-    timestampType: TimestampType = TimestampType.NO_TIMESTAMP_TYPE,
-    key: Array[Byte],
-    value: Array[Byte])
+case class BaseConsumerRecord(topic: String,
+                              partition: Int,
+                              offset: Long,
+                              timestamp: Long = Message.NoTimestamp,
+                              timestampType: TimestampType =
+                                TimestampType.NO_TIMESTAMP_TYPE,
+                              key: Array[Byte],
+                              value: Array[Byte])
 
 class NewShinyConsumer(topic: Option[String],
                        whitelist: Option[String],
@@ -57,11 +57,11 @@ class NewShinyConsumer(topic: Option[String],
   val consumer = new KafkaConsumer[Array[Byte], Array[Byte]](consumerProps)
   if (topic.isDefined) consumer.subscribe(List(topic.get))
   else if (whitelist.isDefined)
-    consumer.subscribe(
-        Pattern.compile(whitelist.get), new NoOpConsumerRebalanceListener())
+    consumer.subscribe(Pattern.compile(whitelist.get),
+                       new NoOpConsumerRebalanceListener())
   else
     throw new IllegalArgumentException(
-        "Exactly one of topic or whitelist has to be provided.")
+      "Exactly one of topic or whitelist has to be provided.")
 
   var recordIter = consumer.poll(0).iterator
 
@@ -100,8 +100,10 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
 
   val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
   val stream: KafkaStream[Array[Byte], Array[Byte]] = consumerConnector
-    .createMessageStreamsByFilter(
-        topicFilter, 1, new DefaultDecoder(), new DefaultDecoder())
+    .createMessageStreamsByFilter(topicFilter,
+                                  1,
+                                  new DefaultDecoder(),
+                                  new DefaultDecoder())
     .head
   val iter = stream.iterator
 

@@ -17,11 +17,11 @@ import scala.util.control.NonFatal
   * @param serverProvider *Experimental API; subject to change* The type of
   * server to use. If not provided, uses Play's default provider.
   */
-case class TestServer(
-    port: Int,
-    application: Application = GuiceApplicationBuilder().build(),
-    sslPort: Option[Int] = None,
-    serverProvider: Option[ServerProvider] = None) {
+case class TestServer(port: Int,
+                      application: Application =
+                        GuiceApplicationBuilder().build(),
+                      sslPort: Option[Int] = None,
+                      serverProvider: Option[ServerProvider] = None) {
 
   private var testServerProcess: TestServerProcess = _
 
@@ -35,11 +35,11 @@ case class TestServer(
 
     try {
       val config = ServerConfig(
-          rootDir = application.path,
-          port = Option(port),
-          sslPort = sslPort,
-          mode = Mode.Test,
-          properties = System.getProperties
+        rootDir = application.path,
+        port = Option(port),
+        sslPort = sslPort,
+        mode = Mode.Test,
+        properties = System.getProperties
       )
       testServerProcess = TestServer.start(serverProvider, config, application)
     } catch {
@@ -74,8 +74,8 @@ object TestServer {
     val serverProvider: ServerProvider = {
       testServerProvider
     } getOrElse {
-      ServerProvider.fromConfiguration(
-          process.classLoader, config.configuration)
+      ServerProvider.fromConfiguration(process.classLoader,
+                                       config.configuration)
     }
     Play.start(application)
     val server = serverProvider.createServer(config, application)
@@ -114,6 +114,8 @@ private[play] class TestServerProcess extends ServerProcess {
   }
 }
 
-private[play] case class TestServerExitException(
-    message: String, cause: Option[Throwable] = None, returnCode: Int = -1)
+private[play] case class TestServerExitException(message: String,
+                                                 cause: Option[Throwable] =
+                                                   None,
+                                                 returnCode: Int = -1)
     extends Exception(s"Exit with $message, $cause, $returnCode", cause.orNull)

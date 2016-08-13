@@ -46,7 +46,7 @@ object DevModeBuild {
         messages += s"Resource at $path returned $status as expected"
       } else {
         throw new RuntimeException(
-            s"Resource at $path returned ${conn.getResponseCode} instead of $status")
+          s"Resource at $path returned ${conn.getResponseCode} instead of $status")
       }
 
       val is =
@@ -70,7 +70,7 @@ object DevModeBuild {
           messages += s"Resource at $path contained $assertion"
         } else {
           throw new RuntimeException(
-              s"Resource at $path didn't contain '$assertion':\n$contents")
+            s"Resource at $path didn't contain '$assertion':\n$contents")
         }
       }
 

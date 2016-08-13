@@ -21,7 +21,11 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.catalog.ExternalCatalog.TablePartitionSpec
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Descending, SortDirection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending,
+  Descending,
+  SortDirection
+}
 import org.apache.spark.sql.catalyst.parser._
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.datasources._
@@ -155,7 +159,7 @@ object AlterTableCommandParser {
         val properties = extractTableProps(args.head)
         val ifExists = getClauseOption("TOK_IFEXISTS", args).isDefined
         AlterTableUnsetProperties(tableIdent, properties, ifExists)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name [PARTITION spec] SET SERDE serde_name [WITH SERDEPROPERTIES props];
       case Token("TOK_ALTERTABLE_SERIALIZER",
@@ -201,8 +205,8 @@ object AlterTableCommandParser {
           }
         }
         AlterTableStorageProperties(
-            tableIdent, BucketSpec(numBuckets, clusterCols, sortCols))(
-            node.source)
+          tableIdent,
+          BucketSpec(numBuckets, clusterCols, sortCols))(node.source)
 
       // ALTER TABLE table_name NOT CLUSTERED
       case Token("TOK_ALTERTABLE_CLUSTER_SORT",
@@ -244,14 +248,13 @@ object AlterTableCommandParser {
         }
         val values = colValues match {
           case Token("TOK_TABCOLVALUE", vals) =>
-            Seq(
-                vals.map { n =>
+            Seq(vals.map { n =>
               cleanAndUnquoteString(n.text)
             })
           case Token("TOK_TABCOLVALUE_PAIR", pairs) =>
             pairs.map {
-              case Token(
-                  "TOK_TABCOLVALUES", Token("TOK_TABCOLVALUE", vals) :: Nil) =>
+              case Token("TOK_TABCOLVALUES",
+                         Token("TOK_TABCOLVALUE", vals) :: Nil) =>
                 vals.map { n =>
                   cleanAndUnquoteString(n.text)
                 }
@@ -300,10 +303,11 @@ object AlterTableCommandParser {
           case Token("TOK_SKEWED_LOCATION_MAP", col :: loc :: Nil) =>
             col match {
               case Token(const, Nil) =>
-                Seq((cleanAndUnquoteString(const),
-                     cleanAndUnquoteString(loc.text)))
-              case Token(
-                  "TOK_TABCOLVALUES", Token("TOK_TABCOLVALUE", keys) :: Nil) =>
+                Seq(
+                  (cleanAndUnquoteString(const),
+                   cleanAndUnquoteString(loc.text)))
+              case Token("TOK_TABCOLVALUES",
+                         Token("TOK_TABCOLVALUE", keys) :: Nil) =>
                 keys.map { k =>
                   (cleanAndUnquoteString(k.text),
                    cleanAndUnquoteString(loc.text))
@@ -337,25 +341,25 @@ object AlterTableCommandParser {
             parseFailed("Invalid ALTER TABLE command", node)
         }
         AlterTableAddPartition(tableIdent, parsedParts, ifNotExists)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name PARTITION spec1 RENAME TO PARTITION spec2;
       case Token("TOK_ALTERTABLE_RENAMEPART", spec :: Nil) :: _ =>
         val newPartition = parsePartitionSpec(spec)
         val oldPartition = partition.getOrElse {
           parseFailed(
-              "Expected old partition spec in ALTER TABLE rename partition command",
-              node)
+            "Expected old partition spec in ALTER TABLE rename partition command",
+            node)
         }
         AlterTableRenamePartition(tableIdent, oldPartition, newPartition)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name_1 EXCHANGE PARTITION spec WITH TABLE table_name_2;
       case Token("TOK_ALTERTABLE_EXCHANGEPARTITION", spec :: newTable :: Nil) :: _ =>
         val parsedSpec = parsePartitionSpec(spec)
         val newTableIdent = extractTableIdent(newTable)
         AlterTableExchangePartition(tableIdent, newTableIdent, parsedSpec)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name DROP [IF EXISTS] PARTITION spec1[, PARTITION spec2, ...] [PURGE];
       case Token("TOK_ALTERTABLE_DROPPARTS", args) :: _ =>
@@ -365,22 +369,23 @@ object AlterTableCommandParser {
         val ifExists = getClauseOption("TOK_IFEXISTS", args).isDefined
         val purge = getClauseOption("PURGE", args).isDefined
         AlterTableDropPartition(tableIdent, parts, ifExists, purge)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name ARCHIVE PARTITION spec;
       case Token("TOK_ALTERTABLE_ARCHIVE", spec :: Nil) :: _ =>
         AlterTableArchivePartition(tableIdent, parsePartitionSpec(spec))(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name UNARCHIVE PARTITION spec;
       case Token("TOK_ALTERTABLE_UNARCHIVE", spec :: Nil) :: _ =>
         AlterTableUnarchivePartition(tableIdent, parsePartitionSpec(spec))(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name [PARTITION spec] SET FILEFORMAT file_format;
       case Token("TOK_ALTERTABLE_FILEFORMAT", args) :: _ =>
         val Seq(fileFormat, genericFormat) = getClauses(
-            Seq("TOK_TABLEFILEFORMAT", "TOK_FILEFORMAT_GENERIC"), args)
+          Seq("TOK_TABLEFILEFORMAT", "TOK_FILEFORMAT_GENERIC"),
+          args)
         // Note: the AST doesn't contain information about which file format is being set here.
         // E.g. we can't differentiate between INPUTFORMAT and OUTPUTFORMAT if either is set.
         // Right now this just stores the values, but we should figure out how to get the keys.
@@ -393,12 +398,13 @@ object AlterTableCommandParser {
           cleanAndUnquoteString(f.children(0).text)
         }
         AlterTableSetFileFormat(tableIdent, partition, fFormat, gFormat)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name [PARTITION spec] SET LOCATION "loc";
       case Token("TOK_ALTERTABLE_LOCATION", Token(loc, Nil) :: Nil) :: _ =>
-        AlterTableSetLocation(
-            tableIdent, partition, cleanAndUnquoteString(loc))(node.source)
+        AlterTableSetLocation(tableIdent,
+                              partition,
+                              cleanAndUnquoteString(loc))(node.source)
 
       // ALTER TABLE table_name TOUCH [PARTITION spec];
       case Token("TOK_ALTERTABLE_TOUCH", args) :: _ =>
@@ -423,7 +429,8 @@ object AlterTableCommandParser {
       case Token("TOK_ALTERTABLE_RENAMECOL",
                  oldName :: newName :: dataType :: args) :: _ =>
         val afterColName: Option[String] = getClauseOption(
-            "TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION", args).map { ap =>
+          "TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION",
+          args).map { ap =>
           ap.children match {
             case Token(col, Nil) :: Nil => col
             case _ => parseFailed("Invalid ALTER TABLE command", node)
@@ -456,7 +463,7 @@ object AlterTableCommandParser {
         val restrict = getClauseOption("TOK_RESTRICT", args).isDefined
         val cascade = getClauseOption("TOK_CASCADE", args).isDefined
         AlterTableAddCol(tableIdent, partition, columns, restrict, cascade)(
-            node.source)
+          node.source)
 
       // ALTER TABLE table_name [PARTITION spec] REPLACE COLUMNS (name type [COMMENT comment], ...)
       // [CASCADE|RESTRICT]
@@ -465,8 +472,11 @@ object AlterTableCommandParser {
         val columns = StructType(columnNodes.map(nodeToStructField))
         val restrict = getClauseOption("TOK_RESTRICT", args).isDefined
         val cascade = getClauseOption("TOK_CASCADE", args).isDefined
-        AlterTableReplaceCol(
-            tableIdent, partition, columns, restrict, cascade)(node.source)
+        AlterTableReplaceCol(tableIdent,
+                             partition,
+                             columns,
+                             restrict,
+                             cascade)(node.source)
 
       case _ =>
         parseFailed("Unsupported ALTER TABLE command", node)

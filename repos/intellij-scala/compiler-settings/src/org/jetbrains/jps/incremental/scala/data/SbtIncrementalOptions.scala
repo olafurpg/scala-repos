@@ -21,7 +21,7 @@ case class SbtIncrementalOptions(nameHashing: Boolean,
     val defaultValues = SbtIncrementalOptions.Default.productIterator.toSeq
     val differs = for {
       ((name, value), defaultValue) <- names.zip(values).zip(defaultValues)
-                                          if value != defaultValue
+      if value != defaultValue
     } yield s"$name = $value"
     differs.mkString(", ")
   }
@@ -35,8 +35,10 @@ object SbtIncrementalOptions {
 
   def fromString(s: String): Option[SbtIncrementalOptions] = {
     Try {
-      val Array(
-      nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction) =
+      val Array(nameHashing,
+                recompileOnMacroDef,
+                transitiveStep,
+                recompileAllFraction) =
         s.split(';')
       SbtIncrementalOptions(nameHashing.toBoolean,
                             recompileOnMacroDef.toBoolean,

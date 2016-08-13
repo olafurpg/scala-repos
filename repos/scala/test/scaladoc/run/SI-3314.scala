@@ -29,10 +29,10 @@ object Test extends ScaladocModelTest {
     assert(test1Constants.refEntity.size == 1,
            test1Constants.refEntity.size + " == 1")
     assert(
-        test1Constants.refEntity(0)._1 == LinkToMember(
-            test1._object("Constants")._class("Value"),
-            test1._object("Constants")),
-        test1Constants.refEntity(0)._1 + " == LinkToMember(test1.Enum.Value)")
+      test1Constants.refEntity(0)._1 == LinkToMember(
+        test1._object("Constants")._class("Value"),
+        test1._object("Constants")),
+      test1Constants.refEntity(0)._1 + " == LinkToMember(test1.Enum.Value)")
 
     // test2
 
@@ -44,9 +44,10 @@ object Test extends ScaladocModelTest {
         assert(doc._value(day).resultType.refEntity.size == 1,
                doc._value(day).resultType.refEntity.size + " == 1")
         assert(doc._value(day).resultType.refEntity(0)._1 == LinkToMember(
-                   doc._classMbr("Value"), doc),
+                 doc._classMbr("Value"),
+                 doc),
                doc._value(day).resultType.refEntity(0)._1 +
-               " == LinkToMember(" + doc.qualifiedName + ".Value)")
+                 " == LinkToMember(" + doc.qualifiedName + ".Value)")
       }
     }
     testDefinition(test2._trait("WeekDayTrait"))
@@ -60,28 +61,32 @@ object Test extends ScaladocModelTest {
       val WeekDayInObject = test2._object("WeekDayObject")._member("WeekDay")
 
       val expected = List(
-          ("isWorkingDay1", "WeekDayClass.Value", ValueInClass),
-          ("isWorkingDay2", "WeekDayClass.Value", ValueInClass),
-          ("isWorkingDay3", "WeekDayTrait.Value", ValueInTrait),
-          ("isWorkingDay4", "WeekDayTrait.Value", ValueInTrait),
-          ("isWorkingDay5", "WeekDayObject.Value", ValueInObject),
-          ("isWorkingDay6", "WeekDay", WeekDayInObject),
-          ("isWorkingDay7", "WeekDayObject.Value", ValueInObject),
-          ("isWorkingDay8", "WeekDay", WeekDayInObject),
-          ("isWorkingDay9", "WeekDayObject.Value", ValueInObject))
+        ("isWorkingDay1", "WeekDayClass.Value", ValueInClass),
+        ("isWorkingDay2", "WeekDayClass.Value", ValueInClass),
+        ("isWorkingDay3", "WeekDayTrait.Value", ValueInTrait),
+        ("isWorkingDay4", "WeekDayTrait.Value", ValueInTrait),
+        ("isWorkingDay5", "WeekDayObject.Value", ValueInObject),
+        ("isWorkingDay6", "WeekDay", WeekDayInObject),
+        ("isWorkingDay7", "WeekDayObject.Value", ValueInObject),
+        ("isWorkingDay8", "WeekDay", WeekDayInObject),
+        ("isWorkingDay9", "WeekDayObject.Value", ValueInObject))
 
       for ((method, name, ref) <- expected) {
         assert(doc._method(method).valueParams(0)(0).resultType.name == name,
                doc._method(method).valueParams(0)(0).resultType.name + " == " +
-               name + " (in " + doc + "." + method + ")")
+                 name + " (in " + doc + "." + method + ")")
         assert(
-            doc._method(method).valueParams(0)(0).resultType.refEntity.size == 1,
-            doc._method(method).valueParams(0)(0).resultType.refEntity.size +
+          doc._method(method).valueParams(0)(0).resultType.refEntity.size == 1,
+          doc._method(method).valueParams(0)(0).resultType.refEntity.size +
             " == " + 1 + " (in " + doc + "." + method + ")")
         assert(
-            doc._method(method).valueParams(0)(0).resultType.refEntity(0)._1 == LinkToMember(
-                ref, ref.inTemplate),
-            doc._method(method).valueParams(0)(0).resultType.refEntity(0)._1 +
+          doc
+            ._method(method)
+            .valueParams(0)(0)
+            .resultType
+            .refEntity(0)
+            ._1 == LinkToMember(ref, ref.inTemplate),
+          doc._method(method).valueParams(0)(0).resultType.refEntity(0)._1 +
             " == LinkToMember(" + ref.qualifiedName + ") (in " + doc + "." +
             method + ")")
       }
@@ -97,8 +102,11 @@ object Test extends ScaladocModelTest {
            foo.valueParams(0)(0).resultType.name + " == T")
     val bar = test3._method("bar")
     assert(
-        bar.valueParams(0)(0).resultType.name == "(AnyRef { type Lambda[X] <: Either[A,X] })#Lambda[String]",
-        bar.valueParams(0)(0).resultType.name +
+      bar
+        .valueParams(0)(0)
+        .resultType
+        .name == "(AnyRef { type Lambda[X] <: Either[A,X] })#Lambda[String]",
+      bar.valueParams(0)(0).resultType.name +
         " == (AnyRef { type Lambda[X] <: Either[A,X] })#Lambda[String]")
   }
 }

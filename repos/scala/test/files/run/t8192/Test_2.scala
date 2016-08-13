@@ -11,7 +11,7 @@ object Test extends App {
     def fullyInitializeSymbol(sym: Symbol): Unit = {
       val internal = ru.asInstanceOf[scala.reflect.internal.SymbolTable]
       internal.definitions.fullyInitializeSymbol(
-          sym.asInstanceOf[internal.Symbol])
+        sym.asInstanceOf[internal.Symbol])
     }
     def defString(sym: Symbol): String = {
       val internal = ru.asInstanceOf[scala.reflect.internal.SymbolTable]

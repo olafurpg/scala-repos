@@ -19,15 +19,15 @@ package mapper
 
 import scala.reflect.{ClassTag, classTag}
 
-class FieldFinder[T : ClassTag](
-    metaMapper: AnyRef, logger: net.liftweb.common.Logger) {
+class FieldFinder[T: ClassTag](metaMapper: AnyRef,
+                               logger: net.liftweb.common.Logger) {
   import java.lang.reflect._
 
   logger.debug("Created FieldFinder for " + classTag[T].runtimeClass)
 
   def isMagicObject(m: Method) =
     m.getReturnType.getName.endsWith("$" + m.getName + "$") &&
-    m.getParameterTypes.length == 0
+      m.getParameterTypes.length == 0
 
   def typeFilter: Class[_] => Boolean =
     classTag[T].runtimeClass.isAssignableFrom
@@ -47,11 +47,10 @@ class FieldFinder[T : ClassTag](
       case c =>
         // get the names of fields that represent the type we want
 
-        val fields = Map(
-            c.getDeclaredFields.filter { f =>
+        val fields = Map(c.getDeclaredFields.filter { f =>
           val ret = typeFilter(f.getType)
           logger.trace(
-              "typeFilter(" + f.getType + "); T=" + classTag[T].runtimeClass)
+            "typeFilter(" + f.getType + "); T=" + classTag[T].runtimeClass)
           ret
         }.map(f => (deMod(f.getName), f)): _*)
 
@@ -62,7 +61,7 @@ class FieldFinder[T : ClassTag](
           case null => Nil
           case c =>
             c :: c.getInterfaces.toList.flatMap(getAllSupers) ::: getAllSupers(
-                c.getSuperclass)
+              c.getSuperclass)
         }
 
         // does the method return an actual instance of an actual class that's
@@ -73,7 +72,7 @@ class FieldFinder[T : ClassTag](
             meth.invoke(onMagic) match {
               case null =>
                 logger.debug(
-                    "Not a valid mapped field: %s".format(meth.getName))
+                  "Not a valid mapped field: %s".format(meth.getName))
                 false
               case inst =>
                 // do we get a T of some sort back?
@@ -90,8 +89,8 @@ class FieldFinder[T : ClassTag](
           } catch {
             case e: Exception =>
               logger.debug(
-                  "Not a valid mapped field: %s, got exception: %s".format(
-                      meth.getName, e))
+                "Not a valid mapped field: %s, got exception: %s"
+                  .format(meth.getName, e))
               false
           }
         }
@@ -102,8 +101,9 @@ class FieldFinder[T : ClassTag](
           . // that take no parameters
           filter(m => Modifier.isPublic(m.getModifiers))
           . // that are public
-          filter(m =>
-                fields.contains(m.getName) &&
+          filter(
+            m =>
+              fields.contains(m.getName) &&
                 // that are associated with private fields
                 fields(m.getName).getType == m.getReturnType)
           .filter(validActualType) // and have a validated type
@@ -114,6 +114,6 @@ class FieldFinder[T : ClassTag](
     findForClass(startingClass).distinct
   }
 
-  lazy val accessorMethods = findMagicFields(
-      metaMapper, metaMapper.getClass.getSuperclass)
+  lazy val accessorMethods =
+    findMagicFields(metaMapper, metaMapper.getClass.getSuperclass)
 }

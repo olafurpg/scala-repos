@@ -31,7 +31,9 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
 
 class BucketedWriteSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   test("bucketed by non-existing column") {
@@ -42,9 +44,9 @@ class BucketedWriteSuite
   test("numBuckets not greater than 0 or less than 100000") {
     val df = Seq(1 -> "a", 2 -> "b").toDF("i", "j")
     intercept[IllegalArgumentException](
-        df.write.bucketBy(0, "i").saveAsTable("tt"))
+      df.write.bucketBy(0, "i").saveAsTable("tt"))
     intercept[IllegalArgumentException](
-        df.write.bucketBy(100000, "i").saveAsTable("tt"))
+      df.write.bucketBy(100000, "i").saveAsTable("tt"))
   }
 
   test("specify sorting columns without bucketing columns") {
@@ -55,23 +57,23 @@ class BucketedWriteSuite
   test("sorting by non-orderable column") {
     val df = Seq("a" -> Map(1 -> 1), "b" -> Map(2 -> 2)).toDF("i", "j")
     intercept[AnalysisException](
-        df.write.bucketBy(2, "i").sortBy("j").saveAsTable("tt"))
+      df.write.bucketBy(2, "i").sortBy("j").saveAsTable("tt"))
   }
 
   test("write bucketed data to unsupported data source") {
     val df = Seq(Tuple1("a"), Tuple1("b")).toDF("i")
     intercept[SparkException](
-        df.write.bucketBy(3, "i").format("text").saveAsTable("tt"))
+      df.write.bucketBy(3, "i").format("text").saveAsTable("tt"))
   }
 
   test("write bucketed data to non-hive-table or existing hive table") {
     val df = Seq(1 -> "a", 2 -> "b").toDF("i", "j")
     intercept[IllegalArgumentException](
-        df.write.bucketBy(2, "i").parquet("/tmp/path"))
+      df.write.bucketBy(2, "i").parquet("/tmp/path"))
     intercept[IllegalArgumentException](
-        df.write.bucketBy(2, "i").json("/tmp/path"))
+      df.write.bucketBy(2, "i").json("/tmp/path"))
     intercept[IllegalArgumentException](
-        df.write.bucketBy(2, "i").insertInto("tt"))
+      df.write.bucketBy(2, "i").insertInto("tt"))
   }
 
   private val df =
@@ -81,8 +83,8 @@ class BucketedWriteSuite
     val identifier =
       hiveContext.sessionState.sqlParser.parseTableIdentifier("bucketed_table")
     new File(
-        URI.create(hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(identifier)))
+      URI.create(
+        hiveContext.sessionState.catalog.hiveDefaultTableFilePath(identifier)))
   }
 
   /**
@@ -134,8 +136,8 @@ class BucketedWriteSuite
       val rows = qe.toRdd.map(_.copy()).collect()
       val getBucketId =
         UnsafeProjection.create(HashPartitioning(
-                                    qe.analyzed.output,
-                                    numBuckets).partitionIdExpression :: Nil,
+                                  qe.analyzed.output,
+                                  numBuckets).partitionIdExpression :: Nil,
                                 qe.analyzed.output)
 
       for (row <- rows) {
@@ -172,29 +174,30 @@ class BucketedWriteSuite
           .saveAsTable("bucketed_table")
 
         for (i <- 0 until 5) {
-          testBucketing(
-              new File(tableDir, s"i=$i"), source, 8, Seq("j"), Seq("k"))
+          testBucketing(new File(tableDir, s"i=$i"),
+                        source,
+                        8,
+                        Seq("j"),
+                        Seq("k"))
         }
       }
     }
   }
 
   test(
-      "write bucketed data with the overlapping bucketBy and partitionBy columns") {
+    "write bucketed data with the overlapping bucketBy and partitionBy columns") {
     intercept[AnalysisException](
-        df.write
-          .partitionBy("i", "j")
-          .bucketBy(8, "j", "k")
-          .sortBy("k")
-          .saveAsTable("bucketed_table"))
+      df.write
+        .partitionBy("i", "j")
+        .bucketBy(8, "j", "k")
+        .sortBy("k")
+        .saveAsTable("bucketed_table"))
   }
 
   test(
-      "write bucketed data with the identical bucketBy and partitionBy columns") {
-    intercept[AnalysisException](df.write
-          .partitionBy("i")
-          .bucketBy(8, "i")
-          .saveAsTable("bucketed_table"))
+    "write bucketed data with the identical bucketBy and partitionBy columns") {
+    intercept[AnalysisException](
+      df.write.partitionBy("i").bucketBy(8, "i").saveAsTable("bucketed_table"))
   }
 
   test("write bucketed data without partitionBy") {
@@ -236,8 +239,10 @@ class BucketedWriteSuite
             .saveAsTable("bucketed_table")
 
           for (i <- 0 until 5) {
-            testBucketing(
-                new File(tableDir, s"i=$i"), source, 8, Seq("j", "k"))
+            testBucketing(new File(tableDir, s"i=$i"),
+                          source,
+                          8,
+                          Seq("j", "k"))
           }
         }
       }

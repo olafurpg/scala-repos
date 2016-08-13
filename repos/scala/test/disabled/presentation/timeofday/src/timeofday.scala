@@ -1,7 +1,7 @@
 object timeofday {
   class DateError extends Exception
 
-  /** Simulating properties in Scala 
+  /** Simulating properties in Scala
     *  (example 4.2.1 in the Scala Language Specification)
     */
   class TimeOfDayVar {
@@ -9,8 +9,8 @@ object timeofday {
 
     def hours = h
 
-    /** A method 'ident_=' is a setter for 'ident'. 'code.ident = ...' will 
-      *  be translated to a call to 'ident_=' 
+    /** A method 'ident_=' is a setter for 'ident'. 'code.ident = ...' will
+      *  be translated to a call to 'ident_='
       */
     def hours_=(h: Int) =
       if (0 <= h && h < 24) this.h = h

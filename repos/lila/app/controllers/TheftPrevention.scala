@@ -11,11 +11,11 @@ import views._
 
 private[controllers] trait TheftPrevention { self: LilaController =>
 
-  protected def PreventTheft(pov: Pov)(
-      ok: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  protected def PreventTheft(pov: Pov)(ok: => Fu[Result])(
+      implicit ctx: Context): Fu[Result] =
     isTheft(pov).fold(
-        fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.color.name))),
-        ok)
+      fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.color.name))),
+      ok)
 
   protected def isTheft(pov: Pov)(implicit ctx: Context) =
     pov.game.isPgnImport || pov.player.isAi || {
@@ -25,10 +25,10 @@ private[controllers] trait TheftPrevention { self: LilaController =>
           playerId != userId && !(ctx.me ?? Granter.superAdmin)
         case (None, _) =>
           lila.api.Mobile.Api.requestVersion(ctx.req).isEmpty &&
-          !ctx.req.cookies
-            .get(AnonCookie.name)
-            .map(_.value)
-            .contains(pov.playerId)
+            !ctx.req.cookies
+              .get(AnonCookie.name)
+              .map(_.value)
+              .contains(pov.playerId)
       }
     }
 
@@ -50,7 +50,8 @@ private[controllers] trait TheftPrevention { self: LilaController =>
     }
 
   protected lazy val theftResponse =
-    Unauthorized(jsonError(
-            "This game requires authentication"
-        )) as JSON
+    Unauthorized(
+      jsonError(
+        "This game requires authentication"
+      )) as JSON
 }

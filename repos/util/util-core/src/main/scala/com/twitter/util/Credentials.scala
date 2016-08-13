@@ -57,8 +57,8 @@ object Credentials {
 
   def byName(name: String): Map[String, String] = {
     apply(
-        new File(System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"),
-                 name))
+      new File(System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"),
+               name))
   }
 }
 

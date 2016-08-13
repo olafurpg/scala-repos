@@ -60,8 +60,8 @@ private[server] class ForwardedHeaderHandler(
     remoteConnection(rawConnection, headers)
   }
 
-  def remoteConnection(
-      rawConnection: ConnectionInfo, headers: Headers): ConnectionInfo = {
+  def remoteConnection(rawConnection: ConnectionInfo,
+                       headers: Headers): ConnectionInfo = {
 
     // Use a mutable iterator for performance when scanning the
     // header entries. Go through the headers in reverse order because
@@ -83,7 +83,7 @@ private[server] class ForwardedHeaderHandler(
           configuration.parseEntry(entry) match {
             case Left(error) =>
               ForwardedHeaderHandler.logger.debug(
-                  s"Error with info in forwarding header $entry, using $prev instead: $error."
+                s"Error with info in forwarding header $entry, using $prev instead: $error."
               )
               prev
             case Right(connection) =>
@@ -123,11 +123,11 @@ private[server] object ForwardedHeaderHandler {
     * An unparsed address and protocol pair from a forwarded header. Both values are
     * optional.
     */
-  final case class ForwardedEntry(
-      addressString: Option[String], protoString: Option[String])
+  final case class ForwardedEntry(addressString: Option[String],
+                                  protoString: Option[String])
 
-  case class ForwardedHeaderHandlerConfig(
-      version: ForwardedHeaderVersion, trustedProxies: List[Subnet]) {
+  case class ForwardedHeaderHandlerConfig(version: ForwardedHeaderVersion,
+                                          trustedProxies: List[Subnet]) {
 
     val nodeIdentifierParser = new NodeIdentifierParser(version)
 
@@ -154,9 +154,9 @@ private[server] object ForwardedHeaderHandler {
             fhs <- headers.getAll("Forwarded")
             fh <- fhs.split(",\\s*")
           } yield fh)
-            .map(_.split(";")
-                  .flatMap(s =>
-                        {
+            .map(
+              _.split(";")
+                .flatMap(s => {
                   val splitted = s.split("=", 2)
                   if (splitted.length < 2) Seq.empty
                   else {
@@ -166,8 +166,8 @@ private[server] object ForwardedHeaderHandler {
                     val value = unquote(splitted(1))
                     Seq(name -> value)
                   }
-              })
-                  .toMap)
+                })
+                .toMap)
             .map { paramMap: Map[String, String] =>
               ForwardedEntry(paramMap.get("for"), paramMap.get("proto"))
             }
@@ -236,13 +236,13 @@ private[server] object ForwardedHeaderHandler {
         case "rfc7239" => Rfc7239
         case _ =>
           throw config.reportError(
-              "version",
-              "Forwarded header version must be either x-forwarded or rfc7239")
+            "version",
+            "Forwarded header version must be either x-forwarded or rfc7239")
       }
 
       ForwardedHeaderHandlerConfig(
-          version,
-          config.get[Seq[String]]("trustedProxies").map(Subnet.apply).toList)
+        version,
+        config.get[Seq[String]]("trustedProxies").map(Subnet.apply).toList)
     }
   }
 }

@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class StageSpec
-    extends SimpleSFXDelegateSpec[jfxs.Stage, Stage](
-        classOf[jfxs.Stage], classOf[Stage]) with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxs.Stage, Stage](classOf[jfxs.Stage],
+                                                     classOf[Stage])
+    with RunOnApplicationThread

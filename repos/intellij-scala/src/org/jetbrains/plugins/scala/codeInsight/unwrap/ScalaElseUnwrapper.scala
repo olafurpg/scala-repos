@@ -12,8 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScIfStmt}
   * 2014-06-27
   */
 class ScalaElseUnwrapper extends ScalaElseUnwrapperBase {
-  override protected def unwrapElseBranch(
-      expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext) = {
+  override protected def unwrapElseBranch(expr: ScExpression,
+                                          ifStmt: ScIfStmt,
+                                          context: ScalaUnwrapContext) = {
     val from = maxIfStmt(ifStmt)
     val branch = expr match {
       case elseIf @ ScIfStmt(_, Some(thenBr), _) => thenBr
@@ -26,11 +27,12 @@ class ScalaElseUnwrapper extends ScalaElseUnwrapperBase {
   override def getDescription(e: PsiElement) =
     CodeInsightBundle.message("unwrap.else")
 
-  override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = elseBranch(e) match {
-    case Some((ifStmt: ScIfStmt, _)) =>
-      super.collectAffectedElements(e, toExtract)
-      maxIfStmt(ifStmt)
-    case _ => e
-  }
+  override def collectAffectedElements(e: PsiElement,
+                                       toExtract: util.List[PsiElement]) =
+    elseBranch(e) match {
+      case Some((ifStmt: ScIfStmt, _)) =>
+        super.collectAffectedElements(e, toExtract)
+        maxIfStmt(ifStmt)
+      case _ => e
+    }
 }

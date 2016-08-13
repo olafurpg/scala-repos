@@ -54,7 +54,7 @@ package object internal {
       throw new Exception("use Type.isEffectivelyPrimitive instead")
     def isNotNullable =
       sym.isClass &&
-      (sym.asClass.isPrimitive || sym.asClass.isDerivedValueClass)
+        (sym.asClass.isPrimitive || sym.asClass.isDerivedValueClass)
     def isNullable = sym.isClass && !isNotNullable
   }
   def currentMirror: ru.Mirror = currentRuntime.currentMirror
@@ -85,8 +85,8 @@ package object internal {
           }
           val tycon = sym.asType.toTypeConstructor
           appliedType(tycon,
-                      appliedTypeArgs.map(
-                          starg => typeFromString(mirror, starg.toString)))
+                      appliedTypeArgs.map(starg =>
+                        typeFromString(mirror, starg.toString)))
         case None =>
           sys.error(s"fatal: cannot unpickle $stpe")
       }
@@ -102,11 +102,12 @@ package object internal {
       tpe.normalize match {
         case ExistentialType(tparams, TypeRef(pre, sym, targs))
             if targs.nonEmpty &&
-            targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
+              targs.forall(targ => tparams.contains(targ.typeSymbol)) =>
           TypeRef(pre, sym, Nil).key
         case TypeRef(pre, sym, targs) if pre.typeSymbol.isModuleClass =>
           sym.fullName + (if (sym.isModuleClass) ".type" else "") +
-          (if (targs.isEmpty) "" else targs.map(_.key).mkString("[", ",", "]"))
+            (if (targs.isEmpty) ""
+            else targs.map(_.key).mkString("[", ",", "]"))
         case _ =>
           tpe.toString
       }
@@ -115,7 +116,7 @@ package object internal {
       case TypeRef(_, sym: ClassSymbol, _) if sym.isPrimitive => true
       case TypeRef(_, sym, eltpe :: Nil)
           if sym == ArrayClass && eltpe.typeSymbol.isClass &&
-          eltpe.typeSymbol.asClass.isPrimitive =>
+            eltpe.typeSymbol.asClass.isPrimitive =>
         true
       case _ => false
     }

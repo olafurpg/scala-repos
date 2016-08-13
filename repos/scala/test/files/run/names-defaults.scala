@@ -145,7 +145,7 @@ object Test extends App {
   val b1 = new B("dklfj")(e = "nixda")
   println(b1.printB)
   val c1 = new C(a = "dlkf", c = new { override def toString() = "struct" })(
-      e = "???")
+    e = "???")
   println(c1.print)
   val c2 = C("dflkj", c = Some(209): Option[Int])(None, "!!")
   println(c2.print)
@@ -159,8 +159,7 @@ object Test extends App {
   println(mn.foo()())
   println(mn.bar(10))
   // anonymous class
-  println(
-      (new M {
+  println((new M {
     def foo[T >: String](x: Int, y: T)(z: String = "2") = z;
     def bar(x: Int, y: Double) = x
   }).foo()())
@@ -415,13 +414,15 @@ object Test extends App {
 
 class Base {
   def test1[T1, T2](a: Int = 100, b: T1)(c: T2, d: String = a + ": " + b)(
-      e: T2 = c, f: Int) =
+      e: T2 = c,
+      f: Int) =
     println(a + ": " + d + ", " + b + ", " + c + ", " + e + ", " + f)
 }
 
 class Sub1 extends Base {
   override def test1[U1, U2](b: Int, a: U1)(m: U2, r: String = "overridden")(
-      o: U2, f: Int = 555) =
+      o: U2,
+      f: Int = 555) =
     println(b + ": " + r + ", " + a + ", " + m + ", " + o + ", " + f)
 }
 

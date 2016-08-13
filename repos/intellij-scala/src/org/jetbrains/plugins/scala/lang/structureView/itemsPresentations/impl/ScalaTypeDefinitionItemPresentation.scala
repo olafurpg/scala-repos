@@ -15,6 +15,6 @@ class ScalaTypeDefinitionItemPresentation(
     extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getTypeDefinitionPresentableText(
-        myElement.asInstanceOf[ScTypeDefinition])
+      myElement.asInstanceOf[ScTypeDefinition])
   }
 }

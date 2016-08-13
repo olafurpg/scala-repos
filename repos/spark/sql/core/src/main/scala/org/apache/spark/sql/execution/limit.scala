@@ -21,7 +21,11 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.Serializer
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, LazilyGeneratedOrdering}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode,
+  LazilyGeneratedOrdering
+}
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.execution.exchange.ShuffleExchange
 
@@ -36,11 +40,13 @@ case class CollectLimit(limit: Int, child: SparkPlan) extends UnaryNode {
   override def outputPartitioning: Partitioning = SinglePartition
   override def executeCollect(): Array[InternalRow] = child.executeTake(limit)
   private val serializer: Serializer = new UnsafeRowSerializer(
-      child.output.size)
+    child.output.size)
   protected override def doExecute(): RDD[InternalRow] = {
     val shuffled = new ShuffledRowRDD(
-        ShuffleExchange.prepareShuffleDependency(
-            child.execute(), child.output, SinglePartition, serializer))
+      ShuffleExchange.prepareShuffleDependency(child.execute(),
+                                               child.output,
+                                               SinglePartition,
+                                               serializer))
     shuffled.mapPartitionsInternal(_.take(limit))
   }
 }
@@ -66,8 +72,9 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     val stopEarly = ctx.freshName("stopEarly")
     ctx.addMutableState("boolean", stopEarly, s"$stopEarly = false;")
 
@@ -136,7 +143,7 @@ case class TakeOrderedAndProject(limit: Int,
   }
 
   private val serializer: Serializer = new UnsafeRowSerializer(
-      child.output.size)
+    child.output.size)
 
   protected override def doExecute(): RDD[InternalRow] = {
     val ord = new LazilyGeneratedOrdering(sortOrder, child.output)
@@ -146,8 +153,10 @@ case class TakeOrderedAndProject(limit: Int,
       }
     }
     val shuffled = new ShuffledRowRDD(
-        ShuffleExchange.prepareShuffleDependency(
-            localTopK, child.output, SinglePartition, serializer))
+      ShuffleExchange.prepareShuffleDependency(localTopK,
+                                               child.output,
+                                               SinglePartition,
+                                               serializer))
     shuffled.mapPartitions { iter =>
       val topK = org.apache.spark.util.collection.Utils
         .takeOrdered(iter.map(_.copy()), limit)(ord)

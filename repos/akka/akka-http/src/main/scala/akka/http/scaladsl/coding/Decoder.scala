@@ -21,7 +21,7 @@ trait Decoder {
       implicit mapper: DataMapper[T]): T#Self =
     if (message.headers exists Encoder.isContentEncodingHeader)
       decodeData(message).withHeaders(
-          message.headers filterNot Encoder.isContentEncodingHeader)
+        message.headers filterNot Encoder.isContentEncodingHeader)
     else message.self
 
   def decodeData[T](t: T)(implicit mapper: DataMapper[T]): T =
@@ -31,8 +31,8 @@ trait Decoder {
   def withMaxBytesPerChunk(maxBytesPerChunk: Int): Decoder
 
   def decoderFlow: Flow[ByteString, ByteString, NotUsed]
-  def decode(
-      input: ByteString)(implicit mat: Materializer): Future[ByteString] =
+  def decode(input: ByteString)(
+      implicit mat: Materializer): Future[ByteString] =
     Source
       .single(input)
       .via(decoderFlow)

@@ -4,7 +4,7 @@ import Import._
 
 object P extends Build {
   override def settings = super.settings ++ Seq(
-      scalaBinaryVersion in update := "2.9.0"
+    scalaBinaryVersion in update := "2.9.0"
   )
 
   def configIvyScala =
@@ -13,15 +13,16 @@ object P extends Build {
   val declared = SettingKey[Boolean]("declared")
   lazy val a =
     Project("A", file("a")) settings
-    (libraryDependencies +=
-          "org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided",
-        configIvyScala)
+      (libraryDependencies +=
+        "org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided",
+      configIvyScala)
 
   lazy val b =
     Project("B", file("b")) dependsOn (a) settings
-    (libraryDependencies <<= declared(d =>
-              if (d)
-                Seq("org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided")
-              else Nil), declared <<= baseDirectory(_ / "declare.lib" exists),
-        configIvyScala)
+      (libraryDependencies <<= declared(
+        d =>
+          if (d)
+            Seq("org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided")
+          else Nil), declared <<= baseDirectory(_ / "declare.lib" exists),
+      configIvyScala)
 }

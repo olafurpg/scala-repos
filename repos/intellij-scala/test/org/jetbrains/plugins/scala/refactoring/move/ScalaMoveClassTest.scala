@@ -14,8 +14,14 @@ import com.intellij.refactoring.PackageWrapper
 import com.intellij.refactoring.move.moveClassesOrPackages.SingleSourceRootMoveDestination
 import com.intellij.testFramework.{PlatformTestUtil, PsiTestUtil}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.refactoring.move.ScalaMoveClassesOrPackagesProcessor
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import org.jetbrains.plugins.scala.util.TestUtils
@@ -103,10 +109,10 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     val root: String = TestUtils.getTestDataPath + "/move/" + testName
     val rootBefore: String = root + "/before"
     val rootDir: VirtualFile = PsiTestUtil.createTestProjectStructure(
-        getProjectAdapter,
-        getModuleAdapter,
-        rootBefore,
-        new util.HashSet[File]())
+      getProjectAdapter,
+      getModuleAdapter,
+      rootBefore,
+      new util.HashSet[File]())
     VirtualFilePointerManager.getInstance
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
@@ -121,7 +127,7 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     settings.MOVE_COMPANION = moveCompanionOld
     val rootAfter: String = root + "/after"
     val rootDir2: VirtualFile = LocalFileSystem.getInstance.findFileByPath(
-        rootAfter.replace(File.separatorChar, '/'))
+      rootAfter.replace(File.separatorChar, '/'))
     VirtualFilePointerManager.getInstance
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
@@ -131,8 +137,9 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     PlatformTestUtil.assertDirectoriesEqual(rootDir2, rootDir)
   }
 
-  private def performAction(
-      classNames: Array[String], newPackageName: String, mode: Kinds.Value) {
+  private def performAction(classNames: Array[String],
+                            newPackageName: String,
+                            mode: Kinds.Value) {
     val classes = new ArrayBuffer[PsiClass]()
     for (name <- classNames) {
       classes ++= ScalaPsiManager
@@ -152,15 +159,15 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     assert(dirs.length == 1)
     ScalaFileImpl.performMoveRefactoring {
       new ScalaMoveClassesOrPackagesProcessor(
-          getProjectAdapter,
-          classes.toArray,
-          new SingleSourceRootMoveDestination(
-              PackageWrapper.create(
-                  JavaDirectoryService.getInstance.getPackage(dirs(0))),
-              dirs(0)),
-          true,
-          true,
-          null).run()
+        getProjectAdapter,
+        classes.toArray,
+        new SingleSourceRootMoveDestination(
+          PackageWrapper.create(
+            JavaDirectoryService.getInstance.getPackage(dirs(0))),
+          dirs(0)),
+        true,
+        true,
+        null).run()
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
   }

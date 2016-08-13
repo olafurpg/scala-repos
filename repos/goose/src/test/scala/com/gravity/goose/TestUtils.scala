@@ -16,7 +16,7 @@ object TestUtils {
   private val NL = '\n';
   private val TAB = "\t\t";
   val articleReport = new StringBuilder(
-      "=======================::. ARTICLE REPORT .::======================\n");
+    "=======================::. ARTICLE REPORT .::======================\n");
 
   val DEFAULT_CONFIG: Configuration = new Configuration
   val NO_IMAGE_CONFIG: Configuration = new Configuration
@@ -146,8 +146,9 @@ object TestUtils {
     if (expectedKeywords != null) {
       val keywords: String = article.metaDescription
       assertNotNull("Meta Keywords was NULL!", keywords)
-      assertEquals(
-          "Meta Keywords was not as expected!", expectedKeywords, keywords)
+      assertEquals("Meta Keywords was not as expected!",
+                   expectedKeywords,
+                   keywords)
     }
   }
 

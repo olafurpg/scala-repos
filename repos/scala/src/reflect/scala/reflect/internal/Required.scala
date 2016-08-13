@@ -12,11 +12,11 @@ trait Required { self: SymbolTable =>
   def settings: MutableSettings
 
   @deprecated(
-      "Interactive is implemented with a custom Global; this flag is ignored",
-      "2.11.0")
+    "Interactive is implemented with a custom Global; this flag is ignored",
+    "2.11.0")
   def forInteractive = false
   @deprecated(
-      "Scaladoc is implemented with a custom Global; this flag is ignored",
-      "2.11.0")
+    "Scaladoc is implemented with a custom Global; this flag is ignored",
+    "2.11.0")
   def forScaladoc = false
 }

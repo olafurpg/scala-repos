@@ -108,12 +108,10 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
 
   private def testBitsetsOnce(numFields1: Int, numFields2: Int): Unit = {
     info(s"num fields: $numFields1 and $numFields2")
-    val schema1 = StructType(
-        Seq.tabulate(numFields1) { i =>
+    val schema1 = StructType(Seq.tabulate(numFields1) { i =>
       StructField(s"a_$i", IntegerType)
     })
-    val schema2 = StructType(
-        Seq.tabulate(numFields2) { i =>
+    val schema2 = StructType(Seq.tabulate(numFields2) { i =>
       StructField(s"b_$i", IntegerType)
     })
 
@@ -157,8 +155,8 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
       if (i < numFields1) {
         assert(output.isNullAt(i) === row1.isNullAt(i), dumpDebug())
       } else {
-        assert(
-            output.isNullAt(i) === row2.isNullAt(i - numFields1), dumpDebug())
+        assert(output.isNullAt(i) === row2.isNullAt(i - numFields1),
+               dumpDebug())
       }
     }
   }

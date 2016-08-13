@@ -14,10 +14,12 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/28/15.
   */
-class CachedWithRecursionGuard[T](
-    element: Any, defaultValue: => Any, dependecyItem: Object)
+class CachedWithRecursionGuard[T](element: Any,
+                                  defaultValue: => Any,
+                                  dependecyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
 }
 
 object CachedWithRecursionGuard {
@@ -69,8 +71,8 @@ object CachedWithRecursionGuard {
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           $cachesUtilFQN.getWithRecursionPreventingWithRollback[$providerType, $retTp]($element, $keyVarName, $builder, $defaultValue)
           """
-        val updatedDef = DefDef(
-            mods, name, tpParams, params, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, params, retTp, updatedRhs)
         val res = q"""
           private val $keyVarName = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
 

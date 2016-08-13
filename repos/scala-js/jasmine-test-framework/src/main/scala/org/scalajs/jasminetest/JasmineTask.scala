@@ -22,8 +22,8 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
 
   def tags(): Array[String] = Array()
 
-  def execute(
-      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] =
+  def execute(eventHandler: EventHandler,
+              loggers: Array[Logger]): Array[Task] =
     throw new UnsupportedOperationException("Jasmine only supports JavaScript")
 
   def execute(eventHandler: EventHandler,
@@ -31,8 +31,8 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
               continuation: Array[Task] => Unit): Unit = {
     val doneCont = () => continuation(Array())
     val jasmine = global.jasmine
-    val reporter = new JasmineTestReporter(
-        taskDef, eventHandler, loggers, doneCont)
+    val reporter =
+      new JasmineTestReporter(taskDef, eventHandler, loggers, doneCont)
 
     try {
       // Reset JasmineEnv
@@ -50,12 +50,12 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
       case t: Throwable =>
         // Jasmine itself failed. Issue a failure
         eventHandler.handle(
-            new JasmineEvent(
-                taskDef = taskDef,
-                status = Status.Failure,
-                selector = new SuiteSelector,
-                throwable = new OptionalThrowable(t)
-            ))
+          new JasmineEvent(
+            taskDef = taskDef,
+            status = Status.Failure,
+            selector = new SuiteSelector,
+            throwable = new OptionalThrowable(t)
+          ))
         for (log <- loggers) {
           log.error("Problem executing code in tests: " + t.toString)
           log.trace(t)

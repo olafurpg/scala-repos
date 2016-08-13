@@ -13,7 +13,9 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.javadsl
 import akka.testkit.AkkaSpec
 import akka.util.Timeout
-import docs.persistence.query.PersistenceQueryDocSpec.{TheOneWhoWritesToQueryJournal}
+import docs.persistence.query.PersistenceQueryDocSpec.{
+  TheOneWhoWritesToQueryJournal
+}
 import org.reactivestreams.Subscriber
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -54,7 +56,8 @@ object PersistenceQueryDocSpec {
       config.getDuration("refresh-interval", MILLISECONDS).millis
 
     override def eventsByTag(
-        tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+        tag: String,
+        offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
       val props = MyEventsByTagPublisher.props(tag, offset, refreshInterval)
       Source
         .actorPublisher[EventEnvelope](props)
@@ -186,7 +189,8 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
   import PersistenceQueryDocSpec._
 
   def this() {
-    this("""
+    this(
+      """
         akka.persistence.query.my-read-journal {
           class = "docs.persistence.query.PersistenceQueryDocSpec$MyReadJournalProvider"
           refresh-interval = 3s
@@ -201,7 +205,7 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
     // obtain read journal by plugin id
     val readJournal =
       PersistenceQuery(system).readJournalFor[MyScaladslReadJournal](
-          "akka.persistence.query.my-read-journal")
+        "akka.persistence.query.my-read-journal")
 
     // issue query to journal
     val source: Source[EventEnvelope, NotUsed] =
@@ -248,7 +252,8 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
       readJournal.byTagsWithMeta(Set("red", "blue"))
 
     query.mapMaterializedValue { meta =>
-      println(s"The query is: " +
+      println(
+        s"The query is: " +
           s"ordered deterministically: ${meta.deterministicOrder}, " +
           s"infinite: ${meta.infinite}")
     }.map { event =>
@@ -296,7 +301,7 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
   class RunWithAsyncFunction {
     val readJournal =
       PersistenceQuery(system).readJournalFor[MyScaladslReadJournal](
-          "akka.persistence.query.my-read-journal")
+        "akka.persistence.query.my-read-journal")
 
     //#projection-into-different-store-simple
     trait ExampleStore {

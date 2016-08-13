@@ -21,9 +21,12 @@ import HttpEntity._
 import HttpMethods._
 
 class RequestRendererSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll {
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -55,7 +58,7 @@ class RequestRendererSpec
       }
 
       "GET request to a literal IPv6 address" in new TestSetup(
-          serverAddress = new InetSocketAddress("[::1]", 8080)) {
+        serverAddress = new InetSocketAddress("[::1]", 8080)) {
         HttpRequest(GET, uri = "/abc") should renderTo {
           """GET /abc HTTP/1.1
             |Host: [0:0:0:0:0:0:0:1]:8080
@@ -83,12 +86,12 @@ class RequestRendererSpec
       }
 
       "PUT request, a few headers and a body" in new TestSetup() {
-        HttpRequest(
-            PUT,
-            "/abc/xyz",
-            List(RawHeader("X-Fancy", "naa"),
-                 RawHeader("Cache-Control", "public"),
-                 Host("spray.io"))).withEntity("The content please!") should renderTo {
+        HttpRequest(PUT,
+                    "/abc/xyz",
+                    List(RawHeader("X-Fancy", "naa"),
+                         RawHeader("Cache-Control", "public"),
+                         Host("spray.io")))
+          .withEntity("The content please!") should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |X-Fancy: naa
             |Cache-Control: public
@@ -103,13 +106,13 @@ class RequestRendererSpec
 
       "PUT request, a few headers and a body with suppressed content type" in new TestSetup() {
         HttpRequest(
-            PUT,
-            "/abc/xyz",
-            List(RawHeader("X-Fancy", "naa"),
-                 RawHeader("Cache-Control", "public"),
-                 Host("spray.io")),
-            HttpEntity(ContentTypes.NoContentType,
-                       ByteString("The content please!"))) should renderTo {
+          PUT,
+          "/abc/xyz",
+          List(RawHeader("X-Fancy", "naa"),
+               RawHeader("Cache-Control", "public"),
+               Host("spray.io")),
+          HttpEntity(ContentTypes.NoContentType,
+                     ByteString("The content please!"))) should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |X-Fancy: naa
             |Cache-Control: public
@@ -123,9 +126,9 @@ class RequestRendererSpec
 
       "PUT request with a custom Transfer-Encoding header" in new TestSetup() {
         HttpRequest(
-            PUT,
-            "/abc/xyz",
-            List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))))
+          PUT,
+          "/abc/xyz",
+          List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))))
           .withEntity("The content please!") should renderTo {
           """PUT /abc/xyz HTTP/1.1
               |Transfer-Encoding: fancy
@@ -169,11 +172,11 @@ class RequestRendererSpec
 
       "POST request with body" in new TestSetup() {
         HttpRequest(
-            POST,
-            "/abc/xyz",
-            entity = Chunked(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
+          POST,
+          "/abc/xyz",
+          entity = Chunked(
+            ContentTypes.`text/plain(UTF-8)`,
+            source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
           """POST /abc/xyz HTTP/1.1
               |Host: test.com:8080
               |User-Agent: akka-http/1.0.0
@@ -243,12 +246,12 @@ class RequestRendererSpec
 
       "POST request with custom Transfer-Encoding header" in new TestSetup() {
         HttpRequest(
-            POST,
-            "/abc/xyz",
-            List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
-            entity = Chunked(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
+          POST,
+          "/abc/xyz",
+          List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
+          entity = Chunked(
+            ContentTypes.`text/plain(UTF-8)`,
+            source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
           """POST /abc/xyz HTTP/1.1
               |Transfer-Encoding: fancy, chunked
               |Host: test.com:8080
@@ -268,7 +271,7 @@ class RequestRendererSpec
 
     "properly handle the User-Agent header" - {
       "if no default is set and no explicit User-Agent header given" in new TestSetup(
-          None) {
+        None) {
         HttpRequest(GET, "/abc") should renderTo {
           """GET /abc HTTP/1.1
             |Host: test.com:8080
@@ -344,17 +347,18 @@ class RequestRendererSpec
   override def afterAll() = system.terminate()
 
   class TestSetup(val userAgent: Option[`User-Agent`] = Some(
-                        `User-Agent`("akka-http/1.0.0")),
-                  serverAddress: InetSocketAddress = new InetSocketAddress(
-                        "test.com", 8080))
-      extends HttpRequestRendererFactory(
-          userAgent, requestHeaderSizeHint = 64, NoLogging) {
+                    `User-Agent`("akka-http/1.0.0")),
+                  serverAddress: InetSocketAddress =
+                    new InetSocketAddress("test.com", 8080))
+      extends HttpRequestRendererFactory(userAgent,
+                                         requestHeaderSizeHint = 64,
+                                         NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpRequest] =
       equal(expected.stripMarginWithNewline("\r\n")).matcher[String] compose {
         request ⇒
           val byteStringSource = renderToSource(
-              RequestRenderingContext(request, Host(serverAddress)))
+            RequestRenderingContext(request, Host(serverAddress)))
           val future = byteStringSource
             .limit(1000)
             .runWith(Sink.seq)

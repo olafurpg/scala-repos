@@ -5,7 +5,11 @@ import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
@@ -42,21 +46,22 @@ class VarianceTest extends SimpleTestCase {
 
   def testVarianceParameterizedReturnType() {
     assertMatches(
-        messages("abstract class F[-P[+_], +R](in: P[R]) {def a = in}")) {
+      messages("abstract class F[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }
 
   def testVariancePrivateThis() {
-    assertMatches(messages(
-            "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
+    assertMatches(
+      messages(
+        "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }
 
   def testFunctionInsideFunction() {
     assertMatches(
-        messages("trait H[+S] { def outer = {def inner(s: S) = s }}")) {
+      messages("trait H[+S] { def outer = {def inner(s: S) = s }}")) {
       case Nil =>
     }
   }
@@ -140,7 +145,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testSCL8803() {
-    assertMatches(messages("""object Main extends App {
+    assertMatches(
+      messages("""object Main extends App {
         |
         |  class Sum[+T](dummy: T, val sel: Int) {
         |    def this(d: T, value: List[Int]) = this(d, value.sum)
@@ -163,7 +169,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testUV() = {
-    assertMatches(messages("""
+    assertMatches(
+      messages("""
         |import scala.annotation.unchecked.{ uncheckedVariance => uV }
         |
         |class Test[+T] {
@@ -195,9 +202,9 @@ class VarianceTest extends SimpleTestCase {
   }
 
   val ContravariantPosition = ContainsPattern(
-      "occurs in contravariant position")
+    "occurs in contravariant position")
   val CovariantPosition = ContainsPattern("occurs in covariant position")
   val AbstractModifier = ContainsPattern(
-      "Abstract member may not have private modifier")
+    "Abstract member may not have private modifier")
   val NotConformsUpper = ContainsPattern("doesn't conform to upper bound")
 }

@@ -97,7 +97,7 @@ package scala.test.scaladoc {
       trait A
       trait X
       def foo[T](x: T) = 7
-      def bar[A](x: ({ type Lambda [X] <: Either[A, X] })#Lambda[String]) = 5
+      def bar[A](x: ({ type Lambda[X] <: Either[A, X] })#Lambda[String]) = 5
     }
   }
 }

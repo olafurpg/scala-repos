@@ -28,7 +28,7 @@ object TraverseTestJVM extends SpecLite {
       val as = Stream.range(0, 100000)
       val state: State[Int, IO[Stream[Int]]] =
         as.traverseSTrampoline[IO, Int, Int](a =>
-              for {
+          for {
             s <- State.get[Int]
             _ <- State.put(a)
           } yield IO(a - s))

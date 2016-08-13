@@ -120,11 +120,11 @@ class IndexedRowMatrix @Since("1.0.0")(
       val rowIndex = row.index
       row.vector match {
         case SparseVector(size, indices, values) =>
-          Iterator.tabulate(indices.length)(
-              i => MatrixEntry(rowIndex, indices(i), values(i)))
+          Iterator.tabulate(indices.length)(i =>
+            MatrixEntry(rowIndex, indices(i), values(i)))
         case DenseVector(values) =>
-          Iterator.tabulate(values.length)(
-              i => MatrixEntry(rowIndex, i, values(i)))
+          Iterator.tabulate(values.length)(i =>
+            MatrixEntry(rowIndex, i, values(i)))
       }
     }
     new CoordinateMatrix(entries, numRows(), numCols())

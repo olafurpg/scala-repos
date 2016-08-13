@@ -7,7 +7,12 @@ package signatures
 
 import _root_.org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScParametersImpl
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameters
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScParamClausesStubImpl
 
@@ -17,19 +22,21 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScParamClausesStubImpl
   */
 class ScParamClausesElementType
     extends ScStubElementType[ScParamClausesStub, ScParameters](
-        "parameter clauses") {
+      "parameter clauses") {
   def serialize(stub: ScParamClausesStub, dataStream: StubOutputStream) {}
 
   def indexStub(stub: ScParamClausesStub, sink: IndexSink) {}
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScParamClausesStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScParamClausesStub = {
     new ScParamClausesStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this)
   }
 
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScParameters, parentStub: StubElement[ParentPsi]) = {
+      psi: ScParameters,
+      parentStub: StubElement[ParentPsi]) = {
     new ScParamClausesStubImpl(parentStub, this)
   }
 

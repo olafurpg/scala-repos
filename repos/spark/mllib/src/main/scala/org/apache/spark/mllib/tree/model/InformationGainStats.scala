@@ -42,15 +42,15 @@ class InformationGainStats(val gain: Double,
 
   override def toString: String = {
     s"gain = $gain, impurity = $impurity, left impurity = $leftImpurity, " +
-    s"right impurity = $rightImpurity"
+      s"right impurity = $rightImpurity"
   }
 
   override def equals(o: Any): Boolean = o match {
     case other: InformationGainStats =>
       gain == other.gain &&
-      impurity == other.impurity && leftImpurity == other.leftImpurity &&
-      rightImpurity == other.rightImpurity &&
-      leftPredict == other.leftPredict && rightPredict == other.rightPredict
+        impurity == other.impurity && leftImpurity == other.leftImpurity &&
+        rightImpurity == other.rightImpurity &&
+        leftPredict == other.leftPredict && rightPredict == other.rightPredict
 
     case _ => false
   }
@@ -73,12 +73,12 @@ private[spark] object InformationGainStats {
     * minimum number of instances per node.
     */
   val invalidInformationGainStats = new InformationGainStats(
-      Double.MinValue,
-      -1.0,
-      -1.0,
-      -1.0,
-      new Predict(0.0, 0.0),
-      new Predict(0.0, 0.0))
+    Double.MinValue,
+    -1.0,
+    -1.0,
+    -1.0,
+    new Predict(0.0, 0.0),
+    new Predict(0.0, 0.0))
 }
 
 /**
@@ -104,7 +104,7 @@ private[spark] class ImpurityStats(
 
   override def toString: String = {
     s"gain = $gain, impurity = $impurity, left impurity = $leftImpurity, " +
-    s"right impurity = $rightImpurity"
+      s"right impurity = $rightImpurity"
   }
 
   def leftImpurity: Double =

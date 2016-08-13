@@ -5,7 +5,10 @@ package structureView
 import com.intellij.ide.structureView.StructureViewBuilder
 import com.intellij.lang.PsiStructureViewFactory
 import com.intellij.psi.PsiFile
-import org.jetbrains.plugins.scala.console.{ScalaConsoleInfo, ScalaLanguageConsoleView}
+import org.jetbrains.plugins.scala.console.{
+  ScalaConsoleInfo,
+  ScalaLanguageConsoleView
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**

@@ -16,11 +16,11 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class SslTest extends FunSuite {
   val certChainInput = new CertChainInput(
-      "setup-chain", // directory that contains the files below
-      "setupCA.sh",
-      "makecert.sh",
-      "openssl-intermediate.conf",
-      "openssl-root.conf"
+    "setup-chain", // directory that contains the files below
+    "setupCA.sh",
+    "makecert.sh",
+    "openssl-intermediate.conf",
+    "openssl-root.conf"
   )
 
   // before we run any tests, construct the chain
@@ -31,20 +31,21 @@ class SslTest extends FunSuite {
     certChainInput.makeCertFile.setExecutable(true)
     // this process requires an openssl executable
     val process = Runtime.getRuntime.exec(
-        Array[String](
-            certChainInput.setupCAPath,
-            certChainInput.makeCertPath,
-            certChainInput.openSSLIntConfPath,
-            certChainInput.openSSLRootConfPath
-        ), // command
-        null, // null == inherit the environment of the current process
-        certChainInput.setupCADirPath.toFile // working dir
+      Array[String](
+        certChainInput.setupCAPath,
+        certChainInput.makeCertPath,
+        certChainInput.openSSLIntConfPath,
+        certChainInput.openSSLRootConfPath
+      ), // command
+      null, // null == inherit the environment of the current process
+      certChainInput.setupCADirPath.toFile // working dir
     )
     process.waitFor()
     assert(process.exitValue == 0)
   } catch {
     case e: java.io.IOException =>
-      println("IOException: I/O error in running setupCA script: " +
+      println(
+        "IOException: I/O error in running setupCA script: " +
           e.getMessage())
       throw e
     case NonFatal(e) =>
@@ -54,11 +55,11 @@ class SslTest extends FunSuite {
 
   // the chain should have generated the files below
   val certChain = new CertChainOutput(
-      "test.example.com.chain",
-      "test.example.com.cert",
-      "test.example.com.key",
-      "cacert.pem",
-      certChainInput.setupCADirPath.toString
+    "test.example.com.chain",
+    "test.example.com.cert",
+    "test.example.com.key",
+    "cacert.pem",
+    certChainInput.setupCADirPath.toString
   )
 
   // now let's run some tests
@@ -167,15 +168,15 @@ class SslTest extends FunSuite {
     // ... then connect to that service using openssl and ensure that
     // the chain is correct
     val cmd = Array[String](
-        "openssl",
-        "s_client",
-        "-connect",
-        "localhost:" + addr.getPort.toString,
-        "-CAfile",
-        certChain.rootCertOnlyPath, // cacert.pem
-        "-verify",
-        "9",
-        "-showcerts"
+      "openssl",
+      "s_client",
+      "-connect",
+      "localhost:" + addr.getPort.toString,
+      "-CAfile",
+      certChain.rootCertOnlyPath, // cacert.pem
+      "-verify",
+      "9",
+      "-showcerts"
     )
 
     try {
@@ -193,11 +194,13 @@ class SslTest extends FunSuite {
       val outBuf = new Array[Byte](out.available)
       out.read(outBuf)
       val outBufStr = new String(outBuf)
-      assert("Verify return code: 0 \\(ok\\)".r.findFirstIn(outBufStr) == Some(
-              """Verify return code: 0 (ok)"""))
+      assert(
+        "Verify return code: 0 \\(ok\\)".r.findFirstIn(outBufStr) == Some(
+          """Verify return code: 0 (ok)"""))
     } catch {
       case ex: java.io.IOException =>
-        println("Test skipped: running openssl failed" +
+        println(
+          "Test skipped: running openssl failed" +
             " (openssl executable might be absent?)")
     }
   }
@@ -213,22 +216,23 @@ class CertChainInput(
     openSSLRootConfFilename: String
 ) {
   val setupCADirPath: Path = Files.createTempDirectory(setupCADirName)
-  def writeResourceToDir(
-      klass: Class[_], name: String, directory: Path): File = {
+  def writeResourceToDir(klass: Class[_],
+                         name: String,
+                         directory: Path): File = {
     val fullName = File.separator + setupCADirName + File.separator + name
     val url = Resources.getResource(klass, fullName)
     val newFile = new File(setupCADirPath.toFile, name)
     Resources.asByteSource(url).copyTo(GuavaFiles.asByteSink(newFile))
     newFile
   }
-  val setupCAFile = writeResourceToDir(
-      getClass, setupCAFilename, setupCADirPath)
-  val makeCertFile = writeResourceToDir(
-      getClass, makeCertFilename, setupCADirPath)
-  val openSSLIntConfFile = writeResourceToDir(
-      getClass, openSSLIntConfFilename, setupCADirPath)
-  val openSSLRootConfFile = writeResourceToDir(
-      getClass, openSSLRootConfFilename, setupCADirPath)
+  val setupCAFile =
+    writeResourceToDir(getClass, setupCAFilename, setupCADirPath)
+  val makeCertFile =
+    writeResourceToDir(getClass, makeCertFilename, setupCADirPath)
+  val openSSLIntConfFile =
+    writeResourceToDir(getClass, openSSLIntConfFilename, setupCADirPath)
+  val openSSLRootConfFile =
+    writeResourceToDir(getClass, openSSLRootConfFilename, setupCADirPath)
 
   val setupCAPath: String = setupCAFile.getAbsolutePath
   val makeCertPath: String = makeCertFile.getAbsolutePath

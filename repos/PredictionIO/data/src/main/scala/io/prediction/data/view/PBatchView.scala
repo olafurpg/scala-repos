@@ -55,8 +55,8 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
     val combinedT = if (this.t > that.t) this.t else that.t
 
     SetProp(
-        fields = combinedFields,
-        t = combinedT
+      fields = combinedFields,
+      t = combinedT
     )
   }
 }
@@ -78,7 +78,7 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
 
     UnsetProp(
-        fields = combinedFields
+      fields = combinedFields
     )
   }
 }
@@ -93,14 +93,13 @@ private[prediction] case class EventOp(
     val setProp: Option[SetProp] = None,
     val unsetProp: Option[UnsetProp] = None,
     val deleteEntity: Option[DeleteEntity] = None
-)
-    extends Serializable {
+) extends Serializable {
 
   def ++(that: EventOp): EventOp = {
     EventOp(
-        setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
-        unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
-        deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _)
+      setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
+      unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
+      deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _)
     )
   }
 
@@ -108,7 +107,7 @@ private[prediction] case class EventOp(
     setProp.flatMap { set =>
       val unsetKeys: Set[String] = unsetProp
         .map(unset =>
-              unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
+          unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
       val combinedFields = deleteEntity.map { delete =>
@@ -138,27 +137,27 @@ private[prediction] object EventOp {
     val t = e.eventTime.getMillis
     e.event match {
       case "$set" => {
-          val fields =
-            e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
+        val fields =
+          e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
-          EventOp(
-              setProp = Some(SetProp(fields = fields, t = t))
-          )
-        }
+        EventOp(
+          setProp = Some(SetProp(fields = fields, t = t))
+        )
+      }
       case "$unset" => {
-          val fields = e.properties.fields.mapValues(jv => t).map(identity)
-          EventOp(
-              unsetProp = Some(UnsetProp(fields = fields))
-          )
-        }
+        val fields = e.properties.fields.mapValues(jv => t).map(identity)
+        EventOp(
+          unsetProp = Some(UnsetProp(fields = fields))
+        )
+      }
       case "$delete" => {
-          EventOp(
-              deleteEntity = Some(DeleteEntity(t))
-          )
-        }
+        EventOp(
+          deleteEntity = Some(DeleteEntity(t))
+        )
+      }
       case _ => {
-          EventOp()
-        }
+        EventOp()
+      }
     }
   }
 }
@@ -190,14 +189,14 @@ class PBatchView(val appId: Int,
 
     _events
       .filter(e =>
-            ((e.entityType == entityType) &&
-                (EventValidation.isSpecialEvents(e.event))))
+        ((e.entityType == entityType) &&
+          (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
-          // within same partition
-          seqOp = { case (u, v) => u ++ v },
-          // across partition
-          combOp = { case (accu, u) => accu ++ u }
+        // within same partition
+        seqOp = { case (u, v) => u ++ v },
+        // across partition
+        combOp = { case (accu, u) => accu ++ u }
       )
       .mapValues(_.toDataMap)
       .filter { case (k, v) => v.isDefined }

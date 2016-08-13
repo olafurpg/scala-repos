@@ -33,10 +33,17 @@ import org.scalatest.BeforeAndAfter
 
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.internal.Logging
-import org.apache.spark.util.logging.{FileAppender, RollingFileAppender, SizeBasedRollingPolicy, TimeBasedRollingPolicy}
+import org.apache.spark.util.logging.{
+  FileAppender,
+  RollingFileAppender,
+  SizeBasedRollingPolicy,
+  TimeBasedRollingPolicy
+}
 
 class FileAppenderSuite
-    extends SparkFunSuite with BeforeAndAfter with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Logging {
 
   val testFile =
     new File(Utils.createTempDir(), "FileAppenderSuite-test").getAbsoluteFile
@@ -69,15 +76,18 @@ class FileAppenderSuite
     val textToAppend = (1 to numRollovers).map(_.toString * 10)
 
     val appender = new RollingFileAppender(
-        testInputStream,
-        testFile,
-        new TimeBasedRollingPolicy(
-            rolloverIntervalMillis, s"--HH-mm-ss-SSSS", false),
-        new SparkConf(),
-        10)
+      testInputStream,
+      testFile,
+      new TimeBasedRollingPolicy(rolloverIntervalMillis,
+                                 s"--HH-mm-ss-SSSS",
+                                 false),
+      new SparkConf(),
+      10)
 
-    testRolling(
-        appender, testOutputStream, textToAppend, rolloverIntervalMillis)
+    testRolling(appender,
+                testOutputStream,
+                textToAppend,
+                rolloverIntervalMillis)
   }
 
   test("rolling file appender - size-based rolling") {
@@ -133,7 +143,8 @@ class FileAppenderSuite
 
     // verify whether the earliest file has been deleted
     val rolledOverFiles = allGeneratedFiles.filter { _ != testFile.toString }.toArray.sorted
-    logInfo(s"All rolled over files generated:${rolledOverFiles.size}\n" +
+    logInfo(
+      s"All rolled over files generated:${rolledOverFiles.size}\n" +
         rolledOverFiles.mkString("\n"))
     assert(rolledOverFiles.size > 2)
     val earliestRolledOverFile = rolledOverFiles.head
@@ -141,7 +152,8 @@ class FileAppenderSuite
       .getSortedRolledOverFiles(testFile.getParentFile.toString,
                                 testFile.getName)
       .map(_.toString)
-    logInfo("Existing rolled over files:\n" +
+    logInfo(
+      "Existing rolled over files:\n" +
         existingRolledOverFiles.mkString("\n"))
     assert(!existingRolledOverFiles.toSet.contains(earliestRolledOverFile))
   }
@@ -150,8 +162,8 @@ class FileAppenderSuite
     // Test whether FileAppender.apply() returns the right type of the FileAppender based
     // on SparkConf settings.
 
-    def testAppenderSelection[
-        ExpectedAppender : ClassTag, ExpectedRollingPolicy](
+    def testAppenderSelection[ExpectedAppender: ClassTag,
+                              ExpectedRollingPolicy](
         properties: Seq[(String, String)],
         expectedRollingPolicyParam: Long = -1): Unit = {
 
@@ -167,7 +179,7 @@ class FileAppenderSuite
       val appender = FileAppender(testInputStream, testFile, conf)
       // assert(appender.getClass === classTag[ExpectedAppender].getClass)
       assert(
-          appender.getClass.getSimpleName === classTag[ExpectedAppender].runtimeClass.getSimpleName)
+        appender.getClass.getSimpleName === classTag[ExpectedAppender].runtimeClass.getSimpleName)
       if (appender.isInstanceOf[RollingFileAppender]) {
         val rollingPolicy =
           appender.asInstanceOf[RollingFileAppender].rollingPolicy
@@ -204,23 +216,27 @@ class FileAppenderSuite
     testAppenderSelection[FileAppender, Any](Seq.empty)
 
     // test time based rolling strategy
-    testAppenderSelection[RollingFileAppender, Any](
-        rollingStrategy("time"), msInDay)
+    testAppenderSelection[RollingFileAppender, Any](rollingStrategy("time"),
+                                                    msInDay)
     testAppenderSelection[RollingFileAppender, TimeBasedRollingPolicy](
-        rollingStrategy("time") ++ rollingInterval("daily"), msInDay)
+      rollingStrategy("time") ++ rollingInterval("daily"),
+      msInDay)
     testAppenderSelection[RollingFileAppender, TimeBasedRollingPolicy](
-        rollingStrategy("time") ++ rollingInterval("hourly"), msInHour)
+      rollingStrategy("time") ++ rollingInterval("hourly"),
+      msInHour)
     testAppenderSelection[RollingFileAppender, TimeBasedRollingPolicy](
-        rollingStrategy("time") ++ rollingInterval("minutely"), msInMinute)
+      rollingStrategy("time") ++ rollingInterval("minutely"),
+      msInMinute)
     testAppenderSelection[RollingFileAppender, TimeBasedRollingPolicy](
-        rollingStrategy("time") ++ rollingInterval("123456789"),
-        123456789 * 1000L)
+      rollingStrategy("time") ++ rollingInterval("123456789"),
+      123456789 * 1000L)
     testAppenderSelection[FileAppender, Any](
-        rollingStrategy("time") ++ rollingInterval("xyz"))
+      rollingStrategy("time") ++ rollingInterval("xyz"))
 
     // test size based rolling strategy
     testAppenderSelection[RollingFileAppender, SizeBasedRollingPolicy](
-        rollingStrategy("size") ++ rollingSize("123456789"), 123456789)
+      rollingStrategy("size") ++ rollingSize("123456789"),
+      123456789)
     testAppenderSelection[FileAppender, Any](rollingSize("xyz"))
 
     // test illegal strategy
@@ -251,8 +267,9 @@ class FileAppenderSuite
     verify(mockAppender, atLeast(1)).doAppend(loggingEventCaptor.capture)
     val loggingEvent = loggingEventCaptor.getValue
     assert(loggingEvent.getThrowableInformation !== null)
-    assert(loggingEvent.getThrowableInformation.getThrowable
-          .isInstanceOf[IOException])
+    assert(
+      loggingEvent.getThrowableInformation.getThrowable
+        .isInstanceOf[IOException])
   }
 
   test("file appender async close stream gracefully") {
@@ -285,7 +302,8 @@ class FileAppenderSuite
     verify(mockAppender, atLeast(0)).doAppend(loggingEventCaptor.capture)
     import scala.collection.JavaConverters._
     loggingEventCaptor.getAllValues.asScala.foreach { loggingEvent =>
-      assert(loggingEvent.getThrowableInformation === null ||
+      assert(
+        loggingEvent.getThrowableInformation === null ||
           !loggingEvent.getThrowableInformation.getThrowable
             .isInstanceOf[IOException])
     }
@@ -315,7 +333,8 @@ class FileAppenderSuite
 
     // verify whether all the data written to rolled over files is same as expected
     val generatedFiles = RollingFileAppender.getSortedRolledOverFiles(
-        testFile.getParentFile.toString, testFile.getName)
+      testFile.getParentFile.toString,
+      testFile.getName)
     logInfo("Filtered files: \n" + generatedFiles.mkString("\n"))
     assert(generatedFiles.size > 1)
     val allText = generatedFiles.map { file =>

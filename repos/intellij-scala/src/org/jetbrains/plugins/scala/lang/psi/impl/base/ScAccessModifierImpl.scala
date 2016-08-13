@@ -22,12 +22,13 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScAccessModifierStub
 
 import scala.collection.mutable.ArrayBuffer
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-class ScAccessModifierImpl private (
-    stub: StubElement[ScAccessModifier], nodeType: IElementType, node: ASTNode)
+class ScAccessModifierImpl private (stub: StubElement[ScAccessModifier],
+                                    nodeType: IElementType,
+                                    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScAccessModifier {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -109,15 +110,15 @@ class ScAccessModifierImpl private (
           case p: PsiPackage => doRename(p.name)
           case _ =>
             throw new IncorrectOperationException(
-                "cannot bind to anything but type definition or package")
+              "cannot bind to anything but type definition or package")
         }
 
         private def doRename(newName: String) = {
           val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
           val parent = id.getNode.getTreeParent
           parent.replaceChild(
-              id.getNode,
-              ScalaPsiElementFactory.createIdentifier(newName, getManager))
+            id.getNode,
+            ScalaPsiElementFactory.createIdentifier(newName, getManager))
           ScAccessModifierImpl.this
         }
 
@@ -131,7 +132,7 @@ class ScAccessModifierImpl private (
           val name = text.get
           def findPackage(qname: String): PsiPackage = {
             var pack: PsiPackage = ScPackageImpl(
-                JavaPsiFacade.getInstance(getProject).findPackage(qname))
+              JavaPsiFacade.getInstance(getProject).findPackage(qname))
             while (pack != null) {
               if (pack.name == name) return pack
               pack = pack.getParentPackage
@@ -153,7 +154,7 @@ class ScAccessModifierImpl private (
           val buff = new ArrayBuffer[Object]
           def processPackages(qname: String) {
             var pack: PsiPackage = ScPackageImpl(
-                JavaPsiFacade.getInstance(getProject).findPackage(qname))
+              JavaPsiFacade.getInstance(getProject).findPackage(qname))
             while (pack != null && pack.name != null) {
               buff += pack
               pack = pack.getParentPackage

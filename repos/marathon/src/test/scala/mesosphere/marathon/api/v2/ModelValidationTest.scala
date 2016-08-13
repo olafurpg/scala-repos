@@ -17,7 +17,9 @@ import play.api.libs.json.{JsObject, Json}
 import scala.collection.immutable.Seq
 
 class ModelValidationTest
-    extends MarathonSpec with Matchers with BeforeAndAfterAll
+    extends MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
     with OptionValues {
 
   test("A group update should pass validation") {
@@ -27,12 +29,12 @@ class ModelValidationTest
   }
 
   test(
-      "A group can not be updated to have more than the configured number of apps") {
+    "A group can not be updated to have more than the configured number of apps") {
     val group = Group("/".toPath,
                       Set(
-                          createServicePortApp("/a".toPath, 0),
-                          createServicePortApp("/b".toPath, 0),
-                          createServicePortApp("/c".toPath, 0)
+                        createServicePortApp("/a".toPath, 0),
+                        createServicePortApp("/b".toPath, 0),
+                        createServicePortApp("/c".toPath, 0)
                       ))
 
     val failedResult = Group.validGroupWithConfig(Some(2)).apply(group)
@@ -40,16 +42,16 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(failedResult)
       .find(v =>
-            v.message.contains(
-                "This Marathon instance may only handle up to 2 Apps!")) should be(
-        'defined)
+        v.message.contains(
+          "This Marathon instance may only handle up to 2 Apps!")) should be(
+      'defined)
 
     val successfulResult = Group.validGroupWithConfig(Some(10)).apply(group)
     successfulResult.isSuccess should be(true)
   }
 
   test(
-      "Model validation should catch new apps that conflict with service ports in existing apps") {
+    "Model validation should catch new apps that conflict with service ports in existing apps") {
     val existingApp = createServicePortApp("/app1".toPath, 3200)
     val conflictingApp = createServicePortApp("/app2".toPath, 3200)
 
@@ -60,12 +62,12 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(result)
       .exists(v =>
-            v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
-        true)
+        v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
+      true)
   }
 
   test(
-      "Model validation should allow new apps that do not conflict with service ports in existing apps") {
+    "Model validation should allow new apps that do not conflict with service ports in existing apps") {
 
     val existingApp = createServicePortApp("/app1".toPath, 3200)
     val conflictingApp = createServicePortApp("/app2".toPath, 3201)
@@ -88,12 +90,12 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(result)
       .exists(v =>
-            v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
-        true)
+        v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
+      true)
   }
 
   test(
-      "Multiple errors within one field of a validator should be grouped into one array") {
+    "Multiple errors within one field of a validator should be grouped into one array") {
     val empty = ImportantTitle("")
 
     validate(empty) match {
@@ -107,14 +109,15 @@ class ModelValidationTest
   }
 
   test(
-      "Validators should not produce 'value' string at the end of description.") {
-    val group = Group(
-        "/test".toPath,
-        groups = Set(Group("/test/group1".toPath,
-                           Set(AppDefinition("/test/group1/valid".toPath,
-                                             cmd = Some("foo")),
-                               AppDefinition("/test/group1/invalid".toPath))),
-                     Group("/test/group2".toPath)))
+    "Validators should not produce 'value' string at the end of description.") {
+    val group =
+      Group("/test".toPath,
+            groups =
+              Set(Group("/test/group1".toPath,
+                        Set(AppDefinition("/test/group1/valid".toPath,
+                                          cmd = Some("foo")),
+                            AppDefinition("/test/group1/invalid".toPath))),
+                  Group("/test/group2".toPath)))
 
     validate(group) match {
       case Success => fail()
@@ -127,16 +130,17 @@ class ModelValidationTest
 
   private def createServicePortApp(id: PathId, servicePort: Int) =
     AppDefinition(
-        id,
-        container = Some(
-              Container(
-                  docker = Some(Docker(
-                            image = "demothing",
-                            network = Some(Network.BRIDGE),
-                            portMappings = Some(Seq(PortMapping(
-                                          2000, servicePort = servicePort)))
-                        ))
-              ))
+      id,
+      container = Some(
+        Container(
+          docker = Some(
+            Docker(
+              image = "demothing",
+              network = Some(Network.BRIDGE),
+              portMappings =
+                Some(Seq(PortMapping(2000, servicePort = servicePort)))
+            ))
+        ))
     )
 
   case class ImportantTitle(name: String)

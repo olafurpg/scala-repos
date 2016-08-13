@@ -3,7 +3,14 @@
 object Test {
   import scala.tools.nsc._
   import interpreter._
-  import java.io.{OutputStream, BufferedReader, StringReader, PrintWriter, Writer, OutputStreamWriter}
+  import java.io.{
+    OutputStream,
+    BufferedReader,
+    StringReader,
+    PrintWriter,
+    Writer,
+    OutputStreamWriter
+  }
 
   val code = """
     def foo = {
@@ -38,7 +45,7 @@ object Test {
     val vals = new ReplVals {}
     val power = new Power(intp, vals)
     intp.interpret(
-        """def initialize = "Have to interpret something or we get errors." """)
+      """def initialize = "Have to interpret something or we get errors." """)
     power trees code foreach println
   }
 }

@@ -4,8 +4,21 @@
 package akka.cluster
 
 import akka.ConfigurationException
-import akka.actor.{ActorRef, ActorSystem, ActorSystemImpl, Deploy, DynamicAccess, NoScopeGiven, Scope}
-import akka.cluster.routing.{ClusterRouterGroup, ClusterRouterGroupSettings, ClusterRouterPool, ClusterRouterPoolSettings}
+import akka.actor.{
+  ActorRef,
+  ActorSystem,
+  ActorSystemImpl,
+  Deploy,
+  DynamicAccess,
+  NoScopeGiven,
+  Scope
+}
+import akka.cluster.routing.{
+  ClusterRouterGroup,
+  ClusterRouterGroupSettings,
+  ClusterRouterPool,
+  ClusterRouterPoolSettings
+}
 import akka.event.EventStream
 import akka.remote.{RemoteActorRefProvider, RemoteDeployer}
 import akka.remote.routing.RemoteRouterConfig
@@ -24,8 +37,10 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
                                             _settings: ActorSystem.Settings,
                                             _eventStream: EventStream,
                                             _dynamicAccess: DynamicAccess)
-    extends RemoteActorRefProvider(
-        _systemName, _settings, _eventStream, _dynamicAccess) {
+    extends RemoteActorRefProvider(_systemName,
+                                   _settings,
+                                   _eventStream,
+                                   _dynamicAccess) {
 
   override def init(system: ActorSystemImpl): Unit = {
     super.init(system)
@@ -42,12 +57,13 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
     import remoteSettings._
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
-        ClusterRemoteWatcher.props(
-            failureDetector,
-            heartbeatInterval = WatchHeartBeatInterval,
-            unreachableReaperInterval = WatchUnreachableReaperInterval,
-            heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter),
-        "remote-watcher")
+      ClusterRemoteWatcher.props(failureDetector,
+                                 heartbeatInterval = WatchHeartBeatInterval,
+                                 unreachableReaperInterval =
+                                   WatchUnreachableReaperInterval,
+                                 heartbeatExpectedResponseAfter =
+                                   WatchHeartbeatExpectedResponseAfter),
+      "remote-watcher")
   }
 
   /**
@@ -63,8 +79,8 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
   *
   * Deployer of cluster aware routers.
   */
-private[akka] class ClusterDeployer(
-    _settings: ActorSystem.Settings, _pm: DynamicAccess)
+private[akka] class ClusterDeployer(_settings: ActorSystem.Settings,
+                                    _pm: DynamicAccess)
     extends RemoteDeployer(_settings, _pm) {
 
   override def parseConfig(path: String, config: Config): Option[Deploy] = {
@@ -88,31 +104,31 @@ private[akka] class ClusterDeployer(
         if (deploy.config.getBoolean("cluster.enabled")) {
           if (deploy.scope != NoScopeGiven)
             throw new ConfigurationException(
-                "Cluster deployment can't be combined with scope [%s]".format(
-                    deploy.scope))
+              "Cluster deployment can't be combined with scope [%s]".format(
+                deploy.scope))
           if (deploy.routerConfig.isInstanceOf[RemoteRouterConfig])
             throw new ConfigurationException(
-                "Cluster deployment can't be combined with [%s]".format(
-                    deploy.routerConfig))
+              "Cluster deployment can't be combined with [%s]".format(
+                deploy.routerConfig))
 
           deploy.routerConfig match {
             case r: Pool ⇒
               Some(
-                  deploy.copy(routerConfig = ClusterRouterPool(
-                                    r,
-                                    ClusterRouterPoolSettings.fromConfig(
-                                        deploy.config)),
-                              scope = ClusterScope))
+                deploy.copy(
+                  routerConfig = ClusterRouterPool(
+                    r,
+                    ClusterRouterPoolSettings.fromConfig(deploy.config)),
+                  scope = ClusterScope))
             case r: Group ⇒
               Some(
-                  deploy.copy(routerConfig = ClusterRouterGroup(
-                                    r,
-                                    ClusterRouterGroupSettings.fromConfig(
-                                        deploy.config)),
-                              scope = ClusterScope))
+                deploy.copy(
+                  routerConfig = ClusterRouterGroup(
+                    r,
+                    ClusterRouterGroupSettings.fromConfig(deploy.config)),
+                  scope = ClusterScope))
             case other ⇒
               throw new IllegalArgumentException(
-                  s"Cluster aware router can only wrap Pool or Group, got [${other.getClass.getName}]")
+                s"Cluster aware router can only wrap Pool or Group, got [${other.getClass.getName}]")
           }
         } else d
       case None ⇒ None

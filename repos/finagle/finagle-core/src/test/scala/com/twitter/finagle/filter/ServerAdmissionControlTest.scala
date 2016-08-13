@@ -48,8 +48,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     val stack = StackServer.newStack[Int, Int] ++ Stack.Leaf(Endpoint, echo)
 
     ServerAdmissionControl.register(
-        Addition2Filter.name,
-        Addition2Filter.typeAgnostic
+      Addition2Filter.name,
+      Addition2Filter.typeAgnostic
     )
   }
 
@@ -69,7 +69,7 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     import ctx._
 
     val factory = stack.make(
-        StackServer.defaultParams + ServerAdmissionControl.Param(false))
+      StackServer.defaultParams + ServerAdmissionControl.Param(false))
     val svc = Await.result(factory(), 5.seconds)
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 1)
@@ -93,8 +93,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     import ctx._
 
     ServerAdmissionControl.register(
-        (Addition2Filter.name, Addition2Filter.typeAgnostic),
-        (Addition3Filter.name, Addition3Filter.typeAgnostic))
+      (Addition2Filter.name, Addition2Filter.typeAgnostic),
+      (Addition3Filter.name, Addition3Filter.typeAgnostic))
 
     val factory = stack.make(StackServer.defaultParams)
     val svc = Await.result(factory(), 5.seconds)
@@ -108,8 +108,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     import ctx._
 
     ServerAdmissionControl.register(
-        Addition2Filter.name,
-        Addition2Filter.typeAgnostic
+      Addition2Filter.name,
+      Addition2Filter.typeAgnostic
     )
 
     val factory = stack.make(StackServer.defaultParams)

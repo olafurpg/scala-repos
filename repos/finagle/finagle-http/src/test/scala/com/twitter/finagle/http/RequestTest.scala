@@ -21,11 +21,11 @@ class RequestTest extends FunSuite {
 
   test("path") {
     val tests = Map(
-        "/" -> "/",
-        "/search.json" -> "/search.json",
-        "/search.json?" -> "/search.json",
-        "/search.json?q=twitter" -> "/search.json",
-        "/search.json%3Fq=twitter" -> "/search.json%3Fq=twitter"
+      "/" -> "/",
+      "/search.json" -> "/search.json",
+      "/search.json?" -> "/search.json",
+      "/search.json?q=twitter" -> "/search.json",
+      "/search.json%3Fq=twitter" -> "/search.json%3Fq=twitter"
     )
     tests.foreach {
       case (input, expected) => assert(Request(input).path == expected)
@@ -34,16 +34,16 @@ class RequestTest extends FunSuite {
 
   test("file extension") {
     val tests = Map(
-        "/search.json" -> "json",
-        "/1.1/search/tweets.json" -> "json",
-        "/1.1/search/tweets.JSON" -> "json",
-        "/1.1/search/tweets" -> "",
-        "/1.1/se.arch/tweets" -> "",
-        "/1.1/se.arch/tweets.json" -> "json",
-        "/search" -> "",
-        "/search." -> "",
-        "/" -> "",
-        "/." -> ""
+      "/search.json" -> "json",
+      "/1.1/search/tweets.json" -> "json",
+      "/1.1/search/tweets.JSON" -> "json",
+      "/1.1/search/tweets" -> "",
+      "/1.1/se.arch/tweets" -> "",
+      "/1.1/se.arch/tweets.json" -> "json",
+      "/search" -> "",
+      "/search." -> "",
+      "/" -> "",
+      "/." -> ""
     )
     tests.foreach {
       case (input, expected) =>
@@ -72,7 +72,7 @@ class RequestTest extends FunSuite {
 
   test("decode") {
     val request = Request.decodeString(
-        "GET /search.json?q=twitter HTTP/1.1\r\nHost: search.twitter.com\r\n\r\n")
+      "GET /search.json?q=twitter HTTP/1.1\r\nHost: search.twitter.com\r\n\r\n")
     assert(request.path == "/search.json")
     assert(request.params("q") == "twitter")
     assert(request.headers.get("Host") == "search.twitter.com")
@@ -91,13 +91,15 @@ class RequestTest extends FunSuite {
     assert(Request.queryString() == "")
     assert(Request.queryString(Map.empty[String, String]) == "")
     assert(Request.queryString("/search.json") == "/search.json")
-    assert(
-        Request.queryString("/search.json", Map.empty[String, String]) == "/search.json")
+    assert(Request
+      .queryString("/search.json", Map.empty[String, String]) == "/search.json")
 
     assert(
-        Request.queryString("/search.json", "q" -> "twitter") == "/search.json?q=twitter")
+      Request
+        .queryString("/search.json", "q" -> "twitter") == "/search.json?q=twitter")
     assert(
-        Request.queryString("/search.json", Map("q" -> "twitter")) == "/search.json?q=twitter")
+      Request
+        .queryString("/search.json", Map("q" -> "twitter")) == "/search.json?q=twitter")
     assert(Request.queryString("q" -> "twitter") == "?q=twitter")
     assert(Request.queryString(Map("q" -> "twitter")) == "?q=twitter")
 

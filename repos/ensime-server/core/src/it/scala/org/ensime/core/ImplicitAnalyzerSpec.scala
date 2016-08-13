@@ -8,7 +8,8 @@ import org.ensime.util.EnsimeSpec
 import scala.reflect.internal.util.{OffsetPosition, RangePosition}
 
 class ImplicitAnalyzerSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -22,19 +23,19 @@ class ImplicitAnalyzerSpec
     dets.map {
       case c: ImplicitConversionInfo =>
         (
-            "conversion",
-            content.substring(c.start, c.end),
-            c.fun.name
+          "conversion",
+          content.substring(c.start, c.end),
+          c.fun.name
         )
       case c: ImplicitParamInfo =>
         (
-            "param",
-            content.substring(c.start, c.end),
-            c.fun.name,
-            c.params.map { p =>
-              p.name
-            },
-            c.funIsImplicit
+          "param",
+          content.substring(c.start, c.end),
+          c.fun.name,
+          c.params.map { p =>
+            p.name
+          },
+          c.funIsImplicit
         )
     }
   }
@@ -42,8 +43,8 @@ class ImplicitAnalyzerSpec
   "ImplicitAnalyzer" should "render implicit conversions" in {
     withPresCompiler { (config, cc) =>
       val dets = getImplicitDetails(
-          cc,
-          """
+        cc,
+        """
             package com.example
             class Test {}
             object I {
@@ -52,17 +53,18 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
-              ("conversion", "\"sample\"", "StringToTest")
-          ))
+      dets should ===(
+        List(
+          ("conversion", "\"sample\"", "StringToTest")
+        ))
     }
   }
 
   it should "render implicit parameters passed to implicit conversion functions" in {
     withPresCompiler { (config, cc) =>
       val dets = getImplicitDetails(
-          cc,
-          """
+        cc,
+        """
             package com.example
             class Test {}
             class Thing {}
@@ -73,18 +75,19 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(List(
-              ("param", "\"sample\"", "StringToTest", List("myThing"), true),
-              ("conversion", "\"sample\"", "StringToTest")
-          ))
+      dets should ===(
+        List(
+          ("param", "\"sample\"", "StringToTest", List("myThing"), true),
+          ("conversion", "\"sample\"", "StringToTest")
+        ))
     }
   }
 
   it should "render implicit parameters" in {
     withPresCompiler { (config, cc) =>
       val dets = getImplicitDetails(
-          cc,
-          """
+        cc,
+        """
             package com.example
             class Thing {}
             class Thong {}
@@ -99,14 +102,10 @@ class ImplicitAnalyzerSpec
         """
       )
       dets should ===(
-          List(
-              ("param",
-               "zz(1)(\"abc\")",
-               "zz",
-               List("myThing", "myThong"),
-               false),
-              ("param", "yy", "yy", List("myThing"), false)
-          ))
+        List(
+          ("param", "zz(1)(\"abc\")", "zz", List("myThing", "myThong"), false),
+          ("param", "yy", "yy", List("myThing"), false)
+        ))
     }
   }
 

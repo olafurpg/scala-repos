@@ -81,8 +81,9 @@ object Mailer extends Mailer {
   final case class ReplyTo(address: String, name: Box[String] = Empty)
       extends AddressType
 
-  final case class MessageInfo(
-      from: From, subject: Subject, info: List[MailTypes])
+  final case class MessageInfo(from: From,
+                               subject: Subject,
+                               info: List[MailTypes])
 }
 
 /**
@@ -213,8 +214,8 @@ trait Mailer extends SimpleInjector {
     * How to send a message in test mode.  By default, log the message
     */
   lazy val testModeSend: Inject[MimeMessage => Unit] =
-    new Inject[MimeMessage => Unit](
-        (m: MimeMessage) => logger.info("Sending Mime Message: " + m)) {}
+    new Inject[MimeMessage => Unit]((m: MimeMessage) =>
+      logger.info("Sending Mime Message: " + m)) {}
 
   /**
     * How to send a message in staging mode.  By default, use Transport.send(msg)
@@ -269,8 +270,7 @@ trait Mailer extends SimpleInjector {
     })
     message.setSentDate(new java.util.Date())
     // message.setReplyTo(filter[MailTypes, ReplyTo](info, {case x @ ReplyTo(_) => Some(x); case _ => None}))
-    message.setReplyTo(
-        info.flatMap {
+    message.setReplyTo(info.flatMap {
       case x: ReplyTo => Some[ReplyTo](x)
       case _ => None
     })
@@ -333,16 +333,16 @@ trait Mailer extends SimpleInjector {
         bp.setText(txt, charset)
 
       case XHTMLMailBodyType(html) =>
-        bp.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+        bp.setContent(encodeHtmlBodyPart(html),
+                      "text/html; charset=" + charSet)
 
       case XHTMLPlusImages(html, img @ _ *) =>
         val (attachments, images) = img.partition(_.attachment)
         val relatedMultipart = new MimeMultipart("related")
 
         val htmlBodyPart = new MimeBodyPart
-        htmlBodyPart.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+        htmlBodyPart.setContent(encodeHtmlBodyPart(html),
+                                "text/html; charset=" + charSet)
         relatedMultipart.addBodyPart(htmlBodyPart)
 
         images.foreach { image =>
@@ -379,15 +379,15 @@ trait Mailer extends SimpleInjector {
     part.setFileName(holder.name)
     part.setContentID(holder.name)
     part.setDisposition(
-        if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
+      if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
     part.setDataHandler(
-        new javax.activation.DataHandler(new javax.activation.DataSource {
-      def getContentType = holder.mimeType
-      def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
-      def getName = holder.name
-      def getOutputStream =
-        throw new java.io.IOException("Unable to write to item")
-    }))
+      new javax.activation.DataHandler(new javax.activation.DataSource {
+        def getContentType = holder.mimeType
+        def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
+        def getName = holder.name
+        def getOutputStream =
+          throw new java.io.IOException("Unable to write to item")
+      }))
 
     part
   }

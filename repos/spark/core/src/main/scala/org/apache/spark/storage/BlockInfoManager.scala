@@ -39,8 +39,8 @@ import org.apache.spark.internal.Logging
   * @param tellMaster whether state changes for this block should be reported to the master. This
   *                   is true for most blocks, but is false for broadcast blocks.
   */
-private[storage] class BlockInfo(
-    val level: StorageLevel, val tellMaster: Boolean) {
+private[storage] class BlockInfo(val level: StorageLevel,
+                                 val tellMaster: Boolean) {
 
   /**
     * The size of the block (in bytes)
@@ -180,11 +180,11 @@ private[storage] class BlockInfoManager extends Logging {
     * @return None if the block did not exist or was removed (in which case no lock is held), or
     *         Some(BlockInfo) (in which case the block is locked for reading).
     */
-  def lockForReading(
-      blockId: BlockId, blocking: Boolean = true): Option[BlockInfo] =
+  def lockForReading(blockId: BlockId,
+                     blocking: Boolean = true): Option[BlockInfo] =
     synchronized {
       logTrace(
-          s"Task $currentTaskAttemptId trying to acquire read lock for $blockId")
+        s"Task $currentTaskAttemptId trying to acquire read lock for $blockId")
       do {
         infos.get(blockId) match {
           case None => return None
@@ -193,7 +193,7 @@ private[storage] class BlockInfoManager extends Logging {
               info.readerCount += 1
               readLocksByTask(currentTaskAttemptId).add(blockId)
               logTrace(
-                  s"Task $currentTaskAttemptId acquired read lock for $blockId")
+                s"Task $currentTaskAttemptId acquired read lock for $blockId")
               return Some(info)
             }
         }
@@ -219,24 +219,24 @@ private[storage] class BlockInfoManager extends Logging {
     * @return None if the block did not exist or was removed (in which case no lock is held), or
     *         Some(BlockInfo) (in which case the block is locked for writing).
     */
-  def lockForWriting(
-      blockId: BlockId, blocking: Boolean = true): Option[BlockInfo] =
+  def lockForWriting(blockId: BlockId,
+                     blocking: Boolean = true): Option[BlockInfo] =
     synchronized {
       logTrace(
-          s"Task $currentTaskAttemptId trying to acquire write lock for $blockId")
+        s"Task $currentTaskAttemptId trying to acquire write lock for $blockId")
       do {
         infos.get(blockId) match {
           case None => return None
           case Some(info) =>
             if (info.writerTask == currentTaskAttemptId) {
               throw new IllegalStateException(
-                  s"Task $currentTaskAttemptId has already locked $blockId for writing")
+                s"Task $currentTaskAttemptId has already locked $blockId for writing")
             } else if (info.writerTask == BlockInfo.NO_WRITER &&
                        info.readerCount == 0) {
               info.writerTask = currentTaskAttemptId
               writeLocksByTask.addBinding(currentTaskAttemptId, blockId)
               logTrace(
-                  s"Task $currentTaskAttemptId acquired write lock for $blockId")
+                s"Task $currentTaskAttemptId acquired write lock for $blockId")
               return Some(info)
             }
         }
@@ -257,7 +257,7 @@ private[storage] class BlockInfoManager extends Logging {
         case Some(info) =>
           if (info.writerTask != currentTaskAttemptId) {
             throw new SparkException(
-                s"Task $currentTaskAttemptId has not locked block $blockId for writing")
+              s"Task $currentTaskAttemptId has not locked block $blockId for writing")
           } else {
             info
           }
@@ -282,8 +282,8 @@ private[storage] class BlockInfoManager extends Logging {
     logTrace(s"Task $currentTaskAttemptId downgrading write lock for $blockId")
     val info = get(blockId).get
     require(
-        info.writerTask == currentTaskAttemptId,
-        s"Task $currentTaskAttemptId tried to downgrade a write lock that it does not hold on" +
+      info.writerTask == currentTaskAttemptId,
+      s"Task $currentTaskAttemptId tried to downgrade a write lock that it does not hold on" +
         s" block $blockId")
     unlock(blockId)
     val lockOutcome = lockForReading(blockId, blocking = false)
@@ -307,8 +307,8 @@ private[storage] class BlockInfoManager extends Logging {
       val countsForTask = readLocksByTask(currentTaskAttemptId)
       val newPinCountForTask: Int = countsForTask.remove(blockId, 1) - 1
       assert(
-          newPinCountForTask >= 0,
-          s"Task $currentTaskAttemptId release lock on block $blockId more times than it acquired it")
+        newPinCountForTask >= 0,
+        s"Task $currentTaskAttemptId release lock on block $blockId more times than it acquired it")
     }
     notifyAll()
   }
@@ -324,8 +324,8 @@ private[storage] class BlockInfoManager extends Logging {
     *         a read lock on the existing block will be held. If this returns true, a write lock on
     *         the new block will be held.
     */
-  def lockNewBlockForWriting(
-      blockId: BlockId, newBlockInfo: BlockInfo): Boolean = synchronized {
+  def lockNewBlockForWriting(blockId: BlockId,
+                             newBlockInfo: BlockInfo): Boolean = synchronized {
     logTrace(s"Task $currentTaskAttemptId trying to put $blockId")
     lockForReading(blockId) match {
       case Some(info) =>
@@ -395,7 +395,7 @@ private[storage] class BlockInfoManager extends Logging {
     */
   private[storage] def getNumberOfMapEntries: Long = synchronized {
     size + readLocksByTask.size + readLocksByTask.map(_._2.size()).sum +
-    writeLocksByTask.size + writeLocksByTask.map(_._2.size).sum
+      writeLocksByTask.size + writeLocksByTask.map(_._2.size).sum
   }
 
   /**
@@ -418,7 +418,7 @@ private[storage] class BlockInfoManager extends Logging {
       case Some(blockInfo) =>
         if (blockInfo.writerTask != currentTaskAttemptId) {
           throw new IllegalStateException(
-              s"Task $currentTaskAttemptId called remove() on block $blockId without a write lock")
+            s"Task $currentTaskAttemptId called remove() on block $blockId without a write lock")
         } else {
           infos.remove(blockId)
           blockInfo.readerCount = 0
@@ -426,7 +426,7 @@ private[storage] class BlockInfoManager extends Logging {
         }
       case None =>
         throw new IllegalArgumentException(
-            s"Task $currentTaskAttemptId called remove() on non-existent block $blockId")
+          s"Task $currentTaskAttemptId called remove() on non-existent block $blockId")
     }
     notifyAll()
   }

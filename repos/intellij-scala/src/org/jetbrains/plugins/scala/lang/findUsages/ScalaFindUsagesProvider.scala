@@ -12,9 +12,18 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.PsiClassFake
 
 class ScalaFindUsagesProvider extends FindUsagesProvider {
@@ -46,9 +55,9 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
       case _: ScBindingPattern =>
         var parent = element
         while (parent match {
-          case null | _: ScValue | _: ScVariable => false
-          case _ => true
-        }) parent = parent.getParent
+                 case null | _: ScValue | _: ScVariable => false
+                 case _ => true
+               }) parent = parent.getParent
         parent match {
           case null => "pattern"
           case _ => "variable"
@@ -71,10 +80,10 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
     val name = element match {
       case x: PsiMethod =>
         var res = PsiFormatUtil.formatMethod(
-            x,
-            PsiSubstitutor.EMPTY,
-            PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_PARAMETERS,
-            PsiFormatUtilBase.SHOW_TYPE)
+          x,
+          PsiSubstitutor.EMPTY,
+          PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_PARAMETERS,
+          PsiFormatUtilBase.SHOW_TYPE)
         if (x.containingClass != null)
           res = res + " of " + getDescriptiveName(x.containingClass)
         res
@@ -93,10 +102,10 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
     val name = element match {
       case c: PsiMethod =>
         PsiFormatUtil.formatMethod(
-            c,
-            PsiSubstitutor.EMPTY,
-            PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_PARAMETERS,
-            PsiFormatUtilBase.SHOW_TYPE)
+          c,
+          PsiSubstitutor.EMPTY,
+          PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_PARAMETERS,
+          PsiFormatUtilBase.SHOW_TYPE)
       case c: PsiVariable => c.name
       case c: PsiFile => c.name
       case c: ScTypeDefinition => if (useFullName) c.qualifiedName else c.name

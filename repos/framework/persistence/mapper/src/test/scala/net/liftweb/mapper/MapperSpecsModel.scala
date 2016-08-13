@@ -70,27 +70,26 @@ object MapperSpecsModel {
 
   def cleanup() {
     // Snake connection doesn't create FK constraints (put this here to be absolutely sure it gets set before Schemify)
-    MapperRules.createForeignKeys_? = c =>
-      {
-        c.jndiName != "snake"
+    MapperRules.createForeignKeys_? = c => {
+      c.jndiName != "snake"
     }
 
     Schemifier.destroyTables_!!(
-        DefaultConnectionIdentifier,
-        if (doLog) Schemifier.infoF _ else ignoreLogger _,
-        SampleTag,
-        SampleModel,
-        Dog,
-        Mixer,
-        Dog2,
-        User,
-        TstItem,
-        Thing)
+      DefaultConnectionIdentifier,
+      if (doLog) Schemifier.infoF _ else ignoreLogger _,
+      SampleTag,
+      SampleModel,
+      Dog,
+      Mixer,
+      Dog2,
+      User,
+      TstItem,
+      Thing)
     Schemifier.destroyTables_!!(
-        DbProviders.SnakeConnectionIdentifier,
-        if (doLog) Schemifier.infoF _ else ignoreLogger _,
-        SampleTagSnake,
-        SampleModelSnake)
+      DbProviders.SnakeConnectionIdentifier,
+      if (doLog) Schemifier.infoF _ else ignoreLogger _,
+      SampleTagSnake,
+      SampleModelSnake)
     Schemifier.schemify(true,
                         if (doLog) Schemifier.infoF _ else ignoreLogger _,
                         DefaultConnectionIdentifier,
@@ -115,10 +114,10 @@ object SampleTag extends SampleTag with LongKeyedMetaMapper[SampleTag] {
 
   private def populate {
     val samp = SampleModel.findAll()
-    val tags = List(
-        "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
+    val tags =
+      List("Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
-    m <- samp) SampleTag.create.tag(t).model(m).save
+         m <- samp) SampleTag.create.tag(t).model(m).save
   }
 }
 
@@ -140,7 +139,8 @@ object SampleStatus extends Enumeration {
 }
 
 object SampleModel
-    extends SampleModel with KeyedMetaMapper[Long, SampleModel] {
+    extends SampleModel
+    with KeyedMetaMapper[Long, SampleModel] {
   override def dbAddTable = Full(populate _)
 
   def encodeAsJson(in: SampleModel): JsonAST.JObject = encodeAsJSON_!(in)
@@ -178,15 +178,16 @@ class SampleModel extends KeyedMapper[Long, SampleModel] {
 }
 
 object SampleTagSnake
-    extends SampleTagSnake with LongKeyedMetaMapper[SampleTagSnake] {
+    extends SampleTagSnake
+    with LongKeyedMetaMapper[SampleTagSnake] {
   override def dbAddTable = Full(populate _)
 
   private def populate {
     val samp = SampleModelSnake.findAll()
-    val tags = List(
-        "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
+    val tags =
+      List("Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
-    m <- samp) SampleTagSnake.create.tag(t).model(m).save
+         m <- samp) SampleTagSnake.create.tag(t).model(m).save
   }
 
   override def dbDefaultConnectionIdentifier =
@@ -208,7 +209,8 @@ class SampleTagSnake extends LongKeyedMapper[SampleTagSnake] with IdPK {
 }
 
 object SampleModelSnake
-    extends SampleModelSnake with KeyedMetaMapper[Long, SampleModelSnake] {
+    extends SampleModelSnake
+    with KeyedMetaMapper[Long, SampleModelSnake] {
   override def dbAddTable = Full(populate _)
 
   def encodeAsJson(in: SampleModelSnake): JsonAST.JObject = encodeAsJSON_!(in)
@@ -263,7 +265,7 @@ object User extends User with MetaMegaProtoUser[User] {
   // define the DB table name
   override def screenWrap =
     Full(
-        <lift:surround with="default" at="content"><lift:bind/></lift:surround>)
+      <lift:surround with="default" at="content"><lift:bind/></lift:surround>)
 
   // define the order fields will appear in forms and output
   override def fieldOrder =
@@ -346,10 +348,8 @@ object Thing extends Thing with KeyedMetaMapper[String, Thing] {
 
   import java.util.UUID
   override def beforeCreate =
-    List(
-        (thing: Thing) =>
-          {
-        thing.thing_id(UUID.randomUUID().toString())
+    List((thing: Thing) => {
+      thing.thing_id(UUID.randomUUID().toString())
     })
 }
 

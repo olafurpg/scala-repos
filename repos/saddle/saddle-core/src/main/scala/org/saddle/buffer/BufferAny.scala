@@ -21,7 +21,7 @@ import org.saddle.Buffer
 /**
   * Buffer instance for Any type
   */
-class BufferAny[T : ST](sz: Int = 16) extends Buffer[T] {
+class BufferAny[T: ST](sz: Int = 16) extends Buffer[T] {
   var list = Array.ofDim[T](sz)
   var count = 0
   var remain = sz
@@ -49,6 +49,6 @@ class BufferAny[T : ST](sz: Int = 16) extends Buffer[T] {
 }
 
 object BufferAny {
-  def apply[T : ST](sz: Int) = new BufferAny[T](sz)
-  def apply[T : ST]() = new BufferAny[T]()
+  def apply[T: ST](sz: Int) = new BufferAny[T](sz)
+  def apply[T: ST]() = new BufferAny[T]()
 }

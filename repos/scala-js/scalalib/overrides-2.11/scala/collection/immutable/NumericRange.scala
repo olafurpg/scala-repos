@@ -39,9 +39,13 @@ import mutable.{Builder, ListBuffer}
   *  @define willNotTerminateInf
   */
 abstract class NumericRange[T](
-    val start: T, val end: T, val step: T, val isInclusive: Boolean)(
-    implicit num: Integral[T])
-    extends AbstractSeq[T] with IndexedSeq[T] with Serializable {
+    val start: T,
+    val end: T,
+    val step: T,
+    val isInclusive: Boolean)(implicit num: Integral[T])
+    extends AbstractSeq[T]
+    with IndexedSeq[T]
+    with Serializable {
 
   /** Note that NumericRange must be invariant so that constructs
     *  such as "1L to 10 by 5" do not infer the range type as AnyVal.
@@ -85,7 +89,7 @@ abstract class NumericRange[T](
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: T) =
     !isEmpty &&
-    ((step > zero && start <= elem && elem <= last) ||
+      ((step > zero && start <= elem && elem <= last) ||
         (step < zero && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.
@@ -99,13 +103,13 @@ abstract class NumericRange[T](
 
   final override def take(n: Int): NumericRange[T] =
     (if (n <= 0 || length == 0) newEmptyRange(start)
-     else if (n >= length) this
-     else new NumericRange.Inclusive(start, locationAfterN(n - 1), step))
+    else if (n >= length) this
+    else new NumericRange.Inclusive(start, locationAfterN(n - 1), step))
 
   final override def drop(n: Int): NumericRange[T] =
     (if (n <= 0 || length == 0) this
-     else if (n >= length) newEmptyRange(end)
-     else copy(locationAfterN(n), end, step))
+    else if (n >= length) newEmptyRange(end)
+    else copy(locationAfterN(n), end, step))
 
   def apply(idx: Int): T = {
     if (idx < 0 || idx >= length)
@@ -175,7 +179,8 @@ abstract class NumericRange[T](
     isWithinBoundaries(x) && (((x - start) % step) == zero)
 
   override def contains[A1 >: T](x: A1): Boolean =
-    try containsTyped(x.asInstanceOf[T]) catch {
+    try containsTyped(x.asInstanceOf[T])
+    catch {
       case _: ClassCastException => false
     }
 
@@ -212,10 +217,10 @@ abstract class NumericRange[T](
   override def equals(other: Any) = other match {
     case x: NumericRange[_] =>
       (x canEqual this) && (length == x.length) &&
-      ((length == 0) || // all empty sequences are equal
+        ((length == 0) || // all empty sequences are equal
           (start == x.start &&
-              last == x.last) // same length and same endpoints implies equality
-          )
+            last == x.last) // same length and same endpoints implies equality
+        )
     case _ =>
       super.equals(other)
   }
@@ -273,7 +278,7 @@ object NumericRange {
       def check(t: T): T =
         if (num.gt(t, limit))
           throw new IllegalArgumentException(
-              "More than Int.MaxValue elements.")
+            "More than Int.MaxValue elements.")
         else t
       // If the range crosses zero, it might overflow when subtracted
       val startside = num.signum(start)
@@ -354,10 +359,10 @@ object NumericRange {
     new Inclusive(start, end, step)
 
   private[collection] val defaultOrdering = Map[Numeric[_], Ordering[_]](
-      Numeric.IntIsIntegral -> Ordering.Int,
-      Numeric.ShortIsIntegral -> Ordering.Short,
-      Numeric.ByteIsIntegral -> Ordering.Byte,
-      Numeric.CharIsIntegral -> Ordering.Char,
-      Numeric.LongIsIntegral -> Ordering.Long
+    Numeric.IntIsIntegral -> Ordering.Int,
+    Numeric.ShortIsIntegral -> Ordering.Short,
+    Numeric.ByteIsIntegral -> Ordering.Byte,
+    Numeric.CharIsIntegral -> Ordering.Char,
+    Numeric.LongIsIntegral -> Ordering.Long
   )
 }

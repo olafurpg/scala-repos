@@ -85,7 +85,7 @@ private object Perturbers {
 
 object ScroogeGenerators {
   import Perturbers._
-  def dataProvider[T : Arbitrary](i: Int): T = {
+  def dataProvider[T: Arbitrary](i: Int): T = {
     @annotation.tailrec
     def g(innerI: Int, loops: Int): T = {
       val p = new org.scalacheck.Gen.Parameters {
@@ -144,8 +144,15 @@ object ScroogeGenerators {
                          TestEnum.Huge)
       aBinary <- Gen.alphaStr.map(s => ByteBuffer.wrap(s.getBytes("UTF-8")))
     } yield
-      TestTypes(
-          aBool, aByte, aI16, aI32, aI64, aDouble, aString, aEnum, aBinary)
+      TestTypes(aBool,
+                aByte,
+                aI16,
+                aI32,
+                aI64,
+                aDouble,
+                aString,
+                aEnum,
+                aBinary)
   }
 
   implicit def arbitraryTestUnion: Arbitrary[TestUnion] = Arbitrary {
@@ -209,16 +216,18 @@ object ScroogeGenerators {
       aStringSet <- Gen.listOf(Gen.alphaStr).map(_.toSet)
       aStructSet <- Gen.listOf(arb[TestStruct]).map(_.toSet)
       aListSet <- Gen
-        .listOf(Gen.listOf(Gen.alphaStr).map(l => l.to[collection.Seq]))
-        .map(_.to[collection.Set])
+                   .listOf(
+                     Gen.listOf(Gen.alphaStr).map(l => l.to[collection.Seq]))
+                   .map(_.to[collection.Set])
       aSetSet <- Gen
-        .listOf(Gen.listOf(Gen.alphaStr).map(l => l.to[collection.Set]))
-        .map(_.to[collection.Set])
+                  .listOf(
+                    Gen.listOf(Gen.alphaStr).map(l => l.to[collection.Set]))
+                  .map(_.to[collection.Set])
       aMapSet <- Gen
-        .listOf(Gen
-              .listOf(arb[(Int, Int)])
-              .map(l => l.toMap.asInstanceOf[collection.Map[Int, Int]]))
-        .map(_.to[collection.Set])
+                  .listOf(Gen
+                    .listOf(arb[(Int, Int)])
+                    .map(l => l.toMap.asInstanceOf[collection.Map[Int, Int]]))
+                  .map(_.to[collection.Set])
     } yield
       TestSets(aBoolSet,
                aByteSet,
@@ -251,24 +260,25 @@ object ScroogeGenerators {
       aStringMap <- Gen.listOf(arb[(String, Boolean)]).map(_.toMap)
       aStructMap <- Gen.listOf(arb[(TestStruct, List[String])]).map(_.toMap)
       aListMap <- Gen
-        .listOf(arb[(List[String], TestStruct)])
-        .map(_.toMap.map { case (k, v) => k.to[collection.Seq] -> v }
-              .asInstanceOf[
-                collection.Map[collection.Seq[String], TestStruct]])
+                   .listOf(arb[(List[String], TestStruct)])
+                   .map(_.toMap.map {
+                     case (k, v) => k.to[collection.Seq] -> v
+                   }.asInstanceOf[collection.Map[collection.Seq[String],
+                                                 TestStruct]])
       aSetMap <- Gen
-        .listOf(arb[(Set[String], Set[String])])
-        .map(_.toMap.map {
-          case (k, v) => k.to[collection.Set] -> v.to[collection.Set]
-        }.asInstanceOf[collection.Map[collection.Set[String],
-                                      collection.Set[String]]])
+                  .listOf(arb[(Set[String], Set[String])])
+                  .map(_.toMap.map {
+                    case (k, v) => k.to[collection.Set] -> v.to[collection.Set]
+                  }.asInstanceOf[collection.Map[collection.Set[String],
+                                                collection.Set[String]]])
       aMapMap <- Gen
-        .listOf(arb[(Map[Int, Int], Map[Int, Int])])
-        .map(_.toMap.map {
-          case (k, v) =>
-            k.asInstanceOf[collection.Map[Int, Int]] -> v
-              .asInstanceOf[collection.Map[Int, Int]]
-        }.asInstanceOf[collection.Map[collection.Map[Int, Int],
-                                      collection.Map[Int, Int]]])
+                  .listOf(arb[(Map[Int, Int], Map[Int, Int])])
+                  .map(_.toMap.map {
+                    case (k, v) =>
+                      k.asInstanceOf[collection.Map[Int, Int]] -> v
+                        .asInstanceOf[collection.Map[Int, Int]]
+                  }.asInstanceOf[collection.Map[collection.Map[Int, Int],
+                                                collection.Map[Int, Int]]])
     } yield
       TestMaps(aBoolMap,
                aByteMap,

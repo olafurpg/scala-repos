@@ -81,7 +81,9 @@ private object PoolConductor {
 
       retryMerge.out ~> slotSelector.in0
       slotSelector.out ~> route.in
-      retrySplit.out(0).filter(!_.isInstanceOf[SlotEvent.RetryRequest]) ~> flatten ~> slotSelector.in1
+      retrySplit
+        .out(0)
+        .filter(!_.isInstanceOf[SlotEvent.RetryRequest]) ~> flatten ~> slotSelector.in1
       retrySplit.out(1).collect { case SlotEvent.RetryRequest(r) ⇒ r } ~> retryMerge.preferred
 
       Ports(retryMerge.in(0), retrySplit.in, route.outArray.toList)
@@ -110,8 +112,9 @@ private object PoolConductor {
   }
   private object Busy extends Busy(1)
 
-  private class SlotSelector(
-      slotCount: Int, pipeliningLimit: Int, log: LoggingAdapter)
+  private class SlotSelector(slotCount: Int,
+                             pipeliningLimit: Int,
+                             log: LoggingAdapter)
       extends GraphStage[FanInShape2[RequestContext, SlotEvent, SwitchCommand]] {
 
     private val ctxIn = Inlet[RequestContext]("requestContext")
@@ -131,8 +134,8 @@ private object PoolConductor {
           override def onPush(): Unit = {
             val ctx = grab(ctxIn)
             val slot = nextSlot
-            slotStates(slot) = slotStateAfterDispatch(
-                slotStates(slot), ctx.request.method)
+            slotStates(slot) =
+              slotStateAfterDispatch(slotStates(slot), ctx.request.method)
             nextSlot = bestSlot()
             emit(out, SwitchCommand(ctx, slot), tryPullCtx)
           }
@@ -142,11 +145,11 @@ private object PoolConductor {
           override def onPush(): Unit = {
             grab(slotIn) match {
               case SlotEvent.RequestCompleted(slotIx) ⇒
-                slotStates(slotIx) = slotStateAfterRequestCompleted(
-                    slotStates(slotIx))
+                slotStates(slotIx) =
+                  slotStateAfterRequestCompleted(slotStates(slotIx))
               case SlotEvent.Disconnected(slotIx, failed) ⇒
-                slotStates(slotIx) = slotStateAfterDisconnect(
-                    slotStates(slotIx), failed)
+                slotStates(slotIx) =
+                  slotStateAfterDisconnect(slotStates(slotIx), failed)
             }
             pull(slotIn)
             val wasBlocked = nextSlot == -1
@@ -167,8 +170,8 @@ private object PoolConductor {
           pull(slotIn)
         }
 
-        def slotStateAfterDispatch(
-            slotState: SlotState, method: HttpMethod): SlotState =
+        def slotStateAfterDispatch(slotState: SlotState,
+                                   method: HttpMethod): SlotState =
           slotState match {
             case Unconnected | Idle ⇒
               if (method.isIdempotent) Loaded(1) else Busy(1)
@@ -176,7 +179,7 @@ private object PoolConductor {
               if (method.isIdempotent) Loaded(n + 1) else Busy(n + 1)
             case Busy(_) ⇒
               throw new IllegalStateException(
-                  "Request scheduled onto busy connection?")
+                "Request scheduled onto busy connection?")
           }
 
         def slotStateAfterRequestCompleted(slotState: SlotState): SlotState =
@@ -187,11 +190,11 @@ private object PoolConductor {
             case Busy(n) ⇒ Busy(n - 1)
             case _ ⇒
               throw new IllegalStateException(
-                  s"RequestCompleted on $slotState connection?")
+                s"RequestCompleted on $slotState connection?")
           }
 
-        def slotStateAfterDisconnect(
-            slotState: SlotState, failed: Int): SlotState =
+        def slotStateAfterDisconnect(slotState: SlotState,
+                                     failed: Int): SlotState =
           slotState match {
             case Idle if failed == 0 ⇒ Unconnected
             case Loaded(n) if n > failed ⇒ Loaded(n - failed)
@@ -200,7 +203,7 @@ private object PoolConductor {
             case Busy(n) if n == failed ⇒ Unconnected
             case _ ⇒
               throw new IllegalStateException(
-                  s"Disconnect(_, $failed) on $slotState connection?")
+                s"Disconnect(_, $failed) on $slotState connection?")
           }
 
         /**

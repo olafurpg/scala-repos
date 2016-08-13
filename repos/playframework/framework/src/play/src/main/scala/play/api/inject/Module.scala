@@ -4,7 +4,10 @@
 package play.api.inject
 
 import java.lang.reflect.Constructor
-import play.{Configuration => JavaConfiguration, Environment => JavaEnvironment}
+import play.{
+  Configuration => JavaConfiguration,
+  Environment => JavaEnvironment
+}
 import play.api._
 import scala.annotation.varargs
 import scala.reflect.ClassTag
@@ -54,8 +57,8 @@ abstract class Module {
     * @param configuration The configuration
     * @return A sequence of bindings
     */
-  def bindings(
-      environment: Environment, configuration: Configuration): Seq[Binding[_]]
+  def bindings(environment: Environment,
+               configuration: Configuration): Seq[Binding[_]]
 
   /**
     * Create a binding key for the given class.
@@ -66,7 +69,7 @@ abstract class Module {
   /**
     * Create a binding key for the given class.
     */
-  final def bind[T : ClassTag]: BindingKey[T] = play.api.inject.bind[T]
+  final def bind[T: ClassTag]: BindingKey[T] = play.api.inject.bind[T]
 
   /**
     * Create a seq.
@@ -96,8 +99,8 @@ object Modules {
     * @return A sequence of objects. This method makes no attempt to cast or check the types of the modules being loaded,
     *         allowing ApplicationLoader implementations to reuse the same mechanism to load modules specific to them.
     */
-  def locate(
-      environment: Environment, configuration: Configuration): Seq[Any] = {
+  def locate(environment: Environment,
+             configuration: Configuration): Seq[Any] = {
 
     val includes =
       configuration.getStringSeq("play.modules.enabled").getOrElse(Seq.empty)
@@ -116,10 +119,10 @@ object Modules {
             .loadClass(DefaultModuleName)
             .asInstanceOf[Class[Any]]
           Some(
-              constructModule(environment,
-                              configuration,
-                              DefaultModuleName,
-                              () => defaultModuleClass))
+            constructModule(environment,
+                            configuration,
+                            DefaultModuleName,
+                            () => defaultModuleClass))
         } catch {
           case e: ClassNotFoundException => None
         }
@@ -162,8 +165,8 @@ object Modules {
         tryConstruct()
       } getOrElse {
         throw new PlayException(
-            "No valid constructors",
-            "Module [" + className + "] cannot be instantiated.")
+          "No valid constructors",
+          "Module [" + className + "] cannot be instantiated.")
       }
     } catch {
       case e: PlayException => throw e
@@ -171,9 +174,9 @@ object Modules {
       case e: ThreadDeath => throw e
       case e: Throwable =>
         throw new PlayException(
-            "Cannot load module",
-            "Module [" + className + "] cannot be instantiated.",
-            e)
+          "Cannot load module",
+          "Module [" + className + "] cannot be instantiated.",
+          e)
     }
   }
 }

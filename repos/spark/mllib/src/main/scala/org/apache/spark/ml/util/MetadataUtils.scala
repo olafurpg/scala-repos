@@ -68,7 +68,7 @@ private[spark] object MetadataUtils {
                   case Some(numValues: Int) => Iterator(idx -> numValues)
                   case None =>
                     throw new IllegalArgumentException(
-                        s"Feature $idx is marked as" +
+                      s"Feature $idx is marked as" +
                         " Nominal (categorical), but it does not have the number of values specified.")
                 }
             }
@@ -83,16 +83,16 @@ private[spark] object MetadataUtils {
     * @param col  Vector column which must have feature names specified via attributes
     * @param names  List of feature names
     */
-  def getFeatureIndicesFromNames(
-      col: StructField, names: Array[String]): Array[Int] = {
+  def getFeatureIndicesFromNames(col: StructField,
+                                 names: Array[String]): Array[Int] = {
     require(col.dataType.isInstanceOf[VectorUDT],
             s"getFeatureIndicesFromNames expected column $col" +
-            s" to be Vector type, but it was type ${col.dataType} instead.")
+              s" to be Vector type, but it was type ${col.dataType} instead.")
     val inputAttr = AttributeGroup.fromStructField(col)
     names.map { name =>
       require(
-          inputAttr.hasAttr(name),
-          s"getFeatureIndicesFromNames found no feature with name $name in column $col.")
+        inputAttr.hasAttr(name),
+        s"getFeatureIndicesFromNames found no feature with name $name in column $col.")
       inputAttr.getAttr(name).index.get
     }
   }

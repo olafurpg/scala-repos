@@ -22,8 +22,8 @@ trait ArgHelper {
     * @param ex Input Execution
     * @return Output Execution
     */
-  def validatedDescribe[T](
-      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] = {
+  def validatedDescribe[T](describedArgs: Seq[DescribedArg],
+                           ex: Execution[T]): Execution[T] = {
     Execution.getArgs.flatMap { args =>
       validatedDescribe(describedArgs, args)
       ex
@@ -44,7 +44,7 @@ trait ArgHelper {
     if (missingKeys.nonEmpty) {
       val msg = missingKeys.mkString(", ")
       throw new DescriptionValidationException(
-          s"Must describe missing keys : $msg")
+        s"Must describe missing keys : $msg")
     }
   }
 
@@ -56,8 +56,8 @@ trait ArgHelper {
     * @param ex Input Execution
     * @return Output Execution
     */
-  def describe[T](
-      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] = {
+  def describe[T](describedArgs: Seq[DescribedArg],
+                  ex: Execution[T]): Execution[T] = {
     Execution.getArgs.flatMap { args =>
       describe(describedArgs, args)
       ex

@@ -49,25 +49,26 @@ object Test extends App {
       val hashCount0 = hashCount
       val u = a intersect b
       require(
-          hashCount == hashCount0,
-          s"key.hashCode should not be called, but has been called ${hashCount -
+        hashCount == hashCount0,
+        s"key.hashCode should not be called, but has been called ${hashCount -
           hashCount0} times. Key type $keyType.")
       require(u == (a intersect scala.collection.mutable.HashSet(b.toSeq: _*)),
               s"Operation must still work for other sets!")
       require(
-          u.size == i - j,
-          s"Expected size ${i + j}. Real size ${u.size}. Key type $keyType.")
-      for (x <- j until i) require(
+        u.size == i - j,
+        s"Expected size ${i + j}. Real size ${u.size}. Key type $keyType.")
+      for (x <- j until i)
+        require(
           u.contains(mkKey(x)),
           s"Key type $keyType. Set (0 until ${i + j}) should contain $x but does not.")
       val a_as = a intersect as
       val as_a = as intersect a
       require(
-          (a_as eq as) || (a_as eq a),
-          s"No structural sharing in a intersect as. Key type $keyType, a=(0 until $i) as=(0 until $j)")
+        (a_as eq as) || (a_as eq a),
+        s"No structural sharing in a intersect as. Key type $keyType, a=(0 until $i) as=(0 until $j)")
       require(
-          (as_a eq as) || (as_a eq a),
-          s"No structural sharing in as intersect a. Key type $keyType, a=(0 until $i) as=(0 until $j)")
+        (as_a eq as) || (as_a eq a),
+        s"No structural sharing in as intersect a. Key type $keyType, a=(0 until $i) as=(0 until $j)")
     }
   }
 

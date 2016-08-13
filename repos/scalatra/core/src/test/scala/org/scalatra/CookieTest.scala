@@ -17,14 +17,14 @@ class CookieTest extends WordSpec with Matchers with BeforeAndAfterAll {
       val cookie =
         Cookie("cookiename", "value1")(CookieOptions(domain = "nowhere.com"))
       cookie.toCookieString should equal(
-          "cookiename=value1; Domain=.nowhere.com")
+        "cookiename=value1; Domain=.nowhere.com")
     }
 
     "prefix a path with / if a path is set" in {
       val cookie = Cookie("cookiename", "value1")(
-          CookieOptions(path = "path/to/resource"))
+        CookieOptions(path = "path/to/resource"))
       cookie.toCookieString should equal(
-          "cookiename=value1; Path=/path/to/resource")
+        "cookiename=value1; Path=/path/to/resource")
     }
 
     "have a maxAge when the value is >= 0" in {
@@ -33,14 +33,14 @@ class CookieTest extends WordSpec with Matchers with BeforeAndAfterAll {
       val dateString =
         Cookie.formatExpires(new Date(Cookie.currentTimeMillis + 86700000))
       cookie.toCookieString should equal(
-          "cookiename=value1; Expires=" + dateString)
+        "cookiename=value1; Expires=" + dateString)
     }
 
     "set the comment when a comment is given" in {
       val cookie = Cookie("cookiename", "value1")(
-          CookieOptions(comment = "This is the comment"))
+        CookieOptions(comment = "This is the comment"))
       cookie.toCookieString should equal(
-          "cookiename=value1; Comment=This is the comment")
+        "cookiename=value1; Comment=This is the comment")
     }
 
     "flag the cookie as secure if needed" in {
@@ -56,17 +56,17 @@ class CookieTest extends WordSpec with Matchers with BeforeAndAfterAll {
 
     "render a cookie with all options set" in {
       val cookie = Cookie("cookiename", "value3")(
-          CookieOptions(
-              domain = "nowhere.com",
-              path = "path/to/page",
-              comment = "the cookie thingy comment",
-              maxAge = 15500,
-              secure = true,
-              httpOnly = true
-          ))
+        CookieOptions(
+          domain = "nowhere.com",
+          path = "path/to/page",
+          comment = "the cookie thingy comment",
+          maxAge = 15500,
+          secure = true,
+          httpOnly = true
+        ))
       val d = new Date(Cookie.currentTimeMillis + 15500 * 1000)
       cookie.toCookieString should equal(
-          "cookiename=value3; Domain=.nowhere.com; Path=/path/to/page; Comment=the cookie thingy comment; " +
+        "cookiename=value3; Domain=.nowhere.com; Path=/path/to/page; Comment=the cookie thingy comment; " +
           "Expires=" + Cookie.formatExpires(d) + "; Secure; HttpOnly")
     }
   }

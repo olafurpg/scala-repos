@@ -1,7 +1,15 @@
 package spire
 package math
 
-import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
+import spire.algebra.{
+  Eq,
+  EuclideanRing,
+  Field,
+  PartialOrder,
+  Order,
+  Ring,
+  Signed
+}
 
 private[spire] trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]
@@ -38,7 +46,8 @@ private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
 }
 
 private[spire] trait ScalaNumericWrapper[A]
-    extends scala.math.Numeric[A] with ScalaOrderingWrapper[A] {
+    extends scala.math.Numeric[A]
+    with ScalaOrderingWrapper[A] {
   def structure: Ring[A]
   def conversions: ConvertableFrom[A]
   def signed: Signed[A]
@@ -62,14 +71,16 @@ private[spire] trait ScalaNumericWrapper[A]
 }
 
 private[spire] trait ScalaFractionalWrapper[A]
-    extends ScalaNumericWrapper[A] with scala.math.Fractional[A] {
+    extends ScalaNumericWrapper[A]
+    with scala.math.Fractional[A] {
   def structure: Field[A]
 
   def div(x: A, y: A): A = structure.div(x, y)
 }
 
 private[spire] trait ScalaIntegralWrapper[A]
-    extends ScalaNumericWrapper[A] with scala.math.Integral[A] {
+    extends ScalaNumericWrapper[A]
+    with scala.math.Integral[A] {
   def structure: EuclideanRing[A]
 
   def quot(x: A, y: A): A = structure.quot(x, y)

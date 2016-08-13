@@ -120,7 +120,7 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   @inline
   def initialSavedState(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
-        "Android does not support the getter for 'initialSavedState'")
+      "Android does not support the getter for 'initialSavedState'")
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setInitialSavedState(android.support.v4.app.Fragment.SavedState) setInitialSavedState(android.support.v4.app.Fragment.SavedState)]]`
@@ -216,11 +216,11 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
     */
   @inline def view = basis.getView
 
-  @inline def startActivity[T : ClassTag](implicit context: Context): Unit =
+  @inline def startActivity[T: ClassTag](implicit context: Context): Unit =
     basis.startActivity(SIntent[T])
 
   @inline
-  def startActivityForResult[T : ClassTag](p: Int)(
+  def startActivityForResult[T: ClassTag](p: Int)(
       implicit context: Context): Unit =
     basis.startActivityForResult(SIntent[T], p)
 }
@@ -229,7 +229,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html android.support.v4.app.Fragment]]`.
   */
 class SFragment()
-    extends android.support.v4.app.Fragment() with TraitFragment[SFragment] {
+    extends android.support.v4.app.Fragment()
+    with TraitFragment[SFragment] {
 
   def basis = this
 }
@@ -313,9 +314,9 @@ trait TraitFragmentManager[This <: android.support.v4.app.FragmentManager] {
 
   @inline def onBackStackChanged[U](f: => U): This = {
     basis.addOnBackStackChangedListener(
-        new android.support.v4.app.FragmentManager.OnBackStackChangedListener {
-      def onBackStackChanged(): Unit = { f }
-    })
+      new android.support.v4.app.FragmentManager.OnBackStackChangedListener {
+        def onBackStackChanged(): Unit = { f }
+      })
     basis
   }
 }
@@ -338,7 +339,7 @@ trait TraitFragmentTransaction[
   @inline
   def breadCrumbShortTitle(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
-        "Android does not support the getter for 'breadCrumbShortTitle'")
+      "Android does not support the getter for 'breadCrumbShortTitle'")
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbShortTitle(int) setBreadCrumbShortTitle(int)]]`
@@ -367,7 +368,7 @@ trait TraitFragmentTransaction[
 
   @inline def breadCrumbTitle(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
-        "Android does not support the getter for 'breadCrumbTitle'")
+      "Android does not support the getter for 'breadCrumbTitle'")
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbTitle(int) setBreadCrumbTitle(int)]]`
@@ -408,7 +409,7 @@ trait TraitFragmentTransaction[
 
   @inline def transitionStyle(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
-        "Android does not support the getter for 'transitionStyle'")
+      "Android does not support the getter for 'transitionStyle'")
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setTransitionStyle(int) setTransitionStyle(int)]]`
@@ -484,7 +485,7 @@ trait TraitListFragment[This <: android.support.v4.app.ListFragment]
   @inline
   def listShownNoAnimation(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
-        "Android does not support the getter for 'listShownNoAnimation'")
+      "Android does not support the getter for 'listShownNoAnimation'")
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#setListShownNoAnimation(boolean) setListShownNoAnimation(boolean)]]`

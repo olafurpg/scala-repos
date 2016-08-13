@@ -8,16 +8,14 @@ import java.math.BigDecimal
   */
 trait JavaBigDecimalPicklers extends PrimitivePicklers {
   implicit val javaBigDecimalPickler: Pickler[BigDecimal] with Unpickler[
-      BigDecimal] = new AbstractPicklerUnpickler[BigDecimal] {
+    BigDecimal] = new AbstractPicklerUnpickler[BigDecimal] {
     def tag = FastTypeTag[BigDecimal]
     def pickle(picklee: BigDecimal, builder: PBuilder): Unit = {
       builder.beginEntry(picklee, tag)
-      builder.putField("value",
-                       b =>
-                         {
-                           b.hintElidedType(implicitly[FastTypeTag[String]])
-                           stringPickler.pickle(picklee.toString, b)
-                       })
+      builder.putField("value", b => {
+        b.hintElidedType(implicitly[FastTypeTag[String]])
+        stringPickler.pickle(picklee.toString, b)
+      })
       builder.endEntry()
     }
     def unpickle(tag: String, reader: PReader): Any = {
@@ -30,5 +28,6 @@ trait JavaBigDecimalPicklers extends PrimitivePicklers {
 
   // TODO - Figure out if we should somehow have these all registered somewhere else rather than take the hit at construction time.
   internal.currentRuntime.picklers.registerPicklerUnpickler(
-      javaBigDecimalPickler.tag.key, javaBigDecimalPickler)
+    javaBigDecimalPickler.tag.key,
+    javaBigDecimalPickler)
 }

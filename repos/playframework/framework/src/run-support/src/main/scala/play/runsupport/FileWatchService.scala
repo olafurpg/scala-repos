@@ -75,28 +75,29 @@ object FileWatchService {
       .getOrElse(Other)
   }
 
-  def defaultWatchService(
-      targetDirectory: File,
-      pollDelayMillis: Int,
-      logger: LoggerProxy): FileWatchService = new FileWatchService {
-    lazy val delegate = os match {
-      // If Windows or Linux and JDK7, use JDK7 watch service
-      case (Windows | Linux) if Properties.isJavaAtLeast("1.7") =>
-        new JDK7FileWatchService(logger)
-      // If Windows, Linux or OSX, use JNotify but fall back to SBT
-      case (Windows | Linux | OSX) =>
-        JNotifyFileWatchService(targetDirectory).recover {
-          case e =>
-            logger.warn("Error loading JNotify watch service: " + e.getMessage)
-            logger.trace(e)
-            new PollingFileWatchService(pollDelayMillis)
-        }.get
-      case _ => new PollingFileWatchService(pollDelayMillis)
-    }
+  def defaultWatchService(targetDirectory: File,
+                          pollDelayMillis: Int,
+                          logger: LoggerProxy): FileWatchService =
+    new FileWatchService {
+      lazy val delegate = os match {
+        // If Windows or Linux and JDK7, use JDK7 watch service
+        case (Windows | Linux) if Properties.isJavaAtLeast("1.7") =>
+          new JDK7FileWatchService(logger)
+        // If Windows, Linux or OSX, use JNotify but fall back to SBT
+        case (Windows | Linux | OSX) =>
+          JNotifyFileWatchService(targetDirectory).recover {
+            case e =>
+              logger.warn(
+                "Error loading JNotify watch service: " + e.getMessage)
+              logger.trace(e)
+              new PollingFileWatchService(pollDelayMillis)
+          }.get
+        case _ => new PollingFileWatchService(pollDelayMillis)
+      }
 
-    def watch(filesToWatch: Seq[File], onChange: () => Unit) =
-      delegate.watch(filesToWatch, onChange)
-  }
+      def watch(filesToWatch: Seq[File], onChange: () => Unit) =
+        delegate.watch(filesToWatch, onChange)
+    }
 
   def jnotify(targetDirectory: File): FileWatchService =
     optional(JNotifyFileWatchService(targetDirectory))
@@ -199,12 +200,14 @@ private object JNotifyFileWatchService {
     }
     def newListener(onChange: () => Unit): AnyRef = {
       Proxy.newProxyInstance(
-          classLoader, Seq(listenerClass).toArray, new InvocationHandler {
-        def invoke(proxy: AnyRef, m: Method, args: Array[AnyRef]): AnyRef = {
-          onChange()
-          null
-        }
-      })
+        classLoader,
+        Seq(listenerClass).toArray,
+        new InvocationHandler {
+          def invoke(proxy: AnyRef, m: Method, args: Array[AnyRef]): AnyRef = {
+            onChange()
+            null
+          }
+        })
     }
 
     @throws[Throwable]("If we were not able to successfully load JNotify")
@@ -245,7 +248,7 @@ private object JNotifyFileWatchService {
 
               val libs = new File(nativeLibrariesDirectory,
                                   System.getProperty("sun.arch.data.model") +
-                                  "bits").getAbsolutePath
+                                    "bits").getAbsolutePath
 
               // Hack to set java.library.path
               System.setProperty("java.library.path", {
@@ -310,12 +313,12 @@ private[play] class JDK7FileWatchService(logger: LoggerProxy)
       } else if (file.isFile) {
         // JDK7 WatchService can't watch files
         logger.warn(
-            "JDK7 WatchService only supports watching directories, but an attempt has been made to watch the file: " +
+          "JDK7 WatchService only supports watching directories, but an attempt has been made to watch the file: " +
             file.getCanonicalPath)
         logger.warn(
-            "This file will not be watched. Either remove the file from playMonitoredFiles, or configure a different WatchService, eg:")
+          "This file will not be watched. Either remove the file from playMonitoredFiles, or configure a different WatchService, eg:")
         logger.warn(
-            "PlayKeys.fileWatchService := play.runsupport.FileWatchService.jnotify(target.value)")
+          "PlayKeys.fileWatchService := play.runsupport.FileWatchService.jnotify(target.value)")
         false
       } else false
     }
@@ -324,11 +327,11 @@ private[play] class JDK7FileWatchService(logger: LoggerProxy)
 
     def watchDir(dir: File) = {
       dir.toPath.register(
-          watcher,
-          Array[WatchEvent.Kind[_]](ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY),
-          // This custom modifier exists just for polling implementations of the watch service, and means poll every 2 seconds.
-          // For non polling event based watchers, it has no effect.
-          com.sun.nio.file.SensitivityWatchEventModifier.HIGH)
+        watcher,
+        Array[WatchEvent.Kind[_]](ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY),
+        // This custom modifier exists just for polling implementations of the watch service, and means poll every 2 seconds.
+        // For non polling event based watchers, it has no effect.
+        com.sun.nio.file.SensitivityWatchEventModifier.HIGH)
     }
 
     // Get all sub directories
@@ -345,18 +348,17 @@ private[play] class JDK7FileWatchService(logger: LoggerProxy)
 
             import scala.collection.JavaConversions._
             // If a directory has been created, we must watch it and its sub directories
-            events.foreach {
-              event =>
-                if (event.kind == ENTRY_CREATE) {
-                  val file = watchKey.watchable
-                    .asInstanceOf[Path]
-                    .resolve(event.context.asInstanceOf[Path])
-                    .toFile
+            events.foreach { event =>
+              if (event.kind == ENTRY_CREATE) {
+                val file = watchKey.watchable
+                  .asInstanceOf[Path]
+                  .resolve(event.context.asInstanceOf[Path])
+                  .toFile
 
-                  if (file.isDirectory) {
-                    allSubDirectories(Seq(file)).foreach(watchDir)
-                  }
+                if (file.isDirectory) {
+                  allSubDirectories(Seq(file)).foreach(watchDir)
                 }
+              }
             }
 
             onChange()
@@ -436,8 +438,8 @@ private[runsupport] object GlobalStaticVar {
     mmb.setManagedResource(reference, "ObjectReference")
 
     // Register the Model MBean in the MBean Server
-    ManagementFactory.getPlatformMBeanServer.registerMBean(
-        mmb, objectName(name))
+    ManagementFactory.getPlatformMBeanServer
+      .registerMBean(mmb, objectName(name))
   }
 
   /**
@@ -445,13 +447,13 @@ private[runsupport] object GlobalStaticVar {
     */
   def get[T](name: String)(implicit ct: ClassTag[T]): Option[T] = {
     try {
-      val value = ManagementFactory.getPlatformMBeanServer.invoke(
-          objectName(name), "get", Array.empty, Array.empty)
+      val value = ManagementFactory.getPlatformMBeanServer
+        .invoke(objectName(name), "get", Array.empty, Array.empty)
       if (ct.runtimeClass.isInstance(value)) {
         Some(value.asInstanceOf[T])
       } else {
         throw new ClassCastException(
-            s"Global static var $name is not an instance of ${ct.runtimeClass}, but is actually a ${Option(
+          s"Global static var $name is not an instance of ${ct.runtimeClass}, but is actually a ${Option(
             value).fold("null")(_.getClass.getName)}")
       }
     } catch {
@@ -466,7 +468,7 @@ private[runsupport] object GlobalStaticVar {
   def remove(name: String): Unit = {
     try {
       ManagementFactory.getPlatformMBeanServer.unregisterMBean(
-          objectName(name))
+        objectName(name))
     } catch {
       case e: InstanceNotFoundException =>
     }

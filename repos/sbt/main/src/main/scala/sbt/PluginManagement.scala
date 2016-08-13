@@ -26,22 +26,22 @@ final case class PluginManagement(overrides: Set[ModuleID],
     addOverrides(extractOverrides(cp))
 
   def inject: Seq[Setting[_]] = Seq(
-      Keys.dependencyOverrides ++= overrides
+    Keys.dependencyOverrides ++= overrides
   )
 
   def resetDepth: PluginManagement =
     copy(
-        context = Context(globalPluginProject = false, pluginProjectDepth = 0))
+      context = Context(globalPluginProject = false, pluginProjectDepth = 0))
   def forGlobalPlugin: PluginManagement =
     copy(context = Context(globalPluginProject = true, pluginProjectDepth = 0))
   def forPlugin: PluginManagement =
     copy(
-        context = context.copy(
-              pluginProjectDepth = context.pluginProjectDepth + 1))
+      context =
+        context.copy(pluginProjectDepth = context.pluginProjectDepth + 1))
 }
 object PluginManagement {
-  final case class Context private[sbt](
-      globalPluginProject: Boolean, pluginProjectDepth: Int)
+  final case class Context private[sbt] (globalPluginProject: Boolean,
+                                         pluginProjectDepth: Int)
   val emptyContext: Context = Context(false, 0)
 
   def apply(initialLoader: ClassLoader): PluginManagement =

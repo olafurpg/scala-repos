@@ -83,38 +83,41 @@ trait PatternTypers { self: Analyzer =>
       // do not update the symbol if the tree's symbol's type does not define an unapply member
       // (e.g. since it's some method that returns an object with an unapply member)
       val fun = inPlaceAdHocOverloadingResolution(fun0)(hasUnapplyMember)
-      val caseClass = companionSymbolOf(
-          fun.tpe.typeSymbol.sourceModule, context)
+      val caseClass =
+        companionSymbolOf(fun.tpe.typeSymbol.sourceModule, context)
       val member = unapplyMember(fun.tpe)
       def resultType = (fun.tpe memberType member).finalResultType
       def isEmptyType = resultOfMatchingMethod(resultType, nme.isEmpty)()
-      def isOkay = (resultType.isErroneous || (resultType <:< BooleanTpe) ||
+      def isOkay =
+        (resultType.isErroneous || (resultType <:< BooleanTpe) ||
           (isEmptyType <:< BooleanTpe) || member.isMacro ||
           member.isOverloaded // the whole overloading situation is over the rails
-          )
+        )
 
       // Dueling test cases: pos/overloaded-unapply.scala, run/case-class-23.scala, pos/t5022.scala
       // A case class with 23+ params has no unapply method.
       // A case class constructor may be overloaded with unapply methods in the companion.
       if (caseClass.isCase && !member.isOverloaded)
         logResult(s"convertToCaseConstructor($fun, $caseClass, pt=$pt)")(
-            convertToCaseConstructor(fun, caseClass, pt))
+          convertToCaseConstructor(fun, caseClass, pt))
       else if (!reallyExists(member))
         CaseClassConstructorError(
-            fun,
-            s"${fun.symbol} is not a case class, nor does it have an unapply/unapplySeq member")
+          fun,
+          s"${fun.symbol} is not a case class, nor does it have an unapply/unapplySeq member")
       else if (isOkay) fun
       else if (isEmptyType == NoType)
         CaseClassConstructorError(
-            fun, s"an unapply result must have a member `def isEmpty: Boolean")
+          fun,
+          s"an unapply result must have a member `def isEmpty: Boolean")
       else
         CaseClassConstructorError(
-            fun,
-            s"an unapply result must have a member `def isEmpty: Boolean (found: def isEmpty: $isEmptyType)")
+          fun,
+          s"an unapply result must have a member `def isEmpty: Boolean (found: def isEmpty: $isEmptyType)")
     }
 
-    def typedArgsForFormals(
-        args: List[Tree], formals: List[Type], mode: Mode): List[Tree] = {
+    def typedArgsForFormals(args: List[Tree],
+                            formals: List[Type],
+                            mode: Mode): List[Tree] = {
       def typedArgWithFormal(arg: Tree, pt: Type) = {
         val newMode =
           if (isByNameParamType(pt)) mode.onlySticky
@@ -125,7 +128,7 @@ trait PatternTypers { self: Analyzer =>
       val front = (args, fixed).zipped map typedArgWithFormal
       def rest =
         context withinStarPatterns
-        (args drop front.length map (typedArgWithFormal(_, elem)))
+          (args drop front.length map (typedArgWithFormal(_, elem)))
 
       elem match {
         case NoType => front
@@ -186,24 +189,27 @@ trait PatternTypers { self: Analyzer =>
 
       // !!! FIXME - skipping this when variance.isInvariant allows unsoundness, see SI-5189
       // Test case which presently requires the exclusion is run/gadts.scala.
-      def eligible(tparam: Symbol) = (tparam.isTypeParameterOrSkolem &&
+      def eligible(tparam: Symbol) =
+        (tparam.isTypeParameterOrSkolem &&
           tparam.owner.isTerm &&
           (settings.strictInference || !variance.isInvariant))
 
-      def skolems = try skolemBuffer.toList finally skolemBuffer.clear()
+      def skolems =
+        try skolemBuffer.toList
+        finally skolemBuffer.clear()
       def apply(tp: Type): Type = mapOver(tp) match {
         case tp @ TypeRef(NoPrefix, tpSym, Nil) if eligible(tpSym) =>
           val bounds =
             (if (variance.isInvariant) tpSym.tpeHK.bounds
-             else if (variance.isPositive) TypeBounds.upper(tpSym.tpeHK)
-             else TypeBounds.lower(tpSym.tpeHK))
+            else if (variance.isPositive) TypeBounds.upper(tpSym.tpeHK)
+            else TypeBounds.lower(tpSym.tpeHK))
           // origin must be the type param so we can deskolemize
-          val skolem = context.owner.newGADTSkolem(
-              unit.freshTypeName("?" + tpSym.name), tpSym, bounds)
+          val skolem = context.owner
+            .newGADTSkolem(unit.freshTypeName("?" + tpSym.name), tpSym, bounds)
           skolemBuffer += skolem
           logResult(
-              s"Created gadt skolem $skolem: ${skolem.tpe_*} to stand in for $tpSym")(
-              skolem.tpe_*)
+            s"Created gadt skolem $skolem: ${skolem.tpe_*} to stand in for $tpSym")(
+            skolem.tpe_*)
         case tp1 => tp1
       }
     }
@@ -235,13 +241,14 @@ trait PatternTypers { self: Analyzer =>
      *
      * see test/files/../t5189*.scala
      */
-    private def convertToCaseConstructor(
-        tree: Tree, caseClass: Symbol, ptIn: Type): Tree = {
+    private def convertToCaseConstructor(tree: Tree,
+                                         caseClass: Symbol,
+                                         ptIn: Type): Tree = {
       // TODO SI-7886 / SI-5900 This is well intentioned but doesn't quite hit the nail on the head.
       //      For now, I've put it completely behind -Xstrict-inference.
       val untrustworthyPt =
         settings.strictInference &&
-        (ptIn =:= AnyTpe || ptIn =:= NothingTpe ||
+          (ptIn =:= AnyTpe || ptIn =:= NothingTpe ||
             ptIn.typeSymbol != caseClass)
       val variantToSkolem = new VariantToSkolemMap
       val caseClassType = tree.tpe.prefix memberType caseClass
@@ -253,8 +260,8 @@ trait PatternTypers { self: Analyzer =>
       // have to open up the existential and put the skolems in scope
       // can't simply package up pt in an ExistentialType, because that takes us back to square one (List[_ <: T] == List[T] due to covariance)
       val ptSafe = logResult(
-          s"case constructor from (${tree.summaryString}, $caseClassType, $pt)")(
-          variantToSkolem(pt))
+        s"case constructor from (${tree.summaryString}, $caseClassType, $pt)")(
+        variantToSkolem(pt))
       val freeVars = variantToSkolem.skolems
 
       // use "tree" for the context, not context.tree: don't make another CaseDef context,
@@ -275,9 +282,9 @@ trait PatternTypers { self: Analyzer =>
         case MethodType(ctorArgs, restpe) =>
           // ctorArgs are actually in a covariant position, since this is the type of the subpatterns of the pattern represented by this Apply node
           copyMethodType(
-              tree1.tpe,
-              ctorArgs map (_ modifyInfo extrapolate),
-              extrapolate(restpe)) // no need to clone ctorArgs, this is OUR method type
+            tree1.tpe,
+            ctorArgs map (_ modifyInfo extrapolate),
+            extrapolate(restpe)) // no need to clone ctorArgs, this is OUR method type
         case tp => tp
       }
     }
@@ -317,7 +324,7 @@ trait PatternTypers { self: Analyzer =>
 
       def freshUnapplyArgType(): Type = {
         val GenPolyType(freeVars, unappFormal) = freshArgType(
-            unapplyType.skolemizeExistential(context.owner, tree))
+          unapplyType.skolemizeExistential(context.owner, tree))
         val unapplyContext = context.makeNewScope(context.tree, context.owner)
         freeVars foreach unapplyContext.scope.enter
         val pattp = newTyper(unapplyContext).infer
@@ -325,21 +332,22 @@ trait PatternTypers { self: Analyzer =>
         // turn any unresolved type variables in freevars into existential skolems
         val skolems =
           freeVars map
-          (fv => unapplyContext.owner.newExistentialSkolem(fv, fv))
+            (fv => unapplyContext.owner.newExistentialSkolem(fv, fv))
         pattp.substSym(freeVars, skolems)
       }
 
       val unapplyArg =
-        (context.owner.newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
-            (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
-               pt
-             else freshUnapplyArgType()))
+        (context.owner
+          .newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
+          (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
+            pt
+          else freshUnapplyArgType()))
       val unapplyArgTree =
         Ident(unapplyArg) updateAttachment SubpatternsAttachment(args)
 
       // clearing the type is necessary so that ref will be stabilized; see bug 881
       val fun1 = typedPos(fun.pos)(
-          Apply(Select(fun.clearType(), unapplyMethod), unapplyArgTree :: Nil))
+        Apply(Select(fun.clearType(), unapplyMethod), unapplyArgTree :: Nil))
 
       def makeTypedUnapply() = {
         // the union of the expected type and the inferred type of the argument to unapply
@@ -364,8 +372,9 @@ trait PatternTypers { self: Analyzer =>
       } else makeTypedUnapply()
     }
 
-    def wrapClassTagUnapply(
-        uncheckedPattern: Tree, classTagExtractor: Tree, pt: Type): Tree = {
+    def wrapClassTagUnapply(uncheckedPattern: Tree,
+                            classTagExtractor: Tree,
+                            pt: Type): Tree = {
       // TODO: disable when in unchecked match
       // we don't create a new Context for a Match, so find the CaseDef,
       // then go out one level and navigate back to the match that has this case
@@ -375,8 +384,12 @@ trait PatternTypers { self: Analyzer =>
       // and re-typechecks of the target of the unapply call in PATTERNmode,
       // this breaks down when the classTagExtractor (which defines the unapply member) is not a simple reference to an object,
       // but an arbitrary tree as is the case here
-      val res = doTypedUnapply(
-          app, classTagExtractor, classTagExtractor, args, PATTERNmode, pt)
+      val res = doTypedUnapply(app,
+                               classTagExtractor,
+                               classTagExtractor,
+                               args,
+                               PATTERNmode,
+                               pt)
 
       log(sm"""
         |wrapClassTagUnapply {
@@ -412,7 +425,8 @@ trait PatternTypers { self: Analyzer =>
           resolveClassTag(pos, pt1) match {
             case tree if unapplyMember(tree.tpe).exists => tree
             case _ =>
-              devWarning(s"Cannot create runtime type test for $pt1"); EmptyTree
+              devWarning(s"Cannot create runtime type test for $pt1");
+              EmptyTree
           }
       }
     }

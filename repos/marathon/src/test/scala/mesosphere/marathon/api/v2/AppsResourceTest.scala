@@ -6,7 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.event.EventStream
 import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon._
-import mesosphere.marathon.api.{TestGroupManagerFixture, JsonTestHelper, TaskKiller, TestAuthFixture}
+import mesosphere.marathon.api.{
+  TestGroupManagerFixture,
+  JsonTestHelper,
+  TaskKiller,
+  TestAuthFixture
+}
 import mesosphere.marathon.core.appinfo.AppInfo.Embed
 import mesosphere.marathon.core.appinfo._
 import mesosphere.marathon.core.base.ConstantClock
@@ -19,7 +24,10 @@ import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
+import mesosphere.util.{
+  CapConcurrentExecutions,
+  CapConcurrentExecutionsMetrics
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsNumber, JsObject, Json}
 
@@ -30,7 +38,10 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class AppsResourceTest
-    extends MarathonSpec with MarathonActorSupport with Matchers with Mockito
+    extends MarathonSpec
+    with MarathonActorSupport
+    with Matchers
+    with Mockito
     with GivenWhenThen {
 
   import mesosphere.marathon.api.v2.json.Formats._
@@ -44,7 +55,7 @@ class AppsResourceTest
     val plan = DeploymentPlan(group, group)
     val body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     When("The create request is made")
@@ -57,11 +68,11 @@ class AppsResourceTest
     And("the JSON is as expected, including a newly generated version")
     import mesosphere.marathon.api.v2.json.Formats._
     val expected = AppInfo(
-        app.copy(
-            versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
-        maybeTasks = Some(immutable.Seq.empty),
-        maybeCounts = Some(TaskCounts.zero),
-        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
+      app.copy(
+        versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
+      maybeTasks = Some(immutable.Seq.empty),
+      maybeCounts = Some(TaskCounts.zero),
+      maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
     )
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -78,7 +89,7 @@ class AppsResourceTest
     var plan = DeploymentPlan(group, group)
     var body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     Then("A constraint violation exception is thrown")
@@ -93,7 +104,7 @@ class AppsResourceTest
     plan = DeploymentPlan(group, group)
     body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     response = appsResource.create(body, false, auth.request)
@@ -107,7 +118,7 @@ class AppsResourceTest
     plan = DeploymentPlan(group, group)
     body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     response = appsResource.create(body, false, auth.request)
@@ -117,10 +128,10 @@ class AppsResourceTest
   test("Create a new app successfully using ports instead of portDefinitions") {
     Given("An app and group")
     val app = AppDefinition(
-        id = PathId("/app"),
-        cmd = Some("cmd"),
-        portDefinitions = PortDefinitions(1000, 1001),
-        versionInfo = OnlyVersion(Timestamp.zero)
+      id = PathId("/app"),
+      cmd = Some("cmd"),
+      portDefinitions = PortDefinitions(1000, 1001),
+      versionInfo = OnlyVersion(Timestamp.zero)
     )
     val group = Group(PathId("/"), Set(app))
     val plan = DeploymentPlan(group, group)
@@ -130,7 +141,7 @@ class AppsResourceTest
     val body = Json.stringify(appJsonWithOnlyPorts).getBytes("UTF-8")
 
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     When("The create request is made")
@@ -143,11 +154,11 @@ class AppsResourceTest
     And("the JSON is as expected, including a newly generated version")
     import mesosphere.marathon.api.v2.json.Formats._
     val expected = AppInfo(
-        app.copy(
-            versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
-        maybeTasks = Some(immutable.Seq.empty),
-        maybeCounts = Some(TaskCounts.zero),
-        maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
+      app.copy(
+        versionInfo = AppDefinition.VersionInfo.OnlyVersion(clock.now())),
+      maybeTasks = Some(immutable.Seq.empty),
+      maybeCounts = Some(TaskCounts.zero),
+      maybeDeployments = Some(immutable.Seq(Identifiable(plan.id)))
     )
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
@@ -161,7 +172,7 @@ class AppsResourceTest
     val plan = DeploymentPlan(group, group)
     val body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
 
     Then("A constraint violation exception is thrown")
     val response = appsResource.create(body, false, auth.request)
@@ -171,11 +182,11 @@ class AppsResourceTest
   test("Create a new app with float instance count fails") {
     Given("The json of an invalid application")
     val invalidAppJson = Json.stringify(
-        Json.obj("id" -> "/foo", "cmd" -> "cmd", "instances" -> 0.1))
+      Json.obj("id" -> "/foo", "cmd" -> "cmd", "instances" -> 0.1))
     val group = Group(PathId("/"), Set.empty)
     val plan = DeploymentPlan(group, group)
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.rootGroup() returns Future.successful(group)
 
     Then("A constraint violation exception is thrown")
@@ -192,7 +203,7 @@ class AppsResourceTest
     val plan = DeploymentPlan(group, group)
     val body = """{ "cmd": "bla" }""".getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.app(PathId("/app")) returns Future.successful(Some(app))
 
     When("The application is updated")
@@ -204,19 +215,19 @@ class AppsResourceTest
   }
 
   test(
-      "Replace an existing application using ports instead of portDefinitions") {
+    "Replace an existing application using ports instead of portDefinitions") {
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
     val plan = DeploymentPlan(group, group)
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     groupManager.app(PathId("/app")) returns Future.successful(Some(app))
 
     val appJson = Json.toJson(app).as[JsObject]
     val appJsonWithOnlyPorts =
       appJson - "uris" - "portDefinitions" - "version" +
-      ("ports" -> Json.parse("""[1000, 1001]"""))
+        ("ports" -> Json.parse("""[1000, 1001]"""))
     val body = Json.stringify(appJsonWithOnlyPorts).getBytes("UTF-8")
 
     When("The application is updated")
@@ -228,7 +239,7 @@ class AppsResourceTest
   }
 
   test(
-      "Replace an existing application fails due to docker container validation") {
+    "Replace an existing application fails due to docker container validation") {
     Given("An app update with an invalid container (missing docker field)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -240,7 +251,7 @@ class AppsResourceTest
         |  }
         |}""".stripMargin.getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
 
     When("The application is updated")
     val response =
@@ -253,7 +264,7 @@ class AppsResourceTest
   }
 
   test(
-      "Creating an app with broken volume definition fails with readable error message") {
+    "Creating an app with broken volume definition fails with readable error message") {
     Given("An app update with an invalid volume (wrong field name)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -276,21 +287,21 @@ class AppsResourceTest
         |}
       """.stripMargin.getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
 
     When("The request is processed")
     val response = appsResource.create(body, false, auth.request)
 
     Then(
-        "The return code indicates that the hostPath of volumes[0] is missing") // although the wrong field should fail
+      "The return code indicates that the hostPath of volumes[0] is missing") // although the wrong field should fail
     response.getStatus should be(422)
     response.getEntity.toString should include(
-        "/container/volumes(0)/hostPath")
+      "/container/volumes(0)/hostPath")
     response.getEntity.toString should include("must not be empty")
   }
 
   test(
-      "Replace an existing application fails due to mesos container validation") {
+    "Replace an existing application fails due to mesos container validation") {
     Given("An app update with an invalid container (missing docker field)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -305,7 +316,7 @@ class AppsResourceTest
         |  }
         |}""".stripMargin.getBytes("UTF-8")
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
 
     When("The application is updated")
     val response =
@@ -325,7 +336,7 @@ class AppsResourceTest
     groupManager.app(PathId("/app")) returns Future.successful(Some(app))
 
     groupManager.updateApp(any, any, any, any, any) returns Future.successful(
-        plan)
+      plan)
     val response =
       appsResource.restart(app.id.toString, force = true, auth.request)
     response.getStatus should be(200)
@@ -336,7 +347,7 @@ class AppsResourceTest
     groupManager.app(PathId("/app")) returns Future.successful(None)
 
     groupManager.updateApp(any, any, any, any, any) returns Future.failed(
-        new UnknownAppException(missing))
+      new UnknownAppException(missing))
 
     intercept[UnknownAppException] {
       appsResource.restart(missing.toString, force = true, auth.request)
@@ -355,13 +366,13 @@ class AppsResourceTest
       .successful(Seq(appInfo))
 
     When("The the index is fetched without any filters")
-    val response = appsResource.index(
-        null, null, null, new java.util.HashSet(), auth.request)
+    val response = appsResource
+      .index(null, null, null, new java.util.HashSet(), auth.request)
 
     Then("The response holds counts and deployments")
     val appJson = Json.parse(response.getEntity.asInstanceOf[String])
     (appJson \ "apps" \\ "deployments" head) should be(
-        Json.arr(Json.obj("id" -> "deployment-123")))
+      Json.arr(Json.obj("id" -> "deployment-123")))
     (appJson \ "apps" \\ "tasksStaged" head) should be(JsNumber(1))
   }
 
@@ -386,31 +397,31 @@ class AppsResourceTest
     search(cmd = Some("party"), id = None, label = None) should be(Set(app1))
     search(cmd = Some("work"), id = None, label = None) should be(Set(app2))
     search(cmd = Some("hard"), id = None, label = None) should be(
-        Set(app1, app2))
+      Set(app1, app2))
     search(cmd = Some("none"), id = None, label = None) should be(Set.empty)
 
     search(cmd = None, id = Some("app"), label = None) should be(
-        Set(app1, app2))
+      Set(app1, app2))
     search(cmd = None, id = Some("service-a"), label = None) should be(
-        Set(app1))
+      Set(app1))
     search(cmd = Some("party"), id = Some("app"), label = None) should be(
-        Set(app1))
+      Set(app1))
     search(cmd = Some("work"), id = Some("app"), label = None) should be(
-        Set(app2))
+      Set(app2))
     search(cmd = Some("hard"), id = Some("service-a"), label = None) should be(
-        Set(app1))
+      Set(app1))
     search(cmd = Some(""), id = Some(""), label = None) should be(
-        Set(app1, app2))
+      Set(app1, app2))
 
     search(cmd = None, id = None, label = Some("b==2")) should be(Set(app1))
     search(cmd = Some("party"), id = Some("app"), label = Some("a==1")) should be(
-        Set(app1))
+      Set(app1))
     search(cmd = Some("work"), id = Some("app"), label = Some("a==1")) should be(
-        Set(app2))
+      Set(app2))
     search(cmd = Some("hard"), id = Some("service-a"), label = Some("a==1")) should be(
-        Set(app1))
+      Set(app1))
     search(cmd = Some(""), id = Some(""), label = Some("")) should be(
-        Set(app1, app2))
+      Set(app1, app2))
   }
 
   test("access without authentication is denied") {
@@ -508,22 +519,21 @@ class AppsResourceTest
 
   test("access with limited authorization gives a filtered apps listing") {
     Given("An authorized identity with limited ACL's")
-    auth.authFn = (resource: Any) =>
-      {
-        val id = resource match {
-          case app: AppDefinition => app.id.toString
-          case _ => resource.asInstanceOf[Group].id.toString
-        }
-        id.startsWith("/visible")
+    auth.authFn = (resource: Any) => {
+      val id = resource match {
+        case app: AppDefinition => app.id.toString
+        case _ => resource.asInstanceOf[Group].id.toString
+      }
+      id.startsWith("/visible")
     }
     implicit val identity = auth.identity
     val selector = appsResource.selectAuthorized(AppSelector.forall(Seq.empty))
     val apps = Seq(
-        AppDefinition("/visible/app".toPath),
-        AppDefinition("/visible/other/foo/app".toPath),
-        AppDefinition("/secure/app".toPath),
-        AppDefinition("/root".toPath),
-        AppDefinition("/other/great/app".toPath)
+      AppDefinition("/visible/app".toPath),
+      AppDefinition("/visible/other/foo/app".toPath),
+      AppDefinition("/secure/app".toPath),
+      AppDefinition("/root".toPath),
+      AppDefinition("/other/great/app".toPath)
     )
 
     When("The selector selects applications")
@@ -582,15 +592,15 @@ class AppsResourceTest
     appRepository = mock[AppRepository]
     appTaskResource = mock[AppTasksResource]
     appsResource = new AppsResource(
-        clock,
-        eventBus,
-        appTaskResource,
-        service,
-        appInfoService,
-        config,
-        auth.auth,
-        auth.auth,
-        groupManager
+      clock,
+      eventBus,
+      appTaskResource,
+      service,
+      appInfoService,
+      config,
+      auth.auth,
+      auth.auth,
+      groupManager
     )
   }
 
@@ -603,15 +613,15 @@ class AppsResourceTest
     groupRepository = f.groupRepository
 
     appsResource = new AppsResource(
-        clock,
-        eventBus,
-        appTaskResource,
-        service,
-        appInfoService,
-        config,
-        auth.auth,
-        auth.auth,
-        groupManager
+      clock,
+      eventBus,
+      appTaskResource,
+      service,
+      appInfoService,
+      config,
+      auth.auth,
+      auth.auth,
+      groupManager
     )
   }
 }

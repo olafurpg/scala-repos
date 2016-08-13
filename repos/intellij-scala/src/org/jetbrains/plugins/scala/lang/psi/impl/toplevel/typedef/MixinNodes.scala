@@ -15,10 +15,18 @@ import com.intellij.psi.{PsiClass, PsiClassType, PsiElement}
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import org.jetbrains.plugins.scala.macroAnnotations.CachedWithRecursionGuard
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
@@ -49,8 +57,8 @@ abstract class MixinNodes {
       mutable.HashMap.empty
     def addToMap(key: T, node: Node) {
       val name = ScalaPsiUtil.convertMemberName(elemName(key))
-      (if (!isPrivate(key)) this else privatesMap).getOrElseUpdate(
-          name, new ArrayBuffer) += ((key, node))
+      (if (!isPrivate(key)) this else privatesMap)
+        .getOrElseUpdate(name, new ArrayBuffer) += ((key, node))
       if (isImplicit(key)) implicitNames.add(name)
     }
 
@@ -77,17 +85,17 @@ abstract class MixinNodes {
         }
       }
       val thisMap: NodesMap = toNodesMap(
-          getOrElse(convertedName, new ArrayBuffer))
-      val maps: List[NodesMap] = supersList.map(
-          sup => toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
+        getOrElse(convertedName, new ArrayBuffer))
+      val maps: List[NodesMap] = supersList.map(sup =>
+        toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
       val supers = mergeWithSupers(thisMap, mergeSupers(maps))
       val list = supersList.flatMap(
-          _.privatesMap.getOrElse(convertedName, new ArrayBuffer[(T, Node)]))
+        _.privatesMap.getOrElse(convertedName, new ArrayBuffer[(T, Node)]))
       val supersPrivates = toNodesSeq(list)
       val thisPrivates = toNodesSeq(
-          privatesMap
-            .getOrElse(convertedName, new ArrayBuffer[(T, Node)])
-            .toList ::: list)
+        privatesMap
+          .getOrElse(convertedName, new ArrayBuffer[(T, Node)])
+          .toList ::: list)
       val thisAllNodes = new AllNodes(thisMap, thisPrivates)
       val supersAllNodes = new AllNodes(supers, supersPrivates)
       synchronized {
@@ -125,7 +133,7 @@ abstract class MixinNodes {
     }
 
     private def forAll(): (mutable.HashMap[String, AllNodes],
-    mutable.HashMap[String, AllNodes]) = {
+                           mutable.HashMap[String, AllNodes]) = {
       for (name <- allNames()) forName(name)
       synchronized {
         (calculated, calculatedSupers)
@@ -180,8 +188,8 @@ abstract class MixinNodes {
     }
 
     //Return primary selected from supersMerged
-    private def mergeWithSupers(
-        thisMap: NodesMap, supersMerged: MultiMap): NodesMap = {
+    private def mergeWithSupers(thisMap: NodesMap,
+                                supersMerged: MultiMap): NodesMap = {
       val primarySupers = new NodesMap
       for ((key, nodes) <- supersMerged) {
         val primarySuper = nodes.find { n =>
@@ -338,8 +346,9 @@ abstract class MixinNodes {
     var place: Option[PsiElement] = None
     val map = new Map
     val superTypesBuff = new ListBuffer[Map]
-    val (superTypes, subst, thisTypeSubst): (Seq[ScType], ScSubstitutor,
-    ScSubstitutor) = tp match {
+    val (superTypes, subst, thisTypeSubst): (Seq[ScType],
+                                             ScSubstitutor,
+                                             ScSubstitutor) = tp match {
       case cp: ScCompoundType =>
         processRefinement(cp, map, place)
         val thisTypeSubst = compoundThisType match {
@@ -362,18 +371,23 @@ abstract class MixinNodes {
             case template: ScTypeDefinition =>
               if (template.qualifiedName == "scala.Predef") isPredef = true
               place = Option(template.extendsBlock)
-              processScala(
-                  template, ScSubstitutor.empty, map, place, base = true)
+              processScala(template,
+                           ScSubstitutor.empty,
+                           map,
+                           place,
+                           base = true)
               val lin = MixinNodes.linearization(template)
-              var zSubst = new ScSubstitutor(
-                  Map.empty, Map.empty, Some(ScThisType(template)))
+              var zSubst = new ScSubstitutor(Map.empty,
+                                             Map.empty,
+                                             Some(ScThisType(template)))
               var placer = template.getContext
               while (placer != null) {
                 placer match {
                   case t: ScTemplateDefinition =>
                     zSubst = zSubst.followed(
-                        new ScSubstitutor(
-                            Map.empty, Map.empty, Some(ScThisType(t)))
+                      new ScSubstitutor(Map.empty,
+                                        Map.empty,
+                                        Some(ScThisType(t)))
                     )
                   case _ =>
                 }
@@ -384,20 +398,25 @@ abstract class MixinNodes {
                zSubst)
             case template: ScTemplateDefinition =>
               place = Option(
-                  template
-                    .asInstanceOf[ScalaStubBasedElementImpl[_]]
-                    .getLastChildStub)
-              processScala(
-                  template, ScSubstitutor.empty, map, place, base = true)
-              var zSubst = new ScSubstitutor(
-                  Map.empty, Map.empty, Some(ScThisType(template)))
+                template
+                  .asInstanceOf[ScalaStubBasedElementImpl[_]]
+                  .getLastChildStub)
+              processScala(template,
+                           ScSubstitutor.empty,
+                           map,
+                           place,
+                           base = true)
+              var zSubst = new ScSubstitutor(Map.empty,
+                                             Map.empty,
+                                             Some(ScThisType(template)))
               var placer = template.getContext
               while (placer != null) {
                 placer match {
                   case t: ScTemplateDefinition =>
                     zSubst = zSubst.followed(
-                        new ScSubstitutor(
-                            Map.empty, Map.empty, Some(ScThisType(t)))
+                      new ScSubstitutor(Map.empty,
+                                        Map.empty,
+                                        Some(ScThisType(t)))
                     )
                   case _ =>
                 }
@@ -451,8 +470,11 @@ abstract class MixinNodes {
                                   ScalaPsiManager.ClassCategory.TYPE)
                 clazz match {
                   case template: ScTemplateDefinition =>
-                    processScala(
-                        template, newSubst, newMap, place, base = false)
+                    processScala(template,
+                                 newSubst,
+                                 newMap,
+                                 place,
+                                 base = false)
                   case _ => //do nothing
                 }
               case _ => processJava(superClass, newSubst, newMap, place)
@@ -481,7 +503,7 @@ abstract class MixinNodes {
     var res: ScSubstitutor = ScSubstitutor.empty
     for (tp <- superClass.getTypeParameters) {
       res = res bindT
-      ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+          ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
           derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
     }
     superClass match {
@@ -508,14 +530,16 @@ abstract class MixinNodes {
                    map: Map,
                    place: Option[PsiElement],
                    base: Boolean)
-  def processRefinement(
-      cp: ScCompoundType, map: Map, place: Option[PsiElement])
+  def processRefinement(cp: ScCompoundType,
+                        map: Map,
+                        place: Option[PsiElement])
 }
 
 object MixinNodes {
   def linearization(clazz: PsiClass): Seq[ScType] = {
-    @CachedWithRecursionGuard[PsiClass](
-        clazz, Seq.empty, CachesUtil.getDependentItem(clazz)())
+    @CachedWithRecursionGuard[PsiClass](clazz,
+                                        Seq.empty,
+                                        CachesUtil.getDependentItem(clazz)())
     def inner(): Seq[ScType] = {
       clazz match {
         case obj: ScObject
@@ -529,11 +553,10 @@ object MixinNodes {
         def default =
           if (clazz.getTypeParameters.isEmpty) ScType.designator(clazz)
           else
-            ScParameterizedType(ScType.designator(clazz),
-                                clazz.getTypeParameters.map(tp =>
-                                      ScalaPsiManager
-                                        .instance(clazz.getProject)
-                                        .typeVariable(tp)))
+            ScParameterizedType(
+              ScType.designator(clazz),
+              clazz.getTypeParameters.map(tp =>
+                ScalaPsiManager.instance(clazz.getProject).typeVariable(tp)))
         clazz match {
           case td: ScTypeDefinition =>
             td.getType(TypingContext.empty).getOrElse(default)
@@ -555,15 +578,17 @@ object MixinNodes {
         }
       }
 
-      generalLinearization(
-          Some(clazz.getProject), tp, addTp = true, supers = supers)
+      generalLinearization(Some(clazz.getProject),
+                           tp,
+                           addTp = true,
+                           supers = supers)
     }
 
     inner()
   }
 
-  def linearization(
-      compound: ScCompoundType, addTp: Boolean = false): Seq[ScType] = {
+  def linearization(compound: ScCompoundType,
+                    addTp: Boolean = false): Seq[ScType] = {
     val comps = compound.components
 
     generalLinearization(None, compound, addTp = addTp, supers = comps)
@@ -587,20 +612,17 @@ object MixinNodes {
       ScType.extractClass(tp, project) match {
         case Some(clazz)
             if clazz.qualifiedName != null &&
-            !set.contains(classString(clazz)) =>
+              !set.contains(classString(clazz)) =>
           tp +=: buffer
           set += classString(clazz)
         case Some(clazz) if clazz.getTypeParameters.nonEmpty =>
-          val i = buffer.indexWhere(
-              newTp =>
-                {
-              ScType.extractClass(newTp, Some(clazz.getProject)) match {
-                case Some(newClazz)
-                    if ScEquivalenceUtil.areClassesEquivalent(
-                        newClazz, clazz) =>
-                  true
-                case _ => false
-              }
+          val i = buffer.indexWhere(newTp => {
+            ScType.extractClass(newTp, Some(clazz.getProject)) match {
+              case Some(newClazz)
+                  if ScEquivalenceUtil.areClassesEquivalent(newClazz, clazz) =>
+                true
+              case _ => false
+            }
           })
           if (i != -1) {
             val newTp = buffer.apply(i)

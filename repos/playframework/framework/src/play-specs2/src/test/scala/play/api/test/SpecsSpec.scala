@@ -15,15 +15,15 @@ object SpecsSpec extends Specification {
 
   "WithApplication context" should {
     "provide an app" in new WithApplication(
-        _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
+      _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
       app.configuration.getString("foo") must beSome("bar")
     }
     "make the app available implicitly" in new WithApplication(
-        _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
+      _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
       getConfig("foo") must beSome("bar")
     }
     "start the application" in new WithApplication(
-        _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
+      _.configure("foo" -> "bar", "ehcacheplugin" -> "disabled")) {
       //noinspection ScalaDeprecation
       Play.maybeApplication must beSome(app)
     }

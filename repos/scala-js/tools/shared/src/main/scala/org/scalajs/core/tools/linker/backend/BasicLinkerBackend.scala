@@ -14,7 +14,10 @@ import org.scalajs.core.tools.sem.Semantics
 import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 import org.scalajs.core.tools.linker.backend.emitter.Emitter
-import org.scalajs.core.tools.javascript.{JSFileBuilder, JSFileBuilderWithSourceMap}
+import org.scalajs.core.tools.javascript.{
+  JSFileBuilder,
+  JSFileBuilderWithSourceMap
+}
 
 /** The basic backend for the Scala.js linker.
   *
@@ -25,8 +28,7 @@ final class BasicLinkerBackend(
     outputMode: OutputMode,
     withSourceMap: Boolean,
     config: LinkerBackend.Config
-)
-    extends LinkerBackend(semantics, outputMode.esLevel, withSourceMap, config) {
+) extends LinkerBackend(semantics, outputMode.esLevel, withSourceMap, config) {
 
   private[this] val emitter = new Emitter(semantics, outputMode)
 

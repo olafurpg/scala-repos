@@ -36,8 +36,8 @@ abstract class BCodeIdiomatic extends SubComponent {
   val emitStackMapFrame = (majorVersion >= 50)
 
   val extraProc: Int = GenBCode.mkFlags(
-      asm.ClassWriter.COMPUTE_MAXS,
-      if (emitStackMapFrame) asm.ClassWriter.COMPUTE_FRAMES else 0
+    asm.ClassWriter.COMPUTE_MAXS,
+    if (emitStackMapFrame) asm.ClassWriter.COMPUTE_FRAMES else 0
   )
 
   lazy val JavaStringBuilderClassName = jlStringBuilderRef.internalName
@@ -185,10 +185,10 @@ abstract class BCodeIdiomatic extends SubComponent {
       jmethod.visitTypeInsn(Opcodes.NEW, JavaStringBuilderClassName)
       jmethod.visitInsn(Opcodes.DUP)
       invokespecial(
-          JavaStringBuilderClassName,
-          INSTANCE_CONSTRUCTOR_NAME,
-          "()V",
-          pos
+        JavaStringBuilderClassName,
+        INSTANCE_CONSTRUCTOR_NAME,
+        "()V",
+        pos
       )
     }
 
@@ -217,8 +217,10 @@ abstract class BCodeIdiomatic extends SubComponent {
      * can-multi-thread
      */
     final def genEndConcat(pos: Position): Unit = {
-      invokevirtual(
-          JavaStringBuilderClassName, "toString", "()Ljava/lang/String;", pos)
+      invokevirtual(JavaStringBuilderClassName,
+                    "toString",
+                    "()Ljava/lang/String;",
+                    pos)
     }
 
     /*
@@ -232,8 +234,8 @@ abstract class BCodeIdiomatic extends SubComponent {
     final def emitT2T(from: BType, to: BType) {
 
       assert(
-          from.isNonVoidPrimitiveType && to.isNonVoidPrimitiveType,
-          s"Cannot emit primitive conversion from $from to $to - ${global.currentUnit}"
+        from.isNonVoidPrimitiveType && to.isNonVoidPrimitiveType,
+        s"Cannot emit primitive conversion from $from to $to - ${global.currentUnit}"
       )
 
       def pickOne(opcs: Array[Int]) {
@@ -382,23 +384,31 @@ abstract class BCodeIdiomatic extends SubComponent {
     final def rem(tk: BType) { emitPrimitive(JCodeMethodN.remOpcodes, tk) } // can-multi-thread
 
     // can-multi-thread
-    final def invokespecial(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokespecial(owner: String,
+                            name: String,
+                            desc: String,
+                            pos: Position) {
       addInvoke(Opcodes.INVOKESPECIAL, owner, name, desc, false, pos)
     }
     // can-multi-thread
-    final def invokestatic(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokestatic(owner: String,
+                           name: String,
+                           desc: String,
+                           pos: Position) {
       addInvoke(Opcodes.INVOKESTATIC, owner, name, desc, false, pos)
     }
     // can-multi-thread
-    final def invokeinterface(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokeinterface(owner: String,
+                              name: String,
+                              desc: String,
+                              pos: Position) {
       addInvoke(Opcodes.INVOKEINTERFACE, owner, name, desc, true, pos)
     }
     // can-multi-thread
-    final def invokevirtual(
-        owner: String, name: String, desc: String, pos: Position) {
+    final def invokevirtual(owner: String,
+                            name: String,
+                            desc: String,
+                            pos: Position) {
       addInvoke(Opcodes.INVOKEVIRTUAL, owner, name, desc, false, pos)
     }
 
@@ -491,7 +501,7 @@ abstract class BCodeIdiomatic extends SubComponent {
       while (i < keys.length) {
         if (keys(i - 1) == keys(i)) {
           abort(
-              "duplicate keys in SWITCH, can't pick arbitrarily one of them to evict, see SI-6011.")
+            "duplicate keys in SWITCH, can't pick arbitrarily one of them to evict, see SI-6011.")
         }
         i += 1
       }
@@ -526,8 +536,8 @@ abstract class BCodeIdiomatic extends SubComponent {
           i += 1
         }
         assert(oldPos == keys.length, "emitSWITCH")
-        jmethod.visitTableSwitchInsn(
-            keyMin, keyMax, defaultBranch, newBranches: _*)
+        jmethod
+          .visitTableSwitchInsn(keyMin, keyMax, defaultBranch, newBranches: _*)
       } else {
         jmethod.visitLookupSwitchInsn(defaultBranch, keys, branches)
       }

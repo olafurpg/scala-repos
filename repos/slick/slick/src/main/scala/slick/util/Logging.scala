@@ -10,8 +10,9 @@ final class SlickLogger(val slf4jLogger: Slf4jLogger) {
     debug(msg + "\n" + SlickLogger.treePrinter.get(n))
 
   @inline
-  def debug(
-      msg: => String, n: => Dumpable, mark: (Dumpable => Boolean)): Unit =
+  def debug(msg: => String,
+            n: => Dumpable,
+            mark: (Dumpable => Boolean)): Unit =
     debug(msg + "\n" + SlickLogger.treePrinter.copy(mark = mark).get(n))
 
   @inline
@@ -73,8 +74,9 @@ final class SlickLogger(val slf4jLogger: Slf4jLogger) {
 }
 
 object SlickLogger {
-  private val treePrinter = new TreePrinter(prefix = DumpInfo.highlight(
-            if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
+  private val treePrinter = new TreePrinter(
+    prefix =
+      DumpInfo.highlight(if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
 
   def apply[T](implicit ct: ClassTag[T]): SlickLogger =
     new SlickLogger(LoggerFactory.getLogger(ct.runtimeClass))

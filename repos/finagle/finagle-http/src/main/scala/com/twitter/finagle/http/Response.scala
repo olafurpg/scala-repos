@@ -5,8 +5,17 @@ import com.twitter.collection.RecordSchema
 import com.twitter.finagle.http.netty.{HttpResponseProxy, Bijections}
 import com.twitter.io.Reader
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.jboss.netty.handler.codec.embedder.{DecoderEmbedder, EncoderEmbedder}
-import org.jboss.netty.handler.codec.http.{DefaultHttpResponse, HttpResponse, HttpResponseDecoder, HttpResponseEncoder, HttpResponseStatus}
+import org.jboss.netty.handler.codec.embedder.{
+  DecoderEmbedder,
+  EncoderEmbedder
+}
+import org.jboss.netty.handler.codec.http.{
+  DefaultHttpResponse,
+  HttpResponse,
+  HttpResponseDecoder,
+  HttpResponseEncoder,
+  HttpResponseStatus
+}
 
 import Bijections._
 
@@ -70,7 +79,7 @@ object Response {
   /** Decode a [[Response]] from a byte array */
   def decodeBytes(b: Array[Byte]): Response = {
     val decoder = new DecoderEmbedder(
-        new HttpResponseDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
+      new HttpResponseDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val res = decoder.poll().asInstanceOf[HttpResponse]
     assert(res ne null)
@@ -113,6 +122,7 @@ object Response {
   private[http] def apply(httpRequest: Request): Response =
     new Response {
       final val httpResponse = new DefaultHttpResponse(
-          httpRequest.getProtocolVersion, HttpResponseStatus.OK)
+        httpRequest.getProtocolVersion,
+        HttpResponseStatus.OK)
     }
 }

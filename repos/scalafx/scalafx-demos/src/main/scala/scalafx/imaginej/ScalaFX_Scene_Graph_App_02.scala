@@ -59,13 +59,13 @@ object ScalaFX_Scene_Graph_App_02 extends JFXApp {
     scene = new Scene(500, 500) {
       fill = Color.Black
       content = List(
-          new Rectangle {
-            x = 25
-            y = 25
-            width = 250
-            height = 250
-            fill = Color.Blue
-          }
+        new Rectangle {
+          x = 25
+          y = 25
+          width = 250
+          height = 250
+          fill = Color.Blue
+        }
       )
     }
   }

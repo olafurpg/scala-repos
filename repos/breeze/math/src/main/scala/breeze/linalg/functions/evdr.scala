@@ -57,8 +57,8 @@ object evdr extends UFunc {
                              nIter: Int = 0): DenseEigSym = {
 
     require(
-        s <= (M.rows min M.cols),
-        "Number of columns in orthonormal matrix should be less than min(M.rows, M.cols)")
+      s <= (M.rows min M.cols),
+      "Number of columns in orthonormal matrix should be less than min(M.rows, M.cols)")
     require(s >= 1, "Sketch size should be greater than 1")
 
     val nRandom = s + nOversamples
@@ -113,10 +113,8 @@ object evdr extends UFunc {
     val abs_u = abs(u)
     val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
     val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(
-        s =>
-          {
-        u(::, s._2) :*= s._1
+    signs.zipWithIndex.foreach(s => {
+      u(::, s._2) :*= s._1
     })
     u
   }

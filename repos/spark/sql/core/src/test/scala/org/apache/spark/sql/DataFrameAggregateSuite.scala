@@ -23,78 +23,88 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.DecimalType
 
-case class Fact(
-    date: Int, hour: Int, minute: Int, room_name: String, temp: Double)
+case class Fact(date: Int,
+                hour: Int,
+                minute: Int,
+                room_name: String,
+                temp: Double)
 
 class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
   import testImplicits._
 
   test("groupBy") {
     checkAnswer(
-        testData2.groupBy("a").agg(sum($"b")),
-        Seq(Row(1, 3), Row(2, 3), Row(3, 3))
+      testData2.groupBy("a").agg(sum($"b")),
+      Seq(Row(1, 3), Row(2, 3), Row(3, 3))
     )
     checkAnswer(
-        testData2.groupBy("a").agg(sum($"b").as("totB")).agg(sum('totB)),
-        Row(9)
+      testData2.groupBy("a").agg(sum($"b").as("totB")).agg(sum('totB)),
+      Row(9)
     )
     checkAnswer(
-        testData2.groupBy("a").agg(count("*")),
-        Row(1, 2) :: Row(2, 2) :: Row(3, 2) :: Nil
+      testData2.groupBy("a").agg(count("*")),
+      Row(1, 2) :: Row(2, 2) :: Row(3, 2) :: Nil
     )
     checkAnswer(
-        testData2.groupBy("a").agg(Map("*" -> "count")),
-        Row(1, 2) :: Row(2, 2) :: Row(3, 2) :: Nil
+      testData2.groupBy("a").agg(Map("*" -> "count")),
+      Row(1, 2) :: Row(2, 2) :: Row(3, 2) :: Nil
     )
     checkAnswer(
-        testData2.groupBy("a").agg(Map("b" -> "sum")),
-        Row(1, 3) :: Row(2, 3) :: Row(3, 3) :: Nil
+      testData2.groupBy("a").agg(Map("b" -> "sum")),
+      Row(1, 3) :: Row(2, 3) :: Row(3, 3) :: Nil
     )
 
     val df1 = Seq(("a", 1, 0, "b"), ("b", 2, 4, "c"), ("a", 2, 3, "d"))
       .toDF("key", "value1", "value2", "rest")
 
     checkAnswer(
-        df1.groupBy("key").min(),
-        df1.groupBy("key").min("value1", "value2").collect()
+      df1.groupBy("key").min(),
+      df1.groupBy("key").min("value1", "value2").collect()
     )
     checkAnswer(
-        df1.groupBy("key").min("value2"),
-        Seq(Row("a", 0), Row("b", 4))
+      df1.groupBy("key").min("value2"),
+      Seq(Row("a", 0), Row("b", 4))
     )
   }
 
   test("rollup") {
     checkAnswer(
-        courseSales.rollup("course", "year").sum("earnings"),
-        Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
-            "Java", null, 50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
-            "dotNET",
-            2013,
-            48000.0) :: Row("dotNET", null, 63000.0) :: Row(null,
-                                                            null,
-                                                            113000.0) :: Nil
+      courseSales.rollup("course", "year").sum("earnings"),
+      Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
+        "Java",
+        null,
+        50000.0) :: Row("dotNET", 2012, 15000.0) :: Row("dotNET",
+                                                        2013,
+                                                        48000.0) :: Row(
+        "dotNET",
+        null,
+        63000.0) :: Row(null, null, 113000.0) :: Nil
     )
   }
 
   test("cube") {
     checkAnswer(
-        courseSales.cube("course", "year").sum("earnings"),
-        Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
-            "Java", null, 50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
-            "dotNET",
-            2013,
-            48000.0) :: Row("dotNET", null, 63000.0) :: Row(null,
-                                                            2012,
-                                                            35000.0) :: Row(
-            null, 2013, 78000.0) :: Row(null, null, 113000.0) :: Nil
+      courseSales.cube("course", "year").sum("earnings"),
+      Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
+        "Java",
+        null,
+        50000.0) :: Row("dotNET", 2012, 15000.0) :: Row("dotNET",
+                                                        2013,
+                                                        48000.0) :: Row(
+        "dotNET",
+        null,
+        63000.0) :: Row(null, 2012, 35000.0) :: Row(null, 2013, 78000.0) :: Row(
+        null,
+        null,
+        113000.0) :: Nil
     )
 
     val df0 = sqlContext.sparkContext
-      .parallelize(Seq(Fact(20151123, 18, 35, "room1", 18.6),
-                       Fact(20151123, 18, 35, "room2", 22.4),
-                       Fact(20151123, 18, 36, "room1", 17.4),
-                       Fact(20151123, 18, 36, "room2", 25.6)))
+      .parallelize(
+        Seq(Fact(20151123, 18, 35, "room1", 18.6),
+            Fact(20151123, 18, 35, "room2", 22.4),
+            Fact(20151123, 18, 36, "room1", 17.4),
+            Fact(20151123, 18, 36, "room2", 25.6)))
       .toDF()
 
     val cube0 =
@@ -104,19 +114,27 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
 
   test("grouping and grouping_id") {
     checkAnswer(
-        courseSales
-          .cube("course", "year")
-          .agg(grouping("course"),
-               grouping("year"),
-               grouping_id("course", "year")),
-        Row("Java", 2012, 0, 0, 0) :: Row("Java", 2013, 0, 0, 0) :: Row(
-            "Java", null, 0, 1, 1) :: Row("dotNET", 2012, 0, 0, 0) :: Row(
-            "dotNET", 2013, 0, 0, 0) :: Row("dotNET", null, 0, 1, 1) :: Row(
-            null, 2012, 1, 0, 2) :: Row(null, 2013, 1, 0, 2) :: Row(null,
-                                                                    null,
-                                                                    1,
-                                                                    1,
-                                                                    3) :: Nil
+      courseSales
+        .cube("course", "year")
+        .agg(grouping("course"),
+             grouping("year"),
+             grouping_id("course", "year")),
+      Row("Java", 2012, 0, 0, 0) :: Row("Java", 2013, 0, 0, 0) :: Row(
+        "Java",
+        null,
+        0,
+        1,
+        1) :: Row("dotNET", 2012, 0, 0, 0) :: Row("dotNET", 2013, 0, 0, 0) :: Row(
+        "dotNET",
+        null,
+        0,
+        1,
+        1) :: Row(null, 2012, 1, 0, 2) :: Row(null, 2013, 1, 0, 2) :: Row(
+        null,
+        null,
+        1,
+        1,
+        3) :: Nil
     )
 
     intercept[AnalysisException] {
@@ -131,109 +149,115 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
 
     val w = Window.orderBy(sum("earnings"))
     checkAnswer(
-        courseSales
-          .cube("course", "year")
-          .agg(sum("earnings"),
-               grouping_id("course", "year"),
-               rank().over(Window
-                     .partitionBy(grouping_id("course", "year"))
-                     .orderBy(sum("earnings")))),
-        Row("Java", 2012, 20000.0, 0, 2) :: Row("Java", 2013, 30000.0, 0, 3) :: Row(
-            "Java",
-            null,
-            50000.0,
-            1,
-            1) :: Row("dotNET", 2012, 15000.0, 0, 1) :: Row("dotNET",
-                                                            2013,
-                                                            48000.0,
-                                                            0,
-                                                            4) :: Row(
-            "dotNET",
-            null,
-            63000.0,
-            1,
-            2) :: Row(null, 2012, 35000.0, 2, 1) :: Row(null,
-                                                        2013,
-                                                        78000.0,
+      courseSales
+        .cube("course", "year")
+        .agg(sum("earnings"),
+             grouping_id("course", "year"),
+             rank().over(
+               Window
+                 .partitionBy(grouping_id("course", "year"))
+                 .orderBy(sum("earnings")))),
+      Row("Java", 2012, 20000.0, 0, 2) :: Row("Java", 2013, 30000.0, 0, 3) :: Row(
+        "Java",
+        null,
+        50000.0,
+        1,
+        1) :: Row("dotNET", 2012, 15000.0, 0, 1) :: Row(
+        "dotNET",
+        2013,
+        48000.0,
+        0,
+        4) :: Row("dotNET", null, 63000.0, 1, 2) :: Row(null,
+                                                        2012,
+                                                        35000.0,
                                                         2,
-                                                        2) :: Row(null,
-                                                                  null,
-                                                                  113000.0,
-                                                                  3,
-                                                                  1) :: Nil
+                                                        1) :: Row(
+        null,
+        2013,
+        78000.0,
+        2,
+        2) :: Row(null, null, 113000.0, 3, 1) :: Nil
     )
   }
 
   test("rollup overlapping columns") {
     checkAnswer(
-        testData2
-          .rollup($"a" + $"b" as "foo", $"b" as "bar")
-          .agg(sum($"a" - $"b") as "foo"),
-        Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
-            4,
-            1,
-            2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
-            4, null, 2) :: Row(5, null, 1) :: Row(null, null, 3) :: Nil
+      testData2
+        .rollup($"a" + $"b" as "foo", $"b" as "bar")
+        .agg(sum($"a" - $"b") as "foo"),
+      Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
+        4,
+        1,
+        2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
+        4,
+        null,
+        2) :: Row(5, null, 1) :: Row(null, null, 3) :: Nil
     )
 
     checkAnswer(
-        testData2.rollup("a", "b").agg(sum("b")),
-        Row(1, 1, 1) :: Row(1, 2, 2) :: Row(2, 1, 1) :: Row(2, 2, 2) :: Row(
-            3,
-            1,
-            1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
-            3, null, 3) :: Row(null, null, 9) :: Nil
+      testData2.rollup("a", "b").agg(sum("b")),
+      Row(1, 1, 1) :: Row(1, 2, 2) :: Row(2, 1, 1) :: Row(2, 2, 2) :: Row(
+        3,
+        1,
+        1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
+        3,
+        null,
+        3) :: Row(null, null, 9) :: Nil
     )
   }
 
   test("cube overlapping columns") {
     checkAnswer(
-        testData2.cube($"a" + $"b", $"b").agg(sum($"a" - $"b")),
-        Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
-            4,
-            1,
-            2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
-            4, null, 2) :: Row(5, null, 1) :: Row(null, 1, 3) :: Row(
-            null, 2, 0) :: Row(null, null, 3) :: Nil
+      testData2.cube($"a" + $"b", $"b").agg(sum($"a" - $"b")),
+      Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
+        4,
+        1,
+        2) :: Row(5, 2, 1) :: Row(2, null, 0) :: Row(3, null, 0) :: Row(
+        4,
+        null,
+        2) :: Row(5, null, 1) :: Row(null, 1, 3) :: Row(null, 2, 0) :: Row(
+        null,
+        null,
+        3) :: Nil
     )
 
     checkAnswer(
-        testData2.cube("a", "b").agg(sum("b")),
-        Row(1, 1, 1) :: Row(1, 2, 2) :: Row(2, 1, 1) :: Row(2, 2, 2) :: Row(
-            3,
-            1,
-            1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
-            3, null, 3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null,
-                                                                     null,
-                                                                     9) :: Nil
+      testData2.cube("a", "b").agg(sum("b")),
+      Row(1, 1, 1) :: Row(1, 2, 2) :: Row(2, 1, 1) :: Row(2, 2, 2) :: Row(
+        3,
+        1,
+        1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
+        3,
+        null,
+        3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null, null, 9) :: Nil
     )
   }
 
   test("spark.sql.retainGroupColumns config") {
     checkAnswer(
-        testData2.groupBy("a").agg(sum($"b")),
-        Seq(Row(1, 3), Row(2, 3), Row(3, 3))
+      testData2.groupBy("a").agg(sum($"b")),
+      Seq(Row(1, 3), Row(2, 3), Row(3, 3))
     )
 
     sqlContext.conf.setConf(SQLConf.DATAFRAME_RETAIN_GROUP_COLUMNS, false)
     checkAnswer(
-        testData2.groupBy("a").agg(sum($"b")),
-        Seq(Row(3), Row(3), Row(3))
+      testData2.groupBy("a").agg(sum($"b")),
+      Seq(Row(3), Row(3), Row(3))
     )
     sqlContext.conf.setConf(SQLConf.DATAFRAME_RETAIN_GROUP_COLUMNS, true)
   }
 
   test("agg without groups") {
     checkAnswer(
-        testData2.agg(sum('b)),
-        Row(9)
+      testData2.agg(sum('b)),
+      Row(9)
     )
   }
 
   test("agg without groups and functions") {
     checkAnswer(
-        testData2.agg(lit(1)),
-        Row(1)
+      testData2.agg(lit(1)),
+      Row(1)
     )
   }
 
@@ -246,16 +270,16 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
     checkAnswer(decimalData.agg(avg('a)), Row(new java.math.BigDecimal(2.0)))
 
     checkAnswer(
-        decimalData.agg(avg('a), sumDistinct('a)), // non-partial
-        Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
+      decimalData.agg(avg('a), sumDistinct('a)), // non-partial
+      Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
 
     checkAnswer(decimalData.agg(avg('a cast DecimalType(10, 2))),
                 Row(new java.math.BigDecimal(2.0)))
     // non-partial
     checkAnswer(
-        decimalData.agg(avg('a cast DecimalType(10, 2)),
-                        sumDistinct('a cast DecimalType(10, 2))),
-        Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
+      decimalData.agg(avg('a cast DecimalType(10, 2)),
+                      sumDistinct('a cast DecimalType(10, 2))),
+      Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
   }
 
   test("null average") {
@@ -284,27 +308,28 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
 
   test("null count") {
     checkAnswer(
-        testData3.groupBy('a).agg(count('b)),
-        Seq(Row(1, 0), Row(2, 1))
+      testData3.groupBy('a).agg(count('b)),
+      Seq(Row(1, 0), Row(2, 1))
     )
 
     checkAnswer(
-        testData3.groupBy('a).agg(count('a + 'b)),
-        Seq(Row(1, 0), Row(2, 1))
+      testData3.groupBy('a).agg(count('a + 'b)),
+      Seq(Row(1, 0), Row(2, 1))
     )
 
     checkAnswer(
-        testData3.agg(count('a),
-                      count('b),
-                      count(lit(1)),
-                      countDistinct('a),
-                      countDistinct('b)),
-        Row(2, 1, 2, 2, 1)
+      testData3.agg(count('a),
+                    count('b),
+                    count(lit(1)),
+                    countDistinct('a),
+                    countDistinct('b)),
+      Row(2, 1, 2, 2, 1)
     )
 
     checkAnswer(
-        testData3.agg(count('b), countDistinct('b), sumDistinct('b)), // non-partial
-        Row(1, 1, 2)
+      testData3
+        .agg(count('b), countDistinct('b), sumDistinct('b)), // non-partial
+      Row(1, 1, 2)
     )
   }
 
@@ -317,18 +342,18 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
           ("x", "q", null.asInstanceOf[String])).toDF("key1", "key2", "key3")
 
     checkAnswer(
-        df1.agg(countDistinct('key1, 'key2)),
-        Row(3)
+      df1.agg(countDistinct('key1, 'key2)),
+      Row(3)
     )
 
     checkAnswer(
-        df1.agg(countDistinct('key1, 'key2, 'key3)),
-        Row(3)
+      df1.agg(countDistinct('key1, 'key2, 'key3)),
+      Row(3)
     )
 
     checkAnswer(
-        df1.groupBy('key1).agg(countDistinct('key2, 'key3)),
-        Seq(Row("a", 2), Row("x", 1))
+      df1.groupBy('key1).agg(countDistinct('key2, 'key3)),
+      Seq(Row("a", 2), Row("x", 1))
     )
   }
 
@@ -349,8 +374,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
   test("zero stddev") {
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(
-        emptyTableData.agg(stddev('a), stddev_pop('a), stddev_samp('a)),
-        Row(null, null, null))
+      emptyTableData.agg(stddev('a), stddev_pop('a), stddev_samp('a)),
+      Row(null, null, null))
   }
 
   test("zero sum") {

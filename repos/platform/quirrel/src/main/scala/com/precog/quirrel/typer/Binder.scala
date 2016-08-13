@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -34,107 +34,107 @@ trait Binder extends parser.AST {
 
   protected override lazy val LoadId = Identifier(Vector(), "load")
   protected override lazy val RelLoadId = Identifier(Vector(), "relativeLoad")
-  protected override lazy val ExpandGlobId = Identifier(
-      Vector("std", "fs"), "expandGlob")
+  protected override lazy val ExpandGlobId =
+    Identifier(Vector("std", "fs"), "expandGlob")
   protected override lazy val DistinctId = Identifier(Vector(), "distinct")
 
   override def bindNames(tree: Expr) = {
     def loop(tree: Expr, env: Env): Set[Error] = tree match {
       case b @ Let(_, id, formals, left, right) => {
-          val (_, dups) = formals.foldLeft((Set[TicId](), Set[TicId]())) {
-            case ((acc, dup), id) if acc(id) => (acc, dup + id)
-            case ((acc, dup), id) if !acc(id) => (acc + id, dup)
-          }
-
-          if (!dups.isEmpty) {
-            dups map { id =>
-              Error(b, MultiplyDefinedTicVariable(id))
-            }
-          } else {
-            val ids = formals map { Identifier(Vector(), _) }
-            val names2 = ids.foldLeft(env.names) { (m, s) =>
-              m + (s -> FormalBinding(b))
-            }
-            val env2 = env.copy(names = names2)
-            loop(left, env2) ++ loop(
-                right, env.copy(names = env.names + (id -> LetBinding(b))))
-          }
+        val (_, dups) = formals.foldLeft((Set[TicId](), Set[TicId]())) {
+          case ((acc, dup), id) if acc(id) => (acc, dup + id)
+          case ((acc, dup), id) if !acc(id) => (acc + id, dup)
         }
+
+        if (!dups.isEmpty) {
+          dups map { id =>
+            Error(b, MultiplyDefinedTicVariable(id))
+          }
+        } else {
+          val ids = formals map { Identifier(Vector(), _) }
+          val names2 = ids.foldLeft(env.names) { (m, s) =>
+            m + (s -> FormalBinding(b))
+          }
+          val env2 = env.copy(names = names2)
+          loop(left, env2) ++ loop(
+            right,
+            env.copy(names = env.names + (id -> LetBinding(b))))
+        }
+      }
 
       case b @ Solve(_, constraints, child) => {
-          val varVector = constraints map listFreeVars(env)
+        val varVector = constraints map listFreeVars(env)
 
-          val errors =
-            if (varVector exists { _.isEmpty })
-              Set(Error(b, SolveLackingFreeVariables))
-            else Set[Error]()
+        val errors =
+          if (varVector exists { _.isEmpty })
+            Set(Error(b, SolveLackingFreeVariables))
+          else Set[Error]()
 
-          val ids = varVector reduce { _ ++ _ }
-          b.vars = ids
+        val ids = varVector reduce { _ ++ _ }
+        b.vars = ids
 
-          val freeBindings = ids map { _ -> FreeBinding(b) }
-          val constEnv = env.copy(vars = env.vars ++ freeBindings)
-          val constErrors =
-            constraints map { loop(_, constEnv) } reduce { _ ++ _ }
+        val freeBindings = ids map { _ -> FreeBinding(b) }
+        val constEnv = env.copy(vars = env.vars ++ freeBindings)
+        val constErrors =
+          constraints map { loop(_, constEnv) } reduce { _ ++ _ }
 
-          val bindings =
-            ids map { id =>
-              id -> SolveBinding(b)
-            }
-          loop(child, env.copy(vars = env.vars ++ bindings)) ++ constErrors ++ errors
-        }
+        val bindings =
+          ids map { id =>
+            id -> SolveBinding(b)
+          }
+        loop(child, env.copy(vars = env.vars ++ bindings)) ++ constErrors ++ errors
+      }
 
       case Import(_, spec, child) => {
-          //todo see scalaz's Boolean.option
-          val addend = spec match {
-            case SpecificImport(prefix) => {
-                env.names flatMap {
-                  case (Identifier(ns, name), b) => {
-                      if (ns.length >= prefix.length) {
-                        if (ns zip prefix forall { case (a, b) => a == b })
-                          Some(
-                              Identifier(ns drop (prefix.length - 1), name) -> b)
-                        else None
-                      } else if (ns.length == prefix.length - 1) {
-                        if (ns zip prefix forall { case (a, b) => a == b }) {
-                          if (name == prefix.last)
-                            Some(Identifier(Vector(), name) -> b)
-                          else None
-                        } else {
-                          None
-                        }
-                      } else {
-                        None
-                      }
-                    }
-
-                  case _ => None
+        //todo see scalaz's Boolean.option
+        val addend = spec match {
+          case SpecificImport(prefix) => {
+            env.names flatMap {
+              case (Identifier(ns, name), b) => {
+                if (ns.length >= prefix.length) {
+                  if (ns zip prefix forall { case (a, b) => a == b })
+                    Some(Identifier(ns drop (prefix.length - 1), name) -> b)
+                  else None
+                } else if (ns.length == prefix.length - 1) {
+                  if (ns zip prefix forall { case (a, b) => a == b }) {
+                    if (name == prefix.last)
+                      Some(Identifier(Vector(), name) -> b)
+                    else None
+                  } else {
+                    None
+                  }
+                } else {
+                  None
                 }
               }
 
-            case WildcardImport(prefix) => {
-                env.names flatMap {
-                  case (Identifier(ns, name), b) => {
-                      if (ns.length >= prefix.length + 1) {
-                        if (ns zip prefix forall { case (a, b) => a == b })
-                          Some(Identifier(ns drop prefix.length, name) -> b)
-                        else None
-                      } else if (ns.length == prefix.length) {
-                        if (ns zip prefix forall { case (a, b) => a == b })
-                          Some(Identifier(Vector(), name) -> b)
-                        else None
-                      } else {
-                        None
-                      }
-                    }
-
-                  case _ => None
-                }
-              }
+              case _ => None
+            }
           }
 
-          loop(child, env.copy(names = env.names ++ addend))
+          case WildcardImport(prefix) => {
+            env.names flatMap {
+              case (Identifier(ns, name), b) => {
+                if (ns.length >= prefix.length + 1) {
+                  if (ns zip prefix forall { case (a, b) => a == b })
+                    Some(Identifier(ns drop prefix.length, name) -> b)
+                  else None
+                } else if (ns.length == prefix.length) {
+                  if (ns zip prefix forall { case (a, b) => a == b })
+                    Some(Identifier(Vector(), name) -> b)
+                  else None
+                } else {
+                  None
+                }
+              }
+
+              case _ => None
+            }
+          }
         }
+
+        loop(child, env.copy(names = env.names ++ addend))
+      }
 
       case Assert(_, pred, child) => loop(pred, env) ++ loop(child, env)
 
@@ -146,80 +146,80 @@ trait Binder extends parser.AST {
         loop(from, env) ++ loop(to, env) ++ loop(in, env)
 
       case t @ TicVar(_, name) => {
-          env.vars get name match {
-            case Some(b) => {
-                t.binding = b
-                Set()
-              }
-            case None => {
-                t.binding = NullBinding
-                Set(Error(t, UndefinedTicVariable(name)))
-              }
+        env.vars get name match {
+          case Some(b) => {
+            t.binding = b
+            Set()
+          }
+          case None => {
+            t.binding = NullBinding
+            Set(Error(t, UndefinedTicVariable(name)))
           }
         }
+      }
 
       case d @ Dispatch(_, name, actuals) => {
-          val recursive = (actuals map { loop(_, env) }).fold(Set()) { _ ++ _ }
-          if (env.names contains name) {
-            val binding = env.names(name)
+        val recursive = (actuals map { loop(_, env) }).fold(Set()) { _ ++ _ }
+        if (env.names contains name) {
+          val binding = env.names(name)
 
-            val arity = binding match {
-              case FormalBinding(_) => 0
-              case LetBinding(let) => let.params.length
-              case ReductionBinding(_) => 1
-              case LoadBinding => 1
-              case RelLoadBinding => 1
-              case DistinctBinding => 1
-              case ExpandGlobBinding => 1
-              case Morphism1Binding(_) => 1
-              case Morphism2Binding(_) => 2
-              case Op1Binding(_) => 1
-              case Op2Binding(_) => 2
-              case NullBinding => sys.error("unreachable code")
-            }
-
-            val functionLikeM = binding match {
-              case ReductionBinding(f) => Some(f)
-              case Morphism1Binding(f) => Some(f)
-              case Morphism2Binding(f) => Some(f)
-              case Op1Binding(f) => Some(f)
-              case Op2Binding(f) => Some(f)
-              case _ => None
-            }
-
-            val warningM = for {
-              f <- functionLikeM
-              deprecation <- f.deprecation
-            } yield Error(d, DeprecatedFunction(name, deprecation))
-
-            val errors =
-              if (actuals.length == arity) {
-                d.binding = binding
-                Set()
-              } else {
-                d.binding = NullBinding
-                Set(Error(d, IncorrectArity(arity, actuals.length)))
-              }
-
-            d.isReduction = env.names(name) match {
-              case ReductionBinding(_) => true
-              case _ => false
-            }
-
-            binding match {
-              case LetBinding(let) =>
-                let dispatches_+= d
-
-              case _ =>
-            }
-
-            recursive ++ errors ++ warningM.toSet
-          } else {
-            d.binding = NullBinding
-            d.isReduction = false
-            recursive + Error(d, UndefinedFunction(name))
+          val arity = binding match {
+            case FormalBinding(_) => 0
+            case LetBinding(let) => let.params.length
+            case ReductionBinding(_) => 1
+            case LoadBinding => 1
+            case RelLoadBinding => 1
+            case DistinctBinding => 1
+            case ExpandGlobBinding => 1
+            case Morphism1Binding(_) => 1
+            case Morphism2Binding(_) => 2
+            case Op1Binding(_) => 1
+            case Op2Binding(_) => 2
+            case NullBinding => sys.error("unreachable code")
           }
+
+          val functionLikeM = binding match {
+            case ReductionBinding(f) => Some(f)
+            case Morphism1Binding(f) => Some(f)
+            case Morphism2Binding(f) => Some(f)
+            case Op1Binding(f) => Some(f)
+            case Op2Binding(f) => Some(f)
+            case _ => None
+          }
+
+          val warningM = for {
+            f <- functionLikeM
+            deprecation <- f.deprecation
+          } yield Error(d, DeprecatedFunction(name, deprecation))
+
+          val errors =
+            if (actuals.length == arity) {
+              d.binding = binding
+              Set()
+            } else {
+              d.binding = NullBinding
+              Set(Error(d, IncorrectArity(arity, actuals.length)))
+            }
+
+          d.isReduction = env.names(name) match {
+            case ReductionBinding(_) => true
+            case _ => false
+          }
+
+          binding match {
+            case LetBinding(let) =>
+              let dispatches_+= d
+
+            case _ =>
+          }
+
+          recursive ++ errors ++ warningM.toSet
+        } else {
+          d.binding = NullBinding
+          d.isReduction = false
+          recursive + Error(d, UndefinedFunction(name))
         }
+      }
 
       case NaryOp(_, values) =>
         (values map { loop(_, env) }).fold(Set()) { _ ++ _ }
@@ -232,10 +232,12 @@ trait Binder extends parser.AST {
     // more have the same name.
     val builtIns =
       lib1.map(Op1Binding) ++ lib2.map(Op2Binding) ++ libReduction.map(
-          ReductionBinding) ++ libMorphism1.map(Morphism1Binding).filterNot {
+        ReductionBinding) ++ libMorphism1.map(Morphism1Binding).filterNot {
         _.name == ExpandGlobBinding.name
-      } ++ libMorphism2.map(Morphism2Binding) ++ Set(
-          LoadBinding, RelLoadBinding, DistinctBinding, ExpandGlobBinding)
+      } ++ libMorphism2.map(Morphism2Binding) ++ Set(LoadBinding,
+                                                     RelLoadBinding,
+                                                     DistinctBinding,
+                                                     ExpandGlobBinding)
 
     val env = Env(Map(), builtIns.map({ b =>
       b.name -> b
@@ -257,8 +259,8 @@ trait Binder extends parser.AST {
       values map listFreeVars(env) reduceOption { _ ++ _ } getOrElse Set()
   }
 
-  private case class Env(
-      vars: Map[TicId, VarBinding], names: Map[Identifier, NameBinding])
+  private case class Env(vars: Map[TicId, VarBinding],
+                         names: Map[Identifier, NameBinding])
 
   sealed trait NameBinding
   sealed trait VarBinding
@@ -279,7 +281,8 @@ trait Binder extends parser.AST {
   case class ReductionBinding(red: Reduction) extends BuiltInBinding {
     val name = Identifier(red.namespace, red.name)
     override val toString =
-      "<native: %s(%d)>".format(red.name, 1) //assumes all reductions are arity 1
+      "<native: %s(%d)>"
+        .format(red.name, 1) //assumes all reductions are arity 1
   }
 
   case object DistinctBinding extends BuiltInBinding {

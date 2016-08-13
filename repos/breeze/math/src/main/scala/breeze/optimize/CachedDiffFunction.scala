@@ -7,7 +7,7 @@ import breeze.linalg.copy
   *
   * @author dlwh
   */
-class CachedDiffFunction[T : CanCopy](obj: DiffFunction[T])
+class CachedDiffFunction[T: CanCopy](obj: DiffFunction[T])
     extends DiffFunction[T] {
 
   /** calculates the gradient at a point */
@@ -35,7 +35,7 @@ class CachedDiffFunction[T : CanCopy](obj: DiffFunction[T])
 /**
   * @author dlwh
   */
-class CachedBatchDiffFunction[T : CanCopy](obj: BatchDiffFunction[T])
+class CachedBatchDiffFunction[T: CanCopy](obj: BatchDiffFunction[T])
     extends BatchDiffFunction[T] {
 
   /** calculates the gradient at a point */

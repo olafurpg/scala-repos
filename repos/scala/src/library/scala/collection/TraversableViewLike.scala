@@ -73,8 +73,9 @@ trait TraversableViewLike[
     +A,
     +Coll,
     +This <: TraversableView[A, Coll] with TraversableViewLike[A, Coll, This]]
-    extends Traversable[A] with TraversableLike[A, This] with ViewMkString[A] {
-  self =>
+    extends Traversable[A]
+    with TraversableLike[A, This]
+    with ViewMkString[A] { self =>
 
   protected def underlying: Coll
   protected[this] def viewIdentifier: String = ""
@@ -93,7 +94,8 @@ trait TraversableViewLike[
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
-      extends Traversable[B] with Transformed[B]
+      extends Traversable[B]
+      with Transformed[B]
 
   /** The implementation base trait of this view.
     *  This trait and all its subtraits has to be re-implemented for each
@@ -316,8 +318,8 @@ trait TraversableViewLike[
     newForced(thisSeq.scanLeft(z)(op)).asInstanceOf[That]
 
   @migration(
-      "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
-      "2.9.0")
+    "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
+    "2.9.0")
   override def scanRight[B, That](z: B)(op: (A, B) => B)(
       implicit bf: CanBuildFrom[This, B, That]): That =
     newForced(thisSeq.scanRight(z)(op)).asInstanceOf[That]

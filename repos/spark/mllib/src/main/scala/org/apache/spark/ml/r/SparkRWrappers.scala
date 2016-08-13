@@ -19,7 +19,10 @@ package org.apache.spark.ml.api.r
 
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.attribute._
-import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressionModel}
+import org.apache.spark.ml.classification.{
+  LogisticRegression,
+  LogisticRegressionModel
+}
 import org.apache.spark.ml.clustering.{KMeans, KMeansModel}
 import org.apache.spark.ml.feature.{RFormula, VectorAssembler}
 import org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}
@@ -71,26 +74,26 @@ private[r] object SparkRWrappers {
   def getModelCoefficients(model: PipelineModel): Array[Double] = {
     model.stages.last match {
       case m: LinearRegressionModel => {
-          val coefficientStandardErrorsR =
-            Array(m.summary.coefficientStandardErrors.last) ++ m.summary.coefficientStandardErrors
-              .dropRight(1)
-          val tValuesR =
-            Array(m.summary.tValues.last) ++ m.summary.tValues.dropRight(1)
-          val pValuesR =
-            Array(m.summary.pValues.last) ++ m.summary.pValues.dropRight(1)
-          if (m.getFitIntercept) {
-            Array(m.intercept) ++ m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
-          } else {
-            m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
-          }
+        val coefficientStandardErrorsR =
+          Array(m.summary.coefficientStandardErrors.last) ++ m.summary.coefficientStandardErrors
+            .dropRight(1)
+        val tValuesR =
+          Array(m.summary.tValues.last) ++ m.summary.tValues.dropRight(1)
+        val pValuesR =
+          Array(m.summary.pValues.last) ++ m.summary.pValues.dropRight(1)
+        if (m.getFitIntercept) {
+          Array(m.intercept) ++ m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
+        } else {
+          m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
         }
+      }
       case m: LogisticRegressionModel => {
-          if (m.getFitIntercept) {
-            Array(m.intercept) ++ m.coefficients.toArray
-          } else {
-            m.coefficients.toArray
-          }
+        if (m.getFitIntercept) {
+          Array(m.intercept) ++ m.coefficients.toArray
+        } else {
+          m.coefficients.toArray
         }
+      }
       case m: KMeansModel =>
         m.clusterCenters.flatMap(_.toArray)
     }
@@ -102,7 +105,7 @@ private[r] object SparkRWrappers {
         m.summary.devianceResiduals
       case m: LogisticRegressionModel =>
         throw new UnsupportedOperationException(
-            "No deviance residuals available for LogisticRegressionModel")
+          "No deviance residuals available for LogisticRegressionModel")
     }
   }
 
@@ -111,7 +114,7 @@ private[r] object SparkRWrappers {
       case m: KMeansModel => Array(m.getK) ++ m.summary.size
       case other =>
         throw new UnsupportedOperationException(
-            s"KMeansModel required but ${other.getClass.getSimpleName} found.")
+          s"KMeansModel required but ${other.getClass.getSimpleName} found.")
     }
   }
 
@@ -125,11 +128,11 @@ private[r] object SparkRWrappers {
           m.summary.cluster
         } else {
           throw new UnsupportedOperationException(
-              s"Method (centers or classes) required but $method found.")
+            s"Method (centers or classes) required but $method found.")
         }
       case other =>
         throw new UnsupportedOperationException(
-            s"KMeansModel required but ${other.getClass.getSimpleName} found.")
+          s"KMeansModel required but ${other.getClass.getSimpleName} found.")
     }
   }
 
@@ -137,7 +140,7 @@ private[r] object SparkRWrappers {
     model.stages.last match {
       case m: LinearRegressionModel =>
         val attrs = AttributeGroup.fromStructField(
-            m.summary.predictions.schema(m.summary.featuresCol))
+          m.summary.predictions.schema(m.summary.featuresCol))
         if (m.getFitIntercept) {
           Array("(Intercept)") ++ attrs.attributes.get.map(_.name.get)
         } else {
@@ -145,7 +148,7 @@ private[r] object SparkRWrappers {
         }
       case m: LogisticRegressionModel =>
         val attrs = AttributeGroup.fromStructField(
-            m.summary.predictions.schema(m.summary.featuresCol))
+          m.summary.predictions.schema(m.summary.featuresCol))
         if (m.getFitIntercept) {
           Array("(Intercept)") ++ attrs.attributes.get.map(_.name.get)
         } else {
@@ -153,7 +156,7 @@ private[r] object SparkRWrappers {
         }
       case m: KMeansModel =>
         val attrs = AttributeGroup.fromStructField(
-            m.summary.predictions.schema(m.summary.featuresCol))
+          m.summary.predictions.schema(m.summary.featuresCol))
         attrs.attributes.get.map(_.name.get)
     }
   }

@@ -12,7 +12,8 @@ object SeqNo {
     override def compare(x: SeqNo, y: SeqNo): Int = {
       val sgn =
         if (x.rawValue < y.rawValue) -1
-        else if (x.rawValue > y.rawValue) 1 else 0
+        else if (x.rawValue > y.rawValue) 1
+        else 0
       if (((x.rawValue - y.rawValue) * sgn) < 0L) -sgn else sgn
     }
   }
@@ -77,7 +78,7 @@ class ResendBufferCapacityReachedException(c: Int)
 
 class ResendUnfulfillableException
     extends AkkaException(
-        "Unable to fulfill resend request since negatively acknowledged payload is no longer in buffer. " +
+      "Unable to fulfill resend request since negatively acknowledged payload is no longer in buffer. " +
         "The resend states between two systems are compromised and cannot be recovered.")
 
 /**
@@ -105,7 +106,7 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
   def acknowledge(ack: Ack): AckedSendBuffer[T] = {
     if (ack.cumulativeAck > maxSeq)
       throw new IllegalArgumentException(
-          s"Highest SEQ so far was $maxSeq but cumulative ACK is ${ack.cumulativeAck}")
+        s"Highest SEQ so far was $maxSeq but cumulative ACK is ${ack.cumulativeAck}")
     val newNacked =
       if (ack.nacks.isEmpty) Vector.empty
       else
@@ -128,7 +129,7 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
   def buffer(msg: T): AckedSendBuffer[T] = {
     if (msg.seq <= maxSeq)
       throw new IllegalArgumentException(
-          s"Sequence number must be monotonic. Received [${msg.seq}] " +
+        s"Sequence number must be monotonic. Received [${msg.seq}] " +
           s"which is smaller than [$maxSeq]")
 
     if (nonAcked.size == capacity)
@@ -164,9 +165,11 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
     */
   def receive(arrivedMsg: T): AckedReceiveBuffer[T] = {
     this.copy(
-        cumulativeAck = max(arrivedMsg.seq, cumulativeAck),
-        buf = if (arrivedMsg.seq > lastDelivered && !buf.contains(arrivedMsg))
-            buf + arrivedMsg else buf)
+      cumulativeAck = max(arrivedMsg.seq, cumulativeAck),
+      buf =
+        if (arrivedMsg.seq > lastDelivered && !buf.contains(arrivedMsg))
+          buf + arrivedMsg
+        else buf)
   }
 
   /**

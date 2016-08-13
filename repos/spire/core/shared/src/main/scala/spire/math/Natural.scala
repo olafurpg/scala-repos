@@ -20,7 +20,9 @@ import Natural._
 
 @SerialVersionUID(0L)
 sealed abstract class Natural
-    extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable { lhs =>
 
   def digit: UInt
 
@@ -330,7 +332,7 @@ sealed abstract class Natural
       }
     if (lhs < rhs)
       throw new ArithmeticException(
-          "negative subtraction: %s - %s" format (lhs, rhs))
+        "negative subtraction: %s - %s" format (lhs, rhs))
     else recur(lhs, rhs, 0L)
   }
 
@@ -341,8 +343,8 @@ sealed abstract class Natural
         case End(rd) => lhs * rd
         case Digit(rd, rtail) =>
           Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
-          Digit(UInt(0), ltail * rd) + Digit(UInt(0), rtail * ld) + Natural(
-              ld.toLong * rd.toLong)
+            Digit(UInt(0), ltail * rd) + Digit(UInt(0), rtail * ld) + Natural(
+            ld.toLong * rd.toLong)
       }
   }
 
@@ -578,7 +580,7 @@ object Natural extends NaturalInstances {
   def apply(n: BigInt): Natural =
     if (n < 0)
       throw new IllegalArgumentException(
-          "negative numbers not allowed: %s" format n)
+        "negative numbers not allowed: %s" format n)
     else if (n < 0xffffffffL) End(UInt(n.toLong))
     else Digit(UInt((n & 0xffffffffL).toLong), apply(n >> 32))
 
@@ -681,7 +683,7 @@ object Natural extends NaturalInstances {
         if (t >= 0L) End(UInt(t.toInt))
         else
           throw new IllegalArgumentException(
-              "illegal subtraction: %s %s" format (this, n))
+            "illegal subtraction: %s %s" format (this, n))
       }
 
     def *(n: UInt): Natural =
@@ -704,8 +706,12 @@ object Natural extends NaturalInstances {
 trait NaturalInstances {
   implicit final val NaturalAlgebra = new NaturalAlgebra
   import NumberTag._
-  implicit final val NaturalTag = new CustomTag[Natural](
-      Integral, Some(Natural.zero), Some(Natural.zero), None, false, false)
+  implicit final val NaturalTag = new CustomTag[Natural](Integral,
+                                                         Some(Natural.zero),
+                                                         Some(Natural.zero),
+                                                         None,
+                                                         false,
+                                                         false)
 }
 
 private[math] trait NaturalIsRig extends Rig[Natural] {
@@ -736,7 +742,9 @@ private[math] trait NaturalIsSigned extends Signed[Natural] {
 }
 
 private[math] trait NaturalIsReal
-    extends IsIntegral[Natural] with NaturalOrder with NaturalIsSigned {
+    extends IsIntegral[Natural]
+    with NaturalOrder
+    with NaturalIsSigned {
   def toDouble(n: Natural): Double = n.toDouble
   def toBigInt(n: Natural): BigInt = n.toBigInt
 }

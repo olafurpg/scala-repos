@@ -19,7 +19,12 @@ package kafka.admin
 import java.util.Properties
 
 import joptsimple.{OptionParser, OptionSpec}
-import kafka.api.{OffsetFetchRequest, OffsetFetchResponse, OffsetRequest, PartitionOffsetRequestInfo}
+import kafka.api.{
+  OffsetFetchRequest,
+  OffsetFetchResponse,
+  OffsetRequest,
+  PartitionOffsetRequestInfo
+}
 import kafka.client.ClientUtils
 import kafka.common.{TopicAndPartition, _}
 import kafka.consumer.SimpleConsumer
@@ -44,16 +49,16 @@ object ConsumerGroupCommand {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          opts.parser,
-          "List all consumer groups, describe a consumer group, or delete consumer group info.")
+        opts.parser,
+        "List all consumer groups, describe a consumer group, or delete consumer group info.")
 
     // should have exactly one action
     val actions = Seq(opts.listOpt, opts.describeOpt, opts.deleteOpt)
       .count(opts.options.has _)
     if (actions != 1)
       CommandLineUtils.printUsageAndDie(
-          opts.parser,
-          "Command must include exactly one action: --list, --describe, --delete")
+        opts.parser,
+        "Command must include exactly one action: --list, --describe, --delete")
 
     opts.checkArgs()
 
@@ -72,7 +77,7 @@ object ConsumerGroupCommand {
           case service: ZkConsumerGroupService => service.delete()
           case _ =>
             throw new IllegalStateException(
-                s"delete is not supported for $consumerGroupService")
+              s"delete is not supported for $consumerGroupService")
         }
       }
     } catch {
@@ -96,8 +101,8 @@ object ConsumerGroupCommand {
 
     protected def opts: ConsumerGroupCommandOptions
 
-    protected def getLogEndOffset(
-        topic: String, partition: Int): LogEndOffsetResult
+    protected def getLogEndOffset(topic: String,
+                                  partition: Int): LogEndOffsetResult
 
     protected def describeGroup(group: String): Unit
 
@@ -119,13 +124,13 @@ object ConsumerGroupCommand {
 
     protected def printDescribeHeader() {
       println(
-          "%-30s %-30s %-10s %-15s %-15s %-15s %s".format("GROUP",
-                                                          "TOPIC",
-                                                          "PARTITION",
-                                                          "CURRENT-OFFSET",
-                                                          "LOG-END-OFFSET",
-                                                          "LAG",
-                                                          "OWNER"))
+        "%-30s %-30s %-10s %-15s %-15s %-15s %s".format("GROUP",
+                                                        "TOPIC",
+                                                        "PARTITION",
+                                                        "CURRENT-OFFSET",
+                                                        "LOG-END-OFFSET",
+                                                        "LAG",
+                                                        "OWNER"))
     }
 
     private def describePartition(group: String,
@@ -138,14 +143,14 @@ object ConsumerGroupCommand {
           .filter(_ != -1)
           .flatMap(offset => logEndOffset.map(_ - offset))
         println(
-            "%-30s %-30s %-10s %-15s %-15s %-15s %s".format(
-                group,
-                topic,
-                partition,
-                offsetOpt.getOrElse("unknown"),
-                logEndOffset.getOrElse("unknown"),
-                lag.getOrElse("unknown"),
-                ownerOpt.getOrElse("none")))
+          "%-30s %-30s %-10s %-15s %-15s %-15s %s".format(
+            group,
+            topic,
+            partition,
+            offsetOpt.getOrElse("unknown"),
+            logEndOffset.getOrElse("unknown"),
+            lag.getOrElse("unknown"),
+            ownerOpt.getOrElse("none")))
       }
       getLogEndOffset(topic, partition) match {
         case LogEndOffsetResult.LogEndOffset(logEndOffset) =>
@@ -192,9 +197,12 @@ object ConsumerGroupCommand {
       if (topics.isEmpty)
         println("No topic available for consumer group provided")
       printDescribeHeader()
-      topics.foreach(topic =>
-            describeTopic(
-                group, topic, channelSocketTimeoutMs, channelRetryBackoffMs))
+      topics.foreach(
+        topic =>
+          describeTopic(group,
+                        topic,
+                        channelSocketTimeoutMs,
+                        channelRetryBackoffMs))
     }
 
     private def describeTopic(group: String,
@@ -206,7 +214,7 @@ object ConsumerGroupCommand {
       val ownerByTopicPartition = topicPartitions.flatMap { topicPartition =>
         zkUtils
           .readDataMaybeNull(
-              groupDirs.consumerOwnerDir + "/" + topicPartition.partition)
+            groupDirs.consumerOwnerDir + "/" + topicPartition.partition)
           ._1
           .map { owner =>
             topicPartition -> owner
@@ -228,16 +236,18 @@ object ConsumerGroupCommand {
       partitions.map(TopicAndPartition(topic, _))
     }
 
-    protected def getLogEndOffset(
-        topic: String, partition: Int): LogEndOffsetResult = {
+    protected def getLogEndOffset(topic: String,
+                                  partition: Int): LogEndOffsetResult = {
       zkUtils.getLeaderForPartition(topic, partition) match {
         case Some(-1) => LogEndOffsetResult.Unknown
         case Some(brokerId) =>
           getZkConsumer(brokerId).map { consumer =>
             val topicAndPartition = new TopicAndPartition(topic, partition)
             val request = OffsetRequest(
-                Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                        OffsetRequest.LatestTime, 1)))
+              Map(
+                topicAndPartition -> PartitionOffsetRequestInfo(
+                  OffsetRequest.LatestTime,
+                  1)))
             val logEndOffset = consumer
               .getOffsetsBefore(request)
               .partitionErrorAndOffsets(topicAndPartition)
@@ -248,7 +258,7 @@ object ConsumerGroupCommand {
           }.getOrElse(LogEndOffsetResult.Ignore)
         case None =>
           println(
-              s"No broker for partition ${new TopicPartition(topic, partition)}")
+            s"No broker for partition ${new TopicPartition(topic, partition)}")
           LogEndOffsetResult.Ignore
       }
     }
@@ -259,8 +269,10 @@ object ConsumerGroupCommand {
         channelSocketTimeoutMs: Int,
         channelRetryBackoffMs: Int): Map[TopicAndPartition, Long] = {
       val offsetMap = mutable.Map[TopicAndPartition, Long]()
-      val channel = ClientUtils.channelToOffsetManager(
-          group, zkUtils, channelSocketTimeoutMs, channelRetryBackoffMs)
+      val channel = ClientUtils.channelToOffsetManager(group,
+                                                       zkUtils,
+                                                       channelSocketTimeoutMs,
+                                                       channelRetryBackoffMs)
       channel.send(OffsetFetchRequest(group, topicPartitions))
       val offsetFetchResponse =
         OffsetFetchResponse.readFrom(channel.receive().payload())
@@ -274,7 +286,8 @@ object ConsumerGroupCommand {
             // (meaning the lag may be off until all the consumers in the group have the same setting for offsets storage)
             try {
               val offset = zkUtils
-                .readData(topicDirs.consumerOffsetDir +
+                .readData(
+                  topicDirs.consumerOffsetDir +
                     "/" + topicAndPartition.partition)
                 ._1
                 .toLong
@@ -282,17 +295,17 @@ object ConsumerGroupCommand {
             } catch {
               case z: ZkNoNodeException =>
                 println(
-                    "Could not fetch offset from zookeeper for group %s partition %s due to missing offset data in zookeeper."
-                      .format(group, topicAndPartition))
+                  "Could not fetch offset from zookeeper for group %s partition %s due to missing offset data in zookeeper."
+                    .format(group, topicAndPartition))
             }
           } else if (offsetAndMetadata.error == Errors.NONE.code)
             offsetMap.put(topicAndPartition, offsetAndMetadata.offset)
           else
             println(
-                "Could not fetch offset from kafka for group %s partition %s due to %s."
-                  .format(group,
-                          topicAndPartition,
-                          Errors.forCode(offsetAndMetadata.error).exception))
+              "Could not fetch offset from kafka for group %s partition %s due to %s."
+                .format(group,
+                        topicAndPartition,
+                        Errors.forCode(offsetAndMetadata.error).exception))
       }
       channel.disconnect()
       offsetMap.toMap
@@ -304,16 +317,17 @@ object ConsumerGroupCommand {
         try {
           if (AdminUtils.deleteConsumerGroupInZK(zkUtils, group))
             println(
-                "Deleted all consumer group information for group %s in zookeeper."
-                  .format(group))
+              "Deleted all consumer group information for group %s in zookeeper."
+                .format(group))
           else
             println(
-                "Delete for group %s failed because its consumers are still active."
-                  .format(group))
+              "Delete for group %s failed because its consumers are still active."
+                .format(group))
         } catch {
           case e: ZkNoNodeException =>
-            println("Delete for group %s failed because group does not exist."
-                  .format(group))
+            println(
+              "Delete for group %s failed because group does not exist."
+                .format(group))
         }
       }
     }
@@ -324,20 +338,21 @@ object ConsumerGroupCommand {
       Topic.validate(topic)
       groups.asScala.foreach { group =>
         try {
-          if (AdminUtils.deleteConsumerGroupInfoForTopicInZK(
-                  zkUtils, group, topic))
+          if (AdminUtils.deleteConsumerGroupInfoForTopicInZK(zkUtils,
+                                                             group,
+                                                             topic))
             println(
-                "Deleted consumer group information for group %s topic %s in zookeeper."
-                  .format(group, topic))
+              "Deleted consumer group information for group %s topic %s in zookeeper."
+                .format(group, topic))
           else
             println(
-                "Delete for group %s topic %s failed because its consumers are still active."
-                  .format(group, topic))
+              "Delete for group %s topic %s failed because its consumers are still active."
+                .format(group, topic))
         } catch {
           case e: ZkNoNodeException =>
             println(
-                "Delete for group %s topic %s failed because group does not exist."
-                  .format(group, topic))
+              "Delete for group %s topic %s failed because group does not exist."
+                .format(group, topic))
         }
       }
     }
@@ -347,28 +362,34 @@ object ConsumerGroupCommand {
       Topic.validate(topic)
       AdminUtils.deleteAllConsumerGroupInfoForTopicInZK(zkUtils, topic)
       println(
-          "Deleted consumer group information for all inactive consumer groups for topic %s in zookeeper."
-            .format(topic))
+        "Deleted consumer group information for all inactive consumer groups for topic %s in zookeeper."
+          .format(topic))
     }
 
     private def getZkConsumer(brokerId: Int): Option[SimpleConsumer] = {
       try {
-        zkUtils.readDataMaybeNull(ZkUtils.BrokerIdsPath + "/" + brokerId)._1 match {
+        zkUtils
+          .readDataMaybeNull(ZkUtils.BrokerIdsPath + "/" + brokerId)
+          ._1 match {
           case Some(brokerInfoString) =>
             Json.parseFull(brokerInfoString) match {
               case Some(m) =>
                 val brokerInfo = m.asInstanceOf[Map[String, Any]]
                 val host = brokerInfo.get("host").get.asInstanceOf[String]
                 val port = brokerInfo.get("port").get.asInstanceOf[Int]
-                Some(new SimpleConsumer(
-                        host, port, 10000, 100000, "ConsumerGroupCommand"))
+                Some(
+                  new SimpleConsumer(host,
+                                     port,
+                                     10000,
+                                     100000,
+                                     "ConsumerGroupCommand"))
               case None =>
                 throw new BrokerNotAvailableException(
-                    "Broker id %d does not exist".format(brokerId))
+                  "Broker id %d does not exist".format(brokerId))
             }
           case None =>
             throw new BrokerNotAvailableException(
-                "Broker id %d does not exist".format(brokerId))
+              "Broker id %d does not exist".format(brokerId))
         }
       } catch {
         case t: Throwable =>
@@ -400,28 +421,30 @@ object ConsumerGroupCommand {
         val consumer = getConsumer()
         printDescribeHeader()
         consumerSummaries.foreach { consumerSummary =>
-          val topicPartitions = consumerSummary.assignment.map(
-              tp => TopicAndPartition(tp.topic, tp.partition))
+          val topicPartitions = consumerSummary.assignment.map(tp =>
+            TopicAndPartition(tp.topic, tp.partition))
           val partitionOffsets = topicPartitions.flatMap { topicPartition =>
-            Option(consumer.committed(new TopicPartition(
-                        topicPartition.topic, topicPartition.partition))).map {
+            Option(
+              consumer.committed(
+                new TopicPartition(topicPartition.topic,
+                                   topicPartition.partition))).map {
               offsetAndMetadata =>
                 topicPartition -> offsetAndMetadata.offset
             }
           }.toMap
           describeTopicPartition(
-              group,
-              topicPartitions,
-              partitionOffsets.get,
-              _ =>
-                Some(
-                    s"${consumerSummary.clientId}_${consumerSummary.clientHost}"))
+            group,
+            topicPartitions,
+            partitionOffsets.get,
+            _ =>
+              Some(
+                s"${consumerSummary.clientId}_${consumerSummary.clientHost}"))
         }
       }
     }
 
-    protected def getLogEndOffset(
-        topic: String, partition: Int): LogEndOffsetResult = {
+    protected def getLogEndOffset(topic: String,
+                                  partition: Int): LogEndOffsetResult = {
       val consumer = getConsumer()
       val topicPartition = new TopicPartition(topic, partition)
       consumer.assign(List(topicPartition).asJava)
@@ -455,17 +478,17 @@ object ConsumerGroupCommand {
       val deserializer = (new StringDeserializer).getClass.getName
       val brokerUrl = opts.options.valueOf(opts.bootstrapServerOpt)
       properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
-      properties.put(
-          ConsumerConfig.GROUP_ID_CONFIG, opts.options.valueOf(opts.groupOpt))
+      properties.put(ConsumerConfig.GROUP_ID_CONFIG,
+                     opts.options.valueOf(opts.groupOpt))
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
       properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000")
-      properties.put(
-          ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, deserializer)
-      properties.put(
-          ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer)
+      properties
+        .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, deserializer)
+      properties
+        .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer)
       if (opts.options.has(opts.commandConfigOpt))
         properties.putAll(
-            Utils.loadProps(opts.options.valueOf(opts.commandConfigOpt)))
+          Utils.loadProps(opts.options.valueOf(opts.commandConfigOpt)))
 
       new KafkaConsumer(properties)
     }
@@ -482,7 +505,7 @@ object ConsumerGroupCommand {
   class ConsumerGroupCommandOptions(args: Array[String]) {
     val ZkConnectDoc =
       "REQUIRED (unless new-consumer is used): The connection string for the zookeeper connection in the form host:port. " +
-      "Multiple URLS can be given to allow fail-over."
+        "Multiple URLS can be given to allow fail-over."
     val BootstrapServerDoc =
       "REQUIRED (only when using new-consumer): The server to connect to."
     val GroupDoc = "The consumer group we wish to act on."
@@ -494,14 +517,14 @@ object ConsumerGroupCommand {
     val nl = System.getProperty("line.separator")
     val DeleteDoc =
       "Pass in groups to delete topic partition offsets and ownership information " +
-      "over the entire consumer group. For instance --group g1 --group g2" +
-      nl +
-      "Pass in groups with a single topic to just delete the given topic's partition offsets and ownership " +
-      "information for the given consumer groups. For instance --group g1 --group g2 --topic t1" +
-      nl +
-      "Pass in just a topic to delete the given topic's partition offsets and ownership information " +
-      "for every consumer group. For instance --topic t1" + nl +
-      "WARNING: Group deletion only works for old ZK-based consumer groups, and one has to use it carefully to only delete groups that are not active."
+        "over the entire consumer group. For instance --group g1 --group g2" +
+        nl +
+        "Pass in groups with a single topic to just delete the given topic's partition offsets and ownership " +
+        "information for the given consumer groups. For instance --group g1 --group g2 --topic t1" +
+        nl +
+        "Pass in just a topic to delete the given topic's partition offsets and ownership information " +
+        "for every consumer group. For instance --topic t1" + nl +
+        "WARNING: Group deletion only works for old ZK-based consumer groups, and one has to use it carefully to only delete groups that are not active."
     val NewConsumerDoc = "Use new consumer."
     val CommandConfigDoc =
       "Property file containing configs to be passed to Admin Client and Consumer."
@@ -537,8 +560,8 @@ object ConsumerGroupCommand {
       .ofType(classOf[String])
     val options = parser.parse(args: _*)
 
-    val allConsumerGroupLevelOpts: Set[OptionSpec[_]] = Set(
-        listOpt, describeOpt, deleteOpt)
+    val allConsumerGroupLevelOpts: Set[OptionSpec[_]] =
+      Set(listOpt, describeOpt, deleteOpt)
 
     def checkArgs() {
       // check required args
@@ -547,13 +570,13 @@ object ConsumerGroupCommand {
 
         if (options.has(zkConnectOpt))
           CommandLineUtils.printUsageAndDie(
-              parser,
-              s"Option $zkConnectOpt is not valid with $newConsumerOpt")
+            parser,
+            s"Option $zkConnectOpt is not valid with $newConsumerOpt")
 
         if (options.has(deleteOpt))
           CommandLineUtils.printUsageAndDie(
-              parser,
-              s"Option $deleteOpt is not valid with $newConsumerOpt. Note that " +
+            parser,
+            s"Option $deleteOpt is not valid with $newConsumerOpt. Note that " +
               "there's no need to delete group metadata for the new consumer as it is automatically deleted when the last " +
               "member leaves")
       } else {
@@ -561,8 +584,8 @@ object ConsumerGroupCommand {
 
         if (options.has(bootstrapServerOpt))
           CommandLineUtils.printUsageAndDie(
-              parser,
-              s"Option $bootstrapServerOpt is only valid with $newConsumerOpt")
+            parser,
+            s"Option $bootstrapServerOpt is only valid with $newConsumerOpt")
       }
 
       if (options.has(describeOpt))
@@ -570,18 +593,20 @@ object ConsumerGroupCommand {
       if (options.has(deleteOpt) && !options.has(groupOpt) &&
           !options.has(topicOpt))
         CommandLineUtils.printUsageAndDie(
-            parser,
-            "Option %s either takes %s, %s, or both".format(
-                deleteOpt, groupOpt, topicOpt))
+          parser,
+          "Option %s either takes %s, %s, or both"
+            .format(deleteOpt, groupOpt, topicOpt))
 
       // check invalid args
       CommandLineUtils.checkInvalidArgs(
-          parser,
-          options,
-          groupOpt,
-          allConsumerGroupLevelOpts - describeOpt - deleteOpt)
-      CommandLineUtils.checkInvalidArgs(
-          parser, options, topicOpt, allConsumerGroupLevelOpts - deleteOpt)
+        parser,
+        options,
+        groupOpt,
+        allConsumerGroupLevelOpts - describeOpt - deleteOpt)
+      CommandLineUtils.checkInvalidArgs(parser,
+                                        options,
+                                        topicOpt,
+                                        allConsumerGroupLevelOpts - deleteOpt)
     }
   }
 }

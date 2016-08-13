@@ -33,22 +33,22 @@ object SqlToSlick extends App {
   import Tables._
 
   lazy val inserts = DBIO.seq(
-      addresses += (0, "station 14", "Lausanne"),
-      addresses += (0, "Grand Central 1", "New York City"),
-      people += (0, "C. Vogt", 999, 1),
-      people += (0, "J. Vogt", 1001, 1),
-      people += (0, "J. Doe", 18, 2)
+    addresses += (0, "station 14", "Lausanne"),
+    addresses += (0, "Grand Central 1", "New York City"),
+    people += (0, "C. Vogt", 999, 1),
+    people += (0, "J. Vogt", 1001, 1),
+    people += (0, "J. Doe", 18, 2)
   )
 
   val db = Database.forConfig("h2mem1")
   try {
 
     Await.result(db.run(
-                     DBIO.seq(
-                         addresses.schema.create,
-                         people.schema.create,
-                         inserts
-                     )),
+                   DBIO.seq(
+                     addresses.schema.create,
+                     people.schema.create,
+                     inserts
+                   )),
                  Duration.Inf)
 
     def _jdbc = {
@@ -141,7 +141,8 @@ object SqlToSlick extends App {
       //#dbFunction
 
       val (sRes, pRes) = Await.result(
-          db.run(squared.to[Set].result.zip(pow.to[Set].result)), Duration.Inf)
+        db.run(squared.to[Set].result.zip(pow.to[Set].result)),
+        Duration.Inf)
       assert(sRes == pRes)
       assert(Set(998001, 1002001) subsetOf pRes)
     };
@@ -272,17 +273,19 @@ object SqlToSlick extends App {
         //#sqlQueryImplicitJoin
         val slick = //#slickQueryImplicitJoin
         people
-          .flatMap(p =>
-                addresses
-                  .filter(a => p.addressId === a.id)
-                  .map(a => (p.name, a.city)))
+          .flatMap(
+            p =>
+              addresses
+                .filter(a => p.addressId === a.id)
+                .map(a => (p.name, a.city)))
           .result
 
         //#slickQueryImplicitJoin
         val slick2 = //#slickQueryImplicitJoin
         // or equivalent for-expression:
         (for (p <- people;
-        a <- addresses if p.addressId === a.id) yield (p.name, a.city)).result
+              a <- addresses if p.addressId === a.id)
+          yield (p.name, a.city)).result
         //#slickQueryImplicitJoin
         val ((sqlRes, slickRes), slick2Res) =
           Await.result(db.run(sql zip slick zip slick2), Duration.Inf)
@@ -410,7 +413,7 @@ object SqlToSlick extends App {
         val slickInsert = {
           //#slickQueryInsert
           people.map(p => (p.name, p.age, p.addressId)) +=
-          ("M Odersky", 12345, 1)
+            ("M Odersky", 12345, 1)
           //#slickQueryInsert
         }
         val slickUpdate = {
@@ -452,7 +455,7 @@ object SqlToSlick extends App {
         val slick = //#slickCase
         people
           .map(p =>
-                Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
+            Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
           .result
         //#slickCase
         val (sqlRes, slickRes) =

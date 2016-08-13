@@ -51,7 +51,7 @@ abstract class PersistenceEngine {
     * Gives all objects, matching a prefix. This defines how objects are
     * read/deserialized back.
     */
-  def read[T : ClassTag](prefix: String): Seq[T]
+  def read[T: ClassTag](prefix: String): Seq[T]
 
   final def addApplication(app: ApplicationInfo): Unit = {
     persist("app_" + app.id, app)
@@ -99,5 +99,5 @@ private[master] class BlackHolePersistenceEngine extends PersistenceEngine {
 
   override def unpersist(name: String): Unit = {}
 
-  override def read[T : ClassTag](name: String): Seq[T] = Nil
+  override def read[T: ClassTag](name: String): Seq[T] = Nil
 }

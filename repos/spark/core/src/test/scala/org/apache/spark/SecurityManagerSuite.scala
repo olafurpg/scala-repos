@@ -187,19 +187,21 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
 
     assert(securityManager.fileServerSSLOptions.trustStore.isDefined === true)
     assert(
-        securityManager.fileServerSSLOptions.trustStore.get.getName === "truststore")
+      securityManager.fileServerSSLOptions.trustStore.get.getName === "truststore")
     assert(securityManager.fileServerSSLOptions.keyStore.isDefined === true)
     assert(
-        securityManager.fileServerSSLOptions.keyStore.get.getName === "keystore")
-    assert(securityManager.fileServerSSLOptions.trustStorePassword === Some(
-            "password"))
-    assert(securityManager.fileServerSSLOptions.keyStorePassword === Some(
-            "password"))
+      securityManager.fileServerSSLOptions.keyStore.get.getName === "keystore")
     assert(
-        securityManager.fileServerSSLOptions.keyPassword === Some("password"))
+      securityManager.fileServerSSLOptions.trustStorePassword === Some(
+        "password"))
+    assert(
+      securityManager.fileServerSSLOptions.keyStorePassword === Some(
+        "password"))
+    assert(
+      securityManager.fileServerSSLOptions.keyPassword === Some("password"))
     assert(securityManager.fileServerSSLOptions.protocol === Some("TLSv1.2"))
     assert(
-        securityManager.fileServerSSLOptions.enabledAlgorithms === expectedAlgorithms)
+      securityManager.fileServerSSLOptions.enabledAlgorithms === expectedAlgorithms)
   }
 
   test("ssl off setup") {

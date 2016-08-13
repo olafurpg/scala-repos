@@ -30,7 +30,7 @@ class RateControllerSuite extends TestSuiteBase {
   override def batchDuration: Duration = Milliseconds(50)
 
   test(
-      "RateController - rate controller publishes updates after batches complete") {
+    "RateController - rate controller publishes updates after batches complete") {
     val ssc = new StreamingContext(conf, batchDuration)
     withStreamingContext(ssc) { ssc =>
       val dstream = new RateTestInputDStream(ssc)
@@ -63,10 +63,11 @@ class RateControllerSuite extends TestSuiteBase {
       def updateRateAndVerify(rate: Long): Unit = {
         estimator.updateRate(rate)
         eventually(timeout(5.seconds)) {
-          assert(RateTestReceiver
-                .getActive()
-                .get
-                .getDefaultBlockGeneratorRateLimit() === rate)
+          assert(
+            RateTestReceiver
+              .getActive()
+              .get
+              .getDefaultBlockGeneratorRateLimit() === rate)
         }
       }
 

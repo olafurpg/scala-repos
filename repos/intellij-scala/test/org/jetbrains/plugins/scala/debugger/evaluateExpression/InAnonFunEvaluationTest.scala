@@ -1,17 +1,23 @@
 package org.jetbrains.plugins.scala
 package debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * Nikolay.Tropin
   * 8/2/13
   */
 class InAnonFunEvaluationTest
-    extends InAnonFunEvaluationTestBase with ScalaVersion_2_11
+    extends InAnonFunEvaluationTestBase
+    with ScalaVersion_2_11
 
 class InAnonFunEvaluationTest_212
-    extends InAnonFunEvaluationTestBase with ScalaVersion_2_12 {
+    extends InAnonFunEvaluationTestBase
+    with ScalaVersion_2_12 {
   //todo SCL-9139
   override def testPartialFunction(): Unit = {
     runDebugger() {
@@ -139,8 +145,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
       evalEquals("args", "[]")
       evalEquals("ss", "aa")
       evalEquals("i", ScalaBundle.message("not.used.from.for.statement", "i"))
-      evalEquals(
-          "si", ScalaBundle.message("not.used.from.for.statement", "si"))
+      evalEquals("si",
+                 ScalaBundle.message("not.used.from.for.statement", "si"))
     }
   }
 }

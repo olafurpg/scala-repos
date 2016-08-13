@@ -50,8 +50,8 @@ case class Event(
 ) {
   override def toString(): String = {
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +
-    s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
-    s"tags=$tags,pKey=$prId,ct=$creationTime)"
+      s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
+      s"tags=$tags,pKey=$prId,ct=$creationTime)"
   }
 }
 
@@ -124,17 +124,17 @@ object EventValidation {
     require(!isReservedPrefix(e.event) || isSpecialEvents(e.event),
             s"${e.event} is not a supported reserved event name.")
     require(!isSpecialEvents(e.event) ||
-            ((e.targetEntityType == None) && (e.targetEntityId == None)),
+              ((e.targetEntityType == None) && (e.targetEntityId == None)),
             s"Reserved event ${e.event} cannot have targetEntity")
     require(
-        !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
-        s"The entityType ${e.entityType} is not allowed. " +
+      !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
+      s"The entityType ${e.entityType} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
     require(
-        e.targetEntityType.map { t =>
-          (!isReservedPrefix(t) || isBuiltinEntityTypes(t))
-        }.getOrElse(true),
-        s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
+      e.targetEntityType.map { t =>
+        (!isReservedPrefix(t) || isBuiltinEntityTypes(t))
+      }.getOrElse(true),
+      s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
     validateProperties(e)
   }
@@ -160,7 +160,7 @@ object EventValidation {
     e.properties.keySet.foreach { k =>
       require(!isReservedPrefix(k) || builtinProperties.contains(k),
               s"The property ${k} is not allowed. " +
-              s"'pio_' is a reserved name prefix.")
+                s"'pio_' is a reserved name prefix.")
     }
   }
 }

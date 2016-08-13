@@ -27,8 +27,7 @@ import nak.regress.LinearRegression
 case class RegressionStrategyParams(
     indicators: Seq[(String, BaseIndicator)],
     maxTrainingWindowSize: Int
-)
-    extends Params
+) extends Params
 
 class RegressionStrategy(params: RegressionStrategyParams)
     extends StockStrategy[Map[String, DenseVector[Double]]] {
@@ -41,12 +40,12 @@ class RegressionStrategy(params: RegressionStrategyParams)
                       retF1d: Series[DateTime, Double]) = {
     val array =
       (calculatedData.map(_.toVec.contents).reduce(_ ++ _) ++ Array.fill(
-              retF1d.length)(1.0)).toArray[Double]
+        retF1d.length)(1.0)).toArray[Double]
     val target = DenseVector[Double](retF1d.toVec.contents)
     val m = DenseMatrix.create[Double](
-        retF1d.length,
-        calculatedData.length + 1,
-        array
+      retF1d.length,
+      calculatedData.length + 1,
+      array
     )
     val result = LinearRegression.regress(m, target)
     result
@@ -89,12 +88,11 @@ class RegressionStrategy(params: RegressionStrategyParams)
     // For each active ticker, pass in trained series into regress
     val tickerModelMap = tickers
       .filter(ticker => (active.firstCol(ticker).findOne(_ == false) == -1))
-      .map(ticker =>
-            {
-          val model = regress(calcIndicator(price.firstCol(ticker))
-                                .map(_.slice(firstIdx, lastIdx)),
-                              retF1d.firstCol(ticker).slice(firstIdx, lastIdx))
-          (ticker, model)
+      .map(ticker => {
+        val model = regress(calcIndicator(price.firstCol(ticker))
+                              .map(_.slice(firstIdx, lastIdx)),
+                            retF1d.firstCol(ticker).slice(firstIdx, lastIdx))
+        (ticker, model)
       })
       .toMap
 
@@ -109,10 +107,10 @@ class RegressionStrategy(params: RegressionStrategyParams)
 
     val vecArray = params.indicators.map {
       case (name, indicator) => {
-          val price = dataView.priceFrame(indicator.getMinWindowSize())
-          val logPrice = price.mapValues(math.log)
-          indicator.getOne(logPrice.firstCol(ticker))
-        }
+        val price = dataView.priceFrame(indicator.getMinWindowSize())
+        val logPrice = price.mapValues(math.log)
+        indicator.getOne(logPrice.firstCol(ticker))
+      }
     }.toArray
 
     val densVecArray = vecArray ++ Array[Double](1)
@@ -123,8 +121,8 @@ class RegressionStrategy(params: RegressionStrategyParams)
   }
 
   // Returns a mapping of tickers to predictions
-  def onClose(
-      model: Map[String, DenseVector[Double]], query: Query): Prediction = {
+  def onClose(model: Map[String, DenseVector[Double]],
+              query: Query): Prediction = {
     val dataView = query.dataView
 
     val prediction =

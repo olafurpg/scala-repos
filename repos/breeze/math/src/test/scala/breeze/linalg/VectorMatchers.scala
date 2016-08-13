@@ -19,11 +19,11 @@ trait VectorMatchers {
         s"vector $left deviates by $deviation from $right, expected deviation > $allowedDeviation (norm = $norm)"
 
       MatchResult(
-          deviation <= allowedDeviation,
-          "The " + failureMessageSuffix,
-          "The " + negatedFailureMessageSuffix,
-          "the " + failureMessageSuffix,
-          "the " + negatedFailureMessageSuffix
+        deviation <= allowedDeviation,
+        "The " + failureMessageSuffix,
+        "The " + negatedFailureMessageSuffix,
+        "the " + failureMessageSuffix,
+        "the " + negatedFailureMessageSuffix
       )
     }
   }

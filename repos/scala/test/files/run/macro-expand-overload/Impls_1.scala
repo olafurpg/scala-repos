@@ -5,10 +5,8 @@ object Impls {
     import c.{prefix => prefix}
     import c.universe._
     val body = Apply(
-        Select(Ident(definitions.PredefModule), TermName("println")),
-        List(Literal(Constant(tag)),
-             Literal(Constant(prefix.toString)),
-             x.tree))
+      Select(Ident(definitions.PredefModule), TermName("println")),
+      List(Literal(Constant(tag)), Literal(Constant(prefix.toString)), x.tree))
     c.Expr[Unit](body)
   }
 

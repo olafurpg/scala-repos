@@ -50,12 +50,12 @@ object TestBuild {
                              keyMap: Map[String, AttributeKey[_]]) {
     override def toString =
       env.toString + "\n" + "current: " + current + "\nSettings:\n\t" +
-      showData + keyMap.keys.mkString("All keys:\n\t", ", ", "")
+        showData + keyMap.keys.mkString("All keys:\n\t", ", ", "")
     def showKeys(map: AttributeMap): String =
       map.keys.mkString("\n\t   ", ",", "\n")
     def showData: String = {
-      val scopeStrings = for ((scope, map) <- data.data) yield
-        (Scope.display(scope, "<key>"), showKeys(map))
+      val scopeStrings = for ((scope, map) <- data.data)
+        yield (Scope.display(scope, "<key>"), showKeys(map))
       scopeStrings.toSeq.sorted.map(t => t._1 + t._2).mkString("\n\t")
     }
     val extra: BuildUtil[Proj] = {
@@ -78,9 +78,13 @@ object TestBuild {
 
       // task axis of Scope is set to Global and the value of the second map is the original task axis
       val taskAxesMappings = for ((scope, keys) <- data.data.toIterable;
-      key <- keys.keys) yield
-        (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[_],
-        ScopeAxis[AttributeKey[_]])
+                                  key <- keys.keys)
+        yield
+          (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[
+                                                                      _],
+                                                                    ScopeAxis[
+                                                                      AttributeKey[
+                                                                        _]])
 
       val taskAxes = Relation.empty ++ taskAxesMappings
       val global = new HashSet[ScopedKey[_]]
@@ -103,7 +107,7 @@ object TestBuild {
   final class Env(val builds: Seq[Build], val tasks: Seq[Taskk]) {
     override def toString =
       "Env:\n  " + "  Tasks:\n    " + tasks.mkString("\n    ") + "\n" +
-      builds.mkString("\n  ")
+        builds.mkString("\n  ")
     val root = builds.head
     val buildMap = mapBy(builds)(_.uri)
     val taskMap = mapBy(tasks)(getKey)
@@ -124,19 +128,19 @@ object TestBuild {
     def resolve(ref: Reference) =
       Scope.resolveReference(builds.head.uri, rootProject, ref)
     lazy val delegates: Scope => Seq[Scope] = Scope.delegates(
-        allProjects,
-        (_: Proj).configurations.map(toConfigKey),
-        resolve,
-        uri => buildMap(uri).root.id,
-        inheritProject,
-        inheritConfig,
-        inheritTask,
-        (ref, mp) => Nil
+      allProjects,
+      (_: Proj).configurations.map(toConfigKey),
+      resolve,
+      uri => buildMap(uri).root.id,
+      inheritProject,
+      inheritConfig,
+      inheritTask,
+      (ref, mp) => Nil
     )
     lazy val allFullScopes: Seq[Scope] = for {
       (ref, p) <- (Global, root.root) +: allProjects.map {
-        case (ref, p) => (Select(ref), p)
-      }
+                   case (ref, p) => (Select(ref), p)
+                 }
       t <- Global +: tasks.map(t => Select(t.key))
       c <- Global +: p.configurations.map(c => Select(ConfigKey(c.name)))
     } yield Scope(project = ref, config = c, task = t, extra = Global)
@@ -158,8 +162,8 @@ object TestBuild {
                    val configurations: Seq[Config]) {
     override def toString =
       "Project " + id + "\n      Delegates:\n        " +
-      delegates.mkString("\n        ") + "\n      Configurations:\n        " +
-      configurations.mkString("\n        ")
+        delegates.mkString("\n        ") + "\n      Configurations:\n        " +
+        configurations.mkString("\n        ")
     val confMap = mapBy(configurations)(_.name)
   }
 
@@ -170,7 +174,7 @@ object TestBuild {
   final class Taskk(val key: AttributeKey[String], val delegates: Seq[Taskk]) {
     override def toString =
       key.label + " (delegates: " + delegates.map(_.key.label).mkString(", ") +
-      ")"
+        ")"
   }
 
   def mapBy[K, T](s: Seq[T])(f: T => K): Map[K, T] =
@@ -180,8 +184,10 @@ object TestBuild {
 
   implicit lazy val arbKeys: Arbitrary[Keys] = Arbitrary(keysGen)
   lazy val keysGen: Gen[Keys] = for (env <- mkEnv;
-  keyCount <- chooseShrinkable(1, KeysPerEnv);
-  keys <- listOfN(keyCount, scope(env))) yield new Keys(env, keys)
+                                     keyCount <- chooseShrinkable(1,
+                                                                  KeysPerEnv);
+                                     keys <- listOfN(keyCount, scope(env)))
+    yield new Keys(env, keys)
 
   def scope(env: Env): Gen[Scope] =
     for {
@@ -190,8 +196,8 @@ object TestBuild {
       cAxis <- oneOrGlobal(project.configurations map toConfigKey)
       tAxis <- oneOrGlobal(env.tasks map getKey)
       pAxis <- orGlobal(
-          frequency((1, BuildRef(build.uri)),
-                    (3, ProjectRef(build.uri, project.id))))
+                frequency((1, BuildRef(build.uri)),
+                          (3, ProjectRef(build.uri, project.id))))
     } yield Scope(pAxis, cAxis, tAxis, Global)
 
   def orGlobal[T](gen: Gen[T]): Gen[ScopeAxis[T]] =
@@ -211,8 +217,9 @@ object TestBuild {
     Act.scopedKey(keyIndex, current, defaultConfs, keyMap, data)
   }
 
-  def structure(
-      env: Env, settings: Seq[Setting[_]], current: ProjectRef): Structure = {
+  def structure(env: Env,
+                settings: Seq[Setting[_]],
+                current: ProjectRef): Structure = {
     implicit val display =
       Def.showRelativeKey(current, env.allProjects.size > 1)
     val data = Def.make(settings)(env.delegates, const(Nil), display)
@@ -235,23 +242,25 @@ object TestBuild {
   implicit def maskGen(
       implicit arbBoolean: Arbitrary[Boolean]): Gen[ScopeMask] = {
     val b = arbBoolean.arbitrary
-    for (p <- b; c <- b; t <- b; x <- b) yield
-      ScopeMask(project = p, config = c, task = t, extra = x)
+    for (p <- b; c <- b; t <- b; x <- b)
+      yield ScopeMask(project = p, config = c, task = t, extra = x)
   }
 
-  implicit lazy val idGen: Gen[String] = for (size <- chooseShrinkable(
-      1, MaxIDSize); cs <- listOfN(size, alphaChar)) yield cs.mkString
-  implicit lazy val optIDGen: Gen[Option[String]] = frequency(
-      (1, idGen map some.fn), (1, None))
+  implicit lazy val idGen: Gen[String] =
+    for (size <- chooseShrinkable(1, MaxIDSize); cs <- listOfN(size, alphaChar))
+      yield cs.mkString
+  implicit lazy val optIDGen: Gen[Option[String]] =
+    frequency((1, idGen map some.fn), (1, None))
   implicit lazy val uriGen: Gen[URI] = for (sch <- idGen; ssp <- idGen;
-  frag <- optIDGen) yield new URI(sch, ssp, frag.orNull)
+                                            frag <- optIDGen)
+    yield new URI(sch, ssp, frag.orNull)
 
-  implicit def envGen(
-      implicit bGen: Gen[Build], tasks: Gen[Seq[Taskk]]): Gen[Env] =
-    for (i <- MaxBuildsGen; bs <- listOfN(i, bGen); ts <- tasks) yield
-      new Env(bs, ts)
-  implicit def buildGen(
-      implicit uGen: Gen[URI], pGen: URI => Gen[Seq[Proj]]): Gen[Build] =
+  implicit def envGen(implicit bGen: Gen[Build],
+                      tasks: Gen[Seq[Taskk]]): Gen[Env] =
+    for (i <- MaxBuildsGen; bs <- listOfN(i, bGen); ts <- tasks)
+      yield new Env(bs, ts)
+  implicit def buildGen(implicit uGen: Gen[URI],
+                        pGen: URI => Gen[Seq[Proj]]): Gen[Build] =
     for (u <- uGen; ps <- pGen(u)) yield new Build(u, ps)
 
   def nGen[T](igen: Gen[Int])(implicit g: Gen[T]): Gen[List[T]] =
@@ -274,13 +283,13 @@ object TestBuild {
   def genConfigs(implicit genName: Gen[String],
                  maxDeps: Gen[Int],
                  count: Gen[Int]): Gen[Seq[Config]] =
-    genAcyclicDirect[Config, String](maxDeps, genName, count)(
-        (key, deps) => new Config(key, deps))
+    genAcyclicDirect[Config, String](maxDeps, genName, count)((key, deps) =>
+      new Config(key, deps))
   def genTasks(implicit genName: Gen[String],
                maxDeps: Gen[Int],
                count: Gen[Int]): Gen[Seq[Taskk]] =
-    genAcyclicDirect[Taskk, String](maxDeps, genName, count)(
-        (key, deps) => new Taskk(AttributeKey[String](key), deps))
+    genAcyclicDirect[Taskk, String](maxDeps, genName, count)((key, deps) =>
+      new Taskk(AttributeKey[String](key), deps))
 
   def genAcyclicDirect[A, T](maxDeps: Gen[Int], keyGen: Gen[T], max: Gen[Int])(
       make: (T, Seq[A]) => A): Gen[Seq[A]] =
@@ -308,8 +317,9 @@ object TestBuild {
       }
     }
 
-  def mapMake[A, T](
-      key: T, deps: Seq[T], make: T => Gen[Seq[A] => A]): Gen[Inputs[A, T]] =
+  def mapMake[A, T](key: T,
+                    deps: Seq[T],
+                    make: T => Gen[Seq[A] => A]): Gen[Inputs[A, T]] =
     make(key) map { (mk: Seq[A] => A) =>
       (key, deps, mk)
     }
@@ -321,7 +331,8 @@ object TestBuild {
       case Nil => sequence(acc)
       case x :: xs =>
         val next = for (depCount <- maxDeps;
-        d <- pick(depCount min xs.size, xs)) yield (x, d.toList)
+                        d <- pick(depCount min xs.size, xs))
+          yield (x, d.toList)
         genAcyclic(maxDeps, xs, next :: acc)
     }
   def sequence[T](gs: Seq[Gen[T]]): Gen[Seq[T]] = Gen.parameterized { prms =>

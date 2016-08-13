@@ -30,8 +30,8 @@ object Test {
       /** Check annotations to decide whether tpe1 <:< tpe2 */
       def annotationsConform(tpe1: Type, tpe2: Type): Boolean = {
 
-        tpe1.annotations.forall(
-            a1 => tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
+        tpe1.annotations.forall(a1 =>
+          tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
       }
     }
 

@@ -42,8 +42,11 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * This suite tests spark-submit with applications using HiveContext.
   */
 class HiveSparkSubmitSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with ResetSystemProperties
+    with Timeouts {
 
   // TODO: rewrite these or mark them as slow tests to be run sparingly
 
@@ -168,8 +171,8 @@ class HiveSparkSubmitSuite
   // NOTE: This is an expensive operation in terms of time (10 seconds+). Use sparingly.
   // This is copied from org.apache.spark.deploy.SparkSubmitSuite
   private def runSparkSubmit(args: Seq[String]): Unit = {
-    val sparkHome = sys.props.getOrElse(
-        "spark.test.home", fail("spark.test.home is not set!"))
+    val sparkHome = sys.props
+      .getOrElse("spark.test.home", fail("spark.test.home is not set!"))
     val history = ArrayBuffer.empty[String]
     val commands = Seq("./bin/spark-submit") ++ args
     val commandLine = commands.mkString("'", "' '", "'")
@@ -219,7 +222,7 @@ class HiveSparkSubmitSuite
       case to: TestFailedDueToTimeoutException =>
         val historyLog = history.mkString("\n")
         fail(s"Timeout of $commandLine" +
-             s" See the log4j logs for more detail." + s"\n$historyLog",
+               s" See the log4j logs for more detail." + s"\n$historyLog",
              to)
       case t: Throwable => throw t
     } finally {
@@ -269,7 +272,8 @@ object SparkSubmitClassLoaderTest extends Logging {
 
     // Load a Hive UDF from the jar.
     logInfo("Registering temporary Hive UDF provided in a jar.")
-    hiveContext.sql("""
+    hiveContext.sql(
+      """
         |CREATE TEMPORARY FUNCTION example_max
         |AS 'org.apache.hadoop.hive.contrib.udaf.example.UDAFExampleMax'
       """.stripMargin)
@@ -286,12 +290,12 @@ object SparkSubmitClassLoaderTest extends Logging {
     // Actually use the loaded UDF and SerDe.
     logInfo("Writing data into the table.")
     hiveContext.sql(
-        "INSERT INTO TABLE t1 SELECT example_max(key) as key, val FROM sourceTable GROUP BY val")
+      "INSERT INTO TABLE t1 SELECT example_max(key) as key, val FROM sourceTable GROUP BY val")
     logInfo("Running a simple query on the table.")
     val count = hiveContext.table("t1").orderBy("key", "val").count()
     if (count != 10) {
       throw new Exception(
-          s"table t1 should have 10 rows instead of $count rows")
+        s"table t1 should have 10 rows instead of $count rows")
     }
     logInfo("Test finishes.")
     sc.stop()
@@ -323,7 +327,7 @@ object SparkSQLConfTest extends Logging {
 
         // Always add these two metastore settings at the beginning.
         ("spark.sql.hive.metastore.version" -> "0.12") +:
-        ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
+          ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
       }
 
       // For this simple test, we do not really clone this object.
@@ -347,10 +351,10 @@ object SPARK_9757 extends QueryTest {
     Utils.configTestLog4j("INFO")
 
     val sparkContext = new SparkContext(
-        new SparkConf()
-          .set("spark.sql.hive.metastore.version", "0.13.1")
-          .set("spark.sql.hive.metastore.jars", "maven")
-          .set("spark.ui.enabled", "false"))
+      new SparkConf()
+        .set("spark.sql.hive.metastore.version", "0.13.1")
+        .set("spark.sql.hive.metastore.jars", "maven")
+        .set("spark.ui.enabled", "false"))
 
     val hiveContext = new TestHiveContext(sparkContext)
     sqlContext = hiveContext
@@ -375,7 +379,7 @@ object SPARK_9757 extends QueryTest {
         val df = hiveContext
           .range(10)
           .select(
-              callUDF("struct", ('id + 0.2) cast DecimalType(10, 3)) as 'dec_struct)
+            callUDF("struct", ('id + 0.2) cast DecimalType(10, 3)) as 'dec_struct)
         df.write
           .option("path", dir.getCanonicalPath)
           .mode("overwrite")
@@ -399,9 +403,9 @@ object SPARK_11009 extends QueryTest {
     Utils.configTestLog4j("INFO")
 
     val sparkContext = new SparkContext(
-        new SparkConf()
-          .set("spark.ui.enabled", "false")
-          .set("spark.sql.shuffle.partitions", "100"))
+      new SparkConf()
+        .set("spark.ui.enabled", "false")
+        .set("spark.sql.shuffle.partitions", "100"))
 
     val hiveContext = new TestHiveContext(sparkContext)
     sqlContext = hiveContext

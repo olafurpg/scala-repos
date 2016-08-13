@@ -37,7 +37,8 @@ trait RequestTaggingHandler extends Handler {
   * that Play uses to handle requests.
   */
 trait EssentialAction
-    extends (RequestHeader => Accumulator[ByteString, Result]) with Handler { self =>
+    extends (RequestHeader => Accumulator[ByteString, Result])
+    with Handler { self =>
 
   /**
     * Returns itself, for better support in the routes file.
@@ -146,7 +147,8 @@ trait Action[A] extends EssentialAction {
   * @tparam A the body content type
   */
 trait BodyParser[+A]
-    extends (RequestHeader => Accumulator[ByteString, Either[Result, A]]) { self =>
+    extends (RequestHeader => Accumulator[ByteString, Either[Result, A]]) {
+  self =>
 
   /**
     * Uses the provided function to transform the BodyParser's computed result
@@ -326,8 +328,8 @@ trait ActionFunction[-R[_], +P[_]] { self =>
     * @param block The block of code to invoke
     * @return A future of the result
     */
-  def invokeBlock[A](
-      request: R[A], block: P[A] => Future[Result]): Future[Result]
+  def invokeBlock[A](request: R[A],
+                     block: P[A] => Future[Result]): Future[Result]
 
   /**
     * Get the execution context to run the request in.  Override this if you want a custom execution context
@@ -472,8 +474,7 @@ trait ActionBuilder[+R[_]] extends ActionFunction[Request, R] { self =>
     */
   final def async[A](bodyParser: BodyParser[A])(
       block: R[A] => Future[Result]): Action[A] =
-    composeAction(
-        new Action[A] {
+    composeAction(new Action[A] {
       def parser = composeParser(bodyParser)
       def apply(request: Request[A]) =
         try {
@@ -522,8 +523,8 @@ trait ActionBuilder[+R[_]] extends ActionFunction[Request, R] { self =>
 object Action extends ActionBuilder[Request] {
   private val logger = Logger(Action.getClass)
 
-  def invokeBlock[A](
-      request: Request[A], block: (Request[A]) => Future[Result]) =
+  def invokeBlock[A](request: Request[A],
+                     block: (Request[A]) => Future[Result]) =
     block(request)
 }
 
@@ -548,8 +549,8 @@ trait ActionRefiner[-R[_], +P[_]] extends ActionFunction[R, P] {
   protected def refine[A](request: R[A]): Future[Either[Result, P[A]]]
 
   final def invokeBlock[A](request: R[A], block: P[A] => Future[Result]) =
-    refine(request)
-      .flatMap(_.fold(Future.successful _, block))(executionContext)
+    refine(request).flatMap(_.fold(Future.successful _, block))(
+      executionContext)
 }
 
 /**

@@ -19,12 +19,20 @@ package org.apache.spark
 
 import java.io.File
 
-import org.eclipse.jetty.security.{ConstraintMapping, ConstraintSecurityHandler, HashLoginService}
+import org.eclipse.jetty.security.{
+  ConstraintMapping,
+  ConstraintSecurityHandler,
+  HashLoginService
+}
 import org.eclipse.jetty.security.authentication.DigestAuthenticator
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.server.ssl.SslSocketConnector
-import org.eclipse.jetty.servlet.{DefaultServlet, ServletContextHandler, ServletHolder}
+import org.eclipse.jetty.servlet.{
+  DefaultServlet,
+  ServletContextHandler,
+  ServletHolder
+}
 import org.eclipse.jetty.util.security.{Constraint, Password}
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 
@@ -62,8 +70,8 @@ private[spark] class HttpServer(conf: SparkConf,
       throw new ServerStateException("Server is already started")
     } else {
       logInfo("Starting HTTP Server")
-      val (actualServer, actualPort) = Utils.startServiceOnPort[Server](
-          requestedPort, doStart, conf, serverName)
+      val (actualServer, actualPort) = Utils
+        .startServiceOnPort[Server](requestedPort, doStart, conf, serverName)
       server = actualServer
       port = actualPort
     }
@@ -113,11 +121,9 @@ private[spark] class HttpServer(conf: SparkConf,
     }
 
     server.start()
-    val actualPort = server
-      .getConnectors()(0)
-      .getLocalPort
+    val actualPort = server.getConnectors()(0).getLocalPort
 
-      (server, actualPort)
+    (server, actualPort)
   }
 
   /**

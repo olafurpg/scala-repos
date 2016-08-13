@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -83,10 +83,10 @@ trait PerfTestSuite extends Logging {
       pred: (List[String], PerfTest) => Boolean): Option[Tree[PerfTest]] =
     selectTest(test, pred)
 
-  protected def run[M[+ _], T : MetricSpace](test: Tree[PerfTest] = test,
-                                             runner: PerfTestRunner[M, T],
-                                             runs: Int = 60,
-                                             outliers: Double = 0.05) = {
+  protected def run[M[+ _], T: MetricSpace](test: Tree[PerfTest] = test,
+                                            runner: PerfTestRunner[M, T],
+                                            runs: Int = 60,
+                                            outliers: Double = 0.05) = {
     val tails = (runs * (outliers / 2)).toInt
 
     runner.runAll(test, runs) {
@@ -104,11 +104,11 @@ trait PerfTestSuite extends Logging {
 
     try {
       val runner = new NIHDBPerfTestRunner(
-          SimpleTimer,
-          optimize = config.optimize,
-          apiKey = "dummyAPIKey",
-          _rootDir = config.rootDir,
-          testTimeout = Duration(config.queryTimeout, "seconds"))
+        SimpleTimer,
+        optimize = config.optimize,
+        apiKey = "dummyAPIKey",
+        _rootDir = config.rootDir,
+        testTimeout = Duration(config.queryTimeout, "seconds"))
 
       runner.startup()
 
@@ -148,8 +148,7 @@ trait PerfTestSuite extends Logging {
               val delta =
                 BaselineComparisons.compareWithBaseline(result, baseline)
 
-              withPrinter(
-                  _.println(config.format match {
+              withPrinter(_.println(config.format match {
                 case OutputFormat.Legible =>
                   delta.toPrettyString
 
@@ -159,8 +158,7 @@ trait PerfTestSuite extends Logging {
             }
 
           case None =>
-            withPrinter(
-                _.println(config.format match {
+            withPrinter(_.println(config.format match {
               case OutputFormat.Legible =>
                 result.toPrettyString
 
@@ -191,9 +189,9 @@ trait PerfTestSuite extends Logging {
     * Selects a test based on paths, using select to determine which sub-trees
     * should be included.
     */
-  private def selectTest(test: Tree[PerfTest],
-                         select: (List[String],
-                         PerfTest) => Boolean): Option[Tree[PerfTest]] = {
+  private def selectTest(
+      test: Tree[PerfTest],
+      select: (List[String], PerfTest) => Boolean): Option[Tree[PerfTest]] = {
 
     @tailrec
     def find(loc: TreeLoc[PerfTest],

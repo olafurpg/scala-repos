@@ -1,7 +1,11 @@
 package com.twitter.finagle.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.stats.{CategorizingExceptionStatsHandler, ExceptionStatsHandler, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  CategorizingExceptionStatsHandler,
+  ExceptionStatsHandler,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle._
 import com.twitter.util._
 import java.util.concurrent.TimeUnit
@@ -11,8 +15,8 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class StatsFilterTest extends FunSuite {
-  val BasicExceptions = new CategorizingExceptionStatsHandler(
-      _ => None, _ => None, rollup = false)
+  val BasicExceptions =
+    new CategorizingExceptionStatsHandler(_ => None, _ => None, rollup = false)
 
   def getService(
       exceptionStatsHandler: ExceptionStatsHandler = BasicExceptions
@@ -47,8 +51,9 @@ class StatsFilterTest extends FunSuite {
 
   test("latency stat in microseconds") {
     val sr = new InMemoryStatsReceiver()
-    val filter = new StatsFilter[String, String](
-        sr, StatsFilter.DefaultExceptions, TimeUnit.MICROSECONDS)
+    val filter = new StatsFilter[String, String](sr,
+                                                 StatsFilter.DefaultExceptions,
+                                                 TimeUnit.MICROSECONDS)
     val promise = new Promise[String]
     val svc =
       filter andThen new Service[String, String] {
@@ -84,15 +89,16 @@ class StatsFilterTest extends FunSuite {
     assert(unsourced.size == 2)
     assert(unsourced(Seq("failures")) == 1)
     assert(
-        unsourced(Seq("failures",
-                      classOf[ChannelWriteException].getName(),
-                      classOf[RequestException].getName(),
-                      classOf[Exception].getName())) == 1)
+      unsourced(
+        Seq("failures",
+            classOf[ChannelWriteException].getName(),
+            classOf[RequestException].getName(),
+            classOf[Exception].getName())) == 1)
   }
 
   test("source failures") {
     val esh = new CategorizingExceptionStatsHandler(
-        sourceFunction = _ => Some("bogus"))
+      sourceFunction = _ => Some("bogus"))
 
     val (promise, receiver, statsService) = getService(esh)
     val e = new Failure("e").withSource(Failure.Source.Service, "bogus")
@@ -107,7 +113,7 @@ class StatsFilterTest extends FunSuite {
     assert(sourced.size == 2)
     assert(sourced(Seq("sourcedfailures", "bogus")) == 1)
     assert(
-        sourced(Seq("sourcedfailures", "bogus", classOf[Failure].getName())) == 1)
+      sourced(Seq("sourcedfailures", "bogus", classOf[Failure].getName())) == 1)
 
     val unsourced = receiver.counters.filterKeys { _.exists(_ == "failures") }
     assert(unsourced.size == 2)
@@ -201,11 +207,12 @@ class StatsFilterTest extends FunSuite {
     assert(unsourced.size == 3)
     assert(unsourced(Seq("failures")) == 1)
     assert(
-        unsourced(Seq("failures", classOf[ChannelWriteException].getName())) == 1)
+      unsourced(Seq("failures", classOf[ChannelWriteException].getName())) == 1)
     assert(
-        unsourced(Seq("failures",
-                      classOf[ChannelWriteException].getName(),
-                      classOf[Exception].getName())) == 1)
+      unsourced(
+        Seq("failures",
+            classOf[ChannelWriteException].getName(),
+            classOf[Exception].getName())) == 1)
   }
 
   test("respects ResponseClassifier") {
@@ -219,8 +226,10 @@ class StatsFilterTest extends FunSuite {
         ResponseClass.RetryableFailure
       case ReqRep(_, Throw(x)) if x.getMessage == "-5" => ResponseClass.Success
     }
-    val statsFilter = new StatsFilter[Int, Int](
-        sr, aClassifier, StatsFilter.DefaultExceptions, TimeUnit.MILLISECONDS)
+    val statsFilter = new StatsFilter[Int, Int](sr,
+                                                aClassifier,
+                                                StatsFilter.DefaultExceptions,
+                                                TimeUnit.MILLISECONDS)
 
     val service = statsFilter.andThen(svc)
 
@@ -230,8 +239,8 @@ class StatsFilterTest extends FunSuite {
     assert(0 == sr.counter("success")())
     assert(1 == sr.counter("failures")())
     val failure = sr.counter(
-        "failures",
-        "com.twitter.finagle.service.ResponseClassificationSyntheticException")
+      "failures",
+      "com.twitter.finagle.service.ResponseClassificationSyntheticException")
     assert(1 == failure())
 
     // able to categorize Throws as success

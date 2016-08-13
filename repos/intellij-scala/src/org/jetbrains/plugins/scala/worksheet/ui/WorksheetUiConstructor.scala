@@ -14,7 +14,12 @@ import org.jetbrains.plugins.scala.compiler.CompilationProcess
 import org.jetbrains.plugins.scala.components.StopWorksheetAction
 import org.jetbrains.plugins.scala.extensions
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, CopyWorksheetAction, RunWorksheetAction, InteractiveStatusDisplay}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction,
+  CopyWorksheetAction,
+  RunWorksheetAction,
+  InteractiveStatusDisplay
+}
 import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner
 import org.jetbrains.plugins.scala.worksheet.processor.WorksheetCompiler
 
@@ -56,13 +61,14 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
 
       if (RunWorksheetAction.isScratchWorksheet(Option(file), project)) {
         addSplitter()
-        addChild(panel,
-                 createSelectClassPathList(
-                     Option(RunWorksheetAction
-                           .getModuleFor(
-                               PsiManager getInstance project findFile file)
-                           .getName),
-                     file))
+        addChild(
+          panel,
+          createSelectClassPathList(
+            Option(
+              RunWorksheetAction
+                .getModuleFor(PsiManager getInstance project findFile file)
+                .getName),
+            file))
         addChild(panel, new JLabel("Use class path of module:  "))
       }
 
@@ -83,8 +89,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
     Option(statusDisplayN)
   }
 
-  private def createSelectClassPathList(
-      defaultModule: Option[String], file: VirtualFile) = {
+  private def createSelectClassPathList(defaultModule: Option[String],
+                                        file: VirtualFile) = {
     val modulesBox = new ModulesComboBox()
 
     modulesBox fillModules project
@@ -104,7 +110,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
         if (m == null) return
 
         WorksheetCompiler.setModuleForCpName(
-            PsiManager getInstance project findFile file, m.getName)
+          PsiManager getInstance project findFile file,
+          m.getName)
       }
     })
 
@@ -115,16 +122,17 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
 
   def createMakeProjectChb(file: VirtualFile): JCheckBox = {
     createCheckBox(
-        "Make project",
-        WorksheetCompiler.isMakeBeforeRun(
-            PsiManager getInstance project findFile file),
-        box =>
-          new ChangeListener {
-            override def stateChanged(e: ChangeEvent) {
-              WorksheetCompiler.setMakeBeforeRun(
-                  PsiManager getInstance project findFile file, box.isSelected)
-            }
-        }
+      "Make project",
+      WorksheetCompiler.isMakeBeforeRun(
+        PsiManager getInstance project findFile file),
+      box =>
+        new ChangeListener {
+          override def stateChanged(e: ChangeEvent) {
+            WorksheetCompiler.setMakeBeforeRun(
+              PsiManager getInstance project findFile file,
+              box.isSelected)
+          }
+      }
     )
   }
 
@@ -134,16 +142,16 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
     import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner._
 
     createCheckBox(
-        "Interactive Mode",
-        if (isSetEnabled(psiFile)) true
-        else if (isSetDisabled(psiFile)) false
-        else ScalaProjectSettings.getInstance(project).isInteractiveMode,
-        box =>
-          new ChangeListener {
-            override def stateChanged(e: ChangeEvent) {
-              WorksheetAutoRunner.setAutorun(psiFile, box.isSelected)
-            }
-        }
+      "Interactive Mode",
+      if (isSetEnabled(psiFile)) true
+      else if (isSetDisabled(psiFile)) false
+      else ScalaProjectSettings.getInstance(project).isInteractiveMode,
+      box =>
+        new ChangeListener {
+          override def stateChanged(e: ChangeEvent) {
+            WorksheetAutoRunner.setAutorun(psiFile, box.isSelected)
+          }
+      }
     )
   }
 
@@ -194,8 +202,8 @@ object WorksheetUiConstructor {
 
   def createSplitter() = {
     val separator = new JSeparator(SwingConstants.VERTICAL)
-    val size = new Dimension(
-        separator.getPreferredSize.width, separator.getMaximumSize.height)
+    val size = new Dimension(separator.getPreferredSize.width,
+                             separator.getMaximumSize.height)
     separator setMaximumSize size
 
     separator

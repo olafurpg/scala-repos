@@ -8,7 +8,10 @@ import scala.language.reflectiveCalls
 import java.nio.charset.Charset
 import akka.actor.ActorSystem
 import akka.persistence.journal.{EventAdapter, EventSeq}
-import akka.serialization.{SerializationExtension, SerializerWithStringManifest}
+import akka.serialization.{
+  SerializationExtension,
+  SerializerWithStringManifest
+}
 import akka.testkit.TestKit
 import com.typesafe.config._
 import org.scalatest.WordSpec
@@ -83,7 +86,7 @@ class ProtobufReadOptional {
           seatReserved(FlightAppModels.SeatReserved.parseFrom(bytes))
         case _ =>
           throw new IllegalArgumentException(
-              "Unable to handle manifest: " + manifest)
+            "Unable to handle manifest: " + manifest)
       }
 
     override def toBinary(o: AnyRef): Array[Byte] = o match {
@@ -143,8 +146,7 @@ class RenamePlainJson {
     override def fromJournal(event: Any, manifest: String): EventSeq =
       event match {
         case json: JsObject =>
-          EventSeq(
-              marshaller.fromJson(manifest match {
+          EventSeq(marshaller.fromJson(manifest match {
             case V1 => rename(json, "code", "seatNr")
             case V2 => json // pass-through
             case unknown =>
@@ -153,7 +155,7 @@ class RenamePlainJson {
         case _ =>
           val c = event.getClass
           throw new IllegalArgumentException(
-              "Can only work with JSON, was: %s".format(c))
+            "Can only work with JSON, was: %s".format(c))
       }
 
     def rename(json: JsObject, from: String, to: String): JsObject = {
@@ -195,7 +197,7 @@ object SimplestCustomSerializer {
       case p: Person => s"""${p.name}|${p.surname}""".getBytes(Utf8)
       case _ =>
         throw new IllegalArgumentException(
-            s"Unable to serialize to bytes, clazz was: ${obj.getClass}!")
+          s"Unable to serialize to bytes, clazz was: ${obj.getClass}!")
     }
 
     // deserialize the object, using the manifest to indicate which logic to apply
@@ -207,7 +209,7 @@ object SimplestCustomSerializer {
           Person(name, surname)
         case _ =>
           throw new IllegalArgumentException(
-              s"Unable to deserialize from bytes, manifest was: $manifest! Bytes length: " +
+            s"Unable to deserialize from bytes, manifest was: $manifest! Bytes length: " +
               bytes.length)
       }
   }
@@ -276,7 +278,7 @@ class RemovedEventsAwareSerializer extends SerializerWithStringManifest {
   override def identifier: Int = 8337
 
   val SkipEventManifestsEvents = Set(
-      "docs.persistence.CustomerBlinked" // ...
+    "docs.persistence.CustomerBlinked" // ...
   )
 
   override def manifest(o: AnyRef): String = o.getClass.getName
@@ -361,7 +363,7 @@ class DetachedModelsAdapter extends EventAdapter {
     event match {
       case DataModel.SeatBooked(code, customerName) =>
         EventSeq(
-            DomainModel.SeatBooked(code, DomainModel.Customer(customerName)))
+          DomainModel.SeatBooked(code, DomainModel.Customer(customerName)))
     }
 }
 //#detach-models-adapter
@@ -387,7 +389,7 @@ class JsonDataModelAdapter extends EventAdapter {
         EventSeq(marshaller.fromJson(json))
       case _ =>
         throw new IllegalArgumentException(
-            "Unable to fromJournal a non-JSON object! Was: " + event.getClass)
+          "Unable to fromJournal a non-JSON object! Was: " + event.getClass)
     }
 }
 //#detach-models-adapter-json

@@ -37,7 +37,9 @@ trait StdNames { self: SymbolTable =>
       kws = kws + result
       result
     }
-    def result: Set[TermName] = try kws finally kws = null
+    def result: Set[TermName] =
+      try kws
+      finally kws = null
   }
 
   private[reflect] def compactifyName(orig: String): String = compactify(orig)
@@ -63,10 +65,10 @@ trait StdNames { self: SymbolTable =>
     val maxSuffixLength =
       "$.class".length + 1 // potential module class suffix and file extension
     val MaxNameLength = math.min(
-        settings.maxClassfileName.value - maxSuffixLength,
-        2 *
+      settings.maxClassfileName.value - maxSuffixLength,
+      2 *
         (settings.maxClassfileName.value - maxSuffixLength -
-            2 * marker.length - 32)
+          2 * marker.length - 32)
     )
     def toMD5(s: String, edge: Int): String = {
       val prefix = s take edge
@@ -79,8 +81,9 @@ trait StdNames { self: SymbolTable =>
 
       prefix + marker + md5chars + marker + suffix
     }
-    def apply(s: String): String = (if (s.length <= MaxNameLength) s
-                                    else toMD5(s, MaxNameLength / 4))
+    def apply(s: String): String =
+      (if (s.length <= MaxNameLength) s
+      else toMD5(s, MaxNameLength / 4))
   }
 
   abstract class CommonNames extends NamesApi {
@@ -407,18 +410,19 @@ trait StdNames { self: SymbolTable =>
     def isVariableName(name: Name): Boolean = {
       val first = name.startChar
       (((first.isLower && first.isLetter) || first == '_') &&
-          (name != nme.false_) && (name != nme.true_) && (name != nme.null_))
+      (name != nme.false_) && (name != nme.true_) && (name != nme.null_))
     }
 
     def isOpAssignmentName(name: Name) = name match {
       case raw.NE | raw.LE | raw.GE | EMPTY => false
       case _ =>
         name.endChar == '=' && name.startChar != '=' &&
-        isOperatorPart(name.startChar)
+          isOperatorPart(name.startChar)
     }
 
-    private def expandedNameInternal(
-        name: TermName, base: Symbol, separator: String): TermName =
+    private def expandedNameInternal(name: TermName,
+                                     base: Symbol,
+                                     separator: String): TermName =
       newTermNameCached(base.fullName('$') + separator + name)
 
     /** The expanded name of `name` relative to this class `base`
@@ -470,9 +474,9 @@ trait StdNames { self: SymbolTable =>
       */
     def unspecializedName(name: Name): Name =
       (// DUPLICATED LOGIC WITH `splitSpecializedName`
-       if (name endsWith SPECIALIZED_SUFFIX)
-         name.subName(0, name.lastIndexOf('m') - 1)
-       else name)
+      if (name endsWith SPECIALIZED_SUFFIX)
+        name.subName(0, name.lastIndexOf('m') - 1)
+      else name)
 
     /** Return the original name and the types on which this name
       *  is specialized. For example,
@@ -500,21 +504,21 @@ trait StdNames { self: SymbolTable =>
     // Nominally, name$default$N, encoded for <init>
     def defaultGetterName(name: Name, pos: Int): TermName =
       (if (isConstructorName(name)) DEFAULT_GETTER_INIT_STRING + pos
-       else name + DEFAULT_GETTER_STRING + pos)
+      else name + DEFAULT_GETTER_STRING + pos)
     // Nominally, name from name$default$N, CONSTRUCTOR for <init>
     def defaultGetterToMethod(name: Name): TermName =
       (if (name startsWith DEFAULT_GETTER_INIT_STRING) nme.CONSTRUCTOR
-       else
-         name indexOf DEFAULT_GETTER_STRING match {
-           case -1 => name.toTermName
-           case idx => name.toTermName take idx
-         })
+      else
+        name indexOf DEFAULT_GETTER_STRING match {
+          case -1 => name.toTermName
+          case idx => name.toTermName take idx
+        })
 
     def localDummyName(clazz: Symbol): TermName =
       newTermName(LOCALDUMMY_PREFIX + clazz.name + ">")
     def superName(name: Name, mix: Name = EMPTY): TermName =
       newTermName(
-          SUPER_PREFIX_STRING + name + (if (mix.isEmpty) "" else "$" + mix))
+        SUPER_PREFIX_STRING + name + (if (mix.isEmpty) "" else "$" + mix))
 
     /** The name of an accessor for protected symbols. */
     def protName(name: Name): TermName = newTermName(PROTECTED_PREFIX + name)
@@ -1065,14 +1069,14 @@ trait StdNames { self: SymbolTable =>
 
     val BITMAP_NORMAL: NameType =
       BITMAP_PREFIX +
-      "" // initialization bitmap for public/protected lazy vals
+        "" // initialization bitmap for public/protected lazy vals
     val BITMAP_TRANSIENT: NameType =
       BITMAP_PREFIX + "trans$" // initialization bitmap for transient lazy vals
     val BITMAP_CHECKINIT: NameType =
       BITMAP_PREFIX + "init$" // initialization bitmap for checkinit values
     val BITMAP_CHECKINIT_TRANSIENT: NameType =
       BITMAP_PREFIX +
-      "inittrans$" // initialization bitmap for transient checkinit values
+        "inittrans$" // initialization bitmap for transient checkinit values
   }
 
   lazy val typeNames: tpnme.type = tpnme
@@ -1208,14 +1212,14 @@ trait StdNames { self: SymbolTable =>
     final val Bootstrap: TermName = newTermName("bootstrap")
 
     val Boxed = immutable.Map[TypeName, TypeName](
-        tpnme.Boolean -> BoxedBoolean,
-        tpnme.Byte -> BoxedByte,
-        tpnme.Char -> BoxedCharacter,
-        tpnme.Short -> BoxedShort,
-        tpnme.Int -> BoxedInteger,
-        tpnme.Long -> BoxedLong,
-        tpnme.Float -> BoxedFloat,
-        tpnme.Double -> BoxedDouble
+      tpnme.Boolean -> BoxedBoolean,
+      tpnme.Byte -> BoxedByte,
+      tpnme.Char -> BoxedCharacter,
+      tpnme.Short -> BoxedShort,
+      tpnme.Int -> BoxedInteger,
+      tpnme.Long -> BoxedLong,
+      tpnme.Float -> BoxedFloat,
+      tpnme.Double -> BoxedDouble
     )
   }
 

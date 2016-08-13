@@ -4,8 +4,15 @@ package actions
 import java.util.Properties
 
 import com.intellij.ide.IdeView
-import com.intellij.ide.actions.{CreateFileFromTemplateDialog, CreateTemplateInPackageAction}
-import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager, JavaTemplateUtil}
+import com.intellij.ide.actions.{
+  CreateFileFromTemplateDialog,
+  CreateTemplateInPackageAction
+}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate,
+  FileTemplateManager,
+  JavaTemplateUtil
+}
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.ex.FileTypeManagerEx
@@ -29,10 +36,11 @@ import org.jetbrains.plugins.scala.project._
   */
 class NewScalaTypeDefinitionAction
     extends CreateTemplateInPackageAction[ScTypeDefinition](
-        ScalaBundle.message("newclass.menu.action.text"),
-        ScalaBundle.message("newclass.menu.action.description"),
-        Icons.CLASS,
-        JavaModuleSourceRootTypes.SOURCES) with DumbAware {
+      ScalaBundle.message("newclass.menu.action.text"),
+      ScalaBundle.message("newclass.menu.action.description"),
+      Icons.CLASS,
+      JavaModuleSourceRootTypes.SOURCES)
+    with DumbAware {
   protected def buildDialog(project: Project,
                             directory: PsiDirectory,
                             builder: CreateFileFromTemplateDialog.Builder) {
@@ -40,10 +48,12 @@ class NewScalaTypeDefinitionAction
     builder.addKind("Object", Icons.OBJECT, ScalaFileTemplateUtil.SCALA_OBJECT)
     builder.addKind("Trait", Icons.TRAIT, ScalaFileTemplateUtil.SCALA_TRAIT)
 
-    for (template <- FileTemplateManager.getInstance(project).getAllTemplates) {
+    for (template <- FileTemplateManager
+                      .getInstance(project)
+                      .getAllTemplates) {
       if (isScalaTemplate(template) && checkPackageExists(directory)) {
-        builder.addKind(
-            template.getName, Icons.FILE_TYPE_LOGO, template.getName)
+        builder
+          .addKind(template.getName, Icons.FILE_TYPE_LOGO, template.getName)
       }
     }
 
@@ -127,11 +137,11 @@ class NewScalaTypeDefinitionAction
                                       templateName: String,
                                       parameters: String*): PsiFile = {
     NewScalaTypeDefinitionAction.createFromTemplate(
-        directory,
-        className,
-        className + SCALA_EXTENSION,
-        templateName,
-        parameters: _*)
+      directory,
+      className,
+      className + SCALA_EXTENSION,
+      templateName,
+      parameters: _*)
   }
 
   private val SCALA_EXTENSION = ".scala"
@@ -156,12 +166,12 @@ object NewScalaTypeDefinitionAction {
       .getInstance(project)
       .getInternalTemplate(templateName)
     val properties: Properties = new Properties(
-        FileTemplateManager.getInstance(project).getDefaultProperties())
+      FileTemplateManager.getInstance(project).getDefaultProperties())
     JavaTemplateUtil.setPackageNameAttribute(properties, directory)
     properties.setProperty(NAME_TEMPLATE_PROPERTY, name)
     properties.setProperty(
-        LOW_CASE_NAME_TEMPLATE_PROPERTY,
-        name.substring(0, 1).toLowerCase + name.substring(1))
+      LOW_CASE_NAME_TEMPLATE_PROPERTY,
+      name.substring(0, 1).toLowerCase + name.substring(1))
 
     var i: Int = 0
     while (i < parameters.length) {
@@ -176,9 +186,9 @@ object NewScalaTypeDefinitionAction {
     } catch {
       case e: Exception =>
         throw new RuntimeException(
-            "Unable to load template for " + FileTemplateManager.getInstance
-              .internalTemplateToSubject(templateName),
-            e)
+          "Unable to load template for " + FileTemplateManager.getInstance
+            .internalTemplateToSubject(templateName),
+          e)
     }
     val factory: PsiFileFactory = PsiFileFactory.getInstance(project)
     val file: PsiFile =

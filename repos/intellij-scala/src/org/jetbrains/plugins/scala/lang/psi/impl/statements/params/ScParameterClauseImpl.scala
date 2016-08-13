@@ -37,8 +37,8 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
   override def toString: String = "ParametersClause"
 
   def parameters: Seq[ScParameter] = {
-    getStubOrPsiChildren[ScParameter](
-        TokenSets.PARAMETERS, JavaArrayFactoryUtil.ScParameterFactory)
+    getStubOrPsiChildren[ScParameter](TokenSets.PARAMETERS,
+                                      JavaArrayFactoryUtil.ScParameterFactory)
   }
 
   @volatile
@@ -70,9 +70,9 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
             //it's important for all calculations to have the same psi here
             if (synthClauseModCount == modCount) return synthClause
             synthClause = ScalaPsiUtil.syntheticParamClause(
-                typeParametersOwner,
-                clauses,
-                typeParametersOwner.isInstanceOf[ScClass])
+              typeParametersOwner,
+              clauses,
+              typeParametersOwner.isInstanceOf[ScClass])
             synthClauseModCount = modCount
             synthClause
           }

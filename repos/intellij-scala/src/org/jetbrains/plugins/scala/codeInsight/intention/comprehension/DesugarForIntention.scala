@@ -30,7 +30,9 @@ class DesugarForIntention extends PsiElementBaseIntentionAction {
       case Some(expText) =>
         val desugared =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              expText, statement.getContext, statement)
+            expText,
+            statement.getContext,
+            statement)
         val result = statement.replace(desugared.copy())
         val manager: CodeStyleManager = CodeStyleManager.getInstance(project)
         manager.reformat(result)

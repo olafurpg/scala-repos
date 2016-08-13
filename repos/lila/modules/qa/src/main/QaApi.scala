@@ -50,7 +50,8 @@ final class QaApi(questionColl: Coll,
           val q2 = q
             .copy(title = data.title, body = data.body, tags = data.tags)
             .editNow
-          questionColl.update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
+          questionColl
+            .update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
         }
       }
 
@@ -64,8 +65,8 @@ final class QaApi(questionColl: Coll,
         .collect[List]()
 
     def accept(q: Question) = questionColl.update(
-        BSONDocument("_id" -> q.id),
-        BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
+      BSONDocument("_id" -> q.id),
+      BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
     )
 
     def count: Fu[Int] = questionColl.count(None)
@@ -78,22 +79,22 @@ final class QaApi(questionColl: Coll,
                           page: Int,
                           perPage: Int): Fu[Paginator[Question]] =
       Paginator(adapter = new BSONAdapter[Question](
-                      collection = questionColl,
-                      selector = selector,
-                      projection = BSONDocument(),
-                      sort = sort
-                  ),
+                  collection = questionColl,
+                  selector = selector,
+                  projection = BSONDocument(),
+                  sort = sort
+                ),
                 currentPage = page,
                 maxPerPage = perPage)
 
     private def popularCache =
       mongoCache(prefix = "qa:popular",
                  f = (nb: Int) =>
-                     questionColl
-                       .find(BSONDocument())
-                       .sort(BSONDocument("vote.score" -> -1))
-                       .cursor[Question]()
-                       .collect[List](nb),
+                   questionColl
+                     .find(BSONDocument())
+                     .sort(BSONDocument("vote.score" -> -1))
+                     .cursor[Question]()
+                     .collect[List](nb),
                  timeToLive = 3 hour)
 
     def popular(max: Int): Fu[List[Question]] = popularCache(max)
@@ -107,31 +108,32 @@ final class QaApi(questionColl: Coll,
 
     def byTags(tags: List[String], max: Int): Fu[List[Question]] =
       questionColl
-        .find(BSONDocument(
-                "tags" -> BSONDocument("$in" -> tags.map(_.toLowerCase))))
+        .find(
+          BSONDocument(
+            "tags" -> BSONDocument("$in" -> tags.map(_.toLowerCase))))
         .cursor[Question]()
         .collect[List](max)
 
     def addComment(c: Comment)(q: Question) =
       questionColl.update(
-          BSONDocument("_id" -> q.id),
-          BSONDocument("$push" -> BSONDocument("comments" -> c)))
+        BSONDocument("_id" -> q.id),
+        BSONDocument("$push" -> BSONDocument("comments" -> c)))
 
     def vote(id: QuestionId, user: User, v: Boolean): Fu[Option[Vote]] =
       question findById id flatMap {
         _ ?? { q =>
           val newVote = q.vote.add(user.id, v)
           questionColl.update(
-              BSONDocument("_id" -> q.id),
-              BSONDocument("$set" -> BSONDocument("vote" -> newVote))
+            BSONDocument("_id" -> q.id),
+            BSONDocument("$set" -> BSONDocument("vote" -> newVote))
           ) inject newVote.some
         }
       }
 
     def incViews(q: Question) =
       questionColl.update(
-          BSONDocument("_id" -> q.id),
-          BSONDocument("$inc" -> BSONDocument("views" -> BSONInteger(1))))
+        BSONDocument("_id" -> q.id),
+        BSONDocument("$inc" -> BSONDocument("views" -> BSONInteger(1))))
 
     def recountAnswers(id: QuestionId) = answer.countByQuestionId(id) flatMap {
       setAnswers(id, _)
@@ -141,21 +143,21 @@ final class QaApi(questionColl: Coll,
       questionColl
         .update(BSONDocument("_id" -> id),
                 BSONDocument(
-                    "$set" -> BSONDocument(
-                        "answers" -> BSONInteger(nb),
-                        "updatedAt" -> DateTime.now
-                    )
+                  "$set" -> BSONDocument(
+                    "answers" -> BSONInteger(nb),
+                    "updatedAt" -> DateTime.now
+                  )
                 ))
         .void
 
     def remove(id: QuestionId) =
       questionColl.remove(BSONDocument("_id" -> id)) >>
-      (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
+        (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
 
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
-        BSONDocument("_id" -> id),
-        BSONDocument(
-            "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c)))
+      BSONDocument("_id" -> id),
+      BSONDocument(
+        "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c)))
     )
   }
 
@@ -194,12 +196,12 @@ final class QaApi(questionColl: Coll,
 
     def accept(q: Question, a: Answer) =
       (question accept q) >> answerColl.update(
-          BSONDocument("questionId" -> q.id),
-          BSONDocument("$unset" -> BSONDocument("acceptedAt" -> true)),
-          multi = true
+        BSONDocument("questionId" -> q.id),
+        BSONDocument("$unset" -> BSONDocument("acceptedAt" -> true)),
+        multi = true
       ) >> answerColl.update(
-          BSONDocument("_id" -> a.id),
-          BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
+        BSONDocument("_id" -> a.id),
+        BSONDocument("$set" -> BSONDocument("acceptedAt" -> DateTime.now))
       )
 
     def popular(questionId: QuestionId): Fu[List[Answer]] =
@@ -225,15 +227,15 @@ final class QaApi(questionColl: Coll,
         _ ?? { a =>
           val newVote = a.vote.add(user.id, v)
           answerColl.update(
-              BSONDocument("_id" -> a.id),
-              BSONDocument("$set" -> BSONDocument("vote" -> newVote))
+            BSONDocument("_id" -> a.id),
+            BSONDocument("$set" -> BSONDocument("vote" -> newVote))
           ) inject newVote.some
         }
       }
 
     def remove(a: Answer): Fu[Unit] =
       answerColl.remove(BSONDocument("_id" -> a.id)) >>
-      (question recountAnswers a.questionId).void
+        (question recountAnswers a.questionId).void
 
     def remove(id: AnswerId): Fu[Unit] = findById(id) flatMap { _ ?? remove }
 
@@ -242,10 +244,10 @@ final class QaApi(questionColl: Coll,
 
     def removeComment(id: QuestionId, c: CommentId) =
       answerColl.update(
-          BSONDocument("questionId" -> id),
-          BSONDocument(
-              "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c))),
-          multi = true)
+        BSONDocument("questionId" -> id),
+        BSONDocument(
+          "$pull" -> BSONDocument("comments" -> BSONDocument("id" -> c))),
+        multi = true)
 
     def moveToQuestionComment(a: Answer, q: Question) = {
       val allComments =
@@ -295,8 +297,8 @@ final class QaApi(questionColl: Coll,
     }
 
     def remove(questionId: QuestionId, commentId: CommentId) =
-      question.removeComment(questionId, commentId) >> answer.removeComment(
-          questionId, commentId)
+      question.removeComment(questionId, commentId) >> answer
+        .removeComment(questionId, commentId)
 
     private implicit val commentBSONHandler = Macros.handler[Comment]
   }
@@ -309,23 +311,29 @@ final class QaApi(questionColl: Coll,
     // list all tags found in questions collection
     def all: Fu[List[Tag]] = cache(true) {
       val col = questionColl
-      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{AddToSet, Group, Project, Unwind}
+      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+        AddToSet,
+        Group,
+        Project,
+        Unwind
+      }
 
       col
         .aggregate(Project(BSONDocument("tags" -> BSONBoolean(true))),
                    List(Unwind("tags"),
                         Group(BSONBoolean(true))("tags" -> AddToSet("tags"))))
-        .map(_.documents.headOption
-              .flatMap(_.getAs[List[String]]("tags"))
-              .getOrElse(List.empty[String])
-              .map(_.toLowerCase)
-              .distinct)
+        .map(
+          _.documents.headOption
+            .flatMap(_.getAs[List[String]]("tags"))
+            .getOrElse(List.empty[String])
+            .map(_.toLowerCase)
+            .distinct)
     }
   }
 
   object relation {
     private val questionsCache: Cache[List[Question]] = LruCache(
-        timeToLive = 3.hours)
+      timeToLive = 3.hours)
 
     def questions(q: Question, max: Int): Fu[List[Question]] =
       questionsCache(q.id -> max) {

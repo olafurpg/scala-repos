@@ -29,9 +29,9 @@ object Headers {
 
   def byName(name: String): Header[HttpHeader] =
     HeaderImpl[HttpHeader](
-        name,
-        _ ⇒ optionalHeaderInstanceByName(name.toLowerCase()).map(_.asScala),
-        classTag[HttpHeader])
+      name,
+      _ ⇒ optionalHeaderInstanceByName(name.toLowerCase()).map(_.asScala),
+      classTag[HttpHeader])
 
   def byClass[T <: HttpHeader](clazz: Class[T]): Header[T] =
     HeaderImpl[T](clazz.getSimpleName,
@@ -40,8 +40,7 @@ object Headers {
 
   private def optionalHeaderInstanceByName(
       lowercaseName: String): Directive1[Optional[model.HttpHeader]] =
-    extract(
-        _.request.headers.collectFirst {
+    extract(_.request.headers.collectFirst {
       case h @ model.HttpHeader(`lowercaseName`, _) ⇒ h
     }.asJava)
 }

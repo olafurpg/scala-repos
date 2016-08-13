@@ -17,7 +17,7 @@ class DurationToHumanReadableTest extends MarathonSpec with Matchers {
     val d = 1.hour + 5.minutes + 10.seconds + 500.millis
 
     d.toHumanReadable should equal(
-        "1 hours 5 minutes 10 seconds 500 milliseconds")
+      "1 hours 5 minutes 10 seconds 500 milliseconds")
   }
 
   test("should show '0 milliseconds' if less than 1ms") {

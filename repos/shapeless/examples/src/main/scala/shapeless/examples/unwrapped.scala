@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Miles Sabin 
+ * Copyright (c) 2016 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ object UnwrappedExamples {
       encodeRest: Strict[Encode[Rest]]) = new Encode[FieldType[K, V] :: Rest] {
       def fields(hl: FieldType[K, V] :: Rest) =
         encodeRest.value.fields(hl.tail) +
-        (key.value.name -> encodeV.value.toJsonFragment(hl.head))
+          (key.value.name -> encodeV.value.toJsonFragment(hl.head))
     }
     // the magic one!
     implicit def encodeGeneric[T, Repr](
@@ -118,8 +118,8 @@ object UnwrappedExamples {
       new Encode2[FieldType[K, V] :: Rest] {
         def fields(hl: FieldType[K, V] :: Rest) =
           encodeRest.value.fields(hl.tail) +
-          (key.value.name -> encodeV.value.toJsonFragment(
-                  uw.value.unwrap(hl.head)))
+            (key.value.name -> encodeV.value.toJsonFragment(
+              uw.value.unwrap(hl.head)))
       }
     implicit def encodeGeneric[T, Repr](
         implicit gen: LabelledGeneric.Aux[T, Repr],

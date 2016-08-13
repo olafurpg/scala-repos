@@ -28,7 +28,7 @@ class StreamLayoutSpec extends AkkaSpec {
   def testSink(): Module = testAtomic(1, 0)
 
   implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system).withAutoFusing(false))
+    ActorMaterializerSettings(system).withAutoFusing(false))
 
   "StreamLayout" must {
 
@@ -133,7 +133,7 @@ class StreamLayoutSpec extends AkkaSpec {
     "fail fusing when value computation is too complex" in {
       // this tests that the canary in to coal mine actually works
       val g = (1 to tooDeepForStack).foldLeft(
-          Flow[Int].mapMaterializedValue(_ ⇒ 1)) { (flow, i) ⇒
+        Flow[Int].mapMaterializedValue(_ ⇒ 1)) { (flow, i) ⇒
         flow.mapMaterializedValue(x ⇒ x + i)
       }
       a[StackOverflowError] shouldBe thrownBy {
@@ -145,8 +145,8 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "starting from a Source" in {
         val g = (1 to tooDeepForStack).foldLeft(
-            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-            i) ⇒ f.map(identity))
+          Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+          f.map(identity))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -163,8 +163,8 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "using .via" in {
         val g = (1 to tooDeepForStack).foldLeft(
-            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-            i) ⇒ f.via(Flow[Int].map(identity)))
+          Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+          f.via(Flow[Int].map(identity)))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -175,9 +175,10 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "starting from a Source" in {
         val g =
-          Source fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-                  i) ⇒ f.map(identity)))
+          Source fromGraph Fusing.aggressive(
+            (1 to tooDeepForStack).foldLeft(
+              Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+              f.map(identity)))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -185,8 +186,9 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "starting from a Flow" in {
         val g =
-          Flow fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Flow[Int])((f, i) ⇒ f.map(identity)))
+          Flow fromGraph Fusing.aggressive(
+            (1 to tooDeepForStack).foldLeft(Flow[Int])((f, i) ⇒
+              f.map(identity)))
         val (mat, fut) =
           g.runWith(Source.single(42).mapMaterializedValue(_ ⇒ 1), Sink.seq)
         mat should ===(1)
@@ -195,9 +197,10 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "using .via" in {
         val g =
-          Source fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-                  i) ⇒ f.via(Flow[Int].map(identity))))
+          Source fromGraph Fusing.aggressive(
+            (1 to tooDeepForStack).foldLeft(
+              Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+              f.via(Flow[Int].map(identity))))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -206,7 +209,8 @@ class StreamLayoutSpec extends AkkaSpec {
   }
 
   case class TestPublisher(owner: Module, port: OutPort)
-      extends Publisher[Any] with Subscription {
+      extends Publisher[Any]
+      with Subscription {
     var downstreamModule: Module = _
     var downstreamPort: InPort = _
 
@@ -306,9 +310,9 @@ class StreamLayoutSpec extends AkkaSpec {
     }
 
     materializer.publishers.distinct.size should be(
-        materializer.publishers.size)
+      materializer.publishers.size)
     materializer.subscribers.distinct.size should be(
-        materializer.subscribers.size)
+      materializer.subscribers.size)
 
     (materializer.publishers.toSet, materializer.subscribers.toSet)
   }

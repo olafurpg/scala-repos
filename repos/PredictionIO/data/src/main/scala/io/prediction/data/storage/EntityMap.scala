@@ -65,13 +65,13 @@ object EntityIdIxMap {
 
 /** :: Experimental :: */
 @Experimental
-class EntityMap[A](
-    val idToData: Map[String, A], override val idToIx: BiMap[String, Long])
+class EntityMap[A](val idToData: Map[String, A],
+                   override val idToIx: BiMap[String, Long])
     extends EntityIdIxMap(idToIx) {
 
   def this(idToData: Map[String, A]) = this(
-      idToData,
-      BiMap.stringLong(idToData.keySet)
+    idToData,
+    BiMap.stringLong(idToData.keySet)
   )
 
   def data(id: String): A = idToData(id)

@@ -100,7 +100,7 @@ private[repl] trait SparkExprTyper extends Logging {
   def typeOfExpression(expr: String, silent: Boolean = true): Type = {
     if (typeOfExpressionDepth > 2) {
       logDebug(
-          "Terminating typeOfExpression recursion for expression: " + expr)
+        "Terminating typeOfExpression recursion for expression: " + expr)
       return NoType
     }
     typeOfExpressionDepth += 1

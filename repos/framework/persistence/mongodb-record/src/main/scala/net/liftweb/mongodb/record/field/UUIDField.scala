@@ -30,7 +30,8 @@ import net.liftweb.record.{Field, FieldHelpers, MandatoryTypedField}
 import net.liftweb.util.Helpers._
 
 class UUIDField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[UUID, OwnerType] with MandatoryTypedField[UUID] {
+    extends Field[UUID, OwnerType]
+    with MandatoryTypedField[UUID] {
 
   def owner = rec
 

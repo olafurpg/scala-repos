@@ -80,11 +80,11 @@ trait MethodImpl[A, +R] {
 }
 
 trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
-    extends ((A, B) => R) with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] {
-  this: Method[A, B, R] =>
+    extends ((A, B) => R)
+    with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] { this: Method[A, B, R] =>
   protected def bindingMissing(a: A, b: B): R =
     throw new UnsupportedOperationException(
-        "Types not found!" + a + b + " " + ops)
+      "Types not found!" + a + b + " " + ops)
   protected def multipleOptions(
       a: A,
       b: B,
@@ -126,7 +126,8 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   }
 
   def register[AA <: A, BB <: B](op: Method[AA, BB, _ <: R])(
-      implicit manA: Manifest[AA], manB: Manifest[BB]) {
+      implicit manA: Manifest[AA],
+      manB: Manifest[BB]) {
     super.register(manA.runtimeClass.asInstanceOf[Class[_]],
                    manB.runtimeClass.asInstanceOf[Class[_]],
                    op)
@@ -138,12 +139,14 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   * @author dlwh
   */
 trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
-    extends ((A, B) => Unit) with MMRegistry2[Method[_ <: A, _ <: B]] {
-  this: Method[A, B] =>
+    extends ((A, B) => Unit)
+    with MMRegistry2[Method[_ <: A, _ <: B]] { this: Method[A, B] =>
   protected def bindingMissing(a: A, b: B): Unit =
     throw new UnsupportedOperationException("Types not found!")
   protected def multipleOptions(
-      a: A, b: B, m: Map[(Class[_], Class[_]), Method[_ <: A, _ <: B]]) = {
+      a: A,
+      b: B,
+      m: Map[(Class[_], Class[_]), Method[_ <: A, _ <: B]]) = {
     throw new RuntimeException("Multiple bindings for method: " + m)
   }
 
@@ -160,8 +163,8 @@ trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
       }
     } else {
       val m = resolve(
-          a.getClass,
-          b.asInstanceOf[AnyRef].getClass.asInstanceOf[Class[_ <: B]])
+        a.getClass,
+        b.asInstanceOf[AnyRef].getClass.asInstanceOf[Class[_ <: B]])
       m.size match {
         case 0 =>
           cache.put(ac -> bc, None)
@@ -182,8 +185,8 @@ trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
     }
   }
 
-  def register[AA <: A, BB <: B](op: Method[AA, BB])(
-      implicit manA: Manifest[AA], manB: Manifest[BB]) {
+  def register[AA <: A, BB <: B](
+      op: Method[AA, BB])(implicit manA: Manifest[AA], manB: Manifest[BB]) {
     super.register(manA.runtimeClass.asInstanceOf[Class[AA]],
                    manB.runtimeClass.asInstanceOf[Class[BB]],
                    op)
@@ -205,8 +208,8 @@ trait MMRegistry2[R] {
       ops(ReflectionUtil.boxedFromPrimitive(a) -> b) = op
       if (b.isPrimitive) {
         ops(
-            ReflectionUtil.boxedFromPrimitive(a) -> ReflectionUtil
-              .boxedFromPrimitive(b)) = op
+          ReflectionUtil.boxedFromPrimitive(a) -> ReflectionUtil
+            .boxedFromPrimitive(b)) = op
       }
     }
     cache.clear()
@@ -254,10 +257,10 @@ trait MMRegistry2[R] {
     for (pair @ (aa, bb) <- options.keys) {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
-                aa.isAssignableFrom(pair._1) &&
-                bb.isAssignableFrom(pair._2))) {
+            aa.isAssignableFrom(pair._1) &&
+              bb.isAssignableFrom(pair._2))) {
         bestCandidates = bestCandidates.filterNot(pair =>
-              pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb))
+          pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb))
         bestCandidates += pair
       }
     }
@@ -332,11 +335,12 @@ trait MMRegistry3[R] {
     for (pair @ (aa, bb, cc) <- options.keys) {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
-                aa.isAssignableFrom(pair._1) &&
-                bb.isAssignableFrom(pair._2)) &&
+            aa.isAssignableFrom(pair._1) &&
+              bb.isAssignableFrom(pair._2)) &&
           cc.isAssignableFrom(pair._3)) {
-        bestCandidates = bestCandidates.filterNot(pair =>
-              pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb) &&
+        bestCandidates = bestCandidates.filterNot(
+          pair =>
+            pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb) &&
               pair._3.isAssignableFrom(cc))
         bestCandidates += pair
       }
@@ -359,15 +363,17 @@ trait MMRegistry1[M] {
   }
 
   protected def resolve(
-      a: Class[_], checkedA: Set[Class[_]] = Set.empty): Map[Class[_], M] = {
+      a: Class[_],
+      checkedA: Set[Class[_]] = Set.empty): Map[Class[_], M] = {
     ops.get(a) match {
       case Some(m) => Map(a -> m)
       case None =>
         val newCA = checkedA ++ a.getInterfaces
         val sa = a.getSuperclass +: a.getInterfaces.filterNot(checkedA)
-        val allParents = for (aa <- sa; if aa != null; m <- resolve(aa, newCA)) yield {
-          m
-        }
+        val allParents = for (aa <- sa; if aa != null; m <- resolve(aa, newCA))
+          yield {
+            m
+          }
         allParents.toMap
     }
   }

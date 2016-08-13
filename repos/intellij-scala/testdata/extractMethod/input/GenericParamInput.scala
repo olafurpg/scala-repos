@@ -6,7 +6,7 @@ abstract class GenericParamInput[T] {
     val y = x
     /*start*/
     println(y)
-/*end*/
+    /*end*/
   }
 }
 /*

@@ -50,48 +50,46 @@ case class AppUpdate(id: Option[PathId] = None,
     * after updating its members with respect to this update request.
     */
   def apply(app: AppDefinition): AppDefinition = app.copy(
-      id = app.id,
-      cmd = cmd.orElse(app.cmd),
-      args = args.orElse(app.args),
-      user = user.orElse(app.user),
-      env = env.getOrElse(app.env),
-      instances = instances.getOrElse(app.instances),
-      cpus = cpus.getOrElse(app.cpus),
-      mem = mem.getOrElse(app.mem),
-      disk = disk.getOrElse(app.disk),
-      executor = executor.getOrElse(app.executor),
-      constraints = constraints.getOrElse(app.constraints),
-      fetch = fetch.getOrElse(app.fetch),
-      storeUrls = storeUrls.getOrElse(app.storeUrls),
-      portDefinitions = portDefinitions.getOrElse(app.portDefinitions),
-      requirePorts = requirePorts.getOrElse(app.requirePorts),
-      backoff = backoff.getOrElse(app.backoff),
-      backoffFactor = backoffFactor.getOrElse(app.backoffFactor),
-      maxLaunchDelay = maxLaunchDelay.getOrElse(app.maxLaunchDelay),
-      container = container
-          .filterNot(_ == Container.Empty)
-          .orElse(app.container),
-      healthChecks = healthChecks.getOrElse(app.healthChecks),
-      dependencies = dependencies
-          .map(_.map(_.canonicalPath(app.id)))
-          .getOrElse(app.dependencies),
-      upgradeStrategy = upgradeStrategy.getOrElse(app.upgradeStrategy),
-      labels = labels.getOrElse(app.labels),
-      acceptedResourceRoles = acceptedResourceRoles.orElse(
-            app.acceptedResourceRoles),
-      ipAddress = ipAddress.orElse(app.ipAddress),
-      // The versionInfo may never be overridden by an AppUpdate.
-      // Setting the version in AppUpdate means that the user wants to revert to that version. In that
-      // case, we do not update the current AppDefinition but revert completely to the specified version.
-      // For all other updates, the GroupVersioningUtil will determine a new version if the AppDefinition
-      // has really changed.
-      versionInfo = app.versionInfo,
-      residency = residency.orElse(app.residency)
+    id = app.id,
+    cmd = cmd.orElse(app.cmd),
+    args = args.orElse(app.args),
+    user = user.orElse(app.user),
+    env = env.getOrElse(app.env),
+    instances = instances.getOrElse(app.instances),
+    cpus = cpus.getOrElse(app.cpus),
+    mem = mem.getOrElse(app.mem),
+    disk = disk.getOrElse(app.disk),
+    executor = executor.getOrElse(app.executor),
+    constraints = constraints.getOrElse(app.constraints),
+    fetch = fetch.getOrElse(app.fetch),
+    storeUrls = storeUrls.getOrElse(app.storeUrls),
+    portDefinitions = portDefinitions.getOrElse(app.portDefinitions),
+    requirePorts = requirePorts.getOrElse(app.requirePorts),
+    backoff = backoff.getOrElse(app.backoff),
+    backoffFactor = backoffFactor.getOrElse(app.backoffFactor),
+    maxLaunchDelay = maxLaunchDelay.getOrElse(app.maxLaunchDelay),
+    container = container.filterNot(_ == Container.Empty).orElse(app.container),
+    healthChecks = healthChecks.getOrElse(app.healthChecks),
+    dependencies = dependencies
+      .map(_.map(_.canonicalPath(app.id)))
+      .getOrElse(app.dependencies),
+    upgradeStrategy = upgradeStrategy.getOrElse(app.upgradeStrategy),
+    labels = labels.getOrElse(app.labels),
+    acceptedResourceRoles =
+      acceptedResourceRoles.orElse(app.acceptedResourceRoles),
+    ipAddress = ipAddress.orElse(app.ipAddress),
+    // The versionInfo may never be overridden by an AppUpdate.
+    // Setting the version in AppUpdate means that the user wants to revert to that version. In that
+    // case, we do not update the current AppDefinition but revert completely to the specified version.
+    // For all other updates, the GroupVersioningUtil will determine a new version if the AppDefinition
+    // has really changed.
+    versionInfo = app.versionInfo,
+    residency = residency.orElse(app.residency)
   )
 
   def withCanonizedIds(base: PathId = PathId.empty): AppUpdate = copy(
-      id = id.map(_.canonicalPath(base)),
-      dependencies = dependencies.map(_.map(_.canonicalPath(base)))
+    id = id.map(_.canonicalPath(base)),
+    dependencies = dependencies.map(_.map(_.canonicalPath(base)))
   )
 }
 

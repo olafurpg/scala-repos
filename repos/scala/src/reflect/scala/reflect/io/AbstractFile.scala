@@ -7,7 +7,13 @@ package scala
 package reflect
 package io
 
-import java.io.{IOException, InputStream, OutputStream, BufferedOutputStream, ByteArrayOutputStream}
+import java.io.{
+  IOException,
+  InputStream,
+  OutputStream,
+  BufferedOutputStream,
+  ByteArrayOutputStream
+}
 import java.io.{File => JFile}
 import java.net.URL
 import scala.reflect.internal.util.Statistics
@@ -233,8 +239,8 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     file
   }
 
-  private def fileOrSubdirectoryNamed(
-      name: String, isDir: Boolean): AbstractFile = {
+  private def fileOrSubdirectoryNamed(name: String,
+                                      isDir: Boolean): AbstractFile = {
     val lookup = lookupName(name, isDir)
     if (lookup != null) lookup
     else {
@@ -250,8 +256,8 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     */
   def fileNamed(name: String): AbstractFile = {
     assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(
-               name, path))
+           "Tried to find '%s' in '%s' but it is not a directory".format(name,
+                                                                         path))
     fileOrSubdirectoryNamed(name, isDir = false)
   }
 
@@ -261,8 +267,8 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     */
   def subdirectoryNamed(name: String): AbstractFile = {
     assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(
-               name, path))
+           "Tried to find '%s' in '%s' but it is not a directory".format(name,
+                                                                         path))
     fileOrSubdirectoryNamed(name, isDir = true)
   }
 

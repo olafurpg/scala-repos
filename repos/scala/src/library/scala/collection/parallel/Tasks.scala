@@ -10,7 +10,11 @@ package scala
 package collection.parallel
 
 import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.{ForkJoinPool, RecursiveAction, ForkJoinWorkerThread}
+import java.util.concurrent.{
+  ForkJoinPool,
+  RecursiveAction,
+  ForkJoinWorkerThread
+}
 import scala.concurrent.ExecutionContext
 import scala.util.control.Breaks._
 import scala.annotation.unchecked.uncheckedVariance
@@ -331,20 +335,20 @@ object ThreadPoolTasks {
   val tcount = new atomic.AtomicLong(0L)
 
   val defaultThreadPool = new ThreadPoolExecutor(
-      numCores,
-      Int.MaxValue,
-      60L,
-      TimeUnit.MILLISECONDS,
-      new LinkedBlockingQueue[Runnable],
-      new ThreadFactory {
-        def newThread(r: Runnable) = {
-          val t = new Thread(r)
-          t.setName("pc-thread-" + tcount.incrementAndGet)
-          t.setDaemon(true)
-          t
-        }
-      },
-      new ThreadPoolExecutor.CallerRunsPolicy
+    numCores,
+    Int.MaxValue,
+    60L,
+    TimeUnit.MILLISECONDS,
+    new LinkedBlockingQueue[Runnable],
+    new ThreadFactory {
+      def newThread(r: Runnable) = {
+        val t = new Thread(r)
+        t.setName("pc-thread-" + tcount.incrementAndGet)
+        t.setDaemon(true)
+        t
+      }
+    },
+    new ThreadPoolExecutor.CallerRunsPolicy
   )
 }
 
@@ -374,7 +378,8 @@ trait HavingForkJoinPool {
 trait ForkJoinTasks extends Tasks with HavingForkJoinPool {
 
   trait WrappedTask[R, +Tp]
-      extends RecursiveAction with super.WrappedTask[R, Tp] {
+      extends RecursiveAction
+      with super.WrappedTask[R, Tp] {
     def start() = fork
     def sync() = join
     def tryCancel = tryUnfork
@@ -441,11 +446,12 @@ object ForkJoinTasks {
 /* Some boilerplate due to no deep mixin composition. Not sure if it can be done differently without them.
  */
 trait AdaptiveWorkStealingForkJoinTasks
-    extends ForkJoinTasks with AdaptiveWorkStealingTasks {
+    extends ForkJoinTasks
+    with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
-      extends super [ForkJoinTasks].WrappedTask[R, Tp]
-      with super [AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+      extends super[ForkJoinTasks].WrappedTask[R, Tp]
+      with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
@@ -454,11 +460,12 @@ trait AdaptiveWorkStealingForkJoinTasks
 
 @deprecated("Use `AdaptiveWorkStealingForkJoinTasks` instead.", "2.11.0")
 trait AdaptiveWorkStealingThreadPoolTasks
-    extends ThreadPoolTasks with AdaptiveWorkStealingTasks {
+    extends ThreadPoolTasks
+    with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
-      extends super [ThreadPoolTasks].WrappedTask[R, Tp]
-      with super [AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+      extends super[ThreadPoolTasks].WrappedTask[R, Tp]
+      with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
@@ -489,8 +496,8 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
     def compute(task: Task[R, Tp], depth: Int): Future[Task[R, Tp]] = {
       if (task.shouldSplitFurther && depth < maxdepth) {
         val subtasks = task.split
-        val subfutures = for (subtask <- subtasks.iterator) yield
-          compute(subtask, depth + 1)
+        val subfutures = for (subtask <- subtasks.iterator)
+          yield compute(subtask, depth + 1)
         subfutures.reduceLeft { (firstFuture, nextFuture) =>
           for {
             firstTask <- firstFuture
@@ -521,9 +528,8 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
 
   def execute[R, Tp](task: Task[R, Tp]): () => R = {
     val future = exec(task)
-    val callback = () =>
-      {
-        Await.result(future, scala.concurrent.duration.Duration.Inf)
+    val callback = () => {
+      Await.result(future, scala.concurrent.duration.Duration.Inf)
     }
     callback
   }
@@ -536,7 +542,7 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
 }
 
 /** This tasks implementation uses execution contexts to spawn a parallel computation.
-  *  
+  *
   *  As an optimization, it internally checks whether the execution context is the
   *  standard implementation based on fork/join pools, and if it is, creates a
   *  `ForkJoinTaskSupport` that shares the same pool to forward its request to it.
@@ -550,7 +556,7 @@ trait ExecutionContextTasks extends Tasks {
   val environment: ExecutionContext
 
   /** A driver serves as a target for this proxy `Tasks` object.
-    *  
+    *
     *  If the execution context has the standard implementation and uses fork/join pools,
     *  the driver is `ForkJoinTaskSupport` with the same pool, as an optimization.
     *  Otherwise, the driver will be a Scala `Future`-based implementation.

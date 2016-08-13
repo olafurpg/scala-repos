@@ -32,9 +32,9 @@ final class Env(config: Config,
   import settings._
 
   private val socket = system.actorOf(Props(
-                                          new Socket(history = history,
-                                                     router = hub.actor.router,
-                                                     uidTtl = SocketUidTtl)),
+                                        new Socket(history = history,
+                                                   router = hub.actor.router,
+                                                   uidTtl = SocketUidTtl)),
                                       name = SocketName)
 
   lazy val seekApi = new SeekApi(coll = db(CollectionSeek),
@@ -44,26 +44,27 @@ final class Env(config: Config,
                                  maxPerUser = SeekMaxPerUser)
 
   val lobby = system.actorOf(Props(
-                                 new Lobby(
-                                     socket = socket,
-                                     seekApi = seekApi,
-                                     blocking = blocking,
-                                     playban = playban,
-                                     onStart = onStart,
-                                     broomPeriod = BroomPeriod,
-                                     resyncIdsPeriod = ResyncIdsPeriod
-                                 )),
+                               new Lobby(
+                                 socket = socket,
+                                 seekApi = seekApi,
+                                 blocking = blocking,
+                                 playban = playban,
+                                 onStart = onStart,
+                                 broomPeriod = BroomPeriod,
+                                 resyncIdsPeriod = ResyncIdsPeriod
+                               )),
                              name = ActorName)
 
-  lazy val socketHandler = new SocketHandler(
-      hub = hub, lobby = lobby, socket = socket, blocking = blocking)
+  lazy val socketHandler = new SocketHandler(hub = hub,
+                                             lobby = lobby,
+                                             socket = socket,
+                                             blocking = blocking)
 
   lazy val history = new History[actorApi.Messadata](ttl = MessageTtl)
 
   private val abortListener = new AbortListener(seekApi = seekApi)
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'abortGame)
     def receive = {
       case lila.game.actorApi.AbortedBy(pov) if pov.game.isCorrespondence =>
@@ -76,12 +77,12 @@ object Env {
 
   lazy val current =
     "lobby" boot new Env(
-        config = lila.common.PlayApp loadConfig "lobby",
-        db = lila.db.Env.current,
-        hub = lila.hub.Env.current,
-        onStart = lila.game.Env.current.onStart,
-        blocking = lila.relation.Env.current.api.fetchBlocking,
-        playban = lila.playban.Env.current.api.currentBan _,
-        system = lila.common.PlayApp.system,
-        scheduler = lila.common.PlayApp.scheduler)
+      config = lila.common.PlayApp loadConfig "lobby",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      onStart = lila.game.Env.current.onStart,
+      blocking = lila.relation.Env.current.api.fetchBlocking,
+      playban = lila.playban.Env.current.api.currentBan _,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler)
 }

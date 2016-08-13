@@ -36,9 +36,10 @@ import org.apache.spark.rdd.RDD
   * @param predictionAndLabels an RDD of (predicted ranking, ground truth set) pairs.
   */
 @Since("1.2.0")
-class RankingMetrics[T : ClassTag](
+class RankingMetrics[T: ClassTag](
     predictionAndLabels: RDD[(Array[T], Array[T])])
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   /**
     * Compute the average precision of all the queries, truncated at ranking position k.

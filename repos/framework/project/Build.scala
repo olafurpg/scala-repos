@@ -46,7 +46,7 @@ object BuildDef extends Build {
     classpath.collectFirst {
       case entry @ MatchingModule(moduleOrganization, moduleName, revision)
           if moduleOrganization == organization &&
-          moduleName.startsWith(name) =>
+            moduleName.startsWith(name) =>
         (revision, entry.data)
     }
   }
@@ -61,13 +61,13 @@ object BuildDef extends Build {
 
   // Core Projects
   // -------------
-  lazy val core: Seq[ProjectReference] = Seq(
-      common, actor, markdown, json, json_scalaz7, json_ext, util)
+  lazy val core: Seq[ProjectReference] =
+    Seq(common, actor, markdown, json, json_scalaz7, json_ext, util)
 
   lazy val common = coreProject("common").settings(
-      description := "Common Libraties and Utilities",
-      libraryDependencies ++=
-        Seq(slf4j_api, logback, slf4j_log4j12, scala_xml, scala_parser))
+    description := "Common Libraties and Utilities",
+    libraryDependencies ++=
+      Seq(slf4j_api, logback, slf4j_log4j12, scala_xml, scala_parser))
 
   lazy val actor = coreProject("actor")
     .dependsOn(common)
@@ -75,18 +75,18 @@ object BuildDef extends Build {
               parallelExecution in Test := false)
 
   lazy val markdown = coreProject("markdown").settings(
-      description := "Markdown Parser",
-      parallelExecution in Test := false,
-      libraryDependencies <++= scalaVersion { sv =>
-        Seq(scalatest, junit, scala_xml, scala_parser)
-      })
+    description := "Markdown Parser",
+    parallelExecution in Test := false,
+    libraryDependencies <++= scalaVersion { sv =>
+      Seq(scalatest, junit, scala_xml, scala_parser)
+    })
 
   lazy val json = coreProject("json").settings(
-      description := "JSON Library",
-      parallelExecution in Test := false,
-      libraryDependencies <++= scalaVersion { sv =>
-        Seq(scalap(sv), paranamer)
-      })
+    description := "JSON Library",
+    parallelExecution in Test := false,
+    libraryDependencies <++= scalaVersion { sv =>
+      Seq(scalap(sv), paranamer)
+    })
 
   lazy val documentationHelpers = coreProject("documentation-helpers")
     .settings(description := "Documentation Helpers")
@@ -129,7 +129,7 @@ object BuildDef extends Build {
   lazy val webkit = webProject("webkit")
     .dependsOn(util, testkit % "provided")
     .settings(libraryDependencies ++=
-          Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
+      Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
     .settings(yuiCompressor.Plugin.yuiSettings: _*)
     .settings(description := "Webkit Library",
               parallelExecution in Test := false,
@@ -146,7 +146,7 @@ object BuildDef extends Build {
                                    (src / "webapp").absString)
               },
               (compile in Compile) <<= (compile in Compile) dependsOn
-              (WebKeys.assets),
+                (WebKeys.assets),
               /**
                 * This is to ensure that the tests in net.liftweb.webapptest run last
                 * so that other tests (MenuSpec in particular) run before the SiteMap
@@ -160,16 +160,16 @@ object BuildDef extends Build {
                 }
 
                 Seq(
-                    new Group("others", others, InProcess),
-                    new Group("webapptests", webapptests, InProcess)
+                  new Group("others", others, InProcess),
+                  new Group("webapptests", webapptests, InProcess)
                 )
               })
     .enablePlugins(SbtWeb)
 
   // Persistence Projects
   // --------------------
-  lazy val persistence: Seq[ProjectReference] = Seq(
-      db, proto, mapper, record, squeryl_record, mongodb, mongodb_record)
+  lazy val persistence: Seq[ProjectReference] =
+    Seq(db, proto, mapper, record, squeryl_record, mongodb, mongodb_record)
 
   lazy val db = persistenceProject("db")
     .dependsOn(util, webkit)
@@ -219,27 +219,27 @@ object BuildDef extends Build {
     * @param prefix   the prefix of project module.
     * @param module   the name of the project module. Typically, a project id is of the form lift-`module`.
     */
-  def liftProject(
-      base: String, prefix: String = "lift-")(module: String): Project =
-    liftProject(
-        id = if (module.startsWith(prefix)) module else prefix + module,
-        base = file(base) / module.stripPrefix(prefix))
+  def liftProject(base: String, prefix: String = "lift-")(
+      module: String): Project =
+    liftProject(id =
+                  if (module.startsWith(prefix)) module else prefix + module,
+                base = file(base) / module.stripPrefix(prefix))
 
   def liftProject(id: String, base: File): Project = {
     Project(id, base)
       .settings(liftBuildSettings: _*)
       .settings(
-          scalacOptions ++= List("-feature", "-language:implicitConversions"))
+        scalacOptions ++= List("-feature", "-language:implicitConversions"))
       .settings(
-          autoAPIMappings := true,
-          apiMappings ++= {
-            val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
+        autoAPIMappings := true,
+        apiMappings ++= {
+          val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
 
-            findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
-              case (revision, file) =>
-                (file -> url("http://www.scala-lang.org/api/" + version))
-            }.toMap
-          }
+          findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
+            case (revision, file) =>
+              (file -> url("http://www.scala-lang.org/api/" + version))
+          }.toMap
+        }
       )
   }
 }

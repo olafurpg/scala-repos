@@ -16,16 +16,16 @@ trait FlatSpecSingleTestTest extends FlatSpecGenerator {
     addFlatSpec()
 
     runTestByLocation(
-        7,
-        1,
-        flatSpecFileName,
-        checkConfigAndSettings(
-            _,
-            flatSpecClassName,
-            "A FlatSpecTest should be able to run single test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root, flatSpecTestPath: _*) &&
+      7,
+      1,
+      flatSpecFileName,
+      checkConfigAndSettings(
+        _,
+        flatSpecClassName,
+        "A FlatSpecTest should be able to run single test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root, flatSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
-        debug = true)
+      debug = true)
   }
 }

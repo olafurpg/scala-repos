@@ -84,8 +84,8 @@ final class Env(config: Config,
         move.simulId foreach { simulId =>
           move.opponentUserId foreach { opId =>
             hub.actor.userRegister ! lila.hub.actorApi.SendTo(
-                opId,
-                lila.socket.Socket.makeMessage("simulPlayerMove", move.gameId))
+              opId,
+              lila.socket.Socket.makeMessage("simulPlayerMove", move.gameId))
           }
         }
     }
@@ -107,8 +107,7 @@ final class Env(config: Config,
 
   private[simul] val simulColl = db(CollectionSimul)
 
-  private val sequencerMap = system.actorOf(
-      Props(ActorMap { id =>
+  private val sequencerMap = system.actorOf(Props(ActorMap { id =>
     new Sequencer(SequencerTimeout.some, logger = logger)
   }))
 

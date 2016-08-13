@@ -20,14 +20,14 @@ import scala.concurrent.duration._
 class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
-      "akka.actor.default-dispatcher")
+    "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
   "InputStreamSource" must {
 
     "not signal when no demand" in {
       val f = StreamConverters.fromInputStream(() ⇒
-            new InputStream {
+        new InputStream {
           override def read(): Int = 42
       })
 
@@ -37,7 +37,7 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
     "read bytes from InputStream" in assertAllStagesStopped {
       val f = StreamConverters
         .fromInputStream(() ⇒
-              new InputStream {
+          new InputStream {
             @volatile var buf = List("a", "b", "c").map(_.charAt(0).toInt)
             override def read(): Int = {
               buf match {

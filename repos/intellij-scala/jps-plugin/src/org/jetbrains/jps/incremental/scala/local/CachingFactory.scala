@@ -3,7 +3,11 @@ package local
 
 import java.io.File
 
-import org.jetbrains.jps.incremental.scala.data.{CompilerData, CompilerJars, SbtData}
+import org.jetbrains.jps.incremental.scala.data.{
+  CompilerData,
+  CompilerJars,
+  SbtData
+}
 import sbt.compiler.AnalyzingCompiler
 import sbt.inc.AnalysisStore
 
@@ -21,7 +25,7 @@ class CachingFactory(delegate: CompilerFactory,
 
   private val scalacCache =
     new Cache[(SbtData, Option[CompilerJars]), Option[AnalyzingCompiler]](
-        scalacLimit)
+      scalacLimit)
 
   def createCompiler(compilerData: CompilerData,
                      client: Client,

@@ -14,7 +14,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class TimerTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
 
   private def testTimerRunsWithLocals(timer: Timer): Unit = {
@@ -59,7 +61,7 @@ class TimerTest
   }
 
   test(
-      "ReferenceCountingTimer stops the underlying timer when acquire count reaches 0") {
+    "ReferenceCountingTimer stops the underlying timer when acquire count reaches 0") {
 
     val underlying = mock[Timer]
     val factory = mock[() => Timer]

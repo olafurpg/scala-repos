@@ -31,30 +31,31 @@ import kafka.common.InvalidOffsetException
 /**
   * An index that maps offsets to physical file locations for a particular log segment. This index may be sparse:
   * that is it may not hold an entry for all messages in the log.
-  * 
+  *
   * The index is stored in a file that is pre-allocated to hold a fixed maximum number of 8-byte entries.
-  * 
+  *
   * The index supports lookups against a memory-map of this file. These lookups are done using a simple binary search variant
   * to locate the offset/location pair for the greatest offset less than or equal to the target offset.
-  * 
+  *
   * Index files can be opened in two ways: either as an empty, mutable index that allows appends or
-  * an immutable read-only index file that has previously been populated. The makeReadOnly method will turn a mutable file into an 
+  * an immutable read-only index file that has previously been populated. The makeReadOnly method will turn a mutable file into an
   * immutable one and truncate off any extra bytes. This is done when the index file is rolled over.
-  * 
+  *
   * No attempt is made to checksum the contents of this file, in the event of a crash it is rebuilt.
-  * 
-  * The file format is a series of entries. The physical format is a 4 byte "relative" offset and a 4 byte file location for the 
+  *
+  * The file format is a series of entries. The physical format is a 4 byte "relative" offset and a 4 byte file location for the
   * message with that offset. The offset stored is relative to the base offset of the index file. So, for example,
   * if the base offset was 50, then the offset 55 would be stored as 5. Using relative offsets in this way let's us use
   * only 4 bytes for the offset.
-  * 
+  *
   * The frequency of entries is up to the user of this class.
-  * 
-  * All external APIs translate from relative offsets to full offsets, so users of this class do not interact with the internal 
+  *
+  * All external APIs translate from relative offsets to full offsets, so users of this class do not interact with the internal
   * storage format.
   */
-class OffsetIndex(
-    @volatile var file: File, val baseOffset: Long, val maxIndexSize: Int = -1)
+class OffsetIndex(@volatile var file: File,
+                  val baseOffset: Long,
+                  val maxIndexSize: Int = -1)
     extends Logging {
 
   private val lock = new ReentrantLock
@@ -68,7 +69,7 @@ class OffsetIndex(
       if (newlyCreated) {
         if (maxIndexSize < 8)
           throw new IllegalArgumentException(
-              "Invalid max index size: " + maxIndexSize)
+            "Invalid max index size: " + maxIndexSize)
         raf.setLength(roundToExactMultiple(maxIndexSize, 8))
       }
 
@@ -100,13 +101,13 @@ class OffsetIndex(
   var lastOffset = readLastEntry.offset
 
   debug(
-      "Loaded index file %s with maxEntries = %d, maxIndexSize = %d, entries = %d, lastOffset = %d, file position = %d"
-        .format(file.getAbsolutePath,
-                maxEntries,
-                maxIndexSize,
-                entries(),
-                lastOffset,
-                mmap.position))
+    "Loaded index file %s with maxEntries = %d, maxIndexSize = %d, entries = %d, lastOffset = %d, file position = %d"
+      .format(file.getAbsolutePath,
+              maxEntries,
+              maxIndexSize,
+              entries(),
+              lastOffset,
+              mmap.position))
 
   /**
     * The last entry in the index
@@ -123,12 +124,12 @@ class OffsetIndex(
   }
 
   /**
-    * Find the largest offset less than or equal to the given targetOffset 
+    * Find the largest offset less than or equal to the given targetOffset
     * and return a pair holding this offset and its corresponding physical file position.
-    * 
+    *
     * @param targetOffset The offset to look up.
-    * 
-    * @return The offset found and the corresponding file position for this offset. 
+    *
+    * @return The offset found and the corresponding file position for this offset.
     * If the target offset is smaller than the least entry in the index (or the index is empty),
     * the pair (baseOffset, 0) is returned.
     */
@@ -138,18 +139,18 @@ class OffsetIndex(
       val slot = indexSlotFor(idx, targetOffset)
       if (slot == -1) OffsetPosition(baseOffset, 0)
       else
-        OffsetPosition(
-            baseOffset + relativeOffset(idx, slot), physical(idx, slot))
+        OffsetPosition(baseOffset + relativeOffset(idx, slot),
+                       physical(idx, slot))
     }
   }
 
   /**
     * Find the slot in which the largest offset less than or equal to the given
     * target offset is stored.
-    * 
+    *
     * @param idx The index buffer
     * @param targetOffset The offset to look for
-    * 
+    *
     * @return The slot found or -1 if the least entry in the index is larger than the target offset or the index is empty
     */
   private def indexSlotFor(idx: ByteBuffer, targetOffset: Long): Int = {
@@ -192,8 +193,8 @@ class OffsetIndex(
     maybeLock(lock) {
       if (n >= entries)
         throw new IllegalArgumentException(
-            "Attempt to fetch the %dth entry from an index of size %d.".format(
-                n, entries))
+          "Attempt to fetch the %dth entry from an index of size %d."
+            .format(n, entries))
       val idx = mmap.duplicate
       OffsetPosition(relativeOffset(idx, n), physical(idx, n))
     }
@@ -204,22 +205,23 @@ class OffsetIndex(
     */
   def append(offset: Long, position: Int) {
     inLock(lock) {
-      require(
-          !isFull, "Attempt to append to a full index (size = " + size + ").")
+      require(!isFull,
+              "Attempt to append to a full index (size = " + size + ").")
       if (size.get == 0 || offset > lastOffset) {
-        debug("Adding index entry %d => %d to %s.".format(
-                offset, position, file.getName))
+        debug(
+          "Adding index entry %d => %d to %s."
+            .format(offset, position, file.getName))
         this.mmap.putInt((offset - baseOffset).toInt)
         this.mmap.putInt(position)
         this.size.incrementAndGet()
         this.lastOffset = offset
         require(entries * 8 == mmap.position,
                 entries + " entries but file position in index is " +
-                mmap.position + ".")
+                  mmap.position + ".")
       } else {
         throw new InvalidOffsetException(
-            "Attempt to append an offset (%d) to position %d no larger than the last offset appended (%d) to %s."
-              .format(offset, entries, lastOffset, file.getAbsolutePath))
+          "Attempt to append an offset (%d) to position %d no larger than the last offset appended (%d) to %s."
+            .format(offset, entries, lastOffset, file.getAbsolutePath))
       }
     }
   }
@@ -354,7 +356,8 @@ class OffsetIndex(
     * @throws IOException if rename fails
     */
   def renameTo(f: File) {
-    try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file = f
+    try Utils.atomicMoveWithFallback(file.toPath, f.toPath)
+    finally this.file = f
   }
 
   /**
@@ -363,13 +366,13 @@ class OffsetIndex(
     */
   def sanityCheck() {
     require(
-        entries == 0 || lastOffset > baseOffset,
-        "Corrupt index found, index file (%s) has non-zero size but the last offset is %d and the base offset is %d"
-          .format(file.getAbsolutePath, lastOffset, baseOffset))
+      entries == 0 || lastOffset > baseOffset,
+      "Corrupt index found, index file (%s) has non-zero size but the last offset is %d and the base offset is %d"
+        .format(file.getAbsolutePath, lastOffset, baseOffset))
     val len = file.length()
     require(len % 8 == 0,
             "Index file " + file.getName + " is corrupt, found " + len +
-            " bytes which is not positive or not a multiple of 8.")
+              " bytes which is not positive or not a multiple of 8.")
   }
 
   /**
@@ -380,7 +383,7 @@ class OffsetIndex(
     factor * (number / factor)
 
   /**
-    * Execute the given function in a lock only if we are running on windows. We do this 
+    * Execute the given function in a lock only if we are running on windows. We do this
     * because Windows won't let us resize a file while it is mmapped. As a result we have to force unmap it
     * and this requires synchronizing reads.
     */

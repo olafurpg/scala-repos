@@ -15,33 +15,33 @@ class OptionEqualsSomeTest extends OperationsOnCollectionInspectionTest {
 
   def test1(): Unit = {
     doTest(
-        s"${START}Option(1) == Some(2)$END",
-        "Option(1) == Some(2)",
-        "Option(1).contains(2)"
+      s"${START}Option(1) == Some(2)$END",
+      "Option(1) == Some(2)",
+      "Option(1).contains(2)"
     )
   }
 
   def test2(): Unit = {
     doTest(
-        s"${START}Option(1) equals Some(2)$END",
-        "Option(1) equals Some(2)",
-        "Option(1).contains(2)"
+      s"${START}Option(1) equals Some(2)$END",
+      "Option(1) equals Some(2)",
+      "Option(1).contains(2)"
     )
   }
 
   def test3(): Unit = {
     doTest(
-        s"${START}Some(2) == Option(1)$END",
-        "Some(2) == Option(1)",
-        "Option(1).contains(2)"
+      s"${START}Some(2) == Option(1)$END",
+      "Some(2) == Option(1)",
+      "Option(1).contains(2)"
     )
   }
 
   def test4(): Unit = {
     doTest(
-        s"${START}Option(1).equals(Some(2))$END",
-        "Option(1).equals(Some(2))",
-        "Option(1).contains(2)"
+      s"${START}Option(1).equals(Some(2))$END",
+      "Option(1).equals(Some(2))",
+      "Option(1).contains(2)"
     )
   }
 }
@@ -56,17 +56,17 @@ class OptionNotEqualsSomeTest extends OperationsOnCollectionInspectionTest {
 
   def test1(): Unit = {
     doTest(
-        s"${START}Option(1) != Some(2)$END",
-        "Option(1) != Some(2)",
-        "!Option(1).contains(2)"
+      s"${START}Option(1) != Some(2)$END",
+      "Option(1) != Some(2)",
+      "!Option(1).contains(2)"
     )
   }
 
   def test2(): Unit = {
     doTest(
-        s"${START}Some(2) != Option(1)$END",
-        "Some(2) != Option(1)",
-        "!Option(1).contains(2)"
+      s"${START}Some(2) != Option(1)$END",
+      "Some(2) != Option(1)",
+      "!Option(1).contains(2)"
     )
   }
 }

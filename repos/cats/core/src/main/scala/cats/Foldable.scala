@@ -41,18 +41,18 @@ trait Foldable[F[_]] { self =>
     * For more detailed information about how this method works see the
     * documentation for `Eval[_]`.
     */
-  def foldRight[A, B](fa: F[A], lb: Eval[B])(
-      f: (A, Eval[B]) => Eval[B]): Eval[B]
+  def foldRight[A, B](fa: F[A], lb: Eval[B])(f: (A,
+                                                 Eval[B]) => Eval[B]): Eval[B]
 
-  def reduceLeftToOption[A, B](
-      fa: F[A])(f: A => B)(g: (B, A) => B): Option[B] =
+  def reduceLeftToOption[A, B](fa: F[A])(f: A => B)(g: (B,
+                                                        A) => B): Option[B] =
     foldLeft(fa, Option.empty[B]) {
       case (Some(b), a) => Some(g(b, a))
       case (None, a) => Some(f(a))
     }
 
-  def reduceRightToOption[A, B](
-      fa: F[A])(f: A => B)(g: (A, Eval[B]) => Eval[B]): Eval[Option[B]] =
+  def reduceRightToOption[A, B](fa: F[A])(f: A => B)(
+      g: (A, Eval[B]) => Eval[B]): Eval[Option[B]] =
     foldRight(fa, Now(Option.empty[B])) { (a, lb) =>
       lb.flatMap {
         case Some(b) => g(a, Now(b)).map(Some(_))
@@ -71,7 +71,7 @@ trait Foldable[F[_]] { self =>
   /**
     * Alias for [[fold]].
     */
-  def combineAll[A : Monoid](fa: F[A]): A = fold(fa)
+  def combineAll[A: Monoid](fa: F[A]): A = fold(fa)
 
   /**
     * Fold implemented by mapping `A` values into `B` and then
@@ -111,8 +111,8 @@ trait Foldable[F[_]] { self =>
     * or effect, and the specific `A` aspect of `G[A]` is not otherwise
     * needed.
     */
-  def traverse_[G[_], A, B](
-      fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[Unit] =
+  def traverse_[G[_], A, B](fa: F[A])(f: A => G[B])(
+      implicit G: Applicative[G]): G[Unit] =
     foldLeft(fa, G.pure(())) { (acc, a) =>
       G.map2(acc, f(a)) { (_, _) =>
         ()

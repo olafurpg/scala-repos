@@ -16,28 +16,28 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
       @group Basic customization overrides */
   def code = {
     "import slick.model.ForeignKeyAction\n" +
-    (if (tables.exists(_.hlistEnabled)) {
-       "import slick.collection.heterogeneous._\n" +
-       "import slick.collection.heterogeneous.syntax._\n"
-     } else "") +
-    (if (tables.exists(_.PlainSqlMapper.enabled)) {
-       "// NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.\n" +
-       "import slick.jdbc.{GetResult => GR}\n"
-     } else "") +
-    (if (ddlEnabled) {
-       "\n/** DDL for all tables. Call .create to execute. */" +
-       (if (tables.length > 5)
-          "\nlazy val schema: profile.SchemaDescription = Array(" +
-          tables.map(_.TableValue.name + ".schema").mkString(", ") +
-          ").reduceLeft(_ ++ _)"
-        else if (tables.nonEmpty)
-          "\nlazy val schema: profile.SchemaDescription = " +
-          tables.map(_.TableValue.name + ".schema").mkString(" ++ ")
-        else
-          "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
-       "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
-       "\ndef ddl = schema" + "\n\n"
-     } else "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
+      (if (tables.exists(_.hlistEnabled)) {
+        "import slick.collection.heterogeneous._\n" +
+          "import slick.collection.heterogeneous.syntax._\n"
+      } else "") +
+      (if (tables.exists(_.PlainSqlMapper.enabled)) {
+        "// NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.\n" +
+          "import slick.jdbc.{GetResult => GR}\n"
+      } else "") +
+      (if (ddlEnabled) {
+        "\n/** DDL for all tables. Call .create to execute. */" +
+          (if (tables.length > 5)
+            "\nlazy val schema: profile.SchemaDescription = Array(" +
+              tables.map(_.TableValue.name + ".schema").mkString(", ") +
+              ").reduceLeft(_ ++ _)"
+          else if (tables.nonEmpty)
+            "\nlazy val schema: profile.SchemaDescription = " +
+              tables.map(_.TableValue.name + ".schema").mkString(" ++ ")
+          else
+            "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
+          "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
+          "\ndef ddl = schema" + "\n\n"
+      } else "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
   }
 
   protected def tuple(i: Int) = termName(s"_${i + 1}")
@@ -60,7 +60,7 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
       else if (values.size <= 22) s"""(${values.mkString(", ")})"""
       else
         throw new Exception(
-            "Cannot generate tuple for > 22 columns, please set hlistEnable=true or override compound.")
+          "Cannot generate tuple for > 22 columns, please set hlistEnable=true or override compound.")
     }
 
     def factory =
@@ -71,17 +71,18 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
     trait EntityTypeDef extends super.EntityTypeDef {
       def code = {
         val args = columns
-          .map(c =>
-                c.default
-                  .map(v => s"${c.name}: ${c.exposedType} = $v")
-                  .getOrElse(
-                      s"${c.name}: ${c.exposedType}"
-                ))
+          .map(
+            c =>
+              c.default
+                .map(v => s"${c.name}: ${c.exposedType} = $v")
+                .getOrElse(
+                  s"${c.name}: ${c.exposedType}"
+              ))
           .mkString(", ")
         if (classEnabled) {
           val prns = (parents.take(1).map(" extends " + _) ++ parents
-                .drop(1)
-                .map(" with " + _)).mkString("")
+            .drop(1)
+            .map(" with " + _)).mkString("")
           s"""case class $name($args)$prns"""
         } else {
           s"""
@@ -98,17 +99,17 @@ def $name($args): $name = {
     trait PlainSqlMapperDef extends super.PlainSqlMapperDef {
       def code = {
         val positional = compoundValue(
-            columnsPositional.map(c =>
-                  (if (c.fakeNullable || c.model.nullable) s"<<?[${c.rawType}]"
-                   else s"<<[${c.rawType}]")))
+          columnsPositional.map(c =>
+            (if (c.fakeNullable || c.model.nullable) s"<<?[${c.rawType}]"
+            else s"<<[${c.rawType}]")))
         val dependencies = columns
           .map(_.exposedType)
           .distinct
           .zipWithIndex
           .map { case (t, i) => s"""e$i: GR[$t]""" }
           .mkString(", ")
-        val rearranged = compoundValue(desiredColumnOrder.map(
-                i => if (hlistEnabled) s"r($i)" else tuple(i)))
+        val rearranged = compoundValue(desiredColumnOrder.map(i =>
+          if (hlistEnabled) s"r($i)" else tuple(i)))
         def result(args: String) =
           if (mappingEnabled) s"$factory($args)" else args
         val body =
@@ -131,18 +132,18 @@ implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR
     trait TableClassDef extends super.TableClassDef {
       def star = {
         val struct = compoundValue(
-            columns.map(c =>
-                  if (c.fakeNullable) s"Rep.Some(${c.name})"
-                  else s"${c.name}"))
+          columns.map(c =>
+            if (c.fakeNullable) s"Rep.Some(${c.name})"
+            else s"${c.name}"))
         val rhs =
           if (mappingEnabled) s"$struct <> ($factory, $extractor)" else struct
         s"def * = $rhs"
       }
       def option = {
         val struct = compoundValue(
-            columns.map(c =>
-                  if (c.model.nullable) s"${c.name}"
-                  else s"Rep.Some(${c.name})"))
+          columns.map(c =>
+            if (c.model.nullable) s"${c.name}"
+            else s"Rep.Some(${c.name})"))
         val rhs =
           if (mappingEnabled)
             s"""$struct.shaped.<>($optionFactory, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))"""
@@ -170,7 +171,7 @@ implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR
         val prns = parents.map(" with " + _).mkString("")
         val args =
           model.name.schema.map(n => s"""Some("$n")""") ++ Seq(
-              "\"" + model.name.table + "\"")
+            "\"" + model.name.table + "\"")
         s"""
 class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
           .mkString(", ")})$prns {
@@ -199,7 +200,7 @@ class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
         case AutoInc => Some(s"O.AutoInc")
         case NotNull | Nullable =>
           throw new SlickException(
-              s"Please don't use Nullable or NotNull column options. Use an Option type, respectively the nullable flag in Slick's model model Column.")
+            s"Please don't use Nullable or NotNull column options. Use an Option type, respectively the nullable flag in Slick's model model Column.")
         case o =>
           None // throw new SlickException( s"Don't know how to generate code for unexpected ColumnOption $o." )
       }
@@ -219,7 +220,7 @@ class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
           s"new scala.math.BigDecimal(new java.math.BigDecimal($v))"
         case v =>
           throw new SlickException(
-              s"Dont' know how to generate code for default value $v of ${v.getClass}. Override def defaultCode to render the value.")
+            s"Dont' know how to generate code for default value $v of ${v.getClass}. Override def defaultCode to render the value.")
       }
       // Explicit type to allow overloading existing Slick method names.
       // Explicit type argument for better error message when implicit type mapper not found.
@@ -233,7 +234,7 @@ class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
         extends super.PrimaryKeyDef(model) {
       def code =
         s"""val $name = primaryKey("$dbName", ${compoundValue(
-            columns.map(_.name))})"""
+          columns.map(_.name))})"""
     }
 
     class ForeignKeyDef(model: m.ForeignKey)
@@ -257,7 +258,7 @@ class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
             else (pk, fk)
           }.unzip
         s"""lazy val $name = foreignKey("$dbName", ${compoundValue(fkColumns)}, $pkTable)(r => ${compoundValue(
-            pkColumns)}, onUpdate=${onUpdate}, onDelete=${onDelete})"""
+          pkColumns)}, onUpdate=${onUpdate}, onDelete=${onDelete})"""
       }
     }
 
@@ -274,7 +275,7 @@ trait StringGeneratorHelpers
     extends slick.codegen.GeneratorHelpers[String, String, String] {
   def docWithCode(doc: String, code: String): String =
     (if (doc != "") "/** " + doc.split("\n").mkString("\n *  ") + " */\n"
-     else "") + code
+    else "") + code
   final def optionType(t: String) = s"Option[$t]"
   def parseType(tpe: String): String = tpe
   def shouldQuoteIdentifier(s: String) = {

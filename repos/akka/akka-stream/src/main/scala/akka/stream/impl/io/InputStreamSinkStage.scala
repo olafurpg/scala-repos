@@ -106,7 +106,7 @@ private[akka] class InputStreamAdapter(
   var isActive = true
   var isStageAlive = true
   val subscriberClosedException = new IOException(
-      "Reactive stream is terminated, no reads are possible")
+    "Reactive stream is terminated, no reads are possible")
   var detachedChunk: Option[ByteString] = None
 
   @scala.throws(classOf[IOException])
@@ -134,13 +134,13 @@ private[akka] class InputStreamAdapter(
     require(begin + length <= a.length,
             "begin + length must be smaller or equal to the array length")
 
-    executeIfNotClosed(
-        () ⇒
-          if (isStageAlive) {
+    executeIfNotClosed(() ⇒
+      if (isStageAlive) {
         detachedChunk match {
           case None ⇒
             try {
-              sharedBuffer.poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
+              sharedBuffer
+                .poll(readTimeout.toMillis, TimeUnit.MILLISECONDS) match {
                 case Data(data) ⇒
                   detachedChunk = Some(data)
                   readBytes(a, begin, length)
@@ -154,7 +154,7 @@ private[akka] class InputStreamAdapter(
                   throw new IOException("Timeout on waiting for new data")
                 case Initialized ⇒
                   throw new IllegalStateException(
-                      "message 'Initialized' must come first")
+                    "message 'Initialized' must come first")
               }
             } catch {
               case ex: InterruptedException ⇒ throw new IOException(ex)
@@ -175,12 +175,10 @@ private[akka] class InputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   override def close(): Unit = {
-    executeIfNotClosed(
-        () ⇒
-          {
-        // at this point Subscriber may be already terminated
-        if (isStageAlive) sendToStage(Close)
-        isActive = false
+    executeIfNotClosed(() ⇒ {
+      // at this point Subscriber may be already terminated
+      if (isStageAlive) sendToStage(Close)
+      isActive = false
     })
   }
 

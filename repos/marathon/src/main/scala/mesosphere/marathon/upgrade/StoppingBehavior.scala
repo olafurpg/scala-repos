@@ -38,18 +38,26 @@ trait StoppingBehavior extends Actor with ActorLogging {
     eventBus.unsubscribe(self)
     if (!promise.isCompleted)
       promise.tryFailure(
-          new TaskUpgradeCanceledException("The operation has been cancelled"))
+        new TaskUpgradeCanceledException("The operation has been cancelled"))
   }
 
   val taskFinished = "^TASK_(ERROR|FAILED|FINISHED|LOST|KILLED)$".r
 
   def receive: Receive = {
-    case MesosStatusUpdateEvent(
-        _, taskId, taskFinished(_), _, _, _, _, _, _, _, _)
-        if idsToKill(taskId) =>
+    case MesosStatusUpdateEvent(_,
+                                taskId,
+                                taskFinished(_),
+                                _,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _) if idsToKill(taskId) =>
       idsToKill.remove(taskId)
       log.info(
-          s"Task $taskId has been killed. Waiting for ${idsToKill.size} more tasks to be killed.")
+        s"Task $taskId has been killed. Waiting for ${idsToKill.size} more tasks to be killed.")
       checkFinished()
 
     case SynchronizeTasks =>
@@ -76,8 +84,8 @@ trait StoppingBehavior extends Actor with ActorLogging {
     }
 
   def scheduleSynchronization(): Unit =
-    periodicalCheck = context.system.scheduler
-      .scheduleOnce(5.seconds, self, SynchronizeTasks)
+    periodicalCheck =
+      context.system.scheduler.scheduleOnce(5.seconds, self, SynchronizeTasks)
 }
 
 object StoppingBehavior {

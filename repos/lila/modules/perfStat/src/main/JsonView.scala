@@ -15,16 +15,16 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
             rank: Option[Int],
             ratingDistribution: Option[List[Int]]) =
     Json.obj(
-        "user" -> user,
-        "perf" -> user.perfs(stat.perfType),
-        "rank" -> rank,
-        "percentile" -> ratingDistribution.map { distrib =>
-          lila.user.Stat
-            .percentile(distrib, user.perfs(stat.perfType).intRating) match {
-            case (under, sum) => Math.round(under * 1000.0 / sum) / 10.0
-          }
-        },
-        "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent))
+      "user" -> user,
+      "perf" -> user.perfs(stat.perfType),
+      "rank" -> rank,
+      "percentile" -> ratingDistribution.map { distrib =>
+        lila.user.Stat
+          .percentile(distrib, user.perfs(stat.perfType).intRating) match {
+          case (under, sum) => Math.round(under * 1000.0 / sum) / 10.0
+        }
+      },
+      "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent))
 
   private def truncate(v: Double) = lila.common.Maths.truncateAt(v, 2)
 

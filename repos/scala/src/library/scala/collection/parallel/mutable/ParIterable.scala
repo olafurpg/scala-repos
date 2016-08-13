@@ -28,9 +28,10 @@ trait ParIterable[T]
     extends scala.collection.GenIterable[T]
     with scala.collection.parallel.ParIterable[T]
     with GenericParTemplate[T, ParIterable]
-    with ParIterableLike[T, ParIterable[T], Iterable[T]] with Mutable {
+    with ParIterableLike[T, ParIterable[T], Iterable[T]]
+    with Mutable {
   override def companion: GenericCompanion[ParIterable] with GenericParCompanion[
-      ParIterable] = ParIterable
+    ParIterable] = ParIterable
   //protected[this] override def newBuilder = ParIterable.newBuilder[T]
 
   // if `mutable.ParIterableLike` is introduced, please move these methods there

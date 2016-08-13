@@ -48,9 +48,10 @@ class BalancingDispatcher(
     * INTERNAL API
     */
   private[akka] val team = new ConcurrentSkipListSet[ActorCell](
-      Helpers.identityHashComparator(new Comparator[ActorCell] {
-    def compare(l: ActorCell, r: ActorCell) = l.self.path compareTo r.self.path
-  }))
+    Helpers.identityHashComparator(new Comparator[ActorCell] {
+      def compare(l: ActorCell, r: ActorCell) =
+        l.self.path compareTo r.self.path
+    }))
 
   /**
     * INTERNAL API
@@ -58,9 +59,10 @@ class BalancingDispatcher(
   private[akka] val messageQueue: MessageQueue =
     _mailboxType.create(None, None)
 
-  private class SharingMailbox(
-      val system: ActorSystemImpl, _messageQueue: MessageQueue)
-      extends Mailbox(_messageQueue) with DefaultSystemMessageQueue {
+  private class SharingMailbox(val system: ActorSystemImpl,
+                               _messageQueue: MessageQueue)
+      extends Mailbox(_messageQueue)
+      with DefaultSystemMessageQueue {
     override def cleanUp(): Unit = {
       val dlq = mailboxes.deadLetterMailbox
       //Don't call the original implementation of this since it scraps all messages, and we don't want to do that
@@ -76,7 +78,8 @@ class BalancingDispatcher(
   }
 
   protected[akka] override def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox =
+      actor: akka.actor.Cell,
+      mailboxType: MailboxType): Mailbox =
     new SharingMailbox(actor.systemImpl, messageQueue)
 
   protected[akka] override def register(actor: ActorCell): Unit = {
@@ -90,8 +93,8 @@ class BalancingDispatcher(
     teamWork()
   }
 
-  override protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope) = {
+  override protected[akka] def dispatch(receiver: ActorCell,
+                                        invocation: Envelope) = {
     messageQueue.enqueue(receiver.self, invocation)
     if (!registerForExecution(receiver.mailbox, false, false)) teamWork()
   }
@@ -101,9 +104,9 @@ class BalancingDispatcher(
       @tailrec def scheduleOne(i: Iterator[ActorCell] = team.iterator): Unit =
         if (messageQueue.hasMessages && i.hasNext &&
             (executorService.executor match {
-                  case lm: LoadMetrics ⇒ lm.atFullThrottle == false
-                  case other ⇒ true
-                }) && !registerForExecution(i.next.mailbox, false, false))
+              case lm: LoadMetrics ⇒ lm.atFullThrottle == false
+              case other ⇒ true
+            }) && !registerForExecution(i.next.mailbox, false, false))
           scheduleOne(i)
 
       scheduleOne()

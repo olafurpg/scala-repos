@@ -46,9 +46,7 @@ object LoggerConfigurator {
       val loggerConfiguratorClass: Class[_] =
         classLoader.loadClass(loggerConfiguratorClassName)
       Some(
-          loggerConfiguratorClass
-            .newInstance()
-            .asInstanceOf[LoggerConfigurator])
+        loggerConfiguratorClass.newInstance().asInstanceOf[LoggerConfigurator])
     } catch {
       case ex: Exception =>
         val msg = s"""

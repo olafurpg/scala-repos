@@ -47,7 +47,8 @@ object Light {
 
   class Distant(
       override val delegate: jfxse.Light.Distant = new jfxse.Light.Distant)
-      extends Light(delegate) with SFXDelegate[jfxse.Light.Distant] {
+      extends Light(delegate)
+      with SFXDelegate[jfxse.Light.Distant] {
 
     /**
       * Creates a new instance of Distant light with the specified azimuth, elevation, and color.
@@ -82,7 +83,8 @@ object Light {
   }
 
   class Point(override val delegate: jfxse.Light.Point = new jfxse.Light.Point)
-      extends Light(delegate) with PositionDelegate[jfxse.Light.Point]
+      extends Light(delegate)
+      with PositionDelegate[jfxse.Light.Point]
       with SFXDelegate[jfxse.Light.Point] {
 
     def this(x: Double, y: Double, z: Double, color: Color) =
@@ -107,7 +109,8 @@ object Light {
   }
 
   class Spot(override val delegate: jfxse.Light.Spot = new jfxse.Light.Spot)
-      extends Point(delegate) with SFXDelegate[jfxse.Light.Spot] {
+      extends Point(delegate)
+      with SFXDelegate[jfxse.Light.Spot] {
 
     /**
       * Creates a new instance of Spot light with the specified x, y, z, specularExponent, and color
@@ -156,4 +159,5 @@ object Light {
 }
 
 abstract class Light protected (override val delegate: jfxse.Light)
-    extends ColorDelegate[jfxse.Light] with SFXDelegate[jfxse.Light]
+    extends ColorDelegate[jfxse.Light]
+    with SFXDelegate[jfxse.Light]

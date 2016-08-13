@@ -17,7 +17,7 @@
 package kafka.producer
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 class ProducerClosedException()
     extends RuntimeException("producer already closed") {}

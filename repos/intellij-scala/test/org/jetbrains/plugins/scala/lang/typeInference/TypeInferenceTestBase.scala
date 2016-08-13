@@ -14,8 +14,16 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation, Unit}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScType,
+  ScTypePresentation,
+  Unit
+}
 import org.jetbrains.plugins.scala.util.TestUtils
 
 /**
@@ -35,7 +43,7 @@ abstract class TypeInferenceTestBase
 
   protected def doInjectorTest(injector: SyntheticMembersInjector): Unit = {
     val extensionPoint = Extensions.getRootArea.getExtensionPoint(
-        SyntheticMembersInjector.EP_NAME)
+      SyntheticMembersInjector.EP_NAME)
     extensionPoint.registerExtension(injector)
     try {
       doTest()
@@ -57,18 +65,22 @@ abstract class TypeInferenceTestBase
     val startOffset = offset + startExprMarker.length
 
     assert(
-        offset != -1,
-        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+      offset != -1,
+      "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endExprMarker)
     assert(
-        endOffset != -1,
-        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+      endOffset != -1,
+      "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
     val addOne =
       if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+                                      classOf[ScExpression]) != null) 0
+      else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+      scalaFile,
+      startOffset + addOne,
+      endOffset,
+      classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty) match {
       case Success(Unit, _) => expr.getTypeIgnoreBaseType(TypingContext.empty)
@@ -91,15 +103,15 @@ abstract class TypeInferenceTestBase
             } else resText
           case _ =>
             throw new AssertionError(
-                "Test result must be in last comment statement.")
+              "Test result must be in last comment statement.")
         }
         output match {
           case ExpectedPattern("<none>") =>
             expr.expectedType() match {
               case Some(et) =>
                 fail(
-                    "found unexpected expected type: %s".format(
-                        ScType.presentableText(et)))
+                  "found unexpected expected type: %s".format(
+                    ScType.presentableText(et)))
               case None => // all good
             }
           case ExpectedPattern(expectedExpectedTypeText) =>
@@ -109,17 +121,17 @@ abstract class TypeInferenceTestBase
               ScType.presentableText(actualExpectedType)
             assertEquals(expectedExpectedTypeText, actualExpectedTypeText)
           case SimplifiedPattern(expectedText) =>
-            assertEquals(
-                expectedText, ScTypePresentation.withoutAliases(ttypez))
+            assertEquals(expectedText,
+                         ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
         }
       case Failure(msg, elem) =>
         assert(assertion = false,
                msg + " :: " +
-               (elem match {
-                     case Some(x) => x.getText
-                     case None => "empty element"
-                   }))
+                 (elem match {
+                   case Some(x) => x.getText
+                   case None => "empty element"
+                 }))
     }
   }
 }

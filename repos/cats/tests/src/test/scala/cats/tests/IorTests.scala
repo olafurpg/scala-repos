@@ -2,7 +2,13 @@ package cats
 package tests
 
 import cats.data.{Xor, Ior}
-import cats.laws.discipline.{BifunctorTests, TraverseTests, MonadTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BifunctorTests,
+  TraverseTests,
+  MonadTests,
+  SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq._
 import org.scalacheck.Arbitrary._
@@ -21,13 +27,13 @@ class IorTests extends CatsSuite {
            SerializableTests.serializable(Monad[String Ior ?]))
 
   checkAll(
-      "Ior[String, Int] with Option",
-      TraverseTests[String Ior ?].traverse[Int, Int, Int, Int, Option, Option])
+    "Ior[String, Int] with Option",
+    TraverseTests[String Ior ?].traverse[Int, Int, Int, Int, Option, Option])
   checkAll("Traverse[String Ior ?]",
            SerializableTests.serializable(Traverse[String Ior ?]))
   checkAll(
-      "? Ior ?",
-      BifunctorTests[Ior].bifunctor[Int, Int, Int, String, String, String])
+    "? Ior ?",
+    BifunctorTests[Ior].bifunctor[Int, Int, Int, String, String, String])
 
   test("left Option is defined left and both") {
     forAll { (i: Int Ior String) =>
@@ -44,7 +50,7 @@ class IorTests extends CatsSuite {
   test("onlyLeftOrRight") {
     forAll { (i: Int Ior String) =>
       i.onlyLeft.map(Xor.left).orElse(i.onlyRight.map(Xor.right)) should ===(
-          i.onlyLeftOrRight)
+        i.onlyLeftOrRight)
     }
   }
 
@@ -125,14 +131,14 @@ class IorTests extends CatsSuite {
   test("append left") {
     forAll { (i: Int Ior String, j: Int Ior String) =>
       i.append(j).left should ===(
-          i.left.map(_ + j.left.getOrElse(0)).orElse(j.left))
+        i.left.map(_ + j.left.getOrElse(0)).orElse(j.left))
     }
   }
 
   test("append right") {
     forAll { (i: Int Ior String, j: Int Ior String) =>
       i.append(j).right should ===(
-          i.right.map(_ + j.right.getOrElse("")).orElse(j.right))
+        i.right.map(_ + j.right.getOrElse("")).orElse(j.right))
     }
   }
 

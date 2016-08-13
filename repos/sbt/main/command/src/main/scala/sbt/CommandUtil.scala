@@ -27,8 +27,9 @@ object CommandUtil {
       case e: NoSuchMethodError => new File(".").getAbsoluteFile
     }
 
-  def aligned(
-      pre: String, sep: String, in: Seq[(String, String)]): Seq[String] =
+  def aligned(pre: String,
+              sep: String,
+              in: Seq[(String, String)]): Seq[String] =
     if (in.isEmpty) Nil
     else {
       val width = in.map(_._1.length).max
@@ -61,7 +62,7 @@ object CommandUtil {
         } catch {
           case pse: PatternSyntaxException =>
             sys.error(
-                "Invalid regular expression (java.util.regex syntax).\n" +
+              "Invalid regular expression (java.util.regex syntax).\n" +
                 pse.getMessage)
         }
     }
@@ -81,7 +82,7 @@ object CommandUtil {
   }
   def layoutDetails(details: Map[String, String]): String =
     details.map { case (k, v) => k + "\n\n  " + v } mkString
-    ("\n", "\n\n", "\n")
+      ("\n", "\n\n", "\n")
 
   final val HelpPatternFlags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 }

@@ -39,7 +39,7 @@ case object Both extends SaslSetupMode
  */
 trait SaslSetup {
   private val workDir = new File(
-      System.getProperty("test.dir", "build/tmp/test-workDir"))
+    System.getProperty("test.dir", "build/tmp/test-workDir"))
   private val kdcConf = MiniKdc.createConf()
   private val kdc = new MiniKdc(kdcConf, workDir)
 
@@ -51,16 +51,16 @@ trait SaslSetup {
     kdc.createPrincipal(keytabFile, "client", "kafka/localhost")
     if (mode == Both || mode == ZkSasl)
       System.setProperty(
-          "zookeeper.authProvider.1",
-          "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
+        "zookeeper.authProvider.1",
+        "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
   }
 
   protected def createKeytabAndSetConfiguration(mode: SaslSetupMode): File = {
     val (keytabFile, jaasFile) = createKeytabAndJaasFiles(mode)
     // This will cause a reload of the Configuration singleton when `getConfiguration` is called
     Configuration.setConfiguration(null)
-    System.setProperty(
-        JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
+    System
+      .setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
     keytabFile
   }
 

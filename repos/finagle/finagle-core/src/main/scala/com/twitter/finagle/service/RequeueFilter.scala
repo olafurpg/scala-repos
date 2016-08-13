@@ -79,15 +79,21 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
             case Duration.Zero #:: rest =>
               // no delay between retries. Retry immediately.
               requeueCounter.incr()
-              applyService(
-                  req, service, attempt + 1, retriesRemaining - 1, rest)
+              applyService(req,
+                           service,
+                           attempt + 1,
+                           retriesRemaining - 1,
+                           rest)
             case delay #:: rest =>
               // Delay and then retry.
               timer
                 .doLater(delay) {
                   requeueCounter.incr()
-                  applyService(
-                      req, service, attempt + 1, retriesRemaining - 1, rest)
+                  applyService(req,
+                               service,
+                               attempt + 1,
+                               retriesRemaining - 1,
+                               rest)
                 }
                 .flatten
             case _ =>

@@ -20,8 +20,8 @@ import java.io.{InputStream, OutputStream}
 
 import scala.util.{Failure, Success, Try}
 
-class Serialization2[A, B](
-    val serA: Serialization[A], val serB: Serialization[B])
+class Serialization2[A, B](val serA: Serialization[A],
+                           val serB: Serialization[B])
     extends Serialization[(A, B)] {
   override def hash(x: (A, B)) = {
     import MurmurHashUtils._
@@ -63,8 +63,8 @@ class Serialization2[A, B](
 }
 
 object OrderedSerialization2 {
-  def maybeOrderedSerialization2[A, B](
-      implicit ordA: Ordering[A], ordB: Ordering[B]): Ordering[(A, B)] = {
+  def maybeOrderedSerialization2[A, B](implicit ordA: Ordering[A],
+                                       ordB: Ordering[B]): Ordering[(A, B)] = {
     (ordA, ordB) match {
       case (ordA: OrderedSerialization[_], ordB: OrderedSerialization[_]) =>
         new OrderedSerialization2(ordA.asInstanceOf[OrderedSerialization[A]],
@@ -74,8 +74,8 @@ object OrderedSerialization2 {
   }
 }
 
-class OrderedSerialization2[A, B](
-    val ordA: OrderedSerialization[A], val ordB: OrderedSerialization[B])
+class OrderedSerialization2[A, B](val ordA: OrderedSerialization[A],
+                                  val ordB: OrderedSerialization[B])
     extends Serialization2[A, B](ordA, ordB)
     with OrderedSerialization[(A, B)] {
   override def compare(x: (A, B), y: (A, B)) = {

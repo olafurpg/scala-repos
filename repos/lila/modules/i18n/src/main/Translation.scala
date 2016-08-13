@@ -24,8 +24,8 @@ private[i18n] object Translation {
     Json.obj("author" -> none[String], "comment" -> none[String])
 
   private[i18n] val tube = JsTube(
-      (__.json update (merge(defaults) andThen readDate('createdAt))) andThen Json
-        .reads[Translation],
-      Json.writes[Translation] andThen (__.json update writeDate('createdAt))
+    (__.json update (merge(defaults) andThen readDate('createdAt))) andThen Json
+      .reads[Translation],
+    Json.writes[Translation] andThen (__.json update writeDate('createdAt))
   )
 }

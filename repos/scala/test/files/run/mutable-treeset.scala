@@ -82,8 +82,8 @@ object Test extends App {
         assert(builtList forall set.apply,
                s"$set did not contain all elements of $builtList using apply")
         assert(
-            builtList.size == set.size,
-            s"$set had size ${set.size} while $builtList had size ${builtList.size}")
+          builtList.size == set.size,
+          s"$set had size ${set.size} while $builtList had size ${builtList.size}")
       }
       assert(!(nonlist exists set.apply),
              s"$set had an element from $nonlist using apply")
@@ -117,8 +117,8 @@ object Test extends App {
         assert(builtList forall set.apply,
                s"$set did not contain all elements of $builtList using apply")
         assert(
-            builtList.size == set.size,
-            s"$set had size $set.size while $builtList had size $builtList.size")
+          builtList.size == set.size,
+          s"$set had size $set.size while $builtList had size $builtList.size")
       }
     }
     val set = TreeSet(list: _*)

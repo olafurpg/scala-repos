@@ -37,7 +37,7 @@ class DescriptorParserSpec extends EnsimeSpec {
 
   it should "handle multiple object parameters" in {
     parse("(I[IILjava/lang/String;Z)V") should ===(
-        D(List(I, A(I), I, S, Z), V))
+      D(List(I, A(I), I, S, Z), V))
   }
 
   it should "be invertible" in {
@@ -57,12 +57,12 @@ class DescriptorParserSpec extends EnsimeSpec {
 
   it should "handle $_- in package names" in {
     parseType("Lcom/-$random_/Foo;") should ===(
-        ClassName(PackageName(List("com", "-$random_")), "Foo"))
+      ClassName(PackageName(List("com", "-$random_")), "Foo"))
   }
 
   it should "handle examples" in {
     parseType("Lscalaz/syntax/ToApplicativeOps$ApplicativeIdV$$anonfun$η$1;") should ===(
-        SZ)
+      SZ)
     parseType("Ljava/lang/String;") should ===(S)
     parseType("[Ljava/lang/String;") should ===(A(S))
     parseType("[[Ljava/lang/String;") should ===(A(A(S)))
@@ -71,7 +71,7 @@ class DescriptorParserSpec extends EnsimeSpec {
 
     // of course, SUN break their own rules for package names (capitals)
     Try(parseType(
-            "Lcom/sun/tools/corba/se/idl/toJavaPortable/NameModifierImpl;")).success
+      "Lcom/sun/tools/corba/se/idl/toJavaPortable/NameModifierImpl;")).success
 
     // hmmm, apache, what???? dashes in package names????
     Try(parseType("Lorg/spark-project/guava/annotations/VisibleForTesting;")).success

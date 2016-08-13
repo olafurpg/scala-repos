@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TouchPointStateSpec
     extends SFXEnumDelegateSpec[jfxsi.TouchPoint.State, TouchPoint.State](
-        classOf[jfxsi.TouchPoint.State],
-        classOf[TouchPoint.State],
-        TouchPoint.State)
+      classOf[jfxsi.TouchPoint.State],
+      classOf[TouchPoint.State],
+      TouchPoint.State)

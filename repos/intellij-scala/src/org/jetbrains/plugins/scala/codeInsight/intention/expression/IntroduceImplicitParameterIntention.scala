@@ -67,8 +67,9 @@ object IntroduceImplicitParameterIntention {
       }
     }
 
-    val result = expr.result.getOrElse(return Right(
-            InspectionBundle.message("introduce.implicit.not.allowed.here")))
+    val result = expr.result.getOrElse(
+      return Right(
+        InspectionBundle.message("introduce.implicit.not.allowed.here")))
 
     val buf = new StringBuilder
     buf.append(result.getText)
@@ -81,13 +82,13 @@ object IntroduceImplicitParameterIntention {
 
     if (occurrences.isEmpty || occurrences.size != expr.parameters.size)
       return Right(
-          InspectionBundle.message("introduce.implicit.incorrect.count"))
+        InspectionBundle.message("introduce.implicit.incorrect.count"))
 
     for (p <- expr.parameters) {
       if (!occurrences.keySet.contains(p.name) ||
           occurrences(p.name) < previousOffset)
         return Right(
-            InspectionBundle.message("introduce.implicit.incorrect.order"))
+          InspectionBundle.message("introduce.implicit.incorrect.order"))
       previousOffset = occurrences(p.name)
     }
 
@@ -106,12 +107,12 @@ object IntroduceImplicitParameterIntention {
       buf.replace(offset, offset + p.name.length, newParam)
     }
 
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        buf.toString(), expr.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(buf.toString(), expr.getManager)
 
     if (!isValidExpr(newExpr, expr.parameters.length))
       return Right(
-          InspectionBundle.message("introduce.implicit.not.allowed.here"))
+        InspectionBundle.message("introduce.implicit.not.allowed.here"))
 
     Left(newExpr)
   }
@@ -123,8 +124,9 @@ class IntroduceImplicitParameterIntention
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val expr: ScFunctionExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
     if (expr == null) return false

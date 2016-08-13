@@ -25,8 +25,7 @@ case class ALSAlgorithmParams(
     numIterations: Int,
     lambda: Double,
     seed: Option[Long]
-)
-    extends Params
+) extends Params
 
 class ALSModel(
     val rank: Int,
@@ -34,20 +33,19 @@ class ALSModel(
     val productFeatures: Map[Int, (Item, Option[Array[Double]])],
     val userStringIntMap: BiMap[String, Int],
     val itemStringIntMap: BiMap[String, Int]
-)
-    extends Serializable {
+) extends Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
   override def toString = {
     s" rank: ${rank}" + s" userFeatures: [${userFeatures.size}]" +
-    s"(${userFeatures.take(2).toList}...)" +
-    s" productFeatures: [${productFeatures.size}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" userStringIntMap: [${userStringIntMap.size}]" +
-    s"(${userStringIntMap.take(2).toString}...)]" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]"
+      s"(${userFeatures.take(2).toList}...)" +
+      s" productFeatures: [${productFeatures.size}]" +
+      s"(${productFeatures.take(2).toList}...)" +
+      s" userStringIntMap: [${userStringIntMap.size}]" +
+      s"(${userStringIntMap.take(2).toString}...)]" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]"
   }
 }
 
@@ -70,16 +68,16 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
     require(!data.viewEvents.take(1).isEmpty,
             s"viewEvents in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.users.take(1).isEmpty,
             s"users in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     require(!data.items.take(1).isEmpty,
             s"items in PreparedData cannot be empty." +
-            " Please check if DataSource generates TrainingData" +
-            " and Preprator generates PreparedData correctly.")
+              " Please check if DataSource generates TrainingData" +
+              " and Preprator generates PreparedData correctly.")
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
@@ -91,11 +89,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-            " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-            " to Int index.")
+          " to Int index.")
 
       ((uindex, iindex), 1)
     }.filter {
@@ -113,7 +111,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
             s"mllibRatings cannot be empty." +
-            " Please check if your events contain valid user and item ID.")
+              " Please check if your events contain valid user and item ID.")
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
@@ -139,11 +137,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       items.leftOuterJoin(m.productFeatures).collectAsMap.toMap
 
     new ALSModel(
-        rank = m.rank,
-        userFeatures = userFeatures,
-        productFeatures = productFeatures,
-        userStringIntMap = userStringIntMap,
-        itemStringIntMap = itemStringIntMap
+      rank = m.rank,
+      userFeatures = userFeatures,
+      productFeatures = productFeatures,
+      userStringIntMap = userStringIntMap,
+      itemStringIntMap = itemStringIntMap
     )
   }
 
@@ -164,19 +162,19 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
         // get all user item events which are considered as "seen" events
         val seenEvents: Iterator[Event] = lEventsDb.findSingleEntity(
-            appId = ap.appId,
-            entityType = "user",
-            entityId = query.user,
-            eventNames = Some(ap.seenEvents),
-            targetEntityType = Some(Some("item")),
-            // set time limit to avoid super long DB access
-            timeout = 200.millis
+          appId = ap.appId,
+          entityType = "user",
+          entityId = query.user,
+          eventNames = Some(ap.seenEvents),
+          targetEntityType = Some(Some("item")),
+          // set time limit to avoid super long DB access
+          timeout = 200.millis
         ) match {
           case Right(x) => x
           case Left(e) => {
-              logger.error(s"Error when read seen events: ${e}")
-              Iterator[Event]()
-            }
+            logger.error(s"Error when read seen events: ${e}")
+            Iterator[Event]()
+          }
         }
 
         seenEvents.map { event =>
@@ -184,9 +182,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             event.targetEntityId.get
           } catch {
             case e => {
-                logger.error(s"Can't get targetEntityId of event ${event}.")
-                throw e
-              }
+              logger.error(s"Can't get targetEntityId of event ${event}.")
+              throw e
+            }
           }
         }.toSet
       } else {
@@ -195,36 +193,36 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // get the latest constraint unavailableItems $set event
     val unavailableItems: Set[String] = lEventsDb.findSingleEntity(
-        appId = ap.appId,
-        entityType = "constraint",
-        entityId = "unavailableItems",
-        eventNames = Some(Seq("$set")),
-        limit = Some(1),
-        latest = true,
-        timeout = 200.millis
+      appId = ap.appId,
+      entityType = "constraint",
+      entityId = "unavailableItems",
+      eventNames = Some(Seq("$set")),
+      limit = Some(1),
+      latest = true,
+      timeout = 200.millis
     ) match {
       case Right(x) => {
-          if (x.hasNext) {
-            x.next.properties.get[Set[String]]("items")
-          } else {
-            Set[String]()
-          }
-        }
-      case Left(e) => {
-          logger.error(s"Error when read set unavailableItems event: ${e}")
+        if (x.hasNext) {
+          x.next.properties.get[Set[String]]("items")
+        } else {
           Set[String]()
         }
+      }
+      case Left(e) => {
+        logger.error(s"Error when read set unavailableItems event: ${e}")
+        Set[String]()
+      }
     }
 
     // Get the latest constraint weightedItems. This comes in the form of a sequence of WeightsGroup
     val groupedWeights = lEventsDb.findSingleEntity(
-        appId = ap.appId,
-        entityType = "constraint",
-        entityId = "weightedItems",
-        eventNames = Some(Seq("$set")),
-        limit = Some(1),
-        latest = true,
-        timeout = 200.millis
+      appId = ap.appId,
+      entityType = "constraint",
+      entityId = "weightedItems",
+      eventNames = Some(Seq("$set")),
+      limit = Some(1),
+      latest = true,
+      timeout = 200.millis
     ) match {
       case Right(x) =>
         if (x.hasNext) x.next().properties.get[Seq[WeightsGroup]]("weights")
@@ -265,11 +263,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           .filter {
             case (i, (item, feature)) =>
               feature.isDefined && isCandidateItem(
-                  i = i,
-                  item = item,
-                  categories = query.categories,
-                  whiteList = whiteList,
-                  blackList = finalBlackList
+                i = i,
+                item = item,
+                categories = query.categories,
+                whiteList = whiteList,
+                blackList = finalBlackList
               )
           }.map {
             case (i, (item, feature)) =>
@@ -290,20 +288,20 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         // For example, new user is created after model is trained.
         logger.info(s"No userFeature found for user ${query.user}.")
         predictNewUser(
-            model = model,
-            query = query,
-            whiteList = whiteList,
-            blackList = finalBlackList,
-            weights = weights
+          model = model,
+          query = query,
+          whiteList = whiteList,
+          blackList = finalBlackList,
+          weights = weights
         )
       }
 
     val itemScores = topScores.map {
       case (i, s) =>
         new ItemScore(
-            // convert item int index back to string ID
-            item = model.itemIntStringMap(i),
-            score = s
+          // convert item int index back to string ID
+          item = model.itemIntStringMap(i),
+          score = s
         )
     }
 
@@ -322,22 +320,22 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // get latest 10 user view item events
     val recentEvents = lEventsDb.findSingleEntity(
-        appId = ap.appId,
-        // entityType and entityId is specified for fast lookup
-        entityType = "user",
-        entityId = query.user,
-        eventNames = Some(Seq("view")),
-        targetEntityType = Some(Some("item")),
-        limit = Some(10),
-        latest = true,
-        // set time limit to avoid super long DB access
-        timeout = Duration(200, "millis")
+      appId = ap.appId,
+      // entityType and entityId is specified for fast lookup
+      entityType = "user",
+      entityId = query.user,
+      eventNames = Some(Seq("view")),
+      targetEntityType = Some(Some("item")),
+      limit = Some(10),
+      latest = true,
+      // set time limit to avoid super long DB access
+      timeout = Duration(200, "millis")
     ) match {
       case Right(x) => x
       case Left(e) => {
-          logger.error(s"Error when read recent events: ${e}")
-          Iterator[Event]()
-        }
+        logger.error(s"Error when read recent events: ${e}")
+        Iterator[Event]()
+      }
     }
 
     val recentItems: Set[String] = recentEvents.map { event =>
@@ -345,9 +343,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         event.targetEntityId.get
       } catch {
         case e => {
-            logger.error("Can't get targetEntityId of event ${event}.")
-            throw e
-          }
+          logger.error("Can't get targetEntityId of event ${event}.")
+          throw e
+        }
       }
     }.toSet
 
@@ -363,18 +361,18 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val indexScores: Map[Int, Double] =
       if (recentFeatures.isEmpty) {
         logger.info(
-            s"No productFeatures vector for recent items ${recentItems}.")
+          s"No productFeatures vector for recent items ${recentItems}.")
         Map[Int, Double]()
       } else {
         productFeatures.par // convert to parallel collection
         .filter {
           case (i, (item, feature)) =>
             feature.isDefined && isCandidateItem(
-                i = i,
-                item = item,
-                categories = query.categories,
-                whiteList = whiteList,
-                blackList = blackList
+              i = i,
+              item = item,
+              categories = query.categories,
+              whiteList = whiteList,
+              blackList = blackList
             )
         }.map {
           case (i, (item, feature)) =>

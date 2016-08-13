@@ -15,20 +15,21 @@ trait MilestonesService {
       description: Option[String],
       dueDate: Option[java.util.Date])(implicit s: Session): Unit =
     Milestones insert Milestone(
-        userName = owner,
-        repositoryName = repository,
-        title = title,
-        description = description,
-        dueDate = dueDate,
-        closedDate = None
+      userName = owner,
+      repositoryName = repository,
+      title = title,
+      description = description,
+      dueDate = dueDate,
+      closedDate = None
     )
 
   def updateMilestone(milestone: Milestone)(implicit s: Session): Unit =
     Milestones
-      .filter(t =>
-            t.byPrimaryKey(milestone.userName,
-                           milestone.repositoryName,
-                           milestone.milestoneId))
+      .filter(
+        t =>
+          t.byPrimaryKey(milestone.userName,
+                         milestone.repositoryName,
+                         milestone.milestoneId))
       .map(t => (t.title, t.description.?, t.dueDate.?, t.closedDate.?))
       .update(milestone.title,
               milestone.description,

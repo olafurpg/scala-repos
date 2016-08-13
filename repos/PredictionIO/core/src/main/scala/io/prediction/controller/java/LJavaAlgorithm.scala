@@ -28,4 +28,4 @@ import scala.reflect.ClassTag
   */
 abstract class LJavaAlgorithm[PD, M, Q, P]
     extends LAlgorithm[PD, M, Q, P]()(
-        ClassTag.AnyRef.asInstanceOf[ClassTag[M]])
+      ClassTag.AnyRef.asInstanceOf[ClassTag[M]])

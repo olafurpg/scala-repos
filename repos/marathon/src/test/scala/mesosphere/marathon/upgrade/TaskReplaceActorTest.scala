@@ -26,8 +26,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class TaskReplaceActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with Eventually with BeforeAndAfterAll with MockitoSugar {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with Eventually
+    with BeforeAndAfterAll
+    with MockitoSugar {
 
   test("Replace without health checks") {
     val app = AppDefinition(id = "myApp".toPath,
@@ -61,25 +65,25 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
-    for (i <- 0 until app.instances) ref ! MesosStatusUpdateEvent(
-        "",
-        Task.Id(s"task_$i"),
-        "TASK_RUNNING",
-        "",
-        app.id,
-        "",
-        Nil,
-        Nil,
-        app.version.toString)
+    for (i <- 0 until app.instances)
+      ref ! MesosStatusUpdateEvent("",
+                                   Task.Id(s"task_$i"),
+                                   "TASK_RUNNING",
+                                   "",
+                                   app.id,
+                                   "",
+                                   Nil,
+                                   Nil,
+                                   app.version.toString)
 
     Await.result(promise.future, 5.seconds)
     verify(queue).resetDelay(app)
@@ -123,17 +127,20 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
-    for (i <- 0 until app.instances) ref ! HealthStatusChanged(
-        app.id, Task.Id(s"task_$i"), app.version, alive = true)
+    for (i <- 0 until app.instances)
+      ref ! HealthStatusChanged(app.id,
+                                Task.Id(s"task_$i"),
+                                app.version,
+                                alive = true)
 
     Await.result(promise.future, 5.seconds)
     verify(queue).resetDelay(app)
@@ -176,12 +183,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -219,10 +226,10 @@ class TaskReplaceActorTest
 
   test("Replace with minimum running tasks") {
     val app = AppDefinition(
-        id = "myApp".toPath,
-        instances = 3,
-        healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(0.5)
+      id = "myApp".toPath,
+      instances = 3,
+      healthChecks = Set(HealthCheck()),
+      upgradeStrategy = UpgradeStrategy(0.5)
     )
 
     val driver = mock[SchedulerDriver]
@@ -258,12 +265,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -276,18 +283,24 @@ class TaskReplaceActorTest
     assert(oldTaskCount == 2)
 
     // first new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id(s"task_0"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id(s"task_0"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(1) }
 
     // second new task becomes healthy and the last old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id(s"task_1"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id(s"task_1"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(0) }
 
     // third new task becomes healthy
-    ref ! HealthStatusChanged(
-        app.id, Task.Id(s"task_2"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id(s"task_2"),
+                              app.version,
+                              alive = true)
     oldTaskCount should be(0)
 
     Await.result(promise.future, 5.seconds)
@@ -302,10 +315,10 @@ class TaskReplaceActorTest
 
   test("Replace with rolling upgrade without over-capacity") {
     val app = AppDefinition(
-        id = "myApp".toPath,
-        instances = 3,
-        healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(0.5, 0.0)
+      id = "myApp".toPath,
+      instances = 3,
+      healthChecks = Set(HealthCheck()),
+      upgradeStrategy = UpgradeStrategy(0.5, 0.0)
     )
 
     val driver = mock[SchedulerDriver]
@@ -341,12 +354,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -358,20 +371,26 @@ class TaskReplaceActorTest
     assert(oldTaskCount == 2)
 
     // first new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_0"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_0"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(1) }
     eventually { queueOrder.verify(queue).add(_: AppDefinition, 1) }
 
     // second new task becomes healthy and the last old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_1"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_1"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(0) }
     eventually { queueOrder.verify(queue).add(_: AppDefinition, 1) }
 
     // third new task becomes healthy
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_2"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_2"),
+                              app.version,
+                              alive = true)
     oldTaskCount should be(0)
 
     Await.result(promise.future, 5.seconds)
@@ -387,10 +406,10 @@ class TaskReplaceActorTest
 
   test("Replace with rolling upgrade with minimal over-capacity") {
     val app = AppDefinition(
-        id = "myApp".toPath,
-        instances = 3,
-        healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(1.0, 0.0) // 1 task over-capacity is ok
+      id = "myApp".toPath,
+      instances = 3,
+      healthChecks = Set(HealthCheck()),
+      upgradeStrategy = UpgradeStrategy(1.0, 0.0) // 1 task over-capacity is ok
     )
 
     val driver = mock[SchedulerDriver]
@@ -426,12 +445,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -441,20 +460,26 @@ class TaskReplaceActorTest
     assert(oldTaskCount == 3)
 
     // first new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_0"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_0"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(2) }
     eventually { queueOrder.verify(queue).add(_: AppDefinition, 1) }
 
     // second new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_1"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_1"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(1) }
     eventually { queueOrder.verify(queue).add(_: AppDefinition, 1) }
 
     // third new task becomes healthy and last old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_2"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_2"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(0) }
     queueOrder.verify(queue, never()).add(_: AppDefinition, 1)
 
@@ -470,10 +495,10 @@ class TaskReplaceActorTest
 
   test("Replace with rolling upgrade with 2/3 over-capacity") {
     val app = AppDefinition(
-        id = "myApp".toPath,
-        instances = 3,
-        healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(1.0, 0.7)
+      id = "myApp".toPath,
+      instances = 3,
+      healthChecks = Set(HealthCheck()),
+      upgradeStrategy = UpgradeStrategy(1.0, 0.7)
     )
 
     val driver = mock[SchedulerDriver]
@@ -509,12 +534,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -524,20 +549,26 @@ class TaskReplaceActorTest
     assert(oldTaskCount == 3)
 
     // first new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_0"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_0"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(2) }
     eventually { queueOrder.verify(queue).add(_: AppDefinition, 1) }
 
     // second new task becomes healthy and another old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_1"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_1"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(1) }
     queueOrder.verify(queue, never()).add(_: AppDefinition, 1)
 
     // third new task becomes healthy and last old task is killed
-    ref ! HealthStatusChanged(
-        app.id, Task.Id("task_2"), app.version, alive = true)
+    ref ! HealthStatusChanged(app.id,
+                              Task.Id("task_2"),
+                              app.version,
+                              alive = true)
     eventually { oldTaskCount should be(0) }
     queueOrder.verify(queue, never()).add(_: AppDefinition, 1)
 
@@ -565,12 +596,12 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
@@ -622,28 +653,28 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
     ref.underlyingActor.periodicalRetryKills.cancel()
     ref ! RetryKills
 
-    for (i <- 0 until app.instances) ref ! MesosStatusUpdateEvent(
-        "",
-        Task.Id(s"task_$i"),
-        "TASK_RUNNING",
-        "",
-        app.id,
-        "",
-        Nil,
-        Nil,
-        app.version.toString)
+    for (i <- 0 until app.instances)
+      ref ! MesosStatusUpdateEvent("",
+                                   Task.Id(s"task_$i"),
+                                   "TASK_RUNNING",
+                                   "",
+                                   app.id,
+                                   "",
+                                   Nil,
+                                   Nil,
+                                   app.version.toString)
 
     Await.result(promise.future, 5.seconds)
     verify(queue).resetDelay(app)
@@ -669,16 +700,17 @@ class TaskReplaceActorTest
     val promise = Promise[Unit]()
 
     val ref = TestActorRef(
-        new TaskReplaceActor(driver,
-                             queue,
-                             tracker,
-                             system.eventStream,
-                             app,
-                             promise))
+      new TaskReplaceActor(driver,
+                           queue,
+                           tracker,
+                           system.eventStream,
+                           app,
+                           promise))
 
     watch(ref)
 
-    for (i <- 0 until app.instances) ref.receive(
+    for (i <- 0 until app.instances)
+      ref.receive(
         MesosStatusUpdateEvent("",
                                Task.Id(s"task_$i"),
                                "TASK_RUNNING",
@@ -695,7 +727,8 @@ class TaskReplaceActorTest
 
     promise.isCompleted should be(false)
 
-    for (oldTask <- Iterable(taskA, taskB)) ref.receive(
+    for (oldTask <- Iterable(taskA, taskB))
+      ref.receive(
         MesosStatusUpdateEvent("",
                                oldTask.taskId,
                                "TASK_KILLED",

@@ -11,18 +11,25 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, _}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  _
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScValueStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScPatternDefinitionImpl private (
-    stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
+class ScPatternDefinitionImpl private (stub: StubElement[ScValue],
+                                       nodeType: IElementType,
+                                       node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScPatternDefinition {
   override def accept(visitor: PsiElementVisitor): Unit = {
@@ -59,7 +66,7 @@ class ScPatternDefinitionImpl private (
         expr
           .map(_.getType(ctx))
           .getOrElse(
-              Failure("Cannot infer type without an expression", Some(this)))
+            Failure("Cannot infer type without an expression", Some(this)))
     }
   }
 

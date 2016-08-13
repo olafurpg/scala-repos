@@ -53,7 +53,8 @@ private[spark] trait Spillable[C] extends Logging {
   // For testing only
   private[this] val numElementsForceSpillThreshold: Long =
     SparkEnv.get.conf.getLong(
-        "spark.shuffle.spill.numElementsForceSpillThreshold", Long.MaxValue)
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      Long.MaxValue)
 
   // Threshold for this collection's size in bytes before we start tracking its memory usage
   // To avoid a large number of small spills, initialize this to a value orders of magnitude > 0
@@ -81,8 +82,8 @@ private[spark] trait Spillable[C] extends Logging {
     if (elementsRead % 32 == 0 && currentMemory >= myMemoryThreshold) {
       // Claim up to double our current memory from the shuffle memory pool
       val amountToRequest = 2 * currentMemory - myMemoryThreshold
-      val granted = taskMemoryManager.acquireExecutionMemory(
-          amountToRequest, MemoryMode.ON_HEAP, null)
+      val granted = taskMemoryManager
+        .acquireExecutionMemory(amountToRequest, MemoryMode.ON_HEAP, null)
       myMemoryThreshold += granted
       // If we were granted too little memory to grow further (either tryToAcquire returned 0,
       // or we already had more memory than myMemoryThreshold), spill the current collection
@@ -112,7 +113,9 @@ private[spark] trait Spillable[C] extends Logging {
   def releaseMemory(): Unit = {
     // The amount we requested does not include the initial memory tracking threshold
     taskMemoryManager.releaseExecutionMemory(
-        myMemoryThreshold - initialMemoryThreshold, MemoryMode.ON_HEAP, null)
+      myMemoryThreshold - initialMemoryThreshold,
+      MemoryMode.ON_HEAP,
+      null)
     myMemoryThreshold = initialMemoryThreshold
   }
 
@@ -124,10 +127,10 @@ private[spark] trait Spillable[C] extends Logging {
   @inline private def logSpillage(size: Long) {
     val threadId = Thread.currentThread().getId
     logInfo(
-        "Thread %d spilling in-memory map of %s to disk (%d time%s so far)"
-          .format(threadId,
-                  org.apache.spark.util.Utils.bytesToString(size),
-                  _spillCount,
-                  if (_spillCount > 1) "s" else ""))
+      "Thread %d spilling in-memory map of %s to disk (%d time%s so far)"
+        .format(threadId,
+                org.apache.spark.util.Utils.bytesToString(size),
+                _spillCount,
+                if (_spillCount > 1) "s" else ""))
   }
 }

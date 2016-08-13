@@ -114,7 +114,8 @@ class LineTokenizer() extends Parsers {
           if (in.atEnd) {
             Success(lds.toLinkDefinition(None), in)
           } else {
-            lineParsers.parseAll(lineParsers.linkDefinitionTitle, in.first) match {
+            lineParsers
+              .parseAll(lineParsers.linkDefinitionTitle, in.first) match {
               case lineParsers.Success(title, _) =>
                 Success(lds.toLinkDefinition(Some(title)), in.rest)
               case _ => Success(lds.toLinkDefinition(None), in)
@@ -244,7 +245,7 @@ class LineTokenizer() extends Parsers {
       case Success(reader, _) => reader
       case n: NoSuccess =>
         throw new IllegalStateException(
-            "Inner line Tokenizing failed. This is a bug. Message was: " +
+          "Inner line Tokenizing failed. This is a bug. Message was: " +
             n.msg)
     }
 
@@ -264,6 +265,6 @@ class LineTokenizer() extends Parsers {
       case Success(reader, _) => reader
       case n: NoSuccess =>
         throw new IllegalStateException(
-            "Tokenizing failed. This is a bug. Message was: " + n.msg)
+          "Tokenizing failed. This is a bug. Message was: " + n.msg)
     }
 }

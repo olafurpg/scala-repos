@@ -4,9 +4,28 @@
 package sbt
 
 import sbt.internal.inc.javac.{IncrementalCompilerJavaTools, JavaTools}
-import sbt.internal.inc.{Analysis, AnalyzingCompiler, ClasspathOptions, CompileOutput, ComponentCompiler, IncrementalCompilerImpl, JavaTool, Locate, LoggerReporter, ScalaInstance}
+import sbt.internal.inc.{
+  Analysis,
+  AnalyzingCompiler,
+  ClasspathOptions,
+  CompileOutput,
+  ComponentCompiler,
+  IncrementalCompilerImpl,
+  JavaTool,
+  Locate,
+  LoggerReporter,
+  ScalaInstance
+}
 import xsbti.{Logger => _, _}
-import xsbti.compile.{CompileOrder, Compilers, CompileResult, GlobalsCache, IncOptions, Inputs, MiniSetup}
+import xsbti.compile.{
+  CompileOrder,
+  Compilers,
+  CompileResult,
+  GlobalsCache,
+  IncOptions,
+  Inputs,
+  MiniSetup
+}
 import CompileOrder.{JavaThenScala, Mixed, ScalaThenJava}
 import Locate.DefinesClass
 import java.io.File
@@ -111,9 +130,10 @@ object Compiler {
   //     new AnalyzingCompiler(instance, provider, cpOptions)
   //   }
 
-  def compilers(
-      cpOptions: ClasspathOptions, ivyConfiguration: IvyConfiguration)(
-      implicit app: AppConfiguration, log: Logger): Compilers = {
+  def compilers(cpOptions: ClasspathOptions,
+                ivyConfiguration: IvyConfiguration)(
+      implicit app: AppConfiguration,
+      log: Logger): Compilers = {
     val scalaProvider = app.provider.scalaProvider
     val instance = ScalaInstance(scalaProvider.version, scalaProvider.launcher)
     val sourceModule = scalaCompilerBridgeSource2_11
@@ -128,10 +148,13 @@ object Compiler {
                 cpOptions: ClasspathOptions,
                 javaHome: Option[File],
                 ivyConfiguration: IvyConfiguration,
-                sourcesModule: ModuleID)(
-      implicit app: AppConfiguration, log: Logger): Compilers = {
-    val scalac = scalaCompiler(
-        instance, cpOptions, javaHome, ivyConfiguration, sourcesModule)
+                sourcesModule: ModuleID)(implicit app: AppConfiguration,
+                                         log: Logger): Compilers = {
+    val scalac = scalaCompiler(instance,
+                               cpOptions,
+                               javaHome,
+                               ivyConfiguration,
+                               sourcesModule)
     val javac = JavaTools.directOrFork(instance, cpOptions, javaHome)
     IncrementalCompilerImpl.Compilers(scalac, javac)
   }
@@ -140,14 +163,15 @@ object Compiler {
                     javaHome: Option[File],
                     ivyConfiguration: IvyConfiguration,
                     sourcesModule: ModuleID)(
-      implicit app: AppConfiguration, log: Logger): AnalyzingCompiler = {
+      implicit app: AppConfiguration,
+      log: Logger): AnalyzingCompiler = {
     val launcher = app.provider.scalaProvider.launcher
     val componentManager = new ComponentManager(launcher.globalLock,
                                                 app.provider.components,
                                                 Option(launcher.ivyHome),
                                                 log)
-    val provider = ComponentCompiler.interfaceProvider(
-        componentManager, ivyConfiguration, sourcesModule)
+    val provider = ComponentCompiler
+      .interfaceProvider(componentManager, ivyConfiguration, sourcesModule)
     new AnalyzingCompiler(instance, provider, cpOptions)
   }
 

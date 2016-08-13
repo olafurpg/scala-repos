@@ -11,8 +11,8 @@ import scala.collection.mutable
 case class UserWithGender(name: String, gender: String)
 case class UserWithAge(name: String, age: Int)
 case class UserInfo(name: String, gender: String, age: Int)
-case class EstimatedContribution(
-    name: String, suggestedPensionContributionPerMonth: Double)
+case class EstimatedContribution(name: String,
+                                 suggestedPensionContributionPerMonth: Double)
 
 class TypedApiTest extends WordSpec with Matchers with TBddDsl {
   "A test with a single source" should {
@@ -173,8 +173,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
                 case (_, false) => 80
               }
 
-              Some(EstimatedContribution(
-                      name, floor(income / (lifeExpectancy - age))))
+              Some(
+                EstimatedContribution(name,
+                                      floor(income / (lifeExpectancy - age))))
             case _ => None
           }
           .values

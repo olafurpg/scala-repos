@@ -21,9 +21,9 @@ trait Helpers { self: Analyzer =>
     *  For example, it can be used to strip macroImpl.paramss from the evidences (necessary when checking def <-> impl correspondence)
     *  or to streamline creation of the list of macro arguments.
     */
-  def transformTypeTagEvidenceParams(macroImplRef: Tree,
-                                     transform: (Symbol,
-                                     Symbol) => Symbol): List[List[Symbol]] = {
+  def transformTypeTagEvidenceParams(
+      macroImplRef: Tree,
+      transform: (Symbol, Symbol) => Symbol): List[List[Symbol]] = {
     val runDefinitions = currentRun.runDefinitions
     import runDefinitions._
 

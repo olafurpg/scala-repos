@@ -46,7 +46,8 @@ object Inject extends InjectInstances {
     Free.liftF(I.inj(ga)) flatMap identity
 
   def match_[F[_], G[_], A](fa: Free[F, A])(
-      implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
+      implicit F: Functor[F],
+      I: Inject[G, F]): Option[G[Free[F, A]]] =
     fa.resume.fold(I.prj, _ => None)
 
   def apply[F[_], G[_]](implicit I: Inject[F, G]): Inject[F, G] = I

@@ -93,7 +93,7 @@ class DynamicConfigManager(
             case Some(ConfigType.Client) => ConfigType.Client
             case _ =>
               throw new IllegalArgumentException(
-                  "Config change notification must have 'entity_type' set to either 'client' or 'topic'." +
+                "Config change notification must have 'entity_type' set to either 'client' or 'topic'." +
                   " Received: " + json)
           }
 
@@ -101,18 +101,18 @@ class DynamicConfigManager(
             case Some(value: String) => value
             case _ =>
               throw new IllegalArgumentException(
-                  "Config change notification does not specify 'entity_name'. Received: " +
+                "Config change notification does not specify 'entity_name'. Received: " +
                   json)
           }
           val entityConfig =
             AdminUtils.fetchEntityConfig(zkUtils, entityType, entity)
           logger.info(
-              s"Processing override for entityType: $entityType, entity: $entity with config: $entityConfig")
+            s"Processing override for entityType: $entityType, entity: $entity with config: $entityConfig")
           configHandlers(entityType).processConfigChanges(entity, entityConfig)
 
         case o =>
           throw new IllegalArgumentException(
-              "Config change notification has an unexpected value. The format is:" +
+            "Config change notification has an unexpected value. The format is:" +
               "{\"version\" : 1," + " \"entity_type\":\"topic/client\"," +
               " \"entity_name\" : \"topic_name/client_id\"}." + " Received: " +
               json)
@@ -121,10 +121,10 @@ class DynamicConfigManager(
   }
 
   private val configChangeListener = new ZkNodeChangeNotificationListener(
-      zkUtils,
-      ZkUtils.EntityConfigChangesPath,
-      AdminUtils.EntityConfigChangeZnodePrefix,
-      ConfigChangedNotificationHandler)
+    zkUtils,
+    ZkUtils.EntityConfigChangesPath,
+    AdminUtils.EntityConfigChangeZnodePrefix,
+    ConfigChangedNotificationHandler)
 
   /**
     * Begin watching for config changes

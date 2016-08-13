@@ -60,8 +60,8 @@ object SystemMessageDeliveryStressTest {
     }
                                                    """)
 
-  private[akka] class SystemMessageSequenceVerifier(
-      system: ActorSystem, testActor: ActorRef)
+  private[akka] class SystemMessageSequenceVerifier(system: ActorSystem,
+                                                    testActor: ActorRef)
       extends MinimalActorRef {
     val provider = RARP(system).provider
     val path = provider.tempPath()
@@ -110,10 +110,11 @@ object SystemMessageDeliveryStressTest {
 
 abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
     extends AkkaSpec(
-        ConfigFactory
-          .parseString(cfg)
-          .withFallback(SystemMessageDeliveryStressTest.baseConfig))
-    with ImplicitSender with DefaultTimeout {
+      ConfigFactory
+        .parseString(cfg)
+        .withFallback(SystemMessageDeliveryStressTest.baseConfig))
+    with ImplicitSender
+    with DefaultTimeout {
   import SystemMessageDeliveryStressTest._
 
   override def expectedTestDuration: FiniteDuration = 120.seconds
@@ -134,19 +135,19 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
   // We test internals here (system message delivery) so we are allowed to cheat
   val targetForA = RARP(systemA).provider.resolveActorRef(
-      RootActorPath(addressB) / "temp" / sysMsgVerifierB.path.name)
+    RootActorPath(addressB) / "temp" / sysMsgVerifierB.path.name)
   val targetForB = RARP(systemB).provider.resolveActorRef(
-      RootActorPath(addressA) / "temp" / sysMsgVerifierA.path.name)
+    RootActorPath(addressA) / "temp" / sysMsgVerifierA.path.name)
 
   override def atStartup() = {
     systemA.eventStream.publish(
-        TestEvent.Mute(EventFilter[EndpointException](),
-                       EventFilter.error(start = "AssociationError"),
-                       EventFilter.warning(pattern = "received dead .*")))
+      TestEvent.Mute(EventFilter[EndpointException](),
+                     EventFilter.error(start = "AssociationError"),
+                     EventFilter.warning(pattern = "received dead .*")))
     systemB.eventStream.publish(
-        TestEvent.Mute(EventFilter[EndpointException](),
-                       EventFilter.error(start = "AssociationError"),
-                       EventFilter.warning(pattern = "received dead .*")))
+      TestEvent.Mute(EventFilter[EndpointException](),
+                     EventFilter.error(start = "AssociationError"),
+                     EventFilter.warning(pattern = "received dead .*")))
 
     systemA.eventStream.subscribe(probeA.ref, classOf[QuarantinedEvent])
     systemB.eventStream.subscribe(probeB.ref, classOf[QuarantinedEvent])
@@ -166,27 +167,29 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
       // Schedule peridodic disassociates
       systemA.scheduler.schedule(3.second, 8.seconds) {
-        transportA.managementCommand(ForceDisassociateExplicitly(
-                addressB, reason = AssociationHandle.Unknown))
+        transportA.managementCommand(
+          ForceDisassociateExplicitly(addressB,
+                                      reason = AssociationHandle.Unknown))
       }
 
       systemB.scheduler.schedule(7.seconds, 8.seconds) {
-        transportB.managementCommand(ForceDisassociateExplicitly(
-                addressA, reason = AssociationHandle.Unknown))
+        transportB.managementCommand(
+          ForceDisassociateExplicitly(addressA,
+                                      reason = AssociationHandle.Unknown))
       }
 
       systemB.actorOf(
-          Props(classOf[SystemMessageSender],
-                msgCount,
-                burstSize,
-                burstDelay,
-                targetForB))
+        Props(classOf[SystemMessageSender],
+              msgCount,
+              burstSize,
+              burstDelay,
+              targetForB))
       systemA.actorOf(
-          Props(classOf[SystemMessageSender],
-                msgCount,
-                burstSize,
-                burstDelay,
-                targetForA))
+        Props(classOf[SystemMessageSender],
+              msgCount,
+              burstSize,
+              burstDelay,
+              targetForA))
 
       val toSend = (0 until msgCount).toList
       var maxDelay = 0L
@@ -195,26 +198,25 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
         val start = System.currentTimeMillis()
         probeB.expectMsg(10.minutes, m)
         probeA.expectMsg(10.minutes, m)
-        maxDelay = math.max(maxDelay,
-                            (System.currentTimeMillis() - start) / 1000)
+        maxDelay =
+          math.max(maxDelay, (System.currentTimeMillis() - start) / 1000)
       }
     }
   }
 
   override def beforeTermination() {
     system.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter.warning(
-                source = "akka://AkkaProtocolStressTest/user/$a",
-                start = "received dead letter"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a",
+                            start = "received dead letter"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter[EndpointException](),
-            EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter[EndpointException](),
+        EventFilter.error(start = "AssociationError"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)
@@ -222,11 +224,12 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
 class SystemMessageDeliveryRetryGate
     extends SystemMessageDeliveryStressTest(
-        "passive connections on", "akka.remote.retry-gate-closed-for = 0.5 s")
+      "passive connections on",
+      "akka.remote.retry-gate-closed-for = 0.5 s")
 class SystemMessageDeliveryNoPassiveRetryGate
     extends SystemMessageDeliveryStressTest(
-        "passive connections off",
-        """
+      "passive connections off",
+      """
     akka.remote.use-passive-connections = off
     akka.remote.retry-gate-closed-for = 0.5 s
   """)

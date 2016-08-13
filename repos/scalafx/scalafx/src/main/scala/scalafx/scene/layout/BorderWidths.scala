@@ -88,14 +88,14 @@ class BorderWidths(override val delegate: jfxsl.BorderWidths)
            bottomAsPercentage: Boolean,
            leftAsPercentage: Boolean) =
     this(
-        new jfxsl.BorderWidths(top,
-                               right,
-                               bottom,
-                               left,
-                               topAsPercentage,
-                               rightAsPercentage,
-                               bottomAsPercentage,
-                               leftAsPercentage))
+      new jfxsl.BorderWidths(top,
+                             right,
+                             bottom,
+                             left,
+                             topAsPercentage,
+                             rightAsPercentage,
+                             bottomAsPercentage,
+                             leftAsPercentage))
 
   /**
     * The non-negative value (with the exception of AUTO) indicating the border thickness on

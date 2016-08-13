@@ -40,16 +40,14 @@ object ReceivePipelineSpec {
     override def toString: String = s"IntList(${l.mkString(", ")})"
   }
 
-  trait ListBuilderInterceptor {
-    this: ReceivePipeline ⇒
+  trait ListBuilderInterceptor { this: ReceivePipeline ⇒
 
     pipelineOuter {
       case n: Int ⇒ Inner(IntList((n until n + 3).toList))
     }
   }
 
-  trait AdderInterceptor {
-    this: ReceivePipeline ⇒
+  trait AdderInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case n: Int ⇒ Inner(n + 10)
@@ -58,8 +56,7 @@ object ReceivePipelineSpec {
     }
   }
 
-  trait ToStringInterceptor {
-    this: ReceivePipeline ⇒
+  trait ToStringInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int ⇒ Inner(i.toString)
@@ -68,24 +65,21 @@ object ReceivePipelineSpec {
     }
   }
 
-  trait OddDoublerInterceptor {
-    this: ReceivePipeline ⇒
+  trait OddDoublerInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int if (i % 2 != 0) ⇒ Inner(i * 2)
     }
   }
 
-  trait EvenHalverInterceptor {
-    this: ReceivePipeline ⇒
+  trait EvenHalverInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int if (i % 2 == 0) ⇒ Inner(i / 2)
     }
   }
 
-  trait Timer {
-    this: ReceivePipeline ⇒
+  trait Timer { this: ReceivePipeline ⇒
 
     def notifyDuration(duration: Long): Unit
 
@@ -120,8 +114,9 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
 
     "support any number of interceptors" in {
       val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+        system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+          with AdderInterceptor with ToStringInterceptor))
       replier ! 8
       expectMsg("List(18, 19, 20)")
     }
@@ -129,8 +124,9 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
     "delegate messages unhandled by interceptors to the inner behavior" in {
 
       val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+        system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+          with AdderInterceptor with ToStringInterceptor))
       replier ! 8L // unhandled by all interceptors but still replied
       expectMsg(8L)
       replier ! Set(8F) // unhandled by all but ToString Interceptor, so replied as String
@@ -140,8 +136,9 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
     "let any interceptor to explicitly ignore some messages" in {
 
       val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+        system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+          with AdderInterceptor with ToStringInterceptor))
       replier ! "explicitly ignored"
       replier ! 8L // unhandled by all interceptors but still replied
       expectMsg(8L)
@@ -149,8 +146,9 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
 
     "support changing behavior without losing the interceptions" in {
       val replier =
-        system.actorOf(Props(new ReplierActor with ListBuilderInterceptor
-                with AdderInterceptor with ToStringInterceptor))
+        system.actorOf(
+          Props(new ReplierActor with ListBuilderInterceptor
+          with AdderInterceptor with ToStringInterceptor))
       replier ! 8
       expectMsg("List(18, 19, 20)")
       replier ! "become"
@@ -159,10 +157,12 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
     }
 
     "support swapping inner and outer interceptors mixin order" in {
-      val outerInnerReplier = system.actorOf(Props(new ReplierActor
-              with ListBuilderInterceptor with AdderInterceptor))
-      val innerOuterReplier = system.actorOf(Props(new ReplierActor
-              with AdderInterceptor with ListBuilderInterceptor))
+      val outerInnerReplier = system.actorOf(
+        Props(
+          new ReplierActor with ListBuilderInterceptor with AdderInterceptor))
+      val innerOuterReplier = system.actorOf(
+        Props(
+          new ReplierActor with AdderInterceptor with ListBuilderInterceptor))
       outerInnerReplier ! 4
       expectMsg(IntList(List(14, 15, 16)))
       innerOuterReplier ! 6
@@ -190,7 +190,8 @@ object PersistentReceivePipelineSpec {
   }
 }
 class PersistentReceivePipelineSpec(config: Config)
-    extends AkkaSpec(config) with ImplicitSender {
+    extends AkkaSpec(config)
+    with ImplicitSender {
   import ReceivePipelineSpec._
   import PersistentReceivePipelineSpec._
 
@@ -204,14 +205,15 @@ class PersistentReceivePipelineSpec(config: Config)
   "A PersistentActor with ReceivePipeline" must {
     "support any number of interceptors" in {
       val replier = system.actorOf(
-          Props(new PersistentReplierActor with ListBuilderInterceptor
-              with AdderInterceptor with ToStringInterceptor))
+        Props(new PersistentReplierActor with ListBuilderInterceptor
+        with AdderInterceptor with ToStringInterceptor))
       replier ! 8
       expectMsg("List(18, 19, 20)")
     }
     "allow messages explicitly passed on by interceptors to be handled by the actor" in {
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor))
 
       // 6 -> 3 -> 6
       replier ! 6
@@ -219,8 +221,9 @@ class PersistentReceivePipelineSpec(config: Config)
     }
 
     "allow messages not handled by some interceptors to be handled by the actor" in {
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor))
 
       // 8 -> 4 ( -> not handled by OddDoublerInterceptor)
       replier ! 8
@@ -231,10 +234,11 @@ class PersistentReceivePipelineSpec(config: Config)
       val probe = new TestProbe(system)
       val probeRef = probe.ref
 
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor {
-        override def unhandled(message: Any) = probeRef ! message
-      }))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor {
+          override def unhandled(message: Any) = probeRef ! message
+        }))
 
       // 22 -> 11 -> 22 but > 10 so not handled in main receive: falls back to unhandled implementation...
       replier ! 22
@@ -245,12 +249,13 @@ class PersistentReceivePipelineSpec(config: Config)
       val probe = new TestProbe(system)
       val probeRef = probe.ref
 
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor {
-        override def unhandled(message: Any) = probeRef ! message
-      }))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor {
+          override def unhandled(message: Any) = probeRef ! message
+        }))
 
-      // 11 ( -> not handled by EvenHalverInterceptor) -> 22 but > 10 so not handled in main receive: 
+      // 11 ( -> not handled by EvenHalverInterceptor) -> 22 but > 10 so not handled in main receive:
       // original message falls back to unhandled implementation...
       replier ! 11
       probe.expectMsg(11)
@@ -260,10 +265,11 @@ class PersistentReceivePipelineSpec(config: Config)
       val probe = new TestProbe(system)
       val probeRef = probe.ref
 
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor {
-        override def unhandled(message: Any) = probeRef ! message
-      }))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor {
+          override def unhandled(message: Any) = probeRef ! message
+        }))
 
       replier ! "hi there!"
       probe.expectMsg("hi there!")
@@ -273,10 +279,11 @@ class PersistentReceivePipelineSpec(config: Config)
       val probe = new TestProbe(system)
       val probeRef = probe.ref
 
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor {
-        override def unhandled(message: Any) = probeRef ! message
-      }))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor {
+          override def unhandled(message: Any) = probeRef ! message
+        }))
 
       replier ! 4
       expectMsg(2)
@@ -287,10 +294,11 @@ class PersistentReceivePipelineSpec(config: Config)
       val probe = new TestProbe(system)
       val probeRef = probe.ref
 
-      val replier = system.actorOf(Props(new IntReplierActor(10)
-              with EvenHalverInterceptor with OddDoublerInterceptor {
-        override def unhandled(message: Any) = probeRef ! message
-      }))
+      val replier = system.actorOf(
+        Props(new IntReplierActor(10) with EvenHalverInterceptor
+        with OddDoublerInterceptor {
+          override def unhandled(message: Any) = probeRef ! message
+        }))
 
       replier ! "hi there!"
       replier ! 8
@@ -299,8 +307,9 @@ class PersistentReceivePipelineSpec(config: Config)
     }
 
     "call side-effecting receive code only once" in {
-      val totaller = system.actorOf(Props(new TotallerActor
-              with EvenHalverInterceptor with OddDoublerInterceptor))
+      val totaller = system.actorOf(
+        Props(new TotallerActor with EvenHalverInterceptor
+        with OddDoublerInterceptor))
 
       totaller ! 8
       totaller ! 6
@@ -309,8 +318,9 @@ class PersistentReceivePipelineSpec(config: Config)
     }
 
     "not cache the result of the same message" in {
-      val totaller = system.actorOf(Props(new TotallerActor
-              with EvenHalverInterceptor with OddDoublerInterceptor))
+      val totaller = system.actorOf(
+        Props(new TotallerActor with EvenHalverInterceptor
+        with OddDoublerInterceptor))
 
       totaller ! 6
       totaller ! 6
@@ -410,18 +420,17 @@ object MixinSample extends App {
 
   //#mixin-model
   val texts = Map(
-      "that.rug_EN" -> "That rug really tied the room together.",
-      "your.opinion_EN" -> "Yeah, well, you know, that's just, like, your opinion, man.",
-      "that.rug_ES" -> "Esa alfombra realmente completaba la sala.",
-      "your.opinion_ES" -> "Sí, bueno, ya sabes, eso es solo, como, tu opinion, amigo.")
+    "that.rug_EN" -> "That rug really tied the room together.",
+    "your.opinion_EN" -> "Yeah, well, you know, that's just, like, your opinion, man.",
+    "that.rug_ES" -> "Esa alfombra realmente completaba la sala.",
+    "your.opinion_ES" -> "Sí, bueno, ya sabes, eso es solo, como, tu opinion, amigo.")
 
   case class I18nText(locale: String, key: String)
   case class Message(author: Option[String], text: Any)
   //#mixin-model
 
   //#mixin-interceptors
-  trait I18nInterceptor {
-    this: ReceivePipeline ⇒
+  trait I18nInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case m @ Message(_, I18nText(loc, key)) ⇒
@@ -429,8 +438,7 @@ object MixinSample extends App {
     }
   }
 
-  trait AuditInterceptor {
-    this: ReceivePipeline ⇒
+  trait AuditInterceptor { this: ReceivePipeline ⇒
 
     pipelineOuter {
       case m @ Message(Some(author), text) ⇒
@@ -444,7 +452,9 @@ object MixinSample extends App {
 
   //#mixin-actor
   class PrinterActor
-      extends Actor with ReceivePipeline with I18nInterceptor
+      extends Actor
+      with ReceivePipeline
+      with I18nInterceptor
       with AuditInterceptor {
 
     override def receive: Receive = {
@@ -473,8 +483,7 @@ object UnhandledSample extends App {
   //#unhandled
   case class PrivateMessage(userId: Option[Long], msg: Any)
 
-  trait PrivateInterceptor {
-    this: ReceivePipeline ⇒
+  trait PrivateInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case PrivateMessage(Some(userId), msg) ⇒
@@ -489,8 +498,7 @@ object AfterSamples {
   import ReceivePipeline._
 
   //#interceptor-after
-  trait TimerInterceptor extends ActorLogging {
-    this: ReceivePipeline ⇒
+  trait TimerInterceptor extends ActorLogging { this: ReceivePipeline ⇒
 
     def logTimeTaken(time: Long) = log.debug(s"Time taken: $time ns")
 

@@ -19,20 +19,20 @@ object FingerprintSerializer {
           requireNoArgConstructor = fp.requireNoArgConstructor)
     case _ =>
       throw new IllegalArgumentException(
-          s"Unknown Fingerprint type: ${fp.getClass}")
+        s"Unknown Fingerprint type: ${fp.getClass}")
   }
 
   def deserialize(obj: js.Dynamic): Fingerprint = {
     obj.fpType.asInstanceOf[String] match {
       case "AnnotatedFingerprint" =>
         new DeserializedAnnotatedFingerprint(
-            obj.isModule.asInstanceOf[Boolean],
-            obj.annotationName.asInstanceOf[String])
+          obj.isModule.asInstanceOf[Boolean],
+          obj.annotationName.asInstanceOf[String])
       case "SubclassFingerprint" =>
         new DeserializedSubclassFingerprint(
-            obj.isModule.asInstanceOf[Boolean],
-            obj.superclassName.asInstanceOf[String],
-            obj.requireNoArgConstructor.asInstanceOf[Boolean])
+          obj.isModule.asInstanceOf[Boolean],
+          obj.superclassName.asInstanceOf[String],
+          obj.requireNoArgConstructor.asInstanceOf[Boolean])
       case tpe =>
         throw new IllegalArgumentException(s"Unknown Fingerprint type: $tpe")
     }
@@ -41,13 +41,11 @@ object FingerprintSerializer {
   final class DeserializedAnnotatedFingerprint(
       val isModule: Boolean,
       val annotationName: String
-  )
-      extends AnnotatedFingerprint
+  ) extends AnnotatedFingerprint
 
   final class DeserializedSubclassFingerprint(
       val isModule: Boolean,
       val superclassName: String,
       val requireNoArgConstructor: Boolean
-  )
-      extends SubclassFingerprint
+  ) extends SubclassFingerprint
 }

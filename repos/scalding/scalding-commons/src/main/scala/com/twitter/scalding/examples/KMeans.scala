@@ -10,10 +10,10 @@ object KMeans {
     */
   private def distance(v1: Vector[Double], v2: Vector[Double]): Double =
     math.sqrt(
-        v1.iterator
-          .zip(v2.iterator)
-          .map { case (l, r) => (l - r) * (l - r) }
-          .sum)
+      v1.iterator
+        .zip(v2.iterator)
+        .map { case (l, r) => (l - r) * (l - r) }
+        .sum)
 
   // Just normal vector addition
   private def add(v1: Vector[Double], v2: Vector[Double]): Vector[Double] =
@@ -86,17 +86,17 @@ object KMeans {
     // Now update the clusters:
     next.map { pipe =>
       (ComputedValue(
-           pipe.group
-           // There is no need to use more than k reducers
-             .withReducers(k)
-             .mapValueStream { vectors =>
-           Iterator(centroidOf(vectors))
-         }
-             // Now collect them all into one big
-             .groupAll
-             .toList
-             // discard the "all" key used to group them together
-             .values),
+         pipe.group
+         // There is no need to use more than k reducers
+           .withReducers(k)
+           .mapValueStream { vectors =>
+             Iterator(centroidOf(vectors))
+           }
+           // Now collect them all into one big
+           .groupAll
+           .toList
+           // discard the "all" key used to group them together
+           .values),
        pipe)
     }
   }
@@ -128,8 +128,8 @@ object KMeans {
    */
   def kmeans(k: Int,
              clusters: ValuePipe[List[LabeledVector]],
-             points: TypedPipe[LabeledVector]): Execution[(Int, ValuePipe[List[
-              LabeledVector]], TypedPipe[LabeledVector])] = {
+             points: TypedPipe[LabeledVector]): Execution[
+    (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
 
     val key = StatKey("changed", "scalding.kmeans")
 
@@ -137,7 +137,7 @@ object KMeans {
            c: ValuePipe[List[LabeledVector]],
            p: TypedPipe[LabeledVector],
            step: Int): Execution[
-        (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] =
+      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] =
       kmeansStep(k, s, c, p).getAndResetCounters.flatMap {
         case ((nextC, nextP), counters) =>
           val changed = counters(key)
@@ -151,7 +151,7 @@ object KMeans {
   }
 
   def apply(k: Int, points: TypedPipe[Vector[Double]]): Execution[
-      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
+    (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
     val (clusters, labeled) = initializeClusters(k, points)
     kmeans(k, clusters, labeled)
   }

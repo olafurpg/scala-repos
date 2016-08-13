@@ -21,16 +21,16 @@ final class Env(config: Config,
   private val analysisColl = db(config getString "collection.analysis")
   private val clientColl = db(config getString "collection.client")
 
-  private val repo = new FishnetRepo(
-      analysisColl = analysisColl, clientColl = clientColl)
+  private val repo =
+    new FishnetRepo(analysisColl = analysisColl, clientColl = clientColl)
 
   private val moveDb = new MoveDB
 
-  private val sequencer = new lila.hub.FutureSequencer(
-      system = system,
-      receiveTimeout = None,
-      executionTimeout = Some(1 second),
-      logger = logger)
+  private val sequencer = new lila.hub.FutureSequencer(system = system,
+                                                       receiveTimeout = None,
+                                                       executionTimeout =
+                                                         Some(1 second),
+                                                       logger = logger)
 
   private val monitor = new Monitor(moveDb, repo, sequencer, scheduler)
 
@@ -61,17 +61,14 @@ final class Env(config: Config,
   new MainWatcher(repo = repo, bus = bus, scheduler = scheduler)
 
   // api actor
-  system.actorOf(
-      Props(
-          new Actor {
-        def receive = {
-          case lila.hub.actorApi.fishnet.AutoAnalyse(gameId) =>
-            analyser(gameId,
-                     Work.Sender(
-                         userId = none, ip = none, mod = false, system = true))
-        }
-      }),
-      name = ActorName)
+  system.actorOf(Props(new Actor {
+    def receive = {
+      case lila.hub.actorApi.fishnet.AutoAnalyse(gameId) =>
+        analyser(
+          gameId,
+          Work.Sender(userId = none, ip = none, mod = false, system = true))
+    }
+  }), name = ActorName)
 
   def cli = new lila.common.Cli {
     def process = {
@@ -92,13 +89,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "fishnet" boot new Env(
-        system = lila.common.PlayApp.system,
-        uciMemo = lila.game.Env.current.uciMemo,
-        hub = lila.hub.Env.current,
-        db = lila.db.Env.current,
-        config = lila.common.PlayApp loadConfig "fishnet",
-        scheduler = lila.common.PlayApp.scheduler,
-        bus = lila.common.PlayApp.system.lilaBus,
-        saveAnalysis = lila.analyse.Env.current.analyser.save _)
+    "fishnet" boot new Env(system = lila.common.PlayApp.system,
+                           uciMemo = lila.game.Env.current.uciMemo,
+                           hub = lila.hub.Env.current,
+                           db = lila.db.Env.current,
+                           config = lila.common.PlayApp loadConfig "fishnet",
+                           scheduler = lila.common.PlayApp.scheduler,
+                           bus = lila.common.PlayApp.system.lilaBus,
+                           saveAnalysis =
+                             lila.analyse.Env.current.analyser.save _)
 }

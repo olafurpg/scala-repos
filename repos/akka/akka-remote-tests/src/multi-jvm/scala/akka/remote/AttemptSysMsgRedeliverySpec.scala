@@ -37,7 +37,9 @@ class AttemptSysMsgRedeliveryMultiJvmNode3 extends AttemptSysMsgRedeliverySpec
 
 class AttemptSysMsgRedeliverySpec
     extends MultiNodeSpec(AttemptSysMsgRedeliveryMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender with DefaultTimeout {
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import AttemptSysMsgRedeliveryMultiJvmSpec._
 
   def initialParticipants = roles.size

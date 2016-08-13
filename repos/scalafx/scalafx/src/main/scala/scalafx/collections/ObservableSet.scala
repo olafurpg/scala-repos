@@ -30,7 +30,11 @@ import java.{util => ju}
 import javafx.{collections => jfxc}
 
 import scala.collection.JavaConversions._
-import scala.collection.generic.{GenericCompanion, GenericSetTemplate, MutableSetFactory}
+import scala.collection.generic.{
+  GenericCompanion,
+  GenericSetTemplate,
+  MutableSetFactory
+}
 import scala.collection.mutable.{Builder, Set, SetLike}
 import scala.language.implicitConversions
 import scalafx.beans.Observable
@@ -122,9 +126,12 @@ object ObservableSet extends MutableSetFactory[ObservableSet] {
   * @define SET `Set`
   */
 trait ObservableSet[T]
-    extends Set[T] with SetLike[T, ObservableSet[T]]
-    with GenericSetTemplate[T, ObservableSet] with Builder[T, ObservableSet[T]]
-    with Observable with SFXDelegate[jfxc.ObservableSet[T]] {
+    extends Set[T]
+    with SetLike[T, ObservableSet[T]]
+    with GenericSetTemplate[T, ObservableSet]
+    with Builder[T, ObservableSet[T]]
+    with Observable
+    with SFXDelegate[jfxc.ObservableSet[T]] {
 
   /**
     * The factory companion object that builds instances of class $OS.
@@ -211,7 +218,7 @@ trait ObservableSet[T]
               ObservableSet.Remove(change.getElementRemoved)
             case _ =>
               throw new IllegalStateException(
-                  "Irregular Change. Added: " + change.getElementAdded +
+                "Irregular Change. Added: " + change.getElementAdded +
                   ", Removed: " + change.getElementRemoved)
           }
 
@@ -226,8 +233,7 @@ trait ObservableSet[T]
     * @param op No-argument function to be activated when some change in this $OS was made.
     */
   def onChange(op: => Unit) {
-    delegate.addListener(
-        new jfxc.SetChangeListener[T] {
+    delegate.addListener(new jfxc.SetChangeListener[T] {
       def onChanged(change: jfxc.SetChangeListener.Change[_ <: T]) {
         op
       }
@@ -248,6 +254,6 @@ trait ObservableSet[T]
   *                 [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/FXCollections.html FXCollections]].
   */
 class ObservableHashSet[T](
-    override val delegate: jfxc.ObservableSet[T] = jfxc.FXCollections
-        .observableSet(new ju.HashSet[T]))
+    override val delegate: jfxc.ObservableSet[T] =
+      jfxc.FXCollections.observableSet(new ju.HashSet[T]))
     extends ObservableSet[T]

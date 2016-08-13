@@ -30,8 +30,8 @@ private[relation] final class RelationActor(
       onlineFriends(userId) foreach {
         case OnlineFriends(users) =>
           bus.publish(
-              SendTo(userId, "following_onlines", users.map(_.titleName)),
-              'users)
+            SendTo(userId, "following_onlines", users.map(_.titleName)),
+            'users)
       }
 
     case NotifyMovement =>

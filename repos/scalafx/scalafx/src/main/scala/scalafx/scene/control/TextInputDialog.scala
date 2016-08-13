@@ -60,7 +60,8 @@ object TextInputDialog {
   */
 class TextInputDialog(
     override val delegate: jfxsc.TextInputDialog = new jfxsc.TextInputDialog())
-    extends Dialog[String](delegate) with SFXDelegate[jfxsc.TextInputDialog] {
+    extends Dialog[String](delegate)
+    with SFXDelegate[jfxsc.TextInputDialog] {
 
   /**
     * Creates a new TextInputDialog with the default value entered into the

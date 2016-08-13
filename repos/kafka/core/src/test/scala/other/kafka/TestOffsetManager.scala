@@ -43,17 +43,17 @@ object TestOffsetManager {
 
     def printStats() {
       println(
-          "--------------------------------------------------------------------------------")
+        "--------------------------------------------------------------------------------")
       println("Aggregate stats for commits:")
       println(
-          "Error count: %d; Max:%f; Min: %f; Mean: %f; Commit count: %d"
-            .format(commitThreads.map(_.numErrors.get).sum,
-                    commitThreads.map(_.timer.max()).max,
-                    commitThreads.map(_.timer.min()).min,
-                    commitThreads.map(_.timer.mean()).sum / commitThreads.size,
-                    commitThreads.map(_.numCommits.get).sum))
+        "Error count: %d; Max:%f; Min: %f; Mean: %f; Commit count: %d".format(
+          commitThreads.map(_.numErrors.get).sum,
+          commitThreads.map(_.timer.max()).max,
+          commitThreads.map(_.timer.min()).min,
+          commitThreads.map(_.timer.mean()).sum / commitThreads.size,
+          commitThreads.map(_.numCommits.get).sum))
       println(
-          "--------------------------------------------------------------------------------")
+        "--------------------------------------------------------------------------------")
       commitThreads.foreach(t => println(t.stats))
       println(fetchThread.stats)
     }
@@ -64,9 +64,12 @@ object TestOffsetManager {
     }
   }
 
-  class CommitThread(
-      id: Int, partitionCount: Int, commitIntervalMs: Long, zkUtils: ZkUtils)
-      extends ShutdownableThread("commit-thread") with KafkaMetricsGroup {
+  class CommitThread(id: Int,
+                     partitionCount: Int,
+                     commitIntervalMs: Long,
+                     zkUtils: ZkUtils)
+      extends ShutdownableThread("commit-thread")
+      with KafkaMetricsGroup {
 
     private val groupId = "group-" + id
     private val metadata = "Metadata from commit thread " + id
@@ -75,23 +78,25 @@ object TestOffsetManager {
     private var offset = 0L
     val numErrors = new AtomicInteger(0)
     val numCommits = new AtomicInteger(0)
-    val timer = newTimer(
-        "commit-thread", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    val timer =
+      newTimer("commit-thread", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
     private val commitTimer = new KafkaTimer(timer)
     val shutdownLock = new Object
 
     private def ensureConnected() {
       if (!offsetsChannel.isConnected)
-        offsetsChannel = ClientUtils.channelToOffsetManager(
-            groupId, zkUtils, SocketTimeoutMs)
+        offsetsChannel =
+          ClientUtils.channelToOffsetManager(groupId, zkUtils, SocketTimeoutMs)
     }
 
     override def doWork() {
       val commitRequest = OffsetCommitRequest(
-          groupId,
-          immutable.Map((1 to partitionCount).map(
-                  TopicAndPartition("topic-" + id, _) -> OffsetAndMetadata(
-                      offset, metadata)): _*))
+        groupId,
+        immutable.Map(
+          (1 to partitionCount).map(
+            TopicAndPartition("topic-" + id, _) -> OffsetAndMetadata(
+              offset,
+              metadata)): _*))
       try {
         ensureConnected()
         offsetsChannel.send(commitRequest)
@@ -107,10 +112,8 @@ object TestOffsetManager {
         case e1: ClosedByInterruptException =>
           offsetsChannel.disconnect()
         case e2: IOException =>
-          println(
-              "Commit thread %d: Error while committing offsets to %s:%d for group %s due to %s."
-                .format(
-                  id, offsetsChannel.host, offsetsChannel.port, groupId, e2))
+          println("Commit thread %d: Error while committing offsets to %s:%d for group %s due to %s."
+            .format(id, offsetsChannel.host, offsetsChannel.port, groupId, e2))
           offsetsChannel.disconnect()
       } finally {
         Thread.sleep(commitIntervalMs)
@@ -122,8 +125,8 @@ object TestOffsetManager {
       awaitShutdown()
       offsetsChannel.disconnect()
       println(
-          "Commit thread %d ended. Last committed offset: %d.".format(
-              id, offset))
+        "Commit thread %d ended. Last committed offset: %d.".format(id,
+                                                                    offset))
     }
 
     def stats = {
@@ -138,10 +141,11 @@ object TestOffsetManager {
   }
 
   class FetchThread(numGroups: Int, fetchIntervalMs: Long, zkUtils: ZkUtils)
-      extends ShutdownableThread("fetch-thread") with KafkaMetricsGroup {
+      extends ShutdownableThread("fetch-thread")
+      with KafkaMetricsGroup {
 
-    private val timer = newTimer(
-        "fetch-thread", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    private val timer =
+      newTimer("fetch-thread", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
     private val fetchTimer = new KafkaTimer(timer)
 
     private val channels = mutable.Map[Int, BlockingChannel]()
@@ -164,16 +168,16 @@ object TestOffsetManager {
         val channel =
           if (channels.contains(coordinatorId)) channels(coordinatorId)
           else {
-            val newChannel = ClientUtils.channelToOffsetManager(
-                group, zkUtils, SocketTimeoutMs)
+            val newChannel = ClientUtils
+              .channelToOffsetManager(group, zkUtils, SocketTimeoutMs)
             channels.put(coordinatorId, newChannel)
             newChannel
           }
 
         try {
           // send the offset fetch request
-          val fetchRequest = OffsetFetchRequest(
-              group, Seq(TopicAndPartition("topic-" + id, 1)))
+          val fetchRequest =
+            OffsetFetchRequest(group, Seq(TopicAndPartition("topic-" + id, 1)))
           channel.send(fetchRequest)
 
           fetchTimer.time {
@@ -188,20 +192,21 @@ object TestOffsetManager {
             channel.disconnect()
             channels.remove(coordinatorId)
           case e2: IOException =>
-            println("Error while fetching offset from %s:%d due to %s.".format(
-                    channel.host, channel.port, e2))
+            println(
+              "Error while fetching offset from %s:%d due to %s."
+                .format(channel.host, channel.port, e2))
             channel.disconnect()
             channels.remove(coordinatorId)
         }
       } catch {
         case e: IOException =>
           println(
-              "Error while querying %s:%d - shutting down query channel."
-                .format(metadataChannel.host, metadataChannel.port))
+            "Error while querying %s:%d - shutting down query channel."
+              .format(metadataChannel.host, metadataChannel.port))
           metadataChannel.disconnect()
           println("Creating new query channel.")
-          metadataChannel = ClientUtils.channelToAnyBroker(
-              zkUtils, SocketTimeoutMs)
+          metadataChannel =
+            ClientUtils.channelToAnyBroker(zkUtils, SocketTimeoutMs)
       } finally {
         Thread.sleep(fetchIntervalMs)
       }
@@ -285,12 +290,12 @@ object TestOffsetManager {
     val zookeeper = options.valueOf(zookeeperOpt)
     val reportingIntervalMs = options.valueOf(reportingIntervalOpt).intValue()
     println(
-        "Commit thread count: %d; Partition count: %d, Commit interval: %d ms; Fetch interval: %d ms; Reporting interval: %d ms"
-          .format(threadCount,
-                  partitionCount,
-                  commitIntervalMs,
-                  fetchIntervalMs,
-                  reportingIntervalMs))
+      "Commit thread count: %d; Partition count: %d, Commit interval: %d ms; Fetch interval: %d ms; Reporting interval: %d ms"
+        .format(threadCount,
+                partitionCount,
+                commitIntervalMs,
+                fetchIntervalMs,
+                reportingIntervalMs))
 
     var zkUtils: ZkUtils = null
     var commitThreads: Seq[CommitThread] = Seq()
@@ -304,11 +309,10 @@ object TestOffsetManager {
 
       fetchThread = new FetchThread(threadCount, fetchIntervalMs, zkUtils)
 
-      val statsThread = new StatsThread(
-          reportingIntervalMs, commitThreads, fetchThread)
+      val statsThread =
+        new StatsThread(reportingIntervalMs, commitThreads, fetchThread)
 
-      Runtime.getRuntime.addShutdownHook(
-          new Thread() {
+      Runtime.getRuntime.addShutdownHook(new Thread() {
         override def run() {
           cleanShutdown()
           statsThread.printStats()

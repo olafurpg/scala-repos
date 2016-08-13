@@ -5,10 +5,13 @@ import scala.runtime.ScalaRunTime.isAnyVal
 import scala.reflect.reify.codegen._
 
 trait Reify
-    extends GenSymbols with GenTypes with GenNames with GenTrees
-    with GenAnnotationInfos with GenPositions with GenUtils {
-
-  self: Reifier =>
+    extends GenSymbols
+    with GenTypes
+    with GenNames
+    with GenTrees
+    with GenAnnotationInfos
+    with GenPositions
+    with GenUtils { self: Reifier =>
 
   import global._
 
@@ -18,7 +21,8 @@ trait Reify
 
     @inline final def push[T](reifee: Any)(body: => T): T = {
       currents ::= reifee
-      try body finally currents = currents.tail
+      try body
+      finally currents = currents.tail
     }
   }
   def boundSymbolsInCallstack = flatCollect(reifyStack.currents) {
@@ -51,7 +55,8 @@ trait Reify
       case v if isAnyVal(v) => Literal(Constant(v))
       case null => Literal(Constant(null))
       case _ =>
-        throw new Error("reifee %s of type %s is not supported".format(
-                reifee, reifee.getClass))
+        throw new Error(
+          "reifee %s of type %s is not supported".format(reifee,
+                                                         reifee.getClass))
     })
 }

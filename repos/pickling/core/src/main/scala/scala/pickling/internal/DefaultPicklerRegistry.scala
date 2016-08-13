@@ -8,7 +8,8 @@ import scala.pickling.spi.{PicklerRegistry, RuntimePicklerGenerator}
 
 /** Default pickle registry just uses TrieMaps and delgates behavior to a runtime pickler generator. */
 final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
-    extends PicklerRegistry with RuntimePicklerRegistryHelper {
+    extends PicklerRegistry
+    with RuntimePicklerRegistryHelper {
   type PicklerGenerator = AppliedType => Pickler[_]
   type UnpicklerGenerator = AppliedType => Unpickler[_]
   // TODO - We need to move the special encoding for runtime classes into here, rather than in magical traits.
@@ -38,8 +39,9 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
     }
   }
   def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_] = {
+      classLoader: ClassLoader,
+      clazz: Class[_],
+      tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_] = {
     lookupPickler(tag.key) match {
       case Some(p) => p
       case None =>
@@ -128,7 +130,8 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
     * @param p  The unpickler to register.
     */
   override def registerPicklerUnpickler[T](
-      key: String, p: (Pickler[T] with Unpickler[T])): Unit = {
+      key: String,
+      p: (Pickler[T] with Unpickler[T])): Unit = {
     // TODO - Should we lock or something here?
     registerPickler(key, p)
     registerUnpickler(key, p)

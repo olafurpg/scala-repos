@@ -11,18 +11,18 @@ class StringLiteralBackspaceActionTest
     extends ScalaLightCodeInsightFixtureTestAdapter {
   def testSimpleMultiLine() {
     checkGeneratedTextAfterBackspace(
-        s"val x = ${"\"\"\""}$CARET_MARKER${"\"\"\""}",
-        s"val x = ${"\"\""}$CARET_MARKER")
+      s"val x = ${"\"\"\""}$CARET_MARKER${"\"\"\""}",
+      s"val x = ${"\"\""}$CARET_MARKER")
   }
 
   def testInterpolated() {
     checkGeneratedTextAfterBackspace(
-        s"val x = s${"\"\"\""}$CARET_MARKER${"\"\"\""}",
-        s"val x = s${"\"\""}$CARET_MARKER")
+      s"val x = s${"\"\"\""}$CARET_MARKER${"\"\"\""}",
+      s"val x = s${"\"\""}$CARET_MARKER")
   }
 
   def testSimpleInterpolated() {
-    checkGeneratedTextAfterBackspace(
-        s"""val x = s"$CARET_MARKER"""", s"val x = s$CARET_MARKER")
+    checkGeneratedTextAfterBackspace(s"""val x = s"$CARET_MARKER"""",
+                                     s"val x = s$CARET_MARKER")
   }
 }

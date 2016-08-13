@@ -26,19 +26,19 @@ final class Env(config: Config,
   def unregisterDevices = deviceApi.unregister _
 
   private lazy val googlePush = new GooglePush(
-      deviceApi.findLastByUserId("android") _,
-      url = GooglePushUrl,
-      key = GooglePushKey)
+    deviceApi.findLastByUserId("android") _,
+    url = GooglePushUrl,
+    key = GooglePushKey)
 
   private lazy val applePush = new ApplePush(
-      deviceApi.findLastByUserId("ios") _,
-      system = system,
-      certificate = appleCertificate(ApplePushCertPath),
-      password = ApplePushPassword,
-      enabled = ApplePushEnabled)
+    deviceApi.findLastByUserId("ios") _,
+    system = system,
+    certificate = appleCertificate(ApplePushCertPath),
+    password = ApplePushPassword,
+    enabled = ApplePushEnabled)
 
-  private lazy val pushApi = new PushApi(
-      googlePush, applePush, getLightUser, roundSocketHub)
+  private lazy val pushApi =
+    new PushApi(googlePush, applePush, getLightUser, roundSocketHub)
 
   system.actorOf(Props(new Actor {
     override def preStart() {
@@ -63,7 +63,7 @@ object Env {
                         getLightUser = lila.user.Env.current.lightUser,
                         roundSocketHub = lila.hub.Env.current.socket.round,
                         appleCertificate = path =>
-                            lila.common.PlayApp.withApp {
+                          lila.common.PlayApp.withApp {
                             _.classloader.getResourceAsStream(path)
                         },
                         config = lila.common.PlayApp loadConfig "push")

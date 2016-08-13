@@ -24,12 +24,20 @@ import scala.collection.JavaConverters._
 
 import org.scalatest.Matchers
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext,
+  SparkConf,
+  SparkContext,
+  SparkException,
+  SparkFunSuite
+}
 import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkListenerSuite
-    extends SparkFunSuite with LocalSparkContext with Matchers
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Matchers
     with ResetSystemProperties {
 
   /** Length of time to wait while draining listener events. */
@@ -276,7 +284,7 @@ class SparkListenerSuite
           case (taskInfo, taskMetrics) =>
             taskMetrics.resultSize should be > (0L)
             if (stageInfo.rddInfos.exists(
-                    info => info.name == d2.name || info.name == d3.name)) {
+                  info => info.name == d2.name || info.name == d3.name)) {
               taskMetrics.inputMetrics should not be ('defined)
               taskMetrics.outputMetrics should not be ('defined)
               taskMetrics.shuffleWriteMetrics should be('defined)
@@ -336,7 +344,7 @@ class SparkListenerSuite
   }
 
   test(
-      "onTaskEnd() should be called for all started tasks, even after job has been killed") {
+    "onTaskEnd() should be called for all started tasks, even after job has been killed") {
     sc = new SparkContext("local", "SparkListenerSuite")
     val WAIT_TIMEOUT_MILLIS = 10000
     val listener = new SaveTaskEvents
@@ -368,7 +376,7 @@ class SparkListenerSuite
     listener.synchronized {
       var remainingWait = finishTime - System.currentTimeMillis
       while (listener.endedTasks.size < listener.startedTasks.size &&
-      remainingWait > 0) {
+             remainingWait > 0) {
         listener.wait(finishTime - System.currentTimeMillis)
         remainingWait = finishTime - System.currentTimeMillis
       }
@@ -406,10 +414,10 @@ class SparkListenerSuite
       .setAppName("test")
       .set("spark.extraListeners",
            classOf[ListenerThatAcceptsSparkConf].getName + "," +
-           classOf[BasicJobCounter].getName)
+             classOf[BasicJobCounter].getName)
     sc = new SparkContext(conf)
-    sc.listenerBus.listeners.asScala.count(_.isInstanceOf[BasicJobCounter]) should be(
-        1)
+    sc.listenerBus.listeners.asScala
+      .count(_.isInstanceOf[BasicJobCounter]) should be(1)
     sc.listenerBus.listeners.asScala
       .count(_.isInstanceOf[ListenerThatAcceptsSparkConf]) should be(1)
   }

@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.specs2.Specs2DuplicateConfigTe
   * @since 27.01.2015.
   */
 class Specs2_2_11_3_1_M_DuplicateConfigTest
-    extends Specs2DuplicateConfigTest with Specs2_2_11_3_1_M_Base {}
+    extends Specs2DuplicateConfigTest
+    with Specs2_2_11_3_1_M_Base {}

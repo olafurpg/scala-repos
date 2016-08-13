@@ -63,7 +63,7 @@ import reflect.ClassTag
   * }}}
   */
 @implicitNotFound(
-    "No QueryString binder found for type ${A}. Try to implement an implicit QueryStringBindable for this type."
+  "No QueryString binder found for type ${A}. Try to implement an implicit QueryStringBindable for this type."
 )
 trait QueryStringBindable[A] { self =>
 
@@ -75,8 +75,8 @@ trait QueryStringBindable[A] { self =>
     * @return `None` if the parameter was not present in the query string data. Otherwise, returns `Some` of either
     * `Right` of the parameter value, or `Left` of an error message if the binding failed.
     */
-  def bind(
-      key: String, params: Map[String, Seq[String]]): Option[Either[String, A]]
+  def bind(key: String,
+           params: Map[String, Seq[String]]): Option[Either[String, A]]
 
   /**
     * Unbind a query string parameter.
@@ -151,7 +151,7 @@ trait QueryStringBindable[A] { self =>
   * }}}
   */
 @implicitNotFound(
-    "No URL path binder found for type ${A}. Try to implement an implicit PathBindable for this type."
+  "No URL path binder found for type ${A}. Try to implement an implicit PathBindable for this type."
 )
 trait PathBindable[A] { self =>
 
@@ -191,7 +191,7 @@ trait PathBindable[A] { self =>
   * Transform a value to a Javascript literal.
   */
 @implicitNotFound(
-    "No JavaScript literal binder found for type ${A}. Try to implement an implicit JavascriptLiteral for this type."
+  "No JavaScript literal binder found for type ${A}. Try to implement an implicit JavascriptLiteral for this type."
 )
 trait JavascriptLiteral[A] {
 
@@ -344,7 +344,10 @@ object QueryStringBindable {
     */
   implicit def bindableString = new QueryStringBindable[String] {
     def bind(key: String, params: Map[String, Seq[String]]) =
-      params.get(key).flatMap(_.headOption).map(Right(_)) // No need to URL decode from query string since netty already does that
+      params
+        .get(key)
+        .flatMap(_.headOption)
+        .map(Right(_)) // No need to URL decode from query string since netty already does that
     // Use an option here in case users call index(null) in the routes -- see #818
     def unbind(key: String, value: String) =
       key + "=" + URLEncoder.encode(Option(value).getOrElse(""), "utf-8")
@@ -357,7 +360,8 @@ object QueryStringBindable {
     def bind(key: String, params: Map[String, Seq[String]]) =
       params.get(key).flatMap(_.headOption).map { value =>
         if (value.length != 1)
-          Left(s"Cannot parse parameter $key with value '$value' as Char: $key must be exactly one digit in length.")
+          Left(
+            s"Cannot parse parameter $key with value '$value' as Char: $key must be exactly one digit in length.")
         else Right(value.charAt(0))
       }
     def unbind(key: String, value: Char) = key + "=" + value.toString
@@ -368,10 +372,10 @@ object QueryStringBindable {
     */
   implicit object bindableInt
       extends Parsing[Int](
-          _.toInt,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Int: %s".format(key, e.getMessage)
+        _.toInt,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Int: %s".format(key, e.getMessage)
       )
 
   /**
@@ -385,10 +389,10 @@ object QueryStringBindable {
     */
   implicit object bindableLong
       extends Parsing[Long](
-          _.toLong,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Long: %s".format(key, e.getMessage)
+        _.toLong,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Long: %s".format(key, e.getMessage)
       )
 
   /**
@@ -402,10 +406,10 @@ object QueryStringBindable {
     */
   implicit object bindableDouble
       extends Parsing[Double](
-          _.toDouble,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Double: %s".format(key, e.getMessage)
+        _.toDouble,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Double: %s".format(key, e.getMessage)
       )
 
   /**
@@ -419,10 +423,10 @@ object QueryStringBindable {
     */
   implicit object bindableFloat
       extends Parsing[Float](
-          _.toFloat,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Float: %s".format(key, e.getMessage)
+        _.toFloat,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Float: %s".format(key, e.getMessage)
       )
 
   /**
@@ -436,19 +440,19 @@ object QueryStringBindable {
     */
   implicit object bindableBoolean
       extends Parsing[Boolean](
-          _.trim match {
-            case "true" => true
-            case "false" => false
-            case b =>
-              b.toInt match {
-                case 1 => true
-                case 0 => false
-              }
-          },
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Boolean: should be true, false, 0 or 1"
-              .format(key)
+        _.trim match {
+          case "true" => true
+          case "false" => false
+          case b =>
+            b.toInt match {
+              case 1 => true
+              case 0 => false
+            }
+        },
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Boolean: should be true, false, 0 or 1"
+            .format(key)
       ) {
     override def javascriptUnbind = """function(k,v){return k+'='+(!!v)}"""
   }
@@ -464,23 +468,23 @@ object QueryStringBindable {
     */
   implicit object bindableUUID
       extends Parsing[UUID](
-          UUID.fromString(_),
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as UUID: %s".format(key, e.getMessage)
+        UUID.fromString(_),
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as UUID: %s".format(key, e.getMessage)
       )
 
   /**
     * QueryString binder for Option.
     */
-  implicit def bindableOption[T : QueryStringBindable] =
+  implicit def bindableOption[T: QueryStringBindable] =
     new QueryStringBindable[Option[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
-            implicitly[QueryStringBindable[T]]
-              .bind(key, params)
-              .map(_.right.map(Some(_)))
-              .getOrElse(Right(None)))
+          implicitly[QueryStringBindable[T]]
+            .bind(key, params)
+            .map(_.right.map(Some(_)))
+            .getOrElse(Right(None)))
       }
       def unbind(key: String, value: Option[T]) =
         value
@@ -488,21 +492,21 @@ object QueryStringBindable {
           .getOrElse("")
       override def javascriptUnbind =
         javascriptUnbindOption(
-            implicitly[QueryStringBindable[T]].javascriptUnbind)
+          implicitly[QueryStringBindable[T]].javascriptUnbind)
     }
 
   /**
     * QueryString binder for Java Optional.
     */
-  implicit def bindableJavaOption[
-      T : QueryStringBindable]: QueryStringBindable[Optional[T]] =
+  implicit def bindableJavaOption[T: QueryStringBindable]
+    : QueryStringBindable[Optional[T]] =
     new QueryStringBindable[Optional[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
-            implicitly[QueryStringBindable[T]]
-              .bind(key, params)
-              .map(_.right.map(Optional.ofNullable[T]))
-              .getOrElse(Right(Optional.empty[T])))
+          implicitly[QueryStringBindable[T]]
+            .bind(key, params)
+            .map(_.right.map(Optional.ofNullable[T]))
+            .getOrElse(Right(Optional.empty[T])))
       }
       def unbind(key: String, value: Optional[T]) = {
         value.asScala
@@ -511,7 +515,7 @@ object QueryStringBindable {
       }
       override def javascriptUnbind =
         javascriptUnbindOption(
-            implicitly[QueryStringBindable[T]].javascriptUnbind)
+          implicitly[QueryStringBindable[T]].javascriptUnbind)
     }
 
   private def javascriptUnbindOption(jsUnbindT: String) =
@@ -520,8 +524,8 @@ object QueryStringBindable {
   /**
     * QueryString binder for Seq
     */
-  implicit def bindableSeq[T : QueryStringBindable]: QueryStringBindable[
-      Seq[T]] = new QueryStringBindable[Seq[T]] {
+  implicit def bindableSeq[T: QueryStringBindable]
+    : QueryStringBindable[Seq[T]] = new QueryStringBindable[Seq[T]] {
     def bind(key: String, params: Map[String, Seq[String]]) =
       bindSeq[T](key, params)
     def unbind(key: String, values: Seq[T]) = unbindSeq(key, values)
@@ -532,33 +536,36 @@ object QueryStringBindable {
   /**
     * QueryString binder for List
     */
-  implicit def bindableList[T : QueryStringBindable]: QueryStringBindable[
-      List[T]] =
+  implicit def bindableList[T: QueryStringBindable]
+    : QueryStringBindable[List[T]] =
     bindableSeq[T].transform(_.toList, _.toSeq)
 
   /**
     * QueryString binder for java.util.List
     */
-  implicit def bindableJavaList[T : QueryStringBindable]: QueryStringBindable[
-      java.util.List[T]] = new QueryStringBindable[java.util.List[T]] {
-    def bind(key: String, params: Map[String, Seq[String]]) =
-      bindSeq[T](key, params).map(_.right.map(_.asJava))
-    def unbind(key: String, values: java.util.List[T]) =
-      unbindSeq(key, values.asScala)
-    override def javascriptUnbind =
-      javascriptUnbindSeq(implicitly[QueryStringBindable[T]].javascriptUnbind)
-  }
+  implicit def bindableJavaList[T: QueryStringBindable]
+    : QueryStringBindable[java.util.List[T]] =
+    new QueryStringBindable[java.util.List[T]] {
+      def bind(key: String, params: Map[String, Seq[String]]) =
+        bindSeq[T](key, params).map(_.right.map(_.asJava))
+      def unbind(key: String, values: java.util.List[T]) =
+        unbindSeq(key, values.asScala)
+      override def javascriptUnbind =
+        javascriptUnbindSeq(
+          implicitly[QueryStringBindable[T]].javascriptUnbind)
+    }
 
-  private def bindSeq[T : QueryStringBindable](
+  private def bindSeq[T: QueryStringBindable](
       key: String,
       params: Map[String, Seq[String]]): Option[Either[String, Seq[T]]] = {
     @tailrec
-    def collectResults(
-        values: List[String], results: List[T]): Either[String, Seq[T]] = {
+    def collectResults(values: List[String],
+                       results: List[T]): Either[String, Seq[T]] = {
       values match {
         case Nil => Right(results.reverse) // to preserve the original order
         case head :: rest =>
-          implicitly[QueryStringBindable[T]].bind(key, Map(key -> Seq(head))) match {
+          implicitly[QueryStringBindable[T]]
+            .bind(key, Map(key -> Seq(head))) match {
             case None => collectResults(rest, results)
             case Some(Right(result)) => collectResults(rest, result :: results)
             case Some(Left(err)) => collectErrs(rest, err :: Nil)
@@ -567,12 +574,13 @@ object QueryStringBindable {
     }
 
     @tailrec
-    def collectErrs(
-        values: List[String], errs: List[String]): Left[String, Seq[T]] = {
+    def collectErrs(values: List[String],
+                    errs: List[String]): Left[String, Seq[T]] = {
       values match {
         case Nil => Left(errs.reverse.mkString("\n"))
         case head :: rest =>
-          implicitly[QueryStringBindable[T]].bind(key, Map(key -> Seq(head))) match {
+          implicitly[QueryStringBindable[T]]
+            .bind(key, Map(key -> Seq(head))) match {
             case Some(Left(err)) => collectErrs(rest, err :: errs)
             case Some(Right(_)) | None => collectErrs(rest, errs)
           }
@@ -585,8 +593,9 @@ object QueryStringBindable {
     }
   }
 
-  private def unbindSeq[T : QueryStringBindable](
-      key: String, values: Iterable[T]): String = {
+  private def unbindSeq[T: QueryStringBindable](
+      key: String,
+      values: Iterable[T]): String = {
     (for (value <- values) yield {
       implicitly[QueryStringBindable[T]].unbind(key, value)
     }).mkString("&")
@@ -594,7 +603,7 @@ object QueryStringBindable {
 
   private def javascriptUnbindSeq(jsUnbindT: String) =
     "function(k,vs){var l=vs&&vs.length,r=[],i=0;for(;i<l;i++){r[i]=(" +
-    jsUnbindT + ")(k,vs[i])}return r.join('&')}"
+      jsUnbindT + ")(k,vs[i])}return r.join('&')}"
 
   /**
     * QueryString binder for QueryStringBindable.
@@ -649,10 +658,10 @@ object PathBindable {
     */
   implicit object bindableString
       extends Parsing[String](
-          (s: String) => s,
-          (s: String) => s,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as String: %s".format(key, e.getMessage)
+        (s: String) => s,
+        (s: String) => s,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as String: %s".format(key, e.getMessage)
       )
 
   /**
@@ -662,7 +671,7 @@ object PathBindable {
     def bind(key: String, value: String) = {
       if (value.length != 1)
         Left(
-            s"Cannot parse parameter $key with value '$value' as Char: $key must be exactly one digit in length.")
+          s"Cannot parse parameter $key with value '$value' as Char: $key must be exactly one digit in length.")
       else Right(value.charAt(0))
     }
     def unbind(key: String, value: Char) = value.toString
@@ -673,10 +682,10 @@ object PathBindable {
     */
   implicit object bindableInt
       extends Parsing[Int](
-          _.toInt,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Int: %s".format(key, e.getMessage)
+        _.toInt,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Int: %s".format(key, e.getMessage)
       )
 
   /**
@@ -690,10 +699,10 @@ object PathBindable {
     */
   implicit object bindableLong
       extends Parsing[Long](
-          _.toLong,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Long: %s".format(key, e.getMessage)
+        _.toLong,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Long: %s".format(key, e.getMessage)
       )
 
   /**
@@ -707,10 +716,10 @@ object PathBindable {
     */
   implicit object bindableDouble
       extends Parsing[Double](
-          _.toDouble,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Double: %s".format(key, e.getMessage)
+        _.toDouble,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Double: %s".format(key, e.getMessage)
       )
 
   /**
@@ -724,10 +733,10 @@ object PathBindable {
     */
   implicit object bindableFloat
       extends Parsing[Float](
-          _.toFloat,
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Float: %s".format(key, e.getMessage)
+        _.toFloat,
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Float: %s".format(key, e.getMessage)
       )
 
   /**
@@ -741,19 +750,19 @@ object PathBindable {
     */
   implicit object bindableBoolean
       extends Parsing[Boolean](
-          _.trim match {
-            case "true" => true
-            case "false" => false
-            case b =>
-              b.toInt match {
-                case 1 => true
-                case 0 => false
-              }
-          },
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as Boolean: should be true, false, 0 or 1"
-              .format(key)
+        _.trim match {
+          case "true" => true
+          case "false" => false
+          case b =>
+            b.toInt match {
+              case 1 => true
+              case 0 => false
+            }
+        },
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as Boolean: should be true, false, 0 or 1"
+            .format(key)
       ) {
     override def javascriptUnbind = """function(k,v){return !!v}"""
   }
@@ -769,10 +778,10 @@ object PathBindable {
     */
   implicit object bindableUUID
       extends Parsing[UUID](
-          UUID.fromString(_),
-          _.toString,
-          (key: String, e: Exception) =>
-            "Cannot parse parameter %s as UUID: %s".format(key, e.getMessage)
+        UUID.fromString(_),
+        _.toString,
+        (key: String, e: Exception) =>
+          "Cannot parse parameter %s as UUID: %s".format(key, e.getMessage)
       )
 
   /**
@@ -802,13 +811,13 @@ object PathBindable {
     def register[T](implicit pb: PathBindable[T], ct: ClassTag[T]) =
       ct.runtimeClass -> pb
     Map(
-        register[String],
-        register[java.lang.Integer],
-        register[java.lang.Long],
-        register[java.lang.Double],
-        register[java.lang.Float],
-        register[java.lang.Boolean],
-        register[UUID]
+      register[String],
+      register[java.lang.Integer],
+      register[java.lang.Long],
+      register[java.lang.Double],
+      register[java.lang.Float],
+      register[java.lang.Boolean],
+      register[UUID]
     )
   }
 }

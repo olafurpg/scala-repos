@@ -3,7 +3,12 @@ package akka.stream.scaladsl
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.Future
-import akka.stream.{SourceShape, ClosedShape, ActorMaterializer, ActorMaterializerSettings}
+import akka.stream.{
+  SourceShape,
+  ClosedShape,
+  ActorMaterializer,
+  ActorMaterializerSettings
+}
 import akka.stream.testkit._
 import akka.stream.testkit.scaladsl._
 import akka.stream.testkit.Utils._
@@ -11,8 +16,8 @@ import akka.testkit.AkkaSpec
 
 class GraphBalanceSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -136,21 +141,22 @@ class GraphBalanceSpec extends AkkaSpec {
       val sink = Sink.head[Seq[Int]]
       val (s1, s2, s3, s4, s5) = RunnableGraph
         .fromGraph(
-            GraphDSL.create(sink, sink, sink, sink, sink)(Tuple5.apply) {
-          implicit b ⇒ (f1, f2, f3, f4, f5) ⇒
-            val balance = b.add(Balance[Int](5, waitForAllDownstreams = true))
-            Source(0 to 14) ~> balance.in
-            balance.out(0).grouped(15) ~> f1
-            balance.out(1).grouped(15) ~> f2
-            balance.out(2).grouped(15) ~> f3
-            balance.out(3).grouped(15) ~> f4
-            balance.out(4).grouped(15) ~> f5
-            ClosedShape
-        })
+          GraphDSL.create(sink, sink, sink, sink, sink)(Tuple5.apply) {
+            implicit b ⇒ (f1, f2, f3, f4, f5) ⇒
+              val balance =
+                b.add(Balance[Int](5, waitForAllDownstreams = true))
+              Source(0 to 14) ~> balance.in
+              balance.out(0).grouped(15) ~> f1
+              balance.out(1).grouped(15) ~> f2
+              balance.out(2).grouped(15) ~> f3
+              balance.out(3).grouped(15) ~> f4
+              balance.out(4).grouped(15) ~> f5
+              ClosedShape
+          })
         .run()
 
       Set(s1, s2, s3, s4, s5) flatMap (Await.result(_, 3.seconds)) should be(
-          (0 to 14).toSet)
+        (0 to 14).toSet)
     }
 
     "balance between all three outputs" in {

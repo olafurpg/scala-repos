@@ -28,15 +28,15 @@ class RedundantConversionTest extends OperationsOnCollectionInspectionTest {
 
   def test_4(): Unit = {
     doTest(
-        s"""
+      s"""
          |def list() = List(1, 2)
          |list().${START}toList$END
        """.stripMargin,
-        """
+      """
          |def list() = List(1, 2)
          |list().toList
        """.stripMargin,
-        """
+      """
         |def list() = List(1, 2)
         |list()
       """.stripMargin
@@ -45,13 +45,13 @@ class RedundantConversionTest extends OperationsOnCollectionInspectionTest {
 
   def test_5(): Unit = {
     doTest(
-        s"""Seq(1) match {
+      s"""Seq(1) match {
         |  case seq => seq.${START}toSeq$END
         |}""".stripMargin,
-        s"""Seq(1) match {
+      s"""Seq(1) match {
           |  case seq => seq.toSeq
           |}""".stripMargin,
-        s"""Seq(1) match {
+      s"""Seq(1) match {
           |  case seq => seq
           |}""".stripMargin
     )

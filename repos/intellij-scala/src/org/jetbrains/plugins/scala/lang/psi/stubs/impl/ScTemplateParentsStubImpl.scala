@@ -19,8 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   */
 class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScTemplateParents](parent, elemType)
     with ScTemplateParentsStub {
   private var typesString: Seq[StringRef] = Seq.empty
@@ -28,14 +28,14 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
   private var constructor: Option[StringRef] = None
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            constructor: Option[StringRef],
            typesString: Seq[StringRef]) = {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.typesString = typesString
     this.constructor = constructor
   }
@@ -59,11 +59,14 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
     }
     val res: Seq[ScTypeElement] =
       constructor
-        .map(s =>
-              ScalaPsiElementFactory.createConstructorTypeElementFromText(
-                  StringRef.toString(s), getPsi, null))
+        .map(
+          s =>
+            ScalaPsiElementFactory.createConstructorTypeElementFromText(
+              StringRef.toString(s),
+              getPsi,
+              null))
         .toSeq ++ getTemplateParentsTypesTexts.map(
-          ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
+        ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     types = new SofterReference(res)
     res
   }

@@ -2,7 +2,11 @@ package com.twitter.finagle.mux.lease.exp
 
 import com.twitter.conversions.storage.intToStorageUnitableWholeNumber
 import com.twitter.util.{Duration, StorageUnit, Stopwatch}
-import java.lang.management.{GarbageCollectorMXBean, MemoryPoolMXBean, ManagementFactory}
+import java.lang.management.{
+  GarbageCollectorMXBean,
+  MemoryPoolMXBean,
+  ManagementFactory
+}
 import java.util.logging.Logger
 import scala.collection.JavaConverters._
 import scala.collection.mutable.Buffer
@@ -19,8 +23,9 @@ private[lease] class Coordinator(
   def gateCycle() {
     Alarm.arm { () =>
       new PredicateAlarm(() =>
-            counter.info.remaining >= (counter.info.committed * 80 / 100)) min new BytesAlarm(
-          counter, () => 0.bytes)
+        counter.info.remaining >= (counter.info.committed * 80 / 100)) min new BytesAlarm(
+        counter,
+        () => 0.bytes)
     }
   }
 
@@ -29,11 +34,11 @@ private[lease] class Coordinator(
   def warmup() {
     Alarm.arm { () =>
       new BytesAlarm(
-          counter, {
-            val saved = counter.info.remaining()
-            () =>
-              saved - 1.byte
-          }
+        counter, {
+          val saved = counter.info.remaining()
+          () =>
+            saved - 1.byte
+        }
       )
     }
   }
@@ -69,14 +74,14 @@ private[lease] class Coordinator(
     val elapsed = Stopwatch.start()
     // TODO: if grabbing memory info is slow, rewrite this to only check memory info occasionally
     Alarm.armAndExecute({ () =>
-      new BytesAlarm(counter, () => space.left) min new DurationAlarm(
-          (maxWait -
-              elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
-          () => npending() == 0)
+      new BytesAlarm(counter, () => space.left) min new DurationAlarm((maxWait -
+        elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
+        () => npending() == 0)
     }, { () =>
       // TODO MN: reenable
       if (verbose) {
-        log.info("DRAIN-LOOP: target=" +
+        log.info(
+          "DRAIN-LOOP: target=" +
             ((counter.info.remaining - space.minDiscount) / 100).inBytes +
             "; n=" + npending() + "; counter=" + counter + "; maxMs=" +
             ((maxWait - elapsed()) / 2).inMilliseconds.toInt)

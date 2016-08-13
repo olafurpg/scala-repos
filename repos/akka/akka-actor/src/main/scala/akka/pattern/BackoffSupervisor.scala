@@ -80,12 +80,12 @@ object BackoffSupervisor {
     require(0.0 <= randomFactor && randomFactor <= 1.0,
             "randomFactor must be between 0.0 and 1.0")
     Props(
-        new BackoffSupervisor(childProps,
-                              childName,
-                              minBackoff,
-                              maxBackoff,
-                              randomFactor,
-                              strategy))
+      new BackoffSupervisor(childProps,
+                            childName,
+                            minBackoff,
+                            maxBackoff,
+                            randomFactor,
+                            strategy))
   }
 
   /**
@@ -146,7 +146,7 @@ object BackoffSupervisor {
 
   private[akka] final case object StartChild extends DeadLetterSuppression
 
-  // not final for binary compatibility with 2.4.1 
+  // not final for binary compatibility with 2.4.1
   private[akka] case class ResetRestartCount(current: Int)
       extends DeadLetterSuppression
 
@@ -182,7 +182,8 @@ final class BackoffSupervisor(val childProps: Props,
                               val reset: BackoffReset,
                               randomFactor: Double,
                               strategy: SupervisorStrategy)
-    extends Actor with HandleBackoff {
+    extends Actor
+    with HandleBackoff {
 
   import BackoffSupervisor._
   import context.dispatcher
@@ -233,8 +234,8 @@ final class BackoffSupervisor(val childProps: Props,
   def onTerminated: Receive = {
     case Terminated(ref) if child.contains(ref) ⇒
       child = None
-      val restartDelay = calculateDelay(
-          restartCount, minBackoff, maxBackoff, randomFactor)
+      val restartDelay =
+        calculateDelay(restartCount, minBackoff, maxBackoff, randomFactor)
       context.system.scheduler.scheduleOnce(restartDelay, self, StartChild)
       restartCount += 1
   }
@@ -242,8 +243,7 @@ final class BackoffSupervisor(val childProps: Props,
   def receive = onTerminated orElse handleBackoff
 }
 
-private[akka] trait HandleBackoff {
-  this: Actor ⇒
+private[akka] trait HandleBackoff { this: Actor ⇒
   def childProps: Props
   def childName: String
   def reset: BackoffReset

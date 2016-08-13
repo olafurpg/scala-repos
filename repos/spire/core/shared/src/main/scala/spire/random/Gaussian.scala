@@ -45,7 +45,7 @@ trait GaussianInstances {
   * An implementation of `Gaussian` that uses the Marsaglia algorithm.
   */
 final class MarsagliaGaussian[
-    @sp(Float, Double) A : Field : NRoot : Trig : Order : Uniform]
+    @sp(Float, Double) A: Field: NRoot: Trig: Order: Uniform]
     extends Gaussian[A] {
   import spire.syntax.field._
   import spire.syntax.nroot._

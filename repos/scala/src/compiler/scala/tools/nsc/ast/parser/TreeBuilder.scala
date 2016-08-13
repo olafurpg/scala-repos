@@ -109,18 +109,20 @@ abstract class TreeBuilder {
   def makeCatchFromExpr(catchExpr: Tree): CaseDef = {
     val binder = freshTermName()
     val pat = Bind(binder, Typed(Ident(nme.WILDCARD), Ident(tpnme.Throwable)))
-    val catchDef = ValDef(
-        Modifiers(ARTIFACT), freshTermName("catchExpr"), TypeTree(), catchExpr)
+    val catchDef = ValDef(Modifiers(ARTIFACT),
+                          freshTermName("catchExpr"),
+                          TypeTree(),
+                          catchExpr)
     val catchFn = Ident(catchDef.name)
     val body = atPos(catchExpr.pos.makeTransparent)(
-        Block(
-            List(catchDef),
-            If(
-                Apply(Select(catchFn, nme.isDefinedAt), List(Ident(binder))),
-                Apply(Select(catchFn, nme.apply), List(Ident(binder))),
-                Throw(Ident(binder))
-            )
-        ))
+      Block(
+        List(catchDef),
+        If(
+          Apply(Select(catchFn, nme.isDefinedAt), List(Ident(binder))),
+          Apply(Select(catchFn, nme.apply), List(Ident(binder))),
+          Throw(Ident(binder))
+        )
+      ))
     makeCaseDef(pat, EmptyTree, body)
   }
 
@@ -135,7 +137,7 @@ abstract class TreeBuilder {
     if (contextBounds.isEmpty) vparamss
     else {
       val mods = Modifiers(
-          if (owner.isTypeName) PARAMACCESSOR | LOCAL | PRIVATE else PARAM)
+        if (owner.isTypeName) PARAMACCESSOR | LOCAL | PRIVATE else PARAM)
       def makeEvidenceParam(tpt: Tree) =
         ValDef(mods | IMPLICIT | SYNTHETIC,
                freshTermName(nme.EVIDENCE_PARAM_PREFIX),

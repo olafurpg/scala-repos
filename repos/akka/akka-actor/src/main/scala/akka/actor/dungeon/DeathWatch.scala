@@ -5,11 +5,19 @@ package akka.actor.dungeon
 
 import akka.dispatch.sysmsg.{Unwatch, Watch, DeathWatchNotification}
 import akka.event.Logging.{Warning, Debug}
-import akka.actor.{InternalActorRef, Address, Terminated, Actor, ActorRefScope, ActorCell, ActorRef, MinimalActorRef}
+import akka.actor.{
+  InternalActorRef,
+  Address,
+  Terminated,
+  Actor,
+  ActorRefScope,
+  ActorCell,
+  ActorRef,
+  MinimalActorRef
+}
 import akka.event.AddressTerminatedTopic
 
-private[akka] trait DeathWatch {
-  this: ActorCell ⇒
+private[akka] trait DeathWatch { this: ActorCell ⇒
 
   private var watching: Set[ActorRef] = ActorCell.emptyActorRefSet
   private var watchedBy: Set[ActorRef] = ActorCell.emptyActorRefSet
@@ -56,8 +64,8 @@ private[akka] trait DeathWatch {
         watching = removeFromSet(actor, watching)
       }
       if (!isTerminating) {
-        self.tell(
-            Terminated(actor)(existenceConfirmed, addressTerminated), actor)
+        self.tell(Terminated(actor)(existenceConfirmed, addressTerminated),
+                  actor)
         terminatedQueuedFor(actor)
       }
     }
@@ -71,13 +79,13 @@ private[akka] trait DeathWatch {
   //   when all actor references have uid, i.e. actorFor is removed
   private def watchingContains(subject: ActorRef): Boolean =
     watching.contains(subject) ||
-    (subject.path.uid != ActorCell.undefinedUid &&
+      (subject.path.uid != ActorCell.undefinedUid &&
         watching.contains(new UndefinedUidActorRef(subject)))
 
   // TODO this should be removed and be replaced with `set - subject`
   //   when all actor references have uid, i.e. actorFor is removed
-  private def removeFromSet(
-      subject: ActorRef, set: Set[ActorRef]): Set[ActorRef] =
+  private def removeFromSet(subject: ActorRef,
+                            set: Set[ActorRef]): Set[ActorRef] =
     if (subject.path.uid != ActorCell.undefinedUid)
       (set - subject) - new UndefinedUidActorRef(subject)
     else set filterNot (_.path == subject.path)
@@ -92,9 +100,9 @@ private[akka] trait DeathWatch {
             watcher
               .asInstanceOf[InternalActorRef]
               .sendSystemMessage(
-                  DeathWatchNotification(self,
-                                         existenceConfirmed = true,
-                                         addressTerminated = false))
+                DeathWatchNotification(self,
+                                       existenceConfirmed = true,
+                                       addressTerminated = false))
 
         /*
          * It is important to notify the remote watchers first, otherwise RemoteDaemon might shut down, causing
@@ -144,18 +152,18 @@ private[akka] trait DeathWatch {
           watchedBy += watcher
           if (system.settings.DebugLifecycle)
             publish(
-                Debug(self.path.toString,
-                      clazz(actor),
-                      s"now watched by $watcher"))
+              Debug(self.path.toString,
+                    clazz(actor),
+                    s"now watched by $watcher"))
         }
     } else if (!watcheeSelf && watcherSelf) {
       watch(watchee)
     } else {
       publish(
-          Warning(self.path.toString,
-                  clazz(actor),
-                  "BUG: illegal Watch(%s,%s) for %s".format(
-                      watchee, watcher, self)))
+        Warning(
+          self.path.toString,
+          clazz(actor),
+          "BUG: illegal Watch(%s,%s) for %s".format(watchee, watcher, self)))
     }
   }
 
@@ -169,18 +177,18 @@ private[akka] trait DeathWatch {
           watchedBy -= watcher
           if (system.settings.DebugLifecycle)
             publish(
-                Debug(self.path.toString,
-                      clazz(actor),
-                      s"no longer watched by $watcher"))
+              Debug(self.path.toString,
+                    clazz(actor),
+                    s"no longer watched by $watcher"))
         }
     } else if (!watcheeSelf && watcherSelf) {
       unwatch(watchee)
     } else {
       publish(
-          Warning(self.path.toString,
-                  clazz(actor),
-                  "BUG: illegal Unwatch(%s,%s) for %s".format(
-                      watchee, watcher, self)))
+        Warning(
+          self.path.toString,
+          clazz(actor),
+          "BUG: illegal Unwatch(%s,%s) for %s".format(watchee, watcher, self)))
     }
   }
 
@@ -198,10 +206,10 @@ private[akka] trait DeathWatch {
     // immediate creation of child with same name.
     for (a ← watching; if a.path.address == address) {
       self.sendSystemMessage(
-          DeathWatchNotification(
-              a,
-              existenceConfirmed = childrenRefs.getByRef(a).isDefined,
-              addressTerminated = true))
+        DeathWatchNotification(a,
+                               existenceConfirmed =
+                                 childrenRefs.getByRef(a).isDefined,
+                               addressTerminated = true))
     }
   }
 
@@ -245,5 +253,5 @@ private[akka] class UndefinedUidActorRef(ref: ActorRef)
   override val path = ref.path.withUid(ActorCell.undefinedUid)
   override def provider =
     throw new UnsupportedOperationException(
-        "UndefinedUidActorRef does not provide")
+      "UndefinedUidActorRef does not provide")
 }

@@ -46,7 +46,7 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
   /** Produces a collection from the added elements.  This is a terminal operation:
     *  the builder's contents are undefined after this operation, and no further
     *  methods should be called.
-    *  
+    *
     *  @return a collection containing the elements added to this builder.
     */
   def result(): To
@@ -133,8 +133,8 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
         self ++= xs; this
       }
       override def sizeHint(size: Int) = self.sizeHint(size)
-      override def sizeHintBounded(
-          size: Int, boundColl: TraversableLike[_, _]) =
+      override def sizeHintBounded(size: Int,
+                                   boundColl: TraversableLike[_, _]) =
         self.sizeHintBounded(size, boundColl)
       def result: NewTo = f(self.result())
     }

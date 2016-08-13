@@ -25,12 +25,12 @@ class ScalaSubtypesMacro extends Macro {
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
 
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result =
     if (params.length != 1) null else params(0).calculateResult(context)
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result =
     calculateResult(params, context)
 
   override def calculateLookupItems(
@@ -44,12 +44,13 @@ class ScalaSubtypesMacro extends Macro {
           case Some(x: ScTypeDefinition) =>
             import scala.collection.JavaConversions._
             ClassInheritorsSearch
-              .search(
-                  x, GlobalSearchScope.projectScope(context.getProject), true)
+              .search(x,
+                      GlobalSearchScope.projectScope(context.getProject),
+                      true)
               .findAll()
               .filter(_.isInstanceOf[ScTypeDefinition])
-              .map(_.asInstanceOf[ScTypeDefinition].getType(
-                      TypingContext.empty))
+              .map(
+                _.asInstanceOf[ScTypeDefinition].getType(TypingContext.empty))
               .flatMap(_.toOption)
               .flatMap(MacroUtil.getTypeLookupItem(_, project))
               .toArray

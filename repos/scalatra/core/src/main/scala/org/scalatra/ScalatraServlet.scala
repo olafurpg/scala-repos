@@ -19,7 +19,7 @@ object ScalatraServlet {
             "The request can't be null for getting the request path")
     def startIndex(r: HttpServletRequest) =
       r.getContextPath.blankOption.map(_.length).getOrElse(0) +
-      r.getServletPath.blankOption.map(_.length).getOrElse(0)
+        r.getServletPath.blankOption.map(_.length).getOrElse(0)
     def getRequestPath(r: HttpServletRequest) = {
       val u =
         (catching(classOf[NullPointerException]) opt { r.getRequestURI } getOrElse "/")
@@ -56,8 +56,8 @@ object ScalatraServlet {
   */
 trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
 
-  override def service(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
+  override def service(request: HttpServletRequest,
+                       response: HttpServletResponse): Unit = {
     handle(request, response)
   }
 
@@ -76,11 +76,11 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     ScalatraServlet.requestPath(request)
 
   protected def routeBasePath(implicit request: HttpServletRequest): String = {
+    require(config != null,
+            "routeBasePath requires the servlet to be initialized")
     require(
-        config != null, "routeBasePath requires the servlet to be initialized")
-    require(
-        request != null,
-        "routeBasePath requires an active request to determine the servlet path")
+      request != null,
+      "routeBasePath requires an active request to determine the servlet path")
 
     servletContext.getContextPath + request.getServletPath
   }
@@ -91,9 +91,8 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     *
     * This action can be overridden by a notFound block.
     */
-  protected var doNotFound: Action = () =>
-    {
-      serveStaticResource() getOrElse resourceNotFound()
+  protected var doNotFound: Action = () => {
+    serveStaticResource() getOrElse resourceNotFound()
   }
 
   /**
@@ -118,10 +117,10 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     if (isDevelopmentMode) {
       val error = "Requesting \"%s %s\" on servlet \"%s\" but only have: %s"
       response.getWriter println error.format(
-          request.getMethod,
-          Option(request.getPathInfo) getOrElse "/",
-          request.getServletPath,
-          routes.entryPoints.mkString("<ul><li>", "</li><li>", "</li></ul>"))
+        request.getMethod,
+        Option(request.getPathInfo) getOrElse "/",
+        request.getServletPath,
+        routes.entryPoints.mkString("<ul><li>", "</li><li>", "</li></ul>"))
     }
   }
 

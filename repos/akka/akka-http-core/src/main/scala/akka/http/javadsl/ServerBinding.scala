@@ -11,7 +11,7 @@ import scala.compat.java8.FutureConverters._
 /**
   * Represents a prospective HTTP server binding.
   */
-class ServerBinding private[http](
+class ServerBinding private[http] (
     delegate: akka.http.scaladsl.Http.ServerBinding) {
 
   /**

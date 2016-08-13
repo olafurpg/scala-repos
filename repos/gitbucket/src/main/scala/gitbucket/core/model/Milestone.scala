@@ -7,7 +7,8 @@ trait MilestoneComponent extends TemplateComponent { self: Profile =>
   lazy val Milestones = TableQuery[Milestones]
 
   class Milestones(tag: Tag)
-      extends Table[Milestone](tag, "MILESTONE") with MilestoneTemplate {
+      extends Table[Milestone](tag, "MILESTONE")
+      with MilestoneTemplate {
     override val milestoneId = column[Int]("MILESTONE_ID", O AutoInc)
     val title = column[String]("TITLE")
     val description = column[String]("DESCRIPTION")

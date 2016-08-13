@@ -82,8 +82,9 @@ object JavaCompatible {
     * @param fs  sampling frequency (Hz)
     * @param shifted whether to return fourierShift'ed frequencies, default=false
     */
-  def fourierFreqD(
-      windowLength: Int, fs: Double, shifted: Boolean): Array[Double] =
+  def fourierFreqD(windowLength: Int,
+                   fs: Double,
+                   shifted: Boolean): Array[Double] =
     dvDToArray(breeze.signal.fourierFreq(windowLength, fs, -1, shifted))
 
   /**See [[fourierFreq]]. shifted = false
@@ -110,8 +111,8 @@ object JavaCompatible {
                sampleRate: Double,
                taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterBP(
-            arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
+      breeze.signal
+        .filterBP(arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
 
   /**See [[filterBP]]
     */
@@ -144,8 +145,8 @@ object JavaCompatible {
                sampleRate: Double,
                taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterBS(
-            arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
+      breeze.signal
+        .filterBS(arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
 
   /**See [[filterBS]]
     */
@@ -176,12 +177,13 @@ object JavaCompatible {
                sampleRate: Double,
                taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterLP(arrayDToDv(data), omega, sampleRate, taps))
+      breeze.signal.filterLP(arrayDToDv(data), omega, sampleRate, taps))
 
   /**See [[filterLP]]
     */
-  def filterLP(
-      data: Array[Double], omega: Double, sampleRate: Double): Array[Double] =
+  def filterLP(data: Array[Double],
+               omega: Double,
+               sampleRate: Double): Array[Double] =
     filterLP(data, omega, sampleRate, 512)
 
   /**See [[filterLP]]
@@ -203,12 +205,13 @@ object JavaCompatible {
                sampleRate: Double,
                taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterHP(arrayDToDv(data), omega, sampleRate, taps))
+      breeze.signal.filterHP(arrayDToDv(data), omega, sampleRate, taps))
 
   /**See [[filterHP]]
     */
-  def filterHP(
-      data: Array[Double], omega: Double, sampleRate: Double): Array[Double] =
+  def filterHP(data: Array[Double],
+               omega: Double,
+               sampleRate: Double): Array[Double] =
     filterHP(data, omega, sampleRate, 512)
 
   /**See [[filterHP]]

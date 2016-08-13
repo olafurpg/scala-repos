@@ -14,7 +14,7 @@ object Test {
     oos.flush
     oos.close
     val ois = new java.io.ObjectInputStream(
-        new java.io.ByteArrayInputStream(buf.toByteArray))
+      new java.io.ByteArrayInputStream(buf.toByteArray))
     var obj: Object = null
     foreach(ois) { obj =>
       obj match {

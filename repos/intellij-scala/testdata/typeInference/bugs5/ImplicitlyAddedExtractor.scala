@@ -9,7 +9,9 @@ object Test {
   val a = new A
 
   a match {
-    case a.ex(x) => /*start*/ x /*end*/
+    case a.ex(x) =>
+      /*start*/
+      x /*end*/
   }
 }
 //Int

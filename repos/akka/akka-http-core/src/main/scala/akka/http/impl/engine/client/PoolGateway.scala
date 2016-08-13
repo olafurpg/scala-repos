@@ -54,7 +54,7 @@ private[http] class PoolGateway(hcps: HostConnectionPoolSetup,
         .withDeploy(Deploy.local)
     val ref = system.actorOf(props, PoolInterfaceActor.name.next())
     new AtomicReference[State](
-        Running(ref, _shutdownStartedPromise, shutdownCompletedPromise))
+      Running(ref, _shutdownStartedPromise, shutdownCompletedPromise))
   }
 
   def currentState: Any = state.get() // enables test access
@@ -79,15 +79,15 @@ private[http] class PoolGateway(hcps: HostConnectionPoolSetup,
       case x @ NewIncarnation(newGatewayFuture) ⇒
         if (previousIncarnation != null)
           previousIncarnation.state.set(x) // collapse incarnation chain
-        newGatewayFuture.flatMap(_ (request, this))
+        newGatewayFuture.flatMap(_(request, this))
     }
 
   // triggers a shutdown of the current pool, even if it is already a later incarnation
   @tailrec final def shutdown(): Future[Done] =
     state.get match {
       case x @ Running(ref, shutdownStartedPromise, shutdownCompletedPromise) ⇒
-        if (state.compareAndSet(
-                x, IsShutdown(shutdownCompletedPromise.future))) {
+        if (state.compareAndSet(x,
+                                IsShutdown(shutdownCompletedPromise.future))) {
           shutdownStartedPromise.success(Done) // trigger cache removal
           ref ! PoolInterfaceActor.Shutdown
           shutdownCompletedPromise.future

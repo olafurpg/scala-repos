@@ -55,7 +55,7 @@ object Report {
   import play.api.libs.json._
 
   private[report] lazy val tube = JsTube(
-      (__.json update readDate('createdAt)) andThen Json.reads[Report],
-      Json.writes[Report] andThen (__.json update writeDate('createdAt))
+    (__.json update readDate('createdAt)) andThen Json.reads[Report],
+    Json.writes[Report] andThen (__.json update writeDate('createdAt))
   )
 }

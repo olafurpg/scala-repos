@@ -22,10 +22,9 @@ object StreamTTest extends SpecLite {
     "be lazy" in {
       var highestTouched = 0
 
-      val s1 = StreamT.unfold(1)(i =>
-            {
-          highestTouched = math.max(i, highestTouched)
-          if (i < 100) Some((i, i + 1)) else None
+      val s1 = StreamT.unfold(1)(i => {
+        highestTouched = math.max(i, highestTouched)
+        if (i < 100) Some((i, i + 1)) else None
       })
 
       val s2 = s1.asStream
@@ -62,14 +61,14 @@ object StreamTTest extends SpecLite {
   "mapM" ! forAll { (s: Stream[Int], l: List[Int]) =>
     val s0 = s map (_ + 1)
     StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must_==
-    (Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: Traverse[Stream]
-          .traverse(s0)(i => l.map(_ + i)))
+      (Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: Traverse[Stream]
+        .traverse(s0)(i => l.map(_ + i)))
   }
 
   "foldMap" ! forAll { (s: Stream[Int]) =>
     import scalaz.Scalaz._
     StreamT.fromStream(s.some).foldMap(_.toString) must_==
-    (s.foldMap(_.toString))
+      (s.foldMap(_.toString))
   }
 
   checkAll(equal.laws[StreamTOpt[Int]])

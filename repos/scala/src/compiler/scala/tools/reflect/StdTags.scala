@@ -21,7 +21,7 @@ trait StdTags {
       }
     })
 
-  protected def tagOfStaticClass[T : ClassTag]: u.TypeTag[T] =
+  protected def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
     u.TypeTag[T](m, new TypeCreator {
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         m.staticClass(classTag[T].runtimeClass.getName)

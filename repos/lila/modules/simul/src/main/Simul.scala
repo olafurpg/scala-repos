@@ -51,8 +51,7 @@ case class Simul(_id: Simul.ID,
   }
 
   def accept(userId: String, v: Boolean) = Created {
-    copy(
-        applicants = applicants map {
+    copy(applicants = applicants map {
       case a if a is userId => a.copy(accepted = v)
       case a => a
     })
@@ -73,8 +72,7 @@ case class Simul(_id: Simul.ID,
                           hostSeenAt = none)
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
-    copy(
-        pairings = pairings collect {
+    copy(pairings = pairings collect {
       case p if p.gameId == gameId => f(p)
       case p => p
     }).finishIfDone
@@ -107,7 +105,7 @@ case class Simul(_id: Simul.ID,
 
   def hostColor =
     (color flatMap chess.Color.apply) | chess.Color(
-        scala.util.Random.nextBoolean)
+      scala.util.Random.nextBoolean)
 
   def setPairingHostColor(gameId: String, hostColor: chess.Color) =
     updatePairing(gameId, _.copy(hostColor = hostColor))
@@ -125,26 +123,27 @@ object Simul {
            clock: SimulClock,
            variants: List[Variant],
            color: String): Simul =
-    Simul(_id = Random nextStringUppercase 8,
-          name = RandomName(),
-          status = SimulStatus.Created,
-          clock = clock,
-          hostId = host.id,
-          hostRating = host.perfs.bestRatingIn {
-            variants flatMap { variant =>
-              lila.game.PerfPicker.perfType(
-                  speed = chess.Speed(clock.chessClock.some),
-                  variant = variant,
-                  daysPerTurn = none)
-            }
-          },
-          hostGameId = none,
-          createdAt = DateTime.now,
-          variants = variants,
-          applicants = Nil,
-          pairings = Nil,
-          startedAt = none,
-          finishedAt = none,
-          hostSeenAt = DateTime.now.some,
-          color = color.some)
+    Simul(
+      _id = Random nextStringUppercase 8,
+      name = RandomName(),
+      status = SimulStatus.Created,
+      clock = clock,
+      hostId = host.id,
+      hostRating = host.perfs.bestRatingIn {
+        variants flatMap { variant =>
+          lila.game.PerfPicker.perfType(speed =
+                                          chess.Speed(clock.chessClock.some),
+                                        variant = variant,
+                                        daysPerTurn = none)
+        }
+      },
+      hostGameId = none,
+      createdAt = DateTime.now,
+      variants = variants,
+      applicants = Nil,
+      pairings = Nil,
+      startedAt = none,
+      finishedAt = none,
+      hostSeenAt = DateTime.now.some,
+      color = color.some)
 }

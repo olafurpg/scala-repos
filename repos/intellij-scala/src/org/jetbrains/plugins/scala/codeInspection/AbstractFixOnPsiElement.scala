@@ -9,8 +9,9 @@ import com.intellij.psi.{PsiElement, PsiFile, SmartPointerManager}
   * Nikolay.Tropin
   * 2014-11-12
   */
-abstract class AbstractFixOnPsiElement[T <: PsiElement](
-    name: String, startElement: T, endElement: T)
+abstract class AbstractFixOnPsiElement[T <: PsiElement](name: String,
+                                                        startElement: T,
+                                                        endElement: T)
     extends LocalQuickFixOnPsiElement(startElement, endElement) {
 
   def this(name: String, element: T) = this(name, element, element)
@@ -42,7 +43,9 @@ abstract class AbstractFixOnPsiElement[T <: PsiElement](
 }
 
 abstract class AbstractFixOnTwoPsiElements[T <: PsiElement, S <: PsiElement](
-    name: String, first: T, second: S)
+    name: String,
+    first: T,
+    second: S)
     extends LocalQuickFixOnPsiElement(first) {
 
   private val secondRef = SmartPointerManager

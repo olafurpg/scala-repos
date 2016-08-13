@@ -24,8 +24,8 @@ import org.apache.hadoop.yarn.api.records.{ApplicationAttemptId, ApplicationId}
   * @param applicationId application ID
   * @param attempt an attempt counter
   */
-class StubApplicationAttemptId(
-    var applicationId: ApplicationId, var attempt: Int)
+class StubApplicationAttemptId(var applicationId: ApplicationId,
+                               var attempt: Int)
     extends ApplicationAttemptId {
 
   override def setApplicationId(appID: ApplicationId): Unit = {

@@ -29,7 +29,9 @@ trait PossiblyHarmful
 trait NoSerializationVerificationNeeded
 
 abstract class PoisonPill
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 /**
   * A message all Actors will understand, that when processed will terminate the Actor permanently.
@@ -98,10 +100,12 @@ final case class ActorIdentity(correlationId: Any, ref: Option[ActorRef]) {
   *   that the remote node hosting the watched actor was detected as unreachable
   */
 @SerialVersionUID(1L)
-final case class Terminated private[akka](@BeanProperty actor: ActorRef)(
+final case class Terminated private[akka] (@BeanProperty actor: ActorRef)(
     @BeanProperty val existenceConfirmed: Boolean,
     @BeanProperty val addressTerminated: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 /**
   * INTERNAL API
@@ -114,7 +118,9 @@ final case class Terminated private[akka](@BeanProperty actor: ActorRef)(
   */
 @SerialVersionUID(1L)
 private[akka] final case class AddressTerminated(address: Address)
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 abstract class ReceiveTimeout extends PossiblyHarmful
 
@@ -141,15 +147,16 @@ trait NotInfluenceReceiveTimeout
   * For instance, if you try to create an Actor that doesn't extend Actor.
   */
 @SerialVersionUID(1L)
-final case class IllegalActorStateException private[akka](message: String)
+final case class IllegalActorStateException private[akka] (message: String)
     extends AkkaException(message)
 
 /**
   * ActorKilledException is thrown when an Actor receives the [[akka.actor.Kill]] message
   */
 @SerialVersionUID(1L)
-final case class ActorKilledException private[akka](message: String)
-    extends AkkaException(message) with NoStackTrace
+final case class ActorKilledException private[akka] (message: String)
+    extends AkkaException(message)
+    with NoStackTrace
 
 /**
   * An InvalidActorNameException is thrown when you try to convert something, usually a String, to an Actor name
@@ -171,8 +178,9 @@ final case class InvalidActorNameException(message: String)
   * }}}
   */
 @SerialVersionUID(1L)
-class ActorInitializationException protected (
-    actor: ActorRef, message: String, cause: Throwable)
+class ActorInitializationException protected (actor: ActorRef,
+                                              message: String,
+                                              cause: Throwable)
     extends AkkaException(message, cause) {
   def getActor: ActorRef = actor
 }
@@ -201,19 +209,20 @@ object ActorInitializationException {
   * @param messageOption is the message which was optionally passed into preRestart()
   */
 @SerialVersionUID(1L)
-final case class PreRestartException private[akka](actor: ActorRef,
-                                                   cause: Throwable,
-                                                   originalCause: Throwable,
-                                                   messageOption: Option[Any])
+final case class PreRestartException private[akka] (actor: ActorRef,
+                                                    cause: Throwable,
+                                                    originalCause: Throwable,
+                                                    messageOption: Option[Any])
     extends ActorInitializationException(
-        actor,
-        "exception in preRestart(" +
+      actor,
+      "exception in preRestart(" +
         (if (originalCause == null)
-           "null" else originalCause.getClass) + ", " +
+          "null"
+        else originalCause.getClass) + ", " +
         (messageOption match {
-              case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
-            }) + ")",
-        cause)
+          case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
+        }) + ")",
+      cause)
 
 /**
   * A PostRestartException is thrown when constructor or postRestart() method
@@ -224,13 +233,14 @@ final case class PreRestartException private[akka](actor: ActorRef,
   * @param originalCause is the exception which caused the restart in the first place
   */
 @SerialVersionUID(1L)
-final case class PostRestartException private[akka](
-    actor: ActorRef, cause: Throwable, originalCause: Throwable)
+final case class PostRestartException private[akka] (actor: ActorRef,
+                                                     cause: Throwable,
+                                                     originalCause: Throwable)
     extends ActorInitializationException(
-        actor,
-        "exception post restart (" +
+      actor,
+      "exception post restart (" +
         (if (originalCause == null) "null" else originalCause.getClass) + ")",
-        cause)
+      cause)
 
 /**
   * This is an extractor for retrieving the original cause (i.e. the first
@@ -254,7 +264,7 @@ object OriginalRestartException {
   * Currently only `null` is an invalid message.
   */
 @SerialVersionUID(1L)
-final case class InvalidMessageException private[akka](message: String)
+final case class InvalidMessageException private[akka] (message: String)
     extends AkkaException(message)
 
 /**
@@ -262,7 +272,7 @@ final case class InvalidMessageException private[akka](message: String)
   * that it doesn't handle itself, effectively crashing the Actor and escalating to the supervisor.
   */
 @SerialVersionUID(1L)
-final case class DeathPactException private[akka](dead: ActorRef)
+final case class DeathPactException private[akka] (dead: ActorRef)
     extends AkkaException("Monitored actor [" + dead + "] terminated")
     with NoStackTrace
 
@@ -271,7 +281,7 @@ final case class DeathPactException private[akka](dead: ActorRef)
   * avoid cascading interrupts to other threads than the originally interrupted one.
   */
 @SerialVersionUID(1L)
-class ActorInterruptedException private[akka](cause: Throwable)
+class ActorInterruptedException private[akka] (cause: Throwable)
     extends AkkaException(cause.getMessage, cause)
 
 /**
@@ -315,8 +325,7 @@ object Status {
   * }
   * }}}
   */
-trait ActorLogging {
-  this: Actor ⇒
+trait ActorLogging { this: Actor ⇒
   private var _log: LoggingAdapter = _
 
   def log: LoggingAdapter = {
@@ -349,8 +358,8 @@ trait DiagnosticActorLogging extends Actor {
   val log = akka.event.Logging(this)
   def mdc(currentMessage: Any): MDC = emptyMDC
 
-  override protected[akka] def aroundReceive(
-      receive: Actor.Receive, msg: Any): Unit =
+  override protected[akka] def aroundReceive(receive: Actor.Receive,
+                                             msg: Any): Unit =
     try {
       log.mdc(mdc(msg))
       super.aroundReceive(receive, msg)
@@ -467,7 +476,7 @@ trait Actor {
     val contextStack = ActorCell.contextStack.get
     if ((contextStack.isEmpty) || (contextStack.head eq null))
       throw ActorInitializationException(
-          s"You cannot create an instance of [${getClass.getName}] explicitly using the constructor (new). " +
+        s"You cannot create an instance of [${getClass.getName}] explicitly using the constructor (new). " +
           "You have to use one of the 'actorOf' factory methods to create a new actor. See the documentation.")
     val c = contextStack.head
     ActorCell.contextStack.set(null :: contextStack)
@@ -526,8 +535,8 @@ trait Actor {
   /**
     * Can be overridden to intercept calls to `preRestart`. Calls `preRestart` by default.
     */
-  protected[akka] def aroundPreRestart(
-      reason: Throwable, message: Option[Any]): Unit =
+  protected[akka] def aroundPreRestart(reason: Throwable,
+                                       message: Option[Any]): Unit =
     preRestart(reason, message)
 
   /**

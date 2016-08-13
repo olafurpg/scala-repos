@@ -195,14 +195,14 @@ class Model(var optionalFrogMap: Map[Int, Option[Frog]]) {
 
   private val canMoveTwoRightAt = (i: Int) =>
     !isAtRightOrOneButRight(i) && optionalFrogMap(i + 1).get.movesToLeft &&
-    optionalFrogMap(i + 2) == None
+      optionalFrogMap(i + 2) == None
 
   private val canMoveOneLeftAt = (i: Int) =>
     !isAtLeft(i) && optionalFrogMap(i - 1) == None
 
   private val canMoveTwoLeftAt = (i: Int) =>
     !isAtLeftOrOneButLeft(i) && optionalFrogMap(i - 1).get.movesToRight &&
-    optionalFrogMap(i - 2) == None
+      optionalFrogMap(i - 2) == None
 
   private def positionSingleton(frog: Frog) =
     for {
@@ -210,20 +210,19 @@ class Model(var optionalFrogMap: Map[Int, Option[Frog]]) {
     } yield i
 
   private def update(next: Int => Int) =
-    (frog: Frog) =>
-      {
-        optionalFrogMap = for {
-          entry @ (i, _) <- optionalFrogMap
-          j <- positionSingleton(frog)
-        } yield {
-          if (i == j) {
-            i -> None
-          } else if (i == next(j)) {
-            i -> Some(frog)
-          } else {
-            entry
-          }
+    (frog: Frog) => {
+      optionalFrogMap = for {
+        entry @ (i, _) <- optionalFrogMap
+        j <- positionSingleton(frog)
+      } yield {
+        if (i == j) {
+          i -> None
+        } else if (i == next(j)) {
+          i -> Some(frog)
+        } else {
+          entry
         }
+      }
     }
 
   val position = (frog: Frog) => positionSingleton(frog).head
@@ -322,28 +321,27 @@ object theViewValues {
 //
 class View(position: FrogShape => Int, val frogShapes: List[FrogShape]) {
   private def update(length: Int, next: (Double, Double) => Double) =
-    (frogShape: FrogShape) =>
-      {
-        val frogShapeCenterX =
-          FIRST_FROG_CENTER_X + STONE_STEP * position(frogShape)
-        val frogShapeCenterY = FROG_CENTER_Y
+    (frogShape: FrogShape) => {
+      val frogShapeCenterX =
+        FIRST_FROG_CENTER_X + STONE_STEP * position(frogShape)
+      val frogShapeCenterY = FROG_CENTER_Y
 
-        Timeline(
-            Seq(
-                at(length * TIME s) {
-              frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
-            },
-                at(length * TIME s) {
-              frogShape.centerX -> next(frogShapeCenterX,
-                                        length * STONE_STEP / 2)
-            },
-                at(2 * length * TIME s) {
-              frogShape.centerY -> frogShapeCenterY
-            },
-                at(2 * length * TIME s) {
-              frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
-            }
-            )).play()
+      Timeline(
+        Seq(
+          at(length * TIME s) {
+            frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
+          },
+          at(length * TIME s) {
+            frogShape.centerX -> next(frogShapeCenterX,
+                                      length * STONE_STEP / 2)
+          },
+          at(2 * length * TIME s) {
+            frogShape.centerY -> frogShapeCenterY
+          },
+          at(2 * length * TIME s) {
+            frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
+          }
+        )).play()
     }
 
   val jumpOneRight = update(1, _ + _)
@@ -395,8 +393,8 @@ class Control {
 object theModel extends Model(theModelValues.optionalFrogMap)
 
 object theView
-    extends View(
-        theModel.position compose (_.getFrog), theViewValues.frogShapes) {
+    extends View(theModel.position compose (_.getFrog),
+                 theViewValues.frogShapes) {
   theControl.update(theModel, this)
 }
 

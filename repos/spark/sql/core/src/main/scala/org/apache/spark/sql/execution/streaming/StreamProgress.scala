@@ -29,8 +29,7 @@ class StreamProgress {
     currentOffsets
       .get(source)
       .foreach(old =>
-            assert(
-                newOffset > old, s"Stream going backwards $newOffset -> $old"))
+        assert(newOffset > old, s"Stream going backwards $newOffset -> $old"))
     currentOffsets.put(source, newOffset)
   }
 

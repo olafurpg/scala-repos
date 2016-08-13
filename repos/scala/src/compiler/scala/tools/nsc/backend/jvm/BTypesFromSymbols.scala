@@ -44,10 +44,10 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
   val inliner: Inliner[this.type] = new Inliner(this)
 
   val inlinerHeuristics: InlinerHeuristics[this.type] = new InlinerHeuristics(
-      this)
+    this)
 
   val closureOptimizer: ClosureOptimizer[this.type] = new ClosureOptimizer(
-      this)
+    this)
 
   val callGraph: CallGraph[this.type] = new CallGraph(this)
 
@@ -68,15 +68,15 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
   final val strMODULE_INSTANCE_FIELD = nme.MODULE_INSTANCE_FIELD.toString
 
   private val primitiveCompilationUnits = Set(
-      "Unit.scala",
-      "Boolean.scala",
-      "Char.scala",
-      "Byte.scala",
-      "Short.scala",
-      "Int.scala",
-      "Float.scala",
-      "Long.scala",
-      "Double.scala"
+    "Unit.scala",
+    "Boolean.scala",
+    "Char.scala",
+    "Byte.scala",
+    "Short.scala",
+    "Int.scala",
+    "Float.scala",
+    "Long.scala",
+    "Double.scala"
   )
 
   /**
@@ -123,7 +123,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         val res = ClassBType(internalName)
         if (completeSilentlyAndCheckErroneous(classSym)) {
           res.info = Left(
-              NoClassBTypeInfoClassSymbolInfoFailedSI9111(classSym.fullName))
+            NoClassBTypeInfoClassSymbolInfoFailedSI9111(classSym.fullName))
           res
         } else {
           setClassInfo(classSym, res)
@@ -139,14 +139,14 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     assert(methodSymbol.isMethod, s"not a method-symbol: $methodSymbol")
     methodBTypeFromMethodType(methodSymbol.info,
                               methodSymbol.isClassConstructor ||
-                              methodSymbol.isConstructor)
+                                methodSymbol.isConstructor)
   }
 
   /**
     * Builds a [[MethodBType]] for a method type.
     */
-  final def methodBTypeFromMethodType(
-      tpe: Type, isConstructor: Boolean): MethodBType = {
+  final def methodBTypeFromMethodType(tpe: Type,
+                                      isConstructor: Boolean): MethodBType = {
     val resultType: BType =
       if (isConstructor) UNIT
       else typeToBType(tpe.resultType)
@@ -162,8 +162,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       c.value.asInstanceOf[AnyRef]
     case _ =>
       reporter.error(
-          pos,
-          "Unable to convert static argument of ApplyDynamic into a classfile constant: " +
+        pos,
+        "Unable to convert static argument of ApplyDynamic into a classfile constant: " +
           t); null
   }
 
@@ -239,8 +239,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
       case tp =>
         currentUnit.warning(
-            tp.typeSymbol.pos,
-            s"an unexpected type representation reached the compiler backend while compiling $currentUnit: $tp. " +
+          tp.typeSymbol.pos,
+          s"an unexpected type representation reached the compiler backend while compiling $currentUnit: $tp. " +
             "If possible, please file a bug on issues.scala-lang.org.")
 
         tp match {
@@ -285,8 +285,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       // parents of a java annotations. undo this for the backend (where we need classfile-level information).
       if (classSym.hasJavaAnnotationFlag)
         parents.filterNot(
-            c =>
-              c.typeSymbol == ClassfileAnnotationClass ||
+          c =>
+            c.typeSymbol == ClassfileAnnotationClass ||
               c.typeSymbol == AnnotationClass)
       else parents
     }
@@ -332,8 +332,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         r
     })(collection.breakOut)
 
-  private def setClassInfo(
-      classSym: Symbol, classBType: ClassBType): ClassBType = {
+  private def setClassInfo(classSym: Symbol,
+                           classBType: ClassBType): ClassBType = {
 
     /**
       * Reconstruct the classfile flags from a Java defined class symbol.
@@ -364,19 +364,21 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         if (hasAbstractMethod) ACC_ABSTRACT else 0
       }
       GenBCode.mkFlags(
-          // SI-9393: the classfile / java source parser make java annotation symbols look like classes.
-          // here we recover the actual classfile flags.
-          if (classSym.hasJavaAnnotationFlag)
-            ACC_ANNOTATION | ACC_INTERFACE | ACC_ABSTRACT else 0,
-          if (classSym.isPublic) ACC_PUBLIC else 0,
-          if (classSym.isFinal) ACC_FINAL else 0,
-          // see the link above. javac does the same: ACC_SUPER for all classes, but not interfaces.
-          if (classSym.isInterface) ACC_INTERFACE else ACC_SUPER,
-          // for Java enums, we cannot trust `hasAbstractFlag` (see comment in enumFlags)
-          if (!classSym.hasJavaEnumFlag && classSym.hasAbstractFlag)
-            ACC_ABSTRACT else 0,
-          if (classSym.isArtifact) ACC_SYNTHETIC else 0,
-          if (classSym.hasJavaEnumFlag) enumFlags else 0
+        // SI-9393: the classfile / java source parser make java annotation symbols look like classes.
+        // here we recover the actual classfile flags.
+        if (classSym.hasJavaAnnotationFlag)
+          ACC_ANNOTATION | ACC_INTERFACE | ACC_ABSTRACT
+        else 0,
+        if (classSym.isPublic) ACC_PUBLIC else 0,
+        if (classSym.isFinal) ACC_FINAL else 0,
+        // see the link above. javac does the same: ACC_SUPER for all classes, but not interfaces.
+        if (classSym.isInterface) ACC_INTERFACE else ACC_SUPER,
+        // for Java enums, we cannot trust `hasAbstractFlag` (see comment in enumFlags)
+        if (!classSym.hasJavaEnumFlag && classSym.hasAbstractFlag)
+          ACC_ABSTRACT
+        else 0,
+        if (classSym.isArtifact) ACC_SYNTHETIC else 0,
+        if (classSym.hasJavaEnumFlag) enumFlags else 0
       )
     }
 
@@ -395,13 +397,13 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         else sc
       }
     assert(
-        if (classSym == ObjectClass) superClassSym == NoSymbol
-        else if (classSym.isInterface) superClassSym == ObjectClass
-        else
-          // A ClassBType for a primitive class (scala.Boolean et al) is only created when compiling these classes.
-          ((superClassSym != NoSymbol) && !superClassSym.isInterface) ||
-          (isCompilingPrimitive && primitiveTypeToBType.contains(classSym)),
-        s"Bad superClass for $classSym: $superClassSym"
+      if (classSym == ObjectClass) superClassSym == NoSymbol
+      else if (classSym.isInterface) superClassSym == ObjectClass
+      else
+        // A ClassBType for a primitive class (scala.Boolean et al) is only created when compiling these classes.
+        ((superClassSym != NoSymbol) && !superClassSym.isInterface) ||
+        (isCompilingPrimitive && primitiveTypeToBType.contains(classSym)),
+      s"Bad superClass for $classSym: $superClassSym"
     )
     val superClass =
       if (superClassSym == NoSymbol) None
@@ -428,7 +430,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       // anonymous ones.
       val nestedClasses = {
         val allNested = exitingPhase(currentRun.lambdaliftPhase)(
-            memberClassesForInnerClassTable(classSym))
+          memberClassesForInnerClassTable(classSym))
         val nested = {
           // Classes nested in value classes are nested in the companion at this point. For InnerClass /
           // EnclosingMethod, we use the value class as the outer class. So we remove nested classes
@@ -442,7 +444,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           // For Java compatibility, member classes of top-level objects are treated as members of
           // the top-level companion class, see comment below.
           val members = exitingPickler(
-              memberClassesForInnerClassTable(classSym))
+            memberClassesForInnerClassTable(classSym))
           nested diff members
         } else {
           nested
@@ -486,9 +488,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
                 exitingPickler(classSym.isDerivedValueClass)) {
               val moduleMemberClasses =
                 exitingPhase(currentRun.lambdaliftPhase)(
-                    memberClassesForInnerClassTable(linkedClass))
+                  memberClassesForInnerClassTable(linkedClass))
               moduleMemberClasses.filter(
-                  classOriginallyNestedInClass(_, classSym))
+                classOriginallyNestedInClass(_, classSym))
             } else Nil
           }
 
@@ -504,19 +506,17 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       * for A contain both the class B and the module class B.
       * Here we get rid of the module class B, making sure that the class B is present.
       */
-    val nestedClassSymbolsNoJavaModuleClasses = nestedClassSymbols.filter(
-        s =>
-          {
-        if (s.isJavaDefined && s.isModuleClass) {
-          // We could also search in nestedClassSymbols for s.linkedClassOfClass, but sometimes that
-          // returns NoSymbol, so it doesn't work.
-          val nb = nestedClassSymbols.count(
-              mc => mc.name == s.name && mc.owner == s.owner)
-          assert(
-              nb == 2,
-              s"Java member module without member class: $s - $nestedClassSymbols")
-          false
-        } else true
+    val nestedClassSymbolsNoJavaModuleClasses = nestedClassSymbols.filter(s => {
+      if (s.isJavaDefined && s.isModuleClass) {
+        // We could also search in nestedClassSymbols for s.linkedClassOfClass, but sometimes that
+        // returns NoSymbol, so it doesn't work.
+        val nb = nestedClassSymbols.count(mc =>
+          mc.name == s.name && mc.owner == s.owner)
+        assert(
+          nb == 2,
+          s"Java member module without member class: $s - $nestedClassSymbols")
+        false
+      } else true
     })
 
     val nestedClasses =
@@ -527,12 +527,12 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     val inlineInfo = buildInlineInfo(classSym, classBType.internalName)
 
     classBType.info = Right(
-        ClassInfo(superClass,
-                  interfaces,
-                  flags,
-                  nestedClasses,
-                  nestedInfo,
-                  inlineInfo))
+      ClassInfo(superClass,
+                interfaces,
+                flags,
+                nestedClasses,
+                nestedInfo,
+                inlineInfo))
     classBType
   }
 
@@ -549,14 +549,14 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       // classes to be the enclosing class. SI-9392 shows an errant macro that leaves a reference
       // to a local class symbol that no longer exists, which is not updated by lambdalift.
       devWarning(
-          innerClassSym.pos,
-          s"""The class symbol $innerClassSym with the term symbol ${innerClassSym.rawowner} as `rawowner` reached the backend.
+        innerClassSym.pos,
+        s"""The class symbol $innerClassSym with the term symbol ${innerClassSym.rawowner} as `rawowner` reached the backend.
            |Most likely this indicates a stale reference to a non-existing class introduced by a macro, see SI-9392.""".stripMargin)
       None
     } else {
       // See comment in BTypes, when is a class marked static in the InnerClass table.
       val isStaticNestedClass = isOriginallyStaticOwner(
-          innerClassSym.originalOwner)
+        innerClassSym.originalOwner)
 
       // After lambdalift (which is where we are), the rawowner field contains the enclosing class.
       val enclosingClass = {
@@ -568,9 +568,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
         // (2) Java compatibility. See the big comment in BTypes that summarizes the InnerClass spec.
         if ((innerClassSym.isJavaDefined &&
-                innerClassSym.rawowner.isModuleClass) || // (1)
+            innerClassSym.rawowner.isModuleClass) || // (1)
             (!isAnonymousOrLocalClass(innerClassSym) &&
-                isTopLevelModuleClass(innerClassSym.rawowner))) {
+            isTopLevelModuleClass(innerClassSym.rawowner))) {
           // (2)
           // phase travel for linkedCoC - does not always work in late phases
           exitingPickler(innerClassSym.rawowner.linkedClassOfClass) match {
@@ -595,13 +595,13 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         // phase travel necessary: after flatten, the name includes the name of outer classes.
         // if some outer name contains $anon, a non-anon class is considered anon.
         if (exitingPickler(innerClassSym.isAnonymousClass ||
-                innerClassSym.isAnonymousFunction)) None
+              innerClassSym.isAnonymousFunction)) None
         else
           Some(innerClassSym.rawname + innerClassSym.moduleSuffix) // moduleSuffix for module classes
       }
 
-      Some(NestedInfo(
-              enclosingClass, outerName, innerName, isStaticNestedClass))
+      Some(
+        NestedInfo(enclosingClass, outerName, innerName, isStaticNestedClass))
     }
   }
 
@@ -617,8 +617,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     * So for classes being compiled, the InlineInfo is created here and stored in the ScalaInlineInfo
     * classfile attribute.
     */
-  private def buildInlineInfo(
-      classSym: Symbol, internalName: InternalName): InlineInfo = {
+  private def buildInlineInfo(classSym: Symbol,
+                              internalName: InternalName): InlineInfo = {
     def buildFromSymbol =
       buildInlineInfoFromClassSymbol(classSym,
                                      classBTypeFromSymbol(_).internalName,
@@ -641,8 +641,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           inlineInfoFromClassfile(classNode)
         case Left(missingClass) =>
           EmptyInlineInfo.copy(
-              warning = Some(ClassNotFoundWhenBuildingInlineInfoFromSymbol(
-                        missingClass)))
+            warning = Some(
+              ClassNotFoundWhenBuildingInlineInfoFromSymbol(missingClass)))
       }
     }
   }
@@ -662,13 +662,13 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       val nested =
         exitingPickler(memberClassesForInnerClassTable(moduleClassSym)) map classBTypeFromSymbol
       c.info = Right(
-          ClassInfo(
-              superClass = Some(ObjectRef),
-              interfaces = Nil,
-              flags = asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
-              nestedClasses = nested,
-              nestedInfo = None,
-              inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
+        ClassInfo(
+          superClass = Some(ObjectRef),
+          interfaces = Nil,
+          flags = asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
+          nestedClasses = nested,
+          nestedInfo = None,
+          inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
       c
     })
   }
@@ -678,12 +678,12 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     classBTypeFromInternalName.getOrElse(internalName, {
       val c = ClassBType(internalName)
       c.info = Right(
-          ClassInfo(superClass = Some(sbScalaBeanInfoRef),
-                    interfaces = Nil,
-                    flags = javaFlags(mainClass),
-                    nestedClasses = Nil,
-                    nestedInfo = None,
-                    inlineInfo = EmptyInlineInfo))
+        ClassInfo(superClass = Some(sbScalaBeanInfoRef),
+                  interfaces = Nil,
+                  flags = javaFlags(mainClass),
+                  nestedClasses = Nil,
+                  nestedInfo = None,
+                  inlineInfo = EmptyInlineInfo))
       c
     })
   }
@@ -742,7 +742,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     // TODO: do this early, mark the symbol private.
     val privateFlag =
       sym.isPrivate ||
-      (sym.isPrimaryConstructor && isTopLevelModuleClass(sym.owner))
+        (sym.isPrimaryConstructor && isTopLevelModuleClass(sym.owner))
 
     // Symbols marked in source as `final` have the FINAL flag. (In the past, the flag was also
     // added to modules and module classes, not anymore since 296b706).
@@ -772,9 +772,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
     val finalFlag =
       ((((sym.rawflags & symtab.Flags.FINAL) != 0) ||
-              isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
-          !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
-          )
+        isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
+        !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
+      )
 
     // Primitives are "abstract final" to prohibit instantiation
     // without having to provide any implementations, but that is an
@@ -782,28 +782,29 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     // suppress final if abstract is present.
     import asm.Opcodes._
     GenBCode.mkFlags(
-        if (privateFlag) ACC_PRIVATE else ACC_PUBLIC,
-        if ((sym.isDeferred &&
-                !sym.hasFlag(symtab.Flags.JAVA_DEFAULTMETHOD)) ||
-            sym.hasAbstractFlag) ACC_ABSTRACT else 0,
-        if (sym.isTraitOrInterface) ACC_INTERFACE else 0,
-        if (finalFlag && !sym.hasAbstractFlag) ACC_FINAL else 0,
-        if (sym.isStaticMember) ACC_STATIC else 0,
-        if (sym.isBridge) ACC_BRIDGE | ACC_SYNTHETIC else 0,
-        if (sym.isArtifact) ACC_SYNTHETIC else 0,
-        if (sym.isClass && !sym.isTraitOrInterface) ACC_SUPER else 0,
-        if (sym.hasJavaEnumFlag) ACC_ENUM else 0,
-        if (sym.isVarargsMethod) ACC_VARARGS else 0,
-        if (sym.hasFlag(symtab.Flags.SYNCHRONIZED)) ACC_SYNCHRONIZED else 0,
-        if (sym.isDeprecated) asm.Opcodes.ACC_DEPRECATED else 0
+      if (privateFlag) ACC_PRIVATE else ACC_PUBLIC,
+      if ((sym.isDeferred &&
+          !sym.hasFlag(symtab.Flags.JAVA_DEFAULTMETHOD)) ||
+          sym.hasAbstractFlag) ACC_ABSTRACT
+      else 0,
+      if (sym.isTraitOrInterface) ACC_INTERFACE else 0,
+      if (finalFlag && !sym.hasAbstractFlag) ACC_FINAL else 0,
+      if (sym.isStaticMember) ACC_STATIC else 0,
+      if (sym.isBridge) ACC_BRIDGE | ACC_SYNTHETIC else 0,
+      if (sym.isArtifact) ACC_SYNTHETIC else 0,
+      if (sym.isClass && !sym.isTraitOrInterface) ACC_SUPER else 0,
+      if (sym.hasJavaEnumFlag) ACC_ENUM else 0,
+      if (sym.isVarargsMethod) ACC_VARARGS else 0,
+      if (sym.hasFlag(symtab.Flags.SYNCHRONIZED)) ACC_SYNCHRONIZED else 0,
+      if (sym.isDeprecated) asm.Opcodes.ACC_DEPRECATED else 0
     )
   }
 
   def javaFieldFlags(sym: Symbol) = {
     javaFlags(sym) | GenBCode.mkFlags(
-        if (sym hasAnnotation TransientAttr) asm.Opcodes.ACC_TRANSIENT else 0,
-        if (sym hasAnnotation VolatileAttr) asm.Opcodes.ACC_VOLATILE else 0,
-        if (sym.isMutable) 0 else asm.Opcodes.ACC_FINAL
+      if (sym hasAnnotation TransientAttr) asm.Opcodes.ACC_TRANSIENT else 0,
+      if (sym hasAnnotation VolatileAttr) asm.Opcodes.ACC_VOLATILE else 0,
+      if (sym.isMutable) 0 else asm.Opcodes.ACC_FINAL
     )
   }
 }

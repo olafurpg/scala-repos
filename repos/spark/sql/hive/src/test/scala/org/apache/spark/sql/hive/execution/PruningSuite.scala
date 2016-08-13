@@ -49,25 +49,25 @@ class PruningSuite extends HiveComparisonTest with BeforeAndAfter {
                     Seq.empty)
 
   createPruningTest(
-      "Column pruning - with multiple projects",
-      "SELECT c1 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
-      Seq("c1"),
-      Seq("key"),
-      Seq.empty)
+    "Column pruning - with multiple projects",
+    "SELECT c1 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
+    Seq("c1"),
+    Seq("key"),
+    Seq.empty)
 
   createPruningTest(
-      "Column pruning - projects alias substituting",
-      "SELECT c1 AS c2 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
-      Seq("c2"),
-      Seq("key"),
-      Seq.empty)
+    "Column pruning - projects alias substituting",
+    "SELECT c1 AS c2 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
+    Seq("c2"),
+    Seq("key"),
+    Seq.empty)
 
   createPruningTest(
-      "Column pruning - filter alias in-lining",
-      "SELECT c1 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 WHERE c1 < 100 LIMIT 3",
-      Seq("c1"),
-      Seq("key"),
-      Seq.empty)
+    "Column pruning - filter alias in-lining",
+    "SELECT c1 FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 WHERE c1 < 100 LIMIT 3",
+    Seq("c1"),
+    Seq("key"),
+    Seq.empty)
 
   createPruningTest("Column pruning - without filters",
                     "SELECT c1 FROM (SELECT key AS c1 FROM src) t1 LIMIT 3",
@@ -76,18 +76,18 @@ class PruningSuite extends HiveComparisonTest with BeforeAndAfter {
                     Seq.empty)
 
   createPruningTest(
-      "Column pruning - simple top project without aliases",
-      "SELECT key FROM (SELECT key FROM src WHERE key > 10) t1 WHERE key < 100 LIMIT 3",
-      Seq("key"),
-      Seq("key"),
-      Seq.empty)
+    "Column pruning - simple top project without aliases",
+    "SELECT key FROM (SELECT key FROM src WHERE key > 10) t1 WHERE key < 100 LIMIT 3",
+    Seq("key"),
+    Seq("key"),
+    Seq.empty)
 
   createPruningTest(
-      "Column pruning - non-trivial top project with aliases",
-      "SELECT c1 * 2 AS dbl FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
-      Seq("dbl"),
-      Seq("key"),
-      Seq.empty)
+    "Column pruning - non-trivial top project with aliases",
+    "SELECT c1 * 2 AS dbl FROM (SELECT key AS c1 FROM src WHERE key > 10) t1 LIMIT 3",
+    Seq("dbl"),
+    Seq("key"),
+    Seq.empty)
 
   // Partition pruning tests
 
@@ -116,25 +116,25 @@ class PruningSuite extends HiveComparisonTest with BeforeAndAfter {
                     Seq(Seq("2008-04-08", "11"), Seq("2008-04-09", "11")))
 
   createPruningTest(
-      "Partition pruning - left only 1 partition",
-      "SELECT value, hr FROM srcpart1 WHERE ds = '2008-04-08' AND hr < 12",
-      Seq("value", "hr"),
-      Seq("value", "hr"),
-      Seq(Seq("2008-04-08", "11")))
+    "Partition pruning - left only 1 partition",
+    "SELECT value, hr FROM srcpart1 WHERE ds = '2008-04-08' AND hr < 12",
+    Seq("value", "hr"),
+    Seq("value", "hr"),
+    Seq(Seq("2008-04-08", "11")))
 
   createPruningTest(
-      "Partition pruning - all partitions pruned",
-      "SELECT value, hr FROM srcpart1 WHERE ds = '2014-01-27' AND hr = 11",
-      Seq("value", "hr"),
-      Seq("value", "hr"),
-      Seq.empty)
+    "Partition pruning - all partitions pruned",
+    "SELECT value, hr FROM srcpart1 WHERE ds = '2014-01-27' AND hr = 11",
+    Seq("value", "hr"),
+    Seq("value", "hr"),
+    Seq.empty)
 
   createPruningTest(
-      "Partition pruning - pruning with both column key and partition key",
-      "SELECT value, hr FROM srcpart1 WHERE value IS NOT NULL AND hr < 12",
-      Seq("value", "hr"),
-      Seq("value", "hr"),
-      Seq(Seq("2008-04-08", "11"), Seq("2008-04-09", "11")))
+    "Partition pruning - pruning with both column key and partition key",
+    "SELECT value, hr FROM srcpart1 WHERE value IS NOT NULL AND hr < 12",
+    Seq("value", "hr"),
+    Seq("value", "hr"),
+    Seq(Seq("2008-04-08", "11"), Seq("2008-04-09", "11")))
 
   def createPruningTest(testCaseName: String,
                         sql: String,

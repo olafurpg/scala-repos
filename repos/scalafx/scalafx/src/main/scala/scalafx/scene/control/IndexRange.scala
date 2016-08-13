@@ -40,8 +40,8 @@ object IndexRange {
     */
   val ValueDelimiter = jfxsc.IndexRange.VALUE_DELIMITER
   @deprecated(
-      "Use ValueDelimiter; VALUE_DELIMITER will be removed in a future release",
-      "8.0.60-R10")
+    "Use ValueDelimiter; VALUE_DELIMITER will be removed in a future release",
+    "8.0.60-R10")
   val VALUE_DELIMITER = ValueDelimiter
 
   /**

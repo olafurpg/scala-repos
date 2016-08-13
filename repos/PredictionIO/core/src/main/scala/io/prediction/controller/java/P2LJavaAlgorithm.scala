@@ -28,5 +28,5 @@ import scala.reflect.ClassTag
   */
 abstract class P2LJavaAlgorithm[PD, M, Q, P]
     extends P2LAlgorithm[PD, M, Q, P]()(
-        ClassTag.AnyRef.asInstanceOf[ClassTag[M]],
-        ClassTag.AnyRef.asInstanceOf[ClassTag[Q]])
+      ClassTag.AnyRef.asInstanceOf[ClassTag[M]],
+      ClassTag.AnyRef.asInstanceOf[ClassTag[Q]])

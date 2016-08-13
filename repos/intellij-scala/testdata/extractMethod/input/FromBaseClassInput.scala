@@ -9,7 +9,7 @@ object Bug {
       def foo() = {
         /*start*/
         x + 1
-/*end*/
+        /*end*/
       }
     }
   }

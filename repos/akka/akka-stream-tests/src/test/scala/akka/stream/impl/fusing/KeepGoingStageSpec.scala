@@ -6,7 +6,12 @@ package akka.stream.impl.fusing
 import akka.actor.{NoSerializationVerificationNeeded, ActorRef}
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{Attributes, Inlet, SinkShape, ActorMaterializer}
-import akka.stream.stage.{InHandler, AsyncCallback, GraphStageLogic, GraphStageWithMaterializedValue}
+import akka.stream.stage.{
+  InHandler,
+  AsyncCallback,
+  GraphStageLogic,
+  GraphStageWithMaterializedValue
+}
 import akka.testkit.AkkaSpec
 import akka.stream.testkit.Utils._
 

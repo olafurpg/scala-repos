@@ -72,6 +72,6 @@ object RateEstimator {
 
       case estimator =>
         throw new IllegalArgumentException(
-            s"Unkown rate estimator: $estimator")
+          s"Unkown rate estimator: $estimator")
     }
 }

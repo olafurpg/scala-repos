@@ -19,9 +19,11 @@ case class HookConfig(variant: chess.variant.Variant,
 
   def fixColor =
     copy(
-        color = if (mode == Mode.Rated &&
-                    lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
-                    color != Color.Random) Color.Random else color)
+      color =
+        if (mode == Mode.Rated &&
+            lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
+            color != Color.Random) Color.Random
+        else color)
 
   // allowAnons -> membersOnly
   def >> =
@@ -42,13 +44,13 @@ case class HookConfig(variant: chess.variant.Variant,
     case _ => this
   }
 
-  def hook(
-      uid: String,
-      user: Option[User],
-      sid: Option[String],
-      blocking: Set[String]): Either[Hook, Option[Seek]] = timeMode match {
-    case TimeMode.RealTime =>
-      Left(
+  def hook(uid: String,
+           user: Option[User],
+           sid: Option[String],
+           blocking: Set[String]): Either[Hook, Option[Seek]] =
+    timeMode match {
+      case TimeMode.RealTime =>
+        Left(
           Hook.make(uid = uid,
                     variant = variant,
                     clock = justMakeClock,
@@ -59,18 +61,17 @@ case class HookConfig(variant: chess.variant.Variant,
                     blocking = blocking,
                     sid = sid,
                     ratingRange = ratingRange))
-    case _ =>
-      Right(
-          user map { u =>
-        Seek.make(variant = variant,
-                  daysPerTurn = makeDaysPerTurn,
-                  mode = mode,
-                  color = color.name,
-                  user = u,
-                  blocking = blocking,
-                  ratingRange = ratingRange)
-      })
-  }
+      case _ =>
+        Right(user map { u =>
+          Seek.make(variant = variant,
+                    daysPerTurn = makeDaysPerTurn,
+                    mode = mode,
+                    color = color.name,
+                    user = u,
+                    blocking = blocking,
+                    ratingRange = ratingRange)
+        })
+    }
 
   def noRatedUnlimited = mode.casual || hasClock || makeDaysPerTurn.isDefined
 
@@ -97,17 +98,17 @@ object HookConfig extends BaseHumanConfig {
     val realMode = m.fold(Mode.default)(Mode.orDefault)
     val useRatingRange = realMode.rated || membersOnly
     new HookConfig(
-        variant = chess.variant.Variant(v) err "Invalid game variant " + v,
-        timeMode = TimeMode(tm) err s"Invalid time mode $tm",
-        time = t,
-        increment = i,
-        days = d,
-        mode = realMode,
-        allowAnon = !membersOnly, // membersOnly
-        ratingRange = e
-            .filter(_ => useRatingRange)
-            .fold(RatingRange.default)(RatingRange.orDefault),
-        color = Color(c) err "Invalid color " + c)
+      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
+      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      time = t,
+      increment = i,
+      days = d,
+      mode = realMode,
+      allowAnon = !membersOnly, // membersOnly
+      ratingRange = e
+        .filter(_ => useRatingRange)
+        .fold(RatingRange.default)(RatingRange.orDefault),
+      color = Color(c) err "Invalid color " + c)
   }
 
   val default = HookConfig(variant = variantDefault,
@@ -127,15 +128,15 @@ object HookConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): HookConfig =
       HookConfig(
-          variant = chess.variant.Variant orDefault (r int "v"),
-          timeMode = TimeMode orDefault (r int "tm"),
-          time = r double "t",
-          increment = r int "i",
-          days = r int "d",
-          mode = Mode orDefault (r int "m"),
-          allowAnon = r bool "a",
-          color = Color.Random,
-          ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
+        variant = chess.variant.Variant orDefault (r int "v"),
+        timeMode = TimeMode orDefault (r int "tm"),
+        time = r double "t",
+        increment = r int "i",
+        days = r int "d",
+        mode = Mode orDefault (r int "m"),
+        allowAnon = r bool "a",
+        color = Color.Random,
+        ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
 
     def writes(w: BSON.Writer, o: HookConfig) =
       BSONDocument("v" -> o.variant.id,

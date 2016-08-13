@@ -5,7 +5,10 @@ package psi
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.impl.CheckUtil
-import com.intellij.psi.impl.source.tree.{LazyParseablePsiElement, SharedImplUtil}
+import com.intellij.psi.impl.source.tree.{
+  LazyParseablePsiElement,
+  SharedImplUtil
+}
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.{IElementType, TokenSet}
 import com.intellij.psi.{PsiElement, PsiElementVisitor}
@@ -16,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 @author ven
   */
 abstract class ScalaPsiElementImpl(node: ASTNode)
-    extends ASTWrapperPsiElement(node) with ScalaPsiElement {
+    extends ASTWrapperPsiElement(node)
+    with ScalaPsiElement {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -57,11 +61,11 @@ abstract class ScalaPsiElementImpl(node: ASTNode)
   }
 
   override def findLastChildByType[T <: PsiElement](t: IElementType): T = {
-    super [ScalaPsiElement].findLastChildByType(t)
+    super[ScalaPsiElement].findLastChildByType(t)
   }
 
   override def findLastChildByType(t: TokenSet) = {
-    super [ScalaPsiElement].findLastChildByType(t)
+    super[ScalaPsiElement].findLastChildByType(t)
   }
 
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
@@ -97,7 +101,9 @@ abstract class ScalaPsiElementImpl(node: ASTNode)
 }
 
 abstract class ScalaStubBasedElementImpl[T <: PsiElement](
-    stub: StubElement[T], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[T],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBaseElementImplJavaRawTypeHack[T](stub, nodeType, node)
     with ScalaPsiElement {
   override def accept(visitor: PsiElementVisitor) {
@@ -156,11 +162,11 @@ abstract class ScalaStubBasedElementImpl[T <: PsiElement](
   }
 
   override def findLastChildByType[T <: PsiElement](t: IElementType): T = {
-    super [ScalaPsiElement].findLastChildByType(t)
+    super[ScalaPsiElement].findLastChildByType(t)
   }
 
   override def findLastChildByType(t: TokenSet) = {
-    super [ScalaPsiElement].findLastChildByType(t)
+    super[ScalaPsiElement].findLastChildByType(t)
   }
 
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](

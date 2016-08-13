@@ -13,7 +13,8 @@ import org.scalactic.ConversionCheckedTripleEquals
 import org.scalacheck.Shrink
 
 class GraphMergeSortedSpec
-    extends TwoStreamsSetup with GeneratorDrivenPropertyChecks {
+    extends TwoStreamsSetup
+    with GeneratorDrivenPropertyChecks {
 
   override type Outputs = Int
 

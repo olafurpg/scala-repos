@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class KeyCodeSpec
     extends SFXEnumDelegateSpec[jfxsi.KeyCode, KeyCode](
-        javaClass = classOf[jfxsi.KeyCode],
-        scalaClass = classOf[KeyCode],
-        companion = KeyCode)
+      javaClass = classOf[jfxsi.KeyCode],
+      scalaClass = classOf[KeyCode],
+      companion = KeyCode)

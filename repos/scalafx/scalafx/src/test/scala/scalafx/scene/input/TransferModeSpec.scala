@@ -40,9 +40,9 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TransferModeSpec
     extends SFXEnumDelegateSpec[jfxsi.TransferMode, TransferMode](
-        javaClass = classOf[jfxsi.TransferMode],
-        scalaClass = classOf[TransferMode],
-        companion = TransferMode) {
+      javaClass = classOf[jfxsi.TransferMode],
+      scalaClass = classOf[TransferMode],
+      companion = TransferMode) {
 
   it should "contain all static fields" in {
     TransferMode.ANY should be(jfxsi.TransferMode.ANY)

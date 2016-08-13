@@ -12,9 +12,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
 
   def flatMap[B](fas: A => StateT[F, S, B])(
       implicit F: Monad[F]): StateT[F, S, B] =
-    StateT(
-        s =>
-          F.flatMap(runF) { fsf =>
+    StateT(s =>
+      F.flatMap(runF) { fsf =>
         F.flatMap(fsf(s)) {
           case (s, a) =>
             fas(a).run(s)
@@ -72,7 +71,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     * Like [[transform]], but allows the context to change from `F` to `G`.
     */
   def transformF[G[_], B](f: F[(S, A)] => G[(S, B)])(
-      implicit F: FlatMap[F], G: Applicative[G]): StateT[G, S, B] =
+      implicit F: FlatMap[F],
+      G: Applicative[G]): StateT[G, S, B] =
     StateT(s => f(run(s)))
 
   /**
@@ -93,8 +93,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     * res1: Option[(GlobalEnv, Double)] = Some(((6,hello),5.0))
     * }}}
     */
-  def transformS[R](
-      f: R => S, g: (R, S) => R)(implicit F: Monad[F]): StateT[F, R, A] =
+  def transformS[R](f: R => S, g: (R, S) => R)(
+      implicit F: Monad[F]): StateT[F, R, A] =
     StateT { r =>
       F.flatMap(runF) { ff =>
         val s = f(r)

@@ -87,19 +87,19 @@ abstract class CentralMomentAgg(child: Expression)
     val newM4 =
       if (momentOrder >= 4) {
         m4 - Literal(4.0) * deltaN * newM3 - Literal(6.0) * deltaN2 * newM2 +
-        delta * (delta * delta2 - deltaN * deltaN2)
+          delta * (delta * delta2 - deltaN * deltaN2)
       } else {
         Literal(0.0)
       }
 
     trimHigherOrder(
-        Seq(
-            If(IsNull(child), n, newN),
-            If(IsNull(child), avg, newAvg),
-            If(IsNull(child), m2, newM2),
-            If(IsNull(child), m3, newM3),
-            If(IsNull(child), m4, newM4)
-        ))
+      Seq(
+        If(IsNull(child), n, newN),
+        If(IsNull(child), avg, newAvg),
+        If(IsNull(child), m2, newM2),
+        If(IsNull(child), m3, newM3),
+        If(IsNull(child), m4, newM4)
+      ))
   }
 
   override val mergeExpressions: Seq[Expression] = {
@@ -118,7 +118,7 @@ abstract class CentralMomentAgg(child: Expression)
     val newM3 =
       if (momentOrder >= 3) {
         m3.left + m3.right + deltaN * deltaN * delta * n1 * n2 * (n1 - n2) +
-        Literal(3.0) * deltaN * (n1 * m2.right - n2 * m2.left)
+          Literal(3.0) * deltaN * (n1 * m2.right - n2 * m2.left)
       } else {
         Literal(0.0)
       }
@@ -126,9 +126,9 @@ abstract class CentralMomentAgg(child: Expression)
     val newM4 =
       if (momentOrder >= 4) {
         m4.left + m4.right + deltaN * deltaN * deltaN * delta * n1 * n2 *
-        (n1 * n1 - n1 * n2 + n2 * n2) + Literal(6.0) * deltaN * deltaN *
-        (n1 * n1 * m2.right + n2 * n2 * m2.left) + Literal(4.0) * deltaN *
-        (n1 * m3.right - n2 * m3.left)
+          (n1 * n1 - n1 * n2 + n2 * n2) + Literal(6.0) * deltaN * deltaN *
+          (n1 * n1 * m2.right + n2 * n2 * m2.left) + Literal(4.0) * deltaN *
+          (n1 * m3.right - n2 * m3.left)
       } else {
         Literal(0.0)
       }

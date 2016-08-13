@@ -125,8 +125,8 @@ object TokenSets {
                                      ScalaTokenTypes.tIDENTIFIER,
                                      ScalaTokenTypes.tUNDER)
 
-  val ALIASES_SET = TokenSet.create(
-      ScalaElementTypes.TYPE_DECLARATION, ScalaElementTypes.TYPE_DEFINITION)
+  val ALIASES_SET = TokenSet.create(ScalaElementTypes.TYPE_DECLARATION,
+                                    ScalaElementTypes.TYPE_DEFINITION)
 
   val FUNCTIONS = TokenSet.create(ScalaElementTypes.FUNCTION_DECLARATION,
                                   ScalaElementTypes.FUNCTION_DEFINITION,
@@ -138,26 +138,26 @@ object TokenSets {
   val VARIABLES = TokenSet.create(ScalaElementTypes.VARIABLE_DECLARATION,
                                   ScalaElementTypes.VARIABLE_DEFINITION)
 
-  val TEMPLATE_PARENTS = TokenSet.create(
-      ScalaElementTypes.CLASS_PARENTS, ScalaElementTypes.TRAIT_PARENTS)
+  val TEMPLATE_PARENTS = TokenSet
+    .create(ScalaElementTypes.CLASS_PARENTS, ScalaElementTypes.TRAIT_PARENTS)
 
   val MEMBERS = TokenSet.orSet(
-      TokenSet.orSet(FUNCTIONS,
-                     TokenSet.orSet(
-                         ALIASES_SET,
-                         TokenSet.orSet(
-                             TMPL_DEF_BIT_SET,
-                             TokenSet.orSet(
-                                 VALUES,
-                                 TokenSet.orSet(
-                                     VARIABLES,
-                                     TokenSet.create(
-                                         ScalaElementTypes.PRIMARY_CONSTRUCTOR)
-                                 )
-                             )
-                         )
-                     )),
-      MemberElementTypesExtension.getAllElementTypes)
+    TokenSet.orSet(
+      FUNCTIONS,
+      TokenSet.orSet(
+        ALIASES_SET,
+        TokenSet.orSet(
+          TMPL_DEF_BIT_SET,
+          TokenSet.orSet(
+            VALUES,
+            TokenSet.orSet(
+              VARIABLES,
+              TokenSet.create(ScalaElementTypes.PRIMARY_CONSTRUCTOR)
+            )
+          )
+        )
+      )),
+    MemberElementTypesExtension.getAllElementTypes)
 
   val DECLARED_ELEMENTS_HOLDER =
     TokenSet.orSet(FUNCTIONS, TokenSet.orSet(VALUES, VARIABLES))
@@ -165,17 +165,17 @@ object TokenSets {
   val PARAMETERS = TokenSet.create(PARAM, CLASS_PARAM)
 
   val TYPE_ELEMENTS_TOKEN_SET = TokenSet.create(
-      SIMPLE_TYPE,
-      TYPE,
-      TYPE_IN_PARENTHESIS,
-      TYPE_GENERIC_CALL,
-      INFIX_TYPE,
-      TUPLE_TYPE,
-      EXISTENTIAL_TYPE,
-      COMPOUND_TYPE,
-      ANNOT_TYPE,
-      WILDCARD_TYPE,
-      TYPE_PROJECTION,
-      TYPE_VARIABLE
+    SIMPLE_TYPE,
+    TYPE,
+    TYPE_IN_PARENTHESIS,
+    TYPE_GENERIC_CALL,
+    INFIX_TYPE,
+    TUPLE_TYPE,
+    EXISTENTIAL_TYPE,
+    COMPOUND_TYPE,
+    ANNOT_TYPE,
+    WILDCARD_TYPE,
+    TYPE_PROJECTION,
+    TYPE_VARIABLE
   )
 }

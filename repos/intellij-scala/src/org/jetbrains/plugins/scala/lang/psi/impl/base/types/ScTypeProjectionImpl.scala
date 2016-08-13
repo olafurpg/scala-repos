@@ -16,16 +16,26 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve._
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, CompletionProcessor, ResolveProcessor}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor,
+  CompletionProcessor,
+  ResolveProcessor
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 13.03.2008
   */
 class ScTypeProjectionImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypeProjection {
+    extends ScalaPsiElementImpl(node)
+    with ScTypeProjection {
 
   override def toString: String = "TypeProjection: " + getText
 
@@ -73,8 +83,10 @@ class ScTypeProjectionImpl(node: ASTNode)
   object MyResolver
       extends ResolveCache.PolyVariantResolver[ScTypeProjectionImpl] {
     def resolve(projection: ScTypeProjectionImpl, incomplete: Boolean) = {
-      projection.doResolve(new ResolveProcessor(
-              projection.getKinds(incomplete), projection, projection.refName))
+      projection.doResolve(
+        new ResolveProcessor(projection.getKinds(incomplete),
+                             projection,
+                             projection.refName))
     }
   }
 
@@ -87,9 +99,9 @@ class ScTypeProjectionImpl(node: ASTNode)
       r.element match {
         case mem: PsiMember if mem.containingClass != null =>
           new ScalaResolveResult(
-              mem,
-              r.substitutor /*.bindO(mem.getContainingClass, projected, this)*/,
-              r.importsUsed)
+            mem,
+            r.substitutor /*.bindO(mem.getContainingClass, projected, this)*/,
+            r.importsUsed)
         case _ => r: ResolveResult
       }
     }
@@ -99,8 +111,11 @@ class ScTypeProjectionImpl(node: ASTNode)
   }
 
   def getSameNameVariants: Array[ResolveResult] =
-    doResolve(new CompletionProcessor(
-            getKinds(incomplete = true), this, false, Some(refName)))
+    doResolve(
+      new CompletionProcessor(getKinds(incomplete = true),
+                              this,
+                              false,
+                              Some(refName)))
 
   override def accept(visitor: ScalaElementVisitor) {
     visitor.visitTypeProjection(this)

@@ -20,14 +20,14 @@ trait JavaReflectionRuntimes { self: scala.tools.nsc.typechecker.Analyzer =>
           throw new NoSuchMethodException(s"$className.$methName")
         }
       macroLogVerbose(
-          s"successfully loaded macro impl as ($implClass, $implMeth)")
+        s"successfully loaded macro impl as ($implClass, $implMeth)")
       args =>
         {
           val implObj =
             if (isBundle) {
               def isMacroContext(clazz: Class[_]) =
                 clazz == classOf[BlackboxContext] ||
-                clazz == classOf[WhiteboxContext]
+                  clazz == classOf[WhiteboxContext]
               def isBundleCtor(ctor: jConstructor[_]) =
                 ctor.getParameterTypes match {
                   case Array(param) if isMacroContext(param) => true

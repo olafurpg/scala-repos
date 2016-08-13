@@ -12,8 +12,8 @@ import scala.beans.BeanProperty
   * @author Pavel Fatin
   */
 @State(
-    name = "SbtLocalSettings",
-    storages = Array(new Storage(StoragePathMacros.WORKSPACE_FILE))
+  name = "SbtLocalSettings",
+  storages = Array(new Storage(StoragePathMacros.WORKSPACE_FILE))
 )
 class SbtLocalSettings(project: Project)
     extends AbstractExternalSystemLocalSettings(SbtProjectSystem.Id, project)
@@ -31,7 +31,7 @@ class SbtLocalSettings(project: Project)
   }
 
   def loadState(state: SbtLocalSettingsState) {
-    super [AbstractExternalSystemLocalSettings].loadState(state)
+    super[AbstractExternalSystemLocalSettings].loadState(state)
     sbtSupportSuggested = state.getSbtSupportSuggested
     lastUpdateTimestamp = state.getLastUpdateTimestamp
   }

@@ -3,7 +3,11 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.app.App
 import com.twitter.conversions.time._
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  StatsReceiver,
+  NullStatsReceiver,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Function => _, _}
 import org.junit.runner.RunWith
@@ -39,11 +43,11 @@ private[loadbalancer] trait P2CSuite {
       sr: StatsReceiver = NullStatsReceiver,
       clock: (() => Long) = System.nanoTime
   ): ServiceFactory[Unit, Int] = new P2CBalancer(
-      Activity(fs.map(Activity.Ok(_))),
-      maxEffort = 5,
-      rng = Rng(12345L),
-      statsReceiver = sr,
-      emptyException = noBrokers
+    Activity(fs.map(Activity.Ok(_))),
+    maxEffort = 5,
+    rng = Rng(12345L),
+    statsReceiver = sr,
+    emptyException = noBrokers
   )
 
   def assertEven(fs: Traversable[P2CServiceFactory]) {
@@ -58,7 +62,7 @@ private[loadbalancer] trait P2CSuite {
 @RunWith(classOf[JUnitRunner])
 class P2CBalancerTest extends FunSuite with App with P2CSuite {
   flag.parseArgs(
-      Array("-com.twitter.finagle.loadbalancer.exp.loadMetric=leastReq"))
+    Array("-com.twitter.finagle.loadbalancer.exp.loadMetric=leastReq"))
 
   case class LoadedFactory(which: Int) extends P2CServiceFactory {
     var stat: Status = Status.Open
@@ -75,8 +79,7 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
       sum += load
       count += 1
 
-      Future.value(
-          new Service[Unit, Int] {
+      Future.value(new Service[Unit, Int] {
         def apply(req: Unit) = Future.value(which)
         override def close(deadline: Time) = {
           load -= 1
@@ -304,12 +307,12 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
       clock: (() => Long) = System.nanoTime
   ): ServiceFactory[Unit, Int] =
     new P2CBalancerPeakEwma(
-        Activity(fs.map(Activity.Ok(_))),
-        maxEffort = 5,
-        decayTime = 150.nanoseconds,
-        rng = Rng(12345L),
-        statsReceiver = sr,
-        emptyException = noBrokers
+      Activity(fs.map(Activity.Ok(_))),
+      maxEffort = 5,
+      decayTime = 150.nanoseconds,
+      rng = Rng(12345L),
+      statsReceiver = sr,
+      emptyException = noBrokers
     ) {
       override def nanoTime() = clock()
     }
@@ -327,7 +330,7 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
           val latency = Await.result(svc((): Unit)).toLong
           val work =
             (clock() + latency ->
-                (schedule.getOrElse(clock() + latency, Nil) :+ svc))
+              (schedule.getOrElse(clock() + latency, Nil) :+ svc))
           schedule + work
         }
       for (seq <- next.get(step); c <- seq) c.close()

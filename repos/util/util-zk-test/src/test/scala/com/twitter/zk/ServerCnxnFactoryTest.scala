@@ -17,8 +17,8 @@ class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter {
 
   before {
     tmpDir = FileUtils.createTempDir()
-    testServer = new ZooKeeperServer(
-        tmpDir, tmpDir, ZooKeeperServer.DEFAULT_TICK_TIME)
+    testServer =
+      new ZooKeeperServer(tmpDir, tmpDir, ZooKeeperServer.DEFAULT_TICK_TIME)
   }
 
   after {

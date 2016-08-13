@@ -24,7 +24,8 @@ import scala.util._
   * Local filesystem backed snapshot store.
   */
 private[persistence] class LocalSnapshotStore
-    extends SnapshotStore with ActorLogging {
+    extends SnapshotStore
+    with ActorLogging {
   private val FilenamePattern = """^snapshot-(.+)-(\d+)-(\d+)""".r
 
   import akka.util.Helpers._
@@ -42,8 +43,8 @@ private[persistence] class LocalSnapshotStore
   private var saving =
     immutable.Set.empty[SnapshotMetadata] // saving in progress
 
-  override def loadAsync(
-      persistenceId: String, criteria: SnapshotSelectionCriteria)
+  override def loadAsync(persistenceId: String,
+                         criteria: SnapshotSelectionCriteria)
     : Future[Option[SelectedSnapshot]] = {
     //
     // Heuristics:
@@ -57,8 +58,8 @@ private[persistence] class LocalSnapshotStore
     Future(load(metadata))(streamDispatcher)
   }
 
-  override def saveAsync(
-      metadata: SnapshotMetadata, snapshot: Any): Future[Unit] = {
+  override def saveAsync(metadata: SnapshotMetadata,
+                         snapshot: Any): Future[Unit] = {
     saving += metadata
     val completion = Future(save(metadata, snapshot))(streamDispatcher)
     completion
@@ -118,10 +119,10 @@ private[persistence] class LocalSnapshotStore
       .deserialize(streamToBytes(inputStream), classOf[Snapshot])
       .get
 
-  protected def serialize(
-      outputStream: OutputStream, snapshot: Snapshot): Unit =
+  protected def serialize(outputStream: OutputStream,
+                          snapshot: Snapshot): Unit =
     outputStream.write(
-        serializationExtension.findSerializerFor(snapshot).toBinary(snapshot))
+      serializationExtension.findSerializerFor(snapshot).toBinary(snapshot))
 
   protected def withOutputStream(metadata: SnapshotMetadata)(
       p: (OutputStream) ⇒ Unit): File = {
@@ -130,21 +131,21 @@ private[persistence] class LocalSnapshotStore
     tmpFile
   }
 
-  private def withInputStream[T](
-      metadata: SnapshotMetadata)(p: (InputStream) ⇒ T): T =
+  private def withInputStream[T](metadata: SnapshotMetadata)(
+      p: (InputStream) ⇒ T): T =
     withStream(new BufferedInputStream(
-                   new FileInputStream(snapshotFileForWrite(metadata))),
+                 new FileInputStream(snapshotFileForWrite(metadata))),
                p)
 
   private def withStream[A <: Closeable, B](stream: A, p: A ⇒ B): B =
     try { p(stream) } finally { stream.close() }
 
   /** Only by persistenceId and sequenceNr, timestamp is informational - accomodates for 2.13.x series files */
-  private def snapshotFileForWrite(
-      metadata: SnapshotMetadata, extension: String = ""): File =
+  private def snapshotFileForWrite(metadata: SnapshotMetadata,
+                                   extension: String = ""): File =
     new File(snapshotDir, s"snapshot-${URLEncoder.encode(
-        metadata.persistenceId,
-        UTF_8)}-${metadata.sequenceNr}-${metadata.timestamp}${extension}")
+      metadata.persistenceId,
+      UTF_8)}-${metadata.sequenceNr}-${metadata.timestamp}${extension}")
 
   private def snapshotMetadatas(
       persistenceId: String,
@@ -157,8 +158,9 @@ private[persistence] class LocalSnapshotStore
         .map(_.getName)
         .collect {
           case FilenamePattern(pid, snr, tms) ⇒
-            SnapshotMetadata(
-                URLDecoder.decode(pid, UTF_8), snr.toLong, tms.toLong)
+            SnapshotMetadata(URLDecoder.decode(pid, UTF_8),
+                             snr.toLong,
+                             tms.toLong)
         }
         .filter(md ⇒ criteria.matches(md) && !saving.contains(md))
         .toVector
@@ -174,7 +176,7 @@ private[persistence] class LocalSnapshotStore
       // try to create the directory, on failure double check if someone else beat us to it
       if (!dir.mkdirs() && !dir.isDirectory) {
         throw new IOException(
-            s"Failed to create snapshot directory [${dir.getCanonicalPath}]")
+          s"Failed to create snapshot directory [${dir.getCanonicalPath}]")
       }
     }
     dir
@@ -195,7 +197,8 @@ private[persistence] class LocalSnapshotStore
       extends FilenameFilter {
     private final def matches(pid: String, snr: String, tms: String): Boolean = {
       pid.equals(URLEncoder.encode(md.persistenceId)) &&
-      Try(snr.toLong == md.sequenceNr &&
+      Try(
+        snr.toLong == md.sequenceNr &&
           (md.timestamp == 0L || tms.toLong == md.timestamp)).getOrElse(false)
     }
 

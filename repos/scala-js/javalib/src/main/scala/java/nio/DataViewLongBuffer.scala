@@ -83,13 +83,17 @@ private[nio] final class DataViewLongBuffer private (
     _dataView.setInt64(8 * index, elem, !isBigEndian)
 
   @inline
-  override private[nio] def load(
-      startIndex: Int, dst: Array[Long], offset: Int, length: Int): Unit =
+  override private[nio] def load(startIndex: Int,
+                                 dst: Array[Long],
+                                 offset: Int,
+                                 length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(
-      startIndex: Int, src: Array[Long], offset: Int, length: Int): Unit =
+  override private[nio] def store(startIndex: Int,
+                                  src: Array[Long],
+                                  offset: Int,
+                                  length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -103,8 +107,11 @@ private[nio] object DataViewLongBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): LongBuffer = {
-      new DataViewLongBuffer(
-          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
+      new DataViewLongBuffer(dataView,
+                             initialPosition,
+                             initialLimit,
+                             readOnly,
+                             isBigEndian)
     }
   }
 

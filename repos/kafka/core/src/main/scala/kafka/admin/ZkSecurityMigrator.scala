@@ -36,21 +36,21 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 /**
-  * This tool is to be used when making access to ZooKeeper authenticated or 
+  * This tool is to be used when making access to ZooKeeper authenticated or
   * the other way around, when removing authenticated access. The exact steps
   * to migrate a Kafka cluster from unsecure to secure with respect to ZooKeeper
   * access are the following:
-  * 
+  *
   * 1- Perform a rolling upgrade of Kafka servers, setting zookeeper.set.acl to false
-  * and passing a valid JAAS login file via the system property 
+  * and passing a valid JAAS login file via the system property
   * java.security.auth.login.config
   * 2- Perform a second rolling upgrade keeping the system property for the login file
   * and now setting zookeeper.set.acl to true
-  * 3- Finally run this tool. There is a script under ./bin. Run 
+  * 3- Finally run this tool. There is a script under ./bin. Run
   *   ./bin/zookeeper-security-migration --help
   * to see the configuration parameters. An example of running it is the following:
   *  ./bin/zookeeper-security-migration --zookeeper.acl=secure --zookeeper.connection=localhost:2181
-  * 
+  *
   * To convert a cluster from secure to unsecure, we need to perform the following
   * steps:
   * 1- Perform a rolling upgrade setting zookeeper.set.acl to false for each server
@@ -61,23 +61,23 @@ import scala.concurrent.duration._
 object ZkSecurityMigrator extends Logging {
   val usageMessage =
     ("ZooKeeper Migration Tool Help. This tool updates the ACLs of " +
-        "znodes as part of the process of setting up ZooKeeper " +
-        "authentication.")
+      "znodes as part of the process of setting up ZooKeeper " +
+      "authentication.")
 
   def run(args: Array[String]) {
     var jaasFile = System.getProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
     val parser = new OptionParser()
     val zkAclOpt = parser
       .accepts(
-          "zookeeper.acl",
-          "Indicates whether to make the Kafka znodes in ZooKeeper secure or unsecure." +
+        "zookeeper.acl",
+        "Indicates whether to make the Kafka znodes in ZooKeeper secure or unsecure." +
           " The options are 'secure' and 'unsecure'")
       .withRequiredArg()
       .ofType(classOf[String])
     val zkUrlOpt = parser
       .accepts(
-          "zookeeper.connect",
-          "Sets the ZooKeeper connect string (ensemble). This parameter " +
+        "zookeeper.connect",
+        "Sets the ZooKeeper connect string (ensemble). This parameter " +
           "takes a comma-separated list of host:port pairs.")
       .withRequiredArg()
       .defaultsTo("localhost:2181")
@@ -103,7 +103,7 @@ object ZkSecurityMigrator extends Logging {
     if ((jaasFile == null)) {
       val errorMsg =
         ("No JAAS configuration file has been specified. Please make sure that you have set " +
-            "the system property %s".format(JaasUtils.JAVA_LOGIN_CONFIG_PARAM))
+          "the system property %s".format(JaasUtils.JAVA_LOGIN_CONFIG_PARAM))
       System.out.println("ERROR: %s".format(errorMsg))
       throw new IllegalArgumentException("Incorrect configuration")
     }
@@ -151,11 +151,11 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
   private def setAcl(path: String, setPromise: Promise[String]) = {
     info("Setting ACL for path %s".format(path))
     zkUtils.zkConnection.getZookeeper.setACL(
-        path,
-        ZkUtils.DefaultAcls(zkUtils.isSecure),
-        -1,
-        SetACLCallback,
-        setPromise)
+      path,
+      ZkUtils.DefaultAcls(zkUtils.isSecure),
+      -1,
+      SetACLCallback,
+      setPromise)
   }
 
   private def getChildren(path: String, childrenPromise: Promise[String]) = {
@@ -204,28 +204,25 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
           zkHandle.getChildren(path, false, GetChildrenCallback, ctx)
         case Code.NONODE =>
           warn(
-              "Node is gone, it could be have been legitimately deleted: %s"
-                .format(path))
+            "Node is gone, it could be have been legitimately deleted: %s"
+              .format(path))
           promise success "done"
         case Code.SESSIONEXPIRED =>
           // Starting a new session isn't really a problem, but it'd complicate
           // the logic of the tool, so we quit and let the user re-run it.
           System.out.println("ZooKeeper session expired while changing ACLs")
           promise failure ZkException.create(
-              KeeperException.create(Code.get(rc)))
+            KeeperException.create(Code.get(rc)))
         case _ =>
           System.out.println("Unexpected return code: %d".format(rc))
           promise failure ZkException.create(
-              KeeperException.create(Code.get(rc)))
+            KeeperException.create(Code.get(rc)))
       }
     }
   }
 
   private object SetACLCallback extends StatCallback {
-    def processResult(rc: Int,
-                      path: String,
-                      ctx: Object,
-                      stat: Stat) {
+    def processResult(rc: Int, path: String, ctx: Object, stat: Stat) {
       val zkHandle = zkUtils.zkConnection.getZookeeper
       val promise = ctx.asInstanceOf[Promise[String]]
 
@@ -241,19 +238,19 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
                           ctx)
         case Code.NONODE =>
           warn(
-              "Znode is gone, it could be have been legitimately deleted: %s"
-                .format(path))
+            "Znode is gone, it could be have been legitimately deleted: %s"
+              .format(path))
           promise success "done"
         case Code.SESSIONEXPIRED =>
           // Starting a new session isn't really a problem, but it'd complicate
           // the logic of the tool, so we quit and let the user re-run it.
           System.out.println("ZooKeeper session expired while changing ACLs")
           promise failure ZkException.create(
-              KeeperException.create(Code.get(rc)))
+            KeeperException.create(Code.get(rc)))
         case _ =>
           System.out.println("Unexpected return code: %d".format(rc))
           promise failure ZkException.create(
-              KeeperException.create(Code.get(rc)))
+            KeeperException.create(Code.get(rc)))
       }
     }
   }

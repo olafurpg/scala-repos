@@ -8,7 +8,13 @@ import sbt.Keys._
 
 import play.api.PlayException
 import play.sbt.PlayExceptions._
-import play.runsupport.Reloader.{CompileResult, CompileSuccess, CompileFailure, Source, SourceMap}
+import play.runsupport.Reloader.{
+  CompileResult,
+  CompileSuccess,
+  CompileFailure,
+  Source,
+  SourceMap
+}
 
 object PlayReload {
 
@@ -50,8 +56,8 @@ object PlayReload {
     CompileFailure(taskFailureHandler(incomplete, streams))
   }
 
-  def taskFailureHandler(
-      incomplete: Incomplete, streams: Option[Streams]): PlayException = {
+  def taskFailureHandler(incomplete: Incomplete,
+                         streams: Option[Streams]): PlayException = {
     Incomplete
       .allExceptions(incomplete)
       .headOption
@@ -62,14 +68,13 @@ object PlayReload {
             .find(_.severity == xsbti.Severity.Error)
             .map(CompilationException)
             .getOrElse(UnexpectedException(
-                    Some(
-                        "The compilation failed without reporting any problem!"),
-                    Some(e)))
+              Some("The compilation failed without reporting any problem!"),
+              Some(e)))
         case e: Exception => UnexpectedException(unexpected = Some(e))
       }
       .getOrElse {
         UnexpectedException(
-            Some("The compilation task failed without any exception!"))
+          Some("The compilation task failed without any exception!"))
       }
   }
 
@@ -79,8 +84,8 @@ object PlayReload {
       case task: Task[_] => task.info.attributes get taskDefinitionKey
     }
 
-  def getProblems(
-      incomplete: Incomplete, streams: Option[Streams]): Seq[xsbti.Problem] = {
+  def getProblems(incomplete: Incomplete,
+                  streams: Option[Streams]): Seq[xsbti.Problem] = {
     allProblems(incomplete) ++ {
       Incomplete.linearize(incomplete).flatMap(getScopedKey).flatMap {
         scopedKey =>
@@ -102,10 +107,11 @@ object PlayReload {
                   parsed = Some((file, line, message)) -> None
                 case JavacErrorInfo(key, message) =>
                   parsed._1.foreach { o =>
-                    parsed = Some((parsed._1.get._1,
-                                   parsed._1.get._2,
-                                   parsed._1.get._3 + " [" + key.trim + ": " +
-                                   message.trim + "]")) -> None
+                    parsed = Some(
+                        (parsed._1.get._1,
+                         parsed._1.get._2,
+                         parsed._1.get._3 + " [" + key.trim + ": " +
+                           message.trim + "]")) -> None
                   }
                 case JavacErrorPosition(pos) =>
                   parsed = parsed._1 -> Some(pos.size)
@@ -126,8 +132,8 @@ object PlayReload {
                   def pointer =
                     maybePosition
                       .map(pos =>
-                            xsbti.Maybe.just(
-                                (pos - 1).asInstanceOf[java.lang.Integer]))
+                        xsbti.Maybe.just(
+                          (pos - 1).asInstanceOf[java.lang.Integer]))
                       .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
                   def pointerSpace = xsbti.Maybe.nothing[String]
                   def sourceFile = xsbti.Maybe.just(file(error._1))

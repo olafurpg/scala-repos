@@ -28,13 +28,21 @@ import org.apache.spark.internal.Logging
   */
 @DeveloperApi
 class SparkJLineCompletion(val intp: SparkIMain)
-    extends Completion with CompletionOutput with Logging {
+    extends Completion
+    with CompletionOutput
+    with Logging {
   // NOTE: Exposed in package as used in quite a few classes
   // NOTE: Must be public to override the global found in CompletionOutput
   val global: intp.global.type = intp.global
 
   import global._
-  import definitions.{PredefModule, AnyClass, AnyRefClass, ScalaPackage, JavaLangPackage}
+  import definitions.{
+    PredefModule,
+    AnyClass,
+    AnyRefClass,
+    ScalaPackage,
+    JavaLangPackage
+  }
   import rootMirror.{RootClass, getModuleIfDefined}
   type ExecResult = Any
   import intp.{debugging}
@@ -53,7 +61,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
   private def getSymbol(name: String, isModule: Boolean) =
     (if (isModule) getModuleIfDefined(name)
-     else getModuleIfDefined(name))
+    else getModuleIfDefined(name))
   private def getType(name: String, isModule: Boolean) =
     getSymbol(name, isModule).tpe
   private def typeOf(name: String) = getType(name, false)
@@ -80,7 +88,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
     // compiler to crash for reasons not yet known.
     def members =
       afterTyper(
-          (effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
+        (effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
           (_.isPublic))
     def methods = members.toList filter (_.isMethod)
     def packages = members.toList filter (_.isPackage)
@@ -108,15 +116,15 @@ class SparkJLineCompletion(val intp: SparkIMain)
         lazy val upgrade = {
           intp rebind param
           intp.reporter.printMessage(
-              "\nRebinding stable value %s from %s to %s".format(
-                  param.name, tp, param.tpe))
+            "\nRebinding stable value %s from %s to %s"
+              .format(param.name, tp, param.tpe))
           upgraded = true
           new TypeMemberCompletion(runtimeType)
         }
         override def completions(verbosity: Int) = {
           super.completions(verbosity) ++
-          (if (verbosity == 0) Nil
-           else upgrade.completions(verbosity))
+            (if (verbosity == 0) Nil
+            else upgrade.completions(verbosity))
         }
         override def follow(s: String) = super.follow(s) orElse {
           if (upgraded) upgrade.follow(s)
@@ -124,8 +132,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
         }
         override def alternativesFor(id: String) =
           super.alternativesFor(id) ++
-          (if (upgraded) upgrade.alternativesFor(id)
-           else Nil) distinct
+            (if (upgraded) upgrade.alternativesFor(id)
+            else Nil) distinct
       }
     }
     def apply(tp: Type): TypeMemberCompletion = {
@@ -137,7 +145,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
   }
 
   class TypeMemberCompletion(val tp: Type)
-      extends CompletionAware with CompilerCompletion {
+      extends CompletionAware
+      with CompilerCompletion {
     def excludeEndsWith: List[String] = Nil
     def excludeStartsWith: List[String] =
       List("<") // <byname>, <repeated>, etc.
@@ -148,7 +157,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
       IMain stripString afterTyper(new MethodSymbolOutput(sym).methodString())
     }
 
-    def exclude(name: String): Boolean = ((name contains "$") ||
+    def exclude(name: String): Boolean =
+      ((name contains "$") ||
         (excludeNames contains name) ||
         (excludeEndsWith exists (name endsWith _)) ||
         (excludeStartsWith exists (name startsWith _)))
@@ -159,7 +169,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
     override def follow(s: String): Option[CompletionAware] =
       debugging(tp + " -> '" + s + "' ==> ")(
-          Some(TypeMemberCompletion(memberNamed(s).tpe)) filterNot
+        Some(TypeMemberCompletion(memberNamed(s).tpe)) filterNot
           (_ eq NoTypeCompletion))
 
     override def alternativesFor(id: String): List[String] =
@@ -294,8 +304,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
   // the list of completion aware objects which should be consulted
   // for top level unqualified, it's too noisy to let much in.
-  private lazy val topLevelBase: List[CompletionAware] = List(
-      ids, rootClass, predef, scalalang, javalang, literals)
+  private lazy val topLevelBase: List[CompletionAware] =
+    List(ids, rootClass, predef, scalalang, javalang, literals)
   private def topLevel = topLevelBase ++ imported
   private def topLevelThreshold = 50
 
@@ -365,8 +375,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
     override def complete(buf: String, cursor: Int): Candidates = {
       verbosity = if (isConsecutiveTabs(buf, cursor)) verbosity + 1 else 0
       logDebug(
-          "\ncomplete(%s, %d) last = (%s, %d), verbosity: %s".format(
-              buf, cursor, lastBuf, lastCursor, verbosity))
+        "\ncomplete(%s, %d) last = (%s, %d), verbosity: %s"
+          .format(buf, cursor, lastBuf, lastCursor, verbosity))
 
       // we don't try lower priority completions unless higher ones return no results.
       def tryCompletion(
@@ -381,8 +391,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
             lastCursor = p.position + advance.length
             lastBuf = (buf take p.position) + advance
             logDebug(
-                "tryCompletion(%s, _) lastBuf = %s, lastCursor = %s, p.position = %s"
-                  .format(p, lastBuf, lastCursor, p.position))
+              "tryCompletion(%s, _) lastBuf = %s, lastCursor = %s, p.position = %s"
+                .format(p, lastBuf, lastCursor, p.position))
             p.position
           }
 
@@ -398,8 +408,10 @@ class SparkJLineCompletion(val intp: SparkIMain)
         if (!looksLikeInvocation(buf)) None
         else tryCompletion(Parsed.dotted(buf drop 1, cursor), lastResultFor)
 
-      def tryAll = (lastResultCompletion orElse tryCompletion(
-              mkDotted, topLevelFor) getOrElse Candidates(cursor, Nil))
+      def tryAll =
+        (lastResultCompletion orElse tryCompletion(mkDotted, topLevelFor) getOrElse Candidates(
+          cursor,
+          Nil))
 
       /**
         *  This is the kickoff point for all manner of theoretically
@@ -411,10 +423,11 @@ class SparkJLineCompletion(val intp: SparkIMain)
         *  because there are some spots which like to throw an assertion
         *  once, then work after that. Yeah, what can I say.
         */
-      try tryAll catch {
+      try tryAll
+      catch {
         case ex: Throwable =>
           logWarning(
-              "Error: complete(%s, %s) provoked".format(buf, cursor) + ex)
+            "Error: complete(%s, %s) provoked".format(buf, cursor) + ex)
           Candidates(cursor,
                      if (isReplDebug) List("<error:" + ex + ">")
                      else Nil)

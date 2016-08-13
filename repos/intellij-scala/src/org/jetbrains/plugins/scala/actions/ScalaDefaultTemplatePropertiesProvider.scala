@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala.actions
 
 import java.util.Properties
 
-import com.intellij.ide.fileTemplates.{FileTemplate, TemplatePackagePropertyProvider}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate,
+  TemplatePackagePropertyProvider
+}
 import com.intellij.psi.PsiDirectory
 
 /**

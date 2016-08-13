@@ -20,8 +20,16 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
-import org.apache.spark.sql.catalyst.util.{quoteIdentifier, ArrayData, GenericArrayData, MapData}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
+import org.apache.spark.sql.catalyst.util.{
+  quoteIdentifier,
+  ArrayData,
+  GenericArrayData,
+  MapData
+}
 import org.apache.spark.sql.types._
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,10 +96,10 @@ object ExtractValue {
     val ordinal = fields.indexWhere(checkField)
     if (ordinal == -1) {
       throw new AnalysisException(
-          s"No such struct field $fieldName in ${fields.map(_.name).mkString(", ")}")
+        s"No such struct field $fieldName in ${fields.map(_.name).mkString(", ")}")
     } else if (fields.indexWhere(checkField, ordinal + 1) != -1) {
       throw new AnalysisException(
-          s"Ambiguous reference to fields ${fields.filter(checkField).mkString(", ")}")
+        s"Ambiguous reference to fields ${fields.filter(checkField).mkString(", ")}")
     } else {
       ordinal
     }
@@ -108,9 +116,11 @@ trait ExtractValue extends Expression
   * Note that we can pass in the field name directly to keep case preserving in `toString`.
   * For example, when get field `yEAr` from `<year: int, month: int>`, we should pass in `yEAr`.
   */
-case class GetStructField(
-    child: Expression, ordinal: Int, name: Option[String] = None)
-    extends UnaryExpression with ExtractValue {
+case class GetStructField(child: Expression,
+                          ordinal: Int,
+                          name: Option[String] = None)
+    extends UnaryExpression
+    with ExtractValue {
 
   private[sql] lazy val childSchema = child.dataType.asInstanceOf[StructType]
 
@@ -121,30 +131,27 @@ case class GetStructField(
     s"$child.${name.getOrElse(childSchema(ordinal).name)}"
   override def sql: String =
     child.sql +
-    s".${quoteIdentifier(name.getOrElse(childSchema(ordinal).name))}"
+      s".${quoteIdentifier(name.getOrElse(childSchema(ordinal).name))}"
 
   protected override def nullSafeEval(input: Any): Any =
     input.asInstanceOf[InternalRow].get(ordinal, childSchema(ordinal).dataType)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        if (nullable) {
-                          s"""
+    nullSafeCodeGen(ctx, ev, eval => {
+      if (nullable) {
+        s"""
           if ($eval.isNullAt($ordinal)) {
             ${ev.isNull} = true;
           } else {
             ${ev.value} = ${ctx.getValue(eval, dataType, ordinal.toString)};
           }
         """
-                        } else {
-                          s"""
+      } else {
+        s"""
           ${ev.value} = ${ctx.getValue(eval, dataType, ordinal.toString)};
         """
-                        }
-                    })
+      }
+    })
   }
 }
 
@@ -159,7 +166,8 @@ case class GetArrayStructFields(child: Expression,
                                 ordinal: Int,
                                 numFields: Int,
                                 containsNull: Boolean)
-    extends UnaryExpression with ExtractValue {
+    extends UnaryExpression
+    with ExtractValue {
 
   override def dataType: DataType = ArrayType(field.dataType, containsNull)
   override def toString: String = s"$child.${field.name}"
@@ -188,15 +196,12 @@ case class GetArrayStructFields(child: Expression,
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val arrayClass = classOf[GenericArrayData].getName
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        val n = ctx.freshName("n")
-                        val values = ctx.freshName("values")
-                        val j = ctx.freshName("j")
-                        val row = ctx.freshName("row")
-                        s"""
+    nullSafeCodeGen(ctx, ev, eval => {
+      val n = ctx.freshName("n")
+      val values = ctx.freshName("values")
+      val j = ctx.freshName("j")
+      val row = ctx.freshName("row")
+      s"""
         final int $n = $eval.numElements();
         final Object[] $values = new Object[$n];
         for (int $j = 0; $j < $n; $j++) {
@@ -207,14 +212,14 @@ case class GetArrayStructFields(child: Expression,
             if ($row.isNullAt($ordinal)) {
               $values[$j] = null;
             } else {
-              $values[$j] = ${ctx.getValue(
-                            row, field.dataType, ordinal.toString)};
+              $values[$j] = ${ctx
+        .getValue(row, field.dataType, ordinal.toString)};
             }
           }
         }
         ${ev.value} = new $arrayClass($values);
       """
-                    })
+    })
   }
 }
 
@@ -224,7 +229,9 @@ case class GetArrayStructFields(child: Expression,
   * We need to do type checking here as `ordinal` expression maybe unresolved.
   */
 case class GetArrayItem(child: Expression, ordinal: Expression)
-    extends BinaryExpression with ExpectsInputTypes with ExtractValue {
+    extends BinaryExpression
+    with ExpectsInputTypes
+    with ExtractValue {
 
   // We have done type checking for child in `ExtractValue`, so only need to check the `ordinal`.
   override def inputTypes: Seq[AbstractDataType] =
@@ -254,12 +261,9 @@ case class GetArrayItem(child: Expression, ordinal: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2) =>
-                      {
-                        val index = ctx.freshName("index")
-                        s"""
+    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+      val index = ctx.freshName("index")
+      s"""
         final int $index = (int) $eval2;
         if ($index >= $eval1.numElements() || $index < 0 || $eval1.isNullAt($index)) {
           ${ev.isNull} = true;
@@ -267,7 +271,7 @@ case class GetArrayItem(child: Expression, ordinal: Expression)
           ${ev.value} = ${ctx.getValue(eval1, dataType, index)};
         }
       """
-                    })
+    })
   }
 }
 
@@ -277,7 +281,9 @@ case class GetArrayItem(child: Expression, ordinal: Expression)
   * We need to do type checking here as `key` expression maybe unresolved.
   */
 case class GetMapValue(child: Expression, key: Expression)
-    extends BinaryExpression with ExpectsInputTypes with ExtractValue {
+    extends BinaryExpression
+    with ExpectsInputTypes
+    with ExtractValue {
 
   private def keyType = child.dataType.asInstanceOf[MapType].keyType
 
@@ -327,11 +333,8 @@ case class GetMapValue(child: Expression, key: Expression)
     val found = ctx.freshName("found")
     val key = ctx.freshName("key")
     val values = ctx.freshName("values")
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2) =>
-                      {
-                        s"""
+    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+      s"""
         final int $length = $eval1.numElements();
         final ArrayData $keys = $eval1.keyArray();
         final ArrayData $values = $eval1.valueArray();
@@ -339,8 +342,8 @@ case class GetMapValue(child: Expression, key: Expression)
         int $index = 0;
         boolean $found = false;
         while ($index < $length && !$found) {
-          final ${ctx.javaType(keyType)} $key = ${ctx.getValue(
-                            keys, keyType, index)};
+          final ${ctx.javaType(keyType)} $key = ${ctx
+        .getValue(keys, keyType, index)};
           if (${ctx.genEqual(keyType, key, eval2)}) {
             $found = true;
           } else {
@@ -354,6 +357,6 @@ case class GetMapValue(child: Expression, key: Expression)
           ${ev.value} = ${ctx.getValue(values, dataType, index)};
         }
       """
-                    })
+    })
   }
 }

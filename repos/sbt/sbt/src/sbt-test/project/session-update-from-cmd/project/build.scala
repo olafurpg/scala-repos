@@ -11,10 +11,15 @@ object build extends Build {
   val UpdateK1 = Command.command("UpdateK1") { st: State =>
     val ex = Project extract st
     import ex._
-    val session2 = BuiltinCommands.setThis(st, ex, Seq(k1 := {}), """k1 := {
+    val session2 = BuiltinCommands
+      .setThis(st,
+               ex,
+               Seq(k1 := {}),
+               """k1 := {
     |//
     |//
-    |}""".stripMargin).session
+    |}""".stripMargin)
+      .session
     val st1 = BuiltinCommands.reapply(session2, structure, st)
     // SessionSettings.writeSettings(ex.currentRef, session2, ex.session.original, ex.structure)
     SessionSettings.saveAllSettings(st1)
@@ -24,7 +29,10 @@ object build extends Build {
     val ex = Project extract st
     import ex._
     val session2 = BuiltinCommands
-      .setThis(st, ex, Seq(k3 := {}), """k3 := {
+      .setThis(st,
+               ex,
+               Seq(k3 := {}),
+               """k3 := {
                                                                     |//
                                                                     |//
                                                                     |}""".stripMargin)

@@ -92,14 +92,14 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
       sql(s"set ${SQLConf.CASE_SENSITIVE.key}=10")
     }
     assert(
-        e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
+      e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
   }
 
   test("Test SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE's method") {
     sqlContext.conf.clear()
 
-    sqlContext.setConf(
-        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "100")
+    sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+                       "100")
     assert(sqlContext.conf.targetPostShuffleInputSize === 100)
 
     sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "1k")

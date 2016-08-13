@@ -36,7 +36,7 @@ object PendingRequestFilter {
     }
 
   val PendingRequestsLimitExceeded = new RejectedExecutionException(
-      "Pending request limit exceeded")
+    "Pending request limit exceeded")
 }
 
 /**
@@ -48,7 +48,7 @@ private[finagle] class PendingRequestFilter[Req, Rep](limit: Int)
 
   if (limit < 1)
     throw new IllegalArgumentException(
-        s"request limit must be greater than zero, saw $limit")
+      s"request limit must be greater than zero, saw $limit")
 
   private[this] val pending = new AtomicInteger(0)
   private[this] val decFn: Any => Unit = { _: Any =>

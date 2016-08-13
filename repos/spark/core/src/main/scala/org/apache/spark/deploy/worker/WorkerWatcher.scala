@@ -24,9 +24,11 @@ import org.apache.spark.rpc._
   * Actor which connects to a worker process and terminates the JVM if the connection is severed.
   * Provides fate sharing between a worker and its associated child processes.
   */
-private[spark] class WorkerWatcher(
-    override val rpcEnv: RpcEnv, workerUrl: String, isTesting: Boolean = false)
-    extends RpcEndpoint with Logging {
+private[spark] class WorkerWatcher(override val rpcEnv: RpcEnv,
+                                   workerUrl: String,
+                                   isTesting: Boolean = false)
+    extends RpcEndpoint
+    with Logging {
 
   logInfo(s"Connecting to worker $workerUrl")
   if (!isTesting) {
@@ -65,12 +67,12 @@ private[spark] class WorkerWatcher(
     }
   }
 
-  override def onNetworkError(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
+  override def onNetworkError(cause: Throwable,
+                              remoteAddress: RpcAddress): Unit = {
     if (isWorker(remoteAddress)) {
       // These logs may not be seen if the worker (and associated pipe) has died
       logError(
-          s"Could not initialize connection to worker $workerUrl. Exiting.")
+        s"Could not initialize connection to worker $workerUrl. Exiting.")
       logError(s"Error was: $cause")
       exitNonZero()
     }

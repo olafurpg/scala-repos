@@ -70,16 +70,17 @@ trait ServletFilterProvider extends Filter with HTTPProvider {
       LiftRules.reqCnt.incrementAndGet()
       try {
         TransientRequestVarHandler(
-            Empty, RequestVarHandler(Empty, (req, res) match {
-          case (httpReq: HttpServletRequest, httpRes: HttpServletResponse) =>
-            val httpRequest = new HTTPRequestServlet(httpReq, this)
-            val httpResponse = new HTTPResponseServlet(httpRes)
+          Empty,
+          RequestVarHandler(Empty, (req, res) match {
+            case (httpReq: HttpServletRequest, httpRes: HttpServletResponse) =>
+              val httpRequest = new HTTPRequestServlet(httpReq, this)
+              val httpResponse = new HTTPResponseServlet(httpRes)
 
-            handleLoanWrappers(service(httpRequest, httpResponse) {
-              chain.doFilter(req, res)
-            })
-          case _ => chain.doFilter(req, res)
-        }))
+              handleLoanWrappers(service(httpRequest, httpResponse) {
+                chain.doFilter(req, res)
+              })
+            case _ => chain.doFilter(req, res)
+          }))
       } finally { LiftRules.reqCnt.decrementAndGet() }
     }
   }

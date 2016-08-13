@@ -28,8 +28,7 @@ trait BinOpFrame {
   // ***************
 
   // Binary element-wise operation on one frame and one scalar
-  final class FrScEOp[
-      OP <: ScalarOp, X : ST : ORD, Y : ST : ORD, A, B, C : ST](
+  final class FrScEOp[OP <: ScalarOp, X: ST: ORD, Y: ST: ORD, A, B, C: ST](
       opv: BinOp[OP, Vec[A], B, Vec[C]])
       extends BinOp[OP, Frame[X, Y, A], B, Frame[X, Y, C]] {
     def apply(v1: Frame[X, Y, A], v2: B) = v1.mapVec(opv(_, v2))
@@ -102,7 +101,7 @@ trait BinOpFrame {
       opv: BinOp[Op, Vec[Int], Int, Vec[Int]]) =
     new FrScEOp[Op, X, Y, Int, Int, Int](opv)
 
-  // comparisons                                                                                                                                                                                    
+  // comparisons
   implicit def FrScEOpDDB[Op <: ScalarOp, X, Y](
       implicit cm: ST[X],
       cmp: ORD[X],
@@ -169,7 +168,7 @@ trait BinOpFrame {
       opv: BinOp[Op, Vec[Int], Int, Vec[Boolean]]) =
     new FrScEOp[Op, X, Y, Int, Int, Boolean](opv)
 
-  // and, or ops                                                                                                               
+  // and, or ops
   implicit def FrScEOpBBB[Op <: ScalarOp, X, Y](
       implicit cm: ST[X],
       cmp: ORD[X],
@@ -181,8 +180,7 @@ trait BinOpFrame {
   // ***************
 
   // Binary element-wise operation on two frames
-  final class FrFrEOp[
-      OP <: ScalarOp, X : ST : ORD, Y : ST : ORD, A, B : ST, C : ST](
+  final class FrFrEOp[OP <: ScalarOp, X: ST: ORD, Y: ST: ORD, A, B: ST, C: ST](
       opv: BinOp[OP, Vec[A], Vec[B], Vec[C]])
       extends BinOp[OP, Frame[X, Y, A], Frame[X, Y, B], Frame[X, Y, C]] {
     def apply(f1: Frame[X, Y, A], f2: Frame[X, Y, B]) = {

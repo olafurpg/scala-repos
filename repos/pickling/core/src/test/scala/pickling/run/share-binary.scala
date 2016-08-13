@@ -6,8 +6,10 @@ import scala.pickling._, scala.pickling.Defaults._, binary._
 
 import java.io.ByteArrayInputStream
 
-final class C(
-    val name: String, val desc: String, var c: C, val arr: Array[Int])
+final class C(val name: String,
+              val desc: String,
+              var c: C,
+              val arr: Array[Int])
 case class Outer(a: Array[Simple])
 
 final class Simple(x: Int) {

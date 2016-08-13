@@ -19,7 +19,9 @@ class AppStartActor(val driver: SchedulerDriver,
                     val app: AppDefinition,
                     val scaleTo: Int,
                     promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+    extends Actor
+    with ActorLogging
+    with StartingBehavior {
 
   val nrToStart: Int = scaleTo
 
@@ -31,7 +33,7 @@ class AppStartActor(val driver: SchedulerDriver,
     eventBus.unsubscribe(self)
     if (!promise.isCompleted) {
       if (promise.tryFailure(new AppStartCanceledException(
-                  "The app start has been cancelled"))) {
+            "The app start has been cancelled"))) {
         scheduler
           .stopApp(driver, app)
           .onFailure {

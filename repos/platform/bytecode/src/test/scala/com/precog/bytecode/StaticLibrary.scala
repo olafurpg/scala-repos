@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -22,33 +22,33 @@ package com.precog.bytecode
 trait StaticLibrary extends Library {
 
   lazy val libReduction = Set(
-      Reduction(Vector(), "count", 0x2000),
-      Reduction(Vector(), "max", 0x2001),
-      Reduction(Vector(), "min", 0x2004),
-      Reduction(Vector(), "sum", 0x2002),
-      Reduction(Vector(), "mean", 0x2013),
-      Reduction(Vector(), "geometricMean", 0x2003),
-      Reduction(Vector(), "sumSq", 0x2005),
-      Reduction(Vector(), "variance", 0x2006),
-      Reduction(Vector(), "stdDev", 0x2007),
-      Reduction(Vector(), "median", 0x2008),
-      Reduction(Vector(), "mode", 0x2009),
-      Reduction(Vector(), "exists", 0x2010),
-      Reduction(Vector(), "forall", 0x2011),
-      Reduction(Vector("std", "lib"), "sum", 0x0010),
-      Reduction(Vector("ack"), "ook", 0x0011),
-      Reduction(Vector("one", "two", "three"), "qnd", 0x0012))
+    Reduction(Vector(), "count", 0x2000),
+    Reduction(Vector(), "max", 0x2001),
+    Reduction(Vector(), "min", 0x2004),
+    Reduction(Vector(), "sum", 0x2002),
+    Reduction(Vector(), "mean", 0x2013),
+    Reduction(Vector(), "geometricMean", 0x2003),
+    Reduction(Vector(), "sumSq", 0x2005),
+    Reduction(Vector(), "variance", 0x2006),
+    Reduction(Vector(), "stdDev", 0x2007),
+    Reduction(Vector(), "median", 0x2008),
+    Reduction(Vector(), "mode", 0x2009),
+    Reduction(Vector(), "exists", 0x2010),
+    Reduction(Vector(), "forall", 0x2011),
+    Reduction(Vector("std", "lib"), "sum", 0x0010),
+    Reduction(Vector("ack"), "ook", 0x0011),
+    Reduction(Vector("one", "two", "three"), "qnd", 0x0012))
 
   lazy val lib1 = Set(
-      Op1(Vector(), "bin", 0x0000),
-      Op1(Vector("std"), "bin", 0x0001),
-      Op1(Vector("std"), "lib", 0x0004), // weird shadowing ahoy!
-      Op1(Vector(), "bar", 0x0002),
-      Op1(Vector("std", "lib"), "baz", 0x0003),
-      Op1(Vector("std", "math"), "floor", 0x0005),
-      Op1(Vector("std", "time"), "minuteOfHour", 0x0010),
-      Op1(Vector("std", "time"), "hourOfDay", 0x0012),
-      Op1(Vector("std", "time"), "getMillis", 0x0014))
+    Op1(Vector(), "bin", 0x0000),
+    Op1(Vector("std"), "bin", 0x0001),
+    Op1(Vector("std"), "lib", 0x0004), // weird shadowing ahoy!
+    Op1(Vector(), "bar", 0x0002),
+    Op1(Vector("std", "lib"), "baz", 0x0003),
+    Op1(Vector("std", "math"), "floor", 0x0005),
+    Op1(Vector("std", "time"), "minuteOfHour", 0x0010),
+    Op1(Vector("std", "time"), "hourOfDay", 0x0012),
+    Op1(Vector("std", "time"), "getMillis", 0x0014))
 
   lazy val lib2 = Set(Op2(Vector(), "bin2", 0x0000),
                       Op2(Vector("std"), "bin2", 0x0001),
@@ -99,8 +99,8 @@ trait StaticLibrary extends Library {
   }
 
   object M1Product extends Morphism1(Vector(), "bin8", 0x0339) {
-    override val idPolicy = IdentityPolicy.Product(
-        IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
+    override val idPolicy = IdentityPolicy
+      .Product(IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
   }
 
   object M2RetainMerge extends Morphism2(Vector(), "bin9", 0x1000) {
@@ -128,8 +128,8 @@ trait StaticLibrary extends Library {
   }
 
   object M2Product extends Morphism2(Vector(), "bin12", 0x1339) {
-    override val idPolicy = IdentityPolicy.Product(
-        IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
+    override val idPolicy = IdentityPolicy
+      .Product(IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
   }
 
   object M11 extends Morphism1(Vector("std", "random"), "foobar", 0x0006) {
@@ -144,26 +144,29 @@ trait StaticLibrary extends Library {
 
   case class Morphism2(namespace: Vector[String], name: String, opcode: Int)
       extends Morphism2Like {
-    val tpe = BinaryOperationType(
-        JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
+    val tpe =
+      BinaryOperationType(JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
   }
 
   case class Op1(namespace: Vector[String], name: String, opcode: Int)
-      extends Op1Like with Morphism1Like {
+      extends Op1Like
+      with Morphism1Like {
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
   }
 
   case class Op2(namespace: Vector[String], name: String, opcode: Int)
-      extends Op2Like with Morphism2Like {
-    val tpe = BinaryOperationType(
-        JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
+      extends Op2Like
+      with Morphism2Like {
+    val tpe =
+      BinaryOperationType(JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
   }
 
   case class Reduction(namespace: Vector[String], name: String, opcode: Int)
-      extends ReductionLike with Morphism1Like {
+      extends ReductionLike
+      with Morphism1Like {
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
   }

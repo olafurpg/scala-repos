@@ -9,8 +9,8 @@ import MediaTypes._
 
 private[parser] trait CommonActions {
 
-  type StringMapBuilder = scala.collection.mutable.Builder[
-      (String, String), Map[String, String]]
+  type StringMapBuilder =
+    scala.collection.mutable.Builder[(String, String), Map[String, String]]
 
   def getMediaType(mainType: String,
                    subType: String,

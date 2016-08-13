@@ -70,21 +70,21 @@ object BijectionsTest {
   }
 
   val arbNettyMethod = Gen.oneOf(
-      HttpMethod.GET,
-      HttpMethod.POST
+    HttpMethod.GET,
+    HttpMethod.POST
   )
 
   val arbNettyStatus = Gen.oneOf(
-      HttpResponseStatus.OK,
-      HttpResponseStatus.BAD_REQUEST,
-      HttpResponseStatus.SERVICE_UNAVAILABLE,
-      HttpResponseStatus.GATEWAY_TIMEOUT
+    HttpResponseStatus.OK,
+    HttpResponseStatus.BAD_REQUEST,
+    HttpResponseStatus.SERVICE_UNAVAILABLE,
+    HttpResponseStatus.GATEWAY_TIMEOUT
   )
 
   val arbNettyVersion = Gen.oneOf(
-      HttpVersion.HTTP_1_0,
-      HttpVersion.HTTP_1_1,
-      new HttpVersion("SECURE-HTTP/1.4", true)
+    HttpVersion.HTTP_1_0,
+    HttpVersion.HTTP_1_1,
+    new HttpVersion("SECURE-HTTP/1.4", true)
   )
 
   val arbNettyRequest = for {
@@ -97,12 +97,12 @@ object BijectionsTest {
     val headers = new DefaultHttpHeaders()
     kvHeaders.foreach { case (k, v) => headers.add(k, v) }
     val req = new DefaultFullHttpRequest(
-        version,
-        method,
-        uri,
-        Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
-        headers,
-        EmptyHttpHeaders.INSTANCE
+      version,
+      method,
+      uri,
+      Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
+      headers,
+      EmptyHttpHeaders.INSTANCE
     )
     (req, body)
   }
@@ -117,11 +117,11 @@ object BijectionsTest {
     val headers = new DefaultHttpHeaders
     kvHeaders.foreach { case (k, v) => headers.add(k, v) }
     val req = new DefaultFullHttpResponse(
-        version,
-        status,
-        Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
-        headers,
-        EmptyHttpHeaders.INSTANCE
+      version,
+      status,
+      Unpooled.wrappedBuffer(body.getBytes(UTF_8)),
+      headers,
+      EmptyHttpHeaders.INSTANCE
     )
     (req, body)
   }
@@ -138,13 +138,14 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
         assert(out.getUri == in.uri)
         assert(out.isChunked == false)
         assert(out.contentString == body)
-        assert(out.version == Bijections.netty.versionToFinagle(
-                in.protocolVersion))
+        assert(
+          out.version == Bijections.netty.versionToFinagle(in.protocolVersion))
         out.headerMap.foreach {
           case (k, v) =>
-            assert(in.headers.getAll(k).asScala.toSet == out.headerMap
-                  .getAll(k)
-                  .toSet)
+            assert(
+              in.headers.getAll(k).asScala.toSet == out.headerMap
+                .getAll(k)
+                .toSet)
         }
     }
   }
@@ -156,13 +157,14 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
         assert(out.statusCode == in.status.code)
         assert(out.isChunked == false)
         assert(out.contentString == body)
-        assert(out.version == Bijections.netty.versionToFinagle(
-                in.protocolVersion))
+        assert(
+          out.version == Bijections.netty.versionToFinagle(in.protocolVersion))
         out.headerMap.foreach {
           case (k, v) =>
-            assert(in.headers.getAll(k).asScala.toSet == out.headerMap
-                  .getAll(k)
-                  .toSet)
+            assert(
+              in.headers.getAll(k).asScala.toSet == out.headerMap
+                .getAll(k)
+                .toSet)
         }
     }
   }
@@ -172,14 +174,15 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
       case (in: Response, body: String) =>
         val out = Bijections.finagle.responseToNetty(in)
         assert(HttpUtil.isTransferEncodingChunked(out) == false)
-        assert(out.protocolVersion == Bijections.finagle.versionToNetty(
-                in.version))
+        assert(
+          out.protocolVersion == Bijections.finagle.versionToNetty(in.version))
         assert(out.content.toString(UTF_8) == body)
         in.headerMap.foreach {
           case (k, v) =>
-            assert(out.headers.getAll(k).asScala.toSet == in.headerMap
-                  .getAll(k)
-                  .toSet)
+            assert(
+              out.headers.getAll(k).asScala.toSet == in.headerMap
+                .getAll(k)
+                .toSet)
         }
     }
   }
@@ -189,16 +192,17 @@ class BijectionsTest extends FunSuite with GeneratorDrivenPropertyChecks {
       case (in: Request, body: String) =>
         val out = Bijections.finagle.requestToNetty(in)
         assert(HttpUtil.isTransferEncodingChunked(out) == false)
-        assert(out.protocolVersion == Bijections.finagle.versionToNetty(
-                in.version))
+        assert(
+          out.protocolVersion == Bijections.finagle.versionToNetty(in.version))
         assert(out.method == Bijections.finagle.methodToNetty(in.method))
         assert(out.uri == in.getUri)
         assert(out.content.toString(UTF_8) == body)
         in.headerMap.foreach {
           case (k, v) =>
-            assert(out.headers.getAll(k).asScala.toSet == in.headerMap
-                  .getAll(k)
-                  .toSet)
+            assert(
+              out.headers.getAll(k).asScala.toSet == in.headerMap
+                .getAll(k)
+                .toSet)
         }
     }
   }

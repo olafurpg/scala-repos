@@ -26,7 +26,12 @@
  */
 package scalafx.animation
 
-import javafx.{animation => jfxa, geometry => jfxg, scene => jfxs, util => jfxu}
+import javafx.{
+  animation => jfxa,
+  geometry => jfxg,
+  scene => jfxs,
+  util => jfxu
+}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
@@ -68,7 +73,8 @@ object RotateTransition extends AnimationStatics {
   */
 class RotateTransition(
     override val delegate: jfxa.RotateTransition = new jfxa.RotateTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.RotateTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.RotateTransition] {
 
   // CONSTRUCTOR
 

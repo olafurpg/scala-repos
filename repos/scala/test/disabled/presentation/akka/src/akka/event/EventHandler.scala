@@ -99,7 +99,7 @@ object EventHandler extends ListenerManagement {
     case "DEBUG" => DebugLevel
     case unknown =>
       throw new ConfigurationException(
-          "Configuration option 'akka.event-handler-level' is invalid [" +
+        "Configuration option 'akka.event-handler-level' is invalid [" +
           unknown + "]")
   }
 
@@ -117,7 +117,7 @@ object EventHandler extends ListenerManagement {
     } else notifyListeners(event)
   }
 
-  def notify[T <: Event : ClassTag](event: => T) {
+  def notify[T <: Event: ClassTag](event: => T) {
     if (level >= levelFor(classTag[T].erasure.asInstanceOf[Class[_ <: Event]]))
       notifyListeners(event)
   }
@@ -192,29 +192,29 @@ object EventHandler extends ListenerManagement {
     def receive = {
       case event @ Error(cause, instance, message) =>
         println(
-            error.format(formattedTimestamp,
-                         event.thread.getName,
-                         instance.getClass.getSimpleName,
-                         message,
-                         stackTraceFor(cause)))
+          error.format(formattedTimestamp,
+                       event.thread.getName,
+                       instance.getClass.getSimpleName,
+                       message,
+                       stackTraceFor(cause)))
       case event @ Warning(instance, message) =>
         println(
-            warning.format(formattedTimestamp,
-                           event.thread.getName,
-                           instance.getClass.getSimpleName,
-                           message))
-      case event @ Info(instance, message) =>
-        println(
-            info.format(formattedTimestamp,
-                        event.thread.getName,
-                        instance.getClass.getSimpleName,
-                        message))
-      case event @ Debug(instance, message) =>
-        println(
-            debug.format(formattedTimestamp,
+          warning.format(formattedTimestamp,
                          event.thread.getName,
                          instance.getClass.getSimpleName,
                          message))
+      case event @ Info(instance, message) =>
+        println(
+          info.format(formattedTimestamp,
+                      event.thread.getName,
+                      instance.getClass.getSimpleName,
+                      message))
+      case event @ Debug(instance, message) =>
+        println(
+          debug.format(formattedTimestamp,
+                       event.thread.getName,
+                       instance.getClass.getSimpleName,
+                       message))
       case event =>
         println(generic.format(formattedTimestamp, event.toString))
     }
@@ -234,9 +234,9 @@ object EventHandler extends ListenerManagement {
     } catch {
       case e: Exception =>
         throw new ConfigurationException(
-            "Event Handler specified in config can't be loaded [" +
+          "Event Handler specified in config can't be loaded [" +
             listenerName + "] due to [" + e.toString + "]",
-            e)
+          e)
     }
   }
 }

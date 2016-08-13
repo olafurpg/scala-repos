@@ -29,7 +29,13 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.configuration.Algo._
 import org.apache.spark.mllib.tree.configuration.QuantileStrategy._
 import org.apache.spark.mllib.tree.configuration.Strategy
-import org.apache.spark.mllib.tree.impl.{BaggedPoint, DecisionTreeMetadata, NodeIdCache, TimeTracker, TreePoint}
+import org.apache.spark.mllib.tree.impl.{
+  BaggedPoint,
+  DecisionTreeMetadata,
+  NodeIdCache,
+  TimeTracker,
+  TreePoint
+}
 import org.apache.spark.mllib.tree.impurity.Impurities
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd.RDD
@@ -68,7 +74,8 @@ private class RandomForest(private val strategy: Strategy,
                            private val numTrees: Int,
                            featureSubsetStrategy: String,
                            private val seed: Int)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /*
      ALGORITHM
@@ -113,12 +120,12 @@ private class RandomForest(private val strategy: Strategy,
 
   strategy.assertValid()
   require(
-      numTrees > 0,
-      s"RandomForest requires numTrees > 0, but was given numTrees = $numTrees.")
+    numTrees > 0,
+    s"RandomForest requires numTrees > 0, but was given numTrees = $numTrees.")
   require(
-      RandomForest.supportedFeatureSubsetStrategies
-        .contains(featureSubsetStrategy),
-      s"RandomForest given invalid featureSubsetStrategy: $featureSubsetStrategy." +
+    RandomForest.supportedFeatureSubsetStrategies.contains(
+      featureSubsetStrategy),
+    s"RandomForest given invalid featureSubsetStrategy: $featureSubsetStrategy." +
       s" Supported values: ${RandomForest.supportedFeatureSubsetStrategies.mkString(", ")}.")
 
   /**
@@ -136,8 +143,8 @@ private class RandomForest(private val strategy: Strategy,
     timer.start("init")
 
     val retaggedInput = input.retag(classOf[LabeledPoint])
-    val metadata = DecisionTreeMetadata.buildMetadata(
-        retaggedInput, strategy, numTrees, featureSubsetStrategy)
+    val metadata = DecisionTreeMetadata
+      .buildMetadata(retaggedInput, strategy, numTrees, featureSubsetStrategy)
     logDebug("algo = " + strategy.algo)
     logDebug("numTrees = " + numTrees)
     logDebug("seed = " + seed)
@@ -152,8 +159,7 @@ private class RandomForest(private val strategy: Strategy,
     val (splits, bins) = DecisionTree.findSplitsBins(retaggedInput, metadata)
     timer.stop("findSplitsBins")
     logDebug("numBins: feature: number of bins")
-    logDebug(
-        Range(0, metadata.numFeatures).map { featureIndex =>
+    logDebug(Range(0, metadata.numFeatures).map { featureIndex =>
       s"\t$featureIndex\t${metadata.numBins(featureIndex)}"
     }.mkString("\n"))
 
@@ -174,8 +180,8 @@ private class RandomForest(private val strategy: Strategy,
     // depth of the decision tree
     val maxDepth = strategy.maxDepth
     require(
-        maxDepth <= 30,
-        s"DecisionTree currently only supports maxDepth <= 30, but was given maxDepth = $maxDepth.")
+      maxDepth <= 30,
+      s"DecisionTree currently only supports maxDepth <= 30, but was given maxDepth = $maxDepth.")
 
     // Max memory usage for aggregates
     // TODO: Calculate memory usage more precisely.
@@ -186,18 +192,18 @@ private class RandomForest(private val strategy: Strategy,
         if (metadata.subsamplingFeatures) {
           // Find numFeaturesPerNode largest bins to get an upper bound on memory usage.
           Some(
-              metadata.numBins.zipWithIndex
-                .sortBy(-_._1)
-                .take(metadata.numFeaturesPerNode)
-                .map(_._2))
+            metadata.numBins.zipWithIndex
+              .sortBy(-_._1)
+              .take(metadata.numFeaturesPerNode)
+              .map(_._2))
         } else {
           None
         }
       RandomForest.aggregateSizeForNode(metadata, featureSubset) * 8L
     }
     require(
-        maxMemoryPerNode <= maxMemoryUsage,
-        s"RandomForest/DecisionTree given maxMemoryInMB = ${strategy.maxMemoryInMB}," +
+      maxMemoryPerNode <= maxMemoryUsage,
+      s"RandomForest/DecisionTree given maxMemoryInMB = ${strategy.maxMemoryInMB}," +
         " which is too small for the given features." +
         s"  Minimum value = ${maxMemoryPerNode / (1024L * 1024L)}")
 
@@ -215,10 +221,10 @@ private class RandomForest(private val strategy: Strategy,
     val nodeIdCache =
       if (strategy.useNodeIdCache) {
         Some(
-            NodeIdCache.init(data = baggedInput,
-                             numTrees = numTrees,
-                             checkpointInterval = strategy.checkpointInterval,
-                             initVal = 1))
+          NodeIdCache.init(data = baggedInput,
+                           numTrees = numTrees,
+                           checkpointInterval = strategy.checkpointInterval,
+                           initVal = 1))
       } else {
         None
       }
@@ -232,19 +238,19 @@ private class RandomForest(private val strategy: Strategy,
     // Allocate and queue root nodes.
     val topNodes: Array[Node] =
       Array.fill[Node](numTrees)(Node.emptyNode(nodeIndex = 1))
-    Range(0, numTrees).foreach(
-        treeIndex => nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
+    Range(0, numTrees).foreach(treeIndex =>
+      nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
 
     while (nodeQueue.nonEmpty) {
       // Collect some nodes to split, and choose features for each node (if subsampling).
       // Each group of nodes may come from one or multiple trees, and at multiple levels.
       val (nodesForGroup, treeToNodeToIndexInfo) =
-        RandomForest.selectNodesToSplit(
-            nodeQueue, maxMemoryUsage, metadata, rng)
+        RandomForest
+          .selectNodesToSplit(nodeQueue, maxMemoryUsage, metadata, rng)
       // Sanity check (should never occur):
       assert(
-          nodesForGroup.size > 0,
-          s"RandomForest selected empty nodesForGroup.  Error for unknown reason.")
+        nodesForGroup.size > 0,
+        s"RandomForest selected empty nodesForGroup.  Error for unknown reason.")
 
       // Choose node splits, and enqueue new nodes as needed.
       timer.start("findBestSplits")
@@ -275,7 +281,7 @@ private class RandomForest(private val strategy: Strategy,
       } catch {
         case e: IOException =>
           logWarning(
-              s"delete all checkpoints failed. Error reason: ${e.getMessage}")
+            s"delete all checkpoints failed. Error reason: ${e.getMessage}")
       }
     }
 
@@ -310,8 +316,8 @@ object RandomForest extends Serializable with Logging {
                       featureSubsetStrategy: String,
                       seed: Int): RandomForestModel = {
     require(
-        strategy.algo == Classification,
-        s"RandomForest.trainClassifier given Strategy with invalid algo: ${strategy.algo}")
+      strategy.algo == Classification,
+      s"RandomForest.trainClassifier given Strategy with invalid algo: ${strategy.algo}")
     val rf = new RandomForest(strategy, numTrees, featureSubsetStrategy, seed)
     rf.run(input)
   }
@@ -367,16 +373,17 @@ object RandomForest extends Serializable with Logging {
     * Java-friendly API for [[org.apache.spark.mllib.tree.RandomForest$#trainClassifier]]
     */
   @Since("1.2.0")
-  def trainClassifier(input: JavaRDD[LabeledPoint],
-                      numClasses: Int,
-                      categoricalFeaturesInfo: java.util.Map[
-                          java.lang.Integer, java.lang.Integer],
-                      numTrees: Int,
-                      featureSubsetStrategy: String,
-                      impurity: String,
-                      maxDepth: Int,
-                      maxBins: Int,
-                      seed: Int): RandomForestModel = {
+  def trainClassifier(
+      input: JavaRDD[LabeledPoint],
+      numClasses: Int,
+      categoricalFeaturesInfo: java.util.Map[java.lang.Integer,
+                                             java.lang.Integer],
+      numTrees: Int,
+      featureSubsetStrategy: String,
+      impurity: String,
+      maxDepth: Int,
+      maxBins: Int,
+      seed: Int): RandomForestModel = {
     trainClassifier(input.rdd,
                     numClasses,
                     categoricalFeaturesInfo
@@ -413,8 +420,8 @@ object RandomForest extends Serializable with Logging {
                      featureSubsetStrategy: String,
                      seed: Int): RandomForestModel = {
     require(
-        strategy.algo == Regression,
-        s"RandomForest.trainRegressor given Strategy with invalid algo: ${strategy.algo}")
+      strategy.algo == Regression,
+      s"RandomForest.trainRegressor given Strategy with invalid algo: ${strategy.algo}")
     val rf = new RandomForest(strategy, numTrees, featureSubsetStrategy, seed)
     rf.run(input)
   }
@@ -468,8 +475,8 @@ object RandomForest extends Serializable with Logging {
     */
   @Since("1.2.0")
   def trainRegressor(input: JavaRDD[LabeledPoint],
-                     categoricalFeaturesInfo: java.util.Map[
-                         java.lang.Integer, java.lang.Integer],
+                     categoricalFeaturesInfo: java.util.Map[java.lang.Integer,
+                                                            java.lang.Integer],
                      numTrees: Int,
                      featureSubsetStrategy: String,
                      impurity: String,
@@ -493,11 +500,11 @@ object RandomForest extends Serializable with Logging {
     * List of supported feature subset sampling strategies.
     */
   @Since("1.2.0")
-  val supportedFeatureSubsetStrategies: Array[String] = Array(
-      "auto", "all", "sqrt", "log2", "onethird")
+  val supportedFeatureSubsetStrategies: Array[String] =
+    Array("auto", "all", "sqrt", "log2", "onethird")
 
-  private[tree] class NodeIndexInfo(
-      val nodeIndexInGroup: Int, val featureSubset: Option[Array[Int]])
+  private[tree] class NodeIndexInfo(val nodeIndexInGroup: Int,
+                                    val featureSubset: Option[Array[Int]])
       extends Serializable
 
   /**
@@ -536,12 +543,11 @@ object RandomForest extends Serializable with Logging {
       val featureSubset: Option[Array[Int]] =
         if (metadata.subsamplingFeatures) {
           Some(
-              SamplingUtils
-                .reservoirSampleAndCount(
-                    Range(0, metadata.numFeatures).iterator,
-                    metadata.numFeaturesPerNode,
-                    rng.nextLong)
-                ._1)
+            SamplingUtils
+              .reservoirSampleAndCount(Range(0, metadata.numFeatures).iterator,
+                                       metadata.numFeaturesPerNode,
+                                       rng.nextLong)
+              ._1)
         } else {
           None
         }
@@ -550,13 +556,12 @@ object RandomForest extends Serializable with Logging {
         RandomForest.aggregateSizeForNode(metadata, featureSubset) * 8L
       if (memUsage + nodeMemUsage <= maxMemoryUsage) {
         nodeQueue.dequeue()
-        mutableNodesForGroup.getOrElseUpdate(
-            treeIndex, new mutable.ArrayBuffer[Node]()) += node
-        mutableTreeToNodeToIndexInfo.getOrElseUpdate(treeIndex,
-                                                     new mutable.HashMap[
-                                                         Int,
-                                                         NodeIndexInfo]())(
-            node.id) = new NodeIndexInfo(numNodesInGroup, featureSubset)
+        mutableNodesForGroup
+          .getOrElseUpdate(treeIndex, new mutable.ArrayBuffer[Node]()) += node
+        mutableTreeToNodeToIndexInfo.getOrElseUpdate(
+          treeIndex,
+          new mutable.HashMap[Int, NodeIndexInfo]())(node.id) =
+          new NodeIndexInfo(numNodesInGroup, featureSubset)
       }
       numNodesInGroup += 1
       memUsage += nodeMemUsage
@@ -564,10 +569,9 @@ object RandomForest extends Serializable with Logging {
     // Convert mutable maps to immutable ones.
     val nodesForGroup: Map[Int, Array[Node]] =
       mutableNodesForGroup.mapValues(_.toArray).toMap
-    val treeToNodeToIndexInfo = mutableTreeToNodeToIndexInfo
-      .mapValues(_.toMap)
-      .toMap
-      (nodesForGroup, treeToNodeToIndexInfo)
+    val treeToNodeToIndexInfo =
+      mutableTreeToNodeToIndexInfo.mapValues(_.toMap).toMap
+    (nodesForGroup, treeToNodeToIndexInfo)
   }
 
   /**

@@ -19,7 +19,8 @@ import akka.dispatch.Mapper
 class CamelMessage(val body: Any,
                    val headers: Map[String, Any],
                    val attachments: Map[String, DataHandler])
-    extends Serializable with Product {
+    extends Serializable
+    with Product {
   def this(body: Any, headers: JMap[String, Any]) =
     this(body, headers.toMap, Map.empty[String, DataHandler]) //Java
   def this(body: Any,
@@ -70,16 +71,14 @@ class CamelMessage(val body: Any,
     * using the `getCamelContext` method, and is available on the [[akka.camel.CamelExtension]].
     *
     */
-  def headerAs[T](name: String)(
-      implicit t: ClassTag[T], camelContext: CamelContext): Try[T] =
+  def headerAs[T](name: String)(implicit t: ClassTag[T],
+                                camelContext: CamelContext): Try[T] =
     Try(
-        headers
-          .get(name)
-          .map(camelContext.getTypeConverter.mandatoryConvertTo[T](t.runtimeClass
-                                                                     .asInstanceOf[Class[
-                                                                           T]],
-                                                                   _))
-          .getOrElse(throw new NoSuchElementException(name)))
+      headers
+        .get(name)
+        .map(camelContext.getTypeConverter
+          .mandatoryConvertTo[T](t.runtimeClass.asInstanceOf[Class[T]], _))
+        .getOrElse(throw new NoSuchElementException(name)))
 
   /**
     * Java API: Returns the header by given <code>name</code> parameter. The header is  converted to type <code>T</code> as defined by the <code>clazz</code> parameter.
@@ -88,8 +87,9 @@ class CamelMessage(val body: Any,
     * The CamelContext is accessible in a [[akka.camel.javaapi.UntypedConsumerActor]] and [[akka.camel.javaapi.UntypedProducerActor]]
     * using the `getCamelContext` method, and is available on the [[akka.camel.CamelExtension]].
     */
-  def getHeaderAs[T](
-      name: String, clazz: Class[T], camelContext: CamelContext): T =
+  def getHeaderAs[T](name: String,
+                     clazz: Class[T],
+                     camelContext: CamelContext): T =
     headerAs[T](name)(ClassTag(clazz), camelContext).get
 
   /**
@@ -150,8 +150,8 @@ class CamelMessage(val body: Any,
     * The CamelContext is accessible in a [[akka.camel.javaapi.UntypedConsumerActor]] and [[akka.camel.javaapi.UntypedProducerActor]]
     * using the `getCamelContext` method, and is available on the [[akka.camel.CamelExtension]].
     */
-  def withBodyAs[T](
-      implicit t: ClassTag[T], camelContext: CamelContext): CamelMessage =
+  def withBodyAs[T](implicit t: ClassTag[T],
+                    camelContext: CamelContext): CamelMessage =
     withBodyAs(t.runtimeClass.asInstanceOf[Class[T]])
 
   /**
@@ -204,7 +204,7 @@ class CamelMessage(val body: Any,
     that match {
       case that: CamelMessage if canEqual(that) ⇒
         this.body == that.body && this.headers == that.headers &&
-        this.attachments == that.attachments
+          this.attachments == that.attachments
       case _ ⇒ false
     }
 
@@ -287,8 +287,8 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
     * @param headers additional headers to set on the created CamelMessage in addition to those
     *                in the Camel message.
     */
-  private[camel] def from(
-      camelMessage: JCamelMessage, headers: Map[String, Any]): CamelMessage =
+  private[camel] def from(camelMessage: JCamelMessage,
+                          headers: Map[String, Any]): CamelMessage =
     CamelMessage(camelMessage.getBody,
                  headers ++ camelMessage.getHeaders,
                  camelMessage.getAttachments.toMap)
@@ -315,8 +315,8 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
     */
   private[camel] def copyContent(from: CamelMessage, to: JCamelMessage): Unit = {
     to.setBody(from.body)
-    for ((name, value) ← from.headers) to.getHeaders.put(
-        name, value.asInstanceOf[AnyRef])
+    for ((name, value) ← from.headers)
+      to.getHeaders.put(name, value.asInstanceOf[AnyRef])
     to.getAttachments.putAll(from.getAttachments)
   }
 }
@@ -336,8 +336,8 @@ case object Ack {
   * It contains the failure cause obtained from Exchange.getException and the headers from either the Exchange.getIn
   * message or Exchange.getOut message, depending on the exchange pattern.
   */
-class AkkaCamelException private[akka](
-    cause: Throwable, val headers: Map[String, Any])
+class AkkaCamelException private[akka] (cause: Throwable,
+                                        val headers: Map[String, Any])
     extends AkkaException(cause.getMessage, cause) {
   def this(cause: Throwable) = this(cause, Map.empty)
 }

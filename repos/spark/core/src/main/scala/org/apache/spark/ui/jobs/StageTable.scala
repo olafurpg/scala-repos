@@ -61,8 +61,8 @@ private[ui] class StageTableBase(stages: Seq[StageInfo],
   }
 
   /** Special table that merges two header cells. */
-  protected def stageTable[T](
-      makeRow: T => Seq[Node], rows: Seq[T]): Seq[Node] = {
+  protected def stageTable[T](makeRow: T => Seq[Node],
+                              rows: Seq[T]): Seq[Node] = {
     <table class="table table-bordered table-striped table-condensed sortable">
       <thead>{columns}</thead>
       <tbody>
@@ -78,7 +78,7 @@ private[ui] class StageTableBase(stages: Seq[StageInfo],
       if (killEnabled) {
         val confirm =
           s"if (window.confirm('Are you sure you want to kill stage ${s.stageId} ?')) " +
-          "{ this.parentNode.submit(); return true; } else { return false; }"
+            "{ this.parentNode.submit(); return true; } else { return false; }"
         // SPARK-6846 this should be POST-only but YARN AM won't proxy POST
         /*
       val killLinkUri = s"$basePathUri/stages/stage/kill/"
@@ -127,13 +127,13 @@ private[ui] class StageTableBase(stages: Seq[StageInfo],
     <td>{stageId}</td> ++ {
       if (isFairScheduler) { <td>-</td> } else Seq.empty
     } ++ <td>No data available for this stage</td> ++ // Description
-    <td></td> ++ // Submitted
-    <td></td> ++ // Duration
-    <td></td> ++ // Tasks: Succeeded/Total
-    <td></td> ++ // Input
-    <td></td> ++ // Output
-    <td></td> ++ // Shuffle Read
-    <td></td> // Shuffle Write
+      <td></td> ++ // Submitted
+      <td></td> ++ // Duration
+      <td></td> ++ // Tasks: Succeeded/Total
+      <td></td> ++ // Input
+      <td></td> ++ // Output
+      <td></td> ++ // Shuffle Read
+      <td></td> // Shuffle Write
   }
 
   protected def stageRow(s: StageInfo): Seq[Node] = {
@@ -222,8 +222,11 @@ private[ui] class FailedStageTable(stages: Seq[StageInfo],
                                    basePath: String,
                                    listener: JobProgressListener,
                                    isFairScheduler: Boolean)
-    extends StageTableBase(
-        stages, basePath, listener, isFairScheduler, killEnabled = false) {
+    extends StageTableBase(stages,
+                           basePath,
+                           listener,
+                           isFairScheduler,
+                           killEnabled = false) {
 
   override protected def columns: Seq[Node] =
     super.columns ++ <th>Failure Reason</th>
@@ -233,8 +236,7 @@ private[ui] class FailedStageTable(stages: Seq[StageInfo],
     val failureReason = s.failureReason.getOrElse("")
     val isMultiline = failureReason.indexOf('\n') >= 0
     // Display the first line by default
-    val failureReasonSummary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val failureReasonSummary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       failureReason.substring(0, failureReason.indexOf('\n'))
     } else {
       failureReason

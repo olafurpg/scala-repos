@@ -54,10 +54,10 @@ class SourceMapTest {
           e.getFileName.replace('\\', '/')
 
         val trace0 = e.getStackTrace.toList
-        val trace1 = trace0.dropWhile(normFileName(_).endsWith(
-                "/scala/scalajs/runtime/StackTrace.scala"))
+        val trace1 = trace0.dropWhile(
+          normFileName(_).endsWith("/scala/scalajs/runtime/StackTrace.scala"))
         val trace2 = trace1.dropWhile(
-            normFileName(_).endsWith("/java/lang/Throwables.scala"))
+          normFileName(_).endsWith("/java/lang/Throwables.scala"))
 
         val topSte = trace2.head
         assertTrue(normFileName(topSte).contains("/SourceMapTest.scala"))
@@ -185,7 +185,7 @@ class SourceMapTest {
       /**/
       assert(get(json, 8, "comment") == "// /* <!-- --")
       assert(
-          get(json, 8, "jsontext") == "{\"object with 1 member\":[\"array with 1 element\"]}")
+        get(json, 8, "jsontext") == "{\"object with 1 member\":[\"array with 1 element\"]}")
       assert(get(json, 19) == "rosebud") /**/
     }
     /**/
@@ -242,12 +242,18 @@ trait Writer {
         /**/
         /**/
         s.charAt(i) match {
-          case '\\' => /**/ sb.append("\\\\") /**/
+          case '\\' =>
+            /**/
+            sb.append("\\\\") /**/
           case '"' => sb.append("\\\"")
-          case '/' => /**/ sb.append("\\/") /**/
+          case '/' =>
+            /**/
+            sb.append("\\/") /**/
           case '\b' => sb.append("\\b")
           case '\t' => sb.append("\\t")
-          case '\n' => /**/ sb.append("\\n") /**/
+          case '\n' =>
+            /**/
+            sb.append("\\n") /**/
           case '\f' => sb.append("\\f")
           case '\r' => sb.append("\\r")
           case c =>
@@ -271,21 +277,19 @@ trait Writer {
 
       /**/
       var first = true
-      kvs.foreach(
-          kv =>
-            {
+      kvs.foreach(kv => {
 
-          /**/
-          val (k, v) = kv
-          if (first) first = false
-          else sb.append(", ")
+        /**/
+        val (k, v) = kv
+        if (first) first = false
+        else sb.append(", ")
 
-          /**/
-          writeToBuffer(JsString(k), sb)
-          sb.append(": ")
+        /**/
+        writeToBuffer(JsString(k), sb)
+        sb.append(": ")
 
-          /**/
-          writeToBuffer(v, sb)
+        /**/
+        writeToBuffer(v, sb)
       })
       sb.append("}")
 
@@ -370,11 +374,21 @@ class Json extends Writer2 {
       case c if 'a'.toInt <= c && c <= 'z'.toInt => Letter
       case c if 'A'.toInt <= c && c <= 'Z'.toInt => Letter
       case c if '0'.toInt <= c && c <= '9'.toInt => Digit
-      case '-' => /**/ Minus
-      case ',' => /**/ Comma
-      case '"' => /**/ Quote
-      case ':' => /**/ Colon
-      case '{' => /**/ Lbra
+      case '-' =>
+        /**/
+        Minus
+      case ',' =>
+        /**/
+        Comma
+      case '"' =>
+        /**/
+        Quote
+      case ':' =>
+        /**/
+        Colon
+      case '{' =>
+        /**/
+        Lbra
       case '}' => Rbra
       case '[' => Larr
       case ']' => Rarr
@@ -389,14 +403,14 @@ class Json extends Writer2 {
     // *** Character Escapes
     /**/
     val escapeMap = Map[Int, String](
-        '\\'.toInt -> "\\",
-        '/'.toInt -> "/",
-        '\"'.toInt -> "\"",
-        'b'.toInt -> "\b",
-        'f'.toInt -> "\f",
-        'n'.toInt -> "\n",
-        'r'.toInt -> "\r",
-        't'.toInt -> "\t"
+      '\\'.toInt -> "\\",
+      '/'.toInt -> "/",
+      '\"'.toInt -> "\"",
+      'b'.toInt -> "\b",
+      'f'.toInt -> "\f",
+      'n'.toInt -> "\n",
+      'r'.toInt -> "\r",
+      't'.toInt -> "\t"
     )
     // *** Import Shared Data ***
 
@@ -644,7 +658,9 @@ class Json extends Writer2 {
 
         /**/
         tokenKind match {
-          case COMMA => /**/ tokenNext()
+          case COMMA =>
+            /**/
+            tokenNext()
           case RARR => // do nothing
           case _ => tokenError("Expecting , or ]")
         }
@@ -735,5 +751,5 @@ object Json {
                   val line: Int,
                   val char: Int)
       extends scala.Exception(
-          s"JsonParse Error: $msg line $line [$char] in $input")
+        s"JsonParse Error: $msg line $line [$char] in $input")
 }

@@ -21,7 +21,7 @@ class SbtOrderEnumeratorHandler extends OrderEnumerationHandler {
     (orderEntry, settings) match {
       case (library: LibraryOrderEntry, enumerator: ModuleOrderEnumerator) =>
         val isTransitive = getModuleFromEnumerator(enumerator).fold(false)(
-            _ != library.getOwnerModule)
+          _ != library.getOwnerModule)
         if (isTransitive) AddDependencyType.DO_NOT_ADD
         else AddDependencyType.DEFAULT
       case _ =>
@@ -37,7 +37,7 @@ class SbtOrderEnumeratorHandler extends OrderEnumerationHandler {
     import scala.collection.JavaConverters._
     val modules = new util.ArrayList[Module]()
     enumerator.processRootModules(
-        new CommonProcessors.CollectProcessor[Module](modules))
+      new CommonProcessors.CollectProcessor[Module](modules))
     modules.asScala.headOption
   }
 }
@@ -52,7 +52,7 @@ class SbtOrderEnumeratorHandlerFactory
   }
 
   override def isApplicable(module: Module): Boolean = {
-    ExternalSystemApiUtil.isExternalSystemAwareModule(
-        SbtProjectSystem.Id, module)
+    ExternalSystemApiUtil
+      .isExternalSystemAwareModule(SbtProjectSystem.Id, module)
   }
 }

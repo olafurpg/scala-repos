@@ -50,8 +50,8 @@ class EnsembleGraphicButton extends EnsembleExample {
       text = "Graphic Button"
       graphic = new ImageView {
         image = new Image(
-            this.getClass
-              .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+          this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
         margin = Insets(0, 0, 0, 10)
       }
     }

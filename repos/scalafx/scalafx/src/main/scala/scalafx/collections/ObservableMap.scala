@@ -44,7 +44,7 @@ import scalafx.delegate.SFXDelegate
 object ObservableMap extends MutableMapFactory[ObservableMap] {
 
   /**
-    * Extracts a JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]] from a 
+    * Extracts a JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]] from a
     * ScalaFX's $OM.
     *
     * @param om ScalaFX's $OM.
@@ -151,8 +151,10 @@ object ObservableMap extends MutableMapFactory[ObservableMap] {
   * @define MAP `Map`
   */
 trait ObservableMap[K, V]
-    extends Map[K, V] with MapLike[K, V, ObservableMap[K, V]]
-    with Builder[(K, V), ObservableMap[K, V]] with Observable
+    extends Map[K, V]
+    with MapLike[K, V, ObservableMap[K, V]]
+    with Builder[(K, V), ObservableMap[K, V]]
+    with Observable
     with SFXDelegate[jfxc.ObservableMap[K, V]] {
 
   /**
@@ -242,13 +244,14 @@ trait ObservableMap[K, V]
         val changeEvent: Change[K, V] =
           (change.wasAdded, change.wasRemoved) match {
             case (true, true) =>
-              Replace(
-                  change.getKey, change.getValueAdded, change.getValueRemoved)
+              Replace(change.getKey,
+                      change.getValueAdded,
+                      change.getValueRemoved)
             case (true, false) => Add(change.getKey, change.getValueAdded)
             case (false, true) => Remove(change.getKey, change.getValueRemoved)
             case (false, false) =>
               throw new IllegalStateException(
-                  "Irregular Change: neither addition nor remotion")
+                "Irregular Change: neither addition nor remotion")
           }
 
         op(ObservableMap.this, changeEvent)
@@ -262,8 +265,7 @@ trait ObservableMap[K, V]
     * @param op No-argument function to be activated when some change in this $OM was made.
     */
   def onChange(op: => Unit) {
-    delegate.addListener(
-        new jfxc.MapChangeListener[K, V] {
+    delegate.addListener(new jfxc.MapChangeListener[K, V] {
       def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V]) {
         op
       }
@@ -284,6 +286,6 @@ trait ObservableMap[K, V]
   *                 [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/FXCollections.html `FXCollections`]].
   */
 class ObservableHashMap[K, V](
-    override val delegate: jfxc.ObservableMap[K, V] = jfxc.FXCollections
-        .observableMap(new ju.HashMap[K, V]))
+    override val delegate: jfxc.ObservableMap[K, V] =
+      jfxc.FXCollections.observableMap(new ju.HashMap[K, V]))
     extends ObservableMap[K, V]

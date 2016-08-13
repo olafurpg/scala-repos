@@ -12,12 +12,15 @@ import play.core.server.Server
 import play.it._
 
 object NettyFlashCookieSpec
-    extends FlashCookieSpec with NettyIntegrationSpecification
+    extends FlashCookieSpec
+    with NettyIntegrationSpecification
 object AkkaHttpFlashCookieSpec
-    extends FlashCookieSpec with AkkaHttpIntegrationSpecification
+    extends FlashCookieSpec
+    with AkkaHttpIntegrationSpecification
 
 trait FlashCookieSpec
-    extends PlaySpecification with ServerIntegrationSpecification
+    extends PlaySpecification
+    with ServerIntegrationSpecification
     with WsTestClient {
 
   sequential
@@ -27,7 +30,7 @@ trait FlashCookieSpec
       case ("GET", "/flash") =>
         Action {
           Redirect("/landing").flashing(
-              "success" -> "found"
+            "success" -> "found"
           )
         }
       case ("GET", "/set-cookie") =>
@@ -78,11 +81,11 @@ trait FlashCookieSpec
       ws =>
         val response = await(ws.url("/flash").withFollowRedirects(false).get())
         val Some(flashCookie) = readFlashCookie(response)
-        val response2 = await(ws
-              .url("/set-cookie")
-              .withHeaders(
-                  "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
-              .get())
+        val response2 = await(
+          ws.url("/set-cookie")
+            .withHeaders(
+              "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
+            .get())
 
         readFlashCookie(response2) must beSome.like {
           case cookie => cookie.value must beNone
@@ -94,7 +97,7 @@ trait FlashCookieSpec
     }
 
     "honor configuration for flash.secure" in Helpers.running(
-        _.configure("play.http.flash.secure" -> true)) { _ =>
+      _.configure("play.http.flash.secure" -> true)) { _ =>
       Flash.encodeAsCookie(Flash()).secure must beTrue
     }
   }

@@ -3,7 +3,12 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
+import java.math.{
+  BigDecimal => JBigDecimal,
+  BigInteger,
+  MathContext,
+  RoundingMode
+}
 
 import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{Positive, Zero, Negative}
@@ -14,8 +19,9 @@ import spire.syntax.nroot._
 
 //scalastyle:off equals.hash.code
 sealed abstract class Rational
-    extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
-  lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Ordered[Rational] { lhs =>
 
   def numerator: SafeLong
   def denominator: SafeLong
@@ -143,8 +149,8 @@ sealed abstract class Rational
     * See [[http://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Mediants_and_binary_search]]
     */
   def limitDenominatorTo(limit: SafeLong): Rational = {
-    require(
-        limit.signum > 0, "Cannot limit denominator to non-positive number.")
+    require(limit.signum > 0,
+            "Cannot limit denominator to non-positive number.")
 
     // TODO: We should always perform a binary search from the left or right to
     //       speed up computation. For example, if in a search, we have a lower
@@ -163,8 +169,8 @@ sealed abstract class Rational
 
     @tailrec
     def closest(l: Rational, u: Rational): Rational = {
-      val mediant = Rational(
-          l.numerator + u.numerator, l.denominator + u.denominator)
+      val mediant =
+        Rational(l.numerator + u.numerator, l.denominator + u.denominator)
 
       if (mediant.denominator > limit) {
         if ((this - l).abs > (u - this).abs) u else l
@@ -229,7 +235,7 @@ object Rational extends RationalInstances {
         val addBit =
           if (nShared < dShared ||
               (nShared == dShared &&
-                  d.toBigInteger.getLowestSetBit < dLowerLength)) {
+              d.toBigInteger.getLowestSetBit < dLowerLength)) {
             1
           } else {
             0
@@ -261,8 +267,10 @@ object Rational extends RationalInstances {
     else build0(-n, -d)
   }
 
-  private[math] def buildWithDiv(
-      num: Long, ngcd: Long, rd: Long, lden: Long): Rational = {
+  private[math] def buildWithDiv(num: Long,
+                                 ngcd: Long,
+                                 rd: Long,
+                                 lden: Long): Rational = {
     val n = num / ngcd
     val d = rd / ngcd
     Checked.tryOrReturn {
@@ -356,7 +364,8 @@ object Rational extends RationalInstances {
 
   @SerialVersionUID(0L)
   private final class LongRational(val n: Long, val d: Long)
-      extends Rational with Serializable {
+      extends Rational
+      with Serializable {
     def numerator: SafeLong = SafeLong(n)
     def denominator: SafeLong = SafeLong(d)
 
@@ -584,10 +593,9 @@ object Rational extends RationalInstances {
           case r: BigRational =>
             val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
             if (dgcd == 1L) {
-              Rational(
-                  spire.math.gcd(
-                      spire.math.abs(n), spire.math.abs((r.n % n).toLong)),
-                  SafeLong(d) * r.d)
+              Rational(spire.math.gcd(spire.math.abs(n),
+                                      spire.math.abs((r.n % n).toLong)),
+                       SafeLong(d) * r.d)
             } else {
               val lm = d / dgcd
               val rm = r.d / dgcd
@@ -659,7 +667,8 @@ object Rational extends RationalInstances {
 
   @SerialVersionUID(0L)
   private final class BigRational(val n: SafeLong, val d: SafeLong)
-      extends Rational with Serializable {
+      extends Rational
+      with Serializable {
     def numerator: SafeLong = n
     def denominator: SafeLong = d
 
@@ -868,4 +877,6 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 
 @SerialVersionUID(1L)
 class RationalAlgebra
-    extends RationalIsField with RationalIsReal with Serializable
+    extends RationalIsField
+    with RationalIsReal
+    with Serializable

@@ -13,8 +13,9 @@ class MapGetOrElseBooleanInspection extends OperationOnCollectionInspection {
     Array(MapGetOrElseFalse, MapGetOrElseTrue)
 }
 
-abstract class MapGetOrElseBoolean(
-    defaultValue: String, newMethodName: String, hintKey: String)
+abstract class MapGetOrElseBoolean(defaultValue: String,
+                                   newMethodName: String,
+                                   hintKey: String)
     extends SimplificationType() {
   def hint = InspectionBundle.message(hintKey)
 
@@ -23,9 +24,9 @@ abstract class MapGetOrElseBoolean(
       case qual `.map` (f @ returnsBoolean()) `.getOrElse`(literal(
           `defaultValue`)) if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, newMethodName, f))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, newMethodName, f))
+            .highlightFrom(qual))
       case _ => None
     }
   }

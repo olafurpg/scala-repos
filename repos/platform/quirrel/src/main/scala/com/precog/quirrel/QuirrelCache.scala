@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -44,8 +44,10 @@ trait QuirrelCache extends AST { parser: Parser =>
   private case class Ignore(r: Regex) extends Rule(r)
 
   private case class Slot(lineNum: Int, colNum: Int, width: Int)
-  private case class Binding(
-      tpe: String, name: String, rawValue: String, pos: Int) {
+  private case class Binding(tpe: String,
+                             name: String,
+                             rawValue: String,
+                             pos: Int) {
     def value: String = tpe match {
       case "p" => canonicalizePath(rawValue)
       case "s" => canonicalizeStr(rawValue)
@@ -67,13 +69,13 @@ trait QuirrelCache extends AST { parser: Parser =>
     val wordRe = """['a-zA-Z_]['a-zA-Z0-9_]*""".r
 
     val rules = Array(
-        // Ignore(commentRe),
-        Ignore(spaceRe),
-        Keep("n", numRe),
-        Keep("b", boolRe),
-        Keep("s", strRe),
-        Keep("p", pathRe),
-        Ignore(wordRe)
+      // Ignore(commentRe),
+      Ignore(spaceRe),
+      Keep("n", numRe),
+      Keep("b", boolRe),
+      Keep("s", strRe),
+      Keep("p", pathRe),
+      Ignore(wordRe)
     )
 
     def fromString(input: String): (String, IndexedSeq[Binding]) = {
@@ -147,7 +149,7 @@ trait QuirrelCache extends AST { parser: Parser =>
             else if (s.startsWith("false")) ("b", 5)
             else {
               sys.error(
-                  "error recovering boolean literal from %s (%s at %s)" format
+                "error recovering boolean literal from %s (%s at %s)" format
                   (s, original, i))
             }
           case _: NumLit =>
@@ -156,7 +158,7 @@ trait QuirrelCache extends AST { parser: Parser =>
               .map(x => ("n", x.length))
               .getOrElse {
                 sys.error(
-                    "error recovering number literal from %s (%s at %s)" format
+                  "error recovering number literal from %s (%s at %s)" format
                     (s, original, i))
               }
           case _: StrLit =>
@@ -175,7 +177,7 @@ trait QuirrelCache extends AST { parser: Parser =>
               }
               .getOrElse {
                 sys.error(
-                    "error recovering string literal from %s (%s at %s)" format
+                  "error recovering string literal from %s (%s at %s)" format
                     (s, original, i))
               }
         }
@@ -240,8 +242,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         (b, index(i))
     }.sortBy(_._2).map(_._1).toList
 
-    val result = replaceLiteralsS(
-        expr, sortedBindings, locUpdates(bindings, slots))
+    val result =
+      replaceLiteralsS(expr, sortedBindings, locUpdates(bindings, slots))
     result
   }
 
@@ -256,27 +258,26 @@ trait QuirrelCache extends AST { parser: Parser =>
         val width = widths(name)
         val delta = width - oldWidth
         lineNum -> (colNum, delta)
-    }.groupBy(_._1)
-      .map {
-        case (lineNum, ds) =>
-          (lineNum, ds.map(_._2).sortBy(_._1))
-      }
+    }.groupBy(_._1).map {
+      case (lineNum, ds) =>
+        (lineNum, ds.map(_._2).sortBy(_._1))
+    }
 
-      { (loc: LineStream) =>
-        val colNum =
-          deltas get loc.lineNum map { ds =>
-            ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
-          } map (_ + loc.colNum) getOrElse loc.colNum
+    { (loc: LineStream) =>
+      val colNum =
+        deltas get loc.lineNum map { ds =>
+          ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
+        } map (_ + loc.colNum) getOrElse loc.colNum
 
-        loc match {
-          case ln: LazyLineCons =>
-            new LazyLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
-          case ln: StrictLineCons =>
-            new StrictLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
-          case LineNil =>
-            LineNil
-        }
+      loc match {
+        case ln: LazyLineCons =>
+          new LazyLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
+        case ln: StrictLineCons =>
+          new StrictLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
+        case LineNil =>
+          LineNil
       }
+    }
   }
 
   private type BindingS[+A] = StateT[Option, List[Binding], A]
@@ -312,8 +313,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         }
 
       case Let(loc, name, params, lchild0, rchild0) =>
-        for (lchild <- repl(lchild0); rchild <- repl(rchild0)) yield
-          Let(updateLoc(loc), name, params, lchild, rchild)
+        for (lchild <- repl(lchild0); rchild <- repl(rchild0))
+          yield Let(updateLoc(loc), name, params, lchild, rchild)
 
       case Solve(loc, constraints0, child0) =>
         for {
@@ -325,12 +326,12 @@ trait QuirrelCache extends AST { parser: Parser =>
         repl(child) map (Import(updateLoc(loc), spec, _))
 
       case Assert(loc, pred0, child0) =>
-        for (pred <- repl(pred0); child <- repl(child0)) yield
-          Assert(updateLoc(loc), pred, child)
+        for (pred <- repl(pred0); child <- repl(child0))
+          yield Assert(updateLoc(loc), pred, child)
 
       case Observe(loc, data0, samples0) =>
-        for (data <- repl(data0); samples <- repl(data0)) yield
-          Observe(updateLoc(loc), data, samples)
+        for (data <- repl(data0); samples <- repl(data0))
+          yield Observe(updateLoc(loc), data, samples)
 
       case New(loc, child0) =>
         repl(child0) map (New(updateLoc(loc), _))
@@ -369,8 +370,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         repl(child0) map (MetaDescent(updateLoc(loc), _, property))
 
       case Deref(loc, lchild0, rchild0) =>
-        for (lchild <- repl(lchild0); rchild <- repl(rchild0)) yield
-          Deref(updateLoc(loc), lchild, rchild)
+        for (lchild <- repl(lchild0); rchild <- repl(rchild0))
+          yield Deref(updateLoc(loc), lchild, rchild)
 
       case Dispatch(loc, name, actuals) =>
         (actuals map repl).sequence map (Dispatch(updateLoc(loc), name, _))
@@ -383,80 +384,80 @@ trait QuirrelCache extends AST { parser: Parser =>
         } yield Cond(updateLoc(loc), pred, left, right)
 
       case Where(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Where(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Where(updateLoc(loc), left, right)
 
       case With(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          With(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield With(updateLoc(loc), left, right)
 
       case Union(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Union(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Union(updateLoc(loc), left, right)
 
       case Intersect(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Intersect(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Intersect(updateLoc(loc), left, right)
 
       case Difference(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Difference(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Difference(updateLoc(loc), left, right)
 
       case Add(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Add(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Add(updateLoc(loc), left, right)
 
       case Sub(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Sub(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Sub(updateLoc(loc), left, right)
 
       case Mul(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Mul(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Mul(updateLoc(loc), left, right)
 
       case Div(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Div(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Div(updateLoc(loc), left, right)
 
       case Mod(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Mod(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Mod(updateLoc(loc), left, right)
 
       case Pow(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Pow(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Pow(updateLoc(loc), left, right)
 
       case Lt(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Lt(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Lt(updateLoc(loc), left, right)
 
       case LtEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          LtEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield LtEq(updateLoc(loc), left, right)
 
       case Gt(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Gt(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Gt(updateLoc(loc), left, right)
 
       case GtEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          GtEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield GtEq(updateLoc(loc), left, right)
 
       case Eq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Eq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Eq(updateLoc(loc), left, right)
 
       case NotEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          NotEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield NotEq(updateLoc(loc), left, right)
 
       case And(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          And(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield And(updateLoc(loc), left, right)
 
       case Or(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Or(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Or(updateLoc(loc), left, right)
 
       case Comp(loc, expr) =>
         repl(expr) map (Comp(updateLoc(loc), _))
@@ -471,8 +472,8 @@ trait QuirrelCache extends AST { parser: Parser =>
     val result = for {
       expr <- repl(expr0)
       _ <- StateT { s: List[Binding] =>
-        s.isEmpty.option((Nil, ()))
-      }: BindingS[Unit]
+            s.isEmpty.option((Nil, ()))
+          }: BindingS[Unit]
     } yield expr
 
     result.eval(bindings)

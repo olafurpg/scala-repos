@@ -30,8 +30,10 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 
   import testImplicits._
 
-  case class AddTextFileData(
-      source: FileStreamSource, content: String, src: File, tmp: File)
+  case class AddTextFileData(source: FileStreamSource,
+                             content: String,
+                             src: File,
+                             tmp: File)
       extends AddData {
 
     override def addData(): Offset = {
@@ -82,14 +84,15 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 }
 
 class FileStreamSourceSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
-  private def createFileStreamSourceAndGetSchema(
-      format: Option[String],
-      path: Option[String],
-      schema: Option[StructType] = None): StructType = {
+  private def createFileStreamSourceAndGetSchema(format: Option[String],
+                                                 path: Option[String],
+                                                 schema: Option[StructType] =
+                                                   None): StructType = {
     val reader = sqlContext.read
     format.foreach(reader.format)
     schema.foreach(reader.schema)
@@ -106,16 +109,18 @@ class FileStreamSourceSuite
 
   test("FileStreamSource schema: no path") {
     val e = intercept[IllegalArgumentException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = None, schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = None,
+                                         schema = None)
     }
     assert("'path' is not specified" === e.getMessage)
   }
 
   test("FileStreamSource schema: path doesn't exist") {
     intercept[AnalysisException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = Some("/a/b/c"), schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = Some("/a/b/c"),
+                                         schema = None)
     }
   }
 
@@ -156,12 +161,12 @@ class FileStreamSourceSuite
     withTempDir { src =>
       val e = intercept[AnalysisException] {
         createFileStreamSourceAndGetSchema(
-            format = Some("parquet"),
-            path = Some(new File(src, "1").getCanonicalPath),
-            schema = None)
+          format = Some("parquet"),
+          path = Some(new File(src, "1").getCanonicalPath),
+          schema = None)
       }
       assert(
-          "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
+        "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
     }
   }
 
@@ -206,7 +211,7 @@ class FileStreamSourceSuite
                                            schema = None)
       }
       assert(
-          "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
+        "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
     }
   }
 
@@ -241,14 +246,14 @@ class FileStreamSourceSuite
     val filtered = textSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddTextFileData(textSource, "drop1\nkeep2\nkeep3", src, tmp),
-        CheckAnswer("keep2", "keep3"),
-        StopStream,
-        AddTextFileData(textSource, "drop4\nkeep5\nkeep6", src, tmp),
-        StartStream,
-        CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+      AddTextFileData(textSource, "drop1\nkeep2\nkeep3", src, tmp),
+      CheckAnswer("keep2", "keep3"),
+      StopStream,
+      AddTextFileData(textSource, "drop4\nkeep5\nkeep6", src, tmp),
+      StartStream,
+      CheckAnswer("keep2", "keep3", "keep5", "keep6"),
+      AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
+      CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 
     Utils.deleteRecursively(src)
@@ -264,26 +269,26 @@ class FileStreamSourceSuite
     val filtered = textSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddTextFileData(
-            textSource,
-            "{'value': 'drop1'}\n{'value': 'keep2'}\n{'value': 'keep3'}",
-            src,
-            tmp),
-        CheckAnswer("keep2", "keep3"),
-        StopStream,
-        AddTextFileData(
-            textSource,
-            "{'value': 'drop4'}\n{'value': 'keep5'}\n{'value': 'keep6'}",
-            src,
-            tmp),
-        StartStream,
-        CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddTextFileData(
-            textSource,
-            "{'value': 'drop7'}\n{'value': 'keep8'}\n{'value': 'keep9'}",
-            src,
-            tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+      AddTextFileData(
+        textSource,
+        "{'value': 'drop1'}\n{'value': 'keep2'}\n{'value': 'keep3'}",
+        src,
+        tmp),
+      CheckAnswer("keep2", "keep3"),
+      StopStream,
+      AddTextFileData(
+        textSource,
+        "{'value': 'drop4'}\n{'value': 'keep5'}\n{'value': 'keep6'}",
+        src,
+        tmp),
+      StartStream,
+      CheckAnswer("keep2", "keep3", "keep5", "keep6"),
+      AddTextFileData(
+        textSource,
+        "{'value': 'drop7'}\n{'value': 'keep8'}\n{'value': 'keep9'}",
+        src,
+        tmp),
+      CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 
     Utils.deleteRecursively(src)
@@ -304,11 +309,11 @@ class FileStreamSourceSuite
     val filtered = textSource.toDF().filter($"c" contains "keep")
 
     testStream(filtered)(
-        AddTextFileData(textSource,
-                        "{'c': 'drop4'}\n{'c': 'keep5'}\n{'c': 'keep6'}",
-                        src,
-                        tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6")
+      AddTextFileData(textSource,
+                      "{'c': 'drop4'}\n{'c': 'keep5'}\n{'c': 'keep6'}",
+                      src,
+                      tmp),
+      CheckAnswer("keep2", "keep3", "keep5", "keep6")
     )
 
     Utils.deleteRecursively(src)
@@ -319,22 +324,20 @@ class FileStreamSourceSuite
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
-    val fileSource = createFileStreamSource(
-        "parquet", src.getCanonicalPath, Some(valueSchema))
+    val fileSource = createFileStreamSource("parquet",
+                                            src.getCanonicalPath,
+                                            Some(valueSchema))
     val filtered = fileSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddParquetFileData(
-            fileSource, Seq("drop1", "keep2", "keep3"), src, tmp),
-        CheckAnswer("keep2", "keep3"),
-        StopStream,
-        AddParquetFileData(
-            fileSource, Seq("drop4", "keep5", "keep6"), src, tmp),
-        StartStream,
-        CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddParquetFileData(
-            fileSource, Seq("drop7", "keep8", "keep9"), src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+      AddParquetFileData(fileSource, Seq("drop1", "keep2", "keep3"), src, tmp),
+      CheckAnswer("keep2", "keep3"),
+      StopStream,
+      AddParquetFileData(fileSource, Seq("drop4", "keep5", "keep6"), src, tmp),
+      StartStream,
+      CheckAnswer("keep2", "keep3", "keep5", "keep6"),
+      AddParquetFileData(fileSource, Seq("drop7", "keep8", "keep9"), src, tmp),
+      CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 
     Utils.deleteRecursively(src)
@@ -376,14 +379,14 @@ class FileStreamSourceSuite
     val filtered = textSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddTextFileData(textSource, "drop1\nkeep2\nkeep3", src, tmp),
-        CheckAnswer("keep2", "keep3"),
-        StopStream,
-        AddTextFileData(textSource, "drop4\nkeep5\nkeep6", src, tmp),
-        StartStream,
-        CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
-        CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
+      AddTextFileData(textSource, "drop1\nkeep2\nkeep3", src, tmp),
+      CheckAnswer("keep2", "keep3"),
+      StopStream,
+      AddTextFileData(textSource, "drop4\nkeep5\nkeep6", src, tmp),
+      StartStream,
+      CheckAnswer("keep2", "keep3", "keep5", "keep6"),
+      AddTextFileData(textSource, "drop7\nkeep8\nkeep9", src, tmp),
+      CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 
     val textSource2 = createFileStreamSource("text", src.getCanonicalPath)
@@ -401,7 +404,8 @@ class FileStreamSourceSuite
 }
 
 class FileStreamSourceStressTestSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
@@ -411,12 +415,9 @@ class FileStreamSourceStressTestSuite
 
     val textSource = createFileStreamSource("text", src.getCanonicalPath)
     val ds = textSource.toDS[String]().map(_.toInt + 1)
-    runStressTest(
-        ds,
-        data =>
-          {
-            AddTextFileData(textSource, data.mkString("\n"), src, tmp)
-        })
+    runStressTest(ds, data => {
+      AddTextFileData(textSource, data.mkString("\n"), src, tmp)
+    })
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)

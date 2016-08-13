@@ -9,11 +9,11 @@ import org.scalacheck.Arbitrary
 
 class FuncTests extends CatsSuite {
   import cats.laws.discipline.eq._
-  implicit def funcEq[F[_], A, B](
-      implicit A: Arbitrary[A], FB: Eq[F[B]]): Eq[Func[F, A, B]] =
+  implicit def funcEq[F[_], A, B](implicit A: Arbitrary[A],
+                                  FB: Eq[F[B]]): Eq[Func[F, A, B]] =
     Eq.by[Func[F, A, B], A => F[B]](_.run)
-  implicit def appFuncEq[F[_], A, B](
-      implicit A: Arbitrary[A], FB: Eq[F[B]]): Eq[AppFunc[F, A, B]] =
+  implicit def appFuncEq[F[_], A, B](implicit A: Arbitrary[A],
+                                     FB: Eq[F[B]]): Eq[AppFunc[F, A, B]] =
     Eq.by[AppFunc[F, A, B], A => F[B]](_.run)
 
   implicit val iso =
@@ -53,11 +53,11 @@ class FuncTests extends CatsSuite {
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[AppFunc[Option, Int, ?]]
     checkAll(
-        "AppFunc[Option, Int, Int]",
-        ApplicativeTests[AppFunc[Option, Int, ?]].applicative[Int, Int, Int])
+      "AppFunc[Option, Int, Int]",
+      ApplicativeTests[AppFunc[Option, Int, ?]].applicative[Int, Int, Int])
     checkAll(
-        "Applicative[AppFunc[Option, Int, ?]]",
-        SerializableTests.serializable(Applicative[AppFunc[Option, Int, ?]]))
+      "Applicative[AppFunc[Option, Int, ?]]",
+      SerializableTests.serializable(Applicative[AppFunc[Option, Int, ?]]))
   }
 
   test("product") {

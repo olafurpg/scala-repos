@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScStableReferenceE
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
@@ -26,10 +26,10 @@ class StatementFilter extends ElementFilter {
           !parent.getParent.isInstanceOf[ScStableReferenceElementPattern] &&
           (!parent.getParent.isInstanceOf[ScInfixExpr]) &&
           (parent.getPrevSibling == null ||
-              parent.getPrevSibling.getPrevSibling == null ||
-              (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
-                  !parent.getPrevSibling.getPrevSibling.getLastChild
-                    .isInstanceOf[PsiErrorElement]))) {
+          parent.getPrevSibling.getPrevSibling == null ||
+          (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
+          !parent.getPrevSibling.getPrevSibling.getLastChild
+            .isInstanceOf[PsiErrorElement]))) {
         parent.getParent match {
           case _: ScBlockExpr | _: ScBlock | _: ScTemplateBody => return true
           case x: ScExpression =>

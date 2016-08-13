@@ -33,7 +33,9 @@ case class TestData(key: Int, value: String)
 case class ThreeCloumntable(key: Int, value: String, key1: String)
 
 class InsertIntoHiveTableSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfter {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfter {
   import hiveContext.implicits._
   import hiveContext.sql
 
@@ -57,8 +59,8 @@ class InsertIntoHiveTableSuite
 
     // Make sure the table has also been updated.
     checkAnswer(
-        sql("SELECT * FROM createAndInsertTest"),
-        testData.collect().toSeq
+      sql("SELECT * FROM createAndInsertTest"),
+      testData.collect().toSeq
     )
 
     // Add more data.
@@ -66,8 +68,8 @@ class InsertIntoHiveTableSuite
 
     // Make sure the table has been updated.
     checkAnswer(
-        sql("SELECT * FROM createAndInsertTest"),
-        testData.toDF().collect().toSeq ++ testData.toDF().collect().toSeq
+      sql("SELECT * FROM createAndInsertTest"),
+      testData.toDF().collect().toSeq ++ testData.toDF().collect().toSeq
     )
 
     // Now overwrite.
@@ -75,8 +77,8 @@ class InsertIntoHiveTableSuite
 
     // Make sure the registered table has also been updated.
     checkAnswer(
-        sql("SELECT * FROM createAndInsertTest"),
-        testData.collect().toSeq
+      sql("SELECT * FROM createAndInsertTest"),
+      testData.collect().toSeq
     )
   }
 
@@ -90,22 +92,24 @@ class InsertIntoHiveTableSuite
 
   test("Double create does not fail when allowExisting = true") {
     sql("CREATE TABLE doubleCreateAndInsertTest (key int, value string)")
-    sql("CREATE TABLE IF NOT EXISTS doubleCreateAndInsertTest (key int, value string)")
+    sql(
+      "CREATE TABLE IF NOT EXISTS doubleCreateAndInsertTest (key int, value string)")
   }
 
   test("SPARK-4052: scala.collection.Map as value type of MapType") {
     val schema = StructType(
-        StructField("m", MapType(StringType, StringType), true) :: Nil)
+      StructField("m", MapType(StringType, StringType), true) :: Nil)
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
-              Row(scala.collection.mutable.HashMap(s"key$i" -> s"value$i"))))
+      Row(scala.collection.mutable.HashMap(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithMapValue")
     sql("CREATE TABLE hiveTableWithMapValue(m MAP <STRING, STRING>)")
-    sql("INSERT OVERWRITE TABLE hiveTableWithMapValue SELECT m FROM tableWithMapValue")
+    sql(
+      "INSERT OVERWRITE TABLE hiveTableWithMapValue SELECT m FROM tableWithMapValue")
 
     checkAnswer(
-        sql("SELECT * FROM hiveTableWithMapValue"),
-        rowRDD.collect().toSeq
+      sql("SELECT * FROM hiveTableWithMapValue"),
+      rowRDD.collect().toSeq
     )
 
     sql("DROP TABLE hiveTableWithMapValue")
@@ -153,65 +157,69 @@ class InsertIntoHiveTableSuite
       }
     }
     val expected = List(
-        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=2" :: Nil,
-        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=3" :: Nil,
-        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=1" :: Nil,
-        "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=4" :: Nil
+      "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=2" :: Nil,
+      "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=3" :: Nil,
+      "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=1" :: Nil,
+      "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=4" :: Nil
     )
     assert(
-        listFolders(tmpDir, List()).sortBy(_.toString()) === expected.sortBy(
-            _.toString))
+      listFolders(tmpDir, List()).sortBy(_.toString()) === expected.sortBy(
+        _.toString))
     sql("DROP TABLE table_with_partition")
     sql("DROP TABLE tmp_table")
   }
 
   test("Insert ArrayType.containsNull == false") {
     val schema = StructType(
-        Seq(StructField("a", ArrayType(StringType, containsNull = false))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Seq(s"value$i"))))
+      Seq(StructField("a", ArrayType(StringType, containsNull = false))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+      Row(Seq(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithArrayValue")
     sql("CREATE TABLE hiveTableWithArrayValue(a Array <STRING>)")
-    sql("INSERT OVERWRITE TABLE hiveTableWithArrayValue SELECT a FROM tableWithArrayValue")
+    sql(
+      "INSERT OVERWRITE TABLE hiveTableWithArrayValue SELECT a FROM tableWithArrayValue")
 
-    checkAnswer(
-        sql("SELECT * FROM hiveTableWithArrayValue"), rowRDD.collect().toSeq)
+    checkAnswer(sql("SELECT * FROM hiveTableWithArrayValue"),
+                rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithArrayValue")
   }
 
   test("Insert MapType.valueContainsNull == false") {
-    val schema = StructType(Seq(StructField(
-                "m",
-                MapType(StringType, StringType, valueContainsNull = false))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Map(s"key$i" -> s"value$i"))))
+    val schema = StructType(Seq(
+      StructField("m",
+                  MapType(StringType, StringType, valueContainsNull = false))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+      Row(Map(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithMapValue")
     sql("CREATE TABLE hiveTableWithMapValue(m Map <STRING, STRING>)")
-    sql("INSERT OVERWRITE TABLE hiveTableWithMapValue SELECT m FROM tableWithMapValue")
+    sql(
+      "INSERT OVERWRITE TABLE hiveTableWithMapValue SELECT m FROM tableWithMapValue")
 
-    checkAnswer(
-        sql("SELECT * FROM hiveTableWithMapValue"), rowRDD.collect().toSeq)
+    checkAnswer(sql("SELECT * FROM hiveTableWithMapValue"),
+                rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithMapValue")
   }
 
   test("Insert StructType.fields.exists(_.nullable == false)") {
     val schema = StructType(
-        Seq(StructField("s",
-                        StructType(Seq(StructField(
-                                    "f", StringType, nullable = false))))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Row(s"value$i"))))
+      Seq(
+        StructField(
+          "s",
+          StructType(Seq(StructField("f", StringType, nullable = false))))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+      Row(Row(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithStructValue")
     sql("CREATE TABLE hiveTableWithStructValue(s Struct <f: STRING>)")
-    sql("INSERT OVERWRITE TABLE hiveTableWithStructValue SELECT s FROM tableWithStructValue")
+    sql(
+      "INSERT OVERWRITE TABLE hiveTableWithStructValue SELECT s FROM tableWithStructValue")
 
-    checkAnswer(
-        sql("SELECT * FROM hiveTableWithStructValue"), rowRDD.collect().toSeq)
+    checkAnswer(sql("SELECT * FROM hiveTableWithStructValue"),
+                rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithStructValue")
   }
@@ -239,26 +247,26 @@ class InsertIntoHiveTableSuite
     // test schema the same between partition and table
     sql("ALTER TABLE table_with_partition CHANGE COLUMN key key BIGINT")
     checkAnswer(
-        sql("select key,value from table_with_partition where ds='1' "),
-        testData.collect().toSeq)
+      sql("select key,value from table_with_partition where ds='1' "),
+      testData.collect().toSeq)
 
     // test difference type of field
     sql("ALTER TABLE table_with_partition CHANGE COLUMN key key BIGINT")
     checkAnswer(
-        sql("select key,value from table_with_partition where ds='1' "),
-        testData.collect().toSeq)
+      sql("select key,value from table_with_partition where ds='1' "),
+      testData.collect().toSeq)
 
     // add column to table
     sql("ALTER TABLE table_with_partition ADD COLUMNS(key1 string)")
     checkAnswer(
-        sql("select key,value,key1 from table_with_partition where ds='1' "),
-        testDatawithNull.collect().toSeq)
+      sql("select key,value,key1 from table_with_partition where ds='1' "),
+      testDatawithNull.collect().toSeq)
 
     // change column name to table
     sql("ALTER TABLE table_with_partition CHANGE COLUMN key keynew BIGINT")
     checkAnswer(
-        sql("select keynew,value from table_with_partition where ds='1' "),
-        testData.collect().toSeq)
+      sql("select keynew,value from table_with_partition where ds='1' "),
+      testData.collect().toSeq)
 
     sql("DROP TABLE table_with_partition")
   }

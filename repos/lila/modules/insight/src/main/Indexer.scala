@@ -46,7 +46,7 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
 
   private def gameQuery(user: User) =
     Query.user(user.id) ++ Query.rated ++ Query.finished ++ Query.turnsMoreThan(
-        2) ++ Query.notFromPosition ++ Query.notHordeOrSincePawnsAreWhite
+      2) ++ Query.notFromPosition ++ Query.notHordeOrSincePawnsAreWhite
 
   // private val maxGames = 1 * 10
   private val maxGames = 10 * 1000
@@ -74,28 +74,28 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
             e.printStackTrace
         } map (_.toOption)
       }
-      val query = $query(gameQuery(user) ++ Json.obj(
-              Game.BSONFields.createdAt -> $gte($date(from))))
+      val query = $query(
+        gameQuery(user) ++ Json.obj(
+          Game.BSONFields.createdAt -> $gte($date(from))))
       pimpQB(query)
         .sort(Query.sortChronological)
         .cursor[Game]()
         .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
-          Iteratee takeUpTo 4) &> Enumeratee
-        .mapM[Seq[Game]]
-        .apply[Seq[Entry]] { games =>
+        Iteratee takeUpTo 4) &> Enumeratee.mapM[Seq[Game]].apply[Seq[Entry]] {
+        games =>
           games.map(toEntry).sequenceFu.map(_.flatten).addFailureEffect { e =>
             println(e)
             e.printStackTrace
           }
-        } &> Enumeratee.grouped(Iteratee takeUpTo 50) |>>> Iteratee
+      } &> Enumeratee.grouped(Iteratee takeUpTo 50) |>>> Iteratee
         .foldM[Seq[Seq[Entry]], Int](fromNumber) {
-        case (number, xs) =>
-          val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
-            case (e, i) => e.copy(number = number + i)
-          }
-          val nextNumber = number + entries.size
-          storage bulkInsert entries inject nextNumber
-      }
+          case (number, xs) =>
+            val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
+              case (e, i) => e.copy(number = number + i)
+            }
+            val nextNumber = number + entries.size
+            storage bulkInsert entries inject nextNumber
+        }
     } void
   }
 }

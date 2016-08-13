@@ -41,4 +41,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TreeItemSpec[T <: AnyRef]
     extends SimpleSFXDelegateSpec[jfxsc.TreeItem[T], TreeItem[T]](
-        classOf[jfxsc.TreeItem[T]], classOf[TreeItem[T]])
+      classOf[jfxsc.TreeItem[T]],
+      classOf[TreeItem[T]])

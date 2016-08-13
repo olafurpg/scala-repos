@@ -22,15 +22,15 @@ object DropTakeToSlice extends SimplificationType {
     expr match {
       case qual `.drop` (m) `.take` (n) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "slice", m, sum(m, n)))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "slice", m, sum(m, n)))
+            .highlightFrom(qual))
       case qual `.take` (n) `.drop` (m) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "slice", m, n))
-              .highlightFrom(qual)
-              .withHint(takeDropHint))
+          replace(expr)
+            .withText(invocationText(qual, "slice", m, n))
+            .highlightFrom(qual)
+            .withHint(takeDropHint))
       case _ => None
     }
 

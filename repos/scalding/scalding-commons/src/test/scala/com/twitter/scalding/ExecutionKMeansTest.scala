@@ -33,7 +33,7 @@ class ExecutionKMeansTest extends WordSpec with Matchers {
       // Then all the tail are random, but very small enough to never bridge the gap
       def randVect(cluster: Int): Vector[Double] =
         Vector.fill(k)(0.0).updated(cluster, 100.0) ++ Vector.fill(dim - k)(
-            rng.nextDouble / (1e6 * dim))
+          rng.nextDouble / (1e6 * dim))
 
       // To have the seeds stay sane for kmeans k == vectorCount
       val vectorCount = k

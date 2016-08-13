@@ -25,11 +25,35 @@ import org.apache.commons.lang3.RandomUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.{LongWritable, Text}
-import org.apache.hadoop.mapred.{FileSplit => OldFileSplit, InputSplit => OldInputSplit, JobConf, LineRecordReader => OldLineRecordReader, RecordReader => OldRecordReader, Reporter, TextInputFormat => OldTextInputFormat}
-import org.apache.hadoop.mapred.lib.{CombineFileInputFormat => OldCombineFileInputFormat, CombineFileRecordReader => OldCombineFileRecordReader, CombineFileSplit => OldCombineFileSplit}
-import org.apache.hadoop.mapreduce.{InputSplit => NewInputSplit, RecordReader => NewRecordReader, TaskAttemptContext}
-import org.apache.hadoop.mapreduce.lib.input.{CombineFileInputFormat => NewCombineFileInputFormat, CombineFileRecordReader => NewCombineFileRecordReader, CombineFileSplit => NewCombineFileSplit, FileSplit => NewFileSplit, TextInputFormat => NewTextInputFormat}
-import org.apache.hadoop.mapreduce.lib.output.{TextOutputFormat => NewTextOutputFormat}
+import org.apache.hadoop.mapred.{
+  FileSplit => OldFileSplit,
+  InputSplit => OldInputSplit,
+  JobConf,
+  LineRecordReader => OldLineRecordReader,
+  RecordReader => OldRecordReader,
+  Reporter,
+  TextInputFormat => OldTextInputFormat
+}
+import org.apache.hadoop.mapred.lib.{
+  CombineFileInputFormat => OldCombineFileInputFormat,
+  CombineFileRecordReader => OldCombineFileRecordReader,
+  CombineFileSplit => OldCombineFileSplit
+}
+import org.apache.hadoop.mapreduce.{
+  InputSplit => NewInputSplit,
+  RecordReader => NewRecordReader,
+  TaskAttemptContext
+}
+import org.apache.hadoop.mapreduce.lib.input.{
+  CombineFileInputFormat => NewCombineFileInputFormat,
+  CombineFileRecordReader => NewCombineFileRecordReader,
+  CombineFileSplit => NewCombineFileSplit,
+  FileSplit => NewFileSplit,
+  TextInputFormat => NewTextInputFormat
+}
+import org.apache.hadoop.mapreduce.lib.output.{
+  TextOutputFormat => NewTextOutputFormat
+}
 import org.scalatest.BeforeAndAfter
 
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
@@ -38,7 +62,9 @@ import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskEnd}
 import org.apache.spark.util.Utils
 
 class InputOutputMetricsSuite
-    extends SparkFunSuite with SharedSparkContext with BeforeAndAfter {
+    extends SparkFunSuite
+    with SharedSparkContext
+    with BeforeAndAfter {
 
   @transient var tmpDir: File = _
   @transient var tmpFile: File = _
@@ -272,7 +298,8 @@ class InputOutputMetricsSuite
     // As a result we read from the second partition n times where n is the number of keys in
     // p1. Thus the math below for the test.
     assert(cartesianBytes != 0)
-    assert(cartesianBytes == firstSize * numPartitions +
+    assert(
+      cartesianBytes == firstSize * numPartitions +
         (cartVector.length * secondSize))
   }
 
@@ -296,8 +323,7 @@ class InputOutputMetricsSuite
     // Avoid receiving earlier taskEnd events
     sc.listenerBus.waitUntilEmpty(500)
 
-    sc.addSparkListener(
-        new SparkListener() {
+    sc.addSparkListener(new SparkListener() {
       override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
         collector(taskEnd).foreach(taskMetrics += _)
       }
@@ -332,7 +358,7 @@ class InputOutputMetricsSuite
         sc.parallelize(1 to numRecords)
           .map(key => (key.toString, key.toString))
           .saveAsNewAPIHadoopFile[NewTextOutputFormat[String, String]](
-              filePath)
+            filePath)
       }
       assert(records == numRecords)
     }
@@ -344,8 +370,7 @@ class InputOutputMetricsSuite
 
     if (SparkHadoopUtil.get.getFSBytesWrittenOnThreadCallback().isDefined) {
       val taskBytesWritten = new ArrayBuffer[Long]()
-      sc.addSparkListener(
-          new SparkListener() {
+      sc.addSparkListener(new SparkListener() {
         override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
           taskBytesWritten +=
             taskEnd.taskMetrics.outputMetrics.get.bytesWritten
@@ -405,11 +430,11 @@ class OldCombineTextInputFormat
       conf: JobConf,
       reporter: Reporter): OldRecordReader[LongWritable, Text] = {
     new OldCombineFileRecordReader[LongWritable, Text](
-        conf,
-        split.asInstanceOf[OldCombineFileSplit],
-        reporter,
-        classOf[OldCombineTextRecordReaderWrapper]
-          .asInstanceOf[Class[OldRecordReader[LongWritable, Text]]])
+      conf,
+      split.asInstanceOf[OldCombineFileSplit],
+      reporter,
+      classOf[OldCombineTextRecordReaderWrapper]
+        .asInstanceOf[Class[OldRecordReader[LongWritable, Text]]])
   }
 }
 
@@ -446,14 +471,15 @@ class NewCombineTextInputFormat
       split: NewInputSplit,
       context: TaskAttemptContext): NewRecordReader[LongWritable, Text] = {
     new NewCombineFileRecordReader[LongWritable, Text](
-        split.asInstanceOf[NewCombineFileSplit],
-        context,
-        classOf[NewCombineTextRecordReaderWrapper])
+      split.asInstanceOf[NewCombineFileSplit],
+      context,
+      classOf[NewCombineTextRecordReaderWrapper])
   }
 }
 
-class NewCombineTextRecordReaderWrapper(
-    split: NewCombineFileSplit, context: TaskAttemptContext, idx: Integer)
+class NewCombineTextRecordReaderWrapper(split: NewCombineFileSplit,
+                                        context: TaskAttemptContext,
+                                        idx: Integer)
     extends NewRecordReader[LongWritable, Text] {
 
   val fileSplit = new NewFileSplit(split.getPath(idx),
@@ -464,8 +490,8 @@ class NewCombineTextRecordReaderWrapper(
   val delegate =
     new NewTextInputFormat().createRecordReader(fileSplit, context)
 
-  override def initialize(
-      split: NewInputSplit, context: TaskAttemptContext): Unit = {
+  override def initialize(split: NewInputSplit,
+                          context: TaskAttemptContext): Unit = {
     delegate.initialize(fileSplit, context)
   }
 

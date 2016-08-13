@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
@@ -22,7 +22,7 @@ class WithFilter extends ElementFilter {
     if (leaf != null) {
       var i = context.getTextRange.getStartOffset - 1
       while (i >= 0 &&
-      context.getContainingFile.getText.charAt(i) == ' ') i = i - 1
+             context.getContainingFile.getText.charAt(i) == ' ') i = i - 1
       if (i >= 0) {
         var leaf1 = getLeafByOffset(i, context)
         while (leaf1 != null && !leaf1.isInstanceOf[ScTypeDefinition]) {
@@ -39,7 +39,7 @@ class WithFilter extends ElementFilter {
         }
         leaf1 = getLeafByOffset(i, context)
         while (leaf1 != null && !leaf1.isInstanceOf[ScTypeElement] &&
-        !leaf1.isInstanceOf[ScNewTemplateDefinition]) {
+               !leaf1.isInstanceOf[ScNewTemplateDefinition]) {
           leaf1 = leaf1.getParent
         }
         if (leaf1 != null && leaf1.getTextRange.getEndOffset != i + 1 &&

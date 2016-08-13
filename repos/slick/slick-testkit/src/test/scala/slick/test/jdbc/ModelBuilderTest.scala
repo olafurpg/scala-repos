@@ -26,10 +26,10 @@ class ModelBuilderTest(val tdb: JdbcTestDB) extends DBTest {
         .asTry
     val mt = Await.result(db.run(a.withPinnedSession), Duration.Inf)
     assertTrue(
-        mt.asInstanceOf[Failure[_]]
-          .exception
-          .asInstanceOf[SlickException]
-          .getMessage
-          .contains("not parse default"))
+      mt.asInstanceOf[Failure[_]]
+        .exception
+        .asInstanceOf[SlickException]
+        .getMessage
+        .contains("not parse default"))
   }
 }

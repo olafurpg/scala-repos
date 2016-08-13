@@ -13,7 +13,7 @@ import org.scalatest.junit.JUnitRunner
 class DesignFilterTest extends FunSuite {
 
   test(
-      "designFilterFirwin tested against output from scipy.signal.firwin (0.13.2-1)") {
+    "designFilterFirwin tested against output from scipy.signal.firwin (0.13.2-1)") {
 
     val testNormThreshold = 1.0E-10
     val firwin1 =
@@ -73,8 +73,9 @@ class DesignFilterTest extends FunSuite {
                                 0.44332166714039256,
                                 0.064454645578710029,
                                 -0.0077763127191025679)
-  val testFirwin2 = DenseVector(
-      0.022053155816871686, 0.66666666666666663, 0.022053155816871686)
+  val testFirwin2 = DenseVector(0.022053155816871686,
+                                0.66666666666666663,
+                                0.022053155816871686)
   val testFirwin3 = DenseVector(-0.018510492178744953,
                                 -0.01461577162249808,
                                 0.26666666666666661,

@@ -20,7 +20,8 @@ object Product8 {
   *  @since 2.3
   */
 trait Product8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8]
-    extends Any with Product {
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 8

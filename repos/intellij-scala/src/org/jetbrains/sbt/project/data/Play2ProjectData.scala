@@ -2,7 +2,11 @@ package org.jetbrains.sbt
 package project.data
 
 import com.intellij.openapi.externalSystem.model.project.AbstractExternalEntityData
-import com.intellij.openapi.externalSystem.model.{Key, ProjectKeys, ProjectSystemId}
+import com.intellij.openapi.externalSystem.model.{
+  Key,
+  ProjectKeys,
+  ProjectSystemId
+}
 import org.jetbrains.sbt.project.structure.Play2Keys.AllKeys.ParsedValue
 
 /**
@@ -16,6 +20,6 @@ class Play2ProjectData(
 
 object Play2ProjectData {
   val Key: Key[Play2ProjectData] = new Key(
-      classOf[Play2ProjectData].getName,
-      ProjectKeys.PROJECT.getProcessingWeight + 1)
+    classOf[Play2ProjectData].getName,
+    ProjectKeys.PROJECT.getProcessingWeight + 1)
 }

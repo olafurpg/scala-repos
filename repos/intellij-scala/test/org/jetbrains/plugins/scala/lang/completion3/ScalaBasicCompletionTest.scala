@@ -22,7 +22,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "VectorBuilder").get)
+      activeLookup.find(le => le.getLookupString == "VectorBuilder").get)
     checkResultByText(resultText)
   }
 
@@ -48,7 +48,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxxxx").get)
+      activeLookup.find(le => le.getLookupString == "xxxxx").get)
     checkResultByText(resultText)
   }
 
@@ -76,7 +76,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     assert(!activeLookup.exists(le => le.getLookupString == "xxxxx_="))
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxxxx").get)
+      activeLookup.find(le => le.getLookupString == "xxxxx").get)
     checkResultByText(resultText)
   }
 
@@ -102,7 +102,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxxxx_=").get)
+      activeLookup.find(le => le.getLookupString == "xxxxx_=").get)
     checkResultByText(resultText)
   }
 
@@ -124,7 +124,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "BBBBB").get)
+      activeLookup.find(le => le.getLookupString == "BBBBB").get)
     checkResultByText(resultText)
   }
 
@@ -143,8 +143,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    assert(
-        activeLookup.collect {
+    assert(activeLookup.collect {
       case le if le.getLookupString == "getGoo" => le
     }.length == 1)
   }
@@ -163,7 +162,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "abcdef").get)
+      activeLookup.find(le => le.getLookupString == "abcdef").get)
     checkResultByText(resultText)
   }
 
@@ -205,7 +204,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "brrrrr").get)
+      activeLookup.find(le => le.getLookupString == "brrrrr").get)
     checkResultByText(resultText)
   }
 
@@ -231,7 +230,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "States").get)
+      activeLookup.find(le => le.getLookupString == "States").get)
     checkResultByText(resultText)
   }
 
@@ -257,7 +256,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "States").get)
+      activeLookup.find(le => le.getLookupString == "States").get)
     checkResultByText(resultText)
   }
 
@@ -283,7 +282,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "States").get, '.')
+      activeLookup.find(le => le.getLookupString == "States").get,
+      '.')
     checkResultByText(resultText)
   }
 
@@ -309,7 +309,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "fooaa").get)
+      activeLookup.find(le => le.getLookupString == "fooaa").get)
     checkResultByText(resultText)
   }
 
@@ -327,7 +327,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "theMap").get, '(')
+      activeLookup.find(le => le.getLookupString == "theMap").get,
+      '(')
     checkResultByText(resultText)
   }
 
@@ -349,7 +350,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "ListBuffer").get, '[')
+      activeLookup.find(le => le.getLookupString == "ListBuffer").get,
+      '[')
     checkResultByText(resultText)
   }
 
@@ -371,7 +373,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "ListBuffer").get, '[')
+      activeLookup.find(le => le.getLookupString == "ListBuffer").get,
+      '[')
     checkResultByText(resultText)
   }
 
@@ -391,7 +394,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "Seq").get, '(')
+      activeLookup.find(le => le.getLookupString == "Seq").get,
+      '(')
     checkResultByText(resultText)
   }
 
@@ -411,7 +415,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "AnyRef").get, ')')
+      activeLookup.find(le => le.getLookupString == "AnyRef").get,
+      ')')
     checkResultByText(resultText)
   }
 
@@ -433,7 +438,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "deprecated").get, '\t')
+      activeLookup.find(le => le.getLookupString == "deprecated").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -453,7 +459,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "length").get, '\t')
+      activeLookup.find(le => le.getLookupString == "length").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -545,7 +552,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
+      activeLookup.find(le => le.getLookupString == "BLLLL").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -565,7 +573,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "`yield`").get, '\t')
+      activeLookup.find(le => le.getLookupString == "`yield`").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -587,7 +596,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "foo").get, '\t')
+      activeLookup.find(le => le.getLookupString == "foo").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -607,7 +617,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "aaa.this").get, '\t')
+      activeLookup.find(le => le.getLookupString == "aaa.this").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -627,7 +638,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "aaa.super").get, '\t')
+      activeLookup.find(le => le.getLookupString == "aaa.super").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -647,7 +659,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
+      activeLookup.find(le => le.getLookupString == "aaa").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -707,7 +720,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "map").get, '{')
+      activeLookup.find(le => le.getLookupString == "map").get,
+      '{')
     checkResultByText(resultText)
   }
 
@@ -731,7 +745,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "tailrec").get, '\t')
+      activeLookup.find(le => le.getLookupString == "tailrec").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -773,7 +788,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "fault").get, '\t')
+      activeLookup.find(le => le.getLookupString == "fault").get,
+      '\t')
     checkResultByText(resultText)
   }
 
@@ -789,8 +805,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "currentTimeMillis").get,
-        '\t')
+      activeLookup.find(le => le.getLookupString == "currentTimeMillis").get,
+      '\t')
 
     checkResultByText(resultText)
   }
@@ -809,7 +825,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "foo").get, '\t')
+      activeLookup.find(le => le.getLookupString == "foo").get,
+      '\t')
 
     checkResultByText(resultText)
   }
@@ -826,7 +843,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "classOf").get, '\t')
+      activeLookup.find(le => le.getLookupString == "classOf").get,
+      '\t')
 
     checkResultByText(resultText)
   }
@@ -843,8 +861,9 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(activeLookup
-                         .find(le =>
-                               le.getLookupString == "Option" &&
+                         .find(
+                           le =>
+                             le.getLookupString == "Option" &&
                                le.getPsiElement.isInstanceOf[ScClass])
                          .get,
                        '[')
@@ -864,7 +883,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "apply").get, '[')
+      activeLookup.find(le => le.getLookupString == "apply").get,
+      '[')
 
     checkResultByText(resultText)
   }
@@ -881,8 +901,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "currentTimeMillis").get,
-        '(')
+      activeLookup.find(le => le.getLookupString == "currentTimeMillis").get,
+      '(')
 
     checkResultByText(resultText)
   }
@@ -899,7 +919,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "takeRight").get, ' ')
+      activeLookup.find(le => le.getLookupString == "takeRight").get,
+      ' ')
 
     checkResultByText(resultText)
   }
@@ -939,7 +960,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "`foo`").get)
+      activeLookup.find(le => le.getLookupString == "`foo`").get)
 
     checkResultByText(resultText)
   }
@@ -962,7 +983,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxx").get)
+      activeLookup.find(le => le.getLookupString == "xxx").get)
 
     checkResultByText(resultText)
   }
@@ -983,7 +1004,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "yyy").get)
+      activeLookup.find(le => le.getLookupString == "yyy").get)
 
     checkResultByText(resultText)
   }
@@ -1006,7 +1027,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxx").get, '\n')
+      activeLookup.find(le => le.getLookupString == "xxx").get,
+      '\n')
 
     checkResultByText(resultText)
   }
@@ -1029,7 +1051,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "xxx").get)
+      activeLookup.find(le => le.getLookupString == "xxx").get)
 
     checkResultByText(resultText)
   }
@@ -1052,7 +1074,7 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "substring").get)
+      activeLookup.find(le => le.getLookupString == "substring").get)
 
     checkResultByText(resultText)
   }

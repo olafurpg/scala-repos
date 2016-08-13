@@ -55,7 +55,7 @@ class IllegalFormatConversionException private (private val c: Char)
   override def getMessage(): String = s"$c != ${arg.getName()}"
 }
 
-class IllegalFormatException private[util]() extends IllegalArgumentException
+class IllegalFormatException private[util] () extends IllegalArgumentException
 
 class IllegalFormatFlagsException private () extends IllegalFormatException {
   private var flags: String = null
@@ -82,7 +82,7 @@ class IllegalFormatWidthException(private val w: Int)
 
 class IllformedLocaleException(s: String, errorIndex: Int)
     extends RuntimeException(
-        s + (if (errorIndex < 0) "" else " [at index " + errorIndex + "]")) {
+      s + (if (errorIndex < 0) "" else " [at index " + errorIndex + "]")) {
   def this() = this(null, -1)
   def this(s: String) = this(s, -1)
   def getErrorIndex(): Int = errorIndex
@@ -127,10 +127,10 @@ class MissingFormatWidthException private () extends IllegalFormatException {
   override def getMessage(): String = s
 }
 
-class MissingResourceException private[util](s: String,
-                                             private var className: String,
-                                             private var key: String,
-                                             e: Throwable)
+class MissingResourceException private[util] (s: String,
+                                              private var className: String,
+                                              private var key: String,
+                                              e: Throwable)
     extends RuntimeException(s, e) {
   def this(s: String, className: String, key: String) =
     this(s, className, key, null)

@@ -32,8 +32,8 @@ trait TimeoutDirectives {
     *
     * @param handler optional custom "timeout response" function. If left None, the default timeout HttpResponse will be used.
     */
-  def withRequestTimeout(
-      timeout: Duration, handler: HttpRequest ⇒ HttpResponse): Directive0 =
+  def withRequestTimeout(timeout: Duration,
+                         handler: HttpRequest ⇒ HttpResponse): Directive0 =
     withRequestTimeout(timeout, Some(handler))
 
   /**
@@ -56,7 +56,7 @@ trait TimeoutDirectives {
           }
         case _ ⇒
           ctx.log.warning(
-              "withRequestTimeout was used in route however no request-timeout is set!")
+            "withRequestTimeout was used in route however no request-timeout is set!")
       }
       inner()(ctx)
     }
@@ -75,7 +75,7 @@ trait TimeoutDirectives {
         case Some(t) ⇒ t.timeoutAccess.updateHandler(handler)
         case _ ⇒
           ctx.log.warning(
-              "withRequestTimeoutResponse was used in route however no request-timeout is set!")
+            "withRequestTimeoutResponse was used in route however no request-timeout is set!")
       }
       inner()(ctx)
     }

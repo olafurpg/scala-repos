@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -44,29 +44,35 @@ class AccessControlSpec extends Specification {
       val userAPIKey = userAPIKeyRecord.apiKey
 
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(userAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/user"),
-                               WrittenByAccount(userAccountId)))) must beTrue
+                    Set(
+                      ReadPermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/other"),
-                            WrittenByAccount(userAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(userAccountId)))) must beTrue
+                    Set(
+                      ReducePermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(userAccountId)))) must beTrue
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(userAccountId)))) must beTrue
+                    Set(
+                      ReducePermission(
+                        Path("/other"),
+                        WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      ReadPermission(
+                        Path("/"),
+                        WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      ReducePermission(
+                        Path("/"),
+                        WrittenByAccount(userAccountId)))) must beTrue
     }
 
     "prevent user accounts from reading/reducing others data" in {
@@ -78,29 +84,34 @@ class AccessControlSpec extends Specification {
       val otherAccountId = "other"
 
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReducePermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/user"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
                              WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReducePermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "allow user accounts to write/delete any data under their path" in {
@@ -114,17 +125,19 @@ class AccessControlSpec extends Specification {
       hasCapability(userAPIKey,
                     Set(WritePermission(Path("/user"),
                                         WriteAs(userAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/user"),
-                               WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      DeletePermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(userAPIKey,
                     Set(WritePermission(Path("/user"),
                                         WriteAs(otherAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/user"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      DeletePermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beTrue
     }
 
     "prevent user accounts from writing/deleting any data under another accounts path" in {
@@ -138,17 +151,19 @@ class AccessControlSpec extends Specification {
       hasCapability(userAPIKey,
                     Set(WritePermission(Path("/other"),
                                         WriteAs(userAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(userAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beFalse
+                    Set(
+                      DeletePermission(
+                        Path("/other"),
+                        WrittenByAccount(userAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "allow user accounts to read/reduce others data via a grant" in {
@@ -163,64 +178,77 @@ class AccessControlSpec extends Specification {
       val otherAPIKey = otherAPIKeyRecord.apiKey
 
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReducePermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/user"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
                              WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReducePermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
 
       val readReduceOther = Set[Permission](
-          ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId))
+        ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        ReducePermission(Path("/other"), WrittenByAccount(otherAccountId))
       )
 
       apiKeyManager
-        .deriveAndAddGrant(
-            None, None, otherAPIKey, readReduceOther, userAPIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           otherAPIKey,
+                           readReduceOther,
+                           userAPIKey)
         .get
 
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReducePermission(
+                        Path("/user"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/user"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
                              WrittenByAccount(otherAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+                    Set(
+                      ReducePermission(
+                        Path("/"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "allow user accounts to write/delete data under another accounts path via a grant" in {
@@ -237,44 +265,51 @@ class AccessControlSpec extends Specification {
       hasCapability(userAPIKey,
                     Set(WritePermission(Path("/other"),
                                         WriteAs(userAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(userAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beFalse
+                    Set(
+                      DeletePermission(
+                        Path("/other"),
+                        WrittenByAccount(userAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
 
       val writeDeleteOther = Set[Permission](
-          WritePermission(Path("/other"), WriteAs(userAccountId)),
-          DeletePermission(Path("/other"), WrittenByAccount(userAccountId)),
-          WritePermission(Path("/other"), WriteAs(otherAccountId)),
-          DeletePermission(Path("/other"), WrittenByAccount(otherAccountId))
+        WritePermission(Path("/other"), WriteAs(userAccountId)),
+        DeletePermission(Path("/other"), WrittenByAccount(userAccountId)),
+        WritePermission(Path("/other"), WriteAs(otherAccountId)),
+        DeletePermission(Path("/other"), WrittenByAccount(otherAccountId))
       )
 
       apiKeyManager
-        .deriveAndAddGrant(
-            None, None, otherAPIKey, writeDeleteOther, userAPIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           otherAPIKey,
+                           writeDeleteOther,
+                           userAPIKey)
         .get
 
       hasCapability(userAPIKey,
                     Set(WritePermission(Path("/other"),
                                         WriteAs(userAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beTrue
+                    Set(
+                      DeletePermission(
+                        Path("/other"),
+                        WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beTrue
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beTrue
     }
 
     "prevent access via invalid API key" in {
@@ -288,28 +323,31 @@ class AccessControlSpec extends Specification {
       hasCapability(invalidAPIKey,
                     Set(ReadPermission(Path("/"), WrittenByAny))) must beFalse
       hasCapability(
-          invalidAPIKey,
-          Set(ReducePermission(Path("/"), WrittenByAny))) must beFalse
+        invalidAPIKey,
+        Set(ReducePermission(Path("/"), WrittenByAny))) must beFalse
       hasCapability(invalidAPIKey, Set(WritePermission(Path("/"), WriteAsAny))) must beFalse
       hasCapability(
-          invalidAPIKey,
-          Set(DeletePermission(Path("/"), WrittenByAny))) must beFalse
+        invalidAPIKey,
+        Set(DeletePermission(Path("/"), WrittenByAny))) must beFalse
 
       hasCapability(invalidAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(userAccountId)))) must beFalse
-      hasCapability(
-          invalidAPIKey,
-          Set(ReducePermission(Path("/user"),
-                               WrittenByAccount(userAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beFalse
+      hasCapability(invalidAPIKey,
+                    Set(
+                      ReducePermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beFalse
       hasCapability(invalidAPIKey,
                     Set(WritePermission(Path("/user"),
                                         WriteAs(userAccountId)))) must beFalse
-      hasCapability(
-          invalidAPIKey,
-          Set(DeletePermission(Path("/user"),
-                               WrittenByAccount(userAccountId)))) must beFalse
+      hasCapability(invalidAPIKey,
+                    Set(
+                      DeletePermission(
+                        Path("/user"),
+                        WrittenByAccount(userAccountId)))) must beFalse
     }
 
     "prevent access via a revoked grant" in {
@@ -324,49 +362,53 @@ class AccessControlSpec extends Specification {
       val otherAPIKey = otherAPIKeyRecord.apiKey
 
       val accessOther = Set[Permission](
-          ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+        ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        WritePermission(Path("/other"), WriteAsAny),
+        DeletePermission(Path("/other"), WrittenByAny)
       )
 
       val accessOtherGrant = apiKeyManager
         .deriveAndAddGrant(None, None, otherAPIKey, accessOther, userAPIKey)
         .get
 
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
-                             WrittenByAccount(otherAccountId)))) must beTrue
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beTrue
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beTrue
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beTrue
+      hasCapability(
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beTrue
 
       apiKeyManager.deleteGrant(accessOtherGrant.grantId)
 
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
-                             WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beFalse
+      hasCapability(
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "prevent access via an expired grant" in {
@@ -381,10 +423,10 @@ class AccessControlSpec extends Specification {
       val otherAPIKey = otherAPIKeyRecord.apiKey
 
       val accessOther = Set[Permission](
-          ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+        ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        WritePermission(Path("/other"), WriteAsAny),
+        DeletePermission(Path("/other"), WrittenByAny)
       )
 
       val expiredAccessOtherGrant = apiKeyManager
@@ -396,21 +438,23 @@ class AccessControlSpec extends Specification {
                            Some(new DateTime().minusYears(1000)))
         .get
 
-      hasCapability(
-          userAPIKey,
-          Set(ReadPermission(Path("/other"),
-                             WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          userAPIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(userAPIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
-          userAPIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
+        userAPIKey,
+        Set(ReducePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(userAPIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beFalse
+      hasCapability(
+        userAPIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "prevent access via a grant with a revoked parent" in {
@@ -430,10 +474,10 @@ class AccessControlSpec extends Specification {
       val otherAPIKey = otherAPIKeyRecord.apiKey
 
       val accessOther = Set[Permission](
-          ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
-          WritePermission(Path("/other"), WriteAsAny),
-          DeletePermission(Path("/other"), WrittenByAny)
+        ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        ReducePermission(Path("/other"), WrittenByAccount(otherAccountId)),
+        WritePermission(Path("/other"), WriteAsAny),
+        DeletePermission(Path("/other"), WrittenByAny)
       )
 
       val user1AccessOtherGrant = apiKeyManager
@@ -443,39 +487,43 @@ class AccessControlSpec extends Specification {
         .deriveAndAddGrant(None, None, user1APIKey, accessOther, user2APIKey)
         .get
 
-      hasCapability(
-          user2APIKey,
-          Set(ReadPermission(Path("/other"),
-                             WrittenByAccount(otherAccountId)))) must beTrue
-      hasCapability(
-          user2APIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(user2APIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beTrue
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beTrue
       hasCapability(
-          user2APIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beTrue
+        user2APIKey,
+        Set(ReducePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beTrue
+      hasCapability(user2APIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beTrue
+      hasCapability(
+        user2APIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beTrue
 
       apiKeyManager.deleteGrant(user1AccessOtherGrant.grantId)
 
-      hasCapability(
-          user2APIKey,
-          Set(ReadPermission(Path("/other"),
-                             WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(
-          user2APIKey,
-          Set(ReducePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(user2APIKey,
-                    Set(WritePermission(Path("/other"),
-                                        WriteAs(otherAccountId)))) must beFalse
+                    Set(
+                      ReadPermission(
+                        Path("/other"),
+                        WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
-          user2APIKey,
-          Set(DeletePermission(Path("/other"),
-                               WrittenByAccount(otherAccountId)))) must beFalse
+        user2APIKey,
+        Set(ReducePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(user2APIKey,
+                    Set(
+                      WritePermission(Path("/other"),
+                                      WriteAs(otherAccountId)))) must beFalse
+      hasCapability(
+        user2APIKey,
+        Set(DeletePermission(Path("/other"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "support addon grants sandboxed to customer paths" in {
@@ -495,18 +543,22 @@ class AccessControlSpec extends Specification {
       val customer2APIKey = customer2APIKeyRecord.apiKey
 
       val readCustomer1Customer1 =
-        Set[Permission](ReadPermission(Path("/customer1/data"),
-                                       WrittenByAccount(customer1AccountId)))
+        Set[Permission](
+          ReadPermission(Path("/customer1/data"),
+                         WrittenByAccount(customer1AccountId)))
       val readCustomer1AddOn =
-        Set[Permission](ReadPermission(Path("/customer1/data"),
-                                       WrittenByAccount(addOnAccountId)))
+        Set[Permission](
+          ReadPermission(Path("/customer1/data"),
+                         WrittenByAccount(addOnAccountId)))
 
       val readCustomer2Customer2 =
-        Set[Permission](ReadPermission(Path("/customer2/data"),
-                                       WrittenByAccount(customer2AccountId)))
+        Set[Permission](
+          ReadPermission(Path("/customer2/data"),
+                         WrittenByAccount(customer2AccountId)))
       val readCustomer2AddOn =
-        Set[Permission](ReadPermission(Path("/customer2/data"),
-                                       WrittenByAccount(addOnAccountId)))
+        Set[Permission](
+          ReadPermission(Path("/customer2/data"),
+                         WrittenByAccount(addOnAccountId)))
 
       hasCapability(customer1APIKey, readCustomer1Customer1) must beTrue
       hasCapability(customer1APIKey, readCustomer1AddOn) must beFalse
@@ -516,12 +568,18 @@ class AccessControlSpec extends Specification {
       hasCapability(customer2APIKey, readCustomer1AddOn) must beFalse
 
       val customer1CanRead = apiKeyManager
-        .deriveAndAddGrant(
-            None, None, addOnAPIKey, readCustomer1AddOn, customer1APIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           addOnAPIKey,
+                           readCustomer1AddOn,
+                           customer1APIKey)
         .get
       val customer2CanRead = apiKeyManager
-        .deriveAndAddGrant(
-            None, None, addOnAPIKey, readCustomer2AddOn, customer2APIKey)
+        .deriveAndAddGrant(None,
+                           None,
+                           addOnAPIKey,
+                           readCustomer2AddOn,
+                           customer2APIKey)
         .get
 
       hasCapability(customer1APIKey, readCustomer1Customer1) must beTrue
@@ -549,11 +607,13 @@ class AccessControlSpec extends Specification {
       val customerAPIKey = customerAPIKeyRecord.apiKey
 
       val readPerm =
-        Set[Permission](ReadPermission(Path("/provider/customer/data"),
-                                       WrittenByAccount(customerAccountId)))
+        Set[Permission](
+          ReadPermission(Path("/provider/customer/data"),
+                         WrittenByAccount(customerAccountId)))
       val writePerm =
-        Set[Permission](WritePermission(Path("/provider/customer/data"),
-                                        WriteAs(customerAccountId)))
+        Set[Permission](
+          WritePermission(Path("/provider/customer/data"),
+                          WriteAs(customerAccountId)))
 
       hasCapability(providerAPIKey, readPerm) must beFalse
       hasCapability(providerAPIKey, writePerm) must beTrue
@@ -595,8 +655,9 @@ class AccessControlSpec extends Specification {
       val customerAPIKey = customerAPIKeyRecord.apiKey
 
       val addOnPerm =
-        Set(ReadPermission(Path("/addon/public"),
-                           WrittenByAccount(addOnAccountId)): Permission)
+        Set(
+          ReadPermission(Path("/addon/public"),
+                         WrittenByAccount(addOnAccountId)): Permission)
 
       hasCapability(addOnAPIKey, addOnPerm) must beTrue
       hasCapability(customerAPIKey, addOnPerm) must beFalse

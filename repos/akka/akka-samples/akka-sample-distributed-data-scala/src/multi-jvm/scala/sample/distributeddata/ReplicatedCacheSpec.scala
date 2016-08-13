@@ -16,7 +16,9 @@ object ReplicatedCacheSpec extends MultiNodeConfig {
   val node2 = role("node-2")
   val node3 = role("node-3")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -28,7 +30,8 @@ class ReplicatedCacheSpecMultiJvmNode2 extends ReplicatedCacheSpec
 class ReplicatedCacheSpecMultiJvmNode3 extends ReplicatedCacheSpec
 
 class ReplicatedCacheSpec
-    extends MultiNodeSpec(ReplicatedCacheSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatedCacheSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatedCacheSpec._
   import ReplicatedCache._

@@ -10,20 +10,20 @@ class MapSpec extends FlatSpec with Matchers {
   import map._
 
   val as = Map(
-      1 -> Set('a, 'b, 'c),
-      2 -> Set('b)
+    1 -> Set('a, 'b, 'c),
+    2 -> Set('b)
   )
 
   val bs = Map(
-      1 -> Set('c, 'd),
-      2 -> Set('a),
-      3 -> Set('e)
+    1 -> Set('c, 'd),
+    2 -> Set('a),
+    3 -> Set('e)
   )
 
   val merged = Map(
-      1 -> Set('a, 'b, 'c, 'd),
-      2 -> Set('a, 'b),
-      3 -> Set('e)
+    1 -> Set('a, 'b, 'c, 'd),
+    2 -> Set('a, 'b),
+    3 -> Set('e)
   )
 
   "map._" should "map values eagerly" in {

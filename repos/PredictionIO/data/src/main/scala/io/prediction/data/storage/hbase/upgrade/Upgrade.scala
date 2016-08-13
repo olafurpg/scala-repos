@@ -49,7 +49,7 @@ object Upgrade {
 
     val newTableName = newTable.getName().getNameAsString()
     println(
-        s"Copying data from ${fromNamespace}:events for app ID ${fromAppId}" +
+      s"Copying data from ${fromNamespace}:events for app ID ${fromAppId}" +
         s" to new HBase table ${newTableName}...")
 
     HB_0_8_0

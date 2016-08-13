@@ -35,8 +35,8 @@ class EventServerPluginContext(
 object EventServerPluginContext extends Logging {
   def apply(log: LoggingAdapter): EventServerPluginContext = {
     val plugins = mutable.Map[String, mutable.Map[String, EventServerPlugin]](
-        EventServerPlugin.inputBlocker -> mutable.Map(),
-        EventServerPlugin.inputSniffer -> mutable.Map())
+      EventServerPlugin.inputBlocker -> mutable.Map(),
+      EventServerPlugin.inputSniffer -> mutable.Map())
     val serviceLoader = ServiceLoader.load(classOf[EventServerPlugin])
     serviceLoader foreach { service =>
       plugins(service.pluginType) += service.pluginName -> service

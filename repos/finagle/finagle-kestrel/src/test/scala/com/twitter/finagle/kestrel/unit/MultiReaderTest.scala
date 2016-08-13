@@ -2,7 +2,12 @@ package com.twitter.finagle.kestrel.unit
 
 import _root_.java.net.{InetSocketAddress, SocketAddress}
 import _root_.java.nio.charset.Charset
-import _root_.java.util.concurrent.{BlockingDeque, ExecutorService, Executors, LinkedBlockingDeque}
+import _root_.java.util.concurrent.{
+  BlockingDeque,
+  ExecutorService,
+  Executors,
+  LinkedBlockingDeque
+}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.twitter.concurrent.{Broker, Spool}
@@ -10,7 +15,13 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.builder.{ClientBuilder, ClientConfig, Cluster}
 import com.twitter.finagle.kestrel._
 import com.twitter.finagle.kestrel.protocol.{Command, Response, Set}
-import com.twitter.finagle.{Addr, Address, ClientConnection, Service, ServiceFactory}
+import com.twitter.finagle.{
+  Addr,
+  Address,
+  ClientConnection,
+  Service,
+  ServiceFactory
+}
 import com.twitter.io.Buf
 import com.twitter.util._
 import org.junit.runner.RunWith
@@ -27,7 +38,9 @@ import scala.collection.mutable.{ArrayBuffer, Set => MSet}
 
 @RunWith(classOf[JUnitRunner])
 class MultiReaderTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
   class MockHandle extends ReadHandle {
     val _messages = new Broker[ReadMessage]
@@ -56,7 +69,7 @@ class MultiReaderTest
     val hosts =
       0 until N map { i =>
         Address(
-            InetSocketAddress.createUnresolved("10.0.0.%d".format(i), 22133))
+          InetSocketAddress.createUnresolved("10.0.0.%d".format(i), 22133))
       }
 
     val executor = Executors.newCachedThreadPool()
@@ -71,8 +84,7 @@ class MultiReaderTest
           val promise = new Promise[Response]()
           executor match {
             case Some(exec) =>
-              exec.submit(
-                  new Runnable {
+              exec.submit(new Runnable {
                 def run() {
                   promise.setValue(interpreter(request))
                 }
@@ -90,12 +102,16 @@ class MultiReaderTest
         .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
           def load(k: Buf) = new LinkedBlockingDeque[Buf]
         })
-        (host, queues)
+      (host, queues)
     }.toMap
 
     lazy val mockClientBuilder = {
-      val result = mock[ClientBuilder[
-              Command, Response, Nothing, ClientConfig.Yes, ClientConfig.Yes]]
+      val result = mock[
+        ClientBuilder[Command,
+                      Response,
+                      Nothing,
+                      ClientConfig.Yes,
+                      ClientConfig.Yes]]
 
       hosts.foreach { host =>
         val mockHostClientBuilder = mock[ClientBuilder[Command,
@@ -182,8 +198,7 @@ class MultiReaderTest
           val promise = new Promise[Response]()
           executor match {
             case Some(exec) =>
-              exec.submit(
-                  new Runnable {
+              exec.submit(new Runnable {
                 def run() {
                   promise.setValue(interpreter(request))
                 }
@@ -201,12 +216,16 @@ class MultiReaderTest
         .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
           def load(k: Buf) = new LinkedBlockingDeque[Buf]
         })
-        (host, queues)
+      (host, queues)
     }.toMap
 
     lazy val mockClientBuilder = {
-      val result = mock[ClientBuilder[
-              Command, Response, Nothing, ClientConfig.Yes, ClientConfig.Yes]]
+      val result = mock[
+        ClientBuilder[Command,
+                      Response,
+                      Nothing,
+                      ClientConfig.Yes,
+                      ClientConfig.Yes]]
 
       hosts.foreach { host =>
         val mockHostClientBuilder = mock[ClientBuilder[Command,
@@ -248,7 +267,7 @@ class MultiReaderTest
   }
 
   test(
-      "static ReadHandle cluster should always grab the first available message") {
+    "static ReadHandle cluster should always grab the first available message") {
     new MultiReaderHelper {
       val handle = MultiReaderHelper.merge(va)
 
@@ -272,7 +291,7 @@ class MultiReaderTest
   }
 
   test(
-      "static ReadHandle cluster should round robin from multiple available queues") {
+    "static ReadHandle cluster should round robin from multiple available queues") {
     // We use frozen time for deterministic randomness.
     new MultiReaderHelper {
       Time.withTimeAt(Time.epoch + 1.seconds) { _ =>
@@ -286,9 +305,9 @@ class MultiReaderTest
 
         val handle = MultiReaderHelper.merge(va)
         assert(
-            ISet((handle.messages ??),
-                 (handle.messages ??),
-                 (handle.messages ??)) == ISet(ms(0), ms(1), ms(2))
+          ISet((handle.messages ??),
+               (handle.messages ??),
+               (handle.messages ??)) == ISet(ms(0), ms(1), ms(2))
         )
       }
     }
@@ -308,7 +327,7 @@ class MultiReaderTest
   }
 
   test(
-      "static ReadHandle cluster should propagate errors when everything's errored out") {
+    "static ReadHandle cluster should propagate errors when everything's errored out") {
     new MultiReaderHelper {
       val handle = MultiReaderHelper.merge(va)
       val e = handle.error.sync()
@@ -336,8 +355,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -347,7 +367,7 @@ class MultiReaderTest
   }
 
   test(
-      "Var[Addr]-based cluster should read messages as cluster hosts are added") {
+    "Var[Addr]-based cluster should read messages as cluster hosts are added") {
     new AddrClusterHelper {
       val va = Var(Addr.Bound(hosts.head))
       val handle =
@@ -361,8 +381,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       // 0, 3, 6 ...
@@ -376,13 +397,13 @@ class MultiReaderTest
       // 1, 2, 4, 5, ...
       eventually {
         assert(
-            messages == sentMessages.grouped(N).map { _.tail }.flatten.toSet)
+          messages == sentMessages.grouped(N).map { _.tail }.flatten.toSet)
       }
     }
   }
 
   test(
-      "Var[Addr]-based cluster should read messages as cluster hosts are removed") {
+    "Var[Addr]-based cluster should read messages as cluster hosts are removed") {
     new AddrClusterHelper {
       var mutableHosts: Seq[Address] = hosts
       val va = Var(Addr.Bound(mutableHosts: _*))
@@ -399,8 +420,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -415,25 +437,27 @@ class MultiReaderTest
           // write to all 3
           sentMessages.zipWithIndex foreach {
             case (m, i) =>
-              Await.result(services(i % services.size)
-                    .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+              Await.result(
+                services(i % services.size)
+                  .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
           }
 
           // expect fewer to be read on each pass
           val expectFirstN = N - hostIndex - 1
           eventually {
-            assert(messages == sentMessages
-                  .grouped(N)
-                  .map { _.take(expectFirstN) }
-                  .flatten
-                  .toSet)
+            assert(
+              messages == sentMessages
+                .grouped(N)
+                .map { _.take(expectFirstN) }
+                .flatten
+                .toSet)
           }
       }
     }
   }
 
   test(
-      "Var[Addr]-based cluster should wait for cluster to become ready before snapping initial hosts") {
+    "Var[Addr]-based cluster should wait for cluster to become ready before snapping initial hosts") {
     new AddrClusterHelper {
       val va = Var(Addr.Bound())
       val handle =
@@ -448,8 +472,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       assert(messages.size == 0) // cluster not ready
@@ -464,7 +489,7 @@ class MultiReaderTest
   }
 
   test(
-      "Var[Addr]-based cluster should report an error if all hosts are removed") {
+    "Var[Addr]-based cluster should report an error if all hosts are removed") {
     new AddrClusterHelper {
       val va = Var(Addr.Bound(hosts: _*))
       val handle =
@@ -492,7 +517,7 @@ class MultiReaderTest
   }
 
   test(
-      "dynamic SocketAddress cluster should read messages from a ready cluster") {
+    "dynamic SocketAddress cluster should read messages from a ready cluster") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](hosts)
       val handle = MultiReader(cluster, "the_queue")
@@ -507,8 +532,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -518,7 +544,7 @@ class MultiReaderTest
   }
 
   test(
-      "dynamic SocketAddress cluster should read messages as cluster hosts are added") {
+    "dynamic SocketAddress cluster should read messages as cluster hosts are added") {
     new DynamicClusterHelper {
       val (host, rest) = (hosts.head, hosts.tail)
       val cluster = new DynamicCluster[SocketAddress](List(host))
@@ -534,8 +560,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       // 0, 3, 6 ...
@@ -551,13 +578,13 @@ class MultiReaderTest
       // 1, 2, 4, 5, ...
       eventually {
         assert(
-            messages == sentMessages.grouped(N).map { _.tail }.flatten.toSet)
+          messages == sentMessages.grouped(N).map { _.tail }.flatten.toSet)
       }
     }
   }
 
   test(
-      "dynamic SocketAddress cluster should read messages as cluster hosts are removed") {
+    "dynamic SocketAddress cluster should read messages as cluster hosts are removed") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](hosts)
       val rest = hosts.tail
@@ -574,8 +601,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -590,24 +618,27 @@ class MultiReaderTest
           // write to all 3
           sentMessages.zipWithIndex foreach {
             case (m, i) =>
-              Await.result(services(i % services.size)
-                    .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+              Await.result(
+                services(i % services.size)
+                  .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
           }
 
           // expect fewer to be read on each pass
           val expectFirstN = N - hostIndex - 1
           eventually {
-            assert(messages == sentMessages
-                  .grouped(N)
-                  .map { _.take(expectFirstN) }
-                  .flatten
-                  .toSet)
+            assert(
+              messages == sentMessages
+                .grouped(N)
+                .map { _.take(expectFirstN) }
+                .flatten
+                .toSet)
           }
       }
     }
   }
 
-  test("dynamic SocketAddress cluster should wait " +
+  test(
+    "dynamic SocketAddress cluster should wait " +
       "for cluster to become ready before snapping initial hosts") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](Seq())
@@ -624,8 +655,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       assert(messages.size == 0) // cluster not ready
@@ -642,7 +674,7 @@ class MultiReaderTest
   }
 
   test(
-      "dynamic SocketAddress cluster should report an error if all hosts are removed") {
+    "dynamic SocketAddress cluster should report an error if all hosts are removed") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](hosts)
       val handle = MultiReader(cluster, "the_queue")
@@ -658,7 +690,8 @@ class MultiReaderTest
     }
   }
 
-  test("dynamic SocketAddress cluster should silently" +
+  test(
+    "dynamic SocketAddress cluster should silently" +
       " handle the removal of a host that was never added") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](hosts)
@@ -674,8 +707,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
       eventually {
         assert(messages == sentMessages.toSet)
@@ -686,8 +720,9 @@ class MultiReaderTest
 
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
-          Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+          Await.result(
+            services(i % services.size)
+              .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
       eventually {
         assert(messages == sentMessages.toSet)

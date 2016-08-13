@@ -28,7 +28,7 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
   override val db = new DatabaseOnDocker {
     override val imageName = "mysql:5.7.9"
     override val env = Map(
-        "MYSQL_ROOT_PASSWORD" -> "rootpass"
+      "MYSQL_ROOT_PASSWORD" -> "rootpass"
     )
     override val jdbcPort: Int = 3306
     override def getJdbcUrl(ip: String, port: Int): String =
@@ -45,36 +45,37 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
 
     conn
       .prepareStatement(
-          "CREATE TABLE numbers (onebit BIT(1), tenbits BIT(10), " +
+        "CREATE TABLE numbers (onebit BIT(1), tenbits BIT(10), " +
           "small SMALLINT, med MEDIUMINT, nor INT, big BIGINT, deci DECIMAL(40,20), flt FLOAT, " +
           "dbl DOUBLE)")
       .executeUpdate()
     conn
-      .prepareStatement("INSERT INTO numbers VALUES (b'0', b'1000100101', " +
+      .prepareStatement(
+        "INSERT INTO numbers VALUES (b'0', b'1000100101', " +
           "17, 77777, 123456789, 123456789012345, 123456789012345.123456789012345, " +
           "42.75, 1.0000000000000002)")
       .executeUpdate()
 
     conn
       .prepareStatement(
-          "CREATE TABLE dates (d DATE, t TIME, dt DATETIME, ts TIMESTAMP, " +
+        "CREATE TABLE dates (d DATE, t TIME, dt DATETIME, ts TIMESTAMP, " +
           "yr YEAR)")
       .executeUpdate()
     conn
       .prepareStatement(
-          "INSERT INTO dates VALUES ('1991-11-09', '13:31:24', " +
+        "INSERT INTO dates VALUES ('1991-11-09', '13:31:24', " +
           "'1996-01-01 01:23:45', '2009-02-13 23:31:30', '2001')")
       .executeUpdate()
 
     // TODO: Test locale conversion for strings.
     conn
       .prepareStatement(
-          "CREATE TABLE strings (a CHAR(10), b VARCHAR(10), c TINYTEXT, " +
+        "CREATE TABLE strings (a CHAR(10), b VARCHAR(10), c TINYTEXT, " +
           "d TEXT, e MEDIUMTEXT, f LONGTEXT, g BINARY(4), h VARBINARY(10), i BLOB)")
       .executeUpdate()
     conn
       .prepareStatement(
-          "INSERT INTO strings VALUES ('the', 'quick', 'brown', 'fox', " +
+        "INSERT INTO strings VALUES ('the', 'quick', 'brown', 'fox', " +
           "'jumps', 'over', 'the', 'lazy', 'dog')")
       .executeUpdate()
   }
@@ -128,15 +129,18 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(types(3).equals("class java.sql.Timestamp"))
     assert(types(4).equals("class java.sql.Date"))
     assert(rows(0).getAs[Date](0).equals(Date.valueOf("1991-11-09")))
-    assert(rows(0)
-          .getAs[Timestamp](1)
-          .equals(Timestamp.valueOf("1970-01-01 13:31:24")))
-    assert(rows(0)
-          .getAs[Timestamp](2)
-          .equals(Timestamp.valueOf("1996-01-01 01:23:45")))
-    assert(rows(0)
-          .getAs[Timestamp](3)
-          .equals(Timestamp.valueOf("2009-02-13 23:31:30")))
+    assert(
+      rows(0)
+        .getAs[Timestamp](1)
+        .equals(Timestamp.valueOf("1970-01-01 13:31:24")))
+    assert(
+      rows(0)
+        .getAs[Timestamp](2)
+        .equals(Timestamp.valueOf("1996-01-01 01:23:45")))
+    assert(
+      rows(0)
+        .getAs[Timestamp](3)
+        .equals(Timestamp.valueOf("2009-02-13 23:31:30")))
     assert(rows(0).getAs[Date](4).equals(Date.valueOf("2001-01-01")))
   }
 
@@ -161,12 +165,15 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(rows(0).getString(3).equals("fox"))
     assert(rows(0).getString(4).equals("jumps"))
     assert(rows(0).getString(5).equals("over"))
-    assert(java.util.Arrays.equals(rows(0).getAs[Array[Byte]](6),
-                                   Array[Byte](116, 104, 101, 0)))
-    assert(java.util.Arrays.equals(rows(0).getAs[Array[Byte]](7),
-                                   Array[Byte](108, 97, 122, 121)))
-    assert(java.util.Arrays
-          .equals(rows(0).getAs[Array[Byte]](8), Array[Byte](100, 111, 103)))
+    assert(
+      java.util.Arrays
+        .equals(rows(0).getAs[Array[Byte]](6), Array[Byte](116, 104, 101, 0)))
+    assert(
+      java.util.Arrays
+        .equals(rows(0).getAs[Array[Byte]](7), Array[Byte](108, 97, 122, 121)))
+    assert(
+      java.util.Arrays
+        .equals(rows(0).getAs[Array[Byte]](8), Array[Byte](100, 111, 103)))
   }
 
   test("Basic write test") {

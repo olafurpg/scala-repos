@@ -31,9 +31,10 @@ import org.apache.spark.rdd.RDD
   * @param gradient Gradient function to be used.
   * @param updater Updater to be used to update weights after every iteration.
   */
-class GradientDescent private[spark](
-    private var gradient: Gradient, private var updater: Updater)
-    extends Optimizer with Logging {
+class GradientDescent private[spark] (private var gradient: Gradient,
+                                      private var updater: Updater)
+    extends Optimizer
+    with Logging {
 
   private var stepSize: Double = 1.0
   private var numIterations: Int = 100
@@ -182,7 +183,7 @@ object GradientDescent extends Logging {
     // convergenceTol should be set with non minibatch settings
     if (miniBatchFraction < 1.0 && convergenceTol > 0.0) {
       logWarning(
-          "Testing against a convergenceTol when using miniBatchFraction " +
+        "Testing against a convergenceTol when using miniBatchFraction " +
           "< 1.0 can be unstable because of the stochasticity in sampling.")
     }
 
@@ -197,7 +198,7 @@ object GradientDescent extends Logging {
     // if no data, return initial weights to avoid NaNs
     if (numExamples == 0) {
       logWarning(
-          "GradientDescent.runMiniBatchSGD returning initial weights, no data found")
+        "GradientDescent.runMiniBatchSGD returning initial weights, no data found")
       return (initialWeights, stochasticLossHistory.toArray)
     }
 
@@ -225,19 +226,15 @@ object GradientDescent extends Logging {
       // compute and sum up the subgradients on this subset (this is one map-reduce)
       val (gradientSum, lossSum, miniBatchSize) = data
         .sample(false, miniBatchFraction, 42 + i)
-        .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(
-            seqOp = (c, v) =>
-                {
-                // c: (grad, loss, count), v: (label, features)
-                val l = gradient.compute(
-                    v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
-                (c._1, c._2 + l, c._3 + 1)
-            },
-            combOp = (c1, c2) =>
-                {
-                // c: (grad, loss, count)
-                (c1._1 += c2._1, c1._2 + c2._2, c1._3 + c2._3)
-            })
+        .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(seqOp = (c, v) => {
+          // c: (grad, loss, count), v: (label, features)
+          val l = gradient
+            .compute(v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
+          (c._1, c._2 + l, c._3 + 1)
+        }, combOp = (c1, c2) => {
+          // c: (grad, loss, count)
+          (c1._1 += c2._1, c1._2 + c2._2, c1._3 + c2._3)
+        })
 
       if (miniBatchSize > 0) {
 
@@ -247,30 +244,31 @@ object GradientDescent extends Logging {
           */
         stochasticLossHistory.append(lossSum / miniBatchSize + regVal)
         val update = updater.compute(
-            weights,
-            Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble),
-            stepSize,
-            i,
-            regParam)
+          weights,
+          Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble),
+          stepSize,
+          i,
+          regParam)
         weights = update._1
         regVal = update._2
 
         previousWeights = currentWeights
         currentWeights = Some(weights)
         if (previousWeights != None && currentWeights != None) {
-          converged = isConverged(
-              previousWeights.get, currentWeights.get, convergenceTol)
+          converged = isConverged(previousWeights.get,
+                                  currentWeights.get,
+                                  convergenceTol)
         }
       } else {
         logWarning(
-            s"Iteration ($i/$numIterations). The size of sampled batch is zero")
+          s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
       i += 1
     }
 
     logInfo(
-        "GradientDescent.runMiniBatchSGD finished. Last 10 stochastic losses %s"
-          .format(stochasticLossHistory.takeRight(10).mkString(", ")))
+      "GradientDescent.runMiniBatchSGD finished. Last 10 stochastic losses %s"
+        .format(stochasticLossHistory.takeRight(10).mkString(", ")))
 
     (weights, stochasticLossHistory.toArray)
   }

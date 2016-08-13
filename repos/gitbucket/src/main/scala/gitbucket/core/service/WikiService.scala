@@ -20,43 +20,49 @@ object WikiService {
 
   /**
     * The model for wiki page.
-    * 
+    *
     * @param name the page name
     * @param content the page content
     * @param committer the last committer
     * @param time the last modified time
     * @param id the latest commit id
     */
-  case class WikiPageInfo(
-      name: String, content: String, committer: String, time: Date, id: String)
+  case class WikiPageInfo(name: String,
+                          content: String,
+                          committer: String,
+                          time: Date,
+                          id: String)
 
   /**
     * The model for wiki page history.
-    * 
+    *
     * @param name the page name
     * @param committer the committer the committer
     * @param message the commit message
     * @param date the commit date
     */
-  case class WikiPageHistoryInfo(
-      name: String, committer: String, message: String, date: Date)
+  case class WikiPageHistoryInfo(name: String,
+                                 committer: String,
+                                 message: String,
+                                 date: Date)
 
-  def wikiHttpUrl(
-      repositoryInfo: RepositoryInfo)(implicit context: Context): String =
-    RepositoryService.httpUrl(
-        repositoryInfo.owner, repositoryInfo.name + ".wiki")
+  def wikiHttpUrl(repositoryInfo: RepositoryInfo)(
+      implicit context: Context): String =
+    RepositoryService
+      .httpUrl(repositoryInfo.owner, repositoryInfo.name + ".wiki")
 
   def wikiSshUrl(repositoryInfo: RepositoryInfo)(
       implicit context: Context): Option[String] =
-    RepositoryService.sshUrl(
-        repositoryInfo.owner, repositoryInfo.name + ".wiki")
+    RepositoryService
+      .sshUrl(repositoryInfo.owner, repositoryInfo.name + ".wiki")
 }
 
 trait WikiService {
   import WikiService._
 
-  def createWikiRepository(
-      loginAccount: Account, owner: String, repository: String): Unit =
+  def createWikiRepository(loginAccount: Account,
+                           owner: String,
+                           repository: String): Unit =
     LockUtil.lock(s"${owner}/${repository}/wiki") {
       defining(Directory.getWikiRepositoryDir(owner, repository)) { dir =>
         if (!dir.exists) {
@@ -87,7 +93,7 @@ trait WikiService {
           .map { file =>
             WikiPageInfo(file.name,
                          StringUtil.convertFromByteArray(
-                             git.getRepository.open(file.id).getBytes),
+                           git.getRepository.open(file.id).getBytes),
                          file.author,
                          file.time,
                          file.commitId)
@@ -99,8 +105,9 @@ trait WikiService {
   /**
     * Returns the content of the specified file.
     */
-  def getFileContent(
-      owner: String, repository: String, path: String): Option[Array[Byte]] =
+  def getFileContent(owner: String,
+                     repository: String,
+                     path: String): Option[Array[Byte]] =
     using(Git.open(Directory.getWikiRepositoryDir(owner, repository))) { git =>
       if (!JGitUtil.isEmpty(git)) {
         val index = path.lastIndexOf('/')
@@ -182,34 +189,34 @@ trait WikiService {
             val revertInfo = (p.getFiles.asScala.map { fh =>
               fh.getChangeType match {
                 case DiffEntry.ChangeType.MODIFY => {
-                    val source = getWikiPage(owner,
-                                             repository,
-                                             fh.getNewPath.stripSuffix(".md"))
-                      .map(_.content)
-                      .getOrElse("")
-                    val applied = PatchUtil.apply(source, patch, fh)
-                    if (applied != null) {
-                      Seq(RevertInfo("ADD", fh.getNewPath, applied))
-                    } else Nil
-                  }
+                  val source = getWikiPage(owner,
+                                           repository,
+                                           fh.getNewPath.stripSuffix(".md"))
+                    .map(_.content)
+                    .getOrElse("")
+                  val applied = PatchUtil.apply(source, patch, fh)
+                  if (applied != null) {
+                    Seq(RevertInfo("ADD", fh.getNewPath, applied))
+                  } else Nil
+                }
                 case DiffEntry.ChangeType.ADD => {
-                    val applied = PatchUtil.apply("", patch, fh)
-                    if (applied != null) {
-                      Seq(RevertInfo("ADD", fh.getNewPath, applied))
-                    } else Nil
-                  }
+                  val applied = PatchUtil.apply("", patch, fh)
+                  if (applied != null) {
+                    Seq(RevertInfo("ADD", fh.getNewPath, applied))
+                  } else Nil
+                }
                 case DiffEntry.ChangeType.DELETE => {
-                    Seq(RevertInfo("DELETE", fh.getNewPath, ""))
-                  }
+                  Seq(RevertInfo("DELETE", fh.getNewPath, ""))
+                }
                 case DiffEntry.ChangeType.RENAME => {
-                    val applied = PatchUtil.apply("", patch, fh)
-                    if (applied != null) {
-                      Seq(RevertInfo("DELETE", fh.getOldPath, ""),
-                          RevertInfo("ADD", fh.getNewPath, applied))
-                    } else {
-                      Seq(RevertInfo("DELETE", fh.getOldPath, ""))
-                    }
+                  val applied = PatchUtil.apply("", patch, fh)
+                  if (applied != null) {
+                    Seq(RevertInfo("DELETE", fh.getOldPath, ""),
+                        RevertInfo("ADD", fh.getNewPath, applied))
+                  } else {
+                    Seq(RevertInfo("DELETE", fh.getOldPath, ""))
                   }
+                }
                 case _ => Nil
               }
             }).flatten
@@ -222,41 +229,44 @@ trait WikiService {
 
               JGitUtil.processTree(git, headId) { (path, tree) =>
                 if (revertInfo.find(x => x.filePath == path).isEmpty) {
-                  builder.add(JGitUtil.createDirCacheEntry(
-                          path, tree.getEntryFileMode, tree.getEntryObjectId))
+                  builder.add(
+                    JGitUtil.createDirCacheEntry(path,
+                                                 tree.getEntryFileMode,
+                                                 tree.getEntryObjectId))
                 }
               }
 
               revertInfo.filter(_.operation == "ADD").foreach { x =>
-                builder.add(JGitUtil.createDirCacheEntry(
-                        x.filePath,
-                        FileMode.REGULAR_FILE,
-                        inserter.insert(Constants.OBJ_BLOB,
-                                        x.source.getBytes("UTF-8"))))
+                builder.add(
+                  JGitUtil.createDirCacheEntry(
+                    x.filePath,
+                    FileMode.REGULAR_FILE,
+                    inserter.insert(Constants.OBJ_BLOB,
+                                    x.source.getBytes("UTF-8"))))
               }
               builder.finish()
 
               JGitUtil.createNewCommit(
-                  git,
-                  inserter,
-                  headId,
-                  builder.getDirCache.writeTree(inserter),
-                  Constants.HEAD,
-                  committer.fullName,
-                  committer.mailAddress,
-                  pageName match {
-                    case Some(x) => s"Revert ${from} ... ${to} on ${x}"
-                    case None => s"Revert ${from} ... ${to}"
-                  })
+                git,
+                inserter,
+                headId,
+                builder.getDirCache.writeTree(inserter),
+                Constants.HEAD,
+                committer.fullName,
+                committer.mailAddress,
+                pageName match {
+                  case Some(x) => s"Revert ${from} ... ${to} on ${x}"
+                  case None => s"Revert ${from} ... ${to}"
+                })
             }
         }
       }
       true
     } catch {
       case e: Exception => {
-          e.printStackTrace()
-          false
-        }
+        e.printStackTrace()
+        false
+      }
     }
   }
 
@@ -287,8 +297,10 @@ trait WikiService {
                   currentPageName != newPageName) {
                 removed = true
               } else if (path != newPageName + ".md") {
-                builder.add(JGitUtil.createDirCacheEntry(
-                        path, tree.getEntryFileMode, tree.getEntryObjectId))
+                builder.add(
+                  JGitUtil.createDirCacheEntry(path,
+                                               tree.getEntryFileMode,
+                                               tree.getEntryObjectId))
               } else {
                 created = false
                 updated = JGitUtil
@@ -301,31 +313,31 @@ trait WikiService {
 
           if (created || updated || removed) {
             builder.add(
-                JGitUtil.createDirCacheEntry(
-                    newPageName + ".md",
-                    FileMode.REGULAR_FILE,
-                    inserter.insert(Constants.OBJ_BLOB,
-                                    content.getBytes("UTF-8"))))
+              JGitUtil.createDirCacheEntry(
+                newPageName + ".md",
+                FileMode.REGULAR_FILE,
+                inserter.insert(Constants.OBJ_BLOB,
+                                content.getBytes("UTF-8"))))
             builder.finish()
             val newHeadId = JGitUtil.createNewCommit(
-                git,
-                inserter,
-                headId,
-                builder.getDirCache.writeTree(inserter),
-                Constants.HEAD,
-                committer.fullName,
-                committer.mailAddress,
-                if (message.trim.length == 0) {
-                  if (removed) {
-                    s"Rename ${currentPageName} to ${newPageName}"
-                  } else if (created) {
-                    s"Created ${newPageName}"
-                  } else {
-                    s"Updated ${newPageName}"
-                  }
+              git,
+              inserter,
+              headId,
+              builder.getDirCache.writeTree(inserter),
+              Constants.HEAD,
+              committer.fullName,
+              committer.mailAddress,
+              if (message.trim.length == 0) {
+                if (removed) {
+                  s"Rename ${currentPageName} to ${newPageName}"
+                } else if (created) {
+                  s"Created ${newPageName}"
                 } else {
-                  message
-                })
+                  s"Updated ${newPageName}"
+                }
+              } else {
+                message
+              })
 
             Some(newHeadId.getName)
           } else None
@@ -352,8 +364,10 @@ trait WikiService {
 
           JGitUtil.processTree(git, headId) { (path, tree) =>
             if (path != pageName + ".md") {
-              builder.add(JGitUtil.createDirCacheEntry(
-                      path, tree.getEntryFileMode, tree.getEntryObjectId))
+              builder.add(
+                JGitUtil.createDirCacheEntry(path,
+                                             tree.getEntryFileMode,
+                                             tree.getEntryObjectId))
             } else {
               removed = true
             }

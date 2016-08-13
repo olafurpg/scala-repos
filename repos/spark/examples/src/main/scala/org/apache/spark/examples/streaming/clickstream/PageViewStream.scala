@@ -38,7 +38,7 @@ object PageViewStream {
     if (args.length != 3) {
       System.err.println("Usage: PageViewStream <metric> <host> <port>")
       System.err.println(
-          "<metric> must be one of pageCounts, slidingPageCounts," +
+        "<metric> must be one of pageCounts, slidingPageCounts," +
           " errorRatePerZipCode, activeUserCount, popularUsersSeen")
       System.exit(1)
     }
@@ -49,11 +49,11 @@ object PageViewStream {
 
     // Create the context
     val ssc = new StreamingContext(
-        "local[2]",
-        "PageViewStream",
-        Seconds(1),
-        System.getenv("SPARK_HOME"),
-        StreamingContext.jarOfClass(this.getClass).toSeq)
+      "local[2]",
+      "PageViewStream",
+      Seconds(1),
+      System.getenv("SPARK_HOME"),
+      StreamingContext.jarOfClass(this.getClass).toSeq)
 
     // Create a ReceiverInputDStream on target host:port and convert each line to a PageView
     val pageViews = ssc
@@ -95,9 +95,8 @@ object PageViewStream {
       .map("Unique active users: " + _)
 
     // An external dataset we want to join to this stream
-    val userList = ssc.sparkContext.parallelize(Seq(1 -> "Patrick Wendell",
-                                                    2 -> "Reynold Xin",
-                                                    3 -> "Matei Zaharia"))
+    val userList = ssc.sparkContext.parallelize(
+      Seq(1 -> "Patrick Wendell", 2 -> "Reynold Xin", 3 -> "Matei Zaharia"))
 
     metric match {
       case "pageCounts" => pageCounts.print()
@@ -108,13 +107,14 @@ object PageViewStream {
         // Look for users in our existing dataset and print it out if we have a match
         pageViews
           .map(view => (view.userID, 1))
-          .foreachRDD((rdd, time) =>
-                rdd
-                  .join(userList)
-                  .map(_._2._2)
-                  .take(10)
-                  .foreach(u =>
-                        println("Saw user %s at time %s".format(u, time))))
+          .foreachRDD(
+            (rdd, time) =>
+              rdd
+                .join(userList)
+                .map(_._2._2)
+                .take(10)
+                .foreach(u =>
+                  println("Saw user %s at time %s".format(u, time))))
       case _ => println("Invalid metric entered: " + metric)
     }
 

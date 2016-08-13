@@ -25,25 +25,25 @@ private final class PushApi(
         Pov.ofUserId(game, userId) ?? { pov =>
           IfAway(pov) {
             pushToAll(
-                userId,
-                _.finish,
-                PushApi.Data(
-                    title = pov.win match {
-                      case Some(true) => "You won!"
-                      case Some(false) => "You lost."
-                      case _ => "It's a draw."
-                    },
-                    body = s"Your game with ${opponentName(pov)} is over.",
-                    payload = Json.obj(
-                          "userId" -> userId,
-                          "userData" -> Json.obj(
-                              "type" -> "gameFinish",
-                              "gameId" -> game.id,
-                              "fullId" -> pov.fullId,
-                              "color" -> pov.color.name,
-                              "fen" -> Forsyth.exportBoard(game.toChess.board),
-                              "lastMove" -> game.castleLastMoveTime.lastMoveString,
-                              "win" -> pov.win))))
+              userId,
+              _.finish,
+              PushApi.Data(
+                title = pov.win match {
+                  case Some(true) => "You won!"
+                  case Some(false) => "You lost."
+                  case _ => "It's a draw."
+                },
+                body = s"Your game with ${opponentName(pov)} is over.",
+                payload = Json.obj(
+                  "userId" -> userId,
+                  "userData" -> Json.obj(
+                    "type" -> "gameFinish",
+                    "gameId" -> game.id,
+                    "fullId" -> pov.fullId,
+                    "color" -> pov.color.name,
+                    "fen" -> Forsyth.exportBoard(game.toChess.board),
+                    "lastMove" -> game.castleLastMoveTime.lastMoveString,
+                    "win" -> pov.win))))
           }
         }
       }.sequenceFu.void
@@ -56,21 +56,21 @@ private final class PushApi(
           game.pgnMoves.lastOption ?? { sanMove =>
             IfAway(pov) {
               pushToAll(
-                  userId,
-                  _.move,
-                  PushApi.Data(title = "It's your turn!",
-                               body = s"${opponentName(pov)} played $sanMove",
-                               payload = Json
-                                   .obj("userId" -> userId,
-                                        "userData" -> Json
-                                          .obj("type" -> "gameMove",
-                                               "gameId" -> game.id,
-                                               "fullId" -> pov.fullId,
-                                               "color" -> pov.color.name,
-                                               "fen" -> Forsyth
-                                                 .exportBoard(game.toChess.board),
-                    "lastMove" -> game.castleLastMoveTime.lastMoveString,
-                    "secondsLeft" -> pov.remainingSeconds))))
+                userId,
+                _.move,
+                PushApi.Data(
+                  title = "It's your turn!",
+                  body = s"${opponentName(pov)} played $sanMove",
+                  payload = Json.obj(
+                    "userId" -> userId,
+                    "userData" -> Json.obj(
+                      "type" -> "gameMove",
+                      "gameId" -> game.id,
+                      "fullId" -> pov.fullId,
+                      "color" -> pov.color.name,
+                      "fen" -> Forsyth.exportBoard(game.toChess.board),
+                      "lastMove" -> game.castleLastMoveTime.lastMoveString,
+                      "secondsLeft" -> pov.remainingSeconds))))
             }
           }
         }
@@ -82,15 +82,16 @@ private final class PushApi(
     c.challengerUser.ifFalse(c.hasClock) ?? { challenger =>
       lightUser(challenger.id) ?? { lightChallenger =>
         pushToAll(
-            dest.id,
-            _.challenge.create,
-            PushApi.Data(
-                title = s"${lightChallenger.titleName} (${challenger.rating.show}) challenges you!",
-                body = describeChallenge(c),
-                payload = Json.obj(
-                      "userId" -> dest.id,
-                      "userData" -> Json.obj("type" -> "challengeCreate",
-                                             "challengeId" -> c.id))))
+          dest.id,
+          _.challenge.create,
+          PushApi.Data(
+            title =
+              s"${lightChallenger.titleName} (${challenger.rating.show}) challenges you!",
+            body = describeChallenge(c),
+            payload =
+              Json.obj("userId" -> dest.id,
+                       "userData" -> Json.obj("type" -> "challengeCreate",
+                                              "challengeId" -> c.id))))
       }
     }
   }
@@ -100,22 +101,24 @@ private final class PushApi(
       challenger =>
         val lightJoiner = joinerId flatMap lightUser
         pushToAll(
-            challenger.id,
-            _.challenge.accept,
-            PushApi.Data(
-                title = s"${lightJoiner.fold("Anonymous")(_.titleName)} accepts your challenge!",
-                body = describeChallenge(c),
-                payload = Json.obj(
-                      "userId" -> challenger.id,
-                      "userData" -> Json.obj("type" -> "challengeAccept",
-                                             "challengeId" -> c.id,
-                                             "joiner" -> lightJoiner))))
+          challenger.id,
+          _.challenge.accept,
+          PushApi.Data(
+            title =
+              s"${lightJoiner.fold("Anonymous")(_.titleName)} accepts your challenge!",
+            body = describeChallenge(c),
+            payload =
+              Json.obj("userId" -> challenger.id,
+                       "userData" -> Json.obj("type" -> "challengeAccept",
+                                              "challengeId" -> c.id,
+                                              "joiner" -> lightJoiner))))
     }
 
   private type MonitorType = lila.mon.push.send.type => (String => Unit)
 
-  private def pushToAll(
-      userId: String, monitor: MonitorType, data: PushApi.Data) = {
+  private def pushToAll(userId: String,
+                        monitor: MonitorType,
+                        data: PushApi.Data) = {
     googlePush(userId) {
       monitor(lila.mon.push.send)("android")
       data
@@ -129,20 +132,20 @@ private final class PushApi(
   private def describeChallenge(c: Challenge) = {
     import lila.challenge.Challenge.TimeControl._
     List(
-        c.mode.fold("Casual", "Rated"),
-        c.timeControl match {
-          case Unlimited => "Unlimited"
-          case Correspondence(d) => s"$d days"
-          case c: Clock => c.show
-        },
-        c.variant.name
+      c.mode.fold("Casual", "Rated"),
+      c.timeControl match {
+        case Unlimited => "Unlimited"
+        case Correspondence(d) => s"$d days"
+        case c: Clock => c.show
+      },
+      c.variant.name
     ) mkString " • "
   }
 
   private def IfAway(pov: Pov)(f: => Funit): Funit = {
     import makeTimeout.short
     roundSocketHub ? Ask(pov.gameId, IsOnGame(pov.color)) mapTo manifest[
-        Boolean] flatMap {
+      Boolean] flatMap {
       case true => funit
       case false => f
     }

@@ -30,7 +30,9 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark._
 
 class AsyncRDDActionsSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Timeouts {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Timeouts {
 
   @transient private var sc: SparkContext = _
 
@@ -91,9 +93,9 @@ class AsyncRDDActionsSuite
       val expected = input.take(num)
       val saw = rdd.takeAsync(num).get()
       assert(
-          saw == expected,
-          "incorrect result for rdd with %d partitions (expected %s, saw %s)"
-            .format(rdd.partitions.size, expected, saw))
+        saw == expected,
+        "incorrect result for rdd with %d partitions (expected %s, saw %s)"
+          .format(rdd.partitions.size, expected, saw))
     }
     val input = Range(1, 1000)
 
@@ -133,7 +135,8 @@ class AsyncRDDActionsSuite
       case scala.util.Success(res) =>
         sem.release()
       case scala.util.Failure(e) =>
-        info("Should not have reached this code path (onComplete matching Failure)")
+        info(
+          "Should not have reached this code path (onComplete matching Failure)")
         throw new Exception("Task should succeed")
     }
     f.onSuccess {
@@ -170,7 +173,8 @@ class AsyncRDDActionsSuite
 
     f.onComplete {
       case scala.util.Success(res) =>
-        info("Should not have reached this code path (onComplete matching Success)")
+        info(
+          "Should not have reached this code path (onComplete matching Success)")
         throw new Exception("Task should fail")
       case scala.util.Failure(e) =>
         sem.release()

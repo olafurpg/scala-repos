@@ -45,8 +45,11 @@ object DecisionTreeRegressionExample {
     val maxDepth = 5
     val maxBins = 32
 
-    val model = DecisionTree.trainRegressor(
-        trainingData, categoricalFeaturesInfo, impurity, maxDepth, maxBins)
+    val model = DecisionTree.trainRegressor(trainingData,
+                                            categoricalFeaturesInfo,
+                                            impurity,
+                                            maxDepth,
+                                            maxBins)
 
     // Evaluate model on test instances and compute test error
     val labelsAndPredictions = testData.map { point =>

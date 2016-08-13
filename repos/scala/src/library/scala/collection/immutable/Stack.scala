@@ -50,12 +50,14 @@ object Stack extends SeqFactory[Stack] {
   */
 @SerialVersionUID(1976480595012942526L)
 @deprecated(
-    "Stack is an inelegant and potentially poorly-performing wrapper around List.  Use List instead: stack push x becomes x :: list; stack.pop is list.tail.",
-    "2.11.0")
+  "Stack is an inelegant and potentially poorly-performing wrapper around List.  Use List instead: stack push x becomes x :: list; stack.pop is list.tail.",
+  "2.11.0")
 class Stack[+A] protected (protected val elems: List[A])
-    extends AbstractSeq[A] with LinearSeq[A]
+    extends AbstractSeq[A]
+    with LinearSeq[A]
     with GenericTraversableTemplate[A, Stack]
-    with LinearSeqOptimized[A, Stack[A]] with Serializable {
+    with LinearSeqOptimized[A, Stack[A]]
+    with Serializable {
   override def companion: GenericCompanion[Stack] = Stack
 
   def this() = this(Nil)

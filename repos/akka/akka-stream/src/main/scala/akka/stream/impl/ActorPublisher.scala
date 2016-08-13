@@ -98,7 +98,8 @@ private[akka] class ActorPublisher[T](val impl: ActorRef)
   * INTERNAL API
   */
 private[akka] class ActorSubscription[T](
-    final val impl: ActorRef, final val subscriber: Subscriber[_ >: T])
+    final val impl: ActorRef,
+    final val subscriber: Subscriber[_ >: T])
     extends Subscription {
   override def request(elements: Long): Unit =
     impl ! RequestMore(this, elements)
@@ -109,15 +110,15 @@ private[akka] class ActorSubscription[T](
   * INTERNAL API
   */
 private[akka] class ActorSubscriptionWithCursor[T](
-    _impl: ActorRef, _subscriber: Subscriber[_ >: T])
+    _impl: ActorRef,
+    _subscriber: Subscriber[_ >: T])
     extends ActorSubscription[T](_impl, _subscriber)
     with SubscriptionWithCursor[T]
 
 /**
   * INTERNAL API
   */
-private[akka] trait SoftShutdown {
-  this: Actor ⇒
+private[akka] trait SoftShutdown { this: Actor ⇒
   def softShutdown(): Unit = {
     val children = context.children
     if (children.isEmpty) {

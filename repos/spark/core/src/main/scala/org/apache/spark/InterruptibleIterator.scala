@@ -25,8 +25,8 @@ import org.apache.spark.annotation.DeveloperApi
   * It works by checking the interrupted flag in [[TaskContext]].
   */
 @DeveloperApi
-class InterruptibleIterator[+T](
-    val context: TaskContext, val delegate: Iterator[T])
+class InterruptibleIterator[+T](val context: TaskContext,
+                                val delegate: Iterator[T])
     extends Iterator[T] {
 
   def hasNext: Boolean = {

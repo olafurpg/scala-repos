@@ -14,40 +14,42 @@ private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix {
   def getHeapSnapshot = {
     val metrics = getMetrics
     HeapMemoryUsage(
-        metrics.get(key("heap-init")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("heap-used")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("heap-max")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("heap-committed")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("heap-usage")).asInstanceOf[RatioGauge].getValue)
+      metrics.get(key("heap-init")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("heap-used")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("heap-max")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("heap-committed")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("heap-usage")).asInstanceOf[RatioGauge].getValue)
   }
 
   def getTotalSnapshot = {
     val metrics = getMetrics
     TotalMemoryUsage(
-        metrics.get(key("total-init")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("total-used")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("total-max")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("total-committed")).asInstanceOf[Gauge[Long]].getValue)
+      metrics.get(key("total-init")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("total-used")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("total-max")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("total-committed")).asInstanceOf[Gauge[Long]].getValue)
   }
 
   def getNonHeapSnapshot = {
     val metrics = getMetrics
     NonHeapMemoryUsage(
-        metrics.get(key("non-heap-init")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("non-heap-used")).asInstanceOf[Gauge[Long]].getValue,
-        metrics.get(key("non-heap-max")).asInstanceOf[Gauge[Long]].getValue,
-        metrics
-          .get(key("non-heap-committed"))
-          .asInstanceOf[Gauge[Long]]
-          .getValue,
-        metrics.get(key("non-heap-usage")).asInstanceOf[RatioGauge].getValue)
+      metrics.get(key("non-heap-init")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("non-heap-used")).asInstanceOf[Gauge[Long]].getValue,
+      metrics.get(key("non-heap-max")).asInstanceOf[Gauge[Long]].getValue,
+      metrics
+        .get(key("non-heap-committed"))
+        .asInstanceOf[Gauge[Long]]
+        .getValue,
+      metrics.get(key("non-heap-usage")).asInstanceOf[RatioGauge].getValue)
   }
 
   private def key(k: String) = prefix + "." + k
 }
 
-private[akka] case class TotalMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long) {
+private[akka] case class TotalMemoryUsage(init: Long,
+                                          used: Long,
+                                          max: Long,
+                                          comitted: Long) {
 
   def diff(other: TotalMemoryUsage): TotalMemoryUsage =
     TotalMemoryUsage(this.init - other.init,
@@ -56,8 +58,11 @@ private[akka] case class TotalMemoryUsage(
                      this.comitted - other.comitted)
 }
 
-private[akka] case class HeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+private[akka] case class HeapMemoryUsage(init: Long,
+                                         used: Long,
+                                         max: Long,
+                                         comitted: Long,
+                                         usage: Double) {
 
   def diff(other: HeapMemoryUsage): HeapMemoryUsage =
     HeapMemoryUsage(this.init - other.init,
@@ -67,8 +72,11 @@ private[akka] case class HeapMemoryUsage(
                     this.usage - other.usage)
 }
 
-private[akka] case class NonHeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+private[akka] case class NonHeapMemoryUsage(init: Long,
+                                            used: Long,
+                                            max: Long,
+                                            comitted: Long,
+                                            usage: Double) {
 
   def diff(other: NonHeapMemoryUsage): NonHeapMemoryUsage =
     NonHeapMemoryUsage(this.init - other.init,

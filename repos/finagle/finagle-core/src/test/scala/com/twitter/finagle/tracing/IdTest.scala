@@ -9,33 +9,45 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class IdTest extends FunSuite {
   test("compare unequal ids") {
-    assert(TraceId(None, None, SpanId(0L), None) != TraceId(
-            None, None, SpanId(1L), None))
+    assert(
+      TraceId(None, None, SpanId(0L), None) != TraceId(None,
+                                                       None,
+                                                       SpanId(1L),
+                                                       None))
   }
 
   test("compare equal ids") {
-    assert(TraceId(None, None, SpanId(0L), None) == TraceId(
-            None, None, SpanId(0L), None))
+    assert(
+      TraceId(None, None, SpanId(0L), None) == TraceId(None,
+                                                       None,
+                                                       SpanId(0L),
+                                                       None))
   }
 
   test("compare synthesized parentId") {
-    assert(TraceId(None, Some(SpanId(1L)), SpanId(1L), None) == TraceId(
-            None, None, SpanId(1L), None))
+    assert(
+      TraceId(None, Some(SpanId(1L)), SpanId(1L), None) == TraceId(None,
+                                                                   None,
+                                                                   SpanId(1L),
+                                                                   None))
   }
 
   test("compare synthesized traceId") {
     assert(
-        TraceId(Some(SpanId(1L)), Some(SpanId(1L)), SpanId(1L), None) == TraceId(
-            None, Some(SpanId(1L)), SpanId(1L), None))
+      TraceId(Some(SpanId(1L)), Some(SpanId(1L)), SpanId(1L), None) == TraceId(
+        None,
+        Some(SpanId(1L)),
+        SpanId(1L),
+        None))
   }
 
   test("serialize and deserialize") {
     val traceIdOne = TraceId(None, Some(SpanId(1L)), SpanId(1L), None)
     assert(
-        traceIdOne == TraceId.deserialize(TraceId.serialize(traceIdOne)).get())
+      traceIdOne == TraceId.deserialize(TraceId.serialize(traceIdOne)).get())
     val traceIdTwo = TraceId(None, None, SpanId(0L), None, Flags().setDebug)
     assert(
-        traceIdTwo == TraceId.deserialize(TraceId.serialize(traceIdTwo)).get())
+      traceIdTwo == TraceId.deserialize(TraceId.serialize(traceIdTwo)).get())
   }
 
   test("fail to deserialize incorrect traces") {
@@ -45,8 +57,8 @@ class IdTest extends FunSuite {
 
   test("return sampled true if debug mode") {
     assert(
-        TraceId(None, None, SpanId(0L), None, Flags().setDebug).sampled == Some(
-            true))
+      TraceId(None, None, SpanId(0L), None, Flags().setDebug).sampled == Some(
+        true))
   }
 
   def hex(l: Long) = new RichU64Long(l).toU64HexString
@@ -65,10 +77,10 @@ class IdTest extends FunSuite {
 
   test("hashCode only accounts for id fields") {
     assert(
-        TraceId(Some(SpanId(1L)), Some(SpanId(2L)), SpanId(3L), Some(true)).hashCode == TraceId(
-            Some(SpanId(1L)),
-            Some(SpanId(2L)),
-            SpanId(3L),
-            Some(false)).hashCode)
+      TraceId(Some(SpanId(1L)), Some(SpanId(2L)), SpanId(3L), Some(true)).hashCode == TraceId(
+        Some(SpanId(1L)),
+        Some(SpanId(2L)),
+        SpanId(3L),
+        Some(false)).hashCode)
   }
 }

@@ -10,14 +10,28 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference,
+  ScThisReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 import scala.collection.Set
 
@@ -41,7 +55,7 @@ object ResolveProcessor {
               case Some(c: ScObject) => defaultForTypeAlias(t)
               case Some(td: ScTypeDefinition)
                   if td.typeParameters.length == 0 &&
-                  ScalaPsiUtil.hasStablePath(td) =>
+                    ScalaPsiUtil.hasStablePath(td) =>
                 "Class:" + td.qualifiedName
               case Some(c: PsiClass) if c.getTypeParameters.length == 0 =>
                 "Class:" + c.qualifiedName
@@ -59,7 +73,8 @@ object ResolveProcessor {
 class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
                        val ref: PsiElement,
                        val name: String)
-    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[String] {
   @volatile
   private var resolveScope: GlobalSearchScope = null
   def getResolveScope: GlobalSearchScope = {
@@ -153,41 +168,41 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
               .findPackage(o.qualifiedName) != null =>
         case pack: PsiPackage =>
           val resolveResult: ScalaResolveResult = new ScalaResolveResult(
-              ScPackageImpl(pack),
-              getSubst(state),
-              getImports(state),
-              nameShadow,
-              isAccessible = accessible)
+            ScPackageImpl(pack),
+            getSubst(state),
+            getImports(state),
+            nameShadow,
+            isAccessible = accessible)
           addResult(resolveResult)
         case clazz: PsiClass
             if !isThisOrSuperResolve ||
-            PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
+              PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
           addResult(
-              new ScalaResolveResult(named,
-                                     getSubst(state),
-                                     getImports(state),
-                                     nameShadow,
-                                     boundClass = getBoundClass(state),
-                                     fromType = getFromType(state),
-                                     isAccessible = accessible))
+            new ScalaResolveResult(named,
+                                   getSubst(state),
+                                   getImports(state),
+                                   nameShadow,
+                                   boundClass = getBoundClass(state),
+                                   fromType = getFromType(state),
+                                   isAccessible = accessible))
         case clazz: PsiClass => //do nothing, it's wrong class or object
         case _ if isThisOrSuperResolve => //do nothing for type alias
         case _ =>
           addResult(
-              new ScalaResolveResult(named,
-                                     getSubst(state),
-                                     getImports(state),
-                                     nameShadow,
-                                     boundClass = getBoundClass(state),
-                                     fromType = getFromType(state),
-                                     isAccessible = accessible))
+            new ScalaResolveResult(named,
+                                   getSubst(state),
+                                   getImports(state),
+                                   nameShadow,
+                                   boundClass = getBoundClass(state),
+                                   fromType = getFromType(state),
+                                   isAccessible = accessible))
       }
     }
     true
   }
 
-  protected def nameAndKindMatch(
-      named: PsiNamedElement, state: ResolveState): Boolean = {
+  protected def nameAndKindMatch(named: PsiNamedElement,
+                                 state: ResolveState): Boolean = {
     val nameSet = state.get(ResolverEnv.nameKey)
     val elName =
       if (nameSet == null) {
@@ -237,13 +252,14 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     }
      */
     res.filter {
-      case r @ ScalaResolveResult(
-          _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+      case r @ ScalaResolveResult(_: ScTypeAlias | _: ScClass | _: ScTrait,
+                                  _) =>
         res.foldLeft(true) {
           case (false, _) => false
           case (true,
-                rr @ ScalaResolveResult(
-                _: ScTypeAlias | _: ScClass | _: ScTrait, _)) =>
+                rr @ ScalaResolveResult(_: ScTypeAlias | _: ScClass |
+                                        _: ScTrait,
+                                        _)) =>
             rr.element.name != r.element.name || ScalaPsiUtil
               .superTypeMembers(rr.element)
               .find(_ == r.element) == None

@@ -22,7 +22,12 @@ import scala.collection.mutable.ArrayBuilder
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.Transformer
-import org.apache.spark.ml.attribute.{Attribute, AttributeGroup, NumericAttribute, UnresolvedAttribute}
+import org.apache.spark.ml.attribute.{
+  Attribute,
+  AttributeGroup,
+  NumericAttribute,
+  UnresolvedAttribute
+}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util._
@@ -37,7 +42,9 @@ import org.apache.spark.sql.types._
   */
 @Experimental
 class VectorAssembler(override val uid: String)
-    extends Transformer with HasInputCols with HasOutputCol
+    extends Transformer
+    with HasInputCols
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vecAssembler"))
@@ -85,12 +92,12 @@ class VectorAssembler(override val uid: String)
             // from metadata, check the first row.
             val numAttrs =
               group.numAttributes.getOrElse(first.getAs[Vector](index).size)
-            Array.tabulate(numAttrs)(
-                i => NumericAttribute.defaultAttr.withName(c + "_" + i))
+            Array.tabulate(numAttrs)(i =>
+              NumericAttribute.defaultAttr.withName(c + "_" + i))
           }
         case otherType =>
           throw new SparkException(
-              s"VectorAssembler does not support the $otherType type")
+            s"VectorAssembler does not support the $otherType type")
       }
     }
     val metadata = new AttributeGroup($(outputCol), attrs).toMetadata()
@@ -108,8 +115,8 @@ class VectorAssembler(override val uid: String)
       }
     }
 
-    dataset.select(
-        col("*"), assembleFunc(struct(args: _*)).as($(outputCol), metadata))
+    dataset.select(col("*"),
+                   assembleFunc(struct(args: _*)).as($(outputCol), metadata))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -121,14 +128,14 @@ class VectorAssembler(override val uid: String)
       case t if t.isInstanceOf[VectorUDT] =>
       case other =>
         throw new IllegalArgumentException(
-            s"Data type $other is not supported.")
+          s"Data type $other is not supported.")
     }
     if (schema.fieldNames.contains(outputColName)) {
       throw new IllegalArgumentException(
-          s"Output column $outputColName already exists.")
+        s"Output column $outputColName already exists.")
     }
     StructType(
-        schema.fields :+ new StructField(outputColName, new VectorUDT, true))
+      schema.fields :+ new StructField(outputColName, new VectorUDT, true))
   }
 
   override def copy(extra: ParamMap): VectorAssembler = defaultCopy(extra)
@@ -165,7 +172,7 @@ object VectorAssembler extends DefaultParamsReadable[VectorAssembler] {
         throw new SparkException("Values to assemble cannot be null.")
       case o =>
         throw new SparkException(
-            s"$o of type ${o.getClass.getName} is not supported.")
+          s"$o of type ${o.getClass.getName} is not supported.")
     }
     Vectors.sparse(cur, indices.result(), values.result()).compressed
   }

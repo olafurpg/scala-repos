@@ -5,7 +5,19 @@ package akka.remote
 
 import scala.annotation.tailrec
 import scala.util.control.NonFatal
-import akka.actor.{VirtualPathContainer, Deploy, Props, Nobody, InternalActorRef, ActorSystemImpl, ActorRef, ActorPathExtractor, ActorPath, Actor, AddressTerminated}
+import akka.actor.{
+  VirtualPathContainer,
+  Deploy,
+  Props,
+  Nobody,
+  InternalActorRef,
+  ActorSystemImpl,
+  ActorRef,
+  ActorPathExtractor,
+  ActorPath,
+  Actor,
+  AddressTerminated
+}
 import akka.event.LoggingAdapter
 import akka.dispatch.sysmsg.{DeathWatchNotification, SystemMessage, Watch}
 import akka.actor.ActorRefWithCell
@@ -31,8 +43,10 @@ private[akka] sealed trait DaemonMsg
   * INTERNAL API
   */
 @SerialVersionUID(1L)
-private[akka] final case class DaemonMsgCreate(
-    props: Props, deploy: Deploy, path: String, supervisor: ActorRef)
+private[akka] final case class DaemonMsgCreate(props: Props,
+                                               deploy: Deploy,
+                                               path: String,
+                                               supervisor: ActorRef)
     extends DaemonMsg
 
 /**
@@ -58,8 +72,8 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
 
   private val parent2children = new ConcurrentHashMap[ActorRef, Set[ActorRef]]
 
-  @tailrec private def addChildParentNeedsWatch(
-      parent: ActorRef, child: ActorRef): Boolean =
+  @tailrec private def addChildParentNeedsWatch(parent: ActorRef,
+                                                child: ActorRef): Boolean =
     parent2children.get(parent) match {
       case null ⇒
         if (parent2children.putIfAbsent(parent, Set(child)) == null) true
@@ -70,7 +84,8 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
     }
 
   @tailrec private def removeChildParentNeedsUnwatch(
-      parent: ActorRef, child: ActorRef): Boolean = {
+      parent: ActorRef,
+      child: ActorRef): Boolean = {
     parent2children.get(parent) match {
       case null ⇒ false // no-op
       case children ⇒
@@ -117,8 +132,9 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
 
   override def sendSystemMessage(message: SystemMessage): Unit =
     message match {
-      case DeathWatchNotification(
-          child: ActorRefWithCell with ActorRefScope, _, _) if child.isLocal ⇒
+      case DeathWatchNotification(child: ActorRefWithCell with ActorRefScope,
+                                  _,
+                                  _) if child.isLocal ⇒
         terminating.locked {
           removeChild(child.path.elements.drop(1).mkString("/"), child)
           val parent = child.getParent
@@ -183,9 +199,9 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
                 }
                 if (isTerminating)
                   log.error(
-                      "Skipping [{}] to RemoteSystemDaemon on [{}] while terminating",
-                      message,
-                      p.address)
+                    "Skipping [{}] to RemoteSystemDaemon on [{}] while terminating",
+                    message,
+                    p.address)
               case _ ⇒
                 log.debug("remote path does not match path from message [{}]",
                           message)
@@ -213,9 +229,9 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
         getChild(concatenatedChildNames.iterator) match {
           case Nobody ⇒
             val emptyRef = new EmptyLocalActorRef(
-                system.provider,
-                path / sel.elements.map(_.toString),
-                system.eventStream)
+              system.provider,
+              path / sel.elements.map(_.toString),
+              system.eventStream)
             emptyRef.tell(sel, sender)
           case child ⇒
             child.tell(m, sender)

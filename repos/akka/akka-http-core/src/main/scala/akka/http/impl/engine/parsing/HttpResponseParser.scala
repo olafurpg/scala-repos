@@ -16,8 +16,8 @@ import ParserOutput._
 /**
   * INTERNAL API
   */
-private[http] class HttpResponseParser(
-    _settings: ParserSettings, _headerParser: HttpHeaderParser)
+private[http] class HttpResponseParser(_settings: ParserSettings,
+                                       _headerParser: HttpHeaderParser)
     extends HttpMessageParser[ResponseOutput](_settings, _headerParser) {
   import HttpResponseParser._
   import HttpMessageParser._
@@ -81,7 +81,7 @@ private[http] class HttpResponseParser(
           else skipReason(idx + 1)
         else
           throw new ParsingException(
-              "Response reason phrase exceeds the configured limit of " +
+            "Response reason phrase exceeds the configured limit of " +
               maxResponseReasonLength + " characters")
       skipReason(startIdx)
     } else if (byteChar(input, cursor + 3) == '\r' &&
@@ -155,8 +155,8 @@ private[http] class HttpResponseParser(
               } else {
                 emitResponseStart(defaultEntity(cth, contentLength))
                 parseFixedLengthBody(
-                    contentLength, closeAfterResponseCompletion)(
-                    input, bodyStart)
+                  contentLength,
+                  closeAfterResponseCompletion)(input, bodyStart)
               }
             case None ⇒
               emitResponseStart {
@@ -165,7 +165,8 @@ private[http] class HttpResponseParser(
                     case EntityPart(bytes) ⇒ bytes
                   }
                   HttpEntity.CloseDelimited(
-                      contentType(cth), HttpEntity.limitableByteSource(data))
+                    contentType(cth),
+                    HttpEntity.limitableByteSource(data))
                 }
               }
               setCompletionHandling(HttpMessageParser.CompletionOk)
@@ -173,8 +174,8 @@ private[http] class HttpResponseParser(
           }
 
         case Some(te) ⇒
-          val completedHeaders = addTransferEncodingWithChunkedPeeled(
-              headers, te)
+          val completedHeaders =
+            addTransferEncodingWithChunkedPeeled(headers, te)
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitResponseStart(chunkedEntity(cth), completedHeaders)
@@ -184,7 +185,7 @@ private[http] class HttpResponseParser(
                          totalBytesRead = 0L)
             } else
               failMessageStart(
-                  "A chunked response must not contain a Content-Length header.")
+                "A chunked response must not contain a Content-Length header.")
           } else
             parseEntity(completedHeaders,
                         protocol,
@@ -200,8 +201,9 @@ private[http] class HttpResponseParser(
     } else finishEmptyResponse()
   }
 
-  def parseToCloseBody(
-      input: ByteString, bodyStart: Int, totalBytesRead: Long): StateResult = {
+  def parseToCloseBody(input: ByteString,
+                       bodyStart: Int,
+                       totalBytesRead: Long): StateResult = {
     val newTotalBytes = totalBytesRead + math.max(0, input.length - bodyStart)
     if (input.length > bodyStart)
       emit(EntityPart(input.drop(bodyStart).compact))
@@ -223,6 +225,6 @@ private[http] object HttpResponseParser {
 
   private[http] object OneHundredContinueError
       extends RuntimeException(
-          "Received error response for request with `Expect: 100-continue` header")
+        "Received error response for request with `Expect: 100-continue` header")
       with NoStackTrace
 }

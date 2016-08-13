@@ -23,7 +23,7 @@ import org.ensime.sexp.util.ThreadLocalSupport
   * `OptionAltFormat`.
   */
 trait StandardFormats extends ThreadLocalSupport {
-  implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => SexpList(x.toSexp)
@@ -39,8 +39,8 @@ trait StandardFormats extends ThreadLocalSupport {
   import scala.util.Success
   import scala.util.Failure
   import SexpFormatUtils._
-  implicit def eitherFormat[L : SexpFormat, R : SexpFormat]: SexpFormat[Either[
-          L, R]] =
+  implicit def eitherFormat[L: SexpFormat, R: SexpFormat]
+    : SexpFormat[Either[L, R]] =
     new SexpFormat[Either[L, R]] {
       def write(either: Either[L, R]) = either match {
         case Left(b) => b.toSexp
@@ -66,8 +66,7 @@ trait StandardFormats extends ThreadLocalSupport {
     }
   }
 
-  implicit val UuidFormat: SexpFormat[UUID] = viaString(
-      new ViaString[UUID] {
+  implicit val UuidFormat: SexpFormat[UUID] = viaString(new ViaString[UUID] {
     def toSexpString(uuid: UUID) = uuid.toString
     def fromSexpString(s: String) = UUID.fromString(s)
   })
@@ -79,14 +78,12 @@ trait StandardFormats extends ThreadLocalSupport {
   //   def fromSexpString(s: String) = new URL(s)
   // })
 
-  implicit val UriFormat: SexpFormat[URI] = viaString(
-      new ViaString[URI] {
+  implicit val UriFormat: SexpFormat[URI] = viaString(new ViaString[URI] {
     def toSexpString(uri: URI) = uri.toASCIIString
     def fromSexpString(s: String) = new URI(s)
   })
 
-  implicit val FileFormat: SexpFormat[File] = viaString(
-      new ViaString[File] {
+  implicit val FileFormat: SexpFormat[File] = viaString(new ViaString[File] {
     def toSexpString(file: File) = file.getPath
     def fromSexpString(s: String) = new File(s)
   })
@@ -116,10 +113,9 @@ trait StandardFormats extends ThreadLocalSupport {
   })
 }
 
-trait OptionAltFormat {
-  this: StandardFormats =>
+trait OptionAltFormat { this: StandardFormats =>
 
-  override implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  override implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => x.toSexp

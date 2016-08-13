@@ -29,10 +29,10 @@ object ClassParamClause {
         builder.disableNewlines
         builder.getTokenType match {
           case ScalaTokenTypes.kIMPLICIT => {
-              classParamMarker.rollbackTo
-              builder.restoreNewlinesState
-              return false
-            }
+            classParamMarker.rollbackTo
+            builder.restoreNewlinesState
+            return false
+          }
           case _ => {}
         }
         //ok, let's parse parameters

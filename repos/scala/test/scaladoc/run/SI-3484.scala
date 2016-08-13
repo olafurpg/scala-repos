@@ -49,7 +49,7 @@ object Test extends ScaladocModelTest {
 
     val foo = rootPackage._class("SR704")._method("foo")
     assert(
-        extractCommentText(foo.comment.get).contains("Hello Mister John."),
-        extractCommentText(foo.comment.get) + ".contains(Hello Mister John.)")
+      extractCommentText(foo.comment.get).contains("Hello Mister John."),
+      extractCommentText(foo.comment.get) + ".contains(Hello Mister John.)")
   }
 }

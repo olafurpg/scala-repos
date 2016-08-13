@@ -36,21 +36,25 @@ abstract class PatternParameterInfoTestBase
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(caretMarker)
     assert(
-        offset != -1,
-        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+      offset != -1,
+      "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
     val editor = fileEditorManager.openTextEditor(
-        new OpenFileDescriptor(getProjectAdapter, file, offset), false)
-    val context = new ShowParameterInfoContext(
-        editor, getProjectAdapter, scalaFile, offset, -1)
+      new OpenFileDescriptor(getProjectAdapter, file, offset),
+      false)
+    val context = new ShowParameterInfoContext(editor,
+                                               getProjectAdapter,
+                                               scalaFile,
+                                               offset,
+                                               -1)
     val handler = new ScalaPatternParameterInfoHandler
     val leafElement = scalaFile.findElementAt(offset)
     val element =

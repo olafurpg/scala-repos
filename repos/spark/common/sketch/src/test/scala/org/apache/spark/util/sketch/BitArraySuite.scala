@@ -27,7 +27,7 @@ class BitArraySuite extends FunSuite {
   test("error case when create BitArray") {
     intercept[IllegalArgumentException](new BitArray(0))
     intercept[IllegalArgumentException](
-        new BitArray(64L * Integer.MAX_VALUE + 1))
+      new BitArray(64L * Integer.MAX_VALUE + 1))
   }
 
   test("bitSize") {

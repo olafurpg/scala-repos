@@ -38,7 +38,7 @@ class EliminateSubqueryAliasesSuite extends PlanTest with PredicateHelper {
     val correctAnswer =
       Project(Alias(e2, "out")() :: Nil, OneRowRelation).analyze
     val actual = Optimize.execute(
-        Project(Alias(e1, "out")() :: Nil, OneRowRelation).analyze)
+      Project(Alias(e1, "out")() :: Nil, OneRowRelation).analyze)
     comparePlans(actual, correctAnswer)
   }
 

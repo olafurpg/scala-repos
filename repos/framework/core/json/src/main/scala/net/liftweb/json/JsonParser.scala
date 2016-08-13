@@ -133,7 +133,7 @@ object JsonParser {
     buf.substring
   }
 
-  // FIXME fail fast to prevent infinite loop, see 
+  // FIXME fail fast to prevent infinite loop, see
   // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
   private val BrokenDouble = BigDecimal("2.2250738585072012e-308")
   private[json] def parseDouble(s: String) = {
@@ -142,76 +142,74 @@ object JsonParser {
     else d.doubleValue
   }
 
-  private val astParser = (p: Parser) =>
-    {
-      val vals = new ValStack(p)
-      var token: Token = null
-      var root: Option[JValue] = None
+  private val astParser = (p: Parser) => {
+    val vals = new ValStack(p)
+    var token: Token = null
+    var root: Option[JValue] = None
 
-      // This is a slightly faster way to correct order of fields and arrays than using 'map'.
-      def reverse(v: JValue): JValue = v match {
-        case JObject(l) =>
-          JObject(
-              (l.map { field =>
-            field.copy(value = reverse(field.value))
-          }).reverse)
-        case JArray(l) => JArray(l.map(reverse).reverse)
-        case x => x
+    // This is a slightly faster way to correct order of fields and arrays than using 'map'.
+    def reverse(v: JValue): JValue = v match {
+      case JObject(l) =>
+        JObject((l.map { field =>
+          field.copy(value = reverse(field.value))
+        }).reverse)
+      case JArray(l) => JArray(l.map(reverse).reverse)
+      case x => x
+    }
+
+    def closeBlock(v: Any) {
+      @inline def toJValue(x: Any) = x match {
+        case json: JValue => json
+        case _ => p.fail("unexpected field " + x)
       }
 
-      def closeBlock(v: Any) {
-        @inline def toJValue(x: Any) = x match {
-          case json: JValue => json
-          case _ => p.fail("unexpected field " + x)
-        }
+      vals.peekOption match {
+        case Some(JField(name: String, value)) =>
+          vals.pop(classOf[JField])
+          val obj = vals.peek(classOf[JObject])
+          vals.replace(JObject(JField(name, toJValue(v)) :: obj.obj))
+        case Some(o: JObject) =>
+          vals.replace(JObject(vals.peek(classOf[JField]) :: o.obj))
+        case Some(a: JArray) => vals.replace(JArray(toJValue(v) :: a.arr))
+        case Some(x) =>
+          p.fail("expected field, array or object but got " + x)
+        case None => root = Some(reverse(toJValue(v)))
+      }
+    }
 
-        vals.peekOption match {
-          case Some(JField(name: String, value)) =>
+    def newValue(v: JValue) {
+      if (!vals.isEmpty)
+        vals.peekAny match {
+          case JField(name, value) =>
             vals.pop(classOf[JField])
             val obj = vals.peek(classOf[JObject])
-            vals.replace(JObject(JField(name, toJValue(v)) :: obj.obj))
-          case Some(o: JObject) =>
-            vals.replace(JObject(vals.peek(classOf[JField]) :: o.obj))
-          case Some(a: JArray) => vals.replace(JArray(toJValue(v) :: a.arr))
-          case Some(x) =>
-            p.fail("expected field, array or object but got " + x)
-          case None => root = Some(reverse(toJValue(v)))
-        }
+            vals.replace(JObject(JField(name, v) :: obj.obj))
+          case a: JArray => vals.replace(JArray(v :: a.arr))
+          case other => p.fail("expected field or array but got " + other)
+        } else {
+        vals.push(v)
+        root = Some(v)
       }
+    }
 
-      def newValue(v: JValue) {
-        if (!vals.isEmpty)
-          vals.peekAny match {
-            case JField(name, value) =>
-              vals.pop(classOf[JField])
-              val obj = vals.peek(classOf[JObject])
-              vals.replace(JObject(JField(name, v) :: obj.obj))
-            case a: JArray => vals.replace(JArray(v :: a.arr))
-            case other => p.fail("expected field or array but got " + other)
-          } else {
-          vals.push(v)
-          root = Some(v)
-        }
+    do {
+      token = p.nextToken
+      token match {
+        case OpenObj => vals.push(JObject(Nil))
+        case FieldStart(name) => vals.push(JField(name, null))
+        case StringVal(x) => newValue(JString(x))
+        case IntVal(x) => newValue(JInt(x))
+        case DoubleVal(x) => newValue(JDouble(x))
+        case BoolVal(x) => newValue(JBool(x))
+        case NullVal => newValue(JNull)
+        case CloseObj => closeBlock(vals.popAny)
+        case OpenArr => vals.push(JArray(Nil))
+        case CloseArr => closeBlock(vals.pop(classOf[JArray]))
+        case End =>
       }
+    } while (token != End)
 
-      do {
-        token = p.nextToken
-        token match {
-          case OpenObj => vals.push(JObject(Nil))
-          case FieldStart(name) => vals.push(JField(name, null))
-          case StringVal(x) => newValue(JString(x))
-          case IntVal(x) => newValue(JInt(x))
-          case DoubleVal(x) => newValue(JDouble(x))
-          case BoolVal(x) => newValue(JBool(x))
-          case NullVal => newValue(JNull)
-          case CloseObj => closeBlock(vals.popAny)
-          case OpenArr => vals.push(JArray(Nil))
-          case CloseArr => closeBlock(vals.pop(classOf[JArray]))
-          case End =>
-        }
-      } while (token != End)
-
-      root getOrElse JNothing
+    root getOrElse JNothing
   }
 
   private val EOF = (-1).asInstanceOf[Char]
@@ -252,7 +250,7 @@ object JsonParser {
     def nextToken: Token = {
       def isDelimiter(c: Char) =
         c == ' ' || c == '\n' || c == ',' || c == '\r' || c == '\t' ||
-        c == '}' || c == ']'
+          c == '}' || c == ']'
 
       def parseString: String =
         try {
@@ -275,7 +273,7 @@ object JsonParser {
             doubleVal = true
             s.append(c)
           } else if (!(Character.isDigit(c) || c == '.' || c == 'e' ||
-                         c == 'E' || c == '-' || c == '+')) {
+                       c == 'E' || c == '-' || c == '+')) {
             wasInt = false
             buf.back
           } else s.append(c)

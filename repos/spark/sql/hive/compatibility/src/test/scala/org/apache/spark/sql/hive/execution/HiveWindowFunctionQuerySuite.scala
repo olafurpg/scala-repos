@@ -33,7 +33,8 @@ import org.apache.spark.util.Utils
   * files, every `createQueryTest` calls should explicitly set `reset` to `false`.
   */
 class HiveWindowFunctionQuerySuite
-    extends HiveComparisonTest with BeforeAndAfter {
+    extends HiveComparisonTest
+    with BeforeAndAfter {
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()
@@ -595,8 +596,8 @@ class HiveWindowFunctionQuerySuite
                   reset = false)
 
   createQueryTest(
-      "windowing.q -- 24. testLateralViews",
-      """
+    "windowing.q -- 24. testLateralViews",
+    """
       |select p_mfgr, p_name,
       |lv_col, p_size, sum(p_size) over w1   as s
       |from (select p_mfgr, p_name, p_size, array(1,2,3) arr from part) p
@@ -604,11 +605,11 @@ class HiveWindowFunctionQuerySuite
       |window w1 as (distribute by p_mfgr sort by p_size, lv_col
       |             rows between 2 preceding and current row)
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest(
-      "windowing.q -- 26. testGroupByHavingWithSWQAndAlias",
-      """
+    "windowing.q -- 26. testGroupByHavingWithSWQAndAlias",
+    """
       |select p_mfgr, p_name, p_size, min(p_retailprice) as mi,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
@@ -617,7 +618,7 @@ class HiveWindowFunctionQuerySuite
       |group by p_mfgr, p_name, p_size
       |having p_size > 0
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest("windowing.q -- 27. testMultipleRangeWindows",
                   """
@@ -651,8 +652,8 @@ class HiveWindowFunctionQuerySuite
                   reset = false)
 
   createQueryTest(
-      "windowing.q -- 30. testDefaultPartitioningSpecRules",
-      """
+    "windowing.q -- 30. testDefaultPartitioningSpecRules",
+    """
       |select p_mfgr, p_name, p_size,
       |sum(p_size) over w1 as s,
       |sum(p_size) over w2 as s2
@@ -660,7 +661,7 @@ class HiveWindowFunctionQuerySuite
       |window w1 as (distribute by p_mfgr sort by p_name rows between 2 preceding and 2 following),
       |       w2 as (partition by p_mfgr order by p_name)
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   /* p_name is not a numeric column. What is Hive's semantic?
   createQueryTest("windowing.q -- 31. testWindowCrossReference",
@@ -737,8 +738,8 @@ class HiveWindowFunctionQuerySuite
                   reset = false)
 
   createQueryTest(
-      "windowing.q -- 37. testPartitioningVariousForms",
-      """
+    "windowing.q -- 37. testPartitioningVariousForms",
+    """
       |select p_mfgr,
       |round(sum(p_retailprice) over (partition by p_mfgr order by p_mfgr),2) as s1,
       |min(p_retailprice) over (partition by p_mfgr) as s2,
@@ -747,11 +748,11 @@ class HiveWindowFunctionQuerySuite
       |count(p_retailprice) over (cluster by p_mfgr ) as s5
       |from part
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest(
-      "windowing.q -- 38. testPartitioningVariousForms2",
-      """
+    "windowing.q -- 38. testPartitioningVariousForms2",
+    """
       |select p_mfgr, p_name, p_size,
       |sum(p_retailprice) over (partition by p_mfgr, p_name order by p_mfgr, p_name
       |rows between unbounded preceding and current row) as s1,
@@ -760,34 +761,34 @@ class HiveWindowFunctionQuerySuite
       |max(p_retailprice) over (partition by p_mfgr, p_name order by p_name) as s3
       |from part
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest(
-      "windowing.q -- 39. testUDFOnOrderCols",
-      """
+    "windowing.q -- 39. testUDFOnOrderCols",
+    """
       |select p_mfgr, p_type, substr(p_type, 2) as short_ptype,
       |rank() over (partition by p_mfgr order by substr(p_type, 2))  as r
       |from part
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest(
-      "windowing.q -- 40. testNoBetweenForRows",
-      """
+    "windowing.q -- 40. testNoBetweenForRows",
+    """
       |select p_mfgr, p_name, p_size,
       |sum(p_retailprice) over (distribute by p_mfgr sort by p_name rows unbounded preceding) as s1
       |from part
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest(
-      "windowing.q -- 41. testNoBetweenForRange",
-      """
+    "windowing.q -- 41. testNoBetweenForRange",
+    """
       |select p_mfgr, p_name, p_size,
       |sum(p_retailprice) over (distribute by p_mfgr sort by p_size range unbounded preceding) as s1
       |from part
     """.stripMargin,
-      reset = false)
+    reset = false)
 
   createQueryTest("windowing.q -- 42. testUnboundedFollowingForRows",
                   """
@@ -818,7 +819,8 @@ class HiveWindowFunctionQuerySuite
 }
 
 class HiveWindowFunctionQueryFileSuite
-    extends HiveCompatibilitySuite with BeforeAndAfter {
+    extends HiveCompatibilitySuite
+    with BeforeAndAfter {
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()
@@ -848,31 +850,31 @@ class HiveWindowFunctionQueryFileSuite
   }
 
   override def blackList: Seq[String] = Seq(
-      // Partitioned table functions are not supported.
-      "ptf*",
-      // tests of windowing.q are in HiveWindowFunctionQueryBaseSuite
-      "windowing.q",
-      // This one failed on the expression of
-      // sum(lag(p_retailprice,1,0.0)) over w1
-      // lag(p_retailprice,1,0.0) is a GenericUDF and the argument inspector of
-      // p_retailprice created by HiveInspectors is
-      // PrimitiveObjectInspectorFactory.javaDoubleObjectInspector.
-      // However, seems Hive assumes it is
-      // PrimitiveObjectInspectorFactory.writableDoubleObjectInspector, which introduces an error.
-      "windowing_expressions",
-      // Hive's results are not deterministic
-      "windowing_multipartitioning",
-      "windowing_navfn",
-      "windowing_ntile",
-      "windowing_udaf",
-      "windowing_windowspec",
-      "windowing_rank"
+    // Partitioned table functions are not supported.
+    "ptf*",
+    // tests of windowing.q are in HiveWindowFunctionQueryBaseSuite
+    "windowing.q",
+    // This one failed on the expression of
+    // sum(lag(p_retailprice,1,0.0)) over w1
+    // lag(p_retailprice,1,0.0) is a GenericUDF and the argument inspector of
+    // p_retailprice created by HiveInspectors is
+    // PrimitiveObjectInspectorFactory.javaDoubleObjectInspector.
+    // However, seems Hive assumes it is
+    // PrimitiveObjectInspectorFactory.writableDoubleObjectInspector, which introduces an error.
+    "windowing_expressions",
+    // Hive's results are not deterministic
+    "windowing_multipartitioning",
+    "windowing_navfn",
+    "windowing_ntile",
+    "windowing_udaf",
+    "windowing_windowspec",
+    "windowing_rank"
   )
 
   override def whiteList: Seq[String] = Seq(
-      "windowing_udaf2",
-      "windowing_columnPruning",
-      "windowing_adjust_rowcontainer_sz"
+    "windowing_udaf2",
+    "windowing_columnPruning",
+    "windowing_adjust_rowcontainer_sz"
   )
 
   // Only run those query tests in the realWhileList (do not try other ignored query files).

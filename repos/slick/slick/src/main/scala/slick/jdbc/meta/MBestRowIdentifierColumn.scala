@@ -16,20 +16,27 @@ case class MBestRowIdentifierColumn(scope: MBestRowIdentifierColumn.Scope,
 }
 
 object MBestRowIdentifierColumn {
-  def getBestRowIdentifier(
-      table: MQName, scope: Scope, nullable: Boolean = false) =
+  def getBestRowIdentifier(table: MQName,
+                           scope: Scope,
+                           nullable: Boolean = false) =
     ResultSetAction[MBestRowIdentifierColumn](
-        _.metaData.getBestRowIdentifier(table.catalog_?,
-                                        table.schema_?,
-                                        table.name,
-                                        scope.value,
-                                        nullable)) { r =>
+      _.metaData.getBestRowIdentifier(table.catalog_?,
+                                      table.schema_?,
+                                      table.name,
+                                      scope.value,
+                                      nullable)) { r =>
       MBestRowIdentifierColumn(
-          Scope(r.<<), r.<<, r.<<, r.<<, r.<<, r.skip.<<, r.nextShort match {
-        case DatabaseMetaData.bestRowNotPseudo => Some(false)
-        case DatabaseMetaData.bestRowPseudo => Some(true)
-        case _ => None
-      })
+        Scope(r.<<),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.skip.<<,
+        r.nextShort match {
+          case DatabaseMetaData.bestRowNotPseudo => Some(false)
+          case DatabaseMetaData.bestRowPseudo => Some(true)
+          case _ => None
+        })
     }
 
   sealed abstract class Scope(val value: Int)

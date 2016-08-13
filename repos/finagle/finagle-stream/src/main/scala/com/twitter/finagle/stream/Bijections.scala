@@ -57,9 +57,9 @@ private[stream] object Bijections {
     new From[HttpResponse, StreamResponse.Info] {
       def apply(res: HttpResponse) =
         new StreamResponse.Info(
-            fromNettyVersion(res.getProtocolVersion),
-            StreamResponse.Status(res.getStatus.getCode),
-            fromNettyHeaders(res.headers)
+          fromNettyVersion(res.getProtocolVersion),
+          StreamResponse.Status(res.getStatus.getCode),
+          fromNettyHeaders(res.headers)
         )
     }
 
@@ -67,8 +67,8 @@ private[stream] object Bijections {
     new From[StreamResponse.Info, HttpResponse] {
       def apply(info: StreamResponse.Info) = {
         val res = new DefaultHttpResponse(
-            toNettyVersion(info.version),
-            HttpResponseStatus.valueOf(info.status.code))
+          toNettyVersion(info.version),
+          HttpResponseStatus.valueOf(info.status.code))
         info.headers.foreach(h => res.headers.add(h.key, h.value))
         res
       }
@@ -80,11 +80,11 @@ private[stream] object Bijections {
     new From[HttpRequest, StreamRequest] {
       def apply(req: HttpRequest) =
         StreamRequest(
-            from(req.getMethod),
-            req.getUri,
-            from(req.getProtocolVersion),
-            from(req.headers),
-            ChannelBufferBuf.Owned(req.getContent)
+          from(req.getMethod),
+          req.getUri,
+          from(req.getProtocolVersion),
+          from(req.headers),
+          ChannelBufferBuf.Owned(req.getContent)
         )
     }
 
@@ -92,9 +92,9 @@ private[stream] object Bijections {
     new From[StreamRequest, HttpRequest] {
       def apply(req: StreamRequest) = {
         val httpReq = new DefaultHttpRequest(
-            from(req.version),
-            from(req.method),
-            req.uri
+          from(req.version),
+          from(req.method),
+          req.uri
         )
         req.headers.foreach(h => httpReq.headers.add(h.key, h.value))
         httpReq.setContent(BufChannelBuffer(req.body))

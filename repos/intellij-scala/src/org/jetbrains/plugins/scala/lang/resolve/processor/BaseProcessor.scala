@@ -14,13 +14,23 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticFunction, SyntheticClasses}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  ScSyntheticFunction,
+  SyntheticClasses
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes
 
 import scala.collection.immutable.HashSet
@@ -135,14 +145,14 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         case DeclarationKind.PACKAGE => kinds contains ResolveTargets.PACKAGE
         case DeclarationKind.CLASS if classKind =>
           (kinds contains ResolveTargets.CLASS) ||
-          (kinds contains ResolveTargets.OBJECT) ||
-          (kinds contains ResolveTargets.METHOD) //case classes get 'apply' generated
+            (kinds contains ResolveTargets.OBJECT) ||
+            (kinds contains ResolveTargets.METHOD) //case classes get 'apply' generated
         case DeclarationKind.VARIABLE =>
           (kinds contains ResolveTargets.VAR) ||
-          (kinds contains ResolveTargets.VAL)
+            (kinds contains ResolveTargets.VAL)
         case DeclarationKind.FIELD =>
           (kinds contains ResolveTargets.VAR) ||
-          (kinds contains ResolveTargets.VAL)
+            (kinds contains ResolveTargets.VAL)
         case DeclarationKind.METHOD => kinds contains ResolveTargets.METHOD
         case _ => false
       }
@@ -161,15 +171,14 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
   protected def kindMatches(element: PsiElement): Boolean =
     ResolveUtils.kindMatches(element, kinds)
 
-  def processType(
-      t: ScType,
-      place: PsiElement,
-      state: ResolveState = ResolveState.initial(),
-      updateWithProjectionSubst: Boolean = true,
-      //todo ugly recursion breakers, maybe we need general for type? What about performance?
-      visitedAliases: HashSet[ScTypeAlias] = HashSet.empty,
-      visitedTypeParameter: HashSet[ScTypeParameterType] = HashSet.empty)
-    : Boolean = {
+  def processType(t: ScType,
+                  place: PsiElement,
+                  state: ResolveState = ResolveState.initial(),
+                  updateWithProjectionSubst: Boolean = true,
+                  //todo ugly recursion breakers, maybe we need general for type? What about performance?
+                  visitedAliases: HashSet[ScTypeAlias] = HashSet.empty,
+                  visitedTypeParameter: HashSet[ScTypeParameterType] =
+                    HashSet.empty): Boolean = {
     ProgressManager.checkCanceled()
 
     t match {
@@ -206,13 +215,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
                            visitedTypeParameter = visitedTypeParameter)
           } else if (selfType.conforms(clazzType)) {
             processType(
-                selfType,
-                place,
-                state
-                  .put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t))
-                  .put(ScSubstitutor.key, thisSubst),
-                visitedAliases = visitedAliases,
-                visitedTypeParameter = visitedTypeParameter)
+              selfType,
+              place,
+              state
+                .put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t))
+                .put(ScSubstitutor.key, thisSubst),
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           } else if (clazzType.conforms(selfType)) {
             processElement(clazz,
                            thisSubst,
@@ -222,11 +231,11 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
                            visitedTypeParameter = visitedTypeParameter)
           } else {
             processType(
-                clazz.selfType.map(Bounds.glb(_, clazzType)).get,
-                place,
-                state.put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t)),
-                visitedAliases = visitedAliases,
-                visitedTypeParameter = visitedTypeParameter)
+              clazz.selfType.map(Bounds.glb(_, clazzType)).get,
+              place,
+              state.put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t)),
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           }
         }
       case d @ ScDesignatorType(e: PsiClass)
@@ -234,15 +243,15 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         //not scala from scala
         var break = true
         for (method <- e.getMethods if break &&
-                      method.hasModifierProperty("static")) {
+               method.hasModifierProperty("static")) {
           if (!execute(method, state)) break = false
         }
         for (cl <- e.getInnerClasses if break &&
-                  cl.hasModifierProperty("static")) {
+               cl.hasModifierProperty("static")) {
           if (!execute(cl, state)) break = false
         }
         for (field <- e.getFields if break &&
-                     field.hasModifierProperty("static")) {
+               field.hasModifierProperty("static")) {
           if (!execute(field, state)) break = false
         }
         if (!break) return false
@@ -285,12 +294,12 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
                     visitedTypeParameter = visitedTypeParameter)
       case j: JavaArrayType =>
         processType(
-            j.getParameterizedType(place.getProject, place.getResolveScope)
-              .getOrElse(return true),
-            place,
-            state,
-            visitedAliases = visitedAliases,
-            visitedTypeParameter = visitedTypeParameter)
+          j.getParameterizedType(place.getProject, place.getResolveScope)
+            .getOrElse(return true),
+          place,
+          state,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case p @ ScParameterizedType(des, typeArgs) =>
         p.designator match {
           case tpt @ ScTypeParameterType(_, _, _, upper, _) =>
@@ -365,8 +374,8 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         true
       case comp @ ScCompoundType(components, signaturesMap, typesMap) =>
-        TypeDefinitionMembers.processDeclarations(
-            comp, this, state, null, place)
+        TypeDefinitionMembers
+          .processDeclarations(comp, this, state, null, place)
       case ex: ScExistentialType =>
         processType(ex.skolem,
                     place,
@@ -409,11 +418,11 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
       //need to process scala way
       case clazz: PsiClass =>
         TypeDefinitionMembers.processDeclarations(
-            clazz,
-            BaseProcessor.this,
-            state.put(ScSubstitutor.key, newSubst),
-            null,
-            place)
+          clazz,
+          BaseProcessor.this,
+          state.put(ScSubstitutor.key, newSubst),
+          null,
+          place)
       case des: ScTypedDefinition =>
         val typeResult: TypeResult[ScType] = des match {
           case p: ScParameter => p.getRealParameterType(TypingContext.empty)

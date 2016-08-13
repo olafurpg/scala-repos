@@ -29,9 +29,9 @@ private[sbt] object ForkTests {
     val main =
       if (opts.tests.isEmpty)
         constant(
-            TestOutput(TestResult.Passed,
-                       Map.empty[String, SuiteResult],
-                       Iterable.empty))
+          TestOutput(TestResult.Passed,
+                     Map.empty[String, SuiteResult],
+                     Iterable.empty))
       else
         mainTestTask(runners, opts, classpath, fork, log, config.parallel)
           .tagw(config.tags: _*)
@@ -65,7 +65,8 @@ private[sbt] object ForkTests {
             server.accept()
           } catch {
             case e: java.net.SocketException =>
-              log.error("Could not accept connection from test agent: " +
+              log.error(
+                "Could not accept connection from test agent: " +
                   e.getClass + ": " + e.getMessage)
               log.trace(e)
               server.close()
@@ -81,11 +82,12 @@ private[sbt] object ForkTests {
               new ForkConfiguration(log.ansiCodesSupported, parallel)
             os.writeObject(config)
 
-            val taskdefs = opts.tests.map(t =>
-                  new TaskDef(t.name,
-                              forkFingerprint(t.fingerprint),
-                              t.explicitlySpecified,
-                              t.selectors))
+            val taskdefs = opts.tests.map(
+              t =>
+                new TaskDef(t.name,
+                            forkFingerprint(t.fingerprint),
+                            t.explicitlySpecified,
+                            t.selectors))
             os.writeObject(taskdefs.toArray)
 
             os.writeInt(runners.size)
@@ -119,10 +121,11 @@ private[sbt] object ForkTests {
         val result =
           if (ec != 0)
             TestOutput(
-                TestResult.Error,
-                Map("Running java with options " + options.mkString(" ") +
-                    " failed with exit code " + ec -> SuiteResult.Error),
-                Iterable.empty)
+              TestResult.Error,
+              Map(
+                "Running java with options " + options.mkString(" ") +
+                  " failed with exit code " + ec -> SuiteResult.Error),
+              Iterable.empty)
           else {
             // Need to wait acceptor thread to finish its business
             acceptorThread.join()

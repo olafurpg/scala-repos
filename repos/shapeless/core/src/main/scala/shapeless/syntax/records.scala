@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import tag.@@
 
 /**
   * Record operations on `HList`'s with field-like elements.
-  * 
+  *
   * @author Miles Sabin
   */
 final class RecordOps[L <: HList](val l: L) extends AnyVal with Serializable {
@@ -138,7 +138,7 @@ final class RecordOps[L <: HList](val l: L) extends AnyVal with Serializable {
 
 /**
   * Record wrapper providing `selectDynamic` access to fields.
-  * 
+  *
   * @author Cody Allen
   */
 final case class DynamicRecordOps[L <: HList](l: L) extends Dynamic {

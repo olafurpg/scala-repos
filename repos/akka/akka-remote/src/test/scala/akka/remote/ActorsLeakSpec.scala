@@ -19,7 +19,8 @@ import scala.concurrent.duration._
 object ActorsLeakSpec {
 
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
       | akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       | #akka.loglevel = DEBUG
       | akka.remote.netty.tcp.applied-adapters = ["trttl"]
@@ -39,8 +40,8 @@ object ActorsLeakSpec {
           val cell = wc.underlying
 
           cell.childrenRefs match {
-            case ChildrenContainer.TerminatingChildrenContainer(
-                _, toDie, reason) ⇒
+            case ChildrenContainer
+                  .TerminatingChildrenContainer(_, toDie, reason) ⇒
               Nil
             case x @ (ChildrenContainer.TerminatedChildrenContainer |
                 ChildrenContainer.EmptyChildrenContainer) ⇒
@@ -66,7 +67,8 @@ object ActorsLeakSpec {
 }
 
 class ActorsLeakSpec
-    extends AkkaSpec(ActorsLeakSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorsLeakSpec.config)
+    with ImplicitSender {
   import ActorsLeakSpec._
 
   "Remoting" must {
@@ -154,7 +156,7 @@ class ActorsLeakSpec
 
         // Watch a remote actor - this results in system message traffic
         system.actorSelection(
-            RootActorPath(remoteAddress) / "user" / "stoppable") ! Identify(1)
+          RootActorPath(remoteAddress) / "user" / "stoppable") ! Identify(1)
         val remoteActor = expectMsgType[ActorIdentity].ref.get
         watch(remoteActor)
         remoteActor ! "stop"
@@ -177,11 +179,9 @@ class ActorsLeakSpec
 
       EventFilter[TimeoutException](occurrences = 1).intercept {}
 
-      val finalActors = targets
-        .flatMap(collectLiveActors)
-        .toSet
+      val finalActors = targets.flatMap(collectLiveActors).toSet
 
-        (finalActors diff initialActors) should be(Set.empty)
+      (finalActors diff initialActors) should be(Set.empty)
     }
   }
 }

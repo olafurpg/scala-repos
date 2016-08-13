@@ -74,8 +74,8 @@ object Scalajsp {
     binarySupported.foreach(v => println(s"* $v"))
   }
 
-  private def displayFileContent(
-      vfile: VirtualScalaJSIRFile, opts: Options): Unit = {
+  private def displayFileContent(vfile: VirtualScalaJSIRFile,
+                                 opts: Options): Unit = {
     if (opts.infos) new InfoPrinter(stdout).print(vfile.info)
     else new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
 
@@ -114,5 +114,5 @@ object Scalajsp {
   }
 
   private val stdout = new BufferedWriter(
-      new OutputStreamWriter(Console.out, "UTF-8"))
+    new OutputStreamWriter(Console.out, "UTF-8"))
 }

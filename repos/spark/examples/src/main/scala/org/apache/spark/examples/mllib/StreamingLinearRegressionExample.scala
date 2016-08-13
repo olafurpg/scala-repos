@@ -31,7 +31,7 @@ object StreamingLinearRegressionExample {
   def main(args: Array[String]): Unit = {
     if (args.length != 2) {
       System.err.println(
-          "Usage: StreamingLinearRegressionExample <trainingDir> <testDir>")
+        "Usage: StreamingLinearRegressionExample <trainingDir> <testDir>")
       System.exit(1)
     }
 

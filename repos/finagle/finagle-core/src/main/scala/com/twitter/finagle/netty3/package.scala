@@ -20,5 +20,5 @@ package object netty3 {
   ThreadRenamingRunnable.setThreadNameDeterminer(ThreadNameDeterminer.CURRENT);
 
   val Executor = Executors.newCachedThreadPool(
-      new NamedPoolThreadFactory("finagle/netty3", true /*daemon*/ ))
+    new NamedPoolThreadFactory("finagle/netty3", true /*daemon*/ ))
 }

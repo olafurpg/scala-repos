@@ -231,8 +231,11 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       // Only create new instance if anything changed
       if (newPath == origPath) this
       else
-        new URI(
-            getScheme(), getRawAuthority(), newPath, getQuery(), getFragment())
+        new URI(getScheme(),
+                getRawAuthority(),
+                newPath,
+                getQuery(),
+                getFragment())
     }
 
   def parseServerAuthority(): URI = {
@@ -317,7 +320,8 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 object URI {
 
   def create(str: String): URI = {
-    try new URI(str) catch {
+    try new URI(str)
+    catch {
       case e: URISyntaxException => throw new IllegalArgumentException(e)
     }
   }
@@ -333,36 +337,36 @@ object URI {
     val ipv4 = ipv4address
 
     "(?:" + lelem + "{7}" + block + "|" + // 1:2:3:4:5:6:7:8
-    lelem + "{1,7}:|" +
-    // 1::                                        1:2:3:4:5:6:7::
-    lelem + "{1,6}" + relem + "|" +
-    // 1::8                  1:2:3:4:5:6::8       1:2:3:4:5:6::8
-    lelem + "{1,5}" + relem + "{1,2}|" +
-    // 1::7:8                1:2:3:4:5::7:8       1:2:3:4:5::8
-    lelem + "{1,4}" + relem + "{1,3}|" +
-    // 1::6:7:8              1:2:3:4::6:7:8       1:2:3:4::8
-    lelem + "{1,3}" + relem + "{1,4}|" +
-    // 1::5:6:7:8            1:2:3::5:6:7:8       1:2:3::8
-    lelem + "{1,2}" + relem + "{1,5}|" +
-    // 1::4:5:6:7:8          1:2::4:5:6:7:8       1:2::8
-    lelem + relem + "{1,6}|" +
-    // 1::3:4:5:6:7:8        1::3:4:5:6:7:8       1::8
-    ":(?:" + relem + "{1,7}|:)|" +
-    // ::2:3:4:5:6:7:8       ::2:3:4:5:6:7:8      ::8       ::
-    lelem + "{6}" + ipv4 + "|" + // 1:2:3:4:5:6:10.0.0.1
-    lelem + "{1,5}:" + ipv4 + "|" +
-    // 1::10.0.0.1           1:2:3:4:5::10.0.0.1
-    lelem + "{1,4}" + relem + ":" + ipv4 + "|" +
-    // 1::6:10.0.0.1         1:2:3:4::6:10.0.0.1
-    lelem + "{1,3}" + relem + "{1,2}:" + ipv4 + "|" +
-    // 1::5:6:10.0.0.1       1:2:3::5:6:10.0.0.1  1:2:3::6:10.0.0.1
-    lelem + "{1,2}" + relem + "{1,3}:" + ipv4 + "|" +
-    // 1::4:5:6:10.0.0.1     1:2::4:5:6:10.0.0.1  1:2::6:10.0.0.1
-    lelem + relem + "{1,4}:" + ipv4 + "|" +
-    // 1::3:4:5:6:10.0.0.1   1::3:4:5:6:10.0.0.1  1::6:10.0.0.1
-    "::" + lelem + "{1,5}" + ipv4 +
-    // ::2:3:4:5:10.0.0.1    ::5:10.0.0.1         ::10.0.0.1
-    ")(?:%[0-9a-z]+)?"
+      lelem + "{1,7}:|" +
+      // 1::                                        1:2:3:4:5:6:7::
+      lelem + "{1,6}" + relem + "|" +
+      // 1::8                  1:2:3:4:5:6::8       1:2:3:4:5:6::8
+      lelem + "{1,5}" + relem + "{1,2}|" +
+      // 1::7:8                1:2:3:4:5::7:8       1:2:3:4:5::8
+      lelem + "{1,4}" + relem + "{1,3}|" +
+      // 1::6:7:8              1:2:3:4::6:7:8       1:2:3:4::8
+      lelem + "{1,3}" + relem + "{1,4}|" +
+      // 1::5:6:7:8            1:2:3::5:6:7:8       1:2:3::8
+      lelem + "{1,2}" + relem + "{1,5}|" +
+      // 1::4:5:6:7:8          1:2::4:5:6:7:8       1:2::8
+      lelem + relem + "{1,6}|" +
+      // 1::3:4:5:6:7:8        1::3:4:5:6:7:8       1::8
+      ":(?:" + relem + "{1,7}|:)|" +
+      // ::2:3:4:5:6:7:8       ::2:3:4:5:6:7:8      ::8       ::
+      lelem + "{6}" + ipv4 + "|" + // 1:2:3:4:5:6:10.0.0.1
+      lelem + "{1,5}:" + ipv4 + "|" +
+      // 1::10.0.0.1           1:2:3:4:5::10.0.0.1
+      lelem + "{1,4}" + relem + ":" + ipv4 + "|" +
+      // 1::6:10.0.0.1         1:2:3:4::6:10.0.0.1
+      lelem + "{1,3}" + relem + "{1,2}:" + ipv4 + "|" +
+      // 1::5:6:10.0.0.1       1:2:3::5:6:10.0.0.1  1:2:3::6:10.0.0.1
+      lelem + "{1,2}" + relem + "{1,3}:" + ipv4 + "|" +
+      // 1::4:5:6:10.0.0.1     1:2::4:5:6:10.0.0.1  1:2::6:10.0.0.1
+      lelem + relem + "{1,4}:" + ipv4 + "|" +
+      // 1::3:4:5:6:10.0.0.1   1::3:4:5:6:10.0.0.1  1::6:10.0.0.1
+      "::" + lelem + "{1,5}" + ipv4 +
+      // ::2:3:4:5:10.0.0.1    ::5:10.0.0.1         ::10.0.0.1
+      ")(?:%[0-9a-z]+)?"
 
     // scalastyle:off line.size.limit
 
@@ -533,7 +537,7 @@ object URI {
     val relativeURI =
       /*3CAPT*/
       "((?:" + net_path + "|(" + abs_path + ")|(" + rel_path + "))(?:\\?" +
-      query + ")?)"
+        query + ")?)"
 
     // URI-reference = [ absoluteURI | relativeURI ] [ "#" fragment ]
     val uriRef =
@@ -696,12 +700,12 @@ object URI {
 
   /** matches any character not in unreserved, punct, escaped or other */
   private val userInfoQuoteRe = new RegExp(
-      // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
-      // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%]
-      "[\u0000- \"#/<>?@\\[-\\^`{-}" +
+    // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
+    // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%]
+    "[\u0000- \"#/<>?@\\[-\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-      "ig")
+    "ig")
 
   /** Quote any character not in unreserved, punct, escaped or other */
   private def quoteUserInfo(str: String) = {
@@ -713,12 +717,12 @@ object URI {
     *  to '/' or '@'
     */
   private val pathQuoteRe = new RegExp(
-      // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
-      // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@/]
-      "[\u0000- \"#<>?\\[-\\^`{-}" +
+    // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
+    // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@/]
+    "[\u0000- \"#<>?\\[-\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-      "ig")
+    "ig")
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '/' or '@'
@@ -736,12 +740,12 @@ object URI {
     *  due to RFC2732).
     */
   private val authorityQuoteRe = new RegExp(
-      // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
-      // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@\[\]]
-      "[\u0000- \"#/<>?\\^`{-}" +
+    // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
+    // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@\[\]]
+    "[\u0000- \"#/<>?\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-      "ig")
+    "ig")
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '@'
@@ -753,12 +757,12 @@ object URI {
 
   /** matches any character not in unreserved, reserved, escaped or other */
   private val illegalQuoteRe = new RegExp(
-      // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
-      // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=?/\\[\\]%]
-      "[\u0000- \"#<>@\\^`{-}" +
+    // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
+    // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=?/\\[\\]%]
+    "[\u0000- \"#<>@\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-      "ig")
+    "ig")
 
   /** Quote any character not in unreserved, reserved, escaped or other */
   private def quoteIllegal(str: String) = {

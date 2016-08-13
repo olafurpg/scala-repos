@@ -10,7 +10,8 @@ import scala.util.parsing.input.CharSequenceReader
 import org.specs2.matcher.{ExpectedParsedResult, ParserMatchers}
 
 object AlgorithmConstraintsParserSpec
-    extends Specification with ParserMatchers {
+    extends Specification
+    with ParserMatchers {
 
   val parsers = AlgorithmConstraintsParser
 
@@ -24,32 +25,32 @@ object AlgorithmConstraintsParserSpec
 
     "succeed to recognize 'RSA keySize < 1024'" in {
       expression must succeedOn("RSA keySize < 1024").withResult(
-          AlgorithmConstraint("RSA", Some(LessThan(1024))))
+        AlgorithmConstraint("RSA", Some(LessThan(1024))))
     }
 
     "succeed to recognize 'RSA keySize <= 1024'" in {
       expression must succeedOn("RSA keySize <= 1024").withResult(
-          AlgorithmConstraint("RSA", Some(LessThanOrEqual(1024))))
+        AlgorithmConstraint("RSA", Some(LessThanOrEqual(1024))))
     }
 
     "succeed to recognize 'EC keySize > 1024'" in {
       expression must succeedOn("EC keySize > 1024").withResult(
-          AlgorithmConstraint("EC", Some(MoreThan(1024))))
+        AlgorithmConstraint("EC", Some(MoreThan(1024))))
     }
 
     "succeed to recognize 'EC keySize >= 1024'" in {
       expression must succeedOn("EC keySize >= 1024").withResult(
-          AlgorithmConstraint("EC", Some(MoreThanOrEqual(1024))))
+        AlgorithmConstraint("EC", Some(MoreThanOrEqual(1024))))
     }
 
     "succeed to recognize 'EC keySize == 1024'" in {
       expression must succeedOn("EC keySize == 1024").withResult(
-          AlgorithmConstraint("EC", Some(Equal(1024))))
+        AlgorithmConstraint("EC", Some(Equal(1024))))
     }
 
     "succeed to recognize 'EC keySize != 1024'" in {
       expression must succeedOn("EC keySize != 1024").withResult(
-          AlgorithmConstraint("EC", Some(NotEqual(1024))))
+        AlgorithmConstraint("EC", Some(NotEqual(1024))))
     }
 
     "fail to recognize 'EC > 1024'" in {

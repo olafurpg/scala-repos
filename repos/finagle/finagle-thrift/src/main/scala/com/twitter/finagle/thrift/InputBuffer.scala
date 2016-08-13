@@ -20,8 +20,8 @@ private[finagle] object InputBuffer {
   }
 }
 
-private[finagle] class InputBuffer(
-    bytes: Array[Byte], protocolFactory: TProtocolFactory) {
+private[finagle] class InputBuffer(bytes: Array[Byte],
+                                   protocolFactory: TProtocolFactory) {
 
   private[this] val memoryTransport = new TMemoryInputTransport(bytes)
   private[this] val iprot = protocolFactory.getProtocol(memoryTransport)
@@ -34,11 +34,11 @@ private[finagle] class InputBuffer(
       case 0 => bytes
       case l if l == length => InputBuffers.EmptyBytes
       case position => {
-          val diff = length - position
-          val newBytes = new Array[Byte](diff)
-          System.arraycopy(bytes, position, newBytes, 0, diff)
-          newBytes
-        }
+        val diff = length - position
+        val newBytes = new Array[Byte](diff)
+        System.arraycopy(bytes, position, newBytes, 0, diff)
+        newBytes
+      }
     }
   }
 }

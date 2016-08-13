@@ -88,8 +88,8 @@ private[spark] object InternalAccumulator {
     */
   def create(name: String): Accumulator[_] = {
     require(
-        name.startsWith(METRICS_PREFIX),
-        s"internal accumulator name must start with '$METRICS_PREFIX': $name")
+      name.startsWith(METRICS_PREFIX),
+      s"internal accumulator name must start with '$METRICS_PREFIX': $name")
     getParam(name) match {
       case p @ LongAccumulatorParam => newMetric[Long](0L, name, p)
       case p @ IntAccumulatorParam => newMetric[Int](0, name, p)
@@ -98,7 +98,7 @@ private[spark] object InternalAccumulator {
         newMetric[Seq[(BlockId, BlockStatus)]](Seq(), name, p)
       case p =>
         throw new IllegalArgumentException(
-            s"unsupported accumulator param '${p.getClass.getSimpleName}' for metric '$name'.")
+          s"unsupported accumulator param '${p.getClass.getSimpleName}' for metric '$name'.")
     }
   }
 
@@ -108,8 +108,8 @@ private[spark] object InternalAccumulator {
     */
   def getParam(name: String): AccumulatorParam[_] = {
     require(
-        name.startsWith(METRICS_PREFIX),
-        s"internal accumulator name must start with '$METRICS_PREFIX': $name")
+      name.startsWith(METRICS_PREFIX),
+      s"internal accumulator name must start with '$METRICS_PREFIX': $name")
     name match {
       case UPDATED_BLOCK_STATUSES => UpdatedBlockStatusesAccumulatorParam
       case shuffleRead.LOCAL_BLOCKS_FETCHED => IntAccumulatorParam
@@ -124,16 +124,16 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking internal metrics.
     */
   def createAll(): Seq[Accumulator[_]] = {
-    Seq[String](
-        EXECUTOR_DESERIALIZE_TIME,
-        EXECUTOR_RUN_TIME,
-        RESULT_SIZE,
-        JVM_GC_TIME,
-        RESULT_SERIALIZATION_TIME,
-        MEMORY_BYTES_SPILLED,
-        DISK_BYTES_SPILLED,
-        PEAK_EXECUTION_MEMORY,
-        UPDATED_BLOCK_STATUSES).map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
+    Seq[String](EXECUTOR_DESERIALIZE_TIME,
+                EXECUTOR_RUN_TIME,
+                RESULT_SIZE,
+                JVM_GC_TIME,
+                RESULT_SERIALIZATION_TIME,
+                MEMORY_BYTES_SPILLED,
+                DISK_BYTES_SPILLED,
+                PEAK_EXECUTION_MEMORY,
+                UPDATED_BLOCK_STATUSES)
+      .map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
       .get("spark.testing")
       .map(_ => create(TEST_ACCUM))
       .toSeq

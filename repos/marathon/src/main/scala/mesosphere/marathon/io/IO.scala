@@ -23,7 +23,7 @@ object IO {
     if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath)
     if (!file.isDirectory)
       throw new FileNotFoundException(
-          s"File ${file.getAbsolutePath} is not a directory!")
+        s"File ${file.getAbsolutePath} is not a directory!")
     file.listFiles()
   }
 
@@ -54,7 +54,7 @@ object IO {
       val result = dir.mkdirs()
       if (!result || !dir.isDirectory || !dir.exists)
         throw new IOException(
-            "Can not create Directory: " + dir.getAbsolutePath)
+          "Can not create Directory: " + dir.getAbsolutePath)
     }
   }
 

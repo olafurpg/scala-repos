@@ -49,12 +49,12 @@ class EnsembleAdvLineCategoryChart extends EnsembleExample {
       name = "Data Series 1"
       // create sample data
       data = Seq(
-          XYChart.Data[String, Number]("Alpha", 50d),
-          XYChart.Data[String, Number]("Beta", 80d),
-          XYChart.Data[String, Number]("RC1", 90d),
-          XYChart.Data[String, Number]("RC2", 30d),
-          XYChart.Data[String, Number]("1.0", 120d),
-          XYChart.Data[String, Number]("1.1", 20d)
+        XYChart.Data[String, Number]("Alpha", 50d),
+        XYChart.Data[String, Number]("Beta", 80d),
+        XYChart.Data[String, Number]("RC1", 90d),
+        XYChart.Data[String, Number]("RC2", 30d),
+        XYChart.Data[String, Number]("1.0", 120d),
+        XYChart.Data[String, Number]("1.1", 20d)
       )
     }
 

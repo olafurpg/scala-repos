@@ -41,4 +41,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CubicCurveSpec
     extends SimpleSFXDelegateSpec[jfxss.CubicCurve, CubicCurve](
-        classOf[jfxss.CubicCurve], classOf[CubicCurve])
+      classOf[jfxss.CubicCurve],
+      classOf[CubicCurve])

@@ -42,8 +42,8 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Literal.create(null, TimestampType), null)
     checkEvaluation(Literal.create(null, CalendarIntervalType), null)
     checkEvaluation(Literal.create(null, ArrayType(ByteType, true)), null)
-    checkEvaluation(
-        Literal.create(null, MapType(StringType, IntegerType)), null)
+    checkEvaluation(Literal.create(null, MapType(StringType, IntegerType)),
+                    null)
     checkEvaluation(Literal.create(null, StructType(Seq.empty)), null)
   }
 
@@ -56,20 +56,20 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Literal.default(FloatType), 0.0f)
     checkEvaluation(Literal.default(DoubleType), 0.0)
     checkEvaluation(Literal.default(StringType), "")
-    checkEvaluation(
-        Literal.default(BinaryType), "".getBytes(StandardCharsets.UTF_8))
+    checkEvaluation(Literal.default(BinaryType),
+                    "".getBytes(StandardCharsets.UTF_8))
     checkEvaluation(Literal.default(DecimalType.USER_DEFAULT), Decimal(0))
     checkEvaluation(Literal.default(DecimalType.SYSTEM_DEFAULT), Decimal(0))
     checkEvaluation(Literal.default(DateType), DateTimeUtils.toJavaDate(0))
-    checkEvaluation(
-        Literal.default(TimestampType), DateTimeUtils.toJavaTimestamp(0L))
-    checkEvaluation(
-        Literal.default(CalendarIntervalType), new CalendarInterval(0, 0L))
+    checkEvaluation(Literal.default(TimestampType),
+                    DateTimeUtils.toJavaTimestamp(0L))
+    checkEvaluation(Literal.default(CalendarIntervalType),
+                    new CalendarInterval(0, 0L))
     checkEvaluation(Literal.default(ArrayType(StringType)), Array())
     checkEvaluation(Literal.default(MapType(IntegerType, StringType)), Map())
     checkEvaluation(
-        Literal.default(StructType(StructField("a", StringType) :: Nil)),
-        Row(""))
+      Literal.default(StructType(StructField("a", StringType) :: Nil)),
+      Row(""))
   }
 
   test("boolean literals") {
@@ -111,10 +111,10 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("binary literals") {
-    checkEvaluation(
-        Literal.create(new Array[Byte](0), BinaryType), new Array[Byte](0))
-    checkEvaluation(
-        Literal.create(new Array[Byte](2), BinaryType), new Array[Byte](2))
+    checkEvaluation(Literal.create(new Array[Byte](0), BinaryType),
+                    new Array[Byte](0))
+    checkEvaluation(Literal.create(new Array[Byte](2), BinaryType),
+                    new Array[Byte](2))
   }
 
   test("decimal") {

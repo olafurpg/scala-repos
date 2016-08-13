@@ -126,8 +126,8 @@ package shapeless {
       val owner = tCtx.owner
       if (!owner.isVal && !owner.isLazy)
         c.abort(
-            c.enclosingPosition,
-            "cachedImplicit should only be used to initialize vals and lazy vals")
+          c.enclosingPosition,
+          "cachedImplicit should only be used to initialize vals and lazy vals")
       val tTpe = weakTypeOf[T]
       val application = casted.macroApplication
       val tpe = {
@@ -141,11 +141,11 @@ package shapeless {
       // the thing we are enclosed in
       val sCtx = tCtx.makeImplicit(false)
       val is = new analyzer.ImplicitSearch(
-          tree = application,
-          pt = tpe,
-          isView = false,
-          context0 = sCtx,
-          pos0 = c.enclosingPosition.asInstanceOf[global.Position]
+        tree = application,
+        pt = tpe,
+        isView = false,
+        context0 = sCtx,
+        pos0 = c.enclosingPosition.asInstanceOf[global.Position]
       ) {
         override def searchImplicit(
             implicitInfoss: List[List[analyzer.ImplicitInfo]],

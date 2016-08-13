@@ -38,8 +38,8 @@ class ReflectionToolBoxTest extends ScalaOsgiHelper {
     val eval = tb.eval(tree)
     assertEquals(Vector(2, 3, 4), eval)
     assertEquals(
-        "Evaluate expression using local class.",
-        2,
-        tb.eval(tb.parse("(new tools.test.osgi.reflection.toolbox.C).f1")))
+      "Evaluate expression using local class.",
+      2,
+      tb.eval(tb.parse("(new tools.test.osgi.reflection.toolbox.C).f1")))
   }
 }

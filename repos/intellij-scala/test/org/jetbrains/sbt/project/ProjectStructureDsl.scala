@@ -55,7 +55,7 @@ object ProjectStructureDsl {
   sealed trait Attributed {
     protected val attributes = new AttributeMap
 
-    def foreach[T : Manifest](attribute: Attribute[T])(body: T => Unit): Unit =
+    def foreach[T: Manifest](attribute: Attribute[T])(body: T => Unit): Unit =
       attributes.get(attribute).foreach(body)
   }
 
@@ -64,7 +64,7 @@ object ProjectStructureDsl {
   }
 
   class project(val name: String) extends Attributed {
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ProjectAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -74,7 +74,7 @@ object ProjectStructureDsl {
   }
 
   class module(val name: String) extends Attributed with Named {
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with ModuleAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -84,7 +84,7 @@ object ProjectStructureDsl {
   }
 
   class library(val name: String) extends Attributed with Named {
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with LibraryAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
     protected implicit def defineAttributeSeq[T](
@@ -94,9 +94,10 @@ object ProjectStructureDsl {
   }
 
   class dependency[D <: Named](val reference: D)
-      extends Attributed with Named {
+      extends Attributed
+      with Named {
     override val name: String = reference.name
-    protected implicit def defineAttribute[T : Manifest](
+    protected implicit def defineAttribute[T: Manifest](
         attribute: Attribute[T] with DependencyAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
   }

@@ -38,10 +38,10 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
 
   import space._
 
-  override protected def chooseDescentDirection(
-      state: State, fn: DiffFunction[T]) = {
-    val descentDir = super.chooseDescentDirection(
-        state.copy(grad = state.adjustedGradient), fn)
+  override protected def chooseDescentDirection(state: State,
+                                                fn: DiffFunction[T]) = {
+    val descentDir = super
+      .chooseDescentDirection(state.copy(grad = state.adjustedGradient), fn)
 
     // The original paper requires that the descent direction be corrected to be
     // in the same directional (within the same hypercube) as the adjusted gradient for proof.
@@ -55,8 +55,9 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
     correctedDir
   }
 
-  override protected def determineStepSize(
-      state: State, f: DiffFunction[T], dir: T) = {
+  override protected def determineStepSize(state: State,
+                                           f: DiffFunction[T],
+                                           dir: T) = {
     val iter = state.iter
 
     val normGradInDir = {
@@ -86,8 +87,9 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
         adjv -> (adjgrad dot dir)
       }
     }
-    val search = new BacktrackingLineSearch(
-        state.value, shrinkStep = if (iter < 1) 0.1 else 0.5)
+    val search = new BacktrackingLineSearch(state.value,
+                                            shrinkStep =
+                                              if (iter < 1) 0.1 else 0.5)
     val alpha =
       search.minimize(ff, if (iter < 1) .5 / norm(state.grad) else 1.0)
 
@@ -107,8 +109,9 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
   }
 
   // Adds in the regularization stuff to the gradient
-  override protected def adjust(
-      newX: T, newGrad: T, newVal: Double): (Double, T) = {
+  override protected def adjust(newX: T,
+                                newGrad: T,
+                                newVal: Double): (Double, T) = {
     var adjValue = newVal
     val res = space.zipMapKeyValues.mapActive(newX, newGrad, {
       case (i, xv, v) =>
@@ -121,10 +124,10 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
           adjValue += Math.abs(l1regValue * xv)
           xv match {
             case 0.0 => {
-                val delta_+ = v + l1regValue
-                val delta_- = v - l1regValue
-                if (delta_- > 0) delta_- else if (delta_+ < 0) delta_+ else 0.0
-              }
+              val delta_+ = v + l1regValue
+              val delta_- = v - l1regValue
+              if (delta_- > 0) delta_- else if (delta_+ < 0) delta_+ else 0.0
+            }
             case _ => v + math.signum(xv) * l1regValue
           }
         }

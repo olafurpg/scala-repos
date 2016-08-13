@@ -45,16 +45,18 @@ object TransformChangedEvent {
   /** The only valid EventType for the TransformChangedEvent. */
   val TransformChanged = jfxst.TransformChangedEvent.TRANSFORM_CHANGED
   @deprecated(
-      "Use TransformChanged; TRANSFORM_CHANGED will be removed in a future release",
-      "8.0.60-R10")
+    "Use TransformChanged; TRANSFORM_CHANGED will be removed in a future release",
+    "8.0.60-R10")
   val TRANSFORM_CHANGED = TransformChanged
 }
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/scene/transform/TransformChangedEvent.html]] */
 class TransformChangedEvent(
-    override val delegate: jfxst.TransformChangedEvent = new jfxst.TransformChangedEvent(
-          ))
-    extends Event(delegate) with SFXDelegate[jfxst.TransformChangedEvent] {
+    override val delegate: jfxst.TransformChangedEvent =
+      new jfxst.TransformChangedEvent(
+        ))
+    extends Event(delegate)
+    with SFXDelegate[jfxst.TransformChangedEvent] {
 
   def this(source: Any, target: jfxe.EventTarget) {
     this(new jfxst.TransformChangedEvent(source, target))

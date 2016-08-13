@@ -56,20 +56,20 @@ trait EventHandlerDelegate {
     */
   type EventHandled = {
     // Registers an event handler to this type.
-    def addEventHandler[E <: jfxe.Event](
-        eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_])
+    def addEventHandler[E <: jfxe.Event](eventType: jfxe.EventType[E],
+                                         eventHandler: jfxe.EventHandler[_])
 
     // Unregisters a previously registered event handler from this type.
-    def removeEventHandler[E <: jfxe.Event](
-        eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_])
+    def removeEventHandler[E <: jfxe.Event](eventType: jfxe.EventType[E],
+                                            eventHandler: jfxe.EventHandler[_])
 
     // Registers an event filter to this type.
-    def addEventFilter[E <: jfxe.Event](
-        eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_])
+    def addEventFilter[E <: jfxe.Event](eventType: jfxe.EventType[E],
+                                        eventHandler: jfxe.EventHandler[_])
 
     // Unregisters a previously registered event filter from this type.
-    def removeEventFilter[E <: jfxe.Event](
-        eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_])
+    def removeEventFilter[E <: jfxe.Event](eventType: jfxe.EventType[E],
+                                           eventHandler: jfxe.EventHandler[_])
 
     // Construct an event dispatch chain for this target.
     def buildEventDispatchChain(
@@ -92,7 +92,8 @@ trait EventHandlerDelegate {
     * @param eventHandler the handler to register that will manipulate event
     */
   def addEventHandler[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E],
+      eventHandler: jfxe.EventHandler[_ >: E]) {
     eventHandlerDelegate.addEventHandler(eventType, eventHandler)
   }
 
@@ -104,12 +105,12 @@ trait EventHandlerDelegate {
     protected val eventHandler: jfxe.EventHandler[J]
 
     def apply(eventType: EventType[J]): Subscription = {
-      EventHandlerDelegate.this.addEventHandler(
-          eventType.delegate, eventHandler)
+      EventHandlerDelegate.this
+        .addEventHandler(eventType.delegate, eventHandler)
       new Subscription {
         def cancel() {
-          EventHandlerDelegate.this.removeEventHandler(
-              eventType.delegate, eventHandler)
+          EventHandlerDelegate.this
+            .removeEventHandler(eventType.delegate, eventHandler)
         }
       }
     }
@@ -184,7 +185,8 @@ trait EventHandlerDelegate {
     * @param eventHandler  the handler to unregister
     */
   def removeEventHandler[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E],
+      eventHandler: jfxe.EventHandler[_ >: E]) {
     eventHandlerDelegate.removeEventHandler(eventType, eventHandler)
   }
 
@@ -197,7 +199,8 @@ trait EventHandlerDelegate {
     * @param eventHandler the filter to register that will filter event
     */
   def addEventFilter[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E],
+      eventHandler: jfxe.EventHandler[_ >: E]) {
     eventHandlerDelegate.addEventFilter(eventType, eventHandler)
   }
 
@@ -212,8 +215,8 @@ trait EventHandlerDelegate {
       EventHandlerDelegate.this.addEventFilter(eventType.delegate, eventFilter)
       new Subscription {
         def cancel() {
-          EventHandlerDelegate.this.removeEventFilter(
-              eventType.delegate, eventFilter)
+          EventHandlerDelegate.this
+            .removeEventFilter(eventType.delegate, eventFilter)
         }
       }
     }
@@ -293,7 +296,8 @@ trait EventHandlerDelegate {
     * @param eventHandler the filter to unregister
     */
   def removeEventFilter[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E],
+      eventHandler: jfxe.EventHandler[_ >: E]) {
     eventHandlerDelegate.removeEventFilter(eventType, eventHandler)
   }
 

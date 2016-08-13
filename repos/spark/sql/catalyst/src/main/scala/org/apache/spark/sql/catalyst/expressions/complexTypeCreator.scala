@@ -32,8 +32,8 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
   override def foldable: Boolean = children.forall(_.foldable)
 
   override def checkInputDataTypes(): TypeCheckResult =
-    TypeUtils.checkForSameTypeInputExpr(
-        children.map(_.dataType), "function array")
+    TypeUtils
+      .checkForSameTypeInputExpr(children.map(_.dataType), "function array")
 
   override def dataType: DataType = {
     ArrayType(children.headOption.map(_.dataType).getOrElse(NullType),
@@ -63,7 +63,7 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final ArrayData ${ev.value} = new $arrayClass($values);"
+      s"final ArrayData ${ev.value} = new $arrayClass($values);"
   }
 
   override def prettyName: String = "array"
@@ -115,7 +115,7 @@ case class CreateStruct(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final InternalRow ${ev.value} = new $rowClass($values);"
+      s"final InternalRow ${ev.value} = new $rowClass($values);"
   }
 
   override def prettyName: String = "struct"
@@ -162,13 +162,13 @@ case class CreateNamedStruct(children: Seq[Expression]) extends Expression {
   override def checkInputDataTypes(): TypeCheckResult = {
     if (children.size % 2 != 0) {
       TypeCheckResult.TypeCheckFailure(
-          s"$prettyName expects an even number of arguments.")
+        s"$prettyName expects an even number of arguments.")
     } else {
       val invalidNames =
         nameExprs.filterNot(e => e.foldable && e.dataType == StringType)
       if (invalidNames.nonEmpty) {
         TypeCheckResult.TypeCheckFailure(
-            s"Only foldable StringType expressions are allowed to appear at odd position , got :" +
+          s"Only foldable StringType expressions are allowed to appear at odd position , got :" +
             s" ${invalidNames.mkString(",")}")
       } else if (!names.contains(null)) {
         TypeCheckResult.TypeCheckSuccess
@@ -199,7 +199,7 @@ case class CreateNamedStruct(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final InternalRow ${ev.value} = new $rowClass($values);"
+      s"final InternalRow ${ev.value} = new $rowClass($values);"
   }
 
   override def prettyName: String = "named_struct"

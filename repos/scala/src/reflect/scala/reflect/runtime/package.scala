@@ -31,16 +31,15 @@ package runtime {
       import c.universe._
       val runtimeClass = c.reifyEnclosingRuntimeClass
       if (runtimeClass.isEmpty)
-        c.abort(
-            c.enclosingPosition, "call site does not have an enclosing class")
+        c.abort(c.enclosingPosition,
+                "call site does not have an enclosing class")
       val scalaPackage = Select(Ident(TermName("_root_")), TermName("scala"))
       val runtimeUniverse = Select(
-          Select(
-              Select(scalaPackage, TermName("reflect")), TermName("runtime")),
-          TermName("universe"))
+        Select(Select(scalaPackage, TermName("reflect")), TermName("runtime")),
+        TermName("universe"))
       val currentMirror = Apply(
-          Select(runtimeUniverse, TermName("runtimeMirror")),
-          List(Select(runtimeClass, TermName("getClassLoader"))))
+        Select(runtimeUniverse, TermName("runtimeMirror")),
+        List(Select(runtimeClass, TermName("getClassLoader"))))
       c.Expr[Nothing](currentMirror)(c.WeakTypeTag.Nothing)
     }
   }

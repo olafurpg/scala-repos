@@ -42,17 +42,28 @@ import org.apache.spark.mllib.optimization.NNLS
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StructType}
+import org.apache.spark.sql.types.{
+  DoubleType,
+  FloatType,
+  IntegerType,
+  StructType
+}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
-import org.apache.spark.util.collection.{OpenHashMap, OpenHashSet, SortDataFormat, Sorter}
+import org.apache.spark.util.collection.{
+  OpenHashMap,
+  OpenHashSet,
+  SortDataFormat,
+  Sorter
+}
 import org.apache.spark.util.random.XORShiftRandom
 
 /**
   * Common params for ALS and ALSModel.
   */
 private[recommendation] trait ALSModelParams
-    extends Params with HasPredictionCol {
+    extends Params
+    with HasPredictionCol {
 
   /**
     * Param for the column name for user ids.
@@ -79,16 +90,22 @@ private[recommendation] trait ALSModelParams
   * Common params for ALS.
   */
 private[recommendation] trait ALSParams
-    extends ALSModelParams with HasMaxIter with HasRegParam
-    with HasPredictionCol with HasCheckpointInterval with HasSeed {
+    extends ALSModelParams
+    with HasMaxIter
+    with HasRegParam
+    with HasPredictionCol
+    with HasCheckpointInterval
+    with HasSeed {
 
   /**
     * Param for rank of the matrix factorization (>= 1).
     * Default: 10
     * @group param
     */
-  val rank = new IntParam(
-      this, "rank", "rank of the factorization", ParamValidators.gtEq(1))
+  val rank = new IntParam(this,
+                          "rank",
+                          "rank of the factorization",
+                          ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getRank: Int = $(rank)
@@ -98,8 +115,10 @@ private[recommendation] trait ALSParams
     * Default: 10
     * @group param
     */
-  val numUserBlocks = new IntParam(
-      this, "numUserBlocks", "number of user blocks", ParamValidators.gtEq(1))
+  val numUserBlocks = new IntParam(this,
+                                   "numUserBlocks",
+                                   "number of user blocks",
+                                   ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getNumUserBlocks: Int = $(numUserBlocks)
@@ -109,8 +128,10 @@ private[recommendation] trait ALSParams
     * Default: 10
     * @group param
     */
-  val numItemBlocks = new IntParam(
-      this, "numItemBlocks", "number of item blocks", ParamValidators.gtEq(1))
+  val numItemBlocks = new IntParam(this,
+                                   "numItemBlocks",
+                                   "number of item blocks",
+                                   ParamValidators.gtEq(1))
 
   /** @group getParam */
   def getNumItemBlocks: Int = $(numItemBlocks)
@@ -120,8 +141,9 @@ private[recommendation] trait ALSParams
     * Default: false
     * @group param
     */
-  val implicitPrefs = new BooleanParam(
-      this, "implicitPrefs", "whether to use implicit preference")
+  val implicitPrefs = new BooleanParam(this,
+                                       "implicitPrefs",
+                                       "whether to use implicit preference")
 
   /** @group getParam */
   def getImplicitPrefs: Boolean = $(implicitPrefs)
@@ -131,8 +153,10 @@ private[recommendation] trait ALSParams
     * Default: 1.0
     * @group param
     */
-  val alpha = new DoubleParam(
-      this, "alpha", "alpha for implicit preference", ParamValidators.gtEq(0))
+  val alpha = new DoubleParam(this,
+                              "alpha",
+                              "alpha for implicit preference",
+                              ParamValidators.gtEq(0))
 
   /** @group getParam */
   def getAlpha: Double = $(alpha)
@@ -154,9 +178,9 @@ private[recommendation] trait ALSParams
     * @group param
     */
   val nonnegative = new BooleanParam(
-      this,
-      "nonnegative",
-      "whether to use nonnegative constraint for least squares")
+    this,
+    "nonnegative",
+    "whether to use nonnegative constraint for least squares")
 
   /** @group getParam */
   def getNonnegative: Boolean = $(nonnegative)
@@ -198,11 +222,13 @@ private[recommendation] trait ALSParams
   */
 @Experimental
 @Since("1.3.0")
-class ALSModel private[ml](@Since("1.4.0") override val uid: String,
-                           @Since("1.4.0") val rank: Int,
-                           @transient val userFactors: DataFrame,
-                           @transient val itemFactors: DataFrame)
-    extends Model[ALSModel] with ALSModelParams with MLWritable {
+class ALSModel private[ml] (@Since("1.4.0") override val uid: String,
+                            @Since("1.4.0") val rank: Int,
+                            @transient val userFactors: DataFrame,
+                            @transient val itemFactors: DataFrame)
+    extends Model[ALSModel]
+    with ALSModelParams
+    with MLWritable {
 
   /** @group setParam */
   @Since("1.4.0")
@@ -328,7 +354,9 @@ object ALSModel extends MLReadable[ALSModel] {
 @Experimental
 @Since("1.3.0")
 class ALS(@Since("1.4.0") override val uid: String)
-    extends Estimator[ALSModel] with ALSParams with DefaultParamsWritable {
+    extends Estimator[ALSModel]
+    with ALSParams
+    with DefaultParamsWritable {
 
   import org.apache.spark.ml.recommendation.ALS.Rating
 
@@ -417,17 +445,17 @@ class ALS(@Since("1.4.0") override val uid: String)
         Rating(row.getInt(0), row.getInt(1), row.getFloat(2))
       }
     val (userFactors, itemFactors) = ALS.train(
-        ratings,
-        rank = $(rank),
-        numUserBlocks = $(numUserBlocks),
-        numItemBlocks = $(numItemBlocks),
-        maxIter = $(maxIter),
-        regParam = $(regParam),
-        implicitPrefs = $(implicitPrefs),
-        alpha = $(alpha),
-        nonnegative = $(nonnegative),
-        checkpointInterval = $(checkpointInterval),
-        seed = $(seed))
+      ratings,
+      rank = $(rank),
+      numUserBlocks = $(numUserBlocks),
+      numItemBlocks = $(numItemBlocks),
+      maxIter = $(maxIter),
+      regParam = $(regParam),
+      implicitPrefs = $(implicitPrefs),
+      alpha = $(alpha),
+      nonnegative = $(nonnegative),
+      checkpointInterval = $(checkpointInterval),
+      seed = $(seed))
     val userDF = userFactors.toDF("id", "features")
     val itemDF = itemFactors.toDF("id", "features")
     val model = new ALSModel(uid, $(rank), userDF, itemDF).setParent(this)
@@ -459,8 +487,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Rating class for better code readability.
     */
   @DeveloperApi
-  case class Rating[@specialized(Int, Long) ID](
-      user: ID, item: ID, rating: Float)
+  case class Rating[@specialized(Int, Long) ID](user: ID,
+                                                item: ID,
+                                                rating: Float)
 
   @Since("1.6.0")
   override def load(path: String): ALS = super.load(path)
@@ -626,7 +655,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Implementation of the ALS algorithm.
     */
   @DeveloperApi
-  def train[ID : ClassTag](
+  def train[ID: ClassTag](
       // scalastyle:ignore
       ratings: RDD[Rating[ID]],
       rank: Int = 10,
@@ -651,9 +680,12 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     val itemLocalIndexEncoder = new LocalIndexEncoder(itemPart.numPartitions)
     val solver = if (nonnegative) new NNLSSolver else new CholeskySolver
     val blockRatings = partitionRatings(ratings, userPart, itemPart).persist(
-        intermediateRDDStorageLevel)
-    val (userInBlocks, userOutBlocks) = makeBlocks(
-        "user", blockRatings, userPart, itemPart, intermediateRDDStorageLevel)
+      intermediateRDDStorageLevel)
+    val (userInBlocks, userOutBlocks) = makeBlocks("user",
+                                                   blockRatings,
+                                                   userPart,
+                                                   itemPart,
+                                                   intermediateRDDStorageLevel)
     // materialize blockRatings and user blocks
     userOutBlocks.count()
     val swappedBlockRatings = blockRatings.map {
@@ -675,7 +707,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     var previousCheckpointFile: Option[String] = None
     val shouldCheckpoint: Int => Boolean = (iter) =>
       sc.checkpointDir.isDefined && checkpointInterval != -1 &&
-      (iter % checkpointInterval == 0)
+        (iter % checkpointInterval == 0)
     val deletePreviousCheckpointFile: () => Unit = () =>
       previousCheckpointFile.foreach { file =>
         try {
@@ -706,7 +738,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
           .persist(intermediateRDDStorageLevel)
         // TODO: Generalize PeriodicGraphCheckpointer and use it here.
         if (shouldCheckpoint(iter)) {
-          itemFactors.checkpoint() // itemFactors gets materialized in computeFactors.
+          itemFactors
+            .checkpoint() // itemFactors gets materialized in computeFactors.
         }
         val previousUserFactors = userFactors
         userFactors = computeFactors(itemFactors,
@@ -821,10 +854,10 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @see [[LocalIndexEncoder]]
     */
   private[recommendation] case class InBlock[
-      @specialized(Int, Long) ID : ClassTag](srcIds: Array[ID],
-                                             dstPtrs: Array[Int],
-                                             dstEncodedIndices: Array[Int],
-                                             ratings: Array[Float]) {
+      @specialized(Int, Long) ID: ClassTag](srcIds: Array[ID],
+                                            dstPtrs: Array[Int],
+                                            dstEncodedIndices: Array[Int],
+                                            ratings: Array[Float]) {
 
     /** Size of the block. */
     def size: Int = ratings.length
@@ -864,8 +897,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A rating block that contains src IDs, dst IDs, and ratings, stored in primitive arrays.
     */
   private[recommendation] case class RatingBlock[
-      @specialized(Int, Long) ID : ClassTag](
-      srcIds: Array[ID], dstIds: Array[ID], ratings: Array[Float]) {
+      @specialized(Int, Long) ID: ClassTag](srcIds: Array[ID],
+                                            dstIds: Array[ID],
+                                            ratings: Array[Float]) {
 
     /** Size of the block. */
     def size: Int = srcIds.length
@@ -877,7 +911,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Builder for [[RatingBlock]]. [[mutable.ArrayBuilder]] is used to avoid boxing/unboxing.
     */
   private[recommendation] class RatingBlockBuilder[
-      @specialized(Int, Long) ID : ClassTag]
+      @specialized(Int, Long) ID: ClassTag]
       extends Serializable {
 
     private val srcIds = mutable.ArrayBuilder.make[ID]
@@ -918,7 +952,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     *
     * @return an RDD of rating blocks in the form of ((srcBlockId, dstBlockId), ratingBlock)
     */
-  private def partitionRatings[ID : ClassTag](
+  private def partitionRatings[ID: ClassTag](
       ratings: RDD[Rating[ID]],
       srcPart: Partitioner,
       dstPart: Partitioner): RDD[((Int, Int), RatingBlock[ID])] = {
@@ -971,7 +1005,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @param encoder encoder for dst indices
     */
   private[recommendation] class UncompressedInBlockBuilder[
-      @specialized(Int, Long) ID : ClassTag](encoder: LocalIndexEncoder)(
+      @specialized(Int, Long) ID: ClassTag](encoder: LocalIndexEncoder)(
       implicit ord: Ordering[ID]) {
 
     private val srcIds = mutable.ArrayBuilder.make[ID]
@@ -1006,8 +1040,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
 
     /** Builds a [[UncompressedInBlock]]. */
     def build(): UncompressedInBlock[ID] = {
-      new UncompressedInBlock(
-          srcIds.result(), dstEncodedIndices.result(), ratings.result())
+      new UncompressedInBlock(srcIds.result(),
+                              dstEncodedIndices.result(),
+                              ratings.result())
     }
   }
 
@@ -1015,10 +1050,10 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A block of (srcId, dstEncodedIndex, rating) tuples stored in primitive arrays.
     */
   private[recommendation] class UncompressedInBlock[
-      @specialized(Int, Long) ID : ClassTag](val srcIds: Array[ID],
-                                             val dstEncodedIndices: Array[Int],
-                                             val ratings: Array[Float])(
-      implicit ord: Ordering[ID]) {
+      @specialized(Int, Long) ID: ClassTag](
+      val srcIds: Array[ID],
+      val dstEncodedIndices: Array[Int],
+      val ratings: Array[Float])(implicit ord: Ordering[ID]) {
 
     /** Size the of block. */
     def length: Int = srcIds.length
@@ -1071,7 +1106,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       // Since there might be interleaved log messages, we insert a unique id for easy pairing.
       val sortId = Utils.random.nextInt()
       logDebug(
-          s"Start sorting an uncompressed in-block of size $sz. (sortId = $sortId)")
+        s"Start sorting an uncompressed in-block of size $sz. (sortId = $sortId)")
       val start = System.nanoTime()
       val sorter = new Sorter(new UncompressedInBlockSort[ID])
       sorter.sort(this, 0, length, Ordering[KeyWrapper[ID]])
@@ -1085,7 +1120,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     *
     * @see [[UncompressedInBlockSort]]
     */
-  private class KeyWrapper[@specialized(Int, Long) ID : ClassTag](
+  private class KeyWrapper[@specialized(Int, Long) ID: ClassTag](
       implicit ord: Ordering[ID])
       extends Ordered[KeyWrapper[ID]] {
 
@@ -1104,7 +1139,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
   /**
     * [[SortDataFormat]] of [[UncompressedInBlock]] used by [[Sorter]].
     */
-  private class UncompressedInBlockSort[@specialized(Int, Long) ID : ClassTag](
+  private class UncompressedInBlockSort[@specialized(Int, Long) ID: ClassTag](
       implicit ord: Ordering[ID])
       extends SortDataFormat[KeyWrapper[ID], UncompressedInBlock[ID]] {
 
@@ -1120,20 +1155,22 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       }
     }
 
-    override def getKey(
-        data: UncompressedInBlock[ID], pos: Int): KeyWrapper[ID] = {
+    override def getKey(data: UncompressedInBlock[ID],
+                        pos: Int): KeyWrapper[ID] = {
       getKey(data, pos, null)
     }
 
-    private def swapElements[@specialized(Int, Float) T](
-        data: Array[T], pos0: Int, pos1: Int): Unit = {
+    private def swapElements[@specialized(Int, Float) T](data: Array[T],
+                                                         pos0: Int,
+                                                         pos1: Int): Unit = {
       val tmp = data(pos0)
       data(pos0) = data(pos1)
       data(pos1) = tmp
     }
 
-    override def swap(
-        data: UncompressedInBlock[ID], pos0: Int, pos1: Int): Unit = {
+    override def swap(data: UncompressedInBlock[ID],
+                      pos0: Int,
+                      pos1: Int): Unit = {
       swapElements(data.srcIds, pos0, pos1)
       swapElements(data.dstEncodedIndices, pos0, pos1)
       swapElements(data.ratings, pos0, pos1)
@@ -1145,8 +1182,11 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
                            dstPos: Int,
                            length: Int): Unit = {
       System.arraycopy(src.srcIds, srcPos, dst.srcIds, dstPos, length)
-      System.arraycopy(
-          src.dstEncodedIndices, srcPos, dst.dstEncodedIndices, dstPos, length)
+      System.arraycopy(src.dstEncodedIndices,
+                       srcPos,
+                       dst.dstEncodedIndices,
+                       dstPos,
+                       length)
       System.arraycopy(src.ratings, srcPos, dst.ratings, dstPos, length)
     }
 
@@ -1174,7 +1214,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @param dstPart partitioner for dst IDs
     * @return (in-blocks, out-blocks)
     */
-  private def makeBlocks[ID : ClassTag](
+  private def makeBlocks[ID: ClassTag](
       prefix: String,
       ratingBlocks: RDD[((Int, Int), RatingBlock[ID])],
       srcPart: Partitioner,
@@ -1204,14 +1244,15 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
           dstIdToLocalIndex.update(sortedDstIds(i), i)
           i += 1
         }
-        logDebug("Converting to local indices took " +
+        logDebug(
+          "Converting to local indices took " +
             (System.nanoTime() - start) / 1e9 + " seconds.")
         val dstLocalIndices = dstIds.map(dstIdToLocalIndex.apply)
         (srcBlockId, (dstBlockId, srcIds, dstLocalIndices, ratings))
     }.groupByKey(new ALSPartitioner(srcPart.numPartitions))
       .mapValues { iter =>
         val builder = new UncompressedInBlockBuilder[ID](
-            new LocalIndexEncoder(dstPart.numPartitions))
+          new LocalIndexEncoder(dstPart.numPartitions))
         iter.foreach {
           case (dstBlockId, srcIds, dstLocalIndices, ratings) =>
             builder.add(dstBlockId, srcIds, dstLocalIndices, ratings)
@@ -1243,9 +1284,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
         activeIds.map { x =>
           x.result()
         }
-    }.setName(prefix + "OutBlocks")
-      .persist(storageLevel)
-      (inBlocks, outBlocks)
+    }.setName(prefix + "OutBlocks").persist(storageLevel)
+    (inBlocks, outBlocks)
   }
 
   /**
@@ -1287,8 +1327,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     val merged =
       srcOut.groupByKey(new ALSPartitioner(dstInBlocks.partitions.length))
     dstInBlocks.join(merged).mapValues {
-      case (
-          InBlock(dstIds, srcPtrs, srcEncodedIndices, ratings), srcFactors) =>
+      case (InBlock(dstIds, srcPtrs, srcEncodedIndices, ratings),
+            srcFactors) =>
         val sortedSrcFactors = new Array[FactorBlock](numSrcBlocks)
         srcFactors.foreach {
           case (srcBlockId, factors) =>
@@ -1338,15 +1378,14 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Computes the Gramian matrix of user or item factors, which is only used in implicit preference.
     * Caching of the input factors is handled in [[ALS#train]].
     */
-  private def computeYtY(
-      factorBlocks: RDD[(Int, FactorBlock)], rank: Int): NormalEquation = {
+  private def computeYtY(factorBlocks: RDD[(Int, FactorBlock)],
+                         rank: Int): NormalEquation = {
     factorBlocks.values.aggregate(new NormalEquation(rank))(
-        seqOp = (ne, factors) =>
-            {
-            factors.foreach(ne.add(_, 0.0))
-            ne
-        },
-        combOp = (ne1, ne2) => ne1.merge(ne2))
+      seqOp = (ne, factors) => {
+        factors.foreach(ne.add(_, 0.0))
+        ne
+      },
+      combOp = (ne1, ne2) => ne1.merge(ne2))
   }
 
   /**
@@ -1392,5 +1431,6 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * we have getPartition(getPartition(k)) = getPartition(k). Since the default HashPartitioner
     * satisfies this requirement, we simply use a type alias here.
     */
-  private[recommendation] type ALSPartitioner = org.apache.spark.HashPartitioner
+  private[recommendation] type ALSPartitioner =
+    org.apache.spark.HashPartitioner
 }

@@ -10,22 +10,23 @@ trait Tags { self: Analyzer =>
 
     private val runDefinitions = currentRun.runDefinitions
 
-    private def resolveTag(
-        pos: Position, taggedTp: Type, allowMaterialization: Boolean) =
+    private def resolveTag(pos: Position,
+                           taggedTp: Type,
+                           allowMaterialization: Boolean) =
       enteringTyper {
         def wrapper(tree: => Tree): Tree =
           if (allowMaterialization)(context.withMacrosEnabled[Tree](tree))
           else (context.withMacrosDisabled[Tree](tree))
         wrapper(
-            inferImplicit(
-                EmptyTree,
-                taggedTp,
-                reportAmbiguous = true,
-                isView = false,
-                context,
-                saveAmbiguousDivergent = true,
-                pos
-            ).tree)
+          inferImplicit(
+            EmptyTree,
+            taggedTp,
+            reportAmbiguous = true,
+            isView = false,
+            context,
+            saveAmbiguousDivergent = true,
+            pos
+          ).tree)
       }
 
     /** Finds in scope or materializes a ClassTag.

@@ -22,7 +22,11 @@ import java.io.{IOException, ObjectInputStream, ObjectOutputStream}
 import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.streaming.dstream.{DStream, InputDStream, ReceiverInputDStream}
+import org.apache.spark.streaming.dstream.{
+  DStream,
+  InputDStream,
+  ReceiverInputDStream
+}
 import org.apache.spark.streaming.scheduler.Job
 import org.apache.spark.util.Utils
 
@@ -69,8 +73,8 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
   def setBatchDuration(duration: Duration) {
     this.synchronized {
       require(
-          batchDuration == null,
-          s"Batch duration already set as $batchDuration. Cannot set it again.")
+        batchDuration == null,
+        s"Batch duration already set as $batchDuration. Cannot set it again.")
       batchDuration = duration
     }
   }
@@ -78,8 +82,8 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
   def remember(duration: Duration) {
     this.synchronized {
       require(
-          rememberDuration == null,
-          s"Remember duration already set as $rememberDuration. Cannot set it again.")
+        rememberDuration == null,
+        s"Remember duration already set as $rememberDuration. Cannot set it again.")
       rememberDuration = duration
     }
   }

@@ -23,7 +23,8 @@ object SnapshotRecoveryLocalStoreSpec {
   }
 
   class LoadSnapshotTestPersistentActor(name: String, probe: ActorRef)
-      extends NamedPersistentActor(name) with TurnOffRecoverOnStart
+      extends NamedPersistentActor(name)
+      with TurnOffRecoverOnStart
       with ActorLogging {
 
     def receiveCommand = {
@@ -37,7 +38,7 @@ object SnapshotRecoveryLocalStoreSpec {
 
 class SnapshotRecoveryLocalStoreSpec
     extends PersistenceSpec(
-        PersistenceSpec.config("inmem", "SnapshotRecoveryLocalStoreSpec"))
+      PersistenceSpec.config("inmem", "SnapshotRecoveryLocalStoreSpec"))
     with ImplicitSender {
 
   import SnapshotRecoveryLocalStoreSpec._
@@ -46,11 +47,11 @@ class SnapshotRecoveryLocalStoreSpec
     super.beforeEach()
 
     val persistentActor1 = system.actorOf(
-        Props(classOf[SaveSnapshotTestPersistentActor],
-              persistenceId,
-              testActor))
-    val persistentActor2 = system.actorOf(Props(
-            classOf[SaveSnapshotTestPersistentActor], extendedName, testActor))
+      Props(classOf[SaveSnapshotTestPersistentActor],
+            persistenceId,
+            testActor))
+    val persistentActor2 = system.actorOf(
+      Props(classOf[SaveSnapshotTestPersistentActor], extendedName, testActor))
     persistentActor1 ! TakeSnapshot
     persistentActor2 ! TakeSnapshot
     expectMsgAllOf(0L, 0L)
@@ -60,9 +61,10 @@ class SnapshotRecoveryLocalStoreSpec
     "recover state only from its own correct snapshot file" in {
 
       val recoveringActor =
-        system.actorOf(Props(classOf[LoadSnapshotTestPersistentActor],
-                             persistenceId,
-                             testActor))
+        system.actorOf(
+          Props(classOf[LoadSnapshotTestPersistentActor],
+                persistenceId,
+                testActor))
 
       expectMsgPF() {
         case SnapshotOffer(SnapshotMetadata(`persistenceId`, seqNo, timestamp),

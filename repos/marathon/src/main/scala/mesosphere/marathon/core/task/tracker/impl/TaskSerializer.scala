@@ -15,8 +15,9 @@ object TaskSerializer {
   def fromProto(proto: Protos.MarathonTask): Task = {
 
     def required[T](name: String, maybeValue: Option[T]): T = {
-      maybeValue.getOrElse(throw new IllegalArgumentException(
-              s"task[${proto.getId}]: $name must be set"))
+      maybeValue.getOrElse(
+        throw new IllegalArgumentException(
+          s"task[${proto.getId}]: $name must be set"))
     }
 
     def opt[T](hasAttribute: Protos.MarathonTask => Boolean,
@@ -31,9 +32,9 @@ object TaskSerializer {
 
     def agentInfo: Task.AgentInfo = {
       Task.AgentInfo(
-          host = required("host", opt(_.hasHost, _.getHost)),
-          agentId = opt(_.hasSlaveId, _.getSlaveId).map(_.getValue),
-          attributes = proto.getAttributesList.iterator().asScala.toVector
+        host = required("host", opt(_.hasHost, _.getHost)),
+        agentId = opt(_.hasSlaveId, _.getSlaveId).map(_.getValue),
+        attributes = proto.getAttributesList.iterator().asScala.toVector
       )
     }
 
@@ -45,16 +46,17 @@ object TaskSerializer {
     def appVersion = Timestamp(proto.getVersion)
 
     def taskStatus = Task.Status(
-        stagedAt = Timestamp(proto.getStagedAt),
-        startedAt = if (proto.hasStartedAt) Some(Timestamp(proto.getStartedAt))
-          else None,
-        mesosStatus = opt(_.hasStatus, _.getStatus)
+      stagedAt = Timestamp(proto.getStagedAt),
+      startedAt =
+        if (proto.hasStartedAt) Some(Timestamp(proto.getStartedAt))
+        else None,
+      mesosStatus = opt(_.hasStatus, _.getStatus)
     )
 
     def networking =
       if (proto.getPortsCount != 0) {
         Task.HostPorts(
-            proto.getPortsList.iterator().asScala.map(_.intValue()).toVector)
+          proto.getPortsList.iterator().asScala.map(_.intValue()).toVector)
       } else if (proto.getNetworksCount != 0) {
         Task.NetworkInfoList(proto.getNetworksList.asScala)
       } else {
@@ -64,11 +66,11 @@ object TaskSerializer {
     def launchedTask: Option[Task.Launched] = {
       if (proto.hasStagedAt) {
         Some(
-            Task.Launched(
-                appVersion = appVersion,
-                status = taskStatus,
-                networking = networking
-            )
+          Task.Launched(
+            appVersion = appVersion,
+            status = taskStatus,
+            networking = networking
+          )
         )
       } else {
         None
@@ -76,10 +78,10 @@ object TaskSerializer {
     }
 
     constructTask(
-        taskId = Task.Id(proto.getId),
-        agentInfo = agentInfo,
-        reservation,
-        launchedTask
+      taskId = Task.Id(proto.getId),
+      agentInfo = agentInfo,
+      reservation,
+      launchedTask
     )
   }
 
@@ -134,8 +136,8 @@ object TaskSerializer {
                     networking: Task.Networking): Unit = {
       builder.setVersion(appVersion.toString)
       builder.setStagedAt(status.stagedAt.toDateTime.getMillis)
-      status.startedAt.foreach(
-          startedAt => builder.setStartedAt(startedAt.toDateTime.getMillis))
+      status.startedAt.foreach(startedAt =>
+        builder.setStartedAt(startedAt.toDateTime.getMillis))
       status.mesosStatus.foreach(status => builder.setStatus(status))
       networking match {
         case Task.HostPorts(hostPorts) =>
@@ -157,8 +159,9 @@ object TaskSerializer {
         setReservation(reserved.reservation)
 
       case launchedOnR: Task.LaunchedOnReservation =>
-        setLaunched(
-            launchedOnR.appVersion, launchedOnR.status, launchedOnR.networking)
+        setLaunched(launchedOnR.appVersion,
+                    launchedOnR.status,
+                    launchedOnR.networking)
         setReservation(launchedOnR.reservation)
     }
 
@@ -180,13 +183,13 @@ private[impl] object ReservationSerializer {
           Timeout.Reason.ReservationTimeout
         case _ =>
           throw new SerializationFailedException(
-              s"Unable to parse ${proto.getReason}")
+            s"Unable to parse ${proto.getReason}")
       }
 
       Timeout(
-          Timestamp(proto.getInitiated),
-          Timestamp(proto.getDeadline),
-          reason
+        Timestamp(proto.getInitiated),
+        Timestamp(proto.getDeadline),
+        reason
       )
     }
 
@@ -213,7 +216,8 @@ private[impl] object ReservationSerializer {
     def fromProto(proto: ProtoState): State = {
       val timeout =
         if (proto.hasTimeout)
-          Some(TimeoutSerializer.fromProto(proto.getTimeout)) else None
+          Some(TimeoutSerializer.fromProto(proto.getTimeout))
+        else None
       proto.getType match {
         case ProtoState.Type.New => State.New(timeout)
         case ProtoState.Type.Launched => State.Launched
@@ -222,7 +226,7 @@ private[impl] object ReservationSerializer {
         case ProtoState.Type.Unknown => State.Unknown(timeout)
         case _ =>
           throw new SerializationFailedException(
-              s"Unable to parse ${proto.getType}")
+            s"Unable to parse ${proto.getType}")
       }
     }
 
@@ -241,8 +245,8 @@ private[impl] object ReservationSerializer {
       }
       val builder =
         Protos.MarathonTask.Reservation.State.newBuilder().setType(stateType)
-      state.timeout.foreach(
-          timeout => builder.setTimeout(TimeoutSerializer.toProto(timeout)))
+      state.timeout.foreach(timeout =>
+        builder.setTimeout(TimeoutSerializer.toProto(timeout)))
       builder.build()
     }
   }
@@ -250,7 +254,7 @@ private[impl] object ReservationSerializer {
   def fromProto(proto: Protos.MarathonTask.Reservation): Task.Reservation = {
     if (!proto.hasState)
       throw new SerializationFailedException(
-          s"Serialized resident task has no state: $proto")
+        s"Serialized resident task has no state: $proto")
 
     val state: Task.Reservation.State =
       StateSerializer.fromProto(proto.getState)
@@ -258,7 +262,7 @@ private[impl] object ReservationSerializer {
       case LocalVolumeId(volumeId) => volumeId
       case invalid: String =>
         throw new SerializationFailedException(
-            s"$invalid is no valid volumeId")
+          s"$invalid is no valid volumeId")
     }
 
     Reservation(volumes, state)

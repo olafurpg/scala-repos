@@ -114,8 +114,8 @@ object Server {
     * @return The result of the block of code.
     */
   def withApplication[T](application: Application,
-                         config: ServerConfig = ServerConfig(
-                               port = Some(0), mode = Mode.Test))(
+                         config: ServerConfig =
+                           ServerConfig(port = Some(0), mode = Mode.Test))(
       block: Port => T)(implicit provider: ServerProvider): T = {
     Play.start(application)
     val server = provider.createServer(config, application)
@@ -139,17 +139,17 @@ object Server {
     * @param provider The server provider.
     * @return The result of the block of code.
     */
-  def withRouter[T](
-      config: ServerConfig = ServerConfig(port = Some(0), mode = Mode.Test))(
+  def withRouter[T](config: ServerConfig =
+                      ServerConfig(port = Some(0), mode = Mode.Test))(
       routes: PartialFunction[RequestHeader, Handler])(block: Port => T)(
       implicit provider: ServerProvider): T = {
     val application = new BuiltInComponentsFromContext(
-        ApplicationLoader.Context(
-            Environment.simple(path = config.rootDir, mode = config.mode),
-            None,
-            new DefaultWebCommands(),
-            Configuration(ConfigFactory.load())
-        )) {
+      ApplicationLoader.Context(
+        Environment.simple(path = config.rootDir, mode = config.mode),
+        None,
+        new DefaultWebCommands(),
+        Configuration(ConfigFactory.load())
+      )) {
       def router = Router.from(routes)
     }.application
     withApplication(application, config)(block)
@@ -163,12 +163,12 @@ private[play] object JavaServerHelper {
                 sslPort: Option[Integer]): Server = {
     val r = router
     val application = new BuiltInComponentsFromContext(
-        ApplicationLoader.Context(
-            Environment.simple(mode = mode),
-            None,
-            new DefaultWebCommands(),
-            Configuration(ConfigFactory.load())
-        )) {
+      ApplicationLoader.Context(
+        Environment.simple(mode = mode),
+        None,
+        new DefaultWebCommands(),
+        Configuration(ConfigFactory.load())
+      )) {
       def router = r
     }.application
     Play.start(application)

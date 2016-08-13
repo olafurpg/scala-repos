@@ -63,8 +63,8 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
 
   def score(game: Game): Int = math.round {
     (heuristics map {
-          case (fn, coefficient) => heuristicBox(fn(game)) * coefficient
-        }).sum * 1000
+      case (fn, coefficient) => heuristicBox(fn(game)) * coefficient
+    }).sum * 1000
   }
 
   type Heuristic = Game => Float
@@ -73,9 +73,9 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
   val turnBox = box(1 to 25) _
 
   val heuristics: List[(Heuristic, Float)] = List(
-      ratingHeuristic(Color.White) -> 1.2f,
-      ratingHeuristic(Color.Black) -> 1.2f,
-      progressHeuristic -> 0.7f)
+    ratingHeuristic(Color.White) -> 1.2f,
+    ratingHeuristic(Color.Black) -> 1.2f,
+    progressHeuristic -> 0.7f)
 
   def ratingHeuristic(color: Color): Heuristic =
     game => ratingBox(game.player(color).rating | 1400)

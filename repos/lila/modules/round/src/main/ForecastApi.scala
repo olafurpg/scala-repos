@@ -30,9 +30,9 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
     lila.mon.round.forecast.create()
     coll
       .update(
-          BSONDocument("_id" -> pov.fullId),
-          Forecast(_id = pov.fullId, steps = steps, date = DateTime.now).truncate,
-          upsert = true)
+        BSONDocument("_id" -> pov.fullId),
+        Forecast(_id = pov.fullId, steps = steps, date = DateTime.now).truncate,
+        upsert = true)
       .void
   }
 
@@ -98,9 +98,10 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
 
   def clearGame(g: Game) =
     coll
-      .remove(BSONDocument(
-              "_id" -> BSONDocument("$in" -> chess.Color.all.map(g.fullIdOf))
-          ))
+      .remove(
+        BSONDocument(
+          "_id" -> BSONDocument("$in" -> chess.Color.all.map(g.fullIdOf))
+        ))
       .void
 
   def clearPov(pov: Pov) = coll.remove(BSONDocument("_id" -> pov.fullId)).void

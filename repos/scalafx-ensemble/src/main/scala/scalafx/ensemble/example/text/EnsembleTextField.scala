@@ -38,15 +38,15 @@ class EnsembleTextField extends EnsembleExample {
     spacing = 10
     padding = Insets(20)
     children = List(
-        new TextField {
-          promptText = "Hi! I am Scalafx TextField"
-          maxWidth = 200
-        },
-        new TextField {
-          promptText = "So Sad! I am disabled"
-          disable = true
-          maxWidth = 200
-        }
+      new TextField {
+        promptText = "Hi! I am Scalafx TextField"
+        maxWidth = 200
+      },
+      new TextField {
+        promptText = "So Sad! I am disabled"
+        disable = true
+        maxWidth = 200
+      }
     )
   }
 }

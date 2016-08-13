@@ -10,19 +10,18 @@ import org.jboss.netty.channel._
   * complete reception within a certain time, preventing a resource DoS
   * on a server.
   */
-private[finagle] class WriteCompletionTimeoutHandler(
-    timer: Timer, timeout: Duration)
+private[finagle] class WriteCompletionTimeoutHandler(timer: Timer,
+                                                     timeout: Duration)
     extends SimpleChannelDownstreamHandler {
   override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) {
     val task = timer.schedule(Time.now + timeout) {
       val channel = ctx.getChannel
       Channels.fireExceptionCaught(
-          channel,
-          new WriteTimedOutException(
-              if (channel != null) channel.getRemoteAddress else null))
+        channel,
+        new WriteTimedOutException(
+          if (channel != null) channel.getRemoteAddress else null))
     }
-    e.getFuture.addListener(
-        new ChannelFutureListener {
+    e.getFuture.addListener(new ChannelFutureListener {
       override def operationComplete(f: ChannelFuture): Unit =
         if (!f.isCancelled) {
           // on success or failure

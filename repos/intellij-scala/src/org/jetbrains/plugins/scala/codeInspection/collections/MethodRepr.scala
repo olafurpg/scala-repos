@@ -15,9 +15,10 @@ class MethodRepr private (val itself: ScExpression,
 
 object MethodRepr {
   //method represented by optional base expression, optional method reference and arguments
-  def unapply(
-      expr: ScExpression): Option[(ScExpression, Option[ScExpression], Option[
-          ScReferenceExpression], Seq[ScExpression])] = {
+  def unapply(expr: ScExpression): Option[(ScExpression,
+                                           Option[ScExpression],
+                                           Option[ScReferenceExpression],
+                                           Seq[ScExpression])] = {
     expr match {
       case call: ScMethodCall =>
         val args = call.args match {

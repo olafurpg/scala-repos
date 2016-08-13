@@ -12,7 +12,9 @@ import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
 class TracingFilterTest
-    extends FunSuite with MockitoSugar with BeforeAndAfter
+    extends FunSuite
+    with MockitoSugar
+    with BeforeAndAfter
     with AssertionsForJUnit {
 
   val serviceName = "bird"
@@ -123,7 +125,7 @@ class TracingFilterTest
         case Record(_, _, a @ Annotation.ClientRecv(), _) => a
       }
     assert(
-        annotations == Seq(Annotation.ClientSend(), Annotation.ClientRecv()))
+      annotations == Seq(Annotation.ClientSend(), Annotation.ClientRecv()))
   }
 
   test("clnt: recv error") {
@@ -134,10 +136,10 @@ class TracingFilterTest
         case Record(_, _, a @ Annotation.ClientRecvError(_), _) => a
       }
     assert(
-        annotations == Seq(
-            Annotation.ClientSend(),
-            Annotation.ClientRecvError("java.lang.Exception: bummer"),
-            Annotation.ClientRecv()))
+      annotations == Seq(
+        Annotation.ClientSend(),
+        Annotation.ClientRecvError("java.lang.Exception: bummer"),
+        Annotation.ClientRecv()))
   }
 
   /*
@@ -156,6 +158,6 @@ class TracingFilterTest
         case Record(_, _, a @ Annotation.ServerSend(), _) => a
       }
     assert(
-        annotations == Seq(Annotation.ServerRecv(), Annotation.ServerSend()))
+      annotations == Seq(Annotation.ServerRecv(), Annotation.ServerSend()))
   }
 }

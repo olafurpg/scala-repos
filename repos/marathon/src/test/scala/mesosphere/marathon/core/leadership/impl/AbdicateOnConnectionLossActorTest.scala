@@ -9,8 +9,11 @@ import org.apache.zookeeper.{ZooKeeper, WatchedEvent, Watcher}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, GivenWhenThen}
 
 class AbdicateOnConnectionLossActorTest
-    extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with BeforeAndAfter {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with BeforeAndAfter {
 
   test("register as zk listener on start") {
     Given("ZK and leader refs")
@@ -27,7 +30,7 @@ class AbdicateOnConnectionLossActorTest
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
     val actor = TestActorRef[AbdicateOnConnectionLossActor](
-        AbdicateOnConnectionLossActor.props(zk, leader))
+      AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("The actor is killed")
     val disconnected = new WatchedEvent(Watcher.Event.EventType.None,
@@ -43,11 +46,12 @@ class AbdicateOnConnectionLossActorTest
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
     val actor = TestActorRef[AbdicateOnConnectionLossActor](
-        AbdicateOnConnectionLossActor.props(zk, leader))
+      AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("An event is fired, that is not a disconnected event")
-    val authFailed = new WatchedEvent(
-        Watcher.Event.EventType.None, Watcher.Event.KeeperState.AuthFailed, "")
+    val authFailed = new WatchedEvent(Watcher.Event.EventType.None,
+                                      Watcher.Event.KeeperState.AuthFailed,
+                                      "")
     actor.underlyingActor.watcher.process(authFailed)
 
     Then("Abdication is _NOT_ called")

@@ -11,8 +11,10 @@ import org.ensime.util.file._
   * Verifies common operations work correctly for unsaved files.
   */
 class UnsavedFileTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.TimingTestProject
 
@@ -28,9 +30,9 @@ class UnsavedFileTest
           assert(!missing.exists)
 
           val inMemory = SourceFileInfo(
-              missing,
-              Some("class Foo { def main = { System.out.println(1) } }"),
-              None
+            missing,
+            Some("class Foo { def main = { System.out.println(1) } }"),
+            None
           )
 
           project ! TypecheckFileReq(inMemory)

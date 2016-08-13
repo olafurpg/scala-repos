@@ -28,7 +28,7 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
     findOuterString(file.findElementAt(startOffsets(0))) match {
       case Some(element)
           if element.getTextRange.getStartOffset <= startOffsets(0) &&
-          element.getTextRange.getEndOffset >= endOffsets(0) =>
+            element.getTextRange.getEndOffset >= endOffsets(0) =>
         text stripMargin getMarginChar(element)
       case _ => null
     }
@@ -52,12 +52,13 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
 
     val marginChar = getMarginChar(element)
     val textRange = new TextRange(
-        document.getLineStartOffset(document.getLineNumber(offset)), offset)
+      document.getLineStartOffset(document.getLineNumber(offset)),
+      offset)
 
     (if (document.getText(textRange).trim.length == 0 &&
          (text.trim().length == 0 || text.trim.charAt(0) != marginChar))
-       marginChar
-     else "") + text.replace("\n", "\n " + marginChar)
+      marginChar
+    else "") + text.replace("\n", "\n " + marginChar)
   }
 
   private def getMarginChar(element: PsiElement): Char =
@@ -70,7 +71,7 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
         Some(interpLiteral)
       case string
           if MultiLineStringCopyPasteProcessor.SAFE_ELEMENTS.contains(
-              string.getNode.getElementType) =>
+            string.getNode.getElementType) =>
         Some(findOuterString(element.getParent).getOrElse(string))
       case _ => None
     }
@@ -82,7 +83,7 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
 
 object MultiLineStringCopyPasteProcessor {
   private val SAFE_ELEMENTS = TokenSet.create(
-      ScalaTokenTypes.tMULTILINE_STRING,
-      ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING,
-      ScalaTokenTypes.tINTERPOLATED_STRING_ID)
+    ScalaTokenTypes.tMULTILINE_STRING,
+    ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING,
+    ScalaTokenTypes.tINTERPOLATED_STRING_ID)
 }

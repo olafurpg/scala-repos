@@ -36,9 +36,10 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
     "have a nested flow with a different dispatcher" in {
       Source
         .single(1)
-        .via(Flow[Int]
-              .map(sendThreadNameTo(testActor))
-              .withAttributes(dispatcher("my-dispatcher1")))
+        .via(
+          Flow[Int]
+            .map(sendThreadNameTo(testActor))
+            .withAttributes(dispatcher("my-dispatcher1")))
         .to(Sink.ignore)
         .run()
 
@@ -86,7 +87,7 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
         .map(sendThreadNameTo(customDispatcher.ref))
         .map(x ⇒ x)
         .withAttributes(
-            dispatcher("my-dispatcher1") and name("separate-disptacher"))
+          dispatcher("my-dispatcher1") and name("separate-disptacher"))
 
       Source(0 to 2).via(f1).via(f2).runWith(Sink.ignore)
 

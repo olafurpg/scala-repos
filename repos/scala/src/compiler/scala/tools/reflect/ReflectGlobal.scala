@@ -34,11 +34,10 @@ class ReflectGlobal(currentSettings: Settings,
 
   override def transformedType(sym: Symbol) =
     postErasure.transformInfo(
+      sym,
+      erasure.transformInfo(
         sym,
-        erasure.transformInfo(
-            sym,
-            uncurry.transformInfo(sym,
-                                  refChecks.transformInfo(sym, sym.info))))
+        uncurry.transformInfo(sym, refChecks.transformInfo(sym, sym.info))))
 
   override def isCompilerUniverse = true
 

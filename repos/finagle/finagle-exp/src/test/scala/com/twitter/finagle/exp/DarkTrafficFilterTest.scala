@@ -30,8 +30,8 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
 
     val enableSampling = (s: String) => gate()
 
-    val filter = new DarkTrafficFilter(
-        darkService, enableSampling, statsReceiver)
+    val filter =
+      new DarkTrafficFilter(darkService, enableSampling, statsReceiver)
 
     val forwarded = Seq("darkTrafficFilter", "forwarded")
     val skipped = Seq("darkTrafficFilter", "skipped")
@@ -55,7 +55,7 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "when decider is on, send dark traffic to darkService and light to service") {
+    "when decider is on, send dark traffic to darkService and light to service") {
     new Fixture {
       when(gate()) thenReturn true
       assert(Await.result(filter(request, service)) == response)

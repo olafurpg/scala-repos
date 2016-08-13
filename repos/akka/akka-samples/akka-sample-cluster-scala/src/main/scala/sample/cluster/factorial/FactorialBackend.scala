@@ -38,7 +38,7 @@ object FactorialBackend {
     val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.port=$port")
       .withFallback(
-          ConfigFactory.parseString("akka.cluster.roles = [backend]"))
+        ConfigFactory.parseString("akka.cluster.roles = [backend]"))
       .withFallback(ConfigFactory.load("factorial"))
 
     val system = ActorSystem("ClusterSystem", config)

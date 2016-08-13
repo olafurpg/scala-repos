@@ -21,7 +21,7 @@ trait GenericMarshallers extends LowPriorityToResponseMarshallerImplicits {
         case Some(value) ⇒ m(value)
         case None ⇒
           FastFuture.successful(
-              Marshalling.Opaque(() ⇒ empty.emptyValue) :: Nil)
+            Marshalling.Opaque(() ⇒ empty.emptyValue) :: Nil)
       }
     }
 

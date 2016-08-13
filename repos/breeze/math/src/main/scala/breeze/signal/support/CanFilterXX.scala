@@ -49,8 +49,8 @@ object CanFilterBPBS {
   /** Use via implicit delegate syntax filterBP(x: DenseVector) and filterBS(x: DenseVector)
     *
     */
-  implicit val dvDouble1DFilterBPBS: CanFilterBPBS[
-      DenseVector[Double], DenseVector[Double]] = {
+  implicit val dvDouble1DFilterBPBS: CanFilterBPBS[DenseVector[Double],
+                                                   DenseVector[Double]] = {
     new CanFilterBPBS[DenseVector[Double], DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 omega: (Double, Double),
@@ -69,10 +69,9 @@ object CanFilterBPBS {
                                        zeroPass = bandStop,
                                        nyquist = sampleRate / 2d)
           case x => {
-              require(false, "Cannot handle option value " + x)
-              new FIRKernel1D[Double](
-                  DenseVector[Double](), 1d, "null kernel!")
-            }
+            require(false, "Cannot handle option value " + x)
+            new FIRKernel1D[Double](DenseVector[Double](), 1d, "null kernel!")
+          }
         }
 //        println(kernel)
 //        println(kernel.kernel)
@@ -88,8 +87,8 @@ object CanFilterLPHP {
   /** Use via implicit delegate syntax filterLP(x: DenseVector) and filterHP(x: DenseVector)
     *
     */
-  implicit val dvDouble1DFilterLPHP: CanFilterLPHP[
-      DenseVector[Double], DenseVector[Double]] = {
+  implicit val dvDouble1DFilterLPHP: CanFilterLPHP[DenseVector[Double],
+                                                   DenseVector[Double]] = {
     new CanFilterLPHP[DenseVector[Double], DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 omega: Double,
@@ -108,10 +107,9 @@ object CanFilterLPHP {
                                        zeroPass = lowPass,
                                        nyquist = sampleRate / 2d)
           case x => {
-              require(false, "Cannot handle option value " + x)
-              new FIRKernel1D[Double](
-                  DenseVector[Double](), 1d, "null kernel!")
-            }
+            require(false, "Cannot handle option value " + x)
+            new FIRKernel1D[Double](DenseVector[Double](), 1d, "null kernel!")
+          }
         }
 
         filter(data, kernel, overhang, padding)

@@ -49,7 +49,7 @@ private[http] final case class RequestContextImpl(
         underlying.complete(value)
       case _ ⇒
         throw new IllegalArgumentException(
-            s"Unsupported marshaller: $marshaller")
+          s"Unsupported marshaller: $marshaller")
     }
   def complete(response: jm.HttpResponse): RouteResult =
     underlying.complete(response.asScala)

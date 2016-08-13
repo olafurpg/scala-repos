@@ -4,10 +4,20 @@ package lang.refactoring.util
 import com.intellij.codeInsight.CodeInsightUtilCore
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.codeInsight.template._
-import com.intellij.codeInsight.template.impl.{TemplateImpl, TemplateManagerImpl, TemplateState, TextExpression}
+import com.intellij.codeInsight.template.impl.{
+  TemplateImpl,
+  TemplateManagerImpl,
+  TemplateState,
+  TextExpression
+}
 import com.intellij.openapi.editor.colors.{EditorColors, EditorColorsManager}
 import com.intellij.openapi.editor.markup.{RangeHighlighter, TextAttributes}
-import com.intellij.openapi.editor.{Document, Editor, EditorFactory, RangeMarker}
+import com.intellij.openapi.editor.{
+  Document,
+  Editor,
+  EditorFactory,
+  RangeMarker
+}
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiNamedElement}
 import com.intellij.refactoring.rename.inplace.MyLookupExpression
@@ -55,8 +65,8 @@ class InplaceRenameHelper(parent: PsiElement) {
       depNames += dependentName
       val (depElem, depRange) = dependentsWithRanges(index)
       if (depRange != null)
-        builder.replaceElement(
-            depElem, depRange, dependentName, newName, false)
+        builder
+          .replaceElement(depElem, depRange, dependentName, newName, false)
       else builder.replaceElement(depElem, dependentName, newName, false)
     }
     primaries += primary
@@ -80,8 +90,8 @@ class InplaceRenameHelper(parent: PsiElement) {
     val template = builder.buildInlineTemplate().asInstanceOf[TemplateImpl]
     val templateVariables = template.getVariables
     val stopAtVariables = templateVariables.asScala.filter(_.isAlwaysStopAt)
-    val primarySortedVariables = primaries.flatMap(
-        p => stopAtVariables.find(_.getName == primaryNames(p)))
+    val primarySortedVariables = primaries.flatMap(p =>
+      stopAtVariables.find(_.getName == primaryNames(p)))
     for ((v, idx) <- primarySortedVariables.zipWithIndex) {
       templateVariables.set(idx, v)
     }
@@ -148,10 +158,10 @@ class InplaceRenameHelper(parent: PsiElement) {
             val attributes: TextAttributes =
               if (name == primaryNames(primary))
                 colorsManager.getGlobalScheme.getAttributes(
-                    EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
+                  EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
               else if (dependentNames(primary) contains name)
                 colorsManager.getGlobalScheme.getAttributes(
-                    EditorColors.SEARCH_RESULT_ATTRIBUTES)
+                  EditorColors.SEARCH_RESULT_ATTRIBUTES)
               else null
             if (attributes != null)
               rangesToHighlight.put(segmentMarker, attributes)

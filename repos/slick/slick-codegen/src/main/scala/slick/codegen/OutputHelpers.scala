@@ -20,8 +20,10 @@ trait OutputHelpers {
     *  Ensures the file ends with a newline character.
     *  @group Output
     */
-  def writeStringToFile(
-      content: String, folder: String, pkg: String, fileName: String) {
+  def writeStringToFile(content: String,
+                        folder: String,
+                        pkg: String,
+                        fileName: String) {
     val folder2: String = folder + "/" + (pkg.replace(".", "/")) + "/"
     new File(folder2).mkdirs()
     val file = new File(folder2 + fileName)

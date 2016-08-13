@@ -26,7 +26,11 @@ import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.command.RunnableCommand
-import org.apache.spark.sql.execution.datasources.{BucketSpec, DataSource, LogicalRelation}
+import org.apache.spark.sql.execution.datasources.{
+  BucketSpec,
+  DataSource,
+  LogicalRelation
+}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
@@ -115,13 +119,13 @@ private[hive] case class CreateMetastoreDataSource(
     // the metastore.
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
-          s"Table name ${tableIdent.table} is not a valid name for " +
+        s"Table name ${tableIdent.table} is not a valid name for " +
           s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
-          s"Database name ${tableIdent.database.get} is not a valid name " +
+        s"Database name ${tableIdent.database.get} is not a valid name " +
           s"for metastore. Metastore only accepts database name containing " +
           s"characters, numbers and _.")
     }
@@ -142,8 +146,8 @@ private[hive] case class CreateMetastoreDataSource(
       if (!options.contains("path") && managedIfNoPath) {
         isExternal = false
         options +
-        ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
+          ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
       } else {
         options
       }
@@ -184,13 +188,13 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
     // the metastore.
     if (!MetaStoreUtils.validateName(tableIdent.table)) {
       throw new AnalysisException(
-          s"Table name ${tableIdent.table} is not a valid name for " +
+        s"Table name ${tableIdent.table} is not a valid name for " +
           s"metastore. Metastore only accepts table name containing characters, numbers and _.")
     }
     if (tableIdent.database.isDefined &&
         !MetaStoreUtils.validateName(tableIdent.database.get)) {
       throw new AnalysisException(
-          s"Database name ${tableIdent.database.get} is not a valid name " +
+        s"Database name ${tableIdent.database.get} is not a valid name " +
           s"for metastore. Metastore only accepts database name containing " +
           s"characters, numbers and _.")
     }
@@ -203,8 +207,8 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
       if (!options.contains("path")) {
         isExternal = false
         options +
-        ("path" -> hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(tableIdent))
+          ("path" -> hiveContext.sessionState.catalog
+            .hiveDefaultTableFilePath(tableIdent))
       } else {
         options
       }
@@ -215,7 +219,7 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
       mode match {
         case SaveMode.ErrorIfExists =>
           throw new AnalysisException(
-              s"Table $tableName already exists. " +
+            s"Table $tableName already exists. " +
               s"If you are using saveAsTable, you can set SaveMode to SaveMode.Append to " +
               s"insert data into the table or set SaveMode to SaveMode.Overwrite to overwrite" +
               s"the existing data. " +
@@ -225,24 +229,26 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
           return Seq.empty[Row]
         case SaveMode.Append =>
           // Check if the specified data source match the data source of the existing table.
-          val dataSource = DataSource(
-              sqlContext = sqlContext,
-              userSpecifiedSchema = Some(query.schema.asNullable),
-              partitionColumns = partitionColumns,
-              bucketSpec = bucketSpec,
-              className = provider,
-              options = optionsWithPath)
+          val dataSource = DataSource(sqlContext = sqlContext,
+                                      userSpecifiedSchema =
+                                        Some(query.schema.asNullable),
+                                      partitionColumns = partitionColumns,
+                                      bucketSpec = bucketSpec,
+                                      className = provider,
+                                      options = optionsWithPath)
           // TODO: Check that options from the resolved relation match the relation that we are
           // inserting into (i.e. using the same compression).
 
-          EliminateSubqueryAliases(sqlContext.sessionState.catalog
-                .lookupRelation(tableIdent)) match {
-            case l @ LogicalRelation(
-                _: InsertableRelation | _: HadoopFsRelation, _, _) =>
+          EliminateSubqueryAliases(
+            sqlContext.sessionState.catalog.lookupRelation(tableIdent)) match {
+            case l @ LogicalRelation(_: InsertableRelation |
+                                     _: HadoopFsRelation,
+                                     _,
+                                     _) =>
               existingSchema = Some(l.schema)
             case o =>
               throw new AnalysisException(
-                  s"Saving data in ${o.toString} is not supported.")
+                s"Saving data in ${o.toString} is not supported.")
           }
         case SaveMode.Overwrite =>
           hiveContext.sql(s"DROP TABLE IF EXISTS $tableName")
@@ -276,13 +282,13 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
       // the schema of df). It is important since the nullability may be changed by the relation
       // provider (for example, see org.apache.spark.sql.parquet.DefaultSource).
       hiveContext.sessionState.catalog.createDataSourceTable(
-          tableIdent,
-          Some(result.schema),
-          partitionColumns,
-          bucketSpec,
-          provider,
-          optionsWithPath,
-          isExternal)
+        tableIdent,
+        Some(result.schema),
+        partitionColumns,
+        bucketSpec,
+        provider,
+        optionsWithPath,
+        isExternal)
     }
 
     // Refresh the cache of the table in the catalog.

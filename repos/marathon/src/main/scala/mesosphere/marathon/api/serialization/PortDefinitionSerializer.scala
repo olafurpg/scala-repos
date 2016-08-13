@@ -34,10 +34,10 @@ object PortDefinitionSerializer {
       else Map.empty[String, String]
 
     PortDefinition(
-        proto.getNumber,
-        proto.getProtocol,
-        if (proto.hasName) Some(proto.getName) else None,
-        labels
+      proto.getNumber,
+      proto.getProtocol,
+      if (proto.hasName) Some(proto.getName) else None,
+      labels
     )
   }
 }

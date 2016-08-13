@@ -5,7 +5,10 @@ import java.util
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions.childOf
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScCaseClauses}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScCaseClauses
+}
 
 /**
   * Nikolay.Tropin
@@ -16,12 +19,13 @@ class ScalaCaseClauseRemover extends ScalaUnwrapper {
   override def isApplicableTo(e: PsiElement): Boolean =
     forCaseClause(e)(_ => true)(false)
 
-  override def doUnwrap(
-      element: PsiElement, context: ScalaUnwrapContext): Unit =
+  override def doUnwrap(element: PsiElement,
+                        context: ScalaUnwrapContext): Unit =
     forCaseClause(element)(context.delete(_)) {}
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]): PsiElement =
+      e: PsiElement,
+      toExtract: util.List[PsiElement]): PsiElement =
     forCaseClause[PsiElement](e) { cl =>
       super.collectAffectedElements(cl, toExtract)
       cl

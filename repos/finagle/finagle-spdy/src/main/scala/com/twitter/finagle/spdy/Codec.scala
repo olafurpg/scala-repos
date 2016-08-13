@@ -12,8 +12,8 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
 import org.jboss.netty.handler.codec.spdy._
 
 class AnnotateSpdyStreamId extends SimpleFilter[HttpRequest, HttpResponse] {
-  def apply(
-      request: HttpRequest, service: Service[HttpRequest, HttpResponse]) = {
+  def apply(request: HttpRequest,
+            service: Service[HttpRequest, HttpResponse]) = {
     val streamId = request.headers.get(SpdyHttpHeaders.Names.STREAM_ID)
     service(request) map { response =>
       response.headers.set(SpdyHttpHeaders.Names.STREAM_ID, streamId)
@@ -25,8 +25,8 @@ class AnnotateSpdyStreamId extends SimpleFilter[HttpRequest, HttpResponse] {
 class GenerateSpdyStreamId extends SimpleFilter[HttpRequest, HttpResponse] {
   private[this] val currentStreamId = new AtomicInteger(1)
 
-  def apply(
-      request: HttpRequest, service: Service[HttpRequest, HttpResponse]) = {
+  def apply(request: HttpRequest,
+            service: Service[HttpRequest, HttpResponse]) = {
     SpdyHttpHeaders.setStreamId(request, currentStreamId.getAndAdd(2))
     service(request) map { response =>
       SpdyHttpHeaders.removeStreamId(response)
@@ -70,8 +70,8 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
           val pipeline = Channels.pipeline()
           pipeline.addLast("spdyFrameCodec", spdyFrameCodec)
-          pipeline.addLast(
-              "spdySessionHandler", new SpdySessionHandler(_version, false))
+          pipeline.addLast("spdySessionHandler",
+                           new SpdySessionHandler(_version, false))
           pipeline.addLast("spdyHttpCodec",
                            new SpdyHttpCodec(_version, maxResponseSizeInBytes))
           pipeline
@@ -82,18 +82,19 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
           underlying: ServiceFactory[HttpRequest, HttpResponse],
           params: Stack.Params
       ): ServiceFactory[HttpRequest, HttpResponse] = {
-        new GenerateSpdyStreamId andThen super.prepareConnFactory(
-            underlying, params)
+        new GenerateSpdyStreamId andThen super
+          .prepareConnFactory(underlying, params)
       }
 
       override def newClientTransport(
-          ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+          ch: Channel,
+          statsReceiver: StatsReceiver): Transport[Any, Any] =
         new ChannelTransport(ch)
 
-      override def newClientDispatcher(
-          transport: Transport[Any, Any], params: Stack.Params) =
+      override def newClientDispatcher(transport: Transport[Any, Any],
+                                       params: Stack.Params) =
         new SpdyClientDispatcher(
-            Transport.cast[HttpRequest, HttpResponse](transport))
+          Transport.cast[HttpRequest, HttpResponse](transport))
     }
   }
 
@@ -105,8 +106,8 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
           val pipeline = Channels.pipeline()
           pipeline.addLast("spdyFrameCodec", spdyFrameCodec)
-          pipeline.addLast(
-              "spdySessionHandler", new SpdySessionHandler(_version, true))
+          pipeline.addLast("spdySessionHandler",
+                           new SpdySessionHandler(_version, true))
           pipeline.addLast("spdyHttpCodec",
                            new SpdyHttpCodec(_version, maxRequestSizeInBytes))
           pipeline
@@ -117,8 +118,8 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
           underlying: ServiceFactory[HttpRequest, HttpResponse],
           params: Stack.Params
       ): ServiceFactory[HttpRequest, HttpResponse] = {
-        new AnnotateSpdyStreamId andThen super.prepareConnFactory(
-            underlying, params)
+        new AnnotateSpdyStreamId andThen super
+          .prepareConnFactory(underlying, params)
       }
 
       override def newServerDispatcher(
@@ -126,7 +127,8 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
           service: Service[HttpRequest, HttpResponse]
       ): Closable =
         new SpdyServerDispatcher(
-            Transport.cast[HttpResponse, HttpRequest](transport), service)
+          Transport.cast[HttpResponse, HttpRequest](transport),
+          service)
     }
   }
 

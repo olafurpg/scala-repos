@@ -137,19 +137,19 @@ class NameTreeTest extends FunSuite {
 
   test("NameTree.eval/simplified") {
     val cases = Seq[(String, Option[Set[String]])](
-        "~" -> None,
-        "/ok" -> Some(Set("/ok")),
-        "/ok & /ok1" -> Some(Set("/ok", "/ok1")),
-        "/ok & ~ & /blah & $" -> Some(Set("/ok", "/blah")),
-        "$ & $ & $" -> Some(Set.empty),
-        "~ & ~ & (~ | ~)" -> None,
-        "~ | /foo | /bar" -> Some(Set("/foo")),
-        "~ | $ | /blah" -> Some(Set.empty),
-        "~ | (~ | $) | /blah" -> Some(Set.empty),
-        "(~|$|/foo) & (/bar|/blah) & ~ & /FOO" -> Some(Set("/bar", "/FOO")),
-        "! | /ok" -> None,
-        "/ok & !" -> None,
-        "~ | /ok | !" -> Some(Set("/ok"))
+      "~" -> None,
+      "/ok" -> Some(Set("/ok")),
+      "/ok & /ok1" -> Some(Set("/ok", "/ok1")),
+      "/ok & ~ & /blah & $" -> Some(Set("/ok", "/blah")),
+      "$ & $ & $" -> Some(Set.empty),
+      "~ & ~ & (~ | ~)" -> None,
+      "~ | /foo | /bar" -> Some(Set("/foo")),
+      "~ | $ | /blah" -> Some(Set.empty),
+      "~ | (~ | $) | /blah" -> Some(Set.empty),
+      "(~|$|/foo) & (/bar|/blah) & ~ & /FOO" -> Some(Set("/bar", "/FOO")),
+      "! | /ok" -> None,
+      "/ok & !" -> None,
+      "~ | /ok | !" -> Some(Set("/ok"))
     )
 
     for ((tree, res) <- cases) {

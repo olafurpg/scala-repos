@@ -36,7 +36,8 @@ import net.liftweb.proto.{ProtoUser => GenProtoUser}
   * last name, email, etc.
   */
 trait ProtoUser[T <: ProtoUser[T]]
-    extends KeyedMapper[Long, T] with UserIdAsString { self: T =>
+    extends KeyedMapper[Long, T]
+    with UserIdAsString { self: T =>
 
   override def primaryKeyField: MappedLongIndex[T] = id
 
@@ -184,8 +185,8 @@ trait ProtoUser[T <: ProtoUser[T]]
   * get a bunch of user functionality including password reset, etc.
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
-    extends KeyedMetaMapper[Long, ModelType] with GenProtoUser {
-  self: ModelType =>
+    extends KeyedMetaMapper[Long, ModelType]
+    with GenProtoUser { self: ModelType =>
 
   type TheUserType = ModelType
 
@@ -305,7 +306,8 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * Given a field pointer and an instance, get the field on that instance
     */
   protected def computeFieldFromPointer(
-      instance: TheUserType, pointer: FieldPointerType): Box[BaseField] =
+      instance: TheUserType,
+      pointer: FieldPointerType): Box[BaseField] =
     Full(getActualField(instance, pointer))
 
   /**
@@ -334,22 +336,13 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * The list of fields presented to the user at sign-up
     */
   def signupFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone,
-         password)
+    List(firstName, lastName, email, locale, timezone, password)
 
   /**
     * The list of fields presented to the user for editing
     */
   def editFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone)
+    List(firstName, lastName, email, locale, timezone)
 }
 
 /**

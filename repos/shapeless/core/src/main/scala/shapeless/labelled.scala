@@ -48,8 +48,8 @@ object DefaultSymbolicLabelling {
   def apply[T](implicit lab: DefaultSymbolicLabelling[T]): Aux[T, lab.Out] =
     lab
 
-  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] = macro LabelledMacros
-    .mkDefaultSymbolicLabellingImpl[T]
+  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] =
+    macro LabelledMacros.mkDefaultSymbolicLabellingImpl[T]
 }
 
 /**
@@ -88,7 +88,8 @@ trait FieldOf[V] {
 
 @macrocompat.bundle
 class LabelledMacros(val c: whitebox.Context)
-    extends SingletonTypeUtils with CaseClassMacros {
+    extends SingletonTypeUtils
+    with CaseClassMacros {
   import labelled._
   import c.universe._
 
@@ -103,8 +104,8 @@ class LabelledMacros(val c: whitebox.Context)
           nameAsString(nameOf(tpe))
         } else
         c.abort(
-            c.enclosingPosition,
-            s"$tTpe is not case class like or the root of a sealed family of types")
+          c.enclosingPosition,
+          s"$tTpe is not case class like or the root of a sealed family of types")
 
     val labelTpes = labels.map(SingletonSymbolType(_))
     val labelValues = labels.map(mkSingletonSymbol)
@@ -142,11 +143,11 @@ class LabelledMacros(val c: whitebox.Context)
         tpeString.split(",").map(_.trim).map(_.split("->").map(_.trim)).map {
           case Array(key, value) =>
             val keyTpe = parseLiteralType(key).getOrElse(
-                c.abort(c.enclosingPosition, s"Malformed literal type $key"))
+              c.abort(c.enclosingPosition, s"Malformed literal type $key"))
 
             val valueTpe = parseType(value).getOrElse(
-                c.abort(c.enclosingPosition,
-                        s"Malformed literal or standard type $value"))
+              c.abort(c.enclosingPosition,
+                      s"Malformed literal or standard type $value"))
 
             (keyTpe, valueTpe)
 
@@ -179,8 +180,8 @@ class LabelledMacros(val c: whitebox.Context)
       else
         tpeString.split(",").map(_.trim).map { elemTypeStr =>
           parseType(elemTypeStr).getOrElse(
-              c.abort(c.enclosingPosition,
-                      s"Malformed literal or standard type $elemTypeStr"))
+            c.abort(c.enclosingPosition,
+                    s"Malformed literal or standard type $elemTypeStr"))
         }
 
     val tpe = elemTypes.foldRight(nilTpe) {

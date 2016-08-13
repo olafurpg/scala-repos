@@ -22,14 +22,15 @@ object PinnedActorSpec {
       case "Hello" ⇒ sender() ! "World"
       case "Failure" ⇒
         throw new RuntimeException(
-            "Expected exception; to test fault-tolerance")
+          "Expected exception; to test fault-tolerance")
     }
   }
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class PinnedActorSpec
-    extends AkkaSpec(PinnedActorSpec.config) with BeforeAndAfterEach
+    extends AkkaSpec(PinnedActorSpec.config)
+    with BeforeAndAfterEach
     with DefaultTimeout {
   import PinnedActorSpec._
 

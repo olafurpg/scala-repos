@@ -33,12 +33,12 @@ import org.apache.spark.streaming.dstream.MapWithStateDStream
   * @tparam MappedType Class of the mapped data
   */
 @Experimental
-class JavaMapWithStateDStream[
-    KeyType, ValueType, StateType, MappedType] private[streaming](
+class JavaMapWithStateDStream[KeyType, ValueType, StateType, MappedType] private[streaming] (
     dstream: MapWithStateDStream[KeyType, ValueType, StateType, MappedType])
     extends JavaDStream[MappedType](dstream)(JavaSparkContext.fakeClassTag) {
 
   def stateSnapshots(): JavaPairDStream[KeyType, StateType] =
     new JavaPairDStream(dstream.stateSnapshots())(
-        JavaSparkContext.fakeClassTag, JavaSparkContext.fakeClassTag)
+      JavaSparkContext.fakeClassTag,
+      JavaSparkContext.fakeClassTag)
 }

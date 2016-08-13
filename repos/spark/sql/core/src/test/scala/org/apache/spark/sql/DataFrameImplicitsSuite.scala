@@ -47,7 +47,7 @@ class DataFrameImplicitsSuite extends QueryTest with SharedSQLContext {
 
   test("RDD[String]") {
     checkAnswer(
-        sparkContext.parallelize(1 to 10).map(_.toString).toDF("stringCol"),
-        (1 to 10).map(i => Row(i.toString)))
+      sparkContext.parallelize(1 to 10).map(_.toString).toDF("stringCol"),
+      (1 to 10).map(i => Row(i.toString)))
   }
 }

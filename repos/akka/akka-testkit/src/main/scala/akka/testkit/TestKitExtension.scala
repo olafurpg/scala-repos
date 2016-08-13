@@ -27,5 +27,5 @@ class TestKitSettings(val config: Config) extends Extension {
   val TestEventFilterLeeway: FiniteDuration =
     config.getMillisDuration("akka.test.filter-leeway")
   val DefaultTimeout: Timeout = Timeout(
-      config.getMillisDuration("akka.test.default-timeout"))
+    config.getMillisDuration("akka.test.default-timeout"))
 }

@@ -20,20 +20,18 @@ class LassoTest extends WordSpec with Matchers {
     "handle trickier case" in {
       val a = new DenseMatrix[Double](100, 5)
       val b = new DenseVector(new Array[Double](100))
-      cfor(0)(i => i < 100, i => i + 1)(
-          i =>
-            {
-          a.update(i, 0, 1)
-          a.update(i, 1, i)
-          a.update(i, 2, i * i)
-          a.update(i, 3, i * i * i)
-          a.update(i, 4, i * i * i * i)
-          b.update(i, 5.0 + 2 * i + math.random * 0.01 + 0.00001 * i * i)
+      cfor(0)(i => i < 100, i => i + 1)(i => {
+        a.update(i, 0, 1)
+        a.update(i, 1, i)
+        a.update(i, 2, i * i)
+        a.update(i, 3, i * i * i)
+        a.update(i, 4, i * i * i * i)
+        b.update(i, 5.0 + 2 * i + math.random * 0.01 + 0.00001 * i * i)
       })
       val result = lasso(a, b, 0.0001)
       assert(
-          norm(result.coefficients - DenseVector(5.0, 2.0, 0.0, 0.0, 0.0)) < 1e-2,
-          "norm is too large")
+        norm(result.coefficients - DenseVector(5.0, 2.0, 0.0, 0.0, 0.0)) < 1e-2,
+        "norm is too large")
     }
     "handle transpose" in {
       val a = DenseMatrix((1.0, 2.0, 3.0, 4.0), (1.0, -2.0, 3.0, 5.0)).t

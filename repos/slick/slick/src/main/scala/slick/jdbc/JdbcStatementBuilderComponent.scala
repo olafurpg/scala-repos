@@ -6,9 +6,20 @@ import slick.SlickException
 import slick.ast._
 import slick.ast.Util.nodeToNodeOps
 import slick.ast.TypeUtil._
-import slick.compiler.{RewriteBooleans, CodeGen, Phase, CompilerState, QueryCompiler}
+import slick.compiler.{
+  RewriteBooleans,
+  CodeGen,
+  Phase,
+  CompilerState,
+  QueryCompiler
+}
 import slick.lifted._
-import slick.relational.{RelationalProfile, RelationalCapabilities, ResultConverter, CompiledMapping}
+import slick.relational.{
+  RelationalProfile,
+  RelationalCapabilities,
+  ResultConverter,
+  CompiledMapping
+}
 import slick.sql.SqlProfile
 import slick.util._
 import slick.util.MacroSupport.macroSupportInterpolation
@@ -29,8 +40,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     new UpdateInsertBuilder(node)
   def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  def createColumnDDLBuilder(column: FieldSymbol,
+                             table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   def createSequenceDDLBuilder(seq: Sequence[_]): SequenceDDLBuilder =
     new SequenceDDLBuilder(seq)
@@ -51,9 +62,9 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
                            CompiledStatement(sql, ibr: InsertBuilderResult, _),
                            CompiledMapping(conv, _)) = compiled
       new Artifacts(
-          compiled,
-          conv.asInstanceOf[ResultConverter[JdbcResultConverterDomain, Any]],
-          ibr)
+        compiled,
+        conv.asInstanceOf[ResultConverter[JdbcResultConverterDomain, Any]],
+        ibr)
     }
 
     /** The compiled artifacts for standard insert statements. */
@@ -72,27 +83,29 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     lazy val updateInsert = compile(updateInsertCompiler)
 
     /** Build a list of columns and a matching `ResultConverter` for retrieving keys of inserted rows. */
-    def buildReturnColumns(node: Node): (ConstArray[String],
-    ResultConverter[JdbcResultConverterDomain, _], Boolean) = {
+    def buildReturnColumns(
+        node: Node): (ConstArray[String],
+                      ResultConverter[JdbcResultConverterDomain, _],
+                      Boolean) = {
       if (!capabilities.contains(JdbcCapabilities.returnInsertKey))
         throw new SlickException(
-            "This DBMS does not allow returning columns from INSERT statements")
+          "This DBMS does not allow returning columns from INSERT statements")
       val ResultSetMapping(_,
                            CompiledStatement(_, ibr: InsertBuilderResult, _),
                            CompiledMapping(rconv, _)) =
         forceInsertCompiler.run(node).tree
       if (ibr.table.baseIdentity != standardInsert.table.baseIdentity)
         throw new SlickException(
-            "Returned key columns must be from same table as inserted columns (" +
+          "Returned key columns must be from same table as inserted columns (" +
             ibr.table.baseIdentity + " != " +
             standardInsert.table.baseIdentity + ")")
       val returnOther =
         ibr.fields.length > 1 ||
-        !ibr.fields.head.options.contains(ColumnOption.AutoInc)
+          !ibr.fields.head.options.contains(ColumnOption.AutoInc)
       if (!capabilities.contains(JdbcCapabilities.returnInsertOther) &&
           returnOther)
         throw new SlickException(
-            "This DBMS allows only a single AutoInc column to be returned from an INSERT")
+          "This DBMS allows only a single AutoInc column to be returned from an INSERT")
       (ibr.fields.map(_.name),
        rconv.asInstanceOf[ResultConverter[JdbcResultConverterDomain, _]],
        returnOther)
@@ -168,7 +181,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         c.children.iterator
           .drop(1)
           .flatMap(_.collect { case c: Comprehension => c }.toSeq
-                .flatMap(_.findNode(_ == Ref(s))))
+            .flatMap(_.findNode(_ == Ref(s))))
           .nonEmpty
       currentUniqueFrom = from match {
         case Seq((s, _: TableNode)) if !containsSymbolInSubquery(s) => Some(s)
@@ -193,7 +206,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       else Some(ns.reduceLeft((p1, p2) => Library.And.typed[Boolean](p1, p2)))
 
     protected def flattenJoins(
-        s: TermSymbol, n: Node): (Seq[(TermSymbol, Node)], Seq[Node]) = {
+        s: TermSymbol,
+        n: Node): (Seq[(TermSymbol, Node)], Seq[Node]) = {
       def f(s: TermSymbol,
             n: Node): Option[(Seq[(TermSymbol, Node)], Seq[Node])] = n match {
         case Join(ls, rs, l, r, JoinType.Inner, on) =>
@@ -254,8 +268,9 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             b"\nfrom "
             b.sep(from, ", ") {
               case (sym, n) =>
-                buildFrom(
-                    n, if (Some(sym) == currentUniqueFrom) None else Some(sym))
+                buildFrom(n,
+                          if (Some(sym) == currentUniqueFrom) None
+                          else Some(sym))
             }
         }
       }
@@ -264,8 +279,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       building(WherePart)(where.foreach(p => b"\nwhere !$p"))
 
     protected def buildGroupByClause(groupBy: Option[Node]) =
-      building(OtherPart)(
-          groupBy.foreach { n =>
+      building(OtherPart)(groupBy.foreach { n =>
         b"\ngroup by "
         n match {
           case ProductNode(es) => b.sep(es, ", ")(buildGroupByColumn)
@@ -291,16 +305,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         }
       }
 
-    protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = building(OtherPart) {
-      (fetch, offset) match {
-        /* SQL:2008 syntax */
-        case (Some(t), Some(d)) => b"\noffset $d row fetch next $t row only"
-        case (Some(t), None) => b"\nfetch next $t row only"
-        case (None, Some(d)) => b"\noffset $d row"
-        case _ =>
+    protected def buildFetchOffsetClause(fetch: Option[Node],
+                                         offset: Option[Node]) =
+      building(OtherPart) {
+        (fetch, offset) match {
+          /* SQL:2008 syntax */
+          case (Some(t), Some(d)) => b"\noffset $d row fetch next $t row only"
+          case (Some(t), None) => b"\nfetch next $t row only"
+          case (None, Some(d)) => b"\noffset $d row"
+          case _ =>
+        }
       }
-    }
 
     protected def buildSelectPart(n: Node): Unit = n match {
       case c: Comprehension =>
@@ -311,24 +326,24 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         expr(n, true)
     }
 
-    protected def buildFrom(
-        n: Node,
-        alias: Option[TermSymbol],
-        skipParens: Boolean = false): Unit = building(FromPart) {
-      def addAlias = alias foreach { s =>
-        b += ' ' += symbolName(s)
+    protected def buildFrom(n: Node,
+                            alias: Option[TermSymbol],
+                            skipParens: Boolean = false): Unit =
+      building(FromPart) {
+        def addAlias = alias foreach { s =>
+          b += ' ' += symbolName(s)
+        }
+        n match {
+          case t: TableNode =>
+            b += quoteTableName(t)
+            addAlias
+          case j: Join =>
+            buildJoin(j)
+          case n =>
+            expr(n, skipParens)
+            addAlias
+        }
       }
-      n match {
-        case t: TableNode =>
-          b += quoteTableName(t)
-          addAlias
-        case j: Join =>
-          buildJoin(j)
-        case n =>
-          expr(n, skipParens)
-          addAlias
-      }
-    }
 
     protected def buildJoin(j: Join): Unit = {
       buildFrom(j.left, Some(j.leftGen))
@@ -364,7 +379,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
           case field :: Nil => b += symbolName(field)
           case _ =>
             throw new SlickException(
-                "Cannot resolve " + p + " as field or view")
+              "Cannot resolve " + p + " as field or view")
         }
       case (n @ LiteralNode(v)) :@ JdbcType(ti, option) =>
         if (n.volatileHint || !ti.hasLiteralForm)
@@ -393,8 +408,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             }
             b"\)"
           case RewriteBooleans.ToFakeBoolean(ch) =>
-            expr(IfThenElse(ConstArray(
-                         ch, LiteralNode(1).infer(), LiteralNode(0).infer())),
+            expr(IfThenElse(
+                   ConstArray(ch,
+                              LiteralNode(1).infer(),
+                              LiteralNode(0).infer())),
                  skipParens)
           case RewriteBooleans.ToRealBoolean(ch) =>
             expr(Library.==.typed[Boolean](ch, LiteralNode(true).infer()),
@@ -404,7 +421,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
              * in exists(select ...) is probably not supported, either, so we rewrite
              * such sub-queries to "select 1". */
             b"exists\[!${(if (supportsTuples) c
-                          else c.copy(select = Pure(LiteralNode(1))).infer()): Node}\]"
+            else c.copy(select = Pure(LiteralNode(1))).infer()): Node}\]"
           case Library.Concat(l, r) if concatOperator.isDefined =>
             b"\($l${concatOperator.get}$r\)"
           case Library.User()
@@ -412,7 +429,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             b += "''"
           case Library.Database()
               if !capabilities.contains(
-                  RelationalCapabilities.functionDatabase) =>
+                RelationalCapabilities.functionDatabase) =>
             b += "''"
           case Library.Pi() if !hasPiFunction => b += pi
           case Library.Degrees(ch) if !hasRadDegConversion =>
@@ -427,7 +444,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
           case Library.Like(l, r, LiteralNode(esc: Char)) =>
             if (esc == '\'' || esc == '%' || esc == '_')
               throw new SlickException(
-                  "Illegal escape character '" + esc + "' for LIKE expression")
+                "Illegal escape character '" + esc + "' for LIKE expression")
             // JDBC defines an {escape } syntax but the unescaped version is understood by more DBs/drivers
             b"\($l like $r escape '$esc'\)"
           case Library.StartsWith(n, LiteralNode(s: String)) =>
@@ -438,12 +455,12 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             expr(Library.LTrim.typed[String](Library.RTrim.typed[String](n)),
                  skipParens)
           case Library.Substring(n, start, end) =>
-            b"\({fn substring($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-                start, LiteralNode(1).infer())}, ${QueryParameter.constOp[Int](
-                "-")(_ - _)(end, start)})}\)"
+            b"\({fn substring($n, ${QueryParameter
+              .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())}, ${QueryParameter
+              .constOp[Int]("-")(_ - _)(end, start)})}\)"
           case Library.Substring(n, start) =>
-            b"\({fn substring($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-                start, LiteralNode(1).infer())})}\)"
+            b"\({fn substring($n, ${QueryParameter
+              .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())})}\)"
           case Library.IndexOf(n, str) => b"\({fn locate($str, $n)} - 1\)"
           case Library.Cast(ch @ _ *) =>
             val tn =
@@ -472,7 +489,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             b")"
           case n =>
             throw new SlickException(
-                "Unexpected function call " + n + " -- SQL prefix: " +
+              "Unexpected function call " + n + " -- SQL prefix: " +
                 b.build.sql)
         }
       case c: IfThenElse =>
@@ -516,7 +533,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       case s: SimpleBinaryOperator => b"\(${s.left} ${s.name} ${s.right}\)"
       case n =>
         throw new SlickException(
-            "Unexpected node " + n + " -- SQL prefix: " + b.build.sql)
+          "Unexpected node " + n + " -- SQL prefix: " + b.build.sql)
     }
 
     protected def buildOrdering(n: Node, o: Ordering) {
@@ -545,18 +562,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
                   case Select(Ref(struct), _) if struct == sym => true;
                   case _ => false
                 } =>
-              (
-                  sym, from, where, ch.map {
+              (sym, from, where, ch.map {
                 case Select(Ref(_), field) => field
               })
             case _ =>
               throw new SlickException(
-                  "A query for an UPDATE statement must select table columns only -- Unsupported shape: " +
+                "A query for an UPDATE statement must select table columns only -- Unsupported shape: " +
                   select)
           }
         case o =>
           throw new SlickException(
-              "A query for an UPDATE statement must resolve to a comprehension with a single table -- Unsupported shape: " +
+            "A query for an UPDATE statement must resolve to a comprehension with a single table -- Unsupported shape: " +
               o)
       }
 
@@ -566,8 +582,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       b.sep(select, ", ")(field => b += symbolName(field) += " = ?")
       if (!where.isEmpty) {
         b" where "
-        expr(
-            where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)), true)
+        expr(where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
+             true)
       }
       b.build
     }
@@ -594,7 +610,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
               fail("A single source table is required, found: " + from)
           }
         case o =>
-          fail("Unsupported shape: " + o +
+          fail(
+            "Unsupported shape: " + o +
               " -- A single SQL comprehension is required")
       }
       val qtn = quoteTableName(from)
@@ -602,8 +619,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       b"delete from $qtn"
       if (!where.isEmpty) {
         b" where "
-        expr(
-            where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)), true)
+        expr(where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
+             true)
       }
       b.build
     }
@@ -611,8 +628,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
   /** Builder for INSERT statements. */
   class InsertBuilder(val ins: Insert) {
-    protected val Insert(
-    _, table: TableNode, ProductNode(rawColumns), allFields) = ins
+    protected val Insert(_,
+                         table: TableNode,
+                         ProductNode(rawColumns),
+                         allFields) = ins
     protected val syms: ConstArray[FieldSymbol] = rawColumns.map {
       case Select(_, fs: FieldSymbol) => fs
     }
@@ -645,14 +664,15 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     /** Reorder InsertColumn indices in a mapping Node in the order of the given
       * sequence of FieldSymbols (which may contain duplicates). */
-    protected def reorderColumns(
-        n: Node, order: IndexedSeq[FieldSymbol]): Node = {
+    protected def reorderColumns(n: Node,
+                                 order: IndexedSeq[FieldSymbol]): Node = {
       val newIndices = order.zipWithIndex.groupBy(_._1)
       lazy val reordering: ConstArray[IndexedSeq[Int]] =
         syms.map(fs => newIndices(fs).map(_._2 + 1))
       n.replace({
-        case InsertColumn(
-            ConstArray(Select(ref, ElementSymbol(idx))), fs, tpe) =>
+        case InsertColumn(ConstArray(Select(ref, ElementSymbol(idx))),
+                          fs,
+                          tpe) =>
           val newPaths =
             reordering(idx - 1).map(i => Select(ref, ElementSymbol(i)))
           InsertColumn(ConstArray.from(newPaths), fs, tpe) :@ tpe
@@ -680,7 +700,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       val end = buildMergeEnd
       val paramSel =
         "select " + allNames.map(n => "? as " + n).iterator.mkString(",") +
-        scalarFrom.map(n => " from " + n).getOrElse("")
+          scalarFrom.map(n => " from " + n).getOrElse("")
       // We'd need a way to alias the column names at the top level in order to support merges from a source Query
       new InsertBuilderResult(table, start + paramSel + end, syms)
     }
@@ -702,11 +722,11 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
   class CheckInsertBuilder(ins: Insert) extends UpsertBuilder(ins) {
     override def buildInsert: InsertBuilderResult =
       new InsertBuilderResult(
-          table,
-          pkNames
-            .map(n => s"$n=?")
-            .mkString(s"select 1 from $tableName where ", " and ", ""),
-          ConstArray.from(pkSyms))
+        table,
+        pkNames
+          .map(n => s"$n=?")
+          .mkString(s"select 1 from $tableName where ", " and ", ""),
+        ConstArray.from(pkSyms))
   }
 
   /** Builder for UPDATE statements used as part of an insertOrUpdate operation
@@ -714,11 +734,11 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
   class UpdateInsertBuilder(ins: Insert) extends UpsertBuilder(ins) {
     override def buildInsert: InsertBuilderResult =
       new InsertBuilderResult(
-          table,
-          "update " +
+        table,
+        "update " +
           tableName + " set " + softNames.map(n => s"$n=?").mkString(",") +
           " where " + pkNames.map(n => s"$n=?").mkString(" and "),
-          ConstArray.from(softSyms ++ pkSyms))
+        ConstArray.from(softSyms ++ pkSyms))
 
     override def transformMapping(n: Node) =
       reorderColumns(n, softSyms ++ pkSyms)
@@ -737,7 +757,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     def buildDDL: DDL = {
       if (primaryKeys.size > 1)
         throw new SlickException(
-            "Table " + tableNode.tableName +
+          "Table " + tableNode.tableName +
             " defines multiple primary keys (" +
             primaryKeys.map(_.name).mkString(", ") + ")")
       DDL(createPhase1, createPhase2, dropPhase1, dropPhase2)
@@ -754,7 +774,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     protected def createTable: String = {
       val b =
         new StringBuilder append "create table " append quoteTableName(
-            tableNode) append " ("
+          tableNode) append " ("
       var first = true
       for (c <- columns) {
         if (first) first = false else b append ","
@@ -773,7 +793,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       val b = new StringBuilder append "create "
       if (idx.unique) b append "unique "
       b append "index " append quoteIdentifier(idx.name) append " on " append quoteTableName(
-          tableNode) append " ("
+        tableNode) append " ("
       addIndexColumnList(idx.on, b, idx.table.tableName)
       b append ")"
       b.toString
@@ -782,15 +802,16 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     protected def createForeignKey(fk: ForeignKey): String = {
       val sb =
         new StringBuilder append "alter table " append quoteTableName(
-            tableNode) append " add "
+          tableNode) append " add "
       addForeignKey(fk, sb)
       sb.toString
     }
 
     protected def addForeignKey(fk: ForeignKey, sb: StringBuilder) {
       sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
-      addForeignKeyColumnList(
-          fk.linearizedSourceColumns, sb, tableNode.tableName)
+      addForeignKeyColumnList(fk.linearizedSourceColumns,
+                              sb,
+                              tableNode.tableName)
       sb append ") references " append quoteTableName(fk.targetTable) append "("
       addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
                               sb,
@@ -802,7 +823,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     protected def createPrimaryKey(pk: PrimaryKey): String = {
       val sb =
         new StringBuilder append "alter table " append quoteTableName(
-            tableNode) append " add "
+          tableNode) append " add "
       addPrimaryKey(pk, sb)
       sb.toString
     }
@@ -815,11 +836,11 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     protected def dropForeignKey(fk: ForeignKey): String =
       "alter table " + quoteTableName(tableNode) + " drop constraint " +
-      quoteIdentifier(fk.name)
+        quoteIdentifier(fk.name)
 
     protected def dropPrimaryKey(pk: PrimaryKey): String =
       "alter table " + quoteTableName(tableNode) + " drop constraint " +
-      quoteIdentifier(pk.name)
+        quoteIdentifier(pk.name)
 
     protected def addIndexColumnList(columns: IndexedSeq[Node],
                                      sb: StringBuilder,
@@ -848,11 +869,11 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
           sb append quoteIdentifier(field.name)
           if (requiredTableName != t.tableName)
             throw new SlickException(
-                "All columns in " + typeInfo + " must belong to table " +
+              "All columns in " + typeInfo + " must belong to table " +
                 requiredTableName)
         case _ =>
           throw new SlickException(
-              "Cannot use column " + c + " in " + typeInfo +
+            "Cannot use column " + c + " in " + typeInfo +
               " (only named columns are allowed)")
       }
     }
@@ -914,7 +935,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     def buildDDL: DDL = {
       val b =
         new StringBuilder append "create sequence " append quoteIdentifier(
-            seq.name)
+          seq.name)
       seq._increment.foreach { b append " increment " append _ }
       seq._minValue.foreach { b append " minvalue " append _ }
       seq._maxValue.foreach { b append " maxvalue " append _ }
@@ -930,5 +951,5 @@ class InsertBuilderResult(val table: TableNode,
                           val fields: ConstArray[FieldSymbol]) {
   def buildInsert(compiledQuery: Node): SQLBuilder.Result =
     throw new SlickException(
-        "Building Query-based inserts from this InsertBuilderResult is not supported")
+      "Building Query-based inserts from this InsertBuilderResult is not supported")
 }

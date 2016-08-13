@@ -158,7 +158,8 @@ class AsyncQueue[T](maxPendingOffers: Int) {
 
     case s @ Polling(q) =>
       if (!state.compareAndSet(s, Excepting(Queue.empty, exc)))
-        fail(exc, discard) else q.foreach(_.setException(exc))
+        fail(exc, discard)
+      else q.foreach(_.setException(exc))
 
     case s @ Offering(q) =>
       val nextq = if (discard) Queue.empty else q

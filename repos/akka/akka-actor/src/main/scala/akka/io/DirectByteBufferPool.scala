@@ -23,8 +23,8 @@ trait BufferPool {
   * to be faster than wrapping on-heap Arrays. There is ultimately no performance
   * benefit to wrapping in-heap JVM data when writing with NIO.
   */
-private[akka] class DirectByteBufferPool(
-    defaultBufferSize: Int, maxPoolEntries: Int)
+private[akka] class DirectByteBufferPool(defaultBufferSize: Int,
+                                         maxPoolEntries: Int)
     extends BufferPool {
   private[this] val pool: Array[ByteBuffer] =
     new Array[ByteBuffer](maxPoolEntries)

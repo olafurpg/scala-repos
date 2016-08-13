@@ -16,9 +16,8 @@ final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
     new InputTask[T](s => Parser(parser(s))(in))
 
   def fullInput(in: String): InputTask[T] =
-    new InputTask[T](
-        s =>
-          Parser.parse(in, parser(s)) match {
+    new InputTask[T](s =>
+      Parser.parse(in, parser(s)) match {
         case Right(v) => Parser.success(v)
         case Left(msg) =>
           val indented = msg.lines.map("   " + _).mkString("\n")
@@ -34,16 +33,16 @@ object InputTask {
 
     import std.FullInstance._
     def toTask(in: String): Initialize[Task[T]] = flatten(
-        (Def.stateKey zipWith i)(
-            (sTask, it) =>
-              sTask map
-              (s =>
-                    Parser.parse(in, it.parser(s)) match {
-                  case Right(t) => Def.value(t)
-                  case Left(msg) =>
-                    val indented = msg.lines.map("   " + _).mkString("\n")
-                    sys.error(s"Invalid programmatic input:\n$indented")
-              }))
+      (Def.stateKey zipWith i)(
+        (sTask, it) =>
+          sTask map
+            (s =>
+               Parser.parse(in, it.parser(s)) match {
+                 case Right(t) => Def.value(t)
+                 case Left(msg) =>
+                   val indented = msg.lines.map("   " + _).mkString("\n")
+                   sys.error(s"Invalid programmatic input:\n$indented")
+               }))
     )
   }
 
@@ -102,8 +101,8 @@ object InputTask {
     i(Types.const)
 
   @deprecated(
-      "Use another InputTask constructor or the `Def.inputTask` macro.",
-      "0.13.0")
+    "Use another InputTask constructor or the `Def.inputTask` macro.",
+    "0.13.0")
   def apply[I, T](p: Initialize[State => Parser[I]])(
       action: TaskKey[I] => Initialize[Task[T]]): Initialize[InputTask[T]] = {
     val dummyKey = localKey[Task[I]]
@@ -117,8 +116,8 @@ object InputTask {
   }
 
   @deprecated(
-      "Use another InputTask constructor or the `Def.inputTask` macro.",
-      "0.13.0")
+    "Use another InputTask constructor or the `Def.inputTask` macro.",
+    "0.13.0")
   def apply[I, T](p: State => Parser[I])(
       action: TaskKey[I] => Initialize[Task[T]]): Initialize[InputTask[T]] =
     apply(Def.value(p))(action)
@@ -131,8 +130,8 @@ object InputTask {
   private[this] def localKey[T]: AttributeKey[T] =
     AttributeKey.local[Unit].asInstanceOf[AttributeKey[T]]
 
-  private[this] def subResultForDummy[I](
-      dummyKey: AttributeKey[Task[I]], dummyTask: Task[I]) =
+  private[this] def subResultForDummy[I](dummyKey: AttributeKey[Task[I]],
+                                         dummyTask: Task[I]) =
     new (ScopedKey ~> Option) {
       def apply[T](sk: ScopedKey[T]) =
         if (sk.key eq dummyKey) {
@@ -146,12 +145,13 @@ object InputTask {
     val key = localKey[Option[I]]
     val f: () => I = () =>
       sys.error(
-          s"Internal sbt error: InputTask stub was not substituted properly.")
+        s"Internal sbt error: InputTask stub was not substituted properly.")
     val t: Task[I] = Task(Info[I]().set(key, None), Pure(f, false))
     (key, t)
   }
-  private[this] def subForDummy[I, T](
-      marker: AttributeKey[Option[I]], value: I, task: Task[T]): Task[T] = {
+  private[this] def subForDummy[I, T](marker: AttributeKey[Option[I]],
+                                      value: I,
+                                      task: Task[T]): Task[T] = {
     val seen = new java.util.IdentityHashMap[Task[_], Task[_]]
     lazy val f: Task ~> Task = new (Task ~> Task) {
       def apply[T](t: Task[T]): Task[T] = {

@@ -74,7 +74,7 @@ object ScalaJSPartestOptions {
         filter = Some(SomeTests(oldNames ++ newNames))
       case (Some(fil), newFilter) =>
         error(
-            s"You cannot specify twice what tests to use (already specified: $fil, new: $newFilter)")
+          s"You cannot specify twice what tests to use (already specified: $fil, new: $newFilter)")
       case (None, newFilter) =>
         filter = Some(newFilter)
     }
@@ -103,8 +103,9 @@ object ScalaJSPartestOptions {
     if (failed) None
     else
       Some {
-        new ScalaJSPartestOptions(
-            filter.getOrElse(WhitelistedTests), optMode, showDiff)
+        new ScalaJSPartestOptions(filter.getOrElse(WhitelistedTests),
+                                  optMode,
+                                  showDiff)
       }
   }
 }

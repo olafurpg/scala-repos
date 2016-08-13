@@ -2,7 +2,12 @@ package cats.tests
 
 import cats.{Id, Monad, Cartesian, Show}
 import cats.data.{OptionT, Xor}
-import cats.laws.discipline.{FunctorTests, SerializableTests, CartesianTests, MonadTests}
+import cats.laws.discipline.{
+  FunctorTests,
+  SerializableTests,
+  CartesianTests,
+  MonadTests
+}
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq._
 
@@ -136,10 +141,10 @@ class OptionTTests extends CatsSuite {
   }
 
   test(
-      "implicit Show[OptionT] instance and explicit show method are consistent") {
+    "implicit Show[OptionT] instance and explicit show method are consistent") {
     forAll { optionT: OptionT[List, Int] =>
       optionT.show should ===(
-          implicitly[Show[OptionT[List, Int]]].show(optionT))
+        implicitly[Show[OptionT[List, Int]]].show(optionT))
     }
   }
 

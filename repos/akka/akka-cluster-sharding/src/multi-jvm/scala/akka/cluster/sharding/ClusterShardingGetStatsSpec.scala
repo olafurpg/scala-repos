@@ -45,7 +45,9 @@ object ClusterShardingGetStatsSpecConfig extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -61,7 +63,7 @@ object ClusterShardingGetStatsSpecConfig extends MultiNodeConfig {
     """))
 
   nodeConfig(first, second, third)(
-      ConfigFactory.parseString("""akka.cluster.roles=["shard"]"""))
+    ConfigFactory.parseString("""akka.cluster.roles=["shard"]"""))
 }
 
 class ClusterShardingGetStatsSpecMultiJvmNode1
@@ -84,11 +86,11 @@ abstract class ClusterShardingGetStatsSpec
 
   def startShard(): ActorRef = {
     ClusterSharding(system).start(
-        typeName = shardTypeName,
-        entityProps = Props(new ShardedActor),
-        settings = ClusterShardingSettings(system).withRole("shard"),
-        extractEntityId = extractEntityId,
-        extractShardId = extractShardId)
+      typeName = shardTypeName,
+      entityProps = Props(new ShardedActor),
+      settings = ClusterShardingSettings(system).withRole("shard"),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId)
   }
 
   def startProxy(): ActorRef = {
@@ -118,8 +120,8 @@ abstract class ClusterShardingGetStatsSpec
       // make sure all nodes are up
       within(10.seconds) {
         awaitAssert {
-          Cluster(system).state.members.count(_.status == MemberStatus.Up) should ===(
-              4)
+          Cluster(system).state.members
+            .count(_.status == MemberStatus.Up) should ===(4)
         }
       }
 
@@ -222,8 +224,8 @@ abstract class ClusterShardingGetStatsSpec
           awaitAssert {
             val probe = TestProbe()
             region.tell(
-                ShardRegion.GetClusterShardingStats(20.seconds.dilated),
-                probe.ref)
+              ShardRegion.GetClusterShardingStats(20.seconds.dilated),
+              probe.ref)
             val regions =
               probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
             regions.size === 2

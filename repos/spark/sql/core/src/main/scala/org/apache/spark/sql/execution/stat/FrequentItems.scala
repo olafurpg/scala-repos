@@ -81,8 +81,9 @@ private[sql] object FrequentItems extends Logging {
     *                than 1e-4.
     * @return A Local DataFrame with the Array of frequent items for each column.
     */
-  private[sql] def singlePassFreqItems(
-      df: DataFrame, cols: Seq[String], support: Double): DataFrame = {
+  private[sql] def singlePassFreqItems(df: DataFrame,
+                                       cols: Seq[String],
+                                       support: Double): DataFrame = {
     require(support >= 1e-4, s"support ($support) must be greater than 1e-4.")
     val numCols = cols.length
     // number of max items to keep counts for
@@ -98,26 +99,24 @@ private[sql] object FrequentItems extends Logging {
       .select(cols.map(Column(_)): _*)
       .rdd
       .aggregate(countMaps)(
-          seqOp = (counts, row) =>
-              {
-              var i = 0
-              while (i < numCols) {
-                val thisMap = counts(i)
-                val key = row.get(i)
-                thisMap.add(key, 1L)
-                i += 1
-              }
-              counts
-          },
-          combOp = (baseCounts, counts) =>
-              {
-              var i = 0
-              while (i < numCols) {
-                baseCounts(i).merge(counts(i))
-                i += 1
-              }
-              baseCounts
+        seqOp = (counts, row) => {
+          var i = 0
+          while (i < numCols) {
+            val thisMap = counts(i)
+            val key = row.get(i)
+            thisMap.add(key, 1L)
+            i += 1
           }
+          counts
+        },
+        combOp = (baseCounts, counts) => {
+          var i = 0
+          while (i < numCols) {
+            baseCounts(i).merge(counts(i))
+            i += 1
+          }
+          baseCounts
+        }
       )
     val justItems = freqItems.map(m => m.baseMap.keys.toArray)
     val resultRow = Row(justItems: _*)
@@ -127,6 +126,7 @@ private[sql] object FrequentItems extends Logging {
     }
     val schema = StructType(outputCols).toAttributes
     Dataset.newDataFrame(
-        df.sqlContext, LocalRelation.fromExternalRows(schema, Seq(resultRow)))
+      df.sqlContext,
+      LocalRelation.fromExternalRows(schema, Seq(resultRow)))
   }
 }

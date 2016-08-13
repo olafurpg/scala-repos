@@ -5,7 +5,7 @@ package api
 package base
 package patterns
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

@@ -56,8 +56,8 @@ object EnsembleTestHelper {
     }
     val accuracy = (input.length - numOffPredictions).toDouble / input.length
     assert(
-        accuracy >= requiredAccuracy,
-        s"validateClassifier calculated accuracy $accuracy but required $requiredAccuracy.")
+      accuracy >= requiredAccuracy,
+      s"validateClassifier calculated accuracy $accuracy but required $requiredAccuracy.")
   }
 
   /**
@@ -80,12 +80,12 @@ object EnsembleTestHelper {
     }
 
     assert(
-        metric <= required,
-        s"validateRegressor calculated $metricName $metric but required $required.")
+      metric <= required,
+      s"validateRegressor calculated $metricName $metric but required $required.")
   }
 
-  def generateOrderedLabeledPoints(
-      numFeatures: Int, numInstances: Int): Array[LabeledPoint] = {
+  def generateOrderedLabeledPoints(numFeatures: Int,
+                                   numInstances: Int): Array[LabeledPoint] = {
     val arr = new Array[LabeledPoint](numInstances)
     for (i <- 0 until numInstances) {
       val label =

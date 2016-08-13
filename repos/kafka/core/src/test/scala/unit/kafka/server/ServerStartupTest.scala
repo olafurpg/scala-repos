@@ -77,8 +77,8 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     val server = TestUtils.createServer(KafkaConfig.fromProps(props))
 
     TestUtils.waitUntilTrue(
-        () => server.metadataCache.getAliveBrokers.nonEmpty,
-        "Wait for cache to update")
+      () => server.metadataCache.getAliveBrokers.nonEmpty,
+      "Wait for cache to update")
     assertEquals(1, server.metadataCache.getAliveBrokers.size)
     assertEquals(brokerId, server.metadataCache.getAliveBrokers.head.id)
 

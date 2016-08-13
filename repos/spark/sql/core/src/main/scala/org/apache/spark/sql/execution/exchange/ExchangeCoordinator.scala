@@ -22,7 +22,11 @@ import javax.annotation.concurrent.GuardedBy
 
 import scala.collection.mutable.ArrayBuffer
 
-import org.apache.spark.{MapOutputStatistics, ShuffleDependency, SimpleFutureAction}
+import org.apache.spark.{
+  MapOutputStatistics,
+  ShuffleDependency,
+  SimpleFutureAction
+}
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
@@ -130,17 +134,15 @@ private[sql] class ExchangeCoordinator(
         // There is no particular reason that we pick 16. We just need a number to
         // prevent maxPostShuffleInputSize from being set to 0.
         val maxPostShuffleInputSize = math.max(
-            math
-              .ceil(totalPostShuffleInputSize / numPartitions.toDouble)
-              .toLong,
-            16)
+          math.ceil(totalPostShuffleInputSize / numPartitions.toDouble).toLong,
+          16)
         math.min(maxPostShuffleInputSize, advisoryTargetPostShuffleInputSize)
 
       case None => advisoryTargetPostShuffleInputSize
     }
 
     logInfo(
-        s"advisoryTargetPostShuffleInputSize: $advisoryTargetPostShuffleInputSize, " +
+      s"advisoryTargetPostShuffleInputSize: $advisoryTargetPostShuffleInputSize, " +
         s"targetPostShuffleInputSize $targetPostShuffleInputSize.")
 
     // Make sure we do get the same number of pre-shuffle partitions for those stages.
@@ -154,8 +156,8 @@ private[sql] class ExchangeCoordinator(
     // number of partitions, they will have the same number of pre-shuffle partitions
     // (i.e. map output partitions).
     assert(
-        distinctNumPreShufflePartitions.length == 1,
-        "There should be only one distinct value of the number pre-shuffle partitions " +
+      distinctNumPreShufflePartitions.length == 1,
+      "There should be only one distinct value of the number pre-shuffle partitions " +
         "among registered Exchange operator.")
     val numPreShufflePartitions = distinctNumPreShufflePartitions.head
 
@@ -251,8 +253,8 @@ private[sql] class ExchangeCoordinator(
       var k = 0
       while (k < numExchanges) {
         val exchange = exchanges(k)
-        val rdd = exchange.preparePostShuffleRDD(
-            shuffleDependencies(k), partitionStartIndices)
+        val rdd = exchange.preparePostShuffleRDD(shuffleDependencies(k),
+                                                 partitionStartIndices)
         newPostShuffleRDDs.put(exchange, rdd)
 
         k += 1
@@ -271,7 +273,7 @@ private[sql] class ExchangeCoordinator(
 
     if (!postShuffleRDDs.containsKey(exchange)) {
       throw new IllegalStateException(
-          s"The given $exchange is not registered in this coordinator.")
+        s"The given $exchange is not registered in this coordinator.")
     }
 
     postShuffleRDDs.get(exchange)

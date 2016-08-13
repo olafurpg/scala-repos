@@ -30,7 +30,7 @@ object StatsSample {
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)
         .withFallback(
-            ConfigFactory.parseString("akka.cluster.roles = [compute]"))
+          ConfigFactory.parseString("akka.cluster.roles = [compute]"))
         .withFallback(ConfigFactory.load("stats1"))
 
       val system = ActorSystem("ClusterSystem", config)
@@ -45,8 +45,8 @@ object StatsSampleClient {
   def main(args: Array[String]): Unit = {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
-    system.actorOf(
-        Props(classOf[StatsSampleClient], "/user/statsService"), "client")
+    system.actorOf(Props(classOf[StatsSampleClient], "/user/statsService"),
+                   "client")
   }
 }
 
@@ -56,7 +56,7 @@ class StatsSampleClient(servicePath: String) extends Actor {
     case RelativeActorPath(elements) => elements
     case _ =>
       throw new IllegalArgumentException(
-          "servicePath [%s] is not a valid relative actor path" format servicePath)
+        "servicePath [%s] is not a valid relative actor path" format servicePath)
   }
   import context.dispatcher
   val tickTask =

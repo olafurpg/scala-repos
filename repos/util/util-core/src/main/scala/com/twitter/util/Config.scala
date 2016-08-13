@@ -127,8 +127,8 @@ trait Config[T] extends (() => T) {
     */
   def missingValues: Seq[String] = {
     val alreadyVisited = mutable.Set[AnyRef]()
-    val interestingReturnTypes = Seq(
-        classOf[Required[_]], classOf[Config[_]], classOf[Option[_]])
+    val interestingReturnTypes =
+      Seq(classOf[Required[_]], classOf[Config[_]], classOf[Option[_]])
     val buf = new mutable.ListBuffer[String]
     def collect(prefix: String, config: Config[_]) {
       if (!alreadyVisited.contains(config)) {

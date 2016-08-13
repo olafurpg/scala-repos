@@ -47,13 +47,13 @@ object VertexFormat {
     * Specifies the format of a vertex that consists of a point and texture coordinates.
     */
   val PointTexcoord: VertexFormat = new VertexFormat(
-      jfxss.VertexFormat.POINT_TEXCOORD)
+    jfxss.VertexFormat.POINT_TEXCOORD)
 
   /**
     * Specifies the format of a vertex that consists of a point, normal and texture coordinates.
     */
   val PointNormalTexcoord = new VertexFormat(
-      jfxss.VertexFormat.POINT_NORMAL_TEXCOORD)
+    jfxss.VertexFormat.POINT_NORMAL_TEXCOORD)
 }
 
 /**

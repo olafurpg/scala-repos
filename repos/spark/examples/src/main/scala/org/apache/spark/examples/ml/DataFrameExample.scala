@@ -86,10 +86,10 @@ object DataFrameExample {
     val features = df.select("features").rdd.map { case Row(v: Vector) => v }
     val featureSummary =
       features.aggregate(new MultivariateOnlineSummarizer())(
-          (summary, feat) => summary.add(feat),
-          (sum1, sum2) => sum1.merge(sum2))
+        (summary, feat) => summary.add(feat),
+        (sum1, sum2) => sum1.merge(sum2))
     println(
-        s"Selected features column with average values:\n ${featureSummary.mean.toString}")
+      s"Selected features column with average values:\n ${featureSummary.mean.toString}")
 
     // Save the records in a parquet file.
     val tmpDir = Files.createTempDir()

@@ -71,13 +71,13 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
     val sigAlgorithms = Algorithms.decomposes(sigAlgName)
 
     logger.debug(
-        s"checkSignatureAlgorithms: sigAlgName = $sigAlgName, sigAlgName = $sigAlgName, sigAlgorithms = $sigAlgorithms")
+      s"checkSignatureAlgorithms: sigAlgName = $sigAlgName, sigAlgName = $sigAlgName, sigAlgorithms = $sigAlgorithms")
 
     for (a <- sigAlgorithms) {
       findSignatureConstraint(a).map { constraint =>
         if (constraint.matches(a)) {
           logger.debug(
-              s"checkSignatureAlgorithms: x509Cert = $x509Cert failed on constraint $constraint")
+            s"checkSignatureAlgorithms: x509Cert = $x509Cert failed on constraint $constraint")
           val msg = s"Certificate failed: $a matched constraint $constraint"
           throw new CertPathValidatorException(msg)
         }
@@ -98,14 +98,14 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
 
     val keyAlgorithms = Algorithms.decomposes(keyAlgorithmName)
     logger.debug(
-        s"checkKeyAlgorithms: keyAlgorithmName = $keyAlgorithmName, keySize = $keySize, keyAlgorithms = $keyAlgorithms")
+      s"checkKeyAlgorithms: keyAlgorithmName = $keyAlgorithmName, keySize = $keySize, keyAlgorithms = $keyAlgorithms")
 
     for (a <- keyAlgorithms) {
       findKeyConstraint(a).map { constraint =>
         if (constraint.matches(a, keySize)) {
           val certName = x509Cert.getSubjectX500Principal.getName
           logger.debug(
-              s"""checkKeyAlgorithms: cert = "$certName" failed on constraint $constraint, algorithm = $a, keySize = $keySize""")
+            s"""checkKeyAlgorithms: cert = "$certName" failed on constraint $constraint, algorithm = $a, keySize = $keySize""")
 
           val msg =
             s"""Certificate failed: cert = "$certName" failed on constraint $constraint, algorithm = $a, keySize = $keySize"""
@@ -119,8 +119,8 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
     * Checks the algorithms in the given certificate.  Note that this implementation skips signature checking in a
     * root certificate, as a trusted root cert by definition is in the trust store and doesn't need to be signed.
     */
-  def check(
-      cert: Certificate, unresolvedCritExts: java.util.Collection[String]) {
+  def check(cert: Certificate,
+            unresolvedCritExts: java.util.Collection[String]) {
     cert match {
       case x509Cert: X509Certificate =>
         val commonName = getCommonName(x509Cert)
@@ -128,14 +128,14 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
         val certName = x509Cert.getSubjectX500Principal.getName
         val expirationDate = new DateTime(x509Cert.getNotAfter.getTime)
         logger.debug(
-            s"check: checking certificate commonName = $commonName, subjAltName = $subAltNames, certName = $certName, expirationDate = $expirationDate")
+          s"check: checking certificate commonName = $commonName, subjAltName = $subAltNames, certName = $certName, expirationDate = $expirationDate")
 
         sunsetSHA1SignatureAlgorithm(x509Cert)
         checkSignatureAlgorithms(x509Cert)
         checkKeyAlgorithms(x509Cert)
       case _ =>
         throw new UnsupportedOperationException(
-            "check only works with x509 certificates!")
+          "check only works with x509 certificates!")
     }
   }
 
@@ -178,13 +178,13 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
   def infoOnSunset(x509Cert: X509Certificate, expirationDate: DateTime): Unit = {
     val certName = x509Cert.getSubjectX500Principal.getName
     logger.info(
-        s"Certificate $certName uses SHA-1 and expires $expirationDate: this certificate expires soon, but SHA-1 is being sunsetted.")
+      s"Certificate $certName uses SHA-1 and expires $expirationDate: this certificate expires soon, but SHA-1 is being sunsetted.")
   }
 
   def warnOnSunset(x509Cert: X509Certificate, expirationDate: DateTime): Unit = {
     val certName = x509Cert.getSubjectX500Principal.getName
     logger.warn(
-        s"Certificate $certName uses SHA-1 and expires $expirationDate: SHA-1 cannot be considered secure and this certificate should be replaced.")
+      s"Certificate $certName uses SHA-1 and expires $expirationDate: SHA-1 cannot be considered secure and this certificate should be replaced.")
   }
 
   /**

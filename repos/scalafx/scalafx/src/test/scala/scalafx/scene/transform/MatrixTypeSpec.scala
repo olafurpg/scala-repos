@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class MatrixTypeSpec
     extends SFXEnumDelegateSpec[jfxst.MatrixType, MatrixType](
-        javaClass = classOf[jfxst.MatrixType],
-        scalaClass = classOf[MatrixType],
-        companion = MatrixType)
+      javaClass = classOf[jfxst.MatrixType],
+      scalaClass = classOf[MatrixType],
+      companion = MatrixType)

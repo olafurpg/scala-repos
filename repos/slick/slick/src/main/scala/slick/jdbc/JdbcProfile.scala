@@ -7,19 +7,27 @@ import slick.ast._
 import slick.ast.TypeUtil.:@
 import slick.compiler.{Phase, QueryCompiler, InsertCompiler}
 import slick.lifted._
-import slick.relational.{RelationalProfile, CompiledMapping, SimpleFastPathResultConverter}
+import slick.relational.{
+  RelationalProfile,
+  CompiledMapping,
+  SimpleFastPathResultConverter
+}
 import slick.sql.SqlProfile
 
 /** Abstract profile for accessing SQL databases via JDBC. */
 trait JdbcProfile
-    extends SqlProfile with JdbcActionComponent with JdbcInvokerComponent
-    with JdbcTypesComponent with JdbcModelComponent
-    /* internal: */ with JdbcStatementBuilderComponent
+    extends SqlProfile
+    with JdbcActionComponent
+    with JdbcInvokerComponent
+    with JdbcTypesComponent
+    with JdbcModelComponent
+    /* internal: */
+    with JdbcStatementBuilderComponent
     with JdbcMappingCompilerComponent {
 
   @deprecated(
-      "Use the Profile object directly instead of calling `.profile` on it",
-      "3.2")
+    "Use the Profile object directly instead of calling `.profile` on it",
+    "3.2")
   override val profile: JdbcProfile = this
 
   type Backend = JdbcBackend
@@ -36,30 +44,30 @@ trait JdbcProfile
   lazy val updateCompiler = compiler + new JdbcCodeGen(_.buildUpdate)
   lazy val deleteCompiler = compiler + new JdbcCodeGen(_.buildDelete)
   lazy val insertCompiler = QueryCompiler(
-      Phase.assignUniqueSymbols,
-      Phase.inferTypes,
-      new InsertCompiler(InsertCompiler.NonAutoInc),
-      new JdbcInsertCodeGen(createInsertBuilder))
+    Phase.assignUniqueSymbols,
+    Phase.inferTypes,
+    new InsertCompiler(InsertCompiler.NonAutoInc),
+    new JdbcInsertCodeGen(createInsertBuilder))
   lazy val forceInsertCompiler = QueryCompiler(
-      Phase.assignUniqueSymbols,
-      Phase.inferTypes,
-      new InsertCompiler(InsertCompiler.AllColumns),
-      new JdbcInsertCodeGen(createInsertBuilder))
+    Phase.assignUniqueSymbols,
+    Phase.inferTypes,
+    new InsertCompiler(InsertCompiler.AllColumns),
+    new JdbcInsertCodeGen(createInsertBuilder))
   lazy val upsertCompiler = QueryCompiler(
-      Phase.assignUniqueSymbols,
-      Phase.inferTypes,
-      new InsertCompiler(InsertCompiler.AllColumns),
-      new JdbcInsertCodeGen(createUpsertBuilder))
+    Phase.assignUniqueSymbols,
+    Phase.inferTypes,
+    new InsertCompiler(InsertCompiler.AllColumns),
+    new JdbcInsertCodeGen(createUpsertBuilder))
   lazy val checkInsertCompiler = QueryCompiler(
-      Phase.assignUniqueSymbols,
-      Phase.inferTypes,
-      new InsertCompiler(InsertCompiler.PrimaryKeys),
-      new JdbcInsertCodeGen(createCheckInsertBuilder))
+    Phase.assignUniqueSymbols,
+    Phase.inferTypes,
+    new InsertCompiler(InsertCompiler.PrimaryKeys),
+    new JdbcInsertCodeGen(createCheckInsertBuilder))
   lazy val updateInsertCompiler = QueryCompiler(
-      Phase.assignUniqueSymbols,
-      Phase.inferTypes,
-      new InsertCompiler(InsertCompiler.AllColumns),
-      new JdbcInsertCodeGen(createUpdateInsertBuilder))
+    Phase.assignUniqueSymbols,
+    Phase.inferTypes,
+    new InsertCompiler(InsertCompiler.AllColumns),
+    new JdbcInsertCodeGen(createUpdateInsertBuilder))
   def compileInsert(tree: Node) = new JdbcCompiledInsert(tree)
   type CompiledInsert = JdbcCompiledInsert
 
@@ -106,7 +114,8 @@ trait JdbcProfile
   def runSynchronousQuery[R](tree: Node, param: Any)(
       implicit session: Backend#Session): R = tree match {
     case rsm @ ResultSetMapping(_, _, CompiledMapping(_, elemType)) :@ CollectionType(
-        cons, el) =>
+        cons,
+        el) =>
       val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, R]]
       createQueryInvoker[Any](rsm, param, null).foreach({ x =>
         b += x

@@ -43,7 +43,7 @@ private[twitter] object ClientRegistry extends StackRegistry {
             resolution match {
               case bound: Addr.Bound =>
                 log.info(
-                    s"${name} resolved to Addr.Bound, current size=${bound.addrs.size}")
+                  s"${name} resolved to Addr.Bound, current size=${bound.addrs.size}")
               case _ =>
                 log.info(s"${name} resolved to ${resolution}")
             }
@@ -68,7 +68,7 @@ private[finagle] object RegistryEntryLifecycle {
 
       val description: String = "Maintains the ClientRegistry for the stack"
       def parameters: Seq[Stack.Param[_]] = Seq(
-          implicitly[Stack.Param[BindingFactory.Dest]]
+        implicitly[Stack.Param[BindingFactory.Dest]]
       )
 
       def make(

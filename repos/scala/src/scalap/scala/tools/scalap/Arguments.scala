@@ -83,29 +83,30 @@ object Arguments {
             i += 1
           } else {
             res.addBinding(
-                args(i), parseBinding(args(i + 1), optionalBindings(args(i))))
+              args(i),
+              parseBinding(args(i + 1), optionalBindings(args(i))))
             i += 2
           }
         } else {
           val iter = prefixes.iterator
           val j = i
-          while ( (i == j) && iter.hasNext) {
+          while ((i == j) && iter.hasNext) {
             val prefix = iter.next
             if (args(i) startsWith prefix) {
-              res.addPrefixed(
-                  prefix, args(i).substring(prefix.length()).trim())
+              res
+                .addPrefixed(prefix, args(i).substring(prefix.length()).trim())
               i += 1
             }
           }
           if (i == j) {
             val iter = prefixedBindings.keysIterator
-            while ( (i == j) && iter.hasNext) {
+            while ((i == j) && iter.hasNext) {
               val prefix = iter.next
               if (args(i) startsWith prefix) {
                 val arg = args(i).substring(prefix.length()).trim()
                 i = i + 1
-                res.addBinding(
-                    prefix, parseBinding(arg, prefixedBindings(prefix)))
+                res.addBinding(prefix,
+                               parseBinding(arg, prefixedBindings(prefix)))
               }
             }
             if (i == j) {

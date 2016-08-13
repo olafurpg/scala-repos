@@ -55,7 +55,7 @@ trait HttpServiceBase {
     Http(system)
       .bind(interface, port)
       .toMat(Sink.foreach(_.handleWith(RouteResult.route2HandlerFlow(r))))(
-          Keep.left)
+        Keep.left)
       .run()(materializer)
       .toJava
   }

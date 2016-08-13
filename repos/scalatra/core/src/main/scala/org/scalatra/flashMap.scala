@@ -137,13 +137,12 @@ object FlashMapSupport {
   * }}}
   * @see FlashMap
   */
-trait FlashMapSupport extends Handler {
-  this: ScalatraBase =>
+trait FlashMapSupport extends Handler { this: ScalatraBase =>
 
   import org.scalatra.FlashMapSupport._
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse): Unit = {
     withRequest(req) {
       val f = flash
       val isOutermost = !request.contains(LockKey)

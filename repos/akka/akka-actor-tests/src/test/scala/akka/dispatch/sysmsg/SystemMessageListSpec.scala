@@ -24,7 +24,7 @@ class SystemMessageListSpec extends AkkaSpec {
       ((create0 :: LNil).head eq create0) should ===(true)
       ((create1 :: create0 :: LNil).head eq create1) should ===(true)
       ((create2 :: create1 :: create0 :: LNil).head eq create2) should ===(
-          true)
+        true)
 
       (create2.next eq create1) should ===(true)
       (create1.next eq create0) should ===(true)

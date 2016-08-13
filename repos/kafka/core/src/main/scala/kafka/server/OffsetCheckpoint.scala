@@ -65,8 +65,8 @@ class OffsetCheckpoint(val file: File) extends Logging {
         case e: FileNotFoundException =>
           if (FileSystems.getDefault.isReadOnly) {
             fatal(
-                "Halting writes to offset checkpoint file because the underlying file system is inaccessible : ",
-                e)
+              "Halting writes to offset checkpoint file because the underlying file system is inaccessible : ",
+              e)
             Runtime.getRuntime.halt(1)
           }
           throw e
@@ -108,11 +108,11 @@ class OffsetCheckpoint(val file: File) extends Logging {
             }
             if (offsets.size != expectedSize)
               throw new IOException(
-                  s"Expected $expectedSize entries but found only ${offsets.size}")
+                s"Expected $expectedSize entries but found only ${offsets.size}")
             offsets
           case _ =>
             throw new IOException(
-                "Unrecognized version of the highwatermark checkpoint file: " +
+              "Unrecognized version of the highwatermark checkpoint file: " +
                 version)
         }
       } catch {

@@ -92,7 +92,8 @@ object ScheduledService {
   */
 abstract class ScheduledService[T](
     override val delegate: jfxc.ScheduledService[T])
-    extends Service[T](delegate) with SFXDelegate[jfxc.ScheduledService[T]] {
+    extends Service[T](delegate)
+    with SFXDelegate[jfxc.ScheduledService[T]] {
 
   /**
     * The initial delay between when the ScheduledService is first started, and when it will begin
@@ -159,7 +160,7 @@ abstract class ScheduledService[T](
     * Computes the amount of time to add to the period on each failure.
     */
   def backoffStrategy: ObjectProperty[
-      jfxu.Callback[jfxc.ScheduledService[_], jfxu.Duration]] =
+    jfxu.Callback[jfxc.ScheduledService[_], jfxu.Duration]] =
     delegate.backoffStrategyProperty
   def backoffStrategy_=(
       v: jfxu.Callback[jfxc.ScheduledService[_], jfxu.Duration]) {

@@ -16,8 +16,10 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -27,8 +29,8 @@ class DataSource(val dsp: DataSourceParams)
     // create a RDD of (entityID, User)
     val usersRDD: RDD[(String, User)] = eventsDb
       .aggregateProperties(
-          appId = dsp.appId,
-          entityType = "user"
+        appId = dsp.appId,
+        entityType = "user"
       )(sc)
       .map {
         case (entityId, properties) =>
@@ -36,10 +38,11 @@ class DataSource(val dsp: DataSourceParams)
             User()
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" user ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(
+                s"Failed to get properties ${properties} of" +
+                  s" user ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
           (entityId, user)
       }
@@ -48,8 +51,8 @@ class DataSource(val dsp: DataSourceParams)
     // create a RDD of (entityID, Item)
     val itemsRDD: RDD[(String, Item)] = eventsDb
       .aggregateProperties(
-          appId = dsp.appId,
-          entityType = "item"
+        appId = dsp.appId,
+        entityType = "item"
       )(sc)
       .map {
         case (entityId, properties) =>
@@ -58,10 +61,11 @@ class DataSource(val dsp: DataSourceParams)
             Item(categories = properties.getOpt[List[String]]("categories"))
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties ${properties} of" +
-                    s" item ${entityId}. Exception: ${e}.")
-                throw e
-              }
+              logger.error(
+                s"Failed to get properties ${properties} of" +
+                  s" item ${entityId}. Exception: ${e}.")
+              throw e
+            }
           }
           (entityId, item)
       }
@@ -81,30 +85,30 @@ class DataSource(val dsp: DataSourceParams)
           event.event match {
             case "rate" =>
               RateEvent(
-                  //MODIFIED
-                  user = event.entityId,
-                  item = event.targetEntityId.get,
-                  rating = event.properties.get[Double]("rating"), // ADDED
-                  t = event.eventTime.getMillis)
+                //MODIFIED
+                user = event.entityId,
+                item = event.targetEntityId.get,
+                rating = event.properties.get[Double]("rating"), // ADDED
+                t = event.eventTime.getMillis)
             case _ =>
               throw new Exception(s"Unexpected event ${event} is read.")
           }
         } catch {
           case e: Exception => {
-              logger.error(
-                  s"Cannot convert ${event} to RateEvent." + //MODIFIED
-                  s" Exception: ${e}.")
-              throw e
-            }
+            logger.error(
+              s"Cannot convert ${event} to RateEvent." + //MODIFIED
+                s" Exception: ${e}.")
+            throw e
+          }
         }
         rateEvent
       }
       .cache()
 
     new TrainingData(
-        users = usersRDD,
-        items = itemsRDD,
-        rateEvents = rateEventsRDD
+      users = usersRDD,
+      items = itemsRDD,
+      rateEvents = rateEventsRDD
     )
   }
 }
@@ -119,11 +123,10 @@ class TrainingData(
     val users: RDD[(String, User)],
     val items: RDD[(String, Item)],
     val rateEvents: RDD[RateEvent]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
-    s"items: [${items.count()} (${items.take(2).toList}...)]" +
-    s"rateEvents: [${rateEvents.count()}] (${rateEvents.take(2).toList}...)"
+      s"items: [${items.count()} (${items.take(2).toList}...)]" +
+      s"rateEvents: [${rateEvents.count()}] (${rateEvents.take(2).toList}...)"
   }
 }

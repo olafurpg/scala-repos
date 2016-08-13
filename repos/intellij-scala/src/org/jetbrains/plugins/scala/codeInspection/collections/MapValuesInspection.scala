@@ -20,15 +20,15 @@ object MapValues extends SimplificationType {
         val iteratorHint =
           InspectionBundle.message("replace.with.valuesIterator")
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "valuesIterator"))
-              .highlightFrom(qual)
-              .withHint(iteratorHint))
+          replace(expr)
+            .withText(invocationText(qual, "valuesIterator"))
+            .highlightFrom(qual)
+            .withHint(iteratorHint))
       case qual `.map`(`_._2`()) if isMap(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "values"))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "values"))
+            .highlightFrom(qual))
       case _ => None
     }
 }

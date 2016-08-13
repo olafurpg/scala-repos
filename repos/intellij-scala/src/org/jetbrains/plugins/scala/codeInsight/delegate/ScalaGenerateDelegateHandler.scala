@@ -17,13 +17,20 @@ import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameterClause, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameterClause,
+  ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 import org.jetbrains.plugins.scala.lang.psi.{TypeAdjuster, ScalaPsiUtil, types}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult, StdKinds}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult,
+  StdKinds
+}
 import org.jetbrains.plugins.scala.overrideImplement._
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
@@ -44,8 +51,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
                       @NotNull editor: Editor,
                       @NotNull file: PsiFile) {
     if (!CodeInsightUtilBase.prepareEditorForWrite(editor)) return
-    if (!FileDocumentManager.getInstance.requestWriting(
-            editor.getDocument, project)) return
+    if (!FileDocumentManager.getInstance.requestWriting(editor.getDocument,
+                                                        project)) return
     PsiDocumentManager.getInstance(project).commitAllDocuments()
 
     val target = chooseTarget(file, editor, project)
@@ -63,8 +70,10 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
         val aClass = classAtOffset(editor.getCaretModel.getOffset, file)
         val generatedMethods = for (member <- candidates) yield {
           val prototype: ScFunctionDefinition = ScalaPsiElementFactory
-            .createMethodFromSignature(
-                member.sign, aClass.getManager, specifyType, body = "???")
+            .createMethodFromSignature(member.sign,
+                                       aClass.getManager,
+                                       specifyType,
+                                       body = "???")
             .asInstanceOf[ScFunctionDefinition]
           prototype.setModifierProperty("override", value = member.isOverride)
           val body = methodBody(target, prototype)
@@ -72,8 +81,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
           val genInfo = new ScalaGenerationInfo(member)
           val added = aClass
             .addMember(
-                prototype,
-                Option(genInfo.findInsertionAnchor(aClass, elementAtOffset)))
+              prototype,
+              Option(genInfo.findInsertionAnchor(aClass, elementAtOffset)))
             .asInstanceOf[ScFunctionDefinition]
           if (added.superMethod.nonEmpty)
             added.setModifierProperty("override", value = true)
@@ -91,21 +100,21 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
       } catch {
         case e: IncorrectOperationException =>
           throw new IncorrectOperationException(
-              s"Could not delegate methods to ${target.getText}")
+            s"Could not delegate methods to ${target.getText}")
       }
     }
   }
 
-  private def methodBody(
-      delegate: ClassMember, prototype: ScFunction): ScExpression = {
-    def typeParameterUsedIn(
-        parameter: ScTypeParam, elements: Seq[PsiElement]) = {
+  private def methodBody(delegate: ClassMember,
+                         prototype: ScFunction): ScExpression = {
+    def typeParameterUsedIn(parameter: ScTypeParam,
+                            elements: Seq[PsiElement]) = {
       elements.exists(
-          elem =>
-            ReferencesSearch
-              .search(parameter, new LocalSearchScope(elem))
-              .findAll()
-              .nonEmpty)
+        elem =>
+          ReferencesSearch
+            .search(parameter, new LocalSearchScope(elem))
+            .findAll()
+            .nonEmpty)
     }
     val typeParamsForCall: String = {
       val typeParams = prototype.typeParameters
@@ -124,7 +133,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
       .map(paramClauseApplicationText)
       .mkString
     ScalaPsiElementFactory.createExpressionFromText(
-        s"$dText.$methodName$typeParamsForCall$params", prototype.getManager)
+      s"$dText.$methodName$typeParamsForCall$params",
+      prototype.getManager)
   }
 
   private def delegateText(delegate: ClassMember): String = {
@@ -151,7 +161,9 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
     val aClass = classAtOffset(editor.getCaretModel.getOffset, file)
     val tBody = aClass.extendsBlock.templateBody.get
     val place = ScalaPsiElementFactory.createExpressionWithContextFromText(
-        delegateText(delegate), tBody, tBody.getFirstChild)
+      delegateText(delegate),
+      tBody,
+      tBody.getFirstChild)
     if (aClass == null) return null
     val processor = new CompletionProcessor(StdKinds.methodRef, place, false)
     processor.processType(delegateType, place)
@@ -159,14 +171,19 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
     val members = toMethodMembers(candidates, place)
 
     if (!ApplicationManager.getApplication.isUnitTestMode) {
-      val chooser = new ScalaMemberChooser[ScMethodMember](
-          members.toArray, false, true, false, true, aClass)
+      val chooser = new ScalaMemberChooser[ScMethodMember](members.toArray,
+                                                           false,
+                                                           true,
+                                                           false,
+                                                           true,
+                                                           aClass)
       chooser.setTitle(
-          CodeInsightBundle.message("generate.delegate.method.chooser.title"))
+        CodeInsightBundle.message("generate.delegate.method.chooser.title"))
       chooser.show()
       if (chooser.getExitCode != DialogWrapper.OK_EXIT_CODE) return null
       chooser.getSelectedElements.toBuffer.toArray
-    } else if (members.nonEmpty) Array(members.head) else Array()
+    } else if (members.nonEmpty) Array(members.head)
+    else Array()
   }
 
   private def toMethodMembers(candidates: Iterable[ScalaResolveResult],
@@ -183,8 +200,9 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
               if meth.getContainingClass.getQualifiedName == CommonClassNames.JAVA_LANG_OBJECT =>
             None
           case meth: PsiMethod
-              if !ResolveUtils.isAccessible(
-                  meth, place, forCompletion = true) =>
+              if !ResolveUtils.isAccessible(meth,
+                                            place,
+                                            forCompletion = true) =>
             None
           case meth: PsiMethod =>
             Some(new PhysicalSignature(meth, srr.substitutor))
@@ -199,20 +217,21 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
   }
 
   @Nullable
-  private def chooseTarget(
-      file: PsiFile, editor: Editor, project: Project): ClassMember = {
+  private def chooseTarget(file: PsiFile,
+                           editor: Editor,
+                           project: Project): ClassMember = {
     val elements: Array[ClassMember] = targetElements(file, editor)
     if (elements == null || elements.length == 0) return null
     if (!ApplicationManager.getApplication.isUnitTestMode) {
       val chooser = new ScalaMemberChooser(
-          elements,
-          false,
-          false,
-          false,
-          false,
-          classAtOffset(editor.getCaretModel.getOffset, file))
+        elements,
+        false,
+        false,
+        false,
+        false,
+        classAtOffset(editor.getCaretModel.getOffset, file))
       chooser.setTitle(
-          CodeInsightBundle.message("generate.delegate.target.chooser.title"))
+        CodeInsightBundle.message("generate.delegate.target.chooser.title"))
       chooser.show()
       if (chooser.getExitCode != DialogWrapper.OK_EXIT_CODE) return null
       val selectedElements = chooser.getSelectedElements
@@ -224,8 +243,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
     null
   }
 
-  private def targetElements(
-      file: PsiFile, editor: Editor): Array[ClassMember] = {
+  private def targetElements(file: PsiFile,
+                             editor: Editor): Array[ClassMember] = {
     parentClasses(file, editor).flatMap(targetsIn).toArray
   }
 
@@ -251,8 +270,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
     false
   }
 
-  private def canBeTargetInClass(
-      member: ClassMember, clazz: ScTemplateDefinition): Boolean =
+  private def canBeTargetInClass(member: ClassMember,
+                                 clazz: ScTemplateDefinition): Boolean =
     member match {
       case ta: ScAliasMember => false
       case typed: ScalaTypedMember if typed.scType == types.Unit => false
@@ -266,28 +285,29 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
             false
           case f: ScFunction =>
             (f.isParameterless || f.isEmptyParen) &&
-            ResolveUtils.isAccessible(f, clazz, forCompletion = false)
+              ResolveUtils.isAccessible(f, clazz, forCompletion = false)
           case m: PsiMethod =>
             m.isAccessor &&
-            ResolveUtils.isAccessible(m, clazz, forCompletion = false)
+              ResolveUtils.isAccessible(m, clazz, forCompletion = false)
           case _ => false
         }
       case v @ (_: ScValueMember | _: ScVariableMember | _: JavaFieldMember)
-          if ResolveUtils.isAccessible(
-              v.getElement, clazz, forCompletion = false) =>
+          if ResolveUtils.isAccessible(v.getElement,
+                                       clazz,
+                                       forCompletion = false) =>
         true
       case _ => false
     }
 
   private def classAtOffset(offset: Int, file: PsiFile) = {
-    val td = PsiTreeUtil.getContextOfType(
-        file.findElementAt(offset), classOf[ScTemplateDefinition])
+    val td = PsiTreeUtil.getContextOfType(file.findElementAt(offset),
+                                          classOf[ScTemplateDefinition])
     if (td == null || td.extendsBlock.templateBody.isEmpty) null
     else td
   }
 
-  private def parentClasses(
-      file: PsiFile, editor: Editor): Seq[ScTemplateDefinition] = {
+  private def parentClasses(file: PsiFile,
+                            editor: Editor): Seq[ScTemplateDefinition] = {
     val closestClass = classAtOffset(editor.getCaretModel.getOffset, file)
     if (closestClass == null) return Seq.empty
 

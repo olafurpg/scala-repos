@@ -50,7 +50,8 @@ object Scheduler {
     } catch {
       case e: Exception =>
         val error = SchedulerException(
-            message + " could not be scheduled on " + receiver, e)
+          message + " could not be scheduled on " + receiver,
+          e)
         EventHandler.error(error, this, "%s @ %s".format(receiver, message))
         throw error
     }
@@ -95,13 +96,15 @@ object Scheduler {
                    timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
     try {
       service
-        .schedule(
-            new Runnable { def run = receiver ! message }, delay, timeUnit)
+        .schedule(new Runnable { def run = receiver ! message },
+                  delay,
+                  timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
     } catch {
       case e: Exception =>
         val error = SchedulerException(
-            message + " could not be scheduleOnce'd on " + receiver, e)
+          message + " could not be scheduleOnce'd on " + receiver,
+          e)
         EventHandler.error(e, this, receiver + " @ " + message)
         throw error
     }
@@ -144,8 +147,8 @@ object Scheduler {
   def restart() {
     synchronized {
       shutdown()
-      service = Executors.newSingleThreadScheduledExecutor(
-          SchedulerThreadFactory)
+      service =
+        Executors.newSingleThreadScheduledExecutor(SchedulerThreadFactory)
     }
   }
 }

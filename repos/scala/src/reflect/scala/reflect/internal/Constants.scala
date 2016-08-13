@@ -50,7 +50,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case x: Symbol => EnumTag
       case _ =>
         throw new Error(
-            "bad constant value: " + value + " of class " + value.getClass)
+          "bad constant value: " + value + " of class " + value.getClass)
     }
 
     def isByteRange: Boolean =

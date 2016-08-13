@@ -39,12 +39,12 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class NonInvertibleTransformExceptionSpec
     extends SimpleSFXDelegateSpec[jfxst.NonInvertibleTransformException,
                                   NonInvertibleTransformException](
-        classOf[jfxst.NonInvertibleTransformException],
-        classOf[NonInvertibleTransformException]) {
+      classOf[jfxst.NonInvertibleTransformException],
+      classOf[NonInvertibleTransformException]) {
 
   override protected def getJavaClassInstance =
     new jfxst.NonInvertibleTransformException("test message")
   override protected def getScalaClassInstance =
     new NonInvertibleTransformException(
-        new jfxst.NonInvertibleTransformException("test message"))
+      new jfxst.NonInvertibleTransformException("test message"))
 }

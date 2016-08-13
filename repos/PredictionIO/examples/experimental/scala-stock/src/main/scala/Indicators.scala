@@ -20,7 +20,7 @@ import nak.regress.LinearRegression
   *
   * All indicators should be defined as classes that extend
   * this base class. See RSIIndicator as an example. These indicators can then
-  * be instantiated and passed into a StockStrategy class. Refer to tutorial 
+  * be instantiated and passed into a StockStrategy class. Refer to tutorial
   * for further explanation (found in the README.md file).
   */
 @SerialVersionUID(100L)
@@ -34,12 +34,12 @@ abstract class BaseIndicator extends Serializable {
     */
   def getTraining(logPrice: Series[DateTime, Double]): Series[DateTime, Double]
 
-  /** Applies indicator on a window size of the value returned by 
+  /** Applies indicator on a window size of the value returned by
     * getMinWindowSize() and returns the last value in the resulting series to
     * be used for prediction in RegressionStrategy.
     *
     * @param logPrice series of logarithm of all prices for a particular stock
-    * @return the last value in the resulting series from the feature 
+    * @return the last value in the resulting series from the feature
     *           calculation
     */
   def getOne(input: Series[DateTime, Double]): Double
@@ -73,10 +73,10 @@ class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
       logPrice.mapValues[Double]((x: Double) => if (x < 0) x else 0)
 
     //Get the sum of positive/negative Frame
-    val avgPosSeries = posSeries.rolling[Double](
-        rsiPeriod, (f: Series[DateTime, Double]) => f.mean)
-    val avgNegSeries = negSeries.rolling[Double](
-        rsiPeriod, (f: Series[DateTime, Double]) => f.mean)
+    val avgPosSeries = posSeries
+      .rolling[Double](rsiPeriod, (f: Series[DateTime, Double]) => f.mean)
+    val avgNegSeries = negSeries
+      .rolling[Double](rsiPeriod, (f: Series[DateTime, Double]) => f.mean)
 
     val rsSeries = avgPosSeries / avgNegSeries
     rsSeries
@@ -102,7 +102,7 @@ class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
 /** Indicator that calcuate differences of closing prices
   *
   * @constructor create an instance of a ShiftsIndicator
-  * @param period number of days between any 2 closing prices to consider for 
+  * @param period number of days between any 2 closing prices to consider for
   *          calculating a return
   */
 class ShiftsIndicator(period: Int) extends BaseIndicator {

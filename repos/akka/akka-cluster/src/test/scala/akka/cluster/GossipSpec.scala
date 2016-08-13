@@ -114,11 +114,11 @@ class GossipSpec extends WordSpec with Matchers {
 
       val merged1 = g1 merge g2
       merged1.overview.reachability.allUnreachable should ===(
-          Set(a1.uniqueAddress, c1.uniqueAddress, d1.uniqueAddress))
+        Set(a1.uniqueAddress, c1.uniqueAddress, d1.uniqueAddress))
 
       val merged2 = g2 merge g1
       merged2.overview.reachability.allUnreachable should ===(
-          merged1.overview.reachability.allUnreachable)
+        merged1.overview.reachability.allUnreachable)
     }
 
     "merge members by removing removed members" in {
@@ -134,21 +134,21 @@ class GossipSpec extends WordSpec with Matchers {
       val merged1 = g1 merge g2
       merged1.members should ===(SortedSet(a1, b1))
       merged1.overview.reachability.allUnreachable should ===(
-          Set(a1.uniqueAddress))
+        Set(a1.uniqueAddress))
 
       val merged2 = g2 merge g1
       merged2.overview.reachability.allUnreachable should ===(
-          merged1.overview.reachability.allUnreachable)
+        merged1.overview.reachability.allUnreachable)
       merged2.members should ===(merged1.members)
     }
 
     "have leader as first member based on ordering, except Exiting status" in {
       Gossip(members = SortedSet(c2, e2)).leader(c2.uniqueAddress) should ===(
-          Some(c2.uniqueAddress))
+        Some(c2.uniqueAddress))
       Gossip(members = SortedSet(c3, e2)).leader(c3.uniqueAddress) should ===(
-          Some(e2.uniqueAddress))
+        Some(e2.uniqueAddress))
       Gossip(members = SortedSet(c3)).leader(c3.uniqueAddress) should ===(
-          Some(c3.uniqueAddress))
+        Some(c3.uniqueAddress))
     }
 
     "have leader as first reachable member based on ordering" in {
@@ -190,14 +190,16 @@ class GossipSpec extends WordSpec with Matchers {
       // a2 and e1 is Joining
       val g1 =
         Gossip(members = SortedSet(a2, b1.copyUp(3), e1),
-               overview = GossipOverview(reachability = Reachability.empty
-                         .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
+               overview = GossipOverview(
+                 reachability = Reachability.empty
+                   .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
       g1.youngestMember should ===(b1)
       val g2 =
         Gossip(members = SortedSet(a2, b1.copyUp(3), e1),
-               overview = GossipOverview(reachability = Reachability.empty
-                         .unreachable(a2.uniqueAddress, b1.uniqueAddress)
-                         .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
+               overview = GossipOverview(
+                 reachability = Reachability.empty
+                   .unreachable(a2.uniqueAddress, b1.uniqueAddress)
+                   .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
       g2.youngestMember should ===(b1)
       val g3 = Gossip(members = SortedSet(a2, b1.copyUp(3), e2.copyUp(4)))
       g3.youngestMember should ===(e2)

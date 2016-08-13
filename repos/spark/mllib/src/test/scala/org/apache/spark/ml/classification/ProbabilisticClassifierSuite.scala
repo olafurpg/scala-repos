@@ -24,7 +24,8 @@ final class TestProbabilisticClassificationModel(override val uid: String,
                                                  override val numFeatures: Int,
                                                  override val numClasses: Int)
     extends ProbabilisticClassificationModel[
-        Vector, TestProbabilisticClassificationModel] {
+      Vector,
+      TestProbabilisticClassificationModel] {
 
   override def copy(extra: org.apache.spark.ml.param.ParamMap): this.type =
     defaultCopy(extra)
@@ -68,7 +69,7 @@ object ProbabilisticClassifierSuite {
     */
   val allParamSettings: Map[String, Any] =
     ClassifierSuite.allParamSettings ++ Map(
-        "probabilityCol" -> "myProbability",
-        "thresholds" -> Array(0.4, 0.6)
+      "probabilityCol" -> "myProbability",
+      "thresholds" -> Array(0.4, 0.6)
     )
 }

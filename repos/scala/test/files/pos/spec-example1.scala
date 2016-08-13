@@ -3,7 +3,7 @@ abstract class C[@specialized T](_f: T) {
   def n(x: T): T = x
 
   val f: T = _f
-/*
+  /*
   class Inner[@specialized B] {
     def foo(x: T): T = x
   }

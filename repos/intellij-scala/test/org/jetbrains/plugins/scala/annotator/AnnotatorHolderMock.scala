@@ -1,7 +1,12 @@
 package org.jetbrains.plugins.scala.annotator
 
 import com.intellij.lang.ASTNode
-import com.intellij.lang.annotation.{Annotation, AnnotationHolder, AnnotationSession, HighlightSeverity}
+import com.intellij.lang.annotation.{
+  Annotation,
+  AnnotationHolder,
+  AnnotationSession,
+  HighlightSeverity
+}
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 
@@ -10,7 +15,11 @@ import com.intellij.psi.PsiElement
   */
 class AnnotatorHolderMock extends AnnotationHolder {
   private val FakeAnnotation = new com.intellij.lang.annotation.Annotation(
-      0, 0, HighlightSeverity.WEAK_WARNING, "message", "tooltip")
+    0,
+    0,
+    HighlightSeverity.WEAK_WARNING,
+    "message",
+    "tooltip")
 
   def annotations = myAnnotations.reverse
   def errorAnnotations = annotations.filter {

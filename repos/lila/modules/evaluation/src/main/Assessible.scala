@@ -14,11 +14,11 @@ case class Assessible(analysed: Analysed) {
 
   def suspiciousErrorRate(color: Color): Boolean =
     listAverage(Accuracy.diffsList(Pov(game, color), analysis)) <
-    (game.speed match {
-          case Speed.Bullet => 25
-          case Speed.Blitz => 20
-          case _ => 15
-        })
+      (game.speed match {
+        case Speed.Bullet => 25
+        case Speed.Blitz => 20
+        case _ => 15
+      })
 
   def alwaysHasAdvantage(color: Color): Boolean =
     !analysis.infos.exists { info =>
@@ -39,13 +39,13 @@ case class Assessible(analysed: Analysed) {
     game.player(color).hasSuspiciousHoldAlert
 
   def mkFlags(color: Color): PlayerFlags = PlayerFlags(
-      suspiciousErrorRate(color),
-      alwaysHasAdvantage(color),
-      highBlurRate(color),
-      moderateBlurRate(color),
-      consistentMoveTimes(Pov(game, color)),
-      noFastMoves(Pov(game, color)),
-      suspiciousHoldAlert(color)
+    suspiciousErrorRate(color),
+    alwaysHasAdvantage(color),
+    highBlurRate(color),
+    moderateBlurRate(color),
+    consistentMoveTimes(Pov(game, color)),
+    noFastMoves(Pov(game, color)),
+    suspiciousHoldAlert(color)
   )
 
   private val T = true
@@ -101,19 +101,19 @@ case class Assessible(analysed: Analysed) {
 
   def playerAssessment(color: Color): PlayerAssessment =
     PlayerAssessment(
-        _id = game.id + "/" + color.name,
-        gameId = game.id,
-        userId = ~game.player(color).userId,
-        white = (color == Color.White),
-        assessment = rankCheating(color),
-        date = DateTime.now,
-        // meta
-        flags = mkFlags(color),
-        sfAvg = sfAvg(color),
-        sfSd = sfSd(color),
-        mtAvg = mtAvg(color),
-        mtSd = mtSd(color),
-        blurs = blurs(color),
-        hold = hold(color)
+      _id = game.id + "/" + color.name,
+      gameId = game.id,
+      userId = ~game.player(color).userId,
+      white = (color == Color.White),
+      assessment = rankCheating(color),
+      date = DateTime.now,
+      // meta
+      flags = mkFlags(color),
+      sfAvg = sfAvg(color),
+      sfSd = sfSd(color),
+      mtAvg = mtAvg(color),
+      mtSd = mtSd(color),
+      blurs = blurs(color),
+      hold = hold(color)
     )
 }

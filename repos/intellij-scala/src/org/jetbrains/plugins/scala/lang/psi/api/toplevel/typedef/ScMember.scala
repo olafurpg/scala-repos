@@ -10,11 +10,17 @@ import com.intellij.psi.impl.source.PsiFileImpl
 import com.intellij.psi.search.{LocalSearchScope, PackageScope, SearchScope}
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier,
+  ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlock
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock,
+  ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaFileImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScMemberOrLocal
 
@@ -25,7 +31,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 04.05.2008
   */
 trait ScMember
-    extends ScalaPsiElement with ScModifierListOwner with PsiMember {
+    extends ScalaPsiElement
+    with ScModifierListOwner
+    with PsiMember {
   def getContainingClass: PsiClass = containingClass
 
   def isPrivate: Boolean = hasModifierPropertyScala("private")
@@ -65,8 +73,8 @@ trait ScMember
       case (found, _: ScClassParameter | _: ScPrimaryConstructor) => found
       case (found, _)
           if context == found.extendsBlock ||
-          found.extendsBlock.templateBody.contains(context) ||
-          found.extendsBlock.earlyDefinitions.contains(context) =>
+            found.extendsBlock.templateBody.contains(context) ||
+            found.extendsBlock.earlyDefinitions.contains(context) =>
         found
       case (found, _) => null // See SCL-3178
     }
@@ -82,12 +90,12 @@ trait ScMember
       stub.getParentStubOfType(classOf[ScTemplateDefinition])
     } else {
       child match {
-        // TODO is all of this mess still necessary?! 
+        // TODO is all of this mess still necessary?!
         case c: ScClass if c.isCase =>
           this match {
             case fun: ScFunction
                 if fun.isSyntheticApply || fun.isSyntheticUnapply ||
-                fun.isSyntheticUnapplySeq =>
+                  fun.isSyntheticUnapplySeq =>
               //this is special case for synthetic apply and unapply methods
               ScalaPsiUtil.getCompanionModule(c) match {
                 case Some(td) => return td
@@ -122,10 +130,10 @@ trait ScMember
       case PsiModifier.STATIC => containingClass.isInstanceOf[ScObject]
       case PsiModifier.PRIVATE =>
         getModifierList.accessModifier.exists(
-            _.access == ScAccessModifier.Type.THIS_PRIVATE)
+          _.access == ScAccessModifier.Type.THIS_PRIVATE)
       case PsiModifier.PROTECTED =>
         getModifierList.accessModifier.exists(
-            _.access == ScAccessModifier.Type.THIS_PROTECTED)
+          _.access == ScAccessModifier.Type.THIS_PROTECTED)
       case _ => super.hasModifierProperty(name)
     }
   }
@@ -157,7 +165,7 @@ trait ScMember
                   else if (buf.length == 1) buf(0)
                   else {
                     val filter = buf.filter(
-                        isSimilarMemberForNavigation(_, isStrict = true))
+                      isSimilarMemberForNavigation(_, isStrict = true))
                     if (filter.isEmpty) buf(0)
                     else filter(0)
                   }
@@ -184,8 +192,8 @@ trait ScMember
     val accessModifier = Option(getModifierList).flatMap(_.accessModifier)
 
     def fromContainingBlockOrMember(): Option[SearchScope] = {
-      val blockOrMember = PsiTreeUtil.getContextOfType(
-          this, true, classOf[ScBlock], classOf[ScMember])
+      val blockOrMember = PsiTreeUtil
+        .getContextOfType(this, true, classOf[ScBlock], classOf[ScMember])
       blockOrMember match {
         case null => None
         case block: ScBlock => Some(new LocalSearchScope(block))

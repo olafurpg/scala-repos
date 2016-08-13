@@ -36,11 +36,12 @@ object ProcessKeeper {
     startService {
       log.info(s"Start Http Service on port $port")
       val conf = new ScallopConf(
-          Array("--http_port", port.toString, "--assets_path", assetPath))
+        Array("--http_port", port.toString, "--assets_path", assetPath))
       with HttpConf
       conf.afterInit()
-      val injector = Guice.createInjector(
-          new MetricsModule, new HttpModule(conf), new HttpServiceTestModule)
+      val injector = Guice.createInjector(new MetricsModule,
+                                          new HttpModule(conf),
+                                          new HttpServiceTestModule)
       injector.getInstance(classOf[HttpService])
     }
   }
@@ -103,10 +104,9 @@ object ProcessKeeper {
                        "MESOS_ACLS" -> s"file://$aclsPath",
                        "MESOS_CREDENTIALS" -> s"file://$credentialsPath")
     startProcess(
-        "mesos",
-        Process(
-            Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
-        upWhen = _.toLowerCase.contains("registered with master"))
+      "mesos",
+      Process(Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
+      upWhen = _.toLowerCase.contains("registered with master"))
   }
 
   def startMarathon(cwd: File,
@@ -117,10 +117,10 @@ object ProcessKeeper {
                     processName: String = "marathon"): Process = {
 
     val debugArgs = List(
-        "-Dakka.loglevel=DEBUG",
-        "-Dakka.actor.debug.receive=true",
-        "-Dakka.actor.debug.autoreceive=true",
-        "-Dakka.actor.debug.lifecycle=true"
+      "-Dakka.loglevel=DEBUG",
+      "-Dakka.actor.debug.receive=true",
+      "-Dakka.actor.debug.autoreceive=true",
+      "-Dakka.actor.debug.lifecycle=true"
     )
 
     val marathonWorkDir: String = "/tmp/marathon-itest-marathon"
@@ -128,15 +128,16 @@ object ProcessKeeper {
     FileUtils.deleteDirectory(marathonWorkDirFile)
     FileUtils.forceMkdir(marathonWorkDirFile)
 
-    val secretPath = write(
-        marathonWorkDirFile, fileName = "marathon-secret", content = "secret1")
+    val secretPath = write(marathonWorkDirFile,
+                           fileName = "marathon-secret",
+                           content = "secret1")
     val authSettings = List(
-        "--mesos_authentication_principal",
-        "principal1",
-        "--mesos_role",
-        "foo",
-        "--mesos_authentication_secret_file",
-        s"$secretPath"
+      "--mesos_authentication_principal",
+      "principal1",
+      "--mesos_role",
+      "foo",
+      "--mesos_authentication_secret_file",
+      s"$secretPath"
     )
 
     val argsWithMain = mainClass :: arguments ++ authSettings
@@ -148,8 +149,9 @@ object ProcessKeeper {
                      upWhen = _.contains(startupLine))
   }
 
-  private[this] def write(
-      dir: File, fileName: String, content: String): String = {
+  private[this] def write(dir: File,
+                          fileName: String,
+                          content: String): String = {
     val file = File.createTempFile(fileName, "", dir)
     file.deleteOnExit()
     FileUtils.write(file, content)
@@ -169,8 +171,8 @@ object ProcessKeeper {
     val memSettings = s"-Xmx${heapInMegs}m"
     // Omit the classpath in order to avoid cluttering the tests output
     log.info(
-        s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments)
-      .mkString(" ")}")
+      s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments)
+        .mkString(" ")}")
     val command: List[String] =
       javaExecutable :: memSettings :: "-classpath" :: classPath :: arguments
     val builder = Process(command, cwd, env.toList: _*)
@@ -213,22 +215,22 @@ object ProcessKeeper {
       ProcessExited
     }(ExecutionContext.fromExecutor(Executors.newCachedThreadPool()))
     val upOrExited = Future.firstCompletedOf(Seq(up.future, processExitCode))(
-        ExecutionContext.global)
+      ExecutionContext.global)
     Try(Await.result(upOrExited, timeout)) match {
       case Success(result) =>
         result match {
           case ProcessExited =>
             throw new IllegalStateException(
-                s"Process $name exited before coming up. Give up. $processBuilder")
+              s"Process $name exited before coming up. Give up. $processBuilder")
           case ProcessIsUp =>
             processes += name -> process
             log.info(
-                s"Process $name is up and running. ${processes.size} processes in total.")
+              s"Process $name is up and running. ${processes.size} processes in total.")
         }
       case Failure(_) =>
         process.destroy()
         throw new IllegalStateException(
-            s"Process $name does not came up within time bounds ($timeout). Give up. $processBuilder")
+          s"Process $name does not came up within time bounds ($timeout). Give up. $processBuilder")
     }
     process
   }

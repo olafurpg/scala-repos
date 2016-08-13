@@ -45,7 +45,9 @@ import org.apache.spark.sql.types._
 @Since("1.6.0")
 @Experimental
 class Interaction @Since("1.6.0")(override val uid: String)
-    extends Transformer with HasInputCols with HasOutputCol
+    extends Transformer
+    with HasInputCols
+    with HasOutputCol
     with DefaultParamsWritable {
 
   @Since("1.6.0")
@@ -68,7 +70,7 @@ class Interaction @Since("1.6.0")(override val uid: String)
     require($(inputCols).distinct.length == $(inputCols).length,
             "Input cols must be distinct.")
     StructType(
-        schema.fields :+ StructField($(outputCol), new VectorUDT, false))
+      schema.fields :+ StructField($(outputCol), new VectorUDT, false))
   }
 
   @Since("1.6.0")
@@ -92,17 +94,14 @@ class Interaction @Since("1.6.0")(override val uid: String)
         indices = ArrayBuilder.make[Int]
         values = ArrayBuilder.make[Double]
         size *= currentEncoder.outputSize
-        currentEncoder.foreachNonzeroOutput(
-            row(featureIndex),
-            (i, a) =>
-              {
-                var j = 0
-                while (j < prevIndices.length) {
-                  indices += prevIndices(j) + i * prevSize
-                  values += prevValues(j) * a
-                  j += 1
-                }
-            })
+        currentEncoder.foreachNonzeroOutput(row(featureIndex), (i, a) => {
+          var j = 0
+          while (j < prevIndices.length) {
+            indices += prevIndices(j) + i * prevSize
+            values += prevValues(j) * a
+            j += 1
+          }
+        })
         featureIndex -= 1
       }
       Vectors.sparse(size, indices.result(), values.result()).compressed
@@ -131,10 +130,10 @@ class Interaction @Since("1.6.0")(override val uid: String)
     def getNumFeatures(attr: Attribute): Int = {
       attr match {
         case nominal: NominalAttribute =>
-          math.max(
-              1,
-              nominal.getNumValues.getOrElse(throw new SparkException(
-                      "Nominal features must have attr numValues defined.")))
+          math.max(1,
+                   nominal.getNumValues.getOrElse(
+                     throw new SparkException(
+                       "Nominal features must have attr numValues defined.")))
         case _ =>
           1 // numeric feature
       }
@@ -148,7 +147,7 @@ class Interaction @Since("1.6.0")(override val uid: String)
             .fromStructField(f)
             .attributes
             .getOrElse(throw new SparkException(
-                    "Vector attributes must be defined for interaction."))
+              "Vector attributes must be defined for interaction."))
           attrs.map(getNumFeatures).toArray
       }
       new FeatureEncoder(numFeatures)
@@ -172,7 +171,8 @@ class Interaction @Since("1.6.0")(override val uid: String)
           val attr = Attribute.decodeStructField(f, preserveName = true)
           if (attr == UnresolvedAttribute) {
             encodedFeatureAttrs(
-                Seq(NumericAttribute.defaultAttr.withName(f.name)), None)
+              Seq(NumericAttribute.defaultAttr.withName(f.name)),
+              None)
           } else if (!attr.name.isDefined) {
             encodedFeatureAttrs(Seq(attr.withName(f.name)), None)
           } else {
@@ -188,7 +188,7 @@ class Interaction @Since("1.6.0")(override val uid: String)
         featureAttrs = encodedAttrs.flatMap { head =>
           featureAttrs.map { tail =>
             NumericAttribute.defaultAttr.withName(
-                head.name.get + ":" + tail.name.get)
+              head.name.get + ":" + tail.name.get)
           }
         }
       }
@@ -211,21 +211,23 @@ class Interaction @Since("1.6.0")(override val uid: String)
     def format(index: Int,
                attrName: Option[String],
                categoryName: Option[String]): String = {
-      val parts = Seq(
-          groupName, Some(attrName.getOrElse(index.toString)), categoryName)
+      val parts =
+        Seq(groupName, Some(attrName.getOrElse(index.toString)), categoryName)
       parts.flatten.mkString("_")
     }
 
     inputAttrs.zipWithIndex.flatMap {
       case (nominal: NominalAttribute, i) =>
         if (nominal.values.isDefined) {
-          nominal.values.get.map(v =>
-                BinaryAttribute.defaultAttr.withName(
-                    format(i, nominal.name, Some(v))))
+          nominal.values.get.map(
+            v =>
+              BinaryAttribute.defaultAttr.withName(
+                format(i, nominal.name, Some(v))))
         } else {
-          Array.tabulate(nominal.getNumValues.get)(j =>
-                BinaryAttribute.defaultAttr.withName(
-                    format(i, nominal.name, Some(j.toString))))
+          Array.tabulate(nominal.getNumValues.get)(
+            j =>
+              BinaryAttribute.defaultAttr.withName(
+                format(i, nominal.name, Some(j.toString))))
         }
       case (a: Attribute, i) =>
         Seq(NumericAttribute.defaultAttr.withName(format(i, a.name, None)))
@@ -291,8 +293,8 @@ private[ml] class FeatureEncoder(numFeatures: Array[Int])
         }
       case vec: Vector =>
         assert(
-            numFeatures.length == vec.size,
-            s"Vector column size was ${vec.size}, expected ${numFeatures.length}")
+          numFeatures.length == vec.size,
+          s"Vector column size was ${vec.size}, expected ${numFeatures.length}")
         vec.foreachActive { (i, v) =>
           val numOutputCols = numFeatures(i)
           if (numOutputCols > 1) {
@@ -307,6 +309,6 @@ private[ml] class FeatureEncoder(numFeatures: Array[Int])
         throw new SparkException("Values to interact cannot be null.")
       case o =>
         throw new SparkException(
-            s"$o of type ${o.getClass.getName} is not supported.")
+          s"$o of type ${o.getClass.getName} is not supported.")
     }
 }

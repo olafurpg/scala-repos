@@ -12,7 +12,9 @@ import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 
 @RunWith(classOf[JUnitRunner])
 class ThresholdFailureDetectorTest
-    extends FunSuite with AssertionsForJUnit with Eventually
+    extends FunSuite
+    with AssertionsForJUnit
+    with Eventually
     with IntegrationPatience {
   def testt(desc: String)(f: TimeControl => Unit): Unit =
     test(desc) {
@@ -33,14 +35,14 @@ class ThresholdFailureDetectorTest
 
     val timer = new MockTimer
     val d = new ThresholdFailureDetector(
-        ping,
-        minPeriod = 10.milliseconds,
-        threshold = 2,
-        windowSize = 5,
-        closeTimeout = closeTimeout,
-        nanoTime = nanoTime,
-        statsReceiver = sr,
-        timer = timer
+      ping,
+      minPeriod = 10.milliseconds,
+      threshold = 2,
+      windowSize = 5,
+      closeTimeout = closeTimeout,
+      nanoTime = nanoTime,
+      statsReceiver = sr,
+      timer = timer
     )
   }
 
@@ -180,14 +182,14 @@ class ThresholdFailureDetectorTest
     }
 
     val d = new ThresholdFailureDetector(
-        ping,
-        minPeriod = 10.milliseconds,
-        threshold = 2,
-        windowSize = 5,
-        closeTimeout = Duration.Top,
-        nanoTime = nanoTime,
-        timer = timer,
-        statsReceiver = sr
+      ping,
+      minPeriod = 10.milliseconds,
+      threshold = 2,
+      windowSize = 5,
+      closeTimeout = Duration.Top,
+      nanoTime = nanoTime,
+      timer = timer,
+      statsReceiver = sr
     )
 
     for (i <- 1 until failAfter) {

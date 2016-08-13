@@ -18,7 +18,8 @@ case class CaughtException(action: Action) extends RuntimeException
 object Test extends App {
   def test(action: Action, expectException: Boolean = false) {
     var gotException = false
-    val result = try driver(action) catch {
+    val result = try driver(action)
+    catch {
       case UncaughtException(a) =>
         gotException = true
         a

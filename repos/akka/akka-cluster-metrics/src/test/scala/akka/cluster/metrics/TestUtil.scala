@@ -48,12 +48,13 @@ case class SimpleSigarProvider(location: String = "native")
   * Provide sigar library as static mock.
   */
 case class MockitoSigarProvider(pid: Long = 123,
-                                loadAverage: Array[Double] = Array(
-                                      0.7, 0.3, 0.1),
+                                loadAverage: Array[Double] =
+                                  Array(0.7, 0.3, 0.1),
                                 cpuCombined: Double = 0.5,
                                 cpuStolen: Double = 0.2,
                                 steps: Int = 5)
-    extends SigarProvider with MockitoSugar {
+    extends SigarProvider
+    with MockitoSugar {
 
   import org.hyperic.sigar._
   import org.mockito.Mockito._
@@ -90,8 +91,7 @@ case class MockitoSigarProvider(pid: Long = 123,
   *
   * TODO change factory after https://github.com/akka/akka/issues/16369
   */
-trait MetricsCollectorFactory {
-  this: AkkaSpec ⇒
+trait MetricsCollectorFactory { this: AkkaSpec ⇒
   import MetricsConfig._
   import org.hyperic.sigar.Sigar
 
@@ -138,9 +138,9 @@ trait MetricsCollectorFactory {
   */
 class MockitoSigarMetricsCollector(system: ActorSystem)
     extends SigarMetricsCollector(
-        Address("akka.tcp", system.name),
-        MetricsConfig.defaultDecayFactor,
-        MockitoSigarProvider().createSigarInstance) {}
+      Address("akka.tcp", system.name),
+      MetricsConfig.defaultDecayFactor,
+      MockitoSigarProvider().createSigarInstance) {}
 
 /**
   * Metrics test configurations.
@@ -208,8 +208,9 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
   /** Create actor that subscribes to the cluster eventBus to update current read view state. */
   private val eventBusListener: ActorRef = {
     system.systemActorOf(
-        Props(new Actor with ActorLogging
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      Props(
+        new Actor with ActorLogging
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit = extension.subscribe(self)
           override def postStop(): Unit = extension.unsubscribe(self)
           def receive = {
@@ -219,9 +220,10 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
             case _ ⇒
             // Ignore.
           }
-        }).withDispatcher(Dispatchers.DefaultDispatcherId)
-          .withDeploy(Deploy.local),
-        name = "metrics-event-bus-listener")
+        })
+        .withDispatcher(Dispatchers.DefaultDispatcherId)
+        .withDeploy(Deploy.local),
+      name = "metrics-event-bus-listener")
   }
 
   /** Current cluster metrics. */

@@ -5,8 +5,7 @@ import scala.collection.script._
 object Test {
   def main(args: Array[String]) {
     val buf = new ArrayBuffer[Int] with ObservableBuffer[Int]
-    buf.subscribe(
-        new Subscriber[Message[Int], ObservableBuffer[Int]] {
+    buf.subscribe(new Subscriber[Message[Int], ObservableBuffer[Int]] {
       def notify(pub: ObservableBuffer[Int], event: Message[Int]) =
         println(event)
     })

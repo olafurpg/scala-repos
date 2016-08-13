@@ -48,7 +48,7 @@ object FileIO {
   def toFile(f: File, options: util.Set[StandardOpenOption])
     : javadsl.Sink[ByteString, CompletionStage[IOResult]] =
     new Sink(
-        scaladsl.FileIO.toFile(f, options.asScala.toSet).toCompletionStage())
+      scaladsl.FileIO.toFile(f, options.asScala.toSet).toCompletionStage())
 
   /**
     * Creates a Source from a Files contents.

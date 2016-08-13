@@ -41,7 +41,8 @@ object HLineTo {
 }
 
 class HLineTo(override val delegate: jfxss.HLineTo = new jfxss.HLineTo())
-    extends PathElement(delegate) with SFXDelegate[jfxss.HLineTo] {
+    extends PathElement(delegate)
+    with SFXDelegate[jfxss.HLineTo] {
 
   /**
     * Defines the X coordinate.

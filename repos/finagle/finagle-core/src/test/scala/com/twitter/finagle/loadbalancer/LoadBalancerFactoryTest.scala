@@ -4,7 +4,10 @@ import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, StringClient}
 import com.twitter.finagle.param.Stats
 import com.twitter.finagle.server.StringServer
-import com.twitter.finagle.stats.{InMemoryHostStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  InMemoryHostStatsReceiver,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Await, Future, Var}
 import java.net.{InetAddress, InetSocketAddress, SocketAddress}
@@ -15,7 +18,10 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class LoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer with Eventually
+    extends FunSuite
+    with StringClient
+    with StringServer
+    with Eventually
     with IntegrationPatience {
   val echoService = Service.mk[String, String](Future.value(_))
 
@@ -71,10 +77,10 @@ class LoadBalancerFactoryTest
     val client = stringClient
       .configured(Stats(sr))
       .newService(
-          Name.bound(
-              Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
-              Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
-          "client")
+        Name.bound(
+          Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
+          Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
+        "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 2)
     assert(Await.result(client("hello\n")) == "hello")
@@ -84,7 +90,7 @@ class LoadBalancerFactoryTest
     val next: Stack[ServiceFactory[String, String]] =
       Stack.Leaf(Stack.Role("mock"),
                  ServiceFactory.const[String, String](
-                     Service.mk[String, String](req => Future.value(s"$req"))))
+                   Service.mk[String, String](req => Future.value(s"$req"))))
 
     val stack = new LoadBalancerFactory.StackModule[String, String] {
       val description = "mock"
@@ -101,7 +107,9 @@ class LoadBalancerFactoryTest
 
 @RunWith(classOf[JUnitRunner])
 class ConcurrentLoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer {
+    extends FunSuite
+    with StringClient
+    with StringServer {
   val echoService = Service.mk[String, String](Future.value(_))
 
   test("makes service factory stack") {
@@ -110,15 +118,15 @@ class ConcurrentLoadBalancerFactoryTest
 
     val sr = new InMemoryStatsReceiver
     val clientStack = StackClient.newStack.replace(
-        LoadBalancerFactory.role,
-        ConcurrentLoadBalancerFactory.module[String, String])
+      LoadBalancerFactory.role,
+      ConcurrentLoadBalancerFactory.module[String, String])
     val client = stringClient
       .withStack(clientStack)
       .configured(Stats(sr))
       .newService(
-          Name.bound(
-              Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
-          "client")
+        Name.bound(
+          Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
+        "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 4)
     assert(Await.result(client("hello\n")) == "hello")
@@ -133,17 +141,17 @@ class ConcurrentLoadBalancerFactoryTest
 
     val sr = new InMemoryStatsReceiver
     val clientStack = StackClient.newStack.replace(
-        LoadBalancerFactory.role,
-        ConcurrentLoadBalancerFactory.module[String, String])
+      LoadBalancerFactory.role,
+      ConcurrentLoadBalancerFactory.module[String, String])
     val client = stringClient
       .withStack(clientStack)
       .configured(Stats(sr))
       .configured(ConcurrentLoadBalancerFactory.Param(3))
       .newService(
-          Name.bound(
-              Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
-              Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
-          "client")
+        Name.bound(
+          Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
+          Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
+        "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 6)
   }

@@ -25,7 +25,10 @@ import com.amazonaws.services.kinesis.model.Record
 import org.apache.spark.api.java.function.{Function => JFunction}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Duration, StreamingContext}
-import org.apache.spark.streaming.api.java.{JavaReceiverInputDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaReceiverInputDStream,
+  JavaStreamingContext
+}
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 
 object KinesisUtils {
@@ -59,7 +62,7 @@ object KinesisUtils {
     * @param messageHandler A custom message handler that can generate a generic output from a
     *                       Kinesis `Record`, which contains both message data, and metadata.
     */
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,
@@ -117,7 +120,7 @@ object KinesisUtils {
     * @param awsSecretKey  AWS SecretKey (if null, will use DefaultAWSCredentialsProviderChain)
     */
   // scalastyle:off
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,
@@ -133,16 +136,16 @@ object KinesisUtils {
     val cleanedHandler = ssc.sc.clean(messageHandler)
     ssc.withNamedScope("kinesis stream") {
       new KinesisInputDStream[T](
-          ssc,
-          streamName,
-          endpointUrl,
-          validateRegion(regionName),
-          initialPositionInStream,
-          kinesisAppName,
-          checkpointInterval,
-          storageLevel,
-          cleanedHandler,
-          Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
+        ssc,
+        streamName,
+        endpointUrl,
+        validateRegion(regionName),
+        initialPositionInStream,
+        kinesisAppName,
+        checkpointInterval,
+        storageLevel,
+        cleanedHandler,
+        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
     }
   }
 
@@ -238,16 +241,16 @@ object KinesisUtils {
                    awsSecretKey: String): ReceiverInputDStream[Array[Byte]] = {
     ssc.withNamedScope("kinesis stream") {
       new KinesisInputDStream[Array[Byte]](
-          ssc,
-          streamName,
-          endpointUrl,
-          validateRegion(regionName),
-          initialPositionInStream,
-          kinesisAppName,
-          checkpointInterval,
-          storageLevel,
-          defaultMessageHandler,
-          Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
+        ssc,
+        streamName,
+        endpointUrl,
+        validateRegion(regionName),
+        initialPositionInStream,
+        kinesisAppName,
+        checkpointInterval,
+        storageLevel,
+        defaultMessageHandler,
+        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
     }
   }
 
@@ -473,7 +476,7 @@ object KinesisUtils {
   private def validateRegion(regionName: String): String = {
     Option(RegionUtils.getRegion(regionName)).map { _.getName }.getOrElse {
       throw new IllegalArgumentException(
-          s"Region name '$regionName' is not valid")
+        s"Region name '$regionName' is not valid")
     }
   }
 
@@ -499,7 +502,7 @@ private class KinesisUtilsPythonHelper {
       case 1 => InitialPositionInStream.TRIM_HORIZON
       case _ =>
         throw new IllegalArgumentException(
-            "Illegal InitialPositionInStream. Please use " +
+          "Illegal InitialPositionInStream. Please use " +
             "InitialPositionInStream.LATEST or InitialPositionInStream.TRIM_HORIZON")
     }
   }
@@ -518,34 +521,34 @@ private class KinesisUtilsPythonHelper {
   ): JavaReceiverInputDStream[Array[Byte]] = {
     if (awsAccessKeyId == null && awsSecretKey != null) {
       throw new IllegalArgumentException(
-          "awsSecretKey is set but awsAccessKeyId is null")
+        "awsSecretKey is set but awsAccessKeyId is null")
     }
     if (awsAccessKeyId != null && awsSecretKey == null) {
       throw new IllegalArgumentException(
-          "awsAccessKeyId is set but awsSecretKey is null")
+        "awsAccessKeyId is set but awsSecretKey is null")
     }
     if (awsAccessKeyId == null && awsSecretKey == null) {
       KinesisUtils.createStream(
-          jssc,
-          kinesisAppName,
-          streamName,
-          endpointUrl,
-          regionName,
-          getInitialPositionInStream(initialPositionInStream),
-          checkpointInterval,
-          storageLevel)
+        jssc,
+        kinesisAppName,
+        streamName,
+        endpointUrl,
+        regionName,
+        getInitialPositionInStream(initialPositionInStream),
+        checkpointInterval,
+        storageLevel)
     } else {
       KinesisUtils.createStream(
-          jssc,
-          kinesisAppName,
-          streamName,
-          endpointUrl,
-          regionName,
-          getInitialPositionInStream(initialPositionInStream),
-          checkpointInterval,
-          storageLevel,
-          awsAccessKeyId,
-          awsSecretKey)
+        jssc,
+        kinesisAppName,
+        streamName,
+        endpointUrl,
+        regionName,
+        getInitialPositionInStream(initialPositionInStream),
+        checkpointInterval,
+        storageLevel,
+        awsAccessKeyId,
+        awsSecretKey)
     }
   }
 }

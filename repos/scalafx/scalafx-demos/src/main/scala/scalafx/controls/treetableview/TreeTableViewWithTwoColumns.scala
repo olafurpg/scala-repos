@@ -49,15 +49,15 @@ object TreeTableViewWithTwoColumns extends JFXApp {
   }
 
   val employees = Seq(
-      new Employee("Ethan Williams", "ethan.williams@example.com"),
-      new Employee("Emma Jones", "emma.jones@example.com"),
-      new Employee("Michael Brown", "michael.brown@example.com"),
-      new Employee("Anna Black", "anna.black@example.com"),
-      new Employee("Rodger York", "roger.york@example.com"),
-      new Employee("Susan Collins", "susan.collins@example.com"))
+    new Employee("Ethan Williams", "ethan.williams@example.com"),
+    new Employee("Emma Jones", "emma.jones@example.com"),
+    new Employee("Michael Brown", "michael.brown@example.com"),
+    new Employee("Anna Black", "anna.black@example.com"),
+    new Employee("Rodger York", "roger.york@example.com"),
+    new Employee("Susan Collins", "susan.collins@example.com"))
 
   val depIcon = new ImageView(
-      getClass.getResource("department.png").toExternalForm)
+    getClass.getResource("department.png").toExternalForm)
 
   assert(depIcon != null)
 
@@ -72,18 +72,18 @@ object TreeTableViewWithTwoColumns extends JFXApp {
       fill = Color.LightGray
       root = new TreeTableView[Employee](rootNode) {
         columns ++= Seq(
-            new TreeTableColumn[Employee, String]("Employee") {
-              prefWidth = 150
-              cellValueFactory = { p =>
-                ReadOnlyStringWrapper(p.value.value.value.name())
-              }
-            },
-            new TreeTableColumn[Employee, String]("Email") {
-              prefWidth = 190
-              cellValueFactory = { p =>
-                ReadOnlyStringWrapper(p.value.value.value.email())
-              }
+          new TreeTableColumn[Employee, String]("Employee") {
+            prefWidth = 150
+            cellValueFactory = { p =>
+              ReadOnlyStringWrapper(p.value.value.value.name())
             }
+          },
+          new TreeTableColumn[Employee, String]("Email") {
+            prefWidth = 190
+            cellValueFactory = { p =>
+              ReadOnlyStringWrapper(p.value.value.value.email())
+            }
+          }
         )
         tableMenuButtonVisible = true
       }

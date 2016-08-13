@@ -8,7 +8,12 @@ import scala.io.Source
 import scala.util.Random
 
 // for Java Serialization:
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectOutputStream,
+  ObjectInputStream
+}
 
 import scala.pickling._
 import scala.pickling.Defaults._
@@ -30,10 +35,10 @@ final class Vertex(val label: String, var neighbors: List[Vertex])
   def sameAs(other: Vertex): Boolean = {
     (this ne other) && this.label == other.label &&
     (this.neighbors.length == other.neighbors.length && this.neighbors
-          .zip(other.neighbors)
-          .forall {
-            case (thisv, otherv) => thisv.label == otherv.label
-          })
+      .zip(other.neighbors)
+      .forall {
+        case (thisv, otherv) => thisv.label == otherv.label
+      })
   }
 
   override def toString = "Vertex(" + label + ")"
@@ -226,9 +231,9 @@ object WikiGraphPicklingBench extends WikiGraphBenchmark {
   //   }
   // }
   implicit lazy val picklerUnpicklerColonColonVertex: Pickler[::[Vertex]] with Unpickler[
-      ::[Vertex]] = implicitly
+    ::[Vertex]] = implicitly
   implicit lazy val picklerUnpicklerVectorVertex: Pickler[Vector[Vertex]] with Unpickler[
-      Vector[Vertex]] = Defaults.vectorPickler[Vertex]
+    Vector[Vertex]] = Defaults.vectorPickler[Vertex]
   implicit val picklerGraph = implicitly[Pickler[Graph]]
   implicit val unpicklerGraph = implicitly[Unpickler[Graph]]
 

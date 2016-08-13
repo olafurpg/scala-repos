@@ -84,8 +84,8 @@ object Scope {
       case ThisBuild => BuildRef(current)
       case BuildRef(uri) => BuildRef(resolveBuild(current, uri))
     }
-  def resolveProjectBuild(
-      current: URI, ref: ProjectReference): ProjectReference =
+  def resolveProjectBuild(current: URI,
+                          ref: ProjectReference): ProjectReference =
     ref match {
       case LocalRootProject => RootProject(current)
       case LocalProject(id) => ProjectRef(current, id)
@@ -127,8 +127,9 @@ object Scope {
     displayMasked(scope, sep, showProject, ScopeMask())
   def displayMasked(scope: Scope, sep: String, mask: ScopeMask): String =
     displayMasked(scope, sep, showProject, mask)
-  def display(
-      scope: Scope, sep: String, showProject: Reference => String): String =
+  def display(scope: Scope,
+              sep: String,
+              showProject: Reference => String): String =
     displayMasked(scope, sep, showProject, ScopeMask())
   def displayMasked(scope: Scope,
                     sep: String,
@@ -148,8 +149,8 @@ object Scope {
 
   def equal(a: Scope, b: Scope, mask: ScopeMask): Boolean =
     (!mask.project || a.project == b.project) &&
-    (!mask.config || a.config == b.config) && (!mask.task || a.task == b.task) &&
-    (!mask.extra || a.extra == b.extra)
+      (!mask.config || a.config == b.config) && (!mask.task || a.task == b.task) &&
+      (!mask.extra || a.extra == b.extra)
 
   def projectPrefix(project: ScopeAxis[Reference],
                     show: Reference => String = showProject): String =
@@ -160,8 +161,15 @@ object Scope {
   def parseScopedKey(command: String): (Scope, String) = {
     val ScopedKeyRegex2 =
       """([{](.*?)[}])?((\w*)\/)?(([\w\*]+)\:)?(([\w\-]+)\:\:)?([\w\-]+)""".r
-    val ScopedKeyRegex2(
-    _, uriOrNull, _, projectIdOrNull, _, configOrNull, _, inTaskOrNull, key) =
+    val ScopedKeyRegex2(_,
+                        uriOrNull,
+                        _,
+                        projectIdOrNull,
+                        _,
+                        configOrNull,
+                        _,
+                        inTaskOrNull,
+                        key) =
       command
     val uriOpt = Option(uriOrNull) map { new URI(_) }
     val projectIdOpt = Option(projectIdOrNull)
@@ -206,12 +214,12 @@ object Scope {
       projectInherit: ProjectRef => Seq[ProjectRef],
       configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey],
       taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
-      extraInherit: (ResolvedReference,
-      AttributeMap) => Seq[AttributeMap]): Scope => Seq[Scope] = {
+      extraInherit: (ResolvedReference, AttributeMap) => Seq[AttributeMap])
+    : Scope => Seq[Scope] = {
     val index = delegates(refs, configurations, projectInherit, configInherit)
     scope =>
       indexedDelegates(resolve, index, rootProject, taskInherit, extraInherit)(
-          scope)
+        scope)
   }
 
   def indexedDelegates(resolve: Reference => ResolvedReference,
@@ -219,7 +227,7 @@ object Scope {
                        rootProject: URI => String,
                        taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
                        extraInherit: (ResolvedReference,
-                       AttributeMap) => Seq[AttributeMap])(
+                                      AttributeMap) => Seq[AttributeMap])(
       rawScope: Scope): Seq[Scope] = {
     val scope = Scope.replaceThis(GlobalScope)(rawScope)
 
@@ -266,25 +274,26 @@ object Scope {
       case Select(ref) => Select(BuildRef(ref.build)) :: Nil; case _ => Nil
     }
 
-  def delegates[Proj](refs: Seq[(ProjectRef, Proj)],
-                      configurations: Proj => Seq[ConfigKey],
-                      projectInherit: ProjectRef => Seq[ProjectRef],
-                      configInherit: (ResolvedReference,
+  def delegates[Proj](
+      refs: Seq[(ProjectRef, Proj)],
+      configurations: Proj => Seq[ConfigKey],
+      projectInherit: ProjectRef => Seq[ProjectRef],
+      configInherit: (ResolvedReference,
                       ConfigKey) => Seq[ConfigKey]): DelegateIndex = {
     val pDelegates = refs map {
       case (ref, project) =>
         (ref,
-         delegateIndex(ref, configurations(project))(
-             projectInherit, configInherit))
+         delegateIndex(ref, configurations(project))(projectInherit,
+                                                     configInherit))
     } toMap;
     new DelegateIndex0(pDelegates)
   }
   private[this] def delegateIndex(ref: ProjectRef, confs: Seq[ConfigKey])(
       projectInherit: ProjectRef => Seq[ProjectRef],
       configInherit: (ResolvedReference,
-      ConfigKey) => Seq[ConfigKey]): ProjectDelegates = {
+                      ConfigKey) => Seq[ConfigKey]): ProjectDelegates = {
     val refDelegates = withRawBuilds(
-        linearize(Select(ref), false)(projectInherit))
+      linearize(Select(ref), false)(projectInherit))
     val configs =
       confs map { c =>
         axisDelegates(configInherit, ref, c)
@@ -312,5 +321,5 @@ object Scope {
     if (scope == GlobalScope) GlobalScope :: Nil
     else
       for (c <- withGlobalAxis(scope.config); t <- withGlobalAxis(scope.task);
-      e <- withGlobalAxis(scope.extra)) yield Scope(Global, c, t, e)
+           e <- withGlobalAxis(scope.extra)) yield Scope(Global, c, t, e)
 }

@@ -62,7 +62,8 @@ object CustomReceiver {
 }
 
 class CustomReceiver(host: String, port: Int)
-    extends Receiver[String](StorageLevel.MEMORY_AND_DISK_2) with Logging {
+    extends Receiver[String](StorageLevel.MEMORY_AND_DISK_2)
+    with Logging {
 
   def onStart() {
     // Start the thread that receives data over a connection
@@ -85,8 +86,7 @@ class CustomReceiver(host: String, port: Int)
       socket = new Socket(host, port)
       logInfo("Connected to " + host + ":" + port)
       val reader = new BufferedReader(
-          new InputStreamReader(
-              socket.getInputStream(), StandardCharsets.UTF_8))
+        new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))
       userInput = reader.readLine()
       while (!isStopped && userInput != null) {
         store(userInput)

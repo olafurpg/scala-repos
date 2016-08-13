@@ -12,8 +12,8 @@ class ScalaAnnotationSupport extends PsiAnnotationSupport {
   def createLiteralValue(value: String, context: PsiElement): PsiLiteral = {
     return ScalaPsiElementFactory
       .createExpressionFromText(
-          "\"" + StringUtil.escapeStringCharacters(value) + "\"",
-          context.getManager)
+        "\"" + StringUtil.escapeStringCharacters(value) + "\"",
+        context.getManager)
       .asInstanceOf[ScLiteral]
   }
 }

@@ -57,7 +57,7 @@ package object interpreter extends ReplConfig with ReplStrings {
 
   private val ourClassloader = getClass.getClassLoader
 
-  def staticTypeTag[T : ClassTag]: ru.TypeTag[T] =
+  def staticTypeTag[T: ClassTag]: ru.TypeTag[T] =
     ru.TypeTag[T](ru.runtimeMirror(ourClassloader), new TypeCreator {
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         m.staticClass(classTag[T].runtimeClass.getName)
@@ -98,7 +98,8 @@ package object interpreter extends ReplConfig with ReplStrings {
 
       filtered foreach {
         case (source, syms) =>
-          p("/* " + syms.size + " implicit members imported from " +
+          p(
+            "/* " + syms.size + " implicit members imported from " +
               source.fullName + " */")
 
           // This groups the members by where the symbol is defined
@@ -120,7 +121,7 @@ package object interpreter extends ReplConfig with ReplStrings {
                 val (big, small) = groups partition (_._2.size > 3)
                 val xss =
                   ((big sortBy (_._1.toString) map (_._2)) :+
-                      (small flatMap (_._2)))
+                    (small flatMap (_._2)))
 
                 xss map (xs => xs sortBy (_.name.toString))
               }

@@ -18,8 +18,12 @@ import org.scalatest._
 import akka.testkit._
 
 class UntypedProducerTest
-    extends WordSpec with Matchers with BeforeAndAfterAll
-    with BeforeAndAfterEach with SharedCamelSystem with GivenWhenThen {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with SharedCamelSystem
+    with GivenWhenThen {
   import UntypedProducerTest._
   val timeout = 1 second
   override protected def beforeAll = {

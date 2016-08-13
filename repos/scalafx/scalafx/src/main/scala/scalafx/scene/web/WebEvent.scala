@@ -51,8 +51,8 @@ object WebEvent {
     * This event occurs when a script calls the JavaScript alert function.
     */
   val Alert: EventType[jfxsw.WebEvent[_]] = jfxsw.WebEvent.ALERT
-  @deprecated(
-      "Use Alert; ALERT will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Alert; ALERT will be removed in a future release",
+              "8.0.60-R10")
   val ALERT = Alert
 
   /**
@@ -66,8 +66,8 @@ object WebEvent {
     * This event occurs when a script changes location of the JavaScript window object.
     */
   val Resized: EventType[jfxsw.WebEvent[_]] = jfxsw.WebEvent.RESIZED
-  @deprecated(
-      "Use Resized; RESIZED will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Resized; RESIZED will be removed in a future release",
+              "8.0.60-R10")
   val RESIZED = Resized
 
   /**
@@ -76,8 +76,8 @@ object WebEvent {
   val StatusChanged: EventType[jfxsw.WebEvent[_]] =
     jfxsw.WebEvent.STATUS_CHANGED
   @deprecated(
-      "Use StatusChanged; STATUS_CHANGED will be removed in a future release",
-      "8.0.60-R10")
+    "Use StatusChanged; STATUS_CHANGED will be removed in a future release",
+    "8.0.60-R10")
   val STATUS_CHANGED = StatusChanged
 
   /**
@@ -86,8 +86,8 @@ object WebEvent {
   val VisibilityChanged: EventType[jfxsw.WebEvent[_]] =
     jfxsw.WebEvent.VISIBILITY_CHANGED
   @deprecated(
-      "Use VisibilityChanged; VISIBILITY_CHANGED will be removed in a future release",
-      "8.0.60-R10")
+    "Use VisibilityChanged; VISIBILITY_CHANGED will be removed in a future release",
+    "8.0.60-R10")
   val VISIBILITY_CHANGED = VisibilityChanged
 }
 
@@ -98,7 +98,8 @@ object WebEvent {
   * @param delegate JavaFX WebEvent. Since it has no default constructor, there is not default value.
   */
 final class WebEvent[T](override val delegate: jfxsw.WebEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsw.WebEvent[T]] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsw.WebEvent[T]] {
 
   /**
     * Creates a new event object.

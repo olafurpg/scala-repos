@@ -25,8 +25,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class BetaTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with HasCdfTestBase {
   type Distr = Beta
 
   val expFam = Beta
@@ -34,11 +37,11 @@ class BetaTest
 
   def arbParameter = Arbitrary {
     for (mean <- arbitrary[Double].map { x =>
-      math.abs(x) % 100.0 + 1E-4
-    };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 100 + 1E-4
-    }) yield (mean, std)
+                  math.abs(x) % 100.0 + 1E-4
+                };
+         std <- arbitrary[Double].map { x =>
+                 math.abs(x) % 100 + 1E-4
+               }) yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -55,11 +58,11 @@ class BetaTest
 
   implicit def arbDistr = Arbitrary {
     for (a <- arbitrary[Double].map { x =>
-      math.abs(x) % 10000.0 + 1.1
-    };
-    b <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + 1.1
-    }) yield new Beta(a, b);
+               math.abs(x) % 10000.0 + 1.1
+             };
+         b <- arbitrary[Double].map { x =>
+               math.abs(x) % 8.0 + 1.1
+             }) yield new Beta(a, b);
   }
 
   test("#15 test 1: Small a and b") {

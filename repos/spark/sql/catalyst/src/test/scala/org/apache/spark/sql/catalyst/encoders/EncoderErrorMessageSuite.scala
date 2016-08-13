@@ -59,50 +59,60 @@ class EncoderErrorMessageSuite extends SparkFunSuite {
 
   test("nice error message for missing encoder") {
     val errorMsg1 = intercept[UnsupportedOperationException](
-        ExpressionEncoder[ComplexNonEncodable1]).getMessage
-    assert(errorMsg1.contains(
-            s"""root class: "${clsName[ComplexNonEncodable1]}""""))
-    assert(errorMsg1.contains(
-            s"""field (class: "${clsName[NonEncodable]}", name: "name1")"""))
+      ExpressionEncoder[ComplexNonEncodable1]).getMessage
+    assert(
+      errorMsg1.contains(
+        s"""root class: "${clsName[ComplexNonEncodable1]}""""))
+    assert(
+      errorMsg1.contains(
+        s"""field (class: "${clsName[NonEncodable]}", name: "name1")"""))
 
     val errorMsg2 = intercept[UnsupportedOperationException](
-        ExpressionEncoder[ComplexNonEncodable2]).getMessage
+      ExpressionEncoder[ComplexNonEncodable2]).getMessage
+    assert(
+      errorMsg2.contains(
+        s"""root class: "${clsName[ComplexNonEncodable2]}""""))
     assert(errorMsg2.contains(
-            s"""root class: "${clsName[ComplexNonEncodable2]}""""))
-    assert(errorMsg2.contains(s"""field (class: "${clsName[
-        ComplexNonEncodable1]}", name: "name2")"""))
-    assert(errorMsg1.contains(
-            s"""field (class: "${clsName[NonEncodable]}", name: "name1")"""))
+      s"""field (class: "${clsName[ComplexNonEncodable1]}", name: "name2")"""))
+    assert(
+      errorMsg1.contains(
+        s"""field (class: "${clsName[NonEncodable]}", name: "name1")"""))
 
     val errorMsg3 = intercept[UnsupportedOperationException](
-        ExpressionEncoder[ComplexNonEncodable3]).getMessage
-    assert(errorMsg3.contains(
-            s"""root class: "${clsName[ComplexNonEncodable3]}""""))
-    assert(errorMsg3.contains(
-            s"""field (class: "scala.Option", name: "name3")"""))
-    assert(errorMsg3.contains(
-            s"""option value class: "${clsName[NonEncodable]}""""))
+      ExpressionEncoder[ComplexNonEncodable3]).getMessage
+    assert(
+      errorMsg3.contains(
+        s"""root class: "${clsName[ComplexNonEncodable3]}""""))
+    assert(
+      errorMsg3.contains(s"""field (class: "scala.Option", name: "name3")"""))
+    assert(
+      errorMsg3.contains(
+        s"""option value class: "${clsName[NonEncodable]}""""))
 
     val errorMsg4 = intercept[UnsupportedOperationException](
-        ExpressionEncoder[ComplexNonEncodable4]).getMessage
-    assert(errorMsg4.contains(
-            s"""root class: "${clsName[ComplexNonEncodable4]}""""))
+      ExpressionEncoder[ComplexNonEncodable4]).getMessage
     assert(
-        errorMsg4.contains(s"""field (class: "scala.Array", name: "name4")"""))
-    assert(errorMsg4.contains(
-            s"""array element class: "${clsName[NonEncodable]}""""))
+      errorMsg4.contains(
+        s"""root class: "${clsName[ComplexNonEncodable4]}""""))
+    assert(
+      errorMsg4.contains(s"""field (class: "scala.Array", name: "name4")"""))
+    assert(
+      errorMsg4.contains(
+        s"""array element class: "${clsName[NonEncodable]}""""))
 
     val errorMsg5 = intercept[UnsupportedOperationException](
-        ExpressionEncoder[ComplexNonEncodable5]).getMessage
-    assert(errorMsg5.contains(
-            s"""root class: "${clsName[ComplexNonEncodable5]}""""))
-    assert(errorMsg5.contains(
-            s"""field (class: "scala.Option", name: "name5")"""))
+      ExpressionEncoder[ComplexNonEncodable5]).getMessage
+    assert(
+      errorMsg5.contains(
+        s"""root class: "${clsName[ComplexNonEncodable5]}""""))
+    assert(
+      errorMsg5.contains(s"""field (class: "scala.Option", name: "name5")"""))
     assert(errorMsg5.contains(s"""option value class: "scala.Array""""))
-    assert(errorMsg5.contains(
-            s"""array element class: "${clsName[NonEncodable]}""""))
+    assert(
+      errorMsg5.contains(
+        s"""array element class: "${clsName[NonEncodable]}""""))
   }
 
-  private def clsName[T : ClassTag]: String =
+  private def clsName[T: ClassTag]: String =
     implicitly[ClassTag[T]].runtimeClass.getName
 }

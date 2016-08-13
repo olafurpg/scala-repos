@@ -3,9 +3,10 @@ package java.util
 import scala.scalajs.js
 
 class ArrayDeque[E] private (private var inner: js.Array[E])
-    extends AbstractCollection[E] with Deque[E] with Cloneable
-    with Serializable {
-  self =>
+    extends AbstractCollection[E]
+    with Deque[E]
+    with Cloneable
+    with Serializable { self =>
 
   private var status = 0
 

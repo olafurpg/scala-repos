@@ -21,7 +21,10 @@ import javax.servlet.http.HttpServletRequest
 
 import scala.xml.Node
 
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, RequestMasterState}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse,
+  RequestMasterState
+}
 import org.apache.spark.deploy.ExecutorState
 import org.apache.spark.deploy.master.ExecutorDesc
 import org.apache.spark.ui.{UIUtils, WebUIPage}
@@ -47,8 +50,8 @@ private[ui] class ApplicationPage(parent: MasterWebUI)
       return UIUtils.basicSparkPage(msg, "Not Found")
     }
 
-    val executorHeaders = Seq(
-        "ExecutorID", "Worker", "Cores", "Memory", "State", "Logs")
+    val executorHeaders =
+      Seq("ExecutorID", "Worker", "Cores", "Memory", "State", "Logs")
     val allExecutors =
       (app.executors.values ++ app.removedExecutors).toSet.toSeq
     // This includes executors that are either still running or have exited cleanly

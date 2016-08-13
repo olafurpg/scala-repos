@@ -4,7 +4,12 @@
 package akka.stream.actor
 
 import akka.actor.{ActorRef, PoisonPill, Props}
-import akka.stream.{ClosedShape, ActorMaterializer, ActorMaterializerSettings, ActorAttributes}
+import akka.stream.{
+  ClosedShape,
+  ActorMaterializer,
+  ActorMaterializerSettings,
+  ActorAttributes
+}
 import akka.stream.scaladsl._
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._
@@ -22,8 +27,8 @@ object ActorPublisherSpec {
       my-dispatcher2 = $${akka.test.stream-dispatcher}
     """
 
-  def testPublisherProps(
-      probe: ActorRef, useTestDispatcher: Boolean = true): Props = {
+  def testPublisherProps(probe: ActorRef,
+                         useTestDispatcher: Boolean = true): Props = {
     val p = Props(new TestPublisher(probe))
     if (useTestDispatcher) p.withDispatcher("akka.test.stream-dispatcher")
     else p
@@ -129,7 +134,8 @@ object ActorPublisherSpec {
 }
 
 class ActorPublisherSpec
-    extends AkkaSpec(ActorPublisherSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorPublisherSpec.config)
+    with ImplicitSender {
 
   import akka.stream.actor.ActorPublisherSpec._
 
@@ -303,7 +309,7 @@ class ActorPublisherSpec
       val s2 = TestSubscriber.manualProbe[String]()
       ActorPublisher[String](ref).subscribe(s2)
       s2.expectSubscriptionAndError().getClass should be(
-          classOf[IllegalStateException])
+        classOf[IllegalStateException])
     }
 
     "signal onCompete when actor is stopped" in {
@@ -327,10 +333,9 @@ class ActorPublisherSpec
 
         val (snd, rcv) = source.collect {
           case n if n % 2 == 0 ⇒ "elem-" + n
-        }.toMat(sink)(Keep.both)
-          .run()
+        }.toMat(sink)(Keep.both).run()
 
-          (1 to 3) foreach { snd ! _ }
+        (1 to 3) foreach { snd ! _ }
         probe.expectMsg("elem-2")
 
         (4 to 500) foreach { n ⇒
@@ -357,7 +362,7 @@ class ActorPublisherSpec
       val source1 = Source.fromPublisher(ActorPublisher[Int](senderRef1))
 
       val sink1 = Sink.fromSubscriber(
-          ActorSubscriber[String](system.actorOf(receiverProps(probe1.ref))))
+        ActorSubscriber[String](system.actorOf(receiverProps(probe1.ref))))
       val sink2: Sink[String, ActorRef] =
         Sink.actorSubscriber(receiverProps(probe2.ref))
 
@@ -380,7 +385,7 @@ class ActorPublisherSpec
         })
         .run()
 
-        (0 to 10).foreach {
+      (0 to 10).foreach {
         senderRef1 ! _
         senderRef2 ! _
       }
@@ -432,11 +437,11 @@ class ActorPublisherSpec
 
     "use dispatcher from materializer settings" in {
       implicit val materializer = ActorMaterializer(
-          ActorMaterializerSettings(system).withDispatcher("my-dispatcher1"))
+        ActorMaterializerSettings(system).withDispatcher("my-dispatcher1"))
       val s = TestSubscriber.manualProbe[String]()
       val ref = Source
         .actorPublisher(
-            testPublisherProps(testActor, useTestDispatcher = false))
+          testPublisherProps(testActor, useTestDispatcher = false))
         .to(Sink.fromSubscriber(s))
         .run()
       ref ! ThreadName
@@ -448,7 +453,7 @@ class ActorPublisherSpec
       val s = TestSubscriber.manualProbe[String]()
       val ref = Source
         .actorPublisher(
-            testPublisherProps(testActor, useTestDispatcher = false))
+          testPublisherProps(testActor, useTestDispatcher = false))
         .withAttributes(ActorAttributes.dispatcher("my-dispatcher1"))
         .to(Sink.fromSubscriber(s))
         .run()
@@ -460,9 +465,9 @@ class ActorPublisherSpec
       implicit val materializer = ActorMaterializer()
       val s = TestSubscriber.manualProbe[String]()
       val ref = Source
-        .actorPublisher(testPublisherProps(
-                testActor,
-                useTestDispatcher = false).withDispatcher("my-dispatcher1"))
+        .actorPublisher(
+          testPublisherProps(testActor, useTestDispatcher = false)
+            .withDispatcher("my-dispatcher1"))
         .withAttributes(ActorAttributes.dispatcher("my-dispatcher2"))
         .to(Sink.fromSubscriber(s))
         .run()

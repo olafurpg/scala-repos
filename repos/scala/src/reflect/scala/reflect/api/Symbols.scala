@@ -128,8 +128,7 @@ trait Symbols { self: Universe =>
     *  @groupname Module        Module Symbol Members
     *  @groupprio Module        -2
     */
-  trait SymbolApi {
-    this: Symbol =>
+  trait SymbolApi { this: Symbol =>
 
     /** The owner of this symbol. This is the symbol
       *  that directly contains the current symbol's definition.
@@ -225,7 +224,7 @@ trait Symbols { self: Universe =>
     def asMethod: MethodSymbol = {
       def overloadedMsg =
         "encapsulates multiple overloaded alternatives and cannot be treated as a method. " +
-        "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
+          "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
       def vanillaMsg = "is not a method"
       val msg = if (isOverloadedMethod) overloadedMsg else vanillaMsg
       throw new ScalaReflectionException(s"$this $msg")
@@ -307,8 +306,8 @@ trait Symbols { self: Universe =>
       *  @group Basics
       */
     @deprecated(
-        "Use `companion` instead, but beware of possible changes in behavior",
-        "2.11.0")
+      "Use `companion` instead, but beware of possible changes in behavior",
+      "2.11.0")
     def companionSymbol: Symbol
 
     /** For a class: its companion object if exists.
@@ -558,8 +557,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait TermSymbolApi extends SymbolApi {
-    this: TermSymbol =>
+  trait TermSymbolApi extends SymbolApi { this: TermSymbol =>
 
     /** Term symbols have their names of type `TermName`.
       */
@@ -675,8 +673,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait TypeSymbolApi extends SymbolApi {
-    this: TypeSymbol =>
+  trait TypeSymbolApi extends SymbolApi { this: TypeSymbol =>
 
     /** Type symbols have their names of type `TypeName`.
       */
@@ -762,8 +759,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait MethodSymbolApi extends TermSymbolApi {
-    this: MethodSymbol =>
+  trait MethodSymbolApi extends TermSymbolApi { this: MethodSymbol =>
     final override def isMethod = true
     final override def asMethod = this
 
@@ -822,8 +818,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait ModuleSymbolApi extends TermSymbolApi {
-    this: ModuleSymbol =>
+  trait ModuleSymbolApi extends TermSymbolApi { this: ModuleSymbol =>
 
     /** The class implicitly associated with the object definition.
       *  One can go back from a module class to the associated module symbol
@@ -844,8 +839,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait ClassSymbolApi extends TypeSymbolApi {
-    this: ClassSymbol =>
+  trait ClassSymbolApi extends TypeSymbolApi { this: ClassSymbol =>
     final override def isClass = true
     final override def asClass = this
 

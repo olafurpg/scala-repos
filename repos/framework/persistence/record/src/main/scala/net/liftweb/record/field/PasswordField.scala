@@ -76,9 +76,9 @@ trait PasswordTypedField extends TypedField[String] {
       case Full(hash: String) if (hash.startsWith("$2a$")) =>
         setBox(Full(hash))
       case _ => {
-          invalidPw = true; invalidMsg = S.?("passwords.do.not.match");
-          Failure(invalidMsg)
-        }
+        invalidPw = true; invalidMsg = S.?("passwords.do.not.match");
+        Failure(invalidMsg)
+      }
     }
   }
 
@@ -103,7 +103,7 @@ trait PasswordTypedField extends TypedField[String] {
       name={funcName}
       value={valueBox openOr ""}
       tabindex={tabIndex.toString}/>
-  
+
   }
 
   def toForm: Box[NodeSeq] =
@@ -115,12 +115,13 @@ trait PasswordTypedField extends TypedField[String] {
   protected def validatePassword(pwdValue: Box[String]): Boolean = {
     pwdValue match {
       case Empty | Full("" | null) if !optional_? => {
-          invalidPw = true; invalidMsg = notOptionalErrorMessage
-        }
+        invalidPw = true; invalidMsg = notOptionalErrorMessage
+      }
       case Full(s)
           if s == "" || s == PasswordField.blankPw ||
-          s.length < PasswordField.minPasswordLength =>
-        { invalidPw = true; invalidMsg = S.?("password.too.short") }
+            s.length < PasswordField.minPasswordLength => {
+        invalidPw = true; invalidMsg = S.?("password.too.short")
+      }
       case _ => { invalidPw = false; invalidMsg = "" }
     }
     invalidPw
@@ -141,7 +142,8 @@ trait PasswordTypedField extends TypedField[String] {
 }
 
 class PasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with MandatoryTypedField[String]
+    extends Field[String, OwnerType]
+    with MandatoryTypedField[String]
     with PasswordTypedField {
 
   def this(rec: OwnerType, value: String) = {
@@ -161,7 +163,8 @@ class PasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalPasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with OptionalTypedField[String]
+    extends Field[String, OwnerType]
+    with OptionalTypedField[String]
     with PasswordTypedField {
 
   def this(rec: OwnerType, value: Box[String]) = {

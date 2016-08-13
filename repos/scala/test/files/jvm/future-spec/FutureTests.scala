@@ -13,8 +13,8 @@ class FutureTests extends MinimalScalaTest {
     s match {
       case "Hello" => Future { "World" }
       case "Failure" =>
-        Future.failed(new RuntimeException(
-                "Expected exception; to test fault-tolerance"))
+        Future.failed(
+          new RuntimeException("Expected exception; to test fault-tolerance"))
       case "NoReply" => Promise[String]().future
     }
 
@@ -41,8 +41,8 @@ class FutureTests extends MinimalScalaTest {
       with mutable.SynchronizedSet[Throwable]
       implicit val ec = scala.concurrent.ExecutionContext
         .fromExecutor(new java.util.concurrent.ForkJoinPool(), { t =>
-        ms += t
-      })
+          ms += t
+        })
 
       class ThrowableTest(m: String) extends Throwable(m)
 
@@ -110,8 +110,12 @@ class FutureTests extends MinimalScalaTest {
       p.toString mustBe expectNotCompleteString
       Promise[Int]().success(s).toString mustBe expectSuccessString
       Promise[Int]().failure(f).toString mustBe expectFailureString
-      Await.ready(Future { throw f }, 2000 millis).toString mustBe expectFailureString
-      Await.ready(Future { s }, 2000 millis).toString mustBe expectSuccessString
+      Await
+        .ready(Future { throw f }, 2000 millis)
+        .toString mustBe expectFailureString
+      Await
+        .ready(Future { s }, 2000 millis)
+        .toString mustBe expectSuccessString
 
       Future.never.toString mustBe "Future(<never>)"
       Future.unit.toString mustBe "Future(Success(()))"
@@ -122,20 +126,20 @@ class FutureTests extends MinimalScalaTest {
       val f = Future.successful(s)
 
       ECNotUsed(ec =>
-            f.onFailure({
+        f.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.recover({
+        f.recover({
           case _ => fail("recover should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.recoverWith({
+        f.recoverWith({
           case _ => fail("flatMap should not have been called")
         })(ec)) eq f)
       assert(
-          f.fallbackTo(f) eq f,
-          "Future.fallbackTo must be the same instance as Future.fallbackTo")
+        f.fallbackTo(f) eq f,
+        "Future.fallbackTo must be the same instance as Future.fallbackTo")
     }
 
     "have proper const representation for failure" in {
@@ -151,25 +155,24 @@ class FutureTests extends MinimalScalaTest {
       assert(f.failed eq f,
              "Future.failed must be the same instance as Future.failed")
 
+      ECNotUsed(
+        ec => f.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            f.foreach(_ => fail("foreach should not have been called"))(ec))
-      ECNotUsed(ec =>
-            f.onSuccess({
+        f.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.map(_ => fail("map should not have been called"))(ec)) eq f)
+        f.map(_ => fail("map should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.flatMap(_ => fail("flatMap should not have been called"))(
-                    ec)) eq f)
+        f.flatMap(_ => fail("flatMap should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
+        f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.collect({
+        f.collect({
           case _ => fail("collect should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.zipWith(f)({ (_, _) =>
+        f.zipWith(f)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec)) eq f)
     }
@@ -225,47 +228,48 @@ class FutureTests extends MinimalScalaTest {
       assert(test.mapTo[String] eq test)
 
       ECNotUsed(ec =>
-            test.foreach(_ => fail("foreach should not have been called"))(ec))
+        test.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            test.onSuccess({
+        test.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onFailure({
+        test.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onComplete({
+        test.onComplete({
           case _ => fail("onComplete should not have been called")
         })(ec))
       ECNotUsed(ec => test.transform(identity, identity)(ec) eq test)
       ECNotUsed(ec => test.transform(identity)(ec) eq test)
       ECNotUsed(ec =>
-            test.transformWith(_ =>
-                  fail("transformWith should not have been called"))(ec) eq test)
+        test.transformWith(_ =>
+          fail("transformWith should not have been called"))(ec) eq test)
       ECNotUsed(ec => test.map(identity)(ec) eq test)
       ECNotUsed(ec =>
-            test.flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
+        test.flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.filter(_ => fail("filter should not have been called"))(ec) eq test)
+        test
+          .filter(_ => fail("filter should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.collect({
+        test.collect({
           case _ => fail("collect should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recover({
+        test.recover({
           case _ => fail("recover should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recoverWith({
+        test.recoverWith({
           case _ => fail("recoverWith should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.andThen({
+        test.andThen({
           case _ => fail("andThen should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.zipWith(test)({ (_, _) =>
+        test.zipWith(test)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec) eq test)
     }
@@ -589,14 +593,15 @@ class FutureTests extends MinimalScalaTest {
 
       Await.result(Future.firstCompletedOf(futures), defaultTimeout) mustBe (5)
       Await.result(Future.firstCompletedOf(futures.iterator), defaultTimeout) mustBe
-      (5)
+        (5)
     }
 
     "find" in {
-      val futures = for (i <- 1 to 10) yield
-        Future {
-          i
-        }
+      val futures = for (i <- 1 to 10)
+        yield
+          Future {
+            i
+          }
 
       val result = Future.find[Int](futures)(_ == 3)
       Await.result(result, defaultTimeout) mustBe (Some(3))
@@ -704,7 +709,7 @@ class FutureTests extends MinimalScalaTest {
         Thread.sleep(wait)
         if (add == 6)
           throw new IllegalArgumentException(
-              "shouldFoldResultsWithException: expected")
+            "shouldFoldResultsWithException: expected")
         add
       }
       def futures = (0 to 9) map { idx =>
@@ -758,7 +763,7 @@ class FutureTests extends MinimalScalaTest {
         Thread.sleep(wait)
         if (add == 6)
           throw new IllegalArgumentException(
-              "shouldFoldResultsWithException: expected")
+            "shouldFoldResultsWithException: expected")
         else add
       }
       val timeout = 10000 millis
@@ -927,11 +932,16 @@ class FutureTests extends MinimalScalaTest {
     }
 
     "should not throw when Await.ready" in {
-      val expected = try Success(5 / 0) catch {
+      val expected = try Success(5 / 0)
+      catch {
         case a: ArithmeticException => Failure(a)
       }
       val f = Future(5).map(_ / 0)
-      Await.ready(f, defaultTimeout).value.get.toString mustBe expected.toString
+      Await
+        .ready(f, defaultTimeout)
+        .value
+        .get
+        .toString mustBe expected.toString
     }
   }
 }

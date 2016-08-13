@@ -18,8 +18,8 @@ case class MTable(name: MQName,
   def getExportedKeys = MForeignKey.getExportedKeys(name)
   def getVersionColumns = MVersionColumn.getVersionColumns(name)
   def getTablePrivileges = MTablePrivilege.getTablePrivileges(name)
-  def getBestRowIdentifier(
-      scope: MBestRowIdentifierColumn.Scope, nullable: Boolean = false) =
+  def getBestRowIdentifier(scope: MBestRowIdentifierColumn.Scope,
+                           nullable: Boolean = false) =
     MBestRowIdentifierColumn.getBestRowIdentifier(name, scope, nullable)
 
   /** @param unique when true, return only indices for unique values; when false, return indices regardless of whether unique or not */
@@ -33,10 +33,10 @@ object MTable {
                 namePattern: Option[String],
                 types: Option[Seq[String]]) =
     ResultSetAction[MTable](
-        _.metaData.getTables(cat.orNull,
-                             schemaPattern.orNull,
-                             namePattern.orNull,
-                             types.map(_.toArray).orNull)) { r =>
+      _.metaData.getTables(cat.orNull,
+                           schemaPattern.orNull,
+                           namePattern.orNull,
+                           types.map(_.toArray).orNull)) { r =>
       if (r.numColumns > 5)
         MTable(MQName.from(r), r.<<, r.<<, MQName.optionalFrom(r), r.<<, r.<<)
       else MTable(MQName.from(r), r.<<, r.<<, None, None, None)

@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class PopupSpec
-    extends SimpleSFXDelegateSpec[jfxs.Popup, Popup](
-        classOf[jfxs.Popup], classOf[Popup]) with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxs.Popup, Popup](classOf[jfxs.Popup],
+                                                     classOf[Popup])
+    with RunOnApplicationThread

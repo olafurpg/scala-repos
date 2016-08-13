@@ -41,7 +41,9 @@ import org.apache.spark.streaming.scheduler.ReceivedBlockInfo
 import org.apache.spark.util.Utils
 
 abstract class KinesisStreamTests(aggregateTestData: Boolean)
-    extends KinesisFunSuite with Eventually with BeforeAndAfter
+    extends KinesisFunSuite
+    with Eventually
+    with BeforeAndAfter
     with BeforeAndAfterAll {
 
   // This is the name that KCL will use to save metadata to DynamoDB
@@ -142,7 +144,7 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
 
     // Generate block info data for testing
     val seqNumRanges1 = SequenceNumberRanges(
-        SequenceNumberRange("fakeStream", "fakeShardId", "xxx", "yyy"))
+      SequenceNumberRange("fakeStream", "fakeShardId", "xxx", "yyy"))
     val blockId1 = StreamBlockId(kinesisStream.id, 123)
     val blockInfo1 =
       ReceivedBlockInfo(0,
@@ -151,7 +153,7 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
                         new BlockManagerBasedStoreResult(blockId1, None))
 
     val seqNumRanges2 = SequenceNumberRanges(
-        SequenceNumberRange("fakeStream", "fakeShardId", "aaa", "bbb"))
+      SequenceNumberRange("fakeStream", "fakeShardId", "aaa", "bbb"))
     val blockId2 = StreamBlockId(kinesisStream.id, 345)
     val blockInfo2 =
       ReceivedBlockInfo(0,
@@ -167,8 +169,9 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
     assert(kinesisRDD.regionName === dummyRegionName)
     assert(kinesisRDD.endpointUrl === dummyEndpointUrl)
     assert(kinesisRDD.retryTimeoutMs === batchDuration.milliseconds)
-    assert(kinesisRDD.awsCredentialsOption === Some(
-            SerializableAWSCredentials(dummyAWSAccessKey, dummyAWSSecretKey)))
+    assert(
+      kinesisRDD.awsCredentialsOption === Some(
+        SerializableAWSCredentials(dummyAWSAccessKey, dummyAWSSecretKey)))
     assert(nonEmptyRDD.partitions.size === blockInfos.size)
     nonEmptyRDD.partitions.foreach {
       _ shouldBe a[KinesisBackedBlockRDDPartition]
@@ -176,8 +179,9 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
     val partitions = nonEmptyRDD.partitions.map {
       _.asInstanceOf[KinesisBackedBlockRDDPartition]
     }.toSeq
-    assert(partitions.map { _.seqNumberRanges } === Seq(seqNumRanges1,
-                                                        seqNumRanges2))
+    assert(
+      partitions.map { _.seqNumberRanges } === Seq(seqNumRanges1,
+                                                   seqNumRanges2))
     assert(partitions.map { _.blockId } === Seq(blockId1, blockId2))
     assert(partitions.forall { _.isBlockIdValid === true })
 
@@ -192,9 +196,10 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
     blockInfos.foreach { _.setBlockIdInvalid() }
     kinesisStream.createBlockRDD(time, blockInfos).partitions.foreach {
       partition =>
-        assert(partition
-              .asInstanceOf[KinesisBackedBlockRDDPartition]
-              .isBlockIdValid === false)
+        assert(
+          partition
+            .asInstanceOf[KinesisBackedBlockRDDPartition]
+            .isBlockIdValid === false)
     }
   }
 
@@ -301,15 +306,14 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
                                 awsCredentials.getAWSSecretKey)
 
     // Verify that the generated RDDs are KinesisBackedBlockRDDs, and collect the data in each batch
-    kinesisStream.foreachRDD((rdd: RDD[Array[Byte]], time: Time) =>
-          {
-        val kRdd = rdd.asInstanceOf[KinesisBackedBlockRDD[Array[Byte]]]
-        val data = rdd.map { bytes =>
-          new String(bytes).toInt
-        }.collect().toSeq
-        collectedData.synchronized {
-          collectedData(time) = (kRdd.arrayOfseqNumberRanges, data)
-        }
+    kinesisStream.foreachRDD((rdd: RDD[Array[Byte]], time: Time) => {
+      val kRdd = rdd.asInstanceOf[KinesisBackedBlockRDD[Array[Byte]]]
+      val data = rdd.map { bytes =>
+        new String(bytes).toInt
+      }.collect().toSeq
+      collectedData.synchronized {
+        collectedData(time) = (kRdd.arrayOfseqNumberRanges, data)
+      }
     })
 
     ssc.remember(Minutes(60)) // remember all the batches so that they are all saved in checkpoint

@@ -66,33 +66,32 @@ object TypeClassesDemo {
     //implicitly[Show[ADT2]]
 
     val adt: ADT = IndirectADTRec(
-        "top",
-        List(
-            Ctor("child"),
-            ExtCtor(true),
-            ADTRec(ExtCtor(false)),
-            CtorRec(Ctor("otherchild")),
-            IndirectADTRec(
-                "treeChild",
-                List(
-                    Ctor("grandchild"),
-                    Ctor("otherGrandchild"),
-                    ExtIndirectADTRec("blah", Option(Ctor("wibble"))),
-                    RefMutual(Some(RefADT(Ctor("mutual")))),
-                    Show2Dep(23)
-                ))
-        ))
+      "top",
+      List(
+        Ctor("child"),
+        ExtCtor(true),
+        ADTRec(ExtCtor(false)),
+        CtorRec(Ctor("otherchild")),
+        IndirectADTRec("treeChild",
+                       List(
+                         Ctor("grandchild"),
+                         Ctor("otherGrandchild"),
+                         ExtIndirectADTRec("blah", Option(Ctor("wibble"))),
+                         RefMutual(Some(RefADT(Ctor("mutual")))),
+                         Show2Dep(23)
+                       ))
+      ))
 
     val out = adt.show
     val exp =
       "IndirectADTRec(s = top, " + "as = List(" + "Ctor(s = child), " +
-      "ExtCtor(ExtCtor!(true)), " + "ADTRec(a = ExtCtor(ExtCtor!(false))), " +
-      //"CtorRec(c = Ctor(s = otherchild)), "+
-      "CtorRec(c = s = otherchild), " + "IndirectADTRec(s = treeChild, " +
-      "as = List(" + "Ctor(s = grandchild), " + "Ctor(s = otherGrandchild), " +
-      "ExtIndirectADTRec(s = blah, oa = Ctor(s = wibble)), " +
-      "RefMutual(m = RefADT(a = Ctor(s = mutual))), " +
-      "Show2Dep(Show2Dep: >23<)" + ")" + ")" + ")" + ")"
+        "ExtCtor(ExtCtor!(true)), " + "ADTRec(a = ExtCtor(ExtCtor!(false))), " +
+        //"CtorRec(c = Ctor(s = otherchild)), "+
+        "CtorRec(c = s = otherchild), " + "IndirectADTRec(s = treeChild, " +
+        "as = List(" + "Ctor(s = grandchild), " + "Ctor(s = otherGrandchild), " +
+        "ExtIndirectADTRec(s = blah, oa = Ctor(s = wibble)), " +
+        "RefMutual(m = RefADT(a = Ctor(s = mutual))), " +
+        "Show2Dep(Show2Dep: >23<)" + ")" + ")" + ")" + ")"
     assert(out == exp)
 
     val adt2: ADT2 = Ctor2a("foo")
@@ -175,8 +174,8 @@ object TypeClassesDemoAux {
           }
       }
 
-    implicit def deriveInstance[F, G](
-        implicit gen: LabelledGeneric.Aux[F, G], sg: Lazy[Show[G]]): Show[F] =
+    implicit def deriveInstance[F, G](implicit gen: LabelledGeneric.Aux[F, G],
+                                      sg: Lazy[Show[G]]): Show[F] =
       new Show[F] {
         def show(f: F) = sg.value.show(gen.to(f))
       }
@@ -197,7 +196,8 @@ object TypeClassesDemoAux {
       }
 
     implicit def deriveHCons[H, T <: HList](
-        implicit sv: Lazy[Show2[H]], st: Lazy[Show2[T]]): Show2[H :: T] =
+        implicit sv: Lazy[Show2[H]],
+        st: Lazy[Show2[T]]): Show2[H :: T] =
       new Show2[H :: T] {
         def show2(p: H :: T): String = {
           val head = sv.value.show2(p.head)
@@ -206,8 +206,8 @@ object TypeClassesDemoAux {
         }
       }
 
-    implicit def deriveInstance[F, G](
-        implicit gen: Generic.Aux[F, G], sg: Lazy[Show2[G]]): Show2[F] =
+    implicit def deriveInstance[F, G](implicit gen: Generic.Aux[F, G],
+                                      sg: Lazy[Show2[G]]): Show2[F] =
       new Show2[F] {
         def show2(f: F) = sg.value.show2(gen.to(f))
       }

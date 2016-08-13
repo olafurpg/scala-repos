@@ -41,9 +41,9 @@ final class SetClientServerIntegrationSuite
              addMemErrMessage)
       Await.result(client(SMembers(key))) match {
         case MBulkReply(message) => {
-            val messageSet = ReplyFormat.toString(message).toSet
-            assert(messageSet == CollectionSet("foo", "bar"))
-          }
+          val messageSet = ReplyFormat.toString(message).toSet
+          assert(messageSet == CollectionSet("foo", "bar"))
+        }
         case EmptyMBulkReply() =>
           fail("Should not have received an EmptyMBulkReply")
         case _ => fail("Received incorrect reply type")
@@ -78,9 +78,9 @@ final class SetClientServerIntegrationSuite
   }
 
   test(
-      "SCARD should return the cardinality of the set, or 0 if key does not exist",
-      RedisTest,
-      ClientServerTest) {
+    "SCARD should return the cardinality of the set, or 0 if key does not exist",
+    RedisTest,
+    ClientServerTest) {
     withRedisClient { client =>
       assert(Await.result(client(SCard(key))) == IntegerReply(0),
              "Found member where none was " + "expected")
@@ -98,9 +98,9 @@ final class SetClientServerIntegrationSuite
   }
 
   test(
-      "SREM should return the number of members that were removed from the set",
-      ClientServerTest,
-      RedisTest) {
+    "SREM should return the number of members that were removed from the set",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(SAdd(key, List(baz)))) == IntegerReply(1),
              addMemErrMessage)

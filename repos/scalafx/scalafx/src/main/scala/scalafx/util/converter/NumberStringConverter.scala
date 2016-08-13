@@ -41,7 +41,7 @@ object NumberStringConverter {
 class NumberStringConverter(
     delegate: jfxuc.NumberStringConverter = new jfxuc.NumberStringConverter)
     extends NumberStringConverterDelegate[jfxuc.NumberStringConverter](
-        delegate) {
+      delegate) {
 
   def this(locale: Locale) = this(new jfxuc.NumberStringConverter(locale))
 

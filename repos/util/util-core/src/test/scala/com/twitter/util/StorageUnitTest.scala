@@ -9,7 +9,7 @@ import com.twitter.conversions.storage._
 @RunWith(classOf[JUnitRunner])
 class StorageUnitTest extends FunSuite {
   test(
-      "StorageUnit: should convert whole numbers into storage units (back and forth)") {
+    "StorageUnit: should convert whole numbers into storage units (back and forth)") {
     assert(1.byte.inBytes == 1)
     assert(1.kilobyte.inBytes == 1024)
     assert(1.megabyte.inMegabytes == 1.0)

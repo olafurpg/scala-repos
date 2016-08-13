@@ -6,8 +6,7 @@ class MyApp[S] {
   def foo(p: Int) = ""
 
   /*start*/
-  foo(
-      new Pure[({ type λ[α] = State[S, α] })#λ] {
+  foo(new Pure[({ type λ[α] = State[S, α] })#λ] {
     def pure[A](a: => A) = a.state[S]
   }) /*end*/
 }

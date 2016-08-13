@@ -29,9 +29,9 @@ final class BlogApi(prismicUrl: String, collection: String) {
       implicit linkResolver: (Api, Option[String]) => DocumentLinkResolver) =
     prismicApi map { api =>
       BlogApi.Context(
-          api,
-          ref.map(_.trim).filterNot(_.isEmpty).getOrElse(api.master.ref),
-          linkResolver(api, ref))
+        api,
+        ref.map(_.trim).filterNot(_.isEmpty).getOrElse(api.master.ref),
+        linkResolver(api, ref))
     }
 
   private val cache = BuiltInCache(200)
@@ -43,8 +43,8 @@ final class BlogApi(prismicUrl: String, collection: String) {
   }
 
   private val fetchPrismicApi = AsyncCache.single[Api](
-      f = Api.get(prismicUrl, cache = cache, logger = prismicLogger),
-      timeToLive = 10 seconds)
+    f = Api.get(prismicUrl, cache = cache, logger = prismicLogger),
+    timeToLive = 10 seconds)
 
   def prismicApi = fetchPrismicApi(true)
 }

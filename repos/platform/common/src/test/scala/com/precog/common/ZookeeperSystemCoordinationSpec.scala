@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -173,7 +173,8 @@ class ZookeeperSystemCoordinationSpec extends Specification {
         val checkpoints = sc.loadYggCheckpoint("bifrost")
 
         checkpoints must beLike {
-          case Some(Failure(
+          case Some(
+              Failure(
               blueeyes.json.serialization.Extractor.Invalid(_, None))) =>
             ok
         }
@@ -210,8 +211,10 @@ class ZookeeperSystemCoordinationSpec extends Specification {
   }
 
   def newSystemCoordination(client: ZkClient) =
-    new ZookeeperSystemCoordination(
-        client, ServiceUID("test", "hostId", ""), true, None)
+    new ZookeeperSystemCoordination(client,
+                                    ServiceUID("test", "hostId", ""),
+                                    true,
+                                    None)
 
   type ClientFactory = () => ZkClient
 
@@ -219,11 +222,10 @@ class ZookeeperSystemCoordinationSpec extends Specification {
       extends AroundOutside[ClientFactory] {
 
     private val clients = ListBuffer[ZkClient]()
-    private val factory = () =>
-      {
-        val client = new ZkClient(zkHosts, 1000)
-        clients += client
-        client
+    private val factory = () => {
+      val client = new ZkClient(zkHosts, 1000)
+      clients += client
+      client
     }
 
     private def zookeeperAvailable(): Boolean = {

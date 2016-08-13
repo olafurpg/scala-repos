@@ -69,7 +69,8 @@ object MouseEvent {
 }
 
 class MouseEvent(override val delegate: jfxsi.MouseEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.MouseEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.MouseEvent] {
 
   /**
     * Which, if any, of the mouse buttons is responsible for this event.

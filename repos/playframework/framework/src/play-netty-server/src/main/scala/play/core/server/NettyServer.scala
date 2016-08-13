@@ -42,11 +42,11 @@ case object Native extends NettyTransport
 /**
   * creates a Server implementation based Netty
   */
-class NettyServer(config: ServerConfig,
-                  val applicationProvider: ApplicationProvider,
-                  stopHook: () => Future[_],
-                  val actorSystem: ActorSystem)(
-    implicit val materializer: Materializer)
+class NettyServer(
+    config: ServerConfig,
+    val applicationProvider: ApplicationProvider,
+    stopHook: () => Future[_],
+    val actorSystem: ActorSystem)(implicit val materializer: Materializer)
     extends Server {
 
   private val nettyConfig =
@@ -61,7 +61,7 @@ class NettyServer(config: ServerConfig,
     case "jdk" => Jdk
     case _ =>
       throw ServerStartException(
-          "Netty transport configuration value should be either jdk or native")
+        "Netty transport configuration value should be either jdk or native")
   }
 
   import NettyServer._
@@ -96,8 +96,8 @@ class NettyServer(config: ServerConfig,
       None
   }
 
-  private def setOptions(
-      setOption: (ChannelOption[AnyRef], AnyRef) => Any, config: Config) = {
+  private def setOptions(setOption: (ChannelOption[AnyRef], AnyRef) => Any,
+                         config: Config) = {
     def unwrap(value: ConfigValue) = value.unwrapped() match {
       case number: Number => number.intValue().asInstanceOf[Integer]
       case other => other
@@ -108,18 +108,18 @@ class NettyServer(config: ServerConfig,
       .filterNot(_.getKey.startsWith("child."))
       .foreach { option =>
         if (ChannelOption.exists(option.getKey)) {
-          setOption(
-              ChannelOption.valueOf(option.getKey), unwrap(option.getValue))
+          setOption(ChannelOption.valueOf(option.getKey),
+                    unwrap(option.getValue))
         } else {
           logger.warn(
-              "Ignoring unknown Netty channel option: " + option.getKey)
+            "Ignoring unknown Netty channel option: " + option.getKey)
           transport match {
             case Native =>
               logger.warn(
-                  "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html and http://netty.io/4.0/api/io/netty/channel/epoll/EpollChannelOption.html")
+                "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html and http://netty.io/4.0/api/io/netty/channel/epoll/EpollChannelOption.html")
             case Jdk =>
               logger.warn(
-                  "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html")
+                "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html")
           }
         }
       }
@@ -132,8 +132,8 @@ class NettyServer(config: ServerConfig,
     val serverChannelEventLoop = eventLoop.next
 
     // Watches for channel events, and pushes them through a reactive streams publisher.
-    val channelPublisher = new HandlerPublisher(
-        serverChannelEventLoop, classOf[Channel])
+    val channelPublisher =
+      new HandlerPublisher(serverChannelEventLoop, classOf[Channel])
 
     val channelClass = transport match {
       case Native => classOf[EpollServerSocketChannel]
@@ -189,8 +189,9 @@ class NettyServer(config: ServerConfig,
 
       // Netty HTTP decoders/encoders/etc
       pipeline.addLast("decoder",
-                       new HttpRequestDecoder(
-                           maxInitialLineLength, maxHeaderSize, maxChunkSize))
+                       new HttpRequestDecoder(maxInitialLineLength,
+                                              maxHeaderSize,
+                                              maxChunkSize))
       pipeline.addLast("encoder", new HttpResponseEncoder())
       pipeline.addLast("decompressor", new HttpContentDecompressor())
       if (logWire) {
@@ -202,7 +203,7 @@ class NettyServer(config: ServerConfig,
       // Use the streams handler to close off the connection.
       pipeline.addLast("http-handler",
                        new HttpStreamsServerHandler(
-                           Seq[ChannelHandler](requestHandler).asJava))
+                         Seq[ChannelHandler](requestHandler).asJava))
 
       pipeline.addLast("request-handler", requestHandler)
 
@@ -294,12 +295,12 @@ class NettyServer(config: ServerConfig,
 class NettyServerProvider extends ServerProvider {
   def createServer(context: ServerProvider.Context) =
     new NettyServer(
-        context.config,
-        context.appProvider,
-        context.stopHook,
-        context.actorSystem
+      context.config,
+      context.appProvider,
+      context.stopHook,
+      context.actorSystem
     )(
-        context.materializer
+      context.materializer
     )
 }
 
@@ -314,7 +315,7 @@ object NettyServer {
 
   def main(args: Array[String]) {
     System.err.println(
-        s"NettyServer.main is deprecated. Please start your Play server with the ${ProdServerStart.getClass.getName}.main.")
+      s"NettyServer.main is deprecated. Please start your Play server with the ${ProdServerStart.getClass.getName}.main.")
     ProdServerStart.main(args)
   }
 

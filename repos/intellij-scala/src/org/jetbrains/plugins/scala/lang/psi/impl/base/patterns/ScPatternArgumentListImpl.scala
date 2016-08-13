@@ -15,7 +15,8 @@ import _root_.scala.collection.mutable._
   * @author ilyas
   */
 class ScPatternArgumentListImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPatternArgumentList {
+    extends ScalaPsiElementImpl(node)
+    with ScPatternArgumentList {
 
   override def toString: String = "Pattern Argument List"
 

@@ -45,11 +45,9 @@ class SbtCompiler(javac: JavaCompiler,
 
     val outputToAnalysisMap = compilationData.outputToCacheMap.map {
       case (output, cache) =>
-        val analysis = fileToStore(cache)
-          .get()
-          .map(_._1)
-          .getOrElse(Analysis.Empty)
-          (output, analysis)
+        val analysis =
+          fileToStore(cache).get().map(_._1).getOrElse(Analysis.Empty)
+        (output, analysis)
     }
 
     val incOptions = compilationData.sbtIncOptions match {
@@ -64,23 +62,23 @@ class SbtCompiler(javac: JavaCompiler,
 
     try {
       val Result(analysis, setup, hasModified) = IC.incrementalCompile(
-          scalac.orNull,
-          javac,
-          compilationData.sources,
-          compilationData.classpath,
-          compileOutput,
-          CompilerCache.fresh,
-          Some(progress),
-          compilationData.scalaOptions,
-          compilationData.javaOptions,
-          previousAnalysis,
-          previousSetup,
-          outputToAnalysisMap.get,
-          Locate.definesClass,
-          reporter,
-          order,
-          skip = false,
-          incOptions
+        scalac.orNull,
+        javac,
+        compilationData.sources,
+        compilationData.classpath,
+        compileOutput,
+        CompilerCache.fresh,
+        Some(progress),
+        compilationData.scalaOptions,
+        compilationData.javaOptions,
+        previousAnalysis,
+        previousSetup,
+        outputToAnalysisMap.get,
+        Locate.definesClass,
+        reporter,
+        order,
+        skip = false,
+        incOptions
       )(logger)
 
       analysisStore.set(analysis, setup)

@@ -52,8 +52,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
   def resolveOperators(
       rule: PartialFunction[LogicalPlan, LogicalPlan]): LogicalPlan = {
     if (!analyzed) {
-      val afterRuleOnChildren = transformChildren(
-          rule, (t, r) => t.resolveOperators(r))
+      val afterRuleOnChildren =
+        transformChildren(rule, (t, r) => t.resolveOperators(r))
       if (this fastEquals afterRuleOnChildren) {
         CurrentOrigin.withOrigin(origin) {
           rule.applyOrElse(this, identity[LogicalPlan])
@@ -89,7 +89,7 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
   def statistics: Statistics = {
     if (children.size == 0) {
       throw new UnsupportedOperationException(
-          s"LeafNode $nodeName must implement statistics.")
+        s"LeafNode $nodeName must implement statistics.")
     }
     Statistics(sizeInBytes = children.map(_.statistics.sizeInBytes).product)
   }
@@ -135,7 +135,7 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
           sys.error(s"can not handle nested schema yet...  plan $this")
       }.getOrElse {
         throw new AnalysisException(
-            s"Unable to resolve ${field.name} given [${output.map(_.name).mkString(", ")}]")
+          s"Unable to resolve ${field.name} given [${output.map(_.name).mkString(", ")}]")
       }
     }
   }
@@ -145,8 +145,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * nodes of this LogicalPlan. The attribute is expressed as
     * as string in the following form: `[scope].AttributeName.[nested].[fields]...`.
     */
-  def resolveChildren(
-      nameParts: Seq[String], resolver: Resolver): Option[NamedExpression] =
+  def resolveChildren(nameParts: Seq[String],
+                      resolver: Resolver): Option[NamedExpression] =
     resolve(nameParts, children.flatMap(_.output), resolver)
 
   /**
@@ -154,8 +154,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * LogicalPlan. The attribute is expressed as string in the following form:
     * `[scope].AttributeName.[nested].[fields]...`.
     */
-  def resolve(
-      nameParts: Seq[String], resolver: Resolver): Option[NamedExpression] =
+  def resolve(nameParts: Seq[String],
+              resolver: Resolver): Option[NamedExpression] =
     resolve(nameParts, output, resolver)
 
   /**
@@ -163,8 +163,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * don't split the name parts quoted by backticks, for example,
     * `ab.cd`.`efg` should be split into two parts "ab.cd" and "efg".
     */
-  def resolveQuoted(
-      name: String, resolver: Resolver): Option[NamedExpression] = {
+  def resolveQuoted(name: String,
+                    resolver: Resolver): Option[NamedExpression] = {
     resolve(UnresolvedAttribute.parseAttributeName(name), output, resolver)
   }
 
@@ -248,8 +248,9 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
         // For example, consider "a.b.c", where "a" is resolved to an existing attribute.
         // Then this will add ExtractValue("c", ExtractValue("b", a)), and alias the final
         // expression as "c".
-        val fieldExprs = nestedFields.foldLeft(a: Expression)((expr,
-            fieldName) => ExtractValue(expr, Literal(fieldName), resolver))
+        val fieldExprs =
+          nestedFields.foldLeft(a: Expression)((expr, fieldName) =>
+            ExtractValue(expr, Literal(fieldName), resolver))
         Some(Alias(fieldExprs, nestedFields.last)())
 
       // No matches.
@@ -261,7 +262,7 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
       case ambiguousReferences =>
         val referenceNames = ambiguousReferences.map(_._1).mkString(", ")
         throw new AnalysisException(
-            s"Reference '$name' is ambiguous, could be: $referenceNames.")
+          s"Reference '$name' is ambiguous, could be: $referenceNames.")
     }
   }
 }

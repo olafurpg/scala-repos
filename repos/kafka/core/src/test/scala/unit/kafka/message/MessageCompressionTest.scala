@@ -39,9 +39,9 @@ class MessageCompressionTest extends JUnitSuite {
     val bytes2k: Array[Byte] = (1000 until 2000).map(_.toByte).toArray
     val bytes3k: Array[Byte] = (3000 until 4000).map(_.toByte).toArray
     val messages: List[Message] = List(
-        new Message(bytes1k, Message.NoTimestamp, Message.MagicValue_V1),
-        new Message(bytes2k, Message.NoTimestamp, Message.MagicValue_V1),
-        new Message(bytes3k, Message.NoTimestamp, Message.MagicValue_V1))
+      new Message(bytes1k, Message.NoTimestamp, Message.MagicValue_V1),
+      new Message(bytes2k, Message.NoTimestamp, Message.MagicValue_V1),
+      new Message(bytes3k, Message.NoTimestamp, Message.MagicValue_V1))
 
     testCompressSize(GZIPCompressionCodec, messages, 396)
 
@@ -53,11 +53,12 @@ class MessageCompressionTest extends JUnitSuite {
 
   def testSimpleCompressDecompress(compressionCodec: CompressionCodec) {
     val messages = List[Message](
-        new Message("hi there".getBytes),
-        new Message("I am fine".getBytes),
-        new Message("I am not so well today".getBytes))
-    val messageSet = new ByteBufferMessageSet(
-        compressionCodec = compressionCodec, messages = messages: _*)
+      new Message("hi there".getBytes),
+      new Message("I am fine".getBytes),
+      new Message("I am not so well today".getBytes))
+    val messageSet = new ByteBufferMessageSet(compressionCodec =
+                                                compressionCodec,
+                                              messages = messages: _*)
     assertEquals(compressionCodec,
                  messageSet.shallowIterator.next().message.compressionCodec)
     val decompressed = messageSet.iterator.map(_.message).toList
@@ -67,8 +68,9 @@ class MessageCompressionTest extends JUnitSuite {
   def testCompressSize(compressionCodec: CompressionCodec,
                        messages: List[Message],
                        expectedSize: Int) {
-    val messageSet = new ByteBufferMessageSet(
-        compressionCodec = compressionCodec, messages = messages: _*)
+    val messageSet = new ByteBufferMessageSet(compressionCodec =
+                                                compressionCodec,
+                                              messages = messages: _*)
     assertEquals(s"$compressionCodec size has changed.",
                  expectedSize,
                  messageSet.sizeInBytes)

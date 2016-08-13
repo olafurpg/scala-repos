@@ -10,8 +10,9 @@ import org.eclipse.jgit.lib.Repository
 
 import lila.memo.AsyncCache
 
-private[i18n] final class Context(
-    gitUrl: String, gitFile: String, keys: I18nKeys) {
+private[i18n] final class Context(gitUrl: String,
+                                  gitFile: String,
+                                  keys: I18nKeys) {
 
   type Contexts = Map[String, String]
 

@@ -42,8 +42,9 @@ private class Log4jController extends Log4jControllerMBean {
       val logger = loggers.nextElement().asInstanceOf[Logger]
       if (logger != null) {
         val level = if (logger != null) logger.getLevel else null
-        lst.add("%s=%s".format(
-                logger.getName, if (level != null) level.toString else "null"))
+        lst.add(
+          "%s=%s".format(logger.getName,
+                         if (level != null) level.toString else "null"))
       }
     }
     lst

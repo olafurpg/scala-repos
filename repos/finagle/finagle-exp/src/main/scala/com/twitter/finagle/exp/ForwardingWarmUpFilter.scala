@@ -15,8 +15,7 @@ abstract class ForwardingWarmUpFilter[Req, Rep](
     warmupPeriod: Duration,
     forwardTo: Service[Req, Rep],
     statsReceiver: StatsReceiver = DefaultStatsReceiver
-)
-    extends SimpleFilter[Req, Rep] {
+) extends SimpleFilter[Req, Rep] {
 
   @volatile private[this] var warmupComplete = false
 

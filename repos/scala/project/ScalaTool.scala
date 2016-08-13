@@ -36,21 +36,23 @@ case class ScalaTool(mainClass: String,
           .replaceAll(varRegex, """\${$1}""")
 
     val variables = Map(
-        ("@@" -> "@"), // for backwards compatibility
-        ("@class@" -> mainClass),
-        ("@properties@" ->
-            (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
-        ("@javaflags@" -> javaOpts),
-        ("@toolflags@" -> toolFlags),
-        ("@classpath@" -> platformClasspath)
+      ("@@" -> "@"), // for backwards compatibility
+      ("@class@" -> mainClass),
+      ("@properties@" ->
+        (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
+      ("@javaflags@" -> javaOpts),
+      ("@toolflags@" -> toolFlags),
+      ("@classpath@" -> platformClasspath)
     )
 
     val (from, to) = variables.unzip
     replaceEach(template, from.toArray, to.toArray)
   }
 
-  def writeScript(
-      file: String, platform: String, rootDir: File, outDir: File): File = {
+  def writeScript(file: String,
+                  platform: String,
+                  rootDir: File,
+                  outDir: File): File = {
     val forWindows = platform match {
       case "windows" => true
       case _ => false
@@ -59,9 +61,10 @@ case class ScalaTool(mainClass: String,
     val suffix = if (forWindows) ".bat" else ""
     val scriptFile = outDir / s"$file$suffix"
     val patched = patchedToolScript(
-        IO.read(rootDir / templatePath).replace("\r", ""), forWindows)
-    IO.write(
-        scriptFile, if (forWindows) patched.replace("\n", "\r\n") else patched)
+      IO.read(rootDir / templatePath).replace("\r", ""),
+      forWindows)
+    IO.write(scriptFile,
+             if (forWindows) patched.replace("\n", "\r\n") else patched)
     scriptFile
   }
 }

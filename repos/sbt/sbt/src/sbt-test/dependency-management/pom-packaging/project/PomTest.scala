@@ -10,7 +10,7 @@ object PomTest extends Build {
   lazy val subWar = Project("sub-war", file("subWar")) settings (warArtifact)
   lazy val subParent =
     Project("sub-parent", file("subParent")) settings
-    (publishArtifact in Compile := false)
+      (publishArtifact in Compile := false)
 
   def art(p: ProjectReference) = makePom in p
   def checkPom = (art(subJar), art(subWar), art(subParent)) map {
@@ -22,7 +22,8 @@ object PomTest extends Build {
   def checkPackaging(pom: File, expected: String) = {
     val packaging = (xml.XML.loadFile(pom) \\ "packaging").text
     if (packaging != expected)
-      sys.error("Incorrect packaging for '" + pom + "'.  Expected '" +
+      sys.error(
+        "Incorrect packaging for '" + pom + "'.  Expected '" +
           expected + "', but got '" + packaging + "'")
   }
   def warArtifact = artifact in (Compile, packageBin) ~= {

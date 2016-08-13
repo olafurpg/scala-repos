@@ -45,8 +45,8 @@ object Literal {
     case d: BigDecimal =>
       Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale))
     case d: java.math.BigDecimal =>
-      Literal(
-          Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale()))
+      Literal(Decimal(d),
+              DecimalType(Math.max(d.precision, d.scale), d.scale()))
     case d: Decimal =>
       Literal(d, DecimalType(Math.max(d.precision, d.scale), d.scale))
     case t: Timestamp =>
@@ -58,7 +58,7 @@ object Literal {
     case v: Literal => v
     case _ =>
       throw new RuntimeException(
-          "Unsupported literal type " + v.getClass + " " + v)
+        "Unsupported literal type " + v.getClass + " " + v)
   }
 
   /**
@@ -121,9 +121,9 @@ object Literal {
     case arr: ArrayType => create(Array(), arr)
     case map: MapType => create(Map(), map)
     case struct: StructType =>
-      create(InternalRow.fromSeq(
-                 struct.fields.map(f => default(f.dataType).value)),
-             struct)
+      create(
+        InternalRow.fromSeq(struct.fields.map(f => default(f.dataType).value)),
+        struct)
     case other =>
       throw new RuntimeException(s"no default for type $dataType")
   }
@@ -170,7 +170,8 @@ object DecimalLiteral {
   * In order to do type checking, use Literal.create() instead of constructor
   */
 case class Literal protected (value: Any, dataType: DataType)
-    extends LeafExpression with CodegenFallback {
+    extends LeafExpression
+    with CodegenFallback {
 
   override def foldable: Boolean = true
   override def nullable: Boolean = value == null
@@ -180,7 +181,7 @@ case class Literal protected (value: Any, dataType: DataType)
   override def equals(other: Any): Boolean = other match {
     case o: Literal =>
       dataType.equals(o.dataType) &&
-      (value == null && null == o.value || value != null &&
+        (value == null && null == o.value || value != null &&
           value.equals(o.value))
     case _ => false
   }
@@ -214,7 +215,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case FloatType =>
           val v = value.asInstanceOf[Float]
           if (v.isNaN || v.isInfinite) {
-            super [CodegenFallback].genCode(ctx, ev)
+            super[CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}f"
@@ -223,7 +224,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case DoubleType =>
           val v = value.asInstanceOf[Double]
           if (v.isNaN || v.isInfinite) {
-            super [CodegenFallback].genCode(ctx, ev)
+            super[CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}D"
@@ -243,7 +244,7 @@ case class Literal protected (value: Any, dataType: DataType)
           ""
         // eval() version may be faster for non-primitive types
         case other =>
-          super [CodegenFallback].genCode(ctx, ev)
+          super[CodegenFallback].genCode(ctx, ev)
       }
     }
   }

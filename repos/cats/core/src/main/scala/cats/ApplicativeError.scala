@@ -45,7 +45,7 @@ trait ApplicativeError[F[_], E] extends Applicative[F] {
     */
   def attempt[A](fa: F[A]): F[E Xor A] =
     handleErrorWith(
-        map(fa)(Xor.right[E, A])
+      map(fa)(Xor.right[E, A])
     )(e => pure(Xor.left(e)))
 
   /**

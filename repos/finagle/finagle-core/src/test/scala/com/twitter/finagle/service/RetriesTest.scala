@@ -29,22 +29,22 @@ class RetriesTest extends FunSuite {
   private[this] val notRequeueableEx = new RuntimeException("nope")
 
   private val end: Stack[ServiceFactory[Exception, Int]] = Stack.Leaf(
-      Stack.Role("test"),
-      ServiceFactory.const(
-          Service.mk[Exception, Int] { req =>
-            Future.exception(req)
-          }
-      )
+    Stack.Role("test"),
+    ServiceFactory.const(
+      Service.mk[Exception, Int] { req =>
+        Future.exception(req)
+      }
+    )
   )
 
   private val minBudget = 3
 
   private def newBudget(): RetryBudget =
     RetryBudget(
-        ttl = 1.second, // simplifies the math such that minRetries == minRetriesPerSecond
-        minRetriesPerSec = minBudget,
-        percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
-        nowMillis = Stopwatch.timeMillis)
+      ttl = 1.second, // simplifies the math such that minRetries == minRetriesPerSecond
+      minRetriesPerSec = minBudget,
+      percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
+      nowMillis = Stopwatch.timeMillis)
 
   test("moduleRetryableWrites only does requeues") {
     val stats = new InMemoryStatsReceiver()
@@ -56,7 +56,8 @@ class RetriesTest extends FunSuite {
 
     val params =
       Stack.Params.empty + param.Stats(stats) +
-      Retries.Policy(RetryPolicy.tries(10, retryAll)) + Retries.Budget(budget)
+        Retries.Policy(RetryPolicy.tries(10, retryAll)) + Retries.Budget(
+        budget)
 
     val svcFactory: ServiceFactory[Exception, Int] =
       Retries.moduleRequeueable.toStack(end).make(params)
@@ -97,8 +98,8 @@ class RetriesTest extends FunSuite {
 
     val params =
       Stack.Params.empty + param.Stats(stats) +
-      Retries.Policy(RetryPolicy.Never) + // explicitly turn it off
-      Retries.Budget(budget)
+        Retries.Policy(RetryPolicy.Never) + // explicitly turn it off
+        Retries.Budget(budget)
 
     val svcFactory: ServiceFactory[Exception, Int] =
       Retries.moduleWithRetryPolicy.toStack(end).make(params)
@@ -137,15 +138,15 @@ class RetriesTest extends FunSuite {
     val stats = new InMemoryStatsReceiver()
 
     val budget = RetryBudget(
-        ttl = 20.seconds, // give a long window so we don't need to worry
-        minRetriesPerSec = 1, // works out to 20 minimum retries per ttl
-        percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
-        nowMillis = Stopwatch.systemMillis)
+      ttl = 20.seconds, // give a long window so we don't need to worry
+      minRetriesPerSec = 1, // works out to 20 minimum retries per ttl
+      percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
+      nowMillis = Stopwatch.systemMillis)
 
     val params =
       Stack.Params.empty + param.Stats(stats) +
-      Retries.Policy(newRetryPolicy(100)) + // way higher than the budget
-      Retries.Budget(budget)
+        Retries.Policy(newRetryPolicy(100)) + // way higher than the budget
+        Retries.Budget(budget)
 
     val svcFactory: ServiceFactory[Exception, Int] =
       Retries.moduleWithRetryPolicy.toStack(end).make(params)
@@ -170,8 +171,8 @@ class RetriesTest extends FunSuite {
 
     val params =
       Stack.Params.empty + param.Stats(stats) +
-      Retries.Policy(newRetryPolicy(10)) + // this count doesn't come into play
-      Retries.Budget(newBudget())
+        Retries.Policy(newRetryPolicy(10)) + // this count doesn't come into play
+        Retries.Budget(newBudget())
 
     val svcFactory: ServiceFactory[Exception, Int] =
       Retries.moduleWithRetryPolicy.toStack(end).make(params)
@@ -196,17 +197,19 @@ class RetriesTest extends FunSuite {
   ): Service[Exception, Int] = {
     val midParams =
       Stack.Params.empty + param.Stats(stats.scope("mid")) +
-      Retries.Budget(mkBudget()) + Retries.Policy(newRetryPolicy(retries = 4))
+        Retries.Budget(mkBudget()) + Retries.Policy(
+        newRetryPolicy(retries = 4))
 
     val frontParams =
       Stack.Params.empty + param.Stats(stats.scope("front")) +
-      Retries.Budget(mkBudget()) + Retries.Policy(newRetryPolicy(retries = 4))
+        Retries.Budget(mkBudget()) + Retries.Policy(
+        newRetryPolicy(retries = 4))
 
     val backSvc = ServiceFactory.const(
-        Service.mk[Exception, Int] { req =>
-          backReqs.incrementAndGet()
-          Future.exception(req)
-        }
+      Service.mk[Exception, Int] { req =>
+        backReqs.incrementAndGet()
+        Future.exception(req)
+      }
     )
 
     // wire em together.
@@ -249,10 +252,12 @@ class RetriesTest extends FunSuite {
       }
 
       // verify each layer only sees 20% more
-      assert((numReqs * 0.2).toInt == nRetries(
-              stats.stats(Seq("front", "retries"))))
-      assert((numReqs * (0.2 * 1.2)).toInt == nRetries(
-              stats.stats(Seq("mid", "retries"))))
+      assert(
+        (numReqs * 0.2).toInt == nRetries(
+          stats.stats(Seq("front", "retries"))))
+      assert(
+        (numReqs * (0.2 * 1.2)).toInt == nRetries(
+          stats.stats(Seq("mid", "retries"))))
       // numReqs + front's retries + mid's retries
       // which is a 1.44x multiplier
       assert((numReqs * 1.44).toInt == backReqs.get)
@@ -276,9 +281,10 @@ class RetriesTest extends FunSuite {
       }
 
       assert(
-          numReqs * retries == nRetries(stats.stats(Seq("front", "retries"))))
-      assert((numReqs * retries) + (numReqs * retries * retries) == nRetries(
-              stats.stats(Seq("mid", "retries"))))
+        numReqs * retries == nRetries(stats.stats(Seq("front", "retries"))))
+      assert(
+        (numReqs * retries) + (numReqs * retries * retries) == nRetries(
+          stats.stats(Seq("mid", "retries"))))
       // there is a 25x multiplier. each initial front attempt triggers
       // 1 attempt + 4 retries = 5 reqs from the mid to the backend,
       // and the front will do that a total of 5 times (so 5 * 5 = 25)
@@ -289,14 +295,14 @@ class RetriesTest extends FunSuite {
   test("budget gauge lifecycle") {
     val stats = new InMemoryStatsReceiver()
     def budgetGauge: Option[Float] =
-      stats.gauges.get(Seq("retries", "budget")).map(_ ())
+      stats.gauges.get(Seq("retries", "budget")).map(_())
 
     assert(budgetGauge.isEmpty)
 
     // creating the service factory creates the gauge
     val params =
       Stack.Params.empty + param.Stats(stats) +
-      Retries.Budget(RetryBudget.Empty)
+        Retries.Budget(RetryBudget.Empty)
     val svcFactory: ServiceFactory[Exception, Int] =
       Retries.moduleRequeueable.toStack(end).make(params)
     assert(budgetGauge.exists(_ == 0))

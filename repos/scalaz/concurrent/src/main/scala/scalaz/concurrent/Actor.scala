@@ -23,7 +23,8 @@ import java.util.concurrent.atomic.AtomicReference
   * @tparam A       The type of messages accepted by this actor.
   */
 final case class Actor[A](
-    handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)(
+    handler: A => Unit,
+    onError: Throwable => Unit = ActorUtils.rethrowError)(
     implicit val strategy: Strategy) {
   private val head = new AtomicReference[Node[A]]
 
@@ -47,7 +48,8 @@ final case class Actor[A](
 
   @annotation.tailrec
   private def act(n: Node[A], i: Int = 1024): Unit = {
-    try handler(n.a) catch {
+    try handler(n.a)
+    catch {
       case ex: Throwable => onError(ex)
     }
     val n2 = n.get

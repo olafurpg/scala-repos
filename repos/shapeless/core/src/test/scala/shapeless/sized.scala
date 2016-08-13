@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,10 +139,10 @@ class SizedTests {
 
     val p = cl.get match {
       case Sized(a, b, _ *) => {
-          typed[Int](a)
-          typed[Int](b)
-          (a - b, a + b)
-        }
+        typed[Int](a)
+        typed[Int](b)
+        (a - b, a + b)
+      }
       case _ => (9, 10)
     }
     typed[(Int, Int)](p)
@@ -345,15 +345,15 @@ class SizedTests {
     // equalInferredTypes(m2im2sm2im2im2dList.head, hlM2im2sm2im2im2d(Nat._3))
     // equalInferredTypes(m2im2sm2im2im2dList.head, hlM2im2sm2im2im2d(Nat._4))
     typed[M2[_ >: Double with Int with String, Unit]](
-        hlM2im2sm2im2im2d(Nat._0))
+      hlM2im2sm2im2im2d(Nat._0))
     typed[M2[_ >: Double with Int with String, Unit]](
-        hlM2im2sm2im2im2d(Nat._1))
+      hlM2im2sm2im2im2d(Nat._1))
     typed[M2[_ >: Double with Int with String, Unit]](
-        hlM2im2sm2im2im2d(Nat._2))
+      hlM2im2sm2im2im2d(Nat._2))
     typed[M2[_ >: Double with Int with String, Unit]](
-        hlM2im2sm2im2im2d(Nat._3))
+      hlM2im2sm2im2im2d(Nat._3))
     typed[M2[_ >: Double with Int with String, Unit]](
-        hlM2im2sm2im2im2d(Nat._4))
+      hlM2im2sm2im2im2d(Nat._4))
     assertEquals(m2im2sm2im2im2d, hlM2im2sm2im2im2d)
 
     val hlM2eim2esm2eim2eem2ed = m2eim2esm2eim2eem2edSized.toHList
@@ -364,15 +364,15 @@ class SizedTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edList.head, hlM2eim2esm2eim2eem2ed(Nat._3))
     // equalInferredTypes(m2eim2esm2eim2eem2edList.head, hlM2eim2esm2eim2eem2ed(Nat._4))
     typed[M2[_ >: Double with Int with String, _]](
-        hlM2eim2esm2eim2eem2ed(Nat._0))
+      hlM2eim2esm2eim2eem2ed(Nat._0))
     typed[M2[_ >: Double with Int with String, _]](
-        hlM2eim2esm2eim2eem2ed(Nat._1))
+      hlM2eim2esm2eim2eem2ed(Nat._1))
     typed[M2[_ >: Double with Int with String, _]](
-        hlM2eim2esm2eim2eem2ed(Nat._2))
+      hlM2eim2esm2eim2eem2ed(Nat._2))
     typed[M2[_ >: Double with Int with String, _]](
-        hlM2eim2esm2eim2eem2ed(Nat._3))
+      hlM2eim2esm2eim2eem2ed(Nat._3))
     typed[M2[_ >: Double with Int with String, _]](
-        hlM2eim2esm2eim2eem2ed(Nat._4))
+      hlM2eim2esm2eim2eem2ed(Nat._4))
     assertEquals(m2eim2esm2eim2eem2ed, hlM2eim2esm2eim2eem2ed)
   }
 

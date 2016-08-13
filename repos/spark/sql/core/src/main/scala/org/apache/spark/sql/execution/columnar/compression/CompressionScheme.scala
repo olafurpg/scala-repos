@@ -52,8 +52,8 @@ private[columnar] trait CompressionScheme {
 
   def encoder[T <: AtomicType](columnType: NativeColumnType[T]): Encoder[T]
 
-  def decoder[T <: AtomicType](
-      buffer: ByteBuffer, columnType: NativeColumnType[T]): Decoder[T]
+  def decoder[T <: AtomicType](buffer: ByteBuffer,
+                               columnType: NativeColumnType[T]): Decoder[T]
 }
 
 private[columnar] trait WithCompressionSchemes {
@@ -76,9 +76,9 @@ private[columnar] object CompressionScheme {
 
   def apply(typeId: Int): CompressionScheme = {
     typeIdToScheme.getOrElse(
-        typeId,
-        throw new UnsupportedOperationException(
-            s"Unrecognized compression scheme type ID: $typeId"))
+      typeId,
+      throw new UnsupportedOperationException(
+        s"Unrecognized compression scheme type ID: $typeId"))
   }
 
   def columnHeaderSize(columnBuffer: ByteBuffer): Int = {

@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class OrientationSpec
     extends SFXEnumDelegateSpec[jfxg.Orientation, Orientation](
-        javaClass = classOf[jfxg.Orientation],
-        scalaClass = classOf[Orientation],
-        companion = Orientation)
+      javaClass = classOf[jfxg.Orientation],
+      scalaClass = classOf[Orientation],
+      companion = Orientation)

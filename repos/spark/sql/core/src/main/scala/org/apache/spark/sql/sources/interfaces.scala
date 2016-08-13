@@ -31,7 +31,11 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.{expressions, CatalystTypeConverters, InternalRow}
+import org.apache.spark.sql.catalyst.{
+  expressions,
+  CatalystTypeConverters,
+  InternalRow
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.execution.FileRelation
 import org.apache.spark.sql.execution.datasources._
@@ -89,8 +93,8 @@ trait RelationProvider {
     * Note: the parameters' keywords are case insensitive and this insensitivity is enforced
     * by the Map that is passed to the function.
     */
-  def createRelation(
-      sqlContext: SQLContext, parameters: Map[String, String]): BaseRelation
+  def createRelation(sqlContext: SQLContext,
+                     parameters: Map[String, String]): BaseRelation
 }
 
 /**
@@ -269,8 +273,8 @@ trait PrunedScan {
   */
 @DeveloperApi
 trait PrunedFilteredScan {
-  def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row]
+  def buildScan(requiredColumns: Array[String],
+                filters: Array[Filter]): RDD[Row]
 }
 
 /**
@@ -308,8 +312,8 @@ trait InsertableRelation {
   */
 @Experimental
 trait CatalystScan {
-  def buildScan(
-      requiredColumns: Seq[Attribute], filters: Seq[Expression]): RDD[Row]
+  def buildScan(requiredColumns: Seq[Attribute],
+                filters: Seq[Expression]): RDD[Row]
 }
 
 /**
@@ -404,12 +408,12 @@ case class HadoopFsRelation(sqlContext: SQLContext,
                             bucketSpec: Option[BucketSpec],
                             fileFormat: FileFormat,
                             options: Map[String, String])
-    extends BaseRelation with FileRelation {
+    extends BaseRelation
+    with FileRelation {
 
   val schema: StructType = {
     val dataSchemaColumnNames = dataSchema.map(_.name.toLowerCase).toSet
-    StructType(
-        dataSchema ++ partitionSchema.filterNot { column =>
+    StructType(dataSchema ++ partitionSchema.filterNot { column =>
       dataSchemaColumnNames.contains(column.name.toLowerCase)
     })
   }
@@ -485,7 +489,7 @@ trait FileFormat {
     // TODO: Remove this default implementation when the other formats have been ported
     // Until then we guard in [[FileSourceStrategy]] to only call this method on supported formats.
     throw new UnsupportedOperationException(
-        s"buildReader is not supported for $this")
+      s"buildReader is not supported for $this")
   }
 }
 
@@ -535,10 +539,11 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
                       val parameters: Map[String, String],
                       val paths: Seq[Path],
                       val partitionSchema: Option[StructType])
-    extends FileCatalog with Logging {
+    extends FileCatalog
+    with Logging {
 
   private val hadoopConf = new Configuration(
-      sqlContext.sparkContext.hadoopConfiguration)
+    sqlContext.sparkContext.hadoopConfiguration)
 
   var leafFiles = mutable.LinkedHashMap.empty[Path, FileStatus]
   var leafDirToChildrenFiles = mutable.Map.empty[Path, Array[FileStatus]]
@@ -579,12 +584,12 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
         .reduceOption(expressions.And)
         .getOrElse(Literal(true))
 
-      val boundPredicate = InterpretedPredicate.create(
-          predicate.transform {
+      val boundPredicate = InterpretedPredicate.create(predicate.transform {
         case a: AttributeReference =>
           val index = partitionColumns.indexWhere(a.name == _.name)
-          BoundReference(
-              index, partitionColumns(index).dataType, nullable = true)
+          BoundReference(index,
+                         partitionColumns(index).dataType,
+                         nullable = true)
       })
 
       val selected = partitions.filter {
@@ -610,8 +615,8 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
   private def listLeafFiles(
       paths: Seq[Path]): mutable.LinkedHashSet[FileStatus] = {
     if (paths.length >= sqlContext.conf.parallelPartitionDiscoveryThreshold) {
-      HadoopFsRelation.listLeafFilesInParallel(
-          paths, hadoopConf, sqlContext.sparkContext)
+      HadoopFsRelation
+        .listLeafFilesInParallel(paths, hadoopConf, sqlContext.sparkContext)
     } else {
       val statuses = paths.flatMap { path =>
         val fs = path.getFileSystem(hadoopConf)
@@ -646,16 +651,15 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
     schema match {
       case Some(userProvidedSchema) if userProvidedSchema.nonEmpty =>
         val spec = PartitioningUtils.parsePartitions(
-            leafDirs,
-            PartitioningUtils.DEFAULT_PARTITION_NAME,
-            typeInference = false,
-            basePaths = basePaths)
+          leafDirs,
+          PartitioningUtils.DEFAULT_PARTITION_NAME,
+          typeInference = false,
+          basePaths = basePaths)
 
         // Without auto inference, all of value in the `row` should be null or in StringType,
         // we need to cast into the data type that user specified.
         def castPartitionValuesToUserSchema(row: InternalRow) = {
-          InternalRow(
-              (0 until row.numFields).map { i =>
+          InternalRow((0 until row.numFields).map { i =>
             Cast(Literal.create(row.getUTF8String(i), StringType),
                  userProvidedSchema.fields(i).dataType).eval()
           }: _*)
@@ -665,11 +669,12 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
           part.copy(values = castPartitionValuesToUserSchema(part.values))
         })
       case _ =>
-        PartitioningUtils.parsePartitions(
+        PartitioningUtils
+          .parsePartitions(
             leafDirs,
             PartitioningUtils.DEFAULT_PARTITION_NAME,
-            typeInference = sqlContext.conf
-                .partitionColumnTypeInferenceEnabled(),
+            typeInference =
+              sqlContext.conf.partitionColumnTypeInferenceEnabled(),
             basePaths = basePaths)
     }
   }
@@ -778,7 +783,7 @@ private[sql] object HadoopFsRelation extends Logging {
       hadoopConf: Configuration,
       sparkContext: SparkContext): mutable.LinkedHashSet[FileStatus] = {
     logInfo(
-        s"Listing leaf files and directories in parallel under: ${paths.mkString(", ")}")
+      s"Listing leaf files and directories in parallel under: ${paths.mkString(", ")}")
 
     val serializableConfiguration = new SerializableConfiguration(hadoopConf)
     val serializedPaths = paths.map(_.toString)

@@ -28,7 +28,7 @@ package scalafx
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/package-summary.html `javafx.print`]] package.
-  * 
+  *
   * @since 8.0
   */
 package object print {}

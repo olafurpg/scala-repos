@@ -29,7 +29,8 @@ object IntegrationDocSpec {
   import TwitterStreamQuickstartDocSpec._
 
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     #//#blocking-dispatcher-config
     blocking-dispatcher {
       executor = "thread-pool-executor"
@@ -144,10 +145,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
 
     //#send-emails
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
-      .mapAsync(4)(address =>
-            {
-          emailServer.send(
-              Email(to = address, title = "Akka", body = "I like your tweet"))
+      .mapAsync(4)(address => {
+        emailServer.send(
+          Email(to = address, title = "Akka", body = "I like your tweet"))
       })
       .to(Sink.ignore)
 
@@ -172,9 +172,10 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     import ActorAttributes.supervisionStrategy
     import Supervision.resumingDecider
 
-    val emailAddresses: Source[String, NotUsed] = authors.via(Flow[Author]
-          .mapAsync(4)(author => addressSystem.lookupEmail(author.handle))
-          .withAttributes(supervisionStrategy(resumingDecider)))
+    val emailAddresses: Source[String, NotUsed] = authors.via(
+      Flow[Author]
+        .mapAsync(4)(author => addressSystem.lookupEmail(author.handle))
+        .withAttributes(supervisionStrategy(resumingDecider)))
     //#email-addresses-mapAsync-supervision
   }
 
@@ -192,10 +193,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       .collect { case Some(emailAddress) => emailAddress }
 
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
-      .mapAsyncUnordered(4)(address =>
-            {
-          emailServer.send(
-              Email(to = address, title = "Akka", body = "I like your tweet"))
+      .mapAsyncUnordered(4)(address => {
+        emailServer.send(
+          Email(to = address, title = "Akka", body = "I like your tweet"))
       })
       .to(Sink.ignore)
 
@@ -203,13 +203,13 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#external-service-mapAsyncUnordered
 
     probe.receiveN(7).toSet should be(
-        Set("rolandkuhn@somewhere.com",
-            "patriknw@somewhere.com",
-            "bantonsson@somewhere.com",
-            "drewhk@somewhere.com",
-            "ktosopl@somewhere.com",
-            "mmartynas@somewhere.com",
-            "akkateam@somewhere.com"))
+      Set("rolandkuhn@somewhere.com",
+          "patriknw@somewhere.com",
+          "bantonsson@somewhere.com",
+          "drewhk@somewhere.com",
+          "ktosopl@somewhere.com",
+          "mmartynas@somewhere.com",
+          "akkateam@somewhere.com"))
   }
 
   "careful managed blocking with mapAsync" in {
@@ -228,12 +228,10 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
 
     val sendTextMessages: RunnableGraph[NotUsed] = phoneNumbers
-      .mapAsync(4)(phoneNo =>
-            {
-          Future {
-            smsServer.send(
-                TextMessage(to = phoneNo, body = "I like your tweet"))
-          }(blockingExecutionContext)
+      .mapAsync(4)(phoneNo => {
+        Future {
+          smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
+        }(blockingExecutionContext)
       })
       .to(Sink.ignore)
 
@@ -241,13 +239,13 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#blocking-mapAsync
 
     probe.receiveN(7).toSet should be(
-        Set("rolandkuhn".hashCode.toString,
-            "patriknw".hashCode.toString,
-            "bantonsson".hashCode.toString,
-            "drewhk".hashCode.toString,
-            "ktosopl".hashCode.toString,
-            "mmartynas".hashCode.toString,
-            "akkateam".hashCode.toString))
+      Set("rolandkuhn".hashCode.toString,
+          "patriknw".hashCode.toString,
+          "bantonsson".hashCode.toString,
+          "drewhk".hashCode.toString,
+          "ktosopl".hashCode.toString,
+          "mmartynas".hashCode.toString,
+          "akkateam".hashCode.toString))
   }
 
   "careful managed blocking with map" in {
@@ -316,8 +314,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                        maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })
@@ -348,8 +347,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       system.dispatchers.lookup("blocking-dispatcher")
     val service = new SometimesSlowService
 
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(
-            system).withInputBuffer(initialSize = 4, maxSize = 4))
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withInputBuffer(initialSize = 4,
+                                                        maxSize = 4))
 
     Source(List("a", "B", "C", "D", "e", "F", "g", "H", "i", "J"))
       .map(elem => { println(s"before: $elem"); elem })
@@ -358,15 +358,15 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#sometimes-slow-mapAsyncUnordered
 
     probe.receiveN(10).toSet should be(
-        Set("after: A",
-            "after: B",
-            "after: C",
-            "after: D",
-            "after: E",
-            "after: F",
-            "after: G",
-            "after: H",
-            "after: I",
-            "after: J"))
+      Set("after: A",
+          "after: B",
+          "after: C",
+          "after: D",
+          "after: E",
+          "after: F",
+          "after: G",
+          "after: H",
+          "after: I",
+          "after: J"))
   }
 }

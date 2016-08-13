@@ -35,27 +35,26 @@ private[spark] class BlockStoreShuffleReader[K, C](
     context: TaskContext,
     blockManager: BlockManager = SparkEnv.get.blockManager,
     mapOutputTracker: MapOutputTracker = SparkEnv.get.mapOutputTracker)
-    extends ShuffleReader[K, C] with Logging {
+    extends ShuffleReader[K, C]
+    with Logging {
 
   private val dep = handle.dependency
 
   /** Read the combined key-values for this reduce task */
   override def read(): Iterator[Product2[K, C]] = {
     val blockFetcherItr =
-      new ShuffleBlockFetcherIterator(context,
-                                      blockManager.shuffleClient,
-                                      blockManager,
-                                      mapOutputTracker.getMapSizesByExecutorId(
-                                          handle.shuffleId,
-                                          startPartition,
-                                          endPartition),
-                                      // Note: we use getSizeAsMb when no suffix is provided for backwards compatibility
-                                      SparkEnv.get.conf.getSizeAsMb(
-                                          "spark.reducer.maxSizeInFlight",
-                                          "48m") * 1024 * 1024,
-                                      SparkEnv.get.conf.getInt(
-                                          "spark.reducer.maxReqsInFlight",
-                                          Int.MaxValue))
+      new ShuffleBlockFetcherIterator(
+        context,
+        blockManager.shuffleClient,
+        blockManager,
+        mapOutputTracker.getMapSizesByExecutorId(handle.shuffleId,
+                                                 startPartition,
+                                                 endPartition),
+        // Note: we use getSizeAsMb when no suffix is provided for backwards compatibility
+        SparkEnv.get.conf
+          .getSizeAsMb("spark.reducer.maxSizeInFlight", "48m") * 1024 * 1024,
+        SparkEnv.get.conf
+          .getInt("spark.reducer.maxReqsInFlight", Int.MaxValue))
 
     // Wrap the streams for compression based on configuration
     val wrappedStreams = blockFetcherItr.map {
@@ -76,13 +75,11 @@ private[spark] class BlockStoreShuffleReader[K, C](
     // Update the context task metrics for each record read.
     val readMetrics = context.taskMetrics.registerTempShuffleReadMetrics()
     val metricIter = CompletionIterator[(Any, Any), Iterator[(Any, Any)]](
-        recordIter.map(
-            record =>
-              {
-            readMetrics.incRecordsRead(1)
-            record
-        }),
-        context.taskMetrics().mergeShuffleReadMetrics())
+      recordIter.map(record => {
+        readMetrics.incRecordsRead(1)
+        record
+      }),
+      context.taskMetrics().mergeShuffleReadMetrics())
 
     // An interruptible iterator must be used here in order to support task cancellation
     val interruptibleIter =
@@ -115,8 +112,9 @@ private[spark] class BlockStoreShuffleReader[K, C](
       case Some(keyOrd: Ordering[K]) =>
         // Create an ExternalSorter to sort the data. Note that if spark.shuffle.spill is disabled,
         // the ExternalSorter won't spill to disk.
-        val sorter = new ExternalSorter[K, C, C](
-            context, ordering = Some(keyOrd), serializer = dep.serializer)
+        val sorter = new ExternalSorter[K, C, C](context,
+                                                 ordering = Some(keyOrd),
+                                                 serializer = dep.serializer)
         sorter.insertAll(aggregatedIter)
         context.taskMetrics().incMemoryBytesSpilled(sorter.memoryBytesSpilled)
         context.taskMetrics().incDiskBytesSpilled(sorter.diskBytesSpilled)
@@ -124,7 +122,8 @@ private[spark] class BlockStoreShuffleReader[K, C](
           .taskMetrics()
           .incPeakExecutionMemory(sorter.peakMemoryUsedBytes)
         CompletionIterator[Product2[K, C], Iterator[Product2[K, C]]](
-            sorter.iterator, sorter.stop())
+          sorter.iterator,
+          sorter.stop())
       case None =>
         aggregatedIter
     }

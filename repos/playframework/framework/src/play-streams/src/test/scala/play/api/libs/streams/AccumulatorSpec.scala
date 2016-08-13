@@ -32,8 +32,7 @@ object AccumulatorSpec extends Specification {
   def await[T](f: Future[T]) = Await.result(f, 10.seconds)
   def error[T](any: Any): T = throw sys.error("error")
   def errorSource[T] =
-    Source.fromPublisher(
-        new Publisher[T] {
+    Source.fromPublisher(new Publisher[T] {
       def subscribe(s: Subscriber[_ >: T]) = {
         s.onSubscribe(new Subscription {
           def cancel() = s.onComplete()
@@ -55,12 +54,13 @@ object AccumulatorSpec extends Specification {
 
       "when the exception is introduced in the materialized value" in withMaterializer {
         implicit m =>
-          await(sum
-                .map(error[Int])
-                .recover {
-              case e => 20
-            }
-                .run(source)) must_== 20
+          await(
+            sum
+              .map(error[Int])
+              .recover {
+                case e => 20
+              }
+              .run(source)) must_== 20
       }
 
       "when the exception comes from the stream" in withMaterializer {
@@ -75,12 +75,13 @@ object AccumulatorSpec extends Specification {
 
       "when the exception is introduced in the materialized value" in withMaterializer {
         implicit m =>
-          await(sum
-                .map(error[Int])
-                .recoverWith {
-              case e => Future(20)
-            }
-                .run(source)) must_== 20
+          await(
+            sum
+              .map(error[Int])
+              .recoverWith {
+                case e => Future(20)
+              }
+              .run(source)) must_== 20
       }
 
       "when the exception comes from the stream" in withMaterializer {
@@ -115,18 +116,18 @@ object AccumulatorSpec extends Specification {
 
       "for a failed stream" in withMaterializer { implicit m =>
         await(Accumulator.flatten(Future(sum)).run(errorSource)) must throwA[
-            RuntimeException]("error")
+          RuntimeException]("error")
       }
     }
 
     "be compatible with Java accumulator" in {
       "Java asScala" in withMaterializer { implicit m =>
-        await(play.libs.streams.Accumulator
-              .fromSink(sum.toSink
-                    .mapMaterializedValue(FutureConverters.toJava)
-                    .asJava)
-              .asScala()
-              .run(source)) must_== 6
+        await(
+          play.libs.streams.Accumulator
+            .fromSink(
+              sum.toSink.mapMaterializedValue(FutureConverters.toJava).asJava)
+            .asScala()
+            .run(source)) must_== 6
       }
 
       "Scala asJava" in withMaterializer { implicit m =>

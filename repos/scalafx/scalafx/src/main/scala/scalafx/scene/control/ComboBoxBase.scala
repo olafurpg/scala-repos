@@ -31,7 +31,12 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyBooleanProperty,
+  StringProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object ComboBoxBase {
@@ -41,7 +46,8 @@ object ComboBoxBase {
 }
 
 abstract class ComboBoxBase[T](override val delegate: jfxsc.ComboBoxBase[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.ComboBoxBase[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ComboBoxBase[T]] {
 
   /**
     * Arms the ComboBox.

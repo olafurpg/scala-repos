@@ -13,8 +13,7 @@ import scala.collection.GenTraversable
 /**
   * Support for anything with a `CanBuildFrom`.
   */
-trait CollectionFormats {
-  this: BasicFormats =>
+trait CollectionFormats { this: BasicFormats =>
 
   import scala.language.higherKinds
 
@@ -81,8 +80,7 @@ trait CollectionFormats {
       vf: SexpFormat[V]
   ): SexpFormat[M[K, V]] = new SexpFormat[M[K, V]] {
     def write(m: M[K, V]) =
-      SexpList(
-          m.map {
+      SexpList(m.map {
         case (k, v) => SexpList(k.toSexp, v.toSexp)
       }(breakOut): List[Sexp])
 
@@ -160,9 +158,9 @@ trait CollectionFormats {
   private val inclusive = SexpSymbol(":inclusive")
   implicit object RangeFormat extends SexpFormat[im.Range] {
     def write(r: im.Range) = SexpData(
-        start -> SexpNumber(r.start),
-        end -> SexpNumber(r.end),
-        step -> SexpNumber(r.step)
+      start -> SexpNumber(r.start),
+      end -> SexpNumber(r.end),
+      step -> SexpNumber(r.step)
     )
 
     def read(s: Sexp) = s match {
@@ -185,10 +183,10 @@ trait CollectionFormats {
       int: Integral[E]): SexpFormat[im.NumericRange[E]] =
     new SexpFormat[im.NumericRange[E]] {
       def write(r: im.NumericRange[E]) = SexpData(
-          start -> r.start.toSexp,
-          end -> r.end.toSexp,
-          step -> r.step.toSexp,
-          inclusive -> BooleanFormat.write(r.isInclusive)
+        start -> r.start.toSexp,
+        end -> r.end.toSexp,
+        step -> r.step.toSexp,
+        inclusive -> BooleanFormat.write(r.isInclusive)
       )
 
       def read(s: Sexp): im.NumericRange[E] = s match {
@@ -196,9 +194,9 @@ trait CollectionFormats {
           (data(start), data(end), data(step), data(inclusive)) match {
             case (s, e, st, incl) if BooleanFormat.read(incl) =>
               im.NumericRange.inclusive(
-                  s.convertTo[E],
-                  e.convertTo[E],
-                  st.convertTo[E]
+                s.convertTo[E],
+                e.convertTo[E],
+                st.convertTo[E]
               )
             case (s, e, st, incl) =>
               im.NumericRange(s.convertTo[E], e.convertTo[E], st.convertTo[E])

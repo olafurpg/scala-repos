@@ -14,11 +14,13 @@ import scala.reflect.ClassTag
 private[play] object WebSocketActor {
 
   object WebSocketActorSupervisor {
-    def props[In, Out : ClassTag](enumerator: Enumerator[In],
-                                  iteratee: Iteratee[Out, Unit],
-                                  createHandler: ActorRef => Props) =
-      Props(new WebSocketActorSupervisor[In, Out](
-              enumerator, iteratee, createHandler))
+    def props[In, Out: ClassTag](enumerator: Enumerator[In],
+                                 iteratee: Iteratee[Out, Unit],
+                                 createHandler: ActorRef => Props) =
+      Props(
+        new WebSocketActorSupervisor[In, Out](enumerator,
+                                              iteratee,
+                                              createHandler))
   }
 
   /**
@@ -121,9 +123,9 @@ private[play] object WebSocketActor {
     def receive = {
       case c @ Connect(requestId, enumerator, iteratee, createHandler) =>
         implicit val mt = c.messageType
-        context.actorOf(WebSocketActorSupervisor.props(
-                            enumerator, iteratee, createHandler),
-                        requestId.toString)
+        context.actorOf(
+          WebSocketActorSupervisor.props(enumerator, iteratee, createHandler),
+          requestId.toString)
     }
   }
 
@@ -133,7 +135,7 @@ private[play] object WebSocketActor {
   object WebSocketsExtension extends ExtensionId[WebSocketsExtension] {
     def createExtension(system: ExtendedActorSystem) = {
       new WebSocketsExtension(
-          system.systemActorOf(WebSocketsActor.props, "websockets"))
+        system.systemActorOf(WebSocketsActor.props, "websockets"))
     }
   }
 

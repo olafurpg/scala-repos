@@ -30,7 +30,7 @@ class MarshalSpec extends AkkaSpec {
     response.entity.contentType shouldEqual ContentTypes.`text/plain(UTF-8)`
 
     val request = HttpRequest(
-        headers = List(headers.Accept(MediaTypes.`application/json`)))
+      headers = List(headers.Accept(MediaTypes.`application/json`)))
     val responseText = "Plaintext"
     val respFuture =
       Marshal(responseText).toResponseFor(request) // with content negotiation!

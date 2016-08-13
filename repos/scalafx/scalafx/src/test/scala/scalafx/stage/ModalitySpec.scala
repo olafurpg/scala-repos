@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ModalitySpec
     extends SFXEnumDelegateSpec[jfxs.Modality, Modality](
-        javaClass = classOf[jfxs.Modality],
-        scalaClass = classOf[Modality],
-        companion = Modality)
+      javaClass = classOf[jfxs.Modality],
+      scalaClass = classOf[Modality],
+      companion = Modality)

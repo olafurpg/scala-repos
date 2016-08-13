@@ -31,13 +31,14 @@ import com.twitter.util.{TempFolder, Time}
 class FileHandlerTest extends WordSpec with TempFolder {
   def reader(filename: String) = {
     new BufferedReader(
-        new InputStreamReader(
-            new FileInputStream(new File(folderName, filename))))
+      new InputStreamReader(
+        new FileInputStream(new File(folderName, filename))))
   }
 
   def writer(filename: String) = {
     new OutputStreamWriter(
-        new FileOutputStream(new File(folderName, filename)), "UTF-8")
+      new FileOutputStream(new File(folderName, filename)),
+      "UTF-8")
   }
 
   "FileHandler" should {
@@ -51,10 +52,10 @@ class FileHandlerTest extends WordSpec with TempFolder {
         f.close
 
         val handler = FileHandler(
-            filename = folderName + "/test.log",
-            rollPolicy = Policy.Hourly,
-            append = true,
-            formatter = BareFormatter
+          filename = folderName + "/test.log",
+          rollPolicy = Policy.Hourly,
+          append = true,
+          formatter = BareFormatter
         ).apply()
 
         handler.publish(record1)
@@ -69,10 +70,10 @@ class FileHandlerTest extends WordSpec with TempFolder {
         f.close
 
         val handler = FileHandler(
-            filename = folderName + "/test.log",
-            rollPolicy = Policy.Hourly,
-            append = false,
-            formatter = BareFormatter
+          filename = folderName + "/test.log",
+          rollPolicy = Policy.Hourly,
+          append = false,
+          formatter = BareFormatter
         ).apply()
 
         handler.publish(record1)
@@ -123,38 +124,46 @@ class FileHandlerTest extends WordSpec with TempFolder {
       "hourly" in {
         withTempFolder {
           val handler = FileHandler(
-              filename = folderName + "/test.log",
-              rollPolicy = Policy.Hourly,
-              append = true,
-              formatter = BareFormatter
+            filename = folderName + "/test.log",
+            rollPolicy = Policy.Hourly,
+            append = true,
+            formatter = BareFormatter
           ).apply()
-          assert(handler.computeNextRollTime(1206769996722L) == Some(
-                  1206770400000L))
-          assert(handler.computeNextRollTime(1206770400000L) == Some(
-                  1206774000000L))
-          assert(handler.computeNextRollTime(1206774000001L) == Some(
-                  1206777600000L))
+          assert(
+            handler.computeNextRollTime(1206769996722L) == Some(
+              1206770400000L))
+          assert(
+            handler.computeNextRollTime(1206770400000L) == Some(
+              1206774000000L))
+          assert(
+            handler.computeNextRollTime(1206774000001L) == Some(
+              1206777600000L))
         }
       }
 
       "weekly" in {
         withTempFolder {
           val handler = FileHandler(
-              filename = folderName + "/test.log",
-              rollPolicy = Policy.Weekly(Calendar.SUNDAY),
-              append = true,
-              formatter = new Formatter(timezone = Some("GMT-7:00"))
+            filename = folderName + "/test.log",
+            rollPolicy = Policy.Weekly(Calendar.SUNDAY),
+            append = true,
+            formatter = new Formatter(timezone = Some("GMT-7:00"))
           ).apply()
-          assert(handler.computeNextRollTime(1250354734000L) == Some(
-                  1250406000000L))
-          assert(handler.computeNextRollTime(1250404734000L) == Some(
-                  1250406000000L))
-          assert(handler.computeNextRollTime(1250406001000L) == Some(
-                  1251010800000L))
-          assert(handler.computeNextRollTime(1250486000000L) == Some(
-                  1251010800000L))
-          assert(handler.computeNextRollTime(1250496000000L) == Some(
-                  1251010800000L))
+          assert(
+            handler.computeNextRollTime(1250354734000L) == Some(
+              1250406000000L))
+          assert(
+            handler.computeNextRollTime(1250404734000L) == Some(
+              1250406000000L))
+          assert(
+            handler.computeNextRollTime(1250406001000L) == Some(
+              1251010800000L))
+          assert(
+            handler.computeNextRollTime(1250486000000L) == Some(
+              1251010800000L))
+          assert(
+            handler.computeNextRollTime(1250496000000L) == Some(
+              1251010800000L))
         }
       }
     }
@@ -178,7 +187,7 @@ class FileHandlerTest extends WordSpec with TempFolder {
           handler.close()
 
           assert(
-              reader("test-" + handler.timeSuffix(date) + ".log").readLine == "first post!")
+            reader("test-" + handler.timeSuffix(date) + ".log").readLine == "first post!")
           assert(reader("test.log").readLine == "second post")
         }
       }
@@ -189,11 +198,11 @@ class FileHandlerTest extends WordSpec with TempFolder {
         assert(new File(folderName).list().length == 0)
 
         val handler = FileHandler(
-            filename = folderName + "/test.log",
-            rollPolicy = Policy.Hourly,
-            append = true,
-            rotateCount = 2,
-            formatter = BareFormatter
+          filename = folderName + "/test.log",
+          rollPolicy = Policy.Hourly,
+          append = true,
+          rotateCount = 2,
+          formatter = BareFormatter
         ).apply()
 
         handler.publish(record1)
@@ -219,11 +228,11 @@ class FileHandlerTest extends WordSpec with TempFolder {
         val name = namePrefix + ".log"
 
         val handler = FileHandler(
-            filename = folderName + "/" + name,
-            rollPolicy = Policy.Hourly,
-            append = true,
-            rotateCount = 1,
-            formatter = BareFormatter
+          filename = folderName + "/" + name,
+          rollPolicy = Policy.Hourly,
+          append = true,
+          rotateCount = 1,
+          formatter = BareFormatter
         ).apply()
 
         // create a file without the '.log' suffix, which will sort before the target
@@ -255,11 +264,11 @@ class FileHandlerTest extends WordSpec with TempFolder {
           System.setProperty("user.dir", folderName)
 
           val handler = FileHandler(
-              filename = "test.log", // Note relative path!
-              rollPolicy = Policy.Hourly,
-              append = true,
-              rotateCount = 2,
-              formatter = BareFormatter
+            filename = "test.log", // Note relative path!
+            rollPolicy = Policy.Hourly,
+            append = true,
+            rotateCount = 2,
+            formatter = BareFormatter
           ).apply()
 
           handler.publish(record1)
@@ -288,10 +297,10 @@ class FileHandlerTest extends WordSpec with TempFolder {
         assert(new File(folderName).list().length == 0)
 
         val handler = FileHandler(
-            filename = folderName + "/test.log",
-            rollPolicy = Policy.MaxSize(maxSize.bytes),
-            append = true,
-            formatter = BareFormatter
+          filename = folderName + "/test.log",
+          rollPolicy = Policy.MaxSize(maxSize.bytes),
+          append = true,
+          formatter = BareFormatter
         ).apply()
 
         // move time forward so the rotated logfiles will have distinct names.

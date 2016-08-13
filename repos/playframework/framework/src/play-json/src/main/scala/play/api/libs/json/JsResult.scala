@@ -62,16 +62,15 @@ object JsError {
   def toFlatJson(errors: Seq[(JsPath, Seq[ValidationError])]): JsObject =
     toJson(errors, true)
 
-  private def toJson(
-      errors: Seq[(JsPath, Seq[ValidationError])], flat: Boolean): JsObject = {
+  private def toJson(errors: Seq[(JsPath, Seq[ValidationError])],
+                     flat: Boolean): JsObject = {
     val argsWrite = Writes.traversableWrites[Any](Writes.anyWrites)
     errors.foldLeft(Json.obj()) { (obj, error) =>
-      obj ++ Json.obj(
-          error._1.toJsonString -> error._2.foldLeft(Json.arr()) {
+      obj ++ Json.obj(error._1.toJsonString -> error._2.foldLeft(Json.arr()) {
         (arr, err) =>
           arr :+ Json.obj(
-              "msg" -> (if (flat) err.message else Json.toJson(err.messages)),
-              "args" -> Json.toJson(err.args)(argsWrite)
+            "msg" -> (if (flat) err.message else Json.toJson(err.messages)),
+            "args" -> Json.toJson(err.args)(argsWrite)
           )
       })
     }
@@ -83,8 +82,8 @@ sealed trait JsResult[+A] { self =>
   def isSuccess: Boolean = this.isInstanceOf[JsSuccess[_]]
   def isError: Boolean = this.isInstanceOf[JsError]
 
-  def fold[X](
-      invalid: Seq[(JsPath, Seq[ValidationError])] => X, valid: A => X): X =
+  def fold[X](invalid: Seq[(JsPath, Seq[ValidationError])] => X,
+              valid: A => X): X =
     this match {
       case JsSuccess(v, _) => valid(v)
       case JsError(e) => invalid(e)

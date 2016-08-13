@@ -23,8 +23,10 @@ object Insight extends LilaController {
          dimension = Dimension.Perf.key,
          filters = "")
 
-  def path(
-      username: String, metric: String, dimension: String, filters: String) =
+  def path(username: String,
+           metric: String,
+           dimension: String,
+           filters: String) =
     Open { implicit ctx =>
       Accessible(username) { user =>
         import lila.insight.InsightApi.UserStatus._
@@ -37,13 +39,13 @@ object Insight extends LilaController {
               prefId <- env.share getPrefId user
             } yield
               Ok(
-                  html.insight.index(u = user,
-                                     cache = cache,
-                                     prefId = prefId,
-                                     ui = env.jsonView.ui(cache.ecos),
-                                     question = env.jsonView.question(
-                                           metric, dimension, filters),
-                                     stale = s == Stale))
+                html.insight.index(
+                  u = user,
+                  cache = cache,
+                  prefId = prefId,
+                  ui = env.jsonView.ui(cache.ecos),
+                  question = env.jsonView.question(metric, dimension, filters),
+                  stale = s == Stale))
         }
       }
     }
@@ -55,14 +57,14 @@ object Insight extends LilaController {
         ctx.body.body
           .validate[JsonQuestion]
           .fold(
-              err => BadRequest(jsonError(err.toString)).fuccess,
-              qJson =>
-                qJson.question.fold(BadRequest.fuccess) { q =>
-                  env.api.ask(q, user) map lila.insight.Chart.fromAnswer(
-                      Env.user.lightUser) map env.jsonView.chart.apply map {
-                    Ok(_)
-                  }
-              }
+            err => BadRequest(jsonError(err.toString)).fuccess,
+            qJson =>
+              qJson.question.fold(BadRequest.fuccess) { q =>
+                env.api.ask(q, user) map lila.insight.Chart.fromAnswer(
+                  Env.user.lightUser) map env.jsonView.chart.apply map {
+                  Ok(_)
+                }
+            }
           )
       }
   }
@@ -83,9 +85,8 @@ object Insight extends LilaController {
       _.fold(notFoundJson(s"No such user: $username")) { u =>
         env.share.grant(u, ctx.me) flatMap {
           _.fold(
-              f(u),
-              fuccess(
-                  Forbidden(jsonError(s"User $username data is protected"))))
+            f(u),
+            fuccess(Forbidden(jsonError(s"User $username data is protected"))))
         }
       }
     } map (_ as JSON)

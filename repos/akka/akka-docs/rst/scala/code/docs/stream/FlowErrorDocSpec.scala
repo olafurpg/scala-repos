@@ -36,7 +36,7 @@ class FlowErrorDocSpec extends AkkaSpec {
       case _ => Supervision.Stop
     }
     implicit val materializer = ActorMaterializer(
-        ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+      ActorMaterializerSettings(system).withSupervisionStrategy(decider))
     val source = Source(0 to 5).map(100 / _)
     val result = source.runWith(Sink.fold(0)(_ + _))
     // the element causing division by zero will be dropped

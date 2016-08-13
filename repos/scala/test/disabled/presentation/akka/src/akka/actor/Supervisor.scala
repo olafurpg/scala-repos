@@ -12,8 +12,8 @@ import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
 import java.net.InetSocketAddress
 import akka.config.Supervision._
 
-class SupervisorException private[akka](
-    message: String, cause: Throwable = null)
+class SupervisorException private[akka] (message: String,
+                                         cause: Throwable = null)
     extends AkkaException(message, cause)
 
 /**
@@ -82,8 +82,8 @@ case class SupervisorFactory(val config: SupervisorConfig) {
   def newInstance: Supervisor = newInstanceFor(config)
 
   def newInstanceFor(config: SupervisorConfig): Supervisor = {
-    val supervisor = new Supervisor(
-        config.restartStrategy, config.maxRestartsHandler)
+    val supervisor =
+      new Supervisor(config.restartStrategy, config.maxRestartsHandler)
     supervisor.configure(config)
     supervisor.start
     supervisor
@@ -105,7 +105,7 @@ case class SupervisorFactory(val config: SupervisorConfig) {
 sealed class Supervisor(
     handler: FaultHandlingStrategy,
     maxRestartsHandler: (ActorRef,
-    MaximumNumberOfRestartsWithinTimeRangeReached) => Unit) {
+                         MaximumNumberOfRestartsWithinTimeRangeReached) => Unit) {
   import Supervisor._
 
   private val _childActors = new ConcurrentHashMap[String, List[ActorRef]]
@@ -136,9 +136,8 @@ sealed class Supervisor(
 
   def configure(config: SupervisorConfig): Unit = config match {
     case SupervisorConfig(_, servers, _) =>
-      servers.map(
-          server =>
-            server match {
+      servers.map(server =>
+        server match {
           case Supervise(actorRef, lifeCycle, registerAsRemoteService) =>
             actorRef.start()
             val className = actorRef.actor.getClass.getName
@@ -165,10 +164,10 @@ sealed class Supervisor(
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-final class SupervisorActor private[akka](
+final class SupervisorActor private[akka] (
     handler: FaultHandlingStrategy,
     maxRestartsHandler: (ActorRef,
-    MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
+                         MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
     extends Actor {
   self.faultHandler = handler
 
@@ -186,7 +185,7 @@ final class SupervisorActor private[akka](
       maxRestartsHandler(self, max)
     case unknown =>
       throw new SupervisorException(
-          "SupervisorActor can not respond to messages.\n\tUnknown message [" +
+        "SupervisorActor can not respond to messages.\n\tUnknown message [" +
           unknown + "]")
   }
 }

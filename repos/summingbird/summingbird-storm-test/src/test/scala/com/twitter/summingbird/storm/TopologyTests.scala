@@ -37,7 +37,13 @@ import org.scalacheck.Properties
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ArrayBuffer, HashMap => MutableHashMap, Map => MutableMap, SynchronizedBuffer, SynchronizedMap}
+import scala.collection.mutable.{
+  ArrayBuffer,
+  HashMap => MutableHashMap,
+  Map => MutableMap,
+  SynchronizedBuffer,
+  SynchronizedMap
+}
 
 /**
   * Tests for Summingbird's Storm planner.
@@ -62,7 +68,7 @@ class TopologyTests extends WordSpec {
 
   implicit val storm = Storm.local()
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   /**
     * Perform a single run of TestGraphs.singleStepJob using the
@@ -70,12 +76,13 @@ class TopologyTests extends WordSpec {
     */
   def funcToPlan(
       mkJob: (Producer[Storm, Int],
-      Storm#Store[Int, Int]) => TailProducer[Storm, Any]): StormTopology = {
+              Storm#Store[Int, Int]) => TailProducer[Storm, Any])
+    : StormTopology = {
     val original = sample[List[Int]]
 
     val job = mkJob(
-        Storm.source(TraversableSpout(original)),
-        TestStore.createStore[Int, Int]()._2
+      Storm.source(TraversableSpout(original)),
+      TestStore.createStore[Int, Int]()._2
     )
 
     storm.plan(job).topology
@@ -83,7 +90,7 @@ class TopologyTests extends WordSpec {
 
   "Number of bolts should be as expected" in {
     val stormTopo = funcToPlan(
-        TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
+      TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
     )
     // Final Flatmap + summer
     assert(stormTopo.get_bolts_size() == 2)
@@ -91,7 +98,7 @@ class TopologyTests extends WordSpec {
 
   "Number of spouts in simple task should be 1" in {
     val stormTopo = funcToPlan(
-        TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
+      TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
     )
     // Source producer
     assert(stormTopo.get_spouts_size() == 1)
@@ -173,9 +180,10 @@ class TopologyTests extends WordSpec {
       .name("Throw away name")
       .sumByKey(TestStore.createStore[Int, Int]()._2)
 
-    val opts = Map(nodeName -> Options()
-          .set(FlatMapParallelism(50))
-          .set(SourceParallelism(30)))
+    val opts = Map(
+      nodeName -> Options()
+        .set(FlatMapParallelism(50))
+        .set(SourceParallelism(30)))
     val storm = Storm.local(opts)
     val stormTopo = storm.plan(p).topology
     // Source producer

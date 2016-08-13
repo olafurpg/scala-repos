@@ -49,20 +49,18 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val model = new StreamingKMeans()
       .setK(1)
       .setDecayFactor(1.0)
-      .setInitialCenters(
-          Array(Vectors.dense(0.0, 0.0, 0.0, 0.0, 0.0)), Array(0.0))
+      .setInitialCenters(Array(Vectors.dense(0.0, 0.0, 0.0, 0.0, 0.0)),
+                         Array(0.0))
 
     // generate random data for k-means
     val (input, centers) =
       StreamingKMeansDataGenerator(numPoints, numBatches, k, d, r, 42)
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           model.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      model.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // estimated center should be close to true center
@@ -72,9 +70,10 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     // because the decay factor is set to 1.0
     val grandMean =
       input.flatten.map(x => x.toBreeze).reduce(_ + _) /
-      (numBatches * numPoints).toDouble
-    assert(model.latestModel().clusterCenters(0) ~==
-          Vectors.dense(grandMean.toArray) absTol 1E-5)
+        (numBatches * numPoints).toDouble
+    assert(
+      model.latestModel().clusterCenters(0) ~==
+        Vectors.dense(grandMean.toArray) absTol 1E-5)
   }
 
   test("accuracy for two centers") {
@@ -97,12 +96,10 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       StreamingKMeansDataGenerator(numPoints, numBatches, k, d, r, 42)
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           kMeans.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      kMeans.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -130,20 +127,23 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val kMeans = new StreamingKMeans()
       .setK(2)
       .setHalfLife(0.5, "points")
-      .setInitialCenters(
-          Array(Vectors.dense(0.0), Vectors.dense(1000.0)), Array(1.0, 1.0))
+      .setInitialCenters(Array(Vectors.dense(0.0), Vectors.dense(1000.0)),
+                         Array(1.0, 1.0))
 
     // new data are all around the first cluster 0.0
-    val (input, _) = StreamingKMeansDataGenerator(
-        numPoints, numBatches, k, d, r, 42, Array(Vectors.dense(0.0)))
+    val (input, _) = StreamingKMeansDataGenerator(numPoints,
+                                                  numBatches,
+                                                  k,
+                                                  d,
+                                                  r,
+                                                  42,
+                                                  Array(Vectors.dense(0.0)))
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           kMeans.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      kMeans.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -184,7 +184,7 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       (0 until numPoints).map { idx =>
         val center = centers(idx % k)
         Vectors.dense(
-            Array.tabulate(d)(x => center(x) + rand.nextGaussian() * r))
+          Array.tabulate(d)(x => center(x) + rand.nextGaussian() * r))
       }
     }
     (data, centers)

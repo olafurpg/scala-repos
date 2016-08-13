@@ -32,14 +32,14 @@ object ApiRepository {
             watchers: Int = 0,
             urlIsHtmlUrl: Boolean = false): ApiRepository =
     ApiRepository(
-        name = repository.repositoryName,
-        full_name = s"${repository.userName}/${repository.repositoryName}",
-        description = repository.description.getOrElse(""),
-        watchers = 0,
-        forks = forkedCount,
-        `private` = repository.isPrivate,
-        default_branch = repository.defaultBranch,
-        owner = owner
+      name = repository.repositoryName,
+      full_name = s"${repository.userName}/${repository.repositoryName}",
+      description = repository.description.getOrElse(""),
+      watchers = 0,
+      forks = forkedCount,
+      `private` = repository.isPrivate,
+      default_branch = repository.defaultBranch,
+      owner = owner
     )(urlIsHtmlUrl)
 
   def apply(repositoryInfo: RepositoryInfo, owner: ApiUser): ApiRepository =
@@ -50,8 +50,8 @@ object ApiRepository {
   def apply(repositoryInfo: RepositoryInfo, owner: Account): ApiRepository =
     this(repositoryInfo.repository, ApiUser(owner))
 
-  def forPushPayload(
-      repositoryInfo: RepositoryInfo, owner: ApiUser): ApiRepository =
+  def forPushPayload(repositoryInfo: RepositoryInfo,
+                     owner: ApiUser): ApiRepository =
     ApiRepository(repositoryInfo.repository,
                   owner,
                   forkedCount = repositoryInfo.forkedCount,

@@ -65,7 +65,7 @@ class WrappedJoinerTest extends WordSpec with Matchers {
       } catch {
         case ex: FlowException =>
           ex.getCause.getMessage should include(
-              "the FlowProcess for unique id")
+            "the FlowProcess for unique id")
       }
     }
   }

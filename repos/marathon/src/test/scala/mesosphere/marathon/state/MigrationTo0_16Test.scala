@@ -9,29 +9,35 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.JavaConverters._
 
 class MigrationTo0_16Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   class Fixture {
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val store = new InMemoryStore()
 
-    lazy val groupStore = new MarathonStore[Group](
-        store, metrics, () => Group.empty, prefix = "group:")
-    lazy val groupRepo = new GroupRepository(
-        groupStore, maxVersions = None, metrics)
-    lazy val appStore = new MarathonStore[AppDefinition](
-        store, metrics, () => AppDefinition(), prefix = "app:")
+    lazy val groupStore = new MarathonStore[Group](store,
+                                                   metrics,
+                                                   () => Group.empty,
+                                                   prefix = "group:")
+    lazy val groupRepo =
+      new GroupRepository(groupStore, maxVersions = None, metrics)
+    lazy val appStore = new MarathonStore[AppDefinition](store,
+                                                         metrics,
+                                                         () => AppDefinition(),
+                                                         prefix = "app:")
     lazy val appRepo = new AppRepository(appStore, maxVersions = None, metrics)
 
-    lazy val migration = new MigrationTo0_16(
-        groupRepository = groupRepo, appRepository = appRepo)
+    lazy val migration =
+      new MigrationTo0_16(groupRepository = groupRepo, appRepository = appRepo)
   }
 
   val emptyGroup = Group.empty
 
   implicit val patienceConfig: PatienceConfig = PatienceConfig(
-      timeout = Span(3, Seconds))
+    timeout = Span(3, Seconds))
 
   test("empty migration does nothing") {
     Given("no apps/groups")
@@ -116,12 +122,13 @@ class MigrationTo0_16Test
   private[this] def deprecatedAppDefinition(version: Long = 0) = {
     class T
         extends AppDefinition(
-            PathId("/test"),
-            cmd = Some("true"),
-            portDefinitions = PortDefinitions(1000, 1001),
-            versionInfo = AppDefinition.VersionInfo.OnlyVersion(
-                  Timestamp(version))
-        ) with DeprecatedSerialization
+          PathId("/test"),
+          cmd = Some("true"),
+          portDefinitions = PortDefinitions(1000, 1001),
+          versionInfo =
+            AppDefinition.VersionInfo.OnlyVersion(Timestamp(version))
+        )
+        with DeprecatedSerialization
 
     new T()
   }

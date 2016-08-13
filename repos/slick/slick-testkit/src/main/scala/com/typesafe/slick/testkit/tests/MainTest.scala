@@ -19,8 +19,8 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
   lazy val users = TableQuery[Users]
 
   class Orders(tag: Tag)
-      extends Table[(Int, Int, String, Boolean, Option[Boolean])](
-          tag, "orders") {
+      extends Table[(Int, Int, String, Boolean, Option[Boolean])](tag,
+                                                                  "orders") {
     def userID = column[Int]("userID")
     def orderID = column[Int]("orderID", O.PrimaryKey, O.AutoInc)
     def product = column[String]("product")
@@ -38,43 +38,44 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
     val q1 = (for (u <- users) yield (u.id, u.first, u.last)).sortBy(_._1)
     q1.result.statements.toSeq.length.should(_ >= 1)
 
-    val q1b = for (u <- users) yield
-      (u.id,
-       u.first.?,
-       u.last,
-       (Case If u.id < 3 Then "low" If u.id < 6 Then "medium" Else "high"))
+    val q1b = for (u <- users)
+      yield
+        (u.id,
+         u.first.?,
+         u.last,
+         (Case If u.id < 3 Then "low" If u.id < 6 Then "medium" Else "high"))
     q1b.result.statements.toSeq.length.should(_ >= 1)
 
     val q2 = for (u <- users if u.first === "Apu".bind) yield (u.last, u.id)
     q2.result.statements.toSeq.length.should(_ >= 1)
 
     val expectedUserTuples = List(
-        (1, "Homer", Some("Simpson")),
-        (2, "Marge", Some("Simpson")),
-        (3, "Apu", Some("Nahasapeemapetilon")),
-        (4, "Carl", Some("Carlson")),
-        (5, "Lenny", Some("Leonard")),
-        (6, "Santa's Little Helper", None),
-        (7, "Snowball", None)
+      (1, "Homer", Some("Simpson")),
+      (2, "Marge", Some("Simpson")),
+      (3, "Apu", Some("Nahasapeemapetilon")),
+      (4, "Carl", Some("Carlson")),
+      (5, "Lenny", Some("Leonard")),
+      (6, "Santa's Little Helper", None),
+      (7, "Snowball", None)
     )
 
     val p1 = db.stream(((for {
-          _ <- ddl.create
-          ins1 <- users.map(u => (u.first, u.last)) +=
-          ("Homer", Some("Simpson"))
-          ins2 <- users.map(u => (u.first, u.last)) ++=
-            Seq(("Marge", Some("Simpson")),
-                ("Apu", Some("Nahasapeemapetilon")),
-                ("Carl", Some("Carlson")),
-                ("Lenny", Some("Leonard")))
-          ins3 <- users.map(_.first) ++=
-            Seq("Santa's Little Helper", "Snowball")
-          total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
-          /* All test DBs seem to report the actual number of rows. None would also be acceptable: */
-          _ = total.map(_ shouldBe 7)
-          r1 <- q1.result
-          _ = r1 shouldBe expectedUserTuples
-        } yield ()) andThen q1.result).withPinnedSession)
+      _ <- ddl.create
+      ins1 <- users.map(u => (u.first, u.last)) +=
+               ("Homer", Some("Simpson"))
+      ins2 <- users.map(u => (u.first, u.last)) ++=
+               Seq(("Marge", Some("Simpson")),
+                   ("Apu", Some("Nahasapeemapetilon")),
+                   ("Carl", Some("Carlson")),
+                   ("Lenny", Some("Leonard")))
+      ins3 <- users.map(_.first) ++=
+               Seq("Santa's Little Helper", "Snowball")
+      total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
+      /* All test DBs seem to report the actual number of rows. None would also be acceptable: */
+      _ = total.map(_ shouldBe 7)
+      r1 <- q1.result
+      _ = r1 shouldBe expectedUserTuples
+    } yield ()) andThen q1.result).withPinnedSession)
 
     materialize(p1.mapResult { case (id, f, l) => User(id, f, l.orNull) }).flatMap {
       allUsers =>
@@ -95,41 +96,42 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
     }.flatMap { allUsers =>
       //TODO verifyable non-random test
       val ordersInserts = for (u <- allUsers if u.first != "Apu" &&
-                                   u.first != "Snowball"; i <- 1 to 2) yield
-        orders.map(o => (o.userID, o.product, o.shipped, o.rebate)) +=
-        (u.id, "Gizmo " + ((scala.math.random * 10) + 1).toInt, i == 2,
+                                 u.first != "Snowball"; i <- 1 to 2)
+        yield
+          orders.map(o => (o.userID, o.product, o.shipped, o.rebate)) +=
+            (u.id, "Gizmo " + ((scala.math.random * 10) + 1).toInt, i == 2,
             Some(u.first == "Marge"))
       db.run(seq(ordersInserts: _*))
     }.flatMap { _ =>
       val q3 = for (u <- users.sortBy(_.first) if u.last.isDefined;
-      o <- u.orders) yield
-        (u.first, u.last, o.orderID, o.product, o.shipped, o.rebate)
+                    o <- u.orders)
+        yield (u.first, u.last, o.orderID, o.product, o.shipped, o.rebate)
       q3.result.statements.toSeq.length.should(_ >= 1)
       // All Orders by Users with a last name by first name:
       materialize(db.stream(q3.result)).map(s => s.length shouldBe 8)
     }.flatMap { _ =>
       val q4 = for {
         u <- users
-        o <- u.orders if
-            (o.orderID === (for { o2 <- orders filter (o.userID === _.userID) } yield
-                  o2.orderID).max)
+        o <- u.orders if (o.orderID === (for {
+          o2 <- orders filter (o.userID === _.userID)
+        } yield o2.orderID).max)
       } yield (u.first, o.orderID)
       q4.result.statements.toSeq.length.should(_ >= 1)
 
-      def maxOfPer[T <: Table[_], C[_]](c: Query[T, _, C])(
-          m: (T => Rep[Int]), p: (T => Rep[Int])) =
+      def maxOfPer[T <: Table[_], C[_]](
+          c: Query[T, _, C])(m: (T => Rep[Int]), p: (T => Rep[Int])) =
         c filter { o =>
           m(o) === (for { o2 <- c if p(o) === p(o2) } yield m(o2)).max
         }
 
       val q4b = for (u <- users;
-      o <- maxOfPer(orders)(_.orderID, _.userID) if o.userID === u.id) yield
-        (u.first, o.orderID)
+                     o <- maxOfPer(orders)(_.orderID, _.userID)
+                     if o.userID === u.id) yield (u.first, o.orderID)
       q4b.result.statements.toSeq.length.should(_ >= 1)
 
       val q4d = for (u <- users if u.first inSetBind List("Homer", "Marge");
-      o <- orders if o.userID === u.id) yield
-        (u.first, (LiteralColumn(1) + o.orderID, 1), o.product)
+                     o <- orders if o.userID === u.id)
+        yield (u.first, (LiteralColumn(1) + o.orderID, 1), o.product)
       q4d.result.statements.toSeq.length.should(_ >= 1)
 
       db.run(for {
@@ -140,9 +142,9 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
                             ("Lenny", 8),
                             ("Santa's Little Helper", 10))
         r4b <- q4b
-          .to[Set]
-          .result
-          .named("Latest Order per User, using maxOfPer")
+                .to[Set]
+                .result
+                .named("Latest Order per User, using maxOfPer")
         _ = r4b shouldBe Set(("Homer", 2),
                              ("Marge", 4),
                              ("Carl", 6),
@@ -216,8 +218,7 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
       val q10 =
         users.filter(_.last inSetBind Seq()).map(u => (u.first, u.last))
 
-      db.run(
-          for {
+      db.run(for {
         updated2 <- q8.update("n/a", Some("n/a"))
         _ = updated2 shouldBe 1
         _ <- q9.result.map(_ shouldBe 4)

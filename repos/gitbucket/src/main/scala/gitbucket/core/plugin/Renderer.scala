@@ -20,14 +20,14 @@ object MarkdownRenderer extends Renderer {
   override def render(request: RenderRequest): Html = {
     import request._
     Html(
-        Markdown.toHtml(
-            markdown = fileContent,
-            repository = repository,
-            enableWikiLink = enableWikiLink,
-            enableRefsLink = enableRefsLink,
-            enableAnchor = enableAnchor,
-            enableLineBreaks = false
-        )(context))
+      Markdown.toHtml(
+        markdown = fileContent,
+        repository = repository,
+        enableWikiLink = enableWikiLink,
+        enableRefsLink = enableRefsLink,
+        enableAnchor = enableAnchor,
+        enableLineBreaks = false
+      )(context))
   }
 }
 
@@ -35,7 +35,7 @@ object DefaultRenderer extends Renderer {
   override def render(request: RenderRequest): Html = {
     import request._
     Html(
-        s"<tt>${fileContent.split("(\\r\\n)|\\n").map(xml.Utility.escape(_)).mkString("<br/>")}</tt>"
+      s"<tt>${fileContent.split("(\\r\\n)|\\n").map(xml.Utility.escape(_)).mkString("<br/>")}</tt>"
     )
   }
 }

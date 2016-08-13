@@ -21,7 +21,11 @@ import cascading.flow.{Flow, FlowDef}
 import com.twitter.algebird._
 import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
-import com.twitter.summingbird.option.{Commutative, NonCommutative, Commutativity}
+import com.twitter.summingbird.option.{
+  Commutative,
+  NonCommutative,
+  Commutativity
+}
 import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
 
 import org.scalacheck._
@@ -59,7 +63,7 @@ object LTuple2Properties extends Properties("LTuple2 Properties") {
   }
 
   property(
-      "things when tuple2 of different types equals then LTuple2 equals too") = {
+    "things when tuple2 of different types equals then LTuple2 equals too") = {
     forAll { (a1: Int, b1: String, a2: Int, b2: String) =>
       val ltup1 = LTuple2(a1, b1)
       val ltup2 = LTuple2(a2, b2)

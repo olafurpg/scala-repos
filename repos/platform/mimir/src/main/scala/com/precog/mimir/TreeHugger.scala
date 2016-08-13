@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -45,10 +45,10 @@ class Code extends UsefulStuff {
 
   val imports =
     BLOCK(
-        IMPORT("bytecode.Library") :: IMPORT("bytecode.BuiltInFunc1") :: IMPORT(
-            "java.lang.Math") :: IMPORT("java.lang.String") :: IMPORT(
-            "bytecode.BuiltInFunc2") :: IMPORT("yggdrasil._") :: Nil: _*) inPackage
-    ("mimir") inPackage ("com.precog")
+      IMPORT("bytecode.Library") :: IMPORT("bytecode.BuiltInFunc1") :: IMPORT(
+        "java.lang.Math") :: IMPORT("java.lang.String") :: IMPORT(
+        "bytecode.BuiltInFunc2") :: IMPORT("yggdrasil._") :: Nil: _*) inPackage
+      ("mimir") inPackage ("com.precog")
 
   val methods: Array[String] = classOf[Math].getMethods.map(_.getName)
   val parameters = classOf[Math].getMethods.map(_.getParameterTypes)
@@ -65,39 +65,41 @@ class Code extends UsefulStuff {
 
   val trait1: Tree = {
     TRAITDEF("GenLibrary") withParents ("Library") := BLOCK(
-        LAZYVAL("mathlib1") := REF("_mathlib1"),
-        LAZYVAL("mathlib2") := REF("_mathlib2"),
-        DEF("_mathlib1", sym.BIF1) := REF("Set()"),
-        DEF("_mathlib2", sym.BIF2) := REF("Set()")
+      LAZYVAL("mathlib1") := REF("_mathlib1"),
+      LAZYVAL("mathlib2") := REF("_mathlib2"),
+      DEF("_mathlib1", sym.BIF1) := REF("Set()"),
+      DEF("_mathlib2", sym.BIF2) := REF("Set()")
     )
   }
 
   def trait2: Tree = {
     TRAITDEF("Genlib") withParents ("GenOpcode", "GenLibrary") := BLOCK(
-        (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
-              REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
+      (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
+        REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
         (DEF("_mathlib2") withFlags (Flags.OVERRIDE) := REF("super._mathlib2") SEQ_++
-            (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
+          (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
     )
   }
 
   def objects1(method: String): Tree = {
     OBJECTDEF(method) withParents
-    ("""BIF1(Vector("std", "math"), "%s")""".format(method)) :=
+      ("""BIF1(Vector("std", "math"), "%s")""".format(method)) :=
       BLOCK(VAL("operandType") := (REF("Some(SDecimal)")),
             VAL("operation", sym.PartialFunction1) :=
-              BLOCK(CASE(REF("SDecimal(num)")) ==> REF(
-                    """SDecimal(Math.%s(num.toDouble))""".format(method))))
+              BLOCK(
+                CASE(REF("SDecimal(num)")) ==> REF(
+                  """SDecimal(Math.%s(num.toDouble))""".format(method))))
   }
 
   def objects2(method: String): Tree = {
     OBJECTDEF(method) withParents
-    ("""BIF2(Vector("std", "math"), "%s")""".format(method)) := BLOCK(
-        VAL("operandType") := (REF("(Some(SDecimal), Some(SDecimal))")),
-        VAL("operation", sym.PartialFunction2) :=
-          BLOCK(CASE(REF("(SDecimal(num1), SDecimal(num2))")) ==> REF(
-                """SDecimal(Math.%s(num1.toDouble, num2.toDouble))""".format(
-                    method))))
+      ("""BIF2(Vector("std", "math"), "%s")""".format(method)) := BLOCK(
+      VAL("operandType") := (REF("(Some(SDecimal), Some(SDecimal))")),
+      VAL("operation", sym.PartialFunction2) :=
+        BLOCK(
+          CASE(REF("(SDecimal(num1), SDecimal(num2))")) ==> REF(
+            """SDecimal(Math.%s(num1.toDouble, num2.toDouble))""".format(
+              method))))
   }
 
   val methodsOneGen =
@@ -115,7 +117,7 @@ class Code extends UsefulStuff {
   val str: String = treeToString(trees: _*)
 
   val fileInstance = new File(
-      "mimir/src/main/scala/com/precog/mimir/Genlib.scala")
+    "mimir/src/main/scala/com/precog/mimir/Genlib.scala")
   fileInstance.delete()
   fileInstance.createNewFile()
   val writer = new FileWriter(fileInstance)

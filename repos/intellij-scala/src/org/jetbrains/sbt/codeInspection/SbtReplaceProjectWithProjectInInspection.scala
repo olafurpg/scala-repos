@@ -4,7 +4,10 @@ package codeInspection
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
@@ -26,17 +29,17 @@ class SbtReplaceProjectWithProjectInInspection extends AbstractInspection {
               Seq(projectNamePattern: ScReferencePattern)) =>
           findPlaceToFix(call, projectNamePattern.getText).foreach { place =>
             holder.registerProblem(
-                place,
-                SbtBundle("sbt.inspection.projectIn.name"),
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                new SbtReplaceProjectWithProjectInQuickFix(place))
+              place,
+              SbtBundle("sbt.inspection.projectIn.name"),
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+              new SbtReplaceProjectWithProjectInQuickFix(place))
           }
         case _ => // do nothing
       }
   }
 
-  private def findPlaceToFix(
-      call: ScMethodCall, projectName: String): Option[ScMethodCall] = {
+  private def findPlaceToFix(call: ScMethodCall,
+                             projectName: String): Option[ScMethodCall] = {
     var placeToFix: Option[ScMethodCall] = None
     val visitor = new ScalaRecursiveElementVisitor {
       override def visitMethodCallExpression(call: ScMethodCall) = call match {
@@ -53,15 +56,17 @@ class SbtReplaceProjectWithProjectInInspection extends AbstractInspection {
 }
 
 class SbtReplaceProjectWithProjectInQuickFix(call: ScMethodCall)
-    extends AbstractFixOnPsiElement(
-        SbtBundle("sbt.inspection.projectIn.name"), call) {
+    extends AbstractFixOnPsiElement(SbtBundle("sbt.inspection.projectIn.name"),
+                                    call) {
 
   def doApplyFix(project: Project) = {
     val place = getElement
     place match {
       case ScMethodCall(_, Seq(_, pathElt)) =>
-        place.replace(ScalaPsiElementFactory.createExpressionFromText(
-                "project.in(" + pathElt.getText + ")", place.getManager))
+        place.replace(
+          ScalaPsiElementFactory.createExpressionFromText(
+            "project.in(" + pathElt.getText + ")",
+            place.getManager))
       case _ => // do nothing
     }
   }

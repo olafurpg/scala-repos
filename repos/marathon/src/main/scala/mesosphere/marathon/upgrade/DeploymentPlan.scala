@@ -24,10 +24,10 @@ final case class StartApplication(app: AppDefinition, scaleTo: Int)
     extends DeploymentAction
 
 // application is started, but the instance count should be changed
-final case class ScaleApplication(
-    app: AppDefinition,
-    scaleTo: Int,
-    sentencedToDeath: Option[Iterable[Task]] = None)
+final case class ScaleApplication(app: AppDefinition,
+                                  scaleTo: Int,
+                                  sentencedToDeath: Option[Iterable[Task]] =
+                                    None)
     extends DeploymentAction
 
 // application is started, but shall be completely stopped
@@ -38,8 +38,8 @@ final case class RestartApplication(app: AppDefinition)
     extends DeploymentAction
 
 // resolve and store artifacts for given app
-final case class ResolveArtifacts(
-    app: AppDefinition, url2Path: Map[URL, String])
+final case class ResolveArtifacts(app: AppDefinition,
+                                  url2Path: Map[URL, String])
     extends DeploymentAction
 
 /**
@@ -94,8 +94,8 @@ final case class DeploymentPlan(id: String,
     affectedApplicationIds.intersect(other.affectedApplicationIds).nonEmpty
 
   def createdOrUpdatedApps: Seq[AppDefinition] = {
-    target.transitiveApps.toIndexedSeq
-      .filter(app => affectedApplicationIds(app.id))
+    target.transitiveApps.toIndexedSeq.filter(app =>
+      affectedApplicationIds(app.id))
   }
 
   override def toString: String = {
@@ -140,9 +140,9 @@ final case class DeploymentPlan(id: String,
   override def mergeFromProto(
       msg: Protos.DeploymentPlanDefinition): DeploymentPlan =
     DeploymentPlan(
-        original = Group.empty.mergeFromProto(msg.getOriginal),
-        target = Group.empty.mergeFromProto(msg.getTarget),
-        version = Timestamp(msg.getVersion)
+      original = Group.empty.mergeFromProto(msg.getOriginal),
+      target = Group.empty.mergeFromProto(msg.getTarget),
+      version = Timestamp(msg.getVersion)
     ).copy(id = msg.getId)
 
   override def toProto: Protos.DeploymentPlanDefinition =
@@ -198,8 +198,8 @@ object DeploymentPlan {
     import org.jgrapht.DirectedGraph
     import org.jgrapht.graph.DefaultEdge
 
-    def longestPathFromVertex[V](
-        g: DirectedGraph[V, DefaultEdge], vertex: V): Seq[V] = {
+    def longestPathFromVertex[V](g: DirectedGraph[V, DefaultEdge],
+                                 vertex: V): Seq[V] = {
       val outgoingEdges: Set[DefaultEdge] =
         if (g.containsVertex(vertex)) g.outgoingEdgesOf(vertex).asScala.toSet
         else Set[DefaultEdge]()
@@ -243,8 +243,10 @@ object DeploymentPlan {
 
               // Scale-only change.
               case Some(oldApp) if oldApp.isOnlyScaleChange(newApp) =>
-                Some(ScaleApplication(
-                        newApp, newApp.instances, toKill.get(newApp.id)))
+                Some(
+                  ScaleApplication(newApp,
+                                   newApp.instances,
+                                   toKill.get(newApp.id)))
 
               // Update or restart an existing app.
               case Some(oldApp) if oldApp.needsRestart(newApp) =>
@@ -291,18 +293,18 @@ object DeploymentPlan {
 
     // 1. Destroy apps that do not exist in the target.
     steps += DeploymentStep(
-        (originalApps -- targetApps.keys).valuesIterator.map { oldApp =>
-          StopApplication(oldApp)
-        }.to[Seq]
+      (originalApps -- targetApps.keys).valuesIterator.map { oldApp =>
+        StopApplication(oldApp)
+      }.to[Seq]
     )
 
     // 2. Start apps that do not exist in the original, requiring only 0
     //    instances.  These are scaled as needed in the dependency-ordered
     //    steps that follow.
     steps += DeploymentStep(
-        (targetApps -- originalApps.keys).valuesIterator.map { newApp =>
-          StartApplication(newApp, 0)
-        }.to[Seq]
+      (targetApps -- originalApps.keys).valuesIterator.map { newApp =>
+        StartApplication(newApp, 0)
+      }.to[Seq]
     )
 
     // 3. For each app in each dependency class,
@@ -321,11 +323,11 @@ object DeploymentPlan {
 
     // Build the result.
     val result = DeploymentPlan(
-        UUID.randomUUID().toString,
-        original,
-        target,
-        steps.result().filter(_.actions.nonEmpty),
-        version
+      UUID.randomUUID().toString,
+      original,
+      target,
+      steps.result().filter(_.actions.nonEmpty),
+      version
     )
 
     result
@@ -334,6 +336,6 @@ object DeploymentPlan {
   implicit lazy val deploymentPlanIsValid: Validator[DeploymentPlan] =
     validator[DeploymentPlan] { plan =>
       plan.createdOrUpdatedApps as "app" is every(
-          valid(AppDefinition.updateIsValid(plan.original)))
+        valid(AppDefinition.updateIsValid(plan.original)))
     }
 }

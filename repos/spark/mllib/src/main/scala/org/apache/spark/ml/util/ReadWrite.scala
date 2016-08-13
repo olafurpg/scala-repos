@@ -52,7 +52,7 @@ private[util] sealed trait BaseReadWrite {
   protected final def sqlContext: SQLContext = {
     if (optionSQLContext.isEmpty) {
       optionSQLContext = Some(
-          SQLContext.getOrCreate(SparkContext.getOrCreate()))
+        SQLContext.getOrCreate(SparkContext.getOrCreate()))
     }
     optionSQLContext.get
   }
@@ -75,7 +75,7 @@ abstract class MLWriter extends BaseReadWrite with Logging {
     */
   @Since("1.6.0")
   @throws[IOException](
-      "If the input path already exists but overwrite is not enabled.")
+    "If the input path already exists but overwrite is not enabled.")
   def save(path: String): Unit = {
     val hadoopConf = sc.hadoopConfiguration
     val outputPath = new Path(path)
@@ -89,7 +89,7 @@ abstract class MLWriter extends BaseReadWrite with Logging {
         fs.delete(qualifiedOutputPath, true)
       } else {
         throw new IOException(
-            s"Path $path already exists. Please use write.overwrite().save(path) to overwrite it.")
+          s"Path $path already exists. Please use write.overwrite().save(path) to overwrite it.")
       }
     }
     saveImpl(path)
@@ -133,7 +133,7 @@ trait MLWritable {
     */
   @Since("1.6.0")
   @throws[IOException](
-      "If the input path already exists but overwrite is not enabled.")
+    "If the input path already exists but overwrite is not enabled.")
   def save(path: String): Unit = write.save(path)
 }
 
@@ -226,15 +226,14 @@ private[ml] object DefaultParamsWriter {
     val cls = instance.getClass.getName
     val params =
       instance.extractParamMap().toSeq.asInstanceOf[Seq[ParamPair[Any]]]
-    val jsonParams = paramMap.getOrElse(
-        render(params.map {
+    val jsonParams = paramMap.getOrElse(render(params.map {
       case ParamPair(p, v) =>
         p.name -> parse(p.jsonEncode(v))
     }.toList))
     val basicMetadata =
       ("class" -> cls) ~ ("timestamp" -> System.currentTimeMillis()) ~
-      ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
-      ("paramMap" -> jsonParams)
+        ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
+        ("paramMap" -> jsonParams)
     val metadata = extraMetadata match {
       case Some(jObject) =>
         basicMetadata ~ jObject
@@ -299,12 +298,12 @@ private[ml] object DefaultParamsReader {
           }.map(_._2)
           assert(values.length == 1,
                  s"Expected one instance of Param '$paramName' but found" +
-                 s" ${values.length} in JSON Params: " +
-                 pairs.map(_.toString).mkString(", "))
+                   s" ${values.length} in JSON Params: " +
+                   pairs.map(_.toString).mkString(", "))
           values.head
         case _ =>
           throw new IllegalArgumentException(
-              s"Cannot recognize JSON metadata: $metadataJson.")
+            s"Cannot recognize JSON metadata: $metadataJson.")
       }
     }
   }
@@ -330,11 +329,16 @@ private[ml] object DefaultParamsReader {
     if (expectedClassName.nonEmpty) {
       require(className == expectedClassName,
               s"Error loading metadata: Expected class name" +
-              s" $expectedClassName but found class name $className")
+                s" $expectedClassName but found class name $className")
     }
 
-    Metadata(
-        className, uid, timestamp, sparkVersion, params, metadata, metadataStr)
+    Metadata(className,
+             uid,
+             timestamp,
+             sparkVersion,
+             params,
+             metadata,
+             metadataStr)
   }
 
   /**
@@ -354,7 +358,7 @@ private[ml] object DefaultParamsReader {
         }
       case _ =>
         throw new IllegalArgumentException(
-            s"Cannot recognize JSON metadata: ${metadata.metadataJson}.")
+          s"Cannot recognize JSON metadata: ${metadata.metadataJson}.")
     }
   }
 

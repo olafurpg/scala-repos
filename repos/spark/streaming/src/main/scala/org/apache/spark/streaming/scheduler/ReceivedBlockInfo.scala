@@ -18,7 +18,10 @@
 package org.apache.spark.streaming.scheduler
 
 import org.apache.spark.storage.StreamBlockId
-import org.apache.spark.streaming.receiver.{ReceivedBlockStoreResult, WriteAheadLogBasedStoreResult}
+import org.apache.spark.streaming.receiver.{
+  ReceivedBlockStoreResult,
+  WriteAheadLogBasedStoreResult
+}
 import org.apache.spark.streaming.util.WriteAheadLogRecordHandle
 
 /** Information about blocks received by the receiver */

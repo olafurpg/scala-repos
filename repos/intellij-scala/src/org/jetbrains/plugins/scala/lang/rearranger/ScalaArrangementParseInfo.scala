@@ -89,7 +89,7 @@ class ScalaArrangementParseInfo {
   ): Option[ScalaArrangementDependency] = {
     val entry: ScalaArrangementEntry = methodToEntry(method)
     val result: ScalaArrangementDependency = new ScalaArrangementDependency(
-        entry)
+      entry)
     var toProcess: List[(ScFunction, ScalaArrangementDependency)] =
       List[(ScFunction, ScalaArrangementDependency)]()
     toProcess = (method, result) :: toProcess
@@ -107,7 +107,7 @@ class ScalaArrangementParseInfo {
             methodToEntry
               .get(dependentMethod)
               .foreach(dependentEntry =>
-                    if (dependentEntry != null) {
+                if (dependentEntry != null) {
                   val dependentMethodInfo =
                     if (cache.contains(dependentMethod)) {
                       cache(dependentMethod)
@@ -131,7 +131,7 @@ class ScalaArrangementParseInfo {
     javaPropertiesData.get(key) match {
       case Some(existingData) =>
         javaPropertiesData +=
-        (key -> new ScalaPropertyInfo(entry, existingData.setter))
+          (key -> new ScalaPropertyInfo(entry, existingData.setter))
       case None =>
         javaPropertiesData += (key -> new ScalaPropertyInfo(entry, null))
     }
@@ -143,7 +143,7 @@ class ScalaArrangementParseInfo {
     javaPropertiesData.get(key) match {
       case Some(existingData) =>
         javaPropertiesData +=
-        (key -> new ScalaPropertyInfo(existingData.getter, entry))
+          (key -> new ScalaPropertyInfo(existingData.getter, entry))
       case None =>
         javaPropertiesData += (key -> new ScalaPropertyInfo(null, entry))
     }
@@ -155,7 +155,7 @@ class ScalaArrangementParseInfo {
     scalaPropertiesData.get(key) match {
       case Some(existingData) =>
         scalaPropertiesData +=
-        (key -> new ScalaPropertyInfo(entry, existingData.setter))
+          (key -> new ScalaPropertyInfo(entry, existingData.setter))
       case None =>
         scalaPropertiesData += (key -> new ScalaPropertyInfo(entry, null))
     }
@@ -167,7 +167,7 @@ class ScalaArrangementParseInfo {
     scalaPropertiesData.get(key) match {
       case Some(existingData) =>
         scalaPropertiesData +=
-        (key -> new ScalaPropertyInfo(existingData.getter, entry))
+          (key -> new ScalaPropertyInfo(existingData.getter, entry))
       case None =>
         scalaPropertiesData += (key -> new ScalaPropertyInfo(null, entry))
     }

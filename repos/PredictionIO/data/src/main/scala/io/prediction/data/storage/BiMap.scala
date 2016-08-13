@@ -21,11 +21,10 @@ import org.apache.spark.rdd.RDD
 /** Immutable Bi-directional Map
   *
   */
-class BiMap[K, V] private[prediction](
+class BiMap[K, V] private[prediction] (
     private val m: Map[K, V],
     private val i: Option[BiMap[V, K]] = None
-)
-    extends Serializable {
+) extends Serializable {
 
   // NOTE: make inverse's inverse point back to current BiMap
   val inverse: BiMap[V, K] = i.getOrElse {
@@ -130,7 +129,7 @@ object BiMap {
     new BiMap(HashMap(ki: _*))
   }
 
-  /** Create a BiMap[String, Double] from a set of String. The Double index 
+  /** Create a BiMap[String, Double] from a set of String. The Double index
     * starts from 0.
     * @param keys a set of String
     * @return a String to Double BiMap

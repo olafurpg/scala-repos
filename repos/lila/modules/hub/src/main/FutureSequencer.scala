@@ -12,9 +12,9 @@ final class FutureSequencer(system: ActorSystem,
   import FutureSequencer._
 
   private val sequencer = system.actorOf(
-      Props(classOf[FSequencer], receiveTimeout, executionTimeout, logger))
+    Props(classOf[FSequencer], receiveTimeout, executionTimeout, logger))
 
-  def apply[A : Manifest](op: => Fu[A]): Fu[A] = {
+  def apply[A: Manifest](op: => Fu[A]): Fu[A] = {
     val promise = Promise[A]()
     sequencer ! FSequencer.work(op, promise)
     promise.future
@@ -32,10 +32,10 @@ object FutureSequencer {
     val message = s"FutureSequencer timed out after $duration"
   }
 
-  private final class FSequencer(
-      receiveTimeout: Option[FiniteDuration],
-      executionTimeout: Option[FiniteDuration] = None,
-      logger: lila.log.Logger)
+  private final class FSequencer(receiveTimeout: Option[FiniteDuration],
+                                 executionTimeout: Option[FiniteDuration] =
+                                   None,
+                                 logger: lila.log.Logger)
       extends Actor {
 
     receiveTimeout.foreach(context.setReceiveTimeout)
@@ -73,8 +73,8 @@ object FutureSequencer {
             .orElse(executionTimeout)
             .fold(run()) { timeout =>
               run().withTimeout(
-                  duration = timeout,
-                  error = Timeout(timeout)
+                duration = timeout,
+                error = Timeout(timeout)
               )(context.system)
             }
             .andThenAnyway {

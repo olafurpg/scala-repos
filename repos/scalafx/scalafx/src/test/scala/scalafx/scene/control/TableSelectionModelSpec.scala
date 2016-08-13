@@ -39,10 +39,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TableViewTableSelectionModelSpec[T]
-    extends SimpleSFXDelegateSpec[
-        jfxsc.TableSelectionModel[T], TableSelectionModel[T]](
-        classOf[jfxsc.TableSelectionModel[T]],
-        classOf[TableSelectionModel[T]]) {
+    extends SimpleSFXDelegateSpec[jfxsc.TableSelectionModel[T],
+                                  TableSelectionModel[T]](
+      classOf[jfxsc.TableSelectionModel[T]],
+      classOf[TableSelectionModel[T]]) {
 
   override def getScalaClassInstance =
     new TableSelectionModel[T](this.getJavaClassInstance) {}

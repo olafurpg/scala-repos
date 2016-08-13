@@ -64,9 +64,9 @@ private[hive] case class InsertIntoHiveTable(
     conf.value.set("mapred.output.format.class", outputFileFormatClassName)
 
     FileOutputFormat.setOutputPath(
-        conf.value,
-        SparkHiveWriterContainer.createPathFromString(
-            fileSinkConf.getDirName, conf.value))
+      conf.value,
+      SparkHiveWriterContainer.createPathFromString(fileSinkConf.getDirName,
+                                                    conf.value))
     log.debug("Saving as hadoop file of type " + valueClass.getSimpleName)
     writerContainer.driverSideSetup()
     sc.sparkContext.runJob(rdd, writerContainer.writeToFile _)
@@ -88,8 +88,8 @@ private[hive] case class InsertIntoHiveTable(
     val tmpLocation = hiveContext.getExternalTmpPath(tableLocation)
     val fileSinkConf = new FileSinkDesc(tmpLocation.toString, tableDesc, false)
     val isCompressed = sc.hiveconf.getBoolean(
-        ConfVars.COMPRESSRESULT.varname,
-        ConfVars.COMPRESSRESULT.defaultBoolVal)
+      ConfVars.COMPRESSRESULT.varname,
+      ConfVars.COMPRESSRESULT.defaultBoolVal)
 
     if (isCompressed) {
       // Please note that isCompressed, "mapred.output.compress", "mapred.output.compression.codec",
@@ -98,9 +98,9 @@ private[hive] case class InsertIntoHiveTable(
       sc.hiveconf.set("mapred.output.compress", "true")
       fileSinkConf.setCompressed(true)
       fileSinkConf.setCompressCodec(
-          sc.hiveconf.get("mapred.output.compression.codec"))
+        sc.hiveconf.get("mapred.output.compression.codec"))
       fileSinkConf.setCompressType(
-          sc.hiveconf.get("mapred.output.compression.type"))
+        sc.hiveconf.get("mapred.output.compression.type"))
     }
 
     val numDynamicPartitions = partition.values.count(_.isEmpty)
@@ -148,9 +148,9 @@ private[hive] case class InsertIntoHiveTable(
     if (speculationEnabled && outputCommitterClass.contains("Direct")) {
       val warningMessage =
         s"$outputCommitterClass may be an output committer that writes data directly to " +
-        "the final location. Because speculation is enabled, this output committer may " +
-        "cause data loss (see the case in SPARK-10063). If possible, please use a output " +
-        "committer that does not have this behavior (e.g. FileOutputCommitter)."
+          "the final location. Because speculation is enabled, this output committer may " +
+          "cause data loss (see the case in SPARK-10063). If possible, please use a output " +
+          "committer that does not have this behavior (e.g. FileOutputCommitter)."
       logWarning(warningMessage)
     }
 
@@ -164,8 +164,10 @@ private[hive] case class InsertIntoHiveTable(
                                                      child.output,
                                                      table)
       } else {
-        new SparkHiveWriterContainer(
-            jobConf, fileSinkConf, child.output, table)
+        new SparkHiveWriterContainer(jobConf,
+                                     fileSinkConf,
+                                     child.output,
+                                     table)
       }
 
     @transient val outputClass =
@@ -188,8 +190,8 @@ private[hive] case class InsertIntoHiveTable(
       // loadPartition call orders directories created on the iteration order of the this map
       val orderedPartitionSpec = new util.LinkedHashMap[String, String]()
       table.hiveQlTable.getPartCols.asScala.foreach { entry =>
-        orderedPartitionSpec.put(
-            entry.getName, partitionSpec.getOrElse(entry.getName, ""))
+        orderedPartitionSpec.put(entry.getName,
+                                 partitionSpec.getOrElse(entry.getName, ""))
       }
 
       // inheritTableSpecs is set to true. It should be set to false for a IMPORT query
@@ -213,8 +215,8 @@ private[hive] case class InsertIntoHiveTable(
         // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-InsertingdataintoHiveTablesfromqueries
         // scalastyle:on
         val oldPart = catalog.client.getPartitionOption(
-            catalog.client.getTable(table.databaseName, table.tableName),
-            partitionSpec)
+          catalog.client.getTable(table.databaseName, table.tableName),
+          partitionSpec)
 
         if (oldPart.isEmpty || !ifNotExists) {
           catalog.client.loadPartition(outputPath.toString,
@@ -246,7 +248,7 @@ private[hive] case class InsertIntoHiveTable(
   override def executeCollect(): Array[InternalRow] = sideEffectResult.toArray
 
   protected override def doExecute(): RDD[InternalRow] = {
-    sqlContext.sparkContext.parallelize(
-        sideEffectResult.asInstanceOf[Seq[InternalRow]], 1)
+    sqlContext.sparkContext
+      .parallelize(sideEffectResult.asInstanceOf[Seq[InternalRow]], 1)
   }
 }

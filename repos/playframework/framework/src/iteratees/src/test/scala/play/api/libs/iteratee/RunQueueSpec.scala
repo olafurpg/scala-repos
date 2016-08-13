@@ -65,7 +65,10 @@ object RunQueueSpec extends Specification with ExecutionSpecification {
         val results: Seq[Future[Int]] = for (i <- 0 until 9) yield {
           countOrderingErrors(runSize, queueTester)
         }
-        Await.result(Future.sequence(results), waitTime).filter(_ > 0).size * 10
+        Await
+          .result(Future.sequence(results), waitTime)
+          .filter(_ > 0)
+          .size * 10
       }
 
       // Iteratively increase the run size until we get observable errors 90% of the time
@@ -79,8 +82,8 @@ object RunQueueSpec extends Specification with ExecutionSpecification {
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(
-            runSize, new NaiveQueueTester())
+        errorPercentage =
+          percentageOfRunsWithOrderingErrors(runSize, new NaiveQueueTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 

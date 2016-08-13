@@ -2,11 +2,20 @@ package org.scalatra
 package scalate
 
 import java.io.PrintWriter
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
+import javax.servlet.http.{
+  HttpServletRequest,
+  HttpServletResponse,
+  HttpSession
+}
 
 import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.servlet.ServletRenderContext
-import org.scalatra.servlet.{FileItem, FileMultiParams, FileUploadSupport, ServletBase}
+import org.scalatra.servlet.{
+  FileItem,
+  FileMultiParams,
+  FileUploadSupport,
+  ServletBase
+}
 
 /**
   * A render context integrated with Scalatra.  Exposes a few extra
@@ -38,8 +47,8 @@ class ScalatraRenderContext(protected val kernel: ServletBase,
   }
 
   @deprecated(
-      "`format` now means the same as `responseFormat`, `responseFormat` will be removed eventually",
-      "2.3")
+    "`format` now means the same as `responseFormat`, `responseFormat` will be removed eventually",
+    "2.3")
   def responseFormat: String = format
 
   def fileMultiParams: FileMultiParams = kernel match {

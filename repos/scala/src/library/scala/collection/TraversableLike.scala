@@ -67,10 +67,12 @@ import scala.language.higherKinds
   *  @define coll traversable collection
   */
 trait TraversableLike[+A, +Repr]
-    extends Any with HasNewBuilder[A, Repr] with FilterMonadic[A, Repr]
-    with TraversableOnce[A] with GenTraversableLike[A, Repr]
-    with Parallelizable[A, ParIterable[A]] {
-  self =>
+    extends Any
+    with HasNewBuilder[A, Repr]
+    with FilterMonadic[A, Repr]
+    with TraversableOnce[A]
+    with GenTraversableLike[A, Repr]
+    with Parallelizable[A, ParIterable[A]] { self =>
 
   import Traversable.breaks._
 
@@ -379,8 +381,8 @@ trait TraversableLike[+A, +Repr]
   }
 
   @migration(
-      "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
-      "2.9.0")
+    "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
+    "2.9.0")
   def scanRight[B, That](z: B)(op: (A, B) => B)(
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     var scanned = List(z)
@@ -479,8 +481,9 @@ trait TraversableLike[+A, +Repr]
     sliceWithKnownBound(scala.math.max(from, 0), until)
 
   // Precondition: from >= 0, until > 0, builder already configured for building.
-  private[this] def sliceInternal(
-      from: Int, until: Int, b: Builder[A, Repr]): Repr = {
+  private[this] def sliceInternal(from: Int,
+                                  until: Int,
+                                  b: Builder[A, Repr]): Repr = {
     var i = 0
     breakable {
       for (x <- this) {
@@ -492,8 +495,9 @@ trait TraversableLike[+A, +Repr]
     b.result
   }
   // Precondition: from >= 0
-  private[scala] def sliceWithKnownDelta(
-      from: Int, until: Int, delta: Int): Repr = {
+  private[scala] def sliceWithKnownDelta(from: Int,
+                                         until: Int,
+                                         delta: Int): Repr = {
     val b = newBuilder
     if (until <= from) b.result
     else {
@@ -585,8 +589,8 @@ trait TraversableLike[+A, +Repr]
   }
 
   @deprecatedOverriding(
-      "Enforce contract of toTraversable that if it is Traversable it returns itself.",
-      "2.11.0")
+    "Enforce contract of toTraversable that if it is Traversable it returns itself.",
+    "2.11.0")
   def toTraversable: Traversable[A] = thisCollection
 
   def toIterator: Iterator[A] = toStream.iterator

@@ -21,5 +21,5 @@ object AbstractSetFactory {
 }
 
 trait AbstractSetFactory extends SetFactory {
-  def empty[E : ClassTag]: ju.AbstractSet[E]
+  def empty[E: ClassTag]: ju.AbstractSet[E]
 }

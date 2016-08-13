@@ -8,11 +8,23 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportExprUsed, ImportSelectorUsed, ImportUsed, ImportWildcardSelectorUsed}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportExprUsed,
+  ImportSelectorUsed,
+  ImportUsed,
+  ImportWildcardSelectorUsed
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
-import org.jetbrains.plugins.scala.lang.psi.implicits.ImplicitCollector.{ImplicitState, NoResult, ImplicitResult}
+import org.jetbrains.plugins.scala.lang.psi.implicits.ImplicitCollector.{
+  ImplicitState,
+  NoResult,
+  ImplicitResult
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 
@@ -89,26 +101,25 @@ class ScalaResolveResult(
 
   def isRenamed: Option[String] = nameShadow
 
-  def copy(
-      subst: ScSubstitutor = substitutor,
-      problems: Seq[ApplicabilityProblem] = problems,
-      defaultParameterUsed: Boolean = defaultParameterUsed,
-      innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
-      tuplingUsed: Boolean = tuplingUsed,
-      isSetterFunction: Boolean = isSetterFunction,
-      isAssignment: Boolean = isAssignment,
-      notCheckedResolveResult: Boolean = notCheckedResolveResult,
-      isAccessible: Boolean = isAccessible,
-      resultUndef: Option[ScUndefinedSubstitutor] = None,
-      isDynamic: Boolean = isDynamic,
-      isForwardReference: Boolean = isForwardReference,
-      implicitParameterType: Option[ScType] = implicitParameterType,
-      importsUsed: collection.Set[ImportUsed] = importsUsed,
-      implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
-      implicitReason: ImplicitResult = implicitReason,
-      implicitSearchState: Option[ImplicitState] = implicitSearchState,
-      unresolvedTypeParameters: Option[Seq[TypeParameter]] = unresolvedTypeParameters)
-    : ScalaResolveResult =
+  def copy(subst: ScSubstitutor = substitutor,
+           problems: Seq[ApplicabilityProblem] = problems,
+           defaultParameterUsed: Boolean = defaultParameterUsed,
+           innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
+           tuplingUsed: Boolean = tuplingUsed,
+           isSetterFunction: Boolean = isSetterFunction,
+           isAssignment: Boolean = isAssignment,
+           notCheckedResolveResult: Boolean = notCheckedResolveResult,
+           isAccessible: Boolean = isAccessible,
+           resultUndef: Option[ScUndefinedSubstitutor] = None,
+           isDynamic: Boolean = isDynamic,
+           isForwardReference: Boolean = isForwardReference,
+           implicitParameterType: Option[ScType] = implicitParameterType,
+           importsUsed: collection.Set[ImportUsed] = importsUsed,
+           implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
+           implicitReason: ImplicitResult = implicitReason,
+           implicitSearchState: Option[ImplicitState] = implicitSearchState,
+           unresolvedTypeParameters: Option[Seq[TypeParameter]] =
+             unresolvedTypeParameters): ScalaResolveResult =
     new ScalaResolveResult(element,
                            subst,
                            importsUsed,
@@ -150,7 +161,7 @@ class ScalaResolveResult(
 
   override def hashCode: Int =
     element.hashCode + innerResolveResult.hashCode() * 31 +
-    nameShadow.hashCode() * 31 * 31 + implicitFunction.hashCode() * 31 * 31
+      nameShadow.hashCode() * 31 * 31 + implicitFunction.hashCode() * 31 * 31
 
   override def toString = {
     val name = element match {
@@ -223,8 +234,8 @@ class ScalaResolveResult(
           case clazz: PsiClass =>
             return getClazzPrecedence(clazz)
           case memb @ (_: ScBindingPattern | _: PsiMember) =>
-            val clazzStub = ScalaPsiUtil.getContextOfType(
-                getActualElement, false, classOf[PsiClass])
+            val clazzStub = ScalaPsiUtil
+              .getContextOfType(getActualElement, false, classOf[PsiClass])
             val clazz: PsiClass = clazzStub match {
               case clazz: PsiClass => clazz
               case _ => null
@@ -240,7 +251,7 @@ class ScalaResolveResult(
                   clazz match {
                     case o: ScObject
                         if o.isPackageObject &&
-                        !PsiTreeUtil.isContextAncestor(o, place, false) =>
+                          !PsiTreeUtil.isContextAncestor(o, place, false) =>
                       var q = o.qualifiedName
                       val packageSuffix: String = ".`package`"
                       if (q.endsWith(packageSuffix))

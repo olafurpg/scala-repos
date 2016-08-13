@@ -13,7 +13,7 @@ object ScalaAsyncSpec extends PlaySpecification {
   "scala async" should {
     "allow returning a future" in new WithApplication() {
       contentAsString(ScalaAsyncSamples.futureResult) must startWith(
-          "PI value computed: 3.14")
+        "PI value computed: 3.14")
     }
 
     "allow dispatching an intensive computation" in new WithApplication() {

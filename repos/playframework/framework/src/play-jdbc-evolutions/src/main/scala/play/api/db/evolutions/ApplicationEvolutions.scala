@@ -34,7 +34,7 @@ class ApplicationEvolutions @Inject()(config: EvolutionsConfig,
   def start(): Unit = {
 
     webCommands.addHandler(
-        new EvolutionsWebCommands(evolutions, reader, config))
+      new EvolutionsWebCommands(evolutions, reader, config))
 
     // allow db modules to write evolution files
     dynamicEvolutions.create()
@@ -69,17 +69,17 @@ class ApplicationEvolutions @Inject()(config: EvolutionsConfig,
               evolutions.evolve(db, scripts, autocommit, schema)
             case Mode.Prod if hasDown =>
               logger.warn(
-                  s"Your production database [$db] needs evolutions, including downs! \n\n${toHumanReadableScript(scripts)}")
+                s"Your production database [$db] needs evolutions, including downs! \n\n${toHumanReadableScript(scripts)}")
               logger.warn(
-                  s"Run with -Dplay.evolutions.db.$db.autoApply=true and -Dplay.evolutions.db.$db.autoApplyDowns=true if you want to run them automatically, including downs (be careful, especially if your down evolutions drop existing data)")
+                s"Run with -Dplay.evolutions.db.$db.autoApply=true and -Dplay.evolutions.db.$db.autoApplyDowns=true if you want to run them automatically, including downs (be careful, especially if your down evolutions drop existing data)")
 
               throw InvalidDatabaseRevision(db, toHumanReadableScript(scripts))
 
             case Mode.Prod =>
               logger.warn(
-                  s"Your production database [$db] needs evolutions! \n\n${toHumanReadableScript(scripts)}")
+                s"Your production database [$db] needs evolutions! \n\n${toHumanReadableScript(scripts)}")
               logger.warn(
-                  s"Run with -Dplay.evolutions.db.$db.autoApply=true if you want to run them automatically (be careful)")
+                s"Run with -Dplay.evolutions.db.$db.autoApply=true if you want to run them automatically (be careful)")
 
               throw InvalidDatabaseRevision(db, toHumanReadableScript(scripts))
 
@@ -153,14 +153,14 @@ class ApplicationEvolutions @Inject()(config: EvolutionsConfig,
       case _ => lockPlayEvolutionsLockSqls
     }
     try {
-      for (script <- lockScripts) s.executeQuery(
-          applySchema(script, dbConfig.schema))
+      for (script <- lockScripts)
+        s.executeQuery(applySchema(script, dbConfig.schema))
     } catch {
       case e: SQLException =>
         if (attempts == 0) throw e
         else {
           logger.warn(
-              "Exception while attempting to lock evolutions (other node probably has lock), sleeping for 1 sec")
+            "Exception while attempting to lock evolutions (other node probably has lock), sleeping for 1 sec")
           c.rollback()
           Thread.sleep(1000)
           lock(url, c, s, dbConfig, attempts - 1)
@@ -180,8 +180,8 @@ class ApplicationEvolutions @Inject()(config: EvolutionsConfig,
 
   private def applySchema(sql: String, schema: String): String = {
     sql.replaceAll(
-        "\\$\\{schema}",
-        Option(schema).filter(_.trim.nonEmpty).map(_.trim + ".").getOrElse(""))
+      "\\$\\{schema}",
+      Option(schema).filter(_.trim.nonEmpty).map(_.trim + ".").getOrElse(""))
   }
 }
 
@@ -230,16 +230,16 @@ private object ApplicationEvolutions {
     """
 
   val lockPlayEvolutionsLockSqls = List(
-      """
+    """
         select lock from ${schema}play_evolutions_lock where lock = 1 for update nowait
       """
   )
 
   val lockPlayEvolutionsLockMysqlSqls = List(
-      """
+    """
         set innodb_lock_wait_timeout = 1
       """,
-      """
+    """
         select `lock` from ${schema}play_evolutions_lock where `lock` = 1 for update
       """
   )
@@ -303,10 +303,10 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
 
     // Since the evolutions config was completely inverted and has changed massively, we have our own deprecated
     // implementation that reads deprecated keys from the root config, otherwise reads from the passed in config
-    def getDeprecated[A : ConfigLoader](config: PlayConfig,
-                                        baseKey: => String,
-                                        path: String,
-                                        deprecated: String): A = {
+    def getDeprecated[A: ConfigLoader](config: PlayConfig,
+                                       baseKey: => String,
+                                       path: String,
+                                       deprecated: String): A = {
       if (rootConfig.underlying.hasPath(deprecated)) {
         rootConfig.reportDeprecation(s"$baseKey.$path", deprecated)
         rootConfig.get[A](deprecated)
@@ -325,20 +325,28 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
     }
     val datasources =
       config.get[PlayConfig]("db").subKeys ++ loadDatasources(
-          "applyEvolutions") ++ loadDatasources("applyDownEvolutions")
+        "applyEvolutions") ++ loadDatasources("applyDownEvolutions")
 
     // Load defaults
     val enabled = config.get[Boolean]("enabled")
     val schema = config.get[String]("schema")
-    val autocommit = getDeprecated[Boolean](
-        config, "play.evolutions", "autocommit", "evolutions.autocommit")
-    val useLocks = getDeprecated[Boolean](
-        config, "play.evolutions", "useLocks", "evolutions.use.locks")
+    val autocommit = getDeprecated[Boolean](config,
+                                            "play.evolutions",
+                                            "autocommit",
+                                            "evolutions.autocommit")
+    val useLocks = getDeprecated[Boolean](config,
+                                          "play.evolutions",
+                                          "useLocks",
+                                          "evolutions.use.locks")
     val autoApply = config.get[Boolean]("autoApply")
     val autoApplyDowns = config.get[Boolean]("autoApplyDowns")
 
-    val defaultConfig = new DefaultEvolutionsDatasourceConfig(
-        enabled, schema, autocommit, useLocks, autoApply, autoApplyDowns)
+    val defaultConfig = new DefaultEvolutionsDatasourceConfig(enabled,
+                                                              schema,
+                                                              autocommit,
+                                                              useLocks,
+                                                              autoApply,
+                                                              autoApplyDowns)
 
     // Load config specific to datasources
     // Since not all the datasources will necessarily appear in the db map, because some will come from deprecated
@@ -362,8 +370,12 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
                                  s"play.evolutions.db.$datasource",
                                  "autoApplyDowns",
                                  s"applyDownEvolutions.$datasource")
-        datasource -> new DefaultEvolutionsDatasourceConfig(
-            enabled, schema, autocommit, useLocks, autoApply, autoApplyDowns)
+        datasource -> new DefaultEvolutionsDatasourceConfig(enabled,
+                                                            schema,
+                                                            autocommit,
+                                                            useLocks,
+                                                            autoApply,
+                                                            autoApplyDowns)
     }.toMap
 
     new DefaultEvolutionsConfig(defaultConfig, datasourceConfig)
@@ -409,28 +421,29 @@ class EvolutionsWebCommands @Inject()(evolutions: EvolutionsApi,
       .getOrElse("/")
 
     // Regex removes all parent directories from request path
-    request.path.replaceFirst("^((?!/@evolutions).)*(/@evolutions.*$)", "$2") match {
+    request.path
+      .replaceFirst("^((?!/@evolutions).)*(/@evolutions.*$)", "$2") match {
 
       case applyEvolutions(db) => {
-          Some {
-            val scripts =
-              evolutions.scripts(db, reader, config.forDatasource(db).schema)
-            evolutions.evolve(db,
-                              scripts,
-                              config.forDatasource(db).autocommit,
-                              config.forDatasource(db).schema)
-            buildLink.forceReload()
-            play.api.mvc.Results.Redirect(redirectUrl)
-          }
+        Some {
+          val scripts =
+            evolutions.scripts(db, reader, config.forDatasource(db).schema)
+          evolutions.evolve(db,
+                            scripts,
+                            config.forDatasource(db).autocommit,
+                            config.forDatasource(db).schema)
+          buildLink.forceReload()
+          play.api.mvc.Results.Redirect(redirectUrl)
         }
+      }
 
       case resolveEvolutions(db, rev) => {
-          Some {
-            evolutions.resolve(db, rev.toInt, config.forDatasource(db).schema)
-            buildLink.forceReload()
-            play.api.mvc.Results.Redirect(redirectUrl)
-          }
+        Some {
+          evolutions.resolve(db, rev.toInt, config.forDatasource(db).schema)
+          buildLink.forceReload()
+          play.api.mvc.Results.Redirect(redirectUrl)
         }
+      }
 
       case _ => None
     }
@@ -445,8 +458,8 @@ class EvolutionsWebCommands @Inject()(evolutions: EvolutionsApi,
   */
 case class InvalidDatabaseRevision(db: String, script: String)
     extends PlayException.RichDescription(
-        "Database '" + db + "' needs evolution!",
-        "An SQL script need to be run on your database.") {
+      "Database '" + db + "' needs evolution!",
+      "An SQL script need to be run on your database.") {
 
   def subTitle = "This SQL script must be run:"
   def content = script

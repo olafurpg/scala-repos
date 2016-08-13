@@ -48,7 +48,7 @@ private[spark] object PythonGatewayServer extends Logging {
     val callbackHost = sys.env("_PYSPARK_DRIVER_CALLBACK_HOST")
     val callbackPort = sys.env("_PYSPARK_DRIVER_CALLBACK_PORT").toInt
     logDebug(
-        s"Communicating GatewayServer port to Python driver at $callbackHost:$callbackPort")
+      s"Communicating GatewayServer port to Python driver at $callbackHost:$callbackPort")
     val callbackSocket = new Socket(callbackHost, callbackPort)
     val dos = new DataOutputStream(callbackSocket.getOutputStream)
     dos.writeInt(boundPort)

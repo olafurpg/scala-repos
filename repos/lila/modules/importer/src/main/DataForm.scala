@@ -2,7 +2,15 @@ package lila.importer
 
 import chess.format.Forsyth
 import chess.format.pgn.{Parser, Reader, ParsedPgn, Tag, TagType}
-import chess.{Game => ChessGame, Board, Replay, Color, Mode, MoveOrDrop, Status}
+import chess.{
+  Game => ChessGame,
+  Board,
+  Replay,
+  Color,
+  Mode,
+  MoveOrDrop,
+  Status
+}
 import play.api.data._
 import play.api.data.Forms._
 import scalaz.Validation.FlatMap._
@@ -12,18 +20,19 @@ import lila.game._
 private[importer] final class DataForm {
 
   lazy val importForm = Form(
-      mapping(
-          "pgn" -> nonEmptyText.verifying("Invalid PGN", checkPgn _),
-          "analyse" -> optional(nonEmptyText)
-      )(ImportData.apply)(ImportData.unapply))
+    mapping(
+      "pgn" -> nonEmptyText.verifying("Invalid PGN", checkPgn _),
+      "analyse" -> optional(nonEmptyText)
+    )(ImportData.apply)(ImportData.unapply))
 
   private def checkPgn(pgn: String): Boolean =
     ImportData(pgn, none).preprocess(none).isSuccess
 }
 
 private[importer] case class Result(status: Status, winner: Option[Color])
-private[importer] case class Preprocessed(
-    game: Game, replay: Replay, result: Option[Result])
+private[importer] case class Preprocessed(game: Game,
+                                          replay: Replay,
+                                          result: Option[Result])
 
 case class ImportData(pgn: String, analyse: Option[String]) {
 
@@ -74,20 +83,17 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
             val dbGame = Game
               .make(
-                  game = replay.state,
-                  whitePlayer = Player.white withName name(_.White,
-                                                           _.WhiteElo),
-                  blackPlayer = Player.black withName name(_.Black,
-                                                           _.BlackElo),
-                  mode = Mode.Casual,
-                  variant = variant,
-                  source = Source.Import,
-                  pgnImport = PgnImport
-                      .make(user = user, date = date, pgn = pgn)
-                      .some
-                )
+                game = replay.state,
+                whitePlayer = Player.white withName name(_.White, _.WhiteElo),
+                blackPlayer = Player.black withName name(_.Black, _.BlackElo),
+                mode = Mode.Casual,
+                variant = variant,
+                source = Source.Import,
+                pgnImport =
+                  PgnImport.make(user = user, date = date, pgn = pgn).some
+              )
               .copy(
-                  binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
+                binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
               )
               .start
 

@@ -11,12 +11,13 @@ import org.jetbrains.sbt.settings.{SbtSystemSettings, SbtSystemSettingsControl}
   * @author Pavel Fatin
   */
 class SbtImportControl
-    extends AbstractImportFromExternalSystemControl[
-        SbtProjectSettings, SbtProjectSettingsListener, SbtSystemSettings](
-        SbtProjectSystem.Id,
-        SbtSystemSettings.getInstance(
-            ProjectManager.getInstance.getDefaultProject),
-        SbtProjectSettings.default) {
+    extends AbstractImportFromExternalSystemControl[SbtProjectSettings,
+                                                    SbtProjectSettingsListener,
+                                                    SbtSystemSettings](
+      SbtProjectSystem.Id,
+      SbtSystemSettings.getInstance(
+        ProjectManager.getInstance.getDefaultProject),
+      SbtProjectSettings.default) {
 
   def getLinkedProjectChooserDescriptor =
     new FileChooserDescriptor(true, true, true, true, true, true)

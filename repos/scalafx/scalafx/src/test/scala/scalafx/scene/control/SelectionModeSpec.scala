@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SelectionModeSpec
     extends SFXEnumDelegateSpec[jfxsc.SelectionMode, SelectionMode](
-        javaClass = classOf[jfxsc.SelectionMode],
-        scalaClass = classOf[SelectionMode],
-        companion = SelectionMode)
+      javaClass = classOf[jfxsc.SelectionMode],
+      scalaClass = classOf[SelectionMode],
+      companion = SelectionMode)

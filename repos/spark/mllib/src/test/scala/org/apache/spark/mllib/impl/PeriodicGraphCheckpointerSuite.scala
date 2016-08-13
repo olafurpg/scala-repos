@@ -26,7 +26,8 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
 
 class PeriodicGraphCheckpointerSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   import PeriodicGraphCheckpointerSuite._
 
@@ -35,7 +36,8 @@ class PeriodicGraphCheckpointerSuite
 
     val graph1 = createGraph(sc)
     val checkpointer = new PeriodicGraphCheckpointer[Double, Double](
-        10, graph1.vertices.sparkContext)
+      10,
+      graph1.vertices.sparkContext)
     checkpointer.update(graph1)
     graphsToCheck = graphsToCheck :+ GraphToCheck(graph1, 1)
     checkPersistence(graphsToCheck, 1)
@@ -58,7 +60,8 @@ class PeriodicGraphCheckpointerSuite
     sc.setCheckpointDir(path)
     val graph1 = createGraph(sc)
     val checkpointer = new PeriodicGraphCheckpointer[Double, Double](
-        checkpointInterval, graph1.vertices.sparkContext)
+      checkpointInterval,
+      graph1.vertices.sparkContext)
     checkpointer.update(graph1)
     graph1.edges.count()
     graph1.vertices.count()
@@ -121,7 +124,7 @@ private object PeriodicGraphCheckpointerSuite {
     } catch {
       case _: AssertionError =>
         throw new Exception(
-            s"PeriodicGraphCheckpointerSuite.checkPersistence failed with:\n" +
+          s"PeriodicGraphCheckpointerSuite.checkPersistence failed with:\n" +
             s"\t gIndex = $gIndex\n" + s"\t iteration = $iteration\n" +
             s"\t graph.vertices.getStorageLevel = ${graph.vertices.getStorageLevel}\n" +
             s"\t graph.edges.getStorageLevel = ${graph.edges.getStorageLevel}\n")
@@ -171,15 +174,15 @@ private object PeriodicGraphCheckpointerSuite {
         }
       } else {
         // Graph should never be checkpointed
-        assert(
-            !graph.isCheckpointed, "Graph should never have been checkpointed")
+        assert(!graph.isCheckpointed,
+               "Graph should never have been checkpointed")
         assert(graph.getCheckpointFiles.isEmpty,
                "Graph should not have any checkpoint files")
       }
     } catch {
       case e: AssertionError =>
         throw new Exception(
-            s"PeriodicGraphCheckpointerSuite.checkCheckpoint failed with:\n" +
+          s"PeriodicGraphCheckpointerSuite.checkCheckpoint failed with:\n" +
             s"\t gIndex = $gIndex\n" + s"\t iteration = $iteration\n" +
             s"\t checkpointInterval = $checkpointInterval\n" +
             s"\t graph.isCheckpointed = ${graph.isCheckpointed}\n" +

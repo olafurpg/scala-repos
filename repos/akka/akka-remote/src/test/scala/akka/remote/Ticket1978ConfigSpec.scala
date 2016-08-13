@@ -9,12 +9,14 @@ class Ticket1978ConfigSpec
     akka.remote.netty.ssl.security {
       random-number-generator = "AES128CounterSecureRNG"
     }
-    """) with ImplicitSender with DefaultTimeout {
+    """)
+    with ImplicitSender
+    with DefaultTimeout {
 
   "SSL Remoting" must {
     "be able to parse these extra Netty config elements" in {
       val settings = new SSLSettings(
-          system.settings.config.getConfig("akka.remote.netty.ssl.security"))
+        system.settings.config.getConfig("akka.remote.netty.ssl.security"))
 
       settings.SSLKeyStore should ===(Some("keystore"))
       settings.SSLKeyStorePassword should ===(Some("changeme"))
@@ -23,9 +25,9 @@ class Ticket1978ConfigSpec
       settings.SSLTrustStorePassword should ===(Some("changeme"))
       settings.SSLProtocol should ===(Some("TLSv1.2"))
       settings.SSLEnabledAlgorithms should ===(
-          Set("TLS_RSA_WITH_AES_128_CBC_SHA"))
+        Set("TLS_RSA_WITH_AES_128_CBC_SHA"))
       settings.SSLRandomNumberGenerator should ===(
-          Some("AES128CounterSecureRNG"))
+        Some("AES128CounterSecureRNG"))
     }
   }
 }

@@ -34,7 +34,11 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{DoubleProperty, StringProperty}
 import scalafx.collections._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 
 /**
@@ -291,7 +295,8 @@ object ButtonBar {
 
   */
 class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
-    extends Control(delegate) with SFXDelegate[jfxsc.ButtonBar] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ButtonBar] {
 
   /**
     * Creates a ButtonBar with the given button order (refer to

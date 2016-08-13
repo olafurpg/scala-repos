@@ -62,15 +62,15 @@ object PJavaEventStore {
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
 
     PEventStore.find(
-        appName,
-        channelName,
-        startTime,
-        untilTime,
-        entityType,
-        entityId,
-        eventNamesSeq,
-        targetEntityType,
-        targetEntityId
+      appName,
+      channelName,
+      startTime,
+      untilTime,
+      entityType,
+      entityId,
+      eventNamesSeq,
+      targetEntityType,
+      targetEntityId
     )(sc)
   }
 
@@ -95,11 +95,11 @@ object PJavaEventStore {
                           sc: SparkContext): JavaRDD[(String, PropertyMap)] = {
 
     PEventStore.aggregateProperties(
-        appName,
-        entityType,
-        channelName,
-        startTime,
-        untilTime
+      appName,
+      entityType,
+      channelName,
+      startTime,
+      untilTime
     )(sc)
   }
 }

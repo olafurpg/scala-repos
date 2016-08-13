@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScTypeParamImpl
@@ -68,8 +73,8 @@ class ScTypeParamElementType[Func <: ScTypeParam]
                             StringRef.fromString(typeParameterText))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeParamStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTypeParamStub = {
     val name = dataStream.readName
     val upperText = dataStream.readName
     val lowerText = dataStream.readName

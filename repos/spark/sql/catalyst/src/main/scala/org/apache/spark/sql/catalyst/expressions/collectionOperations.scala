@@ -19,15 +19,24 @@ package org.apache.spark.sql.catalyst.expressions
 import java.util.Comparator
 
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, CodegenFallback, ExprCode}
-import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData, MapData}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  CodegenFallback,
+  ExprCode
+}
+import org.apache.spark.sql.catalyst.util.{
+  ArrayData,
+  GenericArrayData,
+  MapData
+}
 import org.apache.spark.sql.types._
 
 /**
   * Given an array or map, returns its size.
   */
 case class Size(child: Expression)
-    extends UnaryExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with ExpectsInputTypes {
   override def dataType: DataType = IntegerType
   override def inputTypes: Seq[AbstractDataType] =
     Seq(TypeCollection(ArrayType, MapType))
@@ -47,7 +56,9 @@ case class Size(child: Expression)
   * the array elements and returns it.
   */
 case class SortArray(base: Expression, ascendingOrder: Expression)
-    extends BinaryExpression with ExpectsInputTypes with CodegenFallback {
+    extends BinaryExpression
+    with ExpectsInputTypes
+    with CodegenFallback {
 
   def this(e: Expression) = this(e, Literal(true))
 
@@ -61,10 +72,10 @@ case class SortArray(base: Expression, ascendingOrder: Expression)
       TypeCheckResult.TypeCheckSuccess
     case ArrayType(dt, _) =>
       TypeCheckResult.TypeCheckFailure(
-          s"$prettyName does not support sorting array of type ${dt.simpleString}")
+        s"$prettyName does not support sorting array of type ${dt.simpleString}")
     case _ =>
       TypeCheckResult.TypeCheckFailure(
-          s"$prettyName only supports array input.")
+        s"$prettyName only supports array input.")
   }
 
   @transient
@@ -136,7 +147,8 @@ case class SortArray(base: Expression, ascendingOrder: Expression)
   * Checks if the array (left) has the element (right)
   */
 case class ArrayContains(left: Expression, right: Expression)
-    extends BinaryExpression with ImplicitCastInputTypes {
+    extends BinaryExpression
+    with ImplicitCastInputTypes {
 
   override def dataType: DataType = BooleanType
 
@@ -152,12 +164,12 @@ case class ArrayContains(left: Expression, right: Expression)
   override def checkInputDataTypes(): TypeCheckResult = {
     if (right.dataType == NullType) {
       TypeCheckResult.TypeCheckFailure(
-          "Null typed values cannot be used as arguments")
+        "Null typed values cannot be used as arguments")
     } else if (!left.dataType.isInstanceOf[ArrayType] || left.dataType
                  .asInstanceOf[ArrayType]
                  .elementType != right.dataType) {
       TypeCheckResult.TypeCheckFailure(
-          "Arguments must be an array followed by a value of same type as the array members")
+        "Arguments must be an array followed by a value of same type as the array members")
     } else {
       TypeCheckResult.TypeCheckSuccess
     }
@@ -187,13 +199,10 @@ case class ArrayContains(left: Expression, right: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (arr, value) =>
-                      {
-                        val i = ctx.freshName("i")
-                        val getValue = ctx.getValue(arr, right.dataType, i)
-                        s"""
+    nullSafeCodeGen(ctx, ev, (arr, value) => {
+      val i = ctx.freshName("i")
+      val getValue = ctx.getValue(arr, right.dataType, i)
+      s"""
       for (int $i = 0; $i < $arr.numElements(); $i ++) {
         if ($arr.isNullAt($i)) {
           ${ev.isNull} = true;
@@ -204,7 +213,7 @@ case class ArrayContains(left: Expression, right: Expression)
         }
       }
      """
-                    })
+    })
   }
 
   override def prettyName: String = "array_contains"

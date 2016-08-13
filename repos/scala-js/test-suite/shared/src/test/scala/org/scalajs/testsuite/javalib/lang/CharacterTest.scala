@@ -16,9 +16,8 @@ import org.scalajs.testsuite.utils.Platform._
 class CharacterTest {
 
   @Test def isISOControl(): Unit = {
-    val isoControlChars = (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F'))
-      .map(_.toInt)
-      .toSet
+    val isoControlChars =
+      (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F')).map(_.toInt).toSet
     isoControlChars foreach { c =>
       assertEquals(true, Character.isISOControl(c))
     }
@@ -51,13 +50,13 @@ class CharacterTest {
   @Test def toChars(): Unit = {
     assertTrue(Character.toChars(0x61) sameElements Array('a'))
     assertTrue(
-        Character.toChars(0x10000) sameElements Array('\uD800', '\uDC00'))
+      Character.toChars(0x10000) sameElements Array('\uD800', '\uDC00'))
     assertTrue(
-        Character.toChars(0x10001) sameElements Array('\uD800', '\uDC01'))
+      Character.toChars(0x10001) sameElements Array('\uD800', '\uDC01'))
     assertTrue(
-        Character.toChars(0x10401) sameElements Array('\uD801', '\uDC01'))
+      Character.toChars(0x10401) sameElements Array('\uD801', '\uDC01'))
     assertTrue(
-        Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
+      Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
 
     expectThrows(classOf[IllegalArgumentException],
                  Character.toChars(Integer.MAX_VALUE))
@@ -285,14 +284,14 @@ class CharacterTest {
   }
 
   @Test def isIdentifierIgnorable(): Unit = {
-    for (c <- '\u0000' to '\u0008') assertTrue(
-        Character.isIdentifierIgnorable(c))
+    for (c <- '\u0000' to '\u0008')
+      assertTrue(Character.isIdentifierIgnorable(c))
 
-    for (c <- '\u000E' to '\u001B') assertTrue(
-        Character.isIdentifierIgnorable(c))
+    for (c <- '\u000E' to '\u001B')
+      assertTrue(Character.isIdentifierIgnorable(c))
 
-    for (c <- '\u007F' to '\u009F') assertTrue(
-        Character.isIdentifierIgnorable(c))
+    for (c <- '\u007F' to '\u009F')
+      assertTrue(Character.isIdentifierIgnorable(c))
 
     // Exhaustive list of Cf category. Unicode 7.0.0
     assertTrue(Character.isIdentifierIgnorable('\u00AD'))

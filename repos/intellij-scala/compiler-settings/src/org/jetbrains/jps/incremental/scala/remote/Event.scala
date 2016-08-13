@@ -27,7 +27,7 @@ object Event {
     if (stream.available > 0) {
       val excess = FileUtil.loadTextAndClose(stream)
       throw new IllegalArgumentException(
-          "Excess bytes after event deserialization: " + excess)
+        "Excess bytes after event deserialization: " + excess)
     }
     stream.close()
     event

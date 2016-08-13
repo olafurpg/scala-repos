@@ -56,8 +56,9 @@ trait DependencyBuilders {
   }
 }
 
-final class ScalaJSGroupID private[sbtplugin](private val groupID: String) {
-  def %%%(artifactID: String): CrossGroupArtifactID = macro ScalaJSGroupID.auto_impl
+final class ScalaJSGroupID private[sbtplugin] (private val groupID: String) {
+  def %%%(artifactID: String): CrossGroupArtifactID =
+    macro ScalaJSGroupID.auto_impl
 
   def %%%!(artifactID: String): CrossGroupArtifactID =
     ScalaJSGroupID.withCross(this, artifactID, ScalaJSCrossVersion.binary)
@@ -86,7 +87,7 @@ object ScalaJSGroupID {
     // Hack to work around bug in sbt macros (wrong way of collecting local
     // definitions)
     val keysSym = rootMirror.staticModule(
-        "_root_.org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport")
+      "_root_.org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport")
     val keys = c.Expr[ScalaJSPlugin.AutoImport.type](Ident(keysSym))
 
     reify {
@@ -100,8 +101,9 @@ object ScalaJSGroupID {
   }
 }
 
-final class CrossGroupArtifactID(
-    groupID: String, artifactID: String, crossVersion: CrossVersion) {
+final class CrossGroupArtifactID(groupID: String,
+                                 artifactID: String,
+                                 crossVersion: CrossVersion) {
   def %(revision: String): ModuleID = {
     nonEmpty(revision, "Revision")
     ModuleID(groupID, artifactID, revision).cross(crossVersion)

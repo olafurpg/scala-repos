@@ -46,7 +46,7 @@ private final class Captcher extends Actor {
 
     private val capacity = 512
     private var challenges: NonEmptyList[Captcha] = NonEmptyList(
-        Captcha.default)
+      Captcha.default)
 
     private def add(c: Captcha) {
       find(c.gameId) ifNone {
@@ -71,10 +71,9 @@ private final class Captcher extends Actor {
     private def fromGame(game: Game): OptionT[Fu, Captcha] =
       optionT(GameRepo getOptionPgn game.id) flatMap { makeCaptcha(game, _) }
 
-    private def makeCaptcha(
-        game: Game, moves: List[String]): OptionT[Fu, Captcha] =
-      optionT(
-          Future {
+    private def makeCaptcha(game: Game,
+                            moves: List[String]): OptionT[Fu, Captcha] =
+      optionT(Future {
         for {
           rewinded ← rewind(game, moves)
           solutions ← solve(rewinded)
@@ -100,7 +99,8 @@ private final class Captcher extends Actor {
       } toNel
 
     private def rewind(game: Game, moves: List[String]): Option[ChessGame] =
-      pgn.Reader.movesWithSans(moves, safeInit, tags = Nil) map (_.state) toOption
+      pgn.Reader
+        .movesWithSans(moves, safeInit, tags = Nil) map (_.state) toOption
 
     private def safeInit[A](list: List[A]): List[A] = list match {
       case x :: Nil => Nil

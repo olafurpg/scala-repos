@@ -17,7 +17,9 @@ import ArbitrarySupport._
 import Ordinal._
 
 class RealCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   val pi200 =
     "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196"
@@ -207,8 +209,8 @@ class RealCheck
   // sample1("sample1 sqrt")(_.sqrt)
   // sample1("sample1 pow(2)")(_.pow(2))
 
-  def arcSample(f: Rational => Rational)(
-      g: Double => Double, h: Real => Real): String =
+  def arcSample(f: Rational => Rational)(g: Double => Double,
+                                         h: Real => Real): String =
     (-8 to 8).map { i =>
       val x = Real(f(Rational(i)))
       if ((g(x.toDouble) - h(x).toDouble).abs < 0.00001) "." else "!"

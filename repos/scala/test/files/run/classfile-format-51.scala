@@ -2,7 +2,14 @@ import java.io.{File, FileOutputStream}
 
 import scala.tools.partest._
 import scala.tools.asm
-import asm.{AnnotationVisitor, ClassWriter, FieldVisitor, Handle, MethodVisitor, Opcodes}
+import asm.{
+  AnnotationVisitor,
+  ClassWriter,
+  FieldVisitor,
+  Handle,
+  MethodVisitor,
+  Opcodes
+}
 import Opcodes._
 
 // This test ensures that we can read JDK 7 (classfile format 51) files, including those
@@ -18,7 +25,7 @@ import Opcodes._
 object Test extends DirectTest {
   override def extraSettings: String =
     "-Yopt:l:classpath -usejavacp -d " + testOutput.path + " -cp " +
-    testOutput.path
+      testOutput.path
 
   def generateClass() {
     val invokerClassName = "DynamicInvoker"
@@ -39,8 +46,11 @@ object Test extends DirectTest {
     val constructor = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null)
     constructor.visitCode()
     constructor.visitVarInsn(ALOAD, 0)
-    constructor.visitMethodInsn(
-        INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+    constructor.visitMethodInsn(INVOKESPECIAL,
+                                "java/lang/Object",
+                                "<init>",
+                                "()V",
+                                false)
     constructor.visitInsn(RETURN)
     constructor.visitMaxs(1, 1)
     constructor.visitEnd()
@@ -88,11 +98,11 @@ object Test extends DirectTest {
                               "()Ljava/lang/ClassLoader;",
                               false)
     bootstrap.visitMethodInsn(
-        INVOKESTATIC,
-        "java/lang/invoke/MethodType",
-        "fromMethodDescriptorString",
-        "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;",
-        false)
+      INVOKESTATIC,
+      "java/lang/invoke/MethodType",
+      "fromMethodDescriptorString",
+      "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;",
+      false)
     bootstrap.visitVarInsn(ASTORE, 5) // methodType
 
 //  val methodHandle = lookup.findStatic(thisClass, "target", methodType)
@@ -101,11 +111,11 @@ object Test extends DirectTest {
     bootstrap.visitLdcInsn("target")
     bootstrap.visitVarInsn(ALOAD, 5) // methodType
     bootstrap.visitMethodInsn(
-        INVOKEVIRTUAL,
-        "java/lang/invoke/MethodHandles$Lookup",
-        "findStatic",
-        "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;",
-        false)
+      INVOKEVIRTUAL,
+      "java/lang/invoke/MethodHandles$Lookup",
+      "findStatic",
+      "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;",
+      false)
     bootstrap.visitVarInsn(ASTORE, 6) // methodHandle
 
 //  new ConstantCallSite(methodHandle)
@@ -121,8 +131,11 @@ object Test extends DirectTest {
     bootstrap.visitMaxs(4, 7)
     bootstrap.visitEnd()
 
-    val test = cw.visitMethod(
-        ACC_PUBLIC + ACC_FINAL, "test", s"()Ljava/lang/String;", null, null)
+    val test = cw.visitMethod(ACC_PUBLIC + ACC_FINAL,
+                              "test",
+                              s"()Ljava/lang/String;",
+                              null,
+                              null)
     test.visitCode()
     val bootstrapHandle = new Handle(H_INVOKESTATIC,
                                      invokerClassName,
@@ -137,8 +150,9 @@ object Test extends DirectTest {
     val bytes = cw.toByteArray()
 
     val fos = new FileOutputStream(
-        new File(s"${testOutput.path}/$invokerClassName.class"))
-    try fos write bytes finally fos.close()
+      new File(s"${testOutput.path}/$invokerClassName.class"))
+    try fos write bytes
+    finally fos.close()
   }
 
   def code =

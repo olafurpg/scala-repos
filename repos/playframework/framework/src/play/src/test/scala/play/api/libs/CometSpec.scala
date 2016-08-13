@@ -44,7 +44,7 @@ class CometSpec extends Specification {
 
     "work with enumerator" in {
       val result = Results.Ok.chunked(
-          Enumerator("foo", "bar", "baz") &> Comet("callback.method"))
+        Enumerator("foo", "bar", "baz") &> Comet("callback.method"))
       result.body.contentType must beSome(ContentTypes.HTML)
     }
 
@@ -55,7 +55,7 @@ class CometSpec extends Specification {
         val controller = new MockController(m)
         val result = controller.cometString.apply(FakeRequest())
         contentAsString(result) must contain(
-            "<html><body><script type=\"text/javascript\">parent.cometMessage('kiki');</script><script type=\"text/javascript\">parent.cometMessage('foo');</script><script type=\"text/javascript\">parent.cometMessage('bar');</script>")
+          "<html><body><script type=\"text/javascript\">parent.cometMessage('kiki');</script><script type=\"text/javascript\">parent.cometMessage('foo');</script><script type=\"text/javascript\">parent.cometMessage('bar');</script>")
       } finally {
         app.stop()
       }
@@ -68,7 +68,7 @@ class CometSpec extends Specification {
         val controller = new MockController(m)
         val result = controller.cometJson.apply(FakeRequest())
         contentAsString(result) must contain(
-            "<html><body><script type=\"text/javascript\">parent.cometMessage(\"jsonString\");</script>")
+          "<html><body><script type=\"text/javascript\">parent.cometMessage(\"jsonString\");</script>")
       } finally {
         app.stop()
       }

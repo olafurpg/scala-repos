@@ -72,8 +72,8 @@ object ActivatorRepoProcessor {
       val status = connection.getResponseMessage
       if (status != null && status.trim.startsWith("OK")) {
         val text = StreamUtil.readText(
-            connection.getInputStream,
-            "utf-8" /*connection.getContentEncoding*/ )
+          connection.getInputStream,
+          "utf-8" /*connection.getContentEncoding*/ )
         Some(text)
       } else None
     } catch {

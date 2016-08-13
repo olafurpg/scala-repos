@@ -9,7 +9,12 @@ import akka.stream.IOResult
 import akka.stream.impl.SinkModule
 import akka.stream.impl.StreamLayout.Module
 import akka.stream.impl.Stages.DefaultAttributes.IODispatcher
-import akka.stream.{ActorMaterializer, MaterializationContext, Attributes, SinkShape}
+import akka.stream.{
+  ActorMaterializer,
+  MaterializationContext,
+  Attributes,
+  SinkShape
+}
 import akka.stream.ActorAttributes.Dispatcher
 import akka.util.ByteString
 import scala.concurrent.{Future, Promise}
@@ -32,8 +37,8 @@ private[akka] final class FileSink(f: File,
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
 
     val ioResultPromise = Promise[IOResult]()
-    val props = FileSubscriber.props(
-        f, ioResultPromise, settings.maxInputBufferSize, options)
+    val props = FileSubscriber
+      .props(f, ioResultPromise, settings.maxInputBufferSize, options)
     val dispatcher =
       context.effectiveAttributes.get[Dispatcher](IODispatcher).dispatcher
 
@@ -68,8 +73,8 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
 
     val os = createOutput() // if it fails, we fail the materialization
 
-    val props = OutputStreamSubscriber.props(
-        os, ioResultPromise, settings.maxInputBufferSize, autoFlush)
+    val props = OutputStreamSubscriber
+      .props(os, ioResultPromise, settings.maxInputBufferSize, autoFlush)
 
     val ref = materializer.actorOf(context, props)
     (akka.stream.actor.ActorSubscriber[ByteString](ref),

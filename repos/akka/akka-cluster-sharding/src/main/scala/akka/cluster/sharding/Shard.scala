@@ -63,8 +63,8 @@ private[akka] object Shard {
   case object GetCurrentShardState extends ShardQuery
 
   @SerialVersionUID(1L)
-  final case class CurrentShardState(
-      shardId: ShardRegion.ShardId, entityIds: Set[EntityId])
+  final case class CurrentShardState(shardId: ShardRegion.ShardId,
+                                     entityIds: Set[EntityId])
 
   @SerialVersionUID(1L)
   case object GetShardStats extends ShardQuery
@@ -80,7 +80,7 @@ private[akka] object Shard {
     * Persistent state of the Shard.
     */
   @SerialVersionUID(1L)
-  final case class State private[akka](entities: Set[EntityId] = Set.empty)
+  final case class State private[akka] (entities: Set[EntityId] = Set.empty)
       extends ClusterShardingSerializable
 
   /**
@@ -97,22 +97,22 @@ private[akka] object Shard {
             handOffStopMessage: Any): Props = {
     if (settings.rememberEntities)
       Props(
-          new PersistentShard(typeName,
-                              shardId,
-                              entityProps,
-                              settings,
-                              extractEntityId,
-                              extractShardId,
-                              handOffStopMessage)).withDeploy(Deploy.local)
+        new PersistentShard(typeName,
+                            shardId,
+                            entityProps,
+                            settings,
+                            extractEntityId,
+                            extractShardId,
+                            handOffStopMessage)).withDeploy(Deploy.local)
     else
       Props(
-          new Shard(typeName,
-                    shardId,
-                    entityProps,
-                    settings,
-                    extractEntityId,
-                    extractShardId,
-                    handOffStopMessage)).withDeploy(Deploy.local)
+        new Shard(typeName,
+                  shardId,
+                  entityProps,
+                  settings,
+                  extractEntityId,
+                  extractShardId,
+                  handOffStopMessage)).withDeploy(Deploy.local)
   }
 }
 
@@ -131,12 +131,25 @@ private[akka] class Shard(typeName: String,
                           extractEntityId: ShardRegion.ExtractEntityId,
                           extractShardId: ShardRegion.ExtractShardId,
                           handOffStopMessage: Any)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
-  import ShardRegion.{handOffStopperProps, EntityId, Msg, Passivate, ShardInitialized}
+  import ShardRegion.{
+    handOffStopperProps,
+    EntityId,
+    Msg,
+    Passivate,
+    ShardInitialized
+  }
   import ShardCoordinator.Internal.{HandOff, ShardStopped}
   import Shard.{State, RestartEntity, EntityStopped, EntityStarted}
-  import Shard.{ShardQuery, GetCurrentShardState, CurrentShardState, GetShardStats, ShardStats}
+  import Shard.{
+    ShardQuery,
+    GetCurrentShardState,
+    CurrentShardState,
+    GetShardStats,
+    ShardStats
+  }
   import akka.cluster.sharding.ShardCoordinator.Internal.CoordinatorMessage
   import akka.cluster.sharding.ShardRegion.ShardRegionCommand
   import settings.tuningParameters._
@@ -184,8 +197,9 @@ private[akka] class Shard(typeName: String,
   def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match {
     case HandOff(`shardId`) ⇒ handOff(sender())
     case HandOff(shard) ⇒
-      log.warning(
-          "Shard [{}] can not hand off for another Shard [{}]", shardId, shard)
+      log.warning("Shard [{}] can not hand off for another Shard [{}]",
+                  shardId,
+                  shard)
     case _ ⇒ unhandled(msg)
   }
 
@@ -197,17 +211,19 @@ private[akka] class Shard(typeName: String,
 
   def handOff(replyTo: ActorRef): Unit = handOffStopper match {
     case Some(_) ⇒
-      log.warning(
-          "HandOff shard [{}] received during existing handOff", shardId)
+      log.warning("HandOff shard [{}] received during existing handOff",
+                  shardId)
     case None ⇒
       log.debug("HandOff shard [{}]", shardId)
 
       if (state.entities.nonEmpty) {
         handOffStopper = Some(
-            context
-              .watch(context
-                  .actorOf(
-                    handOffStopperProps(shardId, replyTo, idByRef.keySet, handOffStopMessage))))
+          context.watch(
+            context.actorOf(
+              handOffStopperProps(shardId,
+                                  replyTo,
+                                  idByRef.keySet,
+                                  handOffStopMessage))))
 
         //During hand off we only care about watching for termination of the hand off stopper
         context become {
@@ -229,7 +245,8 @@ private[akka] class Shard(typeName: String,
     val id = idByRef(ref)
     if (messageBuffers.getOrElse(id, Vector.empty).nonEmpty) {
       log.debug(
-          "Starting entity [{}] again, there are buffered messages for it", id)
+        "Starting entity [{}] again, there are buffered messages for it",
+        id)
       sendMsgBuffer(EntityStarted(id))
     } else {
       processChange(EntityStopped(id))(passivateCompleted)
@@ -286,8 +303,8 @@ private[akka] class Shard(typeName: String,
   def deliverMessage(msg: Any, snd: ActorRef): Unit = {
     val (id, payload) = extractEntityId(msg)
     if (id == null || id == "") {
-      log.warning(
-          "Id must not be empty, dropping message [{}]", msg.getClass.getName)
+      log.warning("Id must not be empty, dropping message [{}]",
+                  msg.getClass.getName)
       context.system.deadLetters ! msg
     } else {
       messageBuffers.get(id) match {
@@ -348,7 +365,9 @@ private[akka] class PersistentShard(
                   settings,
                   extractEntityId,
                   extractShardId,
-                  handOffStopMessage) with PersistentActor with ActorLogging {
+                  handOffStopMessage)
+    with PersistentActor
+    with ActorLogging {
 
   import ShardRegion.{EntityId, Msg}
   import Shard.{State, RestartEntity, EntityStopped, EntityStarted}
@@ -404,13 +423,14 @@ private[akka] class PersistentShard(
       //Note; because we're not persisting the EntityStopped, we don't need
       // to persist the EntityStarted either.
       log.debug(
-          "Starting entity [{}] again, there are buffered messages for it", id)
+        "Starting entity [{}] again, there are buffered messages for it",
+        id)
       sendMsgBuffer(EntityStarted(id))
     } else {
       if (!passivating.contains(ref)) {
         log.debug(
-            "Entity [{}] stopped without passivating, will restart after backoff",
-            id)
+          "Entity [{}] stopped without passivating, will restart after backoff",
+          id)
         import context.dispatcher
         context.system.scheduler
           .scheduleOnce(entityRestartBackoff, self, RestartEntity(id))
@@ -420,8 +440,10 @@ private[akka] class PersistentShard(
     passivating = passivating - ref
   }
 
-  override def deliverTo(
-      id: EntityId, msg: Any, payload: Msg, snd: ActorRef): Unit = {
+  override def deliverTo(id: EntityId,
+                         msg: Any,
+                         payload: Msg,
+                         snd: ActorRef): Unit = {
     val name = URLEncoder.encode(id, "utf-8")
     context.child(name) match {
       case Some(actor) ⇒

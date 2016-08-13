@@ -14,8 +14,7 @@ import akka.actor.{ActorRefFactory, ActorSystem}
 /**
   * INTERNAL API
   */
-private[http] abstract class SettingsCompanion[
-    T](protected val prefix: String) {
+private[http] abstract class SettingsCompanion[T](protected val prefix: String) {
   private final val MaxCached = 8
   private[this] var cache = ListMap.empty[ActorSystem, T]
 
@@ -40,9 +39,9 @@ private[http] abstract class SettingsCompanion[
 
   def apply(configOverrides: String): T =
     apply(
-        parseString(configOverrides)
-          .withFallback(SettingsCompanion.configAdditions)
-          .withFallback(defaultReference(getClass.getClassLoader)))
+      parseString(configOverrides)
+        .withFallback(SettingsCompanion.configAdditions)
+        .withFallback(defaultReference(getClass.getClassLoader)))
 
   def apply(config: Config): T =
     fromSubConfig(config, config getConfig prefix)
@@ -53,7 +52,8 @@ private[http] abstract class SettingsCompanion[
 private[http] object SettingsCompanion {
   lazy val configAdditions: Config = {
     val localHostName =
-      try new InetSocketAddress(InetAddress.getLocalHost, 80).getHostString catch {
+      try new InetSocketAddress(InetAddress.getLocalHost, 80).getHostString
+      catch {
         case NonFatal(_) ⇒ ""
       }
     ConfigFactory.parseMap(Map("akka.http.hostname" -> localHostName).asJava)

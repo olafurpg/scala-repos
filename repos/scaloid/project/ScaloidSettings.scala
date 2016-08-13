@@ -16,9 +16,9 @@ object ScaloidSettings {
   lazy val apiVersion = settingKey[Int]("Target Android API Version")
 
   lazy val scaloidSettings = Seq(
-      generate in Scaloid <<= generateTask,
-      extract in Scaloid <<= extractTask,
-      apiVersion in Scaloid := 16,
-      libraryDependencies += android
+    generate in Scaloid <<= generateTask,
+    extract in Scaloid <<= extractTask,
+    apiVersion in Scaloid := 16,
+    libraryDependencies += android
   )
 }

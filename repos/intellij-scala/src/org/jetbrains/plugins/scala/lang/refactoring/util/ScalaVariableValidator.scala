@@ -9,11 +9,24 @@ import com.intellij.util.containers.MultiMap
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScEnumerator, ScGenerator}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScCaseClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScEnumerator,
+  ScGenerator
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScMember,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.collection.mutable.ArrayBuffer
@@ -30,9 +43,9 @@ object ScalaVariableValidator {
             mainOccurence: TextRange,
             occurrences: Array[TextRange]): ScalaVariableValidator = {
     val container = ScalaRefactoringUtil.enclosingContainer(
-        ScalaRefactoringUtil.commonParent(file, occurrences: _*))
+      ScalaRefactoringUtil.commonParent(file, occurrences: _*))
     val containerOne = ScalaRefactoringUtil.enclosingContainer(
-        ScalaRefactoringUtil.commonParent(file, mainOccurence))
+      ScalaRefactoringUtil.commonParent(file, mainOccurence))
     ScalaRefactoringUtil.getExpression(project,
                                        editor,
                                        file,
@@ -56,7 +69,7 @@ object ScalaVariableValidator {
             element: PsiElement,
             occurrences: Array[TextRange]): ScalaVariableValidator = {
     val container = ScalaRefactoringUtil.enclosingContainer(
-        ScalaRefactoringUtil.commonParent(file, occurrences: _*))
+      ScalaRefactoringUtil.commonParent(file, occurrences: _*))
     val containerOne = ScalaRefactoringUtil.enclosingContainer(element)
     new ScalaVariableValidator(conflictsReporter,
                                project,
@@ -81,7 +94,8 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
                            enclosingOne) {
 
   override def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+      name: String,
+      allOcc: Boolean): Array[(PsiNamedElement, String)] = {
     //returns declaration and message
     val container = enclosingContainer(allOcc)
     if (container == null) return Array()
@@ -96,11 +110,13 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
           for (member <- x.members) {
             member match {
               case x: ScVariable =>
-                for (el <- x.declaredElements if el.name == name) buf +=
-                ((el, messageForMember(el.name)))
+                for (el <- x.declaredElements if el.name == name)
+                  buf +=
+                    ((el, messageForMember(el.name)))
               case x: ScValue =>
-                for (el <- x.declaredElements if el.name == name) buf +=
-                ((el, messageForMember(el.name)))
+                for (el <- x.declaredElements if el.name == name)
+                  buf +=
+                    ((el, messageForMember(el.name)))
               case _ =>
             }
           }
@@ -123,7 +139,8 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
   }
 
   private def validateReference(
-      context: PsiElement, name: String): Seq[(PsiNamedElement, String)] = {
+      context: PsiElement,
+      name: String): Seq[(PsiNamedElement, String)] = {
     ScalaPsiElementFactory.createExpressionFromText(name, context) match {
       case ResolvesTo(elem @ ScalaPsiUtil.inNameContext(nameCtx)) =>
         val message = nameCtx match {
@@ -156,12 +173,12 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
           buf += ((x, messageForParameter(x.name)))
         case x: ScFunctionDefinition if x.name == name =>
           buf +=
-          (if (x.isLocal) (x, messageForLocal(x.name))
-           else (x, messageForMember(x.name)))
+            (if (x.isLocal) (x, messageForLocal(x.name))
+            else (x, messageForMember(x.name)))
         case x: ScBindingPattern if x.name == name =>
           buf +=
-          (if (x.isClassMember) (x, messageForMember(x.name))
-           else (x, messageForLocal(x.name)))
+            (if (x.isClassMember) (x, messageForMember(x.name))
+            else (x, messageForLocal(x.name)))
         case _ =>
       }
     }
@@ -178,7 +195,7 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
           }
         if (PsiTreeUtil.isAncestor(container, parent, true))
           while (parent.getParent != null &&
-          parent.getParent != container) parent = parent.getParent
+                 parent.getParent != container) parent = parent.getParent
         else parent = container.getFirstChild
         parent
       }
@@ -189,14 +206,16 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
         fromDoubles match {
           case x: ScVariableDefinition =>
             val elems = x.declaredElements
-            for (elem <- elems; if elem.name == name) buf +=
-            (if (x.isLocal) (elem, messageForLocal(elem.name))
-             else (elem, messageForMember(elem.name)))
+            for (elem <- elems; if elem.name == name)
+              buf +=
+                (if (x.isLocal) (elem, messageForLocal(elem.name))
+                else (elem, messageForMember(elem.name)))
           case x: ScPatternDefinition =>
             val elems = x.declaredElements
-            for (elem <- elems; if elem.name == name) buf +=
-            (if (x.isLocal) (elem, messageForLocal(elem.name))
-             else (elem, messageForMember(elem.name)))
+            for (elem <- elems; if elem.name == name)
+              buf +=
+                (if (x.isLocal) (elem, messageForLocal(elem.name))
+                else (elem, messageForMember(elem.name)))
           case _ =>
         }
         fromDoubles = fromDoubles.getPrevSibling
@@ -214,9 +233,9 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
   private def messageForLocal(name: String) =
     ScalaBundle.message("introduced.variable.will.conflict.with.local", name)
   private def messageForParameter(name: String) =
-    ScalaBundle.message(
-        "introduced.variable.will.conflict.with.parameter", name)
+    ScalaBundle
+      .message("introduced.variable.will.conflict.with.parameter", name)
   private def messageForClassParameter(name: String) =
-    ScalaBundle.message(
-        "introduced.variable.will.conflict.with.class.parameter", name)
+    ScalaBundle
+      .message("introduced.variable.will.conflict.with.class.parameter", name)
 }

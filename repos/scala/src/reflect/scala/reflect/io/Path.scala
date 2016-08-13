@@ -89,7 +89,7 @@ import Path._
   *
   *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-class Path private[io](val jfile: JFile) {
+class Path private[io] (val jfile: JFile) {
   val separator = java.io.File.separatorChar
   val separatorStr = java.io.File.separator
 
@@ -143,8 +143,8 @@ class Path private[io](val jfile: JFile) {
     assert(isAbsolute == other.isAbsolute,
            "Paths not of same type: " + this + ", " + other)
 
-    def createRelativePath(
-        baseSegs: List[String], otherSegs: List[String]): String = {
+    def createRelativePath(baseSegs: List[String],
+                           otherSegs: List[String]): String = {
       (baseSegs, otherSegs) match {
         case (b :: bs, o :: os) if b == o => createRelativePath(bs, os)
         case (bs, os) =>
@@ -201,7 +201,7 @@ class Path private[io](val jfile: JFile) {
   // if the current path has none.
   def changeExtension(ext: String): Path =
     (if (extension == "") addExtension(ext)
-     else Path(path.stripSuffix(extension) + ext))
+    else Path(path.stripSuffix(extension) + ext))
 
   // conditionally execute
   def ifFile[T](f: File => T): Option[T] =
@@ -214,17 +214,20 @@ class Path private[io](val jfile: JFile) {
   def canWrite = jfile.canWrite()
   def exists = {
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileExistsCount)
-    try jfile.exists() catch { case ex: SecurityException => false }
+    try jfile.exists()
+    catch { case ex: SecurityException => false }
   }
 
   def isFile = {
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileIsFileCount)
-    try jfile.isFile() catch { case ex: SecurityException => false }
+    try jfile.isFile()
+    catch { case ex: SecurityException => false }
   }
   def isDirectory = {
     if (Statistics.canEnable)
       Statistics.incCounter(IOStats.fileIsDirectoryCount)
-    try jfile.isDirectory() catch {
+    try jfile.isDirectory()
+    catch {
       case ex: SecurityException => jfile.getPath == "."
     }
   }
@@ -241,8 +244,8 @@ class Path private[io](val jfile: JFile) {
   def isFresher(other: Path) = lastModified > other.lastModified
 
   // creations
-  def createDirectory(
-      force: Boolean = true, failIfExists: Boolean = false): Directory = {
+  def createDirectory(force: Boolean = true,
+                      failIfExists: Boolean = false): Directory = {
     val res = if (force) jfile.mkdirs() else jfile.mkdir()
     if (!res && failIfExists && exists)
       fail("Directory '%s' already exists." format name)

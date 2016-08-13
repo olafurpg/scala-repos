@@ -1,6 +1,14 @@
 package slick.lifted
 
-import slick.ast.{LiteralNode, IfThenElse, Node, BaseTypedType, OptionType, TypedType, OptionApply}
+import slick.ast.{
+  LiteralNode,
+  IfThenElse,
+  Node,
+  BaseTypedType,
+  OptionType,
+  TypedType,
+  OptionApply
+}
 import slick.SlickException
 import slick.util.ConstArray
 
@@ -19,15 +27,14 @@ object Case {
     new UntypedWhen(cond.toNode)
 
   final class UntypedWhen(cond: Node) {
-    def Then[P, B](
-        res: Rep[P])(implicit om: OptionMapperDSL.arg[B, P]#to[B, P],
-                     bType: BaseTypedType[B]) =
-      new TypedCase[B, P](ConstArray(cond, res.toNode))(
-          bType, om.liftedType(bType))
+    def Then[P, B](res: Rep[P])(
+        implicit om: OptionMapperDSL.arg[B, P]#to[B, P],
+        bType: BaseTypedType[B]) =
+      new TypedCase[B, P](ConstArray(cond, res.toNode))(bType,
+                                                        om.liftedType(bType))
   }
 
-  final class TypedCase[B : TypedType, T : TypedType](
-      clauses: ConstArray[Node])
+  final class TypedCase[B: TypedType, T: TypedType](clauses: ConstArray[Node])
       extends Rep.TypedRep[Option[B]] {
     def toNode: IfThenElse = {
       val cl =
@@ -44,8 +51,9 @@ object Case {
       Rep.forNode(IfThenElse(clauses :+ res.toNode))
   }
 
-  final class TypedWhen[B : TypedType, T : TypedType](
-      cond: Node, parentClauses: ConstArray[Node]) {
+  final class TypedWhen[B: TypedType, T: TypedType](
+      cond: Node,
+      parentClauses: ConstArray[Node]) {
     def Then(res: Rep[T]) =
       new TypedCase[B, T](parentClauses ++ ConstArray(cond, res.toNode))
   }

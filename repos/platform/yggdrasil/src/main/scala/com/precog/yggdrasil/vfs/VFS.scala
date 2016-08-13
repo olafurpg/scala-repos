@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -123,12 +123,12 @@ trait VFSModule[M[+ _], Block] extends Logging {
       : Resource => EitherT[M, ResourceError, String] = { resource =>
       def notAQuery =
         notFound(
-            "Requested resource at %s version %s cannot be interpreted as a Quirrel query."
-              .format(path.path, version))
+          "Requested resource at %s version %s cannot be interpreted as a Quirrel query."
+            .format(path.path, version))
       EitherT {
         resource.fold(
-            br => br.asString.run.map(_.toRightDisjunction(notAQuery)),
-            _ => \/.left(notAQuery).point[M]
+          br => br.asString.run.map(_.toRightDisjunction(notAQuery)),
+          _ => \/.left(notAQuery).point[M]
         )
       }
     }
@@ -137,11 +137,11 @@ trait VFSModule[M[+ _], Block] extends Logging {
       : Resource => EitherT[M, ResourceError, Projection] = { resource =>
       def notAProjection =
         notFound(
-            "Requested resource at %s version %s cannot be interpreted as a Quirrel projection."
-              .format(path.path, version))
+          "Requested resource at %s version %s cannot be interpreted as a Quirrel projection."
+            .format(path.path, version))
       resource.fold(
-          _ => EitherT.left(notAProjection.point[M]),
-          pr => EitherT.right(pr.projection)
+        _ => EitherT.left(notAProjection.point[M]),
+        pr => EitherT.right(pr.projection)
       )
     }
   }
@@ -162,12 +162,12 @@ trait VFSModule[M[+ _], Block] extends Logging {
       // FIXME: We're dealing with MimeType in too many places here
       val acceptableMimeTypes =
         ((Seq(ApplicationJson, XJsonStream, TextCSV).map { mt =>
-              mt -> (mt, mt)
-            }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
-                      OctetStream -> (XJsonStream, OctetStream))).toMap
+          mt -> (mt, mt)
+        }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
+                  OctetStream -> (XJsonStream, OctetStream))).toMap
       for {
-        selectedMT <- OptionT(
-            M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
+        selectedMT <- OptionT(M.point(
+                       requestedMimeTypes.find(acceptableMimeTypes.contains)))
         (conversionMT, returnMT) = acceptableMimeTypes(selectedMT)
         stream <- asByteStream(conversionMT)
       } yield (returnMT, stream)
@@ -189,8 +189,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
                                     AnyMimeType -> mimeType,
                                     OctetStream -> OctetStream)
       for {
-        selectedMT <- OptionT(
-            M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
+        selectedMT <- OptionT(M.point(
+                       requestedMimeTypes.find(acceptableMimeTypes.contains)))
         stream <- asByteStream(selectedMT)
       } yield (selectedMT, stream)
     }
@@ -216,8 +216,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
     def writeAllSync(
         data: Seq[(Long, EventMessage)]): EitherT[M, ResourceError, PrecogUnit]
 
-    def readResource(
-        path: Path, version: Version): EitherT[M, ResourceError, Resource]
+    def readResource(path: Path,
+                     version: Version): EitherT[M, ResourceError, Resource]
 
     /**
       * Returns the direct children of path.

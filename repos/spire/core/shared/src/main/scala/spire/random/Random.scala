@@ -118,10 +118,9 @@ trait RandomCompanion[G <: Generator] { self =>
 
     def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] = {
       def loop(mb: Op[B], ma: Op[A]): Op[B] =
-        mb.flatMap(
-            b =>
-              ma.flatMap(a =>
-                    f(b, a) match {
+        mb.flatMap(b =>
+          ma.flatMap(a =>
+            f(b, a) match {
               case Some(b2) => More(() => loop(Const(b2), ma))
               case None => Const(b)
           }))
@@ -133,8 +132,10 @@ trait RandomCompanion[G <: Generator] { self =>
     r1 and r2
   def tuple3[A, B, C](r1: R[A], r2: R[B], r3: R[C]): R[(A, B, C)] =
     for { a <- r1; b <- r2; c <- r3 } yield (a, b, c)
-  def tuple4[A, B, C, D](
-      r1: R[A], r2: R[B], r3: R[C], r4: R[D]): R[(A, B, C, D)] =
+  def tuple4[A, B, C, D](r1: R[A],
+                         r2: R[B],
+                         r3: R[C],
+                         r4: R[D]): R[(A, B, C, D)] =
     for { a <- r1; b <- r2; c <- r3; d <- r4 } yield (a, b, c, d)
 }
 
@@ -207,7 +208,7 @@ object Size {
   }
 }
 
-class Seed private[spire](private[spire] val bytes: Array[Byte])
+class Seed private[spire] (private[spire] val bytes: Array[Byte])
 
 object Seed {
   val zero = Seed(Array[Byte](0, 0, 0, 0))

@@ -25,8 +25,8 @@ private[persistence] sealed trait PersistentEnvelope {
   * INTERNAL API
   * Message which can be resequenced by the Journal, but will not be persisted.
   */
-private[persistence] final case class NonPersistentRepr(
-    payload: Any, sender: ActorRef)
+private[persistence] final case class NonPersistentRepr(payload: Any,
+                                                        sender: ActorRef)
     extends PersistentEnvelope {
   override def size: Int = 1
 }
@@ -36,7 +36,8 @@ object AtomicWrite {
 }
 
 final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
-    extends PersistentEnvelope with Message {
+    extends PersistentEnvelope
+    with Message {
   require(payload.nonEmpty, "payload of AtomicWrite must not be empty!")
 
   // only check that all persistenceIds are equal when there's more than one in the Seq
@@ -46,8 +47,8 @@ final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
         case _ ⇒ true // some other collection type, let's just check
       })
     require(
-        payload.forall(_.persistenceId == payload.head.persistenceId),
-        "AtomicWrite must contain messages for the same persistenceId, " +
+      payload.forall(_.persistenceId == payload.head.persistenceId),
+      "AtomicWrite must contain messages for the same persistenceId, " +
         s"yet different persistenceIds found: ${payload.map(_.persistenceId).toSet}")
 
   def persistenceId = payload.head.persistenceId
@@ -176,7 +177,8 @@ private[persistence] final case class PersistentImpl(
     override val deleted: Boolean,
     override val sender: ActorRef,
     override val writerUuid: String)
-    extends PersistentRepr with NoSerializationVerificationNeeded {
+    extends PersistentRepr
+    with NoSerializationVerificationNeeded {
 
   def withPayload(payload: Any): PersistentRepr =
     copy(payload = payload)

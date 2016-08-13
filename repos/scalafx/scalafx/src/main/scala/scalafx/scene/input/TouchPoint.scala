@@ -30,7 +30,11 @@ import javafx.scene.{input => jfxsi}
 import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 
 object TouchPoint {
   implicit def sfxTouchPoint2jfx(tp: TouchPoint): jfxsi.TouchPoint =
@@ -43,8 +47,8 @@ object TouchPoint {
       * The touch point has been moved
       */
     val Moved = new State(jfxsi.TouchPoint.State.MOVED)
-    @deprecated(
-        "Use Moved; MOVED will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use Moved; MOVED will be removed in a future release",
+                "8.0.60-R10")
     val MOVED = Moved
 
     /**
@@ -60,8 +64,8 @@ object TouchPoint {
       */
     val Stationary = new State(jfxsi.TouchPoint.State.STATIONARY)
     @deprecated(
-        "Use Stationary; STATIONARY will be removed in a future release",
-        "8.0.60-R10")
+      "Use Stationary; STATIONARY will be removed in a future release",
+      "8.0.60-R10")
     val STATIONARY = Stationary
 
     /**

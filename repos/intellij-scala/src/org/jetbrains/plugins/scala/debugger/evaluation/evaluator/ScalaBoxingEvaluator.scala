@@ -2,7 +2,12 @@ package org.jetbrains.plugins.scala
 package debugger.evaluation.evaluator
 
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
-import com.intellij.debugger.engine.evaluation.expression.{BoxingEvaluator, Evaluator, IdentityEvaluator, Modifier}
+import com.intellij.debugger.engine.evaluation.expression.{
+  BoxingEvaluator,
+  Evaluator,
+  IdentityEvaluator,
+  Modifier
+}
 import com.sun.jdi.Value
 import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
@@ -29,7 +34,7 @@ object ScalaBoxingEvaluator {
         new BoxingEvaluator(new IdentityEvaluator(v)).evaluate(context)
       case result =>
         throw EvaluationException(
-            s"Cannot perform boxing conversion for $result")
+          s"Cannot perform boxing conversion for $result")
     }
   }
 }

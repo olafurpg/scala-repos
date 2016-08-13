@@ -29,7 +29,9 @@ import kafka.coordinator.GroupCoordinator
 import org.apache.kafka.common.internals.TopicConstants
 
 class TopicCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness
+    with Logging
+    with RackAwareTest {
 
   @Test
   def testConfigPreservationAcrossPartitionAlteration() {
@@ -42,14 +44,14 @@ class TopicCommandTest
     TestUtils.createBrokersInZk(zkUtils, brokers)
     // create the topic
     val createOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitionsOriginal.toString,
-              "--replication-factor",
-              "1",
-              "--config",
-              cleanupKey + "=" + cleanupVal,
-              "--topic",
-              topic))
+      Array("--partitions",
+            numPartitionsOriginal.toString,
+            "--replication-factor",
+            "1",
+            "--config",
+            cleanupKey + "=" + cleanupVal,
+            "--topic",
+            topic))
     TopicCommand.createTopic(zkUtils, createOpts)
     val props = AdminUtils.fetchEntityConfig(zkUtils, ConfigType.Topic, topic)
     assertTrue("Properties after creation don't contain " + cleanupKey,
@@ -63,8 +65,7 @@ class TopicCommandTest
     // modify the topic to add new partitions
     val numPartitionsModified = 3
     val alterOpts = new TopicCommandOptions(
-        Array(
-            "--partitions", numPartitionsModified.toString, "--topic", topic))
+      Array("--partitions", numPartitionsModified.toString, "--topic", topic))
     TopicCommand.alterTopic(zkUtils, alterOpts)
     val newProps =
       AdminUtils.fetchEntityConfig(zkUtils, ConfigType.Topic, topic)
@@ -86,12 +87,12 @@ class TopicCommandTest
 
     // create the NormalTopic
     val createOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitionsOriginal.toString,
-              "--replication-factor",
-              "1",
-              "--topic",
-              normalTopic))
+      Array("--partitions",
+            numPartitionsOriginal.toString,
+            "--replication-factor",
+            "1",
+            "--topic",
+            normalTopic))
     TopicCommand.createTopic(zkUtils, createOpts)
 
     // delete the NormalTopic
@@ -105,19 +106,19 @@ class TopicCommandTest
 
     // create the offset topic
     val createOffsetTopicOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitionsOriginal.toString,
-              "--replication-factor",
-              "1",
-              "--topic",
-              TopicConstants.GROUP_METADATA_TOPIC_NAME))
+      Array("--partitions",
+            numPartitionsOriginal.toString,
+            "--replication-factor",
+            "1",
+            "--topic",
+            TopicConstants.GROUP_METADATA_TOPIC_NAME))
     TopicCommand.createTopic(zkUtils, createOffsetTopicOpts)
 
     // try to delete the TopicConstants.GROUP_METADATA_TOPIC_NAME and make sure it doesn't
     val deleteOffsetTopicOpts = new TopicCommandOptions(
-        Array("--topic", TopicConstants.GROUP_METADATA_TOPIC_NAME))
+      Array("--topic", TopicConstants.GROUP_METADATA_TOPIC_NAME))
     val deleteOffsetTopicPath = getDeleteTopicPath(
-        TopicConstants.GROUP_METADATA_TOPIC_NAME)
+      TopicConstants.GROUP_METADATA_TOPIC_NAME)
     assertFalse("Delete path for topic shouldn't exist before deletion.",
                 zkUtils.zkClient.exists(deleteOffsetTopicPath))
     intercept[AdminOperationException] {
@@ -141,7 +142,7 @@ class TopicCommandTest
 
     // delete a topic that does not exist with --if-exists
     val deleteExistsOpts = new TopicCommandOptions(
-        Array("--topic", "test", "--if-exists"))
+      Array("--topic", "test", "--if-exists"))
     TopicCommand.deleteTopic(zkUtils, deleteExistsOpts)
   }
 
@@ -153,14 +154,14 @@ class TopicCommandTest
 
     // alter a topic that does not exist without --if-exists
     val alterOpts = new TopicCommandOptions(
-        Array("--topic", "test", "--partitions", "1"))
+      Array("--topic", "test", "--partitions", "1"))
     intercept[IllegalArgumentException] {
       TopicCommand.alterTopic(zkUtils, alterOpts)
     }
 
     // alter a topic that does not exist with --if-exists
     val alterExistsOpts = new TopicCommandOptions(
-        Array("--topic", "test", "--partitions", "1", "--if-exists"))
+      Array("--topic", "test", "--partitions", "1", "--if-exists"))
     TopicCommand.alterTopic(zkUtils, alterExistsOpts)
   }
 
@@ -175,12 +176,12 @@ class TopicCommandTest
 
     // create the topic
     val createOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitions.toString,
-              "--replication-factor",
-              "1",
-              "--topic",
-              topic))
+      Array("--partitions",
+            numPartitions.toString,
+            "--replication-factor",
+            "1",
+            "--topic",
+            topic))
     TopicCommand.createTopic(zkUtils, createOpts)
 
     // try to re-create the topic without --if-not-exists
@@ -190,13 +191,13 @@ class TopicCommandTest
 
     // try to re-create the topic with --if-not-exists
     val createNotExistsOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitions.toString,
-              "--replication-factor",
-              "1",
-              "--topic",
-              topic,
-              "--if-not-exists"))
+      Array("--partitions",
+            numPartitions.toString,
+            "--replication-factor",
+            "1",
+            "--topic",
+            topic,
+            "--if-not-exists"))
     TopicCommand.createTopic(zkUtils, createNotExistsOpts)
   }
 
@@ -213,25 +214,28 @@ class TopicCommandTest
     val numPartitions = 18
     val replicationFactor = 3
     val createOpts = new TopicCommandOptions(
-        Array("--partitions",
-              numPartitions.toString,
-              "--replication-factor",
-              replicationFactor.toString,
-              "--topic",
-              "foo"))
+      Array("--partitions",
+            numPartitions.toString,
+            "--replication-factor",
+            replicationFactor.toString,
+            "--topic",
+            "foo"))
     TopicCommand.createTopic(zkUtils, createOpts)
 
     var assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map {
       case (tp, replicas) =>
         tp.partition -> replicas
     }
-    checkReplicaDistribution(
-        assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
+    checkReplicaDistribution(assignment,
+                             rackInfo,
+                             rackInfo.size,
+                             numPartitions,
+                             replicationFactor)
 
     val alteredNumPartitions = 36
     // verify that adding partitions will also be rack aware
     val alterOpts = new TopicCommandOptions(
-        Array("--partitions", alteredNumPartitions.toString, "--topic", "foo"))
+      Array("--partitions", alteredNumPartitions.toString, "--topic", "foo"))
     TopicCommand.alterTopic(zkUtils, alterOpts)
     assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map {
       case (tp, replicas) =>

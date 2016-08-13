@@ -238,7 +238,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     "throw an exception if opened" in {
       {
         Empty.openOrThrowException(
-            "See what happens?, at least we expect it in this case :)"); ()
+          "See what happens?, at least we expect it in this case :)"); ()
       } must throwA[NullPointerException]
     }
     "return a default value if opened with openOr" in {
@@ -356,7 +356,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
         ParamFailure("Apple",
                      Empty,
                      Full(
-                         ParamFailure("Apple", Empty, Empty, 404)
+                       ParamFailure("Apple", Empty, Empty, 404)
                      ),
                      "apple")
     }
@@ -428,9 +428,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
       val expectedChain =
         Failure("I HATE BACON",
                 Empty,
-                Full(Failure("MORE BACON FAIL",
-                             Empty,
-                             Full(Failure("BACON WHY U BACON")))))
+                Full(
+                  Failure("MORE BACON FAIL",
+                          Empty,
+                          Full(Failure("BACON WHY U BACON")))))
 
       singleBox must beLike {
         case ParamFailure(_, _, chain, _) =>
@@ -450,9 +451,9 @@ trait BoxGenerator {
   implicit def genBox[T](implicit a: Arbitrary[T]): Arbitrary[Box[T]] =
     Arbitrary[Box[T]] {
       frequency(
-          (3, const(Empty)),
-          (3, a.arbitrary.map(Full[T])),
-          (1, genFailureBox)
+        (3, const(Empty)),
+        (3, a.arbitrary.map(Full[T])),
+        (1, genFailureBox)
       )
     }
 
@@ -462,7 +463,7 @@ trait BoxGenerator {
       msg <- listOfN(msgLen, alphaChar)
       exception <- const(Full(new Exception("")))
       chainLen <- choose(1, 5)
-      chain <- frequency(
-          (1, listOfN(chainLen, genFailureBox)), (3, const(Nil)))
+      chain <- frequency((1, listOfN(chainLen, genFailureBox)),
+                         (3, const(Nil)))
     } yield Failure(msg.mkString, exception, Box(chain.headOption))
 }

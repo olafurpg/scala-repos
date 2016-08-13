@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class FontPostureSpec
     extends SFXEnumDelegateSpec[jfxst.FontPosture, FontPosture](
-        javaClass = classOf[jfxst.FontPosture],
-        scalaClass = classOf[FontPosture],
-        companion = FontPosture)
+      javaClass = classOf[jfxst.FontPosture],
+      scalaClass = classOf[FontPosture],
+      companion = FontPosture)

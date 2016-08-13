@@ -32,8 +32,8 @@ trait ParamsValueReaderProperties {
   implicit def stringMapValueReader(d: immutable.Map[String, String])
     : ValueReader[immutable.Map[String, String], String] =
     new StringMapValueReader(d)
-  implicit def multiMapHeadViewMapValueReader[T <: MultiMapHeadView[
-          String, String]](d: T): ValueReader[T, String] =
+  implicit def multiMapHeadViewMapValueReader[
+      T <: MultiMapHeadView[String, String]](d: T): ValueReader[T, String] =
     new MultiMapHeadViewValueReader(d)
   implicit def multiParamsValueReader(
       d: MultiParams): ValueReader[MultiParams, Seq[String]] =

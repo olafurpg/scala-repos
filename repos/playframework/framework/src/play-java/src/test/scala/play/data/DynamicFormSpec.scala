@@ -19,9 +19,9 @@ import javax.validation.Validation
   */
 object DynamicFormSpec extends Specification {
   val messagesApi = new DefaultMessagesApi(
-      Environment.simple(),
-      Configuration.reference,
-      new DefaultLangs(Configuration.reference))
+    Environment.simple(),
+    Configuration.reference,
+    new DefaultLangs(Configuration.reference))
   implicit val messages = messagesApi.preferred(Seq.empty)
   val jMessagesApi = new play.i18n.MessagesApi(messagesApi)
   val validator = Validation.buildDefaultValidatorFactory().getValidator()

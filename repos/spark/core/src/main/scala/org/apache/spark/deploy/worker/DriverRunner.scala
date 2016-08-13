@@ -164,14 +164,15 @@ private[deploy] class DriverRunner(conf: SparkConf,
     if (!localJarFile.exists()) {
       // Verify copy succeeded
       throw new Exception(
-          s"Did not see expected jar $jarFileName in $driverDir")
+        s"Did not see expected jar $jarFileName in $driverDir")
     }
 
     localJarFilename
   }
 
-  private def launchDriver(
-      builder: ProcessBuilder, baseDir: File, supervise: Boolean) {
+  private def launchDriver(builder: ProcessBuilder,
+                           baseDir: File,
+                           supervise: Boolean) {
     builder.directory(baseDir)
     def initialize(process: Process): Unit = {
       // Redirect stdout and stderr to files
@@ -201,7 +202,7 @@ private[deploy] class DriverRunner(conf: SparkConf,
 
     while (keepTrying) {
       logInfo(
-          "Launch Command: " + command.command.mkString("\"", "\" \"", "\""))
+        "Launch Command: " + command.command.mkString("\"", "\" \"", "\""))
 
       synchronized {
         if (killed) { return }
@@ -212,13 +213,13 @@ private[deploy] class DriverRunner(conf: SparkConf,
       val processStart = clock.getTimeMillis()
       val exitCode = process.get.waitFor()
       if (clock.getTimeMillis() -
-          processStart > successfulRunDuration * 1000) {
+            processStart > successfulRunDuration * 1000) {
         waitSeconds = 1
       }
 
       if (supervise && exitCode != 0 && !killed) {
         logInfo(
-            s"Command exited with status $exitCode, re-launching after $waitSeconds s.")
+          s"Command exited with status $exitCode, re-launching after $waitSeconds s.")
         sleeper.sleep(waitSeconds)
         waitSeconds = waitSeconds * 2 // exponential back-off
       }

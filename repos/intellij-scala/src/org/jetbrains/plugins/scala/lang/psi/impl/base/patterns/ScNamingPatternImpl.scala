@@ -11,14 +11,20 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{Bounds, ScType}
 
 /**
   * @author Alexander Podkhalyuzin
   */
 class ScNamingPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScNamingPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScNamingPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -55,11 +61,14 @@ class ScNamingPatternImpl(node: ASTNode)
                                    lastParent: PsiElement,
                                    place: PsiElement) = {
     if (isStable) {
-      ScalaPsiUtil.processImportLastParent(
-          processor, state, place, lastParent, getType(TypingContext.empty))
+      ScalaPsiUtil.processImportLastParent(processor,
+                                           state,
+                                           place,
+                                           lastParent,
+                                           getType(TypingContext.empty))
     } else true
   }
 
   override def getOriginalElement: PsiElement =
-    super [ScNamingPattern].getOriginalElement
+    super[ScNamingPattern].getOriginalElement
 }

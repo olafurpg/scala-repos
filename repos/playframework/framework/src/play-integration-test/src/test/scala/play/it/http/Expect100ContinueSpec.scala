@@ -10,12 +10,15 @@ import play.api.mvc._
 import play.api.test._
 
 object NettyExpect100ContinueSpec
-    extends Expect100ContinueSpec with NettyIntegrationSpecification
+    extends Expect100ContinueSpec
+    with NettyIntegrationSpecification
 object AkkaHttpExpect100ContinueSpec
-    extends Expect100ContinueSpec with AkkaHttpIntegrationSpecification
+    extends Expect100ContinueSpec
+    with AkkaHttpIntegrationSpecification
 
 trait Expect100ContinueSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   "Play" should {
 
@@ -30,12 +33,11 @@ trait Expect100ContinueSpec
 
     "honour 100 continue" in withServer(Action(req => Results.Ok)) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Expect" -> "100-continue",
-                           "Content-Length" -> "10"),
-                       "abcdefghij")
+        BasicRequest("POST",
+                     "/",
+                     "HTTP/1.1",
+                     Map("Expect" -> "100-continue", "Content-Length" -> "10"),
+                     "abcdefghij")
       )
       responses.length must_== 2
       responses(0).status must_== 100
@@ -43,15 +45,15 @@ trait Expect100ContinueSpec
     }
 
     "not read body when expecting 100 continue but action iteratee is done" in withServer(
-        EssentialAction(_ => Accumulator.done(Results.Ok))
+      EssentialAction(_ => Accumulator.done(Results.Ok))
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Expect" -> "100-continue",
-                           "Content-Length" -> "100000"),
-                       "foo")
+        BasicRequest("POST",
+                     "/",
+                     "HTTP/1.1",
+                     Map("Expect" -> "100-continue",
+                         "Content-Length" -> "100000"),
+                     "foo")
       )
       responses.length must_== 1
       responses(0).status must_== 200
@@ -65,31 +67,30 @@ trait Expect100ContinueSpec
     //
     // See https://issues.jboss.org/browse/NETTY-390 for more details.
     "close the connection after rejecting a Expect: 100-continue body" in withServer(
-        EssentialAction(_ => Accumulator.done(Results.Ok))
+      EssentialAction(_ => Accumulator.done(Results.Ok))
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port, checkClosed = true)(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Expect" -> "100-continue",
-                           "Content-Length" -> "100000"),
-                       "foo")
+        BasicRequest("POST",
+                     "/",
+                     "HTTP/1.1",
+                     Map("Expect" -> "100-continue",
+                         "Content-Length" -> "100000"),
+                     "foo")
       )
       responses.length must_== 1
       responses(0).status must_== 200
     }
 
     "leave the Netty pipeline in the right state after accepting a 100 continue request" in withServer(
-        Action(req => Results.Ok)
+      Action(req => Results.Ok)
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Expect" -> "100-continue",
-                           "Content-Length" -> "10"),
-                       "abcdefghij"),
-          BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
+        BasicRequest("POST",
+                     "/",
+                     "HTTP/1.1",
+                     Map("Expect" -> "100-continue", "Content-Length" -> "10"),
+                     "abcdefghij"),
+        BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
       )
       responses.length must_== 3
       responses(0).status must_== 100

@@ -41,40 +41,43 @@ import scalafx.scene.layout.{HBox, VBox}
 object SpinnersDemo extends JFXApp {
 
   val styles = Seq(
-      "spinner", // defaults to arrows on right stacked vertically
-      Spinner.StyleClassArrowsOnRightHorizontal,
-      Spinner.StyleClassArrowsOnLeftVertical,
-      Spinner.StyleClassArrowsOnLeftHorizontal,
-      Spinner.StyleClassSplitArrowsVertical,
-      Spinner.StyleClassSplitArrowsHorizontal
+    "spinner", // defaults to arrows on right stacked vertically
+    Spinner.StyleClassArrowsOnRightHorizontal,
+    Spinner.StyleClassArrowsOnLeftVertical,
+    Spinner.StyleClassArrowsOnLeftHorizontal,
+    Spinner.StyleClassSplitArrowsVertical,
+    Spinner.StyleClassSplitArrowsHorizontal
   )
 
-  val intSpinners = for (s <- styles) yield
-    new Spinner[Integer](1, 99, 5) {
-      styleClass += s
-      prefWidth = 100
-    }
+  val intSpinners = for (s <- styles)
+    yield
+      new Spinner[Integer](1, 99, 5) {
+        styleClass += s
+        prefWidth = 100
+      }
 
-  val stringSpinners = for (s <- styles) yield
-    new Spinner[String](ObservableBuffer("Grace", "Matt", "Katie")) {
-      styleClass += s
-      prefWidth = 100
-    }
+  val stringSpinners = for (s <- styles)
+    yield
+      new Spinner[String](ObservableBuffer("Grace", "Matt", "Katie")) {
+        styleClass += s
+        prefWidth = 100
+      }
 
-  val doubleSpinners = for (s <- styles) yield
-    new Spinner[Double](0.0, 1.0, 0.5, 0.01) {
-      styleClass += s
-      prefWidth = 100
-    }
+  val doubleSpinners = for (s <- styles)
+    yield
+      new Spinner[Double](0.0, 1.0, 0.5, 0.01) {
+        styleClass += s
+        prefWidth = 100
+      }
 
   stage = new PrimaryStage {
     title = "Spinners Demo"
     scene = new Scene {
       content = new VBox(30) {
         children = Seq(
-            new HBox(30, intSpinners: _*),
-            new HBox(30, doubleSpinners: _*),
-            new HBox(30, stringSpinners: _*)
+          new HBox(30, intSpinners: _*),
+          new HBox(30, doubleSpinners: _*),
+          new HBox(30, stringSpinners: _*)
         )
         padding = Insets(24)
       }

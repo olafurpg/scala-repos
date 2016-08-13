@@ -21,9 +21,9 @@ object FilterHeadOption extends SimplificationType {
     expr match {
       case qual `.filter` (cond) `.headOption` () if !hasSideEffects(cond) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "find", cond))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "find", cond))
+            .highlightFrom(qual))
       case _ => None
     }
   }

@@ -29,7 +29,7 @@ import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.receiver.Receiver
 import org.apache.spark.streaming.scheduler.ReceivedBlockInfo
 
-private[kinesis] class KinesisInputDStream[T : ClassTag](
+private[kinesis] class KinesisInputDStream[T: ClassTag](
     _ssc: StreamingContext,
     streamName: String,
     endpointUrl: String,
@@ -40,11 +40,11 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
     storageLevel: StorageLevel,
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials]
-)
-    extends ReceiverInputDStream[T](_ssc) {
+) extends ReceiverInputDStream[T](_ssc) {
 
   private[streaming] override def createBlockRDD(
-      time: Time, blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
+      time: Time,
+      blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
 
     // This returns true even for when blockInfos is empty
     val allBlocksHaveRanges = blockInfos.map { _.metadataOption }
@@ -58,21 +58,21 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
       }.toArray
       val isBlockIdValid = blockInfos.map { _.isBlockIdValid() }.toArray
       logDebug(
-          s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
+        s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
           s"seq number ranges: ${seqNumRanges.mkString(", ")} ")
-      new KinesisBackedBlockRDD(
-          context.sc,
-          regionName,
-          endpointUrl,
-          blockIds,
-          seqNumRanges,
-          isBlockIdValid = isBlockIdValid,
-          retryTimeoutMs = ssc.graph.batchDuration.milliseconds.toInt,
-          messageHandler = messageHandler,
-          awsCredentialsOption = awsCredentialsOption)
+      new KinesisBackedBlockRDD(context.sc,
+                                regionName,
+                                endpointUrl,
+                                blockIds,
+                                seqNumRanges,
+                                isBlockIdValid = isBlockIdValid,
+                                retryTimeoutMs =
+                                  ssc.graph.batchDuration.milliseconds.toInt,
+                                messageHandler = messageHandler,
+                                awsCredentialsOption = awsCredentialsOption)
     } else {
       logWarning(
-          "Kinesis sequence number information was not present with some block metadata," +
+        "Kinesis sequence number information was not present with some block metadata," +
           " it may not be possible to recover from failures")
       super.createBlockRDD(time, blockInfos)
     }

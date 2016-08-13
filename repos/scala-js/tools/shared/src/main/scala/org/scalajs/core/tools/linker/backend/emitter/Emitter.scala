@@ -48,13 +48,14 @@ final class Emitter private (semantics: Semantics,
   private[backend] def withOptimizeBracketSelects(
       optimizeBracketSelects: Boolean): Emitter = {
     new Emitter(
-        semantics,
-        outputMode,
-        internalOptions.withOptimizeBracketSelects(optimizeBracketSelects))
+      semantics,
+      outputMode,
+      internalOptions.withOptimizeBracketSelects(optimizeBracketSelects))
   }
 
-  def emitAll(
-      unit: LinkingUnit, builder: JSFileBuilder, logger: Logger): Unit = {
+  def emitAll(unit: LinkingUnit,
+              builder: JSFileBuilder,
+              logger: Logger): Unit = {
     emitPrelude(builder, logger)
     emit(unit, builder, logger)
     emitPostlude(builder, logger)
@@ -114,16 +115,16 @@ final class Emitter private (semantics: Semantics,
 
   private def endRun(logger: Logger): Unit = {
     logger.debug(
-        s"Emitter: Class tree cache stats: reused: $statsClassesReused -- " +
+      s"Emitter: Class tree cache stats: reused: $statsClassesReused -- " +
         s"invalidated: $statsClassesInvalidated")
     logger.debug(
-        s"Emitter: Method tree cache stats: resued: $statsMethodsReused -- " +
+      s"Emitter: Method tree cache stats: resued: $statsMethodsReused -- " +
         s"invalidated: $statsMethodsInvalidated")
     classCaches.retain((_, c) => c.cleanAfterRun())
   }
 
-  private def emitLinkedClass(
-      linkedClass: LinkedClass, builder: JSTreeBuilder): Unit = {
+  private def emitLinkedClass(linkedClass: LinkedClass,
+                              builder: JSTreeBuilder): Unit = {
 
     def addTree(tree: js.Tree): Unit = builder.addJSTree(tree)
 
@@ -137,25 +138,25 @@ final class Emitter private (semantics: Semantics,
       val methodCache = classCache.getStaticCache(m.info.encodedName)
 
       addTree(
-          methodCache.getOrElseUpdate(
-              m.version, classEmitter.genMethod(className, m.tree)))
+        methodCache.getOrElseUpdate(m.version,
+                                    classEmitter.genMethod(className, m.tree)))
     }
 
     if (linkedClass.hasInstances && kind.isAnyScalaJSDefinedClass) {
       val ctor = classTreeCache.constructor.getOrElseUpdate(
-          classEmitter.genConstructor(linkedClass))
+        classEmitter.genConstructor(linkedClass))
 
       // Normal methods
       val memberMethods = for (m <- linkedClass.memberMethods) yield {
         val methodCache = classCache.getMethodCache(m.info.encodedName)
 
-        methodCache.getOrElseUpdate(
-            m.version, classEmitter.genMethod(className, m.tree))
+        methodCache.getOrElseUpdate(m.version,
+                                    classEmitter.genMethod(className, m.tree))
       }
 
       // Exported Members
       val exportedMembers = classTreeCache.exportedMembers.getOrElseUpdate(
-          classEmitter.genExportedMembers(linkedClass))
+        classEmitter.genExportedMembers(linkedClass))
 
       outputMode match {
         case OutputMode.ECMAScript51Global | OutputMode.ECMAScript51Isolated =>
@@ -166,7 +167,7 @@ final class Emitter private (semantics: Semantics,
         case OutputMode.ECMAScript6 =>
           val allMembersBlock =
             js.Block(ctor :: memberMethods ::: exportedMembers :: Nil)(
-                Position.NoPosition)
+              Position.NoPosition)
           val allMembers = allMembersBlock match {
             case js.Block(members) => members
             case js.Skip() => Nil
@@ -179,38 +180,41 @@ final class Emitter private (semantics: Semantics,
       for (m <- linkedClass.memberMethods) yield {
         val methodCache = classCache.getMethodCache(m.info.encodedName)
         addTree(
-            methodCache.getOrElseUpdate(
-                m.version, classEmitter.genDefaultMethod(className, m.tree)))
+          methodCache.getOrElseUpdate(
+            m.version,
+            classEmitter.genDefaultMethod(className, m.tree)))
       }
     }
 
     if (classEmitter.needInstanceTests(linkedClass)) {
       addTree(
-          classTreeCache.instanceTests.getOrElseUpdate(js.Block(
-                  classEmitter.genInstanceTests(linkedClass),
-                  classEmitter.genArrayInstanceTests(linkedClass)
-              )(linkedClass.pos)))
+        classTreeCache.instanceTests.getOrElseUpdate(
+          js.Block(
+            classEmitter.genInstanceTests(linkedClass),
+            classEmitter.genArrayInstanceTests(linkedClass)
+          )(linkedClass.pos)))
     }
 
     if (linkedClass.hasRuntimeTypeInfo) {
       addTree(
-          classTreeCache.typeData.getOrElseUpdate(
-              classEmitter.genTypeData(linkedClass)))
+        classTreeCache.typeData.getOrElseUpdate(
+          classEmitter.genTypeData(linkedClass)))
     }
 
     if (linkedClass.hasInstances && kind.isClass &&
         linkedClass.hasRuntimeTypeInfo)
-      addTree(classTreeCache.setTypeData.getOrElseUpdate(
-              classEmitter.genSetTypeData(linkedClass)))
+      addTree(
+        classTreeCache.setTypeData.getOrElseUpdate(
+          classEmitter.genSetTypeData(linkedClass)))
 
     if (linkedClass.kind.hasModuleAccessor)
       addTree(
-          classTreeCache.moduleAccessor.getOrElseUpdate(
-              classEmitter.genModuleAccessor(linkedClass)))
+        classTreeCache.moduleAccessor.getOrElseUpdate(
+          classEmitter.genModuleAccessor(linkedClass)))
 
     addTree(
-        classTreeCache.classExports.getOrElseUpdate(
-            classEmitter.genClassExports(linkedClass)))
+      classTreeCache.classExports.getOrElseUpdate(
+        classEmitter.genClassExports(linkedClass)))
   }
 
   // Helpers
@@ -324,7 +328,8 @@ private[scalajs] object Emitter {
 
   // The only reason this is not private is that Rhino needs it
   private[scalajs] def symbolRequirements(
-      semantics: Semantics, esLevel: ESLevel): SymbolRequirement = {
+      semantics: Semantics,
+      esLevel: ESLevel): SymbolRequirement = {
     import semantics._
     import CheckedBehavior._
 
@@ -335,31 +340,29 @@ private[scalajs] object Emitter {
       if (p) v else none()
 
     multiple(
-        instantiateClass("O", "init___"),
-        classData("O"),
-        instantiateClass("jl_CloneNotSupportedException", "init___"),
-        cond(asInstanceOfs != Unchecked) {
-          instantiateClass("jl_ClassCastException", "init___T")
-        },
-        cond(asInstanceOfs == Fatal) {
-          instantiateClass(
-              "sjsr_UndefinedBehaviorError", "init___jl_Throwable")
-        },
-        cond(moduleInit == Fatal) {
-          instantiateClass("sjsr_UndefinedBehaviorError", "init___T")
-        },
-        instantiateClass("jl_Class", "init___jl_ScalaJSClassData"),
-        callOnModule("jl_Double$", "compare__D__D__I"),
-        callOnModule("sjsr_RuntimeString$", "hashCode__T__I"),
-        instanceTests(LongImpl.RuntimeLongClass),
-        instantiateClass(LongImpl.RuntimeLongClass, LongImpl.AllConstructors),
-        callMethods(LongImpl.RuntimeLongClass, LongImpl.AllMethods),
-        callOnModule(
-            LongImpl.RuntimeLongModuleClass, LongImpl.AllModuleMethods),
-        cond(semantics.strictFloats && esLevel == ESLevel.ES5) {
-          callOnModule("sjsr_package$", "froundPolyfill__D__D")
-        },
-        callOnModule("sjsr_Bits$", "numberHashCode__D__I")
+      instantiateClass("O", "init___"),
+      classData("O"),
+      instantiateClass("jl_CloneNotSupportedException", "init___"),
+      cond(asInstanceOfs != Unchecked) {
+        instantiateClass("jl_ClassCastException", "init___T")
+      },
+      cond(asInstanceOfs == Fatal) {
+        instantiateClass("sjsr_UndefinedBehaviorError", "init___jl_Throwable")
+      },
+      cond(moduleInit == Fatal) {
+        instantiateClass("sjsr_UndefinedBehaviorError", "init___T")
+      },
+      instantiateClass("jl_Class", "init___jl_ScalaJSClassData"),
+      callOnModule("jl_Double$", "compare__D__D__I"),
+      callOnModule("sjsr_RuntimeString$", "hashCode__T__I"),
+      instanceTests(LongImpl.RuntimeLongClass),
+      instantiateClass(LongImpl.RuntimeLongClass, LongImpl.AllConstructors),
+      callMethods(LongImpl.RuntimeLongClass, LongImpl.AllMethods),
+      callOnModule(LongImpl.RuntimeLongModuleClass, LongImpl.AllModuleMethods),
+      cond(semantics.strictFloats && esLevel == ESLevel.ES5) {
+        callOnModule("sjsr_package$", "froundPolyfill__D__D")
+      },
+      callOnModule("sjsr_Bits$", "numberHashCode__D__I")
     )
   }
 }

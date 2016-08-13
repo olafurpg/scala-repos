@@ -4,7 +4,11 @@ package decompiler
 import java.io.IOException
 
 import com.intellij.lang.LanguageParserDefinitions
-import com.intellij.openapi.project.{DefaultProjectFactory, Project, ProjectManager}
+import com.intellij.openapi.project.{
+  DefaultProjectFactory,
+  Project,
+  ProjectManager
+}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.compiled.ClsStubBuilder
 import com.intellij.psi.stubs.{PsiFileStub, PsiFileStubImpl}
@@ -32,8 +36,8 @@ object ScClsStubBuilder {
     }
   }
 
-  private def canBeProcessed(
-      file: VirtualFile, bytes: => Array[Byte]): Boolean = {
+  private def canBeProcessed(file: VirtualFile,
+                             bytes: => Array[Byte]): Boolean = {
     if (DecompilerUtil.isScalaFile(file, bytes)) return true
     val fileName: String = file.getNameWithoutExtension
     val parent = file.getParent
@@ -82,9 +86,9 @@ class ScClsStubBuilder extends ClsStubBuilder {
     val source = result.sourceName
     val text = result.sourceText
     val file = ScalaPsiElementFactory.createScalaFile(
-        text.replace("\r", ""),
-        PsiManager.getInstance(
-            DefaultProjectFactory.getInstance().getDefaultProject))
+      text.replace("\r", ""),
+      PsiManager.getInstance(
+        DefaultProjectFactory.getInstance().getDefaultProject))
 
     val adj = file.asInstanceOf[CompiledFileAdjuster]
     adj.setCompiled(c = true)
@@ -123,11 +127,12 @@ class ScClsStubBuilder extends ClsStubBuilder {
     val index: Int = name.indexOf('$', from)
     index != -1 &&
     (containsPart(directory, name, index) ||
-        isInner(name, index + 1, directory))
+    isInner(name, index + 1, directory))
   }
 
-  private def containsPart(
-      directory: Directory, name: String, endIndex: Int): Boolean = {
+  private def containsPart(directory: Directory,
+                           name: String,
+                           endIndex: Int): Boolean = {
     endIndex > 0 && directory.contains(name.substring(0, endIndex))
   }
 
@@ -138,8 +143,9 @@ class ScClsStubBuilder extends ClsStubBuilder {
   private class ParentDirectory(dir: VirtualFile) extends Directory {
     def contains(name: String): Boolean = {
       if (dir == null) return false
-      !dir.getChildren.forall(child =>
-            child.getExtension != "class" ||
+      !dir.getChildren.forall(
+        child =>
+          child.getExtension != "class" ||
             NameTransformer.decode(child.getNameWithoutExtension) == name)
     }
   }

@@ -30,7 +30,8 @@ trait Exprs extends Core with Types with Xml {
     val Enumerators = {
       val Generator = P(`<-` ~/ Expr ~ Guard.?)
       val Assign = P(`=` ~/ Expr)
-      val Enumerator = P(Semis ~ `val`.? ~ TypeOrBindPattern ~/
+      val Enumerator = P(
+        Semis ~ `val`.? ~ TypeOrBindPattern ~/
           (Generator | Assign) | Semis.? ~ Guard)
       P(TypeOrBindPattern ~ Generator ~~ Enumerator.repX)
     }
@@ -47,11 +48,11 @@ trait Exprs extends Core with Types with Xml {
         P(`try` ~/ Expr ~ Catch.? ~ Finally.?)
       }
       val DoWhile = P(
-          `do` ~/ Expr ~ Semi.? ~ `while` ~ "(" ~ ExprCtx.Expr ~ ")")
+        `do` ~/ Expr ~ Semi.? ~ `while` ~ "(" ~ ExprCtx.Expr ~ ")")
 
       val For = {
         val Body = P(
-            "(" ~/ ExprCtx.Enumerators ~ ")" | "{" ~/ StatCtx.Enumerators ~ "}")
+          "(" ~/ ExprCtx.Enumerators ~ ")" | "{" ~/ StatCtx.Enumerators ~ "}")
         P(`for` ~/ Body ~ `yield`.? ~ Expr)
       }
       val Throw = P(`throw` ~/ Expr)
@@ -59,13 +60,13 @@ trait Exprs extends Core with Types with Xml {
       val LambdaRhs = if (curlyBlock) P(BlockChunk) else P(Expr)
 
       val ImplicitLambda = P(
-          `implicit` ~ (Id | `_`) ~ (`:` ~ InfixType).? ~ `=>` ~ LambdaRhs.?)
+        `implicit` ~ (Id | `_`) ~ (`:` ~ InfixType).? ~ `=>` ~ LambdaRhs.?)
       val ParenedLambda = P(
-          Parened ~~ (WL ~ `=>` ~ LambdaRhs.? | ExprSuffix ~~ PostfixSuffix))
+        Parened ~~ (WL ~ `=>` ~ LambdaRhs.? | ExprSuffix ~~ PostfixSuffix))
       val PostfixLambda = P(PostfixExpr ~ (`=>` ~ LambdaRhs.?).?)
       val SmallerExprOrLambda = P(ParenedLambda | PostfixLambda)
       P(
-          If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda
+        If | While | Try | DoWhile | For | Throw | Return | ImplicitLambda | SmallerExprOrLambda
       )
     }
     val AscriptionType = if (curlyBlock) P(PostfixType) else P(Type)
@@ -73,18 +74,18 @@ trait Exprs extends Core with Types with Xml {
     val MatchAscriptionSuffix = P(`match` ~/ "{" ~ CaseClauses | Ascription)
     val ExprPrefix = P(WL ~ CharIn("-+!~") ~~ !syntax.Basic.OpChar ~ WS)
     val ExprSuffix = P(
-        (WL ~ "." ~/ Id | WL ~ TypeArgs | NoSemis ~ ArgList).repX ~~
+      (WL ~ "." ~/ Id | WL ~ TypeArgs | NoSemis ~ ArgList).repX ~~
         (NoSemis ~ `_`).?)
     val PrefixExpr = P(ExprPrefix.? ~ SimpleExpr)
 
     // Intermediate `WL` needs to always be non-cutting, because you need to
     // backtrack out of `InfixSuffix` into `PostFixSuffix` if it doesn't work out
     val InfixSuffix = P(
-        NoSemis ~~ WL ~~ Id ~ TypeArgs.? ~~ OneSemiMax ~ PrefixExpr ~~ ExprSuffix)
+      NoSemis ~~ WL ~~ Id ~ TypeArgs.? ~~ OneSemiMax ~ PrefixExpr ~~ ExprSuffix)
     val PostFix = P(NoSemis ~~ WL ~~ Id ~ Newline.?)
 
     val PostfixSuffix = P(
-        InfixSuffix.repX ~~ PostFix.? ~ (`=` ~/ Expr).? ~ MatchAscriptionSuffix.?)
+      InfixSuffix.repX ~~ PostFix.? ~ (`=` ~/ Expr).? ~ MatchAscriptionSuffix.?)
 
     val PostfixExpr: P0 = P(PrefixExpr ~~ ExprSuffix ~~ PostfixSuffix)
 
@@ -138,7 +139,7 @@ trait Exprs extends Core with Types with Xml {
     // Need to lookahead for `class` and `object` because
     // the block { case object X } is not a case clause!
     val CaseClause: P0 = P(
-        `case` ~ !(`class` | `object`) ~/ Pattern ~ ExprCtx.Guard.? ~ `=>` ~ Block)
+      `case` ~ !(`class` | `object`) ~/ Pattern ~ ExprCtx.Guard.? ~ `=>` ~ Block)
     P(CaseClause.rep(1) ~ "}")
   }
 }

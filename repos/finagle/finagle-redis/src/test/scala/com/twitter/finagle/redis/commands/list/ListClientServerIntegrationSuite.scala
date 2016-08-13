@@ -44,15 +44,15 @@ final class ListClientServerIntegrationSuite
   }
 
   test(
-      "LINSERT should insert an element before or after another element in a list",
-      ClientServerTest,
-      RedisTest) {
+    "LINSERT should insert an element before or after another element in a list",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(LPush(foo, List(bar)))) == IntegerReply(1))
 
       assert(
-          Await.result(client(LInsert(foo, "BEFORE", bar, moo))) == IntegerReply(
-              2))
+        Await.result(client(LInsert(foo, "BEFORE", bar, moo))) == IntegerReply(
+          2))
     }
   }
 

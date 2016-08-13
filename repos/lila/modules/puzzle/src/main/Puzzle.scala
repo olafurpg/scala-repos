@@ -39,7 +39,7 @@ case class Puzzle(id: PuzzleId,
       sit1 <- Forsyth << fen
       uci <- Uci.Move(initialMove)
       sit2 <- sit1.move(uci.orig, uci.dest, uci.promotion).toOption map
-      (_.situationAfter)
+               (_.situationAfter)
     } yield Forsyth >> sit2
   }
 }
@@ -86,8 +86,7 @@ object Puzzle {
         case _ => sys error s"Invalid move notation: $move"
       }
     def write(lines: Lines): BSONDocument =
-      BSONDocument(
-          lines map {
+      BSONDocument(lines map {
         case Win(move) => writeMove(move) -> BSONBoolean(true)
         case Retry(move) => writeMove(move) -> BSONBoolean(false)
         case Node(move, lines) => writeMove(move) -> write(lines)

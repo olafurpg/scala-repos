@@ -237,7 +237,7 @@ object M9 {
 
   val pi =
     2 * product(x => 2 * x * 2 * x)(1, 20) / product(
-        x => (2 * x - 1) * (2 * x - 1))(1, 20) / 40
+      x => (2 * x - 1) * (2 * x - 1))(1, 20) / 40
 
   Console.println(sumInts(1, 4))
   Console.println(sumCubes(1, 4))

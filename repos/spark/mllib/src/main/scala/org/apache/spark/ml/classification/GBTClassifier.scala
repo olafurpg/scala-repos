@@ -24,14 +24,24 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.ml.{PredictionModel, Predictor}
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.ml.regression.DecisionTreeRegressionModel
-import org.apache.spark.ml.tree.{DecisionTreeModel, GBTParams, TreeClassifierParams, TreeEnsembleModel}
+import org.apache.spark.ml.tree.{
+  DecisionTreeModel,
+  GBTParams,
+  TreeClassifierParams,
+  TreeEnsembleModel
+}
 import org.apache.spark.ml.tree.impl.GradientBoostedTrees
 import org.apache.spark.ml.util.{Identifiable, MetadataUtils}
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
-import org.apache.spark.mllib.tree.loss.{LogLoss => OldLogLoss, Loss => OldLoss}
-import org.apache.spark.mllib.tree.model.{GradientBoostedTreesModel => OldGBTModel}
+import org.apache.spark.mllib.tree.loss.{
+  LogLoss => OldLogLoss,
+  Loss => OldLoss
+}
+import org.apache.spark.mllib.tree.model.{
+  GradientBoostedTreesModel => OldGBTModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -48,7 +58,9 @@ import org.apache.spark.sql.functions._
 final class GBTClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[Vector, GBTClassifier, GBTClassificationModel]
-    with GBTParams with TreeClassifierParams with Logging {
+    with GBTParams
+    with TreeClassifierParams
+    with Logging {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("gbtc"))
@@ -102,7 +114,7 @@ final class GBTClassifier @Since("1.4.0")(
   @Since("1.4.0")
   override def setSeed(value: Long): this.type = {
     logWarning(
-        "The 'seed' parameter is currently ignored by Gradient Boosting.")
+      "The 'seed' parameter is currently ignored by Gradient Boosting.")
     super.setSeed(value)
   }
 
@@ -124,13 +136,13 @@ final class GBTClassifier @Since("1.4.0")(
     */
   @Since("1.4.0")
   val lossType: Param[String] = new Param[String](
-      this,
-      "lossType",
-      "Loss function which GBT" +
+    this,
+    "lossType",
+    "Loss function which GBT" +
       " tries to minimize (case-insensitive). Supported options:" +
       s" ${GBTClassifier.supportedLossTypes.mkString(", ")}",
-      (value: String) =>
-        GBTClassifier.supportedLossTypes.contains(value.toLowerCase))
+    (value: String) =>
+      GBTClassifier.supportedLossTypes.contains(value.toLowerCase))
 
   setDefault(lossType -> "logistic")
 
@@ -149,7 +161,7 @@ final class GBTClassifier @Since("1.4.0")(
       case _ =>
         // Should never happen because of check in setter method.
         throw new RuntimeException(
-            s"GBTClassifier was given bad loss type: $getLossType")
+          s"GBTClassifier was given bad loss type: $getLossType")
     }
   }
 
@@ -161,14 +173,14 @@ final class GBTClassifier @Since("1.4.0")(
         case Some(n: Int) => n
         case None =>
           throw new IllegalArgumentException(
-              "GBTClassifier was given input" +
+            "GBTClassifier was given input" +
               s" with invalid label column ${$(labelCol)}, without the number of classes" +
               " specified. See StringIndexer.")
         // TODO: Automatically index labels: SPARK-7126
       }
     require(
-        numClasses == 2,
-        s"GBTClassifier only supports binary classification but was given numClasses = $numClasses")
+      numClasses == 2,
+      s"GBTClassifier only supports binary classification but was given numClasses = $numClasses")
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val numFeatures = oldDataset.first().features.size
     val boostingStrategy =
@@ -203,18 +215,19 @@ object GBTClassifier {
   */
 @Since("1.6.0")
 @Experimental
-final class GBTClassificationModel private[ml](
+final class GBTClassificationModel private[ml] (
     @Since("1.6.0") override val uid: String,
     private val _trees: Array[DecisionTreeRegressionModel],
     private val _treeWeights: Array[Double],
     @Since("1.6.0") override val numFeatures: Int)
     extends PredictionModel[Vector, GBTClassificationModel]
-    with TreeEnsembleModel with Serializable {
+    with TreeEnsembleModel
+    with Serializable {
 
   require(numTrees > 0, "GBTClassificationModel requires at least 1 tree.")
   require(
-      _trees.length == _treeWeights.length,
-      "GBTClassificationModel given trees, treeWeights" +
+    _trees.length == _treeWeights.length,
+    "GBTClassificationModel given trees, treeWeights" +
       s" of non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
 
   /**
@@ -255,8 +268,8 @@ final class GBTClassificationModel private[ml](
   @Since("1.4.0")
   override def copy(extra: ParamMap): GBTClassificationModel = {
     copyValues(
-        new GBTClassificationModel(uid, _trees, _treeWeights, numFeatures),
-        extra).setParent(parent)
+      new GBTClassificationModel(uid, _trees, _treeWeights, numFeatures),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -278,8 +291,8 @@ private[ml] object GBTClassificationModel {
               categoricalFeatures: Map[Int, Int],
               numFeatures: Int = -1): GBTClassificationModel = {
     require(
-        oldModel.algo == OldAlgo.Classification,
-        "Cannot convert GradientBoostedTreesModel" +
+      oldModel.algo == OldAlgo.Classification,
+      "Cannot convert GradientBoostedTreesModel" +
         s" with algo=${oldModel.algo} (old API) to GBTClassificationModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
@@ -287,7 +300,9 @@ private[ml] object GBTClassificationModel {
     }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtc")
-    new GBTClassificationModel(
-        parent.uid, newTrees, oldModel.treeWeights, numFeatures)
+    new GBTClassificationModel(parent.uid,
+                               newTrees,
+                               oldModel.treeWeights,
+                               numFeatures)
   }
 }

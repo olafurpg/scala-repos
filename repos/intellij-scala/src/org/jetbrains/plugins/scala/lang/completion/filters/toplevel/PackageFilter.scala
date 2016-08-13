@@ -19,7 +19,7 @@ class PackageFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
     val (leaf, _) = processPsiLeafForFilter(
-        getLeafByOffset(context.getTextRange.getStartOffset, context))
+      getLeafByOffset(context.getTextRange.getStartOffset, context))
 
     if (leaf != null) {
       val parent = leaf.getParent

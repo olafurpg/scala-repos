@@ -3,7 +3,7 @@ package breeze.linalg
 import org.scalatest.FunSuite
 
 /**
-  * 
+  *
   * @author dlwh
   */
 class NumericOpsArrayTest extends FunSuite {

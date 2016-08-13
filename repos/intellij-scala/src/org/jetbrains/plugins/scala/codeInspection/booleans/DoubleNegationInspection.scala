@@ -4,8 +4,16 @@ package codeInspection.booleans
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr, ScParenthesisedExpr, ScPrefixExpr}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScInfixExpr,
+  ScParenthesisedExpr,
+  ScPrefixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.annotation.tailrec
@@ -65,11 +73,11 @@ object DoubleNegationUtil {
         val hasNegInfix = hasNegation(infix)
         val builder = new mutable.StringBuilder()
         builder.append(
-            if (hasNegLeft) invertedNegationText(left) else left.getText)
+          if (hasNegLeft) invertedNegationText(left) else left.getText)
         builder.append(
-            if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
+          if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
         builder.append(
-            if (hasNegRight) invertedNegationText(right) else right.getText)
+          if (hasNegRight) invertedNegationText(right) else right.getText)
         builder.toString()
     }
     ScalaPsiElementFactory.createExpressionFromText(text, expr.getManager)

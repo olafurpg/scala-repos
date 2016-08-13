@@ -67,8 +67,8 @@ class LeaderProxyFilter @Inject()(
 
   private[this] val scheme = if (httpConf.disableHttp()) "https" else "http"
 
-  private[this] def buildUrl(
-      leaderData: String, request: HttpServletRequest): URL = {
+  private[this] def buildUrl(leaderData: String,
+                             request: HttpServletRequest): URL = {
     buildUrl(leaderData, request.getRequestURI, Option(request.getQueryString))
   }
 
@@ -107,11 +107,11 @@ class LeaderProxyFilter @Inject()(
 
         if (retries >= 0) {
           log.info(
-              s"Waiting for consistent leadership state. Are we leader?: $weAreLeader, leader: $currentLeaderData")
+            s"Waiting for consistent leadership state. Are we leader?: $weAreLeader, leader: $currentLeaderData")
           sleep()
         } else {
           log.error(
-              s"inconsistent leadership state, refusing request for ourselves at $myHostPort. " +
+            s"inconsistent leadership state, refusing request for ourselves at $myHostPort. " +
               s"Are we leader?: $weAreLeader, leader: $currentLeaderData")
         }
 
@@ -132,7 +132,7 @@ class LeaderProxyFilter @Inject()(
         } else if (leaderDataOpt.forall(_ == myHostPort)) {
           // either not leader or ourselves
           log.info(
-              s"Do not proxy to myself. Waiting for consistent leadership state. " +
+            s"Do not proxy to myself. Waiting for consistent leadership state. " +
               s"Are we leader?: false, leader: $leaderDataOpt")
           if (waitForConsistentLeadership(response)) {
             doFilter(rawRequest, rawResponse, chain)
@@ -151,7 +151,7 @@ class LeaderProxyFilter @Inject()(
         }
       case _ =>
         throw new IllegalArgumentException(
-            s"expected http request/response but got $rawRequest/$rawResponse")
+          s"expected http request/response but got $rawRequest/$rawResponse")
     }
   }
 
@@ -212,11 +212,11 @@ class JavaUrlConnectionRequestForwarder @Inject()(
           httpConnection
         case connection: URLConnection =>
           throw new scala.RuntimeException(
-              s"unexpected connection type: ${connection.getClass}")
+            s"unexpected connection type: ${connection.getClass}")
       }
 
       connection.setConnectTimeout(
-          leaderProxyConf.leaderProxyConnectionTimeout())
+        leaderProxyConf.leaderProxyConnectionTimeout())
       connection.setReadTimeout(leaderProxyConf.leaderProxyReadTimeout())
       connection.setInstanceFollowRedirects(false)
 
@@ -230,15 +230,15 @@ class JavaUrlConnectionRequestForwarder @Inject()(
       val names = Option(request.getHeaderNames).map(_.asScala).getOrElse(Nil)
       for {
         name <- names
-               // Reverse proxies commonly filter these headers: connection, host.
-               //
-               // The connection header is removed since it may make sense to persist the connection
-               // for further requests even if this single client will stop using it.
-               //
-               // The host header is used to choose the correct virtual host and should be set to the hostname
-               // of the URL for HTTP 1.1. Thus we do not preserve it, even though Marathon does not care.
-               if !name.equalsIgnoreCase("host") &&
-               !name.equalsIgnoreCase("connection")
+        // Reverse proxies commonly filter these headers: connection, host.
+        //
+        // The connection header is removed since it may make sense to persist the connection
+        // for further requests even if this single client will stop using it.
+        //
+        // The host header is used to choose the correct virtual host and should be set to the hostname
+        // of the URL for HTTP 1.1. Thus we do not preserve it, even though Marathon does not care.
+        if !name.equalsIgnoreCase("host") &&
+          !name.equalsIgnoreCase("connection")
         headerValues <- Option(request.getHeaders(name))
         headerValue <- headerValues.asScala
       } {
@@ -248,8 +248,8 @@ class JavaUrlConnectionRequestForwarder @Inject()(
 
       leaderConnection.addRequestProperty(HEADER_VIA, viaValue)
       val forwardedFor = Seq(
-          Option(request.getHeader(HEADER_FORWARDED_FOR)),
-          Option(request.getRemoteAddr)
+        Option(request.getHeader(HEADER_FORWARDED_FOR)),
+        Option(request.getRemoteAddr)
       ).flatten.mkString(",")
       leaderConnection.addRequestProperty(HEADER_FORWARDED_FOR, forwardedFor)
     }
@@ -318,14 +318,14 @@ class JavaUrlConnectionRequestForwarder @Inject()(
         response.sendError(HttpStatus.SC_BAD_GATEWAY, ERROR_STATUS_LOOP)
       } else {
         val leaderConnection: HttpURLConnection = createAndConfigureConnection(
-            url)
+          url)
         try {
           copyRequestToConnection(leaderConnection, request)
           copyConnectionResponse(leaderConnection, response)
         } catch {
           case connException: ConnectException =>
-            response.sendError(
-                HttpStatus.SC_BAD_GATEWAY, ERROR_STATUS_CONNECTION_REFUSED)
+            response.sendError(HttpStatus.SC_BAD_GATEWAY,
+                               ERROR_STATUS_CONNECTION_REFUSED)
         } finally {
           Try(leaderConnection.getInputStream.close())
           Try(leaderConnection.getErrorStream.close())

@@ -38,7 +38,11 @@ import org.apache.hadoop.security.UserGroupInformation
 import org.apache.hadoop.security.token.{Token, TokenIdentifier}
 import org.apache.hadoop.yarn.api.ApplicationConstants
 import org.apache.hadoop.yarn.api.ApplicationConstants.Environment
-import org.apache.hadoop.yarn.api.records.{ApplicationAccessType, ContainerId, Priority}
+import org.apache.hadoop.yarn.api.records.{
+  ApplicationAccessType,
+  ContainerId,
+  Priority
+}
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
 
@@ -56,8 +60,8 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
 
   private var tokenRenewer: Option[ExecutorDelegationTokenUpdater] = None
 
-  override def transferCredentials(
-      source: UserGroupInformation, dest: UserGroupInformation) {
+  override def transferCredentials(source: UserGroupInformation,
+                                   dest: UserGroupInformation) {
     dest.addCredentials(source.getCredentials())
   }
 
@@ -223,8 +227,8 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       mirror.classLoader.loadClass("org.apache.hadoop.hive.conf.HiveConf")
     // using the (Configuration, Class) constructor allows the current configuration to be included
     // in the hive config.
-    val ctor = hiveConfClass.getDeclaredConstructor(
-        classOf[Configuration], classOf[Object].getClass)
+    val ctor = hiveConfClass
+      .getDeclaredConstructor(classOf[Configuration], classOf[Object].getClass)
     val hiveConf =
       ctor.newInstance(conf, hiveConfClass).asInstanceOf[Configuration]
     val metastoreUri = hiveConf.getTrimmed("hive.metastore.uris", "")
@@ -236,15 +240,15 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       require(principal.nonEmpty, "Hive principal $principalKey undefined")
       val currentUser = UserGroupInformation.getCurrentUser()
       logDebug(
-          s"Getting Hive delegation token for ${currentUser.getUserName()} against " +
+        s"Getting Hive delegation token for ${currentUser.getUserName()} against " +
           s"$principal at $metastoreUri")
       val hiveClass =
         mirror.classLoader.loadClass("org.apache.hadoop.hive.ql.metadata.Hive")
       val closeCurrent = hiveClass.getMethod("closeCurrent")
       try {
         // get all the instance methods before invoking any
-        val getDelegationToken = hiveClass.getMethod(
-            "getDelegationToken", classOf[String], classOf[String])
+        val getDelegationToken = hiveClass
+          .getMethod("getDelegationToken", classOf[String], classOf[String])
         val getHive = hiveClass.getMethod("get", hiveConfClass)
 
         doAsRealUser {
@@ -312,9 +316,9 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     if ("kerberos" == hbaseConf.get("hbase.security.authentication")) {
       logDebug("Attempting to fetch HBase security token.")
       Some(
-          obtainToken
-            .invoke(null, hbaseConf)
-            .asInstanceOf[Token[TokenIdentifier]])
+        obtainToken
+          .invoke(null, hbaseConf)
+          .asInstanceOf[Token[TokenIdentifier]])
     } else {
       None
     }
@@ -331,8 +335,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     // For some reason the Scala-generated anonymous class ends up causing an
     // UndeclaredThrowableException, even if you annotate the method with @throws.
     try {
-      realUser.doAs(
-          new PrivilegedExceptionAction[T]() {
+      realUser.doAs(new PrivilegedExceptionAction[T]() {
         override def run(): T = fn
       })
     } catch {
@@ -359,11 +362,11 @@ object YarnSparkHadoopUtil {
   val RM_REQUEST_PRIORITY = Priority.newInstance(1)
 
   def get: YarnSparkHadoopUtil = {
-    val yarnMode = java.lang.Boolean.valueOf(System.getProperty(
-            "SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
+    val yarnMode = java.lang.Boolean.valueOf(
+      System.getProperty("SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
     if (!yarnMode) {
       throw new SparkException(
-          "YarnSparkHadoopUtil is not available in non-YARN mode!")
+        "YarnSparkHadoopUtil is not available in non-YARN mode!")
     }
     SparkHadoopUtil.get.asInstanceOf[YarnSparkHadoopUtil]
   }
@@ -372,8 +375,9 @@ object YarnSparkHadoopUtil {
     * Add a path variable to the given environment map.
     * If the map already contains this key, append the value to the existing value instead.
     */
-  def addPathToEnvironment(
-      env: HashMap[String, String], key: String, value: String): Unit = {
+  def addPathToEnvironment(env: HashMap[String, String],
+                           key: String,
+                           value: String): Unit = {
     val newValue =
       if (env.contains(key)) { env(key) + getClassPathSeparator + value } else
         value
@@ -384,8 +388,8 @@ object YarnSparkHadoopUtil {
     * Set zero or more environment variables specified by the given input string.
     * The input string is expected to take the form "KEY1=VAL1,KEY2=VAL2,KEY3=VAL3".
     */
-  def setEnvFromInputString(
-      env: HashMap[String, String], inputString: String): Unit = {
+  def setEnvFromInputString(env: HashMap[String, String],
+                            inputString: String): Unit = {
     if (inputString != null && inputString.length() > 0) {
       val childEnvs = inputString.split(",")
       val p = Pattern.compile(environmentVariableRegex)
@@ -487,8 +491,8 @@ object YarnSparkHadoopUtil {
   def getApplicationAclsForYarn(
       securityMgr: SecurityManager): Map[ApplicationAccessType, String] = {
     Map[ApplicationAccessType, String](
-        ApplicationAccessType.VIEW_APP -> securityMgr.getViewAcls,
-        ApplicationAccessType.MODIFY_APP -> securityMgr.getModifyAcls
+      ApplicationAccessType.VIEW_APP -> securityMgr.getViewAcls,
+      ApplicationAccessType.MODIFY_APP -> securityMgr.getModifyAcls
     )
   }
 
@@ -523,16 +527,17 @@ object YarnSparkHadoopUtil {
     * enabled.
     * If not using dynamic allocation it gets the number of executors requested by the user.
     */
-  def getInitialTargetExecutorNumber(
-      conf: SparkConf, numExecutors: Int = DEFAULT_NUMBER_EXECUTORS): Int = {
+  def getInitialTargetExecutorNumber(conf: SparkConf,
+                                     numExecutors: Int =
+                                       DEFAULT_NUMBER_EXECUTORS): Int = {
     if (Utils.isDynamicAllocationEnabled(conf)) {
       val minNumExecutors = conf.get(DYN_ALLOCATION_MIN_EXECUTORS)
       val initialNumExecutors = conf.get(DYN_ALLOCATION_INITIAL_EXECUTORS)
       val maxNumExecutors = conf.get(DYN_ALLOCATION_MAX_EXECUTORS)
       require(
-          initialNumExecutors >= minNumExecutors &&
+        initialNumExecutors >= minNumExecutors &&
           initialNumExecutors <= maxNumExecutors,
-          s"initial executor number $initialNumExecutors must between min executor number" +
+        s"initial executor number $initialNumExecutors must between min executor number" +
           s"$minNumExecutors and max executor number $maxNumExecutors")
 
       initialNumExecutors

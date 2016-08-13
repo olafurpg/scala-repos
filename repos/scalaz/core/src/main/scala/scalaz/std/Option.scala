@@ -10,8 +10,8 @@ sealed trait OptionInstances0 {
 
 trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[
-      Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[
-      Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+    Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[
+    Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with BindRec[Option]
     with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option]
     with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
@@ -90,7 +90,7 @@ trait OptionInstances extends OptionInstances0 {
         }
     }
 
-  implicit def optionMonoid[A : Semigroup]: Monoid[Option[A]] =
+  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
     new Monoid[Option[A]] {
       def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
         case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
@@ -108,7 +108,7 @@ trait OptionInstances extends OptionInstances0 {
       implicit def A = A0
     }
 
-  implicit def optionShow[A : Show]: Show[Option[A]] = new Show[Option[A]] {
+  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
     override def show(o1: Option[A]) = o1 match {
       case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
       case None => "None"
@@ -122,10 +122,10 @@ trait OptionInstances extends OptionInstances0 {
       Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
   }
 
-  implicit def optionFirstShow[A : Show]: Show[FirstOption[A]] =
+  implicit def optionFirstShow[A: Show]: Show[FirstOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionFirstOrder[A : Order]: Order[FirstOption[A]] =
+  implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionFirstMonad: Monad[FirstOption] =
@@ -138,10 +138,10 @@ trait OptionInstances extends OptionInstances0 {
       Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
   }
 
-  implicit def optionLastShow[A : Show]: Show[LastOption[A]] =
+  implicit def optionLastShow[A: Show]: Show[LastOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionLastOrder[A : Order]: Order[LastOption[A]] =
+  implicit def optionLastOrder[A: Order]: Order[LastOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionLastMonad: Monad[LastOption] =
@@ -151,8 +151,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
         case (Some(v1), Some(v2)) => Some(Order[A].min(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
@@ -160,10 +159,10 @@ trait OptionInstances extends OptionInstances0 {
       })
   }
 
-  implicit def optionMinShow[A : Show]: Show[MinOption[A]] =
+  implicit def optionMinShow[A: Show]: Show[MinOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionMinOrder[A : Order]: Order[MinOption[A]] =
+  implicit def optionMinOrder[A: Order]: Order[MinOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionMinMonad: Monad[MinOption] =
@@ -173,8 +172,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
         case (Some(v1), Some(v2)) => Some(Order[A].max(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
@@ -182,10 +180,10 @@ trait OptionInstances extends OptionInstances0 {
       })
   }
 
-  implicit def optionMaxShow[A : Show]: Show[MaxOption[A]] =
+  implicit def optionMaxShow[A: Show]: Show[MaxOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionMaxOrder[A : Order]: Order[MaxOption[A]] =
+  implicit def optionMaxOrder[A: Order]: Order[MaxOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionMaxMonad: Monad[MaxOption] =
@@ -256,7 +254,7 @@ trait OptionFunctions {
     * Returns the item contained in the Option wrapped in type M if the Option is defined,
     * otherwise, the empty value for type M.
     */
-  final def orEmpty[A, M[_]: Applicative : PlusEmpty](oa: Option[A]): M[A] =
+  final def orEmpty[A, M[_]: Applicative: PlusEmpty](oa: Option[A]): M[A] =
     oa match {
       case Some(a) => Applicative[M].point(a)
       case None => PlusEmpty[M].empty
@@ -265,8 +263,8 @@ trait OptionFunctions {
   /**
     * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
     */
-  final def foldLift[F[_], A, B](oa: Option[A])(
-      b: => B, k: F[A] => B)(implicit p: Applicative[F]): B = oa match {
+  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(
+      implicit p: Applicative[F]): B = oa match {
     case None => b
     case Some(a) => k(Applicative[F].point(a))
   }

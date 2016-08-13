@@ -57,9 +57,10 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       val result = reifee match {
         case tree: Tree =>
           reifyTrace("reifying = ")(
-              if (settings.Xshowtrees || settings.XshowtreesCompact ||
-                  settings.XshowtreesStringified)
-                "\n" + nodePrinters.nodeToString(tree).trim else tree.toString)
+            if (settings.Xshowtrees || settings.XshowtreesCompact ||
+                settings.XshowtreesStringified)
+              "\n" + nodePrinters.nodeToString(tree).trim
+            else tree.toString)
           reifyTrace("reifee is located at: ")(tree.pos)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
@@ -70,8 +71,11 @@ abstract class Reifier extends States with Phases with Errors with Utils {
 
           val tpe = typer.packedType(tree, NoSymbol)
           val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) =
-            `package`.reifyType(global)(
-                typer, universe, mirror, tpe, concrete = false)
+            `package`.reifyType(global)(typer,
+                                        universe,
+                                        mirror,
+                                        tpe,
+                                        concrete = false)
           state.reificationIsConcrete &= tpeReificationIsConcrete
           state.symtab ++= tpeSymtab
           ReifiedTree(universe,
@@ -87,14 +91,18 @@ abstract class Reifier extends States with Phases with Errors with Utils {
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
           val rtree = reify(tpe)
-          ReifiedType(
-              universe, mirror, symtab, tpe, rtree, reificationIsConcrete)
+          ReifiedType(universe,
+                      mirror,
+                      symtab,
+                      tpe,
+                      rtree,
+                      reificationIsConcrete)
 
         case _ =>
           throw new Error(
-              "reifee %s of type %s is not supported".format(
-                  reifee,
-                  if (reifee == null) "null" else reifee.getClass.toString))
+            "reifee %s of type %s is not supported".format(
+              reifee,
+              if (reifee == null) "null" else reifee.getClass.toString))
       }
 
       // todo. why do we reset attrs?
@@ -122,18 +130,18 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       // needs to be solved some day
       // upd. a new hope: https://groups.google.com/forum/#!topic/scala-internals/TtCTPlj_qcQ
       var importantSymbols = Set[Symbol](
-          NothingClass,
-          AnyClass,
-          SingletonClass,
-          PredefModule,
-          ScalaRunTimeModule,
-          TypeCreatorClass,
-          TreeCreatorClass,
-          MirrorClass,
-          ApiUniverseClass,
-          JavaUniverseClass,
-          ReflectRuntimePackage,
-          runDefinitions.ReflectRuntimeCurrentMirror)
+        NothingClass,
+        AnyClass,
+        SingletonClass,
+        PredefModule,
+        ScalaRunTimeModule,
+        TypeCreatorClass,
+        TreeCreatorClass,
+        MirrorClass,
+        ApiUniverseClass,
+        JavaUniverseClass,
+        ReflectRuntimePackage,
+        runDefinitions.ReflectRuntimeCurrentMirror)
       importantSymbols ++= importantSymbols map (_.companionSymbol)
       importantSymbols ++= importantSymbols map (_.moduleClass)
       importantSymbols ++= importantSymbols map (_.linkedClassOfClass)
@@ -162,8 +170,9 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       case ex: UnexpectedReificationException =>
         throw ex
       case ex: Throwable =>
-        throw new UnexpectedReificationException(
-            defaultErrorPosition, "reification crashed", ex)
+        throw new UnexpectedReificationException(defaultErrorPosition,
+                                                 "reification crashed",
+                                                 ex)
     }
   }
 }

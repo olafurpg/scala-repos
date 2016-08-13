@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.StructType
   * Params for [[IDF]] and [[IDFModel]].
   */
 private[feature] trait IDFBase
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * The minimum of documents in which a term should appear.
@@ -42,9 +44,9 @@ private[feature] trait IDFBase
     * @group param
     */
   final val minDocFreq = new IntParam(
-      this,
-      "minDocFreq",
-      "minimum of documents in which a term should appear for filtering")
+    this,
+    "minDocFreq",
+    "minimum of documents in which a term should appear for filtering")
 
   setDefault(minDocFreq -> 0)
 
@@ -66,7 +68,9 @@ private[feature] trait IDFBase
   */
 @Experimental
 final class IDF(override val uid: String)
-    extends Estimator[IDFModel] with IDFBase with DefaultParamsWritable {
+    extends Estimator[IDFModel]
+    with IDFBase
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("idf"))
 
@@ -106,9 +110,11 @@ object IDF extends DefaultParamsReadable[IDF] {
   * Model fitted by [[IDF]].
   */
 @Experimental
-class IDFModel private[ml](
-    override val uid: String, idfModel: feature.IDFModel)
-    extends Model[IDFModel] with IDFBase with MLWritable {
+class IDFModel private[ml] (override val uid: String,
+                            idfModel: feature.IDFModel)
+    extends Model[IDFModel]
+    with IDFBase
+    with MLWritable {
 
   import IDFModel._
 

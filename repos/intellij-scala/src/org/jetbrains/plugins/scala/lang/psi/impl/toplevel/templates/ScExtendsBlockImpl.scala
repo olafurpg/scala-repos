@@ -20,9 +20,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScExtendsBlockStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScDesignatorType, _}
-import org.jetbrains.plugins.scala.macroAnnotations.{Cached, CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScCompoundType,
+  ScDesignatorType,
+  _
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  Cached,
+  CachedInsidePsiElement,
+  ModCount
+}
 
 import scala.annotation.tailrec
 import scala.collection.Seq
@@ -32,8 +43,9 @@ import scala.collection.mutable.ListBuffer
   * @author AlexanderPodkhalyuzin
   * Date: 20.02.2008
   */
-class ScExtendsBlockImpl private (
-    stub: StubElement[ScExtendsBlock], nodeType: IElementType, node: ASTNode)
+class ScExtendsBlockImpl private (stub: StubElement[ScExtendsBlock],
+                                  nodeType: IElementType,
+                                  node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScExtendsBlock {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -221,9 +233,9 @@ class ScExtendsBlockImpl private (
           addClass(t)
         }
       case _ =>
-        ScTemplateParents.extractSupers(syntheticTypeElements, getProject) foreach {
-          t =>
-            addClass(t)
+        ScTemplateParents
+          .extractSupers(syntheticTypeElements, getProject) foreach { t =>
+          addClass(t)
         }
     }
     if (isUnderCaseClass) {
@@ -248,7 +260,7 @@ class ScExtendsBlockImpl private (
           if AnyVal.asClass(getProject).contains(s) => //do nothing
       case Some(s: ScSyntheticClass)
           if AnyRef.asClass(getProject).contains(s) ||
-          Any.asClass(getProject).contains(s) =>
+            Any.asClass(getProject).contains(s) =>
         buffer -= s
         if (javaObjectClass != null) buffer += javaObjectClass
       case Some(clazz: PsiClass) => //do nothing
@@ -342,8 +354,8 @@ class ScExtendsBlockImpl private (
     val stub = getStub
     if (stub != null) {
       val array = stub.getChildrenByType(
-          TokenSets.TEMPLATE_PARENTS,
-          JavaArrayFactoryUtil.ScTemplateParentsFactory)
+        TokenSets.TEMPLATE_PARENTS,
+        JavaArrayFactoryUtil.ScTemplateParentsFactory)
       array.headOption
     } else findChild(classOf[ScTemplateParents])
   }
@@ -352,8 +364,8 @@ class ScExtendsBlockImpl private (
     val stub = getStub
     if (stub != null) {
       val array = stub.getChildrenByType(
-          ScalaElementTypes.EARLY_DEFINITIONS,
-          JavaArrayFactoryUtil.ScEarlyDefinitionsFactory)
+        ScalaElementTypes.EARLY_DEFINITIONS,
+        JavaArrayFactoryUtil.ScEarlyDefinitionsFactory)
       array.headOption
     } else findChild(classOf[ScEarlyDefinitions])
   }
@@ -362,7 +374,9 @@ class ScExtendsBlockImpl private (
     earlyDefinitions.getOrElse {
       val text = "class A extends {} with B {}"
       val templDef = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-          text, getParentByStub.getContext, getParentByStub)
+        text,
+        getParentByStub.getContext,
+        getParentByStub)
       val extBlock = templDef.extendsBlock
       val kExtends = extBlock.children
         .find(_.getNode.getElementType == ScalaTokenTypes.kEXTENDS)

@@ -21,7 +21,10 @@ import scala.collection.immutable.HashSet
 import scala.util.Random
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericMutableRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  GenericInternalRow,
+  GenericMutableRow
+}
 import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData}
 import org.apache.spark.sql.types.{AtomicType, Decimal}
 import org.apache.spark.unsafe.types.UTF8String
@@ -59,13 +62,13 @@ object ColumnarTestUtils {
         Decimal(Random.nextLong(), precision, scale)
       case STRUCT(_) =>
         new GenericInternalRow(
-            Array[Any](UTF8String.fromString(Random.nextString(10))))
+          Array[Any](UTF8String.fromString(Random.nextString(10))))
       case ARRAY(_) =>
         new GenericArrayData(Array[Any](Random.nextInt(), Random.nextInt()))
       case MAP(_) =>
         ArrayBasedMapData(
-            Map(Random.nextInt() -> UTF8String.fromString(
-                    Random.nextString(Random.nextInt(32)))))
+          Map(Random.nextInt() -> UTF8String.fromString(
+            Random.nextString(Random.nextInt(32)))))
       case _ =>
         throw new IllegalArgumentException(s"Unknown column type $columnType")
     }).asInstanceOf[JvmType]
@@ -78,8 +81,8 @@ object ColumnarTestUtils {
     columnTypes.map(makeRandomValue(_))
   }
 
-  def makeUniqueRandomValues[JvmType](
-      columnType: ColumnType[JvmType], count: Int): Seq[JvmType] = {
+  def makeUniqueRandomValues[JvmType](columnType: ColumnType[JvmType],
+                                      count: Int): Seq[JvmType] = {
 
     Iterator
       .iterate(HashSet.empty[JvmType]) { set =>

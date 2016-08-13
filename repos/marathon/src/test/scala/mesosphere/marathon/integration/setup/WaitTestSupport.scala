@@ -12,7 +12,7 @@ object WaitTestSupport {
     def checkValid(): Boolean = {
       if (!valid)
         throw new IllegalStateException(
-            s"$description not valid for $until. Give up.")
+          s"$description not valid for $until. Give up.")
       if (deadLine.isOverdue()) true
       else {
         Thread.sleep(100)
@@ -34,7 +34,7 @@ object WaitTestSupport {
     def next(): T = {
       if (deadLine.isOverdue())
         throw new AssertionError(
-            s"Waiting for $description took longer than $maxWait. Give up.")
+          s"Waiting for $description took longer than $maxWait. Give up.")
       fn match {
         case Some(t) => t
         case None => Thread.sleep(100); next()

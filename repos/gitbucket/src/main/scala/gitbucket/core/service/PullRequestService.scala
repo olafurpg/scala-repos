@@ -1,6 +1,13 @@
 package gitbucket.core.service
 
-import gitbucket.core.model.{Account, Issue, PullRequest, WebHook, CommitStatus, CommitState}
+import gitbucket.core.model.{
+  Account,
+  Issue,
+  PullRequest,
+  WebHook,
+  CommitStatus,
+  CommitState
+}
 import gitbucket.core.model.Profile._
 import gitbucket.core.util.JGitUtil
 import profile.simple._
@@ -29,8 +36,9 @@ trait PullRequestService { self: IssuesService =>
       .map(pr => pr.commitIdTo -> pr.commitIdFrom)
       .update((commitIdTo, commitIdFrom))
 
-  def getPullRequestCountGroupByUser(
-      closed: Boolean, owner: Option[String], repository: Option[String])(
+  def getPullRequestCountGroupByUser(closed: Boolean,
+                                     owner: Option[String],
+                                     repository: Option[String])(
       implicit s: Session): List[PullRequestCount] =
     PullRequests
       .innerJoin(Issues)
@@ -40,8 +48,8 @@ trait PullRequestService { self: IssuesService =>
       .filter {
         case (t1, t2) =>
           (t2.closed === closed.bind) &&
-          (t1.userName === owner.get.bind, owner.isDefined) &&
-          (t1.repositoryName === repository.get.bind, repository.isDefined)
+            (t1.userName === owner.get.bind, owner.isDefined) &&
+            (t1.repositoryName === repository.get.bind, repository.isDefined)
       }
       .groupBy { case (t1, t2) => t2.openedUserName }
       .map { case (userName, t) => userName -> t.length }
@@ -88,11 +96,11 @@ trait PullRequestService { self: IssuesService =>
                                     commitIdFrom,
                                     commitIdTo)
 
-  def getPullRequestsByRequest(userName: String,
-                               repositoryName: String,
-                               branch: String,
-                               closed: Boolean)(
-      implicit s: Session): List[PullRequest] =
+  def getPullRequestsByRequest(
+      userName: String,
+      repositoryName: String,
+      branch: String,
+      closed: Boolean)(implicit s: Session): List[PullRequest] =
     PullRequests
       .innerJoin(Issues)
       .on { (t1, t2) =>
@@ -101,8 +109,8 @@ trait PullRequestService { self: IssuesService =>
       .filter {
         case (t1, t2) =>
           (t1.requestUserName === userName.bind) &&
-          (t1.requestRepositoryName === repositoryName.bind) &&
-          (t1.requestBranch === branch.bind) && (t2.closed === closed.bind)
+            (t1.requestRepositoryName === repositoryName.bind) &&
+            (t1.requestBranch === branch.bind) && (t2.closed === closed.bind)
       }
       .map { case (t1, t2) => t1 }
       .list
@@ -127,10 +135,10 @@ trait PullRequestService { self: IssuesService =>
       .filter {
         case (t1, t2) =>
           (t1.requestUserName === userName.bind) &&
-          (t1.requestRepositoryName === repositoryName.bind) &&
-          (t1.requestBranch === branch.bind) && (t1.userName === userName.bind) &&
-          (t1.repositoryName === repositoryName.bind) &&
-          (t2.closed === false.bind)
+            (t1.requestRepositoryName === repositoryName.bind) &&
+            (t1.requestBranch === branch.bind) && (t1.userName === userName.bind) &&
+            (t1.repositoryName === repositoryName.bind) &&
+            (t2.closed === false.bind)
       }
       .sortBy { case (t1, t2) => t1.branch =!= defaultBranch.bind }
       .firstOption
@@ -162,12 +170,12 @@ trait PullRequestService { self: IssuesService =>
         }
     }
 
-  def getPullRequestByRequestCommit(userName: String,
-                                    repositoryName: String,
-                                    toBranch: String,
-                                    fromBranch: String,
-                                    commitId: String)(
-      implicit s: Session): Option[(PullRequest, Issue)] = {
+  def getPullRequestByRequestCommit(
+      userName: String,
+      repositoryName: String,
+      toBranch: String,
+      fromBranch: String,
+      commitId: String)(implicit s: Session): Option[(PullRequest, Issue)] = {
     if (toBranch == fromBranch) {
       None
     } else {
@@ -179,12 +187,12 @@ trait PullRequestService { self: IssuesService =>
         .filter {
           case (t1, t2) =>
             (t1.userName === userName.bind) &&
-            (t1.repositoryName === repositoryName.bind) &&
-            (t1.branch === toBranch.bind) &&
-            (t1.requestUserName === userName.bind) &&
-            (t1.requestRepositoryName === repositoryName.bind) &&
-            (t1.requestBranch === fromBranch.bind) &&
-            (t1.commitIdTo === commitId.bind)
+              (t1.repositoryName === repositoryName.bind) &&
+              (t1.branch === toBranch.bind) &&
+              (t1.requestUserName === userName.bind) &&
+              (t1.requestRepositoryName === repositoryName.bind) &&
+              (t1.requestBranch === fromBranch.bind) &&
+              (t1.commitIdTo === commitId.bind)
         }
         .firstOption
     }
@@ -209,16 +217,17 @@ object PullRequestService {
 
     val statuses: List[CommitStatus] =
       commitStatues ++
-      (branchProtection.contexts.toSet -- commitStatues.map(_.context).toSet)
-        .map(CommitStatus.pending(
-              branchProtection.owner, branchProtection.repository, _))
+        (branchProtection.contexts.toSet -- commitStatues.map(_.context).toSet)
+          .map(CommitStatus
+            .pending(branchProtection.owner, branchProtection.repository, _))
     val hasRequiredStatusProblem =
-      needStatusCheck && branchProtection.contexts.exists(context =>
-            statuses.find(_.context == context).map(_.state) != Some(
-                CommitState.SUCCESS))
+      needStatusCheck && branchProtection.contexts.exists(
+        context =>
+          statuses.find(_.context == context).map(_.state) != Some(
+            CommitState.SUCCESS))
     val hasProblem =
       hasRequiredStatusProblem || hasConflict ||
-      (!statuses.isEmpty &&
+        (!statuses.isEmpty &&
           CommitState.combine(statuses.map(_.state).toSet) != CommitState.SUCCESS)
     val canUpdate = branchIsOutOfDate && !hasConflict
     val canMerge =

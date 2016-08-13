@@ -8,8 +8,8 @@ object Scripted {
   def scriptedPath = file("scripted")
   lazy val scripted = InputKey[Unit]("scripted")
   lazy val scriptedUnpublished = InputKey[Unit](
-      "scripted-unpublished",
-      "Execute scripted without publishing SBT first. Saves you some time when only your test has changed.")
+    "scripted-unpublished",
+    "Execute scripted without publishing SBT first. Saves you some time when only your test has changed.")
   lazy val scriptedSource = SettingKey[File]("scripted-source")
   lazy val scriptedPrescripted = TaskKey[File => Unit]("scripted-prescripted")
 
@@ -58,8 +58,8 @@ object Scripted {
       //if !files.isEmpty
     } yield files map (f => group + '/' + f)
 
-    val testID = (for (group <- groupP; name <- nameP(group)) yield
-      (group, name))
+    val testID =
+      (for (group <- groupP; name <- nameP(group)) yield (group, name))
     val testIdAsGroup = matched(testID) map (test => Seq(test))
     //(token(Space) ~> matched(testID)).*
     (token(Space) ~> (PagedIds | testIdAsGroup)).* map (_.flatten)
@@ -82,11 +82,11 @@ object Scripted {
                  args: Seq[String],
                  prescripted: File => Unit): Unit = {
     System.err.println(
-        s"About to run tests: ${args.mkString("\n * ", "\n * ", "\n")}")
+      s"About to run tests: ${args.mkString("\n * ", "\n * ", "\n")}")
     val noJLine =
       new classpath.FilteredLoader(scriptedSbtInstance.loader, "jline." :: Nil)
-    val loader = classpath.ClasspathUtilities.toLoader(
-        scriptedSbtClasspath.files, noJLine)
+    val loader = classpath.ClasspathUtilities
+      .toLoader(scriptedSbtClasspath.files, noJLine)
     val bridgeClass = Class.forName("sbt.test.ScriptedRunner", true, loader)
     val bridge = bridgeClass.newInstance.asInstanceOf[SbtScriptedRunner]
     val launcherVmOptions =

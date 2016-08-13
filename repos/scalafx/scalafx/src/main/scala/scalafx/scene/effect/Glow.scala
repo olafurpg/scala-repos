@@ -39,7 +39,8 @@ object Glow {
 }
 
 class Glow(override val delegate: jfxse.Glow = new jfxse.Glow)
-    extends Effect(delegate) with InputDelegate[jfxse.Glow]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.Glow]
     with SFXDelegate[jfxse.Glow] {
 
   /**

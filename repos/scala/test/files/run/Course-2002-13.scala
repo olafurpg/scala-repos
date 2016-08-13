@@ -24,7 +24,7 @@ class Tokenizer(s: String, delimiters: String) extends Iterator[String] {
       if (isDelimiter(ch)) ch.toString()
       else {
         while (i < s.length() && s.charAt(i) > ' ' &&
-        !isDelimiter(s.charAt(i))) { i = i + 1 }
+               !isDelimiter(s.charAt(i))) { i = i + 1 }
         s.substring(start, i)
       }
     } else "";
@@ -148,8 +148,8 @@ object Programs {
         else Stream.empty
       case q :: query1 =>
         for (clause <- list2stream(clauses);
-        s1 <- tryClause(clause.newInstance, q, s);
-        s2 <- solve1(query1, s1)) yield s2
+             s1 <- tryClause(clause.newInstance, q, s);
+             s2 <- solve1(query1, s1)) yield s2
     }
 
     def solve1(query: List[Term], s: Subst): Stream[Subst] = {
@@ -160,8 +160,8 @@ object Programs {
 
     def tryClause(c: Clause, q: Term, s: Subst): Stream[Subst] = {
       if (debug) Console.println("trying " + c);
-      for (s1 <- option2stream(unify(q, c.lhs, s)); s2 <- solve1(c.rhs, s1)) yield
-        s2;
+      for (s1 <- option2stream(unify(q, c.lhs, s)); s2 <- solve1(c.rhs, s1))
+        yield s2;
     }
 
     solve1(query, List())
@@ -198,7 +198,7 @@ class Parser(s: String) {
     val ch = token.charAt(0);
     if ('A' <= ch &&
         ch <= 'Z') { val a = token; token = it.next; Var(a) } else if (it.isDelimiter(
-                                                                           ch)) {
+                                                                         ch)) {
       syntaxError("term expected"); null
     } else constructor
   }
@@ -261,7 +261,7 @@ object Prolog {
 object Test {
   def main(args: Array[String]): Unit = {
     Prolog.process(
-        "sujet(jean).\n" + "sujet(marie).\n" +
+      "sujet(jean).\n" + "sujet(marie).\n" +
         "verbe(mange).\n" + "verbe(dort).\n" + "article(le).\n" +
         "article(la).\n" + "adjectif(grand).\n" +
         "adjectif(belle).\n" + "nom(table).\n" + "nom(cheval).\n" +
@@ -272,7 +272,7 @@ object Test {
     Console.println;
 
     Prolog.process(
-        "sujet(jean).\n" + "sujet(marie).\n" +
+      "sujet(jean).\n" + "sujet(marie).\n" +
         "verbe(mange).\n" + "verbe(dort).\n" + "article(le,m).\n" +
         "article(la,f).\n" + "adjectif(grand,m).\n" +
         "adjectif(belle,f).\n" + "nom(table,f).\n" + "nom(cheval,m).\n" +
@@ -283,7 +283,7 @@ object Test {
     Console.println;
 
     Prolog.process(
-        "sujet(jean).\n" + "sujet(marie).\n" + "verbe(mange).\n" +
+      "sujet(jean).\n" + "sujet(marie).\n" + "verbe(mange).\n" +
         "verbe(dort).\n" + "article(le,m).\n" + "article(la,f).\n" +
         "adjectif(grand,m).\n" + "adjectif(belle,f).\n" +
         "nom(table,f).\n" + "nom(cheval,m).\n" + "adjectifs(nil,G).\n" +

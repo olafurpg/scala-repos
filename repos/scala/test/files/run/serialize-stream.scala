@@ -5,7 +5,7 @@ object Test {
     oos.writeObject(s)
 
     val ois = new java.io.ObjectInputStream(
-        new java.io.ByteArrayInputStream(bos.toByteArray))
+      new java.io.ByteArrayInputStream(bos.toByteArray))
     val obj = ois.readObject()
     println(obj)
     println(obj.asInstanceOf[Seq[T]].toList)

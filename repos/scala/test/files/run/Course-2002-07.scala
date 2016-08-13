@@ -53,11 +53,12 @@ object M0 {
     Console.println("        0 = " + eval(new Number(0)));
     Console.println("        1 = " + eval(new Number(1)));
     Console.println(
-        "    0 + 1 = " + eval(new Sum(new Number(0), new Number(1))));
+      "    0 + 1 = " + eval(new Sum(new Number(0), new Number(1))));
     Console.println(
-        "    1 + 2 = " + eval(new Sum(new Number(1), new Number(2))));
-    Console.println("2 + 3 + 4 = " + eval(
-            new Sum(new Sum(new Number(2), new Number(3)), new Number(4))));
+      "    1 + 2 = " + eval(new Sum(new Number(1), new Number(2))));
+    Console.println(
+      "2 + 3 + 4 = " + eval(
+        new Sum(new Sum(new Number(2), new Number(3)), new Number(4))));
     Console.println;
   }
 }
@@ -80,11 +81,12 @@ object M1 {
     Console.println("        0 = " + new Number(0).eval);
     Console.println("        1 = " + new Number(1).eval);
     Console.println(
-        "    0 + 1 = " + new Sum(new Number(0), new Number(1)).eval);
+      "    0 + 1 = " + new Sum(new Number(0), new Number(1)).eval);
     Console.println(
-        "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
-    Console.println("2 + 3 + 4 = " + new Sum(
-            new Sum(new Number(2), new Number(3)), new Number(4)).eval);
+      "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
+    Console.println(
+      "2 + 3 + 4 = " + new Sum(new Sum(new Number(2), new Number(3)),
+                               new Number(4)).eval);
     Console.println;
   }
 }
@@ -108,7 +110,7 @@ object M2 {
     Console.println("    0 + 1 = " + eval(Sum(Number(0), Number(1))));
     Console.println("    1 + 2 = " + eval(Sum(Number(1), Number(2))));
     Console.println(
-        "2 + 3 + 4 = " + eval(Sum(Sum(Number(2), Number(3)), Number(4))));
+      "2 + 3 + 4 = " + eval(Sum(Sum(Number(2), Number(3)), Number(4))));
     Console.println;
   }
 }
@@ -132,7 +134,7 @@ object M3 {
     Console.println("    0 + 1 = " + Sum(Number(0), Number(1)).eval);
     Console.println("    1 + 2 = " + Sum(Number(1), Number(2)).eval);
     Console.println(
-        "2 + 3 + 4 = " + Sum(Sum(Number(2), Number(3)), Number(4)).eval);
+      "2 + 3 + 4 = " + Sum(Sum(Number(2), Number(3)), Number(4)).eval);
     Console.println;
   }
 }
@@ -186,7 +188,8 @@ object M5 {
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+    Console.println(
+      zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
         ")"); // !!! .toString
   }
 
@@ -220,7 +223,8 @@ object M6 {
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+    Console.println(
+      zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
         ")"); // !!! .toString
   }
 
@@ -444,7 +448,8 @@ object Utils {
 
   private def power0(x: Int, y: Int): Int =
     if (y == 1) x
-    else if (y % 2 == 0) power0(x * x, y / 2) else x * power0(x, y - 1);
+    else if (y % 2 == 0) power0(x * x, y / 2)
+    else x * power0(x, y - 1);
 
   def power(x: Int, y: Int): Int = (x, y) match {
     case (0, 0) => sys.error("power(0,0)")
@@ -467,9 +472,9 @@ object Utils {
     case (List(), _) => -1
     case (_, List()) => +1
     case (x :: xs, y :: ys) => {
-        val diff = x.compareTo(y);
-        if (diff != 0) diff else compare(xs, ys)
-      }
+      val diff = x.compareTo(y);
+      if (diff != 0) diff else compare(xs, ys)
+    }
   }
 }
 
@@ -514,11 +519,11 @@ object MB {
           case (_, Add(rl, rr)) => (this + rl) + rr
           case (Add(ll, lr), _) if (lr +<= that) => ll + (that + lr)
           case (_, _) => {
-              val l = this.term;
-              val r = that.term;
-              if (l equ r) Lit(this.count + that.count) * r
-              else Add(this, that)
-            }
+            val l = this.term;
+            val r = that.term;
+            if (l equ r) Lit(this.count + that.count) * r
+            else Add(this, that)
+          }
         } else that + this;
 
     private def *<(that: Expr): Boolean = (this *<? that) < 0;
@@ -651,7 +656,7 @@ object MB {
 
     val f4 =
       (x + _3) * (_2 + x) * x * (x + _1) + (x + _5) * (x * (x + _2) + x + _1) +
-      (x ^ 2) + x;
+        (x ^ 2) + x;
     val f3 = f4.derive(x);
     val f2 = f3.derive(x);
     val f1 = f2.derive(x);

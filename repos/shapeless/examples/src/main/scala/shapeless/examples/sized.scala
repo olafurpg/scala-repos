@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-13 Miles Sabin 
+ * Copyright (c) 2011-13 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Sized collection examples.
-  * 
+  *
   * @author Miles Sabin
   */
 object SizedExamples extends App {
@@ -30,17 +30,17 @@ object SizedExamples extends App {
 
   def row(cols: Seq[String]) = cols.mkString("\"", "\", \"", "\"")
 
-  def csv[N <: Nat](
-      hdrs: Sized[Seq[String], N], rows: List[Sized[Seq[String], N]]) =
+  def csv[N <: Nat](hdrs: Sized[Seq[String], N],
+                    rows: List[Sized[Seq[String], N]]) =
     row(hdrs) :: rows.map(row(_))
 
   def fullyStatic {
     val hdrs = Sized("Title", "Author") // Sized[IndexedSeq[String], _2]
     val rows = List(
-        // List[Sized[IndexedSeq[String], _2]]
-        Sized("Types and Programming Languages", "Benjamin Pierce"),
-        Sized("The Implementation of Functional Programming Languages",
-              "Simon Peyton-Jones"))
+      // List[Sized[IndexedSeq[String], _2]]
+      Sized("Types and Programming Languages", "Benjamin Pierce"),
+      Sized("The Implementation of Functional Programming Languages",
+            "Simon Peyton-Jones"))
 
     // hdrs and rows statically known to have the same number of columns
     val formatted = csv(hdrs, rows)
@@ -64,9 +64,9 @@ object SizedExamples extends App {
   def mixedDynamicStatic {
     val hdrs = List("Title", "Author")
     val rows = List(
-        List("Types and Programming Languages", "Benjamin Pierce"),
-        List("The Implementation of Functional Programming Languages",
-             "Simon Peyton-Jones")
+      List("Types and Programming Languages", "Benjamin Pierce"),
+      List("The Implementation of Functional Programming Languages",
+           "Simon Peyton-Jones")
     )
 
     for {
@@ -85,7 +85,7 @@ object SizedExamples extends App {
     val extendedHdrs = List("Title", "Author", "ISBN")
 
     for {
-      shdrs <- extendedHdrs.sized(2) // This will be empty ... 
+      shdrs <- extendedHdrs.sized(2) // This will be empty ...
       srows <- sequence(rows map (_.sized(2)))
     } {
       // ... hence, not reached

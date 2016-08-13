@@ -30,10 +30,10 @@ private[akka] object RemoteWatcher {
           unreachableReaperInterval,
           heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
 
-  final case class WatchRemote(
-      watchee: InternalActorRef, watcher: InternalActorRef)
-  final case class UnwatchRemote(
-      watchee: InternalActorRef, watcher: InternalActorRef)
+  final case class WatchRemote(watchee: InternalActorRef,
+                               watcher: InternalActorRef)
+  final case class UnwatchRemote(watchee: InternalActorRef,
+                                 watcher: InternalActorRef)
 
   @SerialVersionUID(1L)
   case object Heartbeat extends PriorityMessage
@@ -92,7 +92,8 @@ private[akka] class RemoteWatcher(
     heartbeatInterval: FiniteDuration,
     unreachableReaperInterval: FiniteDuration,
     heartbeatExpectedResponseAfter: FiniteDuration)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import RemoteWatcher._
@@ -104,11 +105,11 @@ private[akka] class RemoteWatcher(
       case rarp: RemoteActorRefProvider ⇒ rarp
       case other ⇒
         throw new ConfigurationException(
-            s"ActorSystem [${context.system}] needs to have a 'RemoteActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
+          s"ActorSystem [${context.system}] needs to have a 'RemoteActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
     }
 
   val selfHeartbeatRspMsg = HeartbeatRsp(
-      AddressUidExtension(context.system).addressUid)
+    AddressUidExtension(context.system).addressUid)
 
   // actors that this node is watching, map of watchee -> Set(watchers)
   val watching =
@@ -124,8 +125,8 @@ private[akka] class RemoteWatcher(
   var unreachable: Set[Address] = Set.empty
   var addressUids: Map[Address, Int] = Map.empty
 
-  val heartbeatTask = scheduler.schedule(
-      heartbeatInterval, heartbeatInterval, self, HeartbeatTick)
+  val heartbeatTask = scheduler
+    .schedule(heartbeatInterval, heartbeatInterval, self, HeartbeatTick)
   val failureDetectorReaperTask = scheduler.schedule(unreachableReaperInterval,
                                                      unreachableReaperInterval,
                                                      self,
@@ -157,8 +158,8 @@ private[akka] class RemoteWatcher(
           }
       }.toSet[(ActorRef, ActorRef)]
       sender() ! Stats(
-          watching = watchSet.size,
-          watchingNodes = watchingNodes.size)(watchSet, watchingNodes.toSet)
+        watching = watchSet.size,
+        watchingNodes = watchingNodes.size)(watchSet, watchingNodes.toSet)
   }
 
   def receiveHeartbeat(): Unit =
@@ -268,8 +269,8 @@ private[akka] class RemoteWatcher(
       for {
         watchers ← watching.get(watchee)
         watcher ← watchers
-      } watcher.sendSystemMessage(DeathWatchNotification(
-              watchee, existenceConfirmed, addressTerminated))
+      } watcher.sendSystemMessage(
+        DeathWatchNotification(watchee, existenceConfirmed, addressTerminated))
 
     removeWatchee(watchee)
   }
@@ -283,8 +284,9 @@ private[akka] class RemoteWatcher(
           log.debug("Sending first Heartbeat to [{}]", a)
           // schedule the expected first heartbeat for later, which will give the
           // other side a chance to reply, and also trigger some resends if needed
-          scheduler.scheduleOnce(
-              heartbeatExpectedResponseAfter, self, ExpectedFirstHeartbeat(a))
+          scheduler.scheduleOnce(heartbeatExpectedResponseAfter,
+                                 self,
+                                 ExpectedFirstHeartbeat(a))
         }
         context.actorSelection(RootActorPath(a) / self.path.elements) ! Heartbeat
       }

@@ -31,7 +31,7 @@ class RationalTest extends FunSuite {
 
   test("RationalIsFractional implicit exists") {
     import spire.implicits._
-    def doStuff[NT : Fractional](a: NT, b: NT): NT = a / b
+    def doStuff[NT: Fractional](a: NT, b: NT): NT = a / b
 
     assertResult(Rational(1, 2)) {
       doStuff(Rational(1), Rational(2))
@@ -305,8 +305,8 @@ class RationalTest extends FunSuite {
     rationals foreach { a =>
       val b = a.limitToInt
       assert(
-          b.numerator.isValidInt && b.denominator.isValidInt,
-          "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
+        b.numerator.isValidInt && b.denominator.isValidInt,
+        "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
     }
   }
 

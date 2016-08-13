@@ -1,6 +1,10 @@
 package com.twitter.finagle.http.netty
 
-import org.jboss.netty.handler.codec.http.{HttpMessage, HttpRequest, HttpMethod}
+import org.jboss.netty.handler.codec.http.{
+  HttpMessage,
+  HttpRequest,
+  HttpMethod
+}
 
 /** Proxy for HttpRequest.  Used by Request. */
 private[finagle] trait HttpRequestProxy extends HttpMessageProxy {

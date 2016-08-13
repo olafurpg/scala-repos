@@ -17,8 +17,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
 class TaskUpdateActorTest
-    extends MarathonActorSupport with FunSuiteLike with Mockito
-    with GivenWhenThen with Matchers {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
 
   test("process failures are escalated") {
     val f = new Fixture
@@ -27,10 +30,10 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val taskId = Task.Id.forApp(appId)
     val op = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        taskId,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      taskId,
+      TaskOpProcessor.Action.Expunge
     )
 
     And("a processor that fails immediately")
@@ -59,10 +62,10 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val taskId = Task.Id.forApp(appId)
     val op = TaskOpProcessor.Operation(
-        f.clock.now,
-        f.opInitiator.ref,
-        taskId,
-        TaskOpProcessor.Action.Expunge
+      f.clock.now,
+      f.opInitiator.ref,
+      taskId,
+      TaskOpProcessor.Action.Expunge
     )
 
     And("a processor that succeeds immediately")
@@ -99,10 +102,10 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val taskId = Task.Id.forApp(appId)
     val op = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        taskId,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      taskId,
+      TaskOpProcessor.Action.Expunge
     )
 
     And("a processor that processes it immediately")
@@ -129,10 +132,10 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val taskId = Task.Id.forApp(appId)
     val op = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        taskId,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      taskId,
+      TaskOpProcessor.Action.Expunge
     )
 
     And("a processor that does not return")
@@ -159,17 +162,17 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val task1Id = Task.Id.forApp(appId)
     val op1 = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        task1Id,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      task1Id,
+      TaskOpProcessor.Action.Expunge
     )
     val task2Id = Task.Id.forApp(appId)
     val op2 = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        task2Id,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      task2Id,
+      TaskOpProcessor.Action.Expunge
     )
 
     And("a processor that does not return")
@@ -198,13 +201,14 @@ class TaskUpdateActorTest
 
     Then("eventually our active ops count gets decreased")
     WaitTestSupport.waitUntil("actor reacts to op2 finishing", 1.second)(
-        f.actorMetrics.numberOfActiveOps.getValue == 1)
+      f.actorMetrics.numberOfActiveOps.getValue == 1)
 
     And("the second task doesn't have queue anymore")
     f.updateActor.underlyingActor.operationsByTaskId should have size 1
 
     And("but the first task still does have a queue")
-    f.updateActor.underlyingActor.operationsByTaskId(task1Id) should have size 1
+    f.updateActor.underlyingActor
+      .operationsByTaskId(task1Id) should have size 1
   }
 
   test("ops for the same task are processed sequentially") {
@@ -214,16 +218,16 @@ class TaskUpdateActorTest
     val appId = PathId("/app")
     val task1Id = Task.Id.forApp(appId)
     val op1 = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        task1Id,
-        TaskOpProcessor.Action.Expunge
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      task1Id,
+      TaskOpProcessor.Action.Expunge
     )
     val op2 = TaskOpProcessor.Operation(
-        f.oneSecondInFuture,
-        f.opInitiator.ref,
-        task1Id,
-        TaskOpProcessor.Action.Noop
+      f.oneSecondInFuture,
+      f.opInitiator.ref,
+      task1Id,
+      TaskOpProcessor.Action.Noop
     )
 
     And("a processor that does not return")
@@ -264,7 +268,7 @@ class TaskUpdateActorTest
 
     Then("eventually our active ops count gets decreased")
     WaitTestSupport.waitUntil("actor reacts to op2 finishing", 1.second)(
-        f.actorMetrics.numberOfActiveOps.getValue == 0)
+      f.actorMetrics.numberOfActiveOps.getValue == 0)
 
     And("our queue will be empty")
     f.updateActor.underlyingActor.operationsByTaskId should be(empty)
@@ -280,7 +284,7 @@ class TaskUpdateActorTest
     lazy val actorMetrics = new TaskUpdateActor.ActorMetrics(metrics)
     lazy val processor = mock[TaskOpProcessor]
     lazy val updateActor = TestActorRef(
-        new TaskUpdateActor(clock, actorMetrics, processor))
+      new TaskUpdateActor(clock, actorMetrics, processor))
 
     def oneSecondInFuture: Timestamp = clock.now() + 1.second
 

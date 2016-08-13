@@ -9,7 +9,10 @@ import org.jetbrains.plugins.scala.console.ScalaLanguageConsoleView
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
 import scala.collection.mutable.ArrayBuffer
@@ -64,15 +67,15 @@ class ScalaFileNameInspection extends LocalInspectionTool {
     val res = new ArrayBuffer[ProblemDescriptor]
     if (hasProblems) {
       for (clazz <- definitions;
-      scalaClass: ScTypeDefinition = clazz) {
+           scalaClass: ScTypeDefinition = clazz) {
         res += manager.createProblemDescriptor(
-            scalaClass.nameId,
-            "Class doesn't correspond to file name",
-            isOnTheFly,
-            Array[LocalQuickFix](
-                new ScalaRenameClassQuickFix(scalaClass, name),
-                new ScalaRenameFileQuickFix(scalaFile, clazz.name + ".scala")),
-            ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+          scalaClass.nameId,
+          "Class doesn't correspond to file name",
+          isOnTheFly,
+          Array[LocalQuickFix](
+            new ScalaRenameClassQuickFix(scalaClass, name),
+            new ScalaRenameFileQuickFix(scalaFile, clazz.name + ".scala")),
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
     }
     res.toArray

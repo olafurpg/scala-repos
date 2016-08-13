@@ -36,34 +36,38 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
         case JNull | JNothing => Empty
         case JObject(
             JField("box_failure", JString("Failure")) :: JField(
-            "msg", JString(msg)) :: JField("exception", exception) :: JField(
-            "chain", chain) :: Nil) =>
+            "msg",
+            JString(msg)) :: JField("exception", exception) :: JField(
+            "chain",
+            chain) :: Nil) =>
           Failure(msg,
                   deserializeException(exception),
                   extract(chain, TypeInfo(BoxClass, Some(typeHoldingFailure)))
                     .asInstanceOf[Box[Failure]])
         case JObject(
             JField("box_failure", JString("ParamFailure")) :: JField(
-            "msg", JString(msg)) :: JField("exception", exception) :: JField(
+            "msg",
+            JString(msg)) :: JField("exception", exception) :: JField(
             "chain",
             chain) :: JField("paramType", JString(paramType)) :: JField(
-            "param", param) :: Nil) =>
+            "param",
+            param) :: Nil) =>
           val clazz =
             Thread.currentThread.getContextClassLoader.loadClass(paramType)
           ParamFailure(
-              msg,
-              deserializeException(exception),
-              extract(chain, TypeInfo(BoxClass, Some(typeHoldingFailure)))
-                .asInstanceOf[Box[Failure]],
-              extract(param, TypeInfo(clazz, None)))
+            msg,
+            deserializeException(exception),
+            extract(chain, TypeInfo(BoxClass, Some(typeHoldingFailure)))
+              .asInstanceOf[Box[Failure]],
+            extract(param, TypeInfo(clazz, None)))
         case x =>
-          val t = ptype.getOrElse(throw new MappingException(
-                  "parameterized type not known for Box"))
+          val t = ptype.getOrElse(
+            throw new MappingException("parameterized type not known for Box"))
           Full(
-              extract(x,
-                      TypeInfo(
-                          t.getActualTypeArguments()(0).asInstanceOf[Class[_]],
-                          None)))
+            extract(
+              x,
+              TypeInfo(t.getActualTypeArguments()(0).asInstanceOf[Class[_]],
+                       None)))
       }
   }
 
@@ -71,20 +75,21 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
     case Full(x) => decompose(x)
     case Empty => JNull
     case ParamFailure(msg, exception, chain, param) =>
-      JObject(
-          JField("box_failure", JString("ParamFailure")) :: JField(
-              "msg", JString(msg)) :: JField(
-              "exception", serializeException(exception)) :: JField(
-              "chain", decompose(chain)) :: JField(
-              "paramType",
-              JString(param.asInstanceOf[AnyRef].getClass.getName)) :: JField(
-              "param", decompose(param)) :: Nil)
+      JObject(JField("box_failure", JString("ParamFailure")) :: JField(
+        "msg",
+        JString(msg)) :: JField("exception", serializeException(exception)) :: JField(
+        "chain",
+        decompose(chain)) :: JField(
+        "paramType",
+        JString(param.asInstanceOf[AnyRef].getClass.getName)) :: JField(
+        "param",
+        decompose(param)) :: Nil)
     case Failure(msg, exception, chain) =>
-      JObject(
-          JField("box_failure", JString("Failure")) :: JField(
-              "msg", JString(msg)) :: JField(
-              "exception", serializeException(exception)) :: JField(
-              "chain", decompose(chain)) :: Nil)
+      JObject(JField("box_failure", JString("Failure")) :: JField(
+        "msg",
+        JString(msg)) :: JField("exception", serializeException(exception)) :: JField(
+        "chain",
+        decompose(chain)) :: Nil)
   }
 
   private val typeHoldingFailure = new ParameterizedType {
@@ -112,7 +117,7 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
 
   private def javaDeserialize(s: String): Any = {
     val bytes = new ByteArrayInputStream(
-        (new Base64).decode(s.getBytes("UTF-8")))
+      (new Base64).decode(s.getBytes("UTF-8")))
     val in = new ObjectInputStream(bytes)
     in.readObject
   }

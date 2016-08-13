@@ -101,7 +101,8 @@ object DirectoryFileLookup {
 }
 
 case class DirectoryFlatClassPath(dir: File)
-    extends DirectoryFileLookup[ClassFileEntryImpl] with NoSourcePaths {
+    extends DirectoryFileLookup[ClassFileEntryImpl]
+    with NoSourcePaths {
 
   override def findClass(
       className: String): Option[ClassRepresentation[AbstractFile]] =
@@ -134,7 +135,8 @@ object DirectoryFlatClassPath {
 }
 
 case class DirectoryFlatSourcePath(dir: File)
-    extends DirectoryFileLookup[SourceFileEntryImpl] with NoClassPaths {
+    extends DirectoryFileLookup[SourceFileEntryImpl]
+    with NoClassPaths {
 
   override def asSourcePathString: String = asClassPathString
 

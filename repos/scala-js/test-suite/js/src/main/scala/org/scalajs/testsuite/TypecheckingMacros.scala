@@ -52,8 +52,8 @@ object TypecheckingMacros {
     m.typeError(m.treeToString(code.tree), None)
   }
 
-  def typeErrorWithMsg(c: Context)(
-      code: c.Expr[String], msg: c.Expr[String]): c.Expr[Unit] = {
+  def typeErrorWithMsg(c: Context)(code: c.Expr[String],
+                                   msg: c.Expr[String]): c.Expr[Unit] = {
     import c.universe._
     val m = new Macros[c.type](c)
     m.typeError(m.treeToString(code.tree), Some(m.treeToString(msg.tree)))

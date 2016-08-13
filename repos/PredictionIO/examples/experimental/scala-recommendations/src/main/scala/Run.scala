@@ -29,14 +29,16 @@ import java.io.File
 case class DataSourceParams(val filepath: String) extends Params
 
 case class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        DataSourceParams, Null, RDD[Rating], (Int, Int), Double] {
+    extends PDataSource[DataSourceParams,
+                        Null,
+                        RDD[Rating],
+                        (Int, Int),
+                        Double] {
 
   override def read(sc: SparkContext)
     : Seq[(Null, RDD[Rating], RDD[((Int, Int), Double)])] = {
     val data = sc.textFile(dsp.filepath)
-    val ratings: RDD[Rating] = data.map(
-        _.split("::") match {
+    val ratings: RDD[Rating] = data.map(_.split("::") match {
       case Array(user, item, rate) =>
         Rating(user.toInt, item.toInt, rate.toDouble)
     })
@@ -74,9 +76,9 @@ object PMatrixFactorizationModel
     extends IPersistentModelLoader[AlgorithmParams, PMatrixFactorizationModel] {
   def apply(id: String, params: AlgorithmParams, sc: Option[SparkContext]) = {
     new PMatrixFactorizationModel(
-        rank = sc.get.objectFile[Int](s"/tmp/${id}/rank").first,
-        userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
-        productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"))
+      rank = sc.get.objectFile[Int](s"/tmp/${id}/rank").first,
+      userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
+      productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"))
   }
 }
 
@@ -122,16 +124,16 @@ object Run {
     val ap = AlgorithmParams()
 
     Workflow.run(
-        dataSourceClassOpt = Some(classOf[DataSource]),
-        dataSourceParams = dsp,
-        preparatorClassOpt = Some(PIdentityPreparator(classOf[DataSource])),
-        algorithmClassMapOpt = Some(Map("" -> classOf[ALSAlgorithm])),
-        algorithmParamsList = Seq(("", ap)),
-        servingClassOpt = Some(LFirstServing(classOf[ALSAlgorithm])),
-        params = WorkflowParams(
-              batch = "Imagine: P Recommendations",
-              verbose = 1
-          )
+      dataSourceClassOpt = Some(classOf[DataSource]),
+      dataSourceParams = dsp,
+      preparatorClassOpt = Some(PIdentityPreparator(classOf[DataSource])),
+      algorithmClassMapOpt = Some(Map("" -> classOf[ALSAlgorithm])),
+      algorithmParamsList = Seq(("", ap)),
+      servingClassOpt = Some(LFirstServing(classOf[ALSAlgorithm])),
+      params = WorkflowParams(
+        batch = "Imagine: P Recommendations",
+        verbose = 1
+      )
     )
   }
 }
@@ -146,9 +148,8 @@ object RecommendationEngine extends IEngineFactory {
 }
 
 class Tuple2IntSerializer
-    extends CustomSerializer[(Int, Int)](
-        format =>
-          ({
+    extends CustomSerializer[(Int, Int)](format =>
+      ({
         case JArray(List(JInt(x), JInt(y))) => (x.intValue, y.intValue)
       }, {
         case x: (Int, Int) => JArray(List(JInt(x._1), JInt(x._2)))

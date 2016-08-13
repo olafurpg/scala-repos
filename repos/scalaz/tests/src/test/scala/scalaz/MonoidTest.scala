@@ -41,7 +41,7 @@ object MonoidTest extends SpecLite {
   }
 
   "intercalate empty" in
-  (Foldable[List].intercalate(List[String](), "oops") must_=== (""))
+    (Foldable[List].intercalate(List[String](), "oops") must_=== (""))
 
   "intercalate" in {
     val xs = List(Vector(Cord("this"), Cord("has")),
@@ -50,8 +50,8 @@ object MonoidTest extends SpecLite {
                   Vector(Cord("beneath")),
                   Vector())
     ((Foldable[List] compose Foldable[Vector])
-          .intercalate(xs, Cord("!!"))
-          .toString must_=== (Cord("this!!has!!elements!!beneath").toString))
+      .intercalate(xs, Cord("!!"))
+      .toString must_=== (Cord("this!!has!!elements!!beneath").toString))
   }
 
   "invariant functor" in {

@@ -27,7 +27,7 @@ trait JettyContainer extends Container {
       addFilter(filter.asInstanceOf[Class[_ <: Filter]], path)
     case _ =>
       throw new IllegalArgumentException(
-          klass + " is not assignable to either HttpServlet or Filter")
+        klass + " is not assignable to either HttpServlet or Filter")
   }
 
   def mount(servlet: HttpServlet, path: String) { addServlet(servlet, path) }
@@ -48,26 +48,25 @@ trait JettyContainer extends Container {
 
     servlet match {
       case s: HasMultipartConfig => {
-          holder.getRegistration.setMultipartConfig(
-              s.multipartConfig.toMultipartConfigElement)
-        }
+        holder.getRegistration.setMultipartConfig(
+          s.multipartConfig.toMultipartConfigElement)
+      }
       case s: ScalatraAsyncSupport =>
         holder.getRegistration.setAsyncSupported(true)
       case _ =>
     }
 
-    servletContextHandler.addServlet(
-        holder, if (path.endsWith("/*")) path else path + "/*")
+    servletContextHandler
+      .addServlet(holder, if (path.endsWith("/*")) path else path + "/*")
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], path: String) =
     servletContextHandler.addServlet(servlet, path)
 
-  def addFilter(
-      filter: Filter,
-      path: String,
-      dispatches: util.EnumSet[DispatcherType] = DefaultDispatcherTypes)
-    : FilterHolder = {
+  def addFilter(filter: Filter,
+                path: String,
+                dispatches: util.EnumSet[DispatcherType] =
+                  DefaultDispatcherTypes): FilterHolder = {
     val holder = new FilterHolder(filter)
     servletContextHandler.addFilter(holder, path, dispatches)
     holder
@@ -84,11 +83,11 @@ trait JettyContainer extends Container {
   // Add a default servlet.  If there is no underlying servlet, then
   // filters just return 404.
   if (!skipDefaultServlet)
-    servletContextHandler.addServlet(
-        new ServletHolder("default", classOf[DefaultServlet]), "/")
+    servletContextHandler
+      .addServlet(new ServletHolder("default", classOf[DefaultServlet]), "/")
 
   protected def ensureSessionIsSerializable() {
     servletContextHandler.getSessionHandler.addEventListener(
-        SessionSerializingListener)
+      SessionSerializingListener)
   }
 }

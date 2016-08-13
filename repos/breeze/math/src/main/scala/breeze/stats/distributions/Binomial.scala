@@ -27,7 +27,8 @@ import math._
   * @param p the probability of any one being true
   */
 case class Binomial(n: Int, p: Double)(implicit rand: RandBasis = Rand)
-    extends DiscreteDistr[Int] with Moments[Double, Double] {
+    extends DiscreteDistr[Int]
+    with Moments[Double, Double] {
   type Distr = Gamma
   require(n > 0, "n must be positive!")
   require(p >= 0.0, "p must be non-negative!")
@@ -42,7 +43,7 @@ case class Binomial(n: Int, p: Double)(implicit rand: RandBasis = Rand)
     else if (p == 1) logI(k == n)
     else {
       lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1) + k * log(p) + (n - k) * log(
-          1 - p)
+        1 - p)
     }
   }
 
@@ -78,9 +79,9 @@ case class Binomial(n: Int, p: Double)(implicit rand: RandBasis = Rand)
         bnl = floor(bnl)
         t = 1.2 * sq * (1.0 + y * y) * exp(
             nfact - breeze.numerics.lgamma(bnl + 1.0) -
-            breeze.numerics.lgamma(n - bnl + 1.0) +
-            bnl * plog + (n - bnl) * pclog
-        )
+              breeze.numerics.lgamma(n - bnl + 1.0) +
+              bnl * plog + (n - bnl) * pclog
+          )
       } while (rand.uniform.get > t)
     }
     if (p != pp) bnl = n - bnl

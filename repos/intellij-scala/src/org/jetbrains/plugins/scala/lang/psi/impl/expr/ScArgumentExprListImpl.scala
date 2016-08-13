@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
   * Date: 07.03.2008
   */
 class ScArgumentExprListImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScArgumentExprList {
+    extends ScalaPsiElementImpl(node)
+    with ScArgumentExprList {
   override def toString: String = "ArgumentList"
 
   def invocationCount: Int = {
@@ -107,8 +108,8 @@ class ScArgumentExprListImpl(node: ASTNode)
     this
   }
 
-  def addExprAfter(
-      expr: ScExpression, anchor: PsiElement): ScArgumentExprList = {
+  def addExprAfter(expr: ScExpression,
+                   anchor: PsiElement): ScArgumentExprList = {
     val nextNode = anchor.getNode.getTreeNext
     val comma = ScalaPsiElementFactory.createComma(getManager)
     val space = ScalaPsiElementFactory.createNewLineNode(getManager, " ")

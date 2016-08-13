@@ -18,7 +18,7 @@ object SshServer {
   private def configure(sshAddress: SshAddress, baseUrl: String) = {
     server.setPort(sshAddress.port)
     val provider = new SimpleGeneratorHostKeyProvider(
-        new File(s"${Directory.GitBucketHome}/gitbucket.ser"))
+      new File(s"${Directory.GitBucketHome}/gitbucket.ser"))
     provider.setAlgorithm("RSA")
     provider.setOverwriteAllowed(false)
     server.setKeyPairProvider(provider)
@@ -52,7 +52,8 @@ object SshServer {
  * git clone ssh://username@host_or_ip:29418/owner/repository_name.git
  */
 class SshServerListener
-    extends ServletContextListener with SystemSettingsService {
+    extends ServletContextListener
+    with SystemSettingsService {
 
   private val logger = LoggerFactory.getLogger(classOf[SshServerListener])
 
@@ -60,7 +61,7 @@ class SshServerListener
     val settings = loadSystemSettings()
     if (settings.sshAddress.isDefined && settings.baseUrl.isEmpty) {
       logger.error(
-          "Could not start SshServer because the baseUrl is not configured.")
+        "Could not start SshServer because the baseUrl is not configured.")
     }
     for {
       sshAddress <- settings.sshAddress

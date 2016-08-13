@@ -11,8 +11,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 class PostfixMethodCallInspection
-    extends AbstractInspection(
-        "UseOfPostfixMethodCall", "Use of postfix method call") {
+    extends AbstractInspection("UseOfPostfixMethodCall",
+                               "Use of postfix method call") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case pexpr: ScPostfixExpr if !safe(pexpr) =>

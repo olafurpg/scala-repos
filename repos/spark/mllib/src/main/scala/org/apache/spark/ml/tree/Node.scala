@@ -20,7 +20,12 @@ package org.apache.spark.ml.tree
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.tree.impurity.ImpurityCalculator
-import org.apache.spark.mllib.tree.model.{ImpurityStats, InformationGainStats => OldInformationGainStats, Node => OldNode, Predict => OldPredict}
+import org.apache.spark.mllib.tree.model.{
+  ImpurityStats,
+  InformationGainStats => OldInformationGainStats,
+  Node => OldNode,
+  Predict => OldPredict
+}
 
 /**
   * :: DeveloperApi ::
@@ -99,13 +104,13 @@ private[ml] object Node {
           0.0
         }
       new InternalNode(
-          prediction = oldNode.predict.predict,
-          impurity = oldNode.impurity,
-          gain = gain,
-          leftChild = fromOld(oldNode.leftNode.get, categoricalFeatures),
-          rightChild = fromOld(oldNode.rightNode.get, categoricalFeatures),
-          split = Split.fromOld(oldNode.split.get, categoricalFeatures),
-          impurityStats = null)
+        prediction = oldNode.predict.predict,
+        impurity = oldNode.impurity,
+        gain = gain,
+        leftChild = fromOld(oldNode.leftNode.get, categoricalFeatures),
+        rightChild = fromOld(oldNode.rightNode.get, categoricalFeatures),
+        split = Split.fromOld(oldNode.split.get, categoricalFeatures),
+        impurityStats = null)
     }
   }
 }
@@ -117,7 +122,7 @@ private[ml] object Node {
   * @param impurity  Impurity measure at this node (for training data)
   */
 @DeveloperApi
-final class LeafNode private[ml](
+final class LeafNode private[ml] (
     override val prediction: Double,
     override val impurity: Double,
     override private[ml] val impurityStats: ImpurityCalculator)
@@ -139,14 +144,14 @@ final class LeafNode private[ml](
 
   override private[ml] def toOld(id: Int): OldNode = {
     new OldNode(
-        id,
-        new OldPredict(prediction, prob = impurityStats.prob(prediction)),
-        impurity,
-        isLeaf = true,
-        None,
-        None,
-        None,
-        None)
+      id,
+      new OldPredict(prediction, prob = impurityStats.prob(prediction)),
+      impurity,
+      isLeaf = true,
+      None,
+      None,
+      None,
+      None)
   }
 
   override private[ml] def maxSplitFeatureIndex(): Int = -1
@@ -164,7 +169,7 @@ final class LeafNode private[ml](
   * @param split  Information about the test used to split to the left or right child.
   */
 @DeveloperApi
-final class InternalNode private[ml](
+final class InternalNode private[ml] (
     override val prediction: Double,
     override val impurity: Double,
     val gain: Double,
@@ -193,9 +198,9 @@ final class InternalNode private[ml](
   override private[tree] def subtreeToString(indentFactor: Int = 0): String = {
     val prefix: String = " " * indentFactor
     prefix + s"If (${InternalNode.splitToString(split, left = true)})\n" +
-    leftChild.subtreeToString(indentFactor + 1) + prefix +
-    s"Else (${InternalNode.splitToString(split, left = false)})\n" +
-    rightChild.subtreeToString(indentFactor + 1)
+      leftChild.subtreeToString(indentFactor + 1) + prefix +
+      s"Else (${InternalNode.splitToString(split, left = false)})\n" +
+      rightChild.subtreeToString(indentFactor + 1)
   }
 
   override private[tree] def subtreeDepth: Int = {
@@ -205,23 +210,23 @@ final class InternalNode private[ml](
   override private[ml] def toOld(id: Int): OldNode = {
     assert(id.toLong * 2 < Int.MaxValue,
            "Decision Tree could not be converted from new to old API" +
-           " since the old API does not support deep trees.")
+             " since the old API does not support deep trees.")
     new OldNode(
-        id,
-        new OldPredict(prediction, prob = impurityStats.prob(prediction)),
-        impurity,
-        isLeaf = false,
-        Some(split.toOld),
-        Some(leftChild.toOld(OldNode.leftChildIndex(id))),
-        Some(rightChild.toOld(OldNode.rightChildIndex(id))),
-        Some(
-            new OldInformationGainStats(
-                gain,
-                impurity,
-                leftChild.impurity,
-                rightChild.impurity,
-                new OldPredict(leftChild.prediction, prob = 0.0),
-                new OldPredict(rightChild.prediction, prob = 0.0))))
+      id,
+      new OldPredict(prediction, prob = impurityStats.prob(prediction)),
+      impurity,
+      isLeaf = false,
+      Some(split.toOld),
+      Some(leftChild.toOld(OldNode.leftChildIndex(id))),
+      Some(rightChild.toOld(OldNode.rightChildIndex(id))),
+      Some(
+        new OldInformationGainStats(
+          gain,
+          impurity,
+          leftChild.impurity,
+          rightChild.impurity,
+          new OldPredict(leftChild.prediction, prob = 0.0),
+          new OldPredict(rightChild.prediction, prob = 0.0))))
   }
 
   override private[ml] def maxSplitFeatureIndex(): Int = {
@@ -290,8 +295,8 @@ private[tree] class LearningNode(var id: Int,
   def toNode: Node = {
     if (leftChild.nonEmpty) {
       assert(
-          rightChild.nonEmpty && split.nonEmpty && stats != null,
-          "Unknown error during Decision Tree learning.  Could not convert LearningNode to Node.")
+        rightChild.nonEmpty && split.nonEmpty && stats != null,
+        "Unknown error during Decision Tree learning.  Could not convert LearningNode to Node.")
       new InternalNode(stats.impurityCalculator.predict,
                        stats.impurity,
                        stats.gain,
@@ -306,8 +311,9 @@ private[tree] class LearningNode(var id: Int,
                      stats.impurityCalculator)
       } else {
         // Here we want to keep same behavior with the old mllib.DecisionTreeModel
-        new LeafNode(
-            stats.impurityCalculator.predict, -1.0, stats.impurityCalculator)
+        new LeafNode(stats.impurityCalculator.predict,
+                     -1.0,
+                     stats.impurityCalculator)
       }
     }
   }
@@ -325,8 +331,8 @@ private[tree] class LearningNode(var id: Int,
     *                This index is different from the index used during training a particular
     *                group of nodes on one call to [[findBestSplits()]].
     */
-  def predictImpl(
-      binnedFeatures: Array[Int], splits: Array[Array[Split]]): Int = {
+  def predictImpl(binnedFeatures: Array[Int],
+                  splits: Array[Array[Split]]): Int = {
     if (this.isLeaf || this.split.isEmpty) {
       this.id
     } else {

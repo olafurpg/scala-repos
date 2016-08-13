@@ -8,8 +8,8 @@ class TupleTests extends CatsSuite {
   checkAll("Tuple2",
            BitraverseTests[Tuple2]
              .bitraverse[Option, Int, Int, Int, String, String, String])
-  checkAll(
-      "Bitraverse[Tuple2]", SerializableTests.serializable(Bitraverse[Tuple2]))
+  checkAll("Bitraverse[Tuple2]",
+           SerializableTests.serializable(Bitraverse[Tuple2]))
 
   test("show") {
     (1, 2).show should ===("(1,2)")

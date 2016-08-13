@@ -48,10 +48,10 @@ class DatabaseService(dir: File) extends SLF4JLogging {
     log.info("creating the search database...")
     dir.mkdirs()
     Await.result(
-        db.run(
-            (fileChecks.schema ++ fqnSymbols.schema).create
-        ),
-        Duration.Inf
+      db.run(
+        (fileChecks.schema ++ fqnSymbols.schema).create
+      ),
+      Duration.Inf
     )
     log.info("... created the search database")
   }
@@ -62,8 +62,8 @@ class DatabaseService(dir: File) extends SLF4JLogging {
   // file with last modified time
   def knownFiles(): Future[Seq[FileCheck]] = db.run(fileChecks.result)
 
-  def removeFiles(
-      files: List[FileObject])(implicit ec: ExecutionContext): Future[Int] =
+  def removeFiles(files: List[FileObject])(
+      implicit ec: ExecutionContext): Future[Int] =
     db.run {
       val restrict = files.map(_.getName.getURI)
       // Deletion from fqnSymbols relies on fk cascade delete action
@@ -74,22 +74,22 @@ class DatabaseService(dir: File) extends SLF4JLogging {
     fileChecks.filter(_.filename === filename).take(1)
   }
 
-  def outOfDate(f: FileObject)(
-      implicit vfs: EnsimeVFS, ec: ExecutionContext): Future[Boolean] = {
+  def outOfDate(f: FileObject)(implicit vfs: EnsimeVFS,
+                               ec: ExecutionContext): Future[Boolean] = {
     val uri = f.getName.getURI
     val modified = f.getContent.getLastModifiedTime
 
     db.run(
-        for {
-          check <- timestampsQuery(uri).result.headOption
-        } yield check.map(_.changed).getOrElse(true)
+      for {
+        check <- timestampsQuery(uri).result.headOption
+      } yield check.map(_.changed).getOrElse(true)
     )
   }
 
   def persist(check: FileCheck, symbols: Seq[FqnSymbol])(
       implicit ec: ExecutionContext): Future[Option[Int]] =
     db.run(
-        (fileChecksCompiled += check) andThen (fqnSymbolsCompiled ++= symbols)
+      (fileChecksCompiled += check) andThen (fqnSymbolsCompiled ++= symbols)
     )
 
   private val findCompiled = Compiled { fqn: Rep[String] =>
@@ -97,7 +97,7 @@ class DatabaseService(dir: File) extends SLF4JLogging {
   }
 
   def find(fqn: String): Future[Option[FqnSymbol]] = db.run(
-      findCompiled(fqn).result.headOption
+    findCompiled(fqn).result.headOption
   )
 
   import org.ensime.indexer.IndexService._
@@ -105,7 +105,7 @@ class DatabaseService(dir: File) extends SLF4JLogging {
       implicit ec: ExecutionContext): Future[List[FqnSymbol]] = {
     val restrict = fqns.map(_.fqn)
     db.run(
-          fqnSymbols.filter(_.fqn inSet restrict).result
+        fqnSymbols.filter(_.fqn inSet restrict).result
       )
       .map { results =>
         val grouped = results.groupBy(_.fqn)
@@ -175,13 +175,14 @@ object DatabaseService {
     def offset = column[Option[Int]]("offset in source")
     def * =
       (id.?, file, path, fqn, descriptor, internal, source, line, offset) <>
-      (FqnSymbol.tupled, FqnSymbol.unapply)
+        (FqnSymbol.tupled, FqnSymbol.unapply)
     def fqnIdx =
       index("idx_fqn", fqn, unique = false) // fqns are unique by type and sig
     def uniq = index("idx_uniq", (fqn, descriptor, internal), unique = true)
     def filename =
-      foreignKey("filename_fk", file, fileChecks)(
-          _.filename, onDelete = ForeignKeyAction.Cascade)
+      foreignKey("filename_fk", file, fileChecks)(_.filename,
+                                                  onDelete =
+                                                    ForeignKeyAction.Cascade)
   }
   private val fqnSymbols = TableQuery[FqnSymbols]
   private val fqnSymbolsCompiled = Compiled { TableQuery[FqnSymbols] }

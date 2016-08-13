@@ -32,8 +32,8 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
   * Block files are hashed among the directories listed in spark.local.dir (or in
   * SPARK_LOCAL_DIRS, if it's set).
   */
-private[spark] class DiskBlockManager(
-    conf: SparkConf, deleteFilesOnStop: Boolean)
+private[spark] class DiskBlockManager(conf: SparkConf,
+                                      deleteFilesOnStop: Boolean)
     extends Logging {
 
   private[spark] val subDirsPerLocalDir =
@@ -139,8 +139,8 @@ private[spark] class DiskBlockManager(
       } catch {
         case e: IOException =>
           logError(
-              s"Failed to create local dir in $rootDir. Ignoring this directory.",
-              e)
+            s"Failed to create local dir in $rootDir. Ignoring this directory.",
+            e)
           None
       }
     }
@@ -148,7 +148,7 @@ private[spark] class DiskBlockManager(
 
   private def addShutdownHook(): AnyRef = {
     ShutdownHookManager.addShutdownHook(
-        ShutdownHookManager.TEMP_DIR_SHUTDOWN_PRIORITY + 1) { () =>
+      ShutdownHookManager.TEMP_DIR_SHUTDOWN_PRIORITY + 1) { () =>
       logInfo("Shutdown hook called")
       DiskBlockManager.this.doStop()
     }
@@ -176,8 +176,8 @@ private[spark] class DiskBlockManager(
             }
           } catch {
             case e: Exception =>
-              logError(
-                  s"Exception while deleting local spark dir: $localDir", e)
+              logError(s"Exception while deleting local spark dir: $localDir",
+                       e)
           }
         }
       }

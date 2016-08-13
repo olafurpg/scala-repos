@@ -12,8 +12,8 @@ object Template {
       url: String => String = identity _,
       head: Seq[Node] = Nil,
       scripts: Seq[String] = Seq.empty,
-      defaultScripts: Seq[String] = Seq(
-            "/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
+      defaultScripts: Seq[String] =
+        Seq("/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
     <html lang="en">
       <head>
         <title>{ title }</title>
@@ -81,7 +81,9 @@ object Template {
 }
 
 class TemplateExample
-    extends ScalatraServlet with FlashMapSupport with ScalateSupport {
+    extends ScalatraServlet
+    with FlashMapSupport
+    with ScalateSupport {
 
   private def displayPage(title: String, content: Seq[Node]) =
     Template.page(title, content, url(_, includeServletPath = false))
@@ -131,13 +133,13 @@ class TemplateExample
   post("/login") {
     (params("first"), params("last")) match {
       case (first: String, last: String) => {
-          session("first") = first
-          session("last") = last
-          displayPage(
-              "Scalatra: Session Example",
-              <pre>You have just logged in as: { first + " " + last }</pre>
+        session("first") = first
+        session("last") = last
+        displayPage(
+          "Scalatra: Session Example",
+          <pre>You have just logged in as: { first + " " + last }</pre>
           <pre>Route: /login</pre>)
-        }
+      }
     }
   }
 
@@ -177,8 +179,8 @@ class TemplateExample
 
   get("/flash-map/result") {
     displayPage(
-        title = "Scalatra: Flash  Example",
-        content = <span>Message = { flash.getOrElse("message", "") }</span>
+      title = "Scalatra: Flash  Example",
+      content = <span>Message = { flash.getOrElse("message", "") }</span>
     )
   }
 

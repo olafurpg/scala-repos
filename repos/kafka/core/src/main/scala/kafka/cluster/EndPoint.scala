@@ -50,7 +50,7 @@ object EndPoint {
         new EndPoint(host, port.toInt, SecurityProtocol.forName(protocol))
       case _ =>
         throw new KafkaException(
-            "Unable to parse " + connectionString + " to a broker endpoint")
+          "Unable to parse " + connectionString + " to a broker endpoint")
     }
   }
 }

@@ -41,20 +41,20 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
 
   def testFine() {
     val codes = Seq(
-        "new A(0)",
-        "new A(a = 0)",
-        "new B[Int](0)}",
-        "new B(0)",
-        "new C(0)",
-        "new C()",
-        "new C",
-        "new D(0)",
-        "new D(false)",
-        "new E[Int](new Y[Int])",
-        "new E[Int](new Z[Int])",
-        "new E(new Y[Int])",
-        "new E(new Z[Int])",
-        "new Alias[Int](0)"
+      "new A(0)",
+      "new A(a = 0)",
+      "new B[Int](0)}",
+      "new B(0)",
+      "new C(0)",
+      "new C()",
+      "new C",
+      "new D(0)",
+      "new D(false)",
+      "new E[Int](new Y[Int])",
+      "new E[Int](new Z[Int])",
+      "new E(new Y[Int])",
+      "new E(new Z[Int])",
+      "new Alias[Int](0)"
     )
     for { code <- codes } {
       assertMatches(messages(code)) {
@@ -84,7 +84,8 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   def testNamedDuplicates() {
     assertMatches(messages("new A(a = null, a = Unit)")) {
       case Error("a", "Parameter specified multiple times") :: Error(
-          "a", "Parameter specified multiple times") :: Nil =>
+          "a",
+          "Parameter specified multiple times") :: Nil =>
     }
   }
 

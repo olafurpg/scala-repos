@@ -8,7 +8,7 @@ import com.intellij.lang.PsiBuilder
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
@@ -20,8 +20,9 @@ object InfixType {
   def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, star = false)
   def parse(builder: ScalaPsiBuilder, star: Boolean): Boolean =
     parse(builder, star, isPattern = false)
-  def parse(
-      builder: ScalaPsiBuilder, star: Boolean, isPattern: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder,
+            star: Boolean,
+            isPattern: Boolean): Boolean = {
     var infixTypeMarker = builder.mark
     var markerList =
       List[PsiBuilder.Marker]() //This list consist of markers for right-associated op
@@ -47,9 +48,9 @@ object InfixType {
     }
     var assoc: Int = 0 //this mark associativity: left - 1, right - -1
     while (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
-    (!builder.newlineBeforeCurrentToken) &&
-    (!star || builder.getTokenText != "*") &&
-    (!isPattern || builder.getTokenText != "|")) {
+           (!builder.newlineBeforeCurrentToken) &&
+           (!star || builder.getTokenText != "*") &&
+           (!isPattern || builder.getTokenText != "|")) {
       count = count + 1
       //need to know associativity
       val s = builder.getTokenText
@@ -101,8 +102,8 @@ object InfixType {
         infixTypeMarker.drop()
       } else {
         markerList.head.drop()
-        for (x: PsiBuilder.Marker <- markerList.tail) x.done(
-            ScalaElementTypes.INFIX_TYPE)
+        for (x: PsiBuilder.Marker <- markerList.tail)
+          x.done(ScalaElementTypes.INFIX_TYPE)
       }
     } else {
       if (assoc == 1) {

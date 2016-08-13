@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -70,19 +70,22 @@ trait ManagedMongoJobManagerModule {
   }
 }
 
-case class MongoJobManagerSettings(
-    queryTimeout: Timeout, jobs: String, messages: String)
+case class MongoJobManagerSettings(queryTimeout: Timeout,
+                                   jobs: String,
+                                   messages: String)
 object MongoJobManagerSettings {
-  val default: MongoJobManagerSettings = MongoJobManagerSettings(
-      5000, "jobs", "jog_messages")
+  val default: MongoJobManagerSettings =
+    MongoJobManagerSettings(5000, "jobs", "jog_messages")
 }
 
-final class MongoJobManager(database: Database,
-                            settings: MongoJobManagerSettings,
-                            fs0: FileStorage[Future])(
-    implicit executionContext: ExecutionContext)
+final class MongoJobManager(
+    database: Database,
+    settings: MongoJobManagerSettings,
+    fs0: FileStorage[Future])(implicit executionContext: ExecutionContext)
     extends JobManager[Future]
-    with JobStateManager[Future] with JobResultManager[Future] with Logging {
+    with JobStateManager[Future]
+    with JobResultManager[Future]
+    with Logging {
 
   import JobManager._
   import JobState._
@@ -111,8 +114,9 @@ final class MongoJobManager(database: Database,
     val job = Job(id, apiKey, name, jobType, data, state)
     database(insert(job.serialize.asInstanceOf[JObject]).into(settings.jobs)) map {
       _ =>
-        logger.info("Job %s created in %f ms".format(
-                id, (System.nanoTime - start) / 1000000.0))
+        logger.info(
+          "Job %s created in %f ms"
+            .format(id, (System.nanoTime - start) / 1000000.0))
         job
     }
   }
@@ -140,16 +144,19 @@ final class MongoJobManager(database: Database,
     nextMessageId(jobId) flatMap { statusId =>
       prevStatusId match {
         case Some(prevId) =>
-          database(selectAndUpdate(settings.jobs)
-                .set(JPath("status") set statusId)
-                .where("id" === jobId && "status" === prevId)) flatMap {
+          database(
+            selectAndUpdate(settings.jobs)
+              .set(JPath("status") set statusId)
+              .where("id" === jobId && "status" === prevId)) flatMap {
             case Some(_) => // Success
               val status = Status(jobId, statusId, msg, progress, unit, extra)
               val message = Status.toMessage(status)
-              database(insert(message.serialize.asInstanceOf[JObject])
-                    .into(settings.messages)) map { _ =>
-                logger.trace("Job %s updated in %f ms".format(
-                        jobId, (System.nanoTime - start) / 1000.0))
+              database(
+                insert(message.serialize.asInstanceOf[JObject])
+                  .into(settings.messages)) map { _ =>
+                logger.trace(
+                  "Job %s updated in %f ms"
+                    .format(jobId, (System.nanoTime - start) / 1000.0))
                 Right(status)
               }
 
@@ -167,8 +174,9 @@ final class MongoJobManager(database: Database,
               .set(JPath("status") set statusId)
               .where("id" === jobId)
           } flatMap { _ =>
-            database(insert(message.serialize.asInstanceOf[JObject])
-                  .into(settings.messages))
+            database(
+              insert(message.serialize.asInstanceOf[JObject])
+                .into(settings.messages))
           } map { _ =>
             Right(status)
           }
@@ -182,18 +190,18 @@ final class MongoJobManager(database: Database,
     // It'll include at least the last status, but rarely much more.
 
     listMessages(jobId, channels.Status, None) map
-    (_.lastOption flatMap (Status.fromMessage(_)))
+      (_.lastOption flatMap (Status.fromMessage(_)))
   }
 
   private def nextMessageId(jobId: JobId): Future[Long] = {
     database(
-        selectAndUpsert(settings.jobs)
-          .set(JPath("sequence") inc 1)
-          .where("id" === jobId)
-          .returnNew(true)) map {
+      selectAndUpsert(settings.jobs)
+        .set(JPath("sequence") inc 1)
+        .where("id" === jobId)
+        .returnNew(true)) map {
       case Some(obj) =>
         (obj \ "sequence").validated[Long] getOrElse sys.error(
-            "Expected an integral sequence number.")
+          "Expected an integral sequence number.")
       case None =>
         sys.error("Sequence number doesn't exist. This shouldn't happen.")
     }
@@ -203,13 +211,14 @@ final class MongoJobManager(database: Database,
     database {
       distinct("channel").from(settings.messages).where("jobId" === jobId)
     } map
-    (_.collect {
-          case JString(channel) => channel
-        }.toList)
+      (_.collect {
+        case JString(channel) => channel
+      }.toList)
   }
 
-  def addMessage(
-      jobId: JobId, channel: String, value: JValue): Future[Message] = {
+  def addMessage(jobId: JobId,
+                 channel: String,
+                 value: JValue): Future[Message] = {
     nextMessageId(jobId) flatMap { id =>
       val message = Message(jobId, id, channel, value)
       database {

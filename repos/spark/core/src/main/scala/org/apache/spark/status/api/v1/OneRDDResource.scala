@@ -29,7 +29,7 @@ private[v1] class OneRDDResource(ui: SparkUI) {
     AllRDDResource
       .getRDDStorageInfo(rddId, ui.storageListener, true)
       .getOrElse(
-          throw new NotFoundException(s"no rdd found w/ id $rddId")
+        throw new NotFoundException(s"no rdd found w/ id $rddId")
       )
   }
 }

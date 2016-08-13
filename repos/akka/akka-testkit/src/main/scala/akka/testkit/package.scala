@@ -23,26 +23,26 @@ package object testkit {
       val stop = now + testKitSettings.TestEventFilterLeeway.dilated.toMillis
       val failed =
         eventFilters filterNot
-        (_.awaitDone(Duration(stop - now, MILLISECONDS))) map
-        ("Timeout (" + testKitSettings.TestEventFilterLeeway.dilated +
+          (_.awaitDone(Duration(stop - now, MILLISECONDS))) map
+          ("Timeout (" + testKitSettings.TestEventFilterLeeway.dilated +
             ") waiting for " + _)
       if (failed.nonEmpty)
         throw new AssertionError(
-            "Filter completion error:\n" + failed.mkString("\n"))
+          "Filter completion error:\n" + failed.mkString("\n"))
 
       result
     } finally {
       system.eventStream.publish(
-          TestEvent.UnMute(eventFilters.to[immutable.Seq]))
+        TestEvent.UnMute(eventFilters.to[immutable.Seq]))
     }
   }
 
-  def filterEvents[T](eventFilters: EventFilter*)(
-      block: ⇒ T)(implicit system: ActorSystem): T =
+  def filterEvents[T](eventFilters: EventFilter*)(block: ⇒ T)(
+      implicit system: ActorSystem): T =
     filterEvents(eventFilters.toSeq)(block)
 
-  def filterException[T <: Throwable](block: ⇒ Unit)(
-      implicit system: ActorSystem, t: ClassTag[T]): Unit =
+  def filterException[T <: Throwable](
+      block: ⇒ Unit)(implicit system: ActorSystem, t: ClassTag[T]): Unit =
     EventFilter[T]() intercept (block)
 
   /**

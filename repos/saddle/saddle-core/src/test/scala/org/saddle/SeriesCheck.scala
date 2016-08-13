@@ -175,7 +175,7 @@ class SeriesCheck extends Specification with ScalaCheck {
 
             val exp3 = srt.slice(srt.index.getFirst(keys(0)),
                                  srt.index.getLast(keys(1)) -
-                                 srt.index.count(keys(1)) + 1)
+                                   srt.index.count(keys(1)) + 1)
             srt.sliceBy(keys(0), keys(1), inclusive = false) must_== exp3
           }
         }
@@ -198,7 +198,7 @@ class SeriesCheck extends Specification with ScalaCheck {
       forAll { (s1: Series[Int, Double], s2: Series[Int, Double]) =>
         val proxied = s1.proxyWith(s2)
         val all = for (i <- 0 until proxied.length if s1.at(i).isNA &&
-                           i < s2.length) yield {
+                         i < s2.length) yield {
           proxied.at(i) must_== s2.at(i)
         }
         all.foldLeft(true)((acc, v) => acc && v.isSuccess)
@@ -217,7 +217,7 @@ class SeriesCheck extends Specification with ScalaCheck {
         val idx = Gen.choose(0, s.length - 1)
         forAll(idx) { i =>
           (s.filterAt(_ != i).length == 0 ||
-              s.filterAt(_ != i).length == s.length - 1) must beTrue
+          s.filterAt(_ != i).length == s.length - 1) must beTrue
         }
       }
     }
@@ -340,7 +340,7 @@ class SeriesCheck extends Specification with ScalaCheck {
 
             val exp3 = srt.slice(srt.index.getFirst(keys(0)),
                                  srt.index.getLast(keys(1)) -
-                                 srt.index.count(keys(1)) + 1)
+                                   srt.index.count(keys(1)) + 1)
             srt.sliceBy(keys(0), keys(1), inclusive = false) must_== exp3
           }
         }
@@ -353,7 +353,7 @@ class SeriesCheck extends Specification with ScalaCheck {
       forAll { (s1: Series[DateTime, Double], s2: Series[DateTime, Double]) =>
         val proxied = s1.proxyWith(s2)
         val all = for (i <- 0 until proxied.length if s1.at(i).isNA &&
-                           i < s2.length) yield {
+                         i < s2.length) yield {
           proxied.at(i) must_== s2.at(i)
         }
         all.foldLeft(true)((acc, v) => acc && v.isSuccess)

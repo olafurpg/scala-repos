@@ -22,8 +22,8 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     val jUnitMetadata = classMetadata.metadata()
 
     val assumptionViolated = try {
-      for (method <- jUnitMetadata.beforeClassMethod) classMetadata.invoke(
-          method.name)
+      for (method <- jUnitMetadata.beforeClassMethod)
+        classMetadata.invoke(method.name)
       false
     } catch {
       case _: AssumptionViolatedException |
@@ -58,13 +58,13 @@ final class JUnitExecuteTest(taskDef: TaskDef,
         }
       }
 
-      for (method <- jUnitMetadata.afterClassMethod) classMetadata.invoke(
-          method.name)
+      for (method <- jUnitMetadata.afterClassMethod)
+        classMetadata.invoke(method.name)
     }
   }
 
-  private[this] def executeTestMethod(
-      classMetadata: JUnitTestBootstrapper, method: JUnitMethodMetadata) = {
+  private[this] def executeTestMethod(classMetadata: JUnitTestBootstrapper,
+                                      method: JUnitMethodMetadata) = {
     val jUnitMetadata = classMetadata.metadata()
     val testClassInstance = classMetadata.newInstance()
 
@@ -73,8 +73,8 @@ final class JUnitExecuteTest(taskDef: TaskDef,
 
     val beforeMethodsAssertionFaild = {
       try {
-        for (method <- jUnitMetadata.beforeMethod) classMetadata.invoke(
-            testClassInstance, method.name)
+        for (method <- jUnitMetadata.beforeMethod)
+          classMetadata.invoke(testClassInstance, method.name)
         false
       } catch {
         case ex: AssumptionViolatedException =>
@@ -94,36 +94,40 @@ final class JUnitExecuteTest(taskDef: TaskDef,
       val testMethodFailed = {
         try {
           classMetadata.invoke(testClassInstance, method.name)
-          executedWithoutExceptions(
-              method.name, testAnnotation, timeInSeconds())
+          executedWithoutExceptions(method.name,
+                                    testAnnotation,
+                                    timeInSeconds())
           false
         } catch {
           case ex: Throwable =>
-            executedWithExceptions(
-                method.name, testAnnotation, timeInSeconds(), ex)
+            executedWithExceptions(method.name,
+                                   testAnnotation,
+                                   timeInSeconds(),
+                                   ex)
             true
         }
       }
 
       if (!testMethodFailed) {
         try {
-          for (method <- jUnitMetadata.afterMethod) classMetadata.invoke(
-              testClassInstance, method.name)
+          for (method <- jUnitMetadata.afterMethod)
+            classMetadata.invoke(testClassInstance, method.name)
 
           if (testAnnotation.timeout != 0 &&
               testAnnotation.timeout <= timeInSeconds) {
             richLogger.warn(
-                "Timeout: took " + timeInSeconds + " sec, expected " +
+              "Timeout: took " + timeInSeconds + " sec, expected " +
                 (testAnnotation.timeout.toDouble / 1000) + " sec")
           }
         } catch {
           case ex: Throwable =>
-            logFormattedError(
-                method.name, "failed: on @AfterClass method", Some(ex))
-            val selector = new NestedTestSelector(
-                fullyQualifiedName, method.name)
+            logFormattedError(method.name,
+                              "failed: on @AfterClass method",
+                              Some(ex))
+            val selector =
+              new NestedTestSelector(fullyQualifiedName, method.name)
             eventHandler.handle(
-                new JUnitEvent(taskDef, Status.Failure, selector))
+              new JUnitEvent(taskDef, Status.Failure, selector))
         }
       }
     }
@@ -138,7 +142,7 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     } else {
       val msg = {
         s"failed: Expected exception: ${testAnnotation.expected} " +
-        s"took $timeInSeconds sec"
+          s"took $timeInSeconds sec"
       }
       logFormattedError(methodName, msg, None)
       taskFailed(methodName)
@@ -213,11 +217,12 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     eventHandler.handle(new JUnitEvent(taskDef, Status.Success, selector))
   }
 
-  private[this] def logAssertionWarning(
-      methodName: String, ex: Throwable, timeInSeconds: Double): Unit = {
+  private[this] def logAssertionWarning(methodName: String,
+                                        ex: Throwable,
+                                        timeInSeconds: Double): Unit = {
     val msg = {
       "failed: org.junit." + c("AssumptionViolatedException", ERRMSG) + ": " +
-      ex.getMessage + ", took " + timeInSeconds + " sec"
+        ex.getMessage + ", took " + timeInSeconds + " sec"
     }
     logFormattedWarn("Test assumption in test ", methodName, msg)
   }
@@ -225,21 +230,23 @@ final class JUnitExecuteTest(taskDef: TaskDef,
   private[this] def logFormattedInfo(method: String, msg: String): Unit = {
     val fMethod = if (method != null) c(method, NNAME2) else null
     richLogger.info(
-        formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg))
+      formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg))
   }
 
-  private[this] def logFormattedWarn(
-      prefix: String, method: String, msg: String): Unit = {
+  private[this] def logFormattedWarn(prefix: String,
+                                     method: String,
+                                     msg: String): Unit = {
     val fMethod = if (method != null) c(method, ERRMSG) else null
     richLogger.warn(
-        formatLayout(prefix, packageName, c(className, NNAME1), fMethod, msg))
+      formatLayout(prefix, packageName, c(className, NNAME1), fMethod, msg))
   }
 
-  private[this] def logFormattedError(
-      method: String, msg: String, exOpt: Option[Throwable]): Unit = {
+  private[this] def logFormattedError(method: String,
+                                      msg: String,
+                                      exOpt: Option[Throwable]): Unit = {
     val fMethod = if (method != null) c(method, ERRMSG) else null
-    val formattedMsg = formatLayout(
-        "Test ", packageName, c(className, NNAME1), fMethod, msg)
+    val formattedMsg =
+      formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg)
     exOpt match {
       case Some(ex) => richLogger.error(formattedMsg, ex)
       case None => richLogger.error(formattedMsg)

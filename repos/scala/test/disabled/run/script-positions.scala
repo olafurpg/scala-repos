@@ -43,17 +43,16 @@ object Test {
   settings.nocompdaemon.value = true
 
   def runScript(code: String): String =
-    stringFromStream(
-        stream =>
-          Console.withOut(stream) {
+    stringFromStream(stream =>
+      Console.withOut(stream) {
         Console.withErr(stream) {
           ScriptRunner.runCommand(settings, code, Nil)
         }
     })
 
   val tests: List[(String, String)] = List(
-      test1 -> output1,
-      test2 -> output2
+    test1 -> output1,
+    test2 -> output2
   )
   // def lines(s: String) = s split """\r\n|\r|\n""" toList
   def lines(s: String) = s split "\\n" toList
@@ -73,8 +72,8 @@ object Test {
       val success = out.size == exp.size && nomatch.isEmpty
 
       assert(
-          success,
-          "Output doesn't match expected:\n" + "Expected:\n" + expected +
+        success,
+        "Output doesn't match expected:\n" + "Expected:\n" + expected +
           "Actual:\n" + out.mkString("\n")
       )
     }

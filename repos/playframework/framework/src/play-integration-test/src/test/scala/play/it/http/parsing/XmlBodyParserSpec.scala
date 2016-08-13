@@ -20,11 +20,12 @@ object XmlBodyParserSpec extends PlaySpecification {
               contentType: Option[String],
               encoding: String,
               bodyParser: BodyParser[NodeSeq] = BodyParsers.parse.tolerantXml(
-                    1048576))(implicit mat: Materializer) = {
+                1048576))(implicit mat: Materializer) = {
       await(
-          bodyParser(FakeRequest().withHeaders(
-                  contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(ByteString(xml, encoding)))
+        bodyParser(
+          FakeRequest().withHeaders(
+            contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+          .run(Source.single(ByteString(xml, encoding)))
       )
     }
 
@@ -145,7 +146,8 @@ object XmlBodyParserSpec extends PlaySpecification {
     "parse XML bodies without loading in a related schema from a parameter" in new WithApplication() {
       val externalParameterEntity = File.createTempFile("xep", ".dtd")
       val externalGeneralEntity = File.createTempFile("xxe", ".txt")
-      FileUtils.writeStringToFile(externalParameterEntity, s"""
+      FileUtils.writeStringToFile(externalParameterEntity,
+                                  s"""
           |<!ENTITY % xge SYSTEM "${externalGeneralEntity.toURI}">
           |<!ENTITY % pe "<!ENTITY xxe '%xge;'>">
         """.stripMargin)
@@ -164,9 +166,10 @@ object XmlBodyParserSpec extends PlaySpecification {
     }
 
     "gracefully fail when there are too many nested entities" in new WithApplication() {
-      val nested = for (x <- 1 to 30) yield
-        "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
-        ";\">"
+      val nested = for (x <- 1 to 30)
+        yield
+          "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
+            ";\">"
       val xml = s"""<?xml version="1.0"?>
                   | <!DOCTYPE billion [
                   | <!ELEMENT billion (#PCDATA)>

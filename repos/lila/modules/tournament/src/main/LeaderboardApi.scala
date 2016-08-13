@@ -29,10 +29,11 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     coll
       .aggregate(
-          Match(BSONDocument("u" -> user.id)),
-          List(GroupField("v")("nb" -> SumValue(1),
-                               "points" -> Push("s"),
-                               "ratios" -> Push("w")))
+        Match(BSONDocument("u" -> user.id)),
+        List(
+          GroupField("v")("nb" -> SumValue(1),
+                          "points" -> Push("s"),
+                          "ratios" -> Push("w")))
       )
       .map {
         _.documents map leaderboardAggregationResultBSONHandler.read
@@ -50,13 +51,14 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
       }
   }
 
-  private def paginator(
-      user: User, page: Int, sort: BSONDocument): Fu[Paginator[TourEntry]] =
+  private def paginator(user: User,
+                        page: Int,
+                        sort: BSONDocument): Fu[Paginator[TourEntry]] =
     Paginator(adapter = new BSONAdapter[Entry](
-                    collection = coll,
-                    selector = BSONDocument("u" -> user.id),
-                    projection = BSONDocument(),
-                    sort = sort
+                  collection = coll,
+                  selector = BSONDocument("u" -> user.id),
+                  projection = BSONDocument(),
+                  sort = sort
                 ) mapFutureList withTournaments,
               currentPage = page,
               maxPerPage = maxPerPage)
@@ -120,7 +122,9 @@ object LeaderboardApi {
       def rankPercentMedian = rank.median map rankPercent
     }
 
-    case class AggregationResult(
-        _id: Int, nb: Int, points: List[Int], ratios: List[Int])
+    case class AggregationResult(_id: Int,
+                                 nb: Int,
+                                 points: List[Int],
+                                 ratios: List[Int])
   }
 }

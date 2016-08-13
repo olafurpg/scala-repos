@@ -46,8 +46,8 @@ abstract class MultipleSelectionModel[T](
     with SFXDelegate[jfxsc.MultipleSelectionModel[T]] {
 
   /**
-    * Specifies the selection mode to use in this selection model. 
-    * The selection mode specifies how many items in the underlying data model 
+    * Specifies the selection mode to use in this selection model.
+    * The selection mode specifies how many items in the underlying data model
     * can be selected at
     * any one time.
     *
@@ -60,29 +60,29 @@ abstract class MultipleSelectionModel[T](
   }
 
   /**
-    * Returns a read-only ObservableList of all selected indices. The 
-    * ObservableList will be updated by the selection model to always reflect 
-    * changes in selection. This can be observed by adding a ListChangeListener 
+    * Returns a read-only ObservableList of all selected indices. The
+    * ObservableList will be updated by the selection model to always reflect
+    * changes in selection. This can be observed by adding a ListChangeListener
     * to the returned ObservableList.
     */
   def selectedIndices: ObservableBuffer[Integer] = delegate.getSelectedIndices
 
   /**
-    * Returns a read-only ObservableList of all selected items. The 
-    * ObservableList will be updated further by the selection model to always 
-    * reflect changes in selection. This can be observed by adding a 
+    * Returns a read-only ObservableList of all selected items. The
+    * ObservableList will be updated further by the selection model to always
+    * reflect changes in selection. This can be observed by adding a
     * ListChangeListener to the returned ObservableList.
     */
   def selectedItems: ObservableBuffer[T] = delegate.getSelectedItems
 
   /**
-    * This method allows for one or more selections to be set at the same time. 
-    * It will ignore any value that is not within the valid range (i.e. greater 
-    * than or equal to zero, and less than the total number of items in the 
+    * This method allows for one or more selections to be set at the same time.
+    * It will ignore any value that is not within the valid range (i.e. greater
+    * than or equal to zero, and less than the total number of items in the
     * underlying data model). Any duplication of indices will be ignored.
     *
-    * If there is already one or more indices selected in this model, calling 
-    * this method will not clear these selections - to do so it is necessary to 
+    * If there is already one or more indices selected in this model, calling
+    * this method will not clear these selections - to do so it is necessary to
     * first call clearSelection.
     *
     * The last valid value given will become the selected index / selected item.
@@ -94,14 +94,14 @@ abstract class MultipleSelectionModel[T](
   }
 
   /**
-    * Selects all indices from the given start index to the item before the 
-    * given end index. This means that the selection is inclusive of the start 
-    * index, and exclusive of the end index. This method will work regardless 
-    * of whether start < end or start > end: the only constant is that the index 
+    * Selects all indices from the given start index to the item before the
+    * given end index. This means that the selection is inclusive of the start
+    * index, and exclusive of the end index. This method will work regardless
+    * of whether start < end or start > end: the only constant is that the index
     * before the given end index will become the selected index.
     *
-    * If there is already one or more indices selected in this model, calling 
-    * this method will not clear these selections - to do so it is necessary to 
+    * If there is already one or more indices selected in this model, calling
+    * this method will not clear these selections - to do so it is necessary to
     * first call clearSelection.
     *
     * @param start The first index to select - this index will be selected.

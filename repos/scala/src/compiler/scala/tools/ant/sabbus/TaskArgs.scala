@@ -13,8 +13,7 @@ import org.apache.tools.ant.Task
 import org.apache.tools.ant.types.{Path, Reference}
 import org.apache.tools.ant.types.Commandline.Argument
 
-trait CompilationPathProperty {
-  this: Task =>
+trait CompilationPathProperty { this: Task =>
 
   protected var compilationPath: Option[Path] = None
 
@@ -33,8 +32,7 @@ trait CompilationPathProperty {
   }
 }
 
-trait TaskArgs extends CompilationPathProperty {
-  this: Task =>
+trait TaskArgs extends CompilationPathProperty { this: Task =>
 
   def setId(input: String) {
     id = Some(input)

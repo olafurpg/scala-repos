@@ -23,11 +23,11 @@ trait ServerProvider {
     */
   final def createServer(config: ServerConfig, app: Application): Server =
     createServer(
-        ServerProvider.Context(config,
-                               ApplicationProvider(app),
-                               app.actorSystem,
-                               app.materializer,
-                               () => Future.successful(())))
+      ServerProvider.Context(config,
+                             ApplicationProvider(app),
+                             app.actorSystem,
+                             app.materializer,
+                             () => Future.successful(())))
 }
 
 object ServerProvider {
@@ -60,20 +60,23 @@ object ServerProvider {
     val ClassNameConfigKey = "play.server.provider"
     val className: String = configuration
       .getString(ClassNameConfigKey)
-      .getOrElse(throw new ServerStartException(
-              s"No ServerProvider configured with key '$ClassNameConfigKey'"))
-    val clazz = try classLoader.loadClass(className) catch {
+      .getOrElse(
+        throw new ServerStartException(
+          s"No ServerProvider configured with key '$ClassNameConfigKey'"))
+    val clazz = try classLoader.loadClass(className)
+    catch {
       case _: ClassNotFoundException =>
         throw ServerStartException(
-            s"Couldn't find ServerProvider class '$className'")
+          s"Couldn't find ServerProvider class '$className'")
     }
     if (!classOf[ServerProvider].isAssignableFrom(clazz))
       throw ServerStartException(
-          s"Class ${clazz.getName} must implement ServerProvider interface")
-    val ctor = try clazz.getConstructor() catch {
+        s"Class ${clazz.getName} must implement ServerProvider interface")
+    val ctor = try clazz.getConstructor()
+    catch {
       case _: NoSuchMethodException =>
         throw ServerStartException(
-            s"ServerProvider class ${clazz.getName} must have a public default constructor")
+          s"ServerProvider class ${clazz.getName} must have a public default constructor")
     }
     ctor.newInstance().asInstanceOf[ServerProvider]
   }

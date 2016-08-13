@@ -11,7 +11,9 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsObject, JsResultException, Json}
 
 class MarathonExceptionMapperTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("Render js result exception correctly") {
     Given("A JsResultException, from an invalid json to object Reads")
@@ -53,7 +55,7 @@ class MarathonExceptionMapperTest
     val entity = Json.parse(entityString)
     (entity \ "message").as[String] should be("Invalid JSON")
     (entity \ "details").as[String] should be(
-        """Unexpected end-of-input: expected close marker for OBJECT (from [Source: {"id":"/test"; line: 1, column: 0])""")
+      """Unexpected end-of-input: expected close marker for OBJECT (from [Source: {"id":"/test"; line: 1, column: 0])""")
   }
 
   test("Render json mapping exception correctly") {
@@ -71,9 +73,9 @@ class MarathonExceptionMapperTest
     val entityString = response.getEntity.asInstanceOf[String]
     val entity = Json.parse(entityString)
     (entity \ "message").as[String] should be(
-        "Please specify data in JSON format")
+      "Please specify data in JSON format")
     (entity \ "details").as[String] should be(
-        "No content to map due to end-of-input\n at [Source: ; line: 1, column: 1]")
+      "No content to map due to end-of-input\n at [Source: ; line: 1, column: 1]")
   }
 
   test("Render ConstraintValidationException correctly") {
@@ -97,6 +99,6 @@ class MarathonExceptionMapperTest
     (firstError \ "path").as[String] should be("/")
     val errorMsgs = (firstError \ "errors").as[Seq[String]]
     errorMsgs.head should be(
-        "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.")
+      "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.")
   }
 }

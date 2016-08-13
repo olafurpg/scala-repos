@@ -125,6 +125,6 @@ class ResolveNaturalJoinSuite extends AnalysisTest {
       SimpleAnalyzer.checkAnalysis(usingPlan)
     }
     assert(error.message.contains(
-            "using columns ['d] can not be resolved given input columns: [b, a, c]"))
+      "using columns ['d] can not be resolved given input columns: [b, a, c]"))
   }
 }

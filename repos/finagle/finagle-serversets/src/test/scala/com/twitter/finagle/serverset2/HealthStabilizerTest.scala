@@ -26,8 +26,8 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
 
   def stabilize(va: Var[ClientHealth]): AtomicReference[ClientHealth] = {
     val ref = new AtomicReference[ClientHealth](ClientHealth.Healthy)
-    closeMe = HealthStabilizer(va, limboEpoch, stats).changes
-      .register(Witness { ref })
+    closeMe =
+      HealthStabilizer(va, limboEpoch, stats).changes.register(Witness { ref })
     ref
   }
 
@@ -60,7 +60,7 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
   }
 
   test(
-      "Stabilizer doesn't change from healthy to unhealthy until the epoch turns") {
+    "Stabilizer doesn't change from healthy to unhealthy until the epoch turns") {
     Time.withCurrentTimeFrozen { tc =>
       val underlying = Event[ClientHealth]()
       val underlyingVar = Var[ClientHealth](ClientHealth.Healthy, underlying)

@@ -11,11 +11,11 @@ object SwankTestData extends EnsimeTestData {
 
   val typeInspectInfoStr =
     s"""(:type $typeInfoStr :companion-id 1 :interfaces ((:type """ +
-    typeInfoStr + """ :via-view "DEF")) :info-type typeInspect)"""
+      typeInfoStr + """ :via-view "DEF")) :info-type typeInspect)"""
 
   val callCompletionInfoStr =
     """(:result-type """ + typeInfoStr +
-    """ :param-sections ((:params (("ABC" """ + typeInfoStr + """)))))"""
+      """ :param-sections ((:params (("ABC" """ + typeInfoStr + """)))))"""
 
   val symbolDesignationsStr =
     s"""(:file $symFile :syms ((object 7 9) (trait 11 22)))"""

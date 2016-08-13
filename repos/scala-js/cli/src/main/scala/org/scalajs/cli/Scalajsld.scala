@@ -27,29 +27,29 @@ import java.net.URI
 
 object Scalajsld {
 
-  private case class Options(
-      cp: Seq[File] = Seq.empty,
-      output: File = null,
-      jsoutput: Boolean = false,
-      semantics: Semantics = Semantics.Defaults,
-      outputMode: OutputMode = OutputMode.ECMAScript51Isolated,
-      noOpt: Boolean = false,
-      fullOpt: Boolean = false,
-      prettyPrint: Boolean = false,
-      sourceMap: Boolean = false,
-      relativizeSourceMap: Option[URI] = None,
-      bypassLinkingErrors: Boolean = false,
-      checkIR: Boolean = false,
-      stdLib: Option[File] = None,
-      logLevel: Level = Level.Info)
+  private case class Options(cp: Seq[File] = Seq.empty,
+                             output: File = null,
+                             jsoutput: Boolean = false,
+                             semantics: Semantics = Semantics.Defaults,
+                             outputMode: OutputMode =
+                               OutputMode.ECMAScript51Isolated,
+                             noOpt: Boolean = false,
+                             fullOpt: Boolean = false,
+                             prettyPrint: Boolean = false,
+                             sourceMap: Boolean = false,
+                             relativizeSourceMap: Option[URI] = None,
+                             bypassLinkingErrors: Boolean = false,
+                             checkIR: Boolean = false,
+                             stdLib: Option[File] = None,
+                             logLevel: Level = Level.Info)
 
   private implicit object OutputModeRead extends scopt.Read[OutputMode] {
     val arity = 1
     val reads = { (s: String) =>
       OutputMode.All
         .find(_.toString() == s)
-        .getOrElse(throw new IllegalArgumentException(
-                s"$s is not a valid output mode"))
+        .getOrElse(
+          throw new IllegalArgumentException(s"$s is not a valid output mode"))
     }
   }
 
@@ -119,7 +119,8 @@ object Scalajsld {
         .action { (x, c) =>
           c.copy(stdLib = Some(x))
         }
-        .text("Location of Scala.js standard libarary. This is set by the " +
+        .text(
+          "Location of Scala.js standard libarary. This is set by the " +
             "runner script and automatically prepended to the classpath. " +
             "Use -n to not include it.")
       opt[Unit]('d', "debug").action { (_, c) =>
@@ -147,7 +148,7 @@ object Scalajsld {
       // Warn if writing JS dependencies was requested.
       if (options.jsoutput) {
         Console.err.println(
-            "Support for the --jsoutput flag has been dropped. " +
+          "Support for the --jsoutput flag has been dropped. " +
             "JS dependencies will not be written to disk. " +
             "Comment on https://github.com/scala-js/scala-js/issues/2163 " +
             "if you rely on this feature.")
@@ -156,7 +157,7 @@ object Scalajsld {
       // Warn if bypassing linking errors was requested.
       if (options.bypassLinkingErrors) {
         Console.err.println(
-            "Support for bypassing linking errors with -b or " +
+          "Support for bypassing linking errors with -b or " +
             "--bypassLinkingErrors will be dropped in the next major version.")
       }
 

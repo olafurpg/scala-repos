@@ -113,10 +113,10 @@ class TupleTests {
   val m2iExist: M2[Int, _] = new M2[Int, Unit] {}
   val m2sExist: M2[String, _] = new M2[String, Unit] {}
   val m2dExist: M2[Double, _] = new M2[Double, Unit] {}
-  val m2eim2esm2eim2eem2edList = List(
-      m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
-  val m2eim2esm2eim2eem2edArray = Array(
-      m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
+  val m2eim2esm2eim2eem2edList =
+    List(m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
+  val m2eim2esm2eim2eem2edArray =
+    Array(m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
   val m2eim2esm2eim2eem2ed = (m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
 
   object mkString extends (Any -> String)(_.toString)
@@ -332,15 +332,15 @@ class TupleTests {
                  sizedM2eim2esm2eim2eem2ed.length)
     // equalInferredTypes(m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
     typed[List[M2[_ >: Double with Int with String, _]]](
-        sizedM2eim2esm2eim2eem2ed.unsized)
+      sizedM2eim2esm2eim2eem2ed.unsized)
     assertEquals(m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
   }
 
   @Test
   def testToSizedArray {
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
@@ -426,8 +426,9 @@ class TupleTests {
     val u4 = getUnifier((a, a, a))
     typed[Unifier.Aux[(Apple, Apple, Apple), (Apple, Apple, Apple)]](u4)
     val u5 = getUnifier((a, a, a, a))
-    typed[Unifier.Aux[
-            (Apple, Apple, Apple, Apple), (Apple, Apple, Apple, Apple)]](u5)
+    typed[
+      Unifier.Aux[(Apple, Apple, Apple, Apple), (Apple, Apple, Apple, Apple)]](
+      u5)
     //val u6 = getUnifier((a, p))
     //typed[Unifier.Aux[(Apple, Pear), (Fruit, Fruit)]](u6)
     val u7 = getUnifier((a, f))
@@ -619,8 +620,8 @@ class TupleTests {
   @Test
   def testToTraversableArray {
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     val empty = ().to[Array]
     typed[Array[Nothing]](empty)
@@ -668,8 +669,8 @@ class TupleTests {
     // equalInferredTypes(mimsmimemdArray, mWithEx)
     // typed[Array[M[_]]](mWithEx)
     // The line above compiles when mimsmimemd is an HList, not when it it a tuple, as in testToSizedArray
-    assertArrayEquals2(
-        mimsmimemdArray.map(x => x: Any), mWithEx.map(x => x: Any))
+    assertArrayEquals2(mimsmimemdArray.map(x => x: Any),
+                       mWithEx.map(x => x: Any))
 
     val m2 = m2im2sm2im2im2d.to[Array]
     equalInferredTypes(m2im2sm2im2im2dArray, m2)
@@ -680,8 +681,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // Same remark as above
-    assertArrayEquals2(
-        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test
@@ -693,8 +694,8 @@ class TupleTests {
     ToArray[APAP, Fruit]
 
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
-      assertArrayEquals(
-          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+      assertArrayEquals(arr1.asInstanceOf[Array[Object]],
+                        arr2.asInstanceOf[Array[Object]])
 
     val empty = ().toArray
     typed[Array[Nothing]](empty)
@@ -752,8 +753,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // The line above compiles when mimsmimemd is an HList, not when it is a tuple...
-    assertArrayEquals2(
-        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test
@@ -805,28 +806,28 @@ class TupleTests {
     assertEquals(5L, at6)
 
     val sn2 = (
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
     )
 
     val at21 = sn2(_21)
@@ -867,28 +868,28 @@ class TupleTests {
     assertEquals(5L, at6)
 
     val sn2 = (
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
     )
 
     val at21 = sn2(21)
@@ -1294,8 +1295,8 @@ class TupleTests {
 
     val z2 = l3.zipOne(l4)
     typed[
-        ((Int, String, Double), (Int, String, Double), (Int, String, Double))](
-        z2)
+      ((Int, String, Double), (Int, String, Double), (Int, String, Double))](
+      z2)
     assertEquals(((1, "a", 1.0), (2, "b", 2.0), (3, "c", 3.0)), z2)
 
     val mc2 = l3.mapConst(())
@@ -1308,14 +1309,14 @@ class TupleTests {
 
     val t3 = z2.transpose
     typed[
-        ((Int, Int, Int), (String, String, String), (Double, Double, Double))](
-        t3)
+      ((Int, Int, Int), (String, String, String), (Double, Double, Double))](
+      t3)
     assertEquals(((1, 2, 3), ("a", "b", "c"), (1.0, 2.0, 3.0)), t3)
 
     val t4 = t3.transpose
     typed[
-        ((Int, String, Double), (Int, String, Double), (Int, String, Double))](
-        t4)
+      ((Int, String, Double), (Int, String, Double), (Int, String, Double))](
+      t4)
     assertEquals(z2, t4)
   }
 
@@ -1561,12 +1562,12 @@ class TupleTests {
     assertEquals(((1, "foo"), ("foo", 1)), (1, "foo").permutations)
 
     assertEquals((
-                     (1, "foo", 2.0),
-                     ("foo", 1, 2.0),
-                     ("foo", 2.0, 1),
-                     (1, 2.0, "foo"),
-                     (2.0, 1, "foo"),
-                     (2.0, "foo", 1)
+                   (1, "foo", 2.0),
+                   ("foo", 1, 2.0),
+                   ("foo", 2.0, 1),
+                   (1, 2.0, "foo"),
+                   (2.0, 1, "foo"),
+                   (2.0, "foo", 1)
                  ),
                  (1, "foo", 2.0).permutations)
   }
@@ -1772,17 +1773,15 @@ class TupleTests {
 
     {
       val twoByThree = Tuple.fill(2, 3)(None)
-      typed[
-          ((None.type, None.type, None.type), (None.type, None.type, None.type))](
-          twoByThree)
+      typed[((None.type, None.type, None.type),
+             (None.type, None.type, None.type))](twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
     }
 
     {
       val twoByThree = Tuple.fill[None.type](2, 3)(None)
-      typed[
-          ((None.type, None.type, None.type), (None.type, None.type, None.type))](
-          twoByThree)
+      typed[((None.type, None.type, None.type),
+             (None.type, None.type, None.type))](twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
     }
   }
@@ -1852,39 +1851,39 @@ class TupleTests {
 
     // partition a Tuple of 4 items into 2 (4/2) tuples of 2 items
     assertEquals(
-        ((0, 1), (2, 3)),
-        range(0, 4) group (2, 2)
+      ((0, 1), (2, 3)),
+      range(0, 4) group (2, 2)
     )
 
     // partition a Tuple of 5 items into 2 (5/2) tuples of 2 items
     // the last item does not make a complete partition and is dropped.
     assertEquals(
-        ((0, 1), (2, 3)),
-        range(0, 5) group (2, 2)
+      ((0, 1), (2, 3)),
+      range(0, 5) group (2, 2)
     )
 
     // uses the step to select the starting point for each partition
     assertEquals(
-        ((0, 1), (4, 5)),
-        range(0, 6) group (2, 4)
+      ((0, 1), (4, 5)),
+      range(0, 6) group (2, 4)
     )
 
     // if the step is smaller than the partition size, items will be reused
     assertEquals(
-        ((0, 1), (1, 2), (2, 3)),
-        range(0, 4) group (2, 1)
+      ((0, 1), (1, 2), (2, 3)),
+      range(0, 4) group (2, 1)
     )
 
     // when there are not enough items to fill the last partition, a pad can be supplied.
     assertEquals(
-        ((0, 1), (2, 3), (4, 'a')),
-        range(0, 5) group (2, 2, Tuple1('a'))
+      ((0, 1), (2, 3), (4, 'a')),
+      range(0, 5) group (2, 2, Tuple1('a'))
     )
 
     // but only as many pad elements are used as necessary to fill the final partition.
     assertEquals(
-        ((0, 1), (2, 3), (4, 'a')),
-        range(0, 5) group (2, 2, ('a', 'b', 'c'))
+      ((0, 1), (2, 3), (4, 'a')),
+      range(0, 5) group (2, 2, ('a', 'b', 'c'))
     )
   }
 

@@ -10,9 +10,9 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
   def pathTree(t: String) =
     NameTree.read(t).map(Name(_))
 
-  def assertEquiv[T : Equiv](left: T, right: T) = assert(
-      if (Equiv[T].equiv(left, right)) None
-      else Some(left + "!=" + right)
+  def assertEquiv[T: Equiv](left: T, right: T) = assert(
+    if (Equiv[T].equiv(left, right)) None
+    else Some(left + "!=" + right)
   )
 
   test("d1 ++ d2") {

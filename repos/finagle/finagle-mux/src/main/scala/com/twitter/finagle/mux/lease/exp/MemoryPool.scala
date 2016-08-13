@@ -1,6 +1,10 @@
 package com.twitter.finagle.mux.lease.exp
 
-import java.lang.management.{GarbageCollectorMXBean, MemoryPoolMXBean, MemoryUsage}
+import java.lang.management.{
+  GarbageCollectorMXBean,
+  MemoryPoolMXBean,
+  MemoryUsage
+}
 import java.lang.{Boolean => JBoolean}
 import javax.management.ObjectName
 import com.twitter.conversions.storage.longToStorageUnitableWholeNumber
@@ -28,8 +32,7 @@ private[lease] class FakeMemoryPool(original: MemoryPoolInfo)
 private[lease] class FakeGarbageCollectorMXBean(
     @volatile var getCollectionCount: Long,
     @volatile var getCollectionTime: Long
-)
-    extends GarbageCollectorMXBean {
+) extends GarbageCollectorMXBean {
   private[this] def ??? =
     throw new UnsupportedOperationException("not supported")
 
@@ -50,12 +53,12 @@ private[lease] class MemoryUsageInfo(usage: MemoryUsage)
   def committed(): StorageUnit = usage.getCommitted().bytes
 }
 
-private[lease] case class FakeMemoryUsage(
-    used: StorageUnit, committed: StorageUnit)
+private[lease] case class FakeMemoryUsage(used: StorageUnit,
+                                          committed: StorageUnit)
     extends MemoryPoolInfo
 
-private[lease] class JvmInfo(
-    val pool: MemoryPool, val collector: GarbageCollectorMXBean) {
+private[lease] class JvmInfo(val pool: MemoryPool,
+                             val collector: GarbageCollectorMXBean) {
   def committed(): StorageUnit = pool.snapshot().committed()
   def used(): StorageUnit = pool.snapshot().used()
   def generation(): Long = collector.getCollectionCount()
@@ -70,12 +73,12 @@ private[lease] class JvmInfo(
 
     lr.record("com_%s".format(state), snap.committed().toString)
     lr.record("use_%s".format(state), snap.used().toString)
-    lr.record(
-        "byte_%s".format(state), (snap.committed() - snap.used()).toString)
+    lr.record("byte_%s".format(state),
+              (snap.committed() - snap.used()).toString)
     lr.record("gen_%s".format(state), generation().toString)
   }
 
   override def toString(): String =
     "JvmInfo(committed" + committed() + ", generation=" + generation() +
-    ", used=" + used() + ", remaining=" + remaining() + ")"
+      ", used=" + used() + ", remaining=" + remaining() + ")"
 }

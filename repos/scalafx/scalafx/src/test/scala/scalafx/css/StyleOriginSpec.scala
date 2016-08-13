@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class StyleOriginSpec
     extends SFXEnumDelegateSpec[jfxcss.StyleOrigin, StyleOrigin](
-        javaClass = classOf[jfxcss.StyleOrigin],
-        scalaClass = classOf[StyleOrigin],
-        companion = StyleOrigin)
+      javaClass = classOf[jfxcss.StyleOrigin],
+      scalaClass = classOf[StyleOrigin],
+      companion = StyleOrigin)

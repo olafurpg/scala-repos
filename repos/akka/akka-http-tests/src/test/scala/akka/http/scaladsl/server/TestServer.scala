@@ -35,18 +35,19 @@ object TestServer extends App {
     get {
       path("") {
         withRequestTimeout(
-            1.milli,
-            _ ⇒
-              HttpResponse(
-                  StatusCodes.EnhanceYourCalm,
-                  entity = "Unable to serve response within time limit, please enchance your calm.")) {
+          1.milli,
+          _ ⇒
+            HttpResponse(
+              StatusCodes.EnhanceYourCalm,
+              entity =
+                "Unable to serve response within time limit, please enchance your calm.")) {
           Thread.sleep(1000)
           complete(index)
         }
       } ~ path("secure") {
         authenticateBasicPF("My very secure site", auth) { user ⇒
           complete(
-              <html><body>Hello <b>{ user }</b>. Access has been granted!</body></html>)
+            <html><body>Hello <b>{ user }</b>. Access has been granted!</body></html>)
         }
       } ~ path("ping") {
         complete("PONG!")

@@ -11,7 +11,11 @@ import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAda
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScExistentialType, ScType}
 
 /**
@@ -29,28 +33,32 @@ abstract class ExistentialSimplificationTestBase
 
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
     val startOffset = offset + startExprMarker.length
 
     assert(
-        offset != -1,
-        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+      offset != -1,
+      "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endExprMarker)
     assert(
-        endOffset != -1,
-        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+      endOffset != -1,
+      "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
     val addOne =
       if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+                                      classOf[ScExpression]) != null) 0
+      else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+      scalaFile,
+      startOffset + addOne,
+      endOffset,
+      classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty)
     typez match {
@@ -67,15 +75,15 @@ abstract class ExistentialSimplificationTestBase
         }
         assertEquals(output, res)
       case Success(_, _) =>
-        assert(
-            assertion = false, message = "Expression has not existential type")
+        assert(assertion = false,
+               message = "Expression has not existential type")
       case Failure(msg, elem) =>
         assert(assertion = false,
                message = msg + " :: " +
-                 (elem match {
-                     case Some(x) => x.getText
-                     case None => "empty element"
-                   }))
+                   (elem match {
+                   case Some(x) => x.getText
+                   case None => "empty element"
+                 }))
     }
   }
 }

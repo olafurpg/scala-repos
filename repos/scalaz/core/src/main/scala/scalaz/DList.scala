@@ -14,7 +14,7 @@ import std.function._
   * making it very useful for append-heavy uses, such as logging and
   * pretty printing.
   */
-final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
+final class DList[A] private[scalaz] (f: IList[A] => Trampoline[IList[A]]) {
   import DList._
   def apply(xs: => IList[A]): Trampoline[IList[A]] = f(xs)
 
@@ -37,11 +37,11 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
     (apply(IList()) >>= {
-          case INil() => return_(z)
-          case ICons(x, xs) =>
-            val r = f(x, fromIList(xs))
-            return_(r)
-        }).run
+      case INil() => return_(z)
+      case ICons(x, xs) =>
+        val r = f(x, fromIList(xs))
+        return_(r)
+    }).run
 
   /** Get the first element of the list, if any. */
   def headOption: Option[A] = uncons(None, (x, _) => Some(x))
@@ -87,16 +87,14 @@ object DList extends DListInstances {
     xs.foldRight(DList[A]())(_ ++ _)
 
   def replicate[A](n: Int, a: A): DList[A] =
-    DL(
-        xs =>
-          {
-        def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
-        go(n)
+    DL(xs => {
+      def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
+      go(n)
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {
     def go(b: B, f: B => Option[(A, B)]): Trampoline[DList[A]] =
       f(b) map { case (a, c) => suspend(go(c, f)) map (a +: _) } getOrElse return_(
-          DList())
+        DList())
     go(b, f).run
   }
 }
@@ -107,7 +105,7 @@ sealed abstract class DListInstances {
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
   implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with BindRec[
-      DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList]
+    DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList]
   with Traverse[DList] with BindRec[DList] with Zip[DList]
   with IsEmpty[DList] {
     def point[A](a: => A) = DList(a)
@@ -123,7 +121,7 @@ sealed abstract class DListInstances {
     def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] =
       DList.fromIList(BindRec[IList].tailrecM[A, B](f(_).toIList)(a))
   }
-  implicit def dlistEqual[A : Equal]: Equal[DList[A]] = {
+  implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
     import std.list._
     Equal[List[A]].contramap((_: DList[A]).toList)
   }

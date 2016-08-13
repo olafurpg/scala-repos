@@ -5,7 +5,14 @@ package play.api.libs.json
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
-import java.time.{Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneOffset, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  OffsetDateTime,
+  ZoneOffset,
+  ZonedDateTime
+}
 
 import com.fasterxml.jackson.databind.JsonNode
 import play.api.libs.functional.ContravariantFunctor
@@ -20,7 +27,7 @@ import scala.reflect.ClassTag
   * Json serializer: write an implicit to define a serializer for any type
   */
 @implicitNotFound(
-    "No Json serializer found for type ${A}. Try to implement an implicit Writes or Format for this type."
+  "No Json serializer found for type ${A}. Try to implement an implicit Writes or Format for this type."
 )
 trait Writes[-A] {
 
@@ -45,7 +52,7 @@ trait Writes[-A] {
 }
 
 @implicitNotFound(
-    "No Json serializer as JsObject found for type ${A}. Try to implement an implicit OWrites or OFormat for this type."
+  "No Json serializer as JsObject found for type ${A}. Try to implement an implicit OWrites or OFormat for this type."
 )
 trait OWrites[-A] extends Writes[A] {
   def writes(o: A): JsObject
@@ -188,7 +195,7 @@ trait DefaultWrites {
   /**
     * Serializer for Array[T] types.
     */
-  implicit def arrayWrites[T : ClassTag : Writes]: Writes[Array[T]] =
+  implicit def arrayWrites[T: ClassTag: Writes]: Writes[Array[T]] =
     Writes[Array[T]] { ts =>
       JsArray(ts.map(toJson(_)).toSeq)
     }
@@ -196,7 +203,7 @@ trait DefaultWrites {
   /**
     * Serializer for Map[String,V] types.
     */
-  implicit def mapWrites[V : Writes]: OWrites[Map[String, V]] =
+  implicit def mapWrites[V: Writes]: OWrites[Map[String, V]] =
     OWrites[Map[String, V]] { ts =>
       JsObject(ts.mapValues(toJson(_)).toSeq)
     }
@@ -204,7 +211,7 @@ trait DefaultWrites {
   /**
     * Serializer for Traversables types.
     */
-  implicit def traversableWrites[A : Writes] = Writes[Traversable[A]] { as =>
+  implicit def traversableWrites[A: Writes] = Writes[Traversable[A]] { as =>
     JsArray(as.map(toJson(_)).toSeq)
   }
 
@@ -302,7 +309,7 @@ trait DefaultWrites {
     implicit def PatternInstantFormatter(
         pattern: String): TemporalFormatter[Instant] =
       DefaultInstantFormatter(
-          DateTimeFormatter.ofPattern(pattern).withZone(ZoneOffset.UTC))
+        DateTimeFormatter.ofPattern(pattern).withZone(ZoneOffset.UTC))
   }
 
   /**
@@ -334,7 +341,7 @@ trait DefaultWrites {
     */
   implicit val DefaultLocalDateTimeWrites =
     temporalWrites[LocalDateTime, DateTimeFormatter](
-        DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
   /**
     * The default typeclass to write a `java.time.OffsetDateTime`,
@@ -342,7 +349,7 @@ trait DefaultWrites {
     */
   implicit val DefaultOffsetDateTimeWrites =
     temporalWrites[OffsetDateTime, DateTimeFormatter](
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+      DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
   /**
     * The default typeclass to write a `java.time.ZonedDateTime`,
@@ -350,7 +357,7 @@ trait DefaultWrites {
     */
   implicit val DefaultZonedDateTimeWrites =
     temporalWrites[ZonedDateTime, DateTimeFormatter](
-        DateTimeFormatter.ISO_ZONED_DATE_TIME)
+      DateTimeFormatter.ISO_ZONED_DATE_TIME)
 
   /**
     * The default typeclass to write a `java.time.LocalDate`,
@@ -358,7 +365,7 @@ trait DefaultWrites {
     */
   implicit val DefaultLocalDateWrites =
     temporalWrites[LocalDate, DateTimeFormatter](
-        DateTimeFormatter.ISO_LOCAL_DATE)
+      DateTimeFormatter.ISO_LOCAL_DATE)
 
   /**
     * The default typeclass to write a `java.time.Instant`,
@@ -413,8 +420,8 @@ trait DefaultWrites {
   val LocalDateNumberWrites: Writes[LocalDate] = new Writes[LocalDate] {
     def writes(t: LocalDate): JsValue =
       JsNumber(
-          BigDecimal.valueOf(
-              t.atStartOfDay.toInstant(ZoneOffset.UTC).toEpochMilli))
+        BigDecimal.valueOf(
+          t.atStartOfDay.toInstant(ZoneOffset.UTC).toEpochMilli))
   }
 
   /**

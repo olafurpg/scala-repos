@@ -29,9 +29,12 @@ import immutable.StringLike
   */
 @SerialVersionUID(0 - 8525408645367278351L)
 final class StringBuilder(private val underlying: JavaStringBuilder)
-    extends AbstractSeq[Char] with java.lang.CharSequence
-    with IndexedSeq[Char] with StringLike[StringBuilder]
-    with ReusableBuilder[Char, String] with Serializable {
+    extends AbstractSeq[Char]
+    with java.lang.CharSequence
+    with IndexedSeq[Char]
+    with StringLike[StringBuilder]
+    with ReusableBuilder[Char, String]
+    with Serializable {
 
   override protected[this] def thisCollection: StringBuilder = this
   override protected[this] def toCollection(
@@ -46,7 +49,7 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     */
   def this(initCapacity: Int, initValue: String) =
     this(
-        new JavaStringBuilder(initValue.length + initCapacity) append initValue)
+      new JavaStringBuilder(initValue.length + initCapacity) append initValue)
 
   /** Constructs a string builder with no characters in it and an
     *  initial capacity of 16 characters.
@@ -310,8 +313,10 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     * @throws StringIndexOutOfBoundsException  if index < 0, index > length,
     *         offset < 0, len < 0, or (offset + len) > str.length.
     */
-  def insertAll(
-      index: Int, str: Array[Char], offset: Int, len: Int): StringBuilder = {
+  def insertAll(index: Int,
+                str: Array[Char],
+                offset: Int,
+                len: Int): StringBuilder = {
     underlying.insert(index, str, offset, len)
     this
   }
@@ -422,8 +427,8 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return   the reversed StringBuilder
     */
   @migration(
-      "`reverse` returns a new instance.  Use `reverseContents` to update in place and return that StringBuilder itself.",
-      "2.8.0")
+    "`reverse` returns a new instance.  Use `reverseContents` to update in place and return that StringBuilder itself.",
+    "2.8.0")
   override def reverse: StringBuilder =
     new StringBuilder(new JavaStringBuilder(underlying).reverse)
 

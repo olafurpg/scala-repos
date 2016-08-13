@@ -25,13 +25,13 @@ case class MProcedureColumn(procedure: MQName,
 }
 
 object MProcedureColumn {
-  def getProcedureColumns(
-      procedurePattern: MQName, columnNamePattern: String = "%") =
+  def getProcedureColumns(procedurePattern: MQName,
+                          columnNamePattern: String = "%") =
     ResultSetAction[MProcedureColumn](
-        _.metaData.getProcedureColumns(procedurePattern.catalog_?,
-                                       procedurePattern.schema_?,
-                                       procedurePattern.name,
-                                       columnNamePattern)) { r =>
+      _.metaData.getProcedureColumns(procedurePattern.catalog_?,
+                                     procedurePattern.schema_?,
+                                     procedurePattern.name,
+                                     columnNamePattern)) { r =>
       MProcedureColumn(MQName.from(r),
                        r.<<,
                        r.<<,

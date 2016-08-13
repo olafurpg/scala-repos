@@ -42,6 +42,6 @@ class OfflineCompilerCommand(arguments: List[String], settings: FscSettings)
     (createUsageMsg("where possible fsc",
                     shouldExplain = false,
                     x => x.isStandard && settings.isFscSpecific(x.name)) +
-        "\n\nStandard scalac options also available:" + createUsageMsg(
-            x => x.isStandard && !settings.isFscSpecific(x.name)))
+      "\n\nStandard scalac options also available:" + createUsageMsg(
+      x => x.isStandard && !settings.isFscSpecific(x.name)))
 }

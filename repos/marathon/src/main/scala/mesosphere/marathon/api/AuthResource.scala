@@ -3,7 +3,11 @@ package mesosphere.marathon.api
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.core.Response
 
-import mesosphere.marathon.{UnknownGroupException, UnknownAppException, AccessDeniedException}
+import mesosphere.marathon.{
+  UnknownGroupException,
+  UnknownAppException,
+  AccessDeniedException
+}
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.plugin.http.HttpResponse
 
@@ -27,14 +31,14 @@ trait AuthResource extends RestResource {
       }
     }.getOrElse {
       withResponseFacade(
-          authenticator.handleNotAuthenticated(requestWrapper, _))
+        authenticator.handleNotAuthenticated(requestWrapper, _))
     }
   }
 
-  def checkAuthorization[T](action: AuthorizedAction[T],
-                            maybeResource: Option[T],
-                            ifNotExists: Exception)(
-      implicit identity: Identity): Unit = {
+  def checkAuthorization[T](
+      action: AuthorizedAction[T],
+      maybeResource: Option[T],
+      ifNotExists: Exception)(implicit identity: Identity): Unit = {
     maybeResource match {
       case Some(resource) => checkAuthorization(action, resource)
       case None => throw ifNotExists

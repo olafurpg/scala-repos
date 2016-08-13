@@ -38,7 +38,8 @@ case class TungstenAggregate(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   private[this] val aggregateBufferAttributes = {
     aggregateExpressions.flatMap(_.aggregateFunction.aggBufferAttributes)
@@ -51,17 +52,18 @@ case class TungstenAggregate(
       .flatMap(_.aggregateFunction.inputAggBufferAttributes)
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(
-          sparkContext, "number of output rows"),
-      "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
-      "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
+    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
+                                                   "number of output rows"),
+    "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
+    "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
 
   override def output: Seq[Attribute] = resultExpressions.map(_.toAttribute)
 
   override def producedAttributes: AttributeSet =
-    AttributeSet(aggregateAttributes) ++ AttributeSet(resultExpressions
-          .diff(groupingExpressions)
-          .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
+    AttributeSet(aggregateAttributes) ++ AttributeSet(
+      resultExpressions
+        .diff(groupingExpressions)
+        .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
 
   override def requiredChildDistribution: List[Distribution] = {
     requiredChildDistributionExpressions match {
@@ -75,8 +77,8 @@ case class TungstenAggregate(
   // This is for testing. We force TungstenAggregationIterator to fall back to sort-based
   // aggregation once it has processed a given number of input rows.
   private val testFallbackStartsAt: Option[Int] = {
-    sqlContext.getConf(
-        "spark.sql.TungstenAggregate.testFallbackStartsAt", null) match {
+    sqlContext.getConf("spark.sql.TungstenAggregate.testFallbackStartsAt",
+                       null) match {
       case null | "" => None
       case fallbackStartsAt => Some(fallbackStartsAt.toInt)
     }
@@ -96,24 +98,25 @@ case class TungstenAggregate(
           Iterator.empty
         } else {
           val aggregationIterator = new TungstenAggregationIterator(
-              groupingExpressions,
-              aggregateExpressions,
-              aggregateAttributes,
-              initialInputBufferOffset,
-              resultExpressions,
-              (expressions, inputSchema) =>
-                newMutableProjection(
-                    expressions, inputSchema, subexpressionEliminationEnabled),
-              child.output,
-              iter,
-              testFallbackStartsAt,
-              numOutputRows,
-              dataSize,
-              spillSize)
+            groupingExpressions,
+            aggregateExpressions,
+            aggregateAttributes,
+            initialInputBufferOffset,
+            resultExpressions,
+            (expressions, inputSchema) =>
+              newMutableProjection(expressions,
+                                   inputSchema,
+                                   subexpressionEliminationEnabled),
+            child.output,
+            iter,
+            testFallbackStartsAt,
+            numOutputRows,
+            dataSize,
+            spillSize)
           if (!hasInput && groupingExpressions.isEmpty) {
             numOutputRows += 1
             Iterator.single[UnsafeRow](
-                aggregationIterator.outputForEmptyGroupingKeyWithoutInput())
+              aggregationIterator.outputForEmptyGroupingKeyWithoutInput())
           } else {
             aggregationIterator
           }
@@ -129,7 +132,7 @@ case class TungstenAggregate(
   override def supportCodegen: Boolean = {
     // ImperativeAggregate is not supported right now
     !aggregateExpressions.exists(
-        _.aggregateFunction.isInstanceOf[ImperativeAggregate])
+      _.aggregateFunction.isInstanceOf[ImperativeAggregate])
   }
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
@@ -144,8 +147,9 @@ case class TungstenAggregate(
     }
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     if (groupingExpressions.isEmpty) {
       doConsumeWithoutKeys(ctx, input)
     } else {
@@ -162,7 +166,7 @@ case class TungstenAggregate(
 
     // generate variables for aggregation buffer
     val functions = aggregateExpressions.map(
-        _.aggregateFunction.asInstanceOf[DeclarativeAggregate])
+      _.aggregateFunction.asInstanceOf[DeclarativeAggregate])
     val initExpr = functions.flatMap(f => f.initialValues)
     bufVars = initExpr.map { e =>
       val isNull = ctx.freshName("bufIsNull")
@@ -193,7 +197,8 @@ case class TungstenAggregate(
         val resultVars = resultExpressions.map { e =>
           BindReferences.bindReference(e, aggregateAttributes).gen(ctx)
         }
-        (resultVars, s"""
+        (resultVars,
+         s"""
         |$evaluateAggResults
         |${evaluateVariables(resultVars)}
        """.stripMargin)
@@ -207,7 +212,8 @@ case class TungstenAggregate(
       }
 
     val doAgg = ctx.freshName("doAggregateWithoutKey")
-    ctx.addNewFunction(doAgg, s"""
+    ctx.addNewFunction(doAgg,
+                       s"""
          | private void $doAgg() throws java.io.IOException {
          |   // initialize aggregation buffer
          |   $initBufVar
@@ -231,11 +237,11 @@ case class TungstenAggregate(
      """.stripMargin
   }
 
-  private def doConsumeWithoutKeys(
-      ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def doConsumeWithoutKeys(ctx: CodegenContext,
+                                   input: Seq[ExprCode]): String = {
     // only have DeclarativeAggregate
     val functions = aggregateExpressions.map(
-        _.aggregateFunction.asInstanceOf[DeclarativeAggregate])
+      _.aggregateFunction.asInstanceOf[DeclarativeAggregate])
     val inputAttrs = functions.flatMap(_.aggBufferAttributes) ++ child.output
     val updateExpr = aggregateExpressions.flatMap { e =>
       e.mode match {
@@ -292,13 +298,13 @@ case class TungstenAggregate(
 
     // create hashMap
     new UnsafeFixedWidthAggregationMap(
-        initialBuffer,
-        bufferSchema,
-        groupingKeySchema,
-        TaskContext.get().taskMemoryManager(),
-        1024 * 16, // initial capacity
-        TaskContext.get().taskMemoryManager().pageSizeBytes,
-        false // disable tracking of performance metrics
+      initialBuffer,
+      bufferSchema,
+      groupingKeySchema,
+      TaskContext.get().taskMemoryManager(),
+      1024 * 16, // initial capacity
+      TaskContext.get().taskMemoryManager().pageSizeBytes,
+      false // disable tracking of performance metrics
     )
   }
 
@@ -341,10 +347,10 @@ case class TungstenAggregate(
       // Create a MutableProjection to merge the rows of same key together
       val mergeExpr = declFunctions.flatMap(_.mergeExpressions)
       val mergeProjection = newMutableProjection(
-          mergeExpr,
-          aggregateBufferAttributes ++ declFunctions.flatMap(
-              _.inputAggBufferAttributes),
-          subexpressionEliminationEnabled)()
+        mergeExpr,
+        aggregateBufferAttributes ++ declFunctions.flatMap(
+          _.inputAggBufferAttributes),
+        subexpressionEliminationEnabled)()
       val joinedRow = new JoinedRow()
 
       var currentKey: UnsafeRow = null
@@ -465,16 +471,18 @@ case class TungstenAggregate(
                         hashMapTerm,
                         s"$hashMapTerm = $thisPlan.createHashMap();")
     sorterTerm = ctx.freshName("sorter")
-    ctx.addMutableState(
-        classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
+    ctx
+      .addMutableState(classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
 
     // Create a name for iterator from HashMap
     val iterTerm = ctx.freshName("mapIter")
-    ctx.addMutableState(
-        classOf[KVIterator[UnsafeRow, UnsafeRow]].getName, iterTerm, "")
+    ctx.addMutableState(classOf[KVIterator[UnsafeRow, UnsafeRow]].getName,
+                        iterTerm,
+                        "")
 
     val doAgg = ctx.freshName("doAggregateWithKeys")
-    ctx.addNewFunction(doAgg, s"""
+    ctx.addNewFunction(doAgg,
+                       s"""
         private void $doAgg() throws java.io.IOException {
           ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
 
@@ -515,15 +523,15 @@ case class TungstenAggregate(
      """
   }
 
-  private def doConsumeWithKeys(
-      ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def doConsumeWithKeys(ctx: CodegenContext,
+                                input: Seq[ExprCode]): String = {
 
     // create grouping key
     ctx.currentVars = input
     val keyCode = GenerateUnsafeProjection.createCode(
-        ctx,
-        groupingExpressions.map(
-            e => BindReferences.bindReference[Expression](e, child.output)))
+      ctx,
+      groupingExpressions.map(e =>
+        BindReferences.bindReference[Expression](e, child.output)))
     val key = keyCode.value
     val buffer = ctx.freshName("aggBuffer")
 
@@ -618,7 +626,7 @@ case class TungstenAggregate(
         s"TungstenAggregate(key=$keyString, functions=$functionString, output=$outputString)"
       case Some(fallbackStartsAt) =>
         s"TungstenAggregateWithControlledFallback $groupingExpressions " +
-        s"$allAggregateExpressions $resultExpressions fallbackStartsAt=$fallbackStartsAt"
+          s"$allAggregateExpressions $resultExpressions fallbackStartsAt=$fallbackStartsAt"
     }
   }
 }
@@ -628,6 +636,6 @@ object TungstenAggregate {
     val aggregationBufferSchema =
       StructType.fromAttributes(aggregateBufferAttributes)
     UnsafeFixedWidthAggregationMap.supportsAggregationBufferSchema(
-        aggregationBufferSchema)
+      aggregationBufferSchema)
   }
 }

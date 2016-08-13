@@ -336,8 +336,9 @@ object ClassfileConstants {
 
     private def isAnnotation(flags: Int): Boolean =
       (flags & JAVA_ACC_ANNOTATION) != 0
-    private def translateFlag(
-        jflag: Int, isAnnotation: Boolean, isClass: Boolean): Long =
+    private def translateFlag(jflag: Int,
+                              isAnnotation: Boolean,
+                              isClass: Boolean): Long =
       (jflag: @switch) match {
         case JAVA_ACC_PRIVATE => PRIVATE
         case JAVA_ACC_PROTECTED => PROTECTED
@@ -353,8 +354,9 @@ object ClassfileConstants {
         case JAVA_ACC_ANNOTATION => JAVA_ANNOTATION
         case _ => 0L
       }
-    private def translateFlags(
-        jflags: Int, baseFlags: Long, isClass: Boolean): Long = {
+    private def translateFlags(jflags: Int,
+                               baseFlags: Long,
+                               isClass: Boolean): Long = {
       val isAnnot = isAnnotation(jflags)
       def translateFlag0(jflags: Int): Long =
         translateFlag(jflags, isAnnot, isClass)
@@ -382,9 +384,9 @@ object ClassfileConstants {
     }
     def methodFlags(jflags: Int): Long = {
       translateFlags(
-          jflags,
-          if ((jflags & JAVA_ACC_BRIDGE) != 0) BRIDGE | ARTIFACT else 0,
-          isClass = false)
+        jflags,
+        if ((jflags & JAVA_ACC_BRIDGE) != 0) BRIDGE | ARTIFACT else 0,
+        isClass = false)
     }
   }
   object FlagTranslation extends FlagTranslation {}

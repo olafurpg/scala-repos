@@ -25,8 +25,8 @@ import org.apache.spark.mllib.tree.impurity._
   * and helps with indexing.
   * This class is abstract to support learning with and without feature subsampling.
   */
-private[spark] class DTStatsAggregator(
-    val metadata: DecisionTreeMetadata, featureSubset: Option[Array[Int]])
+private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
+                                       featureSubset: Option[Array[Int]])
     extends Serializable {
 
   /**
@@ -38,7 +38,7 @@ private[spark] class DTStatsAggregator(
     case Variance => new VarianceAggregator()
     case _ =>
       throw new IllegalArgumentException(
-          s"Bad impurity parameter: ${metadata.impurity}")
+        s"Bad impurity parameter: ${metadata.impurity}")
   }
 
   /**
@@ -89,10 +89,10 @@ private[spark] class DTStatsAggregator(
     * @param featureOffset  This is a pre-computed (node, feature) offset
     *                           from [[getFeatureOffset]].
     */
-  def getImpurityCalculator(
-      featureOffset: Int, binIndex: Int): ImpurityCalculator = {
-    impurityAggregator.getCalculator(
-        allStats, featureOffset + binIndex * statsSize)
+  def getImpurityCalculator(featureOffset: Int,
+                            binIndex: Int): ImpurityCalculator = {
+    impurityAggregator
+      .getCalculator(allStats, featureOffset + binIndex * statsSize)
   }
 
   /**
@@ -130,8 +130,10 @@ private[spark] class DTStatsAggregator(
                     binIndex: Int,
                     label: Double,
                     instanceWeight: Double): Unit = {
-    impurityAggregator.update(
-        allStats, featureOffset + binIndex * statsSize, label, instanceWeight)
+    impurityAggregator.update(allStats,
+                              featureOffset + binIndex * statsSize,
+                              label,
+                              instanceWeight)
   }
 
   /**
@@ -147,8 +149,9 @@ private[spark] class DTStatsAggregator(
     * @param binIndex  The other bin is merged into this bin.
     * @param otherBinIndex  This bin is not modified.
     */
-  def mergeForFeature(
-      featureOffset: Int, binIndex: Int, otherBinIndex: Int): Unit = {
+  def mergeForFeature(featureOffset: Int,
+                      binIndex: Int,
+                      otherBinIndex: Int): Unit = {
     impurityAggregator.merge(allStats,
                              featureOffset + binIndex * statsSize,
                              featureOffset + otherBinIndex * statsSize)
@@ -160,8 +163,8 @@ private[spark] class DTStatsAggregator(
     */
   def merge(other: DTStatsAggregator): DTStatsAggregator = {
     require(
-        allStatsSize == other.allStatsSize,
-        s"DTStatsAggregator.merge requires that both aggregators have the same length stats vectors." +
+      allStatsSize == other.allStatsSize,
+      s"DTStatsAggregator.merge requires that both aggregators have the same length stats vectors." +
         s" This aggregator is of length $allStatsSize, but the other is ${other.allStatsSize}.")
     var i = 0
     // TODO: Test BLAS.axpy
@@ -171,8 +174,8 @@ private[spark] class DTStatsAggregator(
     }
 
     require(
-        statsSize == other.statsSize,
-        s"DTStatsAggregator.merge requires that both aggregators have the same length parent " +
+      statsSize == other.statsSize,
+      s"DTStatsAggregator.merge requires that both aggregators have the same length parent " +
         s"stats vectors. This aggregator's parent stats are length $statsSize, " +
         s"but the other is ${other.statsSize}.")
     var j = 0

@@ -42,8 +42,9 @@ private object PostgresDialect extends JdbcDialect {
     } else None
   }
 
-  private def toCatalystType(
-      typeName: String, precision: Int, scale: Int): Option[DataType] =
+  private def toCatalystType(typeName: String,
+                             precision: Int,
+                             scale: Int): Option[DataType] =
     typeName match {
       case "bool" => Some(BooleanType)
       case "bit" => Some(BinaryType)
@@ -70,8 +71,9 @@ private object PostgresDialect extends JdbcDialect {
     case FloatType => Some(JdbcType("FLOAT4", Types.FLOAT))
     case DoubleType => Some(JdbcType("FLOAT8", Types.DOUBLE))
     case t: DecimalType =>
-      Some(JdbcType(
-              s"NUMERIC(${t.precision},${t.scale})", java.sql.Types.NUMERIC))
+      Some(
+        JdbcType(s"NUMERIC(${t.precision},${t.scale})",
+                 java.sql.Types.NUMERIC))
     case ArrayType(et, _) if et.isInstanceOf[AtomicType] =>
       getJDBCType(et)
         .map(_.databaseTypeDefinition)
@@ -79,7 +81,7 @@ private object PostgresDialect extends JdbcDialect {
         .map(typeName => JdbcType(s"$typeName[]", java.sql.Types.ARRAY))
     case ByteType =>
       throw new IllegalArgumentException(
-          s"Unsupported type in postgresql: $dt");
+        s"Unsupported type in postgresql: $dt");
     case _ => None
   }
 
@@ -87,8 +89,8 @@ private object PostgresDialect extends JdbcDialect {
     s"SELECT 1 FROM $table LIMIT 1"
   }
 
-  override def beforeFetch(
-      connection: Connection, properties: Map[String, String]): Unit = {
+  override def beforeFetch(connection: Connection,
+                           properties: Map[String, String]): Unit = {
     super.beforeFetch(connection, properties)
 
     // According to the postgres jdbc documentation we need to be in autocommit=false if we actually

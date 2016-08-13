@@ -33,7 +33,7 @@ object SortFilter extends SimplificationType {
         case (_: ScMethodCall | _: ScReferenceExpression, Some(baseExpr)) =>
           val startIndex =
             baseExpr.getTextRange.getEndOffset -
-            method.itself.getTextRange.getStartOffset
+              method.itself.getTextRange.getStartOffset
           val text = method.itself.getText
           if (startIndex > 0 && startIndex < text.length)
             Option(text.substring(startIndex))

@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * @since 22.09.2015.
   */
 class ScalaCurrentPackageMacro extends Macro {
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     PsiDocumentManager
       .getInstance(context.getProject)
       .getPsiFile(context.getEditor.getDocument) match {
@@ -22,15 +22,15 @@ class ScalaCurrentPackageMacro extends Macro {
     }
   }
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result =
     calculateResult(params, context)
 
   override def getName: String = MacroUtil.scalaIdPrefix + "currentPackage"
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.current.package")
+      "macro.current.package")
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]

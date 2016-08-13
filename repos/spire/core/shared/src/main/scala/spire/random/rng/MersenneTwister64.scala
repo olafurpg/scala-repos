@@ -35,12 +35,23 @@ import java.util.Arrays
   * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
   */
-final class MersenneTwister64 protected[random](
-    mt: Array[Long], mti0: Int = 313)
+final class MersenneTwister64 protected[random] (mt: Array[Long],
+                                                 mti0: Int = 313)
     extends LongBasedGenerator {
   // N + 1 = 313
 
-  import MersenneTwister64.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
+  import MersenneTwister64.{
+    UpperMask,
+    LowerMask,
+    N,
+    M,
+    N_M,
+    N_1,
+    M_N,
+    M_1,
+    BYTES,
+    mag01
+  }
 
   private var mti = mti0
 

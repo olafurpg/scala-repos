@@ -285,8 +285,10 @@ object qr extends UFunc {
   *   pvt : pivot indices
   */
 object qrp extends UFunc {
-  case class QRP[M, PivotMatrix](
-      q: M, r: M, pivotMatrix: PivotMatrix, pivotIndices: Array[Int])
+  case class QRP[M, PivotMatrix](q: M,
+                                 r: M,
+                                 pivotMatrix: PivotMatrix,
+                                 pivotIndices: Array[Int])
 
   type DenseQRP = QRP[DenseMatrix[Double], DenseMatrix[Int]]
 
@@ -301,8 +303,15 @@ object qrp extends UFunc {
       var info = new intW(0)
       lapack.dgeqrf(m, n, scratch, m, scratch, work, -1, info)
       val lwork1 = if (info.`val` != 0) n else work(0).toInt
-      lapack.dorgqr(
-          m, m, scala.math.min(m, n), scratch, m, scratch, work, -1, info)
+      lapack.dorgqr(m,
+                    m,
+                    scala.math.min(m, n),
+                    scratch,
+                    m,
+                    scratch,
+                    work,
+                    -1,
+                    info)
       val lwork2 = if (info.`val` != 0) n else work(0).toInt
       //allocate workspace mem. as max of lwork1 and lwork3
       val workspace = new Array[Double](scala.math.max(lwork1, lwork2))
@@ -317,8 +326,15 @@ object qrp extends UFunc {
         AFact(r, c) = A(r, c)
       }
 
-      lapack.dgeqp3(
-          m, n, AFact.data, m, pvt, tau, workspace, workspace.length, info)
+      lapack.dgeqp3(m,
+                    n,
+                    AFact.data,
+                    m,
+                    pvt,
+                    tau,
+                    workspace,
+                    workspace.length,
+                    info)
 
       //Error check
       if (info.`val` > 0)

@@ -81,16 +81,15 @@ object LaunchburyInterpreter extends App {
   // \x.x
   val example1 = Lambda("x", Var("x"))
   // let z = \y.y in (\x.x) z
-  val example2 = Let(HashMap("z" -> Lambda("y", Var("y"))),
-                     Apply(example1, "z"))
+  val example2 =
+    Let(HashMap("z" -> Lambda("y", Var("y"))), Apply(example1, "z"))
 
-  case class ReduceState(heap: Map[String, Expr],
-                         freshVars: Stream[String])
+  case class ReduceState(heap: Map[String, Expr], freshVars: Stream[String])
 
   private val initialState = ReduceState(
-      HashMap(),
-      Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
-      )
+    HashMap(),
+    Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
+  )
   // Substitute new variable names in
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
   private def sub(m: Map[String, String])(e: Expr): Expr = {
@@ -135,8 +134,8 @@ object LaunchburyInterpreter extends App {
             .toList
           e3 <- freshen(subs(e2))
           freshendBs <- bs2.traverseS {
-            case (x, e) => freshen(subs(e)).map((x, _))
-          }.map(_.toMap)
+                         case (x, e) => freshen(subs(e)).map((x, _))
+                       }.map(_.toMap)
         } yield Let(freshendBs, e3)
     }
   }
@@ -166,10 +165,11 @@ object LaunchburyInterpreter extends App {
           freshendE <- freshen(e3)
         } yield freshendE
       case Let(bs, e2) => {
-          val heapAdd = ((binding: (String, Expr)) =>
-            modify((s: ReduceState) => s.copy(heap = s.heap + binding)))
-          bs.toList.traverseS(heapAdd) >> reduce(e2)
-        }
+        val heapAdd =
+          ((binding: (String, Expr)) =>
+             modify((s: ReduceState) => s.copy(heap = s.heap + binding)))
+        bs.toList.traverseS(heapAdd) >> reduce(e2)
+      }
     }
   }
 

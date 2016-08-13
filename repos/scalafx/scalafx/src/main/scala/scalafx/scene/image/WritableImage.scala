@@ -41,7 +41,8 @@ object WritableImage {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritableImage.html]]
   */
 class WritableImage(override val delegate: jfxsi.WritableImage)
-    extends Image(delegate) with SFXDelegate[jfxsi.WritableImage] {
+    extends Image(delegate)
+    with SFXDelegate[jfxsi.WritableImage] {
 
   /**
     * Construct an empty image of the specified dimensions.

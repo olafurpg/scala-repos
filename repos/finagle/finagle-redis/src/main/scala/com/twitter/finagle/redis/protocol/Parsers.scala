@@ -9,8 +9,8 @@ trait UnifiedProtocolCodec {
 
   type ByteArrays = List[Array[Byte]]
 
-  def decodeUnifiedFormat[T <: AnyRef](
-      argCount: Long, doneFn: ByteArrays => T) =
+  def decodeUnifiedFormat[T <: AnyRef](argCount: Long,
+                                       doneFn: ByteArrays => T) =
     argCount match {
       case n if n < 0 =>
         throw new ProtocolError("Invalid argument count specified")
@@ -20,8 +20,9 @@ trait UnifiedProtocolCodec {
         })
     }
 
-  def decodeRequestLines[T <: AnyRef](
-      i: Long, lines: ByteArrays, doneFn: ByteArrays => T): NextStep = {
+  def decodeRequestLines[T <: AnyRef](i: Long,
+                                      lines: ByteArrays,
+                                      doneFn: ByteArrays => T): NextStep = {
     if (i <= 0) {
       emit(doneFn(lines.reverse))
     } else {
@@ -31,14 +32,15 @@ trait UnifiedProtocolCodec {
           case ARG_SIZE_MARKER =>
             val size = NumberFormat.toInt(line.drop(1))
             if (size < 1) {
-              decodeRequestLines(
-                  i - 1, lines.+:(RedisCodec.NIL_VALUE_BA.array), doneFn)
+              decodeRequestLines(i - 1,
+                                 lines.+:(RedisCodec.NIL_VALUE_BA.array),
+                                 doneFn)
             } else {
               readBytes(size) { byteArray =>
                 readBytes(2) { eol =>
                   if (eol(0) != '\r' || eol(1) != '\n') {
                     throw new ProtocolError(
-                        "Expected EOL after line data and didn't find it")
+                      "Expected EOL after line data and didn't find it")
                   }
                   decodeRequestLines(i - 1, lines.+:(byteArray), doneFn)
                 }

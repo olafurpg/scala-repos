@@ -42,7 +42,8 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class LightPointSpec
     extends SimpleSFXDelegateSpec[jfxse.Light.Point, Light.Point](
-        classOf[jfxse.Light.Point], classOf[Light.Point])
+      classOf[jfxse.Light.Point],
+      classOf[Light.Point])
     with PositionDelegateSpec[Light.Point]
     with ColorDelegateSpec[Light.Point] {
 

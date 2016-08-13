@@ -50,44 +50,45 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
 
   def consumerConfig =
     new ConsumerConfig(
-        TestUtils.createConsumerProperties(zkConnect, group, consumer0))
+      TestUtils.createConsumerProperties(zkConnect, group, consumer0))
 
   @Before
   override def setUp() {
     super.setUp()
     topicInfos = configs.map(
-        c =>
-          new PartitionTopicInfo(topic,
-                                 0,
-                                 queue,
-                                 new AtomicLong(consumedOffset),
-                                 new AtomicLong(0),
-                                 new AtomicInteger(0),
-                                 ""))
-    createTopic(
-        zkUtils,
-        topic,
-        partitionReplicaAssignment = Map(0 -> Seq(configs.head.brokerId)),
-        servers = servers)
+      c =>
+        new PartitionTopicInfo(topic,
+                               0,
+                               queue,
+                               new AtomicLong(consumedOffset),
+                               new AtomicLong(0),
+                               new AtomicInteger(0),
+                               ""))
+    createTopic(zkUtils,
+                topic,
+                partitionReplicaAssignment =
+                  Map(0 -> Seq(configs.head.brokerId)),
+                servers = servers)
   }
 
   @Test
   def testConsumerIteratorDeduplicationDeepIterator() {
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
-    val messageSet = new ByteBufferMessageSet(
-        DefaultCompressionCodec, new LongRef(0), messages: _*)
+    val messageSet = new ByteBufferMessageSet(DefaultCompressionCodec,
+                                              new LongRef(0),
+                                              messages: _*)
 
     topicInfos(0).enqueue(messageSet)
     assertEquals(1, queue.size)
     queue.put(ZookeeperConsumerConnector.shutdownCommand)
 
     val iter = new ConsumerIterator[String, String](
-        queue,
-        consumerConfig.consumerTimeoutMs,
-        new StringDecoder(),
-        new StringDecoder(),
-        clientId = "")
+      queue,
+      consumerConfig.consumerTimeoutMs,
+      new StringDecoder(),
+      new StringDecoder(),
+      clientId = "")
     val receivedMessages = (0 until 5).map(i => iter.next.message).toList
 
     assertFalse(iter.hasNext)
@@ -103,18 +104,19 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
   def testConsumerIteratorDecodingFailure() {
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
-    val messageSet = new ByteBufferMessageSet(
-        NoCompressionCodec, new LongRef(0), messages: _*)
+    val messageSet = new ByteBufferMessageSet(NoCompressionCodec,
+                                              new LongRef(0),
+                                              messages: _*)
 
     topicInfos(0).enqueue(messageSet)
     assertEquals(1, queue.size)
 
     val iter = new ConsumerIterator[String, String](
-        queue,
-        ConsumerConfig.ConsumerTimeoutMs,
-        new FailDecoder(),
-        new FailDecoder(),
-        clientId = "")
+      queue,
+      ConsumerConfig.ConsumerTimeoutMs,
+      new FailDecoder(),
+      new FailDecoder(),
+      clientId = "")
 
     val receivedMessages = (0 until 5).map { i =>
       assertTrue(iter.hasNext)
@@ -126,7 +128,8 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
       } catch {
         case e: UnsupportedOperationException => // this is ok
         case e2: Throwable =>
-          fail("Unexpected exception when iterating the message set. " +
+          fail(
+            "Unexpected exception when iterating the message set. " +
               e2.getMessage)
       }
     }
@@ -136,7 +139,7 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
       extends Decoder[String] {
     def fromBytes(bytes: Array[Byte]): String = {
       throw new UnsupportedOperationException(
-          "This decoder does not work at all..")
+        "This decoder does not work at all..")
     }
   }
 }

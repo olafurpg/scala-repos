@@ -38,52 +38,77 @@ class HttpMuxerTest extends FunSuite {
     .withHandler("foo/<a>", new DummyService(percentEncode))
 
   test("handles params properly") {
-    assert(Await
-          .result(muxService(Request("/foo/bar/blah?j={}")))
-          .contentString == fooBarPrefix)
+    assert(
+      Await
+        .result(muxService(Request("/foo/bar/blah?j={}")))
+        .contentString == fooBarPrefix)
   }
 
   test("prefix matching is handled correctly") {
     assert(
-        Await.result(muxService(Request("/foo/<a>"))).contentString == percentEncode)
+      Await
+        .result(muxService(Request("/foo/<a>")))
+        .contentString == percentEncode)
 
     assert(
-        Await.result(muxService(Request("/fooblah"))).status == Status.NotFound)
+      Await.result(muxService(Request("/fooblah"))).status == Status.NotFound)
 
     assert(
-        Await.result(muxService(Request("/foo/bar/blah"))).contentString == fooBarPrefix)
+      Await
+        .result(muxService(Request("/foo/bar/blah")))
+        .contentString == fooBarPrefix)
 
     assert(
-        Await.result(muxService(Request("/foo//bar/blah"))).contentString == fooBarPrefix)
+      Await
+        .result(muxService(Request("/foo//bar/blah")))
+        .contentString == fooBarPrefix)
 
     assert(
-        Await.result(muxService(Request("/foo//bar/<a>"))).contentString == fooBarPrefix)
+      Await
+        .result(muxService(Request("/foo//bar/<a>")))
+        .contentString == fooBarPrefix)
 
     assert(
-        Await.result(muxService(Request("/foo/bar"))).contentString == fooBarExact)
+      Await
+        .result(muxService(Request("/foo/bar")))
+        .contentString == fooBarExact)
 
     assert(
-        Await.result(muxService(Request("/foo/bar/"))).contentString == fooBarPrefix)
+      Await
+        .result(muxService(Request("/foo/bar/")))
+        .contentString == fooBarPrefix)
 
     assert(
-        Await.result(muxService(Request("/foo/boo/baz"))).status == Status.NotFound)
+      Await
+        .result(muxService(Request("/foo/boo/baz")))
+        .status == Status.NotFound)
 
     assert(
-        Await.result(muxService(Request("/foo/boo/baz/blah"))).contentString == fooBooBaz)
+      Await
+        .result(muxService(Request("/foo/boo/baz/blah")))
+        .contentString == fooBooBaz)
 
     assert(
-        Await.result(muxService(Request("/foo/barblah"))).status == Status.NotFound)
+      Await
+        .result(muxService(Request("/foo/barblah")))
+        .status == Status.NotFound)
   }
 
   test("exact matching is handled correctly") {
     assert(
-        Await.result(muxService(Request("/exact/match"))).contentString == exactMatch)
+      Await
+        .result(muxService(Request("/exact/match")))
+        .contentString == exactMatch)
 
     assert(
-        Await.result(muxService(Request("/exact/match/"))).status == Status.NotFound)
+      Await
+        .result(muxService(Request("/exact/match/")))
+        .status == Status.NotFound)
 
     assert(
-        Await.result(muxService(Request("/exact/match/nested"))).status == Status.NotFound)
+      Await
+        .result(muxService(Request("/exact/match/nested")))
+        .status == Status.NotFound)
   }
 
   test("""special cases "" and "/" are handled correctly""") {
@@ -92,16 +117,20 @@ class HttpMuxerTest extends FunSuite {
     assert(Await.result(slashMux(Request("/"))).contentString == specialCase)
     assert(Await.result(slashMux(Request(""))).status == Status.NotFound)
     assert(
-        Await.result(slashMux(Request("/anything"))).contentString == specialCase)
+      Await
+        .result(slashMux(Request("/anything")))
+        .contentString == specialCase)
 
     val emptyStringMux =
       new HttpMuxer().withHandler("", new DummyService(specialCase))
     assert(
-        Await.result(emptyStringMux(Request("/"))).contentString == specialCase)
+      Await.result(emptyStringMux(Request("/"))).contentString == specialCase)
     assert(
-        Await.result(emptyStringMux(Request(""))).contentString == specialCase)
+      Await.result(emptyStringMux(Request(""))).contentString == specialCase)
     assert(
-        Await.result(emptyStringMux(Request("/anything"))).status == Status.NotFound)
+      Await
+        .result(emptyStringMux(Request("/anything")))
+        .status == Status.NotFound)
   }
 
   test("Registering a service with an existing name will overwrite the old") {
@@ -111,6 +140,6 @@ class HttpMuxerTest extends FunSuite {
 
     assert(Await.result(orig(Request("/foo/bar"))).contentString == origResp)
     assert(
-        Await.result(overridden(Request("/foo/bar"))).contentString == newResp)
+      Await.result(overridden(Request("/foo/bar"))).contentString == newResp)
   }
 }

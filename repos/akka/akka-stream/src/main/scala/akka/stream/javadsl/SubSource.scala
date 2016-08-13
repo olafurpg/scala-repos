@@ -30,10 +30,10 @@ class SubSource[+Out, +Mat](
 
   /** Converts this Flow to its Scala DSL counterpart */
   def asScala: scaladsl.SubFlow[
-      Out,
-      Mat,
-      scaladsl.Source[Out, Mat]#Repr,
-      scaladsl.RunnableGraph[Mat]] @uncheckedVariance = delegate
+    Out,
+    Mat,
+    scaladsl.Source[Out, Mat]#Repr,
+    scaladsl.RunnableGraph[Mat]] @uncheckedVariance = delegate
 
   /**
     * Flatten the sub-flows back into the super-source by performing a merge
@@ -145,8 +145,7 @@ class SubSource[+Out, +Mat](
     */
   def mapConcat[T](
       f: function.Function[Out, java.lang.Iterable[T]]): SubSource[T, Mat] =
-    new SubSource(
-        delegate.mapConcat { elem ⇒
+    new SubSource(delegate.mapConcat { elem ⇒
       Util.immutableSeq(f(elem))
     })
 
@@ -177,8 +176,7 @@ class SubSource[+Out, +Mat](
   def statefulMapConcat[T](
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : SubSource[T, Mat] =
-    new SubSource(
-        delegate.statefulMapConcat { () ⇒
+    new SubSource(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
@@ -817,7 +815,7 @@ class SubSource[+Out, +Mat](
       seed: function.Function[Out, S],
       aggregate: function.Function2[S, Out, S]): SubSource[S, Mat] =
     new SubSource(
-        delegate.batchWeighted(max, costFn.apply, seed.apply)(aggregate.apply))
+      delegate.batchWeighted(max, costFn.apply, seed.apply)(aggregate.apply))
 
   /**
     * Allows a faster downstream to progress independently of a slower publisher by extrapolating elements from an older
@@ -866,8 +864,8 @@ class SubSource[+Out, +Mat](
     * @param size The size of the buffer in element count
     * @param overflowStrategy Strategy that is used when incoming elements cannot fit inside the buffer
     */
-  def buffer(
-      size: Int, overflowStrategy: OverflowStrategy): SubSource[Out, Mat] =
+  def buffer(size: Int,
+             overflowStrategy: OverflowStrategy): SubSource[Out, Mat] =
     new SubSource(delegate.buffer(size, overflowStrategy))
 
   /**
@@ -902,15 +900,12 @@ class SubSource[+Out, +Mat](
     * '''Cancels when''' downstream cancels or substream cancels
     */
   def prefixAndTail(n: Int): SubSource[
-      akka.japi.Pair[java.util.List[Out @uncheckedVariance],
-                     javadsl.Source[Out @uncheckedVariance, NotUsed]],
-      Mat] =
-    new SubSource(
-        delegate
-          .prefixAndTail(n)
-          .map {
-        case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+    akka.japi.Pair[java.util.List[Out @uncheckedVariance],
+                   javadsl.Source[Out @uncheckedVariance, NotUsed]],
+    Mat] =
+    new SubSource(delegate.prefixAndTail(n).map {
+      case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
+    })
 
   /**
     * Transform each input element into a `Source` of output elements that is
@@ -945,7 +940,8 @@ class SubSource[+Out, +Mat](
     * '''Cancels when''' downstream cancels
     */
   def flatMapMerge[T, M](
-      breadth: Int, f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
+      breadth: Int,
+      f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
     : SubSource[T, Mat] =
     new SubSource(delegate.flatMapMerge(breadth, o ⇒ f(o)))
 
@@ -1045,8 +1041,8 @@ class SubSource[+Out, +Mat](
     *
     * '''Cancels when''' downstream cancels
     */
-  def interleave[T >: Out](
-      that: Graph[SourceShape[T], _], segmentSize: Int): SubSource[T, Mat] =
+  def interleave[T >: Out](that: Graph[SourceShape[T], _],
+                           segmentSize: Int): SubSource[T, Mat] =
     new SubSource(delegate.interleave(that, segmentSize))
 
   /**
@@ -1068,7 +1064,7 @@ class SubSource[+Out, +Mat](
       that: Graph[SourceShape[U], M],
       comp: Comparator[U]): javadsl.SubSource[U, Mat] =
     new SubSource(
-        delegate.mergeSorted(that)(Ordering.comparatorToOrdering(comp)))
+      delegate.mergeSorted(that)(Ordering.comparatorToOrdering(comp)))
 
   /**
     * Combine the elements of current [[Flow]] and the given [[Source]] into a stream of tuples.
@@ -1229,8 +1225,8 @@ class SubSource[+Out, +Mat](
                costCalculation: function.Function[Out, Integer],
                mode: ThrottleMode): javadsl.SubSource[Out, Mat] =
     new SubSource(
-        delegate.throttle(
-            cost, per, maximumBurst, costCalculation.apply _, mode))
+      delegate
+        .throttle(cost, per, maximumBurst, costCalculation.apply _, mode))
 
   /**
     * Detaches upstream demand from downstream demand without detaching the

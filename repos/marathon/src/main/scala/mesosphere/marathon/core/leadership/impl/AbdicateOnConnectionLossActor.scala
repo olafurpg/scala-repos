@@ -13,8 +13,8 @@ private[leadership] object AbdicateOnConnectionLossActor {
   }
 
   private val connectionDropped = Set(
-      Watcher.Event.KeeperState.Disconnected,
-      Watcher.Event.KeeperState.Expired
+    Watcher.Event.KeeperState.Disconnected,
+    Watcher.Event.KeeperState.Expired
   )
 }
 
@@ -23,7 +23,8 @@ private[leadership] object AbdicateOnConnectionLossActor {
   */
 private[impl] class AbdicateOnConnectionLossActor(zk: ZooKeeperClient,
                                                   leader: LeadershipAbdication)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[impl] val watcher = new Watcher {
     val reference = self
@@ -44,7 +45,7 @@ private[impl] class AbdicateOnConnectionLossActor(zk: ZooKeeperClient,
 
   def disconnected(event: WatchedEvent): Unit = {
     log.warning(
-        s"ZooKeeper connection has been dropped. Abdicate Leadership: $event")
+      s"ZooKeeper connection has been dropped. Abdicate Leadership: $event")
     leader.abdicateLeadership()
   }
 

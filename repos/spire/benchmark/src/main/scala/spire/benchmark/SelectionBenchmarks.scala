@@ -44,7 +44,7 @@ class SelectionBenchmarks extends MyBenchmark {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
-  def mkarray[A : ClassTag : Order](size: Int)(init: => A): Array[A] = {
+  def mkarray[A: ClassTag: Order](size: Int)(init: => A): Array[A] = {
     val data = Array.ofDim[A](size)
     var i = 0
     while (i < size) { data(i) = init; i += 1 }
@@ -61,8 +61,9 @@ class SelectionBenchmarks extends MyBenchmark {
     fs = if (typ == "float") mkarray(size, layout)(nextFloat) else null
     ds = if (typ == "double") mkarray(size, layout)(nextDouble) else null
     cs = if (typ == "complex") mkarray(size, layout)(nextComplex) else null
-    cs2 = if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag))
-    else null
+    cs2 =
+      if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag))
+      else null
   }
 
   def timeSpireQuickSelect(reps: Int) = run(reps) {

@@ -12,14 +12,14 @@ private[parser] trait ContentDispositionHeader {
   // http://tools.ietf.org/html/rfc6266#section-4.1
   def `content-disposition` = rule {
     `disposition-type` ~ zeroOrMore(ws(';') ~ `disposition-parm`) ~ EOI ~>
-    (_.toMap) ~> (`Content-Disposition`(_, _))
+      (_.toMap) ~> (`Content-Disposition`(_, _))
   }
 
   def `disposition-type` =
     rule(
-        ignoreCase("inline") ~ OWS ~ push(ContentDispositionTypes.inline) | ignoreCase(
-            "attachment") ~ OWS ~ push(ContentDispositionTypes.attachment) | ignoreCase(
-            "form-data") ~ OWS ~ push(ContentDispositionTypes.`form-data`) | `disp-ext-type` ~>
+      ignoreCase("inline") ~ OWS ~ push(ContentDispositionTypes.inline) | ignoreCase(
+        "attachment") ~ OWS ~ push(ContentDispositionTypes.attachment) | ignoreCase(
+        "form-data") ~ OWS ~ push(ContentDispositionTypes.`form-data`) | `disp-ext-type` ~>
         (ContentDispositionTypes.Ext(_)))
 
   def `disp-ext-type` = rule { token }
@@ -30,8 +30,8 @@ private[parser] trait ContentDispositionHeader {
 
   def `filename-parm` =
     rule(
-        ignoreCase("filename") ~ OWS ~ ws('=') ~ push("filename") ~ word | ignoreCase(
-            "filename*") ~ OWS ~ ws('=') ~ push("filename") ~ `ext-value`)
+      ignoreCase("filename") ~ OWS ~ ws('=') ~ push("filename") ~ word | ignoreCase(
+        "filename*") ~ OWS ~ ws('=') ~ push("filename") ~ `ext-value`)
 
   def `disp-ext-parm` =
     rule(token ~ ws('=') ~ word | `ext-token` ~ ws('=') ~ `ext-value`)

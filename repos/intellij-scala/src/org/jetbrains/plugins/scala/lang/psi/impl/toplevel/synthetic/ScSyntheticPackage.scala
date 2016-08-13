@@ -15,7 +15,11 @@ import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition,
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
@@ -33,7 +37,7 @@ abstract class ScSyntheticPackage(name: String, manager: PsiManager)
   def getDirectories = PsiDirectory.EMPTY_ARRAY
   def checkSetName(s: String) {
     throw new IncorrectOperationException(
-        "cannot set name: nonphysical element")
+      "cannot set name: nonphysical element")
   }
   override def getText = ""
   override def toString = "Scala Synthetic Package " + getQualifiedName
@@ -44,7 +48,7 @@ abstract class ScSyntheticPackage(name: String, manager: PsiManager)
   override def getName = name
   def setName(newName: String) =
     throw new IncorrectOperationException(
-        "cannot set name: nonphysical element")
+      "cannot set name: nonphysical element")
   override def copy =
     throw new IncorrectOperationException("cannot copy: nonphysical element")
   override def getContainingFile =
@@ -103,9 +107,8 @@ object ScSyntheticPackage {
                      GlobalSearchScope.allScope(project),
                      classOf[PsiClass])
         .toSeq
-        .find(pc =>
-              {
-            pc.qualifiedName == fqn
+        .find(pc => {
+          pc.qualifiedName == fqn
         }) match {
         case Some(obj) =>
           val pname = if (i < 0) "" else fqn.substring(0, i)
@@ -123,16 +126,15 @@ object ScSyntheticPackage {
             def getSubPackages(scope: GlobalSearchScope) = Array.empty
             def getContainer: PsiQualifiedNamedElement = null
             def findClassByShortName(
-                name: String, scope: GlobalSearchScope): Array[PsiClass] =
+                name: String,
+                scope: GlobalSearchScope): Array[PsiClass] =
               Array.empty
           }
         case None => null
       }
     } else {
-      val pkgs = packages.filter(
-          pc =>
-            {
-          pc.fqn.startsWith(fqn) && fqn.startsWith(pc.prefix)
+      val pkgs = packages.filter(pc => {
+        pc.fqn.startsWith(fqn) && fqn.startsWith(pc.prefix)
       })
 
       if (pkgs.isEmpty) null
@@ -144,7 +146,8 @@ object ScSyntheticPackage {
             Array.empty //todo: ?
 
           def findClassByShortName(
-              name: String, scope: GlobalSearchScope): Array[PsiClass] = {
+              name: String,
+              scope: GlobalSearchScope): Array[PsiClass] = {
             getClasses.filter(_.name == name)
           }
 
@@ -156,14 +159,14 @@ object ScSyntheticPackage {
 
           def getClasses = {
             Array(
-                pkgs.flatMap(p =>
-                      if (p.fqn.length == fqn.length)
-                        p.typeDefs.flatMap {
-                  case td @ (c: ScTypeDefinition)
-                      if c.fakeCompanionModule.isDefined =>
-                    Seq(td, c.fakeCompanionModule.get)
-                  case td => Seq(td)
-                } else Seq.empty): _*)
+              pkgs.flatMap(p =>
+                if (p.fqn.length == fqn.length)
+                  p.typeDefs.flatMap {
+                    case td @ (c: ScTypeDefinition)
+                        if c.fakeCompanionModule.isDefined =>
+                      Seq(td, c.fakeCompanionModule.get)
+                    case td => Seq(td)
+                  } else Seq.empty): _*)
           }
 
           def getClasses(scope: GlobalSearchScope) =

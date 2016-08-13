@@ -29,7 +29,9 @@ object TailChoppingSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TailChoppingSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec
+    with DefaultTimeout
+    with ImplicitSender {
   import TailChoppingSpec._
 
   def oneOfShouldEqual(what: Any, default: Any, ref: ActorRef*)(
@@ -50,8 +52,7 @@ class TailChoppingSpec
       val doneLatch = new TestLatch(2)
 
       val counter1 = new AtomicInteger
-      val actor1 = system.actorOf(
-          Props(new Actor {
+      val actor1 = system.actorOf(Props(new Actor {
         def receive = {
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter1.addAndGet(msg)
@@ -59,8 +60,7 @@ class TailChoppingSpec
       }))
 
       val counter2 = new AtomicInteger
-      val actor2 = system.actorOf(
-          Props(new Actor {
+      val actor2 = system.actorOf(Props(new Actor {
         def receive = {
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter2.addAndGet(msg)
@@ -68,8 +68,9 @@ class TailChoppingSpec
       }))
 
       val paths = List(actor1, actor2).map(_.path.toString)
-      val routedActor = system.actorOf(TailChoppingGroup(
-              paths, within = 1.second, interval = 100.millisecond).props())
+      val routedActor = system.actorOf(
+        TailChoppingGroup(paths, within = 1.second, interval = 100.millisecond)
+          .props())
       routedActor ! Broadcast(1)
       routedActor ! Broadcast("end")
 
@@ -84,14 +85,15 @@ class TailChoppingSpec
       val actor2 = newActor(2, 1.millis)
       val probe = TestProbe()
       val paths = List(actor1, actor2).map(_.path.toString)
-      val routedActor = system.actorOf(TailChoppingGroup(
-              paths, within = 1.seconds, interval = 50.millisecond).props())
+      val routedActor = system.actorOf(
+        TailChoppingGroup(paths, within = 1.seconds, interval = 50.millisecond)
+          .props())
 
       probe.send(routedActor, "")
       probe.expectMsg("ack")
 
-      oneOfShouldEqual(1, 1, actor1, actor2)(
-          ref ⇒ Await.result(ref ? "times", timeout.duration))
+      oneOfShouldEqual(1, 1, actor1, actor2)(ref ⇒
+        Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }
@@ -102,17 +104,18 @@ class TailChoppingSpec
       val probe = TestProbe()
       val paths = List(actor1, actor2).map(_.path.toString)
       val routedActor =
-        system.actorOf(TailChoppingGroup(paths,
-                                         within = 300.milliseconds,
-                                         interval = 50.milliseconds).props())
+        system.actorOf(
+          TailChoppingGroup(paths,
+                            within = 300.milliseconds,
+                            interval = 50.milliseconds).props())
 
       probe.send(routedActor, "")
       probe.expectMsgPF() {
         case Failure(timeoutEx: AskTimeoutException) ⇒
       }
 
-      allShouldEqual(1, actor1, actor2)(
-          ref ⇒ Await.result(ref ? "times", timeout.duration))
+      allShouldEqual(1, actor1, actor2)(ref ⇒
+        Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }
@@ -122,8 +125,10 @@ class TailChoppingSpec
       val actor2 = newActor(6, 4.seconds)
       val probe = TestProbe()
       val paths = List(actor1, actor2).map(_.path.toString)
-      val routedActor = system.actorOf(TailChoppingGroup(
-              paths, within = 5.seconds, interval = 100.milliseconds).props())
+      val routedActor = system.actorOf(
+        TailChoppingGroup(paths,
+                          within = 5.seconds,
+                          interval = 100.milliseconds).props())
 
       probe.send(routedActor, "")
       probe.expectMsg(max = 2.seconds, "ack")

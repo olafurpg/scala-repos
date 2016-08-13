@@ -66,8 +66,9 @@ import org.apache.spark.util.Utils
   *
   * [options] is the specific property of this source or sink.
   */
-private[spark] class MetricsSystem private (
-    val instance: String, conf: SparkConf, securityMgr: SecurityManager)
+private[spark] class MetricsSystem private (val instance: String,
+                                            conf: SparkConf,
+                                            securityMgr: SecurityManager)
     extends Logging {
 
   private[this] val metricsConfig = new MetricsConfig(conf)
@@ -85,8 +86,8 @@ private[spark] class MetricsSystem private (
     * Get any UI handlers used by this metrics system; can only be called after start().
     */
   def getServletHandlers: Array[ServletContextHandler] = {
-    require(
-        running, "Can only call getServletHandlers on a running MetricsSystem")
+    require(running,
+            "Can only call getServletHandlers on a running MetricsSystem")
     metricsServlet.map(_.getHandlers(conf)).getOrElse(Array())
   }
 
@@ -162,8 +163,7 @@ private[spark] class MetricsSystem private (
   def removeSource(source: Source) {
     sources -= source
     val regName = buildRegistryName(source)
-    registry.removeMatching(
-        new MetricFilter {
+    registry.removeMatching(new MetricFilter {
       def matches(name: String, metric: Metric): Boolean =
         name.startsWith(regName)
     })
@@ -209,9 +209,9 @@ private[spark] class MetricsSystem private (
           }
         } catch {
           case e: Exception => {
-              logError("Sink class " + classPath + " cannot be instantiated")
-              throw e
-            }
+            logError("Sink class " + classPath + " cannot be instantiated")
+            throw e
+          }
         }
       }
     }
@@ -229,7 +229,7 @@ private[spark] object MetricsSystem {
     val period = MINIMAL_POLL_UNIT.convert(pollPeriod, pollUnit)
     if (period < MINIMAL_POLL_PERIOD) {
       throw new IllegalArgumentException(
-          "Polling period " + pollPeriod + " " + pollUnit +
+        "Polling period " + pollPeriod + " " + pollUnit +
           " below than minimal polling period ")
     }
   }

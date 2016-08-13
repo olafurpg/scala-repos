@@ -67,7 +67,7 @@ class BackoffOnRestartSupervisorSpec extends AkkaSpec with ImplicitSender {
   trait Setup2 {
     val probe = TestProbe()
     val parent = system.actorOf(
-        TestParentActor.props(probe.ref, supervisorProps(probe.ref)))
+      TestParentActor.props(probe.ref, supervisorProps(probe.ref)))
     probe.expectMsg("STARTED")
     val child = probe.lastSender
   }

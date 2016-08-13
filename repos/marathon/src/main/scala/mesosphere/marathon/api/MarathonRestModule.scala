@@ -31,8 +31,8 @@ class LeaderProxyFilterModule extends ServletModule {
   @Singleton
   @Named(JavaUrlConnectionRequestForwarder.NAMED_LEADER_PROXY_SSL_CONTEXT)
   def provideSSLContext(httpConf: HttpConf): SSLContext = {
-    SSLContextUtil.createSSLContext(
-        httpConf.sslKeystorePath.get, httpConf.sslKeystorePassword.get)
+    SSLContextUtil.createSSLContext(httpConf.sslKeystorePath.get,
+                                    httpConf.sslKeystorePassword.get)
   }
 }
 

@@ -23,7 +23,8 @@ import makeTimeout.short
 private[lobby] final class Socket(val history: History[Messadata],
                                   router: akka.actor.ActorSelection,
                                   uidTtl: FiniteDuration)
-    extends SocketActor[Member](uidTtl) with Historical[Member, Messadata] {
+    extends SocketActor[Member](uidTtl)
+    with Historical[Member, Messadata] {
 
   override val startsOnApplicationBoot = true
 
@@ -73,8 +74,8 @@ private[lobby] final class Socket(val history: History[Messadata],
       withMember(uid)(notifyPlayerStart(game, !creatorColor))
 
     case JoinSeek(userId, seek, game, creatorColor) =>
-      membersByUserId(seek.user.id) foreach notifyPlayerStart(
-          game, creatorColor)
+      membersByUserId(seek.user.id) foreach notifyPlayerStart(game,
+                                                              creatorColor)
       membersByUserId(userId) foreach notifyPlayerStart(game, !creatorColor)
 
     case HookIds(ids) => notifyVersion("hli", ids mkString ",", Messadata())
@@ -93,9 +94,9 @@ private[lobby] final class Socket(val history: History[Messadata],
     notifyMember("redirect",
                  Json
                    .obj(
-                       "id" -> (game fullIdOf color),
-                       "url" -> playerUrl(game fullIdOf color),
-                       "cookie" -> AnonCookie.json(game, color)
+                     "id" -> (game fullIdOf color),
+                     "url" -> playerUrl(game fullIdOf color),
+                     "cookie" -> AnonCookie.json(game, color)
                    )
                    .noNull) _
 

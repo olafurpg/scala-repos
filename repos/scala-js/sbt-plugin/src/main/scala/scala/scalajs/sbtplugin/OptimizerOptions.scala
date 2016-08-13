@@ -36,8 +36,8 @@ final class OptimizerOptions private (
 ) {
 
   @deprecated(
-      "Bypassing linking errors will not be possible in the next major version.",
-      "0.6.6")
+    "Bypassing linking errors will not be possible in the next major version.",
+    "0.6.6")
   def withBypassLinkingErrors(bypassLinkingErrors: Boolean): OptimizerOptions =
     copy(bypassLinkingErrors = bypassLinkingErrors)
 

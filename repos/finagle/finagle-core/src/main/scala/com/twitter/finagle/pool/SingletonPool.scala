@@ -69,8 +69,8 @@ private[finagle] object SingletonPool {
   * service. A new Service is established whenever the service factory
   * fails or the current service has become unavailable.
   */
-class SingletonPool[Req, Rep](
-    underlying: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver)
+class SingletonPool[Req, Rep](underlying: ServiceFactory[Req, Rep],
+                              statsReceiver: StatsReceiver)
     extends ServiceFactory[Req, Rep] {
   import SingletonPool._
 
@@ -108,8 +108,8 @@ class SingletonPool[Req, Rep](
         complete(Idle)
         svc.close()
         Future.exception(
-            Failure("Returned unavailable service", Failure.Restartable)
-              .withSource(Failure.Source.Role, SingletonPool.role))
+          Failure("Returned unavailable service", Failure.Restartable)
+            .withSource(Failure.Source.Role, SingletonPool.role))
 
       case Return(svc) =>
         if (!complete(Open(new RefcountedService(svc)))) svc.close()
@@ -156,7 +156,7 @@ class SingletonPool[Req, Rep](
   /**
     * @inheritdoc
     *
-    * The status of a [[SingletonPool]] is the worse of the 
+    * The status of a [[SingletonPool]] is the worse of the
     * the underlying status and the status of the currently
     * cached service, if any.
     */

@@ -214,8 +214,9 @@ trait CodegenSupport extends SparkPlan {
     *   if (isNull1 || !value2) continue;
     *   # call consume(), which will call parent.doConsume()
     */
-  protected def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  protected def doConsume(ctx: CodegenContext,
+                          input: Seq[ExprCode],
+                          row: String): String = {
     throw new UnsupportedOperationException
   }
 }
@@ -227,7 +228,8 @@ trait CodegenSupport extends SparkPlan {
   * an RDD iterator of InternalRow.
   */
 case class InputAdapter(child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = child.outputPartitioning
@@ -248,11 +250,12 @@ case class InputAdapter(child: SparkPlan)
   override def doProduce(ctx: CodegenContext): String = {
     val input = ctx.freshName("input")
     // Right now, InputAdapter is only used when there is one upstream.
-    ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+    ctx.addMutableState("scala.collection.Iterator",
+                        input,
+                        s"$input = inputs[0];")
 
-    val exprs = output.zipWithIndex.map(
-        x => new BoundReference(x._2, x._1.dataType, true))
+    val exprs = output.zipWithIndex.map(x =>
+      new BoundReference(x._2, x._1.dataType, true))
     val row = ctx.freshName("row")
     ctx.INPUT_ROW = row
     ctx.currentVars = null
@@ -302,7 +305,8 @@ case class InputAdapter(child: SparkPlan)
   * used to generated code for BoundReference.
   */
 case class WholeStageCodegen(child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = child.outputPartitioning

@@ -46,13 +46,14 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       val sink = new DownstreamProbe[Int]("sink")
 
       // Constructing an assembly by hand and resolving ambiguities
-      val assembly = new GraphAssembly(
-          stages = Array(identity, identity),
-          originalAttributes = Array(Attributes.none, Attributes.none),
-          ins = Array(identity.in, identity.in, null),
-          inOwners = Array(0, 1, -1),
-          outs = Array(null, identity.out, identity.out),
-          outOwners = Array(-1, 0, 1))
+      val assembly =
+        new GraphAssembly(stages = Array(identity, identity),
+                          originalAttributes =
+                            Array(Attributes.none, Attributes.none),
+                          ins = Array(identity.in, identity.in, null),
+                          inOwners = Array(0, 1, -1),
+                          outs = Array(null, identity.out, identity.out),
+                          outOwners = Array(-1, 0, 1))
 
       manualInit(assembly)
       interpreter.attachDownstreamBoundary(2, sink)
@@ -122,9 +123,10 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       lastEvents() should ===(Set.empty)
 
       source2.onNext("Meaning of life")
-      lastEvents() should ===(Set(OnNext(sink, (42, "Meaning of life")),
-                                  RequestOne(source1),
-                                  RequestOne(source2)))
+      lastEvents() should ===(
+        Set(OnNext(sink, (42, "Meaning of life")),
+            RequestOne(source1),
+            RequestOne(source2)))
     }
 
     "implement Broadcast" in new TestSetup {
@@ -202,10 +204,11 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       lastEvents() should ===(Set.empty)
 
       source2.onNext(2)
-      lastEvents() should ===(Set(OnNext(sink1, (1, 2)),
-                                  OnNext(sink2, (1, 2)),
-                                  RequestOne(source1),
-                                  RequestOne(source2)))
+      lastEvents() should ===(
+        Set(OnNext(sink1, (1, 2)),
+            OnNext(sink2, (1, 2)),
+            RequestOne(source1),
+            RequestOne(source2)))
     }
 
     "implement merge" in new TestSetup {
@@ -342,8 +345,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       val source = new UpstreamProbe[String]("source")
       val sink = new DownstreamProbe[String]("sink")
       val buffer = new PushPullGraphStage[String, String, NotUsed](
-          (_) ⇒ new Buffer[String](2, OverflowStrategy.backpressure),
-          Attributes.none)
+        (_) ⇒ new Buffer[String](2, OverflowStrategy.backpressure),
+        Attributes.none)
 
       builder(buffer)
         .connect(source, buffer.shape.in)

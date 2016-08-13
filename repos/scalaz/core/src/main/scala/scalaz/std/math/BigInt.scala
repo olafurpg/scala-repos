@@ -4,7 +4,7 @@ package math
 
 trait BigInts {
   implicit val bigIntInstance: Monoid[BigInt] with Enum[BigInt] with Show[
-      BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
+    BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
     override def shows(f: BigInt) = f.toString
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
@@ -25,7 +25,7 @@ trait BigInts {
   import Tags.Multiplication
 
   implicit val bigIntMultiplication: Monoid[BigInt @@ Multiplication] with Order[
-      BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] =
+    BigInt @@ Multiplication] with Show[BigInt @@ Multiplication] =
     new Monoid[BigInt @@ Multiplication] with Order[BigInt @@ Multiplication]
     with Show[BigInt @@ Multiplication] {
       override def shows(f: scalaz.@@[BigInt, Multiplication]) = f.toString
@@ -36,10 +36,11 @@ trait BigInts {
 
       def zero: BigInt @@ Multiplication = Multiplication(1)
 
-      def order(
-          x: BigInt @@ Multiplication, y: BigInt @@ Multiplication): Ordering =
+      def order(x: BigInt @@ Multiplication,
+                y: BigInt @@ Multiplication): Ordering =
         if (Tag.unwrap(x) < Tag.unwrap(y)) Ordering.LT
-        else if (Tag.unwrap(x) == Tag.unwrap(y)) Ordering.EQ else Ordering.GT
+        else if (Tag.unwrap(x) == Tag.unwrap(y)) Ordering.EQ
+        else Ordering.GT
     }
 }
 

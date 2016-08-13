@@ -44,8 +44,8 @@ object TaskOp {
 
     def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer = {
       import scala.collection.JavaConverters._
-      ResourceUtil.consumeResourcesFromOffer(
-          offer, taskInfo.getResourcesList.asScala)
+      ResourceUtil
+        .consumeResourcesFromOffer(offer, taskInfo.getResourcesList.asScala)
     }
   }
 

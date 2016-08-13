@@ -14,13 +14,13 @@ case class Forecast(_id: String, // player full id
   def apply(g: Game, lastMove: Move): Option[(Forecast, Uci.Move)] =
     nextMove(g, lastMove) map { move =>
       copy(
-          steps = steps.collect {
-            case (fst :: snd :: rest)
-                if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove) &&
+        steps = steps.collect {
+          case (fst :: snd :: rest)
+              if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove) &&
                 snd.is(move) =>
-              rest
-          },
-          date = DateTime.now
+            rest
+        },
+        date = DateTime.now
       ) -> move
     }
 

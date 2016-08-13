@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.project.{ProjectPsiElementExt, ScalaLanguageLevel}
+import org.jetbrains.plugins.scala.project.{
+  ProjectPsiElementExt,
+  ScalaLanguageLevel
+}
 
 /**
   * @author Nikolay.Tropin
@@ -20,18 +23,18 @@ object OptionEqualsSomeToContains extends SimplificationType {
     expr match {
       case _
           if expr.scalaLanguageLevel.exists(
-              _ <= ScalaLanguageLevel.Scala_2_10) =>
+            _ <= ScalaLanguageLevel.Scala_2_10) =>
         None
       case qual `==` `scalaSome`(elem) if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(s"${qual.getText}.contains(${elem.getText})")
-              .highlightAll)
+          replace(expr)
+            .withText(s"${qual.getText}.contains(${elem.getText})")
+            .highlightAll)
       case `scalaSome`(elem) `==` qual if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(s"${qual.getText}.contains(${elem.getText})")
-              .highlightAll)
+          replace(expr)
+            .withText(s"${qual.getText}.contains(${elem.getText})")
+            .highlightAll)
       case _ => None
     }
 }
@@ -44,18 +47,18 @@ object OptionNotEqualsSomeToNotContains extends SimplificationType {
     expr match {
       case _
           if expr.scalaLanguageLevel.exists(
-              _ <= ScalaLanguageLevel.Scala_2_10) =>
+            _ <= ScalaLanguageLevel.Scala_2_10) =>
         None
       case qual `!=` `scalaSome`(elem) if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(s"!${qual.getText}.contains(${elem.getText})")
-              .highlightAll)
+          replace(expr)
+            .withText(s"!${qual.getText}.contains(${elem.getText})")
+            .highlightAll)
       case `scalaSome`(elem) `!=` qual if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(s"!${qual.getText}.contains(${elem.getText})")
-              .highlightAll)
+          replace(expr)
+            .withText(s"!${qual.getText}.contains(${elem.getText})")
+            .highlightAll)
       case _ => None
     }
 }

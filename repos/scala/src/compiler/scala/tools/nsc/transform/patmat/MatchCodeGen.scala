@@ -29,10 +29,12 @@ trait MatchCodeGen extends Interface {
 
     // assert(owner ne null); assert(owner ne NoSymbol)
     def freshSym(pos: Position, tp: Type = NoType, prefix: String = "x") =
-      NoSymbol.newTermSymbol(freshName(prefix), pos, newFlags = SYNTHETIC) setInfo tp
+      NoSymbol
+        .newTermSymbol(freshName(prefix), pos, newFlags = SYNTHETIC) setInfo tp
 
     def newSynthCaseLabel(name: String) =
-      NoSymbol.newLabel(freshName(name), NoPosition) setFlag treeInfo.SYNTH_CASE_FLAGS
+      NoSymbol
+        .newLabel(freshName(name), NoPosition) setFlag treeInfo.SYNTH_CASE_FLAGS
 
     // codegen relevant to the structure of the translation (how extractors are combined)
     trait AbsCodegen {
@@ -56,8 +58,10 @@ trait MatchCodeGen extends Interface {
       def one(res: Tree): Tree
 
       def flatMap(prev: Tree, b: Symbol, next: Tree): Tree
-      def flatMapCond(
-          cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree
+      def flatMapCond(cond: Tree,
+                      res: Tree,
+                      nextBinder: Symbol,
+                      next: Tree): Tree
       def flatMapGuard(cond: Tree, next: Tree): Tree
       def ifThenElseZero(c: Tree, thenp: Tree): Tree = {
         val z = zero
@@ -105,16 +109,18 @@ trait MatchCodeGen extends Interface {
         if (b.info <:< tp) REF(b)
         else gen.mkCastPreservingAnnotations(REF(b), tp)
       def _isInstanceOf(b: Symbol, tp: Type): Tree =
-        gen.mkIsInstanceOf(
-            REF(b), tp.withoutAnnotations, any = true, wrapInApply = false)
+        gen.mkIsInstanceOf(REF(b),
+                           tp.withoutAnnotations,
+                           any = true,
+                           wrapInApply = false)
 
       def mkZero(tp: Type): Tree = gen.mkConstantZero(tp) match {
         case Constant(null) =>
           gen.mkAsInstanceOf(
-              Literal(Constant(null)),
-              tp,
-              any = true,
-              wrapInApply = false) // the magic incantation is true/false here
+            Literal(Constant(null)),
+            tp,
+            any = true,
+            wrapInApply = false) // the magic incantation is true/false here
         case const => Literal(const)
       }
     }
@@ -143,7 +149,7 @@ trait MatchCodeGen extends Interface {
           cases: List[Casegen => Tree],
           matchFailGen: Option[Tree => Tree]): Tree =
         _match(vpmName.runOrElse) APPLY (scrut) APPLY
-        (fun(scrutSym, cases map (f => f(this)) reduceLeft typedOrElse))
+          (fun(scrutSym, cases map (f => f(this)) reduceLeft typedOrElse))
 
       // __match.one(`res`)
       def one(res: Tree): Tree = (_match(vpmName.one))(res)
@@ -161,8 +167,10 @@ trait MatchCodeGen extends Interface {
       def typedOrElse(thisCase: Tree, elseCase: Tree): Tree =
         (thisCase DOT vpmName.orElse) APPLY (elseCase)
       //  __match.guard(`cond`, `res`).flatMap(`nextBinder` => `next`)
-      def flatMapCond(
-          cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree =
+      def flatMapCond(cond: Tree,
+                      res: Tree,
+                      nextBinder: Symbol,
+                      next: Tree): Tree =
         flatMap(guard(cond, res), nextBinder, next)
       //  __match.guard(`guardTree`, ()).flatMap((_: P[Unit]) => `next`)
       def flatMapGuard(guardTree: Tree, next: Tree): Tree =
@@ -174,7 +182,9 @@ trait MatchCodeGen extends Interface {
   }
 
   trait OptimizedCodegen
-      extends CodegenCore with TypedSubstitution with MatchMonadInterface {
+      extends CodegenCore
+      with TypedSubstitution
+      with MatchMonadInterface {
     override def codegen: AbsCodegen = optimizedCodegen
 
     // when we know we're targeting Option, do some inlining the optimizer won't do
@@ -195,12 +205,12 @@ trait MatchCodeGen extends Interface {
           matchFailGen: Option[Tree => Tree]): Tree = {
         val matchRes =
           NoSymbol.newValueParameter(
-              newTermName("x"),
-              NoPosition,
-              newFlags = SYNTHETIC) setInfo restpe.withoutAnnotations
+            newTermName("x"),
+            NoPosition,
+            newFlags = SYNTHETIC) setInfo restpe.withoutAnnotations
         val matchEnd =
-          newSynthCaseLabel("matchEnd") setInfo MethodType(
-              List(matchRes), restpe)
+          newSynthCaseLabel("matchEnd") setInfo MethodType(List(matchRes),
+                                                           restpe)
 
         def newCaseSym =
           newSynthCaseLabel("case") setInfo MethodType(Nil, restpe)
@@ -235,18 +245,19 @@ trait MatchCodeGen extends Interface {
         // the prologue may be empty, usually it is the valdef that stores the scrut
         // val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
         Block(
-            scrutDef ++ caseDefs ++ catchAllDef,
-            LabelDef(matchEnd, List(matchRes), REF(matchRes))
+          scrutDef ++ caseDefs ++ catchAllDef,
+          LabelDef(matchEnd, List(matchRes), REF(matchRes))
         )
       }
 
       class OptimizedCasegen(matchEnd: Symbol, nextCase: Symbol)
-          extends CommonCodegen with Casegen {
+          extends CommonCodegen
+          with Casegen {
         def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
             cases: List[Casegen => Tree],
             matchFailGen: Option[Tree => Tree]): Tree =
-          optimizedCodegen.matcher(scrut, scrutSym, restpe)(
-              cases, matchFailGen)
+          optimizedCodegen
+            .matcher(scrut, scrutSym, restpe)(cases, matchFailGen)
 
         // only used to wrap the RHS of a body
         // res: T
@@ -262,12 +273,12 @@ trait MatchCodeGen extends Interface {
         def flatMap(prev: Tree, b: Symbol, next: Tree): Tree = {
           val prevSym = freshSym(prev.pos, prev.tpe, "o")
           BLOCK(
-              ValDef(prevSym, prev),
-              // must be isEmpty and get as we don't control the target of the call (prev is an extractor call)
-              ifThenElseZero(
-                  NOT(prevSym DOT vpmName.isEmpty),
-                  Substitution(b, prevSym DOT vpmName.get)(next)
-              )
+            ValDef(prevSym, prev),
+            // must be isEmpty and get as we don't control the target of the call (prev is an extractor call)
+            ifThenElseZero(
+              NOT(prevSym DOT vpmName.isEmpty),
+              Substitution(b, prevSym DOT vpmName.get)(next)
+            )
           )
         }
 
@@ -276,13 +287,15 @@ trait MatchCodeGen extends Interface {
         // nextBinder: T
         // next == MatchMonad[U]
         // returns MatchMonad[U]
-        def flatMapCond(
-            cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree = {
+        def flatMapCond(cond: Tree,
+                        res: Tree,
+                        nextBinder: Symbol,
+                        next: Tree): Tree = {
           val rest =
             (// only emit a local val for `nextBinder` if it's actually referenced in `next`
-             if (next.exists(_.symbol eq nextBinder))
-               BLOCK(ValDef(nextBinder, res), next)
-             else next)
+            if (next.exists(_.symbol eq nextBinder))
+              BLOCK(ValDef(nextBinder, res), next)
+            else next)
           ifThenElseZero(cond, rest)
         }
 
@@ -299,9 +312,9 @@ trait MatchCodeGen extends Interface {
                               next: Tree): Tree =
           ifThenElseZero(cond,
                          BLOCK(
-                             condSym === mkTRUE,
-                             nextBinder === res,
-                             next
+                           condSym === mkTRUE,
+                           nextBinder === res,
+                           next
                          ))
       }
     }

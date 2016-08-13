@@ -36,8 +36,10 @@ object Test {
     assertVectorIterated(a, label, start, end)
   }
 
-  def assertVectorIndexed[V](
-      a: Vector[V], label: String, start: Int, end: Int) = {
+  def assertVectorIndexed[V](a: Vector[V],
+                             label: String,
+                             start: Int,
+                             end: Int) = {
     val res = a
     assert(res.length == (end - start),
            res.length + "!=" + (end - start) + " (" + res + ")")
@@ -47,8 +49,10 @@ object Test {
     res
   }
 
-  def assertVectorIterated[V](
-      a: Vector[V], label: String, start: Int, end: Int) = {
+  def assertVectorIterated[V](a: Vector[V],
+                              label: String,
+                              start: Int,
+                              end: Int) = {
     val res = a
     assert(res.length == (end - start),
            res.length + "!=" + (end - start) + " (" + res + ")")
@@ -119,8 +123,9 @@ object Test {
     val N = 150000
     val a = vector("a", N)
 
-    val pos = scala.util.Random.shuffle(scala.collection.mutable.WrappedArray
-          .make[Int](Array.tabulate[Int](N)(i => i)))
+    val pos = scala.util.Random.shuffle(
+      scala.collection.mutable.WrappedArray
+        .make[Int](Array.tabulate[Int](N)(i => i)))
 
     var b = a
 

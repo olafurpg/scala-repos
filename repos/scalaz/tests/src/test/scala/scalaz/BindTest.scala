@@ -11,7 +11,7 @@ object BindTest extends SpecLite {
 
   "ifM" in {
     List(true, false, true).ifM(List(0), List(1, 1)) must_===
-    (List(0, 1, 1, 0))
+      (List(0, 1, 1, 0))
   }
 
   ">>" in {

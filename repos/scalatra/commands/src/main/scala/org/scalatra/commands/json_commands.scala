@@ -10,7 +10,8 @@ import org.scalatra.util.ValueReader
 import org.scalatra.util.conversion._
 
 trait JsonBindingImplicits
-    extends BindingImplicits with JsonImplicitConversions {
+    extends BindingImplicits
+    with JsonImplicitConversions {
 
   implicit def jsonToDateTime(implicit df: DateParser = JodaDateFormats.Web)
     : TypeConverter[JValue, DateTime] =
@@ -22,7 +23,8 @@ trait JsonBindingImplicits
 }
 
 trait JsonTypeConverterFactory[T]
-    extends TypeConverterFactory[T] with JsonBindingImplicits {
+    extends TypeConverterFactory[T]
+    with JsonBindingImplicits {
   def resolveJson: TypeConverter[JValue, T]
 }
 

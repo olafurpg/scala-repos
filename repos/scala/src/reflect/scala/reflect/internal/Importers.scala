@@ -12,22 +12,22 @@ trait Importers { to: SymbolTable =>
   override def mkImporter(
       from0: api.Universe): Importer { val from: from0.type } =
     (if (to eq from0) {
-       new Importer {
-         val from = from0
-         val reverse = this.asInstanceOf[from.Importer { val from: to.type }]
-         def importSymbol(their: from.Symbol) = their.asInstanceOf[to.Symbol]
-         def importType(their: from.Type) = their.asInstanceOf[to.Type]
-         def importTree(their: from.Tree) = their.asInstanceOf[to.Tree]
-         def importPosition(their: from.Position) =
-           their.asInstanceOf[to.Position]
-       }
-     } else {
-       // todo. fix this loophole
-       assert(
-           from0.isInstanceOf[SymbolTable],
-           "`from` should be an instance of scala.reflect.internal.SymbolTable")
-       new StandardImporter { val from = from0.asInstanceOf[SymbolTable] }
-     }).asInstanceOf[Importer { val from: from0.type }]
+      new Importer {
+        val from = from0
+        val reverse = this.asInstanceOf[from.Importer { val from: to.type }]
+        def importSymbol(their: from.Symbol) = their.asInstanceOf[to.Symbol]
+        def importType(their: from.Type) = their.asInstanceOf[to.Type]
+        def importTree(their: from.Tree) = their.asInstanceOf[to.Tree]
+        def importPosition(their: from.Position) =
+          their.asInstanceOf[to.Position]
+      }
+    } else {
+      // todo. fix this loophole
+      assert(
+        from0.isInstanceOf[SymbolTable],
+        "`from` should be an instance of scala.reflect.internal.SymbolTable")
+      new StandardImporter { val from = from0.asInstanceOf[SymbolTable] }
+    }).asInstanceOf[Importer { val from: from0.type }]
 
   abstract class StandardImporter extends Importer {
 
@@ -51,7 +51,7 @@ trait Importers { to: SymbolTable =>
       if (pendingSyms == 0 && pendingTpes == 0) {
         val fixups = this.fixups.toList
         this.fixups.clear()
-        fixups foreach { _ () }
+        fixups foreach { _() }
       }
     }
 
@@ -59,10 +59,12 @@ trait Importers { to: SymbolTable =>
       val from: to.type = to
       // FIXME this and reverse should be constantly kept in sync
       // not just synced once upon the first usage of reverse
-      for ((theirsym, WeakReference(mysym)) <- StandardImporter.this.symMap) symMap +=
-      ((mysym, WeakReference(theirsym)))
-      for ((theirtpe, WeakReference(mytpe)) <- StandardImporter.this.tpeMap) tpeMap +=
-      ((mytpe, WeakReference(theirtpe)))
+      for ((theirsym, WeakReference(mysym)) <- StandardImporter.this.symMap)
+        symMap +=
+          ((mysym, WeakReference(theirsym)))
+      for ((theirtpe, WeakReference(mytpe)) <- StandardImporter.this.tpeMap)
+        tpeMap +=
+          ((mytpe, WeakReference(theirtpe)))
     }
 
     // ============== SYMBOLS ==============
@@ -112,9 +114,9 @@ trait Importers { to: SymbolTable =>
                          importSymbol)
         case their: from.ModuleSymbol =>
           val ret = linkReferenced(
-              myowner.newModuleSymbol(myname.toTermName, mypos, myflags),
-              their,
-              importSymbol)
+            myowner.newModuleSymbol(myname.toTermName, mypos, myflags),
+            their,
+            importSymbol)
           ret.associatedFile = their.associatedFile
           ret
         case their: from.FreeTermSymbol =>
@@ -134,8 +136,8 @@ trait Importers { to: SymbolTable =>
             case theirloc: from.Tree => importTree(theirloc)
             case theirloc: from.Symbol => importSymbol(theirloc)
           }
-          myowner.newTypeSkolemSymbol(
-              myname.toTypeName, origin, mypos, myflags)
+          myowner
+            .newTypeSkolemSymbol(myname.toTypeName, origin, mypos, myflags)
         case their: from.ModuleClassSymbol =>
           val my = myowner.newModuleClass(myname.toTypeName, mypos, myflags)
           symMap.weakUpdate(their, my)
@@ -178,7 +180,8 @@ trait Importers { to: SymbolTable =>
 
           var theirscope =
             if (their.owner.isClass && !their.owner.isRefinementClass)
-              their.owner.info else from.NoType
+              their.owner.info
+            else from.NoType
           val theirexisting =
             if (isModuleClass) theirscope.decl(their.name).moduleClass
             else theirscope.decl(their.name)
@@ -188,15 +191,16 @@ trait Importers { to: SymbolTable =>
           val myowner = importSymbol(their.owner)
           val myscope =
             if (theirscope != from.NoType && !(myowner hasFlag Flags.LOCKED))
-              myowner.info else NoType
+              myowner.info
+            else NoType
           val myexisting = {
             if (isModuleClass) importSymbol(their.sourceModule).moduleClass
             else if (isTparam)
               (if (myowner hasFlag Flags.LOCKED) NoSymbol
-               else myowner.typeParams(their.paramPos))
+              else myowner.typeParams(their.paramPos))
             else if (isOverloaded)
-              myowner.newOverloaded(
-                  myowner.thisType, their.alternatives map importSymbol)
+              myowner.newOverloaded(myowner.thisType,
+                                    their.alternatives map importSymbol)
             else {
               def disambiguate(my: Symbol) = {
                 val result =
@@ -207,8 +211,8 @@ trait Importers { to: SymbolTable =>
                     my filter (!_.isMethod)
                   }
                 assert(
-                    !result.isOverloaded,
-                    "import failure: cannot determine unique overloaded method alternative from\n " +
+                  !result.isOverloaded,
+                  "import failure: cannot determine unique overloaded method alternative from\n " +
                     (result.alternatives map (_.defString) mkString "\n") +
                     "\n that matches " + their + ":" + their.tpe)
                 result
@@ -276,8 +280,8 @@ trait Importers { to: SymbolTable =>
         val myclazz = importSymbol(clazz)
         val myscope =
           if (myclazz.isPackageClass) newPackageScope(myclazz) else newScope
-        val myclazzTpe = ClassInfoType(
-            parents map importType, myscope, myclazz)
+        val myclazzTpe =
+          ClassInfoType(parents map importType, myscope, myclazz)
         myclazz setInfo GenPolyType(myclazz.typeParams, myclazzTpe) // needed so that newly created symbols find their scope
         decls foreach importSymbol // will enter itself into myclazz
         myclazzTpe
@@ -387,8 +391,9 @@ trait Importers { to: SymbolTable =>
       case from.Import(expr, selectors) =>
         new Import(importTree(expr), selectors map importImportSelector)
       case from.Template(parents, self, body) =>
-        new Template(
-            parents map importTree, importValDef(self), body map importTree)
+        new Template(parents map importTree,
+                     importValDef(self),
+                     body map importTree)
       case from.Block(stats, expr) =>
         new Block(stats map importTree, importTree(expr))
       case from.CaseDef(pat, guard, body) =>
@@ -447,8 +452,9 @@ trait Importers { to: SymbolTable =>
       case from.Ident(name) =>
         new Ident(importName(name))
       case from.ReferenceToBoxed(ident) =>
-        new ReferenceToBoxed(
-            importTree(ident) match { case ident: Ident => ident })
+        new ReferenceToBoxed(importTree(ident) match {
+          case ident: Ident => ident
+        })
       case from.Literal(constant @ from.Constant(_)) =>
         new Literal(importConstant(constant))
       case theirtt @ from.TypeTree() =>
@@ -469,8 +475,8 @@ trait Importers { to: SymbolTable =>
       case from.TypeBoundsTree(lo, hi) =>
         new TypeBoundsTree(importTree(lo), importTree(hi))
       case from.ExistentialTypeTree(tpt, whereClauses) =>
-        new ExistentialTypeTree(
-            importTree(tpt), whereClauses map importMemberDef)
+        new ExistentialTypeTree(importTree(tpt),
+                                whereClauses map importMemberDef)
       case from.EmptyTree =>
         EmptyTree
       case null =>
@@ -545,10 +551,10 @@ trait Importers { to: SymbolTable =>
 
     def importImportSelector(sel: from.ImportSelector): ImportSelector =
       new ImportSelector(
-          importName(sel.name),
-          sel.namePos,
-          if (sel.rename != null) importName(sel.rename) else null,
-          sel.renamePos)
+        importName(sel.name),
+        sel.namePos,
+        if (sel.rename != null) importName(sel.rename) else null,
+        sel.renamePos)
     def importValDef(tree: from.ValDef): ValDef =
       importTree(tree).asInstanceOf[ValDef]
     def importTypeDef(tree: from.TypeDef): TypeDef =
@@ -564,8 +570,7 @@ trait Importers { to: SymbolTable =>
     def importCaseDef(tree: from.CaseDef): CaseDef =
       importTree(tree).asInstanceOf[CaseDef]
     def importConstant(constant: from.Constant): Constant =
-      new Constant(
-          constant.tag match {
+      new Constant(constant.tag match {
         case ClazzTag => importType(constant.value.asInstanceOf[from.Type])
         case EnumTag => importSymbol(constant.value.asInstanceOf[from.Symbol])
         case _ => constant.value

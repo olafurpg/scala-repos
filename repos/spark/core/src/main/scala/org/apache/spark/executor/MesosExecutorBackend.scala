@@ -21,7 +21,11 @@ import java.nio.ByteBuffer
 
 import scala.collection.JavaConverters._
 
-import org.apache.mesos.{Executor => MesosExecutor, ExecutorDriver, MesosExecutorDriver}
+import org.apache.mesos.{
+  Executor => MesosExecutor,
+  ExecutorDriver,
+  MesosExecutorDriver
+}
 import org.apache.mesos.Protos.{TaskStatus => MesosTaskStatus, _}
 import org.apache.mesos.protobuf.ByteString
 
@@ -33,7 +37,9 @@ import org.apache.spark.scheduler.cluster.mesos.MesosTaskLaunchData
 import org.apache.spark.util.Utils
 
 private[spark] class MesosExecutorBackend
-    extends MesosExecutor with ExecutorBackend with Logging {
+    extends MesosExecutor
+    with ExecutorBackend
+    with Logging {
 
   var executor: Executor = null
   var driver: ExecutorDriver = null
@@ -41,12 +47,12 @@ private[spark] class MesosExecutorBackend
   override def statusUpdate(taskId: Long, state: TaskState, data: ByteBuffer) {
     val mesosTaskId = TaskID.newBuilder().setValue(taskId.toString).build()
     driver.sendStatusUpdate(
-        MesosTaskStatus
-          .newBuilder()
-          .setTaskId(mesosTaskId)
-          .setState(TaskState.toMesos(state))
-          .setData(ByteString.copyFrom(data))
-          .build())
+      MesosTaskStatus
+        .newBuilder()
+        .setTaskId(mesosTaskId)
+        .setState(TaskState.toMesos(state))
+        .setData(ByteString.copyFrom(data))
+        .build())
   }
 
   override def registered(driver: ExecutorDriver,
@@ -62,7 +68,7 @@ private[spark] class MesosExecutorBackend
     val executorId = executorInfo.getExecutorId.getValue
 
     logInfo(
-        s"Registered with Mesos as executor ID $executorId with $cpusPerTask cpus")
+      s"Registered with Mesos as executor ID $executorId with $cpusPerTask cpus")
     this.driver = driver
     // Set a context class loader to be picked up by the serializer. Without this call
     // the serializer would default to the null class loader, and fail to find Spark classes
@@ -71,8 +77,8 @@ private[spark] class MesosExecutorBackend
 
     val properties =
       Utils.deserialize[Array[(String, String)]](
-          executorInfo.getData.toByteArray) ++ Seq[(String, String)](
-          ("spark.app.id", frameworkInfo.getId.getValue))
+        executorInfo.getData.toByteArray) ++ Seq[(String, String)](
+        ("spark.app.id", frameworkInfo.getId.getValue))
     val conf = new SparkConf(loadDefaults = true).setAll(properties)
     val port = conf.getInt("spark.executor.port", 0)
     val env = SparkEnv.createExecutorEnv(conf,

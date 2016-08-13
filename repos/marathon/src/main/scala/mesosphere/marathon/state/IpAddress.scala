@@ -27,13 +27,14 @@ object IpAddress {
 
   def fromProto(proto: Protos.IpAddress): IpAddress = {
     IpAddress(
-        groups = proto.getGroupsList.asScala.toIndexedSeq,
-        labels = proto.getLabelsList.asScala.map { p =>
-          p.getKey -> p.getValue
-        }.toMap,
-        discoveryInfo = if (proto.hasDiscoveryInfo)
-            DiscoveryInfo.fromProto(proto.getDiscoveryInfo)
-          else DiscoveryInfo.empty
+      groups = proto.getGroupsList.asScala.toIndexedSeq,
+      labels = proto.getLabelsList.asScala.map { p =>
+        p.getKey -> p.getValue
+      }.toMap,
+      discoveryInfo =
+        if (proto.hasDiscoveryInfo)
+          DiscoveryInfo.fromProto(proto.getDiscoveryInfo)
+        else DiscoveryInfo.empty
     )
   }
 }

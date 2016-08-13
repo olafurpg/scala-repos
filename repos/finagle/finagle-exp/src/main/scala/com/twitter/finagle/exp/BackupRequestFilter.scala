@@ -79,14 +79,14 @@ object BackupRequestFilter {
   * onto a different endpoint from the original. Eventually, this
   * should be implemented as a sort of queueing policy.
   */
-class BackupRequestFilter[Req, Rep] private[exp](quantile: Int,
-                                                 clipDuration: Duration,
-                                                 timer: Timer,
-                                                 statsReceiver: StatsReceiver,
-                                                 history: Duration,
-                                                 nowMs: () => Long,
-                                                 recalculateWindow: Int,
-                                                 quantileError: Double)
+class BackupRequestFilter[Req, Rep] private[exp] (quantile: Int,
+                                                  clipDuration: Duration,
+                                                  timer: Timer,
+                                                  statsReceiver: StatsReceiver,
+                                                  history: Duration,
+                                                  nowMs: () => Long,
+                                                  recalculateWindow: Int,
+                                                  quantileError: Double)
     extends SimpleFilter[Req, Rep] {
 
   def this(
@@ -96,14 +96,14 @@ class BackupRequestFilter[Req, Rep] private[exp](quantile: Int,
       statsReceiver: StatsReceiver,
       history: Duration
   ) = this(
-      quantile,
-      clipDuration,
-      timer,
-      statsReceiver,
-      history,
-      BackupRequestFilter.DefaultNowMs,
-      BackupRequestFilter.DefaultRecalcWindow,
-      BackupRequestFilter.defaultError(clipDuration)
+    quantile,
+    clipDuration,
+    timer,
+    statsReceiver,
+    history,
+    BackupRequestFilter.DefaultNowMs,
+    BackupRequestFilter.DefaultRecalcWindow,
+    BackupRequestFilter.defaultError(clipDuration)
   )
 
   require(quantile > 0 && quantile < 100)
@@ -111,11 +111,11 @@ class BackupRequestFilter[Req, Rep] private[exp](quantile: Int,
   require(recalculateWindow >= 1)
 
   private[this] val histo = new LatencyHistogram(
-      clipDuration.inMilliseconds,
-      quantileError,
-      history.inMilliseconds,
-      LatencyHistogram.DefaultSlices,
-      nowMs)
+    clipDuration.inMilliseconds,
+    quantileError,
+    history.inMilliseconds,
+    LatencyHistogram.DefaultSlices,
+    nowMs)
 
   @volatile
   private[this] var cachedCutoffMs = 0L
@@ -142,8 +142,8 @@ class BackupRequestFilter[Req, Rep] private[exp](quantile: Int,
     cachedCutoffMs
   }
 
-  private[this] def record(
-      f: Future[Rep], successCounter: Counter): Future[Rep] = {
+  private[this] def record(f: Future[Rep],
+                           successCounter: Counter): Future[Rep] = {
     val start = nowMs()
     f.onSuccess { _ =>
       successCounter.incr()

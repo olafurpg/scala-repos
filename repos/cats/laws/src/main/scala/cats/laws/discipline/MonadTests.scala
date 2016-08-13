@@ -10,7 +10,7 @@ import Prop._
 trait MonadTests[F[_]] extends ApplicativeTests[F] with FlatMapTests[F] {
   def laws: MonadLaws[F]
 
-  def monad[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def monad[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],
@@ -26,9 +26,9 @@ trait MonadTests[F[_]] extends ApplicativeTests[F] with FlatMapTests[F] {
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(applicative[A, B, C], flatMap[A, B, C])
       def props: Seq[(String, Prop)] = Seq(
-          "monad left identity" -> forAll(laws.monadLeftIdentity[A, B] _),
-          "monad right identity" -> forAll(laws.monadRightIdentity[A] _),
-          "map flatMap coherence" -> forAll(laws.mapFlatMapCoherence[A, B] _)
+        "monad left identity" -> forAll(laws.monadLeftIdentity[A, B] _),
+        "monad right identity" -> forAll(laws.monadRightIdentity[A] _),
+        "map flatMap coherence" -> forAll(laws.mapFlatMapCoherence[A, B] _)
       )
     }
   }

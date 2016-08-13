@@ -22,7 +22,7 @@ trait CollectionsSynchronizedListTest extends CollectionsOnListTest {
       override def implementationName: String =
         s"synchronizedList(${originalFactory.implementationName})"
 
-      override def empty[E : ClassTag]: ju.List[E] =
+      override def empty[E: ClassTag]: ju.List[E] =
         ju.Collections.synchronizedList(originalFactory.empty[E])
 
       override def allowsMutationThroughIterator: Boolean =

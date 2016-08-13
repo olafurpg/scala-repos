@@ -27,20 +27,20 @@ class CreateResultSetMapping extends Phase {
         (tpe match {
           case CollectionType(cons, el) =>
             ResultSetMapping(
-                gen,
-                collectionCast(ch, cons).infer(),
-                createResult(
-                    Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
-                    el,
-                    syms))
+              gen,
+              collectionCast(ch, cons).infer(),
+              createResult(
+                Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
+                el,
+                syms))
           case t =>
             ResultSetMapping(
-                gen,
-                ch,
-                createResult(
-                    Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
-                    t,
-                    syms))
+              gen,
+              ch,
+              createResult(
+                Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
+                t,
+                syms))
         })
       }
       .infer()
@@ -97,7 +97,7 @@ class RemoveMappedTypes extends Phase {
           .map(_.typeMapping)
           .getOrElse(true))
       state.withNode(removeTypeMapping(state.tree)) +
-      (this -> state.tree.nodeType)
+        (this -> state.tree.nodeType)
     else state + (this -> state.tree.nodeType)
 
   /** Remove TypeMapping nodes and MappedTypes */

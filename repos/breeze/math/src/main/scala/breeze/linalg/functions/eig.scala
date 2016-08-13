@@ -138,16 +138,17 @@ object eigSym extends UFunc {
     val work = Array.ofDim[Double](lwork)
     val info = new intW(0)
     lapack.dsyev(
-        if (rightEigenvectors)
-          "V" else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
-        "L" /* lower triangular */,
-        N /* number of rows */,
-        A.data,
-        scala.math.max(1, N) /* LDA */,
-        evs.data,
-        work /* workspace */,
-        lwork /* workspace size */,
-        info
+      if (rightEigenvectors)
+        "V"
+      else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
+      "L" /* lower triangular */,
+      N /* number of rows */,
+      A.data,
+      scala.math.max(1, N) /* LDA */,
+      evs.data,
+      work /* workspace */,
+      lwork /* workspace size */,
+      info
     )
     // A value of info.`val` < 0 would tell us that the i-th argument
     // of the call to dsyev was erroneous (where i == |info.`val`|).

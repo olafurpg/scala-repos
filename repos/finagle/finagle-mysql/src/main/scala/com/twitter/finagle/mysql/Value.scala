@@ -37,8 +37,7 @@ case class RawValue(
     charset: Short,
     isBinary: Boolean,
     bytes: Array[Byte]
-)
-    extends Value
+) extends Value
 
 /**
   * A type class used for injecting values of a domain type `A` into
@@ -65,9 +64,10 @@ private[mysql] trait Extractable[A] {
   * @param extractionTimeZone The timezone in which TIMESTAMP and DATETIME
   * rows are extracted from database rows into [[java.sql.Timestamp Timestamps]].
   */
-class TimestampValue(
-    val injectionTimeZone: TimeZone, val extractionTimeZone: TimeZone)
-    extends Injectable[Timestamp] with Extractable[Timestamp] {
+class TimestampValue(val injectionTimeZone: TimeZone,
+                     val extractionTimeZone: TimeZone)
+    extends Injectable[Timestamp]
+    with Extractable[Timestamp] {
 
   /**
     * Injects a [[java.sql.Timestamp]] into a
@@ -178,8 +178,8 @@ class TimestampValue(
     * MySQL binary protocol.
     * @param timeZone The timezone in which to interpret the timestamp.
     */
-  private[this] def fromBytes(
-      bytes: Array[Byte], timeZone: TimeZone): Timestamp = {
+  private[this] def fromBytes(bytes: Array[Byte],
+                              timeZone: TimeZone): Timestamp = {
     if (bytes.isEmpty) {
       return Zero
     }
@@ -224,29 +224,29 @@ class TimestampValue(
   * [[com.twitter.finagle.exp.mysql.TimestampValue]].
   */
 @deprecated(
-    "Injects `java.sql.Timestamp`s in local time and extracts them in UTC." +
+  "Injects `java.sql.Timestamp`s in local time and extracts them in UTC." +
     "To use a different time zone, create an instance of " +
     "TimestampValue(InjectionTimeZone, ExtractionTimeZone)",
-    "6.20.2")
+  "6.20.2")
 object TimestampValue
     extends TimestampValue(
-        TimeZone.getDefault(),
-        TimeZone.getTimeZone("UTC")
+      TimeZone.getDefault(),
+      TimeZone.getTimeZone("UTC")
     ) {
   private[this] val log = Logger.getLogger("finagle-mysql")
 
   override def apply(ts: Timestamp): Value = {
     log.warning(
-        "Injecting timezone-less `java.sql.Timestamp` with a hardcoded local timezone (%s)"
-          .format(injectionTimeZone.getID)
+      "Injecting timezone-less `java.sql.Timestamp` with a hardcoded local timezone (%s)"
+        .format(injectionTimeZone.getID)
     )
     super.apply(ts)
   }
 
   override def unapply(v: Value): Option[Timestamp] = {
     log.warning(
-        "Extracting TIMESTAMP or DATETIME row as a `java.sql.Timestamp` with a hardcoded timezone (%s)"
-          .format(extractionTimeZone.getID)
+      "Extracting TIMESTAMP or DATETIME row as a `java.sql.Timestamp` with a hardcoded timezone (%s)"
+        .format(extractionTimeZone.getID)
     )
     super.unapply(v)
   }
@@ -323,7 +323,8 @@ object DateValue extends Injectable[Date] with Extractable[Date] {
 }
 
 object BigDecimalValue
-    extends Injectable[BigDecimal] with Extractable[BigDecimal] {
+    extends Injectable[BigDecimal]
+    with Extractable[BigDecimal] {
   def apply(b: BigDecimal): Value = {
     val str = b.toString.getBytes(Charset(Charset.Binary))
     RawValue(Type.NewDecimal, Charset.Binary, true, str)

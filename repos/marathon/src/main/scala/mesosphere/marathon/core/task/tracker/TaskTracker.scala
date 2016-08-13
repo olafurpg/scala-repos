@@ -89,7 +89,7 @@ object TaskTracker {
         copy(appTasksMap = appTasksMap - appId)
       } else {
         log.debug(
-            s"Updated app [$appId], currently ${updated.taskMap.size} tasks in total.")
+          s"Updated app [$appId], currently ${updated.taskMap.size} tasks in total.")
         copy(appTasksMap = appTasksMap + (appId -> updated))
       }
     }
@@ -101,20 +101,18 @@ object TaskTracker {
     def of(appTasks: collection.immutable.Map[PathId, TaskTracker.AppTasks])
       : TasksByApp = {
       new TasksByApp(
-          appTasks.withDefault(appId => TaskTracker.AppTasks(appId)))
+        appTasks.withDefault(appId => TaskTracker.AppTasks(appId)))
     }
 
     def of(apps: TaskTracker.AppTasks*): TasksByApp =
       of(Map(apps.map(app => app.appId -> app): _*))
 
     def forTasks(tasks: Task*): TasksByApp = of(
-        tasks
-          .groupBy(_.appId)
-          .map {
-            case (appId, appTasks) =>
-              appId -> AppTasks.forTasks(appId, appTasks)
-          }
-      )
+      tasks.groupBy(_.appId).map {
+        case (appId, appTasks) =>
+          appId -> AppTasks.forTasks(appId, appTasks)
+      }
+    )
 
     def empty: TasksByApp =
       of(collection.immutable.Map.empty[PathId, TaskTracker.AppTasks])
@@ -126,8 +124,8 @@ object TaskTracker {
     * @param appId   The id of the app.
     * @param taskStateMap The tasks of this app by task ID. FIXME: change keys to Task.TaskID
     */
-  case class AppTasks(
-      appId: PathId, taskStateMap: Map[Task.Id, Task] = Map.empty) {
+  case class AppTasks(appId: PathId,
+                      taskStateMap: Map[Task.Id, Task] = Map.empty) {
 
     def isEmpty: Boolean = taskMap.isEmpty
     def contains(taskId: Task.Id): Boolean = taskMap.contains(taskId)
@@ -148,7 +146,7 @@ object TaskTracker {
     def apply(appId: PathId, tasks: Iterable[MarathonTask]): AppTasks =
       AppTasks.forTasks(appId, tasks.map(TaskSerializer.fromProto(_)))
     def forTasks(appId: PathId, tasks: Iterable[Task]): AppTasks =
-      AppTasks(
-          appId, tasks.map(taskState => taskState.taskId -> taskState).toMap)
+      AppTasks(appId,
+               tasks.map(taskState => taskState.taskId -> taskState).toMap)
   }
 }

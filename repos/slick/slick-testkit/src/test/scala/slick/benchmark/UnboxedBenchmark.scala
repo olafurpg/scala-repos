@@ -29,8 +29,8 @@ object UnboxedBenchmark extends App {
 
   // Fast path
   val q2 = as.map(
-      a =>
-        a.proj <> (A.tupled, A.unapply) fastPath
+    a =>
+      a.proj <> (A.tupled, A.unapply) fastPath
         (new FastPath(_) {
           val (a, b, c, d) = (next[Int], next[Int], next[Int], next[Int])
           override def read(r: Reader) =
@@ -40,8 +40,8 @@ object UnboxedBenchmark extends App {
   // Allocation-free fast path
   val sharedA = new A(0, 0, 0, 0)
   val q3 = as.map(
-      a =>
-        a.proj <> (A.tupled, A.unapply) fastPath
+    a =>
+      a.proj <> (A.tupled, A.unapply) fastPath
         (new FastPath(_) {
           val (a, b, c, d) = (next[Int], next[Int], next[Int], next[Int])
           override def read(r: Reader) = {
@@ -63,15 +63,14 @@ object UnboxedBenchmark extends App {
     val ResultSetMapping(_, _, CompiledMapping(converter, _)) = rsm
     for (i <- 1 to 5) {
       val pr = createFakePR(
-          10000000,
-          converter
-            .asInstanceOf[ResultConverter[JdbcResultConverterDomain, _]])
+        10000000,
+        converter.asInstanceOf[ResultConverter[JdbcResultConverterDomain, _]])
       readPR(pr)
     }
   }
 
-  def createFakePR(
-      len: Long, converter: ResultConverter[JdbcResultConverterDomain, _])
+  def createFakePR(len: Long,
+                   converter: ResultConverter[JdbcResultConverterDomain, _])
     : PositionedResultIterator[Any] = {
     val fakeRS = new DelegateResultSet(null) {
       var count: Long = 0
@@ -102,7 +101,7 @@ object UnboxedBenchmark extends App {
     }
     val time = System.currentTimeMillis() - t0
     println(
-        "Read " + count + " rows in " + time + " ms. Last row was: " + lastRow)
+      "Read " + count + " rows in " + time + " ms. Last row was: " + lastRow)
     (count, lastRow)
   }
 }

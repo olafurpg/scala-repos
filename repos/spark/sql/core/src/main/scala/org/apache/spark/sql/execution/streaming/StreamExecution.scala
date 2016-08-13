@@ -42,7 +42,8 @@ class StreamExecution(val sqlContext: SQLContext,
                       override val name: String,
                       private[sql] val logicalPlan: LogicalPlan,
                       val sink: Sink)
-    extends ContinuousQuery with Logging {
+    extends ContinuousQuery
+    with Logging {
 
   /** An monitor used to wait/notify when batches complete. */
   private val awaitBatchLock = new Object
@@ -72,7 +73,7 @@ class StreamExecution(val sqlContext: SQLContext,
 
   /** The thread that runs the micro-batches of this stream. */
   private[sql] val microBatchThread = new Thread(
-      s"stream execution thread for $name") {
+    s"stream execution thread for $name") {
     override def run(): Unit = { runBatches() }
   }
 
@@ -101,7 +102,8 @@ class StreamExecution(val sqlContext: SQLContext,
   private[sql] def start(): Unit = {
     microBatchThread.setDaemon(true)
     microBatchThread.start()
-    startLatch.await() // Wait until thread started and QueryStart event has been posted
+    startLatch
+      .await() // Wait until thread started and QueryStart event has been posted
   }
 
   /**
@@ -134,10 +136,10 @@ class StreamExecution(val sqlContext: SQLContext,
       // interrupted by stop()
       case NonFatal(e) =>
         streamDeathCause = new ContinuousQueryException(
-            this,
-            s"Query $name terminated with exception: ${e.getMessage}",
-            e,
-            Some(streamProgress.toCompositeOffset(sources)))
+          this,
+          s"Query $name terminated with exception: ${e.getMessage}",
+          e,
+          Some(streamProgress.toCompositeOffset(sources)))
         logError(s"Query $name terminated with error", e)
     } finally {
       state = TERMINATED
@@ -168,7 +170,7 @@ class StreamExecution(val sqlContext: SQLContext,
       case None => // We are starting this stream for the first time.
       case _ =>
         throw new IllegalArgumentException(
-            "Expected composite offset from sink")
+          "Expected composite offset from sink")
     }
   }
 
@@ -281,7 +283,7 @@ class StreamExecution(val sqlContext: SQLContext,
   override def awaitTermination(): Unit = {
     if (state == INITIALIZED) {
       throw new IllegalStateException(
-          "Cannot wait for termination on a query that has not started")
+        "Cannot wait for termination on a query that has not started")
     }
     terminationLatch.await()
     if (streamDeathCause != null) {
@@ -292,7 +294,7 @@ class StreamExecution(val sqlContext: SQLContext,
   override def awaitTermination(timeoutMs: Long): Boolean = {
     if (state == INITIALIZED) {
       throw new IllegalStateException(
-          "Cannot wait for termination on a query that has not started")
+        "Cannot wait for termination on a query that has not started")
     }
     require(timeoutMs > 0, "Timeout has to be positive")
     terminationLatch.await(timeoutMs, TimeUnit.MILLISECONDS)

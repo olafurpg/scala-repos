@@ -8,8 +8,9 @@ import ir._
 
 import internal._
 
-class RuntimeTypeInfo(
-    classLoader: ClassLoader, clazz: Class[_], share: refs.Share) {
+class RuntimeTypeInfo(classLoader: ClassLoader,
+                      clazz: Class[_],
+                      share: refs.Share) {
   import ru._
   import definitions._
 
@@ -25,8 +26,8 @@ class RuntimeTypeInfo(
       if (clazz != null) clazz.getComponentType() else null
 
     if (elemClass != null) // assume it's an array
-      appliedType(
-          ArrayClass.toType, List(mirror.classSymbol(elemClass).asType.toType))
+      appliedType(ArrayClass.toType,
+                  List(mirror.classSymbol(elemClass).asType.toType))
     else sym.asType.toType
   }
   // debug(s"tpe: ${tpe.key}")
@@ -49,9 +50,9 @@ class RuntimeTypeInfo(
 }
 
 // Note: This entire class must be constructed inside of a GRL-locked method.
-class RuntimePickler(
-    classLoader: ClassLoader, clazz: Class[_], fastTag: FastTypeTag[_])(
-    implicit share: refs.Share)
+class RuntimePickler(classLoader: ClassLoader,
+                     clazz: Class[_],
+                     fastTag: FastTypeTag[_])(implicit share: refs.Share)
     extends RuntimeTypeInfo(classLoader, clazz, share) {
   import ru._
 
@@ -88,12 +89,9 @@ class RuntimePickler(
         .asInstanceOf[Pickler[Any]]
       //debug(s"looked up field pickler: $fldPickler")
 
-      builder.putField(
-          fir.name,
-          b =>
-            {
-              pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
-          })
+      builder.putField(fir.name, b => {
+        pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
+      })
     }
 
     def pickleLogic(fieldClass: Class[_],
@@ -147,8 +145,9 @@ class RuntimePickler(
   sealed class PrivateJavaFieldLogic(fir: irs.FieldIR, field: Field)
       extends Logic(fir, false) {
     // debug(s"creating PrivateJavaFieldLogic for ${fir.name}")
-    override def run(
-        builder: PBuilder, picklee: Any, im: ru.InstanceMirror): Unit = {
+    override def run(builder: PBuilder,
+                     picklee: Any,
+                     im: ru.InstanceMirror): Unit = {
       field.setAccessible(true)
       val fldValue = field.get(picklee)
       val fldClass = if (fldValue != null) fldValue.getClass else null
@@ -169,12 +168,9 @@ class RuntimePickler(
         .asInstanceOf[Pickler[Any]]
       // debug(s"looked up field pickler: $fldPickler")
 
-      builder.putField(
-          field.getName,
-          b =>
-            {
-              pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
-          })
+      builder.putField(field.getName, b => {
+        pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
+      })
     }
 
     def pickleLogic(fldClass: Class[_],
@@ -186,8 +182,8 @@ class RuntimePickler(
     }
   }
 
-  final class PrivateEffectivelyFinalJavaFieldLogic(
-      fir: irs.FieldIR, field: Field)
+  final class PrivateEffectivelyFinalJavaFieldLogic(fir: irs.FieldIR,
+                                                    field: Field)
       extends PrivateJavaFieldLogic(fir, field) {
     // debug(s"creating PrivateEffectivelyFinalJavaFieldLogic for ${fir.name}")
     override def pickleLogic(fldClass: Class[_],
@@ -225,19 +221,19 @@ class RuntimePickler(
       val fields: List[Logic] = cir.fields.flatMap { fir =>
         if (fir.accessor.nonEmpty)
           List(
-              if (fir.tpe.typeSymbol.isEffectivelyFinal)
-                new EffectivelyFinalLogic(fir)
-              else if (fir.tpe.typeSymbol.asType.isAbstractType)
-                new AbstractLogic(fir)
-              else new DefaultLogic(fir)
+            if (fir.tpe.typeSymbol.isEffectivelyFinal)
+              new EffectivelyFinalLogic(fir)
+            else if (fir.tpe.typeSymbol.asType.isAbstractType)
+              new AbstractLogic(fir)
+            else new DefaultLogic(fir)
           )
         else
           try {
             val javaField = clazz.getDeclaredField(fir.name)
             List(
-                if (fir.tpe.typeSymbol.isEffectivelyFinal)
-                  new PrivateEffectivelyFinalJavaFieldLogic(fir, javaField)
-                else new PrivateJavaFieldLogic(fir, javaField)
+              if (fir.tpe.typeSymbol.isEffectivelyFinal)
+                new PrivateEffectivelyFinalJavaFieldLogic(fir, javaField)
+              else new PrivateJavaFieldLogic(fir, javaField)
             )
           } catch {
             case e: java.lang.NoSuchFieldException => List()

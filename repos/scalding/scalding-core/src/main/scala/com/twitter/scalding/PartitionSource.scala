@@ -29,7 +29,8 @@ import cascading.tuple.Fields
   * This is a base class for partition-based output sources
   */
 abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
-    extends SchemedSource with HfsTapProvider {
+    extends SchemedSource
+    with HfsTapProvider {
 
   // The root path of the partitioned output.
   def basePath: String
@@ -49,29 +50,30 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
     readOrWrite match {
       case Read =>
         throw new InvalidSourceException(
-            "Using PartitionSource for input not yet implemented")
+          "Using PartitionSource for input not yet implemented")
       case Write => {
-          mode match {
-            case Local(_) => {
-                val localTap = new FileTap(localScheme, basePath, sinkMode)
-                openWritesThreshold match {
-                  case Some(threshold) =>
-                    new LPartitionTap(localTap, partition, threshold)
-                  case None => new LPartitionTap(localTap, partition)
-                }
-              }
-            case hdfsMode @ Hdfs(_, _) => {
-                val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case hdfsTest @ HadoopTest(_, _) => {
-                val hfsTap = createHfsTap(
-                    hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
+        mode match {
+          case Local(_) => {
+            val localTap = new FileTap(localScheme, basePath, sinkMode)
+            openWritesThreshold match {
+              case Some(threshold) =>
+                new LPartitionTap(localTap, partition, threshold)
+              case None => new LPartitionTap(localTap, partition)
+            }
           }
+          case hdfsMode @ Hdfs(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case hdfsTest @ HadoopTest(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme,
+                                      hdfsTest.getWritePathFor(this),
+                                      sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
         }
+      }
     }
   }
 
@@ -83,7 +85,7 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
   override def validateTaps(mode: Mode): Unit = {
     if (basePath == null) {
       throw new InvalidSourceException(
-          "basePath cannot be null for PartitionTap")
+        "basePath cannot be null for PartitionTap")
     }
   }
 
@@ -139,7 +141,8 @@ case class PartitionedTsv(override val basePath: String,
                           override val writeHeader: Boolean,
                           val tsvFields: Fields,
                           override val sinkMode: SinkMode)
-    extends PartitionSource with DelimitedScheme {
+    extends PartitionSource
+    with DelimitedScheme {
 
   override val fields = tsvFields
 }
@@ -180,7 +183,8 @@ case class PartitionedSequenceFile(override val basePath: String,
                                    override val partition: Partition,
                                    val sequenceFields: Fields,
                                    override val sinkMode: SinkMode)
-    extends PartitionSource with SequenceFileScheme {
+    extends PartitionSource
+    with SequenceFileScheme {
 
   override val fields = sequenceFields
 }

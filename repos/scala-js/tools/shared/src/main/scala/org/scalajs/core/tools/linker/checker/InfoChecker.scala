@@ -27,7 +27,8 @@ import org.scalajs.core.tools.logging._
 
 /** Checker for the validity of the IR. */
 private final class InfoChecker(
-    infoAndTrees: Traversable[(ClassInfo, ClassDef)], logger: Logger) {
+    infoAndTrees: Traversable[(ClassInfo, ClassDef)],
+    logger: Logger) {
 
   private var errorCount: Int = 0
 
@@ -84,8 +85,9 @@ private final class InfoChecker(
     }
   }
 
-  private def checkMethodInfo(
-      className: String, info: MethodInfo, expectedInfo: MethodInfo): Unit = {
+  private def checkMethodInfo(className: String,
+                              info: MethodInfo,
+                              expectedInfo: MethodInfo): Unit = {
 
     /* Note that it is fine for the actual info to contain *more* than the
      * expected info. It can produce non-optimal results, but it is still
@@ -119,13 +121,14 @@ private final class InfoChecker(
                      expectedInfo.methodsCalledStatically) ||
         !mapIncludes(info.staticMethodsCalled,
                      expectedInfo.staticMethodsCalled) || !listIncludes(
-            info.instantiatedClasses, expectedInfo.instantiatedClasses) ||
+          info.instantiatedClasses,
+          expectedInfo.instantiatedClasses) ||
         !listIncludes(info.accessedModules, expectedInfo.accessedModules) ||
         !listIncludes(info.usedInstanceTests, expectedInfo.usedInstanceTests) ||
         !listIncludes(info.accessedClassData, expectedInfo.accessedClassData)) {
       errorCount += 1
       logger.error(
-          s"Method info mismatch for $className.${expectedInfo.encodedName}" +
+        s"Method info mismatch for $className.${expectedInfo.encodedName}" +
           (if (expectedInfo.isStatic) " (static)" else ""))
       logger.error(s"Expected:\n${methodInfoString(expectedInfo)}")
       logger.error(s"Got:\n${methodInfoString(info)}")

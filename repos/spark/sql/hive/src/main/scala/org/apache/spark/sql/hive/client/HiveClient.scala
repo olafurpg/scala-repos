@@ -72,7 +72,7 @@ private[hive] trait HiveClient {
   /** Returns the specified table, or throws [[NoSuchTableException]]. */
   final def getTable(dbName: String, tableName: String): CatalogTable = {
     getTableOption(dbName, tableName).getOrElse(
-        throw new NoSuchTableException(dbName, tableName))
+      throw new NoSuchTableException(dbName, tableName))
   }
 
   /** Returns the metadata for the specified table or None if it doesn't exist. */
@@ -88,8 +88,9 @@ private[hive] trait HiveClient {
   def createTable(table: CatalogTable, ignoreIfExists: Boolean): Unit
 
   /** Drop the specified table. */
-  def dropTable(
-      dbName: String, tableName: String, ignoreIfNotExists: Boolean): Unit
+  def dropTable(dbName: String,
+                tableName: String,
+                ignoreIfNotExists: Boolean): Unit
 
   /** Alter a table whose name matches the one specified in `table`, assuming it exists. */
   final def alterTable(table: CatalogTable): Unit =
@@ -108,8 +109,9 @@ private[hive] trait HiveClient {
     * @param ignoreIfNotExists if true, do not throw error if the database does not exist
     * @param cascade whether to remove all associated objects such as tables and functions
     */
-  def dropDatabase(
-      name: String, ignoreIfNotExists: Boolean, cascade: Boolean): Unit
+  def dropDatabase(name: String,
+                   ignoreIfNotExists: Boolean,
+                   cascade: Boolean): Unit
 
   /**
     * Alter a database whose name matches the one specified in `database`, assuming it exists.
@@ -147,8 +149,9 @@ private[hive] trait HiveClient {
     * Alter one or more table partitions whose specs match the ones specified in `newParts`,
     * assuming the partitions exist.
     */
-  def alterPartitions(
-      db: String, table: String, newParts: Seq[CatalogTablePartition]): Unit
+  def alterPartitions(db: String,
+                      table: String,
+                      newParts: Seq[CatalogTablePartition]): Unit
 
   /** Returns the specified partition, or throws [[NoSuchPartitionException]]. */
   final def getPartition(
@@ -174,8 +177,8 @@ private[hive] trait HiveClient {
       spec: ExternalCatalog.TablePartitionSpec): Option[CatalogTablePartition]
 
   /** Returns all partitions for the given table. */
-  final def getAllPartitions(
-      db: String, table: String): Seq[CatalogTablePartition] = {
+  final def getAllPartitions(db: String,
+                             table: String): Seq[CatalogTablePartition] = {
     getAllPartitions(getTable(db, table))
   }
 
@@ -228,7 +231,7 @@ private[hive] trait HiveClient {
   /** Return an existing function in the database, assuming it exists. */
   final def getFunction(db: String, name: String): CatalogFunction = {
     getFunctionOption(db, name).getOrElse(
-        throw new NoSuchFunctionException(db, name))
+      throw new NoSuchFunctionException(db, name))
   }
 
   /** Return an existing function in the database, or None if it doesn't exist. */

@@ -3,7 +3,11 @@ package org.jetbrains.plugins.scala.codeInsight.template.macros
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.template.impl.TextExpression
-import com.intellij.codeInsight.template.{Result, Expression, ExpressionContext}
+import com.intellij.codeInsight.template.{
+  Result,
+  Expression,
+  ExpressionContext
+}
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
@@ -20,7 +24,7 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
 
   override def getPresentableName =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.array.variable")
+      "macro.array.variable")
 
   override def addLookupItems(exprs: Array[String],
                               context: ExpressionContext,
@@ -28,8 +32,12 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
                               scType: ScType,
                               project: Project,
                               array: ArrayBuffer[LookupElement]) =
-    super.addLookupItems(
-        Array("scala.Array"), context, variant, scType, project, array)
+    super.addLookupItems(Array("scala.Array"),
+                         context,
+                         variant,
+                         scType,
+                         project,
+                         array)
 
   override def getResult(exprs: Array[Expression],
                          context: ExpressionContext,

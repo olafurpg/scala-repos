@@ -445,11 +445,11 @@ abstract class ScalaPrimitives {
     if (alts.isEmpty) inform(s"Unknown primitive method $cls.$method")
     else
       alts foreach
-      (s =>
-            addPrimitive(s, s.info.paramTypes match {
-              case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
-              case _ => code
-            }))
+        (s =>
+           addPrimitive(s, s.info.paramTypes match {
+             case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
+             case _ => code
+           }))
   }
 
   def isCoercion(code: Int): Boolean = (code >= B2B) && (code <= D2D)
@@ -457,7 +457,7 @@ abstract class ScalaPrimitives {
   /** Check whether the given operation code is an array operation. */
   def isArrayOp(code: Int): Boolean =
     isArrayNew(code) | isArrayLength(code) | isArrayGet(code) | isArraySet(
-        code)
+      code)
 
   def isArrayNew(code: Int): Boolean = code match {
     case NEW_ZARRAY | NEW_BARRAY | NEW_SARRAY | NEW_CARRAY | NEW_IARRAY |
@@ -467,9 +467,9 @@ abstract class ScalaPrimitives {
   }
 
   def isArrayLength(code: Int): Boolean = code match {
-    case ZARRAY_LENGTH | BARRAY_LENGTH |
-        SARRAY_LENGTH | CARRAY_LENGTH | IARRAY_LENGTH | LARRAY_LENGTH |
-        FARRAY_LENGTH | DARRAY_LENGTH | OARRAY_LENGTH | LENGTH =>
+    case ZARRAY_LENGTH | BARRAY_LENGTH | SARRAY_LENGTH | CARRAY_LENGTH |
+        IARRAY_LENGTH | LARRAY_LENGTH | FARRAY_LENGTH | DARRAY_LENGTH |
+        OARRAY_LENGTH | LENGTH =>
       true
     case _ => false
   }
@@ -523,8 +523,8 @@ abstract class ScalaPrimitives {
 
   /** Return the code for the given symbol. */
   def getPrimitive(sym: Symbol): Int =
-    primitives.getOrElse(
-        sym, throw new AssertionError(s"Unknown primitive $sym"))
+    primitives
+      .getOrElse(sym, throw new AssertionError(s"Unknown primitive $sym"))
 
   /**
     * Return the primitive code of the given operation. If the
@@ -545,7 +545,8 @@ abstract class ScalaPrimitives {
         tpe :: tpe.parents collectFirst {
           case TypeRef(_, ArrayClass, elem :: Nil) => elem
         }
-      arrayParent getOrElse sys.error(fun.fullName + " : " +
+      arrayParent getOrElse sys.error(
+        fun.fullName + " : " +
           (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
     }
 

@@ -52,8 +52,7 @@ object SoftReferenceCache {
   def initialize = {
     // A daemon thread is more approapriate here then an Actor as
     // we'll do blocking reads from the reference queue
-    val thread = new Thread(
-        new Runnable() {
+    val thread = new Thread(new Runnable() {
       def run() {
         processQueue
       }
@@ -154,8 +153,8 @@ class SoftReferenceCache[K, V](cacheSize: Int) {
     lock(writeLock) {
       for (t <- tuple) yield {
         cache.put(
-            t._1,
-            new SoftValue(t._1, t._2, this, SoftReferenceCache.refQueue));
+          t._1,
+          new SoftValue(t._1, t._2, this, SoftReferenceCache.refQueue));
       }
     }
     this

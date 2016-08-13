@@ -69,17 +69,16 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
     JobTest(new TypedWriteIncrementalJob(_))
       .source(TypedTsv[Int]("input"), input)
       .sink[(Int, Int)](
-          VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
+        VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
         outputBuffer: Buffer[(Int, Int)] =>
           "Outputs must be as expected" in {
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
-            assert(input.map { k =>
-              (k, k)
-            }.sortBy(_._1).toString === outputBuffer
-                  .sortBy(_._1)
-                  .toList
-                  .toString)
+            assert(
+              input.map { k =>
+                (k, k)
+              }.sortBy(_._1)
+                .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run
@@ -90,17 +89,16 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
     JobTest(new MoreComplexTypedWriteIncrementalJob(_))
       .source(TypedTsv[Int]("input"), input)
       .sink[(Int, Int)](
-          VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
+        VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
         outputBuffer: Buffer[(Int, Int)] =>
           "Outputs must be as expected" in {
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
-            assert(input.map { k =>
-              (k, k)
-            }.sortBy(_._1).toString === outputBuffer
-                  .sortBy(_._1)
-                  .toList
-                  .toString)
+            assert(
+              input.map { k =>
+                (k, k)
+              }.sortBy(_._1)
+                .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run
@@ -129,7 +127,8 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
         the[InvalidSourceException] thrownBy {
           validateVersion(path, Some(103))
         }
-      assert(thrown.getMessage === "Version 103 does not exist. " +
+      assert(
+        thrown.getMessage === "Version 103 does not exist. " +
           "Currently available versions are: [102, 101, 100]")
 
       // should not throw

@@ -65,14 +65,14 @@ object PublishDateExtractor extends Logging {
 
     try {
       Option(
-          datatypeFactory
-            .newXMLGregorianCalendar(txt)
-            .toGregorianCalendar
-            .getTime)
+        datatypeFactory
+          .newXMLGregorianCalendar(txt)
+          .toGregorianCalendar
+          .getTime)
     } catch {
       case ex: Exception =>
         info(
-            s"`$txt` could not be parsed to date as it did not meet the ISO 8601 spec")
+          s"`$txt` could not be parsed to date as it did not meet the ISO 8601 spec")
         None
     }
   }

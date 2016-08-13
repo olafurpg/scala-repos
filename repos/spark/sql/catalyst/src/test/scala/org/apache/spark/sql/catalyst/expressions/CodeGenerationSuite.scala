@@ -39,7 +39,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
       Future {
         GeneratePredicate.generate(EqualTo(Literal(1), Literal(1)))
         GenerateMutableProjection.generate(
-            EqualTo(Literal(1), Literal(1)) :: Nil)
+          EqualTo(Literal(1), Literal(1)) :: Nil)
         GenerateOrdering.generate(Add(Literal(1), Literal(1)).asc :: Nil)
       }
     }
@@ -48,7 +48,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test(
-      "SPARK-8443: split wide projections into blocks due to JVM code size limit") {
+    "SPARK-8443: split wide projections into blocks due to JVM code size limit") {
     val length = 5000
     val expressions = List.fill(length)(EqualTo(Literal(1), Literal(1)))
     val plan = GenerateMutableProjection.generate(expressions)()
@@ -58,12 +58,12 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
 
     if (!checkResult(actual, expected)) {
       fail(
-          s"Incorrect Evaluation: expressions: $expressions, actual: $actual, expected: $expected")
+        s"Incorrect Evaluation: expressions: $expressions, actual: $actual, expected: $expected")
     }
   }
 
   test(
-      "SPARK-13242: case-when expression with large number of branches (or cases)") {
+    "SPARK-13242: case-when expression with large number of branches (or cases)") {
     val cases = 50
     val clauses = 20
 
@@ -71,16 +71,16 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
     def generateCase(n: Int): (Expression, Expression) = {
       val condition = (1 to clauses)
         .map(c =>
-              EqualTo(BoundReference(0, StringType, false), Literal(s"$c:$n")))
+          EqualTo(BoundReference(0, StringType, false), Literal(s"$c:$n")))
         .reduceLeft[Expression]((l, r) => Or(l, r))
-        (condition, Literal(n))
+      (condition, Literal(n))
     }
 
     val expression = CaseWhen((1 to cases).map(generateCase(_)))
 
     val plan = GenerateMutableProjection.generate(Seq(expression))()
     val input = new GenericMutableRow(
-        Array[Any](UTF8String.fromString(s"${clauses}:${cases}")))
+      Array[Any](UTF8String.fromString(s"${clauses}:${cases}")))
     val actual = plan(input).toSeq(Seq(expression.dataType))
 
     assert(actual(0) == cases)
@@ -88,30 +88,29 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("test generated safe and unsafe projection") {
     val schema = new StructType(
-        Array(
-            StructField("a", StringType, true),
-            StructField("b", IntegerType, true),
-            StructField("c",
-                        new StructType(Array(
-                                StructField("aa", StringType, true),
-                                StructField("bb",
-                                            IntegerType,
-                                            true)
-                            )),
-                        true),
-            StructField(
-                "d",
-                new StructType(
-                    Array(
+      Array(
+        StructField("a", StringType, true),
+        StructField("b", IntegerType, true),
+        StructField("c",
+                    new StructType(
+                      Array(
+                        StructField("aa", StringType, true),
+                        StructField("bb", IntegerType, true)
+                      )),
+                    true),
+        StructField("d",
+                    new StructType(
+                      Array(
                         StructField("a",
-                                    new StructType(Array(
-                                            StructField("b", StringType, true),
-                                            StructField("", IntegerType, true)
-                                        )),
+                                    new StructType(
+                                      Array(
+                                        StructField("b", StringType, true),
+                                        StructField("", IntegerType, true)
+                                      )),
                                     true)
-                    )),
-                true)
-        ))
+                      )),
+                    true)
+      ))
     val row = Row("a", 1, Row("b", 2), Row(Row("c", 3)))
     val lit = Literal.create(row, schema)
     val internalRow = lit.value.asInstanceOf[InternalRow]
@@ -121,12 +120,12 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
     assert(unsafeRow.getUTF8String(0) === UTF8String.fromString("a"))
     assert(unsafeRow.getInt(1) === 1)
     assert(
-        unsafeRow.getStruct(2, 2).getUTF8String(0) === UTF8String.fromString(
-            "b"))
+      unsafeRow.getStruct(2, 2).getUTF8String(0) === UTF8String.fromString(
+        "b"))
     assert(unsafeRow.getStruct(2, 2).getInt(1) === 2)
     assert(
-        unsafeRow.getStruct(3, 1).getStruct(0, 2).getUTF8String(0) === UTF8String
-          .fromString("c"))
+      unsafeRow.getStruct(3, 1).getStruct(0, 2).getUTF8String(0) === UTF8String
+        .fromString("c"))
     assert(unsafeRow.getStruct(3, 1).getStruct(0, 2).getInt(1) === 3)
 
     val fromUnsafe = FromUnsafeProjection(schema)

@@ -144,8 +144,12 @@ object InfoSerializers {
           methods0
         }
 
-      val info = ClassInfo(
-          encodedName, isExported, kind, superClass, interfaces, methods)
+      val info = ClassInfo(encodedName,
+                           isExported,
+                           kind,
+                           superClass,
+                           interfaces,
+                           methods)
 
       (version, info)
     }
@@ -163,9 +167,9 @@ object InfoSerializers {
       val supported = ScalaJSVersions.binarySupported
       if (!supported.contains(version)) {
         throw new IRVersionNotSupportedException(
-            version,
-            supported,
-            s"This version ($version) of Scala.js IR is not supported. " +
+          version,
+          supported,
+          s"This version ($version) of Scala.js IR is not supported. " +
             s"Supported versions are: ${supported.mkString(", ")}")
       }
 

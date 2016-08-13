@@ -29,8 +29,9 @@ import org.apache.spark.util.collection.ExternalSorter
 /**
   * A reference sort implementation used to compare against our normal sort.
   */
-case class ReferenceSort(
-    sortOrder: Seq[SortOrder], global: Boolean, child: SparkPlan)
+case class ReferenceSort(sortOrder: Seq[SortOrder],
+                         global: Boolean,
+                         child: SparkPlan)
     extends UnaryNode {
 
   override def requiredChildDistribution: Seq[Distribution] =
@@ -44,7 +45,8 @@ case class ReferenceSort(
         .mapPartitions({ iterator =>
           val ordering = newOrdering(sortOrder, child.output)
           val sorter = new ExternalSorter[InternalRow, Null, InternalRow](
-              TaskContext.get(), ordering = Some(ordering))
+            TaskContext.get(),
+            ordering = Some(ordering))
           sorter.insertAll(iterator.map(r => (r.copy(), null)))
           val baseIterator = sorter.iterator.map(_._1)
           val context = TaskContext.get()

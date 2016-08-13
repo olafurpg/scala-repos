@@ -68,9 +68,10 @@ object ClassHelpersSpec extends Specification {
 
   "The findClass function" should {
     "return a Full can with the found class when given a list of names and corresponding packages" in {
-      findClass(List(("wrong name", List("net.liftweb.util", "other.package")),
-                     ("ClassHelpers",
-                      List("net.liftweb.util", "other.package")))) must_==
+      findClass(
+        List(
+          ("wrong name", List("net.liftweb.util", "other.package")),
+          ("ClassHelpers", List("net.liftweb.util", "other.package")))) must_==
         Full(classOf[ClassHelpers])
     }
     "use a list of modifiers functions to try to modify the original name in order to find the class" in {
@@ -108,8 +109,8 @@ object ClassHelpersSpec extends Specification {
     }
     "return false if the list to match doesn't contain any class assignable by the tested class" in {
       containsClass(
-          classOf[String],
-          List(classOf[Float], classOf[java.lang.Integer])) must beFalse
+        classOf[String],
+        List(classOf[Float], classOf[java.lang.Integer])) must beFalse
     }
   }
 
@@ -135,7 +136,7 @@ object ClassHelpersSpec extends Specification {
     }
     "throw an exception when the method is not callable" in {
       invokeControllerMethod(classOf[String], "isNotEmpty") must throwA[
-          NoSuchMethodException]
+        NoSuchMethodException]
     }
     "throw an exception if the class is null" in {
       invokeControllerMethod(null, "length") must throwA[NullPointerException]
@@ -174,7 +175,7 @@ object ClassHelpersSpec extends Specification {
       class TestSnippet { def throwException = throw new SpecificException }
       val testSnippet = new TestSnippet
       invokeMethod(testSnippet.getClass, testSnippet, "throwException") must throwA[
-          SpecificException]
+        SpecificException]
     }
   }
 
@@ -213,8 +214,9 @@ object ClassHelpersSpec extends Specification {
     }
     "The invoker function will throw the cause exception if the method can't be called" in {
       (() =>
-        createInvoker("get", "").openOrThrowException("Test").apply)() must throwA[
-          Exception]
+         createInvoker("get", "")
+           .openOrThrowException("Test")
+           .apply)() must throwA[Exception]
     }
   }
 }

@@ -42,13 +42,12 @@ object Compiled {
 
   /** Create a new `Compiled` value for a raw value that is `Compilable`. */
   @inline
-  def apply[V, C <: Compiled[V]](raw: V)(
-      implicit compilable: Compilable[V, C], profile: BasicProfile): C =
+  def apply[V, C <: Compiled[V]](raw: V)(implicit compilable: Compilable[V, C],
+                                         profile: BasicProfile): C =
     compilable.compiled(raw, profile)
 }
 
-trait CompilersMixin {
-  this: Compiled[_] =>
+trait CompilersMixin { this: Compiled[_] =>
   def toNode: Node
   lazy val compiledQuery = profile.queryCompiler.run(toNode).tree
   lazy val compiledUpdate = profile.updateCompiler.run(toNode).tree
@@ -61,7 +60,8 @@ class CompiledFunction[F, PT, PU, R <: Rep[_], RU](
     val tuple: F => PT => R,
     val pshape: Shape[ColumnsShapeLevel, PU, PU, PT],
     val profile: BasicProfile)
-    extends Compiled[F] with CompilersMixin {
+    extends Compiled[F]
+    with CompilersMixin {
 
   /** Create an applied `Compiled` value for this compiled function. All applied
     * values share their compilation state with the original compiled function. */
@@ -100,22 +100,23 @@ class AppliedCompiledFunction[PU, R <: Rep[_], RU](
   def compiledInsert = function.compiledInsert
 }
 
-abstract class CompiledExecutable[R, RU](
-    val extract: R, val profile: BasicProfile)
-    extends RunnableCompiled[R, RU] with CompilersMixin {
+abstract class CompiledExecutable[R, RU](val extract: R,
+                                         val profile: BasicProfile)
+    extends RunnableCompiled[R, RU]
+    with CompilersMixin {
   def param = ()
   def toNode: Node
 }
 
-abstract class CompiledStreamingExecutable[R, RU, EU](
-    extract: R, profile: BasicProfile)
+abstract class CompiledStreamingExecutable[R, RU, EU](extract: R,
+                                                      profile: BasicProfile)
     extends CompiledExecutable[R, RU](extract, profile)
     with StreamableCompiled[R, RU, EU]
 
 /** Typeclass for types that can be executed as queries. This encompasses
   * collection-valued (`Query[_, _, _[_] ]`), scalar and record types. */
 @implicitNotFound(
-    "Computation of type ${T} cannot be executed (with result type ${TU})")
+  "Computation of type ${T} cannot be executed (with result type ${TU})")
 trait Executable[T, TU] {
   def toNode(value: T): Node
 }
@@ -123,11 +124,15 @@ trait Executable[T, TU] {
 object Executable {
   @inline implicit def queryIsExecutable[B, BU, C[_]] =
     StreamingExecutable[Query[B, BU, C], C[BU], BU]
-  @inline implicit def tableQueryIsExecutable[
-      B <: AbstractTable[_], BU, C[_]] =
+  @inline implicit def tableQueryIsExecutable[B <: AbstractTable[_], BU, C[_]] =
     StreamingExecutable[Query[B, BU, C] with TableQuery[B], C[BU], BU]
-  @inline implicit def baseJoinQueryIsExecutable[
-      B1, B2, BU1, BU2, C[_], Ba1, Ba2] =
+  @inline implicit def baseJoinQueryIsExecutable[B1,
+                                                 B2,
+                                                 BU1,
+                                                 BU2,
+                                                 C[_],
+                                                 Ba1,
+                                                 Ba2] =
     StreamingExecutable[BaseJoinQuery[B1, B2, BU1, BU2, C, Ba1, Ba2],
                         C[(BU1, BU2)],
                         (BU1, BU2)]
@@ -141,7 +146,7 @@ object Executable {
   * as a phantom type for computing the required types. The actual value is
   * always `null`. */
 @implicitNotFound(
-    "Computation of type ${T} cannot be executed (with sequence result type ${TU} and base result type ${EU})")
+  "Computation of type ${T} cannot be executed (with sequence result type ${TU} and base result type ${EU})")
 trait StreamingExecutable[T, TU, EU] extends Executable[T, TU]
 
 /** A prototype `StreamingExecutable` instance for `Rep` types. */
@@ -168,10 +173,10 @@ object Compilable extends CompilableFunctions {
     new Compilable[A => B, CompiledFunction[A => B, A, P, B, U]] {
       def compiled(raw: A => B, profile: BasicProfile) =
         new CompiledFunction[A => B, A, P, B, U](
-            raw,
-            identity[A => B],
-            pshape.asInstanceOf[Shape[ColumnsShapeLevel, P, P, A]],
-            profile)
+          raw,
+          identity[A => B],
+          pshape.asInstanceOf[Shape[ColumnsShapeLevel, P, P, A]],
+          profile)
     }
   implicit def streamingExecutableIsCompilable[T, U, EU](
       implicit e: StreamingExecutable[T, U, EU])
@@ -200,10 +205,10 @@ final class Parameters[PU, PP](pshape: Shape[ColumnsShapeLevel, PU, PU, _]) {
       implicit rexe: Executable[R, RU],
       profile: BasicProfile): CompiledFunction[PP => R, PP, PU, R, RU] =
     new CompiledFunction[PP => R, PP, PU, R, RU](
-        f,
-        identity[PP => R],
-        pshape.asInstanceOf[Shape[ColumnsShapeLevel, PU, PU, PP]],
-        profile)
+      f,
+      identity[PP => R],
+      pshape.asInstanceOf[Shape[ColumnsShapeLevel, PU, PU, PP]],
+      profile)
 
   @inline def withFilter(f: PP => Boolean): Parameters[PU, PP] = this
 }

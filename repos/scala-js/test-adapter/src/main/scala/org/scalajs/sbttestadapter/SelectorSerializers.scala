@@ -34,7 +34,7 @@ private[testadapter] object SelectorSerializers {
             .fld("testWildcard", sel.testWildcard)
         case _ =>
           throw new IllegalArgumentException(
-              s"Unknown Selector type: ${sel.getClass}")
+            s"Unknown Selector type: ${sel.getClass}")
       }
       bld.toJSON
     }

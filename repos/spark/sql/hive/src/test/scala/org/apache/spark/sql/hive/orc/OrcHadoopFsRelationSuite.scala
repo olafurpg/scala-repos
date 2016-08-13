@@ -43,7 +43,7 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
     }
 
   test(
-      "save()/load() - partitioned table - simple queries - partition columns in data") {
+    "save()/load() - partitioned table - simple queries - partition columns in data") {
     withTempDir { file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
@@ -59,14 +59,14 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
       }
 
       val dataSchemaWithPartition = StructType(
-          dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
+        dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
 
       checkQueries(
-          hiveContext.read
-            .options(Map("path" -> file.getCanonicalPath,
-                         "dataSchema" -> dataSchemaWithPartition.json))
-            .format(dataSourceName)
-            .load())
+        hiveContext.read
+          .options(Map("path" -> file.getCanonicalPath,
+                       "dataSchema" -> dataSchemaWithPartition.json))
+          .format(dataSourceName)
+          .load())
     }
   }
 
@@ -79,18 +79,18 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
         (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b").write.orc(path)
 
         checkAnswer(
-            sqlContext.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
-            (1 to 5).map(i => Row(i, (i % 2).toString)))
+          sqlContext.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
+          (1 to 5).map(i => Row(i, (i % 2).toString)))
 
         checkAnswer(
-            sqlContext.read.orc(path).where("not (a = 2 and b in ('1'))"),
-            (1 to 5).map(i => Row(i, (i % 2).toString)))
+          sqlContext.read.orc(path).where("not (a = 2 and b in ('1'))"),
+          (1 to 5).map(i => Row(i, (i % 2).toString)))
       }
     }
   }
 
   test(
-      "SPARK-13543: Support for specifying compression codec for ORC via option()") {
+    "SPARK-13543: Support for specifying compression codec for ORC via option()") {
     withTempPath { dir =>
       val path = s"${dir.getCanonicalPath}/table1"
       val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")

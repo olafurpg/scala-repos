@@ -20,9 +20,9 @@ class IteratorTest {
     val slidingIt = it sliding 2
     slidingIt.next
     assertEquals(
-        "Counter should be one, that means we didn't look further than needed",
-        1,
-        counter)
+      "Counter should be one, that means we didn't look further than needed",
+      1,
+      counter)
   }
 
   @Test def groupedIteratorIsLazyWhenPadded(): Unit = {
@@ -33,9 +33,9 @@ class IteratorTest {
     val slidingIt = it sliding 2 withPadding -1
     slidingIt.next
     assertEquals(
-        "Counter should be one, that means we didn't look further than needed",
-        1,
-        counter)
+      "Counter should be one, that means we didn't look further than needed",
+      1,
+      counter)
   }
 
   @Test def dropDoesNotGrowStack(): Unit = {

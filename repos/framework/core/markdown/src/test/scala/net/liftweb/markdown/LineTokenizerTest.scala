@@ -35,11 +35,11 @@ class LineTokenizerTest extends FlatSpec with ShouldMatchers {
   "The LineTokenizer" should "split input lines correctly" in {
     tokenizer.splitLines("line1\nline2\n") should equal(List("line1", "line2"))
     tokenizer.splitLines("line1\nline2 no nl") should equal(
-        List("line1", "line2 no nl"))
+      List("line1", "line2 no nl"))
     tokenizer.splitLines("test1\n\ntest2\n") should equal(
-        List("test1", "", "test2"))
+      List("test1", "", "test2"))
     tokenizer.splitLines("test1\n\ntest2\n\n") should equal(
-        List("test1", "", "test2"))
+      List("test1", "", "test2"))
     tokenizer.splitLines("\n\n") should equal(Nil)
     tokenizer.splitLines("\n") should equal(Nil)
     tokenizer.splitLines("") should equal(List(""))
@@ -47,14 +47,15 @@ class LineTokenizerTest extends FlatSpec with ShouldMatchers {
 
   it should "preprocess the input correctly" in {
     tokenizer.tokenize("[foo]: http://example.com/  \"Optional Title Here\"") should equal(
-        (new MarkdownLineReader(
-            List(),
-            Map("foo" -> new LinkDefinition("foo",
-                                            "http://example.com/",
-                                            Some("Optional Title Here"))))))
+      (new MarkdownLineReader(
+        List(),
+        Map(
+          "foo" -> new LinkDefinition("foo",
+                                      "http://example.com/",
+                                      Some("Optional Title Here"))))))
 
     tokenizer.tokenize(
-        """[Baz]:    http://foo.bar
+      """[Baz]:    http://foo.bar
 'Title next line'
 some text
 > bla
@@ -63,21 +64,24 @@ some text
 more text
 [BAR]: <http://www.example.com/bla> (Also a title)"""
     ) should equal(
-        new MarkdownLineReader(
-            List(
-                new OtherLine("some text"),
-                new BlockQuoteLine("> ", "bla"),
-                new EmptyLine(""),
-                new OtherLine("more text")
-            ),
-            Map(
-                "bar" -> new LinkDefinition(
-                    "bar", "http://www.example.com/bla", Some("Also a title")),
-                "baz" -> new LinkDefinition(
-                    "baz", "http://foo.bar", Some("Title next line")),
-                "foo" -> new LinkDefinition(
-                    "foo", "http://www.example.com", Some("A Title"))
-            )))
+      new MarkdownLineReader(
+        List(
+          new OtherLine("some text"),
+          new BlockQuoteLine("> ", "bla"),
+          new EmptyLine(""),
+          new OtherLine("more text")
+        ),
+        Map(
+          "bar" -> new LinkDefinition("bar",
+                                      "http://www.example.com/bla",
+                                      Some("Also a title")),
+          "baz" -> new LinkDefinition("baz",
+                                      "http://foo.bar",
+                                      Some("Title next line")),
+          "foo" -> new LinkDefinition("foo",
+                                      "http://www.example.com",
+                                      Some("A Title"))
+        )))
   }
 
   it should "parse different line types" in {

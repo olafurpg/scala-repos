@@ -94,31 +94,32 @@ object ResourceServer {
   def findResourceInClasspath(request: Req, uri: List[String])(
       ): Box[LiftResponse] =
     for {
-      auri <- Full(uri.filter(!_.startsWith(".")))
-        .filter(auri => isAllowed(auri))
+      auri <- Full(uri.filter(!_.startsWith("."))).filter(auri =>
+               isAllowed(auri))
       rw = baseResourceLocation :: pathRewriter(auri)
       path = rw.mkString("/", "/", "")
       url <- LiftRules.getResource(path)
       lastModified = calcLastModified(url)
     } yield
       request.testFor304(
-          lastModified, "Expires" -> toInternetDate(millis + 30.days)) openOr {
+        lastModified,
+        "Expires" -> toInternetDate(millis + 30.days)) openOr {
         val stream = url.openStream
         val uc = url.openConnection
         StreamingResponse(
-            stream,
-            () => stream.close,
-            uc.getContentLength,
-            (if (lastModified == 0L) Nil
-             else
-               List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
-                "Expires" -> toInternetDate(millis + 30.days),
-                "Date" -> Helpers.nowAsInternetDate,
-                "Pragma" -> "",
-                "Cache-Control" -> "",
-                "Content-Type" -> detectContentType(rw.last)),
-            Nil,
-            200)
+          stream,
+          () => stream.close,
+          uc.getContentLength,
+          (if (lastModified == 0L) Nil
+          else
+            List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
+            "Expires" -> toInternetDate(millis + 30.days),
+            "Date" -> Helpers.nowAsInternetDate,
+            "Pragma" -> "",
+            "Cache-Control" -> "",
+            "Content-Type" -> detectContentType(rw.last)),
+          Nil,
+          200)
       }
 
   /**
@@ -135,7 +136,9 @@ object ResourceServer {
   def detectContentType(path: String): String = {
     // Configure response with content type of resource
     (LiftRules.context.mimeType(path) or
-        (Box !! URLConnection.getFileNameMap().getContentTypeFor(path))) openOr "application/octet-stream"
+      (Box !! URLConnection
+        .getFileNameMap()
+        .getContentTypeFor(path))) openOr "application/octet-stream"
   }
 
   private def isAllowed(path: List[String]) =

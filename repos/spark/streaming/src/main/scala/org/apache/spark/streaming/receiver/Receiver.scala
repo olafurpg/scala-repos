@@ -274,8 +274,8 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
   /** Get the attached supervisor. */
   private[streaming] def supervisor: ReceiverSupervisor = {
     assert(
-        _supervisor != null,
-        "A ReceiverSupervisor has not been attached to the receiver yet. Maybe you are starting " +
+      _supervisor != null,
+      "A ReceiverSupervisor has not been attached to the receiver yet. Maybe you are starting " +
         "some computation in the receiver before the Receiver.onStart() has been called.")
     _supervisor
   }

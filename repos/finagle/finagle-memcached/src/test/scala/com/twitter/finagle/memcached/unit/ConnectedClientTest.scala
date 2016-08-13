@@ -35,15 +35,17 @@ class ConnectedClientTest extends FunSuite with MockitoSugar {
   test("checkAndSet correctly responds to return states of the service") {
     when(service.apply(any[Command])).thenReturn(Future.value(Stored()))
     assert(
-        Await.result(client.checkAndSet(key, value, casUnique)) == CasResult.Stored)
+      Await
+        .result(client.checkAndSet(key, value, casUnique)) == CasResult.Stored)
 
     when(service.apply(any[Command])).thenReturn(Future.value(Exists()))
     assert(
-        Await.result(client.checkAndSet(key, value, casUnique)) == CasResult.Exists)
+      Await
+        .result(client.checkAndSet(key, value, casUnique)) == CasResult.Exists)
 
     when(service.apply(any[Command])).thenReturn(Future.value(NotFound()))
-    assert(
-        Await.result(client.checkAndSet(key, value, casUnique)) == CasResult.NotFound)
+    assert(Await
+      .result(client.checkAndSet(key, value, casUnique)) == CasResult.NotFound)
   }
 
   test("cas correctly responds to the error states of the service") {

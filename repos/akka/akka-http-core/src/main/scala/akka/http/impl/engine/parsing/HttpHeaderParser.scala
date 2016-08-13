@@ -10,7 +10,12 @@ import scala.annotation.tailrec
 import akka.parboiled2.CharUtils
 import akka.util.ByteString
 import akka.http.impl.util._
-import akka.http.scaladsl.model.{IllegalHeaderException, StatusCodes, HttpHeader, ErrorInfo}
+import akka.http.scaladsl.model.{
+  IllegalHeaderException,
+  StatusCodes,
+  HttpHeader,
+  ErrorInfo
+}
 import akka.http.scaladsl.model.headers.{EmptyHeader, RawHeader}
 import akka.http.impl.model.parser.HeaderParser
 import akka.http.impl.model.parser.CharacterClasses._
@@ -105,7 +110,8 @@ private[engine] final class HttpHeaderParser private (
     */
   @tailrec
   def parseHeaderLine(input: ByteString, lineStart: Int = 0)(
-      cursor: Int = lineStart, nodeIx: Int = 0): Int = {
+      cursor: Int = lineStart,
+      nodeIx: Int = 0): Int = {
     def startValueBranch(rootValueIx: Int, valueParser: HeaderValueParser) = {
       val (header, endIx) = valueParser(this, input, cursor, onIllegalHeader)
       if (valueParser.cachingEnabled)
@@ -154,36 +160,48 @@ private[engine] final class HttpHeaderParser private (
                 case subNodeIx ⇒
                   // descend into branch and advance on char matches (otherwise descend but don't advance)
                   parseHeaderLine(input, lineStart)(
-                      cursor + 1 - math.abs(signum), subNodeIx)
+                    cursor + 1 - math.abs(signum),
+                    subNodeIx)
               }
           }
     }
   }
 
-  private def parseRawHeader(
-      input: ByteString, lineStart: Int, cursor: Int, nodeIx: Int): Int = {
+  private def parseRawHeader(input: ByteString,
+                             lineStart: Int,
+                             cursor: Int,
+                             nodeIx: Int): Int = {
     val colonIx = scanHeaderNameAndReturnIndexOfColon(
-        input, lineStart, lineStart + 1 + maxHeaderNameLength)(cursor)
+      input,
+      lineStart,
+      lineStart + 1 + maxHeaderNameLength)(cursor)
     val headerName = asciiString(input, lineStart, colonIx)
     try {
       val valueParser = new RawHeaderValueParser(
-          headerName, maxHeaderValueLength, headerValueCacheLimit(headerName))
+        headerName,
+        maxHeaderValueLength,
+        headerValueCacheLimit(headerName))
       insert(input, valueParser)(cursor, colonIx + 1, nodeIx, colonIx)
       parseHeaderLine(input, lineStart)(cursor, nodeIx)
     } catch {
       case OutOfTrieSpaceException ⇒
         // if we cannot insert we drop back to simply creating new header instances
-        val (headerValue, endIx) = scanHeaderValue(
-            this, input, colonIx + 1, colonIx + maxHeaderValueLength + 3)()
+        val (headerValue, endIx) =
+          scanHeaderValue(this,
+                          input,
+                          colonIx + 1,
+                          colonIx + maxHeaderValueLength + 3)()
         resultHeader = RawHeader(headerName, headerValue.trim)
         endIx
     }
   }
 
   @tailrec
-  private def parseHeaderValue(
-      input: ByteString, valueStart: Int, branch: ValueBranch)(
-      cursor: Int = valueStart, nodeIx: Int = branch.branchRootNodeIx): Int = {
+  private def parseHeaderValue(input: ByteString,
+                               valueStart: Int,
+                               branch: ValueBranch)(
+      cursor: Int = valueStart,
+      nodeIx: Int = branch.branchRootNodeIx): Int = {
     def parseAndInsertHeader() = {
       val (header, endIx) =
         branch.parser(this, input, valueStart, onIllegalHeader)
@@ -217,7 +235,8 @@ private[engine] final class HttpHeaderParser private (
                 case subNodeIx ⇒
                   // descend into branch and advance on char matches (otherwise descend but don't advance)
                   parseHeaderValue(input, valueStart, branch)(
-                      cursor + 1 - math.abs(signum), subNodeIx)
+                    cursor + 1 - math.abs(signum),
+                    subNodeIx)
               }
           }
       }
@@ -253,8 +272,10 @@ private[engine] final class HttpHeaderParser private (
           val rowIx = newBranchDataRowIndex
           unshareIfRequired()
           val newNodeIx = nodeCount.toShort
-          insertRemainingCharsAsNewNodes(input, value)(
-              cursor, endIx, valueIx, colonIx)
+          insertRemainingCharsAsNewNodes(input, value)(cursor,
+                                                       endIx,
+                                                       valueIx,
+                                                       colonIx)
           nodes(nodeIx) = nodeBits(rowIx, nodeChar)
           branchData(rowIx + 1) = (nodeIx + 1).toShort
           branchData(rowIx + 1 + signum) = newNodeIx
@@ -273,12 +294,16 @@ private[engine] final class HttpHeaderParser private (
                   newValueIndex // compute early in order to trigger OutOfTrieSpaceExceptions before any change
                 unshareIfRequired()
                 val newNodeIx = nodeCount.toShort
-                insertRemainingCharsAsNewNodes(input, value)(
-                    cursor, endIx, valueIx, colonIx)
+                insertRemainingCharsAsNewNodes(input, value)(cursor,
+                                                             endIx,
+                                                             valueIx,
+                                                             colonIx)
                 branchData(branchIndex) = newNodeIx // make the previously implicit "equals" sub node explicit
               case subNodeIx ⇒ // descend, but advance only on match
-                insert(input, value)(
-                    cursor + 1 - math.abs(signum), endIx, subNodeIx, colonIx)
+                insert(input, value)(cursor + 1 - math.abs(signum),
+                                     endIx,
+                                     subNodeIx,
+                                     colonIx)
             }
           }
       }
@@ -300,8 +325,10 @@ private[engine] final class HttpHeaderParser private (
       val c = input(cursor).toChar
       val char = if (cursor < colonIx) CharUtils.toLowerCase(c) else c
       nodes(newNodeIx) = char
-      insertRemainingCharsAsNewNodes(input, value)(
-          cursor + 1, endIx, valueIx, colonIx)
+      insertRemainingCharsAsNewNodes(input, value)(cursor + 1,
+                                                   endIx,
+                                                   valueIx,
+                                                   colonIx)
     } else {
       values(valueIx) = value
       nodes(newNodeIx) = ((valueIx + 1) << 8).toChar
@@ -349,8 +376,10 @@ private[engine] final class HttpHeaderParser private (
     */
   def formatTrie: String = {
     def recurse(nodeIx: Int = 0): (Seq[List[String]], Int) = {
-      def recurseAndPrefixLines(
-          subNodeIx: Int, p1: String, p2: String, p3: String) = {
+      def recurseAndPrefixLines(subNodeIx: Int,
+                                p1: String,
+                                p2: String,
+                                p3: String) = {
         val (lines, mainIx) = recurse(subNodeIx)
         val prefixedLines =
           lines.zipWithIndex map {
@@ -389,8 +418,8 @@ private[engine] final class HttpHeaderParser private (
               val postLines = branchLines(rix + 2, "| ", "└─", "  ")
               val p1 = if (preLines.nonEmpty) "| " else "  "
               val p3 = if (postLines.nonEmpty) "| " else "  "
-              val (matchLines, mainLineIx) = recurseAndPrefixLines(
-                  branchData(rix + 1), p1, char + '-', p3)
+              val (matchLines, mainLineIx) =
+                recurseAndPrefixLines(branchData(rix + 1), p1, char + '-', p3)
               (preLines ++ matchLines ++ postLines, mainLineIx + preLines.size)
           }
       }
@@ -425,7 +454,7 @@ private[engine] final class HttpHeaderParser private (
             if (ix > 0) build(ix) else Map.empty
           val rix = rowIx(msb)
           branch(branchData(rix + 0)) ++ branch(branchData(rix + 1)) ++ branch(
-              branchData(rix + 2))
+            branchData(rix + 2))
       }
     }
     build()
@@ -437,11 +466,11 @@ private[engine] final class HttpHeaderParser private (
   def formatRawTrie: String = {
     def char(c: Char) =
       (c >> 8).toString +
-      (if ((c & 0xFF) > 0) "/" + (c & 0xFF).toChar else "/Ω")
+        (if ((c & 0xFF) > 0) "/" + (c & 0xFF).toChar else "/Ω")
     s"nodes: ${nodes take nodeCount map char mkString ", "}\n" +
-    s"branchData: ${branchData take branchDataCount grouped 3 map {
-      case Array(a, b, c) ⇒ s"$a/$b/$c"
-    } mkString ", "}\n" + s"values: ${values take valueCount mkString ", "}"
+      s"branchData: ${branchData take branchDataCount grouped 3 map {
+        case Array(a, b, c) ⇒ s"$a/$b/$c"
+      } mkString ", "}\n" + s"values: ${values take valueCount mkString ", "}"
   }
 
   /**
@@ -500,7 +529,7 @@ private[http] object HttpHeaderParser {
 
   def apply(settings: HttpHeaderParser.Settings)(
       onIllegalHeader: ErrorInfo ⇒ Unit = info ⇒
-          throw IllegalHeaderException(info)) =
+        throw IllegalHeaderException(info)) =
     prime(unprimed(settings, onIllegalHeader))
 
   def unprimed(settings: HttpHeaderParser.Settings,
@@ -511,21 +540,21 @@ private[http] object HttpHeaderParser {
     val valueParsers: Seq[HeaderValueParser] = HeaderParser.ruleNames.map {
       name ⇒
         new ModeledHeaderValueParser(
-            name,
-            parser.settings.maxHeaderValueLength,
-            parser.settings.headerValueCacheLimit(name),
-            parser.settings)
+          name,
+          parser.settings.maxHeaderValueLength,
+          parser.settings.headerValueCacheLimit(name),
+          parser.settings)
     }(collection.breakOut)
-    def insertInGoodOrder(items: Seq[Any])(
-        startIx: Int = 0, endIx: Int = items.size): Unit =
+    def insertInGoodOrder(items: Seq[Any])(startIx: Int = 0,
+                                           endIx: Int = items.size): Unit =
       if (endIx - startIx > 0) {
         val pivot = (startIx + endIx) / 2
         items(pivot) match {
           case valueParser: HeaderValueParser ⇒
             val insertName = valueParser.headerName.toRootLowerCase + ':'
             if (parser.isEmpty)
-              parser.insertRemainingCharsAsNewNodes(
-                  ByteString(insertName), valueParser)()
+              parser.insertRemainingCharsAsNewNodes(ByteString(insertName),
+                                                    valueParser)()
             else parser.insert(ByteString(insertName), valueParser)()
           case header: String ⇒
             parser.parseHeaderLine(ByteString(header + "\r\nx"))()
@@ -541,15 +570,17 @@ private[http] object HttpHeaderParser {
   }
 
   // helper forwarders for testing
-  def insert(
-      parser: HttpHeaderParser, input: ByteString, value: AnyRef): Unit =
+  def insert(parser: HttpHeaderParser,
+             input: ByteString,
+             value: AnyRef): Unit =
     parser.insert(input, value)()
-  def insertRemainingCharsAsNewNodes(
-      parser: HttpHeaderParser, input: ByteString, value: AnyRef): Unit =
+  def insertRemainingCharsAsNewNodes(parser: HttpHeaderParser,
+                                     input: ByteString,
+                                     value: AnyRef): Unit =
     parser.insertRemainingCharsAsNewNodes(input, value)()
 
-  private[parsing] abstract class HeaderValueParser(
-      val headerName: String, val maxValueCount: Int) {
+  private[parsing] abstract class HeaderValueParser(val headerName: String,
+                                                    val maxValueCount: Int) {
     def apply(hhp: HttpHeaderParser,
               input: ByteString,
               valueStart: Int,
@@ -569,36 +600,45 @@ private[http] object HttpHeaderParser {
               valueStart: Int,
               onIllegalHeader: ErrorInfo ⇒ Unit): (HttpHeader, Int) = {
       // TODO: optimize by running the header value parser directly on the input ByteString (rather than an extracted String)
-      val (headerValue, endIx) = scanHeaderValue(
-          hhp, input, valueStart, valueStart + maxHeaderValueLength + 2)()
+      val (headerValue, endIx) =
+        scanHeaderValue(hhp,
+                        input,
+                        valueStart,
+                        valueStart + maxHeaderValueLength + 2)()
       val trimmedHeaderValue = headerValue.trim
-      val header = HeaderParser.parseFull(
-          headerName, trimmedHeaderValue, settings) match {
+      val header = HeaderParser
+        .parseFull(headerName, trimmedHeaderValue, settings) match {
         case Right(h) ⇒ h
         case Left(error) ⇒
           onIllegalHeader(
-              error.withSummaryPrepended(s"Illegal '$headerName' header"))
+            error.withSummaryPrepended(s"Illegal '$headerName' header"))
           RawHeader(headerName, trimmedHeaderValue)
       }
       header -> endIx
     }
   }
 
-  private[parsing] class RawHeaderValueParser(
-      headerName: String, maxHeaderValueLength: Int, maxValueCount: Int)
+  private[parsing] class RawHeaderValueParser(headerName: String,
+                                              maxHeaderValueLength: Int,
+                                              maxValueCount: Int)
       extends HeaderValueParser(headerName, maxValueCount) {
     def apply(hhp: HttpHeaderParser,
               input: ByteString,
               valueStart: Int,
               onIllegalHeader: ErrorInfo ⇒ Unit): (HttpHeader, Int) = {
-      val (headerValue, endIx) = scanHeaderValue(
-          hhp, input, valueStart, valueStart + maxHeaderValueLength + 2)()
+      val (headerValue, endIx) =
+        scanHeaderValue(hhp,
+                        input,
+                        valueStart,
+                        valueStart + maxHeaderValueLength + 2)()
       RawHeader(headerName, headerValue.trim) -> endIx
     }
   }
 
   @tailrec private def scanHeaderNameAndReturnIndexOfColon(
-      input: ByteString, start: Int, limit: Int)(ix: Int): Int =
+      input: ByteString,
+      start: Int,
+      limit: Int)(ix: Int): Int =
     if (ix < limit)
       byteChar(input, ix) match {
         case ':' ⇒ ix
@@ -607,16 +647,17 @@ private[http] object HttpHeaderParser {
         case c ⇒ fail(s"Illegal character '${escape(c)}' in header name")
       } else
       fail(
-          s"HTTP header name exceeds the configured limit of ${limit - start - 1} characters")
+        s"HTTP header name exceeds the configured limit of ${limit - start - 1} characters")
 
   @tailrec private def scanHeaderValue(hhp: HttpHeaderParser,
                                        input: ByteString,
                                        start: Int,
                                        limit: Int)(
-      sb: JStringBuilder = null, ix: Int = start): (String, Int) = {
+      sb: JStringBuilder = null,
+      ix: Int = start): (String, Int) = {
     def appended(c: Char) =
       (if (sb != null) sb
-       else new JStringBuilder(asciiString(input, start, ix))).append(c)
+      else new JStringBuilder(asciiString(input, start, ix))).append(c)
     def appended2(c: Int) =
       if ((c >> 16) != 0) appended(c.toChar).append((c >> 16).toChar)
       else appended(c.toChar)
@@ -659,7 +700,8 @@ private[http] object HttpHeaderParser {
                   if (sb != null)
                     sb.append(c)
                       .append(byteChar(input, ix + 1))
-                      .append(byteChar(input, ix + 2)) else null
+                      .append(byteChar(input, ix + 2))
+                  else null
                 case cc ⇒ appended2(cc)
               }
             } else if ((c & 0xF8) == 0xF0) {
@@ -676,14 +718,15 @@ private[http] object HttpHeaderParser {
                     sb.append(c)
                       .append(byteChar(input, ix + 1))
                       .append(byteChar(input, ix + 2))
-                      .append(byteChar(input, ix + 3)) else null
+                      .append(byteChar(input, ix + 3))
+                  else null
                 case cc ⇒ appended2(cc)
               }
             } else fail(s"Illegal character '${escape(c)}' in header value")
           scanHeaderValue(hhp, input, start, limit)(nsb, nix)
       } else
       fail(
-          s"HTTP header value exceeds the configured limit of ${limit - start - 2} characters")
+        s"HTTP header value exceeds the configured limit of ${limit - start - 2} characters")
   }
 
   def fail(summary: String) =

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Type-level encoding of factorial function.
-  * 
+  *
   * @author George Leontiev
   */
 object FactorialExamples {
@@ -30,8 +30,8 @@ object FactorialExamples {
   trait Factorial[I <: Nat] { type Out <: Nat }
 
   object Factorial {
-    def factorial[N <: Nat](i: Nat)(
-        implicit fact: Factorial.Aux[i.N, N], wn: Witness.Aux[N]): N = wn.value
+    def factorial[N <: Nat](i: Nat)(implicit fact: Factorial.Aux[i.N, N],
+                                    wn: Witness.Aux[N]): N = wn.value
 
     type Aux[I <: Nat, Out0 <: Nat] = Factorial[I] { type Out = Out0 }
 

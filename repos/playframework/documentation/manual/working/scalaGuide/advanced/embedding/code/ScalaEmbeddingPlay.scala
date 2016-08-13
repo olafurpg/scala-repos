@@ -42,10 +42,11 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
       import play.api.routing.sird._
       import play.api.mvc._
 
-      val server = NettyServer.fromRouter(ServerConfig(
-              port = Some(19000),
-              address = "127.0.0.1"
-          )) {
+      val server = NettyServer.fromRouter(
+        ServerConfig(
+          port = Some(19000),
+          address = "127.0.0.1"
+        )) {
         case GET(p"/hello/$to") =>
           Action {
             Results.Ok(s"Hello $to")
@@ -79,14 +80,17 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
             }
         }
 
-        override lazy val httpErrorHandler = new DefaultHttpErrorHandler(
-            environment, configuration, sourceMapper, Some(router)) {
+        override lazy val httpErrorHandler =
+          new DefaultHttpErrorHandler(environment,
+                                      configuration,
+                                      sourceMapper,
+                                      Some(router)) {
 
-          override protected def onNotFound(request: RequestHeader,
-                                            message: String) = {
-            Future.successful(Results.NotFound("Nothing was found!"))
+            override protected def onNotFound(request: RequestHeader,
+                                              message: String) = {
+              Future.successful(Results.NotFound("Nothing was found!"))
+            }
           }
-        }
       }
       val server = components.server
       //#components
@@ -101,7 +105,9 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
 
   def testRequest(port: Int) = {
     withClient { client =>
-      Await.result(client.url("/hello/world").get(), Duration.Inf).body must_== "Hello world"
+      Await
+        .result(client.url("/hello/world").get(), Duration.Inf)
+        .body must_== "Hello world"
     }(new play.api.http.Port(port))
   }
 }

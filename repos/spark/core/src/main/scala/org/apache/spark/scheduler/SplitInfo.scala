@@ -31,8 +31,8 @@ class SplitInfo(val inputFormatClazz: Class[_],
                 val underlyingSplit: Any) {
   override def toString(): String = {
     "SplitInfo " + super.toString + " .. inputFormatClazz " +
-    inputFormatClazz + ", hostLocation : " + hostLocation + ", path : " +
-    path + ", length : " + length + ", underlyingSplit " + underlyingSplit
+      inputFormatClazz + ", hostLocation : " + hostLocation + ", path : " +
+      path + ", length : " + length + ", underlyingSplit " + underlyingSplit
   }
 
   override def hashCode(): Int = {
@@ -49,12 +49,12 @@ class SplitInfo(val inputFormatClazz: Class[_],
   // is pointing to same block.
   override def equals(other: Any): Boolean = other match {
     case that: SplitInfo => {
-        this.hostLocation == that.hostLocation &&
-        this.inputFormatClazz == that.inputFormatClazz &&
-        this.path == that.path && this.length == that.length &&
-        // other split specific checks (like start for FileSplit)
-        this.underlyingSplit == that.underlyingSplit
-      }
+      this.hostLocation == that.hostLocation &&
+      this.inputFormatClazz == that.inputFormatClazz &&
+      this.path == that.path && this.length == that.length &&
+      // other split specific checks (like start for FileSplit)
+      this.underlyingSplit == that.underlyingSplit
+    }
     case _ => false
   }
 }

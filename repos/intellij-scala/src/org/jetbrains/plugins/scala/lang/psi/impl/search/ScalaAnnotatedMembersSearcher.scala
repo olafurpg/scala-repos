@@ -12,7 +12,10 @@ import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScAnnotations}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation,
+  ScAnnotations
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScAnnotatedMemberIndex
 
 /**

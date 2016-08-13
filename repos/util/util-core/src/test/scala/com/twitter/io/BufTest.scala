@@ -11,16 +11,19 @@ import org.scalatest.prop.{GeneratorDrivenPropertyChecks, Checkers}
 
 @RunWith(classOf[JUnitRunner])
 class BufTest
-    extends FunSuite with MockitoSugar with GeneratorDrivenPropertyChecks
-    with Checkers with AssertionsForJUnit {
+    extends FunSuite
+    with MockitoSugar
+    with GeneratorDrivenPropertyChecks
+    with Checkers
+    with AssertionsForJUnit {
 
   val AllCharsets = Seq(
-      Charsets.Iso8859_1,
-      Charsets.UsAscii,
-      Charsets.Utf8,
-      Charsets.Utf16,
-      Charsets.Utf16BE,
-      Charsets.Utf16LE
+    Charsets.Iso8859_1,
+    Charsets.UsAscii,
+    Charsets.Utf8,
+    Charsets.Utf16,
+    Charsets.Utf16BE,
+    Charsets.Utf16LE
   )
 
   test("Buf.ByteArray.slice") {
@@ -202,8 +205,9 @@ class BufTest
   }
 
   AllCharsets foreach { charset =>
-    test("Buf.StringCoder: decoding to %s does not modify underlying byte buffer"
-          .format(charset.name)) {
+    test(
+      "Buf.StringCoder: decoding to %s does not modify underlying byte buffer"
+        .format(charset.name)) {
       val coder = new Buf.StringCoder(charset) {}
       val hw = "Hello, world!"
       val bb = charset.encode(hw)
@@ -216,8 +220,9 @@ class BufTest
   }
 
   AllCharsets foreach { charset =>
-    test("Buf.StringCoder: %s charset can encode and decode an English phrase"
-          .format(charset.name)) {
+    test(
+      "Buf.StringCoder: %s charset can encode and decode an English phrase"
+        .format(charset.name)) {
       val coder = new Buf.StringCoder(charset) {}
       val phrase = "Hello, world!"
       val encoded = coder(phrase)
@@ -247,7 +252,7 @@ class BufTest
 
     assert(Buf.ByteBuffer.Owned(java.nio.ByteBuffer.allocate(0)) == Buf.Empty)
     assert(
-        Buf.ByteBuffer.Owned(java.nio.ByteBuffer.allocateDirect(0)) == Buf.Empty)
+      Buf.ByteBuffer.Owned(java.nio.ByteBuffer.allocateDirect(0)) == Buf.Empty)
 
     val bytes2 = Array[Byte](1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
     val buf2 = Buf.ByteBuffer.Owned(java.nio.ByteBuffer.wrap(bytes2, 3, 4))
@@ -345,8 +350,7 @@ class BufTest
     ae(Buf.Utf8(string), Buf.ByteArray.Owned(shifted, 3, 3 + bytes.length))
   }
 
-  check(
-      Prop.forAll { (in: Int) =>
+  check(Prop.forAll { (in: Int) =>
     val buf = Buf.U32BE(in)
     val Buf.U32BE(out, _) = buf
 
@@ -356,8 +360,7 @@ class BufTest
     out == in && outByteBuf.getInt == in
   })
 
-  check(
-      Prop.forAll { (in: Int) =>
+  check(Prop.forAll { (in: Int) =>
     val buf = Buf.U32LE(in)
     val Buf.U32LE(out, _) = buf
 
@@ -367,8 +370,7 @@ class BufTest
     out == in && outByteBuf.getInt == in
   })
 
-  check(
-      Prop.forAll { (in: Long) =>
+  check(Prop.forAll { (in: Long) =>
     val buf = Buf.U64BE(in)
     val Buf.U64BE(out, _) = buf
 
@@ -378,8 +380,7 @@ class BufTest
     out == in && outByteBuf.getLong == in
   })
 
-  check(
-      Prop.forAll { (in: Long) =>
+  check(Prop.forAll { (in: Long) =>
     val buf = Buf.U64LE(in)
     val Buf.U64LE(out, _) = buf
 
@@ -405,8 +406,9 @@ class BufTest
       .concat(Buf.U32LE(Int.MinValue))
       .concat(Buf.U64LE(Long.MinValue))
 
-    val Buf.U32BE(be32,
-                  Buf.U64BE(be64, Buf.U32LE(le32, Buf.U64LE(le64, rem)))) = buf
+    val Buf
+      .U32BE(be32, Buf.U64BE(be64, Buf.U32LE(le32, Buf.U64LE(le64, rem)))) =
+      buf
 
     assert(be32 == Int.MaxValue)
     assert(be64 == Long.MaxValue)
@@ -458,17 +460,16 @@ class BufTest
   implicit lazy val arbBuf: Arbitrary[Buf] = {
     import java.nio.charset.StandardCharsets.UTF_8
     val ctors: Seq[String => Buf] = Seq(
-        Buf.Iso8859_1.apply,
-        Buf.UsAscii.apply,
-        Buf.Utf8.apply,
-        Buf.Utf16.apply,
-        Buf.Utf16BE.apply,
-        Buf.Utf16LE.apply,
-        s => Buf.ByteArray.Owned(s.getBytes("UTF-8")),
-        s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s))))
+      Buf.Iso8859_1.apply,
+      Buf.UsAscii.apply,
+      Buf.Utf8.apply,
+      Buf.Utf16.apply,
+      Buf.Utf16BE.apply,
+      Buf.Utf16LE.apply,
+      s => Buf.ByteArray.Owned(s.getBytes("UTF-8")),
+      s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s))))
 
-    Arbitrary(
-        for {
+    Arbitrary(for {
       s <- Arbitrary.arbitrary[String]
       c <- Gen.oneOf(ctors)
     } yield c.apply(s))

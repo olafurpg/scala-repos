@@ -26,8 +26,8 @@ case class MediaType(mediaType: String,
           "=" + value
         } else {
           "=\"" +
-          value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") +
-          "\""
+            value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") +
+            "\""
         }
       }.getOrElse("")
     }.mkString("")
@@ -55,9 +55,9 @@ class MediaRange(mediaType: String,
     */
   def accepts(mimeType: String): Boolean =
     (mediaType + "/" + mediaSubType).equalsIgnoreCase(mimeType) ||
-    (mediaSubType == "*" &&
+      (mediaSubType == "*" &&
         mediaType.equalsIgnoreCase(mimeType.takeWhile(_ != '/'))) ||
-    (mediaType == "*" && mediaSubType == "*")
+      (mediaType == "*" && mediaSubType == "*")
 
   override def toString = {
     new MediaType(mediaType,
@@ -83,16 +83,16 @@ object MediaType {
     def apply(mediaType: String): Option[MediaType] = {
       MediaRangeParser.mediaType(new CharSequenceReader(mediaType)) match {
         case MediaRangeParser.Success(mt: MediaType, next) => {
-            if (!next.atEnd) {
-              logger.debug(
-                  "Unable to parse part of media type '" + next.source + "'")
-            }
-            Some(mt)
+          if (!next.atEnd) {
+            logger.debug(
+              "Unable to parse part of media type '" + next.source + "'")
           }
+          Some(mt)
+        }
         case MediaRangeParser.NoSuccess(err, next) => {
-            logger.debug("Unable to parse media type '" + next.source + "'")
-            None
-          }
+          logger.debug("Unable to parse media type '" + next.source + "'")
+          None
+        }
       }
     }
   }
@@ -111,12 +111,14 @@ object MediaRange {
       MediaRangeParser(new CharSequenceReader(mediaRanges)) match {
         case MediaRangeParser.Success(mrs: List[MediaRange], next) =>
           if (next.atEnd) {
-            logger.debug("Unable to parse part of media range header '" +
+            logger.debug(
+              "Unable to parse part of media range header '" +
                 next.source + "'")
           }
           mrs.sorted
         case MediaRangeParser.NoSuccess(err, _) =>
-          logger.debug("Unable to parse media range header '" + mediaRanges +
+          logger.debug(
+            "Unable to parse media range header '" + mediaRanges +
               "': " + err)
           Nil
       }
@@ -192,8 +194,8 @@ object MediaRange {
     val char = acceptIf(_ < 0x80)(_ => "Expected an ascii character")
     val text = not(ctl) ~> any
     val separators = {
-      acceptIf(c => separatorBitSet(c))(
-          _ => "Expected one of " + separatorChars)
+      acceptIf(c => separatorBitSet(c))(_ =>
+        "Expected one of " + separatorChars)
     }
 
     val token = rep1(not(separators | ctl) ~> any) ^^ charSeqToString
@@ -204,8 +206,8 @@ object MediaRange {
           logger.debug(msg + ": " + charSeqToString(chars))
           None
       }
-    val badParameter = badPart(
-        c => c != ',' && c != ';', "Bad media type parameter")
+    val badParameter =
+      badPart(c => c != ',' && c != ';', "Bad media type parameter")
     val badMediaType = badPart(c => c != ',', "Bad media type")
 
     def tolerant[T](p: Parser[T], bad: Parser[Option[T]]) =
@@ -227,8 +229,8 @@ object MediaRange {
       }
 
     // Either it's a valid parameter followed immediately by the end, a comma or a semicolon, or it's a bad parameter
-    val tolerantParameter = tolerant(
-        parameter <~ guard(end | ';' | ','), badParameter)
+    val tolerantParameter =
+      tolerant(parameter <~ guard(end | ';' | ','), badParameter)
 
     val parameters = rep(';' ~> rep(' ') ~> tolerantParameter <~ rep(' '))
     val mediaType: Parser[MediaType] =
@@ -247,7 +249,7 @@ object MediaRange {
     // need to support it.
     val mediaRange =
       (mediaType |
-          ('*' ~> parameters.map(ps => MediaType("*", "*", ps.flatten)))) ^^ {
+        ('*' ~> parameters.map(ps => MediaType("*", "*", ps.flatten)))) ^^ {
         mediaType =>
           val (params, rest) = mediaType.parameters.span(_._1 != "q")
           val (qValueStr, acceptParams) = rest match {
@@ -277,8 +279,8 @@ object MediaRange {
       }
 
     // Either it's a valid media range followed immediately by the end or a comma, or it's a bad media type
-    val tolerantMediaRange = tolerant(
-        mediaRange <~ guard(end | ','), badMediaType)
+    val tolerantMediaRange =
+      tolerant(mediaRange <~ guard(end | ','), badMediaType)
 
     val mediaRanges =
       rep1sep(tolerantMediaRange, ',' ~ rep(' ')).map(_.flatten)

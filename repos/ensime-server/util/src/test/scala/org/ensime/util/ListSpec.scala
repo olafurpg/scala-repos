@@ -15,16 +15,16 @@ class ListSpec extends FlatSpec with Matchers {
   }
 
   val tuples = List(
-      (1, 'a),
-      (1, 'b),
-      (1, 'c),
-      (2, 'b),
-      (2, 'b)
+    (1, 'a),
+    (1, 'b),
+    (1, 'c),
+    (2, 'b),
+    (2, 'b)
   )
 
   val multi = Map(
-      1 -> Set('a, 'b, 'c),
-      2 -> Set('b)
+    1 -> Set('a, 'b, 'c),
+    2 -> Set('b)
   )
 
   it should "gather multimap sets" in {

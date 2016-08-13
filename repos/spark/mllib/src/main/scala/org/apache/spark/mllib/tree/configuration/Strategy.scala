@@ -72,9 +72,10 @@ class Strategy @Since("1.3.0")(
     @Since("1.0.0") @BeanProperty var maxDepth: Int,
     @Since("1.2.0") @BeanProperty var numClasses: Int = 2,
     @Since("1.0.0") @BeanProperty var maxBins: Int = 32,
-    @Since("1.0.0") @BeanProperty var quantileCalculationStrategy: QuantileStrategy = Sort,
-    @Since("1.0.0") @BeanProperty var categoricalFeaturesInfo: Map[Int, Int] = Map[
-          Int, Int](),
+    @Since("1.0.0") @BeanProperty var quantileCalculationStrategy: QuantileStrategy =
+      Sort,
+    @Since("1.0.0") @BeanProperty var categoricalFeaturesInfo: Map[Int, Int] =
+      Map[Int, Int](),
     @Since("1.2.0") @BeanProperty var minInstancesPerNode: Int = 1,
     @Since("1.2.0") @BeanProperty var minInfoGain: Double = 0.0,
     @Since("1.0.0") @BeanProperty var maxMemoryInMB: Int = 256,
@@ -106,8 +107,8 @@ class Strategy @Since("1.3.0")(
            maxDepth: Int,
            numClasses: Int,
            maxBins: Int,
-           categoricalFeaturesInfo: java.util.Map[
-               java.lang.Integer, java.lang.Integer]) {
+           categoricalFeaturesInfo: java.util.Map[java.lang.Integer,
+                                                  java.lang.Integer]) {
     this(algo,
          impurity,
          maxDepth,
@@ -133,8 +134,9 @@ class Strategy @Since("1.3.0")(
     * Sets categoricalFeaturesInfo using a Java Map.
     */
   @Since("1.2.0")
-  def setCategoricalFeaturesInfo(categoricalFeaturesInfo: java.util.Map[
-          java.lang.Integer, java.lang.Integer]): Unit = {
+  def setCategoricalFeaturesInfo(
+      categoricalFeaturesInfo: java.util.Map[java.lang.Integer,
+                                             java.lang.Integer]): Unit = {
     this.categoricalFeaturesInfo = categoricalFeaturesInfo
       .asInstanceOf[java.util.Map[Int, Int]]
       .asScala
@@ -149,40 +151,40 @@ class Strategy @Since("1.3.0")(
     algo match {
       case Classification =>
         require(
-            numClasses >= 2,
-            s"DecisionTree Strategy for Classification must have numClasses >= 2," +
+          numClasses >= 2,
+          s"DecisionTree Strategy for Classification must have numClasses >= 2," +
             s" but numClasses = $numClasses.")
         require(
-            Set(Gini, Entropy).contains(impurity),
-            s"DecisionTree Strategy given invalid impurity for Classification: $impurity." +
+          Set(Gini, Entropy).contains(impurity),
+          s"DecisionTree Strategy given invalid impurity for Classification: $impurity." +
             s"  Valid settings: Gini, Entropy")
       case Regression =>
         require(
-            impurity == Variance,
-            s"DecisionTree Strategy given invalid impurity for Regression: $impurity." +
+          impurity == Variance,
+          s"DecisionTree Strategy given invalid impurity for Regression: $impurity." +
             s"  Valid settings: Variance")
       case _ =>
         throw new IllegalArgumentException(
-            s"DecisionTree Strategy given invalid algo parameter: $algo." +
+          s"DecisionTree Strategy given invalid algo parameter: $algo." +
             s"  Valid settings are: Classification, Regression.")
     }
     require(
-        maxDepth >= 0,
-        s"DecisionTree Strategy given invalid maxDepth parameter: $maxDepth." +
+      maxDepth >= 0,
+      s"DecisionTree Strategy given invalid maxDepth parameter: $maxDepth." +
         s"  Valid values are integers >= 0.")
     require(
-        maxBins >= 2,
-        s"DecisionTree Strategy given invalid maxBins parameter: $maxBins." +
+      maxBins >= 2,
+      s"DecisionTree Strategy given invalid maxBins parameter: $maxBins." +
         s"  Valid values are integers >= 2.")
     require(
-        minInstancesPerNode >= 1,
-        s"DecisionTree Strategy requires minInstancesPerNode >= 1 but was given $minInstancesPerNode")
+      minInstancesPerNode >= 1,
+      s"DecisionTree Strategy requires minInstancesPerNode >= 1 but was given $minInstancesPerNode")
     require(
-        maxMemoryInMB <= 10240,
-        s"DecisionTree Strategy requires maxMemoryInMB <= 10240, but was given $maxMemoryInMB")
+      maxMemoryInMB <= 10240,
+      s"DecisionTree Strategy requires maxMemoryInMB <= 10240, but was given $maxMemoryInMB")
     require(
-        subsamplingRate > 0 && subsamplingRate <= 1,
-        s"DecisionTree Strategy requires subsamplingRate <=1 and >0, but was given " +
+      subsamplingRate > 0 && subsamplingRate <= 1,
+      s"DecisionTree Strategy requires subsamplingRate <=1 and >0, but was given " +
         s"$subsamplingRate")
   }
 

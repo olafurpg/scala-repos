@@ -71,8 +71,8 @@ class ALS private (
     private var implicitPrefs: Boolean,
     private var alpha: Double,
     private var seed: Long = System.nanoTime()
-)
-    extends Serializable with Logging {
+) extends Serializable
+    with Logging {
 
   /**
     * Constructs an ALS instance with default parameters: {numBlocks: -1, rank: 10, iterations: 10,
@@ -240,20 +240,20 @@ class ALS private (
       }
 
     val (floatUserFactors, floatProdFactors) = NewALS.train[Int](
-        ratings = ratings.map(
-              r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
-        rank = rank,
-        numUserBlocks = numUserBlocks,
-        numItemBlocks = numProductBlocks,
-        maxIter = iterations,
-        regParam = lambda,
-        implicitPrefs = implicitPrefs,
-        alpha = alpha,
-        nonnegative = nonnegative,
-        intermediateRDDStorageLevel = intermediateRDDStorageLevel,
-        finalRDDStorageLevel = StorageLevel.NONE,
-        checkpointInterval = checkpointInterval,
-        seed = seed)
+      ratings =
+        ratings.map(r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
+      rank = rank,
+      numUserBlocks = numUserBlocks,
+      numItemBlocks = numProductBlocks,
+      maxIter = iterations,
+      regParam = lambda,
+      implicitPrefs = implicitPrefs,
+      alpha = alpha,
+      nonnegative = nonnegative,
+      intermediateRDDStorageLevel = intermediateRDDStorageLevel,
+      finalRDDStorageLevel = StorageLevel.NONE,
+      checkpointInterval = checkpointInterval,
+      seed = seed)
 
     val userFactors = floatUserFactors
       .mapValues(_.map(_.toDouble))

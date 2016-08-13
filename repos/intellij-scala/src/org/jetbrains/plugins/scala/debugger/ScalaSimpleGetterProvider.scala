@@ -3,8 +3,16 @@ package org.jetbrains.plugins.scala.debugger
 import com.intellij.debugger.engine.SimplePropertyGetterProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement, PsiMethod}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScExpression, ScReferenceExpression, ScThisReference}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScExpression,
+  ScReferenceExpression,
+  ScThisReference
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScFunctionDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**

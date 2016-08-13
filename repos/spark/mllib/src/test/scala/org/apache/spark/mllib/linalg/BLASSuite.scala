@@ -59,7 +59,7 @@ class BLASSuite extends SparkFunSuite {
 
     scal(a, sx)
     assert(
-        sx ~== Vectors.sparse(3, Array(0, 2), Array(0.1, -0.2)) absTol 1e-15)
+      sx ~== Vectors.sparse(3, Array(0, 2), Array(0.1, -0.2)) absTol 1e-15)
 
     scal(a, dx)
     assert(dx ~== Vectors.dense(0.1, 0.0, -0.2) absTol 1e-15)
@@ -135,7 +135,7 @@ class BLASSuite extends SparkFunSuite {
     val x = new DenseVector(Array(1.0, 2, 2.1, 4))
     val U = new DenseVector(Array(1.0, 2, 2, 3, 3, 3, 4, 4, 4, 4))
     val expected = new DenseVector(
-        Array(1.1, 2.2, 2.4, 3.21, 3.42, 3.441, 4.4, 4.8, 4.84, 5.6))
+      Array(1.1, 2.2, 2.4, 3.21, 3.42, 3.441, 4.4, 4.8, 4.84, 5.6))
 
     spr(alpha, x, U)
     assert(U ~== expected absTol 1e-9)
@@ -202,9 +202,9 @@ class BLASSuite extends SparkFunSuite {
     assert(dA ~== expected absTol 1e-15)
 
     val dB = new DenseMatrix(
-        3,
-        4,
-        Array(0.0, 1.2, 2.2, 3.1, 1.2, 3.2, 5.3, 4.6, 2.2, 5.3, 1.8, 3.0))
+      3,
+      4,
+      Array(0.0, 1.2, 2.2, 3.1, 1.2, 3.2, 5.3, 4.6, 2.2, 5.3, 1.8, 3.0))
 
     withClue("Matrix A must be a symmetric Matrix") {
       intercept[Exception] {
@@ -272,11 +272,14 @@ class BLASSuite extends SparkFunSuite {
 
   test("gemm") {
     val dA = new DenseMatrix(
-        4,
-        3,
-        Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
-    val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+      4,
+      3,
+      Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
+    val sA = new SparseMatrix(4,
+                              3,
+                              Array(0, 1, 3, 4),
+                              Array(1, 0, 2, 3),
+                              Array(1.0, 2.0, 1.0, 3.0))
 
     val B = new DenseMatrix(3, 2, Array(1.0, 0.0, 0.0, 0.0, 2.0, 1.0))
     val expected =
@@ -333,9 +336,9 @@ class BLASSuite extends SparkFunSuite {
     }
 
     val dATman = new DenseMatrix(
-        3,
-        4,
-        Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
+      3,
+      4,
+      Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
     val sATman = new SparseMatrix(3,
                                   4,
                                   Array(0, 1, 2, 3, 4),
@@ -381,17 +384,20 @@ class BLASSuite extends SparkFunSuite {
   test("gemv") {
 
     val dA = new DenseMatrix(
-        4,
-        3,
-        Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
-    val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+      4,
+      3,
+      Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
+    val sA = new SparseMatrix(4,
+                              3,
+                              Array(0, 1, 3, 4),
+                              Array(1, 0, 2, 3),
+                              Array(1.0, 2.0, 1.0, 3.0))
 
     val dA2 = new DenseMatrix(
-        4,
-        3,
-        Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0),
-        true)
+      4,
+      3,
+      Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0),
+      true)
     val sA2 = new SparseMatrix(4,
                                3,
                                Array(0, 1, 2, 3, 4),
@@ -484,9 +490,9 @@ class BLASSuite extends SparkFunSuite {
     }
 
     val dAT = new DenseMatrix(
-        3,
-        4,
-        Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
+      3,
+      4,
+      Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
     val sAT = new SparseMatrix(3,
                                4,
                                Array(0, 1, 2, 3, 4),

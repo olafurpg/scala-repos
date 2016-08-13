@@ -59,19 +59,22 @@ object UntrustedSpec {
 }
 
 class UntrustedSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+      """
 akka.actor.provider = akka.remote.RemoteActorRefProvider
 akka.remote.untrusted-mode = on
 akka.remote.trusted-selection-paths = ["/user/receptionist", ]    
 akka.remote.netty.tcp.port = 0
 akka.loglevel = DEBUG
-""") with ImplicitSender {
+""")
+    with ImplicitSender {
 
   import UntrustedSpec._
 
   val client = ActorSystem(
-      "UntrustedSpec-client",
-      ConfigFactory.parseString("""
+    "UntrustedSpec-client",
+    ConfigFactory.parseString(
+      """
       akka.actor.provider = akka.remote.RemoteActorRefProvider
       akka.remote.netty.tcp.port = 0
   """))
@@ -141,8 +144,7 @@ akka.loglevel = DEBUG
     }
 
     "discard watch messages" in {
-      client.actorOf(
-          Props(new Actor {
+      client.actorOf(Props(new Actor {
         context.watch(target2)
         def receive = {
           case x ⇒ testActor forward x
@@ -176,14 +178,14 @@ akka.loglevel = DEBUG
 
     "discard actor selection to child of matching white list" in {
       val sel = client.actorSelection(
-          RootActorPath(addr) / receptionist.path.elements / "child1")
+        RootActorPath(addr) / receptionist.path.elements / "child1")
       sel ! "hello"
       expectNoMsg(1.second)
     }
 
     "discard actor selection with wildcard" in {
       val sel = client.actorSelection(
-          RootActorPath(addr) / receptionist.path.elements / "*")
+        RootActorPath(addr) / receptionist.path.elements / "*")
       sel ! "hello"
       expectNoMsg(1.second)
     }

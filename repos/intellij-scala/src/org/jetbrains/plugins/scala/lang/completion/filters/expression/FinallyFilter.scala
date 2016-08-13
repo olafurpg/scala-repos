@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
@@ -22,19 +22,20 @@ class FinallyFilter extends ElementFilter {
     if (leaf != null) {
       val parent = leaf.getParent
       var i = getPrevNotWhitespaceAndComment(
-          context.getTextRange.getStartOffset - 1, context)
+        context.getTextRange.getStartOffset - 1,
+        context)
       var leaf1 = getLeafByOffset(i, context)
       while (leaf1 != null &&
-      !leaf1.isInstanceOf[ScTryStmt]) leaf1 = leaf1.getParent
+             !leaf1.isInstanceOf[ScTryStmt]) leaf1 = leaf1.getParent
       if (leaf1 == null) return false
       if (leaf1.getNode
             .getChildren(null)
             .exists(_.getElementType == ScalaElementTypes.FINALLY_BLOCK))
         return false
-      i = getNextNotWhitespaceAndComment(
-          context.getTextRange.getEndOffset, context)
+      i = getNextNotWhitespaceAndComment(context.getTextRange.getEndOffset,
+                                         context)
       if (Array("catch", "finally").contains(
-              getLeafByOffset(i, context).getText)) return false
+            getLeafByOffset(i, context).getText)) return false
       return true
     }
     false
@@ -53,12 +54,13 @@ class FinallyFilter extends ElementFilter {
     var i = index
     if (i < 0) return 0
     while (i > 0 &&
-    (context.getContainingFile.getText.charAt(i) == ' ' ||
-        context.getContainingFile.getText.charAt(i) == '\n')) i = i - 1
+           (context.getContainingFile.getText.charAt(i) == ' ' ||
+           context.getContainingFile.getText.charAt(i) == '\n')) i = i - 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
       return getPrevNotWhitespaceAndComment(
-          leaf.getTextRange.getStartOffset - 1, context)
+        leaf.getTextRange.getStartOffset - 1,
+        context)
     i
   }
 
@@ -67,12 +69,12 @@ class FinallyFilter extends ElementFilter {
     if (i >= context.getContainingFile.getTextLength - 1)
       return context.getContainingFile.getTextLength - 2
     while (i < context.getContainingFile.getText.length - 1 &&
-    (context.getContainingFile.getText.charAt(i) == ' ' ||
-        context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
+           (context.getContainingFile.getText.charAt(i) == ' ' ||
+           context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
-      return getNextNotWhitespaceAndComment(
-          leaf.getTextRange.getEndOffset, context)
+      return getNextNotWhitespaceAndComment(leaf.getTextRange.getEndOffset,
+                                            context)
     i
   }
 }

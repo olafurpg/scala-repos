@@ -20,7 +20,14 @@ import java.io.{File, FileOutputStream, FilenameFilter, OutputStream}
 import java.nio.charset.Charset
 import java.util.{Calendar, Date, logging => javalog}
 
-import com.twitter.util.{TwitterDateFormat, HandleSignal, Return, StorageUnit, Time, Try}
+import com.twitter.util.{
+  TwitterDateFormat,
+  HandleSignal,
+  Return,
+  StorageUnit,
+  Time,
+  Try
+}
 
 sealed abstract class Policy
 object Policy {
@@ -34,10 +41,10 @@ object Policy {
   case class MaxSize(size: StorageUnit) extends Policy
 
   private[this] val singletonPolicyNames: Map[String, Policy] = Map(
-      "never" -> Never,
-      "hourly" -> Hourly,
-      "daily" -> Daily,
-      "sighup" -> SigHup)
+    "never" -> Never,
+    "hourly" -> Hourly,
+    "daily" -> Daily,
+    "sighup" -> SigHup)
 
   // Regex object that matches "Weekly(n)" and extracts the `dayOfWeek` number.
   private[this] val weeklyRegex = """(?i)weekly\(([1-7]+)\)""".r
@@ -91,8 +98,12 @@ object FileHandler {
       level: Option[Level] = None
   ) =
     () =>
-      new FileHandler(
-          filename, rollPolicy, append, rotateCount, formatter, level)
+      new FileHandler(filename,
+                      rollPolicy,
+                      append,
+                      rotateCount,
+                      formatter,
+                      level)
 }
 
 /**
@@ -219,21 +230,21 @@ class FileHandler(path: String,
     val rv = rollPolicy match {
       case Policy.MaxSize(_) | Policy.Never | Policy.SigHup => None
       case Policy.Hourly => {
-          next.add(Calendar.HOUR_OF_DAY, 1)
-          Some(next)
-        }
+        next.add(Calendar.HOUR_OF_DAY, 1)
+        Some(next)
+      }
       case Policy.Daily => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          next.add(Calendar.DAY_OF_MONTH, 1)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        next.add(Calendar.DAY_OF_MONTH, 1)
+        Some(next)
+      }
       case Policy.Weekly(weekday) => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          do {
-            next.add(Calendar.DAY_OF_MONTH, 1)
-          } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        do {
+          next.add(Calendar.DAY_OF_MONTH, 1)
+        } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
+        Some(next)
+      }
     }
 
     rv map { _.getTimeInMillis }
@@ -250,11 +261,11 @@ class FileHandler(path: String,
       val rotatedFiles = new File(filename)
         .getParentFile()
         .listFiles(
-            new FilenameFilter {
-              def accept(f: File, fname: String): Boolean =
-                fname != name && fname.startsWith(prefixName) &&
+          new FilenameFilter {
+            def accept(f: File, fname: String): Boolean =
+              fname != name && fname.startsWith(prefixName) &&
                 fname.endsWith(filenameSuffix)
-            }
+          }
         )
         .sortBy(_.getName)
 

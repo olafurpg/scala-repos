@@ -59,7 +59,7 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
   override def equals(that: Any): Boolean = that match {
     case m: Manifest[_] =>
       (m canEqual this) && (this.runtimeClass == m.runtimeClass) &&
-      (this <:< m) && (m <:< this)
+        (this <:< m) && (m <:< this)
     case _ => false
   }
   override def hashCode = this.runtimeClass.##
@@ -69,7 +69,8 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
 // @deprecated("Use type tags and manually check the corresponding class or type instead", "2.10.0")
 @SerialVersionUID(1L)
 abstract class AnyValManifest[T <: AnyVal](override val toString: String)
-    extends Manifest[T] with Equals {
+    extends Manifest[T]
+    with Equals {
   override def <:<(that: ClassManifest[_]): Boolean =
     (that eq this) || (that eq Manifest.Any) || (that eq Manifest.AnyVal)
   override def canEqual(other: Any) = other match {
@@ -285,7 +286,7 @@ object ManifestFactory {
       extends Manifest[T] {
     override def toString =
       (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
-      (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
+        (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
   }
 
   def arrayType[T](arg: Manifest[_]): Manifest[Array[T]] =
@@ -306,13 +307,13 @@ object ManifestFactory {
 
   /** Manifest for the unknown type `_ >: L <: U` in an existential.
     */
-  def wildcardType[T](
-      lowerBound: Manifest[_], upperBound: Manifest[_]): Manifest[T] =
+  def wildcardType[T](lowerBound: Manifest[_],
+                      upperBound: Manifest[_]): Manifest[T] =
     new Manifest[T] {
       def runtimeClass = upperBound.runtimeClass
       override def toString =
         "_" + (if (lowerBound eq Nothing) "" else " >: " + lowerBound) +
-        (if (upperBound eq Nothing) "" else " <: " + upperBound)
+          (if (upperBound eq Nothing) "" else " <: " + upperBound)
     }
 
   /** Manifest for the intersection type `parents_0 with ... with parents_n`. */

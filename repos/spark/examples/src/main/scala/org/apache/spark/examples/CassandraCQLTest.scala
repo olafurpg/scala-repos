@@ -83,10 +83,11 @@ object CassandraCQLTest {
     val configuration = job.getConfiguration
     ConfigHelper.setInputInitialAddress(job.getConfiguration(), cHost)
     ConfigHelper.setInputRpcPort(job.getConfiguration(), cPort)
-    ConfigHelper.setInputColumnFamily(
-        job.getConfiguration(), KeySpace, InputColumnFamily)
-    ConfigHelper.setInputPartitioner(
-        job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper.setInputColumnFamily(job.getConfiguration(),
+                                      KeySpace,
+                                      InputColumnFamily)
+    ConfigHelper
+      .setInputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
     CqlConfigHelper.setInputCQLPageRowSize(job.getConfiguration(), "3")
 
     /** CqlConfigHelper.setInputWhereClauses(job.getConfiguration(), "user_id='bob'") */
@@ -96,12 +97,13 @@ object CassandraCQLTest {
     CqlConfigHelper.setOutputCql(job.getConfiguration(), query)
 
     job.setOutputFormatClass(classOf[CqlOutputFormat])
-    ConfigHelper.setOutputColumnFamily(
-        job.getConfiguration(), KeySpace, OutputColumnFamily)
+    ConfigHelper.setOutputColumnFamily(job.getConfiguration(),
+                                       KeySpace,
+                                       OutputColumnFamily)
     ConfigHelper.setOutputInitialAddress(job.getConfiguration(), cHost)
     ConfigHelper.setOutputRpcPort(job.getConfiguration(), cPort)
-    ConfigHelper.setOutputPartitioner(
-        job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper
+      .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
 
     val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),
                                     classOf[CqlPagingInputFormat],
@@ -111,9 +113,9 @@ object CassandraCQLTest {
     println("Count: " + casRdd.count)
     val productSaleRDD = casRdd.map {
       case (key, value) => {
-          (ByteBufferUtil.string(value.get("prod_id")),
-           ByteBufferUtil.toInt(value.get("quantity")))
-        }
+        (ByteBufferUtil.string(value.get("prod_id")),
+         ByteBufferUtil.toInt(value.get("quantity")))
+      }
     }
     val aggregatedRDD = productSaleRDD.reduceByKey(_ + _)
     aggregatedRDD.collect().foreach {
@@ -122,20 +124,20 @@ object CassandraCQLTest {
 
     val casoutputCF = aggregatedRDD.map {
       case (productId, saleCount) => {
-          val outKey = Collections.singletonMap(
-              "prod_id", ByteBufferUtil.bytes(productId))
-          val outVal =
-            Collections.singletonList(ByteBufferUtil.bytes(saleCount))
-          (outKey, outVal)
-        }
+        val outKey =
+          Collections.singletonMap("prod_id", ByteBufferUtil.bytes(productId))
+        val outVal =
+          Collections.singletonList(ByteBufferUtil.bytes(saleCount))
+        (outKey, outVal)
+      }
     }
 
     casoutputCF.saveAsNewAPIHadoopFile(
-        KeySpace,
-        classOf[java.util.Map[String, ByteBuffer]],
-        classOf[java.util.List[ByteBuffer]],
-        classOf[CqlOutputFormat],
-        job.getConfiguration()
+      KeySpace,
+      classOf[java.util.Map[String, ByteBuffer]],
+      classOf[java.util.List[ByteBuffer]],
+      classOf[CqlOutputFormat],
+      job.getConfiguration()
     )
 
     sc.stop()

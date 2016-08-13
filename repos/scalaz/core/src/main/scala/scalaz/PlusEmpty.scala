@@ -53,7 +53,8 @@ object PlusEmpty {
 
   ////
   implicit def liftPlusEmpty[M[_], N[_]](
-      implicit M: Monad[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
+      implicit M: Monad[M],
+      P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
     new PlusEmpty[λ[α => M[N[α]]]] {
       def empty[A] = M.point(P.empty[A])
       def plus[A](a: M[N[A]], b: => M[N[A]]): M[N[A]] =

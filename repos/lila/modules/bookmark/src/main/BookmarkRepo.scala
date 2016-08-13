@@ -15,13 +15,14 @@ private[bookmark] object BookmarkRepo {
   def toggle(gameId: String, userId: String): Fu[Boolean] =
     $count exists selectId(gameId, userId) flatMap { e =>
       e.fold(
-          remove(gameId, userId),
-          add(gameId, userId, DateTime.now)
+        remove(gameId, userId),
+        add(gameId, userId, DateTime.now)
       ) inject !e
     }
 
   def gameIdsByUserId(userId: String): Fu[Set[String]] =
-    bookmarkTube.coll.distinct("g", BSONDocument("u" -> userId).some) map lila.db.BSON.asStringSet
+    bookmarkTube.coll
+      .distinct("g", BSONDocument("u" -> userId).some) map lila.db.BSON.asStringSet
 
   def removeByGameId(gameId: String): Funit =
     $remove(Json.obj("g" -> gameId))
@@ -31,10 +32,10 @@ private[bookmark] object BookmarkRepo {
 
   private def add(gameId: String, userId: String, date: DateTime): Funit =
     $insert(
-        Json.obj("_id" -> makeId(gameId, userId),
-                 "g" -> gameId,
-                 "u" -> userId,
-                 "d" -> $date(date)))
+      Json.obj("_id" -> makeId(gameId, userId),
+               "g" -> gameId,
+               "u" -> userId,
+               "d" -> $date(date)))
 
   def userIdQuery(userId: String) = Json.obj("u" -> userId)
   def makeId(gameId: String, userId: String) = gameId + userId

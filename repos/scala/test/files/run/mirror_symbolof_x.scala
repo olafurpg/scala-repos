@@ -33,7 +33,8 @@ object Test extends App {
 
   object test3 {
     val m = ru.runtimeMirror(classOf[Int].getClass.getClassLoader)
-    try println(m.symbolOf[C]) catch {
+    try println(m.symbolOf[C])
+    catch {
       case ex: ScalaReflectionException =>
         println(s"exception: ${ex.getMessage}")
     }

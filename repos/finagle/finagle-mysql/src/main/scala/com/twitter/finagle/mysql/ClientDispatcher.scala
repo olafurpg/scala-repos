@@ -1,11 +1,20 @@
 package com.twitter.finagle.exp.mysql
 
-import com.google.common.cache.{CacheBuilder, RemovalListener, RemovalNotification}
+import com.google.common.cache.{
+  CacheBuilder,
+  RemovalListener,
+  RemovalNotification
+}
 import com.twitter.cache.guava.GuavaCache
 import com.twitter.finagle.dispatch.GenSerialClientDispatcher
 import com.twitter.finagle.exp.mysql.transport.{BufferReader, Packet}
 import com.twitter.finagle.transport.Transport
-import com.twitter.finagle.{CancelledRequestException, Service, WriteException, ServiceProxy}
+import com.twitter.finagle.{
+  CancelledRequestException,
+  Service,
+  WriteException,
+  ServiceProxy
+}
 import com.twitter.util.{Future, Promise, Return, Try, Throw}
 
 /**
@@ -31,8 +40,7 @@ case class LostSyncException(underlying: Throwable)
 private[mysql] class PrepareCache(
     svc: Service[Request, Result],
     max: Int = 20
-)
-    extends ServiceProxy[Request, Result](svc) {
+) extends ServiceProxy[Request, Result](svc) {
 
   private[this] val fn = {
     val listener = new RemovalListener[Request, Future[Result]] {
@@ -106,8 +114,7 @@ object ClientDispatcher {
 class ClientDispatcher(
     trans: Transport[Packet, Packet],
     handshake: HandshakeInit => Try[HandshakeResponse]
-)
-    extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
+) extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
   import ClientDispatcher._
 
   override def apply(req: Request): Future[Result] =
@@ -188,14 +195,12 @@ class ClientDispatcher(
         ok <- const(PrepareOK(packet))
         (seq1, _) <- readTx(ok.numOfParams)
         (seq2, _) <- readTx(ok.numOfCols)
-        ps <- Future.collect(
-            seq1 map { p =>
-          const(Field(p))
-        })
-        cs <- Future.collect(
-            seq2 map { p =>
-          const(Field(p))
-        })
+        ps <- Future.collect(seq1 map { p =>
+               const(Field(p))
+             })
+        cs <- Future.collect(seq2 map { p =>
+               const(Field(p))
+             })
       } yield ok.copy(params = ps, columns = cs)
 
       result ensure signal.setDone()

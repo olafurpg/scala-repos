@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,7 +46,8 @@ import scalaz._
 import scala.collection.mutable
 
 trait PrecogLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with TransSpecModule
+    extends ColumnarTableLibModule[M]
+    with TransSpecModule
     with HttpClientModule[M] {
   val PrecogNamespace = Vector("precog")
 
@@ -58,24 +59,25 @@ trait PrecogLibModule[M[+ _]]
     object Enrichment extends Op2(PrecogNamespace, "enrichment") {
 
       val tpe = BinaryOperationType(
-          JObjectUnfixedT,
-          JUnionT(JObjectFixedT(
-                      Map("url" -> JTextT, "options" -> JObjectUnfixedT)),
-                  JObjectFixedT(Map("url" -> JTextT))),
-          JObjectUnfixedT)
+        JObjectUnfixedT,
+        JUnionT(
+          JObjectFixedT(Map("url" -> JTextT, "options" -> JObjectUnfixedT)),
+          JObjectFixedT(Map("url" -> JTextT))),
+        JObjectUnfixedT)
 
       def spec[A <: SourceType](ctx: MorphContext)(
-          left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = {
-        trans.MapWith(trans.InnerArrayConcat(
-                          trans.WrapArray(left), trans.WrapArray(right)),
+          left: TransSpec[A],
+          right: TransSpec[A]): TransSpec[A] = {
+        trans.MapWith(trans.InnerArrayConcat(trans.WrapArray(left),
+                                             trans.WrapArray(right)),
                       new EnrichmentMapper(ctx))
       }
 
       class EnrichmentMapper(ctx: MorphContext) extends CMapperM[M] {
         import Extractor.Error
 
-        private type Result[+A] = Validation[
-            NonEmptyList[HttpClientError \/ Error], A]
+        private type Result[+A] =
+          Validation[NonEmptyList[HttpClientError \/ Error], A]
         private val httpError: HttpClientError => HttpClientError \/ Error =
           -\/(_)
         private val jsonError: Error => HttpClientError \/ Error = \/-(_)
@@ -166,7 +168,7 @@ trait PrecogLibModule[M[+ _]]
                   def populate(data: List[JValue]): Validation[Error, Slice] = {
                     if (data.size != members.cardinality) {
                       Failure(Error.invalid(
-                              "Number of items returned does not match number sent."))
+                        "Number of items returned does not match number sent."))
                     } else {
                       def sparseStream(row: Int,
                                        xs: List[RValue]): Stream[RValue] =
@@ -186,18 +188,17 @@ trait PrecogLibModule[M[+ _]]
 
                   val client = HttpClient(url)
                   val request = Request(
-                      HttpMethod.POST,
-                      body = Some(
-                            Request.Body("application/json", requestBody)))
+                    HttpMethod.POST,
+                    body = Some(Request.Body("application/json", requestBody)))
 
                   client.execute(request).run map { responseE =>
                     val validation = for {
                       response <- httpError <-: responseE.validation
                       body <- httpError <-: response.ok.validation
-                      json <- jsonError <-:(Error.thrown(_)) <-: JParser
-                        .parseFromString(body)
+                      json <- jsonError <-: (Error.thrown(_)) <-: JParser
+                               .parseFromString(body)
                       data <- jsonError <-: (json \ "data")
-                        .validated[List[JValue]]
+                               .validated[List[JValue]]
                       result <- jsonError <-: populate(data)
                     } yield result
                     validation leftMap (NonEmptyList(_))
@@ -214,11 +215,11 @@ trait PrecogLibModule[M[+ _]]
             case Failure(errors) =>
               val messages =
                 errors.toList map
-                (_.fold({ httpError =>
-                      "Error making HTTP request: " + httpError.userMessage
-                    }, { jsonError =>
-                      "Error parsing JSON: " + jsonError.message
-                    }))
+                  (_.fold({ httpError =>
+                    "Error making HTTP request: " + httpError.userMessage
+                  }, { jsonError =>
+                    "Error parsing JSON: " + jsonError.message
+                  }))
               val units: M[List[Unit]] =
                 messages traverse (ctx.logger.error(_))
               units flatMap { _ =>

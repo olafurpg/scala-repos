@@ -99,94 +99,94 @@ object DependencyGroups {
   import Dependencies._
 
   val sbtBundled = Seq(
-      compilerInterfaceSources,
-      bundledJline,
-      incrementalCompiler,
-      sbtInterface
+    compilerInterfaceSources,
+    bundledJline,
+    incrementalCompiler,
+    sbtInterface
   )
 
   val plexusContainer = Seq(
-      plexusContainerDefault,
-      plexusClassworlds,
-      plexusUtils,
-      plexusComponentAnnotations,
-      xbeanReflect
+    plexusContainerDefault,
+    plexusClassworlds,
+    plexusUtils,
+    plexusComponentAnnotations,
+    xbeanReflect
   )
 
   val lucene = Seq(
-      luceneCore,
-      luceneHighlighter,
-      luceneMemory,
-      luceneQueries,
-      luceneQueryParser,
-      luceneAnalyzers,
-      luceneSandbox
+    luceneCore,
+    luceneHighlighter,
+    luceneMemory,
+    luceneQueries,
+    luceneQueryParser,
+    luceneAnalyzers,
+    luceneSandbox
   )
 
   val aether = Seq(
-      aetherApi,
-      aetherUtil
+    aetherApi,
+    aetherUtil
   )
 
   val sisu = Seq(
-      sisuInjectPlexus,
-      sisuInjectBean,
-      sisuGuice
+    sisuInjectPlexus,
+    sisuInjectBean,
+    sisuGuice
   )
 
   val wagon = Seq(
-      wagonHttp,
-      wagonHttpShared,
-      wagonProviderApi,
-      httpClient,
-      httpCore,
-      commonsCodec,
-      commonsLogging,
-      commonsLang,
-      commonsIo,
-      jsoup
+    wagonHttp,
+    wagonHttpShared,
+    wagonProviderApi,
+    httpClient,
+    httpCore,
+    commonsCodec,
+    commonsLogging,
+    commonsLang,
+    commonsIo,
+    jsoup
   )
 
   val scalastyle = Seq(
-      scalastyle_2_11,
-      scalariform_2_11
+    scalastyle_2_11,
+    scalariform_2_11
   )
 
   val mavenIndexer =
     Seq(
-        mavenIndexerCore,
-        mavenModel
+      mavenIndexerCore,
+      mavenModel
     ) ++ plexusContainer ++ lucene ++ aether ++ sisu ++ wagon
 
   val scalaCommunity =
     Seq(
-        scalaLibrary,
-        scalaReflect,
-        scalaXml,
-        scalaParserCombinators,
-        sbtStructureCore,
-        evoInflector,
-        scalatestFindersPatched,
-        jamm
+      scalaLibrary,
+      scalaReflect,
+      scalaXml,
+      scalaParserCombinators,
+      sbtStructureCore,
+      evoInflector,
+      scalatestFindersPatched,
+      jamm
     ) ++ mavenIndexer ++ scalastyle
 
   val scalap = Seq(
-      scalaLibrary,
-      scalaReflect,
-      scalaCompiler,
-      commonsLang
+    scalaLibrary,
+    scalaReflect,
+    scalaCompiler,
+    commonsLang
   )
 
   val scalaRunner = Seq(
-      "org.specs2" %% "specs2" % "2.3.11" % "provided" excludeAll ExclusionRule(
-          organization = "org.ow2.asm")
+    "org.specs2" %% "specs2" % "2.3.11" % "provided" excludeAll ExclusionRule(
+      organization = "org.ow2.asm")
   )
 
   val runners = Seq(
-      "org.specs2" %% "specs2" % "2.3.11" % "provided" excludeAll ExclusionRule(
-          organization = "org.ow2.asm"),
-      "org.scalatest" % "scalatest_2.11" % "2.2.1" % "provided",
-      "com.lihaoyi" %% "utest" % "0.3.1" % "provided"
+    "org.specs2" %% "specs2" % "2.3.11" % "provided" excludeAll ExclusionRule(
+      organization = "org.ow2.asm"),
+    "org.scalatest" % "scalatest_2.11" % "2.2.1" % "provided",
+    "com.lihaoyi" %% "utest" % "0.3.1" % "provided"
   )
 
   val sbtLaunchTestDownloader =
@@ -201,65 +201,65 @@ object DependencyGroups {
         "0.13.9").map(v => "org.scala-sbt" % "sbt-launch" % v)
 
   val testDownloader = Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.1",
-      "org.scalatest" % "scalatest_2.10" % "2.2.1",
-      "org.specs2" % "specs2_2.11" % "2.4.15",
-      "org.specs2" % "specs2-core_2.11" % "3.0.1",
-      "org.specs2" % "specs2-common_2.11" % "3.0.1",
-      "org.specs2" % "specs2-matcher_2.11" % "3.0.1",
-      "com.lihaoyi" % "utest_2.10" % "0.3.1" % "provided",
-      "org.scalaz" % "scalaz-core_2.11" % "7.1.0",
-      "org.scalaz" % "scalaz-concurrent_2.11" % "7.1.0",
-      "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
-      "org.specs2" % "specs2_2.10" % "2.4.6",
-      "org.scalaz" % "scalaz-core_2.10" % "7.1.0",
-      "org.scalaz" % "scalaz-concurrent_2.10" % "7.1.0",
-      "org.scalaz.stream" % "scalaz-stream_2.11" % "0.6a",
-      "com.chuusai" % "shapeless_2.11" % "2.0.0",
-      "org.typelevel" % "scodec-bits_2.11" % "1.1.0-SNAPSHOT",
-      "org.typelevel" % "scodec-core_2.11" % "1.7.0-SNAPSHOT",
-      "org.scalatest" % "scalatest_2.11" % "2.1.7",
-      "org.scalatest" % "scalatest_2.10" % "2.1.7",
-      "org.scalatest" % "scalatest_2.10" % "1.9.2",
-      "com.github.julien-truffaut" %% "monocle-core" % "1.2.0",
-      "com.github.julien-truffaut" %% "monocle-generic" % "1.2.0",
-      "com.github.julien-truffaut" %% "monocle-macro" % "1.2.0",
-      "io.spray" %% "spray-routing" % "1.3.1",
-      "com.typesafe.slick" %% "slick" % "3.1.0",
-      "org.scala-lang.modules" % "scala-async_2.11" % "0.9.5",
-      "org.typelevel" %% "cats" % "0.4.0"
+    "org.scalatest" % "scalatest_2.11" % "2.2.1",
+    "org.scalatest" % "scalatest_2.10" % "2.2.1",
+    "org.specs2" % "specs2_2.11" % "2.4.15",
+    "org.specs2" % "specs2-core_2.11" % "3.0.1",
+    "org.specs2" % "specs2-common_2.11" % "3.0.1",
+    "org.specs2" % "specs2-matcher_2.11" % "3.0.1",
+    "com.lihaoyi" % "utest_2.10" % "0.3.1" % "provided",
+    "org.scalaz" % "scalaz-core_2.11" % "7.1.0",
+    "org.scalaz" % "scalaz-concurrent_2.11" % "7.1.0",
+    "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
+    "org.specs2" % "specs2_2.10" % "2.4.6",
+    "org.scalaz" % "scalaz-core_2.10" % "7.1.0",
+    "org.scalaz" % "scalaz-concurrent_2.10" % "7.1.0",
+    "org.scalaz.stream" % "scalaz-stream_2.11" % "0.6a",
+    "com.chuusai" % "shapeless_2.11" % "2.0.0",
+    "org.typelevel" % "scodec-bits_2.11" % "1.1.0-SNAPSHOT",
+    "org.typelevel" % "scodec-core_2.11" % "1.7.0-SNAPSHOT",
+    "org.scalatest" % "scalatest_2.11" % "2.1.7",
+    "org.scalatest" % "scalatest_2.10" % "2.1.7",
+    "org.scalatest" % "scalatest_2.10" % "1.9.2",
+    "com.github.julien-truffaut" %% "monocle-core" % "1.2.0",
+    "com.github.julien-truffaut" %% "monocle-generic" % "1.2.0",
+    "com.github.julien-truffaut" %% "monocle-macro" % "1.2.0",
+    "io.spray" %% "spray-routing" % "1.3.1",
+    "com.typesafe.slick" %% "slick" % "3.1.0",
+    "org.scala-lang.modules" % "scala-async_2.11" % "0.9.5",
+    "org.typelevel" %% "cats" % "0.4.0"
   )
 
   val testScalaLibraryDownloader = Seq(
-      "org.scala-lang" % "scala-library" % "2.10.6" withSources (),
-      "org.scala-lang" % "scala-reflect" % "2.10.6",
-      "org.scala-lang" % "scala-compiler" % "2.10.6",
-      "org.scala-lang" % "scala-library" % "2.11.7" withSources (),
-      "org.scala-lang" % "scala-reflect" % "2.11.7",
-      "org.scala-lang" % "scala-compiler" % "2.11.7",
-      "org.scala-lang" % "scala-library" % "2.12.0-M2" withSources (),
-      "org.scala-lang" % "scala-reflect" % "2.12.0-M2",
-      "org.scala-lang" % "scala-compiler" % "2.12.0-M2"
+    "org.scala-lang" % "scala-library" % "2.10.6" withSources (),
+    "org.scala-lang" % "scala-reflect" % "2.10.6",
+    "org.scala-lang" % "scala-compiler" % "2.10.6",
+    "org.scala-lang" % "scala-library" % "2.11.7" withSources (),
+    "org.scala-lang" % "scala-reflect" % "2.11.7",
+    "org.scala-lang" % "scala-compiler" % "2.11.7",
+    "org.scala-lang" % "scala-library" % "2.12.0-M2" withSources (),
+    "org.scala-lang" % "scala-reflect" % "2.12.0-M2",
+    "org.scala-lang" % "scala-compiler" % "2.12.0-M2"
   )
 
   val mockSbtDownloader = {
     val v = "0.13.5"
     Seq(
-        "org.scala-sbt" % "collections" % v,
-        "org.scala-sbt" % "interface" % v,
-        "org.scala-sbt" % "io" % v,
-        "org.scala-sbt" % "ivy" % v,
-        "org.scala-sbt" % "logging" % v,
-        "org.scala-sbt" % "main" % v,
-        "org.scala-sbt" % "main-settings" % v,
-        "org.scala-sbt" % "process" % v,
-        "org.scala-sbt" % "sbt" % v
+      "org.scala-sbt" % "collections" % v,
+      "org.scala-sbt" % "interface" % v,
+      "org.scala-sbt" % "io" % v,
+      "org.scala-sbt" % "ivy" % v,
+      "org.scala-sbt" % "logging" % v,
+      "org.scala-sbt" % "main" % v,
+      "org.scala-sbt" % "main-settings" % v,
+      "org.scala-sbt" % "process" % v,
+      "org.scala-sbt" % "sbt" % v
     )
   }
 
   val sbtRuntime = Seq(
-      sbtStructureExtractor012,
-      sbtStructureExtractor013,
-      sbtLaunch
+    sbtStructureExtractor012,
+    sbtStructureExtractor013,
+    sbtLaunch
   )
 }

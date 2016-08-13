@@ -11,17 +11,17 @@ class Misc
 
 @RunWith(classOf[JUnit4])
 class ClassTagTest {
-  def checkNotString[A : ClassTag](a: Any) = a match {
+  def checkNotString[A: ClassTag](a: Any) = a match {
     case x: String => false
     case x: A => true
     case _ => false
   }
-  def checkNotInt[A : ClassTag](a: Any) = a match {
+  def checkNotInt[A: ClassTag](a: Any) = a match {
     case x: Int => false
     case x: A => true
     case _ => false
   }
-  def checkNotLong[A : ClassTag](a: Any) = a match {
+  def checkNotLong[A: ClassTag](a: Any) = a match {
     case x: Long => false
     case x: A => true
     case _ => false

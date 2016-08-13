@@ -23,8 +23,9 @@ object ClusterDeathWatchMultiJvmSpec extends MultiNodeConfig {
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+    debugConfig(on = false).withFallback(
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 
   deployOn(fourth, """/hello.remote = "@first@" """)
 
@@ -41,7 +42,8 @@ class ClusterDeathWatchMultiJvmNode5 extends ClusterDeathWatchSpec
 
 abstract class ClusterDeathWatchSpec
     extends MultiNodeSpec(ClusterDeathWatchMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import ClusterDeathWatchMultiJvmSpec._
 
@@ -50,7 +52,7 @@ abstract class ClusterDeathWatchSpec
     if (!log.isDebugEnabled) {
       muteMarkingAsUnreachable()
       system.eventStream.publish(
-          Mute(EventFilter[java.net.UnknownHostException]()))
+        Mute(EventFilter[java.net.UnknownHostException]()))
     }
   }
 
@@ -61,7 +63,7 @@ abstract class ClusterDeathWatchSpec
 
   "An actor watching a remote actor in the cluster" must {
     "receive Terminated when watched node becomes Down/Removed" in within(
-        20 seconds) {
+      20 seconds) {
       awaitClusterUp(first, second, third, fourth)
       enterBarrier("cluster-up")
 
@@ -94,14 +96,15 @@ abstract class ClusterDeathWatchSpec
 
         markNodeAsUnavailable(third)
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should contain(
-                address(third)))
+          clusterView.unreachableMembers.map(_.address) should contain(
+            address(third)))
         cluster.down(third)
         // removed
-        awaitAssert(clusterView.members.map(_.address) should not contain
+        awaitAssert(
+          clusterView.members.map(_.address) should not contain
             (address(third)))
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should not contain
+          clusterView.unreachableMembers.map(_.address) should not contain
             (address(third)))
         expectMsg(path3)
         enterBarrier("third-terminated")
@@ -116,14 +119,15 @@ abstract class ClusterDeathWatchSpec
         runOn(third) {
           markNodeAsUnavailable(second)
           awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should contain(
-                  address(second)))
+            clusterView.unreachableMembers.map(_.address) should contain(
+              address(second)))
           cluster.down(second)
           // removed
-          awaitAssert(clusterView.members.map(_.address) should not contain
+          awaitAssert(
+            clusterView.members.map(_.address) should not contain
               (address(second)))
           awaitAssert(
-              clusterView.unreachableMembers.map(_.address) should not contain
+            clusterView.unreachableMembers.map(_.address) should not contain
               (address(second)))
         }
         enterBarrier("second-terminated")
@@ -158,7 +162,7 @@ abstract class ClusterDeathWatchSpec
     }
 
     "be able to watch actor before node joins cluster, ClusterRemoteWatcher takes over from RemoteWatcher" in within(
-        20 seconds) {
+      20 seconds) {
       runOn(fifth) {
         system.actorOf(Props(new Actor { def receive = Actor.emptyBehavior })
                          .withDeploy(Deploy.local),
@@ -168,7 +172,7 @@ abstract class ClusterDeathWatchSpec
 
       runOn(first) {
         system.actorSelection(RootActorPath(fifth) / "user" / "subject5") ! Identify(
-            "subject5")
+          "subject5")
         val subject5 = expectMsgType[ActorIdentity].ref.get
         watch(subject5)
 
@@ -201,14 +205,15 @@ abstract class ClusterDeathWatchSpec
       runOn(fourth) {
         markNodeAsUnavailable(fifth)
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should contain(
-                address(fifth)))
+          clusterView.unreachableMembers.map(_.address) should contain(
+            address(fifth)))
         cluster.down(fifth)
         // removed
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should not contain
+          clusterView.unreachableMembers.map(_.address) should not contain
             (address(fifth)))
-        awaitAssert(clusterView.members.map(_.address) should not contain
+        awaitAssert(
+          clusterView.members.map(_.address) should not contain
             (address(fifth)))
       }
 
@@ -221,7 +226,7 @@ abstract class ClusterDeathWatchSpec
     }
 
     "be able to shutdown system when using remote deployed actor on node that crash" in within(
-        20 seconds) {
+      20 seconds) {
       // fourth actor system will be shutdown, not part of testConductor any more
       // so we can't use barriers to synchronize with it
       val firstAddress = address(first)
@@ -239,14 +244,15 @@ abstract class ClusterDeathWatchSpec
 
         markNodeAsUnavailable(first)
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should contain(
-                address(first)))
+          clusterView.unreachableMembers.map(_.address) should contain(
+            address(first)))
         cluster.down(first)
         // removed
         awaitAssert(
-            clusterView.unreachableMembers.map(_.address) should not contain
+          clusterView.unreachableMembers.map(_.address) should not contain
             (address(first)))
-        awaitAssert(clusterView.members.map(_.address) should not contain
+        awaitAssert(
+          clusterView.members.map(_.address) should not contain
             (address(first)))
 
         expectTerminated(hello)
@@ -254,12 +260,14 @@ abstract class ClusterDeathWatchSpec
         enterBarrier("first-unavailable")
 
         val timeout = remainingOrDefault
-        try Await.ready(system.whenTerminated, timeout) catch {
+        try Await.ready(system.whenTerminated, timeout)
+        catch {
           case _: TimeoutException ⇒
-            fail("Failed to stop [%s] within [%s] \n%s".format(
-                    system.name,
-                    timeout,
-                    system.asInstanceOf[ActorSystemImpl].printTree))
+            fail(
+              "Failed to stop [%s] within [%s] \n%s".format(
+                system.name,
+                timeout,
+                system.asInstanceOf[ActorSystemImpl].printTree))
         }
 
         // signal to the first node that fourth is done

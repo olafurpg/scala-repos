@@ -4,7 +4,10 @@ package quasiquotes
 import scala.reflect.macros.runtime.Context
 
 abstract class Quasiquotes
-    extends Parsers with Holes with Placeholders with Reifiers {
+    extends Parsers
+    with Holes
+    with Placeholders
+    with Reifiers {
   val c: Context
   val global: c.universe.type = c.universe
   import c.universe._
@@ -14,21 +17,20 @@ abstract class Quasiquotes
 
   lazy val (universe: Tree, args, parts, parse, reify, method) =
     c.macroApplication match {
-      case Apply(
-          build.SyntacticTypeApplied(
-          Select(
-          Select(
-          Apply(Select(universe0, _), List(Apply(_, parts0))), interpolator0),
-          method0),
-          _),
-          args0) =>
+      case Apply(build.SyntacticTypeApplied(
+                 Select(Select(
+                        Apply(Select(universe0, _), List(Apply(_, parts0))),
+                        interpolator0),
+                        method0),
+                 _),
+                 args0) =>
         debug(
-            s"parse prefix:\nuniverse=$universe0\nparts=$parts0\ninterpolator=$interpolator0\nmethod=$method0\nargs=$args0\n")
+          s"parse prefix:\nuniverse=$universe0\nparts=$parts0\ninterpolator=$interpolator0\nmethod=$method0\nargs=$args0\n")
         val parts1 = parts0.map {
           case lit @ Literal(Constant(s: String)) => s -> lit.pos
           case part =>
-            c.abort(
-                part.pos, "Quasiquotes can only be used with literal strings")
+            c.abort(part.pos,
+                    "Quasiquotes can only be used with literal strings")
         }
         val reify0 = method0 match {
           case nme.apply => new ApplyReifier().reifyFillingHoles(_)
@@ -60,8 +62,8 @@ abstract class Quasiquotes
     def sreified =
       reified.toString
         .replace(
-            "scala.reflect.runtime.`package`.universe.internal.reificationSupport.",
-            "")
+          "scala.reflect.runtime.`package`.universe.internal.reificationSupport.",
+          "")
         .replace("scala.reflect.runtime.`package`.universe.", "")
         .replace("scala.collection.immutable.", "")
     debug(s"reified tree:\n$sreified\n")

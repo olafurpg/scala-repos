@@ -44,41 +44,38 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
     addWordSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(17, 10, wordSpecFileName),
-            wordSpecClassName,
-            "sum name should test"))
+      checkConfigAndSettings(createTestFromLocation(17, 10, wordSpecFileName),
+                             wordSpecClassName,
+                             "sum name should test"))
   }
 
   def testWordSpecVal() = {
     addWordSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(6, 10, wordSpecFileName),
-                               wordSpecClassName,
-                               "const should const"))
+      checkConfigAndSettings(createTestFromLocation(6, 10, wordSpecFileName),
+                             wordSpecClassName,
+                             "const should const"))
   }
 
   def testWordSpecValSum() = {
     addWordSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(14, 10, wordSpecFileName),
-            wordSpecClassName,
-            "sum name should constconst"))
+      checkConfigAndSettings(createTestFromLocation(14, 10, wordSpecFileName),
+                             wordSpecClassName,
+                             "sum name should constconst"))
     assert(
-        checkConfigAndSettings(createTestFromLocation(9, 10, wordSpecFileName),
-                               wordSpecClassName,
-                               "const should const sum"))
+      checkConfigAndSettings(createTestFromLocation(9, 10, wordSpecFileName),
+                             wordSpecClassName,
+                             "const should const sum"))
   }
 
   def testWordSpecNonConst() = {
     addWordSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(19, 10, wordSpecFileName),
-            wordSpecClassName))
+      checkConfigAndSettings(createTestFromLocation(19, 10, wordSpecFileName),
+                             wordSpecClassName))
   }
 }

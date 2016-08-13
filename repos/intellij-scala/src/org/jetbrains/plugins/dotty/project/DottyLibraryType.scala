@@ -3,7 +3,10 @@ package org.jetbrains.plugins.dotty.project
 import javax.swing.{Icon, JComponent}
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.libraries.ui.{LibraryEditorComponent, LibraryPropertiesEditor}
+import com.intellij.openapi.roots.libraries.ui.{
+  LibraryEditorComponent,
+  LibraryPropertiesEditor
+}
 import com.intellij.openapi.roots.libraries.{LibraryProperties, LibraryType}
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.plugins.dotty.project.template.DottyLibraryDescription
@@ -38,8 +41,7 @@ object DottyLibraryType {
 
   def instance =
     Option(
-        LibraryType
-          .findByKind(DottyLibraryKind)
-          .asInstanceOf[DottyLibraryType]).getOrElse(
+      LibraryType.findByKind(DottyLibraryKind).asInstanceOf[DottyLibraryType])
+      .getOrElse(
         throw new NoSuchElementException("Dotty library type not found"))
 }

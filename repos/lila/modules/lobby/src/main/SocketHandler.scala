@@ -19,8 +19,9 @@ private[lobby] final class SocketHandler(hub: lila.hub.Env,
                                          socket: ActorRef,
                                          blocking: String => Fu[Set[String]]) {
 
-  private def controller(
-      socket: ActorRef, uid: String, member: Member): Handler.Controller = {
+  private def controller(socket: ActorRef,
+                         uid: String,
+                         member: Member): Handler.Controller = {
     case ("p", o) =>
       o int "v" foreach { v =>
         socket ! PingVersion(uid, v)
@@ -43,11 +44,14 @@ private[lobby] final class SocketHandler(hub: lila.hub.Env,
       } lobby ! CancelSeek(id, user)
   }
 
-  def apply(
-      uid: String, user: Option[User], mobile: Boolean): Fu[JsSocketHandler] =
+  def apply(uid: String,
+            user: Option[User],
+            mobile: Boolean): Fu[JsSocketHandler] =
     (user ?? (u => blocking(u.id))) flatMap { blockedUserIds =>
-      val join = Join(
-          uid = uid, user = user, blocking = blockedUserIds, mobile = mobile)
+      val join = Join(uid = uid,
+                      user = user,
+                      blocking = blockedUserIds,
+                      mobile = mobile)
       Handler(hub, socket, uid, join, user map (_.id)) {
         case Connected(enum, member) =>
           (controller(socket, uid, member), enum, member)

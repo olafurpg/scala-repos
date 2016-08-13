@@ -18,7 +18,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateDefinitionStub
-import org.jetbrains.plugins.scala.lang.psi.types.{PhysicalSignature, ScSubstitutor}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  PhysicalSignature,
+  ScSubstitutor
+}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -29,8 +32,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
                            nodeType: IElementType,
                            node: ASTNode)
-    extends ScTypeDefinitionImpl(stub, nodeType, node) with ScTrait
-    with ScTypeParametersOwner with ScTemplateDefinition {
+    extends ScTypeDefinitionImpl(stub, nodeType, node)
+    with ScTrait
+    with ScTypeParametersOwner
+    with ScTemplateDefinition {
   override def additionalJavaNames: Array[String] = {
     Array(fakeCompanionClass.getName) //do not add fakeCompanionModule => will build tree from stubs everywhere
   }
@@ -58,8 +63,11 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
       state: ResolveState,
       lastParent: PsiElement,
       place: PsiElement): Boolean = {
-    super [ScTypeParametersOwner].processDeclarations(
-        processor, state, lastParent, place) && super [ScTemplateDefinition]
+    super[ScTypeParametersOwner].processDeclarations(
+      processor,
+      state,
+      lastParent,
+      place) && super[ScTemplateDefinition]
       .processDeclarationsForTemplateBody(processor, state, lastParent, place)
   }
 
@@ -67,8 +75,8 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super [ScTemplateDefinition].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTemplateDefinition]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def isInterface: Boolean = true
@@ -89,17 +97,18 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
     val res = new ArrayBuffer[PsiMethod]()
     res ++= getConstructors
     TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      this.processPsiMethodsForNode(
-          node, isStatic = false, isInterface = true)(res += _)
+      this.processPsiMethodsForNode(node,
+                                    isStatic = false,
+                                    isInterface = true)(res += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
       this.processPsiMethodsForNode(
-          new SignatureNodes.Node(new PhysicalSignature(synthetic,
-                                                        ScSubstitutor.empty),
-                                  ScSubstitutor.empty),
-          isStatic = false,
-          isInterface = isInterface)(res += _)
+        new SignatureNodes.Node(new PhysicalSignature(synthetic,
+                                                      ScSubstitutor.empty),
+                                ScSubstitutor.empty),
+        isStatic = false,
+        isInterface = isInterface)(res += _)
     }
     res.toArray
   }

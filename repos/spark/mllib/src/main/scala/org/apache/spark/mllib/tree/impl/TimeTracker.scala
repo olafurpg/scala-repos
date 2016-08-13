@@ -37,7 +37,7 @@ private[spark] class TimeTracker extends Serializable {
     val currentTime = System.nanoTime()
     if (starts.contains(timerLabel)) {
       throw new RuntimeException(
-          s"TimeTracker.start(timerLabel) called again on" +
+        s"TimeTracker.start(timerLabel) called again on" +
           s" timerLabel = $timerLabel before that timer was stopped.")
     }
     starts(timerLabel) = currentTime
@@ -50,7 +50,7 @@ private[spark] class TimeTracker extends Serializable {
     val currentTime = System.nanoTime()
     if (!starts.contains(timerLabel)) {
       throw new RuntimeException(
-          s"TimeTracker.stop(timerLabel) called on" +
+        s"TimeTracker.stop(timerLabel) called on" +
           s" timerLabel = $timerLabel, but that timer was not started.")
     }
     val elapsed = currentTime - starts(timerLabel)

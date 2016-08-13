@@ -34,22 +34,24 @@ class FlowReduceSpec extends AkkaSpec {
 
     "work when using Source.reduce" in assertAllStagesStopped {
       Await.result(reduceSource runWith Sink.head, 3.seconds) should be(
-          expected)
+        expected)
     }
 
     "work when using Sink.reduce" in assertAllStagesStopped {
       Await.result(inputSource runWith reduceSink, 3.seconds) should be(
-          expected)
+        expected)
     }
 
     "work when using Flow.reduce" in assertAllStagesStopped {
-      Await.result(inputSource via reduceFlow runWith Sink.head, 3.seconds) should be(
-          expected)
+      Await
+        .result(inputSource via reduceFlow runWith Sink.head, 3.seconds) should be(
+        expected)
     }
 
     "work when using Source.reduce + Flow.reduce + Sink.reduce" in assertAllStagesStopped {
-      Await.result(reduceSource via reduceFlow runWith reduceSink, 3.seconds) should be(
-          expected)
+      Await
+        .result(reduceSource via reduceFlow runWith reduceSink, 3.seconds) should be(
+        expected)
     }
 
     "propagate an error" in assertAllStagesStopped {

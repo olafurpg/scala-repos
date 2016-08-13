@@ -25,7 +25,7 @@ class FixTest {
   // argument expression's type is not compatible with formal parameter type;
   //  found   : One[Nothing]
   //  required: ?Op[ Fix[?Op[ A ]] ]
-  //   val zero = new Fix(new One)   // this seems like something which could plausibly work  
+  //   val zero = new Fix(new One)   // this seems like something which could plausibly work
   //              ^
-  // two errors found    
+  // two errors found
 }

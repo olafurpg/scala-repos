@@ -7,8 +7,7 @@ import com.intellij.psi.PsiModifier
   * Nikolay.Tropin
   * 2014-08-29
   */
-private[changeInfo] trait VisibilityChangeInfo {
-  this: ScalaChangeInfo =>
+private[changeInfo] trait VisibilityChangeInfo { this: ScalaChangeInfo =>
 
   def getNewVisibility: String = {
     if (newVisibility != null) scalaToJavaVisibility(newVisibility)

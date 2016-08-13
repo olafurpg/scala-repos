@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -28,8 +28,12 @@ import java.io.File
 import scala.io.Source
 
 object ProvenanceCheckingSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with RandomLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with RandomLibrarySpec {
 
   import ast._
 
@@ -166,7 +170,7 @@ object ProvenanceCheckingSpecs
         """.stripMargin
       val tree = compileSingle(input)
       tree.provenance.possibilities must containAllOf(
-          List(StaticProvenance("/foo"), StaticProvenance("/bar")))
+        List(StaticProvenance("/foo"), StaticProvenance("/bar")))
       tree.errors must beEmpty
     }
 
@@ -194,7 +198,7 @@ object ProvenanceCheckingSpecs
         """.stripMargin
       val tree = compileSingle(input)
       tree.provenance.possibilities must containAllOf(
-          List(StaticProvenance("foo"), StaticProvenance("bar")))
+        List(StaticProvenance("foo"), StaticProvenance("bar")))
       tree.errors must beEmpty
     }
 
@@ -500,7 +504,7 @@ object ProvenanceCheckingSpecs
     "accept a dispatch to a function wrapping Add with explicitly related parameters" in {
       val tree = compileSingle("a(b) := b + //foo //foo ~ //bar a(//bar)")
       tree.provenance.possibilities must containAllOf(
-          List(StaticProvenance("/foo"), StaticProvenance("/bar")))
+        List(StaticProvenance("/foo"), StaticProvenance("/bar")))
       tree.errors must beEmpty
     }
 
@@ -695,7 +699,7 @@ object ProvenanceCheckingSpecs
 
     "give null provenance for difference with coproducts containing dynamic provenance" in {
       val tree = compileSingle(
-          "(//foo union //bar) difference ((new //baz) union //qux)")
+        "(//foo union //bar) difference ((new //baz) union //qux)")
       tree.provenance mustEqual NullProvenance
       tree.errors mustEqual Set(DifferenceWithNoCommonalities)
     }
@@ -704,7 +708,7 @@ object ProvenanceCheckingSpecs
     // while different instances of `new //foo` and `new //foo` have the same identities
     "give coproduct provenance for difference with coproducts containing dynamic provenance" in {
       val tree = compileSingle(
-          "(//foo union (new //bar)) difference ((new //baz) union //qux)")
+        "(//foo union (new //bar)) difference ((new //baz) union //qux)")
       tree.provenance must beLike {
         case CoproductProvenance(StaticProvenance("/foo"),
                                  DynamicProvenance(_)) =>

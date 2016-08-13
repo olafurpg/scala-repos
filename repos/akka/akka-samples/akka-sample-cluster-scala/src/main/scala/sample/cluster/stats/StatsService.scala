@@ -13,8 +13,8 @@ class StatsService extends Actor {
   // This router is used both with lookup and deploy of routees. If you
   // have a router with only lookup of routees you can use Props.empty
   // instead of Props[StatsWorker.class].
-  val workerRouter = context.actorOf(
-      FromConfig.props(Props[StatsWorker]), name = "workerRouter")
+  val workerRouter = context
+    .actorOf(FromConfig.props(Props[StatsWorker]), name = "workerRouter")
 
   def receive = {
     case StatsJob(text) if text != "" =>

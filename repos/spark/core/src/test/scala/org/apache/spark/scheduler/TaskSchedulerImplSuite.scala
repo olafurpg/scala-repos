@@ -28,7 +28,9 @@ class FakeSchedulerBackend extends SchedulerBackend {
 }
 
 class TaskSchedulerImplSuite
-    extends SparkFunSuite with LocalSparkContext with Logging {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Logging {
 
   test("Scheduler does not always schedule tasks on the same workers") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
@@ -88,9 +90,8 @@ class TaskSchedulerImplSuite
       Seq(new WorkerOffer("executor0", "host0", numFreeCores),
           new WorkerOffer("executor1", "host1", numFreeCores))
     taskScheduler.submitTasks(taskSet)
-    taskDescriptions = taskScheduler
-      .resourceOffers(singleCoreWorkerOffers)
-      .flatten
+    taskDescriptions =
+      taskScheduler.resourceOffers(singleCoreWorkerOffers).flatten
     assert(0 === taskDescriptions.length)
 
     // Now change the offers to have 2 cores in one executor and verify if it
@@ -99,9 +100,8 @@ class TaskSchedulerImplSuite
       Seq(new WorkerOffer("executor0", "host0", taskCpus),
           new WorkerOffer("executor1", "host1", numFreeCores))
     taskScheduler.submitTasks(taskSet)
-    taskDescriptions = taskScheduler
-      .resourceOffers(multiCoreWorkerOffers)
-      .flatten
+    taskDescriptions =
+      taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
     assert(1 === taskDescriptions.length)
     assert("executor0" === taskDescriptions(0).executorId)
   }
@@ -139,14 +139,13 @@ class TaskSchedulerImplSuite
     // still be processed without error
     taskScheduler.submitTasks(taskSet)
     taskScheduler.submitTasks(FakeTask.createTaskSet(1))
-    taskDescriptions = taskScheduler
-      .resourceOffers(multiCoreWorkerOffers)
-      .flatten
+    taskDescriptions =
+      taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
     assert(taskDescriptions.map(_.executorId) === Seq("executor0"))
   }
 
   test(
-      "refuse to schedule concurrent attempts for the same stage (SPARK-8103)") {
+    "refuse to schedule concurrent attempts for the same stage (SPARK-8103)") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
@@ -218,7 +217,7 @@ class TaskSchedulerImplSuite
   }
 
   test(
-      "if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts") {
+    "if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)

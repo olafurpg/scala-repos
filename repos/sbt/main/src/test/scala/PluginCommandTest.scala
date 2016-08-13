@@ -4,7 +4,14 @@ import java.io._
 
 import org.specs2.mutable.Specification
 
-import sbt.internal.util.{AttributeEntry, AttributeMap, ConsoleOut, GlobalLogging, MainLogging, Settings}
+import sbt.internal.util.{
+  AttributeEntry,
+  AttributeMap,
+  ConsoleOut,
+  GlobalLogging,
+  MainLogging,
+  Settings
+}
 
 object PluginCommandTestPlugin0 extends AutoPlugin
 
@@ -34,7 +41,7 @@ object PluginCommandTest extends Specification {
                        PluginCommandTestPlugin0,
                        PluginCommandTestPlugin1)
       output must contain(
-          "sbt.subpackage.PluginCommandTestPlugin1 is activated.")
+        "sbt.subpackage.PluginCommandTestPlugin1 is activated.")
     }
 
     "suggest a plugin when given an incorrect plugin with a similar name" in {
@@ -42,7 +49,7 @@ object PluginCommandTest extends Specification {
                                   PluginCommandTestPlugin0,
                                   PluginCommandTestPlugin1)
       output must contain(
-          "Not a valid plugin: PluginCommandTestPlugin0 (similar: sbt.PluginCommandTestPlugin0, sbt.subpackage.PluginCommandTestPlugin1)"
+        "Not a valid plugin: PluginCommandTestPlugin0 (similar: sbt.PluginCommandTestPlugin0, sbt.subpackage.PluginCommandTestPlugin1)"
       )
     }
   }
@@ -73,8 +80,12 @@ object FakeState {
     val currentProject = Map(testProject.base.toURI -> testProject.id)
     val currentEval: () => sbt.compiler.Eval = () =>
       Load.mkEval(Nil, base, Nil)
-    val sessionSettings = SessionSettings(
-        base.toURI, currentProject, Nil, Map.empty, Nil, currentEval)
+    val sessionSettings = SessionSettings(base.toURI,
+                                          currentProject,
+                                          Nil,
+                                          Map.empty,
+                                          Nil,
+                                          currentEval)
 
     val delegates: (Scope) => Seq[Scope] = _ => Nil
     val scopeLocal: Def.ScopeLocal = _ => Nil
@@ -88,12 +99,12 @@ object FakeState {
     val streams: (State) => BuildStreams.Streams = null
 
     val loadedDefinitions: LoadedDefinitions = new LoadedDefinitions(
-        base,
-        Nil,
-        ClassLoader.getSystemClassLoader,
-        Nil,
-        Seq(testProject),
-        Nil
+      base,
+      Nil,
+      ClassLoader.getSystemClassLoader,
+      Nil,
+      Seq(testProject),
+      Nil
     )
 
     val pluginData = PluginData(Nil, Nil, None, None, Nil)
@@ -102,12 +113,14 @@ object FakeState {
 
     val detectedAutoPlugins: Seq[DetectedAutoPlugin] =
       plugins.map(p => DetectedAutoPlugin(p.label, p, hasAutoImport = false))
-    val detectedPlugins = new DetectedPlugins(
-        detectedModules, detectedAutoPlugins, builds)
-    val loadedPlugins = new LoadedPlugins(
-        base, pluginData, ClassLoader.getSystemClassLoader, detectedPlugins)
-    val buildUnit = new BuildUnit(
-        base.toURI, base, loadedDefinitions, loadedPlugins)
+    val detectedPlugins =
+      new DetectedPlugins(detectedModules, detectedAutoPlugins, builds)
+    val loadedPlugins = new LoadedPlugins(base,
+                                          pluginData,
+                                          ClassLoader.getSystemClassLoader,
+                                          detectedPlugins)
+    val buildUnit =
+      new BuildUnit(base.toURI, base, loadedDefinitions, loadedPlugins)
 
     val (partBuildUnit: PartBuildUnit, _) = Load.loaded(buildUnit)
     val loadedBuildUnit =
@@ -125,22 +138,22 @@ object FakeState {
 
     val attributes =
       AttributeMap.empty ++ AttributeMap(
-          AttributeEntry(Keys.sessionSettings, sessionSettings),
-          AttributeEntry(Keys.stateBuildStructure, buildStructure)
+        AttributeEntry(Keys.sessionSettings, sessionSettings),
+        AttributeEntry(Keys.stateBuildStructure, buildStructure)
       )
 
     State(
-        null,
-        Seq(BuiltinCommands.plugin),
-        Set.empty,
-        None,
-        Seq.empty,
-        State.newHistory,
-        attributes,
-        GlobalLogging.initial(MainLogging.globalDefault(ConsoleOut.systemOut),
-                              File.createTempFile("sbt", ".log"),
-                              ConsoleOut.systemOut),
-        State.Continue
+      null,
+      Seq(BuiltinCommands.plugin),
+      Set.empty,
+      None,
+      Seq.empty,
+      State.newHistory,
+      attributes,
+      GlobalLogging.initial(MainLogging.globalDefault(ConsoleOut.systemOut),
+                            File.createTempFile("sbt", ".log"),
+                            ConsoleOut.systemOut),
+      State.Continue
     )
   }
 }

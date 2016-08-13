@@ -23,7 +23,10 @@ import scala.xml.Node
 
 import org.apache.spark.deploy.Command
 import org.apache.spark.deploy.mesos.MesosDriverDescription
-import org.apache.spark.scheduler.cluster.mesos.{MesosClusterRetryState, MesosClusterSubmissionState}
+import org.apache.spark.scheduler.cluster.mesos.{
+  MesosClusterRetryState,
+  MesosClusterSubmissionState
+}
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[ui] class DriverPage(parent: MesosClusterUI)
@@ -46,8 +49,8 @@ private[ui] class DriverPage(parent: MesosClusterUI)
     val commandEnvHeaders = Seq("Command environment variable", "Value")
     val launchedHeaders = Seq("Launched property", "Value")
     val commandHeaders = Seq("Command property", "Value")
-    val retryHeaders = Seq(
-        "Last failed status", "Next retry time", "Retry count")
+    val retryHeaders =
+      Seq("Last failed status", "Next retry time", "Retry count")
     val driverDescription = Iterable.apply(driverState.description)
     val submissionState = Iterable.apply(driverState.submissionState)
     val command = Iterable.apply(driverState.description.command)
@@ -61,14 +64,14 @@ private[ui] class DriverPage(parent: MesosClusterUI)
       UIUtils.listingTable(commandHeaders, commandRow, command)
     val commandEnvTable =
       UIUtils.listingTable(commandEnvHeaders, propertiesRow, commandEnv)
-    val schedulerTable = UIUtils.listingTable(
-        schedulerHeaders, propertiesRow, schedulerProperties)
+    val schedulerTable = UIUtils
+      .listingTable(schedulerHeaders, propertiesRow, schedulerProperties)
     val launchedTable =
       UIUtils.listingTable(launchedHeaders, launchedRow, submissionState)
     val retryTable = UIUtils.listingTable(
-        retryHeaders,
-        retryRow,
-        Iterable.apply(driverState.description.retryState))
+      retryHeaders,
+      retryRow,
+      Iterable.apply(driverState.description.retryState))
     val content = <p>Driver state information for driver id {driverId}</p>
         <a href={UIUtils.prependBaseUri("/")}>Back to Drivers</a>
         <div class="row-fluid">

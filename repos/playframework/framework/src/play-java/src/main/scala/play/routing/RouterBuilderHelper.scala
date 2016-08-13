@@ -29,8 +29,8 @@ private[routing] object RouterBuilderHelper {
       .from(Function.unlift { requestHeader =>
         // Find the first route that matches
         routes.collectFirst(Function.unlift(route =>
-                  // First check method
-                  if (requestHeader.method == route.method) {
+          // First check method
+          if (requestHeader.method == route.method) {
 
             // Now match against the path pattern
             val matcher = route.pathPattern.matcher(requestHeader.path)
@@ -71,22 +71,24 @@ private[routing] object RouterBuilderHelper {
                     // it to instantiate the default body parser, we have to instantiate it ourselves.
                     val app = Play.privateMaybeApplication.get // throw exception if no current app
                     new play.mvc.BodyParser.Default(
-                        new JavaHttpErrorHandlerDelegate(app.errorHandler),
-                        app.injector.instanceOf[HttpConfiguration])
+                      new JavaHttpErrorHandlerDelegate(app.errorHandler),
+                      app.injector.instanceOf[HttpConfiguration])
                   }
-                  Action.async(parser) { request =>
-                    val ctx = JavaHelpers.createJavaContext(request)
-                    try {
-                      Context.current.set(ctx)
-                      route.actionMethod.invoke(route.action, params: _*) match {
-                        case result: Result =>
-                          Future.successful(result.asScala)
-                        case promise: CompletionStage[Result] =>
-                          FutureConverters.toScala(promise).map(_.asScala)
+                  Action.async(parser) {
+                    request =>
+                      val ctx = JavaHelpers.createJavaContext(request)
+                      try {
+                        Context.current.set(ctx)
+                        route.actionMethod
+                          .invoke(route.action, params: _*) match {
+                          case result: Result =>
+                            Future.successful(result.asScala)
+                          case promise: CompletionStage[Result] =>
+                            FutureConverters.toScala(promise).map(_.asScala)
+                        }
+                      } finally {
+                        Context.current.remove()
                       }
-                    } finally {
-                      Context.current.remove()
-                    }
                   }
               }
 

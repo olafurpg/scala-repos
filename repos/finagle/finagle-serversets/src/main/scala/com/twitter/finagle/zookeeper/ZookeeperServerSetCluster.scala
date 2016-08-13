@@ -22,8 +22,8 @@ import scala.collection.mutable.HashSet
   * membership is indicated by children Zookeeper node.
   */
 @deprecated("Get a Group[SocketAddress] from ZkResolver instead", "6.7.1")
-class ZookeeperServerSetCluster(
-    serverSet: ServerSet, endpointName: Option[String])
+class ZookeeperServerSetCluster(serverSet: ServerSet,
+                                endpointName: Option[String])
     extends Cluster[SocketAddress] {
 
   def this(serverSet: ServerSet) = this(serverSet, None)
@@ -94,8 +94,8 @@ class ZookeeperServerSetCluster(
 
   def joinServerSet(
       address: SocketAddress,
-      endpoints: Map[String, InetSocketAddress] = Map[
-            String, InetSocketAddress]()
+      endpoints: Map[String, InetSocketAddress] =
+        Map[String, InetSocketAddress]()
   ): EndpointStatus = {
     require(address.isInstanceOf[InetSocketAddress])
 
@@ -104,12 +104,12 @@ class ZookeeperServerSetCluster(
 
   def join(
       address: SocketAddress,
-      endpoints: Map[String, InetSocketAddress] = Map[
-            String, InetSocketAddress]()
+      endpoints: Map[String, InetSocketAddress] =
+        Map[String, InetSocketAddress]()
   ): Unit = joinServerSet(address, endpoints)
 
-  def snap: (Seq[SocketAddress],
-  Future[Spool[Cluster.Change[SocketAddress]]]) = synchronized {
-    (underlyingSet.toSeq, changes)
-  }
+  def snap: (Seq[SocketAddress], Future[Spool[Cluster.Change[SocketAddress]]]) =
+    synchronized {
+      (underlyingSet.toSeq, changes)
+    }
 }

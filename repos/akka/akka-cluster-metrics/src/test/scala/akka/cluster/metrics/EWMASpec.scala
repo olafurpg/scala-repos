@@ -57,7 +57,7 @@ class EWMASpec
       val collectInterval = 1.second
       val halfLifeDuration = (halfLife * 1000).millis
       EWMA.alpha(halfLifeDuration, collectInterval) should ===(
-          expectedAlpha +- 0.001)
+        expectedAlpha +- 0.001)
     }
 
     "calculate sane alpha from short half-life" in {

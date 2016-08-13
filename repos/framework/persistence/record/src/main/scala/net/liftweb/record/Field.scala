@@ -208,7 +208,7 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Helper function that does validation of a value by using the validators specified for the field */
   protected def runValidation(in: Box[MyType]): List[FieldError] = in match {
-    case Full(_) => validations.flatMap(_ (toValueType(in))).distinct
+    case Full(_) => validations.flatMap(_(toValueType(in))).distinct
     case Empty => Nil
     case Failure(msg, _, _) => Text(msg)
   }
@@ -279,8 +279,8 @@ trait TypedField[ThisType] extends BaseField {
   protected def setFilterBox: List[Box[MyType] => Box[MyType]] =
     liftSetFilterToBox _ :: Nil
 
-  def runFilters(
-      in: Box[MyType], filter: List[Box[MyType] => Box[MyType]]): Box[MyType] =
+  def runFilters(in: Box[MyType],
+                 filter: List[Box[MyType] => Box[MyType]]): Box[MyType] =
     filter match {
       case Nil => in
       case x :: xs => runFilters(x(in), xs)
@@ -358,7 +358,8 @@ trait TypedField[ThisType] extends BaseField {
 }
 
 trait MandatoryTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[ThisType] {
+    extends TypedField[ThisType]
+    with Product1[ThisType] {
 
   /**
     * ValueType represents the type that users will work with.  For MandatoryTypeField, this is
@@ -407,7 +408,8 @@ trait MandatoryTypedField[ThisType]
 }
 
 trait OptionalTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[Box[ThisType]] {
+    extends TypedField[ThisType]
+    with Product1[Box[ThisType]] {
 
   /**
     * ValueType represents the type that users will work with.  For OptionalTypedField, this is
@@ -460,7 +462,8 @@ trait OptionalTypedField[ThisType]
   * A simple field that can store and retrieve a value of a given type
   */
 trait Field[ThisType, OwnerType <: Record[OwnerType]]
-    extends OwnedField[OwnerType] with TypedField[ThisType] {
+    extends OwnedField[OwnerType]
+    with TypedField[ThisType] {
 
   def apply(in: MyType): OwnerType = apply(Full(in))
 
@@ -485,8 +488,8 @@ trait Field[ThisType, OwnerType <: Record[OwnerType]]
 trait DisplayWithLabel[OwnerType <: Record[OwnerType]]
     extends OwnedField[OwnerType] {
   override abstract def toForm: Box[NodeSeq] =
-    for (id <- uniqueFieldId; control <- super.toForm) yield
-      <div id={ id + "_holder" }>
+    for (id <- uniqueFieldId; control <- super.toForm)
+      yield <div id={ id + "_holder" }>
         <div><label for={ id }>{ displayName }</label></div>
         { control }
         <lift:msg id={id} errorClass="lift_error"/>
@@ -502,12 +505,12 @@ trait KeyField[
 
 object FieldHelpers {
   def expectedA(what: String, notA: AnyRef): Failure =
-    Failure("Expected a " + what + ", not a " +
+    Failure(
+      "Expected a " + what + ", not a " +
         (if (notA == null) "null" else notA.getClass.getName))
 }
 
-trait LifecycleCallbacks {
-  this: BaseField =>
+trait LifecycleCallbacks { this: BaseField =>
 
   def beforeValidation {}
   def afterValidation {}

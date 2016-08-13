@@ -65,15 +65,15 @@ object PEventStore {
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
     eventsDb.find(
-        appId = appId,
-        channelId = channelId,
-        startTime = startTime,
-        untilTime = untilTime,
-        entityType = entityType,
-        entityId = entityId,
-        eventNames = eventNames,
-        targetEntityType = targetEntityType,
-        targetEntityId = targetEntityId
+      appId = appId,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId
     )(sc)
   }
 
@@ -100,12 +100,12 @@ object PEventStore {
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
     eventsDb.aggregateProperties(
-        appId = appId,
-        entityType = entityType,
-        channelId = channelId,
-        startTime = startTime,
-        untilTime = untilTime,
-        required = required
+      appId = appId,
+      entityType = entityType,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      required = required
     )(sc)
   }
 }

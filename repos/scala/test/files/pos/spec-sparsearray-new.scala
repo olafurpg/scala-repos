@@ -1,7 +1,7 @@
 import scala.reflect.{ClassTag, classTag}
 import scala.collection.mutable.MapLike
 
-class SparseArray[@specialized(Int) T : ClassTag]
+class SparseArray[@specialized(Int) T: ClassTag]
     extends collection.mutable.Map[Int, T]
     with collection.mutable.MapLike[Int, T, SparseArray[T]] {
   override def get(x: Int) = {

@@ -37,7 +37,8 @@ object ResizerSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ResizerSpec
-    extends AkkaSpec(ResizerSpec.config) with DefaultTimeout
+    extends AkkaSpec(ResizerSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
 
   import akka.routing.ResizerSpec._
@@ -78,8 +79,9 @@ class ResizerSpec
           enabled = on
         }
         """)
-      Resizer.fromConfig(cfg).get shouldBe a[
-          DefaultOptimalSizeExploringResizer]
+      Resizer
+        .fromConfig(cfg)
+        .get shouldBe a[DefaultOptimalSizeExploringResizer]
     }
 
     "throws exception when both resizer and optimal-size-exploring-resizer is enabled" in {
@@ -144,8 +146,8 @@ class ResizerSpec
 
       val resizer = DefaultResizer(lowerBound = 2, upperBound = 3)
       val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
-            .props(Props[TestActor]))
+        RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+          .props(Props[TestActor]))
 
       router ! latch
       router ! latch
@@ -185,14 +187,14 @@ class ResizerSpec
                                    backoffThreshold = 0.0)
 
       val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)).props(
-              Props(new Actor {
-        def receive = {
-          case d: FiniteDuration ⇒
-            Thread.sleep(d.dilated.toMillis); sender() ! "done"
-          case "echo" ⇒ sender() ! "reply"
-        }
-      })))
+        RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+          .props(Props(new Actor {
+            def receive = {
+              case d: FiniteDuration ⇒
+                Thread.sleep(d.dilated.toMillis); sender() ! "done"
+              case "echo" ⇒ sender() ! "reply"
+            }
+          })))
 
       // first message should create the minimum number of routees
       router ! "echo"
@@ -230,13 +232,13 @@ class ResizerSpec
                                    messagesPerResize = 2)
 
       val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)).props(
-              Props(new Actor {
-        def receive = {
-          case n: Int if n <= 0 ⇒ // done
-          case n: Int ⇒ Thread.sleep((n millis).dilated.toMillis)
-        }
-      })))
+        RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+          .props(Props(new Actor {
+            def receive = {
+              case n: Int if n <= 0 ⇒ // done
+              case n: Int ⇒ Thread.sleep((n millis).dilated.toMillis)
+            }
+          })))
 
       // put some pressure on the router
       for (m ← 0 until 15) {

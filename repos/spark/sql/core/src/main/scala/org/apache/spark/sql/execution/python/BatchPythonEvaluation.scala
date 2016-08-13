@@ -25,7 +25,12 @@ import org.apache.spark.TaskContext
 import org.apache.spark.api.python.PythonRunner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Attribute, GenericMutableRow, JoinedRow, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  GenericMutableRow,
+  JoinedRow,
+  UnsafeProjection
+}
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.types.{StructField, StructType}
 
@@ -39,8 +44,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * we drain the queue to find the original input row. Note that if the Python process is way too
   * slow, this could lead to the queue growing unbounded and eventually run out of memory.
   */
-case class BatchPythonEvaluation(
-    udf: PythonUDF, output: Seq[Attribute], child: SparkPlan)
+case class BatchPythonEvaluation(udf: PythonUDF,
+                                 output: Seq[Attribute],
+                                 child: SparkPlan)
     extends SparkPlan {
 
   def children: Seq[SparkPlan] = child :: Nil
@@ -48,8 +54,8 @@ case class BatchPythonEvaluation(
   protected override def doExecute(): RDD[InternalRow] = {
     val inputRDD = child.execute().map(_.copy())
     val bufferSize = inputRDD.conf.getInt("spark.buffer.size", 65536)
-    val reuseWorker = inputRDD.conf.getBoolean(
-        "spark.python.worker.reuse", defaultValue = true)
+    val reuseWorker = inputRDD.conf
+      .getBoolean("spark.python.worker.reuse", defaultValue = true)
 
     inputRDD.mapPartitions { iter =>
       EvaluatePython.registerPicklers() // register pickler for Row
@@ -78,9 +84,9 @@ case class BatchPythonEvaluation(
 
       // Output iterator for results from Python.
       val outputIterator = new PythonRunner(
-          udf.func,
-          bufferSize,
-          reuseWorker
+        udf.func,
+        bufferSize,
+        reuseWorker
       ).compute(inputIterator, context.partitionId(), context)
 
       val unpickle = new Unpickler

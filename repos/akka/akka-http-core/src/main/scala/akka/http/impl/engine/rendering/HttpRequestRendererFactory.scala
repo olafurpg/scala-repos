@@ -58,19 +58,23 @@ private[http] class HttpRequestRendererFactory(
           head match {
             case x: `Content-Length` ⇒
               suppressionWarning(
-                  log,
-                  x,
-                  "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+                log,
+                x,
+                "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
 
             case x: `Content-Type` ⇒
               suppressionWarning(
-                  log,
-                  x,
-                  "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+                log,
+                x,
+                "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
 
             case x: `Transfer-Encoding` ⇒
               x.withChunkedPeeled match {
@@ -83,8 +87,9 @@ private[http] class HttpRequestRendererFactory(
                 case Some(te) ⇒
                   // if the user applied some custom transfer-encoding we need to keep the header
                   render(
-                      if (entity.isChunked && !entity.isKnownEmpty)
-                        te.withChunked else te)
+                    if (entity.isChunked && !entity.isKnownEmpty)
+                      te.withChunked
+                    else te)
                   renderHeaders(tail,
                                 hostHeaderSeen,
                                 userAgentSeen,
@@ -106,28 +111,36 @@ private[http] class HttpRequestRendererFactory(
                             transferEncodingSeen)
 
             case x: `Raw-Request-URI` ⇒ // we never render this header
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
 
             case x: CustomHeader ⇒
               if (x.renderInRequests) render(x)
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
 
             case x: RawHeader
                 if (x is "content-type") || (x is "content-length") ||
-                (x is "transfer-encoding") || (x is "host") ||
-                (x is "user-agent") ⇒
+                  (x is "transfer-encoding") || (x is "host") ||
+                  (x is "user-agent") ⇒
               suppressionWarning(log, x, "illegal RawHeader")
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
 
             case x ⇒
               if (x.renderInRequests) render(x)
               else
                 log.warning("HTTP header '{}' is not allowed in requests", x)
-              renderHeaders(
-                  tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
+              renderHeaders(tail,
+                            hostHeaderSeen,
+                            userAgentSeen,
+                            transferEncodingSeen)
           }
 
         case Nil ⇒
@@ -142,7 +155,8 @@ private[http] class HttpRequestRendererFactory(
     def renderContentLength(contentLength: Long) =
       if (method.isEntityAccepted &&
           (contentLength > 0 || method.requestEntityAcceptance == Expected))
-        r ~~ `Content-Length` ~~ contentLength ~~ CrLf else r
+        r ~~ `Content-Length` ~~ contentLength ~~ CrLf
+      else r
 
     def renderStreamed(body: Source[ByteString, Any]): RequestRenderingOutput = {
       val headerPart = Source.single(r.get)
@@ -153,7 +167,7 @@ private[http] class HttpRequestRendererFactory(
             .fromFuture(future)
             .drop(1)
             .asInstanceOf[Source[ByteString, Any]]
-            (headerPart ++ barrier ++ body).recoverWith {
+          (headerPart ++ barrier ++ body).recoverWith {
             case HttpResponseParser.OneHundredContinueError ⇒ Source.empty
           }
       }
@@ -175,7 +189,7 @@ private[http] class HttpRequestRendererFactory(
         case HttpEntity.Default(_, contentLength, data) ⇒
           renderContentLength(contentLength) ~~ CrLf
           renderStreamed(
-              data.via(CheckContentLengthTransformer.flow(contentLength)))
+            data.via(CheckContentLengthTransformer.flow(contentLength)))
 
         case HttpEntity.Chunked(_, chunks) ⇒
           r ~~ CrLf
@@ -193,7 +207,7 @@ private[http] class HttpRequestRendererFactory(
       case RequestRenderingOutput.Strict(bytes) ⇒ bytes
       case _: RequestRenderingOutput.Streamed ⇒
         throw new IllegalArgumentException(
-            s"Request entity was not Strict but ${ctx.request.entity.getClass.getSimpleName}")
+          s"Request entity was not Strict but ${ctx.request.entity.getClass.getSimpleName}")
     }
 }
 

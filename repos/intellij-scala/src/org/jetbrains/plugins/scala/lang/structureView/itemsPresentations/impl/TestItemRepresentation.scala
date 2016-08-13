@@ -10,8 +10,9 @@ import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.ScalaIt
   * @author Roman.Shein
   * @since 14.04.2015.
   */
-class TestItemRepresentation(
-    private val element: PsiElement, val testName: String, val testStatus: Int)
+class TestItemRepresentation(private val element: PsiElement,
+                             val testName: String,
+                             val testStatus: Int)
     extends ScalaItemPresentation(element) {
 
   override def getPresentableText: String = testName

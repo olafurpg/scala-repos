@@ -14,8 +14,9 @@ class SimpleDnsCache extends Dns with PeriodicCacheCleanup {
   import akka.io.SimpleDnsCache._
 
   private val cache = new AtomicReference(
-      new Cache(
-          immutable.SortedSet()(ExpiryEntryOrdering), immutable.Map(), clock))
+    new Cache(immutable.SortedSet()(ExpiryEntryOrdering),
+              immutable.Map(),
+              clock))
 
   private val nanoBase = System.nanoTime()
 

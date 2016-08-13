@@ -44,13 +44,13 @@ class Kalman(N: Int) {
   }
 
   private[this] def mvar = variance(
-      if (n < N) mbuf take n.toInt
-      else mbuf
+    if (n < N) mbuf take n.toInt
+    else mbuf
   )
 
   private[this] def evar = variance(
-      if (n < N) ebuf take n.toInt
-      else ebuf
+    if (n < N) ebuf take n.toInt
+    else ebuf
   )
 
   def estimate = est
@@ -61,14 +61,14 @@ class Kalman(N: Int) {
     val sum = samples.sum
     val mean = sum / samples.length
     val diff = (samples map { x =>
-          (x - mean) * (x - mean)
-        }).sum
+      (x - mean) * (x - mean)
+    }).sum
     diff / (samples.length - 1)
   }
 
   override def toString =
-    "Kalman<estimate=%f, weight=%f, mvar=%f, evar=%f>".format(
-        estimate, weight, mvar, evar)
+    "Kalman<estimate=%f, weight=%f, mvar=%f, evar=%f>"
+      .format(estimate, weight, mvar, evar)
 }
 
 /**
@@ -77,7 +77,8 @@ class Kalman(N: Int) {
   * value).
   */
 class KalmanGaussianError(N: Int, range: Double)
-    extends Kalman(N) with Estimator[Double] {
+    extends Kalman(N)
+    with Estimator[Double] {
   require(range >= 0D && range < 1D)
   private[this] val rng = new Random
 
@@ -138,8 +139,9 @@ class LoadAverage(interval: Double) extends Estimator[Double] {
   private[this] var load = Double.NaN
 
   def measure(m: Double) {
-    load = if (load.isNaN) m
-    else load * a + m * (1 - a)
+    load =
+      if (load.isNaN) m
+      else load * a + m * (1 - a)
   }
 
   def estimate = load

@@ -25,8 +25,8 @@ object DatabaseConfig {
   def fromConfig(config: PlayConfig, environment: Environment) = {
 
     val driver = config.get[Option[String]]("driver")
-    val (url, userPass) = ConnectionPool.extractUrl(
-        config.get[Option[String]]("url"), environment.mode)
+    val (url, userPass) = ConnectionPool
+      .extractUrl(config.get[Option[String]]("url"), environment.mode)
     val username = config
       .getDeprecated[Option[String]]("username", "user")
       .orElse(userPass.map(_._1))

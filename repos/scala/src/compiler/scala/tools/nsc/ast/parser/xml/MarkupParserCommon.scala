@@ -24,8 +24,9 @@ private[scala] trait MarkupParserCommon {
   type AttributesType // (MetaData, NamespaceBinding), mutable.Map[String, Tree]
 
   def mkAttributes(name: String, pscope: NamespaceType): AttributesType
-  def mkProcInstr(
-      position: PositionType, name: String, text: String): ElementType
+  def mkProcInstr(position: PositionType,
+                  name: String,
+                  text: String): ElementType
 
   /** parse a start or empty tag.
     *  [40] STag         ::= '<' Name { S Attribute } [S]
@@ -87,7 +88,8 @@ private[scala] trait MarkupParserCommon {
     if (ch == SU) truncatedError("")
     else if (!isNameStart(ch))
       return errorAndResult(
-          "name expected, but char '%s' cannot start a name" format ch, "")
+        "name expected, but char '%s' cannot start a name" format ch,
+        "")
 
     val buf = new StringBuilder
 
@@ -170,7 +172,8 @@ private[scala] trait MarkupParserCommon {
   /** Execute body with a variable saved and restored after execution */
   def saving[A, B](getter: A, setter: A => Unit)(body: => B): B = {
     val saved = getter
-    try body finally setter(saved)
+    try body
+    finally setter(saved)
   }
 
   /** Take characters from input stream until given String "until"

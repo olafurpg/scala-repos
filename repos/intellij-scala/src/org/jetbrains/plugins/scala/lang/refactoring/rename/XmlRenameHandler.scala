@@ -63,7 +63,8 @@ class XmlRenameHandler extends RenameHandler {
 
     val element =
       if (elements(0) == null ||
-          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return else
+          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return
+      else
         elements(0).getParent.asInstanceOf[ScXmlPairedTag]
     if (element.getMatchedTag == null || element.getTagNameElement == null ||
         element.getMatchedTag.getTagNameElement == null) return
@@ -76,7 +77,7 @@ class XmlRenameHandler extends RenameHandler {
     def highlightMatched() {
       val colorsManager = EditorColorsManager.getInstance()
       val attributes = colorsManager.getGlobalScheme.getAttributes(
-          EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
+        EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
 
       HighlightManager
         .getInstance(editor.getProject)
@@ -103,7 +104,7 @@ class XmlRenameHandler extends RenameHandler {
               val offset = editor.getCaretModel.getOffset
               val template = buildTemplate()
               editor.getCaretModel.moveToOffset(
-                  element.getParent.getTextOffset)
+                element.getParent.getTextOffset)
 
               TemplateManager
                 .getInstance(project)
@@ -136,15 +137,21 @@ class XmlRenameHandler extends RenameHandler {
       val builder = new TemplateBuilderImpl(element.getParent)
 
       builder.replaceElement(
-          element.getTagNameElement, "first", new EmptyExpression {
-        override def calculateQuickResult(context: ExpressionContext): Result =
-          new TextResult(
+        element.getTagNameElement,
+        "first",
+        new EmptyExpression {
+          override def calculateQuickResult(
+              context: ExpressionContext): Result =
+            new TextResult(
               Option(element.getTagName).getOrElse(elementStartName))
-        override def calculateResult(context: ExpressionContext): Result =
-          calculateQuickResult(context)
-      }, true)
-      builder.replaceElement(
-          element.getMatchedTag.getTagNameElement, "second", "first", false)
+          override def calculateResult(context: ExpressionContext): Result =
+            calculateQuickResult(context)
+        },
+        true)
+      builder.replaceElement(element.getMatchedTag.getTagNameElement,
+                             "second",
+                             "first",
+                             false)
 
       builder.buildInlineTemplate()
     }

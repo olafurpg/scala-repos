@@ -49,8 +49,9 @@ object Variance extends Impurity {
     */
   @Since("1.0.0")
   @DeveloperApi
-  override def calculate(
-      count: Double, sum: Double, sumSquares: Double): Double = {
+  override def calculate(count: Double,
+                         sum: Double,
+                         sumSquares: Double): Double = {
     if (count == 0) {
       return 0
     }
@@ -72,7 +73,8 @@ object Variance extends Impurity {
   * Note: Instances of this class do not hold the data; they operate on views of the data.
   */
 private[tree] class VarianceAggregator()
-    extends ImpurityAggregator(statsSize = 3) with Serializable {
+    extends ImpurityAggregator(statsSize = 3)
+    with Serializable {
 
   /**
     * Update stats for one (node, feature, bin) with the given label.
@@ -108,8 +110,8 @@ private[spark] class VarianceCalculator(stats: Array[Double])
     extends ImpurityCalculator(stats) {
 
   require(
-      stats.length == 3,
-      s"VarianceCalculator requires sufficient statistics array stats to be of length 3," +
+    stats.length == 3,
+    s"VarianceCalculator requires sufficient statistics array stats to be of length 3," +
       s" but was given array of length ${stats.length}.")
 
   /**

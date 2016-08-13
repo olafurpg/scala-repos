@@ -20,7 +20,8 @@ class MultiNodeSpecSpecMultiJvmNode3 extends MultiNodeSpecSpec
 class MultiNodeSpecSpecMultiJvmNode4 extends MultiNodeSpecSpec
 
 class MultiNodeSpecSpec
-    extends MultiNodeSpec(MultiNodeSpecMultiJvmSpec) with STMultiNodeSpec {
+    extends MultiNodeSpec(MultiNodeSpecMultiJvmSpec)
+    with STMultiNodeSpec {
 
   import MultiNodeSpecMultiJvmSpec._
 

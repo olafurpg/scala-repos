@@ -15,7 +15,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
@@ -25,7 +30,8 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScParameterizedTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParameterizedTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScParameterizedTypeElement {
   override def toString: String = "ParametrizedTypeElement: " + getText
 
   def typeArgList = findChildByClass(classOf[ScTypeArgs])
@@ -86,8 +92,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
               }
               val lambdaText =
                 s"({type $typeName[$paramText] = ${ret.getText}})#$typeName"
-              val newTE = ScalaPsiElementFactory.createTypeElementFromText(
-                  lambdaText, getContext, this)
+              val newTE = ScalaPsiElementFactory
+                .createTypeElementFromText(lambdaText, getContext, this)
               Option(newTE)
             case _ => None
           }
@@ -122,8 +128,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       val typeName = "Λ$"
       val inlineText =
         s"({type $typeName$paramText = ${typeElement.getText}$bodyText})#$typeName"
-      val newTE = ScalaPsiElementFactory.createTypeElementFromText(
-          inlineText, getContext, this)
+      val newTE = ScalaPsiElementFactory
+        .createTypeElementFromText(inlineText, getContext, this)
       Option(newTE)
     }
 
@@ -133,7 +139,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       forSomeBuilder.append(" forSome {")
       val typeElements = typeArgList.typeArgs.map {
         case w: ScWildcardTypeElement =>
-          forSomeBuilder.append("type _" + "$" + count +
+          forSomeBuilder.append(
+            "type _" + "$" + count +
               w.lowerTypeElement.fold("")(te => s" >: ${te.getText}") +
               w.upperTypeElement.fold("")(te => s" <: ${te.getText}"))
           forSomeBuilder.append("; ")
@@ -146,8 +153,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       forSomeBuilder.append("}")
       val newTypeText =
         s"(${typeElement.getText}${typeElements.mkString("[", ", ", "]")} ${forSomeBuilder.toString()})"
-      val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
-          newTypeText, getContext, this)
+      val newTypeElement = ScalaPsiElementFactory
+        .createTypeElementFromText(newTypeText, getContext, this)
       Option(newTypeElement)
     }
 
@@ -164,7 +171,7 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       element match {
         case simple: ScSimpleTypeElement
             if kindProjectorEnabled &&
-            inlineSyntaxIds.contains(simple.getText) =>
+              inlineSyntaxIds.contains(simple.getText) =>
           true
         case parametrized: ScParameterizedTypeElement
             if kindProjectorEnabled =>
@@ -206,12 +213,13 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
             if (ref.isConstructorReference) {
               ref.resolveNoConstructor match {
                 case Array(
-                    ScalaResolveResult(
-                    to: ScTypeParametersOwner, subst: ScSubstitutor))
+                    ScalaResolveResult(to: ScTypeParametersOwner,
+                                       subst: ScSubstitutor))
                     if to.isInstanceOf[PsiNamedElement] =>
                   return tr //all things were done in ScSimpleTypeElementImpl.innerType
-                case Array(ScalaResolveResult(
-                    to: PsiTypeParameterListOwner, subst: ScSubstitutor))
+                case Array(
+                    ScalaResolveResult(to: PsiTypeParameterListOwner,
+                                       subst: ScSubstitutor))
                     if to.isInstanceOf[PsiNamedElement] =>
                   return tr //all things were done in ScSimpleTypeElementImpl.innerType
                 case _ =>
@@ -232,8 +240,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
     val argTypesWrapped = args.map { _.getType(ctx) }
     val argTypesgetOrElseped = argTypesWrapped.map { _.getOrAny }
     def fails(t: ScType) =
-      (for (f @ Failure(_, _) <- argTypesWrapped) yield
-        f).foldLeft(Success(t, Some(this)))(_.apply(_))
+      (for (f @ Failure(_, _) <- argTypesWrapped)
+        yield f).foldLeft(Success(t, Some(this)))(_.apply(_))
 
     //Find cyclic type references
     argTypesWrapped.find(_.isCyclic) match {
@@ -242,8 +250,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       case None =>
         val typeArgs = args.map(_.getType(ctx))
         val result = ScParameterizedType(res, typeArgs.map(_.getOrAny))
-        (for (f @ Failure(_, _) <- typeArgs) yield
-          f).foldLeft(Success(result, Some(this)))(_.apply(_))
+        (for (f @ Failure(_, _) <- typeArgs)
+          yield f).foldLeft(Success(result, Some(this)))(_.apply(_))
     }
   }
 
@@ -279,30 +287,32 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
                             val upperBound = text.indexOf("<:")
                             //we have to call processor execute so both `+A` and A resolve: Lambda[`+A` => (A, A)]
                             processor.execute(tp, state)
-                            processor.execute(new ScSyntheticClass(
-                                                  getManager, s"`$text`", Any),
+                            processor.execute(new ScSyntheticClass(getManager,
+                                                                   s"`$text`",
+                                                                   Any),
                                               state)
                             if (lowerBound < 0 && upperBound > 0) {
                               processor.execute(
-                                  new ScSyntheticClass(
-                                      getManager,
-                                      text.substring(0, upperBound),
-                                      Any),
-                                  state)
+                                new ScSyntheticClass(
+                                  getManager,
+                                  text.substring(0, upperBound),
+                                  Any),
+                                state)
                             } else if (upperBound < 0 && lowerBound > 0) {
                               processor.execute(
-                                  new ScSyntheticClass(
-                                      getManager,
-                                      text.substring(0, lowerBound),
-                                      Any),
-                                  state)
+                                new ScSyntheticClass(
+                                  getManager,
+                                  text.substring(0, lowerBound),
+                                  Any),
+                                state)
                             } else if (upperBound > 0 && lowerBound > 0) {
-                              val actualText = text.substring(
-                                  0, math.min(lowerBound, upperBound))
+                              val actualText = text
+                                .substring(0, math.min(lowerBound, upperBound))
                               processor.execute(
-                                  new ScSyntheticClass(
-                                      getManager, actualText, Any),
-                                  state)
+                                new ScSyntheticClass(getManager,
+                                                     actualText,
+                                                     Any),
+                                state)
                             }
                           }
                         case _ =>

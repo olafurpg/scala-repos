@@ -50,8 +50,8 @@ class BlockParsersTest extends FlatSpec with ShouldMatchers with BlockParsers {
   it should "detect line types" in {
     val p = line(classOf[CodeLine])
     apply(p, List(new CodeLine("    ", "code"))) should equal(
-        new CodeLine("    ", "code"))
+      new CodeLine("    ", "code"))
     evaluating(apply(p, List(new OtherLine("foo")))) should produce[
-        IllegalArgumentException]
+      IllegalArgumentException]
   }
 }

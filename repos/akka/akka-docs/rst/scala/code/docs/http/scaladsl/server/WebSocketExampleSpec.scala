@@ -53,11 +53,11 @@ class WebSocketExampleSpec extends WordSpec with Matchers {
     }
     //#websocket-request-handling
 
-    val bindingFuture = Http().bindAndHandleSync(
-        requestHandler, interface = "localhost", port = 8080)
+    val bindingFuture = Http()
+      .bindAndHandleSync(requestHandler, interface = "localhost", port = 8080)
 
     println(
-        s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+      s"Server online at http://localhost:8080/\nPress RETURN to stop...")
     Console.readLine()
 
     import system.dispatcher // for the future transformations
@@ -98,7 +98,7 @@ class WebSocketExampleSpec extends WordSpec with Matchers {
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
     println(
-        s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+      s"Server online at http://localhost:8080/\nPress RETURN to stop...")
     Console.readLine()
 
     import system.dispatcher // for the future transformations

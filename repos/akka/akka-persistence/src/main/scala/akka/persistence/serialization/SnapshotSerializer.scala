@@ -23,7 +23,8 @@ final case class Snapshot(data: Any)
   */
 @SerialVersionUID(1L)
 private[serialization] final case class SnapshotHeader(
-    serializerId: Int, manifest: Option[String])
+    serializerId: Int,
+    manifest: Option[String])
 
 /**
   * [[Snapshot]] serializer.
@@ -49,7 +50,7 @@ class SnapshotSerializer(val system: ExtendedActorSystem)
     case Snapshot(data) ⇒ snapshotToBinary(data.asInstanceOf[AnyRef])
     case _ ⇒
       throw new IllegalArgumentException(
-          s"Can't serialize object of type ${o.getClass}")
+        s"Can't serialize object of type ${o.getClass}")
   }
 
   /**
@@ -151,8 +152,9 @@ class SnapshotSerializer(val system: ExtendedActorSystem)
     }
 
     serialization
-      .deserialize(
-          snapshotBytes, header.serializerId, header.manifest.getOrElse(""))
+      .deserialize(snapshotBytes,
+                   header.serializerId,
+                   header.manifest.getOrElse(""))
       .get
   }
 
@@ -235,7 +237,7 @@ object SnapshotSerializer {
         // running on 2.11
         true
       } else if (uid ==
-                 (key.slice(offset, offset + replacement.length): Seq[Byte])) {
+                   (key.slice(offset, offset + replacement.length): Seq[Byte])) {
         // running on 2.10, need to switch out UID between key and replacement
         val len = replacement.length
         val tmp = new Array[Byte](len)

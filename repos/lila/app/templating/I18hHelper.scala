@@ -47,7 +47,9 @@ trait I18nHelper {
       .map {
         case (code, name) =>
           """<a class="lang_fallback" lang="%s" href="%s">%s</a>""".format(
-              code, langUrl(Lang(code))(I18nDomain(ctx.req.domain)), name)
+            code,
+            langUrl(Lang(code))(I18nDomain(ctx.req.domain)),
+            name)
       }
       .mkString("")
       .replace(uriPlaceholder, ctx.req.uri)

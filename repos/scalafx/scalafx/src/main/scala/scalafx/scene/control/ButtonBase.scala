@@ -41,7 +41,8 @@ object ButtonBase {
 }
 
 abstract class ButtonBase(override val delegate: jfxsc.ButtonBase)
-    extends Labeled(delegate) with FireDelegate[jfxsc.ButtonBase]
+    extends Labeled(delegate)
+    with FireDelegate[jfxsc.ButtonBase]
     with SFXDelegate[jfxsc.ButtonBase] {
 
   /**

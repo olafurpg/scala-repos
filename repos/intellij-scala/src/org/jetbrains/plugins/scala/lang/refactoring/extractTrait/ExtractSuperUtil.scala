@@ -21,7 +21,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateParents
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.IntroduceException
 
@@ -32,12 +36,12 @@ import scala.collection.JavaConverters._
   * 2014-05-20
   */
 object ExtractSuperUtil {
-  def afterClassChoosing(element: PsiElement,
-                         project: Project,
-                         editor: Editor,
-                         file: PsiFile,
-                         isSuitableClass: PsiClass => Boolean)(
-      action: => Unit) {
+  def afterClassChoosing(
+      element: PsiElement,
+      project: Project,
+      editor: Editor,
+      file: PsiFile,
+      isSuitableClass: PsiClass => Boolean)(action: => Unit) {
     try {
       val classes = ScalaPsiUtil
         .getParents(element, file)
@@ -100,15 +104,15 @@ object ExtractSuperUtil {
     val templParents = oldExtBlock.templateParents match {
       case Some(tp: ScTemplateParents) =>
         val tpText = s"${tp.getText} with $text"
-        val (_, newTp) = ScalaPsiElementFactory.createClassTemplateParents(
-            tpText, clazz.getManager)
+        val (_, newTp) = ScalaPsiElementFactory
+          .createClassTemplateParents(tpText, clazz.getManager)
         tp.replace(newTp).asInstanceOf[ScTemplateParents]
       case None =>
         val (extKeyword, newTp) =
-          ScalaPsiElementFactory.createClassTemplateParents(
-              text, clazz.getManager)
-        oldExtBlock.addRangeBefore(
-            extKeyword, newTp, oldExtBlock.getFirstChild)
+          ScalaPsiElementFactory
+            .createClassTemplateParents(text, clazz.getManager)
+        oldExtBlock
+          .addRangeBefore(extKeyword, newTp, oldExtBlock.getFirstChild)
         oldExtBlock.templateParents.get
     }
     templParents.typeElementsWithoutConstructor.foreach {
@@ -119,7 +123,8 @@ object ExtractSuperUtil {
   }
 
   def getDirUnderSameSourceRoot(
-      clazz: PsiClass, directories: Array[PsiDirectory]): PsiDirectory = {
+      clazz: PsiClass,
+      directories: Array[PsiDirectory]): PsiDirectory = {
     val sourceFile: VirtualFile = clazz.getContainingFile.getVirtualFile
     if (sourceFile != null) {
       val fileIndex: ProjectFileIndex =
@@ -128,8 +133,8 @@ object ExtractSuperUtil {
       if (sourceRoot != null) {
         for (dir <- directories) {
           if (Comparing.equal(
-                  fileIndex.getSourceRootForFile(dir.getVirtualFile),
-                  sourceRoot)) {
+                fileIndex.getSourceRootForFile(dir.getVirtualFile),
+                sourceRoot)) {
             return dir
           }
         }
@@ -156,8 +161,8 @@ object ExtractSuperUtil {
 
     val dir: PsiDirectory =
       ExtractSuperUtil.getDirUnderSameSourceRoot(sourceClass, dirs)
-    val cantCreateFile: String = RefactoringMessageUtil.checkCanCreateFile(
-        dir, targetClassName + ".scala")
+    val cantCreateFile: String = RefactoringMessageUtil
+      .checkCanCreateFile(dir, targetClassName + ".scala")
     if (cantCreateFile != null) return cantCreateFile
 
     null

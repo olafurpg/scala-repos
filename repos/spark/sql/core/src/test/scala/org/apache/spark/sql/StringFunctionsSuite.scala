@@ -30,8 +30,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(concat($"a", $"b"), concat($"a", $"b", $"c")),
                 Row("ab", null))
 
-    checkAnswer(
-        df.selectExpr("concat(a, b)", "concat(a, b, c)"), Row("ab", null))
+    checkAnswer(df.selectExpr("concat(a, b)", "concat(a, b, c)"),
+                Row("ab", null))
   }
 
   test("string concat_ws") {
@@ -57,7 +57,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(regexp_replace($"a", "(\\d+)", "num"),
                           regexp_extract($"a", "(\\d+)-(\\d+)", 1)),
                 Row("num-num", "100") :: Row("num-num", "100") :: Row(
-                    "num-num", "100") :: Nil)
+                  "num-num",
+                  "100") :: Nil)
 
     // for testing the mutable state of the expression in code gen.
     // This is a hack way to enable the codegen, thus the codegen is enable by default,
@@ -65,9 +66,9 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     // hence we add a filter operator.
     // See the optimizer rule `ConvertToLocalRelation`
     checkAnswer(
-        df.filter("isnotnull(a)")
-          .selectExpr("regexp_replace(a, b, c)", "regexp_extract(a, b, 1)"),
-        Row("300", "100") :: Row("400", "100") :: Row("400-400", "100") :: Nil)
+      df.filter("isnotnull(a)")
+        .selectExpr("regexp_replace(a, b, c)", "regexp_extract(a, b, 1)"),
+      Row("300", "100") :: Row("400", "100") :: Row("400-400", "100") :: Nil)
   }
 
   test("string ascii function") {
@@ -80,11 +81,11 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   test("string base64/unbase64 function") {
     val bytes = Array[Byte](1, 2, 3, 4)
     val df = Seq((bytes, "AQIDBA==")).toDF("a", "b")
-    checkAnswer(
-        df.select(base64($"a"), unbase64($"b")), Row("AQIDBA==", bytes))
+    checkAnswer(df.select(base64($"a"), unbase64($"b")),
+                Row("AQIDBA==", bytes))
 
-    checkAnswer(
-        df.selectExpr("base64(a)", "unbase64(b)"), Row("AQIDBA==", bytes))
+    checkAnswer(df.selectExpr("base64(a)", "unbase64(b)"),
+                Row("AQIDBA==", bytes))
   }
 
   test("string / binary substring function") {
@@ -98,8 +99,18 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("string encode/decode function") {
-    val bytes = Array[Byte](
-        -27, -92, -89, -27, -115, -125, -28, -72, -106, -25, -107, -116)
+    val bytes = Array[Byte](-27,
+                            -92,
+                            -89,
+                            -27,
+                            -115,
+                            -125,
+                            -28,
+                            -72,
+                            -106,
+                            -25,
+                            -107,
+                            -116)
     // scalastyle:off
     // non ascii characters are not allowed in the code, so we disable the scalastyle here.
     val df = Seq(("大千世界", "utf-8", bytes)).toDF("a", "b", "c")
@@ -154,16 +165,16 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     val df = Seq(("www.apache.org", ".", "zz")).toDF("a", "b", "c")
     checkAnswer(df.select(substring_index($"a", ".", 2)), Row("www.apache"))
     checkAnswer(
-        df.selectExpr("substring_index(a, '.', 2)"),
-        Row("www.apache")
+      df.selectExpr("substring_index(a, '.', 2)"),
+      Row("www.apache")
     )
   }
 
   test("string locate function") {
     val df = Seq(("aaads", "aa", "zz", 1)).toDF("a", "b", "c", "d")
 
-    checkAnswer(
-        df.select(locate("aa", $"a"), locate("aa", $"a", 1)), Row(1, 2))
+    checkAnswer(df.select(locate("aa", $"a"), locate("aa", $"a", 1)),
+                Row(1, 2))
 
     checkAnswer(df.selectExpr("locate(b, a)", "locate(b, a, d)"), Row(1, 2))
   }
@@ -189,8 +200,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(repeat($"a", 2)), Row("hihi"))
 
-    checkAnswer(
-        df.selectExpr("repeat(a, 2)", "repeat(a, b)"), Row("hihi", "hihi"))
+    checkAnswer(df.selectExpr("repeat(a, 2)", "repeat(a, b)"),
+                Row("hihi", "hihi"))
   }
 
   test("string reverse function") {
@@ -212,8 +223,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(split($"a", "[1-9]+")), Row(Seq("aa", "bb", "cc")))
 
-    checkAnswer(
-        df.selectExpr("split(a, '[1-9]+')"), Row(Seq("aa", "bb", "cc")))
+    checkAnswer(df.selectExpr("split(a, '[1-9]+')"),
+                Row(Seq("aa", "bb", "cc")))
   }
 
   test("string / binary length function") {
@@ -240,16 +251,16 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(format_number(lit(5L), 4)), Row("5.0000"))
 
     checkAnswer(
-        df.select(format_number(lit(1.toByte), 4)), // convert the 1st argument to integer
-        Row("1.0000"))
+      df.select(format_number(lit(1.toByte), 4)), // convert the 1st argument to integer
+      Row("1.0000"))
 
     checkAnswer(
-        df.select(format_number(lit(2.toShort), 4)), // convert the 1st argument to integer
-        Row("2.0000"))
+      df.select(format_number(lit(2.toShort), 4)), // convert the 1st argument to integer
+      Row("2.0000"))
 
     checkAnswer(
-        df.select(format_number(lit(3.1322.toFloat), 4)), // convert the 1st argument to double
-        Row("3.1322"))
+      df.select(format_number(lit(3.1322.toFloat), 4)), // convert the 1st argument to double
+      Row("3.1322"))
 
     checkAnswer(df.select(format_number(lit(4), 4)), // not convert anything
                 Row("4.0000"))
@@ -258,12 +269,12 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
                 Row("5.0000"))
 
     checkAnswer(
-        df.select(format_number(lit(6.48173), 4)), // not convert anything
-        Row("6.4817"))
+      df.select(format_number(lit(6.48173), 4)), // not convert anything
+      Row("6.4817"))
 
     checkAnswer(
-        df.select(format_number(lit(BigDecimal(7.128381)), 4)), // not convert anything
-        Row("7.1284"))
+      df.select(format_number(lit(BigDecimal(7.128381)), 4)), // not convert anything
+      Row("7.1284"))
 
     intercept[AnalysisException] {
       df.select(format_number(lit("aa"), 4)) // string type of the 1st argument is unacceptable
@@ -280,8 +291,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     // See the optimizer rule `ConvertToLocalRelation`
     val df2 = Seq((5L, 4), (4L, 3), (4L, 3), (4L, 3), (3L, 2)).toDF("a", "b")
     checkAnswer(
-        df2.filter("b>0").selectExpr("format_number(a, b)"),
-        Row("5.0000") :: Row("4.000") :: Row("4.000") :: Row("4.000") :: Row(
-            "3.00") :: Nil)
+      df2.filter("b>0").selectExpr("format_number(a, b)"),
+      Row("5.0000") :: Row("4.000") :: Row("4.000") :: Row("4.000") :: Row(
+        "3.00") :: Nil)
   }
 }

@@ -78,8 +78,8 @@ class ArrayOpsTest {
     val left = js.Array("hello", "world")
     val right = js.Array("and", "everyone", "else")
     assertArrayEquals(
-        Array[AnyRef]("hello", "world", "and", "everyone", "else"),
-        (left ++ right).toArray[AnyRef])
+      Array[AnyRef]("hello", "world", "and", "everyone", "else"),
+      (left ++ right).toArray[AnyRef])
 
     val ints = js.Array(4, 3)
     val concat = left ++ ints
@@ -92,7 +92,7 @@ class ArrayOpsTest {
   // Some arbitrary methods to test the builders
 
   @Test def collect(): Unit = {
-    def ct[A : ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
+    def ct[A: ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
     val array = js.Array(3, 4, 5, 6, 3, 4)
     val res = array.collect {
       case x if x > 4 => 2 * x

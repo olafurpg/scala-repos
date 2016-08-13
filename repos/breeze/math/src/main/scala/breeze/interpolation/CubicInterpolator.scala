@@ -15,7 +15,7 @@ class CubicInterpolator(x_coords: Vector[Double], y_coords: Vector[Double])
 
   if (X.length < 3)
     throw new Exception(
-        "You must provide at least 3 points for CubicInterpolator.")
+      "You must provide at least 3 points for CubicInterpolator.")
 
   private def h(k: Int): Double = X(k + 1) - X(k)
   private def d(k: Int): Double = (Y(k + 1) - Y(k)) / h(k)
@@ -54,7 +54,7 @@ class CubicInterpolator(x_coords: Vector[Double], y_coords: Vector[Double])
     else {
       val dx = x - X(index)
       A(index, 0) + A(index, 1) * dx + A(index, 2) * dx * dx +
-      A(index, 3) * dx * dx * dx
+        A(index, 3) * dx * dx * dx
     }
   }
 }

@@ -28,7 +28,8 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.logging.RollingFileAppender
 
 private[ui] class LogPage(parent: WorkerWebUI)
-    extends WebUIPage("logPage") with Logging {
+    extends WebUIPage("logPage")
+    with Logging {
   private val worker = parent.worker
   private val workDir = new File(parent.workDir.toURI.normalize().getPath)
   private val supportedLogTypes = Set("stderr", "stdout")
@@ -52,11 +53,11 @@ private[ui] class LogPage(parent: WorkerWebUI)
         s"${workDir.getPath}/$driverId/"
       case _ =>
         throw new Exception(
-            "Request must specify either application or driver identifiers")
+          "Request must specify either application or driver identifiers")
     }
 
-    val (logText, startByte, endByte, logLength) = getLog(
-        logDir, logType, offset, byteLength)
+    val (logText, startByte, endByte, logLength) =
+      getLog(logDir, logType, offset, byteLength)
     val pre =
       s"==== Bytes $startByte-$endByte of $logLength of $logDir$logType ====\n"
     pre + logText
@@ -80,11 +81,11 @@ private[ui] class LogPage(parent: WorkerWebUI)
         (s"${workDir.getPath}/$d/", s"driverId=$d", d)
       case _ =>
         throw new Exception(
-            "Request must specify either application or driver identifiers")
+          "Request must specify either application or driver identifiers")
     }
 
-    val (logText, startByte, endByte, logLength) = getLog(
-        logDir, logType, offset, byteLength)
+    val (logText, startByte, endByte, logLength) =
+      getLog(logDir, logType, offset, byteLength)
     val linkToMaster =
       <p><a href={worker.activeMasterWebUiUrl}>Back to Master</a></p>
     val range =
@@ -144,11 +145,11 @@ private[ui] class LogPage(parent: WorkerWebUI)
   ): (String, Long, Long, Long) = {
 
     if (!supportedLogTypes.contains(logType)) {
-      return (
-          "Error: Log type must be one of " + supportedLogTypes.mkString(", "),
-          0,
-          0,
-          0)
+      return ("Error: Log type must be one of " + supportedLogTypes.mkString(
+                ", "),
+              0,
+              0,
+              0)
     }
 
     // Verify that the normalized path of the log directory is in the working directory
@@ -162,7 +163,7 @@ private[ui] class LogPage(parent: WorkerWebUI)
       val files =
         RollingFileAppender.getSortedRolledOverFiles(logDirectory, logType)
       logDebug(
-          s"Sorted log files of type $logType in $logDirectory:\n${files.mkString("\n")}")
+        s"Sorted log files of type $logType in $logDirectory:\n${files.mkString("\n")}")
 
       val totalLength = files.map { _.length }.sum
       val offset = offsetOption.getOrElse(totalLength - byteLength)
@@ -182,8 +183,8 @@ private[ui] class LogPage(parent: WorkerWebUI)
       (logText, startIndex, endIndex, totalLength)
     } catch {
       case e: Exception =>
-        logError(
-            s"Error getting $logType logs from directory $logDirectory", e)
+        logError(s"Error getting $logType logs from directory $logDirectory",
+                 e)
         ("Error getting logs due to exception: " + e.getMessage, 0, 0, 0)
     }
   }

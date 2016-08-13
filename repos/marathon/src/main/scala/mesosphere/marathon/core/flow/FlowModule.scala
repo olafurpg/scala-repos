@@ -3,7 +3,11 @@ package mesosphere.marathon.core.flow
 import akka.event.EventStream
 import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
-import mesosphere.marathon.core.flow.impl.{OfferReviverDelegate, OfferMatcherLaunchTokensActor, ReviveOffersActor}
+import mesosphere.marathon.core.flow.impl.{
+  OfferReviverDelegate,
+  OfferMatcherLaunchTokensActor,
+  ReviveOffersActor
+}
 import mesosphere.marathon.core.leadership.LeadershipModule
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.bus.TaskStatusObservables
@@ -35,20 +39,20 @@ class FlowModule(leadershipModule: LeadershipModule) {
 
     if (conf.reviveOffersForNewApps()) {
       lazy val reviveOffersActor = ReviveOffersActor.props(
-          clock,
-          conf,
-          marathonEventStream,
-          offersWanted,
-          driverHolder
+        clock,
+        conf,
+        marathonEventStream,
+        offersWanted,
+        driverHolder
       )
-      val actorRef = leadershipModule.startWhenLeader(
-          reviveOffersActor, "reviveOffersWhenWanted")
+      val actorRef = leadershipModule
+        .startWhenLeader(reviveOffersActor, "reviveOffersWhenWanted")
       log.info(
-          s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
+        s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
       Some(new OfferReviverDelegate(actorRef))
     } else {
       log.info(
-          s"Calling reviveOffers is disabled. Use --revive_offers_for_new_apps to enable.")
+        s"Calling reviveOffers is disabled. Use --revive_offers_for_new_apps to enable.")
       None
     }
   }
@@ -67,11 +71,11 @@ class FlowModule(leadershipModule: LeadershipModule) {
       offerMatcherManager: OfferMatcherManager): Unit = {
     lazy val offerMatcherLaunchTokensProps =
       OfferMatcherLaunchTokensActor.props(
-          conf,
-          taskStatusObservables,
-          offerMatcherManager
+        conf,
+        taskStatusObservables,
+        offerMatcherManager
       )
-    leadershipModule.startWhenLeader(
-        offerMatcherLaunchTokensProps, "offerMatcherLaunchTokens")
+    leadershipModule.startWhenLeader(offerMatcherLaunchTokensProps,
+                                     "offerMatcherLaunchTokens")
   }
 }

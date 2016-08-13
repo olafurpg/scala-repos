@@ -34,7 +34,7 @@ case class ActorUnregistered(actor: ActorRef) extends ActorRegistryEvent
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-final class ActorRegistry private[actor]() extends ListenerManagement {
+final class ActorRegistry private[actor] () extends ListenerManagement {
 
   private val actorsByUUID = new ConcurrentHashMap[Uuid, ActorRef]
   private val actorsById = new Index[String, ActorRef]
@@ -77,8 +77,8 @@ final class ActorRegistry private[actor]() extends ListenerManagement {
   def actorsFor[T <: Actor](message: Any)(
       implicit classTag: ClassTag[T]): Array[ActorRef] =
     filter(
-        a =>
-          classTag.erasure.isAssignableFrom(a.actor.getClass) &&
+      a =>
+        classTag.erasure.isAssignableFrom(a.actor.getClass) &&
           a.isDefinedAt(message))
 
   /**
@@ -291,7 +291,7 @@ final class ActorRegistry private[actor]() extends ListenerManagement {
   *
   * @author Viktor Klang
   */
-class Index[K <: AnyRef, V <: AnyRef : ArrayTag] {
+class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
   private val Naught = Array[V]() //Nil for Arrays
   private val container = new ConcurrentHashMap[K, JSet[V]]
   private val emptySet = new ConcurrentSkipListSet[V]
@@ -386,7 +386,8 @@ class Index[K <: AnyRef, V <: AnyRef : ArrayTag] {
         if (set.remove(value)) {
           //If we can remove the value
           if (set.isEmpty) //and the set becomes empty
-            container.remove(key, emptySet) //We try to remove the key if it's mapped to an empty set
+            container
+              .remove(key, emptySet) //We try to remove the key if it's mapped to an empty set
 
           true //Remove succeeded
         } else false //Remove failed

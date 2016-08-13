@@ -94,7 +94,7 @@ trait CombParserHelpers { self: Parsers =>
 
   private def acceptCIChar(c: Elem) =
     acceptIf(a => xform(a) == xform(c))(
-        "`" + c + "' expected but " + _ + " found")
+      "`" + c + "' expected but " + _ + " found")
 
   /**
     * @return a trimmed string of the input (a List of Elem)
@@ -226,8 +226,8 @@ trait SafeSeqParser extends Parsers {
     *         (and that only succeeds if `p' matches at least once).
     *         The results of `p' are collected in a list. The results of `q' are discarded.
     */
-  override def rep1sep[T](
-      p: => Parser[T], q: => Parser[Any]): Parser[List[T]] =
+  override def rep1sep[T](p: => Parser[T],
+                          q: => Parser[Any]): Parser[List[T]] =
     new Parser[List[T]] {
       def apply(in0: Input) = {
         val xs = new scala.collection.mutable.ListBuffer[T]

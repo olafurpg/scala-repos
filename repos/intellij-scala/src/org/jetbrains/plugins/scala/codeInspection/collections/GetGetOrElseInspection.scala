@@ -21,9 +21,9 @@ object GetGetOrElse extends SimplificationType() {
     expr match {
       case map `.getOnMap` (key) `.getOrElse` (default) =>
         Some(
-            replace(expr)
-              .withText(invocationText(map, "getOrElse", key, default))
-              .highlightFrom(map))
+          replace(expr)
+            .withText(invocationText(map, "getOrElse", key, default))
+            .highlightFrom(map))
       case _ => None
     }
   }

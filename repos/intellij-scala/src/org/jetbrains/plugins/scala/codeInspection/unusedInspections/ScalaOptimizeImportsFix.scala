@@ -4,7 +4,11 @@ package unusedInspections
 
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.daemon.QuickFixBundle
-import com.intellij.codeInsight.intention.{HighPriorityAction, IntentionAction, LowPriorityAction}
+import com.intellij.codeInsight.intention.{
+  HighPriorityAction,
+  IntentionAction,
+  LowPriorityAction
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -29,7 +33,7 @@ class ScalaOptimizeImportsFix extends IntentionAction with HighPriorityAction {
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
     file.getManager.isInProject(file) &&
     (file.isInstanceOf[ScalaFile] ||
-        ScalaLanguageDerivative.hasDerivativeOnFile(file))
+    ScalaLanguageDerivative.hasDerivativeOnFile(file))
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
@@ -59,7 +63,7 @@ class ScalaEnableOptimizeImportsOnTheFlyFix extends IntentionAction {
     ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY = true
     if (file.getManager.isInProject(file) &&
         (file.isInstanceOf[ScalaFile] ||
-            ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
+        ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
       if (!FileModificationService.getInstance.prepareFileForWrite(file))
         return
 
@@ -76,7 +80,8 @@ class ScalaEnableOptimizeImportsOnTheFlyFix extends IntentionAction {
 }
 
 class MarkImportAsAlwaysUsed(importText: String)
-    extends IntentionAction with LowPriorityAction {
+    extends IntentionAction
+    with LowPriorityAction {
   def getText: String = "Mark import as always used in this project"
 
   def startInWriteAction: Boolean = true
@@ -89,7 +94,7 @@ class MarkImportAsAlwaysUsed(importText: String)
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     val settings = ScalaCodeStyleSettings.getInstance(project)
     settings.setAlwaysUsedImports(
-        (settings.getAlwaysUsedImports ++ Array(importText)).sorted)
+      (settings.getAlwaysUsedImports ++ Array(importText)).sorted)
     FileContentUtil.reparseFiles(project, Seq(file.getVirtualFile), true)
   }
 

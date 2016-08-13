@@ -10,7 +10,12 @@ package org.scalajs.core.tools.linker.backend.closure
 
 import scala.collection.JavaConverters._
 
-import com.google.javascript.jscomp.{SourceFile => ClosureSource, Compiler => ClosureCompiler, CompilerOptions => ClosureOptions, _}
+import com.google.javascript.jscomp.{
+  SourceFile => ClosureSource,
+  Compiler => ClosureCompiler,
+  CompilerOptions => ClosureOptions,
+  _
+}
 
 import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.javascript.ESLevel
@@ -31,8 +36,7 @@ final class ClosureLinkerBackend(
     semantics: Semantics,
     withSourceMap: Boolean,
     config: LinkerBackend.Config
-)
-    extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
+) extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
 
   private[this] val emitter = {
     new Emitter(semantics, OutputMode.ECMAScript51Isolated)
@@ -64,21 +68,24 @@ final class ClosureLinkerBackend(
     // Build a Closure JSModule which includes the core libs
     val module = new JSModule("Scala.js")
 
-    module.add(new CompilerInput(toClosureSource(
-                CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
+    module.add(
+      new CompilerInput(
+        toClosureSource(
+          CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
 
     val ast = builder.closureAST
     module.add(new CompilerInput(ast, ast.getInputId(), false))
 
     // Compile the module
     val closureExterns = toClosureSource(
-        ClosureLinkerBackend.ScalaJSExternsFile)
+      ClosureLinkerBackend.ScalaJSExternsFile)
     val options = closureOptions(output.name)
     val compiler = closureCompiler(logger)
 
     val result = logger.time("Closure: Compiler pass") {
-      compiler.compileModules(
-          List(closureExterns).asJava, List(module).asJava, options)
+      compiler.compileModules(List(closureExterns).asJava,
+                              List(module).asJava,
+                              options)
     }
 
     logger.time("Closure: Write result") {
@@ -121,7 +128,8 @@ final class ClosureLinkerBackend(
     sourceMap.foreach { sm =>
       sm.setWrapperPrefix(header)
       val w = output.sourceMapWriter
-      try sm.appendTo(w, output.name) finally w.close()
+      try sm.appendTo(w, output.name)
+      finally w.close()
     }
   }
 
@@ -129,7 +137,7 @@ final class ClosureLinkerBackend(
     val options = new ClosureOptions
     options.prettyPrint = config.prettyPrint
     CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(
-        options)
+      options)
     options.setLanguageIn(ClosureOptions.LanguageMode.ECMASCRIPT5)
     options.setCheckGlobalThisLevel(CheckLevel.OFF)
 

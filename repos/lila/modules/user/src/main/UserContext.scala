@@ -28,14 +28,14 @@ sealed trait UserContext {
   def noKid = !kid
 }
 
-sealed abstract class BaseUserContext(
-    val req: RequestHeader, val me: Option[User])
+sealed abstract class BaseUserContext(val req: RequestHeader,
+                                      val me: Option[User])
     extends UserContext {
 
   override def toString = "%s %s %s".format(
-      me.fold("Anonymous")(_.username),
-      req.remoteAddress,
-      req.headers.get("User-Agent") | "?"
+    me.fold("Anonymous")(_.username),
+    req.remoteAddress,
+    req.headers.get("User-Agent") | "?"
   )
 }
 

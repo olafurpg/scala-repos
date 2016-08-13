@@ -31,13 +31,12 @@ case class ProjectIdentity() extends Proximal {
 //2. Implement randomized O(n) algorithm from Duchi et al's paper Efficient Projections onto the l1-Ball for Learning in High Dimensions
 case class ProjectProbabilitySimplex(s: Double) extends Proximal {
   require(
-      s > 0,
-      s"Proximal:ProjectProbabilitySimplex Radius s must be strictly positive")
+    s > 0,
+    s"Proximal:ProjectProbabilitySimplex Radius s must be strictly positive")
   def prox(x: DenseVector[Double], rho: Double = 1.0) = {
     val sorted = x.data.sorted(Ordering[Double].reverse)
     val cum = sorted.scanLeft(0.0)(_ + _).slice(1, x.length + 1)
-    val cs = DenseVector(
-        cum.zipWithIndex.map { elem =>
+    val cs = DenseVector(cum.zipWithIndex.map { elem =>
       (elem._1 - s) / (elem._2 + 1)
     })
     val ndx =

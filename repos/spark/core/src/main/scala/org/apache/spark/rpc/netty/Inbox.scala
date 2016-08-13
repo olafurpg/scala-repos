@@ -27,12 +27,13 @@ import org.apache.spark.rpc.{RpcAddress, RpcEndpoint, ThreadSafeRpcEndpoint}
 
 private[netty] sealed trait InboxMessage
 
-private[netty] case class OneWayMessage(
-    senderAddress: RpcAddress, content: Any)
+private[netty] case class OneWayMessage(senderAddress: RpcAddress,
+                                        content: Any)
     extends InboxMessage
 
-private[netty] case class RpcMessage(
-    senderAddress: RpcAddress, content: Any, context: NettyRpcCallContext)
+private[netty] case class RpcMessage(senderAddress: RpcAddress,
+                                     content: Any,
+                                     context: NettyRpcCallContext)
     extends InboxMessage
 
 private[netty] case object OnStart extends InboxMessage
@@ -49,14 +50,15 @@ private[netty] case class RemoteProcessDisconnected(remoteAddress: RpcAddress)
 
 /** A message to tell all endpoints that a network error has happened. */
 private[netty] case class RemoteProcessConnectionError(
-    cause: Throwable, remoteAddress: RpcAddress)
+    cause: Throwable,
+    remoteAddress: RpcAddress)
     extends InboxMessage
 
 /**
   * A inbox that stores messages for an [[RpcEndpoint]] and posts messages to it thread-safely.
   */
-private[netty] class Inbox(
-    val endpointRef: NettyRpcEndpointRef, val endpoint: RpcEndpoint)
+private[netty] class Inbox(val endpointRef: NettyRpcEndpointRef,
+                           val endpoint: RpcEndpoint)
     extends Logging { inbox => // Give this an alias so we can use it more clearly in closures.
 
   @GuardedBy("this")
@@ -104,7 +106,7 @@ private[netty] class Inbox(
                 .receiveAndReply(context)
                 .applyOrElse[Any, Unit](content, { msg =>
                   throw new SparkException(
-                      s"Unsupported message $message from ${_sender}")
+                    s"Unsupported message $message from ${_sender}")
                 })
             } catch {
               case NonFatal(e) =>
@@ -117,7 +119,7 @@ private[netty] class Inbox(
           case OneWayMessage(_sender, content) =>
             endpoint.receive.applyOrElse[Any, Unit](content, { msg =>
               throw new SparkException(
-                  s"Unsupported message $message from ${_sender}")
+                s"Unsupported message $message from ${_sender}")
             })
 
           case OnStart =>
@@ -133,8 +135,8 @@ private[netty] class Inbox(
           case OnStop =>
             val activeThreads = inbox.synchronized { inbox.numActiveThreads }
             assert(
-                activeThreads == 1,
-                s"There should be only a single active thread but found $activeThreads threads.")
+              activeThreads == 1,
+              s"There should be only a single active thread but found $activeThreads threads.")
             dispatcher.removeRpcEndpointRef(endpoint)
             endpoint.onStop()
             assert(isEmpty, "OnStop should be the last message")
@@ -205,9 +207,11 @@ private[netty] class Inbox(
     * Calls action closure, and calls the endpoint's onError function in the case of exceptions.
     */
   private def safelyCall(endpoint: RpcEndpoint)(action: => Unit): Unit = {
-    try action catch {
+    try action
+    catch {
       case NonFatal(e) =>
-        try endpoint.onError(e) catch {
+        try endpoint.onError(e)
+        catch {
           case NonFatal(ee) => logError(s"Ignoring error", ee)
         }
     }

@@ -14,7 +14,8 @@ trait MappedToBase extends Any {
 
 object MappedToBase {
   implicit def mappedToIsomorphism[E <: MappedToBase]: Isomorphism[
-      E, E#Underlying] = macro mappedToIsomorphismMacroImpl[E]
+    E,
+    E#Underlying] = macro mappedToIsomorphismMacroImpl[E]
 
   def mappedToIsomorphismMacroImpl[E <: MappedToBase](c: Context)(
       implicit e: c.WeakTypeTag[E]): c.Expr[Isomorphism[E, E#Underlying]] = {
@@ -24,22 +25,24 @@ object MappedToBase {
     // check fails, overriding our error (or backtracking in implicit search).
     if (!(e.tpe <:< c.typeOf[MappedToBase]))
       c.abort(
-          c.enclosingPosition,
-          "Work-around for SI-8351 leading to illegal macro-invocation -- You should not see this message")
+        c.enclosingPosition,
+        "Work-around for SI-8351 leading to illegal macro-invocation -- You should not see this message")
     implicit val eutag = c.TypeTag[E#Underlying](
-        e.tpe.member(TypeName("Underlying")).typeSignatureIn(e.tpe))
+      e.tpe.member(TypeName("Underlying")).typeSignatureIn(e.tpe))
     val cons = c.Expr[E#Underlying => E](
-        Function(
-            List(ValDef(Modifiers(Flag.PARAM),
-                        TermName("v"), /*Ident(eu.tpe.typeSymbol)*/ TypeTree(),
-                        EmptyTree)),
-            Apply(
-                Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
-                List(Ident(TermName("v")))
-            )
-        ))
+      Function(
+        List(
+          ValDef(Modifiers(Flag.PARAM),
+                 TermName("v"), /*Ident(eu.tpe.typeSymbol)*/ TypeTree(),
+                 EmptyTree)),
+        Apply(
+          Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
+          List(Ident(TermName("v")))
+        )
+      ))
     val res = reify { new Isomorphism[E, E#Underlying](_.value, cons.splice) }
-    try c.typecheck(res.tree) catch {
+    try c.typecheck(res.tree)
+    catch {
       case NonFatal(ex) =>
         val p = c.enclosingPosition
         val msg = "Error typechecking MappedTo expansion: " + ex.getMessage

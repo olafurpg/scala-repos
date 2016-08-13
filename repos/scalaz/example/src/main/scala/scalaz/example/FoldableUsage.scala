@@ -18,7 +18,7 @@ object FoldableUsage extends App {
   // infinite stream, as it attempts to reverse the stream, causing a
   // Stack Overflow
   val so = \/.fromTryCatchThrowable[Boolean, Throwable](
-      trues.foldRight(false)(_ || _))
+    trues.foldRight(false)(_ || _))
   assert(so.fold(_.toString, _.toString) === "java.lang.StackOverflowError")
 
   // however, the Foldable typeclass has an implementation named foldr
@@ -36,9 +36,8 @@ object FoldableUsage extends App {
   // we can also map the structure to values for which we have a
   // monoid, we can collapse the list, as we can see, this one is also
   // properly lazy, allowing us to collapse our infinite stream again
-  assert(
-      Tag.unwrap(Foldable[Stream].foldMap(trues)(
-              (b: Boolean) => Tags.Disjunction(b))))
+  assert(Tag.unwrap(Foldable[Stream].foldMap(trues)((b: Boolean) =>
+    Tags.Disjunction(b))))
 
   // We can import syntax for foldable, allowing us to "enhance" the foldable with the new methods:
   import scalaz.syntax.foldable._
@@ -51,34 +50,36 @@ object FoldableUsage extends App {
   // Foldables can be composed:
   val FoldListOfOptions = Foldable[List] compose Foldable[Option]
 
-  val listOfOptions: List[Option[Int]] = List(
-      1.some, 2.some, none[Int], 3.some, 4.some)
+  val listOfOptions: List[Option[Int]] =
+    List(1.some, 2.some, none[Int], 3.some, 4.some)
   assert(FoldListOfOptions.fold(listOfOptions) === 10)
 
   // with this you get a collapse function which is perhaps like the
   // flatten method in the standard library, however it is more versatile
   assert(
-      FoldListOfOptions.collapse[List, Int](listOfOptions) === listOfOptions.flatten)
+    FoldListOfOptions
+      .collapse[List, Int](listOfOptions) === listOfOptions.flatten)
 
   // we can accumulate into any type for which we have an
   // ApplicativePlus instance, so here we can collapse our List of
   // Options into a Vector
-  assert(FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(
-          listOfOptions.flatten: _*))
+  assert(
+    FoldListOfOptions.collapse[Vector, Int](listOfOptions) === Vector(
+      listOfOptions.flatten: _*))
 
   // we can go deeeeep:
   val deepFolder =
     Foldable[List] compose Foldable[Vector] compose Foldable[Stream] compose Foldable[
-        Option]
+      Option]
   val deep: List[Vector[Stream[Option[Int]]]] = List(
-      Vector(Stream(1.some, none[Int]), Stream(2.some)),
-      Vector(Stream(3.some)))
+    Vector(Stream(1.some, none[Int]), Stream(2.some)),
+    Vector(Stream(3.some)))
   assert(deepFolder.fold(deep) === 6)
   assert(deepFolder.collapse[IList, Int](deep) === IList(1, 2, 3))
   assert(deepFolder.foldLeft(deep, "")(_ + _.toString) === "123")
 
   // Monadic Folds: we can fold over a structure with a function
-  // which returns its value in a Monad, 
+  // which returns its value in a Monad,
   val sumEvens: (Int, Int) => Option[Int] = { (x, y) =>
     // if the right int is even, add it to the left
     // otherwise return None

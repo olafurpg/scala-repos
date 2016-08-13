@@ -7,7 +7,10 @@ import com.intellij.ide.startup.impl.StartupManagerImpl
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants
 import com.intellij.openapi.module.{Module, ModuleManager, ModuleUtilCore}
 import com.intellij.openapi.projectRoots.{JavaSdk, Sdk}
-import com.intellij.openapi.roots.{ModifiableRootModel, ModuleRootModificationUtil}
+import com.intellij.openapi.roots.{
+  ModifiableRootModel,
+  ModuleRootModificationUtil
+}
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtilCore}
 import com.intellij.psi.PsiManager
@@ -42,17 +45,17 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     addTestFileToModuleSources()
     setUpProjectSettings()
     inWriteAction(
-        StartupManager
-          .getInstance(getProject)
-          .asInstanceOf[StartupManagerImpl]
-          .startCacheUpdate())
+      StartupManager
+        .getInstance(getProject)
+        .asInstanceOf[StartupManagerImpl]
+        .startCacheUpdate())
   }
 
   override def loadTestFile(): SbtFileImpl = {
     val fileName = "SbtAnnotator.sbt"
     val filePath = testdataPath + fileName
     val vfile = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     val psifile = PsiManager.getInstance(getProject).findFile(vfile)
     psifile.putUserData(ModuleUtilCore.KEY_MODULE, getModule)
     psifile.asInstanceOf[SbtFileImpl]
@@ -61,8 +64,8 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
   override def getTestProjectJdk: Sdk =
     JavaSdk.getInstance().createJdk("java sdk", TestUtils.getDefaultJdk, false)
 
-  private def runTest(
-      sbtVersion: String, expectedMessages: Seq[Message]): Unit = {
+  private def runTest(sbtVersion: String,
+                      expectedMessages: Seq[Message]): Unit = {
     setSbtVersion(sbtVersion)
     val actualMessages = annotate().asJava
     UsefulTestCase.assertSameElements(actualMessages, expectedMessages: _*)
@@ -96,35 +99,37 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     val projectSettings = SbtProjectSettings.default
     projectSettings.setExternalProjectPath(getProject.getBasePath)
     projectSettings.setModules(
-        java.util.Collections.singleton(getModule.getModuleFilePath))
+      java.util.Collections.singleton(getModule.getModuleFilePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
-    getModule.setOption(
-        ExternalSystemConstants.ROOT_PROJECT_PATH_KEY, getProject.getBasePath)
+    getModule.setOption(ExternalSystemConstants.ROOT_PROJECT_PATH_KEY,
+                        getProject.getBasePath)
   }
 
   private def addTestFileToModuleSources(): Unit = {
-    ModuleRootModificationUtil.updateModel(
-        getModule, new Consumer[ModifiableRootModel] {
-      override def consume(model: ModifiableRootModel): Unit = {
-        val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
-        model.addContentEntry(testdataUrl).addSourceFolder(testdataUrl, false)
-      }
-    })
+    ModuleRootModificationUtil
+      .updateModel(getModule, new Consumer[ModifiableRootModel] {
+        override def consume(model: ModifiableRootModel): Unit = {
+          val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
+          model
+            .addContentEntry(testdataUrl)
+            .addSourceFolder(testdataUrl, false)
+        }
+      })
     preventLeakageOfVfsPointers()
   }
 }
 
 object Expectations {
   val sbt0137 = Seq(
-      Error("object Bar",
-            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
-      Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
-      Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
-      Error("organization",
-            SbtBundle(
-                "sbt.annotation.expressionMustConform", "SettingKey[String]")),
-      Error("\"some string\"",
-            SbtBundle("sbt.annotation.expressionMustConform", "String"))
+    Error("object Bar",
+          SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
+    Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
+    Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
+    Error(
+      "organization",
+      SbtBundle("sbt.annotation.expressionMustConform", "SettingKey[String]")),
+    Error("\"some string\"",
+          SbtBundle("sbt.annotation.expressionMustConform", "String"))
   )
 
   val sbt013 =
@@ -133,10 +138,10 @@ object Expectations {
 
   val sbt012 =
     sbt0137 ++ Seq(
-        Error("version := \"SNAPSHOT\"",
-              SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
-        Error(
-            "lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
-            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
+      Error("version := \"SNAPSHOT\"",
+            SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
+      Error(
+        "lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
+        SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
     )
 }

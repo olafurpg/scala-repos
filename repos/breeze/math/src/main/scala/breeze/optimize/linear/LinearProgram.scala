@@ -44,12 +44,13 @@ class LinearProgram {
       }
     }
 
-    override def toString = ("maximize    " + objective + {
-          if (constraints.nonEmpty) {
-            "\nsubject to  " +
+    override def toString =
+      ("maximize    " + objective + {
+        if (constraints.nonEmpty) {
+          "\nsubject to  " +
             constraints.mkString("\n" + " " * "subject to  ".length)
-          } else ""
-        })
+        } else ""
+      })
   }
 
   /**
@@ -288,8 +289,8 @@ object LinearProgram {
       import lp._
 
       val obj = new LinearObjectiveFunction(
-          objective.objective.coefficients.toDenseVector.data,
-          objective.objective.scalarComponent)
+        objective.objective.coefficients.toDenseVector.data,
+        objective.objective.scalarComponent)
 
       val constraintSet = buildConstraints(lp)(objective)
 
@@ -302,8 +303,8 @@ object LinearProgram {
       import lp._
 
       val obj = new LinearObjectiveFunction(
-          objective.objective.coefficients.toDenseVector.data,
-          objective.objective.scalarComponent)
+        objective.objective.coefficients.toDenseVector.data,
+        objective.objective.scalarComponent)
 
       val constraintSet = buildConstraints(lp)(objective)
 
@@ -322,8 +323,9 @@ object LinearProgram {
         case EQ => Relationship.EQ
       }
 
-      for (v <- variables) if (!v.isInstanceOf[lp.Variable])
-        throw new UnsupportedOperationException(
+      for (v <- variables)
+        if (!v.isInstanceOf[lp.Variable])
+          throw new UnsupportedOperationException(
             "Apache Solver can only handle real-valued linear programs.")
 
       val constraints = for (c: Constraint <- objective.constraints) yield {

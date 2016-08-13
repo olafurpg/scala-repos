@@ -51,10 +51,9 @@ class TimeoutFactoryTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "TimeoutFactory after the timeout should interrupt the underlying promise with a TimeoutException") {
+    "TimeoutFactory after the timeout should interrupt the underlying promise with a TimeoutException") {
     new AfterHelper {
-      assert(
-          promise.interrupted forall {
+      assert(promise.interrupted forall {
         case _: java.util.concurrent.TimeoutException => true
         case _ => false
       })
@@ -62,7 +61,7 @@ class TimeoutFactoryTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "TimeoutFactory before the timeout should pass the successfully created service through") {
+    "TimeoutFactory before the timeout should pass the successfully created service through") {
     new TimeoutFactoryHelper {
       val res = factory()
       assert(!res.isDefined)

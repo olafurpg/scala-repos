@@ -25,18 +25,18 @@ object LensTest extends SpecLite {
   checkAll("Tuple2.first", lens.laws(Lens.firstLens[Int, Int]))
   checkAll("Tuple2.second", lens.laws(Lens.secondLens[Int, Int]))
   checkAll("Set.contains", lens.laws(Lens.lensId[Set[Int]].contains(0)))
+  checkAll("Map.member",
+           lens.laws(Lens.lensId[Map[Boolean, Int]].member(true)))
   checkAll(
-      "Map.member", lens.laws(Lens.lensId[Map[Boolean, Int]].member(true)))
-  checkAll(
-      "sum",
-      lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
+    "sum",
+    lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
 
   "NumericLens" should {
-    "+=" ! forAll((i: Int) =>
-          (Lens.lensId[Int] += i).run(1) must_=== ((i + 1) -> (i + 1)))
-    "-=" ! forAll((i: Int) =>
-          (Lens.lensId[Int] -= i).run(1) must_=== ((1 - i) -> (1 - i)))
-    "*=" ! forAll((i: Int) =>
-          (Lens.lensId[Int] *= i).run(2) must_=== ((i * 2) -> (i * 2)))
+    "+=" ! forAll(
+      (i: Int) => (Lens.lensId[Int] += i).run(1) must_=== ((i + 1) -> (i + 1)))
+    "-=" ! forAll(
+      (i: Int) => (Lens.lensId[Int] -= i).run(1) must_=== ((1 - i) -> (1 - i)))
+    "*=" ! forAll(
+      (i: Int) => (Lens.lensId[Int] *= i).run(2) must_=== ((i * 2) -> (i * 2)))
   }
 }

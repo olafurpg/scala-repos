@@ -51,7 +51,7 @@ class ObjectExpression[J](val delegate: jfxbb.ObjectExpression[J]) {
   // explicit conversion needed due to AnyRef typed method
   def =!=[T](v: ObservableValue[T, T]) =
     delegate.isNotEqualTo(
-        ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
+      ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
   def =!=(v: AnyRef) = delegate.isNotEqualTo(v)
 
   def selectDouble(s: String) = jfxbb.Bindings.selectDouble(this.delegate, s)

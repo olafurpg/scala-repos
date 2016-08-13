@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -67,13 +67,13 @@ object DirectKafkaConsumer extends App {
       msgs += 1
       if (msgs % 1000 == 0) {
         System.out.println(
-            "consumed: " + EventMessageEncoding.read(msg.message.buffer));
+          "consumed: " + EventMessageEncoding.read(msg.message.buffer));
         val now = System.nanoTime
         val secs = (now - start) / 1000000000.0
         val throughput = msgs / secs
         println(
-            "Message %d batch %d time %.02fs throughput %.01f msgs/s".format(
-                msgs, batch, secs, throughput))
+          "Message %d batch %d time %.02fs throughput %.01f msgs/s"
+            .format(msgs, batch, secs, throughput))
       }
     }
 
@@ -85,8 +85,8 @@ object DirectKafkaProducer extends App {
   val config = new Properties()
   config.put("broker.list", "0:localhost:9092")
   config.put("enable.zookeeper", "false")
-  config.put(
-      "serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
+  config
+    .put("serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
 
   val producer =
     new Producer[String, IngestMessage](new ProducerConfig(config))
@@ -110,8 +110,8 @@ object DirectKafkaProducer extends App {
       val secs = (now - start) / 1000000000.0
       val throughput = i / secs
       println(
-          "Message %d time %.02fs throughput %.01f msgs/s".format(
-              i, secs, throughput))
+        "Message %d time %.02fs throughput %.01f msgs/s"
+          .format(i, secs, throughput))
     }
 
     val data = new ProducerData[String, IngestMessage](topic, msg)

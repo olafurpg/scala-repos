@@ -25,18 +25,18 @@ class OffsetCommitRequest(
     clientId: String,
     versionId: Short) {
   val underlying = {
-    val scalaMap: collection.immutable.Map[
-        TopicAndPartition, OffsetAndMetadata] = {
+    val scalaMap: collection.immutable.Map[TopicAndPartition,
+                                           OffsetAndMetadata] = {
       import collection.JavaConversions._
 
       requestInfo.toMap
     }
     kafka.api.OffsetCommitRequest(
-        groupId = groupId,
-        requestInfo = scalaMap,
-        versionId = versionId,
-        correlationId = correlationId,
-        clientId = clientId
+      groupId = groupId,
+      requestInfo = scalaMap,
+      versionId = versionId,
+      correlationId = correlationId,
+      clientId = clientId
     )
   }
 

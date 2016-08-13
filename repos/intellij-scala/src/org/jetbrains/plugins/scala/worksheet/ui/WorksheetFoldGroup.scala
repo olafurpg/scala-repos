@@ -57,13 +57,16 @@ class WorksheetFoldGroup(
   }
 
   def getCorrespondInfo = regions map {
-    case FoldRegionInfo(
-        region: WorksheetFoldRegionDelegate, _, leftStart, spaces, lsLength) =>
+    case FoldRegionInfo(region: WorksheetFoldRegionDelegate,
+                        _,
+                        leftStart,
+                        spaces,
+                        lsLength) =>
       (region.getStartOffset, region.getEndOffset, leftStart, spaces, lsLength)
   }
 
-  private def traverseAndChange(
-      target: WorksheetFoldRegionDelegate, expand: Boolean): Boolean = {
+  private def traverseAndChange(target: WorksheetFoldRegionDelegate,
+                                expand: Boolean): Boolean = {
     if (!viewerEditor.asInstanceOf[EditorImpl].getContentComponent.hasFocus)
       return false
 
@@ -98,13 +101,13 @@ class WorksheetFoldGroup(
               case Array(start, end, expanded, trueStart, spaces, lsLength) =>
                 try {
                   val region = new WorksheetFoldRegionDelegate(
-                      viewerEditor,
-                      start.toInt,
-                      end.toInt,
-                      trueStart.toInt,
-                      spaces.toInt,
-                      WorksheetFoldGroup.this,
-                      lsLength.toInt
+                    viewerEditor,
+                    start.toInt,
+                    end.toInt,
+                    trueStart.toInt,
+                    spaces.toInt,
+                    WorksheetFoldGroup.this,
+                    lsLength.toInt
                   )
 
                   region.setExpanded(expanded.length == 4)
@@ -156,8 +159,8 @@ class WorksheetFoldGroup(
     val lower = unfolded.tailMap(line).entrySet().iterator()
     while (lower.hasNext) {
       val t = lower.next()
-      unfolded.put(
-          t.getKey, if (expand) t.getValue + spaces else t.getValue - spaces)
+      unfolded.put(t.getKey,
+                   if (expand) t.getValue + spaces else t.getValue - spaces)
     }
 
     if (expand) unfolded.put(line, unfolded.get(key) + spaces)
@@ -179,14 +182,14 @@ class WorksheetFoldGroup(
 }
 
 object WorksheetFoldGroup {
-  private val WORKSHEET_PERSISTENT_FOLD_KEY = new FileAttribute(
-      "WorksheetPersistentFoldings", 1, false)
+  private val WORKSHEET_PERSISTENT_FOLD_KEY =
+    new FileAttribute("WorksheetPersistentFoldings", 1, false)
 
   def save(file: ScalaFile, group: WorksheetFoldGroup) {
     val virtualFile = file.getVirtualFile
     if (!virtualFile.isValid) return
-    FileAttributeUtilCache.writeAttribute(
-        WORKSHEET_PERSISTENT_FOLD_KEY, file, group.serialize())
+    FileAttributeUtilCache
+      .writeAttribute(WORKSHEET_PERSISTENT_FOLD_KEY, file, group.serialize())
   }
 
   def load(viewerEditor: Editor,
@@ -198,8 +201,8 @@ object WorksheetFoldGroup {
       FileAttributeUtilCache.readAttribute(WORKSHEET_PERSISTENT_FOLD_KEY, file)
     if (bytes == null) return
 
-    lazy val group = new WorksheetFoldGroup(
-        viewerEditor, originalEditor, project, splitter)
+    lazy val group =
+      new WorksheetFoldGroup(viewerEditor, originalEditor, project, splitter)
     bytes foreach {
       case nonEmpty if nonEmpty.length > 0 => group deserialize nonEmpty
       case _ =>

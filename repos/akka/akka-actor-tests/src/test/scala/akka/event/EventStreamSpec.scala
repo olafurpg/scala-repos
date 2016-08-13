@@ -13,7 +13,8 @@ import akka.testkit.{TestProbe, AkkaSpec}
 object EventStreamSpec {
 
   val config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
       akka {
         actor.serialize-messages = off
         stdout-loglevel = WARNING
@@ -96,15 +97,15 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     "not allow null as subscriber" in {
       val bus = new EventStream(system, true)
       intercept[IllegalArgumentException] { bus.subscribe(null, classOf[M]) }.getMessage should ===(
-          "subscriber is null")
+        "subscriber is null")
     }
 
     "not allow null as unsubscriber" in {
       val bus = new EventStream(system, true)
       intercept[IllegalArgumentException] { bus.unsubscribe(null, classOf[M]) }.getMessage should ===(
-          "subscriber is null")
+        "subscriber is null")
       intercept[IllegalArgumentException] { bus.unsubscribe(null) }.getMessage should ===(
-          "subscriber is null")
+        "subscriber is null")
     }
 
     "be able to log unhandled messages" in {
@@ -117,7 +118,7 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
                        Logging.Debug(sys.deadLetters.path.toString,
                                      sys.deadLetters.getClass,
                                      "unhandled message from " +
-                                     sys.deadLetters + ": 42"))
+                                       sys.deadLetters + ": 42"))
         sys.eventStream.unsubscribe(testActor)
       } finally {
         shutdown(sys)
@@ -402,16 +403,17 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
 
         es.unsubscribe(a2.ref, classOf[A]) should equal(true)
         fishForDebugMessage(
-            a1,
-            s"unsubscribing ${a2.ref} from channel class akka.event.EventStreamSpec$$A")
+          a1,
+          s"unsubscribing ${a2.ref} from channel class akka.event.EventStreamSpec$$A")
         a1.expectNoMsg(1 second)
 
         es.unsubscribe(a2.ref, classOf[T]) should equal(true)
         fishForDebugMessage(
-            a1,
-            s"unsubscribing ${a2.ref} from channel interface akka.event.EventStreamSpec$$T")
+          a1,
+          s"unsubscribing ${a2.ref} from channel interface akka.event.EventStreamSpec$$T")
         fishForDebugMessage(
-            a1, s"unwatching ${a2.ref}, since has no subscriptions")
+          a1,
+          s"unwatching ${a2.ref}, since has no subscriptions")
         a1.expectNoMsg(1 second)
 
         es.unsubscribe(a2.ref, classOf[T]) should equal(false)
@@ -432,10 +434,12 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     msg foreach (expectMsg(_))
   }
 
-  private def fishForDebugMessage(
-      a: TestProbe, messagePrefix: String, max: Duration = 3 seconds) {
+  private def fishForDebugMessage(a: TestProbe,
+                                  messagePrefix: String,
+                                  max: Duration = 3 seconds) {
     a.fishForMessage(
-        max, hint = "expected debug message prefix: " + messagePrefix) {
+      max,
+      hint = "expected debug message prefix: " + messagePrefix) {
       case Logging.Debug(_, _, msg: String) if msg startsWith messagePrefix ⇒
         true
       case other ⇒ false

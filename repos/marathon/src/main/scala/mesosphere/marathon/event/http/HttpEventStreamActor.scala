@@ -23,8 +23,8 @@ trait HttpEventStreamHandle {
 
 class HttpEventStreamActorMetrics @Inject()(metrics: Metrics) {
   val numberOfStreams: AtomicIntGauge = metrics.gauge(
-      metrics.name(MetricPrefixes.API, getClass, "number-of-streams"),
-      new AtomicIntGauge)
+    metrics.name(MetricPrefixes.API, getClass, "number-of-streams"),
+    new AtomicIntGauge)
 }
 
 /**
@@ -62,10 +62,10 @@ class HttpEventStreamActor(leaderInfo: LeaderInfo,
     */
   private[this] def behaviour(newConnectionBehaviour: Receive): Receive = {
     Seq(
-        handleLeadership,
-        cleanupHandlerActors,
-        newConnectionBehaviour,
-        warnAboutUnknownMessages
+      handleLeadership,
+      cleanupHandlerActors,
+      newConnectionBehaviour,
+      warnAboutUnknownMessages
     ).reduceLeft {
       // Prevent fatal warning about deriving type Any as type parameter
       _.orElse[Any, Unit](_)
@@ -86,7 +86,7 @@ class HttpEventStreamActor(leaderInfo: LeaderInfo,
     case HttpEventStreamConnectionOpen(handle) =>
       metrics.numberOfStreams.setValue(streamHandleActors.size)
       log.info(
-          s"Add EventStream Handle as event listener: $handle. Current nr of streams: ${streamHandleActors.size}")
+        s"Add EventStream Handle as event listener: $handle. Current nr of streams: ${streamHandleActors.size}")
       val actor = context.actorOf(handleStreamProps(handle), handle.id)
       context.watch(actor)
       streamHandleActors += handle -> actor
@@ -116,7 +116,8 @@ class HttpEventStreamActor(leaderInfo: LeaderInfo,
       context.stop(actor)
       streamHandleActors -= handle
       metrics.numberOfStreams.setValue(streamHandleActors.size)
-      log.info(s"Removed EventStream Handle as event listener: $handle. " +
+      log.info(
+        s"Removed EventStream Handle as event listener: $handle. " +
           s"Current nr of listeners: ${streamHandleActors.size}")
     }
   }

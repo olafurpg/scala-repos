@@ -58,9 +58,9 @@ private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
         call.reply(result)
       case _ =>
         Channels.fireExceptionCaught(
-            ctx,
-            new TApplicationException(
-                TApplicationException.INVALID_MESSAGE_TYPE))
+          ctx,
+          new TApplicationException(
+            TApplicationException.INVALID_MESSAGE_TYPE))
         null
     }
   }

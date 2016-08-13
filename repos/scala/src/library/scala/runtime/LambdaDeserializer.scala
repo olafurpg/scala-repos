@@ -45,7 +45,7 @@ object LambdaDeserializer {
         MethodType.fromMethodDescriptorString(s, loader)
 
       val funcInterfaceSignature = parseDescriptor(
-          getFunctionalInterfaceMethodSignature)
+        getFunctionalInterfaceMethodSignature)
       val instantiated = parseDescriptor(getInstantiatedMethodType)
       val functionalInterfaceClass =
         loader.loadClass(slashDot(getFunctionalInterfaceClass))
@@ -84,8 +84,8 @@ object LambdaDeserializer {
                    implMethodSig)
       } catch {
         case e: ReflectiveOperationException =>
-          throw new IllegalArgumentException(
-              "Illegal lambda deserialization", e)
+          throw new IllegalArgumentException("Illegal lambda deserialization",
+                                             e)
       }
 
       val flags: Int =
@@ -93,19 +93,19 @@ object LambdaDeserializer {
       val isScalaFunction =
         functionalInterfaceClass.getName.startsWith("scala.Function")
       val markerInterface: Class[_] = loader.loadClass(
-          if (isScalaFunction) ScalaSerializable else JavaIOSerializable)
+        if (isScalaFunction) ScalaSerializable else JavaIOSerializable)
 
       LambdaMetafactory.altMetafactory(
-          lookup,
-          getFunctionalInterfaceMethodName,
-          invokedType,
-          /* samMethodType          = */ funcInterfaceSignature,
-          /* implMethod             = */ implMethod,
-          /* instantiatedMethodType = */ instantiated,
-          /* flags                  = */ flags.asInstanceOf[AnyRef],
-          /* markerInterfaceCount   = */ 1.asInstanceOf[AnyRef],
-          /* markerInterfaces[0]    = */ markerInterface,
-          /* bridgeCount            = */ 0.asInstanceOf[AnyRef]
+        lookup,
+        getFunctionalInterfaceMethodName,
+        invokedType,
+        /* samMethodType          = */ funcInterfaceSignature,
+        /* implMethod             = */ implMethod,
+        /* instantiatedMethodType = */ instantiated,
+        /* flags                  = */ flags.asInstanceOf[AnyRef],
+        /* markerInterfaceCount   = */ 1.asInstanceOf[AnyRef],
+        /* markerInterfaces[0]    = */ markerInterface,
+        /* bridgeCount            = */ 0.asInstanceOf[AnyRef]
       )
     }
 
@@ -124,8 +124,8 @@ object LambdaDeserializer {
           case target => target
         }
 
-    val captures = Array.tabulate(serialized.getCapturedArgCount)(
-        n => serialized.getCapturedArg(n))
+    val captures = Array.tabulate(serialized.getCapturedArgCount)(n =>
+      serialized.getCapturedArg(n))
     factory.invokeWithArguments(captures: _*)
   }
 

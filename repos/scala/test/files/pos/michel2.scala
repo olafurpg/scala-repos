@@ -5,7 +5,7 @@ object Test {
   }
 
   class B extends AnyRef with A {
-    override def f: Int = super [A].f
+    override def f: Int = super[A].f
   }
 
   def main(args: Array[String]) =

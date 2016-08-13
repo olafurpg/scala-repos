@@ -40,28 +40,28 @@ final class GameSearchApi(client: ESClient)
   private def toDoc(game: Game, analysed: Boolean) =
     Json
       .obj(
-          Fields.status -> (game.status match {
-            case s if s.is(_.Timeout) => chess.Status.Resign
-            case s if s.is(_.NoStart) => chess.Status.Resign
-            case s => game.status
-          }).id,
-          Fields.turns -> math.ceil(game.turns.toFloat / 2),
-          Fields.rated -> game.rated,
-          Fields.perf -> game.perfType.map(_.id),
-          Fields.uids -> game.userIds.toArray.some.filterNot(_.isEmpty),
-          Fields.winner -> (game.winner flatMap (_.userId)),
-          Fields.winnerColor -> game.winner.fold(3)(_.color.fold(1, 2)),
-          Fields.averageRating -> game.averageUsersRating,
-          Fields.ai -> game.aiLevel,
-          Fields.date ->
+        Fields.status -> (game.status match {
+          case s if s.is(_.Timeout) => chess.Status.Resign
+          case s if s.is(_.NoStart) => chess.Status.Resign
+          case s => game.status
+        }).id,
+        Fields.turns -> math.ceil(game.turns.toFloat / 2),
+        Fields.rated -> game.rated,
+        Fields.perf -> game.perfType.map(_.id),
+        Fields.uids -> game.userIds.toArray.some.filterNot(_.isEmpty),
+        Fields.winner -> (game.winner flatMap (_.userId)),
+        Fields.winnerColor -> game.winner.fold(3)(_.color.fold(1, 2)),
+        Fields.averageRating -> game.averageUsersRating,
+        Fields.ai -> game.aiLevel,
+        Fields.date ->
           (lila.search.Date.formatter print game.updatedAtOrCreatedAt),
-          Fields.duration -> game.durationSeconds,
-          Fields.clockInit -> game.clock.map(_.limit),
-          Fields.clockInc -> game.clock.map(_.increment),
-          Fields.analysed -> analysed,
-          Fields.whiteUser -> game.whitePlayer.userId,
-          Fields.blackUser -> game.blackPlayer.userId,
-          Fields.source -> game.source.map(_.id)
+        Fields.duration -> game.durationSeconds,
+        Fields.clockInit -> game.clock.map(_.limit),
+        Fields.clockInc -> game.clock.map(_.increment),
+        Fields.analysed -> analysed,
+        Fields.whiteUser -> game.whitePlayer.userId,
+        Fields.blackUser -> game.blackPlayer.userId,
+        Fields.source -> game.source.map(_.id)
       )
       .noNull
 
@@ -115,12 +115,12 @@ final class GameSearchApi(client: ESClient)
 
     lila.game.tube.gameTube.coll
       .find(BSONDocument(
-              "ca" -> BSONDocument("$gt" -> since)
-          ))
+        "ca" -> BSONDocument("$gt" -> since)
+      ))
       .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)
       .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
-        Iteratee takeUpTo batchSize) |>>> Enumeratee
+      Iteratee takeUpTo batchSize) |>>> Enumeratee
       .mapM[Seq[Game]]
       .apply[(Seq[Game], Set[String])] { games =>
         GameRepo filterAnalysed games.map(_.id) map games.->

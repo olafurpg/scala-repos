@@ -60,8 +60,8 @@ class StorageLevel private (private var _useDisk: Boolean,
   def replication: Int = _replication
 
   assert(
-      replication < 40,
-      "Replication restricted to be less than 40 for calculating hash codes")
+    replication < 40,
+    "Replication restricted to be less than 40 for calculating hash codes")
 
   if (useOffHeap) {
     require(!useDisk, "Off-heap storage level does not support using disk")
@@ -80,8 +80,8 @@ class StorageLevel private (private var _useDisk: Boolean,
   override def equals(other: Any): Boolean = other match {
     case s: StorageLevel =>
       s.useDisk == useDisk && s.useMemory == useMemory &&
-      s.useOffHeap == useOffHeap && s.deserialized == deserialized &&
-      s.replication == replication
+        s.useOffHeap == useOffHeap && s.deserialized == deserialized &&
+        s.replication == replication
     case _ =>
       false
   }
@@ -192,8 +192,12 @@ object StorageLevel {
             useOffHeap: Boolean,
             deserialized: Boolean,
             replication: Int): StorageLevel = {
-    getCachedStorageLevel(new StorageLevel(
-            useDisk, useMemory, useOffHeap, deserialized, replication))
+    getCachedStorageLevel(
+      new StorageLevel(useDisk,
+                       useMemory,
+                       useOffHeap,
+                       deserialized,
+                       replication))
   }
 
   /**
@@ -206,7 +210,7 @@ object StorageLevel {
             deserialized: Boolean,
             replication: Int = 1): StorageLevel = {
     getCachedStorageLevel(
-        new StorageLevel(useDisk, useMemory, false, deserialized, replication))
+      new StorageLevel(useDisk, useMemory, false, deserialized, replication))
   }
 
   /**

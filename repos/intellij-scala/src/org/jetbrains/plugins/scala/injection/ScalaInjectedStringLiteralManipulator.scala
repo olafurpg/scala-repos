@@ -5,7 +5,10 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.AbstractElementManipulator
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
@@ -14,8 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScalaInjectedStringLiteralManipulator
     extends AbstractElementManipulator[ScLiteral] {
-  override def handleContentChange(
-      expr: ScLiteral, range: TextRange, newContent: String): ScLiteral = {
+  override def handleContentChange(expr: ScLiteral,
+                                   range: TextRange,
+                                   newContent: String): ScLiteral = {
     val oldText = expr.getText
     val contentString = expr.getFirstChild.getNode.getElementType match {
       case ScalaTokenTypes.tMULTILINE_STRING => newContent
@@ -23,7 +27,7 @@ class ScalaInjectedStringLiteralManipulator
     }
     val newText =
       oldText.substring(0, range.getStartOffset) + contentString +
-      oldText.substring(range.getEndOffset)
+        oldText.substring(range.getEndOffset)
 
     expr match {
       case inter: ScInterpolatedStringLiteral =>
@@ -32,18 +36,19 @@ class ScalaInjectedStringLiteralManipulator
         inter.reference.map {
           case ref =>
             ScalaPsiElementFactory.createExpressionFromText(
-                s"${ref.getText}$quotes$newContent$quotes", expr.getManager)
+              s"${ref.getText}$quotes$newContent$quotes",
+              expr.getManager)
         } match {
           case Some(l: ScLiteral) =>
             expr.replace(l)
             l
           case _ =>
             throw new IncorrectOperationException(
-                "cannot handle content change")
+              "cannot handle content change")
         }
       case str if str.isString =>
-        val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-            newText, str.getManager)
+        val newExpr = ScalaPsiElementFactory
+          .createExpressionFromText(newText, str.getManager)
 
         val firstChild = str.getFirstChild
         val newElement = newExpr.getFirstChild

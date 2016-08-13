@@ -20,16 +20,21 @@ final class JUnitFramework extends Framework {
   def runner(args: Array[String],
              remoteArgs: Array[String],
              testClassLoader: ClassLoader): JUnitMasterRunner = {
-    new JUnitMasterRunner(
-        args, remoteArgs, testClassLoader, parseRunSettings(args))
+    new JUnitMasterRunner(args,
+                          remoteArgs,
+                          testClassLoader,
+                          parseRunSettings(args))
   }
 
   def slaveRunner(args: Array[String],
                   remoteArgs: Array[String],
                   testClassLoader: ClassLoader,
                   send: String => Unit): JUnitSlaveRunner = {
-    new JUnitSlaveRunner(
-        args, remoteArgs, testClassLoader, send, parseRunSettings(args))
+    new JUnitSlaveRunner(args,
+                         remoteArgs,
+                         testClassLoader,
+                         send,
+                         parseRunSettings(args))
   }
 
   def arrayString(arr: Array[String]): String =

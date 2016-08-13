@@ -44,16 +44,17 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
         Dns.resolve(send.target.getHostName)(context.system, self) match {
           case Some(r) ⇒
             try {
-              pendingSend = pendingSend.copy(target = new InetSocketAddress(
-                        r.addr, pendingSend.target.getPort))
+              pendingSend = pendingSend.copy(
+                target =
+                  new InetSocketAddress(r.addr, pendingSend.target.getPort))
               doSend(registration)
             } catch {
               case NonFatal(e) ⇒
                 sender() ! CommandFailed(send)
                 log.debug(
-                    "Failure while sending UDP datagram to remote address [{}]: {}",
-                    send.target,
-                    e)
+                  "Failure while sending UDP datagram to remote address [{}]: {}",
+                  send.target,
+                  e)
                 retriedSend = false
                 pendingSend = null
                 pendingCommander = null

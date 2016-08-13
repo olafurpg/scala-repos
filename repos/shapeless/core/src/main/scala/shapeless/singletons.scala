@@ -34,10 +34,11 @@ object Witness extends Dynamic {
   type Aux[T0] = Witness { type T = T0 }
   type Lt[Lub] = Witness { type T <: Lub }
 
-  implicit def apply[T]: Witness.Aux[T] = macro SingletonTypeMacros
-    .materializeImpl[T]
+  implicit def apply[T]: Witness.Aux[T] =
+    macro SingletonTypeMacros.materializeImpl[T]
 
-  implicit def apply[T](t: T): Witness.Lt[T] = macro SingletonTypeMacros.convertImpl
+  implicit def apply[T](t: T): Witness.Lt[T] =
+    macro SingletonTypeMacros.convertImpl
 
   def mkWitness[T0](value0: T0): Aux[T0] =
     new Witness {
@@ -56,7 +57,8 @@ object Witness extends Dynamic {
       val value = new Succ[P]()
     }
 
-  def selectDynamic(tpeSelector: String): Any = macro SingletonTypeMacros.witnessTypeImpl
+  def selectDynamic(tpeSelector: String): Any =
+    macro SingletonTypeMacros.witnessTypeImpl
 }
 
 trait WitnessWith[TC[_]] extends Witness {
@@ -64,17 +66,17 @@ trait WitnessWith[TC[_]] extends Witness {
 }
 
 trait LowPriorityWitnessWith {
-  implicit def apply2[H, TC2[_ <: H, _], S <: H, T](t: T): WitnessWith.Lt[
-      ({ type λ[X] = TC2[S, X] })#λ, T] = macro SingletonTypeMacros
-    .convertInstanceImpl2[H, TC2, S]
+  implicit def apply2[H, TC2[_ <: H, _], S <: H, T](
+      t: T): WitnessWith.Lt[({ type λ[X] = TC2[S, X] })#λ, T] =
+    macro SingletonTypeMacros.convertInstanceImpl2[H, TC2, S]
 }
 
 object WitnessWith extends LowPriorityWitnessWith {
   type Aux[TC[_], T0] = WitnessWith[TC] { type T = T0 }
   type Lt[TC[_], Lub] = WitnessWith[TC] { type T <: Lub }
 
-  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] = macro SingletonTypeMacros
-    .convertInstanceImpl1[TC]
+  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] =
+    macro SingletonTypeMacros.convertInstanceImpl1[TC]
 }
 
 trait NatWith[TC[_ <: Nat]] {
@@ -86,12 +88,12 @@ trait NatWith[TC[_ <: Nat]] {
 object NatWith {
   type Aux[TC[_ <: Nat], N0 <: Nat] = NatWith[TC] { type N = N0 }
 
-  implicit def apply[TC[_ <: Nat]](i: Any): NatWith[TC] = macro SingletonTypeMacros
-    .convertInstanceImplNat[TC]
+  implicit def apply[TC[_ <: Nat]](i: Any): NatWith[TC] =
+    macro SingletonTypeMacros.convertInstanceImplNat[TC]
 
-  implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](i: Int): NatWith[
-      ({ type λ[t <: Nat] = TC[T, t] })#λ] = macro SingletonTypeMacros
-    .convertInstanceImplNat1[B, T, TC]
+  implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](
+      i: Int): NatWith[({ type λ[t <: Nat] = TC[T, t] })#λ] =
+    macro SingletonTypeMacros.convertInstanceImplNat1[B, T, TC]
 }
 
 /**
@@ -126,11 +128,11 @@ object Widen {
       def apply(t: T) = f(t)
     }
 
-  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] = macro SingletonTypeMacros
-    .convertInstanceImpl1[TC]
+  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] =
+    macro SingletonTypeMacros.convertInstanceImpl1[TC]
 
-  implicit def materialize[T, Out]: Aux[T, Out] = macro SingletonTypeMacros
-    .materializeWiden[T, Out]
+  implicit def materialize[T, Out]: Aux[T, Out] =
+    macro SingletonTypeMacros.materializeWiden[T, Out]
 }
 
 @macrocompat.bundle
@@ -217,7 +219,7 @@ trait SingletonTypeUtils extends ReprTypes {
 
   def fieldTypeCarrier(tpe: Type) =
     mkTypeCarrier(
-        tq"{ type T = $tpe ; type ->>[V] = Field[V] ; type Field[V] = _root_.shapeless.labelled.FieldType[$tpe,V] }")
+      tq"{ type T = $tpe ; type ->>[V] = Field[V] ; type Field[V] = _root_.shapeless.labelled.FieldType[$tpe,V] }")
 
   def mkTypeCarrier(tree: Tree) = {
     val carrier = c.typecheck(tree, mode = c.TYPEmode).tpe
@@ -235,7 +237,8 @@ trait SingletonTypeUtils extends ReprTypes {
 
 @macrocompat.bundle
 class SingletonTypeMacros(val c: whitebox.Context)
-    extends SingletonTypeUtils with NatMacroDefns {
+    extends SingletonTypeUtils
+    with NatMacroDefns {
   import c.universe._
   import internal.decorators._
 
@@ -308,11 +311,11 @@ class SingletonTypeMacros(val c: whitebox.Context)
       case SingletonSymbolType(c) => mkSingletonSymbol(c)
 
       case _ =>
-        c.abort(
-            c.enclosingPosition, s"Type argument $tpe is not a singleton type")
+        c.abort(c.enclosingPosition,
+                s"Type argument $tpe is not a singleton type")
     }
 
-  def materializeImpl[T : WeakTypeTag]: Tree = {
+  def materializeImpl[T: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T].dealias
     mkWitness(tpe, extractSingletonValue(tpe))
   }
@@ -331,7 +334,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
 
       case (tpe, tree)
           if tree.symbol.isTerm && tree.symbol.asTerm.isStable &&
-          !isValueClass(tree.symbol) =>
+            !isValueClass(tree.symbol) =>
         val sym = tree.symbol.asTerm
         val pre =
           if (sym.owner.isClass) c.internal.thisType(sym.owner) else NoPrefix
@@ -340,8 +343,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
 
       case _ =>
         c.abort(
-            c.enclosingPosition,
-            s"Expression $t does not evaluate to a constant or a stable reference value")
+          c.enclosingPosition,
+          s"Expression $t does not evaluate to a constant or a stable reference value")
     }
 
   def convertImpl(t: Tree): Tree = extractResult(t)(mkWitness)
@@ -365,7 +368,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     val tc = tcTag.tpe.typeConstructor
     val tcParam = tc.typeParams(1)
     val tcTpe = c.internal.polyType(
-        List(tcParam), appliedType(tc, List(tTpe, tcParam.asType.toType)))
+      List(tcParam),
+      appliedType(tc, List(tTpe, tcParam.asType.toType)))
     convertInstanceImplNatAux(i, tcTpe)
   }
 
@@ -374,8 +378,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
       case NatLiteral(n) => (mkNatValue(n), mkNatTpe(n))
       case _ =>
         c.abort(
-            c.enclosingPosition,
-            s"Expression $i does not evaluate to a non-negative Int literal")
+          c.enclosingPosition,
+          s"Expression $i does not evaluate to a non-negative Int literal")
     }
     val nwTC = typeOf[NatWith[Any]].typeConstructor
     val parent = appliedType(nwTC, List(tcTpe))
@@ -384,8 +388,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     mkWitnessNat(parent, nTpe, n, iInst)
   }
 
-  def convertInstanceImpl1[TC[_]](
-      t: Tree)(implicit tcTag: WeakTypeTag[TC[_]]): Tree =
+  def convertInstanceImpl1[TC[_]](t: Tree)(
+      implicit tcTag: WeakTypeTag[TC[_]]): Tree =
     extractResult(t) { (sTpe, value) =>
       val tc = tcTag.tpe.typeConstructor
       val wwTC = typeOf[WitnessWith[Nothing]].typeConstructor
@@ -396,7 +400,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     }
 
   def convertInstanceImpl2[H, TC2[_ <: H, _], S <: H](t: Tree)(
-      implicit tc2Tag: WeakTypeTag[TC2[_, _]], sTag: WeakTypeTag[S]): Tree =
+      implicit tc2Tag: WeakTypeTag[TC2[_, _]],
+      sTag: WeakTypeTag[S]): Tree =
     extractResult(t) { (sTpe, value) =>
       val tc2 = tc2Tag.tpe.typeConstructor
       val s = sTag.tpe
@@ -417,7 +422,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
       mkOps(tpe, mkWitness(tpe, tree))
     }
 
-  def narrowSymbol[S <: String : WeakTypeTag](t: Tree): Tree = {
+  def narrowSymbol[S <: String: WeakTypeTag](t: Tree): Tree = {
     (weakTypeOf[S], t) match {
       case (ConstantType(Constant(s1: String)), LiteralSymbol(s2))
           if s1 == s2 =>
@@ -431,12 +436,12 @@ class SingletonTypeMacros(val c: whitebox.Context)
   def witnessTypeImpl(tpeSelector: Tree): Tree = {
     val q"${ tpeString: String }" = tpeSelector
     val tpe = parseLiteralType(tpeString).getOrElse(
-        c.abort(c.enclosingPosition, s"Malformed literal $tpeString"))
+      c.abort(c.enclosingPosition, s"Malformed literal $tpeString"))
 
     fieldTypeCarrier(tpe)
   }
 
-  def materializeWiden[T : WeakTypeTag, Out : WeakTypeTag]: Tree = {
+  def materializeWiden[T: WeakTypeTag, Out: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T].dealias
 
     val widenTpe = tpe match {

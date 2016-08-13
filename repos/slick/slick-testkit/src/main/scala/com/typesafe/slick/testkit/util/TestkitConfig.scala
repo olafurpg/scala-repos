@@ -19,10 +19,10 @@ object TestkitConfig {
   private[this] lazy val (conf, testkitConfig, defaults, ref) = {
     val configFileName = sys.props.get("slick.testkit-config")
     val configFile = new File(
-        configFileName.getOrElse("test-dbs/testkit.conf"))
+      configFileName.getOrElse("test-dbs/testkit.conf"))
     if (configFileName.isDefined && !configFile.isFile)
       throw new SlickException(
-          "TestKit config file \"" + configFileName.get + "\" not found")
+        "TestKit config file \"" + configFileName.get + "\" not found")
     val ref = ConfigFactory.parseResources(getClass, "/testkit-reference.conf")
     val conf = ConfigFactory.parseFile(configFile)
     val testkitConfig = {
@@ -35,13 +35,13 @@ object TestkitConfig {
         else ref.getConfig("testkit").resolve()
       c.withValue("absTestDir",
                   ConfigValueFactory.fromAnyRef(
-                      new File(c.getString("testDir")).getAbsolutePath))
+                    new File(c.getString("testDir")).getAbsolutePath))
     }
     val defaults = ref
       .getObject("defaults")
       .withValue("testkit", testkitConfig.root())
       .toConfig
-      (conf, testkitConfig, defaults, ref)
+    (conf, testkitConfig, defaults, ref)
   }
 
   /** Get a resolved test configuration */
@@ -71,15 +71,16 @@ object TestkitConfig {
   lazy val testClasses: Seq[Class[_ <: GenericTest[_ >: Null <: TestDB]]] =
     getStrings(testkitConfig, "testClasses")
       .getOrElse(Nil)
-      .map(n =>
-            Class
-              .forName(n)
-              .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]])
+      .map(
+        n =>
+          Class
+            .forName(n)
+            .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]])
 
   /** The duration after which asynchronous tests should be aborted and failed */
   lazy val asyncTimeout = Duration(
-      testkitConfig.getDuration("asyncTimeout", TimeUnit.MILLISECONDS),
-      TimeUnit.MILLISECONDS)
+    testkitConfig.getDuration("asyncTimeout", TimeUnit.MILLISECONDS),
+    TimeUnit.MILLISECONDS)
 
   def getStrings(config: Config, path: String): Option[Seq[String]] = {
     if (config.hasPath(path)) {

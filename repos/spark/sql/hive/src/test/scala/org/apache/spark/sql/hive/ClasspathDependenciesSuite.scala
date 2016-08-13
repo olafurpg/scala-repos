@@ -93,19 +93,19 @@ class ClasspathDependenciesSuite extends SparkFunSuite {
 
   test("Forbidden Dependencies") {
     assertClassNotFound(
-        SPARK_HIVE + KRYO,
-        SPARK_SHADED + KRYO,
-        "org.apache.hive." + KRYO,
-        "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
-        SPARK_HIVE + "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
-        "org.apache.hive.com.esotericsoftware.shaded." + STD_INSTANTIATOR
+      SPARK_HIVE + KRYO,
+      SPARK_SHADED + KRYO,
+      "org.apache.hive." + KRYO,
+      "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
+      SPARK_HIVE + "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
+      "org.apache.hive.com.esotericsoftware.shaded." + STD_INSTANTIATOR
     )
   }
 
   test("parquet-hadoop-bundle") {
     assertLoads(
-        "parquet.hadoop.ParquetOutputFormat",
-        "parquet.hadoop.ParquetInputFormat"
+      "parquet.hadoop.ParquetOutputFormat",
+      "parquet.hadoop.ParquetInputFormat"
     )
   }
 }

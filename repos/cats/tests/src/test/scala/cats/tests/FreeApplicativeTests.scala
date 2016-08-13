@@ -3,7 +3,11 @@ package tests
 
 import cats.arrow.NaturalTransformation
 import cats.free.FreeApplicative
-import cats.laws.discipline.{CartesianTests, ApplicativeTests, SerializableTests}
+import cats.laws.discipline.{
+  CartesianTests,
+  ApplicativeTests,
+  SerializableTests
+}
 import cats.laws.discipline.eq.{tuple3Eq, tuple2Eq}
 import cats.data.State
 
@@ -14,8 +18,8 @@ class FreeApplicativeTests extends CatsSuite {
       implicit F: Arbitrary[F[A]],
       A: Arbitrary[A]): Arbitrary[FreeApplicative[F, A]] =
     Arbitrary(
-        Gen.oneOf(A.arbitrary.map(FreeApplicative.pure[F, A]),
-                  F.arbitrary.map(FreeApplicative.lift[F, A])))
+      Gen.oneOf(A.arbitrary.map(FreeApplicative.pure[F, A]),
+                F.arbitrary.map(FreeApplicative.lift[F, A])))
 
   implicit def freeApplicativeEq[S[_]: Applicative, A](
       implicit SA: Eq[S[A]]): Eq[FreeApplicative[S, A]] =
@@ -30,11 +34,11 @@ class FreeApplicativeTests extends CatsSuite {
     CartesianTests.Isomorphisms.invariant[FreeApplicative[Option, ?]]
 
   checkAll(
-      "FreeApplicative[Option, ?]",
-      ApplicativeTests[FreeApplicative[Option, ?]].applicative[Int, Int, Int])
+    "FreeApplicative[Option, ?]",
+    ApplicativeTests[FreeApplicative[Option, ?]].applicative[Int, Int, Int])
   checkAll(
-      "Monad[FreeApplicative[Option, ?]]",
-      SerializableTests.serializable(Applicative[FreeApplicative[Option, ?]]))
+    "Monad[FreeApplicative[Option, ?]]",
+    SerializableTests.serializable(Applicative[FreeApplicative[Option, ?]]))
 
   test("FreeApplicative#fold") {
     val n = 2

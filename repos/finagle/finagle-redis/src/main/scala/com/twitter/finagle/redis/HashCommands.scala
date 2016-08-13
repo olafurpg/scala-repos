@@ -58,8 +58,9 @@ trait Hashes { self: BaseClient =>
     * @param hash key, fields, amount
     * @return new value of field
     */
-  def hIncrBy(
-      key: ChannelBuffer, field: ChannelBuffer, amount: Long): Future[JLong] =
+  def hIncrBy(key: ChannelBuffer,
+              field: ChannelBuffer,
+              amount: Long): Future[JLong] =
     doRequest(HIncrBy(key, field, amount)) {
       case IntegerReply(n) => Future.value(n)
     }

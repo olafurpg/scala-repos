@@ -33,10 +33,10 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
       maxExecutionMem: Long,
       maxStorageMem: Long): (StaticMemoryManager, MemoryStore) = {
     val mm = new StaticMemoryManager(
-        conf,
-        maxOnHeapExecutionMemory = maxExecutionMem,
-        maxStorageMemory = maxStorageMem,
-        numCores = 1)
+      conf,
+      maxOnHeapExecutionMemory = maxExecutionMem,
+      maxStorageMemory = maxStorageMem,
+      numCores = 1)
     val ms = makeMemoryStore(mm)
     (mm, ms)
   }
@@ -45,14 +45,13 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
       maxOnHeapExecutionMemory: Long,
       maxOffHeapExecutionMemory: Long): StaticMemoryManager = {
     new StaticMemoryManager(
-        conf.clone
-          .set("spark.memory.fraction", "1")
-          .set("spark.testing.memory", maxOnHeapExecutionMemory.toString)
-          .set(
-              "spark.memory.offHeap.size", maxOffHeapExecutionMemory.toString),
-        maxOnHeapExecutionMemory = maxOnHeapExecutionMemory,
-        maxStorageMemory = 0,
-        numCores = 1)
+      conf.clone
+        .set("spark.memory.fraction", "1")
+        .set("spark.testing.memory", maxOnHeapExecutionMemory.toString)
+        .set("spark.memory.offHeap.size", maxOffHeapExecutionMemory.toString),
+      maxOnHeapExecutionMemory = maxOnHeapExecutionMemory,
+      maxStorageMemory = 0,
+      numCores = 1)
   }
 
   test("basic execution memory") {
@@ -60,27 +59,28 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     val taskAttemptId = 0L
     val (mm, _) = makeThings(maxExecutionMem, Long.MaxValue)
     assert(mm.executionMemoryUsed === 0L)
-    assert(
-        mm.acquireExecutionMemory(10L, taskAttemptId, MemoryMode.ON_HEAP) === 10L)
+    assert(mm
+      .acquireExecutionMemory(10L, taskAttemptId, MemoryMode.ON_HEAP) === 10L)
     assert(mm.executionMemoryUsed === 10L)
-    assert(
-        mm.acquireExecutionMemory(100L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
+    assert(mm
+      .acquireExecutionMemory(100L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
     // Acquire up to the max
     assert(
-        mm.acquireExecutionMemory(1000L, taskAttemptId, MemoryMode.ON_HEAP) === 890L)
+      mm.acquireExecutionMemory(1000L, taskAttemptId, MemoryMode.ON_HEAP) === 890L)
     assert(mm.executionMemoryUsed === maxExecutionMem)
     assert(
-        mm.acquireExecutionMemory(1L, taskAttemptId, MemoryMode.ON_HEAP) === 0L)
+      mm.acquireExecutionMemory(1L, taskAttemptId, MemoryMode.ON_HEAP) === 0L)
     assert(mm.executionMemoryUsed === maxExecutionMem)
     mm.releaseExecutionMemory(800L, taskAttemptId, MemoryMode.ON_HEAP)
     assert(mm.executionMemoryUsed === 200L)
     // Acquire after release
     assert(
-        mm.acquireExecutionMemory(1L, taskAttemptId, MemoryMode.ON_HEAP) === 1L)
+      mm.acquireExecutionMemory(1L, taskAttemptId, MemoryMode.ON_HEAP) === 1L)
     assert(mm.executionMemoryUsed === 201L)
     // Release beyond what was acquired
-    mm.releaseExecutionMemory(
-        maxExecutionMem, taskAttemptId, MemoryMode.ON_HEAP)
+    mm.releaseExecutionMemory(maxExecutionMem,
+                              taskAttemptId,
+                              MemoryMode.ON_HEAP)
     assert(mm.executionMemoryUsed === 0L)
   }
 
@@ -135,12 +135,12 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     val dummyBlock = TestBlockId("ain't nobody love like you do")
     val (mm, ms) = makeThings(maxExecutionMem, maxStorageMem)
     // Only execution memory should increase
-    assert(
-        mm.acquireExecutionMemory(100L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
+    assert(mm
+      .acquireExecutionMemory(100L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
     assert(mm.storageMemoryUsed === 0L)
     assert(mm.executionMemoryUsed === 100L)
     assert(
-        mm.acquireExecutionMemory(1000L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
+      mm.acquireExecutionMemory(1000L, taskAttemptId, MemoryMode.ON_HEAP) === 100L)
     assert(mm.storageMemoryUsed === 0L)
     assert(mm.executionMemoryUsed === 200L)
     // Only storage memory should increase

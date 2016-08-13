@@ -25,13 +25,17 @@ import org.apache.spark.rdd.RDD
 import org.json4s._
 import java.io.File
 
-case class DataSourceParams(
-    val filepath: String, val k: Int = 3, val seed: Int = 9527)
+case class DataSourceParams(val filepath: String,
+                            val k: Int = 3,
+                            val seed: Int = 9527)
     extends Params
 
 case class ParallelDataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        DataSourceParams, Integer, RDD[LabeledPoint], Vector, Double] {
+    extends PDataSource[DataSourceParams,
+                        Integer,
+                        RDD[LabeledPoint],
+                        Vector,
+                        Double] {
   override def read(sc: SparkContext)
     : Seq[(Integer, RDD[LabeledPoint], RDD[(Vector, Double)])] = {
     val input = sc.textFile(dsp.filepath)
@@ -49,13 +53,16 @@ case class ParallelDataSource(val dsp: DataSourceParams)
   }
 }
 
-case class AlgorithmParams(
-    val numIterations: Int = 200, val stepSize: Double = 0.1)
+case class AlgorithmParams(val numIterations: Int = 200,
+                           val stepSize: Double = 0.1)
     extends Params
 
 case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
-    extends P2LAlgorithm[
-        AlgorithmParams, RDD[LabeledPoint], RegressionModel, Vector, Double] {
+    extends P2LAlgorithm[AlgorithmParams,
+                         RDD[LabeledPoint],
+                         RegressionModel,
+                         Vector,
+                         Double] {
 
   def train(data: RDD[LabeledPoint]): RegressionModel = {
     LinearRegressionWithSGD.train(data, ap.numIterations, ap.stepSize)
@@ -87,23 +94,24 @@ object Run {
                                   (SGD, AlgorithmParams(stepSize = 0.2)),
                                   (SGD, AlgorithmParams(stepSize = 0.4)))
 
-    Workflow.run(
-        dataSourceClassOpt = Some(classOf[ParallelDataSource]),
-        dataSourceParams = dataSourceParams,
-        preparatorClassOpt = Some(
-              classOf[IdentityPreparator[RDD[LabeledPoint]]]),
-        algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
-        algorithmParamsList = algorithmParamsList,
-        servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
-        evaluatorClassOpt = Some(classOf[MeanSquareError]),
-        params = WorkflowParams(batch = "Imagine: Parallel Regression"))
+    Workflow.run(dataSourceClassOpt = Some(classOf[ParallelDataSource]),
+                 dataSourceParams = dataSourceParams,
+                 preparatorClassOpt =
+                   Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
+                 algorithmClassMapOpt =
+                   Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
+                 algorithmParamsList = algorithmParamsList,
+                 servingClassOpt =
+                   Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
+                 evaluatorClassOpt = Some(classOf[MeanSquareError]),
+                 params =
+                   WorkflowParams(batch = "Imagine: Parallel Regression"))
   }
 }
 
 class VectorSerializer
-    extends CustomSerializer[Vector](
-        format =>
-          ({
+    extends CustomSerializer[Vector](format =>
+      ({
         case JArray(x) =>
           val v = x.toArray.map { y =>
             y match {

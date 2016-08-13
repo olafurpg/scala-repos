@@ -25,8 +25,9 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Merge sequential 'if's"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -40,9 +41,9 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
     if (ifStmt.condition.orNull == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-            offset <= elseBranch.getTextRange.getStartOffset) &&
+          offset <= elseBranch.getTextRange.getStartOffset) &&
         !(ifStmt.getTextRange.getStartOffset <= offset &&
-            offset <= ifStmt.condition.get.getTextRange.getStartOffset))
+          offset <= ifStmt.condition.get.getTextRange.getStartOffset))
       return false
 
     val innerThenBranch = elseBranch.asInstanceOf[ScIfStmt].thenBranch.orNull
@@ -65,8 +66,8 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
       }
     }
 
-    PsiEquivalenceUtil.areElementsEquivalent(
-        thenBranch, innerThenBranch, comparator, false)
+    PsiEquivalenceUtil
+      .areElementsEquivalent(thenBranch, innerThenBranch, comparator, false)
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
@@ -92,8 +93,8 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
       expr.append(" else ").append(innerElseBranch.getText)
 
     val newIfStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+      ScalaPsiElementFactory
+        .createExpressionFromText(expr.toString(), element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

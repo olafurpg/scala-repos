@@ -15,8 +15,10 @@ object Test extends App {
           ls.view.sliding(N, 2).toList.map(_.toList),
           s"sliding($N, 2)")
   }
-  for (b <- List(true, false)) check(
-      ls.filterNot(x => true), ls.view.filterNot(x => true), s"filterNot($b)")
+  for (b <- List(true, false))
+    check(ls.filterNot(x => true),
+          ls.view.filterNot(x => true),
+          s"filterNot($b)")
 
   check(ls.inits.toList, ls.view.inits.toList.map(_.toList), "inits")
   check(ls.tails.toList, ls.view.tails.toList.map(_.toList), "tails")

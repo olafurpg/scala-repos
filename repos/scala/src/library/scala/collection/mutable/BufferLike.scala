@@ -58,9 +58,12 @@ import scala.annotation.migration
   *  undeprecated methods throughout the collections hierarchy.
   */
 trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
-    extends Growable[A] with Shrinkable[A] with Scriptable[A]
-    with Subtractable[A, This] with SeqLike[A, This] with scala.Cloneable {
-  self: This =>
+    extends Growable[A]
+    with Shrinkable[A]
+    with Scriptable[A]
+    with Subtractable[A, This]
+    with SeqLike[A, This]
+    with scala.Cloneable { self: This =>
 
   // Abstract methods from Seq:
 
@@ -112,7 +115,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
   def remove(n: Int, count: Int) {
     if (count < 0)
       throw new IllegalArgumentException(
-          "removing negative number of elements: " + count.toString)
+        "removing negative number of elements: " + count.toString)
     for (i <- 0 until count) remove(n)
   }
 
@@ -205,7 +208,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     case s: Script[_] => s.iterator foreach <<
     case _ =>
       throw new UnsupportedOperationException(
-          "message " + cmd + " not understood")
+        "message " + cmd + " not understood")
   }
 
   /** Defines the prefix of this object's `toString` representation.
@@ -221,8 +224,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @return       a new collection consisting of all the elements of this collection and `xs`.
     */
   @migration(
-      "`++` creates a new buffer. Use `++=` to add an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`++` creates a new buffer. Use `++=` to add an element from this buffer and return that buffer itself.",
+    "2.8.0")
   def ++(xs: GenTraversableOnce[A]): This = clone() ++= xs.seq
 
   /** Creates a new collection with all the elements of this collection except `elem`.
@@ -231,8 +234,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @return      a new collection consisting of all the elements of this collection except `elem`.
     */
   @migration(
-      "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def -(elem: A): This = clone() -= elem
 
   /** Creates a new collection with all the elements of this collection except the two
@@ -245,8 +248,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *               `elem1`, `elem2` and those in `elems`.
     */
   @migration(
-      "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def -(elem1: A, elem2: A, elems: A*): This =
     clone() -= elem1 -= elem2 --= elems
 
@@ -258,8 +261,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *                  those in `xs`
     */
   @migration(
-      "`--` creates a new buffer. Use `--=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`--` creates a new buffer. Use `--=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def --(xs: GenTraversableOnce[A]): This = clone() --= xs.seq
 
   /** Return a clone of this buffer.

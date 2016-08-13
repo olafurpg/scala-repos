@@ -2,7 +2,12 @@ package org.jetbrains.plugins.scala.lang.completion
 
 import javax.swing.Icon
 
-import com.intellij.codeInsight.lookup.{Lookup, LookupActionProvider, LookupElement, LookupElementAction}
+import com.intellij.codeInsight.lookup.{
+  Lookup,
+  LookupActionProvider,
+  LookupElement,
+  LookupElementAction
+}
 import com.intellij.psi.PsiClass
 import com.intellij.util.ui.EmptyIcon
 import com.intellij.util.{Consumer, PlatformIcons}
@@ -25,8 +30,7 @@ class ScalaImportStaticLookupActionProvider extends LookupActionProvider {
         val icon: Icon =
           if (!elem.shouldImport) checkIcon
           else new EmptyIcon(checkIcon.getIconWidth, checkIcon.getIconHeight)
-        consumer.consume(
-            new LookupElementAction(icon, "Import method") {
+        consumer.consume(new LookupElementAction(icon, "Import method") {
           def performLookupAction: LookupElementAction.Result = {
             elem.usedImportStaticQuickfix = true
             new LookupElementAction.Result.ChooseItem(elem)

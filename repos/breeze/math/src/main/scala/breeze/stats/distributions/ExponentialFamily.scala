@@ -5,13 +5,13 @@ package distributions
 import optimize.DiffFunction
 
 /**
-  * 
+  *
   * @author dlwh
   */
 trait ExponentialFamily[D, T] {
   type Parameter;
   type SufficientStatistic <: distributions.SufficientStatistic[
-      SufficientStatistic];
+    SufficientStatistic];
   def emptySufficientStatistic: SufficientStatistic;
   def sufficientStatisticFor(t: T): SufficientStatistic;
   def mle(stats: SufficientStatistic): Parameter

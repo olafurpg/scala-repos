@@ -8,7 +8,10 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.changeSignature.JavaParameterInfo
 import com.intellij.refactoring.util.CanonicalTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
@@ -60,10 +63,10 @@ class ScalaParameterInfo(@BeanProperty var name: String,
       val functionType = ScFunctionType(scType, Seq())(project, allScope)
       ScType.toPsi(functionType, project, allScope)
     } else if (isRepeatedParameter) {
-      val seqType = ScDesignatorType.fromClassFqn(
-          "scala.collection.Seq", project, allScope)
-      ScType.toPsi(
-          ScParameterizedType(seqType, Seq(scType)), project, allScope)
+      val seqType = ScDesignatorType
+        .fromClassFqn("scala.collection.Seq", project, allScope)
+      ScType
+        .toPsi(ScParameterizedType(seqType, Seq(scType)), project, allScope)
     } else ScType.toPsi(scType, project, allScope)
   }
 

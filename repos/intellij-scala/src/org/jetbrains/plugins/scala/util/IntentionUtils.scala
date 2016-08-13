@@ -12,7 +12,10 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.ui.awt.RelativePoint
-import org.jetbrains.plugins.scala.actions.{GoToImplicitConversionAction, MakeExplicitAction}
+import org.jetbrains.plugins.scala.actions.{
+  GoToImplicitConversionAction,
+  MakeExplicitAction
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
@@ -33,8 +36,8 @@ import scala.collection.mutable.ArrayBuffer
   */
 object IntentionUtils {
 
-  def addNameToArgumentsFix(
-      element: PsiElement, onlyBoolean: Boolean): Option[() => Unit] = {
+  def addNameToArgumentsFix(element: PsiElement,
+                            onlyBoolean: Boolean): Option[() => Unit] = {
     val argList: ScArgumentExprList =
       PsiTreeUtil.getParentOfType(element, classOf[ScArgumentExprList])
     if (argList == null || argList.isBraceArgs) return None
@@ -71,29 +74,29 @@ object IntentionUtils {
 
     if (hasRepeated || !allNamesDefined || hasUnderscore) None
     else {
-      val doIt = () =>
-        {
-          argsAndMatchedParams.foreach {
-            case (argExpr childOf (a: ScAssignStmt), param)
-                if a.getLExpression.getText == param.name =>
-            case (argExpr, param) =>
-              if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean)) {
-                val newArgExpr =
-                  ScalaPsiElementFactory.createExpressionFromText(
-                      param.name + " = " + argExpr.getText, element.getManager)
-                inWriteAction {
-                  argExpr.replace(newArgExpr)
-                }
+      val doIt = () => {
+        argsAndMatchedParams.foreach {
+          case (argExpr childOf (a: ScAssignStmt), param)
+              if a.getLExpression.getText == param.name =>
+          case (argExpr, param) =>
+            if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean)) {
+              val newArgExpr =
+                ScalaPsiElementFactory.createExpressionFromText(
+                  param.name + " = " + argExpr.getText,
+                  element.getManager)
+              inWriteAction {
+                argExpr.replace(newArgExpr)
               }
-            case _ =>
-          }
+            }
+          case _ =>
+        }
       }
       Some(doIt)
     }
   }
 
-  def analyzeMethodCallArgs(
-      methodCallArgs: ScArgumentExprList, argsBuilder: scala.StringBuilder) {
+  def analyzeMethodCallArgs(methodCallArgs: ScArgumentExprList,
+                            argsBuilder: scala.StringBuilder) {
     if (methodCallArgs.exprs.length == 1) {
       methodCallArgs.exprs.head match {
         case _: ScLiteral =>
@@ -128,8 +131,9 @@ object IntentionUtils {
     }
   }
 
-  def negateAndValidateExpression(
-      expr: ScExpression, manager: PsiManager, buf: scala.StringBuilder) = {
+  def negateAndValidateExpression(expr: ScExpression,
+                                  manager: PsiManager,
+                                  buf: scala.StringBuilder) = {
     val parent =
       if (expr.getParent != null &&
           expr.getParent.isInstanceOf[ScParenthesisedExpr])
@@ -139,21 +143,21 @@ object IntentionUtils {
     if (parent != null && parent.isInstanceOf[ScPrefixExpr] &&
         parent.asInstanceOf[ScPrefixExpr].operation.getText == "!") {
 
-      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-          buf.toString(), manager)
+      val newExpr = ScalaPsiElementFactory
+        .createExpressionFromText(buf.toString(), manager)
 
       val size = newExpr match {
         case infix: ScInfixExpr =>
           infix.operation.nameId.getTextRange.getStartOffset -
-          newExpr.getTextRange.getStartOffset - 2
+            newExpr.getTextRange.getStartOffset - 2
         case _ => 0
       }
 
       (parent.asInstanceOf[ScPrefixExpr], newExpr, size)
     } else {
       buf.insert(0, "!(").append(")")
-      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-          buf.toString(), manager)
+      val newExpr = ScalaPsiElementFactory
+        .createExpressionFromText(buf.toString(), manager)
 
       val children = newExpr
         .asInstanceOf[ScPrefixExpr]
@@ -163,7 +167,7 @@ object IntentionUtils {
       val size = children(0) match {
         case infix: ScInfixExpr =>
           infix.operation.nameId.getTextRange.getStartOffset -
-          newExpr.getTextRange.getStartOffset
+            newExpr.getTextRange.getStartOffset
         case _ => 0
       }
       (expr, newExpr, size)
@@ -179,7 +183,8 @@ object IntentionUtils {
               e.getBaseExpr.getText.drop(1).dropRight(1)
             else e.getBaseExpr.getText
           val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-              exprWithoutParentheses, expression.getManager)
+            exprWithoutParentheses,
+            expression.getManager)
           inWriteAction {
             e.replaceExpression(newExpr, removeParenthesis = true).getText
           }
@@ -214,8 +219,8 @@ object IntentionUtils {
             buf.append(clazz.name).append(".")
 
           buf.append(f.name).append("(").append(expr.getText).append(")")
-          val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-              buf.toString(), expr.getManager)
+          val newExpr = ScalaPsiElementFactory
+            .createExpressionFromText(buf.toString(), expr.getManager)
 
           inWriteAction {
             val replaced = expr.replace(newExpr)
@@ -252,8 +257,8 @@ object IntentionUtils {
           val bufExpr = new StringBuilder
           bufExpr.append(f.name).append("(").append(expr.getText).append(")")
           buf.append(bufExpr.toString())
-          val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-              bufExpr.toString(), expr.getManager)
+          val newExpr = ScalaPsiElementFactory
+            .createExpressionFromText(bufExpr.toString(), expr.getManager)
           val fullRef = ScalaPsiElementFactory
             .createReferenceFromText(buf.toString(), expr.getManager)
             .resolve()
@@ -287,18 +292,21 @@ object IntentionUtils {
     val base = new BaseListPopupStep[String](null, values.toArray: _*) {
       override def getTextFor(value: String): String = value
 
-      override def onChosen(
-          selectedValue: String, finalChoice: Boolean): PopupStep[_] = {
+      override def onChosen(selectedValue: String,
+                            finalChoice: Boolean): PopupStep[_] = {
         if (selectedValue == null) return PopupStep.FINAL_CHOICE
         if (finalChoice) {
           PsiDocumentManager.getInstance(project).commitAllDocuments()
           GoToImplicitConversionAction.getPopup.dispose()
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT)
-            IntentionUtils.replaceWithExplicit(
-                expr, function, project, editor, secondPart)
+            IntentionUtils
+              .replaceWithExplicit(expr, function, project, editor, secondPart)
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT_STATICALLY)
-            IntentionUtils.replaceWithExplicitStatically(
-                expr, function, project, editor, secondPart)
+            IntentionUtils.replaceWithExplicitStatically(expr,
+                                                         function,
+                                                         project,
+                                                         editor,
+                                                         secondPart)
           return PopupStep.FINAL_CHOICE
         }
         super.onChosen(selectedValue, finalChoice)
@@ -309,7 +317,7 @@ object IntentionUtils {
     val bounds: Rectangle = getCurrentItemBounds()
 
     popup.show(
-        new RelativePoint(GoToImplicitConversionAction.getList,
-                          new Point(bounds.x + bounds.width - 20, bounds.y)))
+      new RelativePoint(GoToImplicitConversionAction.getList,
+                        new Point(bounds.x + bounds.width - 20, bounds.y)))
   }
 }

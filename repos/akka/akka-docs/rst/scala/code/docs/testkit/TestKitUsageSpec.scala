@@ -27,9 +27,12 @@ import scala.collection.immutable
   */
 class TestKitUsageSpec
     extends TestKit(
-        ActorSystem("TestKitUsageSpec",
-                    ConfigFactory.parseString(TestKitUsageSpec.config)))
-    with DefaultTimeout with ImplicitSender with WordSpecLike with Matchers
+      ActorSystem("TestKitUsageSpec",
+                  ConfigFactory.parseString(TestKitUsageSpec.config)))
+    with DefaultTimeout
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
     with BeforeAndAfterAll {
   import TestKitUsageSpec._
 
@@ -41,7 +44,7 @@ class TestKitUsageSpec
   val headList = immutable.Seq().padTo(randomHead, "0")
   val tailList = immutable.Seq().padTo(randomTail, "1")
   val seqRef = system.actorOf(
-      Props(classOf[SequencingActor], testActor, headList, tailList))
+    Props(classOf[SequencingActor], testActor, headList, tailList))
 
   override def afterAll {
     shutdown()
@@ -142,10 +145,10 @@ object TestKitUsageSpec {
       extends Actor {
     def receive = {
       case msg => {
-          head foreach { next ! _ }
-          next ! msg
-          tail foreach { next ! _ }
-        }
+        head foreach { next ! _ }
+        next ! msg
+        tail foreach { next ! _ }
+      }
     }
   }
 }

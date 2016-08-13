@@ -37,7 +37,7 @@ private[mux] trait TagMap[T] extends Iterable[(Int, T)] {
 }
 
 private[mux] object TagMap {
-  def apply[T <: Object : ClassTag](
+  def apply[T <: Object: ClassTag](
       set: TagSet,
       fastSize: Int = 256
   ): TagMap[T] = new TagMap[T] {

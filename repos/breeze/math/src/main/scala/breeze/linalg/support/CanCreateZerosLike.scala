@@ -30,15 +30,15 @@ trait CanCreateZerosLike[From, +To] {
 
 object CanCreateZerosLike {
 
-  class OpArray[@specialized V : ClassTag : Semiring]
+  class OpArray[@specialized V: ClassTag: Semiring]
       extends CanCreateZerosLike[Array[V], Array[V]] {
     override def apply(from: Array[V]) = {
       Array.fill(from.length)(implicitly[Semiring[V]].zero)
     }
   }
 
-  class OpMapValues[From, A, To](
-      implicit op: Semiring[A], map: CanMapValues[From, A, A, To])
+  class OpMapValues[From, A, To](implicit op: Semiring[A],
+                                 map: CanMapValues[From, A, A, To])
       extends CanCreateZerosLike[From, To] {
     def apply(v: From) = map(v, _ => op.zero)
   }
@@ -48,7 +48,7 @@ object CanCreateZerosLike {
       op: Field[A]): CanCreateZerosLike[From, To] =
     new OpMapValues[From, A, To]()(op, map)
 
-  implicit def OpArrayAny[V : ClassTag : Semiring]: OpArray[V] =
+  implicit def OpArrayAny[V: ClassTag: Semiring]: OpArray[V] =
     new OpArray[V]
 
   implicit object OpArrayI extends OpArray[Int]

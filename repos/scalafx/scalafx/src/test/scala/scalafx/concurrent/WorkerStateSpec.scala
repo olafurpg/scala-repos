@@ -38,4 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class WorkerStateSpec
     extends SFXEnumDelegateSpec[jfxc.Worker.State, Worker.State](
-        classOf[jfxc.Worker.State], classOf[Worker.State], Worker.State)
+      classOf[jfxc.Worker.State],
+      classOf[Worker.State],
+      Worker.State)

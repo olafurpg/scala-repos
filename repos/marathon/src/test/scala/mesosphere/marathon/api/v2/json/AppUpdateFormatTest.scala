@@ -26,9 +26,9 @@ class AppUpdateFormatTest extends MarathonSpec with Matchers {
   }
 
   test(
-      """FromJSON should parse "acceptedResourceRoles": ["production", "*"] """) {
+    """FromJSON should parse "acceptedResourceRoles": ["production", "*"] """) {
     val json = Json.parse(
-        """ { "id": "test", "acceptedResourceRoles": ["production", "*"] }""")
+      """ { "id": "test", "acceptedResourceRoles": ["production", "*"] }""")
     val appUpdate = json.as[AppUpdate]
     appUpdate.acceptedResourceRoles should equal(Some(Set("production", "*")))
   }
@@ -41,16 +41,16 @@ class AppUpdateFormatTest extends MarathonSpec with Matchers {
   }
 
   test(
-      "FromJSON should fail when 'acceptedResourceRoles' is defined but empty") {
+    "FromJSON should fail when 'acceptedResourceRoles' is defined but empty") {
     val json = Json.parse(""" { "id": "test", "acceptedResourceRoles": [] }""")
     a[JsResultException] shouldBe thrownBy { json.as[AppUpdate] }
   }
 
   // Regression test for #3140
   test(
-      "FromJSON should set healthCheck portIndex to 0 when neither port nor portIndex are set") {
+    "FromJSON should set healthCheck portIndex to 0 when neither port nor portIndex are set") {
     val json = Json.parse(
-        """ { "id": "test", "healthChecks": [{ "path": "/", "protocol": "HTTP" }] } """)
+      """ { "id": "test", "healthChecks": [{ "path": "/", "protocol": "HTTP" }] } """)
     val appUpdate = json.as[AppUpdate]
     appUpdate.healthChecks.get.head.portIndex should equal(Some(0))
   }

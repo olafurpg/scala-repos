@@ -61,27 +61,27 @@ object LiftJavaScript {
   def settings: JsObj = {
     val jsCometServer = LiftRules.cometServer().map(Str(_)).getOrElse(JsNull)
     JsObj(
-        "liftPath" -> LiftRules.liftPath,
-        "ajaxRetryCount" -> Num(LiftRules.ajaxRetryCount.openOr(3)),
-        "ajaxPostTimeout" -> LiftRules.ajaxPostTimeout,
-        "gcPollingInterval" -> LiftRules.liftGCPollingInterval,
-        "gcFailureRetryTimeout" -> LiftRules.liftGCFailureRetryTimeout,
-        "cometGetTimeout" -> LiftRules.cometGetTimeout,
-        "cometFailureRetryTimeout" -> LiftRules.cometFailureRetryTimeout,
-        "cometServer" -> jsCometServer,
-        "logError" -> LiftRules.jsLogFunc
-          .map(fnc => AnonFunc("msg", fnc(JsVar("msg"))))
-          .openOr(AnonFunc("msg", Noop)),
-        "ajaxOnFailure" -> LiftRules.ajaxDefaultFailure
-          .map(fnc => AnonFunc(fnc()))
-          .openOr(AnonFunc(Noop)),
-        "ajaxOnStart" -> LiftRules.ajaxStart
-          .map(fnc => AnonFunc(fnc()))
-          .openOr(AnonFunc(Noop)),
-        "ajaxOnEnd" -> LiftRules.ajaxEnd
-          .map(fnc => AnonFunc(fnc()))
-          .openOr(AnonFunc(Noop))
-      )
+      "liftPath" -> LiftRules.liftPath,
+      "ajaxRetryCount" -> Num(LiftRules.ajaxRetryCount.openOr(3)),
+      "ajaxPostTimeout" -> LiftRules.ajaxPostTimeout,
+      "gcPollingInterval" -> LiftRules.liftGCPollingInterval,
+      "gcFailureRetryTimeout" -> LiftRules.liftGCFailureRetryTimeout,
+      "cometGetTimeout" -> LiftRules.cometGetTimeout,
+      "cometFailureRetryTimeout" -> LiftRules.cometFailureRetryTimeout,
+      "cometServer" -> jsCometServer,
+      "logError" -> LiftRules.jsLogFunc
+        .map(fnc => AnonFunc("msg", fnc(JsVar("msg"))))
+        .openOr(AnonFunc("msg", Noop)),
+      "ajaxOnFailure" -> LiftRules.ajaxDefaultFailure
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop)),
+      "ajaxOnStart" -> LiftRules.ajaxStart
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop)),
+      "ajaxOnEnd" -> LiftRules.ajaxEnd
+        .map(fnc => AnonFunc(fnc()))
+        .openOr(AnonFunc(Noop))
+    )
   }
 
   def initCmd(settings: JsObj): JsCmd = {
@@ -97,7 +97,8 @@ object LiftJavaScript {
     }
 
     JsCrVar("lift_settings", JsObj()) & extendJsHelpersCmd & Call(
-        "window.lift.extend", JsVar("lift_settings"), settings) & Call(
-        "window.lift.init", JsVar("lift_settings"))
+      "window.lift.extend",
+      JsVar("lift_settings"),
+      settings) & Call("window.lift.init", JsVar("lift_settings"))
   }
 }

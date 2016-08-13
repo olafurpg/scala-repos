@@ -17,12 +17,12 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
   def byUser(user: User, page: Int): Fu[Paginator[Bookmark]] =
     paginator(new UserAdapter(user), page)
 
-  private def paginator(
-      adapter: AdapterLike[Bookmark], page: Int): Fu[Paginator[Bookmark]] =
+  private def paginator(adapter: AdapterLike[Bookmark],
+                        page: Int): Fu[Paginator[Bookmark]] =
     Paginator(
-        adapter,
-        currentPage = page,
-        maxPerPage = maxPerPage
+      adapter,
+      currentPage = page,
+      maxPerPage = maxPerPage
     )
 
   final class UserAdapter(user: User) extends AdapterLike[Bookmark] {
@@ -36,8 +36,8 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
                              _ sort sorting skip offset,
                              length.some)(_.asOpt[String])
         games ← lila.game.tube.gameTube |> { implicit t =>
-          $find.byOrderedIds[Game](gameIds)
-        }
+                 $find.byOrderedIds[Game](gameIds)
+               }
       } yield
         games map { g =>
           Bookmark(g, user)

@@ -21,7 +21,10 @@ import com.twitter.summingbird.scalding.{Scalding, ScaldingEnv}
 import com.twitter.summingbird.scalding.store.InitialBatchedStore
 import com.twitter.summingbird._
 import com.twitter.summingbird.batch.{Batcher, BatchID}
-import com.twitter.summingbird.option.{MonoidIsCommutative => BMonoidIsCommutative, _}
+import com.twitter.summingbird.option.{
+  MonoidIsCommutative => BMonoidIsCommutative,
+  _
+}
 import com.twitter.summingbird.source.EventSource
 import com.twitter.summingbird.store.CompoundStore
 import org.scalatest.WordSpec
@@ -42,7 +45,7 @@ class TestJob1(env: Env) extends AbstractJob(env) {
         (e % 2, e)
       }
       .groupAndSumTo(CompoundStore.fromOffline[Long, Long](
-              new InitialBatchedStore(BatchID(12L), null)))
+        new InitialBatchedStore(BatchID(12L), null)))
       .set(BMonoidIsCommutative(true))
   } catch {
     case t: Throwable => t.printStackTrace
@@ -52,17 +55,18 @@ class TestJob1(env: Env) extends AbstractJob(env) {
 class OptionsTest extends WordSpec {
   "Commutative Options should not be lost" in {
     val scalding = ScaldingEnv(
-        "com.twitter.summingbird.builder.TestJob1",
-        Array("-Dcascading.aggregateby.threshold=100000", "--test", "arg"))
+      "com.twitter.summingbird.builder.TestJob1",
+      Array("-Dcascading.aggregateby.threshold=100000", "--test", "arg"))
 
     assert(
-        scalding.build.platform.jobName == "com.twitter.summingbird.builder.TestJob1")
+      scalding.build.platform.jobName == "com.twitter.summingbird.builder.TestJob1")
 
     val conf = new Configuration
     val cfg = scalding.build.platform.buildConfig(conf)
     assert(cfg.get("com.twitter.chill.config.configuredinstantiator") != None)
-    assert(cfg.get("summingbird.options") == Some(
-            scalding.build.platform.options.toString))
+    assert(
+      cfg.get("summingbird.options") == Some(
+        scalding.build.platform.options.toString))
     assert(cfg.get("cascading.aggregateby.threshold") == Some("100000"))
 
     val opts = scalding.build.platform.options
@@ -72,9 +76,9 @@ class OptionsTest extends WordSpec {
     assert(summers.size == 1)
     val names = dependants.namesOf(summers.head).map(_.id)
     assert(
-        Scalding.getCommutativity(
-            names,
-            opts,
-            summers.head.asInstanceOf[Summer[Scalding, _, _]]) == Commutative)
+      Scalding.getCommutativity(
+        names,
+        opts,
+        summers.head.asInstanceOf[Summer[Scalding, _, _]]) == Commutative)
   }
 }

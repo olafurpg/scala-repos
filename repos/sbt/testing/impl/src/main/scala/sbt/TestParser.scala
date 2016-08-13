@@ -16,19 +16,23 @@ sealed abstract class Discovered extends Fingerprint with NotNull {
 }
 
 /** Represents a class 'className' that has 'superClassName' as an ancestor.*/
-final case class DiscoveredSubclass(
-    isModule: Boolean, className: String, superClassName: String)
-    extends Discovered with TestFingerprint {
+final case class DiscoveredSubclass(isModule: Boolean,
+                                    className: String,
+                                    superClassName: String)
+    extends Discovered
+    with TestFingerprint {
   override def toString =
     (if (isModule) IsModuleLiteral else "") + className + SubSuperSeparator +
-    superClassName
+      superClassName
 }
 
 /** Represents an annotation on a method or class.*/
-final case class DiscoveredAnnotated(
-    isModule: Boolean, className: String, annotationName: String)
-    extends Discovered with AnnotatedFingerprint {
+final case class DiscoveredAnnotated(isModule: Boolean,
+                                     className: String,
+                                     annotationName: String)
+    extends Discovered
+    with AnnotatedFingerprint {
   override def toString =
     (if (isModule) IsModuleLiteral else "") + className + AnnotationSeparator +
-    annotationName
+      annotationName
 }

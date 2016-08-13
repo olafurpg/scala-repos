@@ -26,7 +26,7 @@ import scala.tools.nsc.Settings
 private[repl] class SparkRunnerSettings(error: String => Unit)
     extends Settings(error) {
   val loadfiles = MultiStringSetting(
-      "-i",
-      "file",
-      "load a file (assumes the code is given interactively)")
+    "-i",
+    "file",
+    "load a file (assumes the code is given interactively)")
 }

@@ -44,7 +44,7 @@ final case class Binding[T](key: BindingKey[T],
   /**
     * Configure the scope for this binding.
     */
-  def in[A <: Annotation : ClassTag]: Binding[T] =
+  def in[A <: Annotation: ClassTag]: Binding[T] =
     in(implicitly[ClassTag[A]].runtimeClass.asInstanceOf[Class[A]])
 
   /**
@@ -55,7 +55,7 @@ final case class Binding[T](key: BindingKey[T],
   override def toString = {
     val eagerDesc = if (eager) " eagerly" else ""
     s"$source:\nBinding($key to ${target.getOrElse("self")}${scope.fold("")(
-        " in " + _)}$eagerDesc)"
+      " in " + _)}$eagerDesc)"
   }
 }
 
@@ -77,8 +77,8 @@ object BindingKey {
   * @param qualifier An optional qualifier.
   * @see The [[Module]] class for information on how to provide bindings.
   */
-final case class BindingKey[T](
-    clazz: Class[T], qualifier: Option[QualifierAnnotation]) {
+final case class BindingKey[T](clazz: Class[T],
+                               qualifier: Option[QualifierAnnotation]) {
 
   def this(clazz: Class[T]) = this(clazz, None)
 
@@ -145,7 +145,7 @@ final case class BindingKey[T](
     *
     * In the above example, the controller will get the cached `Foo` service.
     */
-  def qualifiedWith[A <: Annotation : ClassTag]: BindingKey[T] =
+  def qualifiedWith[A <: Annotation: ClassTag]: BindingKey[T] =
     qualifiedWith(implicitly[ClassTag[A]].runtimeClass.asInstanceOf[Class[A]])
 
   /**
@@ -187,7 +187,7 @@ final case class BindingKey[T](
     *
     * This class will be instantiated and injected by the injection framework.
     */
-  def to[C <: T : ClassTag]: Binding[T] =
+  def to[C <: T: ClassTag]: Binding[T] =
     to(implicitly[ClassTag[C]].runtimeClass.asInstanceOf[Class[C]])
 
   /**
@@ -212,8 +212,11 @@ final case class BindingKey[T](
     * Bind this binding key to another binding key.
     */
   def to(key: BindingKey[_ <: T]): Binding[T] =
-    Binding(
-        this, Some(BindingKeyTarget(key)), None, false, SourceLocator.source)
+    Binding(this,
+            Some(BindingKeyTarget(key)),
+            None,
+            false,
+            SourceLocator.source)
 
   /**
     * Bind this binding key to the given provider class.
@@ -321,7 +324,9 @@ final case class QualifierClass[T <: Annotation](clazz: Class[T])
 
 private object SourceLocator {
   val provider = SourceProvider.DEFAULT_INSTANCE.plusSkippedClasses(
-      this.getClass, classOf[BindingKey[_]], classOf[Binding[_]])
+    this.getClass,
+    classOf[BindingKey[_]],
+    classOf[Binding[_]])
 
   def source = provider.get()
 }

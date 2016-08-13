@@ -36,7 +36,12 @@ import org.scalatest.Matchers.{be, convertToAnyShouldWrapper, equal}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
-import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx, jfxObjectProperty2sfx, sfxObjectPropertyWithSFXDelegate2jfxObjectProperty}
+import scalafx.Includes.{
+  jfxBooleanBinding2sfx,
+  jfxBooleanProperty2sfx,
+  jfxObjectProperty2sfx,
+  sfxObjectPropertyWithSFXDelegate2jfxObjectProperty
+}
 import scalafx.beans.property.BooleanProperty.sfxBooleanProperty2jfx
 import scalafx.beans.property.ObjectProperty.sfxObjectProperty2jfx
 import scalafx.scene.control.Button
@@ -49,7 +54,9 @@ import scalafx.testutil.RunOnApplicationThread
   */
 @RunWith(classOf[JUnitRunner])
 class ObjectPropertySpec
-    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
+    extends FlatSpec
+    with BeforeAndAfterEach
+    with RunOnApplicationThread {
   val bean = new Object()
   var objectProperty: jfxbp.ObjectProperty[String] = null
   var objectProperty2: jfxbp.ObjectProperty[String] = null
@@ -249,13 +256,12 @@ class ObjectPropertySpec
 
   // Testing fillProperty method from companion.
 
-  private def evaluateFillProperty[T <: Object](
-      property: ObjectProperty[T], newValue: T) {
+  private def evaluateFillProperty[T <: Object](property: ObjectProperty[T],
+                                                newValue: T) {
     val originalValue: T = property.value
     var oldVal: T = null.asInstanceOf[T]
     var newVal: T = null.asInstanceOf[T]
-    property.delegate.addListener(
-        new jfxbv.ChangeListener[T] {
+    property.delegate.addListener(new jfxbv.ChangeListener[T] {
       def changed(obs: jfxbv.ObservableValue[_ <: T], oldV: T, newV: T) {
         oldVal = oldV
         newVal = newV
@@ -274,17 +280,17 @@ class ObjectPropertySpec
   }
 
   "fillProperty" should "fill property with not null value if receives a not null" in {
-    evaluateFillProperty(
-        ObjectProperty[ju.Date](new ju.Date), new ju.Date(123456L))
+    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date),
+                         new ju.Date(123456L))
   }
 
   "fillProperty" should "supports variance" in {
-    evaluateFillProperty(
-        ObjectProperty[ju.Date](new ju.Date), new java.sql.Date(1234678L))
+    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date),
+                         new java.sql.Date(1234678L))
   }
 
   "fillProperty" should "supports covariance" in {
-    evaluateFillProperty(
-        ObjectProperty[ju.Date](new java.sql.Date(1234678L)), new ju.Date)
+    evaluateFillProperty(ObjectProperty[ju.Date](new java.sql.Date(1234678L)),
+                         new ju.Date)
   }
 }

@@ -1,4 +1,13 @@
-import scala.concurrent.{Future, Promise, TimeoutException, SyncVar, ExecutionException, ExecutionContext, CanAwait, Await}
+import scala.concurrent.{
+  Future,
+  Promise,
+  TimeoutException,
+  SyncVar,
+  ExecutionException,
+  ExecutionContext,
+  CanAwait,
+  Await
+}
 import scala.concurrent.blocking
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.duration.Duration
@@ -10,8 +19,7 @@ trait TestBase {
   def once(body: Done => Unit) {
     import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
     val q = new LinkedBlockingQueue[Try[Boolean]]
-    body(
-        new Done {
+    body(new Done {
       def apply(proof: => Boolean): Unit = q offer Try(proof)
     })
     assert(q.poll(2000, TimeUnit.MILLISECONDS).get)
@@ -569,7 +577,8 @@ trait Blocking extends TestBase {
   }
 
   def testFQCNForAwaitAPI(): Unit = once { done =>
-    done(classOf[CanAwait].getName == "scala.concurrent.CanAwait" &&
+    done(
+      classOf[CanAwait].getName == "scala.concurrent.CanAwait" &&
         Await.getClass.getName == "scala.concurrent.Await")
   }
 
@@ -718,7 +727,7 @@ trait CustomExecutionContext extends TestBase {
 
     override def reportFailure(t: Throwable): Unit = {
       System.err.println(
-          "Failure: " + t.getClass.getSimpleName + ": " + t.getMessage)
+        "Failure: " + t.getClass.getSimpleName + ": " + t.getMessage)
       delegate.reportFailure(t)
     }
   }
@@ -782,8 +791,8 @@ trait CustomExecutionContext extends TestBase {
             Promise.successful(x + 1).future.map(addOne).map(addOne)
           } onComplete {
             case Failure(t) =>
-              done(throw new AssertionError("error in test: " + t.getMessage,
-                                            t))
+              done(
+                throw new AssertionError("error in test: " + t.getMessage, t))
             case Success(x) =>
               assertEC()
               done(x == 14)
@@ -857,9 +866,15 @@ trait ExecutionContextPrepare extends TestBase {
 }
 
 object Test
-    extends App with FutureCallbacks with FutureCombinators
-    with FutureProjections with Promises with BlockContexts with Exceptions
-    with GlobalExecutionContext with CustomExecutionContext
+    extends App
+    with FutureCallbacks
+    with FutureCombinators
+    with FutureProjections
+    with Promises
+    with BlockContexts
+    with Exceptions
+    with GlobalExecutionContext
+    with CustomExecutionContext
     with ExecutionContextPrepare {
   System.exit(0)
 }

@@ -23,7 +23,8 @@ final class Tv(actor: ActorRef) {
     } flatMap { _ ?? GameRepo.game }
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
-    (actor ? TvActor.GetGameIds(channel, max) mapTo manifest[List[String]]) recover {
+    (actor ? TvActor
+      .GetGameIds(channel, max) mapTo manifest[List[String]]) recover {
       case e: Exception => Nil
     } flatMap GameRepo.games
 
@@ -42,9 +43,10 @@ object Tv {
     def get = channels.get _
   }
 
-  sealed abstract class Channel(
-      val name: String, val icon: String, filters: Seq[Game => Boolean]) {
-    def filter(g: Game) = filters forall { _ (g) }
+  sealed abstract class Channel(val name: String,
+                                val icon: String,
+                                filters: Seq[Game => Boolean]) {
+    def filter(g: Game) = filters forall { _(g) }
     val key = toString.head.toLower + toString.drop(1)
   }
   object Channel {
@@ -53,20 +55,20 @@ object Tv {
                         icon = "C",
                         filters = Seq(rated, standard, freshBlitz))
     case object Bullet
-        extends Channel(
-            name = S.Bullet.name,
-            icon = P.Bullet.iconChar.toString,
-            filters = Seq(rated, standard, speed(S.Bullet), fresh(15)))
+        extends Channel(name = S.Bullet.name,
+                        icon = P.Bullet.iconChar.toString,
+                        filters =
+                          Seq(rated, standard, speed(S.Bullet), fresh(15)))
     case object Blitz
-        extends Channel(
-            name = S.Blitz.name,
-            icon = P.Blitz.iconChar.toString,
-            filters = Seq(rated, standard, speed(S.Blitz), freshBlitz))
+        extends Channel(name = S.Blitz.name,
+                        icon = P.Blitz.iconChar.toString,
+                        filters =
+                          Seq(rated, standard, speed(S.Blitz), freshBlitz))
     case object Classical
         extends Channel(
-            name = S.Classical.name,
-            icon = P.Classical.iconChar.toString,
-            filters = Seq(rated, standard, speed(S.Classical), fresh(60 * 3)))
+          name = S.Classical.name,
+          icon = P.Classical.iconChar.toString,
+          filters = Seq(rated, standard, speed(S.Classical), fresh(60 * 3)))
     case object Chess960
         extends Channel(name = V.Chess960.name,
                         icon = P.Chess960.iconChar.toString,
@@ -127,11 +129,10 @@ object Tv {
     (g: Game) => g.variant == variant
   private val standard = variant(V.Standard)
   private def fresh(seconds: Int) =
-    (g: Game) =>
-      {
-        g.isBeingPlayed && !g.olderThan(seconds)
-      } || {
-        g.finished && !g.olderThan(7)
+    (g: Game) => {
+      g.isBeingPlayed && !g.olderThan(seconds)
+    } || {
+      g.finished && !g.olderThan(7)
     } // rematch time
   private val freshBlitz = fresh(40)
   private def computerFromInitialPosition =

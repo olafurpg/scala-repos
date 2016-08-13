@@ -17,7 +17,7 @@ class ApplicationSpec extends Specification {
 
     "send 404 on a bad request" in new WithApplication {
       route(app, FakeRequest(GET, "/boum")) must beSome.which(
-          status(_) == NOT_FOUND)
+        status(_) == NOT_FOUND)
     }
 
     "render the index page" in new WithApplication {

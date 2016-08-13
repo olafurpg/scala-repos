@@ -43,9 +43,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
     def natN(in: ByteCode, x: Int): Result[ByteCode, Int, Nothing] =
       in.nextByte match {
         case Success(out, b) => {
-            val y = (x << 7) + (b & 0x7f)
-            if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
-          }
+          val y = (x << 7) + (b & 0x7f)
+          if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
+        }
         case _ => Failure
       }
     in =>
@@ -61,8 +61,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
   val longValue = read(_ toLong)
 }
 
-case class ScalaSig(
-    majorVersion: Int, minorVersion: Int, table: Seq[Int ~ ByteCode])
+case class ScalaSig(majorVersion: Int,
+                    minorVersion: Int,
+                    table: Seq[Int ~ ByteCode])
     extends DefaultMemoisable {
 
   case class Entry(index: Int, entryType: Int, byteCode: ByteCode)
@@ -87,8 +88,8 @@ case class ScalaSig(
 
   override def toString =
     "ScalaSig version " + majorVersion + "." + minorVersion + {
-      for (i <- 0 until table.size) yield
-        i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
+      for (i <- 0 until table.size)
+        yield i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
     }.mkString("\n", "\n", "")
 
   lazy val symbols: Seq[Symbol] = ScalaSigParsers.symbols
@@ -255,50 +256,50 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
 
   lazy val typeEntry: EntryParser[Type] =
     oneOf(
-        11 -^ NoType,
-        12 -^ NoPrefixType,
-        13 -~ symbolRef ^^ ThisType,
-        14 -~ typeRef ~ symbolRef ^~^ SingleType,
-        15 -~ constantRef ^^ ConstantType,
-        16 -~ typeRef ~ symbolRef ~ (typeRef *) ^~~^ TypeRefType,
-        17 -~ typeRef ~ typeRef ^~^ TypeBoundsType,
-        18 -~ classSymRef ~ (typeRef *) ^~^ RefinedType,
-        19 -~ symbolRef ~ (typeRef *) ^~^ ClassInfoType,
-        20 -~ typeRef ~ (symbolRef *) ^~^ MethodType,
-        21 -~ typeRef ~ (refTo(typeSymbol) *) ^~^ PolyType,
-        // TODO: make future safe for past by doing the same transformation as in the
-        // full unpickler in case we're reading pre-2.9 classfiles
-        entryType(21) -~ typeRef ^^ NullaryMethodType,
-        22 -~ typeRef ~ (symbolRef *) ^~^ ImplicitMethodType,
-        42 -~ typeRef ~ (attribTreeRef *) ^~^ AnnotatedType,
-        51 -~ typeRef ~ symbolRef ~ (attribTreeRef *) ^~~^ AnnotatedWithSelfType,
-        47 -~ typeLevel ~ typeIndex ^~^ DeBruijnIndexType,
-        48 -~ typeRef ~ (symbolRef *) ^~^ ExistentialType,
-        52 -~ typeRef ~ typeRef ^~^ SuperType) as "type"
+      11 -^ NoType,
+      12 -^ NoPrefixType,
+      13 -~ symbolRef ^^ ThisType,
+      14 -~ typeRef ~ symbolRef ^~^ SingleType,
+      15 -~ constantRef ^^ ConstantType,
+      16 -~ typeRef ~ symbolRef ~ (typeRef *) ^~~^ TypeRefType,
+      17 -~ typeRef ~ typeRef ^~^ TypeBoundsType,
+      18 -~ classSymRef ~ (typeRef *) ^~^ RefinedType,
+      19 -~ symbolRef ~ (typeRef *) ^~^ ClassInfoType,
+      20 -~ typeRef ~ (symbolRef *) ^~^ MethodType,
+      21 -~ typeRef ~ (refTo(typeSymbol) *) ^~^ PolyType,
+      // TODO: make future safe for past by doing the same transformation as in the
+      // full unpickler in case we're reading pre-2.9 classfiles
+      entryType(21) -~ typeRef ^^ NullaryMethodType,
+      22 -~ typeRef ~ (symbolRef *) ^~^ ImplicitMethodType,
+      42 -~ typeRef ~ (attribTreeRef *) ^~^ AnnotatedType,
+      51 -~ typeRef ~ symbolRef ~ (attribTreeRef *) ^~~^ AnnotatedWithSelfType,
+      47 -~ typeLevel ~ typeIndex ^~^ DeBruijnIndexType,
+      48 -~ typeRef ~ (symbolRef *) ^~^ ExistentialType,
+      52 -~ typeRef ~ typeRef ^~^ SuperType) as "type"
 
   lazy val literal = oneOf(
-      24 -^ (()),
-      25 -~ longValue ^^ (_ != 0L),
-      26 -~ longValue ^^ (_.toByte),
-      27 -~ longValue ^^ (_.toShort),
-      28 -~ longValue ^^ (_.toChar),
-      29 -~ longValue ^^ (_.toInt),
-      30 -~ longValue ^^ (_.toLong),
-      31 -~ longValue ^^ (l => java.lang.Float.intBitsToFloat(l.toInt)),
-      32 -~ longValue ^^ (java.lang.Double.longBitsToDouble),
-      33 -~ nameRef,
-      34 -^ null,
-      35 -~ typeRef,
-      36 -~ symbolRef)
+    24 -^ (()),
+    25 -~ longValue ^^ (_ != 0L),
+    26 -~ longValue ^^ (_.toByte),
+    27 -~ longValue ^^ (_.toShort),
+    28 -~ longValue ^^ (_.toChar),
+    29 -~ longValue ^^ (_.toInt),
+    30 -~ longValue ^^ (_.toLong),
+    31 -~ longValue ^^ (l => java.lang.Float.intBitsToFloat(l.toInt)),
+    32 -~ longValue ^^ (java.lang.Double.longBitsToDouble),
+    33 -~ nameRef,
+    34 -^ null,
+    35 -~ typeRef,
+    36 -~ symbolRef)
 
   //for now, support only constants and arrays of constants
   lazy val annotArgArray =
     44 -~ (oneOf(constantRef, constAnnotArgRef) *).map(_.toArray)
-  lazy val constAnnotArgRef: Rule[Any, String] = oneOf(
-      constantRef, refTo(annotArgArray))
+  lazy val constAnnotArgRef: Rule[Any, String] =
+    oneOf(constantRef, refTo(annotArgArray))
   lazy val attributeInfo =
     40 -~ symbolRef ~ typeRef ~ (constAnnotArgRef ?) ~
-    (nameRef ~ constAnnotArgRef *) ^~~~^ AttributeInfo // sym_Ref info_Ref {constant_Ref} {nameRef constantRef}
+      (nameRef ~ constAnnotArgRef *) ^~~~^ AttributeInfo // sym_Ref info_Ref {constant_Ref} {nameRef constantRef}
   lazy val children = 41 -~ (nat *) ^^ Children //sym_Ref {sym_Ref}
   lazy val annotInfo =
     43 -~ (nat *) ^^ AnnotInfo // attarg_Ref {constant_Ref attarg_Ref}

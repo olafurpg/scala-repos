@@ -46,7 +46,7 @@ class ScalaAnnotatorHighlightVisitor(project: Project)
     try {
       myHolder = holder
       myAnnotationHolder = new AnnotationHolderImpl(
-          holder.getAnnotationSession)
+        holder.getAnnotationSession)
       if (updateWholeFile) {
         val project: Project = file.getProject
         val refCountHolder: ScalaRefCountHolder =

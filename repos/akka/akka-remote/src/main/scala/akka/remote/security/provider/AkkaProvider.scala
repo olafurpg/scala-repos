@@ -10,9 +10,9 @@ import java.security.{PrivilegedAction, AccessController, Provider}
   */
 object AkkaProvider
     extends Provider(
-        "Akka",
-        1.0,
-        "Akka provider 1.0 that implements a secure AES random number generator") {
+      "Akka",
+      1.0,
+      "Akka provider 1.0 that implements a secure AES random number generator") {
   AccessController.doPrivileged(new PrivilegedAction[this.type] {
     def run = {
       //SecureRandom

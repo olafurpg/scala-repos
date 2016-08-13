@@ -23,5 +23,5 @@ import org.apache.kafka.common.protocol.SecurityProtocol
 class SslReplicaFetchTest extends BaseReplicaFetchTest {
   protected def securityProtocol = SecurityProtocol.SSL
   protected lazy val trustStoreFile = Some(
-      File.createTempFile("truststore", ".jks"))
+    File.createTempFile("truststore", ".jks"))
 }

@@ -91,7 +91,7 @@ object SexpData {
       require(mapped.keys.forall(_.value.startsWith(":")),
               "keys must start with ':' " + mapped.keys)
       SexpList(
-          kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
+        kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
     }
 
   def unapply(sexp: Sexp): Option[Map[SexpSymbol, Sexp]] = sexp match {

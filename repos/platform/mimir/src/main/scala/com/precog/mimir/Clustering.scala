@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -79,8 +79,8 @@ trait KMediansCoreSetClustering {
       val coresets =
         tree map {
           case (_, coreset) =>
-            CoreSet.fromWeightedPoints(
-                coreset._1, coreset._2, k, epsilon / 6.0)
+            CoreSet
+              .fromWeightedPoints(coreset._1, coreset._2, k, epsilon / 6.0)
         }
 
       coresets.foldLeft((new Array[Array[Double]](0), new Array[Long](0))) {
@@ -95,8 +95,10 @@ trait KMediansCoreSetClustering {
       val (centers2, weights2) = c2
       val epsilon0 = epsilon / (c * ((level + 1) ** 2))
 
-      CoreSet.fromWeightedPoints(
-          centers1 ++ centers2, weights1 ++ weights2, k, epsilon0)
+      CoreSet.fromWeightedPoints(centers1 ++ centers2,
+                                 weights1 ++ weights2,
+                                 k,
+                                 epsilon0)
     }
 
     private def insertCoreSet(coreset: CoreSet, level: Int): CoreSetTree = {
@@ -196,8 +198,8 @@ trait KMediansCoreSetClustering {
                           centers0: Array[Array[Double]],
                           epsilon: Double): (Double, Array[Array[Double]]) = {
 
-    val minCost0 = kMediansCost(
-        points, weights, centers0, Double.PositiveInfinity)
+    val minCost0 =
+      kMediansCost(points, weights, centers0, Double.PositiveInfinity)
     val centers = java.util.Arrays.copyOf(centers0, centers0.length)
 
     var minCost = minCost0
@@ -455,7 +457,7 @@ trait KMediansCoreSetClustering {
 
         require(j < sideLengths.length,
                 "Point (%d) found outside of grid (%d). What to do..." format
-                (j, sideLengths.length))
+                  (j, sideLengths.length))
 
         val sideLength = sideLengths(j)
         val scaledPoint = {
@@ -466,7 +468,7 @@ trait KMediansCoreSetClustering {
         var i = 0
         while (i < scaledPoint.length) {
           scaledPoint(i) = center(i) +
-          math.floor(scaledPoint(i)) * sideLength + (sideLength / 2)
+              math.floor(scaledPoint(i)) * sideLength + (sideLength / 2)
           i += 1
         }
         new GridPoint(scaledPoint)
@@ -560,7 +562,8 @@ trait KMediansCoreSetClustering {
 }
 
 trait ClusteringLibModule[M[+ _]]
-    extends ColumnarTableModule[M] with AssignClusterModule[M] {
+    extends ColumnarTableModule[M]
+    with AssignClusterModule[M] {
   trait ClusteringLib extends ColumnarTableLib with AssignClusterSupport {
     import trans._
     import TransSpecModule._
@@ -572,8 +575,8 @@ trait ClusteringLibModule[M[+ _]]
     object KMediansClustering
         extends Morphism2(Stats4Namespace, "kMedians")
         with KMediansCoreSetClustering {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JNumberT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JNumberT, JObjectUnfixedT)
 
       lazy val alignment =
         MorphismAlignment.Custom(IdentityPolicy.Retain.Cross, alignCustom _)
@@ -590,41 +593,41 @@ trait ClusteringLibModule[M[+ _]]
         def reduce(schema: CSchema, range: Range): KS = {
           val columns = schema.columns(JObjectFixedT(Map("value" -> JNumberT)))
           val cols: List[Int] = (columns flatMap {
-                case lc: LongColumn =>
-                  range collect {
-                    case i if lc.isDefinedAt(i) && lc(i) > 0 => lc(i).toInt
-                  }
+            case lc: LongColumn =>
+              range collect {
+                case i if lc.isDefinedAt(i) && lc(i) > 0 => lc(i).toInt
+              }
 
-                case dc: DoubleColumn =>
-                  range flatMap { i =>
-                    if (dc.isDefinedAt(i)) {
-                      val n = dc(i)
-                      if (n.isValidInt && n > 0) {
-                        Some(n.toInt)
-                      } else {
-                        None
-                      }
-                    } else {
-                      None
-                    }
+            case dc: DoubleColumn =>
+              range flatMap { i =>
+                if (dc.isDefinedAt(i)) {
+                  val n = dc(i)
+                  if (n.isValidInt && n > 0) {
+                    Some(n.toInt)
+                  } else {
+                    None
                   }
+                } else {
+                  None
+                }
+              }
 
-                case nc: NumColumn =>
-                  range flatMap { i =>
-                    if (nc.isDefinedAt(i)) {
-                      val n = nc(i)
-                      if (n.isValidInt && n > 0) {
-                        Some(n.toInt)
-                      } else {
-                        None
-                      }
-                    } else {
-                      None
-                    }
+            case nc: NumColumn =>
+              range flatMap { i =>
+                if (nc.isDefinedAt(i)) {
+                  val n = nc(i)
+                  if (n.isValidInt && n > 0) {
+                    Some(n.toInt)
+                  } else {
+                    None
                   }
+                } else {
+                  None
+                }
+              }
 
-                case _ => List.empty[Int]
-              }).toList
+            case _ => List.empty[Int]
+          }).toList
           cols
         }
       }
@@ -684,13 +687,13 @@ trait ClusteringLibModule[M[+ _]]
           transformedTables.zipWithIndex map {
             case (tbl, idx) =>
               tbl.transform(
-                  trans.WrapObject(TransSpec1.Id, "cluster" + (idx + 1)))
+                trans.WrapObject(TransSpec1.Id, "cluster" + (idx + 1)))
           }
 
         val table =
           wrappedTables reduce { (t1, t2) =>
             t1.cross(t2)(
-                trans.InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              trans.InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
           }
 
         val result =
@@ -699,17 +702,18 @@ trait ClusteringLibModule[M[+ _]]
         val valueTable =
           result.transform(trans.WrapObject(Leaf(Source), paths.Value.name))
         val keyTable = Table.constEmptyArray.transform(
-            trans.WrapObject(Leaf(Source), paths.Key.name))
+          trans.WrapObject(Leaf(Source), paths.Key.name))
 
         valueTable.cross(keyTable)(
-            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
       }
 
       def morph1Apply(ks: List[Int]): Morph1Apply = new Morph1Apply {
         def apply(table0: Table, ctx: MorphContext): M[Table] = {
-          val table = table0.transform(DerefObjectStatic(
-                  trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble),
-                  paths.Value))
+          val table = table0.transform(
+            DerefObjectStatic(
+              trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble),
+              paths.Value))
 
           val defaultNumber = new java.util.concurrent.atomic.AtomicInteger(1)
 
@@ -727,8 +731,8 @@ trait ClusteringLibModule[M[+ _]]
               val tables: StreamT[M, (Table, JType)] = StreamT.wrapEffect {
                 specs map { ts =>
                   StreamT.fromStream(M.point((ts map {
-                        case (spec, jtype) => (table.transform(spec), jtype)
-                      }).toStream))
+                    case (spec, jtype) => (table.transform(spec), jtype)
+                  }).toStream))
                 }
               }
 
@@ -744,8 +748,7 @@ trait ClusteringLibModule[M[+ _]]
                       .normalize
                       .reduce(reducerFeatures(k))
 
-                    StreamT(
-                        coreSetTree map { tree =>
+                    StreamT(coreSetTree map { tree =>
                       StreamT.Yield(extract(tree,
                                             k,
                                             jtype,
@@ -760,9 +763,9 @@ trait ClusteringLibModule[M[+ _]]
           val tables: StreamT[M, Table] =
             res.foldLeft(StreamT.empty[M, Table])(_ ++ _)
           val modelConcat = buildConstantWrapSpec(
-              OuterObjectConcat(
-                  DerefObjectStatic(Leaf(SourceLeft), paths.Value),
-                  DerefObjectStatic(Leaf(SourceRight), paths.Value)))
+            OuterObjectConcat(
+              DerefObjectStatic(Leaf(SourceLeft), paths.Value),
+              DerefObjectStatic(Leaf(SourceRight), paths.Value)))
 
           def merge(table: Option[Table],
                     tables: StreamT[M, Table]): OptionT[M, Table] = {
@@ -791,8 +794,8 @@ trait ClusteringLibModule[M[+ _]]
     object AssignClusters
         extends Morphism2(Vector("std", "stats"), "assignClusters")
         with AssignClusterBase {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
 
       override val idPolicy = IdentityPolicy.Retain.Merge
 
@@ -801,7 +804,7 @@ trait ClusteringLibModule[M[+ _]]
 
       def alignCustom(t1: Table, t2: Table): M[(Table, Morph1Apply)] = {
         val spec = liftToValues(
-            trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
+          trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
         t2.transform(spec).reduce(reducer) map { models =>
           (t1.transform(spec), morph1Apply(models))
         }

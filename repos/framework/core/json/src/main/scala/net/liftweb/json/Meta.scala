@@ -24,12 +24,18 @@ package json
 // from being able to remove this, though.
 import scala.language.existentials
 
-import java.lang.reflect.{Constructor => JConstructor, Field, Type, ParameterizedType, GenericArrayType}
+import java.lang.reflect.{
+  Constructor => JConstructor,
+  Field,
+  Type,
+  ParameterizedType,
+  GenericArrayType
+}
 import java.util.Date
 import java.sql.Timestamp
 
-case class TypeInfo(
-    clazz: Class[_], parameterizedType: Option[ParameterizedType])
+case class TypeInfo(clazz: Class[_],
+                    parameterizedType: Option[ParameterizedType])
 
 trait ParameterNameReader {
   def lookupParameterNames(constructor: JConstructor[_]): Traversable[String]
@@ -62,16 +68,16 @@ private[json] object Meta {
   case class Cycle(targetType: Type) extends Mapping
   case class Dict(mapping: Mapping) extends Mapping
   case class Col(targetType: TypeInfo, mapping: Mapping) extends Mapping
-  case class Constructor(
-      targetType: TypeInfo, choices: List[DeclaredConstructor])
+  case class Constructor(targetType: TypeInfo,
+                         choices: List[DeclaredConstructor])
       extends Mapping {
     def bestMatching(argNames: List[String]): Option[DeclaredConstructor] = {
       val names = Set(argNames: _*)
       def countOptionals(args: List[Arg]) =
         args.foldLeft(0)((n, x) => if (x.optional) n + 1 else n)
       def score(args: List[Arg]) =
-        args.foldLeft(0)(
-            (s, arg) => if (names.contains(arg.path)) s + 1 else -100)
+        args.foldLeft(0)((s, arg) =>
+          if (names.contains(arg.path)) s + 1 else -100)
 
       if (choices.isEmpty) None
       else {
@@ -81,8 +87,10 @@ private[json] object Meta {
               val newScore = score(c.args)
               if (newScore == best._2) {
                 if (countOptionals(c.args) < countOptionals(best._1.args))
-                  (c, newScore) else best
-              } else if (newScore > best._2) (c, newScore) else best
+                  (c, newScore)
+                else best
+              } else if (newScore > best._2) (c, newScore)
+              else best
           }
         Some(best._1)
       }
@@ -129,14 +137,16 @@ private[json] object Meta {
               genericType: Type,
               visited: Set[Type],
               context: Context): Arg = {
-      def mkContainer(
-          t: Type, k: Kind, valueTypeIndex: Int, factory: Mapping => Mapping) =
+      def mkContainer(t: Type,
+                      k: Kind,
+                      valueTypeIndex: Int,
+                      factory: Mapping => Mapping) =
         if (typeConstructor_?(t)) {
           val typeArgs = typeConstructors(t, k)(valueTypeIndex)
           factory(fieldMapping(typeArgs)._1)
         } else
           factory(
-              fieldMapping(typeParameters(t, k, context)(valueTypeIndex))._1)
+            fieldMapping(typeParameters(t, k, context)(valueTypeIndex))._1)
 
       def parameterizedTypeOpt(t: Type) = t match {
         case x: ParameterizedType =>
@@ -180,9 +190,9 @@ private[json] object Meta {
           val raw = java.lang.reflect.Array
             .newInstance(rawClassOf(aType.getGenericComponentType), 0: Int)
             .getClass
-            (Col(TypeInfo(raw, None),
-                 fieldMapping(aType.getGenericComponentType)._1),
-             false)
+          (Col(TypeInfo(raw, None),
+               fieldMapping(aType.getGenericComponentType)._1),
+           false)
         case raw: Class[_] =>
           if (primitive_?(raw)) (Value(raw), false)
           else if (raw.isArray)
@@ -261,36 +271,37 @@ private[json] object Meta {
 
     val primitives =
       Map[Class[_], Unit]() ++
-      (List[Class[_]](classOf[String],
-                      classOf[Int],
-                      classOf[Long],
-                      classOf[Double],
-                      classOf[Float],
-                      classOf[Byte],
-                      classOf[BigInt],
-                      classOf[Boolean],
-                      classOf[Short],
-                      classOf[java.lang.Integer],
-                      classOf[java.lang.Long],
-                      classOf[java.lang.Double],
-                      classOf[java.lang.Float],
-                      classOf[java.lang.Byte],
-                      classOf[java.lang.Boolean],
-                      classOf[Number],
-                      classOf[java.lang.Short],
-                      classOf[Date],
-                      classOf[Timestamp],
-                      classOf[Symbol],
-                      classOf[JValue],
-                      classOf[JObject],
-                      classOf[JArray]).map((_, ())))
+        (List[Class[_]](classOf[String],
+                        classOf[Int],
+                        classOf[Long],
+                        classOf[Double],
+                        classOf[Float],
+                        classOf[Byte],
+                        classOf[BigInt],
+                        classOf[Boolean],
+                        classOf[Short],
+                        classOf[java.lang.Integer],
+                        classOf[java.lang.Long],
+                        classOf[java.lang.Double],
+                        classOf[java.lang.Float],
+                        classOf[java.lang.Byte],
+                        classOf[java.lang.Boolean],
+                        classOf[Number],
+                        classOf[java.lang.Short],
+                        classOf[Date],
+                        classOf[Timestamp],
+                        classOf[Symbol],
+                        classOf[JValue],
+                        classOf[JObject],
+                        classOf[JArray]).map((_, ())))
 
     private val primaryConstructorArgumentsMemo =
       new Memo[Class[_], List[(String, Type)]]
     private val declaredFieldsMemo = new Memo[Class[_], Map[String, Field]]
 
-    def constructors(
-        t: Type, names: ParameterNameReader, context: Option[Context])
+    def constructors(t: Type,
+                     names: ParameterNameReader,
+                     context: Option[Context])
       : List[(JConstructor[_], List[(String, Type)])] =
       rawClassOf(t).getDeclaredConstructors
         .map(c => (c, constructorArgs(t, c, names, context)))
@@ -313,12 +324,12 @@ private[json] object Meta {
                 val arg = typeArgs.getOrElse(v, v)
                 if (arg == classOf[java.lang.Object])
                   context
-                    .map(ctx =>
-                          ScalaSigReader.readConstructor(
-                              ctx.argName,
-                              ctx.containingClass,
-                              idx,
-                              ctx.allArgs.map(_._1)))
+                    .map(
+                      ctx =>
+                        ScalaSigReader.readConstructor(ctx.argName,
+                                                       ctx.containingClass,
+                                                       idx,
+                                                       ctx.allArgs.map(_._1)))
                     .getOrElse(arg)
                 else arg
               case (x, _) => x
@@ -413,20 +424,21 @@ private[json] object Meta {
 
     def array_?(x: Any) =
       x != null &&
-      classOf[scala.Array[_]].isAssignableFrom(x.asInstanceOf[AnyRef].getClass)
+        classOf[scala.Array[_]]
+          .isAssignableFrom(x.asInstanceOf[AnyRef].getClass)
 
     def fields(clazz: Class[_]): List[(String, TypeInfo)] = {
       val fs = clazz.getDeclaredFields.toList
         .filterNot(f =>
-              Modifier.isStatic(f.getModifiers) ||
-              Modifier.isTransient(f.getModifiers))
+          Modifier.isStatic(f.getModifiers) ||
+            Modifier.isTransient(f.getModifiers))
         .map(f =>
-              (f.getName, TypeInfo(f.getType, f.getGenericType match {
+          (f.getName, TypeInfo(f.getType, f.getGenericType match {
             case p: ParameterizedType => Some(p)
             case _ => None
           })))
       fs :::
-      (if (clazz.getSuperclass == null) Nil else fields(clazz.getSuperclass))
+        (if (clazz.getSuperclass == null) Nil else fields(clazz.getSuperclass))
     }
 
     def setField(a: AnyRef, name: String, value: Any) = {

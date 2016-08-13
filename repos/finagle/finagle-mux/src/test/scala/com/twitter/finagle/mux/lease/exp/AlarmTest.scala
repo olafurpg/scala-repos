@@ -105,7 +105,7 @@ class AlarmTest extends FunSuite with LocalConductors {
 
   trait GenerationAlarmHelper {
     val fakePool = new FakeMemoryPool(
-        new FakeMemoryUsage(StorageUnit.zero, 10.megabytes))
+      new FakeMemoryUsage(StorageUnit.zero, 10.megabytes))
     val fakeBean = new FakeGarbageCollectorMXBean(0, 0)
     val nfo = new JvmInfo(fakePool, fakeBean)
     val ctr = FakeByteCounter(1, Time.now, nfo)

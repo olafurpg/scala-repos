@@ -19,23 +19,25 @@ import org.apache.zookeeper.CreateMode
 private[serverset2] object LocalServerSetService extends App {
 
   private val initialMembers = flag(
-      "members.init", 500, "Number of members to start with in the serverset")
-  private val additionsPerCycle = flag(
-      "members.add", 100, "Number of members to add each churn cycle")
-  private val removalsPerCycle = flag(
-      "members.remove", 25, "Number of members to remove each churn cycle")
-  private val maxMembers = flag(
-      "members.max", 1000, "Max members to keep in the serverset")
+    "members.init",
+    500,
+    "Number of members to start with in the serverset")
+  private val additionsPerCycle =
+    flag("members.add", 100, "Number of members to add each churn cycle")
+  private val removalsPerCycle =
+    flag("members.remove", 25, "Number of members to remove each churn cycle")
+  private val maxMembers =
+    flag("members.max", 1000, "Max members to keep in the serverset")
   private val churnFrequency = flag(
-      "churn.frequency",
-      200.milliseconds,
-      "How often to add/remove members to a single serverset")
-  private val numberOfServersets = flag(
-      "serversets.count", 25, "Number of serversets to churn")
+    "churn.frequency",
+    200.milliseconds,
+    "How often to add/remove members to a single serverset")
+  private val numberOfServersets =
+    flag("serversets.count", 25, "Number of serversets to churn")
   private val zkListenPort = flag(
-      "zk.listenport",
-      2181,
-      "port that the localhost zookeeper will listen on")
+    "zk.listenport",
+    2181,
+    "port that the localhost zookeeper will listen on")
 
   private val timer = DefaultTimer.twitter
   private val logger = Logger(getClass)
@@ -106,7 +108,7 @@ private[serverset2] object LocalServerSetService extends App {
     scheduleUpdate()
 
     logger.info(
-        s"ServerSet ${setToUpdate + 1} now has ${membersets(setToUpdate).size} members.")
+      s"ServerSet ${setToUpdate + 1} now has ${membersets(setToUpdate).size} members.")
   }
 
   private def addMembers(serversetIndex: Int, toAdd: Int): Unit = {

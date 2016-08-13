@@ -5,7 +5,10 @@ import java.io.File
 
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.scala.data._
-import org.jetbrains.jps.incremental.scala.model.{CompileOrder, IncrementalityType}
+import org.jetbrains.jps.incremental.scala.model.{
+  CompileOrder,
+  IncrementalityType
+}
 import org.jetbrains.jps.incremental.scala.remote.Arguments._
 
 /**
@@ -20,8 +23,8 @@ case class Arguments(sbtData: SbtData,
 
     val (sourceRoots, outputDirs) = compilationData.outputGroups.unzip
 
-    val compilerJarPaths = compilerData.compilerJars.map(
-        jars => filesToPaths(jars.library +: jars.compiler +: jars.extra))
+    val compilerJarPaths = compilerData.compilerJars.map(jars =>
+      filesToPaths(jars.library +: jars.compiler +: jars.extra))
 
     val javaHomePath = compilerData.javaHome.map(fileToPath)
 
@@ -31,26 +34,26 @@ case class Arguments(sbtData: SbtData,
       compilationData.sbtIncOptions.map(_.asString).getOrElse("")
 
     Seq(
-        fileToPath(sbtData.interfaceJar),
-        fileToPath(sbtData.sourceJar),
-        fileToPath(sbtData.interfacesHome),
-        sbtData.javaClassVersion,
-        optionToString(compilerJarPaths),
-        optionToString(javaHomePath),
-        filesToPaths(compilationData.sources),
-        filesToPaths(compilationData.classpath),
-        fileToPath(compilationData.output),
-        sequenceToString(compilationData.scalaOptions),
-        sequenceToString(compilationData.javaOptions),
-        compilationData.order.toString,
-        fileToPath(compilationData.cacheFile),
-        filesToPaths(outputs),
-        filesToPaths(caches),
-        incrementalType.name,
-        filesToPaths(sourceRoots),
-        filesToPaths(outputDirs),
-        sequenceToString(worksheetFiles),
-        sbtIncOptions
+      fileToPath(sbtData.interfaceJar),
+      fileToPath(sbtData.sourceJar),
+      fileToPath(sbtData.interfacesHome),
+      sbtData.javaClassVersion,
+      optionToString(compilerJarPaths),
+      optionToString(javaHomePath),
+      filesToPaths(compilationData.sources),
+      filesToPaths(compilationData.classpath),
+      fileToPath(compilationData.output),
+      sequenceToString(compilationData.scalaOptions),
+      sequenceToString(compilationData.javaOptions),
+      compilationData.order.toString,
+      fileToPath(compilationData.cacheFile),
+      filesToPaths(outputs),
+      filesToPaths(caches),
+      incrementalType.name,
+      filesToPaths(sourceRoots),
+      filesToPaths(outputDirs),
+      sequenceToString(worksheetFiles),
+      sbtIncOptions
     )
   }
 }
@@ -79,8 +82,8 @@ object Arguments {
              PathsToFiles(outputDirs),
              StringToSequence(worksheetClass),
              sbtIncOptionsString) =>
-      val sbtData = SbtData(
-          interfaceJar, sourceJar, interfacesHome, javaClassVersion)
+      val sbtData =
+        SbtData(interfaceJar, sourceJar, interfacesHome, javaClassVersion)
 
       val compilerJars = compilerJarPaths.map {
         case PathsToFiles(Seq(libraryJar, compilerJar, extraJars @ _ *)) =>

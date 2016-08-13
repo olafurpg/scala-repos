@@ -23,7 +23,11 @@ import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
 import org.apache.spark.api.java.JavaRDDLike
-import org.apache.spark.streaming.api.java.{JavaDStreamLike, JavaDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaDStreamLike,
+  JavaDStream,
+  JavaStreamingContext
+}
 
 /** Exposes streaming test functionality in a Java-friendly way. */
 trait JavaTestBase extends TestSuiteBase {
@@ -47,8 +51,9 @@ trait JavaTestBase extends TestSuiteBase {
     * Attach a provided stream to it's associated StreamingContext as a
     * [[org.apache.spark.streaming.TestOutputStream]].
     **/
-  def attachTestOutputStream[
-      T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
+  def attachTestOutputStream[T,
+                             This <: JavaDStreamLike[T, This, R],
+                             R <: JavaRDDLike[T, R]](
       dstream: JavaDStreamLike[T, This, R]) = {
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]

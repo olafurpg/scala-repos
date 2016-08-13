@@ -49,7 +49,7 @@ class RecipeMultiGroupBy extends RecipeSpec {
         .runWith(Sink.seq)
 
       Await.result(result, 3.seconds).toSet should be(
-          Set("1[1: a, 1: b, all: c, all: d, 1: e]", "2[all: c, all: d]"))
+        Set("1[1: a, 1: b, all: c, all: d, 1: e]", "2[all: c, all: d]"))
     }
   }
 }

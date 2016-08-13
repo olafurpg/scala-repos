@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -67,13 +67,13 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
   def ingestConfig = config.detach("ingest") |> { config =>
     for {
       failureLogRoot <- config.get[File]("failure_log_root")
-                           if config[Boolean]("enabled", false)
+      if config[Boolean]("enabled", false)
     } yield {
       IngestConfig(bufferSize = config[Int]("buffer_size", 1024 * 1024),
                    maxParallel = config[Int]("max_parallel", 5),
                    batchTimeout = config[Int]("timeout", 120) seconds,
-                   maxConsecutiveFailures = config[Int](
-                         "ingest.max_consecutive_failures", 3),
+                   maxConsecutiveFailures =
+                     config[Int]("ingest.max_consecutive_failures", 3),
                    failureLogRoot = failureLogRoot)
     }
   }
@@ -99,8 +99,8 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
 trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
   type YggConfig <: KafkaIngestActorProjectionSystemConfig
 
-  def ingestFailureLog(
-      checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog
+  def ingestFailureLog(checkpoint: YggCheckpoint,
+                       logRoot: File): IngestFailureLog
 
   override def initIngestActor(
       actorSystem: ActorSystem,
@@ -116,24 +116,24 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
                            yggConfig.kafkaBufferSize)
 
       actorSystem.actorOf(
-          Props(
-              new KafkaShardIngestActor(
-                  shardId = yggConfig.shardId,
-                  initialCheckpoint = checkpoint,
-                  consumer = consumer,
-                  topic = yggConfig.kafkaTopic,
-                  permissionsFinder = permissionsFinder,
-                  routingActor = routingActor,
-                  ingestFailureLog = ingestFailureLog(checkpoint,
-                                                      conf.failureLogRoot),
-                  fetchBufferSize = conf.bufferSize,
-                  idleDelay = yggConfig.batchStoreDelay,
-                  ingestTimeout = conf.batchTimeout,
-                  maxCacheSize = conf.maxParallel,
-                  maxConsecutiveFailures = conf.maxConsecutiveFailures) {
+        Props(
+          new KafkaShardIngestActor(
+            shardId = yggConfig.shardId,
+            initialCheckpoint = checkpoint,
+            consumer = consumer,
+            topic = yggConfig.kafkaTopic,
+            permissionsFinder = permissionsFinder,
+            routingActor = routingActor,
+            ingestFailureLog =
+              ingestFailureLog(checkpoint, conf.failureLogRoot),
+            fetchBufferSize = conf.bufferSize,
+            idleDelay = yggConfig.batchStoreDelay,
+            ingestTimeout = conf.batchTimeout,
+            maxCacheSize = conf.maxParallel,
+            maxConsecutiveFailures = conf.maxConsecutiveFailures) {
 
             implicit val M = new FutureMonad(
-                ExecutionContext.defaultExecutionContext(actorSystem))
+              ExecutionContext.defaultExecutionContext(actorSystem))
 
             def handleBatchComplete(ck: YggCheckpoint) {
               logger.debug("Complete up to " + ck)
@@ -141,7 +141,7 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
               logger.info("Saved checkpoint: " + ck)
             }
           }),
-          "ingest")
+        "ingest")
     }
   }
 

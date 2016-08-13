@@ -56,7 +56,8 @@ private[spark] trait MesosClusterPersistenceEngine {
   */
 private[spark] class ZookeeperMesosClusterPersistenceEngineFactory(
     conf: SparkConf)
-    extends MesosClusterPersistenceEngineFactory(conf) with Logging {
+    extends MesosClusterPersistenceEngineFactory(conf)
+    with Logging {
 
   lazy val zk = SparkCuratorUtil.newClient(conf)
 
@@ -93,11 +94,14 @@ private[spark] class BlackHoleMesosClusterPersistenceEngine
   * reuses a shared Zookeeper client.
   */
 private[spark] class ZookeeperMesosClusterPersistenceEngine(
-    baseDir: String, zk: CuratorFramework, conf: SparkConf)
-    extends MesosClusterPersistenceEngine with Logging {
+    baseDir: String,
+    zk: CuratorFramework,
+    conf: SparkConf)
+    extends MesosClusterPersistenceEngine
+    with Logging {
   private val WORKING_DIR =
     conf.get("spark.deploy.zookeeper.dir", "/spark_mesos_dispatcher") + "/" +
-    baseDir
+      baseDir
 
   SparkCuratorUtil.mkdir(zk, WORKING_DIR)
 
@@ -124,10 +128,10 @@ private[spark] class ZookeeperMesosClusterPersistenceEngine(
     } catch {
       case e: NoNodeException => None
       case e: Exception => {
-          logWarning("Exception while reading persisted file, deleting", e)
-          zk.delete().forPath(zkPath)
-          None
-        }
+        logWarning("Exception while reading persisted file, deleting", e)
+        zk.delete().forPath(zkPath)
+        None
+      }
     }
   }
 

@@ -43,24 +43,30 @@ import org.apache.spark.util.NextIterator
   * @param offsetRanges offset ranges that define the Kafka data belonging to this RDD
   * @param messageHandler function for translating each message into the desired type
   */
-private[kafka] class KafkaRDD[K : ClassTag,
-                              V : ClassTag,
+private[kafka] class KafkaRDD[K: ClassTag,
+                              V: ClassTag,
                               U <: Decoder[_]: ClassTag,
                               T <: Decoder[_]: ClassTag,
-                              R : ClassTag] private[spark](
+                              R: ClassTag] private[spark] (
     sc: SparkContext,
     kafkaParams: Map[String, String],
     val offsetRanges: Array[OffsetRange],
     leaders: Map[TopicAndPartition, (String, Int)],
     messageHandler: MessageAndMetadata[K, V] => R
-)
-    extends RDD[R](sc, Nil) with Logging with HasOffsetRanges {
+) extends RDD[R](sc, Nil)
+    with Logging
+    with HasOffsetRanges {
   override def getPartitions: Array[Partition] = {
     offsetRanges.zipWithIndex.map {
       case (o, i) =>
         val (host, port) = leaders(TopicAndPartition(o.topic, o.partition))
-        new KafkaRDDPartition(
-            i, o.topic, o.partition, o.fromOffset, o.untilOffset, host, port)
+        new KafkaRDDPartition(i,
+                              o.topic,
+                              o.partition,
+                              o.fromOffset,
+                              o.untilOffset,
+                              host,
+                              port)
     }.toArray
   }
 
@@ -98,11 +104,10 @@ private[kafka] class KafkaRDD[K : ClassTag,
     }
 
     val buf = new ArrayBuffer[R]
-    val res = context.runJob(
-        this,
-        (tc: TaskContext,
-        it: Iterator[R]) => it.take(parts(tc.partitionId)).toArray,
-        parts.keys.toArray)
+    val res = context.runJob(this,
+                             (tc: TaskContext, it: Iterator[R]) =>
+                               it.take(parts(tc.partitionId)).toArray,
+                             parts.keys.toArray)
     res.foreach(buf ++= _)
     buf.toArray
   }
@@ -115,26 +120,26 @@ private[kafka] class KafkaRDD[K : ClassTag,
 
   private def errBeginAfterEnd(part: KafkaRDDPartition): String =
     s"Beginning offset ${part.fromOffset} is after the ending offset ${part.untilOffset} " +
-    s"for topic ${part.topic} partition ${part.partition}. " +
-    "You either provided an invalid fromOffset, or the Kafka topic has been damaged"
+      s"for topic ${part.topic} partition ${part.partition}. " +
+      "You either provided an invalid fromOffset, or the Kafka topic has been damaged"
 
   private def errRanOutBeforeEnd(part: KafkaRDDPartition): String =
     s"Ran out of messages before reaching ending offset ${part.untilOffset} " +
-    s"for topic ${part.topic} partition ${part.partition} start ${part.fromOffset}." +
-    " This should not happen, and indicates that messages may have been lost"
+      s"for topic ${part.topic} partition ${part.partition} start ${part.fromOffset}." +
+      " This should not happen, and indicates that messages may have been lost"
 
-  private def errOvershotEnd(
-      itemOffset: Long, part: KafkaRDDPartition): String =
+  private def errOvershotEnd(itemOffset: Long,
+                             part: KafkaRDDPartition): String =
     s"Got ${itemOffset} > ending offset ${part.untilOffset} " +
-    s"for topic ${part.topic} partition ${part.partition} start ${part.fromOffset}." +
-    " This should not happen, and indicates a message may have been skipped"
+      s"for topic ${part.topic} partition ${part.partition} start ${part.fromOffset}." +
+      " This should not happen, and indicates a message may have been skipped"
 
   override def compute(thePart: Partition, context: TaskContext): Iterator[R] = {
     val part = thePart.asInstanceOf[KafkaRDDPartition]
     assert(part.fromOffset <= part.untilOffset, errBeginAfterEnd(part))
     if (part.fromOffset == part.untilOffset) {
       log.info(
-          s"Beginning offset ${part.fromOffset} is the same as ending offset " +
+        s"Beginning offset ${part.fromOffset} is the same as ending offset " +
           s"skipping ${part.topic} ${part.partition}")
       Iterator.empty
     } else {
@@ -149,7 +154,8 @@ private[kafka] class KafkaRDD[K : ClassTag,
       closeIfNeeded()
     }
 
-    log.info(s"Computing topic ${part.topic}, partition ${part.partition} " +
+    log.info(
+      s"Computing topic ${part.topic}, partition ${part.partition} " +
         s"offsets ${part.fromOffset} -> ${part.untilOffset}")
 
     val kc = new KafkaCluster(kafkaParams)
@@ -171,11 +177,11 @@ private[kafka] class KafkaRDD[K : ClassTag,
       if (context.attemptNumber > 0) {
         kc.connectLeader(part.topic, part.partition)
           .fold(
-              errs =>
-                throw new SparkException(
-                    s"Couldn't connect to leader for topic ${part.topic} ${part.partition}: " +
-                    errs.mkString("\n")),
-              consumer => consumer
+            errs =>
+              throw new SparkException(
+                s"Couldn't connect to leader for topic ${part.topic} ${part.partition}: " +
+                  errs.mkString("\n")),
+            consumer => consumer
           )
       } else {
         kc.connect(part.host, part.port)
@@ -188,7 +194,7 @@ private[kafka] class KafkaRDD[K : ClassTag,
         if (err == ErrorMapping.LeaderNotAvailableCode ||
             err == ErrorMapping.NotLeaderForPartitionCode) {
           log.error(
-              s"Lost leader for topic ${part.topic} partition ${part.partition}, " +
+            s"Lost leader for topic ${part.topic} partition ${part.partition}, " +
               s" sleeping for ${kc.config.refreshLeaderBackoffMs}ms")
           Thread.sleep(kc.config.refreshLeaderBackoffMs)
         }
@@ -237,12 +243,12 @@ private[kafka] class KafkaRDD[K : ClassTag,
         } else {
           requestOffset = item.nextOffset
           messageHandler(
-              new MessageAndMetadata(part.topic,
-                                     part.partition,
-                                     item.message,
-                                     item.offset,
-                                     keyDecoder,
-                                     valueDecoder))
+            new MessageAndMetadata(part.topic,
+                                   part.partition,
+                                   item.message,
+                                   item.offset,
+                                   keyDecoder,
+                                   valueDecoder))
         }
       }
     }
@@ -263,11 +269,11 @@ private[kafka] object KafkaRDD {
     *  ending point of the batch
     * @param messageHandler function for translating each message into the desired type
     */
-  def apply[K : ClassTag,
-            V : ClassTag,
+  def apply[K: ClassTag,
+            V: ClassTag,
             U <: Decoder[_]: ClassTag,
             T <: Decoder[_]: ClassTag,
-            R : ClassTag](
+            R: ClassTag](
       sc: SparkContext,
       kafkaParams: Map[String, String],
       fromOffsets: Map[TopicAndPartition, Long],
@@ -285,7 +291,10 @@ private[kafka] object KafkaRDD {
         OffsetRange(tp.topic, tp.partition, fo, uo.offset)
     }.toArray
 
-    new KafkaRDD[K, V, U, T, R](
-        sc, kafkaParams, offsetRanges, leaders, messageHandler)
+    new KafkaRDD[K, V, U, T, R](sc,
+                                kafkaParams,
+                                offsetRanges,
+                                leaders,
+                                messageHandler)
   }
 }

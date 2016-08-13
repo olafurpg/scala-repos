@@ -31,9 +31,10 @@ import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.hive.thriftserver.ReflectionUtils._
 import org.apache.spark.sql.hive.thriftserver.server.SparkSQLOperationManager
 
-private[hive] class SparkSQLSessionManager(
-    hiveServer: HiveServer2, hiveContext: HiveContext)
-    extends SessionManager(hiveServer) with ReflectedCompositeService {
+private[hive] class SparkSQLSessionManager(hiveServer: HiveServer2,
+                                           hiveContext: HiveContext)
+    extends SessionManager(hiveServer)
+    with ReflectedCompositeService {
 
   private lazy val sparkSqlOperationManager = new SparkSQLOperationManager()
 
@@ -75,9 +76,9 @@ private[hive] class SparkSQLSessionManager(
                                           delegationToken)
     val session = super.getSession(sessionHandle)
     HiveThriftServer2.listener.onSessionCreated(
-        session.getIpAddress,
-        sessionHandle.getSessionId.toString,
-        session.getUsername)
+      session.getIpAddress,
+      sessionHandle.getSessionId.toString,
+      session.getUsername)
     val ctx =
       if (hiveContext.hiveThriftServerSingleSession) {
         hiveContext
@@ -91,7 +92,7 @@ private[hive] class SparkSQLSessionManager(
 
   override def closeSession(sessionHandle: SessionHandle) {
     HiveThriftServer2.listener.onSessionClosed(
-        sessionHandle.getSessionId.toString)
+      sessionHandle.getSessionId.toString)
     super.closeSession(sessionHandle)
     sparkSqlOperationManager.sessionToActivePool -= sessionHandle
     sparkSqlOperationManager.sessionToContexts.remove(sessionHandle)

@@ -146,7 +146,7 @@ class ORMapSpec extends WordSpec with Matchers {
       val merged1: ORMap[ORSet[String]] = m1 merge m2
 
       val m3 = merged1.updated(node1, "b", ORSet.empty[String])(
-          _.clear(node1).add(node1, "B2"))
+        _.clear(node1).add(node1, "B2"))
 
       val merged2 = merged1 merge m3
       merged2.entries("a").elements should be(Set("A"))

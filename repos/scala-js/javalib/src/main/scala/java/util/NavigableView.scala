@@ -10,7 +10,9 @@ private[util] class NavigableView[E](original: NavigableSet[E],
                                      lowerInclusive: Boolean,
                                      upperBound: Option[E],
                                      upperInclusive: Boolean)
-    extends AbstractCollection[E] with NavigableSet[E] with SortedSet[E] {
+    extends AbstractCollection[E]
+    with NavigableSet[E]
+    with SortedSet[E] {
 
   def size(): Int =
     iterator.size
@@ -168,8 +170,12 @@ private[util] class NavigableView[E](original: NavigableSet[E],
       if (inclusive) () => innerNow.from(boxed)
       else () => innerNow.from(boxed) - boxed
 
-    new NavigableView(
-        this, tailSetFun, Some(fromElement), inclusive, None, true)
+    new NavigableView(this,
+                      tailSetFun,
+                      Some(fromElement),
+                      inclusive,
+                      None,
+                      true)
   }
 
   def subSet(fromElement: E, toElement: E): NavigableSet[E] =

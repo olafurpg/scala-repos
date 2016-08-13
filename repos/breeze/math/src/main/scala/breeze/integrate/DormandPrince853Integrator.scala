@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{DormandPrince853Integrator => ApacheDormandPrince853Integrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  DormandPrince853Integrator => ApacheDormandPrince853Integrator
+}
 
 class DormandPrince853Integrator(minStep: Double,
                                  maxStep: Double,
@@ -13,8 +15,8 @@ class DormandPrince853Integrator(minStep: Double,
 
   protected final def create: ApacheDormandPrince853Integrator =
     new ApacheDormandPrince853Integrator(
-        minStep,
-        maxStep,
-        ApacheAdaptiveStepIntegrator.defaultAbsTol,
-        ApacheAdaptiveStepIntegrator.defaultRelTol)
+      minStep,
+      maxStep,
+      ApacheAdaptiveStepIntegrator.defaultAbsTol,
+      ApacheAdaptiveStepIntegrator.defaultRelTol)
 }

@@ -151,8 +151,8 @@ trait InterfaceImplicits {
     }
 
   @deprecated(
-      "Can cause confusion when this conversion is used for block of code",
-      "3.6")
+    "Can cause confusion when this conversion is used for block of code",
+    "3.6")
   implicit def lazy2ViewOnClickListener[F](f: => F): View.OnClickListener =
     new View.OnClickListener() {
       def onClick(view: View) {
@@ -184,8 +184,8 @@ trait InterfaceImplicits {
     }
 
   @deprecated(
-      "Can cause confusion when this conversion is used for block of code",
-      "3.6")
+    "Can cause confusion when this conversion is used for block of code",
+    "3.6")
   implicit def lazy2runnable[F](f: => F): Runnable =
     new Runnable() {
       def run() {
@@ -209,7 +209,9 @@ class RichCursor(c: Cursor) extends Iterable[Cursor] {
     }
   }
 
-  def closeAfter[T](body: RichCursor => T) = try body(this) finally c.close()
+  def closeAfter[T](body: RichCursor => T) =
+    try body(this)
+    finally c.close()
 
   def orm[T](body: Cursor => T) = closeAfter(_.map(body).toList)
 
@@ -237,6 +239,9 @@ trait DatabaseImplicits {
 }
 
 trait Implicits
-    extends ConversionImplicits with InterfaceImplicits with ViewImplicits
-    with WidgetImplicits with DatabaseImplicits
+    extends ConversionImplicits
+    with InterfaceImplicits
+    with ViewImplicits
+    with WidgetImplicits
+    with DatabaseImplicits
 object Implicits extends Implicits

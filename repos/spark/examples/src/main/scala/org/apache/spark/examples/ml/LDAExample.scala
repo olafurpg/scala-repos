@@ -54,7 +54,7 @@ object LDAExample {
       .map(Vectors.dense)
       .map(Row(_))
     val schema = StructType(
-        Array(StructField(FEATURES_COL, new VectorUDT, false)))
+      Array(StructField(FEATURES_COL, new VectorUDT, false)))
     val dataset = sqlContext.createDataFrame(rowRDD, schema)
 
     // Trains a LDA model

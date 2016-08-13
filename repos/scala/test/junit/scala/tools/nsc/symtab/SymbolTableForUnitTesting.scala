@@ -43,15 +43,15 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
     lazy val classPath: ClassPath[AbstractFile] = {
       assert(
-          settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
-          "It's not possible to use the recursive classpath representation, when it's not the chosen classpath scanning method")
+        settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
+        "It's not possible to use the recursive classpath representation, when it's not the chosen classpath scanning method")
       new PathResolver(settings).result
     }
 
     private[nsc] lazy val flatClassPath: FlatClassPath = {
       assert(
-          settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
-          "It's not possible to use the flat classpath representation, when it's not the chosen classpath scanning method")
+        settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
+        "It's not possible to use the flat classpath representation, when it's not the chosen classpath scanning method")
       new FlatClassPathResolver(settings).result
     }
 
@@ -71,7 +71,7 @@ class SymbolTableForUnitTesting extends SymbolTable {
       sym.info.member(name)
     protected override def compileLate(srcfile: AbstractFile): Unit =
       sys.error(
-          s"We do not expect compileLate to be called in SymbolTableTest. The srcfile passed in is $srcfile")
+        s"We do not expect compileLate to be called in SymbolTableTest. The srcfile passed in is $srcfile")
   }
 
   class GlobalMirror extends Roots(NoSymbol) {
@@ -80,8 +80,8 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
     def rootLoader: LazyType = settings.YclasspathImpl.value match {
       case ClassPathRepresentationType.Flat =>
-        new loaders.PackageLoaderUsingFlatClassPath(
-            FlatClassPath.RootPackage, flatClassPath)
+        new loaders.PackageLoaderUsingFlatClassPath(FlatClassPath.RootPackage,
+                                                    flatClassPath)
       case ClassPathRepresentationType.Recursive =>
         new loaders.PackageLoader(classPath)
     }
@@ -108,8 +108,10 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
   // Members declared in scala.reflect.internal.Reporting
   def reporter = new scala.reflect.internal.ReporterImpl {
-    protected def info0(
-        pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
+    protected def info0(pos: Position,
+                        msg: String,
+                        severity: Severity,
+                        force: Boolean): Unit =
       println(msg)
   }
 

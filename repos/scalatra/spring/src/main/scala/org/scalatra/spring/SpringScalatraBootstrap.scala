@@ -5,7 +5,10 @@ import javax.servlet.ServletContext
 
 import org.scalatra.ScalatraServlet
 import org.scalatra.servlet.RichServletContext
-import org.springframework.context.{ApplicationContext, ApplicationContextAware}
+import org.springframework.context.{
+  ApplicationContext,
+  ApplicationContextAware
+}
 import org.springframework.stereotype.Component
 import org.springframework.web.context.ServletContextAware
 
@@ -14,7 +17,8 @@ import scala.collection.JavaConverters._
 /** @author Stephen Samuel */
 @Component
 class SpringScalatraBootstrap
-    extends ApplicationContextAware with ServletContextAware {
+    extends ApplicationContextAware
+    with ServletContextAware {
 
   @PostConstruct
   def bootstrap() {

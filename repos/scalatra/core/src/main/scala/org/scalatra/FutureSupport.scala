@@ -37,13 +37,13 @@ trait FutureSupport extends AsyncSupport {
   // IPC: it may not be perfect but I need to be able to configure this timeout in an application
   // This is a Duration instead of a timeout because a duration has the concept of infinity
   @deprecated(
-      "Override the `timeout` method on a `org.scalatra.AsyncResult` instead.",
-      "2.2")
+    "Override the `timeout` method on a `org.scalatra.AsyncResult` instead.",
+    "2.2")
   protected def asyncTimeout: Duration = 30 seconds
 
   override protected def isAsyncExecutable(result: Any): Boolean =
     classOf[Future[_]].isAssignableFrom(result.getClass) ||
-    classOf[AsyncResult].isAssignableFrom(result.getClass)
+      classOf[AsyncResult].isAssignableFrom(result.getClass)
 
   override protected def renderResponse(actionResult: Any): Unit = {
     actionResult match {
@@ -66,30 +66,30 @@ trait FutureSupport extends AsyncSupport {
         case Success(r: AsyncResult) => renderFutureResult(r.is)
         case t => {
 
-            if (gotResponseAlready.compareAndSet(false, true)) {
-              withinAsyncContext(context) {
-                try {
-                  t map { result =>
-                    renderResponse(result)
-                  } recover {
-                    case e: HaltException =>
-                      renderHaltException(e)
-                    case e =>
-                      try {
-                        renderResponse(errorHandler(e))
-                      } catch {
-                        case e: Throwable =>
-                          ScalatraBase.runCallbacks(Failure(e))
-                          renderUncaughtException(e)
-                          ScalatraBase.runRenderCallbacks(Failure(e))
-                      }
-                  }
-                } finally {
-                  context.complete()
+          if (gotResponseAlready.compareAndSet(false, true)) {
+            withinAsyncContext(context) {
+              try {
+                t map { result =>
+                  renderResponse(result)
+                } recover {
+                  case e: HaltException =>
+                    renderHaltException(e)
+                  case e =>
+                    try {
+                      renderResponse(errorHandler(e))
+                    } catch {
+                      case e: Throwable =>
+                        ScalatraBase.runCallbacks(Failure(e))
+                        renderUncaughtException(e)
+                        ScalatraBase.runRenderCallbacks(Failure(e))
+                    }
                 }
+              } finally {
+                context.complete()
               }
             }
           }
+        }
       }
     }
 
@@ -99,7 +99,7 @@ trait FutureSupport extends AsyncSupport {
         onAsyncEvent(event) {
           if (gotResponseAlready.compareAndSet(false, true)) {
             renderHaltException(
-                HaltException(Some(504), None, Map.empty, "Gateway timeout"))
+              HaltException(Some(504), None, Map.empty, "Gateway timeout"))
             event.getAsyncContext.complete()
           }
         }

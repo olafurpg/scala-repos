@@ -19,7 +19,12 @@ package com.twitter.summingbird.online
 import com.twitter.util.{Await, Duration, Future, Try}
 
 import java.util.{Queue => JQueue}
-import java.util.concurrent.{ArrayBlockingQueue, BlockingQueue, LinkedBlockingQueue, TimeUnit}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  BlockingQueue,
+  LinkedBlockingQueue,
+  TimeUnit
+}
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 

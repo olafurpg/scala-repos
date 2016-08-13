@@ -18,15 +18,15 @@ case class OptimizeImportSettings(addFullQualifiedImports: Boolean,
 
   private def this(s: ScalaCodeStyleSettings) {
     this(
-        s.isAddFullQualifiedImports,
-        s.isDoNotChangeLocalImportsOnOptimize,
-        s.isSortImports,
-        s.isCollectImports,
-        s.REPLACE_CASE_ARROW_WITH_UNICODE_CHAR,
-        s.SPACES_IN_IMPORTS,
-        s.getClassCountToUseImportOnDemand,
-        s.getImportLayout,
-        s.isAlwaysUsedImport
+      s.isAddFullQualifiedImports,
+      s.isDoNotChangeLocalImportsOnOptimize,
+      s.isSortImports,
+      s.isCollectImports,
+      s.REPLACE_CASE_ARROW_WITH_UNICODE_CHAR,
+      s.SPACES_IN_IMPORTS,
+      s.getClassCountToUseImportOnDemand,
+      s.getImportLayout,
+      s.isAlwaysUsedImport
     )
   }
 }

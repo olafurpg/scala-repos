@@ -12,7 +12,7 @@ trait Parser {
 trait ScalaParserAutoEdit extends Parser {
   type Node <: NodeImpl;
   implicit def coerce(node: NodeImpl) = node.self;
-  trait NodeImpl extends super [Parser].NodeImpl {
+  trait NodeImpl extends super[Parser].NodeImpl {
     def self: Node;
     def foo = {
       var link: Link = null;

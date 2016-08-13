@@ -17,7 +17,9 @@ import java.util.concurrent.TimeoutException
 import akka.util.Timeout
 
 class ActivationIntegrationTest
-    extends WordSpec with Matchers with SharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with SharedCamelSystem {
   val timeoutDuration = 10 seconds
   implicit val timeout = Timeout(timeoutDuration)
   def template: ProducerTemplate = camel.template
@@ -25,10 +27,11 @@ class ActivationIntegrationTest
 
   "ActivationAware should be notified when endpoint is activated" in {
     val latch = new TestLatch(0)
-    val actor = system.actorOf(
-        Props(new TestConsumer("direct:actor-1", latch)), "act-direct-actor-1")
+    val actor =
+      system.actorOf(Props(new TestConsumer("direct:actor-1", latch)),
+                     "act-direct-actor-1")
     Await.result(camel.activationFutureFor(actor), 10 seconds) should ===(
-        actor)
+      actor)
 
     template.requestBody("direct:actor-1", "test") should ===("received test")
   }
@@ -62,8 +65,9 @@ class ActivationIntegrationTest
 
   "activationFutureFor must fail if notification timeout is too short and activation is not complete yet" in {
     val latch = new TestLatch(1)
-    val actor = system.actorOf(
-        Props(new TestConsumer("direct:actor-4", latch)), "direct-actor-4")
+    val actor =
+      system.actorOf(Props(new TestConsumer("direct:actor-4", latch)),
+                     "direct-actor-4")
     intercept[TimeoutException] {
       Await.result(camel.activationFutureFor(actor), 1 millis)
     }

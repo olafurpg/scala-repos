@@ -26,7 +26,10 @@ import org.scalactic.Constraint
   * Helper class for writing tests for typed Actors with ScalaTest.
   */
 class TypedSpec(config: Config)
-    extends Spec with Matchers with BeforeAndAfterAll with ScalaFutures
+    extends Spec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures
     with ConversionCheckedTripleEquals {
   import TypedSpec._
   import AskPattern._
@@ -34,9 +37,9 @@ class TypedSpec(config: Config)
   def this() = this(ConfigFactory.empty)
 
   implicit val system = ActorSystem(
-      AkkaSpec.getCallerName(classOf[TypedSpec]),
-      Props(guardian()),
-      Some(config withFallback AkkaSpec.testConf))
+    AkkaSpec.getCallerName(classOf[TypedSpec]),
+    Props(guardian()),
+    Some(config withFallback AkkaSpec.testConf))
 
   implicit val timeout = Timeout(1.minute)
   implicit val patience = PatienceConfig(3.seconds)
@@ -50,15 +53,15 @@ class TypedSpec(config: Config)
   def await[T](f: Future[T]): T =
     Await.result(f, 60.seconds.dilated(system.untyped))
 
-  val blackhole = await(
-      system ? Create(Props(ScalaDSL.Full[Any] { case _ ⇒ ScalaDSL.Same }),
-                      "blackhole"))
+  val blackhole = await(system ? Create(Props(ScalaDSL.Full[Any] {
+    case _ ⇒ ScalaDSL.Same
+  }), "blackhole"))
 
   /**
     * Run an Actor-based test. The test procedure is most conveniently
     * formulated using the [[StepWise$]] behavior type.
     */
-  def runTest[T : ClassTag](name: String)(
+  def runTest[T: ClassTag](name: String)(
       behavior: Behavior[T]): Future[Status] =
     system ? (RunTest(name, Props(behavior), _, timeout.duration))
 
@@ -76,7 +79,7 @@ class TypedSpec(config: Config)
     }
   }
 
-  def muteExpectedException[T <: Exception : ClassTag](
+  def muteExpectedException[T <: Exception: ClassTag](
       message: String = null,
       source: String = null,
       start: String = "",
@@ -92,7 +95,7 @@ class TypedSpec(config: Config)
     */
   def assertEmpty(inboxes: Inbox.SyncInbox[_]*): Unit = {
     inboxes foreach
-    (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
+      (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
   }
 
   // for ScalaTest === compare of Class objects
@@ -101,8 +104,8 @@ class TypedSpec(config: Config)
       def areEqual(a: Class[A], b: Class[B]) = a == b
     }
 
-  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]: Constraint[
-      Set[A], T] =
+  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]
+    : Constraint[Set[A], T] =
     new Constraint[Set[A], T] {
       def areEqual(a: Set[A], b: T) = a == b
     }

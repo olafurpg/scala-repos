@@ -102,13 +102,14 @@ object Menu extends DispatchSnippet {
     val innerTag: String = S.attr("inner_tag") openOr "li"
     val expandAll = (S.attr("expandAll") or S.attr("expandall")).isDefined
     val linkToSelf: Boolean =
-      (S.attr("linkToSelf") or S.attr("linktoself")).map(Helpers.toBoolean) openOr false
+      (S.attr("linkToSelf") or S.attr("linktoself"))
+        .map(Helpers.toBoolean) openOr false
 
     val expandAny: Boolean =
       S.attr("expand").map(Helpers.toBoolean) openOr true
 
-    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield
-      i
+    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs))
+      yield i
 
     val toRender: Seq[MenuItem] = (S.attr("item"), S.attr("group")) match {
       case (Full(item), _) =>
@@ -150,66 +151,68 @@ object Menu extends DispatchSnippet {
 
             case m @ MenuItem(text, uri, kids, _, _, _) if m.placeholder_? =>
               Helpers.addCssClass(
-                  i.cssClass,
-                  Elem(null,
-                       innerTag,
-                       Null,
-                       TopScope,
-                       true,
-                       // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
-                       <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
+                i.cssClass,
+                Elem(
+                  null,
+                  innerTag,
+                  Null,
+                  TopScope,
+                  true,
+                  // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
+                  <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
                   (if (m.path)
-                     S.prefixedAttrsToMetaData("li_path", liMap) else Null) %
+                    S.prefixedAttrsToMetaData("li_path", liMap)
+                  else Null) %
                   (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
-                   else Null))
+                  else Null))
 
             case MenuItem(text, uri, kids, true, _, _) if linkToSelf =>
               Helpers.addCssClass(
-                  i.cssClass,
-                  Elem(
-                      null,
-                      innerTag,
-                      Null,
-                      TopScope,
-                      true,
-                      <xml:group> <a href={uri}>{text}</a>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
-                    .prefixedAttrsToMetaData("li_item", liMap))
+                i.cssClass,
+                Elem(
+                  null,
+                  innerTag,
+                  Null,
+                  TopScope,
+                  true,
+                  <xml:group> <a href={uri}>{text}</a>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
+                  .prefixedAttrsToMetaData("li_item", liMap))
 
             case MenuItem(text, uri, kids, true, _, _) =>
               Helpers.addCssClass(
-                  i.cssClass,
-                  Elem(
-                      null,
-                      innerTag,
-                      Null,
-                      TopScope,
-                      true,
-                      <xml:group> <span>{text}</span>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
-                    .prefixedAttrsToMetaData("li_item", liMap))
+                i.cssClass,
+                Elem(
+                  null,
+                  innerTag,
+                  Null,
+                  TopScope,
+                  true,
+                  <xml:group> <span>{text}</span>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
+                  .prefixedAttrsToMetaData("li_item", liMap))
 
             // Not current, but on the path, so we need to expand children to show the current one
             case MenuItem(text, uri, kids, _, true, _) =>
               Helpers.addCssClass(
-                  i.cssClass,
-                  Elem(
-                      null,
-                      innerTag,
-                      Null,
-                      TopScope,
-                      true,
-                      <xml:group> <a href={uri}>{text}</a>{buildUlLine(kids)}</xml:group>) % S
-                    .prefixedAttrsToMetaData("li_path", liMap))
+                i.cssClass,
+                Elem(
+                  null,
+                  innerTag,
+                  Null,
+                  TopScope,
+                  true,
+                  <xml:group> <a href={uri}>{text}</a>{buildUlLine(kids)}</xml:group>) % S
+                  .prefixedAttrsToMetaData("li_path", liMap))
 
             case MenuItem(text, uri, kids, _, _, _) =>
               Helpers.addCssClass(
-                  i.cssClass,
-                  Elem(
-                      null,
-                      innerTag,
-                      Null,
-                      TopScope,
-                      true,
-                      <xml:group> <a href={uri}>{text}</a>{ifExpandAll(buildUlLine(kids))}</xml:group>) % li)
+                i.cssClass,
+                Elem(
+                  null,
+                  innerTag,
+                  Null,
+                  TopScope,
+                  true,
+                  <xml:group> <a href={uri}>{text}</a>{ifExpandAll(buildUlLine(kids))}</xml:group>) % li)
           }
         }
 
@@ -260,9 +263,9 @@ object Menu extends DispatchSnippet {
 
   private def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-       for { sm <- LiftRules.siteMap; req <- S.request } yield
-         sm.buildMenu(req.location).lines
-     else S.request.map(_.buildMenu.lines)) openOr Nil
+      for { sm <- LiftRules.siteMap; req <- S.request } yield
+        sm.buildMenu(req.location).lines
+    else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def jsonMenu(ignore: NodeSeq): NodeSeq = {
     val toRender = renderWhat(true)
@@ -282,8 +285,8 @@ object Menu extends DispatchSnippet {
       JsArray(in.map(buildItem): _*)
 
     Script(
-        JsCrVar(S.attr("var") openOr "lift_menu",
-                JsObj("menu" -> buildItems(toRender))))
+      JsCrVar(S.attr("var") openOr "lift_menu",
+              JsObj("menu" -> buildItems(toRender))))
   }
 
   /**
@@ -313,29 +316,29 @@ object Menu extends DispatchSnippet {
     */
   def title(text: NodeSeq): NodeSeq = {
     val r = for (request <- S.request;
-    loc <- request.location) yield loc.title
+                 loc <- request.location) yield loc.title
 
     text match {
       case TitleText(attrs, str) => {
-          r.map { rt =>
-            {
-              val rts = rt.text
-              val idx = str.indexOf("%*%")
-              val bodyStr =
-                if (idx >= 0) {
-                  str.substring(0, idx) + rts + str.substring(idx + 3)
-                } else {
-                  str + " " + rts
-                }
+        r.map { rt =>
+          {
+            val rts = rt.text
+            val idx = str.indexOf("%*%")
+            val bodyStr =
+              if (idx >= 0) {
+                str.substring(0, idx) + rts + str.substring(idx + 3)
+              } else {
+                str + " " + rts
+              }
 
-              <title>{bodyStr}</title> % attrs
-            }
-          } openOr text
-        }
+            <title>{bodyStr}</title> % attrs
+          }
+        } openOr text
+      }
 
       case _ => {
-          r openOr Text("")
-        }
+        r openOr Text("")
+      }
     }
   }
 
@@ -465,14 +468,15 @@ object Menu extends DispatchSnippet {
   def item(_text: NodeSeq): NodeSeq = {
     val donthide = S.attr("donthide").map(Helpers.toBoolean) openOr false
     val linkToSelf =
-      (S.attr("linkToSelf") or S.attr("linktoself")).map(Helpers.toBoolean) openOr false
+      (S.attr("linkToSelf") or S.attr("linktoself"))
+        .map(Helpers.toBoolean) openOr false
 
     val text = ("a" #>
-        ((n: NodeSeq) =>
-              n match {
-                case e: Elem => e.child
-                case xs => xs
-            })).apply(_text)
+      ((n: NodeSeq) =>
+         n match {
+           case e: Elem => e.child
+           case xs => xs
+         })).apply(_text)
 
     for {
       name <- S.attr("name").toList
@@ -481,8 +485,7 @@ object Menu extends DispatchSnippet {
 
       // Builds a link for the given loc
       def buildLink[T](loc: Loc[T]) = {
-        Group(
-            SiteMap.buildLink(name, text) match {
+        Group(SiteMap.buildLink(name, text) match {
           case e: Elem =>
             Helpers.addCssClass(loc.cssClassForMenuItem,
                                 e % S.prefixedAttrsToMetaData("a"))
@@ -494,33 +497,33 @@ object Menu extends DispatchSnippet {
        S.attr("param"),
        SiteMap.findAndTestLoc(name)) match {
         case (_, Full(param), Full(loc: Loc[_] with ConvertableLoc[_])) => {
-            val typedLoc = loc.asInstanceOf[Loc[T] with ConvertableLoc[T]]
+          val typedLoc = loc.asInstanceOf[Loc[T] with ConvertableLoc[T]]
 
-            (for {
-              pv <- typedLoc.convert(param)
-              link <- typedLoc.createLink(pv)
-            } yield {
-              Helpers.addCssClass(
-                  typedLoc.cssClassForMenuItem,
-                  <a href={link}></a> % S.prefixedAttrsToMetaData("a"))
-            }) openOr {
-              Text("")
-            }
+          (for {
+            pv <- typedLoc.convert(param)
+            link <- typedLoc.createLink(pv)
+          } yield {
+            Helpers.addCssClass(
+              typedLoc.cssClassForMenuItem,
+              <a href={link}></a> % S.prefixedAttrsToMetaData("a"))
+          }) openOr {
+            Text("")
           }
+        }
 
         case (Full(loc), _, _) if loc.name == name => {
-            (linkToSelf, donthide) match {
-              case (true, _) => buildLink(loc)
-              case (_, true) => {
-                  if (!text.isEmpty) {
-                    Group(text)
-                  } else {
-                    Group(loc.linkText openOr Text(loc.name))
-                  }
-                }
-              case _ => Text("")
+          (linkToSelf, donthide) match {
+            case (true, _) => buildLink(loc)
+            case (_, true) => {
+              if (!text.isEmpty) {
+                Group(text)
+              } else {
+                Group(loc.linkText openOr Text(loc.name))
+              }
             }
+            case _ => Text("")
           }
+        }
 
         case (Full(loc), _, _) => buildLink(loc)
 

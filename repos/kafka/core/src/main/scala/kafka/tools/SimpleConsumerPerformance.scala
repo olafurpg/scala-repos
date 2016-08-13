@@ -18,7 +18,11 @@ package kafka.tools
 
 import java.net.URI
 import java.text.SimpleDateFormat
-import kafka.api.{PartitionOffsetRequestInfo, FetchRequestBuilder, OffsetRequest}
+import kafka.api.{
+  PartitionOffsetRequestInfo,
+  FetchRequestBuilder,
+  OffsetRequest
+}
 import kafka.consumer.SimpleConsumer
 import kafka.utils._
 import org.apache.log4j.Logger
@@ -38,10 +42,10 @@ object SimpleConsumerPerformance {
     if (!config.hideHeader) {
       if (!config.showDetailedStats)
         println(
-            "start.time, end.time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
+          "start.time, end.time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
       else
         println(
-            "time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
+          "time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
     }
 
     val consumer = new SimpleConsumer(config.url.getHost,
@@ -53,12 +57,13 @@ object SimpleConsumerPerformance {
     // reset to latest or smallest offset
     val topicAndPartition = TopicAndPartition(config.topic, config.partition)
     val request = OffsetRequest(
-        Map(
-            topicAndPartition -> PartitionOffsetRequestInfo(
-                if (config.fromLatest)
-                  OffsetRequest.LatestTime else OffsetRequest.EarliestTime,
-                1)
-        ))
+      Map(
+        topicAndPartition -> PartitionOffsetRequestInfo(
+          if (config.fromLatest)
+            OffsetRequest.LatestTime
+          else OffsetRequest.EarliestTime,
+          1)
+      ))
     var offset: Long = consumer
       .getOffsetsBefore(request)
       .partitionErrorAndOffsets(topicAndPartition)
@@ -106,13 +111,13 @@ object SimpleConsumerPerformance {
           val totalMBRead =
             ((totalBytesRead - lastBytesRead) * 1.0) / (1024 * 1024)
           println(
-              ("%s, %d, %.4f, %.4f, %d, %.4f").format(
-                  config.dateFormat.format(reportTime),
-                  config.fetchSize,
-                  (totalBytesRead * 1.0) / (1024 * 1024),
-                  totalMBRead / elapsed,
-                  totalMessagesRead,
-                  (totalMessagesRead - lastMessagesRead) / elapsed))
+            ("%s, %d, %.4f, %.4f, %d, %.4f").format(
+              config.dateFormat.format(reportTime),
+              config.fetchSize,
+              (totalBytesRead * 1.0) / (1024 * 1024),
+              totalMBRead / elapsed,
+              totalMessagesRead,
+              (totalMessagesRead - lastMessagesRead) / elapsed))
         }
         lastReportTime = SystemTime.milliseconds
         lastBytesRead = totalBytesRead
@@ -126,14 +131,14 @@ object SimpleConsumerPerformance {
     if (!config.showDetailedStats) {
       val totalMBRead = (totalBytesRead * 1.0) / (1024 * 1024)
       println(
-          ("%s, %s, %d, %.4f, %.4f, %d, %.4f").format(
-              config.dateFormat.format(startMs),
-              config.dateFormat.format(reportTime),
-              config.fetchSize,
-              totalMBRead,
-              totalMBRead / elapsed,
-              totalMessagesRead,
-              totalMessagesRead / elapsed))
+        ("%s, %s, %d, %.4f, %.4f, %d, %.4f").format(
+          config.dateFormat.format(startMs),
+          config.dateFormat.format(reportTime),
+          config.fetchSize,
+          totalMBRead,
+          totalMBRead / elapsed,
+          totalMessagesRead,
+          totalMessagesRead / elapsed))
     }
     System.exit(0)
   }
@@ -150,8 +155,8 @@ object SimpleConsumerPerformance {
       .describedAs("topic")
       .ofType(classOf[String])
     val resetBeginningOffsetOpt = parser.accepts(
-        "from-latest",
-        "If the consumer does not already have an established " +
+      "from-latest",
+      "If the consumer does not already have an established " +
         "offset to consume from, start with the latest message present in the log rather than the earliest message.")
     val partitionOpt = parser
       .accepts("partition", "The topic partition to consume from.")
@@ -175,8 +180,8 @@ object SimpleConsumerPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, topicOpt, urlOpt, numMessagesOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, topicOpt, urlOpt, numMessagesOpt)
 
     val url = new URI(options.valueOf(urlOpt))
     val fetchSize = options.valueOf(fetchSizeOpt).intValue

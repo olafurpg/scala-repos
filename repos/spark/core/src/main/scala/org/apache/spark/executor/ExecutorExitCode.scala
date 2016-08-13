@@ -62,11 +62,11 @@ private[spark] object ExecutorExitCode {
         "Unable to send heartbeats to driver."
       case _ =>
         "Unknown executor exit code (" + exitCode + ")" +
-        (if (exitCode > 128) {
-           " (died from signal " + (exitCode - 128) + "?)"
-         } else {
-           ""
-         })
+          (if (exitCode > 128) {
+            " (died from signal " + (exitCode - 128) + "?)"
+          } else {
+            ""
+          })
     }
   }
 }

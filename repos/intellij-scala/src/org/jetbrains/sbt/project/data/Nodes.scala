@@ -18,10 +18,10 @@ class ProjectNode(val data: ProjectData) extends Node[ProjectData] {
            ideProjectFileDirectoryPath: String,
            linkedExternalProjectPath: String) {
     this(
-        new ProjectData(SbtProjectSystem.Id,
-                        name,
-                        ideProjectFileDirectoryPath,
-                        linkedExternalProjectPath))
+      new ProjectData(SbtProjectSystem.Id,
+                      name,
+                      ideProjectFileDirectoryPath,
+                      linkedExternalProjectPath))
   }
 
   protected def key = ProjectKeys.PROJECT
@@ -34,12 +34,12 @@ class ModuleNode(val data: ModuleData) extends Node[ModuleData] {
            moduleFileDirectoryPath: String,
            externalConfigPath: String) {
     this(
-        new ModuleData(id,
-                       SbtProjectSystem.Id,
-                       typeId,
-                       name,
-                       moduleFileDirectoryPath,
-                       externalConfigPath))
+      new ModuleData(id,
+                     SbtProjectSystem.Id,
+                     typeId,
+                     name,
+                     moduleFileDirectoryPath,
+                     externalConfigPath))
   }
 
   protected def key = ProjectKeys.MODULE
@@ -81,8 +81,9 @@ class ModuleDependencyNode(val data: ModuleDependencyData)
 
 class LibraryDependencyNode(val data: LibraryDependencyData)
     extends Node[LibraryDependencyData] {
-  def this(
-      ownerModule: ModuleData, library: LibraryData, level: LibraryLevel) {
+  def this(ownerModule: ModuleData,
+           library: LibraryData,
+           level: LibraryLevel) {
     this(new LibraryDependencyData(ownerModule, library, level))
   }
 
@@ -96,12 +97,12 @@ class SbtProjectNode(val data: SbtProjectData) extends Node[SbtProjectData] {
            sbtVersion: String,
            projectPath: String) {
     this(
-        new SbtProjectData(SbtProjectSystem.Id,
-                           basePackages,
-                           jdk,
-                           javacOptions,
-                           sbtVersion,
-                           projectPath))
+      new SbtProjectData(SbtProjectSystem.Id,
+                         basePackages,
+                         jdk,
+                         javacOptions,
+                         sbtVersion,
+                         projectPath))
   }
 
   protected def key = SbtProjectData.Key
@@ -114,12 +115,12 @@ class ModuleExtNode(val data: ModuleExtData) extends Node[ModuleExtData] {
            jdk: Option[Sdk],
            javacOptions: Seq[String]) {
     this(
-        new ModuleExtData(SbtProjectSystem.Id,
-                          scalaVersion,
-                          scalacClasspath,
-                          scalacOptions,
-                          jdk,
-                          javacOptions))
+      new ModuleExtData(SbtProjectSystem.Id,
+                        scalaVersion,
+                        scalacClasspath,
+                        scalacOptions,
+                        jdk,
+                        javacOptions))
   }
 
   protected def key = ModuleExtData.Key
@@ -137,16 +138,16 @@ class AndroidFacetNode(val data: AndroidFacetData)
            isLibrary: Boolean,
            proguardConfig: Seq[String]) {
     this(
-        new AndroidFacetData(SbtProjectSystem.Id,
-                             version,
-                             manifest,
-                             apk,
-                             res,
-                             assets,
-                             gen,
-                             libs,
-                             isLibrary,
-                             proguardConfig))
+      new AndroidFacetData(SbtProjectSystem.Id,
+                           version,
+                           manifest,
+                           apk,
+                           res,
+                           assets,
+                           gen,
+                           libs,
+                           isLibrary,
+                           proguardConfig))
   }
 
   protected def key = AndroidFacetData.Key

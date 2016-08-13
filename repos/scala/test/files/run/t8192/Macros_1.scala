@@ -13,7 +13,7 @@ object Macros {
         val internal =
           c.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
         internal.definitions.fullyInitializeSymbol(
-            sym.asInstanceOf[internal.Symbol])
+          sym.asInstanceOf[internal.Symbol])
       }
       def defString(sym: Symbol): String = {
         val internal =

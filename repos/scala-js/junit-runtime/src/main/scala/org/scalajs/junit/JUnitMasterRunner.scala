@@ -25,7 +25,7 @@ final class JUnitMasterRunner(args: Array[String],
 
     if (slaves > 0)
       throw new IllegalStateException(
-          s"There are still $slaves slaves running")
+        s"There are still $slaves slaves running")
 
     if (registered != done) {
       val msg = s"$registered task(s) were registered, $done were executed"

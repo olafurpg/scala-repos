@@ -147,7 +147,7 @@ trait Enum[F] extends Order[F] { self =>
       if (equal(a, z)) return_(a :: Nil)
       else
         suspend(
-            fromToLT(if (lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
+          fromToLT(if (lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
   }
 

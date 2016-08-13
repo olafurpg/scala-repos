@@ -36,17 +36,15 @@ class HBaseResultToStringConverter extends Converter[Any, String] {
   override def convert(obj: Any): String = {
     val result = obj.asInstanceOf[Result]
     val output = result.listCells.asScala.map(
-        cell =>
-          Map(
-              "row" -> Bytes.toStringBinary(CellUtil.cloneRow(cell)),
-              "columnFamily" -> Bytes.toStringBinary(
-                  CellUtil.cloneFamily(cell)),
-              "qualifier" -> Bytes.toStringBinary(
-                  CellUtil.cloneQualifier(cell)),
-              "timestamp" -> cell.getTimestamp.toString,
-              "type" -> Type.codeToType(cell.getTypeByte).toString,
-              "value" -> Bytes.toStringBinary(CellUtil.cloneValue(cell))
-        ))
+      cell =>
+        Map(
+          "row" -> Bytes.toStringBinary(CellUtil.cloneRow(cell)),
+          "columnFamily" -> Bytes.toStringBinary(CellUtil.cloneFamily(cell)),
+          "qualifier" -> Bytes.toStringBinary(CellUtil.cloneQualifier(cell)),
+          "timestamp" -> cell.getTimestamp.toString,
+          "type" -> Type.codeToType(cell.getTypeByte).toString,
+          "value" -> Bytes.toStringBinary(CellUtil.cloneValue(cell))
+      ))
     output.map(JSONObject(_).toString()).mkString("\n")
   }
 }

@@ -49,8 +49,9 @@ object Test extends App {
         val prog = p.replaceAll("[^\\+\\-\\[\\]\\.\\,\\>\\<]", "")
 
         @tailrec
-        def braceMatcher(
-            pos: Int, stack: List[Int], o2c: Map[Int, Int]): Map[Int, Int] =
+        def braceMatcher(pos: Int,
+                         stack: List[Int],
+                         o2c: Map[Int, Int]): Map[Int, Int] =
           if (pos == prog.length) o2c
           else
             (prog(pos): @switch) match {

@@ -23,14 +23,14 @@ case class PerfStat(_id: String, // userId/perfId
     else {
       val thisYear = pov.game.createdAt isAfter DateTime.now.minusYears(1)
       copy(
-          highest = RatingAt.agg(highest, pov, 1),
-          lowest = thisYear.fold(RatingAt.agg(lowest, pov, -1), lowest),
-          bestWins = (~pov.win).fold(bestWins.agg(pov, -1), bestWins),
-          worstLosses = (thisYear &&
-                ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
-          count = count(pov),
-          resultStreak = resultStreak agg pov,
-          playStreak = playStreak agg pov
+        highest = RatingAt.agg(highest, pov, 1),
+        lowest = thisYear.fold(RatingAt.agg(lowest, pov, -1), lowest),
+        bestWins = (~pov.win).fold(bestWins.agg(pov, -1), bestWins),
+        worstLosses = (thisYear &&
+          ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
+        count = count(pov),
+        resultStreak = resultStreak agg pov,
+        playStreak = playStreak agg pov
       )
     }
 }
@@ -40,17 +40,17 @@ object PerfStat {
   def makeId(userId: String, perfType: PerfType) = s"$userId/${perfType.id}"
 
   def init(userId: String, perfType: PerfType) = PerfStat(
-      _id = makeId(userId, perfType),
-      userId = UserId(userId),
-      perfType = perfType,
-      highest = none,
-      lowest = none,
-      bestWins = Results(Nil),
-      worstLosses = Results(Nil),
-      count = Count.init,
-      resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
-      playStreak = PlayStreak(
-            nb = Streaks.init, time = Streaks.init, lastDate = none)
+    _id = makeId(userId, perfType),
+    userId = UserId(userId),
+    perfType = perfType,
+    highest = none,
+    lowest = none,
+    bestWins = Results(Nil),
+    worstLosses = Results(Nil),
+    count = Count.init,
+    resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
+    playStreak =
+      PlayStreak(nb = Streaks.init, time = Streaks.init, lastDate = none)
   )
 }
 
@@ -81,7 +81,7 @@ object PlayStreak {
 case class Streaks(cur: Streak, max: Streak) {
   def apply(cont: Boolean, pov: Pov)(v: Int) =
     copy(
-        cur = cur(cont, pov)(v)
+      cur = cur(cont, pov)(v)
     ).setMax
   def reset = copy(cur = Streak.init)
   private def setMax = copy(max = if (cur.v >= max.v) cur else max)
@@ -125,10 +125,10 @@ case class Count(all: Int,
          berserk = berserk + pov.player.berserk.fold(1, 0),
          opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
          seconds = seconds +
-           (pov.game.durationSeconds match {
-               case s if s > 3 * 60 * 60 => 0
-               case s => s
-             }),
+             (pov.game.durationSeconds match {
+             case s if s > 3 * 60 * 60 => 0
+             case s => s
+           }),
          disconnects = disconnects + {
            ~pov.loss && pov.game.status == chess.Status.Timeout
          }.fold(1, 0))
@@ -168,12 +168,12 @@ case class Results(results: List[Result]) {
   def agg(pov: Pov, comp: Int) =
     pov.opponent.rating.ifTrue(pov.game.rated).fold(this) { opInt =>
       copy(
-          results = (Result(
-                    opInt,
-                    UserId(~pov.opponent.userId),
-                    pov.game.updatedAtOrCreatedAt,
-                    pov.game.id
-                ) :: results).sortBy(_.opInt * comp) take Results.nb)
+        results = (Result(
+            opInt,
+            UserId(~pov.opponent.userId),
+            pov.game.updatedAtOrCreatedAt,
+            pov.game.id
+          ) :: results).sortBy(_.opInt * comp) take Results.nb)
     }
 }
 object Results {

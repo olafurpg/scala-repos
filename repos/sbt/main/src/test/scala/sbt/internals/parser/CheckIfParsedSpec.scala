@@ -3,7 +3,8 @@ package sbt.internals.parser
 import sbt.EvaluateConfigurations
 
 abstract class CheckIfParsedSpec(
-    implicit val splitter: SplitExpressions.SplitExpression = EvaluateConfigurations.splitExpressions)
+    implicit val splitter: SplitExpressions.SplitExpression =
+      EvaluateConfigurations.splitExpressions)
     extends AbstractSpec {
 
   this.getClass.getName should {
@@ -14,11 +15,11 @@ abstract class CheckIfParsedSpec(
           println(s"""${getClass.getSimpleName}: "$description" """)
           val (imports, statements) = split(content)
           statements.nonEmpty must be_==(nonEmptyStatements).setMessage(
-              s"""$description
+            s"""$description
                                  |***${shouldContains(nonEmptyStatements)} statements***
                                  |$content """.stripMargin)
           imports.nonEmpty must be_==(nonEmptyImports).setMessage(
-              s"""$description
+            s"""$description
                                |***${shouldContains(nonEmptyImports)} imports***
                                |$content """.stripMargin)
       }

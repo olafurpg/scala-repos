@@ -26,10 +26,10 @@ object DataTypeTestUtils {
     * Instances of all [[IntegralType]]s.
     */
   val integralType: Set[IntegralType] = Set(
-      ByteType,
-      ShortType,
-      IntegerType,
-      LongType
+    ByteType,
+    ShortType,
+    IntegerType,
+    LongType
   )
 
   /**
@@ -37,11 +37,11 @@ object DataTypeTestUtils {
     * decimal types.
     */
   val fractionalTypes: Set[FractionalType] = Set(
-      DecimalType.USER_DEFAULT,
-      DecimalType(20, 5),
-      DecimalType.SYSTEM_DEFAULT,
-      DoubleType,
-      FloatType
+    DecimalType.USER_DEFAULT,
+    DecimalType(20, 5),
+    DecimalType.SYSTEM_DEFAULT,
+    DoubleType,
+    FloatType
   )
 
   /**
@@ -64,7 +64,7 @@ object DataTypeTestUtils {
     */
   val ordered: Set[DataType] =
     numericTypeWithoutDecimal + BooleanType + TimestampType + DateType +
-    StringType + BinaryType
+      StringType + BinaryType
 
   /**
     * All the types that we can use in a property check
@@ -76,11 +76,11 @@ object DataTypeTestUtils {
     */
   val atomicTypes: Set[DataType] =
     numericTypes ++ Set(
-        BinaryType,
-        BooleanType,
-        DateType,
-        StringType,
-        TimestampType
+      BinaryType,
+      BooleanType,
+      DateType,
+      StringType,
+      TimestampType
     )
 
   /**

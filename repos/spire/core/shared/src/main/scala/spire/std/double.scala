@@ -118,7 +118,9 @@ trait DoubleIsSigned extends Signed[Double] {
 }
 
 trait DoubleIsReal
-    extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
+    extends IsRational[Double]
+    with DoubleOrder
+    with DoubleIsSigned {
   def toDouble(x: Double): Double = x
   def ceil(a: Double): Double = Math.ceil(a)
   def floor(a: Double): Double = Math.floor(a)
@@ -129,15 +131,22 @@ trait DoubleIsReal
 
 @SerialVersionUID(0L)
 class DoubleAlgebra
-    extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig
-    with DoubleIsReal with Serializable
+    extends DoubleIsField
+    with DoubleIsNRoot
+    with DoubleIsTrig
+    with DoubleIsReal
+    with Serializable
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag._
-  implicit final val DoubleTag = new BuiltinFloatTag(
-      0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+  implicit final val DoubleTag = new BuiltinFloatTag(0D,
+                                                     MinValue,
+                                                     MaxValue,
+                                                     NaN,
+                                                     PositiveInfinity,
+                                                     NegativeInfinity) {
     def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
     def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
   }

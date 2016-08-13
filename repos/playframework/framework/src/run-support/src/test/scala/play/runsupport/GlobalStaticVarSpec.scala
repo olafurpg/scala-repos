@@ -34,7 +34,7 @@ class GlobalStaticVarSpec extends Specification {
         val classLoader = this.getClass.getClassLoader
         GlobalStaticVar.set("classLoader", classLoader)
         GlobalStaticVar.get[ClassLoader]("classLoader") must beSome(
-            classLoader)
+          classLoader)
       } finally {
         GlobalStaticVar.remove("classLoader")
       }

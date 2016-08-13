@@ -61,7 +61,8 @@ import org.saddle.index.{IndexIntRange, Slice}
   * @tparam A Type of elements within the Mat
   */
 trait Mat[@spec(Boolean, Int, Long, Double) A]
-    extends NumericOps[Mat[A]] with Serializable {
+    extends NumericOps[Mat[A]]
+    with Serializable {
   def scalarTag: ScalarTag[A]
 
   /**
@@ -175,7 +176,7 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
   /**
     * Maps a function over each element in the matrix
     */
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: A => B): Mat[B]
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: A => B): Mat[B]
 
   /**
     * Changes the shape of matrix without changing the underlying data
@@ -362,8 +363,8 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     */
   def mult[B](m: Mat[B])(implicit evA: NUM[A], evB: NUM[B]): Mat[Double] = {
     if (numCols != m.numRows) {
-      val errMsg = "Cannot multiply (%d %d) x (%d %d)".format(
-          numRows, numCols, m.numRows, m.numCols)
+      val errMsg = "Cannot multiply (%d %d) x (%d %d)"
+        .format(numRows, numCols, m.numRows, m.numCols)
       throw new IllegalArgumentException(errMsg)
     }
 
@@ -443,11 +444,10 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     // function to build a row
     def createRow(r: Int) = {
       val buf = new StringBuilder()
-      val strFn = (col: Int) =>
-        {
-          val l = lenMap(col)
-          "%" + { if (l > 0) l else 1 } + "s " format scalarTag.show(
-              apply(r, col))
+      val strFn = (col: Int) => {
+        val l = lenMap(col)
+        "%" + { if (l > 0) l else 1 } + "s " format scalarTag.show(
+          apply(r, col))
       }
       buf.append(util.buildStr(ncols, numCols, strFn))
       buf.append("\n")
@@ -465,8 +465,9 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     * Pretty-printer for Mat, which simply outputs the result of stringify.
     * @param nrows Number of elements to display
     */
-  def print(
-      nrows: Int = 8, ncols: Int = 8, stream: OutputStream = System.out) {
+  def print(nrows: Int = 8,
+            ncols: Int = 8,
+            stream: OutputStream = System.out) {
     stream.write(stringify(nrows, ncols).getBytes)
   }
 
@@ -480,13 +481,13 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
   override def equals(o: Any): Boolean = o match {
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+        this.numCols == rv.numCols && {
         var i = 0
         var eq = true
         while (eq && i < length) {
           eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
-              rv.scalarTag.isMissing(rv(i)))
+            (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+            rv.scalarTag.isMissing(rv(i)))
           i += 1
         }
         eq
@@ -516,13 +517,13 @@ object Mat extends BinOpMat {
     * @param m Mat instance
     * @tparam T The type of elements in Mat
     */
-  implicit def matToFrame[T : ST](m: Mat[T]) = Frame(m)
+  implicit def matToFrame[T: ST](m: Mat[T]) = Frame(m)
 
   /**
     * Factory method to create an empty Mat
     * @tparam T Type of Mat
     */
-  def empty[T : ST]: Mat[T] = apply(0, 0, Array.empty[T])
+  def empty[T: ST]: Mat[T] = apply(0, 0, Array.empty[T])
 
   /**
     * Factory method to create an zero Mat (all zeros)
@@ -530,7 +531,7 @@ object Mat extends BinOpMat {
     * @param numCols Number of cols in Mat
     * @tparam T Type of elements in Mat
     */
-  def apply[T : ST](numRows: Int, numCols: Int): Mat[T] =
+  def apply[T: ST](numRows: Int, numCols: Int): Mat[T] =
     apply(numRows, numCols, Array.ofDim[T](numRows * numCols))
 
   /**
@@ -539,7 +540,7 @@ object Mat extends BinOpMat {
     * @param values Array of arrays, each of which is to be a column
     * @tparam T Type of elements in inner array
     */
-  def apply[T : ST](values: Array[Array[T]]): Mat[T] =
+  def apply[T: ST](values: Array[Array[T]]): Mat[T] =
     implicitly[ST[T]].makeMat(values.map(Vec(_)))
 
   /**
@@ -548,7 +549,7 @@ object Mat extends BinOpMat {
     * @param values Array of Vec, each of which is to be a column
     * @tparam T Type of elements in Vec
     */
-  def apply[T : ST](values: Array[Vec[T]]): Mat[T] =
+  def apply[T: ST](values: Array[Vec[T]]): Mat[T] =
     implicitly[ST[T]].makeMat(values)
 
   /**
@@ -557,7 +558,7 @@ object Mat extends BinOpMat {
     * @param values Sequence of Vec, each of which is to be a column
     * @tparam T Type of elements in array
     */
-  def apply[T : ST](values: Vec[T]*): Mat[T] =
+  def apply[T: ST](values: Vec[T]*): Mat[T] =
     implicitly[ST[T]].makeMat(values.toArray)
 
   /**

@@ -18,7 +18,11 @@ package net.liftweb
 package mongodb
 
 import BsonDSL._
-import net.liftweb.util.{Helpers, ConnectionIdentifier, DefaultConnectionIdentifier}
+import net.liftweb.util.{
+  Helpers,
+  ConnectionIdentifier,
+  DefaultConnectionIdentifier
+}
 
 import java.util.{Calendar, Date, UUID}
 import java.util.regex.Pattern
@@ -84,8 +88,11 @@ package mongotestdocs {
    * _id as ObjectId.toString
    */
   case class TCInfo(x: Int, y: Int, uuid: UUID)
-  case class TstCollection(
-      _id: String, name: String, dbtype: String, count: Int, info: TCInfo)
+  case class TstCollection(_id: String,
+                           name: String,
+                           dbtype: String,
+                           count: Int,
+                           info: TCInfo)
       extends MongoDocument[TstCollection] {
 
     def meta = TstCollection
@@ -110,8 +117,10 @@ package mongotestdocs {
     createIndex(("i" -> -1), ("name" -> "i_ix1"))
   }
 
-  case class SessCollection(
-      _id: ObjectId, name: String, dbtype: String, count: Int)
+  case class SessCollection(_id: ObjectId,
+                            name: String,
+                            dbtype: String,
+                            count: Int)
       extends MongoDocument[SessCollection] {
 
     def meta = SessCollection
@@ -137,8 +146,7 @@ package mongotestdocs {
       booleanfield: Boolean,
       shortfield: Short,
       datefield: Date
-  )
-      extends MongoDocument[Primitive] {
+  ) extends MongoDocument[Primitive] {
 
     def meta = Primitive
   }
@@ -356,9 +364,8 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     checkMongoIsRunning
 
     // get the indexes
-    val ixs = MongoDB.useCollection(TstCollection.collectionName)(coll =>
-          {
-        coll.getIndexInfo
+    val ixs = MongoDB.useCollection(TstCollection.collectionName)(coll => {
+      coll.getIndexInfo
     })
 
     // unique index on name
@@ -515,54 +522,54 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     val tc3 = SessCollection(ObjectId.get, "MongoDB", "db", 1)
 
     // use a Mongo instance directly
-    MongoDB.use(db =>
-          {
+    MongoDB.use(db => {
 
-        // save to db
-        Helpers.tryo(SessCollection.save(tc, db)).toOption must beSome
-        SessCollection.save(tc2, db) must throwA[MongoException]
-        Helpers.tryo(SessCollection.save(tc2, db)) must beLike {
-          case Failure(msg, _, _) =>
-            msg must contain("E11000")
-        }
+      // save to db
+      Helpers.tryo(SessCollection.save(tc, db)).toOption must beSome
+      SessCollection.save(tc2, db) must throwA[MongoException]
+      Helpers.tryo(SessCollection.save(tc2, db)) must beLike {
+        case Failure(msg, _, _) =>
+          msg must contain("E11000")
+      }
 
-        Helpers.tryo(SessCollection.save(tc3, db)).toOption must beSome
+      Helpers.tryo(SessCollection.save(tc3, db)).toOption must beSome
 
-        // query for the docs by type
-        val qry = ("dbtype" -> "db")
-        SessCollection.findAll(qry).size must_== 2
+      // query for the docs by type
+      val qry = ("dbtype" -> "db")
+      SessCollection.findAll(qry).size must_== 2
 
-        // modifier operations $inc, $set, $push...
-        val o2 = ("$inc" -> ("count" -> 1)) // increment count by 1
-        SessCollection.update(qry, o2, db)
-        SessCollection.update(qry, o2, db, Multi)
+      // modifier operations $inc, $set, $push...
+      val o2 = ("$inc" -> ("count" -> 1)) // increment count by 1
+      SessCollection.update(qry, o2, db)
+      SessCollection.update(qry, o2, db, Multi)
 
-        // regex query example
-        val lst = SessCollection.findAll(
-            new BasicDBObject("name", Pattern.compile("^Mongo")))
-        lst.size must_== 2
+      // regex query example
+      val lst = SessCollection.findAll(
+        new BasicDBObject("name", Pattern.compile("^Mongo")))
+      lst.size must_== 2
 
-        // jobject query now also works
-        val lstjobj = SessCollection.findAll(
-            ("name" -> (("$regex" -> "^Mon") ~ ("$flags" -> 0))))
-        lstjobj.size must_== 2
+      // jobject query now also works
+      val lstjobj = SessCollection.findAll(
+        ("name" -> (("$regex" -> "^Mon") ~ ("$flags" -> 0))))
+      lstjobj.size must_== 2
 
-        // use regex and another clause
-        val lst2 = SessCollection.findAll(new BasicDBObject(
-                "name", Pattern.compile("^Mon")).append("count", 2))
-        lst2.size must_== 1
+      // use regex and another clause
+      val lst2 = SessCollection.findAll(
+        new BasicDBObject("name", Pattern.compile("^Mon")).append("count", 2))
+      lst2.size must_== 1
 
-        val lstjobj2 = SessCollection.findAll(("name" ->
-                (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
-        lstjobj2.size must_== 1
+      val lstjobj2 = SessCollection.findAll(
+        ("name" ->
+          (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
+      lstjobj2.size must_== 1
 
-        if (!debug) {
-          // delete them
-          SessCollection.delete(qry)
-          SessCollection.findAll.size must_== 0
+      if (!debug) {
+        // delete them
+        SessCollection.delete(qry)
+        SessCollection.findAll.size must_== 0
 
-          SessCollection.drop
-        }
+        SessCollection.drop
+      }
     })
 
     success
@@ -667,8 +674,8 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     checkMongoIsRunning
 
-    val pdoc1 = PatternDoc(
-        ObjectId.get, Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
+    val pdoc1 = PatternDoc(ObjectId.get,
+                           Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
     pdoc1.save
 
     PatternDoc.find(pdoc1._id) must beLike {

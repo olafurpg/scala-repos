@@ -30,7 +30,8 @@ trait GenericParTemplate[+A, +CC[X] <: ParIterable[X]]
   def companion: GenericCompanion[CC] with GenericParCompanion[CC]
 
   protected[this] override def newBuilder: scala.collection.mutable.Builder[
-      A, CC[A]] = newCombiner
+    A,
+    CC[A]] = newCombiner
 
   protected[this] override def newCombiner: Combiner[A, CC[A]] = {
     val cb = companion.newCombiner[A]

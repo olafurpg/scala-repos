@@ -8,7 +8,11 @@ package akka.cluster
 
 import java.io.Closeable
 import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
-import java.lang.management.{OperatingSystemMXBean, MemoryMXBean, ManagementFactory}
+import java.lang.management.{
+  OperatingSystemMXBean,
+  MemoryMXBean,
+  ManagementFactory
+}
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import scala.collection.immutable
@@ -41,7 +45,8 @@ import java.lang.management.MemoryUsage
   * [[akka.cluster.EWMA]] for exponential weighted moving average.
   */
 private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import InternalClusterAction._
   import ClusterEvent._
@@ -66,25 +71,26 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * The metrics collector that samples data on the node.
     */
   val collector: MetricsCollector = MetricsCollector(
-      context.system.asInstanceOf[ExtendedActorSystem], settings)
+    context.system.asInstanceOf[ExtendedActorSystem],
+    settings)
 
   /**
     * Start periodic gossip to random nodes in cluster
     */
   val gossipTask = scheduler.schedule(
-      PeriodicTasksInitialDelay max MetricsGossipInterval,
-      MetricsGossipInterval,
-      self,
-      GossipTick)
+    PeriodicTasksInitialDelay max MetricsGossipInterval,
+    MetricsGossipInterval,
+    self,
+    GossipTick)
 
   /**
     * Start periodic metrics collection
     */
   val metricsTask = scheduler.schedule(
-      PeriodicTasksInitialDelay max MetricsInterval,
-      MetricsInterval,
-      self,
-      MetricsTick)
+    PeriodicTasksInitialDelay max MetricsInterval,
+    MetricsInterval,
+    self,
+    MetricsTick)
 
   override def preStart(): Unit = {
     cluster.subscribe(self, classOf[MemberEvent], classOf[ReachabilityEvent])
@@ -230,7 +236,8 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
   def :+(newNodeMetrics: NodeMetrics): MetricsGossip =
     nodeMetricsFor(newNodeMetrics.address) match {
       case Some(existingNodeMetrics) ⇒
-        copy(nodes = nodes - existingNodeMetrics +
+        copy(
+          nodes = nodes - existingNodeMetrics +
               (existingNodeMetrics merge newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
@@ -248,8 +255,9 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
   * Envelope adding a sender address to the gossip.
   */
 @SerialVersionUID(1L)
-private[cluster] final case class MetricsGossipEnvelope(
-    from: Address, gossip: MetricsGossip, reply: Boolean)
+private[cluster] final case class MetricsGossipEnvelope(from: Address,
+                                                        gossip: MetricsGossip,
+                                                        reply: Boolean)
     extends ClusterMessage
 
 private[cluster] object EWMA {
@@ -268,8 +276,8 @@ private[cluster] object EWMA {
     * its original relevance. The initial relevance of a data sample is given by
     * 1 – 0.5 ^ (collect-interval / half-life).
     */
-  def alpha(
-      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double = {
+  def alpha(halfLife: FiniteDuration,
+            collectInterval: FiniteDuration): Double = {
     val halfLifeMillis = halfLife.toMillis
     require(halfLife.toMillis > 0, "halfLife must be > 0 s")
     val decayRate = LogOf2 / halfLifeMillis
@@ -328,10 +336,12 @@ private[cluster] final case class EWMA(value: Double, alpha: Double) {
   *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
   */
 @SerialVersionUID(1L)
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
-final case class Metric private[cluster](
-    name: String, value: Number, private[cluster] val average: Option[EWMA])
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
+final case class Metric private[cluster] (
+    name: String,
+    value: Number,
+    private[cluster] val average: Option[EWMA])
     extends MetricNumericConverter {
 
   require(defined(value), s"Invalid Metric [$name] value [$value]")
@@ -379,8 +389,8 @@ final case class Metric private[cluster](
 /**
   * Factory for creating valid Metric instances.
   */
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
 object Metric extends MetricNumericConverter {
 
   /**
@@ -405,8 +415,8 @@ object Metric extends MetricNumericConverter {
     case Failure(_) ⇒ None
   }
 
-  private def ceateEWMA(
-      value: Double, decayFactor: Option[Double]): Option[EWMA] =
+  private def ceateEWMA(value: Double,
+                        decayFactor: Option[Double]): Option[EWMA] =
     decayFactor match {
       case Some(alpha) ⇒ Some(EWMA(value, alpha))
       case None ⇒ None
@@ -424,8 +434,8 @@ object Metric extends MetricNumericConverter {
   * @param metrics the set of sampled [[akka.cluster.Metric]]
   */
 @SerialVersionUID(1L)
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
 final case class NodeMetrics(address: Address,
                              timestamp: Long,
                              metrics: Set[Metric] = Set.empty[Metric]) {
@@ -435,8 +445,8 @@ final case class NodeMetrics(address: Address,
     */
   def merge(that: NodeMetrics): NodeMetrics = {
     require(
-        address == that.address,
-        s"merge only allowed for same address, [$address] != [$that.address]")
+      address == that.address,
+      s"merge only allowed for same address, [$address] != [$that.address]")
     if (timestamp >= that.timestamp) this // that is older
     else {
       // equality is based on the name of the Metric and Set doesn't replace existing element
@@ -472,8 +482,8 @@ final case class NodeMetrics(address: Address,
   * The following extractors and data structures makes it easy to consume the
   * [[akka.cluster.NodeMetrics]] in for example load balancers.
   */
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
 object StandardMetrics {
 
   // Constants for the heap related Metric names
@@ -634,8 +644,8 @@ private[cluster] trait MetricNumericConverter {
 /**
   * Implementations of cluster system metrics extends this trait.
   */
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
 trait MetricsCollector extends Closeable {
 
   /**
@@ -652,8 +662,8 @@ trait MetricsCollector extends Closeable {
   * @param address The [[akka.actor.Address]] of the node being sampled
   * @param decay how quickly the exponential weighting of past data is decayed
   */
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
 class JmxMetricsCollector(address: Address, decayFactor: Double)
     extends MetricsCollector {
   import StandardMetrics._
@@ -741,8 +751,8 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def heapMax(heap: MemoryUsage): Option[Metric] =
-    Metric.create(
-        name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
+    Metric
+      .create(name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
 
   override def close(): Unit = ()
 }
@@ -759,10 +769,11 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
   * @param decay how quickly the exponential weighting of past data is decayed
   * @param sigar the org.hyperic.Sigar instance
   */
-@deprecated(
-    "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
-class SigarMetricsCollector(
-    address: Address, decayFactor: Double, sigar: AnyRef)
+@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+            "2.4")
+class SigarMetricsCollector(address: Address,
+                            decayFactor: Double,
+                            sigar: AnyRef)
     extends JmxMetricsCollector(address, decayFactor) {
 
   import StandardMetrics._
@@ -783,17 +794,18 @@ class SigarMetricsCollector(
   private val decayFactorOption = Some(decayFactor)
 
   private val EmptyClassArray: Array[(Class[_])] = Array.empty[(Class[_])]
-  private val LoadAverage: Option[Method] = createMethodFrom(
-      sigar, "getLoadAverage")
+  private val LoadAverage: Option[Method] =
+    createMethodFrom(sigar, "getLoadAverage")
   private val Cpu: Option[Method] = createMethodFrom(sigar, "getCpuPerc")
   private val CombinedCpu: Option[Method] = Try(
-      Cpu.get.getReturnType.getMethod("getCombined")).toOption
+    Cpu.get.getReturnType.getMethod("getCombined")).toOption
 
   // Do something initially, in constructor, to make sure that the native library can be loaded.
   // This will by design throw exception if sigar isn't usable
   val pid: Long = createMethodFrom(sigar, "getPid") match {
     case Some(method) ⇒
-      try method.invoke(sigar).asInstanceOf[Long] catch {
+      try method.invoke(sigar).asInstanceOf[Long]
+      catch {
         case e: InvocationTargetException
             if e.getCause.isInstanceOf[LinkageError] ⇒
           // native libraries not in place
@@ -803,12 +815,13 @@ class SigarMetricsCollector(
       }
     case None ⇒
       throw new IllegalArgumentException(
-          "Wrong version of Sigar, expected 'getPid' method")
+        "Wrong version of Sigar, expected 'getPid' method")
   }
 
   override def metrics: Set[Metric] = {
     super.metrics.filterNot(_.name == SystemLoadAverage) union Set(
-        systemLoadAverage, cpuCombined).flatten
+      systemLoadAverage,
+      cpuCombined).flatten
   }
 
   /**
@@ -821,10 +834,10 @@ class SigarMetricsCollector(
   override def systemLoadAverage: Option[Metric] =
     Metric.create(name = SystemLoadAverage,
                   value = Try(
-                        LoadAverage.get
-                          .invoke(sigar)
-                          .asInstanceOf[Array[AnyRef]](0)
-                          .asInstanceOf[Number]),
+                    LoadAverage.get
+                      .invoke(sigar)
+                      .asInstanceOf[Array[AnyRef]](0)
+                      .asInstanceOf[Number]),
                   decayFactor = None) orElse super.systemLoadAverage
 
   /**
@@ -838,12 +851,11 @@ class SigarMetricsCollector(
     * Creates a new instance each time.
     */
   def cpuCombined: Option[Metric] =
-    Metric.create(name = CpuCombined,
-                  value = Try(
-                        CombinedCpu.get
-                          .invoke(Cpu.get.invoke(sigar))
-                          .asInstanceOf[Number]),
-                  decayFactor = decayFactorOption)
+    Metric.create(
+      name = CpuCombined,
+      value = Try(
+        CombinedCpu.get.invoke(Cpu.get.invoke(sigar)).asInstanceOf[Number]),
+      decayFactor = decayFactorOption)
 
   /**
     * Releases any native resources associated with this instance.
@@ -873,21 +885,21 @@ private[cluster] object MetricsCollector {
       Try(new SigarMetricsCollector(system)) match {
         case Success(sigarCollector) ⇒ sigarCollector
         case Failure(e) ⇒
-          Cluster(system).InfoLogger.logInfo(
-              "Metrics will be retreived from MBeans, and may be incorrect on some platforms. " +
-              "To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate " +
-              "platform-specific native libary to 'java.library.path'. Reason: " +
-              e.toString)
+          Cluster(system).InfoLogger.logInfo("Metrics will be retreived from MBeans, and may be incorrect on some platforms. " +
+            "To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate " +
+            "platform-specific native libary to 'java.library.path'. Reason: " +
+            e.toString)
           new JmxMetricsCollector(system)
       }
     } else {
       system.dynamicAccess
         .createInstanceFor[MetricsCollector](
-            fqcn, List(classOf[ActorSystem] -> system))
+          fqcn,
+          List(classOf[ActorSystem] -> system))
         .recover {
           case e ⇒
             throw new ConfigurationException(
-                "Could not create custom metrics collector [" + fqcn +
+              "Could not create custom metrics collector [" + fqcn +
                 "] due to:" + e.toString)
         }
         .get

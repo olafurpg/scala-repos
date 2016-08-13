@@ -5,7 +5,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.bijection.macros.impl.IsCaseClassImpl
-import com.twitter.scalding.macros.impl.{FieldsProviderImpl, TupleConverterImpl, TupleSetterImpl}
+import com.twitter.scalding.macros.impl.{
+  FieldsProviderImpl,
+  TupleConverterImpl,
+  TupleSetterImpl
+}
 import com.twitter.scalding.db.DBTypeDescriptor
 import com.twitter.scalding.db.macros._
 
@@ -17,8 +21,8 @@ object DBTypeDescriptorImpl {
 
     if (!IsCaseClassImpl.isCaseClassType(c)(T.tpe))
       c.abort(
-          c.enclosingPosition,
-          s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
+        c.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
         This will mean the macro is operating on a non-resolved type.""")
 
     val columnDefn = ColumnDefinitionProviderImpl[T](c)

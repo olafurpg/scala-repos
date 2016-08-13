@@ -8,7 +8,13 @@ import akka.util.{ReflectiveAccess, Switch}
 
 import java.util.Queue
 import java.util.concurrent.atomic.{AtomicReference, AtomicInteger}
-import java.util.concurrent.{TimeUnit, ExecutorService, RejectedExecutionException, ConcurrentLinkedQueue, LinkedBlockingQueue}
+import java.util.concurrent.{
+  TimeUnit,
+  ExecutorService,
+  RejectedExecutionException,
+  ConcurrentLinkedQueue,
+  LinkedBlockingQueue
+}
 import util.DynamicVariable
 
 /**
@@ -33,8 +39,11 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     throughputDeadlineTime: Int = Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
     mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     config: ThreadPoolConfig = ThreadPoolConfig())
-    extends ExecutorBasedEventDrivenDispatcher(
-        _name, throughput, throughputDeadlineTime, mailboxType, config) {
+    extends ExecutorBasedEventDrivenDispatcher(_name,
+                                               throughput,
+                                               throughputDeadlineTime,
+                                               mailboxType,
+                                               config) {
 
   def this(_name: String,
            throughput: Int,
@@ -90,10 +99,10 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
       case Some(aType) =>
         if (aType != actorRef.actor.getClass)
           throw new IllegalActorStateException(
-              String.format(
-                  "Can't register actor %s in a work stealing dispatcher which already knows actors of type %s",
-                  actorRef,
-                  aType))
+            String.format(
+              "Can't register actor %s in a work stealing dispatcher which already knows actors of type %s",
+              actorRef,
+              aType))
     }
 
     synchronized { members :+= actorRef } //Update members
@@ -140,9 +149,9 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     // the dispatcher is being shut down...
     // Starts at is seeded by current time
     doFindDonorRecipient(
-        donorMbox,
-        actors,
-        (System.currentTimeMillis % actors.size).asInstanceOf[Int]) match {
+      donorMbox,
+      actors,
+      (System.currentTimeMillis % actors.size).asInstanceOf[Int]) match {
       case null => false
       case recipient => donate(donorMbox.dequeue, recipient)
     }
@@ -159,9 +168,9 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
       val actors =
         members // copy to prevent concurrent modifications having any impact
       doFindDonorRecipient(
-          donorMbox,
-          actors,
-          System.identityHashCode(message) % actors.size) match {
+        donorMbox,
+        actors,
+        System.identityHashCode(message) % actors.size) match {
         case null => false
         case recipient => donate(message, recipient)
       }
@@ -171,12 +180,15 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     * Rewrites the message and adds that message to the recipients mailbox
     * returns true if the message is non-null
     */
-  protected def donate(
-      organ: MessageInvocation, recipient: ActorRef): Boolean = {
+  protected def donate(organ: MessageInvocation,
+                       recipient: ActorRef): Boolean = {
     if (organ ne null) {
       if (organ.senderFuture.isDefined)
         recipient.postMessageToMailboxAndCreateFutureResultWithTimeout[Any](
-            organ.message, recipient.timeout, organ.sender, organ.senderFuture)
+          organ.message,
+          recipient.timeout,
+          organ.sender,
+          organ.senderFuture)
       else if (organ.sender.isDefined)
         recipient.postMessageToMailbox(organ.message, organ.sender)
       else recipient.postMessageToMailbox(organ.message, None)
@@ -195,7 +207,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     var i = 0
     var recipient: ActorRef = null
 
-    while ( (i < prSz) && (recipient eq null)) {
+    while ((i < prSz) && (recipient eq null)) {
       val actor =
         potentialRecipients((i + startIndex) % prSz) //Wrap-around, one full lap
       val mbox = getMailbox(actor)

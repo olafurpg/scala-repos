@@ -5,14 +5,22 @@ package setter
 import com.intellij.openapi.project.Project
 import com.intellij.psi._
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.search.{PsiSearchHelper, SearchScope, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  PsiSearchHelper,
+  SearchScope,
+  TextOccurenceProcessor,
+  UsageSearchContext
+}
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.{Parent, inReadAction}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAssignStmt
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper
 
@@ -43,9 +51,11 @@ class SetterMethodSearcher
     }
   }
 
-  private def processAssignments(
-      element: PsiElement, name: String, project: Project)(
-      implicit consumer: Processor[PsiReference], scope: SearchScope) = {
+  private def processAssignments(element: PsiElement,
+                                 name: String,
+                                 project: Project)(
+      implicit consumer: Processor[PsiReference],
+      scope: SearchScope) = {
     val processor = new TextOccurenceProcessor {
       def execute(elem: PsiElement, offsetInElement: Int): Boolean = {
         inReadAction {
@@ -74,9 +84,11 @@ class SetterMethodSearcher
                                    true)
   }
 
-  private def processSimpleUsages(
-      element: PsiElement, name: String, project: Project)(
-      implicit consumer: Processor[PsiReference], scope: SearchScope) = {
+  private def processSimpleUsages(element: PsiElement,
+                                  name: String,
+                                  project: Project)(
+      implicit consumer: Processor[PsiReference],
+      scope: SearchScope) = {
     val processor = new TextOccurenceProcessor {
       def execute(elem: PsiElement, offsetInElement: Int): Boolean = {
         inReadAction {
@@ -98,7 +110,10 @@ class SetterMethodSearcher
       }
     }
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
-    helper.processElementsWithWord(
-        processor, scope, name, UsageSearchContext.IN_CODE, true)
+    helper.processElementsWithWord(processor,
+                                   scope,
+                                   name,
+                                   UsageSearchContext.IN_CODE,
+                                   true)
   }
 }

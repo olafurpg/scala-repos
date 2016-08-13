@@ -23,32 +23,34 @@ private[opening] final class Finisher(api: OpeningApi, openingColl: Coll) {
                       win.fold(Glicko.Result.Win, Glicko.Result.Loss))
         val date = DateTime.now
         val userPerf = user.perfs.opening.addOrReset(
-            _.opening.crazyGlicko,
-            s"opening ${opening.id} user")(userRating, date)
+          _.opening.crazyGlicko,
+          s"opening ${opening.id} user")(userRating, date)
         val openingPerf = opening.perf.addOrReset(
-            _.opening.crazyGlicko,
-            s"opening ${opening.id}")(openingRating, date)
+          _.opening.crazyGlicko,
+          s"opening ${opening.id}")(openingRating, date)
         val a = new Attempt(
-            id = Attempt.makeId(opening.id, user.id),
-            openingId = opening.id,
-            userId = user.id,
-            date = DateTime.now,
-            win = win,
-            openingRating = opening.perf.intRating,
-            openingRatingDiff = openingPerf.intRating - opening.perf.intRating,
-            userRating = user.perfs.opening.intRating,
-            userRatingDiff = userPerf.intRating - user.perfs.opening.intRating)
+          id = Attempt.makeId(opening.id, user.id),
+          openingId = opening.id,
+          userId = user.id,
+          date = DateTime.now,
+          win = win,
+          openingRating = opening.perf.intRating,
+          openingRatingDiff = openingPerf.intRating - opening.perf.intRating,
+          userRating = user.perfs.opening.intRating,
+          userRatingDiff = userPerf.intRating - user.perfs.opening.intRating)
         ((api.attempt add a) >> {
-              openingColl.update(
-                  BSONDocument("_id" -> opening.id),
-                  BSONDocument("$inc" -> BSONDocument(
-                          Opening.BSONFields.attempts -> BSONInteger(1),
-                          Opening.BSONFields.wins -> BSONInteger(win ? 1 | 0)
-                      )) ++ BSONDocument("$set" -> BSONDocument(
-                          Opening.BSONFields.perf -> Perf.perfBSONHandler
-                            .write(openingPerf)
-                      ))) zip UserRepo.setPerf(user.id, "opening", userPerf)
-            }) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
+          openingColl.update(
+            BSONDocument("_id" -> opening.id),
+            BSONDocument(
+              "$inc" -> BSONDocument(
+                Opening.BSONFields.attempts -> BSONInteger(1),
+                Opening.BSONFields.wins -> BSONInteger(win ? 1 | 0)
+              )) ++ BSONDocument(
+              "$set" -> BSONDocument(
+                Opening.BSONFields.perf -> Perf.perfBSONHandler.write(
+                  openingPerf)
+              ))) zip UserRepo.setPerf(user.id, "opening", userPerf)
+        }) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
     }
   }
 

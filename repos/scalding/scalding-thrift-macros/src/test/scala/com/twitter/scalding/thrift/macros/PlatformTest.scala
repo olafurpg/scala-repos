@@ -16,7 +16,10 @@ limitations under the License.
 package com.twitter.scalding.thrift.macros
 
 import com.twitter.scalding._
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatformTest}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest,
+  HadoopSharedPlatformTest
+}
 import com.twitter.scalding.serialization.OrderedSerialization
 import com.twitter.scalding.thrift.macros.impl.ScroogeInternalOrderedSerializationImpl
 import com.twitter.scalding.thrift.macros.scalathrift._
@@ -25,7 +28,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 import scala.language.experimental.{macros => sMacros}
 
-class CompareJob[T : OrderedSerialization](in: Iterable[T], args: Args)
+class CompareJob[T: OrderedSerialization](in: Iterable[T], args: Args)
     extends Job(args) {
   TypedPipe
     .from(in)
@@ -44,7 +47,9 @@ private[macros] trait InstanceProvider[T] {
   def g(idx: Int): T
 }
 class PlatformTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
   org.apache.log4j.Logger
     .getLogger("org.apache.hadoop")
     .setLevel(org.apache.log4j.Level.FATAL)
@@ -52,16 +57,16 @@ class PlatformTest
     .getLogger("org.mortbay")
     .setLevel(org.apache.log4j.Level.FATAL)
   implicit def toScroogeInternalOrderedSerialization[T]: OrderedSerialization[
-      T] = macro ScroogeInternalOrderedSerializationImpl[T]
+    T] = macro ScroogeInternalOrderedSerializationImpl[T]
 
   import ScroogeGenerators._
 
-  implicit def arbitraryInstanceProvider[T : Arbitrary] =
+  implicit def arbitraryInstanceProvider[T: Arbitrary] =
     new InstanceProvider[T] {
       def g(idx: Int) = ScroogeGenerators.dataProvider[T](idx)
     }
 
-  def runCompareTest[T : OrderedSerialization](
+  def runCompareTest[T: OrderedSerialization](
       implicit iprov: InstanceProvider[T]) {
     val input = (0 until 10000).map { idx =>
       iprov.g(idx % 50)
@@ -81,7 +86,8 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestStructdd" in {
       runCompareTest[TestStruct](
-          toScroogeInternalOrderedSerialization[TestStruct], implicitly)
+        toScroogeInternalOrderedSerialization[TestStruct],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestSets" in {
@@ -91,7 +97,8 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestLists" in {
       runCompareTest[TestLists](
-          toScroogeInternalOrderedSerialization[TestLists], implicitly)
+        toScroogeInternalOrderedSerialization[TestLists],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer /  TestMaps" in {
@@ -102,8 +109,8 @@ class PlatformTest
     "Expected items should match : Internal Serializer / TestUnion" in {
       toScroogeInternalOrderedSerialization[TestUnion]
       runCompareTest[TestUnion](
-          toScroogeInternalOrderedSerialization[TestUnion],
-          arbitraryInstanceProvider[TestUnion])
+        toScroogeInternalOrderedSerialization[TestUnion],
+        arbitraryInstanceProvider[TestUnion])
     }
 
     "Expected items should match : Internal Serializer / Enum" in {
@@ -113,12 +120,14 @@ class PlatformTest
 
     "Expected items should match : Internal Serializer / TestTypes" in {
       runCompareTest[TestTypes](
-          toScroogeInternalOrderedSerialization[TestTypes], implicitly)
+        toScroogeInternalOrderedSerialization[TestTypes],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestTypes2" in {
       runCompareTest[TestTypes](
-          toScroogeInternalOrderedSerialization[TestTypes], implicitly)
+        toScroogeInternalOrderedSerialization[TestTypes],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / (Long, TestTypes)" in {

@@ -243,7 +243,8 @@ object Trees {
       extends Literal
 
   case class StringLiteral(value: String)(implicit val pos: Position)
-      extends Literal with PropertyName {
+      extends Literal
+      with PropertyName {
     override def name = value
   }
 
@@ -270,18 +271,20 @@ object Trees {
                       members: List[Tree])(implicit val pos: Position)
       extends Tree
 
-  case class MethodDef(
-      static: Boolean, name: PropertyName, args: List[ParamDef], body: Tree)(
-      implicit val pos: Position)
+  case class MethodDef(static: Boolean,
+                       name: PropertyName,
+                       args: List[ParamDef],
+                       body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class GetterDef(static: Boolean, name: PropertyName, body: Tree)(
       implicit val pos: Position)
       extends Tree
 
-  case class SetterDef(
-      static: Boolean, name: PropertyName, param: ParamDef, body: Tree)(
-      implicit val pos: Position)
+  case class SetterDef(static: Boolean,
+                       name: PropertyName,
+                       param: ParamDef,
+                       body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class Super()(implicit val pos: Position) extends Tree

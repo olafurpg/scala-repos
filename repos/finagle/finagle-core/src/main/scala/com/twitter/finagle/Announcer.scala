@@ -70,7 +70,8 @@ object Announcer {
       announcers groupBy (_.scheme) filter { case (_, rs) => rs.size > 1 }
     if (dups.size > 0) throw new MultipleAnnouncersPerSchemeException(dups)
 
-    for (r <- announcers) log.info(
+    for (r <- announcers)
+      log.info(
         "Announcer[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
     announcers
   }

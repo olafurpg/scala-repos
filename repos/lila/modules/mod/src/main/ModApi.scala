@@ -67,15 +67,16 @@ final class ModApi(logApi: ModlogApi,
       val user = u.copy(troll = value)
       changed ?? {
         UserRepo.updateTroll(user) >>- logApi.troll(mod, user.id, user.troll)
-      } >>- (reporter ! lila.hub.actorApi.report.MarkTroll(user.id, mod)) inject user.troll
+      } >>- (reporter ! lila.hub.actorApi.report
+        .MarkTroll(user.id, mod)) inject user.troll
     }
 
   def ban(mod: String, username: String): Funit = withUser(username) { user =>
     userSpy(user.id) flatMap { spy =>
-      UserRepo.toggleIpBan(user.id) zip logApi.ban(mod, user.id, !user.ipBan) zip user.ipBan
-        .fold(
-          firewall unblockIps spy.ipStrings,
-          (spy.ipStrings map firewall.blockIp).sequenceFu >>
+      UserRepo.toggleIpBan(user.id) zip logApi
+        .ban(mod, user.id, !user.ipBan) zip user.ipBan.fold(
+        firewall unblockIps spy.ipStrings,
+        (spy.ipStrings map firewall.blockIp).sequenceFu >>
           (SecurityStore disconnect user.id)
       ) void
     }
@@ -97,13 +98,15 @@ final class ModApi(logApi: ModlogApi,
 
   def setTitle(mod: String, username: String, title: Option[String]): Funit =
     withUser(username) { user =>
-      UserRepo.setTitle(user.id, title) >> lightUserApi.invalidate(user.id) >> logApi
+      UserRepo
+        .setTitle(user.id, title) >> lightUserApi.invalidate(user.id) >> logApi
         .setTitle(mod, user.id, title)
     }
 
   def setEmail(mod: String, username: String, email: String): Funit =
     withUser(username) { user =>
-      UserRepo.email(user.id, email) >> UserRepo.setEmailConfirmed(user.id) >> logApi
+      UserRepo
+        .email(user.id, email) >> UserRepo.setEmailConfirmed(user.id) >> logApi
         .setEmail(mod, user.id)
     }
 

@@ -13,8 +13,9 @@ class MirrorsTest {
     assertEquals("RootPackage.moduleClass == RootClass",
                  RootClass,
                  RootPackage.moduleClass)
-    assertEquals(
-        "RootClass.module == RootPackage", RootPackage, RootClass.module)
+    assertEquals("RootClass.module == RootPackage",
+                 RootPackage,
+                 RootClass.module)
     assertEquals("EmptyPackage.moduleClass == EmptyPackageClass",
                  EmptyPackageClass,
                  EmptyPackage.moduleClass)

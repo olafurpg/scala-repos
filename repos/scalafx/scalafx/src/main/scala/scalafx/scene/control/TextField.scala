@@ -40,7 +40,8 @@ object TextField {
 }
 
 class TextField(override val delegate: jfxsc.TextField = new jfxsc.TextField)
-    extends TextInputControl(delegate) with AlignmentDelegate[jfxsc.TextField]
+    extends TextInputControl(delegate)
+    with AlignmentDelegate[jfxsc.TextField]
     with SFXDelegate[jfxsc.TextField] {
 
   /**

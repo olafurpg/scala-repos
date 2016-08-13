@@ -32,19 +32,19 @@ private[handler] abstract class AnnotationHelper {
 
   def sizeAnnotation: scala.util.Try[(AnnotationHelper, SizeAnno)] =
     consume[SizeAnno](typeOf[com.twitter.scalding.db.macros.size])(
-        _.flatten.map(o => WithSize(o)).getOrElse(WithoutSize))
+      _.flatten.map(o => WithSize(o)).getOrElse(WithoutSize))
 
   def textAnnotation: scala.util.Try[(AnnotationHelper, TextAnno)] =
     consume(typeOf[com.twitter.scalding.db.macros.text])(
-        _.map(_ => WithText).getOrElse(WithoutText))
+      _.map(_ => WithText).getOrElse(WithoutText))
 
   def varcharAnnotation: scala.util.Try[(AnnotationHelper, VarcharAnno)] =
-    consume(typeOf[com.twitter.scalding.db.macros.varchar])(
-        _.map(_ => WithVarchar).getOrElse(WithoutVarchar))
+    consume(typeOf[com.twitter.scalding.db.macros.varchar])(_.map(_ =>
+      WithVarchar).getOrElse(WithoutVarchar))
 
   def dateAnnotation: scala.util.Try[(AnnotationHelper, DateAnno)] =
     consume(typeOf[com.twitter.scalding.db.macros.date])(
-        _.map(_ => WithDate).getOrElse(WithoutDate))
+      _.map(_ => WithDate).getOrElse(WithoutDate))
 
   def consume[T](t: ctx.universe.Type)(
       fn: Option[Option[Int]] => T): scala.util.Try[(AnnotationHelper, T)] = {
@@ -64,8 +64,7 @@ private[handler] abstract class AnnotationHelper {
       case h :: Nil => Success((newHelper, fn(Some(h._2))))
       case h :: t =>
         Failure(
-            new Exception(
-                s"Error more than one annotation when looking for $t"))
+          new Exception(s"Error more than one annotation when looking for $t"))
       case Nil => Success((newHelper, fn(None)))
     }
   }

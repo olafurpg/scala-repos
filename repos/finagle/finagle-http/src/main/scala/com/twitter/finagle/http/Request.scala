@@ -8,7 +8,10 @@ import java.net.{InetAddress, InetSocketAddress}
 import java.util.{AbstractMap, List => JList, Map => JMap, Set => JSet}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.jboss.netty.channel.Channel
-import org.jboss.netty.handler.codec.embedder.{DecoderEmbedder, EncoderEmbedder}
+import org.jboss.netty.handler.codec.embedder.{
+  DecoderEmbedder,
+  EncoderEmbedder
+}
 import org.jboss.netty.handler.codec.http._
 import scala.beans.BeanProperty
 import scala.annotation.varargs
@@ -227,7 +230,7 @@ object Request {
   /** Decode a Request from Array[Byte] */
   def decodeBytes(b: Array[Byte]): Request = {
     val decoder = new DecoderEmbedder(
-        new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
+      new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val req = decoder.poll().asInstanceOf[HttpRequest]
     assert(req ne null)
@@ -323,8 +326,8 @@ object Request {
   }
 
   /** Create Request from HttpRequest and Channel.  Used by Codec. */
-  private[finagle] def apply(
-      httpRequestArg: HttpRequest, channel: Channel): Request =
+  private[finagle] def apply(httpRequestArg: HttpRequest,
+                             channel: Channel): Request =
     new Request {
       val httpRequest = httpRequestArg
       lazy val remoteSocketAddress =

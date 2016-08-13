@@ -2,20 +2,23 @@ object Test {
   def mkNumbers(x: Int): List[AnyRef] = {
     //Use explicit AnyRef to workaround known limitation of type inference with F-Bounds
     val base = List[AnyRef](
-        BigDecimal(x),
-        BigInt(x),
-        new java.lang.Double(x.toDouble),
-        new java.lang.Float(x.toFloat),
-        new java.lang.Long(x.toLong),
-        new java.lang.Integer(x)
+      BigDecimal(x),
+      BigInt(x),
+      new java.lang.Double(x.toDouble),
+      new java.lang.Float(x.toFloat),
+      new java.lang.Long(x.toLong),
+      new java.lang.Integer(x)
     )
     val extras = List(
-        if (x >= Short.MinValue && x <= Short.MaxValue)
-          List(new java.lang.Short(x.toShort)) else Nil,
-        if (x >= Byte.MinValue && x <= Byte.MaxValue)
-          List(new java.lang.Byte(x.toByte)) else Nil,
-        if (x >= Char.MinValue && x <= Char.MaxValue)
-          List(new java.lang.Character(x.toChar)) else Nil
+      if (x >= Short.MinValue && x <= Short.MaxValue)
+        List(new java.lang.Short(x.toShort))
+      else Nil,
+      if (x >= Byte.MinValue && x <= Byte.MaxValue)
+        List(new java.lang.Byte(x.toByte))
+      else Nil,
+      if (x >= Char.MinValue && x <= Char.MaxValue)
+        List(new java.lang.Character(x.toChar))
+      else Nil
     ).flatten
 
     base ::: extras
@@ -23,15 +26,15 @@ object Test {
 
   def mkNumbers(x: BigInt): List[AnyRef] = {
     List(
-        List(BigDecimal(x, java.math.MathContext.UNLIMITED)),
-        List(x),
-        if (x.isValidDouble) List(new java.lang.Double(x.toDouble)) else Nil,
-        if (x.isValidFloat) List(new java.lang.Float(x.toFloat)) else Nil,
-        if (x.isValidLong) List(new java.lang.Long(x.toLong)) else Nil,
-        if (x.isValidInt) List(new java.lang.Integer(x.toInt)) else Nil,
-        if (x.isValidShort) List(new java.lang.Short(x.toShort)) else Nil,
-        if (x.isValidByte) List(new java.lang.Byte(x.toByte)) else Nil,
-        if (x.isValidChar) List(new java.lang.Character(x.toChar)) else Nil
+      List(BigDecimal(x, java.math.MathContext.UNLIMITED)),
+      List(x),
+      if (x.isValidDouble) List(new java.lang.Double(x.toDouble)) else Nil,
+      if (x.isValidFloat) List(new java.lang.Float(x.toFloat)) else Nil,
+      if (x.isValidLong) List(new java.lang.Long(x.toLong)) else Nil,
+      if (x.isValidInt) List(new java.lang.Integer(x.toInt)) else Nil,
+      if (x.isValidShort) List(new java.lang.Short(x.toShort)) else Nil,
+      if (x.isValidByte) List(new java.lang.Byte(x.toByte)) else Nil,
+      if (x.isValidChar) List(new java.lang.Character(x.toChar)) else Nil
     ).flatten
   }
 

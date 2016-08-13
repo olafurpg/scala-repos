@@ -82,8 +82,7 @@ sealed class AnnotatingTracingFilter[Req, Rep](
     afterFailure: String => Annotation,
     finagleVersion: () => String = () => Init.finagleVersion,
     traceMetaData: Boolean = true
-)
-    extends SimpleFilter[Req, Rep] {
+) extends SimpleFilter[Req, Rep] {
   def this(label: String,
            before: Annotation,
            after: Annotation,
@@ -116,8 +115,8 @@ sealed class AnnotatingTracingFilter[Req, Rep](
         resp match {
           case Return(_) =>
           case Throw(error) =>
-            Trace.record(afterFailure("%s: %s".format(
-                        error.getClass().getName(), error.getMessage())))
+            Trace.record(afterFailure(
+              "%s: %s".format(error.getClass().getName(), error.getMessage())))
         }
         Trace.record(after)
       }
@@ -142,8 +141,7 @@ object ServerTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
+  ) extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "srv",
                                                 Annotation.ServerRecv(),
                                                 Annotation.ServerSend(),
@@ -171,8 +169,7 @@ object ClientTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
+  ) extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "clnt",
                                                 Annotation.ClientSend(),
                                                 Annotation.ClientRecv(),
@@ -200,8 +197,7 @@ private[finagle] object WireTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
+  ) extends AnnotatingTracingFilter[Req, Rep](label,
                                                 "clnt",
                                                 Annotation.WireSend,
                                                 Annotation.WireRecv,

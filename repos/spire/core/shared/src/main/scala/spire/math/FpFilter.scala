@@ -34,30 +34,32 @@ import spire.macros.fpf._
   *
   * [1] Burnikel, Funke, Seel. Exact Geometric Computation Using Cascading. SoCG 1998.
   */
-final class FpFilter[A](
-    val apx: Double, val mes: Double, val ind: Int, exact0: => A) {
+final class FpFilter[A](val apx: Double,
+                        val mes: Double,
+                        val ind: Int,
+                        exact0: => A) {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
-  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
 
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 
   def signum(implicit ev: Signed[A]): Int = macro FpFilter.signImpl[A]
 
@@ -81,29 +83,29 @@ final class FpFilter[A](
 final class FpFilterApprox[A](val exact: A) extends AnyVal {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
-  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 }
 
 object FpFilterApprox {
-  implicit def liftApprox[A : IsReal](approx: FpFilterApprox[A]): FpFilter[A] = {
+  implicit def liftApprox[A: IsReal](approx: FpFilterApprox[A]): FpFilter[A] = {
     val apx = IsReal[A].toDouble(approx.exact)
     new FpFilter[A](apx, spire.math.abs(apx), 1, approx.exact)
   }
@@ -112,29 +114,29 @@ object FpFilterApprox {
 final class FpFilterExact[A](val value: Double) extends AnyVal {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_- : FpFilterExact[A] = new FpFilterExact[A](-value)
-  def +(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 }
 
 object FpFilterExact {
-  implicit def liftExact[A : Field](exact: FpFilterExact[A]): FpFilter[A] =
+  implicit def liftExact[A: Field](exact: FpFilterExact[A]): FpFilter[A] =
     new FpFilter(exact.value,
                  spire.math.abs(exact.value),
                  0,
@@ -150,72 +152,84 @@ object FpFilter {
   @inline final def approx[A](exact: A): FpFilterApprox[A] =
     new FpFilterApprox[A](exact)
 
-  @inline final def apply[A](
-      apx: Double, mes: Double, ind: Int, exact: => A): FpFilter[A] =
+  @inline final def apply[A](apx: Double,
+                             mes: Double,
+                             ind: Int,
+                             exact: => A): FpFilter[A] =
     new FpFilter[A](apx, mes, ind, exact)
 
   def apply[A](approx: Double, exact: => A): FpFilter[A] =
     new FpFilter[A](approx, spire.math.abs(approx), 1, exact)
 
-  def negateImpl[A : c.WeakTypeTag](
-      c: Context)(ev: c.Expr[Rng[A]]): c.Expr[FpFilter[A]] =
+  def negateImpl[A: c.WeakTypeTag](c: Context)(
+      ev: c.Expr[Rng[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](
-        Fuser[c.type, A](c).negate(c.prefix.tree)(ev.tree).expr)
+      Fuser[c.type, A](c).negate(c.prefix.tree)(ev.tree).expr)
 
-  def absImpl[A : c.WeakTypeTag](c: Context)(
+  def absImpl[A: c.WeakTypeTag](c: Context)(
       ev: c.Expr[Signed[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](Fuser[c.type, A](c).abs(c.prefix.tree, ev.tree).expr)
 
-  def sqrtImpl[A : c.WeakTypeTag](c: Context)(
+  def sqrtImpl[A: c.WeakTypeTag](c: Context)(
       ev: c.Expr[NRoot[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](Fuser[c.type, A](c).sqrt(c.prefix.tree)(ev.tree).expr)
 
-  def plusImpl[A : c.WeakTypeTag](c: Context)(
-      rhs: c.Expr[FpFilter[A]])(ev: c.Expr[Semiring[A]]): c.Expr[FpFilter[A]] =
+  def plusImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev: c.Expr[Semiring[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](
-        Fuser[c.type, A](c).plus(c.prefix.tree, rhs.tree)(ev.tree).expr)
+      Fuser[c.type, A](c).plus(c.prefix.tree, rhs.tree)(ev.tree).expr)
 
-  def minusImpl[A : c.WeakTypeTag](c: Context)(
-      rhs: c.Expr[FpFilter[A]])(ev: c.Expr[Rng[A]]): c.Expr[FpFilter[A]] =
+  def minusImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev: c.Expr[Rng[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](
-        Fuser[c.type, A](c).minus(c.prefix.tree, rhs.tree)(ev.tree).expr)
+      Fuser[c.type, A](c).minus(c.prefix.tree, rhs.tree)(ev.tree).expr)
 
-  def timesImpl[A : c.WeakTypeTag](c: Context)(
-      rhs: c.Expr[FpFilter[A]])(ev: c.Expr[Semiring[A]]): c.Expr[FpFilter[A]] =
+  def timesImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev: c.Expr[Semiring[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](
-        Fuser[c.type, A](c).times(c.prefix.tree, rhs.tree)(ev.tree).expr)
+      Fuser[c.type, A](c).times(c.prefix.tree, rhs.tree)(ev.tree).expr)
 
-  def divideImpl[A : c.WeakTypeTag](c: Context)(
-      rhs: c.Expr[FpFilter[A]])(ev: c.Expr[Field[A]]): c.Expr[FpFilter[A]] =
+  def divideImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev: c.Expr[Field[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](
-        Fuser[c.type, A](c).divide(c.prefix.tree, rhs.tree)(ev.tree).expr)
+      Fuser[c.type, A](c).divide(c.prefix.tree, rhs.tree)(ev.tree).expr)
 
-  def signImpl[A : c.WeakTypeTag](c: Context)(
+  def signImpl[A: c.WeakTypeTag](c: Context)(
       ev: c.Expr[Signed[A]]): c.Expr[Int] =
     c.Expr[Int](Fuser[c.type, A](c).sign(c.prefix.tree)(ev.tree))
 
-  def ltImpl[A : c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
-          .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Lt))
+  def ltImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+      Fuser[c.type, A](c)
+        .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Lt))
 
-  def gtImpl[A : c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
-          .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Gt))
+  def gtImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+      Fuser[c.type, A](c)
+        .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Gt))
 
-  def ltEqImpl[A : c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
-          .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.LtEq))
+  def ltEqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+      Fuser[c.type, A](c)
+        .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.LtEq))
 
-  def gtEqImpl[A : c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
-          .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.GtEq))
+  def gtEqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+      Fuser[c.type, A](c)
+        .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.GtEq))
 
-  def eqImpl[A : c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
-      ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
-    c.Expr[Boolean](Fuser[c.type, A](c)
-          .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Eq))
+  def eqImpl[A: c.WeakTypeTag](c: Context)(rhs: c.Expr[FpFilter[A]])(
+      ev0: c.Expr[Signed[A]],
+      ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
+    c.Expr[Boolean](
+      Fuser[c.type, A](c)
+        .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Eq))
 }

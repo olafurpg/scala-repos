@@ -51,10 +51,10 @@ object Test extends ScaladocModelTest {
      */
     assert(extractCommentText(test.comment.get) == "object comment")
     assert(
-        extractCommentText(test._method("foo").comment.get) == "foo comment")
+      extractCommentText(test._method("foo").comment.get) == "foo comment")
     assert(
-        extractCommentText(test._method("bar").comment.get) == "bar comment")
+      extractCommentText(test._method("bar").comment.get) == "bar comment")
     assert(
-        extractCommentText(test._method("baz").comment.get) == "baz comment")
+      extractCommentText(test._method("baz").comment.get) == "baz comment")
   }
 }

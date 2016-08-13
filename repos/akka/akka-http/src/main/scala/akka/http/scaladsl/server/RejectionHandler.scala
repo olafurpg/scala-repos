@@ -12,7 +12,8 @@ import akka.http.scaladsl.model._
 import StatusCodes._
 import AuthenticationFailedRejection._
 
-trait RejectionHandler extends (immutable.Seq[Rejection] ⇒ Option[Route]) { self ⇒
+trait RejectionHandler extends (immutable.Seq[Rejection] ⇒ Option[Route]) {
+  self ⇒
   import RejectionHandler._
 
   /**
@@ -23,8 +24,9 @@ trait RejectionHandler extends (immutable.Seq[Rejection] ⇒ Option[Route]) { se
       case (a: BuiltRejectionHandler, _) if a.isDefault ⇒
         this // the default handler already handles everything
       case (a: BuiltRejectionHandler, b: BuiltRejectionHandler) ⇒
-        new BuiltRejectionHandler(
-            a.cases ++ b.cases, a.notFound orElse b.notFound, b.isDefault)
+        new BuiltRejectionHandler(a.cases ++ b.cases,
+                                  a.notFound orElse b.notFound,
+                                  b.isDefault)
       case _ ⇒
         new RejectionHandler {
           def apply(rejections: immutable.Seq[Rejection]): Option[Route] =
@@ -49,7 +51,7 @@ object RejectionHandler {
     */
   def newBuilder(): Builder = new Builder(isDefault = false)
 
-  final class Builder private[RejectionHandler](isDefault: Boolean) {
+  final class Builder private[RejectionHandler] (isDefault: Boolean) {
     private[this] val cases = new immutable.VectorBuilder[Handler]
     private[this] var notFound: Option[Route] = None
 
@@ -65,7 +67,7 @@ object RejectionHandler {
       * Handles several Rejections of the same type at the same time.
       * The seq passed to the given function is guaranteed to be non-empty.
       */
-    def handleAll[T <: Rejection : ClassTag](
+    def handleAll[T <: Rejection: ClassTag](
         f: immutable.Seq[T] ⇒ Route): this.type = {
       val runtimeClass = implicitly[ClassTag[T]].runtimeClass
       cases += TypeHandler[T](runtimeClass, f)
@@ -88,8 +90,10 @@ object RejectionHandler {
   private final case class CaseHandler(pf: PartialFunction[Rejection, Route])
       extends Handler
   private final case class TypeHandler[T <: Rejection](
-      runtimeClass: Class[_], f: immutable.Seq[T] ⇒ Route)
-      extends Handler with PartialFunction[Rejection, T] {
+      runtimeClass: Class[_],
+      f: immutable.Seq[T] ⇒ Route)
+      extends Handler
+      with PartialFunction[Rejection, T] {
     def isDefinedAt(rejection: Rejection) = runtimeClass isInstance rejection
     def apply(rejection: Rejection) = rejection.asInstanceOf[T]
   }
@@ -133,12 +137,13 @@ object RejectionHandler {
         complete((MethodNotAllowed,
                   List(Allow(methods)),
                   "HTTP method not allowed, supported methods: " +
-                  names.mkString(", ")))
+                    names.mkString(", ")))
       }
       .handle {
         case AuthorizationFailedRejection ⇒
-          complete((Forbidden,
-                    "The supplied authentication is not authorized to access this resource"))
+          complete(
+            (Forbidden,
+             "The supplied authentication is not authorized to access this resource"))
       }
       .handle {
         case MalformedFormFieldRejection(name, msg, _) ⇒
@@ -148,15 +153,15 @@ object RejectionHandler {
       .handle {
         case MalformedHeaderRejection(headerName, msg, _) ⇒
           complete(
-              (BadRequest,
-               s"The value of HTTP header '$headerName' was malformed:\n" +
+            (BadRequest,
+             s"The value of HTTP header '$headerName' was malformed:\n" +
                msg))
       }
       .handle {
         case MalformedQueryParamRejection(name, msg, _) ⇒
           complete((BadRequest,
                     "The query parameter '" + name +
-                    "' was malformed:\n" + msg))
+                      "' was malformed:\n" + msg))
       }
       .handle {
         case MalformedRequestContentRejection(msg, _) ⇒
@@ -166,25 +171,25 @@ object RejectionHandler {
         case MissingCookieRejection(cookieName) ⇒
           complete((BadRequest,
                     "Request is missing required cookie '" + cookieName +
-                    '\''))
+                      '\''))
       }
       .handle {
         case MissingFormFieldRejection(fieldName) ⇒
           complete((BadRequest,
                     "Request is missing required form field '" + fieldName +
-                    '\''))
+                      '\''))
       }
       .handle {
         case MissingHeaderRejection(headerName) ⇒
           complete((BadRequest,
                     "Request is missing required HTTP header '" + headerName +
-                    '\''))
+                      '\''))
       }
       .handle {
         case MissingQueryParamRejection(paramName) ⇒
           complete((NotFound,
                     "Request is missing required query parameter '" +
-                    paramName + '\''))
+                      paramName + '\''))
       }
       .handle {
         case RequestEntityExpectedRejection ⇒
@@ -199,13 +204,13 @@ object RejectionHandler {
         case UnsatisfiableRangeRejection(unsatisfiableRanges,
                                          actualEntityLength) ⇒
           complete(
-              (RequestedRangeNotSatisfiable,
-               List(`Content-Range`(
-                       ContentRange.Unsatisfiable(actualEntityLength))),
-               unsatisfiableRanges.mkString(
-                   "None of the following requested Ranges were satisfiable:\n",
-                   "\n",
-                   "")))
+            (RequestedRangeNotSatisfiable,
+             List(`Content-Range`(
+               ContentRange.Unsatisfiable(actualEntityLength))),
+             unsatisfiableRanges.mkString(
+               "None of the following requested Ranges were satisfiable:\n",
+               "\n",
+               "")))
       }
       .handleAll[AuthenticationFailedRejection] { rejections ⇒
         val rejectionMessage = rejections.head.cause match {
@@ -228,28 +233,30 @@ object RejectionHandler {
         val msg = supported
           .map(_.format)
           .mkString(
-              "Resource representation is only available with these types:\n",
-              "\n",
-              "")
+            "Resource representation is only available with these types:\n",
+            "\n",
+            "")
         complete((NotAcceptable, msg))
       }
       .handleAll[UnacceptedResponseEncodingRejection] { rejections ⇒
         val supported = rejections.flatMap(_.supported)
-        complete((NotAcceptable,
-                  "Resource representation is only available with these Content-Encodings:\n" +
-                  supported.map(_.value).mkString("\n")))
+        complete(
+          (NotAcceptable,
+           "Resource representation is only available with these Content-Encodings:\n" +
+             supported.map(_.value).mkString("\n")))
       }
       .handleAll[UnsupportedRequestContentTypeRejection] { rejections ⇒
         val supported = rejections.flatMap(_.supported).mkString(" or ")
-        complete((UnsupportedMediaType,
-                  "The request's Content-Type is not supported. Expected:\n" +
-                  supported))
+        complete(
+          (UnsupportedMediaType,
+           "The request's Content-Type is not supported. Expected:\n" +
+             supported))
       }
       .handleAll[UnsupportedRequestEncodingRejection] { rejections ⇒
         val supported = rejections.map(_.supported.value).mkString(" or ")
         complete(
-            (BadRequest,
-             "The request's Content-Encoding is not supported. Expected:\n" +
+          (BadRequest,
+           "The request's Content-Encoding is not supported. Expected:\n" +
              supported))
       }
       .handle {
@@ -258,12 +265,14 @@ object RejectionHandler {
       }
       .handleAll[UnsupportedWebSocketSubprotocolRejection] { rejections ⇒
         val supported = rejections.map(_.supportedProtocol)
-        complete(HttpResponse(
-                BadRequest,
-                entity = s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
-              .map("'" + _ + "'")
-              .mkString(",")}.",
-                headers = `Sec-WebSocket-Protocol`(supported) :: Nil))
+        complete(
+          HttpResponse(
+            BadRequest,
+            entity =
+              s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
+                .map("'" + _ + "'")
+                .mkString(",")}.",
+            headers = `Sec-WebSocket-Protocol`(supported) :: Nil))
       }
       .handle {
         case ValidationRejection(msg, _) ⇒ complete((BadRequest, msg))
@@ -283,7 +292,7 @@ object RejectionHandler {
     val (transformations, rest) =
       rejections.partition(_.isInstanceOf[TransformationRejection])
     (rest.distinct /: transformations
-          .asInstanceOf[Seq[TransformationRejection]]) {
+      .asInstanceOf[Seq[TransformationRejection]]) {
       case (remaining, transformation) ⇒ transformation.transform(remaining)
     }
   }

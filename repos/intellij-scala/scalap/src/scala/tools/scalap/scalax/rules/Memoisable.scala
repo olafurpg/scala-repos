@@ -26,8 +26,8 @@ trait MemoisableRules extends Rules {
     }
   }
 
-  override def ruleWithName[In, Out, A, X](
-      name: String, f: In => rules.Result[Out, A, X]) =
+  override def ruleWithName[In, Out, A, X](name: String,
+                                           f: In => rules.Result[Out, A, X]) =
     super.ruleWithName(name,
                        (in: In) =>
                          in match {

@@ -11,8 +11,8 @@ object SizedSink {
   // eg: http://psy-lob-saw.blogspot.com/2014/11/the-mythical-modulo-mask.html
   private def nextPowOf2(n: Int): Int =
     math.min(
-        1 << 30,
-        math.max(1, Integer.highestOneBit(n - 1) * 2)
+      1 << 30,
+      math.max(1, Integer.highestOneBit(n - 1) * 2)
     )
 
   /**
@@ -65,7 +65,7 @@ object SizedSink {
   * @param milliTime gets the current time in millis from the epoch.
   *          This is exposed to allow for more control in tests.
   */
-class SizedSink private[events](capacity: Int, milliTime: () => Long)
+class SizedSink private[events] (capacity: Int, milliTime: () => Long)
     extends Sink {
   import SizedSink._
 
@@ -86,13 +86,13 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
 
   private[this] val evs = Array.fill(capacity) {
     new MutableEvent(
-        etype = null,
-        whenMillis = -1L,
-        longVal = Event.NoLong,
-        objectVal = Event.NoObject,
-        doubleVal = Event.NoDouble,
-        traceIdVal = Event.NoTraceId,
-        spanIdVal = Event.NoSpanId
+      etype = null,
+      whenMillis = -1L,
+      longVal = Event.NoLong,
+      objectVal = Event.NoObject,
+      doubleVal = Event.NoDouble,
+      traceIdVal = Event.NoTraceId,
+      spanIdVal = Event.NoSpanId
     )
   }
 

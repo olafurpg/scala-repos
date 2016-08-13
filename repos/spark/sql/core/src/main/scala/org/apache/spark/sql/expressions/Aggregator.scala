@@ -19,7 +19,10 @@ package org.apache.spark.sql.expressions
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, TypedColumn}
 import org.apache.spark.sql.catalyst.encoders.encoderFor
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, Complete}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression,
+  Complete
+}
 import org.apache.spark.sql.execution.aggregate.TypedAggregateExpression
 
 /**
@@ -82,8 +85,8 @@ abstract class Aggregator[-I, B, O] extends Serializable {
     */
   def toColumn(implicit bEncoder: Encoder[B],
                cEncoder: Encoder[O]): TypedColumn[I, O] = {
-    val expr = new AggregateExpression(
-        TypedAggregateExpression(this), Complete, false)
+    val expr =
+      new AggregateExpression(TypedAggregateExpression(this), Complete, false)
 
     new TypedColumn[I, O](expr, encoderFor[O])
   }

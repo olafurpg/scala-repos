@@ -6,8 +6,11 @@ object Accuracy {
 
   def withSignOf(i: Int, signed: Int) = if (signed < 0) -i else i
 
-  private val makeDiff: PartialFunction[
-      (Option[Score], Option[Int], Option[Score], Option[Int]), Int] = {
+  private val makeDiff: PartialFunction[(Option[Score],
+                                         Option[Int],
+                                         Option[Score],
+                                         Option[Int]),
+                                        Int] = {
     case (Some(s1), _, Some(s2), _) =>
       s2.ceiled.centipawns - s1.ceiled.centipawns
     case (Some(s1), _, _, Some(m2)) =>
@@ -21,8 +24,8 @@ object Accuracy {
   def diffsList(pov: Pov, analysis: Analysis): List[Int] =
     (pov.color == pov.game.startColor)
       .fold(
-          Info.start(pov.game.startedAtTurn) :: analysis.infos,
-          analysis.infos
+        Info.start(pov.game.startedAtTurn) :: analysis.infos,
+        analysis.infos
       )
       .grouped(2)
       .foldLeft(List[Int]()) {
@@ -38,8 +41,8 @@ object Accuracy {
   def prevColorInfos(pov: Pov, analysis: Analysis): List[Info] = {
     (pov.color == pov.game.startColor)
       .fold(
-          Info.start(pov.game.startedAtTurn) :: analysis.infos,
-          analysis.infos
+        Info.start(pov.game.startedAtTurn) :: analysis.infos,
+        analysis.infos
       )
       .zipWithIndex
       .collect {

@@ -23,10 +23,13 @@ object IntroduceVariableTestUtil {
 
   def extract2[T, U](x: (T, U)): U = x._2
 
-  def getContainerOne(
-      startOffset: Int, endOffset: Int, file: ScalaFile, occLength: Int) = {
+  def getContainerOne(startOffset: Int,
+                      endOffset: Int,
+                      file: ScalaFile,
+                      occLength: Int) = {
     val commonParentOne = PsiTreeUtil.findCommonParent(
-        file.findElementAt(startOffset), file.findElementAt(endOffset - 1))
+      file.findElementAt(startOffset),
+      file.findElementAt(endOffset - 1))
     ScalaPsiUtil.getParentOfType(commonParentOne,
                                  occLength == 1,
                                  classOf[ScalaFile],
@@ -62,12 +65,13 @@ object IntroduceVariableTestUtil {
     val fileEncloser = ScalaRefactoringUtil.fileEncloser(startOffset, file)
     val occurrences: Array[TextRange] =
       ScalaRefactoringUtil.getOccurrenceRanges(
-          ScalaRefactoringUtil.unparExpr(expr), fileEncloser)
+        ScalaRefactoringUtil.unparExpr(expr),
+        fileEncloser)
 
     val container: PsiElement = ScalaRefactoringUtil.enclosingContainer(
-        ScalaRefactoringUtil.commonParent(file, occurrences: _*))
-    val containerOne = getContainerOne(
-        startOffset, endOffset, file, occurrences.length)
+      ScalaRefactoringUtil.commonParent(file, occurrences: _*))
+    val containerOne =
+      getContainerOne(startOffset, endOffset, file, occurrences.length)
     new ScalaVariableValidator(new ScalaIntroduceVariableHandler,
                                project,
                                expr,
@@ -89,10 +93,10 @@ object IntroduceVariableTestUtil {
     val occurrences =
       ScalaRefactoringUtil.getTypeElementOccurrences(typeElement, fileEncloser)
     val container = ScalaRefactoringUtil.enclosingContainer(
-        PsiTreeUtil.findCommonParent(occurrences: _*))
+      PsiTreeUtil.findCommonParent(occurrences: _*))
 
-    val containerOne = getContainerOne(
-        startOffset, endOffset, file, occurrences.length)
+    val containerOne =
+      getContainerOne(startOffset, endOffset, file, occurrences.length)
     new ScalaTypeValidator(new ScalaIntroduceVariableHandler,
                            project,
                            typeElement,

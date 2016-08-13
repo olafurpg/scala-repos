@@ -12,7 +12,8 @@ import java.util.concurrent.ThreadLocalRandom
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class EWMASpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with MetricsCollectorFactory {
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
 
@@ -59,7 +60,7 @@ class EWMASpec
       val collectInterval = 1.second
       val halfLifeDuration = (halfLife * 1000).millis
       EWMA.alpha(halfLifeDuration, collectInterval) should ===(
-          expectedAlpha +- 0.001)
+        expectedAlpha +- 0.001)
     }
 
     "calculate sane alpha from short half-life" in {

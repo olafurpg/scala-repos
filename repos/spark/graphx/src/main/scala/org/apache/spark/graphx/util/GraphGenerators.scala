@@ -75,8 +75,10 @@ object GraphGenerators extends Logging {
 
     val edges = vertices.flatMap {
       case (src, degree) =>
-        generateRandomEdges(
-            src.toInt, degree.toInt, numVertices, seed = (seed2 ^ src))
+        generateRandomEdges(src.toInt,
+                            degree.toInt,
+                            numVertices,
+                            seed = (seed2 ^ src))
     }
 
     Graph(vertices, edges, 0)
@@ -106,8 +108,10 @@ object GraphGenerators extends Logging {
     * @param maxVal exclusive upper bound on the value of the sample
     * @param seed optional seed
     */
-  private[spark] def sampleLogNormal(
-      mu: Double, sigma: Double, maxVal: Int, seed: Long = -1): Int = {
+  private[spark] def sampleLogNormal(mu: Double,
+                                     sigma: Double,
+                                     maxVal: Int,
+                                     seed: Long = -1): Int = {
     val rand = if (seed == -1) new Random() else new Random(seed)
 
     val sigmaSq = sigma * sigma
@@ -137,14 +141,15 @@ object GraphGenerators extends Logging {
     // the number of vertices is 2^n where n=ceil(log2[N])
     // This ensures that the 4 quadrants are the same size at all recursion levels
     val numVertices = math
-      .round(math.pow(
-              2.0, math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
+      .round(
+        math.pow(2.0,
+                 math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
       .toInt
     val numEdgesUpperBound =
       math.pow(2.0, 2 * ((math.log(numVertices) / math.log(2.0)) - 1)).toInt
     if (numEdgesUpperBound < numEdges) {
       throw new IllegalArgumentException(
-          s"numEdges must be <= $numEdgesUpperBound but was $numEdges")
+        s"numEdges must be <= $numEdgesUpperBound but was $numEdges")
     }
     var edges: Set[Edge[Int]] = Set()
     while (edges.size < numEdges) {
@@ -156,7 +161,7 @@ object GraphGenerators extends Logging {
     outDegreeFromEdges(sc.parallelize(edges.toList))
   }
 
-  private def outDegreeFromEdges[ED : ClassTag](
+  private def outDegreeFromEdges[ED: ClassTag](
       edges: RDD[Edge[ED]]): Graph[Int, ED] = {
     val vertices = edges.flatMap { edge =>
       List((edge.srcId, 1))
@@ -227,7 +232,7 @@ object GraphGenerators extends Logging {
   private def pickQuadrant(a: Double, b: Double, c: Double, d: Double): Int = {
     if (a + b + c + d != 1.0) {
       throw new IllegalArgumentException(
-          "R-MAT probability parameters sum to " + (a + b + c + d) +
+        "R-MAT probability parameters sum to " + (a + b + c + d) +
           ", should sum to 1.0")
     }
     val rand = new Random()
@@ -252,8 +257,9 @@ object GraphGenerators extends Logging {
     * @return A graph containing vertices with the row and column ids
     * as their attributes and edge values as 1.0.
     */
-  def gridGraph(
-      sc: SparkContext, rows: Int, cols: Int): Graph[(Int, Int), Double] = {
+  def gridGraph(sc: SparkContext,
+                rows: Int,
+                cols: Int): Graph[(Int, Int), Double] = {
     // Convert row column address into vertex ids (row major order)
     def sub2ind(r: Int, c: Int): VertexId = r * cols + c
 
@@ -264,11 +270,11 @@ object GraphGenerators extends Logging {
     val edges: RDD[Edge[Double]] = vertices.flatMap {
       case (vid, (r, c)) =>
         (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else {
-           Seq.empty
-         }) ++
-        (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
-           Seq.empty
-         })
+          Seq.empty
+        }) ++
+          (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
+            Seq.empty
+          })
     }.map { case (src, dst) => Edge(src, dst, 1.0) }
     Graph(vertices, edges)
   } // end of gridGraph

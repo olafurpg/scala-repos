@@ -12,8 +12,11 @@ object DisplayAppScalingResults {
     val appInfos: Seq[JsObject] =
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
-    val header = IndexedSeq(
-        "relative time (ms)", "staged", "running", "newRunning/s", "instances")
+    val header = IndexedSeq("relative time (ms)",
+                            "staged",
+                            "running",
+                            "newRunning/s",
+                            "instances")
     var lastTimestamp: Long = 0
     var lastRunning: Long = 0
     val rows = appInfos.map { jsObject: JsObject =>
@@ -93,12 +96,12 @@ object DisplayAppScalingResults {
                         units)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left, right, right, right, right, right, left),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(left, right, right, right, right, right, left),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def displayHistograms(histograms: Map[String, JsObject]): Unit = {
@@ -133,23 +136,23 @@ object DisplayAppScalingResults {
                         d("stddev"))
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(left,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def displayTimers(timers: Map[String, JsObject]): Unit = {
@@ -195,25 +198,25 @@ object DisplayAppScalingResults {
                         rateUnits)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            left),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(left,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          right,
+          left),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def main(args: Array[String]): Unit = {

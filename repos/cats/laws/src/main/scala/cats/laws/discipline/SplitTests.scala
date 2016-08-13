@@ -17,10 +17,10 @@ trait SplitTests[F[_, _]] extends ComposeTests[F] {
                               ArbFEG: Arbitrary[F[E, G]],
                               EqFAD: Eq[F[A, D]],
                               EqFADCG: Eq[F[(A, D), (C, G)]]): RuleSet =
-    new DefaultRuleSet(name = "split",
-                       parent = Some(compose[A, B, C, D]),
-                       "split interchange" -> forAll(
-                           laws.splitInterchange[A, B, C, D, E, G] _))
+    new DefaultRuleSet(
+      name = "split",
+      parent = Some(compose[A, B, C, D]),
+      "split interchange" -> forAll(laws.splitInterchange[A, B, C, D, E, G] _))
 }
 
 object SplitTests {

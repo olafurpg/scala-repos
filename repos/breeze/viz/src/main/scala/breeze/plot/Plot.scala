@@ -1,12 +1,20 @@
 package breeze.plot
 
 import org.jfree.chart.JFreeChart
-import org.jfree.chart.plot.{CrosshairState, PlotRenderingInfo, DefaultDrawingSupplier}
+import org.jfree.chart.plot.{
+  CrosshairState,
+  PlotRenderingInfo,
+  DefaultDrawingSupplier
+}
 import org.jfree.chart.axis._
 import java.awt._
 import collection.mutable.ArrayBuffer
 import collection.mutable
-import org.jfree.chart.renderer.xy.{XYItemRendererState, XYItemRenderer, AbstractXYItemRenderer}
+import org.jfree.chart.renderer.xy.{
+  XYItemRendererState,
+  XYItemRenderer,
+  AbstractXYItemRenderer
+}
 import java.awt.geom.Rectangle2D
 import org.jfree.data.xy
 import java.lang
@@ -110,8 +118,9 @@ class Plot() {
     if (value != logScaleX) {
       // TODO this is such a pain. There has to be a better way.
       val oldAxis = _xaxis
-      _xaxis = if (value) new LogarithmicAxis(xlabel)
-      else new NumberAxis(xlabel)
+      _xaxis =
+        if (value) new LogarithmicAxis(xlabel)
+        else new NumberAxis(xlabel)
       plot.setDomainAxis(_xaxis)
       xlim = oldAxis.getLowerBound -> oldAxis.getUpperBound
       _xaxis.setStandardTickUnits(oldAxis.getStandardTickUnits)
@@ -123,8 +132,9 @@ class Plot() {
     if (value != logScaleY) {
       // TODO this is such a pain. There has to be a better way.
       val oldAxis = _yaxis
-      _yaxis = if (value) new LogarithmicAxis(ylabel)
-      else new NumberAxis(ylabel)
+      _yaxis =
+        if (value) new LogarithmicAxis(ylabel)
+        else new NumberAxis(ylabel)
       plot.setRangeAxis(_yaxis)
       ylim = oldAxis.getLowerBound -> oldAxis.getUpperBound
       _yaxis.setStandardTickUnits(oldAxis.getStandardTickUnits)
@@ -157,11 +167,10 @@ class Plot() {
 
   // set integer tick units by default
   Array(xaxis, yaxis) foreach
-  (axis =>
-        {
-          axis.setAutoRangeIncludesZero(false)
-          axis.setStandardTickUnits(Plot.integerTickUnits)
-      })
+    (axis => {
+       axis.setAutoRangeIncludesZero(false)
+       axis.setStandardTickUnits(Plot.integerTickUnits)
+     })
 
   /** The JFreeChart plot object. */
   lazy val plot = {
@@ -170,12 +179,12 @@ class Plot() {
     rv.setRangeAxis(yaxis)
 
     rv.setDrawingSupplier(
-        new DefaultDrawingSupplier(Plot.paints,
-                                   Plot.fillPaints,
-                                   Plot.outlinePaints,
-                                   Plot.strokes,
-                                   Plot.outlineStrokes,
-                                   Plot.shapes))
+      new DefaultDrawingSupplier(Plot.paints,
+                                 Plot.fillPaints,
+                                 Plot.outlinePaints,
+                                 Plot.strokes,
+                                 Plot.outlineStrokes,
+                                 Plot.shapes))
 
     rv
   }
@@ -368,7 +377,7 @@ object Plot {
                  p11: CrosshairState,
                  p12: Int) {
       delegate(series)(
-          _.drawItem(p1, p2, p3, p4, p5, p6, p7, p8, _, item, p11, p12))
+        _.drawItem(p1, p2, p3, p4, p5, p6, p7, p8, _, item, p11, p12))
     }
 
     override def getItemVisible(series: Int, item: Int): Boolean = {
@@ -385,8 +394,9 @@ object Plot {
       delegate(series)(_.setSeriesVisible(_, visible))
     }
 
-    override def setSeriesVisible(
-        series: Int, visible: lang.Boolean, notify: Boolean) {
+    override def setSeriesVisible(series: Int,
+                                  visible: lang.Boolean,
+                                  notify: Boolean) {
       delegate(series)(_.setSeriesVisible(_, visible, notify))
     }
 
@@ -407,8 +417,9 @@ object Plot {
       delegate(series)(_.setSeriesVisibleInLegend(_, visible))
     }
 
-    override def setSeriesVisibleInLegend(
-        series: Int, visible: lang.Boolean, notify: Boolean) {
+    override def setSeriesVisibleInLegend(series: Int,
+                                          visible: lang.Boolean,
+                                          notify: Boolean) {
       delegate(series)(_.setSeriesVisibleInLegend(_, visible, notify))
     }
 

@@ -28,9 +28,9 @@ private object Json {
       // deserialized with a runtime type of int.
       // See: https://github.com/FasterXML/jackson-module-scala/issues/106.
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) traceId: Option[
-          Long],
+        Long],
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) spanId: Option[
-          Long],
+        Long],
       data: A)
 
   val mapper = new ObjectMapper()
@@ -38,13 +38,13 @@ private object Json {
 
   def serialize(o: AnyRef): String = mapper.writeValueAsString(o)
 
-  def deserialize[T : Manifest](value: String): T =
+  def deserialize[T: Manifest](value: String): T =
     mapper.readValue(value, typeReference[T])
 
-  def deserialize[T : Manifest](node: JsonNode): T =
+  def deserialize[T: Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private def typeReference[T : Manifest] = new TypeReference[T] {
+  private def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 
@@ -64,8 +64,8 @@ private object Json {
 // property you can avoid that brittleness.
 object debugLoggedStatNames
     extends GlobalFlag[Set[String]](
-        Set.empty,
-        "Comma separated stat names for logging observed values" +
+      Set.empty,
+      "Comma separated stat names for logging observed values" +
         " (set via a -D system property to avoid load ordering issues)"
     )
 
@@ -75,8 +75,8 @@ object debugLoggedStatNames
 // `"_"` as scope separator.
 object scopeSeparator
     extends GlobalFlag[String](
-        "/",
-        "Override the scope separator."
+      "/",
+      "Override the scope separator."
     )
 
 object MetricsStatsReceiver {
@@ -107,8 +107,11 @@ object MetricsStatsReceiver {
         case Event(etype, when, value, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
-          val env = Json.Envelope(
-              id, when.inMilliseconds, t, s, CounterIncrData(name, value))
+          val env = Json.Envelope(id,
+                                  when.inMilliseconds,
+                                  t,
+                                  s,
+                                  CounterIncrData(name, value))
           Try(Buf.Utf8(Json.serialize(env)))
 
         case _ =>
@@ -149,8 +152,8 @@ object MetricsStatsReceiver {
         case Event(etype, when, delta, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
-          val env = Json.Envelope(
-              id, when.inMilliseconds, t, s, StatAddData(name, delta))
+          val env = Json
+            .Envelope(id, when.inMilliseconds, t, s, StatAddData(name, delta))
           Try(Buf.Utf8(Json.serialize(env)))
 
         case _ =>
@@ -194,8 +197,7 @@ class MetricsStatsReceiver(
     val registry: Metrics,
     sink: Sink,
     histogramFactory: String => HistogramInterface
-)
-    extends StatsReceiverWithCumulativeGauges {
+) extends StatsReceiverWithCumulativeGauges {
   import MetricsStatsReceiver._
 
   def this(registry: Metrics, sink: Sink) =
@@ -217,8 +219,8 @@ class MetricsStatsReceiver(
   private[this] val statRequests = new LongAdder()
   private[this] val gaugeRequests = new LongAdder()
 
-  private[this] def checkRequestsLimit(
-      which: String, adder: LongAdder): Option[Issue] = {
+  private[this] def checkRequestsLimit(which: String,
+                                       adder: LongAdder): Option[Issue] = {
     // todo: ideally these would be computed as rates over time, but this is a
     // relatively simple proxy for bad behavior.
     val count = adder.sum()
@@ -228,20 +230,20 @@ class MetricsStatsReceiver(
   }
 
   GlobalRules.get.add(
-      Rule(
-          Category.Performance,
-          "Elevated metric creation requests",
-          "For best performance, metrics should be created and stored in member variables " +
-          "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
-          "Large numbers are an indication that these metrics are being requested " +
-          "frequently at runtime."
-      ) {
-        Seq(
-            checkRequestsLimit("counter", counterRequests),
-            checkRequestsLimit("stat", statRequests),
-            checkRequestsLimit("addGauge", gaugeRequests)
-        ).flatten
-      }
+    Rule(
+      Category.Performance,
+      "Elevated metric creation requests",
+      "For best performance, metrics should be created and stored in member variables " +
+        "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
+        "Large numbers are an indication that these metrics are being requested " +
+        "frequently at runtime."
+    ) {
+      Seq(
+        checkRequestsLimit("counter", counterRequests),
+        checkRequestsLimit("stat", statRequests),
+        checkRequestsLimit("addGauge", gaugeRequests)
+      ).flatten
+    }
   )
 
   // Scope separator, a string value used to separate scopes defined by `StatsReceiver`.
@@ -354,7 +356,9 @@ class MetricsStatsReceiver(
 }
 
 class MetricsExporter(val registry: Metrics)
-    extends JsonExporter(registry) with HttpMuxHandler with MetricsRegistry {
+    extends JsonExporter(registry)
+    with HttpMuxHandler
+    with MetricsRegistry {
   def this() = this(MetricsStatsReceiver.defaultRegistry)
   val pattern = "/admin/metrics.json"
 }

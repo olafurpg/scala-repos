@@ -20,7 +20,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
 
   implicit val materializer = ActorMaterializer()
   implicit val config = PatienceConfig(
-      timeout = Span(timeout.duration.toMillis, Millis))
+    timeout = Span(timeout.duration.toMillis, Millis))
 
   "Single Source" must {
     "produce element" in {
@@ -150,7 +150,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
 
       val s = Source
         .fromGraph(GraphDSL.create(source, source, source, source, source)(
-                Seq(_, _, _, _, _)) { implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
+          Seq(_, _, _, _, _)) { implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
           import GraphDSL.Implicits._
           val m = b.add(Merge[Int](5))
           i0.out ~> m.in(0)
@@ -290,13 +290,13 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
     "terminate with a failure if there is an exception thrown" in {
       val t = new RuntimeException("expected")
       EventFilter[RuntimeException](message = "expected", occurrences = 1) intercept whenReady(
-          Source
-            .unfold((0, 1)) {
-          case (a, _) if a > 10000000 ⇒ throw t
-          case (a, b) ⇒ Some((b, a + b) → a)
-        }
-            .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
-            .failed) {
+        Source
+          .unfold((0, 1)) {
+            case (a, _) if a > 10000000 ⇒ throw t
+            case (a, b) ⇒ Some((b, a + b) → a)
+          }
+          .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
+          .failed) {
         _ should be theSameInstanceAs (t)
       }
     }
@@ -327,7 +327,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
         .grouped(10)
         .runWith(Sink.head)
         .futureValue should ===(
-          Seq(false, true, false, true, false, true, false, true, false, true))
+        Seq(false, true, false, true, false, true, false, true, false, true))
     }
   }
 

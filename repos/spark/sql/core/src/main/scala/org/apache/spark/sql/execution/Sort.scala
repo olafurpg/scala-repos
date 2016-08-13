@@ -22,8 +22,16 @@ import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, GenerateUnsafeProjection}
-import org.apache.spark.sql.catalyst.plans.physical.{Distribution, OrderedDistribution, UnspecifiedDistribution}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode,
+  GenerateUnsafeProjection
+}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  Distribution,
+  OrderedDistribution,
+  UnspecifiedDistribution
+}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 
 /**
@@ -38,7 +46,8 @@ case class Sort(sortOrder: Seq[SortOrder],
                 global: Boolean,
                 child: SparkPlan,
                 testSpillFrequency: Int = 0)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = child.output
 
@@ -49,8 +58,8 @@ case class Sort(sortOrder: Seq[SortOrder],
     else UnspecifiedDistribution :: Nil
 
   override private[sql] lazy val metrics = Map(
-      "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
-      "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
+    "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
+    "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
 
   def createSorter(): UnsafeExternalRowSorter = {
     val ordering = newOrdering(sortOrder, output)
@@ -71,8 +80,11 @@ case class Sort(sortOrder: Seq[SortOrder],
     }
 
     val pageSize = SparkEnv.get.memoryManager.pageSizeBytes
-    val sorter = new UnsafeExternalRowSorter(
-        schema, ordering, prefixComparator, prefixComputer, pageSize)
+    val sorter = new UnsafeExternalRowSorter(schema,
+                                             ordering,
+                                             prefixComparator,
+                                             prefixComputer,
+                                             pageSize)
     if (testSpillFrequency > 0) {
       sorter.setTestSpillFrequency(testSpillFrequency)
     }
@@ -123,15 +135,17 @@ case class Sort(sortOrder: Seq[SortOrder],
                         s"$sorterVariable = $thisPlan.createSorter();")
     val metrics = ctx.freshName("metrics")
     ctx.addMutableState(
-        classOf[TaskMetrics].getName,
-        metrics,
-        s"$metrics = org.apache.spark.TaskContext.get().taskMetrics();")
+      classOf[TaskMetrics].getName,
+      metrics,
+      s"$metrics = org.apache.spark.TaskContext.get().taskMetrics();")
     val sortedIterator = ctx.freshName("sortedIter")
-    ctx.addMutableState(
-        "scala.collection.Iterator<UnsafeRow>", sortedIterator, "")
+    ctx.addMutableState("scala.collection.Iterator<UnsafeRow>",
+                        sortedIterator,
+                        "")
 
     val addToSorter = ctx.freshName("addToSorter")
-    ctx.addNewFunction(addToSorter, s"""
+    ctx.addNewFunction(addToSorter,
+                       s"""
         | private void $addToSorter() throws java.io.IOException {
         |   ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
         | }
@@ -164,8 +178,9 @@ case class Sort(sortOrder: Seq[SortOrder],
      """.stripMargin.trim
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     if (row != null) {
       s"$sorterVariable.insertRow((UnsafeRow)$row);"
     } else {

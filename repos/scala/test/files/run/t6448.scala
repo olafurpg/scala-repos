@@ -15,15 +15,17 @@ object Test {
 
   def main(args: Array[String]) {
     testing("List.collect")(
-        List(1, 2) collect { case x if f(x) && x < 2 => x })
-    testing("List.collectFirst")(
-        List(1, 2) collectFirst { case x if f(x) && x < 2 => x })
+      List(1, 2) collect { case x if f(x) && x < 2 => x })
+    testing("List.collectFirst")(List(1, 2) collectFirst {
+      case x if f(x) && x < 2 => x
+    })
     testing("Option.collect")(Some(1) collect { case x if f(x) && x < 2 => x })
     testing("Option.collect")(Some(2) collect { case x if f(x) && x < 2 => x })
     testing("Stream.collect")(
-        (Stream(1, 2).collect { case x if f(x) && x < 2 => x }).toList)
-    testing("Stream.collectFirst")(
-        Stream.continually(1) collectFirst { case x if f(x) && x < 2 => x })
+      (Stream(1, 2).collect { case x if f(x) && x < 2 => x }).toList)
+    testing("Stream.collectFirst")(Stream.continually(1) collectFirst {
+      case x if f(x) && x < 2 => x
+    })
 
     import collection.parallel.ParIterable
     import collection.parallel.immutable.ParVector
@@ -42,10 +44,10 @@ object Test {
 
     object PendingTests {
       testing("Iterator.collect")(
-          (Iterator(1, 2) collect { case x if f(x) && x < 2 => x }).toList)
+        (Iterator(1, 2) collect { case x if f(x) && x < 2 => x }).toList)
 
       testing("List.view.collect")(
-          (List(1, 2).view collect { case x if f(x) && x < 2 => x }).force)
+        (List(1, 2).view collect { case x if f(x) && x < 2 => x }).force)
 
       // This would do the trick in Future.collect, but I haven't added this yet as there is a tradeoff
       // with extra allocations to consider.

@@ -15,20 +15,20 @@ import Step.openingWriter
 object Handler {
 
   type Controller = PartialFunction[(String, JsObject), Unit]
-  type Connecter = PartialFunction[
-      Any, (Controller, JsEnumerator, SocketMember)]
+  type Connecter =
+    PartialFunction[Any, (Controller, JsEnumerator, SocketMember)]
 
   val emptyController: Controller = PartialFunction.empty
 
   lazy val AnaRateLimit =
     new lila.memo.RateLimit(90, 60 seconds, "socket analysis move")
 
-  def apply(hub: lila.hub.Env,
-            socket: ActorRef,
-            uid: String,
-            join: Any,
-            userId: Option[String])(
-      connecter: Connecter): Fu[JsSocketHandler] = {
+  def apply(
+      hub: lila.hub.Env,
+      socket: ActorRef,
+      uid: String,
+      join: Any,
+      userId: Option[String])(connecter: Connecter): Fu[JsSocketHandler] = {
 
     def baseController(member: SocketMember): Controller = {
       case ("p", _) => socket ! Ping(uid)
@@ -38,8 +38,9 @@ object Handler {
         }
       case ("startWatching", o) =>
         o str "d" foreach { ids =>
-          hub.actor.moveBroadcast ! StartWatching(
-              uid, member, ids.split(' ').toSet)
+          hub.actor.moveBroadcast ! StartWatching(uid,
+                                                  member,
+                                                  ids.split(' ').toSet)
         }
       case ("moveLat", o) =>
         hub.channel.roundMoveTime ! (~(o boolean "d"))
@@ -50,11 +51,11 @@ object Handler {
             anaMove.step match {
               case scalaz.Success(step) =>
                 member push lila.socket.Socket.makeMessage(
-                    "step",
-                    Json.obj(
-                        "step" -> step.toJson,
-                        "path" -> anaMove.path
-                    ))
+                  "step",
+                  Json.obj(
+                    "step" -> step.toJson,
+                    "path" -> anaMove.path
+                  ))
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
                                                            err.toString)
@@ -67,11 +68,11 @@ object Handler {
             anaDrop.step match {
               case scalaz.Success(step) =>
                 member push lila.socket.Socket.makeMessage(
-                    "step",
-                    Json.obj(
-                        "step" -> step.toJson,
-                        "path" -> anaDrop.path
-                    ))
+                  "step",
+                  Json.obj(
+                    "step" -> step.toJson,
+                    "path" -> anaDrop.path
+                  ))
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
                                                            err.toString)
@@ -83,13 +84,13 @@ object Handler {
           AnaDests parse o match {
             case Some(req) =>
               member push lila.socket.Socket.makeMessage(
-                  "dests",
-                  Json.obj(
-                      "dests" -> req.dests,
-                      "path" -> req.path
-                  ) ++ req.opening.?? { o =>
-                    Json.obj("opening" -> o)
-                  })
+                "dests",
+                Json.obj(
+                  "dests" -> req.dests,
+                  "path" -> req.path
+                ) ++ req.opening.?? { o =>
+                  Json.obj("opening" -> o)
+                })
             case None =>
               member push lila.socket.Socket
                 .makeMessage("destsFailure", "Bad dests request")
@@ -102,7 +103,7 @@ object Handler {
       val control = controller orElse baseController(member)
       Iteratee
         .foreach[JsValue](jsv =>
-              jsv.asOpt[JsObject] foreach { obj =>
+          jsv.asOpt[JsObject] foreach { obj =>
             obj str "t" foreach { t =>
               control.lift(t -> obj)
             }

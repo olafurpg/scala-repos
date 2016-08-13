@@ -32,8 +32,8 @@ trait Typeable[T] extends Serializable {
 }
 
 trait LowPriorityTypeable {
-  implicit def dfltTypeable[T]: Typeable[T] = macro TypeableMacros
-    .dfltTypeableImpl[T]
+  implicit def dfltTypeable[T]: Typeable[T] =
+    macro TypeableMacros.dfltTypeableImpl[T]
 }
 
 /**
@@ -93,8 +93,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   def isValClass[T](clazz: Class[T]) =
     (classOf[jl.Number] isAssignableFrom clazz) ||
-    clazz == classOf[jl.Boolean] || clazz == classOf[jl.Character] ||
-    clazz == classOf[runtime.BoxedUnit]
+      clazz == classOf[jl.Boolean] || clazz == classOf[jl.Character] ||
+      clazz == classOf[runtime.BoxedUnit]
 
   /** Typeable instance for `Any`. */
   implicit val anyTypeable: Typeable[Any] = new Typeable[Any] {
@@ -125,7 +125,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && erased.isAssignableFrom(t.getClass))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = {
         // Workaround for https://issues.scala-lang.org/browse/SI-5425
@@ -147,8 +148,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     }
 
   /** Typeable instance for singleton reference types */
-  def referenceSingletonTypeable[T <: AnyRef](
-      value: T, name: String): Typeable[T] =
+  def referenceSingletonTypeable[T <: AnyRef](value: T,
+                                              name: String): Typeable[T] =
     new Typeable[T] {
       def cast(t: Any): Option[T] =
         if (t.asInstanceOf[AnyRef] eq value) Some(value) else None
@@ -160,7 +161,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && parents.forall(_.cast(t).isDefined))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = parents map (_.describe) mkString " with "
     }
@@ -256,8 +258,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     }
 
   /** Typeable instance for polymorphic case classes with typeable elements */
-  def caseClassTypeable[T](
-      erased: Class[T], fields: Array[Typeable[_]]): Typeable[T] =
+  def caseClassTypeable[T](erased: Class[T],
+                           fields: Array[Typeable[_]]): Typeable[T] =
     new Typeable[T] {
       def cast(t: Any): Option[T] =
         if (classOf[Product].isAssignableFrom(erased) &&
@@ -292,14 +294,15 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   /** Typeable instance for `HList`s. Note that the contents will be tested for conformance to the element types. */
   implicit def hlistTypeable[H, T <: HList](
-      implicit castH: Typeable[H], castT: Typeable[T]): Typeable[H :: T] =
+      implicit castH: Typeable[H],
+      castT: Typeable[T]): Typeable[H :: T] =
     new Typeable[H :: T] {
       def cast(t: Any): Option[H :: T] = {
         if (t == null) None
         else if (t.isInstanceOf[::[_, _ <: HList]]) {
           val l = t.asInstanceOf[::[_, _ <: HList]]
-          for (hd <- l.head.cast[H]; tl <- (l.tail: Any).cast[T]) yield
-            t.asInstanceOf[H :: T]
+          for (hd <- l.head.cast[H]; tl <- (l.tail: Any).cast[T])
+            yield t.asInstanceOf[H :: T]
         } else None
       }
       def describe = s"${castH.describe} :: ${castT.describe}"
@@ -316,7 +319,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     * Note that the contents will be tested for conformance to one of the element types.
     */
   implicit def coproductTypeable[H, T <: Coproduct](
-      implicit castH: Typeable[H], castT: Typeable[T]): Typeable[H :+: T] =
+      implicit castH: Typeable[H],
+      castT: Typeable[T]): Typeable[H :+: T] =
     new Typeable[H :+: T] {
       def cast(t: Any): Option[H :+: T] = {
         t.cast[Inl[H, T]] orElse t.cast[Inr[H, T]]
@@ -378,7 +382,7 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
   import internal._
   import definitions.NothingClass
 
-  def dfltTypeableImpl[T : WeakTypeTag]: Tree = {
+  def dfltTypeableImpl[T: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
 
     val typeableTpe = typeOf[Typeable[_]].typeConstructor

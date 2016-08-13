@@ -31,8 +31,8 @@ object ModifierType extends Enumeration {
   }
 }
 
-case class ModifiersConstruction(
-    annotations: Seq[IntermediateNode], modifiers: Seq[IntermediateNode])
+case class ModifiersConstruction(annotations: Seq[IntermediateNode],
+                                 modifiers: Seq[IntermediateNode])
     extends IntermediateNode {
   val withoutList = new ArrayBuffer[ModifierType]()
 
@@ -55,11 +55,13 @@ case class ModifiersConstruction(
 }
 
 case class ModifierWithExpression(mtype: ModifierType, value: IntermediateNode)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode
+    with Modifier {
   override def modificator: ModifierType = mtype
 }
 
 case class SimpleModifier(mtype: ModifierType)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode
+    with Modifier {
   override def modificator: ModifierType = mtype
 }

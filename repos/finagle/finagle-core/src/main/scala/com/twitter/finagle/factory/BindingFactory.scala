@@ -24,10 +24,10 @@ private class DynNameFactory[Req, Rep](
 
   private sealed trait State
   private case class Pending(
-      q: immutable.Queue[
-          (ClientConnection, Promise[Service[Req, Rep]], Stopwatch.Elapsed)]
-  )
-      extends State
+      q: immutable.Queue[(ClientConnection,
+                          Promise[Service[Req, Rep]],
+                          Stopwatch.Elapsed)]
+  ) extends State
   private case class Named(name: NameTree[Name.Bound]) extends State
   private case class Failed(exc: Throwable) extends State
   private case class Closed() extends State
@@ -158,7 +158,7 @@ private[finagle] object NameTreeFactory {
   ): ServiceFactory[Req, Rep] = {
 
     lazy val noBrokersAvailableFactory = Failed(
-        new NoBrokersAvailableException(path.show))
+      new NoBrokersAvailableException(path.show))
 
     case class Failed(exn: Throwable) extends ServiceFactory[Req, Rep] {
       val service: Future[Service[Req, Rep]] = Future.exception(exn)
@@ -177,8 +177,7 @@ private[finagle] object NameTreeFactory {
     case class Weighted(
         drv: Drv,
         factories: Seq[ServiceFactory[Req, Rep]]
-    )
-        extends ServiceFactory[Req, Rep] {
+    ) extends ServiceFactory[Req, Rep] {
       def apply(conn: ClientConnection) = factories(drv(rng)).apply(conn)
 
       override def status =
@@ -252,37 +251,37 @@ private[finagle] class BindingFactory[Req, Rep](
   private[this] val tree = NameTree.Leaf(path)
 
   private[this] val nameCache = new ServiceFactoryCache[Name.Bound, Req, Rep](
-      bound =>
-        new ServiceFactoryProxy(newFactory(bound)) {
-          private val boundShow = Showable.show(bound)
-          override def apply(conn: ClientConnection) = {
-            Trace.recordBinary("namer.name", boundShow)
-            super.apply(conn)
-          }
-      },
-      statsReceiver.scope("namecache"),
-      maxNameCacheSize)
+    bound =>
+      new ServiceFactoryProxy(newFactory(bound)) {
+        private val boundShow = Showable.show(bound)
+        override def apply(conn: ClientConnection) = {
+          Trace.recordBinary("namer.name", boundShow)
+          super.apply(conn)
+        }
+    },
+    statsReceiver.scope("namecache"),
+    maxNameCacheSize)
 
   private[this] val nameTreeCache =
     new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](
-        tree =>
-          new ServiceFactoryProxy(NameTreeFactory(path, tree, nameCache)) {
-            private val treeShow = tree.show
-            override def apply(conn: ClientConnection) = {
-              Trace.recordBinary("namer.tree", treeShow)
-              super.apply(conn)
-            }
-        },
-        statsReceiver.scope("nametreecache"),
-        maxNameTreeCacheSize)
+      tree =>
+        new ServiceFactoryProxy(NameTreeFactory(path, tree, nameCache)) {
+          private val treeShow = tree.show
+          override def apply(conn: ClientConnection) = {
+            Trace.recordBinary("namer.tree", treeShow)
+            super.apply(conn)
+          }
+      },
+      statsReceiver.scope("nametreecache"),
+      maxNameTreeCacheSize)
 
   private[this] val dtabCache = {
     val newFactory: ((Dtab, Dtab)) => ServiceFactory[Req, Rep] = {
       case (baseDtab, localDtab) =>
         val factory = new DynNameFactory(
-            NameInterpreter.bind(baseDtab ++ localDtab, path),
-            nameTreeCache,
-            statsReceiver = statsReceiver)
+          NameInterpreter.bind(baseDtab ++ localDtab, path),
+          nameTreeCache,
+          statsReceiver = statsReceiver)
 
         new ServiceFactoryProxy(factory) {
           private val pathShow = path.show
@@ -296,15 +295,17 @@ private[finagle] class BindingFactory[Req, Rep](
               // we don't have the dtabs handy at the point we throw
               // the exception; fill them in on the way out
               case e: NoBrokersAvailableException =>
-                Future.exception(new NoBrokersAvailableException(
-                        e.name, baseDtab, localDtab))
+                Future.exception(
+                  new NoBrokersAvailableException(e.name, baseDtab, localDtab))
             }
           }
         }
     }
 
     new ServiceFactoryCache[(Dtab, Dtab), Req, Rep](
-        newFactory, statsReceiver.scope("dtabcache"), maxNamerCacheSize)
+      newFactory,
+      statsReceiver.scope("dtabcache"),
+      maxNamerCacheSize)
   }
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
@@ -380,7 +381,7 @@ object BindingFactory {
 
       def newStack(errorLabel: String, bound: Name.Bound) = {
         val client = next.make(
-            params +
+          params +
             // replace the possibly unbound Dest with the definitely bound
             // Dest because (1) it's needed by AddrMetadataExtraction and
             // (2) it seems disingenuous not to.
@@ -395,8 +396,10 @@ object BindingFactory {
 
         case Name.Path(path) =>
           val BaseDtab(baseDtab) = params[BaseDtab]
-          new BindingFactory(
-              path, newStack(path.show, _), baseDtab, stats.scope("namer"))
+          new BindingFactory(path,
+                             newStack(path.show, _),
+                             baseDtab,
+                             stats.scope("namer"))
       }
 
       Stack.Leaf(role, factory)

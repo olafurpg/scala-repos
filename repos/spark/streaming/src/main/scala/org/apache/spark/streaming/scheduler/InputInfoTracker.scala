@@ -66,11 +66,12 @@ private[streaming] class InputInfoTracker(ssc: StreamingContext)
   def reportInfo(batchTime: Time, inputInfo: StreamInputInfo): Unit =
     synchronized {
       val inputInfos = batchTimeToInputInfos.getOrElseUpdate(
-          batchTime, new mutable.HashMap[Int, StreamInputInfo]())
+        batchTime,
+        new mutable.HashMap[Int, StreamInputInfo]())
 
       if (inputInfos.contains(inputInfo.inputStreamId)) {
         throw new IllegalStateException(
-            s"Input stream ${inputInfo.inputStreamId} for batch" +
+          s"Input stream ${inputInfo.inputStreamId} for batch" +
             s"$batchTime is already added into InputInfoTracker, this is a illegal state")
       }
       inputInfos += ((inputInfo.inputStreamId, inputInfo))

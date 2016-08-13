@@ -23,7 +23,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.Row
 
 class MaxAbsScalerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
   test("MaxAbsScaler fit basic case") {
     val data = Array(Vectors.dense(1, 0, 100),

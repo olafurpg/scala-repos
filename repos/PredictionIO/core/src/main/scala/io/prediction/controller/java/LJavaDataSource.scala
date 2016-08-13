@@ -28,4 +28,4 @@ import scala.reflect.ClassTag
   */
 abstract class LJavaDataSource[TD, EI, Q, A]
     extends LDataSource[TD, EI, Q, A]()(
-        ClassTag.AnyRef.asInstanceOf[ClassTag[TD]])
+      ClassTag.AnyRef.asInstanceOf[ClassTag[TD]])

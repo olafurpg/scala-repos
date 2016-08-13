@@ -19,10 +19,11 @@ class HoistClientOps extends Phase {
         case Bind(s2, from2, Pure(StructNode(defs2), ts2)) =>
           // Extract client-side operations into ResultSetMapping
           val hoisted = defs2.map { case (ts, n) => (ts, n, unwrap(n, true)) }
-          logger.debug("Hoisting operations from defs: " + hoisted.iterator
-                .filter(t => t._2 ne t._3._1)
-                .map(_._1)
-                .mkString(", "))
+          logger.debug(
+            "Hoisting operations from defs: " + hoisted.iterator
+              .filter(t => t._2 ne t._3._1)
+              .map(_._1)
+              .mkString(", "))
           val newDefsM = hoisted.iterator.map {
             case (ts, n, (n2, wrap)) => (n2, new AnonSymbol)
           }.toMap
@@ -32,10 +33,10 @@ class HoistClientOps extends Phase {
               (ts, wrap(Select(Ref(rsm.generator), newDefsM(n2))))
           }.toMap
           val bind2 = rewriteDBSide(
-              Bind(s2,
-                   from2,
-                   Pure(StructNode(ConstArray.from(newDefsM.map(_.swap))),
-                        new AnonTypeSymbol)).infer())
+            Bind(s2,
+                 from2,
+                 Pure(StructNode(ConstArray.from(newDefsM.map(_.swap))),
+                      new AnonTypeSymbol)).infer())
           val rsm2 = rsm
             .copy(from = bind2, map = rsm.map.replace {
               case Select(Ref(s), f) if s == rsm.generator => oldDefsM(f)
@@ -79,7 +80,7 @@ class HoistClientOps extends Phase {
                 case (ts, n) => (ts, n, unwrap(n, false))
               }
               logger.debug(
-                  "Hoisting operations from defs in left side of Join: " +
+                "Hoisting operations from defs in left side of Join: " +
                   hoisted.iterator
                     .filter(t => t._2 ne t._3._1)
                     .map(_._1)
@@ -89,11 +90,12 @@ class HoistClientOps extends Phase {
               }.toMap
               logger.debug("New defs: " + newDefsM)
               val bl2 = bl
-                .copy(select = Pure(
-                          StructNode(ConstArray.from(newDefsM.map(_.swap)))))
+                .copy(
+                  select =
+                    Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger.debug(
-                  "Translated left join side:", Ellipsis(bl2, List(0)))
+              logger
+                .debug("Translated left join side:", Ellipsis(bl2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap
@@ -105,7 +107,7 @@ class HoistClientOps extends Phase {
                 case (ts, n) => (ts, n, unwrap(n, false))
               }
               logger.debug(
-                  "Hoisting operations from defs in right side of Join: " +
+                "Hoisting operations from defs in right side of Join: " +
                   hoisted.iterator
                     .filter(t => t._2 ne t._3._1)
                     .map(_._1)
@@ -115,11 +117,12 @@ class HoistClientOps extends Phase {
               }.toMap
               logger.debug("New defs: " + newDefsM)
               val br2 = br
-                .copy(select = Pure(
-                          StructNode(ConstArray.from(newDefsM.map(_.swap)))))
+                .copy(
+                  select =
+                    Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger.debug(
-                  "Translated right join side:", Ellipsis(br2, List(0)))
+              logger
+                .debug("Translated right join side:", Ellipsis(br2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap
@@ -167,8 +170,8 @@ class HoistClientOps extends Phase {
           val res = Bind(s1, CollectionCast(bfrom1, cons2), sel1.replace {
             case Ref(s) if s == s1 => Ref(s)
           }).infer()
-          logger.debug(
-              "Pulled Bind out of CollectionCast", Ellipsis(res, List(0, 0)))
+          logger.debug("Pulled Bind out of CollectionCast",
+                       Ellipsis(res, List(0, 0)))
           res
         case from2 =>
           if (from2 eq from1) n else n.copy(child = from2) :@ n.nodeType
@@ -218,10 +221,9 @@ class HoistClientOps extends Phase {
       else
         (recCh, { n =>
           IfThenElse(
-              ConstArray(
-                  Library.==.typed[Boolean](recTr(n), LiteralNode(null)),
-                  r1,
-                  r2))
+            ConstArray(Library.==.typed[Boolean](recTr(n), LiteralNode(null)),
+                       r1,
+                       r2))
         })
     case Library.SilentCast(ch) :@ tpe if !topLevel =>
       val (recCh, recTr) = unwrap(ch, topLevel)
@@ -237,12 +239,13 @@ class HoistClientOps extends Phase {
       case GetOrElse(OptionApply(ch), _) => ch
       case n @ GetOrElse(ch :@ OptionType(tpe), default) =>
         logger.debug("Translating GetOrElse to IfNull", n)
-        val d = try default() catch {
+        val d = try default()
+        catch {
           case NonFatal(ex) =>
             throw new SlickException(
-                "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +
+              "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +
                 "This cannot be done lazily when the value is needed on the database side",
-                ex)
+              ex)
         }
         Library.IfNull.typed(tpe, ch, LiteralNode(tpe, d)).infer()
     }, keepType = true, bottomUp = true)

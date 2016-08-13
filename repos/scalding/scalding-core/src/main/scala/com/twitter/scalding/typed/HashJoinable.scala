@@ -54,7 +54,7 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
     TypedPipeFactory({ (fd, mode) =>
       val newPipe =
         new HashJoin(RichPipe.assignName(
-                         mapside.toPipe(('key, 'value))(fd, mode, tup2Setter)),
+                       mapside.toPipe(('key, 'value))(fd, mode, tup2Setter)),
                      Field.singleOrdered("key")(keyOrdering),
                      getForceToDiskPipeIfNecessary(fd, mode),
                      Field.singleOrdered("key1")(keyOrdering),
@@ -62,7 +62,9 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
 
       //Construct the new TypedPipe
       TypedPipe.from[(K, R)](newPipe.project('key, 'value), ('key, 'value))(
-          fd, mode, tuple2Converter)
+        fd,
+        mode,
+        tuple2Converter)
     })
 
   /**
@@ -94,8 +96,8 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
       case eachPipe: Each =>
         if (canSkipEachOperation(eachPipe.getOperation, mode)) {
           //need to recurse down to see if parent pipe is ok
-          getPreviousPipe(eachPipe).exists(
-              prevPipe => isSafeToSkipForceToDisk(prevPipe, mode))
+          getPreviousPipe(eachPipe).exists(prevPipe =>
+            isSafeToSkipForceToDisk(prevPipe, mode))
         } else false
       case _: Checkpoint => true
       case _: GroupBy => true
@@ -113,8 +115,8 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
     * For map and flatMap we can't definitively infer if it is OK to skip the forceToDisk.
     * Thus we just go ahead and forceToDisk in those two cases - users can opt out if needed.
     */
-  private def canSkipEachOperation(
-      eachOperation: Operation[_], mode: Mode): Boolean = {
+  private def canSkipEachOperation(eachOperation: Operation[_],
+                                   mode: Mode): Boolean = {
     eachOperation match {
       case f: FlatMapFunction[_, _] =>
         f.getFunction match {

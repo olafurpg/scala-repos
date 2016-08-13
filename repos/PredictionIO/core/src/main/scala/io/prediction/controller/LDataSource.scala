@@ -31,7 +31,7 @@ import scala.reflect._
   * @tparam A Actual value class.
   * @group Data Source
   */
-abstract class LDataSource[TD : ClassTag, EI, Q, A]
+abstract class LDataSource[TD: ClassTag, EI, Q, A]
     extends BaseDataSource[RDD[TD], EI, Q, A] {
 
   def readTrainingBase(sc: SparkContext): RDD[TD] = {
@@ -46,10 +46,10 @@ abstract class LDataSource[TD : ClassTag, EI, Q, A]
 
     localEvalData.map {
       case (td, ei, qaSeq) => {
-          val tdRDD = sc.parallelize(Seq(None)).map(_ => td)
-          val qaRDD = sc.parallelize(qaSeq)
-          (tdRDD, ei, qaRDD)
-        }
+        val tdRDD = sc.parallelize(Seq(None)).map(_ => td)
+        val qaRDD = sc.parallelize(qaSeq)
+        (tdRDD, ei, qaRDD)
+      }
     }
   }
 

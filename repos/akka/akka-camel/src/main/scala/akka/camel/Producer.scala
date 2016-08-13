@@ -30,7 +30,7 @@ trait ProducerSupport extends Actor with CamelSupport {
     * CamelMessage headers to copy by default from request message to response-message.
     */
   private val headersToCopyDefault: Set[String] = Set(
-      CamelMessage.MessageExchangeId)
+    CamelMessage.MessageExchangeId)
 
   /**
     * If set to false (default), this producer expects a response message from the Camel endpoint.
@@ -62,10 +62,11 @@ trait ProducerSupport extends Actor with CamelSupport {
     case CamelProducerObjects(endpoint, processor) ⇒
       if (producerChild.isEmpty) {
         producerChild = Some(
-            context.actorOf(Props(new ProducerChild(endpoint, processor))))
+          context.actorOf(Props(new ProducerChild(endpoint, processor))))
         messages = {
           for (child ← producerChild;
-          (snd, msg) ← messages) child.tell(transformOutgoingMessage(msg), snd)
+               (snd, msg) ← messages)
+            child.tell(transformOutgoingMessage(msg), snd)
           Vector.empty
         }
       }
@@ -151,8 +152,9 @@ trait ProducerSupport extends Actor with CamelSupport {
           producer.tell(if (xchg.exchange.isFailed)
                           xchg.toFailureResult(cmsg.headers(headersToCopy))
                         else
-                          MessageResult(xchg.toResponseMessage(
-                                  cmsg.headers(headersToCopy))),
+                          MessageResult(
+                            xchg.toResponseMessage(
+                              cmsg.headers(headersToCopy))),
                         originalSender)
       })
     }
@@ -162,8 +164,7 @@ trait ProducerSupport extends Actor with CamelSupport {
 /**
   * Mixed in by Actor implementations to produce messages to Camel endpoints.
   */
-trait Producer extends ProducerSupport {
-  this: Actor ⇒
+trait Producer extends ProducerSupport { this: Actor ⇒
 
   /**
     * Implementation of Actor.receive. Any messages received by this actor
@@ -181,8 +182,8 @@ private final case class MessageResult(message: CamelMessage)
 /**
   * INTERNAL API
   */
-private final case class FailureResult(
-    cause: Throwable, headers: Map[String, Any] = Map.empty)
+private final case class FailureResult(cause: Throwable,
+                                       headers: Map[String, Any] = Map.empty)
     extends NoSerializationVerificationNeeded
 
 /**
@@ -190,7 +191,6 @@ private final case class FailureResult(
   *
   *
   */
-trait Oneway extends Producer {
-  this: Actor ⇒
+trait Oneway extends Producer { this: Actor ⇒
   override def oneway: Boolean = true
 }

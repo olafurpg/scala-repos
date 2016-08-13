@@ -19,7 +19,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
@@ -87,7 +91,7 @@ object EitherOrderedBuf {
       q"""
         val $tmpGetHolder = $inputStreamA.readByte
         if($tmpGetHolder == (0: _root_.scala.Byte)) Left(${leftBuf.get(
-          inputStreamA)})
+        inputStreamA)})
         else Right(${rightBuf.get(inputStreamA)})
       """
     }
@@ -138,8 +142,8 @@ object EitherOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: TermName, inputStreamB: TermName) =
+      override def compareBinary(inputStreamA: TermName,
+                                 inputStreamB: TermName) =
         genBinaryCompare(inputStreamA, inputStreamB)
       override def hash(element: TermName): ctx.Tree = genHashFn(element)
       override def put(inputStream: TermName, element: TermName) =

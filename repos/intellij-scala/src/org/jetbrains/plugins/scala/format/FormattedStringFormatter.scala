@@ -21,7 +21,7 @@ object FormattedStringFormatter extends StringFormatter {
           val format = specifier
             .map(_.format)
             .getOrElse(
-                "%" + injection.expressionType.map(letterFor).getOrElse('s'))
+              "%" + injection.expressionType.map(letterFor).getOrElse('s'))
           val argument =
             if (injection.isComplexBlock) injection.text else injection.value
           (format, Some(argument))

@@ -75,8 +75,8 @@ class BufInputStreamTest extends FunSuite {
     val c = is.read()
     is.reset()
     assert(
-        c == fileString.charAt(0),
-        "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
+      c == fileString.charAt(0),
+      "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
   }
 
   test("read") {

@@ -37,11 +37,11 @@ class InputSizeReducerEstimator extends ReducerEstimator {
     Common.inputSizes(info.step) match {
       case Nil =>
         LOG.warn(
-            "InputSizeReducerEstimator unable to estimate reducers; " +
+          "InputSizeReducerEstimator unable to estimate reducers; " +
             "cannot compute size of:\n - " + Common
-              .unrollTaps(info.step)
-              .filterNot(_.isInstanceOf[Hfs])
-              .mkString("\n - "))
+            .unrollTaps(info.step)
+            .filterNot(_.isInstanceOf[Hfs])
+            .mkString("\n - "))
         None
       case inputSizes =>
         val bytesPerReducer =
@@ -56,7 +56,7 @@ class InputSizeReducerEstimator extends ReducerEstimator {
         }.mkString("\n")
 
         LOG.info(
-            "\nInputSizeReducerEstimator" + "\n - input size (bytes): " +
+          "\nInputSizeReducerEstimator" + "\n - input size (bytes): " +
             totalBytes + "\n - reducer estimate:   " + nReducers +
             "\n - Breakdown:\n" + logStr)
 

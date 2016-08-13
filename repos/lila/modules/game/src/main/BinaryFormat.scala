@@ -59,9 +59,9 @@ object BinaryFormat {
       def enc(mt: MT) =
         encodeMap get mt orElse findClose(mt, encodeList) getOrElse (size - 1)
       (mts grouped 2 map {
-            case Vector(a, b) => (enc(a) << 4) + enc(b)
-            case Vector(a) => enc(a) << 4
-          }).map(_.toByte).toArray
+        case Vector(a, b) => (enc(a) << 4) + enc(b)
+        case Vector(a) => enc(a) << 4
+      }).map(_.toByte).toArray
     }
 
     def read(ba: ByteArray): Vector[MT] = {
@@ -78,8 +78,8 @@ object BinaryFormat {
       def time(t: Float) = writeSignedInt24((t * 100).toInt)
       def timer(seconds: Double) = writeTimer((seconds * 100).toLong)
       Array(writeClockLimit(clock.limit), writeInt8(clock.increment)) ++ time(
-          clock.whiteTime) ++ time(clock.blackTime) ++ timer(
-          clock.timerOption getOrElse 0d) map (_.toByte)
+        clock.whiteTime) ++ time(clock.blackTime) ++ timer(
+        clock.timerOption getOrElse 0d) map (_.toByte)
     }
 
     def read(ba: ByteArray,
@@ -91,23 +91,23 @@ object BinaryFormat {
             readTimer(b9, b10, b11, b12) match {
               case 0 =>
                 PausedClock(
-                    color = color,
-                    limit = readClockLimit(b1),
-                    increment = b2,
-                    whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                    blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                    whiteBerserk = whiteBerserk,
-                    blackBerserk = blackBerserk)
+                  color = color,
+                  limit = readClockLimit(b1),
+                  increment = b2,
+                  whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+                  blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+                  whiteBerserk = whiteBerserk,
+                  blackBerserk = blackBerserk)
               case timer =>
                 RunningClock(
-                    color = color,
-                    limit = readClockLimit(b1),
-                    increment = b2,
-                    whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                    blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                    whiteBerserk = whiteBerserk,
-                    blackBerserk = blackBerserk,
-                    timer = timer.toDouble / 100)
+                  color = color,
+                  limit = readClockLimit(b1),
+                  increment = b2,
+                  whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+                  blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+                  whiteBerserk = whiteBerserk,
+                  blackBerserk = blackBerserk,
+                  timer = timer.toDouble / 100)
             }
           // compatibility with 5 bytes timers
           // #TODO remove me! But fix the DB first!
@@ -167,8 +167,8 @@ object BinaryFormat {
 
       val ints =
         Array(
-            (castleInt << 4) + (lastMoveInt >> 8),
-            (lastMoveInt & 255)
+          (castleInt << 4) + (lastMoveInt >> 8),
+          (lastMoveInt & 255)
         ) ++ writeInt24(time) ++ clmt.check.map(posInt)
 
       ByteArray(ints.map(_.toByte))
@@ -186,19 +186,23 @@ object BinaryFormat {
 
     private def posAt(x: Int, y: Int) = Pos.posAt(x + 1, y + 1)
 
-    private def doRead(
-        b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Option[Int]) =
+    private def doRead(b1: Int,
+                       b2: Int,
+                       b3: Int,
+                       b4: Int,
+                       b5: Int,
+                       b6: Option[Int]) =
       CastleLastMoveTime(
-          castles = Castles(
-                b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
-          lastMove = for {
-            from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
-            to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
-          } yield from -> to,
-          lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
-          check = b6 flatMap { x =>
-            posAt(x >> 3, x & 7)
-          })
+        castles =
+          Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
+        lastMove = for {
+          from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
+          to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
+        } yield from -> to,
+        lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
+        check = b6 flatMap { x =>
+          posAt(x >> 3, x & 7)
+        })
   }
 
   object piece {
@@ -211,8 +215,7 @@ object BinaryFormat {
       def posInt(pos: Pos): Int = (pieces get pos).fold(0) { piece =>
         piece.color.fold(0, 8) + roleToInt(piece.role)
       }
-      ByteArray(
-          groupedPos map {
+      ByteArray(groupedPos map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
       })
     }
@@ -228,8 +231,8 @@ object BinaryFormat {
         }
       val pieceInts = ba.value flatMap splitInts
       (Pos.all zip pieceInts flatMap {
-            case (pos, int) => intPiece(int) map (pos -> _)
-          }).toMap
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }).toMap
     }
 
     // cache standard start position

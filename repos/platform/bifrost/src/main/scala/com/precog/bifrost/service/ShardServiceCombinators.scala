@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -97,7 +97,10 @@ object ShardServiceCombinators extends Logging {
     } yield mimeType
 
     val requested =
-      (request.headers.header[Accept].toSeq.flatMap(_.mimeTypes) ++ requestParamType)
+      (request.headers
+        .header[Accept]
+        .toSeq
+        .flatMap(_.mimeTypes) ++ requestParamType)
 
     val allowed = Set(JSON, CSV, anymaintype / anysubtype)
 
@@ -121,8 +124,8 @@ object ShardServiceCombinators extends Logging {
     import blueeyes.json.serialization.Extractor._
     val onError: Error => String = {
       case err @ Thrown(ex) =>
-        logger.warn(
-            "Exceptiion thrown from JSON parsing of sortOn parameter", ex)
+        logger
+          .warn("Exceptiion thrown from JSON parsing of sortOn parameter", ex)
         err.message
       case other =>
         other.message
@@ -132,14 +135,16 @@ object ShardServiceCombinators extends Logging {
       val parsed: Validation[Error, List[CPath]] =
         ((Thrown(_: Throwable)) <-: JParser.parseFromString(paths)) flatMap {
           case JArray(elems) =>
-            Validation.success(
-                elems collect { case JString(path) => CPath(path) })
+            Validation.success(elems collect {
+              case JString(path) => CPath(path)
+            })
           case JString(path) =>
             Validation.success(CPath(path) :: Nil)
           case badJVal =>
-            Validation.failure(Invalid(
-                    "The sortOn query parameter was expected to be JSON string or array, but found " +
-                    badJVal))
+            Validation.failure(
+              Invalid(
+                "The sortOn query parameter was expected to be JSON string or array, but found " +
+                  badJVal))
         }
 
       onError <-: parsed
@@ -168,7 +173,7 @@ object ShardServiceCombinators extends Logging {
         case Limit(n) => Validation.success(n)
         case _ =>
           Validation.failure(
-              "The limit query parameter must be a positive integer.")
+            "The limit query parameter must be a positive integer.")
       }
       .sequence[({ type λ[α] = Validation[String, α] })#λ, Long]
 
@@ -180,16 +185,16 @@ object ShardServiceCombinators extends Logging {
           Validation.success(n)
         case Offset(n) =>
           Validation.failure(
-              "The offset query parameter cannot be used without a limit.")
+            "The offset query parameter cannot be used without a limit.")
         case _ =>
           Validation.failure(
-              "The offset query parameter must be a non-negative integer.")
+            "The offset query parameter must be a non-negative integer.")
       }
       .sequence[({ type λ[α] = Validation[String, α] })#λ, Long]
 
-      (offset.toValidationNel |@| limit.toValidationNel) { (offset, limit) =>
-        limit map ((offset getOrElse 0, _))
-      }
+    (offset.toValidationNel |@| limit.toValidationNel) { (offset, limit) =>
+      limit map ((offset getOrElse 0, _))
+    }
   }
 
   def queryOpts(request: HttpRequest[_]) = {
@@ -208,16 +213,18 @@ object ShardServiceCombinators extends Logging {
                      output)
     } leftMap { errors =>
       DispatchError(
-          BadRequest,
-          "Errors were encountered decoding query configuration parameters.",
-          Some(errors.list mkString "\n")): NotServed
+        BadRequest,
+        "Errors were encountered decoding query configuration parameters.",
+        Some(errors.list mkString "\n")): NotServed
     }
   }
 }
 
 trait ShardServiceCombinators
-    extends EitherServiceCombinators with PathServiceCombinators
-    with APIKeyServiceCombinators with Logging {
+    extends EitherServiceCombinators
+    with PathServiceCombinators
+    with APIKeyServiceCombinators
+    with Logging {
   import ShardServiceCombinators._
   import ServiceHandlerUtil._
   import DefaultBijections._
@@ -226,60 +233,61 @@ trait ShardServiceCombinators
 
   def query[B](next: HttpService[ByteChunk,
                                  (APIKey, AccountDetails, Path, Query,
-                                 QueryOptions) => Future[HttpResponse[B]]])(
-      implicit executor: ExecutionContext): HttpService[
-      ByteChunk, ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] = {
+                                  QueryOptions) => Future[HttpResponse[B]]])(
+      implicit executor: ExecutionContext)
+    : HttpService[ByteChunk,
+                  ((APIKey, AccountDetails),
+                   Path) => Future[HttpResponse[B]]] = {
     new DelegatingService[ByteChunk,
                           ((APIKey, AccountDetails),
-                          Path) => Future[HttpResponse[B]],
+                           Path) => Future[HttpResponse[B]],
                           ByteChunk,
                           (APIKey, AccountDetails, Path, Query,
-                          QueryOptions) => Future[HttpResponse[B]]] {
+                           QueryOptions) => Future[HttpResponse[B]]] {
       val delegate = next
       val metadata = NoMetadata
       val service: HttpRequest[ByteChunk] => Validation[
-          NotServed,
-          ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] =
-        (request: HttpRequest[ByteChunk]) =>
-          {
-            queryOpts(request) flatMap { opts =>
-              def quirrelContent(
-                  request: HttpRequest[ByteChunk]): Option[ByteChunk] =
-                for {
-                  header <- request.headers.header[`Content-Type`]
-                               if header.mimeTypes exists { t =>
-                             t == text / plain ||
-                             (t.maintype == "text" &&
-                                 t.subtype == "x-quirrel-script")
-                           }
-                  content <- request.content
-                } yield content
-
-              next.service(request) map { f =>
-                val serv: ((APIKey, AccountDetails),
-                Path) => Future[HttpResponse[B]] = {
-                  case ((apiKey, account), path) =>
-                    val query: Option[Future[String]] = request.parameters
-                      .get('q)
-                      .filter(_ != null)
-                      .map(Promise.successful)
-                      .orElse(quirrelContent(request).map(ByteChunk
-                                .forceByteArray(_: ByteChunk)
-                                .map(new String(_: Array[Byte], "UTF-8"))))
-
-                    val result: Future[HttpResponse[B]] =
-                      query map { q =>
-                        q flatMap { f(apiKey, account, path, _: String, opts) }
-                      } getOrElse {
-                        Promise.successful(HttpResponse(HttpStatus(
-                                    BadRequest,
-                                    "Neither the query string nor request body contained an identifiable quirrel query.")))
-                      }
-                    result
+        NotServed,
+        ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] =
+        (request: HttpRequest[ByteChunk]) => {
+          queryOpts(request) flatMap { opts =>
+            def quirrelContent(
+                request: HttpRequest[ByteChunk]): Option[ByteChunk] =
+              for {
+                header <- request.headers.header[`Content-Type`]
+                if header.mimeTypes exists { t =>
+                  t == text / plain ||
+                  (t.maintype == "text" &&
+                  t.subtype == "x-quirrel-script")
                 }
-                serv
+                content <- request.content
+              } yield content
+
+            next.service(request) map { f =>
+              val serv: ((APIKey, AccountDetails),
+                         Path) => Future[HttpResponse[B]] = {
+                case ((apiKey, account), path) =>
+                  val query: Option[Future[String]] = request.parameters
+                    .get('q)
+                    .filter(_ != null)
+                    .map(Promise.successful)
+                    .orElse(quirrelContent(request).map(ByteChunk
+                      .forceByteArray(_: ByteChunk)
+                      .map(new String(_: Array[Byte], "UTF-8"))))
+
+                  val result: Future[HttpResponse[B]] =
+                    query map { q =>
+                      q flatMap { f(apiKey, account, path, _: String, opts) }
+                    } getOrElse {
+                      Promise.successful(HttpResponse(HttpStatus(
+                        BadRequest,
+                        "Neither the query string nor request body contained an identifiable quirrel query.")))
+                    }
+                  result
               }
+              serv
             }
+          }
         }
     }
   }
@@ -287,21 +295,22 @@ trait ShardServiceCombinators
   def asyncQuery[B](
       next: HttpService[ByteChunk,
                         (APIKey, AccountDetails, Path, Query,
-                        QueryOptions) => Future[HttpResponse[B]]])(
-      implicit executor: ExecutionContext): HttpService[
-      ByteChunk, ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {
-    new DelegatingService[ByteChunk,
-                          ((APIKey,
-                          AccountDetails)) => Future[HttpResponse[B]],
-                          ByteChunk,
-                          ((APIKey, AccountDetails),
-                          Path) => Future[HttpResponse[B]]] {
+                         QueryOptions) => Future[HttpResponse[B]]])(
+      implicit executor: ExecutionContext)
+    : HttpService[ByteChunk,
+                  ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {
+    new DelegatingService[
+      ByteChunk,
+      ((APIKey, AccountDetails)) => Future[HttpResponse[B]],
+      ByteChunk,
+      ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] {
       val delegate = query[B](next)
       val service = { (request: HttpRequest[ByteChunk]) =>
         val path =
           request.parameters.get('prefixPath).filter(_ != null).getOrElse("")
-        delegate.service(request.copy(
-                parameters = request.parameters + ('sync -> "async"))) map {
+        delegate.service(
+          request
+            .copy(parameters = request.parameters + ('sync -> "async"))) map {
           f =>
             { (cred: (APIKey, AccountDetails)) =>
               f(cred, Path(path))
@@ -315,11 +324,13 @@ trait ShardServiceCombinators
 
   def requireAccount[A, B](accountFinder: AccountFinder[Future])(
       service: HttpService[
-          A, ((APIKey, AccountDetails)) => Future[HttpResponse[B]]])(
+        A,
+        ((APIKey, AccountDetails)) => Future[HttpResponse[B]]])(
       implicit inj: JValue => B,
       M: Monad[Future]): HttpService[A, APIKey => Future[HttpResponse[B]]] = {
     val service0 =
-      service map { (f: ((APIKey, AccountDetails)) => Future[HttpResponse[B]]) =>
+      service map { (f: ((APIKey, AccountDetails)) => Future[
+        HttpResponse[B]]) =>
         { (v: Validation[String, (APIKey, AccountDetails)]) =>
           v.fold(msg => M.point(forbidden(msg) map inj), f)
         }
@@ -330,13 +341,14 @@ trait ShardServiceCombinators
 
 final class FindAccountService[A, B](accountFinder: AccountFinder[Future])(
     val delegate: HttpService[
-        A, Validation[String, (APIKey, AccountDetails)] => Future[B]])(
+      A,
+      Validation[String, (APIKey, AccountDetails)] => Future[B]])(
     implicit M: Monad[Future])
     extends DelegatingService[
-        A,
-        APIKey => Future[B],
-        A,
-        Validation[String, (APIKey, AccountDetails)] => Future[B]] {
+      A,
+      APIKey => Future[B],
+      A,
+      Validation[String, (APIKey, AccountDetails)] => Future[B]] {
 
   val service: HttpRequest[A] => Validation[NotServed, APIKey => Future[B]] = {
     (request: HttpRequest[A]) =>
@@ -349,13 +361,13 @@ final class FindAccountService[A, B](accountFinder: AccountFinder[Future])(
                   OptionT(accountFinder.findAccountDetailsById(accountId))
               }
             val result = details.fold(
-                account => Success((apiKey, account)),
-                Failure("Cannot find account for API key: " + apiKey))
+              account => Success((apiKey, account)),
+              Failure("Cannot find account for API key: " + apiKey))
             result flatMap f
           }
       }
   }
 
   val metadata = DescriptionMetadata(
-      "Finds the account associated with a given API key.")
+    "Finds the account associated with a given API key.")
 }

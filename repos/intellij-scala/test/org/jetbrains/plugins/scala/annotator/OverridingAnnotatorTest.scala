@@ -4,7 +4,12 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
@@ -17,7 +22,9 @@ class OverridingAnnotatorTest extends SimpleTestCase {
   final val Header = "\n"
 
   def testSyntheticUnapply(): Unit = {
-    assertMatches(messages("""
+    assertMatches(
+      messages(
+        """
         |trait Test {
         |  trait Tree
         |  trait Name

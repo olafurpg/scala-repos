@@ -173,12 +173,12 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
     }
 
   implicit val nullResultArrow: Arrow[NullResult] with Choice[NullResult] with ProChoice[
-      NullResult] = new Arrow[NullResult] with Choice[NullResult]
+    NullResult] = new Arrow[NullResult] with Choice[NullResult]
   with ProChoice[NullResult] {
     def id[A] =
       NullResult.lift(identity)
-    override def compose[A, B, C](
-        f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
+    override def compose[A, B, C](f: NullResult[B, C],
+                                  g: NullResult[A, B]): NullResult[A, C] =
       f compose g
     override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
       f *** g
@@ -194,16 +194,16 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       fa.left
     override def right[A, B, C](fa: NullResult[A, B]) =
       fa.right
-    override def choice[A, B, C](
-        f: => NullResult[A, C], g: => NullResult[B, C]) =
+    override def choice[A, B, C](f: => NullResult[A, C],
+                                 g: => NullResult[B, C]) =
       NullResult {
         case \/-(a) => g(a)
         case -\/(a) => f(a)
       }
   }
 
-  implicit def nullResultMonadPlus[
-      X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
+  implicit def nullResultMonadPlus[X]
+    : MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
     new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
       override def tailrecM[A, B](f: A => NullResult[X, A \/ B])(a: A) =
@@ -238,7 +238,8 @@ private trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
 }
 
 private trait NullResultMonoid[A, B]
-    extends Monoid[NullResult[A, B]] with NullResultSemigroup[A, B] {
+    extends Monoid[NullResult[A, B]]
+    with NullResultSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

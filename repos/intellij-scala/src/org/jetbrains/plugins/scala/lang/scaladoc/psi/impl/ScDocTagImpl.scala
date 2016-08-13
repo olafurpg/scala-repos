@@ -19,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   * Date: 22.07.2008
   */
 class ScDocTagImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocTag {
+    extends ScalaPsiElementImpl(node)
+    with ScDocTag {
   override def toString: String = "DocTag"
 
   override def accept(visitor: PsiElementVisitor) {
@@ -72,8 +73,8 @@ class ScDocTagImpl(node: ASTNode)
   override def getAllText(handler: PsiElement => String): String =
     getNode
       .getChildren(
-          TokenSet.orSet(TokenSet.create(ScalaDocTokenType.DOC_COMMENT_DATA),
-                         ScalaDocTokenType.ALL_SCALADOC_SYNTAX_ELEMENTS))
+        TokenSet.orSet(TokenSet.create(ScalaDocTokenType.DOC_COMMENT_DATA),
+                       ScalaDocTokenType.ALL_SCALADOC_SYNTAX_ELEMENTS))
       .map {
         case nd => handler(nd.getPsi)
       }

@@ -60,13 +60,13 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  Replaces an existing payload of the same type, if exists.
       *  Returns the symbol itself.
       */
-    def updateAttachment[T : ClassTag](
-        symbol: Symbol, attachment: T): symbol.type
+    def updateAttachment[T: ClassTag](symbol: Symbol,
+                                      attachment: T): symbol.type
 
     /** Update the attachment with the payload of the given class type `T` removed.
       *  Returns the symbol itself.
       */
-    def removeAttachment[T : ClassTag](symbol: Symbol): symbol.type
+    def removeAttachment[T: ClassTag](symbol: Symbol): symbol.type
 
     /** Sets the `owner` of the symbol. */
     def setOwner(symbol: Symbol, newowner: Symbol): symbol.type
@@ -96,12 +96,12 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  Replaces an existing payload of the same type, if exists.
       *  Returns the tree itself.
       */
-    def updateAttachment[T : ClassTag](tree: Tree, attachment: T): tree.type
+    def updateAttachment[T: ClassTag](tree: Tree, attachment: T): tree.type
 
     /** Update the attachment with the payload of the given class type `T` removed.
       *  Returns the tree itself.
       */
-    def removeAttachment[T : ClassTag](tree: Tree): tree.type
+    def removeAttachment[T: ClassTag](tree: Tree): tree.type
 
     /** Sets the `pos` of the tree. Returns the tree itself. */
     def setPos(tree: Tree, newpos: Position): tree.type
@@ -163,7 +163,7 @@ abstract class Universe extends scala.reflect.api.Universe {
     trait MacroDecoratorApi extends DecoratorApi {
 
       /** Extension methods for scopes */
-      type ScopeDecorator [T <: Scope] <: MacroScopeDecoratorApi[T]
+      type ScopeDecorator[T <: Scope] <: MacroScopeDecoratorApi[T]
 
       /** @see [[ScopeDecorator]] */
       implicit def scopeDecorator[T <: Scope](tree: T): ScopeDecorator[T]
@@ -179,7 +179,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** @inheritdoc */
-      override type TreeDecorator [T <: Tree] <: MacroTreeDecoratorApi[T]
+      override type TreeDecorator[T <: Tree] <: MacroTreeDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroTreeDecoratorApi[T <: Tree](override val tree: T)
@@ -194,11 +194,11 @@ abstract class Universe extends scala.reflect.api.Universe {
           internal.attachments(tree)
 
         /** @see [[internal.updateAttachment]] */
-        def updateAttachment[A : ClassTag](attachment: A): tree.type =
+        def updateAttachment[A: ClassTag](attachment: A): tree.type =
           internal.updateAttachment(tree, attachment)
 
         /** @see [[internal.removeAttachment]] */
-        def removeAttachment[A : ClassTag]: T =
+        def removeAttachment[A: ClassTag]: T =
           internal.removeAttachment[A](tree)
 
         /** @see [[internal.setPos]] */
@@ -215,7 +215,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** Extension methods for typetrees */
-      type TypeTreeDecorator [T <: TypeTree] <: MacroTypeTreeDecoratorApi[T]
+      type TypeTreeDecorator[T <: TypeTree] <: MacroTypeTreeDecoratorApi[T]
 
       /** @see [[TypeTreeDecorator]] */
       implicit def typeTreeDecorator[T <: TypeTree](
@@ -229,7 +229,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** @inheritdoc */
-      override type SymbolDecorator [T <: Symbol] <: MacroSymbolDecoratorApi[T]
+      override type SymbolDecorator[T <: Symbol] <: MacroSymbolDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroSymbolDecoratorApi[T <: Symbol](override val symbol: T)
@@ -240,11 +240,11 @@ abstract class Universe extends scala.reflect.api.Universe {
           internal.attachments(symbol)
 
         /** @see [[internal.updateAttachment]] */
-        def updateAttachment[A : ClassTag](attachment: A): T =
+        def updateAttachment[A: ClassTag](attachment: A): T =
           internal.updateAttachment(symbol, attachment)
 
         /** @see [[internal.removeAttachment]] */
-        def removeAttachment[A : ClassTag]: T =
+        def removeAttachment[A: ClassTag]: T =
           internal.removeAttachment[A](symbol)
 
         /** @see [[internal.setOwner]] */
@@ -337,8 +337,9 @@ abstract class Universe extends scala.reflect.api.Universe {
 
     def mkMethodCall(target: Tree, args: List[Tree]): Tree
 
-    def mkMethodCall(
-        receiver: Symbol, methodName: Name, args: List[Tree]): Tree
+    def mkMethodCall(receiver: Symbol,
+                     methodName: Name,
+                     args: List[Tree]): Tree
 
     def mkMethodCall(receiver: Tree,
                      method: Symbol,
@@ -374,48 +375,48 @@ abstract class Universe extends scala.reflect.api.Universe {
 
       /** @see [[InternalMacroApi.attachments]] */
       @deprecated(
-          "Use `internal.attachments` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.attachments` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def attachments: Attachments { type Pos = Position } =
         internal.attachments(symbol)
 
       /** @see [[InternalMacroApi.updateAttachment]] */
       @deprecated(
-          "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
-      def updateAttachment[T : ClassTag](attachment: T): Symbol =
+        "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
+      def updateAttachment[T: ClassTag](attachment: T): Symbol =
         internal.updateAttachment[T](symbol, attachment)
 
       /** @see [[InternalMacroApi.removeAttachment]] */
       @deprecated(
-          "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
-      def removeAttachment[T : ClassTag]: Symbol =
+        "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
+      def removeAttachment[T: ClassTag]: Symbol =
         internal.removeAttachment[T](symbol)
 
       /** @see [[InternalMacroApi.setInfo]] */
       @deprecated(
-          "Use `internal.setInfo` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setInfo` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setTypeSignature(tpe: Type): Symbol = internal.setInfo(symbol, tpe)
 
       /** @see [[InternalMacroApi.setAnnotations]] */
       @deprecated(
-          "Use `internal.setAnnotations` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setAnnotations` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setAnnotations(annots: Annotation*): Symbol =
         internal.setAnnotations(symbol, annots: _*)
 
       /** @see [[InternalMacroApi.setName]] */
       @deprecated(
-          "Use `internal.setName` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setName` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setName(name: Name): Symbol = internal.setName(symbol, name)
 
       /** @see [[InternalMacroApi.setPrivateWithin]] */
       @deprecated(
-          "Use `internal.setPrivateWithin` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setPrivateWithin` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setPrivateWithin(sym: Symbol): Symbol =
         internal.setPrivateWithin(symbol, sym)
     }
@@ -425,65 +426,65 @@ abstract class Universe extends scala.reflect.api.Universe {
 
       /** @see [[InternalMacroApi.attachments]] */
       @deprecated(
-          "Use `internal.attachments` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.attachments` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def attachments: Attachments { type Pos = Position } =
         internal.attachments(tree)
 
       /** @see [[InternalMacroApi.updateAttachment]] */
       @deprecated(
-          "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
-      def updateAttachment[T : ClassTag](attachment: T): Tree =
+        "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
+      def updateAttachment[T: ClassTag](attachment: T): Tree =
         internal.updateAttachment[T](tree, attachment)
 
       /** @see [[InternalMacroApi.removeAttachment]] */
       @deprecated(
-          "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
-      def removeAttachment[T : ClassTag]: Tree =
+        "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
+      def removeAttachment[T: ClassTag]: Tree =
         internal.removeAttachment[T](tree)
 
       /** @see [[InternalMacroApi.setPos]] */
       @deprecated(
-          "Use `internal.setPos` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setPos` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def pos_=(pos: Position): Unit = internal.setPos(tree, pos)
 
       /** @see [[InternalMacroApi.setPos]] */
       @deprecated(
-          "Use `internal.setPos` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setPos` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setPos(newpos: Position): Tree = internal.setPos(tree, newpos)
 
       /** @see [[InternalMacroApi.setType]] */
       @deprecated(
-          "Use `internal.setType` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setType` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def tpe_=(t: Type): Unit = internal.setType(tree, t)
 
       /** @see [[InternalMacroApi.setType]] */
       @deprecated(
-          "Use `internal.setType` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setType` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setType(tp: Type): Tree = internal.setType(tree, tp)
 
       /** @see [[InternalMacroApi.defineType]] */
       @deprecated(
-          "Use `internal.defineType` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.defineType` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def defineType(tp: Type): Tree = internal.defineType(tree, tp)
 
       /** @see [[InternalMacroApi.setSymbol]] */
       @deprecated(
-          "Use `internal.setSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def symbol_=(sym: Symbol): Unit = internal.setSymbol(tree, sym)
 
       /** @see [[InternalMacroApi.setSymbol]] */
       @deprecated(
-          "Use `internal.setSymbol` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setSymbol` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setSymbol(sym: Symbol): Tree = internal.setSymbol(tree, sym)
     }
 
@@ -492,8 +493,8 @@ abstract class Universe extends scala.reflect.api.Universe {
 
       /** @see [[InternalMacroApi.setOriginal]] */
       @deprecated(
-          "Use `internal.setOriginal` instead or import `internal.decorators._` for infix syntax",
-          "2.11.0")
+        "Use `internal.setOriginal` instead or import `internal.decorators._` for infix syntax",
+        "2.11.0")
       def setOriginal(tree: Tree): TypeTree = internal.setOriginal(tt, tree)
     }
 
@@ -518,8 +519,8 @@ abstract class Universe extends scala.reflect.api.Universe {
     *  @group Macros
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   type Run <: RunContextApi
 
   /** Compilation run uniquely identifies current invocation of the compiler
@@ -529,20 +530,20 @@ abstract class Universe extends scala.reflect.api.Universe {
     *  @group API
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   trait RunContextApi {
 
     /** Currently processed unit of work (a real or a virtual file). */
     @deprecated(
-        "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-        "2.11.0")
+      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+      "2.11.0")
     def currentUnit: CompilationUnit
 
     /** All units of work comprising this compilation run. */
     @deprecated(
-        "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-        "2.11.0")
+      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+      "2.11.0")
     def units: Iterator[CompilationUnit]
   }
 
@@ -552,8 +553,8 @@ abstract class Universe extends scala.reflect.api.Universe {
     *  @group Macros
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   type CompilationUnit <: CompilationUnitContextApi
 
   /** Compilation unit describes a unit of work of the compilation run.
@@ -562,8 +563,8 @@ abstract class Universe extends scala.reflect.api.Universe {
     *  @group API
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   trait CompilationUnitContextApi {
 
     /** Source file corresponding to this compilation unit.
@@ -576,14 +577,14 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  and exposed as a part of scala.reflect.api.
       */
     @deprecated(
-        "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-        "2.11.0")
+      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+      "2.11.0")
     def source: scala.reflect.internal.util.SourceFile
 
     /** The AST that corresponds to this compilation unit. */
     @deprecated(
-        "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-        "2.11.0")
+      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+      "2.11.0")
     def body: Tree
   }
 }

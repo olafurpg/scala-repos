@@ -20,7 +20,11 @@ import scala.reflect.macros.Context
 import java.io.InputStream
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 import scala.reflect.ClassTag
@@ -139,8 +143,8 @@ object TraversablesOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) = {
         val innerCompareFn = freshT("innerCompareFn")
         val a = freshT("a")
         val b = freshT("b")
@@ -267,8 +271,8 @@ object TraversablesOrderedBuf {
       """
       }
 
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = {
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree = {
 
         val a = freshT("a")
         val b = freshT("b")
@@ -303,7 +307,9 @@ object TraversablesOrderedBuf {
                 val sizeOfZero = 1 // writing the constant 0, for length, takes 1 byte
                 _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(sizeOfZero)
               } else {
-              val maybeRes = ${m.asInstanceOf[MaybeLengthCalculation[c.type]].t}
+              val maybeRes = ${m
+              .asInstanceOf[MaybeLengthCalculation[c.type]]
+              .t}
               maybeRes match {
                 case _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.ConstLen(constSize) =>
                   val sizeOverhead = posVarIntSize($element.size)

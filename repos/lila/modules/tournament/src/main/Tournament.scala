@@ -83,7 +83,7 @@ case class Tournament(id: String,
     if (minutes < 60) s"${minutes}m"
     else
       s"${minutes / 60}h" +
-      (if (minutes % 60 != 0) s" ${(minutes % 60)}m" else "")
+        (if (minutes % 60 != 0) s" ${(minutes % 60)}m" else "")
 
   def berserkable = system.berserkable && clock.chessClock.berserkable
 
@@ -99,8 +99,8 @@ case class Tournament(id: String,
     } map { this -> _ }
 }
 
-case class EnterableTournaments(
-    tours: List[Tournament], scheduled: List[Tournament])
+case class EnterableTournaments(tours: List[Tournament],
+                                scheduled: List[Tournament])
 
 object Tournament {
 
@@ -116,8 +116,10 @@ object Tournament {
            `private`: Boolean,
            waitMinutes: Int) =
     Tournament(id = Random nextStringUppercase 8,
-               name = if (position.initial)
-                   GreatPlayer.randomName else position.shortName,
+               name =
+                 if (position.initial)
+                   GreatPlayer.randomName
+                 else position.shortName,
                status = Status.Created,
                system = system,
                clock = clock,

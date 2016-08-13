@@ -24,9 +24,11 @@ trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
 
   override def alwaysInitSizeMap = true
 
-  abstract class ParFlatHashTableIterator(
-      var idx: Int, val until: Int, val totalsize: Int)
-      extends IterableSplitter[T] with SizeMapUtils {
+  abstract class ParFlatHashTableIterator(var idx: Int,
+                                          val until: Int,
+                                          val totalsize: Int)
+      extends IterableSplitter[T]
+      with SizeMapUtils {
     import scala.collection.DebugUtils._
 
     private[this] var traversed = 0
@@ -40,8 +42,9 @@ trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
       }
     }
 
-    def newIterator(
-        index: Int, until: Int, totalsize: Int): IterableSplitter[T]
+    def newIterator(index: Int,
+                    until: Int,
+                    totalsize: Int): IterableSplitter[T]
 
     def remaining = totalsize - traversed
     def hasNext = traversed < totalsize
@@ -60,8 +63,8 @@ trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
 
         val fstidx = idx
         val fstuntil = divpt
-        val fsttotal = calcNumElems(
-            idx, divpt, itertable.length, sizeMapBucketSize)
+        val fsttotal =
+          calcNumElems(idx, divpt, itertable.length, sizeMapBucketSize)
         val fstit = newIterator(fstidx, fstuntil, fsttotal)
 
         val sndidx = divpt

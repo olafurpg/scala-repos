@@ -42,12 +42,12 @@ import scalafx.Includes._
 @RunWith(classOf[JUnitRunner])
 class PercentageStringConverterSpec
     extends AbstractStringConverterDelegateSpec[
-        Number,
-        jfxuc.PercentageStringConverter,
-        Number,
-        PercentageStringConverter](classOf[jfxuc.PercentageStringConverter],
-                                   classOf[PercentageStringConverter],
-                                   classOf[Number]) {
+      Number,
+      jfxuc.PercentageStringConverter,
+      Number,
+      PercentageStringConverter](classOf[jfxuc.PercentageStringConverter],
+                                 classOf[PercentageStringConverter],
+                                 classOf[Number]) {
 
   val examples = List((new java.lang.Integer(10), "1,000%"),
                       (new java.lang.Integer(0), "0%"),

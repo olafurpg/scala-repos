@@ -38,8 +38,8 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
       serverSet: ServerSet,
       var status: Option[EndpointStatus] = None,
       var addr: Option[InetSocketAddress] = None,
-      endpoints: mutable.Map[String, InetSocketAddress] = mutable.Map
-          .empty[String, InetSocketAddress])
+      endpoints: mutable.Map[String, InetSocketAddress] =
+        mutable.Map.empty[String, InetSocketAddress])
 
   private[this] case class Mutation(conf: ServerSetConf,
                                     addr: Option[InetSocketAddress],
@@ -64,8 +64,8 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
           }
 
           change.addr foreach { addr =>
-            conf.status = Some(conf.serverSet.join(
-                    addr, change.endpoints.asJava, conf.shardId))
+            conf.status = Some(
+              conf.serverSet.join(addr, change.endpoints.asJava, conf.shardId))
           }
 
           change.onComplete.setDone()
@@ -91,8 +91,9 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
   ): Future[Announcement] = {
     val zkHosts = factory.hostSet(hosts)
     if (zkHosts.isEmpty)
-      Future.exception(new ZkAnnouncerException(
-              "ZK client address \"%s\" resolves to nothing".format(hosts)))
+      Future.exception(
+        new ZkAnnouncerException(
+          "ZK client address \"%s\" resolves to nothing".format(hosts)))
     else announce(factory.get(zkHosts)._1, path, shardId, addr, endpoint)
   }
 
@@ -151,6 +152,6 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
 
       case _ =>
         Future.exception(
-            new ZkAnnouncerException("Invalid addr \"%s\"".format(addr)))
+          new ZkAnnouncerException("Invalid addr \"%s\"".format(addr)))
     }
 }

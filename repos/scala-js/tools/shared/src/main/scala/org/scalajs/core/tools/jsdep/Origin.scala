@@ -11,7 +11,7 @@ final class Origin(val moduleName: String, val configuration: String) {
   override def equals(that: Any): Boolean = that match {
     case that: Origin =>
       this.moduleName == that.moduleName &&
-      this.configuration == that.configuration
+        this.configuration == that.configuration
     case _ =>
       false
   }

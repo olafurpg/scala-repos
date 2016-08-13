@@ -12,11 +12,11 @@ import org.scalatra.servlet.ServletApiImplicits._
 import org.scalatra.util.RicherString._
 
 object ScalatraAtmosphereHandler {
-  @deprecated(
-      "Use `org.scalatra.atmosphere.AtmosphereClientKey` instead", "2.2.1")
+  @deprecated("Use `org.scalatra.atmosphere.AtmosphereClientKey` instead",
+              "2.2.1")
   val AtmosphereClientKey = org.scalatra.atmosphere.AtmosphereClientKey
-  @deprecated(
-      "Use `org.scalatra.atmosphere.AtmosphereRouteKey` instead", "2.2.1")
+  @deprecated("Use `org.scalatra.atmosphere.AtmosphereRouteKey` instead",
+              "2.2.1")
   val AtmosphereRouteKey = org.scalatra.atmosphere.AtmosphereRouteKey
 
   private class ScalatraResourceEventListener
@@ -44,7 +44,7 @@ object ScalatraAtmosphereHandler {
       val disconnector =
         if (event.isCancelled) ClientDisconnected else ServerDisconnected
       client(event.getResource) foreach
-      (_.receive.lift(Disconnected(disconnector, Option(event.throwable))))
+        (_.receive.lift(Disconnected(disconnector, Option(event.throwable))))
       //      if (!event.getResource.isResumed) {
       //        event.getResource.session.invalidate()
       //      } else {
@@ -59,7 +59,7 @@ object ScalatraAtmosphereHandler {
 
     def onThrowable(event: AtmosphereResourceEvent) {
       client(event.getResource) foreach
-      (_.receive.lift(Error(Option(event.throwable()))))
+        (_.receive.lift(Error(Option(event.throwable()))))
     }
 
     def onClose(event: AtmosphereResourceEvent) {}
@@ -68,8 +68,8 @@ object ScalatraAtmosphereHandler {
 
 class ScalatraAtmosphereException(message: String)
     extends ScalatraException(message)
-class ScalatraAtmosphereHandler(
-    scalatraApp: ScalatraBase)(implicit wireFormat: WireFormat)
+class ScalatraAtmosphereHandler(scalatraApp: ScalatraBase)(
+    implicit wireFormat: WireFormat)
     extends AbstractReflectorAtmosphereHandler {
   import org.scalatra.atmosphere.ScalatraAtmosphereHandler._
 
@@ -86,40 +86,40 @@ class ScalatraAtmosphereHandler(
 
     scalatraApp
       .withRequestResponse(resource.getRequest, resource.getResponse) {
-      scalatraApp.withRouteMultiParams(route) {
+        scalatraApp.withRouteMultiParams(route) {
 
-        (req.requestMethod, route.isDefined) match {
-          case (Post, _) =>
-            var client: AtmosphereClient = null
-            if (isNew) {
-              session = AtmosphereResourceFactory.getDefault
-                .find(resource.uuid)
-                .session
-            }
-
-            client = session(org.scalatra.atmosphere.AtmosphereClientKey)
-              .asInstanceOf[AtmosphereClient]
-            handleIncomingMessage(req, client)
-          case (_, true) =>
-            val cl =
+          (req.requestMethod, route.isDefined) match {
+            case (Post, _) =>
+              var client: AtmosphereClient = null
               if (isNew) {
-                createClient(route.get, session, resource)
-              } else null
+                session = AtmosphereResourceFactory.getDefault
+                  .find(resource.uuid)
+                  .session
+              }
 
-            addEventListener(resource)
-            resumeIfNeeded(resource)
-            configureBroadcaster(resource)
-            if (isNew && cl != null) handleIncomingMessage(Connected, cl)
-            resource.suspend
-          case _ =>
-            val ex = new ScalatraAtmosphereException(
+              client = session(org.scalatra.atmosphere.AtmosphereClientKey)
+                .asInstanceOf[AtmosphereClient]
+              handleIncomingMessage(req, client)
+            case (_, true) =>
+              val cl =
+                if (isNew) {
+                  createClient(route.get, session, resource)
+                } else null
+
+              addEventListener(resource)
+              resumeIfNeeded(resource)
+              configureBroadcaster(resource)
+              if (isNew && cl != null) handleIncomingMessage(Connected, cl)
+              resource.suspend
+            case _ =>
+              val ex = new ScalatraAtmosphereException(
                 "There is no atmosphere route defined for " +
-                req.getRequestURI)
-            internalLogger.warn(ex.getMessage)
-            throw ex
+                  req.getRequestURI)
+              internalLogger.warn(ex.getMessage)
+              throw ex
+          }
         }
       }
-    }
   }
 
   private[this] def createClient(route: MatchedRoute,
@@ -130,8 +130,8 @@ class ScalatraAtmosphereHandler(
     client.resource = resource
     client
   }
-  private[this] def createClient(
-      route: MatchedRoute, resource: AtmosphereResource) = {
+  private[this] def createClient(route: MatchedRoute,
+                                 resource: AtmosphereResource) = {
     val client = clientForRoute(route)
     client.resource = resource
     client
@@ -140,7 +140,7 @@ class ScalatraAtmosphereHandler(
   private[this] def clientForRoute(route: MatchedRoute): AtmosphereClient = {
     liftAction(route.action) getOrElse {
       throw new ScalatraException(
-          "An atmosphere route should return an atmosphere client")
+        "An atmosphere route should return an atmosphere client")
     }
   }
 
@@ -154,14 +154,14 @@ class ScalatraAtmosphereHandler(
     resource.setBroadcaster(bc)
   }
 
-  private[this] def handleIncomingMessage(
-      req: AtmosphereRequest, client: AtmosphereClient) {
+  private[this] def handleIncomingMessage(req: AtmosphereRequest,
+                                          client: AtmosphereClient) {
     val parsed: InboundMessage = wireFormat.parseInMessage(readBody(req))
     handleIncomingMessage(parsed, client)
   }
 
-  private[this] def handleIncomingMessage(
-      msg: InboundMessage, client: AtmosphereClient) {
+  private[this] def handleIncomingMessage(msg: InboundMessage,
+                                          client: AtmosphereClient) {
     // the ScalatraContext provides the correct request/response values to the AtmosphereClient.receive method
     // this can be later refactored to a (Request, Response) => Any
     client.receiveWithScalatraContext(scalatraApp).lift(msg)

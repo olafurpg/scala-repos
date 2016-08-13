@@ -35,9 +35,9 @@ class TransformerTest extends FlatSpec with ShouldMatchers with Transformer {
     apply("\n") should equal("")
     apply("Paragraph1\n") should equal("<p>Paragraph1</p>\n")
     apply("Paragraph1\n\nParagraph2\n") should equal(
-        "<p>Paragraph1</p>\n<p>Paragraph2</p>\n")
+      "<p>Paragraph1</p>\n<p>Paragraph2</p>\n")
     apply("Paragraph1 *italic*\n") should equal(
-        "<p>Paragraph1 <em>italic</em></p>\n")
+      "<p>Paragraph1 <em>italic</em></p>\n")
     apply("\n\nParagraph1\n") should equal("<p>Paragraph1</p>\n")
   }
 
@@ -45,13 +45,13 @@ class TransformerTest extends FlatSpec with ShouldMatchers with Transformer {
     apply("    foo\n") should equal("<pre><code>foo\n</code></pre>\n")
     apply("\tfoo\n") should equal("<pre><code>foo\n</code></pre>\n")
     apply("    foo\n    bar\n") should equal(
-        "<pre><code>foo\nbar\n</code></pre>\n")
+      "<pre><code>foo\nbar\n</code></pre>\n")
     apply("    foo\n  \n    bar\n") should equal(
-        "<pre><code>foo\n  \nbar\n</code></pre>\n")
+      "<pre><code>foo\n  \nbar\n</code></pre>\n")
     apply("    foo\n\tbaz\n  \n    bar\n") should equal(
-        "<pre><code>foo\nbaz\n  \nbar\n</code></pre>\n")
+      "<pre><code>foo\nbaz\n  \nbar\n</code></pre>\n")
     apply("    public static void main(String[] args)\n") should equal(
-        "<pre><code>public static void main(String[] args)\n</code></pre>\n")
+      "<pre><code>public static void main(String[] args)\n</code></pre>\n")
   }
 
   it should "parse paragraphs" in {
@@ -67,13 +67,13 @@ sed diam nonumy eirmod tempor invidunt ut</p>
   it should "parse multiple paragraphs" in {
     apply("test1\n\ntest2\n") should equal("<p>test1</p>\n<p>test2</p>\n")
     apply(
-        """test
+      """test
 
 test
 
 test"""
     ) should equal(
-        """<p>test</p>
+      """<p>test</p>
 <p>test</p>
 <p>test</p>
 """
@@ -82,12 +82,12 @@ test"""
 
   it should "parse block quotes" in {
     apply("> quote\n> quote2\n") should equal(
-        "<blockquote><p>quote\nquote2</p>\n</blockquote>\n")
+      "<blockquote><p>quote\nquote2</p>\n</blockquote>\n")
   }
 
   it should "parse ordered and unordered lists" in {
     apply("* foo\n* bar\n* baz\n") should equal(
-        """<ul>
+      """<ul>
 <li>foo</li>
 <li>bar</li>
 <li>baz</li>
@@ -95,7 +95,7 @@ test"""
 """
     )
     apply("+ foo\n+ bar\n+ baz\n") should equal(
-        """<ul>
+      """<ul>
 <li>foo</li>
 <li>bar</li>
 <li>baz</li>
@@ -103,7 +103,7 @@ test"""
 """
     )
     apply("- foo\n- bar\n- baz\n") should equal(
-        """<ul>
+      """<ul>
 <li>foo</li>
 <li>bar</li>
 <li>baz</li>
@@ -111,7 +111,7 @@ test"""
 """
     )
     apply("- foo\n+ bar\n* baz\n") should equal(
-        """<ul>
+      """<ul>
 <li>foo</li>
 <li>bar</li>
 <li>baz</li>
@@ -119,7 +119,7 @@ test"""
 """
     )
     apply("1. foo\n22. bar\n10. baz\n") should equal(
-        """<ol>
+      """<ol>
 <li>foo</li>
 <li>bar</li>
 <li>baz</li>
@@ -127,7 +127,7 @@ test"""
 """
     )
     apply("* foo\n\n* bar\n\n* baz\n\n") should equal(
-        """<ul>
+      """<ul>
 <li><p>foo</p>
 </li>
 <li><p>bar</p>
@@ -138,7 +138,7 @@ test"""
 """
     )
     apply("* foo\n\n* bar\n* baz\n") should equal(
-        """<ul>
+      """<ul>
 <li><p>foo</p>
 </li>
 <li><p>bar</p>
@@ -154,7 +154,7 @@ test"""
 
 * bam
 """) should equal(
-        """<ul>
+      """<ul>
 <li><p>foo</p>
 </li>
 <li><p>bar</p>
@@ -172,7 +172,7 @@ test"""
 
 * bam
 """) should equal(
-        """<ul>
+      """<ul>
 <li><p>foo</p>
 </li>
 <li><p>bar</p>
@@ -190,7 +190,7 @@ test"""
 2. b
 
 paragraph""") should equal(
-        """<ol>
+      """<ol>
 <li>a</li>
 <li>b</li>
 </ol>
@@ -201,7 +201,7 @@ paragraph""") should equal(
 
   it should "recursively evaluate quotes" in {
     apply("> foo\n> > bar\n> \n> baz\n") should equal(
-        """<blockquote><p>foo</p>
+      """<blockquote><p>foo</p>
 <blockquote><p>bar</p>
 </blockquote>
 <p>baz</p>
@@ -224,7 +224,8 @@ paragraph""") should equal(
 else in the doc, define the link:
 
   [id]: http://example.com/  "Title"
-""") should equal("""<p>An <a href="http://example.com/" title="Title">example</a>. Then, anywhere
+""") should equal(
+      """<p>An <a href="http://example.com/" title="Title">example</a>. Then, anywhere
 else in the doc, define the link:</p>
 """)
   }
@@ -237,7 +238,7 @@ else in the doc, define the link:</p>
     apply("### A Header##  \n") should equal("<h3>A Header</h3>\n")
     apply("### A Header  ##  \n") should equal("<h3>A Header</h3>\n")
     apply("### A Header ## foo ## \n") should equal(
-        "<h3>A Header ## foo</h3>\n")
+      "<h3>A Header ## foo</h3>\n")
   }
 
   it should "parse setext style level 1 headings" in {
@@ -259,12 +260,12 @@ else in the doc, define the link:</p>
 
   it should "parse xml-like blocks as is" in {
     apply("<foo> bla\nblub <bar>hallo</bar>\n</foo>\n") should equal(
-        "<foo> bla\nblub <bar>hallo</bar>\n</foo>\n")
+      "<foo> bla\nblub <bar>hallo</bar>\n</foo>\n")
   }
 
   it should "parse fenced code blocks" in {
     apply(
-        """```  foobar
+      """```  foobar
 System.out.println("Hello World!");
     
 <some> verbatim xml </some>
@@ -280,7 +281,7 @@ but this is:
 ```         
 """
     ) should equal(
-        """<pre><code>System.out.println(&quot;Hello World!&quot;);
+      """<pre><code>System.out.println(&quot;Hello World!&quot;);
     
 &lt;some&gt; verbatim xml &lt;/some&gt;
     
@@ -297,14 +298,14 @@ but this is:
     )
 
     apply(
-        """```
+      """```
 System.out.println("Hello World!");
 ```
 And now to something completely different.
     old style code
 """
     ) should equal(
-        """<pre><code>System.out.println(&quot;Hello World!&quot;);
+      """<pre><code>System.out.println(&quot;Hello World!&quot;);
 </code></pre>
 <p>And now to something completely different.</p>
 <pre><code>old style code
@@ -313,7 +314,7 @@ And now to something completely different.
     )
 
     apply(
-        """```
+      """```
 System.out.println("Hello World!");
 No need to end blocks
 
@@ -321,7 +322,7 @@ And now to something completely different.
     old style code
 """
     ) should equal(
-        """<pre><code>System.out.println(&quot;Hello World!&quot;);
+      """<pre><code>System.out.println(&quot;Hello World!&quot;);
 No need to end blocks
 
 And now to something completely different.
@@ -331,7 +332,7 @@ And now to something completely different.
     )
 
     apply(
-        """Some text first
+      """Some text first
 ```
 System.out.println("Hello World!");
 No need to end blocks
@@ -340,7 +341,7 @@ And now to something completely different.
     old style code
 """
     ) should equal(
-        """<p>Some text first</p>
+      """<p>Some text first</p>
 <pre><code>System.out.println(&quot;Hello World!&quot;);
 No need to end blocks
 

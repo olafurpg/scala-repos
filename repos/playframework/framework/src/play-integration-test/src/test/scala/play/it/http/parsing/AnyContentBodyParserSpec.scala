@@ -16,18 +16,18 @@ object AnyContentBodyParserSpec extends PlaySpecification {
     def parse(method: String, contentType: Option[String], body: ByteString)(
         implicit mat: Materializer) = {
       val request = FakeRequest(method, "/x").withHeaders(
-          contentType.map(CONTENT_TYPE -> _).toSeq: _*)
+        contentType.map(CONTENT_TYPE -> _).toSeq: _*)
       await(BodyParsers.parse.anyContent(request).run(Source.single(body)))
     }
 
     "parse text bodies for DELETE requests" in new WithApplication() {
       parse("DELETE", Some("text/plain"), ByteString("bar")) must beRight(
-          AnyContentAsText("bar"))
+        AnyContentAsText("bar"))
     }
 
     "parse text bodies for GET requests" in new WithApplication() {
       parse("GET", Some("text/plain"), ByteString("bar")) must beRight(
-          AnyContentAsText("bar"))
+        AnyContentAsText("bar"))
     }
 
     "parse empty bodies as raw for GET requests" in new WithApplication() {
@@ -41,22 +41,22 @@ object AnyContentBodyParserSpec extends PlaySpecification {
 
     "parse text bodies for HEAD requests" in new WithApplication() {
       parse("HEAD", Some("text/plain"), ByteString("bar")) must beRight(
-          AnyContentAsText("bar"))
+        AnyContentAsText("bar"))
     }
 
     "parse text bodies for OPTIONS requests" in new WithApplication() {
       parse("OPTIONS", Some("text/plain"), ByteString("bar")) must beRight(
-          AnyContentAsText("bar"))
+        AnyContentAsText("bar"))
     }
 
     "parse XML bodies for PATCH requests" in new WithApplication() {
       parse("POST", Some("text/xml"), ByteString("<bar></bar>")) must beRight(
-          AnyContentAsXml(<bar></bar>))
+        AnyContentAsXml(<bar></bar>))
     }
 
     "parse text bodies for POST requests" in new WithApplication() {
       parse("POST", Some("text/plain"), ByteString("bar")) must beRight(
-          AnyContentAsText("bar"))
+        AnyContentAsText("bar"))
     }
 
     "parse JSON bodies for PUT requests" in new WithApplication() {

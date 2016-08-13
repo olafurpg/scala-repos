@@ -28,9 +28,9 @@ object SbtException {
         new SbtException(SbtBundle("sbt.import.error", log))
       case Trimmed(whatsLeft) =>
         new SbtException(
-            SbtBundle("sbt.import.errorLogIsTooLong",
-                      whatsLeft,
-                      dumpLog(log).getAbsolutePath))
+          SbtBundle("sbt.import.errorLogIsTooLong",
+                    whatsLeft,
+                    dumpLog(log).getAbsolutePath))
     }
   }
 
@@ -45,9 +45,9 @@ object SbtException {
       } else acc
     }
     new SbtException(
-        SbtBundle("sbt.import.unresolvedDependencies",
-                  dependencies,
-                  dumpLog(joinLines(lines)).getAbsolutePath))
+      SbtBundle("sbt.import.unresolvedDependencies",
+                dependencies,
+                dumpLog(joinLines(lines)).getAbsolutePath))
   }
 
   private object Utils {

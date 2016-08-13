@@ -16,17 +16,18 @@ trait FreeSpecSingleTestTest extends FreeSpecGenerator {
     addFreeSpec()
 
     runTestByLocation(
-        6,
-        3,
-        "FreeSpecTest.scala",
-        checkConfigAndSettings(
-            _,
-            "FreeSpecTest",
-            "A FreeSpecTest should be able to run single tests"),
-        root =>
-          checkResultTreeHasExactNamedPath(root, freeSpecTestPath: _*) &&
+      6,
+      3,
+      "FreeSpecTest.scala",
+      checkConfigAndSettings(
+        _,
+        "FreeSpecTest",
+        "A FreeSpecTest should be able to run single tests"),
+      root =>
+        checkResultTreeHasExactNamedPath(root, freeSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(
-              root, "should not run tests that are not selected"),
-        debug = true)
+            root,
+            "should not run tests that are not selected"),
+      debug = true)
   }
 }

@@ -9,7 +9,7 @@ import play.api.libs.functional._
   * Json formatter: write an implicit to define both a serializer and a deserializer for any type.
   */
 @implicitNotFound(
-    "No Json formatter found for type ${A}. Try to implement an implicit Format for this type."
+  "No Json formatter found for type ${A}. Try to implement an implicit Format for this type."
 )
 trait Format[A] extends Writes[A] with Reads[A]
 trait OFormat[A] extends OWrites[A] with Reads[A] with Format[A]
@@ -23,8 +23,8 @@ object OFormat {
 
       def apply[A, B](fa: OFormat[A], fb: OFormat[B]): OFormat[A ~ B] =
         OFormat[A ~ B](
-            rcb(fa, fb),
-            wcb(fa, fb)
+          rcb(fa, fb),
+          wcb(fa, fb)
         )
     }
 
@@ -32,15 +32,15 @@ object OFormat {
     new InvariantFunctor[OFormat] {
 
       def inmap[A, B](fa: OFormat[A], f1: A => B, f2: B => A): OFormat[B] =
-        OFormat[B](
-            (js: JsValue) => fa.reads(js).map(f1), (b: B) => fa.writes(f2(b)))
+        OFormat[B]((js: JsValue) => fa.reads(js).map(f1),
+                   (b: B) => fa.writes(f2(b)))
     }
 
-  implicit def GenericOFormat[T](
-      implicit fjs: Reads[T], tjs: OWrites[T]): Format[T] = apply(fjs, tjs)
+  implicit def GenericOFormat[T](implicit fjs: Reads[T],
+                                 tjs: OWrites[T]): Format[T] = apply(fjs, tjs)
 
-  def apply[A](
-      read: JsValue => JsResult[A], write: A => JsObject): OFormat[A] =
+  def apply[A](read: JsValue => JsResult[A],
+               write: A => JsObject): OFormat[A] =
     new OFormat[A] {
 
       def reads(js: JsValue): JsResult[A] = read(js)
@@ -82,8 +82,8 @@ object Format extends PathFormat with ConstraintFormat with DefaultFormat {
   */
 trait DefaultFormat {
 
-  implicit def GenericFormat[T](
-      implicit fjs: Reads[T], tjs: Writes[T]): Format[T] = {
+  implicit def GenericFormat[T](implicit fjs: Reads[T],
+                                tjs: Writes[T]): Format[T] = {
     new Format[T] {
       def reads(json: JsValue) = fjs.reads(json)
       def writes(o: T) = tjs.writes(o)

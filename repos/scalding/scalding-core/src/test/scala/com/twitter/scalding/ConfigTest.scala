@@ -27,12 +27,12 @@ class ConfigTest extends WordSpec with Matchers {
     "cascadingAppJar works" in {
       val cls = getClass
       Config.default.setCascadingAppJar(cls).getCascadingAppJar should contain(
-          Success(cls))
+        Success(cls))
     }
     "default has serialization set" in {
       val sers = Config.default.get("io.serializations").get.split(",").toList
       sers.last shouldBe
-      (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
+        (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
     }
     "default has chill configured" in {
       Config.default.get(com.twitter.chill.config.ConfiguredInstantiator.KEY) should not be empty
@@ -110,9 +110,10 @@ object ConfigProps extends Properties("Config") {
     val uids = l.filterNot { s =>
       s.isEmpty || s.contains(",")
     }.map(UniqueID(_))
-    (uids.foldLeft(Config.empty) { (conf, id) =>
-            conf.addUniqueId(id)
-          }
-          .getUniqueIds == uids.toSet)
+    (uids
+      .foldLeft(Config.empty) { (conf, id) =>
+        conf.addUniqueId(id)
+      }
+      .getUniqueIds == uids.toSet)
   }
 }

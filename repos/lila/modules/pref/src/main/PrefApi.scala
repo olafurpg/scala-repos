@@ -51,8 +51,8 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
            challenge = r.getD("challenge", Pref.default.challenge),
            message = r.getD("message", Pref.default.message),
            coordColor = r.getD("coordColor", Pref.default.coordColor),
-           puzzleDifficulty = r.getD(
-                 "puzzleDifficulty", Pref.default.puzzleDifficulty),
+           puzzleDifficulty =
+             r.getD("puzzleDifficulty", Pref.default.puzzleDifficulty),
            submitMove = r.getD("submitMove", Pref.default.submitMove),
            confirmResign = r.getD("confirmResign", Pref.default.confirmResign),
            insightShare = r.getD("insightShare", Pref.default.insightShare),
@@ -122,8 +122,8 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
   def unfollowableIds(userIds: List[String]): Fu[Set[String]] =
     coll.distinct("_id",
                   BSONDocument(
-                      "_id" -> BSONDocument("$in" -> userIds),
-                      "follow" -> false
+                    "_id" -> BSONDocument("$in" -> userIds),
+                    "follow" -> false
                   ).some) map lila.db.BSON.asStringSet
 
   def followableIds(userIds: List[String]): Fu[Set[String]] =
@@ -144,12 +144,15 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
   def setPref(user: User, change: Pref => Pref, notifyChange: Boolean): Funit =
     getPref(user) map change flatMap { setPref(_, notifyChange) }
 
-  def setPref(
-      userId: String, change: Pref => Pref, notifyChange: Boolean): Funit =
+  def setPref(userId: String,
+              change: Pref => Pref,
+              notifyChange: Boolean): Funit =
     getPref(userId) map change flatMap { setPref(_, notifyChange) }
 
-  def setPrefString(
-      user: User, name: String, value: String, notifyChange: Boolean): Funit =
+  def setPrefString(user: User,
+                    name: String,
+                    value: String,
+                    notifyChange: Boolean): Funit =
     getPref(user) map { _.set(name, value) } flatten s"Bad pref ${user.id} $name -> $value" flatMap {
       setPref(_, notifyChange)
     }

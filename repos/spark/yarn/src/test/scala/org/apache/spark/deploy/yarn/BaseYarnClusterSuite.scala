@@ -40,7 +40,10 @@ import org.apache.spark.launcher._
 import org.apache.spark.util.Utils
 
 abstract class BaseYarnClusterSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Matchers with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Matchers
+    with Logging {
 
   // log4j configuration for the YARN containers, so that their output is collected
   // by YARN instead of trying to overwrite unit-tests.log.
@@ -83,8 +86,8 @@ abstract class BaseYarnClusterSuite
     // getting full.
     val yarnConf = newYarnConfig()
     yarnConf.set(
-        "yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage",
-        "100.0")
+      "yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage",
+      "100.0")
 
     yarnCluster = new MiniYARNCluster(getClass().getName(), 1, 1, 1)
     yarnCluster.init(yarnConf)
@@ -115,7 +118,7 @@ abstract class BaseYarnClusterSuite
     }
 
     logInfo(
-        s"RM address in configuration is ${config.get(YarnConfiguration.RM_ADDRESS)}")
+      s"RM address in configuration is ${config.get(YarnConfiguration.RM_ADDRESS)}")
 
     fakeSparkJar = File.createTempFile("sparkJar", null, tempDir)
     hadoopConfDir = new File(tempDir, Client.LOCALIZED_CONF_DIR)
@@ -142,8 +145,8 @@ abstract class BaseYarnClusterSuite
       extraConf: Map[String, String] = Map(),
       extraEnv: Map[String, String] = Map()): SparkAppHandle.State = {
     val deployMode = if (clientMode) "client" else "cluster"
-    val propsFile = createConfFile(
-        extraClassPath = extraClassPath, extraConf = extraConf)
+    val propsFile =
+      createConfFile(extraClassPath = extraClassPath, extraConf = extraConf)
     val env =
       Map("YARN_CONF_DIR" -> hadoopConfDir.getAbsolutePath()) ++ extraEnv
 
@@ -190,8 +193,8 @@ abstract class BaseYarnClusterSuite
     * the tests enforce that something is written to a file after everything is ok to indicate
     * that the job succeeded.
     */
-  protected def checkResult(
-      finalState: SparkAppHandle.State, result: File): Unit = {
+  protected def checkResult(finalState: SparkAppHandle.State,
+                            result: File): Unit = {
     checkResult(finalState, result, "success")
   }
 
@@ -215,7 +218,7 @@ abstract class BaseYarnClusterSuite
 
     val testClasspath = new TestClasspathBuilder()
       .buildClassPath(logConfDir.getAbsolutePath() + File.pathSeparator +
-          extraClassPath.mkString(File.pathSeparator))
+        extraClassPath.mkString(File.pathSeparator))
       .asScala
       .mkString(File.pathSeparator)
 
@@ -223,10 +226,10 @@ abstract class BaseYarnClusterSuite
     props.put("spark.executor.extraClassPath", testClasspath)
 
     // SPARK-4267: make sure java options are propagated correctly.
-    props.setProperty(
-        "spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
-    props.setProperty(
-        "spark.executor.extraJavaOptions", "-Dfoo=\"one two three\"")
+    props
+      .setProperty("spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
+    props.setProperty("spark.executor.extraJavaOptions",
+                      "-Dfoo=\"one two three\"")
 
     yarnCluster.getConfig().asScala.foreach { e =>
       props.setProperty("spark.hadoop." + e.getKey(), e.getValue())
@@ -240,8 +243,8 @@ abstract class BaseYarnClusterSuite
     extraConf.foreach { case (k, v) => props.setProperty(k, v) }
 
     val propsFile = File.createTempFile("spark", ".properties", tempDir)
-    val writer = new OutputStreamWriter(
-        new FileOutputStream(propsFile), StandardCharsets.UTF_8)
+    val writer = new OutputStreamWriter(new FileOutputStream(propsFile),
+                                        StandardCharsets.UTF_8)
     props.store(writer, "Spark properties.")
     writer.close()
     propsFile.getAbsolutePath()

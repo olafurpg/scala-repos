@@ -34,8 +34,8 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
   override def findTargetElement: PsiMember = {
     val element = new JavaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
-    assertTrue(
-        "<caret> is not on method name", element.isInstanceOf[PsiMethod])
+    assertTrue("<caret> is not on method name",
+               element.isInstanceOf[PsiMethod])
     element.asInstanceOf[PsiMethod]
   }
 
@@ -47,24 +47,24 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
 
   def testInstanceMethod() = {
     val newParams = Seq(
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
-        new ParameterInfoImpl(0, "ii", PsiType.INT)
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
+      new ParameterInfoImpl(0, "ii", PsiType.INT)
     )
     doTest(null, "bar", null, Seq(newParams))
   }
 
   def testOverriders() = {
     val newParams = Seq(
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
-        new ParameterInfoImpl(0, "ii", PsiType.INT)
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
+      new ParameterInfoImpl(0, "ii", PsiType.INT)
     )
     doTest(null, "bar", "boolean", Seq(newParams))
   }
 
   def testOverriderInAnonClass() = {
     val newParams = Seq(
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
-        new ParameterInfoImpl(0, "ii", PsiType.INT)
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
+      new ParameterInfoImpl(0, "ii", PsiType.INT)
     )
     doTest(null, "bar", "boolean", Seq(newParams))
   }
@@ -91,9 +91,9 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
 
   def testInfixUsageWithTuple(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(0, "i", PsiType.INT),
-        new ParameterInfoImpl(1, "j", PsiType.INT),
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true")
+      new ParameterInfoImpl(0, "i", PsiType.INT),
+      new ParameterInfoImpl(1, "j", PsiType.INT),
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true")
     )
     doTest(null, "foo", null, Seq(params))
   }
@@ -105,46 +105,47 @@ class ChangeSignatureFromJavaTest extends ChangeSignatureTestBase {
 
   def testGeneric(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(0, "t", getPsiTypeFromText("T", targetMethod)),
-        new ParameterInfoImpl(-1, "s", getPsiTypeFromText("S", targetMethod)))
+      new ParameterInfoImpl(0, "t", getPsiTypeFromText("T", targetMethod)),
+      new ParameterInfoImpl(-1, "s", getPsiTypeFromText("S", targetMethod)))
     doTest(null, "foo", "T", Seq(params))
   }
 
   def testVarargs(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(0, "i", PsiType.INT),
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
-        new ParameterInfoImpl(
-            1,
-            "strs",
-            new PsiEllipsisType(getPsiTypeFromText("String", targetMethod)))
+      new ParameterInfoImpl(0, "i", PsiType.INT),
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true"),
+      new ParameterInfoImpl(
+        1,
+        "strs",
+        new PsiEllipsisType(getPsiTypeFromText("String", targetMethod)))
     )
     doTest(null, "foo", null, Seq(params))
   }
 
   def testVarargsRemove(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(0, "i", PsiType.INT),
-        new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true")
+      new ParameterInfoImpl(0, "i", PsiType.INT),
+      new ParameterInfoImpl(-1, "b", PsiType.BOOLEAN, "true")
     )
     doTest(null, "foo", null, Seq(params))
   }
 
   def testArrayToVarargs(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(0, "i", PsiType.INT),
-        new ParameterInfoImpl(2, "b", PsiType.BOOLEAN),
-        new ParameterInfoImpl(1, "js", new PsiEllipsisType(PsiType.INT))
+      new ParameterInfoImpl(0, "i", PsiType.INT),
+      new ParameterInfoImpl(2, "b", PsiType.BOOLEAN),
+      new ParameterInfoImpl(1, "js", new PsiEllipsisType(PsiType.INT))
     )
     doTest(null, "foo", null, Seq(params))
   }
 
   def testNamedAndDefaultArgs(): Unit = {
     val params = Seq(
-        new ParameterInfoImpl(
-            2, "s", getPsiTypeFromText("String", targetMethod)),
-        new ParameterInfoImpl(3, "b", PsiType.BOOLEAN),
-        new ParameterInfoImpl(-1, "b2", PsiType.BOOLEAN, "true")
+      new ParameterInfoImpl(2,
+                            "s",
+                            getPsiTypeFromText("String", targetMethod)),
+      new ParameterInfoImpl(3, "b", PsiType.BOOLEAN),
+      new ParameterInfoImpl(-1, "b2", PsiType.BOOLEAN, "true")
     )
     doTest(null, "foo", null, Seq(params))
   }

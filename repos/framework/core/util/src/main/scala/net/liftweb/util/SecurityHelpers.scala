@@ -33,7 +33,9 @@ import org.apache.xerces.impl.Constants
 import common._
 
 object SecurityHelpers
-    extends StringHelpers with IoHelpers with SecurityHelpers
+    extends StringHelpers
+    with IoHelpers
+    with SecurityHelpers
 
 /**
   * The SecurityHelpers trait provides functions to:<ul>
@@ -102,7 +104,7 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
   /** create a SHA hash from a String */
   def hashHex(in: String): String = {
     Helpers.hexEncode(
-        MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
+      MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
   }
 
   /** Compare two strings in a way that does not vary if the strings
@@ -124,16 +126,16 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
       case (null, _) => false
       case (_, null) => false
       case (a, b) => {
-          val la = a.length
-          val lb = b.length
-          var ret = true
-          var pos = 0
-          while (pos < la && pos < lb) {
-            ret &= (a(pos) == b(pos))
-            pos += 1
-          }
-          ret && la == lb
+        val la = a.length
+        val lb = b.length
+        var ret = true
+        var pos = 0
+        while (pos < la && pos < lb) {
+          ret &= (a(pos) == b(pos))
+          pos += 1
         }
+        ret && la == lb
+      }
     }
 
   /** create a SHA-256 hash from a Byte array */
@@ -144,7 +146,7 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
   /** create a SHA-256 hash from a String */
   def hash256(in: String): String = {
     base64Encode(
-        MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8")))
+      MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8")))
   }
 
   /** create a hex encoded SHA hash from a Byte array */
@@ -204,10 +206,12 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
         val b: Int = in(pos)
         val msb = (b & 0xf0) >> 4
         val lsb = (b & 0x0f)
-        sb.append((if (msb < 10) ('0' + msb).asInstanceOf[Char]
-                   else ('a' + (msb - 10)).asInstanceOf[Char]))
-        sb.append((if (lsb < 10) ('0' + lsb).asInstanceOf[Char]
-                   else ('a' + (lsb - 10)).asInstanceOf[Char]))
+        sb.append(
+          (if (msb < 10) ('0' + msb).asInstanceOf[Char]
+          else ('a' + (msb - 10)).asInstanceOf[Char]))
+        sb.append(
+          (if (lsb < 10) ('0' + lsb).asInstanceOf[Char]
+          else ('a' + (lsb - 10)).asInstanceOf[Char]))
 
         addDigit(in, pos + 1, len, sb)
       }
@@ -226,19 +230,19 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
     */
   def secureXML: XMLLoader[Elem] = {
     val parserFactory = SAXParserFactory.newInstance(
-        "org.apache.xerces.jaxp.SAXParserFactoryImpl",
-        SecurityHelpers.getClass.getClassLoader
+      "org.apache.xerces.jaxp.SAXParserFactoryImpl",
+      SecurityHelpers.getClass.getClassLoader
     )
 
     parserFactory.setNamespaceAware(false)
     parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                             Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                               Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
                              false)
     parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                             Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+                               Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
                              false)
     parserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                             Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                               Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
                              true)
     parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 

@@ -23,7 +23,7 @@ import akka.testkit.AkkaSpec
 
 class TcpSpec
     extends AkkaSpec(
-        "akka.stream.materializer.subscription-timeout.timeout = 2s")
+      "akka.stream.materializer.subscription-timeout.timeout = 2s")
     with TcpHelper {
   var demand = 0L
 
@@ -43,8 +43,10 @@ class TcpSpec
         .run()
       val serverConnection = server.waitAccept()
 
-      validateServerClientCommunication(
-          testData, serverConnection, tcpReadProbe, tcpWriteProbe)
+      validateServerClientCommunication(testData,
+                                        serverConnection,
+                                        tcpReadProbe,
+                                        tcpWriteProbe)
 
       tcpWriteProbe.close()
       tcpReadProbe.close()
@@ -286,7 +288,7 @@ class TcpSpec
 
       // Cause error
       tcpWriteProbe.tcpWriteSubscription.sendError(
-          new IllegalStateException("test"))
+        new IllegalStateException("test"))
 
       tcpReadProbe.subscriberProbe.expectError()
       serverConnection.expectClosed(_.isErrorClosed)
@@ -321,7 +323,7 @@ class TcpSpec
       serverConnection.waitRead() should be(testData)
 
       tcpWriteProbe.tcpWriteSubscription.sendError(
-          new IllegalStateException("test"))
+        new IllegalStateException("test"))
       serverConnection.expectClosed(_.isErrorClosed)
       serverConnection.expectTerminated()
     }
@@ -372,10 +374,14 @@ class TcpSpec
         .run()
       val serverConnection2 = server.waitAccept()
 
-      validateServerClientCommunication(
-          testData, serverConnection1, tcpReadProbe1, tcpWriteProbe1)
-      validateServerClientCommunication(
-          testData, serverConnection2, tcpReadProbe2, tcpWriteProbe2)
+      validateServerClientCommunication(testData,
+                                        serverConnection1,
+                                        tcpReadProbe1,
+                                        tcpWriteProbe1)
+      validateServerClientCommunication(testData,
+                                        serverConnection2,
+                                        tcpReadProbe2,
+                                        tcpWriteProbe2)
 
       val conn1 = Await.result(conn1F, 1.seconds)
       val conn2 = Await.result(conn2F, 1.seconds)
@@ -395,8 +401,8 @@ class TcpSpec
       val serverAddress = temporaryServerAddress()
       val writeButIgnoreRead: Flow[ByteString, ByteString, NotUsed] =
         Flow.fromSinkAndSourceMat(
-            Sink.ignore,
-            Source.single(ByteString("Early response")))(Keep.right)
+          Sink.ignore,
+          Source.single(ByteString("Early response")))(Keep.right)
 
       val binding = Await.result(Tcp()
                                    .bind(serverAddress.getHostName,
@@ -460,12 +466,15 @@ class TcpSpec
 
       // Getting rid of existing connection actors by using a blunt instrument
       system2.actorSelection(
-          akka.io.Tcp(system2).getManager.path / "selectors" / s"$$a" / "*") ! Kill
+        akka.io
+          .Tcp(system2)
+          .getManager
+          .path / "selectors" / s"$$a" / "*") ! Kill
 
       a[StreamTcpException] should be thrownBy Await.result(result, 3.seconds)
 
       binding.map(_.unbind()).recover { case NonFatal(_) ⇒ () } foreach
-      (_ ⇒ system2.shutdown())
+        (_ ⇒ system2.shutdown())
     }
   }
 
@@ -534,7 +543,8 @@ class TcpSpec
       val address = temporaryServerAddress()
       val probe1 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
       val bind =
-        Tcp(system).bind(address.getHostName, address.getPort) // TODO getHostString in Java7
+        Tcp(system)
+          .bind(address.getHostName, address.getPort) // TODO getHostString in Java7
       // Bind succeeded, we have a local address
       val binding1 =
         Await.result(bind.to(Sink.fromSubscriber(probe1)).run(), 3.second)
@@ -574,7 +584,8 @@ class TcpSpec
       val address = temporaryServerAddress()
       Tcp().bind(address.getHostName, address.getPort).take(1).runForeach {
         tcp ⇒
-          Thread.sleep(1000) // we're testing here to see if it survives such race
+          Thread
+            .sleep(1000) // we're testing here to see if it survives such race
           tcp.flow.join(Flow[ByteString]).run()
       }
 
@@ -589,10 +600,9 @@ class TcpSpec
       val address = temporaryServerAddress()
       val firstClientConnected = Promise[Unit]()
       val takeTwoAndDropSecond = Flow[IncomingConnection]
-        .map(conn ⇒
-              {
-            firstClientConnected.trySuccess(())
-            conn
+        .map(conn ⇒ {
+          firstClientConnected.trySuccess(())
+          conn
         })
         .grouped(2)
         .take(1)

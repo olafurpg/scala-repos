@@ -26,7 +26,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util.StatCounter
 
 class PartitioningSuite
-    extends SparkFunSuite with SharedSparkContext with PrivateMethodTester {
+    extends SparkFunSuite
+    with SharedSparkContext
+    with PrivateMethodTester {
 
   test("HashPartitioner equality") {
     val p2 = new HashPartitioner(2)
@@ -221,26 +223,26 @@ class PartitioningSuite
 
     assert(grouped2.join(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.leftOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.leftOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.rightOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.rightOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.fullOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.fullOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(grouped2.cogroup(grouped4).partitioner === grouped4.partitioner)
 
     assert(grouped2.join(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.leftOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.leftOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.rightOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.rightOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.fullOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.fullOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(grouped2.cogroup(reduced2).partitioner === grouped2.partitioner)
 
     assert(grouped2.map(_ => 1).partitioner === None)
     assert(grouped2.mapValues(_ => 1).partitioner === grouped2.partitioner)
     assert(
-        grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
+      grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
     assert(grouped2.filter(_._1 > 4).partitioner === grouped2.partitioner)
   }
 

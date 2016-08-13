@@ -27,11 +27,11 @@ import org.apache.spark.util.Utils
 class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("single cluster") {
     val data = sc.parallelize(
-        Array(
-            Vectors.dense(6.0, 9.0),
-            Vectors.dense(5.0, 10.0),
-            Vectors.dense(4.0, 11.0)
-        ))
+      Array(
+        Vectors.dense(6.0, 9.0),
+        Vectors.dense(5.0, 10.0),
+        Vectors.dense(4.0, 11.0)
+      ))
 
     // expectations
     val Ew = 1.0
@@ -53,13 +53,13 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // we set an initial gaussian to induce expected results
     val initialGmm = new GaussianMixtureModel(
-        Array(0.5, 0.5),
-        Array(
-            new MultivariateGaussian(Vectors.dense(-1.0),
-                                     Matrices.dense(1, 1, Array(1.0))),
-            new MultivariateGaussian(Vectors.dense(1.0),
-                                     Matrices.dense(1, 1, Array(1.0)))
-        )
+      Array(0.5, 0.5),
+      Array(
+        new MultivariateGaussian(Vectors.dense(-1.0),
+                                 Matrices.dense(1, 1, Array(1.0))),
+        new MultivariateGaussian(Vectors.dense(1.0),
+                                 Matrices.dense(1, 1, Array(1.0)))
+      )
     )
 
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
@@ -92,11 +92,11 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("single cluster with sparse data") {
     val data = sc.parallelize(
-        Array(
-            Vectors.sparse(3, Array(0, 2), Array(4.0, 2.0)),
-            Vectors.sparse(3, Array(0, 2), Array(2.0, 4.0)),
-            Vectors.sparse(3, Array(1), Array(6.0))
-        ))
+      Array(
+        Vectors.sparse(3, Array(0, 2), Array(4.0, 2.0)),
+        Vectors.sparse(3, Array(0, 2), Array(2.0, 4.0)),
+        Vectors.sparse(3, Array(1), Array(6.0))
+      ))
 
     val Ew = 1.0
     val Emu = Vectors.dense(2.0, 2.0, 2.0)
@@ -127,13 +127,13 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
       data.map(point => Vectors.sparse(1, Array(0), point.toArray))
     // we set an initial gaussian to induce expected results
     val initialGmm = new GaussianMixtureModel(
-        Array(0.5, 0.5),
-        Array(
-            new MultivariateGaussian(Vectors.dense(-1.0),
-                                     Matrices.dense(1, 1, Array(1.0))),
-            new MultivariateGaussian(Vectors.dense(1.0),
-                                     Matrices.dense(1, 1, Array(1.0)))
-        )
+      Array(0.5, 0.5),
+      Array(
+        new MultivariateGaussian(Vectors.dense(-1.0),
+                                 Matrices.dense(1, 1, Array(1.0))),
+        new MultivariateGaussian(Vectors.dense(1.0),
+                                 Matrices.dense(1, 1, Array(1.0)))
+      )
     )
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
     val Emu = Array(Vectors.dense(-4.3673), Vectors.dense(5.1604))
@@ -187,21 +187,21 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
   object GaussianTestData {
 
     val data = Array(
-        Vectors.dense(-5.1971),
-        Vectors.dense(-2.5359),
-        Vectors.dense(-3.8220),
-        Vectors.dense(-5.2211),
-        Vectors.dense(-5.0602),
-        Vectors.dense(4.7118),
-        Vectors.dense(6.8989),
-        Vectors.dense(3.4592),
-        Vectors.dense(4.6322),
-        Vectors.dense(5.7048),
-        Vectors.dense(4.6567),
-        Vectors.dense(5.5026),
-        Vectors.dense(4.5605),
-        Vectors.dense(5.2043),
-        Vectors.dense(6.2734)
+      Vectors.dense(-5.1971),
+      Vectors.dense(-2.5359),
+      Vectors.dense(-3.8220),
+      Vectors.dense(-5.2211),
+      Vectors.dense(-5.0602),
+      Vectors.dense(4.7118),
+      Vectors.dense(6.8989),
+      Vectors.dense(3.4592),
+      Vectors.dense(4.6322),
+      Vectors.dense(5.7048),
+      Vectors.dense(4.6567),
+      Vectors.dense(5.5026),
+      Vectors.dense(4.5605),
+      Vectors.dense(5.2043),
+      Vectors.dense(6.2734)
     )
 
     val data2: Array[Vector] = Array.tabulate(25) { i: Int =>

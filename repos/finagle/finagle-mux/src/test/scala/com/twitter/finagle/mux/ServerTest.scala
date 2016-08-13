@@ -29,12 +29,15 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
   private class LeaseCtx {
     val clientToServer = new AsyncQueue[Message]
     val serverToClient = new AsyncQueue[Message]
-    val transport = new QueueTransport(
-        writeq = serverToClient, readq = clientToServer)
+    val transport =
+      new QueueTransport(writeq = serverToClient, readq = clientToServer)
     val service = mock[Service[Request, Response]]
     val lessor = mock[Lessor]
-    val server = ServerDispatcher.newRequestResponse(
-        transport, service, lessor, NullTracer, NullStatsReceiver)
+    val server = ServerDispatcher.newRequestResponse(transport,
+                                                     service,
+                                                     lessor,
+                                                     NullTracer,
+                                                     NullStatsReceiver)
 
     def issue(lease: Duration) {
       val m = serverToClient.poll()
@@ -48,11 +51,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       val m = serverToClient.poll()
       assert(!m.isDefined)
       clientToServer.offer(
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       assert(m.isDefined)
       checkFuture(m, Message.RdispatchNack(0, Seq.empty))
     }
@@ -61,11 +64,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       val m = serverToClient.poll()
       assert(!m.isDefined)
       clientToServer.offer(
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       assert(!m.isDefined)
     }
   }
@@ -154,8 +157,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
 
     when(trans.peerCertificate).thenReturn(None)
 
-    val dispatcher = ServerDispatcher.newRequestResponse(
-        trans, svc, Lessor.nil, NullTracer, NullStatsReceiver)
+    val dispatcher = ServerDispatcher.newRequestResponse(trans,
+                                                         svc,
+                                                         Lessor.nil,
+                                                         NullTracer,
+                                                         NullStatsReceiver)
     assert(dispatcher.npending() == 1)
 
     p.updateIfEmpty(Throw(new RuntimeException("welp")))
@@ -173,11 +179,18 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val serverToClient = new AsyncQueue[Message]
     val transport =
       new QueueTransport(writeq = serverToClient, readq = clientToServer)
-    val server = ServerDispatcher.newRequestResponse(
-        transport, svc, Lessor.nil, NullTracer, NullStatsReceiver)
+    val server = ServerDispatcher.newRequestResponse(transport,
+                                                     svc,
+                                                     Lessor.nil,
+                                                     NullTracer,
+                                                     NullStatsReceiver)
 
-    clientToServer.offer(Message.Tdispatch(
-            0, Seq.empty, Path.empty, Dtab.empty, ChannelBuffers.EMPTY_BUFFER))
+    clientToServer.offer(
+      Message.Tdispatch(0,
+                        Seq.empty,
+                        Path.empty,
+                        Dtab.empty,
+                        ChannelBuffers.EMPTY_BUFFER))
 
     val reply = serverToClient.poll()
     assert(reply.isDefined)
@@ -195,15 +208,15 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       val p = Promise[Response]
       var req: Request = null
       val server = ServerDispatcher.newRequestResponse(
-          transport,
-          Service.mk { _req: Request =>
-            req = _req
-            p
-          }
+        transport,
+        Service.mk { _req: Request =>
+          req = _req
+          p
+        }
       )
 
       clientToServer.offer(
-          Message.Tdispatch(0, Seq.empty, Path.empty, Dtab.empty, buf))
+        Message.Tdispatch(0, Seq.empty, Path.empty, Dtab.empty, buf))
       // one outstanding request
 
       val drain =
@@ -235,19 +248,19 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       })
 
       clientToServer.offer(
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       // one outstanding request
 
       clientToServer.offer(
-          Message.Tdispatch(1,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(1,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       // two outstanding requests
 
       val drain =
@@ -277,8 +290,9 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       val transport =
         new QueueTransport(writeq = serverToClient, readq = clientToServer)
 
-      val server = ServerDispatcher.newRequestResponse(
-          transport, Service.mk(req => Future.???))
+      val server =
+        ServerDispatcher.newRequestResponse(transport,
+                                            Service.mk(req => Future.???))
 
       val drain =
         server.close(Time.Top) // synchronously sends drain request to client
@@ -297,11 +311,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
                              remoteAddr: SocketAddress = null) {
     val serverToClient = new AsyncQueue[Message]
     val clientToServer = new AsyncQueue[Message]
-    val transport = new QueueTransport(
-        writeq = serverToClient, readq = clientToServer) {
-      override def peerCertificate = peerCert
-      override val remoteAddress = remoteAddr
-    }
+    val transport =
+      new QueueTransport(writeq = serverToClient, readq = clientToServer) {
+        override def peerCertificate = peerCert
+        override val remoteAddress = remoteAddr
+      }
     def ping() = Future.Done
 
     val server = ServerDispatcher.newRequestResponse(transport, svc)
@@ -319,11 +333,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       })
 
       server.request( // request before closing
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       assert(server.read().isDefined)
 
       val drain =
@@ -333,11 +347,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       val Tdrain(tag) = tdrain
 
       server.request( // request after sending tdrain, before getting rdrain
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       assert(server.read().isDefined)
 
       assert(!drain.isDefined) // client hasn't acked
@@ -346,11 +360,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
       assert(drain.isDefined) // safe to shut down
 
       server.request( // request after closing down
-          Message.Tdispatch(0,
-                            Seq.empty,
-                            Path.empty,
-                            Dtab.empty,
-                            ChannelBuffers.EMPTY_BUFFER))
+        Message.Tdispatch(0,
+                          Seq.empty,
+                          Path.empty,
+                          Dtab.empty,
+                          ChannelBuffers.EMPTY_BUFFER))
       val Some(Return(rdrain)) = server.read().poll
       assert(rdrain.isInstanceOf[RdispatchNack])
     }
@@ -364,7 +378,8 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val testService = new Service[Request, Response] {
       override def apply(request: Request): Future[Response] = Future.value {
         if (Contexts.local.get(Transport.peerCertCtx) == Some(mockCert))
-          okResponse else failResponse
+          okResponse
+        else failResponse
       }
     }
 
@@ -418,11 +433,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val server = ServerDispatcher.newRequestResponse(transport, svc)
 
     clientToServer.offer(
-        Message.Tdispatch(20,
-                          Seq.empty,
-                          Path.empty,
-                          Dtab.empty,
-                          ChannelBuffers.EMPTY_BUFFER))
+      Message.Tdispatch(20,
+                        Seq.empty,
+                        Path.empty,
+                        Dtab.empty,
+                        ChannelBuffers.EMPTY_BUFFER))
 
     clientToServer.offer(Message.Tdiscarded(20, "timeout"))
 
@@ -447,8 +462,8 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val svc = Service.mk { req: Request =>
       Future.value(Response.empty)
     }
-    val server = ServerDispatcher.newRequestResponse(
-        transport, svc, Lessor.nil, NullTracer, sr)
+    val server = ServerDispatcher
+      .newRequestResponse(transport, svc, Lessor.nil, NullTracer, sr)
 
     val msg = Message.Tdispatch(tag = 10,
                                 Seq.empty,

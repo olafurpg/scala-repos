@@ -4,7 +4,10 @@
 package akka.http.impl.settings
 
 import akka.http.scaladsl.settings.ParserSettings
-import akka.http.scaladsl.settings.ParserSettings.{ErrorLoggingVerbosity, CookieParsingMode}
+import akka.http.scaladsl.settings.ParserSettings.{
+  ErrorLoggingVerbosity,
+  CookieParsingMode
+}
 import com.typesafe.config.Config
 import scala.collection.JavaConverters._
 import akka.http.scaladsl.model.{StatusCode, HttpMethod, Uri}
@@ -33,8 +36,8 @@ private[akka] final case class ParserSettingsImpl(
 
   require(maxUriLength > 0, "max-uri-length must be > 0")
   require(maxMethodLength > 0, "max-method-length must be > 0")
-  require(
-      maxResponseReasonLength > 0, "max-response-reason-length must be > 0")
+  require(maxResponseReasonLength > 0,
+          "max-response-reason-length must be > 0")
   require(maxHeaderNameLength > 0, "max-header-name-length must be > 0")
   require(maxHeaderValueLength > 0, "max-header-value-length must be > 0")
   require(maxHeaderCount > 0, "max-header-count must be > 0")
@@ -43,7 +46,7 @@ private[akka] final case class ParserSettingsImpl(
   require(maxChunkSize > 0, "max-chunk-size must be > 0")
 
   override val defaultHeaderValueCacheLimit: Int = headerValueCacheLimits(
-      "default")
+    "default")
 
   override def headerValueCacheLimit(headerName: String): Int =
     headerValueCacheLimits.getOrElse(headerName, defaultHeaderValueCacheLimit)
@@ -63,24 +66,23 @@ object ParserSettingsImpl
     val cacheConfig = c getConfig "header-cache"
 
     new ParserSettingsImpl(
-        c getIntBytes "max-uri-length",
-        c getIntBytes "max-method-length",
-        c getIntBytes "max-response-reason-length",
-        c getIntBytes "max-header-name-length",
-        c getIntBytes "max-header-value-length",
-        c getIntBytes "max-header-count",
-        c getPossiblyInfiniteBytes "max-content-length",
-        c getIntBytes "max-chunk-ext-length",
-        c getIntBytes "max-chunk-size",
-        Uri.ParsingMode(c getString "uri-parsing-mode"),
-        CookieParsingMode(c getString "cookie-parsing-mode"),
-        c getBoolean "illegal-header-warnings",
-        ErrorLoggingVerbosity(c getString "error-logging-verbosity"),
-        cacheConfig.entrySet.asScala
-          .map(kvp ⇒ kvp.getKey -> cacheConfig.getInt(kvp.getKey))(
-            collection.breakOut),
-        c getBoolean "tls-session-info-header",
-        noCustomMethods,
-        noCustomStatusCodes)
+      c getIntBytes "max-uri-length",
+      c getIntBytes "max-method-length",
+      c getIntBytes "max-response-reason-length",
+      c getIntBytes "max-header-name-length",
+      c getIntBytes "max-header-value-length",
+      c getIntBytes "max-header-count",
+      c getPossiblyInfiniteBytes "max-content-length",
+      c getIntBytes "max-chunk-ext-length",
+      c getIntBytes "max-chunk-size",
+      Uri.ParsingMode(c getString "uri-parsing-mode"),
+      CookieParsingMode(c getString "cookie-parsing-mode"),
+      c getBoolean "illegal-header-warnings",
+      ErrorLoggingVerbosity(c getString "error-logging-verbosity"),
+      cacheConfig.entrySet.asScala.map(kvp ⇒
+        kvp.getKey -> cacheConfig.getInt(kvp.getKey))(collection.breakOut),
+      c getBoolean "tls-session-info-header",
+      noCustomMethods,
+      noCustomStatusCodes)
   }
 }

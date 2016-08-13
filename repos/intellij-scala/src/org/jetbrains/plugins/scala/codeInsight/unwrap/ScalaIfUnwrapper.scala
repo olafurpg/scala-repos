@@ -27,13 +27,14 @@ class ScalaIfUnwrapper extends ScalaUnwrapper {
       case _ =>
     }
 
-  override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e.getParent match {
-    case ifSt @ ScIfStmt(_, Some(`e`), _) =>
-      super.collectAffectedElements(e, toExtract)
-      ifSt
-    case _ => e
-  }
+  override def collectAffectedElements(e: PsiElement,
+                                       toExtract: util.List[PsiElement]) =
+    e.getParent match {
+      case ifSt @ ScIfStmt(_, Some(`e`), _) =>
+        super.collectAffectedElements(e, toExtract)
+        ifSt
+      case _ => e
+    }
 
   override def getDescription(e: PsiElement) =
     CodeInsightBundle.message("unwrap.if")

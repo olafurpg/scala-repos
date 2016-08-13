@@ -17,7 +17,12 @@
 
 package org.apache.spark.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  File,
+  FileOutputStream
+}
 import java.lang.{Double => JDouble, Float => JFloat}
 import java.net.{BindException, ServerSocket, URI}
 import java.nio.{ByteBuffer, ByteOrder}
@@ -39,7 +44,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.util.ByteUnit
 
 class UtilsSuite
-    extends SparkFunSuite with ResetSystemProperties with Logging {
+    extends SparkFunSuite
+    with ResetSystemProperties
+    with Logging {
 
   test("timeConversion") {
     // Test -1
@@ -131,13 +138,13 @@ class UtilsSuite
     // Overflow handling, 1073741824p exceeds Long.MAX_VALUE if converted straight to Bytes
     // This demonstrates that we can have e.g 1024^3 PB without overflowing.
     assert(
-        Utils.byteStringAsGb("1073741824p") === ByteUnit.PiB.toGiB(1073741824))
+      Utils.byteStringAsGb("1073741824p") === ByteUnit.PiB.toGiB(1073741824))
     assert(
-        Utils.byteStringAsMb("1073741824p") === ByteUnit.PiB.toMiB(1073741824))
+      Utils.byteStringAsMb("1073741824p") === ByteUnit.PiB.toMiB(1073741824))
 
     // Run this to confirm it doesn't throw an exception
     assert(
-        Utils.byteStringAsBytes("9223372036854775807") === 9223372036854775807L)
+      Utils.byteStringAsBytes("9223372036854775807") === 9223372036854775807L)
     assert(ByteUnit.PiB.toPiB(9223372036854775807L) === 9223372036854775807L)
 
     // Test overflow exception
@@ -193,7 +200,7 @@ class UtilsSuite
     assert(Utils.bytesToString(2306867) === "2.2 MB")
     assert(Utils.bytesToString(5368709120L) === "5.0 GB")
     assert(
-        Utils.bytesToString(5L * 1024L * 1024L * 1024L * 1024L) === "5.0 TB")
+      Utils.bytesToString(5L * 1024L * 1024L * 1024L * 1024L) === "5.0 TB")
   }
 
   test("copyStream") {
@@ -239,8 +246,10 @@ class UtilsSuite
     assert(Utils.splitCommandString("a \"b c\"") === Seq("a", "b c"))
     assert(Utils.splitCommandString("a \"b c\" d") === Seq("a", "b c", "d"))
     assert(Utils.splitCommandString("\"b c\"") === Seq("b c"))
-    assert(Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq(
-            "a", "b\" c", "d' e"))
+    assert(
+      Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq("a",
+                                                             "b\" c",
+                                                             "d' e"))
     assert(Utils.splitCommandString("a\t'b\nc'\nd") === Seq("a", "b\nc", "d"))
     assert(Utils.splitCommandString("a \"b\\\\c\"") === Seq("a", "b\\c"))
     assert(Utils.splitCommandString("a \"b\\\"c\"") === Seq("a", "b\"c"))
@@ -269,7 +278,8 @@ class UtilsSuite
     assert(str(minute) === "1" + sep + "0 m")
     assert(str(minute + 4 * second + 34) === "1" + sep + "1 m")
     assert(str(10 * hour + minute + 4 * second) === "10" + sep + "02 h")
-    assert(str(10 * hour + 59 * minute + 59 * second + 999) === "11" + sep +
+    assert(
+      str(10 * hour + 59 * minute + 59 * second + 999) === "11" + sep +
         "00 h")
   }
 
@@ -328,7 +338,7 @@ class UtilsSuite
 
     // Read some nonexistent bytes on both ends
     assert(
-        Utils.offsetBytes(files, -5, 35) === "0123456789abcdefghijABCDEFGHIJ")
+      Utils.offsetBytes(files, -5, 35) === "0123456789abcdefghijABCDEFGHIJ")
 
     Utils.deleteRecursively(tmpDir)
   }
@@ -391,8 +401,8 @@ class UtilsSuite
     val rawCwd = System.getProperty("user.dir")
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("hdfs:/root/spark.jar", "hdfs:/root/spark.jar")
-    assertResolves(
-        "hdfs:///root/spark.jar#app.jar", "hdfs:/root/spark.jar#app.jar")
+    assertResolves("hdfs:///root/spark.jar#app.jar",
+                   "hdfs:/root/spark.jar#app.jar")
     assertResolves("spark.jar", s"file:$cwd/spark.jar")
     assertResolves("spark.jar#app.jar", s"file:$cwd/spark.jar#app.jar")
     assertResolves("path to/file.txt", s"file:$cwd/path%20to/file.txt")
@@ -402,8 +412,8 @@ class UtilsSuite
     }
     assertResolves("file:/C:/path/to/file.txt", "file:/C:/path/to/file.txt")
     assertResolves("file:///C:/path/to/file.txt", "file:/C:/path/to/file.txt")
-    assertResolves(
-        "file:/C:/file.txt#alias.txt", "file:/C:/file.txt#alias.txt")
+    assertResolves("file:/C:/file.txt#alias.txt",
+                   "file:/C:/file.txt#alias.txt")
     assertResolves("file:foo", s"file:foo")
     assertResolves("file:foo:baby", s"file:foo:baby")
   }
@@ -423,15 +433,15 @@ class UtilsSuite
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("jar1,jar2", s"file:$cwd/jar1,file:$cwd/jar2")
     assertResolves("file:/jar1,file:/jar2", "file:/jar1,file:/jar2")
+    assertResolves("hdfs:/jar1,file:/jar2,jar3",
+                   s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
     assertResolves(
-        "hdfs:/jar1,file:/jar2,jar3", s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
-    assertResolves(
-        "hdfs:/jar1,file:/jar2,jar3,jar4#jar5,path to/jar6",
-        s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:$cwd/jar4#jar5,file:$cwd/path%20to/jar6")
+      "hdfs:/jar1,file:/jar2,jar3,jar4#jar5,path to/jar6",
+      s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:$cwd/jar4#jar5,file:$cwd/path%20to/jar6")
     if (Utils.isWindows) {
       assertResolves(
-          """hdfs:/jar1,file:/jar2,jar3,C:\pi.py#py.pi,C:\path to\jar4""",
-          s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:/C:/pi.py#py.pi,file:/C:/path%20to/jar4")
+        """hdfs:/jar1,file:/jar2,jar3,C:\pi.py#py.pi,C:\path to\jar4""",
+        s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:/C:/pi.py#py.pi,file:/C:/path%20to/jar4")
     }
   }
 
@@ -442,47 +452,58 @@ class UtilsSuite
     assert(Utils.nonLocalPaths("local:/spark.jar") === Array.empty)
     assert(Utils.nonLocalPaths("local:///spark.jar") === Array.empty)
     assert(Utils.nonLocalPaths("hdfs:/spark.jar") === Array("hdfs:/spark.jar"))
-    assert(Utils.nonLocalPaths("hdfs:///spark.jar") === Array(
-            "hdfs:///spark.jar"))
     assert(
-        Utils.nonLocalPaths("file:/spark.jar,local:/smart.jar,family.py") === Array.empty)
+      Utils.nonLocalPaths("hdfs:///spark.jar") === Array("hdfs:///spark.jar"))
     assert(
-        Utils.nonLocalPaths("local:/spark.jar,file:/smart.jar,family.py") === Array.empty)
-    assert(Utils.nonLocalPaths("hdfs:/spark.jar,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
+      Utils
+        .nonLocalPaths("file:/spark.jar,local:/smart.jar,family.py") === Array.empty)
     assert(
-        Utils.nonLocalPaths("hdfs:/spark.jar,path to/a.jar,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
-    assert(Utils.nonLocalPaths(
-            "hdfs:/spark.jar,s3:/smart.jar,local.py,file:/hello/pi.py") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
-    assert(Utils.nonLocalPaths(
-            "local.py,hdfs:/spark.jar,file:/hello/pi.py,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar", "s3:/smart.jar"))
+      Utils
+        .nonLocalPaths("local:/spark.jar,file:/smart.jar,family.py") === Array.empty)
+    assert(
+      Utils.nonLocalPaths("hdfs:/spark.jar,s3:/smart.jar") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
+    assert(Utils
+      .nonLocalPaths("hdfs:/spark.jar,path to/a.jar,s3:/smart.jar") === Array(
+      "hdfs:/spark.jar",
+      "s3:/smart.jar"))
+    assert(
+      Utils.nonLocalPaths(
+        "hdfs:/spark.jar,s3:/smart.jar,local.py,file:/hello/pi.py") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
+    assert(
+      Utils.nonLocalPaths(
+        "local.py,hdfs:/spark.jar,file:/hello/pi.py,s3:/smart.jar") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
 
     // Test Windows paths
     assert(
-        Utils.nonLocalPaths("C:/some/path.jar", testWindows = true) === Array.empty)
+      Utils
+        .nonLocalPaths("C:/some/path.jar", testWindows = true) === Array.empty)
     assert(
-        Utils.nonLocalPaths("file:/C:/some/path.jar", testWindows = true) === Array.empty)
+      Utils
+        .nonLocalPaths("file:/C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("file:///C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("local:/C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("local:///C:/some/path.jar", testWindows = true) === Array.empty)
     assert(
-        Utils.nonLocalPaths("file:///C:/some/path.jar", testWindows = true) === Array.empty)
+      Utils.nonLocalPaths("hdfs:/a.jar,C:/my.jar,s3:/another.jar",
+                          testWindows = true) === Array("hdfs:/a.jar",
+                                                        "s3:/another.jar"))
     assert(
-        Utils.nonLocalPaths("local:/C:/some/path.jar", testWindows = true) === Array.empty)
+      Utils.nonLocalPaths("D:/your.jar,hdfs:/a.jar,s3:/another.jar",
+                          testWindows = true) === Array("hdfs:/a.jar",
+                                                        "s3:/another.jar"))
     assert(
-        Utils.nonLocalPaths("local:///C:/some/path.jar", testWindows = true) === Array.empty)
-    assert(
-        Utils.nonLocalPaths("hdfs:/a.jar,C:/my.jar,s3:/another.jar",
-                            testWindows = true) === Array("hdfs:/a.jar",
-                                                          "s3:/another.jar"))
-    assert(
-        Utils.nonLocalPaths("D:/your.jar,hdfs:/a.jar,s3:/another.jar",
-                            testWindows = true) === Array("hdfs:/a.jar",
-                                                          "s3:/another.jar"))
-    assert(
-        Utils.nonLocalPaths("hdfs:/a.jar,s3:/another.jar,e:/our.jar",
-                            testWindows = true) === Array("hdfs:/a.jar",
-                                                          "s3:/another.jar"))
+      Utils.nonLocalPaths("hdfs:/a.jar,s3:/another.jar,e:/our.jar",
+                          testWindows = true) === Array("hdfs:/a.jar",
+                                                        "s3:/another.jar"))
   }
 
   test("isBindCollision") {
@@ -562,9 +583,9 @@ class UtilsSuite
     try {
       System.setProperty("spark.test.fileNameLoadB", "2")
       Files.write(
-          "spark.test.fileNameLoadA true\n" + "spark.test.fileNameLoadB 1\n",
-          outFile,
-          StandardCharsets.UTF_8)
+        "spark.test.fileNameLoadA true\n" + "spark.test.fileNameLoadB 1\n",
+        outFile,
+        StandardCharsets.UTF_8)
       val properties = Utils.getPropertiesFromFile(outFile.getAbsolutePath)
       properties.filter { case (k, v) => k.startsWith("spark.") }.foreach {
         case (k, v) => sys.props.getOrElseUpdate(k, v)
@@ -579,10 +600,9 @@ class UtilsSuite
 
   test("timeIt with prepare") {
     var cnt = 0
-    val prepare = () =>
-      {
-        cnt += 1
-        Thread.sleep(1000)
+    val prepare = () => {
+      cnt += 1
+      Thread.sleep(1000)
     }
     val time = Utils.timeIt(2)({}, Some(prepare))
     require(cnt === 2, "prepare should be called twice")
@@ -707,8 +727,9 @@ class UtilsSuite
     // Non-existent files or directories should fail
     assert(!Utils.isInDirectory(parentDir, new File(parentDir, "one.txt")))
     assert(!Utils.isInDirectory(parentDir, new File(parentDir, "one/two.txt")))
-    assert(!Utils.isInDirectory(parentDir,
-                                new File(parentDir, "one/two/three.txt")))
+    assert(
+      !Utils.isInDirectory(parentDir,
+                           new File(parentDir, "one/two/three.txt")))
 
     // Siblings should fail
     assert(!Utils.isInDirectory(childDir1, childDir1b))
@@ -729,7 +750,7 @@ class UtilsSuite
 
     // scalastyle:off println
     stream.println(
-        "test circular test circular test circular test circular test circular")
+      "test circular test circular test circular test circular test circular")
     // scalastyle:on println
     assert(buffer.toString === "t circular test circular\n")
   }
@@ -744,13 +765,13 @@ class UtilsSuite
     shouldMatchDefaultOrder(Double.MinValue, Double.MaxValue)
     assert(Utils.nanSafeCompareDoubles(Double.NaN, Double.NaN) === 0)
     assert(
-        Utils.nanSafeCompareDoubles(Double.NaN, Double.PositiveInfinity) === 1)
+      Utils.nanSafeCompareDoubles(Double.NaN, Double.PositiveInfinity) === 1)
     assert(
-        Utils.nanSafeCompareDoubles(Double.NaN, Double.NegativeInfinity) === 1)
+      Utils.nanSafeCompareDoubles(Double.NaN, Double.NegativeInfinity) === 1)
     assert(
-        Utils.nanSafeCompareDoubles(Double.PositiveInfinity, Double.NaN) === -1)
+      Utils.nanSafeCompareDoubles(Double.PositiveInfinity, Double.NaN) === -1)
     assert(
-        Utils.nanSafeCompareDoubles(Double.NegativeInfinity, Double.NaN) === -1)
+      Utils.nanSafeCompareDoubles(Double.NegativeInfinity, Double.NaN) === -1)
   }
 
   test("nanSafeCompareFloats") {
@@ -765,27 +786,32 @@ class UtilsSuite
     assert(Utils.nanSafeCompareFloats(Float.NaN, Float.PositiveInfinity) === 1)
     assert(Utils.nanSafeCompareFloats(Float.NaN, Float.NegativeInfinity) === 1)
     assert(
-        Utils.nanSafeCompareFloats(Float.PositiveInfinity, Float.NaN) === -1)
+      Utils.nanSafeCompareFloats(Float.PositiveInfinity, Float.NaN) === -1)
     assert(
-        Utils.nanSafeCompareFloats(Float.NegativeInfinity, Float.NaN) === -1)
+      Utils.nanSafeCompareFloats(Float.NegativeInfinity, Float.NaN) === -1)
   }
 
   test("isDynamicAllocationEnabled") {
     val conf = new SparkConf()
     conf.set("spark.master", "yarn-client")
     assert(Utils.isDynamicAllocationEnabled(conf) === false)
-    assert(Utils.isDynamicAllocationEnabled(
-            conf.set("spark.dynamicAllocation.enabled", "false")) === false)
-    assert(Utils.isDynamicAllocationEnabled(
-            conf.set("spark.dynamicAllocation.enabled", "true")) === true)
-    assert(Utils.isDynamicAllocationEnabled(
-            conf.set("spark.executor.instances", "1")) === false)
-    assert(Utils.isDynamicAllocationEnabled(
-            conf.set("spark.executor.instances", "0")) === true)
     assert(
-        Utils.isDynamicAllocationEnabled(conf.set("spark.master", "local")) === false)
-    assert(Utils.isDynamicAllocationEnabled(
-            conf.set("spark.dynamicAllocation.testing", "true")))
+      Utils.isDynamicAllocationEnabled(
+        conf.set("spark.dynamicAllocation.enabled", "false")) === false)
+    assert(
+      Utils.isDynamicAllocationEnabled(
+        conf.set("spark.dynamicAllocation.enabled", "true")) === true)
+    assert(
+      Utils.isDynamicAllocationEnabled(
+        conf.set("spark.executor.instances", "1")) === false)
+    assert(
+      Utils.isDynamicAllocationEnabled(
+        conf.set("spark.executor.instances", "0")) === true)
+    assert(Utils
+      .isDynamicAllocationEnabled(conf.set("spark.master", "local")) === false)
+    assert(
+      Utils.isDynamicAllocationEnabled(
+        conf.set("spark.dynamicAllocation.testing", "true")))
   }
 
   test("encodeFileNameToURIRawPath") {
@@ -798,7 +824,7 @@ class UtilsSuite
     assert(Utils.decodeFileNameInURI(new URI("files:///abc/xyz")) === "xyz")
     assert(Utils.decodeFileNameInURI(new URI("files:///abc")) === "abc")
     assert(
-        Utils.decodeFileNameInURI(new URI("files:///abc%20xyz")) === "abc xyz")
+      Utils.decodeFileNameInURI(new URI("files:///abc%20xyz")) === "abc xyz")
   }
 
   test("Kill process") {

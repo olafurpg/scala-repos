@@ -26,16 +26,16 @@ abstract class Specs2WholeSuiteTest extends Specs2TestCase {
       """.stripMargin)
 
     runTestByLocation(
-        3,
-        14,
-        "SpecificationTest.scala",
-        checkConfigAndSettings(_, "SpecificationTest"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "SpecificationTest",
-                                           "The 'SpecificationTest' should",
-                                           "run single test") &&
+      3,
+      14,
+      "SpecificationTest.scala",
+      checkConfigAndSettings(_, "SpecificationTest"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         "SpecificationTest",
+                                         "The 'SpecificationTest' should",
+                                         "run single test") &&
           checkResultTreeHasExactNamedPath(root,
                                            "[root]",
                                            "SpecificationTest",

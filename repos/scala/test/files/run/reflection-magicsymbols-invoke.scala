@@ -38,7 +38,7 @@ object Test extends App {
   println("============\nAny")
   println("it's important to print the list of Any's members")
   println(
-      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+    "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[Any].members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[Any], "2", "!=", "2")
   test(typeOf[Any], "2", "##")
@@ -55,7 +55,7 @@ object Test extends App {
   println("============\nAnyVal")
   println("it's important to print the list of AnyVal's members")
   println(
-      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+    "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[AnyVal].decls.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[AnyVal], null, termNames.CONSTRUCTOR.toString)
   test(typeOf[AnyVal], 2, "getClass")
@@ -63,7 +63,7 @@ object Test extends App {
   println("============\nAnyRef")
   println("it's important to print the list of AnyRef's members")
   println(
-      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+    "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[AnyRef].members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[AnyRef], "2", "!=", "2")
   test(typeOf[AnyRef], "2", "##")
@@ -88,7 +88,7 @@ object Test extends App {
   println("============\nArray")
   println("it's important to print the list of Array's members")
   println(
-      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+    "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   ArrayClass.info.members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(ArrayClass.info, Array(1, 2), "length")
   test(ArrayClass.info, Array(1, 2), "apply", 0)

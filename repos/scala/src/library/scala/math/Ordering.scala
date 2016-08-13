@@ -67,7 +67,9 @@ import scala.language.{implicitConversions, higherKinds}
   */
 @annotation.implicitNotFound(msg = "No implicit Ordering defined for ${T}.")
 trait Ordering[T]
-    extends Comparator[T] with PartialOrdering[T] with Serializable { outer =>
+    extends Comparator[T]
+    with PartialOrdering[T]
+    with Serializable { outer =>
 
   /** Returns whether a comparison between `x` and `y` is defined, and if so
     * the result of `compare(x, y)`.
@@ -362,8 +364,8 @@ object Ordering extends LowPriorityOrderingImplicits {
       }
     }
 
-  implicit def Tuple2[T1, T2](
-      implicit ord1: Ordering[T1], ord2: Ordering[T2]): Ordering[(T1, T2)] =
+  implicit def Tuple2[T1, T2](implicit ord1: Ordering[T1],
+                              ord2: Ordering[T2]): Ordering[(T1, T2)] =
     new Ordering[(T1, T2)] {
       def compare(x: (T1, T2), y: (T1, T2)): Int = {
         val compare1 = ord1.compare(x._1, y._1)
@@ -415,8 +417,8 @@ object Ordering extends LowPriorityOrderingImplicits {
       ord4: Ordering[T4],
       ord5: Ordering[T5]): Ordering[(T1, T2, T3, T4, T5)] =
     new Ordering[(T1, T2, T3, T4, T5)] {
-      def compare(
-          x: (T1, T2, T3, T4, T5), y: Tuple5[T1, T2, T3, T4, T5]): Int = {
+      def compare(x: (T1, T2, T3, T4, T5),
+                  y: Tuple5[T1, T2, T3, T4, T5]): Int = {
         val compare1 = ord1.compare(x._1, y._1)
         if (compare1 != 0) return compare1
         val compare2 = ord2.compare(x._2, y._2)
@@ -439,8 +441,8 @@ object Ordering extends LowPriorityOrderingImplicits {
       ord5: Ordering[T5],
       ord6: Ordering[T6]): Ordering[(T1, T2, T3, T4, T5, T6)] =
     new Ordering[(T1, T2, T3, T4, T5, T6)] {
-      def compare(
-          x: (T1, T2, T3, T4, T5, T6), y: (T1, T2, T3, T4, T5, T6)): Int = {
+      def compare(x: (T1, T2, T3, T4, T5, T6),
+                  y: (T1, T2, T3, T4, T5, T6)): Int = {
         val compare1 = ord1.compare(x._1, y._1)
         if (compare1 != 0) return compare1
         val compare2 = ord2.compare(x._2, y._2)

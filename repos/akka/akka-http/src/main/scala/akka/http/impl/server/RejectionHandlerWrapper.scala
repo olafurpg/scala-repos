@@ -33,27 +33,35 @@ private[http] class RejectionHandlerWrapper(
           case MissingQueryParamRejection(parameterName) ⇒
             handleMissingQueryParamRejection(ctx, parameterName)
           case MalformedQueryParamRejection(parameterName, errorMsg, cause) ⇒
-            handleMalformedQueryParamRejection(
-                ctx, parameterName, errorMsg, cause.orNull)
+            handleMalformedQueryParamRejection(ctx,
+                                               parameterName,
+                                               errorMsg,
+                                               cause.orNull)
           case MissingFormFieldRejection(fieldName) ⇒
             handleMissingFormFieldRejection(ctx, fieldName)
           case MalformedFormFieldRejection(fieldName, errorMsg, cause) ⇒
-            handleMalformedFormFieldRejection(
-                ctx, fieldName, errorMsg, cause.orNull)
+            handleMalformedFormFieldRejection(ctx,
+                                              fieldName,
+                                              errorMsg,
+                                              cause.orNull)
           case MissingHeaderRejection(headerName) ⇒
             handleMissingHeaderRejection(ctx, headerName)
           case MalformedHeaderRejection(headerName, errorMsg, cause) ⇒
-            handleMalformedHeaderRejection(
-                ctx, headerName, errorMsg, cause.orNull)
+            handleMalformedHeaderRejection(ctx,
+                                           headerName,
+                                           errorMsg,
+                                           cause.orNull)
           case UnsupportedRequestContentTypeRejection(supported) ⇒
             handleUnsupportedRequestContentTypeRejection(
-                ctx, supported.toList.toSeq.asJava)
+              ctx,
+              supported.toList.toSeq.asJava)
           case UnsupportedRequestEncodingRejection(supported) ⇒
             handleUnsupportedRequestEncodingRejection(ctx, supported.asJava)
-          case UnsatisfiableRangeRejection(
-              unsatisfiableRanges, actualEntityLength) ⇒
-            handleUnsatisfiableRangeRejection(
-                ctx, unsatisfiableRanges.asJava, actualEntityLength)
+          case UnsatisfiableRangeRejection(unsatisfiableRanges,
+                                           actualEntityLength) ⇒
+            handleUnsatisfiableRangeRejection(ctx,
+                                              unsatisfiableRanges.asJava,
+                                              actualEntityLength)
           case TooManyRangesRejection(maxRanges) ⇒
             handleTooManyRangesRejection(ctx, maxRanges)
           case MalformedRequestContentRejection(message, cause) ⇒
@@ -62,15 +70,17 @@ private[http] class RejectionHandlerWrapper(
             handleRequestEntityExpectedRejection(ctx)
           case UnacceptedResponseContentTypeRejection(supported) ⇒
             handleUnacceptedResponseContentTypeRejection(
-                ctx, supported.toList.map(_.format).toSeq.asJava)
+              ctx,
+              supported.toList.map(_.format).toSeq.asJava)
           case UnacceptedResponseEncodingRejection(supported) ⇒
             handleUnacceptedResponseEncodingRejection(
-                ctx, supported.toList.toSeq.asJava)
+              ctx,
+              supported.toList.toSeq.asJava)
           case AuthenticationFailedRejection(cause, challenge) ⇒
             handleAuthenticationFailedRejection(
-                ctx,
-                cause == AuthenticationFailedRejection.CredentialsMissing,
-                challenge)
+              ctx,
+              cause == AuthenticationFailedRejection.CredentialsMissing,
+              challenge)
           case AuthorizationFailedRejection ⇒
             handleAuthorizationFailedRejection(ctx)
           case MissingCookieRejection(cookieName) ⇒
@@ -78,8 +88,8 @@ private[http] class RejectionHandlerWrapper(
           case ExpectedWebSocketRequestRejection ⇒
             handleExpectedWebSocketRequestRejection(ctx)
           case UnsupportedWebSocketSubprotocolRejection(supportedProtocol) ⇒
-            handleUnsupportedWebSocketSubprotocolRejection(
-                ctx, supportedProtocol)
+            handleUnsupportedWebSocketSubprotocolRejection(ctx,
+                                                           supportedProtocol)
           case ValidationRejection(message, cause) ⇒
             handleValidationRejection(ctx, message, cause.orNull)
 

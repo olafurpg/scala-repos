@@ -19,8 +19,9 @@ class ResponseToEncoding extends OneToOneEncoder {
   private[this] val NOT_FOUND = Buf.Utf8("NOT_FOUND")
   private[this] val DELETED = Buf.Utf8("DELETED")
 
-  def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+  def encode(ctx: ChannelHandlerContext,
+             ch: Channel,
+             message: AnyRef): Decoding =
     message match {
       case Stored() => Tokens(Seq(STORED))
       case NotStored() => Tokens(Seq(NOT_STORED))
@@ -80,34 +81,35 @@ class CommandToEncoding extends OneToOneEncoder {
   private[this] def intToUtf8(i: Int): Buf =
     if (i == 0) ZeroBuf else Buf.Utf8(i.toString)
 
-  def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+  def encode(ctx: ChannelHandlerContext,
+             ch: Channel,
+             message: AnyRef): Decoding =
     message match {
       case Add(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(ADD, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(ADD, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Set(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(SET, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(SET, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Replace(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(REPLACE, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(REPLACE, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Append(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(APPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(APPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Prepend(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(PREPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(PREPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Cas(key, flags, expiry, value, casUnique) =>
         TokensWithData(
-            Seq(CAS, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value,
-            Some(casUnique))
+          Seq(CAS, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value,
+          Some(casUnique))
       case Get(keys) =>
         Tokens(GET +: keys)
       case Gets(keys) =>
@@ -116,9 +118,9 @@ class CommandToEncoding extends OneToOneEncoder {
         Tokens(GETV +: keys)
       case Upsert(key, flags, expiry, value, version) =>
         TokensWithData(
-            Seq(UPSERT, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value,
-            Some(version))
+          Seq(UPSERT, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value,
+          Some(version))
       case Incr(key, amount) =>
         Tokens(Seq(INCR, key, Buf.Utf8(amount.toString)))
       case Decr(key, amount) =>

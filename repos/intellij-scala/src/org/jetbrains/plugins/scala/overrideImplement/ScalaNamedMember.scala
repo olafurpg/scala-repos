@@ -4,7 +4,12 @@ package overrideImplement
 import com.intellij.codeInsight.generation.PsiElementClassMember
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -35,9 +40,9 @@ class ScMethodMember(val sign: PhysicalSignature, val isOverride: Boolean)
     case fun: ScFunction => sign.substitutor.subst(fun.returnType.getOrAny)
     case method: PsiMethod =>
       sign.substitutor.subst(
-          ScType.create(Option(method.getReturnType).getOrElse(PsiType.VOID),
-                        method.getProject,
-                        method.getResolveScope))
+        ScType.create(Option(method.getReturnType).getOrElse(PsiType.VOID),
+                      method.getProject,
+                      method.getResolveScope))
   }
   val text = ScalaPsiUtil.getMethodPresentableText(sign.method)
 } with PsiElementClassMember[PsiMethod](sign.method, text)
@@ -68,7 +73,7 @@ with ScalaTypedMember
 class JavaFieldMember(field: PsiField, val substitutor: ScSubstitutor)
     extends {
   val scType = substitutor.subst(
-      ScType.create(field.getType, field.getProject, field.getResolveScope))
+    ScType.create(field.getType, field.getProject, field.getResolveScope))
   val name = field.getName
   val text = name + ": " + ScType.presentableText(scType)
 } with PsiElementClassMember[PsiField](field, text) with ScalaNamedMember

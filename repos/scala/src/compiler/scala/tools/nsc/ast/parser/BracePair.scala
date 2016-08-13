@@ -12,5 +12,8 @@ package ast.parser
   *  @param rindent The indentation depth of the line of the closing brace (-1 means missing)
   *  @param nested The brace pairs nested in this one
   */
-case class BracePair(
-    loff: Int, lindent: Int, roff: Int, rindent: Int, nested: List[BracePair])
+case class BracePair(loff: Int,
+                     lindent: Int,
+                     roff: Int,
+                     rindent: Int,
+                     nested: List[BracePair])

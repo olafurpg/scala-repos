@@ -10,8 +10,16 @@ import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.util.ObjectUtils
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpression, ScMethodCall, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList,
+  ScExpression,
+  ScMethodCall,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.util.ScalaConstantExpressionEvaluator
 import org.jetbrains.plugins.scala.scalai18n.codeInspection.i18n.ScalaI18nUtil
 
@@ -32,8 +40,7 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
     val file: ScalaFile = element.asInstanceOf[ScalaFile]
     val project: Project = file.getProject
     val result = new java.util.ArrayList[FoldingDescriptor]
-    file.accept(
-        new ScalaRecursiveElementVisitor {
+    file.accept(new ScalaRecursiveElementVisitor {
       override def visitLiteral(expression: ScLiteral) {
         checkLiteral(project, expression, result)
       }
@@ -47,8 +54,8 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
       case literal: ScLiteral =>
         return ScalaI18nUtil.getI18nMessage(element.getProject, literal)
       case methodCall: ScMethodCall =>
-        return ScalaI18nUtil.formatMethodCallExpression(
-            element.getProject, methodCall)
+        return ScalaI18nUtil
+          .formatMethodCallExpression(element.getProject, methodCall)
       case _ =>
     }
     element.getText
@@ -82,7 +89,8 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
               while (i < count + 1 && ok) {
                 val evaluator = new ScalaConstantExpressionEvaluator
                 val value: AnyRef = evaluator.computeConstantExpression(
-                    args(i), throwExceptionOnOverflow = false)
+                  args(i),
+                  throwExceptionOnOverflow = false)
                 if (value == null) {
                   if (!args(i).isInstanceOf[ScReferenceExpression]) {
                     ok = false
@@ -93,11 +101,11 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
               }
               if (ok) {
                 result.add(
-                    new FoldingDescriptor(
-                        ObjectUtils.assertNotNull(parent.getParent.getNode),
-                        parent.getParent.getTextRange,
-                        null,
-                        set))
+                  new FoldingDescriptor(
+                    ObjectUtils.assertNotNull(parent.getParent.getNode),
+                    parent.getParent.getTextRange,
+                    null,
+                    set))
                 return
               }
             }
@@ -105,10 +113,10 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
         case _ =>
       }
       result.add(
-          new FoldingDescriptor(ObjectUtils.assertNotNull(expression.getNode),
-                                expression.getTextRange,
-                                null,
-                                set))
+        new FoldingDescriptor(ObjectUtils.assertNotNull(expression.getNode),
+                              expression.getTextRange,
+                              null,
+                              set))
     }
   }
 }

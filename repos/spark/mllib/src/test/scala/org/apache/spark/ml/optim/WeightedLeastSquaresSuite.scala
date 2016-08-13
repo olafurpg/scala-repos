@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class WeightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private var instances: RDD[Instance] = _
   private var instancesConstLabel: RDD[Instance] = _
@@ -40,13 +41,13 @@ class WeightedLeastSquaresSuite
        w <- c(1, 2, 3, 4)
      */
     instances = sc.parallelize(
-        Seq(
-            Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-            Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
-            Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
-            Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
-        ),
-        2)
+      Seq(
+        Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+        Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
+        Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
+        Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
+      ),
+      2)
 
     /*
        R code:
@@ -56,13 +57,13 @@ class WeightedLeastSquaresSuite
        w <- c(1, 2, 3, 4)
      */
     instancesConstLabel = sc.parallelize(
-        Seq(
-            Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-            Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
-            Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
-            Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
-        ),
-        2)
+      Seq(
+        Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+        Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
+        Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
+        Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
+      ),
+      2)
   }
 
   test("WLS against lm") {
@@ -86,12 +87,12 @@ class WeightedLeastSquaresSuite
     for (fitIntercept <- Seq(false, true)) {
       for (standardization <- Seq(false, true)) {
         val wls = new WeightedLeastSquares(
-            fitIntercept,
-            regParam = 0.0,
-            standardizeFeatures = standardization,
-            standardizeLabel = standardization).fit(instances)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+          fitIntercept,
+          regParam = 0.0,
+          standardizeFeatures = standardization,
+          standardizeLabel = standardization).fit(instances)
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -119,12 +120,12 @@ class WeightedLeastSquaresSuite
     for (fitIntercept <- Seq(false, true)) {
       for (standardization <- Seq(false, true)) {
         val wls = new WeightedLeastSquares(
-            fitIntercept,
-            regParam = 0.0,
-            standardizeFeatures = standardization,
-            standardizeLabel = standardization).fit(instancesConstLabel)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+          fitIntercept,
+          regParam = 0.0,
+          standardizeFeatures = standardization,
+          standardizeLabel = standardization).fit(instancesConstLabel)
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -188,8 +189,8 @@ class WeightedLeastSquaresSuite
 
     var idx = 0
     for (fitIntercept <- Seq(false, true);
-    regParam <- Seq(0.0, 0.1, 1.0);
-    standardizeFeatures <- Seq(false, true)) {
+         regParam <- Seq(0.0, 0.1, 1.0);
+         standardizeFeatures <- Seq(false, true)) {
       val wls =
         new WeightedLeastSquares(fitIntercept,
                                  regParam,

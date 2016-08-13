@@ -19,7 +19,10 @@ package org.apache.spark.rpc.netty
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-import org.apache.spark.network.buffer.{FileSegmentManagedBuffer, ManagedBuffer}
+import org.apache.spark.network.buffer.{
+  FileSegmentManagedBuffer,
+  ManagedBuffer
+}
 import org.apache.spark.network.server.StreamManager
 import org.apache.spark.rpc.RpcEnvFileServer
 import org.apache.spark.util.Utils
@@ -37,7 +40,8 @@ import org.apache.spark.util.Utils
   * Only streaming (openStream) is supported.
   */
 private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
-    extends StreamManager with RpcEnvFileServer {
+    extends StreamManager
+    with RpcEnvFileServer {
 
   private val files = new ConcurrentHashMap[String, File]()
   private val jars = new ConcurrentHashMap[String, File]()
@@ -59,8 +63,10 @@ private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
     }
 
     if (file != null && file.isFile()) {
-      new FileSegmentManagedBuffer(
-          rpcEnv.transportConf, file, 0, file.length())
+      new FileSegmentManagedBuffer(rpcEnv.transportConf,
+                                   file,
+                                   0,
+                                   file.length())
     } else {
       null
     }
@@ -70,7 +76,7 @@ private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
     require(files.putIfAbsent(file.getName(), file) == null,
             s"File ${file.getName()} already registered.")
     s"${rpcEnv.address.toSparkURL}/files/${Utils.encodeFileNameToURIRawPath(
-        file.getName())}"
+      file.getName())}"
   }
 
   override def addJar(file: File): String = {

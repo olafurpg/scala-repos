@@ -75,8 +75,8 @@ private[camel] object CamelSupervisor {
     * INTERNAL API
     * Provides a Producer with the required camel objects to function.
     */
-  final case class CamelProducerObjects(
-      endpoint: Endpoint, processor: SendProcessor)
+  final case class CamelProducerObjects(endpoint: Endpoint,
+                                        processor: SendProcessor)
       extends NoSerializationVerificationNeeded
 }
 
@@ -84,16 +84,16 @@ private[camel] object CamelSupervisor {
   * INTERNAL API
   * Thrown by registrars to indicate that the actor could not be de-activated.
   */
-private[camel] class ActorDeActivationException(
-    val actorRef: ActorRef, cause: Throwable)
+private[camel] class ActorDeActivationException(val actorRef: ActorRef,
+                                                cause: Throwable)
     extends AkkaException(s"$actorRef failed to de-activate", cause)
 
 /**
   * INTERNAL API
   * Thrown by the registrars to indicate that the actor could not be activated.
   */
-private[camel] class ActorActivationException(
-    val actorRef: ActorRef, cause: Throwable)
+private[camel] class ActorActivationException(val actorRef: ActorRef,
+                                              cause: Throwable)
     extends AkkaException(s"$actorRef failed to activate", cause)
 
 /**
@@ -101,15 +101,16 @@ private[camel] class ActorActivationException(
   * Registry for Camel Consumers and Producers. Supervises the registrars.
   */
 private[camel] class Registry(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   import context.{stop, parent}
 
   private val producerRegistrar = context.actorOf(
-      Props(classOf[ProducerRegistrar], activationTracker),
-      "producerRegistrar")
+    Props(classOf[ProducerRegistrar], activationTracker),
+    "producerRegistrar")
   private val consumerRegistrar = context.actorOf(
-      Props(classOf[ConsumerRegistrar], activationTracker),
-      "consumerRegistrar")
+    Props(classOf[ConsumerRegistrar], activationTracker),
+    "consumerRegistrar")
   private var producers = Set[ActorRef]()
   private var consumers = Set[ActorRef]()
 
@@ -182,7 +183,8 @@ private[camel] class Registry(activationTracker: ActorRef)
   * Registers Producers.
   */
 private[camel] class ProducerRegistrar(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   private var camelObjects = Map[ActorRef, (Endpoint, SendProcessor)]()
 
   def receive = {
@@ -225,13 +227,17 @@ private[camel] class ProducerRegistrar(activationTracker: ActorRef)
   * Registers Consumers.
   */
 private[camel] class ConsumerRegistrar(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   def receive = {
     case Register(consumer, endpointUri, Some(consumerConfig)) ⇒
       try {
         // if this throws, the supervisor stops the consumer and de-registers it on termination
-        camelContext.addRoutes(new ConsumerActorRouteBuilder(
-                endpointUri, consumer, consumerConfig, camel.settings))
+        camelContext.addRoutes(
+          new ConsumerActorRouteBuilder(endpointUri,
+                                        consumer,
+                                        consumerConfig,
+                                        camel.settings))
         activationTracker ! EndpointActivated(consumer)
       } catch {
         case NonFatal(e) ⇒ throw new ActorActivationException(consumer, e)

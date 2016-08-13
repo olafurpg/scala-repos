@@ -49,18 +49,20 @@ class EnsembleGaussianBlur extends EnsembleExample {
     spacing = 10
     padding = Insets(20, 100, 20, 100)
     children = List(
-        new ImageView {
-          image = new Image(this.getClass.getResourceAsStream(
-                  "/scalafx/ensemble/images/icon-48x48.png"))
-          effect = new GaussianBlur()
-        },
-        new ImageView {
-          image = new Image(this.getClass.getResourceAsStream(
-                  "/scalafx/ensemble/images/icon-48x48.png"))
-          effect = new GaussianBlur() {
-            radius = 5d
-          }
+      new ImageView {
+        image = new Image(
+          this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+        effect = new GaussianBlur()
+      },
+      new ImageView {
+        image = new Image(
+          this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+        effect = new GaussianBlur() {
+          radius = 5d
         }
+      }
     )
   }
 }

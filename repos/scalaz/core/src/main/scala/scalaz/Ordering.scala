@@ -7,7 +7,8 @@ package scalaz
   *       `Int`s returned by [[scala.math.Ordering]].
   */
 sealed abstract class Ordering(val toInt: Int, val name: String)
-    extends Product with Serializable {
+    extends Product
+    with Serializable {
   def complement: Ordering
 }
 
@@ -30,8 +31,7 @@ sealed abstract class OrderingInstances {
   import Ordering._
 
   implicit val orderingInstance: Enum[Ordering] with Show[Ordering] with Monoid[
-      Ordering] = new Enum[Ordering] with Show[Ordering]
-  with Monoid[Ordering] {
+    Ordering] = new Enum[Ordering] with Show[Ordering] with Monoid[Ordering] {
     def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match {
       case (LT, LT) => EQ
       case (LT, EQ | GT) => LT

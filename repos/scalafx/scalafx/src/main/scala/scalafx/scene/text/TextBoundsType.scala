@@ -36,20 +36,20 @@ object TextBoundsType
     extends SFXEnumDelegateCompanion[jfxst.TextBoundsType, TextBoundsType] {
 
   val Logical = new TextBoundsType(jfxst.TextBoundsType.LOGICAL)
-  @deprecated(
-      "Use Logical; LOGICAL will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Logical; LOGICAL will be removed in a future release",
+              "8.0.60-R10")
   val LOGICAL = Logical
 
   val LogicalVerticalCenter = new TextBoundsType(
-      jfxst.TextBoundsType.LOGICAL_VERTICAL_CENTER)
+    jfxst.TextBoundsType.LOGICAL_VERTICAL_CENTER)
   @deprecated(
-      "Use LogicalVerticalCenter; LOGICAL_VERTICAL_CENTER will be removed in a future release",
-      "8.0.60-R10")
+    "Use LogicalVerticalCenter; LOGICAL_VERTICAL_CENTER will be removed in a future release",
+    "8.0.60-R10")
   val LOGICAL_VERTICAL_CENTER = LogicalVerticalCenter
 
   val Visual = new TextBoundsType(jfxst.TextBoundsType.VISUAL)
-  @deprecated(
-      "Use Visual; VISUAL will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Visual; VISUAL will be removed in a future release",
+              "8.0.60-R10")
   val VISUAL = Visual
 
   protected override def unsortedValues: Array[TextBoundsType] =

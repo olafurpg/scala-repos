@@ -24,7 +24,8 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.transport.ConnectTransportException
 
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
   override val prefix = "ES"
   val client = try {
     val hosts = config.properties
@@ -42,7 +43,7 @@ class StorageClient(val config: StorageClientConfig)
     val transportClient = new TransportClient(settings)
     (hosts zip ports) foreach { hp =>
       transportClient.addTransportAddress(
-          new InetSocketTransportAddress(hp._1, hp._2))
+        new InetSocketTransportAddress(hp._1, hp._2))
     }
     transportClient
   } catch {

@@ -44,7 +44,8 @@ import scala.language.experimental.macros
   * }}}
   */
 package object sird
-    extends RequestMethodExtractors with PathBindableExtractors {
+    extends RequestMethodExtractors
+    with PathBindableExtractors {
 
   implicit class UrlContext(sc: StringContext) {
 
@@ -63,21 +64,24 @@ package object sird
       *
       * The format must match `q"paramName=\${param}"`.
       */
-    def q: RequiredQueryStringParameter = macro macroimpl.QueryStringParameterMacros.required
+    def q: RequiredQueryStringParameter =
+      macro macroimpl.QueryStringParameterMacros.required
 
     /**
       * String interpolator for optional query parameters out of query strings.
       *
       * The format must match `q_?"paramName=\${param}"`.
       */
-    def q_? : OptionalQueryStringParameter = macro macroimpl.QueryStringParameterMacros.optional
+    def q_? : OptionalQueryStringParameter =
+      macro macroimpl.QueryStringParameterMacros.optional
 
     /**
       * String interpolator for multi valued query parameters out of query strings.
       *
       * The format must match `q_*"paramName=\${params}"`.
       */
-    def q_* : SeqQueryStringParameter = macro macroimpl.QueryStringParameterMacros.seq
+    def q_* : SeqQueryStringParameter =
+      macro macroimpl.QueryStringParameterMacros.seq
 
     /**
       * String interpolator for optional query parameters out of query strings.
@@ -87,7 +91,8 @@ package object sird
       * The `q_?` interpolator is preferred, however Scala 2.10 does not support operator characters in String
       * interpolator methods.
       */
-    def q_o: OptionalQueryStringParameter = macro macroimpl.QueryStringParameterMacros.optional
+    def q_o: OptionalQueryStringParameter =
+      macro macroimpl.QueryStringParameterMacros.optional
 
     /**
       * String interpolator for multi valued query parameters out of query strings.
@@ -97,7 +102,8 @@ package object sird
       * The `q_*` interpolator is preferred, however Scala 2.10 does not support operator characters in String
       * interpolator methods.
       */
-    def q_s: SeqQueryStringParameter = macro macroimpl.QueryStringParameterMacros.seq
+    def q_s: SeqQueryStringParameter =
+      macro macroimpl.QueryStringParameterMacros.seq
   }
 
   /**

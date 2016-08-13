@@ -18,8 +18,10 @@ class AsyncServerEndToEndTest extends FunSuite {
     // Set up the server.
 
     ThriftTypes.add(
-        new ThriftCallFactory[Silly.bleep_args, Silly.bleep_result](
-            "bleep", classOf[Silly.bleep_args], classOf[Silly.bleep_result]))
+      new ThriftCallFactory[Silly.bleep_args, Silly.bleep_result](
+        "bleep",
+        classOf[Silly.bleep_args],
+        classOf[Silly.bleep_result]))
 
     val serverBootstrap =
       new ServerBootstrap(new DefaultLocalServerChannelFactory())
@@ -62,7 +64,7 @@ class AsyncServerEndToEndTest extends FunSuite {
           override def messageReceived(ctx: ChannelHandlerContext,
                                        e: MessageEvent) {
             callResults() = Return(
-                e.getMessage.asInstanceOf[ThriftReply[Silly.bleep_result]])
+              e.getMessage.asInstanceOf[ThriftReply[Silly.bleep_result]])
           }
         })
 
@@ -80,9 +82,9 @@ class AsyncServerEndToEndTest extends FunSuite {
             val ch = f.getChannel
             val thriftCall =
               new ThriftCall[Silly.bleep_args, Silly.bleep_result](
-                  "bleep",
-                  new Silly.bleep_args("heyhey"),
-                  classOf[Silly.bleep_result])
+                "bleep",
+                new Silly.bleep_args("heyhey"),
+                classOf[Silly.bleep_result])
             Channels.write(ch, thriftCall)
           }
       })

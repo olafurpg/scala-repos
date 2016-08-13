@@ -28,8 +28,8 @@ import scala.reflect.ClassTag
   *  @since   2.8
   */
 @deprecated(
-    "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
-    "2.11.0")
+  "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
+  "2.11.0")
 trait TraversableForwarder[+A] extends Traversable[A] {
 
   /** The traversable object to which calls are forwarded. */
@@ -74,7 +74,7 @@ trait TraversableForwarder[+A] extends Traversable[A] {
   override def copyToArray[B >: A](xs: Array[B], start: Int) =
     underlying.copyToArray(xs, start)
   override def copyToArray[B >: A](xs: Array[B]) = underlying.copyToArray(xs)
-  override def toArray[B >: A : ClassTag]: Array[B] = underlying.toArray
+  override def toArray[B >: A: ClassTag]: Array[B] = underlying.toArray
   override def toList: List[A] = underlying.toList
   override def toIterable: Iterable[A] = underlying.toIterable
   override def toSeq: Seq[A] = underlying.toSeq

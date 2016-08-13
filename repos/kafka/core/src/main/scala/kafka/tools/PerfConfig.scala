@@ -34,17 +34,17 @@ class PerfConfig(args: Array[String]) {
   val dateFormatOpt = parser
     .accepts("date-format",
              "The date format to use for formatting the time field. " +
-             "See java.text.SimpleDateFormat for options.")
+               "See java.text.SimpleDateFormat for options.")
     .withRequiredArg
     .describedAs("date format")
     .ofType(classOf[String])
     .defaultsTo("yyyy-MM-dd HH:mm:ss:SSS")
   val showDetailedStatsOpt = parser.accepts(
-      "show-detailed-stats",
-      "If set, stats are reported for each reporting " +
+    "show-detailed-stats",
+    "If set, stats are reported for each reporting " +
       "interval as configured by reporting-interval")
-  val hideHeaderOpt = parser.accepts(
-      "hide-header", "If set, skips printing the header for the stats ")
+  val hideHeaderOpt = parser
+    .accepts("hide-header", "If set, skips printing the header for the stats ")
   val messageSizeOpt = parser
     .accepts("message-size", "The size of each message.")
     .withRequiredArg
@@ -61,7 +61,7 @@ class PerfConfig(args: Array[String]) {
     .accepts("compression-codec", "If set, messages are sent compressed")
     .withRequiredArg
     .describedAs(
-        "supported codec: NoCompressionCodec as 0, GZIPCompressionCodec as 1, SnappyCompressionCodec as 2, LZ4CompressionCodec as 3")
+      "supported codec: NoCompressionCodec as 0, GZIPCompressionCodec as 1, SnappyCompressionCodec as 2, LZ4CompressionCodec as 3")
     .ofType(classOf[java.lang.Integer])
     .defaultsTo(0)
   val helpOpt = parser.accepts("help", "Print usage.")

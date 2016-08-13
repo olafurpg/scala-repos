@@ -29,7 +29,8 @@ object SeriesArbitraries {
     for {
       n <- Gen.choose(0, 20)
       lst <- Gen.listOfN(
-          n, Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
+              n,
+              Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
     } yield Series(Vec(lst: _*))
 
   // As above, but with arbitrary duplicates in (unsorted) index
@@ -39,7 +40,8 @@ object SeriesArbitraries {
     for {
       n <- Gen.choose(0, 20)
       lst <- Gen.listOfN(
-          n, Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
+              n,
+              Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
       idx <- Gen.listOfN(n, Gen.choose(0, 5))
     } yield Series(Vec(lst: _*), Index(idx: _*))
 
@@ -57,7 +59,8 @@ object SeriesArbitraries {
     for {
       n <- Gen.choose(0, 20)
       lst <- Gen.listOfN(
-          n, Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
+              n,
+              Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
       ix <- Gen.listOfN(n, IndexArbitraries.getDate)
     } yield Series(Vec(lst: _*), Index(ix: _*))
 }

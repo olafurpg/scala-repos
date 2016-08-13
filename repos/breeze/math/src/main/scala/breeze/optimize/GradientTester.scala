@@ -42,8 +42,8 @@ object GradientTester extends SerializableLogging {
       canNorm: norm.Impl[T, Double],
       opSub: OpSub.Impl2[T, T, T]) = {
     val indices = Rand
-      .subsetsOfSize(
-          x.keysIterator.toIndexedSeq, (x.size * randFraction + 1).toInt)
+      .subsetsOfSize(x.keysIterator.toIndexedSeq,
+                     (x.size * randFraction + 1).toInt)
       .get()
     testIndices(f, x, indices, skipZeros, toString, epsilon, tolerance)
   }
@@ -75,12 +75,13 @@ object GradientTester extends SerializableLogging {
         xx(k) -= epsilon
         val relDif =
           (grad -
-              trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
+            trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
         if (relDif < tolerance) {
           ok += 1
           logger.debug(s"OK: ${toString(k)} $relDif")
         } else {
-          logger.warn(toString(k) +
+          logger.warn(
+            toString(k) +
               " relDif: %.3e [eps : %e, calculated: %4.3e empirical: %4.3e]"
                 .format(relDif, epsilon, trueGrad(k), grad))
         }
@@ -89,7 +90,7 @@ object GradientTester extends SerializableLogging {
       }
       if (tried % 100 == 0 || tried == sz) {
         logger.info(
-            f"Checked $tried of ${sz} (out of dimension ${x.size}). ${ok * 100.0 / tried}%.4g%% ok.")
+          f"Checked $tried of ${sz} (out of dimension ${x.size}). ${ok * 100.0 / tried}%.4g%% ok.")
       }
     }
     differences

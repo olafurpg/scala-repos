@@ -44,9 +44,9 @@ class FloatStringConverterSpec
                                                 jfxuc.FloatStringConverter,
                                                 Float,
                                                 FloatStringConverter](
-        classOf[jfxuc.FloatStringConverter],
-        classOf[FloatStringConverter],
-        classOf[Float]) {
+      classOf[jfxuc.FloatStringConverter],
+      classOf[FloatStringConverter],
+      classOf[Float]) {
 
   val examples = List((0.0f, "0.0"),
                       (123.45f, "123.45"),

@@ -18,9 +18,9 @@ object ZeroIndexToHead extends SimplificationType() {
     expr match {
       case qual `.apply`(literal("0")) if isSeq(qual) && !isIndexedSeq(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "head"))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "head"))
+            .highlightFrom(qual))
       case _ => None
     }
   }

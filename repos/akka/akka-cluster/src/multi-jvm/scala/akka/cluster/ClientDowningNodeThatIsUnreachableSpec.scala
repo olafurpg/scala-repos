@@ -18,44 +18,45 @@ final case class ClientDowningNodeThatIsUnreachableMultiNodeConfig(
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(
+    debugConfig(on = false)
+      .withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
 class ClientDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode1
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = true)
+      failureDetectorPuppet = true)
 class ClientDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode2
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = true)
+      failureDetectorPuppet = true)
 class ClientDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode3
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = true)
+      failureDetectorPuppet = true)
 class ClientDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode4
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = true)
+      failureDetectorPuppet = true)
 
 class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode1
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = false)
+      failureDetectorPuppet = false)
 class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode2
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = false)
+      failureDetectorPuppet = false)
 class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode3
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = false)
+      failureDetectorPuppet = false)
 class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode4
     extends ClientDowningNodeThatIsUnreachableSpec(
-        failureDetectorPuppet = false)
+      failureDetectorPuppet = false)
 
 abstract class ClientDowningNodeThatIsUnreachableSpec(
     multiNodeConfig: ClientDowningNodeThatIsUnreachableMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(
-        ClientDowningNodeThatIsUnreachableMultiNodeConfig(
-            failureDetectorPuppet))
+      ClientDowningNodeThatIsUnreachableMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 

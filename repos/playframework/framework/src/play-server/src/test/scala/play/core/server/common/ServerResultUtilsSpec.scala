@@ -25,8 +25,9 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
     def remoteAddress = ""
     def secure = false
     override def clientCertificateChain = None
-    val headers = new Headers(
-        cookie.map { case (name, value) => "Cookie" -> s"$name=$value" }.toSeq)
+    val headers = new Headers(cookie.map {
+      case (name, value) => "Cookie" -> s"$name=$value"
+    }.toSeq)
   }
 
   "ServerResultUtils.cleanFlashCookie" should {
@@ -64,8 +65,8 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
     }
     "leave other cookies untouched when clearing" in {
       flashCookieResult(
-          Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-          Ok.withCookies(Cookie("cookie", "value"))) must beSome {
+        Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
+        Ok.withCookies(Cookie("cookie", "value"))) must beSome {
         cookies: Seq[Cookie] =>
           cookies.length must_== 2
           cookies.find(_.name == "PLAY_FLASH") must beSome.like {

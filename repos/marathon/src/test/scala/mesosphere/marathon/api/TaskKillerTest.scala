@@ -4,7 +4,13 @@ import mesosphere.marathon._
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.plugin.auth.{Identity, Authorizer, Authenticator}
-import mesosphere.marathon.state.{AppDefinition, Group, GroupManager, PathId, Timestamp}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  Group,
+  GroupManager,
+  PathId,
+  Timestamp
+}
 import mesosphere.marathon.upgrade.DeploymentPlan
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
@@ -17,7 +23,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TaskKillerTest
-    extends MarathonSpec with Matchers with BeforeAndAfterAll with MockitoSugar
+    extends MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with MockitoSugar
     with ScalaFutures {
 
   var tracker: TaskTracker = _
@@ -36,8 +45,12 @@ class TaskKillerTest
     auth = new TestAuthFixture
     identity = auth.identity
 
-    taskKiller = new TaskKiller(
-        tracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(tracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
 
     when(config.zkTimeoutDuration).thenReturn(1.second)
   }
@@ -87,11 +100,11 @@ class TaskKillerTest
       ArgumentCaptor.forClass(classOf[Map[PathId, Iterable[Task]]])
     val expectedDeploymentPlan = DeploymentPlan.empty
     when(
-        groupManager.update(any[PathId],
-                            groupUpdateCaptor.capture(),
-                            any[Timestamp],
-                            forceCaptor.capture(),
-                            toKillCaptor.capture()))
+      groupManager.update(any[PathId],
+                          groupUpdateCaptor.capture(),
+                          any[Timestamp],
+                          forceCaptor.capture(),
+                          toKillCaptor.capture()))
       .thenReturn(Future.successful(expectedDeploymentPlan))
 
     val result =
@@ -128,13 +141,13 @@ class TaskKillerTest
     val groupUpdateCaptor = ArgumentCaptor.forClass(classOf[(Group) => Group])
     val forceCaptor = ArgumentCaptor.forClass(classOf[Boolean])
     when(
-        groupManager.update(
-            any[PathId],
-            groupUpdateCaptor.capture(),
-            any[Timestamp],
-            forceCaptor.capture(),
-            any[Map[PathId, Iterable[Task]]]
-        )).thenReturn(Future.failed(AppLockedException()))
+      groupManager.update(
+        any[PathId],
+        groupUpdateCaptor.capture(),
+        any[Timestamp],
+        forceCaptor.capture(),
+        any[Map[PathId, Iterable[Task]]]
+      )).thenReturn(Future.failed(AppLockedException()))
 
     val result =
       taskKiller.killAndScale(appId, (tasks) => tasksToKill, force = false)

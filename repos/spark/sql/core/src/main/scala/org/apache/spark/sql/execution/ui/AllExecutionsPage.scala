@@ -28,7 +28,8 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[ui] class AllExecutionsPage(parent: SQLTab)
-    extends WebUIPage("") with Logging {
+    extends WebUIPage("")
+    with Logging {
 
   private val listener = parent.listener
 
@@ -82,8 +83,8 @@ private[ui] abstract class ExecutionTable(
 
   protected def header: Seq[String]
 
-  protected def row(
-      currentTime: Long, executionUIData: SQLExecutionUIData): Seq[Node] = {
+  protected def row(currentTime: Long,
+                    executionUIData: SQLExecutionUIData): Seq[Node] = {
     val submissionTime = executionUIData.submissionTime
     val duration =
       executionUIData.completionTime.getOrElse(currentTime) - submissionTime
@@ -151,8 +152,7 @@ private[ui] abstract class ExecutionTable(
 
   private def detailCell(physicalPlan: String): Seq[Node] = {
     val isMultiline = physicalPlan.indexOf('\n') >= 0
-    val summary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val summary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       physicalPlan.substring(0, physicalPlan.indexOf('\n'))
     } else {
       physicalPlan
@@ -203,8 +203,10 @@ private[ui] class RunningExecutionTable(
                            showFailedJobs = true) {
 
   override protected def header: Seq[String] =
-    baseHeader ++ Seq(
-        "Running Jobs", "Succeeded Jobs", "Failed Jobs", "Detail")
+    baseHeader ++ Seq("Running Jobs",
+                      "Succeeded Jobs",
+                      "Failed Jobs",
+                      "Detail")
 }
 
 private[ui] class CompletedExecutionTable(

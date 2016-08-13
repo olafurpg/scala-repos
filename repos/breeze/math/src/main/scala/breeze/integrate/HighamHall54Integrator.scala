@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{HighamHall54Integrator => ApacheHighamHall54Integrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  HighamHall54Integrator => ApacheHighamHall54Integrator
+}
 
 class HighamHall54Integrator(minStep: Double,
                              maxStep: Double,
@@ -13,8 +15,8 @@ class HighamHall54Integrator(minStep: Double,
 
   protected final def create: ApacheHighamHall54Integrator =
     new ApacheHighamHall54Integrator(
-        minStep,
-        maxStep,
-        ApacheAdaptiveStepIntegrator.defaultAbsTol,
-        ApacheAdaptiveStepIntegrator.defaultRelTol)
+      minStep,
+      maxStep,
+      ApacheAdaptiveStepIntegrator.defaultAbsTol,
+      ApacheAdaptiveStepIntegrator.defaultRelTol)
 }

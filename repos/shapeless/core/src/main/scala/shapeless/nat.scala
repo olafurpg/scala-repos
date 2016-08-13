@@ -79,8 +79,8 @@ class NatMacros(val c: whitebox.Context) extends NatMacroDefns {
       case NatLiteral(n) => mkNatValue(n)
       case _ =>
         c.abort(
-            c.enclosingPosition,
-            s"Expression $i does not evaluate to a non-negative Int literal")
+          c.enclosingPosition,
+          s"Expression $i does not evaluate to a non-negative Int literal")
     }
 }
 

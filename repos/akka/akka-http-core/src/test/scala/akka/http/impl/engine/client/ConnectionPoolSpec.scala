@@ -16,7 +16,11 @@ import scala.util.{Failure, Success, Try}
 import akka.util.ByteString
 import akka.http.scaladsl.{TestUtils, Http}
 import akka.http.impl.util.{SingletonException, StreamUtils}
-import akka.http.scaladsl.settings.{ClientConnectionSettings, ConnectionPoolSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ClientConnectionSettings,
+  ConnectionPoolSettings,
+  ServerSettings
+}
 import akka.stream.{ActorMaterializer}
 import akka.stream.TLSProtocol._
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
@@ -26,7 +30,8 @@ import akka.http.scaladsl.model._
 import akka.testkit.AkkaSpec
 
 class ConnectionPoolSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+      """
     akka.loggers = []
     akka.loglevel = OFF
     akka.io.tcp.windows-connection-abort-workaround-enabled = auto
@@ -38,8 +43,8 @@ class ConnectionPoolSpec
     val serverSocket = ServerSocketChannel.open()
     serverSocket.socket.bind(new InetSocketAddress("127.0.0.1", 0))
     try {
-      val clientSocket = SocketChannel.open(new InetSocketAddress(
-              "127.0.0.1", serverSocket.socket().getLocalPort))
+      val clientSocket = SocketChannel.open(
+        new InetSocketAddress("127.0.0.1", serverSocket.socket().getLocalPort))
       @volatile var serverSideChannel: SocketChannel = null
       awaitCond {
         serverSideChannel = serverSocket.accept()
@@ -66,7 +71,7 @@ class ConnectionPoolSpec
       acceptIncomingConnection()
       val (Success(response), 42) = responseOut.expectNext()
       response.headers should contain(
-          RawHeader("Req-Host", s"$serverHostName:$serverPort"))
+        RawHeader("Req-Host", s"$serverHostName:$serverPort"))
     }
 
     "open a second connection if the first one is loaded" in new TestSetup {
@@ -99,8 +104,8 @@ class ConnectionPoolSpec
       override def testServerHandler(connNr: Int): HttpRequest ⇒ HttpResponse = {
         case request @ HttpRequest(_, Uri.Path("/a"), _, _, _) ⇒
           val entity = HttpEntity.Chunked.fromData(
-              ContentTypes.`text/plain(UTF-8)`,
-              Source.fromPublisher(responseEntityPub))
+            ContentTypes.`text/plain(UTF-8)`,
+            Source.fromPublisher(responseEntityPub))
           super.testServerHandler(connNr)(request) withEntity entity
         case x ⇒ super.testServerHandler(connNr)(x)
       }
@@ -142,8 +147,9 @@ class ConnectionPoolSpec
       val settings = ConnectionPoolSettings(system)
         .withMaxConnections(4)
         .withPipeliningLimit(2)
-      val poolFlow = Http().cachedHostConnectionPool[Int](
-          serverHostName, serverPort, settings = settings)
+      val poolFlow = Http().cachedHostConnectionPool[Int](serverHostName,
+                                                          serverPort,
+                                                          settings = settings)
 
       val N = 500
       val requestIds = Source.fromIterator(() ⇒ Iterator.from(1)).take(N)
@@ -167,7 +173,7 @@ class ConnectionPoolSpec
     }
 
     "properly surface connection-level errors" in new TestSetup(
-        autoAccept = true) {
+      autoAccept = true) {
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int](maxRetries = 0)
 
@@ -218,7 +224,7 @@ class ConnectionPoolSpec
     }
 
     "respect the configured `maxRetries` value" in new TestSetup(
-        autoAccept = true) {
+      autoAccept = true) {
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int](maxRetries = 4)
 
@@ -283,13 +289,13 @@ class ConnectionPoolSpec
 
     "transform absolute request URIs into relative URIs plus host header" in new LocalTestSetup {
       val request = HttpRequest(
-          uri = s"http://$serverHostName:$serverPort/abc?query#fragment")
+        uri = s"http://$serverHostName:$serverPort/abc?query#fragment")
       val responseFuture = Http().singleRequest(request)
       val responseHeaders = Await.result(responseFuture, 1.second).headers
       responseHeaders should contain(
-          RawHeader("Req-Raw-Request-URI", "/abc?query"))
+        RawHeader("Req-Raw-Request-URI", "/abc?query"))
       responseHeaders should contain(
-          RawHeader("Req-Host", s"$serverHostName:$serverPort"))
+        RawHeader("Req-Host", s"$serverHostName:$serverPort"))
     }
 
     "support absolute request URIs without path component" in new LocalTestSetup {
@@ -305,7 +311,7 @@ class ConnectionPoolSpec
       val responseFuture = Http().singleRequest(request)
       val responseHeaders = Await.result(responseFuture, 1.second).headers
       responseHeaders should contain(
-          RawHeader("Req-Uri", s"http://$serverHostName:$serverPort//foo"))
+        RawHeader("Req-Uri", s"http://$serverHostName:$serverPort//foo"))
       responseHeaders should contain(RawHeader("Req-Raw-Request-URI", "//foo"))
     }
 
@@ -322,18 +328,18 @@ class ConnectionPoolSpec
   "The superPool client infrastructure" should {
 
     "route incoming requests to the right cached host connection pool" in new TestSetup(
-        autoAccept = true) {
+      autoAccept = true) {
       val (serverEndpoint2, serverHostName2, serverPort2) =
         TestUtils.temporaryServerHostnameAndPort()
-      Http().bindAndHandleSync(
-          testServerHandler(0), serverHostName2, serverPort2)
+      Http()
+        .bindAndHandleSync(testServerHandler(0), serverHostName2, serverPort2)
 
       val (requestIn, responseOut, responseOutSub, hcp) = superPool[Int]()
 
       requestIn.sendNext(
-          HttpRequest(uri = s"http://$serverHostName:$serverPort/a") -> 42)
+        HttpRequest(uri = s"http://$serverHostName:$serverPort/a") -> 42)
       requestIn.sendNext(
-          HttpRequest(uri = s"http://$serverHostName2:$serverPort2/b") -> 43)
+        HttpRequest(uri = s"http://$serverHostName2:$serverPort2/b") -> 43)
 
       responseOutSub.request(2)
       Seq(responseOut.expectNext(), responseOut.expectNext()) foreach {
@@ -367,14 +373,14 @@ class ConnectionPoolSpec
       TestSubscriber.manualProbe[Http.IncomingConnection]
     val incomingConnectionsSub = {
       val rawBytesInjection = BidiFlow.fromFlows(
-          Flow[SslTlsOutbound]
-            .collect[ByteString] {
-              case SendBytes(x) ⇒ mapServerSideOutboundRawBytes(x)
-            }
-            .transform(StreamUtils.recover {
-              case NoErrorComplete ⇒ ByteString.empty
-            }),
-          Flow[ByteString].map(SessionBytes(null, _)))
+        Flow[SslTlsOutbound]
+          .collect[ByteString] {
+            case SendBytes(x) ⇒ mapServerSideOutboundRawBytes(x)
+          }
+          .transform(StreamUtils.recover {
+            case NoErrorComplete ⇒ ByteString.empty
+          }),
+        Flow[ByteString].map(SessionBytes(null, _)))
       val sink =
         if (autoAccept) Sink.foreach[Http.IncomingConnection](handleConnection)
         else Sink.fromSubscriber(incomingConnections)
@@ -400,42 +406,41 @@ class ConnectionPoolSpec
 
     private def handleConnection(c: Http.IncomingConnection) =
       c.handleWithSyncHandler(
-          testServerHandler(incomingConnectionCounter.incrementAndGet()))
+        testServerHandler(incomingConnectionCounter.incrementAndGet()))
 
-    def cachedHostConnectionPool[T](
-        maxConnections: Int = 2,
-        maxRetries: Int = 2,
-        maxOpenRequests: Int = 8,
-        pipeliningLimit: Int = 1,
-        idleTimeout: Duration = 5.seconds,
-        ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+    def cachedHostConnectionPool[T](maxConnections: Int = 2,
+                                    maxRetries: Int = 2,
+                                    maxOpenRequests: Int = 8,
+                                    pipeliningLimit: Int = 1,
+                                    idleTimeout: Duration = 5.seconds,
+                                    ccSettings: ClientConnectionSettings =
+                                      ClientConnectionSettings(system)) = {
       val settings = new ConnectionPoolSettingsImpl(
-          maxConnections,
-          maxRetries,
-          maxOpenRequests,
-          pipeliningLimit,
-          idleTimeout,
-          ClientConnectionSettings(system))
-      flowTestBench(Http()
-            .cachedHostConnectionPool[T](serverHostName, serverPort, settings))
+        maxConnections,
+        maxRetries,
+        maxOpenRequests,
+        pipeliningLimit,
+        idleTimeout,
+        ClientConnectionSettings(system))
+      flowTestBench(
+        Http()
+          .cachedHostConnectionPool[T](serverHostName, serverPort, settings))
     }
 
-    def superPool[T](
-        maxConnections: Int = 2,
-        maxRetries: Int = 2,
-        maxOpenRequests: Int = 8,
-        pipeliningLimit: Int = 1,
-        idleTimeout: Duration = 5.seconds,
-        ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+    def superPool[T](maxConnections: Int = 2,
+                     maxRetries: Int = 2,
+                     maxOpenRequests: Int = 8,
+                     pipeliningLimit: Int = 1,
+                     idleTimeout: Duration = 5.seconds,
+                     ccSettings: ClientConnectionSettings =
+                       ClientConnectionSettings(system)) = {
       val settings = new ConnectionPoolSettingsImpl(
-          maxConnections,
-          maxRetries,
-          maxOpenRequests,
-          pipeliningLimit,
-          idleTimeout,
-          ClientConnectionSettings(system))
+        maxConnections,
+        maxRetries,
+        maxOpenRequests,
+        pipeliningLimit,
+        idleTimeout,
+        ClientConnectionSettings(system))
       flowTestBench(Http().superPool[T](settings = settings))
     }
 

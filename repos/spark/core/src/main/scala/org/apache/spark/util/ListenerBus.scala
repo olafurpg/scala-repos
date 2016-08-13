@@ -64,8 +64,8 @@ private[spark] trait ListenerBus[L <: AnyRef, E] extends Logging {
       } catch {
         case NonFatal(e) =>
           logError(
-              s"Listener ${Utils.getFormattedClassName(listener)} threw an exception",
-              e)
+            s"Listener ${Utils.getFormattedClassName(listener)} threw an exception",
+            e)
       }
     }
   }
@@ -76,7 +76,7 @@ private[spark] trait ListenerBus[L <: AnyRef, E] extends Logging {
     */
   protected def doPostEvent(listener: L, event: E): Unit
 
-  private[spark] def findListenersByClass[T <: L : ClassTag](): Seq[T] = {
+  private[spark] def findListenersByClass[T <: L: ClassTag](): Seq[T] = {
     val c = implicitly[ClassTag[T]].runtimeClass
     listeners.asScala.filter(_.getClass == c).map(_.asInstanceOf[T]).toSeq
   }

@@ -46,22 +46,22 @@ object TaskFailure {
 
   def empty: TaskFailure = {
     TaskFailure(
-        PathId.empty,
-        mesos.TaskID.newBuilder().setValue("").build,
-        mesos.TaskState.TASK_STAGING
+      PathId.empty,
+      mesos.TaskID.newBuilder().setValue("").build,
+      mesos.TaskState.TASK_STAGING
     )
   }
 
   def apply(proto: Protos.TaskFailure): TaskFailure =
     TaskFailure(
-        appId = proto.getAppId.toPath,
-        taskId = proto.getTaskId,
-        state = proto.getState,
-        message = proto.getMessage,
-        host = proto.getHost,
-        version = Timestamp(proto.getVersion),
-        timestamp = Timestamp(proto.getTimestamp),
-        slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None
+      appId = proto.getAppId.toPath,
+      taskId = proto.getTaskId,
+      state = proto.getState,
+      message = proto.getMessage,
+      host = proto.getHost,
+      version = Timestamp(proto.getVersion),
+      timestamp = Timestamp(proto.getTimestamp),
+      slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None
     )
 
   object FromMesosStatusUpdateEvent {
@@ -87,16 +87,16 @@ object TaskFailure {
 
       if (isFailureState(state))
         Some(
-            TaskFailure(
-                appId,
-                taskId.mesosTaskId,
-                state,
-                message,
-                host,
-                Timestamp(version),
-                Timestamp(ts),
-                Option(slaveIDToProto(SlaveID(slaveId)))
-            ))
+          TaskFailure(
+            appId,
+            taskId.mesosTaskId,
+            state,
+            message,
+            host,
+            Timestamp(version),
+            Timestamp(ts),
+            Option(slaveIDToProto(SlaveID(slaveId)))
+          ))
       else None
     }
   }

@@ -17,7 +17,8 @@ import scala.concurrent.Future
   * @param logger an SLF4J logger
   */
 class AhcCurlRequestLogger(logger: org.slf4j.Logger)
-    extends WSRequestFilter with CurlFormat {
+    extends WSRequestFilter
+    with CurlFormat {
   def apply(executor: WSRequestExecutor): WSRequestExecutor = {
     new WSRequestExecutor {
       override def execute(request: WSRequest): Future[WSResponse] = {

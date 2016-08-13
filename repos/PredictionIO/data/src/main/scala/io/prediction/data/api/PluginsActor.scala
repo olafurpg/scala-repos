@@ -37,7 +37,7 @@ class PluginsActor() extends Actor {
       }
     case _ =>
       log.error(
-          "Unknown message sent to Event Server input sniffer plugin host.")
+        "Unknown message sent to Event Server input sniffer plugin host.")
   }
 }
 

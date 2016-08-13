@@ -52,15 +52,16 @@ object SVDPlusPlus {
     *
     * @return a graph with vertex attributes containing the trained model
     */
-  def run(edges: RDD[Edge[Double]], conf: Conf)
-    : (Graph[(Array[Double], Array[Double], Double, Double), Double],
-    Double) = {
+  def run(edges: RDD[Edge[Double]],
+          conf: Conf): (Graph[(Array[Double], Array[Double], Double, Double),
+                              Double],
+                        Double) = {
     require(conf.maxIters > 0,
             s"Maximum of iterations must be greater than 0," +
-            s" but got ${conf.maxIters}")
+              s" but got ${conf.maxIters}")
     require(conf.maxVal > conf.minVal,
             s"MaxVal must be greater than MinVal," +
-            s" but got {maxVal: ${conf.maxVal}, minVal: ${conf.minVal}}")
+              s" but got {maxVal: ${conf.maxVal}, minVal: ${conf.minVal}}")
 
     // Generate default vertex attribute
     def defaultF(rank: Int): (Array[Double], Array[Double], Double, Double) = {
@@ -82,15 +83,14 @@ object SVDPlusPlus {
     edges.unpersist()
 
     // Calculate initial bias and norm
-    val t0 = g.aggregateMessages[(Long, Double)](
-        ctx =>
-          { ctx.sendToSrc((1L, ctx.attr)); ctx.sendToDst((1L, ctx.attr)) },
-        (g1, g2) => (g1._1 + g2._1, g1._2 + g2._2))
+    val t0 = g.aggregateMessages[(Long, Double)](ctx => {
+      ctx.sendToSrc((1L, ctx.attr)); ctx.sendToDst((1L, ctx.attr))
+    }, (g1, g2) => (g1._1 + g2._1, g1._2 + g2._2))
 
     val gJoinT0 = g
       .outerJoinVertices(t0) {
         (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
-        msg: Option[(Long, Double)]) =>
+         msg: Option[(Long, Double)]) =>
           (vd._1,
            vd._2,
            msg.get._2 / msg.get._1 - u,
@@ -125,26 +125,25 @@ object SVDPlusPlus {
       blas.dscal(rank, err * usr._4 * conf.gamma2, updateY, 1)
       blas.daxpy(rank, -conf.gamma7 * conf.gamma2, itm._2, 1, updateY, 1)
       ctx.sendToSrc(
-          (updateP, updateY, (err - conf.gamma6 * usr._3) * conf.gamma1))
+        (updateP, updateY, (err - conf.gamma6 * usr._3) * conf.gamma1))
       ctx.sendToDst(
-          (updateQ, updateY, (err - conf.gamma6 * itm._3) * conf.gamma1))
+        (updateQ, updateY, (err - conf.gamma6 * itm._3) * conf.gamma1))
     }
 
     for (i <- 0 until conf.maxIters) {
       // Phase 1, calculate pu + |N(u)|^(-0.5)*sum(y) for user nodes
       g.cache()
       val t1 = g.aggregateMessages[Array[Double]](
-          ctx => ctx.sendToSrc(ctx.dstAttr._2),
-          (g1, g2) =>
-            {
-              val out = g1.clone()
-              blas.daxpy(out.length, 1.0, g2, 1, out, 1)
-              out
-          })
+        ctx => ctx.sendToSrc(ctx.dstAttr._2),
+        (g1, g2) => {
+          val out = g1.clone()
+          blas.daxpy(out.length, 1.0, g2, 1, out, 1)
+          out
+        })
       val gJoinT1 = g
         .outerJoinVertices(t1) {
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
-          msg: Option[Array[Double]]) =>
+           msg: Option[Array[Double]]) =>
             if (msg.isDefined) {
               val out = vd._1.clone()
               blas.daxpy(out.length, vd._4, msg.get, 1, out, 1)
@@ -161,20 +160,19 @@ object SVDPlusPlus {
       // Phase 2, update p for user nodes and q, y for item nodes
       g.cache()
       val t2 = g.aggregateMessages(
-          sendMsgTrainF(conf, u),
-          (g1: (Array[Double], Array[Double],
-          Double), g2: (Array[Double], Array[Double], Double)) =>
-            {
-              val out1 = g1._1.clone()
-              blas.daxpy(out1.length, 1.0, g2._1, 1, out1, 1)
-              val out2 = g2._2.clone()
-              blas.daxpy(out2.length, 1.0, g2._2, 1, out2, 1)
-              (out1, out2, g1._3 + g2._3)
-          })
+        sendMsgTrainF(conf, u),
+        (g1: (Array[Double], Array[Double], Double),
+         g2: (Array[Double], Array[Double], Double)) => {
+          val out1 = g1._1.clone()
+          blas.daxpy(out1.length, 1.0, g2._1, 1, out1, 1)
+          val out2 = g2._2.clone()
+          blas.daxpy(out2.length, 1.0, g2._2, 1, out2, 1)
+          (out1, out2, g1._3 + g2._3)
+        })
       val gJoinT2 = g
         .outerJoinVertices(t2) {
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
-          msg: Option[(Array[Double], Array[Double], Double)]) =>
+           msg: Option[(Array[Double], Array[Double], Double)]) =>
             {
               val out1 = vd._1.clone()
               blas.daxpy(out1.length, 1.0, msg.get._1, 1, out1, 1)
@@ -191,8 +189,9 @@ object SVDPlusPlus {
 
     // calculate error on training set
     def sendMsgTestF(conf: Conf, u: Double)(
-        ctx: EdgeContext[
-            (Array[Double], Array[Double], Double, Double), Double, Double]) {
+        ctx: EdgeContext[(Array[Double], Array[Double], Double, Double),
+                         Double,
+                         Double]) {
       val (usr, itm) = (ctx.srcAttr, ctx.dstAttr)
       val (p, q) = (usr._1, itm._1)
       var pred = u + usr._3 + itm._3 + blas.ddot(q.length, q, 1, usr._2, 1)
@@ -207,7 +206,7 @@ object SVDPlusPlus {
     val gJoinT3 = g
       .outerJoinVertices(t3) {
         (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
-        msg: Option[Double]) =>
+         msg: Option[Double]) =>
           if (msg.isDefined) (vd._1, vd._2, vd._3, msg.get) else vd
       }
       .cache()

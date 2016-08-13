@@ -103,10 +103,10 @@ object HttpEntity {
     def dataStream = data
     def asJava =
       new JHttpEntity.Streamed(
-          data.asJava,
-          OptionConverters.toJava(
-              contentLength.asInstanceOf[Option[java.lang.Long]]),
-          OptionConverters.toJava(contentType))
+        data.asJava,
+        OptionConverters.toJava(
+          contentLength.asInstanceOf[Option[java.lang.Long]]),
+        OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
   }
 
@@ -119,8 +119,8 @@ object HttpEntity {
     *               contain no trailers.
     * @param contentType The content type, if known.
     */
-  final case class Chunked(
-      chunks: Source[HttpChunk, _], contentType: Option[String])
+  final case class Chunked(chunks: Source[HttpChunk, _],
+                           contentType: Option[String])
       extends HttpEntity {
     def isKnownEmpty = false
     def contentLength = None
@@ -128,8 +128,8 @@ object HttpEntity {
       case HttpChunk.Chunk(data) => data
     }
     def asJava =
-      new JHttpEntity.Chunked(
-          chunks.asJava, OptionConverters.toJava(contentType))
+      new JHttpEntity.Chunked(chunks.asJava,
+                              OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
   }
 }

@@ -33,7 +33,7 @@ import play.twirl.api._
 object Comet {
 
   val initialHtmlChunk = Html(
-      Array.fill[Char](5 * 1024)(' ').mkString + "<html><body>")
+    Array.fill[Char](5 * 1024)(' ').mkString + "<html><body>")
 
   val initialByteString = ByteString.fromString(initialHtmlChunk.toString())
 
@@ -67,9 +67,10 @@ object Comet {
     */
   def string(callbackName: String): Flow[String, ByteString, NotUsed] = {
     Flow[String]
-      .map(str =>
-            ByteString.fromString(
-                "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
+      .map(
+        str =>
+          ByteString.fromString(
+            "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
       .via(flow(callbackName))
   }
 
@@ -109,8 +110,8 @@ object Comet {
       .prepend(Source.single(initialChunk))
   }
 
-  private def formatted(
-      callbackName: ByteString, javascriptMessage: ByteString): ByteString = {
+  private def formatted(callbackName: ByteString,
+                        javascriptMessage: ByteString): ByteString = {
     val b: ByteStringBuilder = new ByteStringBuilder
     b.append(ByteString.fromString("""<script type="text/javascript">"""))
     b.append(callbackName)
@@ -128,9 +129,9 @@ object Comet {
         Json.stringify(json)
       case other =>
         throw new IllegalStateException(
-            "Illegal type found: only String or JsValue elements are valid")
+          "Illegal type found: only String or JsValue elements are valid")
     }
     Html(
-        s"""<script type="text/javascript">${callbackName}(${javascriptMessage});</script>""")
+      s"""<script type="text/javascript">${callbackName}(${javascriptMessage});</script>""")
   }
 }

@@ -16,8 +16,8 @@ private[play] final class SerializableResult(constructorResult: Result)
     extends Externalizable {
 
   assert(
-      Option(constructorResult).forall(_.body.isInstanceOf[HttpEntity.Strict]),
-      "Only strict entities can be cached, streamed entities cannot be cached")
+    Option(constructorResult).forall(_.body.isInstanceOf[HttpEntity.Strict]),
+    "Only strict entities can be cached, streamed entities cannot be cached")
 
   /**
     * Create an empty object. Must call `readExternal` after calling
@@ -34,8 +34,8 @@ private[play] final class SerializableResult(constructorResult: Result)
 
   def result: Result = {
     assert(
-        cachedResult != null,
-        "Result should have been provided in constructor or when deserializing")
+      cachedResult != null,
+      "Result should have been provided in constructor or when deserializing")
     cachedResult
   }
   override def readExternal(in: ObjectInput): Unit = {
@@ -77,8 +77,8 @@ private[play] final class SerializableResult(constructorResult: Result)
     }
 
     cachedResult = Result(
-        header = ResponseHeader(status, headerMap),
-        body = body
+      header = ResponseHeader(status, headerMap),
+      body = body
     )
   }
   override def writeExternal(out: ObjectOutput): Unit = {
@@ -104,7 +104,7 @@ private[play] final class SerializableResult(constructorResult: Result)
         case HttpEntity.Strict(data, _) => data
         case other =>
           throw new IllegalStateException(
-              "Non strict body cannot be materialized")
+            "Non strict body cannot be materialized")
       }
       out.writeInt(body.length)
       out.write(body.toArray)

@@ -111,8 +111,10 @@ class JavaWriter(classfile: Classfile, writer: Writer)
 
   def isConstr(name: String) = (name == "<init>")
 
-  def printField(
-      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+  def printField(flags: Int,
+                 name: Int,
+                 tpe: Int,
+                 attribs: List[cf.Attribute]) {
     print(flagsToStr(false, flags))
     if ((flags & 0x0010) != 0)
       print("val " + NameTransformer.decode(getName(name)))
@@ -120,8 +122,10 @@ class JavaWriter(classfile: Classfile, writer: Writer)
     print(": " + getType(tpe) + ";").newline
   }
 
-  def printMethod(
-      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+  def printMethod(flags: Int,
+                  name: Int,
+                  tpe: Int,
+                  attribs: List[cf.Attribute]) {
     if (getName(name) == "<init>") print(flagsToStr(false, flags))
     if (getName(name) == "<init>") {
       print("def this" + getType(tpe) + ";").newline
@@ -136,8 +140,8 @@ class JavaWriter(classfile: Classfile, writer: Writer)
         val n = ((data(0) & 0xff) << 8) + (data(1) & 0xff)
         indent.print("throws ")
         for (i <- Iterator.range(0, n) map { x =>
-          2 * (x + 1)
-        }) {
+                   2 * (x + 1)
+                 }) {
           val inx = ((data(i) & 0xff) << 8) + (data(i + 1) & 0xff)
           if (i > 2) print(", ")
           print(getClassName(inx).trim())
@@ -171,7 +175,7 @@ class JavaWriter(classfile: Classfile, writer: Writer)
         printClassHeader;
       case Some(cf.Attribute(_, data)) =>
         val mp = new MetaParser(
-            getName(((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim())
+          getName(((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim())
         mp.parse match {
           case None => printClassHeader;
           case Some(str) =>

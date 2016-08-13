@@ -67,17 +67,18 @@ object Opening {
   implicit val moveBSONHandler = new BSON[Move] {
 
     def reads(r: BSON.Reader): Move =
-      Move(first = r str "first",
-           cp = r int "cp",
-           line = chess.format.pgn.Binary
-               .readMoves(r.bytes("line").value.toList)
-               .get)
+      Move(
+        first = r str "first",
+        cp = r int "cp",
+        line =
+          chess.format.pgn.Binary.readMoves(r.bytes("line").value.toList).get)
 
     def writes(w: BSON.Writer, o: Move) =
-      BSONDocument(
-          "first" -> o.first, "cp" -> o.cp, "line" -> lila.db.ByteArray {
-        chess.format.pgn.Binary.writeMoves(o.line).get.toArray
-      })
+      BSONDocument("first" -> o.first,
+                   "cp" -> o.cp,
+                   "line" -> lila.db.ByteArray {
+                     chess.format.pgn.Binary.writeMoves(o.line).get.toArray
+                   })
   }
 
   object BSONFields {

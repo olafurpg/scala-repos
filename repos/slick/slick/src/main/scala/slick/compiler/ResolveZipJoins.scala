@@ -94,22 +94,33 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
     val rmap = rdefs.iterator.map(t => (t._1, new AnonSymbol)).toMap
     val lisym, risym, l2sym, r2sym = new AnonSymbol
     val l2 = transformZipWithIndex(
-        l2sym, l.generator, l.from, ldefs, 1L, Pure(StructNode(ldefs.map {
-      case (f, _) =>
-        (lmap(f) -> FwdPath(List(l2sym, ElementSymbol(1), f)))
-    } :+ (lisym -> FwdPath(List(l2sym, ElementSymbol(2)))))))
+      l2sym,
+      l.generator,
+      l.from,
+      ldefs,
+      1L,
+      Pure(StructNode(ldefs.map {
+        case (f, _) =>
+          (lmap(f) -> FwdPath(List(l2sym, ElementSymbol(1), f)))
+      } :+ (lisym -> FwdPath(List(l2sym, ElementSymbol(2)))))))
     val r2 = transformZipWithIndex(
-        r2sym, r.generator, r.from, rdefs, 1L, Pure(StructNode(rdefs.map {
-      case (f, _) =>
-        (rmap(f) -> FwdPath(List(r2sym, ElementSymbol(1), f)))
-    } :+ (risym -> FwdPath(List(r2sym, ElementSymbol(2)))))))
-    val j2 = Join(jlsym,
-                  jrsym,
-                  l2,
-                  r2,
-                  JoinType.Inner,
-                  Library.==.typed[Boolean](
-                      Select(Ref(jlsym), lisym), Select(Ref(jrsym), risym)))
+      r2sym,
+      r.generator,
+      r.from,
+      rdefs,
+      1L,
+      Pure(StructNode(rdefs.map {
+        case (f, _) =>
+          (rmap(f) -> FwdPath(List(r2sym, ElementSymbol(1), f)))
+      } :+ (risym -> FwdPath(List(r2sym, ElementSymbol(2)))))))
+    val j2 = Join(
+      jlsym,
+      jrsym,
+      l2,
+      r2,
+      JoinType.Inner,
+      Library.==
+        .typed[Boolean](Select(Ref(jlsym), lisym), Select(Ref(jrsym), risym)))
     Bind(s1, j2, sel.replace {
       case FwdPath(Seq(s, ElementSymbol(1), f)) if s == s1 =>
         FwdPath(List(s, ElementSymbol(1), lmap(f)))

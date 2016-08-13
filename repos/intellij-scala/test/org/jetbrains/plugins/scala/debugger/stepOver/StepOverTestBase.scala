@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.stepOver
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.junit.Assert
 
@@ -20,11 +23,11 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
     val file = getFileInSrc(mainFileName)
     val lines = Source.fromFile(file).getLines().toSeq
     Assert.assertTrue(
-        s"File should start with definition of object $mainClassName",
-        lines.head.startsWith(s"object $mainClassName"))
+      s"File should start with definition of object $mainClassName",
+      lines.head.startsWith(s"object $mainClassName"))
     Assert.assertTrue("Method main should be defined on a second line",
                       lines(1).trim.startsWith("def main") &&
-                      lines(2).trim.nonEmpty)
+                        lines(2).trim.nonEmpty)
 
     def checkLine(expectedLineNumber: Int): Unit = {
       val actualLineNumber = currentLineNumber
@@ -47,7 +50,7 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
         else {
           val lineNumber = currentLineNumber
           Assert.fail(
-              s"No expected lines left, stopped at line $lineNumber: ${lines(lineNumber)}")
+            s"No expected lines left, stopped at line $lineNumber: ${lines(lineNumber)}")
         }
         doStepOver()
       }

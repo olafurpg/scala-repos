@@ -578,7 +578,7 @@ class Scaladoc extends ScalaMatchingTask {
     if (getOrigin.isEmpty) buildError("Attribute 'srcdir' is not set.")
     if (!destination.isEmpty && !destination.get.isDirectory())
       buildError(
-          "Attribute 'destdir' does not refer to an existing directory.")
+        "Attribute 'destdir' does not refer to an existing directory.")
     if (destination.isEmpty) destination = Some(getOrigin.head)
 
     val mapper = new GlobPatternMapper()
@@ -595,7 +595,7 @@ class Scaladoc extends ScalaMatchingTask {
         val list = includedFiles.toList
         if (list.length > 0)
           log(
-              "Documenting " + list.length + " source file" +
+            "Documenting " + list.length + " source file" +
               (if (list.length > 1) "s" else "") +
               (" to " + getDestination.toString)
           )
@@ -682,14 +682,16 @@ class Scaladoc extends ScalaMatchingTask {
       docProcessor.document(sourceFiles.map(_.toString))
       if (reporter.ERROR.count > 0)
         safeBuildError(
-            "Document failed with " + reporter.ERROR.count + " error" +
+          "Document failed with " + reporter.ERROR.count + " error" +
             (if (reporter.ERROR.count > 1)
-               "s" else "") + "; see the documenter error output for details.")
+              "s"
+            else "") + "; see the documenter error output for details.")
       else if (reporter.WARNING.count > 0)
         log(
-            "Document succeeded with " + reporter.WARNING.count + " warning" +
+          "Document succeeded with " + reporter.WARNING.count + " warning" +
             (if (reporter.WARNING.count > 1)
-               "s" else "") + "; see the documenter output for details.")
+              "s"
+            else "") + "; see the documenter output for details.")
       reporter.printSummary()
     } catch {
       case exception: Throwable =>
@@ -697,7 +699,7 @@ class Scaladoc extends ScalaMatchingTask {
         val msg =
           Option(exception.getMessage) getOrElse "no error message provided"
         safeBuildError(
-            s"Document failed because of an internal documenter error ($msg); see the error output for details.")
+          s"Document failed because of an internal documenter error ($msg); see the error output for details.")
     }
   }
 }

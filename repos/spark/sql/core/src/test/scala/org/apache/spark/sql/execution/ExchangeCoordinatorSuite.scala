@@ -19,9 +19,17 @@ package org.apache.spark.sql.execution
 
 import org.scalatest.BeforeAndAfterAll
 
-import org.apache.spark.{MapOutputStatistics, SparkConf, SparkContext, SparkFunSuite}
+import org.apache.spark.{
+  MapOutputStatistics,
+  SparkConf,
+  SparkContext,
+  SparkFunSuite
+}
 import org.apache.spark.sql._
-import org.apache.spark.sql.execution.exchange.{ExchangeCoordinator, ShuffleExchange}
+import org.apache.spark.sql.execution.exchange.{
+  ExchangeCoordinator,
+  ShuffleExchange
+}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.TestSQLContext
@@ -42,8 +50,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
   override protected def afterAll(): Unit = {
     // Set these states back.
     originalActiveSQLContext.foreach(ctx => SQLContext.setActive(ctx))
-    originalInstantiatedSQLContext.foreach(
-        ctx => SQLContext.setInstantiatedContext(ctx))
+    originalInstantiatedSQLContext.foreach(ctx =>
+      SQLContext.setInstantiatedContext(ctx))
   }
 
   private def checkEstimation(
@@ -130,7 +138,7 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
         Array(new MapOutputStatistics(0, bytesByPartitionId1),
               new MapOutputStatistics(1, bytesByPartitionId2))
       intercept[AssertionError](
-          coordinator.estimatePartitionStartIndices(mapOutputStatistics))
+        coordinator.estimatePartitionStartIndices(mapOutputStatistics))
     }
 
     {
@@ -206,7 +214,7 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   test(
-      "test estimatePartitionStartIndices and enforce minimal number of reducers") {
+    "test estimatePartitionStartIndices and enforce minimal number of reducers") {
     val coordinator = new ExchangeCoordinator(2, 100L, Some(2))
 
     {
@@ -276,7 +284,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
     }
     val sparkContext = new SparkContext(sparkConf)
     val sqlContext = new TestSQLContext(sparkContext)
-    try f(sqlContext) finally sparkContext.stop()
+    try f(sqlContext)
+    finally sparkContext.stop()
   }
 
   Seq(Some(3), None).foreach { minNumPostShufflePartitions =>
@@ -286,7 +295,7 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
     }
 
     test(
-        s"determining the number of reducers: aggregate operator$testNameNote") {
+      s"determining the number of reducers: aggregate operator$testNameNote") {
       val test = { sqlContext: SQLContext =>
         val df = sqlContext
           .range(0, 1000, 1, numInputPartitions)
@@ -295,8 +304,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
 
         // Check the answer first.
         checkAnswer(
-            agg,
-            sqlContext.range(0, 20).selectExpr("id", "50 as cnt").collect())
+          agg,
+          sqlContext.range(0, 20).selectExpr("id", "50 as cnt").collect())
 
         // Then, let's look at the number of post-shuffle partitions estimated
         // by the ExchangeCoordinator.
@@ -343,9 +352,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
         val expectedAnswer = sqlContext
           .range(0, 1000)
           .selectExpr("id % 500 as key", "id as value")
-          .unionAll(sqlContext
-                .range(0, 1000)
-                .selectExpr("id % 500 as key", "id as value"))
+          .unionAll(
+            sqlContext
+              .range(0, 1000)
+              .selectExpr("id % 500 as key", "id as value"))
         checkAnswer(join, expectedAnswer.collect())
 
         // Then, let's look at the number of post-shuffle partitions estimated
@@ -417,10 +427,11 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
 
           case None =>
             assert(exchanges.forall(_.coordinator.isDefined))
-            assert(exchanges
-                  .map(_.outputPartitioning.numPartitions)
-                  .toSeq
-                  .toSet === Set(1, 2))
+            assert(
+              exchanges
+                .map(_.outputPartitioning.numPartitions)
+                .toSeq
+                .toSet === Set(1, 2))
         }
       }
 
@@ -466,10 +477,11 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
 
           case None =>
             assert(exchanges.forall(_.coordinator.isDefined))
-            assert(exchanges
-                  .map(_.outputPartitioning.numPartitions)
-                  .toSeq
-                  .toSet === Set(2, 3))
+            assert(
+              exchanges
+                .map(_.outputPartitioning.numPartitions)
+                .toSeq
+                .toSet === Set(2, 3))
         }
       }
 

@@ -24,7 +24,8 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                                     val authenticator: Authenticator,
                                     val authorizer: Authorizer,
                                     val config: MarathonConf)
-    extends AuthResource with Logging {
+    extends AuthResource
+    with Logging {
 
   @GET
   def running(@Context req: HttpServletRequest): Response =
@@ -48,7 +49,7 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
         .map(_.plan)
       plan.fold(notFound(s"DeploymentPlan $id does not exist")) { deployment =>
         deployment.affectedApplications.foreach(
-            checkAuthorization(UpdateApp, _))
+          checkAuthorization(UpdateApp, _))
 
         deployment match {
           case plan: DeploymentPlan if force =>
@@ -59,11 +60,12 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
           case plan: DeploymentPlan =>
             // create a new deployment to return to the previous state
             deploymentResult(
-                result(groupManager.update(
-                        plan.original.id,
-                        plan.revert,
-                        force = true
-                    )))
+              result(
+                groupManager.update(
+                  plan.original.id,
+                  plan.revert,
+                  force = true
+                )))
         }
       }
   }
@@ -75,19 +77,19 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
       .map(step => step.actions.map(actionToMap))
       .map(Json.toJson(_))
     Json.obj(
-        "id" -> deployment.id,
-        "version" -> deployment.version,
-        "affectedApps" -> deployment.affectedApplicationIds.map(_.toString),
-        "steps" -> steps,
-        "currentActions" -> currentStepInfo.step.actions.map(actionToMap),
-        "currentStep" -> currentStepInfo.nr,
-        "totalSteps" -> deployment.steps.size
+      "id" -> deployment.id,
+      "version" -> deployment.version,
+      "affectedApps" -> deployment.affectedApplicationIds.map(_.toString),
+      "steps" -> steps,
+      "currentActions" -> currentStepInfo.step.actions.map(actionToMap),
+      "currentStep" -> currentStepInfo.nr,
+      "totalSteps" -> deployment.steps.size
     )
   }
 
   def actionToMap(action: DeploymentAction): Map[String, String] =
     Map(
-        "action" -> action.getClass.getSimpleName,
-        "app" -> action.app.id.toString
+      "action" -> action.getClass.getSimpleName,
+      "app" -> action.app.id.toString
     )
 }

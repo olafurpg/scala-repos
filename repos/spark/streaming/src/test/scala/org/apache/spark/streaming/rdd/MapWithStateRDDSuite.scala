@@ -31,7 +31,9 @@ import org.apache.spark.streaming.util.OpenHashMapBasedStateMap
 import org.apache.spark.util.Utils
 
 class MapWithStateRDDSuite
-    extends SparkFunSuite with RDDCheckpointTester with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with RDDCheckpointTester
+    with BeforeAndAfterAll {
 
   private var sc: SparkContext = null
   private var checkpointDir: File = _
@@ -39,7 +41,7 @@ class MapWithStateRDDSuite
   override def beforeAll(): Unit = {
     super.beforeAll()
     sc = new SparkContext(
-        new SparkConf().setMaster("local").setAppName("MapWithStateRDDSuite"))
+      new SparkConf().setMaster("local").setAppName("MapWithStateRDDSuite"))
     checkpointDir = Utils.createTempDir()
     sc.setCheckpointDir(checkpointDir.toString)
   }
@@ -61,7 +63,9 @@ class MapWithStateRDDSuite
     val data = Seq((1, "1"), (2, "2"), (3, "3"))
     val partitioner = new HashPartitioner(10)
     val rdd = MapWithStateRDD.createFromPairRDD[Int, Int, String, Int](
-        sc.parallelize(data), partitioner, Time(123))
+      sc.parallelize(data),
+      partitioner,
+      Time(123))
     assertRDD[Int, Int, String, Int](rdd, data.map { x =>
       (x._1, x._2, 123)
     }.toSet, Set.empty)
@@ -141,12 +145,12 @@ class MapWithStateRDDSuite
 
       val updatedRecord =
         MapWithStateRDDRecord.updateRecordWithData[String, String, Int, Int](
-            Some(record),
-            dataIterator,
-            testFunc,
-            Time(updatedTime),
-            timeoutThreshold,
-            removeTimedoutData)
+          Some(record),
+          dataIterator,
+          testFunc,
+          Time(updatedTime),
+          timeoutThreshold,
+          removeTimedoutData)
 
       val updatedStateData = updatedRecord.stateMap.getAll().map { x =>
         (x._2, x._3)
@@ -155,17 +159,17 @@ class MapWithStateRDDSuite
              "states do not match after updating the MapWithStateRDDRecord")
 
       assert(
-          updatedRecord.mappedData.toSet === expectedOutput.toSet,
-          "mapped data do not match after updating the MapWithStateRDDRecord")
+        updatedRecord.mappedData.toSet === expectedOutput.toSet,
+        "mapped data do not match after updating the MapWithStateRDDRecord")
 
       assert(
-          timingOutStates.toSet === expectedTimingOutStates.toSet,
-          "timing out states do not " +
+        timingOutStates.toSet === expectedTimingOutStates.toSet,
+        "timing out states do not " +
           "match those that were expected to do so while updating the MapWithStateRDDRecord")
 
       assert(
-          removedStates.toSet === expectedRemovedStates.toSet,
-          "removed states do not " +
+        removedStates.toSet === expectedRemovedStates.toSet,
+        "removed states do not " +
           "match those that were expected to do so while updating the MapWithStateRDDRecord")
     }
 
@@ -182,8 +186,9 @@ class MapWithStateRDDSuite
                        data = Seq("noop"),
                        expectedStates = Seq((0, initialTime)))
     assert(functionCalled === true)
-    assertRecordUpdate(
-        initStates = None, data = Some("noop"), expectedStates = None)
+    assertRecordUpdate(initStates = None,
+                       data = Some("noop"),
+                       expectedStates = None)
     assert(functionCalled === true)
 
     // Function called with right state data
@@ -258,8 +263,9 @@ class MapWithStateRDDSuite
     }.toSet
     val partitioner = new HashPartitioner(2)
     val initStateRDD = MapWithStateRDD
-      .createFromPairRDD[String, Int, Int, Int](
-          sc.parallelize(initStates), partitioner, Time(initTime))
+      .createFromPairRDD[String, Int, Int, Int](sc.parallelize(initStates),
+                                                partitioner,
+                                                Time(initTime))
       .persist()
     assertRDD(initStateRDD, initStateWthTime, Set.empty)
 
@@ -282,24 +288,23 @@ class MapWithStateRDDSuite
       MapWithStateRDDSuite.touchedStateKeys.clear()
 
       val mappingFunction = (time: Time, key: String, data: Option[Int],
-      state: State[Int]) =>
-        {
+                             state: State[Int]) => {
 
-          // Track the key that has been touched
-          MapWithStateRDDSuite.touchedStateKeys += key
+        // Track the key that has been touched
+        MapWithStateRDDSuite.touchedStateKeys += key
 
-          // If the data is 0, do not do anything with the state
-          // else if the data is 1, increment the state if it exists, or set new state to 0
-          // else if the data is 2, remove the state if it exists
-          data match {
-            case Some(1) =>
-              if (state.exists()) { state.update(state.get + 1) } else
-                state.update(0)
-            case Some(2) =>
-              state.remove()
-            case _ =>
-          }
-          None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
+        // If the data is 0, do not do anything with the state
+        // else if the data is 1, increment the state if it exists, or set new state to 0
+        // else if the data is 2, remove the state if it exists
+        data match {
+          case Some(1) =>
+            if (state.exists()) { state.update(state.get + 1) } else
+              state.update(0)
+          case Some(2) =>
+            state.remove()
+          case _ =>
+        }
+        None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
       }
       val newDataRDD =
         sc.makeRDD(testData).partitionBy(testStateRDD.partitioner.get)
@@ -316,8 +321,8 @@ class MapWithStateRDDSuite
       assert(MapWithStateRDDSuite.touchedStateKeys.size === testData.size,
              "More number of keys are being touched than that is expected")
       assert(
-          MapWithStateRDDSuite.touchedStateKeys.toSet === testData.toMap.keys,
-          "Keys not in the data are being touched unexpectedly")
+        MapWithStateRDDSuite.touchedStateKeys.toSet === testData.toMap.keys,
+        "Keys not in the data are being touched unexpectedly")
 
       // Assert that the test RDD's data has not changed
       assertRDD(initStateRDD, initStateWthTime, Set.empty)
@@ -331,9 +336,9 @@ class MapWithStateRDDSuite
 
     // Test creation of new state
     val rdd1 = testStateUpdates(
-        initStateRDD,
-        Seq(("k3", 1)), // should create k3's state as 0
-        Set(("k1", 0, initTime), ("k2", 0, initTime), ("k3", 0, updateTime)))
+      initStateRDD,
+      Seq(("k3", 1)), // should create k3's state as 0
+      Set(("k1", 0, initTime), ("k2", 0, initTime), ("k3", 0, updateTime)))
 
     val rdd2 =
       testStateUpdates(rdd1,
@@ -350,11 +355,9 @@ class MapWithStateRDDSuite
                        Set(("k1", 1, updateTime), ("k2", 0, initTime)))
 
     val rdd4 = testStateUpdates(
-        rdd3,
-        Seq(("x", 0), ("k2", 1), ("k2", 1), ("k3", 1)), // should update k2, 0 -> 2 and create k3, 0
-        Set(("k1", 1, updateTime),
-            ("k2", 2, updateTime),
-            ("k3", 0, updateTime)))
+      rdd3,
+      Seq(("x", 0), ("k2", 1), ("k2", 1), ("k3", 1)), // should update k2, 0 -> 2 and create k3, 0
+      Set(("k1", 1, updateTime), ("k2", 2, updateTime), ("k3", 0, updateTime)))
 
     val rdd5 =
       testStateUpdates(rdd4,
@@ -396,8 +399,8 @@ class MapWithStateRDDSuite
     /** Generate MapWithStateRDD with data RDD having a long lineage */
     def makeStateRDDWithLongLineageDataRDD(
         longLineageRDD: RDD[Int]): MapWithStateRDD[Int, Int, Int, Int] = {
-      MapWithStateRDD.createFromPairRDD(
-          longLineageRDD.map { _ -> 1 }, partitioner, Time(0))
+      MapWithStateRDD
+        .createFromPairRDD(longLineageRDD.map { _ -> 1 }, partitioner, Time(0))
     }
 
     testRDD(makeStateRDDWithLongLineageDataRDD,
@@ -417,14 +420,13 @@ class MapWithStateRDDSuite
 
       // Create a new MapWithStateRDD, with the lineage lineage MapWithStateRDD as the parent
       new MapWithStateRDD[Int, Int, Int, Int](
-          stateRDDWithLongLineage,
-          stateRDDWithLongLineage.sparkContext
-            .emptyRDD[(Int, Int)]
-            .partitionBy(partitioner),
-          (time: Time,
-          key: Int, value: Option[Int], state: State[Int]) => None,
-          Time(10),
-          None
+        stateRDDWithLongLineage,
+        stateRDDWithLongLineage.sparkContext
+          .emptyRDD[(Int, Int)]
+          .partitionBy(partitioner),
+        (time: Time, key: Int, value: Option[Int], state: State[Int]) => None,
+        Time(10),
+        None
       )
     }
 
@@ -438,17 +440,21 @@ class MapWithStateRDDSuite
 
   test("checkpointing empty state RDD") {
     val emptyStateRDD = MapWithStateRDD.createFromPairRDD[Int, Int, Int, Int](
-        sc.emptyRDD[(Int, Int)], new HashPartitioner(10), Time(0))
+      sc.emptyRDD[(Int, Int)],
+      new HashPartitioner(10),
+      Time(0))
     emptyStateRDD.checkpoint()
     assert(emptyStateRDD.flatMap { _.stateMap.getAll() }.collect().isEmpty)
     val cpRDD = sc.checkpointFile[MapWithStateRDDRecord[Int, Int, Int]](
-        emptyStateRDD.getCheckpointFile.get)
+      emptyStateRDD.getCheckpointFile.get)
     assert(cpRDD.flatMap { _.stateMap.getAll() }.collect().isEmpty)
   }
 
   /** Assert whether the `mapWithState` operation generates expected results */
-  private def assertOperation[
-      K : ClassTag, V : ClassTag, S : ClassTag, T : ClassTag](
+  private def assertOperation[K: ClassTag,
+                              V: ClassTag,
+                              S: ClassTag,
+                              T: ClassTag](
       testStateRDD: MapWithStateRDD[K, V, S, T],
       newDataRDD: RDD[(K, V)],
       mappingFunction: (Time, K, Option[V], State[S]) => Option[T],
@@ -465,8 +471,11 @@ class MapWithStateRDDSuite
         newDataRDD
       }
 
-    val newStateRDD = new MapWithStateRDD[K, V, S, T](
-        testStateRDD, newDataRDD, mappingFunction, Time(currentTime), None)
+    val newStateRDD = new MapWithStateRDD[K, V, S, T](testStateRDD,
+                                                      newDataRDD,
+                                                      mappingFunction,
+                                                      Time(currentTime),
+                                                      None)
     if (doFullScan) newStateRDD.setFullScan()
 
     // Persist to make sure that it gets computed only once and we can track precisely how many
@@ -477,8 +486,7 @@ class MapWithStateRDDSuite
   }
 
   /** Assert whether the [[MapWithStateRDD]] has the expected state and mapped data */
-  private def assertRDD[
-      K : ClassTag, V : ClassTag, S : ClassTag, T : ClassTag](
+  private def assertRDD[K: ClassTag, V: ClassTag, S: ClassTag, T: ClassTag](
       stateRDD: MapWithStateRDD[K, V, S, T],
       expectedStates: Set[(K, S, Int)],
       expectedMappedData: Set[T]): Unit = {

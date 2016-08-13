@@ -19,10 +19,27 @@ package view
 
 import scala.xml.{NodeSeq, Text, Elem}
 import net.liftweb.common.Loggable
-import net.liftweb.http.{S, DispatchSnippet, Paginator, PaginatorSnippet, SortedPaginator, SortedPaginatorSnippet}
+import net.liftweb.http.{
+  S,
+  DispatchSnippet,
+  Paginator,
+  PaginatorSnippet,
+  SortedPaginator,
+  SortedPaginatorSnippet
+}
 import net.liftweb.http.S.?
 import net.liftweb.util.Helpers._
-import net.liftweb.mapper.{Mapper, MetaMapper, MappedField, QueryParam, OrderBy, StartAt, MaxRows, Ascending, Descending}
+import net.liftweb.mapper.{
+  Mapper,
+  MetaMapper,
+  MappedField,
+  QueryParam,
+  OrderBy,
+  StartAt,
+  MaxRows,
+  Ascending,
+  Descending
+}
 
 /**
   * Helper for when using paginators with a ModelSnippet.
@@ -56,8 +73,9 @@ class MapperPaginator[T <: Mapper[T]](val meta: MetaMapper[T])
 
   def count = meta.count(constantParams: _*)
   def page =
-    meta.findAll(constantParams ++ Seq[QueryParam[T]](MaxRows(itemsPerPage),
-                                                      StartAt(first)): _*)
+    meta.findAll(
+      constantParams ++ Seq[QueryParam[T]](MaxRows(itemsPerPage),
+                                           StartAt(first)): _*)
 }
 
 /**
@@ -65,7 +83,8 @@ class MapperPaginator[T <: Mapper[T]](val meta: MetaMapper[T])
   * @param meta The singleton of the Mapper class you're paginating
   */
 class MapperPaginatorSnippet[T <: Mapper[T]](meta: MetaMapper[T])
-    extends MapperPaginator[T](meta) with PaginatorSnippet[T]
+    extends MapperPaginator[T](meta)
+    with PaginatorSnippet[T]
 
 /**
   * Implements MapperPaginator and SortedPaginator.
@@ -86,13 +105,15 @@ class SortedMapperPaginator[T <: Mapper[T]](
   }, true)
 
   override def page =
-    meta.findAll(constantParams ++ Seq[QueryParam[T]](
-            mapperSort, MaxRows(itemsPerPage), StartAt(first)): _*)
+    meta.findAll(
+      constantParams ++ Seq[QueryParam[T]](mapperSort,
+                                           MaxRows(itemsPerPage),
+                                           StartAt(first)): _*)
   private def mapperSort = sort match {
     case (fieldIndex, ascending) =>
       OrderBy(
-          headers(fieldIndex) match { case (_, f) => f },
-          if (ascending) Ascending else Descending
+        headers(fieldIndex) match { case (_, f) => f },
+        if (ascending) Ascending else Descending
       )
   }
 }
@@ -107,6 +128,5 @@ class SortedMapperPaginatorSnippet[T <: Mapper[T]](
     meta: MetaMapper[T],
     initialSort: net.liftweb.mapper.MappedField[_, T],
     headers: (String, MappedField[_, T])*
-)
-    extends SortedMapperPaginator[T](meta, initialSort, headers: _*)
+) extends SortedMapperPaginator[T](meta, initialSort, headers: _*)
     with SortedPaginatorSnippet[T, MappedField[_, T]]

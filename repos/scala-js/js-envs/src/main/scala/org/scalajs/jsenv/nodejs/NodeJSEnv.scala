@@ -29,8 +29,8 @@ class NodeJSEnv private (
     addArgs: Seq[String],
     addEnv: Map[String, String],
     val sourceMap: Boolean
-)
-    extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
+) extends ExternalJSEnv(addArgs, addEnv)
+    with ComJSEnv {
 
   def this(nodejsPath: String = "node",
            addArgs: Seq[String] = Seq.empty,
@@ -64,41 +64,44 @@ class NodeJSEnv private (
   /** Retry-timeout to wait for the JS VM to connect */
   protected val acceptTimeout = 5000
 
-  override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+  override def jsRunner(libs: Seq[ResolvedJSDependency],
+                        code: VirtualJSFile): JSRunner = {
     new NodeRunner(libs, code)
   }
 
-  override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+  override def asyncRunner(libs: Seq[ResolvedJSDependency],
+                           code: VirtualJSFile): AsyncJSRunner = {
     new AsyncNodeRunner(libs, code)
   }
 
-  override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+  override def comRunner(libs: Seq[ResolvedJSDependency],
+                         code: VirtualJSFile): ComJSRunner = {
     new ComNodeRunner(libs, code)
   }
 
-  protected class NodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends ExtRunner(libs, code) with AbstractNodeRunner
+  protected class NodeRunner(libs: Seq[ResolvedJSDependency],
+                             code: VirtualJSFile)
+      extends ExtRunner(libs, code)
+      with AbstractNodeRunner
 
-  protected class AsyncNodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncExtRunner(libs, code) with AbstractNodeRunner
+  protected class AsyncNodeRunner(libs: Seq[ResolvedJSDependency],
+                                  code: VirtualJSFile)
+      extends AsyncExtRunner(libs, code)
+      with AbstractNodeRunner
 
-  protected class ComNodeRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncNodeRunner(libs, code) with ComJSRunner {
+  protected class ComNodeRunner(libs: Seq[ResolvedJSDependency],
+                                code: VirtualJSFile)
+      extends AsyncNodeRunner(libs, code)
+      with ComJSRunner {
 
-    private[this] val serverSocket = new ServerSocket(
-        0, 0, InetAddress.getByName(null)) // Loopback address
+    private[this] val serverSocket =
+      new ServerSocket(0, 0, InetAddress.getByName(null)) // Loopback address
     private[this] var comSocket: Socket = _
     private[this] var jvm2js: DataOutputStream = _
     private[this] var js2jvm: DataInputStream = _
 
     private def comSetup = new MemVirtualJSFile("comSetup.js").withContent(
-        s"""
+      s"""
       (function() {
         // The socket for communication
         var socket = null;
@@ -197,7 +200,7 @@ class NodeJSEnv private (
         val len = js2jvm.readInt()
         val carr = Array.fill(len) {
           comSocket.setSoTimeout(
-              (optDeadline.millisLeft min Int.MaxValue).toInt)
+            (optDeadline.millisLeft min Int.MaxValue).toInt)
           js2jvm.readChar()
         }
 
@@ -230,9 +233,9 @@ class NodeJSEnv private (
         try {
           comSocket = serverSocket.accept()
           jvm2js = new DataOutputStream(
-              new BufferedOutputStream(comSocket.getOutputStream()))
+            new BufferedOutputStream(comSocket.getOutputStream()))
           js2jvm = new DataInputStream(
-              new BufferedInputStream(comSocket.getInputStream()))
+            new BufferedInputStream(comSocket.getInputStream()))
         } catch {
           case to: SocketTimeoutException =>
         }
@@ -257,22 +260,23 @@ class NodeJSEnv private (
     protected def installSourceMap(): Seq[VirtualJSFile] = {
       if (sourceMap)
         Seq(
-            new MemVirtualJSFile("sourceMapSupport.js").withContent(
-                """
+          new MemVirtualJSFile("sourceMapSupport.js").withContent(
+            """
             try {
               require('source-map-support').install();
             } catch (e) {}
             """
-            )
-        ) else Seq()
+          )
+        )
+      else Seq()
     }
 
     /** File(s) to hack console.log to prevent if from changing `%%` to `%`.
       *  Is used by [[initFiles]], override to change/disable.
       */
     protected def fixPercentConsole(): Seq[VirtualJSFile] = Seq(
-        new MemVirtualJSFile("nodeConsoleHack.js").withContent(
-            """
+      new MemVirtualJSFile("nodeConsoleHack.js").withContent(
+        """
           // Hack console log to duplicate double % signs
           (function() {
             function startsWithAnyOf(s, prefixes) {
@@ -299,20 +303,20 @@ class NodeJSEnv private (
             console.log = newLog;
           })();
           """
-        )
+      )
     )
 
     /** File(s) to define `__ScalaJSEnv`. Defines `exitFunction`.
       *  Is used by [[initFiles]], override to change/disable.
       */
     protected def runtimeEnv(): Seq[VirtualJSFile] = Seq(
-        new MemVirtualJSFile("scalaJSEnvInfo.js").withContent(
-            """
+      new MemVirtualJSFile("scalaJSEnvInfo.js").withContent(
+        """
           __ScalaJSEnv = {
             exitFunction: function(status) { process.exit(status); }
           };
           """
-        )
+      )
     )
 
     /** Concatenates results from [[installSourceMap]], [[fixPercentConsole]] and
@@ -332,7 +336,7 @@ class NodeJSEnv private (
         val fname = dep.lib.name
         libCache.materialize(dep.lib)
         new MemVirtualJSFile(s"require-$fname").withContent(
-            s"""$varname = require("${escapeJS(fname)}");"""
+          s"""$varname = require("${escapeJS(fname)}");"""
         )
       }
     }
@@ -345,8 +349,8 @@ class NodeJSEnv private (
     /** write a single JS file to a writer using an include fct if appropriate
       *  uses `require` if the file exists on the filesystem
       */
-    override protected def writeJSFile(
-        file: VirtualJSFile, writer: Writer): Unit = {
+    override protected def writeJSFile(file: VirtualJSFile,
+                                       writer: Writer): Unit = {
       file match {
         case file: FileVirtualJSFile =>
           val fname = file.file.getAbsolutePath
@@ -361,11 +365,11 @@ class NodeJSEnv private (
       val baseNodePath = sys.env.get("NODE_PATH").filter(_.nonEmpty)
       val nodePath =
         libCache.cacheDir.getAbsolutePath +
-        baseNodePath.fold("")(p => File.pathSeparator + p)
+          baseNodePath.fold("")(p => File.pathSeparator + p)
 
       sys.env ++ Seq(
-          "NODE_MODULE_CONTEXTS" -> "0",
-          "NODE_PATH" -> nodePath
+        "NODE_MODULE_CONTEXTS" -> "0",
+        "NODE_PATH" -> nodePath
       ) ++ additionalEnv
     }
   }

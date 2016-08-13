@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class PaginationSpec
     extends SimpleSFXDelegateSpec[jfxsc.Pagination, Pagination](
-        classOf[jfxsc.Pagination], classOf[Pagination])
+      classOf[jfxsc.Pagination],
+      classOf[Pagination])
     with RunOnApplicationThread

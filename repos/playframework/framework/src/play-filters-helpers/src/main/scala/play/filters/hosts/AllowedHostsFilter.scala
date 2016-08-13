@@ -15,13 +15,13 @@ import play.core.j.JavaHttpErrorHandlerAdapter
 /**
   * A filter that denies requests by hosts that do not match a configured list of allowed hosts.
   */
-case class AllowedHostsFilter @Inject()(
-    config: AllowedHostsConfig, errorHandler: HttpErrorHandler)
+case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
+                                        errorHandler: HttpErrorHandler)
     extends EssentialFilter {
 
   // Java API
-  def this(
-      config: AllowedHostsConfig, errorHandler: play.http.HttpErrorHandler) {
+  def this(config: AllowedHostsConfig,
+           errorHandler: play.http.HttpErrorHandler) {
     this(config, new JavaHttpErrorHandlerAdapter(errorHandler))
   }
 
@@ -29,11 +29,13 @@ case class AllowedHostsFilter @Inject()(
     config.allowed map HostMatcher.apply
 
   override def apply(next: EssentialAction) = EssentialAction { req =>
-    if (hostMatchers.exists(_ (req.host))) {
+    if (hostMatchers.exists(_(req.host))) {
       next(req)
     } else {
-      Accumulator.done(errorHandler.onClientError(
-              req, Status.BAD_REQUEST, s"Host not allowed: ${req.host}"))
+      Accumulator.done(
+        errorHandler.onClientError(req,
+                                   Status.BAD_REQUEST,
+                                   s"Host not allowed: ${req.host}"))
     }
   }
 }
@@ -85,7 +87,7 @@ object AllowedHostsConfig {
     */
   def fromConfiguration(conf: Configuration): AllowedHostsConfig = {
     AllowedHostsConfig(
-        PlayConfig(conf).get[Seq[String]]("play.filters.hosts.allowed"))
+      PlayConfig(conf).get[Seq[String]]("play.filters.hosts.allowed"))
   }
 }
 
@@ -97,8 +99,8 @@ class AllowedHostsConfigProvider @Inject()(configuration: Configuration)
 
 class AllowedHostsModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = Seq(
-      bind[AllowedHostsConfig].toProvider[AllowedHostsConfigProvider],
-      bind[AllowedHostsFilter].toSelf
+    bind[AllowedHostsConfig].toProvider[AllowedHostsConfigProvider],
+    bind[AllowedHostsFilter].toSelf
   )
 }
 
@@ -108,6 +110,6 @@ trait AllowedHostsComponents {
 
   lazy val allowedHostsConfig: AllowedHostsConfig =
     AllowedHostsConfig.fromConfiguration(configuration)
-  lazy val allowedHostsFilter: AllowedHostsFilter = AllowedHostsFilter(
-      allowedHostsConfig, httpErrorHandler)
+  lazy val allowedHostsFilter: AllowedHostsFilter =
+    AllowedHostsFilter(allowedHostsConfig, httpErrorHandler)
 }

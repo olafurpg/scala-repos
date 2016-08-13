@@ -1,15 +1,21 @@
 package org.jetbrains.plugins.scala.debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * User: Alefas
   * Date: 19.10.11
   */
 class ScalaExpressionsEvaluator
-    extends ScalaExpressionsEvaluatorBase with ScalaVersion_2_11
+    extends ScalaExpressionsEvaluatorBase
+    with ScalaVersion_2_11
 class ScalaExpressionsEvaluator_212
-    extends ScalaExpressionsEvaluatorBase with ScalaVersion_2_12
+    extends ScalaExpressionsEvaluatorBase
+    with ScalaVersion_2_12
 
 abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
   addFileWithBreakpoints("PrefixUnary.scala",
@@ -73,8 +79,8 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       evalEquals("test2((1, 2))", "2")
       evalEquals("test2(Tuple2(1, 2))", "2")
       evalEquals("foo(1)(2)", "1")
-      evalEquals(
-          "scala.collection.immutable.HashSet.empty + 1 + 2", "Set(1, 2)")
+      evalEquals("scala.collection.immutable.HashSet.empty + 1 + 2",
+                 "Set(1, 2)")
     }
   }
 

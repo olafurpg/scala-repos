@@ -51,11 +51,11 @@ class DateTimeSpec extends WordSpec with Matchers {
   "DateTime.fromIsoDateTimeString" should {
     "properly parse a legal string" in {
       DateTime.fromIsoDateTimeString("2011-07-12T14:08:12") shouldBe Some(
-          DateTime(specificClicks))
+        DateTime(specificClicks))
     }
     "properly parse a legal extended string" in {
       DateTime.fromIsoDateTimeString("2011-07-12T14:08:12.123Z") shouldBe Some(
-          DateTime(specificClicks))
+        DateTime(specificClicks))
     }
     "fail on an illegal string" in {
       DateTime.fromIsoDateTimeString("2011-07-12T14:08:12x") shouldBe None
@@ -83,10 +83,13 @@ class DateTimeSpec extends WordSpec with Matchers {
         DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
       val roundTripOk: Matcher[DateTime] = Matcher { dt: DateTime ⇒
         MatchResult({
-          val rt = roundTrip(dt); dt == rt && dt.weekday == rt.weekday
-        }, dt.toRfc1123DateTimeString + " != " +
-        roundTrip(dt).toRfc1123DateTimeString, dt.toRfc1123DateTimeString +
-        " == " + roundTrip(dt).toRfc1123DateTimeString)
+                      val rt = roundTrip(dt);
+                      dt == rt && dt.weekday == rt.weekday
+                    },
+                    dt.toRfc1123DateTimeString + " != " +
+                      roundTrip(dt).toRfc1123DateTimeString,
+                    dt.toRfc1123DateTimeString +
+                      " == " + roundTrip(dt).toRfc1123DateTimeString)
       }
       all(httpDateTimes.take(10000)) should roundTripOk
     }

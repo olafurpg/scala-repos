@@ -55,10 +55,10 @@ class EngineParams(
 
     // To work around a json4s weird limitation, the parameter names can not be changed
     this(
-        (dataSourceName, dataSourceParams),
-        (preparatorName, preparatorParams),
-        JavaConversions.mapAsScalaMap(algorithmParamsList).toSeq,
-        (servingName, servingParams)
+      (dataSourceName, dataSourceParams),
+      (preparatorName, preparatorParams),
+      JavaConversions.mapAsScalaMap(algorithmParamsList).toSeq,
+      (servingName, servingParams)
     )
   }
 
@@ -99,10 +99,10 @@ object EngineParams {
             servingName: String = "",
             servingParams: Params = EmptyParams()): EngineParams = {
     new EngineParams(
-        dataSourceParams = (dataSourceName, dataSourceParams),
-        preparatorParams = (preparatorName, preparatorParams),
-        algorithmParamsList = algorithmParamsList,
-        servingParams = (servingName, servingParams)
+      dataSourceParams = (dataSourceName, dataSourceParams),
+      preparatorParams = (preparatorName, preparatorParams),
+      algorithmParamsList = algorithmParamsList,
+      servingParams = (servingName, servingParams)
     )
   }
 }

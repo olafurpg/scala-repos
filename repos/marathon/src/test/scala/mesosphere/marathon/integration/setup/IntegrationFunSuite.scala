@@ -45,10 +45,10 @@ trait ExternalMarathonIntegrationTest {
   def startMarathon(port: Int, args: String*): Unit = {
     val cwd = new File(".")
     ProcessKeeper.startMarathon(
-        cwd,
-        env,
-        List("--http_port", port.toString, "--zk", config.zk) ++ args.toList,
-        processName = s"marathon_$port"
+      cwd,
+      env,
+      List("--http_port", port.toString, "--zk", config.zk) ++ args.toList,
+      processName = s"marathon_$port"
     )
   }
 

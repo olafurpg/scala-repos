@@ -3,7 +3,13 @@ package tests
 
 import cats.data.{NonEmptyList, Validated, ValidatedNel, Xor, XorT}
 import cats.data.Validated.{Valid, Invalid}
-import cats.laws.discipline.{BifunctorTests, TraverseTests, ApplicativeErrorTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BifunctorTests,
+  TraverseTests,
+  ApplicativeErrorTests,
+  SerializableTests,
+  CartesianTests
+}
 import org.scalacheck.Arbitrary._
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq.tuple3Eq
@@ -29,7 +35,7 @@ class ValidatedTests extends CatsSuite {
              .applicativeError[Int, Int, Int])
   checkAll("ApplicativeError[Xor, String]",
            SerializableTests.serializable(
-               ApplicativeError[Validated[String, ?], String]))
+             ApplicativeError[Validated[String, ?], String]))
 
   checkAll("Validated[String, Int] with Option",
            TraverseTests[Validated[String, ?]]
@@ -50,12 +56,11 @@ class ValidatedTests extends CatsSuite {
     implicit val S = ListWrapper.partialOrder[String]
     implicit val I = ListWrapper.partialOrder[Int]
     checkAll(
-        "Validated[ListWrapper[String], ListWrapper[Int]]",
-        OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].partialOrder)
-    checkAll(
-        "PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
-        SerializableTests.serializable(
-            PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]))
+      "Validated[ListWrapper[String], ListWrapper[Int]]",
+      OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].partialOrder)
+    checkAll("PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
+             SerializableTests.serializable(
+               PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]))
   }
 
   {
@@ -65,7 +70,7 @@ class ValidatedTests extends CatsSuite {
              OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].eqv)
     checkAll("Eq[Validated[ListWrapper[String], ListWrapper[Int]]]",
              SerializableTests.serializable(
-                 Eq[Validated[ListWrapper[String], ListWrapper[Int]]]))
+               Eq[Validated[ListWrapper[String], ListWrapper[Int]]]))
   }
 
   test("ap2 combines failures in order") {
@@ -75,9 +80,10 @@ class ValidatedTests extends CatsSuite {
   }
 
   test("catchOnly catches matching exceptions") {
-    assert(Validated
-          .catchOnly[NumberFormatException] { "foo".toInt }
-          .isInstanceOf[Invalid[NumberFormatException]])
+    assert(
+      Validated
+        .catchOnly[NumberFormatException] { "foo".toInt }
+        .isInstanceOf[Invalid[NumberFormatException]])
   }
 
   test("catchOnly lets non-matching exceptions escape") {
@@ -164,10 +170,10 @@ class ValidatedTests extends CatsSuite {
       else Validated.invalid(s"$i is not even")
 
     (Validated.valid(3) andThen even) should ===(
-        Validated.invalid("3 is not even"))
+      Validated.invalid("3 is not even"))
     (Validated.valid(4) andThen even) should ===(Validated.valid(4))
     (Validated.invalid("foo") andThen even) should ===(
-        Validated.invalid("foo"))
+      Validated.invalid("foo"))
   }
 
   test("fromOption consistent with Xor.fromOption") {

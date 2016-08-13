@@ -48,7 +48,8 @@ object Circle {
 }
 
 class Circle(override val delegate: jfxss.Circle = new jfxss.Circle())
-    extends Shape(delegate) with SFXDelegate[jfxss.Circle] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Circle] {
   def centerX: DoubleProperty = delegate.centerXProperty
   def centerX_=(v: Double) {
     centerX() = v

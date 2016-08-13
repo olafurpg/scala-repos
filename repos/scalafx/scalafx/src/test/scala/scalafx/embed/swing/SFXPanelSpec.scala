@@ -38,4 +38,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SFXPanelSpec
     extends SimpleSFXDelegateSpec[jfxes.JFXPanel, SFXPanel](
-        classOf[jfxes.JFXPanel], classOf[SFXPanel])
+      classOf[jfxes.JFXPanel],
+      classOf[SFXPanel])

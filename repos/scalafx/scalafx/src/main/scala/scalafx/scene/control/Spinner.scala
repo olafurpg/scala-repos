@@ -31,7 +31,11 @@ import javafx.scene.{control => jfxsc}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
@@ -74,7 +78,8 @@ object Spinner {
   */
 class Spinner[T](
     override val delegate: jfxsc.Spinner[T] = new jfxsc.Spinner[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.Spinner[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Spinner[T]] {
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -138,8 +143,10 @@ class Spinner[T](
     *                     else the min value will be used.
     * @param amountToStepBy The amount to increment or decrement by, per step.
     */
-  def this(
-      min: Double, max: Double, initialValue: Double, amountToStepBy: Double) {
+  def this(min: Double,
+           max: Double,
+           initialValue: Double,
+           amountToStepBy: Double) {
     this(new jfxsc.Spinner[T](min, max, initialValue, amountToStepBy))
   }
 

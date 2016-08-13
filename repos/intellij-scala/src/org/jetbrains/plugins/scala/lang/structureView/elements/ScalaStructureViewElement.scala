@@ -7,14 +7,17 @@ import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.pom.Navigatable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable};
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValue,
+  ScVariable
+};
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-abstract class ScalaStructureViewElement(
-    protected val myElement: PsiElement, val inherited: Boolean)
+abstract class ScalaStructureViewElement(protected val myElement: PsiElement,
+                                         val inherited: Boolean)
     extends StructureViewTreeElement {
 
   def getValue: Object = {

@@ -91,10 +91,10 @@ object FlexMenuBuilderSpec extends WebSpec(FlexMenuBuilderSpecBoot.boot _) {
 object FlexMenuBuilderSpecBoot {
   def boot() {
     def siteMap = SiteMap(
-        Menu.i("Home") / "index",
-        Menu.i("Help") / "help" submenus
+      Menu.i("Home") / "index",
+      Menu.i("Help") / "help" submenus
         (Menu.i("Home1") / "index1", Menu.i("Home2") / "index2"),
-        Menu.i("Help2") / "help2" submenus
+      Menu.i("Help2") / "help2" submenus
         (Menu.i("Home3") / "index3", Menu.i("Home4") / "index4")
     )
     LiftRules.setSiteMap(siteMap)

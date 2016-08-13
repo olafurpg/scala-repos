@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -67,11 +67,11 @@ object Mx4jLoader extends Logging {
       true
     } catch {
       case e: ClassNotFoundException => {
-          info("Will not load MX4J, mx4j-tools.jar is not in the classpath")
-        }
+        info("Will not load MX4J, mx4j-tools.jar is not in the classpath")
+      }
       case e: Throwable => {
-          warn("Could not start register mbean in JMX", e)
-        }
+        warn("Could not start register mbean in JMX", e)
+      }
     }
     false
   }

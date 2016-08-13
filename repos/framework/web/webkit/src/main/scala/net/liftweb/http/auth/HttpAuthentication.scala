@@ -60,15 +60,16 @@ case class HttpBasicAuthentication(realmName: String)(
     func: PartialFunction[(String, String, Req), Boolean])
     extends HttpAuthentication {
   def credentials(r: Req): Box[(String, String)] = {
-    header(r).flatMap(auth =>
-          {
-        val decoded = new String(Base64.decodeBase64(
-                auth.substring(6, auth.length).getBytes)).split(":").toList
-        decoded match {
-          case userName :: password :: _ => Full((userName, password))
-          case userName :: Nil => Full((userName, ""))
-          case _ => Empty
-        }
+    header(r).flatMap(auth => {
+      val decoded = new String(
+        Base64.decodeBase64(auth.substring(6, auth.length).getBytes))
+        .split(":")
+        .toList
+      decoded match {
+        case userName :: password :: _ => Full((userName, password))
+        case userName :: Nil => Full((userName, ""))
+        case _ => Empty
+      }
     })
   }
 
@@ -76,18 +77,19 @@ case class HttpBasicAuthentication(realmName: String)(
 
   def verified_? = {
     case (req) => {
-        credentials(req) match {
-          case Full((user, pwd)) if (func.isDefinedAt(user, pwd, req)) =>
-            func(user, pwd, req)
-          case _ => false
-        }
+      credentials(req) match {
+        case Full((user, pwd)) if (func.isDefinedAt(user, pwd, req)) =>
+          func(user, pwd, req)
+        case _ => false
       }
+    }
   }
 }
 
 case class HttpDigestAuthentication(realmName: String)(
     func: PartialFunction[(String, Req, (String) => Boolean), Boolean])
-    extends HttpAuthentication with Loggable {
+    extends HttpAuthentication
+    with Loggable {
   private val nonceMap = new HashMap[String, Long]
 
   private object CheckAndPurge
@@ -99,13 +101,11 @@ case class HttpDigestAuthentication(realmName: String)(
     protected def messageHandler = {
       case CheckAndPurge =>
         if (keepPinging) doPing()
-        nonceMap.foreach(
-            (entry) =>
-              {
-            val ts = System.currentTimeMillis
-            if ((ts - entry._2) > nonceValidityPeriod) {
-              nonceMap -= entry._1
-            }
+        nonceMap.foreach((entry) => {
+          val ts = System.currentTimeMillis
+          if ((ts - entry._2) > nonceValidityPeriod) {
+            nonceMap -= entry._1
+          }
         })
 
       case ShutDown => keepPinging = false
@@ -126,21 +126,20 @@ case class HttpDigestAuthentication(realmName: String)(
   override def shutDown = NonceWatcher ! ShutDown
 
   def getInfo(req: Req): Box[DigestAuthentication] =
-    header(req).map(auth =>
-          {
+    header(req).map(auth => {
 
-        val info = auth.substring(7, auth.length)
-        val pairs = splitNameValuePairs(info)
-        DigestAuthentication(req.request.method.toUpperCase,
-                             pairs("username"),
-                             pairs("realm"),
-                             pairs("nonce"),
-                             pairs("uri"),
-                             pairs("qop"),
-                             pairs("nc"),
-                             pairs("cnonce"),
-                             pairs("response"),
-                             pairs("opaque"))
+      val info = auth.substring(7, auth.length)
+      val pairs = splitNameValuePairs(info)
+      DigestAuthentication(req.request.method.toUpperCase,
+                           pairs("username"),
+                           pairs("realm"),
+                           pairs("nonce"),
+                           pairs("uri"),
+                           pairs("qop"),
+                           pairs("nc"),
+                           pairs("cnonce"),
+                           pairs("response"),
+                           pairs("opaque"))
     })
 
   /**
@@ -163,38 +162,40 @@ case class HttpDigestAuthentication(realmName: String)(
 
   def verified_? = {
     case (req) => {
-        getInfo(req) match {
-          case Full(auth)
-              if (func.isDefinedAt((auth.userName, req, validate(auth) _))) =>
-            func((auth.userName, req, validate(auth) _)) match {
-              case true =>
-                val ts = System.currentTimeMillis
-                val nonceCreationTime: Long =
-                  nonceMap.getOrElse(auth.nonce, -1)
-                nonceCreationTime match {
-                  case -1 => false
-                  case _ =>
-                    (ts - nonceCreationTime) < nonceValidityPeriod
-                }
-              case _ => false
-            }
-          case _ => false
-        }
+      getInfo(req) match {
+        case Full(auth)
+            if (func.isDefinedAt((auth.userName, req, validate(auth) _))) =>
+          func((auth.userName, req, validate(auth) _)) match {
+            case true =>
+              val ts = System.currentTimeMillis
+              val nonceCreationTime: Long =
+                nonceMap.getOrElse(auth.nonce, -1)
+              nonceCreationTime match {
+                case -1 => false
+                case _ =>
+                  (ts - nonceCreationTime) < nonceValidityPeriod
+              }
+            case _ => false
+          }
+        case _ => false
       }
+    }
   }
 
   private def validate(clientAuth: DigestAuthentication)(
       password: String): Boolean = {
     val ha1 = hexEncode(
-        md5((clientAuth.userName + ":" + clientAuth.realm + ":" +
-                password).getBytes("UTF-8")))
+      md5(
+        (clientAuth.userName + ":" + clientAuth.realm + ":" +
+          password).getBytes("UTF-8")))
     val ha2 = hexEncode(
-        md5((clientAuth.method + ":" + clientAuth.uri).getBytes("UTF-8")))
+      md5((clientAuth.method + ":" + clientAuth.uri).getBytes("UTF-8")))
 
     val response = hexEncode(
-        md5((ha1 + ":" + clientAuth.nonce + ":" + clientAuth.nc +
-                ":" + clientAuth.cnonce + ":" + clientAuth.qop + ":" +
-                ha2).getBytes("UTF-8")));
+      md5(
+        (ha1 + ":" + clientAuth.nonce + ":" + clientAuth.nc +
+          ":" + clientAuth.cnonce + ":" + clientAuth.qop + ":" +
+          ha2).getBytes("UTF-8")));
 
     (response == clientAuth.response) &&
     (nonceMap.getOrElse(clientAuth.nonce, -1) != -1)

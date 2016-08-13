@@ -19,13 +19,13 @@ object Prismic {
   }
 
   private val fetchPrismicApi = AsyncCache.single[PrismicApi](
-      f = PrismicApi.get(Env.api.PrismicApiUrl, logger = prismicLogger),
-      timeToLive = 1 minute)
+    f = PrismicApi.get(Env.api.PrismicApiUrl, logger = prismicLogger),
+    timeToLive = 1 minute)
 
   def prismicApi = fetchPrismicApi(true)
 
-  implicit def makeLinkResolver(
-      prismicApi: PrismicApi, ref: Option[String] = None) =
+  implicit def makeLinkResolver(prismicApi: PrismicApi,
+                                ref: Option[String] = None) =
     DocumentLinkResolver(prismicApi) {
       case (DocumentLink(id, _, _, slug, false), _) =>
         routes.Blog.show(id, slug, ref).url

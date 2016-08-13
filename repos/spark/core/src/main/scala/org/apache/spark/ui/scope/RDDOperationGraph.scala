@@ -39,8 +39,10 @@ private[ui] case class RDDOperationGraph(edges: Seq[RDDOperationEdge],
                                          rootCluster: RDDOperationCluster)
 
 /** A node in an RDDOperationGraph. This represents an RDD. */
-private[ui] case class RDDOperationNode(
-    id: Int, name: String, cached: Boolean, callsite: String)
+private[ui] case class RDDOperationNode(id: Int,
+                                        name: String,
+                                        cached: Boolean,
+                                        callsite: String)
 
 /**
   * A directed edge connecting two nodes in an RDDOperationGraph.
@@ -54,8 +56,8 @@ private[ui] case class RDDOperationEdge(fromId: Int, toId: Int)
   * This represents any grouping of RDDs, including operation scopes (e.g. textFile, flatMap),
   * stages, jobs, or any higher level construct. A cluster may be nested inside of other clusters.
   */
-private[ui] class RDDOperationCluster(
-    val id: String, private var _name: String) {
+private[ui] class RDDOperationCluster(val id: String,
+                                      private var _name: String) {
   private val _childNodes = new ListBuffer[RDDOperationNode]
   private val _childClusters = new ListBuffer[RDDOperationCluster]
 
@@ -115,11 +117,11 @@ private[ui] object RDDOperationGraph extends Logging {
 
       // TODO: differentiate between the intention to cache an RDD and whether it's actually cached
       val node = nodes.getOrElseUpdate(
-          rdd.id,
-          RDDOperationNode(rdd.id,
-                           rdd.name,
-                           rdd.storageLevel != StorageLevel.NONE,
-                           rdd.callSite))
+        rdd.id,
+        RDDOperationNode(rdd.id,
+                         rdd.name,
+                         rdd.storageLevel != StorageLevel.NONE,
+                         rdd.callSite))
 
       if (rdd.scope.isEmpty) {
         // This RDD has no encompassing scope, so we put it directly in the root cluster
@@ -134,8 +136,9 @@ private[ui] object RDDOperationGraph extends Logging {
         val rddClusters = rddScopes.map { scope =>
           val clusterId = scope.id
           val clusterName = scope.name.replaceAll("\\n", "\\\\n")
-          clusters.getOrElseUpdate(
-              clusterId, new RDDOperationCluster(clusterId, clusterName))
+          clusters.getOrElseUpdate(clusterId,
+                                   new RDDOperationCluster(clusterId,
+                                                           clusterName))
         }
         // Build the cluster hierarchy for this RDD
         rddClusters.sliding(2).foreach { pc =>
@@ -216,8 +219,8 @@ private[ui] object RDDOperationGraph extends Logging {
       .append(indent)
       .append(s"subgraph cluster${cluster.id} {\n")
       .append(indent)
-      .append(
-          s"""  label="${StringEscapeUtils.escapeJava(cluster.name)}";\n""")
+      .append(s"""  label="${StringEscapeUtils
+        .escapeJava(cluster.name)}";\n""")
     cluster.childNodes.foreach { node =>
       subgraph.append(indent).append(s"  ${makeDotNode(node)};\n")
     }

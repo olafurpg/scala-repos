@@ -25,7 +25,8 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 
 class HDFSModels(fs: FileSystem, config: StorageClientConfig, prefix: String)
-    extends Models with Logging {
+    extends Models
+    with Logging {
 
   def insert(i: Model): Unit = {
     try {

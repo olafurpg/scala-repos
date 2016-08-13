@@ -28,9 +28,8 @@ object OrderedSerializationProviderImpl {
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
     : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
     case tpe
-        if
-        (!tpe.toString.contains(ImplicitOrderedBuf.macroMarker) &&
-            !(tpe.normalize == tpe)) =>
+        if (!tpe.toString.contains(ImplicitOrderedBuf.macroMarker) &&
+          !(tpe.normalize == tpe)) =>
       buildDispatcher(tpe.normalize)
   }
 

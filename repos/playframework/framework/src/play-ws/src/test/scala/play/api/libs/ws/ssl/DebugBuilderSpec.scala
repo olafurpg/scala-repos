@@ -25,7 +25,7 @@ object DebugBuilderSpec extends Specification {
       val actual = builder.build()
 
       actual.trim.split("\\s+").toSeq must containTheSameElementsAs(
-          Seq("certpath"))
+        Seq("certpath"))
     }
 
     "match certpath + ocsp" in {
@@ -34,7 +34,7 @@ object DebugBuilderSpec extends Specification {
       val actual = builder.build()
 
       actual.trim.split("\\s+").toSeq must containTheSameElementsAs(
-          Seq("certpath", "ocsp"))
+        Seq("certpath", "ocsp"))
     }
   }
 
@@ -64,7 +64,7 @@ object DebugBuilderSpec extends Specification {
       val actual: String = builder.build()
 
       actual.trim.split("\\s+").toSeq must containTheSameElementsAs(
-          Seq("ssl", "defaultctx", "handshake", "data"))
+        Seq("ssl", "defaultctx", "handshake", "data"))
     }
   }
 }

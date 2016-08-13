@@ -39,15 +39,16 @@ private[spark] case class TimeStampedValue[V](value: V, timestamp: Long)
   */
 private[spark] class TimeStampedHashMap[A, B](
     updateTimeStampOnGet: Boolean = false)
-    extends mutable.Map[A, B]() with Logging {
+    extends mutable.Map[A, B]()
+    with Logging {
 
   private val internalMap = new ConcurrentHashMap[A, TimeStampedValue[B]]()
 
   def get(key: A): Option[B] = {
     val value = internalMap.get(key)
     if (value != null && updateTimeStampOnGet) {
-      internalMap.replace(
-          key, value, TimeStampedValue(value.value, currentTime))
+      internalMap
+        .replace(key, value, TimeStampedValue(value.value, currentTime))
     }
     Option(value).map(_.value)
   }

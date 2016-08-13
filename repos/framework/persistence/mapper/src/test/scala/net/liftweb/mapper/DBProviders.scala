@@ -74,8 +74,8 @@ object DbProviders {
       def deleteAllTables {
         DB.use(DefaultConnectionIdentifier) { conn =>
           val md = conn.getMetaData
-          val rs = md.getTables(
-              null, Schemifier.getDefaultSchemaName(conn), null, null)
+          val rs = md
+            .getTables(null, Schemifier.getDefaultSchemaName(conn), null, null)
           var toDelete: List[String] = Nil
           while (rs.next) {
             val tableName = rs.getString(3)
@@ -111,9 +111,9 @@ object DbProviders {
     def vendor = new Vendor("com.mysql.jdbc.Driver") {
       def mkConn = {
         DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/lift_test?autoReconnect=true",
-            "dpp",
-            "")
+          "jdbc:mysql://localhost:3306/lift_test?autoReconnect=true",
+          "dpp",
+          "")
       }
     }
     def propName: String = "mysql_local"
@@ -123,8 +123,8 @@ object DbProviders {
     def name = "PostgreSql"
     def vendor = new Vendor("org.postgresql.Driver") {
       def mkConn =
-        DriverManager.getConnection(
-            "jdbc:postgresql://localhost/lift", "lift", "lift")
+        DriverManager
+          .getConnection("jdbc:postgresql://localhost/lift", "lift", "lift")
     }
     def propName: String = "psql_local"
   }
@@ -165,8 +165,9 @@ object DbProviders {
     def name = "Microsoft SQL Server"
     def vendor = new Vendor("net.sourceforge.jtds.jdbc.Driver") {
       def mkConn =
-        DriverManager.getConnection(
-            "jdbc:jtds:sqlserver://localhost/lift", "lift", "lift")
+        DriverManager.getConnection("jdbc:jtds:sqlserver://localhost/lift",
+                                    "lift",
+                                    "lift")
     }
     def propName: String = "ms_sqlserver"
   }
@@ -176,7 +177,7 @@ object DbProviders {
     def vendor = new Vendor("oracle.jdbc.OracleDriver") {
       def mkConn =
         DriverManager.getConnection(
-            "jdbc:oracle:thin:lift/lift@//localhost:1521/lift")
+          "jdbc:oracle:thin:lift/lift@//localhost:1521/lift")
     }
     def propName: String = "oracle_local"
   }
@@ -186,7 +187,7 @@ object DbProviders {
     def vendor = new Vendor("com.sap.dbtech.jdbc.DriverSapDB") {
       def mkConn =
         DriverManager.getConnection(
-            "jdbc:sapdb://localhost:7210/lift?user=lift&password=lift")
+          "jdbc:sapdb://localhost:7210/lift?user=lift&password=lift")
     }
     def propName: String = "maxdb_local"
   }

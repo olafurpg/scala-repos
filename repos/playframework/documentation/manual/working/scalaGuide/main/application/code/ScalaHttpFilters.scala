@@ -12,8 +12,8 @@ package simple {
   import play.api.mvc._
   import scala.concurrent.{ExecutionContext, Future}
 
-  class LoggingFilter @Inject()(
-      implicit val mat: Materializer, ec: ExecutionContext)
+  class LoggingFilter @Inject()(implicit val mat: Materializer,
+                                ec: ExecutionContext)
       extends Filter {
 
     def apply(nextFilter: RequestHeader => Future[Result])(
@@ -26,7 +26,7 @@ package simple {
         val requestTime = endTime - startTime
 
         Logger.info(
-            s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
+          s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
 
         result.withHeaders("Request-Time" -> requestTime.toString)
       }
@@ -47,8 +47,7 @@ package httpfilters {
   class Filters @Inject()(
       gzip: GzipFilter,
       log: LoggingFilter
-  )
-      extends HttpFilters {
+  ) extends HttpFilters {
 
     val filters = Seq(gzip, log)
   }

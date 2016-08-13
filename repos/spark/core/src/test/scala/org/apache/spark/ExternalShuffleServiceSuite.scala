@@ -22,7 +22,10 @@ import org.scalatest.BeforeAndAfterAll
 import org.apache.spark.network.TransportContext
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.server.TransportServer
-import org.apache.spark.network.shuffle.{ExternalShuffleBlockHandler, ExternalShuffleClient}
+import org.apache.spark.network.shuffle.{
+  ExternalShuffleBlockHandler,
+  ExternalShuffleClient
+}
 
 /**
   * This suite creates an external shuffle server and routes all shuffle fetches through it.
@@ -60,7 +63,7 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
     sc = new SparkContext("local-cluster[2,1,1024]", "test", conf)
     sc.env.blockManager.externalShuffleServiceEnabled should equal(true)
     sc.env.blockManager.shuffleClient.getClass should equal(
-        classOf[ExternalShuffleClient])
+      classOf[ExternalShuffleClient])
 
     // In a slow machine, one slave may register hundreds of milliseconds ahead of the other one.
     // If we don't wait for all slaves, it's possible that only one executor runs all jobs. Then
@@ -78,8 +81,8 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
 
     // Invalidate the registered executors, disallowing access to their shuffle blocks (without
     // deleting the actual shuffle files, so we could access them without the shuffle service).
-    rpcHandler.applicationRemoved(
-        sc.conf.getAppId, false /* cleanupLocalDirs */ )
+    rpcHandler.applicationRemoved(sc.conf.getAppId,
+                                  false /* cleanupLocalDirs */ )
 
     // Now Spark will receive FetchFailed, and not retry the stage due to "spark.test.noStageRetry"
     // being set.
@@ -87,6 +90,6 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
       rdd.count()
     }
     e.getMessage should include(
-        "Fetch failure will not retry stage due to testing config")
+      "Fetch failure will not retry stage due to testing config")
   }
 }

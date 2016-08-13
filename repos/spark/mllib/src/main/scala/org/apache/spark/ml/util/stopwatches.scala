@@ -99,8 +99,8 @@ private[spark] class LocalStopwatch(override val name: String)
   * A distributed [[Stopwatch]] using Spark accumulator.
   * @param sc SparkContext
   */
-private[spark] class DistributedStopwatch(
-    sc: SparkContext, override val name: String)
+private[spark] class DistributedStopwatch(sc: SparkContext,
+                                          override val name: String)
     extends Stopwatch {
 
   private val elapsedTime: Accumulator[Long] =

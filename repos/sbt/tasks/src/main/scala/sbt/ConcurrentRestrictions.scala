@@ -68,7 +68,8 @@ object ConcurrentRestrictions {
   final case class Tag(name: String)
 
   val tagsKey = AttributeKey[TagMap](
-      "tags", "Attributes restricting concurrent execution of tasks.")
+    "tags",
+    "Attributes restricting concurrent execution of tasks.")
 
   /** A standard tag describing the number of tasks that do not otherwise have any tags.*/
   val Untagged = Tag("untagged")
@@ -84,8 +85,8 @@ object ConcurrentRestrictions {
     * @param get extracts tags from a task
     * @param validF defines whether a set of tasks are allowed to execute concurrently based on their merged tags
     */
-  def tagged[A](
-      get: A => TagMap, validF: TagMap => Boolean): ConcurrentRestrictions[A] =
+  def tagged[A](get: A => TagMap,
+                validF: TagMap => Boolean): ConcurrentRestrictions[A] =
     new ConcurrentRestrictions[A] {
       type G = TagMap
       def empty = Map.empty
@@ -168,7 +169,9 @@ object ConcurrentRestrictions {
       }
       private[this] def submitValid(node: A, work: () => R) = {
         running += 1
-        val wrappedWork = () => try work() finally cleanup(node)
+        val wrappedWork = () =>
+          try work()
+          finally cleanup(node)
         CompletionService.submit(wrappedWork, jservice)
       }
       private[this] def cleanup(node: A): Unit = synchronized {
@@ -176,12 +179,12 @@ object ConcurrentRestrictions {
         tagState = tags.remove(tagState, node)
         if (!tags.valid(tagState))
           warn(
-              "Invalid restriction: removing a completed node from a valid system must result in a valid system.")
+            "Invalid restriction: removing a completed node from a valid system must result in a valid system.")
         submitValid(new LinkedList)
       }
       private[this] def errorAddingToIdle() =
         warn(
-            "Invalid restriction: adding a node to an idle system must be allowed.")
+          "Invalid restriction: adding a node to an idle system must be allowed.")
 
       /** Submits pending tasks that are now allowed to executed. */
       @tailrec private[this] def submitValid(tried: Queue[Enqueue]): Unit =

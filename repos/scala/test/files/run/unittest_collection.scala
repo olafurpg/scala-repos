@@ -1,6 +1,11 @@
 object Test {
 
-  import scala.collection.mutable.{ArrayBuffer, Buffer, BufferProxy, ListBuffer}
+  import scala.collection.mutable.{
+    ArrayBuffer,
+    Buffer,
+    BufferProxy,
+    ListBuffer
+  }
 
   def main(args: Array[String]) {
     test(collection.mutable.ArrayBuffer[String]())

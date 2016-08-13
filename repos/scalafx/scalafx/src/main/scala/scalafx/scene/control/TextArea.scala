@@ -31,7 +31,11 @@ import javafx.scene.{control => jfxsc}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object TextArea {
@@ -40,7 +44,8 @@ object TextArea {
 }
 
 class TextArea(override val delegate: jfxsc.TextArea = new jfxsc.TextArea())
-    extends TextInputControl(delegate) with SFXDelegate[jfxsc.TextArea] {
+    extends TextInputControl(delegate)
+    with SFXDelegate[jfxsc.TextArea] {
 
   /**
     * Creates a TextArea with initial text content.

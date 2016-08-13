@@ -28,7 +28,7 @@ class StringConversionsTest extends WordSpec {
     "quoteC" in {
       assert("nothing".quoteC == "nothing")
       assert(
-          "name\tvalue\t\u20acb\u00fcllet?\u20ac".quoteC == "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac")
+        "name\tvalue\t\u20acb\u00fcllet?\u20ac".quoteC == "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac")
       assert("she said \"hello\"".quoteC == "she said \\\"hello\\\"")
       assert("\\backslash".quoteC == "\\\\backslash")
     }
@@ -36,7 +36,7 @@ class StringConversionsTest extends WordSpec {
     "unquoteC" in {
       assert("nothing".unquoteC == "nothing")
       assert(
-          "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac".unquoteC == "name\tvalue\t\u20acb\u00fcllet?\u20ac")
+        "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac".unquoteC == "name\tvalue\t\u20acb\u00fcllet?\u20ac")
       assert("she said \\\"hello\\\"".unquoteC == "she said \"hello\"")
       assert("\\\\backslash".unquoteC == "\\backslash")
       assert("real\\$dollar".unquoteC == "real\\$dollar")

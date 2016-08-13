@@ -40,7 +40,10 @@ import org.apache.spark.streaming.receiver.Receiver
 import org.apache.spark.util.Utils
 
 class StreamingContextSuite
-    extends SparkFunSuite with BeforeAndAfter with Timeouts with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Timeouts
+    with Logging {
 
   val master = "local[2]"
   val appName = this.getClass.getSimpleName
@@ -75,8 +78,12 @@ class StreamingContextSuite
   }
 
   test("from no conf + spark home + env") {
-    ssc = new StreamingContext(
-        master, appName, batchDuration, sparkHome, Nil, Map(envPair))
+    ssc = new StreamingContext(master,
+                               appName,
+                               batchDuration,
+                               sparkHome,
+                               Nil,
+                               Map(envPair))
     assert(ssc.conf.getExecutorEnv.contains(envPair))
   }
 
@@ -109,13 +116,14 @@ class StreamingContextSuite
     addInputStream(ssc1).register()
     ssc1.start()
     val cp = new Checkpoint(ssc1, Time(1000))
-    assert(Utils.timeStringAsSeconds(cp.sparkConfPairs.toMap
-              .getOrElse("spark.dummyTimeConfig", "-1")) === 10)
+    assert(Utils.timeStringAsSeconds(
+      cp.sparkConfPairs.toMap.getOrElse("spark.dummyTimeConfig", "-1")) === 10)
     ssc1.stop()
     val newCp = Utils.deserialize[Checkpoint](Utils.serialize(cp))
-    assert(newCp
-          .createSparkConf()
-          .getTimeAsSeconds("spark.dummyTimeConfig", "-1") === 10)
+    assert(
+      newCp
+        .createSparkConf()
+        .getTimeAsSeconds("spark.dummyTimeConfig", "-1") === 10)
     ssc = new StreamingContext(null, newCp, null)
     assert(ssc.conf.getTimeAsSeconds("spark.dummyTimeConfig", "-1") === 10)
   }
@@ -166,9 +174,10 @@ class StreamingContextSuite
     val exception = intercept[NotSerializableException] {
       ssc.start()
     }
-    assert(exception
-          .getMessage()
-          .contains("DStreams with their functions are not serializable"))
+    assert(
+      exception
+        .getMessage()
+        .contains("DStreams with their functions are not serializable"))
     assert(ssc.getState() !== StreamingContextState.ACTIVE)
     assert(StreamingContext.getActive().isEmpty)
   }
@@ -176,9 +185,8 @@ class StreamingContextSuite
   test("start failure should stop internal components") {
     ssc = new StreamingContext(conf, batchDuration)
     val inputStream = addInputStream(ssc)
-    val updateFunc = (values: Seq[Int], state: Option[Int]) =>
-      {
-        Some(values.sum + state.getOrElse(0))
+    val updateFunc = (values: Seq[Int], state: Option[Int]) => {
+      Some(values.sum + state.getOrElse(0))
     }
     inputStream.map(x => (x, 1)).updateStateByKey[Int](updateFunc)
     // Require that the start fails because checkpoint directory was not set
@@ -190,7 +198,7 @@ class StreamingContextSuite
   }
 
   test(
-      "start should set job group and description of streaming jobs correctly") {
+    "start should set job group and description of streaming jobs correctly") {
     ssc = new StreamingContext(conf, batchDuration)
     ssc.sc.setJobGroup("non-streaming", "non-streaming", true)
     val sc = ssc.sc
@@ -203,8 +211,8 @@ class StreamingContextSuite
     addInputStream(ssc).foreachRDD { rdd =>
       jobGroupFound = sc.getLocalProperty(SparkContext.SPARK_JOB_GROUP_ID)
       jobDescFound = sc.getLocalProperty(SparkContext.SPARK_JOB_DESCRIPTION)
-      jobInterruptFound = sc.getLocalProperty(
-          SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL)
+      jobInterruptFound =
+        sc.getLocalProperty(SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL)
       allFound = true
     }
     ssc.start()
@@ -220,11 +228,11 @@ class StreamingContextSuite
 
     // Verify current thread's thread-local properties have not changed
     assert(
-        sc.getLocalProperty(SparkContext.SPARK_JOB_GROUP_ID) === "non-streaming")
-    assert(
-        sc.getLocalProperty(SparkContext.SPARK_JOB_DESCRIPTION) === "non-streaming")
-    assert(
-        sc.getLocalProperty(SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL) === "true")
+      sc.getLocalProperty(SparkContext.SPARK_JOB_GROUP_ID) === "non-streaming")
+    assert(sc
+      .getLocalProperty(SparkContext.SPARK_JOB_DESCRIPTION) === "non-streaming")
+    assert(sc
+      .getLocalProperty(SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL) === "true")
   }
 
   test("start multiple times") {
@@ -323,8 +331,8 @@ class StreamingContextSuite
       logInfo("Running count = " + runningCount)
       logInfo("TestReceiver.counter = " + TestReceiver.counter.get())
       assert(
-          TestReceiver.counter.get() == runningCount + 1,
-          "Received records = " + TestReceiver.counter.get() + ", " +
+        TestReceiver.counter.get() == runningCount + 1,
+        "Received records = " + TestReceiver.counter.get() + ", " +
           "processed records = " + runningCount
       )
       Thread.sleep(100)
@@ -358,7 +366,7 @@ class StreamingContextSuite
     val totalNumRecords = 15
     val recordsPerSecond = 1
     val input = ssc.receiverStream(
-        new SlowTestReceiver(totalNumRecords, recordsPerSecond))
+      new SlowTestReceiver(totalNumRecords, recordsPerSecond))
     input.count().foreachRDD { rdd =>
       val count = rdd.first()
       runningCount += count.toInt
@@ -552,14 +560,16 @@ class StreamingContextSuite
 
     // getOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = false)
+      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
+                                         creatingFunction _,
+                                         createOnError = false)
     }
 
     // getOrCreate should create new context with fake checkpoint file and createOnError = true
     testGetOrCreate {
-      ssc = StreamingContext.getOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = true)
+      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
+                                         creatingFunction _,
+                                         createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
@@ -678,9 +688,9 @@ class StreamingContextSuite
     // getActiveOrCreate should return the current active context if there is one
     testGetActiveOrCreate {
       ssc = new StreamingContext(
-          conf.clone.set("spark.streaming.clock",
-                         "org.apache.spark.util.ManualClock"),
-          batchDuration)
+        conf.clone.set("spark.streaming.clock",
+                       "org.apache.spark.util.ManualClock"),
+        batchDuration)
       addInputStream(ssc).register()
       ssc.start()
       val returnedSsc =
@@ -705,23 +715,25 @@ class StreamingContextSuite
 
     // getActiveOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getActiveOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = false)
+      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
+                                               creatingFunction _,
+                                               createOnError = false)
     }
 
     // getActiveOrCreate should create new context with fake
     // checkpoint file and createOnError = true
     testGetActiveOrCreate {
-      ssc = StreamingContext.getActiveOrCreate(
-          corruptedCheckpointPath, creatingFunction _, createOnError = true)
+      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
+                                               creatingFunction _,
+                                               createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
 
     // getActiveOrCreate should recover context with checkpoint path, and recover old configuration
     testGetActiveOrCreate {
-      ssc = StreamingContext.getActiveOrCreate(checkpointPath,
-                                               creatingFunction _)
+      ssc =
+        StreamingContext.getActiveOrCreate(checkpointPath, creatingFunction _)
       assert(ssc != null, "no context created")
       assert(!newContextCreated, "old context not recovered")
       assert(ssc.conf.get("someKey") === "someValue")
@@ -729,8 +741,9 @@ class StreamingContextSuite
   }
 
   test("multiple streaming contexts") {
-    sc = new SparkContext(conf.clone.set("spark.streaming.clock",
-                                         "org.apache.spark.util.ManualClock"))
+    sc = new SparkContext(
+      conf.clone.set("spark.streaming.clock",
+                     "org.apache.spark.util.ManualClock"))
     ssc = new StreamingContext(sc, Seconds(1))
     val input = addInputStream(ssc)
     input.foreachRDD { rdd =>
@@ -771,8 +784,8 @@ class StreamingContextSuite
       rdd.count
     }
 
-    def testForException(clue: String, expectedErrorMsg: String)(
-        body: => Unit): Unit = {
+    def testForException(clue: String,
+                         expectedErrorMsg: String)(body: => Unit): Unit = {
       withClue(clue) {
         val ex = intercept[IllegalStateException] {
           body
@@ -831,13 +844,14 @@ class StreamingContextSuite
     }
     ssc.stop()
     val e = intercept[SparkException] {
-      ssc = StreamingContext.getOrCreate(checkpointDirectory,
-                                         creatingFunction _)
+      ssc =
+        StreamingContext.getOrCreate(checkpointDirectory, creatingFunction _)
     }
     // StreamingContext.validate changes the message, so use "contains" here
-    assert(e.getCause.getMessage.contains(
-            "queueStream doesn't support checkpointing. " +
-            "Please don't use queueStream when checkpointing is enabled."))
+    assert(
+      e.getCause.getMessage.contains(
+        "queueStream doesn't support checkpointing. " +
+          "Please don't use queueStream when checkpointing is enabled."))
   }
 
   test("Creating an InputDStream but not using it should not crash") {
@@ -865,8 +879,8 @@ class StreamingContextSuite
   def createValidCheckpoint(): String = {
     val testDirectory = Utils.createTempDir().getAbsolutePath()
     val checkpointDirectory = Utils.createTempDir().getAbsolutePath()
-    ssc = new StreamingContext(
-        conf.clone.set("someKey", "someValue"), batchDuration)
+    ssc = new StreamingContext(conf.clone.set("someKey", "someValue"),
+                               batchDuration)
     ssc.checkpoint(checkpointDirectory)
     ssc.textFileStream(testDirectory).foreachRDD { rdd =>
       rdd.count()
@@ -893,7 +907,8 @@ class TestException(msg: String) extends Exception(msg)
 
 /** Custom receiver for testing whether all data received by a receiver gets processed or not */
 class TestReceiver
-    extends Receiver[Int](StorageLevel.MEMORY_ONLY) with Logging {
+    extends Receiver[Int](StorageLevel.MEMORY_ONLY)
+    with Logging {
 
   var receivingThreadOption: Option[Thread] = None
 
@@ -904,7 +919,8 @@ class TestReceiver
         while (!isStopped) {
           store(TestReceiver.counter.getAndIncrement)
         }
-        logInfo("Receiving stopped at count value of " +
+        logInfo(
+          "Receiving stopped at count value of " +
             TestReceiver.counter.get())
       }
     }
@@ -924,7 +940,8 @@ object TestReceiver {
 
 /** Custom receiver for testing whether a slow receiver can be shutdown gracefully or not */
 class SlowTestReceiver(totalRecords: Int, recordsPerSecond: Int)
-    extends Receiver[Int](StorageLevel.MEMORY_ONLY) with Logging {
+    extends Receiver[Int](StorageLevel.MEMORY_ONLY)
+    with Logging {
 
   var receivingThreadOption: Option[Thread] = None
 
@@ -969,7 +986,7 @@ package object testPackage extends Assertions {
       // Verify creation site of DStream
       val creationSite = inputStream.creationSite
       assert(
-          creationSite.shortForm.contains("receiverStream") &&
+        creationSite.shortForm.contains("receiverStream") &&
           creationSite.shortForm.contains("StreamingContextSuite"))
       assert(creationSite.longForm.contains("testPackage"))
 

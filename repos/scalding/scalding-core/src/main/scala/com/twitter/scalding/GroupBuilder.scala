@@ -30,7 +30,8 @@ import scala.{Range => ScalaRange}
   * which includes some map-side reductions.
   */
 class GroupBuilder(val groupFields: Fields)
-    extends FoldOperations[GroupBuilder] with StreamOperations[GroupBuilder] {
+    extends FoldOperations[GroupBuilder]
+    with StreamOperations[GroupBuilder] {
   // We need the implicit conversions from symbols to Fields
   import Dsl._
 
@@ -162,9 +163,9 @@ class GroupBuilder(val groupFields: Fields)
     * Init needs to be serializable with Kryo (because we copy it for each
     * grouping to avoid possible errors using a mutable init object).
     */
-  def foldLeft[X, T](fieldDef: (Fields, Fields))(init: X)(
-      fn: (X, T) => X)(implicit setter: TupleSetter[X],
-                       conv: TupleConverter[T]): GroupBuilder = {
+  def foldLeft[X, T](fieldDef: (Fields, Fields))(init: X)(fn: (X, T) => X)(
+      implicit setter: TupleSetter[X],
+      conv: TupleConverter[T]): GroupBuilder = {
     val (inFields, outFields) = fieldDef
     conv.assertArityMatches(inFields)
     setter.assertArityMatches(outFields)
@@ -187,8 +188,8 @@ class GroupBuilder(val groupFields: Fields)
     * The previous output goes into the reduce function on the left, like foldLeft,
     * so if your operation is faster for the accumulator to be on one side, be aware.
     */
-  def mapReduceMap[T, X, U](fieldDef: (Fields, Fields))(
-      mapfn: T => X)(redfn: (X, X) => X)(mapfn2: X => U)(
+  def mapReduceMap[T, X, U](fieldDef: (Fields, Fields))(mapfn: T => X)(
+      redfn: (X, X) => X)(mapfn2: X => U)(
       implicit startConv: TupleConverter[T],
       middleSetter: TupleSetter[X],
       middleConv: TupleConverter[X],
@@ -203,15 +204,18 @@ class GroupBuilder(val groupFields: Fields)
     endSetter.assertArityMatches(toFields)
     // Update projectFields
     projectFields = projectFields.map { Fields.merge(_, fromFields) }
-    val ag = new MRMAggregator[T, X, U](
-        mapfn, redfn, mapfn2, toFields, startConv, endSetter)
+    val ag = new MRMAggregator[T, X, U](mapfn,
+                                        redfn,
+                                        mapfn2,
+                                        toFields,
+                                        startConv,
+                                        endSetter)
     val ev = (pipe => new Every(pipe, fromFields, ag)): Pipe => Every
     assert(
-        middleSetter.arity > 0,
-        "The middle arity must have definite size, try wrapping in scala.Tuple1 if you need a hack")
+      middleSetter.arity > 0,
+      "The middle arity must have definite size, try wrapping in scala.Tuple1 if you need a hack")
     // Create the required number of middlefields based on the arity of middleSetter
-    val middleFields = strFields(
-        ScalaRange(0, middleSetter.arity).map { i =>
+    val middleFields = strFields(ScalaRange(0, middleSetter.arity).map { i =>
       getNextMiddlefield
     })
     val mrmBy = new MRMBy[T, X, U](fromFields,
@@ -248,15 +252,19 @@ class GroupBuilder(val groupFields: Fields)
     */
   def mapStream[T, X](fieldDef: (Fields, Fields))(
       mapfn: (Iterator[T]) => TraversableOnce[X])(
-      implicit conv: TupleConverter[T], setter: TupleSetter[X]) = {
+      implicit conv: TupleConverter[T],
+      setter: TupleSetter[X]) = {
     val (inFields, outFields) = fieldDef
     //Check arity
     conv.assertArityMatches(inFields)
     setter.assertArityMatches(outFields)
-    val b = new BufferOp[Unit, T, X](
-        (), (u: Unit, it: Iterator[T]) => mapfn(it), outFields, conv, setter)
+    val b = new BufferOp[Unit, T, X]((),
+                                     (u: Unit, it: Iterator[T]) => mapfn(it),
+                                     outFields,
+                                     conv,
+                                     setter)
     every(
-        pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
+      pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }
 
   def reverse: GroupBuilder = {
@@ -288,15 +296,15 @@ class GroupBuilder(val groupFields: Fields)
     conv.assertArityMatches(inFields)
     setter.assertArityMatches(outFields)
     val b = new BufferOp[X, T, X](
-        init,
-        // On scala 2.8, there is no scanLeft
-        // On scala 2.9, their implementation creates an off-by-one bug with the unused fields
-        (i: X, it: Iterator[T]) => new ScanLeftIterator(it, i, fn),
-        outFields,
-        conv,
-        setter)
+      init,
+      // On scala 2.8, there is no scanLeft
+      // On scala 2.9, their implementation creates an off-by-one bug with the unused fields
+      (i: X, it: Iterator[T]) => new ScanLeftIterator(it, i, fn),
+      outFields,
+      conv,
+      setter)
     every(
-        pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
+      pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }
 
   def groupMode: GroupMode =
@@ -310,7 +318,7 @@ class GroupBuilder(val groupFields: Fields)
         AggregateByMode // use map-side aggregation
       case _ =>
         sys.error(
-            "Invalid GroupBuilder state: %s, %s, %s".format(reds, evs, sortF))
+          "Invalid GroupBuilder state: %s, %s, %s".format(reds, evs, sortF))
     }
 
   protected def groupedPipeOf(name: String, in: Pipe): GroupBy = {
@@ -343,11 +351,12 @@ class GroupBuilder(val groupFields: Fields)
         //There is some non-empty AggregateBy to do:
         val redlist = reds.get
         val ag = new AggregateBy(
-            name,
-            maybeProjectedPipe,
-            groupFields,
-            spillThreshold.getOrElse(0), // cascading considers 0 to be the default
-            redlist.reverse.toArray: _*)
+          name,
+          maybeProjectedPipe,
+          groupFields,
+          spillThreshold
+            .getOrElse(0), // cascading considers 0 to be the default
+          redlist.reverse.toArray: _*)
 
         overrideReducers(ag.getGroupBy())
         overrideDescription(ag.getGroupBy())
@@ -363,9 +372,9 @@ class GroupBuilder(val groupFields: Fields)
     val sort = sortF match {
       case None => f
       case Some(sf) => {
-          sf.append(f)
-          sf
-        }
+        sf.append(f)
+        sf
+      }
     }
     sortF = Some(sort)
     // Update projectFields
@@ -398,25 +407,25 @@ class GroupBuilder(val groupFields: Fields)
       */
     def mapStream[T, X](fieldDef: (Fields, Fields))(
         mapfn: (C, Iterator[T]) => TraversableOnce[X])(
-        implicit conv: TupleConverter[T], setter: TupleSetter[X]) = {
+        implicit conv: TupleConverter[T],
+        setter: TupleSetter[X]) = {
       val (inFields, outFields) = fieldDef
       //Check arity
       conv.assertArityMatches(inFields)
       setter.assertArityMatches(outFields)
 
       val b = new SideEffectBufferOp[Unit, T, C, X](
-          (),
-          bf,
-          (u: Unit, c: C, it: Iterator[T]) => mapfn(c, it),
-          new Function1[C, Unit] with java.io.Serializable {
-            def apply(c: C) { c.release() }
-          },
-          outFields,
-          conv,
-          setter)
+        (),
+        bf,
+        (u: Unit, c: C, it: Iterator[T]) => mapfn(c, it),
+        new Function1[C, Unit] with java.io.Serializable {
+          def apply(c: C) { c.release() }
+        },
+        outFields,
+        conv,
+        setter)
       every(
-          pipe =>
-            new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
+        pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
     }
   }
 }
@@ -426,7 +435,8 @@ class GroupBuilder(val groupFields: Fields)
   * The Scala 2.9 implementation creates an off-by-one bug with the unused fields in the Fields API
   */
 class ScanLeftIterator[T, U](it: Iterator[T], init: U, fn: (U, T) => U)
-    extends Iterator[U] with java.io.Serializable {
+    extends Iterator[U]
+    with java.io.Serializable {
   protected var prev: Option[U] = None
   def hasNext: Boolean = { prev.isEmpty || it.hasNext }
   // Don't use pattern matching in a performance-critical section

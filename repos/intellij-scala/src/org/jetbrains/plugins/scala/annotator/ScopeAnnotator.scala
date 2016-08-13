@@ -4,12 +4,26 @@ package annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScForStatement, ScGenerator}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr,
+  ScForStatement,
+  ScGenerator
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 import scala.collection.mutable.ArrayBuffer
@@ -25,20 +39,20 @@ trait ScopeAnnotator {
     if (!element.isScope) return
     def checkScope(elements: PsiElement*) {
       val (types, terms, parameters, caseClasses, objects) = definitionsIn(
-          elements: _*)
+        elements: _*)
 
       val jointTerms = terms ::: parameters
 
       val complexClashes =
         clashesOf(jointTerms ::: objects) ::: clashesOf(types ::: caseClasses) ::: clashesOf(
-            jointTerms ::: caseClasses)
+          jointTerms ::: caseClasses)
 
       val clashes = (complexClashes.distinct diff clashesOf(parameters))
 
       clashes.foreach { e =>
         holder.createErrorAnnotation(
-            e.getNameIdentifier,
-            ScalaBundle.message("id.is.already.defined", nameOf(e)))
+          e.getNameIdentifier,
+          ScalaBundle.message("id.is.already.defined", nameOf(e)))
       }
     }
     element match {

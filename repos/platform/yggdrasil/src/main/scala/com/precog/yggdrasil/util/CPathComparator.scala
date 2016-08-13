@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -69,7 +69,8 @@ object CPathComparator {
 
   def apply[@spec(Boolean, Long, Double, AnyRef) A,
             @spec(Boolean, Long, Double, AnyRef) B](
-      lCol: Int => A, rCol: Int => B)(implicit order: HetOrder[A, B]) = {
+      lCol: Int => A,
+      rCol: Int => B)(implicit order: HetOrder[A, B]) = {
     new CPathComparator {
       def compare(r1: Int, r2: Int, i: Array[Int]) =
         MaybeOrdering.fromInt(order.compare(lCol(r1), rCol(r2)))
@@ -141,8 +142,10 @@ object CPathComparator {
       case (CNum, CDouble) =>
         new ArrayCPathComparator[BigDecimal, Double](lPath, lCol, rPath, rCol)
       case (CNum, CNum) =>
-        new ArrayCPathComparator[BigDecimal, BigDecimal](
-            lPath, lCol, rPath, rCol)
+        new ArrayCPathComparator[BigDecimal, BigDecimal](lPath,
+                                                         lCol,
+                                                         rPath,
+                                                         rCol)
       case (CBoolean, CBoolean) =>
         new ArrayCPathComparator[Boolean, Boolean](lPath, lCol, rPath, rCol)
       case (CString, CString) =>
@@ -151,7 +154,7 @@ object CPathComparator {
         new ArrayCPathComparator[DateTime, DateTime](lPath, lCol, rPath, rCol)
       case (tpe1, tpe2) =>
         val ordering = MaybeOrdering.fromInt(
-            implicitly[scalaz.Order[CType]].apply(lCol.tpe, rCol.tpe).toInt)
+          implicitly[scalaz.Order[CType]].apply(lCol.tpe, rCol.tpe).toInt)
         new CPathComparator with ArrayCPathComparatorSupport {
           val lMask = makeMask(lPath)
           val rMask = makeMask(rPath)
@@ -197,8 +200,9 @@ object CPathComparator {
       case (CNum, rCol: DoubleColumn) =>
         new HalfArrayCPathComparator[BigDecimal, Double](lPath, lCol, rCol(_))
       case (CNum, rCol: NumColumn) =>
-        new HalfArrayCPathComparator[BigDecimal, BigDecimal](
-            lPath, lCol, rCol(_))
+        new HalfArrayCPathComparator[BigDecimal, BigDecimal](lPath,
+                                                             lCol,
+                                                             rCol(_))
       case (CBoolean, rCol: BoolColumn) =>
         new HalfArrayCPathComparator[Boolean, Boolean](lPath, lCol, rCol(_))
       case (CString, rCol: StrColumn) =>
@@ -207,7 +211,7 @@ object CPathComparator {
         new HalfArrayCPathComparator[DateTime, DateTime](lPath, lCol, rCol(_))
       case (tpe1, _) =>
         val ordering = MaybeOrdering.fromInt(
-            implicitly[scalaz.Order[CType]].apply(tpe1, rCol.tpe).toInt)
+          implicitly[scalaz.Order[CType]].apply(tpe1, rCol.tpe).toInt)
         new CPathComparator with ArrayCPathComparatorSupport {
           val mask = makeMask(lPath)
           val selector = new ArraySelector()(tpe1.manifest)
@@ -243,11 +247,17 @@ private[yggdrasil] trait ArrayCPathComparatorSupport {
   * A non-boxing CPathComparator where the left-side is a homogeneous array and
   * the right side is not.
   */
-private[yggdrasil] final class HalfArrayCPathComparator[
-    @spec(Boolean, Long, Double) A, @spec(Boolean, Long, Double) B](
-    lPath: CPath, lCol: HomogeneousArrayColumn[_], rCol: Int => B)(
-    implicit ma: Manifest[A], ho: HetOrder[A, B])
-    extends CPathComparator with ArrayCPathComparatorSupport {
+private[yggdrasil] final class HalfArrayCPathComparator[@spec(Boolean,
+                                                              Long,
+                                                              Double) A,
+                                                        @spec(Boolean,
+                                                              Long,
+                                                              Double) B](
+    lPath: CPath,
+    lCol: HomogeneousArrayColumn[_],
+    rCol: Int => B)(implicit ma: Manifest[A], ho: HetOrder[A, B])
+    extends CPathComparator
+    with ArrayCPathComparatorSupport {
 
   final lazy val lMask: Array[Boolean] = makeMask(lPath)
 
@@ -273,14 +283,20 @@ private[yggdrasil] final class HalfArrayCPathComparator[
 /**
   * A non-boxing CPathComparator for homogeneous arrays.
   */
-private[yggdrasil] final class ArrayCPathComparator[
-    @spec(Boolean, Long, Double) A, @spec(Boolean, Long, Double) B](
+private[yggdrasil] final class ArrayCPathComparator[@spec(Boolean,
+                                                          Long,
+                                                          Double) A,
+                                                    @spec(Boolean,
+                                                          Long,
+                                                          Double) B](
     lPath: CPath,
     lCol: HomogeneousArrayColumn[_],
     rPath: CPath,
-    rCol: HomogeneousArrayColumn[_])(
-    implicit ma: Manifest[A], mb: Manifest[B], ho: HetOrder[A, B])
-    extends CPathComparator with ArrayCPathComparatorSupport {
+    rCol: HomogeneousArrayColumn[_])(implicit ma: Manifest[A],
+                                     mb: Manifest[B],
+                                     ho: HetOrder[A, B])
+    extends CPathComparator
+    with ArrayCPathComparatorSupport {
 
   // FIXME: These are lazy to get around a bug in @spec. We can probably remove
   // this in 2.10.
@@ -325,8 +341,9 @@ private[yggdrasil] final class ArraySelector[@spec(Boolean, Long, Double) A](
     implicit m: Manifest[A]) {
   private val am = m.arrayManifest
 
-  def canPluck(
-      a: Array[_], indices: Array[Int], mask: Array[Boolean]): Boolean = {
+  def canPluck(a: Array[_],
+               indices: Array[Int],
+               mask: Array[Boolean]): Boolean = {
     var arr: Array[_] = a
     var i = 0
     while (i < mask.length) {

@@ -74,8 +74,9 @@ private[summingbird] object MemoryStatProvider extends PlatformStatProvider {
                          name: Name): Option[MemoryCounterIncrementor] =
     Option(countersForJob.get(jobID)).map { m =>
       MemoryCounterIncrementor(m.getOrElse(
-              group.getString + "/" + name.getString,
-              sys.error("It is only valid to create counter objects during job submission")))
+        group.getString + "/" + name.getString,
+        sys.error(
+          "It is only valid to create counter objects during job submission")))
     }
 
   /**

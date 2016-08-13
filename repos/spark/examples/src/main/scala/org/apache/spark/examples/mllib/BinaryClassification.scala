@@ -22,7 +22,10 @@ import org.apache.log4j.{Level, Logger}
 import scopt.OptionParser
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.classification.{LogisticRegressionWithLBFGS, SVMWithSGD}
+import org.apache.spark.mllib.classification.{
+  LogisticRegressionWithLBFGS,
+  SVMWithSGD
+}
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.optimization.{L1Updater, SquaredL2Updater}
 import org.apache.spark.mllib.util.MLUtils
@@ -68,15 +71,15 @@ object BinaryClassification {
         .action((x, c) => c.copy(numIterations = x))
       opt[Double]("stepSize")
         .text("initial step size (ignored by logistic regression), " +
-            s"default: ${defaultParams.stepSize}")
+          s"default: ${defaultParams.stepSize}")
         .action((x, c) => c.copy(stepSize = x))
       opt[String]("algorithm")
         .text(s"algorithm (${Algorithm.values.mkString(",")}), " +
-            s"default: ${defaultParams.algorithm}")
+          s"default: ${defaultParams.algorithm}")
         .action((x, c) => c.copy(algorithm = Algorithm.withName(x)))
       opt[String]("regType")
         .text(s"regularization type (${RegType.values.mkString(",")}), " +
-            s"default: ${defaultParams.regType}")
+          s"default: ${defaultParams.regType}")
         .action((x, c) => c.copy(regType = RegType.withName(x)))
       opt[Double]("regParam")
         .text(s"regularization parameter, default: ${defaultParams.regParam}")
@@ -84,7 +87,8 @@ object BinaryClassification {
         .required()
         .text("input paths to labeled examples in LIBSVM format")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+        """
           |For example, the following command runs this app on a synthetic dataset:
           |
           | bin/spark-submit --class org.apache.spark.examples.mllib.BinaryClassification \

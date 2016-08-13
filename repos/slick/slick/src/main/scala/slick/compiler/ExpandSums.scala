@@ -30,11 +30,11 @@ class ExpandSums extends Phase {
            oldDiscCandidates: Set[(TypeSymbol, List[TermSymbol])]): Node = {
       val discCandidates =
         oldDiscCandidates ++
-        (tree match {
-              case Filter(_, _, p) => collectDiscriminatorCandidates(p)
-              case Bind(_, j: Join, _) => collectDiscriminatorCandidates(j.on)
-              case _ => Set.empty
-            })
+          (tree match {
+            case Filter(_, _, p) => collectDiscriminatorCandidates(p)
+            case Bind(_, j: Join, _) => collectDiscriminatorCandidates(j.on)
+            case _ => Set.empty
+          })
       val tree2 = tree.mapChildren(tr(_, discCandidates), keepType = true)
       val tree3 = tree2 match {
         // Expand multi-column null values in ELSE branches (used by Rep[Option].filter) with correct type
@@ -47,17 +47,18 @@ class ExpandSums extends Phase {
           IfThenElse(ConstArray(pred, then1, buildMultiColumnNone(tpe))) :@ tpe
 
         // Identity OptionFold/OptionApply combination -> remove
-        case OptionFold(
-            from,
-            LiteralNode(None) :@ OptionType(ScalaBaseType.nullType),
-            oa @ OptionApply(Ref(s)),
-            gen) if s == gen =>
+        case OptionFold(from,
+                        LiteralNode(None) :@ OptionType(
+                        ScalaBaseType.nullType),
+                        oa @ OptionApply(Ref(s)),
+                        gen) if s == gen =>
           silentCast(oa.nodeType, from)
 
         // Primitive OptionFold representing GetOrElse -> translate to GetOrElse
-        case OptionFold(
-            from :@ OptionType.Primitive(_), LiteralNode(v), Ref(s), gen)
-            if s == gen =>
+        case OptionFold(from :@ OptionType.Primitive(_),
+                        LiteralNode(v),
+                        Ref(s),
+                        gen) if s == gen =>
           GetOrElse(from, () => v).infer()
 
         // Primitive OptionFold -> translate to null check
@@ -94,8 +95,9 @@ class ExpandSums extends Phase {
               if (left == Disc1) ifDefined
               else
                 IfThenElse(
-                    ConstArray(
-                        Library.Not.typed[Boolean](pred), ifDefined, ifEmpty2))
+                  ConstArray(Library.Not.typed[Boolean](pred),
+                             ifDefined,
+                             ifEmpty2))
           }
           n2.infer()
 
@@ -106,7 +108,7 @@ class ExpandSums extends Phase {
         case n @ OptionApply(ch) =>
           multi = true
           ProductNode(
-              ConstArray(Disc1, silentCast(toOptionColumns(ch.nodeType), ch)))
+            ConstArray(Disc1, silentCast(toOptionColumns(ch.nodeType), ch)))
             .infer()
 
         // Non-primitive GetOrElse
@@ -116,13 +118,13 @@ class ExpandSums extends Phase {
             case OptionType.Primitive(_) => g
             case _ =>
               throw new SlickException(
-                  ".get may only be called on Options of top-level primitive types")
+                ".get may only be called on Options of top-level primitive types")
           }
 
         // Option-extended left outer, right outer or full outer join
         case bind @ Bind(bsym, Join(_, _, _, _, jt, _), _)
             if jt == JoinType.LeftOption || jt == JoinType.RightOption ||
-            jt == JoinType.OuterOption =>
+              jt == JoinType.OuterOption =>
           multi = true
           translateJoin(bind, discCandidates)
 
@@ -151,8 +153,8 @@ class ExpandSums extends Phase {
              pure) = bind
     val lComplex = !leftElemType.structural.isInstanceOf[AtomicType]
     val rComplex = !rightElemType.structural.isInstanceOf[AtomicType]
-    logger.debug(
-        s"Translating join ($jt, complex: $lComplex, $rComplex):", bind)
+    logger
+      .debug(s"Translating join ($jt, complex: $lComplex, $rComplex):", bind)
 
     // Find an existing column that can serve as a discriminator
     def findDisc(t: Type): Option[List[TermSymbol]] = {
@@ -162,7 +164,7 @@ class ExpandSums extends Phase {
             case (t, ss) => t == ts && ss.nonEmpty
           }.map(_._2)
           logger.debug(
-              "Discriminator candidates from surrounding Filter and Join predicates: " +
+            "Discriminator candidates from surrounding Filter and Join predicates: " +
               c.map(Path.toString).mkString(", "))
           c
         case _ => Set.empty
@@ -171,7 +173,7 @@ class ExpandSums extends Phase {
         t.structural match {
           case StructType(defs) =>
             defs.toSeq.flatMap { case (s, t) => find(t, s :: path) }(
-                collection.breakOut)
+              collection.breakOut)
           case p: ProductType =>
             p.elements.iterator.zipWithIndex.flatMap {
               case (t, i) => find(t, ElementSymbol(i + 1) :: path)
@@ -181,14 +183,14 @@ class ExpandSums extends Phase {
         }
       val local = find(t, Nil).sortBy { ss =>
         (if (global contains ss) 3 else 1) *
-        (ss.head match {
-              case f: FieldSymbol =>
-                if (f.options contains ColumnOption.PrimaryKey) -2 else -1
-              case _ => 0
-            })
+          (ss.head match {
+            case f: FieldSymbol =>
+              if (f.options contains ColumnOption.PrimaryKey) -2 else -1
+            case _ => 0
+          })
       }
       logger.debug(
-          "Local candidates: " + local.map(Path.toString).mkString(", "))
+        "Local candidates: " + local.map(Path.toString).mkString(", "))
       local.headOption
     }
 
@@ -198,16 +200,18 @@ class ExpandSums extends Phase {
       val elemType = side.nodeType.asCollectionType.elementType
       val (disc, createDisc) = findDisc(elemType) match {
         case Some(path) =>
-          logger.debug("Using existing column " + Path(path) +
+          logger.debug(
+            "Using existing column " + Path(path) +
               " as discriminator in " + elemType)
           (FwdPath(extendGen :: path.reverse), true)
         case None =>
           logger.debug("No suitable discriminator column found in " + elemType)
           (Disc1, false)
       }
-      val extend :@ CollectionType(_, extendedElementType) = Bind(
-          extendGen, side, Pure(ProductNode(ConstArray(disc, Ref(extendGen)))))
-        .infer()
+      val extend :@ CollectionType(_, extendedElementType) =
+        Bind(extendGen,
+             side,
+             Pure(ProductNode(ConstArray(disc, Ref(extendGen))))).infer()
       val sideInCondition =
         Select(Ref(sym) :@ extendedElementType, ElementSymbol(2)).infer()
       val on2 = on
@@ -215,7 +219,7 @@ class ExpandSums extends Phase {
           case Ref(s) if s == sym => sideInCondition
         }, bottomUp = true)
         .infer()
-        (extend, on2, createDisc)
+      (extend, on2, createDisc)
     }
 
     // Translate the join depending on JoinType and Option type
@@ -246,18 +250,17 @@ class ExpandSums extends Phase {
           val protoDisc = Select(ref, ElementSymbol(1)).infer()
           val rest = Select(ref, ElementSymbol(2))
           val disc = IfThenElse(
-              ConstArray(
-                  Library.==.typed[Boolean](
-                      silentCast(OptionType(protoDisc.nodeType), protoDisc),
-                      LiteralNode(null)),
-                  DiscNone,
-                  Disc1))
+            ConstArray(Library.==.typed[Boolean](
+                         silentCast(OptionType(protoDisc.nodeType), protoDisc),
+                         LiteralNode(null)),
+                       DiscNone,
+                       Disc1))
           ProductNode(ConstArray(disc, rest))
         } else ref
       silentCast(trType(elemType.asInstanceOf[ProductType].children(idx)), v)
     }
     val ref = ProductNode(
-        ConstArray(optionCast(0, ldisc), optionCast(1, rdisc))).infer()
+      ConstArray(optionCast(0, ldisc), optionCast(1, rdisc))).infer()
     val pure2 = pure.replace({
       case Ref(s) if s == bsym => ref
 
@@ -292,7 +295,7 @@ class ExpandSums extends Phase {
       case OptionType(ch) => LiteralNode(tpe, None)
       case t =>
         throw new SlickException(
-            "Unexpected non-Option type in multi-column None")
+          "Unexpected non-Option type in multi-column None")
     }) :@ tpe
 
   /** Perform the sum expansion on a Type */
@@ -300,8 +303,9 @@ class ExpandSums extends Phase {
     def f(tpe: Type): Type = tpe.mapChildren(f) match {
       case t @ OptionType.Primitive(_) => t
       case OptionType(ch) =>
-        ProductType(ConstArray(
-                ScalaBaseType.optionDiscType.optionType, toOptionColumns(ch)))
+        ProductType(
+          ConstArray(ScalaBaseType.optionDiscType.optionType,
+                     toOptionColumns(ch)))
       case t => t
     }
     val tpe2 = f(tpe)
@@ -363,9 +367,10 @@ class ExpandSums extends Phase {
         invalidate(ch)
         val elems = typeCh.zipWithIndex.map {
           case (t, idx) =>
-            tr(Library.SilentCast
-                  .typed(t, ch.select(ElementSymbol(idx + 1)))
-                  .infer())
+            tr(
+              Library.SilentCast
+                .typed(t, ch.select(ElementSymbol(idx + 1)))
+                .infer())
         }
         ProductNode(elems).infer()
       case Library.SilentCast(ch) :@ Type.Structural(StructType(typeCh)) =>

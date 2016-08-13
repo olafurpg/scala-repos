@@ -41,13 +41,16 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ChartSpec
-    extends SimpleSFXDelegateSpec[jfxsc.Chart, Chart](
-        classOf[jfxsc.Chart], classOf[Chart]) with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.Chart, Chart](classOf[jfxsc.Chart],
+                                                      classOf[Chart])
+    with RunOnApplicationThread {
 
   override def getScalaClassInstance = new Chart(getJavaClassInstance) {}
 
   override def getJavaClassInstance = new jfxsc.Chart {
-    def layoutChartChildren(
-        top: Double, left: Double, width: Double, height: Double) {}
+    def layoutChartChildren(top: Double,
+                            left: Double,
+                            width: Double,
+                            height: Double) {}
   }
 }

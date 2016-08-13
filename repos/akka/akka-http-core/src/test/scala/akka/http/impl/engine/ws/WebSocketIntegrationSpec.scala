@@ -38,17 +38,16 @@ class WebSocketIntegrationSpec
           val upgrade =
             headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
           upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
-              None)
+            Flow.fromSinkAndSource(Sink.ignore, Source.fromPublisher(source)),
+            None)
       }, interface = "localhost", port = 0)
       val binding = Await.result(bindingFuture, 3.seconds)
       val myPort = binding.localAddress.getPort
 
       val (response, sink) = Http().singleWebSocketRequest(
-          WebSocketRequest("ws://127.0.0.1:" + myPort),
-          Flow.fromSinkAndSourceMat(TestSink.probe[Message], Source.empty)(
-              Keep.left))
+        WebSocketRequest("ws://127.0.0.1:" + myPort),
+        Flow.fromSinkAndSourceMat(TestSink.probe[Message], Source.empty)(
+          Keep.left))
 
       response.futureValue.response.status.isSuccess should ===(true)
       sink.request(10).expectNoMsg(500.millis)
@@ -66,9 +65,8 @@ class WebSocketIntegrationSpec
           val upgrade =
             headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
           upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
-              None)
+            Flow.fromSinkAndSource(Sink.ignore, Source.fromPublisher(source)),
+            None)
       }, interface = "localhost", port = 0)
       val binding = Await.result(bindingFuture, 3.seconds)
       val myPort = binding.localAddress.getPort
@@ -77,11 +75,12 @@ class WebSocketIntegrationSpec
         Http()
           .webSocketClientLayer(WebSocketRequest("ws://localhost:" + myPort))
           .atop(TLSPlacebo())
-          .joinMat(Flow
-                .fromGraph(GraphStages.breaker[ByteString])
-                .via(Tcp().outgoingConnection(
-                        new InetSocketAddress("localhost", myPort),
-                        halfClose = true)))(Keep.both)
+          .joinMat(
+            Flow
+              .fromGraph(GraphStages.breaker[ByteString])
+              .via(Tcp().outgoingConnection(new InetSocketAddress("localhost",
+                                                                  myPort),
+                                            halfClose = true)))(Keep.both)
       }(Keep.right).toMat(TestSink.probe[Message])(Keep.both).run()
 
       response.futureValue.response.status.isSuccess should ===(true)
@@ -108,14 +107,14 @@ class WebSocketIntegrationSpec
 
       val N = 100
 
-      EventFilter.warning(
-          pattern = "HTTP header .* is not allowed in responses",
-          occurrences = 0) intercept {
+      EventFilter.warning(pattern =
+                            "HTTP header .* is not allowed in responses",
+                          occurrences = 0) intercept {
         val (response, count) = Http().singleWebSocketRequest(
-            WebSocketRequest("ws://127.0.0.1:" + myPort),
-            Flow.fromSinkAndSourceMat(
-                Sink.fold(0)((n, _: Message) ⇒ n + 1),
-                Source.repeat(TextMessage("hello")).take(N))(Keep.left))
+          WebSocketRequest("ws://127.0.0.1:" + myPort),
+          Flow.fromSinkAndSourceMat(
+            Sink.fold(0)((n, _: Message) ⇒ n + 1),
+            Source.repeat(TextMessage("hello")).take(N))(Keep.left))
         count.futureValue should ===(N)
       }
 
@@ -125,8 +124,7 @@ class WebSocketIntegrationSpec
     "send back 100 elements and then terminate without error even when not ordinarily closed" in Utils.assertAllStagesStopped {
       val N = 100
 
-      val handler = Flow.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      val handler = Flow.fromGraph(GraphDSL.create() { implicit b ⇒
         val merge = b.add(Merge[Int](2))
 
         // convert to int so we can connect to merge

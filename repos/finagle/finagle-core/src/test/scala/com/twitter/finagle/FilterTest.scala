@@ -33,7 +33,7 @@ class FilterTest extends FunSuite {
   }
 
   test(
-      "Filter.andThen(Filter): lifts synchronous exceptions into Future.exception") {
+    "Filter.andThen(Filter): lifts synchronous exceptions into Future.exception") {
     val fail = Filter.mk[Int, Int, Int, Int] { (_, _) =>
       throw new Exception
     }
@@ -50,7 +50,7 @@ class FilterTest extends FunSuite {
   }
 
   test(
-      "Filter.andThen(Service): lifts synchronous exceptions into Future.exception") {
+    "Filter.andThen(Service): lifts synchronous exceptions into Future.exception") {
     val svc = (new PassThruFilter).andThen(NilService)
     val result = Await.result(svc(4).liftToTry)
     assert(result.isThrow)
@@ -100,7 +100,7 @@ class FilterTest extends FunSuite {
   }
 
   test(
-      "Filter.TypeAgnostic.toFilter distributes over Filter.TypeAgnostic.andThen") {
+    "Filter.TypeAgnostic.toFilter distributes over Filter.TypeAgnostic.andThen") {
     val calls = List.newBuilder[(Any, Any)]
     class TestFilter extends Filter.TypeAgnostic {
       def toFilter[Req, Rep] =

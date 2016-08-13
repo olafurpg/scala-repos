@@ -12,13 +12,13 @@ class RequestBuilderTest extends FunSuite {
   val URL0 = new URL("http://joe:blow@www.google.com:77/xxx?foo=bar#xxx")
   val URL1 = new URL("https://www.google.com/")
   val URL2 = new URL(
-      "http://joe%40host.com:blow@www.google.com:77/xxx?foo=bar#xxx")
+    "http://joe%40host.com:blow@www.google.com:77/xxx?foo=bar#xxx")
 
   val BODY0 = Buf.Utf8("blah")
   val FORM0 = Seq(
-      "k1" -> "v1",
-      "k2" -> "v2",
-      "k3" -> "v3"
+    "k1" -> "v1",
+    "k2" -> "v2",
+    "k3" -> "v3"
   )
 
   val MULTIPART0 = """--Boundary

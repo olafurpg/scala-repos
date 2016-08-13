@@ -189,8 +189,8 @@ object GridPane {
                      rowIndex: Int,
                      columnspan: Int,
                      rowspan: Int) {
-    jfxsl.GridPane.setConstraints(
-        child, columnIndex, rowIndex, columnspan, rowspan)
+    jfxsl.GridPane
+      .setConstraints(child, columnIndex, rowIndex, columnspan, rowspan)
   }
 
   /**
@@ -266,7 +266,8 @@ object GridPane {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/GridPane.html]]
   */
 class GridPane(override val delegate: jfxsl.GridPane = new jfxsl.GridPane)
-    extends Pane(delegate) with AlignmentDelegate[jfxsl.GridPane]
+    extends Pane(delegate)
+    with AlignmentDelegate[jfxsl.GridPane]
     with SFXDelegate[jfxsl.GridPane] {
 
   /**

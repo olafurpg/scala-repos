@@ -11,8 +11,8 @@ class LibraryTest extends FunSuite {
     GlobalRegistry.withRegistry(simple) {
       assert(Library.register("foo", Map("bar" -> "baz")).isDefined)
       val expected = Set(
-          Entry(Seq("library", "foo"), Library.Registered),
-          Entry(Seq("library", "foo", "bar"), "baz")
+        Entry(Seq("library", "foo"), Library.Registered),
+        Entry(Seq("library", "foo", "bar"), "baz")
       )
       assert(GlobalRegistry.get.toSet == expected)
     }
@@ -25,8 +25,8 @@ class LibraryTest extends FunSuite {
       assert(!Library.register("foo", Map("qux" -> "quux")).isDefined)
 
       val expected = Set(
-          Entry(Seq("library", "foo"), Library.Registered),
-          Entry(Seq("library", "foo", "bar"), "baz")
+        Entry(Seq("library", "foo"), Library.Registered),
+        Entry(Seq("library", "foo", "bar"), "baz")
       )
       assert(GlobalRegistry.get.toSet == expected)
     }
@@ -38,8 +38,8 @@ class LibraryTest extends FunSuite {
       val maybeRoster = Library.register("foo", Map("bar" -> "baz"))
 
       val old = Set(
-          Entry(Seq("library", "foo"), Library.Registered),
-          Entry(Seq("library", "foo", "bar"), "baz")
+        Entry(Seq("library", "foo"), Library.Registered),
+        Entry(Seq("library", "foo", "bar"), "baz")
       )
       assert(GlobalRegistry.get.toSet == old)
 
@@ -50,8 +50,8 @@ class LibraryTest extends FunSuite {
       // good update
       assert(roster("bar") = "qux")
       val fresh = Set(
-          Entry(Seq("library", "foo"), Library.Registered),
-          Entry(Seq("library", "foo", "bar"), "qux")
+        Entry(Seq("library", "foo"), Library.Registered),
+        Entry(Seq("library", "foo", "bar"), "qux")
       )
       assert(GlobalRegistry.get.toSet == fresh)
 

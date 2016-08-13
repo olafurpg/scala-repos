@@ -112,35 +112,35 @@ object MultipleShapeDrawingDemo extends JFXApp {
         top = new ToolBar {
           val alignToggleGroup = new ToggleGroup()
           content = List(
-              new ToggleButton {
-                id = "rectangle"
-                graphic = new Rectangle {
-                  fill = Color.web("RED", 0.5)
-                  width = 32
-                  height = 32
-                }
-                toggleGroup = alignToggleGroup
-              },
-              new ToggleButton {
-                id = "ellipse"
-                graphic = new Circle {
-                  fill = Color.web("GREEN", 0.5)
-                  radius = 16
-                }
-                toggleGroup = alignToggleGroup
-              },
-              new ToggleButton {
-                id = "line"
-                graphic = new Line {
-                  stroke = Color.web("BLUE", 0.5)
-                  startX = 0
-                  startY = 0
-                  endX = 28
-                  endY = 28
-                  strokeWidth = 3
-                }
-                toggleGroup = alignToggleGroup
+            new ToggleButton {
+              id = "rectangle"
+              graphic = new Rectangle {
+                fill = Color.web("RED", 0.5)
+                width = 32
+                height = 32
               }
+              toggleGroup = alignToggleGroup
+            },
+            new ToggleButton {
+              id = "ellipse"
+              graphic = new Circle {
+                fill = Color.web("GREEN", 0.5)
+                radius = 16
+              }
+              toggleGroup = alignToggleGroup
+            },
+            new ToggleButton {
+              id = "line"
+              graphic = new Line {
+                stroke = Color.web("BLUE", 0.5)
+                startX = 0
+                startY = 0
+                endX = 28
+                endY = 28
+                strokeWidth = 3
+              }
+              toggleGroup = alignToggleGroup
+            }
           )
 
           // Subscription to the current mouse event handler

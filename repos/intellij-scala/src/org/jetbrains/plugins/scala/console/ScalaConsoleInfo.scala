@@ -13,9 +13,10 @@ import com.intellij.util.containers.WeakHashMap
   */
 object ScalaConsoleInfo {
   private val NULL = (null, null, null)
-  private val allConsoles = new WeakHashMap[
-      Project,
-      List[(ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)]]()
+  private val allConsoles = new WeakHashMap[Project,
+                                            List[(ScalaLanguageConsole,
+                                                  ConsoleHistoryController,
+                                                  ProcessHandler)]]()
 
   def getConsole(file: PsiFile): ScalaLanguageConsole = get(file)._1
   def getConsole(project: Project): ScalaLanguageConsole = get(project)._1
@@ -34,8 +35,8 @@ object ScalaConsoleInfo {
       allConsoles.get(project) match {
         case null =>
           allConsoles.put(project, (console, model, processHandler) :: Nil)
-        case list: List[
-                (ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)] =>
+        case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
+            ProcessHandler)] =>
           allConsoles.put(project, (console, model, processHandler) :: list)
       }
     }
@@ -46,8 +47,8 @@ object ScalaConsoleInfo {
     synchronized {
       allConsoles.get(project) match {
         case null =>
-        case list: List[
-                (ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)] =>
+        case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
+            ProcessHandler)] =>
           allConsoles.put(project, list.filter {
             case (sConsole, _, _) => sConsole != console
           })

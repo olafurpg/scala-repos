@@ -22,10 +22,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
   def train(data: PreparedData): ALSModel = {
     // Convert user and item String IDs to Int index for MLlib
-    val mllibRatings = data.ratings.map(r =>
-          // MLlibRating requires integer index for user and item
-          MLlibRating(
-              data.users(r.user).toInt, data.items(r.item).toInt, r.rating))
+    val mllibRatings = data.ratings.map(
+      r =>
+        // MLlibRating requires integer index for user and item
+        MLlibRating(data.users(r.user).toInt,
+                    data.items(r.item).toInt,
+                    r.rating))
     val m = ALS.train(mllibRatings, ap.rank, ap.numIterations, ap.lambda)
     new ALSModel(rank = m.rank,
                  userFeatures = m.userFeatures,

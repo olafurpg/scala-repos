@@ -6,8 +6,8 @@ object Impls {
     val plusOne = Apply(Select(evidence.tree, TermName("plus")),
                         List(x.tree, Literal(Constant(1))))
     val body = Apply(
-        Select(Ident(definitions.PredefModule), TermName("println")),
-        List(plusOne))
+      Select(Ident(definitions.PredefModule), TermName("println")),
+      List(plusOne))
     Expr[Unit](body)
   }
 }

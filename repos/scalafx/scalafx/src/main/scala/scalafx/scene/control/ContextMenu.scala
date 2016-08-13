@@ -45,7 +45,8 @@ object ContextMenu {
   */
 class ContextMenu(
     override val delegate: jfxsc.ContextMenu = new jfxsc.ContextMenu)
-    extends PopupControl(delegate) with SFXDelegate[jfxsc.ContextMenu] {
+    extends PopupControl(delegate)
+    with SFXDelegate[jfxsc.ContextMenu] {
 
   /**
     * Create a new ContextMenu initialized with the given items

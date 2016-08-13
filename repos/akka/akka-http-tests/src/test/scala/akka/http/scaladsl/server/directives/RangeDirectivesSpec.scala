@@ -46,21 +46,21 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
 
     "return a partial response for a ranged request with a single range with undefined lastBytePosition" in {
       Get() ~> addHeader(Range(ByteRange.fromOffset(5))) ~> completeWithRangedBytes(
-          10) ~> check {
+        10) ~> check {
         responseAs[Array[Byte]] shouldEqual Array[Byte](5, 6, 7, 8, 9)
       }
     }
 
     "return a partial response for a ranged request with a single suffix range" in {
       Get() ~> addHeader(Range(ByteRange.suffix(1))) ~> completeWithRangedBytes(
-          10) ~> check {
+        10) ~> check {
         responseAs[Array[Byte]] shouldEqual Array[Byte](9)
       }
     }
 
     "return a partial response for a ranged request with a overlapping suffix range" in {
       Get() ~> addHeader(Range(ByteRange.suffix(100))) ~> completeWithRangedBytes(
-          10) ~> check {
+        10) ~> check {
         responseAs[Array[Byte]] shouldEqual bytes(10)
       }
     }
@@ -80,37 +80,38 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
 
     "reject an unsatisfiable single range" in {
       Get() ~> addHeader(Range(ByteRange(100, 200))) ~> completeWithRangedBytes(
-          10) ~> check {
+        10) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange(100, 200) :: Nil, 10)
+          ByteRange(100, 200) :: Nil,
+          10)
       }
     }
 
     "reject an unsatisfiable single suffix range with length 0" in {
       Get() ~> addHeader(Range(ByteRange.suffix(0))) ~> completeWithRangedBytes(
-          42) ~> check {
+        42) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange.suffix(0) :: Nil, 42)
+          ByteRange.suffix(0) :: Nil,
+          42)
       }
     }
 
     "return a mediaType of 'multipart/byteranges' for a ranged request with multiple ranges" in {
       Get() ~> addHeader(Range(ByteRange(0, 10), ByteRange(0, 10))) ~> completeWithRangedBytes(
-          10) ~> check {
+        10) ~> check {
         mediaType.withParams(Map.empty) shouldEqual MediaTypes.`multipart/byteranges`
       }
     }
 
     "return a 'multipart/byteranges' for a ranged request with multiple coalesced ranges and expect ranges in ascending order" in {
       Get() ~> addHeader(
-          Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
+        Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
         wrs { complete("Some random and not super short entity.") }
       } ~> check {
         header[`Content-Range`] should be(None)
-        val parts = Await.result(responseAs[Multipart.ByteRanges].parts
-                                   .limit(1000)
-                                   .runWith(Sink.seq),
-                                 1.second)
+        val parts = Await.result(
+          responseAs[Multipart.ByteRanges].parts.limit(1000).runWith(Sink.seq),
+          1.second)
         parts.size shouldEqual 2
         inside(parts(0)) {
           case Multipart.ByteRanges.BodyPart(range, entity, unit, headers) ⇒
@@ -133,18 +134,18 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
         StreamUtils.oneTimeSource(Source.single(ByteString(content)))
 
       Get() ~> addHeader(
-          Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
+        Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
         wrs {
-          complete(HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
-                                      content.length,
-                                      entityData()))
+          complete(
+            HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
+                               content.length,
+                               entityData()))
         }
       } ~> check {
         header[`Content-Range`] should be(None)
-        val parts = Await.result(responseAs[Multipart.ByteRanges].parts
-                                   .limit(1000)
-                                   .runWith(Sink.seq),
-                                 1.second)
+        val parts = Await.result(
+          responseAs[Multipart.ByteRanges].parts.limit(1000).runWith(Sink.seq),
+          1.second)
         parts.size shouldEqual 2
       }
     }

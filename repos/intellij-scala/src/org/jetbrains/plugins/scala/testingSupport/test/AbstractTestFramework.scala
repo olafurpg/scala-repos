@@ -78,7 +78,7 @@ abstract class AbstractTestFramework extends JavaTestFramework {
          getAdditionalBuildCommands(compilerVersion))
       case None =>
         throw new RuntimeException(
-            "Failed to download test library jars: scala SDK is not specified to module" +
+          "Failed to download test library jars: scala SDK is not specified to module" +
             module.getName)
     }
     val modifier = new SimpleBuildFileModifier(libraries, resolvers, options)

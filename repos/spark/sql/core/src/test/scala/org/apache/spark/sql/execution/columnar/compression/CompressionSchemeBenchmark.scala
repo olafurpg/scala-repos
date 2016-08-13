@@ -23,8 +23,18 @@ import java.nio.charset.StandardCharsets
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.math3.distribution.LogNormalDistribution
 
-import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericMutableRow}
-import org.apache.spark.sql.execution.columnar.{BOOLEAN, INT, LONG, NativeColumnType, SHORT, STRING}
+import org.apache.spark.sql.catalyst.expressions.{
+  GenericInternalRow,
+  GenericMutableRow
+}
+import org.apache.spark.sql.execution.columnar.{
+  BOOLEAN,
+  INT,
+  LONG,
+  NativeColumnType,
+  SHORT,
+  STRING
+}
 import org.apache.spark.sql.types.AtomicType
 import org.apache.spark.util.Benchmark
 import org.apache.spark.util.Utils._
@@ -179,16 +189,22 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // -------------------------------------------------------------------------------------------
     // PassThrough(1.000)                          6 /    7      10971.4           0.1       1.0X
     // RunLengthEncoding(1.510)                 1526 / 1542         44.0          22.7       0.0X
-    runEncodeBenchmark(
-        "SHORT Encode (Lower Skew)", iters, count, SHORT, testData)
+    runEncodeBenchmark("SHORT Encode (Lower Skew)",
+                       iters,
+                       count,
+                       SHORT,
+                       testData)
 
     // Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz
     // SHORT Decode (Lower Skew):          Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
     // -------------------------------------------------------------------------------------------
     // PassThrough                               811 /  837         82.8          12.1       1.0X
     // RunLengthEncoding                        1219 / 1266         55.1          18.2       0.7X
-    runDecodeBenchmark(
-        "SHORT Decode (Lower Skew)", iters, count, SHORT, testData)
+    runDecodeBenchmark("SHORT Decode (Lower Skew)",
+                       iters,
+                       count,
+                       SHORT,
+                       testData)
 
     val g2 = genHigherSkewData()
     for (i <- 0 until count) {
@@ -200,16 +216,22 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // -------------------------------------------------------------------------------------------
     // PassThrough(1.000)                          7 /    7      10112.4           0.1       1.0X
     // RunLengthEncoding(2.009)                 1623 / 1661         41.4          24.2       0.0X
-    runEncodeBenchmark(
-        "SHORT Encode (Higher Skew)", iters, count, SHORT, testData)
+    runEncodeBenchmark("SHORT Encode (Higher Skew)",
+                       iters,
+                       count,
+                       SHORT,
+                       testData)
 
     // Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz
     // SHORT Decode (Higher Skew):         Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
     // -------------------------------------------------------------------------------------------
     // PassThrough                               818 /  827         82.0          12.2       1.0X
     // RunLengthEncoding                        1202 / 1237         55.8          17.9       0.7X
-    runDecodeBenchmark(
-        "SHORT Decode (Higher Skew)", iters, count, SHORT, testData)
+    runDecodeBenchmark("SHORT Decode (Higher Skew)",
+                       iters,
+                       count,
+                       SHORT,
+                       testData)
   }
 
   def intEncodingBenchmark(iters: Int): Unit = {
@@ -279,8 +301,11 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // RunLengthEncoding(0.748)                 2065 / 2094         32.5          30.8       0.0X
     // DictionaryEncoding(0.250)                 950 /  962         70.6          14.2       0.0X
     // LongDelta(0.125)                          475 /  482        141.2           7.1       0.1X
-    runEncodeBenchmark(
-        "LONG Encode (Lower Skew)", iters, count, LONG, testData)
+    runEncodeBenchmark("LONG Encode (Lower Skew)",
+                       iters,
+                       count,
+                       LONG,
+                       testData)
 
     // Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz
     // LONG Decode (Lower Skew):           Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
@@ -289,8 +314,11 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // RunLengthEncoding                        1301 / 1311         51.6          19.4       0.7X
     // DictionaryEncoding                        887 /  904         75.7          13.2       1.0X
     // LongDelta                                 693 /  735         96.8          10.3       1.3X
-    runDecodeBenchmark(
-        "LONG Decode (Lower Skew)", iters, count, LONG, testData)
+    runDecodeBenchmark("LONG Decode (Lower Skew)",
+                       iters,
+                       count,
+                       LONG,
+                       testData)
 
     val g2 = genHigherSkewData()
     for (i <- 0 until count) {
@@ -304,8 +332,11 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // RunLengthEncoding(0.999)                 2260 / 3021         29.7          33.7       0.0X
     // DictionaryEncoding(0.251)                1270 / 1438         52.8          18.9       0.0X
     // LongDelta(0.125)                          496 /  509        135.3           7.4       0.1X
-    runEncodeBenchmark(
-        "LONG Encode (Higher Skew)", iters, count, LONG, testData)
+    runEncodeBenchmark("LONG Encode (Higher Skew)",
+                       iters,
+                       count,
+                       LONG,
+                       testData)
 
     // Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz
     // LONG Decode (Higher Skew):          Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
@@ -314,8 +345,11 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     // RunLengthEncoding                        1350 / 1378         49.7          20.1       0.7X
     // DictionaryEncoding                        892 /  924         75.2          13.3       1.1X
     // LongDelta                                 817 /  847         82.2          12.2       1.2X
-    runDecodeBenchmark(
-        "LONG Decode (Higher Skew)", iters, count, LONG, testData)
+    runDecodeBenchmark("LONG Decode (Higher Skew)",
+                       iters,
+                       count,
+                       LONG,
+                       testData)
   }
 
   def stringEncodingBenchmark(iters: Int): Unit = {
@@ -325,8 +359,8 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
     val testData = allocateLocal(count * (4 + strLen))
 
     val g = {
-      val dataTable = (0 until tableSize).map(
-          _ => RandomStringUtils.randomAlphabetic(strLen))
+      val dataTable = (0 until tableSize).map(_ =>
+        RandomStringUtils.randomAlphabetic(strLen))
       val rng = genHigherSkewData()
       () =>
         dataTable(rng().toInt % tableSize)

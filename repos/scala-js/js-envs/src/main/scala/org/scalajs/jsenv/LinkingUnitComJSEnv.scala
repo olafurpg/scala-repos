@@ -25,20 +25,21 @@ trait LinkingUnitComJSEnv extends LinkingUnitAsyncJSEnv with ComJSEnv {
     new ComLoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitComLoadedLibs
-      extends LinkingUnitAsyncLoadedLibs with ComLoadedLibs
+      extends LinkingUnitAsyncLoadedLibs
+      with ComLoadedLibs
       with LinkingUnitComJSEnv {
     def comRunner(preLibs: Seq[ResolvedJSDependency],
                   linkingUnit: LinkingUnit,
                   postLibs: Seq[ResolvedJSDependency],
                   code: VirtualJSFile): ComJSRunner = {
-      LinkingUnitComJSEnv.this.comRunner(
-          loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+      LinkingUnitComJSEnv.this
+        .comRunner(loadedLibs ++ preLibs, linkingUnit, postLibs, code)
     }
   }
 
   private[jsenv] trait ComLoadedUnit extends AsyncLoadedUnit with ComJSEnv {
-    def comRunner(
-        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+    def comRunner(libs: Seq[ResolvedJSDependency],
+                  code: VirtualJSFile): ComJSRunner = {
       LinkingUnitComJSEnv.this.comRunner(Nil, loadedUnit, libs, code)
     }
   }

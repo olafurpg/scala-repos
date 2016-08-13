@@ -27,11 +27,7 @@ class AnnouncerTest extends FunSuite {
 
   test("reject unknown announcers") {
     assert(
-        Await
-          .ready(Announcer.announce(addr, "unkown!foobar"))
-          .poll
-          .get
-          .isThrow)
+      Await.ready(Announcer.announce(addr, "unkown!foobar")).poll.get.isThrow)
   }
 
   test("resolve ServiceLoaded announcers") {
@@ -48,7 +44,7 @@ class AnnouncerTest extends FunSuite {
 
   test("get an announcer instance") {
     val anmt = Await.result(
-        Announcer.get(classOf[TestAnnouncer]).get.announce(addr, "foo"))
+      Announcer.get(classOf[TestAnnouncer]).get.announce(addr, "foo"))
     assert(anmt == TestAnnouncement(addr, "foo"))
   }
 }

@@ -33,8 +33,7 @@ trait ParMapLike[K,
                  +Repr <: ParMapLike[K, V, Repr, Sequential] with ParMap[K, V],
                  +Sequential <: Map[K, V] with MapLike[K, V, Sequential]]
     extends GenMapLike[K, V, Repr]
-    with ParIterableLike[(K, V), Repr, Sequential] {
-  self =>
+    with ParIterableLike[(K, V), Repr, Sequential] { self =>
 
   def default(key: K): V =
     throw new NoSuchElementException("key not found: " + key)
@@ -93,9 +92,11 @@ trait ParMapLike[K,
     def contains(key: K) = self.contains(key)
     def splitter = keysIterator(self.splitter)
     def +(elem: K): ParSet[K] =
-      (ParSet[K]() ++ this + elem).asInstanceOf[ParSet[K]] // !!! concrete overrides abstract problem
+      (ParSet[K]() ++ this + elem)
+        .asInstanceOf[ParSet[K]] // !!! concrete overrides abstract problem
     def -(elem: K): ParSet[K] =
-      (ParSet[K]() ++ this - elem).asInstanceOf[ParSet[K]] // !!! concrete overrides abstract problem
+      (ParSet[K]() ++ this - elem)
+        .asInstanceOf[ParSet[K]] // !!! concrete overrides abstract problem
     override def size = self.size
     override def foreach[U](f: K => U) = for ((k, v) <- self) f(k)
     override def seq = self.seq.keySet

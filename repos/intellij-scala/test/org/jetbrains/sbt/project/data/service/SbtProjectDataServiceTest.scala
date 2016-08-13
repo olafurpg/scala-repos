@@ -7,7 +7,10 @@ import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.projectRoots.{ProjectJdkTable, Sdk}
-import com.intellij.openapi.roots.{LanguageLevelProjectExtension, ProjectRootManager}
+import com.intellij.openapi.roots.{
+  LanguageLevelProjectExtension,
+  ProjectRootManager
+}
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.{IdeaTestUtil, UsefulTestCase}
 import org.jetbrains.plugins.scala.project.IncrementalityType
@@ -40,19 +43,17 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
     doTestBasePackages(Seq("com.test1.base", "com.test2.base"))
 
   def testValidJavaSdk(): Unit =
-    doTestSdk(Some(data.JdkByName("1.8")),
-              ProjectJdkTable
-                .getInstance()
-                .findJdk(IdeaTestUtil.getMockJdk18.getName),
-              LanguageLevel.JDK_1_8)
+    doTestSdk(
+      Some(data.JdkByName("1.8")),
+      ProjectJdkTable.getInstance().findJdk(IdeaTestUtil.getMockJdk18.getName),
+      LanguageLevel.JDK_1_8)
 
   def testValidJavaSdkWithDifferentLanguageLevel(): Unit =
-    doTestSdk(Some(data.JdkByName("1.8")),
-              Seq("-source", "1.6"),
-              ProjectJdkTable
-                .getInstance()
-                .findJdk(IdeaTestUtil.getMockJdk18.getName),
-              LanguageLevel.JDK_1_6)
+    doTestSdk(
+      Some(data.JdkByName("1.8")),
+      Seq("-source", "1.6"),
+      ProjectJdkTable.getInstance().findJdk(IdeaTestUtil.getMockJdk18.getName),
+      LanguageLevel.JDK_1_6)
 
   def testInvalidSdk(): Unit =
     doTestSdk(Some(data.JdkByName("20")), defaultJdk, LanguageLevel.JDK_1_7)
@@ -62,12 +63,12 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
 
   def testJavacOptions(): Unit = {
     val options = Seq(
-        "-g:none",
-        "-nowarn",
-        "-deprecation",
-        "-target",
-        "1.8",
-        "-Werror"
+      "-g:none",
+      "-nowarn",
+      "-deprecation",
+      "-target",
+      "1.8",
+      "-Werror"
     )
     importProjectData(generateProject(Seq.empty, None, options, ""))
 
@@ -85,12 +86,12 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
   def testSbtVersion(): Unit = {
     val projectSettings = SbtProjectSettings.default
     projectSettings.setExternalProjectPath(
-        ExternalSystemApiUtil.normalizePath(getProject.getBasePath))
+      ExternalSystemApiUtil.normalizePath(getProject.getBasePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
 
     val expectedVersion = "0.13.8"
     importProjectData(
-        generateProject(Seq.empty, None, Seq.empty, expectedVersion))
+      generateProject(Seq.empty, None, Seq.empty, expectedVersion))
     val actualVersion = SbtSystemSettings
       .getInstance(getProject)
       .getLinkedProjectSettings(getProject.getBasePath)
@@ -111,14 +112,17 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
         externalConfigPath := getProject.getBasePath + "/module1"
       }
 
-      arbitraryNodes += new SbtProjectNode(
-          Seq.empty, None, Seq.empty, "", getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(Seq.empty,
+                                           None,
+                                           Seq.empty,
+                                           "",
+                                           getProject.getBasePath)
     }.build.toDataNode
 
     importProjectData(testProject)
     assertEquals(
-        IncrementalityType.SBT,
-        ScalaCompilerConfiguration.instanceIn(getProject).incrementalityType)
+      IncrementalityType.SBT,
+      ScalaCompilerConfiguration.instanceIn(getProject).incrementalityType)
   }
 
   private def setUpJdks(): Unit = {
@@ -142,15 +146,18 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      arbitraryNodes += new SbtProjectNode(
-          basePackages, jdk, javacOptions, sbtVersion, getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(basePackages,
+                                           jdk,
+                                           javacOptions,
+                                           sbtVersion,
+                                           getProject.getBasePath)
     }.build.toDataNode
 
   private def doTestBasePackages(basePackages: Seq[String]): Unit = {
     importProjectData(generateProject(basePackages, None, Seq.empty, ""))
     UsefulTestCase.assertContainsElements(
-        ScalaProjectSettings.getInstance(getProject).getBasePackages,
-        basePackages: _*)
+      ScalaProjectSettings.getInstance(getProject).getBasePackages,
+      basePackages: _*)
   }
 
   private def defaultJdk: Sdk =
@@ -166,8 +173,8 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
                         expectedSdk: Sdk,
                         expectedLanguageLevel: LanguageLevel): Unit = {
     importProjectData(generateProject(Seq.empty, sdk, javacOptions, ""))
-    assertEquals(
-        expectedSdk, ProjectRootManager.getInstance(getProject).getProjectSdk)
+    assertEquals(expectedSdk,
+                 ProjectRootManager.getInstance(getProject).getProjectSdk)
     val languageLevelProjectExtension =
       LanguageLevelProjectExtension.getInstance(getProject)
     val actualLanguageLevel = languageLevelProjectExtension.getLanguageLevel

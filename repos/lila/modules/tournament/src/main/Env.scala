@@ -46,26 +46,26 @@ final class Env(config: Config,
 
   lazy val forms = new DataForm
 
-  lazy val cached = new Cached(
-      createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
+  lazy val cached =
+    new Cached(createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
 
-  lazy val api = new TournamentApi(
-      cached = cached,
-      scheduleJsonView = scheduleJsonView,
-      system = system,
-      sequencers = sequencerMap,
-      autoPairing = autoPairing,
-      clearJsonViewCache = jsonView.clearCache,
-      router = hub.actor.router,
-      renderer = hub.actor.renderer,
-      timeline = hub.actor.timeline,
-      socketHub = socketHub,
-      site = hub.socket.site,
-      lobby = hub.socket.lobby,
-      trophyApi = trophyApi,
-      indexLeaderboard = leaderboardIndexer.indexOne _,
-      roundMap = roundMap,
-      roundSocketHub = roundSocketHub)
+  lazy val api = new TournamentApi(cached = cached,
+                                   scheduleJsonView = scheduleJsonView,
+                                   system = system,
+                                   sequencers = sequencerMap,
+                                   autoPairing = autoPairing,
+                                   clearJsonViewCache = jsonView.clearCache,
+                                   router = hub.actor.router,
+                                   renderer = hub.actor.renderer,
+                                   timeline = hub.actor.timeline,
+                                   socketHub = socketHub,
+                                   site = hub.socket.site,
+                                   lobby = hub.socket.lobby,
+                                   trophyApi = trophyApi,
+                                   indexLeaderboard =
+                                     leaderboardIndexer.indexOne _,
+                                   roundMap = roundMap,
+                                   roundSocketHub = roundSocketHub)
 
   val tourAndRanks = api tourAndRanks _
 
@@ -76,18 +76,19 @@ final class Env(config: Config,
                                              chat = hub.actor.chat,
                                              flood = flood)
 
-  lazy val winners = new Winners(
-      mongoCache = mongoCache, ttl = LeaderboardCacheTtl)
+  lazy val winners =
+    new Winners(mongoCache = mongoCache, ttl = LeaderboardCacheTtl)
 
   lazy val jsonView = new JsonView(lightUser, cached, performance)
 
   lazy val scheduleJsonView = new ScheduleJsonView(lightUser)
 
-  lazy val leaderboardApi = new LeaderboardApi(
-      coll = leaderboardColl, maxPerPage = 20)
+  lazy val leaderboardApi =
+    new LeaderboardApi(coll = leaderboardColl, maxPerPage = 20)
 
   private lazy val leaderboardIndexer = new LeaderboardIndexer(
-      tournamentColl = tournamentColl, leaderboardColl = leaderboardColl)
+    tournamentColl = tournamentColl,
+    leaderboardColl = leaderboardColl)
 
   private val socketHub =
     system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
@@ -100,8 +101,7 @@ final class Env(config: Config,
                    lightUser = lightUser)
     }), name = SocketName)
 
-  private val sequencerMap = system.actorOf(
-      Props(ActorMap { id =>
+  private val sequencerMap = system.actorOf(Props(ActorMap { id =>
     new Sequencer(receiveTimeout = SequencerTimeout.some,
                   executionTimeout = 5.seconds.some,
                   logger = logger)
@@ -110,23 +110,26 @@ final class Env(config: Config,
   system.actorOf(Props(new ApiActor(api = api)), name = ApiActorName)
 
   system.actorOf(
-      Props(new CreatedOrganizer(
-              api = api,
-              isOnline = isOnline
-          )))
+    Props(
+      new CreatedOrganizer(
+        api = api,
+        isOnline = isOnline
+      )))
 
   private val reminder = system.actorOf(
-      Props(new Reminder(
-              renderer = hub.actor.renderer
-          )))
+    Props(
+      new Reminder(
+        renderer = hub.actor.renderer
+      )))
 
   system.actorOf(
-      Props(new StartedOrganizer(
-              api = api,
-              reminder = reminder,
-              isOnline = isOnline,
-              socketHub = socketHub
-          )))
+    Props(
+      new StartedOrganizer(
+        api = api,
+        reminder = reminder,
+        isOnline = isOnline,
+        socketHub = socketHub
+      )))
 
   system.actorOf(Props(new Scheduler(api)))
 
@@ -140,8 +143,8 @@ final class Env(config: Config,
     }
   }
 
-  private lazy val autoPairing = new AutoPairing(
-      roundMap = roundMap, system = system, onStart = onStart)
+  private lazy val autoPairing =
+    new AutoPairing(roundMap = roundMap, system = system, onStart = onStart)
 
   private[tournament] lazy val tournamentColl = db(CollectionTournament)
   private[tournament] lazy val pairingColl = db(CollectionPairing)
@@ -155,17 +158,17 @@ object Env {
 
   lazy val current =
     "tournament" boot new Env(
-        config = lila.common.PlayApp loadConfig "tournament",
-        system = lila.common.PlayApp.system,
-        db = lila.db.Env.current,
-        mongoCache = lila.memo.Env.current.mongoCache,
-        flood = lila.security.Env.current.flood,
-        hub = lila.hub.Env.current,
-        roundMap = lila.round.Env.current.roundMap,
-        roundSocketHub = lila.hub.Env.current.socket.round,
-        lightUser = lila.user.Env.current.lightUser,
-        isOnline = lila.user.Env.current.isOnline,
-        onStart = lila.game.Env.current.onStart,
-        trophyApi = lila.user.Env.current.trophyApi,
-        scheduler = lila.common.PlayApp.scheduler)
+      config = lila.common.PlayApp loadConfig "tournament",
+      system = lila.common.PlayApp.system,
+      db = lila.db.Env.current,
+      mongoCache = lila.memo.Env.current.mongoCache,
+      flood = lila.security.Env.current.flood,
+      hub = lila.hub.Env.current,
+      roundMap = lila.round.Env.current.roundMap,
+      roundSocketHub = lila.hub.Env.current.socket.round,
+      lightUser = lila.user.Env.current.lightUser,
+      isOnline = lila.user.Env.current.isOnline,
+      onStart = lila.game.Env.current.onStart,
+      trophyApi = lila.user.Env.current.trophyApi,
+      scheduler = lila.common.PlayApp.scheduler)
 }

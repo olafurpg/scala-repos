@@ -42,11 +42,11 @@ object ListViewWithSelectionDemo extends JFXApp {
   }
 
   val characters = ObservableBuffer[Person](
-      Person("Bungalow ", "Bill"),
-      Person("Dennis", "O’Dell"),
-      Person("Eleanor", "Rigby"),
-      Person("Rocky", "Raccoon"),
-      Person("Peggy", "Sue")
+    Person("Bungalow ", "Bill"),
+    Person("Dennis", "O’Dell"),
+    Person("Eleanor", "Rigby"),
+    Person("Rocky", "Raccoon"),
+    Person("Peggy", "Sue")
   )
 
   stage = new PrimaryStage {

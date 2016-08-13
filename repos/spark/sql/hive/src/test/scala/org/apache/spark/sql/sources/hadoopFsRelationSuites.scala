@@ -35,7 +35,9 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types._
 
 abstract class HadoopFsRelationTest
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import sqlContext.implicits._
 
   val dataSourceName: String
@@ -43,8 +45,8 @@ abstract class HadoopFsRelationTest
   protected def supportsDataType(dataType: DataType): Boolean = true
 
   val dataSchema = StructType(
-      Seq(StructField("a", IntegerType, nullable = false),
-          StructField("b", StringType, nullable = false)))
+    Seq(StructField("a", IntegerType, nullable = false),
+        StructField("b", StringType, nullable = false)))
 
   lazy val testDF = (1 to 3).map(i => (i, s"val_$i")).toDF("a", "b")
 
@@ -63,66 +65,63 @@ abstract class HadoopFsRelationTest
   def checkQueries(df: DataFrame): Unit = {
     // Selects everything
     checkAnswer(df,
-                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar")) yield
-                  Row(i, s"val_$i", p1, p2))
+                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+                  yield Row(i, s"val_$i", p1, p2))
 
     // Simple filtering and partition pruning
     checkAnswer(df.filter('a > 1 && 'p1 === 2),
-                for (i <- 2 to 3; p2 <- Seq("foo", "bar")) yield
-                  Row(i, s"val_$i", 2, p2))
+                for (i <- 2 to 3; p2 <- Seq("foo", "bar"))
+                  yield Row(i, s"val_$i", 2, p2))
 
     // Simple projection and filtering
     checkAnswer(df.filter('a > 1).select('b, 'a + 1),
-                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", i + 1))
+                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar"))
+                  yield Row(s"val_$i", i + 1))
 
     // Simple projection and partition pruning
     checkAnswer(df.filter('a > 1 && 'p1 < 2).select('b, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", 1))
+                for (i <- 2 to 3; _ <- Seq("foo", "bar"))
+                  yield Row(s"val_$i", 1))
 
     // Project many copies of columns with different types (reproduction for SPARK-7858)
-    checkAnswer(df.filter('a > 1 && 'p1 < 2)
-                  .select('b, 'b, 'b, 'b, 'p1, 'p1, 'p1, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar")) yield
-                  Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
+    checkAnswer(
+      df.filter('a > 1 && 'p1 < 2).select('b, 'b, 'b, 'b, 'p1, 'p1, 'p1, 'p1),
+      for (i <- 2 to 3; _ <- Seq("foo", "bar"))
+        yield Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
 
     // Self-join
     df.registerTempTable("t")
     withTempTable("t") {
-      checkAnswer(
-          sql("""SELECT l.a, r.b, l.p1, r.p2
+      checkAnswer(sql("""SELECT l.a, r.b, l.p1, r.p2
             |FROM t l JOIN t r
             |ON l.a = r.a AND l.p1 = r.p1 AND l.p2 = r.p2
           """.stripMargin),
-          for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar")) yield
-            Row(i, s"val_$i", p1, p2))
+                  for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+                    yield Row(i, s"val_$i", p1, p2))
     }
   }
 
   private val supportedDataTypes = Seq(
-      StringType,
-      BinaryType,
-      NullType,
-      BooleanType,
-      ByteType,
-      ShortType,
-      IntegerType,
-      LongType,
-      FloatType,
-      DoubleType,
-      DecimalType(25, 5),
-      DecimalType(6, 5),
-      DateType,
-      TimestampType,
-      ArrayType(IntegerType),
-      MapType(StringType, LongType),
-      new StructType()
-        .add("f1", FloatType, nullable = true)
-        .add("f2",
-             ArrayType(BooleanType, containsNull = true),
-             nullable = true),
-      new MyDenseVectorUDT()
+    StringType,
+    BinaryType,
+    NullType,
+    BooleanType,
+    ByteType,
+    ShortType,
+    IntegerType,
+    LongType,
+    FloatType,
+    DoubleType,
+    DecimalType(25, 5),
+    DecimalType(6, 5),
+    DateType,
+    TimestampType,
+    ArrayType(IntegerType),
+    MapType(StringType, LongType),
+    new StructType()
+      .add("f1", FloatType, nullable = true)
+      .add("f2", ArrayType(BooleanType, containsNull = true), nullable = true),
+    new MyDenseVectorUDT()
   ).filter(supportsDataType)
 
   for (dataType <- supportedDataTypes) {
@@ -132,9 +131,9 @@ abstract class HadoopFsRelationTest
 
         val dataGenerator = RandomDataGenerator
           .forType(
-              dataType = dataType,
-              nullable = true,
-              new Random(System.nanoTime())
+            dataType = dataType,
+            nullable = true,
+            new Random(System.nanoTime())
           )
           .getOrElse {
             fail(s"Failed to create data generator for schema $dataType")
@@ -145,8 +144,8 @@ abstract class HadoopFsRelationTest
         val schema = new StructType()
           .add("index", IntegerType, nullable = false)
           .add("col", dataType, nullable = true)
-        val rdd = sqlContext.sparkContext.parallelize(
-            (1 to 10).map(i => Row(i, dataGenerator())))
+        val rdd = sqlContext.sparkContext.parallelize((1 to 10).map(i =>
+          Row(i, dataGenerator())))
         val df =
           sqlContext.createDataFrame(rdd, schema).orderBy("index").coalesce(1)
 
@@ -240,10 +239,11 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkQueries(sqlContext.read
-            .format(dataSourceName)
-            .option("dataSchema", dataSchema.json)
-            .load(file.getCanonicalPath))
+      checkQueries(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath))
     }
   }
 
@@ -410,8 +410,8 @@ abstract class HadoopFsRelationTest
 
     withTable("t") {
       checkAnswer(
-          sqlContext.table("t").sort('id),
-          Row(0, true) :: Row(1, false) :: Nil
+        sqlContext.table("t").sort('id),
+        Row(0, true) :: Row(1, false) :: Nil
       )
     }
   }
@@ -458,7 +458,7 @@ abstract class HadoopFsRelationTest
   }
 
   test(
-      "saveAsTable()/load() - partitioned table - Append - new partition values") {
+    "saveAsTable()/load() - partitioned table - Append - new partition values") {
     partitionedTestDF1.write
       .format(dataSourceName)
       .mode(SaveMode.Overwrite)
@@ -479,7 +479,7 @@ abstract class HadoopFsRelationTest
   }
 
   test(
-      "saveAsTable()/load() - partitioned table - Append - mismatched partition columns") {
+    "saveAsTable()/load() - partitioned table - Append - mismatched partition columns") {
     partitionedTestDF1.write
       .format(dataSourceName)
       .mode(SaveMode.Overwrite)
@@ -543,10 +543,10 @@ abstract class HadoopFsRelationTest
         .load(s"${file.getCanonicalPath}/p1=*/p2=???")
 
       val expectedPaths = Set(
-          s"${file.getCanonicalFile}/p1=1/p2=foo",
-          s"${file.getCanonicalFile}/p1=2/p2=foo",
-          s"${file.getCanonicalFile}/p1=1/p2=bar",
-          s"${file.getCanonicalFile}/p1=2/p2=bar"
+        s"${file.getCanonicalFile}/p1=1/p2=foo",
+        s"${file.getCanonicalFile}/p1=2/p2=foo",
+        s"${file.getCanonicalFile}/p1=1/p2=bar",
+        s"${file.getCanonicalFile}/p1=2/p2=bar"
       ).map { p =>
         val path = new Path(p)
         val fs =
@@ -602,7 +602,7 @@ abstract class HadoopFsRelationTest
   }
 
   test(
-      "SPARK-7616: adjust column name order accordingly when saving partitioned table") {
+    "SPARK-7616: adjust column name order accordingly when saving partitioned table") {
     val df = (1 to 3).map(i => (i, s"val_$i", i * 2)).toDF("a", "b", "c")
 
     df.write
@@ -645,7 +645,7 @@ abstract class HadoopFsRelationTest
   }
 
   test(
-      "SPARK-8578 specified custom output committer will not be used to append data") {
+    "SPARK-8578 specified custom output committer will not be used to append data") {
     val clonedConf = new Configuration(hadoopConfiguration)
     try {
       val df = sqlContext.range(1, 10).toDF("i")
@@ -659,8 +659,8 @@ abstract class HadoopFsRelationTest
         // Since Parquet has its own output committer setting, also set it
         // to AlwaysFailParquetOutputCommitter at here.
         hadoopConfiguration.set(
-            "spark.sql.parquet.output.committer.class",
-            classOf[AlwaysFailParquetOutputCommitter].getName)
+          "spark.sql.parquet.output.committer.class",
+          classOf[AlwaysFailParquetOutputCommitter].getName)
         // Because there data already exists,
         // this append should succeed because we will use the output committer associated
         // with file format and AlwaysFailOutputCommitter will not be used.
@@ -688,8 +688,8 @@ abstract class HadoopFsRelationTest
         // Since Parquet has its own output committer setting, also set it
         // to AlwaysFailParquetOutputCommitter at here.
         hadoopConfiguration.set(
-            "spark.sql.parquet.output.committer.class",
-            classOf[AlwaysFailParquetOutputCommitter].getName)
+          "spark.sql.parquet.output.committer.class",
+          classOf[AlwaysFailParquetOutputCommitter].getName)
         // Because there is no existing data,
         // this append will fail because AlwaysFailOutputCommitter is used when we do append
         // and there is no existing data.
@@ -703,13 +703,13 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
   test(
-      "SPARK-8887: Explicitly define which data types can be used as dynamic partition columns") {
+    "SPARK-8887: Explicitly define which data types can be used as dynamic partition columns") {
     val df = Seq((1, "v1", Array(1, 2, 3), Map("k1" -> "v1"), Tuple2(1, "4")),
                  (2, "v2", Array(4, 5, 6), Map("k2" -> "v2"), Tuple2(2, "5")),
                  (3, "v3", Array(7, 8, 9), Map("k3" -> "v3"), Tuple2(3, "6")))
@@ -756,8 +756,8 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
       sqlContext.sparkContext.conf
         .set("spark.speculation", speculationEnabled.toString)
     }
@@ -776,8 +776,8 @@ class AlwaysFailOutputCommitter(outputPath: Path, context: TaskAttemptContext)
 
 // This class is used to test SPARK-8578. We should not use any custom output committer when
 // we actually append data to an existing dir.
-class AlwaysFailParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+class AlwaysFailParquetOutputCommitter(outputPath: Path,
+                                       context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
 
   override def commitJob(context: JobContext): Unit = {

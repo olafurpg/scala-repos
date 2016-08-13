@@ -41,7 +41,8 @@ object LocalFileLR {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of Logistic Regression and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of Logistic Regression and is given as an example!
         |Please use either org.apache.spark.mllib.classification.LogisticRegressionWithSGD or
         |org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS
         |for more conventional use.

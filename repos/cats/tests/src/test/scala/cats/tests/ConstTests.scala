@@ -38,8 +38,8 @@ class ConstTests extends CatsSuite {
     checkAll("Apply[Const[NonEmptyList[String], Int]]",
              ApplyTests[Const[NonEmptyList[String], ?]].apply[Int, Int, Int])
     checkAll(
-        "Apply[Const[NonEmptyList[String], ?]]",
-        SerializableTests.serializable(Apply[Const[NonEmptyList[String], ?]]))
+      "Apply[Const[NonEmptyList[String], ?]]",
+      SerializableTests.serializable(Apply[Const[NonEmptyList[String], ?]]))
   }
 
   // Algebra checks for Serializability of instances as part of the laws
@@ -64,8 +64,8 @@ class ConstTests extends CatsSuite {
            SerializableTests.serializable(Contravariant[Const[String, ?]]))
 
   checkAll("Const[?, ?]", BifoldableTests[Const].bifoldable[Int, Int, Int])
-  checkAll(
-      "Bifoldable[Const]", SerializableTests.serializable(Bifoldable[Const]))
+  checkAll("Bifoldable[Const]",
+           SerializableTests.serializable(Bifoldable[Const]))
 
   test("show") {
 

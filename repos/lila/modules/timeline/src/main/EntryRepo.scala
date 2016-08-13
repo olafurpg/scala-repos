@@ -24,20 +24,21 @@ private[timeline] final class EntryRepo(coll: Coll, userMax: Int) {
 
   def findRecent(typ: String, since: DateTime) =
     coll
-      .find(BSONDocument(
-              "typ" -> typ,
-              "date" -> BSONDocument("$gt" -> since)
-          ))
+      .find(
+        BSONDocument(
+          "typ" -> typ,
+          "date" -> BSONDocument("$gt" -> since)
+        ))
       .cursor[Entry]()
       .collect[List]()
 
   def channelUserIdRecentExists(channel: String, userId: String): Fu[Boolean] =
     coll.count(
-        BSONDocument(
-            "users" -> userId,
-            "chan" -> channel,
-            "date" -> BSONDocument("$gt" -> DateTime.now.minusDays(7))
-        ).some) map (0 !=)
+      BSONDocument(
+        "users" -> userId,
+        "chan" -> channel,
+        "date" -> BSONDocument("$gt" -> DateTime.now.minusDays(7))
+      ).some) map (0 !=)
 
   def insert(entry: Entry) = coll insert entry void
 }

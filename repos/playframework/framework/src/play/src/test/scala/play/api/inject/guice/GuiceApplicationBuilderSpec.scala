@@ -42,9 +42,9 @@ object GuiceApplicationBuilderSpec extends Specification {
         .injector
 
       injector.instanceOf[play.api.i18n.Langs] must throwA[
-          com.google.inject.ConfigurationException]
-      injector.instanceOf[A] must throwA[
-          com.google.inject.ConfigurationException]
+        com.google.inject.ConfigurationException]
+      injector
+        .instanceOf[A] must throwA[com.google.inject.ConfigurationException]
     }
 
     "set initial configuration loader" in {
@@ -95,7 +95,7 @@ object GuiceApplicationBuilderSpec extends Specification {
               val data = Map(path -> value)
               val builder = new GuiceApplicationBuilder()
               builder.shouldDisplayLoggerDeprecationMessage(
-                  Configuration.from(data)) must_=== true
+                Configuration.from(data)) must_=== true
           }
       }
     }
@@ -106,7 +106,7 @@ object GuiceApplicationBuilderSpec extends Specification {
           val data = Map(path -> "NOT_A_DEPRECATED_VALUE")
           val builder = new GuiceApplicationBuilder()
           builder.shouldDisplayLoggerDeprecationMessage(
-              Configuration.from(data)) must_=== false
+            Configuration.from(data)) must_=== false
       }
     }
   }
@@ -117,7 +117,7 @@ object GuiceApplicationBuilderSpec extends Specification {
 
   class AModule extends Module {
     def bindings(env: Environment, conf: Configuration) = Seq(
-        bind[A].to[A1]
+      bind[A].to[A1]
     )
   }
 

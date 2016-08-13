@@ -24,10 +24,10 @@ case class ApiUser(login: String,
 
 object ApiUser {
   def apply(user: Account): ApiUser = ApiUser(
-      login = user.userName,
-      email = user.mailAddress,
-      `type` = if (user.isGroupAccount) { "Organization" } else { "User" },
-      site_admin = user.isAdmin,
-      created_at = user.registeredDate
+    login = user.userName,
+    email = user.mailAddress,
+    `type` = if (user.isGroupAccount) { "Organization" } else { "User" },
+    site_admin = user.isAdmin,
+    created_at = user.registeredDate
   )
 }

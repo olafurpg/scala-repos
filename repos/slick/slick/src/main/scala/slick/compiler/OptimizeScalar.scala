@@ -23,9 +23,10 @@ class OptimizeScalar extends Phase {
           else LiteralNode(false)
         cast(n.nodeType, res).infer()
 
-      case n @ IfThenElse(ConstArray(
-          Library.Not(Library.==(v, LiteralNode(null))), v2, LiteralNode(z)))
-          if v == v2 && (z == null || z == None) =>
+      case n @ IfThenElse(
+          ConstArray(Library.Not(Library.==(v, LiteralNode(null))),
+                     v2,
+                     LiteralNode(z))) if v == v2 && (z == null || z == None) =>
         logger.debug("Optimizing: if(v != null) v else null", n)
         v
 
@@ -36,13 +37,14 @@ class OptimizeScalar extends Phase {
       case o @ OptionApply(Library.SilentCast(n))
           if o.nodeType == n.nodeType =>
         logger.debug(
-            "Optimizing: Redundant cast to non-nullable within OptionApply", o)
+          "Optimizing: Redundant cast to non-nullable within OptionApply",
+          o)
         n
 
       case n @ Library.<(Library.-(r: RowNumber, LiteralNode(1L)), v) =>
         logger.debug(
-            "Optimizing: Rownum comparison with offset 1, arising from zipWithIndex",
-            n)
+          "Optimizing: Rownum comparison with offset 1, arising from zipWithIndex",
+          n)
         Library.<=.typed(n.nodeType, r, v).infer()
 
       case n @ Library.IfNull(OptionApply(ch), _) =>
@@ -59,8 +61,9 @@ class OptimizeScalar extends Phase {
       case LiteralNode(null) => Some(None)
       case LiteralNode(v) =>
         Some(
-            if (n.nodeType.structural.isInstanceOf[OptionType])
-              v.asInstanceOf[Option[Any]] else Some(v))
+          if (n.nodeType.structural.isInstanceOf[OptionType])
+            v.asInstanceOf[Option[Any]]
+          else Some(v))
       case Apply(Library.SilentCast, ConstArray(ch)) => unapply(ch)
       case OptionApply(ch) => unapply(ch).map(_.map(Option.apply _))
       case _ => None

@@ -25,7 +25,7 @@ trait Erasure {
        */
       case TypeRef(_, sym, _)
           if sym.isAbstractType &&
-          (!sym.owner.isJavaDefined || sym.hasFlag(Flags.EXISTENTIAL)) =>
+            (!sym.owner.isJavaDefined || sym.hasFlag(Flags.EXISTENTIAL)) =>
         tp
       case ExistentialType(tparams, restp) =>
         genericCore(restp)
@@ -62,7 +62,7 @@ trait Erasure {
     case GenericArray(level, core) if !(core <:< AnyRefTpe) => level
     case RefinedType(ps, _) if ps.nonEmpty =>
       logResult(s"Unbounded generic level for $tp is")(
-          (ps map unboundedGenericArrayLevel).max)
+        (ps map unboundedGenericArrayLevel).max)
     case _ => 0
   }
 
@@ -150,12 +150,12 @@ trait Erasure {
       case AnnotatedType(_, atp) =>
         apply(atp)
       case ClassInfoType(parents, decls, clazz) =>
-        ClassInfoType(
-            if (clazz == ObjectClass || isPrimitiveValueClass(clazz)) Nil
-            else if (clazz == ArrayClass) ObjectTpe :: Nil
-            else removeLaterObjects(parents map this),
-            decls,
-            clazz)
+        ClassInfoType(if (clazz == ObjectClass || isPrimitiveValueClass(clazz))
+                        Nil
+                      else if (clazz == ArrayClass) ObjectTpe :: Nil
+                      else removeLaterObjects(parents map this),
+                      decls,
+                      clazz)
       case _ =>
         mapOver(tp)
     }
@@ -281,7 +281,8 @@ trait Erasure {
       val res = javaErasure(tp)
       val old = scalaErasure(tp)
       if (!(res =:= old))
-        log("Identified divergence between java/scala erasure:\n  scala: " +
+        log(
+          "Identified divergence between java/scala erasure:\n  scala: " +
             old + "\n   java: " + res)
       res
     }
@@ -293,7 +294,8 @@ trait Erasure {
     override def applyInArray(tp: Type): Type = {
       val saved = boxPrimitives
       boxPrimitives = false
-      try super.applyInArray(tp) finally boxPrimitives = saved
+      try super.applyInArray(tp)
+      finally boxPrimitives = saved
     }
 
     override def eraseNormalClassRef(tref: TypeRef) =
@@ -322,13 +324,15 @@ trait Erasure {
       val psyms = parents map (_.typeSymbol)
       if (psyms contains ArrayClass) {
         // treat arrays specially
-        arrayType(intersectionDominator(parents filter
-                (_.typeSymbol == ArrayClass) map (_.typeArgs.head)))
+        arrayType(
+          intersectionDominator(
+            parents filter
+              (_.typeSymbol == ArrayClass) map (_.typeArgs.head)))
       } else {
         // implement new spec for erasure of refined types.
         def isUnshadowed(psym: Symbol) =
           !(psyms exists
-              (qsym => (psym ne qsym) && (qsym isNonBottomSubClass psym)))
+            (qsym => (psym ne qsym) && (qsym isNonBottomSubClass psym)))
         val cs = parents.iterator.filter { p =>
           // isUnshadowed is a bit expensive, so try classes first
           val psym = p.typeSymbol
@@ -336,7 +340,7 @@ trait Erasure {
           psym.isClass && !psym.isTrait && isUnshadowed(psym)
         }
         (if (cs.hasNext) cs
-         else parents.iterator.filter(p => isUnshadowed(p.typeSymbol))).next()
+        else parents.iterator.filter(p => isUnshadowed(p.typeSymbol))).next()
       }
     }
   }
@@ -365,9 +369,9 @@ trait Erasure {
         (tp: @unchecked) match {
           case MethodType(List(index, tvar), restpe) =>
             MethodType(
-                List(index.cloneSymbol.setInfo(specialErasure(sym)(index.tpe)),
-                     tvar),
-                UnitTpe)
+              List(index.cloneSymbol.setInfo(specialErasure(sym)(index.tpe)),
+                   tvar),
+              UnitTpe)
         } else specialErasure(sym)(tp)
     } else if (sym.owner != NoSymbol && sym.owner.owner == ArrayClass &&
                sym == Array_update.paramss.head(1)) {

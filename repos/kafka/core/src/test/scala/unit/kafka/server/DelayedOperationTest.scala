@@ -26,7 +26,7 @@ class DelayedOperationTest {
   @Before
   def setUp() {
     purgatory = new DelayedOperationPurgatory[MockDelayedOperation](
-        purgatoryName = "mock")
+      purgatoryName = "mock")
   }
 
   @After
@@ -43,12 +43,14 @@ class DelayedOperationTest {
                  purgatory.checkAndComplete("test1"))
     assertFalse("r1 not satisfied and hence watched",
                 purgatory.tryCompleteElseWatch(r1, Array("test1")))
-    assertEquals(
-        "Still nothing satisfied", 0, purgatory.checkAndComplete("test1"))
+    assertEquals("Still nothing satisfied",
+                 0,
+                 purgatory.checkAndComplete("test1"))
     assertFalse("r2 not satisfied and hence watched",
                 purgatory.tryCompleteElseWatch(r2, Array("test2")))
-    assertEquals(
-        "Still nothing satisfied", 0, purgatory.checkAndComplete("test2"))
+    assertEquals("Still nothing satisfied",
+                 0,
+                 purgatory.checkAndComplete("test2"))
     r1.completable = true
     assertEquals("r1 satisfied", 1, purgatory.checkAndComplete("test1"))
     assertEquals("Nothing satisfied", 0, purgatory.checkAndComplete("test1"))
@@ -71,9 +73,9 @@ class DelayedOperationTest {
     val elapsed = System.currentTimeMillis - start
     assertTrue("r1 completed due to expiration", r1.isCompleted())
     assertFalse("r2 hasn't completed", r2.isCompleted())
-    assertTrue("Time for expiration %d should at least %d".format(
-                   elapsed, expiration),
-               elapsed >= expiration)
+    assertTrue(
+      "Time for expiration %d should at least %d".format(elapsed, expiration),
+      elapsed >= expiration)
   }
 
   @Test
@@ -88,42 +90,43 @@ class DelayedOperationTest {
     assertEquals("Purgatory should have 3 total delayed operations",
                  3,
                  purgatory.delayed())
-    assertEquals(
-        "Purgatory should have 6 watched elements", 6, purgatory.watched())
+    assertEquals("Purgatory should have 6 watched elements",
+                 6,
+                 purgatory.watched())
 
     // complete the operations, it should immediately be purged from the delayed operation
     r2.completable = true
     r2.tryComplete()
     assertEquals(
-        "Purgatory should have 2 total delayed operations instead of " +
+      "Purgatory should have 2 total delayed operations instead of " +
         purgatory.delayed(),
-        2,
-        purgatory.delayed())
+      2,
+      purgatory.delayed())
 
     r3.completable = true
     r3.tryComplete()
     assertEquals(
-        "Purgatory should have 1 total delayed operations instead of " +
+      "Purgatory should have 1 total delayed operations instead of " +
         purgatory.delayed(),
-        1,
-        purgatory.delayed())
+      1,
+      purgatory.delayed())
 
     // checking a watch should purge the watch list
     purgatory.checkAndComplete("test1")
     assertEquals("Purgatory should have 4 watched elements instead of " +
-                 purgatory.watched(),
+                   purgatory.watched(),
                  4,
                  purgatory.watched())
 
     purgatory.checkAndComplete("test2")
     assertEquals("Purgatory should have 2 watched elements instead of " +
-                 purgatory.watched(),
+                   purgatory.watched(),
                  2,
                  purgatory.watched())
 
     purgatory.checkAndComplete("test3")
     assertEquals("Purgatory should have 1 watched elements instead of " +
-                 purgatory.watched(),
+                   purgatory.watched(),
                  1,
                  purgatory.watched())
   }

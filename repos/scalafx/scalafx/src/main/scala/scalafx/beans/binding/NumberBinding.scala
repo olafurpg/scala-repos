@@ -37,6 +37,7 @@ object NumberBinding {
 }
 
 class NumberBinding(override val delegate: jfxbb.NumberBinding)
-    extends NumberExpression(delegate) with ObservableValue[Number, Number] {
+    extends NumberExpression(delegate)
+    with ObservableValue[Number, Number] {
   def value = delegate.getValue
 }

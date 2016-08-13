@@ -57,8 +57,8 @@ object TimePathedSource extends java.io.Serializable {
           case None => None
           case Some(newInit) if newInit.contains(init) =>
             sys.error(
-                "DateRange expansion ill-behaved: %s -> %s -> %s -> %s".format(
-                    init, expanded, subset, newInit))
+              "DateRange expansion ill-behaved: %s -> %s -> %s -> %s"
+                .format(init, expanded, subset, newInit))
           case Some(newInit) => minifyRec(newInit, expander, vertractor)
         }
     }
@@ -103,8 +103,8 @@ object TimePathedSource extends java.io.Serializable {
         .map(_.length > 0)
         .getOrElse(false)
       logger.debug(
-          "Tested input %s, Valid: %s. Conditions: Any files present, DateRange: %s"
-            .format(p, valid, desired))
+        "Tested input %s, Valid: %s. Conditions: Any files present, DateRange: %s"
+          .format(p, valid, desired))
       valid
     }
 

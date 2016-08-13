@@ -12,7 +12,8 @@ import scala.concurrent.duration._
 
 object TypedActorRemoteDeploySpec {
   val conf =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
       akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       akka.remote.netty.tcp.port = 0
                                                             """)
@@ -38,8 +39,8 @@ class TypedActorRemoteDeploySpec extends AkkaSpec(conf) {
   def verify[T](f: RemoteNameService ⇒ Future[T], expected: T) = {
     val ts = TypedActor(system)
     val echoService: RemoteNameService = ts.typedActorOf(
-        TypedProps[RemoteNameServiceImpl].withDeploy(
-            Deploy(scope = RemoteScope(remoteAddress))))
+      TypedProps[RemoteNameServiceImpl].withDeploy(
+        Deploy(scope = RemoteScope(remoteAddress))))
     Await.result(f(echoService), 3.seconds) should ===(expected)
     val actor = ts.getActorRefFor(echoService)
     system.stop(actor)

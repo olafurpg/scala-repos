@@ -4,7 +4,12 @@ import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.lang.Language
 import com.intellij.openapi.application.ApplicationBundle
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider.SettingsType
-import com.intellij.psi.codeStyle.{CodeStyleSettingsCustomizable, CommonCodeStyleSettings, DisplayPriority, LanguageCodeStyleSettingsProvider}
+import com.intellij.psi.codeStyle.{
+  CodeStyleSettingsCustomizable,
+  CommonCodeStyleSettings,
+  DisplayPriority,
+  LanguageCodeStyleSettingsProvider
+}
 import org.jetbrains.plugins.scala.ScalaFileType
 
 import scala.collection.mutable.ArrayBuffer
@@ -27,8 +32,8 @@ class ScalaLanguageCodeStyleSettingsProvider
 
   def getLanguage: Language = ScalaFileType.SCALA_LANGUAGE
 
-  override def customizeSettings(
-      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
+  override def customizeSettings(consumer: CodeStyleSettingsCustomizable,
+                                 settingsType: SettingsType) {
     def showCustomOption(fieldName: String,
                          title: String,
                          groupName: String,
@@ -90,11 +95,11 @@ class ScalaLanguageCodeStyleSettingsProvider
 
     if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
       consumer.renameStandardOption(
-          "BINARY_OPERATION_WRAP",
-          "Wrap infix expressions, patterns and types ")
+        "BINARY_OPERATION_WRAP",
+        "Wrap infix expressions, patterns and types ")
       consumer.renameStandardOption(
-          CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT,
-          "'match' or 'switch' statements")
+        CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT,
+        "'match' or 'switch' statements")
 
       //Binary expression section
       buffer ++= Seq("BINARY_OPERATION_WRAP",
@@ -174,9 +179,9 @@ class ScalaLanguageCodeStyleSettingsProvider
     //Custom options
     if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
       showCustomOption(
-          "WRAP_BEFORE_WITH_KEYWORD",
-          "Wrap before 'with' keyword",
-          ApplicationBundle.message("wrapping.extends.implements.list"))
+        "WRAP_BEFORE_WITH_KEYWORD",
+        "Wrap before 'with' keyword",
+        ApplicationBundle.message("wrapping.extends.implements.list"))
       showCustomOption("ALIGN_IF_ELSE",
                        "Align if-else statements",
                        ApplicationBundle.message("wrapping.if.statement"))
@@ -209,16 +214,16 @@ class ScalaLanguageCodeStyleSettingsProvider
                        "Parameters on new line",
                        ANONYMOUS_METHOD)
       showCustomOption(
-          "NOT_CONTINUATION_INDENT_FOR_PARAMS",
-          "Use normal indent for parameters",
-          CodeStyleSettingsCustomizable.WRAPPING_METHOD_PARAMETERS)
+        "NOT_CONTINUATION_INDENT_FOR_PARAMS",
+        "Use normal indent for parameters",
+        CodeStyleSettingsCustomizable.WRAPPING_METHOD_PARAMETERS)
       showCustomOption("DO_NOT_INDENT_CASE_CLAUSE_BODY",
                        "Do not indent case clause body",
                        CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT)
       showCustomOption(
-          "INDENT_BRACED_FUNCTION_ARGS",
-          "Indent braced arguments",
-          CodeStyleSettingsCustomizable.WRAPPING_METHOD_ARGUMENTS_WRAPPING)
+        "INDENT_BRACED_FUNCTION_ARGS",
+        "Indent braced arguments",
+        CodeStyleSettingsCustomizable.WRAPPING_METHOD_ARGUMENTS_WRAPPING)
       showCustomOption("ALIGN_IN_COLUMNS_CASE_BRANCH",
                        "Align in columns 'case' branches",
                        CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT)
@@ -228,15 +233,16 @@ class ScalaLanguageCodeStyleSettingsProvider
       showCustomOption("PLACE_SELF_TYPE_ON_NEW_LINE",
                        "Place self type on new line",
                        CLASS_DEFINITION)
-      showCustomOption(
-          "KEEP_XML_FORMATTING", "Keep xml formatting", XML_FORMATTING)
+      showCustomOption("KEEP_XML_FORMATTING",
+                       "Keep xml formatting",
+                       XML_FORMATTING)
       showCustomOption("KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST",
                        "Do not format one-line lambdas in arg list",
                        CodeStyleSettingsCustomizable.WRAPPING_KEEP)
       showCustomOption(
-          "DO_NOT_ALIGN_BLOCK_EXPR_PARAMS",
-          "Do not align block expression parameters",
-          CodeStyleSettingsCustomizable.WRAPPING_METHOD_ARGUMENTS_WRAPPING)
+        "DO_NOT_ALIGN_BLOCK_EXPR_PARAMS",
+        "Do not align block expression parameters",
+        CodeStyleSettingsCustomizable.WRAPPING_METHOD_ARGUMENTS_WRAPPING)
     }
 
     if (settingsType == SettingsType.SPACING_SETTINGS) {
@@ -299,9 +305,9 @@ class ScalaLanguageCodeStyleSettingsProvider
                        ApplicationBundle.message("checkbox.after.description"),
                        ScalaDocFormattingPanel.BLANK_LINES_GROUP)
       showCustomOption(
-          "SD_BLANK_LINE_AFTER_PARAMETERS_COMMENTS",
-          ApplicationBundle.message("checkbox.after.parameter.descriptions"),
-          ScalaDocFormattingPanel.BLANK_LINES_GROUP)
+        "SD_BLANK_LINE_AFTER_PARAMETERS_COMMENTS",
+        ApplicationBundle.message("checkbox.after.parameter.descriptions"),
+        ScalaDocFormattingPanel.BLANK_LINES_GROUP)
       showCustomOption("SD_BLANK_LINE_AFTER_RETURN_COMMENTS",
                        ApplicationBundle.message("checkbox.after.return.tag"),
                        ScalaDocFormattingPanel.BLANK_LINES_GROUP)
@@ -345,31 +351,31 @@ class ScalaLanguageCodeStyleSettingsProvider
 
   private val WRAPPING_AND_BRACES_SAMPLE =
     "class A {\n" + "  def foo {\n" +
-    "    val infixExpr = 1 + 2 + (3 + 4) + 5 + 6 +\n" +
-    "      7 + 8 + 9 + 10 + 11 + 12 + 13 + (14 +\n" +
-    "      15) + 16 + 17 * 18 + 19 + 20\n" + "  }\n" + "\n" +
-    "  class Foo {\n" +
-    "    def foo(x: Int = 0, y: Int = 1, z: Int = 2) = new Foo\n" + "  }\n" +
-    "  \n" + "  val goo = new Foo\n" + "\n" +
-    "  goo.foo().foo(1, 2).foo(z = 1, y = 2).foo().foo(1, 2, 3).foo()\n" +
-    "  \n" + "  def m(x: Int, y: Int, z: Int)(u: Int, f: Int, l: Int) {\n" +
-    "    val zz = if (true) 1 else 3\n" + "    val uz = if (true)\n" +
-    "               1\n" + "              else {\n" + "              }\n" +
-    "    if (true) {\n" + "      false\n" + "    } else if (false) {\n" +
-    "    } else true\n" + "    for (i <- 1 to 5) yield i + 1\n" +
-    "    Some(3) match {\n" + "      case Some(a) if a != 2 => a\n" +
-    "      case Some(1) |\n" + "         Some(2) => \n" + "        \n" +
-    "      case _ =>\n" + "    }\n" + "    try a + 2\n" + "    catch {\n" +
-    "      case e => (i: Int) => i + 1\n" + "    } finally \n" +
-    "      doNothing\n" + "    while (true) \n" + "      true = false\n" +
-    "  }\n" + "}"
+      "    val infixExpr = 1 + 2 + (3 + 4) + 5 + 6 +\n" +
+      "      7 + 8 + 9 + 10 + 11 + 12 + 13 + (14 +\n" +
+      "      15) + 16 + 17 * 18 + 19 + 20\n" + "  }\n" + "\n" +
+      "  class Foo {\n" +
+      "    def foo(x: Int = 0, y: Int = 1, z: Int = 2) = new Foo\n" + "  }\n" +
+      "  \n" + "  val goo = new Foo\n" + "\n" +
+      "  goo.foo().foo(1, 2).foo(z = 1, y = 2).foo().foo(1, 2, 3).foo()\n" +
+      "  \n" + "  def m(x: Int, y: Int, z: Int)(u: Int, f: Int, l: Int) {\n" +
+      "    val zz = if (true) 1 else 3\n" + "    val uz = if (true)\n" +
+      "               1\n" + "              else {\n" + "              }\n" +
+      "    if (true) {\n" + "      false\n" + "    } else if (false) {\n" +
+      "    } else true\n" + "    for (i <- 1 to 5) yield i + 1\n" +
+      "    Some(3) match {\n" + "      case Some(a) if a != 2 => a\n" +
+      "      case Some(1) |\n" + "         Some(2) => \n" + "        \n" +
+      "      case _ =>\n" + "    }\n" + "    try a + 2\n" + "    catch {\n" +
+      "      case e => (i: Int) => i + 1\n" + "    } finally \n" +
+      "      doNothing\n" + "    while (true) \n" + "      true = false\n" +
+      "  }\n" + "}"
 
   private val BLANK_LINES_CODE_SAMPLE =
     "//code\npackage A\n" + "\n" + "\n" + "import a.b\n" + "\n" +
-    "import b.c\n" + "import c.d\n" + "\n" + "\n" + "class A {\n" +
-    "  def foo = 1\n" + "  def goo = 2\n" + "  type S = String\n" +
-    "  val a = 1\n" + "  \n" + "  val b = 2\n" + "  val c = 2\n" + "}\n" +
-    "\n" + "trait B {\n" + "  \n" + "  def foo\n" + "  def goo\n" +
-    "  def too = {\n" + "    \n" + "    \n" + "    val x = 2\n" +
-    "    new J {\n" + "      def goo = 1\n" + "    }\n" + "  }\n" + "}"
+      "import b.c\n" + "import c.d\n" + "\n" + "\n" + "class A {\n" +
+      "  def foo = 1\n" + "  def goo = 2\n" + "  type S = String\n" +
+      "  val a = 1\n" + "  \n" + "  val b = 2\n" + "  val c = 2\n" + "}\n" +
+      "\n" + "trait B {\n" + "  \n" + "  def foo\n" + "  def goo\n" +
+      "  def too = {\n" + "    \n" + "    \n" + "    val x = 2\n" +
+      "    new J {\n" + "      def goo = 1\n" + "    }\n" + "  }\n" + "}"
 }

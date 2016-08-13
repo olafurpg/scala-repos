@@ -11,25 +11,24 @@ import akka.testkit.AkkaSpec
 
 class FlowFilterSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   "A Filter" must {
 
     "filter" in {
       def script =
-        Script(
-            TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange map { _ ⇒
           val x = random.nextInt();
           Seq(x) -> (if ((x & 1) == 0) Seq(x) else Seq())
         }: _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.filter(_ % 2 == 0)))
+        (_ ⇒ runScript(script, settings)(_.filter(_ % 2 == 0)))
     }
 
     "not blow up with high request counts" in {
-      val settings = ActorMaterializerSettings(system).withInputBuffer(
-          initialSize = 1, maxSize = 1)
+      val settings = ActorMaterializerSettings(system)
+        .withInputBuffer(initialSize = 1, maxSize = 1)
       implicit val materializer = ActorMaterializer(settings)
 
       val probe = TestSubscriber.manualProbe[Int]()
@@ -55,7 +54,7 @@ class FlowFilterSpec extends AkkaSpec with ScriptedTest {
           Seq(x) -> (if ((x & 1) == 1) Seq(x) else Seq())
         }: _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.filterNot(_ % 2 == 0)))
+        (_ ⇒ runScript(script, settings)(_.filterNot(_ % 2 == 0)))
     }
   }
 }

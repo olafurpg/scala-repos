@@ -24,8 +24,8 @@ import com.twitter.bijection.Injection
   * codec on T for serialization.
   */
 object LzoCodecSource {
-  def apply[T](
-      paths: String*)(implicit passedInjection: Injection[T, Array[Byte]]) =
+  def apply[T](paths: String*)(
+      implicit passedInjection: Injection[T, Array[Byte]]) =
     new LzoCodec[T] {
       val hdfsPaths = paths
       val localPaths = paths

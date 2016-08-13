@@ -16,7 +16,7 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
 
   def test1(): Unit = {
     doTest(
-        s"""
+      s"""
         |Seq("1", "2").map { x =>
         |  if (x.startsWith("1")) x
         |  else $START{
@@ -24,7 +24,7 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
         |  }$END
         |}
       """.stripMargin,
-        """
+      """
         |Seq("1", "2").map { x =>
         |  if (x.startsWith("1")) x
         |  else {
@@ -32,7 +32,7 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
         |  }
         |}
       """.stripMargin,
-        """
+      """
         |Seq("1", "2").foreach { x =>
         |  if (x.startsWith("1")) x
         |  else {

@@ -42,9 +42,10 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class TextFormatterSpec
-    extends SimpleSFXDelegateSpec[
-        jfxsc.TextFormatter[String], TextFormatter[String]](
-        classOf[jfxsc.TextFormatter[String]], classOf[TextFormatter[String]])
+    extends SimpleSFXDelegateSpec[jfxsc.TextFormatter[String],
+                                  TextFormatter[String]](
+      classOf[jfxsc.TextFormatter[String]],
+      classOf[TextFormatter[String]])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance: TextFormatter[String] =

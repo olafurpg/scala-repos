@@ -25,7 +25,12 @@ import scala.util.Random
 import scala.util.control.NonFatal
 
 import kafka.api._
-import kafka.common.{ErrorMapping, OffsetAndMetadata, OffsetMetadataAndError, TopicAndPartition}
+import kafka.common.{
+  ErrorMapping,
+  OffsetAndMetadata,
+  OffsetMetadataAndError,
+  TopicAndPartition
+}
 import kafka.consumer.{ConsumerConfig, SimpleConsumer}
 
 import org.apache.spark.SparkException
@@ -62,8 +67,8 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
                        config.socketReceiveBufferBytes,
                        config.clientId)
 
-  def connectLeader(
-      topic: String, partition: Int): Either[Err, SimpleConsumer] =
+  def connectLeader(topic: String,
+                    partition: Int): Either[Err, SimpleConsumer] =
     findLeader(topic, partition).right.map(hp => connect(hp._1, hp._2))
 
   // Metadata api
@@ -72,8 +77,10 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   // scalastyle:on
 
   def findLeader(topic: String, partition: Int): Either[Err, (String, Int)] = {
-    val req = TopicMetadataRequest(
-        TopicMetadataRequest.CurrentVersion, 0, config.clientId, Seq(topic))
+    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
+                                   0,
+                                   config.clientId,
+                                   Seq(topic))
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -134,8 +141,10 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
 
   def getPartitionMetadata(
       topics: Set[String]): Either[Err, Set[TopicMetadata]] = {
-    val req = TopicMetadataRequest(
-        TopicMetadataRequest.CurrentVersion, 0, config.clientId, topics.toSeq)
+    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
+                                   0,
+                                   config.clientId,
+                                   topics.toSeq)
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -217,7 +226,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
                 }
               } else {
                 errs.append(new SparkException(
-                        s"Empty offsets for ${tp}, is ${before} before log beginning?"))
+                  s"Empty offsets for ${tp}, is ${before} before log beginning?"))
               }
             } else {
               errs.append(ErrorMapping.exceptionFor(por.error))
@@ -230,7 +239,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       }
       val missing = topicAndPartitions.diff(result.keySet)
       errs.append(
-          new SparkException(s"Couldn't find leader offsets for ${missing}"))
+        new SparkException(s"Couldn't find leader offsets for ${missing}"))
       Left(errs)
     }
   }
@@ -268,8 +277,9 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       groupId: String,
       topicAndPartitions: Set[TopicAndPartition]
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] =
-    getConsumerOffsetMetadata(
-        groupId, topicAndPartitions, defaultConsumerApiVersion)
+    getConsumerOffsetMetadata(groupId,
+                              topicAndPartitions,
+                              defaultConsumerApiVersion)
 
   def getConsumerOffsetMetadata(
       groupId: String,
@@ -277,8 +287,8 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       consumerApiVersion: Short
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] = {
     var result = Map[TopicAndPartition, OffsetMetadataAndError]()
-    val req = OffsetFetchRequest(
-        groupId, topicAndPartitions.toSeq, consumerApiVersion)
+    val req =
+      OffsetFetchRequest(groupId, topicAndPartitions.toSeq, consumerApiVersion)
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp = consumer.fetchOffsets(req)
@@ -299,7 +309,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
     }
     val missing = topicAndPartitions.diff(result.keySet)
     errs.append(
-        new SparkException(s"Couldn't find consumer offsets for ${missing}"))
+      new SparkException(s"Couldn't find consumer offsets for ${missing}"))
     Left(errs)
   }
 
@@ -386,8 +396,8 @@ object KafkaCluster {
   /** If the result is right, return it, otherwise throw SparkException */
   def checkErrors[T](result: Either[Err, T]): T = {
     result.fold(
-        errs => throw new SparkException(errs.mkString("\n")),
-        ok => ok
+      errs => throw new SparkException(errs.mkString("\n")),
+      ok => ok
     )
   }
 
@@ -398,14 +408,14 @@ object KafkaCluster {
     * Simple consumers connect directly to brokers, but need many of the same configs.
     * This subclass won't warn about missing ZK params, or presence of broker params.
     */
-  class SimpleConsumerConfig private (
-      brokers: String, originalProps: Properties)
+  class SimpleConsumerConfig private (brokers: String,
+                                      originalProps: Properties)
       extends ConsumerConfig(originalProps) {
     val seedBrokers: Array[(String, Int)] = brokers.split(",").map { hp =>
       val hpa = hp.split(":")
       if (hpa.size == 1) {
         throw new SparkException(
-            s"Broker not in the correct format of <host>:<port> [$brokers]")
+          s"Broker not in the correct format of <host>:<port> [$brokers]")
       }
       (hpa(0), hpa(1).toInt)
     }
@@ -423,7 +433,7 @@ object KafkaCluster {
         .get("metadata.broker.list")
         .orElse(kafkaParams.get("bootstrap.servers"))
         .getOrElse(throw new SparkException(
-                "Must specify metadata.broker.list or bootstrap.servers"))
+          "Must specify metadata.broker.list or bootstrap.servers"))
 
       val props = new Properties()
       kafkaParams.foreach {

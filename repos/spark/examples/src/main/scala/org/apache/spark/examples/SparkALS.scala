@@ -84,7 +84,8 @@ object SparkALS {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of ALS and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of ALS and is given as an example!
         |Please use the ALS method found in org.apache.spark.mllib.recommendation
         |for more conventional use.
       """.stripMargin)

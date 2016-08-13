@@ -134,14 +134,14 @@ class SyslogHandler(val server: String,
   * @param truncateStackTracesAt
   * Truncate stack traces in exception logging (line count).
   */
-class SyslogFormatter(
-    val hostname: String = NetUtil.getLocalHostName(),
-    val serverName: Option[String] = None,
-    val useIsoDateFormat: Boolean = true,
-    val priority: Int = SyslogHandler.PRIORITY_USER,
-    timezone: Option[String] = None,
-    truncateAt: Int = 0,
-    truncateStackTracesAt: Int = Formatter.DefaultStackTraceSizeLimit)
+class SyslogFormatter(val hostname: String = NetUtil.getLocalHostName(),
+                      val serverName: Option[String] = None,
+                      val useIsoDateFormat: Boolean = true,
+                      val priority: Int = SyslogHandler.PRIORITY_USER,
+                      timezone: Option[String] = None,
+                      truncateAt: Int = 0,
+                      truncateStackTracesAt: Int =
+                        Formatter.DefaultStackTraceSizeLimit)
     extends Formatter(timezone,
                       truncateAt,
                       truncateStackTracesAt,
@@ -157,8 +157,9 @@ class SyslogFormatter(
 
   override def lineTerminator = ""
 
-  override def formatPrefix(
-      level: javalog.Level, date: String, name: String): String = {
+  override def formatPrefix(level: javalog.Level,
+                            date: String,
+                            name: String): String = {
     val syslogLevel = level match {
       case x: Level => SyslogHandler.severityForLogLevel(x.value)
       case x: javalog.Level => SyslogHandler.severityForLogLevel(x.intValue)
@@ -167,20 +168,19 @@ class SyslogFormatter(
       case None =>
         "<%d>%s %s %s: ".format(priority | syslogLevel, date, hostname, name)
       case Some(serverName) =>
-        "<%d>%s %s [%s] %s: ".format(
-            priority | syslogLevel, date, hostname, serverName, name)
+        "<%d>%s %s [%s] %s: "
+          .format(priority | syslogLevel, date, hostname, serverName, name)
     }
   }
 }
 
 object SyslogFuture {
   private val executor = Executors.newSingleThreadExecutor(
-      new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true /*daemon*/ ))
+    new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true /*daemon*/ ))
   private val noop = new Runnable { def run() {} }
 
   def apply(action: => Unit) =
-    executor.submit(
-        new Runnable {
+    executor.submit(new Runnable {
       def run() { action }
     })
 

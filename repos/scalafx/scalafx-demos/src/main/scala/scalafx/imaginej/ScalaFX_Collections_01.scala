@@ -53,51 +53,51 @@ import scalafx.collections.ObservableBuffer.{Add, Remove, Reorder}
 object ScalaFX_Collections_01 {
   private def changes01(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes01 " + observableStringBuffer)
+      "observable string buffer before changes01 " + observableStringBuffer)
     observableStringBuffer += "a"
     observableStringBuffer += "b"
     println(
-        "observable string buffer after  changes01 " + observableStringBuffer)
+      "observable string buffer after  changes01 " + observableStringBuffer)
   }
 
   private def changes02(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes02 " + observableStringBuffer)
+      "observable string buffer before changes02 " + observableStringBuffer)
     observableStringBuffer ++= List("c", "d")
     println(
-        "observable string buffer after  changes02 " + observableStringBuffer)
+      "observable string buffer after  changes02 " + observableStringBuffer)
   }
 
   private def changes03(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes03 " + observableStringBuffer)
+      "observable string buffer before changes03 " + observableStringBuffer)
     List("x", "y", "z") ++=: observableStringBuffer
     println(
-        "observable string buffer after  changes03 " + observableStringBuffer)
+      "observable string buffer after  changes03 " + observableStringBuffer)
   }
 
   private def changes04(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes04 " + observableStringBuffer)
+      "observable string buffer before changes04 " + observableStringBuffer)
     observableStringBuffer.remove(1, 4)
     println(
-        "observable string buffer after  changes04 " + observableStringBuffer)
+      "observable string buffer after  changes04 " + observableStringBuffer)
   }
 
   private def changes05(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes05 " + observableStringBuffer)
+      "observable string buffer before changes05 " + observableStringBuffer)
     observableStringBuffer.setAll("X", "C", "D")
     println(
-        "observable string buffer after  changes05 " + observableStringBuffer)
+      "observable string buffer after  changes05 " + observableStringBuffer)
   }
 
   private def changes06(observableStringBuffer: ObservableBuffer[String]) {
     println(
-        "observable string buffer before changes06 " + observableStringBuffer)
+      "observable string buffer before changes06 " + observableStringBuffer)
     observableStringBuffer.sort()
     println(
-        "observable string buffer after  changes06 " + observableStringBuffer)
+      "observable string buffer after  changes06 " + observableStringBuffer)
   }
 
   def main(args: Array[String]) {
@@ -118,24 +118,24 @@ object ScalaFX_Collections_01 {
       }
     }
     println(
-        "======================================================================")
+      "======================================================================")
     changes01(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
     changes02(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
     changes03(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
     changes04(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
     changes05(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
     changes06(observableStringBuffer)
     println(
-        "======================================================================")
+      "======================================================================")
   }
 }

@@ -26,7 +26,8 @@ class NodeQueueBenchmark {
   import NodeQueueBenchmark._
 
   val config = ConfigFactory
-    .parseString("""
+    .parseString(
+      """
 dispatcher {
   executor = "thread-pool-executor"
   throughput = 1000

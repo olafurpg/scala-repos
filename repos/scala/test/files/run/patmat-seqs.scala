@@ -18,25 +18,25 @@ object Test {
   def main(args: Array[String]): Unit = {
     val xs1 =
       List(
-          List(1, 2, 3),
-          List(4, 5),
-          Vector(7),
-          Seq(),
-          Seq(1, 2, 3, 4, 5, "abcd"),
-          "abc"
+        List(1, 2, 3),
+        List(4, 5),
+        Vector(7),
+        Seq(),
+        Seq(1, 2, 3, 4, 5, "abcd"),
+        "abc"
       ) map f1
 
     xs1 foreach println
 
     val xs2 =
       List(
-          Seq(5, 6, 7),
-          Seq(5, 6, 7, 8, 9),
-          Seq("a"),
-          Seq(1, 6, 7),
-          List(5, 6, 7),
-          Nil,
-          5
+        Seq(5, 6, 7),
+        Seq(5, 6, 7, 8, 9),
+        Seq("a"),
+        Seq(1, 6, 7),
+        List(5, 6, 7),
+        Nil,
+        5
       ) map f2
 
     xs2 foreach println

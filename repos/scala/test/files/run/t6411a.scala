@@ -41,9 +41,9 @@ object Test extends App {
         s"${ex1.getClass}: ${ex1.getMessage}"
     }
     println(
-        s"as seen by Scala reflection: ${msym.asInstanceOf[scala.reflect.internal.Symbols#Symbol].defString}")
+      s"as seen by Scala reflection: ${msym.asInstanceOf[scala.reflect.internal.Symbols#Symbol].defString}")
     println(
-        s"as seen by Java reflection: ${mmirror.asInstanceOf[ { val jmeth: java.lang.reflect.Method }].jmeth}")
+      s"as seen by Java reflection: ${mmirror.asInstanceOf[{ val jmeth: java.lang.reflect.Method }].jmeth}")
     println(s"result = $mresult")
   }
 

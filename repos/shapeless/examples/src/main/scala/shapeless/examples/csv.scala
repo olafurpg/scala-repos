@@ -138,17 +138,17 @@ object CSVConverter {
 
       def to(ft: Option[V] :: T): String = {
         ft.head.map(scv.value.to(_) ++ ",").getOrElse("") ++ sct.value.to(
-            ft.tail)
+          ft.tail)
       }
     }
 
   // Anything with a Generic
 
-  implicit def deriveClass[A, R](
-      implicit gen: Generic.Aux[A, R],
-      conv: CSVConverter[R]): CSVConverter[A] = new CSVConverter[A] {
+  implicit def deriveClass[A, R](implicit gen: Generic.Aux[A, R],
+                                 conv: CSVConverter[R]): CSVConverter[A] =
+    new CSVConverter[A] {
 
-    def from(s: String): Try[A] = conv.from(s).map(gen.from)
-    def to(a: A): String = conv.to(gen.to(a))
-  }
+      def from(s: String): Try[A] = conv.from(s).map(gen.from)
+      def to(a: A): String = conv.to(gen.to(a))
+    }
 }

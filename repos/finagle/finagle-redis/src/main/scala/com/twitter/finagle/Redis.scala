@@ -2,9 +2,18 @@ package com.twitter.finagle
 
 import com.twitter.finagle
 import com.twitter.finagle.client._
-import com.twitter.finagle.dispatch.{GenSerialClientDispatcher, PipeliningDispatcher}
+import com.twitter.finagle.dispatch.{
+  GenSerialClientDispatcher,
+  PipeliningDispatcher
+}
 import com.twitter.finagle.netty3.Netty3Transporter
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
+import com.twitter.finagle.param.{
+  Monitor => _,
+  ResponseClassifier => _,
+  ExceptionStatsHandler => _,
+  Tracer => _,
+  _
+}
 import com.twitter.finagle.pool.SingletonPool
 import com.twitter.finagle.redis.protocol.{Command, Reply}
 import com.twitter.finagle.service.{ResponseClassifier, RetryBudget}
@@ -36,15 +45,16 @@ object Redis extends Client[Command, Reply] {
       * A default client stack which supports the pipelined redis client.
       */
     def newStack: Stack[ServiceFactory[Command, Reply]] =
-      StackClient.newStack.replace(
-          DefaultPool.Role, SingletonPool.module[Command, Reply])
+      StackClient.newStack
+        .replace(DefaultPool.Role, SingletonPool.module[Command, Reply])
   }
 
-  case class Client(
-      stack: Stack[ServiceFactory[Command, Reply]] = Client.newStack,
-      params: Stack.Params = Client.defaultParams)
+  case class Client(stack: Stack[ServiceFactory[Command, Reply]] =
+                      Client.newStack,
+                    params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Reply, Client]
-      with WithDefaultLoadBalancer[Client] with RedisRichClient {
+      with WithDefaultLoadBalancer[Client]
+      with RedisRichClient {
 
     protected def copy1(
         stack: Stack[ServiceFactory[Command, Reply]] = this.stack,
@@ -60,9 +70,9 @@ object Redis extends Client[Command, Reply] {
     protected def newDispatcher(
         transport: Transport[In, Out]): Service[Command, Reply] =
       new PipeliningDispatcher(
-          transport,
-          params[finagle.param.Stats].statsReceiver
-            .scope(GenSerialClientDispatcher.StatsScope)
+        transport,
+        params[finagle.param.Stats].statsReceiver
+          .scope(GenSerialClientDispatcher.StatsScope)
       )
 
     // Java-friendly forwarders

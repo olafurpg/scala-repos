@@ -10,7 +10,8 @@ private sealed trait ConstSemigroup[A, B] extends Semigroup[Const[A, B]] {
 }
 
 private sealed trait ConstMonoid[A, B]
-    extends Monoid[Const[A, B]] with ConstSemigroup[A, B] {
+    extends Monoid[Const[A, B]]
+    with ConstSemigroup[A, B] {
   def A: Monoid[A]
 
   override def zero: Const[A, B] =
@@ -27,7 +28,8 @@ private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
 }
 
 private sealed trait ConstApply[C]
-    extends Apply[Const[C, ?]] with ConstTraverse[C] {
+    extends Apply[Const[C, ?]]
+    with ConstTraverse[C] {
   def C: Semigroup[C]
 
   override def ap[A, B](fa: => Const[C, A])(
@@ -36,7 +38,8 @@ private sealed trait ConstApply[C]
 }
 
 private sealed trait ConstApplicative[C]
-    extends Applicative[Const[C, ?]] with ConstApply[C] {
+    extends Applicative[Const[C, ?]]
+    with ConstApply[C] {
   def C: Monoid[C]
 
   override def point[A](a: => A): Const[C, A] = Const(C.zero)
@@ -52,7 +55,8 @@ private sealed trait ConstEqual[A, B] extends Equal[Const[A, B]] {
 }
 
 private sealed trait ConstOrder[A, B]
-    extends Order[Const[A, B]] with ConstEqual[A, B] {
+    extends Order[Const[A, B]]
+    with ConstEqual[A, B] {
   def OA: Order[A]
 
   override def order(a1: Const[A, B], a2: Const[A, B]): Ordering =
@@ -73,34 +77,34 @@ sealed abstract class ConstInstances1 {
 }
 
 sealed abstract class ConstInstances0 extends ConstInstances1 {
-  implicit def constEqual[A : Equal, B]: Equal[Const[A, B]] =
+  implicit def constEqual[A: Equal, B]: Equal[Const[A, B]] =
     new ConstEqual[A, B] {
       val OA: Equal[A] = implicitly
     }
 
-  implicit def constSemigroup[A : Semigroup, B]: Semigroup[Const[A, B]] =
+  implicit def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] =
     new ConstSemigroup[A, B] {
       val A: Semigroup[A] = implicitly
     }
 
-  implicit def constApply[C : Semigroup]: Apply[Const[C, ?]] =
+  implicit def constApply[C: Semigroup]: Apply[Const[C, ?]] =
     new ConstApply[C] {
       val C: Semigroup[C] = implicitly
     }
 }
 
 sealed abstract class ConstInstances extends ConstInstances0 {
-  implicit def constOrder[A : Order, B]: Order[Const[A, B]] =
+  implicit def constOrder[A: Order, B]: Order[Const[A, B]] =
     new ConstOrder[A, B] {
       val OA: Order[A] = implicitly
     }
 
-  implicit def constMonoid[A : Monoid, B]: Monoid[Const[A, B]] =
+  implicit def constMonoid[A: Monoid, B]: Monoid[Const[A, B]] =
     new ConstMonoid[A, B] {
       val A: Monoid[A] = implicitly
     }
 
-  implicit def constApplicative[C : Monoid]: Applicative[Const[C, ?]] =
+  implicit def constApplicative[C: Monoid]: Applicative[Const[C, ?]] =
     new ConstApplicative[C] {
       val C: Monoid[C] = implicitly
     }

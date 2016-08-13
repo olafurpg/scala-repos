@@ -130,7 +130,7 @@ object Test {
 
     def shouldBeTopLevel =
       ((depth == 1) || (nested.headOption == Some(PrivateMethod)) ||
-          (nested.isEmpty && privateObj))
+        (nested.isEmpty && privateObj))
 
     val enums =
       if (shouldBeTopLevel) Contexts.topLevel else Contexts.values.toList
@@ -252,7 +252,7 @@ object Test {
   /** Only allow multithreaded tests if not inside a static initializer. */
   private def allowMT(structure: List[Contexts.Value]): Boolean = {
     var nesting = structure
-    while ( (nesting ne Nil) && nesting.head == Object) {
+    while ((nesting ne Nil) && nesting.head == Object) {
       nesting = nesting.tail
     }
     if (nesting ne Nil) !(nesting.head == Val)
@@ -308,8 +308,8 @@ object Test {
     generate(depth, payloadMT, "runTest", List(), allowMT)
 
     println(
-        template.format(header,
-                        bodies.mkString("", "\n", ""),
-                        triggers.mkString("", "\n", "")))
+      template.format(header,
+                      bodies.mkString("", "\n", ""),
+                      triggers.mkString("", "\n", "")))
   }
 }

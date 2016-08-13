@@ -18,8 +18,8 @@ final class JSDependencyManifest(val origin: Origin,
   override def equals(that: Any): Boolean = that match {
     case that: JSDependencyManifest =>
       this.origin == that.origin && this.libDeps == that.libDeps &&
-      this.requiresDOM == that.requiresDOM &&
-      this.compliantSemantics == that.compliantSemantics
+        this.requiresDOM == that.requiresDOM &&
+        this.compliantSemantics == that.compliantSemantics
     case _ =>
       false
   }
@@ -73,16 +73,17 @@ object JSDependencyManifest {
     def deserialize(x: JSON): JSDependencyManifest = {
       val obj = new JSONObjExtractor(x)
       new JSDependencyManifest(
-          obj.fld[Origin]("origin"),
-          obj.opt[List[JSDependency]]("libDeps").getOrElse(Nil),
-          obj.opt[Boolean]("requiresDOM").getOrElse(false),
-          obj.opt[List[String]]("compliantSemantics").getOrElse(Nil))
+        obj.fld[Origin]("origin"),
+        obj.opt[List[JSDependency]]("libDeps").getOrElse(Nil),
+        obj.opt[Boolean]("requiresDOM").getOrElse(false),
+        obj.opt[List[String]]("compliantSemantics").getOrElse(Nil))
     }
   }
 
   def write(dep: JSDependencyManifest, output: WritableVirtualTextFile): Unit = {
     val writer = output.contentWriter
-    try write(dep, writer) finally writer.close()
+    try write(dep, writer)
+    finally writer.close()
   }
 
   def write(dep: JSDependencyManifest, writer: Writer): Unit =
@@ -90,7 +91,8 @@ object JSDependencyManifest {
 
   def read(file: VirtualTextFile): JSDependencyManifest = {
     val reader = file.reader
-    try read(reader) finally reader.close()
+    try read(reader)
+    finally reader.close()
   }
 
   def read(reader: Reader): JSDependencyManifest =

@@ -38,12 +38,12 @@ object EstimatorTransformerParamExample {
     // Prepare training data from a list of (label, features) tuples.
     val training = sqlContext
       .createDataFrame(
-          Seq(
-              (1.0, Vectors.dense(0.0, 1.1, 0.1)),
-              (0.0, Vectors.dense(2.0, 1.0, -1.0)),
-              (0.0, Vectors.dense(2.0, 1.3, 1.0)),
-              (1.0, Vectors.dense(0.0, 1.2, -0.5))
-          ))
+        Seq(
+          (1.0, Vectors.dense(0.0, 1.1, 0.1)),
+          (0.0, Vectors.dense(2.0, 1.0, -1.0)),
+          (0.0, Vectors.dense(2.0, 1.3, 1.0)),
+          (1.0, Vectors.dense(0.0, 1.2, -0.5))
+        ))
       .toDF("label", "features")
 
     // Create a LogisticRegression instance.  This instance is an Estimator.
@@ -61,7 +61,7 @@ object EstimatorTransformerParamExample {
     // This prints the parameter (name: value) pairs, where names are unique IDs for this
     // LogisticRegression instance.
     println(
-        "Model 1 was fit using parameters: " + model1.parent.extractParamMap)
+      "Model 1 was fit using parameters: " + model1.parent.extractParamMap)
 
     // We may alternatively specify parameters using a ParamMap,
     // which supports several methods for specifying parameters.
@@ -78,15 +78,16 @@ object EstimatorTransformerParamExample {
     // paramMapCombined overrides all parameters set earlier via lr.set* methods.
     val model2 = lr.fit(training, paramMapCombined)
     println(
-        "Model 2 was fit using parameters: " + model2.parent.extractParamMap)
+      "Model 2 was fit using parameters: " + model2.parent.extractParamMap)
 
     // Prepare test data.
     val test = sqlContext
-      .createDataFrame(Seq(
-              (1.0, Vectors.dense(-1.0, 1.5, 1.3)),
-              (0.0, Vectors.dense(3.0, 2.0, -0.1)),
-              (1.0, Vectors.dense(0.0, 2.2, -1.5))
-          ))
+      .createDataFrame(
+        Seq(
+          (1.0, Vectors.dense(-1.0, 1.5, 1.3)),
+          (0.0, Vectors.dense(3.0, 2.0, -0.1)),
+          (1.0, Vectors.dense(0.0, 2.2, -1.5))
+        ))
       .toDF("label", "features")
 
     // Make predictions on test data using the Transformer.transform() method.

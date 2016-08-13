@@ -301,16 +301,16 @@ object CrossProject extends CrossProjectExtra {
   }
 
   private def sharedSrcSettings(crossType: CrossType) = Seq(
-      unmanagedSourceDirectories in Compile ++= {
-        makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "main"),
-                         scalaBinaryVersion.value,
-                         crossPaths.value)
-      },
-      unmanagedSourceDirectories in Test ++= {
-        makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "test"),
-                         scalaBinaryVersion.value,
-                         crossPaths.value)
-      }
+    unmanagedSourceDirectories in Compile ++= {
+      makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "main"),
+                       scalaBinaryVersion.value,
+                       crossPaths.value)
+    },
+    unmanagedSourceDirectories in Test ++= {
+      makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "test"),
+                       scalaBinaryVersion.value,
+                       crossPaths.value)
+    }
   )
 
   // Inspired by sbt's Defaults.makeCrossSources
@@ -335,9 +335,9 @@ object CrossProject extends CrossProjectExtra {
   def crossProject_impl(c: Context): c.Expr[Builder] = {
     import c.universe._
     val enclosingValName = MacroUtils.definingValName(
-        c,
-        methodName =>
-          s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
+      c,
+      methodName =>
+        s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
     reify { new Builder(name.splice, new File(name.splice)) }
   }

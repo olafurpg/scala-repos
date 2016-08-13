@@ -19,7 +19,7 @@ object ActorPublisherTest {
 
     val source: Iterator[Int] =
       (if (allElements == Long.MaxValue) 1 to Int.MaxValue
-       else 0 until allElements.toInt).toIterator
+      else 0 until allElements.toInt).toIterator
 
     override def receive: Receive = {
       case Request(elements) ⇒
@@ -45,8 +45,9 @@ object ActorPublisherTest {
 class ActorPublisherTest extends AkkaPublisherVerification[Int] {
 
   override def createPublisher(elements: Long): Publisher[Int] = {
-    val ref = system.actorOf(Props(classOf[TestPublisher], elements)
-          .withDispatcher("akka.test.stream-dispatcher"))
+    val ref = system.actorOf(
+      Props(classOf[TestPublisher], elements)
+        .withDispatcher("akka.test.stream-dispatcher"))
 
     ActorPublisher(ref)
   }

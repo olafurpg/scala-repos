@@ -16,12 +16,12 @@ object PlayMagic {
     */
   def toHtmlArgs(args: Map[Symbol, Any]) =
     play.twirl.api.Html(
-        args
-          .map({
-        case (s, None) => s.name
-        case (s, v) =>
-          s.name +
-          "=\"" + play.twirl.api.HtmlFormat.escape(v.toString).body + "\""
-      })
-          .mkString(" "))
+      args
+        .map({
+          case (s, None) => s.name
+          case (s, v) =>
+            s.name +
+              "=\"" + play.twirl.api.HtmlFormat.escape(v.toString).body + "\""
+        })
+        .mkString(" "))
 }

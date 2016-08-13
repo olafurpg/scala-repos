@@ -13,9 +13,20 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScPattern, ScWildcardPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMatchStmt}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScPattern,
+  ScWildcardPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScMatchStmt
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}
@@ -25,8 +36,9 @@ import scala.collection.Seq
 final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
   def getFamilyName: String = "Generate case clauses"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     findSurroundingMatch(element) match {
       case Some((_, scrutineeType)) =>
         setText(getFamilyName + scrutineeType)
@@ -41,7 +53,7 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
       case Some((action, _)) =>
         PsiDocumentManager.getInstance(project).commitAllDocuments()
         if (!FileModificationService.getInstance.prepareFileForWrite(
-                element.getContainingFile)) return
+              element.getContainingFile)) return
         IdeDocumentHistory
           .getInstance(project)
           .includeCurrentPlaceAsChangePlace()
@@ -50,34 +62,39 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
     }
   }
 
-  private def addMatchClausesForSealedClass(
-      matchStmt: ScMatchStmt, expr: ScExpression, cls: ScTypeDefinition)(
-      project: Project, editor: Editor, element: PsiElement) {
+  private def addMatchClausesForSealedClass(matchStmt: ScMatchStmt,
+                                            expr: ScExpression,
+                                            cls: ScTypeDefinition)(
+      project: Project,
+      editor: Editor,
+      element: PsiElement) {
     val inheritors = inheritorsOf(cls)
     val (caseClauseTexts, bindTos) = inheritors.map(caseClauseText).unzip
-    val newMatchStmt = ScalaPsiElementFactory.createMatch(
-        expr.getText, caseClauseTexts, element.getManager)
+    val newMatchStmt = ScalaPsiElementFactory
+      .createMatch(expr.getText, caseClauseTexts, element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, bindTos)
   }
 
   private def addMatchClausesForEnum(
-      matchStmt: ScMatchStmt, expr: ScExpression, cls: PsiClass)(
-      project: Project, editor: Editor, element: PsiElement) {
+      matchStmt: ScMatchStmt,
+      expr: ScExpression,
+      cls: PsiClass)(project: Project, editor: Editor, element: PsiElement) {
     val enumConsts: Array[PsiEnumConstant] = cls.getFields.collect {
       case enumConstant: PsiEnumConstant => enumConstant
     }
     val caseClauseTexts =
       enumConsts.map(ec => "case %s.%s =>".format(cls.name, ec.name))
-    val newMatchStmt = ScalaPsiElementFactory.createMatch(
-        expr.getText, caseClauseTexts, element.getManager)
+    val newMatchStmt = ScalaPsiElementFactory
+      .createMatch(expr.getText, caseClauseTexts, element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, _ => cls)
   }
 
   private def addMatchClausesForCaseClassesAndObjects(
-      matchStmt: ScMatchStmt, expr: ScExpression, cls: PsiClass)(
-      project: Project, editor: Editor, element: PsiElement) {
+      matchStmt: ScMatchStmt,
+      expr: ScExpression,
+      cls: PsiClass)(project: Project, editor: Editor, element: PsiElement) {
     val inheritors =
       inheritorsOf(cls).filter(inh => inh.isCase || inh.isObject)
     val (withoutDefault, bindTos) = inheritors.map(caseClauseText).unzip
@@ -85,27 +102,27 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
     val caseClauseTexts =
       if (withoutDefault.nonEmpty) withoutDefault :+ defaultCaseClauseText
       else
-        Seq(s"\n$defaultCaseClauseText //could not find inherited objects or case classes\n")
-    val newMatchStmt = ScalaPsiElementFactory.createMatch(
-        expr.getText, caseClauseTexts, element.getManager)
+        Seq(
+          s"\n$defaultCaseClauseText //could not find inherited objects or case classes\n")
+    val newMatchStmt = ScalaPsiElementFactory
+      .createMatch(expr.getText, caseClauseTexts, element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, bindTos)
   }
 
-  private def bindReferences(
-      newMatchStmt: ScMatchStmt, bindTargets: Int => PsiNamedElement) {
+  private def bindReferences(newMatchStmt: ScMatchStmt,
+                             bindTargets: Int => PsiNamedElement) {
     for {
       (caseClause, i) <- newMatchStmt.caseClauses.zipWithIndex
-                            if !caseClause.pattern.exists(
-                            _.isInstanceOf[ScWildcardPattern])
+      if !caseClause.pattern.exists(_.isInstanceOf[ScWildcardPattern])
     } {
       val bindTo = bindTargets(i)
       bindReference(caseClause, bindTo)
     }
   }
 
-  private def bindReference(
-      caseClause: ScCaseClause, bindTo: PsiNamedElement) {
+  private def bindReference(caseClause: ScCaseClause,
+                            bindTo: PsiNamedElement) {
     val pattern: ScPattern = caseClause.pattern.get
     val ref = pattern.depthFirst.collectFirst {
       case x: ScReferenceElement if x.refName == bindTo.name => x

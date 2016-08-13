@@ -3,8 +3,7 @@ object Test extends App {
   trait Sad { val status = "sad" }
 
   def go1 =
-    (new AnyRef with Happy
-    with Sad {
+    (new AnyRef with Happy with Sad {
       override val status = "happysad"
     }).status
   def go2 =

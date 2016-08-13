@@ -18,7 +18,11 @@
 // scalastyle:off println
 package org.apache.spark.examples
 
-import org.apache.hadoop.hbase.{HBaseConfiguration, HTableDescriptor, TableName}
+import org.apache.hadoop.hbase.{
+  HBaseConfiguration,
+  HTableDescriptor,
+  TableName
+}
 import org.apache.hadoop.hbase.client.HBaseAdmin
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 
@@ -53,10 +57,10 @@ object HBaseTest {
     }
 
     val hBaseRDD = sc.newAPIHadoopRDD(
-        conf,
-        classOf[TableInputFormat],
-        classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable],
-        classOf[org.apache.hadoop.hbase.client.Result])
+      conf,
+      classOf[TableInputFormat],
+      classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable],
+      classOf[org.apache.hadoop.hbase.client.Result])
 
     hBaseRDD.count()
 

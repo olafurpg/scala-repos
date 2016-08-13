@@ -1,7 +1,10 @@
 package com.twitter.scalding.reducer_estimation
 
 import com.twitter.scalding._
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatformTest}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest,
+  HadoopSharedPlatformTest
+}
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
@@ -22,14 +25,14 @@ class SimpleJobWithNoSetReducers(args: Args, customConfig: Config)
 }
 
 object EmptyHistoryService extends HistoryService {
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Success(Nil)
 }
 
 object ErrorHistoryService extends HistoryService {
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Failure(new RuntimeException("Failed to fetch job history"))
 }
 
@@ -82,26 +85,23 @@ abstract class HistoryServiceWithData extends HistoryService
 object ValidHistoryService extends HistoryServiceWithData {
   import HistoryServiceWithData._
 
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]] =
     // past reducer ratio 0.5
     Success(
-        Seq(makeHistory(10, 1), // below threshold, ignored
-            makeHistory(inputSize, inputSize / 2),
-            makeHistory(inputSize, inputSize / 2),
-            makeHistory(inputSize, inputSize / 2)))
+      Seq(makeHistory(10, 1), // below threshold, ignored
+          makeHistory(inputSize, inputSize / 2),
+          makeHistory(inputSize, inputSize / 2),
+          makeHistory(inputSize, inputSize / 2)))
 }
 
 object InvalidHistoryService extends HistoryServiceWithData {
   import HistoryServiceWithData._
 
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]] =
     // all entries below the 10% threshold for past input size
-    Success(
-        Seq(makeHistory(10, 1),
-            makeHistory(10, 1),
-            makeHistory(10, 1)))
+    Success(Seq(makeHistory(10, 1), makeHistory(10, 1), makeHistory(10, 1)))
 }
 
 class EmptyHistoryBasedEstimator extends RatioBasedEstimator {
@@ -121,15 +121,17 @@ class InvalidHistoryBasedEstimator extends RatioBasedEstimator {
 }
 
 class RatioBasedReducerEstimatorTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
   import HipJob._
 
   "Single-step job with ratio-based reducer estimator" should {
     "not set reducers when no history is found" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[EmptyHistoryBasedEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
-        (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
+          (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
@@ -144,8 +146,8 @@ class RatioBasedReducerEstimatorTest
     "not set reducers when error fetching history" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[ErrorHistoryBasedEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
-        (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
+          (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
@@ -160,8 +162,8 @@ class RatioBasedReducerEstimatorTest
     "set reducers correctly when there is valid history" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[ValidHistoryBasedEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
-        (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
+          (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
@@ -179,8 +181,8 @@ class RatioBasedReducerEstimatorTest
     "not set reducers when there is no valid history" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InvalidHistoryBasedEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
-        (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
+          (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>

@@ -49,7 +49,7 @@ object ConnectionPool {
       case "hikaricp" => new HikariCPConnectionPool(environment)
       case fqcn =>
         injector.instanceOf(
-            Reflect.getClass[ConnectionPool](fqcn, environment.classLoader))
+          Reflect.getClass[ConnectionPool](fqcn, environment.classLoader))
     }
   }
 
@@ -81,7 +81,7 @@ object ConnectionPool {
           .map(_ => "")
           .getOrElse(defaultProperties)
         Some(s"jdbc:mysql://$host/${dbname + addDefaultPropertiesIfNeeded}") -> Some(
-            username -> password)
+          username -> password)
 
       case Some(url @ H2DefaultUrl())
           if !url.contains("DB_CLOSE_DELAY") && mode == Mode.Dev =>

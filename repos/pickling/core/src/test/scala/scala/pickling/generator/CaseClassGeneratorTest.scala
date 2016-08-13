@@ -98,18 +98,18 @@ class CaseClassGeneratorTest extends FunSuite {
     implicit val pu = {
       // TODO - We use runtime generation here because we don't have a sufficient algorithm to handle final/serializable but NON-case class classes.
       implicit val nested: Pickler[OpenCaseClassSub] with Unpickler[
-          OpenCaseClassSub] = {
+        OpenCaseClassSub] = {
         val cls = classOf[OpenCaseClassSub]
         import scala.pickling.internal.currentRuntime
         val key = FastTypeTag[OpenCaseClassSub]
         PicklerUnpickler(
-            currentRuntime.picklers
-              .genPickler(cls.getClassLoader, cls, key)
-              .asInstanceOf[Pickler[OpenCaseClassSub]],
-            currentRuntime.picklers
-              .genUnpickler(currentRuntime.currentMirror, key.key)
-              .asInstanceOf[Unpickler[OpenCaseClassSub]]
-          )
+          currentRuntime.picklers
+            .genPickler(cls.getClassLoader, cls, key)
+            .asInstanceOf[Pickler[OpenCaseClassSub]],
+          currentRuntime.picklers
+            .genUnpickler(currentRuntime.currentMirror, key.key)
+            .asInstanceOf[Unpickler[OpenCaseClassSub]]
+        )
       }
       PicklingMacros.genPicklerUnpickler[OpenCaseClass]
     }

@@ -7,7 +7,10 @@ import FailureInjectorTransportAdapter._
 import akka.AkkaException
 import akka.actor.{Address, ExtendedActorSystem}
 import akka.event.Logging
-import akka.remote.transport.AssociationHandle.{HandleEvent, HandleEventListener}
+import akka.remote.transport.AssociationHandle.{
+  HandleEvent,
+  HandleEventListener
+}
 import akka.remote.transport.Transport._
 import akka.util.ByteString
 import java.util.concurrent.ConcurrentHashMap
@@ -17,12 +20,13 @@ import scala.util.control.NoStackTrace
 
 @SerialVersionUID(1L)
 final case class FailureInjectorException(msg: String)
-    extends AkkaException(msg) with NoStackTrace
+    extends AkkaException(msg)
+    with NoStackTrace
 
 class FailureInjectorProvider extends TransportAdapterProvider {
 
-  override def create(
-      wrappedTransport: Transport, system: ExtendedActorSystem): Transport =
+  override def create(wrappedTransport: Transport,
+                      system: ExtendedActorSystem): Transport =
     new FailureInjectorTransportAdapter(wrappedTransport, system)
 }
 
@@ -56,9 +60,11 @@ private[remote] object FailureInjectorTransportAdapter {
   * INTERNAL API
   */
 private[remote] class FailureInjectorTransportAdapter(
-    wrappedTransport: Transport, val extendedSystem: ExtendedActorSystem)
+    wrappedTransport: Transport,
+    val extendedSystem: ExtendedActorSystem)
     extends AbstractTransportAdapter(wrappedTransport)(
-        extendedSystem.dispatcher) with AssociationEventListener {
+      extendedSystem.dispatcher)
+    with AssociationEventListener {
 
   private def rng = ThreadLocalRandom.current()
   private val log = Logging(extendedSystem, getClass.getName)
@@ -90,7 +96,7 @@ private[remote] class FailureInjectorTransportAdapter(
       listenerFuture: Future[AssociationEventListener])
     : Future[AssociationEventListener] = {
     log.warning(
-        "FailureInjectorTransport is active on this system. Gremlins might munch your packets.")
+      "FailureInjectorTransport is active on this system. Gremlins might munch your packets.")
     listenerFuture.onSuccess {
       // Side effecting: As this class is not an actor, the only way to safely modify state is through volatile vars.
       // Listen is called only during the initialization of the stack, and upstreamListener is not read before this
@@ -107,15 +113,15 @@ private[remote] class FailureInjectorTransportAdapter(
     // Association is simulated to be failed if there was either an inbound or outbound message drop
     if (shouldDropInbound(remoteAddress, Unit, "interceptAssociate") ||
         shouldDropOutbound(remoteAddress, Unit, "interceptAssociate"))
-      statusPromise.failure(new FailureInjectorException(
-              "Simulated failure of association to " + remoteAddress))
+      statusPromise.failure(
+        new FailureInjectorException(
+          "Simulated failure of association to " + remoteAddress))
     else
       statusPromise.completeWith(
-          wrappedTransport
-            .associate(remoteAddress)
-            .map { handle ⇒
+        wrappedTransport.associate(remoteAddress).map { handle ⇒
           addressChaosTable.putIfAbsent(
-              handle.remoteAddress.copy(protocol = "", system = ""), PassThru)
+            handle.remoteAddress.copy(protocol = "", system = ""),
+            PassThru)
           new FailureInjectorHandle(handle, this)
         })
   }
@@ -137,8 +143,9 @@ private[remote] class FailureInjectorTransportAdapter(
       case _ ⇒ ev
     }
 
-  def shouldDropInbound(
-      remoteAddress: Address, instance: Any, debugMessage: String): Boolean =
+  def shouldDropInbound(remoteAddress: Address,
+                        instance: Any,
+                        debugMessage: String): Boolean =
     chaosMode(remoteAddress) match {
       case PassThru ⇒ false
       case Drop(_, inboundDropP) ⇒
@@ -152,8 +159,9 @@ private[remote] class FailureInjectorTransportAdapter(
         } else false
     }
 
-  def shouldDropOutbound(
-      remoteAddress: Address, instance: Any, debugMessage: String): Boolean =
+  def shouldDropOutbound(remoteAddress: Address,
+                         instance: Any,
+                         debugMessage: String): Boolean =
     chaosMode(remoteAddress) match {
       case PassThru ⇒ false
       case Drop(outboundDropP, _) ⇒
@@ -180,8 +188,8 @@ private[remote] class FailureInjectorTransportAdapter(
 private[remote] final case class FailureInjectorHandle(
     _wrappedHandle: AssociationHandle,
     private val gremlinAdapter: FailureInjectorTransportAdapter)
-    extends AbstractTransportAdapterHandle(
-        _wrappedHandle, FailureInjectorSchemeIdentifier)
+    extends AbstractTransportAdapterHandle(_wrappedHandle,
+                                           FailureInjectorSchemeIdentifier)
     with HandleEventListener {
   import gremlinAdapter.extendedSystem.dispatcher
 
@@ -195,15 +203,17 @@ private[remote] final case class FailureInjectorHandle(
   }
 
   override def write(payload: ByteString): Boolean =
-    if (!gremlinAdapter.shouldDropOutbound(
-            wrappedHandle.remoteAddress, payload, "handler.write"))
+    if (!gremlinAdapter.shouldDropOutbound(wrappedHandle.remoteAddress,
+                                           payload,
+                                           "handler.write"))
       wrappedHandle.write(payload)
     else true
 
   override def disassociate(): Unit = wrappedHandle.disassociate()
 
   override def notify(ev: HandleEvent): Unit =
-    if (!gremlinAdapter.shouldDropInbound(
-            wrappedHandle.remoteAddress, ev, "handler.notify"))
+    if (!gremlinAdapter.shouldDropInbound(wrappedHandle.remoteAddress,
+                                          ev,
+                                          "handler.notify"))
       upstreamListener notify ev
 }

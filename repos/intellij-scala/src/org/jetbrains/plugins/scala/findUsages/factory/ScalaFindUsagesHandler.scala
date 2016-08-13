@@ -3,7 +3,11 @@ package findUsages.factory
 
 import java.util
 
-import com.intellij.find.findUsages.{AbstractFindUsagesDialog, FindUsagesHandler, FindUsagesOptions}
+import com.intellij.find.findUsages.{
+  AbstractFindUsagesDialog,
+  FindUsagesHandler,
+  FindUsagesOptions
+}
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi._
@@ -15,9 +19,20 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScEnumerator, ScGenerator}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScEnumerator,
+  ScGenerator
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher
@@ -30,8 +45,8 @@ import _root_.scala.collection.mutable
   * User: Alexander Podkhalyuzin
   * Date: 17.08.2009
   */
-class ScalaFindUsagesHandler(
-    element: PsiElement, factory: ScalaFindUsagesHandlerFactory)
+class ScalaFindUsagesHandler(element: PsiElement,
+                             factory: ScalaFindUsagesHandlerFactory)
     extends FindUsagesHandler(element) {
 
   override def getPrimaryElements: Array[PsiElement] = Array(element)
@@ -117,11 +132,11 @@ class ScalaFindUsagesHandler(
             case _ => Array.empty
           }
           a.map(
-              role =>
-                t.getTypedDefinitionWrapper(isStatic = false,
-                                            isInterface = false,
-                                            role = role,
-                                            cClass = None))
+            role =>
+              t.getTypedDefinitionWrapper(isStatic = false,
+                                          isInterface = false,
+                                          role = role,
+                                          cClass = None))
         }
       case _ => Array.empty
     }
@@ -141,8 +156,8 @@ class ScalaFindUsagesHandler(
                                             isSingleFile,
                                             this)
       case _ =>
-        super.getFindUsagesDialog(
-            isSingleFile, toShowInNewTab, mustOpenInNewTab)
+        super
+          .getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab)
     }
   }
 
@@ -218,8 +233,7 @@ class ScalaFindUsagesHandler(
           val res = new mutable.HashSet[PsiClass]()
           ClassInheritorsSearch
             .search(clazz, true)
-            .forEach(
-                new Processor[PsiClass] {
+            .forEach(new Processor[PsiClass] {
               def process(t: PsiClass): Boolean = {
                 t match {
                   case p: PsiClassWrapper =>
@@ -239,8 +253,8 @@ class ScalaFindUsagesHandler(
     inReadAction {
       element match {
         case function: ScFunction if !function.isLocal =>
-          for (elem <- ScalaOverridingMemberSearcher.search(
-              function, deep = true)) {
+          for (elem <- ScalaOverridingMemberSearcher.search(function,
+                                                            deep = true)) {
             val processed =
               super.processElementUsages(elem, processor, options)
             if (!processed) return false
@@ -252,5 +266,6 @@ class ScalaFindUsagesHandler(
   }
 
   override def isSearchForTextOccurencesAvailable(
-      psiElement: PsiElement, isSingleFile: Boolean): Boolean = !isSingleFile
+      psiElement: PsiElement,
+      isSingleFile: Boolean): Boolean = !isSingleFile
 }

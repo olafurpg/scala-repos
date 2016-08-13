@@ -13,7 +13,7 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
   val name = "insertCompiler"
 
   override protected[this] lazy val logger = new SlickLogger(
-      LoggerFactory.getLogger(classOf[CodeGen]))
+    LoggerFactory.getLogger(classOf[CodeGen]))
 
   def apply(state: CompilerState) = state.map { tree =>
     val tableSym, linearSym = new AnonSymbol
@@ -30,10 +30,10 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
         expansionRef = te.generator
       } else if (tableExpansion.table ne te.table)
         throw new SlickTreeException(
-            "Cannot insert into more than one table at once",
-            tree,
-            removeUnmarked = false,
-            mark = (n => (n eq tableExpansion.table) || (n eq te.table)))
+          "Cannot insert into more than one table at once",
+          tree,
+          removeUnmarked = false,
+          mark = (n => (n eq tableExpansion.table) || (n eq te.table)))
     }
 
     def tr(n: Node): Node = n match {
@@ -50,18 +50,19 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
           if (mode(fs)) {
             cols += Select(tref, fs) :@ sel.nodeType
             ConstArray(
-                Select(rref, ElementSymbol(cols.length)) :@ sel.nodeType)
+              Select(rref, ElementSymbol(cols.length)) :@ sel.nodeType)
           } else ConstArray.empty
         InsertColumn(ch, fs, sel.nodeType).infer()
       case Ref(s) if s == expansionRef =>
         tr(tableExpansion.columns)
       case Bind(gen, te @ TableExpansion(_, t: TableNode, _), Pure(sel, _)) =>
         setTable(te)
-        tr(sel.replace({ case Ref(s) if s == gen => Ref(expansionRef) },
-            keepType = true))
+        tr(
+          sel.replace({ case Ref(s) if s == gen => Ref(expansionRef) },
+                      keepType = true))
       case _ =>
         throw new SlickException(
-            "Cannot use node " + n + " for inserting data")
+          "Cannot use node " + n + " for inserting data")
     }
     val tree2 = tr(tree).infer()
     if (tableExpansion eq null)
@@ -71,7 +72,8 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
                      ProductNode(cols.result),
                      allFields.result).infer()
     ResultSetMapping(linearSym, ins, tree2) :@ CollectionType(
-        TypedCollectionTypeConstructor.seq, ins.nodeType)
+      TypedCollectionTypeConstructor.seq,
+      ins.nodeType)
   }
 }
 

@@ -35,9 +35,9 @@ case class Hook(
 
   def compatibleWith(h: Hook) =
     compatibilityProperties == h.compatibilityProperties &&
-    (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
+      (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
       .fold(isAuth && h.isAuth, true) && ratingRangeCompatibleWith(h) &&
-    h.ratingRangeCompatibleWith(this)
+      h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Hook) = realRatingRange.fold(true) {
     range =>
@@ -63,17 +63,17 @@ case class Hook(
   def render: JsObject =
     Json
       .obj(
-          "id" -> id,
-          "uid" -> uid,
-          "u" -> user.map(_.username),
-          "rating" -> rating,
-          "variant" -> realVariant.exotic.option(realVariant.key),
-          "ra" -> realMode.rated.option(1),
-          "clock" -> clock.show,
-          "t" -> clock.estimateTotalTime,
-          "s" -> speed.id,
-          "c" -> chess.Color(color).map(_.name),
-          "perf" -> perfType.map(_.name)
+        "id" -> id,
+        "uid" -> uid,
+        "u" -> user.map(_.username),
+        "rating" -> rating,
+        "variant" -> realVariant.exotic.option(realVariant.key),
+        "ra" -> realMode.rated.option(1),
+        "clock" -> clock.show,
+        "t" -> clock.estimateTotalTime,
+        "s" -> speed.id,
+        "c" -> chess.Color(color).map(_.name),
+        "perf" -> perfType.map(_.name)
       )
       .noNull
 

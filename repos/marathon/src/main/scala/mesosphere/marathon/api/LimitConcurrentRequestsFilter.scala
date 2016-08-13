@@ -25,11 +25,11 @@ class LimitConcurrentRequestsFilter(concurrentOption: Option[Int])
       response match {
         //scalastyle:off magic.number
         case r: HttpServletResponse =>
-          r.sendError(
-              503, s"Too many concurrent requests! Allowed: $concurrent.")
+          r.sendError(503,
+                      s"Too many concurrent requests! Allowed: $concurrent.")
         case r: ServletResponse =>
           throw new IllegalArgumentException(
-              s"Expected http response but got $response")
+            s"Expected http response but got $response")
       }
     }
   }

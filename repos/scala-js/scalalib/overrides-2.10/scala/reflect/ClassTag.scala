@@ -36,7 +36,9 @@ import scala.runtime.ScalaRunTime.{arrayClass, arrayElementClass}
   */
 @scala.annotation.implicitNotFound(msg = "No ClassTag available for ${T}")
 trait ClassTag[T]
-    extends ClassManifestDeprecatedApis[T] with Equals with Serializable {
+    extends ClassManifestDeprecatedApis[T]
+    with Equals
+    with Serializable {
   // please, don't add any APIs here, like it was with `newWrappedArray` and `newArrayBuilder`
   // class tags, and all tags in general, should be as minimalistic as possible
 
@@ -88,7 +90,7 @@ trait ClassTag[T]
   def unapply(x: Boolean): Option[T] = unapply_impl(x)
   def unapply(x: Unit): Option[T] = unapply_impl(x)
 
-  private def unapply_impl[U : ClassTag](x: U): Option[T] =
+  private def unapply_impl[U: ClassTag](x: U): Option[T] =
     if (x == null) None
     else {
       val staticClass = classTag[U].runtimeClass
@@ -102,7 +104,7 @@ trait ClassTag[T]
   override def canEqual(x: Any) = x.isInstanceOf[ClassTag[_]]
   override def equals(x: Any) =
     x.isInstanceOf[ClassTag[_]] &&
-    this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
+      this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
   override def hashCode = scala.runtime.ScalaRunTime.hash(runtimeClass)
   override def toString = {
     def prettyprint(clazz: jClass[_]): String =

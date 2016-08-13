@@ -76,25 +76,32 @@ object Workflow {
   }
    */
 
-  def runEvaluation(
-      evaluation: Evaluation,
-      engineParamsGenerator: EngineParamsGenerator,
-      env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      evaluationInstance: EvaluationInstance = EvaluationInstance(),
-      params: WorkflowParams = WorkflowParams()) {
+  def runEvaluation(evaluation: Evaluation,
+                    engineParamsGenerator: EngineParamsGenerator,
+                    env: Map[String, String] = WorkflowUtils.pioEnvVars,
+                    evaluationInstance: EvaluationInstance =
+                      EvaluationInstance(),
+                    params: WorkflowParams = WorkflowParams()) {
     runEvaluationTypeless(
-        evaluation = evaluation,
-        engine = evaluation.engine,
-        engineParamsList = engineParamsGenerator.engineParamsList,
-        evaluationInstance = evaluationInstance,
-        evaluator = evaluation.evaluator,
-        env = env,
-        params = params
+      evaluation = evaluation,
+      engine = evaluation.engine,
+      engineParamsList = engineParamsGenerator.engineParamsList,
+      evaluationInstance = evaluationInstance,
+      evaluator = evaluation.evaluator,
+      env = env,
+      params = params
     )
   }
 
-  def runEvaluationTypeless[
-      EI, Q, P, A, EEI, EQ, EP, EA, ER <: BaseEvaluatorResult](
+  def runEvaluationTypeless[EI,
+                            Q,
+                            P,
+                            A,
+                            EEI,
+                            EQ,
+                            EP,
+                            EA,
+                            ER <: BaseEvaluatorResult](
       evaluation: Evaluation,
       engine: BaseEngine[EI, Q, P, A],
       engineParamsList: Seq[EngineParams],
@@ -103,13 +110,13 @@ object Workflow {
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       params: WorkflowParams = WorkflowParams()) {
     runEvaluationViaCoreWorkflow(
-        evaluation = evaluation,
-        engine = engine,
-        engineParamsList = engineParamsList,
-        evaluationInstance = evaluationInstance,
-        evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
-        env = env,
-        params = params)
+      evaluation = evaluation,
+      engine = engine,
+      engineParamsList = engineParamsList,
+      evaluationInstance = evaluationInstance,
+      evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
+      env = env,
+      params = params)
   }
 
   /** :: Experimental :: */

@@ -60,19 +60,21 @@ class FiltersSuite extends SparkFunSuite with Logging {
 
   filterTest("int and string filter",
              (Literal(1) === a("intcol", IntegerType)) ::
-             (Literal("a") === a("strcol", IntegerType)) :: Nil,
+               (Literal("a") === a("strcol", IntegerType)) :: Nil,
              "1 = intcol and \"a\" = strcol")
 
-  filterTest(
-      "skip varchar", (Literal("") === a("varchar", StringType)) :: Nil, "")
+  filterTest("skip varchar",
+             (Literal("") === a("varchar", StringType)) :: Nil,
+             "")
 
-  private def filterTest(
-      name: String, filters: Seq[Expression], result: String) = {
+  private def filterTest(name: String,
+                         filters: Seq[Expression],
+                         result: String) = {
     test(name) {
       val converted = shim.convertFilters(testTable, filters)
       if (converted != result) {
         fail(
-            s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
+          s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
       }
     }
   }

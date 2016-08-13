@@ -18,16 +18,16 @@ object Dependencies {
   val junitVersion = "4.12"
 
   val Versions = Seq(
-      crossScalaVersions := Seq("2.11.7"), // "2.12.0-M3"
-      scalaVersion := crossScalaVersions.value.head,
-      scalaStmVersion :=
-        sys.props.get("akka.build.scalaStmVersion").getOrElse("0.7"),
-      scalaCheckVersion :=
-        sys.props.get("akka.build.scalaCheckVersion").getOrElse("1.11.6"),
-      scalaTestVersion :=
+    crossScalaVersions := Seq("2.11.7"), // "2.12.0-M3"
+    scalaVersion := crossScalaVersions.value.head,
+    scalaStmVersion :=
+      sys.props.get("akka.build.scalaStmVersion").getOrElse("0.7"),
+    scalaCheckVersion :=
+      sys.props.get("akka.build.scalaCheckVersion").getOrElse("1.11.6"),
+    scalaTestVersion :=
       (if (scalaVersion.value == "2.12.0-M2") "2.2.5-M2"
-       else if (scalaVersion.value == "2.12.0-M3") "2.2.5-M3"
-       else "2.2.4")
+      else if (scalaVersion.value == "2.12.0-M3") "2.2.5-M3"
+      else "2.2.4")
   )
 
   object Compile {
@@ -35,7 +35,7 @@ object Dependencies {
 
     val camelCore =
       "org.apache.camel" % "camel-core" % "2.13.4" exclude
-      ("org.slf4j", "slf4j-api") // ApacheV2
+        ("org.slf4j", "slf4j-api") // ApacheV2
 
     // when updating config version, update links ActorSystem ScalaDoc to link to the updated version
     val config = "com.typesafe" % "config" % "1.3.0" // ApacheV2
@@ -47,14 +47,14 @@ object Dependencies {
     val scalaXml =
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5" // Scala License
     val scalaReflect = ScalaVersionDependentModuleID.versioned(
-        "org.scala-lang" % "scala-reflect" % _) // Scala License
+      "org.scala-lang" % "scala-reflect" % _) // Scala License
 
     val slf4jApi = "org.slf4j" % "slf4j-api" % "1.7.16" // MIT
 
     // mirrored in OSGi sample
     val uncommonsMath =
       "org.uncommons.maths" % "uncommons-maths" % "1.2.2a" exclude
-      ("jfree", "jcommon") exclude ("jfree", "jfreechart") // ApacheV2
+        ("jfree", "jcommon") exclude ("jfree", "jfreechart") // ApacheV2
     val osgiCore = "org.osgi" % "org.osgi.core" % "4.3.1" // ApacheV2
     val osgiCompendium =
       "org.osgi" % "org.osgi.compendium" % "4.3.1" // ApacheV2
@@ -260,12 +260,12 @@ object Dependencies {
 
   // special, since it also includes a compiler plugin
   lazy val parsing = Seq(
-      DependencyHelpers.versionDependentDeps(
-          Dependencies.Compile.scalaReflect % "provided"
-      ),
-      addCompilerPlugin(
-          "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion
-            .fullMapped(nominalScalaVersion))
+    DependencyHelpers.versionDependentDeps(
+      Dependencies.Compile.scalaReflect % "provided"
+    ),
+    addCompilerPlugin(
+      "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.fullMapped(
+        nominalScalaVersion))
   )
 
   lazy val httpTestkit =
@@ -312,7 +312,7 @@ object DependencyHelpers {
   case class ScalaVersionDependentModuleID(modules: String => Seq[ModuleID]) {
     def %(config: String): ScalaVersionDependentModuleID =
       ScalaVersionDependentModuleID(
-          version => modules(version).map(_ % config))
+        version => modules(version).map(_ % config))
   }
   object ScalaVersionDependentModuleID {
     implicit def liftConstantModule(
@@ -323,7 +323,7 @@ object DependencyHelpers {
     def fromPF(
         f: PartialFunction[String, ModuleID]): ScalaVersionDependentModuleID =
       ScalaVersionDependentModuleID(
-          version => if (f.isDefinedAt(version)) Seq(f(version)) else Nil)
+        version => if (f.isDefinedAt(version)) Seq(f(version)) else Nil)
   }
 
   /**

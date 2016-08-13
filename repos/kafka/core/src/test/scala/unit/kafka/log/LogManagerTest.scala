@@ -90,8 +90,8 @@ class LogManagerTest {
       val info = log.append(set)
       offset = info.lastOffset
     }
-    assertTrue(
-        "There should be more than one segment now.", log.numberOfSegments > 1)
+    assertTrue("There should be more than one segment now.",
+               log.numberOfSegments > 1)
 
     log.logSegments.foreach(_.log.file.setLastModified(time.milliseconds))
 
@@ -126,8 +126,8 @@ class LogManagerTest {
     logManager.shutdown()
     val logProps = new Properties()
     logProps.put(LogConfig.SegmentBytesProp, 10 * setSize: java.lang.Integer)
-    logProps.put(
-        LogConfig.RetentionBytesProp, 5L * 10L * setSize + 10L: java.lang.Long)
+    logProps.put(LogConfig.RetentionBytesProp,
+                 5L * 10L * setSize + 10L: java.lang.Long)
     val config = LogConfig.fromProps(logConfig.originals, logProps)
 
     logManager = createLogManager()
@@ -151,8 +151,9 @@ class LogManagerTest {
 
     // this cleanup shouldn't find any expired segments but should delete some to reduce size
     time.sleep(logManager.InitialTaskDelayMs)
-    assertEquals(
-        "Now there should be exactly 6 segments", 6, log.numberOfSegments)
+    assertEquals("Now there should be exactly 6 segments",
+                 6,
+                 log.numberOfSegments)
     time.sleep(log.config.fileDeleteDelayMs + 1)
     assertEquals("Files should have been deleted",
                  log.numberOfSegments * 2,
@@ -199,9 +200,8 @@ class LogManagerTest {
   @Test
   def testLeastLoadedAssignment() {
     // create a log manager with multiple data directories
-    val dirs = Array(TestUtils.tempDir(),
-                     TestUtils.tempDir(),
-                     TestUtils.tempDir())
+    val dirs =
+      Array(TestUtils.tempDir(), TestUtils.tempDir(), TestUtils.tempDir())
     logManager.shutdown()
     logManager = createLogManager()
 
@@ -225,7 +225,7 @@ class LogManagerTest {
     try {
       createLogManager()
       fail(
-          "Should not be able to create a second log manager instance with the same data directory")
+        "Should not be able to create a second log manager instance with the same data directory")
     } catch {
       case e: KafkaException => // this is good
     }
@@ -237,8 +237,8 @@ class LogManagerTest {
   @Test
   def testCheckpointRecoveryPoints() {
     verifyCheckpointRecovery(
-        Seq(TopicAndPartition("test-a", 1), TopicAndPartition("test-b", 1)),
-        logManager)
+      Seq(TopicAndPartition("test-a", 1), TopicAndPartition("test-b", 1)),
+      logManager)
   }
 
   /**
@@ -249,7 +249,7 @@ class LogManagerTest {
     logManager.shutdown()
     logDir = TestUtils.tempDir()
     logManager = TestUtils.createLogManager(
-        logDirs = Array(new File(logDir.getAbsolutePath + File.separator)))
+      logDirs = Array(new File(logDir.getAbsolutePath + File.separator)))
     logManager.startup
     verifyCheckpointRecovery(Seq(TopicAndPartition("test-a", 1)), logManager)
   }
@@ -272,31 +272,30 @@ class LogManagerTest {
       topicAndPartitions: Seq[TopicAndPartition],
       logManager: LogManager) {
     val logs = topicAndPartitions.map(this.logManager.createLog(_, logConfig))
-    logs.foreach(
-        log =>
-          {
-        for (i <- 0 until 50) log.append(
-            TestUtils.singleMessageSet("test".getBytes()))
+    logs.foreach(log => {
+      for (i <- 0 until 50)
+        log.append(TestUtils.singleMessageSet("test".getBytes()))
 
-        log.flush()
+      log.flush()
     })
 
     logManager.checkpointRecoveryPointOffsets()
     val checkpoints = new OffsetCheckpoint(
-        new File(logDir, logManager.RecoveryPointCheckpointFile)).read()
+      new File(logDir, logManager.RecoveryPointCheckpointFile)).read()
 
     topicAndPartitions.zip(logs).foreach {
       case (tp, log) => {
-          assertEquals("Recovery point should equal checkpoint",
-                       checkpoints(tp),
-                       log.recoveryPoint)
-        }
+        assertEquals("Recovery point should equal checkpoint",
+                     checkpoints(tp),
+                     log.recoveryPoint)
+      }
     }
   }
 
   private def createLogManager(
       logDirs: Array[File] = Array(this.logDir)): LogManager = {
-    TestUtils.createLogManager(
-        defaultConfig = logConfig, logDirs = logDirs, time = this.time)
+    TestUtils.createLogManager(defaultConfig = logConfig,
+                               logDirs = logDirs,
+                               time = this.time)
   }
 }

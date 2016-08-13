@@ -23,8 +23,7 @@ abstract class BaseResponse()
 case class GeneralResponse(
     status: Int = 0,
     message: String = ""
-)
-    extends BaseResponse()
+) extends BaseResponse()
 
 case class AppRequest(
     id: Int = 0,
@@ -39,8 +38,7 @@ case class AppResponse(
     id: Int = 0,
     name: String = "",
     keys: Seq[AccessKey]
-)
-    extends BaseResponse()
+) extends BaseResponse()
 
 case class AppNewResponse(
     status: Int = 0,
@@ -48,15 +46,13 @@ case class AppNewResponse(
     id: Int = 0,
     name: String = "",
     key: String
-)
-    extends BaseResponse()
+) extends BaseResponse()
 
 case class AppListResponse(
     status: Int = 0,
     message: String = "",
     apps: Seq[AppResponse]
-)
-    extends BaseResponse()
+) extends BaseResponse()
 
 class CommandClient(
     val appClient: Apps,
@@ -72,21 +68,22 @@ class CommandClient(
       } getOrElse {
         appClient.get(req.id) map { app2 =>
           GeneralResponse(
-              0,
-              s"App ID ${app2.id} already exists and maps to the app '${app2.name}'. " +
+            0,
+            s"App ID ${app2.id} already exists and maps to the app '${app2.name}'. " +
               "Aborting.")
         } getOrElse {
           val appid =
-            appClient.insert(App(id = Option(req.id).getOrElse(0),
-                                 name = req.name,
-                                 description = Option(req.description)))
+            appClient.insert(
+              App(id = Option(req.id).getOrElse(0),
+                  name = req.name,
+                  description = Option(req.description)))
           appid map { id =>
             val dbInit = eventClient.init(id)
             val r =
               if (dbInit) {
                 val accessKey = AccessKey(key = "", appid = id, events = Seq())
                 val accessKey2 = accessKeyClient.insert(
-                    AccessKey(key = "", appid = id, events = Seq()))
+                  AccessKey(key = "", appid = id, events = Seq()))
                 accessKey2 map { k =>
                   new AppNewResponse(1,
                                      "App created successfully.",
@@ -98,8 +95,8 @@ class CommandClient(
                 }
               } else {
                 GeneralResponse(
-                    0,
-                    s"Unable to initialize Event Store for this app ID: ${id}.")
+                  0,
+                  s"Unable to initialize Event Store for this app ID: ${id}.")
               }
             r
           } getOrElse {
@@ -137,11 +134,12 @@ class CommandClient(
         val data2 =
           if (dbInit) {
             GeneralResponse(
-                1, s"Initialized Event Store for this app ID: ${app.id}.")
+              1,
+              s"Initialized Event Store for this app ID: ${app.id}.")
           } else {
             GeneralResponse(
-                0,
-                s"Unable to initialize Event Store for this appId:" +
+              0,
+              s"Unable to initialize Event Store for this appId:" +
                 s" ${app.id}.")
           }
         GeneralResponse(data.status * data2.status,
@@ -163,7 +161,8 @@ class CommandClient(
             GeneralResponse(1, s"App successfully deleted")
           } else {
             GeneralResponse(
-                0, s"Error removing Event Store for app ${app.name}.");
+              0,
+              s"Error removing Event Store for app ${app.name}.");
           }
         data
       } getOrElse {

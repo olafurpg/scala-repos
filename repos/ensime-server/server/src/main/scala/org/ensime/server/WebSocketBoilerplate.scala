@@ -75,8 +75,8 @@ object WebSocketBoilerplate {
   ): Flow[Incoming, Outgoing, Unit] = {
     val (target, pub) = Source
       .actorRef[Outgoing](
-          0,
-          OverflowStrategy.fail
+        0,
+        OverflowStrategy.fail
       )
       .toMat(Sink.publisher)(Keep.both)
       .run()

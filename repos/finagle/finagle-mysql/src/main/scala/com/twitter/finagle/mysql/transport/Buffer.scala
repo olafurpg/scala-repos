@@ -39,8 +39,8 @@ object Buffer {
 
   def fromChannelBuffer(cb: ChannelBuffer): Buffer = {
     require(cb != null)
-    require(
-        cb.order == ByteOrder.LITTLE_ENDIAN, "Invalid ChannelBuffer ByteOrder")
+    require(cb.order == ByteOrder.LITTLE_ENDIAN,
+            "Invalid ChannelBuffer ByteOrder")
     new Buffer { val underlying = cb }
   }
 }
@@ -207,7 +207,8 @@ object BufferReader {
     * BufferReader implementation backed by a Netty ChannelBuffer.
     */
   private[this] class Netty3BufferReader(val underlying: ChannelBuffer)
-      extends BufferReader with Buffer {
+      extends BufferReader
+      with Buffer {
     def offset = underlying.readerIndex
     def readable(width: Int) = underlying.readableBytes >= width
 
@@ -364,7 +365,8 @@ object BufferWriter {
     * BufferWriter implementation backed by a Netty ChannelBuffer.
     */
   private[this] class Netty3BufferWriter(val underlying: ChannelBuffer)
-      extends BufferWriter with Buffer {
+      extends BufferWriter
+      with Buffer {
     def offset = underlying.writerIndex
     def writable(width: Int = 1): Boolean = underlying.writableBytes >= width
 

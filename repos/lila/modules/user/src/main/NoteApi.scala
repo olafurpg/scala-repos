@@ -9,8 +9,8 @@ case class Note(_id: String,
                 troll: Boolean,
                 date: DateTime)
 
-final class NoteApi(
-    coll: lila.db.Types.Coll, timeline: akka.actor.ActorSelection) {
+final class NoteApi(coll: lila.db.Types.Coll,
+                    timeline: akka.actor.ActorSelection) {
 
   import reactivemongo.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler
@@ -19,10 +19,10 @@ final class NoteApi(
   def get(user: User, me: User, myFriendIds: Set[String]): Fu[List[Note]] =
     coll
       .find(
-          BSONDocument(
-              "to" -> user.id,
-              "from" -> BSONDocument("$in" -> (myFriendIds + me.id))
-          ) ++ me.troll.fold(BSONDocument(), BSONDocument("troll" -> false))
+        BSONDocument(
+          "to" -> user.id,
+          "from" -> BSONDocument("$in" -> (myFriendIds + me.id))
+        ) ++ me.troll.fold(BSONDocument(), BSONDocument("troll" -> false))
       )
       .sort(BSONDocument("date" -> -1))
       .cursor[Note]()
@@ -39,7 +39,7 @@ final class NoteApi(
 
     import lila.hub.actorApi.timeline.{Propagate, NoteCreate}
     timeline !
-    (Propagate(NoteCreate(note.from, note.to)) toFriendsOf from.id exceptUser note.to)
+      (Propagate(NoteCreate(note.from, note.to)) toFriendsOf from.id exceptUser note.to)
 
     coll insert note
   }

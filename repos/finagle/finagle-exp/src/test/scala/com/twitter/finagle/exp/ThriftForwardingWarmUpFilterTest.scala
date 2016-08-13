@@ -21,9 +21,9 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
     val duration = 4.seconds
     val bypassedClientPrefix = "bypassMe"
     val filter = new ThriftForwardingWarmUpFilter(
-        duration,
-        forwardService,
-        isBypassClient = { _.name.startsWith(bypassedClientPrefix) }
+      duration,
+      forwardService,
+      isBypassClient = { _.name.startsWith(bypassedClientPrefix) }
     )
     val req = new Array[Byte](1)
     val rep = new Array[Byte](2)
@@ -45,7 +45,7 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
         filter(req, service)
         sendRequests()
         verify(forwardService, times(numRequests + 1))(
-            any[ThriftClientRequest])
+          any[ThriftClientRequest])
       }
     }
   }

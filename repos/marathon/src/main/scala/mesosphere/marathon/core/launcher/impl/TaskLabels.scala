@@ -28,11 +28,11 @@ object TaskLabels {
 
   def labelsForTask(frameworkId: FrameworkId, task: Task): ResourceLabels =
     labelsForTask(frameworkId, task.taskId)
-  def labelsForTask(
-      frameworkId: FrameworkId, taskId: Task.Id): ResourceLabels =
+  def labelsForTask(frameworkId: FrameworkId,
+                    taskId: Task.Id): ResourceLabels =
     ResourceLabels(
-        Map(
-            FRAMEWORK_ID_LABEL -> frameworkId.id,
-            TASK_ID_LABEL -> taskId.idString
-        ))
+      Map(
+        FRAMEWORK_ID_LABEL -> frameworkId.id,
+        TASK_ID_LABEL -> taskId.idString
+      ))
 }

@@ -44,10 +44,10 @@ package virtualhost {
                                             fooRouter: foo.Routes,
                                             barRouter: bar.Routes)
       extends DefaultHttpRequestHandler(
-          fooRouter,
-          errorHandler,
-          configuration,
-          filters
+        fooRouter,
+        errorHandler,
+        configuration,
+        filters
       ) {
 
     override def routeRequest(request: RequestHeader) = {

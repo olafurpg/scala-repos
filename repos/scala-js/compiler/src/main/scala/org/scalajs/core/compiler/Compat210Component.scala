@@ -171,7 +171,7 @@ trait Compat210Component {
     def valueClazz: Symbol = self.original.typeSymbol
     def erasedUnderlying: Type =
       enteringPhase(currentRun.erasurePhase)(
-          erasure.erasedValueClassArg(self.original))
+        erasure.erasedValueClassArg(self.original))
     def original: TypeRef = sys.error("infinite loop in Compat")
   }
 

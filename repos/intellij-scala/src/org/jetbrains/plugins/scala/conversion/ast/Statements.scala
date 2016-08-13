@@ -13,8 +13,8 @@ case class ReturnStatement(value: IntermediateNode) extends IntermediateNode
 
 case class ThrowStatement(value: IntermediateNode) extends IntermediateNode
 
-case class AssertStatement(
-    condition: Option[IntermediateNode], description: Option[IntermediateNode])
+case class AssertStatement(condition: Option[IntermediateNode],
+                           description: Option[IntermediateNode])
     extends IntermediateNode
 
 case class ImportStatement(importValue: IntermediateNode, onDemand: Boolean)
@@ -40,16 +40,16 @@ case class ForeachStatement(iterParamName: String,
 case class ExpressionListStatement(exprs: Seq[IntermediateNode])
     extends IntermediateNode
 
-case class SynchronizedStatement(
-    lock: Option[IntermediateNode], body: Option[IntermediateNode])
+case class SynchronizedStatement(lock: Option[IntermediateNode],
+                                 body: Option[IntermediateNode])
     extends IntermediateNode
 
-case class SwitchLabelStatement(
-    caseValue: Option[IntermediateNode], arrow: String)
+case class SwitchLabelStatement(caseValue: Option[IntermediateNode],
+                                arrow: String)
     extends IntermediateNode
 
-case class SwitchStatemtnt(
-    expession: Option[IntermediateNode], body: Option[IntermediateNode])
+case class SwitchStatemtnt(expession: Option[IntermediateNode],
+                           body: Option[IntermediateNode])
     extends IntermediateNode
 
 case class TryCatchStatement(

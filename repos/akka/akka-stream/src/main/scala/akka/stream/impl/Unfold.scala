@@ -26,9 +26,9 @@ private[akka] final class Unfold[S, E](s: S, f: S ⇒ Option[(S, E)])
         override def onPull(): Unit = f(state) match {
           case None ⇒ complete(out)
           case Some((newState, v)) ⇒ {
-              push(out, v)
-              state = newState
-            }
+            push(out, v)
+            state = newState
+          }
         }
       })
     }
@@ -37,8 +37,8 @@ private[akka] final class Unfold[S, E](s: S, f: S ⇒ Option[(S, E)])
 /**
   * INTERNAL API
   */
-private[akka] final class UnfoldAsync[S, E](
-    s: S, f: S ⇒ Future[Option[(S, E)]])
+private[akka] final class UnfoldAsync[S, E](s: S,
+                                            f: S ⇒ Future[Option[(S, E)]])
     extends GraphStage[SourceShape[E]] {
   val out: Outlet[E] = Outlet("UnfoldAsync.out")
   override val shape: SourceShape[E] = SourceShape(out)
@@ -62,7 +62,7 @@ private[akka] final class UnfoldAsync[S, E](
       setHandler(out, new OutHandler {
         override def onPull(): Unit =
           f(state).onComplete(asyncHandler)(
-              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+            akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
       })
     }
 }

@@ -32,18 +32,18 @@ trait RackAwareTest {
     // always verify that no broker will be assigned for more than one replica
     for ((_, brokerList) <- assignment) {
       assertEquals(
-          "More than one replica is assigned to same broker for the same partition",
-          brokerList.toSet.size,
-          brokerList.size)
+        "More than one replica is assigned to same broker for the same partition",
+        brokerList.toSet.size,
+        brokerList.size)
     }
     val distribution = getReplicaDistribution(assignment, brokerRackMapping)
 
     if (verifyRackAware) {
       val partitionRackMap = distribution.partitionRacks
       assertEquals(
-          "More than one replica of the same partition is assigned to the same rack",
-          List.fill(numPartitions)(replicationFactor),
-          partitionRackMap.values.toList.map(_.distinct.size))
+        "More than one replica of the same partition is assigned to the same rack",
+        List.fill(numPartitions)(replicationFactor),
+        partitionRackMap.values.toList.map(_.distinct.size))
     }
 
     if (verifyLeaderDistribution) {
@@ -76,11 +76,11 @@ trait RackAwareTest {
         for (brokerId <- replicaList) {
           partitionCount(brokerId) = partitionCount.getOrElse(brokerId, 0) + 1
           val rack = brokerRackMapping.getOrElse(
-              brokerId,
-              sys.error(
-                  s"No mapping found for $brokerId in `brokerRackMapping`"))
-          partitionRackMap(partitionId) = rack :: partitionRackMap.getOrElse(
-              partitionId, List())
+            brokerId,
+            sys.error(
+              s"No mapping found for $brokerId in `brokerRackMapping`"))
+          partitionRackMap(partitionId) = rack :: partitionRackMap
+              .getOrElse(partitionId, List())
         }
     }
     ReplicaDistributions(partitionRackMap, leaderCount, partitionCount)

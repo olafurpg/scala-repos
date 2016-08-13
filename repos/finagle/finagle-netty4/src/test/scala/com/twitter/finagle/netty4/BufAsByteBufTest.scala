@@ -21,7 +21,7 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
 
   before {
     buffer = BufAsByteBuf.Owned(
-        Buf.ByteArray.Owned(Array.fill[Byte](Capacity)(0.toByte)))
+      Buf.ByteArray.Owned(Array.fill[Byte](Capacity)(0.toByte)))
     seed = System.currentTimeMillis()
     random = new Random(seed)
   }
@@ -1293,8 +1293,8 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
     assertEquals(0, buffer.slice(1, buffer.capacity - 1).readerIndex)
     assertEquals(0, buffer.slice(1, buffer.capacity - 2).readerIndex)
 
-    assertEquals(
-        buffer.capacity, buffer.slice(0, buffer.capacity).writerIndex())
+    assertEquals(buffer.capacity,
+                 buffer.slice(0, buffer.capacity).writerIndex())
     assertEquals(buffer.capacity - 1,
                  buffer.slice(0, buffer.capacity - 1).writerIndex())
     assertEquals(buffer.capacity - 1,
@@ -1348,7 +1348,7 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
 
     assert(wrappedBuf.compareTo(Unpooled.wrappedBuffer(value, 0, 31)) > 0)
     assert(
-        wrappedBuf.slice(0, 31).compareTo(Unpooled.wrappedBuffer(value)) < 0)
+      wrappedBuf.slice(0, 31).compareTo(Unpooled.wrappedBuffer(value)) < 0)
   }
 
   test("toString") {
@@ -1485,14 +1485,14 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
   testConstructAndExtract("empty Buf", Buf.Empty)
 
   testConstructAndExtract(
-      "Buf.ByteArray",
-      Buf.ByteArray.Owned(Array[Byte](0, 1, 2, 3, 4))
+    "Buf.ByteArray",
+    Buf.ByteArray.Owned(Array[Byte](0, 1, 2, 3, 4))
   )
 
   testConstructAndExtract(
-      "Buf.ByteBuffer",
-      Buf.ByteBuffer.Owned(
-          ByteBuffer.wrap(Array[Byte](0, 1, 2, 3, 4))
-      )
+    "Buf.ByteBuffer",
+    Buf.ByteBuffer.Owned(
+      ByteBuffer.wrap(Array[Byte](0, 1, 2, 3, 4))
+    )
   )
 }

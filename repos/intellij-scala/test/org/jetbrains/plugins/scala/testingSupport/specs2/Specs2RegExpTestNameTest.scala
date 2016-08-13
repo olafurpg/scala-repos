@@ -39,16 +39,16 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
     addRegExpTest()
 
     runTestByLocation(
-        8,
-        10,
-        regExpFileName,
-        checkConfigAndSettings(_, regExpClassName, "test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           regExpClassName,
-                                           "The RegExpTest should",
-                                           "test") &&
+      8,
+      10,
+      regExpFileName,
+      checkConfigAndSettings(_, regExpClassName, "test"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         regExpClassName,
+                                         "The RegExpTest should",
+                                         "test") &&
           checkResultTreeDoesNotHaveNodes(root, "testtest", "testtesttest"))
   }
 
@@ -56,16 +56,16 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
     addRegExpTest()
 
     runTestByLocation(
-        10,
-        10,
-        regExpFileName,
-        checkConfigAndSettings(_, regExpClassName, "testtest"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           regExpClassName,
-                                           "The RegExpTest should",
-                                           "testtest") &&
+      10,
+      10,
+      regExpFileName,
+      checkConfigAndSettings(_, regExpClassName, "testtest"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         regExpClassName,
+                                         "The RegExpTest should",
+                                         "testtest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtesttest"))
   }
 
@@ -73,16 +73,16 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
     addRegExpTest()
 
     runTestByLocation(
-        4,
-        10,
-        regExpFileName,
-        checkConfigAndSettings(_, regExpClassName, "testtesttest"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           regExpClassName,
-                                           "The RegExpTest should",
-                                           "testtesttest") &&
+      4,
+      10,
+      regExpFileName,
+      checkConfigAndSettings(_, regExpClassName, "testtesttest"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         regExpClassName,
+                                         "The RegExpTest should",
+                                         "testtesttest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtest"))
   }
 
@@ -91,23 +91,29 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
     addRegExpTest()
 
     runTestByLocation(
-        14,
-        10,
-        regExpFileName,
-        checkConfigAndSettings(_, regExpClassName, "run"),
-        root =>
-          checkResultTreeHasExactNamedPath(
-              root, "[root]", regExpClassName, "First should", "run") &&
+      14,
+      10,
+      regExpFileName,
+      checkConfigAndSettings(_, regExpClassName, "run"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         regExpClassName,
+                                         "First should",
+                                         "run") &&
           checkResultTreeDoesNotHaveNodes(root, "Second should"))
 
     runTestByLocation(
-        18,
-        10,
-        regExpFileName,
-        checkConfigAndSettings(_, regExpClassName, "run"),
-        root =>
-          checkResultTreeHasExactNamedPath(
-              root, "[root]", regExpClassName, "Second should", "run") &&
+      18,
+      10,
+      regExpFileName,
+      checkConfigAndSettings(_, regExpClassName, "run"),
+      root =>
+        checkResultTreeHasExactNamedPath(root,
+                                         "[root]",
+                                         regExpClassName,
+                                         "Second should",
+                                         "run") &&
           checkResultTreeDoesNotHaveNodes(root, "First should"))
   }
 }

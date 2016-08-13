@@ -51,7 +51,7 @@ trait HostDirectives {
       case 1 ⇒ forFunc(regex.findPrefixMatchOf(_).map(_.group(1)))
       case _ ⇒
         throw new IllegalArgumentException(
-            "Path regex '" + regex.pattern.pattern +
+          "Path regex '" + regex.pattern.pattern +
             "' must not contain more than one capturing group")
     }
   }
@@ -61,5 +61,5 @@ object HostDirectives extends HostDirectives {
   import BasicDirectives._
 
   private val _extractHost: Directive1[String] = extract(
-      _.request.uri.authority.host.address)
+    _.request.uri.authority.host.address)
 }

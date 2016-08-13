@@ -8,15 +8,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TypeAliasSignature}
 
 /**
   * @author Alefas
   * @since 04/04/14.
   */
-class ScLightTypeAliasDefinition(
-    s: TypeAliasSignature, val ta: ScTypeAliasDefinition)
+class ScLightTypeAliasDefinition(s: TypeAliasSignature,
+                                 val ta: ScTypeAliasDefinition)
     extends LightElement(ta.getManager, ta.getLanguage)
     with ScTypeAliasDefinition {
   setNavigationElement(ta)
@@ -36,7 +40,7 @@ class ScLightTypeAliasDefinition(
     Success(s.lowerBound, Some(this))
 
   override def getOriginalElement: PsiElement =
-    super [ScTypeAliasDefinition].getOriginalElement
+    super[ScTypeAliasDefinition].getOriginalElement
 
   override def toString: String = ta.toString
 

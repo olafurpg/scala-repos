@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 class FilterTest extends FunSuite {
 
   test(
-      "BP filtering tested against output from scipy.signal.firwin/ifilter (0.13.2-1)") {
+    "BP filtering tested against output from scipy.signal.firwin/ifilter (0.13.2-1)") {
 
     val testNormThreshold = 1.0E-6
     val spFirwin1 = DenseVector(1.40718797E-02,
@@ -82,8 +82,8 @@ class FilterTest extends FunSuite {
                              overhang = OptOverhang.PreserveLength,
                              padding = OptPadding.Zero)
     assert(
-        norm(filtered1(0 to -6) - spTestSignalFiltered1(5 to -1)) < testNormThreshold,
-        "filtered result is incorrect!")
+      norm(filtered1(0 to -6) - spTestSignalFiltered1(5 to -1)) < testNormThreshold,
+      "filtered result is incorrect!")
   }
 
   test("filterMedian") {
@@ -97,8 +97,8 @@ class FilterTest extends FunSuite {
     assert(result1 == Array.tabulate[Int](11)(_ + 2).toVector,
            "median filter failed for small data and OptOverhang.None")
     assert(
-        result2 == (Array(0, 1) ++ result1 ++ Array(13, 14)).toVector,
-        "median filter failed for small data and OptOverhang.PreserveLength")
+      result2 == (Array(0, 1) ++ result1 ++ Array(13, 14)).toVector,
+      "median filter failed for small data and OptOverhang.PreserveLength")
 
     val dataLarge = DenseVector.tabulate[Float](100000)(p => p.toFloat)
     val result3 = filterMedian(dataLarge, 5, OptOverhang.None).toScalaVector
@@ -107,7 +107,7 @@ class FilterTest extends FunSuite {
     assert(result3 == Array.tabulate[Float](100000 - 4)(_ + 2).toVector,
            "median filter failed for large data and OptOverhang.None")
     assert(
-        result4 == (Array(0f, 1f) ++ result3 ++ Array(99998f, 99999f)).toVector,
-        "median filter failed for large data and OptOverhang.PreserveLength")
+      result4 == (Array(0f, 1f) ++ result3 ++ Array(99998f, 99999f)).toVector,
+      "median filter failed for large data and OptOverhang.PreserveLength")
   }
 }

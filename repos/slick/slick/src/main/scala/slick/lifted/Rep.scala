@@ -33,7 +33,7 @@ trait Rep[T] {
 }
 
 object Rep {
-  def forNode[T : TypedType](n: Node): Rep[T] = new TypedRep[T] {
+  def forNode[T: TypedType](n: Node): Rep[T] = new TypedRep[T] {
     def toNode = n
   }
   def forNodeUntyped[T](n: Node): Rep[T] = new UntypedRep[T] { def toNode = n }
@@ -47,11 +47,11 @@ object Rep {
     def encodeRef(path: Node): Rep[T] = forNodeUntyped(path)
   }
 
-  def columnPlaceholder[T : TypedType]: Rep[T] = new Rep[T] {
+  def columnPlaceholder[T: TypedType]: Rep[T] = new Rep[T] {
     def encodeRef(path: Node): Rep[T] = Rep.forNode[T](path)
     def toNode =
       throw new SlickException(
-          "Internal error: Cannot get Node from Rep.columnPlaceholder")
+        "Internal error: Cannot get Node from Rep.columnPlaceholder")
   }
 
   /** Lift a value inside a `Rep` into a `Some` Option value. */
@@ -64,7 +64,7 @@ object Rep {
 
 /** A scalar value that is known at the client side at the time a query is executed.
   * This is either a constant value (`LiteralColumn`) or a scalar parameter. */
-class ConstColumn[T : TypedType](val toNode: Node) extends Rep.TypedRep[T] {
+class ConstColumn[T: TypedType](val toNode: Node) extends Rep.TypedRep[T] {
   override def encodeRef(path: Node): ConstColumn[T] = new ConstColumn[T](path)
 }
 

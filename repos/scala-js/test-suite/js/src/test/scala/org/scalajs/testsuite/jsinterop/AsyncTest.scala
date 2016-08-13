@@ -115,7 +115,7 @@ class AsyncTest {
         implicit val executor = QueueExecutionContext()
         queueExecOrderTests { () =>
           tick(1)
-          optProcessQueue.foreach(_ ())
+          optProcessQueue.foreach(_())
         }
       }
     }
@@ -163,7 +163,7 @@ class AsyncTest {
 
       val p = new js.Promise[Int]({
         (resolve: js.Function1[Int | js.Thenable[Int], _],
-        reject: js.Function1[Any, _]) =>
+         reject: js.Function1[Any, _]) =>
           resolve(42)
       })
 
@@ -211,7 +211,7 @@ class AsyncTest {
 
       val initialPromise = new js.Promise[Int]({
         (resolve: js.Function1[Int | js.Thenable[Int], _],
-        reject: js.Function1[Any, _]) =>
+         reject: js.Function1[Any, _]) =>
           resolve(42)
       })
 

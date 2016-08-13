@@ -12,7 +12,8 @@ import scala.collection.mutable
 private[appinfo] class DefaultInfoService(groupManager: GroupManager,
                                           appRepository: AppRepository,
                                           newBaseData: () => AppInfoBaseData)
-    extends AppInfoService with GroupInfoService {
+    extends AppInfoService
+    with GroupInfoService {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -46,8 +47,8 @@ private[appinfo] class DefaultInfoService(groupManager: GroupManager,
     log.debug(s"queryAllInGroup $groupId")
     groupManager
       .group(groupId)
-      .map(_.map(_.transitiveApps.filter(selector.matches))
-            .getOrElse(Seq.empty))
+      .map(
+        _.map(_.transitiveApps.filter(selector.matches)).getOrElse(Seq.empty))
       .flatMap(resolveAppInfos(_, embed))
   }
 
@@ -84,8 +85,8 @@ private[appinfo] class DefaultInfoService(groupManager: GroupManager,
     //fetch all transitive app infos with one request
     val appInfos = {
       if (groupEmbed(GroupInfo.Embed.Apps))
-        resolveAppInfos(
-            group.transitiveApps.filter(groupSelector.matches), appEmbed)
+        resolveAppInfos(group.transitiveApps.filter(groupSelector.matches),
+                        appEmbed)
       else Future.successful(Seq.empty)
     }
 
@@ -97,19 +98,20 @@ private[appinfo] class DefaultInfoService(groupManager: GroupManager,
         def groups: Option[Seq[GroupInfo]] =
           if (groupEmbed(GroupInfo.Embed.Groups))
             Some(
-                ref.groups.toIndexedSeq.flatMap(queryGroup).sortBy(_.group.id))
+              ref.groups.toIndexedSeq.flatMap(queryGroup).sortBy(_.group.id))
           else None
         def apps: Option[Seq[AppInfo]] =
           if (groupEmbed(GroupInfo.Embed.Apps))
-            Some(ref.apps.toIndexedSeq
-                  .flatMap(a => infoById.get(a.id))
-                  .sortBy(_.app.id))
+            Some(
+              ref.apps.toIndexedSeq
+                .flatMap(a => infoById.get(a.id))
+                .sortBy(_.app.id))
           else None
         //if a subgroup is allowed, we also have to allow all parents implicitly
         def groupMatches(group: Group): Boolean = {
           alreadyMatched.getOrElseUpdate(group.id,
                                          groupSelector.matches(group) ||
-                                         group.groups.exists(groupMatches))
+                                           group.groups.exists(groupMatches))
         }
         if (groupMatches(ref)) Some(GroupInfo(ref, apps, groups)) else None
       }

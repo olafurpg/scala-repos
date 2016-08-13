@@ -19,7 +19,12 @@ package org.apache.spark.deploy.master.ui
 
 import org.apache.spark.deploy.master.Master
 import org.apache.spark.internal.Logging
-import org.apache.spark.status.api.v1.{ApiRootResource, ApplicationInfo, ApplicationsListResource, UIRoot}
+import org.apache.spark.status.api.v1.{
+  ApiRootResource,
+  ApplicationInfo,
+  ApplicationsListResource,
+  UIRoot
+}
 import org.apache.spark.ui.{SparkUI, WebUI}
 import org.apache.spark.ui.JettyUtils._
 
@@ -33,7 +38,9 @@ private[master] class MasterWebUI(val master: Master,
                   master.securityMgr.getSSLOptions("standalone"),
                   requestedPort,
                   master.conf,
-                  name = "MasterUI") with Logging with UIRoot {
+                  name = "MasterUI")
+    with Logging
+    with UIRoot {
 
   val masterEndpointRef = master.self
   val killEnabled = master.conf.getBoolean("spark.ui.killEnabled", true)
@@ -49,18 +56,18 @@ private[master] class MasterWebUI(val master: Master,
     attachPage(new HistoryNotFoundPage(this))
     attachPage(masterPage)
     attachHandler(
-        createStaticHandler(MasterWebUI.STATIC_RESOURCE_DIR, "/static"))
+      createStaticHandler(MasterWebUI.STATIC_RESOURCE_DIR, "/static"))
     attachHandler(ApiRootResource.getServletHandler(this))
     attachHandler(
-        createRedirectHandler("/app/kill",
-                              "/",
-                              masterPage.handleAppKillRequest,
-                              httpMethods = Set("POST")))
+      createRedirectHandler("/app/kill",
+                            "/",
+                            masterPage.handleAppKillRequest,
+                            httpMethods = Set("POST")))
     attachHandler(
-        createRedirectHandler("/driver/kill",
-                              "/",
-                              masterPage.handleDriverKillRequest,
-                              httpMethods = Set("POST")))
+      createRedirectHandler("/driver/kill",
+                            "/",
+                            masterPage.handleDriverKillRequest,
+                            httpMethods = Set("POST")))
   }
 
   /** Attach a reconstructed UI to this Master UI. Only valid after bind(). */
@@ -91,10 +98,8 @@ private[master] class MasterWebUI(val master: Master,
   def getSparkUI(appId: String): Option[SparkUI] = {
     val state = masterPage.getMasterState
     val activeApps = state.activeApps.sortBy(_.startTime).reverse
-    val completedApps = state.completedApps
-      .sortBy(_.endTime)
-      .reverse
-      (activeApps ++ completedApps).find { _.id == appId }.flatMap {
+    val completedApps = state.completedApps.sortBy(_.endTime).reverse
+    (activeApps ++ completedApps).find { _.id == appId }.flatMap {
       master.rebuildSparkUI
     }
   }

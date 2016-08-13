@@ -9,8 +9,8 @@ import scala.reflect.ClassTag
 import breeze.linalg._
 import breeze.math.Field
 
-class LinearInterpolator[T : ClassTag : Field : Ordering](
-    x_coords: Vector[T], y_coords: Vector[T])
+class LinearInterpolator[T: ClassTag: Field: Ordering](x_coords: Vector[T],
+                                                       y_coords: Vector[T])
     extends HandyUnivariateInterpolator[T](x_coords, y_coords) {
 
   private val ord = implicitly[Ordering[T]]
@@ -26,7 +26,7 @@ class LinearInterpolator[T : ClassTag : Field : Ordering](
   override protected def extrapolate(x: T): T = {
     if (X.length < 2) {
       throw new IndexOutOfBoundsException(
-          "Cannot extrapolate linearly when given less than two points.")
+        "Cannot extrapolate linearly when given less than two points.")
     }
 
     val index = if (x < X(0)) 1 else X.length - 1
@@ -54,7 +54,7 @@ class LinearInterpolator[T : ClassTag : Field : Ordering](
 }
 
 object LinearInterpolator {
-  def apply[T : ClassTag : Field : Ordering](
-      x_coords: Vector[T], y_coords: Vector[T]) =
+  def apply[T: ClassTag: Field: Ordering](x_coords: Vector[T],
+                                          y_coords: Vector[T]) =
     new LinearInterpolator(x_coords, y_coords)
 }

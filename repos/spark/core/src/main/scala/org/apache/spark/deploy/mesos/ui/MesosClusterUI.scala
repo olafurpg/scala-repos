@@ -30,8 +30,10 @@ private[spark] class MesosClusterUI(securityManager: SecurityManager,
                                     conf: SparkConf,
                                     dispatcherPublicAddress: String,
                                     val scheduler: MesosClusterScheduler)
-    extends WebUI(
-        securityManager, securityManager.getSSLOptions("mesos"), port, conf) {
+    extends WebUI(securityManager,
+                  securityManager.getSSLOptions("mesos"),
+                  port,
+                  conf) {
 
   initialize()
 
@@ -42,7 +44,7 @@ private[spark] class MesosClusterUI(securityManager: SecurityManager,
     attachPage(new MesosClusterPage(this))
     attachPage(new DriverPage(this))
     attachHandler(
-        createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
+      createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
   }
 }
 

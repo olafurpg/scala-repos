@@ -80,15 +80,15 @@ case class InputState[T](state: T) {
   def fanOut(by: Int) = {
     require(by >= 0, "Invalid fanout: %d, by should be >= 0".format(by))
     require(
-        stateTracking.get.counter == 1,
-        "You can only call fanOut once, and must do it before acking the tuple.")
+      stateTracking.get.counter == 1,
+      "You can only call fanOut once, and must do it before acking the tuple.")
     val incrementAmount = by - 1
     val newS = stateTracking.update(_.incrBy(incrementAmount))
     // If we incremented on something that was 0 or negative
     // And not in a failed state, then this is an error
     if ((newS.counter - incrementAmount <= 0) && !newS.failed) {
       throw new Exception(
-          "Invalid call on an inputstate, we had already decremented to 0 and not failed.")
+        "Invalid call on an inputstate, we had already decremented to 0 and not failed.")
     }
     this
   }
@@ -112,7 +112,7 @@ case class InputState[T](state: T) {
 
   override def toString: String = {
     val curState = stateTracking.get
-    "Input State Wrapper(count: %d, failed: %s)".format(
-        curState.counter, curState.failed.toString)
+    "Input State Wrapper(count: %d, failed: %s)"
+      .format(curState.counter, curState.failed.toString)
   }
 }

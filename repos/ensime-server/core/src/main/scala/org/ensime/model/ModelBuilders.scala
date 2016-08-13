@@ -18,8 +18,8 @@ trait ModelBuilders { self: RichPresentationCompiler =>
 
   import rootMirror.RootPackage
 
-  def locateSymbolPos(
-      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] = {
+  def locateSymbolPos(sym: Symbol,
+                      needPos: PosNeeded): Option[SourcePosition] = {
     _locateSymbolPos(sym, needPos).orElse({
       logger.debug(s"search $sym: Try Companion")
       sym.companionSymbol match {
@@ -29,8 +29,8 @@ trait ModelBuilders { self: RichPresentationCompiler =>
     })
   }
 
-  def _locateSymbolPos(
-      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] = {
+  def _locateSymbolPos(sym: Symbol,
+                       needPos: PosNeeded): Option[SourcePosition] = {
     if (sym == NoSymbol || needPos == PosNeededNo) None
     else if (sym.pos != NoPosition) {
       if (needPos == PosNeededYes || needPos == PosNeededAvail) {
@@ -147,7 +147,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
 
     def fromSymbol(sym: Symbol): PackageInfo = {
       val members = sortedMembers(
-          packageMembers(sym).flatMap(packageMemberInfoFromSym))
+        packageMembers(sym).flatMap(packageMemberInfoFromSym))
       if (sym.isRoot || sym.isRootPackage) {
         new PackageInfo("root", "_root_", members)
       } else {
@@ -196,12 +196,12 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           if (typeSym.isModuleClass) typeSym.sourceModule else typeSym
         val symPos = locateSymbolPos(symbolToLocate, needPos)
         new BasicTypeInfo(
-            typeShortName(tpe),
-            declaredAs(typeSym),
-            typeFullName(tpe),
-            tpe.typeArgs.map(TypeInfo(_)),
-            members,
-            symPos
+          typeShortName(tpe),
+          declaredAs(typeSym),
+          typeFullName(tpe),
+          tpe.typeArgs.map(TypeInfo(_)),
+          members,
+          symPos
         )
       }
       tpe match {
@@ -214,18 +214,22 @@ trait ModelBuilders { self: RichPresentationCompiler =>
     }
 
     def nullInfo = {
-      new BasicTypeInfo(
-          "NA", DeclaredAs.Nil, "NA", List.empty, List.empty, None)
+      new BasicTypeInfo("NA",
+                        DeclaredAs.Nil,
+                        "NA",
+                        List.empty,
+                        List.empty,
+                        None)
     }
   }
 
   object ParamSectionInfo {
     def apply(params: Iterable[Symbol]): ParamSectionInfo = {
       new ParamSectionInfo(
-          params.map { s =>
-            (s.nameString, TypeInfo(s.tpe))
-          },
-          params.exists(_.isImplicit)
+        params.map { s =>
+          (s.nameString, TypeInfo(s.tpe))
+        },
+        params.exists(_.isImplicit)
       )
     }
   }
@@ -250,11 +254,11 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           Some(sym.owner.tpe)
         } else None
       new SymbolInfo(
-          name,
-          localName,
-          locateSymbolPos(sym, PosNeededYes),
-          TypeInfo(tpe, PosNeededAvail),
-          isArrowType(tpe)
+        name,
+        localName,
+        locateSymbolPos(sym, PosNeededYes),
+        TypeInfo(tpe, PosNeededAvail),
+        isArrowType(tpe)
       )
     }
   }
@@ -268,24 +272,25 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         relevance: Int,
         toInsert: Option[String]
     ) = new CompletionInfo(
-        name,
-        tpeSig,
-        isCallable,
-        relevance,
-        toInsert
+      name,
+      tpeSig,
+      isCallable,
+      relevance,
+      toInsert
     )
 
     def fromSymbol(sym: Symbol, relevance: Int): CompletionInfo =
       CompletionInfo.fromSymbolAndType(sym, sym.tpe, relevance)
 
-    def fromSymbolAndType(
-        sym: Symbol, tpe: Type, relevance: Int): CompletionInfo = {
+    def fromSymbolAndType(sym: Symbol,
+                          tpe: Type,
+                          relevance: Int): CompletionInfo = {
       CompletionInfo(
-          sym.nameString,
-          completionSignatureForType(tpe),
-          isArrowType(tpe.underlying),
-          relevance,
-          None
+        sym.nameString,
+        completionSignatureForType(tpe),
+        isArrowType(tpe.underlying),
+        relevance,
+        None
       )
     }
   }
@@ -297,8 +302,11 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         if (m.sym.pos == NoPosition) None else Some(EmptySourcePosition())
       val signatureString =
         if (decl == DeclaredAs.Method) Some(m.sym.signatureString) else None
-      new NamedTypeMemberInfo(
-          m.sym.nameString, TypeInfo(m.tpe), pos, signatureString, decl)
+      new NamedTypeMemberInfo(m.sym.nameString,
+                              TypeInfo(m.tpe),
+                              pos,
+                              signatureString,
+                              decl)
     }
   }
 
@@ -322,9 +330,9 @@ trait ModelBuilders { self: RichPresentationCompiler =>
               paramSections: List[ParamSectionInfo],
               finalResultType: Type): ArrowTypeInfo = {
       new ArrowTypeInfo(
-          tpe.toString(),
-          TypeInfo(tpe.finalResultType),
-          paramSections
+        tpe.toString(),
+        TypeInfo(tpe.finalResultType),
+        paramSections
       )
     }
 
@@ -342,8 +350,8 @@ object LineSourcePositionHelper {
   import org.ensime.util.RichFileObject._
   import org.ensime.util.io._
 
-  private def possiblyExtractFile(
-      fo: FileObject)(implicit config: EnsimeConfig): File =
+  private def possiblyExtractFile(fo: FileObject)(
+      implicit config: EnsimeConfig): File =
     fo.pathWithinArchive match {
       case None => fo.asLocalFile
       case Some(path) =>
@@ -359,9 +367,9 @@ object LineSourcePositionHelper {
         file
     }
 
-  def fromFqnSymbol(
-      sym: FqnSymbol)(implicit config: EnsimeConfig,
-                      vfs: EnsimeVFS): Option[LineSourcePosition] =
+  def fromFqnSymbol(sym: FqnSymbol)(
+      implicit config: EnsimeConfig,
+      vfs: EnsimeVFS): Option[LineSourcePosition] =
     (sym.sourceFileObject, sym.line, sym.offset) match {
       case (None, _, _) => None
       case (Some(fo), lineOpt, offsetOpt) =>
@@ -376,8 +384,9 @@ object OffsetSourcePositionHelper {
   def fromPosition(p: Position): Option[OffsetSourcePosition] = p match {
     case NoPosition => None
     case realPos =>
-      Some(new OffsetSourcePosition(
-              File(realPos.source.file.path).canon, realPos.point))
+      Some(
+        new OffsetSourcePosition(File(realPos.source.file.path).canon,
+                                 realPos.point))
   }
 }
 

@@ -34,8 +34,8 @@ object FixedPortTestUtils {
       ports
     } catch {
       case e: IOException => {
-          throw new RuntimeException(e)
-        }
+        throw new RuntimeException(e)
+      }
     }
   }
 
@@ -46,11 +46,11 @@ object FixedPortTestUtils {
       enableDeleteTopic: Boolean = false): Seq[Properties] = {
     val ports = FixedPortTestUtils.choosePorts(numConfigs)
     (0 until numConfigs).map(
-        node =>
-          TestUtils.createBrokerConfig(node,
-                                       zkConnect,
-                                       enableControlledShutdown,
-                                       enableDeleteTopic,
-                                       ports(node)))
+      node =>
+        TestUtils.createBrokerConfig(node,
+                                     zkConnect,
+                                     enableControlledShutdown,
+                                     enableDeleteTopic,
+                                     ports(node)))
   }
 }

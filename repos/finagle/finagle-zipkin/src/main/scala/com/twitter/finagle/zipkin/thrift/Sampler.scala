@@ -33,7 +33,7 @@ class Sampler {
   def setSampleRate(sampleRate: Float) = {
     if (!validSampleRate(sampleRate)) {
       throw new IllegalArgumentException(
-          "Sample rate not within the valid range of 0-1, was " + sampleRate)
+        "Sample rate not within the valid range of 0-1, was " + sampleRate)
     }
     sr = sampleRate
   }

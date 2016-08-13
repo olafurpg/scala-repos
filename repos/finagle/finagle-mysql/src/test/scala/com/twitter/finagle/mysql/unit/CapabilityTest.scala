@@ -22,10 +22,10 @@ class CapabilityTest extends FunSuite {
     }
     assertResult(true) {
       c.hasAll(
-          Capability.LongPassword,
-          Capability.SSL,
-          Capability.Transactions,
-          Capability.MultiResults
+        Capability.LongPassword,
+        Capability.SSL,
+        Capability.Transactions,
+        Capability.MultiResults
       )
     }
   }
@@ -39,8 +39,8 @@ class CapabilityTest extends FunSuite {
     val c2 = c + Capability.LocalFiles + Capability.Compress
     assertResult(true) {
       c2.hasAll(
-          Capability.LocalFiles,
-          Capability.Compress
+        Capability.LocalFiles,
+        Capability.Compress
       )
     }
   }

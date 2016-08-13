@@ -21,7 +21,8 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.graphx._
 
 class StronglyConnectedComponentsSuite
-    extends SparkFunSuite with LocalSparkContext {
+    extends SparkFunSuite
+    with LocalSparkContext {
 
   test("Island Strongly Connected Components") {
     withSpark { sc =>
@@ -50,7 +51,9 @@ class StronglyConnectedComponentsSuite
     withSpark { sc =>
       val edges =
         Array(0L -> 1L, 1L -> 2L, 2L -> 0L) ++ Array(
-            3L -> 4L, 4L -> 5L, 5L -> 3L) ++ Array(6L -> 0L, 5L -> 7L)
+          3L -> 4L,
+          4L -> 5L,
+          5L -> 3L) ++ Array(6L -> 0L, 5L -> 7L)
       val rawEdges = sc.parallelize(edges)
       val graph = Graph.fromEdgeTuples(rawEdges, -1)
       val sccGraph = graph.stronglyConnectedComponents(20)

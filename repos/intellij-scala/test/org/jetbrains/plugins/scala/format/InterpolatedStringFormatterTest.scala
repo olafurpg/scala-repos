@@ -36,13 +36,13 @@ class InterpolatedStringFormatterTest extends SimpleTestCase {
   }
 
   def testExpressionWithDispensableFormat() {
-    assertEquals(
-        "$foo", format(Injection(exp("foo"), Some(Specifier(null, "%d")))))
+    assertEquals("$foo",
+                 format(Injection(exp("foo"), Some(Specifier(null, "%d")))))
   }
 
   def testExpressionWithMadatoryFormat() {
-    assertEquals(
-        "$foo%2d", format(Injection(exp("foo"), Some(Specifier(null, "%2d")))))
+    assertEquals("$foo%2d",
+                 format(Injection(exp("foo"), Some(Specifier(null, "%2d")))))
   }
 
   def testPlainLiteral() {
@@ -50,8 +50,8 @@ class InterpolatedStringFormatterTest extends SimpleTestCase {
   }
 
   def testLiteralWithDispensableFormat() {
-    assertEquals(
-        "123", format(Injection(exp("123"), Some(Specifier(null, "%d")))))
+    assertEquals("123",
+                 format(Injection(exp("123"), Some(Specifier(null, "%d")))))
   }
 
   def testLiteralWithMadatoryFormat() {
@@ -65,14 +65,14 @@ class InterpolatedStringFormatterTest extends SimpleTestCase {
 
   def testComplexExpressionWithDispensableFormat() {
     assertEquals(
-        "${foo.bar}",
-        format(Injection(exp("foo.bar"), Some(Specifier(null, "%d")))))
+      "${foo.bar}",
+      format(Injection(exp("foo.bar"), Some(Specifier(null, "%d")))))
   }
 
   def testComplexExpressionWithMadatoryFormat() {
     assertEquals(
-        "${foo.bar}%2d",
-        format(Injection(exp("foo.bar"), Some(Specifier(null, "%2d")))))
+      "${foo.bar}%2d",
+      format(Injection(exp("foo.bar"), Some(Specifier(null, "%2d")))))
   }
 
   def testPlainBlockExpression() {
@@ -81,20 +81,20 @@ class InterpolatedStringFormatterTest extends SimpleTestCase {
 
   def testBlockExpressionWithDispensableFormat() {
     assertEquals(
-        "${foo.bar}",
-        format(Injection(exp("{foo.bar}"), Some(Specifier(null, "%d")))))
+      "${foo.bar}",
+      format(Injection(exp("{foo.bar}"), Some(Specifier(null, "%d")))))
   }
 
   def testBlockExpressionWithMadatoryFormat() {
     assertEquals(
-        "${foo.bar}%2d",
-        format(Injection(exp("{foo.bar}"), Some(Specifier(null, "%2d")))))
+      "${foo.bar}%2d",
+      format(Injection(exp("{foo.bar}"), Some(Specifier(null, "%2d")))))
   }
 
   def testMixedParts() {
     assertEquals(
-        "foo $exp bar",
-        format(Text("foo "), Injection(exp("exp"), None), Text(" bar")))
+      "foo $exp bar",
+      format(Text("foo "), Injection(exp("exp"), None), Text(" bar")))
   }
 
   def testLiterals() {

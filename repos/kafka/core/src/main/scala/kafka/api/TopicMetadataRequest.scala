@@ -69,12 +69,12 @@ case class TopicMetadataRequest(versionId: Short,
     val topicMetadata = topics.map { topic =>
       TopicMetadata(topic, Nil, Errors.forException(e).code)
     }
-    val errorResponse = TopicMetadataResponse(
-        Seq(), topicMetadata, correlationId)
+    val errorResponse =
+      TopicMetadataResponse(Seq(), topicMetadata, correlationId)
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   override def describe(details: Boolean): String = {

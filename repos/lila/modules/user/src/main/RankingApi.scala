@@ -2,7 +2,14 @@ package lila.user
 
 import org.joda.time.DateTime
 import play.api.libs.iteratee._
-import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Match, Project, Group, GroupField, SumField, SumValue}
+import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+  Match,
+  Project,
+  Group,
+  GroupField,
+  SumField,
+  SumValue
+}
 import reactivemongo.bson._
 import scala.concurrent.duration._
 
@@ -27,7 +34,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
   def save(userId: User.ID, perfType: PerfType, perf: Perf): Funit =
     (perf.nb >= 2) ?? coll
       .update(BSONDocument(
-                  "_id" -> s"$userId:${perfType.id}"
+                "_id" -> s"$userId:${perfType.id}"
               ),
               BSONDocument("user" -> userId,
                            "perf" -> perfType.id,
@@ -42,14 +49,14 @@ final class RankingApi(coll: lila.db.Types.Coll,
     _ ?? { user =>
       coll
         .remove(
-            BSONDocument(
-                "_id" -> BSONDocument(
-                    "$in" -> PerfType.leaderboardable.filter { pt =>
-              user.perfs(pt).nonEmpty
+          BSONDocument(
+            "_id" -> BSONDocument("$in" -> PerfType.leaderboardable.filter {
+              pt =>
+                user.perfs(pt).nonEmpty
             }.map { pt =>
               s"${user.id}:${pt.id}"
             })
-            ))
+          ))
         .void
     }
   }
@@ -82,14 +89,15 @@ final class RankingApi(coll: lila.db.Types.Coll,
           cache(perf.id) map { _ get userId map (perf.key -> _) }
       } map (_.flatten.toMap)
 
-    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](
-        f = compute, timeToLive = 15 minutes)
+    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](f = compute,
+                                                                timeToLive =
+                                                                  15 minutes)
 
     private def compute(perfId: Perf.ID): Fu[Map[User.ID, Rank]] = {
       val enumerator = coll
         .find(
-            BSONDocument("perf" -> perfId, "stable" -> true),
-            BSONDocument("user" -> true, "_id" -> false)
+          BSONDocument("perf" -> perfId, "stable" -> true),
+          BSONDocument("user" -> true, "_id" -> false)
         )
         .sort(BSONDocument("rating" -> -1))
         .cursor[BSONDocument]()
@@ -113,9 +121,9 @@ final class RankingApi(coll: lila.db.Types.Coll,
     def apply(perf: PerfType) = cache(perf.id)
 
     private val cache = mongoCache[Perf.ID, List[NbUsers]](
-        prefix = "user:rating:distribution",
-        f = compute,
-        timeToLive = 3 hour)
+      prefix = "user:rating:distribution",
+      f = compute,
+      timeToLive = 3 hour)
 
     // from 800 to 2500 by Stat.group
     private def compute(perfId: Perf.ID): Fu[List[NbUsers]] =
@@ -123,19 +131,20 @@ final class RankingApi(coll: lila.db.Types.Coll,
         .PerfType(perfId)
         .exists(lila.rating.PerfType.leaderboardable.contains) ?? {
         coll
-          .aggregate(Match(BSONDocument("perf" -> perfId)),
-                     List(Project(
-                              BSONDocument(
-                                  "_id" -> false,
-                                  "r" -> BSONDocument(
-                                      "$subtract" -> BSONArray(
-                                          "$rating",
-                                          BSONDocument("$mod" -> BSONArray(
-                                                  "$rating", Stat.group))
-                                      )
-                                  )
-                              )),
-                          GroupField("r")("nb" -> SumValue(1))))
+          .aggregate(
+            Match(BSONDocument("perf" -> perfId)),
+            List(
+              Project(
+                BSONDocument(
+                  "_id" -> false,
+                  "r" -> BSONDocument(
+                    "$subtract" -> BSONArray(
+                      "$rating",
+                      BSONDocument("$mod" -> BSONArray("$rating", Stat.group))
+                    )
+                  )
+                )),
+              GroupField("r")("nb" -> SumValue(1))))
           .map { res =>
             val hash = res.documents.flatMap { obj =>
               for {

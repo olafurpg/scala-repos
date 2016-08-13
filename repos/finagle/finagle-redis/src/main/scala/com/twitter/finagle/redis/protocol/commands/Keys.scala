@@ -43,7 +43,7 @@ case class Expire(key: ChannelBuffer, seconds: Long) extends StrictKeyCommand {
   def command = Commands.EXPIRE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.EXPIRE, key, StringToChannelBuffer(seconds.toString)))
+      Seq(CommandBytes.EXPIRE, key, StringToChannelBuffer(seconds.toString)))
 }
 object Expire {
   def apply(args: Seq[Array[Byte]]) = {
@@ -63,9 +63,7 @@ case class ExpireAt(key: ChannelBuffer, timestamp: Time)
 
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.EXPIREAT,
-            key,
-            StringToChannelBuffer(seconds.toString)))
+      Seq(CommandBytes.EXPIREAT, key, StringToChannelBuffer(seconds.toString)))
 }
 object ExpireAt {
   def apply(args: Seq[Array[Byte]]) = {
@@ -93,8 +91,8 @@ object Keys {
 case class Move(key: ChannelBuffer, db: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.MOVE
-  RequireClientProtocol(
-      db != null && db.readableBytes > 0, "Database must be specified")
+  RequireClientProtocol(db != null && db.readableBytes > 0,
+                        "Database must be specified")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.MOVE, key, db))
 }
@@ -123,9 +121,9 @@ case class PExpire(key: ChannelBuffer, milliseconds: Long)
   def command = Commands.PEXPIRE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.PEXPIRE,
-            key,
-            StringToChannelBuffer(milliseconds.toString)))
+      Seq(CommandBytes.PEXPIRE,
+          key,
+          StringToChannelBuffer(milliseconds.toString)))
 }
 object PExpire {
   def apply(args: Seq[Array[Byte]]) = {
@@ -145,9 +143,9 @@ case class PExpireAt(key: ChannelBuffer, timestamp: Time)
 
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.PEXPIREAT,
-            key,
-            StringToChannelBuffer(milliseconds.toString)))
+      Seq(CommandBytes.PEXPIREAT,
+          key,
+          StringToChannelBuffer(milliseconds.toString)))
 }
 object PExpireAt {
   def apply(args: Seq[Array[Byte]]) = {
@@ -179,8 +177,8 @@ case class Randomkey() extends Command {
 case class Rename(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAME
-  RequireClientProtocol(
-      newkey != null && newkey.readableBytes > 0, "New key must not be empty")
+  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
+                        "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAME, key, newkey))
 }
@@ -195,8 +193,8 @@ object Rename {
 case class RenameNx(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAMENX
-  RequireClientProtocol(
-      newkey != null && newkey.readableBytes > 0, "New key must not be empty")
+  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
+                        "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAMENX, key, newkey))
 }
@@ -282,7 +280,7 @@ object ScanCompanion {
       case Pattern.PATTERN => args.splitAt(2)
       case s =>
         throw ClientError(
-            "COUNT or PATTERN argument expected, found %s".format(s))
+          "COUNT or PATTERN argument expected, found %s".format(s))
     }
   }
 
@@ -303,7 +301,7 @@ object ScanCompanion {
         Pattern(args1) match {
           case None =>
             throw ClientError(
-                "Have additional arguments but unable to process")
+              "Have additional arguments but unable to process")
           case pattern => pattern
         }
       case None => None

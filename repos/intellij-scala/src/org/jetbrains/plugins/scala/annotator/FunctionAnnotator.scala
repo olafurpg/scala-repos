@@ -4,11 +4,25 @@ package annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.AddModifierQuickFix
-import org.jetbrains.plugins.scala.annotator.quickfix.{AddReturnTypeFix, RemoveElementQuickFix, ReportHighlightingErrorQuickFix}
+import org.jetbrains.plugins.scala.annotator.quickfix.{
+  AddReturnTypeFix,
+  RemoveElementQuickFix,
+  ReportHighlightingErrorQuickFix
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{Any => AnyType, Bounds, ScType, ScTypePresentation, Unit => UnitType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Any => AnyType,
+  Bounds,
+  ScType,
+  ScTypePresentation,
+  Unit => UnitType
+}
 
 /**
   * Pavel.Fatin, 18.05.2010
@@ -19,28 +33,28 @@ trait FunctionAnnotator {
                        typeAware: Boolean) {
     if (!function.hasExplicitType && !function.returnTypeIsDefined) {
       function.recursiveReferences.foreach { ref =>
-        val message = ScalaBundle.message(
-            "function.recursive.need.result.type", function.name)
+        val message = ScalaBundle
+          .message("function.recursive.need.result.type", function.name)
         holder.createErrorAnnotation(ref.element, message)
       }
     }
 
     val tailrecAnnotation = function.annotations.find(
-        _.typeElement
-          .getType(TypingContext.empty)
-          .map(_.canonicalText)
-          .filter(_ == "_root_.scala.annotation.tailrec")
-          .isDefined)
+      _.typeElement
+        .getType(TypingContext.empty)
+        .map(_.canonicalText)
+        .filter(_ == "_root_.scala.annotation.tailrec")
+        .isDefined)
 
     tailrecAnnotation.foreach { it =>
       if (!function.canBeTailRecursive) {
         val annotation = holder.createErrorAnnotation(
-            function.nameId,
-            "Method annotated with @tailrec is neither private nor final (so can be overriden)")
+          function.nameId,
+          "Method annotated with @tailrec is neither private nor final (so can be overriden)")
         annotation.registerFix(new AddModifierQuickFix(function, "private"))
         annotation.registerFix(new AddModifierQuickFix(function, "final"))
         annotation.registerFix(
-            new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
+          new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
       }
 
       if (typeAware) {
@@ -48,10 +62,10 @@ trait FunctionAnnotator {
 
         if (recursiveReferences.isEmpty) {
           val annotation = holder.createErrorAnnotation(
-              function.nameId,
-              "Method annotated with @tailrec contains no recursive calls")
+            function.nameId,
+            "Method annotated with @tailrec contains no recursive calls")
           annotation.registerFix(
-              new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
+            new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
         } else {
           recursiveReferences.filter(!_.isTailCall).foreach { ref =>
             val target = ref.element.getParent match {
@@ -59,10 +73,10 @@ trait FunctionAnnotator {
               case _ => ref.element
             }
             val annotation = holder.createErrorAnnotation(
-                target,
-                "Recursive call not in tail position (in @tailrec annotated method)")
+              target,
+              "Recursive call not in tail position (in @tailrec annotated method)")
             annotation.registerFix(
-                new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
+              new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
           }
         }
       }
@@ -96,8 +110,8 @@ trait FunctionAnnotator {
       }
 
       def needsTypeAnnotation() = {
-        val message = ScalaBundle.message(
-            "function.must.define.type.explicitly", function.name)
+        val message = ScalaBundle
+          .message("function.must.define.type.explicitly", function.name)
         val returnTypes =
           function.returnUsages(withBooleanInfix = false).toSeq.collect {
             case retStmt: ScReturnStmt =>
@@ -106,23 +120,26 @@ trait FunctionAnnotator {
           }
         val lub = Bounds.lub(returnTypes)
         val annotation = holder.createErrorAnnotation(
-            usage.asInstanceOf[ScReturnStmt].returnKeyword, message)
+          usage.asInstanceOf[ScReturnStmt].returnKeyword,
+          message)
         annotation.registerFix(new AddReturnTypeFix(function, lub))
       }
 
       def redundantReturnExpression() = {
-        val message = ScalaBundle.message(
-            "return.expression.is.redundant", usageType.presentableText)
+        val message = ScalaBundle
+          .message("return.expression.is.redundant", usageType.presentableText)
         holder.createWarningAnnotation(
-            usage.asInstanceOf[ScReturnStmt].expr.get, message)
+          usage.asInstanceOf[ScReturnStmt].expr.get,
+          message)
       }
 
       def typeMismatch() {
         if (typeAware) {
           val (usageTypeText, functionTypeText) =
             ScTypePresentation.different(usageType, functionType)
-          val message = ScalaBundle.message(
-              "type.mismatch.found.required", usageTypeText, functionTypeText)
+          val message = ScalaBundle.message("type.mismatch.found.required",
+                                            usageTypeText,
+                                            functionTypeText)
           val returnExpression =
             if (explicitReturn) usage.asInstanceOf[ScReturnStmt].expr else None
           val expr = returnExpression.getOrElse(usage) match {

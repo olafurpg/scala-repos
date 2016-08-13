@@ -49,20 +49,20 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       }
     }
 
+    assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS",
+                         classOf[HiveNativeCommand])
     assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 COMPUTE STATISTICS", classOf[HiveNativeCommand])
+      "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS",
+      classOf[HiveNativeCommand])
     assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS",
-        classOf[HiveNativeCommand])
+      "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS noscan",
+      classOf[HiveNativeCommand])
     assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS noscan",
-        classOf[HiveNativeCommand])
+      "ANALYZE TABLE Table1 PARTITION(ds, hr) COMPUTE STATISTICS",
+      classOf[HiveNativeCommand])
     assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 PARTITION(ds, hr) COMPUTE STATISTICS",
-        classOf[HiveNativeCommand])
-    assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 PARTITION(ds, hr) COMPUTE STATISTICS noscan",
-        classOf[HiveNativeCommand])
+      "ANALYZE TABLE Table1 PARTITION(ds, hr) COMPUTE STATISTICS noscan",
+      classOf[HiveNativeCommand])
 
     assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS nOscAn",
                          classOf[AnalyzeTable])
@@ -104,7 +104,7 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       """.stripMargin).collect()
 
     assert(
-        queryTotalSize("analyzeTable_part") === hiveContext.conf.defaultSizeInBytes)
+      queryTotalSize("analyzeTable_part") === hiveContext.conf.defaultSizeInBytes)
 
     sql("ANALYZE TABLE analyzeTable_part COMPUTE STATISTICS noscan")
 
@@ -148,10 +148,10 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
           r.statistics.sizeInBytes
       }
       assert(
-          sizes.size === 2 &&
+        sizes.size === 2 &&
           sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold &&
           sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold,
-          s"query should contain two relations, each of which has size smaller than autoConvertSize")
+        s"query should contain two relations, each of which has size smaller than autoConvertSize")
 
       // Using `sparkPlan` because for relevant patterns in HashJoin to be
       // matched, other strategies need to be applied.
@@ -159,8 +159,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         case j: BroadcastHashJoin => j
       }
       assert(
-          bhj.size === 1,
-          s"actual query plans do not contain broadcast join: ${df.queryExecution}")
+        bhj.size === 1,
+        s"actual query plans do not contain broadcast join: ${df.queryExecution}")
 
       checkAnswer(df, expectedAnswer) // check correctness of output
 
@@ -173,15 +173,15 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
           case j: BroadcastHashJoin => j
         }
         assert(
-            bhj.isEmpty,
-            "BroadcastHashJoin still planned even though it is switched off")
+          bhj.isEmpty,
+          "BroadcastHashJoin still planned even though it is switched off")
 
         val shj = df.queryExecution.sparkPlan.collect {
           case j: SortMergeJoin => j
         }
         assert(
-            shj.size === 1,
-            "SortMergeJoin should be planned when BroadcastHashJoin is turned off")
+          shj.size === 1,
+          "SortMergeJoin should be planned when BroadcastHashJoin is turned off")
 
         sql(s"""SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=$tmp""")
       }
@@ -194,16 +194,16 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       """SELECT * FROM src a JOIN src b ON a.key = 238 AND a.key = b.key"""
     val metastoreAnswer = Seq.fill(4)(Row(238, "val_238", 238, "val_238"))
     mkTest(
-        () => (),
-        () => (),
-        metastoreQuery,
-        metastoreAnswer,
-        implicitly[ClassTag[MetastoreRelation]]
+      () => (),
+      () => (),
+      metastoreQuery,
+      metastoreAnswer,
+      implicitly[ClassTag[MetastoreRelation]]
     )
   }
 
   test(
-      "auto converts to broadcast left semi join, by size estimate of a relation") {
+    "auto converts to broadcast left semi join, by size estimate of a relation") {
     val leftSemiJoinQuery =
       """SELECT * FROM src a
         |left semi JOIN src b ON a.key=86 and a.key = b.key""".stripMargin
@@ -219,10 +219,10 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         r.statistics.sizeInBytes
     }
     assert(
-        sizes.size === 2 &&
+      sizes.size === 2 &&
         sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold &&
         sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold,
-        s"query should contain two relations, each of which has size smaller than autoConvertSize")
+      s"query should contain two relations, each of which has size smaller than autoConvertSize")
 
     // Using `sparkPlan` because for relevant patterns in HashJoin to be
     // matched, other strategies need to be applied.
@@ -230,8 +230,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       case j: BroadcastHashJoin => j
     }
     assert(
-        bhj.size === 1,
-        s"actual query plans do not contain broadcast join: ${df.queryExecution}")
+      bhj.size === 1,
+      s"actual query plans do not contain broadcast join: ${df.queryExecution}")
 
     checkAnswer(df, answer) // check correctness of output
 
@@ -250,8 +250,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         case j: ShuffledHashJoin => j
       }
       assert(
-          shj.size === 1,
-          "LeftSemiJoinHash should be planned when BroadcastHashJoin is turned off")
+        shj.size === 1,
+        "LeftSemiJoinHash should be planned when BroadcastHashJoin is turned off")
 
       sql(s"SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=$tmp")
     }

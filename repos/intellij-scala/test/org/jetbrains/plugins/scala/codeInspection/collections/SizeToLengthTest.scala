@@ -15,19 +15,19 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""|"".${START}size$END""".stripMargin, "\"\".size", "\"\".length")
 
     doTest(
-        s"""
+      s"""
          |object Foo {
          |  val s = ""
          |  s.${START}size$END
          |}
        """.stripMargin,
-        """
+      """
          |object Foo {
          |  val s = ""
          |  s.size
          |}
        """.stripMargin,
-        """
+      """
         |object Foo {
         |  val s = ""
         |  s.length
@@ -46,19 +46,19 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
            "Seq(1, 2).toArray.length")
 
     doTest(
-        s"""
+      s"""
          |object Foo {
          |  val arr = Array(1, 2)
          |  arr.${START}size$END
          |}
        """.stripMargin,
-        """
+      """
         |object Foo {
         |  val arr = Array(1, 2)
         |  arr.size
         |}
       """.stripMargin,
-        """
+      """
         |object Foo {
         |  val arr = Array(1, 2)
         |  arr.length

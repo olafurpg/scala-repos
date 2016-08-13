@@ -38,13 +38,13 @@ class ParserUtilsTest extends FunSuite {
   }
 
   val strings = Seq(
-      "123" -> true,
-      "1" -> true,
-      "" -> false,
-      " " -> false,
-      "x" -> false,
-      " 9" -> false,
-      "9 " -> false
+    "123" -> true,
+    "1" -> true,
+    "" -> false,
+    " " -> false,
+    "x" -> false,
+    " 9" -> false,
+    "9 " -> false
   )
 
   test("isDigits: Buf") {

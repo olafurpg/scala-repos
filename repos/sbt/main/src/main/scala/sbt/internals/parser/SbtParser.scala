@@ -121,7 +121,7 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
       // Issue errors
       val positionLine = badTree.pos.line
       throw new MessageOnlyException(
-          s"""[$fileName]:$positionLine: Pattern matching in val statements is not supported""".stripMargin)
+        s"""[$fileName]:$positionLine: Pattern matching in val statements is not supported""".stripMargin)
     }
 
     val (imports, statements) =
@@ -139,8 +139,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     def parseStatementAgain(t: Tree, originalStatement: String): String = {
       val statement = scala.util.Try(toolbox.parse(originalStatement)) match {
         case scala.util.Failure(th) =>
-          val missingText = findMissingText(
-              content, t.pos.end, t.pos.line, fileName, th)
+          val missingText =
+            findMissingText(content, t.pos.end, t.pos.line, fileName, th)
           originalStatement + missingText
         case _ =>
           originalStatement
@@ -158,9 +158,9 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
           val statement = parseStatementAgain(t, originalStatement)
           val numberLines = countLines(statement)
           Some(
-              (statement,
-               t,
-               LineRange(position.line - 1, position.line + numberLines)))
+            (statement,
+             t,
+             LineRange(position.line - 1, position.line + numberLines)))
       }
     val stmtTreeLineRange = statements flatMap convertStatement
     val importsLineRange = importsToLineRanges(content, imports)
@@ -175,8 +175,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     * @param imports - trees
     * @return imports per line
     */
-  private def importsToLineRanges(
-      modifiedContent: String, imports: Seq[Tree]): Seq[(String, Int)] = {
+  private def importsToLineRanges(modifiedContent: String,
+                                  imports: Seq[Tree]): Seq[(String, Int)] = {
     val toLineRange = imports map convertImport(modifiedContent)
     val groupedByLineNumber = toLineRange.groupBy {
       case (_, lineNumber) => lineNumber
@@ -247,12 +247,15 @@ private[sbt] object MissingBracketHandler {
           case scala.util.Success(_) =>
             text
           case scala.util.Failure(th) =>
-            findMissingText(
-                content, index + 1, positionLine, fileName, originalException)
+            findMissingText(content,
+                            index + 1,
+                            positionLine,
+                            fileName,
+                            originalException)
         }
       case _ =>
         throw new MessageOnlyException(
-            s"""[$fileName]:$positionLine: ${originalException.getMessage}""".stripMargin)
+          s"""[$fileName]:$positionLine: ${originalException.getMessage}""".stripMargin)
     }
   }
 
@@ -262,8 +265,8 @@ private[sbt] object MissingBracketHandler {
     * @param from - start index
     * @return first not commented index or None
     */
-  private[sbt] def findClosingBracketIndex(
-      content: String, from: Int): Option[Int] = {
+  private[sbt] def findClosingBracketIndex(content: String,
+                                           from: Int): Option[Int] = {
     val index = content.indexWhere(c => c == '}' || c == ')', from)
     if (index == NOT_FOUND_INDEX) {
       None

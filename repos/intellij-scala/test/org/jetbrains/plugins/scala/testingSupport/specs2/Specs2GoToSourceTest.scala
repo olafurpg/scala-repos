@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.testingSupport.IntegrationTest
 abstract class Specs2GoToSourceTest extends Specs2TestCase {
   private def addGoToSourceTest(testName: String) =
     addFileToProject(
-        testName + ".scala",
-        "import org.specs2.mutable.Specification\n\n" + "class " + testName +
+      testName + ".scala",
+      "import org.specs2.mutable.Specification\n\n" + "class " + testName +
         " extends Specification {" + """
             |  "Successful test" should {
             |    "run fine" in {
@@ -40,12 +40,12 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        4,
-        8,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "run fine"),
-        List("[root]", testName, "Successful test should", "run fine"),
-        4)
+      4,
+      8,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "run fine"),
+      List("[root]", testName, "Successful test should", "run fine"),
+      4)
   }
 
   def testGoToPendingLocation(): Unit = {
@@ -53,12 +53,12 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        9,
-        8,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "be pending"),
-        List("[root]", testName, "Pending test should", "be pending"),
-        9)
+      9,
+      8,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "be pending"),
+      List("[root]", testName, "Pending test should", "be pending"),
+      9)
   }
 
   def testGoToIgnoredLocation(): Unit = {
@@ -66,12 +66,12 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        14,
-        8,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "be ignored"),
-        List("[root]", testName, "Ignored test should", "be ignored"),
-        14)
+      14,
+      8,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "be ignored"),
+      List("[root]", testName, "Ignored test should", "be ignored"),
+      14)
   }
 
   def testGoToFailedLocation(): Unit = {

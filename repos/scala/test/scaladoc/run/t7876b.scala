@@ -19,7 +19,7 @@ object Test extends ScaladocModelTest {
     import access._
     List("foo", "bar").foreach { name =>
       println(
-          "foo: " + rootPackage._class("Test")._method(name).resultType.name)
+        "foo: " + rootPackage._class("Test")._method(name).resultType.name)
     }
   }
 }

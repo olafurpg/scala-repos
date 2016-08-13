@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 
 object DeployerSpec {
   val deployerConf = ConfigFactory.parseString(
-      """
+    """
       akka.actor.deployment {
         /service1 {
         }
@@ -62,7 +62,7 @@ object DeployerSpec {
         }
       }
       """,
-      ConfigParseOptions.defaults)
+    ConfigParseOptions.defaults)
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }
@@ -82,12 +82,13 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
         .lookup(service.split("/").drop(1))
 
       deployment should ===(
-          Some(Deploy(service,
-                      deployment.get.config,
-                      NoRouter,
-                      NoScopeGiven,
-                      Deploy.NoDispatcherGiven,
-                      Deploy.NoMailboxGiven)))
+        Some(
+          Deploy(service,
+                 deployment.get.config,
+                 NoRouter,
+                 NoScopeGiven,
+                 Deploy.NoDispatcherGiven,
+                 Deploy.NoMailboxGiven)))
     }
 
     "use None deployment for undefined service" in {
@@ -109,12 +110,13 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
         .lookup(service.split("/").drop(1))
 
       deployment should ===(
-          Some(Deploy(service,
-                      deployment.get.config,
-                      NoRouter,
-                      NoScopeGiven,
-                      dispatcher = "my-dispatcher",
-                      Deploy.NoMailboxGiven)))
+        Some(
+          Deploy(service,
+                 deployment.get.config,
+                 NoRouter,
+                 NoScopeGiven,
+                 dispatcher = "my-dispatcher",
+                 Deploy.NoMailboxGiven)))
     }
 
     "be able to parse 'akka.actor.deployment._' with mailbox config" in {
@@ -126,12 +128,13 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
         .lookup(service.split("/").drop(1))
 
       deployment should ===(
-          Some(Deploy(service,
-                      deployment.get.config,
-                      NoRouter,
-                      NoScopeGiven,
-                      Deploy.NoDispatcherGiven,
-                      mailbox = "my-mailbox")))
+        Some(
+          Deploy(service,
+                 deployment.get.config,
+                 NoRouter,
+                 NoScopeGiven,
+                 Deploy.NoDispatcherGiven,
+                 mailbox = "my-mailbox")))
     }
 
     "detect invalid number-of-instances" in {
@@ -149,7 +152,7 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
           .withFallback(AkkaSpec.testConf)
 
         shutdown(
-            ActorSystem("invalid-number-of-instances", invalidDeployerConf))
+          ActorSystem("invalid-number-of-instances", invalidDeployerConf))
       }
     }
 
@@ -182,8 +185,9 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     }
 
     "be able to parse 'akka.actor.deployment._' with round-robin router" in {
-      assertRouting(
-          "/service-round-robin", RoundRobinPool(1), "/service-round-robin")
+      assertRouting("/service-round-robin",
+                    RoundRobinPool(1),
+                    "/service-round-robin")
     }
 
     "be able to parse 'akka.actor.deployment._' with random router" in {
@@ -226,33 +230,34 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
         .routerTypeMapping
       mapping("from-code") should ===(classOf[akka.routing.NoRouter].getName)
       mapping("round-robin-pool") should ===(
-          classOf[akka.routing.RoundRobinPool].getName)
+        classOf[akka.routing.RoundRobinPool].getName)
       mapping("round-robin-group") should ===(
-          classOf[akka.routing.RoundRobinGroup].getName)
+        classOf[akka.routing.RoundRobinGroup].getName)
       mapping("random-pool") should ===(
-          classOf[akka.routing.RandomPool].getName)
+        classOf[akka.routing.RandomPool].getName)
       mapping("random-group") should ===(
-          classOf[akka.routing.RandomGroup].getName)
+        classOf[akka.routing.RandomGroup].getName)
       mapping("balancing-pool") should ===(
-          classOf[akka.routing.BalancingPool].getName)
+        classOf[akka.routing.BalancingPool].getName)
       mapping("smallest-mailbox-pool") should ===(
-          classOf[akka.routing.SmallestMailboxPool].getName)
+        classOf[akka.routing.SmallestMailboxPool].getName)
       mapping("broadcast-pool") should ===(
-          classOf[akka.routing.BroadcastPool].getName)
+        classOf[akka.routing.BroadcastPool].getName)
       mapping("broadcast-group") should ===(
-          classOf[akka.routing.BroadcastGroup].getName)
+        classOf[akka.routing.BroadcastGroup].getName)
       mapping("scatter-gather-pool") should ===(
-          classOf[akka.routing.ScatterGatherFirstCompletedPool].getName)
+        classOf[akka.routing.ScatterGatherFirstCompletedPool].getName)
       mapping("scatter-gather-group") should ===(
-          classOf[akka.routing.ScatterGatherFirstCompletedGroup].getName)
+        classOf[akka.routing.ScatterGatherFirstCompletedGroup].getName)
       mapping("consistent-hashing-pool") should ===(
-          classOf[akka.routing.ConsistentHashingPool].getName)
+        classOf[akka.routing.ConsistentHashingPool].getName)
       mapping("consistent-hashing-group") should ===(
-          classOf[akka.routing.ConsistentHashingGroup].getName)
+        classOf[akka.routing.ConsistentHashingGroup].getName)
     }
 
-    def assertRouting(
-        service: String, expected: RouterConfig, expectPath: String): Unit = {
+    def assertRouting(service: String,
+                      expected: RouterConfig,
+                      expectPath: String): Unit = {
       val deployment = system
         .asInstanceOf[ActorSystemImpl]
         .provider
@@ -264,7 +269,7 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
       expected match {
         case pool: Pool ⇒
           deployment.get.routerConfig.asInstanceOf[Pool].resizer should ===(
-              pool.resizer)
+            pool.resizer)
         case _ ⇒
       }
     }

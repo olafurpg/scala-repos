@@ -18,25 +18,26 @@ class ContinueOnErrorStep(wrapped: TaskStatusUpdateStep)
 
   override def name: String = s"continueOnError(${wrapped.name})"
 
-  override def processUpdate(
-      timestamp: Timestamp, task: Task, mesosStatus: TaskStatus): Future[_] = {
+  override def processUpdate(timestamp: Timestamp,
+                             task: Task,
+                             mesosStatus: TaskStatus): Future[_] = {
     import scala.concurrent.ExecutionContext.Implicits.global
     val maybeProcessed: Option[Future[_]] = Option(
-        wrapped.processUpdate(timestamp, task, mesosStatus))
+      wrapped.processUpdate(timestamp, task, mesosStatus))
     maybeProcessed match {
       case Some(processed) =>
         processed.recover {
           case NonFatal(e) =>
             log.error(
-                "while executing step {} for [{}], continue with other steps",
-                wrapped.name,
-                mesosStatus.getTaskId.getValue,
-                e)
+              "while executing step {} for [{}], continue with other steps",
+              wrapped.name,
+              mesosStatus.getTaskId.getValue,
+              e)
         }
       case None =>
         log.error(
-            "step {} for [{}] returned null, continue with other steps",
-            Array[Object](wrapped.name, mesosStatus.getTaskId.getValue): _*)
+          "step {} for [{}] returned null, continue with other steps",
+          Array[Object](wrapped.name, mesosStatus.getTaskId.getValue): _*)
         Future.successful(())
     }
   }

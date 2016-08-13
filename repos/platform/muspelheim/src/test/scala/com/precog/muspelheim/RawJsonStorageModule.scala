@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -105,12 +105,12 @@ trait RawJsonStorageModule[M[+ _]] { self =>
   import java.util.regex.Pattern
 
   val reflections = new Reflections(
-      new ConfigurationBuilder()
-        .setUrls(ClasspathHelper.forPackage("test_data"))
-        .setScanners(new ResourcesScanner()))
+    new ConfigurationBuilder()
+      .setUrls(ClasspathHelper.forPackage("test_data"))
+      .setScanners(new ResourcesScanner()))
   val jsonFiles = reflections.getResources(Pattern.compile(".*\\.json"))
-  for (resource <- jsonFiles.asScala) load(
-      Path(resource.replaceAll("test_data/", "").replaceAll("\\.json", "")))
+  for (resource <- jsonFiles.asScala)
+    load(Path(resource.replaceAll("test_data/", "").replaceAll("\\.json", "")))
 
   val vfs: VFSMetadata[M] = new VFSMetadata[M] {
     import com.precog.yggdrasil.metadata._
@@ -120,10 +120,10 @@ trait RawJsonStorageModule[M[+ _]] { self =>
         path: Path): EitherT[M, ResourceError, Set[PathMetadata]] =
       EitherT.right {
         M.point(
-            projections.keySet
-              .filter(_.isDirectChildOf(path))
-              .map(PathMetadata(_, DataOnly(FileContent.XQuirrelData)))
-          )
+          projections.keySet
+            .filter(_.isDirectChildOf(path))
+            .map(PathMetadata(_, DataOnly(FileContent.XQuirrelData)))
+        )
       }
 
     def pathStructure(
@@ -155,7 +155,8 @@ trait RawJsonStorageModule[M[+ _]] { self =>
 }
 
 trait RawJsonColumnarTableStorageModule[M[+ _]]
-    extends RawJsonStorageModule[M] with ColumnarTableModuleTestSupport[M] {
+    extends RawJsonStorageModule[M]
+    with ColumnarTableModuleTestSupport[M] {
   import trans._
   import TableModule._
 

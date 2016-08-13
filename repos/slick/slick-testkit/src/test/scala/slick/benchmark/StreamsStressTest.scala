@@ -40,7 +40,7 @@ object StreamsStressTest extends App {
   def run1: Unit = {
     val sub = env.newManualSubscriber(createPublisher(1L))
     sub.requestNextElementOrEndOfStream(
-        "Timeout while waiting for next element from Publisher")
+      "Timeout while waiting for next element from Publisher")
     sub.requestEndOfStream()
   }
 
@@ -52,10 +52,8 @@ object StreamsStressTest extends App {
     }
     val data = TableQuery[Data]
     val a =
-      data.schema.create >> (data ++= Range.apply(0, elements.toInt)) >> data
-        .sortBy(_.id)
-        .map(_.id)
-        .result
+      data.schema.create >> (data ++= Range
+        .apply(0, elements.toInt)) >> data.sortBy(_.id).map(_.id).result
     db.stream(a.withPinnedSession)
   }
 }

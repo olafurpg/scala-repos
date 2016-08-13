@@ -21,7 +21,7 @@ object SelectorSerializer {
       lit(selType = "TestWildcardSelector", testWildcard = sel.testWildcard)
     case _ =>
       throw new IllegalArgumentException(
-          s"Unknown Selector type: ${sel.getClass}")
+        s"Unknown Selector type: ${sel.getClass}")
   }
 
   def deserialize(obj: js.Dynamic): Selector = {

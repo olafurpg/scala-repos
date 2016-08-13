@@ -55,8 +55,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     val df =
       Seq((1, "Tearing down the walls that divide us")).toDF("id", "saying")
     df.registerTempTable("tmp_table")
-    checkAnswer(
-        sql("select spark_partition_id() from tmp_table").toDF(), Row(0))
+    checkAnswer(sql("select spark_partition_id() from tmp_table").toDF(),
+                Row(0))
     sqlContext.dropTempTable("tmp_table")
   }
 
@@ -70,10 +70,11 @@ class UDFSuite extends QueryTest with SharedSQLContext {
       val answer =
         sql("select input_file_name() from test_table").head().getString(0)
       assert(answer.contains(dir.getCanonicalPath))
-      assert(sql("select input_file_name() from test_table")
-            .distinct()
-            .collect()
-            .length >= 2)
+      assert(
+        sql("select input_file_name() from test_table")
+          .distinct()
+          .collect()
+          .length >= 2)
       sqlContext.dropTempTable("test_table")
     }
   }
@@ -177,8 +178,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
   }
 
   test("struct UDF") {
-    sqlContext.udf.register(
-        "returnStruct", (f1: String, f2: String) => FunctionResult(f1, f2))
+    sqlContext.udf.register("returnStruct",
+                            (f1: String, f2: String) => FunctionResult(f1, f2))
 
     val result = sql("SELECT returnStruct('test', 'test2') as ret")
       .select($"ret.f1")
@@ -191,7 +192,7 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     sqlContext.udf.register("makeStruct", (x: Int, y: Int) => (x, y))
     // 1 + 1 is constant folded causing a transformation.
     assert(
-        sql("SELECT makeStruct(1 + 1, 2)").first().getAs[Row](0) === Row(2, 2))
+      sql("SELECT makeStruct(1 + 1, 2)").first().getAs[Row](0) === Row(2, 2))
   }
 
   test("type coercion for udf inputs") {
@@ -204,22 +205,28 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     sqlContext.udf.register("testDataFunc", (n: Int, s: String) => { (n, s) })
     sqlContext.udf.register("decimalDataFunc",
                             (a: java.math.BigDecimal,
-                            b: java.math.BigDecimal) => { (a, b) })
-    sqlContext.udf.register(
-        "binaryDataFunc", (a: Array[Byte], b: Int) => { (a, b) })
-    sqlContext.udf.register(
-        "arrayDataFunc",
-        (data: Seq[Int], nestedData: Seq[Seq[Int]]) => { (data, nestedData) })
-    sqlContext.udf.register(
-        "mapDataFunc", (data: scala.collection.Map[Int, String]) => { data })
+                             b: java.math.BigDecimal) => { (a, b) })
+    sqlContext.udf.register("binaryDataFunc", (a: Array[Byte], b: Int) => {
+      (a, b)
+    })
+    sqlContext.udf.register("arrayDataFunc",
+                            (data: Seq[Int], nestedData: Seq[Seq[Int]]) => {
+                              (data, nestedData)
+                            })
+    sqlContext.udf
+      .register("mapDataFunc", (data: scala.collection.Map[Int, String]) => {
+        data
+      })
     sqlContext.udf.register("complexDataFunc",
-                            (m: Map[String, Int], a: Seq[Int],
-                            b: Boolean) => { (m, a, b) })
+                            (m: Map[String, Int], a: Seq[Int], b: Boolean) => {
+                              (m, a, b)
+                            })
 
     checkAnswer(
-        sql("SELECT tmp.t.* FROM (SELECT testDataFunc(key, value) AS t from testData) tmp")
-          .toDF(),
-        testData)
+      sql(
+        "SELECT tmp.t.* FROM (SELECT testDataFunc(key, value) AS t from testData) tmp")
+        .toDF(),
+      testData)
     checkAnswer(sql("""
            | SELECT tmp.t.* FROM
            | (SELECT decimalDataFunc(a, b) AS t FROM decimalData) tmp
@@ -231,27 +238,29 @@ class UDFSuite extends QueryTest with SharedSQLContext {
           """.stripMargin).toDF(),
                 binaryData)
     checkAnswer(
-        sql("""
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT arrayDataFunc(data, nestedData) AS t FROM arrayData) tmp
           """.stripMargin).toDF(),
-        arrayData.toDF())
+      arrayData.toDF())
     checkAnswer(sql("""
            | SELECT mapDataFunc(data) AS t FROM mapData
           """.stripMargin).toDF(),
                 mapData.toDF())
     checkAnswer(
-        sql("""
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT complexDataFunc(m, a, b) AS t FROM complexData) tmp
           """.stripMargin).toDF(),
-        complexData.select("m", "a", "b"))
+      complexData.select("m", "a", "b"))
   }
 
   test(
-      "SPARK-11716 UDFRegistration does not include the input data type in returned UDF") {
-    val myUDF = sqlContext.udf.register(
-        "testDataFunc", (n: Int, s: String) => { (n, s.toInt) })
+    "SPARK-11716 UDFRegistration does not include the input data type in returned UDF") {
+    val myUDF =
+      sqlContext.udf.register("testDataFunc", (n: Int, s: String) => {
+        (n, s.toInt)
+      })
 
     // Without the fix, this will fail because we fail to cast data type of b to string
     // because myUDF does not know its input data type. With the fix, this query should not
@@ -260,8 +269,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
                 testData2.selectExpr("struct(a, b)"))
 
     checkAnswer(
-        sql("SELECT tmp.t.* FROM (SELECT testDataFunc(a, b) AS t from testData2) tmp")
-          .toDF(),
-        testData2)
+      sql(
+        "SELECT tmp.t.* FROM (SELECT testDataFunc(a, b) AS t from testData2) tmp")
+        .toDF(),
+      testData2)
   }
 }

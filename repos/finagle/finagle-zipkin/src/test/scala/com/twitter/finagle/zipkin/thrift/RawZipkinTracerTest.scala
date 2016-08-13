@@ -38,11 +38,11 @@ class RawZipkinTracerTest extends FunSuite {
     val remoteEndpoint = Endpoint(333, 22)
 
     val annotations = Seq(
-        ZipkinAnnotation(Time.fromSeconds(123), "cs", localEndpoint),
-        ZipkinAnnotation(Time.fromSeconds(126), "cr", localEndpoint),
-        ZipkinAnnotation(Time.fromSeconds(123), "ss", remoteEndpoint),
-        ZipkinAnnotation(Time.fromSeconds(124), "sr", remoteEndpoint),
-        ZipkinAnnotation(Time.fromSeconds(123), "llamas", localEndpoint)
+      ZipkinAnnotation(Time.fromSeconds(123), "cs", localEndpoint),
+      ZipkinAnnotation(Time.fromSeconds(126), "cr", localEndpoint),
+      ZipkinAnnotation(Time.fromSeconds(123), "ss", remoteEndpoint),
+      ZipkinAnnotation(Time.fromSeconds(124), "sr", remoteEndpoint),
+      ZipkinAnnotation(Time.fromSeconds(123), "llamas", localEndpoint)
     )
 
     val span = Span(traceId = traceId,
@@ -53,8 +53,8 @@ class RawZipkinTracerTest extends FunSuite {
                     endpoint = localEndpoint)
 
     val expected = LogEntry(
-        category = "zipkin",
-        message = "CgABAAAAAAAAAHsLAAMAAAADZm9vCgAEAAAAAAAAAHsKAAUAAAAAAAAAe" +
+      category = "zipkin",
+      message = "CgABAAAAAAAAAHsLAAMAAAADZm9vCgAEAAAAAAAAAHsKAAUAAAAAAAAAe" +
           "w8ABgwAAAAFCgABAAAAAAdU1MALAAIAAAACY3MMAAMIAAEAAAkTBgACABcLAAMAAA" +
           "ALaGlja3VwcXVhaWwAAAoAAQAAAAAHgpuACwACAAAAAmNyDAADCAABAAAJEwYAAgA" +
           "XCwADAAAAC2hpY2t1cHF1YWlsAAAKAAEAAAAAB1TUwAsAAgAAAAJzcwwAAwgAAQAA" +
@@ -74,48 +74,55 @@ class RawZipkinTracerTest extends FunSuite {
     val remoteAddress = InetAddress.getByAddress(Array.fill(4) { 10 })
     val port1 = 80 // never bound
     val port2 = 53 // ditto
-    tracer.record(Record(
-            traceId,
-            Time.fromSeconds(123),
-            Annotation.ClientAddr(new InetSocketAddress(localAddress, port1))))
-    tracer.record(Record(
-            traceId,
-            Time.fromSeconds(123),
-            Annotation.LocalAddr(new InetSocketAddress(localAddress, port1))))
     tracer.record(
-        Record(traceId,
-               Time.fromSeconds(123),
-               Annotation.ServerAddr(
-                   new InetSocketAddress(remoteAddress, port2))))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.Rpcname("service", "method")))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.BinaryAnnotation("i16", 16.toShort)))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.BinaryAnnotation("i32", 32)))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.BinaryAnnotation("i64", 64L)))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.BinaryAnnotation("double", 123.3d)))
-    tracer.record(Record(traceId,
-                         Time.fromSeconds(123),
-                         Annotation.BinaryAnnotation("string", "woopie")))
+      Record(
+        traceId,
+        Time.fromSeconds(123),
+        Annotation.ClientAddr(new InetSocketAddress(localAddress, port1))))
     tracer.record(
-        Record(traceId, Time.fromSeconds(123), Annotation.Message("boo")))
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.LocalAddr(new InetSocketAddress(localAddress, port1))))
     tracer.record(
-        Record(traceId,
-               Time.fromSeconds(123),
-               Annotation.Message("boohoo"),
-               Some(1.second)))
+      Record(
+        traceId,
+        Time.fromSeconds(123),
+        Annotation.ServerAddr(new InetSocketAddress(remoteAddress, port2))))
     tracer.record(
-        Record(traceId, Time.fromSeconds(123), Annotation.ClientSend()))
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.Rpcname("service", "method")))
     tracer.record(
-        Record(traceId, Time.fromSeconds(123), Annotation.ClientRecv()))
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.BinaryAnnotation("i16", 16.toShort)))
+    tracer.record(
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.BinaryAnnotation("i32", 32)))
+    tracer.record(
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.BinaryAnnotation("i64", 64L)))
+    tracer.record(
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.BinaryAnnotation("double", 123.3d)))
+    tracer.record(
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.BinaryAnnotation("string", "woopie")))
+    tracer.record(
+      Record(traceId, Time.fromSeconds(123), Annotation.Message("boo")))
+    tracer.record(
+      Record(traceId,
+             Time.fromSeconds(123),
+             Annotation.Message("boohoo"),
+             Some(1.second)))
+    tracer.record(
+      Record(traceId, Time.fromSeconds(123), Annotation.ClientSend()))
+    tracer.record(
+      Record(traceId, Time.fromSeconds(123), Annotation.ClientRecv()))
 
     // Note: Since ports are ephemeral, we can't hardcode expected message.
     assert(scribe.messages.size == 1)

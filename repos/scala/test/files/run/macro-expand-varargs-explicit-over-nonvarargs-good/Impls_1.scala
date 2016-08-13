@@ -10,8 +10,8 @@ object Impls {
       case _ => ???
     }
     val body = Apply(
-        Select(Ident(definitions.PredefModule), TermName("println")),
-        stripped_xs)
+      Select(Ident(definitions.PredefModule), TermName("println")),
+      stripped_xs)
     c.Expr[Unit](body)
   }
 }

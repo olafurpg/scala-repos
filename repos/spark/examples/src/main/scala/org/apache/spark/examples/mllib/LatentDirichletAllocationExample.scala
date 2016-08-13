@@ -44,7 +44,7 @@ object LatentDirichletAllocationExample {
 
     // Output topics. Each is a distribution over words (matching word count vectors)
     println(
-        "Learned topics (as distributions over vocab of " +
+      "Learned topics (as distributions over vocab of " +
         ldaModel.vocabSize + " words):")
     val topics = ldaModel.topicsMatrix
     for (topic <- Range(0, 3)) {
@@ -57,11 +57,11 @@ object LatentDirichletAllocationExample {
 
     // Save and load model.
     ldaModel.save(
-        sc,
-        "target/org/apache/spark/LatentDirichletAllocationExample/LDAModel")
+      sc,
+      "target/org/apache/spark/LatentDirichletAllocationExample/LDAModel")
     val sameModel = DistributedLDAModel.load(
-        sc,
-        "target/org/apache/spark/LatentDirichletAllocationExample/LDAModel")
+      sc,
+      "target/org/apache/spark/LatentDirichletAllocationExample/LDAModel")
     // $example off$
 
     sc.stop()

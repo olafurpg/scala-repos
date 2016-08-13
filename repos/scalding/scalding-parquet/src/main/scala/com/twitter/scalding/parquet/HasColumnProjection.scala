@@ -25,8 +25,8 @@ trait HasColumnProjection {
     * Instead, we use a Set() here and will eventually join the set on the ; character for you.
     */
   @deprecated(
-      message = "Use withColumnProjections, which uses a different glob syntax",
-      since = "0.15.1")
+    message = "Use withColumnProjections, which uses a different glob syntax",
+    since = "0.15.1")
   def withColumns: Set[String] = Set()
 
   /**
@@ -42,7 +42,7 @@ trait HasColumnProjection {
     * Parquet accepts globs separated by the ; character
     */
   protected[parquet] final def columnProjectionString: Option[
-      ColumnProjectionString] = {
+    ColumnProjectionString] = {
     val deprecated = withColumns
     val strict = withColumnProjections
 
@@ -54,7 +54,7 @@ trait HasColumnProjection {
 
     if (deprecated.nonEmpty) {
       LOG.warn(
-          "withColumns is deprecated. Please use withColumnProjections, which uses a different glob syntax")
+        "withColumns is deprecated. Please use withColumnProjections, which uses a different glob syntax")
       Some(DeprecatedColumnProjectionString(deprecated))
     } else if (strict.nonEmpty) {
       Some(StrictColumnProjectionString(strict))

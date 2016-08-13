@@ -38,8 +38,8 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
   @Test
   def testConfigChange() {
     assertTrue(
-        "Should contain a ConfigHandler for topics",
-        this.servers(0).dynamicConfigHandlers.contains(ConfigType.Topic))
+      "Should contain a ConfigHandler for topics",
+      this.servers(0).dynamicConfigHandlers.contains(ConfigType.Topic))
     val oldVal: java.lang.Long = 100000L
     val newVal: java.lang.Long = 200000L
     val tp = TopicAndPartition("test", 0)
@@ -55,16 +55,16 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     AdminUtils.changeTopicConfig(zkUtils, tp.topic, logProps)
     TestUtils.retry(10000) {
       assertEquals(
-          newVal,
-          this.servers(0).logManager.getLog(tp).get.config.flushInterval)
+        newVal,
+        this.servers(0).logManager.getLog(tp).get.config.flushInterval)
     }
   }
 
   @Test
   def testClientQuotaConfigChange() {
     assertTrue(
-        "Should contain a ConfigHandler for topics",
-        this.servers(0).dynamicConfigHandlers.contains(ConfigType.Client))
+      "Should contain a ConfigHandler for topics",
+      this.servers(0).dynamicConfigHandlers.contains(ConfigType.Client))
     val clientId = "testClient"
     val props = new Properties()
     props.put(ClientConfigOverride.ProducerOverride, "1000")
@@ -84,13 +84,13 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
         quotaManagers.get(ApiKeys.FETCH.id).get.quota(clientId)
 
       assertEquals(
-          s"ClientId $clientId must have overridden producer quota of 1000",
-          Quota.upperBound(1000),
-          overrideProducerQuota)
+        s"ClientId $clientId must have overridden producer quota of 1000",
+        Quota.upperBound(1000),
+        overrideProducerQuota)
       assertEquals(
-          s"ClientId $clientId must have overridden consumer quota of 2000",
-          Quota.upperBound(2000),
-          overrideConsumerQuota)
+        s"ClientId $clientId must have overridden consumer quota of 2000",
+        Quota.upperBound(2000),
+        overrideConsumerQuota)
     }
   }
 
@@ -117,38 +117,38 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     val propertiesArgument = EasyMock.newCapture[Properties]
     val handler = EasyMock.createNiceMock(classOf[ConfigHandler])
     handler.processConfigChanges(
-        EasyMock.and(
-            EasyMock.capture(entityArgument), EasyMock.isA(classOf[String])),
-        EasyMock.and(EasyMock.capture(propertiesArgument),
-                     EasyMock.isA(classOf[Properties])))
+      EasyMock.and(EasyMock.capture(entityArgument),
+                   EasyMock.isA(classOf[String])),
+      EasyMock.and(EasyMock.capture(propertiesArgument),
+                   EasyMock.isA(classOf[Properties])))
     EasyMock.expectLastCall().once()
     EasyMock.replay(handler)
 
-    val configManager = new DynamicConfigManager(
-        zkUtils, Map(ConfigType.Topic -> handler))
+    val configManager =
+      new DynamicConfigManager(zkUtils, Map(ConfigType.Topic -> handler))
     // Notifications created using the old TopicConfigManager are ignored.
     configManager.ConfigChangedNotificationHandler.processNotification(
-        "not json")
+      "not json")
 
     // Incorrect Map. No version
     try {
       val jsonMap = Map("v" -> 1, "x" -> 2)
       configManager.ConfigChangedNotificationHandler.processNotification(
-          Json.encode(jsonMap))
+        Json.encode(jsonMap))
       fail(
-          "Should have thrown an Exception while parsing incorrect notification " +
+        "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
     } catch {
       case t: Throwable =>
     }
     // Version is provided. EntityType is incorrect
     try {
-      val jsonMap = Map(
-          "version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
+      val jsonMap =
+        Map("version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
       configManager.ConfigChangedNotificationHandler.processNotification(
-          Json.encode(jsonMap))
+        Json.encode(jsonMap))
       fail(
-          "Should have thrown an Exception while parsing incorrect notification " +
+        "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
     } catch {
       case t: Throwable =>
@@ -158,9 +158,9 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     try {
       val jsonMap = Map("version" -> 1, "entity_type" -> ConfigType.Topic)
       configManager.ConfigChangedNotificationHandler.processNotification(
-          Json.encode(jsonMap))
+        Json.encode(jsonMap))
       fail(
-          "Should have thrown an Exception while parsing incorrect notification " +
+        "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
     } catch {
       case t: Throwable =>
@@ -171,7 +171,7 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
                       "entity_type" -> ConfigType.Topic,
                       "entity_name" -> "x")
     configManager.ConfigChangedNotificationHandler.processNotification(
-        Json.encode(jsonMap))
+      Json.encode(jsonMap))
 
     // Verify that processConfigChanges was only called once
     EasyMock.verify(handler)

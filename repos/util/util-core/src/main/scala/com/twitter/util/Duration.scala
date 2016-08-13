@@ -246,7 +246,7 @@ object Duration extends TimeLikeOps[Duration] {
               // It's only OK to omit the sign for the first duration.
               case "" if i > 0 =>
                 throw new NumberFormatException(
-                    "Expected a sign between durations")
+                  "Expected a sign between durations")
 
               case _ => absDuration
             }
@@ -303,7 +303,7 @@ private[util] object DurationBox {
   * their arithmetic follows. This is useful for representing durations
   * that are truly infinite; for example the absence of a timeout.
   */
-sealed class Duration private[util](protected val nanos: Long) extends {
+sealed class Duration private[util] (protected val nanos: Long) extends {
   protected val ops = Duration
 } with TimeLike[Duration] with Serializable {
   import ops._

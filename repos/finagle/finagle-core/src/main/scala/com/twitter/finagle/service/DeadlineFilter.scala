@@ -36,8 +36,8 @@ object DeadlineFilter {
     require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
 
     require(
-        maxRejectPercentage >= 0.0 && maxRejectPercentage <= 1.0,
-        s"maxRejectPercentage must be between 0.0 and 1.0: $maxRejectPercentage")
+      maxRejectPercentage >= 0.0 && maxRejectPercentage <= 1.0,
+      s"maxRejectPercentage must be between 0.0 and 1.0: $maxRejectPercentage")
 
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
@@ -52,8 +52,9 @@ object DeadlineFilter {
     * [[com.twitter.finagle.service.DeadlineFilter]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[
-        param.Stats, DeadlineFilter.Param, ServiceFactory[Req, Rep]] {
+    new Stack.Module2[param.Stats,
+                      DeadlineFilter.Param,
+                      ServiceFactory[Req, Rep]] {
       val role = DeadlineFilter.role
       val description = "Reject requests when their deadline has passed"
 
@@ -67,11 +68,11 @@ object DeadlineFilter {
 
         if (maxRejectPercentage <= 0.0) next
         else
-          new DeadlineFilter(tolerance,
-                             DefaultRejectPeriod,
-                             maxRejectPercentage,
-                             statsReceiver.scope("admission_control",
-                                                 "deadline")).andThen(next)
+          new DeadlineFilter(
+            tolerance,
+            DefaultRejectPeriod,
+            maxRejectPercentage,
+            statsReceiver.scope("admission_control", "deadline")).andThen(next)
       }
     }
 }
@@ -97,20 +98,20 @@ object DeadlineFilter {
   * @see The [[https://twitter.github.io/finagle/guide/Servers.html#request-deadline user guide]]
   *      for more details.
   */
-private[finagle] class DeadlineFilter[Req, Rep](
-    tolerance: Duration,
-    rejectPeriod: Duration,
-    maxRejectPercentage: Double,
-    statsReceiver: StatsReceiver,
-    nowMillis: () => Long = Stopwatch.systemMillis)
+private[finagle] class DeadlineFilter[Req, Rep](tolerance: Duration,
+                                                rejectPeriod: Duration,
+                                                maxRejectPercentage: Double,
+                                                statsReceiver: StatsReceiver,
+                                                nowMillis: () => Long =
+                                                  Stopwatch.systemMillis)
     extends SimpleFilter[Req, Rep] {
 
   require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
   require(rejectPeriod.inSeconds >= 1 && rejectPeriod.inSeconds <= 60,
           s"rejectPeriod must be [1 second, 60 seconds]: $rejectPeriod")
   require(
-      maxRejectPercentage <= 1.0,
-      s"maxRejectPercentage must be between 0.0 and 1.0: $maxRejectPercentage")
+    maxRejectPercentage <= 1.0,
+    s"maxRejectPercentage must be between 0.0 and 1.0: $maxRejectPercentage")
 
   private[this] val exceededStat = statsReceiver.counter("exceeded")
   private[this] val beyondToleranceStat =
@@ -133,7 +134,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
       now: Time
   ) =
     s"exceeded request deadline of ${deadline.deadline - deadline.timestamp} " +
-    s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
+      s"by $elapsed. Deadline expired at ${deadline.deadline} and now it is $now."
 
   // The request is rejected if the set deadline has expired, the elapsed time
   // since expiry is less than `tolerance`, and there are at least
@@ -149,7 +150,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
         val remaining = deadline.deadline - now
 
         transitTimeStat.add(
-            (now - deadline.timestamp).max(Duration.Zero).inMilliseconds)
+          (now - deadline.timestamp).max(Duration.Zero).inMilliseconds)
         budgetTimeStat.add(remaining.max(Duration.Zero).inMilliseconds)
 
         // Exceeded the deadline within tolerance, and there are enough

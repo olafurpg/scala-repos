@@ -16,11 +16,10 @@ trait CategoryTests[F[_, _]] extends ComposeTests[F] {
                            EqFAB: Eq[F[A, B]],
                            EqFAD: Eq[F[A, D]]): RuleSet =
     new DefaultRuleSet(
-        name = "category",
-        parent = Some(compose[A, B, C, D]),
-        "category left identity" -> forAll(laws.categoryLeftIdentity[A, B] _),
-        "category right identity" -> forAll(
-            laws.categoryRightIdentity[A, B] _))
+      name = "category",
+      parent = Some(compose[A, B, C, D]),
+      "category left identity" -> forAll(laws.categoryLeftIdentity[A, B] _),
+      "category right identity" -> forAll(laws.categoryRightIdentity[A, B] _))
 }
 
 object CategoryTests {

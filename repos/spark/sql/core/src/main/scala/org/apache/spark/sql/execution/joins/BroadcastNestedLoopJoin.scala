@@ -35,8 +35,8 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
     extends BinaryNode {
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
+                                                   "number of output rows"))
 
   /** BuildRight means the right relation <=> the broadcast relation. */
   private val (streamed, broadcast) = buildSide match {
@@ -58,8 +58,8 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
       // Always put the stream side on left to simplify implementation
       // both of left and right side could be null
       UnsafeProjection.create(
-          output,
-          (streamed.output ++ broadcast.output).map(_.withNullability(true)))
+        output,
+        (streamed.output ++ broadcast.output).map(_.withNullability(true)))
     }
   }
 
@@ -75,12 +75,12 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
         left.output.map(_.withNullability(true)) ++ right.output
       case FullOuter =>
         left.output.map(_.withNullability(true)) ++ right.output.map(
-            _.withNullability(true))
+          _.withNullability(true))
       case LeftSemi =>
         left.output
       case x =>
         throw new IllegalArgumentException(
-            s"BroadcastNestedLoopJoin should not take $x as the JoinType")
+          s"BroadcastNestedLoopJoin should not take $x as the JoinType")
     }
   }
 
@@ -189,8 +189,8 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
       val joinedRow = new JoinedRow
 
       if (condition.isDefined) {
-        streamedIter.filter(
-            l => buildRows.exists(r => boundCondition(joinedRow(l, r))))
+        streamedIter.filter(l =>
+          buildRows.exists(r => boundCondition(joinedRow(l, r))))
       } else {
         streamedIter.filter(r => !buildRows.isEmpty)
       }
@@ -229,7 +229,7 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
     }
 
     val matchedBroadcastRows = matchedBuildRows.fold(
-        new BitSet(relation.value.length)
+      new BitSet(relation.value.length)
     )(_ | _)
 
     if (joinType == LeftSemi) {
@@ -288,8 +288,8 @@ case class BroadcastNestedLoopJoin(left: SparkPlan,
     }
 
     sparkContext.union(
-        matchedStreamRows,
-        sparkContext.makeRDD(notMatchedBroadcastRows)
+      matchedStreamRows,
+      sparkContext.makeRDD(notMatchedBroadcastRows)
     )
   }
 

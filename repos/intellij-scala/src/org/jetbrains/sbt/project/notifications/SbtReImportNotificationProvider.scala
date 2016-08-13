@@ -16,8 +16,8 @@ object SbtReImportNotificationProvider {
   val ProviderKey = Key.create[EditorNotificationPanel](this.getClass.getName)
 }
 
-class SbtReImportNotificationProvider(
-    project: Project, notifications: EditorNotifications)
+class SbtReImportNotificationProvider(project: Project,
+                                      notifications: EditorNotifications)
     extends SbtImportNotificationProvider(project, notifications) {
 
   private val fileChangeListener = new VirtualFileAdapter {
@@ -32,8 +32,8 @@ class SbtReImportNotificationProvider(
   override def getKey: Key[EditorNotificationPanel] =
     SbtReImportNotificationProvider.ProviderKey
 
-  override def shouldShowPanel(
-      file: VirtualFile, fileEditor: FileEditor): Boolean =
+  override def shouldShowPanel(file: VirtualFile,
+                               fileEditor: FileEditor): Boolean =
     getProjectSettings(file).fold(false) { projectSettings =>
       val stamp = Option(SbtLocalSettings.getInstance(project))
         .map(_.lastUpdateTimestamp)
@@ -44,28 +44,29 @@ class SbtReImportNotificationProvider(
   override def createPanel(file: VirtualFile): EditorNotificationPanel = {
     val panel = new EditorNotificationPanel()
     panel.setText(SbtBundle("sbt.notification.reimport.msg", file.getName))
+    panel.createActionLabel(SbtBundle("sbt.notification.refreshProject"),
+                            new Runnable {
+                              override def run() = {
+                                refreshProject()
+                                notifications.updateAllNotifications()
+                              }
+                            })
     panel.createActionLabel(
-        SbtBundle("sbt.notification.refreshProject"), new Runnable {
-      override def run() = {
-        refreshProject()
-        notifications.updateAllNotifications()
-      }
-    })
-    panel.createActionLabel(
-        SbtBundle("sbt.notification.enableAutoImport"), new Runnable {
-      override def run() = {
-        getProjectSettings(file).foreach(_.setUseOurOwnAutoImport(true))
-        refreshProject()
-        notifications.updateAllNotifications()
-      }
-    })
-    panel.createActionLabel(
-        SbtBundle("sbt.notification.ignore"), new Runnable {
-      override def run() = {
-        ignoreFile(file)
-        notifications.updateAllNotifications()
-      }
-    })
+      SbtBundle("sbt.notification.enableAutoImport"),
+      new Runnable {
+        override def run() = {
+          getProjectSettings(file).foreach(_.setUseOurOwnAutoImport(true))
+          refreshProject()
+          notifications.updateAllNotifications()
+        }
+      })
+    panel
+      .createActionLabel(SbtBundle("sbt.notification.ignore"), new Runnable {
+        override def run() = {
+          ignoreFile(file)
+          notifications.updateAllNotifications()
+        }
+      })
     panel
   }
 }

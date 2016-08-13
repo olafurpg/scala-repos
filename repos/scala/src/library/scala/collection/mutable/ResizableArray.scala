@@ -23,7 +23,8 @@ import generic._
   *  @since   1
   */
 trait ResizableArray[A]
-    extends IndexedSeq[A] with GenericTraversableTemplate[A, ResizableArray]
+    extends IndexedSeq[A]
+    with GenericTraversableTemplate[A, ResizableArray]
     with IndexedSeqOptimized[A, ResizableArray[A]] {
 
   override def companion: GenericCompanion[ResizableArray] = ResizableArray

@@ -8,7 +8,8 @@ import org.ensime.util.EnsimeSpec
 import scala.collection.mutable.ListBuffer
 
 class StructureViewBuilderSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -42,9 +43,9 @@ class StructureViewBuilderSpec
   "StructureViewBuilder" should "show top level classes and objects" in {
     withPresCompiler { (config, cc) =>
       val structure = getStructure(
-          config,
-          cc,
-          """
+        config,
+        cc,
+        """
             package com.example
             import org.scalatest._
             class Test {
@@ -57,19 +58,19 @@ class StructureViewBuilderSpec
       )
 
       structure shouldBe List(
-          "(class)Test",
-          "(def)Test.fun",
-          "(object)Test",
-          "(def)Test.apply"
+        "(class)Test",
+        "(def)Test.fun",
+        "(object)Test",
+        "(def)Test.apply"
       )
     }
   }
 
   it should "show nested members" in withPresCompiler { (config, cc) =>
     val structure = getStructure(
-        config,
-        cc,
-        """
+      config,
+      cc,
+      """
             package com.example
             object Test {
               type TestType = Int
@@ -84,20 +85,20 @@ class StructureViewBuilderSpec
     )
 
     structure shouldBe List(
-        "(object)Test",
-        "(type)Test.TestType",
-        "(class)Test.Nested",
-        "(def)Test.Nested.fun",
-        "(object)Test.Nested",
-        "(def)Test.Nested.apply"
+      "(object)Test",
+      "(type)Test.TestType",
+      "(class)Test.Nested",
+      "(def)Test.Nested.fun",
+      "(object)Test.Nested",
+      "(def)Test.Nested.apply"
     )
   }
 
   it should "skip accessors" in withPresCompiler { (config, cc) =>
     val structure = getStructure(
-        config,
-        cc,
-        """
+      config,
+      cc,
+      """
             package com.example
             class Test(val accessor: String)
             class CaseTest(x: String, y: Int)
@@ -109,11 +110,11 @@ class StructureViewBuilderSpec
     )
 
     structure shouldBe List(
-        "(class)Test",
-        "(class)CaseTest",
-        "(object)Test",
-        "(class)Test.Nested",
-        "(class)Test.NestedCase"
+      "(class)Test",
+      "(class)CaseTest",
+      "(object)Test",
+      "(class)Test.Nested",
+      "(class)Test.NestedCase"
     )
   }
 }

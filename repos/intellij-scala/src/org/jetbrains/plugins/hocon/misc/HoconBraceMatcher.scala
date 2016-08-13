@@ -11,16 +11,16 @@ class HoconBraceMatcher extends PairedBraceMatcher {
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
 
   def getPairs = Array(
-      new BracePair(LBrace, RBrace, true),
-      new BracePair(LBracket, RBracket, false),
-      new BracePair(SubLBrace, SubRBrace, false)
+    new BracePair(LBrace, RBrace, true),
+    new BracePair(LBracket, RBracket, false),
+    new BracePair(SubLBrace, SubRBrace, false)
   )
 
   private val AllowsPairedBraceBefore =
     WhitespaceOrComment | Comma | RBrace | RBracket
 
-  def isPairedBracesAllowedBeforeType(
-      lbraceType: IElementType, contextType: IElementType) =
+  def isPairedBracesAllowedBeforeType(lbraceType: IElementType,
+                                      contextType: IElementType) =
     AllowsPairedBraceBefore.contains(contextType)
 
   def getCodeConstructStart(file: PsiFile, openingBraceOffset: Int) =

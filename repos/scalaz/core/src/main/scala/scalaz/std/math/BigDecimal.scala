@@ -4,7 +4,7 @@ package math
 
 trait BigDecimalInstances {
   implicit val bigDecimalInstance: Monoid[BigDecimal] with Enum[BigDecimal] with Show[
-      BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal]
+    BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal]
   with Show[BigDecimal] {
     override def shows(f: BigDecimal) = f.toString
 
@@ -26,7 +26,7 @@ trait BigDecimalInstances {
   import Tags.Multiplication
 
   implicit val BigDecimalMultiplicationNewType: Monoid[
-      BigDecimal @@ Multiplication] =
+    BigDecimal @@ Multiplication] =
     new Monoid[BigDecimal @@ Multiplication] {
       def append(f1: BigDecimal @@ Multiplication,
                  f2: => BigDecimal @@ Multiplication) =

@@ -173,8 +173,8 @@ abstract class GenTraversableFactory[
     *  @return A $coll consisting of elements `f(i1, i2, i3)`
     *          for `0 <= i1 < n1`, `0 <= i2 < n2`, and `0 <= i3 < n3`.
     */
-  def tabulate[A](n1: Int, n2: Int, n3: Int)(
-      f: (Int, Int, Int) => A): CC[CC[CC[A]]] =
+  def tabulate[A](n1: Int, n2: Int, n3: Int)(f: (Int, Int,
+                                                 Int) => A): CC[CC[CC[A]]] =
     tabulate(n1)(i1 => tabulate(n2, n3)(f(i1, _, _)))
 
   /** Produces a four-dimensional $coll containing values of a given function over ranges of integer values starting from 0.
@@ -210,7 +210,7 @@ abstract class GenTraversableFactory[
     *  @param end   the end value of the $coll (the first value NOT contained)
     *  @return  a $coll with values `start, start + 1, ..., end - 1`
     */
-  def range[T : Integral](start: T, end: T): CC[T] =
+  def range[T: Integral](start: T, end: T): CC[T] =
     range(start, end, implicitly[Integral[T]].one)
 
   /** Produces a $coll containing equally spaced values in some integer interval.
@@ -219,14 +219,14 @@ abstract class GenTraversableFactory[
     *  @param step  the difference between successive elements of the $coll (must be positive or negative)
     *  @return      a $coll with values `start, start + step, ...` up to, but excluding `end`
     */
-  def range[T : Integral](start: T, end: T, step: T): CC[T] = {
+  def range[T: Integral](start: T, end: T, step: T): CC[T] = {
     val num = implicitly[Integral[T]]
     import num._
 
     if (step == zero) throw new IllegalArgumentException("zero step")
     val b = newBuilder[T]
-    b sizeHint immutable.NumericRange.count(
-        start, end, step, isInclusive = false)
+    b sizeHint immutable.NumericRange
+      .count(start, end, step, isInclusive = false)
     var i = start
     while (if (step < zero) end < i else i < end) {
       b += i

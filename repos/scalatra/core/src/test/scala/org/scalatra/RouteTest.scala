@@ -17,13 +17,13 @@ class RouteTestServlet extends ScalatraServlet {
   }
 
   get("/optional/?:foo?/?:bar?") {
-    (for (key <- List("foo", "bar") if params.isDefinedAt(key)) yield
-      key + "=" + params(key)).mkString(";")
+    (for (key <- List("foo", "bar") if params.isDefinedAt(key))
+      yield key + "=" + params(key)).mkString(";")
   }
 
   get("/optional-ext.?:ext?") {
-    (for (key <- List("ext") if params.isDefinedAt(key)) yield
-      key + "=" + params(key)).mkString(";")
+    (for (key <- List("ext") if params.isDefinedAt(key))
+      yield key + "=" + params(key)).mkString(";")
   }
 
   get("/single-splat/*") {
@@ -321,12 +321,14 @@ class RouteTest extends ScalatraFunSuite {
       status should equal(200)
     }
 
-    get("/encoded-uri-2/%E4%B8%AD%E5%9B%BD%E8%AF%9D%E4%B8%8D%E7%94%A8%E5%BD%81%E5%AD%97%E3%80%82") {
+    get(
+      "/encoded-uri-2/%E4%B8%AD%E5%9B%BD%E8%AF%9D%E4%B8%8D%E7%94%A8%E5%BD%81%E5%AD%97%E3%80%82") {
       status should equal(200)
     }
 
     // mixing encoded with decoded characters
-    get("/encoded-uri-2/中国%E8%AF%9D%E4%B8%8D%E7%94%A8%E5%BD%81%E5%AD%97%E3%80%82") {
+    get(
+      "/encoded-uri-2/中国%E8%AF%9D%E4%B8%8D%E7%94%A8%E5%BD%81%E5%AD%97%E3%80%82") {
       status should equal(200)
     }
 

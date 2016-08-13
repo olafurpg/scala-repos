@@ -53,12 +53,12 @@ import akka.util.Helpers.ConfigOps
   * @param clock The clock, returning current time in milliseconds, but can be faked for testing
   *   purposes. It is only used for measuring intervals (duration).
   */
-class PhiAccrualFailureDetector(val threshold: Double,
-                                val maxSampleSize: Int,
-                                val minStdDeviation: FiniteDuration,
-                                val acceptableHeartbeatPause: FiniteDuration,
-                                val firstHeartbeatEstimate: FiniteDuration)(
-    implicit clock: Clock)
+class PhiAccrualFailureDetector(
+    val threshold: Double,
+    val maxSampleSize: Int,
+    val minStdDeviation: FiniteDuration,
+    val acceptableHeartbeatPause: FiniteDuration,
+    val firstHeartbeatEstimate: FiniteDuration)(implicit clock: Clock)
     extends FailureDetector {
 
   /**
@@ -71,10 +71,10 @@ class PhiAccrualFailureDetector(val threshold: Double,
     this(threshold = config.getDouble("threshold"),
          maxSampleSize = config.getInt("max-sample-size"),
          minStdDeviation = config.getMillisDuration("min-std-deviation"),
-         acceptableHeartbeatPause = config.getMillisDuration(
-               "acceptable-heartbeat-pause"),
-         firstHeartbeatEstimate = config.getMillisDuration(
-               "heartbeat-interval"))
+         acceptableHeartbeatPause =
+           config.getMillisDuration("acceptable-heartbeat-pause"),
+         firstHeartbeatEstimate =
+           config.getMillisDuration("heartbeat-interval"))
 
   require(threshold > 0.0, "failure-detector.threshold must be > 0")
   require(maxSampleSize > 0, "failure-detector.max-sample-size must be > 0")
@@ -92,7 +92,7 @@ class PhiAccrualFailureDetector(val threshold: Double,
     val mean = firstHeartbeatEstimate.toMillis
     val stdDeviation = mean / 4
     HeartbeatHistory(maxSampleSize) :+ (mean - stdDeviation) :+
-    (mean + stdDeviation)
+      (mean + stdDeviation)
   }
 
   private val acceptableHeartbeatPauseMillis =
@@ -102,11 +102,11 @@ class PhiAccrualFailureDetector(val threshold: Double,
     * Implement using optimistic lockless concurrency, all state is represented
     * by this immutable case class and managed by an AtomicReference.
     */
-  private final case class State(
-      history: HeartbeatHistory, timestamp: Option[Long])
+  private final case class State(history: HeartbeatHistory,
+                                 timestamp: Option[Long])
 
   private val state = new AtomicReference[State](
-      State(history = firstHeartbeat, timestamp = None))
+    State(history = firstHeartbeat, timestamp = None))
 
   override def isAvailable: Boolean = isAvailable(clock())
 
@@ -135,8 +135,8 @@ class PhiAccrualFailureDetector(val threshold: Double,
     }
 
     val newState = oldState.copy(
-        history = newHistory,
-        timestamp = Some(timestamp)) // record new timestamp
+      history = newHistory,
+      timestamp = Some(timestamp)) // record new timestamp
 
     // if we won the race then update else try again
     if (!state.compareAndSet(oldState, newState)) heartbeat() // recur
@@ -176,8 +176,9 @@ class PhiAccrualFailureDetector(val threshold: Double,
     * Error is 0.00014 at +- 3.16
     * The calculated value is equivalent to -log10(1 - CDF(y))
     */
-  private[akka] def phi(
-      timeDiff: Long, mean: Double, stdDeviation: Double): Double = {
+  private[akka] def phi(timeDiff: Long,
+                        mean: Double,
+                        stdDeviation: Double): Double = {
     val y = (timeDiff - mean) / stdDeviation
     val e = math.exp(-y * (1.5976 + 0.070566 * y * y))
     if (timeDiff > mean) -math.log10(e / (1.0 + e))
@@ -222,13 +223,13 @@ private[akka] final case class HeartbeatHistory private (
   // which always have intervals.size > 0.
   if (maxSampleSize < 1)
     throw new IllegalArgumentException(
-        s"maxSampleSize must be >= 1, got [$maxSampleSize]")
+      s"maxSampleSize must be >= 1, got [$maxSampleSize]")
   if (intervalSum < 0L)
     throw new IllegalArgumentException(
-        s"intervalSum must be >= 0, got [$intervalSum]")
+      s"intervalSum must be >= 0, got [$intervalSum]")
   if (squaredIntervalSum < 0L)
     throw new IllegalArgumentException(
-        s"squaredIntervalSum must be >= 0, got [$squaredIntervalSum]")
+      s"squaredIntervalSum must be >= 0, got [$squaredIntervalSum]")
 
   def mean: Double = intervalSum.toDouble / intervals.size
 
@@ -241,19 +242,19 @@ private[akka] final case class HeartbeatHistory private (
   final def :+(interval: Long): HeartbeatHistory = {
     if (intervals.size < maxSampleSize)
       HeartbeatHistory(
-          maxSampleSize,
-          intervals = intervals :+ interval,
-          intervalSum = intervalSum + interval,
-          squaredIntervalSum = squaredIntervalSum + pow2(interval))
+        maxSampleSize,
+        intervals = intervals :+ interval,
+        intervalSum = intervalSum + interval,
+        squaredIntervalSum = squaredIntervalSum + pow2(interval))
     else dropOldest :+ interval // recur
   }
 
   private def dropOldest: HeartbeatHistory =
     HeartbeatHistory(
-        maxSampleSize,
-        intervals = intervals drop 1,
-        intervalSum = intervalSum - intervals.head,
-        squaredIntervalSum = squaredIntervalSum - pow2(intervals.head))
+      maxSampleSize,
+      intervals = intervals drop 1,
+      intervalSum = intervalSum - intervals.head,
+      squaredIntervalSum = squaredIntervalSum - pow2(intervals.head))
 
   private def pow2(x: Long) = x * x
 }

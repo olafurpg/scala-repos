@@ -67,11 +67,11 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     */
   val selfUniqueAddress: UniqueAddress = system.provider match {
     case c: ClusterActorRefProvider ⇒
-      UniqueAddress(
-          c.transport.defaultAddress, AddressUidExtension(system).addressUid)
+      UniqueAddress(c.transport.defaultAddress,
+                    AddressUidExtension(system).addressUid)
     case other ⇒
       throw new ConfigurationException(
-          s"ActorSystem [${system}] needs to have a 'ClusterActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
+        s"ActorSystem [${system}] needs to have a 'ClusterActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
   }
 
   /**
@@ -116,14 +116,14 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   private[cluster] val scheduler: Scheduler = {
     if (system.scheduler.maxFrequency < 1.second / SchedulerTickDuration) {
       logInfo(
-          "Using a dedicated scheduler for cluster. Default scheduler can be used if configured " +
+        "Using a dedicated scheduler for cluster. Default scheduler can be used if configured " +
           "with 'akka.scheduler.tick-duration' [{} ms] <=  'akka.cluster.scheduler.tick-duration' [{} ms].",
-          (1000 / system.scheduler.maxFrequency).toInt,
-          SchedulerTickDuration.toMillis)
+        (1000 / system.scheduler.maxFrequency).toInt,
+        SchedulerTickDuration.toMillis)
 
       val cfg = ConfigFactory
         .parseString(
-            s"akka.scheduler.tick-duration=${SchedulerTickDuration.toMillis}ms")
+          s"akka.scheduler.tick-duration=${SchedulerTickDuration.toMillis}ms")
         .withFallback(system.settings.config)
       val threadFactory = system.threadFactory match {
         case tf: MonitorableThreadFactory ⇒
@@ -132,10 +132,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
       }
       system.dynamicAccess
         .createInstanceFor[Scheduler](
-            system.settings.SchedulerClass,
-            immutable.Seq(classOf[Config] -> cfg,
-                          classOf[LoggingAdapter] -> log,
-                          classOf[ThreadFactory] -> threadFactory))
+          system.settings.SchedulerClass,
+          immutable.Seq(classOf[Config] -> cfg,
+                        classOf[LoggingAdapter] -> log,
+                        classOf[ThreadFactory] -> threadFactory))
         .get
     } else {
       // delegate to system.scheduler, but don't close over system
@@ -179,8 +179,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     } catch {
       case NonFatal(e) ⇒
         log.error(
-            e,
-            "Failed to startup Cluster. You can try to increase 'akka.actor.creation-timeout'.")
+          e,
+          "Failed to startup Cluster. You can try to increase 'akka.actor.creation-timeout'.")
         shutdown()
         // don't re-throw, that would cause the extension to be re-recreated
         // from shutdown() or other places, which may result in
@@ -246,13 +246,13 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   def subscribe(subscriber: ActorRef,
                 initialStateMode: SubscriptionInitialStateMode,
                 to: Class[_]*): Unit = {
+    require(to.length > 0,
+            "at least one `ClusterDomainEvent` class is required")
     require(
-        to.length > 0, "at least one `ClusterDomainEvent` class is required")
-    require(
-        to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
-        s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
-    clusterCore ! InternalClusterAction.Subscribe(
-        subscriber, initialStateMode, to.toSet)
+      to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
+      s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
+    clusterCore ! InternalClusterAction
+      .Subscribe(subscriber, initialStateMode, to.toSet)
   }
 
   /**
@@ -305,7 +305,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     */
   def joinSeedNodes(seedNodes: immutable.Seq[Address]): Unit =
     clusterCore ! InternalClusterAction.JoinSeedNodes(
-        seedNodes.toVector.map(fillLocal))
+      seedNodes.toVector.map(fillLocal))
 
   /**
     * Java API
@@ -381,7 +381,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     if (_isTerminated.get()) callback.run()
     else
       clusterDaemons ! InternalClusterAction.AddOnMemberRemovedListener(
-          callback)
+        callback)
   }
 
   /**

@@ -36,14 +36,14 @@ class InjectTests extends CatsSuite {
   implicit def test1Arbitrary[A](
       implicit seqArb: Arbitrary[Int],
       intAArb: Arbitrary[Int => A]): Arbitrary[Test1[A]] =
-    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
-          Test1(s, f))
+    Arbitrary(
+      for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield Test1(s, f))
 
   implicit def test2Arbitrary[A](
       implicit seqArb: Arbitrary[Int],
       intAArb: Arbitrary[Int => A]): Arbitrary[Test2[A]] =
-    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
-          Test2(s, f))
+    Arbitrary(
+      for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield Test2(s, f))
 
   object Test1Interpreter extends (Test1Algebra ~> Id) {
     override def apply[A](fa: Test1Algebra[A]): Id[A] = fa match {
@@ -103,7 +103,7 @@ class InjectTests extends CatsSuite {
   test("apply in right") {
     forAll { (y: Test2[Int]) =>
       Inject[Test2Algebra, T].inj(y) == Coproduct(Xor.Right(y)) should ===(
-          true)
+        true)
     }
   }
 }

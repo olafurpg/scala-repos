@@ -16,10 +16,10 @@ object ClusterAccrualFailureDetectorMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString(
-                "akka.cluster.failure-detector.threshold = 4"))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        "akka.cluster.failure-detector.threshold = 4"))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
 }

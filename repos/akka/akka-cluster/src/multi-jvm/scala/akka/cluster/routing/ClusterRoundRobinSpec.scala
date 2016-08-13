@@ -48,8 +48,9 @@ object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
   val fourth = role("fourth")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        """
       akka.actor.deployment {
         /router1 {
           router = round-robin-pool
@@ -84,12 +85,12 @@ object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
         }
       }
       """))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   nodeConfig(first, second)(
-      ConfigFactory.parseString("""akka.cluster.roles =["a", "c"]"""))
+    ConfigFactory.parseString("""akka.cluster.roles =["a", "c"]"""))
   nodeConfig(third)(
-      ConfigFactory.parseString("""akka.cluster.roles =["b", "c"]"""))
+    ConfigFactory.parseString("""akka.cluster.roles =["b", "c"]"""))
 
   testTransport(on = true)
 }
@@ -101,27 +102,30 @@ class ClusterRoundRobinMultiJvmNode4 extends ClusterRoundRobinSpec
 
 abstract class ClusterRoundRobinSpec
     extends MultiNodeSpec(ClusterRoundRobinMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import ClusterRoundRobinMultiJvmSpec._
 
   lazy val router1 =
     system.actorOf(FromConfig.props(Props[SomeActor]), "router1")
   lazy val router2 = system.actorOf(
-      ClusterRouterPool(
-          RoundRobinPool(nrOfInstances = 0),
-          ClusterRouterPoolSettings(totalInstances = 3,
-                                    maxInstancesPerNode = 1,
-                                    allowLocalRoutees = true,
-                                    useRole = None)).props(Props[SomeActor]),
-      "router2")
+    ClusterRouterPool(
+      RoundRobinPool(nrOfInstances = 0),
+      ClusterRouterPoolSettings(totalInstances = 3,
+                                maxInstancesPerNode = 1,
+                                allowLocalRoutees = true,
+                                useRole = None)).props(Props[SomeActor]),
+    "router2")
   lazy val router3 =
     system.actorOf(FromConfig.props(Props[SomeActor]), "router3")
   lazy val router4 = system.actorOf(FromConfig.props(), "router4")
   lazy val router5 = system.actorOf(
-      RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]), "router5")
+    RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]),
+    "router5")
 
-  def receiveReplies(
-      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] = {
+  def receiveReplies(routeeType: RouteeType,
+                     expectedReplies: Int): Map[Address, Int] = {
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
     (receiveWhile(5 seconds, messages = expectedReplies) {
       case Reply(`routeeType`, ref) ⇒ fullAddress(ref)
@@ -326,15 +330,15 @@ abstract class ClusterRoundRobinSpec
     }
 
     "remove routees for unreachable nodes, and add when reachable again" in within(
-        30.seconds) {
+      30.seconds) {
 
       // myservice is already running
 
       def routees = currentRoutees(router4)
       def routeeAddresses =
         (routees map {
-              case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
-            }).toSet
+          case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
+        }).toSet
 
       runOn(first) {
         // 4 nodes, 2 routees on each node

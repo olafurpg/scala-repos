@@ -41,7 +41,7 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
     }
 
   test(
-      "save()/load() - partitioned table - simple queries - partition columns in data") {
+    "save()/load() - partitioned table - simple queries - partition columns in data") {
     withTempDir { file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
@@ -57,12 +57,13 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
       }
 
       val dataSchemaWithPartition = StructType(
-          dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
+        dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
 
-      checkQueries(hiveContext.read
-            .format(dataSourceName)
-            .option("dataSchema", dataSchemaWithPartition.json)
-            .load(file.getCanonicalPath))
+      checkQueries(
+        hiveContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchemaWithPartition.json)
+          .load(file.getCanonicalPath))
     }
   }
 
@@ -75,13 +76,13 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
       df.write.format("parquet").save(s"${dir.getCanonicalPath}/_temporary")
 
       checkAnswer(
-          hiveContext.read.format("parquet").load(dir.getCanonicalPath),
-          df.collect())
+        hiveContext.read.format("parquet").load(dir.getCanonicalPath),
+        df.collect())
     }
   }
 
   test(
-      "SPARK-8014: Avoid scanning output directory when SaveMode isn't SaveMode.Append") {
+    "SPARK-8014: Avoid scanning output directory when SaveMode isn't SaveMode.Append") {
     withTempDir { dir =>
       val path = dir.getCanonicalPath
       val df = Seq(1 -> "a").toDF()
@@ -126,7 +127,7 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
   }
 
   test(
-      "SPARK-8604: Parquet data source should write summary file while doing appending") {
+    "SPARK-8604: Parquet data source should write summary file while doing appending") {
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       val df = sqlContext.range(0, 5).toDF()
@@ -161,14 +162,14 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
       val physicalPlan = df.queryExecution.sparkPlan
 
       assert(
-          physicalPlan.collect { case p: execution.Project => p }.length === 1)
+        physicalPlan.collect { case p: execution.Project => p }.length === 1)
       assert(
-          physicalPlan.collect { case p: execution.Filter => p }.length === 1)
+        physicalPlan.collect { case p: execution.Filter => p }.length === 1)
     }
   }
 
   test(
-      "SPARK-11500: Not deterministic order of columns when using merging schemas.") {
+    "SPARK-11500: Not deterministic order of columns when using merging schemas.") {
     import testImplicits._
     withSQLConf(SQLConf.PARQUET_SCHEMA_MERGING_ENABLED.key -> "true") {
       withTempPath { dir =>
@@ -182,8 +183,10 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         // The schema consists of the leading columns of the first part-file
         // in the lexicographic order.
         assert(
-            sqlContext.read.parquet(dir.getCanonicalPath).schema.map(_.name) === Seq(
-                "a", "b", "c", "d", "part"))
+          sqlContext.read
+            .parquet(dir.getCanonicalPath)
+            .schema
+            .map(_.name) === Seq("a", "b", "c", "d", "part"))
       }
     }
   }
@@ -229,7 +232,7 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
   }
 
   test(
-      "SPARK-13543: Support for specifying compression codec for Parquet via option()") {
+    "SPARK-13543: Support for specifying compression codec for Parquet via option()") {
     withSQLConf(SQLConf.PARQUET_COMPRESSION.key -> "UNCOMPRESSED") {
       withTempPath { dir =>
         val path = s"${dir.getCanonicalPath}/table1"

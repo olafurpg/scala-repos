@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class DrawModeSpec
     extends SFXEnumDelegateSpec[jfxss.DrawMode, DrawMode](
-        javaClass = classOf[jfxss.DrawMode],
-        scalaClass = classOf[DrawMode],
-        companion = DrawMode)
+      javaClass = classOf[jfxss.DrawMode],
+      scalaClass = classOf[DrawMode],
+      companion = DrawMode)

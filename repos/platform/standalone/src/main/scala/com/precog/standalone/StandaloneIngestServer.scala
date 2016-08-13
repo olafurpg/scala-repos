@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -43,14 +43,17 @@ import org.streum.configrity.Configuration
 import scalaz._
 
 object StandaloneIngestServer
-    extends StandaloneIngestServer with AkkaDefaults {
+    extends StandaloneIngestServer
+    with AkkaDefaults {
   val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
   val clock = Clock.System
 }
 
 trait StandaloneIngestServer
-    extends BlueEyesServer with EventService with Logging {
+    extends BlueEyesServer
+    with EventService
+    with Logging {
 
   def clock: Clock
 
@@ -60,9 +63,11 @@ trait StandaloneIngestServer
 
     val apiKeyFinder = new StaticAPIKeyFinder[Future](apiKey)
     val accountFinder = new StaticAccountFinder[Future](
-        config[String]("security.masterAccount.accountId"), apiKey, Some("/"))
-    val permissionsFinder = new PermissionsFinder(
-        apiKeyFinder, accountFinder, clock.instant())
+      config[String]("security.masterAccount.accountId"),
+      apiKey,
+      Some("/"))
+    val permissionsFinder =
+      new PermissionsFinder(apiKeyFinder, accountFinder, clock.instant())
     val jobManager =
       new InMemoryJobManager[({ type λ[+α] = EitherT[Future, String, α] })#λ]()
 
@@ -70,14 +75,14 @@ trait StandaloneIngestServer
       KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
         errors =>
           sys.error(
-              "Could not configure event store: " + errors.list.mkString(", "))
+            "Could not configure event store: " + errors.list.mkString(", "))
       }
 
     val serviceConfig =
       EventService.ServiceConfig.fromConfiguration(config) valueOr { errors =>
         sys.error(
-            "Unable to obtain self-referential service locator for event service: %s"
-              .format(errors.list.mkString("; ")))
+          "Unable to obtain self-referential service locator for event service: %s"
+            .format(errors.list.mkString("; ")))
       }
 
     buildServiceState(serviceConfig,

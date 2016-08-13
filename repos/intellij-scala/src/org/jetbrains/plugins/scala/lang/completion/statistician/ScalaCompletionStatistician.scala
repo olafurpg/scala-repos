@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.lang.completion.statistician
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionStatistician}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation,
+  CompletionStatistician
+}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupItem}
 import com.intellij.psi.statistics.StatisticsInfo
 import com.intellij.psi.{PsiClass, PsiMember, PsiNamedElement}
@@ -15,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
   * @since 06.07.12
   */
 class ScalaCompletionStatistician extends CompletionStatistician {
-  def serialize(
-      element: LookupElement, location: CompletionLocation): StatisticsInfo = {
+  def serialize(element: LookupElement,
+                location: CompletionLocation): StatisticsInfo = {
     val currentElement =
       Option(element.as(LookupItem.CLASS_CONDITION_KEY)).getOrElse(return null)
 

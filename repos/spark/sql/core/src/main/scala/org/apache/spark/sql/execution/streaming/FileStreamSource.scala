@@ -37,7 +37,8 @@ class FileStreamSource(sqlContext: SQLContext,
                        dataSchema: Option[StructType],
                        providerName: String,
                        dataFrameBuilder: Array[String] => DataFrame)
-    extends Source with Logging {
+    extends Source
+    with Logging {
 
   private val fs = FileSystem.get(sqlContext.sparkContext.hadoopConfiguration)
   private val metadataLog =

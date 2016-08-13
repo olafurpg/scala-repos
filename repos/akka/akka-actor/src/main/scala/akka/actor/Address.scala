@@ -126,7 +126,8 @@ object RelativeActorPath extends PathUtils {
   */
 object AddressFromURIString {
   def unapply(addr: String): Option[Address] =
-    try unapply(new URI(addr)) catch { case _: URISyntaxException ⇒ None }
+    try unapply(new URI(addr))
+    catch { case _: URISyntaxException ⇒ None }
 
   def unapply(uri: URI): Option[Address] =
     if (uri eq null) None
@@ -141,10 +142,9 @@ object AddressFromURIString {
       if (uri.getHost == null || uri.getPort == -1) None
       else
         Some(
-            if (uri.getUserInfo == null) Address(uri.getScheme, uri.getHost)
-            else
-              Address(
-                  uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort))
+          if (uri.getUserInfo == null) Address(uri.getScheme, uri.getHost)
+          else
+            Address(uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort))
     }
 
   /**

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -65,7 +65,8 @@ import scalaz.syntax.std.option._
 import scala.collection.JavaConverters._
 
 class JDBCQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with JDBCColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig
+    with JDBCColumnarTableModuleConfig {
   val logPrefix = "jdbc"
 
   val dbMap = config.detach("databases").data
@@ -74,19 +75,22 @@ class JDBCQueryExecutorConfig(val config: Configuration)
 object JDBCQueryExecutor {
   def apply(config: Configuration,
             jobManager: JobManager[Future],
-            jobActorSystem: ActorSystem)(
-      implicit ec: ExecutionContext, M: Monad[Future]): ManagedPlatform = {
-    new JDBCQueryExecutor(
-        new JDBCQueryExecutorConfig(config), jobManager, jobActorSystem)
+            jobActorSystem: ActorSystem)(implicit ec: ExecutionContext,
+                                         M: Monad[Future]): ManagedPlatform = {
+    new JDBCQueryExecutor(new JDBCQueryExecutorConfig(config),
+                          jobManager,
+                          jobActorSystem)
   }
 }
 
 class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                         val jobManager: JobManager[Future],
                         val jobActorSystem: ActorSystem)(
-    implicit val executionContext: ExecutionContext, val M: Monad[Future])
-    extends StandaloneQueryExecutor with JDBCColumnarTableModule with Logging {
-  platform =>
+    implicit val executionContext: ExecutionContext,
+    val M: Monad[Future])
+    extends StandaloneQueryExecutor
+    with JDBCColumnarTableModule
+    with Logging { platform =>
   type YggConfig = JDBCQueryExecutorConfig
 
   trait TableCompanion extends JDBCColumnarTableCompanion
@@ -121,7 +125,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
                     val query =
                       "SELECT count(*) as count FROM " +
-                      tableName.filterNot(_ == ';')
+                        tableName.filterNot(_ == ';')
                     logger.debug("Querying with " + query)
 
                     val result = stmt.executeQuery(query)
@@ -146,8 +150,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
         case t => logger.error("Failure during size", t)
       }
 
-    def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] = {
+    def browse(userUID: String,
+               path: Path): Future[Validation[String, JArray]] = {
       Future {
         path.elements.toList match {
           case Nil =>
@@ -191,7 +195,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
           case _ =>
             Failure(
-                "JDBC paths have the form /databaseName/tableName; longer paths are not supported.")
+              "JDBC paths have the form /databaseName/tableName; longer paths are not supported.")
         }
       }.onFailure {
         case t => logger.error("Failure during size", t)
@@ -202,9 +206,9 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                   path: Path,
                   cpath: CPath): Future[Validation[String, JObject]] =
       Promise.successful(
-          Success(
-              JObject(Map("children" -> JArray.empty,
-                          "types" -> JObject.empty))) // TODO: Implement from table metadata
+        Success(JObject(Map(
+          "children" -> JArray.empty,
+          "types" -> JObject.empty))) // TODO: Implement from table metadata
       )
 
     def currentVersion(apiKey: APIKey, path: Path) = Promise.successful(None)

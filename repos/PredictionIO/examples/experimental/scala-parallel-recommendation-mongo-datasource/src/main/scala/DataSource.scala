@@ -22,12 +22,13 @@ case class DataSourceParams( // CHANGED
                             port: Int,
                             db: String, // DB name
                             collection: String // collection name
-)
-    extends Params
+) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -35,8 +36,8 @@ class DataSource(val dsp: DataSourceParams)
     // CHANGED
     val config = new Configuration()
     config.set(
-        "mongo.input.uri",
-        s"mongodb://${dsp.host}:${dsp.port}/${dsp.db}.${dsp.collection}")
+      "mongo.input.uri",
+      s"mongodb://${dsp.host}:${dsp.port}/${dsp.db}.${dsp.collection}")
 
     val mongoRDD = sc.newAPIHadoopRDD(config,
                                       classOf[MongoInputFormat],
@@ -62,8 +63,7 @@ case class Rating(
 
 class TrainingData(
     val ratings: RDD[Rating]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
   }

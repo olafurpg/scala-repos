@@ -24,25 +24,26 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{Row, SQLContext}
 
 class QuantileDiscretizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import org.apache.spark.ml.feature.QuantileDiscretizerSuite._
 
   test("Test quantile discretizer") {
     checkDiscretizedData(
-        sc,
-        Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-        10,
-        Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-        Array("-Infinity, 1.0", "1.0, 2.0", "2.0, 3.0", "3.0, Infinity"))
+      sc,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      10,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      Array("-Infinity, 1.0", "1.0, 2.0", "2.0, 3.0", "3.0, Infinity"))
 
     checkDiscretizedData(
-        sc,
-        Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-        4,
-        Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-        Array("-Infinity, 1.0", "1.0, 2.0", "2.0, 3.0", "3.0, Infinity"))
+      sc,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      4,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      Array("-Infinity, 1.0", "1.0, 2.0", "2.0, 3.0", "3.0, Infinity"))
 
     checkDiscretizedData(sc,
                          Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
@@ -59,23 +60,25 @@ class QuantileDiscretizerSuite
 
   test("Test getting splits") {
     val splitTestPoints = Array(
-        Array[Double]() -> Array(Double.NegativeInfinity,
-                                 0,
-                                 Double.PositiveInfinity),
-        Array(Double.NegativeInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
-        Array(Double.PositiveInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
-        Array(Double.NegativeInfinity, Double.PositiveInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
-        Array(0.0) -> Array(Double.NegativeInfinity,
-                            0,
-                            Double.PositiveInfinity),
-        Array(1.0) -> Array(Double.NegativeInfinity,
-                            1,
-                            Double.PositiveInfinity),
-        Array(0.0, 1.0) -> Array(
-            Double.NegativeInfinity, 0, 1, Double.PositiveInfinity)
+      Array[Double]() -> Array(Double.NegativeInfinity,
+                               0,
+                               Double.PositiveInfinity),
+      Array(Double.NegativeInfinity) -> Array(Double.NegativeInfinity,
+                                              0,
+                                              Double.PositiveInfinity),
+      Array(Double.PositiveInfinity) -> Array(Double.NegativeInfinity,
+                                              0,
+                                              Double.PositiveInfinity),
+      Array(Double.NegativeInfinity, Double.PositiveInfinity) -> Array(
+        Double.NegativeInfinity,
+        0,
+        Double.PositiveInfinity),
+      Array(0.0) -> Array(Double.NegativeInfinity, 0, Double.PositiveInfinity),
+      Array(1.0) -> Array(Double.NegativeInfinity, 1, Double.PositiveInfinity),
+      Array(0.0, 1.0) -> Array(Double.NegativeInfinity,
+                               0,
+                               1,
+                               Double.PositiveInfinity)
     )
     for ((ori, res) <- splitTestPoints) {
       assert(QuantileDiscretizer.getSplits(ori) === res,
@@ -102,8 +105,8 @@ class QuantileDiscretizerSuite
     val observedNumBuckets = result.select("result").distinct.count
 
     assert(
-        observedNumBuckets === numBuckets,
-        "Observed number of buckets does not equal expected number of buckets.")
+      observedNumBuckets === numBuckets,
+      "Observed number of buckets does not equal expected number of buckets.")
   }
 
   test("read/write") {

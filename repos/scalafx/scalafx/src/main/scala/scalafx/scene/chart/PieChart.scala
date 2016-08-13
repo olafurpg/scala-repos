@@ -32,7 +32,12 @@ import javafx.{scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ReadOnlyObjectProperty,
+  StringProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
@@ -70,7 +75,8 @@ object PieChart {
 }
 
 class PieChart(override val delegate: jfxsc.PieChart = new jfxsc.PieChart())
-    extends Chart(delegate) with SFXDelegate[jfxsc.PieChart] {
+    extends Chart(delegate)
+    with SFXDelegate[jfxsc.PieChart] {
 
   def this(data: ObservableBuffer[jfxsc.PieChart.Data]) {
     this(new jfxsc.PieChart(data))

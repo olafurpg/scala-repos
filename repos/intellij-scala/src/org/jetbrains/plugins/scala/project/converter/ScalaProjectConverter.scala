@@ -13,7 +13,7 @@ import ScalaProjectConverter._
 class ScalaProjectConverter(context: ConversionContext)
     extends ProjectConverter {
   private val scalaModuleConverter = new ScalaModuleConversionProcessor(
-      context)
+    context)
 
   private val scalaCompilerSettings: Map[String, ScalaCompilerSettings] =
     scalaCompilerSettingsIn(context)
@@ -71,12 +71,13 @@ private object ScalaProjectConverter {
   private def scalaCompilerSettingsIn(
       context: ConversionContext): Map[String, ScalaCompilerSettings] =
     modulesIn(context)
-      .flatMap(module =>
-            ScalaFacetData
-              .findIn(module)
-              .toSeq
-              .map(facet => (module.getModuleName, facet.compilerSettings))
-              .toSeq)
+      .flatMap(
+        module =>
+          ScalaFacetData
+            .findIn(module)
+            .toSeq
+            .map(facet => (module.getModuleName, facet.compilerSettings))
+            .toSeq)
       .toMap
 
   private def basePackagesIn(context: ConversionContext): Seq[String] =
@@ -110,8 +111,9 @@ private object ScalaProjectConverter {
 
     val profiles = sortedSettingsToModules.zipWithIndex.map {
       case ((settings, modules), i) =>
-        new ScalaCompilerSettingsProfile(
-            "Profile " + i, modules.toSeq, settings)
+        new ScalaCompilerSettingsProfile("Profile " + i,
+                                         modules.toSeq,
+                                         settings)
     }
 
     val defaultSettings =

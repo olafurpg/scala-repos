@@ -39,7 +39,7 @@ class CycledFile(f: File) extends Generator { self =>
   } catch {
     case e: EOFException =>
       throw new IllegalArgumentException(
-          "%s contains less than 8 bytes" format f)
+        "%s contains less than 8 bytes" format f)
   }
 
   def reinit(): Unit = {

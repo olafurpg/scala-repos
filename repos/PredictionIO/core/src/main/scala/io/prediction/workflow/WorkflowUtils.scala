@@ -65,15 +65,15 @@ object WorkflowUtils extends Logging {
     val engineObject = runtimeMirror.reflectModule(engineModule)
     try {
       (
-          EngineLanguage.Scala,
-          engineObject.instance.asInstanceOf[EngineFactory]
+        EngineLanguage.Scala,
+        engineObject.instance.asInstanceOf[EngineFactory]
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
         try {
           (
-              EngineLanguage.Java,
-              Class.forName(engine).newInstance.asInstanceOf[EngineFactory]
+            EngineLanguage.Java,
+            Class.forName(engine).newInstance.asInstanceOf[EngineFactory]
           )
         }
     }
@@ -87,19 +87,16 @@ object WorkflowUtils extends Logging {
     val epgObject = runtimeMirror.reflectModule(epgModule)
     try {
       (
-          EngineLanguage.Scala,
-          epgObject.instance.asInstanceOf[EngineParamsGenerator]
+        EngineLanguage.Scala,
+        epgObject.instance.asInstanceOf[EngineParamsGenerator]
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
         try {
           (
-              EngineLanguage.Java,
-              Class
-                .forName(epg)
-                .newInstance
-                .asInstanceOf[EngineParamsGenerator]
-            )
+            EngineLanguage.Java,
+            Class.forName(epg).newInstance.asInstanceOf[EngineParamsGenerator]
+          )
         }
     }
   }
@@ -111,15 +108,15 @@ object WorkflowUtils extends Logging {
     val evaluationObject = runtimeMirror.reflectModule(evaluationModule)
     try {
       (
-          EngineLanguage.Scala,
-          evaluationObject.instance.asInstanceOf[Evaluation]
+        EngineLanguage.Scala,
+        evaluationObject.instance.asInstanceOf[Evaluation]
       )
     } catch {
       case e @ (_: NoSuchFieldException | _: ClassNotFoundException) =>
         try {
           (
-              EngineLanguage.Java,
-              Class.forName(evaluation).newInstance.asInstanceOf[Evaluation]
+            EngineLanguage.Java,
+            Class.forName(evaluation).newInstance.asInstanceOf[Evaluation]
           )
         }
     }
@@ -147,7 +144,7 @@ object WorkflowUtils extends Logging {
     if (pClass.size == 0) {
       if (json != "") {
         warn(
-            s"Non-empty parameters supplied to ${clazz.getName}, but its " +
+          s"Non-empty parameters supplied to ${clazz.getName}, but its " +
             "constructor does not accept any arguments. Stubbing with empty " +
             "parameters.")
       }
@@ -161,7 +158,7 @@ object WorkflowUtils extends Logging {
       } catch {
         case e @ (_: MappingException | _: JsonSyntaxException) =>
           error(s"Unable to extract parameters for ${apClass.getName} from " +
-                s"JSON string: $json. Aborting workflow.",
+                  s"JSON string: $json. Aborting workflow.",
                 e)
           throw e
       }
@@ -190,7 +187,8 @@ object WorkflowUtils extends Logging {
       val extractedParams = np.params.map { p =>
         try {
           if (!classMap.contains(np.name)) {
-            error(s"Unable to find $field class with name '${np.name}'" +
+            error(
+              s"Unable to find $field class with name '${np.name}'" +
                 " defined in Engine.")
             sys.exit(1)
           }
@@ -220,8 +218,8 @@ object WorkflowUtils extends Logging {
     */
   def javaObjectToJValue(params: AnyRef): JValue = parse(gson.toJson(params))
 
-  private[prediction] def checkUpgrade(
-      component: String = "core", engine: String = ""): Unit = {
+  private[prediction] def checkUpgrade(component: String = "core",
+                                       engine: String = ""): Unit = {
     val runner = new Thread(new UpgradeCheckRunner(component, engine))
     runner.start()
   }
@@ -230,17 +228,17 @@ object WorkflowUtils extends Logging {
   def debugString[D](data: D): String = {
     val s: String = data match {
       case rdd: RDD[_] => {
-          debugString(rdd.collect())
-        }
+        debugString(rdd.collect())
+      }
       case javaRdd: JavaRDDLike[_, _] => {
-          debugString(javaRdd.collect())
-        }
+        debugString(javaRdd.collect())
+      }
       case array: Array[_] => {
-          "[" + array.map(debugString).mkString(",") + "]"
-        }
+        "[" + array.map(debugString).mkString(",") + "]"
+      }
       case d: AnyRef => {
-          d.toString
-        }
+        d.toString
+      }
       case null => "null"
     }
     s
@@ -296,7 +294,7 @@ object WorkflowUtils extends Logging {
 
     if (nameOpt.isEmpty && paramsOpt.isEmpty) {
       error(
-          "Unable to find 'name' or 'params' fields in" +
+        "Unable to find 'name' or 'params' fields in" +
           s" ${compact(render(jv))}.\n" +
           "Since 0.8.4, the 'params' field is required in engine.json" +
           " in order to specify parameters for DataSource, Preparator or" +
@@ -315,8 +313,8 @@ object WorkflowUtils extends Logging {
     }
 
     NameParams(
-        name = nameOpt.getOrElse(""),
-        params = paramsOpt
+      name = nameOpt.getOrElse(""),
+      params = paramsOpt
     )
   }
 
@@ -325,33 +323,35 @@ object WorkflowUtils extends Logging {
       jv match {
         case JObject(fields) =>
           for ((namePrefix, childJV) <- fields;
-          (name, value) <- flatten(childJV)) yield (namePrefix :: name) -> value
+               (name, value) <- flatten(childJV))
+            yield (namePrefix :: name) -> value
         case JArray(_) => {
-            error(
-                "Arrays are not allowed in the sparkConf section of engine.js.")
-            sys.exit(1)
-          }
+          error(
+            "Arrays are not allowed in the sparkConf section of engine.js.")
+          sys.exit(1)
+        }
         case JNothing => List()
         case _ => List(List() -> jv.values.toString)
       }
     }
 
-    flatten(root \ "sparkConf")
-      .map(x => (x._1.reduce((a, b) => s"$a.$b"), x._2))
+    flatten(root \ "sparkConf").map(x =>
+      (x._1.reduce((a, b) => s"$a.$b"), x._2))
   }
 }
 
 case class NameParams(name: String, params: Option[JValue])
 
 class NameParamsSerializer
-    extends CustomSerializer[NameParams](
-        format =>
-          ({
+    extends CustomSerializer[NameParams](format =>
+      ({
         case jv: JValue => WorkflowUtils.extractNameParams(jv)
       }, {
         case x: NameParams =>
-          JObject(JField("name", JString(x.name)) :: JField(
-                  "params", x.params.getOrElse(JNothing)) :: Nil)
+          JObject(
+            JField("name", JString(x.name)) :: JField(
+              "params",
+              x.params.getOrElse(JNothing)) :: Nil)
       }))
 
 /** Collection of reusable workflow related utilities that touch on Apache
@@ -385,7 +385,7 @@ object SparkWorkflowUtils extends Logging {
             throw e
           case e: NoSuchMethodException =>
             error(
-                "The load(String, Params, SparkContext) method cannot be found.")
+              "The load(String, Params, SparkContext) method cannot be found.")
             throw e
         }
     }
@@ -393,7 +393,8 @@ object SparkWorkflowUtils extends Logging {
 }
 
 class UpgradeCheckRunner(val component: String, val engine: String)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
   val version = BuildInfo.version
   val versionsHost = "http://direct.prediction.io/"
 

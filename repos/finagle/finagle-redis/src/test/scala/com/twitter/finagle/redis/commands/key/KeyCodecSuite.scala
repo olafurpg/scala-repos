@@ -54,8 +54,9 @@ final class KeyCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode one key to EXPIREAT at future timestamp", CodecTest) {
-    assert(codec(wrap("EXPIREAT moo 100\r\n")) == List(
-            ExpireAt(moo, Time.fromMilliseconds(100 * 1000))))
+    assert(
+      codec(wrap("EXPIREAT moo 100\r\n")) == List(
+        ExpireAt(moo, Time.fromMilliseconds(100 * 1000))))
   }
 
   test("Correctly encode one key to EXPIREAT a future interpolated timestamp",
@@ -63,14 +64,14 @@ final class KeyCodecSuite extends RedisRequestTest {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("EXPIREAT foo %d\r\n".format(time.inSeconds)))) {
       case ExpireAt(foo, timestamp) => {
-          assert(timestamp.inSeconds == time.inSeconds)
-        }
+        assert(timestamp.inSeconds == time.inSeconds)
+      }
     }
   }
 
   test("Correctly encode a KEYS pattern", CodecTest) {
     assert(
-        codec(wrap("KEYS h?llo\r\n")) == List(Keys(string2ChanBuf("h?llo"))))
+      codec(wrap("KEYS h?llo\r\n")) == List(Keys(string2ChanBuf("h?llo"))))
   }
 
   test("Correctly encode MOVE for one key to another database", CodecTest) {
@@ -103,7 +104,7 @@ final class KeyCodecSuite extends RedisRequestTest {
 
   test("Correctly encode PEXPIRE for one key in 100 seconds", CodecTest) {
     assert(
-        codec(wrap("PEXPIRE foo 100000\r\n")) == List(PExpire(foo, 100000L)))
+      codec(wrap("PEXPIRE foo 100000\r\n")) == List(PExpire(foo, 100000L)))
   }
 
   test("Correctly encode one key to never PEXPIRE", CodecTest) {
@@ -112,18 +113,19 @@ final class KeyCodecSuite extends RedisRequestTest {
 
   test("Correctly encode one key to PEXPIREAT at a future timestamp",
        CodecTest) {
-    assert(codec(wrap("PEXPIREAT boo 100000\r\n")) == List(
-            PExpireAt(boo, Time.fromMilliseconds(100000))))
+    assert(
+      codec(wrap("PEXPIREAT boo 100000\r\n")) == List(
+        PExpireAt(boo, Time.fromMilliseconds(100000))))
   }
 
   test(
-      "Correctly encode one key to PEXPIREAT at a future interpolated timestamp",
-      CodecTest) {
+    "Correctly encode one key to PEXPIREAT at a future interpolated timestamp",
+    CodecTest) {
     val time = Time.now + 10.seconds
     unwrap(codec(wrap("PEXPIREAT foo %d\r\n".format(time.inMilliseconds)))) {
       case PExpireAt(foo, timestamp) => {
-          assert(timestamp.inMilliseconds == time.inMilliseconds)
-        }
+        assert(timestamp.inMilliseconds == time.inMilliseconds)
+      }
     }
   }
 

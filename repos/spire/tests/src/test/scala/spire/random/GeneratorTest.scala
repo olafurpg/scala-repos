@@ -54,7 +54,8 @@ class GeneratorTest extends FunSuite {
     val name = getName(gen)
 
     bases.foreach { mod =>
-      test("%s nextInt(%d) distributed within %.2f%%" format
+      test(
+        "%s nextInt(%d) distributed within %.2f%%" format
           (name, mod, threshold * 100)) {
         val histogram = new Array[Int](mod)
         //val rng = gen.fromTime()

@@ -93,8 +93,8 @@ class RegexTokenizer(override val uid: String)
     * Default: true
     * @group param
     */
-  val gaps: BooleanParam = new BooleanParam(
-      this, "gaps", "Set regex to match gaps or tokens")
+  val gaps: BooleanParam =
+    new BooleanParam(this, "gaps", "Set regex to match gaps or tokens")
 
   /** @group setParam */
   def setGaps(value: Boolean): this.type = set(gaps, value)
@@ -107,8 +107,8 @@ class RegexTokenizer(override val uid: String)
     * Default: `"\\s+"`
     * @group param
     */
-  val pattern: Param[String] = new Param(
-      this, "pattern", "regex pattern used for tokenizing")
+  val pattern: Param[String] =
+    new Param(this, "pattern", "regex pattern used for tokenizing")
 
   /** @group setParam */
   def setPattern(value: String): this.type = set(pattern, value)
@@ -122,9 +122,9 @@ class RegexTokenizer(override val uid: String)
     * @group param
     */
   final val toLowercase: BooleanParam = new BooleanParam(
-      this,
-      "toLowercase",
-      "whether to convert all characters to lowercase before tokenizing.")
+    this,
+    "toLowercase",
+    "whether to convert all characters to lowercase before tokenizing.")
 
   /** @group setParam */
   def setToLowercase(value: Boolean): this.type = set(toLowercase, value)

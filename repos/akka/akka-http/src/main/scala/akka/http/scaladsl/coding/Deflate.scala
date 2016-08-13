@@ -15,7 +15,8 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.HttpEncodings
 
 class Deflate(val messageFilter: HttpMessage ⇒ Boolean)
-    extends Coder with StreamDecoder {
+    extends Coder
+    with StreamDecoder {
   val encoding = HttpEncodings.deflate
   def newCompressor = new DeflateCompressor
   def newDecompressorStage(maxBytesPerChunk: Int) =
@@ -43,8 +44,8 @@ class DeflateCompressor extends Compressor {
   override final def flush(): ByteString = flushWithBuffer(newTempBuffer())
   override final def finish(): ByteString = finishWithBuffer(newTempBuffer())
 
-  protected def compressWithBuffer(
-      input: ByteString, buffer: Array[Byte]): ByteString = {
+  protected def compressWithBuffer(input: ByteString,
+                                   buffer: Array[Byte]): ByteString = {
     require(deflater.needsInput())
     deflater.setInput(input.toArray)
     drainDeflater(deflater, buffer)
@@ -106,8 +107,9 @@ class DeflateDecompressor(
     }
 
     override def afterInflate = inflateState
-    override def afterBytesRead(
-        buffer: Array[Byte], offset: Int, length: Int): Unit = {}
+    override def afterBytesRead(buffer: Array[Byte],
+                                offset: Int,
+                                length: Int): Unit = {}
 
     startWith(inflateState)
   }

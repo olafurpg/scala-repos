@@ -35,15 +35,15 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
         if (throwableSym.isMonomorphicType) throwableSym.tpe
         else {
           debuglog(
-              s"Encountered polymorphic exception `${throwableSym.fullName}` while parsing class file.")
+            s"Encountered polymorphic exception `${throwableSym.fullName}` while parsing class file.")
           // in case we encounter polymorphic exception the best we can do is to convert that type to
           // monomorphic one by introducing existentials, see SI-7009 for details
           existentialAbstraction(throwableSym.typeParams, throwableSym.tpe)
         }
       this withAnnotation AnnotationInfo(
-          appliedType(ThrowsClass, throwableTpe),
-          List(Literal(Constant(throwableTpe))),
-          Nil)
+        appliedType(ThrowsClass, throwableTpe),
+        List(Literal(Constant(throwableTpe))),
+        Nil)
     }
 
     /** Tests for, get, or remove an annotation */
@@ -65,7 +65,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       withAnnotations(List(annot))
 
     @tailrec private def dropOtherAnnotations(
-        anns: List[AnnotationInfo], cls: Symbol): List[AnnotationInfo] =
+        anns: List[AnnotationInfo],
+        cls: Symbol): List[AnnotationInfo] =
       anns match {
         case ann :: rest =>
           if (ann matches cls) anns else dropOtherAnnotations(rest, cls)
@@ -90,7 +91,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     *  an instance of a Java enumeration value).
     */
   case class LiteralAnnotArg(const: Constant)
-      extends ClassfileAnnotArg with LiteralArgumentApi {
+      extends ClassfileAnnotArg
+      with LiteralArgumentApi {
     def value = const
     override def toString = const.escapedStringValue
   }
@@ -98,14 +100,16 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
 
   /** Represents an array of classfile annotation arguments */
   case class ArrayAnnotArg(args: Array[ClassfileAnnotArg])
-      extends ClassfileAnnotArg with ArrayArgumentApi {
+      extends ClassfileAnnotArg
+      with ArrayArgumentApi {
     override def toString = args.mkString("[", ", ", "]")
   }
   object ArrayAnnotArg extends ArrayArgumentExtractor
 
   /** Represents a nested classfile annotation */
   case class NestedAnnotArg(annInfo: AnnotationInfo)
-      extends ClassfileAnnotArg with NestedArgumentApi {
+      extends ClassfileAnnotArg
+      with NestedArgumentApi {
     // The nested annotation should not have any Scala annotation arguments
     assert(annInfo.args.isEmpty, annInfo.args)
     def annotation = annInfo
@@ -137,11 +141,11 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   case class ScalaSigBytes(bytes: Array[Byte]) extends ClassfileAnnotArg {
     override def toString =
       (bytes map { byte =>
-            (byte & 0xff).toHexString
-          }).mkString("[ ", " ", " ]")
+        (byte & 0xff).toHexString
+      }).mkString("[ ", " ", " ]")
     lazy val sevenBitsMayBeZero: Array[Byte] = {
       mapToNextModSevenBits(
-          scala.reflect.internal.pickling.ByteCodecs.encode8to7(bytes))
+        scala.reflect.internal.pickling.ByteCodecs.encode8to7(bytes))
     }
 
     /* In order to store a byte array (the pickle) using a bytecode-level annotation,
@@ -154,8 +158,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       // due to escaping, a zero byte in a classfile-annotation of string-type takes actually two characters.
       val numZeros =
         (sevenBitsMayBeZero count { b =>
-              b == 0
-            })
+          b == 0
+        })
 
       (sevenBitsMayBeZero.length + numZeros) <= 65535
     }
@@ -211,7 +215,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
               case ann if !ann.symbol.isInstanceOf[StubSymbol] => ann.symbol
             }
           categories exists
-          (category => metaSyms exists (_ isNonBottomSubClass category))
+            (category => metaSyms exists (_ isNonBottomSubClass category))
       }
   }
 
@@ -219,8 +223,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       val atp: Type,
       val args: List[Tree],
       val assocs: List[(Name, ClassfileAnnotArg)]
-  )
-      extends AnnotationInfo {
+  ) extends AnnotationInfo {
     // Classfile annot: args empty. Scala annot: assocs empty.
     assert(args.isEmpty || assocs.isEmpty, atp)
 
@@ -252,7 +255,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   final class LazyAnnotationInfo(lazyInfo: => AnnotationInfo)
       extends AnnotationInfo {
     private var forced = false
-    private lazy val forcedInfo = try lazyInfo finally forced = true
+    private lazy val forcedInfo = try lazyInfo
+    finally forced = true
 
     def atp: Type = forcedInfo.atp
     def args: List[Tree] = forcedInfo.args
@@ -422,7 +426,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
           jargs: List[(Name, ClassfileAnnotArg)]): List[Tree] = jargs match {
         case (name, jarg) :: rest =>
           AssignOrNamedArg(Ident(name), reverseEngineerArg(jarg)) :: reverseEngineerArgs(
-              rest)
+            rest)
         case Nil => Nil
       }
       if (ann.javaArgs.isEmpty) ann.scalaArgs
@@ -446,7 +450,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
           NestedAnnotArg(treeToAnnotation(arg))
         case _ =>
           throw new Exception(
-              s"unexpected java argument shape $arg: literals, arrays and nested annotations are supported")
+            s"unexpected java argument shape $arg: literals, arrays and nested annotations are supported")
       }
       def encodeJavaArgs(args: List[Tree]): List[(Name, ClassfileAnnotArg)] =
         args match {
@@ -454,7 +458,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
             (name, encodeJavaArg(arg)) :: encodeJavaArgs(rest)
           case arg :: rest =>
             throw new Exception(
-                s"unexpected java argument shape $arg: only AssignOrNamedArg trees are supported")
+              s"unexpected java argument shape $arg: only AssignOrNamedArg trees are supported")
           case Nil => Nil
         }
       val atp = tpt.tpe
@@ -466,10 +470,10 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
         AnnotationInfo(atp, Nil, encodeJavaArgs(args))
       else
         throw new Exception(
-            s"unexpected annotation type $atp: only subclasses of StaticAnnotation and ClassfileAnnotation are supported")
+          s"unexpected annotation type $atp: only subclasses of StaticAnnotation and ClassfileAnnotation are supported")
     case _ =>
       throw new Exception(
-          """unexpected tree shape: only q"new $annType(..$args)" is supported""")
+        """unexpected tree shape: only q"new $annType(..$args)" is supported""")
   }
 
   object UnmappableAnnotation extends CompleteAnnotationInfo(NoType, Nil, Nil)

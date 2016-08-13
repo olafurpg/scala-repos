@@ -53,7 +53,7 @@ object JavaStreamEnrichments {
       extends OutputStream {
     if (buffer.length < initPos) {
       illegal(
-          s"Initial position cannot be more than length: $initPos > ${buffer.length}")
+        s"Initial position cannot be more than length: $initPos > ${buffer.length}")
     }
     private[this] var pos = initPos
     def position: Int = pos
@@ -172,9 +172,9 @@ object JavaStreamEnrichments {
       val buf = new Array[Byte](8)
       readFully(buf)
       (buf(0).toLong << 56) + ((buf(1) & 255).toLong << 48) +
-      ((buf(2) & 255).toLong << 40) + ((buf(3) & 255).toLong << 32) +
-      ((buf(4) & 255).toLong << 24) + ((buf(5) & 255) << 16) +
-      ((buf(6) & 255) << 8) + (buf(7) & 255)
+        ((buf(2) & 255).toLong << 40) + ((buf(3) & 255).toLong << 32) +
+        ((buf(4) & 255).toLong << 24) + ((buf(5) & 255) << 16) +
+        ((buf(6) & 255) << 8) + (buf(7) & 255)
     }
 
     def readChar: Char = {
@@ -215,7 +215,7 @@ object JavaStreamEnrichments {
         if (skipped == c) ()
         else if (skipped == 0L)
           throw new IOException(
-              s"could not skipFully: count, c, skipped = ${(count, c, skipped)}")
+            s"could not skipFully: count, c, skipped = ${(count, c, skipped)}")
         else go(c - skipped)
       }
       if (count != 0L) go(count) else ()

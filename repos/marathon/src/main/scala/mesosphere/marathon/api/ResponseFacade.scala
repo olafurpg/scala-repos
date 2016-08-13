@@ -14,11 +14,13 @@ class ResponseFacade extends HttpResponse {
   override def sendRedirect(location: String): Unit = {
     builder.status(Status.TEMPORARY_REDIRECT).location(new URI(location))
   }
-  override def cookie(
-      name: String, value: String, maxAge: Int, secure: Boolean): Unit = {
+  override def cookie(name: String,
+                      value: String,
+                      maxAge: Int,
+                      secure: Boolean): Unit = {
     //scalastyle:off null
     builder.cookie(
-        new NewCookie(name, value, null, null, null, maxAge.toInt, secure))
+      new NewCookie(name, value, null, null, null, maxAge.toInt, secure))
   }
   override def body(mediaType: String, bytes: Array[Byte]): Unit = {
     builder.`type`(mediaType)

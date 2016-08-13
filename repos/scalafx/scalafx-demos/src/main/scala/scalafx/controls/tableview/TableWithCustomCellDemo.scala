@@ -40,9 +40,9 @@ import scalafx.scene.shape.Circle
 object TableWithCustomCellDemo extends JFXApp {
 
   val characters = ObservableBuffer[Person](
-      new Person("Peggy", "Sue", "555-6798", Color.Violet),
-      new Person("Rocky", "Raccoon", "555-6798", Color.GreenYellow),
-      new Person("Bungalow ", "Bill", "555-9275", Color.DarkSalmon)
+    new Person("Peggy", "Sue", "555-6798", Color.Violet),
+    new Person("Rocky", "Raccoon", "555-6798", Color.GreenYellow),
+    new Person("Bungalow ", "Bill", "555-9275", Color.DarkSalmon)
   )
 
   stage = new PrimaryStage {
@@ -50,29 +50,29 @@ object TableWithCustomCellDemo extends JFXApp {
     scene = new Scene {
       content = new TableView[Person](characters) {
         columns ++= List(
-            new TableColumn[Person, String] {
-              text = "First Name"
-              cellValueFactory = { _.value.firstName }
-              prefWidth = 100
-            },
-            new TableColumn[Person, String]() {
-              text = "Last Name"
-              cellValueFactory = { _.value.lastName }
-              prefWidth = 100
-            },
-            new TableColumn[Person, Color] {
-              text = "Favorite Color"
-              cellValueFactory = { _.value.favoriteColor }
-              // Render the property value when it changes, including initial assignment
-              cellFactory = { _ =>
-                new TableCell[Person, Color] {
-                  item.onChange { (_, _, newColor) =>
-                    graphic = new Circle { fill = newColor; radius = 8 }
-                  }
+          new TableColumn[Person, String] {
+            text = "First Name"
+            cellValueFactory = { _.value.firstName }
+            prefWidth = 100
+          },
+          new TableColumn[Person, String]() {
+            text = "Last Name"
+            cellValueFactory = { _.value.lastName }
+            prefWidth = 100
+          },
+          new TableColumn[Person, Color] {
+            text = "Favorite Color"
+            cellValueFactory = { _.value.favoriteColor }
+            // Render the property value when it changes, including initial assignment
+            cellFactory = { _ =>
+              new TableCell[Person, Color] {
+                item.onChange { (_, _, newColor) =>
+                  graphic = new Circle { fill = newColor; radius = 8 }
                 }
               }
-              prefWidth = 100
             }
+            prefWidth = 100
+          }
         )
       }
     }

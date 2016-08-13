@@ -108,7 +108,7 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
                          b6: Byte,
                          b7: Byte): Long = {
     (makeIntBE(b0, b1, b2, b3).toLong << 32) |
-    (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
+      (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
   }
 
   @inline
@@ -232,9 +232,9 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
   }
 
   @inline
-  private def store8Bytes(index: Int,
-                          bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte,
-                          Byte)): Unit = {
+  private def store8Bytes(
+      index: Int,
+      bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte)): Unit = {
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2

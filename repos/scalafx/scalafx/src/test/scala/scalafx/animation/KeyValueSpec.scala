@@ -43,10 +43,11 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class KeyValueSpec
     extends SimpleSFXDelegateSpec[jfxa.KeyValue, KeyValue[_, _]](
-        classOf[jfxa.KeyValue], classOf[KeyValue[_, _]]) {
+      classOf[jfxa.KeyValue],
+      classOf[KeyValue[_, _]]) {
 
   //////////////////////////////
-  // PRIVATE VALUES AND METHODS 
+  // PRIVATE VALUES AND METHODS
   //////////////////////////////
 
   private val name = "test"
@@ -63,14 +64,15 @@ class KeyValueSpec
       kv.interpolator should equal(jfxa.Interpolator.EASE_BOTH)
   }
 
-  private def evaluateFromJfx[S, J](
-      property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J]) {
+  private def evaluateFromJfx[S, J](property: jfxbp.Property[J],
+                                    endValue: S,
+                                    kv: KeyValue[S, J]) {
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
   }
 
   //////////////////////////////
-  // OVERRIDE PROTECTED METHODS 
+  // OVERRIDE PROTECTED METHODS
   //////////////////////////////
 
   override protected def getScalaClassInstance = KeyValue(doubleProperty, 50d)
@@ -79,7 +81,7 @@ class KeyValueSpec
     new jfxa.KeyValue(doubleProperty, double2Double(50))
 
   /////////
-  // TESTS 
+  // TESTS
   /////////
 
   it should "have a convenient apply construction format for integers" in {

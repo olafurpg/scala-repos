@@ -13,7 +13,8 @@ import org.ensime.indexer.SearchServiceTestUtils
 import org.ensime.util.EnsimeSpec
 
 class JavaCompilerSpec
-    extends EnsimeSpec with IsolatedJavaCompilerFixture
+    extends EnsimeSpec
+    with IsolatedJavaCompilerFixture
     with SearchServiceTestUtils {
 
   val original = EnsimeConfigFixture.SimpleTestProject
@@ -26,7 +27,7 @@ class JavaCompilerSpec
                                      "class Test1 {",
                                      "  ksjdfkdjsf @1@",
                                      "}") { (sf, p, label, cc) =>
-      }
+        }
       store.notes should not be empty
     }
   }
@@ -55,11 +56,11 @@ class JavaCompilerSpec
   it should "link symbols to their source positions" in {
     withJavaCompiler { (_, config, cc, store, _) =>
       val test1 = SourceFileInfo(
-          new File(config.rootDir,
-                   "testing/simple/src/main/java/org/example/Test1.java"))
+        new File(config.rootDir,
+                 "testing/simple/src/main/java/org/example/Test1.java"))
       val test2 = SourceFileInfo(
-          new File(config.rootDir,
-                   "testing/simple/src/main/java/org/example/Test2.java"))
+        new File(config.rootDir,
+                 "testing/simple/src/main/java/org/example/Test2.java"))
 
       cc.askLinkPos(JavaFqn("org.example", "Test2", None), test2) should matchPattern {
         case Some(OffsetSourcePosition(f, 22)) =>
@@ -79,34 +80,34 @@ class JavaCompilerSpec
       implicit val searchService = search
       refresh()
       runForPositionInCompiledSource(
-          config,
-          cc,
-          "package org.example;",
-          "import java.io.File;",
-          "class Test1 {",
-          "  private class Foo { public Foo() {} }",
-          "  public static final int CONST = 2;",
-          "  private void main(String[] args) {",
-          "    int foo = 1;",
-          "    System.out.println(ar@1@gs);",
-          "    System.out.pr@3@intln(new Fo@2@o());",
-          "    System.out.println(new Fi@4@le(\".\"));",
-          "    System.out.println(Tes@5@t2.com@6@pute());",
-          "    System.out.println(comp@7@ute(2, 3));",
-          "    System.out.println(CO@8@NST);",
-          "    System.out.println(@11@fo@0@o@12@);",
-          "    int k = 2;",
-          "    System.out.println( @13@k@14@ );",
-          "  }",
-          "  private static int compute(int a, int b) {",
-          "    return a + b;",
-          "  }",
-          "  private static String hello(D@9@ay day) {",
-          "    if (day == Day.MO@10@N) return \"monday\";",
-          "    return \"tues\";",
-          "  }",
-          "  public enum Day { MON, TUES }",
-          "}") { (sf, offset, label, cc) =>
+        config,
+        cc,
+        "package org.example;",
+        "import java.io.File;",
+        "class Test1 {",
+        "  private class Foo { public Foo() {} }",
+        "  public static final int CONST = 2;",
+        "  private void main(String[] args) {",
+        "    int foo = 1;",
+        "    System.out.println(ar@1@gs);",
+        "    System.out.pr@3@intln(new Fo@2@o());",
+        "    System.out.println(new Fi@4@le(\".\"));",
+        "    System.out.println(Tes@5@t2.com@6@pute());",
+        "    System.out.println(comp@7@ute(2, 3));",
+        "    System.out.println(CO@8@NST);",
+        "    System.out.println(@11@fo@0@o@12@);",
+        "    int k = 2;",
+        "    System.out.println( @13@k@14@ );",
+        "  }",
+        "  private static int compute(int a, int b) {",
+        "    return a + b;",
+        "  }",
+        "  private static String hello(D@9@ay day) {",
+        "    if (day == Day.MO@10@N) return \"monday\";",
+        "    return \"tues\";",
+        "  }",
+        "  public enum Day { MON, TUES }",
+        "}") { (sf, offset, label, cc) =>
         val info = cc.askSymbolAtPoint(sf, offset).get
         label match {
           case "0" | "11" | "12" =>
@@ -170,17 +171,16 @@ class JavaCompilerSpec
               case Some(OffsetSourcePosition(f, 48))
                   if f.getName == "Test2.java" =>
             }
-          case "7" =>
-            {}
-            info.name shouldBe "org.example.Test1.compute(int,int)"
-            info.localName shouldBe "compute"
-            info.`type`.name shouldBe "(int,int)int"
-            info.isCallable shouldBe true
-            info.declPos should matchPattern {
-              case Some(OffsetSourcePosition(f, 481))
-                  if f.getName == "Test1.java" =>
-            }
-          case "8" =>
+          case "7" => {}
+          info.name shouldBe "org.example.Test1.compute(int,int)"
+          info.localName shouldBe "compute"
+          info.`type`.name shouldBe "(int,int)int"
+          info.isCallable shouldBe true
+          info.declPos should matchPattern {
+            case Some(OffsetSourcePosition(f, 481))
+                if f.getName == "Test1.java" =>
+          }
+        case "8" =>
             info.name shouldBe "org.example.Test1.CONST"
             info.localName shouldBe "CONST"
             info.`type`.name shouldBe "int"
@@ -219,34 +219,34 @@ class JavaCompilerSpec
   it should "find completions at point" in {
     withJavaCompiler { (_, config, cc, store, search) =>
       runForPositionInCompiledSource(
-          config,
-          cc,
-          "import java.io.File;",
-          "import java.lang.Str@5@;",
-          "import java.util.Map.E@6@;",
-          "import java.util.Map.E@7@blablabla;",
-          "class Test1 {",
-          "  public static final int MAX_VALUE = 10;",
-          "  public static class TestInner {",
-          "    public int maxValue = 10;",
-          "    private void main(String foo, String bar) {",
-          "      File f = new File(\".\");",
-          "      f.toSt@0@;",
-          "      System.out.println(f.toStr@1@);",
-          "      System.out.println((f).toStr@2@);",
-          "      System.out.println(f.toString().substr@3@);",
-          "      f.@4@;",
-          "      new Fi@8@",
-          "      System.out.println(fo@9@ + bar);",
-          "      System.out.println(maxV@10@);",
-          "      System.out.println(MAX_@11@);",
-          "      System.out.println(new Inte@12@);",
-          "      int testinner = 5;",
-          "      System.out.println(f.toStr@1@);",
-          "      System.out.@14@",
-          "    }",
-          "  }",
-          "}") { (sf, offset, label, cc) =>
+        config,
+        cc,
+        "import java.io.File;",
+        "import java.lang.Str@5@;",
+        "import java.util.Map.E@6@;",
+        "import java.util.Map.E@7@blablabla;",
+        "class Test1 {",
+        "  public static final int MAX_VALUE = 10;",
+        "  public static class TestInner {",
+        "    public int maxValue = 10;",
+        "    private void main(String foo, String bar) {",
+        "      File f = new File(\".\");",
+        "      f.toSt@0@;",
+        "      System.out.println(f.toStr@1@);",
+        "      System.out.println((f).toStr@2@);",
+        "      System.out.println(f.toString().substr@3@);",
+        "      f.@4@;",
+        "      new Fi@8@",
+        "      System.out.println(fo@9@ + bar);",
+        "      System.out.println(maxV@10@);",
+        "      System.out.println(MAX_@11@);",
+        "      System.out.println(new Inte@12@);",
+        "      int testinner = 5;",
+        "      System.out.println(f.toStr@1@);",
+        "      System.out.@14@",
+        "    }",
+        "  }",
+        "}") { (sf, offset, label, cc) =>
         val info = cc.askCompletionsAtPoint(sf, offset, 0, false)
         label match {
           case "0" =>
@@ -300,20 +300,20 @@ class JavaCompilerSpec
   it should "find doc sig at point" in withJavaCompiler {
     (_, config, cc, store, search) =>
       runForPositionInCompiledSource(
-          config,
-          cc,
-          "import java.io.Fi@5@le;",
-          "class Test1 {",
-          "  private void main() {",
-          "    File f = new F@1@ile(\".\")",
-          "    System.out.println(f.toStr@2@ing());",
-          "    File.create@3@TempFile(\"bla\", \"foo\");",
-          "    File.create@4@TempFile(\"bla\", \"foo\", f);",
-          "    System.out.println(\"bla\".ind@6@exOf(\"b\"));",
-          "    System.out.println(\"bla\".index@7@Of(\"b\", 1));",
-          "    System.out.println(\"bla\".index@8@Of(1));",
-          "  }",
-          "}") { (sf, offset, label, cc) =>
+        config,
+        cc,
+        "import java.io.Fi@5@le;",
+        "class Test1 {",
+        "  private void main() {",
+        "    File f = new F@1@ile(\".\")",
+        "    System.out.println(f.toStr@2@ing());",
+        "    File.create@3@TempFile(\"bla\", \"foo\");",
+        "    File.create@4@TempFile(\"bla\", \"foo\", f);",
+        "    System.out.println(\"bla\".ind@6@exOf(\"b\"));",
+        "    System.out.println(\"bla\".index@7@Of(\"b\", 1));",
+        "    System.out.println(\"bla\".index@8@Of(1));",
+        "  }",
+        "}") { (sf, offset, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(sf, offset).get.java
         label match {
           case "0" => sig.fqn shouldBe DocFqn("", "Test1")
@@ -322,12 +322,13 @@ class JavaCompilerSpec
             sig shouldBe DocSig(DocFqn("java.io", "File"), Some("toString()"));
           case "3" =>
             sig shouldBe DocSig(
-                DocFqn("java.io", "File"),
-                Some("createTempFile(java.lang.String,java.lang.String)"));
+              DocFqn("java.io", "File"),
+              Some("createTempFile(java.lang.String,java.lang.String)"));
           case "4" =>
             sig shouldBe DocSig(
-                DocFqn("java.io", "File"),
-                Some("createTempFile(java.lang.String,java.lang.String,java.io.File)"));
+              DocFqn("java.io", "File"),
+              Some(
+                "createTempFile(java.lang.String,java.lang.String,java.io.File)"));
           case "5" => sig.fqn shouldBe DocFqn("java.io", "File")
           case "6" =>
             sig shouldBe DocSig(DocFqn("java.lang", "String"),

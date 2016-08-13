@@ -50,11 +50,12 @@ class Node @Since("1.2.0")(
     @Since("1.0.0") var leftNode: Option[Node],
     @Since("1.0.0") var rightNode: Option[Node],
     @Since("1.0.0") var stats: Option[InformationGainStats])
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   override def toString: String = {
     s"id = $id, isLeaf = $isLeaf, predict = $predict, impurity = $impurity, " +
-    s"split = $split, stats = $stats"
+      s"split = $split, stats = $stats"
   }
 
   /**
@@ -63,8 +64,8 @@ class Node @Since("1.2.0")(
     */
   @Since("1.0.0")
   @deprecated(
-      "build should no longer be used since trees are constructed on-the-fly in training",
-      "1.2.0")
+    "build should no longer be used since trees are constructed on-the-fly in training",
+    "1.2.0")
   def build(nodes: Array[Node]): Unit = {
     logDebug("building node " + id + " at level " + Node.indexToLevel(id))
     logDebug("id = " + id + ", split = " + split)
@@ -180,9 +181,9 @@ class Node @Since("1.2.0")(
       prefix + s"Predict: ${predict.predict}\n"
     } else {
       prefix + s"If ${splitToString(split.get, left = true)}\n" +
-      leftNode.get.subtreeToString(indentFactor + 1) + prefix +
-      s"Else ${splitToString(split.get, left = false)}\n" +
-      rightNode.get.subtreeToString(indentFactor + 1)
+        leftNode.get.subtreeToString(indentFactor + 1) + prefix +
+        s"Else ${splitToString(split.get, left = false)}\n" +
+        rightNode.get.subtreeToString(indentFactor + 1)
     }
   }
 

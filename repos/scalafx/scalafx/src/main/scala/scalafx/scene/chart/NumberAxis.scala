@@ -46,7 +46,7 @@ object NumberAxis {
             upperBound: Double,
             tickUnit: Double) =
     new NumberAxis(
-        new jfxsc.NumberAxis(axisLabel, lowerBound, upperBound, tickUnit))
+      new jfxsc.NumberAxis(axisLabel, lowerBound, upperBound, tickUnit))
 
   def apply(axisLabel: String) = new NumberAxis { label = axisLabel }
 
@@ -62,19 +62,21 @@ object NumberAxis {
 
     def apply(axis: NumberAxis, prefix: String, suffix: String) =
       new DefaultFormatter(
-          new jfxsc.NumberAxis.DefaultFormatter(axis, prefix, suffix))
+        new jfxsc.NumberAxis.DefaultFormatter(axis, prefix, suffix))
   }
 
   class DefaultFormatter(
       override val delegate: jfxsc.NumberAxis.DefaultFormatter)
-      extends StringConverterDelegate[
-          java.lang.Number, Number, jfxsc.NumberAxis.DefaultFormatter](
-          delegate)
+      extends StringConverterDelegate[java.lang.Number,
+                                      Number,
+                                      jfxsc.NumberAxis.DefaultFormatter](
+        delegate)
 }
 
 class NumberAxis(
     override val delegate: jfxsc.NumberAxis = new jfxsc.NumberAxis)
-    extends ValueAxis[Number](delegate) with SFXDelegate[jfxsc.NumberAxis] {
+    extends ValueAxis[Number](delegate)
+    with SFXDelegate[jfxsc.NumberAxis] {
 
   def this(lowerBound: Double, upperBound: Double, tickUnit: Double) {
     this(new jfxsc.NumberAxis(lowerBound, upperBound, tickUnit))

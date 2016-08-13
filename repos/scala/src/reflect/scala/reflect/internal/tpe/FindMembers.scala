@@ -9,12 +9,13 @@ import Flags._
 import util.Statistics
 import TypesStats._
 
-trait FindMembers {
-  this: SymbolTable =>
+trait FindMembers { this: SymbolTable =>
 
   /** Implementation of `Type#{findMember, findMembers}` */
-  private[internal] abstract class FindMemberBase[T](
-      tpe: Type, name: Name, excludedFlags: Long, requiredFlags: Long) {
+  private[internal] abstract class FindMemberBase[T](tpe: Type,
+                                                     name: Name,
+                                                     excludedFlags: Long,
+                                                     requiredFlags: Long) {
     protected val initBaseClasses: List[Symbol] = tpe.baseClasses
 
     // The first base class, or the symbol of the ThisType
@@ -48,8 +49,10 @@ trait FindMembers {
       if (Statistics.canEnable) Statistics.incCounter(findMemberCount)
       val start =
         if (Statistics.canEnable)
-          Statistics.pushTimer(typeOpsStack, findMemberNanos) else null
-      try searchConcreteThenDeferred finally if (Statistics.canEnable)
+          Statistics.pushTimer(typeOpsStack, findMemberNanos)
+        else null
+      try searchConcreteThenDeferred
+      finally if (Statistics.canEnable)
         Statistics.popTimer(typeOpsStack, start)
     }
 
@@ -57,11 +60,11 @@ trait FindMembers {
 
     // SLS 5.1.3 First, a concrete definition always overrides an abstract definition
     private def searchConcreteThenDeferred: T = {
-      val deferredSeen = walkBaseClasses(
-          requiredFlags, excludedFlags | DEFERRED)
+      val deferredSeen =
+        walkBaseClasses(requiredFlags, excludedFlags | DEFERRED)
       if (deferredSeen) // OPT: the `if` avoids a second pass if the first pass didn't spot any candidates.
-        walkBaseClasses(
-            requiredFlags | DEFERRED, excludedFlags & ~(DEFERRED.toLong))
+        walkBaseClasses(requiredFlags | DEFERRED,
+                        excludedFlags & ~(DEFERRED.toLong))
       result
     }
 
@@ -152,9 +155,9 @@ trait FindMembers {
       // TODO Is the special handling of `private[this]` vs `private` backed up by the spec?
       def admitPrivate(sym: Symbol): Boolean =
         (selectorClass == owner) ||
-        (!isPrivateLocal // private[this] only a member from within the selector class. (Optimization only? Does the spec back this up?)
+          (!isPrivateLocal // private[this] only a member from within the selector class. (Optimization only? Does the spec back this up?)
             &&
-            (!seenFirstNonRefinementClass ||
+              (!seenFirstNonRefinementClass ||
                 refinementParents.contains(owner)))
 
       (!isPrivate || admitPrivate(sym)) &&
@@ -164,12 +167,12 @@ trait FindMembers {
     // True unless the already-found member of type `memberType` matches the candidate symbol `other`.
     protected def isNewMember(member: Symbol, other: Symbol): Boolean =
       ((other ne member) &&
-          ((member.owner eq other.owner) // same owner, therefore overload
-              || (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
-              || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
-              ||
-              !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
-              ))
+        ((member.owner eq other.owner) // same owner, therefore overload
+          || (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
+          || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
+          ||
+            !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
+        ))
 
     // Cache for the member type of a candidate member when comparing against multiple, already-found existing members
     //
@@ -202,10 +205,13 @@ trait FindMembers {
     }
   }
 
-  private[reflect] final class FindMembers(
-      tpe: Type, excludedFlags: Long, requiredFlags: Long)
-      extends FindMemberBase[Scope](
-          tpe, nme.ANYname, excludedFlags, requiredFlags) {
+  private[reflect] final class FindMembers(tpe: Type,
+                                           excludedFlags: Long,
+                                           requiredFlags: Long)
+      extends FindMemberBase[Scope](tpe,
+                                    nme.ANYname,
+                                    excludedFlags,
+                                    requiredFlags) {
     private[this] var _membersScope: Scope = null
     private def membersScope: Scope = {
       if (_membersScope eq null) _membersScope = newFindMemberScope
@@ -219,7 +225,7 @@ trait FindMembers {
       val members = membersScope
       var others = members.lookupEntry(sym.name)
       var isNew = true
-      while ( (others ne null) && isNew) {
+      while ((others ne null) && isNew) {
         val member = others.sym
         if (!isNewMember(member, sym)) isNew = false
         others = members lookupNextEntry others // next existing member with the same name.
@@ -267,7 +273,7 @@ trait FindMembers {
         var ms: List[Symbol] = members
 
         var isNew = true
-        while ( (ms ne null) && isNew) {
+        while ((ms ne null) && isNew) {
           val member = ms.head
           if (!isNewMember(member, sym)) isNew = false
           ms = ms.tail

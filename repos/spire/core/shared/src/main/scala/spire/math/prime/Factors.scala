@@ -21,7 +21,8 @@ object Factors {
 }
 
 case class Factors(factors: Map[SafeLong, Int], sign: Sign)
-    extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
+    extends Iterable[(SafeLong, Int)]
+    with Ordered[Factors] { lhs =>
 
   private[prime] def prod(m: Map[SafeLong, Int]): SafeLong =
     m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * p.pow(e) }

@@ -22,7 +22,7 @@ object Imports {
 object OrgPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def projectSettings = Seq(
-      organization := "override"
+    organization := "override"
   )
 }
 
@@ -68,10 +68,10 @@ object R extends AutoPlugin {
   override def trigger = allRequirements
 
   override def projectSettings = Seq(
-      // tests proper ordering: R requires Q, so Q settings should come first
-      del in q += " R",
-      // tests that configurations are properly registered, enabling delegation from p to q
-      demo += (del in p).value
+    // tests proper ordering: R requires Q, so Q settings should come first
+    del in q += " R",
+    // tests that configurations are properly registered, enabling delegation from p to q
+    demo += (del in p).value
   )
 }
 
@@ -82,7 +82,7 @@ object S extends AutoPlugin {
   override def trigger = noTrigger
 
   override def projectSettings = Seq(
-      del in q += " S",
-      organization := "S"
+    del in q += " S",
+    organization := "S"
   )
 }

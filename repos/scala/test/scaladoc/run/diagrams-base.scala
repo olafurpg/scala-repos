@@ -52,8 +52,8 @@ object Test extends ScaladocModelTest {
     val (incoming, outgoing) = diag.edges.partition(!_._1.isThisNode)
     assert(incoming.length == 5)
     assert(
-        outgoing.head._2.length == 4,
-        s"${outgoing.head._2} has length ${outgoing.head._2.length}, expecting 4")
+      outgoing.head._2.length == 4,
+      s"${outgoing.head._2} has length ${outgoing.head._2.length}, expecting 4")
 
     val (outgoingSuperclass, outgoingImplicit) =
       outgoing.head._2.partition(_.isNormalNode)

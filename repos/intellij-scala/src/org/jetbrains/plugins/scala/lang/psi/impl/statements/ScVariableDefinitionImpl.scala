@@ -16,13 +16,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScVariableStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScVariableDefinitionImpl private (
-    stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
+class ScVariableDefinitionImpl private (stub: StubElement[ScVariable],
+                                        nodeType: IElementType,
+                                        node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScVariableDefinition {
   override def accept(visitor: PsiElementVisitor) {
@@ -60,7 +64,7 @@ class ScVariableDefinitionImpl private (
       expr
         .map(_.getType(TypingContext.empty))
         .getOrElse(
-            Failure("Cannot infer type without an expression", Some(this)))
+          Failure("Cannot infer type without an expression", Some(this)))
   }
 
   def typeElement: Option[ScTypeElement] = {

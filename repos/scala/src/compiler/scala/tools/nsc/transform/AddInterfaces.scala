@@ -41,8 +41,8 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
   }
 
 // Tree transformation --------------------------------------------------------------
-  private class ChangeOwnerAndReturnTraverser(
-      oldowner: Symbol, newowner: Symbol)
+  private class ChangeOwnerAndReturnTraverser(oldowner: Symbol,
+                                              newowner: Symbol)
       extends ChangeOwnerTraverser(oldowner, newowner) {
     override def traverse(tree: Tree) {
       tree match {
@@ -69,8 +69,7 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
     }
     val mixinConstructorCalls: List[Tree] = {
       for (mc <- clazz.mixinClasses.reverse if mc.isTrait &&
-                mc.primaryConstructor != NoSymbol) yield
-        mixinConstructorCall(mc)
+             mc.primaryConstructor != NoSymbol) yield mixinConstructorCall(mc)
     }
     tree match {
 
@@ -88,9 +87,9 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
         val (presuper, supercall :: rest) =
           stats span (t => t.hasSymbolWhich(_ hasFlag PRESUPER))
         treeCopy.Block(
-            tree,
-            presuper ::: (supercall :: mixinConstructorCalls ::: rest),
-            expr)
+          tree,
+          presuper ::: (supercall :: mixinConstructorCalls ::: rest),
+          expr)
     }
   }
 
@@ -100,7 +99,7 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
       val tree1 = tree match {
         case DefDef(_, _, _, _, _, _)
             if sym.isClassConstructor && sym.isPrimaryConstructor &&
-            sym.owner != ArrayClass =>
+              sym.owner != ArrayClass =>
           deriveDefDef(tree)(addMixinConstructorCalls(_, sym.owner)) // (3)
         case Template(parents, self, body) =>
           val parents1 =

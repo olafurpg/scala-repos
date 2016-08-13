@@ -37,7 +37,8 @@ trait NetworkFailureSpec extends DefaultTimeout { self: AkkaSpec ⇒
     Future {
       try {
         enableNetworkThrottling()
-        println("===>>> Throttling network with [" + BytesPerSecond + ", " +
+        println(
+          "===>>> Throttling network with [" + BytesPerSecond + ", " +
             DelayMillis + "] for [" + duration + "]")
         Thread.sleep(duration.toMillis)
         restoreIP
@@ -72,73 +73,73 @@ trait NetworkFailureSpec extends DefaultTimeout { self: AkkaSpec ⇒
   def enableNetworkThrottling() = {
     restoreIP()
     assert(
-        new ProcessBuilder("ipfw",
-                           "add",
-                           "pipe",
-                           "1",
-                           "ip",
-                           "from",
-                           "any",
-                           "to",
-                           "any").start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "add",
+                         "pipe",
+                         "1",
+                         "ip",
+                         "from",
+                         "any",
+                         "to",
+                         "any").start.waitFor == 0)
     assert(
-        new ProcessBuilder("ipfw",
-                           "add",
-                           "pipe",
-                           "2",
-                           "ip",
-                           "from",
-                           "any",
-                           "to",
-                           "any").start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "add",
+                         "pipe",
+                         "2",
+                         "ip",
+                         "from",
+                         "any",
+                         "to",
+                         "any").start.waitFor == 0)
     assert(
-        new ProcessBuilder("ipfw",
-                           "pipe",
-                           "1",
-                           "config",
-                           "bw",
-                           BytesPerSecond,
-                           "delay",
-                           DelayMillis).start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "pipe",
+                         "1",
+                         "config",
+                         "bw",
+                         BytesPerSecond,
+                         "delay",
+                         DelayMillis).start.waitFor == 0)
     assert(
-        new ProcessBuilder("ipfw",
-                           "pipe",
-                           "2",
-                           "config",
-                           "bw",
-                           BytesPerSecond,
-                           "delay",
-                           DelayMillis).start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "pipe",
+                         "2",
+                         "config",
+                         "bw",
+                         BytesPerSecond,
+                         "delay",
+                         DelayMillis).start.waitFor == 0)
   }
 
   def enableNetworkDrop() = {
     restoreIP()
     assert(
-        new ProcessBuilder("ipfw",
-                           "add",
-                           "1",
-                           "deny",
-                           "tcp",
-                           "from",
-                           "any",
-                           "to",
-                           "any",
-                           PortRange).start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "add",
+                         "1",
+                         "deny",
+                         "tcp",
+                         "from",
+                         "any",
+                         "to",
+                         "any",
+                         PortRange).start.waitFor == 0)
   }
 
   def enableTcpReset() = {
     restoreIP()
     assert(
-        new ProcessBuilder("ipfw",
-                           "add",
-                           "1",
-                           "reset",
-                           "tcp",
-                           "from",
-                           "any",
-                           "to",
-                           "any",
-                           PortRange).start.waitFor == 0)
+      new ProcessBuilder("ipfw",
+                         "add",
+                         "1",
+                         "reset",
+                         "tcp",
+                         "from",
+                         "any",
+                         "to",
+                         "any",
+                         PortRange).start.waitFor == 0)
   }
 
   def restoreIP() = {

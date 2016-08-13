@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -20,12 +20,17 @@ import org.junit.Assert._
 import org.scalatest.junit.JUnitSuite
 import org.junit.Test
 import kafka.utils.TestUtils
-import kafka.message.{DefaultCompressionCodec, NoCompressionCodec, CompressionCodec, Message}
+import kafka.message.{
+  DefaultCompressionCodec,
+  NoCompressionCodec,
+  CompressionCodec,
+  Message
+}
 
 trait BaseMessageSetTestCases extends JUnitSuite {
 
-  val messages = Array(
-      new Message("abcd".getBytes()), new Message("efgh".getBytes()))
+  val messages =
+    Array(new Message("abcd".getBytes()), new Message("efgh".getBytes()))
   def createMessageSet(
       messages: Seq[Message],
       compressed: CompressionCodec = NoCompressionCodec): MessageSet
@@ -69,8 +74,8 @@ trait BaseMessageSetTestCases extends JUnitSuite {
   @Test
   def testSizeInBytesWithCompression() {
     assertEquals(
-        "Empty message set should have 0 bytes.",
-        0, // overhead of the GZIP output stream
-        createMessageSet(Array[Message](), DefaultCompressionCodec).sizeInBytes)
+      "Empty message set should have 0 bytes.",
+      0, // overhead of the GZIP output stream
+      createMessageSet(Array[Message](), DefaultCompressionCodec).sizeInBytes)
   }
 }

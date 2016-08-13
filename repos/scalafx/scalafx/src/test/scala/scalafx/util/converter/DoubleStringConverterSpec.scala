@@ -44,9 +44,9 @@ class DoubleStringConverterSpec
                                                 jfxuc.DoubleStringConverter,
                                                 Double,
                                                 DoubleStringConverter](
-        classOf[jfxuc.DoubleStringConverter],
-        classOf[DoubleStringConverter],
-        classOf[Double]) {
+      classOf[jfxuc.DoubleStringConverter],
+      classOf[DoubleStringConverter],
+      classOf[Double]) {
 
   val examples = List((0.0, "0.0"),
                       (123.09, "123.09"),

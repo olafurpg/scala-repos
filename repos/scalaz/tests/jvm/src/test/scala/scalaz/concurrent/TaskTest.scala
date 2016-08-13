@@ -18,8 +18,8 @@ object TaskTest extends SpecLite {
 
   // standard worst case scenario for trampolining -
   // huge series of left associated binds
-  def leftAssociatedBinds(
-      seed: (=> Int) => Task[Int], cur: (=> Int) => Task[Int]): Task[Int] =
+  def leftAssociatedBinds(seed: (=> Int) => Task[Int],
+                          cur: (=> Int) => Task[Int]): Task[Int] =
     (0 to N).map(cur(_)).foldLeft(seed(0))(Task.taskInstance.lift2(_ + _))
 
   val options =
@@ -107,7 +107,7 @@ object TaskTest extends SpecLite {
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
     val t2 = Task { 43 }
     Nondeterminism[Task].both(t1, t2).unsafePerformSyncAttempt == -\/(
-        FailWhale)
+      FailWhale)
   }
 
   "handles exceptions in handle" ! {
@@ -207,7 +207,7 @@ object TaskTest extends SpecLite {
       }
 
       val t = fork(
-          Task.gatherUnordered(Seq(t1, t2, t3), exceptionCancels = true))(es3)
+        Task.gatherUnordered(Seq(t1, t2, t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
@@ -236,7 +236,7 @@ object TaskTest extends SpecLite {
       }
 
       val t = fork(
-          Task.gatherUnordered(Seq(t1, t2, t3), exceptionCancels = true))(es3)
+        Task.gatherUnordered(Seq(t1, t2, t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
@@ -259,17 +259,18 @@ object TaskTest extends SpecLite {
 
       val seenThreadNames = scala.collection.JavaConversions
         .asScalaSet(ju.Collections.synchronizedSet(new ju.HashSet[String]()))
-      val t = for (i <- 0 to 5) yield
-        fork {
-          seenThreadNames += currentThread().getName()
-          //Prevent the execution scheduler from reusing threads. This will only
-          //proceed after all 6 threads reached this point.
-          barrier.await(1, TimeUnit.SECONDS)
-          now(('a' + i).toChar)
-        }
+      val t = for (i <- 0 to 5)
+        yield
+          fork {
+            seenThreadNames += currentThread().getName()
+            //Prevent the execution scheduler from reusing threads. This will only
+            //proceed after all 6 threads reached this point.
+            barrier.await(1, TimeUnit.SECONDS)
+            now(('a' + i).toChar)
+          }
 
       val r = Nondeterminism[Task].nmap6(t(0), t(1), t(2), t(3), t(4), t(5))(
-          List(_, _, _, _, _, _))
+        List(_, _, _, _, _, _))
       val chars = List('a', 'b', 'c', 'd', 'e', 'f')
       r.unsafePerformSync must_== chars
       //Ensure we saw 6 distinct threads.

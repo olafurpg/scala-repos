@@ -7,14 +7,16 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 import scala.text.Document
 
 trait JsonSupportServlet[T]
-    extends ScalatraBase with JsonSupport[T] with JValueResult {
+    extends ScalatraBase
+    with JsonSupport[T]
+    with JValueResult {
 
   post("/json") {
     parsedBody match {
       case JNothing ⇒ halt(400, "invalid json")
       case json: JObject ⇒ {
-          (json \ "name").extract[String]
-        }
+        (json \ "name").extract[String]
+      }
       case _ ⇒ halt(400, "unknown json")
     }
   }
@@ -96,7 +98,8 @@ trait BigDecimalJsonRequestSpec extends MutableScalatraSpec {
 
 // servlets
 class NativeJsonSupportServlet(val withBigDecimal: Boolean)
-    extends ScalatraServlet with JsonSupportServlet[Document]
+    extends ScalatraServlet
+    with JsonSupportServlet[Document]
     with NativeJsonSupport {
 
   protected implicit val jsonFormats: Formats =
@@ -104,7 +107,8 @@ class NativeJsonSupportServlet(val withBigDecimal: Boolean)
 }
 
 class JacksonSupportServlet(val withBigDecimal: Boolean)
-    extends ScalatraServlet with JsonSupportServlet[JValue]
+    extends ScalatraServlet
+    with JsonSupportServlet[JValue]
     with JacksonJsonSupport {
 
   protected implicit val jsonFormats: Formats =

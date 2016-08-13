@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[StandardScaler]] and [[StandardScalerModel]].
   */
 private[feature] trait StandardScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * Whether to center the data with mean before scaling.
@@ -43,8 +45,8 @@ private[feature] trait StandardScalerParams
     * Default: false
     * @group param
     */
-  val withMean: BooleanParam = new BooleanParam(
-      this, "withMean", "Whether to center data with mean")
+  val withMean: BooleanParam =
+    new BooleanParam(this, "withMean", "Whether to center data with mean")
 
   /** @group getParam */
   def getWithMean: Boolean = $(withMean)
@@ -55,7 +57,9 @@ private[feature] trait StandardScalerParams
     * @group param
     */
   val withStd: BooleanParam = new BooleanParam(
-      this, "withStd", "Whether to scale the data to unit standard deviation")
+    this,
+    "withStd",
+    "Whether to scale the data to unit standard deviation")
 
   /** @group getParam */
   def getWithStd: Boolean = $(withStd)
@@ -70,7 +74,8 @@ private[feature] trait StandardScalerParams
   */
 @Experimental
 class StandardScaler(override val uid: String)
-    extends Estimator[StandardScalerModel] with StandardScalerParams
+    extends Estimator[StandardScalerModel]
+    with StandardScalerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("stdScal"))
@@ -95,8 +100,8 @@ class StandardScaler(override val uid: String)
       new feature.StandardScaler(withMean = $(withMean), withStd = $(withStd))
     val scalerModel = scaler.fit(input)
     copyValues(
-        new StandardScalerModel(uid, scalerModel.std, scalerModel.mean)
-          .setParent(this))
+      new StandardScalerModel(uid, scalerModel.std, scalerModel.mean)
+        .setParent(this))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -128,9 +133,11 @@ object StandardScaler extends DefaultParamsReadable[StandardScaler] {
   * @param mean Mean of the StandardScalerModel
   */
 @Experimental
-class StandardScalerModel private[ml](
-    override val uid: String, val std: Vector, val mean: Vector)
-    extends Model[StandardScalerModel] with StandardScalerParams
+class StandardScalerModel private[ml] (override val uid: String,
+                                       val std: Vector,
+                                       val mean: Vector)
+    extends Model[StandardScalerModel]
+    with StandardScalerParams
     with MLWritable {
 
   import StandardScalerModel._

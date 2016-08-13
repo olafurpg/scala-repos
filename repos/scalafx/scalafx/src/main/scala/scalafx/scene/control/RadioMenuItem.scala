@@ -42,7 +42,8 @@ object RadioMenuItem {
   *
   */
 class RadioMenuItem(override val delegate: jfxsc.RadioMenuItem)
-    extends MenuItem(delegate) with Toggle
+    extends MenuItem(delegate)
+    with Toggle
     with SFXDelegate[jfxsc.RadioMenuItem] {
 
   /**

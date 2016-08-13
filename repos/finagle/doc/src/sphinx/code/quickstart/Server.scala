@@ -9,7 +9,7 @@ object Server extends App {
   val service = new Service[http.Request, http.Response] {
     def apply(req: http.Request): Future[http.Response] =
       Future.value(
-          http.Response(req.version, http.Status.Ok)
+        http.Response(req.version, http.Status.Ok)
       )
   }
 //#service

@@ -11,7 +11,15 @@ import scala.concurrent.duration.Duration
 import java.io.File
 import Def.{displayFull, dummyState, ScopedKey, Setting}
 import Keys.{streams, Streams, TaskStreams}
-import Keys.{dummyRoots, dummyStreamsManager, executionRoots, pluginData, streamsManager, taskDefinitionKey, transformState}
+import Keys.{
+  dummyRoots,
+  dummyStreamsManager,
+  executionRoots,
+  pluginData,
+  streamsManager,
+  taskDefinitionKey,
+  transformState
+}
 import Project.richInitializeTask
 import Scope.{GlobalScope, ThisScope}
 import sbt.internal.util.Types.const
@@ -21,11 +29,11 @@ import std.Transform.{DummyTaskMap, TaskAndValue}
 import TaskName._
 
 @deprecated("Use EvaluateTaskConfig instead.", "0.13.5")
-final case class EvaluateConfig(
-    cancelable: Boolean,
-    restrictions: Seq[Tags.Rule],
-    checkCycles: Boolean = false,
-    progress: ExecuteProgress[Task] = EvaluateTask.defaultProgress)
+final case class EvaluateConfig(cancelable: Boolean,
+                                restrictions: Seq[Tags.Rule],
+                                checkCycles: Boolean = false,
+                                progress: ExecuteProgress[Task] =
+                                  EvaluateTask.defaultProgress)
 
 /**
   * An API that allows you to cancel executing tasks upon some signal.
@@ -127,8 +135,8 @@ final object EvaluateTaskConfig {
     AdaptedTaskConfig
   }
 
-  @deprecated(
-      "Use the alternative that specifies minForcegcInterval", "0.13.9")
+  @deprecated("Use the alternative that specifies minForcegcInterval",
+              "0.13.9")
   def apply(restrictions: Seq[Tags.Rule],
             checkCycles: Boolean,
             progressReporter: ExecuteProgress[Task],
@@ -176,16 +184,19 @@ final case class PluginData(dependencyClasspath: Seq[Attributed[File]],
 }
 object PluginData {
   @deprecated(
-      "Use the alternative that specifies the compiler options and specific classpaths.",
-      "0.13.1")
+    "Use the alternative that specifies the compiler options and specific classpaths.",
+    "0.13.1")
   def apply(dependencyClasspath: Seq[Attributed[File]],
             definitionClasspath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
-    PluginData(
-        dependencyClasspath, definitionClasspath, resolvers, report, Nil)
-  @deprecated(
-      "Use the alternative that specifies the specific classpaths.", "0.13.0")
+    PluginData(dependencyClasspath,
+               definitionClasspath,
+               resolvers,
+               report,
+               Nil)
+  @deprecated("Use the alternative that specifies the specific classpaths.",
+              "0.13.0")
   def apply(classpath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
@@ -211,12 +222,13 @@ object EvaluateTask {
 
   @deprecated("Use extractedTaskConfig.", "0.13.0")
   def defaultConfig(extracted: Extracted, structure: BuildStructure) =
-    EvaluateConfig(
-        false, restrictions(extracted, structure), progress = defaultProgress)
+    EvaluateConfig(false,
+                   restrictions(extracted, structure),
+                   progress = defaultProgress)
 
   @deprecated("Use other extractedTaskConfig", "0.13.2")
-  def extractedConfig(
-      extracted: Extracted, structure: BuildStructure): EvaluateConfig = {
+  def extractedConfig(extracted: Extracted,
+                      structure: BuildStructure): EvaluateConfig = {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
     EvaluateConfig(cancelable = canCancel,
@@ -230,8 +242,9 @@ object EvaluateTask {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
     val progress = executeProgress(extracted, structure, state)
-    EvaluateConfig(
-        cancelable = canCancel, restrictions = workers, progress = progress)
+    EvaluateConfig(cancelable = canCancel,
+                   restrictions = workers,
+                   progress = progress)
   }
   def extractedTaskConfig(extracted: Extracted,
                           structure: BuildStructure,
@@ -245,16 +258,16 @@ object EvaluateTask {
   }
 
   def defaultRestrictions(maxWorkers: Int) = Tags.limitAll(maxWorkers) :: Nil
-  def defaultRestrictions(
-      extracted: Extracted, structure: BuildStructure): Seq[Tags.Rule] =
+  def defaultRestrictions(extracted: Extracted,
+                          structure: BuildStructure): Seq[Tags.Rule] =
     Tags.limitAll(maxWorkers(extracted, structure)) :: Nil
 
   def restrictions(state: State): Seq[Tags.Rule] = {
     val extracted = Project.extract(state)
     restrictions(extracted, extracted.structure)
   }
-  def restrictions(
-      extracted: Extracted, structure: BuildStructure): Seq[Tags.Rule] =
+  def restrictions(extracted: Extracted,
+                   structure: BuildStructure): Seq[Tags.Rule] =
     getSetting(Keys.concurrentRestrictions,
                defaultRestrictions(extracted, structure),
                extracted,
@@ -277,22 +290,22 @@ object EvaluateTask {
                                    state: State): ExecuteProgress[Task] = {
     import Types.const
     val maker: State => Keys.TaskProgress = getSetting(
-        Keys.executeProgress,
-        const(new Keys.TaskProgress(defaultProgress)),
-        extracted,
-        structure)
+      Keys.executeProgress,
+      const(new Keys.TaskProgress(defaultProgress)),
+      extracted,
+      structure)
     maker(state).progress
   }
   // TODO - Should this pull from Global or from the project itself?
-  private[sbt] def forcegc(
-      extracted: Extracted, structure: BuildStructure): Boolean =
+  private[sbt] def forcegc(extracted: Extracted,
+                           structure: BuildStructure): Boolean =
     getSetting(Keys.forcegc in Global,
                GCUtil.defaultForceGarbageCollection,
                extracted,
                structure)
   // TODO - Should this pull from Global or from the project itself?
-  private[sbt] def minForcegcInterval(
-      extracted: Extracted, structure: BuildStructure): Duration =
+  private[sbt] def minForcegcInterval(extracted: Extracted,
+                                      structure: BuildStructure): Duration =
     getSetting(Keys.minForcegcInterval in Global,
                GCUtil.defaultMinForcegcInterval,
                extracted,
@@ -305,15 +318,15 @@ object EvaluateTask {
     key in extracted.currentRef get structure.data getOrElse default
 
   def injectSettings: Seq[Setting[_]] = Seq(
-      (state in GlobalScope) ::= dummyState,
-      (streamsManager in GlobalScope) ::= dummyStreamsManager,
-      (executionRoots in GlobalScope) ::= dummyRoots
+    (state in GlobalScope) ::= dummyState,
+    (streamsManager in GlobalScope) ::= dummyStreamsManager,
+    (executionRoots in GlobalScope) ::= dummyRoots
   )
 
-  def evalPluginDef(log: Logger)(
-      pluginDef: BuildStructure, state: State): PluginData = {
-    val root = ProjectRef(
-        pluginDef.root, Load.getRootProject(pluginDef.units)(pluginDef.root))
+  def evalPluginDef(log: Logger)(pluginDef: BuildStructure,
+                                 state: State): PluginData = {
+    val root = ProjectRef(pluginDef.root,
+                          Load.getRootProject(pluginDef.units)(pluginDef.root))
     val pluginKey = pluginData
     val config = extractedTaskConfig(Project.extract(state), pluginDef, state)
     val evaluated = apply(pluginDef,
@@ -323,15 +336,15 @@ object EvaluateTask {
                           config)
     val (newS, result) =
       evaluated getOrElse sys.error(
-          "Plugin data does not exist for plugin definition at " +
+        "Plugin data does not exist for plugin definition at " +
           pluginDef.root)
     Project.runUnloadHooks(newS) // discard states
     processResult(result, log)
   }
 
   @deprecated(
-      "This method does not apply state changes requested during task execution and does not honor concurrent execution restrictions.  Use 'apply' instead.",
-      "0.11.1")
+    "This method does not apply state changes requested during task execution and does not honor concurrent execution restrictions.  Use 'apply' instead.",
+    "0.11.1")
   def evaluateTask[T](structure: BuildStructure,
                       taskKey: ScopedKey[Task[T]],
                       state: State,
@@ -378,8 +391,9 @@ object EvaluateTask {
                ref: ProjectRef,
                config: EvaluateTaskConfig): Option[(State, Result[T])] = {
     withStreams(structure, state) { str =>
-      for ((task, toNode) <- getTask(structure, taskKey, state, str, ref)) yield
-        runTask(task, state, str, structure.index.triggers, config)(toNode)
+      for ((task, toNode) <- getTask(structure, taskKey, state, str, ref))
+        yield
+          runTask(task, state, str, structure.index.triggers, config)(toNode)
     }
   }
   def logIncResult(result: Result[_], state: State, streams: Streams) =
@@ -389,8 +403,8 @@ object EvaluateTask {
   def logIncomplete(result: Incomplete, state: State, streams: Streams): Unit = {
     val all = Incomplete linearize result
     val keyed =
-      for (Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) <- all) yield
-        (key, msg, ex)
+      for (Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) <- all)
+        yield (key, msg, ex)
     val un = all.filter { i =>
       i.node.isEmpty || i.message.isEmpty
     }
@@ -419,7 +433,7 @@ object EvaluateTask {
   def suppressedMessage(key: ScopedKey[_])(
       implicit display: Show[ScopedKey[_]]): String =
     "Stack trace suppressed.  Run 'last %s' for the full log.".format(
-        display(key))
+      display(key))
 
   def getStreams(key: ScopedKey[_], streams: Streams): TaskStreams =
     streams(ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key))
@@ -436,16 +450,17 @@ object EvaluateTask {
                  ref: ProjectRef): Option[(Task[T], NodeView[Task])] = {
     val thisScope = Load.projectScope(ref)
     val resolvedScope = Scope.replaceThis(thisScope)(taskKey.scope)
-    for (t <- structure.data.get(resolvedScope, taskKey.key)) yield
-      (t, nodeView(state, streams, taskKey :: Nil))
+    for (t <- structure.data.get(resolvedScope, taskKey.key))
+      yield (t, nodeView(state, streams, taskKey :: Nil))
   }
   def nodeView[HL <: HList](
       state: State,
       streams: Streams,
       roots: Seq[ScopedKey[_]],
       dummies: DummyTaskMap = DummyTaskMap(Nil)): NodeView[Task] =
-    Transform((dummyRoots, roots) :: (dummyStreamsManager, streams) :: (
-            dummyState, state) :: dummies)
+    Transform(
+      (dummyRoots, roots) :: (dummyStreamsManager, streams) :: (dummyState,
+                                                                state) :: dummies)
 
   @deprecated("Use new EvaluateTaskConfig option to runTask", "0.13.5")
   def runTask[T](root: Task[T],
@@ -463,11 +478,17 @@ object EvaluateTask {
                  triggers: Triggers[Task],
                  config: EvaluateTaskConfig)(
       implicit taskToNode: NodeView[Task]): (State, Result[T]) = {
-    import ConcurrentRestrictions.{completionService, TagMap, Tag, tagged, tagsKey}
+    import ConcurrentRestrictions.{
+      completionService,
+      TagMap,
+      Tag,
+      tagged,
+      tagsKey
+    }
 
     val log = state.log
     log.debug(
-        s"Running task... Cancel: ${config.cancelStrategy}, check cycles: ${config.checkCycles}, forcegc: ${config.forceGarbageCollection}")
+      s"Running task... Cancel: ${config.cancelStrategy}, check cycles: ${config.checkCycles}, forcegc: ${config.forceGarbageCollection}")
     val tags = tagged[Task[_]](_.info get tagsKey getOrElse Map.empty,
                                Tags.predicate(config.restrictions))
     val (service, shutdownThreads) =
@@ -511,14 +532,16 @@ object EvaluateTask {
     // Register with our cancel handler we're about to start.
     val strat = config.cancelStrategy
     val cancelState = strat.onTaskEngineStart(runningEngine)
-    try run() finally strat.onTaskEngineFinish(cancelState)
+    try run()
+    finally strat.onTaskEngineFinish(cancelState)
   }
 
-  private[this] def storeValuesForPrevious(
-      results: RMap[Task, Result], state: State, streams: Streams): Unit =
+  private[this] def storeValuesForPrevious(results: RMap[Task, Result],
+                                           state: State,
+                                           streams: Streams): Unit =
     for (referenced <- Previous.references in Global get Project
-      .structure(state)
-      .data) Previous.complete(referenced, results, streams)
+                        .structure(state)
+                        .data) Previous.complete(referenced, results, streams)
 
   def applyResults[T](results: RMap[Task, Result],
                       state: State,
@@ -526,18 +549,18 @@ object EvaluateTask {
     (stateTransform(results)(state), results(root))
   def stateTransform(results: RMap[Task, Result]): State => State =
     Function.chain(
-        results.toTypedSeq flatMap {
-          case results.TPair(Task(info, _), Value(v)) =>
-            info.post(v) get transformState
-          case _ => Nil
-        }
+      results.toTypedSeq flatMap {
+        case results.TPair(Task(info, _), Value(v)) =>
+          info.post(v) get transformState
+        case _ => Nil
+      }
     )
 
   def transformInc[T](result: Result[T]): Result[T] =
     // taskToKey needs to be before liftAnonymous.  liftA only lifts non-keyed (anonymous) Incompletes.
     result.toEither.left.map { i =>
       Incomplete.transformBU(i)(
-          convertCyclicInc andThen taskToKey andThen liftAnonymous)
+        convertCyclicInc andThen taskToKey andThen liftAnonymous)
     }
   def taskToKey: Incomplete => Incomplete = {
     case in @ Incomplete(Some(node: Task[_]), _, _, _, _) =>
@@ -554,15 +577,16 @@ object EvaluateTask {
     (c.caller, c.target) match {
       case (caller: Task[_], target: Task[_]) =>
         c.toString +
-        (if (caller eq target) "(task: " + name(caller) + ")"
-         else "(caller: " + name(caller) + ", target: " + name(target) + ")")
+          (if (caller eq target) "(task: " + name(caller) + ")"
+          else "(caller: " + name(caller) + ", target: " + name(target) + ")")
       case _ => c.toString
     }
 
   def liftAnonymous: Incomplete => Incomplete = {
     case i @ Incomplete(node, tpe, None, causes, None) =>
-      causes.find(inc =>
-            inc.node.isEmpty &&
+      causes.find(
+        inc =>
+          inc.node.isEmpty &&
             (inc.message.isDefined || inc.directCause.isDefined)) match {
         case Some(lift) =>
           i.copy(directCause = lift.directCause, message = lift.message)
@@ -571,8 +595,9 @@ object EvaluateTask {
     case i => i
   }
 
-  def processResult[T](
-      result: Result[T], log: Logger, show: Boolean = false): T =
+  def processResult[T](result: Result[T],
+                       log: Logger,
+                       show: Boolean = false): T =
     onResult(result, log) { v =>
       if (show) println("Result: " + v); v
     }
@@ -585,8 +610,7 @@ object EvaluateTask {
   // if the return type Seq[Setting[_]] is not explicitly given, scalac hangs
   val injectStreams: ScopedKey[_] => Seq[Setting[_]] = scoped =>
     if (scoped.key == streams.key)
-      Seq(
-          streams in scoped.scope <<= streamsManager map { mgr =>
+      Seq(streams in scoped.scope <<= streamsManager map { mgr =>
         val stream = mgr(scoped)
         stream.open()
         stream

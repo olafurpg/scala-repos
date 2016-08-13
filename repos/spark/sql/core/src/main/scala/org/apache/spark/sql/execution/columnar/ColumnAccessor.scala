@@ -21,7 +21,12 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import scala.annotation.tailrec
 
-import org.apache.spark.sql.catalyst.expressions.{MutableRow, UnsafeArrayData, UnsafeMapData, UnsafeRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  MutableRow,
+  UnsafeArrayData,
+  UnsafeMapData,
+  UnsafeRow
+}
 import org.apache.spark.sql.execution.columnar.compression.CompressibleColumnAccessor
 import org.apache.spark.sql.types._
 
@@ -64,12 +69,14 @@ private[columnar] abstract class BasicColumnAccessor[JvmType](
 }
 
 private[columnar] class NullColumnAccessor(buffer: ByteBuffer)
-    extends BasicColumnAccessor[Any](buffer, NULL) with NullableColumnAccessor
+    extends BasicColumnAccessor[Any](buffer, NULL)
+    with NullableColumnAccessor
 
 private[columnar] abstract class NativeColumnAccessor[T <: AtomicType](
     override protected val buffer: ByteBuffer,
     override protected val columnType: NativeColumnType[T])
-    extends BasicColumnAccessor(buffer, columnType) with NullableColumnAccessor
+    extends BasicColumnAccessor(buffer, columnType)
+    with NullableColumnAccessor
     with CompressibleColumnAccessor[T]
 
 private[columnar] class BooleanColumnAccessor(buffer: ByteBuffer)
@@ -100,27 +107,27 @@ private[columnar] class BinaryColumnAccessor(buffer: ByteBuffer)
     extends BasicColumnAccessor[Array[Byte]](buffer, BINARY)
     with NullableColumnAccessor
 
-private[columnar] class CompactDecimalColumnAccessor(
-    buffer: ByteBuffer, dataType: DecimalType)
+private[columnar] class CompactDecimalColumnAccessor(buffer: ByteBuffer,
+                                                     dataType: DecimalType)
     extends NativeColumnAccessor(buffer, COMPACT_DECIMAL(dataType))
 
-private[columnar] class DecimalColumnAccessor(
-    buffer: ByteBuffer, dataType: DecimalType)
+private[columnar] class DecimalColumnAccessor(buffer: ByteBuffer,
+                                              dataType: DecimalType)
     extends BasicColumnAccessor[Decimal](buffer, LARGE_DECIMAL(dataType))
     with NullableColumnAccessor
 
-private[columnar] class StructColumnAccessor(
-    buffer: ByteBuffer, dataType: StructType)
+private[columnar] class StructColumnAccessor(buffer: ByteBuffer,
+                                             dataType: StructType)
     extends BasicColumnAccessor[UnsafeRow](buffer, STRUCT(dataType))
     with NullableColumnAccessor
 
-private[columnar] class ArrayColumnAccessor(
-    buffer: ByteBuffer, dataType: ArrayType)
+private[columnar] class ArrayColumnAccessor(buffer: ByteBuffer,
+                                            dataType: ArrayType)
     extends BasicColumnAccessor[UnsafeArrayData](buffer, ARRAY(dataType))
     with NullableColumnAccessor
 
-private[columnar] class MapColumnAccessor(
-    buffer: ByteBuffer, dataType: MapType)
+private[columnar] class MapColumnAccessor(buffer: ByteBuffer,
+                                          dataType: MapType)
     extends BasicColumnAccessor[UnsafeMapData](buffer, MAP(dataType))
     with NullableColumnAccessor
 

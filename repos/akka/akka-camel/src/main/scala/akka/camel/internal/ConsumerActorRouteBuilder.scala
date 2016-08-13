@@ -29,10 +29,11 @@ private[camel] class ConsumerActorRouteBuilder(endpointUri: String,
     CamelPath.toUri(consumer, config.autoAck, config.replyTimeout)
 
   def configure(): Unit =
-    applyUserRouteCustomization(settings.Conversions.apply(
-            endpointUri take endpointUri.indexOf(":"), // e.g. "http" from "http://whatever/..."
-            from(endpointUri).routeId(consumer.path.toString)))
-      .to(targetActorUri)
+    applyUserRouteCustomization(
+      settings.Conversions.apply(
+        endpointUri take endpointUri
+          .indexOf(":"), // e.g. "http" from "http://whatever/..."
+        from(endpointUri).routeId(consumer.path.toString))).to(targetActorUri)
 
   def applyUserRouteCustomization(rd: RouteDefinition) =
     config.onRouteDefinition(rd)

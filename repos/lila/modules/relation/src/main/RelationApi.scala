@@ -31,8 +31,8 @@ final class RelationApi(coll: Coll,
   def fetchRelation(u1: ID, u2: ID): Fu[Option[Relation]] =
     coll
       .find(
-          BSONDocument("u1" -> u1, "u2" -> u2),
-          BSONDocument("r" -> true, "_id" -> false)
+        BSONDocument("u1" -> u1, "u2" -> u2),
+        BSONDocument("r" -> true, "_id" -> false)
       )
       .one[BSONDocument]
       .map {
@@ -48,18 +48,20 @@ final class RelationApi(coll: Coll,
   def fetchFriends(userId: ID) =
     coll
       .aggregate(
-          Match(BSONDocument(
-                  "$or" -> BSONArray(BSONDocument("u1" -> userId),
-                                     BSONDocument("u2" -> userId)),
-                  "r" -> Follow
-              )),
-          List(
-              Group(BSONNull)("u1" -> AddToSet("u1"), "u2" -> AddToSet("u2")),
-              Project(BSONDocument(
-                      "_id" -> BSONDocument(
-                          "$setIntersection" -> BSONArray("$u1", "$u2"))
-                  ))
-          ))
+        Match(
+          BSONDocument(
+            "$or" -> BSONArray(BSONDocument("u1" -> userId),
+                               BSONDocument("u2" -> userId)),
+            "r" -> Follow
+          )),
+        List(
+          Group(BSONNull)("u1" -> AddToSet("u1"), "u2" -> AddToSet("u2")),
+          Project(
+            BSONDocument(
+              "_id" -> BSONDocument(
+                "$setIntersection" -> BSONArray("$u1", "$u2"))
+            ))
+        ))
       .map {
         ~_.documents.headOption.flatMap(_.getAs[Set[String]]("_id")) - userId
       }
@@ -78,16 +80,14 @@ final class RelationApi(coll: Coll,
     fetchFollows(u1, u2) flatMap { _ ?? fetchFollows(u2, u1) }
 
   private val countFollowingCache = AsyncCache[ID, Int](
-      f = userId =>
-          coll.count(BSONDocument("u1" -> userId, "r" -> Follow).some),
-      timeToLive = 10 minutes)
+    f = userId => coll.count(BSONDocument("u1" -> userId, "r" -> Follow).some),
+    timeToLive = 10 minutes)
 
   def countFollowing(userId: ID) = countFollowingCache(userId)
 
   private val countFollowersCache = AsyncCache[ID, Int](
-      f = userId =>
-          coll.count(BSONDocument("u2" -> userId, "r" -> Follow).some),
-      timeToLive = 10 minutes)
+    f = userId => coll.count(BSONDocument("u2" -> userId, "r" -> Follow).some),
+    timeToLive = 10 minutes)
 
   def countFollowers(userId: ID) = countFollowersCache(userId)
 
@@ -98,25 +98,28 @@ final class RelationApi(coll: Coll,
     coll.count(BSONDocument("u2" -> userId, "r" -> Block).some)
 
   def followingPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Followed](
-        collection = coll,
-        selector = BSONDocument("u1" -> userId, "r" -> Follow),
-        projection = BSONDocument("u2" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Followed](collection = coll,
+                              selector =
+                                BSONDocument("u1" -> userId, "r" -> Follow),
+                              projection =
+                                BSONDocument("u2" -> true, "_id" -> false),
+                              sort = BSONDocument()).map(_.userId)
 
   def followersPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Follower](
-        collection = coll,
-        selector = BSONDocument("u2" -> userId, "r" -> Follow),
-        projection = BSONDocument("u1" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Follower](collection = coll,
+                              selector =
+                                BSONDocument("u2" -> userId, "r" -> Follow),
+                              projection =
+                                BSONDocument("u1" -> true, "_id" -> false),
+                              sort = BSONDocument()).map(_.userId)
 
   def blockingPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Blocked](
-        collection = coll,
-        selector = BSONDocument("u1" -> userId, "r" -> Block),
-        projection = BSONDocument("u2" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Blocked](collection = coll,
+                             selector =
+                               BSONDocument("u1" -> userId, "r" -> Block),
+                             projection =
+                               BSONDocument("u2" -> true, "_id" -> false),
+                             sort = BSONDocument()).map(_.userId)
 
   def follow(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit

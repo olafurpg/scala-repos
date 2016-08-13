@@ -17,10 +17,13 @@ import akka.http.impl.model.parser.CharacterClasses
 import akka.http.impl.util._
 
 class HttpHeaderParserSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll {
 
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.http.parsing.max-header-name-length = 60
@@ -43,7 +46,7 @@ class HttpHeaderParserSpec
     }
 
     "insert a new branch underneath a simple node" in new TestSetup(
-        primed = false) {
+      primed = false) {
       insert("Hello", 'Hello)
       insert("Hallo", 'Hallo)
       check {
@@ -76,7 +79,7 @@ class HttpHeaderParserSpec
     }
 
     "insert a new branch underneath an existing branch node" in new TestSetup(
-        primed = false) {
+      primed = false) {
       insert("Hello", 'Hello)
       insert("Hallo", 'Hallo)
       insert("Yeah", 'Yeah)
@@ -96,7 +99,7 @@ class HttpHeaderParserSpec
     }
 
     "support overriding of previously inserted values" in new TestSetup(
-        primed = false) {
+      primed = false) {
       insert("Hello", 'Hello)
       insert("Hallo", 'Hallo)
       insert("Yeah", 'Yeah)
@@ -121,29 +124,34 @@ class HttpHeaderParserSpec
 
     "retrieve a cached header with a case-insensitive header-name match" in new TestSetup() {
       parseAndCache("Connection: close\r\nx")("coNNection: close\r\nx") shouldEqual Connection(
-          "close")
+        "close")
     }
 
     "parse and cache a modelled header" in new TestSetup() {
       parseAndCache("Host: spray.io:123\r\nx")("HOST: spray.io:123\r\nx") shouldEqual Host(
-          "spray.io", 123)
+        "spray.io",
+        123)
     }
 
     "parse and cache an invalid modelled header as RawHeader" in new TestSetup() {
       parseAndCache("Content-Type: abc:123\r\nx")() shouldEqual RawHeader(
-          "content-type", "abc:123")
+        "content-type",
+        "abc:123")
       parseAndCache("Origin: localhost:8080\r\nx")() shouldEqual RawHeader(
-          "origin", "localhost:8080")
+        "origin",
+        "localhost:8080")
     }
 
     "parse and cache an X-Forwarded-For with a hostname in it as a RawHeader" in new TestSetup() {
       parseAndCache("X-Forwarded-For: 1.2.3.4, akka.io\r\nx")() shouldEqual RawHeader(
-          "x-forwarded-for", "1.2.3.4, akka.io")
+        "x-forwarded-for",
+        "1.2.3.4, akka.io")
     }
 
     "parse and cache an X-Real-Ip with a hostname as it's value as a RawHeader" in new TestSetup() {
       parseAndCache("X-Real-Ip: akka.io\r\nx")() shouldEqual RawHeader(
-          "x-real-ip", "akka.io")
+        "x-real-ip",
+        "akka.io")
     }
     "parse and cache a raw header" in new TestSetup(primed = false) {
       insert("hello: bob", 'Hello)
@@ -161,7 +169,7 @@ class HttpHeaderParserSpec
 
     "parse and cache a modelled header with line-folding" in new TestSetup() {
       parseAndCache("Connection: foo,\r\n bar\r\nx")(
-          "Connection: foo,\r\n bar\r\nx") shouldEqual Connection("foo", "bar")
+        "Connection: foo,\r\n bar\r\nx") shouldEqual Connection("foo", "bar")
     }
 
     "parse and cache a header with a tab char in the value" in new TestSetup() {
@@ -171,13 +179,15 @@ class HttpHeaderParserSpec
 
     "parse and cache a header with UTF8 chars in the value" in new TestSetup() {
       parseAndCache("2-UTF8-Bytes: árvíztűrő ütvefúrógép\r\nx")() shouldEqual RawHeader(
-          "2-UTF8-Bytes", "árvíztűrő ütvefúrógép")
+        "2-UTF8-Bytes",
+        "árvíztűrő ütvefúrógép")
       parseAndCache("3-UTF8-Bytes: The € or the $?\r\nx")() shouldEqual RawHeader(
-          "3-UTF8-Bytes", "The € or the $?")
+        "3-UTF8-Bytes",
+        "The € or the $?")
       parseAndCache(
-          "4-UTF8-Bytes: Surrogate pairs: \uD801\uDC1B\uD801\uDC04\uD801\uDC1B!\r\nx")() shouldEqual RawHeader(
-          "4-UTF8-Bytes",
-          "Surrogate pairs: \uD801\uDC1B\uD801\uDC04\uD801\uDC1B!")
+        "4-UTF8-Bytes: Surrogate pairs: \uD801\uDC1B\uD801\uDC04\uD801\uDC1B!\r\nx")() shouldEqual RawHeader(
+        "4-UTF8-Bytes",
+        "Surrogate pairs: \uD801\uDC1B\uD801\uDC04\uD801\uDC1B!")
     }
 
     "produce an error message for lines with an illegal header name" in new TestSetup() {
@@ -188,16 +198,16 @@ class HttpHeaderParserSpec
 
     "produce an error message for lines with a too-long header name" in new TestSetup() {
       noException should be thrownBy parseLine(
-          "123456789012345678901234567890123456789012345678901234567890: foo\r\nx")
+        "123456789012345678901234567890123456789012345678901234567890: foo\r\nx")
       the[ParsingException] thrownBy parseLine(
-          "1234567890123456789012345678901234567890123456789012345678901: foo\r\nx") should have message "HTTP header name exceeds the configured limit of 60 characters"
+        "1234567890123456789012345678901234567890123456789012345678901: foo\r\nx") should have message "HTTP header name exceeds the configured limit of 60 characters"
     }
 
     "produce an error message for lines with a too-long header value" in new TestSetup() {
       noException should be thrownBy parseLine(
-          s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1000)}\r\nx")
+        s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1000)}\r\nx")
       the[ParsingException] thrownBy parseLine(
-          s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1001)}\r\nx") should have message "HTTP header value exceeds the configured limit of 1000 characters"
+        s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1001)}\r\nx") should have message "HTTP header value exceeds the configured limit of 1000 characters"
     }
 
     "continue parsing raw headers even if the overall cache value capacity is reached" in new TestSetup() {
@@ -216,8 +226,8 @@ class HttpHeaderParserSpec
 
     "continue parsing modelled headers even if the overall cache value capacity is reached" in new TestSetup() {
       val randomHostHeaders = Stream.continually {
-        Host(host = nextRandomString(nextRandomAlphaNumChar,
-                                     nextRandomInt(4, 8)),
+        Host(host =
+               nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 8)),
              port = nextRandomInt(1000, 10000))
       }
       randomHostHeaders.take(300).foldLeft(0) {
@@ -252,7 +262,7 @@ class HttpHeaderParserSpec
     "continue parsing modelled headers even if the header-specific cache capacity is reached" in new TestSetup() {
       val randomHeaders = Stream.continually {
         `User-Agent`(
-            nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 16)))
+          nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 16)))
       }
       randomHeaders.take(40).foldLeft(0) {
         case (acc, header) ⇒
@@ -271,14 +281,14 @@ class HttpHeaderParserSpec
   abstract class TestSetup(primed: Boolean = true) {
     val parser = {
       val p = HttpHeaderParser.unprimed(
-          settings = ParserSettings(system),
-          warnOnIllegalHeader = info ⇒ system.log.warning(info.formatPretty))
+        settings = ParserSettings(system),
+        warnOnIllegalHeader = info ⇒ system.log.warning(info.formatPretty))
       if (primed) HttpHeaderParser.prime(p) else p
     }
     def insert(line: String, value: AnyRef): Unit =
       if (parser.isEmpty)
-        HttpHeaderParser.insertRemainingCharsAsNewNodes(
-            parser, ByteString(line), value)
+        HttpHeaderParser
+          .insertRemainingCharsAsNewNodes(parser, ByteString(line), value)
       else HttpHeaderParser.insert(parser, ByteString(line), value)
 
     def parseLine(line: String) =

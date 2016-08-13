@@ -35,18 +35,18 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 object Side extends SFXEnumDelegateCompanion[jfxg.Side, Side] {
 
   val Bottom = new Side(jfxg.Side.BOTTOM)
-  @deprecated(
-      "Use Bottom; BOTTOM will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Bottom; BOTTOM will be removed in a future release",
+              "8.0.60-R10")
   val BOTTOM = Bottom
 
   val Left = new Side(jfxg.Side.LEFT)
-  @deprecated(
-      "Use Left; LEFT will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Left; LEFT will be removed in a future release",
+              "8.0.60-R10")
   val LEFT = Left
 
   val Right = new Side(jfxg.Side.RIGHT)
-  @deprecated(
-      "Use Right; RIGHT will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Right; RIGHT will be removed in a future release",
+              "8.0.60-R10")
   val RIGHT = Right
 
   val Top = new Side(jfxg.Side.TOP)

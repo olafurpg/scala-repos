@@ -35,7 +35,7 @@ object RecordRules extends Factory {
     *  RecordRules.fieldName.default.set((_, name) => StringHelpers.snakify(name))
     */
   val fieldName = new FactoryMaker[(ConnectionIdentifier, String) => String](
-      (_: ConnectionIdentifier, name: String) => name) {}
+    (_: ConnectionIdentifier, name: String) => name) {}
 
   /**
     * This function is used to calculate the displayName of a field. Can be
@@ -44,5 +44,5 @@ object RecordRules extends Factory {
     */
   val displayName: FactoryMaker[(Record[_], Locale, String) => String] =
     new FactoryMaker[(Record[_], Locale, String) => String](
-        (m: Record[_], l: Locale, name: String) => name) {}
+      (m: Record[_], l: Locale, name: String) => name) {}
 }

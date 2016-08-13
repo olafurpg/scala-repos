@@ -56,10 +56,10 @@ class EnsembleImageBarChart extends EnsembleExample {
     data = new XYChart.Series[String, Number]() {
       name = "Sales Per Product"
       data = Seq(
-          XYChart.Data[String, Number]("SUV", 120),
-          XYChart.Data[String, Number]("Sedan", 50),
-          XYChart.Data[String, Number]("Truck", 180),
-          XYChart.Data[String, Number]("Van", 20)
+        XYChart.Data[String, Number]("SUV", 120),
+        XYChart.Data[String, Number]("Sedan", 50),
+        XYChart.Data[String, Number]("Truck", 180),
+        XYChart.Data[String, Number]("Van", 20)
       )
     }
   }

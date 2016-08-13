@@ -27,8 +27,8 @@ private[http] sealed trait FrameEvent extends FrameEventOrError {
   * Starts a frame. Contains the frame's headers. May contain all the data of the frame if `lastPart == true`. Otherwise,
   * following events will be `FrameData` events that contain the remaining data of the frame.
   */
-private[http] final case class FrameStart(
-    header: FrameHeader, data: ByteString)
+private[http] final case class FrameStart(header: FrameHeader,
+                                          data: ByteString)
     extends FrameEvent {
   def lastPart: Boolean = data.size == header.length
   def withData(data: ByteString): FrameStart = copy(data = data)
@@ -67,10 +67,10 @@ private[http] object FrameEvent {
                 rsv1: Boolean = false,
                 rsv2: Boolean = false,
                 rsv3: Boolean = false): FrameStart =
-    FrameStart(
-        FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3), data)
-  val emptyLastContinuationFrame: FrameStart = empty(
-      Protocol.Opcode.Continuation, fin = true)
+    FrameStart(FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3),
+               data)
+  val emptyLastContinuationFrame: FrameStart =
+    empty(Protocol.Opcode.Continuation, fin = true)
 
   def closeFrame(closeCode: Int,
                  reason: String = "",
@@ -78,9 +78,12 @@ private[http] object FrameEvent {
     require(closeCode >= 1000, s"Invalid close code: $closeCode")
     val body =
       ByteString(((closeCode & 0xff00) >> 8).toByte, (closeCode & 0xff).toByte) ++ ByteString(
-          reason, "UTF8")
+        reason,
+        "UTF8")
 
-    fullFrame(
-        Opcode.Close, mask, FrameEventParser.mask(body, mask), fin = true)
+    fullFrame(Opcode.Close,
+              mask,
+              FrameEventParser.mask(body, mask),
+              fin = true)
   }
 }

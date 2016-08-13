@@ -4,7 +4,16 @@ import java.io.FileInputStream
 
 import sbt.internal.librarymanagement.BaseIvySpecification
 import sbt.internal.librarymanagement.mavenint.PomExtraDependencyAttributes
-import sbt.librarymanagement.{Artifact, Configurations, CrossVersion, DefaultMavenRepository, MavenRepository, ModuleID, Resolver, UpdateOptions}
+import sbt.librarymanagement.{
+  Artifact,
+  Configurations,
+  CrossVersion,
+  DefaultMavenRepository,
+  MavenRepository,
+  ModuleID,
+  Resolver,
+  UpdateOptions
+}
 
 import sbt.internal.util.ShowLines
 
@@ -63,8 +72,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def testSnapshot =
     ModuleID("com.typesafe", "config", "0.4.9-SNAPSHOT", Some("compile"))
   val SnapshotResolver = MavenRepository(
-      "some-snapshots",
-      "https://oss.sonatype.org/content/repositories/snapshots/")
+    "some-snapshots",
+    "https://oss.sonatype.org/content/repositories/snapshots/")
 
   override def resolvers =
     Seq(DefaultMavenRepository, SnapshotResolver, Resolver.publishMavenLocal)
@@ -128,7 +137,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
     (newJars should have size 1)
     (oldJars should have size 1)
     (oldJars.map(_._2) should not(
-            contain theSameElementsAs (newJars.map(_._2))))
+      contain theSameElementsAs (newJars.map(_._2))))
   }
 
   def resolveSnapshotPubDate = {
@@ -154,7 +163,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
     val jars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name == "scala-library") ||
-          (m.module.name contains "parser")
+        (m.module.name contains "parser")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     jars should have size 2
@@ -163,11 +172,10 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def failIfPomMissing = {
     // TODO - we need the jar to not exist too.
     val m = module(
-        ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-        Seq(ModuleID(
-                "org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
-        Some("2.10.2"),
-        defaultUpdateOptions)
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(ModuleID("org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     an[Exception] should be thrownBy ivyUpdate(m)
   }
 
@@ -220,13 +228,13 @@ class MavenResolutionSpec extends BaseIvySpecification {
     val transitiveJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-          !(m.module.name contains "testkit")
+        !(m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     val directJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-          (m.module.name contains "testkit")
+        (m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     (report.configurations should have size configurations.size)
@@ -252,21 +260,22 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
   def resolveSourceAndJavadoc = {
     val m = module(
-        ModuleID("com.example", "foo", "0.1.0", Some("sources")),
-        Seq(akkaActor.artifacts(Artifact(akkaActor.name, "javadoc"),
-                                Artifact(akkaActor.name, "sources"))),
-        Some("2.10.2"),
-        defaultUpdateOptions
+      ModuleID("com.example", "foo", "0.1.0", Some("sources")),
+      Seq(
+        akkaActor.artifacts(Artifact(akkaActor.name, "javadoc"),
+                            Artifact(akkaActor.name, "sources"))),
+      Some("2.10.2"),
+      defaultUpdateOptions
     )
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations
-             //  We actually injected javadoc/sources into the compile scope, due to how we did the request.
-             //  SO, we report that here.
-             if conf.configuration == "compile"
+      //  We actually injected javadoc/sources into the compile scope, due to how we did the request.
+      //  SO, we report that here.
+      if conf.configuration == "compile"
       m <- conf.modules
       (a, f) <- m.artifacts if (f.getName contains "sources") ||
-               (f.getName contains "javadoc")
+        (f.getName contains "javadoc")
     } yield f
     (report.configurations should have size configurations.size)
     (jars should have size 2)
@@ -274,10 +283,10 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
   def publishMavenMetadata = {
     val m = module(
-        ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
-        Seq(),
-        None,
-        defaultUpdateOptions.withLatestSnapshots(true)
+      ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
+      Seq(),
+      None,
+      defaultUpdateOptions.withLatestSnapshots(true)
     )
     sbt.io.IO.withTemporaryDirectory { dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
@@ -292,15 +301,15 @@ class MavenResolutionSpec extends BaseIvySpecification {
       val jarFile = new java.io.File(dir, "test-it-1.0-SNAPSHOT.jar")
       sbt.io.IO.touch(jarFile)
       System.err.println(
-          s"DEBUGME - Publishing $m to ${Resolver.publishMavenLocal}")
+        s"DEBUGME - Publishing $m to ${Resolver.publishMavenLocal}")
       ivyPublish(
-          m,
-          mkPublishConfiguration(
-              Resolver.publishMavenLocal,
-              Map(
-                  Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
-                  Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
-              )))
+        m,
+        mkPublishConfiguration(
+          Resolver.publishMavenLocal,
+          Map(
+            Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
+            Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
+          )))
     }
     val baseLocalMavenDir: java.io.File = Resolver.publishMavenLocal.rootFile
     val allFiles: Seq[java.io.File] = sbt.io

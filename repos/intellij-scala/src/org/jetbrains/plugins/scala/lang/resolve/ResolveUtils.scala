@@ -11,24 +11,56 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSelfTypeElement, ScTypeElement, ScTypeVariableTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScFieldId, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScSelfTypeElement,
+  ScTypeElement,
+  ScTypeVariableTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier,
+  ScFieldId,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference,
+  ScThisReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter,
+  ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticClass, ScSyntheticValue}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  ScSyntheticClass,
+  ScSyntheticValue
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil, types}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiElement,
+  ScalaPsiUtil,
+  types
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets._
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ResolveProcessor, ResolverEnv}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor,
+  ResolveProcessor,
+  ResolverEnv
+}
 
 import _root_.scala.collection.Set
 
@@ -36,68 +68,68 @@ import _root_.scala.collection.Set
   * @author ven
   */
 object ResolveUtils {
-  def kindMatches(
-      element: PsiElement, kinds: Set[ResolveTargets.Value]): Boolean =
+  def kindMatches(element: PsiElement,
+                  kinds: Set[ResolveTargets.Value]): Boolean =
     kinds == null ||
-    (element match {
-          case _: PsiPackage | _: ScPackaging => kinds contains PACKAGE
-          case obj: ScObject if obj.isPackageObject => kinds contains PACKAGE
-          case obj: ScObject =>
-            (kinds contains OBJECT) || (kinds contains METHOD)
-          case _: ScTypeVariableTypeElement => kinds contains CLASS
-          case _: ScTypeParam => kinds contains CLASS
-          case _: ScTypeAlias => kinds contains CLASS
-          case _: ScTypeDefinition => kinds contains CLASS
-          case _: ScSyntheticClass => kinds contains CLASS
-          case c: PsiClass =>
-            if (kinds contains CLASS) true
-            else {
-              def isStaticCorrect(clazz: PsiClass): Boolean = {
-                val cclazz = clazz.getContainingClass
-                cclazz == null ||
-                (clazz.hasModifierProperty(PsiModifier.STATIC) &&
-                    isStaticCorrect(cclazz))
-              }
-              (kinds contains OBJECT) && isStaticCorrect(c)
+      (element match {
+        case _: PsiPackage | _: ScPackaging => kinds contains PACKAGE
+        case obj: ScObject if obj.isPackageObject => kinds contains PACKAGE
+        case obj: ScObject =>
+          (kinds contains OBJECT) || (kinds contains METHOD)
+        case _: ScTypeVariableTypeElement => kinds contains CLASS
+        case _: ScTypeParam => kinds contains CLASS
+        case _: ScTypeAlias => kinds contains CLASS
+        case _: ScTypeDefinition => kinds contains CLASS
+        case _: ScSyntheticClass => kinds contains CLASS
+        case c: PsiClass =>
+          if (kinds contains CLASS) true
+          else {
+            def isStaticCorrect(clazz: PsiClass): Boolean = {
+              val cclazz = clazz.getContainingClass
+              cclazz == null ||
+              (clazz.hasModifierProperty(PsiModifier.STATIC) &&
+              isStaticCorrect(cclazz))
             }
-          case patt: ScBindingPattern =>
-            val parent = ScalaPsiUtil.getParentOfType(
-                patt, classOf[ScVariable], classOf[ScValue])
-            parent match {
-              case x: ScVariable => kinds contains VAR
-              case _ => kinds contains VAL
-            }
-          case patt: ScFieldId =>
-            if (patt.getParent /*list of ids*/ .getParent
-                  .isInstanceOf[ScVariable]) kinds contains VAR
-            else kinds contains VAL
-          case classParam: ScClassParameter =>
-            if (classParam.isVar) kinds.contains(VAR) else kinds.contains(VAL)
-          case param: ScParameter => kinds contains VAL
-          case _: ScSelfTypeElement => kinds contains VAL
-          case _: PsiMethod => kinds contains METHOD
-          case _: ScFun => kinds contains METHOD
-          case _: ScSyntheticValue => kinds contains VAL
-          case f: PsiField =>
-            (kinds contains VAR) ||
+            (kinds contains OBJECT) && isStaticCorrect(c)
+          }
+        case patt: ScBindingPattern =>
+          val parent = ScalaPsiUtil
+            .getParentOfType(patt, classOf[ScVariable], classOf[ScValue])
+          parent match {
+            case x: ScVariable => kinds contains VAR
+            case _ => kinds contains VAL
+          }
+        case patt: ScFieldId =>
+          if (patt.getParent /*list of ids*/ .getParent
+                .isInstanceOf[ScVariable]) kinds contains VAR
+          else kinds contains VAL
+        case classParam: ScClassParameter =>
+          if (classParam.isVar) kinds.contains(VAR) else kinds.contains(VAL)
+        case param: ScParameter => kinds contains VAL
+        case _: ScSelfTypeElement => kinds contains VAL
+        case _: PsiMethod => kinds contains METHOD
+        case _: ScFun => kinds contains METHOD
+        case _: ScSyntheticValue => kinds contains VAL
+        case f: PsiField =>
+          (kinds contains VAR) ||
             (f.hasModifierPropertyScala(PsiModifier.FINAL) &&
-                kinds.contains(VAL))
-          case _: PsiParameter =>
-            kinds contains VAL //to enable named Parameters resolve in Play 2.0 routing file for java methods
-          case _ => false
-        })
+              kinds.contains(VAL))
+        case _: PsiParameter =>
+          kinds contains VAL //to enable named Parameters resolve in Play 2.0 routing file for java methods
+        case _ => false
+      })
 
   def methodType(m: PsiMethod, s: ScSubstitutor, scope: GlobalSearchScope) =
     ScFunctionType(
-        s.subst(ScType.create(m.getReturnType, m.getProject, scope)),
-        m.getParameterList.getParameters
-          .map({ p =>
-            val pt = p.getType
-            //scala hack: Objects in java are modelled as Any in scala
-            if (pt.equalsToText("java.lang.Object")) types.Any
-            else s.subst(ScType.create(pt, m.getProject, scope))
-          })
-          .toSeq)(m.getProject, scope)
+      s.subst(ScType.create(m.getReturnType, m.getProject, scope)),
+      m.getParameterList.getParameters
+        .map({ p =>
+          val pt = p.getType
+          //scala hack: Objects in java are modelled as Any in scala
+          if (pt.equalsToText("java.lang.Object")) types.Any
+          else s.subst(ScType.create(pt, m.getProject, scope))
+        })
+        .toSeq)(m.getProject, scope)
 
   def javaMethodType(m: PsiMethod,
                      s: ScSubstitutor,
@@ -157,8 +189,12 @@ object ResolveUtils {
       case _ =>
     }
     if (place.getLanguage == JavaLanguage.INSTANCE) {
-      return JavaResolveUtil.isAccessible(
-          memb, memb.containingClass, memb.getModifierList, place, null, null)
+      return JavaResolveUtil.isAccessible(memb,
+                                          memb.containingClass,
+                                          memb.getModifierList,
+                                          place,
+                                          null,
+                                          null)
     }
 
     import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.getPlaceTd
@@ -241,36 +277,44 @@ object ResolveUtils {
                     ref.qualifier match {
                       case None =>
                         val enclosing = PsiTreeUtil.getContextOfType(
-                            scMember, true, classOf[ScTemplateDefinition])
+                          scMember,
+                          true,
+                          classOf[ScTemplateDefinition])
                         if (enclosing == null) return true
-                        return PsiTreeUtil.isContextAncestor(
-                            enclosing, place, false)
+                        return PsiTreeUtil
+                          .isContextAncestor(enclosing, place, false)
                       case Some(t: ScThisReference) =>
                         val enclosing = PsiTreeUtil.getContextOfType(
-                            scMember, true, classOf[ScTemplateDefinition])
+                          scMember,
+                          true,
+                          classOf[ScTemplateDefinition])
                         if (enclosing == null) return true
                         t.refTemplate match {
                           case Some(t) => return t == enclosing
                           case _ =>
-                            return PsiTreeUtil.isContextAncestor(
-                                enclosing, place, false)
+                            return PsiTreeUtil
+                              .isContextAncestor(enclosing, place, false)
                         }
                       case Some(ref: ScReferenceElement) =>
                         val enclosing = PsiTreeUtil.getContextOfType(
-                            scMember, true, classOf[ScTemplateDefinition])
+                          scMember,
+                          true,
+                          classOf[ScTemplateDefinition])
                         if (enclosing == null) return false
                         val resolve = ref.resolve()
                         if (enclosing.extendsBlock.selfTypeElement == Some(
-                                resolve)) return true
+                              resolve)) return true
                         else return false
                       case _ => return false
                     }
                   case _ =>
                     val enclosing = PsiTreeUtil.getContextOfType(
-                        scMember, true, classOf[ScTemplateDefinition])
+                      scMember,
+                      true,
+                      classOf[ScTemplateDefinition])
                     if (enclosing == null) return true
-                    return PsiTreeUtil.isContextAncestor(
-                        enclosing, place, false)
+                    return PsiTreeUtil
+                      .isContextAncestor(enclosing, place, false)
                 }
               }
               val ref = am.getReference
@@ -286,9 +330,11 @@ object ResolveUtils {
                                                   classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
-                  placeEnclosing.isInstanceOf[ScObject] && !placeEnclosing
-                    .asInstanceOf[ScObject]
-                    .isPackageObject) placeEnclosing = context(placeEnclosing)
+                         placeEnclosing
+                           .isInstanceOf[ScObject] && !placeEnclosing
+                           .asInstanceOf[ScObject]
+                           .isPackageObject) placeEnclosing = context(
+                    placeEnclosing)
                   if (placeEnclosing == null) return false //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""
@@ -300,13 +346,13 @@ object ResolveUtils {
                 bind match {
                   case td: ScTemplateDefinition =>
                     PsiTreeUtil.isContextAncestor(td, place, false) ||
-                    PsiTreeUtil.isContextAncestor(
+                      PsiTreeUtil.isContextAncestor(
                         ScalaPsiUtil
                           .getCompanionModule(td)
                           .getOrElse(null: PsiElement),
                         place,
                         false) ||
-                    (td.isInstanceOf[ScObject] &&
+                      (td.isInstanceOf[ScObject] &&
                         td.asInstanceOf[ScObject].isPackageObject &&
                         processPackage(td.qualifiedName))
                   case pack: PsiPackage =>
@@ -321,15 +367,15 @@ object ResolveUtils {
                 template and its companion module or companion class
                  */
                 val enclosing = ScalaPsiUtil.getContextOfType(
-                    scMember,
-                    true,
-                    classOf[ScalaFile],
-                    classOf[ScPackaging],
-                    classOf[ScTemplateDefinition])
+                  scMember,
+                  true,
+                  classOf[ScalaFile],
+                  classOf[ScPackaging],
+                  classOf[ScTemplateDefinition])
                 enclosing match {
                   case td: ScTemplateDefinition =>
                     PsiTreeUtil.isContextAncestor(td, place, false) ||
-                    PsiTreeUtil.isContextAncestor(
+                      PsiTreeUtil.isContextAncestor(
                         ScalaPsiUtil
                           .getCompanionModule(td)
                           .getOrElse(null: PsiElement),
@@ -343,9 +389,11 @@ object ResolveUtils {
                       case packaging: ScPackaging => packaging.getPackageName
                       case _ => ""
                     }
-                    val placeEnclosing: PsiElement = ScalaPsiUtil
-                      .getContextOfType(
-                        place, true, classOf[ScPackaging], classOf[ScalaFile])
+                    val placeEnclosing: PsiElement =
+                      ScalaPsiUtil.getContextOfType(place,
+                                                    true,
+                                                    classOf[ScPackaging],
+                                                    classOf[ScalaFile])
                     if (placeEnclosing == null) return false //not Scala
                     val placePackageName = placeEnclosing match {
                       case file: ScalaFile => ""
@@ -371,9 +419,11 @@ object ResolveUtils {
                                                   classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
-                  placeEnclosing.isInstanceOf[ScObject] && !placeEnclosing
-                    .asInstanceOf[ScObject]
-                    .isPackageObject) placeEnclosing = context(placeEnclosing)
+                         placeEnclosing
+                           .isInstanceOf[ScObject] && !placeEnclosing
+                           .asInstanceOf[ScObject]
+                           .isPackageObject) placeEnclosing = context(
+                    placeEnclosing)
                   if (placeEnclosing == null) return Some(false) //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""
@@ -388,11 +438,11 @@ object ResolveUtils {
                   case td: ScTemplateDefinition =>
                     if (PsiTreeUtil.isContextAncestor(td, place, false) ||
                         PsiTreeUtil.isContextAncestor(
-                            ScalaPsiUtil
-                              .getCompanionModule(td)
-                              .getOrElse(null: PsiElement),
-                            place,
-                            false)) return true
+                          ScalaPsiUtil
+                            .getCompanionModule(td)
+                            .getOrElse(null: PsiElement),
+                          place,
+                          false)) return true
                     td match {
                       case o: ScObject if o.isPackageObject =>
                         processPackage(o.qualifiedName) match {
@@ -412,14 +462,14 @@ object ResolveUtils {
                 }
               }
               val enclosing = ScalaPsiUtil.getContextOfType(
-                  scMember,
-                  true,
-                  classOf[ScalaFile],
-                  classOf[ScTemplateDefinition],
-                  classOf[ScPackaging])
+                scMember,
+                true,
+                classOf[ScalaFile],
+                classOf[ScTemplateDefinition],
+                classOf[ScPackaging])
               assert(
-                  enclosing != null,
-                  s"Enclosing is null in file ${scMember.getContainingFile.getName}:\n${scMember.getContainingFile.getText}")
+                enclosing != null,
+                s"Enclosing is null in file ${scMember.getContainingFile.getName}:\n${scMember.getContainingFile.getText}")
               if (am.isThis) {
                 place match {
                   case ref: ScReferenceElement =>
@@ -429,11 +479,13 @@ object ResolveUtils {
                       case Some(s: ScSuperReference) =>
                       case Some(ref: ScReferenceElement) =>
                         val enclosing = PsiTreeUtil.getContextOfType(
-                            scMember, true, classOf[ScTemplateDefinition])
+                          scMember,
+                          true,
+                          classOf[ScTemplateDefinition])
                         if (enclosing == null) return false
                         val resolve = ref.resolve()
                         if (enclosing.extendsBlock.selfTypeElement != Some(
-                                resolve)) return false
+                              resolve)) return false
                       case _ => return false
                     }
                   case _ =>
@@ -443,11 +495,11 @@ object ResolveUtils {
                 case td: ScTypeDefinition =>
                   if (PsiTreeUtil.isContextAncestor(td, place, false) ||
                       (withCompanion && PsiTreeUtil.isContextAncestor(
-                              ScalaPsiUtil
-                                .getCompanionModule(td)
-                                .getOrElse(null: PsiElement),
-                              place,
-                              false))) return true
+                        ScalaPsiUtil
+                          .getCompanionModule(td)
+                          .getOrElse(null: PsiElement),
+                        place,
+                        false))) return true
                   checkProtected(td, withCompanion)
                 case td: ScTemplateDefinition =>
                   //it'd anonymous class, has access only inside
@@ -459,8 +511,10 @@ object ResolveUtils {
                     case packaging: ScPackaging => packaging.fullPackageName
                   }
                   val placeEnclosing: PsiElement =
-                    ScalaPsiUtil.getContextOfType(
-                        place, true, classOf[ScPackaging], classOf[ScalaFile])
+                    ScalaPsiUtil.getContextOfType(place,
+                                                  true,
+                                                  classOf[ScPackaging],
+                                                  classOf[ScalaFile])
                   if (placeEnclosing == null) return false //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""
@@ -483,7 +537,10 @@ object ResolveUtils {
             case _ => return false
           }
           val placeEnclosing: PsiElement = ScalaPsiUtil.getContextOfType(
-              place, true, classOf[ScPackaging], classOf[ScalaFile])
+            place,
+            true,
+            classOf[ScPackaging],
+            classOf[ScalaFile])
           if (placeEnclosing == null) return false
           val placePackageName = placeEnclosing match {
             case file: ScalaFile => ""
@@ -509,12 +566,12 @@ object ResolveUtils {
           superRef.drvTemplate match {
             case Some(c) =>
               TypeDefinitionMembers.processSuperDeclarations(
-                  c,
-                  processor,
-                  ResolveState.initial.put(
-                      ScSubstitutor.key, ScSubstitutor.empty),
-                  null,
-                  place)
+                c,
+                processor,
+                ResolveState.initial
+                  .put(ScSubstitutor.key, ScSubstitutor.empty),
+                null,
+                place)
             case None =>
           }
       }
@@ -531,8 +588,8 @@ object ResolveUtils {
     pack.fullPackageName
   }
 
-  private def isInheritorOrSelfOrSame(
-      placeTd: ScTemplateDefinition, td: PsiClass): Boolean = {
+  private def isInheritorOrSelfOrSame(placeTd: ScTemplateDefinition,
+                                      td: PsiClass): Boolean = {
     if (ScalaPsiUtil.cachedDeepIsInheritor(placeTd, td)) return true
     placeTd.selfTypeElement match {
       case Some(te: ScSelfTypeElement) =>
@@ -578,8 +635,8 @@ object ResolveUtils {
       case b: BaseProcessor if b.isImplicitProcessor =>
         val objectsIterator = ScalaPsiManager
           .instance(pack.getProject)
-          .getPackageImplicitObjects(
-              pack.getQualifiedName, place.getResolveScope)
+          .getPackageImplicitObjects(pack.getQualifiedName,
+                                     place.getResolveScope)
           .iterator
         while (objectsIterator.hasNext) {
           val obj = objectsIterator.next()
@@ -676,8 +733,8 @@ object ResolveUtils {
               //process subpackages
               pack match {
                 case s: ScPackageImpl =>
-                  s.pack.processDeclarations(
-                      processor, state, lastParent, place)
+                  s.pack
+                    .processDeclarations(processor, state, lastParent, place)
                 case _ =>
                   pack.processDeclarations(processor, state, lastParent, place)
               }

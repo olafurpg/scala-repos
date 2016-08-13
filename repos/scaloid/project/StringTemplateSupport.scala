@@ -6,8 +6,9 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException
 import sbt._
 import scala.collection.JavaConversions._
 
-class StringTemplateSupport(
-    version: Int, templateFile: File, logger: sbt.Logger) {
+class StringTemplateSupport(version: Int,
+                            templateFile: File,
+                            logger: sbt.Logger) {
   import StringTemplateSupport._
 
   def render(file: File, parameters: Map[String, Any]) = {
@@ -53,10 +54,10 @@ class StringTemplateSupport(
   private def baseGroup = {
     val g = new STGroup('$', '$')
     g.defineTemplate("license", ScaloidCodeGenerator.license)
-    g.registerRenderer(
-        classOf[AndroidClass], new AndroidClassRenderer(companionTemplate))
-    g.registerRenderer(
-        classOf[AndroidPackage], new AndroidPackageRenderer(companionTemplate))
+    g.registerRenderer(classOf[AndroidClass],
+                       new AndroidClassRenderer(companionTemplate))
+    g.registerRenderer(classOf[AndroidPackage],
+                       new AndroidPackageRenderer(companionTemplate))
     g.registerRenderer(classOf[String], new StringRenderer())
     g.registerModelAdaptor(classOf[AndroidPackage], new AndroidPackageAdaptor)
     g.defineDictionary("ver", verDic)
@@ -69,12 +70,14 @@ class StringTemplateSupport(
       def kv(prod: Boolean, keys: String*) =
         keys.map(k => (k + "_" + v) -> prod.asInstanceOf[Object])
       kv(ver == v, "eq", "gte", "lte") ++ kv(ver > v, "gt", "gte") ++ kv(
-          ver < v, "lt", "lte")
+        ver < v,
+        "lt",
+        "lte")
     }.toMap
 
   private def expandToPackageMap(pkg: Map[String, Any]): Map[String, Any] = {
-    def expand(
-        lmap: Map[List[String], Any], level: Int = 0): Map[String, Any] = {
+    def expand(lmap: Map[List[String], Any],
+               level: Int = 0): Map[String, Any] = {
       lmap
         .groupBy(_._1.head)
         .mapValues(_.map { case (k, v) => k.tail -> v })

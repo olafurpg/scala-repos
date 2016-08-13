@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ object nat {
 
   /**
     * Type class witnessing that `B` is the predecessor of `A`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Pred[A <: Nat] extends Serializable { type Out <: Nat }
@@ -38,7 +38,7 @@ object nat {
 
   /**
     * Type class witnessing that `C` is the sum of `A` and `B`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Sum[A <: Nat, B <: Nat] extends Serializable { type Out <: Nat }
@@ -59,7 +59,7 @@ object nat {
 
   /**
     * Type class witnessing that `C` is the difference of `A` and `B`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Diff[A <: Nat, B <: Nat] extends Serializable { type Out <: Nat }
@@ -80,7 +80,7 @@ object nat {
 
   /**
     * Type class witnessing that `C` is the product of `A` and `B`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Prod[A <: Nat, B <: Nat] extends Serializable { type Out <: Nat }
@@ -151,7 +151,7 @@ object nat {
 
   /**
     * Type class witnessing that `A` is less than `B`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait LT[A <: Nat, B <: Nat] extends Serializable
@@ -172,7 +172,7 @@ object nat {
 
   /**
     * Type class witnessing that `A` is less than or equal to `B`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait LTEq[A <: Nat, B <: Nat] extends Serializable
@@ -372,7 +372,7 @@ object nat {
 
   /**
     * Type class supporting conversion of type-level Nats to value level Ints.
-    * 
+    *
     * @author Miles Sabin
     */
   trait ToInt[N <: Nat] extends Serializable {

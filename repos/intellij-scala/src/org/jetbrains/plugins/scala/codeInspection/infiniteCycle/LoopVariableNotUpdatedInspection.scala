@@ -25,14 +25,14 @@ class LoopVariableNotUpdatedInspection
                                  _)),
                      Some(body))
         if !ref.isQualified && ComparisonOperators.contains(operator) &&
-        !isMutatedWithing(body, target) =>
+          !isMutatedWithing(body, target) =>
       holder.registerProblem(ref.asInstanceOf[PsiReference],
                              getDisplayName,
                              ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
   }
 
-  private def isMutatedWithing(
-      scope: ScalaPsiElement, target: PsiElement): Boolean = {
+  private def isMutatedWithing(scope: ScalaPsiElement,
+                               target: PsiElement): Boolean = {
     val Target = target
 
     scope.breadthFirst.exists {

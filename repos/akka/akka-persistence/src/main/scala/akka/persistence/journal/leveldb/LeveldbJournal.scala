@@ -25,8 +25,11 @@ private[persistence] class LeveldbJournal extends {
   import LeveldbJournal._
 
   override def receivePluginInternal: Receive = {
-    case r @ ReplayTaggedMessages(
-        fromSequenceNr, toSequenceNr, max, tag, replyTo) ⇒
+    case r @ ReplayTaggedMessages(fromSequenceNr,
+                                  toSequenceNr,
+                                  max,
+                                  tag,
+                                  replyTo) ⇒
       import context.dispatcher
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
       asyncReadHighestSequenceNr(tagAsPersistenceId(tag),
@@ -111,9 +114,11 @@ private[persistence] object LeveldbJournal {
                                         tag: String,
                                         replyTo: ActorRef)
       extends SubscriptionCommand
-  final case class ReplayedTaggedMessage(
-      persistent: PersistentRepr, tag: String, offset: Long)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+  final case class ReplayedTaggedMessage(persistent: PersistentRepr,
+                                         tag: String,
+                                         offset: Long)
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 }
 
 /**
@@ -132,9 +137,9 @@ private[persistence] class SharedLeveldbJournal extends AsyncWriteProxy {
         case Some(s) ⇒ s.forward(cmd)
         case None ⇒
           log.error(
-              "Failed {} request. " +
+            "Failed {} request. " +
               "Store not initialized. Use `SharedLeveldbJournal.setStore(sharedStore, system)`",
-              cmd)
+            cmd)
       }
   }
 }

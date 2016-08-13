@@ -30,7 +30,9 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark.ui.SparkUICssErrorHandler
 
 class UISeleniumSuite
-    extends HiveThriftJdbcTest with WebBrowser with Matchers
+    extends HiveThriftJdbcTest
+    with WebBrowser
+    with Matchers
     with BeforeAndAfterAll {
 
   implicit var webDriver: WebDriver = _
@@ -79,8 +81,8 @@ class UISeleniumSuite
       val baseURL = s"http://localhost:$uiPort"
 
       val queries = Seq(
-          "CREATE TABLE test_map(key INT, value STRING)",
-          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
+        "CREATE TABLE test_map(key INT, value STRING)",
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
 
       queries.foreach(statement.execute)
 
@@ -96,8 +98,9 @@ class UISeleniumSuite
 
         // check whether statements exists
         queries.foreach { line =>
-          findAll(cssSelector("""ul table tbody tr td""")).map(_.text).toList should contain(
-              line)
+          findAll(cssSelector("""ul table tbody tr td"""))
+            .map(_.text)
+            .toList should contain(line)
         }
       }
     }

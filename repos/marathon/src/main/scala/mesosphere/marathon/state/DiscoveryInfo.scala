@@ -17,13 +17,13 @@ object DiscoveryInfo {
 
   def fromProto(proto: Protos.DiscoveryInfo): DiscoveryInfo = {
     DiscoveryInfo(
-        proto.getPortsList.asScala.map(Port.fromProto).toList
+      proto.getPortsList.asScala.map(Port.fromProto).toList
     )
   }
 
   case class Port(number: Int, name: String, protocol: String) {
-    require(
-        Port.AllowedProtocols(protocol), "protocol can only be 'tcp' or 'udp'")
+    require(Port.AllowedProtocols(protocol),
+            "protocol can only be 'tcp' or 'udp'")
 
     def toProto: MesosProtos.Port = {
       MesosProtos.Port.newBuilder
@@ -39,9 +39,9 @@ object DiscoveryInfo {
 
     def fromProto(proto: MesosProtos.Port): Port = {
       Port(
-          number = proto.getNumber,
-          name = proto.getName,
-          protocol = proto.getProtocol
+        number = proto.getNumber,
+        name = proto.getName,
+        protocol = proto.getProtocol
       )
     }
   }

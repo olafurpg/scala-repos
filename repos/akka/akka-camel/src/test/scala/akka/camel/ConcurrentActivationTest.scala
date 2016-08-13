@@ -21,33 +21,35 @@ import akka.actor.ActorLogging
   * A test to concurrently register and de-register consumer and producer endpoints
   */
 class ConcurrentActivationTest
-    extends WordSpec with Matchers with NonSharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with NonSharedCamelSystem {
 
   "Activation" must {
     "support concurrent registrations and de-registrations" in {
       implicit val ec = system.dispatcher
       val number = 10
       val eventFilter = EventFilter.warning(
-          pattern = "received dead letter from .*producerRegistrar.*")
+        pattern = "received dead letter from .*producerRegistrar.*")
       system.eventStream.publish(TestEvent.Mute(eventFilter))
       try {
         // A ConsumerBroadcast creates 'number' amount of ConsumerRegistrars, which will register 'number' amount of endpoints,
         // in total number*number endpoints, activating and deactivating every endpoint.
         // a promise to the list of registrars, which have a list of actorRefs each. A tuple of a list of activated refs and a list of deactivated refs
-        val promiseRegistrarLists = Promise[
-            (Future[List[List[ActorRef]]], Future[List[List[ActorRef]]])]()
+        val promiseRegistrarLists = Promise[(Future[List[List[ActorRef]]],
+                                             Future[List[List[ActorRef]]])]()
         // future to all the futures of activation and deactivation
         val futureRegistrarLists = promiseRegistrarLists.future
 
-        val ref = system.actorOf(
-            Props(classOf[ConsumerBroadcast], promiseRegistrarLists),
-            name = "broadcaster")
+        val ref = system.actorOf(Props(classOf[ConsumerBroadcast],
+                                       promiseRegistrarLists),
+                                 name = "broadcaster")
         // create the registrars
         ref ! CreateRegistrars(number)
         // send a broadcast to all registrars, so that number * number messages are sent
         // every Register registers a consumer and a producer
-        (1 to number).map(
-            i ⇒ ref ! RegisterConsumersAndProducers("direct:concurrent-"))
+        (1 to number).map(i ⇒
+          ref ! RegisterConsumersAndProducers("direct:concurrent-"))
         // de-register all consumers and producers
         ref ! DeRegisterConsumersAndProducers()
 
@@ -59,7 +61,7 @@ class ConcurrentActivationTest
             futureActivations zip futureDeactivations map {
               case (activations, deactivations) ⇒
                 promiseAllRefs.success(
-                    (activations.flatten, deactivations.flatten))
+                  (activations.flatten, deactivations.flatten))
             }
         }
         val (activations, deactivations) =
@@ -81,9 +83,9 @@ class ConcurrentActivationTest
         val (deactivatedConsumerNames, deactivatedProducerNames) =
           partitionNames(deactivations)
         assertContainsSameElements(
-            activatedConsumerNames -> deactivatedConsumerNames)
+          activatedConsumerNames -> deactivatedConsumerNames)
         assertContainsSameElements(
-            activatedProducerNames -> deactivatedProducerNames)
+          activatedProducerNames -> deactivatedProducerNames)
       } finally {
         system.eventStream.publish(TestEvent.UnMute(eventFilter))
       }
@@ -91,8 +93,9 @@ class ConcurrentActivationTest
   }
 }
 
-class ConsumerBroadcast(promise: Promise[(Future[List[List[ActorRef]]], Future[
-            List[List[ActorRef]]])])
+class ConsumerBroadcast(
+    promise: Promise[(Future[List[List[ActorRef]]],
+                      Future[List[List[ActorRef]]])])
     extends Actor {
   private var broadcaster: Option[ActorRef] = None
   private implicit val ec = context.dispatcher
@@ -117,12 +120,13 @@ class ConsumerBroadcast(promise: Promise[(Future[List[List[ActorRef]]], Future[
                                      "registrar-" + i)
         routee.path.toString
       }
-      promise.success(Future.sequence(allActivationFutures) -> Future.sequence(
-              allDeactivationFutures))
+      promise.success(
+        Future.sequence(allActivationFutures) -> Future.sequence(
+          allDeactivationFutures))
 
       broadcaster = Some(
-          context.actorOf(
-              BroadcastGroup(routeePaths).props(), "registrarRouter"))
+        context.actorOf(BroadcastGroup(routeePaths).props(),
+                        "registrarRouter"))
     case reg: Any ⇒
       broadcaster.foreach(_.forward(reg))
   }
@@ -138,7 +142,8 @@ class Registrar(val start: Int,
                 val number: Int,
                 activationsPromise: Promise[List[ActorRef]],
                 deActivationsPromise: Promise[List[ActorRef]])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   private var actorRefs = Set[ActorRef]()
   private var activations = Set[Future[ActorRef]]()
   private var deActivations = Set[Future[ActorRef]]()
@@ -165,8 +170,9 @@ class Registrar(val start: Int,
         val result = camel.deactivationFutureFor(aref)
         result.onFailure {
           case e ⇒
-            log.error(
-                "deactivationFutureFor {} failed: {}", aref, e.getMessage)
+            log.error("deactivationFutureFor {} failed: {}",
+                      aref,
+                      e.getMessage)
         }
         deActivations += result
         if (deActivations.size == number * 2) {

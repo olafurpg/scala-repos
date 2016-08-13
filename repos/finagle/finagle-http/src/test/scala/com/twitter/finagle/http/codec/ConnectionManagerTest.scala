@@ -1,6 +1,14 @@
 package com.twitter.finagle.http.codec
 
-import com.twitter.finagle.http.{HttpTransport, Request, Version, Method, Response, Fields, Status}
+import com.twitter.finagle.http.{
+  HttpTransport,
+  Request,
+  Version,
+  Method,
+  Response,
+  Fields,
+  Status
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Promise, Return, Future, Time}
 import java.net.InetSocketAddress
@@ -92,17 +100,17 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
   // Note: by way of the codec, this reply is already taken care of.
   test("terminate http/1.1 connections without content length") {
     perform(
-        makeRequest(Version.Http11),
-        makeResponse(Version.Http11),
-        true
+      makeRequest(Version.Http11),
+      makeResponse(Version.Http11),
+      true
     )
   }
 
   test("terminate http/1.1 connections with Connection: close") {
     perform(
-        makeRequest(Version.Http11, "Connection" -> "close"),
-        makeResponse(Version.Http11),
-        true
+      makeRequest(Version.Http11, "Connection" -> "close"),
+      makeResponse(Version.Http11),
+      true
     )
   }
 }

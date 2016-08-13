@@ -45,12 +45,13 @@ object MultivariateSummarizer {
 
     val parser = new OptionParser[Params]("MultivariateSummarizer") {
       head(
-          "MultivariateSummarizer: an example app for MultivariateOnlineSummarizer")
+        "MultivariateSummarizer: an example app for MultivariateOnlineSummarizer")
       opt[String]("input")
         .text(
-            s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
+          s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+        """
         |For example, the following command runs this app on a synthetic dataset:
         |
         | bin/spark-submit --class org.apache.spark.examples.mllib.MultivariateSummarizer \
@@ -78,29 +79,28 @@ object MultivariateSummarizer {
 
     // Summarize labels
     val labelSummary = examples.aggregate(new MultivariateOnlineSummarizer())(
-        (summary, lp) => summary.add(Vectors.dense(lp.label)),
-        (sum1, sum2) => sum1.merge(sum2))
+      (summary, lp) => summary.add(Vectors.dense(lp.label)),
+      (sum1, sum2) => sum1.merge(sum2))
 
     // Summarize features
     val featureSummary =
       examples.aggregate(new MultivariateOnlineSummarizer())(
-          (summary, lp) => summary.add(lp.features),
-          (sum1, sum2) => sum1.merge(sum2))
+        (summary, lp) => summary.add(lp.features),
+        (sum1, sum2) => sum1.merge(sum2))
 
     println()
     println(s"Summary statistics")
     println(s"\tLabel\tFeatures")
     println(
-        s"mean\t${labelSummary.mean(0)}\t${featureSummary.mean.toArray.mkString("\t")}")
+      s"mean\t${labelSummary.mean(0)}\t${featureSummary.mean.toArray.mkString("\t")}")
     println(
-        s"var\t${labelSummary.variance(0)}\t${featureSummary.variance.toArray.mkString("\t")}")
+      s"var\t${labelSummary.variance(0)}\t${featureSummary.variance.toArray.mkString("\t")}")
+    println(s"nnz\t${labelSummary
+      .numNonzeros(0)}\t${featureSummary.numNonzeros.toArray.mkString("\t")}")
     println(
-        s"nnz\t${labelSummary.numNonzeros(0)}\t${featureSummary.numNonzeros.toArray
-      .mkString("\t")}")
+      s"max\t${labelSummary.max(0)}\t${featureSummary.max.toArray.mkString("\t")}")
     println(
-        s"max\t${labelSummary.max(0)}\t${featureSummary.max.toArray.mkString("\t")}")
-    println(
-        s"min\t${labelSummary.min(0)}\t${featureSummary.min.toArray.mkString("\t")}")
+      s"min\t${labelSummary.min(0)}\t${featureSummary.min.toArray.mkString("\t")}")
     println()
 
     sc.stop()

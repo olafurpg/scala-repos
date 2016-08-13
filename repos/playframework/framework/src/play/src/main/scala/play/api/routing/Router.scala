@@ -64,15 +64,15 @@ object Router {
 
     try {
       Some(
-          Reflect.getClass[Router](
-              className.getOrElse("router.Routes"), env.classLoader))
+        Reflect.getClass[Router](className.getOrElse("router.Routes"),
+                                 env.classLoader))
     } catch {
       case e: ClassNotFoundException =>
         // Only throw an exception if a router was explicitly configured, but not found.
         // Otherwise, it just means this application has no router, and that's ok.
         className.map { routerName =>
-          throw configuration.reportError(
-              "application.router", "Router not found: " + routerName)
+          throw configuration.reportError("application.router",
+                                          "Router not found: " + routerName)
         }
     }
   }

@@ -27,8 +27,9 @@ object Supervision {
       restartStrategy: FaultHandlingStrategy,
       worker: List[Server],
       maxRestartsHandler: (ActorRef,
-      MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = { (aRef, max) =>
-        ()
+                           MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
+        (aRef, max) =>
+          ()
       })
       extends Server {
     //Java API
@@ -37,7 +38,8 @@ object Supervision {
     def this(restartStrategy: FaultHandlingStrategy,
              worker: Array[Server],
              restartHandler: Procedure2[
-                 ActorRef, MaximumNumberOfRestartsWithinTimeRangeReached]) =
+               ActorRef,
+               MaximumNumberOfRestartsWithinTimeRangeReached]) =
       this(restartStrategy, worker.toList, { (aRef, max) =>
         restartHandler.apply(aRef, max)
       })
@@ -61,9 +63,9 @@ object Supervision {
       new Supervise(actorRef, lifeCycle, false)
     def unapply(supervise: Supervise) =
       Some(
-          (supervise.actorRef,
-           supervise.lifeCycle,
-           supervise.registerAsRemoteService))
+        (supervise.actorRef,
+         supervise.lifeCycle,
+         supervise.registerAsRemoteService))
   }
 
   object AllForOneStrategy {
@@ -71,9 +73,9 @@ object Supervision {
               maxNrOfRetries: Int,
               withinTimeRange: Int): AllForOneStrategy =
       new AllForOneStrategy(
-          trapExit,
-          if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-          if (withinTimeRange < 0) None else Some(withinTimeRange))
+        trapExit,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
   }
 
   case class AllForOneStrategy(
@@ -108,9 +110,9 @@ object Supervision {
               maxNrOfRetries: Int,
               withinTimeRange: Int): OneForOneStrategy =
       new OneForOneStrategy(
-          trapExit,
-          if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-          if (withinTimeRange < 0) None else Some(withinTimeRange))
+        trapExit,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
   }
 
   case class OneForOneStrategy(
@@ -161,8 +163,7 @@ object Supervision {
                                  val timeout: Long,
                                  _dispatcher: MessageDispatcher, // optional
                                  _remoteAddress: RemoteAddress // optional
-  )
-      extends Server {
+  ) extends Server {
     val intf: Option[Class[_]] = Option(_intf)
     val dispatcher: Option[MessageDispatcher] = Option(_dispatcher)
     val remoteAddress: Option[RemoteAddress] = Option(_remoteAddress)

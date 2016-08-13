@@ -86,10 +86,11 @@ object ObjectProperty {
     * @param name The name of this $OP
     * @param initialValue The initial value of the wrapped value
     */
-  def apply[T <: Any](
-      bean: Object, name: String, initialValue: T): ObjectProperty[T] =
+  def apply[T <: Any](bean: Object,
+                      name: String,
+                      initialValue: T): ObjectProperty[T] =
     new ObjectProperty(
-        new jfxbp.SimpleObjectProperty[T](bean, name, initialValue))
+      new jfxbp.SimpleObjectProperty[T](bean, name, initialValue))
 
   /**
     * Creates a new $OP with with its reference bean and name and a [[scalafx.delegate.SFXDelegate]] as initial value.
@@ -105,7 +106,7 @@ object ObjectProperty {
                          name: String,
                          initialValue: SFXDelegate[J]): ObjectProperty[J] =
     new ObjectProperty(
-        new jfxbp.SimpleObjectProperty[J](bean, name, initialValue.delegate))
+      new jfxbp.SimpleObjectProperty[J](bean, name, initialValue.delegate))
 
   /**
     * Helper method for setting a value of an `ObjectProperty`,
@@ -118,8 +119,8 @@ object ObjectProperty {
     * @param property $OP to be filled.
     * @param value Value to be injected in $OP, to avoid implicit conversion and NPE is `value` is `null`.
     */
-  def fillProperty[J <: AnyRef](
-      property: ObjectProperty[J], value: SFXDelegate[J]) {
+  def fillProperty[J <: AnyRef](property: ObjectProperty[J],
+                                value: SFXDelegate[J]) {
     if (value == null) {
       property.delegate.setValue(null.asInstanceOf[J])
     } else {
@@ -161,9 +162,10 @@ object ObjectProperty {
   * This assumes that will not provide property type but let Scala compiler infer correct one.
   */
 class ObjectProperty[T <: Any](
-    override val delegate: jfxbp.ObjectProperty[T] = new jfxbp.SimpleObjectProperty[
-          T])
-    extends ReadOnlyObjectProperty[T](delegate) with Property[T, T]
+    override val delegate: jfxbp.ObjectProperty[T] =
+      new jfxbp.SimpleObjectProperty[T])
+    extends ReadOnlyObjectProperty[T](delegate)
+    with Property[T, T]
     with SFXDelegate[jfxbp.ObjectProperty[T]] {
 
   def this(bean: Object, name: String) =

@@ -5,7 +5,12 @@ import java.io._
 import java.util.Properties
 
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.util.io.{PersistentEnumeratorBase, DataExternalizer, EnumeratorStringDescriptor, PersistentHashMap}
+import com.intellij.util.io.{
+  PersistentEnumeratorBase,
+  DataExternalizer,
+  EnumeratorStringDescriptor,
+  PersistentHashMap
+}
 import org.apache.maven.index.ArtifactInfo
 
 import scala.collection.JavaConversions._
@@ -24,11 +29,11 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
 
   ensureIndexDir()
   private val artifactToGroupMap = createPersistentMap(
-      indexDir / Paths.ARTIFACT_TO_GROUP_FILE)
+    indexDir / Paths.ARTIFACT_TO_GROUP_FILE)
   private val groupToArtifactMap = createPersistentMap(
-      indexDir / Paths.GROUP_TO_ARTIFACT_FILE)
+    indexDir / Paths.GROUP_TO_ARTIFACT_FILE)
   private val groupArtifactToVersionMap = createPersistentMap(
-      indexDir / Paths.GROUP_ARTIFACT_TO_VERSION_FILE)
+    indexDir / Paths.GROUP_ARTIFACT_TO_VERSION_FILE)
 
   def update(progressIndicator: Option[ProgressIndicator] = None) {
     val agMap = mutable.HashMap.empty[String, mutable.Set[String]]
@@ -39,8 +44,8 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
         artifact.getGroupId
       gaMap.getOrElseUpdate(artifact.getGroupId, mutable.Set.empty) +=
         artifact.getArtifactId
-      gavMap.getOrElseUpdate(
-          SbtResolverUtils.joinGroupArtifact(artifact), mutable.Set.empty) +=
+      gavMap.getOrElseUpdate(SbtResolverUtils.joinGroupArtifact(artifact),
+                             mutable.Set.empty) +=
         artifact.getVersion
     }
 
@@ -104,7 +109,7 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
 
   def versions(group: String, artifact: String) =
     groupArtifactToVersionMap.getOrEmpty(
-        SbtResolverUtils.joinGroupArtifact(group, artifact))
+      SbtResolverUtils.joinGroupArtifact(group, artifact))
 
   def isLocal: Boolean =
     kind == SbtResolver.Kind.Ivy || root.startsWith("file:")
@@ -116,8 +121,9 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   }
 
   private def createPersistentMap(file: File) =
-    new PersistentHashMap[String, Set[String]](
-        file, new EnumeratorStringDescriptor, new SetDescriptor) {
+    new PersistentHashMap[String, Set[String]](file,
+                                               new EnumeratorStringDescriptor,
+                                               new SetDescriptor) {
       def getOrEmpty(key: String): Set[String] =
         try {
           Option(get(key)).getOrElse(Set.empty)

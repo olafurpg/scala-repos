@@ -44,7 +44,8 @@ import org.apache.spark.rdd.{EmptyRDD, HadoopRDD, NewHadoopRDD, RDD}
   * creating a new one.  This limitation may eventually be removed; see SPARK-2243 for more details.
   */
 class JavaSparkContext(val sc: SparkContext)
-    extends JavaSparkContextVarargsWorkaround with Closeable {
+    extends JavaSparkContextVarargsWorkaround
+    with Closeable {
 
   /**
     * Create a JavaSparkContext that loads settings from system properties (for instance, when
@@ -79,8 +80,10 @@ class JavaSparkContext(val sc: SparkContext)
     * @param jarFile JAR file to send to the cluster. This can be a path on the local file system
     *                or an HDFS, HTTP, HTTPS, or FTP URL.
     */
-  def this(
-      master: String, appName: String, sparkHome: String, jarFile: String) =
+  def this(master: String,
+           appName: String,
+           sparkHome: String,
+           jarFile: String) =
     this(new SparkContext(master, appName, sparkHome, Seq(jarFile)))
 
   /**
@@ -110,8 +113,11 @@ class JavaSparkContext(val sc: SparkContext)
            jars: Array[String],
            environment: JMap[String, String]) =
     this(
-        new SparkContext(
-            master, appName, sparkHome, jars.toSeq, environment.asScala))
+      new SparkContext(master,
+                       appName,
+                       sparkHome,
+                       jars.toSeq,
+                       environment.asScala))
 
   private[spark] val env = sc.env
 
@@ -168,10 +174,10 @@ class JavaSparkContext(val sc: SparkContext)
     parallelizePairs(list, sc.defaultParallelism)
 
   /** Distribute a local Scala collection to form an RDD. */
-  def parallelizeDoubles(
-      list: java.util.List[java.lang.Double], numSlices: Int): JavaDoubleRDD =
+  def parallelizeDoubles(list: java.util.List[java.lang.Double],
+                         numSlices: Int): JavaDoubleRDD =
     JavaDoubleRDD.fromRDD(
-        sc.parallelize(list.asScala.map(_.doubleValue()), numSlices))
+      sc.parallelize(list.asScala.map(_.doubleValue()), numSlices))
 
   /** Distribute a local Scala collection to form an RDD. */
   def parallelizeDoubles(
@@ -221,8 +227,8 @@ class JavaSparkContext(val sc: SparkContext)
     *
     * @param minPartitions A suggestion value of the minimal splitting number for input data.
     */
-  def wholeTextFiles(
-      path: String, minPartitions: Int): JavaPairRDD[String, String] =
+  def wholeTextFiles(path: String,
+                     minPartitions: Int): JavaPairRDD[String, String] =
     new JavaPairRDD(sc.wholeTextFiles(path, minPartitions))
 
   /**
@@ -442,8 +448,8 @@ class JavaSparkContext(val sc: SparkContext)
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)
-    val rdd = sc.hadoopFile(
-        path, inputFormatClass, keyClass, valueClass, minPartitions)
+    val rdd = sc
+      .hadoopFile(path, inputFormatClass, keyClass, valueClass, minPartitions)
     new JavaHadoopRDD(rdd.asInstanceOf[HadoopRDD[K, V]])
   }
 
@@ -516,8 +522,8 @@ class JavaSparkContext(val sc: SparkContext)
   }
 
   /** Build the union of two or more RDDs. */
-  override def union[T](
-      first: JavaRDD[T], rest: java.util.List[JavaRDD[T]]): JavaRDD[T] = {
+  override def union[T](first: JavaRDD[T],
+                        rest: java.util.List[JavaRDD[T]]): JavaRDD[T] = {
     val rdds: Seq[RDD[T]] = (Seq(first) ++ rest.asScala).map(_.rdd)
     implicit val ctag: ClassTag[T] = first.classTag
     sc.union(rdds)
@@ -555,8 +561,8 @@ class JavaSparkContext(val sc: SparkContext)
     *
     * This version supports naming the accumulator for display in Spark's web UI.
     */
-  def intAccumulator(
-      initialValue: Int, name: String): Accumulator[java.lang.Integer] =
+  def intAccumulator(initialValue: Int,
+                     name: String): Accumulator[java.lang.Integer] =
     sc.accumulator(initialValue, name)(IntAccumulatorParam)
       .asInstanceOf[Accumulator[java.lang.Integer]]
 
@@ -574,8 +580,8 @@ class JavaSparkContext(val sc: SparkContext)
     *
     * This version supports naming the accumulator for display in Spark's web UI.
     */
-  def doubleAccumulator(
-      initialValue: Double, name: String): Accumulator[java.lang.Double] =
+  def doubleAccumulator(initialValue: Double,
+                        name: String): Accumulator[java.lang.Double] =
     sc.accumulator(initialValue, name)(DoubleAccumulatorParam)
       .asInstanceOf[Accumulator[java.lang.Double]]
 
@@ -592,8 +598,8 @@ class JavaSparkContext(val sc: SparkContext)
     *
     * This version supports naming the accumulator for display in Spark's web UI.
     */
-  def accumulator(
-      initialValue: Int, name: String): Accumulator[java.lang.Integer] =
+  def accumulator(initialValue: Int,
+                  name: String): Accumulator[java.lang.Integer] =
     intAccumulator(initialValue, name)
 
   /**
@@ -609,16 +615,16 @@ class JavaSparkContext(val sc: SparkContext)
     *
     * This version supports naming the accumulator for display in Spark's web UI.
     */
-  def accumulator(
-      initialValue: Double, name: String): Accumulator[java.lang.Double] =
+  def accumulator(initialValue: Double,
+                  name: String): Accumulator[java.lang.Double] =
     doubleAccumulator(initialValue, name)
 
   /**
     * Create an [[org.apache.spark.Accumulator]] variable of a given type, which tasks can "add"
     * values to using the `add` method. Only the master can access the accumulator's `value`.
     */
-  def accumulator[T](
-      initialValue: T, accumulatorParam: AccumulatorParam[T]): Accumulator[T] =
+  def accumulator[T](initialValue: T,
+                     accumulatorParam: AccumulatorParam[T]): Accumulator[T] =
     sc.accumulator(initialValue)(accumulatorParam)
 
   /**
@@ -636,8 +642,8 @@ class JavaSparkContext(val sc: SparkContext)
     * Create an [[org.apache.spark.Accumulable]] shared variable of the given type, to which tasks
     * can "add" values with `add`. Only the master can access the accumuable's `value`.
     */
-  def accumulable[T, R](
-      initialValue: T, param: AccumulableParam[T, R]): Accumulable[T, R] =
+  def accumulable[T, R](initialValue: T,
+                        param: AccumulableParam[T, R]): Accumulable[T, R] =
     sc.accumulable(initialValue)(param)
 
   /**
@@ -783,8 +789,9 @@ class JavaSparkContext(val sc: SparkContext)
     * that the tasks are actually stopped in a timely manner, but is off by default due to HDFS-1208,
     * where HDFS may respond to Thread.interrupt() by marking nodes as dead.
     */
-  def setJobGroup(
-      groupId: String, description: String, interruptOnCancel: Boolean): Unit =
+  def setJobGroup(groupId: String,
+                  description: String,
+                  interruptOnCancel: Boolean): Unit =
     sc.setJobGroup(groupId, description, interruptOnCancel)
 
   /**

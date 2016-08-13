@@ -27,7 +27,9 @@ object RemoteNodeRestartDeathWatchMultiJvmSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+    debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = off
       akka.remote.transport-failure-detector.heartbeat-interval = 1 s
@@ -55,7 +57,8 @@ class RemoteNodeRestartDeathWatchMultiJvmNode2
 
 abstract class RemoteNodeRestartDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeRestartDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeRestartDeathWatchMultiJvmSpec._
 
@@ -63,7 +66,7 @@ abstract class RemoteNodeRestartDeathWatchSpec
 
   def identify(role: RoleName, actorName: String): ActorRef = {
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
-        actorName)
+      actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -90,7 +93,7 @@ abstract class RemoteNodeRestartDeathWatchSpec
           // retry because the Subject actor might not be started yet
           awaitAssert {
             system.actorSelection(
-                RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
+              RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
             expectMsg(1.second, "shutdown-ack")
           }
         }
@@ -107,7 +110,8 @@ abstract class RemoteNodeRestartDeathWatchSpec
         Await.ready(system.whenTerminated, 30.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(system.name,
+                      ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}

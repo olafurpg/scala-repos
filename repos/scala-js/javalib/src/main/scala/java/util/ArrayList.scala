@@ -3,9 +3,10 @@ package java.util
 import scala.scalajs._
 
 class ArrayList[E] private (private[ArrayList] val inner: js.Array[E])
-    extends AbstractList[E] with RandomAccess with Cloneable
-    with Serializable {
-  self =>
+    extends AbstractList[E]
+    with RandomAccess
+    with Cloneable
+    with Serializable { self =>
 
   def this(initialCapacity: Int) = {
     this(new js.Array[E])

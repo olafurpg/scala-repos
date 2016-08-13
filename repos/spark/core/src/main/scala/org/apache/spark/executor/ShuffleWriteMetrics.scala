@@ -32,12 +32,15 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
     extends Serializable {
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
-    this(TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.BYTES_WRITTEN),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME))
+    this(
+      TaskMetrics.getAccum[Long](
+        accumMap,
+        InternalAccumulator.shuffleWrite.BYTES_WRITTEN),
+      TaskMetrics.getAccum[Long](
+        accumMap,
+        InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME))
   }
 
   /**
@@ -51,12 +54,12 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
     */
   private[spark] def this() {
     this(
-        InternalAccumulator
-          .createShuffleWriteAccums()
-          .map { a =>
-        (a.name.get, a)
-      }
-          .toMap)
+      InternalAccumulator
+        .createShuffleWriteAccums()
+        .map { a =>
+          (a.name.get, a)
+        }
+        .toMap)
   }
 
   /**

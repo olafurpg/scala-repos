@@ -20,14 +20,14 @@ class OfferOperationFactory(private val principalOpt: Option[String],
     case Some(value) => value
     case _ =>
       throw new WrongConfigurationException(
-          "No principal set. Set --mesos_authentication_principal to enable using local volumes in Marathon.")
+        "No principal set. Set --mesos_authentication_principal to enable using local volumes in Marathon.")
   }
 
   private[this] lazy val role: String = roleOpt match {
     case Some(value) => value
     case _ =>
       throw new WrongConfigurationException(
-          "No role set. Set --mesos_role to enable using local volumes in Marathon.")
+        "No role set. Set --mesos_role to enable using local volumes in Marathon.")
   }
 
   /** Create a launch operation for the given taskInfo. */
@@ -51,12 +51,12 @@ class OfferOperationFactory(private val principalOpt: Option[String],
         .newBuilder(resource)
         .setRole(role)
         .setReservation(
-            ReservationInfo
-              .newBuilder()
-              .setPrincipal(principal)
-              .setLabels(
-                  TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
-          )
+          ReservationInfo
+            .newBuilder()
+            .setPrincipal(principal)
+            .setLabels(
+              TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
+        )
         .build()
     }
 
@@ -105,10 +105,11 @@ class OfferOperationFactory(private val principalOpt: Option[String],
         .newBuilder()
         .setName("disk")
         .setType(Mesos.Value.Type.SCALAR)
-        .setScalar(Mesos.Value.Scalar
-              .newBuilder()
-              .setValue(vol.persistentVolume.persistent.size.toDouble)
-              .build())
+        .setScalar(
+          Mesos.Value.Scalar
+            .newBuilder()
+            .setValue(vol.persistentVolume.persistent.size.toDouble)
+            .build())
         .setRole(role)
         .setReservation(reservation)
         .setDisk(disk)

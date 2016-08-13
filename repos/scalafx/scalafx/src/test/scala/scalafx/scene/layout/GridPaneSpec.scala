@@ -40,5 +40,6 @@ import scalafx.testutil.{AlignmentDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class GridPaneSpec
     extends SimpleSFXDelegateSpec[jfxsl.GridPane, GridPane](
-        classOf[jfxsl.GridPane], classOf[GridPane])
+      classOf[jfxsl.GridPane],
+      classOf[GridPane])
     with AlignmentDelegateSpec[jfxsl.GridPane, GridPane]

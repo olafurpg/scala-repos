@@ -38,8 +38,8 @@ class IntegerTestOnJDK8 {
 
   @Test def should_reject_invalid_uInt_strings_when_parsing(): Unit = {
     def test(s: String, radix: Int = 10): Unit =
-      expectThrows(
-          classOf[NumberFormatException], Integer.parseUnsignedInt(s, radix))
+      expectThrows(classOf[NumberFormatException],
+                   Integer.parseUnsignedInt(s, radix))
 
     test("abc")
     test("5a")

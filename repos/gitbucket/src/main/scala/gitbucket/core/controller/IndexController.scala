@@ -3,32 +3,54 @@ package gitbucket.core.controller
 import gitbucket.core.api._
 import gitbucket.core.helper.xml
 import gitbucket.core.model.Account
-import gitbucket.core.service.{RepositoryService, ActivityService, AccountService, RepositorySearchService, IssuesService}
+import gitbucket.core.service.{
+  RepositoryService,
+  ActivityService,
+  AccountService,
+  RepositorySearchService,
+  IssuesService
+}
 import gitbucket.core.util.Implicits._
 import gitbucket.core.util.ControlUtil._
-import gitbucket.core.util.{LDAPUtil, Keys, UsersAuthenticator, ReferrerAuthenticator, StringUtil}
+import gitbucket.core.util.{
+  LDAPUtil,
+  Keys,
+  UsersAuthenticator,
+  ReferrerAuthenticator,
+  StringUtil
+}
 
 import io.github.gitbucket.scalatra.forms._
 
 class IndexController
-    extends IndexControllerBase with RepositoryService with ActivityService
-    with AccountService with RepositorySearchService with IssuesService
-    with UsersAuthenticator with ReferrerAuthenticator
+    extends IndexControllerBase
+    with RepositoryService
+    with ActivityService
+    with AccountService
+    with RepositorySearchService
+    with IssuesService
+    with UsersAuthenticator
+    with ReferrerAuthenticator
 
 trait IndexControllerBase extends ControllerBase {
-  self: RepositoryService with ActivityService with AccountService with RepositorySearchService with UsersAuthenticator with ReferrerAuthenticator =>
+  self: RepositoryService
+    with ActivityService
+    with AccountService
+    with RepositorySearchService
+    with UsersAuthenticator
+    with ReferrerAuthenticator =>
 
   case class SignInForm(userName: String, password: String)
 
   val signinForm = mapping(
-      "userName" -> trim(label("Username", text(required))),
-      "password" -> trim(label("Password", text(required)))
+    "userName" -> trim(label("Username", text(required))),
+    "password" -> trim(label("Password", text(required)))
   )(SignInForm.apply)
 
   val searchForm = mapping(
-      "query" -> trim(text(required)),
-      "owner" -> trim(text(required)),
-      "repository" -> trim(text(required))
+    "query" -> trim(text(required)),
+    "owner" -> trim(text(required)),
+    "repository" -> trim(text(required))
   )(SearchForm.apply)
 
   case class SearchForm(query: String, owner: String, repository: String)
@@ -37,11 +59,11 @@ trait IndexControllerBase extends ControllerBase {
     val loginAccount = context.loginAccount
     if (loginAccount.isEmpty) {
       gitbucket.core.html.index(
-          getRecentActivities(),
-          getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-          loginAccount.map { account =>
-            getUserRepositories(account.userName, withoutPhysicalInfo = true)
-          }.getOrElse(Nil))
+        getRecentActivities(),
+        getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
+        loginAccount.map { account =>
+          getUserRepositories(account.userName, withoutPhysicalInfo = true)
+        }.getOrElse(Nil))
     } else {
       val loginUserName = loginAccount.get.userName
       val loginUserGroups = getGroupsByUserName(loginUserName)
@@ -50,11 +72,11 @@ trait IndexControllerBase extends ControllerBase {
       visibleOwnerSet ++= loginUserGroups
 
       gitbucket.core.html.index(
-          getRecentActivitiesByOwners(visibleOwnerSet),
-          getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-          loginAccount.map { account =>
-            getUserRepositories(account.userName, withoutPhysicalInfo = true)
-          }.getOrElse(Nil))
+        getRecentActivitiesByOwners(visibleOwnerSet),
+        getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
+        loginAccount.map { account =>
+          getUserRepositories(account.userName, withoutPhysicalInfo = true)
+        }.getOrElse(Nil))
     }
   }
 
@@ -112,15 +134,15 @@ trait IndexControllerBase extends ControllerBase {
   /**
     * JSON API for collaborator completion.
     */
-  get("/_user/proposals")(
-      usersOnly {
+  get("/_user/proposals")(usersOnly {
     contentType = formats("json")
     org.json4s.jackson.Serialization.write(
-        Map("options" -> getAllUsers(false)
-              .filter(!_.isGroupAccount)
-              .map(_.userName)
-              .toArray)
-      )
+      Map(
+        "options" -> getAllUsers(false)
+          .filter(!_.isGroupAccount)
+          .map(_.userName)
+          .toArray)
+    )
   })
 
   /**
@@ -133,7 +155,7 @@ trait IndexControllerBase extends ControllerBase {
   // TODO Move to RepositoryViwerController?
   post("/search", searchForm) { form =>
     redirect(
-        s"/${form.owner}/${form.repository}/search?q=${StringUtil.urlEncode(form.query)}")
+      s"/${form.owner}/${form.repository}/search?q=${StringUtil.urlEncode(form.query)}")
   }
 
   // TODO Move to RepositoryViwerController?
@@ -150,19 +172,19 @@ trait IndexControllerBase extends ControllerBase {
         target.toLowerCase match {
           case "issue" =>
             gitbucket.core.search.html.issues(
-                searchIssues(repository.owner, repository.name, query),
-                countFiles(repository.owner, repository.name, query),
-                query,
-                page,
-                repository)
+              searchIssues(repository.owner, repository.name, query),
+              countFiles(repository.owner, repository.name, query),
+              query,
+              page,
+              repository)
 
           case _ =>
             gitbucket.core.search.html.code(
-                searchFiles(repository.owner, repository.name, query),
-                countIssues(repository.owner, repository.name, query),
-                query,
-                page,
-                repository)
+              searchFiles(repository.owner, repository.name, query),
+              countIssues(repository.owner, repository.name, query),
+              query,
+              page,
+              repository)
         }
     }
   })

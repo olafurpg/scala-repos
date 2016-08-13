@@ -94,10 +94,10 @@ object ActorPath {
       // valid
       case EmptyPathCode ⇒
         throw new InvalidActorNameException(
-            s"Actor path element must not be empty $fullPathMsg")
+          s"Actor path element must not be empty $fullPathMsg")
       case invalidAt ⇒
         throw new InvalidActorNameException(
-            s"""Invalid actor path element [$element]$fullPathMsg, illegal character [${element(
+          s"""Invalid actor path element [$element]$fullPathMsg, illegal character [${element(
             invalidAt)}] at position: $invalidAt. """ +
             """Actor paths MUST: """ + """not start with `$`, """ +
             s"""include only ASCII letters and can only contain these special characters: ${ActorPath.ValidSymbols}.""")
@@ -119,11 +119,11 @@ object ActorPath {
     else {
       def isValidChar(c: Char): Boolean =
         (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-        (c >= '0' && c <= '9') || (ValidSymbols.indexOf(c) != -1)
+          (c >= '0' && c <= '9') || (ValidSymbols.indexOf(c) != -1)
 
       def isHexChar(c: Char): Boolean =
         (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') ||
-        (c >= '0' && c <= '9')
+          (c >= '0' && c <= '9')
 
       val len = s.length
       def validate(pos: Int): Int =
@@ -132,7 +132,7 @@ object ActorPath {
             case c if isValidChar(c) ⇒ validate(pos + 1)
             case '%'
                 if pos + 2 < len && isHexChar(s.charAt(pos + 1)) &&
-                isHexChar(s.charAt(pos + 2)) ⇒
+                  isHexChar(s.charAt(pos + 2)) ⇒
               validate(pos + 3)
             case _ ⇒ pos
           } else ValidPathCode
@@ -270,12 +270,12 @@ sealed trait ActorPath extends Comparable[ActorPath] with Serializable {
 final case class RootActorPath(address: Address, name: String = "/")
     extends ActorPath {
   require(
-      name.length == 1 || name.indexOf('/', 1) == -1,
-      "/ may only exist at the beginning of the root actors name, " +
+    name.length == 1 || name.indexOf('/', 1) == -1,
+    "/ may only exist at the beginning of the root actors name, " +
       "it is a path separator and is not legal in ActorPath names: [%s]" format name)
   require(
-      name.indexOf('#') == -1,
-      "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
+    name.indexOf('#') == -1,
+    "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
 
   override def parent: ActorPath = this
 
@@ -317,20 +317,20 @@ final case class RootActorPath(address: Address, name: String = "/")
     if (uid == ActorCell.undefinedUid) this
     else
       throw new IllegalStateException(
-          s"RootActorPath must have undefinedUid, [$uid != ${ActorCell.undefinedUid}")
+        s"RootActorPath must have undefinedUid, [$uid != ${ActorCell.undefinedUid}")
 }
 
 @SerialVersionUID(1L)
-final class ChildActorPath private[akka](val parent: ActorPath,
-                                         val name: String,
-                                         override private[akka] val uid: Int)
+final class ChildActorPath private[akka] (val parent: ActorPath,
+                                          val name: String,
+                                          override private[akka] val uid: Int)
     extends ActorPath {
   if (name.indexOf('/') != -1)
     throw new IllegalArgumentException(
-        "/ is a path separator and is not legal in ActorPath names: [%s]" format name)
+      "/ is a path separator and is not legal in ActorPath names: [%s]" format name)
   if (name.indexOf('#') != -1)
     throw new IllegalArgumentException(
-        "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
+      "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
 
   def this(parent: ActorPath, name: String) =
     this(parent, name, ActorCell.undefinedUid)
@@ -375,8 +375,8 @@ final class ChildActorPath private[akka](val parent: ActorPath,
 
   override def toSerializationFormat: String = {
     val length = toStringLength
-    val sb = buildToString(
-        new JStringBuilder(length + 12), length, 0, _.toString)
+    val sb =
+      buildToString(new JStringBuilder(length + 12), length, 0, _.toString)
     appendUidFragment(sb).toString
   }
 

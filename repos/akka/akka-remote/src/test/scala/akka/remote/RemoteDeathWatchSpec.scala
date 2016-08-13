@@ -13,7 +13,9 @@ import akka.event.Logging.Warning
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteDeathWatchSpec
-    extends AkkaSpec(ConfigFactory.parseString("""
+    extends AkkaSpec(
+      ConfigFactory.parseString(
+        """
 akka {
     actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -28,7 +30,10 @@ akka {
         port = 0
     }
 }
-""")) with ImplicitSender with DefaultTimeout with DeathWatchSpec {
+"""))
+    with ImplicitSender
+    with DefaultTimeout
+    with DeathWatchSpec {
 
   val other = ActorSystem("other",
                           ConfigFactory
@@ -36,8 +41,9 @@ akka {
                             .withFallback(system.settings.config))
 
   override def beforeTermination() {
-    system.eventStream.publish(TestEvent.Mute(EventFilter.warning(
-                pattern = "received dead letter.*Disassociate")))
+    system.eventStream.publish(
+      TestEvent.Mute(
+        EventFilter.warning(pattern = "received dead letter.*Disassociate")))
   }
 
   override def afterTermination() {
@@ -54,9 +60,8 @@ akka {
     val port = SocketUtil.temporaryServerAddress().getPort
     // simulate de-serialized ActorRef
     val ref = rarp.resolveActorRef(
-        s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
-    system.actorOf(
-        Props(new Actor {
+      s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
+    system.actorOf(Props(new Actor {
       context.watch(ref)
       def receive = {
         case Terminated(r) ⇒ testActor ! r
@@ -64,7 +69,7 @@ akka {
     }).withDeploy(Deploy.local))
 
     expectMsg(20.seconds, ref)
-    // we don't expect real quarantine when the UID is unknown, i.e. QuarantinedEvent is not published 
+    // we don't expect real quarantine when the UID is unknown, i.e. QuarantinedEvent is not published
     probe.expectNoMsg(3.seconds)
     // The following verifies ticket #3870, i.e. make sure that re-delivery of Watch message is stopped.
     // It was observed as periodic logging of "address is now gated" when the gate was lifted.
@@ -96,11 +101,12 @@ akka {
     // Synthesize an ActorRef to a remote system this one has never talked to before.
     // This forces ReliableDeliverySupervisor to start with unknown remote system UID.
     val extinctPath =
-      RootActorPath(Address(
-              "akka.tcp",
-              "extinct-system",
-              "localhost",
-              SocketUtil.temporaryServerAddress().getPort)) / "user" / "noone"
+      RootActorPath(
+        Address(
+          "akka.tcp",
+          "extinct-system",
+          "localhost",
+          SocketUtil.temporaryServerAddress().getPort)) / "user" / "noone"
     val transport = RARP(system).provider.transport
     val extinctRef =
       new RemoteActorRef(transport,
@@ -117,6 +123,6 @@ akka {
     probe.expectNoMsg(5.seconds)
     system.eventStream.subscribe(probe.ref, classOf[Warning])
     probe.expectNoMsg(
-        RARP(system).provider.remoteSettings.RetryGateClosedFor * 2)
+      RARP(system).provider.remoteSettings.RetryGateClosedFor * 2)
   }
 }

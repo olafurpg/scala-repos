@@ -1,13 +1,24 @@
 package org.jetbrains.plugins.scala
 package codeInsight.template.macros
 
-import com.intellij.codeInsight.lookup.{LookupElementBuilder, LookupElement, LookupItem}
+import com.intellij.codeInsight.lookup.{
+  LookupElementBuilder,
+  LookupElement,
+  LookupItem
+}
 import com.intellij.codeInsight.template._
 import com.intellij.psi.{PsiDocumentManager, PsiNamedElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{JavaArrayType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  JavaArrayType,
+  ScParameterizedType,
+  ScType
+}
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 
 /**
@@ -26,8 +37,8 @@ class SuggestScalaVariableNameMacro extends Macro {
     a.map((s: String) => LookupElementBuilder.create(s, s))
   }
 
-  def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  def calculateResult(params: Array[Expression],
+                      context: ExpressionContext): Result = {
     val a = SuggestNamesUtil.getNames(params, context)
     if (a.length == 0) return null
     new TextResult(a(0))
@@ -39,15 +50,15 @@ class SuggestScalaVariableNameMacro extends Macro {
 
   override def getDefaultValue: String = "value"
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result = null
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result = null
 
   def getPresentableName: String = "Suggest Scala variable macro"
 }
 
 object SuggestNamesUtil {
-  def getNames(
-      params: Array[Expression], context: ExpressionContext): Array[String] = {
+  def getNames(params: Array[Expression],
+               context: ExpressionContext): Array[String] = {
     val p: Array[String] = params.map(_.calculateResult(context).toString)
     val offset = context.getStartOffset
     val editor = context.getEditor

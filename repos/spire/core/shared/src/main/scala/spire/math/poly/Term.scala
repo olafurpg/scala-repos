@@ -14,7 +14,7 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def +(rhs: Term[C])(implicit r: Semiring[C]): Term[C] = {
     if (lhs.exp != rhs.exp)
       throw new IllegalArgumentException(
-          s"can't add terms of degree $exp and ${rhs.exp}")
+        s"can't add terms of degree $exp and ${rhs.exp}")
     Term(lhs.coeff + rhs.coeff, lhs.exp)
   }
 
@@ -85,33 +85,33 @@ object Term {
   private val IsNegative = "-(.*)".r
 
   private val digitToSuperscript = Array(
-      '0' -> '\u2070',
-      '1' -> '\u2071',
-      '2' -> '\u2072',
-      '3' -> '\u2073',
-      '4' -> '\u2074',
-      '5' -> '\u2075',
-      '6' -> '\u2076',
-      '7' -> '\u2077',
-      '8' -> '\u2078',
-      '9' -> '\u2079',
-      '-' -> '\u207B',
-      '1' -> '\u00B9',
-      '2' -> '\u00B2',
-      '3' -> '\u00B3'
+    '0' -> '\u2070',
+    '1' -> '\u2071',
+    '2' -> '\u2072',
+    '3' -> '\u2073',
+    '4' -> '\u2074',
+    '5' -> '\u2075',
+    '6' -> '\u2076',
+    '7' -> '\u2077',
+    '8' -> '\u2078',
+    '9' -> '\u2079',
+    '-' -> '\u207B',
+    '1' -> '\u00B9',
+    '2' -> '\u00B2',
+    '3' -> '\u00B3'
   )
 
   // call Regex constructor directly to get rid of compiler warning
   // replace with "".r once SI-6723 is fixed
   private val superscriptRegex = new scala.util.matching.Regex(
-      "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+")
+    "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+")
 
   private[spire] def removeSuperscript(text: String): String =
-    superscriptRegex.replaceAllIn(
-        text, "^" + _.group(0).map(removeSuperscript))
+    superscriptRegex
+      .replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
 
   private val superscript: (Char => Char) = Map(digitToSuperscript: _*)
 
   private val removeSuperscript: (Char => Char) = Map(
-      digitToSuperscript.map(_.swap): _*)
+    digitToSuperscript.map(_.swap): _*)
 }

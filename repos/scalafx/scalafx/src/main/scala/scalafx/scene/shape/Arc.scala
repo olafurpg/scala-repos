@@ -44,11 +44,12 @@ object Arc {
             startAngle: Double,
             length: Double) =
     new Arc(
-        new jfxss.Arc(centerX, centerY, radiusX, radiusY, startAngle, length))
+      new jfxss.Arc(centerX, centerY, radiusX, radiusY, startAngle, length))
 }
 
 class Arc(override val delegate: jfxss.Arc = new jfxss.Arc())
-    extends Shape(delegate) with SFXDelegate[jfxss.Arc] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Arc] {
   def centerX: DoubleProperty = delegate.centerXProperty
   def centerX_=(v: Double) {
     centerX() = v

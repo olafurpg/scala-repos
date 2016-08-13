@@ -20,29 +20,27 @@ object I18n extends LilaController {
     Form(single("lang" -> text.verifying(env.pool contains _))).bindFromRequest
       .fold(
         _ => notFound,
-        lang =>
-          {
-            ctx.me.filterNot(_.lang contains lang) ?? { me =>
-              lila.user.UserRepo.setLang(me.id, lang)
-            }
-          } >> negotiate(html = Redirect {
-            s"${Env.api.Net.Protocol}${lang}.${Env.api.Net.Domain}" + {
-              HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) {
-                str =>
-                  try {
-                    val pageUrl = new java.net.URL(str);
-                    val path = pageUrl.getPath
-                    val query = pageUrl.getQuery
-                    if (query == null) path
-                    else path + "?" + query
-                  } catch {
-                    case e: java.net.MalformedURLException =>
-                      routes.Lobby.home.url
-                  }
+        lang => {
+          ctx.me.filterNot(_.lang contains lang) ?? { me =>
+            lila.user.UserRepo.setLang(me.id, lang)
+          }
+        } >> negotiate(html = Redirect {
+          s"${Env.api.Net.Protocol}${lang}.${Env.api.Net.Domain}" + {
+            HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) { str =>
+              try {
+                val pageUrl = new java.net.URL(str);
+                val path = pageUrl.getPath
+                val query = pageUrl.getQuery
+                if (query == null) path
+                else path + "?" + query
+              } catch {
+                case e: java.net.MalformedURLException =>
+                  routes.Lobby.home.url
               }
             }
-          }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)
-    )
+          }
+        }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)
+      )
   }
 
   def contribute = Open { implicit ctx =>
@@ -76,7 +74,8 @@ object I18n extends LilaController {
           }
         } { metadata =>
           env.forms.process(lang, metadata, data, me.username) inject {
-            Redirect(routes.I18n.contribute).flashing("success" -> "1") withCookies LilaCookie
+            Redirect(routes.I18n.contribute)
+              .flashing("success" -> "1") withCookies LilaCookie
               .cookie(env.hideCallsCookieName, "1", maxAge = Some(60 * 24))
           }
         }

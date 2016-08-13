@@ -42,7 +42,7 @@ private[tracker] class TaskTrackerDelegate(metrics: Option[Metrics],
         .recover {
           case e: AskTimeoutException =>
             throw new TimeoutException(
-                s"timeout while calling list. If you know what you are doing, you can adjust the timeout " +
+              s"timeout while calling list. If you know what you are doing, you can adjust the timeout " +
                 s"with --${config.internalTaskTrackerRequestTimeout.name}."
             )
         }
@@ -79,9 +79,10 @@ private[tracker] class TaskTrackerDelegate(metrics: Option[Metrics],
       implicit ec: ExecutionContext): Future[Option[Task]] =
     tasksByApp().map(_.task(taskId))
 
-  private[this] val tasksByAppTimer = metrics.map(metrics =>
-        metrics.timer(
-            metrics.name(MetricPrefixes.SERVICE, getClass, "tasksByApp")))
+  private[this] val tasksByAppTimer = metrics.map(
+    metrics =>
+      metrics.timer(
+        metrics.name(MetricPrefixes.SERVICE, getClass, "tasksByApp")))
 
   private[this] implicit val taskTrackerQueryTimeout: Timeout =
     config.internalTaskTrackerRequestTimeout().milliseconds

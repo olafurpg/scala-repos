@@ -36,31 +36,32 @@ class Migration @Inject()(store: PersistentStore,
     * They get applied after the master has been elected.
     */
   def migrations: List[MigrationAction] = List(
-      StorageVersions(0, 7, 0) -> { () =>
-        Future.failed(new IllegalStateException(
-                "migration from 0.7.x not supported anymore"))
-      },
-      StorageVersions(0, 11, 0) -> { () =>
-        new MigrationTo0_11(groupRepo, appRepo).migrateApps().recover {
-          case NonFatal(e) =>
-            throw new MigrationFailedException(
-                "while migrating storage to 0.11", e)
-        }
-      },
-      StorageVersions(0, 13, 0) -> { () =>
-        new MigrationTo0_13(taskRepo, store).migrate().recover {
-          case NonFatal(e) =>
-            throw new MigrationFailedException(
-                "while migrating storage to 0.13", e)
-        }
-      },
-      StorageVersions(0, 16, 0) -> { () =>
-        new MigrationTo0_16(groupRepo, appRepo).migrate().recover {
-          case NonFatal(e) =>
-            throw new MigrationFailedException(
-                "while migrating storage to 0.16", e)
-        }
+    StorageVersions(0, 7, 0) -> { () =>
+      Future.failed(
+        new IllegalStateException(
+          "migration from 0.7.x not supported anymore"))
+    },
+    StorageVersions(0, 11, 0) -> { () =>
+      new MigrationTo0_11(groupRepo, appRepo).migrateApps().recover {
+        case NonFatal(e) =>
+          throw new MigrationFailedException("while migrating storage to 0.11",
+                                             e)
       }
+    },
+    StorageVersions(0, 13, 0) -> { () =>
+      new MigrationTo0_13(taskRepo, store).migrate().recover {
+        case NonFatal(e) =>
+          throw new MigrationFailedException("while migrating storage to 0.13",
+                                             e)
+      }
+    },
+    StorageVersions(0, 16, 0) -> { () =>
+      new MigrationTo0_16(groupRepo, appRepo).migrate().recover {
+        case NonFatal(e) =>
+          throw new MigrationFailedException("while migrating storage to 0.16",
+                                             e)
+      }
+    }
   )
 
   def applyMigrationSteps(from: StorageVersion): Future[List[StorageVersion]] = {
@@ -76,7 +77,7 @@ class Migration @Inject()(store: PersistentStore,
         case (resultsFuture, (migrateVersion, change)) =>
           resultsFuture.flatMap { res =>
             log.info(
-                s"Migration for storage: ${from.str} to current: ${current.str}: " +
+              s"Migration for storage: ${from.str} to current: ${current.str}: " +
                 s"apply change for version: ${migrateVersion.str} "
             )
             change.apply().map(_ => res :+ migrateVersion)
@@ -136,8 +137,8 @@ class Migration @Inject()(store: PersistentStore,
   * * Add version info to the AppDefinition by looking at all saved versions.
   * * Make the groupRepository the ultimate source of truth for the latest app version.
   */
-class MigrationTo0_11(
-    groupRepository: GroupRepository, appRepository: AppRepository) {
+class MigrationTo0_11(groupRepository: GroupRepository,
+                      appRepository: AppRepository) {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   def migrateApps(): Future[Unit] = {
@@ -157,11 +158,12 @@ class MigrationTo0_11(
   }
 
   private[this] def storeUpdatedAppsInRootGroup(
-      rootGroup: Group, updatedApps: Iterable[AppDefinition]): Future[Unit] = {
+      rootGroup: Group,
+      updatedApps: Iterable[AppDefinition]): Future[Unit] = {
     val updatedGroup = updatedApps.foldLeft(rootGroup) {
       (updatedGroup, updatedApp) =>
-        updatedGroup.updateApp(
-            updatedApp.id, _ => updatedApp, updatedApp.version)
+        updatedGroup
+          .updateApp(updatedApp.id, _ => updatedApp, updatedApp.version)
     }
     groupRepository
       .store(groupRepository.zkRootName, updatedGroup)
@@ -180,7 +182,7 @@ class MigrationTo0_11(
               addVersionInfo(appId, appInGroup).map(storedApps ++ _)
             case None =>
               log.warn(
-                  s"App [$appId] will be expunged because it is not contained in the group data")
+                s"App [$appId] will be expunged because it is not contained in the group data")
               appRepository.expunge(appId).map(_ => storedApps)
           }
         }
@@ -188,7 +190,8 @@ class MigrationTo0_11(
   }
 
   private[this] def addVersionInfo(
-      id: PathId, appInGroup: AppDefinition): Future[Option[AppDefinition]] = {
+      id: PathId,
+      appInGroup: AppDefinition): Future[Option[AppDefinition]] = {
     def addVersionInfoToVersioned(
         maybeLastApp: Option[AppDefinition],
         nextVersion: Timestamp,
@@ -197,20 +200,22 @@ class MigrationTo0_11(
         maybeLastApp match {
           case Some(lastApp) if !lastApp.isUpgrade(nextApp) =>
             log.info(
-                s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): scaling or restart")
-            nextApp.copy(versionInfo = lastApp.versionInfo
-                    .withScaleOrRestartChange(nextApp.version))
+              s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): scaling or restart")
+            nextApp.copy(
+              versionInfo =
+                lastApp.versionInfo.withScaleOrRestartChange(nextApp.version))
           case _ =>
             log.info(
-                s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): new config")
-            nextApp.copy(versionInfo = AppDefinition.VersionInfo.forNewConfig(
-                      nextApp.version))
+              s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): new config")
+            nextApp.copy(
+              versionInfo =
+                AppDefinition.VersionInfo.forNewConfig(nextApp.version))
         }
       }
     }
 
-    def loadApp(
-        id: PathId, version: Timestamp): Future[Option[AppDefinition]] = {
+    def loadApp(id: PathId,
+                version: Timestamp): Future[Option[AppDefinition]] = {
       if (appInGroup.version == version) {
         Future.successful(Some(appInGroup))
       } else {
@@ -223,19 +228,20 @@ class MigrationTo0_11(
       val sortedVersions =
         sortedVersionsWithoutGroup ++ Seq(appInGroup.version)
       log.info(
-          s"Add versionInfo to app [$id] for ${sortedVersions.size} versions")
+        s"Add versionInfo to app [$id] for ${sortedVersions.size} versions")
 
       sortedVersions.foldLeft(Future.successful[Option[AppDefinition]](None)) {
         (maybeLastAppFuture, nextVersion) =>
           for {
             maybeLastApp <- maybeLastAppFuture
             maybeNextApp <- loadApp(id, nextVersion)
-            withVersionInfo = addVersionInfoToVersioned(
-                maybeLastApp, nextVersion, maybeNextApp)
+            withVersionInfo = addVersionInfoToVersioned(maybeLastApp,
+                                                        nextVersion,
+                                                        maybeNextApp)
             storedResult <- withVersionInfo
-              .map((newApp: AppDefinition) =>
-                    appRepository.store(newApp).map(Some(_)))
-              .getOrElse(maybeLastAppFuture)
+                             .map((newApp: AppDefinition) =>
+                               appRepository.store(newApp).map(Some(_)))
+                             .getOrElse(maybeLastAppFuture)
           } yield storedResult
       }
     }
@@ -249,8 +255,8 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
 
   // the bytes stored via TaskTracker are incompatible to EntityRepo, so we have to parse them 'manually'
   def fetchLegacyTask(taskKey: String): Future[Option[MarathonTask]] = {
-    def deserialize(
-        taskKey: String, source: ObjectInputStream): Option[MarathonTask] = {
+    def deserialize(taskKey: String,
+                    source: ObjectInputStream): Option[MarathonTask] = {
       if (source.available > 0) {
         try {
           val size = source.readInt
@@ -314,8 +320,8 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
           entityStore.expunge(legacyKey).map(_ => ())
         }
       case _ =>
-        Future.failed[Unit](new RuntimeException(
-                s"Unable to load entity with key = $legacyKey"))
+        Future.failed[Unit](
+          new RuntimeException(s"Unable to load entity with key = $legacyKey"))
     }
   }
 
@@ -358,8 +364,8 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
   * * Save all apps, the logic in [[AppDefinition.toProto]] will save the new portDefinitions and skip the deprecated
   *   ports
   */
-class MigrationTo0_16(
-    groupRepository: GroupRepository, appRepository: AppRepository) {
+class MigrationTo0_16(groupRepository: GroupRepository,
+                      appRepository: AppRepository) {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   def migrate(): Future[Unit] = {
@@ -400,7 +406,7 @@ class MigrationTo0_16(
               case Some(group) => groupRepository.store(id, group).map(_ => ())
               case None =>
                 Future.failed(new MigrationFailedException(
-                        s"Group $id:$version not found"))
+                  s"Group $id:$version not found"))
             }
           }
         }
@@ -416,7 +422,7 @@ class MigrationTo0_16(
               case Some(app) => appRepository.store(app).map(_ => ())
               case None =>
                 Future.failed(new MigrationFailedException(
-                        s"App $appId:$version not found"))
+                  s"App $appId:$version not found"))
             }
           }
         }
@@ -440,15 +446,16 @@ object StorageVersions {
     BuildInfo.version match {
       case VersionRegex(major, minor, patch) =>
         StorageVersions(
-            major.toInt,
-            minor.toInt,
-            patch.toInt
+          major.toInt,
+          minor.toInt,
+          patch.toInt
         )
     }
   }
 
   implicit class OrderedStorageVersion(val version: StorageVersion)
-      extends AnyVal with Ordered[StorageVersion] {
+      extends AnyVal
+      with Ordered[StorageVersion] {
     override def compare(that: StorageVersion): Int = {
       def by(left: Int, right: Int, fn: => Int): Int =
         if (left.compareTo(right) != 0) left.compareTo(right) else fn

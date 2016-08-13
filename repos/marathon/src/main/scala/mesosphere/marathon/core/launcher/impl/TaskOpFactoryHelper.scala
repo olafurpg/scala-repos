@@ -10,8 +10,8 @@ import org.apache.mesos.{Protos => Mesos}
 class TaskOpFactoryHelper(private val principalOpt: Option[String],
                           private val roleOpt: Option[String]) {
 
-  private[this] val offerOperationFactory = new OfferOperationFactory(
-      principalOpt, roleOpt)
+  private[this] val offerOperationFactory =
+    new OfferOperationFactory(principalOpt, roleOpt)
 
   def launch(taskInfo: Mesos.TaskInfo,
              newTask: Task,
@@ -33,12 +33,15 @@ class TaskOpFactoryHelper(private val principalOpt: Option[String],
       oldTask: Option[Task] = None): TaskOp.ReserveAndCreateVolumes = {
 
     def createOperations =
-      Seq(offerOperationFactory.reserve(
-              frameworkId, newTask.taskId, resources),
-          offerOperationFactory.createVolumes(
-              frameworkId, newTask.taskId, localVolumes))
+      Seq(
+        offerOperationFactory.reserve(frameworkId, newTask.taskId, resources),
+        offerOperationFactory
+          .createVolumes(frameworkId, newTask.taskId, localVolumes))
 
-    TaskOp.ReserveAndCreateVolumes(
-        newTask, resources, localVolumes, oldTask, createOperations)
+    TaskOp.ReserveAndCreateVolumes(newTask,
+                                   resources,
+                                   localVolumes,
+                                   oldTask,
+                                   createOperations)
   }
 }

@@ -14,8 +14,9 @@ import scala.reflect.internal.util.Position
 /** Like ReplGlobal, a layer for ensuring extra functionality.
   */
 class ReplReporter(intp: IMain)
-    extends ConsoleReporter(
-        intp.settings, Console.in, new ReplStrippingWriter(intp)) {
+    extends ConsoleReporter(intp.settings,
+                            Console.in,
+                            new ReplStrippingWriter(intp)) {
   def printUntruncatedMessage(msg: String) =
     withoutTruncating(printMessage(msg))
 
@@ -28,7 +29,8 @@ class ReplReporter(intp: IMain)
   def withoutTruncating[T](body: => T): T = {
     val saved = _truncationOK
     _truncationOK = false
-    try body finally _truncationOK = saved
+    try body
+    finally _truncationOK = saved
   }
 
   override def warning(pos: Position, msg: String): Unit =
@@ -47,8 +49,8 @@ class ReplReporter(intp: IMain)
   override def print(pos: Position, msg: String, severity: Severity) {
     val prefix =
       (if (replProps.colorOk)
-         severityColor(severity) + clabel(severity) + RESET
-       else clabel(severity))
+        severityColor(severity) + clabel(severity) + RESET
+      else clabel(severity))
     printMessage(pos, prefix + msg)
   }
 

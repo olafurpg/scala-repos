@@ -7,7 +7,10 @@ import javax.swing.SwingUtilities
 import com.intellij.execution.testframework.AbstractTestProxy
 import com.intellij.execution.{PsiLocation, RunnerAndConfigurationSettings}
 import com.intellij.ide.util.treeView.AbstractTreeNode
-import com.intellij.ide.util.treeView.smartTree.{TreeElement, TreeElementWrapper}
+import com.intellij.ide.util.treeView.smartTree.{
+  TreeElement,
+  TreeElementWrapper
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
@@ -43,11 +46,13 @@ trait IntegrationTest {
   protected def createTestFromModule(
       moduleName: String): RunnerAndConfigurationSettings
 
-  protected def createLocation(
-      lineNumber: Int, offset: Int, fileName: String): PsiLocation[PsiElement]
+  protected def createLocation(lineNumber: Int,
+                               offset: Int,
+                               fileName: String): PsiLocation[PsiElement]
 
-  protected def runFileStructureViewTest(
-      testClassName: String, status: Int, tests: String*)
+  protected def runFileStructureViewTest(testClassName: String,
+                                         status: Int,
+                                         tests: String*)
 
   protected def runFileStructureViewTest(
       testClassName: String,
@@ -70,17 +75,17 @@ trait IntegrationTest {
           .asInstanceOf[TestItemRepresentation]
           .testStatus == status &&
         parentName.map(currentParentName == _).getOrElse(true)
-      } || root.getChildren.toList.exists(helper(_,
-                                                 root.getValue
-                                                   .asInstanceOf[TreeElement]
-                                                   .getPresentation
-                                                   .getPresentableText))
+      } || root.getChildren.toList.exists(
+        helper(_,
+               root.getValue
+                 .asInstanceOf[TreeElement]
+                 .getPresentation
+                 .getPresentableText))
     }
 
     var res = false
 
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit = res = helper(root, "")
     })
     res
@@ -117,26 +122,27 @@ trait IntegrationTest {
                             config: AbstractTestRunConfiguration): Boolean = {
     config.getTestClassPath == testClass &&
     (config.getTestName match {
-          case "" => testNames.isEmpty
-          case configTestName =>
-            val configTests = parseTestName(configTestName)
-            configTests.size == testNames.size &&
-            ((configTests zip testNames) forall {
-                  case (actual, required) => actual == required
-                })
+      case "" => testNames.isEmpty
+      case configTestName =>
+        val configTests = parseTestName(configTestName)
+        configTests.size == testNames.size &&
+        ((configTests zip testNames) forall {
+          case (actual, required) => actual == required
         })
+    })
   }
 
-  protected def checkResultTreeHasExactNamedPath(
-      root: AbstractTestProxy, names: String*): Boolean =
+  protected def checkResultTreeHasExactNamedPath(root: AbstractTestProxy,
+                                                 names: String*): Boolean =
     checkResultTreeHasExactNamedPath(root, names)
 
-  protected def checkResultTreeDoesNotHaveNodes(
-      root: AbstractTestProxy, names: String*): Boolean =
+  protected def checkResultTreeDoesNotHaveNodes(root: AbstractTestProxy,
+                                                names: String*): Boolean =
     checkResultTreeDoesNotHaveNodes(root, names)
 
   protected def checkResultTreeDoesNotHaveNodes(
-      root: AbstractTestProxy, names: Iterable[String]): Boolean = {
+      root: AbstractTestProxy,
+      names: Iterable[String]): Boolean = {
     import scala.collection.JavaConversions._
     if (root.isLeaf && !names.contains(root.getName)) true
     else
@@ -155,11 +161,11 @@ trait IntegrationTest {
       case 0 => List(_ => true) //got an empty list of names as initial input
       case 1 =>
         ((node: AbstractTestProxy) =>
-          node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
+           node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
       case _ =>
         buildConditions(names.tail,
                         ((node: AbstractTestProxy) =>
-                          node.getName == names.head && !node.isLeaf) :: acc)
+                           node.getName == names.head && !node.isLeaf) :: acc)
     }
     getPathFromResultTree(root, buildConditions(names).reverse, allowTail)
   }
@@ -228,8 +234,11 @@ trait IntegrationTest {
       debug: Boolean = false,
       duration: Int = 3000,
       checkOutputs: Boolean = false) = {
-    val (res, testTreeRoot) = runTestFromConfig(
-        configurationCheck, runConfig, checkOutputs, duration, debug)
+    val (res, testTreeRoot) = runTestFromConfig(configurationCheck,
+                                                runConfig,
+                                                checkOutputs,
+                                                duration,
+                                                debug)
 
     val semaphore = new Semaphore
     semaphore.down()
@@ -264,7 +273,7 @@ trait IntegrationTest {
     assert(config1.getType == config2.getType)
     assert(config1.getFolderName == config2.getFolderName)
     assert(
-        config1.getConfiguration.getName == config2.getConfiguration.getName)
+      config1.getConfiguration.getName == config2.getConfiguration.getName)
   }
 
   def runGoToSourceTest(
@@ -279,8 +288,7 @@ trait IntegrationTest {
     val (_, testTreeRoot) = runTestFromConfig(configurationCheck, runConfig)
 
     assert(testTreeRoot.isDefined)
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit =
         checkGoToSourceTest(testTreeRoot.get, testNames, fileName, sourceLine)
     })
@@ -290,8 +298,8 @@ trait IntegrationTest {
                                   testNames: Iterable[String],
                                   sourceFile: String,
                                   sourceLine: Int) {
-    val testPathOpt = getExactNamePathFromResultTree(
-        testRoot, testNames, allowTail = true)
+    val testPathOpt =
+      getExactNamePathFromResultTree(testRoot, testNames, allowTail = true)
     assert(testPathOpt.isDefined)
     val test = testPathOpt.get.last
     val project = getProject

@@ -2,8 +2,16 @@ package cats
 package tests
 
 import cats.data.{NonEmptyList, NonEmptyVector}
-import cats.laws.discipline.{AlternativeTests, ApplicativeTests, FoldableTests, CartesianTests, MonoidKTests, SemigroupKTests, arbitrary, eq},
-arbitrary._, eq._
+import cats.laws.discipline.{
+  AlternativeTests,
+  ApplicativeTests,
+  FoldableTests,
+  CartesianTests,
+  MonoidKTests,
+  SemigroupKTests,
+  arbitrary,
+  eq
+}, arbitrary._, eq._
 
 class ComposeTests extends CatsSuite {
   // we have a lot of generated lists of lists in these tests. We have to tell
@@ -16,7 +24,7 @@ class ComposeTests extends CatsSuite {
     // Alternative composition
 
     implicit val alternativeListVector: Alternative[
-        Lambda[A => List[Vector[A]]]] =
+      Lambda[A => List[Vector[A]]]] =
       Alternative[List] compose Alternative[Vector]
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[Lambda[A => List[Vector[A]]]]
@@ -30,7 +38,7 @@ class ComposeTests extends CatsSuite {
     // Applicative composition
 
     implicit val applicativeListVector: Applicative[
-        Lambda[A => List[Vector[A]]]] =
+      Lambda[A => List[Vector[A]]]] =
       Applicative[List] compose Applicative[Vector]
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[Lambda[A => List[Vector[A]]]]
@@ -63,8 +71,8 @@ class ComposeTests extends CatsSuite {
   {
     // Reducible composition
 
-    implicit val reducibleListVector: Reducible[Lambda[A => NonEmptyList[
-                NonEmptyVector[A]]]] =
+    implicit val reducibleListVector: Reducible[
+      Lambda[A => NonEmptyList[NonEmptyVector[A]]]] =
       Reducible[NonEmptyList] compose Reducible[NonEmptyVector]
 
     // No Reducible-specific laws, so check the Foldable laws are satisfied

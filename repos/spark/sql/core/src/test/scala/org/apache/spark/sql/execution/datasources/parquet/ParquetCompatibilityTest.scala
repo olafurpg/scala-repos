@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.execution.datasources.parquet
 
-import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsJavaMapConverter, seqAsJavaListConverter}
+import scala.collection.JavaConverters.{
+  collectionAsScalaIterableConverter,
+  mapAsJavaMapConverter,
+  seqAsJavaListConverter
+}
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{Path, PathFilter}
@@ -33,15 +37,16 @@ import org.apache.spark.sql.QueryTest
   * Helper class for testing Parquet compatibility.
   */
 private[sql] abstract class ParquetCompatibilityTest
-    extends QueryTest with ParquetTest {
+    extends QueryTest
+    with ParquetTest {
   protected def readParquetSchema(path: String): MessageType = {
     readParquetSchema(path, { path =>
       !path.getName.startsWith("_")
     })
   }
 
-  protected def readParquetSchema(
-      path: String, pathFilter: Path => Boolean): MessageType = {
+  protected def readParquetSchema(path: String,
+                                  pathFilter: Path => Boolean): MessageType = {
     val fsPath = new Path(path)
     val fs = fsPath.getFileSystem(hadoopConfiguration)
     val parquetFiles = fs
@@ -51,8 +56,8 @@ private[sql] abstract class ParquetCompatibilityTest
       .toSeq
       .asJava
 
-    val footers = ParquetFileReader.readAllFootersInParallel(
-        hadoopConfiguration, parquetFiles, true)
+    val footers = ParquetFileReader
+      .readAllFootersInParallel(hadoopConfiguration, parquetFiles, true)
     footers.asScala.head.getParquetMetadata.getFileMetaData.getSchema
   }
 
@@ -88,8 +93,8 @@ private[sql] object ParquetCompatibilityTest {
     * A testing Parquet [[WriteSupport]] implementation used to write manually constructed Parquet
     * records with arbitrary structures.
     */
-  private class DirectWriteSupport(
-      schema: MessageType, metadata: Map[String, String])
+  private class DirectWriteSupport(schema: MessageType,
+                                   metadata: Map[String, String])
       extends WriteSupport[RecordConsumer => Unit] {
 
     private var recordConsumer: RecordConsumer = _
@@ -129,6 +134,7 @@ private[sql] object ParquetCompatibilityTest {
     val writeSupport = new DirectWriteSupport(messageType, metadata)
     val parquetWriter =
       new ParquetWriter[RecordConsumer => Unit](new Path(path), writeSupport)
-    try recordWriters.foreach(parquetWriter.write) finally parquetWriter.close()
+    try recordWriters.foreach(parquetWriter.write)
+    finally parquetWriter.close()
   }
 }

@@ -162,7 +162,7 @@ object LineNumbers {
       implicit val constants = getConstants(dis)
       if (debug)
         println(
-            s"LNB:   fwd(${constants.fwd.size}) rev(${constants.rev.size}) ${constants.fwd.keys.toList.sorted}")
+          s"LNB:   fwd(${constants.fwd.size}) rev(${constants.rev.size}) ${constants.fwd.keys.toList.sorted}")
       skipClassInfo(dis)
       skipInterfaceInfo(dis)
       skipFields(dis)
@@ -178,7 +178,8 @@ object LineNumbers {
     } catch {
       case NonFatal(ex) ⇒ UnknownSourceFormat(s"parse error: ${ex.getMessage}")
     } finally {
-      try dis.close() catch {
+      try dis.close()
+      catch {
         case ex: InterruptedException ⇒ throw ex
         case NonFatal(ex) ⇒ // ignore
       }
@@ -295,11 +296,11 @@ object LineNumbers {
     }
   }
 
-  private def readMethod(d: DataInputStream,
-                         codeTag: Int,
-                         lineNumberTableTag: Int,
-                         filter: Option[String])(
-      implicit c: Constants): Option[(Int, Int)] = {
+  private def readMethod(
+      d: DataInputStream,
+      codeTag: Int,
+      lineNumberTableTag: Int,
+      filter: Option[String])(implicit c: Constants): Option[(Int, Int)] = {
     skip(d, 2) // access flags
     val name = d.readUnsignedShort() // name
     skip(d, 2) // signature

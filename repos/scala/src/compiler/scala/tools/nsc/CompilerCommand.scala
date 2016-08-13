@@ -11,8 +11,9 @@ import io.File
 class CompilerCommand(arguments: List[String], val settings: Settings) {
   def this(arguments: List[String], error: String => Unit) =
     this(arguments, new Settings(error))
-  def this(
-      arguments: List[String], settings: Settings, error: String => Unit) =
+  def this(arguments: List[String],
+           settings: Settings,
+           error: String => Unit) =
     this(arguments, settings withErrorFn error)
 
   type Setting = Settings#Setting
@@ -31,7 +32,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   private def explainAdvanced =
     "\n" +
-    """
+      """
     |-- Notes on option parsing --
     |Boolean settings are always false unless set.
     |Where multiple values are accepted, they should be comma-separated.
@@ -68,9 +69,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       if (xs.isEmpty) None else Some(msg :: xs.map(helpStr) mkString "\n  ")
 
     List(
-        sstring("", theRest),
-        sstring("\nAdditional debug settings:", debugs),
-        sstring("\nDeprecated settings:", deprecateds)
+      sstring("", theRest),
+      sstring("\nAdditional debug settings:", debugs),
+      sstring("\nDeprecated settings:", deprecateds)
     ).flatten mkString "\n"
   }
 
@@ -79,9 +80,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
                      cond: Setting => Boolean): String = {
     val prefix =
       List(
-          Some(shortUsage),
-          Some(explainAdvanced) filter (_ => shouldExplain),
-          Some(label + " options include:")
+        Some(shortUsage),
+        Some(explainAdvanced) filter (_ => shouldExplain),
+        Some(label + " options include:")
       ).flatten mkString "\n"
 
     prefix + createUsageMsg(cond)
@@ -89,8 +90,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   /** Messages explaining usage and options */
   def usageMsg =
-    createUsageMsg(
-        "where possible standard", shouldExplain = false, _.isStandard)
+    createUsageMsg("where possible standard",
+                   shouldExplain = false,
+                   _.isStandard)
   def xusageMsg =
     createUsageMsg("Possible advanced", shouldExplain = true, _.isAdvanced)
   def yusageMsg =
@@ -112,7 +114,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     else if (showPlugins) global.pluginDescriptions
     else if (showPhases)
       global.phaseDescriptions +
-      (if (debug) "\n" + global.phaseFlagDescriptions else "")
+        (if (debug) "\n" + global.phaseFlagDescriptions else "")
     else if (genPhaseGraph.isSetByUser) {
       val components =
         global.phaseNames // global.phaseDescriptors // one initializes
@@ -138,7 +140,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     val file = File(arg stripPrefix "@")
     if (!file.exists)
       throw new java.io.FileNotFoundException(
-          "argument file %s could not be found" format file.name)
+        "argument file %s could not be found" format file.name)
 
     settings splitParams (file.lines() map stripComment mkString " ")
   }

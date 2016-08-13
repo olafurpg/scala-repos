@@ -11,8 +11,11 @@ import scala.concurrent.duration.FiniteDuration
 
 object BidiFlow {
 
-  private[this] val _identity: BidiFlow[
-      Object, Object, Object, Object, NotUsed] =
+  private[this] val _identity: BidiFlow[Object,
+                                        Object,
+                                        Object,
+                                        Object,
+                                        NotUsed] =
     BidiFlow.fromFlows(Flow.of(classOf[Object]), Flow.of(classOf[Object]))
 
   def identity[A, B]: BidiFlow[A, A, B, B, NotUsed] =
@@ -53,7 +56,7 @@ object BidiFlow {
       flow2: Graph[FlowShape[I2, O2], M2],
       combine: function.Function2[M1, M2, M]): BidiFlow[I1, O1, I2, O2, M] = {
     new BidiFlow(
-        scaladsl.BidiFlow.fromFlowsMat(flow1, flow2)(combinerToScala(combine)))
+      scaladsl.BidiFlow.fromFlowsMat(flow1, flow2)(combinerToScala(combine)))
   }
 
   /**

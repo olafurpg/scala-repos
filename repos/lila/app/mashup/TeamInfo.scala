@@ -7,7 +7,14 @@ import lila.db.api._
 import lila.forum.MiniForumPost
 import lila.game.{GameRepo, Game}
 import lila.team.tube._
-import lila.team.{Team, Request, RequestRepo, MemberRepo, RequestWithUser, TeamApi}
+import lila.team.{
+  Team,
+  Request,
+  RequestRepo,
+  MemberRepo,
+  RequestWithUser,
+  TeamApi
+}
 import lila.user.{User, UserRepo}
 
 case class TeamInfo(mine: Boolean,
@@ -27,21 +34,22 @@ object TeamInfo {
   private case class Cachable(bestUserIds: List[User.ID], toints: Int)
 
   private val cache = lila.memo.AsyncCache[String, Cachable](
-      teamId =>
-        for {
-          userIds ← MemberRepo userIdsByTeam teamId
-          bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
-          toints ← UserRepo.idsSumToints(userIds)
-        } yield Cachable(bestUserIds, toints),
-      timeToLive = 10 minutes)
+    teamId =>
+      for {
+        userIds ← MemberRepo userIdsByTeam teamId
+        bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
+        toints ← UserRepo.idsSumToints(userIds)
+      } yield Cachable(bestUserIds, toints),
+    timeToLive = 10 minutes)
 
   def apply(api: TeamApi,
             getForumNbPosts: String => Fu[Int],
             getForumPosts: String => Fu[List[MiniForumPost]])(
-      team: Team, me: Option[User]): Fu[TeamInfo] =
+      team: Team,
+      me: Option[User]): Fu[TeamInfo] =
     for {
       requests ← (team.enabled && me.??(m => team.isCreator(m.id))) ?? api
-        .requestsWithUsers(team)
+                  .requestsWithUsers(team)
       mine = me.??(m => api.belongsTo(team.id, m.id))
       requestedByMe ← !mine ?? me.??(m => RequestRepo.exists(team.id, m.id))
       cachable <- cache(team.id)

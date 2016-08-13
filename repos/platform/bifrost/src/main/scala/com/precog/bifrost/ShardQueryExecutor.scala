@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -59,7 +59,9 @@ import scalaz.syntax.traverse._
 trait Blah {}
 
 trait ShardQueryExecutorConfig
-    extends BaseConfig with ColumnarTableModuleConfig with EvaluatorConfig
+    extends BaseConfig
+    with ColumnarTableModuleConfig
+    with EvaluatorConfig
     with IdSourceConfig {
   def clock: Clock
   val queryId = new java.util.concurrent.atomic.AtomicLong()
@@ -70,7 +72,11 @@ case class FaultPosition(line: Int, col: Int, text: String)
 object FaultPosition {
   import shapeless._
   import blueeyes.json.serialization._
-  import DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+  import DefaultSerialization.{
+    DateTimeExtractor => _,
+    DateTimeDecomposer => _,
+    _
+  }
 
   implicit val iso = Iso.hlist(FaultPosition.apply _, FaultPosition.unapply _)
   val schema = "line" :: "column" :: "text" :: HNil
@@ -89,12 +95,13 @@ object Fault {
 }
 
 trait ShardQueryExecutorPlatform[M[+ _]]
-    extends ParseEvalStack[M] with XLightWebHttpClientModule[M] {
+    extends ParseEvalStack[M]
+    with XLightWebHttpClientModule[M] {
   case class StackException(error: StackError)
       extends Exception(error.toString)
 
-  abstract class ShardQueryExecutor[N[+ _]](
-      N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
+  abstract class ShardQueryExecutor[N[+ _]](N0: Monad[N])(implicit mn: M ~> N,
+                                                          nm: N ~> M)
       extends Evaluator[N](N0)
       with QueryExecutor[N, (Set[Fault], StreamT[N, Slice])] {
 
@@ -129,63 +136,63 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
       val qid = yggConfig.queryId.getAndIncrement()
       queryLogger.info(
-          "[QID:%d] Executing query for %s: %s, context: %s" format
+        "[QID:%d] Executing query for %s: %s, context: %s" format
           (qid, evaluationContext.apiKey, query, evaluationContext))
 
       import EvaluationError._
 
       val solution = EitherT
         .fromTryCatch[N, EitherT[N, EvaluationError, (Set[Fault], Table)]] {
-        N point {
-          val (faults, bytecode) = asBytecode(query)
+          N point {
+            val (faults, bytecode) = asBytecode(query)
 
-          val resultVN: N[EvaluationError \/ Table] = {
-            bytecode map { instrs =>
-              ((systemError _) <-:(StackException(_)) <-: decorate(instrs).disjunction) traverse {
-                dag =>
-                  applyQueryOptions(opts) {
-                    logger.debug("[QID:%d] Evaluating query".format(qid))
+            val resultVN: N[EvaluationError \/ Table] = {
+              bytecode map { instrs =>
+                ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse {
+                  dag =>
+                    applyQueryOptions(opts) {
+                      logger.debug("[QID:%d] Evaluating query".format(qid))
 
-                    if (queryLogger.isDebugEnabled) {
-                      eval(dag, evaluationContext, true) map {
-                        _.logged(queryLogger,
-                                 "[QID:" + qid + "]",
-                                 "begin result stream",
-                                 "end result stream") { slice =>
-                          "size: " + slice.size
+                      if (queryLogger.isDebugEnabled) {
+                        eval(dag, evaluationContext, true) map {
+                          _.logged(queryLogger,
+                                   "[QID:" + qid + "]",
+                                   "begin result stream",
+                                   "end result stream") { slice =>
+                            "size: " + slice.size
+                          }
                         }
+                      } else {
+                        eval(dag, evaluationContext, true)
                       }
-                    } else {
-                      eval(dag, evaluationContext, true)
                     }
-                  }
+                }
+              } getOrElse {
+                // compilation errors will be reported as warnings, but there are no results so
+                // we just return an empty stream as the success
+                N.point(\/.right(Table.empty))
               }
-            } getOrElse {
-              // compilation errors will be reported as warnings, but there are no results so
-              // we just return an empty stream as the success
-              N.point(\/.right(Table.empty))
             }
-          }
 
-          EitherT(resultVN) flatMap { table =>
-            EitherT.right {
-              faults.toStream traverse {
-                case Fault.Error(pos, msg) =>
-                  queryReport.error(pos, msg) map { _ =>
-                    true
-                  }
-                case Fault.Warning(pos, msg) =>
-                  queryReport.warn(pos, msg) map { _ =>
-                    false
-                  }
-              } map { errors =>
-                faults ->
-                (if (errors.exists(_ == true)) Table.empty else table)
+            EitherT(resultVN) flatMap { table =>
+              EitherT.right {
+                faults.toStream traverse {
+                  case Fault.Error(pos, msg) =>
+                    queryReport.error(pos, msg) map { _ =>
+                      true
+                    }
+                  case Fault.Warning(pos, msg) =>
+                    queryReport.warn(pos, msg) map { _ =>
+                      false
+                    }
+                } map { errors =>
+                  faults ->
+                    (if (errors.exists(_ == true)) Table.empty else table)
+                }
               }
             }
           }
         }
-      }
 
       for {
         solutionResult <- solution.leftMap(systemError).join
@@ -202,15 +209,14 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
       def sort(table: N[Table]): N[Table] =
         if (!opts.sortOn.isEmpty) {
-          val sortKey = InnerArrayConcat(
-              opts.sortOn map { cpath =>
-            WrapArray(cpath.nodes
-                  .foldLeft(constants.SourceValue.Single: TransSpec1) {
-              case (inner, f @ CPathField(_)) =>
-                DerefObjectStatic(inner, f)
-              case (inner, i @ CPathIndex(_)) =>
-                DerefArrayStatic(inner, i)
-            })
+          val sortKey = InnerArrayConcat(opts.sortOn map { cpath =>
+            WrapArray(
+              cpath.nodes.foldLeft(constants.SourceValue.Single: TransSpec1) {
+                case (inner, f @ CPathField(_)) =>
+                  DerefObjectStatic(inner, f)
+                case (inner, i @ CPathIndex(_)) =>
+                  DerefArrayStatic(inner, i)
+              })
           }: _*)
 
           table flatMap { tbl =>
@@ -268,8 +274,8 @@ trait ShardQueryExecutorPlatform[M[+ _]]
         case ex: ParseException =>
           val loc = ex.failures.head.tail
           val fault = Fault.Error(
-              Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
-              ex.mkString)
+            Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
+            ex.mkString)
 
           (Set(fault), None)
       }

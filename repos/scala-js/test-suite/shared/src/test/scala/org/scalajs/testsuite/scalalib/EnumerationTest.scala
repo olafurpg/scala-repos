@@ -15,7 +15,8 @@ import org.scalajs.testsuite.utils.Platform._
 
 class EnumerationTest {
 
-  @Test def should_use_explicit_naming_for_enumerated_values_issue_38(): Unit = {
+  @Test
+  def should_use_explicit_naming_for_enumerated_values_issue_38(): Unit = {
     object HelpLevel extends Enumeration {
       type HelpLevel = Value
       val None = Value("None")
@@ -51,8 +52,8 @@ class EnumerationTest {
       }
 
       assertTrue(
-          Test.A.toString
-            .startsWith("<Unknown name for enum field #0 of class "))
+        Test.A.toString
+          .startsWith("<Unknown name for enum field #0 of class "))
     }
   }
 
@@ -66,11 +67,11 @@ class EnumerationTest {
 
     if (!executingInJVM) {
       // In the JVM the exception thrown is a ClassCastException
-      val ex = expectThrows(
-          classOf[NoSuchElementException], Test.withName("A"))
+      val ex =
+        expectThrows(classOf[NoSuchElementException], Test.withName("A"))
       val subMsg =
         "Couldn't find enum field with name A.\n" +
-        "However, there were the following unnamed fields:"
+          "However, there were the following unnamed fields:"
       assertTrue(ex.getMessage.contains(subMsg))
     }
   }
@@ -80,8 +81,8 @@ class EnumerationTest {
   }
 
   @Test def should_respond_to_values(): Unit = {
-    assertEquals(
-        "FooBarEnum.ValueSet(A, B, C, D, E, F)", FooBarEnum.values.toString)
+    assertEquals("FooBarEnum.ValueSet(A, B, C, D, E, F)",
+                 FooBarEnum.values.toString)
   }
 
   @Test def should_allow_setting_nextName(): Unit = {

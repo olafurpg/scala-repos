@@ -8,7 +8,13 @@ import lila.api.Context
 import lila.app._
 import lila.common.HTTPRequest
 import lila.game.{Pov, GameRepo}
-import lila.tournament.{System, TournamentRepo, PairingRepo, Tournament => Tourney, VisibleTournaments}
+import lila.tournament.{
+  System,
+  TournamentRepo,
+  PairingRepo,
+  Tournament => Tourney,
+  VisibleTournaments
+}
 import lila.user.UserRepo
 import views._
 
@@ -22,26 +28,27 @@ object Tournament extends LilaController {
 
   def home(page: Int) = Open { implicit ctx =>
     negotiate(
-        html = Reasonable(page, 20) {
-          val finishedPaginator =
-            repo.finishedPaginator(maxPerPage = 30, page = page)
-          if (HTTPRequest isXhr ctx.req)
-            finishedPaginator map { pag =>
-              Ok(html.tournament.finishedPaginator(pag))
-            } else
-            env.api.fetchVisibleTournaments zip repo.scheduledDedup zip finishedPaginator zip UserRepo
-              .allSortToints(10) map {
-              case (((visible, scheduled), finished), leaderboard) =>
-                Ok(html.tournament.home(scheduled,
-                                        finished,
-                                        leaderboard,
-                                        env scheduleJsonView visible))
-            } map NoCache
-        },
-        api = _ =>
-            env.api.fetchVisibleTournaments map { tours =>
-            Ok(env scheduleJsonView tours)
-        }
+      html = Reasonable(page, 20) {
+        val finishedPaginator =
+          repo.finishedPaginator(maxPerPage = 30, page = page)
+        if (HTTPRequest isXhr ctx.req)
+          finishedPaginator map { pag =>
+            Ok(html.tournament.finishedPaginator(pag))
+          } else
+          env.api.fetchVisibleTournaments zip repo.scheduledDedup zip finishedPaginator zip UserRepo
+            .allSortToints(10) map {
+            case (((visible, scheduled), finished), leaderboard) =>
+              Ok(
+                html.tournament.home(scheduled,
+                                     finished,
+                                     leaderboard,
+                                     env scheduleJsonView visible))
+          } map NoCache
+      },
+      api = _ =>
+        env.api.fetchVisibleTournaments map { tours =>
+          Ok(env scheduleJsonView tours)
+      }
     )
   }
 
@@ -57,37 +64,36 @@ object Tournament extends LilaController {
   def show(id: String) = Open { implicit ctx =>
     val page = getInt("page")
     negotiate(
-        html = repo byId id flatMap {
-          _.fold(tournamentNotFound.fuccess) {
-            tour =>
-              env
-                .version(tour.id)
-                .zip(chatOf(tour))
-                .flatMap {
-                  case (version, chat) =>
-                    env.jsonView(tour, page, ctx.userId, none, version.some) map {
-                      html.tournament.show(tour, _, chat)
-                    }
+      html = repo byId id flatMap {
+        _.fold(tournamentNotFound.fuccess) { tour =>
+          env
+            .version(tour.id)
+            .zip(chatOf(tour))
+            .flatMap {
+              case (version, chat) =>
+                env.jsonView(tour, page, ctx.userId, none, version.some) map {
+                  html.tournament.show(tour, _, chat)
                 }
-                .map { Ok(_) }
-                .mon(_.http.response.tournament.show.website)
-          }
-        },
-        api = _ =>
-            repo byId id flatMap {
-            case None => NotFound(jsonError("No such tournament")).fuccess
-            case Some(tour) => {
-                get("playerInfo").?? { env.api.playerInfo(tour.id, _) } zip getBool(
-                    "socketVersion").??(env version tour.id map some) flatMap {
-                  case (playerInfoExt, socketVersion) =>
-                    env.jsonView(tour,
-                                 page,
-                                 ctx.userId,
-                                 playerInfoExt,
-                                 socketVersion)
-                } map { Ok(_) }
-              }.mon(_.http.response.tournament.show.mobile)
-          } map (_ as JSON)
+            }
+            .map { Ok(_) }
+            .mon(_.http.response.tournament.show.website)
+        }
+      },
+      api = _ =>
+        repo byId id flatMap {
+          case None => NotFound(jsonError("No such tournament")).fuccess
+          case Some(tour) => {
+            get("playerInfo").?? { env.api.playerInfo(tour.id, _) } zip getBool(
+              "socketVersion").??(env version tour.id map some) flatMap {
+              case (playerInfoExt, socketVersion) =>
+                env.jsonView(tour,
+                             page,
+                             ctx.userId,
+                             playerInfoExt,
+                             socketVersion)
+            } map { Ok(_) }
+          }.mon(_.http.response.tournament.show.mobile)
+        } map (_ as JSON)
     ) map NoCache
   }
 
@@ -142,17 +148,17 @@ object Tournament extends LilaController {
   def join(id: String) = Auth { implicit ctx => implicit me =>
     NoLame {
       negotiate(
-          html = repo enterableById id map {
-            case None => tournamentNotFound
-            case Some(tour) =>
-              env.api.join(tour.id, me)
-              Redirect(routes.Tournament.show(tour.id))
-          },
-          api = _ =>
-              OptionFuOk(repo enterableById id) { tour =>
-              env.api.join(tour.id, me)
-              fuccess(Json.obj("ok" -> true))
-          }
+        html = repo enterableById id map {
+          case None => tournamentNotFound
+          case Some(tour) =>
+            env.api.join(tour.id, me)
+            Redirect(routes.Tournament.show(tour.id))
+        },
+        api = _ =>
+          OptionFuOk(repo enterableById id) { tour =>
+            env.api.join(tour.id, me)
+            fuccess(Json.obj("ok" -> true))
+        }
       )
     }
   }
@@ -184,11 +190,11 @@ object Tournament extends LilaController {
     NoLame {
       implicit val req = ctx.body
       env.forms.create.bindFromRequest.fold(
-          err => BadRequest(html.tournament.form(err, env.forms)).fuccess,
-          setup =>
-            env.api.createTournament(setup, me) map { tour =>
-              Redirect(routes.Tournament.show(tour.id))
-          })
+        err => BadRequest(html.tournament.form(err, env.forms)).fuccess,
+        setup =>
+          env.api.createTournament(setup, me) map { tour =>
+            Redirect(routes.Tournament.show(tour.id))
+        })
     }
   }
 

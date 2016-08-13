@@ -20,7 +20,7 @@ package ext
 
 import scala.reflect.ClassTag
 
-class EnumSerializer[E <: Enumeration : ClassTag](enum: E)
+class EnumSerializer[E <: Enumeration: ClassTag](enum: E)
     extends json.Serializer[E#Value] {
   import JsonDSL._
 
@@ -33,7 +33,7 @@ class EnumSerializer[E <: Enumeration : ClassTag](enum: E)
         case JInt(value) if (value <= enum.maxId) => enum(value.toInt)
         case value =>
           throw new MappingException(
-              "Can't convert " + value + " to " + EnumerationClass)
+            "Can't convert " + value + " to " + EnumerationClass)
       }
   }
 
@@ -42,7 +42,7 @@ class EnumSerializer[E <: Enumeration : ClassTag](enum: E)
   }
 }
 
-class EnumNameSerializer[E <: Enumeration : ClassTag](enum: E)
+class EnumNameSerializer[E <: Enumeration: ClassTag](enum: E)
     extends json.Serializer[E#Value] {
   import JsonDSL._
 
@@ -56,7 +56,7 @@ class EnumNameSerializer[E <: Enumeration : ClassTag](enum: E)
           enum.withName(value)
         case value =>
           throw new MappingException(
-              "Can't convert " + value + " to " + EnumerationClass)
+            "Can't convert " + value + " to " + EnumerationClass)
       }
   }
 

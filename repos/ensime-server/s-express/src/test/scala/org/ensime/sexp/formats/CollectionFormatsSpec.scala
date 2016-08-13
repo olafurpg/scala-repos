@@ -8,7 +8,9 @@ import org.ensime.sexp._
 
 // http://docs.scala-lang.org/overviews/collections/overview.html
 class CollectionFormatsSpec
-    extends FormatSpec with ProductFormats with CollectionFormats
+    extends FormatSpec
+    with ProductFormats
+    with CollectionFormats
     with BasicFormats {
 
   val foo = SexpString("foo")
@@ -65,8 +67,8 @@ class CollectionFormatsSpec
 
   it should "support SortedMap" in {
     assertFormat(collection.SortedMap[String, String](), SexpNil)
-    assertFormat(
-        collection.SortedMap("foo" -> "foo"), SexpList(SexpList(foo, foo)))
+    assertFormat(collection.SortedMap("foo" -> "foo"),
+                 SexpList(SexpList(foo, foo)))
   }
 
   "CollectionFormats immutable variants of the traits" should "support Traversable" in {
@@ -134,27 +136,27 @@ class CollectionFormatsSpec
 
   it should "support im.Range" in {
     assertFormat(
-        im.Range(-100, 100),
-        SexpList(
-            SexpSymbol(":start"),
-            SexpNumber(-100),
-            SexpSymbol(":end"),
-            SexpNumber(100),
-            SexpSymbol(":step"),
-            SexpNumber(1)
-        )
+      im.Range(-100, 100),
+      SexpList(
+        SexpSymbol(":start"),
+        SexpNumber(-100),
+        SexpSymbol(":end"),
+        SexpNumber(100),
+        SexpSymbol(":step"),
+        SexpNumber(1)
+      )
     )
 
     assertFormat(
-        im.Range(-100, 100, 2),
-        SexpList(
-            SexpSymbol(":start"),
-            SexpNumber(-100),
-            SexpSymbol(":end"),
-            SexpNumber(100),
-            SexpSymbol(":step"),
-            SexpNumber(2)
-        )
+      im.Range(-100, 100, 2),
+      SexpList(
+        SexpSymbol(":start"),
+        SexpNumber(-100),
+        SexpSymbol(":end"),
+        SexpNumber(100),
+        SexpSymbol(":step"),
+        SexpNumber(2)
+      )
     )
   }
 
@@ -162,23 +164,23 @@ class CollectionFormatsSpec
     implicit val DoubleIntegral = Numeric.DoubleAsIfIntegral
 
     assertFormat(
-        -100.0 to 100.0 by 1.5,
-        SexpData(
-            SexpSymbol(":start") -> SexpNumber(-100),
-            SexpSymbol(":end") -> SexpNumber(100),
-            SexpSymbol(":step") -> SexpNumber(1.5),
-            SexpSymbol(":inclusive") -> SexpSymbol("t")
-        )
+      -100.0 to 100.0 by 1.5,
+      SexpData(
+        SexpSymbol(":start") -> SexpNumber(-100),
+        SexpSymbol(":end") -> SexpNumber(100),
+        SexpSymbol(":step") -> SexpNumber(1.5),
+        SexpSymbol(":inclusive") -> SexpSymbol("t")
+      )
     )
 
     assertFormat(
-        -100.0 until 100.0 by 1.5,
-        SexpData(
-            SexpSymbol(":start") -> SexpNumber(-100),
-            SexpSymbol(":end") -> SexpNumber(100),
-            SexpSymbol(":step") -> SexpNumber(1.5),
-            SexpSymbol(":inclusive") -> SexpNil
-        )
+      -100.0 until 100.0 by 1.5,
+      SexpData(
+        SexpSymbol(":start") -> SexpNumber(-100),
+        SexpSymbol(":end") -> SexpNumber(100),
+        SexpSymbol(":step") -> SexpNumber(1.5),
+        SexpSymbol(":inclusive") -> SexpNil
+      )
     )
   }
 }

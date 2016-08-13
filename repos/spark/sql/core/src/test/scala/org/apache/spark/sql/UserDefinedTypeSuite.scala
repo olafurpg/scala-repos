@@ -38,8 +38,8 @@ private[sql] class MyDenseVector(val data: Array[Double])
 }
 
 @BeanInfo
-private[sql] case class MyLabeledPoint(
-    @BeanProperty label: Double, @BeanProperty features: MyDenseVector)
+private[sql] case class MyLabeledPoint(@BeanProperty label: Double,
+                                       @BeanProperty features: MyDenseVector)
 
 private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 
@@ -67,7 +67,9 @@ private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 }
 
 class UserDefinedTypeSuite
-    extends QueryTest with SharedSQLContext with ParquetTest {
+    extends QueryTest
+    with SharedSQLContext
+    with ParquetTest {
   import testImplicits._
 
   private lazy val pointsRDD =
@@ -92,7 +94,8 @@ class UserDefinedTypeSuite
 
   test("UDTs and UDFs") {
     sqlContext.udf.register(
-        "testType", (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
+      "testType",
+      (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
     pointsRDD.registerTempTable("points")
     checkAnswer(sql("SELECT testType(features) from points"),
                 Seq(Row(true), Row(true)))
@@ -138,21 +141,22 @@ class UserDefinedTypeSuite
 
   test("UDTs with JSON") {
     val data = Seq(
-        "{\"id\":1,\"vec\":[1.1,2.2,3.3,4.4]}",
-        "{\"id\":2,\"vec\":[2.25,4.5,8.75]}"
+      "{\"id\":1,\"vec\":[1.1,2.2,3.3,4.4]}",
+      "{\"id\":2,\"vec\":[2.25,4.5,8.75]}"
     )
     val schema = StructType(
-        Seq(
-            StructField("id", IntegerType, false),
-            StructField("vec", new MyDenseVectorUDT, false)
-        ))
+      Seq(
+        StructField("id", IntegerType, false),
+        StructField("vec", new MyDenseVectorUDT, false)
+      ))
 
     val stringRDD = sparkContext.parallelize(data)
     val jsonRDD = sqlContext.read.schema(schema).json(stringRDD)
     checkAnswer(
-        jsonRDD,
-        Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
-            2, new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
+      jsonRDD,
+      Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
+        2,
+        new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
     )
   }
 

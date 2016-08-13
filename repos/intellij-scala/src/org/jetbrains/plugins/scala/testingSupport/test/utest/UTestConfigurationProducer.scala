@@ -2,7 +2,12 @@ package org.jetbrains.plugins.scala
 package testingSupport.test.utest
 
 import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.execution.{JavaRunConfigurationExtensionManager, Location, RunManager, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  JavaRunConfigurationExtensionManager,
+  Location,
+  RunManager,
+  RunnerAndConfigurationSettings
+}
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDirectory, PsiElement, PsiPackage}
@@ -12,10 +17,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScArguments
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.TestKind
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, TestConfigurationProducer, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer,
+  TestConfigurationProducer,
+  TestConfigurationUtil
+}
 
 import scala.annotation.tailrec
 
@@ -33,8 +45,8 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[UTestRunConfiguration]) return false
-      return TestConfigurationUtil.isPackageConfiguration(
-          element, configuration)
+      return TestConfigurationUtil
+        .isPackageConfiguration(element, configuration)
     }
     val (testClass, testClassName) = getLocationClassAndTest(location)
     if (testClass == null) return false
@@ -42,12 +54,12 @@ with AbstractTestConfigurationProducer {
     configuration match {
       case configuration: UTestRunConfiguration
           if configuration.getTestKind == TestKind.CLASS &&
-          testClassName == null =>
+            testClassName == null =>
         testClassPath == configuration.getTestClassPath
       case configuration: UTestRunConfiguration
           if configuration.getTestKind == TestKind.TEST_NAME =>
         testClassPath == configuration.getTestClassPath &&
-        testClassName != null && testClassName == configuration.getTestName
+          testClassName != null && testClassName == configuration.getTestName
       case _ => false
     }
   }
@@ -65,13 +77,12 @@ with AbstractTestConfigurationProducer {
         case d: PsiDirectory => d.getName
       }
       return Some(
-          (element,
-           TestConfigurationUtil.packageSettings(
-               element,
-               location,
-               confFactory,
-               ScalaBundle.message("test.in.scope.utest.presentable.text",
-                                   name))))
+        (element,
+         TestConfigurationUtil.packageSettings(
+           element,
+           location,
+           confFactory,
+           ScalaBundle.message("test.in.scope.utest.presentable.text", name))))
     }
 
     val (testClass, testName) = getLocationClassAndTest(location)
@@ -79,9 +90,10 @@ with AbstractTestConfigurationProducer {
     val testClassPath = testClass.qualifiedName
     val settings = RunManager
       .getInstance(location.getProject)
-      .createRunConfiguration(StringUtil.getShortName(testClassPath) +
-                              (if (testName != null) "\\" + testName else ""),
-                              confFactory)
+      .createRunConfiguration(
+        StringUtil.getShortName(testClassPath) +
+          (if (testName != null) "\\" + testName else ""),
+        confFactory)
     val runConfiguration =
       settings.getConfiguration.asInstanceOf[UTestRunConfiguration]
     runConfiguration.setTestClassPath(testClassPath)
@@ -133,8 +145,8 @@ with AbstractTestConfigurationProducer {
     }
   }
 
-  private def buildTestPath(
-      testExpr: ScExpression, testScopeName: String): Option[String] = {
+  private def buildTestPath(testExpr: ScExpression,
+                            testScopeName: String): Option[String] = {
     testExpr match {
       case (_: ScInfixExpr) | (_: ScMethodCall) =>
         testExpr.getParent match {
@@ -167,8 +179,8 @@ with AbstractTestConfigurationProducer {
 
   private def buildPathFromTestExpr(expr: ScExpression): Option[String] =
     expr.firstChild
-      .flatMap(TestConfigurationUtil.getStaticTestName(
-              _, allowSymbolLiterals = true))
+      .flatMap(
+        TestConfigurationUtil.getStaticTestName(_, allowSymbolLiterals = true))
       .flatMap(buildTestPath(expr, _))
 
   override def getLocationClassAndTest(
@@ -180,22 +192,23 @@ with AbstractTestConfigurationProducer {
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (containingObject == null) return fail
     while (!containingObject.isInstanceOf[ScObject] &&
-    PsiTreeUtil.getParentOfType(
-        containingObject, classOf[ScTypeDefinition], true) != null) {
-      containingObject = PsiTreeUtil.getParentOfType(
-          containingObject, classOf[ScTypeDefinition], true)
+           PsiTreeUtil.getParentOfType(containingObject,
+                                       classOf[ScTypeDefinition],
+                                       true) != null) {
+      containingObject = PsiTreeUtil
+        .getParentOfType(containingObject, classOf[ScTypeDefinition], true)
     }
     if (!containingObject.isInstanceOf[ScObject]) return fail
     if (!suitePaths.exists(suitePath =>
-              TestConfigurationUtil.isInheritor(containingObject, suitePath)))
+          TestConfigurationUtil.isInheritor(containingObject, suitePath)))
       return (null, null)
     val testClassPath = containingObject.qualifiedName
 
     val nameContainer = ScalaPsiUtil.getParentWithProperty(
-        element,
-        strict = false,
-        e =>
-          TestNodeProvider.isUTestInfixExpr(e) ||
+      element,
+      strict = false,
+      e =>
+        TestNodeProvider.isUTestInfixExpr(e) ||
           TestNodeProvider.isUTestSuiteApplyCall(e) ||
           TestNodeProvider.isUTestApplyCall(e))
     val testName = nameContainer.flatMap {
@@ -211,12 +224,12 @@ with AbstractTestConfigurationProducer {
         getTestSuiteName(methodCall)
       case _ => None
     }.getOrElse(
-        //it is also possible that element is on left-hand of test suite definition
-        TestNodeProvider
-          .getUTestLeftHandTestDefinition(element)
-          .flatMap(getTestSuiteName)
-          .orNull
-      )
+      //it is also possible that element is on left-hand of test suite definition
+      TestNodeProvider
+        .getUTestLeftHandTestDefinition(element)
+        .flatMap(getTestSuiteName)
+        .orNull
+    )
     (containingObject, testName)
   }
 }

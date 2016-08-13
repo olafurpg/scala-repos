@@ -29,7 +29,7 @@ class ThriftChannelBufferDecoderTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "ThriftChannelBufferDecoder convert channel buffers to arrays with offset") {
+    "ThriftChannelBufferDecoder convert channel buffers to arrays with offset") {
     val c = new ThriftChannelBufferDecoderContext
     import c._
 

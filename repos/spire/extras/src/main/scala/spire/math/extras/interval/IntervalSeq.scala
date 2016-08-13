@@ -77,14 +77,14 @@ final class IntervalSeq[T] private (val belowAll: Boolean,
 
   override def hashCode: Int = {
     belowAll.## * 41 + Arrays.hashCode(kinds) * 23 + Arrays.hashCode(
-        values.asInstanceOf[Array[AnyRef]])
+      values.asInstanceOf[Array[AnyRef]])
   }
 
   override def equals(rhs: Any): Boolean = rhs match {
     case rhs: IntervalSeq[_] =>
       lhs.belowAll == rhs.belowAll && Arrays.equals(lhs.kinds, rhs.kinds) &&
-      Arrays.equals(values.asInstanceOf[Array[AnyRef]],
-                    rhs.values.asInstanceOf[Array[AnyRef]])
+        Arrays.equals(values.asInstanceOf[Array[AnyRef]],
+                      rhs.values.asInstanceOf[Array[AnyRef]])
     case _ => false
   }
 
@@ -177,8 +177,8 @@ final class IntervalSeq[T] private (val belowAll: Boolean,
 
 object IntervalSeq {
 
-  implicit def algebra[
-      T : Order]: Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] =
+  implicit def algebra[T: Order]
+    : Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] =
     new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
 
       def eqv(x: IntervalSeq[T], y: IntervalSeq[T]): Boolean = x == y
@@ -197,30 +197,30 @@ object IntervalSeq {
         a ^ b
     }
 
-  def atOrAbove[T : Order](value: T): IntervalSeq[T] =
+  def atOrAbove[T: Order](value: T): IntervalSeq[T] =
     singleton(false, value, K11)
 
-  def above[T : Order](value: T): IntervalSeq[T] = singleton(false, value, K01)
+  def above[T: Order](value: T): IntervalSeq[T] = singleton(false, value, K01)
 
-  def atOrBelow[T : Order](value: T): IntervalSeq[T] =
+  def atOrBelow[T: Order](value: T): IntervalSeq[T] =
     singleton(true, value, K10)
 
-  def below[T : Order](value: T): IntervalSeq[T] = singleton(true, value, K00)
+  def below[T: Order](value: T): IntervalSeq[T] = singleton(true, value, K00)
 
-  def point[T : Order](value: T): IntervalSeq[T] = singleton(false, value, K10)
+  def point[T: Order](value: T): IntervalSeq[T] = singleton(false, value, K10)
 
-  def hole[T : Order](value: T): IntervalSeq[T] = singleton(true, value, K01)
+  def hole[T: Order](value: T): IntervalSeq[T] = singleton(true, value, K01)
 
-  def empty[T : Order]: IntervalSeq[T] =
+  def empty[T: Order]: IntervalSeq[T] =
     new IntervalSeq[T](false, Array()(classTag), Array(), implicitly[Order[T]])
 
-  def all[T : Order]: IntervalSeq[T] =
+  def all[T: Order]: IntervalSeq[T] =
     new IntervalSeq[T](true, Array()(classTag), Array(), implicitly[Order[T]])
 
-  implicit def apply[T : Order](value: Boolean): IntervalSeq[T] =
+  implicit def apply[T: Order](value: Boolean): IntervalSeq[T] =
     new IntervalSeq[T](value, Array()(classTag), Array(), implicitly[Order[T]])
 
-  implicit def apply[T : Order](interval: Interval[T]): IntervalSeq[T] =
+  implicit def apply[T: Order](interval: Interval[T]): IntervalSeq[T] =
     interval.fold {
       case (Closed(a), Closed(b)) if a == b => point(a)
       case (Unbound(), Open(x)) => below(x)
@@ -243,7 +243,7 @@ object IntervalSeq {
     (empty[Rational] /: simpleSets)(_ | _)
   }
 
-  implicit def booleanAlgebra[T : Order] =
+  implicit def booleanAlgebra[T: Order] =
     new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
 
       def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
@@ -261,16 +261,21 @@ object IntervalSeq {
       override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
     }
 
-  private def fromTo[T : Order](a: T, ak: Byte, b: T, bk: Byte) =
-    new IntervalSeq[T](
-        false, Array(a, b)(classTag), Array(ak, bk), implicitly[Order[T]])
+  private def fromTo[T: Order](a: T, ak: Byte, b: T, bk: Byte) =
+    new IntervalSeq[T](false,
+                       Array(a, b)(classTag),
+                       Array(ak, bk),
+                       implicitly[Order[T]])
 
   private def wrong: Nothing = throw new IllegalStateException("")
 
-  private def singleton[T : Order](
-      belowAll: Boolean, value: T, kind: Byte): IntervalSeq[T] =
-    new IntervalSeq(
-        belowAll, Array(value)(classTag), Array(kind), implicitly[Order[T]])
+  private def singleton[T: Order](belowAll: Boolean,
+                                  value: T,
+                                  kind: Byte): IntervalSeq[T] =
+    new IntervalSeq(belowAll,
+                    Array(value)(classTag),
+                    Array(kind),
+                    implicitly[Order[T]])
 
   private final val K00 = 0
 
@@ -538,8 +543,8 @@ object IntervalSeq {
     val result = op(a0, b0) && merge0(0, a.length, 0, b.length)
   }
 
-  private class IsSupersetOf[T](
-      val lhs: IntervalSeq[T], val rhs: IntervalSeq[T])
+  private class IsSupersetOf[T](val lhs: IntervalSeq[T],
+                                val rhs: IntervalSeq[T])
       extends BooleanOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = a | !b
@@ -564,7 +569,7 @@ object IntervalSeq {
   }
 
   // todo: switch to AbstractIterator once we no longer need to support 2.10
-  private final class IntervalIterator[T : Order](s: IntervalSeq[T])
+  private final class IntervalIterator[T: Order](s: IntervalSeq[T])
       extends Iterator[Interval[T]] {
 
     private[this] val values = s.values

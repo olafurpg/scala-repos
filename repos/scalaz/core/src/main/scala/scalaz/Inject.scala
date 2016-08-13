@@ -40,7 +40,8 @@ object Inject extends InjectInstances {
     Free[F, A](I.inj(ga))
 
   def match_[F[_], G[_], A](fa: Free[F, A])(
-      implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
+      implicit F: Functor[F],
+      I: Inject[G, F]): Option[G[Free[F, A]]] =
     fa.resume.fold(I.prj(_), _ => none)
 
   @inline def apply[F[_], G[_]](implicit I: Inject[F, G]): Inject[F, G] = I

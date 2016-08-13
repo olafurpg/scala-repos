@@ -8,7 +8,7 @@ object Summary {
   }
 
   // 1 static issue:
-  // 
+  //
   //   Given method in MethodInner: def g(other: MethodInner) = ()
   //   method1.g(method1) fails to compile with type error.
   //
@@ -20,7 +20,7 @@ object Summary {
   //   traverse a method.
   //
   // 4 runtime issues:
-  // 
+  //
   //   From the outside:     inner1.isInstanceOf[outer2.Inner] is true, should (maybe) be false
   //   From inside inner1:   inner2.isInstanceOf[Outer.this.Inner] is true, should (maybe) be false
   //   From the outside:     inner1 match { case _: outer2.Inner => true ... } is true, should definitely be false
@@ -141,8 +141,9 @@ object Test {
          inner1.comparePathWithInstanceOf(inner2) // true
     ) foreach println
 
-    List("These are doing the wrong thing under current proposal",
-         (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
+    List(
+      "These are doing the wrong thing under current proposal",
+      (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
     ) foreach println
   }
 

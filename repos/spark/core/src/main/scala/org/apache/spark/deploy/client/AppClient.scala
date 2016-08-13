@@ -18,7 +18,10 @@
 package org.apache.spark.deploy.client
 
 import java.util.concurrent._
-import java.util.concurrent.{Future => JFuture, ScheduledFuture => JScheduledFuture}
+import java.util.concurrent.{
+  Future => JFuture,
+  ScheduledFuture => JScheduledFuture
+}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 import scala.util.control.NonFatal
@@ -55,7 +58,8 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
   private val registered = new AtomicBoolean(false)
 
   private class ClientEndpoint(override val rpcEnv: RpcEnv)
-      extends ThreadSafeRpcEndpoint with Logging {
+      extends ThreadSafeRpcEndpoint
+      with Logging {
 
     private var master: Option[RpcEndpointRef] = None
     // To avoid calling listener.disconnected() multiple times
@@ -69,21 +73,21 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
     // A thread pool for registering with masters. Because registering with a master is a blocking
     // action, this thread pool must be able to create "masterRpcAddresses.size" threads at the same
     // time so that we can register with all masters.
-    private val registerMasterThreadPool = ThreadUtils
-      .newDaemonCachedThreadPool(
+    private val registerMasterThreadPool =
+      ThreadUtils.newDaemonCachedThreadPool(
         "appclient-register-master-threadpool",
         masterRpcAddresses.length // Make sure we can register with all masters at the same time
-    )
+      )
 
     // A scheduled executor for scheduling the registration actions
     private val registrationRetryThread =
       ThreadUtils.newDaemonSingleThreadScheduledExecutor(
-          "appclient-registration-retry-thread")
+        "appclient-registration-retry-thread")
 
     // A thread pool to perform receive then reply actions in a thread so as not to block the
     // event loop.
     private val askAndReplyThreadPool = ThreadUtils.newDaemonCachedThreadPool(
-        "appclient-receive-and-reply-threadpool")
+      "appclient-receive-and-reply-threadpool")
 
     override def onStart(): Unit = {
       try {
@@ -108,7 +112,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
                 return
               }
               logInfo(
-                  "Connecting to master " + masterAddress.toSparkURL + "...")
+                "Connecting to master " + masterAddress.toSparkURL + "...")
               val masterRef =
                 rpcEnv.setupEndpointRef(masterAddress, Master.ENDPOINT_NAME)
               masterRef.send(RegisterApplication(appDescription, self))
@@ -131,19 +135,19 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
     private def registerWithMaster(nthRetry: Int) {
       registerMasterFutures.set(tryRegisterAllMasters())
       registrationRetryTimer.set(
-          registrationRetryThread.schedule(new Runnable {
-        override def run(): Unit = {
-          if (registered.get) {
-            registerMasterFutures.get.foreach(_.cancel(true))
-            registerMasterThreadPool.shutdownNow()
-          } else if (nthRetry >= REGISTRATION_RETRIES) {
-            markDead("All masters are unresponsive! Giving up.")
-          } else {
-            registerMasterFutures.get.foreach(_.cancel(true))
-            registerWithMaster(nthRetry + 1)
+        registrationRetryThread.schedule(new Runnable {
+          override def run(): Unit = {
+            if (registered.get) {
+              registerMasterFutures.get.foreach(_.cancel(true))
+              registerMasterThreadPool.shutdownNow()
+            } else if (nthRetry >= REGISTRATION_RETRIES) {
+              markDead("All masters are unresponsive! Giving up.")
+            } else {
+              registerMasterFutures.get.foreach(_.cancel(true))
+              registerWithMaster(nthRetry + 1)
+            }
           }
-        }
-      }, REGISTRATION_TIMEOUT_SECONDS, TimeUnit.SECONDS))
+        }, REGISTRATION_TIMEOUT_SECONDS, TimeUnit.SECONDS))
     }
 
     /**
@@ -185,23 +189,23 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
                          memory: Int) =>
         val fullId = appId + "/" + id
         logInfo(
-            "Executor added: %s on %s (%s) with %d cores".format(
-                fullId, workerId, hostPort, cores))
+          "Executor added: %s on %s (%s) with %d cores"
+            .format(fullId, workerId, hostPort, cores))
         listener.executorAdded(fullId, workerId, hostPort, cores, memory)
 
       case ExecutorUpdated(id, state, message, exitStatus) =>
         val fullId = appId + "/" + id
         val messageText = message.map(s => " (" + s + ")").getOrElse("")
         logInfo(
-            "Executor updated: %s is now %s%s".format(
-                fullId, state, messageText))
+          "Executor updated: %s is now %s%s"
+            .format(fullId, state, messageText))
         if (ExecutorState.isFinished(state)) {
           listener.executorRemoved(fullId, message.getOrElse(""), exitStatus)
         }
 
       case MasterChanged(masterRef, masterWebUiUrl) =>
         logInfo(
-            "Master has changed, new master is at " +
+          "Master has changed, new master is at " +
             masterRef.address.toSparkURL)
         master = Some(masterRef)
         alreadyDisconnected = false
@@ -221,7 +225,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
           case Some(m) => askAndReplyAsync(m, context, r)
           case None =>
             logWarning(
-                "Attempted to request executors before registering with Master.")
+              "Attempted to request executors before registering with Master.")
             context.reply(false)
         }
 
@@ -230,7 +234,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
           case Some(m) => askAndReplyAsync(m, context, k)
           case None =>
             logWarning(
-                "Attempted to kill executors before registering with Master.")
+              "Attempted to kill executors before registering with Master.")
             context.reply(false)
         }
     }
@@ -256,7 +260,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
     override def onDisconnected(address: RpcAddress): Unit = {
       if (master.exists(_.address == address)) {
         logWarning(
-            s"Connection to $address failed; waiting for master to reconnect...")
+          s"Connection to $address failed; waiting for master to reconnect...")
         markDisconnected()
       }
     }
@@ -308,7 +312,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
       } catch {
         case e: TimeoutException =>
           logInfo(
-              "Stop request to Master timed out; it may already be shut down.")
+            "Stop request to Master timed out; it may already be shut down.")
       }
       endpoint.set(null)
     }
@@ -326,7 +330,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
         .askWithRetry[Boolean](RequestExecutors(appId.get, requestedTotal))
     } else {
       logWarning(
-          "Attempted to request executors before driver fully initialized.")
+        "Attempted to request executors before driver fully initialized.")
       false
     }
   }
@@ -340,7 +344,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
       endpoint.get.askWithRetry[Boolean](KillExecutors(appId.get, executorIds))
     } else {
       logWarning(
-          "Attempted to kill executors before driver fully initialized.")
+        "Attempted to kill executors before driver fully initialized.")
       false
     }
   }

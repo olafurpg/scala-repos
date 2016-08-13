@@ -22,10 +22,10 @@ class TcpListenerSpec extends AkkaSpec("""
   "A TcpListener" must {
 
     "register its ServerSocketChannel with its selector" in new TestSetup(
-        pullMode = false)
+      pullMode = false)
 
     "let the Bind commander know when binding is completed" in new TestSetup(
-        pullMode = false) {
+      pullMode = false) {
       listener ! new ChannelRegistration {
         def disableInterest(op: Int) = ()
         def enableInterest(op: Int) = ()
@@ -34,7 +34,7 @@ class TcpListenerSpec extends AkkaSpec("""
     }
 
     "accept acceptable connections and register them with its parent" in new TestSetup(
-        pullMode = false) {
+      pullMode = false) {
       bindListener()
 
       attemptConnectionToEndpoint()
@@ -55,7 +55,7 @@ class TcpListenerSpec extends AkkaSpec("""
     }
 
     "continue to accept connections after a previous accept" in new TestSetup(
-        pullMode = false) {
+      pullMode = false) {
       bindListener()
 
       attemptConnectionToEndpoint()
@@ -72,7 +72,7 @@ class TcpListenerSpec extends AkkaSpec("""
     }
 
     "not accept connections after a previous accept until read is reenabled" in new TestSetup(
-        pullMode = true) {
+      pullMode = true) {
       bindListener()
 
       attemptConnectionToEndpoint()
@@ -107,7 +107,7 @@ class TcpListenerSpec extends AkkaSpec("""
     }
 
     "react to Unbind commands by replying with Unbound and stopping itself" in new TestSetup(
-        pullMode = false) {
+      pullMode = false) {
       bindListener()
 
       val unbindCommander = TestProbe()
@@ -118,7 +118,7 @@ class TcpListenerSpec extends AkkaSpec("""
     }
 
     "drop an incoming connection if it cannot be registered with a selector" in new TestSetup(
-        pullMode = false) {
+      pullMode = false) {
       bindListener()
 
       attemptConnectionToEndpoint()
@@ -126,7 +126,8 @@ class TcpListenerSpec extends AkkaSpec("""
       listener ! ChannelAcceptable
       val channel = expectWorkerForCommand
 
-      EventFilter.warning(pattern = "selector capacity limit", occurrences = 1) intercept {
+      EventFilter
+        .warning(pattern = "selector capacity limit", occurrences = 1) intercept {
         listener ! FailedRegisterIncoming(channel)
         awaitCond(!channel.isOpen)
       }
@@ -172,16 +173,17 @@ class TcpListenerSpec extends AkkaSpec("""
       }
 
     private class ListenerParent(pullMode: Boolean)
-        extends Actor with ChannelRegistry {
+        extends Actor
+        with ChannelRegistry {
       val listener = context.actorOf(
-          props = Props(classOf[TcpListener],
-                        selectorRouter.ref,
-                        Tcp(system),
-                        this,
-                        bindCommander.ref,
-                        Bind(handler.ref, endpoint, 100, Nil, pullMode))
-              .withDeploy(Deploy.local),
-          name = "test-listener-" + counter.next())
+        props = Props(classOf[TcpListener],
+                      selectorRouter.ref,
+                      Tcp(system),
+                      this,
+                      bindCommander.ref,
+                      Bind(handler.ref, endpoint, 100, Nil, pullMode))
+          .withDeploy(Deploy.local),
+        name = "test-listener-" + counter.next())
       parent.watch(listener)
       def receive: Receive = {
         case msg ⇒ parent.ref forward msg

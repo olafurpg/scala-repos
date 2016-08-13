@@ -12,7 +12,10 @@ import javax.inject.{Singleton, Inject, Provider}
 import org.asynchttpclient.netty.ssl.JsseSslEngineFactory
 import org.slf4j.LoggerFactory
 
-import org.asynchttpclient.{DefaultAsyncHttpClientConfig, AsyncHttpClientConfig}
+import org.asynchttpclient.{
+  DefaultAsyncHttpClientConfig,
+  AsyncHttpClientConfig
+}
 
 import javax.net.ssl._
 import play.api.{ConfigLoader, PlayConfig, Environment, Configuration}
@@ -68,7 +71,7 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
   def parse(): AhcWSClientConfig = {
 
     val playConfig = PlayConfig(configuration)
-    def get[A : ConfigLoader](name: String): A =
+    def get[A: ConfigLoader](name: String): A =
       playConfig.getDeprecated[A](s"play.ws.ahc.$name", s"play.ws.ning.$name")
 
     val maximumConnectionsPerHost = get[Int]("maxConnectionsPerHost")
@@ -95,15 +98,15 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
       }
     }
     AhcWSClientConfig(
-        wsClientConfig = wsClientConfig,
-        maxConnectionsPerHost = maximumConnectionsPerHost,
-        maxConnectionsTotal = maximumConnectionsTotal,
-        maxConnectionLifetime = maxConnectionLifetime,
-        idleConnectionInPoolTimeout = idleConnectionInPoolTimeout,
-        maxNumberOfRedirects = maximumNumberOfRedirects,
-        maxRequestRetry = maxRequestRetry,
-        disableUrlEncoding = disableUrlEncoding,
-        keepAlive = keepAlive
+      wsClientConfig = wsClientConfig,
+      maxConnectionsPerHost = maximumConnectionsPerHost,
+      maxConnectionsTotal = maximumConnectionsTotal,
+      maxConnectionLifetime = maxConnectionLifetime,
+      idleConnectionInPoolTimeout = idleConnectionInPoolTimeout,
+      maxNumberOfRedirects = maximumNumberOfRedirects,
+      maxRequestRetry = maxRequestRetry,
+      disableUrlEncoding = disableUrlEncoding,
+      keepAlive = keepAlive
     )
   }
 }
@@ -198,7 +201,7 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
     builder.setMaxConnections(ahcConfig.maxConnectionsTotal)
     builder.setConnectionTtl(toMillis(ahcConfig.maxConnectionLifetime))
     builder.setPooledConnectionIdleTimeout(
-        toMillis(ahcConfig.idleConnectionInPoolTimeout))
+      toMillis(ahcConfig.idleConnectionInPoolTimeout))
     builder.setMaxRedirects(ahcConfig.maxNumberOfRedirects)
     builder.setMaxRequestRetry(ahcConfig.maxRequestRetry)
     builder.setDisableUrlEncodingForBoundRequests(ahcConfig.disableUrlEncoding)
@@ -234,15 +237,15 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
       for (deprecatedProtocol <- deprecatedProtocols) {
         if (definedProtocols.contains(deprecatedProtocol)) {
           throw new IllegalStateException(
-              s"Weak protocol $deprecatedProtocol found in ws.ssl.protocols!")
+            s"Weak protocol $deprecatedProtocol found in ws.ssl.protocols!")
         }
       }
     }
     definedProtocols
   }
 
-  def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
+  def configureCipherSuites(existingCiphers: Array[String],
+                            sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
@@ -257,7 +260,7 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
       for (deprecatedCipher <- deprecatedCiphers) {
         if (definedCiphers.contains(deprecatedCipher)) {
           throw new IllegalStateException(
-              s"Weak cipher $deprecatedCipher found in ws.ssl.ciphers!")
+            s"Weak cipher $deprecatedCipher found in ws.ssl.ciphers!")
         }
       }
     }
@@ -273,15 +276,16 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
     val sslContext =
       if (sslConfig.default) {
         logger.info(
-            "buildSSLContext: ws.ssl.default is true, using default SSLContext")
+          "buildSSLContext: ws.ssl.default is true, using default SSLContext")
         validateDefaultTrustManager(sslConfig)
         SSLContext.getDefault
       } else {
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(
-            sslConfig, keyManagerFactory, trustManagerFactory).build()
+        new ConfigSSLContextBuilder(sslConfig,
+                                    keyManagerFactory,
+                                    trustManagerFactory).build()
       }
 
     // protocols!
@@ -330,21 +334,22 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
       tmf.getTrustManagers()(0).asInstanceOf[X509TrustManager]
 
     val constraints = sslConfig.disabledKeyAlgorithms
-      .map(a =>
-            AlgorithmConstraintsParser
-              .parseAll(AlgorithmConstraintsParser.expression, a)
-              .get)
+      .map(
+        a =>
+          AlgorithmConstraintsParser
+            .parseAll(AlgorithmConstraintsParser.expression, a)
+            .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(
-        keyConstraints = constraints, signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
+                                                signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)
       } catch {
         case e: CertPathValidatorException =>
           logger.warn(
-              "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
-              e)
+            "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
+            e)
       }
     }
   }

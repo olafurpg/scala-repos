@@ -29,22 +29,22 @@ object Test extends ScaladocModelTest {
     val fooPC = TEST._method("fooPC")
 
     val expected = List(
-        (fooCA, "Z", 1),
-        (fooCB, "B.Z", 1),
-        (fooCS, "pack2.Z.Z", 1),
-        (fooCL, "L.Z", 1),
-        (fooPA, "a.C", 1),
-        (fooPB, "b.C", 1),
-        (fooPC, "C", 1)
+      (fooCA, "Z", 1),
+      (fooCB, "B.Z", 1),
+      (fooCS, "pack2.Z.Z", 1),
+      (fooCL, "L.Z", 1),
+      (fooPA, "a.C", 1),
+      (fooPB, "b.C", 1),
+      (fooPC, "C", 1)
     )
 
     for ((method, name, refs) <- expected) {
       assert(method.valueParams(0)(0).resultType.name == name,
              method.valueParams(0)(0).resultType.name + " == " + name +
-             " (in " + method.qualifiedName + ")")
+               " (in " + method.qualifiedName + ")")
       assert(method.valueParams(0)(0).resultType.refEntity.size == refs,
              method.valueParams(0)(0).resultType.refEntity.size + " == " +
-             refs + " (in " + method.qualifiedName + ")")
+               refs + " (in " + method.qualifiedName + ")")
     }
 
     val A = base._package("pack1")._package("c")._class("A")

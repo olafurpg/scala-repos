@@ -39,16 +39,16 @@ trait PropertyComparator extends AbstractComparator {
 
   protected def isSpecialMethodName(name: String) =
     super.isImplementation(name) || (name == "applyTo") || (name == "create") ||
-    (name == "build") || name.endsWith("Property") || name.startsWith("get") ||
-    name.startsWith("set") || name.startsWith("is")
+      (name == "build") || name.endsWith("Property") || name.startsWith("get") ||
+      name.startsWith("set") || name.startsWith("is")
 
   private def assertProperties(javaFxProperties: Set[String],
                                scalaFxClass: Class[_],
                                complement: String) {
     val diff = javaFxProperties diff getScalaFXProperties(scalaFxClass)
     assert(
-        diff.isEmpty,
-        "Missing %s: ".format(complement) + diff.toList.sorted.mkString(", "))
+      diff.isEmpty,
+      "Missing %s: ".format(complement) + diff.toList.sorted.mkString(", "))
   }
 
   private def getProperties(javafxClass: Class[_]): Set[String] = {
@@ -67,8 +67,8 @@ trait PropertyComparator extends AbstractComparator {
     assertProperties(getProperties(javafxClass), scalafxClass, "Properties")
   }
 
-  def comparePropertiesInProxy(
-      javafxClass: Class[_], scalafxPropertyProxy: Class[_]) {
+  def comparePropertiesInProxy(javafxClass: Class[_],
+                               scalafxPropertyProxy: Class[_]) {
     assertProperties(getProperties(javafxClass),
                      scalafxPropertyProxy,
                      "Properties in Proxy")

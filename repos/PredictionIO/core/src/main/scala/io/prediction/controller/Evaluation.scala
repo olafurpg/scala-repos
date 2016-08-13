@@ -29,11 +29,18 @@ import scala.language.implicitConversions
   */
 trait Evaluation extends Deployment {
   protected[this] var _evaluatorSet: Boolean = false
-  protected[this] var _evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = _
+  protected[this] var _evaluator: BaseEvaluator[_,
+                                                _,
+                                                _,
+                                                _,
+                                                _ <: BaseEvaluatorResult] = _
 
   private[prediction] def evaluator: BaseEvaluator[
-      _, _, _, _, _ <: BaseEvaluatorResult] = {
+    _,
+    _,
+    _,
+    _,
+    _ <: BaseEvaluatorResult] = {
     assert(_evaluatorSet, "Evaluator not set")
     _evaluator
   }
@@ -41,8 +48,7 @@ trait Evaluation extends Deployment {
   /** Gets the tuple of the [[Engine]] and the implementation of
     * [[io.prediction.core.BaseEvaluator]]
     */
-  def engineEvaluator: (BaseEngine[_, _, _, _],
-  BaseEvaluator[_, _, _, _, _]) = {
+  def engineEvaluator: (BaseEngine[_, _, _, _], BaseEvaluator[_, _, _, _, _]) = {
     assert(_evaluatorSet, "Evaluator not set")
     (engine, _evaluator)
   }
@@ -59,8 +65,7 @@ trait Evaluation extends Deployment {
     * @tparam R Metric result class
     */
   def engineEvaluator_=[EI, Q, P, A, R <: BaseEvaluatorResult](
-      engineEvaluator: (BaseEngine[EI, Q, P, A],
-      BaseEvaluator[EI, Q, P, A, R])) {
+      engineEvaluator: (BaseEngine[EI, Q, P, A], BaseEvaluator[EI, Q, P, A, R])) {
     assert(!_evaluatorSet, "Evaluator can be set at most once")
     engine = engineEvaluator._1
     _evaluator = engineEvaluator._2
@@ -86,15 +91,15 @@ trait Evaluation extends Deployment {
     */
   def engineMetric_=[EI, Q, P, A](
       engineMetric: (BaseEngine[EI, Q, P, A], Metric[EI, Q, P, A, _])) {
-    engineEvaluator = (
-        engineMetric._1,
-        MetricEvaluator(metric = engineMetric._2,
-                        otherMetrics = Seq[Metric[EI, Q, P, A, _]](),
-                        outputPath = "best.json"))
+    engineEvaluator = (engineMetric._1,
+                       MetricEvaluator(metric = engineMetric._2,
+                                       otherMetrics =
+                                         Seq[Metric[EI, Q, P, A, _]](),
+                                       outputPath = "best.json"))
   }
 
   private[prediction] def engineMetrics: (BaseEngine[_, _, _, _],
-  Metric[_, _, _, _, _]) = {
+                                          Metric[_, _, _, _, _]) = {
     throw new NotImplementedError("This method is to keep the compiler happy")
   }
 
@@ -109,9 +114,10 @@ trait Evaluation extends Deployment {
     * @tparam A Actual result class
     */
   def engineMetrics_=[EI, Q, P, A](
-      engineMetrics: (BaseEngine[EI, Q, P, A], Metric[EI, Q, P, A, _],
-      Seq[Metric[EI, Q, P, A, _]])) {
-    engineEvaluator = (
-        engineMetrics._1, MetricEvaluator(engineMetrics._2, engineMetrics._3))
+      engineMetrics: (BaseEngine[EI, Q, P, A],
+                      Metric[EI, Q, P, A, _],
+                      Seq[Metric[EI, Q, P, A, _]])) {
+    engineEvaluator =
+      (engineMetrics._1, MetricEvaluator(engineMetrics._2, engineMetrics._3))
   }
 }

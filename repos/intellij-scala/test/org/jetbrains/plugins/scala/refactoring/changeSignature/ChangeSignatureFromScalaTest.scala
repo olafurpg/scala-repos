@@ -2,12 +2,18 @@ package org.jetbrains.plugins.scala
 package refactoring.changeSignature
 
 import com.intellij.psi.PsiMember
-import com.intellij.refactoring.changeSignature.{ChangeSignatureProcessorBase, ParameterInfo}
+import com.intellij.refactoring.changeSignature.{
+  ChangeSignatureProcessorBase,
+  ParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureHandler, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureHandler,
+  ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**
@@ -26,8 +32,8 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
   override def findTargetElement: PsiMember = {
     val element = new ScalaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
-    assertTrue(
-        "<caret> is not on method name", element.isInstanceOf[ScMethodLike])
+    assertTrue("<caret> is not on method name",
+               element.isInstanceOf[ScMethodLike])
     element.asInstanceOf[ScMethodLike]
   }
 
@@ -36,8 +42,11 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
       newName: String,
       newReturnType: String,
       newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
-    scalaProcessor(
-        newVisibility, newName, newReturnType, newParams, isAddDefaultValue)
+    scalaProcessor(newVisibility,
+                   newName,
+                   newReturnType,
+                   newParams,
+                   isAddDefaultValue)
   }
 
   private def parameterInfo(name: String,
@@ -46,8 +55,13 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
                             defVal: String = "",
                             isRep: Boolean = false,
                             isByName: Boolean = false) = {
-    new ScalaParameterInfo(
-        name, oldIdx, tpe, getProjectAdapter, isRep, isByName, defVal)
+    new ScalaParameterInfo(name,
+                           oldIdx,
+                           tpe,
+                           getProjectAdapter,
+                           isRep,
+                           isByName,
+                           defVal)
   }
 
   def testSimpleMethod() = {
@@ -92,8 +106,8 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
 
   def testGenerics() = {
     def tpe =
-      ScalaPsiElementFactory.createTypeFromText(
-          "T", targetMethod, targetMethod)
+      ScalaPsiElementFactory
+        .createTypeFromText("T", targetMethod, targetMethod)
     doTest(null, "foo", "T", Seq(Seq(parameterInfo("t", 0, tpe))))
   }
 
@@ -140,8 +154,8 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
   }
 
   def testRemoveClause() = {
-    val params = Seq(
-        parameterInfo("b", 1, types.Boolean), parameterInfo("i", 0, types.Int))
+    val params = Seq(parameterInfo("b", 1, types.Boolean),
+                     parameterInfo("i", 0, types.Int))
     doTest(null, "RemoveClauseConstructor", null, Seq(params))
   }
 

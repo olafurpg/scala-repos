@@ -72,8 +72,8 @@ object DevServerStart {
             System.out.println("\n---- Current ClassLoader ----\n")
             System.out.println(this.getClass.getClassLoader)
             System.out.println("\n---- The where is Scala? test ----\n")
-            System.out.println(this.getClass.getClassLoader
-                  .getResource("scala/Predef$.class"))
+            System.out.println(
+              this.getClass.getClassLoader.getResource("scala/Predef$.class"))
           }
         }
 
@@ -93,11 +93,12 @@ object DevServerStart {
             loggerConfigurator.init(path, Mode.Dev)
           case None =>
             System.out.println(
-                "No play.logger.configurator found: logging must be configured entirely by the application.")
+              "No play.logger.configurator found: logging must be configured entirely by the application.")
         }
 
-        println(play.utils.Colors.magenta(
-                "--- (Running the application, auto-reloading is enabled) ---"))
+        println(
+          play.utils.Colors.magenta(
+            "--- (Running the application, auto-reloading is enabled) ---"))
         println()
 
         // Create reloadable ApplicationProvider
@@ -136,8 +137,8 @@ object DevServerStart {
 
                             if (lastState.isSuccess) {
                               println()
-                              println(play.utils.Colors
-                                    .magenta("--- (RELOAD) ---"))
+                              println(
+                                play.utils.Colors.magenta("--- (RELOAD) ---"))
                               println()
                             }
 
@@ -152,12 +153,12 @@ object DevServerStart {
                             val sourceMapper = new SourceMapper {
                               def sourceOf(className: String,
                                            line: Option[Int]) = {
-                                Option(buildLink.findSource(
-                                        className,
-                                        line
-                                          .map(_.asInstanceOf[
-                                                  java.lang.Integer])
-                                          .orNull)).flatMap {
+                                Option(
+                                  buildLink.findSource(
+                                    className,
+                                    line
+                                      .map(_.asInstanceOf[java.lang.Integer])
+                                      .orNull)).flatMap {
                                   case Array(file: java.io.File, null) =>
                                     Some((file, None))
                                   case Array(file: java.io.File,
@@ -171,35 +172,36 @@ object DevServerStart {
                             val webCommands = new DefaultWebCommands
                             currentWebCommands = Some(webCommands)
 
-                            val newApplication = Threads
-                              .withContextClassLoader(projectClassloader) {
-                              val context = ApplicationLoader.createContext(
+                            val newApplication =
+                              Threads.withContextClassLoader(
+                                projectClassloader) {
+                                val context = ApplicationLoader.createContext(
                                   environment,
                                   dirAndDevSettings,
                                   Some(sourceMapper),
                                   webCommands)
-                              val loader = ApplicationLoader(context)
-                              loader.load(context)
-                            }
+                                val loader = ApplicationLoader(context)
+                                loader.load(context)
+                              }
 
                             Play.start(newApplication)
 
                             Success(newApplication)
                           } catch {
                             case e: PlayException => {
-                                lastState = Failure(e)
-                                lastState
-                              }
+                              lastState = Failure(e)
+                              lastState
+                            }
                             case NonFatal(e) => {
-                                lastState = Failure(
-                                    UnexpectedException(unexpected = Some(e)))
-                                lastState
-                              }
+                              lastState = Failure(
+                                UnexpectedException(unexpected = Some(e)))
+                              lastState
+                            }
                             case e: LinkageError => {
-                                lastState = Failure(
-                                    UnexpectedException(unexpected = Some(e)))
-                                lastState
-                              }
+                              lastState = Failure(
+                                UnexpectedException(unexpected = Some(e)))
+                              lastState
+                            }
                           }
                       }
 
@@ -219,25 +221,25 @@ object DevServerStart {
               .maybeHandleDocRequest(request)
               .asInstanceOf[Option[Result]]
               .orElse(
-                  currentWebCommands.flatMap(
-                      _.handleWebCommand(request, buildLink, path))
+                currentWebCommands.flatMap(
+                  _.handleWebCommand(request, buildLink, path))
               )
           }
         }
 
         // Start server with the application
         val serverConfig = ServerConfig(
-            rootDir = path,
-            port = httpPort,
-            sslPort = httpsPort,
-            address = httpAddress,
-            mode = Mode.Dev,
-            properties = process.properties,
-            configuration = Configuration.load(
-                  classLoader,
-                  System.getProperties,
-                  dirAndDevSettings,
-                  allowMissingApplicationConf = true)
+          rootDir = path,
+          port = httpPort,
+          sslPort = httpsPort,
+          address = httpAddress,
+          mode = Mode.Dev,
+          properties = process.properties,
+          configuration =
+            Configuration.load(classLoader,
+                               System.getProperties,
+                               dirAndDevSettings,
+                               allowMissingApplicationConf = true)
         )
 
         // We *must* use a different Akka configuration in dev mode, since loading two actor systems from the same
@@ -249,18 +251,17 @@ object DevServerStart {
         val actorSystem = ActorSystem("play-dev-mode", devModeAkkaConfig)
 
         val serverContext = ServerProvider.Context(
-            serverConfig,
-            appProvider,
-            actorSystem,
-            ActorMaterializer()(actorSystem),
-            () =>
-              {
-                actorSystem.terminate()
-                Await.result(actorSystem.whenTerminated, Duration.Inf)
-                Future.successful(())
-            })
-        val serverProvider = ServerProvider.fromConfiguration(
-            classLoader, serverConfig.configuration)
+          serverConfig,
+          appProvider,
+          actorSystem,
+          ActorMaterializer()(actorSystem),
+          () => {
+            actorSystem.terminate()
+            Await.result(actorSystem.whenTerminated, Duration.Inf)
+            Future.successful(())
+          })
+        val serverProvider = ServerProvider
+          .fromConfiguration(classLoader, serverConfig.configuration)
         serverProvider.createServer(serverContext)
       } catch {
         case e: ExceptionInInitializerError => throw e.getCause

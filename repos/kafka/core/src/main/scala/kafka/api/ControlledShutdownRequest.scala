@@ -46,7 +46,7 @@ case class ControlledShutdownRequest(versionId: Short,
 
   if (versionId > 0 && clientId.isEmpty)
     throw new IllegalArgumentException(
-        "`clientId` must be defined if `versionId` > 0")
+      "`clientId` must be defined if `versionId` > 0")
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putShort(versionId)
@@ -69,13 +69,13 @@ case class ControlledShutdownRequest(versionId: Short,
                            requestChannel: RequestChannel,
                            request: RequestChannel.Request): Unit = {
     val errorResponse = ControlledShutdownResponse(
-        correlationId,
-        Errors.forException(e).code,
-        Set.empty[TopicAndPartition])
+      correlationId,
+      Errors.forException(e).code,
+      Set.empty[TopicAndPartition])
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   override def describe(details: Boolean = false): String = {

@@ -24,15 +24,15 @@ final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean)
   val fifth = role("fifth")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(
+        ConfigFactory.parseString("""
         akka.remote.retry-gate-closed-for = 3 s
         akka.cluster {
           auto-down-unreachable-after = 1s
           failure-detector.threshold = 4
         }"""))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+      .withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 
   testTransport(on = true)
 }
@@ -60,7 +60,8 @@ class SplitBrainWithAccrualFailureDetectorMultiJvmNode5
     extends SplitBrainSpec(failureDetectorPuppet = false)
 
 abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(SplitBrainMultiNodeConfig(failureDetectorPuppet))
@@ -81,7 +82,7 @@ abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
     }
 
     "detect network partition and mark nodes on other side as unreachable and form new cluster" taggedAs LongRunningTest in within(
-        30 seconds) {
+      30 seconds) {
       enterBarrier("before-split")
 
       runOn(first) {

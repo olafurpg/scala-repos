@@ -20,7 +20,11 @@ package org.apache.spark.examples.streaming
 
 import java.util.HashMap
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{
+  KafkaProducer,
+  ProducerConfig,
+  ProducerRecord
+}
 
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
@@ -43,7 +47,7 @@ object KafkaWordCount {
   def main(args: Array[String]) {
     if (args.length < 4) {
       System.err.println(
-          "Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads>")
+        "Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads>")
       System.exit(1)
     }
 
@@ -74,7 +78,7 @@ object KafkaWordCountProducer {
   def main(args: Array[String]) {
     if (args.length < 4) {
       System.err.println(
-          "Usage: KafkaWordCountProducer <metadataBrokerList> <topic> " +
+        "Usage: KafkaWordCountProducer <metadataBrokerList> <topic> " +
           "<messagesPerSec> <wordsPerMessage>")
       System.exit(1)
     }

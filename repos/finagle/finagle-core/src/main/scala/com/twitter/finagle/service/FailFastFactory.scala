@@ -6,7 +6,15 @@ import com.twitter.finagle.client.Transporter
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.{DefaultLogger, Updater}
 import com.twitter.logging.Level
-import com.twitter.util.{Future, Duration, Time, Throw, Return, Timer, TimerTask}
+import com.twitter.util.{
+  Future,
+  Duration,
+  Time,
+  Throw,
+  Return,
+  Timer,
+  TimerTask
+}
 import java.net.SocketAddress
 import java.util.logging.Logger
 import scala.util.Random
@@ -121,7 +129,7 @@ private[finagle] class FailFastFactory[Req, Rep](
   import FailFastFactory._
 
   private[this] val exc = new FailedFastException(
-      s"Endpoint $label is marked down. For more details see: $url")
+    s"Endpoint $label is marked down. For more details see: $url")
 
   private[this] val futureExc = Future.exception(exc)
 
@@ -177,8 +185,8 @@ private[finagle] class FailFastFactory[Req, Rep](
 
         if (logger.isLoggable(Level.DEBUG))
           logger.log(
-              Level.DEBUG,
-              s"""FailFastFactory marking connection to "$label" as dead. Remote Address: ${endpoint.toString}""")
+            Level.DEBUG,
+            s"""FailFastFactory marking connection to "$label" as dead. Remote Address: ${endpoint.toString}""")
 
         state = Retrying(now, task, 0, rest)
 

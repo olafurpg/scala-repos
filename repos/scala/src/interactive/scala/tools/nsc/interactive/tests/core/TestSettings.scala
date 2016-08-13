@@ -8,7 +8,7 @@ private[tests] trait TestSettings {
 
   /** The root directory for this test suite, usually the test kind ("test/files/presentation"). */
   protected val outDir = Path(
-      Option(System.getProperty("partest.cwd")).getOrElse("."))
+    Option(System.getProperty("partest.cwd")).getOrElse("."))
 
   /** The base directory for this test, usually a subdirectory of "test/files/presentation/" */
   protected val baseDir = Option(System.getProperty("partest.testname"))

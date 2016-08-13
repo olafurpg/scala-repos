@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,7 +46,11 @@ import com.precog.util.FilesystemFileOps
 import com.precog.util.PrecogUnit
 
 import blueeyes.bkka._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeExtractor => _,
+  DateTimeDecomposer => _,
+  _
+}
 
 import akka.actor.{ActorSystem, Props}
 import akka.dispatch._
@@ -79,8 +83,11 @@ import org.streum.configrity.Configuration
 // type NIHDBQueryExecutor
 
 trait NIHDBQueryExecutorConfig
-    extends ShardQueryExecutorConfig with BlockStoreColumnarTableModuleConfig
-    with ManagedQueryModuleConfig with IdSourceConfig with EvaluatorConfig
+    extends ShardQueryExecutorConfig
+    with BlockStoreColumnarTableModuleConfig
+    with ManagedQueryModuleConfig
+    with IdSourceConfig
+    with EvaluatorConfig
     with KafkaIngestActorProjectionSystemConfig {
 
   lazy val flatMapTimeout: Duration =
@@ -96,7 +103,7 @@ trait NIHDBQueryExecutorConfig
     config[Int]("precog.storage.cook_threshold", 20000)
   def maxSliceSize = cookThreshold
   lazy val storageTimeout: Timeout = Timeout(
-      config[Int]("precog.storage.timeout", 300) seconds)
+    config[Int]("precog.storage.timeout", 300) seconds)
   lazy val quiescenceTimeout: Duration =
     config[Int]("precog.storage.quiescence_timeout", 300) seconds
   lazy val maxOpenPaths: Int =
@@ -113,8 +120,7 @@ trait NIHDBQueryExecutorComponent {
     new ManagedPlatform with SecureVFSModule[Future, Slice] with ActorVFSModule
     with SchedulingActorModule with ShardQueryExecutorPlatform[Future]
     with VFSColumnarTableModule with KafkaIngestActorProjectionSystem
-    with GracefulStopSupport {
-      platform =>
+    with GracefulStopSupport { platform =>
 
       type YggConfig = NIHDBQueryExecutorConfig
       val yggConfig = new NIHDBQueryExecutorConfig {
@@ -126,9 +132,9 @@ trait NIHDBQueryExecutorComponent {
         val clock = blueeyes.util.Clock.System
         val smallSliceSize = config[Int]("jdbm.small_slice_size", 8)
         val timestampRequiredAfter = new Instant(
-            config[Long]("ingest.timestamp_required_after", 1363327426906L))
+          config[Long]("ingest.timestamp_required_after", 1363327426906L))
         val schedulingTimeout = new Timeout(
-            config[Int]("scheduling.timeout_ms", 10000))
+          config[Int]("scheduling.timeout_ms", 10000))
 
         //TODO: Get a producer ID
         val idSource = new FreshAtomicIdSource
@@ -151,8 +157,8 @@ trait NIHDBQueryExecutorComponent {
       val jobActorSystem = ActorSystem("jobPollingActorSystem")
 
       val chefs = (1 to yggConfig.howManyChefsInTheKitchen).map { _ =>
-        actorSystem.actorOf(Props(
-                Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+        actorSystem.actorOf(
+          Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
                      VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
       }
       val masterChef =
@@ -163,7 +169,9 @@ trait NIHDBQueryExecutorComponent {
 
       val jobManager = extJobManager
       val permissionsFinder = new PermissionsFinder(
-          extApiKeyFinder, extAccountFinder, yggConfig.timestampRequiredAfter)
+        extApiKeyFinder,
+        extAccountFinder,
+        yggConfig.timestampRequiredAfter)
       val resourceBuilder = new ResourceBuilder(actorSystem,
                                                 clock,
                                                 masterChef,
@@ -171,35 +179,38 @@ trait NIHDBQueryExecutorComponent {
                                                 storageTimeout)
 
       private val projectionsActor = actorSystem.actorOf(
-          Props(new PathRoutingActor(yggConfig.dataDir,
-                                     storageTimeout.duration,
-                                     yggConfig.quiescenceTimeout,
-                                     yggConfig.maxOpenPaths,
-                                     clock)))
+        Props(
+          new PathRoutingActor(yggConfig.dataDir,
+                               storageTimeout.duration,
+                               yggConfig.quiescenceTimeout,
+                               yggConfig.maxOpenPaths,
+                               clock)))
       val ingestSystem = initShardActors(permissionsFinder, projectionsActor)
 
-      private val actorVFS = new ActorVFS(
-          projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
+      private val actorVFS = new ActorVFS(projectionsActor,
+                                          yggConfig.storageTimeout,
+                                          yggConfig.storageTimeout)
       val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, clock)
 
       private val (scheduleStorage, scheduleStorageStoppable) =
         MongoScheduleStorage(config0.detach("scheduling"))
 
       private val scheduleActor = actorSystem.actorOf(
-          Props(new SchedulingActor(jobManager,
-                                    permissionsFinder,
-                                    scheduleStorage,
-                                    platform,
-                                    clock)))
+        Props(
+          new SchedulingActor(jobManager,
+                              permissionsFinder,
+                              scheduleStorage,
+                              platform,
+                              clock)))
 
-      val scheduler = new ActorScheduler(
-          scheduleActor, yggConfig.schedulingTimeout)
+      val scheduler =
+        new ActorScheduler(scheduleActor, yggConfig.schedulingTimeout)
 
       trait TableCompanion extends VFSColumnarTableCompanion
       object Table extends TableCompanion
 
-      def ingestFailureLog(
-          checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog =
+      def ingestFailureLog(checkpoint: YggCheckpoint,
+                           logRoot: File): IngestFailureLog =
         FilesystemIngestFailureLog(logRoot, checkpoint)
 
       def asyncExecutorFor(apiKey: APIKey) = {
@@ -244,19 +255,22 @@ trait NIHDBQueryExecutorComponent {
 
       def shutdown() =
         for {
-          _ <- Stoppable.stop(Stoppable.fromFuture(gracefulStop(
-                      scheduleActor,
-                      yggConfig.schedulingTimeout.duration)(actorSystem)))
-          _ <- Stoppable.stop(ingestSystem
-                .map(_.stoppable)
-                .getOrElse(Stoppable.fromFuture(Future(()))))
-          _ <- IngestSystem.actorStop(
-              yggConfig, projectionsActor, "projections")
+          _ <- Stoppable.stop(
+                Stoppable.fromFuture(
+                  gracefulStop(
+                    scheduleActor,
+                    yggConfig.schedulingTimeout.duration)(actorSystem)))
+          _ <- Stoppable.stop(
+                ingestSystem
+                  .map(_.stoppable)
+                  .getOrElse(Stoppable.fromFuture(Future(()))))
+          _ <- IngestSystem
+                .actorStop(yggConfig, projectionsActor, "projections")
           _ <- IngestSystem.actorStop(yggConfig, masterChef, "masterChef")
           _ <- Stoppable.stop(scheduleStorageStoppable)
           _ <- chefs
-            .map(IngestSystem.actorStop(yggConfig, _, "masterChef"))
-            .sequence
+                .map(IngestSystem.actorStop(yggConfig, _, "masterChef"))
+                .sequence
         } yield {
           queryLogger.info("Actor ecossytem shutdown complete.")
           jobActorSystem.shutdown()

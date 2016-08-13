@@ -10,8 +10,8 @@ trait TypedStatementAnnotator {
                              holder: AnnotationHolder,
                              highlightErrors: Boolean) {
     if (highlightErrors) {
-      for (element <- typedStatement.typeElement) checkConformance(
-          typedStatement.expr, element, holder)
+      for (element <- typedStatement.typeElement)
+        checkConformance(typedStatement.expr, element, holder)
     }
   }
 }

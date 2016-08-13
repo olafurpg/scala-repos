@@ -81,7 +81,7 @@ object RRunner {
       // Launch R
       val returnCode = try {
         val builder = new ProcessBuilder(
-            (Seq(rCommand, rFileNormalized) ++ otherArgs).asJava)
+          (Seq(rCommand, rFileNormalized) ++ otherArgs).asJava)
         val env = builder.environment()
         env.put("EXISTING_SPARKR_BACKEND_PORT", sparkRBackendPort.toString)
         val rPackageDir = RUtils.sparkRPackagePath(isDriver = true)
@@ -93,8 +93,9 @@ object RRunner {
         builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
         val process = builder.start()
 
-        new RedirectThread(
-            process.getInputStream, System.out, "redirect R output").start()
+        new RedirectThread(process.getInputStream,
+                           System.out,
+                           "redirect R output").start()
 
         process.waitFor()
       } finally {

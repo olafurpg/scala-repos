@@ -9,8 +9,7 @@ import scala.annotation.tailrec
 /**
   * The aggregator is to be mixed into an actor for the aggregator behavior.
   */
-trait Aggregator {
-  this: Actor ⇒
+trait Aggregator { this: Actor ⇒
 
   private var processing = false
   private val expectList = WorkList.empty[Actor.Receive]

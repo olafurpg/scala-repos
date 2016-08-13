@@ -387,10 +387,13 @@ class SybClassTests {
 
   @Test
   def testGeneric6 {
-    val input = Person(
-        "Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
+    val input = Person("Joe Grey",
+                       37,
+                       Address("Southover Street", "Brighton", "BN2 9UA"))
     val expected = Person(
-        "Joe Grey*", 38, Address("Southover Street*", "Brighton*", "BN2 9UA*"))
+      "Joe Grey*",
+      38,
+      Address("Southover Street*", "Brighton*", "BN2 9UA*"))
 
     val result = everywhere(inc)(input)
     assertEquals(expected, result)
@@ -470,11 +473,11 @@ class SybClassTests {
     assertEquals(expected2, result2)
 
     val tree3: Tree[Int] = Node(
-        Node(Node(Leaf(1), Node(Leaf(2), Leaf(3))), Leaf(4)),
-        Node(Leaf(5), Leaf(6)))
+      Node(Node(Leaf(1), Node(Leaf(2), Leaf(3))), Leaf(4)),
+      Node(Leaf(5), Leaf(6)))
     val expected3: Tree[Int] = Node(
-        Node(Node(Leaf(2), Node(Leaf(3), Leaf(4))), Leaf(5)),
-        Node(Leaf(6), Leaf(7)))
+      Node(Node(Leaf(2), Node(Leaf(3), Leaf(4))), Leaf(5)),
+      Node(Leaf(6), Leaf(7)))
 
     val result3 = everywhere(inc)(tree3)
     typed[Tree[Int]](result3)

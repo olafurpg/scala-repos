@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -81,8 +81,9 @@ case class PastClock(duration: org.joda.time.Duration) extends Clock {
 }
 
 trait TestShardService
-    extends BlueEyesServiceSpecification with ShardService with AkkaDefaults {
-  self =>
+    extends BlueEyesServiceSpecification
+    with ShardService
+    with AkkaDefaults { self =>
 
   val config = """
     security {
@@ -100,8 +101,8 @@ trait TestShardService
   val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        executionContext, Duration(5, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
+                                          Duration(5, "seconds"))
 
   private val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
@@ -120,9 +121,9 @@ trait TestShardService
 
   import Permission._
   val testPermissions = Set[Permission](
-      ReadPermission(Path.Root, WrittenByAccount("test")),
-      WritePermission(testPath, WriteAsAny),
-      DeletePermission(testPath, WrittenByAny)
+    ReadPermission(Path.Root, WrittenByAccount("test")),
+    WritePermission(testPath, WriteAsAny),
+    DeletePermission(testPath, WrittenByAny)
   )
 
   val expiredPath = Path("expired")
@@ -144,8 +145,8 @@ trait TestShardService
   def configureShardState(config: Configuration) = Future {
     val accountFinder = new StaticAccountFinder[Future]("test", testAPIKey)
     val scheduler = NoopScheduler[Future]
-    val platform = new TestPlatform
-    with SecureVFSModule[Future, Slice] with InMemoryVFSModule[Future] {
+    val platform = new TestPlatform with SecureVFSModule[Future, Slice]
+    with InMemoryVFSModule[Future] {
       override val jobActorSystem = self.actorSystem
       override val actorSystem = self.actorSystem
       override val executionContext = self.executionContext
@@ -161,18 +162,19 @@ trait TestShardService
       override val jobManager = self.jobManager
 
       val ownerMap = Map(
-          Path("/") -> Set("root"),
-          Path("/test") -> Set("test"),
-          Path("/test/foo") -> Set("test"),
-          Path("/expired") -> Set("expired"),
-          Path("/inaccessible") -> Set("other"),
-          Path("/inaccessible/foo") -> Set("other")
+        Path("/") -> Set("root"),
+        Path("/test") -> Set("test"),
+        Path("/test/foo") -> Set("test"),
+        Path("/expired") -> Set("expired"),
+        Path("/inaccessible") -> Set("other"),
+        Path("/inaccessible/foo") -> Set("other")
       )
 
       def stubValue(authorities: Authorities)
         : ((Array[Byte], MimeType) \/ Vector[JValue], Authorities) =
-        (\/.right(Vector(JObject("foo" -> JString("foov"), "bar" -> JNum(1)),
-                         JObject("foo" -> JString("foov2")))),
+        (\/.right(
+           Vector(JObject("foo" -> JString("foov"), "bar" -> JNum(1)),
+                  JObject("foo" -> JString("foov2")))),
          authorities)
 
       val stubData =
@@ -181,8 +183,9 @@ trait TestShardService
         }
 
       val rawVFS = new InMemoryVFS(stubData, clock)
-      val permissionsFinder = new PermissionsFinder(
-          self.apiKeyFinder, accountFinder, clock.instant())
+      val permissionsFinder = new PermissionsFinder(self.apiKeyFinder,
+                                                    accountFinder,
+                                                    clock.instant())
       val vfs = new SecureVFS(rawVFS, permissionsFinder, jobManager, clock)
     }
 
@@ -222,35 +225,37 @@ trait TestShardService
             case OK | Accepted => //assume application/json
               response map {
                 case Left(bytes) =>
-                  Left(JParser
-                        .parseFromByteBuffer(ByteBuffer.wrap(bytes))
-                        .valueOr(throw _))
+                  Left(
+                    JParser
+                      .parseFromByteBuffer(ByteBuffer.wrap(bytes))
+                      .valueOr(throw _))
                 case Right(stream) =>
                   Right(
-                      stream.map(bytes => utf8.decode(ByteBuffer.wrap(bytes))))
+                    stream.map(bytes => utf8.decode(ByteBuffer.wrap(bytes))))
               }
 
             case error =>
               if (contentType.exists(_ == MimeTypes.application / json)) {
                 response map {
                   case Left(bytes) =>
-                    Left(JParser
-                          .parseFromByteBuffer(ByteBuffer.wrap(bytes))
-                          .valueOr(throw _))
+                    Left(
+                      JParser
+                        .parseFromByteBuffer(ByteBuffer.wrap(bytes))
+                        .valueOr(throw _))
                   case Right(stream) =>
-                    Right(stream.map(
-                            bytes => utf8.decode(ByteBuffer.wrap(bytes))))
+                    Right(
+                      stream.map(bytes => utf8.decode(ByteBuffer.wrap(bytes))))
                 }
               } else {
                 response map {
                   case Left(bb) => Left(JString(new String(bb.array, "UTF-8")))
                   case chunk =>
                     Right(
-                        StreamT.wrapEffect(chunkToFutureString
-                              .apply(chunk)
-                              .map(s =>
-                                    CharBuffer.wrap(JString(s).renderCompact) :: StreamT
-                                      .empty[Future, CharBuffer])))
+                      StreamT.wrapEffect(chunkToFutureString
+                        .apply(chunk)
+                        .map(s =>
+                          CharBuffer.wrap(JString(s).renderCompact) :: StreamT
+                            .empty[Future, CharBuffer])))
                 }
               }
           }
@@ -273,8 +278,8 @@ trait TestShardService
     .contentType[QueryResult](application / (MimeTypes.json))
     .path("/analytics/v2/analytics/queries")
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
-      1, Duration(3, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts =
+    FutureTimeouts(1, Duration(3, "second"))
   val shortFutureTimeouts = FutureTimeouts(1, Duration(50, "millis"))
 }
 
@@ -305,8 +310,8 @@ class ShardServiceSpec extends TestShardService {
       }
   }
 
-  def asyncQueryResults(
-      jobId: JobId, apiKey: Option[String] = Some(testAPIKey))
+  def asyncQueryResults(jobId: JobId,
+                        apiKey: Option[String] = Some(testAPIKey))
     : Future[HttpResponse[QueryResult]] = {
     apiKey.map { asyncService.query("apiKey", _) }
       .getOrElse(asyncService)
@@ -329,8 +334,8 @@ class ShardServiceSpec extends TestShardService {
     }
   }
 
-  def waitForJobCompletion(jobId: JobId): Future[Either[
-          String, (Option[MimeType], StreamT[Future, Array[Byte]])]] = {
+  def waitForJobCompletion(jobId: JobId): Future[
+    Either[String, (Option[MimeType], StreamT[Future, Array[Byte]])]] = {
     import JobState._
 
     jobManager.findJob(jobId) flatMap {
@@ -353,7 +358,7 @@ class ShardServiceSpec extends TestShardService {
     "create a job when an async query is posted" in {
       val res = for {
         HttpResponse(HttpStatus(Accepted, _), _, Some(Left(res)), _) <- asyncQuery(
-            simpleQuery)
+                                                                         simpleQuery)
         jobId = extractJobId(res)
         job <- jobManager.findJob(jobId)
       } yield job
@@ -365,17 +370,17 @@ class ShardServiceSpec extends TestShardService {
     "results of an async job must eventually be made available" in {
       val res = for {
         HttpResponse(HttpStatus(Accepted, _), _, Some(Left(res)), _) <- asyncQuery(
-            simpleQuery)
+                                                                         simpleQuery)
         jobId = extractJobId(res)
         _ <- waitForJobCompletion(jobId)
         HttpResponse(HttpStatus(OK, _), _, Some(Right(data)), _) <- asyncQueryResults(
-            jobId)
+                                                                     jobId)
         result <- extractResult(data)
       } yield result
 
       val expected = JObject(JField("warnings", JArray(Nil)) :: JField(
-              "errors",
-              JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
+        "errors",
+        JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
 
       res.copoint must_== expected
     }
@@ -399,14 +404,14 @@ class ShardServiceSpec extends TestShardService {
     "reject query when API key not found" in {
       query(simpleQuery, Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
-          content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+          content must_== Left(
+            JString("The specified API key does not exist: not-gonna-find-it"))
       }
     }
     "return 400 and errors if format is 'simple'" in {
       val result = for {
         HttpResponse(HttpStatus(BadRequest, _), _, Some(Left(result)), _) <- query(
-            "bad query")
+                                                                              "bad query")
       } yield result
 
       result.copoint must beLike {
@@ -416,23 +421,29 @@ class ShardServiceSpec extends TestShardService {
     "return warnings/errors if format is 'detailed'" in {
       val result = for {
         HttpResponse(HttpStatus(OK, _), _, Some(Right(data)), _) <- query(
-            simpleQuery, format = Some("detailed"))
+                                                                     simpleQuery,
+                                                                     format =
+                                                                       Some(
+                                                                         "detailed"))
         result <- extractResult(data)
       } yield result
 
       val expected = JObject(
-          JField("serverErrors", JArray(Nil)) :: JField(
-              "serverWarnings",
-              JArray(Nil)) :: JField("warnings", JArray(Nil)) :: JField(
-              "errors",
-              JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
+        JField("serverErrors", JArray(Nil)) :: JField(
+          "serverWarnings",
+          JArray(Nil)) :: JField("warnings", JArray(Nil)) :: JField(
+          "errors",
+          JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
 
       result.copoint must_== expected
     }
     "return just the results if format is 'simple'" in {
       val result = for {
         HttpResponse(HttpStatus(OK, _), _, Some(Right(data)), _) <- query(
-            simpleQuery, format = Some("simple"))
+                                                                     simpleQuery,
+                                                                     format =
+                                                                       Some(
+                                                                         "simple"))
         result <- extractResult(data)
       } yield result
 
@@ -495,8 +506,8 @@ class ShardServiceSpec extends TestShardService {
     "reject browse when API key not found" in {
       browse(Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
-          content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+          content must_== Left(
+            JString("The specified API key does not exist: not-gonna-find-it"))
       }
     }
     /* Per John, this is not the desired behavior
@@ -542,8 +553,8 @@ class ShardServiceSpec extends TestShardService {
     "reject metadata when API key not found" in {
       meta(Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
-          content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+          content must_== Left(
+            JString("The specified API key does not exist: not-gonna-find-it"))
       }
     }
     "return empty response on metadata failure" in {
@@ -580,18 +591,16 @@ trait TestPlatform extends ManagedPlatform { self =>
 
   def asyncExecutorFor(apiKey: APIKey)
     : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
-    EitherT.right(
-        Future(new AsyncQueryExecutor {
+    EitherT.right(Future(new AsyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
 
   def syncExecutorFor(apiKey: APIKey): EitherT[
-      Future,
-      String,
-      QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
-    EitherT.right(
-        Future(new SyncQueryExecutor {
+    Future,
+    String,
+    QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
+    EitherT.right(Future(new SyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
@@ -603,22 +612,23 @@ trait TestPlatform extends ManagedPlatform { self =>
         if (query == "bad query") {
           val mu =
             shardQueryMonad.jobId traverse { jobId =>
-              jobManager.addMessage(
-                  jobId, JobManager.channels.Error, JString("ERROR!"))
+              jobManager.addMessage(jobId,
+                                    JobManager.channels.Error,
+                                    JString("ERROR!"))
             }
 
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
             shardQueryMonad
               .liftM[Future, EvaluationError \/ StreamT[JobQueryTF, Slice]] {
-              mu map { _ =>
-                \/.right(toSlice(JObject("value" -> JNum(2))))
+                mu map { _ =>
+                  \/.right(toSlice(JObject("value" -> JNum(2))))
+                }
               }
-            }
           }
         } else {
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
             shardQueryMonad.point(
-                \/.right(toSlice(JObject("value" -> JNum(2)))))
+              \/.right(toSlice(JObject("value" -> JNum(2)))))
           }
         }
       }

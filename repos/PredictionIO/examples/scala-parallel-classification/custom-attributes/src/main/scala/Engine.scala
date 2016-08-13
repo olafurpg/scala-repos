@@ -7,13 +7,11 @@ class Query(
     val gender: String,
     val age: Int,
     val education: String
-)
-    extends Serializable
+) extends Serializable
 
 class PredictedResult(
     val label: Double
-)
-    extends Serializable
+) extends Serializable
 
 object ClassificationEngine extends IEngineFactory {
   def apply() = {

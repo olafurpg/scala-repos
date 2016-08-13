@@ -49,7 +49,7 @@ abstract class UnPickler {
         /*if (settings.debug.value)*/
         ex.printStackTrace()
         throw new RuntimeException(
-            "error reading Scala signature of " + filename + ": " +
+          "error reading Scala signature of " + filename + ": " +
             ex.getMessage())
     }
   }
@@ -87,7 +87,8 @@ abstract class UnPickler {
     @inline private def runAtIndex[T](i: Int)(body: => T): T = {
       val saved = readIndex
       readIndex = index(i)
-      try body finally readIndex = saved
+      try body
+      finally readIndex = saved
     }
 
     // Laboriously unrolled for performance.
@@ -116,7 +117,7 @@ abstract class UnPickler {
       val minor = readNat()
       if (major != MajorVersion || minor > MinorVersion)
         throw new IOException(
-            "Scala signature " + classRoot.decodedName +
+          "Scala signature " + classRoot.decodedName +
             " has wrong version\n expected: " + MajorVersion + "." +
             MinorVersion + "\n found: " + major + "." + minor + " in " +
             filename)
@@ -130,7 +131,7 @@ abstract class UnPickler {
     protected def isSymbolEntry(i: Int): Boolean = {
       val tag = bytes(index(i)).toInt
       (firstSymTag <= tag && tag <= lastSymTag &&
-          (tag != CLASSsym || !isRefinementSymbolEntry(i)))
+      (tag != CLASSsym || !isRefinementSymbolEntry(i)))
     }
 
     /** Does entry represent an (internal or external) symbol */
@@ -255,10 +256,10 @@ abstract class UnPickler {
             else None
 
           (module map {
-                case (group, art) =>
-                  s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
+            case (group, art) =>
+              s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
                |       See http://docs.scala-lang.org/overviews/ for more information.)""".stripMargin
-              } getOrElse "")
+          } getOrElse "")
         }
 
         def localDummy = {
@@ -336,12 +337,12 @@ abstract class UnPickler {
         markFlagsCompleted(sym)(mask = AllFlags)
         sym.privateWithin = privateWithin
         sym.info = (if (atEnd) {
-                      assert(!sym.isSuperAccessor, sym)
-                      newLazyTypeRef(inforef)
-                    } else {
-                      assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
-                      newLazyTypeRefAndAlias(inforef, readNat())
-                    })
+          assert(!sym.isSuperAccessor, sym)
+          newLazyTypeRef(inforef)
+        } else {
+          assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
+          newLazyTypeRefAndAlias(inforef, readNat())
+        })
         if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
 
         sym
@@ -353,9 +354,9 @@ abstract class UnPickler {
         case CLASSsym =>
           val sym =
             (if (isClassRoot) {
-               if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
-               else classRoot setFlag pflags
-             } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
+              if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
+              else classRoot setFlag pflags
+            } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
           if (!atEnd) sym.typeOfThis = newLazyTypeRef(readNat())
 
           sym
@@ -388,7 +389,7 @@ abstract class UnPickler {
       // alternative after parsing the arguments.
       def MethodTypeRef(restpe: Type, params: List[Symbol]): Type =
         (if (restpe == NoType || (params contains NoSymbol)) NoType
-         else MethodType(params, restpe))
+        else MethodType(params, restpe))
       def PolyOrNullaryType(restpe: Type, tparams: List[Symbol]): Type =
         tparams match {
           case Nil => NullaryMethodType(restpe)
@@ -403,8 +404,9 @@ abstract class UnPickler {
         val sym = readSymbolRef() match {
           case stub: StubSymbol if !stub.isClass =>
             // SI-8502 This allows us to create a stub for a unpickled reference to `missingPackage.Foo`.
-            stub.owner.newStubSymbol(
-                stub.name.toTypeName, stub.missingMessage, isPackage = true)
+            stub.owner.newStubSymbol(stub.name.toTypeName,
+                                     stub.missingMessage,
+                                     isPackage = true)
           case sym => sym
         }
         ThisType(sym)
@@ -428,8 +430,8 @@ abstract class UnPickler {
         case METHODtpe => MethodTypeRef(readTypeRef(), readSymbols())
         case POLYtpe => PolyOrNullaryType(readTypeRef(), readSymbols())
         case EXISTENTIALtpe =>
-          ExistentialType(
-              underlying = readTypeRef(), quantified = readSymbols())
+          ExistentialType(underlying = readTypeRef(),
+                          quantified = readSymbols())
         case ANNOTATEDtpe =>
           AnnotatedType(underlying = readTypeRef(), annotations = readAnnots())
       }
@@ -724,7 +726,7 @@ abstract class UnPickler {
 
     protected def errorBadSignature(msg: String) =
       throw new RuntimeException(
-          "malformed Scala signature of " + classRoot.name + " at " +
+        "malformed Scala signature of " + classRoot.name + " at " +
           readIndex + "; " + msg)
 
     def inferMethodAlternative(fun: Tree, argtpes: List[Type], restpe: Type) {} // can't do it; need a compiler for that.
@@ -744,7 +746,8 @@ abstract class UnPickler {
 
     /** A lazy type which when completed returns type at index `i`. */
     private class LazyTypeRef(i: Int)
-        extends LazyType with FlagAgnosticCompleter {
+        extends LazyType
+        with FlagAgnosticCompleter {
       private val definedAtRunId = currentRunId
       private val p = phase
       protected def completeInternal(sym: Symbol): Unit =
@@ -794,8 +797,9 @@ abstract class UnPickler {
 
           var alias = at(j, readSymbol)
           if (alias.isOverloaded)
-            alias = slowButSafeEnteringPhase(picklerPhase)((alias suchThat
-                    (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
+            alias = slowButSafeEnteringPhase(picklerPhase)(
+              (alias suchThat
+                (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
 
           sym.asInstanceOf[TermSymbol].setAlias(alias)
         } catch {

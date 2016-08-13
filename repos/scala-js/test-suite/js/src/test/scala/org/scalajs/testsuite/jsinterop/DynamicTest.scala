@@ -143,10 +143,10 @@ class DynamicTest {
     assertJSUndefined(x_unknown)
 
     val y = obj(
-        inner = obj(name = "inner obj"),
-        fun = { () =>
-          42
-        }
+      inner = obj(name = "inner obj"),
+      fun = { () =>
+        42
+      }
     )
     val y_inner_name = y.inner.name
     assertEquals("inner obj", y_inner_name)
@@ -163,7 +163,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_provide_object_literal_construction_with_dynamic_naming(): Unit = {
+  def should_provide_object_literal_construction_with_dynamic_naming()
+    : Unit = {
     import js.Dynamic.{literal => obj}
     val x = obj("foo" -> 3, "bar" -> "foobar")
     val x_foo = x.foo
@@ -190,7 +191,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_allow_to_create_an_empty_object_with_the_literal_syntax(): Unit = {
+  def should_allow_to_create_an_empty_object_with_the_literal_syntax()
+    : Unit = {
     import js.Dynamic.{literal => obj}
     val x = obj()
     assertTrue(x.isInstanceOf[js.Object])
@@ -229,10 +231,10 @@ class DynamicTest {
     val quote = '"'
 
     Seq(
-        obj("'" + quote -> 7357),
-        obj(s"'$quote" -> 7357),
-        obj("'\"" -> 7357),
-        obj("'" + quote -> 7357)
+      obj("'" + quote -> 7357),
+      obj(s"'$quote" -> 7357),
+      obj("'\"" -> 7357),
+      obj("'" + quote -> 7357)
     ).foreach { o =>
       val dict = o.asInstanceOf[js.Dictionary[js.Any]]
       assertEquals(7357, dict("'\""))
@@ -269,7 +271,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_allow_object_literals_to_have_duplicate_keys_issue_1595(): Unit = {
+  def should_allow_object_literals_to_have_duplicate_keys_issue_1595()
+    : Unit = {
     import js.Dynamic.{literal => obj}
 
     // Basic functionality

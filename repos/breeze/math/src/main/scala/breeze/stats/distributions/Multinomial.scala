@@ -2,18 +2,18 @@ package breeze.stats.distributions
 
 /*
  Copyright 2014 David Hall, Daniel Ramage, Jacob Andreas
- 
+
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
- You may obtain a copy of the License at 
- 
+ You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License. 
+ limitations under the License.
  */
 
 import breeze.linalg._
@@ -49,7 +49,7 @@ case class Multinomial[T, I](params: T)(
   for ((k, v) <- params.activeIterator) {
     if (v < 0) {
       throw new IllegalArgumentException(
-          "Multinomial has negative mass at index " + k)
+        "Multinomial has negative mass at index " + k)
     }
   }
 
@@ -139,8 +139,8 @@ case class AliasTable[I](probs: DenseVector[Double],
   */
 object Multinomial {
 
-  class ExpFam[T, I](
-      exemplar: T)(implicit space: MutableFiniteCoordinateField[T, I, Double])
+  class ExpFam[T, I](exemplar: T)(
+      implicit space: MutableFiniteCoordinateField[T, I, Double])
       extends ExponentialFamily[Multinomial[T, I], I]
       with HasConjugatePrior[Multinomial[T, I], I] {
 
@@ -150,8 +150,8 @@ object Multinomial {
 
     def predictive(parameter: conjugateFamily.Parameter) = new Polya(parameter)
 
-    def posterior(
-        prior: conjugateFamily.Parameter, evidence: TraversableOnce[I]) = {
+    def posterior(prior: conjugateFamily.Parameter,
+                  evidence: TraversableOnce[I]) = {
       val localCopy: T = space.copy(prior)
       for (e <- evidence) {
         localCopy(e) += 1.0
@@ -162,7 +162,7 @@ object Multinomial {
     type Parameter = T
     case class SufficientStatistic(counts: T)
         extends breeze.stats.distributions.SufficientStatistic[
-            SufficientStatistic] {
+          SufficientStatistic] {
       def +(tt: SufficientStatistic) = SufficientStatistic(counts + tt.counts)
       def *(w: Double) = SufficientStatistic(counts * w)
     }

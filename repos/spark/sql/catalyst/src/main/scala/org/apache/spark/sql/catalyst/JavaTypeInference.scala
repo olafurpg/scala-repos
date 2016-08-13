@@ -25,9 +25,16 @@ import scala.language.existentials
 
 import com.google.common.reflect.TypeToken
 
-import org.apache.spark.sql.catalyst.analysis.{UnresolvedAttribute, UnresolvedExtractValue}
+import org.apache.spark.sql.catalyst.analysis.{
+  UnresolvedAttribute,
+  UnresolvedExtractValue
+}
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, DateTimeUtils, GenericArrayData}
+import org.apache.spark.sql.catalyst.util.{
+  ArrayBasedMapData,
+  DateTimeUtils,
+  GenericArrayData
+}
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
@@ -128,8 +135,8 @@ object JavaTypeInference {
   private def getJavaBeanProperties(
       beanClass: Class[_]): Array[PropertyDescriptor] = {
     val beanInfo = Introspector.getBeanInfo(beanClass)
-    beanInfo.getPropertyDescriptors.filter(
-        p => p.getReadMethod != null && p.getWriteMethod != null)
+    beanInfo.getPropertyDescriptors.filter(p =>
+      p.getReadMethod != null && p.getWriteMethod != null)
   }
 
   private def elementType(typeToken: TypeToken[_]): TypeToken[_] = {
@@ -177,8 +184,8 @@ object JavaTypeInference {
     constructorFor(TypeToken.of(beanClass), None)
   }
 
-  private def constructorFor(
-      typeToken: TypeToken[_], path: Option[Expression]): Expression = {
+  private def constructorFor(typeToken: TypeToken[_],
+                             path: Option[Expression]): Expression = {
 
     /** Returns the current path with a sub-field extracted. */
     def addToPath(part: String): Expression =
@@ -247,9 +254,9 @@ object JavaTypeInference {
           Invoke(getPath, method, ObjectType(c))
         }.getOrElse {
           Invoke(MapObjects(
-                     p => constructorFor(typeToken.getComponentType, Some(p)),
-                     getPath,
-                     inferDataType(elementType)._1),
+                   p => constructorFor(typeToken.getComponentType, Some(p)),
+                   getPath,
+                   inferDataType(elementType)._1),
                  "array",
                  ObjectType(c))
         }
@@ -262,8 +269,10 @@ object JavaTypeInference {
                            "array",
                            ObjectType(classOf[Array[Any]]))
 
-        StaticInvoke(
-            classOf[java.util.Arrays], ObjectType(c), "asList", array :: Nil)
+        StaticInvoke(classOf[java.util.Arrays],
+                     ObjectType(c),
+                     "asList",
+                     array :: Nil)
 
       case _ if mapType.isAssignableFrom(typeToken) =>
         val (keyType, valueType) = mapKeyValueType(typeToken)
@@ -271,18 +280,18 @@ object JavaTypeInference {
         val valueDataType = inferDataType(valueType)._1
 
         val keyData = Invoke(
-            MapObjects(p => constructorFor(keyType, Some(p)),
-                       Invoke(getPath, "keyArray", ArrayType(keyDataType)),
-                       keyDataType),
-            "array",
-            ObjectType(classOf[Array[Any]]))
+          MapObjects(p => constructorFor(keyType, Some(p)),
+                     Invoke(getPath, "keyArray", ArrayType(keyDataType)),
+                     keyDataType),
+          "array",
+          ObjectType(classOf[Array[Any]]))
 
         val valueData = Invoke(
-            MapObjects(p => constructorFor(valueType, Some(p)),
-                       Invoke(getPath, "valueArray", ArrayType(valueDataType)),
-                       valueDataType),
-            "array",
-            ObjectType(classOf[Array[Any]]))
+          MapObjects(p => constructorFor(valueType, Some(p)),
+                     Invoke(getPath, "valueArray", ArrayType(valueDataType)),
+                     valueDataType),
+          "array",
+          ObjectType(classOf[Array[Any]]))
 
         StaticInvoke(ArrayBasedMapData.getClass,
                      ObjectType(classOf[JMap[_, _]]),
@@ -303,21 +312,21 @@ object JavaTypeInference {
             if (nullable) {
               constructor
             } else {
-              AssertNotNull(
-                  constructor, Seq("currently no type path record in java"))
+              AssertNotNull(constructor,
+                            Seq("currently no type path record in java"))
             }
           p.getWriteMethod.getName -> setter
         }.toMap
 
-        val newInstance = NewInstance(
-            other, Nil, ObjectType(other), propagateNull = false)
+        val newInstance =
+          NewInstance(other, Nil, ObjectType(other), propagateNull = false)
         val result = InitializeJavaBean(newInstance, setters)
 
         if (path.nonEmpty) {
           expressions.If(
-              IsNull(getPath),
-              expressions.Literal.create(null, ObjectType(other)),
-              result
+            IsNull(getPath),
+            expressions.Literal.create(null, ObjectType(other)),
+            result
           )
         } else {
           result
@@ -334,11 +343,11 @@ object JavaTypeInference {
       .asInstanceOf[CreateNamedStruct]
   }
 
-  private def extractorFor(
-      inputObject: Expression, typeToken: TypeToken[_]): Expression = {
+  private def extractorFor(inputObject: Expression,
+                           typeToken: TypeToken[_]): Expression = {
 
-    def toCatalystArray(
-        input: Expression, elementType: TypeToken[_]): Expression = {
+    def toCatalystArray(input: Expression,
+                        elementType: TypeToken[_]): Expression = {
       val (dataType, nullable) = inferDataType(elementType)
       if (ScalaReflection.isNativeType(dataType)) {
         NewInstance(classOf[GenericArrayData],
@@ -405,13 +414,12 @@ object JavaTypeInference {
           // not guarantee they have same iteration order(which is different from scala map).
           // A possible solution is creating a new `MapObjects` that can iterate a map directly.
           throw new UnsupportedOperationException(
-              "map type is not supported currently")
+            "map type is not supported currently")
 
         case other =>
           val properties = getJavaBeanProperties(other)
           if (properties.length > 0) {
-            CreateNamedStruct(
-                properties.flatMap { p =>
+            CreateNamedStruct(properties.flatMap { p =>
               val fieldName = p.getName
               val fieldType = typeToken.method(p.getReadMethod).getReturnType
               val fieldValue = Invoke(inputObject,
@@ -422,7 +430,7 @@ object JavaTypeInference {
             })
           } else {
             throw new UnsupportedOperationException(
-                s"Cannot infer type for class ${other.getName} because it is not bean-compliant")
+              s"Cannot infer type for class ${other.getName} because it is not bean-compliant")
           }
       }
     }

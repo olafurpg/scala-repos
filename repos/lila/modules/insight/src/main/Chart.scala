@@ -32,9 +32,9 @@ object Chart {
       val light = player.userId flatMap getLightUser
       Json
         .obj(
-            "name" -> light.map(_.name),
-            "title" -> light.map(_.title),
-            "rating" -> player.rating
+          "name" -> light.map(_.name),
+          "title" -> light.map(_.title),
+          "rating" -> player.rating
         )
         .noNull
     }
@@ -42,7 +42,7 @@ object Chart {
     def games = povs.map { pov =>
       Json.obj("id" -> pov.game.id,
                "fen" ->
-               (chess.format.Forsyth exportBoard pov.game.toChess.board),
+                 (chess.format.Forsyth exportBoard pov.game.toChess.board),
                "color" -> pov.player.color.name,
                "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
                "user1" -> gameUserJson(pov.player),

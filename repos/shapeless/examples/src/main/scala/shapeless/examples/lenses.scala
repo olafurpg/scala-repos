@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-14 Miles Sabin 
+ * Copyright (c) 2012-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /*
  * Examples of Lens usage.
- * 
+ *
  * @author Miles Sabin
  */
 object LenseExamples extends App {
@@ -38,8 +38,8 @@ object LenseExamples extends App {
   val postcodeLens = lens[Person].address.postcode
 
   // Starting value
-  val person = Person(
-      "Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
+  val person =
+    Person("Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
 
   // Atomic lenses ...
 
@@ -65,8 +65,10 @@ object LenseExamples extends App {
   assert(person4.address.street == "Montpelier Road")
 
   // Cumulative result of above updates
-  assert(person4 == Person(
-          "Joe Grey", 39, Address("Montpelier Road", "Brighton", "BN2 9UA")))
+  assert(
+    person4 == Person("Joe Grey",
+                      39,
+                      Address("Montpelier Road", "Brighton", "BN2 9UA")))
   println(person4)
 
   // Product/composite lenses ...
@@ -75,14 +77,16 @@ object LenseExamples extends App {
   val nameAgeCityLens = nameLens ~ ageLens ~ cityLens
 
   val nac1 =
-    nameAgeCityLens.get(person) // Inferred type is the expected tuple type 
+    nameAgeCityLens.get(person) // Inferred type is the expected tuple type
   typed[(String, Int, String)](nac1)
   assert(nac1 == ("Joe Grey", 37, "Brighton"))
   println(nac1)
 
   // Update with a tuple distributing values across Person and Address
   val person5 = nameAgeCityLens.set(person)("Joe Soap", 27, "London")
-  assert(person5 == Person(
-          "Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")))
+  assert(
+    person5 == Person("Joe Soap",
+                      27,
+                      Address("Southover Street", "London", "BN2 9UA")))
   println(person5)
 }

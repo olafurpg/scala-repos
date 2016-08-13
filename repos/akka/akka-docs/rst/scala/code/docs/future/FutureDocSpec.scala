@@ -21,7 +21,7 @@ object FutureDocSpec {
       case x: String => sender() ! x.toUpperCase
       case x: Int if x < 0 =>
         sender() ! Status.Failure(
-            new ArithmeticException("Negative values not supported"))
+          new ArithmeticException("Negative values not supported"))
       case x: Int => sender() ! x
     }
   }
@@ -188,7 +188,7 @@ class FutureDocSpec extends AkkaSpec {
       a <- Future(10 / 2) // 10 / 2 = 5
       b <- Future(a + 1) //  5 + 1 = 6
       c <- Future(a - 1) //  5 - 1 = 4
-          if c > 3 // Future.filter
+      if c > 3 // Future.filter
     } yield b * c //  6 * 4 = 24
 
     // Note that the execution of futures a, b, and c
@@ -437,7 +437,7 @@ class FutureDocSpec extends AkkaSpec {
     // import akka.pattern.after
 
     val delayed = akka.pattern.after(200 millis, using = system.scheduler)(
-        Future.failed(new IllegalStateException("OHNOES")))
+      Future.failed(new IllegalStateException("OHNOES")))
     val future = Future { Thread.sleep(1000); "foo" }
     val result = Future firstCompletedOf Seq(future, delayed)
     //#after

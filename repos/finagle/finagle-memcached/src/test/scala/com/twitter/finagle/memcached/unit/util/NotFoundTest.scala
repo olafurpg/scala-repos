@@ -23,7 +23,7 @@ class NotFoundTest extends FunSuite {
 
     assert(removeAll(map, Set.empty[Int]) == map)
     assert(
-        removeAll(Map.empty[Int, Int], Set.empty[Int]) == Map.empty[Int, Int])
+      removeAll(Map.empty[Int, Int], Set.empty[Int]) == Map.empty[Int, Int])
   }
 
   test("remove all") {
@@ -48,6 +48,6 @@ class NotFoundTest extends FunSuite {
     assert(removeAll(set, elems) == Set(6, 7, 8, 9, 10))
     assert(removeAll(seq, elems) == Set(6, 7, 8, 9, 10))
     assert(
-        removeAll(map, elems) == Map(6 -> 6, 7 -> 7, 8 -> 8, 9 -> 9, 10 -> 10))
+      removeAll(map, elems) == Map(6 -> 6, 7 -> 7, 8 -> 8, 9 -> 9, 10 -> 10))
   }
 }

@@ -26,7 +26,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
   def minimize(a: T, B: M, initX: T): T =
     minimizeAndReturnResidual(a, B, initX)._1
 
-  case class State private[ConjugateGradient](
+  case class State private[ConjugateGradient] (
       x: T,
       residual: T,
       private[ConjugateGradient] val direction: T,
@@ -65,7 +65,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
         if (xnorm >= maxNormValue) {
           // reached the edge. We're done.
           logger.info(
-              f"$iter boundary reached! norm(x): $xnorm%.3f >= maxNormValue $maxNormValue")
+            f"$iter boundary reached! norm(x): $xnorm%.3f >= maxNormValue $maxNormValue")
           val xtd = x dot d
           val xtx = x dot x
 
@@ -81,7 +81,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
 
           assert(!alphaNext.isNaN,
                  xtd + " " + normSquare + " " + xtx + "  " + xtd + " " +
-                 radius + " " + dtd)
+                   radius + " " + dtd)
           axpy(alphaNext, d, x)
           axpy(-alphaNext, Bd + (d :* normSquaredPenalty), r)
 
@@ -101,13 +101,13 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
             val done = iter > maxIterations && maxIterations > 0
             if (done)
               logger.info(
-                  f"max iteration $iter reached! norm(residual): $normr%.3f > tolerance $tolerance.")
+                f"max iteration $iter reached! norm(residual): $normr%.3f > tolerance $tolerance.")
             else
               logger.info(
-                  f"$iter converged! norm(residual): $normr%.3f <= tolerance $tolerance.")
+                f"$iter converged! norm(residual): $normr%.3f <= tolerance $tolerance.")
           } else {
             logger.info(
-                f"$iter: norm(residual): $normr%.3f > tolerance $tolerance.")
+              f"$iter: norm(residual): $normr%.3f > tolerance $tolerance.")
           }
           State(x, r, d, iter + 1, converged)
         }

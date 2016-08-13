@@ -8,7 +8,8 @@ import cats.std.all._
 
 abstract class FoldableCheck[F[_]: Foldable](name: String)(
     implicit ArbFInt: Arbitrary[F[Int]])
-    extends CatsSuite with PropertyChecks {
+    extends CatsSuite
+    with PropertyChecks {
 
   def iterator[T](fa: F[T]): Iterator[T]
 
@@ -45,7 +46,7 @@ abstract class FoldableCheck[F[_]: Foldable](name: String)(
 class FoldableTestsAdditional extends CatsSuite {
 
   // exists method written in terms of foldRight
-  def contains[F[_]: Foldable, A : Eq](as: F[A], goal: A): Eval[Boolean] =
+  def contains[F[_]: Foldable, A: Eq](as: F[A], goal: A): Eval[Boolean] =
     as.foldRight(Now(false)) { (a, lb) =>
       if (a === goal) Now(true) else lb
     }
@@ -78,8 +79,8 @@ class FoldableTestsAdditional extends CatsSuite {
     assert(contains(large, 10000).value)
 
     // safely build large lists
-    val larger = F.foldRight(large, Now(List.empty[Int]))(
-        (x, lxs) => lxs.map((x + 1) :: _))
+    val larger = F.foldRight(large, Now(List.empty[Int]))((x, lxs) =>
+      lxs.map((x + 1) :: _))
     larger.value should ===(large.map(_ + 1))
   }
 

@@ -90,16 +90,16 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     /////////////////// END OF BOILERPLATE /////////////////
 
     assertFormat(SpecialToken, SexpNil)
-    assertFormat(
-        SpecialToken: TokenTree, SexpList(SexpSymbol(":SpecialToken")))
+    assertFormat(SpecialToken: TokenTree,
+                 SexpList(SexpSymbol(":SpecialToken")))
 
     val fieldTerm = FieldTerm("thing is ten", DatabaseField("THING"), "10")
     val expectField = SexpData(
-        SexpSymbol(":text") -> SexpString("thing is ten"),
-        SexpSymbol(":field") -> SexpData(
-            SexpSymbol(":column") -> SexpString("THING")
-        ),
-        SexpSymbol(":value") -> SexpString("10")
+      SexpSymbol(":text") -> SexpString("thing is ten"),
+      SexpSymbol(":field") -> SexpData(
+        SexpSymbol(":column") -> SexpString("THING")
+      ),
+      SexpSymbol(":value") -> SexpString("10")
     )
 
     // confirm that the wrapper is picked up for a specific case class
@@ -113,9 +113,9 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     // confirm recursive works
     val and = AndCondition(fieldTerm, fieldTerm, "wibble")
     val expectAnd = SexpData(
-        SexpSymbol(":left") -> expectFieldTree,
-        SexpSymbol(":right") -> expectFieldTree,
-        SexpSymbol(":text") -> SexpString("wibble")
+      SexpSymbol(":left") -> expectFieldTree,
+      SexpSymbol(":right") -> expectFieldTree,
+      SexpSymbol(":text") -> SexpString("wibble")
     )
     assertFormat(and, expectAnd)
 

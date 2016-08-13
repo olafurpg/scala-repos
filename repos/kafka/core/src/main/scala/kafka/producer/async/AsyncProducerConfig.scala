@@ -19,9 +19,9 @@ package kafka.producer.async
 import kafka.utils.VerifiableProperties
 
 @deprecated(
-    "This trait has been deprecated and will be removed in a future release. " +
+  "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
-    "0.10.0.0")
+  "0.10.0.0")
 trait AsyncProducerConfig {
   val props: VerifiableProperties
 

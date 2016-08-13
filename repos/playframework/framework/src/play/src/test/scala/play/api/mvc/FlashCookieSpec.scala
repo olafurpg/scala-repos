@@ -12,8 +12,8 @@ object FlashCookieSpec extends Specification {
 
   def oldEncoder(data: Map[String, String]): String = {
     URLEncoder.encode(
-        data.map(d => d._1 + ":" + d._2).mkString("\u0000"),
-        "UTF-8"
+      data.map(d => d._1 + ":" + d._2).mkString("\u0000"),
+      "UTF-8"
     )
   }
 
@@ -95,8 +95,9 @@ object FlashCookieSpec extends Specification {
     }
     "put disallows null values" in {
       val c = Flash(Map("foo" -> "bar"))
-      c + (("x", null)) must throwA(new IllegalArgumentException(
-              "requirement failed: Cookie values cannot be null"))
+      c + (("x", null)) must throwA(
+        new IllegalArgumentException(
+          "requirement failed: Cookie values cannot be null"))
     }
     "be insecure by default" in {
       Flash.encodeAsCookie(Flash()).secure must beFalse

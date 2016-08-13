@@ -18,10 +18,10 @@ object PluginsTest extends Specification {
     "order enable plugins after required plugins" in {
       val ns = deducePlugin(A && B, log)
       ((ns indexOf Q) must beGreaterThan(ns indexOf A)) and
-      ((ns indexOf Q) must beGreaterThan(ns indexOf B)) and
-      ((ns indexOf R) must beGreaterThan(ns indexOf A)) and
-      ((ns indexOf R) must beGreaterThan(ns indexOf B)) and
-      ((ns indexOf R) must beGreaterThan(ns indexOf Q))
+        ((ns indexOf Q) must beGreaterThan(ns indexOf B)) and
+        ((ns indexOf R) must beGreaterThan(ns indexOf A)) and
+        ((ns indexOf R) must beGreaterThan(ns indexOf B)) and
+        ((ns indexOf R) must beGreaterThan(ns indexOf Q))
     }
     "not enable plugins with trigger=allRequirements but conflicting requirements" in {
       deducePlugin(A && B, log) must not contain (S)
@@ -31,15 +31,15 @@ object PluginsTest extends Specification {
       (ns must contain(A)) and (ns must contain(B))
     }
     "throw an AutoPluginException on conflicting requirements" in {
-      deducePlugin(S, log) must throwAn[AutoPluginException](
-          message = """Contradiction in enabled plugins:
+      deducePlugin(S, log) must throwAn[AutoPluginException](message =
+        """Contradiction in enabled plugins:
   - requested: sbt.AI\$S
   - enabled: sbt.AI\$S, sbt.AI\$Q, sbt.AI\$R, sbt.AI\$B, sbt.AI\$A
   - conflict: sbt.AI\$R is enabled by sbt.AI\$Q; excluded by sbt.AI\$S""")
     }
     "generates a detailed report on conflicting requirements" in {
-      deducePlugin(T && U, log) must throwAn[AutoPluginException](
-          message = """Contradiction in enabled plugins:
+      deducePlugin(T && U, log) must throwAn[AutoPluginException](message =
+        """Contradiction in enabled plugins:
   - requested: sbt.AI\$T && sbt.AI\$U
   - enabled: sbt.AI\$U, sbt.AI\$T, sbt.AI\$A, sbt.AI\$Q, sbt.AI\$R, sbt.AI\$B
   - conflict: sbt.AI\$Q is enabled by sbt.AI\$A && sbt.AI\$B; required by sbt.AI\$T, sbt.AI\$R; excluded by sbt.AI\$U

@@ -73,7 +73,7 @@ class AdjustSettingsApplicationComponent extends ApplicationComponent {
       panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10))
       val headerPanel = new JPanel(new GridLayout(0, 1, 0, 0))
       headerPanel.add(
-          new JLabel("Recommended memory settings for Scala plugin:"))
+        new JLabel("Recommended memory settings for Scala plugin:"))
       adjustingPanel.add(headerPanel, BorderLayout.NORTH)
       val settingsPanel = new JPanel(new GridLayout(0, 2, 0, 0))
       settingsPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10))
@@ -102,8 +102,8 @@ class AdjustSettingsApplicationComponent extends ApplicationComponent {
         if (!VMOptions.writeOption("-Xms", xmsValue, XMS_PATTERN)) {
           ScalaApplicationSettings.getInstance().IGNORE_SETTINGS_CHECK = true
           Messages.showErrorDialog(
-              "Settings weren't adjusted. Need permissions.",
-              "Access is denied")
+            "Settings weren't adjusted. Need permissions.",
+            "Access is denied")
           return
         }
         VMOptions.writeXmx(xmxValue)
@@ -111,8 +111,7 @@ class AdjustSettingsApplicationComponent extends ApplicationComponent {
       } catch {
         case n: NumberFormatException => //do nothing
       } finally {
-        SwingUtilities.invokeLater(
-            new Runnable {
+        SwingUtilities.invokeLater(new Runnable {
           override def run(): Unit = {
             ApplicationManager.getApplication.restart()
           }

@@ -19,8 +19,7 @@ class NumericTest extends FunSuite {
     *
     *   a=-3  b=3  c=9
     */
-  def runWith[@sp A : Numeric : ClassTag](cls: String)(
-      a: A, b: A, c: A): Unit = {
+  def runWith[@sp A: Numeric: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
@@ -69,8 +68,8 @@ class NumericTest extends FunSuite {
   runWith[Rational]("Rational")(-3, 3, -9)
   //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
   runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(
-      Complex(BigDecimal(-3), BigDecimal(0)),
-      Complex(BigDecimal(3), BigDecimal(0)),
-      Complex(BigDecimal(-9), BigDecimal(0))
+    Complex(BigDecimal(-3), BigDecimal(0)),
+    Complex(BigDecimal(3), BigDecimal(0)),
+    Complex(BigDecimal(-9), BigDecimal(0))
   )
 }

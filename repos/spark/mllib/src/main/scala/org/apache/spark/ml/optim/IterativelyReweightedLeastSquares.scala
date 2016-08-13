@@ -57,13 +57,14 @@ private[ml] class IterativelyReweightedLeastSquaresModel(
   */
 private[ml] class IterativelyReweightedLeastSquares(
     val initialModel: WeightedLeastSquaresModel,
-    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double,
-    Double),
+    val reweightFunc: (Instance,
+                       WeightedLeastSquaresModel) => (Double, Double),
     val fitIntercept: Boolean,
     val regParam: Double,
     val maxIter: Int,
     val tol: Double)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   def fit(instances: RDD[Instance]): IterativelyReweightedLeastSquaresModel = {
 
@@ -84,11 +85,11 @@ private[ml] class IterativelyReweightedLeastSquares(
       }
 
       // Estimate new model
-      model = new WeightedLeastSquares(
-          fitIntercept,
-          regParam,
-          standardizeFeatures = false,
-          standardizeLabel = false).fit(newInstances)
+      model =
+        new WeightedLeastSquares(fitIntercept,
+                                 regParam,
+                                 standardizeFeatures = false,
+                                 standardizeLabel = false).fit(newInstances)
 
       // Check convergence
       val oldCoefficients = oldModel.coefficients
@@ -97,8 +98,8 @@ private[ml] class IterativelyReweightedLeastSquares(
       val maxTolOfCoefficients = oldCoefficients.toArray.reduce { (x, y) =>
         math.max(math.abs(x), math.abs(y))
       }
-      val maxTol = math.max(
-          maxTolOfCoefficients, math.abs(oldModel.intercept - model.intercept))
+      val maxTol = math.max(maxTolOfCoefficients,
+                            math.abs(oldModel.intercept - model.intercept))
 
       if (maxTol < tol) {
         converged = true
@@ -113,7 +114,9 @@ private[ml] class IterativelyReweightedLeastSquares(
       }
     }
 
-    new IterativelyReweightedLeastSquaresModel(
-        model.coefficients, model.intercept, model.diagInvAtWA, iter)
+    new IterativelyReweightedLeastSquaresModel(model.coefficients,
+                                               model.intercept,
+                                               model.diagInvAtWA,
+                                               iter)
   }
 }

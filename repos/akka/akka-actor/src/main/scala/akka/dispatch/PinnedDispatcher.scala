@@ -19,12 +19,12 @@ class PinnedDispatcher(_configurator: MessageDispatcherConfigurator,
                        _shutdownTimeout: FiniteDuration,
                        _threadPoolConfig: ThreadPoolConfig)
     extends Dispatcher(
-        _configurator,
-        _id,
-        Int.MaxValue,
-        Duration.Zero,
-        _threadPoolConfig.copy(corePoolSize = 1, maxPoolSize = 1),
-        _shutdownTimeout) {
+      _configurator,
+      _id,
+      Int.MaxValue,
+      Duration.Zero,
+      _threadPoolConfig.copy(corePoolSize = 1, maxPoolSize = 1),
+      _shutdownTimeout) {
 
   @volatile
   private var owner: ActorCell = _actor
@@ -34,7 +34,7 @@ class PinnedDispatcher(_configurator: MessageDispatcherConfigurator,
     val actor = owner
     if ((actor ne null) && actorCell != actor)
       throw new IllegalArgumentException(
-          "Cannot register to anyone but " + actor)
+        "Cannot register to anyone but " + actor)
     owner = actorCell
     super.register(actorCell)
   }

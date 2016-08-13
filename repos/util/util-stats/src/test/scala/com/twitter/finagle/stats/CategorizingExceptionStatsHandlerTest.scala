@@ -12,9 +12,9 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
     val receiver = new InMemoryStatsReceiver
 
     val esh = new CategorizingExceptionStatsHandler(
-        _ => Some("clienterrors"),
-        PartialFunction.apply(_ => Some("service")),
-        true)
+      _ => Some("clienterrors"),
+      PartialFunction.apply(_ => Some("service")),
+      true)
 
     val cwe = new RuntimeException(new Exception("e"))
     esh.record(receiver, cwe)
@@ -25,35 +25,37 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
 
     assert(receiver.counters.filterKeys(_.contains("clienterrors")).size == 3)
     assert(receiver.counters(Seq("clienterrors")) == 1)
-    assert(receiver.counters(
-            Seq("clienterrors", classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("clienterrors",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+      receiver
+        .counters(Seq("clienterrors", classOf[RuntimeException].getName)) == 1)
+    assert(
+      receiver.counters(
+        Seq("clienterrors",
+            classOf[RuntimeException].getName,
+            classOf[Exception].getName)) == 1)
 
     assert(
-        receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 3)
+      receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 3)
     assert(receiver.counters(Seq("sourcedfailures", "service")) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName)) == 1)
+      receiver.counters(Seq("sourcedfailures",
+                            "service",
+                            classOf[RuntimeException].getName)) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+      receiver.counters(
+        Seq("sourcedfailures",
+            "service",
+            classOf[RuntimeException].getName,
+            classOf[Exception].getName)) == 1)
 
-    assert(
-        keys == Seq(
-            "clienterrors",
-            "clienterrors/java.lang.RuntimeException",
-            "clienterrors/java.lang.RuntimeException/java.lang.Exception",
-            "sourcedfailures/service",
-            "sourcedfailures/service/java.lang.RuntimeException",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
-        ))
+    assert(keys == Seq(
+      "clienterrors",
+      "clienterrors/java.lang.RuntimeException",
+      "clienterrors/java.lang.RuntimeException/java.lang.Exception",
+      "sourcedfailures/service",
+      "sourcedfailures/service/java.lang.RuntimeException",
+      "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+    ))
   }
 
   test("skips unknown source and defaults to failures") {
@@ -67,21 +69,22 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
 
     assert(receiver.counters.filterKeys(_.contains("failures")).size == 3)
     assert(
-        receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 0)
+      receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 0)
 
     assert(
-        keys == Seq(
-            "failures",
-            "failures/java.lang.RuntimeException",
-            "failures/java.lang.RuntimeException/java.lang.Exception"
-        ))
+      keys == Seq(
+        "failures",
+        "failures/java.lang.RuntimeException",
+        "failures/java.lang.RuntimeException/java.lang.Exception"
+      ))
   }
 
   test("supports no rollup") {
     val receiver = new InMemoryStatsReceiver
 
-    val esh = new CategorizingExceptionStatsHandler(
-        _ => Some("clienterrors"), _ => Some("service"), false)
+    val esh = new CategorizingExceptionStatsHandler(_ => Some("clienterrors"),
+                                                    _ => Some("service"),
+                                                    false)
 
     val cwe = new RuntimeException(new Exception("e"))
     esh.record(receiver, cwe)
@@ -93,25 +96,26 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
     assert(receiver.counters.filterKeys(_.contains("clienterrors")).size == 2)
     assert(receiver.counters(Seq("clienterrors")) == 1)
     assert(
-        receiver.counters(Seq("clienterrors",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+      receiver.counters(
+        Seq("clienterrors",
+            classOf[RuntimeException].getName,
+            classOf[Exception].getName)) == 1)
 
     assert(
-        receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 2)
+      receiver.counters.filterKeys(_.contains("sourcedfailures")).size == 2)
     assert(receiver.counters(Seq("sourcedfailures", "service")) == 1)
     assert(
-        receiver.counters(Seq("sourcedfailures",
-                              "service",
-                              classOf[RuntimeException].getName,
-                              classOf[Exception].getName)) == 1)
+      receiver.counters(
+        Seq("sourcedfailures",
+            "service",
+            classOf[RuntimeException].getName,
+            classOf[Exception].getName)) == 1)
 
-    assert(
-        keys == Seq(
-            "clienterrors",
-            "clienterrors/java.lang.RuntimeException/java.lang.Exception",
-            "sourcedfailures/service",
-            "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
-        ))
+    assert(keys == Seq(
+      "clienterrors",
+      "clienterrors/java.lang.RuntimeException/java.lang.Exception",
+      "sourcedfailures/service",
+      "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+    ))
   }
 }

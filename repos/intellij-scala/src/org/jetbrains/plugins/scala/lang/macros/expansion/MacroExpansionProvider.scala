@@ -4,7 +4,12 @@ import java.awt.event.MouseEvent
 import java.util
 
 import com.intellij.codeHighlighting.Pass
-import com.intellij.codeInsight.daemon.{GutterIconNavigationHandler, LineMarkerInfo, LineMarkerProvider, RelatedItemLineMarkerInfo}
+import com.intellij.codeInsight.daemon.{
+  GutterIconNavigationHandler,
+  LineMarkerInfo,
+  LineMarkerProvider,
+  RelatedItemLineMarkerInfo
+}
 import com.intellij.navigation.GotoRelatedItem
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.{PsiElement, PsiManager}
@@ -30,26 +35,27 @@ class MacroExpansionProvider extends LineMarkerProvider {
     val res = expansions.map {
       case (current, saved) =>
         new RelatedItemLineMarkerInfo[PsiElement](
-            current,
-            current.getTextRange,
-            Icons.NO_SCALA_SDK,
-            Pass.UPDATE_OVERRIDEN_MARKERS,
-            new Function[PsiElement, String] {
-              def fun(param: PsiElement): String = "Undo Macro Expansion"
-            },
-            new GutterIconNavigationHandler[PsiElement] {
-              def navigate(mouseEvent: MouseEvent, elt: PsiElement) = {
-                inWriteAction {
-                  val newPsi = ScalaPsiElementFactory
-                    .createBlockExpressionWithoutBracesFromText(
-                      saved, PsiManager.getInstance(current.getProject))
-                  current.replace(newPsi)
-                  saved
-                }
+          current,
+          current.getTextRange,
+          Icons.NO_SCALA_SDK,
+          Pass.UPDATE_OVERRIDEN_MARKERS,
+          new Function[PsiElement, String] {
+            def fun(param: PsiElement): String = "Undo Macro Expansion"
+          },
+          new GutterIconNavigationHandler[PsiElement] {
+            def navigate(mouseEvent: MouseEvent, elt: PsiElement) = {
+              inWriteAction {
+                val newPsi = ScalaPsiElementFactory
+                  .createBlockExpressionWithoutBracesFromText(
+                    saved,
+                    PsiManager.getInstance(current.getProject))
+                current.replace(newPsi)
+                saved
               }
-            },
-            GutterIconRenderer.Alignment.RIGHT,
-            util.Arrays.asList[GotoRelatedItem]())
+            }
+          },
+          GutterIconRenderer.Alignment.RIGHT,
+          util.Arrays.asList[GotoRelatedItem]())
     }
     result.addAll(res)
   }

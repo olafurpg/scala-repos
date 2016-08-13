@@ -10,7 +10,8 @@ object CaptureLogEvents {
 
     val capturingAppender = new CapturingAppender
     capturingAppender.appendToRootLogger()
-    try block finally capturingAppender.detachFromRootLogger()
+    try block
+    finally capturingAppender.detachFromRootLogger()
     capturingAppender.getEvents
   }
 

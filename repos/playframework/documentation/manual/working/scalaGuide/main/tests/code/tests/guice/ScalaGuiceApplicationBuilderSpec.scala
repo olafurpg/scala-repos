@@ -113,8 +113,8 @@ class ScalaGuiceApplicationBuilderSpec extends PlaySpecification {
       // #load-modules
       val injector = new GuiceApplicationBuilder()
         .load(
-            new play.api.inject.BuiltinModule,
-            bind[Component].to[DefaultComponent]
+          new play.api.inject.BuiltinModule,
+          bind[Component].to[DefaultComponent]
         )
         .injector
       // #load-modules
@@ -131,7 +131,7 @@ class ScalaGuiceApplicationBuilderSpec extends PlaySpecification {
       // #disable-modules
 
       injector.instanceOf[Component] must throwA[
-          com.google.inject.ConfigurationException]
+        com.google.inject.ConfigurationException]
     }
 
     "injector builder" in {

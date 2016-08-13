@@ -10,7 +10,10 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.TokenSet
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScAnnotations}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation,
+  ScAnnotations
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -26,14 +29,15 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   def annotations: Seq[ScAnnotation] = {
     val stub: StubElement[_ <: PsiElement] = this match {
       case st: StubBasedPsiElement[_] if st.getStub != null =>
-        st.getStub.asInstanceOf[StubElement[_ <: PsiElement]] // !!! Appeasing an unexplained compile error
+        st.getStub
+          .asInstanceOf[StubElement[_ <: PsiElement]] // !!! Appeasing an unexplained compile error
       case file: PsiFileImpl if file.getStub != null => file.getStub
       case _ => null
     }
     if (stub != null) {
       val annots: Array[ScAnnotations] = stub.getChildrenByType(
-          TokenSet.create(ScalaElementTypes.ANNOTATIONS),
-          JavaArrayFactoryUtil.ScAnnotationsFactory)
+        TokenSet.create(ScalaElementTypes.ANNOTATIONS),
+        JavaArrayFactoryUtil.ScAnnotationsFactory)
       if (annots.length > 0) {
         return annots(0).getAnnotations.toSeq
       } else return Seq.empty
@@ -44,20 +48,19 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   }
 
   def annotationNames: Seq[String] =
-    annotations.map(
-        (x: ScAnnotation) =>
-          {
-        val text: String = x.annotationExpr.constr.typeElement.getText
-        text.substring(text.lastIndexOf(".", 0) + 1, text.length)
+    annotations.map((x: ScAnnotation) => {
+      val text: String = x.annotationExpr.constr.typeElement.getText
+      text.substring(text.lastIndexOf(".", 0) + 1, text.length)
     })
 
   def hasAnnotation(clazz: PsiClass): Boolean =
     hasAnnotation(clazz.qualifiedName).isDefined
 
   def hasAnnotation(qualifiedName: String): Option[ScAnnotation] = {
-    annotations.find(annot =>
-          acceptType(annot.typeElement.getType(TypingContext.empty).getOrAny,
-                     qualifiedName))
+    annotations.find(
+      annot =>
+        acceptType(annot.typeElement.getType(TypingContext.empty).getOrAny,
+                   qualifiedName))
   }
 
   def allMatchingAnnotations(qualifiedName: String): Seq[ScAnnotation] = {
@@ -76,8 +79,8 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
       case _ =>
         tp.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
-            acceptType(
-                ta.aliasedType(TypingContext.empty).getOrAny, qualifiedName)
+            acceptType(ta.aliasedType(TypingContext.empty).getOrAny,
+                       qualifiedName)
           case _ => false
         }
     }

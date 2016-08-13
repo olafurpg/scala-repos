@@ -3,7 +3,12 @@
   */
 package akka.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectInputStream,
+  ObjectOutputStream
+}
 import java.lang.Double.doubleToRawLongBits
 import java.lang.Float.floatToRawIntBits
 import java.nio.{ByteBuffer, ByteOrder}
@@ -81,7 +86,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     }
   }
   implicit val arbitraryByteArraySlice: Arbitrary[ArraySlice[Byte]] = arbSlice(
-      arbitraryByteArray)
+    arbitraryByteArray)
   val arbitraryShortArray: Arbitrary[Array[Short]] = Arbitrary {
     Gen.sized { n ⇒
       Gen.containerOfN[Array, Short](n, arbitrary[Short])
@@ -95,14 +100,14 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     }
   }
   implicit val arbitraryIntArraySlice: Arbitrary[ArraySlice[Int]] = arbSlice(
-      arbitraryIntArray)
+    arbitraryIntArray)
   val arbitraryLongArray: Arbitrary[Array[Long]] = Arbitrary {
     Gen.sized { n ⇒
       Gen.containerOfN[Array, Long](n, arbitrary[Long])
     }
   }
   implicit val arbitraryLongArraySlice: Arbitrary[ArraySlice[Long]] = arbSlice(
-      arbitraryLongArray)
+    arbitraryLongArray)
   val arbitraryFloatArray: Arbitrary[Array[Float]] = Arbitrary {
     Gen.sized { n ⇒
       Gen.containerOfN[Array, Float](n, arbitrary[Float])
@@ -145,8 +150,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     body(bsA, bsB) == body(vecA, vecB)
   }
 
-  def likeVecIt(bs: ByteString)(
-      body: BufferedIterator[Byte] ⇒ Any, strict: Boolean = true): Boolean = {
+  def likeVecIt(bs: ByteString)(body: BufferedIterator[Byte] ⇒ Any,
+                                strict: Boolean = true): Boolean = {
     val bsIterator = bs.iterator
     val vecIterator = Vector(bs: _*).iterator.buffered
     (body(bsIterator) == body(vecIterator)) &&
@@ -173,8 +178,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     bsBuilder.result == vecBuilder.result
   }
 
-  def testShortDecoding(
-      slice: ByteStringSlice, byteOrder: ByteOrder): Boolean = {
+  def testShortDecoding(slice: ByteStringSlice,
+                        byteOrder: ByteOrder): Boolean = {
     val elemSize = 2
     val (bytes, from, until) = slice
     val (n, a, b) =
@@ -222,8 +227,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
-  def testFloatDecoding(
-      slice: ByteStringSlice, byteOrder: ByteOrder): Boolean = {
+  def testFloatDecoding(slice: ByteStringSlice,
+                        byteOrder: ByteOrder): Boolean = {
     val elemSize = 4
     val (bytes, from, until) = slice
     val (n, a, b) =
@@ -236,12 +241,12 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     input.getFloats(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getFloat(byteOrder)
     ((decoded.toSeq map floatToRawIntBits) ==
-        (reference.toSeq map floatToRawIntBits)) &&
+      (reference.toSeq map floatToRawIntBits)) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
-  def testDoubleDecoding(
-      slice: ByteStringSlice, byteOrder: ByteOrder): Boolean = {
+  def testDoubleDecoding(slice: ByteStringSlice,
+                         byteOrder: ByteOrder): Boolean = {
     val elemSize = 8
     val (bytes, from, until) = slice
     val (n, a, b) =
@@ -254,12 +259,12 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     input.getDoubles(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getDouble(byteOrder)
     ((decoded.toSeq map doubleToRawLongBits) ==
-        (reference.toSeq map doubleToRawLongBits)) &&
+      (reference.toSeq map doubleToRawLongBits)) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
-  def testShortEncoding(
-      slice: ArraySlice[Short], byteOrder: ByteOrder): Boolean = {
+  def testShortEncoding(slice: ArraySlice[Short],
+                        byteOrder: ByteOrder): Boolean = {
     val elemSize = 2
     val (data, from, to) = slice
     val reference = Array.ofDim[Byte](data.length * elemSize)
@@ -283,8 +288,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     reference.toSeq == builder.result
   }
 
-  def testLongEncoding(
-      slice: ArraySlice[Long], byteOrder: ByteOrder): Boolean = {
+  def testLongEncoding(slice: ArraySlice[Long],
+                       byteOrder: ByteOrder): Boolean = {
     val elemSize = 8
     val (data, from, to) = slice
     val reference = Array.ofDim[Byte](data.length * elemSize)
@@ -296,16 +301,16 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     reference.toSeq == builder.result
   }
 
-  def testLongPartEncoding(
-      anb: ArrayNumBytes[Long], byteOrder: ByteOrder): Boolean = {
+  def testLongPartEncoding(anb: ArrayNumBytes[Long],
+                           byteOrder: ByteOrder): Boolean = {
     val elemSize = 8
     val (data, nBytes) = anb
 
     val reference = Array.ofDim[Byte](data.length * elemSize)
     ByteBuffer.wrap(reference).order(byteOrder).asLongBuffer.put(data)
     val builder = ByteString.newBuilder
-    for (i ← 0 until data.length) builder.putLongPart(data(i), nBytes)(
-        byteOrder)
+    for (i ← 0 until data.length)
+      builder.putLongPart(data(i), nBytes)(byteOrder)
 
     reference.zipWithIndex
       .collect({
@@ -315,14 +320,14 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
           r
         case (r, i)
             if byteOrder == ByteOrder.BIG_ENDIAN && i % elemSize >=
-            (elemSize - nBytes) ⇒
+              (elemSize - nBytes) ⇒
           r
       })
       .toSeq == builder.result
   }
 
-  def testFloatEncoding(
-      slice: ArraySlice[Float], byteOrder: ByteOrder): Boolean = {
+  def testFloatEncoding(slice: ArraySlice[Float],
+                        byteOrder: ByteOrder): Boolean = {
     val elemSize = 4
     val (data, from, to) = slice
     val reference = Array.ofDim[Byte](data.length * elemSize)
@@ -334,8 +339,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     reference.toSeq == builder.result
   }
 
-  def testDoubleEncoding(
-      slice: ArraySlice[Double], byteOrder: ByteOrder): Boolean = {
+  def testDoubleEncoding(slice: ArraySlice[Double],
+                         byteOrder: ByteOrder): Boolean = {
     val elemSize = 8
     val (data, from, to) = slice
     val reference = Array.ofDim[Byte](data.length * elemSize)
@@ -351,11 +356,11 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     "have correct size" when {
       "concatenating" in {
         check(
-            (a: ByteString, b: ByteString) ⇒ (a ++ b).size == a.size + b.size)
+          (a: ByteString, b: ByteString) ⇒ (a ++ b).size == a.size + b.size)
       }
       "dropping" in {
-        check((a: ByteString,
-            b: ByteString) ⇒ (a ++ b).drop(b.size).size == a.size)
+        check((a: ByteString, b: ByteString) ⇒
+          (a ++ b).drop(b.size).size == a.size)
       }
     }
 
@@ -735,21 +740,20 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
 
           val toRead = b - a
           var (nRead, eof) = (0, false)
-          while ( (nRead < toRead) && !eof) {
+          while ((nRead < toRead) && !eof) {
             val n = input.asInputStream.read(output, a + nRead, toRead - nRead)
             if (n == -1) eof = true
             else nRead += n
           }
           if (eof) throw new RuntimeException("Unexpected EOF")
 
-          for (i ← b until bytes.length) output(i) = input.asInputStream
-            .read()
-            .toByte
+          for (i ← b until bytes.length)
+            output(i) = input.asInputStream.read().toByte
 
-            (output.toSeq.drop(a) == bytes.drop(a)) &&
+          (output.toSeq.drop(a) == bytes.drop(a)) &&
           (input.asInputStream.read() == -1) &&
           ((output.length < 1) ||
-              (input.asInputStream.read(output, 0, 1) == -1))
+          (input.asInputStream.read(output, 0, 1) == -1))
         }
       }
 
@@ -825,7 +829,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
       "adding various contents using ++= and +=" in {
         check {
           (array1: Array[Byte], array2: Array[Byte], bs1: ByteString,
-          bs2: ByteString, bs3: ByteString) ⇒
+           bs2: ByteString, bs3: ByteString) ⇒
             likeVecBld { builder ⇒
               builder ++= array1
               bs1 foreach { b ⇒
@@ -860,8 +864,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
           val builder = ByteString.newBuilder
           for (i ← 0 until from) builder.asOutputStream.write(data(i).toInt)
           builder.asOutputStream.write(data, from, to - from)
-          for (i ← to until data.length) builder.asOutputStream.write(
-              data(i).toInt)
+          for (i ← to until data.length)
+            builder.asOutputStream.write(data(i).toInt)
           data.toSeq == builder.result
         }
       }

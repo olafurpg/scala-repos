@@ -32,11 +32,11 @@ object Generators {
 
 object Commands {
   val quickPublish = Command(
+    "quickPublish",
+    Help.more(
       "quickPublish",
-      Help.more(
-          "quickPublish",
-          "Toggles quick publish mode, disabling/enabling build of documentation/source jars"))(
-      _ => Parsers.EOF) { (state, _) =>
+      "Toggles quick publish mode, disabling/enabling build of documentation/source jars"))(
+    _ => Parsers.EOF) { (state, _) =>
     val x = Project.extract(state)
     import x._
 
@@ -61,12 +61,12 @@ object Commands {
 
     val newStructure =
       Load.reapply(filtered ++ Seq(
-                       publishArtifact in GlobalScope in packageDoc := toggle,
-                       publishArtifact in GlobalScope in packageSrc := toggle,
-                       publishArtifact in GlobalScope := true
+                     publishArtifact in GlobalScope in packageDoc := toggle,
+                     publishArtifact in GlobalScope in packageSrc := toggle,
+                     publishArtifact in GlobalScope := true
                    ),
                    structure)
-    Project.setProject(
-        session, newStructure, state.put(quickPublishToggle, toggle))
+    Project
+      .setProject(session, newStructure, state.put(quickPublishToggle, toggle))
   }
 }

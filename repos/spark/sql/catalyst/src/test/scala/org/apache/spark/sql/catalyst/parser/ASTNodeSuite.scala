@@ -21,13 +21,13 @@ import org.apache.spark.SparkFunSuite
 class ASTNodeSuite extends SparkFunSuite {
   test("SPARK-13157 - remainder must return all input chars") {
     val inputs = Seq(
-        ("add jar", "file:///tmp/ab/TestUDTF.jar"),
-        ("add jar", "file:///tmp/a@b/TestUDTF.jar"),
-        ("add jar", "c:\\windows32\\TestUDTF.jar"),
-        ("add jar", "some \nbad\t\tfile\r\n.\njar"),
-        ("ADD JAR", "@*#&@(!#@$^*!@^@#(*!@#"),
-        ("SET", "foo=bar"),
-        ("SET", "foo*)(@#^*@&!#^=bar")
+      ("add jar", "file:///tmp/ab/TestUDTF.jar"),
+      ("add jar", "file:///tmp/a@b/TestUDTF.jar"),
+      ("add jar", "c:\\windows32\\TestUDTF.jar"),
+      ("add jar", "some \nbad\t\tfile\r\n.\njar"),
+      ("ADD JAR", "@*#&@(!#@$^*!@^@#(*!@#"),
+      ("SET", "foo=bar"),
+      ("SET", "foo*)(@#^*@&!#^=bar")
     )
     inputs.foreach {
       case (command, arguments) =>

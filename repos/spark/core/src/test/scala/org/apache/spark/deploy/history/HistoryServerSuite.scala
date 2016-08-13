@@ -56,13 +56,19 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * are considered part of Spark's public api.
   */
 class HistoryServerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with MockitoSugar
-    with JsonTestUtils with Eventually with WebBrowser with LocalSparkContext
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with MockitoSugar
+    with JsonTestUtils
+    with Eventually
+    with WebBrowser
+    with LocalSparkContext
     with ResetSystemProperties {
 
   private val logDir = new File("src/test/resources/spark-events")
   private val expRoot = new File(
-      "src/test/resources/HistoryServerExpectations/")
+    "src/test/resources/HistoryServerExpectations/")
 
   private var provider: FsHistoryProvider = null
   private var server: HistoryServer = null
@@ -96,40 +102,40 @@ class HistoryServerSuite
   }
 
   val cases = Seq(
-      "application list json" -> "applications",
-      "completed app list json" -> "applications?status=completed",
-      "running app list json" -> "applications?status=running",
-      "minDate app list json" -> "applications?minDate=2015-02-10",
-      "maxDate app list json" -> "applications?maxDate=2015-02-10",
-      "maxDate2 app list json" -> "applications?maxDate=2015-02-03T16:42:40.000GMT",
-      "one app json" -> "applications/local-1422981780767",
-      "one app multi-attempt json" -> "applications/local-1426533911241",
-      "job list json" -> "applications/local-1422981780767/jobs",
-      "job list from multi-attempt app json(1)" -> "applications/local-1426533911241/1/jobs",
-      "job list from multi-attempt app json(2)" -> "applications/local-1426533911241/2/jobs",
-      "one job json" -> "applications/local-1422981780767/jobs/0",
-      "succeeded job list json" -> "applications/local-1422981780767/jobs?status=succeeded",
-      "succeeded&failed job list json" -> "applications/local-1422981780767/jobs?status=succeeded&status=failed",
-      "executor list json" -> "applications/local-1422981780767/executors",
-      "stage list json" -> "applications/local-1422981780767/stages",
-      "complete stage list json" -> "applications/local-1422981780767/stages?status=complete",
-      "failed stage list json" -> "applications/local-1422981780767/stages?status=failed",
-      "one stage json" -> "applications/local-1422981780767/stages/1",
-      "one stage attempt json" -> "applications/local-1422981780767/stages/1/0",
-      "stage task summary w shuffle write" -> "applications/local-1430917381534/stages/0/0/taskSummary",
-      "stage task summary w shuffle read" -> "applications/local-1430917381534/stages/1/0/taskSummary",
-      "stage task summary w/ custom quantiles" -> "applications/local-1430917381534/stages/0/0/taskSummary?quantiles=0.01,0.5,0.99",
-      "stage task list" -> "applications/local-1430917381534/stages/0/0/taskList",
-      "stage task list w/ offset & length" -> "applications/local-1430917381534/stages/0/0/taskList?offset=10&length=50",
-      "stage task list w/ sortBy" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=DECREASING_RUNTIME",
-      "stage task list w/ sortBy short names: -runtime" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=-runtime",
-      "stage task list w/ sortBy short names: runtime" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=runtime",
-      "stage list with accumulable json" -> "applications/local-1426533911241/1/stages",
-      "stage with accumulable json" -> "applications/local-1426533911241/1/stages/0/0",
-      "stage task list from multi-attempt app json(1)" -> "applications/local-1426533911241/1/stages/0/0/taskList",
-      "stage task list from multi-attempt app json(2)" -> "applications/local-1426533911241/2/stages/0/0/taskList",
-      "rdd list storage json" -> "applications/local-1422981780767/storage/rdd",
-      "one rdd storage json" -> "applications/local-1422981780767/storage/rdd/0"
+    "application list json" -> "applications",
+    "completed app list json" -> "applications?status=completed",
+    "running app list json" -> "applications?status=running",
+    "minDate app list json" -> "applications?minDate=2015-02-10",
+    "maxDate app list json" -> "applications?maxDate=2015-02-10",
+    "maxDate2 app list json" -> "applications?maxDate=2015-02-03T16:42:40.000GMT",
+    "one app json" -> "applications/local-1422981780767",
+    "one app multi-attempt json" -> "applications/local-1426533911241",
+    "job list json" -> "applications/local-1422981780767/jobs",
+    "job list from multi-attempt app json(1)" -> "applications/local-1426533911241/1/jobs",
+    "job list from multi-attempt app json(2)" -> "applications/local-1426533911241/2/jobs",
+    "one job json" -> "applications/local-1422981780767/jobs/0",
+    "succeeded job list json" -> "applications/local-1422981780767/jobs?status=succeeded",
+    "succeeded&failed job list json" -> "applications/local-1422981780767/jobs?status=succeeded&status=failed",
+    "executor list json" -> "applications/local-1422981780767/executors",
+    "stage list json" -> "applications/local-1422981780767/stages",
+    "complete stage list json" -> "applications/local-1422981780767/stages?status=complete",
+    "failed stage list json" -> "applications/local-1422981780767/stages?status=failed",
+    "one stage json" -> "applications/local-1422981780767/stages/1",
+    "one stage attempt json" -> "applications/local-1422981780767/stages/1/0",
+    "stage task summary w shuffle write" -> "applications/local-1430917381534/stages/0/0/taskSummary",
+    "stage task summary w shuffle read" -> "applications/local-1430917381534/stages/1/0/taskSummary",
+    "stage task summary w/ custom quantiles" -> "applications/local-1430917381534/stages/0/0/taskSummary?quantiles=0.01,0.5,0.99",
+    "stage task list" -> "applications/local-1430917381534/stages/0/0/taskList",
+    "stage task list w/ offset & length" -> "applications/local-1430917381534/stages/0/0/taskList?offset=10&length=50",
+    "stage task list w/ sortBy" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=DECREASING_RUNTIME",
+    "stage task list w/ sortBy short names: -runtime" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=-runtime",
+    "stage task list w/ sortBy short names: runtime" -> "applications/local-1430917381534/stages/0/0/taskList?sortBy=runtime",
+    "stage list with accumulable json" -> "applications/local-1426533911241/1/stages",
+    "stage with accumulable json" -> "applications/local-1426533911241/1/stages/0/0",
+    "stage task list from multi-attempt app json(1)" -> "applications/local-1426533911241/1/stages/0/0/taskList",
+    "stage task list from multi-attempt app json(2)" -> "applications/local-1426533911241/2/stages/0/0/taskList",
+    "rdd list storage json" -> "applications/local-1422981780767/storage/rdd",
+    "one rdd storage json" -> "applications/local-1422981780767/storage/rdd/0"
   )
 
   // run a bunch of characterization tests -- just verify the behavior is the same as what is saved
@@ -160,10 +166,11 @@ class HistoryServerSuite
             jsonOrg
           }
 
-        val exp = IOUtils.toString(new FileInputStream(
-                new File(expRoot,
-                         HistoryServerSuite.sanitizePath(name) +
-                         "_expectation.json")))
+        val exp = IOUtils.toString(
+          new FileInputStream(
+            new File(expRoot,
+                     HistoryServerSuite.sanitizePath(name) +
+                       "_expectation.json")))
         // compare the ASTs so formatting differences don't cause failures
         import org.json4s._
         import org.json4s.jackson.JsonMethods._
@@ -214,8 +221,8 @@ class HistoryServerSuite
           new File(logDir, entry.getName)
         }
         val expected = Files.toString(expectedFile, StandardCharsets.UTF_8)
-        val actual = new String(
-            ByteStreams.toByteArray(zipStream), StandardCharsets.UTF_8)
+        val actual = new String(ByteStreams.toByteArray(zipStream),
+                                StandardCharsets.UTF_8)
         actual should be(expected)
         filesCompared += 1
       }
@@ -238,7 +245,7 @@ class HistoryServerSuite
       getContentAndCode("applications/local-1422981780767/stages/1/1")
     badStageAttemptId._1 should be(HttpServletResponse.SC_NOT_FOUND)
     badStageAttemptId._3 should be(
-        Some("unknown attempt for stage 1.  Found attempts: [0]"))
+      Some("unknown attempt for stage 1.  Found attempts: [0]"))
 
     val badStageId2 =
       getContentAndCode("applications/local-1422981780767/stages/flimflam")
@@ -246,11 +253,11 @@ class HistoryServerSuite
     // will take some mucking w/ jersey to get a better error msg in this case
 
     val badQuantiles = getContentAndCode(
-        "applications/local-1430917381534/stages/0/0/taskSummary?quantiles=foo,0.1")
+      "applications/local-1430917381534/stages/0/0/taskSummary?quantiles=foo,0.1")
     badQuantiles._1 should be(HttpServletResponse.SC_BAD_REQUEST)
     badQuantiles._3 should be(
-        Some("Bad value for parameter \"quantiles\".  Expected a double, " +
-            "got \"foo\""))
+      Some("Bad value for parameter \"quantiles\".  Expected a double, " +
+        "got \"foo\""))
 
     getContentAndCode("foobar")._1 should be(HttpServletResponse.SC_NOT_FOUND)
   }
@@ -265,8 +272,8 @@ class HistoryServerSuite
     // when
     System.setProperty("spark.ui.proxyBase", uiRoot)
     val response = page.render(request)
-    System.setProperty(
-        "spark.ui.proxyBase", Option(proxyBaseBeforeTest).getOrElse(""))
+    System.setProperty("spark.ui.proxyBase",
+                       Option(proxyBaseBeforeTest).getOrElse(""))
 
     // then
     val urls = response \\ "@href" map (_.toString)
@@ -303,8 +310,8 @@ class HistoryServerSuite
 
     def listDir(dir: Path): Seq[FileStatus] = {
       val statuses = fs.listStatus(dir)
-      statuses.flatMap(
-          stat => if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
+      statuses.flatMap(stat =>
+        if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
     }
 
     def dumpLogDir(msg: String = ""): Unit = {
@@ -330,7 +337,8 @@ class HistoryServerSuite
       val actual = counter.getCount
       if (actual != expected) {
         // this is here because Scalatest loses stack depth
-        fail(s"Wrong $name value - expected $expected but got $actual" +
+        fail(
+          s"Wrong $name value - expected $expected but got $actual" +
             s" in metrics\n$metrics")
       }
     }
@@ -396,15 +404,14 @@ class HistoryServerSuite
         case JNothing => Seq()
         case apps: JArray =>
           apps
-            .filter(app =>
-                  {
-                (app \ "attempts") match {
-                  case attempts: JArray =>
-                    val state = (attempts.children.head \ "completed")
-                      .asInstanceOf[JBool]
-                    state.value == completed
-                  case _ => false
-                }
+            .filter(app => {
+              (app \ "attempts") match {
+                case attempts: JArray =>
+                  val state =
+                    (attempts.children.head \ "completed").asInstanceOf[JBool]
+                  state.value == completed
+                case _ => false
+              }
             })
             .map(app => (app \ "id").asInstanceOf[JString].values)
         case _ => Seq()
@@ -424,8 +431,8 @@ class HistoryServerSuite
     getNumJobs("") should be(1)
     getNumJobs("/jobs") should be(1)
     getNumJobsRestful() should be(1)
-    assert(
-        metrics.lookupCount.getCount > 1, s"lookup count too low in $metrics")
+    assert(metrics.lookupCount.getCount > 1,
+           s"lookup count too low in $metrics")
 
     // dump state before the next bit of test, which is where update
     // checking really gets stressed
@@ -440,11 +447,11 @@ class HistoryServerSuite
     logDebug("waiting for UI to update")
     eventually(stdTimeout, stdInterval) {
       assert(
-          2 === getNumJobs(""),
-          s"jobs not updated, server=$server\n dir = ${listDir(logDirPath)}")
+        2 === getNumJobs(""),
+        s"jobs not updated, server=$server\n dir = ${listDir(logDirPath)}")
       assert(
-          2 === getNumJobs("/jobs"),
-          s"job count under /jobs not updated, server=$server\n dir = ${listDir(logDirPath)}")
+        2 === getNumJobs("/jobs"),
+        s"job count under /jobs not updated, server=$server\n dir = ${listDir(logDirPath)}")
       getNumJobsRestful() should be(2)
     }
 
@@ -484,7 +491,7 @@ class HistoryServerSuite
       path: String,
       port: Int = port): (Int, Option[String], Option[String]) = {
     HistoryServerSuite.getContentAndCode(
-        new URL(s"http://localhost:$port/api/v1/$path"))
+      new URL(s"http://localhost:$port/api/v1/$path"))
   }
 
   def getUrl(path: String): String = {
@@ -498,7 +505,8 @@ class HistoryServerSuite
   def generateExpectation(name: String, path: String): Unit = {
     val json = getUrl(path)
     val file = new File(
-        expRoot, HistoryServerSuite.sanitizePath(name) + "_expectation.json")
+      expRoot,
+      HistoryServerSuite.sanitizePath(name) + "_expectation.json")
     val out = new FileWriter(file)
     out.write(json)
     out.close()
@@ -561,7 +569,7 @@ object HistoryServerSuite {
       resultOpt.get
     } else {
       throw new RuntimeException(
-          "got code: " + code + " when getting " + path + " w/ error: " +
+        "got code: " + code + " when getting " + path + " w/ error: " +
           error)
     }
   }

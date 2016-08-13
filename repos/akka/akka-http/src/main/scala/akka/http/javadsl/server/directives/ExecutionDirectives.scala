@@ -19,8 +19,8 @@ abstract class ExecutionDirectives extends CookieDirectives {
   def handleExceptions(handler: ExceptionHandler,
                        innerRoute: Route,
                        moreInnerRoutes: Route*): Route =
-    RouteStructure.HandleExceptions(handler)(
-        innerRoute, moreInnerRoutes.toList)
+    RouteStructure.HandleExceptions(handler)(innerRoute,
+                                             moreInnerRoutes.toList)
 
   /**
     * Handles rejections in the inner routes using the specified handler.
@@ -29,8 +29,8 @@ abstract class ExecutionDirectives extends CookieDirectives {
   def handleRejections(handler: RejectionHandler,
                        innerRoute: Route,
                        moreInnerRoutes: Route*): Route =
-    RouteStructure.HandleRejections(handler)(
-        innerRoute, moreInnerRoutes.toList)
+    RouteStructure.HandleRejections(handler)(innerRoute,
+                                             moreInnerRoutes.toList)
 
   /**
     * Handles rejections of the given type in the inner routes using the specified handler.
@@ -43,7 +43,8 @@ abstract class ExecutionDirectives extends CookieDirectives {
     RouteStructure.HandleRejections(new RejectionHandler {
       implicit def tTag: ClassTag[T] = ClassTag(tClass)
       override def handleCustomRejection(
-          ctx: RequestContext, rejection: CustomRejection): RouteResult =
+          ctx: RequestContext,
+          rejection: CustomRejection): RouteResult =
         rejection match {
           case t: T ⇒ handler.apply(ctx, t)
           case _ ⇒ passRejection()

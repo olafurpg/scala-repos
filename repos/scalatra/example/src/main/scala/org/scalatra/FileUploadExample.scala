@@ -1,27 +1,33 @@
 package org.scalatra
 
-import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+import org.scalatra.servlet.{
+  FileUploadSupport,
+  MultipartConfig,
+  SizeConstraintExceededException
+}
 
 import scala.xml.Node
 
 class FileUploadExample
-    extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
+    extends ScalatraServlet
+    with FileUploadSupport
+    with FlashMapSupport {
   configureMultipartHandling(
-      MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
+    MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
   def displayPage(content: Seq[Node]) =
-    Template.page(
-        "File upload example", content, url(_, includeServletPath = false))
+    Template
+      .page("File upload example", content, url(_, includeServletPath = false))
 
   error {
     case e: SizeConstraintExceededException =>
       RequestEntityTooLarge(
-          displayPage(<p>The file you uploaded exceeded the 3 MB limit.</p>))
+        displayPage(<p>The file you uploaded exceeded the 3 MB limit.</p>))
   }
 
   get("/") {
     displayPage(
-        <form action={ url("/upload", includeServletPath = false) } method="post" enctype="multipart/form-data">
+      <form action={ url("/upload", includeServletPath = false) } method="post" enctype="multipart/form-data">
         <p>File to upload: <input type="file" name="file"/></p>
         <p><input type="submit" value="Upload"/></p>
       </form>
@@ -40,9 +46,9 @@ class FileUploadExample
       case Some(file) =>
         Ok(file.get(),
            Map(
-               "Content-Type" ->
+             "Content-Type" ->
                (file.contentType.getOrElse("application/octet-stream")),
-               "Content-Disposition" ->
+             "Content-Disposition" ->
                ("attachment; filename=\"" + file.name + "\"")
            ))
 

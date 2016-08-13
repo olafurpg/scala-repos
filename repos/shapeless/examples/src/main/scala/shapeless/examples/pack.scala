@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Miles Sabin 
+ * Copyright (c) 2012 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package shapeless.examples
 
 /**
   * Demonstration of automatic packaging of multiple type class instances at call sites and
-  * automatic unpackaging of them at call targets. 
-  * 
+  * automatic unpackaging of them at call targets.
+  *
   * @author Miles Sabin
   */
 object PackExamples extends App {
@@ -34,10 +34,11 @@ object PackExamples extends App {
     implicit def packHNil[F[_]]: PNil[F] = PNil[F]()
 
     implicit def packHList[F[_], H, T <: HList](
-        implicit fh: F[H], pt: Pack[F, T]): Pack[F, H :: T] = PCons(fh, pt)
+        implicit fh: F[H],
+        pt: Pack[F, T]): Pack[F, H :: T] = PCons(fh, pt)
 
-    implicit def unpack[F[_], E, L <: HList](
-        implicit pack: Pack[F, L], unpack: Unpack[F, L, E]): F[E] =
+    implicit def unpack[F[_], E, L <: HList](implicit pack: Pack[F, L],
+                                             unpack: Unpack[F, L, E]): F[E] =
       unpack(pack)
 
     trait Unpack[F[_], L <: HList, E] {
@@ -70,8 +71,8 @@ object PackExamples extends App {
       type Aux[F[_], L <: HList, H0, T0 <: HList] = IsPCons[F, L] {
         type H = H0; type T = T0
       }
-      implicit def hlistIsPCons[F[_], H0, T0 <: HList]: Aux[
-          F, H0 :: T0, H0, T0] =
+      implicit def hlistIsPCons[F[_], H0, T0 <: HList]
+        : Aux[F, H0 :: T0, H0, T0] =
         new IsPCons[F, H0 :: T0] {
           type H = H0
           type T = T0

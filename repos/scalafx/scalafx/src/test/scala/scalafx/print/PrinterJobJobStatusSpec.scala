@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrinterMarginTypeSpec
     extends SFXEnumDelegateSpec[jfxp.Printer.MarginType, Printer.MarginType](
-        javaClass = classOf[jfxp.Printer.MarginType],
-        scalaClass = classOf[Printer.MarginType],
-        companion = Printer.MarginType)
+      javaClass = classOf[jfxp.Printer.MarginType],
+      scalaClass = classOf[Printer.MarginType],
+      companion = Printer.MarginType)

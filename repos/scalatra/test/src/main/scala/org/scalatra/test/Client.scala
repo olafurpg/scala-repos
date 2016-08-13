@@ -63,10 +63,10 @@ trait Client extends ImplicitConversions {
               params: Iterable[(String, String)],
               headers: Map[String, String])(f: => A): A =
     post(
-        uri,
-        toQueryString(params).getBytes("UTF-8"),
-        Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
-        f)
+      uri,
+      toQueryString(params).getBytes("UTF-8"),
+      Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
+      f)
   def post[A](uri: String,
               body: Array[Byte] = Array(),
               headers: Iterable[(String, String)] = Seq.empty)(f: => A): A =
@@ -88,10 +88,11 @@ trait Client extends ImplicitConversions {
   def put[A](uri: String,
              params: Iterable[(String, String)],
              headers: Map[String, String])(f: => A): A =
-    put(uri,
-        toQueryString(params).getBytes("UTF-8"),
-        Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
-        f)
+    put(
+      uri,
+      toQueryString(params).getBytes("UTF-8"),
+      Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
+      f)
   def put[A](uri: String,
              body: Array[Byte] = Array(),
              headers: Iterable[(String, String)] = Seq.empty)(f: => A) =
@@ -134,10 +135,10 @@ trait Client extends ImplicitConversions {
                params: Iterable[(String, String)],
                headers: Iterable[(String, String)])(f: => A): A =
     patch(
-        uri,
-        toQueryString(params).getBytes("UTF-8"),
-        Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
-        f)
+      uri,
+      toQueryString(params).getBytes("UTF-8"),
+      Seq("Content-Type" -> "application/x-www-form-urlencoded; charset=utf-8") ++ headers)(
+      f)
   def patch[A](uri: String,
                body: Array[Byte] = Array(),
                headers: Iterable[(String, String)] = Seq.empty)(f: => A): A =

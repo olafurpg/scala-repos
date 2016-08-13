@@ -54,14 +54,14 @@ class ScriptRunner extends HasCompileSocket {
 
   /** Choose a jar filename to hold the compiled version of a script. */
   private def jarFileFor(scriptFile: String) = File(
-      if (scriptFile endsWith ".jar") scriptFile
-      else scriptFile.stripSuffix(".scala") + ".jar"
+    if (scriptFile endsWith ".jar") scriptFile
+    else scriptFile.stripSuffix(".scala") + ".jar"
   )
 
   /** Compile a script using the fsc compilation daemon.
     */
-  private def compileWithDaemon(
-      settings: GenericRunnerSettings, scriptFileIn: String) = {
+  private def compileWithDaemon(settings: GenericRunnerSettings,
+                                scriptFileIn: String) = {
     val scriptFile = Path(scriptFileIn).toAbsolute.path
     val compSettingNames =
       new Settings(sys.error).visibleSettings.toList map (_.name)
@@ -86,8 +86,8 @@ class ScriptRunner extends HasCompileSocket {
     * @return true if compilation and the handler succeeds, false otherwise.
     */
   private def withCompiledScript(
-      settings: GenericRunnerSettings, scriptFile: String)(
-      handler: String => Boolean): Boolean = {
+      settings: GenericRunnerSettings,
+      scriptFile: String)(handler: String => Boolean): Boolean = {
     def mainClass = scriptMain(settings)
 
     /* Compiles the script file, and returns the directory with the compiled
@@ -143,7 +143,8 @@ class ScriptRunner extends HasCompileSocket {
                 // running an empty script should succeed
                 true
               } else {
-                try io.Jar.create(jarFile, compiledPath, mainClass) catch {
+                try io.Jar.create(jarFile, compiledPath, mainClass)
+                catch {
                   case _: Exception => jarFile.delete()
                 }
 
@@ -202,7 +203,8 @@ class ScriptRunner extends HasCompileSocket {
       settings: GenericRunnerSettings,
       scriptFile: String,
       scriptArgs: List[String]): Either[Throwable, Boolean] = {
-    try Right(runScript(settings, scriptFile, scriptArgs)) catch {
+    try Right(runScript(settings, scriptFile, scriptArgs))
+    catch {
       case e: Throwable => Left(unwrap(e))
     }
   }

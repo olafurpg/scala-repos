@@ -42,8 +42,7 @@ object Test2 extends A2 with B2
 // TEST 3
 // self-type is singleton type
 
-trait B3 {
-  this: Test3.type =>
+trait B3 { this: Test3.type =>
 
   def y = new { def f() = println("Success 3") }
   def fail() = {

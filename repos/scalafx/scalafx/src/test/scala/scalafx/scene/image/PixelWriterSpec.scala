@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PixelWriterSpec
     extends SimpleSFXDelegateSpec[jfxsi.PixelWriter, PixelWriter](
-        classOf[jfxsi.PixelWriter], classOf[PixelWriter]) {
+      classOf[jfxsi.PixelWriter],
+      classOf[PixelWriter]) {
 
   override protected def getScalaClassInstance = new PixelWriter {
     override val delegate = getJavaClassInstance

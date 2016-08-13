@@ -121,7 +121,7 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
 
     val writeMajority = WriteMajority(timeout = 5.seconds)
     replicator ! Update(Set2Key, ORSet.empty[String], writeMajority)(
-        _ + "hello")
+      _ + "hello")
 
     val writeAll = WriteAll(timeout = 5.seconds)
     replicator ! Update(ActiveFlagKey, Flag.empty, writeAll)(_.switchOn)

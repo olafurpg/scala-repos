@@ -34,10 +34,19 @@ import java.util
   * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
   */
-final class Well19937a protected[random](state: Array[Int], i0: Int)
+final class Well19937a protected[random] (state: Array[Int], i0: Int)
     extends IntBasedGenerator {
 
-  import Well19937a.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3pos}
+  import Well19937a.{
+    UpperMask,
+    LowerMask,
+    R,
+    BYTES,
+    mat0pos,
+    mat0neg,
+    mat1,
+    mat3pos
+  }
 
   private var i: Int = i0
 
@@ -75,7 +84,8 @@ final class Well19937a protected[random](state: Array[Int], i0: Int)
 
     state(i) = z1 ^ z2
     state(vrm1(i)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(
-        21, state(i))
+        21,
+        state(i))
     i = vrm1(i)
 
     state(i)

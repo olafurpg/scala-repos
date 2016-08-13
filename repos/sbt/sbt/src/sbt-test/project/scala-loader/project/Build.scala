@@ -20,6 +20,6 @@ object Build extends Build {
 
   def newProject(i: Int): Project =
     Project("x" + i.toString, file(i.toString)).settings(
-        scalaVersion := "2.9.2" // this should be a Scala version different from the one sbt uses
+      scalaVersion := "2.9.2" // this should be a Scala version different from the one sbt uses
     )
 }

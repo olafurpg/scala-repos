@@ -11,7 +11,10 @@ import akka.http.impl.util._
 import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsRejected, CredentialsMissing}
+import akka.http.scaladsl.server.AuthenticationFailedRejection.{
+  CredentialsRejected,
+  CredentialsMissing
+}
 
 import scala.util.{Try, Success}
 
@@ -62,8 +65,8 @@ trait SecurityDirectives {
   def authenticateBasic[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateBasicAsync(
-        realm, cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateBasicAsync(realm,
+                           cred ⇒ FastFuture.successful(authenticator(cred)))
 
   /**
     * Wraps the inner route with Http Basic authentication support.
@@ -117,8 +120,8 @@ trait SecurityDirectives {
   def authenticateOAuth2[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateOAuth2Async(
-        realm, cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateOAuth2Async(realm,
+                            cred ⇒ FastFuture.successful(authenticator(cred)))
 
   /**
     * A directive that wraps the inner route with OAuth2 Bearer Token authentication support.
@@ -182,7 +185,7 @@ trait SecurityDirectives {
             val cause =
               if (cred.isEmpty) CredentialsMissing else CredentialsRejected
             reject(AuthenticationFailedRejection(cause, challenge)): Directive1[
-                T]
+              T]
         }
       }
     }
@@ -191,11 +194,11 @@ trait SecurityDirectives {
     * Lifts an authenticator function into a directive. Same as `authenticateOrRejectWithChallenge`
     * but only applies the authenticator function with a certain type of credentials.
     */
-  def authenticateOrRejectWithChallenge[C <: HttpCredentials : ClassTag, T](
+  def authenticateOrRejectWithChallenge[C <: HttpCredentials: ClassTag, T](
       authenticator: Option[C] ⇒ Future[AuthenticationResult[T]])
     : AuthenticationDirective[T] =
-    authenticateOrRejectWithChallenge[T](
-        cred ⇒ authenticator(cred collect { case c: C ⇒ c }))
+    authenticateOrRejectWithChallenge[T](cred ⇒
+      authenticator(cred collect { case c: C ⇒ c }))
 
   /**
     * Applies the given authorization check to the request.
@@ -273,7 +276,7 @@ object Credentials {
         }
       case Some(GenericHttpCredentials(scheme, token, params)) ⇒
         throw new UnsupportedOperationException(
-            "cannot verify generic HTTP credentials")
+          "cannot verify generic HTTP credentials")
       case None ⇒ Credentials.Missing
     }
   }

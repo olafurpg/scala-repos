@@ -17,7 +17,13 @@
 package net.liftweb
 package http
 
-import java.io.{InputStream, ByteArrayInputStream, File, FileInputStream, FileOutputStream}
+import java.io.{
+  InputStream,
+  ByteArrayInputStream,
+  File,
+  FileInputStream,
+  FileOutputStream
+}
 import scala.xml._
 
 import common._
@@ -50,7 +56,7 @@ object UserAgentCalculator extends Factory {
       ieMatch = iePattern.pattern.matcher(userAgent)
       findResult = ieMatch.find if findResult
       ieVersionString <- Box.legacyNullTest(ieMatch.group(2)) or Box
-        .legacyNullTest(ieMatch.group(3))
+                          .legacyNullTest(ieMatch.group(3))
       ver <- Helpers.asDouble(ieVersionString)
     } yield ver
 
@@ -65,7 +71,7 @@ object UserAgentCalculator extends Factory {
     */
   object safariCalcFunction
       extends FactoryMaker[Box[String] => Box[Double]](
-          defaultSafariCalcFunction _)
+        defaultSafariCalcFunction _)
 
   /**
     * The built-in mechanism for calculating Safari
@@ -88,7 +94,7 @@ object UserAgentCalculator extends Factory {
     */
   object firefoxCalcFunction
       extends FactoryMaker[Box[String] => Box[Double]](
-          defaultFirefoxCalcFunction _)
+        defaultFirefoxCalcFunction _)
 
   /**
     * The built-in mechanism for calculating Firefox
@@ -111,7 +117,7 @@ object UserAgentCalculator extends Factory {
     */
   object chromeCalcFunction
       extends FactoryMaker[Box[String] => Box[Double]](
-          defaultChromeCalcFunction _)
+        defaultChromeCalcFunction _)
 
   /**
     * You can change the mechanism by which Lift calculates
@@ -168,15 +174,17 @@ trait UserAgentCalculator {
     * Is the Req coming from an iPhone
     */
   lazy val isIPhone: Boolean =
-    UserAgentCalculator.iPhoneCalcFunction.vend.map(_.apply(userAgent)) openOr isSafari &&
-    (userAgent.map(s => s.indexOf("(iPhone") >= 0) openOr false)
+    UserAgentCalculator.iPhoneCalcFunction.vend
+      .map(_.apply(userAgent)) openOr isSafari &&
+      (userAgent.map(s => s.indexOf("(iPhone") >= 0) openOr false)
 
   /**
     * Is the Req coming from an iPad
     */
   lazy val isIPad: Boolean =
-    UserAgentCalculator.iPadCalcFunction.vend.map(_.apply(userAgent)) openOr isSafari &&
-    (userAgent.map(s => s.indexOf("(iPad") >= 0) openOr false)
+    UserAgentCalculator.iPadCalcFunction.vend
+      .map(_.apply(userAgent)) openOr isSafari &&
+      (userAgent.map(s => s.indexOf("(iPad") >= 0) openOr false)
 
   lazy val firefoxVersion: Box[Double] =
     UserAgentCalculator.firefoxCalcFunction.vend.apply(userAgent)
@@ -237,7 +245,8 @@ final case class NormalParamHolder(name: String, value: String)
 abstract class FileParamHolder(val name: String,
                                val mimeType: String,
                                val fileName: String)
-    extends ParamHolder with Serializable {
+    extends ParamHolder
+    with Serializable {
 
   /**
     * Returns the contents of the uploaded file as a Byte array.
@@ -342,8 +351,10 @@ object OnDiskFileParamHolder {
 }
 
 object FileParamHolder {
-  def apply(
-      n: String, mt: String, fn: String, file: Array[Byte]): FileParamHolder =
+  def apply(n: String,
+            mt: String,
+            fn: String,
+            file: Array[Byte]): FileParamHolder =
     new InMemFileParamHolder(n, mt, fn, file)
 
   def unapply(in: Any): Option[(String, String, String, Array[Byte])] =
@@ -387,11 +398,11 @@ object Req {
             statelessTest: List[LiftRules.StatelessTestPF],
             otherStatelessTest: List[LiftRules.StatelessReqTestPF]): Req = {
 
-    def processRewrite(
-        path: ParsePath, params: Map[String, String]): RewriteResponse =
+    def processRewrite(path: ParsePath,
+                       params: Map[String, String]): RewriteResponse =
       NamedPF.applyBox(
-          RewriteRequest(path, original.requestType, original.request),
-          rewrite) match {
+        RewriteRequest(path, original.requestType, original.request),
+        rewrite) match {
         case Full(resp @ RewriteResponse(_, _, true)) => resp
         case _: EmptyBox => RewriteResponse(path, params)
         case Full(resp) => processRewrite(resp.path, params ++ resp.params)
@@ -403,8 +414,8 @@ object Req {
 
     val stateless =
       NamedPF.applyBox(
-          StatelessReqTest(wholePath, original.request),
-          otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
+        StatelessReqTest(wholePath, original.request),
+        otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
 
     new Req(rewritten.path,
             original.contextPath,
@@ -433,13 +444,14 @@ object Req {
       LiftRules.calculateContextPath() openOr request.contextPath
     val turi =
       if (request.uri.length >= contextPath.length)
-        request.uri.substring(contextPath.length) else ""
+        request.uri.substring(contextPath.length)
+      else ""
     val tmpUri = if (turi.length > 0) turi else "/"
 
     val tmpPath = parsePath(tmpUri)
 
-    def processRewrite(
-        path: ParsePath, params: Map[String, String]): RewriteResponse =
+    def processRewrite(path: ParsePath,
+                       params: Map[String, String]): RewriteResponse =
       NamedPF.applyBox(RewriteRequest(path, reqType, request), rewrite) match {
         case Full(resp @ RewriteResponse(_, _, true)) => resp
         case _: EmptyBox => RewriteResponse(path, params)
@@ -450,9 +462,9 @@ object Req {
     val rewritten = processRewrite(tmpPath, Map.empty)
 
     val localParams: Map[String, List[String]] = Map(
-        rewritten.params.toList.map {
-      case (name, value) => name -> List(value)
-    }: _*)
+      rewritten.params.toList.map {
+        case (name, value) => name -> List(value)
+      }: _*)
 
     // val session = request.getSession
     //  val body = ()
@@ -467,15 +479,16 @@ object Req {
       val params: List[(String, String)] = for {
         queryString <- request.queryString.toList
         nameVal <- queryString
-          .split("&")
-          .toList
-          .map(_.trim)
-          .filter(_.length > 0)
-          (name, value) <- nameVal.split("=").toList match {
-          case Nil => Empty
-          case n :: v :: _ => Full((urlDecode(n), urlDecode(v)))
-          case n :: _ => Full((urlDecode(n), ""))
-        }
+                    .split("&")
+                    .toList
+                    .map(_.trim)
+                    .filter(_.length > 0)
+        (name, value) <- nameVal.split("=").toList match {
+                          case Nil => Empty
+                          case n :: v :: _ =>
+                            Full((urlDecode(n), urlDecode(v)))
+                          case n :: _ => Full((urlDecode(n), ""))
+                        }
       } yield (name, value)
 
       val names: List[String] = params.map(_._1).distinct
@@ -489,75 +502,72 @@ object Req {
     }
 
     // make this a thunk so it only gets calculated once
-    val paramCalcInfo: AvoidGAL = new AvoidGAL(
-        () =>
-          {
-        // post/put of XML or JSON... eagerly read the stream
-        if ((reqType.post_? || reqType.put_?) && contentType.dmap(false) {
-              _.toLowerCase match {
-                case x =>
-                  x.startsWith("text/xml") ||
+    val paramCalcInfo: AvoidGAL = new AvoidGAL(() => {
+      // post/put of XML or JSON... eagerly read the stream
+      if ((reqType.post_? || reqType.put_?) && contentType.dmap(false) {
+            _.toLowerCase match {
+              case x =>
+                x.startsWith("text/xml") ||
                   x.startsWith("application/xml") ||
                   x.startsWith("text/json") || x.startsWith("application/json")
-              }
-            }) {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Full(BodyOrInputStream(request.inputStream)))
-          // it's multipart
-        } else if (request.multipartContent_?) {
-          val allInfo = request.extractFiles
+            }
+          }) {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Full(BodyOrInputStream(request.inputStream)))
+        // it's multipart
+      } else if (request.multipartContent_?) {
+        val allInfo = request.extractFiles
 
-          val normal: List[NormalParamHolder] = allInfo.flatMap {
-            case v: NormalParamHolder => List(v)
-            case _ => Nil
-          }
-
-          val files: List[FileParamHolder] = allInfo.flatMap {
-            case v: FileParamHolder => List(v)
-            case _ => Nil
-          }
-
-          val params = normal.foldLeft(eMap)((a, b) =>
-                a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
-
-          ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
-                        queryStringParam._2 ++ localParams ++ params,
-                        files,
-                        Empty)
-          // it's a GET
-        } else if (reqType.get_?) {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Empty)
-        } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
-                           "application/x-www-form-urlencoded"))) {
-          val params =
-            localParams ++(request.params.sortWith { (s1, s2) =>
-              s1.name < s2.name
-            }).map(n => (n.name, n.values))
-          ParamCalcInfo(request.paramNames, params, Nil, Empty)
-        } else {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Full(BodyOrInputStream(request.inputStream)))
+        val normal: List[NormalParamHolder] = allInfo.flatMap {
+          case v: NormalParamHolder => List(v)
+          case _ => Nil
         }
+
+        val files: List[FileParamHolder] = allInfo.flatMap {
+          case v: FileParamHolder => List(v)
+          case _ => Nil
+        }
+
+        val params = normal.foldLeft(eMap)((a, b) =>
+          a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
+
+        ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
+                      queryStringParam._2 ++ localParams ++ params,
+                      files,
+                      Empty)
+        // it's a GET
+      } else if (reqType.get_?) {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Empty)
+      } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
+                   "application/x-www-form-urlencoded"))) {
+        val params =
+          localParams ++ (request.params.sortWith { (s1, s2) =>
+            s1.name < s2.name
+          }).map(n => (n.name, n.values))
+        ParamCalcInfo(request.paramNames, params, Nil, Empty)
+      } else {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Full(BodyOrInputStream(request.inputStream)))
+      }
     })
 
-    val paramCalculator: () => ParamCalcInfo = () =>
-      {
-        paramCalcInfo.thunk
+    val paramCalculator: () => ParamCalcInfo = () => {
+      paramCalcInfo.thunk
     }
 
     val wholePath = rewritten.path.wholePath
 
     val stateless =
       NamedPF.applyBox(
-          StatelessReqTest(wholePath, request),
-          otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
+        StatelessReqTest(wholePath, request),
+        otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
 
     new Req(rewritten.path,
             contextPath,
@@ -594,8 +604,7 @@ object Req {
     }
 
   def parsePath(in: String): ParsePath = {
-    val p1 = fixURI(
-        (in match {
+    val p1 = fixURI((in match {
       case null => "/"; case s if s.length == 0 => "/"; case s => s
     }).replaceAll("/+", "/"))
     val front = p1.startsWith("/")
@@ -626,16 +635,17 @@ object Req {
     val updated =
       if (hv.startsWith("/") && !hv.startsWith("//") &&
           !LiftRules.excludePathFromContextPathRewriting.vend(hv))
-        contextPath + hv else hv
+        contextPath + hv
+      else hv
 
     Text(
-        if (fixURL && rewrite.isDefined && !updated.startsWith("mailto:") &&
-            !updated.startsWith("javascript:") &&
-            !updated.startsWith("http://") &&
-            !updated.startsWith("https://") && !updated.startsWith("//") &&
-            !updated.startsWith("#"))
-          rewrite.openOrThrowException("legacy code").apply(updated)
-        else updated)
+      if (fixURL && rewrite.isDefined && !updated.startsWith("mailto:") &&
+          !updated.startsWith("javascript:") &&
+          !updated.startsWith("http://") &&
+          !updated.startsWith("https://") && !updated.startsWith("//") &&
+          !updated.startsWith("#"))
+        rewrite.openOrThrowException("legacy code").apply(updated)
+      else updated)
   }
 
   @deprecated("Use normalizeHtml instead.", "3.0.0")
@@ -653,9 +663,9 @@ object Req {
       if (attrs == Null) Null
       else if (attrs.key == toFix) {
         new UnprefixedAttribute(
-            toFix,
-            Req.normalizeHref(contextPath, attrs.value, fixURL, rewrite),
-            fixAttrs(toFix, attrs.next, fixURL))
+          toFix,
+          Req.normalizeHref(contextPath, attrs.value, fixURL, rewrite),
+          fixAttrs(toFix, attrs.next, fixURL))
       } else attrs.copy(fixAttrs(toFix, attrs.next, fixURL))
     }
 
@@ -707,12 +717,12 @@ object Req {
 
   private[liftweb] def defaultCreateNotFound(in: Req) =
     XhtmlResponse(
-        ( <html> <body>The Requested URL {in.contextPath + in.uri} was not found on this server</body> </html>),
-        LiftRules.htmlProperties.vend(in).docType,
-        List("Content-Type" -> "text/html; charset=utf-8"),
-        Nil,
-        404,
-        S.legacyIeCompatibilityMode)
+      (<html> <body>The Requested URL {in.contextPath + in.uri} was not found on this server</body> </html>),
+      LiftRules.htmlProperties.vend(in).docType,
+      List("Content-Type" -> "text/html; charset=utf-8"),
+      Nil,
+      404,
+      S.legacyIeCompatibilityMode)
 
   def unapply(in: Req): Option[(List[String], String, RequestType)] =
     Some((in.path.partPath, in.path.suffix, in.requestType))
@@ -786,7 +796,7 @@ final case class ContentType(theType: String,
     */
   def matches(contentType: (String, String)): Boolean =
     (theType == "*" || (theType == contentType._1)) &&
-    (subtype == "*" || subtype == contentType._2)
+      (subtype == "*" || subtype == contentType._2)
 
   /**
     * Is it a wildcard
@@ -807,7 +817,10 @@ object ContentType {
     */
   def parse(str: String): List[ContentType] =
     (for {
-      (part, index) <- str.charSplit(',').map(_.trim).zipWithIndex // split at comma
+      (part, index) <- str
+                        .charSplit(',')
+                        .map(_.trim)
+                        .zipWithIndex // split at comma
       content <- parseIt(part, index)
     } yield content).sortWith(_ < _)
 
@@ -834,13 +847,13 @@ object ContentType {
   private def parseIt(content: String, index: Int): Box[ContentType] =
     content.roboSplit(";") match {
       case TwoType(typ, subType) :: xs => {
-          val kv = xs.flatMap(EqualsSplit.unapply) // get the key/value pairs
-          val q: Box[Double] = first(kv) {
-            case (k, v) if k == "q" => Helpers.asDouble(v)
-            case _ => Empty
-          }
-          Full(ContentType(typ, subType, index, q, kv.filter { _._1 != "q" }))
+        val kv = xs.flatMap(EqualsSplit.unapply) // get the key/value pairs
+        val q: Box[Double] = first(kv) {
+          case (k, v) if k == "q" => Helpers.asDouble(v)
+          case _ => Empty
         }
+        Full(ContentType(typ, subType, index, q, kv.filter { _._1 != "q" }))
+      }
 
       case _ => Empty
     }
@@ -859,10 +872,11 @@ class Req(val path: ParsePath,
           _stateless_? : Boolean,
           private[http] val paramCalculator: () => ParamCalcInfo,
           private[http] val addlParams: Map[String, String])
-    extends HasParams with UserAgentCalculator {
+    extends HasParams
+    with UserAgentCalculator {
   override def toString =
     "Req(" + paramNames + ", " + params + ", " + path + ", " + contextPath +
-    ", " + requestType + ", " + contentType + ")"
+      ", " + requestType + ", " + contentType + ")"
 
   def this(_path: ParsePath,
            _contextPath: String,
@@ -1037,7 +1051,8 @@ class Req(val path: ParsePath,
     }
 
   lazy val headers: List[(String, String)] = for (h <- request.headers;
-  p <- h.values) yield (h.name, p)
+                                                  p <- h.values)
+    yield (h.name, p)
 
   def headers(name: String): List[String] =
     headers.filter(_._1.equalsIgnoreCase(name)).map(_._2)
@@ -1116,7 +1131,7 @@ class Req(val path: ParsePath,
   lazy val json: Box[JsonAST.JValue] = {
     if (!json_?) {
       Failure(
-          "Cannot parse non-JSON request as JSON; please check content-type.")
+        "Cannot parse non-JSON request as JSON; please check content-type.")
     } else {
       forcedBodyAsJson
     }
@@ -1139,9 +1154,9 @@ class Req(val path: ParsePath,
           .getOrElse("UTF-8")
 
       body.map(
-          b =>
-            JsonParser.parse(
-                new InputStreamReader(new ByteArrayInputStream(b), charSet)))
+        b =>
+          JsonParser.parse(
+            new InputStreamReader(new ByteArrayInputStream(b), charSet)))
     } catch {
       case e: LiftFlowOfControlException => throw e
       case e: Exception => Failure(e.getMessage, Full(e), Empty)
@@ -1163,7 +1178,7 @@ class Req(val path: ParsePath,
     */
   lazy val hostAndPath: String =
     containerRequest.map(r =>
-          (r.scheme, r.serverPort) match {
+      (r.scheme, r.serverPort) match {
         case ("http", 80) if r.header("X-SSL").isDefined =>
           "https://" + r.serverName + contextPath
         case ("http", 80) => "http://" + r.serverName + contextPath
@@ -1184,7 +1199,7 @@ class Req(val path: ParsePath,
   lazy val xml: Box[Elem] = {
     if (!xml_?) {
       Failure(
-          "Cannot parse non-XML request as XML; please check content-type.")
+        "Cannot parse non-XML request as XML; please check content-type.")
     } else {
       forcedBodyAsXml
     }
@@ -1256,10 +1271,10 @@ class Req(val path: ParsePath,
       case NotFoundAsResponse(resp) => resp
       case NotFoundAsNode(node) =>
         LiftRules.convertResponse(
-            (node, 404),
-            S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
-            S.responseCookies,
-            this)
+          (node, 404),
+          S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
+          S.responseCookies,
+          this)
     }
 
   def createNotFound(f: Failure): LiftResponse =
@@ -1269,10 +1284,10 @@ class Req(val path: ParsePath,
       case NotFoundAsResponse(resp) => resp
       case NotFoundAsNode(node) =>
         LiftRules.convertResponse(
-            (node, 404),
-            S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
-            S.responseCookies,
-            this)
+          (node, 404),
+          S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
+          S.responseCookies,
+          this)
     }
 
   private[http] def createNotFound(
@@ -1296,11 +1311,11 @@ class Req(val path: ParsePath,
         }
       case NotFoundAsNode(node) =>
         Full(
-            LiftRules.convertResponse(
-                (node, 404),
-                S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
-                S.responseCookies,
-                this))
+          LiftRules.convertResponse(
+            (node, 404),
+            S.getResponseHeaders(LiftRules.defaultHeaders((node, this))),
+            S.responseCookies,
+            this))
     }
 
   val post_? = requestType.post_?
@@ -1323,9 +1338,9 @@ class Req(val path: ParsePath,
         uri <- Box.legacyNullTest(request.uri)
         cp <- Box.legacyNullTest(contextPath)
         part <- (request.uri.length >= cp.length) match {
-          case true => Full(request.uri.substring(cp.length))
-          case _ => Empty
-        }
+                 case true => Full(request.uri.substring(cp.length))
+                 case _ => Empty
+               }
       } yield {
         part match {
           case "" => "/"
@@ -1352,10 +1367,10 @@ class Req(val path: ParsePath,
 
   def testIfModifiedSince(when: Long): Boolean =
     (when == 0L) ||
-    ((when / 1000L) > ((ifModifiedSince.map(_.getTime) openOr 0L) / 1000L))
+      ((when / 1000L) > ((ifModifiedSince.map(_.getTime) openOr 0L) / 1000L))
 
-  def testFor304(
-      lastModified: Long, headers: (String, String)*): Box[LiftResponse] =
+  def testFor304(lastModified: Long,
+                 headers: (String, String)*): Box[LiftResponse] =
     if (!testIfModifiedSince(lastModified))
       Full(InMemoryResponse(new Array[Byte](0), headers.toList, Nil, 304))
     else Empty
@@ -1364,7 +1379,8 @@ class Req(val path: ParsePath,
     * The user agent of the browser that sent the request
     */
   lazy val userAgent: Box[String] = for (r <- Box.legacyNullTest(request);
-  uah <- request.header("User-Agent")) yield uah
+                                         uah <- request.header("User-Agent"))
+    yield uah
 
   /**
     * the accept header
@@ -1392,14 +1408,14 @@ class Req(val path: ParsePath,
     */
   lazy val acceptsXml_? =
     (weightedAccept.find(_.matches("text" -> "xml")) orElse weightedAccept
-          .find(_.matches("application" -> "xml"))).isDefined
+      .find(_.matches("application" -> "xml"))).isDefined
 
   /**
     * Returns true if the request accepts JSON
     */
   lazy val acceptsJson_? =
     (weightedAccept.find(_.matches("text" -> "json")) orElse weightedAccept
-          .find(_.matches("application" -> "json"))).isDefined
+      .find(_.matches("application" -> "json"))).isDefined
 
   /**
     * Is the Accepts Header * / *
@@ -1410,8 +1426,8 @@ class Req(val path: ParsePath,
     * Returns true if the request accepts JavaScript
     */
   lazy val acceptsJavaScript_? = (weightedAccept.find(
-          _.matches("text" -> "javascript")) orElse weightedAccept.find(
-          _.matches("application" -> "javascript"))).isDefined
+    _.matches("text" -> "javascript")) orElse weightedAccept.find(
+    _.matches("application" -> "javascript"))).isDefined
 
   def updateWithContextPath(uri: String): String =
     if (uri.startsWith("/")) contextPath + uri else uri
@@ -1420,8 +1436,9 @@ class Req(val path: ParsePath,
 /**
   * This case class is used for pattern matching.  See LiftRules.statelessRewrite and LiftRules.statefulRewrite
   */
-final case class RewriteRequest(
-    path: ParsePath, requestType: RequestType, httpRequest: HTTPRequest)
+final case class RewriteRequest(path: ParsePath,
+                                requestType: RequestType,
+                                httpRequest: HTTPRequest)
 
 /**
   * The representation of an URI path
@@ -1435,8 +1452,7 @@ case class ParsePath(partPath: List[String],
 
   lazy val wholePath =
     if (suffix.length > 0) {
-      partPath.dropRight(1) ::: List(
-          (partPath match {
+      partPath.dropRight(1) ::: List((partPath match {
         case Nil => ""
         case xs => xs.last
       }) + "." + suffix)
@@ -1462,8 +1478,9 @@ object RewriteResponse {
     new RewriteResponse(ParsePath(path, "", true, false), Map.empty, false)
 
   def apply(path: List[String], stopRewriting: Boolean) =
-    new RewriteResponse(
-        ParsePath(path, "", true, false), Map.empty, stopRewriting)
+    new RewriteResponse(ParsePath(path, "", true, false),
+                        Map.empty,
+                        stopRewriting)
 
   def apply(path: List[String], suffix: String) =
     new RewriteResponse(ParsePath(path, suffix, true, false), Map.empty, false)

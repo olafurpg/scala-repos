@@ -32,8 +32,8 @@ object BasicHttpClient {
       var requestNo = 0
       val responses = requests.flatMap { request =>
         requestNo += 1
-        client.sendRequest(
-            request, requestNo.toString, trickleFeed = trickleFeed)
+        client
+          .sendRequest(request, requestNo.toString, trickleFeed = trickleFeed)
       }
 
       if (checkClosed) {
@@ -41,7 +41,7 @@ object BasicHttpClient {
           val line = client.reader.readLine()
           if (line != null) {
             throw new RuntimeException(
-                "Unexpected data after responses received: " + line)
+              "Unexpected data after responses received: " + line)
           }
         } catch {
           case timeout: SocketTimeoutException => throw timeout
@@ -54,16 +54,16 @@ object BasicHttpClient {
     }
   }
 
-  def pipelineRequests(
-      port: Int, requests: BasicRequest*): Seq[BasicResponse] = {
+  def pipelineRequests(port: Int,
+                       requests: BasicRequest*): Seq[BasicResponse] = {
     val client = new BasicHttpClient(port)
 
     try {
       var requestNo = 0
       requests.foreach { request =>
         requestNo += 1
-        client.sendRequest(
-            request, requestNo.toString, waitForResponses = false)
+        client
+          .sendRequest(request, requestNo.toString, waitForResponses = false)
       }
       for (i <- 0 until requests.length) yield {
         client.readResponse(requestNo.toString)
@@ -157,7 +157,7 @@ class BasicHttpClient(port: Int) {
         case Array(v, s) => (v, s.toInt, "")
         case _ =>
           throw new RuntimeException(
-              "Invalid status line for response " + responseDesc + ": " +
+            "Invalid status line for response " + responseDesc + ": " +
               statusLine)
       }
       // Read headers
@@ -223,8 +223,8 @@ class BasicHttpClient(port: Int) {
         throw io
       case e: Exception =>
         throw new RuntimeException(
-            s"Exception while reading response $responseDesc ${e.getClass.getName}: ${e.getMessage}",
-            e)
+          s"Exception while reading response $responseDesc ${e.getClass.getName}: ${e.getMessage}",
+          e)
     }
   }
 

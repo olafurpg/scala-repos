@@ -25,7 +25,7 @@ import akka.testkit.AkkaSpec
 class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
-      "akka.actor.default-dispatcher")
+    "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
   val TestLines = {
@@ -76,7 +76,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
         result.count should ===(lastWrite.flatten.length)
         checkFileContents(
-            f, lastWrite.mkString("") + TestLines.mkString("").drop(100))
+          f,
+          lastWrite.mkString("") + TestLines.mkString("").drop(100))
       }
     }
 
@@ -96,7 +97,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
         f.length() should ===(result1.count + result2.count)
         checkFileContents(
-            f, TestLines.mkString("") + lastWrite.mkString("") + "\n")
+          f,
+          TestLines.mkString("") + lastWrite.mkString("") + "\n")
       }
     }
 
@@ -136,7 +138,7 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
             .fromIterator(() ⇒ Iterator.continually(TestByteStrings.head))
             .to(FileIO.toFile(f))
             .withAttributes(
-                ActorAttributes.dispatcher("akka.actor.default-dispatcher"))
+              ActorAttributes.dispatcher("akka.actor.default-dispatcher"))
             .run()(materializer)
 
           materializer
@@ -155,7 +157,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
   private def targetFile(block: File ⇒ Unit, create: Boolean = true) {
     val targetFile = File.createTempFile("synchronous-file-sink", ".tmp")
     if (!create) targetFile.delete()
-    try block(targetFile) finally targetFile.delete()
+    try block(targetFile)
+    finally targetFile.delete()
   }
 
   def checkFileContents(f: File, contents: String): Unit = {

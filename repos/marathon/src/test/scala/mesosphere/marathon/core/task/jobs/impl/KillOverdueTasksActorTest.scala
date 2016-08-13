@@ -7,7 +7,11 @@ import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.core.task.tracker.TaskTracker.TasksByApp
 import mesosphere.marathon.state.{PathId, Timestamp}
-import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonSchedulerDriverHolder,
+  MarathonSpec,
+  MarathonTestHelper
+}
 import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.apache.mesos.{Protos => MesosProtos, SchedulerDriver}
@@ -19,7 +23,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class KillOverdueTasksActorTest
-    extends MarathonSpec with GivenWhenThen with marathon.test.Mockito
+    extends MarathonSpec
+    with GivenWhenThen
+    with marathon.test.Mockito
     with ScalaFutures {
   implicit var actorSystem: ActorSystem = _
   var taskTracker: TaskTracker = _
@@ -35,8 +41,8 @@ class KillOverdueTasksActorTest
     driverHolder.driver = Some(driver)
     val config = MarathonTestHelper.defaultConfig()
     checkActor = actorSystem.actorOf(
-        KillOverdueTasksActor.props(config, taskTracker, driverHolder, clock),
-        "check")
+      KillOverdueTasksActor.props(config, taskTracker, driverHolder, clock),
+      "check")
   }
 
   after {
@@ -108,43 +114,46 @@ class KillOverdueTasksActorTest
            "The startedAt property of an unstaged task has a value of 0")
 
     val unconfirmedNotOverdueTask = MarathonTestHelper.startingTaskProto(
-        "unconfirmed",
-        stagedAt = now - config.taskLaunchConfirmTimeout().millis)
+      "unconfirmed",
+      stagedAt = now - config.taskLaunchConfirmTimeout().millis)
 
     val unconfirmedOverdueTask = MarathonTestHelper.startingTaskProto(
-        "unconfirmedOverdue",
-        stagedAt = now - config.taskLaunchConfirmTimeout().millis - 1.millis
+      "unconfirmedOverdue",
+      stagedAt = now - config.taskLaunchConfirmTimeout().millis - 1.millis
     )
 
     val overdueStagedTask = MarathonTestHelper.stagedTaskProto(
-        "overdueStagedTask",
-        stagedAt = now - 10.days
+      "overdueStagedTask",
+      stagedAt = now - 10.days
     )
 
     val stagedTask = MarathonTestHelper.stagedTaskProto(
-        "staged",
-        stagedAt = now - 10.seconds
+      "staged",
+      stagedAt = now - 10.seconds
     )
 
-    val runningTask = MarathonTestHelper.runningTaskProto(
-        "running", stagedAt = now - 5.seconds, startedAt = now - 2.seconds)
+    val runningTask =
+      MarathonTestHelper.runningTaskProto("running",
+                                          stagedAt = now - 5.seconds,
+                                          startedAt = now - 2.seconds)
 
     Given("Several somehow overdue tasks plus some not overdue tasks")
     val appId = PathId("/ignored")
     val app = TaskTracker.AppTasks(
-        appId,
-        Iterable(
-            unconfirmedOverdueTask,
-            unconfirmedNotOverdueTask,
-            overdueUnstagedTask,
-            overdueStagedTask,
-            stagedTask,
-            runningTask
-        )
+      appId,
+      Iterable(
+        unconfirmedOverdueTask,
+        unconfirmedNotOverdueTask,
+        overdueUnstagedTask,
+        overdueStagedTask,
+        stagedTask,
+        runningTask
+      )
     )
     taskTracker.tasksByAppSync returns TasksByApp.of(app)
 
-    When("We check which tasks should be killed because they're not yet staged or unconfirmed")
+    When(
+      "We check which tasks should be killed because they're not yet staged or unconfirmed")
     val testProbe = TestProbe()
     testProbe.send(checkActor,
                    KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
@@ -154,18 +163,21 @@ class KillOverdueTasksActorTest
     verify(taskTracker).tasksByAppSync
 
     And("All somehow overdue tasks are killed")
-    verify(driver).killTask(MesosProtos.TaskID
-          .newBuilder()
-          .setValue(unconfirmedOverdueTask.getId)
-          .build())
-    verify(driver).killTask(MesosProtos.TaskID
-          .newBuilder()
-          .setValue(overdueUnstagedTask.getId)
-          .build())
-    verify(driver).killTask(MesosProtos.TaskID
-          .newBuilder()
-          .setValue(overdueStagedTask.getId)
-          .build())
+    verify(driver).killTask(
+      MesosProtos.TaskID
+        .newBuilder()
+        .setValue(unconfirmedOverdueTask.getId)
+        .build())
+    verify(driver).killTask(
+      MesosProtos.TaskID
+        .newBuilder()
+        .setValue(overdueUnstagedTask.getId)
+        .build())
+    verify(driver).killTask(
+      MesosProtos.TaskID
+        .newBuilder()
+        .setValue(overdueStagedTask.getId)
+        .build())
 
     And("but not more")
     verifyNoMoreInteractions(driver)

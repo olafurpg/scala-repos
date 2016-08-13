@@ -64,7 +64,7 @@ class WrappedArrayBuilder[A](tag: ClassTag[A])
           .asInstanceOf[WrappedArray[A]]
       case _ =>
         new WrappedArray.ofRef[A with AnyRef](
-            tag.newArray(size).asInstanceOf[Array[A with AnyRef]])
+          tag.newArray(size).asInstanceOf[Array[A with AnyRef]])
           .asInstanceOf[WrappedArray[A]]
     }
     if (this.size > 0) Array.copy(elems.array, 0, newelems.array, 0, this.size)

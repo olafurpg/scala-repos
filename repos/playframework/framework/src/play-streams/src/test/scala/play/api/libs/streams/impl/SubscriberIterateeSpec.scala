@@ -98,8 +98,8 @@ object SubscriberIterateeSpec extends Specification {
 
     "become done when the stream is cancelled" in new TestEnv {
       val result =
-        Enumerator(10, 20, 30) |>>> iteratee.flatMap(
-            _ => Iteratee.getChunks[Int])
+        Enumerator(10, 20, 30) |>>> iteratee.flatMap(_ =>
+          Iteratee.getChunks[Int])
       next() must beLike {
         case OnSubscribe(sub) =>
           sub.request(1)

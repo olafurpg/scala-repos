@@ -99,7 +99,7 @@ class TaskInfo(val taskId: Long,
   def duration: Long = {
     if (!finished) {
       throw new UnsupportedOperationException(
-          "duration() called on unfinished task")
+        "duration() called on unfinished task")
     } else {
       finishTime - launchTime
     }

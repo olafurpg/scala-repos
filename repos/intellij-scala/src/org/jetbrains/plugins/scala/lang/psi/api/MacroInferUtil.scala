@@ -4,8 +4,15 @@ package lang.psi.api
 import com.intellij.psi.{PsiElement, PsiNamedElement}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScMacroDefinition, ScTypeAlias}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScMacroDefinition,
+  ScTypeAlias
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
 import org.jetbrains.plugins.scala.lang.psi.types._
@@ -31,18 +38,16 @@ object MacroInferUtil {
       def withCheck(functionName: String,
                     classFqn: String,
                     typeEval: () => Option[ScType]): Checker = {
-        withCheck(
-            () =>
-              {
-            if (f.name != functionName) None
+        withCheck(() => {
+          if (f.name != functionName) None
+          else {
+            val clazz = f.containingClass
+            if (clazz == null) None
             else {
-              val clazz = f.containingClass
-              if (clazz == null) None
-              else {
-                if (clazz.qualifiedName != classFqn) None
-                else typeEval()
-              }
+              if (clazz.qualifiedName != classFqn) None
+              else typeEval()
             }
+          }
         })
       }
 
@@ -59,18 +64,22 @@ object MacroInferUtil {
       expectedType match {
         case Some(tp) =>
           val manager = ScalaPsiManager.instance(place.getProject)
-          val clazz = manager.getCachedClass(
-              "shapeless.Generic", place.getResolveScope, ClassCategory.TYPE)
+          val clazz = manager.getCachedClass("shapeless.Generic",
+                                             place.getResolveScope,
+                                             ClassCategory.TYPE)
           clazz match {
             case c: ScTypeDefinition =>
               val tpt = c.typeParameters
               if (tpt.length == 0) return None
               val undef = new ScUndefinedType(
-                  new ScTypeParameterType(tpt(0), ScSubstitutor.empty))
-              val genericType = ScParameterizedType(
-                  ScDesignatorType(c), Seq(undef))
+                new ScTypeParameterType(tpt(0), ScSubstitutor.empty))
+              val genericType =
+                ScParameterizedType(ScDesignatorType(c), Seq(undef))
               val (res, undefSubst) = Conformance.conformsInner(
-                  genericType, tp, Set.empty, new ScUndefinedSubstitutor())
+                genericType,
+                tp,
+                Set.empty,
+                new ScUndefinedSubstitutor())
               if (!res) return None
               undefSubst.getSubstitutor match {
                 case Some(subst) =>
@@ -79,9 +88,9 @@ object MacroInferUtil {
                     ScPattern.extractProductParts(productLikeType, place)
                   if (parts.length == 0) return None
                   val coloncolon = manager.getCachedClass(
-                      "shapeless.::",
-                      place.getResolveScope,
-                      ClassCategory.TYPE)
+                    "shapeless.::",
+                    place.getResolveScope,
+                    ClassCategory.TYPE)
                   if (coloncolon == null) return None
                   val hnil = manager.getCachedClass("shapeless.HNil",
                                                     place.getResolveScope,
@@ -89,8 +98,8 @@ object MacroInferUtil {
                   if (hnil == null) return None
                   val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
                     case (part, resultType) =>
-                      ScParameterizedType(
-                          ScDesignatorType(coloncolon), Seq(part, resultType))
+                      ScParameterizedType(ScDesignatorType(coloncolon),
+                                          Seq(part, resultType))
                   }
                   ScalaPsiUtil.getCompanionModule(c) match {
                     case Some(obj: ScObject) =>
@@ -100,12 +109,12 @@ object MacroInferUtil {
                       }
                       if (!elem.isDefined) return None
                       Some(
-                          ScParameterizedType(
-                              ScProjectionType(
-                                  ScDesignatorType(obj),
-                                  elem.get.asInstanceOf[PsiNamedElement],
-                                  superReference = false),
-                              Seq(productLikeType, repr)))
+                        ScParameterizedType(
+                          ScProjectionType(
+                            ScDesignatorType(obj),
+                            elem.get.asInstanceOf[PsiNamedElement],
+                            superReference = false),
+                          Seq(productLikeType, repr)))
                     case _ => None
                   }
                 case _ => None

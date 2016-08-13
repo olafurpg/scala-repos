@@ -46,15 +46,16 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       assert(LoadService[Resolver]().nonEmpty)
-      assert(GlobalRegistry.get.toSet == Set(
-              Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
-                    "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
-          ))
+      assert(
+        GlobalRegistry.get.toSet == Set(
+          Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
+                "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
+        ))
     }
   }
 
   test(
-      "LoadService should only load 1 instance of T, even when there's multiple occurence of T") {
+    "LoadService should only load 1 instance of T, even when there's multiple occurence of T") {
     val randomIfaces = LoadService[LoadServiceRandomInterface]()
     assert(randomIfaces.size == 1)
   }
@@ -69,11 +70,11 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     GlobalRegistry.withRegistry(simple) {
       val randomIfaces = LoadService[LoadServiceMaybeInterface]()
       assert(
-          GlobalRegistry.get.toSet == Set(
-              Entry(Seq("loadservice",
-                        "com.twitter.finagle.util.LoadServiceMaybeInterface"),
-                    "com.twitter.finagle.util.LoadServiceGoodClass")
-          ))
+        GlobalRegistry.get.toSet == Set(
+          Entry(Seq("loadservice",
+                    "com.twitter.finagle.util.LoadServiceMaybeInterface"),
+                "com.twitter.finagle.util.LoadServiceGoodClass")
+        ))
     }
   }
 
@@ -175,7 +176,7 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "LoadService should ignore packages according to ignoredPaths GlobalFlag") {
+    "LoadService should ignore packages according to ignoredPaths GlobalFlag") {
     loadServiceIgnoredPaths.let(Seq("foo/", "/bar")) {
       assert(ClassPath.ignoredPackages.takeRight(2) == Seq("foo/", "/bar"))
     }
@@ -183,8 +184,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
 
   test("LoadService should respect Denied if provided") {
     val denied1and2 = Set(
-        "com.twitter.finagle.util.LoadServiceMultipleImpls1",
-        "com.twitter.finagle.util.LoadServiceMultipleImpls2"
+      "com.twitter.finagle.util.LoadServiceMultipleImpls1",
+      "com.twitter.finagle.util.LoadServiceMultipleImpls2"
     )
     loadServiceDenied.let(denied1and2) {
       val loaded = LoadService[LoadServiceMultipleImpls]()
@@ -234,6 +235,6 @@ class MetaInfCodedClassloader(parent: ClassLoader)
 class FooAnnouncer extends Announcer {
   override val scheme: String = "foo"
 
-  override def announce(
-      addr: InetSocketAddress, name: String): Future[Announcement] = null
+  override def announce(addr: InetSocketAddress,
+                        name: String): Future[Announcement] = null
 }

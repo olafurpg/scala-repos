@@ -18,12 +18,15 @@ import scala.language.implicitConversions
 
 @RunWith(classOf[JUnitRunner])
 class Zk2ResolverTest
-    extends FunSuite with BeforeAndAfter with Eventually
-    with PatienceConfiguration with SpanSugar {
+    extends FunSuite
+    with BeforeAndAfter
+    with Eventually
+    with PatienceConfiguration
+    with SpanSugar {
   val zkTimeout: Span = 100.milliseconds
 
-  implicit val config = PatienceConfig(
-      timeout = 45.seconds, interval = zkTimeout)
+  implicit val config =
+    PatienceConfig(timeout = 45.seconds, interval = zkTimeout)
 
   // The Zk2 resolver has a hardcoded session timeout of 10 seconds and a stabilization epoch of
   // 40 seconds. We give these tests double that to observe nodes leaving a serverset.
@@ -57,8 +60,8 @@ class Zk2ResolverTest
 
   private[this] def address(ia: InetSocketAddress): Address =
     WeightedAddress(
-        Address.Inet(ia, ZkMetadata.toAddrMetadata(ZkMetadata(Some(shardId)))),
-        1.0)
+      Address.Inet(ia, ZkMetadata.toAddrMetadata(ZkMetadata(Some(shardId)))),
+      1.0)
 
   test("end-to-end: service endpoint") {
     val Name.Bound(va) = zk2resolve("/foo/bar")
@@ -69,8 +72,8 @@ class Zk2ResolverTest
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
     val joinAddr = RandomSocket()
-    val status = serverSet.join(
-        joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
+    val status = serverSet
+      .join(joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
     eventually {
       assert(va.sample() == Addr.Bound(address(joinAddr)),
              "resolution is not bound once the serverset exists")
@@ -118,10 +121,11 @@ class Zk2ResolverTest
   super.test("statsOf takes the first two components of the first hostname") {
     assert(Zk2Resolver.statsOf("foo-bar.baz.twitter.com") == "foo-bar.baz")
     assert(Zk2Resolver.statsOf(
-            "foo-bar.baz.twitter.com,foo-bar2.baz.twitter.com") == "foo-bar.baz")
+      "foo-bar.baz.twitter.com,foo-bar2.baz.twitter.com") == "foo-bar.baz")
     assert(Zk2Resolver.statsOf("foo-bar,foo-baz") == "foo-bar")
     assert(
-        Zk2Resolver.statsOf("some-very-very-very-long-hostname") == "some-very-very-very-long-hostn")
+      Zk2Resolver
+        .statsOf("some-very-very-very-long-hostname") == "some-very-very-very-long-hostn")
     assert(Zk2Resolver.statsOf("localhost:2181") == "localhost:2181")
   }
 }

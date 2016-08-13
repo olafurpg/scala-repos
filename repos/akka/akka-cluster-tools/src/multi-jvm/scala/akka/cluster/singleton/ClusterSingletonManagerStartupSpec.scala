@@ -32,7 +32,9 @@ object ClusterSingletonManagerStartupSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -61,7 +63,8 @@ class ClusterSingletonManagerStartupMultiJvmNode3
 
 class ClusterSingletonManagerStartupSpec
     extends MultiNodeSpec(ClusterSingletonManagerStartupSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterSingletonManagerStartupSpec._
 
   override def initialParticipants = roles.size
@@ -75,17 +78,18 @@ class ClusterSingletonManagerStartupSpec
 
   def createSingleton(): ActorRef = {
     system.actorOf(ClusterSingletonManager.props(
-                       singletonProps = Props(classOf[Echo], testActor),
-                       terminationMessage = PoisonPill,
-                       settings = ClusterSingletonManagerSettings(system)),
+                     singletonProps = Props(classOf[Echo], testActor),
+                     terminationMessage = PoisonPill,
+                     settings = ClusterSingletonManagerSettings(system)),
                    name = "echo")
   }
 
   lazy val echoProxy: ActorRef = {
-    system.actorOf(ClusterSingletonProxy.props(
-                       singletonManagerPath = "/user/echo",
-                       settings = ClusterSingletonProxySettings(system)),
-                   name = "echoProxy")
+    system.actorOf(
+      ClusterSingletonProxy.props(singletonManagerPath = "/user/echo",
+                                  settings =
+                                    ClusterSingletonProxySettings(system)),
+      name = "echoProxy")
   }
 
   "Startup of Cluster Singleton" must {

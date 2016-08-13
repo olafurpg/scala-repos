@@ -14,7 +14,7 @@ import scala.collection.mutable
   * in a linked list; context lookup requires a linear search.
   */
 trait Context {
-  type Key [A]
+  type Key[A]
 
   sealed trait Env {
 

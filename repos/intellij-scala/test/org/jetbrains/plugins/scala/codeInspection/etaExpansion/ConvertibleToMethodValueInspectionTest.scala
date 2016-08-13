@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala
 package codeInspection.etaExpansion
 
 import com.intellij.codeInspection.LocalInspectionTool
-import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightInspectionFixtureTestAdapter}
+import org.jetbrains.plugins.scala.codeInspection.{
+  InspectionBundle,
+  ScalaLightInspectionFixtureTestAdapter
+}
 
 /**
   * Nikolay.Tropin
@@ -202,7 +205,8 @@ class ConvertibleToMethodValueInspectionTest
   }
 
   def testImplicits(): Unit = {
-    checkTextHasNoErrors("""
+    checkTextHasNoErrors(
+      """
         |import scala.language.implicitConversions
         |
         |object TupleMethod extends App {
@@ -228,7 +232,7 @@ class ConvertibleToMethodValueInspectionTest
 
   def testNonStable(): Unit = {
     checkTextHasNoErrors(
-        """class A(s: String) {
+      """class A(s: String) {
         |  def foo(x: String) = x
         |}
         |

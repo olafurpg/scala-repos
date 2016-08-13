@@ -23,10 +23,10 @@ object AsyncCache {
                   timeToLive: Duration = Duration.Inf,
                   timeToIdle: Duration = Duration.Inf) =
     new AsyncCache(
-        cache = LruCache(maxCapacity, initialCapacity, timeToLive, timeToIdle),
-        f = f)
+      cache = LruCache(maxCapacity, initialCapacity, timeToLive, timeToIdle),
+      f = f)
 
   def single[V](f: => Fu[V], timeToLive: Duration = Duration.Inf) =
-    new AsyncCache[Boolean, V](
-        cache = LruCache(timeToLive = timeToLive), f = _ => f)
+    new AsyncCache[Boolean, V](cache = LruCache(timeToLive = timeToLive),
+                               f = _ => f)
 }

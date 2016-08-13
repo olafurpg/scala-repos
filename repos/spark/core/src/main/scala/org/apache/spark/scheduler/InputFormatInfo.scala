@@ -47,7 +47,7 @@ class InputFormatInfo(val configuration: Configuration,
 
   override def toString: String = {
     "InputFormatInfo " + super.toString + " .. inputFormatClazz " +
-    inputFormatClazz + ", " + "path : " + path
+      inputFormatClazz + ", " + "path : " + path
   }
 
   override def hashCode(): Int = {
@@ -60,16 +60,16 @@ class InputFormatInfo(val configuration: Configuration,
   // absolute path .. which is fine, this is best case effort to remove duplicates - right ?
   override def equals(other: Any): Boolean = other match {
     case that: InputFormatInfo => {
-        // not checking config - that should be fine, right ?
-        this.inputFormatClazz == that.inputFormatClazz &&
-        this.path == that.path
-      }
+      // not checking config - that should be fine, right ?
+      this.inputFormatClazz == that.inputFormatClazz &&
+      this.path == that.path
+    }
     case _ => false
   }
 
   private def validate() {
     logDebug(
-        "validate InputFormatInfo : " + inputFormatClazz + ", path  " + path)
+      "validate InputFormatInfo : " + inputFormatClazz + ", path  " + path)
 
     try {
       if (classOf[org.apache.hadoop.mapreduce.InputFormat[_, _]]
@@ -82,17 +82,17 @@ class InputFormatInfo(val configuration: Configuration,
         mapredInputFormat = true
       } else {
         throw new IllegalArgumentException(
-            "Specified inputformat " + inputFormatClazz +
+          "Specified inputformat " + inputFormatClazz +
             " is NOT a supported input format ? does not implement either of the supported hadoop " +
             "api's")
       }
     } catch {
       case e: ClassNotFoundException => {
-          throw new IllegalArgumentException(
-              "Specified inputformat " + inputFormatClazz +
-              " cannot be found ?",
-              e)
-        }
+        throw new IllegalArgumentException(
+          "Specified inputformat " + inputFormatClazz +
+            " cannot be found ?",
+          e)
+      }
     }
   }
 
@@ -131,8 +131,7 @@ class InputFormatInfo(val configuration: Configuration,
     instance
       .getSplits(jobConf, jobConf.getNumMapTasks())
       .foreach(
-          elem =>
-            retval ++= SplitInfo.toSplitInfo(inputFormatClazz, path, elem)
+        elem => retval ++= SplitInfo.toSplitInfo(inputFormatClazz, path, elem)
       )
 
     retval.toSet
@@ -140,7 +139,7 @@ class InputFormatInfo(val configuration: Configuration,
 
   private def findPreferredLocations(): Set[SplitInfo] = {
     logDebug(
-        "mapreduceInputFormat : " + mapreduceInputFormat +
+      "mapreduceInputFormat : " + mapreduceInputFormat +
         ", mapredInputFormat : " + mapredInputFormat +
         ", inputFormatClazz : " + inputFormatClazz)
     if (mapreduceInputFormat) {

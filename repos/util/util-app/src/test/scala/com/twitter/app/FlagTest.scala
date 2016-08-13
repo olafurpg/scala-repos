@@ -41,7 +41,8 @@ class FlagTest extends FunSuite {
 
     assert(Flaggable.ofInetSocketAddress.show(local) == s":$port")
     assert(
-        Flaggable.ofInetSocketAddress.show(remote) == s"${remote.getHostName}:$port")
+      Flaggable.ofInetSocketAddress
+        .show(remote) == s"${remote.getHostName}:$port")
   }
 
   test("Flaggable: parse seqs") {
@@ -53,13 +54,17 @@ class FlagTest extends FunSuite {
   }
 
   test("Flaggable: parse maps with comma-separated values") {
-    assert(Flaggable.ofMap[String, Seq[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Seq(1, 2, 3, 3), "b" -> Seq(4, 5)))
+    assert(
+      Flaggable.ofMap[String, Seq[Int]].parse("a=1,2,3,3,b=4,5") == Map(
+        "a" -> Seq(1, 2, 3, 3),
+        "b" -> Seq(4, 5)))
   }
 
   test("Flaggable: parse maps of sets with comma-separated values") {
-    assert(Flaggable.ofMap[String, Set[Int]].parse("a=1,2,3,3,b=4,5") == Map(
-            "a" -> Set(1, 2, 3), "b" -> Set(4, 5)))
+    assert(
+      Flaggable.ofMap[String, Set[Int]].parse("a=1,2,3,3,b=4,5") == Map(
+        "a" -> Set(1, 2, 3),
+        "b" -> Set(4, 5)))
   }
 
   test("Flaggable: parse tuples") {
@@ -87,8 +92,9 @@ class FlagTest extends FunSuite {
   test("Flag: add and parse flags") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags
-          .Ok(Nil))
+    assert(
+      flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags.Ok(
+        Nil))
     flag.finishParsing()
     assert(fooFlag() == 973)
     assert(barFlag() == "hello there")
@@ -100,17 +106,17 @@ class FlagTest extends FunSuite {
     val naive = new SimpleRegistry()
     GlobalRegistry.withRegistry(naive) {
       assert(
-          flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags
-            .Ok(Nil))
+        flag.parseArgs(Array("-foo", "973", "-bar", "hello there")) == Flags
+          .Ok(Nil))
       flag.finishParsing()
       assert(fooFlag() == 973)
       assert(barFlag() == "hello there")
       assert(
-          naive.toSet == Set(
-              Entry(Seq("flags", "foo"), "973"),
-              Entry(Seq("flags", "bar"), "hello there"),
-              Entry(Seq("flags", "help"), "false")
-          ))
+        naive.toSet == Set(
+          Entry(Seq("flags", "foo"), "973"),
+          Entry(Seq("flags", "bar"), "hello there"),
+          Entry(Seq("flags", "help"), "false")
+        ))
     }
   }
 
@@ -126,10 +132,11 @@ class FlagTest extends FunSuite {
       intercept[IllegalArgumentException] {
         bazFlag()
       }
-      assert(naive.toSet == Set(
-              Entry(Seq("flags", "baz"), Flag.EmptyRequired),
-              Entry(Seq("flags", "help"), "false")
-          ))
+      assert(
+        naive.toSet == Set(
+          Entry(Seq("flags", "baz"), Flag.EmptyRequired),
+          Entry(Seq("flags", "help"), "false")
+        ))
     }
   }
 
@@ -141,10 +148,11 @@ class FlagTest extends FunSuite {
       assert(flag.parseArgs(Array()) == Flags.Ok(Nil))
       flag.finishParsing()
       assert(fooFlag() == 123)
-      assert(naive.toSet == Set(
-              Entry(Seq("flags", "foo"), "123"),
-              Entry(Seq("flags", "help"), "false")
-          ))
+      assert(
+        naive.toSet == Set(
+          Entry(Seq("flags", "foo"), "123"),
+          Entry(Seq("flags", "help"), "false")
+        ))
     }
   }
 
@@ -155,8 +163,8 @@ class FlagTest extends FunSuite {
     val allFlags = flag.getAll().toSet
 
     flag.finishParsing()
-    assert(!allFlags.exists(_ () == 1), "original flag was not overridden")
-    assert(allFlags.exists(_ () == 2),
+    assert(!allFlags.exists(_() == 1), "original flag was not overridden")
+    assert(allFlags.exists(_() == 2),
            "overriding flag was not present in flags set")
   }
 
@@ -227,22 +235,25 @@ class FlagTest extends FunSuite {
   test("Flag: handle remainders (sequential)") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("-foo", "333", "arg0", "arg1")) == Flags.Ok(
-            Seq("arg0", "arg1")))
+    assert(
+      flag.parseArgs(Array("-foo", "333", "arg0", "arg1")) == Flags.Ok(
+        Seq("arg0", "arg1")))
   }
 
   test("Flag: handle remainders (interpspersed)") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("arg0", "-foo", "333", "arg1")) == Flags.Ok(
-            Seq("arg0", "arg1")))
+    assert(
+      flag.parseArgs(Array("arg0", "-foo", "333", "arg1")) == Flags.Ok(
+        Seq("arg0", "arg1")))
   }
 
   test("Flag: stop parsing at '--'") {
     val ctx = new Ctx
     import ctx._
-    assert(flag.parseArgs(Array("arg0", "--", "-foo", "333")) == Flags.Ok(
-            Seq("arg0", "-foo", "333")))
+    assert(
+      flag.parseArgs(Array("arg0", "--", "-foo", "333")) == Flags.Ok(
+        Seq("arg0", "-foo", "333")))
   }
 
   test("Flag: give nice parse errors") {
@@ -267,8 +278,8 @@ class FlagTest extends FunSuite {
     val ctx = new Ctx
     import ctx._
     assert(flag.parseArgs(Array("-undefined")).isInstanceOf[Flags.Error])
-    assert(flag.parseArgs(Array("-undefined"), true) == Flags.Ok(
-            Seq("-undefined")))
+    assert(
+      flag.parseArgs(Array("-undefined"), true) == Flags.Ok(Seq("-undefined")))
   }
 
   class Dctx extends Ctx {
@@ -338,7 +349,7 @@ class FlagTest extends FunSuite {
 
   test("GlobalFlag: no default usage") {
     assert(
-        MyGlobalFlagNoDefault.usageString == "  -com.twitter.app.MyGlobalFlagNoDefault='Int': a global test flag with no default")
+      MyGlobalFlagNoDefault.usageString == "  -com.twitter.app.MyGlobalFlagNoDefault='Int': a global test flag with no default")
   }
 
   test("GlobalFlag: implicit value of true for booleans") {
@@ -366,15 +377,17 @@ class FlagTest extends FunSuite {
     val flagWithGlobal = new Flags("my", includeGlobal = true)
     flagWithGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithGlobal("flag.with.single.quote",
+                   "i'm so cool",
+                   "why would you do this?")
     flagWithGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val flagWithoutGlobal = new Flags("my", includeGlobal = false)
     flagWithoutGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithoutGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithoutGlobal(
-        "flag.with.single.quote", "i'm so cool", "why would you do this?")
+    flagWithoutGlobal("flag.with.single.quote",
+                      "i'm so cool",
+                      "why would you do this?")
     flagWithoutGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val localOnly = """|Set flags:
@@ -392,13 +405,13 @@ class FlagTest extends FunSuite {
       */
     def matchesGlobal(flagString: String): Boolean = {
       val localAndGlobal = Seq(
-          """Set flags:""",
-          """-set.local.flag='hi'""",
-          """Unset flags:""",
-          """-com.twitter.app.MyGlobalFlag='a test flag'""",
-          """-flag.with.single.quote='i'"'"'m so cool'""",
-          """-help='false'""",
-          """-unset.local.flag='a flag!' \"""
+        """Set flags:""",
+        """-set.local.flag='hi'""",
+        """Unset flags:""",
+        """-com.twitter.app.MyGlobalFlag='a test flag'""",
+        """-flag.with.single.quote='i'"'"'m so cool'""",
+        """-help='false'""",
+        """-unset.local.flag='a flag!' \"""
       )
 
       // make sure every line in localAndGlobal exists in the flagString
@@ -407,12 +420,12 @@ class FlagTest extends FunSuite {
 
     assert(matchesGlobal(flagWithGlobal.formattedFlagValuesString(WithGlobal)))
     assert(
-        matchesGlobal(flagWithoutGlobal.formattedFlagValuesString(WithGlobal)))
+      matchesGlobal(flagWithoutGlobal.formattedFlagValuesString(WithGlobal)))
 
     assert(
-        flagWithGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
+      flagWithGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
     assert(
-        flagWithoutGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
+      flagWithoutGlobal.formattedFlagValuesString(WithoutGlobal) == localOnly)
 
     assert(matchesGlobal(flagWithGlobal.formattedFlagValuesString()))
     assert(flagWithoutGlobal.formattedFlagValuesString() == localOnly)

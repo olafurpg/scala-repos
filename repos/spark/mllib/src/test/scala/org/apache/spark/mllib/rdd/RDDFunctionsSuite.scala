@@ -40,8 +40,8 @@ class RDDFunctionsSuite extends SparkFunSuite with MLlibTestSparkContext {
         }
       }
       assert(
-          rdd.sliding(7).collect().isEmpty,
-          "Should return an empty RDD if the window size is greater than the number of items.")
+        rdd.sliding(7).collect().isEmpty,
+        "Should return an empty RDD if the window size is greater than the number of items.")
     }
   }
 

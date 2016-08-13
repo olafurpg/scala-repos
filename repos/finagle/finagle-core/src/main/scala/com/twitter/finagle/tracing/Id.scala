@@ -105,11 +105,11 @@ object TraceId {
         } else None
 
       val traceId = TraceId(
-          if (trace64 == parent64) None else Some(SpanId(trace64)),
-          if (parent64 == span64) None else Some(SpanId(parent64)),
-          SpanId(span64),
-          sampled,
-          flags)
+        if (trace64 == parent64) None else Some(SpanId(trace64)),
+        if (parent64 == span64) None else Some(SpanId(parent64)),
+        SpanId(span64),
+        sampled,
+        flags)
       Return(traceId)
     }
   }

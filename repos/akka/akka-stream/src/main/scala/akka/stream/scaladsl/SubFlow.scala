@@ -14,8 +14,10 @@ import scala.annotation.unchecked.uncheckedVariance
   */
 trait SubFlow[+Out, +Mat, +F[+ _], C] extends FlowOps[Out, Mat] {
 
-  override type Repr[+T] = SubFlow[
-      T, Mat @uncheckedVariance, F @uncheckedVariance, C @uncheckedVariance]
+  override type Repr[+T] = SubFlow[T,
+                                   Mat @uncheckedVariance,
+                                   F @uncheckedVariance,
+                                   C @uncheckedVariance]
   override type Closed = C
 
   /**

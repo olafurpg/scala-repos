@@ -11,7 +11,7 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
 
       def getCommitStatues =
         dummyService.getCommitStatues(
-            List(("user1", "repo1", 1), ("user1", "repo1", 2)))
+          List(("user1", "repo1", 1), ("user1", "repo1", 2)))
 
       assert(getCommitStatues == Map.empty)
 
@@ -51,13 +51,14 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 now,
                                                 user1)
       assert(
-          getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  1,
-                  1,
-                  Some("default"),
-                  Some(CommitState.SUCCESS),
-                  Some("http://exmple.com/ci"),
-                  Some("exampleService"))))
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(
+            1,
+            1,
+            Some("default"),
+            Some(CommitState.SUCCESS),
+            Some("http://exmple.com/ci"),
+            Some("exampleService"))))
 
       // if there are two statuses, state is none
       val cs3 = dummyService.createCommitStatus("user1",
@@ -69,8 +70,14 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 Some("exampleService"),
                                                 now,
                                                 user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      assert(
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(2,
+                                                    1,
+                                                    None,
+                                                    None,
+                                                    None,
+                                                    None)))
 
       // get only statuses in query issues
       val (is3, pr3) =
@@ -84,8 +91,14 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 None,
                                                 now,
                                                 user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      assert(
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(2,
+                                                    1,
+                                                    None,
+                                                    None,
+                                                    None,
+                                                    None)))
     }
   }
 }

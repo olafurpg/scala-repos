@@ -54,6 +54,6 @@ class RangedArgs(args: Args) {
       Range(cnv(v1), cnv(v2))
     case _ =>
       throw new IllegalArgumentException(
-          argName + " must have either 1 or 2 values specified")
+        argName + " must have either 1 or 2 values specified")
   }
 }

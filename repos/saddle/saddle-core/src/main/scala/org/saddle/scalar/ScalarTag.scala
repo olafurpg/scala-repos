@@ -26,8 +26,12 @@ import org.saddle.array.Sorter
   * as an array. Often implicitly required when dealing with objects in Saddle
   */
 trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
-    extends ClassManifest[T] with SpecializedFactory[T] with CouldBeOrdered[T]
-    with CouldBeNumber[T] with ScalarHelperOps[T] with Serializable {
+    extends ClassManifest[T]
+    with SpecializedFactory[T]
+    with CouldBeOrdered[T]
+    with CouldBeNumber[T]
+    with ScalarHelperOps[T]
+    with Serializable {
   // representation of missing data
   def missing: T
   def isMissing(t: T): Boolean
@@ -47,12 +51,12 @@ trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
 
   override def hashCode(): Int =
     isAny.hashCode() + isAnyVal.hashCode() * 31 +
-    runtimeClass.hashCode() * 31 * 31
+      runtimeClass.hashCode() * 31 * 31
 
   override def equals(o: Any): Boolean = o match {
     case s: ScalarTag[_] =>
       (this eq s) || runtimeClass == s.runtimeClass && isAny == s.isAny &&
-      isAnyVal == s.isAnyVal
+        isAnyVal == s.isAnyVal
     case _ => false
   }
 
@@ -77,21 +81,21 @@ object ScalarTag extends ScalarTagImplicits {
 }
 
 trait ScalarTagImplicits extends ScalarTagImplicitsL1 {
-  implicit def stPrd[T <: Product : CLM] = new ScalarTagProduct[T]
+  implicit def stPrd[T <: Product: CLM] = new ScalarTagProduct[T]
 }
 
 trait ScalarTagImplicitsL1 extends ScalarTagImplicitsL2 {
-  implicit def stAnyVal[T <: AnyVal : CLM] = new ScalarTagAny[T] {
+  implicit def stAnyVal[T <: AnyVal: CLM] = new ScalarTagAny[T] {
     override def isAnyVal = true
   }
 }
 
 trait ScalarTagImplicitsL2 extends ScalarTagImplicitsL3 {
-  implicit def stAnyRef[T <: AnyRef : CLM] = new ScalarTagAny[T]
+  implicit def stAnyRef[T <: AnyRef: CLM] = new ScalarTagAny[T]
 }
 
 trait ScalarTagImplicitsL3 {
-  implicit def stAny[T : CLM] = new ScalarTagAny[T] {
+  implicit def stAny[T: CLM] = new ScalarTagAny[T] {
     override def isAny = true
   }
 }

@@ -35,9 +35,9 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
   test("basic sorting using ExternalSort") {
 
     val input = Seq(
-        ("Hello", 4, 2.0),
-        ("Hello", 1, 1.0),
-        ("World", 8, 3.0)
+      ("Hello", 4, 2.0),
+      ("Hello", 1, 1.0),
+      ("World", 8, 3.0)
     )
 
     checkAnswer(input.toDF("a", "b", "c"),
@@ -55,12 +55,12 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
 
   test("sort followed by limit") {
     checkThatPlansAgree(
-        (1 to 100).map(v => Tuple1(v)).toDF("a"),
-        (child: SparkPlan) =>
-          GlobalLimit(10, Sort('a.asc :: Nil, global = true, child = child)),
-        (child: SparkPlan) =>
-          GlobalLimit(10, ReferenceSort('a.asc :: Nil, global = true, child)),
-        sortAnswers = false
+      (1 to 100).map(v => Tuple1(v)).toDF("a"),
+      (child: SparkPlan) =>
+        GlobalLimit(10, Sort('a.asc :: Nil, global = true, child = child)),
+      (child: SparkPlan) =>
+        GlobalLimit(10, ReferenceSort('a.asc :: Nil, global = true, child)),
+      sortAnswers = false
     )
   }
 
@@ -68,12 +68,12 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
     val sortOrder = 'a.asc :: Nil
     val stringLength = 1024 * 1024 * 2
     checkThatPlansAgree(
-        Seq(Tuple1("a" * stringLength), Tuple1("b" * stringLength))
-          .toDF("a")
-          .repartition(1),
-        Sort(sortOrder, global = true, _: SparkPlan, testSpillFrequency = 1),
-        ReferenceSort(sortOrder, global = true, _: SparkPlan),
-        sortAnswers = false
+      Seq(Tuple1("a" * stringLength), Tuple1("b" * stringLength))
+        .toDF("a")
+        .repartition(1),
+      Sort(sortOrder, global = true, _: SparkPlan, testSpillFrequency = 1),
+      ReferenceSort(sortOrder, global = true, _: SparkPlan),
+      sortAnswers = false
     )
   }
 
@@ -91,24 +91,24 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
 
   // Test sorting on different data types
   for (dataType <- DataTypeTestUtils.atomicTypes ++ Set(NullType);
-  nullable <- Seq(true, false);
-  sortOrder <- Seq('a.asc :: Nil, 'a.desc :: Nil);
-  randomDataGenerator <- RandomDataGenerator.forType(dataType, nullable)) {
+       nullable <- Seq(true, false);
+       sortOrder <- Seq('a.asc :: Nil, 'a.desc :: Nil);
+       randomDataGenerator <- RandomDataGenerator.forType(dataType, nullable)) {
     test(s"sorting on $dataType with nullable=$nullable, sortOrder=$sortOrder") {
       val inputData = Seq.fill(1000)(randomDataGenerator())
       val inputDf = sqlContext.createDataFrame(
-          sparkContext.parallelize(Random.shuffle(inputData).map(v => Row(v))),
-          StructType(StructField("a", dataType, nullable = true) :: Nil)
+        sparkContext.parallelize(Random.shuffle(inputData).map(v => Row(v))),
+        StructType(StructField("a", dataType, nullable = true) :: Nil)
       )
       checkThatPlansAgree(
-          inputDf,
-          p =>
-            Sort(sortOrder,
-                 global = true,
-                 p: SparkPlan,
-                 testSpillFrequency = 23),
-          ReferenceSort(sortOrder, global = true, _: SparkPlan),
-          sortAnswers = false
+        inputDf,
+        p =>
+          Sort(sortOrder,
+               global = true,
+               p: SparkPlan,
+               testSpillFrequency = 23),
+        ReferenceSort(sortOrder, global = true, _: SparkPlan),
+        sortAnswers = false
       )
     }
   }

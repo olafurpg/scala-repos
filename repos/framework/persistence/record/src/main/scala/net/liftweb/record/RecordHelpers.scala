@@ -18,8 +18,27 @@ package net.liftweb
 package record
 
 import net.liftweb.http.js.{JsExp, JsObj}
-import net.liftweb.http.js.JE.{JsArray, JsFalse, JsNull, JsObj, JsTrue, Num, Str}
-import net.liftweb.json.JsonAST.{JArray, JBool, JInt, JDouble, JField, JNothing, JNull, JObject, JString, JValue}
+import net.liftweb.http.js.JE.{
+  JsArray,
+  JsFalse,
+  JsNull,
+  JsObj,
+  JsTrue,
+  Num,
+  Str
+}
+import net.liftweb.json.JsonAST.{
+  JArray,
+  JBool,
+  JInt,
+  JDouble,
+  JField,
+  JNothing,
+  JNull,
+  JObject,
+  JString,
+  JValue
+}
 
 object RecordHelpers {
 

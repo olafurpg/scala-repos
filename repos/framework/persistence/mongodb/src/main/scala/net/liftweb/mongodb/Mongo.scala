@@ -23,7 +23,15 @@ import java.util.concurrent.ConcurrentHashMap
 
 import scala.collection.immutable.HashSet
 
-import com.mongodb.{DB, DBCollection, Mongo, MongoClient, MongoException, MongoOptions, ServerAddress}
+import com.mongodb.{
+  DB,
+  DBCollection,
+  Mongo,
+  MongoClient,
+  MongoException,
+  MongoOptions,
+  ServerAddress
+}
 
 /**
   * Main Mongo object
@@ -69,13 +77,13 @@ object MongoDB {
   /**
     * Get a Mongo collection. Gets a Mongo db first.
     */
-  private def getCollection(
-      name: ConnectionIdentifier,
-      collectionName: String): Option[DBCollection] = getDb(name) match {
-    case Some(mongo) if mongo != null =>
-      Some(mongo.getCollection(collectionName))
-    case _ => None
-  }
+  private def getCollection(name: ConnectionIdentifier,
+                            collectionName: String): Option[DBCollection] =
+    getDb(name) match {
+      case Some(mongo) if mongo != null =>
+        Some(mongo.getCollection(collectionName))
+      case _ => None
+    }
 
   /**
     * Executes function {@code f} with the mongo db named {@code name}.
@@ -100,7 +108,7 @@ object MongoDB {
       case Some(mongo) => mongo
       case _ =>
         throw new MongoException(
-            "Mongo not found: " + DefaultConnectionIdentifier.toString)
+          "Mongo not found: " + DefaultConnectionIdentifier.toString)
     }
 
     f(db)
@@ -116,7 +124,7 @@ object MongoDB {
       case Some(collection) => collection
       case _ =>
         throw new MongoException(
-            "Mongo not found: " + collectionName + ". ConnectionIdentifier: " +
+          "Mongo not found: " + collectionName + ". ConnectionIdentifier: " +
             name.toString)
     }
 
@@ -132,7 +140,7 @@ object MongoDB {
         case Some(collection) => collection
         case _ =>
           throw new MongoException(
-              "Mongo not found: " + collectionName +
+            "Mongo not found: " + collectionName +
               ". ConnectionIdentifier: " +
               DefaultConnectionIdentifier.toString)
       }
@@ -147,7 +155,8 @@ object MongoDB {
     * See: http://docs.mongodb.org/ecosystem/drivers/java-concurrency/
     */
   @deprecated(
-      "No longer needed. See mongo-java-drivers's JavaDocs for details", "3.0")
+    "No longer needed. See mongo-java-drivers's JavaDocs for details",
+    "3.0")
   def useSession[T](name: ConnectionIdentifier)(f: (DB) => T): T = {
 
     val db = getDb(name) match {
@@ -169,14 +178,15 @@ object MongoDB {
     * Same as above except uses DefaultConnectionIdentifier
     */
   @deprecated(
-      "No longer needed. See mongo-java-drivers's JavaDocs for details", "3.0")
+    "No longer needed. See mongo-java-drivers's JavaDocs for details",
+    "3.0")
   def useSession[T](f: (DB) => T): T = {
 
     val db = getDb(DefaultConnectionIdentifier) match {
       case Some(mongo) => mongo
       case _ =>
         throw new MongoException(
-            "Mongo not found: " + DefaultConnectionIdentifier.toString)
+          "Mongo not found: " + DefaultConnectionIdentifier.toString)
     }
 
     // start the request

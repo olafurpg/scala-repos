@@ -38,7 +38,7 @@ class CacheConditionDirectivesSpec extends RoutingSpec {
         headers should contain theSameElementsAs (responseHeaders)
       }
       Get() ~> `If-None-Match`(EntityTag("old")) ~> `If-Modified-Since`(
-          timestamp - 1000) ~> taggedAndTimestamped ~> check {
+        timestamp - 1000) ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
         headers should contain theSameElementsAs (responseHeaders)
       }
@@ -103,12 +103,12 @@ class CacheConditionDirectivesSpec extends RoutingSpec {
       Get() ~> `If-None-Match`(tag) ~> weak ~> check {
         status shouldEqual NotModified
         headers should contain theSameElementsAs
-        (List(ETag(weakTag), `Last-Modified`(timestamp)))
+          (List(ETag(weakTag), `Last-Modified`(timestamp)))
       }
       Get() ~> `If-None-Match`(weakTag) ~> weak ~> check {
         status shouldEqual NotModified
         headers should contain theSameElementsAs
-        (List(ETag(weakTag), `Last-Modified`(timestamp)))
+          (List(ETag(weakTag), `Last-Modified`(timestamp)))
       }
     }
 

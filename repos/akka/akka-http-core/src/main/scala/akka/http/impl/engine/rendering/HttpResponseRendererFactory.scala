@@ -57,13 +57,14 @@ private[http] class HttpResponseRendererFactory(
   // split out so we can stabilize by overriding in tests
   protected def currentTimeMillis(): Long = System.currentTimeMillis()
 
-  def renderer: Flow[
-      ResponseRenderingContext, ResponseRenderingOutput, NotUsed] =
+  def renderer: Flow[ResponseRenderingContext,
+                     ResponseRenderingOutput,
+                     NotUsed] =
     Flow.fromGraph(HttpResponseRenderer)
 
   object HttpResponseRenderer
-      extends GraphStage[FlowShape[
-              ResponseRenderingContext, ResponseRenderingOutput]] {
+      extends GraphStage[
+        FlowShape[ResponseRenderingContext, ResponseRenderingOutput]] {
     val in = Inlet[ResponseRenderingContext]("in")
     val out = Outlet[ResponseRenderingOutput]("out")
     val shape: FlowShape[ResponseRenderingContext, ResponseRenderingOutput] =
@@ -139,8 +140,8 @@ private[http] class HttpResponseRendererFactory(
 
           def mustRenderTransferEncodingChunkedHeader =
             entity.isChunked &&
-            (!entity.isKnownEmpty || ctx.requestMethod == HttpMethods.HEAD) &&
-            (ctx.requestProtocol == `HTTP/1.1`)
+              (!entity.isKnownEmpty || ctx.requestMethod == HttpMethods.HEAD) &&
+              (ctx.requestProtocol == `HTTP/1.1`)
 
           @tailrec
           def renderHeaders(remaining: List[HttpHeader],
@@ -154,9 +155,9 @@ private[http] class HttpResponseRendererFactory(
                 head match {
                   case x: `Content-Length` ⇒
                     suppressionWarning(
-                        log,
-                        x,
-                        "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
+                      log,
+                      x,
+                      "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
                     renderHeaders(tail,
                                   alwaysClose,
                                   connHeader,
@@ -166,9 +167,9 @@ private[http] class HttpResponseRendererFactory(
 
                   case x: `Content-Type` ⇒
                     suppressionWarning(
-                        log,
-                        x,
-                        "explicit `Content-Type` header is not allowed. Set `HttpResponse.entity.contentType` instead.")
+                      log,
+                      x,
+                      "explicit `Content-Type` header is not allowed. Set `HttpResponse.entity.contentType` instead.")
                     renderHeaders(tail,
                                   alwaysClose,
                                   connHeader,
@@ -198,8 +199,9 @@ private[http] class HttpResponseRendererFactory(
                       case Some(te) ⇒
                         // if the user applied some custom transfer-encoding we need to keep the header
                         render(
-                            if (mustRenderTransferEncodingChunkedHeader)
-                              te.withChunked else te)
+                          if (mustRenderTransferEncodingChunkedHeader)
+                            te.withChunked
+                          else te)
                         renderHeaders(tail,
                                       alwaysClose,
                                       connHeader,
@@ -239,8 +241,8 @@ private[http] class HttpResponseRendererFactory(
 
                   case x: RawHeader
                       if (x is "content-type") || (x is "content-length") ||
-                      (x is "transfer-encoding") || (x is "date") ||
-                      (x is "server") || (x is "connection") ⇒
+                        (x is "transfer-encoding") || (x is "date") ||
+                        (x is "server") || (x is "connection") ⇒
                     suppressionWarning(log, x, "illegal RawHeader")
                     renderHeaders(tail,
                                   alwaysClose,
@@ -253,7 +255,8 @@ private[http] class HttpResponseRendererFactory(
                     if (x.renderInResponses) render(x)
                     else
                       log.warning(
-                          "HTTP header '{}' is not allowed in responses", x)
+                        "HTTP header '{}' is not allowed in responses",
+                        x)
                     renderHeaders(tail,
                                   alwaysClose,
                                   connHeader,
@@ -272,29 +275,29 @@ private[http] class HttpResponseRendererFactory(
                   alwaysClose ||
                   // if the client wants to close and we don't override
                   (ctx.closeRequested &&
-                      ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
+                  ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
                   // if the application wants to close explicitly
                   (protocol match {
-                        case `HTTP/1.1` ⇒
-                          (connHeader ne null) && connHeader.hasClose
-                        case `HTTP/1.0` ⇒
-                          if (connHeader eq null)
-                            ctx.requestProtocol == `HTTP/1.1`
-                          else !connHeader.hasKeepAlive
-                      })
+                    case `HTTP/1.1` ⇒
+                      (connHeader ne null) && connHeader.hasClose
+                    case `HTTP/1.0` ⇒
+                      if (connHeader eq null)
+                        ctx.requestProtocol == `HTTP/1.1`
+                      else !connHeader.hasKeepAlive
+                  })
                 }
 
                 // Do we render an explicit Connection header?
                 val renderConnectionHeader =
                   protocol == `HTTP/1.0` && !close || protocol == `HTTP/1.1` &&
-                  close || // if we don't follow the default behavior
-                  close != ctx.closeRequested ||
-                  // if we override the client's closing request
-                  protocol != ctx.requestProtocol // if we reply with a mismatching protocol (let's be very explicit in this case)
+                    close || // if we don't follow the default behavior
+                    close != ctx.closeRequested ||
+                    // if we override the client's closing request
+                    protocol != ctx.requestProtocol // if we reply with a mismatching protocol (let's be very explicit in this case)
 
                 if (renderConnectionHeader)
                   r ~~ Connection ~~
-                  (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
+                    (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
                 else if (connHeader != null && connHeader.hasUpgrade) {
                   r ~~ connHeader ~~ CrLf
                   headers.collectFirst {
@@ -310,7 +313,8 @@ private[http] class HttpResponseRendererFactory(
 
           def renderContentLengthHeader(contentLength: Long) =
             if (status.allowsEntity)
-              r ~~ `Content-Length` ~~ contentLength ~~ CrLf else r
+              r ~~ `Content-Length` ~~ contentLength ~~ CrLf
+            else r
 
           def byteStrings(entityBytes: ⇒ Source[ByteString, Any])
             : Source[ResponseRenderingOutput, Any] =
@@ -339,22 +343,20 @@ private[http] class HttpResponseRendererFactory(
                 renderHeaders(headers.toList)
                 renderEntityContentType(r, entity)
                 renderContentLengthHeader(contentLength) ~~ CrLf
-                Streamed(
-                    byteStrings(data.via(CheckContentLengthTransformer.flow(
-                                contentLength))))
+                Streamed(byteStrings(
+                  data.via(CheckContentLengthTransformer.flow(contentLength))))
 
               case HttpEntity.CloseDelimited(_, data) ⇒
                 renderHeaders(
-                    headers.toList,
-                    alwaysClose = ctx.requestMethod != HttpMethods.HEAD)
+                  headers.toList,
+                  alwaysClose = ctx.requestMethod != HttpMethods.HEAD)
                 renderEntityContentType(r, entity) ~~ CrLf
                 Streamed(byteStrings(data))
 
               case HttpEntity.Chunked(contentType, chunks) ⇒
                 if (ctx.requestProtocol == `HTTP/1.0`)
                   completeResponseRendering(
-                      HttpEntity.CloseDelimited(
-                          contentType, chunks.map(_.data)))
+                    HttpEntity.CloseDelimited(contentType, chunks.map(_.data)))
                 else {
                   renderHeaders(headers.toList)
                   renderEntityContentType(r, entity) ~~ CrLf

@@ -9,7 +9,8 @@ import akka.http.impl.util.{Rendering, ValueRenderable}
 import akka.http.javadsl.{model ⇒ jm}
 
 sealed abstract class ByteRange
-    extends jm.headers.ByteRange with ValueRenderable {
+    extends jm.headers.ByteRange
+    with ValueRenderable {
 
   /** Java API */
   def getSliceFirst: OptionalLong = OptionalLong.empty

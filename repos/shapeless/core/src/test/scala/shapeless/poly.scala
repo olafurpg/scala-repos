@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,8 @@ class PolyTests {
     implicit def caseList[T] = at[List[T]](_.length)
     implicit def caseOption[T](implicit st: Case.Aux[T, Int]) =
       at[Option[T]](t => 1 + (t map size).getOrElse(0))
-    implicit def caseTuple[T, U](
-        implicit st: Case.Aux[T, Int], su: Case.Aux[U, Int]) = at[(T, U)] {
+    implicit def caseTuple[T, U](implicit st: Case.Aux[T, Int],
+                                 su: Case.Aux[U, Int]) = at[(T, U)] {
       case (t, u) => size(t) + size(u)
     }
   }
@@ -194,9 +194,9 @@ class PolyTests {
 
     val m1 = pairMap(singleton)
     typed[(List[Set[Int]], List[Set[String]])](m1)
-    assertEquals((List(Set(1), Set(2), Set(3)),
-                  List(Set("foo"), Set("bar"), Set("baz"))),
-                 m1)
+    assertEquals(
+      (List(Set(1), Set(2), Set(3)), List(Set("foo"), Set("bar"), Set("baz"))),
+      m1)
 
     val m2 = pairMap(list)
     typed[(List[List[Int]], List[List[String]])](m2)

@@ -23,7 +23,7 @@ class randomTest extends FunSuite {
     val minR1000: Double = min(rand1000)
 
     assert(
-        maxR1000 > 0.95 && maxR1000 <= 1 && minR1000 < 0.05 && minR1000 >= 0)
+      maxR1000 > 0.95 && maxR1000 <= 1 && minR1000 < 0.05 && minR1000 >= 0)
 
     val randn10000 = randn(10000)
     assert(abs(mean(randn10000)) < 0.05, mean(randn10000))
@@ -33,7 +33,8 @@ class randomTest extends FunSuite {
     val randDoub1000 = randomDouble(1000, (10d, 15d))
     val maxRD1000: Double = max(randDoub1000)
     val minRD1000: Double = min(randDoub1000)
-    assert(maxRD1000 > 14.5 && maxRD1000 <= 15 && minRD1000 < 10.5 &&
+    assert(
+      maxRD1000 > 14.5 && maxRD1000 <= 15 && minRD1000 < 10.5 &&
         minRD1000 >= 10)
 
     val randI1000 = randomInt((17, 202), (5, 9))

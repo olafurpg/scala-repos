@@ -16,7 +16,10 @@ import org.scalajs.core.tools.javascript.ESLevel
 
 import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
-import org.scalajs.core.tools.linker.frontend.optimizer.{GenIncOptimizer, IncOptimizer}
+import org.scalajs.core.tools.linker.frontend.optimizer.{
+  GenIncOptimizer,
+  IncOptimizer
+}
 
 /** The frontend of the Scala.js linker. Produces a [[LinkingUnit]]
   *
@@ -33,11 +36,11 @@ final class LinkerFrontend(
     config: LinkerFrontend.Config,
     optimizerFactory: Option[GenIncOptimizer.OptimizerFactory]) {
 
-  private[this] val linker: BaseLinker = new BaseLinker(
-      semantics, esLevel, withSourceMap)
+  private[this] val linker: BaseLinker =
+    new BaseLinker(semantics, esLevel, withSourceMap)
 
   private[this] val optOptimizer: Option[GenIncOptimizer] =
-    optimizerFactory.map(_ (semantics, esLevel, withSourceMap))
+    optimizerFactory.map(_(semantics, esLevel, withSourceMap))
 
   private[this] val refiner: Refiner = new Refiner
 
@@ -64,7 +67,7 @@ final class LinkerFrontend(
         optimize(linkResult, symbolRequirements, optimizer, logger)
       } else {
         logger.warn(
-            "Not running the optimizer because there where linking errors.")
+          "Not running the optimizer because there where linking errors.")
         linkResult
       }
     }
@@ -94,8 +97,8 @@ object LinkerFrontend {
       val checkIR: Boolean = false
   ) {
     @deprecated(
-        "Bypassing linking errors will not be possible in the next major version.",
-        "0.6.6")
+      "Bypassing linking errors will not be possible in the next major version.",
+      "0.6.6")
     def withBypassLinkingErrors(bypassLinkingErrors: Boolean): Config =
       copy(bypassLinkingErrors = bypassLinkingErrors)
 

@@ -3,7 +3,7 @@ package lang
 package parser
 
 /**
-  * @author ilyas 
+  * @author ilyas
   */
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
@@ -17,7 +17,7 @@ trait ParserNode extends ScalaTokenTypes {
     builder.advanceLexer()
     var i: Int = 1
     while (!builder.eof && i < elems.length &&
-    (elems(i) == builder.getTokenType)) {
+           (elems(i) == builder.getTokenType)) {
       builder.advanceLexer()
       i += 1
     }

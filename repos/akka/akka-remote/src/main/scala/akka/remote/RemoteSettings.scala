@@ -27,18 +27,18 @@ final class RemoteSettings(val config: Config) {
   val UntrustedMode: Boolean = getBoolean("akka.remote.untrusted-mode")
 
   val TrustedSelectionPaths: Set[String] = immutableSeq(
-      getStringList("akka.remote.trusted-selection-paths")).toSet
+    getStringList("akka.remote.trusted-selection-paths")).toSet
 
   val RemoteLifecycleEventsLogLevel: LogLevel =
     getString("akka.remote.log-remote-lifecycle-events").toLowerCase(
-        Locale.ROOT) match {
+      Locale.ROOT) match {
       case "on" ⇒ Logging.DebugLevel
       case other ⇒
         Logging.levelFor(other) match {
           case Some(level) ⇒ level
           case None ⇒
             throw new ConfigurationException(
-                "Logging level must be one of (on, off, debug, info, warning, error)")
+              "Logging level must be one of (on, off, debug, info, warning, error)")
         }
     }
 
@@ -64,7 +64,7 @@ final class RemoteSettings(val config: Config) {
   } requiring (_ >= Duration.Zero, "retry-gate-closed-for must be >= 0")
 
   val UsePassiveConnections: Boolean = getBoolean(
-      "akka.remote.use-passive-connections")
+    "akka.remote.use-passive-connections")
 
   val BackoffPeriod: FiniteDuration = {
     config.getMillisDuration("akka.remote.backoff-interval")
@@ -80,9 +80,9 @@ final class RemoteSettings(val config: Config) {
 
   val SysMsgAckTimeout: FiniteDuration = {
     config.getMillisDuration(
-        "akka.remote.system-message-ack-piggyback-timeout")
+      "akka.remote.system-message-ack-piggyback-timeout")
   } requiring
-  (_ > Duration.Zero, "system-message-ack-piggyback-timeout must be > 0")
+    (_ > Duration.Zero, "system-message-ack-piggyback-timeout must be > 0")
 
   val SysResendTimeout: FiniteDuration = {
     config.getMillisDuration("akka.remote.resend-interval")
@@ -98,9 +98,9 @@ final class RemoteSettings(val config: Config) {
 
   val InitialSysMsgDeliveryTimeout: FiniteDuration = {
     config.getMillisDuration(
-        "akka.remote.initial-system-message-delivery-timeout")
+      "akka.remote.initial-system-message-delivery-timeout")
   } requiring
-  (_ > Duration.Zero, "initial-system-message-delivery-timeout must be > 0")
+    (_ > Duration.Zero, "initial-system-message-delivery-timeout must be > 0")
 
   val QuarantineSilentSystemTimeout: FiniteDuration = {
     config.getMillisDuration("akka.remote.quarantine-after-silence")
@@ -109,8 +109,8 @@ final class RemoteSettings(val config: Config) {
   val QuarantineDuration: FiniteDuration = {
     config
       .getMillisDuration("akka.remote.prune-quarantine-marker-after")
-      .requiring(
-          _ > Duration.Zero, "prune-quarantine-marker-after must be > 0 ms")
+      .requiring(_ > Duration.Zero,
+                 "prune-quarantine-marker-after must be > 0 ms")
   }
 
   val CommandAckTimeout: Timeout = {
@@ -118,23 +118,23 @@ final class RemoteSettings(val config: Config) {
   } requiring (_.duration > Duration.Zero, "command-ack-timeout must be > 0")
 
   val WatchFailureDetectorConfig: Config = getConfig(
-      "akka.remote.watch-failure-detector")
+    "akka.remote.watch-failure-detector")
   val WatchFailureDetectorImplementationClass: String =
     WatchFailureDetectorConfig.getString("implementation-class")
   val WatchHeartBeatInterval: FiniteDuration = {
     WatchFailureDetectorConfig.getMillisDuration("heartbeat-interval")
   } requiring
-  (_ > Duration.Zero, "watch-failure-detector.heartbeat-interval must be > 0")
+    (_ > Duration.Zero, "watch-failure-detector.heartbeat-interval must be > 0")
   val WatchUnreachableReaperInterval: FiniteDuration = {
     WatchFailureDetectorConfig.getMillisDuration(
-        "unreachable-nodes-reaper-interval")
+      "unreachable-nodes-reaper-interval")
   } requiring
-  (_ > Duration.Zero,
-      "watch-failure-detector.unreachable-nodes-reaper-interval must be > 0")
+    (_ > Duration.Zero,
+    "watch-failure-detector.unreachable-nodes-reaper-interval must be > 0")
   val WatchHeartbeatExpectedResponseAfter: FiniteDuration = {
     WatchFailureDetectorConfig.getMillisDuration("expected-response-after")
   } requiring
-  (_ > Duration.Zero, "watch-failure-detector.expected-response-after > 0")
+    (_ > Duration.Zero, "watch-failure-detector.expected-response-after > 0")
 
   val Transports: immutable.Seq[(String, immutable.Seq[String], Config)] =
     transportNames.map { name ⇒
@@ -145,7 +145,7 @@ final class RemoteSettings(val config: Config) {
     }
 
   val Adapters: Map[String, String] = configToMap(
-      getConfig("akka.remote.adapters"))
+    getConfig("akka.remote.adapters"))
 
   private def transportNames: immutable.Seq[String] =
     immutableSeq(getStringList("akka.remote.enabled-transports"))

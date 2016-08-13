@@ -27,10 +27,10 @@ class ANNSuite extends SparkFunSuite with MLlibTestSparkContext {
   // TODO: test for weights comparison with Weka MLP
   test("ANN with Sigmoid learns XOR function with LBFGS optimizer") {
     val inputs = Array(
-        Array(0.0, 0.0),
-        Array(0.0, 1.0),
-        Array(1.0, 0.0),
-        Array(1.0, 1.0)
+      Array(0.0, 0.0),
+      Array(0.0, 1.0),
+      Array(1.0, 0.0),
+      Array(1.0, 1.0)
     )
     val outputs = Array(0.0, 1.0, 1.0, 0.0)
     val data = inputs.zip(outputs).map {
@@ -59,18 +59,18 @@ class ANNSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test(
-      "ANN with SoftMax learns XOR function with 2-bit output and batch GD optimizer") {
+    "ANN with SoftMax learns XOR function with 2-bit output and batch GD optimizer") {
     val inputs = Array(
-        Array(0.0, 0.0),
-        Array(0.0, 1.0),
-        Array(1.0, 0.0),
-        Array(1.0, 1.0)
+      Array(0.0, 0.0),
+      Array(0.0, 1.0),
+      Array(1.0, 0.0),
+      Array(1.0, 1.0)
     )
     val outputs = Array(
-        Array(1.0, 0.0),
-        Array(0.0, 1.0),
-        Array(0.0, 1.0),
-        Array(1.0, 0.0)
+      Array(1.0, 0.0),
+      Array(0.0, 1.0),
+      Array(0.0, 1.0),
+      Array(1.0, 0.0)
     )
     val data = inputs.zip(outputs).map {
       case (features, label) =>

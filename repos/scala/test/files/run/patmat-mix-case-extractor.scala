@@ -42,14 +42,14 @@ class A {
   }
   def run() {
     List(
-        f1(CaseClass1()),
-        f1(CaseClass2(1, 2, 3)),
-        f1(CaseClass3(4)),
-        f1(CaseClass4(5, 6, 7)),
-        f2(CaseClass1()),
-        f2(CaseClass2(1, 2, 3)),
-        f2(CaseClass3(4)),
-        f2(CaseClass4(5, 6, 7))
+      f1(CaseClass1()),
+      f1(CaseClass2(1, 2, 3)),
+      f1(CaseClass3(4)),
+      f1(CaseClass4(5, 6, 7)),
+      f2(CaseClass1()),
+      f2(CaseClass2(1, 2, 3)),
+      f2(CaseClass3(4)),
+      f2(CaseClass4(5, 6, 7))
     ) foreach println
   }
 }

@@ -25,7 +25,14 @@ import net.liftweb.http.S
 
 import javax.sql.{DataSource}
 import java.sql.{ResultSetMetaData, SQLException}
-import java.sql.{Statement, ResultSet, Types, PreparedStatement, Connection, DriverManager}
+import java.sql.{
+  Statement,
+  ResultSet,
+  Types,
+  PreparedStatement,
+  Connection,
+  DriverManager
+}
 import scala.collection.mutable.{HashMap, ListBuffer}
 import javax.naming.{Context, InitialContext}
 
@@ -74,43 +81,40 @@ trait DB extends Loggable {
     */
   private def jndiConnection(name: ConnectionIdentifier): Box[Connection] = {
     val toTry: List[() => Connection] = List(
-        () =>
-          {
-            logger.trace(
-                "Trying JNDI lookup on java:/comp/env followed by lookup on %s"
-                  .format(name.jndiName))
-            (new InitialContext)
-              .lookup("java:/comp/env")
-              .asInstanceOf[Context]
-              .lookup(name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
-        },
-        () =>
-          {
-            logger.trace("Trying JNDI lookup on java:/comp/env/%s".format(
-                    name.jndiName))
-            (new InitialContext)
-              .lookup("java:/comp/env/" + name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
-        },
-        () =>
-          {
-            logger.trace("Trying JNDI lookup on %s".format(name.jndiName))
-            (new InitialContext)
-              .lookup(name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
-        }
+      () => {
+        logger.trace(
+          "Trying JNDI lookup on java:/comp/env followed by lookup on %s"
+            .format(name.jndiName))
+        (new InitialContext)
+          .lookup("java:/comp/env")
+          .asInstanceOf[Context]
+          .lookup(name.jndiName)
+          .asInstanceOf[DataSource]
+          .getConnection
+      },
+      () => {
+        logger.trace(
+          "Trying JNDI lookup on java:/comp/env/%s".format(name.jndiName))
+        (new InitialContext)
+          .lookup("java:/comp/env/" + name.jndiName)
+          .asInstanceOf[DataSource]
+          .getConnection
+      },
+      () => {
+        logger.trace("Trying JNDI lookup on %s".format(name.jndiName))
+        (new InitialContext)
+          .lookup(name.jndiName)
+          .asInstanceOf[DataSource]
+          .getConnection
+      }
     )
 
     first(toTry)(f =>
-          tryo { t: Throwable =>
+      tryo { t: Throwable =>
         logger.trace("JNDI Lookup failed: " + t)
       }(f())) or {
       logger.trace(
-          "Unable to obtain Connection for JNDI name %s".format(name.jndiName))
+        "Unable to obtain Connection for JNDI name %s".format(name.jndiName))
       Empty
     }
   }
@@ -127,8 +131,8 @@ trait DB extends Loggable {
   private val threadLocalConnectionManagers =
     new ThreadGlobal[Map[ConnectionIdentifier, ConnectionManager]]
 
-  def defineConnectionManager(
-      name: ConnectionIdentifier, mgr: ConnectionManager) {
+  def defineConnectionManager(name: ConnectionIdentifier,
+                              mgr: ConnectionManager) {
     connectionManagers(name) = mgr
   }
 
@@ -192,24 +196,23 @@ trait DB extends Loggable {
         .map(c => new SuperConnection(c, () => cm.releaseConnection(c)))
 
     def jndiSuperConnection: Box[SuperConnection] =
-      jndiConnection(name).map(c =>
-            {
-          val uniqueId =
-            if (logger.isDebugEnabled) Helpers.nextNum.toString else ""
-          logger.debug("Connection ID " + uniqueId +
-              " for JNDI connection " + name.jndiName + " opened")
-          new SuperConnection(c,
-                              () =>
-                                {
-                                  logger.debug("Connection ID " + uniqueId +
-                                      " for JNDI connection " +
-                                      name.jndiName + " closed"); c.close
-                              })
+      jndiConnection(name).map(c => {
+        val uniqueId =
+          if (logger.isDebugEnabled) Helpers.nextNum.toString else ""
+        logger.debug(
+          "Connection ID " + uniqueId +
+            " for JNDI connection " + name.jndiName + " opened")
+        new SuperConnection(c, () => {
+          logger.debug(
+            "Connection ID " + uniqueId +
+              " for JNDI connection " +
+              name.jndiName + " closed"); c.close
+        })
       })
 
     val cmConn = for {
       connectionManager <- threadLocalConnectionManagers.box.flatMap(
-          _.get(name)) or Box(connectionManagers.get(name))
+                            _.get(name)) or Box(connectionManagers.get(name))
       connection <- cmSuperConnection(connectionManager)
     } yield connection
 
@@ -219,7 +222,7 @@ trait DB extends Loggable {
 
     ret openOr {
       throw new NullPointerException(
-          "Looking for Connection Identifier " +
+        "Looking for Connection Identifier " +
           name + " but failed to find either a JNDI data source " +
           "with the name " + name.jndiName +
           " or a lift connection manager with the correct name")
@@ -265,8 +268,8 @@ trait DB extends Loggable {
     * Build a LoanWrapper to pass into S.addAround() to make requests for
     * the List of ConnectionIdentifiers transactional for the complete HTTP request
     */
-  def buildLoanWrapper(
-      eager: Boolean, in: List[ConnectionIdentifier]): LoanWrapper =
+  def buildLoanWrapper(eager: Boolean,
+                       in: List[ConnectionIdentifier]): LoanWrapper =
     new LoanWrapper {
       private object DepthCnt extends DynoVar[Boolean]
 
@@ -288,9 +291,9 @@ trait DB extends Loggable {
                       // this is the case when we want to commit the transaction
                       // but continue to throw the exception
                       case e: LiftFlowOfControlException => {
-                          success = !S.exceptionThrown_?
-                          throw e
-                        }
+                        success = !S.exceptionThrown_?
+                        throw e
+                      }
                     }
                   } finally {
                     clearThread(success)
@@ -313,9 +316,9 @@ trait DB extends Loggable {
                     // this is the case when we want to commit the transaction
                     // but continue to throw the exception
                     case e: LiftFlowOfControlException => {
-                        success = !S.exceptionThrown_?
-                        throw e
-                      }
+                      success = !S.exceptionThrown_?
+                      throw e
+                    }
                   }
                 } finally {
                   clearThread(success)
@@ -334,48 +337,52 @@ trait DB extends Loggable {
     logger.trace("Acquiring " + name + " On thread " + Thread.currentThread)
     var ret = info.get(name) match {
       case None =>
-        ConnectionHolder(
-            newConnection(name), calcBaseCount(name) + 1, Nil, false)
+        ConnectionHolder(newConnection(name),
+                         calcBaseCount(name) + 1,
+                         Nil,
+                         false)
       case Some(ConnectionHolder(conn, cnt, post, rb)) =>
         ConnectionHolder(conn, cnt + 1, post, rb)
     }
     info(name) = ret
-    logger.trace("Acquired " + name + " on thread " + Thread.currentThread +
+    logger.trace(
+      "Acquired " + name + " on thread " + Thread.currentThread +
         " count " + ret.cnt)
     ret.conn
   }
 
-  private def releaseConnectionNamed(
-      name: ConnectionIdentifier, rollback: Boolean) {
-    logger.trace("Request to release %s on thread %s, auto rollback=%s".format(
-            name, Thread.currentThread, rollback))
+  private def releaseConnectionNamed(name: ConnectionIdentifier,
+                                     rollback: Boolean) {
+    logger.trace(
+      "Request to release %s on thread %s, auto rollback=%s"
+        .format(name, Thread.currentThread, rollback))
 
     (info.get(name): @unchecked) match {
       case Some(ConnectionHolder(c, 1, post, manualRollback)) => {
-          // stale and unexpectedly closed connections may throw here
-          try {
-            if (!(c.getAutoCommit() || manualRollback)) {
-              if (rollback) c.rollback
-              else c.commit
-            }
-          } catch {
-            case e: SQLException =>
-              logger.error(
-                  "Swallowed exception during connection release. ", e)
-          } finally {
-            tryo(c.releaseFunc())
-            info -= name
-            val rolledback = rollback | manualRollback
-            logger.trace(
-                "Invoking %d postTransaction functions. rollback=%s".format(
-                    post.size, rolledback))
-            post.reverse.foreach(f => tryo(f(!rolledback)))
-            logger.trace(
-                "Released %s on thread %s".format(name, Thread.currentThread))
+        // stale and unexpectedly closed connections may throw here
+        try {
+          if (!(c.getAutoCommit() || manualRollback)) {
+            if (rollback) c.rollback
+            else c.commit
           }
+        } catch {
+          case e: SQLException =>
+            logger.error("Swallowed exception during connection release. ", e)
+        } finally {
+          tryo(c.releaseFunc())
+          info -= name
+          val rolledback = rollback | manualRollback
+          logger.trace(
+            "Invoking %d postTransaction functions. rollback=%s"
+              .format(post.size, rolledback))
+          post.reverse.foreach(f => tryo(f(!rolledback)))
+          logger.trace(
+            "Released %s on thread %s".format(name, Thread.currentThread))
         }
+      }
       case Some(ConnectionHolder(c, n, post, rb)) =>
-        logger.trace("Did not release " + name + " on thread " +
+        logger.trace(
+          "Did not release " + name + " on thread " +
             Thread.currentThread + " count " + (n - 1))
         info(name) = ConnectionHolder(c, n - 1, post, rb)
       case x =>
@@ -390,17 +397,17 @@ trait DB extends Loggable {
     * Note: the function will only be called when automatic transaction management is in effect, either by executing within
     * the context of a buildLoanWrapper or a DB.use {}
     */
-  def appendPostTransaction(
-      name: ConnectionIdentifier, func: Boolean => Unit) {
+  def appendPostTransaction(name: ConnectionIdentifier,
+                            func: Boolean => Unit) {
     info.get(name) match {
       case Some(ConnectionHolder(c, n, post, rb)) =>
         info(name) = ConnectionHolder(c, n, func :: post, rb)
         logger.trace(
-            "Appended postTransaction function on %s, new count=%d".format(
-                name, post.size + 1))
+          "Appended postTransaction function on %s, new count=%d"
+            .format(name, post.size + 1))
       case _ =>
         throw new IllegalStateException(
-            "Tried to append postTransaction function on illegal ConnectionIdentifer or outside transaction context")
+          "Tried to append postTransaction function on illegal ConnectionIdentifer or outside transaction context")
     }
   }
 
@@ -412,7 +419,7 @@ trait DB extends Loggable {
     appendPostTransaction(DefaultConnectionIdentifier, func)
 
   private def runLogger(logged: Statement, time: Long) = logged match {
-    case st: DBLog => logFuncs.foreach(_ (st, time))
+    case st: DBLog => logFuncs.foreach(_(st, time))
     case _ => // NOP
   }
 
@@ -441,8 +448,9 @@ trait DB extends Loggable {
       f(st.executeQuery(query))
     }
 
-  private def asString(
-      pos: Int, rs: ResultSet, md: ResultSetMetaData): String = {
+  private def asString(pos: Int,
+                       rs: ResultSet,
+                       md: ResultSetMetaData): String = {
     import java.sql.Types._
     md.getColumnType(pos) match {
       case ARRAY | BINARY | BLOB | DATALINK | DISTINCT | JAVA_OBJECT |
@@ -540,8 +548,8 @@ trait DB extends Loggable {
    * This method handles the common task of setting arguments on a prepared
    * statement based on argument type. Returns the properly updated PreparedStatement.
    */
-  private def setPreparedParams(
-      ps: PreparedStatement, params: List[Any]): PreparedStatement = {
+  private def setPreparedParams(ps: PreparedStatement,
+                                params: List[Any]): PreparedStatement = {
     params.zipWithIndex.foreach {
       case (null, idx) => ps.setNull(idx + 1, Types.VARCHAR)
       case (i: Int, idx) => ps.setInt(idx + 1, i)
@@ -570,8 +578,8 @@ trait DB extends Loggable {
     * Timestamp parameter. If you want a specific SQL Date/Time type, use the corresponding
     * java.sql.Date, java.sql.Time, or java.sql.Timestamp classes.
     */
-  def runQuery(
-      query: String, params: List[Any]): (List[String], List[List[String]]) =
+  def runQuery(query: String,
+               params: List[Any]): (List[String], List[List[String]]) =
     runQuery(query, params, DefaultConnectionIdentifier)
 
   /**
@@ -584,9 +592,8 @@ trait DB extends Loggable {
                params: List[Any],
                connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[String]]) = {
-    use(connectionIdentifier)(
-        conn =>
-          prepareStatement(query, conn) { ps =>
+    use(connectionIdentifier)(conn =>
+      prepareStatement(query, conn) { ps =>
         resultSetTo(setPreparedParams(ps, params).executeQuery)
     })
   }
@@ -597,8 +604,8 @@ trait DB extends Loggable {
     * Timestamp parameter. If you want a specific SQL Date/Time type, use the corresponding
     * java.sql.Date, java.sql.Time, or java.sql.Timestamp classes.
     */
-  def performQuery(
-      query: String, params: List[Any]): (List[String], List[List[Any]]) =
+  def performQuery(query: String,
+                   params: List[Any]): (List[String], List[List[Any]]) =
     performQuery(query, params, DefaultConnectionIdentifier)
 
   /**
@@ -611,9 +618,8 @@ trait DB extends Loggable {
                    params: List[Any],
                    connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[Any]]) = {
-    use(connectionIdentifier)(
-        conn =>
-          prepareStatement(query, conn) { ps =>
+    use(connectionIdentifier)(conn =>
+      prepareStatement(query, conn) { ps =>
         resultSetToAny(setPreparedParams(ps, params).executeQuery)
     })
   }
@@ -636,9 +642,8 @@ trait DB extends Loggable {
   def runUpdate(query: String,
                 params: List[Any],
                 connectionIdentifier: ConnectionIdentifier): Int = {
-    use(connectionIdentifier)(
-        conn =>
-          prepareStatement(query, conn) { ps =>
+    use(connectionIdentifier)(conn =>
+      prepareStatement(query, conn) { ps =>
         setPreparedParams(ps, params).executeUpdate
     })
   }
@@ -657,7 +662,7 @@ trait DB extends Loggable {
         use(name)(conn => conn.rollback)
       case _ =>
         throw new IllegalStateException(
-            "Tried to rollback transaction on illegal ConnectionIdentifer or outside transaction context")
+          "Tried to rollback transaction on illegal ConnectionIdentifer or outside transaction context")
     }
   }
 
@@ -703,8 +708,9 @@ trait DB extends Loggable {
     * constants defined on java.sql.Statement: RETURN_GENERATED_KEYS or NO_GENERATED_KEYS
     */
   def prepareStatement[T](
-      statement: String, autokeys: Int, conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      statement: String,
+      autokeys: Int,
+      conn: SuperConnection)(f: (PreparedStatement) => T): T = {
     val st =
       if (loggingEnabled_?) {
         DBLog.prepareStatement(conn.connection, statement, autokeys)
@@ -722,8 +728,9 @@ trait DB extends Loggable {
     * If the driver supports it, generated keys for the given column indices can be retrieved.
     */
   def prepareStatement[T](
-      statement: String, autoColumns: Array[Int], conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      statement: String,
+      autoColumns: Array[Int],
+      conn: SuperConnection)(f: (PreparedStatement) => T): T = {
     val st =
       if (loggingEnabled_?) {
         DBLog.prepareStatement(conn.connection, statement, autoColumns)
@@ -741,8 +748,9 @@ trait DB extends Loggable {
     * If the driver supports it, generated keys for the given column names can be retrieved.
     */
   def prepareStatement[T](
-      statement: String, autoColumns: Array[String], conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      statement: String,
+      autoColumns: Array[String],
+      conn: SuperConnection)(f: (PreparedStatement) => T): T = {
     val st =
       if (loggingEnabled_?) {
         DBLog.prepareStatement(conn.connection, statement, autoColumns)
@@ -788,9 +796,9 @@ trait DB extends Loggable {
         // this is the case when we want to commit the transaction
         // but continue to throw the exception
         case e: LiftFlowOfControlException => {
-            rollback = S.exceptionThrown_?
-            throw e
-          }
+          rollback = S.exceptionThrown_?
+          throw e
+        }
       } finally {
         releaseConnectionNamed(name, rollback)
       }
@@ -817,365 +825,365 @@ trait DB extends Loggable {
     */
   lazy val defaultReservedWords: scala.collection.immutable.Set[String] =
     scala.collection.immutable.HashSet(
-        "abort",
-        "accept",
-        "access",
-        "add",
-        "admin",
-        "after",
-        "all",
-        "allocate",
-        "alter",
-        "analyze",
-        "and",
-        "any",
-        "archive",
-        "archivelog",
-        "array",
-        "arraylen",
-        "as",
-        "asc",
-        "assert",
-        "assign",
-        "at",
-        "audit",
-        "authorization",
-        "avg",
-        "backup",
-        "base_table",
-        "become",
-        "before",
-        "begin",
-        "between",
-        "binary_integer",
-        "blob",
-        "block",
-        "body",
-        "boolean",
-        "by",
-        "cache",
-        "cancel",
-        "cascade",
-        "case",
-        "change",
-        "char",
-        "character",
-        "char_base",
-        "check",
-        "checkpoint",
-        "close",
-        "cluster",
-        "clusters",
-        "cobol",
-        "colauth",
-        "column",
-        "columns",
-        "comment",
-        "commit",
-        "compile",
-        "compress",
-        "connect",
-        "constant",
-        "constraint",
-        "constraints",
-        "contents",
-        "continue",
-        "controlfile",
-        "count",
-        "crash",
-        "create",
-        "current",
-        "currval",
-        "cursor",
-        "cycle",
-        "database",
-        "data_base",
-        "datafile",
-        "date",
-        "dba",
-        "debugoff",
-        "debugon",
-        "dec",
-        "decimal",
-        "declare",
-        "default",
-        "definition",
-        "delay",
-        "delete",
-        "delta",
-        "desc",
-        "digits",
-        "disable",
-        "dismount",
-        "dispose",
-        "distinct",
-        "do",
-        "double",
-        "drop",
-        "dump",
-        "each",
-        "else",
-        "elsif",
-        "enable",
-        "end",
-        "entry",
-        "escape",
-        "events",
-        "except",
-        "exception",
-        "exception_init",
-        "exceptions",
-        "exclusive",
-        "exec",
-        "execute",
-        "exists",
-        "exit",
-        "explain",
-        "extent",
-        "externally",
-        "false",
-        "fetch",
-        "file",
-        "float",
-        "flush",
-        "for",
-        "force",
-        "foreign",
-        "form",
-        "fortran",
-        "found",
-        "freelist",
-        "freelists",
-        "from",
-        "function",
-        "generic",
-        "go",
-        "goto",
-        "grant",
-        "group",
-        "having",
-        "identified",
-        "if",
-        "immediate",
-        "in",
-        "including",
-        "increment",
-        "index",
-        "indexes",
-        "indicator",
-        "initial",
-        "initrans",
-        "insert",
-        "instance",
-        "notnull", // reserved word for PostgreSQL
-        "int",
-        "integer",
-        "intersect",
-        "into",
-        "is",
-        "key",
-        "language",
-        "layer",
-        "level",
-        "like",
-        "limit", // reserved word for PostgreSQL
-        "limited",
-        "link",
-        "lists",
-        "lock",
-        "logfile",
-        "long",
-        "loop",
-        "manage",
-        "manual",
-        "max",
-        "maxdatafiles",
-        "maxextents",
-        "maxinstances",
-        "maxlogfiles",
-        "maxloghistory",
-        "maxlogmembers",
-        "maxtrans",
-        "maxvalue",
-        "min",
-        "minextents",
-        "minus",
-        "minvalue",
-        "mlslabel",
-        "mod",
-        "mode",
-        "modify",
-        "module",
-        "mount",
-        "natural",
-        "new",
-        "next",
-        "nextval",
-        "noarchivelog",
-        "noaudit",
-        "nocache",
-        "nocompress",
-        "nocycle",
-        "nomaxvalue",
-        "nominvalue",
-        "none",
-        "noorder",
-        "noresetlogs",
-        "normal",
-        "nosort",
-        "not",
-        "notfound",
-        "nowait",
-        "null",
-        "number",
-        "number_base",
-        "numeric",
-        "of",
-        "off",
-        "offline",
-        "old",
-        "on",
-        "online",
-        "only",
-        "open",
-        "optimal",
-        "option",
-        "or",
-        "order",
-        "others",
-        "out",
-        "own",
-        "package",
-        "parallel",
-        "partition",
-        "pctfree",
-        "pctincrease",
-        "pctused",
-        "plan",
-        "pli",
-        "positive",
-        "pragma",
-        "precision",
-        "primary",
-        "prior",
-        "private",
-        "privileges",
-        "procedure",
-        "profile",
-        "public",
-        "quota",
-        "raise",
-        "range",
-        "raw",
-        "read",
-        "real",
-        "record",
-        "recover",
-        "references",
-        "referencing",
-        "release",
-        "remr",
-        "rename",
-        "resetlogs",
-        "resource",
-        "restricted",
-        "return",
-        "reuse",
-        "reverse",
-        "revoke",
-        "role",
-        "roles",
-        "rollback",
-        "row",
-        "rowid",
-        "rowlabel",
-        "rownum",
-        "rows",
-        "rowtype",
-        "run",
-        "savepoint",
-        "schema",
-        "scn",
-        "section",
-        "segment",
-        "select",
-        "separate",
-        "sequence",
-        "session",
-        "set",
-        "share",
-        "shared",
-        "show", // MySQL reserved word
-        "size",
-        "smallint",
-        "snapshot",
-        "some",
-        "sort",
-        "space",
-        "sql",
-        "sqlbuf",
-        "sqlcode",
-        "sqlerrm",
-        "sqlerror",
-        "sqlstate",
-        "start",
-        "statement",
-        "statement_id",
-        "statistics",
-        "stddev",
-        "stop",
-        "storage",
-        "subtype",
-        "successful",
-        "sum",
-        "switch",
-        "synonym",
-        "sysdate",
-        "system",
-        "tabauth",
-        "table",
-        "tables",
-        "tablespace",
-        "task",
-        "temporary",
-        "terminate",
-        "then",
-        "thread",
-        "time",
-        "timestamp", // reserved in Oracle
-        "to",
-        "tracing",
-        "transaction",
-        "trigger",
-        "triggers",
-        "true",
-        "truncate",
-        "type",
-        "uid",
-        "under",
-        "union",
-        "unique",
-        "unlimited",
-        "until",
-        "update",
-        "use",
-        "user",
-        "using",
-        "validate",
-        "values",
-        "varchar",
-        "varchar2",
-        "variance",
-        "view",
-        "views",
-        "when",
-        "whenever",
-        "where",
-        "while",
-        "with",
-        "work",
-        "write",
-        "xor")
+      "abort",
+      "accept",
+      "access",
+      "add",
+      "admin",
+      "after",
+      "all",
+      "allocate",
+      "alter",
+      "analyze",
+      "and",
+      "any",
+      "archive",
+      "archivelog",
+      "array",
+      "arraylen",
+      "as",
+      "asc",
+      "assert",
+      "assign",
+      "at",
+      "audit",
+      "authorization",
+      "avg",
+      "backup",
+      "base_table",
+      "become",
+      "before",
+      "begin",
+      "between",
+      "binary_integer",
+      "blob",
+      "block",
+      "body",
+      "boolean",
+      "by",
+      "cache",
+      "cancel",
+      "cascade",
+      "case",
+      "change",
+      "char",
+      "character",
+      "char_base",
+      "check",
+      "checkpoint",
+      "close",
+      "cluster",
+      "clusters",
+      "cobol",
+      "colauth",
+      "column",
+      "columns",
+      "comment",
+      "commit",
+      "compile",
+      "compress",
+      "connect",
+      "constant",
+      "constraint",
+      "constraints",
+      "contents",
+      "continue",
+      "controlfile",
+      "count",
+      "crash",
+      "create",
+      "current",
+      "currval",
+      "cursor",
+      "cycle",
+      "database",
+      "data_base",
+      "datafile",
+      "date",
+      "dba",
+      "debugoff",
+      "debugon",
+      "dec",
+      "decimal",
+      "declare",
+      "default",
+      "definition",
+      "delay",
+      "delete",
+      "delta",
+      "desc",
+      "digits",
+      "disable",
+      "dismount",
+      "dispose",
+      "distinct",
+      "do",
+      "double",
+      "drop",
+      "dump",
+      "each",
+      "else",
+      "elsif",
+      "enable",
+      "end",
+      "entry",
+      "escape",
+      "events",
+      "except",
+      "exception",
+      "exception_init",
+      "exceptions",
+      "exclusive",
+      "exec",
+      "execute",
+      "exists",
+      "exit",
+      "explain",
+      "extent",
+      "externally",
+      "false",
+      "fetch",
+      "file",
+      "float",
+      "flush",
+      "for",
+      "force",
+      "foreign",
+      "form",
+      "fortran",
+      "found",
+      "freelist",
+      "freelists",
+      "from",
+      "function",
+      "generic",
+      "go",
+      "goto",
+      "grant",
+      "group",
+      "having",
+      "identified",
+      "if",
+      "immediate",
+      "in",
+      "including",
+      "increment",
+      "index",
+      "indexes",
+      "indicator",
+      "initial",
+      "initrans",
+      "insert",
+      "instance",
+      "notnull", // reserved word for PostgreSQL
+      "int",
+      "integer",
+      "intersect",
+      "into",
+      "is",
+      "key",
+      "language",
+      "layer",
+      "level",
+      "like",
+      "limit", // reserved word for PostgreSQL
+      "limited",
+      "link",
+      "lists",
+      "lock",
+      "logfile",
+      "long",
+      "loop",
+      "manage",
+      "manual",
+      "max",
+      "maxdatafiles",
+      "maxextents",
+      "maxinstances",
+      "maxlogfiles",
+      "maxloghistory",
+      "maxlogmembers",
+      "maxtrans",
+      "maxvalue",
+      "min",
+      "minextents",
+      "minus",
+      "minvalue",
+      "mlslabel",
+      "mod",
+      "mode",
+      "modify",
+      "module",
+      "mount",
+      "natural",
+      "new",
+      "next",
+      "nextval",
+      "noarchivelog",
+      "noaudit",
+      "nocache",
+      "nocompress",
+      "nocycle",
+      "nomaxvalue",
+      "nominvalue",
+      "none",
+      "noorder",
+      "noresetlogs",
+      "normal",
+      "nosort",
+      "not",
+      "notfound",
+      "nowait",
+      "null",
+      "number",
+      "number_base",
+      "numeric",
+      "of",
+      "off",
+      "offline",
+      "old",
+      "on",
+      "online",
+      "only",
+      "open",
+      "optimal",
+      "option",
+      "or",
+      "order",
+      "others",
+      "out",
+      "own",
+      "package",
+      "parallel",
+      "partition",
+      "pctfree",
+      "pctincrease",
+      "pctused",
+      "plan",
+      "pli",
+      "positive",
+      "pragma",
+      "precision",
+      "primary",
+      "prior",
+      "private",
+      "privileges",
+      "procedure",
+      "profile",
+      "public",
+      "quota",
+      "raise",
+      "range",
+      "raw",
+      "read",
+      "real",
+      "record",
+      "recover",
+      "references",
+      "referencing",
+      "release",
+      "remr",
+      "rename",
+      "resetlogs",
+      "resource",
+      "restricted",
+      "return",
+      "reuse",
+      "reverse",
+      "revoke",
+      "role",
+      "roles",
+      "rollback",
+      "row",
+      "rowid",
+      "rowlabel",
+      "rownum",
+      "rows",
+      "rowtype",
+      "run",
+      "savepoint",
+      "schema",
+      "scn",
+      "section",
+      "segment",
+      "select",
+      "separate",
+      "sequence",
+      "session",
+      "set",
+      "share",
+      "shared",
+      "show", // MySQL reserved word
+      "size",
+      "smallint",
+      "snapshot",
+      "some",
+      "sort",
+      "space",
+      "sql",
+      "sqlbuf",
+      "sqlcode",
+      "sqlerrm",
+      "sqlerror",
+      "sqlstate",
+      "start",
+      "statement",
+      "statement_id",
+      "statistics",
+      "stddev",
+      "stop",
+      "storage",
+      "subtype",
+      "successful",
+      "sum",
+      "switch",
+      "synonym",
+      "sysdate",
+      "system",
+      "tabauth",
+      "table",
+      "tables",
+      "tablespace",
+      "task",
+      "temporary",
+      "terminate",
+      "then",
+      "thread",
+      "time",
+      "timestamp", // reserved in Oracle
+      "to",
+      "tracing",
+      "transaction",
+      "trigger",
+      "triggers",
+      "true",
+      "truncate",
+      "type",
+      "uid",
+      "under",
+      "union",
+      "unique",
+      "unlimited",
+      "until",
+      "update",
+      "use",
+      "user",
+      "using",
+      "validate",
+      "values",
+      "varchar",
+      "varchar2",
+      "variance",
+      "view",
+      "views",
+      "when",
+      "whenever",
+      "where",
+      "while",
+      "with",
+      "work",
+      "write",
+      "xor")
 }
 
 class SuperConnection(val connection: Connection,
@@ -1228,7 +1236,8 @@ class StandardDBVendor(driverName: String,
       case _ =>
         tryo { t: Throwable =>
           logger.error(
-              "Unable to get database connection. url=%s".format(dbUrl), t)
+            "Unable to get database connection. url=%s".format(dbUrl),
+            t)
         }(DriverManager.getConnection(dbUrl))
     }
   }
@@ -1284,8 +1293,9 @@ trait ProtoDBVendor extends ConnectionManager {
           val ret = createOne
           ret.foreach(_.setAutoCommit(false))
           poolSize = poolSize + 1
-          logger.debug("Created new pool entry. name=%s, poolSize=%d".format(
-                  name, poolSize))
+          logger.debug(
+            "Created new pool entry. name=%s, poolSize=%d".format(name,
+                                                                  poolSize))
           ret
 
         case Nil =>
@@ -1295,8 +1305,9 @@ trait ProtoDBVendor extends ConnectionManager {
           // if we've waited 50 ms and the pool is still empty, temporarily expand it
           if (pool.isEmpty && poolSize == curSize && canExpand_?) {
             tempMaxSize += 1
-            logger.debug("Temporarily expanding pool. name=%s, tempMaxSize=%d"
-                  .format(name, tempMaxSize))
+            logger.debug(
+              "Temporarily expanding pool. name=%s, tempMaxSize=%d"
+                .format(name, tempMaxSize))
           }
           newConnection(name)
 
@@ -1310,8 +1321,8 @@ trait ProtoDBVendor extends ConnectionManager {
             case e: Exception =>
               try {
                 logger.debug(
-                    "Test connection failed, removing connection from pool, name=%s"
-                      .format(name))
+                  "Test connection failed, removing connection from pool, name=%s"
+                    .format(name))
                 poolSize = poolSize - 1
                 tryo(x.close)
                 newConnection(name)

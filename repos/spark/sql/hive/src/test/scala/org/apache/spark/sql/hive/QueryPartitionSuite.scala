@@ -26,7 +26,9 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.util.Utils
 
 class QueryPartitionSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext.implicits._
 
   test("SPARK-5068: query data when path doesn't exist") {
@@ -38,21 +40,26 @@ class QueryPartitionSuite
 
       val tmpDir = Files.createTempDir()
       // create the table for test
-      sql(s"CREATE TABLE table_with_partition(key int,value string) " +
+      sql(
+        s"CREATE TABLE table_with_partition(key int,value string) " +
           s"PARTITIONED by (ds string) location '${tmpDir.toURI.toString}' ")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='1') " +
+      sql(
+        "INSERT OVERWRITE TABLE table_with_partition  partition (ds='1') " +
           "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='2') " +
+      sql(
+        "INSERT OVERWRITE TABLE table_with_partition  partition (ds='2') " +
           "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='3') " +
+      sql(
+        "INSERT OVERWRITE TABLE table_with_partition  partition (ds='3') " +
           "SELECT key,value FROM testData")
-      sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='4') " +
+      sql(
+        "INSERT OVERWRITE TABLE table_with_partition  partition (ds='4') " +
           "SELECT key,value FROM testData")
 
       // test for the exist path
       checkAnswer(
-          sql("select key,value from table_with_partition"),
-          testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
+        sql("select key,value from table_with_partition"),
+        testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       // delete the path of one partition
       tmpDir.listFiles.find { f =>
@@ -63,8 +70,8 @@ class QueryPartitionSuite
 
       // test for after delete the path
       checkAnswer(
-          sql("select key,value from table_with_partition"),
-          testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
+        sql("select key,value from table_with_partition"),
+        testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       sql("DROP TABLE table_with_partition")
       sql("DROP TABLE createAndInsertTest")

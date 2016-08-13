@@ -43,9 +43,12 @@ import java.io.{ObjectOutputStream, ObjectInputStream}
 @SerialVersionUID(3419063961353022662L)
 final class ListBuffer[A]
     extends AbstractBuffer[A]
-    with Buffer[A] with GenericTraversableTemplate[A, ListBuffer]
+    with Buffer[A]
+    with GenericTraversableTemplate[A, ListBuffer]
     with BufferLike[A, ListBuffer[A]]
-    with ReusableBuilder[A, List[A]] with SeqForwarder[A] with Serializable {
+    with ReusableBuilder[A, List[A]]
+    with SeqForwarder[A]
+    with Serializable {
   override def companion: GenericCompanion[ListBuffer] = ListBuffer
 
   import scala.collection.Traversable
@@ -264,11 +267,11 @@ final class ListBuffer[A]
   override def remove(n: Int, count: Int) {
     if (count < 0)
       throw new IllegalArgumentException(
-          "removing negative number of elements: " + count.toString)
+        "removing negative number of elements: " + count.toString)
     else if (count == 0) return // Nothing to do
     if (n < 0 || n > len - count)
       throw new IndexOutOfBoundsException(
-          "at " + n.toString + " deleting " + count.toString)
+        "at " + n.toString + " deleting " + count.toString)
     if (exported) copy()
     val n1 = n max 0
     val count1 = count min (len - n1)

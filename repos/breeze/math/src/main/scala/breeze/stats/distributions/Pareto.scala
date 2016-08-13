@@ -7,9 +7,11 @@ import breeze.numerics.{pow, exp, log}
   *
   * @author dlwh
   **/
-case class Pareto(
-    scale: Double, shape: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+case class Pareto(scale: Double, shape: Double)(
+    implicit rand: RandBasis = Rand)
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   def mean: Double = {
     if (shape <= 1) {
       Double.PositiveInfinity

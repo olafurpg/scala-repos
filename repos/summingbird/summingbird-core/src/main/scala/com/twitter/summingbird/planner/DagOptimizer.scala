@@ -177,7 +177,8 @@ trait DagOptimizer[P <: Platform[P]] {
     def summer[K, V](s: Summer[P, K, V]): (M, L[(K, (Option[V], V))]) = {
       val (h1, l1) = toLiteral(hm, s.producer)
       val lit = UnaryLit[(K, V), (K, (Option[V], V)), N](
-          l1, mkSum(s.store, s.semigroup))
+        l1,
+        mkSum(s.store, s.semigroup))
       (h1 + (s -> lit), lit)
     }
 
@@ -348,7 +349,7 @@ trait DagOptimizer[P <: Platform[P]] {
       case MergedProducer(left @ FlatMappedProducer(inleft, fnleft),
                           right @ FlatMappedProducer(inright, fnright))
           if (inleft == inright) && (on.fanOut(left) == 1) &&
-          (on.fanOut(right) == 1) =>
+            (on.fanOut(right) == 1) =>
         FlatMappedProducer(inleft, MergeResults(fnleft, fnright))
     }
   }

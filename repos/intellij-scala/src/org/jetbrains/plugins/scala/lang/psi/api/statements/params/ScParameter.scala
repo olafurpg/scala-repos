@@ -15,12 +15,31 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScFunctionExpr, ScUnderScoreSectionUtil}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScImportableDeclarationsOwner, ScModifierListOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScFunctionExpr,
+  ScUnderScoreSectionUtil
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScMember
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScImportableDeclarationsOwner,
+  ScModifierListOwner,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType,
+  ScParameterizedType,
+  ScType
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec
@@ -31,8 +50,11 @@ import scala.collection.immutable.HashSet
   * Date: 22.02.2008
   */
 trait ScParameter
-    extends ScTypedDefinition with ScModifierListOwner with PsiParameter
-    with ScAnnotationsHolder with ScImportableDeclarationsOwner {
+    extends ScTypedDefinition
+    with ScModifierListOwner
+    with PsiParameter
+    with ScAnnotationsHolder
+    with ScImportableDeclarationsOwner {
   def getTypeElement: PsiTypeElement
 
   def isWildcard: Boolean = "_" == name
@@ -81,8 +103,9 @@ trait ScParameter
   }
 
   def getDeclarationScope =
-    PsiTreeUtil.getParentOfType(
-        this, classOf[ScParameterOwner], classOf[ScFunctionExpr])
+    PsiTreeUtil.getParentOfType(this,
+                                classOf[ScParameterOwner],
+                                classOf[ScFunctionExpr])
 
   def deprecatedName: Option[String]
 
@@ -173,8 +196,8 @@ trait ScParameter
                 case _ =>
               }
             }
-            applyForFunction(
-                tp, ScUnderScoreSectionUtil.underscores(f).nonEmpty)
+            applyForFunction(tp,
+                             ScUnderScoreSectionUtil.underscores(f).nonEmpty)
           }
           result
         case _ => None
@@ -187,8 +210,8 @@ trait ScParameter
   def isDefaultParam: Boolean = calcIsDefaultParam(this, HashSet.empty)
 
   @tailrec
-  private def calcIsDefaultParam(
-      param: ScParameter, visited: HashSet[ScParameter]): Boolean = {
+  private def calcIsDefaultParam(param: ScParameter,
+                                 visited: HashSet[ScParameter]): Boolean = {
     if (param.baseDefaultParam) return true
     if (visited.contains(param)) return false
     getSuperParameter match {

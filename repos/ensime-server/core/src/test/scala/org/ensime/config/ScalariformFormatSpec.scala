@@ -26,11 +26,11 @@ class ScalariformFormatSpec extends EnsimeSpec {
 
   it should "create valid output" in {
     prefs.toSexp should ===(
-        SexpList(
-            SexpSymbol(":doubleIndentClassDeclaration"),
-            SexpSymbol("t"),
-            SexpSymbol(":indentSpaces"),
-            SexpNumber(13)
-        ))
+      SexpList(
+        SexpSymbol(":doubleIndentClassDeclaration"),
+        SexpSymbol("t"),
+        SexpSymbol(":indentSpaces"),
+        SexpNumber(13)
+      ))
   }
 }

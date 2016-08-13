@@ -20,8 +20,7 @@ private[http4] object ReaderUtils {
 
     case invalid =>
       Future.exception(
-          new IllegalArgumentException(
-              "invalid message \"%s\"".format(invalid))
+        new IllegalArgumentException("invalid message \"%s\"".format(invalid))
       )
   }
 

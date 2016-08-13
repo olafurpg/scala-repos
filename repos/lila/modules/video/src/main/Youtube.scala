@@ -6,8 +6,10 @@ import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.Play.current
 
-private[video] final class Youtube(
-    url: String, apiKey: String, max: Int, api: VideoApi) {
+private[video] final class Youtube(url: String,
+                                   apiKey: String,
+                                   max: Int,
+                                   api: VideoApi) {
 
   import Youtube._
 
@@ -22,15 +24,15 @@ private[video] final class Youtube(
     entries.map { entry =>
       api.video
         .setMetadata(
-            entry.id,
-            Metadata(views = ~parseIntOption(entry.statistics.viewCount),
-                     likes = ~parseIntOption(entry.statistics.likeCount) -
+          entry.id,
+          Metadata(views = ~parseIntOption(entry.statistics.viewCount),
+                   likes = ~parseIntOption(entry.statistics.likeCount) -
                        ~parseIntOption(entry.statistics.dislikeCount),
-                     description = entry.snippet.description,
-                     duration = Some(entry.contentDetails.seconds),
-                     publishedAt = entry.snippet.publishedAt.flatMap { at =>
-                       scala.util.Try { new DateTime(at) }.toOption
-                     }))
+                   description = entry.snippet.description,
+                   duration = Some(entry.contentDetails.seconds),
+                   publishedAt = entry.snippet.publishedAt.flatMap { at =>
+                     scala.util.Try { new DateTime(at) }.toOption
+                   }))
         .recover {
           case e: Exception => logger.warn("update all youtube", e)
         }
@@ -40,9 +42,9 @@ private[video] final class Youtube(
   private def fetch: Fu[List[Entry]] = api.video.allIds flatMap { ids =>
     WS.url(url)
       .withQueryString(
-          "id" -> scala.util.Random.shuffle(ids).take(max).mkString(","),
-          "part" -> "id,statistics,snippet,contentDetails",
-          "key" -> apiKey
+        "id" -> scala.util.Random.shuffle(ids).take(max).mkString(","),
+        "part" -> "id,statistics,snippet,contentDetails",
+        "key" -> apiKey
       )
       .get() flatMap {
       case res if res.status == 200 =>
@@ -72,11 +74,12 @@ object Youtube {
                                   statistics: Statistics,
                                   contentDetails: ContentDetails)
 
-  private[video] case class Snippet(
-      description: Option[String], publishedAt: Option[String])
+  private[video] case class Snippet(description: Option[String],
+                                    publishedAt: Option[String])
 
-  private[video] case class Statistics(
-      viewCount: String, likeCount: String, dislikeCount: String)
+  private[video] case class Statistics(viewCount: String,
+                                       likeCount: String,
+                                       dislikeCount: String)
 
   private val iso8601Formatter =
     org.joda.time.format.ISOPeriodFormat.standard()

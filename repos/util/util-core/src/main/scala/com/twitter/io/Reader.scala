@@ -2,7 +2,13 @@ package com.twitter.io
 
 import com.twitter.concurrent.AsyncStream
 import com.twitter.util._
-import java.io.{File, FileInputStream, FileNotFoundException, InputStream, OutputStream}
+import java.io.{
+  File,
+  FileInputStream,
+  FileNotFoundException,
+  InputStream,
+  OutputStream
+}
 
 /**
   * A Reader represents a stream of bytes, read in discrete chunks.
@@ -160,7 +166,7 @@ object Reader {
           val reof = new Promise[Unit]()
           state = Closing(reof)
           p.setException(
-              new IllegalStateException("close while write is pending"))
+            new IllegalStateException("close while write is pending"))
           reof
       }
     }

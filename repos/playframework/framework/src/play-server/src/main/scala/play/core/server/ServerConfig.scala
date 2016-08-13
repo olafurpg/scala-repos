@@ -31,7 +31,7 @@ case class ServerConfig(rootDir: File,
   // Some basic validation of config
   if (!port.isDefined && !sslPort.isDefined)
     throw new IllegalArgumentException(
-        "Must provide either an HTTP port or an HTTPS port")
+      "Must provide either an HTTP port or an HTTPS port")
 }
 
 object ServerConfig {
@@ -44,16 +44,16 @@ object ServerConfig {
             mode: Mode.Mode = Mode.Prod,
             properties: Properties = System.getProperties): ServerConfig = {
     ServerConfig(
-        rootDir = rootDir,
-        port = port,
-        sslPort = sslPort,
-        address = address,
-        mode = mode,
-        properties = properties,
-        configuration = Configuration.load(classLoader,
-                                           properties,
-                                           rootDirConfig(rootDir),
-                                           mode == Mode.Test)
+      rootDir = rootDir,
+      port = port,
+      sslPort = sslPort,
+      address = address,
+      mode = mode,
+      properties = properties,
+      configuration = Configuration.load(classLoader,
+                                         properties,
+                                         rootDirConfig(rootDir),
+                                         mode == Mode.Test)
     )
   }
 

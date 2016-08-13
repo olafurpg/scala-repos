@@ -46,7 +46,7 @@ object StackedAreaChart {
                   yAxis: Axis[Y],
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new StackedAreaChart[X, Y](
-        new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
+      new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
 }
 
 class StackedAreaChart[X, Y](

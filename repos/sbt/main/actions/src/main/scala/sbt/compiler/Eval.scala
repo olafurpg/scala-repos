@@ -2,7 +2,17 @@ package sbt
 package compiler
 
 import scala.reflect.Manifest
-import scala.tools.nsc.{ast, interpreter, io, reporters, util, CompilerCommand, Global, Phase, Settings}
+import scala.tools.nsc.{
+  ast,
+  interpreter,
+  io,
+  reporters,
+  util,
+  CompilerCommand,
+  Global,
+  Phase,
+  Settings
+}
 import interpreter.AbstractFileClassLoader
 import io.{AbstractFile, PlainFile, VirtualDirectory}
 import ast.parser.Tokens
@@ -158,12 +168,10 @@ final class Eval(optionsNoncp: Seq[String],
     // TODO - We also encode the source of the setting into the hash to avoid conflicts where the exact SAME setting
     // is defined in multiple evaluated instances with a backing.  This leads to issues with finding a previous
     // value on the classpath when compiling.
-    val hash = Hash.toHex(
-        Hash(bytes(stringSeqBytes(content) :: optBytes(backing)(
-                    fileExistsBytes) :: stringSeqBytes(options) :: seqBytes(
-                    classpath)(fileModifiedBytes) :: stringSeqBytes(imports.strings
-                      .map(_._1)) :: optBytes(tpeName)(bytes) :: bytes(
-                    ev.extraHash) :: Nil)))
+    val hash = Hash.toHex(Hash(bytes(stringSeqBytes(content) :: optBytes(
+      backing)(fileExistsBytes) :: stringSeqBytes(options) :: seqBytes(
+      classpath)(fileModifiedBytes) :: stringSeqBytes(imports.strings.map(
+      _._1)) :: optBytes(tpeName)(bytes) :: bytes(ev.extraHash) :: Nil)))
     val moduleName = makeModuleName(hash)
 
     lazy val unit = {
@@ -174,8 +182,9 @@ final class Eval(optionsNoncp: Seq[String],
       override def units = (unit :: Nil).iterator
     }
     def unlinkAll(): Unit =
-      for ((sym, _) <- run.symSource) if (ev.unlink) unlink(sym)
-      else toUnlinkLater ::= sym
+      for ((sym, _) <- run.symSource)
+        if (ev.unlink) unlink(sym)
+        else toUnlinkLater ::= sym
 
     val (extra, loader) = backing match {
       case Some(back) if classExists(back, moduleName) =>
@@ -246,8 +255,8 @@ final class Eval(optionsNoncp: Seq[String],
       getValue[Any](moduleName, new AbstractFileClassLoader(dir, parent))
   def loadPlain(dir: File, moduleName: String): ClassLoader => Any =
     parent =>
-      getValue[Any](
-          moduleName, new URLClassLoader(Array(dir.toURI.toURL), parent))
+      getValue[Any](moduleName,
+                    new URLClassLoader(Array(dir.toURI.toURL), parent))
 
   //wrap tree in object objectName { def WrapValName = <tree> }
   def augment(parser: global.syntaxAnalyzer.UnitParser,
@@ -265,20 +274,22 @@ final class Eval(optionsNoncp: Seq[String],
     val emptyTypeName = nme.EMPTY.toTypeName
     def emptyPkg = parser.atPos(0, 0, 0) { Ident(nme.EMPTY_PACKAGE_NAME) }
     def emptyInit = DefDef(
-        NoMods,
-        nme.CONSTRUCTOR,
-        Nil,
-        List(Nil),
-        TypeTree(),
-        Block(List(Apply(Select(Super(This(emptyTypeName), emptyTypeName),
-                                nme.CONSTRUCTOR),
-                         Nil)),
-              Literal(Constant(())))
+      NoMods,
+      nme.CONSTRUCTOR,
+      Nil,
+      List(Nil),
+      TypeTree(),
+      Block(List(
+              Apply(Select(Super(This(emptyTypeName), emptyTypeName),
+                           nme.CONSTRUCTOR),
+                    Nil)),
+            Literal(Constant(())))
     )
 
     def moduleBody =
-      Template(
-          List(gen.scalaAnyRefConstr), emptyValDef, emptyInit :: definitions)
+      Template(List(gen.scalaAnyRefConstr),
+               emptyValDef,
+               emptyInit :: definitions)
     def moduleDef = ModuleDef(NoMods, newTermName(objectName), moduleBody)
     parser.makePackaging(0, emptyPkg, (imports :+ moduleDef).toList)
   }
@@ -305,7 +316,7 @@ final class Eval(optionsNoncp: Seq[String],
     override def traverse(tree: Tree): Unit = tree match {
       case ValDef(_, n, actualTpe, _)
           if isTopLevelModule(tree.symbol.owner) &&
-          isAcceptableType(actualTpe.tpe) =>
+            isAcceptableType(actualTpe.tpe) =>
         vals ::= nme.localToGetter(n).encoded
       case _ => super.traverse(tree)
     }
@@ -323,14 +334,14 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def classExists(dir: File, name: String) =
     (new File(dir, name + ".class")).exists
   // TODO: use the code from Analyzer
-  private[this] def getGeneratedFiles(
-      backing: Option[File], moduleName: String): Seq[File] =
+  private[this] def getGeneratedFiles(backing: Option[File],
+                                      moduleName: String): Seq[File] =
     backing match {
       case None => Nil
       case Some(dir) => dir listFiles moduleFileFilter(moduleName)
     }
-  private[this] def getClassFiles(
-      backing: Option[File], moduleName: String): Seq[File] =
+  private[this] def getClassFiles(backing: Option[File],
+                                  moduleName: String): Seq[File] =
     backing match {
       case None => Nil
       case Some(dir) => dir listFiles moduleClassFilter(moduleName)
@@ -351,16 +362,18 @@ final class Eval(optionsNoncp: Seq[String],
                                         val missingBlank: String,
                                         val extraSemi: String)
   private[this] def definitionErrorStrings = new ParseErrorStrings(
-      base = "Error parsing definition.",
-      extraBlank = "  Ensure that there are no blank lines within a definition.",
-      missingBlank = "  Ensure that definitions are separated by blank lines.",
-      extraSemi = "  A trailing semicolon is not permitted for standalone definitions."
+    base = "Error parsing definition.",
+    extraBlank = "  Ensure that there are no blank lines within a definition.",
+    missingBlank = "  Ensure that definitions are separated by blank lines.",
+    extraSemi =
+      "  A trailing semicolon is not permitted for standalone definitions."
   )
   private[this] def settingErrorStrings = new ParseErrorStrings(
-      base = "Error parsing expression.",
-      extraBlank = "  Ensure that there are no blank lines within a setting.",
-      missingBlank = "  Ensure that settings are separated by blank lines.",
-      extraSemi = "  Note that settings are expressions and do not end with semicolons.  (Semicolons are fine within {} blocks, however.)"
+    base = "Error parsing expression.",
+    extraBlank = "  Ensure that there are no blank lines within a setting.",
+    missingBlank = "  Ensure that settings are separated by blank lines.",
+    extraSemi =
+      "  Note that settings are expressions and do not end with semicolons.  (Semicolons are fine within {} blocks, however.)"
   )
 
   /**
@@ -392,7 +405,7 @@ final class Eval(optionsNoncp: Seq[String],
   }
   private[this] def parseType(tpe: String): Tree = {
     val tpeParser = new syntaxAnalyzer.UnitParser(
-        mkUnit("<expected-type>", DefaultStartLine, tpe))
+      mkUnit("<expected-type>", DefaultStartLine, tpe))
     val tpt0: Tree = tpeParser.typ()
     tpeParser.accept(EOF)
     checkError("Error parsing expression type.")
@@ -468,8 +481,9 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def checkError(label: String) =
     if (reporter.hasErrors) throw new EvalException(label)
 
-  private[this] final class EvalSourceFile(
-      name: String, startLine: Int, contents: String)
+  private[this] final class EvalSourceFile(name: String,
+                                           startLine: Int,
+                                           contents: String)
       extends BatchSourceFile(name, contents) {
     override def lineToOffset(line: Int): Int =
       super.lineToOffset((line - startLine) max 0)
@@ -481,8 +495,8 @@ final class Eval(optionsNoncp: Seq[String],
     * Constructs a CompilationUnit for each definition, which can be used to independently parse the definition into a Tree.
     * Additionally, a CompilationUnit for the combined definitions is constructed for use by combined compilation after parsing.
     */
-  private[this] def mkDefsUnit(
-      srcName: String, definitions: Seq[(String, scala.Range)])
+  private[this] def mkDefsUnit(srcName: String,
+                               definitions: Seq[(String, scala.Range)])
     : (CompilationUnit, Seq[CompilationUnit]) = {
     def fragmentUnit(content: String, lineMap: Array[Int]) =
       new CompilationUnit(fragmentSourceFile(srcName, content, lineMap))
@@ -506,8 +520,9 @@ final class Eval(optionsNoncp: Seq[String],
     * Source file that can map the offset in the file to and from line numbers that may discontinuous.
     * The values in `lineMap` must be ordered, but need not be consecutive.
     */
-  private[this] def fragmentSourceFile(
-      srcName: String, content: String, lineMap: Array[Int]) =
+  private[this] def fragmentSourceFile(srcName: String,
+                                       content: String,
+                                       lineMap: Array[Int]) =
     new BatchSourceFile(srcName, content) {
       override def lineToOffset(line: Int): Int =
         super.lineToOffset(lineMap.indexWhere(_ == line) max 0)
@@ -532,7 +547,7 @@ private[sbt] object Eval {
     else seqBytes(fs)(fileModifiedBytes)
   def fileModifiedBytes(f: File): Array[Byte] =
     (if (f.isDirectory) filesModifiedBytes(f listFiles classDirFilter)
-     else bytes(f.lastModified)) ++ bytes(f.getAbsolutePath)
+    else bytes(f.lastModified)) ++ bytes(f.getAbsolutePath)
   def fileExistsBytes(f: File): Array[Byte] =
     bytes(f.exists) ++ bytes(f.getAbsolutePath)
 

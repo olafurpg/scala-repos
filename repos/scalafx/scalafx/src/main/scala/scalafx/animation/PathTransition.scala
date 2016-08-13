@@ -32,7 +32,11 @@ import javafx.{animation => jfxa, scene => jfxs, util => jfxu}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate,
+  SFXEnumDelegate,
+  SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 import scalafx.scene.shape.Shape
 import scalafx.util.Duration
@@ -59,15 +63,15 @@ object PathTransition extends AnimationStatics {
     * Companion Object for $OT, where its values are defined.
     */
   object OrientationType
-      extends SFXEnumDelegateCompanion[
-          jfxa.PathTransition.OrientationType, OrientationType] {
+      extends SFXEnumDelegateCompanion[jfxa.PathTransition.OrientationType,
+                                       OrientationType] {
 
     /**
       * The targeted node's rotation matrix stays unchanged along the geometric path.
       */
     val None = new OrientationType(jfxa.PathTransition.OrientationType.NONE)
-    @deprecated(
-        "Use None; NONE will be removed in a future release", "8.0.60-R10")
+    @deprecated("Use None; NONE will be removed in a future release",
+                "8.0.60-R10")
     val NONE = None
 
     /**
@@ -75,10 +79,10 @@ object PathTransition extends AnimationStatics {
       * path.
       */
     val OrthogonalToTangent = new OrientationType(
-        jfxa.PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT)
+      jfxa.PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT)
     @deprecated(
-        "Use OrthogonalToTangent; ORTHOGONAL_TO_TANGENT will be removed in a future release",
-        "8.0.60-R10")
+      "Use OrthogonalToTangent; ORTHOGONAL_TO_TANGENT will be removed in a future release",
+      "8.0.60-R10")
     val ORTHOGONAL_TO_TANGENT = OrthogonalToTangent
 
     protected override def unsortedValues: Array[OrientationType] =
@@ -107,7 +111,8 @@ object PathTransition extends AnimationStatics {
   */
 class PathTransition(
     override val delegate: jfxa.PathTransition = new jfxa.PathTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.PathTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.PathTransition] {
 
   /**
     * $CONSTR

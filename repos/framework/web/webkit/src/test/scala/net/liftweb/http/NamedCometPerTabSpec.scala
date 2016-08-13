@@ -52,9 +52,9 @@ object NamedCometPerTabSpec extends Specification {
       NamedCometListener
         .getDispatchersFor(Full("1"))
         .foreach(
-            actor =>
-              actor.map(_.toString must startWith(
-                      "net.liftweb.http.NamedCometDispatcher"))
+          actor =>
+            actor.map(_.toString must startWith(
+              "net.liftweb.http.NamedCometDispatcher"))
         )
       success
     }
@@ -62,9 +62,9 @@ object NamedCometPerTabSpec extends Specification {
       NamedCometListener
         .getOrAddDispatchersFor(Full("3"))
         .foreach(
-            actor =>
-              actor.toString must startWith(
-                  "net.liftweb.http.NamedCometDispatcher")
+          actor =>
+            actor.toString must startWith(
+              "net.liftweb.http.NamedCometDispatcher")
         )
       success
     }
@@ -72,7 +72,7 @@ object NamedCometPerTabSpec extends Specification {
       NamedCometListener
         .getDispatchersFor(Full("2"))
         .foreach(
-            actor => actor must_== Empty
+          actor => actor must_== Empty
         )
       success
     }

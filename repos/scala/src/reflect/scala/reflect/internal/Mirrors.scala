@@ -30,7 +30,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     val EmptyPackageClass: ClassSymbol
     val EmptyPackage: ModuleSymbol
 
-    def symbolOf[T : universe.WeakTypeTag]: universe.TypeSymbol =
+    def symbolOf[T: universe.WeakTypeTag]: universe.TypeSymbol =
       universe.weakTypeTag[T].in(this).tpe.typeSymbolDirect.asType
 
     def findMemberFromRoot(fullName: Name): Symbol = {
@@ -54,7 +54,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
         if (settings.debug) { log(sym.info); log(sym.info.members) } //debug
         thisMirror.missingHook(owner, name) orElse {
           MissingRequirementError.notFound(
-              (if (path.isTermName) "object " else "class ") + path + " in " +
+            (if (path.isTermName) "object " else "class ") + path + " in " +
               thisMirror)
         }
       }
@@ -89,8 +89,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
 
     private[scala] def missingHook(owner: Symbol, name: Name): Symbol =
       logResult(s"missingHook($owner, $name)")(
-          mirrorMissingHook(owner, name) orElse universeMissingHook(owner,
-                                                                    name)
+        mirrorMissingHook(owner, name) orElse universeMissingHook(owner, name)
       )
 
     // todo: get rid of most the methods here and keep just staticClass/Module/Package
@@ -106,13 +105,13 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     }
 
     def getClassByName(fullname: Name): ClassSymbol =
-      ensureClassSymbol(
-          fullname.toString, getModuleOrClass(fullname.toTypeName))
+      ensureClassSymbol(fullname.toString,
+                        getModuleOrClass(fullname.toTypeName))
 
     def getRequiredClass(fullname: String): ClassSymbol =
       getClassByName(newTypeNameCached(fullname))
 
-    def requiredClass[T : ClassTag]: ClassSymbol =
+    def requiredClass[T: ClassTag]: ClassSymbol =
       getRequiredClass(erasureName[T])
 
     def getClassIfDefined(fullname: String): Symbol =
@@ -127,15 +126,17 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
       *  Compiler might ignore them, but they should be loadable with macros.
       */
     override def staticClass(fullname: String): ClassSymbol =
-      try ensureClassSymbol(
-          fullname, staticModuleOrClass(newTypeNameCached(fullname))) catch {
+      try ensureClassSymbol(fullname,
+                            staticModuleOrClass(newTypeNameCached(fullname)))
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
 
     /************************ loaders of module symbols ************************/
-    private def ensureModuleSymbol(
-        fullname: String, sym: Symbol, allowPackages: Boolean): ModuleSymbol =
+    private def ensureModuleSymbol(fullname: String,
+                                   sym: Symbol,
+                                   allowPackages: Boolean): ModuleSymbol =
       sym match {
         case x: ModuleSymbol if allowPackages || !x.hasPackageFlag => x
         case _ => MissingRequirementError.notFound("object " + fullname)
@@ -156,7 +157,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     // removing the trailing $, but I think that classTag should have
     // a method which returns a usable name, one which doesn't expose this
     // detail of the backend.
-    def requiredModule[T : ClassTag]: ModuleSymbol =
+    def requiredModule[T: ClassTag]: ModuleSymbol =
       getRequiredModule(erasureName[T] stripSuffix "$")
 
     def getModuleIfDefined(fullname: String): Symbol =
@@ -173,22 +174,25 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     override def staticModule(fullname: String): ModuleSymbol =
       try ensureModuleSymbol(fullname,
                              staticModuleOrClass(newTermNameCached(fullname)),
-                             allowPackages = false) catch {
+                             allowPackages = false)
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
 
     /************************ loaders of package symbols ************************/
-    private def ensurePackageSymbol(
-        fullname: String, sym: Symbol, allowModules: Boolean): ModuleSymbol =
+    private def ensurePackageSymbol(fullname: String,
+                                    sym: Symbol,
+                                    allowModules: Boolean): ModuleSymbol =
       sym match {
         case x: ModuleSymbol if allowModules || x.hasPackageFlag => x
         case _ => MissingRequirementError.notFound("package " + fullname)
       }
 
     def getPackage(fullname: TermName): ModuleSymbol =
-      ensurePackageSymbol(
-          fullname.toString, getModuleOrClass(fullname), allowModules = true)
+      ensurePackageSymbol(fullname.toString,
+                          getModuleOrClass(fullname),
+                          allowModules = true)
 
     def getPackageIfDefined(fullname: TermName): Symbol =
       wrapMissing(getPackage(fullname))
@@ -215,13 +219,14 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     override def staticPackage(fullname: String): ModuleSymbol =
       try ensurePackageSymbol(fullname.toString,
                               getModuleOrClass(newTermNameCached(fullname)),
-                              allowModules = false) catch {
+                              allowModules = false)
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
 
     /************************ helpers ************************/
-    def erasureName[T : ClassTag]: String = {
+    def erasureName[T: ClassTag]: String = {
       /* We'd like the String representation to be a valid
        * scala type, so we have to decode the jvm's secret language.
        */
@@ -234,7 +239,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     }
 
     @inline final def wrapMissing(body: => Symbol): Symbol =
-      try body catch { case _: MissingRequirementError => NoSymbol }
+      try body
+      catch { case _: MissingRequirementError => NoSymbol }
 
     /** getModule2/getClass2 aren't needed at present but may be again,
       *  so for now they're mothballed.
@@ -276,16 +282,15 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
         // because Definitions.scala, which initializes and enters them, only affects rootMirror
         // therefore we need to enter them manually for non-root mirrors
         definitions.syntheticCoreClasses foreach
-        (theirSym =>
-              {
-                val theirOwner = theirSym.owner
-                assert(theirOwner.isPackageClass,
-                       s"theirSym = $theirSym, theirOwner = $theirOwner")
-                val ourOwner = staticPackage(theirOwner.fullName).moduleClass
-                val ourSym =
-                  theirSym // just copy the symbol into our branch of the symbol table
-                ourOwner.info.decls enterIfNew ourSym
-            })
+          (theirSym => {
+             val theirOwner = theirSym.owner
+             assert(theirOwner.isPackageClass,
+                    s"theirSym = $theirSym, theirOwner = $theirOwner")
+             val ourOwner = staticPackage(theirOwner.fullName).moduleClass
+             val ourSym =
+               theirSym // just copy the symbol into our branch of the symbol table
+             ourOwner.info.decls enterIfNew ourSym
+           })
       }
 
       initialized = true
@@ -307,7 +312,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     // Features common to RootClass and RootPackage, the roots of all
     // type and term symbols respectively.
     sealed trait RootSymbol
-        extends WellKnownSymbol with thisUniverse.RootSymbol {
+        extends WellKnownSymbol
+        with thisUniverse.RootSymbol {
       final override def isRootSymbol = true
       override def owner = rootOwner
       override def typeOfThis = thisSym.tpe
@@ -355,8 +361,9 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     lazy val EmptyPackage = new EmptyPackage
 
     class EmptyPackageClass
-        extends PackageClassSymbol(
-            RootClass, NoPosition, tpnme.EMPTY_PACKAGE_NAME)
+        extends PackageClassSymbol(RootClass,
+                                   NoPosition,
+                                   tpnme.EMPTY_PACKAGE_NAME)
         with WellKnownSymbol {
       override def isEffectiveRoot = true
       override def isEmptyPackageClass = true

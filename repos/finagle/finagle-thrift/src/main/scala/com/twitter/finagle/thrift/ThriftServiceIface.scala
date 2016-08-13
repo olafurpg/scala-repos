@@ -13,8 +13,8 @@ import org.apache.thrift.transport.TMemoryInputTransport
 
 object maxReusableBufferSize
     extends GlobalFlag[StorageUnit](
-        16.kilobytes,
-        "Max size (bytes) for ThriftServiceIface reusable transport buffer"
+      16.kilobytes,
+      "Max size (bytes) for ThriftServiceIface reusable transport buffer"
     )
 
 /**
@@ -125,7 +125,7 @@ object ThriftServiceIface {
       stats: StatsReceiver
   ): SimpleFilter[method.Args, method.Result] = {
     val methodStats = ThriftMethodStats(
-        stats.scope(method.serviceName).scope(method.name))
+      stats.scope(method.serviceName).scope(method.name))
     new SimpleFilter[method.Args, method.Result] {
       def apply(
           args: method.Args,
@@ -187,10 +187,10 @@ object ThriftServiceIface {
                   Future.value(result)
                 case None =>
                   Future.exception(
-                      new TApplicationException(
-                          TApplicationException.MISSING_RESULT,
-                          s"Thrift method '${method.name}' failed: missing result"
-                      ))
+                    new TApplicationException(
+                      TApplicationException.MISSING_RESULT,
+                      s"Thrift method '${method.name}' failed: missing result"
+                    ))
               }
           }
         }

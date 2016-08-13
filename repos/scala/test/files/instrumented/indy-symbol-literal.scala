@@ -13,8 +13,9 @@ object Test {
     stopProfiling()
     // Only expect a single call to lookup the interned Symbol at each call site the defines
     // a single literal.
-    val Symbol_apply = MethodCallTrace(
-        "scala/Symbol$", "apply", "(Ljava/lang/String;)Lscala/Symbol;")
+    val Symbol_apply = MethodCallTrace("scala/Symbol$",
+                                       "apply",
+                                       "(Ljava/lang/String;)Lscala/Symbol;")
     assert(getStatistics.get(Symbol_apply) == Some(1), getStatistics);
   }
 }

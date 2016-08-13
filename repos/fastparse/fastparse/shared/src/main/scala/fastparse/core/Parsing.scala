@@ -23,7 +23,7 @@ sealed trait Parsed[+T] {
   def index: Int
 
   /**
-    * Converts this instance of [[Parsed]] into a [[Parsed.Success]] or 
+    * Converts this instance of [[Parsed]] into a [[Parsed.Success]] or
     * throws an exception if it was a failure.
     */
   def get: Parsed.Success[T] = this match {
@@ -34,8 +34,9 @@ sealed trait Parsed[+T] {
 
 case class ParseError(failure: Parsed.Failure)
     extends Exception(
-        ParseError.msg0(
-            failure.extra.input, failure.extra.traced.expected, failure.index)
+      ParseError.msg0(failure.extra.input,
+                      failure.extra.traced.expected,
+                      failure.index)
     )
 
 object ParseError {
@@ -86,16 +87,14 @@ object Parsed {
     * @param extra Extra supplementary information (including trace information).
     *              For details see [[Parsed.Failure.Extra]]
     */
-  case class Failure(lastParser: Parser[_],
-                     index: Int,
-                     extra: Failure.Extra)
+  case class Failure(lastParser: Parser[_], index: Int, extra: Failure.Extra)
       extends Parsed[Nothing] {
 
     def msg = Failure.formatStackTrace(
-        Nil,
-        extra.input,
-        index,
-        Failure.formatParser(lastParser, extra.input, index)
+      Nil,
+      extra.input,
+      index,
+      Failure.formatParser(lastParser, extra.input, index)
     )
 
     override def toString = s"Failure($msg)"
@@ -130,8 +129,8 @@ object Parsed {
                  index: Int)
           extends Extra {
 
-        lazy val traced = TracedFailure(
-            input, index, lastParser, (startIndex, startParser))
+        lazy val traced =
+          TracedFailure(input, index, lastParser, (startIndex, startParser))
 
         lazy val pos = Position.computeFrom(input, index)
 
@@ -151,10 +150,10 @@ object Parsed {
                          input: String,
                          index: Int,
                          last: String) = {
-      val body = for (Frame(index, p) <- stack) yield
-        formatParser(p, input, index)
+      val body = for (Frame(index, p) <- stack)
+        yield formatParser(p, input, index)
       (body :+ last).mkString(" / ") + " ..." + literalize(
-          input.slice(index, index + 10))
+        input.slice(index, index + 10))
     }
     def filterFullStack(fullStack: Seq[Frame]) = {
       fullStack.collect { case f @ Frame(i, p) if p.shortTraced => f }
@@ -205,8 +204,10 @@ object Parsed {
       * the default error message isn't to your liking.
       */
     lazy val trace = {
-      Failure.formatStackTrace(
-          stack, input, index, Failure.formatParser(expected0, input, index))
+      Failure.formatStackTrace(stack,
+                               input,
+                               index,
+                               Failure.formatParser(expected0, input, index))
     }
   }
   object TracedFailure {
@@ -218,21 +219,21 @@ object Parsed {
 
       val mutFailure = originalParser
         .parseRec(
-            new ParseCtx(input,
-                         0,
-                         index,
-                         originalParser,
-                         originalIndex,
-                         (_, _, _) => ()),
-            originalIndex
+          new ParseCtx(input,
+                       0,
+                       index,
+                       originalParser,
+                       originalIndex,
+                       (_, _, _) => ()),
+          originalIndex
         )
         .asInstanceOf[Mutable.Failure]
 
       new TracedFailure(
-          input,
-          index,
-          mutFailure.fullStack.toVector.reverse,
-          mutFailure.traceParsers + lastParser
+        input,
+        index,
+        mutFailure.fullStack.toVector.reverse,
+        mutFailure.traceParsers + lastParser
       )
     }
   }
@@ -314,8 +315,11 @@ object Mutable {
                      var cut: Boolean)
       extends Mutable[Nothing] {
     def toResult = {
-      val extra = new Parsed.Failure.Extra.Impl(
-          input, originalParser, originalIndex, lastParser, index)
+      val extra = new Parsed.Failure.Extra.Impl(input,
+                                                originalParser,
+                                                originalIndex,
+                                                lastParser,
+                                                index)
       Parsed.Failure(lastParser, index, extra)
     }
   }
@@ -342,15 +346,15 @@ class ParseCtx(val input: String,
   require(traceIndex >= -1,
           "traceIndex can only be -1 (for no tracing) or an index 0")
   val failure = Mutable.Failure(
-      input,
-      mutable.Buffer(),
-      0,
-      null,
-      originalParser,
-      originalIndex,
-      traceIndex,
-      Set.empty,
-      false
+    input,
+    mutable.Buffer(),
+    0,
+    null,
+    originalParser,
+    originalIndex,
+    traceIndex,
+    Set.empty,
+    false
   )
   val success = Mutable.Success(null, 0, Set.empty, false)
 }
@@ -387,7 +391,7 @@ trait Parser[+T] extends ParserResults[T] with Precedence {
   def parse(input: String,
             index: Int = 0,
             instrument: (Parser[_], Int,
-            () => Parsed[_]) => Unit = null): Parsed[T] = {
+                         () => Parsed[_]) => Unit = null): Parsed[T] = {
     parseRec(new ParseCtx(input, 0, -1, this, index, instrument), index).toResult
   }
 
@@ -414,8 +418,7 @@ trait Parser[+T] extends ParserResults[T] with Precedence {
 /**
   * Convenience methods to be used internally inside [[Parser]]s
   */
-trait ParserResults[+T] {
-  this: Parser[T] =>
+trait ParserResults[+T] { this: Parser[T] =>
   def mergeTrace(traceIndex: Int,
                  lhs: Set[Parser[_]],
                  rhs: Set[Parser[_]]): Set[Parser[_]] = {
@@ -443,8 +446,9 @@ trait ParserResults[+T] {
     f.fullStack.clear()
     if (f.traceIndex != -1 && f.traceIndex >= index) {
       if (f.traceIndex == index) {
-        f.traceParsers = if (traceParsers == null) Set(this)
-        else traceParsers
+        f.traceParsers =
+          if (traceParsers == null) Set(this)
+          else traceParsers
       } else {
         f.traceParsers = Set.empty
       }

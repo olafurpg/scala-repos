@@ -43,16 +43,16 @@ trait Aliases { self: blackbox.Context =>
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   type Run = universe.Run
 
   /** The type of compilation units.
     *  @see [[scala.reflect.macros.Enclosures]]
     */
   @deprecated(
-      "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
-      "2.11.0")
+    "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
+    "2.11.0")
   type CompilationUnit = universe.CompilationUnit
 
   /** Expr wraps an abstract syntax tree and tags it with its type. */
@@ -68,7 +68,7 @@ trait Aliases { self: blackbox.Context =>
     *  to other universes/mirrors (the functionality normally not needed for macros, since there is
     *  only one compile-time universe and only one compile-time mirror).
     */
-  def Expr[T : WeakTypeTag](tree: Tree): Expr[T]
+  def Expr[T: WeakTypeTag](tree: Tree): Expr[T]
 
   /** The type of weak type tags. */
   type WeakTypeTag[T] = universe.WeakTypeTag[T]
@@ -123,5 +123,5 @@ trait Aliases { self: blackbox.Context =>
   /**
     * Type symbol of `x` as derived from a type tag.
     */
-  def symbolOf[T : WeakTypeTag]: universe.TypeSymbol = universe.symbolOf[T]
+  def symbolOf[T: WeakTypeTag]: universe.TypeSymbol = universe.symbolOf[T]
 }

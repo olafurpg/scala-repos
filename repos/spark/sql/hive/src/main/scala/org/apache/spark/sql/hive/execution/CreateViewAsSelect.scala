@@ -42,7 +42,7 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
   private val childSchema = child.output
 
   assert(
-      tableDesc.schema == Nil || tableDesc.schema.length == childSchema.length)
+    tableDesc.schema == Nil || tableDesc.schema.length == childSchema.length)
   assert(tableDesc.viewText.isDefined)
 
   private val tableIdentifier = tableDesc.name
@@ -64,7 +64,7 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
         // Handles `CREATE VIEW v0 AS SELECT ...`. Throws exception when the target view already
         // exists.
         throw new AnalysisException(
-            s"View $tableIdentifier already exists. " +
+          s"View $tableIdentifier already exists. " +
             "If you want to update the view definition, please use ALTER VIEW AS or " +
             "CREATE OR REPLACE VIEW AS")
 
@@ -79,7 +79,8 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
   private def prepareTable(sqlContext: SQLContext): CatalogTable = {
     val expandedText =
       if (sqlContext.conf.canonicalView) {
-        try rebuildViewQueryString(sqlContext) catch {
+        try rebuildViewQueryString(sqlContext)
+        catch {
           case NonFatal(e) => wrapViewTextWithSelect
         }
       } else {

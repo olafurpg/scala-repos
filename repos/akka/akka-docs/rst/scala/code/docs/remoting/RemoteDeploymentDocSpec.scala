@@ -23,7 +23,8 @@ class RemoteDeploymentDocSpec
     akka.remote.netty.tcp {
       port = 0
     }
-""") with ImplicitSender {
+""")
+    with ImplicitSender {
 
   import RemoteDeploymentDocSpec._
 
@@ -39,7 +40,7 @@ class RemoteDeploymentDocSpec
   "demonstrate programmatic deployment" in {
     //#deploy
     val ref = system.actorOf(
-        Props[SampleActor].withDeploy(Deploy(scope = RemoteScope(address))))
+      Props[SampleActor].withDeploy(Deploy(scope = RemoteScope(address))))
     //#deploy
     ref.path.address should be(address)
     ref ! "test"

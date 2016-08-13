@@ -80,7 +80,8 @@ case class SchedulerExtensionServiceBinding(
   * is undefined.
   */
 private[spark] class SchedulerExtensionServices
-    extends SchedulerExtensionService with Logging {
+    extends SchedulerExtensionService
+    with Logging {
   private var serviceOption: Option[String] = None
   private var services: List[SchedulerExtensionService] = Nil
   private val started = new AtomicBoolean(false)
@@ -104,7 +105,7 @@ private[spark] class SchedulerExtensionServices
     val appId = binding.applicationId
     val attemptId = binding.attemptId
     logInfo(
-        s"Starting Yarn extension services with app $appId and attemptId $attemptId")
+      s"Starting Yarn extension services with app $appId and attemptId $attemptId")
 
     services = sparkContext.conf
       .get(SCHEDULER_SERVICES)

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -85,8 +85,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       h.snapshotRef(None).segments.length must_== 0
 
       h.write(
-          16,
-          json("""
+        16,
+        json("""
         {"a": 123, "b": true, "c": false, "d": null, "e": "cat", "f": {"aa": 11.0, "bb": 22.0}}
         {"a": 9999.0, "b": "xyz", "arr": [1,2,3]}
         {"a": 0, "b": false, "c": 0.0, "y": [], "z": {}}
@@ -96,13 +96,13 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
 
       val segs1 = h.snapshot(None).segments
       segs1 must contain(
-          ArraySegment(blockid,
-                       CPath(".a"),
-                       CNum,
-                       bitset(0, 1, 2),
-                       decs(123, 9999.0, 0)))
+        ArraySegment(blockid,
+                     CPath(".a"),
+                     CNum,
+                     bitset(0, 1, 2),
+                     decs(123, 9999.0, 0)))
       segs1 must contain(
-          BooleanSegment(blockid, CPath(".b"), bitset(0, 2), bitset(0), 3))
+        BooleanSegment(blockid, CPath(".b"), bitset(0, 2), bitset(0), 3))
 
       val segs1R = h.snapshotRef(None).segments
       segs1R mustEqual segs1
@@ -119,8 +119,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       h.length must_== 8
 
       val segs2 = h.snapshot(None).segments
-      segs2 must contain(BooleanSegment(
-              blockid, CPath(".b"), bitset(0, 2, 7), bitset(0, 7), 8))
+      segs2 must contain(
+        BooleanSegment(blockid, CPath(".b"), bitset(0, 2, 7), bitset(0, 7), 8))
 
       val segs2R = h.snapshotRef(None).segments
       segs2R mustEqual segs2
@@ -213,7 +213,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       */
     val tmp5 = tempfile()
     "throw an exception when creating already-present logs " in new cleanup(
-        tmp5) {
+      tmp5) {
       RawHandler.empty(blockid, tmp5).close()
       RawHandler.empty(blockid, tmp5) must throwA[Exception]
     }
@@ -327,23 +327,23 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
 
       val snap2 = h.snapshot(None).segments
       snap1.toSet must_== Set()
-      snap2.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      snap2.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
 
       val snap2R = h.snapshotRef(None).segments
       snap1R.toSet must_== Set()
-      snap2R.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      snap2R.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
 
       val a2 = h.snapshot(Some(Set(cpa))).segments
       a1.toSet must_== Set()
-      a2.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      a2.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
 
       val a2R = h.snapshotRef(Some(Set(ColumnRef(cpa, CString)))).segments
       a1R.toSet must_== Set()
-      a2R.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      a2R.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
 
       val a2REmpty = h.snapshotRef(Some(Set(ColumnRef(cpa, CNum)))).segments
       a2REmpty.toSet must_== Set()
@@ -361,8 +361,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val snap3R = h.snapshotRef(None).segments
 
       snap1.toSet must_== Set()
-      snap2.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      snap2.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
       snap3.toSet must_== Set(ArraySegment(blockid,
                                            cpa,
                                            CString,
@@ -380,14 +380,14 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val a3REmpty = h.snapshotRef(Some(Set(ColumnRef(cpa, CNum)))).segments
 
       a1.toSet must_== Set()
-      a2.toSet must_== Set(ArraySegment(
-              blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
+      a2.toSet must_== Set(
+        ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
       a3.toSet must_== Set(
-          ArraySegment(blockid,
-                       cpa,
-                       CString,
-                       bitset(0, 1, 2, 3),
-                       Array("foo", "bar", "qux", "baz")))
+        ArraySegment(blockid,
+                     cpa,
+                     CString,
+                     bitset(0, 1, 2, 3),
+                     Array("foo", "bar", "qux", "baz")))
       a3 mustEqual a3R
 
       a3REmpty.toSet must_== Set()

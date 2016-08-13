@@ -50,8 +50,7 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "not work from Outlets" in {
-      RunnableGraph.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
         val o: Outlet[Int] = b.add(source).out
         "o <~ source" shouldNot compile
         sink <~ o
@@ -60,8 +59,7 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "not work from SourceShape" in {
-      RunnableGraph.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
         val o: SourceShape[Int] = b.add(source)
         "o <~ source" shouldNot compile
         sink <~ o
@@ -86,31 +84,31 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "work from UniformFanInShape" in {
-      Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
-              f <~ source
-              f <~ Source.empty
-              f ~> s
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+      Await.result(RunnableGraph
+                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+                       val f: UniformFanInShape[Int, Int] =
+                         b.add(Merge[Int](2))
+                       f <~ source
+                       f <~ Source.empty
+                       f ~> s
+                       ClosedShape
+                     })
+                     .run(),
+                   1.second) should ===(Seq(1, 2, 3))
     }
 
     "work from UniformFanOutShape" in {
-      Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
-              f <~ source
-              f ~> Sink.ignore
-              f ~> s
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+      Await.result(RunnableGraph
+                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+                       val f: UniformFanOutShape[Int, Int] =
+                         b.add(Broadcast[Int](2))
+                       f <~ source
+                       f ~> Sink.ignore
+                       f ~> s
+                       ClosedShape
+                     })
+                     .run(),
+                   1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards Outlets" in {
@@ -158,68 +156,66 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "work towards UniformFanInShape" in {
-      Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
-              s <~ f
-              Source.empty ~> f
-              source ~> f
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+      Await.result(RunnableGraph
+                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+                       val f: UniformFanInShape[Int, Int] =
+                         b.add(Merge[Int](2))
+                       s <~ f
+                       Source.empty ~> f
+                       source ~> f
+                       ClosedShape
+                     })
+                     .run(),
+                   1.second) should ===(Seq(1, 2, 3))
     }
 
     "fail towards already full UniformFanInShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) {
-                       implicit b ⇒ s ⇒
-                         val f: UniformFanInShape[Int, Int] =
-                           b.add(Merge[Int](2))
-                         val src = b.add(source)
-                         Source.empty ~> f
-                         src ~> f
-                         (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
-                             "no more inlets free")
-                         ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] =
+              b.add(Merge[Int](2))
+            val src = b.add(source)
+            Source.empty ~> f
+            src ~> f
+            (the[IllegalArgumentException] thrownBy
+              (s <~ f <~ src)).getMessage should include("no more inlets free")
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards UniformFanOutShape" in {
-      Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
-              s <~ f
-              Sink.ignore <~ f
-              source ~> f
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
-    }
-
-    "fail towards already full UniformFanOutShape" in {
       Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) {
-                       implicit b ⇒ s ⇒
-                         val f: UniformFanOutShape[Int, Int] =
-                           b.add(Broadcast[Int](2))
-                         val sink2: SinkShape[Int] = b.add(Sink.ignore)
-                         val src = b.add(source)
-                         src ~> f
-                         sink2 <~ f
-                         (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
-                             "already connected")
-                         ClosedShape
+                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+                       val f: UniformFanOutShape[Int, Int] =
+                         b.add(Broadcast[Int](2))
+                       s <~ f
+                       Sink.ignore <~ f
+                       source ~> f
+                       ClosedShape
                      })
                      .run(),
                    1.second) should ===(Seq(1, 2, 3))
+    }
+
+    "fail towards already full UniformFanOutShape" in {
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] =
+              b.add(Broadcast[Int](2))
+            val sink2: SinkShape[Int] = b.add(Sink.ignore)
+            val src = b.add(source)
+            src ~> f
+            sink2 <~ f
+            (the[IllegalArgumentException] thrownBy
+              (s <~ f <~ src)).getMessage should include("already connected")
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work across a Flow" in {

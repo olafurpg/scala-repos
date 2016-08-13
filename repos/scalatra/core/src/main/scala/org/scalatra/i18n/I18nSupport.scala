@@ -13,8 +13,7 @@ object I18nSupport {
   val MessagesKey: String = "messages"
 }
 
-trait I18nSupport {
-  this: ScalatraBase =>
+trait I18nSupport { this: ScalatraBase =>
 
   import org.scalatra.i18n.I18nSupport._
 
@@ -26,7 +25,7 @@ trait I18nSupport {
   def locale(implicit request: HttpServletRequest): Locale = {
     if (request == null) {
       throw new ScalatraException(
-          "There needs to be a request in scope to call locale")
+        "There needs to be a request in scope to call locale")
     } else {
       request.get(LocaleKey).map(_.asInstanceOf[Locale]).orNull
     }
@@ -35,7 +34,7 @@ trait I18nSupport {
   def userLocales(implicit request: HttpServletRequest): Array[Locale] = {
     if (request == null) {
       throw new ScalatraException(
-          "There needs to be a request in scope to call userLocales")
+        "There needs to be a request in scope to call userLocales")
     } else {
       request.get(UserLocalesKey).map(_.asInstanceOf[Array[Locale]]).orNull
     }
@@ -47,7 +46,7 @@ trait I18nSupport {
   def messages(implicit request: HttpServletRequest): Messages = {
     if (request == null) {
       throw new ScalatraException(
-          "There needs to be a request in scope to call messages")
+        "There needs to be a request in scope to call messages")
     } else {
       request.get(MessagesKey).map(_.asInstanceOf[Messages]).orNull
     }
@@ -68,7 +67,7 @@ trait I18nSupport {
 
   /*
    * Get locale either from HTTP param, Cookie or Accept-Language header.
-   * 
+   *
    * If locale string is found in HTTP param, it will be set
    * in cookie. Later requests will read locale string directly from this
    *
@@ -96,23 +95,22 @@ trait I18nSupport {
     request.headers.get("Accept-Language") map { s =>
       val locales = s
         .split(",")
-        .map(s =>
-              {
-            def splitLanguageCountry(s: String): Locale = {
-              val langCountry = s.split("-")
-              if (langCountry.length > 1) {
-                new Locale(langCountry.head, langCountry.last)
-              } else {
-                new Locale(langCountry.head)
-              }
-            }
-            // If this language has a quality index:
-            if (s.indexOf(";") > 0) {
-              val qualityLocale = s.split(";")
-              splitLanguageCountry(qualityLocale.head)
+        .map(s => {
+          def splitLanguageCountry(s: String): Locale = {
+            val langCountry = s.split("-")
+            if (langCountry.length > 1) {
+              new Locale(langCountry.head, langCountry.last)
             } else {
-              splitLanguageCountry(s)
+              new Locale(langCountry.head)
             }
+          }
+          // If this language has a quality index:
+          if (s.indexOf(";") > 0) {
+            val qualityLocale = s.split(";")
+            splitLanguageCountry(qualityLocale.head)
+          } else {
+            splitLanguageCountry(s)
+          }
         })
       // save all found locales for later user
       request.setAttribute(UserLocalesKey, locales)

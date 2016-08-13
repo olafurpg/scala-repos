@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,11 +42,14 @@ import scalaz.std.set._
 import scalaz.syntax.traverse._
 
 trait LinearRegressionLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ReductionLibModule[M]
+    extends ColumnarTableLibModule[M]
+    with ReductionLibModule[M]
     with PredictionLibModule[M] {
 
   trait LinearRegressionLib
-      extends ColumnarTableLib with RegressionSupport with PredictionSupport
+      extends ColumnarTableLib
+      with RegressionSupport
+      with PredictionSupport
       with ReductionLib {
 
     import trans._
@@ -56,15 +59,15 @@ trait LinearRegressionLibModule[M[+ _]]
 
     object MultiLinearRegression
         extends Morphism2(Stats2Namespace, "linearRegression") {
-      val tpe = BinaryOperationType(
-          JNumberT, JType.JUniverseT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JNumberT, JType.JUniverseT, JObjectUnfixedT)
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
       type Beta = Array[Double]
 
       // `beta`: current weighted value for coefficients
-      // `count`: number of rows seen 
+      // `count`: number of rows seen
       // `removed`: indices of columns removed due to their dependence on other columns
       case class CoeffAcc(beta: Beta, count: Long, removed: Set[Int])
 
@@ -77,8 +80,8 @@ trait LinearRegressionLibModule[M[+ _]]
         * http://adrem.ua.ac.be/sites/adrem.ua.ac.be/files/StreamFitter.pdf
         *
         * First slice size is made consistent. Then the slices are fed to the reducer, one by one.
-        * The reducer calculates the Ordinary Least Squares regression for each Slice. 
-        * The results of each of these regressions are then combined incrementally using `monoid`. 
+        * The reducer calculates the Ordinary Least Squares regression for each Slice.
+        * The results of each of these regressions are then combined incrementally using `monoid`.
         * `alpha` (a value between 0 and 1) is the paramater which determines the weighting of the
         * data in the stream. A value of 0.5 means that current values and past values
         * are equally weighted. The paper above outlines how `alpha` relates to the half-life
@@ -134,7 +137,7 @@ trait LinearRegressionLibModule[M[+ _]]
               t1.product
             } else {
               assert(
-                  t1.product.getColumnDimension == t2.product.getColumnDimension &&
+                t1.product.getColumnDimension == t2.product.getColumnDimension &&
                   t1.product.getRowDimension == t2.product.getRowDimension)
 
               t1.product plus t2.product
@@ -160,8 +163,8 @@ trait LinearRegressionLibModule[M[+ _]]
       }
 
       // inserts the Double value `0` at all `indices` in `values`
-      def insertZeroAt(
-          values: Array[Double], indices0: Array[Int]): Array[Double] = {
+      def insertZeroAt(values: Array[Double],
+                       indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
           indices0 filter { i =>
@@ -190,8 +193,8 @@ trait LinearRegressionLibModule[M[+ _]]
       }
 
       // removes `indices` from `values`
-      def removeAt(
-          values: Array[Double], indices0: Array[Int]): Array[Double] = {
+      def removeAt(values: Array[Double],
+                   indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
           indices0 filter { i =>
@@ -230,7 +233,7 @@ trait LinearRegressionLibModule[M[+ _]]
               Some(mapped)
             case other =>
               logger.warn(
-                  "Features were not correctly put into a homogeneous array of doubles; returning empty.")
+                "Features were not correctly put into a homogeneous array of doubles; returning empty.")
               None
           }
 
@@ -281,7 +284,7 @@ trait LinearRegressionLibModule[M[+ _]]
             matrixX0 map { mx =>
               if (mx.getRowDimension < mx.getColumnDimension) {
                 throw new IllegalArgumentException(
-                    "Matrix is rank deficient. Not enough rows to determine model.")
+                  "Matrix is rank deficient. Not enough rows to determine model.")
               } else {
                 mx
               }
@@ -323,11 +326,11 @@ trait LinearRegressionLibModule[M[+ _]]
                     sys.error("Rank cannot increase when a column is removed.")
                 } else {
                   sys.error(
-                      "Matrix cannot have rank larger than number of columns.")
+                    "Matrix cannot have rank larger than number of columns.")
                 }
               } else {
                 sys.error(
-                    "Failed to find dependent columns. Should never reach this case.")
+                  "Failed to find dependent columns. Should never reach this case.")
               }
             }
 
@@ -380,8 +383,10 @@ trait LinearRegressionLibModule[M[+ _]]
             val matrixX0 = xs map { case arr => new Matrix(arr) }
             val matrixX =
               matrixX0 map { mx =>
-                removeColumns(
-                    mx, mx.getRowDimension, mx.getColumnDimension, acc.removed)
+                removeColumns(mx,
+                              mx.getRowDimension,
+                              mx.getColumnDimension,
+                              acc.removed)
               }
 
             val matrixProduct =
@@ -447,8 +452,8 @@ trait LinearRegressionLibModule[M[+ _]]
           (0 until colDim) map {
             case i => math.sqrt(varianceCovariance.get(i, i))
           }
-        val stdErrors = insertZeroAt(
-            stdErrors0.toArray, coeffs.removed.toArray)
+        val stdErrors =
+          insertZeroAt(stdErrors0.toArray, coeffs.removed.toArray)
 
         assert(weightedBeta.length == stdErrors.length)
 
@@ -466,24 +471,23 @@ trait LinearRegressionLibModule[M[+ _]]
         val thetaInSchema = theta.transform(spec)
 
         val varCovarArr = varianceCovariance.getArray
-        val varCovarRv = RArray(
-            varCovarArr map { arr =>
+        val varCovarRv = RArray(varCovarArr map { arr =>
           RArray(arr.map(CNum(_)): _*)
         }: _*)
         val varCovarTable0 = Table.fromRValues(Stream(varCovarRv))
 
         val varCovarTable = varCovarTable0.transform(
-            trans.WrapObject(Leaf(Source), "varianceCovarianceMatrix"))
+          trans.WrapObject(Leaf(Source), "varianceCovarianceMatrix"))
 
         val coeffsTable = thetaInSchema.transform(
-            trans.WrapObject(Leaf(Source), "coefficients"))
+          trans.WrapObject(Leaf(Source), "coefficients"))
 
         val stdErrResult = RObject(
-            Map("estimate" -> CNum(math.sqrt(varianceEst)),
-                "degreesOfFreedom" -> CNum(degOfFreedom)))
+          Map("estimate" -> CNum(math.sqrt(varianceEst)),
+              "degreesOfFreedom" -> CNum(degOfFreedom)))
         val residualStdError = Table.fromRValues(Stream(stdErrResult))
         val stdErrorTable = residualStdError.transform(
-            trans.WrapObject(Leaf(Source), "residualStandardError"))
+          trans.WrapObject(Leaf(Source), "residualStandardError"))
 
         val rSquared = {
           if (errors.tss == 0) 1
@@ -494,19 +498,19 @@ trait LinearRegressionLibModule[M[+ _]]
           rSquaredTable0.transform(trans.WrapObject(Leaf(Source), "RSquared"))
 
         val result2 = coeffsTable.cross(rSquaredTable)(
-            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
         val result1 = result2.cross(varCovarTable)(
-            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
         val result = result1.cross(stdErrorTable)(
-            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
 
         val valueTable =
           result.transform(trans.WrapObject(Leaf(Source), paths.Value.name))
         val keyTable = Table.constEmptyArray.transform(
-            trans.WrapObject(Leaf(Source), paths.Key.name))
+          trans.WrapObject(Leaf(Source), paths.Key.name))
 
         valueTable.cross(keyTable)(
-            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
       }
 
       private val morph1 = new Morph1Apply {
@@ -518,8 +522,8 @@ trait LinearRegressionLibModule[M[+ _]]
           val xsSpec = trans.DeepMap1(xsSpec0, cf.util.CoerceToDouble)
 
           // `arraySpec` generates the schema in which the Coefficients will be returned
-          val arraySpec = InnerArrayConcat(
-              trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
+          val arraySpec =
+            InnerArrayConcat(trans.WrapArray(xsSpec), trans.WrapArray(ySpec))
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
           val table = table0.transform(valueSpec).transform(arraySpec)
 
@@ -569,7 +573,7 @@ trait LinearRegressionLibModule[M[+ _]]
           val reducedTables: M[Seq[Table]] =
             tablesWithType flatMap {
               _.map { case (table, jtype) => tableReducer(table, jtype) }.toStream.sequence map
-              (_.toSeq)
+                (_.toSeq)
             }
 
           val objectTables: M[Seq[Table]] =
@@ -578,13 +582,13 @@ trait LinearRegressionLibModule[M[+ _]]
                 case (tbl, idx) =>
                   val modelId = "model" + (idx + 1)
                   tbl.transform(
-                      liftToValues(trans.WrapObject(TransSpec1.Id, modelId)))
+                    liftToValues(trans.WrapObject(TransSpec1.Id, modelId)))
               }
             }
 
           val spec = OuterObjectConcat(
-              DerefObjectStatic(Leaf(SourceLeft), paths.Value),
-              DerefObjectStatic(Leaf(SourceRight), paths.Value))
+            DerefObjectStatic(Leaf(SourceLeft), paths.Value),
+            DerefObjectStatic(Leaf(SourceRight), paths.Value))
 
           objectTables map {
             _.reduceOption { (tl, tr) =>
@@ -598,8 +602,8 @@ trait LinearRegressionLibModule[M[+ _]]
     object LinearPrediction
         extends Morphism2(Stats2Namespace, "predictLinear")
         with LinearPredictionBase {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
 
       override val idPolicy = IdentityPolicy.Retain.Merge
 
@@ -608,7 +612,7 @@ trait LinearRegressionLibModule[M[+ _]]
 
       def alignCustom(t1: Table, t2: Table): M[(Table, Morph1Apply)] = {
         val spec = liftToValues(
-            trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
+          trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
         t2.transform(spec).reduce(reducer) map { models =>
           (t1.transform(spec),
            morph1Apply(models, scala.Predef.identity[Double]))

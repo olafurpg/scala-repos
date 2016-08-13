@@ -47,8 +47,8 @@ class PartitionedWriteSuite extends QueryTest with SharedSQLContext {
     df.write.partitionBy("id").save(path.getCanonicalPath)
 
     checkAnswer(
-        sqlContext.read.load(path.getCanonicalPath),
-        (0 to 99).map(Row(1, _)).toSeq ++ (0 to 99).map(Row(1, _)).toSeq)
+      sqlContext.read.load(path.getCanonicalPath),
+      (0 to 99).map(Row(1, _)).toSeq ++ (0 to 99).map(Row(1, _)).toSeq)
 
     Utils.deleteRecursively(path)
   }

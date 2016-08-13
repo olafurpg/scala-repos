@@ -82,7 +82,8 @@ trait DateTypedField extends TypedField[Date] {
 }
 
 class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[Date, OwnerType] with MandatoryTypedField[Date]
+    extends Field[Date, OwnerType]
+    with MandatoryTypedField[Date]
     with DateTypedField {
 
   def owner = rec
@@ -106,7 +107,8 @@ class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 }
 
 class OptionalDateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[Date, OwnerType] with OptionalTypedField[Date]
+    extends Field[Date, OwnerType]
+    with OptionalTypedField[Date]
     with DateTypedField {
 
   def owner = rec

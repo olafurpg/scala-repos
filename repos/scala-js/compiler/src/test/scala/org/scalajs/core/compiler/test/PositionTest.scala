@@ -25,9 +25,9 @@ class PositionTest extends JSASTTest {
                      "virtualfile",
                      lit.pos.source.getScheme)
         assertEquals(
-            "Scheme specific part of virtual file URI should be its path",
-            name,
-            lit.pos.source.getSchemeSpecificPart)
+          "Scheme specific part of virtual file URI should be its path",
+          name,
+          lit.pos.source.getSchemeSpecificPart)
     }
 
     assertTrue("Should have IntLiteral tree", found)

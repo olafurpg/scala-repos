@@ -392,7 +392,8 @@ trait ListTest extends CollectionTest {
     }
   }
 
-  @Test def shouldIterateAndModifyElementsWithAListIteratorIfAllowed(): Unit = {
+  @Test
+  def shouldIterateAndModifyElementsWithAListIteratorIfAllowed(): Unit = {
     if (factory.allowsMutationThroughIterator) {
       val s = Seq("one", "two", "three")
       val ll = factory.empty[String]
@@ -454,12 +455,13 @@ trait ListTest extends CollectionTest {
 
 object ListFactory {
   def allFactories: Iterator[ListFactory] =
-    Iterator(
-        new ArrayListFactory, new LinkedListFactory, new AbstractListFactory)
+    Iterator(new ArrayListFactory,
+             new LinkedListFactory,
+             new AbstractListFactory)
 }
 
 trait ListFactory extends CollectionFactory {
-  def empty[E : ClassTag]: ju.List[E]
+  def empty[E: ClassTag]: ju.List[E]
 
   /** Sortable using java.util.Collections.sort
     */

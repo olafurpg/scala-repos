@@ -24,10 +24,13 @@ import generic.CanBuildFrom
   *  rapidly as 2^30 is approached.
   *
   */
-final class LongMap[V] private[collection](
-    defaultEntry: Long => V, initialBufferSize: Int, initBlank: Boolean)
+final class LongMap[V] private[collection] (defaultEntry: Long => V,
+                                            initialBufferSize: Int,
+                                            initBlank: Boolean)
     extends AbstractMap[Long, V]
-    with Map[Long, V] with MapLike[Long, V, LongMap[V]] with Serializable {
+    with Map[Long, V]
+    with MapLike[Long, V, LongMap[V]]
+    with Serializable {
   import LongMap._
 
   def this() = this(LongMap.exceptionDefault, 16, true)
@@ -59,10 +62,11 @@ final class LongMap[V] private[collection](
   if (initBlank) defaultInitialize(initialBufferSize)
 
   private[this] def defaultInitialize(n: Int) = {
-    mask = if (n < 0) 0x7
-    else
-      (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
-              1) & 0x3FFFFFFF) | 0x7
+    mask =
+      if (n < 0) 0x7
+      else
+        (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
+          1) & 0x3FFFFFFF) | 0x7
     _keys = new Array[Long](mask + 1)
     _values = new Array[AnyRef](mask + 1)
   }
@@ -371,17 +375,17 @@ final class LongMap[V] private[collection](
 
     def hasNext: Boolean =
       nextPair != null ||
-      (index < kz.length && {
-            var q = kz(index)
-            while (q == -q) {
-              index += 1
-              if (index >= kz.length) return false
-              q = kz(index)
-            }
-            nextPair = (kz(index), vz(index).asInstanceOf[V])
+        (index < kz.length && {
+          var q = kz(index)
+          while (q == -q) {
             index += 1
-            true
-          })
+            if (index >= kz.length) return false
+            q = kz(index)
+          }
+          nextPair = (kz(index), vz(index).asInstanceOf[V])
+          index += 1
+          true
+        })
     def next = {
       if (nextPair == null && !hasNext)
         throw new NoSuchElementException("next")
@@ -412,8 +416,14 @@ final class LongMap[V] private[collection](
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = java.util.Arrays.copyOf(_values, _values.length)
     val lm = new LongMap[V](defaultEntry, 1, false)
-    lm.initializeTo(
-        mask, extraKeys, zeroValue, minValue, _size, _vacant, kz, vz)
+    lm.initializeTo(mask,
+                    extraKeys,
+                    zeroValue,
+                    minValue,
+                    _size,
+                    _vacant,
+                    kz,
+                    vz)
     lm
   }
 
@@ -472,10 +482,12 @@ final class LongMap[V] private[collection](
   def mapValuesNow[V1](f: V => V1): LongMap[V1] = {
     val zv =
       if ((extraKeys & 1) == 1)
-        f(zeroValue.asInstanceOf[V]).asInstanceOf[AnyRef] else null
+        f(zeroValue.asInstanceOf[V]).asInstanceOf[AnyRef]
+      else null
     val mv =
       if ((extraKeys & 2) == 2)
-        f(minValue.asInstanceOf[V]).asInstanceOf[AnyRef] else null
+        f(minValue.asInstanceOf[V]).asInstanceOf[AnyRef]
+      else null
     val lm = new LongMap[V1](LongMap.exceptionDefault, 1, false)
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = new Array[AnyRef](_values.length)
@@ -522,8 +534,8 @@ object LongMap {
   private val exceptionDefault: Long => Nothing = (k: Long) =>
     throw new NoSuchElementException(k.toString)
 
-  implicit def canBuildFrom[V, U]: CanBuildFrom[
-      LongMap[V], (Long, U), LongMap[U]] =
+  implicit def canBuildFrom[V, U]
+    : CanBuildFrom[LongMap[V], (Long, U), LongMap[U]] =
     new CanBuildFrom[LongMap[V], (Long, U), LongMap[U]] {
       def apply(from: LongMap[V]): LongMapBuilder[U] = apply()
       def apply(): LongMapBuilder[U] = new LongMapBuilder[U]

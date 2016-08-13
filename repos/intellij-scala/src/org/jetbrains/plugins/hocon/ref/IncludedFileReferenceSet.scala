@@ -6,7 +6,10 @@ import com.intellij.openapi.roots._
 import com.intellij.openapi.roots.impl.DirectoryIndex
 import com.intellij.openapi.util.{Condition, TextRange}
 import com.intellij.psi._
-import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReference, FileReferenceSet}
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.{
+  FileReference,
+  FileReferenceSet
+}
 import org.jetbrains.plugins.hocon.CommonUtil._
 import org.jetbrains.plugins.hocon.HoconConstants._
 import org.jetbrains.plugins.scala.extensions._
@@ -51,15 +54,16 @@ class IncludedFileReferenceSet(text: String,
     if (relative) !forcedAbsolute
     else fromClasspath
 
-  override def createFileReference(
-      range: TextRange, index: Int, text: String): FileReference =
+  override def createFileReference(range: TextRange,
+                                   index: Int,
+                                   text: String): FileReference =
     new IncludedFileReference(this, range, index, text)
 
   override def getReferenceCompletionFilter: Condition[PsiFileSystemItem] =
     new Condition[PsiFileSystemItem] {
       def value(item: PsiFileSystemItem): Boolean =
         item.isDirectory || item.getName.endsWith(ConfExt) ||
-        item.getName.endsWith(JsonExt) || item.getName.endsWith(PropsExt)
+          item.getName.endsWith(JsonExt) || item.getName.endsWith(PropsExt)
     }
 
   // code mostly based on similar bits in `FileReferenceSet` and `PsiFileReferenceHelper`
@@ -96,10 +100,10 @@ class IncludedFileReferenceSet(text: String,
         pfi.getOrderEntriesForFile(parent).iterator.asScala.collect {
           case msoe: ModuleSourceOrderEntry =>
             msoe.getOwnerModule.getModuleRuntimeScope(
-                pfi.isInTestSourceContent(parent))
+              pfi.isInTestSourceContent(parent))
           case loe: LibraryOrderEntry =>
             loe.getOwnerModule.getModuleRuntimeScope(
-                loe.getScope == DependencyScope.TEST)
+              loe.getScope == DependencyScope.TEST)
         }
 
       def orderEntryScope = allScopes.reduceOption(_ union _)
@@ -109,7 +113,7 @@ class IncludedFileReferenceSet(text: String,
           .toOption
           .map(_.getModuleRuntimeScope(false))
 
-        (orderEntryScope orElse moduleScope).map { scope =>
+      (orderEntryScope orElse moduleScope).map { scope =>
         // If there are any source roots with package prefix and that package is a subpackage of
         // including file's package, they will be omitted because `getDirectoriesByPackageName` doesn't find them.
         // I tried to fix this by manually searching for package-prefixed source dirs and representing them with
@@ -149,14 +153,16 @@ object IncludedFileReference {
   }
 }
 
-class IncludedFileReference(
-    refSet: FileReferenceSet, range: TextRange, index: Int, text: String)
+class IncludedFileReference(refSet: FileReferenceSet,
+                            range: TextRange,
+                            index: Int,
+                            text: String)
     extends FileReference(refSet, range, index, text) {
 
   private def lacksExtension(text: String) =
     isLast && text.nonEmpty && text != "." && text != ".." && text != "/" &&
-    !text.endsWith(ConfExt) && !text.endsWith(JsonExt) &&
-    !text.endsWith(PropsExt)
+      !text.endsWith(ConfExt) && !text.endsWith(JsonExt) &&
+      !text.endsWith(PropsExt)
 
   override def innerResolve(caseSensitive: Boolean,
                             containingFile: PsiFile): Array[ResolveResult] = {

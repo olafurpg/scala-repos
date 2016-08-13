@@ -10,11 +10,11 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
   "DBModule bindings" should {
 
     "use HikariCP when default pool is default" in new WithApplication(
-        _.configure(
-            "db.default.url" -> "jdbc:h2:mem:default",
-            "db.other.driver" -> "org.h2.Driver",
-            "db.other.url" -> "jdbc:h2:mem:other"
-        )) {
+      _.configure(
+        "db.default.url" -> "jdbc:h2:mem:default",
+        "db.other.driver" -> "org.h2.Driver",
+        "db.other.url" -> "jdbc:h2:mem:other"
+      )) {
       val db = app.injector.instanceOf[DBApi]
       db.database("default").withConnection { c =>
         c.getClass.getName must contain("hikari")
@@ -22,12 +22,12 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
     }
 
     "use HikariCP when default pool is 'hikaricp'" in new WithApplication(
-        _.configure(
-            "play.db.pool" -> "hikaricp",
-            "db.default.url" -> "jdbc:h2:mem:default",
-            "db.other.driver" -> "org.h2.Driver",
-            "db.other.url" -> "jdbc:h2:mem:other"
-        )) {
+      _.configure(
+        "play.db.pool" -> "hikaricp",
+        "db.default.url" -> "jdbc:h2:mem:default",
+        "db.other.driver" -> "org.h2.Driver",
+        "db.other.url" -> "jdbc:h2:mem:other"
+      )) {
       val db = app.injector.instanceOf[DBApi]
       db.database("default").withConnection { c =>
         c.getClass.getName must contain("hikari")
@@ -35,12 +35,12 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
     }
 
     "use BoneCP when default pool is 'bonecp'" in new WithApplication(
-        _.configure(
-            "play.db.pool" -> "bonecp",
-            "db.default.url" -> "jdbc:h2:mem:default",
-            "db.other.driver" -> "org.h2.Driver",
-            "db.other.url" -> "jdbc:h2:mem:other"
-        )) {
+      _.configure(
+        "play.db.pool" -> "bonecp",
+        "db.default.url" -> "jdbc:h2:mem:default",
+        "db.other.driver" -> "org.h2.Driver",
+        "db.other.url" -> "jdbc:h2:mem:other"
+      )) {
       val db = app.injector.instanceOf[DBApi]
       db.database("default").withConnection { c =>
         c.getClass.getName must contain("bonecp")
@@ -48,13 +48,13 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
     }
 
     "use BoneCP with 'bonecp' specific settings" in new WithApplication(
-        _.configure(
-            "play.db.pool" -> "bonecp",
-            "db.default.url" -> "jdbc:h2:mem:default",
-            "db.other.driver" -> "org.h2.Driver",
-            "db.other.url" -> "jdbc:h2:mem:other",
-            "play.db.prototype.bonecp.maxConnectionsPerPartition" -> "50"
-        )) {
+      _.configure(
+        "play.db.pool" -> "bonecp",
+        "db.default.url" -> "jdbc:h2:mem:default",
+        "db.other.driver" -> "org.h2.Driver",
+        "db.other.url" -> "jdbc:h2:mem:other",
+        "play.db.prototype.bonecp.maxConnectionsPerPartition" -> "50"
+      )) {
       import com.jolbox.bonecp.BoneCPDataSource
       val db = app.injector.instanceOf[DBApi]
       val bonecpDataSource: BoneCPDataSource =
@@ -64,14 +64,14 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
     }
 
     "use BoneCP when database-specific pool is 'bonecp'" in new WithApplication(
-        FakeApplication(
-            additionalConfiguration = Map(
-                  "db.default.pool" -> "bonecp",
-                  "db.default.url" -> "jdbc:h2:mem:default",
-                  "db.other.driver" -> "org.h2.Driver",
-                  "db.other.url" -> "jdbc:h2:mem:other"
-              )
-        )) {
+      FakeApplication(
+        additionalConfiguration = Map(
+          "db.default.pool" -> "bonecp",
+          "db.default.url" -> "jdbc:h2:mem:default",
+          "db.other.driver" -> "org.h2.Driver",
+          "db.other.url" -> "jdbc:h2:mem:other"
+        )
+      )) {
       val db = app.injector.instanceOf[DBApi]
       db.database("default").withConnection { c =>
         c.getClass.getName must contain("bonecp")

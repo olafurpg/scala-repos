@@ -34,7 +34,7 @@ object TestKafkaAppender extends Logging {
     } catch {
       case e: Exception =>
         System.err.println(
-            "KafkaAppender could not be initialized ! Exiting..")
+          "KafkaAppender could not be initialized ! Exiting..")
         e.printStackTrace()
         System.exit(1)
     }
