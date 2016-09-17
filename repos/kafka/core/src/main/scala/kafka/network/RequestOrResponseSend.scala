@@ -26,7 +26,8 @@ import org.apache.kafka.common.network.NetworkSend
 
 object RequestOrResponseSend {
   def serialize(request: RequestOrResponse): ByteBuffer = {
-    val buffer = ByteBuffer.allocate(request.sizeInBytes + (if(request.requestId != None) 2 else 0))
+    val buffer = ByteBuffer.allocate(
+      request.sizeInBytes + (if (request.requestId != None) 2 else 0))
     request.requestId match {
       case Some(requestId) =>
         buffer.putShort(requestId)
@@ -38,7 +39,9 @@ object RequestOrResponseSend {
   }
 }
 
-class RequestOrResponseSend(val dest: String, val buffer: ByteBuffer) extends NetworkSend(dest, buffer) with Logging {
+class RequestOrResponseSend(val dest: String, val buffer: ByteBuffer)
+    extends NetworkSend(dest, buffer)
+    with Logging {
 
   def this(dest: String, request: RequestOrResponse) {
     this(dest, RequestOrResponseSend.serialize(request))
@@ -46,7 +49,7 @@ class RequestOrResponseSend(val dest: String, val buffer: ByteBuffer) extends Ne
 
   def writeCompletely(channel: GatheringByteChannel): Long = {
     var totalWritten = 0L
-    while(!completed()) {
+    while (!completed()) {
       val written = writeTo(channel)
       trace(written + " bytes written.")
       totalWritten += written

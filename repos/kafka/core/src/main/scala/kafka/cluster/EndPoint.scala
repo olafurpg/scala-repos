@@ -34,32 +34,36 @@ object EndPoint {
   }
 
   /**
-   * Create EndPoint object from connectionString
-   * @param connectionString the format is protocol://host:port or protocol://[ipv6 host]:port
-   *                         for example: PLAINTEXT://myhost:9092 or PLAINTEXT://[::1]:9092
-   *                         Host can be empty (PLAINTEXT://:9092) in which case we'll bind to default interface
-   *                         Negative ports are also accepted, since they are used in some unit tests
-   * @return
-   */
+    * Create EndPoint object from connectionString
+    * @param connectionString the format is protocol://host:port or protocol://[ipv6 host]:port
+    *                         for example: PLAINTEXT://myhost:9092 or PLAINTEXT://[::1]:9092
+    *                         Host can be empty (PLAINTEXT://:9092) in which case we'll bind to default interface
+    *                         Negative ports are also accepted, since they are used in some unit tests
+    * @return
+    */
   def createEndPoint(connectionString: String): EndPoint = {
     val uriParseExp = """^(.*)://\[?([0-9a-zA-Z\-.:]*)\]?:(-?[0-9]+)""".r
     connectionString match {
-      case uriParseExp(protocol, "", port) => new EndPoint(null, port.toInt, SecurityProtocol.forName(protocol))
-      case uriParseExp(protocol, host, port) => new EndPoint(host, port.toInt, SecurityProtocol.forName(protocol))
-      case _ => throw new KafkaException("Unable to parse " + connectionString + " to a broker endpoint")
+      case uriParseExp(protocol, "", port) =>
+        new EndPoint(null, port.toInt, SecurityProtocol.forName(protocol))
+      case uriParseExp(protocol, host, port) =>
+        new EndPoint(host, port.toInt, SecurityProtocol.forName(protocol))
+      case _ =>
+        throw new KafkaException(
+          "Unable to parse " + connectionString + " to a broker endpoint")
     }
   }
 }
 
 /**
- * Part of the broker definition - matching host/port pair to a protocol
- */
+  * Part of the broker definition - matching host/port pair to a protocol
+  */
 case class EndPoint(host: String, port: Int, protocolType: SecurityProtocol) {
 
   def connectionString(): String = {
     val hostport =
       if (host == null)
-        ":"+port
+        ":" + port
       else
         Utils.formatAddress(host, port)
     protocolType + "://" + hostport
@@ -74,5 +78,5 @@ case class EndPoint(host: String, port: Int, protocolType: SecurityProtocol) {
   def sizeInBytes: Int =
     4 + /* port */
     shortStringLength(host) +
-    2 /* protocol id */
+      2 /* protocol id */
 }

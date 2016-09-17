@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.message
 
 import java.io.{InputStream, ByteArrayInputStream, ByteArrayOutputStream}
@@ -33,10 +32,18 @@ class MessageWriterTest extends JUnitSuite {
     (0 until size).map(_ => rnd.nextInt(10).toByte).toArray
   }
 
-  private def mkMessageWithWriter(key: Array[Byte] = null, bytes: Array[Byte], codec: CompressionCodec): Message = {
+  private def mkMessageWithWriter(key: Array[Byte] = null,
+                                  bytes: Array[Byte],
+                                  codec: CompressionCodec): Message = {
     val writer = new MessageWriter(100)
-    writer.write(key = key, codec = codec, timestamp = Message.NoTimestamp, timestampType = TimestampType.CREATE_TIME, magicValue = Message.MagicValue_V1) { output =>
-      val out = if (codec == NoCompressionCodec) output else CompressionFactory(codec, output)
+    writer.write(key = key,
+                 codec = codec,
+                 timestamp = Message.NoTimestamp,
+                 timestampType = TimestampType.CREATE_TIME,
+                 magicValue = Message.MagicValue_V1) { output =>
+      val out =
+        if (codec == NoCompressionCodec) output
+        else CompressionFactory(codec, output)
       try {
         val p = rnd.nextInt(bytes.length)
         out.write(bytes, 0, p)
@@ -51,7 +58,8 @@ class MessageWriterTest extends JUnitSuite {
     new Message(bb)
   }
 
-  private def compress(bytes: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+  private def compress(bytes: Array[Byte],
+                       codec: CompressionCodec): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val out = CompressionFactory(codec, baos)
     out.write(bytes)
@@ -59,7 +67,8 @@ class MessageWriterTest extends JUnitSuite {
     baos.toByteArray
   }
 
-  private def decompress(compressed: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+  private def decompress(compressed: Array[Byte],
+                         codec: CompressionCodec): Array[Byte] = {
     toArray(CompressionFactory(codec, new ByteArrayInputStream(compressed)))
   }
 
@@ -102,15 +111,22 @@ class MessageWriterTest extends JUnitSuite {
   def testWithNoCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
     val actual = mkMessageWithWriter(bytes = bytes, codec = NoCompressionCodec)
-    val expected = new Message(bytes, Message.NoTimestamp, NoCompressionCodec, Message.MagicValue_V1)
+    val expected = new Message(bytes,
+                               Message.NoTimestamp,
+                               NoCompressionCodec,
+                               Message.MagicValue_V1)
     assertEquals(expected.buffer, actual.buffer)
   }
 
   @Test
   def testWithCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(bytes = bytes, codec = SnappyCompressionCodec)
-    val expected = new Message(compress(bytes, SnappyCompressionCodec), Message.NoTimestamp, SnappyCompressionCodec, Message.MagicValue_V1)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, codec = SnappyCompressionCodec)
+    val expected = new Message(compress(bytes, SnappyCompressionCodec),
+                               Message.NoTimestamp,
+                               SnappyCompressionCodec,
+                               Message.MagicValue_V1)
 
     assertEquals(
       decompress(toArray(expected.payload), SnappyCompressionCodec).toSeq,
@@ -122,8 +138,13 @@ class MessageWriterTest extends JUnitSuite {
   def testWithKey(): Unit = {
     val key = mkRandomArray(123)
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(bytes = bytes, key = key, codec = NoCompressionCodec)
-    val expected = new Message(bytes = bytes, key = key, timestamp = Message.NoTimestamp, codec = NoCompressionCodec, magicValue = Message.MagicValue_V1)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, key = key, codec = NoCompressionCodec)
+    val expected = new Message(bytes = bytes,
+                               key = key,
+                               timestamp = Message.NoTimestamp,
+                               codec = NoCompressionCodec,
+                               magicValue = Message.MagicValue_V1)
 
     assertEquals(expected.buffer, actual.buffer)
   }

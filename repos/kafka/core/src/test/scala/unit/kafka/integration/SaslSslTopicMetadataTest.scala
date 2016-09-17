@@ -14,7 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.integration
 
 import java.io.File
@@ -22,8 +21,11 @@ import java.io.File
 import kafka.api.SaslTestHarness
 import org.apache.kafka.common.protocol.SecurityProtocol
 
-class SaslSslTopicMetadataTest extends BaseTopicMetadataTest with SaslTestHarness {
+class SaslSslTopicMetadataTest
+    extends BaseTopicMetadataTest
+    with SaslTestHarness {
   override protected val zkSaslEnabled = false
   protected def securityProtocol = SecurityProtocol.SASL_SSL
-  protected lazy val trustStoreFile = Some(File.createTempFile("truststore", ".jks"))
+  protected lazy val trustStoreFile = Some(
+    File.createTempFile("truststore", ".jks"))
 }

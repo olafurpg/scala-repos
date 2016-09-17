@@ -27,9 +27,9 @@ class ZooKeeperMainWrapper(args: Array[String]) extends ZooKeeperMain(args) {
 }
 
 /**
- * ZooKeeper 3.4.6 broke being able to pass commands on command line.
- * See ZOOKEEPER-1897.  This class is a hack to restore this facility.
- */
+  * ZooKeeper 3.4.6 broke being able to pass commands on command line.
+  * See ZOOKEEPER-1897.  This class is a hack to restore this facility.
+  */
 object ZooKeeperMainWrapper {
 
   def main(args: Array[String]): Unit = {

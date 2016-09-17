@@ -14,13 +14,14 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.server
 
 import kafka.api.SaslTestHarness
 import org.apache.kafka.common.protocol.SecurityProtocol
 
-class SaslPlaintextReplicaFetchTest extends BaseReplicaFetchTest with SaslTestHarness {
+class SaslPlaintextReplicaFetchTest
+    extends BaseReplicaFetchTest
+    with SaslTestHarness {
   override protected val zkSaslEnabled = false
   protected def securityProtocol = SecurityProtocol.SASL_PLAINTEXT
   protected def trustStoreFile = None

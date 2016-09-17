@@ -1,16 +1,15 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+  * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+  * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+  * specific language governing permissions and limitations under the License.
+  */
 package kafka.api
 
 import java.util
@@ -19,18 +18,19 @@ import kafka.server.KafkaConfig
 import kafka.utils.{Logging, ShutdownableThread, TestUtils}
 import org.apache.kafka.clients.consumer._
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
-import org.apache.kafka.common.errors.{IllegalGenerationException, UnknownMemberIdException}
+import org.apache.kafka.common.errors.{
+  IllegalGenerationException,
+  UnknownMemberIdException
+}
 import org.apache.kafka.common.TopicPartition
 import org.junit.Assert._
 import org.junit.{Test, Before}
 
 import scala.collection.JavaConversions._
 
-
-
 /**
- * Integration tests for the new consumer that cover basic usage as well as server failures
- */
+  * Integration tests for the new consumer that cover basic usage as well as server failures
+  */
 class ConsumerBounceTest extends IntegrationTestHarness with Logging {
 
   val producerCount = 1
@@ -42,19 +42,30 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
   val tp = new TopicPartition(topic, part)
 
   // configure the servers and clients
-  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp, "false") // speed up shutdown
-  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp, "3") // don't want to lose offset
+  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
+                                "false") // speed up shutdown
+  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
+                                "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
-  this.serverConfig.setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp, "10") // set small enough session timeout
+  this.serverConfig
+    .setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp, "10") // set small enough session timeout
   this.producerConfig.setProperty(ProducerConfig.ACKS_CONFIG, "all")
   this.consumerConfig.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "my-test")
-  this.consumerConfig.setProperty(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 4096.toString)
-  this.consumerConfig.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100")
-  this.consumerConfig.setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "30")
-  this.consumerConfig.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+  this.consumerConfig.setProperty(
+    ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG,
+    4096.toString)
+  this.consumerConfig
+    .setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100")
+  this.consumerConfig
+    .setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "30")
+  this.consumerConfig
+    .setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
   override def generateConfigs() = {
-    FixedPortTestUtils.createBrokerConfigs(serverCount, zkConnect,enableControlledShutdown = false)
+    FixedPortTestUtils
+      .createBrokerConfigs(serverCount,
+                           zkConnect,
+                           enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, serverConfig))
   }
 
@@ -82,12 +93,14 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     val consumer = this.consumers(0)
 
     consumer.subscribe(List(topic), new ConsumerRebalanceListener {
-      override def onPartitionsAssigned(partitions: util.Collection[TopicPartition]) {
+      override def onPartitionsAssigned(
+          partitions: util.Collection[TopicPartition]) {
         // TODO: until KAFKA-2017 is merged, we have to handle the case in which the
         // the commit fails on prior to rebalancing on coordinator fail-over.
         consumer.seek(tp, consumed)
       }
-      override def onPartitionsRevoked(partitions: util.Collection[TopicPartition]) {}
+      override def onPartitionsRevoked(
+          partitions: util.Collection[TopicPartition]) {}
     })
 
     val scheduler = new BounceBrokerScheduler(numIters)
@@ -117,7 +130,8 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
   }
 
   @Test
-  def testSeekAndCommitWithBrokerFailures() = seekAndCommitWithBrokerFailures(5)
+  def testSeekAndCommitWithBrokerFailures() =
+    seekAndCommitWithBrokerFailures(5)
 
   def seekAndCommitWithBrokerFailures(numIters: Int) {
     val numRecords = 1000
@@ -129,14 +143,21 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     consumer.seek(tp, 0)
 
     // wait until all the followers have synced the last HW with leader
-    TestUtils.waitUntilTrue(() => servers.forall(server =>
-      server.replicaManager.getReplica(tp.topic(), tp.partition()).get.highWatermark.messageOffset == numRecords
-    ), "Failed to update high watermark for followers after timeout")
+    TestUtils.waitUntilTrue(
+      () =>
+        servers.forall(
+          server =>
+            server.replicaManager
+              .getReplica(tp.topic(), tp.partition())
+              .get
+              .highWatermark
+              .messageOffset == numRecords),
+      "Failed to update high watermark for followers after timeout")
 
     val scheduler = new BounceBrokerScheduler(numIters)
     scheduler.start()
 
-    while(scheduler.isRunning.get()) {
+    while (scheduler.isRunning.get()) {
       val coin = TestUtils.random.nextInt(3)
       if (coin == 0) {
         info("Seeking to end of log")
@@ -155,8 +176,8 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     }
   }
 
-  private class BounceBrokerScheduler(val numIters: Int) extends ShutdownableThread("daemon-bounce-broker", false)
-  {
+  private class BounceBrokerScheduler(val numIters: Int)
+      extends ShutdownableThread("daemon-bounce-broker", false) {
     var iter: Int = 0
 
     override def doWork(): Unit = {
@@ -174,10 +195,15 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
 
   private def sendRecords(numRecords: Int) {
     val futures = (0 until numRecords).map { i =>
-      this.producers(0).send(new ProducerRecord(topic, part, i.toString.getBytes, i.toString.getBytes))
+      this
+        .producers(0)
+        .send(
+          new ProducerRecord(topic,
+                             part,
+                             i.toString.getBytes,
+                             i.toString.getBytes))
     }
     futures.map(_.get)
   }
-
 
 }

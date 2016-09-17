@@ -1,19 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import java.nio.file.{FileSystems, Paths}
@@ -32,8 +32,8 @@ object OffsetCheckpoint {
 }
 
 /**
- * This class saves out a map of topic/partition=>offsets to a file
- */
+  * This class saves out a map of topic/partition=>offsets to a file
+  */
 class OffsetCheckpoint(val file: File) extends Logging {
   import OffsetCheckpoint._
   private val path = file.toPath.toAbsolutePath
@@ -53,9 +53,10 @@ class OffsetCheckpoint(val file: File) extends Logging {
         writer.write(offsets.size.toString)
         writer.newLine()
 
-        offsets.foreach { case (topicPart, offset) =>
-          writer.write(s"${topicPart.topic} ${topicPart.partition} $offset")
-          writer.newLine()
+        offsets.foreach {
+          case (topicPart, offset) =>
+            writer.write(s"${topicPart.topic} ${topicPart.partition} $offset")
+            writer.newLine()
         }
 
         writer.flush()
@@ -63,7 +64,9 @@ class OffsetCheckpoint(val file: File) extends Logging {
       } catch {
         case e: FileNotFoundException =>
           if (FileSystems.getDefault.isReadOnly) {
-            fatal("Halting writes to offset checkpoint file because the underlying file system is inaccessible : ", e)
+            fatal(
+              "Halting writes to offset checkpoint file because the underlying file system is inaccessible : ",
+              e)
             Runtime.getRuntime.halt(1)
           }
           throw e
@@ -105,10 +108,12 @@ class OffsetCheckpoint(val file: File) extends Logging {
               }
             }
             if (offsets.size != expectedSize)
-              throw new IOException(s"Expected $expectedSize entries but found only ${offsets.size}")
+              throw new IOException(
+                s"Expected $expectedSize entries but found only ${offsets.size}")
             offsets
           case _ =>
-            throw new IOException("Unrecognized version of the highwatermark checkpoint file: " + version)
+            throw new IOException(
+              "Unrecognized version of the highwatermark checkpoint file: " + version)
         }
       } catch {
         case e: NumberFormatException => throw malformedLineException(line)
@@ -117,5 +122,5 @@ class OffsetCheckpoint(val file: File) extends Logging {
       }
     }
   }
-  
+
 }

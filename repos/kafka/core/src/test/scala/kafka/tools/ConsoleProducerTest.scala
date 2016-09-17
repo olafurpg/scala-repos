@@ -23,7 +23,6 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.junit.Assert
 import org.junit.Test
 
-
 class ConsoleProducerTest {
 
   val validArgs: Array[String] = Array(
@@ -47,11 +46,14 @@ class ConsoleProducerTest {
     val config = new ConsoleProducer.ProducerConfig(validArgs)
     // New ProducerConfig constructor is package private, so we can't call it directly
     // Creating new Producer to validate instead
-    new KafkaProducer[Array[Byte],Array[Byte]](ConsoleProducer.getNewProducerProps(config))
+    new KafkaProducer[Array[Byte], Array[Byte]](
+      ConsoleProducer.getNewProducerProps(config))
   }
 
   @Test
-  @deprecated("This test has been deprecated and it will be removed in a future release.", "0.10.0.0")
+  @deprecated(
+    "This test has been deprecated and it will be removed in a future release.",
+    "0.10.0.0")
   def testValidConfigsOldProducer() {
     val config = new ConsoleProducer.ProducerConfig(validArgs)
     new producer.ProducerConfig(ConsoleProducer.getOldProducerProps(config))
@@ -70,8 +72,11 @@ class ConsoleProducerTest {
   @Test
   def testParseKeyProp(): Unit = {
     val config = new ConsoleProducer.ProducerConfig(validArgs)
-    val reader = Class.forName(config.readerClass).newInstance().asInstanceOf[LineMessageReader];
-    reader.init(System.in,ConsoleProducer.getReaderProps(config))
+    val reader = Class
+      .forName(config.readerClass)
+      .newInstance()
+      .asInstanceOf[LineMessageReader];
+    reader.init(System.in, ConsoleProducer.getReaderProps(config))
     assert(reader.keySeparator == "#")
     assert(reader.parseKey == true)
   }

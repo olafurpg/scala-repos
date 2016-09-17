@@ -18,10 +18,11 @@
 package kafka.common
 
 /**
- * Number of insync replicas for the partition is lower than min.insync.replicas
- * This exception is raised when the low ISR size is discovered *after* the message
- * was already appended to the log. Producer retries will cause duplicates.
- */
-class NotEnoughReplicasAfterAppendException(message: String) extends RuntimeException(message) {
+  * Number of insync replicas for the partition is lower than min.insync.replicas
+  * This exception is raised when the low ISR size is discovered *after* the message
+  * was already appended to the log. Producer retries will cause duplicates.
+  */
+class NotEnoughReplicasAfterAppendException(message: String)
+    extends RuntimeException(message) {
   def this() = this(null)
 }

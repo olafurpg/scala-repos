@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.api
 
 import java.nio.ByteBuffer
@@ -38,7 +37,7 @@ object OffsetCommitResponse extends Logging {
         (TopicAndPartition(topic, partitionId), error)
       })
     })
-    OffsetCommitResponse(Map(pairs:_*), correlationId)
+    OffsetCommitResponse(Map(pairs: _*), correlationId)
   }
 }
 
@@ -48,18 +47,22 @@ case class OffsetCommitResponse(commitStatus: Map[TopicAndPartition, Short],
 
   lazy val commitStatusGroupedByTopic = commitStatus.groupBy(_._1.topic)
 
-  def hasError = commitStatus.exists{ case (topicAndPartition, errorCode) => errorCode != Errors.NONE.code }
+  def hasError = commitStatus.exists {
+    case (topicAndPartition, errorCode) => errorCode != Errors.NONE.code
+  }
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putInt(correlationId)
     buffer.putInt(commitStatusGroupedByTopic.size)
-    commitStatusGroupedByTopic.foreach { case(topic, statusMap) =>
-      ApiUtils.writeShortString(buffer, topic)
-      buffer.putInt(statusMap.size) // partition count
-      statusMap.foreach { case(topicAndPartition, errorCode) =>
-        buffer.putInt(topicAndPartition.partition)
-        buffer.putShort(errorCode)
-      }
+    commitStatusGroupedByTopic.foreach {
+      case (topic, statusMap) =>
+        ApiUtils.writeShortString(buffer, topic)
+        buffer.putInt(statusMap.size) // partition count
+        statusMap.foreach {
+          case (topicAndPartition, errorCode) =>
+            buffer.putInt(topicAndPartition.partition)
+            buffer.putShort(errorCode)
+        }
     }
   }
 
@@ -69,12 +72,11 @@ case class OffsetCommitResponse(commitStatus: Map[TopicAndPartition, Short],
     commitStatusGroupedByTopic.foldLeft(0)((count, partitionStatusMap) => {
       val (topic, partitionStatus) = partitionStatusMap
       count +
-      ApiUtils.shortStringLength(topic) +
-      4 + /* partition count */
-      partitionStatus.size * ( 4 /* partition */  + 2 /* error code */)
+        ApiUtils.shortStringLength(topic) +
+        4 + /* partition count */
+      partitionStatus.size * (4 /* partition */ + 2 /* error code */ )
     })
 
-  override def describe(details: Boolean):String = { toString }
+  override def describe(details: Boolean): String = { toString }
 
 }
-

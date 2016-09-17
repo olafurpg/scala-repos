@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import java.util.concurrent.locks.ReentrantLock
@@ -36,30 +35,35 @@ import java.util.concurrent.atomic.AtomicLong
 import com.yammer.metrics.core.Gauge
 
 /**
- *  Abstract class for fetching data from multiple partitions from the same broker.
- */
+  *  Abstract class for fetching data from multiple partitions from the same broker.
+  */
 abstract class AbstractFetcherThread(name: String,
                                      clientId: String,
                                      sourceBroker: BrokerEndPoint,
                                      fetchBackOffMs: Int = 0,
                                      isInterruptible: Boolean = true)
-  extends ShutdownableThread(name, isInterruptible) {
+    extends ShutdownableThread(name, isInterruptible) {
 
   type REQ <: FetchRequest
   type PD <: PartitionData
 
-  private val partitionMap = new mutable.HashMap[TopicAndPartition, PartitionFetchState] // a (topic, partition) -> partitionFetchState map
+  private val partitionMap = new mutable.HashMap[
+    TopicAndPartition,
+    PartitionFetchState] // a (topic, partition) -> partitionFetchState map
   private val partitionMapLock = new ReentrantLock
   private val partitionMapCond = partitionMapLock.newCondition()
 
-  private val metricId = new ClientIdAndBroker(clientId, sourceBroker.host, sourceBroker.port)
+  private val metricId =
+    new ClientIdAndBroker(clientId, sourceBroker.host, sourceBroker.port)
   val fetcherStats = new FetcherStats(metricId)
   val fetcherLagStats = new FetcherLagStats(metricId)
 
   /* callbacks to be defined in subclass */
 
   // process fetched data
-  def processPartitionData(topicAndPartition: TopicAndPartition, fetchOffset: Long, partitionData: PD)
+  def processPartitionData(topicAndPartition: TopicAndPartition,
+                           fetchOffset: Long,
+                           partitionData: PD)
 
   // handle a partition whose offset is out of range and return a new fetch offset
   def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long
@@ -67,11 +71,12 @@ abstract class AbstractFetcherThread(name: String,
   // deal with partitions with errors, potentially due to leadership changes
   def handlePartitionsWithErrors(partitions: Iterable[TopicAndPartition])
 
-  protected def buildFetchRequest(partitionMap: Map[TopicAndPartition, PartitionFetchState]): REQ
+  protected def buildFetchRequest(
+      partitionMap: Map[TopicAndPartition, PartitionFetchState]): REQ
 
   protected def fetch(fetchRequest: REQ): Map[TopicAndPartition, PD]
 
-  override def shutdown(){
+  override def shutdown() {
     initiateShutdown()
     inLock(partitionMapLock) {
       partitionMapCond.signalAll()
@@ -84,7 +89,9 @@ abstract class AbstractFetcherThread(name: String,
     val fetchRequest = inLock(partitionMapLock) {
       val fetchRequest = buildFetchRequest(partitionMap)
       if (fetchRequest.isEmpty) {
-        trace("There are no active partitions. Back off for %d ms before sending a fetch request".format(fetchBackOffMs))
+        trace(
+          "There are no active partitions. Back off for %d ms before sending a fetch request"
+            .format(fetchBackOffMs))
         partitionMapCond.await(fetchBackOffMs, TimeUnit.MILLISECONDS)
       }
       fetchRequest
@@ -99,7 +106,9 @@ abstract class AbstractFetcherThread(name: String,
     var responseData: Map[TopicAndPartition, PD] = Map.empty
 
     try {
-      trace("Issuing to broker %d of fetch request %s".format(sourceBroker.id, fetchRequest))
+      trace(
+        "Issuing to broker %d of fetch request %s".format(sourceBroker.id,
+                                                          fetchRequest))
       responseData = fetch(fetchRequest)
     } catch {
       case t: Throwable =>
@@ -118,61 +127,90 @@ abstract class AbstractFetcherThread(name: String,
       // process fetched data
       inLock(partitionMapLock) {
 
-        responseData.foreach { case (topicAndPartition, partitionData) =>
-          val TopicAndPartition(topic, partitionId) = topicAndPartition
-          partitionMap.get(topicAndPartition).foreach(currentPartitionFetchState =>
-            // we append to the log if the current offset is defined and it is the same as the offset requested during fetch
-            if (fetchRequest.offset(topicAndPartition) == currentPartitionFetchState.offset) {
-              Errors.forCode(partitionData.errorCode) match {
-                case Errors.NONE =>
-                  try {
-                    val messages = partitionData.toByteBufferMessageSet
-                    val validBytes = messages.validBytes
-                    val newOffset = messages.shallowIterator.toSeq.lastOption match {
-                      case Some(m: MessageAndOffset) => m.nextOffset
-                      case None => currentPartitionFetchState.offset
-                    }
-                    partitionMap.put(topicAndPartition, new PartitionFetchState(newOffset))
-                    fetcherLagStats.getFetcherLagStats(topic, partitionId).lag = Math.max(0L, partitionData.highWatermark - newOffset)
-                    fetcherStats.byteRate.mark(validBytes)
-                    // Once we hand off the partition data to the subclass, we can't mess with it any more in this thread
-                    processPartitionData(topicAndPartition, currentPartitionFetchState.offset, partitionData)
-                  } catch {
-                    case ime: CorruptRecordException =>
-                      // we log the error and continue. This ensures two things
-                      // 1. If there is a corrupt message in a topic partition, it does not bring the fetcher thread down and cause other topic partition to also lag
-                      // 2. If the message is corrupt due to a transient state in the log (truncation, partial writes can cause this), we simply continue and
-                      // should get fixed in the subsequent fetches
-                      logger.error("Found invalid messages during fetch for partition [" + topic + "," + partitionId + "] offset " + currentPartitionFetchState.offset  + " error " + ime.getMessage)
-                    case e: Throwable =>
-                      throw new KafkaException("error processing data for partition [%s,%d] offset %d"
-                        .format(topic, partitionId, currentPartitionFetchState.offset), e)
+        responseData.foreach {
+          case (topicAndPartition, partitionData) =>
+            val TopicAndPartition(topic, partitionId) = topicAndPartition
+            partitionMap
+              .get(topicAndPartition)
+              .foreach(currentPartitionFetchState =>
+                // we append to the log if the current offset is defined and it is the same as the offset requested during fetch
+                if (fetchRequest
+                      .offset(topicAndPartition) == currentPartitionFetchState.offset) {
+                  Errors.forCode(partitionData.errorCode) match {
+                    case Errors.NONE =>
+                      try {
+                        val messages = partitionData.toByteBufferMessageSet
+                        val validBytes = messages.validBytes
+                        val newOffset =
+                          messages.shallowIterator.toSeq.lastOption match {
+                            case Some(m: MessageAndOffset) => m.nextOffset
+                            case None => currentPartitionFetchState.offset
+                          }
+                        partitionMap.put(topicAndPartition,
+                                         new PartitionFetchState(newOffset))
+                        fetcherLagStats
+                          .getFetcherLagStats(topic, partitionId)
+                          .lag =
+                          Math.max(0L, partitionData.highWatermark - newOffset)
+                        fetcherStats.byteRate.mark(validBytes)
+                        // Once we hand off the partition data to the subclass, we can't mess with it any more in this thread
+                        processPartitionData(topicAndPartition,
+                                             currentPartitionFetchState.offset,
+                                             partitionData)
+                      } catch {
+                        case ime: CorruptRecordException =>
+                          // we log the error and continue. This ensures two things
+                          // 1. If there is a corrupt message in a topic partition, it does not bring the fetcher thread down and cause other topic partition to also lag
+                          // 2. If the message is corrupt due to a transient state in the log (truncation, partial writes can cause this), we simply continue and
+                          // should get fixed in the subsequent fetches
+                          logger.error(
+                            "Found invalid messages during fetch for partition [" + topic + "," + partitionId + "] offset " + currentPartitionFetchState.offset + " error " + ime.getMessage)
+                        case e: Throwable =>
+                          throw new KafkaException(
+                            "error processing data for partition [%s,%d] offset %d"
+                              .format(topic,
+                                      partitionId,
+                                      currentPartitionFetchState.offset),
+                            e)
+                      }
+                    case Errors.OFFSET_OUT_OF_RANGE =>
+                      try {
+                        val newOffset =
+                          handleOffsetOutOfRange(topicAndPartition)
+                        partitionMap.put(topicAndPartition,
+                                         new PartitionFetchState(newOffset))
+                        error(
+                          "Current offset %d for partition [%s,%d] out of range; reset offset to %d"
+                            .format(currentPartitionFetchState.offset,
+                                    topic,
+                                    partitionId,
+                                    newOffset))
+                      } catch {
+                        case e: Throwable =>
+                          error("Error getting offset for partition [%s,%d] to broker %d"
+                                  .format(topic, partitionId, sourceBroker.id),
+                                e)
+                          partitionsWithError += topicAndPartition
+                      }
+                    case _ =>
+                      if (isRunning.get) {
+                        error(
+                          "Error for partition [%s,%d] to broker %d:%s".format(
+                            topic,
+                            partitionId,
+                            sourceBroker.id,
+                            partitionData.exception.get))
+                        partitionsWithError += topicAndPartition
+                      }
                   }
-                case Errors.OFFSET_OUT_OF_RANGE =>
-                  try {
-                    val newOffset = handleOffsetOutOfRange(topicAndPartition)
-                    partitionMap.put(topicAndPartition, new PartitionFetchState(newOffset))
-                    error("Current offset %d for partition [%s,%d] out of range; reset offset to %d"
-                      .format(currentPartitionFetchState.offset, topic, partitionId, newOffset))
-                  } catch {
-                    case e: Throwable =>
-                      error("Error getting offset for partition [%s,%d] to broker %d".format(topic, partitionId, sourceBroker.id), e)
-                      partitionsWithError += topicAndPartition
-                  }
-                case _ =>
-                  if (isRunning.get) {
-                    error("Error for partition [%s,%d] to broker %d:%s".format(topic, partitionId, sourceBroker.id,
-                      partitionData.exception.get))
-                    partitionsWithError += topicAndPartition
-                  }
-              }
-            })
+              })
         }
       }
     }
 
     if (partitionsWithError.nonEmpty) {
-      debug("handling partitions with error for %s".format(partitionsWithError))
+      debug(
+        "handling partitions with error for %s".format(partitionsWithError))
       handlePartitionsWithErrors(partitionsWithError)
     }
   }
@@ -185,9 +223,12 @@ abstract class AbstractFetcherThread(name: String,
         if (!partitionMap.contains(topicAndPartition))
           partitionMap.put(
             topicAndPartition,
-            if (PartitionTopicInfo.isOffsetInvalid(offset)) new PartitionFetchState(handleOffsetOutOfRange(topicAndPartition))
+            if (PartitionTopicInfo.isOffsetInvalid(offset))
+              new PartitionFetchState(
+                handleOffsetOutOfRange(topicAndPartition))
             else new PartitionFetchState(offset)
-          )}
+          )
+      }
       partitionMapCond.signalAll()
     } finally partitionMapLock.unlock()
   }
@@ -196,10 +237,15 @@ abstract class AbstractFetcherThread(name: String,
     partitionMapLock.lockInterruptibly()
     try {
       for (partition <- partitions) {
-        partitionMap.get(partition).foreach (currentPartitionFetchState =>
-          if (currentPartitionFetchState.isActive)
-            partitionMap.put(partition, new PartitionFetchState(currentPartitionFetchState.offset, new DelayedItem(delay)))
-        )
+        partitionMap
+          .get(partition)
+          .foreach(
+            currentPartitionFetchState =>
+              if (currentPartitionFetchState.isActive)
+                partitionMap.put(
+                  partition,
+                  new PartitionFetchState(currentPartitionFetchState.offset,
+                                          new DelayedItem(delay))))
       }
       partitionMapCond.signalAll()
     } finally partitionMapLock.unlock()
@@ -235,16 +281,16 @@ object AbstractFetcherThread {
 
 }
 
-class FetcherLagMetrics(metricId: ClientIdTopicPartition) extends KafkaMetricsGroup {
+class FetcherLagMetrics(metricId: ClientIdTopicPartition)
+    extends KafkaMetricsGroup {
   private[this] val lagVal = new AtomicLong(-1L)
   newGauge("ConsumerLag",
-    new Gauge[Long] {
-      def value = lagVal.get
-    },
-    Map("clientId" -> metricId.clientId,
-      "topic" -> metricId.topic,
-      "partition" -> metricId.partitionId.toString)
-  )
+           new Gauge[Long] {
+             def value = lagVal.get
+           },
+           Map("clientId" -> metricId.clientId,
+               "topic" -> metricId.topic,
+               "partition" -> metricId.partitionId.toString))
 
   def lag_=(newLag: Long) {
     lagVal.set(newLag)
@@ -254,25 +300,31 @@ class FetcherLagMetrics(metricId: ClientIdTopicPartition) extends KafkaMetricsGr
 }
 
 class FetcherLagStats(metricId: ClientIdAndBroker) {
-  private val valueFactory = (k: ClientIdTopicPartition) => new FetcherLagMetrics(k)
-  val stats = new Pool[ClientIdTopicPartition, FetcherLagMetrics](Some(valueFactory))
+  private val valueFactory = (k: ClientIdTopicPartition) =>
+    new FetcherLagMetrics(k)
+  val stats =
+    new Pool[ClientIdTopicPartition, FetcherLagMetrics](Some(valueFactory))
 
   def getFetcherLagStats(topic: String, partitionId: Int): FetcherLagMetrics = {
-    stats.getAndMaybePut(new ClientIdTopicPartition(metricId.clientId, topic, partitionId))
+    stats.getAndMaybePut(
+      new ClientIdTopicPartition(metricId.clientId, topic, partitionId))
   }
 }
 
 class FetcherStats(metricId: ClientIdAndBroker) extends KafkaMetricsGroup {
   val tags = Map("clientId" -> metricId.clientId,
-    "brokerHost" -> metricId.brokerHost,
-    "brokerPort" -> metricId.brokerPort.toString)
+                 "brokerHost" -> metricId.brokerHost,
+                 "brokerPort" -> metricId.brokerPort.toString)
 
-  val requestRate = newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
+  val requestRate =
+    newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)
 
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
 }
 
-case class ClientIdTopicPartition(clientId: String, topic: String, partitionId: Int) {
+case class ClientIdTopicPartition(clientId: String,
+                                  topic: String,
+                                  partitionId: Int) {
   override def toString = "%s-%s-%d".format(clientId, topic, partitionId)
 }
 

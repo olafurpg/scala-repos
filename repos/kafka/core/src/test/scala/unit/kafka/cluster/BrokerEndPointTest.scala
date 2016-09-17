@@ -71,23 +71,28 @@ class BrokerEndPointTest extends Logging {
   @Test
   def testFromJsonV2 {
     val brokerInfoStr = "{\"version\":2," +
-                          "\"host\":\"localhost\"," +
-                          "\"port\":9092," +
-                          "\"jmx_port\":9999," +
-                          "\"timestamp\":\"1416974968782\"," +
-                          "\"endpoints\":[\"PLAINTEXT://localhost:9092\"]}"
+        "\"host\":\"localhost\"," +
+        "\"port\":9092," +
+        "\"jmx_port\":9999," +
+        "\"timestamp\":\"1416974968782\"," +
+        "\"endpoints\":[\"PLAINTEXT://localhost:9092\"]}"
     val broker = Broker.createBroker(1, brokerInfoStr)
     assert(broker.id == 1)
-    assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host == "localhost")
+    assert(
+      broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host == "localhost")
     assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).port == 9092)
   }
 
   @Test
   def testFromJsonV1() = {
-    val brokerInfoStr = "{\"jmx_port\":-1,\"timestamp\":\"1420485325400\",\"host\":\"172.16.8.243\",\"version\":1,\"port\":9091}"
+    val brokerInfoStr =
+      "{\"jmx_port\":-1,\"timestamp\":\"1420485325400\",\"host\":\"172.16.8.243\",\"version\":1,\"port\":9091}"
     val broker = Broker.createBroker(1, brokerInfoStr)
     assert(broker.id == 1)
-    assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host == "172.16.8.243")
+    assert(
+      broker
+        .getBrokerEndPoint(SecurityProtocol.PLAINTEXT)
+        .host == "172.16.8.243")
     assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).port == 9091)
   }
 
@@ -127,12 +132,12 @@ class BrokerEndPointTest extends Logging {
     endpoint = EndPoint.createEndPoint(connectionString)
     assert(endpoint.host == "::1")
     assert(endpoint.port == 9092)
-    assert(endpoint.connectionString ==  "PLAINTEXT://[::1]:9092")
+    assert(endpoint.connectionString == "PLAINTEXT://[::1]:9092")
     // test hostname
     connectionString = "PLAINTEXT://MyHostname:9092"
     endpoint = EndPoint.createEndPoint(connectionString)
     assert(endpoint.host == "MyHostname")
     assert(endpoint.port == 9092)
-    assert(endpoint.connectionString ==  "PLAINTEXT://MyHostname:9092")
+    assert(endpoint.connectionString == "PLAINTEXT://MyHostname:9092")
   }
 }

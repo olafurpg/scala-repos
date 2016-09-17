@@ -14,7 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.api
 
 import java.io.File
@@ -23,5 +22,6 @@ import org.apache.kafka.common.protocol.SecurityProtocol
 
 class SslProducerSendTest extends BaseProducerSendTest {
   override protected def securityProtocol = SecurityProtocol.SSL
-  override protected lazy val trustStoreFile = Some(File.createTempFile("truststore", ".jks"))
+  override protected lazy val trustStoreFile = Some(
+    File.createTempFile("truststore", ".jks"))
 }

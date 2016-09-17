@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.utils
 
 import java.util.Arrays
@@ -58,7 +57,7 @@ class UtilsTest extends JUnitSuite {
 
   @Test
   def testReadBytes() {
-    for(testCase <- List("", "a", "abcd")) {
+    for (testCase <- List("", "a", "abcd")) {
       val bytes = testCase.getBytes
       assertTrue(Arrays.equals(bytes, Utils.readBytes(ByteBuffer.wrap(bytes))))
     }
@@ -75,31 +74,45 @@ class UtilsTest extends JUnitSuite {
 
   @Test
   def testReplaceSuffix() {
-    assertEquals("blah.foo.text", CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ".text"))
-    assertEquals("blah.foo", CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ""))
+    assertEquals("blah.foo.text",
+                 CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ".text"))
+    assertEquals("blah.foo",
+                 CoreUtils.replaceSuffix("blah.foo.txt", ".txt", ""))
     assertEquals("txt.txt", CoreUtils.replaceSuffix("txt.txt.txt", ".txt", ""))
     assertEquals("foo.txt", CoreUtils.replaceSuffix("foo", "", ".txt"))
   }
 
   @Test
   def testReadInt() {
-    val values = Array(0, 1, -1, Byte.MaxValue, Short.MaxValue, 2 * Short.MaxValue, Int.MaxValue/2, Int.MinValue/2, Int.MaxValue, Int.MinValue, Int.MaxValue)
+    val values = Array(0,
+                       1,
+                       -1,
+                       Byte.MaxValue,
+                       Short.MaxValue,
+                       2 * Short.MaxValue,
+                       Int.MaxValue / 2,
+                       Int.MinValue / 2,
+                       Int.MaxValue,
+                       Int.MinValue,
+                       Int.MaxValue)
     val buffer = ByteBuffer.allocate(4 * values.size)
-    for(i <- 0 until values.length) {
-      buffer.putInt(i*4, values(i))
-      assertEquals("Written value should match read value.", values(i), CoreUtils.readInt(buffer.array, i*4))
+    for (i <- 0 until values.length) {
+      buffer.putInt(i * 4, values(i))
+      assertEquals("Written value should match read value.",
+                   values(i),
+                   CoreUtils.readInt(buffer.array, i * 4))
     }
   }
 
   @Test
   def testCsvList() {
-    val emptyString:String = ""
-    val nullString:String = null
+    val emptyString: String = ""
+    val nullString: String = null
     val emptyList = CoreUtils.parseCsvList(emptyString)
     val emptyListFromNullString = CoreUtils.parseCsvList(nullString)
     val emptyStringList = Seq.empty[String]
-    assertTrue(emptyList!=null)
-    assertTrue(emptyListFromNullString!=null)
+    assertTrue(emptyList != null)
+    assertTrue(emptyListFromNullString != null)
     assertTrue(emptyStringList.equals(emptyListFromNullString))
     assertTrue(emptyStringList.equals(emptyList))
   }
@@ -119,7 +132,7 @@ class UtilsTest extends JUnitSuite {
       assertTrue(m._2.equals("v"))
     }
 
-    val singleEntry:String = "key:value"
+    val singleEntry: String = "key:value"
     val singleMap = CoreUtils.parseCsvMap(singleEntry)
     val value = singleMap.getOrElse("key", 0)
     assertTrue(value.equals("value"))
@@ -138,7 +151,6 @@ class UtilsTest extends JUnitSuite {
       assertTrue(m._2.equals("value"))
     }
   }
-
 
   @Test
   def testInLock() {

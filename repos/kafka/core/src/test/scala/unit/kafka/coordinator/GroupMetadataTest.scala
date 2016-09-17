@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.coordinator
 
 import org.junit.Assert._
@@ -22,8 +21,8 @@ import org.junit.{Before, Test}
 import org.scalatest.junit.JUnitSuite
 
 /**
- * Test group state transitions and other GroupMetadata functionality
- */
+  * Test group state transitions and other GroupMetadata functionality
+  */
 class GroupMetadataTest extends JUnitSuite {
   var group: GroupMetadata = null
 
@@ -38,7 +37,7 @@ class GroupMetadataTest extends JUnitSuite {
   }
 
   @Test
-  def testCanRebalanceWhenAwaitingSync(){
+  def testCanRebalanceWhenAwaitingSync() {
     group.transitionTo(PreparingRebalance)
     group.transitionTo(AwaitingSync)
     assertTrue(group.canRebalance)
@@ -151,14 +150,24 @@ class GroupMetadataTest extends JUnitSuite {
     val sessionTimeoutMs = 10000
 
     val memberId = "memberId"
-    val member = new MemberMetadata(memberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val member = new MemberMetadata(
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     group.add(memberId, member)
     assertEquals("range", group.selectProtocol)
 
     val otherMemberId = "otherMemberId"
-    val otherMember = new MemberMetadata(otherMemberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val otherMember = new MemberMetadata(
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
 
     group.add(otherMemberId, otherMember)
@@ -166,7 +175,12 @@ class GroupMetadataTest extends JUnitSuite {
     assertTrue(Set("range", "roundrobin")(group.selectProtocol))
 
     val lastMemberId = "lastMemberId"
-    val lastMember = new MemberMetadata(lastMemberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val lastMember = new MemberMetadata(
+      lastMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("roundrobin", Array.empty[Byte]), ("range", Array.empty[Byte])))
 
     group.add(lastMemberId, lastMember)
@@ -188,11 +202,21 @@ class GroupMetadataTest extends JUnitSuite {
     val sessionTimeoutMs = 10000
 
     val memberId = "memberId"
-    val member = new MemberMetadata(memberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val member = new MemberMetadata(
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     val otherMemberId = "otherMemberId"
-    val otherMember = new MemberMetadata(otherMemberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val otherMember = new MemberMetadata(
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
 
     group.add(memberId, member)
@@ -211,7 +235,12 @@ class GroupMetadataTest extends JUnitSuite {
     assertTrue(group.supportsProtocols(Set("roundrobin", "range")))
 
     val memberId = "memberId"
-    val member = new MemberMetadata(memberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val member = new MemberMetadata(
+      memberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte])))
 
     group.add(memberId, member)
@@ -220,7 +249,12 @@ class GroupMetadataTest extends JUnitSuite {
     assertFalse(group.supportsProtocols(Set("foo", "bar")))
 
     val otherMemberId = "otherMemberId"
-    val otherMember = new MemberMetadata(otherMemberId, groupId, clientId, clientHost, sessionTimeoutMs,
+    val otherMember = new MemberMetadata(
+      otherMemberId,
+      groupId,
+      clientId,
+      clientHost,
+      sessionTimeoutMs,
       List(("roundrobin", Array.empty[Byte]), ("blah", Array.empty[Byte])))
 
     group.add(otherMemberId, otherMember)
@@ -230,7 +264,8 @@ class GroupMetadataTest extends JUnitSuite {
   }
 
   private def assertState(group: GroupMetadata, targetState: GroupState) {
-    val states: Set[GroupState] = Set(Stable, PreparingRebalance, AwaitingSync, Dead)
+    val states: Set[GroupState] =
+      Set(Stable, PreparingRebalance, AwaitingSync, Dead)
     val otherStates = states - targetState
     otherStates.foreach { otherState =>
       assertFalse(group.is(otherState))

@@ -23,7 +23,11 @@ import kafka.common.BrokerEndPointNotAvailableException
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.{Errors, SecurityProtocol}
 import org.apache.kafka.common.requests.UpdateMetadataRequest
-import org.apache.kafka.common.requests.UpdateMetadataRequest.{Broker, EndPoint, PartitionState}
+import org.apache.kafka.common.requests.UpdateMetadataRequest.{
+  Broker,
+  EndPoint,
+  PartitionState
+}
 import org.junit.Test
 import org.junit.Assert._
 
@@ -37,7 +41,8 @@ class MetadataCacheTest {
   def getTopicMetadataNonExistingTopics() {
     val topic = "topic"
     val cache = new MetadataCache(1)
-    val topicMetadata = cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
+    val topicMetadata =
+      cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
     assertTrue(topicMetadata.isEmpty)
   }
 
@@ -51,7 +56,8 @@ class MetadataCacheTest {
     val controllerId = 2
     val controllerEpoch = 1
 
-    def securityProtocolToEndPoint(brokerId: Int): Map[SecurityProtocol, EndPoint] = {
+    def securityProtocolToEndPoint(
+        brokerId: Int): Map[SecurityProtocol, EndPoint] = {
       val host = s"foo-$brokerId"
       Map(
         SecurityProtocol.PLAINTEXT -> new EndPoint(host, 9092),
@@ -60,18 +66,40 @@ class MetadataCacheTest {
     }
 
     val brokers = (0 to 2).map { brokerId =>
-      new Broker(brokerId, securityProtocolToEndPoint(brokerId).asJava, "rack1")
+      new Broker(brokerId,
+                 securityProtocolToEndPoint(brokerId).asJava,
+                 "rack1")
     }.toSet
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, 0, 0, asList(0), zkVersion, asSet(0)),
-      new TopicPartition(topic, 1) -> new PartitionState(controllerEpoch, 1, 1, asList(1), zkVersion, asSet(1)),
-      new TopicPartition(topic, 2) -> new PartitionState(controllerEpoch, 2, 2, asList(2), zkVersion, asSet(2)))
+      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                         0,
+                                                         0,
+                                                         asList(0),
+                                                         zkVersion,
+                                                         asSet(0)),
+      new TopicPartition(topic, 1) -> new PartitionState(controllerEpoch,
+                                                         1,
+                                                         1,
+                                                         asList(1),
+                                                         zkVersion,
+                                                         asSet(1)),
+      new TopicPartition(topic, 2) -> new PartitionState(controllerEpoch,
+                                                         2,
+                                                         2,
+                                                         asList(2),
+                                                         zkVersion,
+                                                         asSet(2)))
 
-    val updateMetadataRequest = new UpdateMetadataRequest(controllerId, controllerEpoch, partitionStates.asJava, brokers.asJava)
+    val updateMetadataRequest = new UpdateMetadataRequest(
+      controllerId,
+      controllerEpoch,
+      partitionStates.asJava,
+      brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
-    for (securityProtocol <- Seq(SecurityProtocol.PLAINTEXT, SecurityProtocol.SSL)) {
+    for (securityProtocol <- Seq(SecurityProtocol.PLAINTEXT,
+                                 SecurityProtocol.SSL)) {
       val topicMetadatas = cache.getTopicMetadata(Set(topic), securityProtocol)
       assertEquals(1, topicMetadatas.size)
 
@@ -79,7 +107,8 @@ class MetadataCacheTest {
       assertEquals(Errors.NONE, topicMetadata.error)
       assertEquals(topic, topicMetadata.topic)
 
-      val partitionMetadatas = topicMetadata.partitionMetadata.asScala.sortBy(_.partition)
+      val partitionMetadatas =
+        topicMetadata.partitionMetadata.asScala.sortBy(_.partition)
       assertEquals(3, partitionMetadatas.size)
 
       for (i <- 0 to 2) {
@@ -88,7 +117,8 @@ class MetadataCacheTest {
         assertEquals(i, partitionMetadata.partition)
         val leader = partitionMetadata.leader
         assertEquals(i, leader.id)
-        val endPoint = securityProtocolToEndPoint(partitionMetadata.leader.id)(securityProtocol)
+        val endPoint = securityProtocolToEndPoint(partitionMetadata.leader.id)(
+          securityProtocol)
         assertEquals(endPoint.host, leader.host)
         assertEquals(endPoint.port, leader.port)
         assertEquals(List(i), partitionMetadata.isr.asScala.map(_.id))
@@ -108,17 +138,31 @@ class MetadataCacheTest {
     val zkVersion = 3
     val controllerId = 2
     val controllerEpoch = 1
-    val brokers = Set(new Broker(0, Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava, null))
+    val brokers = Set(
+      new Broker(
+        0,
+        Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+        null))
 
     val leader = 1
     val leaderEpoch = 1
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, leader, leaderEpoch, asList(0), zkVersion, asSet(0)))
+      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                         leader,
+                                                         leaderEpoch,
+                                                         asList(0),
+                                                         zkVersion,
+                                                         asSet(0)))
 
-    val updateMetadataRequest = new UpdateMetadataRequest(controllerId, controllerEpoch, partitionStates.asJava, brokers.asJava)
+    val updateMetadataRequest = new UpdateMetadataRequest(
+      controllerId,
+      controllerEpoch,
+      partitionStates.asJava,
+      brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
-    val topicMetadatas = cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
+    val topicMetadatas =
+      cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
     assertEquals(1, topicMetadatas.size)
 
     val topicMetadata = topicMetadatas.head
@@ -144,7 +188,11 @@ class MetadataCacheTest {
     val zkVersion = 3
     val controllerId = 2
     val controllerEpoch = 1
-    val brokers = Set(new Broker(0, Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava, null))
+    val brokers = Set(
+      new Broker(
+        0,
+        Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+        null))
 
     // replica 1 is not available
     val leader = 0
@@ -153,12 +201,22 @@ class MetadataCacheTest {
     val isr = asList[Integer](0)
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, leader, leaderEpoch, isr, zkVersion, replicas))
+      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                         leader,
+                                                         leaderEpoch,
+                                                         isr,
+                                                         zkVersion,
+                                                         replicas))
 
-    val updateMetadataRequest = new UpdateMetadataRequest(controllerId, controllerEpoch, partitionStates.asJava, brokers.asJava)
+    val updateMetadataRequest = new UpdateMetadataRequest(
+      controllerId,
+      controllerEpoch,
+      partitionStates.asJava,
+      brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
-    val topicMetadatas = cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
+    val topicMetadatas =
+      cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
     assertEquals(1, topicMetadatas.size)
 
     val topicMetadata = topicMetadatas.head
@@ -183,7 +241,11 @@ class MetadataCacheTest {
     val zkVersion = 3
     val controllerId = 2
     val controllerEpoch = 1
-    val brokers = Set(new Broker(0, Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava, "rack1"))
+    val brokers = Set(
+      new Broker(
+        0,
+        Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+        "rack1"))
 
     // replica 1 is not available
     val leader = 0
@@ -192,12 +254,22 @@ class MetadataCacheTest {
     val isr = asList[Integer](0, 1)
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, leader, leaderEpoch, isr, zkVersion, replicas))
+      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                         leader,
+                                                         leaderEpoch,
+                                                         isr,
+                                                         zkVersion,
+                                                         replicas))
 
-    val updateMetadataRequest = new UpdateMetadataRequest(controllerId, controllerEpoch, partitionStates.asJava, brokers.asJava)
+    val updateMetadataRequest = new UpdateMetadataRequest(
+      controllerId,
+      controllerEpoch,
+      partitionStates.asJava,
+      brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
-    val topicMetadatas = cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
+    val topicMetadatas =
+      cache.getTopicMetadata(Set(topic), SecurityProtocol.PLAINTEXT)
     assertEquals(1, topicMetadatas.size)
 
     val topicMetadata = topicMetadatas.head
@@ -217,22 +289,35 @@ class MetadataCacheTest {
   def getTopicMetadataWithNonSupportedSecurityProtocol() {
     val topic = "topic"
     val cache = new MetadataCache(1)
-    val brokers = Set(new Broker(0, Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava, ""))
+    val brokers = Set(
+      new Broker(
+        0,
+        Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+        ""))
     val controllerEpoch = 1
     val leader = 0
     val leaderEpoch = 0
     val replicas = asSet[Integer](0)
     val isr = asList[Integer](0, 1)
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, leader, leaderEpoch, isr, 3, replicas))
-    val updateMetadataRequest = new UpdateMetadataRequest(2, controllerEpoch, partitionStates.asJava, brokers.asJava)
+      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                         leader,
+                                                         leaderEpoch,
+                                                         isr,
+                                                         3,
+                                                         replicas))
+    val updateMetadataRequest = new UpdateMetadataRequest(
+      2,
+      controllerEpoch,
+      partitionStates.asJava,
+      brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
     try {
       val result = cache.getTopicMetadata(Set(topic), SecurityProtocol.SSL)
-      fail(s"Exception should be thrown by `getTopicMetadata` with non-supported SecurityProtocol, $result was returned instead")
-    }
-    catch {
+      fail(
+        s"Exception should be thrown by `getTopicMetadata` with non-supported SecurityProtocol, $result was returned instead")
+    } catch {
       case e: BrokerEndPointNotAvailableException => //expected
     }
 
@@ -245,7 +330,10 @@ class MetadataCacheTest {
 
     def updateCache(brokerIds: Set[Int]) {
       val brokers = brokerIds.map { brokerId =>
-        new Broker(brokerId, Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava, "")
+        new Broker(
+          brokerId,
+          Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+          "")
       }
       val controllerEpoch = 1
       val leader = 0
@@ -253,8 +341,17 @@ class MetadataCacheTest {
       val replicas = asSet[Integer](0)
       val isr = asList[Integer](0, 1)
       val partitionStates = Map(
-        new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch, leader, leaderEpoch, isr, 3, replicas))
-      val updateMetadataRequest = new UpdateMetadataRequest(2, controllerEpoch, partitionStates.asJava, brokers.asJava)
+        new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
+                                                           leader,
+                                                           leaderEpoch,
+                                                           isr,
+                                                           3,
+                                                           replicas))
+      val updateMetadataRequest = new UpdateMetadataRequest(
+        2,
+        controllerEpoch,
+        partitionStates.asJava,
+        brokers.asJava)
       cache.updateCache(15, updateMetadataRequest)
     }
 

@@ -14,7 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.common
 
 import java.io.PrintStream
@@ -32,7 +31,8 @@ trait MessageFormatter {
 
   def init(props: Properties) {}
 
-  def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]], output: PrintStream): Unit
+  def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
+              output: PrintStream): Unit
 
   def close() {}
 

@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import java.io.File
@@ -28,7 +27,7 @@ import kafka.common._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness  {
+abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
   var brokers: Seq[KafkaServer] = null
   val topic1 = "foo"
   val topic2 = "bar"
@@ -40,8 +39,11 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness  {
   @Before
   override def setUp() {
     super.setUp()
-    val props = createBrokerConfigs(2, zkConnect, interBrokerSecurityProtocol = Some(securityProtocol),
-      trustStoreFile = trustStoreFile)
+    val props = createBrokerConfigs(2,
+                                    zkConnect,
+                                    interBrokerSecurityProtocol =
+                                      Some(securityProtocol),
+                                    trustStoreFile = trustStoreFile)
     brokers = props.map(KafkaConfig.fromProps).map(TestUtils.createServer(_))
   }
 
@@ -58,17 +60,22 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness  {
     val testMessageList2 = List("test5", "test6", "test7", "test8")
 
     // create a topic and partition and await leadership
-    for (topic <- List(topic1,topic2)) {
-      createTopic(zkUtils, topic, numPartitions = 1, replicationFactor = 2, servers = brokers)
+    for (topic <- List(topic1, topic2)) {
+      createTopic(zkUtils,
+                  topic,
+                  numPartitions = 1,
+                  replicationFactor = 2,
+                  servers = brokers)
     }
 
     // send test messages to leader
-    val producer = TestUtils.createNewProducer(TestUtils.getBrokerListStrFromServers(brokers),
-                                               retries = 5,
-                                               keySerializer = new StringSerializer,
-                                               valueSerializer = new StringSerializer)
+    val producer = TestUtils.createNewProducer(
+      TestUtils.getBrokerListStrFromServers(brokers),
+      retries = 5,
+      keySerializer = new StringSerializer,
+      valueSerializer = new StringSerializer)
     val records = testMessageList1.map(m => new ProducerRecord(topic1, m, m)) ++
-      testMessageList2.map(m => new ProducerRecord(topic2, m, m))
+        testMessageList2.map(m => new ProducerRecord(topic2, m, m))
     records.map(producer.send).foreach(_.get)
     producer.close()
 
@@ -76,9 +83,14 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness  {
       var result = true
       for (topic <- List(topic1, topic2)) {
         val topicAndPart = TopicAndPartition(topic, partition)
-        val expectedOffset = brokers.head.getLogManager().getLog(topicAndPart).get.logEndOffset
+        val expectedOffset =
+          brokers.head.getLogManager().getLog(topicAndPart).get.logEndOffset
         result = result && expectedOffset > 0 && brokers.forall { item =>
-          (expectedOffset == item.getLogManager().getLog(topicAndPart).get.logEndOffset)
+          (expectedOffset == item
+            .getLogManager()
+            .getLog(topicAndPart)
+            .get
+            .logEndOffset)
         }
       }
       result
