@@ -17,8 +17,8 @@
 package kafka.cluster
 
 import kafka.log.Log
-import kafka.utils.{SystemTime, Time, Logging}
-import kafka.server.{LogReadResult, LogOffsetMetadata}
+import kafka.utils.{Logging, SystemTime, Time}
+import kafka.server.{LogOffsetMetadata, LogReadResult}
 import kafka.common.KafkaException
 
 import java.util.concurrent.atomic.AtomicLong
@@ -119,9 +119,8 @@ class Replica(val brokerId: Int,
     false
   }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     31 + topic.hashCode() + 17 * brokerId + partition.hashCode()
-  }
 
   override def toString(): String = {
     val replicaString = new StringBuilder

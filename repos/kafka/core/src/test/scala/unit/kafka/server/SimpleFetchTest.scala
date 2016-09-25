@@ -21,12 +21,12 @@ import kafka.utils._
 import kafka.cluster.Replica
 import kafka.common.TopicAndPartition
 import kafka.log.Log
-import kafka.message.{MessageSet, ByteBufferMessageSet, Message}
+import kafka.message.{ByteBufferMessageSet, Message, MessageSet}
 import org.apache.kafka.common.metrics.Metrics
 import org.apache.kafka.common.utils.{MockTime => JMockTime}
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
-import java.util.{Properties, Collections}
+import java.util.{Collections, Properties}
 import java.util.concurrent.atomic.AtomicBoolean
 import collection.JavaConversions._
 

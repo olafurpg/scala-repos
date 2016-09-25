@@ -25,31 +25,31 @@ import kafka.log.LogConfig
 import kafka.log.CleanerConfig
 import kafka.log.LogManager
 import java.util.concurrent._
-import atomic.{AtomicInteger, AtomicBoolean}
-import java.io.{IOException, File}
+import atomic.{AtomicBoolean, AtomicInteger}
+import java.io.{File, IOException}
 
 import kafka.security.auth.Authorizer
 import kafka.utils._
 import org.apache.kafka.clients.{
-  ManualMetadataUpdater,
   ClientRequest,
+  ManualMetadataUpdater,
   NetworkClient
 }
 import org.apache.kafka.common.Node
 import org.apache.kafka.common.metrics._
 import org.apache.kafka.common.network.{
-  LoginType,
-  Selectable,
   ChannelBuilders,
+  LoginType,
+  Mode,
   NetworkReceive,
-  Selector,
-  Mode
+  Selectable,
+  Selector
 }
-import org.apache.kafka.common.protocol.{Errors, ApiKeys, SecurityProtocol}
+import org.apache.kafka.common.protocol.{ApiKeys, Errors, SecurityProtocol}
 import org.apache.kafka.common.metrics.{JmxReporter, Metrics}
 import org.apache.kafka.common.requests.{
-  ControlledShutdownResponse,
   ControlledShutdownRequest,
+  ControlledShutdownResponse,
   RequestSend
 }
 import org.apache.kafka.common.security.JaasUtils
@@ -59,8 +59,8 @@ import scala.collection.mutable
 import scala.collection.JavaConverters._
 import org.I0Itec.zkclient.ZkClient
 import kafka.controller.{ControllerStats, KafkaController}
-import kafka.cluster.{EndPoint, Broker}
-import kafka.common.{InconsistentBrokerIdException, GenerateBrokerIdException}
+import kafka.cluster.{Broker, EndPoint}
+import kafka.common.{GenerateBrokerIdException, InconsistentBrokerIdException}
 import kafka.network.{BlockingChannel, SocketServer}
 import kafka.metrics.KafkaMetricsGroup
 import com.yammer.metrics.core.Gauge
@@ -185,9 +185,8 @@ class KafkaServer(val config: KafkaConfig,
   newGauge(
     "yammer-metrics-count",
     new Gauge[Int] {
-      def value = {
+      def value =
         com.yammer.metrics.Metrics.defaultRegistry().allMetrics().size()
-      }
     }
   )
 

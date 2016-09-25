@@ -23,13 +23,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kafka.api.LeaderAndIsr
 import kafka.common.{
   LeaderElectionNotNeededException,
-  TopicAndPartition,
+  NoReplicaOnlineException,
   StateChangeFailedException,
-  NoReplicaOnlineException
+  TopicAndPartition
 }
 import kafka.utils.{Logging, ReplicationUtils}
 import kafka.utils.ZkUtils._
-import org.I0Itec.zkclient.{IZkDataListener, IZkChildListener}
+import org.I0Itec.zkclient.{IZkChildListener, IZkDataListener}
 import org.I0Itec.zkclient.exception.ZkNodeExistsException
 import kafka.controller.Callbacks.CallbackBuilder
 import kafka.utils.CoreUtils._
@@ -144,9 +144,8 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
     }
   }
 
-  def partitionsInState(state: PartitionState): Set[TopicAndPartition] = {
+  def partitionsInState(state: PartitionState): Set[TopicAndPartition] =
     partitionState.filter(p => p._2 == state).keySet
-  }
 
   /**
     * This API is invoked by the partition change zookeeper listener

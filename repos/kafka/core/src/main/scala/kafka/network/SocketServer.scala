@@ -45,7 +45,7 @@ import org.apache.kafka.common.utils.{Time, Utils}
 
 import scala.collection._
 import JavaConverters._
-import scala.util.control.{NonFatal, ControlThrowable}
+import scala.util.control.{ControlThrowable, NonFatal}
 
 /**
   * An NIO socket server. The threading model is
@@ -208,9 +208,7 @@ private[kafka] abstract class AbstractServerThread(
   /**
     * Record that the thread startup is complete
     */
-  protected def startupComplete() = {
-    startupLatch.countDown()
-  }
+  protected def startupComplete() = startupLatch.countDown()
 
   /**
     * Record that the thread shutdown is complete

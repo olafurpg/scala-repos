@@ -19,8 +19,8 @@ import kafka.admin.AdminUtils
 import kafka.consumer.SimpleConsumer
 import kafka.integration.KafkaServerTestHarness
 import kafka.server.{
-  ClientQuotaManager,
   ClientConfigOverride,
+  ClientQuotaManager,
   KafkaConfig,
   KafkaServer
 }
@@ -29,7 +29,7 @@ import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.clients.producer._
 import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
 import org.apache.kafka.common.MetricName
-import org.apache.kafka.common.metrics.{Quota, KafkaMetric}
+import org.apache.kafka.common.metrics.{KafkaMetric, Quota}
 import org.apache.kafka.common.protocol.ApiKeys
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

@@ -26,8 +26,8 @@ import kafka.server.{KafkaConfig, KafkaServer}
 import kafka.utils._
 import org.apache.kafka.common.metrics.Metrics
 import org.apache.kafka.common.requests.{
-  AbstractRequestResponse,
-  AbstractRequest
+  AbstractRequest,
+  AbstractRequestResponse
 }
 import org.apache.kafka.common.utils.SystemTime
 import org.apache.log4j.{Level, Logger}
@@ -194,11 +194,9 @@ class MockChannelManager(private val controllerContext: ControllerContext,
     this.startRequestSendThread(0)
   }
 
-  def queueCapacity(brokerId: Int): Int = {
+  def queueCapacity(brokerId: Int): Int =
     this.brokerStateInfo(brokerId).messageQueue.remainingCapacity
-  }
 
-  def queueSize(brokerId: Int): Int = {
+  def queueSize(brokerId: Int): Int =
     this.brokerStateInfo(brokerId).messageQueue.size
-  }
 }

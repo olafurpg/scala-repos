@@ -19,7 +19,7 @@
   */
 package kafka.metrics
 
-import kafka.utils.{VerifiableProperties, CoreUtils}
+import kafka.utils.{CoreUtils, VerifiableProperties}
 
 class KafkaMetricsConfig(props: VerifiableProperties) {
 

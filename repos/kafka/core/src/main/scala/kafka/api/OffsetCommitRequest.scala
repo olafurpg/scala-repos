@@ -20,7 +20,7 @@ import java.nio.ByteBuffer
 
 import kafka.api.ApiUtils._
 import kafka.common.{OffsetAndMetadata, TopicAndPartition}
-import kafka.network.{RequestOrResponseSend, RequestChannel}
+import kafka.network.{RequestChannel, RequestOrResponseSend}
 import kafka.network.RequestChannel.Response
 import kafka.utils.Logging
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
@@ -204,7 +204,5 @@ case class OffsetCommitRequest(
     offsetCommitRequest.toString()
   }
 
-  override def toString = {
-    describe(details = true)
-  }
+  override def toString = describe(details = true)
 }

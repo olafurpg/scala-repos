@@ -21,7 +21,7 @@ import scala.util.matching.Regex
 import collection.mutable
 import java.util.Date
 import java.text.SimpleDateFormat
-import kafka.utils.{CoreUtils, Logging, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, CoreUtils, Logging}
 import kafka.common.Topic
 import java.io.{BufferedOutputStream, OutputStream}
 

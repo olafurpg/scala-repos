@@ -16,16 +16,16 @@
   */
 package kafka.api.test
 
-import java.util.{Properties, Collection, ArrayList}
+import java.util.{ArrayList, Collection, Properties}
 
 import org.junit.runners.Parameterized
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized.Parameters
 import org.junit.{After, Before, Test}
 import org.apache.kafka.clients.producer.{
-  ProducerRecord,
   KafkaProducer,
-  ProducerConfig
+  ProducerConfig,
+  ProducerRecord
 }
 import org.junit.Assert._
 

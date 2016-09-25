@@ -16,10 +16,10 @@
   */
 package kafka.producer
 
-import kafka.metrics.{KafkaTimer, KafkaMetricsGroup}
+import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import java.util.concurrent.TimeUnit
 import kafka.utils.Pool
-import kafka.common.{ClientIdAllBrokers, ClientIdBroker, ClientIdAndBroker}
+import kafka.common.{ClientIdAllBrokers, ClientIdAndBroker, ClientIdBroker}
 
 @deprecated(
   "This class has been deprecated and will be removed in a future release.",
@@ -83,9 +83,8 @@ object ProducerRequestStatsRegistry {
   private val globalStats =
     new Pool[String, ProducerRequestStats](Some(valueFactory))
 
-  def getProducerRequestStats(clientId: String) = {
+  def getProducerRequestStats(clientId: String) =
     globalStats.getAndMaybePut(clientId)
-  }
 
   def removeProducerRequestStats(clientId: String) {
     globalStats.remove(clientId)

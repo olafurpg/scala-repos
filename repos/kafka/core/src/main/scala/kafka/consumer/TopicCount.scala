@@ -18,7 +18,7 @@ package kafka.consumer
 
 import scala.collection._
 import org.I0Itec.zkclient.ZkClient
-import kafka.utils.{Json, ZKGroupDirs, ZkUtils, Logging, CoreUtils}
+import kafka.utils.{CoreUtils, Json, Logging, ZKGroupDirs, ZkUtils}
 import kafka.common.KafkaException
 
 private[kafka] trait TopicCount {

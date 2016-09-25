@@ -29,7 +29,7 @@ import kafka.utils.TestUtils._
 import kafka.utils._
 import org.I0Itec.zkclient.ZkClient
 import org.apache.log4j.{Level, Logger}
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 import scala.collection._
 

@@ -20,14 +20,14 @@ import org.apache.kafka.common.record.Record
 import org.junit.Assert._
 import kafka.common.{OffsetAndMetadata, TopicAndPartition}
 import kafka.message.{Message, MessageSet}
-import kafka.server.{ReplicaManager, KafkaConfig}
+import kafka.server.{KafkaConfig, ReplicaManager}
 import kafka.utils._
 import org.apache.kafka.common.utils.SystemTime
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.Errors
-import org.apache.kafka.common.requests.{OffsetCommitRequest, JoinGroupRequest}
+import org.apache.kafka.common.requests.{JoinGroupRequest, OffsetCommitRequest}
 import org.apache.kafka.common.requests.ProduceResponse.PartitionResponse
-import org.easymock.{Capture, IAnswer, EasyMock}
+import org.easymock.{Capture, EasyMock, IAnswer}
 import org.junit.{After, Before, Test}
 import org.scalatest.junit.JUnitSuite
 import java.util.concurrent.TimeUnit
@@ -1176,9 +1176,8 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
     Await.result(responseFuture, Duration(40, TimeUnit.MILLISECONDS))
   }
 
-  private def await[T](future: Future[T], millis: Long): T = {
+  private def await[T](future: Future[T], millis: Long): T =
     Await.result(future, Duration(millis, TimeUnit.MILLISECONDS))
-  }
 
   private def commitOffsets(
       groupId: String,

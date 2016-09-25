@@ -19,7 +19,7 @@ package kafka.tools
 import joptsimple._
 import kafka.utils._
 import kafka.consumer.SimpleConsumer
-import kafka.api.{OffsetFetchResponse, OffsetFetchRequest, OffsetRequest}
+import kafka.api.{OffsetFetchRequest, OffsetFetchResponse, OffsetRequest}
 import kafka.common.{OffsetMetadataAndError, TopicAndPartition}
 import org.apache.kafka.common.errors.BrokerNotAvailableException
 import org.apache.kafka.common.protocol.Errors

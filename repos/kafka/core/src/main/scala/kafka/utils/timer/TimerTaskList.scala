@@ -16,10 +16,10 @@
   */
 package kafka.utils.timer
 
-import java.util.concurrent.{TimeUnit, Delayed}
-import java.util.concurrent.atomic.{AtomicLong, AtomicInteger}
+import java.util.concurrent.{Delayed, TimeUnit}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 
-import kafka.utils.{SystemTime, threadsafe}
+import kafka.utils.{threadsafe, SystemTime}
 
 import scala.math._
 
@@ -38,14 +38,11 @@ private[timer] class TimerTaskList(taskCounter: AtomicInteger)
 
   // Set the bucket's expiration time
   // Returns true if the expiration time is changed
-  def setExpiration(expirationMs: Long): Boolean = {
+  def setExpiration(expirationMs: Long): Boolean =
     expiration.getAndSet(expirationMs) != expirationMs
-  }
 
   // Get the bucket's expiration time
-  def getExpiration(): Long = {
-    expiration.get()
-  }
+  def getExpiration(): Long = expiration.get()
 
   // Apply the supplied function to each of tasks in this list
   def foreach(f: (TimerTask) => Unit): Unit = {
@@ -144,9 +141,7 @@ private[timer] class TimerTaskEntry(val timerTask: TimerTask) {
   // setTimerTaskEntry will remove it.
   if (timerTask != null) timerTask.setTimerTaskEntry(this)
 
-  def cancelled: Boolean = {
-    timerTask.getTimerTaskEntry != this
-  }
+  def cancelled: Boolean = timerTask.getTimerTaskEntry != this
 
   def remove(): Unit = {
     var currentList = list

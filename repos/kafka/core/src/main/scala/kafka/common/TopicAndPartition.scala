@@ -1,6 +1,6 @@
 package kafka.common
 
-import kafka.cluster.{Replica, Partition}
+import kafka.cluster.{Partition, Replica}
 import kafka.utils.Json
 
 /**

@@ -16,7 +16,7 @@
   */
 package kafka
 
-import java.io.{FileOutputStream, File}
+import java.io.{File, FileOutputStream}
 import java.security.Permission
 
 import kafka.server.KafkaConfig
@@ -137,9 +137,8 @@ class KafkaTest {
     assertEquals("truststore_password", config.sslTruststorePassword.value)
   }
 
-  def prepareDefaultConfig(): String = {
+  def prepareDefaultConfig(): String =
     prepareConfig(Array("broker.id=1", "zookeeper.connect=somewhere"))
-  }
 
   def prepareConfig(lines: Array[String]): String = {
     val file = File.createTempFile("kafkatest", ".properties")

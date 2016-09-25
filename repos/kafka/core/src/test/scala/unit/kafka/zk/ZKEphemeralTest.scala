@@ -30,7 +30,7 @@ import org.apache.zookeeper.WatchedEvent
 import org.apache.zookeeper.Watcher
 import org.apache.zookeeper.ZooDefs.Ids
 import org.I0Itec.zkclient.exception.{ZkException, ZkNodeExistsException}
-import org.junit.{After, Before, Test, Assert}
+import org.junit.{After, Assert, Before, Test}
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runner.RunWith;

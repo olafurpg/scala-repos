@@ -74,9 +74,8 @@ abstract class AbstractFetcherManager(protected val name: String,
     Map("clientId" -> clientId)
   )
 
-  private def getFetcherId(topic: String, partitionId: Int): Int = {
+  private def getFetcherId(topic: String, partitionId: Int): Int =
     Utils.abs(31 * topic.hashCode() + partitionId) % numFetchers
-  }
 
   // to be defined in subclass to create a specific fetcher
   def createFetcherThread(fetcherId: Int,

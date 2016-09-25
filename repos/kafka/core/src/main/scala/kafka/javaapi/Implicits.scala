@@ -22,9 +22,8 @@ private[javaapi] object Implicits extends Logging {
 
   implicit def scalaMessageSetToJavaMessageSet(
       messageSet: kafka.message.ByteBufferMessageSet)
-    : kafka.javaapi.message.ByteBufferMessageSet = {
+    : kafka.javaapi.message.ByteBufferMessageSet =
     new kafka.javaapi.message.ByteBufferMessageSet(messageSet.buffer)
-  }
 
   implicit def toJavaFetchResponse(
       response: kafka.api.FetchResponse): kafka.javaapi.FetchResponse =

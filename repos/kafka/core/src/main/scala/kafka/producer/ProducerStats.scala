@@ -43,9 +43,8 @@ object ProducerStatsRegistry {
   private val statsRegistry =
     new Pool[String, ProducerStats](Some(valueFactory))
 
-  def getProducerStats(clientId: String) = {
+  def getProducerStats(clientId: String) =
     statsRegistry.getAndMaybePut(clientId)
-  }
 
   def removeProducerStats(clientId: String) {
     statsRegistry.remove(clientId)

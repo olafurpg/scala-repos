@@ -19,13 +19,13 @@ package kafka.controller
 import kafka.server.ConfigType
 import org.apache.kafka.common.protocol.Errors
 import org.apache.kafka.common.requests.{
-  StopReplicaResponse,
-  AbstractRequestResponse
+  AbstractRequestResponse,
+  StopReplicaResponse
 }
 
 import collection.mutable
 import collection.JavaConverters._
-import kafka.utils.{ShutdownableThread, Logging}
+import kafka.utils.{Logging, ShutdownableThread}
 import kafka.utils.CoreUtils._
 import kafka.utils.ZkUtils._
 import collection.Set

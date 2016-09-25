@@ -22,9 +22,9 @@ import kafka.log.LogConfig
 import kafka.utils.Logging
 import kafka.common.{
   LeaderElectionNotNeededException,
-  TopicAndPartition,
+  NoReplicaOnlineException,
   StateChangeFailedException,
-  NoReplicaOnlineException
+  TopicAndPartition
 }
 import kafka.server.{ConfigType, KafkaConfig}
 

@@ -28,10 +28,10 @@ import kafka.utils._
 
 import org.apache.kafka.clients.consumer.{
   Consumer,
-  ConsumerRecord,
-  ConsumerConfig
+  ConsumerConfig,
+  ConsumerRecord
 }
-import org.apache.kafka.clients.producer.{ProducerRecord, ProducerConfig}
+import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 import org.apache.kafka.common.{TopicPartition}
 import org.apache.kafka.common.protocol.SecurityProtocol
@@ -40,7 +40,7 @@ import org.apache.kafka.common.errors.{
   TopicAuthorizationException
 }
 import org.junit.Assert._
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 import scala.collection.JavaConverters._
 

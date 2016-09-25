@@ -18,7 +18,7 @@ package kafka.utils
 
 import org.junit.Assert._
 import java.util.concurrent.atomic._
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 import kafka.utils.TestUtils.retry
 
 class SchedulerTest {

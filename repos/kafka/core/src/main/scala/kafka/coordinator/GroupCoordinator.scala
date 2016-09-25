@@ -31,9 +31,9 @@ import kafka.utils._
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.utils.Time
 import org.apache.kafka.common.protocol.Errors
-import org.apache.kafka.common.requests.{OffsetFetchResponse, JoinGroupRequest}
+import org.apache.kafka.common.requests.{JoinGroupRequest, OffsetFetchResponse}
 
-import scala.collection.{Map, Seq, immutable}
+import scala.collection.{immutable, Map, Seq}
 
 case class GroupConfig(groupMinSessionTimeoutMs: Int,
                        groupMaxSessionTimeoutMs: Int)
@@ -659,9 +659,8 @@ class GroupCoordinator(val brokerId: Int,
     }
   }
 
-  private def validGroupId(groupId: String): Boolean = {
+  private def validGroupId(groupId: String): Boolean =
     groupId != null && !groupId.isEmpty
-  }
 
   private def joinError(memberId: String, errorCode: Short): JoinGroupResult = {
     JoinGroupResult(members = Map.empty,

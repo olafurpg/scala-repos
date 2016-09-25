@@ -19,7 +19,7 @@ import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.record.TimestampType
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.{PartitionInfo, TopicPartition}
-import kafka.utils.{TestUtils, Logging, ShutdownableThread}
+import kafka.utils.{Logging, ShutdownableThread, TestUtils}
 import kafka.server.KafkaConfig
 import java.util.ArrayList
 import org.junit.Assert._
@@ -110,10 +110,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     val rebalanceListener = new ConsumerRebalanceListener {
       override def onPartitionsAssigned(
-          partitions: util.Collection[TopicPartition]) = {
-        // keep partitions paused in this test so that we can verify the commits based on specific seeks
+          partitions: util.Collection[TopicPartition]) = // keep partitions paused in this test so that we can verify the commits based on specific seeks
         consumer0.pause(partitions)
-      }
 
       override def onPartitionsRevoked(
           partitions: util.Collection[TopicPartition]) = {}
@@ -427,15 +425,12 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       }
 
       override def onPartitionsRevoked(
-          partitions: util.Collection[TopicPartition]) = {
+          partitions: util.Collection[TopicPartition]) =
         partitionAssignment = Set.empty[TopicPartition]
-      }
     }
     consumer.subscribe(topicsToSubscribe.asJava, rebalanceListener)
 
-    def consumerAssignment(): Set[TopicPartition] = {
-      partitionAssignment
-    }
+    def consumerAssignment(): Set[TopicPartition] = partitionAssignment
 
     /**
       * Subscribe consumer to a new set of topics.
@@ -456,9 +451,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       subscriptionChanged = true
     }
 
-    def isSubscribeRequestProcessed(): Boolean = {
-      !subscriptionChanged
-    }
+    def isSubscribeRequestProcessed(): Boolean = !subscriptionChanged
 
     override def doWork(): Unit = {
       if (subscriptionChanged) {

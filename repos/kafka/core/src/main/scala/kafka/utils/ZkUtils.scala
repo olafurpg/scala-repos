@@ -78,9 +78,8 @@ object ZkUtils {
   /*
    * Used in tests
    */
-  def apply(zkClient: ZkClient, isZkSecurityEnabled: Boolean): ZkUtils = {
+  def apply(zkClient: ZkClient, isZkSecurityEnabled: Boolean): ZkUtils =
     new ZkUtils(zkClient, null, isZkSecurityEnabled)
-  }
 
   def createZkClient(zkUrl: String,
                      sessionTimeout: Int,
@@ -125,13 +124,11 @@ object ZkUtils {
   /*
    * Get calls that only depend on static paths
    */
-  def getTopicPath(topic: String): String = {
+  def getTopicPath(topic: String): String =
     ZkUtils.BrokerTopicsPath + "/" + topic
-  }
 
-  def getTopicPartitionsPath(topic: String): String = {
+  def getTopicPartitionsPath(topic: String): String =
     getTopicPath(topic) + "/partitions"
-  }
 
   def getTopicPartitionPath(topic: String, partitionId: Int): String =
     getTopicPartitionsPath(topic) + "/" + partitionId
@@ -192,9 +189,8 @@ class ZkUtils(val zkClient: ZkClient,
   }
 
   def getAllBrokerEndPointsForChannel(
-      protocolType: SecurityProtocol): Seq[BrokerEndPoint] = {
+      protocolType: SecurityProtocol): Seq[BrokerEndPoint] =
     getAllBrokersInCluster().map(_.getBrokerEndPoint(protocolType))
-  }
 
   def getLeaderAndIsrForPartition(topic: String,
                                   partition: Int): Option[LeaderAndIsr] = {
@@ -258,9 +254,8 @@ class ZkUtils(val zkClient: ZkClient,
     * users can provide brokerId in the config , inorder to avoid conflicts between zk generated
     * seqId and config.brokerId we increment zk seqId by KafkaConfig.MaxReservedBrokerId.
     */
-  def getBrokerSequenceId(MaxReservedBrokerId: Int): Int = {
+  def getBrokerSequenceId(MaxReservedBrokerId: Int): Int =
     getSequenceId(BrokerSequenceIdPath) + MaxReservedBrokerId
-  }
 
   /**
     * Gets the in-sync replicas (ISR) for a specific topic and partition
@@ -392,9 +387,8 @@ class ZkUtils(val zkClient: ZkClient,
   /**
     * Get JSON partition to replica map from zookeeper.
     */
-  def replicaAssignmentZkData(map: Map[String, Seq[Int]]): String = {
+  def replicaAssignmentZkData(map: Map[String, Seq[Int]]): String =
     Json.encode(Map("version" -> 1, "partitions" -> map))
-  }
 
   /**
     *  make sure a persistent path exists in ZK. Create the path if not exist.
@@ -493,9 +487,8 @@ class ZkUtils(val zkClient: ZkClient,
   def createSequentialPersistentPath(
       path: String,
       data: String = "",
-      acls: java.util.List[ACL] = DefaultAcls): String = {
+      acls: java.util.List[ACL] = DefaultAcls): String =
     ZkPath.createPersistentSequential(zkClient, path, data, acls)
-  }
 
   /**
     * Update the value of a persistent node with the given path and data.
@@ -676,9 +669,7 @@ class ZkUtils(val zkClient: ZkClient,
   /**
     * Check if the given path exists
     */
-  def pathExists(path: String): Boolean = {
-    zkClient.exists(path)
-  }
+  def pathExists(path: String): Boolean = zkClient.exists(path)
 
   def getCluster(): Cluster = {
     val cluster = new Cluster
@@ -815,9 +806,8 @@ class ZkUtils(val zkClient: ZkClient,
   }
 
   def parsePartitionReassignmentData(
-      jsonData: String): Map[TopicAndPartition, Seq[Int]] = {
+      jsonData: String): Map[TopicAndPartition, Seq[Int]] =
     parsePartitionReassignmentDataWithoutDedup(jsonData).toMap
-  }
 
   def parseTopicsData(jsonData: String): Seq[String] = {
     var topics = List.empty[String]
@@ -994,9 +984,7 @@ class ZkUtils(val zkClient: ZkClient,
     }
   }
 
-  def getConsumerGroups() = {
-    getChildren(ConsumersPath)
-  }
+  def getConsumerGroups() = getChildren(ConsumersPath)
 
   def getTopicsByConsumerGroup(consumerGroup: String) = {
     getChildrenParentMayNotExist(

@@ -24,9 +24,8 @@ object LogOffsetMetadata {
   val UnknownFilePosition = -1
 
   class OffsetOrdering extends Ordering[LogOffsetMetadata] {
-    override def compare(x: LogOffsetMetadata, y: LogOffsetMetadata): Int = {
+    override def compare(x: LogOffsetMetadata, y: LogOffsetMetadata): Int =
       x.offsetDiff(y).toInt
-    }
   }
 
 }
@@ -61,9 +60,8 @@ case class LogOffsetMetadata(
   }
 
   // compute the number of messages between this offset to the given offset
-  def offsetDiff(that: LogOffsetMetadata): Long = {
+  def offsetDiff(that: LogOffsetMetadata): Long =
     this.messageOffset - that.messageOffset
-  }
 
   // compute the number of bytes between this offset to the given offset
   // if they are on the same segment and this offset precedes the given offset
@@ -79,9 +77,8 @@ case class LogOffsetMetadata(
   }
 
   // decide if the offset metadata only contains message offset info
-  def messageOffsetOnly(): Boolean = {
+  def messageOffsetOnly(): Boolean =
     segmentBaseOffset == LogOffsetMetadata.UnknownSegBaseOffset && relativePositionInSegment == LogOffsetMetadata.UnknownFilePosition
-  }
 
   override def toString =
     messageOffset.toString + " [" + segmentBaseOffset + " : " + relativePositionInSegment + "]"

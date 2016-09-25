@@ -48,7 +48,5 @@ class KafkaStream[K, V](private val queue: BlockingQueue[FetchedDataChunk],
     iter.clearCurrentChunk()
   }
 
-  override def toString(): String = {
-    "%s kafka stream".format(clientId)
-  }
+  override def toString(): String = "%s kafka stream".format(clientId)
 }

@@ -20,10 +20,10 @@ package kafka.tools
 
 import kafka.consumer._
 import joptsimple._
-import kafka.api.{PartitionOffsetRequestInfo, OffsetRequest}
+import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo}
 import kafka.common.TopicAndPartition
 import kafka.client.ClientUtils
-import kafka.utils.{ToolsUtils, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, ToolsUtils}
 
 object GetOffsetShell {
 

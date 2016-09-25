@@ -19,10 +19,10 @@ package kafka.javaapi.message
 import org.junit.Assert._
 import org.junit.Test
 import kafka.message.{
-  DefaultCompressionCodec,
   CompressionCodec,
-  NoCompressionCodec,
-  Message
+  DefaultCompressionCodec,
+  Message,
+  NoCompressionCodec
 }
 
 class ByteBufferMessageSetTest

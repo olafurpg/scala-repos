@@ -176,9 +176,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     verifyNonDaemonThreadsStatus
   }
 
-  private[this] def isNonDaemonKafkaThread(t: Thread): Boolean = {
+  private[this] def isNonDaemonKafkaThread(t: Thread): Boolean =
     !t.isDaemon && t.isAlive && t.getName.startsWith(this.getClass.getName)
-  }
 
   def verifyNonDaemonThreadsStatus() {
     assertEquals(0,

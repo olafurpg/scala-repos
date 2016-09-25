@@ -17,7 +17,7 @@
 package kafka.integration
 
 import org.apache.kafka.common.config.ConfigException
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 import scala.util.Random
 import org.apache.log4j.{Level, Logger}

@@ -17,14 +17,14 @@
 package kafka.consumer
 
 import kafka.api.{
-  OffsetRequest,
-  Request,
   FetchRequestBuilder,
-  FetchResponsePartitionData
+  FetchResponsePartitionData,
+  OffsetRequest,
+  Request
 }
 import kafka.cluster.BrokerEndPoint
 import kafka.message.ByteBufferMessageSet
-import kafka.server.{PartitionFetchState, AbstractFetcherThread}
+import kafka.server.{AbstractFetcherThread, PartitionFetchState}
 import kafka.common.{ErrorMapping, TopicAndPartition}
 import scala.collection.JavaConverters
 import JavaConverters._

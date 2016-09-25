@@ -18,7 +18,7 @@ package kafka.consumer
 
 import org.I0Itec.zkclient.ZkClient
 import kafka.common.TopicAndPartition
-import kafka.utils.{Pool, CoreUtils, ZkUtils, Logging}
+import kafka.utils.{CoreUtils, Logging, Pool, ZkUtils}
 
 import scala.collection.mutable
 

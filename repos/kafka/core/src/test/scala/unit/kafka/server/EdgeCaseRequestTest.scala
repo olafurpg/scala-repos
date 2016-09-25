@@ -28,9 +28,9 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.types.Type
 import org.apache.kafka.common.protocol.{ApiKeys, SecurityProtocol}
 import org.apache.kafka.common.requests.{
+  ProduceRequest,
   ProduceResponse,
-  ResponseHeader,
-  ProduceRequest
+  ResponseHeader
 }
 import org.junit.Assert._
 import org.junit.Test
@@ -49,9 +49,8 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
 
   private def connect(
       s: SocketServer = socketServer,
-      protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT): Socket = {
+      protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT): Socket =
     new Socket("localhost", s.boundPort(protocol))
-  }
 
   private def sendRequest(socket: Socket,
                           request: Array[Byte],

@@ -16,7 +16,7 @@
   */
 package kafka.integration
 
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 import kafka.zk.ZooKeeperTestHarness
 import kafka.utils.TestUtils._
 import org.junit.Assert._

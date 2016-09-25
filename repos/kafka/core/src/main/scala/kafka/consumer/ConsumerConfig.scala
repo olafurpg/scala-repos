@@ -19,7 +19,7 @@ package kafka.consumer
 import java.util.Properties
 import kafka.api.OffsetRequest
 import kafka.utils._
-import kafka.common.{InvalidConfigException, Config}
+import kafka.common.{Config, InvalidConfigException}
 
 object ConsumerConfig extends Config {
   val RefreshMetadataBackoffMs = 200

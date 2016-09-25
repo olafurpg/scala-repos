@@ -19,7 +19,7 @@ package kafka.api
 import java.nio.ByteBuffer
 
 import kafka.api.ApiUtils._
-import kafka.common.{TopicAndPartition, OffsetMetadataAndError}
+import kafka.common.{OffsetMetadataAndError, TopicAndPartition}
 import kafka.utils.Logging
 
 object OffsetFetchResponse extends Logging {
@@ -84,5 +84,5 @@ case class OffsetFetchResponse(
       })
     })
 
-  override def describe(details: Boolean): String = { toString }
+  override def describe(details: Boolean): String = toString
 }

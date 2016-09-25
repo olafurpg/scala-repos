@@ -20,15 +20,15 @@ import java.util.concurrent.locks.ReentrantLock
 
 import kafka.cluster.BrokerEndPoint
 import kafka.consumer.PartitionTopicInfo
-import kafka.message.{MessageAndOffset, ByteBufferMessageSet}
-import kafka.utils.{Pool, ShutdownableThread, DelayedItem}
-import kafka.common.{KafkaException, ClientIdAndBroker, TopicAndPartition}
+import kafka.message.{ByteBufferMessageSet, MessageAndOffset}
+import kafka.utils.{DelayedItem, Pool, ShutdownableThread}
+import kafka.common.{ClientIdAndBroker, KafkaException, TopicAndPartition}
 import kafka.metrics.KafkaMetricsGroup
 import kafka.utils.CoreUtils.inLock
 import org.apache.kafka.common.errors.CorruptRecordException
 import org.apache.kafka.common.protocol.Errors
 import AbstractFetcherThread._
-import scala.collection.{mutable, Set, Map}
+import scala.collection.{mutable, Map, Set}
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
@@ -335,7 +335,6 @@ case class PartitionFetchState(offset: Long, delay: DelayedItem) {
 
   def this(offset: Long) = this(offset, new DelayedItem(0))
 
-  def isActive: Boolean = { delay.getDelay(TimeUnit.MILLISECONDS) == 0 }
-
+  def isActive: Boolean = delay.getDelay(TimeUnit.MILLISECONDS) == 0
   override def toString = "%d-%b".format(offset, isActive)
 }

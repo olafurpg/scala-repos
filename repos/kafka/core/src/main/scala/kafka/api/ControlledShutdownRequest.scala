@@ -20,7 +20,7 @@ import java.nio.ByteBuffer
 
 import kafka.common.{TopicAndPartition}
 import kafka.api.ApiUtils._
-import kafka.network.{RequestOrResponseSend, RequestChannel}
+import kafka.network.{RequestChannel, RequestOrResponseSend}
 import kafka.network.RequestChannel.Response
 import kafka.utils.Logging
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
@@ -63,9 +63,7 @@ case class ControlledShutdownRequest(versionId: Short,
       4 /* broker id */
   }
 
-  override def toString(): String = {
-    describe(true)
-  }
+  override def toString(): String = describe(true)
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,

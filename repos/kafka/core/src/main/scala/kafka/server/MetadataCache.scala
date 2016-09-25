@@ -19,7 +19,7 @@ package kafka.server
 import java.util.EnumMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-import scala.collection.{Seq, Set, mutable}
+import scala.collection.{mutable, Seq, Set}
 import scala.collection.JavaConverters._
 import kafka.cluster.{Broker, EndPoint}
 import kafka.api._

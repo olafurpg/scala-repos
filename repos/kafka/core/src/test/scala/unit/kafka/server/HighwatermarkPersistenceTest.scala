@@ -26,12 +26,12 @@ import org.junit.Assert._
 import kafka.common._
 import kafka.cluster.Replica
 import kafka.utils.{
-  ZkUtils,
-  SystemTime,
+  CoreUtils,
   KafkaScheduler,
-  TestUtils,
   MockTime,
-  CoreUtils
+  SystemTime,
+  TestUtils,
+  ZkUtils
 }
 import java.util.concurrent.atomic.AtomicBoolean
 import org.apache.kafka.common.utils.{MockTime => JMockTime}

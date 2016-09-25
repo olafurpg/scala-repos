@@ -16,10 +16,10 @@
   */
 package kafka.api
 
-import kafka.cluster.{EndPoint, Broker}
+import kafka.cluster.{Broker, EndPoint}
 import kafka.common.{OffsetAndMetadata, OffsetMetadataAndError}
 import kafka.common._
-import kafka.message.{Message, ByteBufferMessageSet}
+import kafka.message.{ByteBufferMessageSet, Message}
 import kafka.utils.SystemTime
 
 import kafka.controller.LeaderIsrAndControllerEpoch
@@ -185,9 +185,8 @@ object SerializationTestUtils {
       TopicAndPartition(topic1, 3) -> partitionStateInfo3
     )
 
-  def createTestProducerRequest: ProducerRequest = {
+  def createTestProducerRequest: ProducerRequest =
     new ProducerRequest(1, "client 1", 0, 1000, topicDataProducerRequest)
-  }
 
   def createTestProducerResponse: ProducerResponse =
     ProducerResponse(
@@ -201,13 +200,11 @@ object SerializationTestUtils {
       ProducerRequest.CurrentVersion,
       100)
 
-  def createTestFetchRequest: FetchRequest = {
+  def createTestFetchRequest: FetchRequest =
     new FetchRequest(requestInfo = requestInfos)
-  }
 
-  def createTestFetchResponse: FetchResponse = {
+  def createTestFetchResponse: FetchResponse =
     FetchResponse(1, topicDataFetchResponse)
-  }
 
   def createTestOffsetRequest = new OffsetRequest(
     collection.immutable.Map(
@@ -295,9 +292,8 @@ object SerializationTestUtils {
       ))
   }
 
-  def createConsumerMetadataRequest: GroupCoordinatorRequest = {
+  def createConsumerMetadataRequest: GroupCoordinatorRequest =
     GroupCoordinatorRequest("group 1", clientId = "client 1")
-  }
 
   def createConsumerMetadataResponse: GroupCoordinatorResponse = {
     GroupCoordinatorResponse(

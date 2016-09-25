@@ -23,9 +23,9 @@ import kafka.api.{
 }
 import kafka.consumer.SimpleConsumer
 import kafka.common.{
+  OffsetAndMetadata,
   OffsetMetadata,
   OffsetMetadataAndError,
-  OffsetAndMetadata,
   TopicAndPartition
 }
 import kafka.utils._

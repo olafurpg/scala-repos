@@ -17,7 +17,7 @@
 package kafka.consumer
 
 import kafka.utils.Logging
-import java.util.regex.{PatternSyntaxException, Pattern}
+import java.util.regex.{Pattern, PatternSyntaxException}
 import kafka.common.Topic
 import org.apache.kafka.common.internals.TopicConstants
 

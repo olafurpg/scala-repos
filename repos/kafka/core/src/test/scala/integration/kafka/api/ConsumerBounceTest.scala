@@ -24,7 +24,7 @@ import org.apache.kafka.common.errors.{
 }
 import org.apache.kafka.common.TopicPartition
 import org.junit.Assert._
-import org.junit.{Test, Before}
+import org.junit.{Before, Test}
 
 import scala.collection.JavaConversions._
 

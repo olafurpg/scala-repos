@@ -17,15 +17,15 @@
 package kafka.tools
 
 import joptsimple.OptionParser
-import java.util.concurrent.{Executors, CountDownLatch}
+import java.util.concurrent.{CountDownLatch, Executors}
 import java.util.Properties
 import kafka.consumer._
-import kafka.utils.{ToolsUtils, CommandLineUtils, Logging, ZkUtils}
+import kafka.utils.{CommandLineUtils, Logging, ToolsUtils, ZkUtils}
 import kafka.api.OffsetRequest
 import org.apache.kafka.clients.producer.{
-  ProducerRecord,
   KafkaProducer,
-  ProducerConfig
+  ProducerConfig,
+  ProducerRecord
 }
 
 object ReplayLogProducer extends Logging {

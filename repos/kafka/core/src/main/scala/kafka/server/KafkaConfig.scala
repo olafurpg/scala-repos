@@ -37,7 +37,7 @@ import org.apache.kafka.common.metrics.MetricsReporter
 import org.apache.kafka.common.protocol.SecurityProtocol
 import org.apache.kafka.common.record.TimestampType
 
-import scala.collection.{JavaConverters, Map, immutable}
+import scala.collection.{immutable, JavaConverters, Map}
 import JavaConverters._
 
 object Defaults {

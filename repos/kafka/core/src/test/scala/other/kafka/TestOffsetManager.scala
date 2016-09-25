@@ -17,7 +17,7 @@
 package other.kafka
 
 import kafka.api._
-import kafka.utils.{ZkUtils, ShutdownableThread}
+import kafka.utils.{ShutdownableThread, ZkUtils}
 import org.apache.kafka.common.protocol.Errors
 import scala.collection._
 import kafka.client.ClientUtils
@@ -26,7 +26,7 @@ import kafka.common.{OffsetAndMetadata, TopicAndPartition}
 import kafka.network.BlockingChannel
 import scala.util.Random
 import java.io.IOException
-import kafka.metrics.{KafkaTimer, KafkaMetricsGroup}
+import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.nio.channels.ClosedByInterruptException

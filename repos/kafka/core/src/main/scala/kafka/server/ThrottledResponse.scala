@@ -16,7 +16,7 @@
   */
 package kafka.server
 
-import java.util.concurrent.{TimeUnit, Delayed}
+import java.util.concurrent.{Delayed, TimeUnit}
 
 import org.apache.kafka.common.utils.Time
 
@@ -34,9 +34,8 @@ private[server] class ThrottledResponse(val time: Time,
 
   def execute() = callback(throttleTimeMs)
 
-  override def getDelay(unit: TimeUnit): Long = {
+  override def getDelay(unit: TimeUnit): Long =
     unit.convert(endTime - time.milliseconds, TimeUnit.MILLISECONDS)
-  }
 
   override def compareTo(d: Delayed): Int = {
     val other = d.asInstanceOf[ThrottledResponse]

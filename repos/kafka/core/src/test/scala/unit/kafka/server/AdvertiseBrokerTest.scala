@@ -17,10 +17,10 @@
 package kafka.server
 
 import org.junit.Assert._
-import kafka.utils.{TestUtils, CoreUtils, ZkUtils}
+import kafka.utils.{CoreUtils, TestUtils, ZkUtils}
 import kafka.zk.ZooKeeperTestHarness
 import org.apache.kafka.common.protocol.SecurityProtocol
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 class AdvertiseBrokerTest extends ZooKeeperTestHarness {
   var server: KafkaServer = null

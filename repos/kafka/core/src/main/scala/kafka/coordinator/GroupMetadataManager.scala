@@ -119,9 +119,7 @@ class GroupMetadataManager(val brokerId: Int,
   /**
     * Get the group associated with the given groupId, or null if not found
     */
-  def getGroup(groupId: String): GroupMetadata = {
-    groupsCache.get(groupId)
-  }
+  def getGroup(groupId: String): GroupMetadata = groupsCache.get(groupId)
 
   /**
     * Add a group or get the group associated with the given groupId if it already exists
@@ -734,9 +732,8 @@ class GroupMetadataManager(val brokerId: Int,
   /*
    * Check if the offset metadata length is valid
    */
-  private def validateOffsetMetadataLength(metadata: String): Boolean = {
+  private def validateOffsetMetadataLength(metadata: String): Boolean =
     metadata == null || metadata.length() <= config.maxMetadataSize
-  }
 
   def shutdown() {
     shuttingDown.set(true)

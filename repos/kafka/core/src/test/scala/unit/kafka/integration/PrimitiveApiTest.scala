@@ -18,20 +18,20 @@ package kafka.integration
 
 import java.nio.ByteBuffer
 import org.junit.Assert._
-import kafka.api.{PartitionFetchInfo, FetchRequest, FetchRequestBuilder}
-import kafka.server.{KafkaRequestHandler, KafkaConfig}
+import kafka.api.{FetchRequest, FetchRequestBuilder, PartitionFetchInfo}
+import kafka.server.{KafkaConfig, KafkaRequestHandler}
 import kafka.producer.{KeyedMessage, Producer}
 import org.apache.log4j.{Level, Logger}
 import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 import scala.collection._
 import kafka.common.{
-  TopicAndPartition,
   ErrorMapping,
-  UnknownTopicOrPartitionException,
-  OffsetOutOfRangeException
+  OffsetOutOfRangeException,
+  TopicAndPartition,
+  UnknownTopicOrPartitionException
 }
-import kafka.utils.{StaticPartitioner, TestUtils, CoreUtils}
+import kafka.utils.{CoreUtils, StaticPartitioner, TestUtils}
 import kafka.serializer.StringEncoder
 import java.util.Properties
 

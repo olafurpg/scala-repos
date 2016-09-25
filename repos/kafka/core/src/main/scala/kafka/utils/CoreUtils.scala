@@ -19,7 +19,7 @@ package kafka.utils
 import java.io._
 import java.nio._
 import java.nio.channels._
-import java.util.concurrent.locks.{ReadWriteLock, Lock}
+import java.util.concurrent.locks.{Lock, ReadWriteLock}
 import java.lang.management._
 import javax.management._
 

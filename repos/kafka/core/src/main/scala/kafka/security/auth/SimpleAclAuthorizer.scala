@@ -25,7 +25,7 @@ import kafka.security.auth.SimpleAclAuthorizer.VersionedAcls
 import kafka.server.KafkaConfig
 import kafka.utils.CoreUtils.{inReadLock, inWriteLock}
 import kafka.utils._
-import org.I0Itec.zkclient.exception.{ZkNodeExistsException, ZkNoNodeException}
+import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import org.apache.kafka.common.security.JaasUtils
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 import scala.collection.JavaConverters._
@@ -289,9 +289,8 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
     }
   }
 
-  def toResourcePath(resource: Resource): String = {
+  def toResourcePath(resource: Resource): String =
     SimpleAclAuthorizer.AclZkPath + "/" + resource.resourceType + "/" + resource.name
-  }
 
   private def logAuditMessage(principal: KafkaPrincipal,
                               authorized: Boolean,
@@ -418,9 +417,8 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
       resource.toString)
   }
 
-  private def backoffTime = {
+  private def backoffTime =
     retryBackoffMs + Random.nextInt(retryBackoffJitterMs)
-  }
 
   object AclChangedNotificationHandler extends NotificationHandler {
     override def processNotification(notificationMessage: String) {
