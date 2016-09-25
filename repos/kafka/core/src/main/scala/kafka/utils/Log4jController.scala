@@ -16,7 +16,7 @@
   */
 package kafka.utils
 
-import org.apache.log4j.{Logger, Level, LogManager}
+import org.apache.log4j.{Level, LogManager, Logger}
 import java.util
 
 object Log4jController {

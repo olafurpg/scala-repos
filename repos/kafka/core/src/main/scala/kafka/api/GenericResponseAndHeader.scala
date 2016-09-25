@@ -32,9 +32,7 @@ private[kafka] abstract class GenericResponseAndHeader(
       body.sizeOf()
   }
 
-  override def toString(): String = {
-    describe(true)
-  }
+  override def toString(): String = describe(true)
 
   override def describe(details: Boolean): String = {
     val strBuffer = new StringBuilder

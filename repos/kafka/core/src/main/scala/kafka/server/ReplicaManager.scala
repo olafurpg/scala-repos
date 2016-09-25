@@ -34,16 +34,16 @@ import kafka.message.{
 import kafka.metrics.KafkaMetricsGroup
 import kafka.utils._
 import org.apache.kafka.common.errors.{
+  ControllerMovedException,
+  CorruptRecordException,
+  InvalidTimestampException,
+  InvalidTopicException,
+  NotLeaderForPartitionException,
   OffsetOutOfRangeException,
   RecordBatchTooLargeException,
-  ReplicaNotAvailableException,
   RecordTooLargeException,
-  InvalidTopicException,
-  ControllerMovedException,
-  NotLeaderForPartitionException,
-  CorruptRecordException,
-  UnknownTopicOrPartitionException,
-  InvalidTimestampException
+  ReplicaNotAvailableException,
+  UnknownTopicOrPartitionException
 }
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.metrics.Metrics
@@ -108,9 +108,8 @@ case class BecomeLeaderOrFollowerResult(
     responseMap: collection.Map[TopicPartition, Short],
     errorCode: Short) {
 
-  override def toString = {
+  override def toString =
     "update results: [%s], global error: [%d]".format(responseMap, errorCode)
-  }
 }
 
 object ReplicaManager {
@@ -165,9 +164,7 @@ class ReplicaManager(val config: KafkaConfig,
   val leaderCount = newGauge(
     "LeaderCount",
     new Gauge[Int] {
-      def value = {
-        getLeaderPartitions().size
-      }
+      def value = getLeaderPartitions().size
     }
   )
   val partitionCount = newGauge(
@@ -185,9 +182,8 @@ class ReplicaManager(val config: KafkaConfig,
   val isrExpandRate = newMeter("IsrExpandsPerSec", "expands", TimeUnit.SECONDS)
   val isrShrinkRate = newMeter("IsrShrinksPerSec", "shrinks", TimeUnit.SECONDS)
 
-  def underReplicatedPartitionCount(): Int = {
+  def underReplicatedPartitionCount(): Int =
     getLeaderPartitions().count(_.isUnderReplicated)
-  }
 
   def startHighWaterMarksCheckPointThread() = {
     if (highWatermarkCheckPointThreadStarted.compareAndSet(false, true))
@@ -469,9 +465,8 @@ class ReplicaManager(val config: KafkaConfig,
     localProduceResults.values.count(_.error.isDefined) < messagesPerPartition.size
   }
 
-  private def isValidRequiredAcks(requiredAcks: Short): Boolean = {
+  private def isValidRequiredAcks(requiredAcks: Short): Boolean =
     requiredAcks == -1 || requiredAcks == 1 || requiredAcks == 0
-  }
 
   /**
     * Append the messages to the local replica logs
@@ -1241,9 +1236,8 @@ class ReplicaManager(val config: KafkaConfig,
     }
   }
 
-  private def getLeaderPartitions(): List[Partition] = {
+  private def getLeaderPartitions(): List[Partition] =
     allPartitions.values.filter(_.leaderReplicaIfLocal().isDefined).toList
-  }
 
   // Flushes the highwatermark value for all partitions to the highwatermark file
   def checkpointHighWatermarks() {

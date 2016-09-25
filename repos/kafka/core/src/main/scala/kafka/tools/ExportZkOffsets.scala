@@ -18,7 +18,7 @@ package kafka.tools
 
 import java.io.FileWriter
 import joptsimple._
-import kafka.utils.{Logging, ZkUtils, ZKGroupTopicDirs, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, Logging, ZKGroupTopicDirs, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
 import org.apache.kafka.common.security.JaasUtils
 

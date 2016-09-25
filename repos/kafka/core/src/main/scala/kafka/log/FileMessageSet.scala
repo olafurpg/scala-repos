@@ -25,7 +25,7 @@ import kafka.utils._
 import kafka.message._
 import kafka.common.KafkaException
 import java.util.concurrent.TimeUnit
-import kafka.metrics.{KafkaTimer, KafkaMetricsGroup}
+import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import org.apache.kafka.common.errors.CorruptRecordException
 import org.apache.kafka.common.network.TransportLayer
 import org.apache.kafka.common.utils.Utils
@@ -316,9 +316,7 @@ class FileMessageSet private[kafka] (@volatile var file: File,
   /**
     * Commit all written data to the physical disk
     */
-  def flush() = {
-    channel.force(true)
-  }
+  def flush() = channel.force(true)
 
   /**
     * Close this message set

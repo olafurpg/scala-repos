@@ -20,7 +20,7 @@ import java.util.Random
 import java.util.concurrent.TimeUnit
 
 import kafka.api._
-import kafka.network.{RequestOrResponseSend, BlockingChannel}
+import kafka.network.{BlockingChannel, RequestOrResponseSend}
 import kafka.utils._
 import org.apache.kafka.common.network.NetworkReceive
 import org.apache.kafka.common.protocol.ApiKeys

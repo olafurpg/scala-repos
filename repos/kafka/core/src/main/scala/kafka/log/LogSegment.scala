@@ -19,11 +19,11 @@ package kafka.log
 import kafka.message._
 import kafka.common._
 import kafka.utils._
-import kafka.server.{LogOffsetMetadata, FetchDataInfo}
+import kafka.server.{FetchDataInfo, LogOffsetMetadata}
 import org.apache.kafka.common.errors.CorruptRecordException
 
 import scala.math._
-import java.io.{IOException, File}
+import java.io.{File, IOException}
 
 /**
   * A segment of the log. Each segment has two components: a log and an index. The log is a FileMessageSet containing

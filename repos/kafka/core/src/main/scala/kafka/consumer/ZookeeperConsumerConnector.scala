@@ -135,9 +135,8 @@ private[kafka] class ZookeeperConsumerConnector(
   newGauge(
     "yammer-metrics-count",
     new Gauge[Int] {
-      def value = {
+      def value =
         com.yammer.metrics.Metrics.defaultRegistry().allMetrics().size()
-      }
     }
   )
 

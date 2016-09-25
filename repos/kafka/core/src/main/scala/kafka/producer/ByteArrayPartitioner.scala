@@ -25,7 +25,6 @@ import org.apache.kafka.common.utils.Utils
   "0.10.0.0")
 class ByteArrayPartitioner(props: VerifiableProperties = null)
     extends Partitioner {
-  def partition(key: Any, numPartitions: Int): Int = {
+  def partition(key: Any, numPartitions: Int): Int =
     Utils.abs(java.util.Arrays.hashCode(key.asInstanceOf[Array[Byte]])) % numPartitions
-  }
 }

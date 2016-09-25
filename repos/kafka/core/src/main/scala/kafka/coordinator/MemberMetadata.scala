@@ -123,7 +123,6 @@ private[coordinator] class MemberMetadata(
     }
   }
 
-  override def toString = {
+  override def toString =
     "[%s,%s,%s,%d]".format(memberId, clientId, clientHost, sessionTimeoutMs)
-  }
 }

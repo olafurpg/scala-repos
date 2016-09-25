@@ -18,17 +18,17 @@ package kafka.tools
 
 import joptsimple.OptionParser
 import kafka.cluster.BrokerEndPoint
-import kafka.message.{MessageSet, MessageAndOffset, ByteBufferMessageSet}
+import kafka.message.{ByteBufferMessageSet, MessageAndOffset, MessageSet}
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 import kafka.client.ClientUtils
-import java.util.regex.{PatternSyntaxException, Pattern}
+import java.util.regex.{Pattern, PatternSyntaxException}
 import kafka.api._
 import java.text.SimpleDateFormat
 import java.util.Date
 import kafka.common.TopicAndPartition
 import kafka.utils._
-import kafka.consumer.{ConsumerConfig, Whitelist, SimpleConsumer}
+import kafka.consumer.{ConsumerConfig, SimpleConsumer, Whitelist}
 import org.apache.kafka.common.protocol.Errors
 
 /**
@@ -325,9 +325,8 @@ private class ReplicaBuffer(
     messageSetCache.get(topicAndPartition).put(replicaId, partitionData)
   }
 
-  def getOffset(topicAndPartition: TopicAndPartition) = {
+  def getOffset(topicAndPartition: TopicAndPartition) =
     fetchOffsetMap.get(topicAndPartition)
-  }
 
   def verifyCheckSum() {
     debug("Begin verification")

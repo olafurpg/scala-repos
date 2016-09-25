@@ -17,8 +17,8 @@
 package kafka.producer
 
 import kafka.metrics.KafkaMetricsGroup
-import kafka.common.{ClientIdTopic, ClientIdAllTopics, ClientIdAndTopic}
-import kafka.utils.{Pool, threadsafe}
+import kafka.common.{ClientIdAllTopics, ClientIdAndTopic, ClientIdTopic}
+import kafka.utils.{threadsafe, Pool}
 import java.util.concurrent.TimeUnit
 
 @deprecated(
@@ -55,9 +55,8 @@ class ProducerTopicStats(clientId: String) {
 
   def getProducerAllTopicsStats(): ProducerTopicMetrics = allTopicsStats
 
-  def getProducerTopicStats(topic: String): ProducerTopicMetrics = {
+  def getProducerTopicStats(topic: String): ProducerTopicMetrics =
     stats.getAndMaybePut(new ClientIdAndTopic(clientId, topic))
-  }
 }
 
 /**
@@ -71,9 +70,8 @@ object ProducerTopicStatsRegistry {
   private val globalStats =
     new Pool[String, ProducerTopicStats](Some(valueFactory))
 
-  def getProducerTopicStats(clientId: String) = {
+  def getProducerTopicStats(clientId: String) =
     globalStats.getAndMaybePut(clientId)
-  }
 
   def removeProducerTopicStats(clientId: String) {
     globalStats.remove(clientId)

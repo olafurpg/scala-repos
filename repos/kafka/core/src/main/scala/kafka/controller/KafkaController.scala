@@ -37,7 +37,7 @@ import kafka.api._
 import kafka.cluster.Broker
 import kafka.common._
 import kafka.log.LogConfig
-import kafka.metrics.{KafkaTimer, KafkaMetricsGroup}
+import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import kafka.utils.ZkUtils._
 import kafka.utils._
 import kafka.utils.CoreUtils._
@@ -51,7 +51,7 @@ import org.I0Itec.zkclient.{
   ZkClient,
   ZkConnection
 }
-import org.I0Itec.zkclient.exception.{ZkNodeExistsException, ZkNoNodeException}
+import org.I0Itec.zkclient.exception.{ZkNoNodeException, ZkNodeExistsException}
 import java.util.concurrent.locks.ReentrantLock
 import kafka.server._
 import kafka.common.TopicAndPartition
@@ -135,9 +135,8 @@ class ControllerContext(val zkUtils: ZkUtils, val zkSessionTimeout: Int) {
     }.keySet
   }
 
-  def allLiveReplicas(): Set[PartitionAndReplica] = {
+  def allLiveReplicas(): Set[PartitionAndReplica] =
     replicasOnBrokers(liveBrokerIds)
-  }
 
   def replicasForPartition(partitions: collection.Set[TopicAndPartition])
     : collection.Set[PartitionAndReplica] = {
@@ -960,9 +959,8 @@ class KafkaController(val config: KafkaConfig,
                                                      controllerContext.epoch))
   }
 
-  private def registerSessionExpirationListener() = {
+  private def registerSessionExpirationListener() =
     zkUtils.zkClient.subscribeStateChanges(new SessionExpirationListener())
-  }
 
   private def initializeControllerContext() {
     // update controller cache with delete topic information
@@ -1978,9 +1976,8 @@ case class ReassignedPartitionsContext(
     var isrChangeListener: ReassignedPartitionsIsrChangeListener = null)
 
 case class PartitionAndReplica(topic: String, partition: Int, replica: Int) {
-  override def toString(): String = {
+  override def toString(): String =
     "[Topic=%s,Partition=%d,Replica=%d]".format(topic, partition, replica)
-  }
 }
 
 case class LeaderIsrAndControllerEpoch(leaderAndIsr: LeaderAndIsr,

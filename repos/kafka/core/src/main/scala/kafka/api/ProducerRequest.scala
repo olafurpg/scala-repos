@@ -21,7 +21,7 @@ import java.nio._
 import kafka.api.ApiUtils._
 import kafka.common._
 import kafka.message._
-import kafka.network.{RequestOrResponseSend, RequestChannel}
+import kafka.network.{RequestChannel, RequestOrResponseSend}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
@@ -136,9 +136,7 @@ case class ProducerRequest(
 
   def numPartitions = data.size
 
-  override def toString(): String = {
-    describe(true)
-  }
+  override def toString(): String = describe(true)
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,

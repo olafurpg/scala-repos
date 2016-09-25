@@ -136,7 +136,6 @@ object BrokerTopicStats extends Logging {
 
   def getBrokerAllTopicsStats(): BrokerTopicMetrics = allTopicsStats
 
-  def getBrokerTopicStats(topic: String): BrokerTopicMetrics = {
+  def getBrokerTopicStats(topic: String): BrokerTopicMetrics =
     stats.getAndMaybePut(topic)
-  }
 }

@@ -19,18 +19,18 @@ package kafka.tools
 import java.util
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import java.util.concurrent.{CountDownLatch, TimeUnit}
-import java.util.regex.{PatternSyntaxException, Pattern}
+import java.util.regex.{Pattern, PatternSyntaxException}
 import java.util.{Collections, Properties}
 
 import com.yammer.metrics.core.Gauge
 import joptsimple.OptionParser
 import kafka.client.ClientUtils
 import kafka.consumer.{
-  BaseConsumerRecord,
-  ConsumerIterator,
   BaseConsumer,
+  BaseConsumerRecord,
   Blacklist,
   ConsumerConfig,
+  ConsumerIterator,
   ConsumerThreadId,
   ConsumerTimeoutException,
   TopicFilter,
@@ -43,10 +43,10 @@ import kafka.metrics.KafkaMetricsGroup
 import kafka.serializer.DefaultDecoder
 import kafka.utils.{CommandLineUtils, CoreUtils, Logging}
 import org.apache.kafka.clients.consumer.{
-  OffsetAndMetadata,
   Consumer,
   ConsumerRecord,
-  KafkaConsumer
+  KafkaConsumer,
+  OffsetAndMetadata
 }
 import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
 import org.apache.kafka.clients.producer.{

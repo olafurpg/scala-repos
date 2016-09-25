@@ -17,7 +17,7 @@
 package kafka.producer.async
 
 import kafka.common._
-import kafka.message.{NoCompressionCodec, Message, ByteBufferMessageSet}
+import kafka.message.{ByteBufferMessageSet, Message, NoCompressionCodec}
 import kafka.producer._
 import kafka.serializer.Encoder
 import kafka.utils._
@@ -27,10 +27,10 @@ import org.apache.kafka.common.errors.{
 }
 import org.apache.kafka.common.protocol.Errors
 import scala.util.Random
-import scala.collection.{Seq, Map}
+import scala.collection.{Map, Seq}
 import scala.collection.mutable.{ArrayBuffer, HashMap, Set}
 import java.util.concurrent.atomic._
-import kafka.api.{TopicMetadata, ProducerRequest}
+import kafka.api.{ProducerRequest, TopicMetadata}
 import org.apache.kafka.common.utils.Utils
 
 @deprecated(

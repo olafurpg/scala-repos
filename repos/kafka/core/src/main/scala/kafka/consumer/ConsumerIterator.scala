@@ -16,11 +16,11 @@
   */
 package kafka.consumer
 
-import kafka.utils.{IteratorTemplate, Logging, CoreUtils}
-import java.util.concurrent.{TimeUnit, BlockingQueue}
+import kafka.utils.{CoreUtils, IteratorTemplate, Logging}
+import java.util.concurrent.{BlockingQueue, TimeUnit}
 import kafka.serializer.Decoder
 import java.util.concurrent.atomic.AtomicReference
-import kafka.message.{MessageAndOffset, MessageAndMetadata}
+import kafka.message.{MessageAndMetadata, MessageAndOffset}
 import kafka.common.{KafkaException, MessageSizeTooLargeException}
 
 /**

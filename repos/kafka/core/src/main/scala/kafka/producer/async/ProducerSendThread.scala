@@ -16,8 +16,8 @@
   */
 package kafka.producer.async
 
-import kafka.utils.{SystemTime, Logging}
-import java.util.concurrent.{TimeUnit, CountDownLatch, BlockingQueue}
+import kafka.utils.{Logging, SystemTime}
+import java.util.concurrent.{BlockingQueue, CountDownLatch, TimeUnit}
 import collection.mutable.ArrayBuffer
 import kafka.producer.KeyedMessage
 import kafka.metrics.KafkaMetricsGroup

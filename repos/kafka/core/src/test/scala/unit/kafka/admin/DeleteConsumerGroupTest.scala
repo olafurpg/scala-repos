@@ -20,7 +20,7 @@ import kafka.utils._
 import kafka.server.KafkaConfig
 import org.junit.Test
 import kafka.consumer._
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import kafka.integration.KafkaServerTestHarness
 
 class DeleteConsumerGroupTest extends KafkaServerTestHarness {
@@ -267,9 +267,8 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
     }
   }
 
-  private def groupDirExists(dir: ZKGroupDirs) = {
+  private def groupDirExists(dir: ZKGroupDirs) =
     zkUtils.pathExists(dir.consumerGroupDir)
-  }
 
   private def groupTopicOffsetAndOwnerDirsExist(dir: ZKGroupTopicDirs) = {
     zkUtils.pathExists(dir.consumerOffsetDir) && zkUtils.pathExists(

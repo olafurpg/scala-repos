@@ -22,7 +22,7 @@ import java.util.Random
 import java.util.concurrent._
 
 import joptsimple._
-import kafka.server.{DelayedOperationPurgatory, DelayedOperation}
+import kafka.server.{DelayedOperation, DelayedOperationPurgatory}
 import kafka.utils._
 
 import scala.math._
@@ -227,9 +227,7 @@ object TestPurgatoryPerformance {
   //  lambda : the rate parameter of the exponential distribution
   private class ExponentialDistribution(lambda: Double) {
     val rand = new Random
-    def next(): Double = {
-      math.log(1d - rand.nextDouble()) / (-lambda)
-    }
+    def next(): Double = math.log(1d - rand.nextDouble()) / (-lambda)
   }
 
   // Samples of Latencies to completion
@@ -326,9 +324,7 @@ object TestPurgatoryPerformance {
       delayQueue.offer(new Scheduled(operation))
     }
 
-    def shutdown() = {
-      thread.shutdown()
-    }
+    def shutdown() = thread.shutdown()
 
     private class Scheduled(val operation: FakeOperation) extends Delayed {
       def getDelay(unit: TimeUnit): Long = {

@@ -41,7 +41,5 @@ object Resource {
   */
 case class Resource(val resourceType: ResourceType, val name: String) {
 
-  override def toString: String = {
-    resourceType.name + Resource.Separator + name
-  }
+  override def toString: String = resourceType.name + Resource.Separator + name
 }

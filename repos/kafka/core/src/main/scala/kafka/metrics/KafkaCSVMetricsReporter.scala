@@ -23,7 +23,7 @@ import com.yammer.metrics.Metrics
 import java.io.File
 import com.yammer.metrics.reporting.CsvReporter
 import java.util.concurrent.TimeUnit
-import kafka.utils.{CoreUtils, VerifiableProperties, Logging}
+import kafka.utils.{CoreUtils, Logging, VerifiableProperties}
 
 private trait KafkaCSVMetricsReporterMBean extends KafkaMetricsReporterMBean
 

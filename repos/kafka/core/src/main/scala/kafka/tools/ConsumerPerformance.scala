@@ -32,7 +32,7 @@ import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.utils.Utils
 import org.apache.kafka.common.TopicPartition
 import kafka.utils.CommandLineUtils
-import java.util.{Random, Properties}
+import java.util.{Properties, Random}
 import kafka.consumer.Consumer
 import kafka.consumer.ConsumerConnector
 import kafka.consumer.KafkaStream

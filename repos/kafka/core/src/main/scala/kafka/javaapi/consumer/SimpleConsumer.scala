@@ -56,9 +56,8 @@ class SimpleConsumer(val host: String,
     *  @param request specifies the topic name, topic partition, starting byte offset, maximum bytes to be fetched.
     *  @return a set of fetched messages
     */
-  def fetch(request: kafka.javaapi.FetchRequest): FetchResponse = {
+  def fetch(request: kafka.javaapi.FetchRequest): FetchResponse =
     fetch(request.underlying)
-  }
 
   /**
     *  Fetch metadata for a sequence of topics.

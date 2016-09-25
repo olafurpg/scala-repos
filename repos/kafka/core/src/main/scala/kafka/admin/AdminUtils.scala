@@ -27,9 +27,9 @@ import java.util.Random
 import java.util.Properties
 import org.apache.kafka.common.Node
 import org.apache.kafka.common.errors.{
-  ReplicaNotAvailableException,
   InvalidTopicException,
-  LeaderNotAvailableException
+  LeaderNotAvailableException,
+  ReplicaNotAvailableException
 }
 import org.apache.kafka.common.protocol.{Errors, SecurityProtocol}
 import org.apache.kafka.common.requests.MetadataResponse
@@ -390,9 +390,8 @@ object AdminUtils extends Logging {
     }
   }
 
-  def isConsumerGroupActive(zkUtils: ZkUtils, group: String) = {
+  def isConsumerGroupActive(zkUtils: ZkUtils, group: String) =
     zkUtils.getConsumersInGroup(group).nonEmpty
-  }
 
   /**
     * Delete the whole directory of the given consumer group if the group is inactive.

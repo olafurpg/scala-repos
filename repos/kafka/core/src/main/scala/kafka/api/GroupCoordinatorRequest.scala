@@ -18,7 +18,7 @@ package kafka.api
 
 import java.nio.ByteBuffer
 
-import kafka.network.{RequestOrResponseSend, RequestChannel}
+import kafka.network.{RequestChannel, RequestOrResponseSend}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 

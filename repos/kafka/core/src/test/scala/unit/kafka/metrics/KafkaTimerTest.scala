@@ -19,7 +19,7 @@ package kafka.metrics
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import org.junit.Assert._
-import com.yammer.metrics.core.{MetricsRegistry, Clock}
+import com.yammer.metrics.core.{Clock, MetricsRegistry}
 
 class KafkaTimerTest {
 
@@ -43,13 +43,9 @@ class KafkaTimerTest {
 
     private var ticksInNanos = 0L
 
-    override def tick() = {
-      ticksInNanos
-    }
+    override def tick() = ticksInNanos
 
-    override def time() = {
-      TimeUnit.NANOSECONDS.toMillis(ticksInNanos)
-    }
+    override def time() = TimeUnit.NANOSECONDS.toMillis(ticksInNanos)
 
     def addMillis(millis: Long) {
       ticksInNanos += TimeUnit.MILLISECONDS.toNanos(millis)

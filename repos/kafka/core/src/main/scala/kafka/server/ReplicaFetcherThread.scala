@@ -26,34 +26,34 @@ import kafka.api.{KAFKA_0_10_0_IV0, KAFKA_0_9_0}
 import kafka.common.{KafkaStorageException, TopicAndPartition}
 import ReplicaFetcherThread._
 import org.apache.kafka.clients.{
-  ManualMetadataUpdater,
-  NetworkClient,
   ClientRequest,
-  ClientResponse
+  ClientResponse,
+  ManualMetadataUpdater,
+  NetworkClient
 }
 import org.apache.kafka.common.network.{
-  LoginType,
-  Selectable,
   ChannelBuilders,
+  LoginType,
+  Mode,
   NetworkReceive,
-  Selector,
-  Mode
+  Selectable,
+  Selector
 }
 import org.apache.kafka.common.requests.{
-  ListOffsetResponse,
-  FetchResponse,
-  RequestSend,
   AbstractRequest,
-  ListOffsetRequest
+  FetchResponse,
+  ListOffsetRequest,
+  ListOffsetResponse,
+  RequestSend
 }
 import org.apache.kafka.common.requests.{FetchRequest => JFetchRequest}
 import org.apache.kafka.common.security.ssl.SslFactory
 import org.apache.kafka.common.{Node, TopicPartition}
 import org.apache.kafka.common.metrics.Metrics
-import org.apache.kafka.common.protocol.{Errors, ApiKeys}
+import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 import org.apache.kafka.common.utils.Time
 
-import scala.collection.{JavaConverters, Map, mutable}
+import scala.collection.{mutable, JavaConverters, Map}
 import JavaConverters._
 
 class ReplicaFetcherThread(name: String,

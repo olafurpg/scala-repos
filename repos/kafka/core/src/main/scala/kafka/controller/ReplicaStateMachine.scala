@@ -19,8 +19,8 @@ package kafka.controller
 import collection._
 import collection.JavaConversions._
 import java.util.concurrent.atomic.AtomicBoolean
-import kafka.common.{TopicAndPartition, StateChangeFailedException}
-import kafka.utils.{ZkUtils, ReplicationUtils, Logging}
+import kafka.common.{StateChangeFailedException, TopicAndPartition}
+import kafka.utils.{Logging, ReplicationUtils, ZkUtils}
 import org.I0Itec.zkclient.IZkChildListener
 import org.apache.log4j.Logger
 import kafka.controller.Callbacks._
@@ -415,13 +415,11 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
   }
 
   def replicasInState(topic: String,
-                      state: ReplicaState): Set[PartitionAndReplica] = {
+                      state: ReplicaState): Set[PartitionAndReplica] =
     replicaState.filter(r => r._1.topic.equals(topic) && r._2 == state).keySet
-  }
 
-  def isAnyReplicaInState(topic: String, state: ReplicaState): Boolean = {
+  def isAnyReplicaInState(topic: String, state: ReplicaState): Boolean =
     replicaState.exists(r => r._1.topic.equals(topic) && r._2 == state)
-  }
 
   def replicasInDeletionStates(topic: String): Set[PartitionAndReplica] = {
     val deletionStates = Set(ReplicaDeletionStarted,

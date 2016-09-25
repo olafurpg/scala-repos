@@ -17,7 +17,7 @@
 package kafka.utils
 
 import kafka.controller.LeaderIsrAndControllerEpoch
-import kafka.server.{ReplicaFetcherManager, KafkaConfig}
+import kafka.server.{KafkaConfig, ReplicaFetcherManager}
 import kafka.api.LeaderAndIsr
 import kafka.zk.ZooKeeperTestHarness
 import kafka.common.TopicAndPartition

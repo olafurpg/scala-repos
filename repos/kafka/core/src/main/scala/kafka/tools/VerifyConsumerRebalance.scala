@@ -20,7 +20,7 @@ import joptsimple.OptionParser
 import org.I0Itec.zkclient.ZkClient
 import org.apache.kafka.common.security._
 
-import kafka.utils.{Logging, ZKGroupTopicDirs, ZkUtils, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, Logging, ZKGroupTopicDirs, ZkUtils}
 
 object VerifyConsumerRebalance extends Logging {
   def main(args: Array[String]) {

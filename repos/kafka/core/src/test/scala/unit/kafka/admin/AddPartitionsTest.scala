@@ -21,11 +21,11 @@ import org.junit.Assert._
 import org.apache.kafka.common.protocol.SecurityProtocol
 import kafka.zk.ZooKeeperTestHarness
 import kafka.utils.TestUtils._
-import kafka.utils.{ZkUtils, CoreUtils, TestUtils}
+import kafka.utils.{CoreUtils, TestUtils, ZkUtils}
 import kafka.cluster.Broker
 import kafka.client.ClientUtils
 import kafka.server.{KafkaConfig, KafkaServer}
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 class AddPartitionsTest extends ZooKeeperTestHarness {
   var configs: Seq[KafkaConfig] = null

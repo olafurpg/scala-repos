@@ -149,9 +149,7 @@ case class FetchRequest(
 
   def numPartitions = requestInfo.size
 
-  override def toString(): String = {
-    describe(true)
-  }
+  override def toString(): String = describe(true)
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,

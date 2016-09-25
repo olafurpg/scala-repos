@@ -18,7 +18,7 @@ package kafka.security.auth
 
 import kafka.utils.Json
 import org.apache.kafka.common.security.auth.KafkaPrincipal
-import org.junit.{Test, Assert}
+import org.junit.{Assert, Test}
 import org.scalatest.junit.JUnitSuite
 
 class AclTest extends JUnitSuite {

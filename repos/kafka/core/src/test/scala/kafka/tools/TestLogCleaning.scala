@@ -26,9 +26,9 @@ import kafka.utils._
 import kafka.log.FileMessageSet
 import kafka.log.Log
 import org.apache.kafka.clients.producer.{
-  ProducerRecord,
   KafkaProducer,
-  ProducerConfig
+  ProducerConfig,
+  ProducerRecord
 }
 
 /**

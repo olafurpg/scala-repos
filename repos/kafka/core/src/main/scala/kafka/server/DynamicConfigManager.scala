@@ -27,7 +27,7 @@ import org.apache.zookeeper.Watcher.Event.KeeperState
 
 import scala.collection._
 import kafka.admin.AdminUtils
-import org.I0Itec.zkclient.{IZkStateListener, IZkChildListener, ZkClient}
+import org.I0Itec.zkclient.{IZkChildListener, IZkStateListener, ZkClient}
 
 /**
   * Represents all the entities that can be configured via ZK

@@ -18,7 +18,7 @@ package kafka.integration
 
 import java.util.concurrent._
 import java.util.concurrent.atomic._
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 import scala.collection._
 import org.junit.Assert._

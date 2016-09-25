@@ -18,7 +18,7 @@ package kafka.log
 
 import java.io._
 import org.junit.Assert._
-import java.util.{Collections, Arrays}
+import java.util.{Arrays, Collections}
 import org.junit._
 import org.scalatest.junit.JUnitSuite
 import scala.collection._

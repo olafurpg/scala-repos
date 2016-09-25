@@ -26,9 +26,7 @@ class VerifiableProperties(val props: Properties) extends Logging {
 
   def this() = this(new Properties)
 
-  def containsKey(name: String): Boolean = {
-    props.containsKey(name)
-  }
+  def containsKey(name: String): Boolean = props.containsKey(name)
 
   def getProperty(name: String): String = {
     val value = props.getProperty(name)

@@ -19,7 +19,7 @@ package kafka.tools
 import java.io.BufferedReader
 import java.io.FileReader
 import joptsimple._
-import kafka.utils.{Logging, ZkUtils, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, Logging, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
 import org.apache.kafka.common.security.JaasUtils
 

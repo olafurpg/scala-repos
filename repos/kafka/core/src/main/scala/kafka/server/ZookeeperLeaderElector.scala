@@ -18,7 +18,7 @@ package kafka.server
 
 import kafka.utils.ZkUtils._
 import kafka.utils.CoreUtils._
-import kafka.utils.{Json, SystemTime, Logging, ZKCheckedEphemeral}
+import kafka.utils.{Json, Logging, SystemTime, ZKCheckedEphemeral}
 import org.I0Itec.zkclient.exception.ZkNodeExistsException
 import org.I0Itec.zkclient.IZkDataListener
 import kafka.controller.ControllerContext
@@ -111,9 +111,7 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
     amILeader
   }
 
-  def close = {
-    leaderId = -1
-  }
+  def close = leaderId = -1
 
   def amILeader: Boolean = leaderId == brokerId
 

@@ -17,7 +17,7 @@
 package kafka.security.auth
 
 import kafka.common.KafkaException
-import org.junit.{Test, Assert}
+import org.junit.{Assert, Test}
 import org.scalatest.junit.JUnitSuite
 
 class PermissionTypeTest extends JUnitSuite {

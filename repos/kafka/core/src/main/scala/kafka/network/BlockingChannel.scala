@@ -20,7 +20,7 @@ import java.net.InetSocketAddress
 import java.nio.channels._
 
 import kafka.api.RequestOrResponse
-import kafka.utils.{Logging, nonthreadsafe}
+import kafka.utils.{nonthreadsafe, Logging}
 import org.apache.kafka.common.network.NetworkReceive
 
 object BlockingChannel {

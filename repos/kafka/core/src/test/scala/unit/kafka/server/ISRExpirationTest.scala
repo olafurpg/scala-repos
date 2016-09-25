@@ -19,7 +19,7 @@ package kafka.server
 import java.util.Properties
 
 import org.apache.kafka.common.metrics.Metrics
-import org.junit.{Test, Before, After}
+import org.junit.{After, Before, Test}
 import collection.mutable.HashMap
 import collection.mutable.Map
 import kafka.cluster.{Partition, Replica}

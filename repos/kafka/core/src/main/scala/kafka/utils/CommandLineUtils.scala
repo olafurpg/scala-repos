@@ -16,7 +16,7 @@
   */
 package kafka.utils
 
-import joptsimple.{OptionSpec, OptionSet, OptionParser}
+import joptsimple.{OptionParser, OptionSet, OptionSpec}
 import scala.collection.Set
 import java.util.Properties
 

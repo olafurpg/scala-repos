@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import joptsimple.OptionParser
 import org.I0Itec.zkclient.exception.ZkException
-import kafka.utils.{Logging, ZkUtils, CommandLineUtils}
+import kafka.utils.{CommandLineUtils, Logging, ZkUtils}
 import org.apache.log4j.Level
 import org.apache.kafka.common.security.JaasUtils
 import org.apache.zookeeper.AsyncCallback.{ChildrenCallback, StatCallback}

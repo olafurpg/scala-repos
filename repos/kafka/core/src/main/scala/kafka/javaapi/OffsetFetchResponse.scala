@@ -18,7 +18,7 @@ package kafka.javaapi
 
 import java.nio.ByteBuffer
 
-import kafka.common.{TopicAndPartition, OffsetMetadataAndError}
+import kafka.common.{OffsetMetadataAndError, TopicAndPartition}
 import collection.JavaConversions
 
 class OffsetFetchResponse(

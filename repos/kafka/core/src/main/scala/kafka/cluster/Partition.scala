@@ -74,9 +74,7 @@ class Partition(val topic: String,
   val tags = Map("topic" -> topic, "partition" -> partitionId.toString)
 
   newGauge("UnderReplicated", new Gauge[Int] {
-    def value = {
-      if (isUnderReplicated) 1 else 0
-    }
+    def value = if (isUnderReplicated) 1 else 0
   }, tags)
 
   def isUnderReplicated(): Boolean = {
@@ -139,13 +137,10 @@ class Partition(val topic: String,
     }
   }
 
-  def addReplicaIfNotExists(replica: Replica) = {
+  def addReplicaIfNotExists(replica: Replica) =
     assignedReplicaMap.putIfNotExists(replica.brokerId, replica)
-  }
 
-  def assignedReplicas(): Set[Replica] = {
-    assignedReplicaMap.values.toSet
-  }
+  def assignedReplicas(): Set[Replica] = assignedReplicaMap.values.toSet
 
   def removeReplica(replicaId: Int) {
     assignedReplicaMap.remove(replicaId)
@@ -170,9 +165,7 @@ class Partition(val topic: String,
     }
   }
 
-  def getLeaderEpoch(): Int = {
-    return this.leaderEpoch
-  }
+  def getLeaderEpoch(): Int = return this.leaderEpoch
 
   /**
     * Make the local replica the leader by resetting LogEndOffset for remote replicas (there could be old LogEndOffset
@@ -557,9 +550,7 @@ class Partition(val topic: String,
     false
   }
 
-  override def hashCode(): Int = {
-    31 + topic.hashCode() + 17 * partitionId
-  }
+  override def hashCode(): Int = 31 + topic.hashCode() + 17 * partitionId
 
   override def toString(): String = {
     val partitionString = new StringBuilder

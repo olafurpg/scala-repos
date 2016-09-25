@@ -207,9 +207,8 @@ private[coordinator] class GroupMetadata(val groupId: String,
       .reduceLeft((commonProtocols, protocols) => commonProtocols & protocols)
   }
 
-  def supportsProtocols(memberProtocols: Set[String]) = {
+  def supportsProtocols(memberProtocols: Set[String]) =
     isEmpty || (memberProtocols & candidateProtocols).nonEmpty
-  }
 
   def initNextGeneration() = {
     assert(notYetRejoinedMembers == List.empty[MemberMetadata])
@@ -245,9 +244,7 @@ private[coordinator] class GroupMetadata(val groupId: String,
     }
   }
 
-  def overview: GroupOverview = {
-    GroupOverview(groupId, protocolType)
-  }
+  def overview: GroupOverview = GroupOverview(groupId, protocolType)
 
   private def assertValidTransition(targetState: GroupState) {
     if (!GroupMetadata.validPreviousStates(targetState).contains(state))

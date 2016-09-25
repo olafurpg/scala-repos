@@ -597,9 +597,8 @@ class AsyncProducerTest {
                                partition: Int,
                                brokerId: Int,
                                brokerHost: String,
-                               brokerPort: Int): TopicMetadata = {
+                               brokerPort: Int): TopicMetadata =
     getTopicMetadata(topic, List(partition), brokerId, brokerHost, brokerPort)
-  }
 
   private def getTopicMetadata(topic: String,
                                partition: Seq[Int],

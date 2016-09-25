@@ -131,9 +131,8 @@ class AdminClient(val time: Time,
     }
   }
 
-  def listAllGroupsFlattened(): List[GroupOverview] = {
+  def listAllGroupsFlattened(): List[GroupOverview] =
     listAllGroups.values.flatten.toList
-  }
 
   def listAllConsumerGroupsFlattened(): List[GroupOverview] = {
     listAllGroupsFlattened.filter(

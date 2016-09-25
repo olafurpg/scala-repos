@@ -23,11 +23,11 @@ import kafka.utils.TestUtils
 import org.apache.kafka.clients.consumer._
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.common.serialization.{
+  ByteArraySerializer,
   StringDeserializer,
-  StringSerializer,
-  ByteArraySerializer
+  StringSerializer
 }
-import org.apache.kafka.test.{MockProducerInterceptor, MockConsumerInterceptor}
+import org.apache.kafka.test.{MockConsumerInterceptor, MockProducerInterceptor}
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.{
@@ -802,10 +802,8 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       new StringDeserializer())
     val rebalanceListener = new ConsumerRebalanceListener {
       override def onPartitionsAssigned(
-          partitions: util.Collection[TopicPartition]) = {
-        // keep partitions paused in this test so that we can verify the commits based on specific seeks
+          partitions: util.Collection[TopicPartition]) = // keep partitions paused in this test so that we can verify the commits based on specific seeks
         testConsumer.pause(partitions)
-      }
 
       override def onPartitionsRevoked(
           partitions: util.Collection[TopicPartition]) = {}

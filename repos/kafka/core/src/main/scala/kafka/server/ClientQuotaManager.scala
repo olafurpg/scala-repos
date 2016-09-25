@@ -18,10 +18,10 @@ package kafka.server
 
 import java.util.concurrent.{ConcurrentHashMap, DelayQueue, TimeUnit}
 
-import kafka.utils.{ShutdownableThread, Logging}
+import kafka.utils.{Logging, ShutdownableThread}
 import org.apache.kafka.common.MetricName
 import org.apache.kafka.common.metrics._
-import org.apache.kafka.common.metrics.stats.{Total, Rate, Avg}
+import org.apache.kafka.common.metrics.stats.{Avg, Rate, Total}
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 import org.apache.kafka.common.utils.Time
@@ -307,7 +307,5 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
                        clientId)
   }
 
-  def shutdown() = {
-    throttledRequestReaper.shutdown()
-  }
+  def shutdown() = throttledRequestReaper.shutdown()
 }

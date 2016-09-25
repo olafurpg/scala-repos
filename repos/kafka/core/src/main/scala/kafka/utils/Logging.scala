@@ -81,12 +81,9 @@ trait Logging {
   def warn(msg: => String): Unit = {
     logger.warn(msgWithLogIdent(msg))
   }
-  def warn(e: => Throwable): Any = {
-    logger.warn(logIdent, e)
-  }
-  def warn(msg: => String, e: => Throwable) = {
+  def warn(e: => Throwable): Any = logger.warn(logIdent, e)
+  def warn(msg: => String, e: => Throwable) =
     logger.warn(msgWithLogIdent(msg), e)
-  }
   def swallowWarn(action: => Unit) {
     CoreUtils.swallow(logger.warn, action)
   }
@@ -95,12 +92,9 @@ trait Logging {
   def error(msg: => String): Unit = {
     logger.error(msgWithLogIdent(msg))
   }
-  def error(e: => Throwable): Any = {
-    logger.error(logIdent, e)
-  }
-  def error(msg: => String, e: => Throwable) = {
+  def error(e: => Throwable): Any = logger.error(logIdent, e)
+  def error(msg: => String, e: => Throwable) =
     logger.error(msgWithLogIdent(msg), e)
-  }
   def swallowError(action: => Unit) {
     CoreUtils.swallow(logger.error, action)
   }
@@ -108,10 +102,7 @@ trait Logging {
   def fatal(msg: => String): Unit = {
     logger.fatal(msgWithLogIdent(msg))
   }
-  def fatal(e: => Throwable): Any = {
-    logger.fatal(logIdent, e)
-  }
-  def fatal(msg: => String, e: => Throwable) = {
+  def fatal(e: => Throwable): Any = logger.fatal(logIdent, e)
+  def fatal(msg: => String, e: => Throwable) =
     logger.fatal(msgWithLogIdent(msg), e)
-  }
 }

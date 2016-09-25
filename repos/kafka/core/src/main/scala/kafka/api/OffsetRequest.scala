@@ -20,7 +20,7 @@ import java.nio.ByteBuffer
 
 import kafka.api.ApiUtils._
 import kafka.common.TopicAndPartition
-import kafka.network.{RequestOrResponseSend, RequestChannel}
+import kafka.network.{RequestChannel, RequestOrResponseSend}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
@@ -120,9 +120,7 @@ case class OffsetRequest(
   def isFromOrdinaryClient = replicaId == Request.OrdinaryConsumerId
   def isFromDebuggingClient = replicaId == Request.DebuggingConsumerId
 
-  override def toString(): String = {
-    describe(true)
-  }
+  override def toString(): String = describe(true)
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,

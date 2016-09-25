@@ -17,7 +17,7 @@
 package kafka.javaapi
 
 import kafka.common.TopicAndPartition
-import kafka.api.{Request, PartitionOffsetRequestInfo}
+import kafka.api.{PartitionOffsetRequestInfo, Request}
 import scala.collection.mutable
 import java.nio.ByteBuffer
 

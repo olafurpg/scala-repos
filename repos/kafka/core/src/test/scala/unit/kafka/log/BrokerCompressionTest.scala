@@ -25,7 +25,7 @@ import org.junit.Assert._
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import java.util.{Properties, Collection, ArrayList}
+import java.util.{ArrayList, Collection, Properties}
 import kafka.server.KafkaConfig
 import org.apache.kafka.common.record.CompressionType
 import scala.collection.JavaConversions._

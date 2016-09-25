@@ -18,7 +18,7 @@ package kafka.consumer
 
 import java.util.concurrent.TimeUnit
 
-import kafka.common.{ClientIdAllBrokers, ClientIdBroker, ClientIdAndBroker}
+import kafka.common.{ClientIdAllBrokers, ClientIdAndBroker, ClientIdBroker}
 import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import kafka.utils.Pool
 
@@ -76,9 +76,8 @@ object FetchRequestAndResponseStatsRegistry {
   private val globalStats =
     new Pool[String, FetchRequestAndResponseStats](Some(valueFactory))
 
-  def getFetchRequestAndResponseStats(clientId: String) = {
+  def getFetchRequestAndResponseStats(clientId: String) =
     globalStats.getAndMaybePut(clientId)
-  }
 
   def removeConsumerFetchRequestAndResponseStats(clientId: String) {
     val pattern = (".*" + clientId + ".*").r

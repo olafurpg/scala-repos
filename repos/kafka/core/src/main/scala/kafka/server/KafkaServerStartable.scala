@@ -19,7 +19,7 @@ package kafka.server
 import java.util.Properties
 
 import kafka.metrics.KafkaMetricsReporter
-import kafka.utils.{VerifiableProperties, Logging}
+import kafka.utils.{Logging, VerifiableProperties}
 
 object KafkaServerStartable {
   def fromProps(serverProps: Properties) = {

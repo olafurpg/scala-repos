@@ -17,7 +17,7 @@
 package kafka.utils
 
 import org.junit.Assert._
-import org.junit.{Test, After, Before}
+import org.junit.{After, Before, Test}
 
 class JsonTest {
 

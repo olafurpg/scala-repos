@@ -20,7 +20,7 @@ import async.AsyncProducerConfig
 import java.util.Properties
 import kafka.utils.{CoreUtils, VerifiableProperties}
 import kafka.message.NoCompressionCodec
-import kafka.common.{InvalidConfigException, Config}
+import kafka.common.{Config, InvalidConfigException}
 
 @deprecated(
   "This object has been deprecated and will be removed in a future release. " +

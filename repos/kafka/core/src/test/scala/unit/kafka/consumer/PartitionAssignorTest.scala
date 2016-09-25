@@ -19,7 +19,7 @@ package kafka.consumer
 import org.easymock.EasyMock
 import org.I0Itec.zkclient.ZkClient
 import org.apache.zookeeper.data.Stat
-import kafka.utils.{TestUtils, Logging, ZkUtils, Json}
+import kafka.utils.{Json, Logging, TestUtils, ZkUtils}
 import org.junit.Assert._
 import kafka.common.TopicAndPartition
 import kafka.consumer.PartitionAssignorTest.StaticSubscriptionInfo
@@ -132,9 +132,7 @@ private object PartitionAssignorTest extends Logging {
             "pattern" -> "static",
             "timestamp" -> 1234.toString))
 
-    override def toString = {
-      "Stream counts: " + streamCounts
-    }
+    override def toString = "Stream counts: " + streamCounts
   }
 
   private case class WildcardSubscriptionInfo(streamCount: Int,

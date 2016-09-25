@@ -21,8 +21,8 @@ import java.nio._
 import java.nio.file.Files
 import java.nio.channels._
 import java.util
-import java.util.concurrent.{Callable, TimeUnit, Executors}
-import java.util.{Collections, Random, Properties}
+import java.util.concurrent.{Callable, Executors, TimeUnit}
+import java.util.{Collections, Properties, Random}
 import java.security.cert.X509Certificate
 import javax.net.ssl.X509TrustManager
 import charset.Charset
@@ -92,9 +92,7 @@ object TestUtils extends Logging {
   /**
     * Create a temporary directory
     */
-  def tempDir(): File = {
-    tempRelativeDir(IoTmpDir)
-  }
+  def tempDir(): File = tempRelativeDir(IoTmpDir)
 
   def tempTopic(): String = "testTopic" + random.nextInt(1000000)
 
@@ -110,9 +108,7 @@ object TestUtils extends Logging {
     Runtime
       .getRuntime()
       .addShutdownHook(new Thread() {
-        override def run() = {
-          CoreUtils.rm(f)
-        }
+        override def run() = CoreUtils.rm(f)
       })
     f
   }
@@ -1046,9 +1042,8 @@ object TestUtils extends Logging {
         .format(topic, partitionToBeReassigned, leader.get))
   }
 
-  def checkIfReassignPartitionPathExists(zkUtils: ZkUtils): Boolean = {
+  def checkIfReassignPartitionPathExists(zkUtils: ZkUtils): Boolean =
     zkUtils.pathExists(ZkUtils.ReassignPartitionsPath)
-  }
 
   def verifyNonDaemonThreadsStatus(threadNamePrefix: String) {
     assertEquals(
@@ -1287,9 +1282,7 @@ object TestUtils extends Logging {
   // a X509TrustManager to trust self-signed certs for unit tests.
   def trustAllCerts: X509TrustManager = {
     val trustManager = new X509TrustManager() {
-      override def getAcceptedIssuers: Array[X509Certificate] = {
-        null
-      }
+      override def getAcceptedIssuers: Array[X509Certificate] = null
       override def checkClientTrusted(certs: Array[X509Certificate],
                                       authType: String) {}
       override def checkServerTrusted(certs: Array[X509Certificate],
@@ -1365,9 +1358,8 @@ class IntEncoder(props: VerifiableProperties = null) extends Encoder[Int] {
   "0.10.0.0")
 class StaticPartitioner(props: VerifiableProperties = null)
     extends Partitioner {
-  def partition(data: Any, numPartitions: Int): Int = {
+  def partition(data: Any, numPartitions: Int): Int =
     (data.asInstanceOf[String].length % numPartitions)
-  }
 }
 
 @deprecated(

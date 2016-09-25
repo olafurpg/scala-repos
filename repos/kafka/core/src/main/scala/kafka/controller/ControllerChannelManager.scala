@@ -45,7 +45,7 @@ import org.apache.kafka.common.utils.Time
 import org.apache.kafka.common.{BrokerEndPoint, Node, TopicPartition}
 
 import scala.collection.JavaConverters._
-import scala.collection.{Set, mutable}
+import scala.collection.{mutable, Set}
 import scala.collection.mutable.HashMap
 
 class ControllerChannelManager(controllerContext: ControllerContext,

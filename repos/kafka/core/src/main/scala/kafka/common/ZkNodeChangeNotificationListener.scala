@@ -18,10 +18,10 @@ package kafka.common
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-import kafka.utils.{Time, SystemTime, ZkUtils, Logging}
+import kafka.utils.{Logging, SystemTime, Time, ZkUtils}
 import org.apache.zookeeper.Watcher.Event.KeeperState
 import org.I0Itec.zkclient.exception.ZkInterruptedException
-import org.I0Itec.zkclient.{IZkStateListener, IZkChildListener}
+import org.I0Itec.zkclient.{IZkChildListener, IZkStateListener}
 import scala.collection.JavaConverters._
 
 /**
@@ -69,9 +69,7 @@ class ZkNodeChangeNotificationListener(
     processAllNotifications()
   }
 
-  def close() = {
-    isClosed.set(true)
-  }
+  def close() = isClosed.set(true)
 
   /**
     * Process all changes

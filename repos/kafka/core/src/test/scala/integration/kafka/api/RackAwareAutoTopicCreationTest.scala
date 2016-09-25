@@ -18,7 +18,7 @@ package kafka.api
 
 import java.util.Properties
 
-import kafka.admin.{RackAwareMode, AdminUtils, RackAwareTest}
+import kafka.admin.{AdminUtils, RackAwareMode, RackAwareTest}
 import kafka.integration.KafkaServerTestHarness
 import kafka.server.KafkaConfig
 import kafka.utils.TestUtils

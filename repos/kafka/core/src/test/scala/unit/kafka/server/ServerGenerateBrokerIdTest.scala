@@ -19,7 +19,7 @@ package kafka.server
 import java.util.Properties
 
 import kafka.zk.ZooKeeperTestHarness
-import kafka.utils.{TestUtils, CoreUtils}
+import kafka.utils.{CoreUtils, TestUtils}
 import org.junit.{Before, Test}
 import org.junit.Assert._
 import java.io.File

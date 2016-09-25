@@ -110,5 +110,5 @@ case class ProducerResponse(
       buffer.putInt(throttleTime)
   }
 
-  override def describe(details: Boolean): String = { toString }
+  override def describe(details: Boolean): String = toString
 }

@@ -21,10 +21,10 @@ import org.scalatest.junit.JUnitSuite
 import org.junit.Test
 import kafka.utils.TestUtils
 import kafka.message.{
-  DefaultCompressionCodec,
-  NoCompressionCodec,
   CompressionCodec,
-  Message
+  DefaultCompressionCodec,
+  Message,
+  NoCompressionCodec
 }
 
 trait BaseMessageSetTestCases extends JUnitSuite {

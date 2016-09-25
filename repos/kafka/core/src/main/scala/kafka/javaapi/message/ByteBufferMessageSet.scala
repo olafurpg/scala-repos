@@ -46,13 +46,9 @@ class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
   override def iterator: java.util.Iterator[MessageAndOffset] =
     new java.util.Iterator[MessageAndOffset] {
       val underlyingIterator = underlying.iterator
-      override def hasNext(): Boolean = {
-        underlyingIterator.hasNext
-      }
+      override def hasNext(): Boolean = underlyingIterator.hasNext
 
-      override def next(): MessageAndOffset = {
-        underlyingIterator.next
-      }
+      override def next(): MessageAndOffset = underlyingIterator.next
 
       override def remove =
         throw new UnsupportedOperationException(
