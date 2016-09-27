@@ -272,7 +272,7 @@ class InlinerTest extends ClearAfterClass {
 
     assert(callGraph.callsites.size == 3, callGraph.callsites)
     for (callsite <- callGraph.callsites.valuesIterator.flatMap(
-                      _.valuesIterator)
+           _.valuesIterator)
          if methods.contains(callsite.callsiteMethod)) {
       checkCallsite(callsite, g)
     }
@@ -300,7 +300,7 @@ class InlinerTest extends ClearAfterClass {
       callGraph.callsites.valuesIterator.flatMap(_.valuesIterator).size == 7,
       callGraph.callsites)
     for (callsite <- callGraph.callsites.valuesIterator.flatMap(
-                      _.valuesIterator)
+           _.valuesIterator)
          if methods.contains(callsite.callsiteMethod)) {
       checkCallsite(callsite, g)
     }

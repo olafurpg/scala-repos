@@ -27,8 +27,8 @@ trait Phases extends Reshape with Calculate with Metalevels with Reify {
         "reifee = " +
           (if (settings.Xshowtrees || settings.XshowtreesCompact ||
                settings.XshowtreesStringified)
-            "\n" + nodePrinters.nodeToString(tree).trim
-          else tree.toString))
+             "\n" + nodePrinters.nodeToString(tree).trim
+           else tree.toString))
 
     if (reifyDebug) println("[calculate phase]")
     calculate.traverse(tree)

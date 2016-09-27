@@ -41,11 +41,10 @@ object DefaultRoutines {
 
     for {
       xml <- Templates(realPath, loc) or Templates(
-              "templates-hidden" :: realPath,
-              loc) or Templates(
-              realPath.dropRight(1) :::
-                ("resources-hidden" :: realPath.takeRight(1)),
-              loc)
+        "templates-hidden" :: realPath,
+        loc) or Templates(realPath.dropRight(1) :::
+                            ("resources-hidden" :: realPath.takeRight(1)),
+                          loc)
 
       bundle <- BundleBuilder.convert(xml, loc)
     } yield bundle

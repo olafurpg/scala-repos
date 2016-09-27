@@ -236,7 +236,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
       .foreach((image: Element) => {
         for {
           locallyStoredImage <- getLocallyStoredImage(
-                                 buildImagePath(image.attr("src")))
+            buildImagePath(image.attr("src")))
           width = locallyStoredImage.width if (width > MIN_WIDTH)
           height = locallyStoredImage.height if (height > MIN_HEIGHT)
           fileExtension = locallyStoredImage.fileExtension

@@ -87,8 +87,8 @@ class CountTest extends AsyncTest[RelationalTestDB] {
       (for {
         a <- as if a.id === 1L
         l <- Query((for {
-              b <- bs if b.aId === a.id
-            } yield b).length)
+          b <- bs if b.aId === a.id
+        } yield b).length)
       } yield (a, l)).result.named("joinLength").map(_ shouldBe Seq((1L, 2))),
       (for {
         (a, b) <- as joinLeft bs on (_.id === _.aId)

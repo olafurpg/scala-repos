@@ -198,10 +198,10 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
   protected def submitOrAjax(id: String): String =
     (if (ajaxForms_?) {
-      SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id)).toJsCmd
-    } else {
-      "document.getElementById(" + id.encJs + ").submit()"
-    })
+       SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id)).toJsCmd
+     } else {
+       "document.getElementById(" + id.encJs + ").submit()"
+     })
 
   protected def renderHtml(): NodeSeq = {
     val nextId = Helpers.nextFuncName
@@ -237,8 +237,8 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
         for {
           screen <- VisitedScreens.is.toList
           field <- screen.screenFields.collect {
-                    case c: ConfirmField => c
-                  } if field.show_? && field.onConfirm_?
+            case c: ConfirmField => c
+          } if field.show_? && field.onConfirm_?
         } yield
           ScreenFieldInfo(field, field.displayHtml, Empty, Full(field.asHtml))
       } else Nil

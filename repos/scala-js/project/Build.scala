@@ -319,8 +319,8 @@ object Build extends sbt.Build {
 
   val publishIvySettings =
     (if (Properties.envOrNone("PUBLISH_TO_BINTRAY") == Some("true"))
-      publishToBintraySettings
-    else publishToScalaJSRepoSettings) ++ Seq(
+       publishToBintraySettings
+     else publishToScalaJSRepoSettings) ++ Seq(
       publishMavenStyle := false
     )
 
@@ -664,8 +664,8 @@ object Build extends sbt.Build {
   lazy val delambdafySetting = {
     scalacOptions ++=
       (if (isGeneratingEclipse) Seq()
-      else if (scalaBinaryVersion.value == "2.10") Seq()
-      else Seq("-Ydelambdafy:method"))
+       else if (scalaBinaryVersion.value == "2.10") Seq()
+       else Seq("-Ydelambdafy:method"))
   }
 
   private def serializeHardcodedIR(
@@ -1088,15 +1088,15 @@ object Build extends sbt.Build {
 
         val semTags =
           (if (sems.asInstanceOfs == CheckedBehavior.Compliant)
-            Seq("compliant-asinstanceofs")
-          else Seq()) ++
+             Seq("compliant-asinstanceofs")
+           else Seq()) ++
             (if (sems.moduleInit == CheckedBehavior.Compliant)
-              Seq("compliant-moduleinit")
-            else Seq()) ++
+               Seq("compliant-moduleinit")
+             else Seq()) ++
             (if (sems.strictFloats) Seq("strict-floats")
-            else Seq()) ++
+             else Seq()) ++
             (if (sems.productionMode) Seq("production-mode")
-            else Seq("development-mode"))
+             else Seq("development-mode"))
 
         val stageTag = stage match {
           case FastOptStage => "fastopt-stage"

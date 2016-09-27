@@ -1328,7 +1328,7 @@ abstract class GenJSCode
             js.Block(
               otherStats.map(genStat) :+
                 (if (bodyIsStat) genStat(rhs)
-                else genExpr(rhs)))
+                 else genExpr(rhs)))
           }
 
           initialThis match {
@@ -3267,13 +3267,11 @@ abstract class GenJSCode
 
         for {
           (rtClass, reflBoxClass) <- Seq(
-                                      (StringClass, StringClass),
-                                      (BoxedDoubleClass,
-                                       NumberReflectiveCallClass),
-                                      (BoxedBooleanClass,
-                                       BooleanReflectiveCallClass),
-                                      (BoxedLongClass, LongReflectiveCallClass)
-                                    )
+            (StringClass, StringClass),
+            (BoxedDoubleClass, NumberReflectiveCallClass),
+            (BoxedBooleanClass, BooleanReflectiveCallClass),
+            (BoxedLongClass, LongReflectiveCallClass)
+          )
           implMethodSym = matchingSymIn(reflBoxClass)
           if implMethodSym != NoSymbol && implMethodSym.isPublic
         } {

@@ -318,7 +318,7 @@ trait Implicits { self: Analyzer =>
     override def hashCode = name.## + pre.## + sym.##
     override def toString =
       (if (tpeCache eq null) name + ": ?"
-      else name + ": " + tpe)
+       else name + ": " + tpe)
   }
 
   /** A class which is used to track pending implicits to prevent infinite implicit searches.
@@ -952,11 +952,11 @@ trait Implicits { self: Analyzer =>
         val ownerPos = owner.pos.pointOrElse(Int.MaxValue)
         sym.pos.pointOrElse(0) < ownerPos &&
         (if (sym.hasAccessorFlag) {
-          val symAcc = sym.accessed // #3373
-          symAcc.pos.pointOrElse(0) < ownerPos && !(owner.ownerChain exists
-            (o => (o eq sym) || (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
-        } else
-          !(owner hasTransOwner sym)) // faster than owner.ownerChain contains sym
+           val symAcc = sym.accessed // #3373
+           symAcc.pos.pointOrElse(0) < ownerPos && !(owner.ownerChain exists
+             (o => (o eq sym) || (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
+         } else
+           !(owner hasTransOwner sym)) // faster than owner.ownerChain contains sym
       }
 
       sym.isInitialized || sym.sourceFile == null ||
@@ -1510,7 +1510,7 @@ trait Implicits { self: Analyzer =>
                                   tp,
                                   (if ((pre eq NoPrefix) ||
                                        pre.typeSymbol.isStaticOwner) suffix
-                                  else findSubManifest(pre) :: suffix): _*)
+                                   else findSubManifest(pre) :: suffix): _*)
             } else if (sym.isExistentiallyBound && full) {
               manifestFactoryCall("wildcardType",
                                   tp,

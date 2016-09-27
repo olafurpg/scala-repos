@@ -144,8 +144,8 @@ trait DerbyProfile extends JdbcProfile {
         val (toVarchar, tn) = {
           val tn =
             (if (ch.length == 2)
-              ch(1).asInstanceOf[LiteralNode].value.asInstanceOf[String]
-            else jdbcTypeFor(c.nodeType).sqlTypeName(None)).toLowerCase
+               ch(1).asInstanceOf[LiteralNode].value.asInstanceOf[String]
+             else jdbcTypeFor(c.nodeType).sqlTypeName(None)).toLowerCase
           if (tn == "varchar")
             (true, columnTypes.stringJdbcType.sqlTypeName(None))
           else if (tn.startsWith("varchar")) (true, tn)

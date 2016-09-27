@@ -162,8 +162,8 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
       // dirty debuggers will have to get dirty to see the wildcards
       lazy val storedBinders: Set[Symbol] =
         (if (debugInfoEmitVars)
-          subPatBinders.toSet
-        else Set.empty) ++ extraStoredBinders -- ignoredSubPatBinders
+           subPatBinders.toSet
+         else Set.empty) ++ extraStoredBinders -- ignoredSubPatBinders
 
       // e.g., mutable fields of a case class in ProductExtractorTreeMaker
       def extraStoredBinders: Set[Symbol]
@@ -531,11 +531,11 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
         //   have to test type and outer (non-null is implied by successful type test)
         def mkDefault =
           (if (isExpectedPrimitiveType) tru
-          else
-            addOuterTest(
-              if (isExpectedReferenceType) mkNullTest
-              else mkTypeTest
-            ))
+           else
+             addOuterTest(
+               if (isExpectedReferenceType) mkNullTest
+               else mkTypeTest
+             ))
 
         // true when called to type-test the argument to an extractor
         // don't do any fancy equality checking, just test the type

@@ -249,7 +249,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     val allowedHeaders =
       corsConfig.allowedHeaders.map(_.trim.toUpperCase(ENGLISH))
     val requestedHeaders = for (header <- request.headers.getMulti(
-                                           AccessControlRequestHeadersHeader)
+                                  AccessControlRequestHeadersHeader)
                                 if header.nonBlank)
       yield header.toUpperCase(ENGLISH)
 

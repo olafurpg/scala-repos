@@ -191,7 +191,7 @@ private object BucketedHistogramTest {
   def generator =
     for {
       samples <- Gen.nonEmptyContainerOf[List, Int](
-                  Gen.chooseNum(0, Int.MaxValue))
+        Gen.chooseNum(0, Int.MaxValue))
       percentile <- Gen.choose(0.5, 0.9999)
     } yield (samples, percentile)
 }

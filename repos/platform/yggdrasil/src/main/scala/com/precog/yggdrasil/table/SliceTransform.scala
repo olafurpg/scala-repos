@@ -126,13 +126,13 @@ trait SliceTransforms[M[+ _]]
               val columns: Map[ColumnRef, Column] = {
                 val resultColumns = for {
                   cl <- sl.columns collect {
-                         case (ref, col) if ref.selector == CPath.Identity =>
-                           col
-                       }
+                    case (ref, col) if ref.selector == CPath.Identity =>
+                      col
+                  }
                   cr <- sr.columns collect {
-                         case (ref, col) if ref.selector == CPath.Identity =>
-                           col
-                       }
+                    case (ref, col) if ref.selector == CPath.Identity =>
+                      col
+                  }
                   result <- f(cl, cr)
                 } yield result
 

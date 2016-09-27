@@ -494,10 +494,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       elementExtract(ByNameParamClass, tp) orElse tp
     def dropRepeated(tp: Type): Type =
       (if (isJavaRepeatedParamType(tp))
-        elementExtract(JavaRepeatedParamClass, tp) orElse tp
-      else if (isScalaRepeatedParamType(tp))
-        elementExtract(RepeatedParamClass, tp) orElse tp
-      else tp)
+         elementExtract(JavaRepeatedParamClass, tp) orElse tp
+       else if (isScalaRepeatedParamType(tp))
+         elementExtract(RepeatedParamClass, tp) orElse tp
+       else tp)
     def repeatedToSingle(tp: Type): Type =
       elementExtract(RepeatedParamClass, tp) orElse elementExtract(
         JavaRepeatedParamClass,
@@ -930,15 +930,15 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         def volatileUpperBound = isVolatile(tp.bounds.hi)
         def safeIsVolatile =
           (if (volatileRecursions < TypeConstants.LogVolatileThreshold)
-            volatileUpperBound
-          // we can return true when pendingVolatiles contains sym, because
-          // a cycle will be detected afterwards and an error will result anyway.
-          else
-            pendingVolatiles(sym) || {
-              pendingVolatiles += sym
-              try volatileUpperBound
-              finally pendingVolatiles -= sym
-            })
+             volatileUpperBound
+           // we can return true when pendingVolatiles contains sym, because
+           // a cycle will be detected afterwards and an error will result anyway.
+           else
+             pendingVolatiles(sym) || {
+               pendingVolatiles += sym
+               try volatileUpperBound
+               finally pendingVolatiles -= sym
+             })
         volatileRecursions += 1
         try safeIsVolatile
         finally volatileRecursions -= 1
@@ -1237,8 +1237,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           typeParamsToExistentials(ClassClass, ClassClass.typeParams)
         val upperBound =
           (if (isPhantomClass(sym)) AnyTpe
-          else if (sym.isLocalClass) erasure.intersectionDominator(tp.parents)
-          else tp.widen)
+           else if (sym.isLocalClass) erasure.intersectionDominator(tp.parents)
+           else tp.widen)
 
         existentialAbstraction(
           eparams,

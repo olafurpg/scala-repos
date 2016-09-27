@@ -48,14 +48,14 @@ class ScGenericCallImpl(node: ASTNode)
           case _ => Seq.empty[ScExpression]
         }) ++
           (if (isUpdate)
-            curr.getContext.asInstanceOf[ScAssignStmt].getRExpression match {
-              case Some(x) => Seq[ScExpression](x)
-              case None =>
-                Seq[ScExpression](
-                  ScalaPsiElementFactory.createExpressionFromText(
-                    "{val x: Nothing = null; x}",
-                    getManager)) //we can't to not add something => add Nothing expression
-            } else Seq.empty) :: Nil
+             curr.getContext.asInstanceOf[ScAssignStmt].getRExpression match {
+               case Some(x) => Seq[ScExpression](x)
+               case None =>
+                 Seq[ScExpression](
+                   ScalaPsiElementFactory.createExpressionFromText(
+                     "{val x: Nothing = null; x}",
+                     getManager)) //we can't to not add something => add Nothing expression
+             } else Seq.empty) :: Nil
       }
     val typeArgs: Seq[ScTypeElement] = this.arguments
     import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression._

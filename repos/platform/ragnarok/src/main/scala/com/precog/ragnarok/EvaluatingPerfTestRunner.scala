@@ -118,9 +118,9 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
         case Right(dag) =>
           for {
             table <- Evaluator(M)
-                      .eval(dag, dummyEvaluationContext, yggConfig.optimize)
+              .eval(dag, dummyEvaluationContext, yggConfig.optimize)
             size <- Timing.timeM("Counting stream")(
-                     countStream(table.renderJson("", ",", "")))
+              countStream(table.renderJson("", ",", "")))
           } yield size
       }
     } catch {

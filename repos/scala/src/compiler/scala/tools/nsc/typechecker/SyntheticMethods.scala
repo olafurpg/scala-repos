@@ -356,11 +356,11 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
     def synthesize(): List[Tree] = {
       val methods =
         (if (clazz.isCase)
-          if (clazz.isDerivedValueClass) valueCaseClassMethods
-          else if (clazz.isModuleClass) caseObjectMethods
-          else caseClassMethods
-        else if (clazz.isDerivedValueClass) valueClassMethods
-        else Nil)
+           if (clazz.isDerivedValueClass) valueCaseClassMethods
+           else if (clazz.isModuleClass) caseObjectMethods
+           else caseClassMethods
+         else if (clazz.isDerivedValueClass) valueClassMethods
+         else Nil)
 
       /* Always generate overrides for equals and hashCode in value classes,
        * so they can appear in universal traits without breaking value semantics.

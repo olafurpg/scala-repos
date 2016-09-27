@@ -1392,7 +1392,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     def moduleSuffix: String =
       (if (needsModuleSuffix) nme.MODULE_SUFFIX_STRING
-      else "")
+       else "")
 
     /** Whether this symbol needs nme.MODULE_SUFFIX_STRING (aka $) appended on the java platform.
       */
@@ -1951,10 +1951,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
             oldsymbuf += sym
             newsymbuf +=
               (if (sym.isClass)
-                tp.typeSymbol
-                  .newAbstractType(sym.name.toTypeName, sym.pos)
-                  .setInfo(sym.existentialBound)
-              else sym.cloneSymbol(tp.typeSymbol))
+                 tp.typeSymbol
+                   .newAbstractType(sym.name.toTypeName, sym.pos)
+                   .setInfo(sym.existentialBound)
+               else sym.cloneSymbol(tp.typeSymbol))
           }
         }
         val oldsyms = oldsymbuf.toList
@@ -2521,7 +2521,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     final def overridingSymbol(ofclazz: Symbol): Symbol =
       (if (canMatchInheritedSymbols) matchingSymbol(ofclazz, ofclazz.thisType)
-      else NoSymbol)
+       else NoSymbol)
 
     /** If false, this symbol cannot possibly participate in an override,
       *  either as overrider or overridee. For internal use; you should consult
@@ -2536,9 +2536,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     // or Nil if this is NoSymbol.
     def overrideChain =
       (if (this eq NoSymbol) Nil
-      else if (isOverridingSymbol)
-        this :: allOverriddenSymbols
-      else this :: Nil)
+       else if (isOverridingSymbol)
+         this :: allOverriddenSymbols
+       else this :: Nil)
 
     /** Returns all symbols overridden by this symbol. */
     final def allOverriddenSymbols: List[Symbol] = {
@@ -2574,8 +2574,8 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     final def extendedOverriddenSymbols: List[Symbol] =
       (if (canMatchInheritedSymbols)
-        owner.thisSym.ancestors map overriddenSymbol filter (_ != NoSymbol)
-      else Nil)
+         owner.thisSym.ancestors map overriddenSymbol filter (_ != NoSymbol)
+       else Nil)
 
     @deprecated("Use `superSymbolIn` instead", "2.11.0")
     final def superSymbol(base: Symbol): Symbol = superSymbolIn(base)
@@ -2620,7 +2620,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     def needsExpandedSetterName =
       (if (isMethod) hasStableFlag && !isLazy
-      else hasNoFlags(LAZY | MUTABLE))
+       else hasNoFlags(LAZY | MUTABLE))
     def setterNameInBase(base: Symbol, expanded: Boolean): TermName =
       if (expanded) nme.expandedSetterName(setterName, base) else setterName
 
@@ -2882,7 +2882,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     final def infoString(tp: Type): String = {
       def parents =
         (if (settings.debug.value) parentsString(tp.parents)
-        else briefParentsString(tp.parents))
+         else briefParentsString(tp.parents))
       def isStructuralThisType =
         (// prevents disasters like SI-8158
         owner.isInitialized && owner.isStructuralRefinement &&
@@ -2890,12 +2890,12 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       if (isType)
         typeParamsString(tp) +
           (if (isClass) " extends " + parents
-          else if (isAliasType) " = " + tp.resultType
-          else
-            tp.resultType match {
-              case rt @ TypeBounds(_, _) => "" + rt
-              case rt => " <: " + rt
-            })
+           else if (isAliasType) " = " + tp.resultType
+           else
+             tp.resultType match {
+               case rt @ TypeBounds(_, _) => "" + rt
+               case rt => " <: " + rt
+             })
       else if (isModule) "" //  avoid "object X of type X.type"
       else
         tp match {
@@ -3530,11 +3530,11 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     override def associatedFile =
       (if (!isTopLevel) super.associatedFile
-      else {
-        if (_associatedFile eq null)
-          NoAbstractFile // guarantee not null, but save cost of initializing the var
-        else _associatedFile
-      })
+       else {
+         if (_associatedFile eq null)
+           NoAbstractFile // guarantee not null, but save cost of initializing the var
+         else _associatedFile
+       })
     override def associatedFile_=(f: AbstractFile) { _associatedFile = f }
 
     override def reset(completer: Type): this.type = {
@@ -3606,7 +3606,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     }
     override def toString =
       (if (isAnonOrRefinementClass) anonOrRefinementString
-      else super.toString)
+       else super.toString)
 
     if (Statistics.hotEnabled) Statistics.incCounter(classSymbolCount)
   }

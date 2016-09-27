@@ -154,8 +154,8 @@ case class OffsetCommitRequest(
     4 + /* correlationId */
     shortStringLength(clientId) + shortStringLength(groupId) +
       (if (versionId >= 1)
-        4 /* group generation id */ + shortStringLength(memberId)
-      else 0) +
+         4 /* group generation id */ + shortStringLength(memberId)
+       else 0) +
       (if (versionId >= 2) 8 /* retention time */ else 0) + 4 + /* topic count */
     requestInfoGroupedByTopic.foldLeft(0)((count, topicAndOffsets) => {
       val (topic, offsets) = topicAndOffsets

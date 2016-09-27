@@ -785,7 +785,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           val decls = memberDecl(mods, parentToken)
           (if (mods.hasStaticFlag || inInterface &&
                !(decls exists (_.isInstanceOf[DefDef]))) statics
-          else members) ++= decls
+           else members) ++= decls
         }
       }
       def forwarders(sdef: Tree): List[Tree] = sdef match {

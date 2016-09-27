@@ -264,7 +264,7 @@ trait RichTypes {
         case TypeRef(pre, sym, targs) if pre.typeSymbol.isModuleClass =>
           sym.fullName + (if (sym.isModuleClass) ".type" else "") +
             (if (targs.isEmpty) ""
-            else targs.map(_.key).mkString("[", ",", "]"))
+             else targs.map(_.key).mkString("[", ",", "]"))
         case _ =>
           tpe.toString
       }

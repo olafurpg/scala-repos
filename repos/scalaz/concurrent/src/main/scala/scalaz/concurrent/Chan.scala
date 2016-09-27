@@ -35,9 +35,9 @@ private[this] class ChanImpl[A](readVar: MVar[ChStream[A]],
     for {
       newHole <- newEmptyMVar[ChItem[A]]
       _ <- for {
-            oldHole <- writeVar.take
-            _ <- oldHole.put(ChItem(a, newHole))
-            _ <- writeVar.put(newHole)
-          } yield ()
+        oldHole <- writeVar.take
+        _ <- oldHole.put(ChItem(a, newHole))
+        _ <- writeVar.put(newHole)
+      } yield ()
     } yield ()
 }

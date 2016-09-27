@@ -657,7 +657,7 @@ private[http] object HttpHeaderParser {
       ix: Int = start): (String, Int) = {
     def appended(c: Char) =
       (if (sb != null) sb
-      else new JStringBuilder(asciiString(input, start, ix))).append(c)
+       else new JStringBuilder(asciiString(input, start, ix))).append(c)
     def appended2(c: Int) =
       if ((c >> 16) != 0) appended(c.toChar).append((c >> 16).toChar)
       else appended(c.toChar)

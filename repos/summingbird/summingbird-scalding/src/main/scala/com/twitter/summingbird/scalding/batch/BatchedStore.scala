@@ -383,20 +383,20 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       // Try to read the range covering the time we want; get the time we can completely
       // cover and the data from input in that range.
       readTimeFlow <- fromEither(
-                       batchOps.readAvailableTimes(deltaTimes, mode, input))
+        batchOps.readAvailableTimes(deltaTimes, mode, input))
 
       (readDeltaTimestamps, readFlow) = readTimeFlow
 
       // Make sure that the time we can read includes the time just after the last
       // snapshot. We can't roll the store forward without this.
       _ <- fromEither[FactoryInput](
-            if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
-            else
-              Left(
-                List(
-                  "Cannot load initial timestamp " +
-                    firstDeltaTimestamp.toString + " of deltas " + " at " +
-                    this.toString + " only " + readDeltaTimestamps.toString)))
+        if (readDeltaTimestamps.contains(firstDeltaTimestamp)) Right(())
+        else
+          Left(
+            List(
+              "Cannot load initial timestamp " +
+                firstDeltaTimestamp.toString + " of deltas " + " at " +
+                this.toString + " only " + readDeltaTimestamps.toString)))
 
       // Record the timespan we actually read.
       _ <- putState((readDeltaTimestamps, mode))

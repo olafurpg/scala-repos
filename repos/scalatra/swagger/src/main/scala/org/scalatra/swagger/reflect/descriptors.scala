@@ -154,8 +154,8 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
   val typeArgs =
     manifest.typeArguments.map(ta => Reflector.scalaTypeOf(ta)) ++
       (if (erasure.isArray)
-        List(Reflector.scalaTypeOf(erasure.getComponentType))
-      else Nil)
+         List(Reflector.scalaTypeOf(erasure.getComponentType))
+       else Nil)
 
   private[this] var _typeVars: Map[TypeVariable[_], ScalaType] = null
   def typeVars = {
@@ -184,16 +184,16 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
   lazy val simpleName: String =
     rawSimpleName +
       (if (typeArgs.nonEmpty)
-        typeArgs.map(_.simpleName).mkString("[", ", ", "]")
-      else
-        (if (typeVars.nonEmpty)
-          typeVars.map(_._2.simpleName).mkString("[", ", ", "]")
-        else ""))
+         typeArgs.map(_.simpleName).mkString("[", ", ", "]")
+       else
+         (if (typeVars.nonEmpty)
+            typeVars.map(_._2.simpleName).mkString("[", ", ", "]")
+          else ""))
 
   lazy val fullName: String =
     rawFullName +
       (if (typeArgs.nonEmpty) typeArgs.map(_.fullName).mkString("[", ", ", "]")
-      else "")
+       else "")
 
   val isPrimitive = false
 

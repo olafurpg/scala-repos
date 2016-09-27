@@ -61,7 +61,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
   private def getSymbol(name: String, isModule: Boolean) =
     (if (isModule) getModuleIfDefined(name)
-    else getModuleIfDefined(name))
+     else getModuleIfDefined(name))
   private def getType(name: String, isModule: Boolean) =
     getSymbol(name, isModule).tpe
   private def typeOf(name: String) = getType(name, false)
@@ -124,7 +124,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
         override def completions(verbosity: Int) = {
           super.completions(verbosity) ++
             (if (verbosity == 0) Nil
-            else upgrade.completions(verbosity))
+             else upgrade.completions(verbosity))
         }
         override def follow(s: String) = super.follow(s) orElse {
           if (upgraded) upgrade.follow(s)
@@ -133,7 +133,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
         override def alternativesFor(id: String) =
           super.alternativesFor(id) ++
             (if (upgraded) upgrade.alternativesFor(id)
-            else Nil) distinct
+             else Nil) distinct
       }
     }
     def apply(tp: Type): TypeMemberCompletion = {

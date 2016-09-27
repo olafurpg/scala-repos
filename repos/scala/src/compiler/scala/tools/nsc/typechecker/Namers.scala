@@ -697,10 +697,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       // via "x$lzy" as can be seen in test #3927.
       val sym =
         (if (owner.isClass) createFieldSymbol(tree)
-        else
-          owner.newValue(tree.name append nme.LAZY_LOCAL,
-                         tree.pos,
-                         (tree.mods.flags | ARTIFACT) & ~IMPLICIT))
+         else
+           owner.newValue(tree.name append nme.LAZY_LOCAL,
+                          tree.pos,
+                          (tree.mods.flags | ARTIFACT) & ~IMPLICIT))
       enterValSymbol(tree, sym setFlag MUTABLE setLazyAccessor lazyAccessor)
     }
     def enterStrictVal(tree: ValDef): TermSymbol = {
@@ -935,15 +935,15 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
 
       val sym =
         (if (hasType || hasName) {
-          owner.typeOfThis =
-            if (hasType) selfTypeCompleter(tpt)
-            else owner.tpe_*
-          val selfSym = owner.thisSym setPos self.pos
-          if (hasName) selfSym setName name else selfSym
-        } else {
-          val symName = if (name != nme.WILDCARD) name else nme.this_
-          owner.newThisSym(symName, owner.pos) setInfo owner.tpe
-        })
+           owner.typeOfThis =
+             if (hasType) selfTypeCompleter(tpt)
+             else owner.tpe_*
+           val selfSym = owner.thisSym setPos self.pos
+           if (hasName) selfSym setName name else selfSym
+         } else {
+           val symName = if (name != nme.WILDCARD) name else nme.this_
+           owner.newThisSym(symName, owner.pos) setInfo owner.tpe
+         })
       self.symbol = context.scope enter sym
     }
 
@@ -1260,14 +1260,14 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       val res = thisMethodType({
         val rt =
           (if (!tpt.isEmpty) {
-            methResTp
-          } else {
-            // return type is inferred, we don't just use resTpFromOverride. Here, C.f has type String:
-            //   trait T { def f: Object }; class C <: T { def f = "" }
-            // using resTpFromOverride as expected type allows for the following (C.f has type A):
-            //   trait T { def f: A }; class C <: T { implicit def b2a(t: B): A = ???; def f = new B }
-            assignTypeToTree(ddef, typer, resTpFromOverride)
-          })
+             methResTp
+           } else {
+             // return type is inferred, we don't just use resTpFromOverride. Here, C.f has type String:
+             //   trait T { def f: Object }; class C <: T { def f = "" }
+             // using resTpFromOverride as expected type allows for the following (C.f has type A):
+             //   trait T { def f: A }; class C <: T { implicit def b2a(t: B): A = ???; def f = new B }
+             assignTypeToTree(ddef, typer, resTpFromOverride)
+           })
         // #2382: return type of default getters are always @uncheckedVariance
         if (meth.hasDefault)
           rt.withAnnotation(

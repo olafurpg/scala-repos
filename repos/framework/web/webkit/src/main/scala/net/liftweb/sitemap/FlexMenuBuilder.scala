@@ -200,11 +200,11 @@ trait FlexMenuBuilder {
     */
   protected def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-      for {
-        sm <- LiftRules.siteMap;
-        req <- S.request
-      } yield sm.buildMenu(req.location).lines
-    else S.request.map(_.buildMenu.lines)) openOr Nil
+       for {
+         sm <- LiftRules.siteMap;
+         req <- S.request
+       } yield sm.buildMenu(req.location).lines
+     else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def render: NodeSeq = {
 

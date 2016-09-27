@@ -61,10 +61,10 @@ trait ClassHelpers { self: ControlHelpers =>
                         classOf[ClassCastException],
                         classOf[NoClassDefFoundError]);
           klass <- tryo(ignore)(
-                    Class
-                      .forName(fullName)
-                      .asSubclass(targetType)
-                      .asInstanceOf[Class[C]])) yield klass).headOption
+            Class
+              .forName(fullName)
+              .asSubclass(targetType)
+              .asInstanceOf[Class[C]])) yield klass).headOption
 
   /**
     * General method to in find a class according to its type, its name, a list of possible

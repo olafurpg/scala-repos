@@ -486,13 +486,13 @@ object Scalding {
                 // Handle the Option[Producer] return value from getLoopInputs properly.
                 // If there was no producer returned, pass an empty TypedPipe to the join for that part.
                 flowToPipe <- deltaLogOpt.map { del =>
-                               leftPf.join(del).map {
-                                 case (ftpA, ftpB) =>
-                                   Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
-                               }
-                             }.getOrElse(leftPf.map { p =>
-                               p.map((_, TypedPipe.empty))
-                             }) // no extra producer for store
+                  leftPf.join(del).map {
+                    case (ftpA, ftpB) =>
+                      Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
+                  }
+                }.getOrElse(leftPf.map { p =>
+                  p.map((_, TypedPipe.empty))
+                }) // no extra producer for store
                 servOut = flowToPipe.map {
                   case (lpipe, dpipe) =>
                     InternalService.loopJoin[Timestamp, K, V, U](

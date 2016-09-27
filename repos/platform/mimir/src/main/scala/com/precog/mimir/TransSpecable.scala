@@ -234,12 +234,10 @@ trait TransSpecableModule[M[+ _]]
             pr <- rightParent
             (r, ar) = get(pr)
             result <- if (al == ar) {
-                       set(pl,
-                           (transFromBinOp(op, MorphContext(ctx, node))(l, r),
-                            al))
-                     } else {
-                       init(Leaf(Source), node)
-                     }
+              set(pl, (transFromBinOp(op, MorphContext(ctx, node))(l, r), al))
+            } else {
+              init(Leaf(Source), node)
+            }
           } yield result
         }
 
@@ -250,7 +248,7 @@ trait TransSpecableModule[M[+ _]]
             pr <- rightParent
             (r, ar) = get(pr)
             result <- if (al == ar) set(pl, (trans.Filter(l, r), al))
-                     else init(Leaf(Source), node)
+            else init(Leaf(Source), node)
           } yield result
 
         def WrapArray(node: Operate)(parent: N[S]) =
@@ -270,8 +268,8 @@ trait TransSpecableModule[M[+ _]]
             (r, ar) = get(pr)
 
             result <- if (ap == al && al == ar)
-                       set(pp, (trans.Cond(p, l, r), ap))
-                     else init(Leaf(Source), node)
+              set(pp, (trans.Cond(p, l, r), ap))
+            else init(Leaf(Source), node)
           } yield result
         }
 

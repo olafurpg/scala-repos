@@ -124,13 +124,13 @@ trait ContextErrors { self: Analyzer =>
       (if (parents.isEmpty) tp.parents else parents) mkString ", "
     def what =
       (if (tp.typeSymbol.isAbstractType) {
-        val descr =
-          if (onlyAny) "unbounded"
-          else "bounded only by " + parents_s
-        s"$name is $descr, which means AnyRef is not a known parent"
-      } else if (tp.typeSymbol.isAnonOrRefinementClass)
-        s"the parents of this type ($parents_s) extend Any, not AnyRef"
-      else s"$name extends Any, not AnyRef")
+         val descr =
+           if (onlyAny) "unbounded"
+           else "bounded only by " + parents_s
+         s"$name is $descr, which means AnyRef is not a known parent"
+       } else if (tp.typeSymbol.isAnonOrRefinementClass)
+         s"the parents of this type ($parents_s) extend Any, not AnyRef"
+       else s"$name extends Any, not AnyRef")
     if (isPrimitiveValueType(found) || isTrivialTopType(tp)) ""
     else "\n" + sm"""|Note that $what.
             |Such types can participate in value classes, but instances
@@ -167,8 +167,8 @@ trait ContextErrors { self: Analyzer =>
       val paramTp = param.tpe
       def evOrParam =
         (if (paramName startsWith nme.EVIDENCE_PARAM_PREFIX)
-          "evidence parameter of type"
-        else s"parameter $paramName:")
+           "evidence parameter of type"
+         else s"parameter $paramName:")
       paramTp.typeSymbolDirect match {
         case ImplicitNotFoundMsg(msg) => msg.format(paramName, paramTp)
         case _ => s"could not find implicit value for $evOrParam $paramTp"
@@ -414,13 +414,13 @@ trait ContextErrors { self: Analyzer =>
             }
             val semicolon =
               (if (linePrecedes(qual, sel))
-                "\npossible cause: maybe a semicolon is missing before `" +
-                  nameString + "'?"
-              else "")
+                 "\npossible cause: maybe a semicolon is missing before `" +
+                   nameString + "'?"
+               else "")
             val notAnyRef =
               (if (ObjectClass.info.member(name).exists)
-                notAnyRefMessage(target)
-              else "")
+                 notAnyRefMessage(target)
+               else "")
             companion + notAnyRef + semicolon
           }
           def targetStr = targetKindString + target.directObjectString
@@ -1048,7 +1048,7 @@ trait ContextErrors { self: Analyzer =>
             s"If you have troubles tracking free $kind variables, consider using -Xlog-free-${kind}s")
         val forgotten =
           (if (sym.isTerm) "splice when splicing this variable into a reifee"
-          else "c.WeakTypeTag annotation for this type parameter")
+           else "c.WeakTypeTag annotation for this type parameter")
         macroExpansionError(expandee,
                             template(sym.name.nameKind)
                               .format(sym.name + " " + sym.origin, forgotten))
@@ -1070,9 +1070,9 @@ trait ContextErrors { self: Analyzer =>
           expandee,
           s"macro must return a compiler-specific $expected; returned value is " +
             (if (expanded == null) "null"
-            else if (isPathMismatch)
-              s"$actual, but it doesn't belong to this compiler's universe"
-            else "of " + expanded.getClass))
+             else if (isPathMismatch)
+               s"$actual, but it doesn't belong to this compiler's universe"
+             else "of " + expanded.getClass))
       }
 
       def MacroImplementationNotFoundError(expandee: Tree) =
@@ -1235,7 +1235,7 @@ trait ContextErrors { self: Analyzer =>
           val msg0 =
             "argument types " + argtpes.mkString("(", ",", ")") +
               (if (pt == WildcardType) ""
-              else " and expected result type " + pt)
+               else " and expected result type " + pt)
           issueAmbiguousTypeErrorUnlessErroneous(tree.pos,
                                                  pre,
                                                  best,
@@ -1577,12 +1577,12 @@ trait ContextErrors { self: Analyzer =>
             // involving Any, are further explained from foundReqMsg.
             if (AnyRefTpe <:< req)
               (if (sym == AnyClass || sym == UnitClass)
-                (sm"""|Note: ${sym.name} is not implicitly converted to AnyRef.  You can safely
+                 (sm"""|Note: ${sym.name} is not implicitly converted to AnyRef.  You can safely
                       |pattern match `x: AnyRef` or cast `x.asInstanceOf[AnyRef]` to do so.""")
-              else
-                boxedClass get sym map
-                  (boxed =>
-                     sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
+               else
+                 boxedClass get sym map
+                   (boxed =>
+                      sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
                       |methods inherited from Object are rendered ambiguous.  This is to avoid
                       |a blanket implicit which would convert any ${sym.fullName} to any AnyRef.
                       |You may wish to use a type ascription: `x: ${boxed.fullName}`.""") getOrElse "")

@@ -254,8 +254,8 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
               (if (lastScript.isInstanceOf[UpScript]) "Ups" else "Downs") +
               " - " + lastScript.evolution.hash + "\n\n" +
               (if (lastScript.isInstanceOf[UpScript])
-                lastScript.evolution.sql_up
-              else lastScript.evolution.sql_down)
+                 lastScript.evolution.sql_up
+               else lastScript.evolution.sql_down)
 
           throw InconsistentDatabase(database.name,
                                      humanScript,

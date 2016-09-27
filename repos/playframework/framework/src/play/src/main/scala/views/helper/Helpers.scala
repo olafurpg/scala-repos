@@ -21,10 +21,10 @@ package views.html.helper {
                case Some(false) => false
                case _ => true
              }) {
-          field.constraints.map(c =>
-            messages(c._1, c._2.map(a => translateMsgArg(a)): _*)) ++ field.format
-            .map(f => messages(f._1, f._2.map(a => translateMsgArg(a)): _*))
-        } else Nil)
+           field.constraints.map(c =>
+             messages(c._1, c._2.map(a => translateMsgArg(a)): _*)) ++ field.format
+             .map(f => messages(f._1, f._2.map(a => translateMsgArg(a)): _*))
+         } else Nil)
       }
     }
 
@@ -38,9 +38,9 @@ package views.html.helper {
                case Some(false) => false
                case _ => true
              }) {
-          field.errors.map(e =>
-            messages(e.message, e.args.map(a => translateMsgArg(a)): _*))
-        } else Nil)
+           field.errors.map(e =>
+             messages(e.message, e.args.map(a => translateMsgArg(a)): _*))
+         } else Nil)
       }
     }
 

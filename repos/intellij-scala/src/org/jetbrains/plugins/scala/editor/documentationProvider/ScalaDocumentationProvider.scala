@@ -518,7 +518,7 @@ object ScalaDocumentationProvider {
       owner.getDocComment match {
         case scalaComment: ScDocComment =>
           for (docTag <- scalaComment.findTagsByName(
-                          Set(PARAM_TAG, TYPE_PARAM_TAG).contains _)) {
+                 Set(PARAM_TAG, TYPE_PARAM_TAG).contains _)) {
             docTag.name match {
               case PARAM_TAG => registerInheritedParam(inheritedParams, docTag)
               case TYPE_PARAM_TAG =>
@@ -1301,8 +1301,8 @@ object ScalaDocumentationProvider {
         else
           clazz.name + " " + clazz.getPresentation.getLocationString + "\n" +
             (if (clParameter.isVal) "val "
-            else if (clParameter.isVar) "var "
-            else "") + clParameter.name +
+             else if (clParameter.isVar) "var "
+             else "") + clParameter.name +
             ": " + ScType.presentableText(
             subst.subst(clParameter.getType(TypingContext.empty).getOrAny))
       case _ => defaultText

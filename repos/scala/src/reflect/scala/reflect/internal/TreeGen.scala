@@ -193,13 +193,13 @@ abstract class TreeGen {
   /** Computes stable type for a tree if possible */
   def stableTypeFor(tree: Tree): Type =
     (if (!treeInfo.admitsTypeSelection(tree)) NoType
-    else
-      tree match {
-        case This(_) => ThisType(tree.symbol)
-        case Ident(_) => singleType(tree.symbol.owner.thisType, tree.symbol)
-        case Select(qual, _) => singleType(qual.tpe, tree.symbol)
-        case _ => NoType
-      })
+     else
+       tree match {
+         case This(_) => ThisType(tree.symbol)
+         case Ident(_) => singleType(tree.symbol.owner.thisType, tree.symbol)
+         case Select(qual, _) => singleType(qual.tpe, tree.symbol)
+         case _ => NoType
+       })
 
   /** Builds a reference with stable type to given symbol */
   def mkAttributedStableRef(pre: Type, sym: Symbol): Tree =
@@ -227,8 +227,8 @@ abstract class TreeGen {
       // the Typers method "isInPackageObject", used in typedIdent.
       val qualsym =
         (if (qual.tpe ne null) qual.tpe.typeSymbol
-        else if (qual.symbol ne null) qual.symbol
-        else NoSymbol)
+         else if (qual.symbol ne null) qual.symbol
+         else NoSymbol)
       val needsPackageQualifier =
         ((sym ne null) && qualsym.hasPackageFlag && !(sym.isDefinedInPackage ||
           sym.moduleClass.isDefinedInPackage) // SI-7817 work around strangeness in post-flatten `Symbol#owner`

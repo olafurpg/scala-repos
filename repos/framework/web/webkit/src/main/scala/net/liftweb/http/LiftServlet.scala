@@ -1034,10 +1034,11 @@ class LiftServlet extends Loggable {
              case ("Location", uri) =>
                val u = request
                (v._1,
-                ((for (updated <- Full((if (!LiftRules.excludePathFromContextPathRewriting
-                                              .vend(uri)) u.contextPath
-                                 else "") + uri).filter(ignore =>
-                                   uri.startsWith("/"));
+                ((for (updated <- Full(
+                         (if (!LiftRules.excludePathFromContextPathRewriting
+                                .vend(uri)) u.contextPath
+                          else "") + uri).filter(ignore =>
+                         uri.startsWith("/"));
                        rwf <- URLRewriter.rewriteFunc)
                   yield rwf(updated)) openOr uri))
              case _ => v

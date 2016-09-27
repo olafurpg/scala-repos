@@ -173,7 +173,7 @@ class DoubleTest {
       (v == 0.0) &&
       (1 / v ==
         (if (neg) Double.NegativeInfinity
-        else Double.PositiveInfinity))
+         else Double.PositiveInfinity))
     }
 
     import JDouble.{longBitsToDouble => f}

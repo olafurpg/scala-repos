@@ -345,11 +345,11 @@ trait VectorOps { this: Vector.type =>
 
   @expand.valify
   @expand
-  implicit def v_v_Idempotent_Op[
-      @expand.args(Int, Double, Float, Long) T,
-      @expand.args(OpAdd, OpSub) Op <: OpType](implicit @expand.sequence[Op]({
-    _ + _
-  }, { _ - _ }) op: Op.Impl2[T, T, T])
+  implicit def v_v_Idempotent_Op[@expand.args(Int, Double, Float, Long) T,
+                                 @expand.args(OpAdd, OpSub) Op <: OpType](
+      implicit @expand.sequence[Op]({
+        _ + _
+      }, { _ - _ }) op: Op.Impl2[T, T, T])
     : BinaryRegistry[Vector[T], Vector[T], Op.type, Vector[T]] =
     new BinaryRegistry[Vector[T], Vector[T], Op.type, Vector[T]] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): Vector[T] = {

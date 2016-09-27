@@ -217,8 +217,8 @@ final case class PreRestartException private[akka] (actor: ActorRef,
       actor,
       "exception in preRestart(" +
         (if (originalCause == null)
-          "null"
-        else originalCause.getClass) + ", " +
+           "null"
+         else originalCause.getClass) + ", " +
         (messageOption match {
           case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
         }) + ")",

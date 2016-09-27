@@ -95,7 +95,7 @@ object ResourceServer {
       ): Box[LiftResponse] =
     for {
       auri <- Full(uri.filter(!_.startsWith("."))).filter(auri =>
-               isAllowed(auri))
+        isAllowed(auri))
       rw = baseResourceLocation :: pathRewriter(auri)
       path = rw.mkString("/", "/", "")
       url <- LiftRules.getResource(path)
@@ -111,8 +111,8 @@ object ResourceServer {
           () => stream.close,
           uc.getContentLength,
           (if (lastModified == 0L) Nil
-          else
-            List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
+           else
+             List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
             "Expires" -> toInternetDate(millis + 30.days),
             "Date" -> Helpers.nowAsInternetDate,
             "Pragma" -> "",

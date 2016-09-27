@@ -78,8 +78,8 @@ class EnsembleMenu extends EnsembleExample {
                   println(
                     """Menu item "foo" is now """ +
                       (if (fooMenuItem.visible())
-                        ""
-                      else "not") + " visible")
+                         ""
+                       else "not") + " visible")
                 }
               }
             )

@@ -19,7 +19,7 @@ object ActorPublisherTest {
 
     val source: Iterator[Int] =
       (if (allElements == Long.MaxValue) 1 to Int.MaxValue
-      else 0 until allElements.toInt).toIterator
+       else 0 until allElements.toInt).toIterator
 
     override def receive: Receive = {
       case Request(elements) ⇒

@@ -166,8 +166,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
         }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
                   OctetStream -> (XJsonStream, OctetStream))).toMap
       for {
-        selectedMT <- OptionT(M.point(
-                       requestedMimeTypes.find(acceptableMimeTypes.contains)))
+        selectedMT <- OptionT(
+          M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
         (conversionMT, returnMT) = acceptableMimeTypes(selectedMT)
         stream <- asByteStream(conversionMT)
       } yield (returnMT, stream)
@@ -189,8 +189,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
                                     AnyMimeType -> mimeType,
                                     OctetStream -> OctetStream)
       for {
-        selectedMT <- OptionT(M.point(
-                       requestedMimeTypes.find(acceptableMimeTypes.contains)))
+        selectedMT <- OptionT(
+          M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
         stream <- asByteStream(selectedMT)
       } yield (selectedMT, stream)
     }

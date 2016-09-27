@@ -484,123 +484,123 @@ abstract class UnCurry
       val result =
         (if ((sym ne null) &&
              sym.elisionLevel.exists(_ < settings.elidebelow.value))
-          replaceElidableTree(tree)
-        else
-          translateSynchronized(tree) match {
-            case dd @ DefDef(mods, name, tparams, _, tpt, rhs) =>
-              // Remove default argument trees from parameter ValDefs, SI-4812
-              val vparamssNoRhs =
-                dd.vparamss mapConserve
-                  (_ mapConserve { p =>
-                    treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
-                  })
+           replaceElidableTree(tree)
+         else
+           translateSynchronized(tree) match {
+             case dd @ DefDef(mods, name, tparams, _, tpt, rhs) =>
+               // Remove default argument trees from parameter ValDefs, SI-4812
+               val vparamssNoRhs =
+                 dd.vparamss mapConserve
+                   (_ mapConserve { p =>
+                     treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
+                   })
 
-              if (dd.symbol hasAnnotation VarargsClass) validateVarargs(dd)
+               if (dd.symbol hasAnnotation VarargsClass) validateVarargs(dd)
 
-              withNeedLift(needLift = false) {
-                if (dd.symbol.isClassConstructor) {
-                  atOwner(sym) {
-                    val rhs1 = (rhs: @unchecked) match {
-                      case Block(stats, expr) =>
-                        def transformInConstructor(stat: Tree) =
-                          withInConstructorFlag(INCONSTRUCTOR) {
-                            transform(stat)
-                          }
-                        val presupers =
-                          treeInfo.preSuperFields(stats) map transformInConstructor
-                        val rest = stats drop presupers.length
-                        val supercalls =
-                          rest take 1 map transformInConstructor
-                        val others = rest drop 1 map transform
-                        treeCopy.Block(rhs,
-                                       presupers ::: supercalls ::: others,
-                                       transform(expr))
-                    }
-                    treeCopy.DefDef(dd,
-                                    mods,
-                                    name,
-                                    transformTypeDefs(tparams),
-                                    transformValDefss(vparamssNoRhs),
-                                    transform(tpt),
-                                    rhs1)
-                  }
-                } else {
-                  super.transform(treeCopy
-                    .DefDef(dd, mods, name, tparams, vparamssNoRhs, tpt, rhs))
-                }
-              }
-            case ValDef(_, _, _, rhs) =>
-              if (sym eq NoSymbol)
-                throw new IllegalStateException(
-                  "Encountered Valdef without symbol: " + tree + " in " +
-                    unit)
-              if (!sym.owner.isSourceMethod)
-                withNeedLift(needLift = true) { super.transform(tree) } else
-                super.transform(tree)
+               withNeedLift(needLift = false) {
+                 if (dd.symbol.isClassConstructor) {
+                   atOwner(sym) {
+                     val rhs1 = (rhs: @unchecked) match {
+                       case Block(stats, expr) =>
+                         def transformInConstructor(stat: Tree) =
+                           withInConstructorFlag(INCONSTRUCTOR) {
+                             transform(stat)
+                           }
+                         val presupers =
+                           treeInfo.preSuperFields(stats) map transformInConstructor
+                         val rest = stats drop presupers.length
+                         val supercalls =
+                           rest take 1 map transformInConstructor
+                         val others = rest drop 1 map transform
+                         treeCopy.Block(rhs,
+                                        presupers ::: supercalls ::: others,
+                                        transform(expr))
+                     }
+                     treeCopy.DefDef(dd,
+                                     mods,
+                                     name,
+                                     transformTypeDefs(tparams),
+                                     transformValDefss(vparamssNoRhs),
+                                     transform(tpt),
+                                     rhs1)
+                   }
+                 } else {
+                   super.transform(treeCopy
+                     .DefDef(dd, mods, name, tparams, vparamssNoRhs, tpt, rhs))
+                 }
+               }
+             case ValDef(_, _, _, rhs) =>
+               if (sym eq NoSymbol)
+                 throw new IllegalStateException(
+                   "Encountered Valdef without symbol: " + tree + " in " +
+                     unit)
+               if (!sym.owner.isSourceMethod)
+                 withNeedLift(needLift = true) { super.transform(tree) } else
+                 super.transform(tree)
 
-            case Apply(fn, args) =>
-              val needLift =
-                needTryLift ||
-                  !fn.symbol.isLabel // SI-6749, no need to lift in args to label jumps.
-              withNeedLift(needLift) {
-                val formals = fn.tpe.paramTypes
-                treeCopy.Apply(
-                  tree,
-                  transform(fn),
-                  transformTrees(
-                    transformArgs(tree.pos, fn.symbol, args, formals)))
-              }
+             case Apply(fn, args) =>
+               val needLift =
+                 needTryLift ||
+                   !fn.symbol.isLabel // SI-6749, no need to lift in args to label jumps.
+               withNeedLift(needLift) {
+                 val formals = fn.tpe.paramTypes
+                 treeCopy.Apply(
+                   tree,
+                   transform(fn),
+                   transformTrees(
+                     transformArgs(tree.pos, fn.symbol, args, formals)))
+               }
 
-            case Assign(_: RefTree, _) =>
-              withNeedLift(needLift = true) { super.transform(tree) }
+             case Assign(_: RefTree, _) =>
+               withNeedLift(needLift = true) { super.transform(tree) }
 
-            case Assign(lhs, _)
-                if lhs.symbol.owner != currentMethod ||
-                  lhs.symbol.hasFlag(LAZY | ACCESSOR) =>
-              withNeedLift(needLift = true) { super.transform(tree) }
+             case Assign(lhs, _)
+                 if lhs.symbol.owner != currentMethod ||
+                   lhs.symbol.hasFlag(LAZY | ACCESSOR) =>
+               withNeedLift(needLift = true) { super.transform(tree) }
 
-            case ret @ Return(_) if (isNonLocalReturn(ret)) =>
-              withNeedLift(needLift = true) { super.transform(ret) }
+             case ret @ Return(_) if (isNonLocalReturn(ret)) =>
+               withNeedLift(needLift = true) { super.transform(ret) }
 
-            case Try(_, Nil, _) =>
-              // try-finally does not need lifting: lifting is needed only for try-catch
-              // expressions that are evaluated in a context where the stack might not be empty.
-              // `finally` does not attempt to continue evaluation after an exception, so the fact
-              // that values on the stack are 'lost' does not matter
-              super.transform(tree)
+             case Try(_, Nil, _) =>
+               // try-finally does not need lifting: lifting is needed only for try-catch
+               // expressions that are evaluated in a context where the stack might not be empty.
+               // `finally` does not attempt to continue evaluation after an exception, so the fact
+               // that values on the stack are 'lost' does not matter
+               super.transform(tree)
 
-            case Try(block, catches, finalizer) =>
-              if (needTryLift) transform(liftTree(tree))
-              else super.transform(tree)
+             case Try(block, catches, finalizer) =>
+               if (needTryLift) transform(liftTree(tree))
+               else super.transform(tree)
 
-            case CaseDef(pat, guard, body) =>
-              val pat1 = transform(pat)
-              treeCopy.CaseDef(tree, pat1, transform(guard), transform(body))
+             case CaseDef(pat, guard, body) =>
+               val pat1 = transform(pat)
+               treeCopy.CaseDef(tree, pat1, transform(guard), transform(body))
 
-            // if a lambda is already the right shape we don't need to transform it again
-            case fun @ Function(_, Apply(target, _))
-                if (!inlineFunctionExpansion) && isLiftedLambdaBody(target) =>
-              super.transform(fun)
+             // if a lambda is already the right shape we don't need to transform it again
+             case fun @ Function(_, Apply(target, _))
+                 if (!inlineFunctionExpansion) && isLiftedLambdaBody(target) =>
+               super.transform(fun)
 
-            case fun @ Function(_, _) =>
-              mainTransform(transformFunction(fun))
+             case fun @ Function(_, _) =>
+               mainTransform(transformFunction(fun))
 
-            case Template(_, _, _) =>
-              withInConstructorFlag(0) { super.transform(tree) }
+             case Template(_, _, _) =>
+               withInConstructorFlag(0) { super.transform(tree) }
 
-            case _ =>
-              val tree1 = super.transform(tree)
-              if (isByNameRef(tree1)) {
-                val tree2 = tree1 setType functionType(Nil, tree1.tpe)
-                return {
-                  if (noApply contains tree2) tree2
-                  else
-                    localTyper.typedPos(tree1.pos)(
-                      Apply(Select(tree2, nme.apply), Nil))
-                }
-              }
-              tree1
-          })
+             case _ =>
+               val tree1 = super.transform(tree)
+               if (isByNameRef(tree1)) {
+                 val tree2 = tree1 setType functionType(Nil, tree1.tpe)
+                 return {
+                   if (noApply contains tree2) tree2
+                   else
+                     localTyper.typedPos(tree1.pos)(
+                       Apply(Select(tree2, nme.apply), Nil))
+                 }
+               }
+               tree1
+           })
       assert(result.tpe != null,
              result.shortClass + " tpe is null:\n" + result)
       result modifyType uncurry

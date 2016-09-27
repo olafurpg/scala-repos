@@ -21,7 +21,7 @@ abstract class Phase(val prev: Phase) {
 
   val fmask =
     (if (prev eq null) Flags.InitialFlags
-    else prev.flagMask | prev.nextFlags | newFlags)
+     else prev.flagMask | prev.nextFlags | newFlags)
   def flagMask: Long = fmask
 
   private var nx: Phase = NoPhase

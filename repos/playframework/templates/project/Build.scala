@@ -250,9 +250,8 @@ object Templates {
             val status: Future[TemplateStatus] = for {
               _ <- timeout(2.seconds)
               resp <- clientCall(statusUrl)
-                       .withHeaders(
-                         "Accept" -> "application/json,text/html;q=0.9")
-                       .get()
+                .withHeaders("Accept" -> "application/json,text/html;q=0.9")
+                .get()
             } yield {
               resp.header("Content-Type") match {
                 case Some(json) if json.startsWith("application/json") =>
@@ -308,7 +307,7 @@ object Templates {
                       val statusUrl = (for {
                         links <- (js \ "_links").asOpt[JsObject]
                         status <- (links \ "activator/templates/status")
-                                   .asOpt[JsObject]
+                          .asOpt[JsObject]
                         url <- (status \ "href").asOpt[String]
                       } yield
                         url).getOrElse(s"/activator/template/status/$uuid")

@@ -929,10 +929,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       checkAssoc(opHead.offset, opHead.operator, leftAssoc)
     def checkAssoc(offset: Offset, op: Name, leftAssoc: Boolean) =
       (if (treeInfo.isLeftAssoc(op) != leftAssoc)
-        syntaxError(
-          offset,
-          "left- and right-associative operators with same precedence may not be mixed",
-          skipIt = false))
+         syntaxError(
+           offset,
+           "left- and right-associative operators with same precedence may not be mixed",
+           skipIt = false))
 
     def finishPostfixOp(start: Int, base: List[OpInfo], opinfo: OpInfo): Tree = {
       if (opinfo.targs.nonEmpty)
@@ -1207,11 +1207,12 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     /** Assumed (provisionally) to be TermNames. */
     def ident(skipIt: Boolean): Name =
       (if (isIdent) {
-        val name = in.name.encode
-        in.nextToken()
-        name
-      } else
-        syntaxErrorOrIncompleteAnd(expectedMsg(IDENTIFIER), skipIt)(nme.ERROR))
+         val name = in.name.encode
+         in.nextToken()
+         name
+       } else
+         syntaxErrorOrIncompleteAnd(expectedMsg(IDENTIFIER), skipIt)(
+           nme.ERROR))
 
     def ident(): Name = ident(skipIt = true)
     def rawIdent(): Name =
@@ -1418,15 +1419,15 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           partsBuf += literal()
           exprsBuf +=
             (if (inPattern) dropAnyBraces(pattern())
-            else
-              in.token match {
-                case IDENTIFIER => atPos(in.offset)(Ident(ident()))
-                //case USCORE   => freshPlaceholder()  // ifonly etapolation
-                case LBRACE => expr() // dropAnyBraces(expr0(Local))
-                case THIS =>
-                  in.nextToken(); atPos(in.offset)(This(tpnme.EMPTY))
-                case _ => errpolation()
-              })
+             else
+               in.token match {
+                 case IDENTIFIER => atPos(in.offset)(Ident(ident()))
+                 //case USCORE   => freshPlaceholder()  // ifonly etapolation
+                 case LBRACE => expr() // dropAnyBraces(expr0(Local))
+                 case THIS =>
+                   in.nextToken(); atPos(in.offset)(This(tpnme.EMPTY))
+                 case _ => errpolation()
+               })
         }
         if (in.token == STRINGLIT) partsBuf += literal()
 
@@ -3117,10 +3118,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     }
     def packageOrPackageObject(start: Offset): Tree =
       (if (in.token == OBJECT) joinComment(packageObjectDef(start) :: Nil).head
-      else {
-        in.flushDoc
-        makePackaging(start, pkgQualId(), inBracesOrNil(topStatSeq()))
-      })
+       else {
+         in.flushDoc
+         makePackaging(start, pkgQualId(), inBracesOrNil(topStatSeq()))
+       })
     // TODO - eliminate this and use "def packageObjectDef" (see call site of this
     // method for small elaboration.)
     def makePackageObject(start: Offset, objDef: ModuleDef): PackageDef =
@@ -3215,14 +3216,14 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
                     tstart: Offset): Template = {
       val (parents, self, body) =
         (if (in.token == EXTENDS || in.token == SUBTYPE && mods.isTrait) {
-          in.nextToken()
-          template()
-        } else {
-          newLineOptWhenFollowedBy(LBRACE)
-          val (self, body) = templateBodyOpt(
-            parenMeansSyntaxError = mods.isTrait || name.isTermName)
-          (List(), self, body)
-        })
+           in.nextToken()
+           template()
+         } else {
+           newLineOptWhenFollowedBy(LBRACE)
+           val (self, body) = templateBodyOpt(
+             parenMeansSyntaxError = mods.isTrait || name.isTermName)
+           (List(), self, body)
+         })
       def anyvalConstructor() = (
         // Not a well-formed constructor, has to be finished later - see note
         // regarding AnyVal constructor in AddInterfaces.
@@ -3421,8 +3422,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         syntaxErrorOrIncomplete(
           "illegal start of declaration" +
             (if (inFunReturnType)
-              " (possible cause: missing `=' in front of current method body)"
-            else ""),
+               " (possible cause: missing `=' in front of current method body)"
+             else ""),
           skipIt = true)
         Nil
       } else Nil

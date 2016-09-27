@@ -54,7 +54,7 @@ case class TreePrinter(name: String = "",
         out.println(
           di.mainInfo +
             (if (di.attrInfo.isEmpty) ""
-            else " " + cBlue + di.attrInfo + cNormal))
+             else " " + cBlue + di.attrInfo + cNormal))
       }
       val children = di.children.toIndexedSeq
       children.zipWithIndex.foreach {

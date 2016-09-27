@@ -101,17 +101,17 @@ object MultiNodeScalaTest extends AutoPlugin {
     scalatestOptions in MultiJvm := {
       Seq("-C", "org.scalatest.extra.QuietReporter") ++
         (if (excludeTestTags.value.isEmpty) Seq.empty
-        else
-          Seq("-l",
-              if (MultiNode.CliOptions.multiNode.get)
-                excludeTestTags.value.mkString("\"", " ", "\"")
-              else excludeTestTags.value.mkString(" "))) ++
+         else
+           Seq("-l",
+               if (MultiNode.CliOptions.multiNode.get)
+                 excludeTestTags.value.mkString("\"", " ", "\"")
+               else excludeTestTags.value.mkString(" "))) ++
         (if (onlyTestTags.value.isEmpty) Seq.empty
-        else
-          Seq("-n",
-              if (MultiNode.CliOptions.multiNode.get)
-                onlyTestTags.value.mkString("\"", " ", "\"")
-              else onlyTestTags.value.mkString(" ")))
+         else
+           Seq("-n",
+               if (MultiNode.CliOptions.multiNode.get)
+                 onlyTestTags.value.mkString("\"", " ", "\"")
+               else onlyTestTags.value.mkString(" ")))
     }
   )
 }

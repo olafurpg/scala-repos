@@ -564,10 +564,10 @@ trait TestKitBase {
                                         unexpectedMessage: String): Unit = {
     assert(missing.isEmpty && unexpected.isEmpty,
            (if (missing.isEmpty)
-             ""
-           else missing.mkString(missingMessage + " [", ", ", "] ")) +
+              ""
+            else missing.mkString(missingMessage + " [", ", ", "] ")) +
              (if (unexpected.isEmpty) ""
-             else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
+              else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
   }
 
   private def expectMsgAllOf_internal[T](max: FiniteDuration,

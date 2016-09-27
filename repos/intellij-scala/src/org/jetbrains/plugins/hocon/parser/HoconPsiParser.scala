@@ -47,7 +47,7 @@ class HoconPsiParser extends PsiParser {
           def entireLineComment =
             token == commentToken &&
               (if (i > 0) tokens.get(i - 1) == LineBreakingWhitespace
-              else atStreamEdge)
+               else atStreamEdge)
           def noBlankLineWhitespace =
             Whitespace.contains(token) &&
               text.charIterator.count(_ == '\n') <= 1

@@ -26,8 +26,8 @@ object Dependencies {
       sys.props.get("akka.build.scalaCheckVersion").getOrElse("1.11.6"),
     scalaTestVersion :=
       (if (scalaVersion.value == "2.12.0-M2") "2.2.5-M2"
-      else if (scalaVersion.value == "2.12.0-M3") "2.2.5-M3"
-      else "2.2.4")
+       else if (scalaVersion.value == "2.12.0-M3") "2.2.5-M3"
+       else "2.2.4")
   )
 
   object Compile {

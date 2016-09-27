@@ -160,26 +160,26 @@ object Schemifier extends Loggable {
                                            connection,
                                            actualTableNames))) +
           (if (structureOnly) EmptyCollector
-          else
-            (tables.foldLeft(EmptyCollector)(
-              (b, t) =>
-                b + tableCheck(t,
-                               "ensureIndexes",
-                               ensureIndexes(performWrite,
-                                             logFunc,
-                                             t,
-                                             connection,
-                                             actualTableNames))) +
-              tables.foldLeft(EmptyCollector)(
-                (b, t) =>
-                  b + tableCheck(t,
-                                 "ensureConstraints",
-                                 ensureConstraints(performWrite,
-                                                   logFunc,
-                                                   t,
-                                                   dbId,
-                                                   connection,
-                                                   actualTableNames)))))
+           else
+             (tables.foldLeft(EmptyCollector)(
+               (b, t) =>
+                 b + tableCheck(t,
+                                "ensureIndexes",
+                                ensureIndexes(performWrite,
+                                              logFunc,
+                                              t,
+                                              connection,
+                                              actualTableNames))) +
+               tables.foldLeft(EmptyCollector)(
+                 (b, t) =>
+                   b + tableCheck(t,
+                                  "ensureConstraints",
+                                  ensureConstraints(performWrite,
+                                                    logFunc,
+                                                    t,
+                                                    dbId,
+                                                    connection,
+                                                    actualTableNames)))))
 
       if (performWrite) {
         logger.debug("Executing DDL statements")

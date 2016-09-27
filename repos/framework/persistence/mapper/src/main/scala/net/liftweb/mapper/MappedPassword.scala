@@ -315,5 +315,5 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     */
   def fieldCreatorString(dbType: DriverType, colName: String): String =
     (if (colName.endsWith("_pw")) colName + " VARCHAR(48)"
-    else colName + " VARCHAR(20)") + notNullAppender()
+     else colName + " VARCHAR(20)") + notNullAppender()
 }

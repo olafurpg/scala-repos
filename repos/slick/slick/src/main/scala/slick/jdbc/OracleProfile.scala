@@ -108,11 +108,11 @@ trait OracleProfile extends JdbcProfile {
     for {
       user <- SimpleJdbcAction(_.session.metaData.getUserName)
       tables <- SQLActionBuilder(
-                 Seq("select TABLE_NAME from all_tables where OWNER = ?"),
-                 implicitly[SetParameter[String]].applied(user)).as[String]
+        Seq("select TABLE_NAME from all_tables where OWNER = ?"),
+        implicitly[SetParameter[String]].applied(user)).as[String]
       mtables <- MTable
-                  .getTables(None, None, None, Some(Seq("TABLE")))
-                  .map(_.filter(t => tables contains t.name.name)) // FIXME: this should check schema and maybe more
+        .getTables(None, None, None, Some(Seq("TABLE")))
+        .map(_.filter(t => tables contains t.name.name)) // FIXME: this should check schema and maybe more
     } yield mtables
   }
 

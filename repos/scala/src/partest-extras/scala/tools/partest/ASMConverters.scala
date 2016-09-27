@@ -79,8 +79,8 @@ object ASMConverters {
       val printOpcode = opcode != -1
       productPrefix +
         (if (printOpcode)
-          Iterator(opcodeToString(opcode)) ++ productIterator.drop(1)
-        else productIterator).mkString("(", ", ", ")")
+           Iterator(opcodeToString(opcode)) ++ productIterator.drop(1)
+         else productIterator).mkString("(", ", ", ")")
     }
   }
 

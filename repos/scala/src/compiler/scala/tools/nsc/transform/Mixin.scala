@@ -480,9 +480,9 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
       import nme._
       val isNormal =
         (if (isFieldWithBitmap(field)) true
-        // bitmaps for checkinit fields are not inherited
-        else if (needsInitFlag(field) && !field.isDeferred) false
-        else return NO_NAME)
+         // bitmaps for checkinit fields are not inherited
+         else if (needsInitFlag(field) && !field.isDeferred) false
+         else return NO_NAME)
       if (field.accessed hasAnnotation TransientAttr) {
         if (isNormal) BITMAP_TRANSIENT
         else BITMAP_CHECKINIT_TRANSIENT

@@ -527,9 +527,9 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
 
   def functionsByName(name: String): Seq[PsiMethod] = {
     (for ((p: PhysicalSignature, _) <- TypeDefinitionMembers
-                                        .getSignatures(this)
-                                        .forName(name)
-                                        ._1)
+            .getSignatures(this)
+            .forName(name)
+            ._1)
       yield p.method).++(syntheticMethodsNoOverride.filter(_.name == name))
   }
 

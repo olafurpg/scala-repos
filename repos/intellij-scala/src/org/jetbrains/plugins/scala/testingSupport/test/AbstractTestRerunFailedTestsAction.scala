@@ -90,8 +90,8 @@ class AbstractTestRerunFailedTestsAction(
                 .previoslyFailed != null) {
             var added = false
             for (f <- extensionConfiguration
-                       .asInstanceOf[MyRunProfileAdapter]
-                       .previoslyFailed if !added) {
+                   .asInstanceOf[MyRunProfileAdapter]
+                   .previoslyFailed if !added) {
               if (f._2 == getTestName(failed)) {
                 buffer += f
                 added = true

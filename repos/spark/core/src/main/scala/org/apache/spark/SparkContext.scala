@@ -549,7 +549,7 @@ class SparkContext(config: SparkConf)
     for {
       (envKey, propKey) <- Seq(("SPARK_TESTING", "spark.testing"))
       value <- Option(System.getenv(envKey))
-                .orElse(Option(System.getProperty(propKey)))
+        .orElse(Option(System.getProperty(propKey)))
     } {
       executorEnvs(envKey) = value
     }

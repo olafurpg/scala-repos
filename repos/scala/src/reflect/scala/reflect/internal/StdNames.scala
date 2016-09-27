@@ -83,7 +83,7 @@ trait StdNames { self: SymbolTable =>
     }
     def apply(s: String): String =
       (if (s.length <= MaxNameLength) s
-      else toMD5(s, MaxNameLength / 4))
+       else toMD5(s, MaxNameLength / 4))
   }
 
   abstract class CommonNames extends NamesApi {
@@ -504,15 +504,15 @@ trait StdNames { self: SymbolTable =>
     // Nominally, name$default$N, encoded for <init>
     def defaultGetterName(name: Name, pos: Int): TermName =
       (if (isConstructorName(name)) DEFAULT_GETTER_INIT_STRING + pos
-      else name + DEFAULT_GETTER_STRING + pos)
+       else name + DEFAULT_GETTER_STRING + pos)
     // Nominally, name from name$default$N, CONSTRUCTOR for <init>
     def defaultGetterToMethod(name: Name): TermName =
       (if (name startsWith DEFAULT_GETTER_INIT_STRING) nme.CONSTRUCTOR
-      else
-        name indexOf DEFAULT_GETTER_STRING match {
-          case -1 => name.toTermName
-          case idx => name.toTermName take idx
-        })
+       else
+         name indexOf DEFAULT_GETTER_STRING match {
+           case -1 => name.toTermName
+           case idx => name.toTermName take idx
+         })
 
     def localDummyName(clazz: Symbol): TermName =
       newTermName(LOCALDUMMY_PREFIX + clazz.name + ">")

@@ -337,12 +337,12 @@ abstract class UnPickler {
         markFlagsCompleted(sym)(mask = AllFlags)
         sym.privateWithin = privateWithin
         sym.info = (if (atEnd) {
-          assert(!sym.isSuperAccessor, sym)
-          newLazyTypeRef(inforef)
-        } else {
-          assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
-          newLazyTypeRefAndAlias(inforef, readNat())
-        })
+                      assert(!sym.isSuperAccessor, sym)
+                      newLazyTypeRef(inforef)
+                    } else {
+                      assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
+                      newLazyTypeRefAndAlias(inforef, readNat())
+                    })
         if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
 
         sym
@@ -354,9 +354,9 @@ abstract class UnPickler {
         case CLASSsym =>
           val sym =
             (if (isClassRoot) {
-              if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
-              else classRoot setFlag pflags
-            } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
+               if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
+               else classRoot setFlag pflags
+             } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
           if (!atEnd) sym.typeOfThis = newLazyTypeRef(readNat())
 
           sym
@@ -389,7 +389,7 @@ abstract class UnPickler {
       // alternative after parsing the arguments.
       def MethodTypeRef(restpe: Type, params: List[Symbol]): Type =
         (if (restpe == NoType || (params contains NoSymbol)) NoType
-        else MethodType(params, restpe))
+         else MethodType(params, restpe))
       def PolyOrNullaryType(restpe: Type, tparams: List[Symbol]): Type =
         tparams match {
           case Nil => NullaryMethodType(restpe)

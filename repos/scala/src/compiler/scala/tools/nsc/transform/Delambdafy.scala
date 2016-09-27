@@ -337,7 +337,7 @@ abstract class Delambdafy
         val suffix =
           nme.DELAMBDAFY_LAMBDA_CLASS_NAME + "$" +
             (if (funOwner.isPrimaryConstructor) ""
-            else "$" + funOwner.name + "$")
+             else "$" + funOwner.name + "$")
         val oldClassPart = oldClass.name.decode
         // make sure the class name doesn't contain $anon, otherwise isAnonymousClass/Function may be true
         val name = unit.freshTypeName(

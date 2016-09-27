@@ -616,40 +616,41 @@ object JGitUtil {
           val buffer = new scala.collection.mutable.ListBuffer[DiffInfo]()
           while (treeWalk.next) {
             val newIsImage = FileUtil.isImage(treeWalk.getPathString)
-            buffer.append((if (!fetchContent) {
-              DiffInfo(
-                changeType = ChangeType.ADD,
-                oldPath = null,
-                newPath = treeWalk.getPathString,
-                oldContent = None,
-                newContent = None,
-                oldIsImage = false,
-                newIsImage = newIsImage,
-                oldObjectId = None,
-                newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
-                oldMode = treeWalk.getFileMode(0).toString,
-                newMode = treeWalk.getFileMode(0).toString,
-                tooLarge = false
-              )
-            } else {
-              DiffInfo(
-                changeType = ChangeType.ADD,
-                oldPath = null,
-                newPath = treeWalk.getPathString,
-                oldContent = None,
-                newContent = JGitUtil
-                  .getContentFromId(git, treeWalk.getObjectId(0), false)
-                  .filter(FileUtil.isText)
-                  .map(convertFromByteArray),
-                oldIsImage = false,
-                newIsImage = newIsImage,
-                oldObjectId = None,
-                newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
-                oldMode = treeWalk.getFileMode(0).toString,
-                newMode = treeWalk.getFileMode(0).toString,
-                tooLarge = false
-              )
-            }))
+            buffer.append(
+              (if (!fetchContent) {
+                 DiffInfo(
+                   changeType = ChangeType.ADD,
+                   oldPath = null,
+                   newPath = treeWalk.getPathString,
+                   oldContent = None,
+                   newContent = None,
+                   oldIsImage = false,
+                   newIsImage = newIsImage,
+                   oldObjectId = None,
+                   newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
+                   oldMode = treeWalk.getFileMode(0).toString,
+                   newMode = treeWalk.getFileMode(0).toString,
+                   tooLarge = false
+                 )
+               } else {
+                 DiffInfo(
+                   changeType = ChangeType.ADD,
+                   oldPath = null,
+                   newPath = treeWalk.getPathString,
+                   oldContent = None,
+                   newContent = JGitUtil
+                     .getContentFromId(git, treeWalk.getObjectId(0), false)
+                     .filter(FileUtil.isText)
+                     .map(convertFromByteArray),
+                   oldIsImage = false,
+                   newIsImage = newIsImage,
+                   oldObjectId = None,
+                   newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
+                   oldMode = treeWalk.getFileMode(0).toString,
+                   newMode = treeWalk.getFileMode(0).toString,
+                   tooLarge = false
+                 )
+               }))
           }
           (buffer.toList, None)
         }

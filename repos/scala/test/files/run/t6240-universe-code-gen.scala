@@ -17,7 +17,7 @@ object Test extends App {
       val path = s"$prefix.${sym.name}"
       "    " +
         (if (sym.isPrivate || sym.isProtected) s"// inaccessible: $path"
-        else path)
+         else path)
     }.mkString("\n")
   }
 

@@ -37,8 +37,8 @@ class GaussianTest
   def arbParameter = Arbitrary {
     for (mean <- arbitrary[Double].map { _ % 10000.0 };
          std <- arbitrary[Double].map { x =>
-                 math.abs(x) % 8.0 + .1
-               }) yield (mean, std)
+           math.abs(x) % 8.0 + .1
+         }) yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -70,11 +70,11 @@ class GaussianTest
 
   implicit def arbDistr: Arbitrary[Distr] = Arbitrary {
     for (mean <- arbitrary[Double].map { x =>
-                  math.abs(x) % 10000.0
-                };
+           math.abs(x) % 10000.0
+         };
          std <- arbitrary[Double].map { x =>
-                 math.abs(x) % 8.0 + .1
-               }) yield new Gaussian(mean, std);
+           math.abs(x) % 8.0 + .1
+         }) yield new Gaussian(mean, std);
   }
 
   def asDouble(x: Double) = x

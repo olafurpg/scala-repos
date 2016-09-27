@@ -205,8 +205,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
           val code =
             s"""
           |boolean $isNull = true;
-          |${ctx.javaType(a.dataType)} $value = ${ctx
-                 .defaultValue(a.dataType)};
+          |${ctx.javaType(a.dataType)} $value = ${ctx.defaultValue(a.dataType)};
           |if ($matched != null) {
           |  ${ev.code}
           |  $isNull = ${ev.isNull};

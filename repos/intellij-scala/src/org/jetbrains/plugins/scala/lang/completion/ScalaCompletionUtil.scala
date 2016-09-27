@@ -99,8 +99,8 @@ object ScalaCompletionUtil {
       case (s, tp) =>
         s + ": " +
           (if (canonical) {
-            ScType.canonicalText(tp)
-          } else ScType.presentableText(tp))
+             ScType.canonicalText(tp)
+           } else ScType.presentableText(tp))
     }
     val paramsString =
       if (paramNamesWithTypes.size != 1 || !braceArgs)

@@ -111,14 +111,14 @@ trait DocFinding { self: RichPresentationCompiler =>
   private def signatureString(sym: Symbol, java: Boolean): String = {
     sym.nameString +
       (if (java) {
-        if (sym.paramLists.isEmpty) ""
-        else
-          sym.paramLists
-            .flatMap(_.map { sym =>
-              javaFqn(sym.tpe).mkString
-            })
-            .mkString("(", ", ", ")")
-      } else sym.signatureString.replaceAll("[\\s]", ""))
+         if (sym.paramLists.isEmpty) ""
+         else
+           sym.paramLists
+             .flatMap(_.map { sym =>
+               javaFqn(sym.tpe).mkString
+             })
+             .mkString("(", ", ", ")")
+       } else sym.signatureString.replaceAll("[\\s]", ""))
   }
 
   def docSignature(sym: Symbol, pos: Option[Position]): Option[DocSigPair] = {

@@ -49,36 +49,36 @@ trait Enumeratee2TFunctions {
                 leftOpt <- peek[J, IterateeM]
                 rightOpt <- lift[J, K, F, Option[K]](peek[K, F])
                 a <- (leftOpt, rightOpt) match {
-                      case (left, Some(right))
-                          if left.forall(order(_, right) == GT) =>
-                        for {
-                          _ <- lift[J, K, F, Option[K]](head[K, F])
-                          a <- iterateeT[J, IterateeM, StepM[A]](
-                                contf(elInput(Right3(right))) >>==
-                                  (step(_, Nil).value))
-                        } yield a
+                  case (left, Some(right))
+                      if left.forall(order(_, right) == GT) =>
+                    for {
+                      _ <- lift[J, K, F, Option[K]](head[K, F])
+                      a <- iterateeT[J, IterateeM, StepM[A]](
+                        contf(elInput(Right3(right))) >>==
+                          (step(_, Nil).value))
+                    } yield a
 
-                      case (Some(left), right)
-                          if right.forall(order(left, _) == LT) =>
-                        for {
-                          _ <- head[J, IterateeM]
-                          a <- iterateeT[J, IterateeM, StepM[A]](
-                                advance(left, rbuf, scont(contf)) >>==
-                                  (step(_, rbuf).value))
-                        } yield a
+                  case (Some(left), right)
+                      if right.forall(order(left, _) == LT) =>
+                    for {
+                      _ <- head[J, IterateeM]
+                      a <- iterateeT[J, IterateeM, StepM[A]](
+                        advance(left, rbuf, scont(contf)) >>==
+                          (step(_, rbuf).value))
+                    } yield a
 
-                      case (Some(left), Some(right)) =>
-                        for {
-                          _ <- lift[J, K, F, Option[K]](head[K, F])
-                          a <- step(s,
-                                    if (rbuf.headOption.exists(
-                                          order(left, _) == EQ))
-                                      right :: rbuf
-                                    else right :: Nil)
-                        } yield a
+                  case (Some(left), Some(right)) =>
+                    for {
+                      _ <- lift[J, K, F, Option[K]](head[K, F])
+                      a <- step(
+                        s,
+                        if (rbuf.headOption.exists(order(left, _) == EQ))
+                          right :: rbuf
+                        else right :: Nil)
+                    } yield a
 
-                      case _ => done[J, IterateeM, StepM[A]](s, eofInput)
-                    }
+                  case _ => done[J, IterateeM, StepM[A]](s, eofInput)
+                }
               } yield a
             },
             done = (a, r) =>
@@ -128,22 +128,22 @@ trait Enumeratee2TFunctions {
                 leftOpt <- peek[E, IterateeM]
                 rightOpt <- lift[E, E, F, Option[E]](peek[E, F])
                 a <- (leftOpt, rightOpt) match {
-                      case (left, Some(right)) if left.forall(_ > right) =>
-                        for {
-                          _ <- lift[E, E, F, Option[E]](head[E, F])
-                          a <- iterateeT[E, IterateeM, StepM[A]](
-                                contf(elInput(right)) >>== (step(_).value))
-                        } yield a
+                  case (left, Some(right)) if left.forall(_ > right) =>
+                    for {
+                      _ <- lift[E, E, F, Option[E]](head[E, F])
+                      a <- iterateeT[E, IterateeM, StepM[A]](
+                        contf(elInput(right)) >>== (step(_).value))
+                    } yield a
 
-                      case (Some(left), _) =>
-                        for {
-                          _ <- head[E, IterateeM]
-                          a <- iterateeT[E, IterateeM, StepM[A]](
-                                contf(elInput(left)) >>== (step(_).value))
-                        } yield a
+                  case (Some(left), _) =>
+                    for {
+                      _ <- head[E, IterateeM]
+                      a <- iterateeT[E, IterateeM, StepM[A]](
+                        contf(elInput(left)) >>== (step(_).value))
+                    } yield a
 
-                      case _ => done[E, IterateeM, StepM[A]](s, eofInput)
-                    }
+                  case _ => done[E, IterateeM, StepM[A]](s, eofInput)
+                }
               } yield a
             },
             done = (a, r) =>

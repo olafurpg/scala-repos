@@ -39,7 +39,7 @@ case class Puzzle(id: PuzzleId,
       sit1 <- Forsyth << fen
       uci <- Uci.Move(initialMove)
       sit2 <- sit1.move(uci.orig, uci.dest, uci.promotion).toOption map
-               (_.situationAfter)
+        (_.situationAfter)
     } yield Forsyth >> sit2
   }
 }

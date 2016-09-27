@@ -298,7 +298,7 @@ object Group {
                 existingApp <- group.transitiveApps.toList
                 if existingApp.id != app.id // in case of an update, do not compare the app against itself
                 existingServicePort <- existingApp.portMappings.toList.flatten
-                                        .map(_.servicePort)
+                  .map(_.servicePort)
                 if existingServicePort != 0 // ignore zero ports, which will be chosen at random
                 if servicePorts contains existingServicePort
               } yield

@@ -384,8 +384,8 @@ class ScalaTestConfigurationProducer extends {
             case SuccessResult(_, featureName, _) =>
               //check with Informing is used to distinguish scalatest 2.0 from scalatest 1.9.2
               testName = (if (isInheritor(clazz, "org.scalatest.Informing"))
-                  "Feature: "
-                else "") + featureName + " " + testName
+                            "Feature: "
+                          else "") + featureName + " " + testName
             case WrongResult => return None
             case _ =>
           }

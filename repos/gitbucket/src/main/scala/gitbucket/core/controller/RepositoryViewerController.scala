@@ -952,8 +952,8 @@ trait RepositoryViewerControllerBase extends ControllerBase {
     val filename =
       repository.name + "-" +
         (if (revision.length == 40)
-          revision.substring(0, 10)
-        else revision).replace('/', '_') + suffix
+           revision.substring(0, 10)
+         else revision).replace('/', '_') + suffix
 
     using(Git.open(getRepositoryDir(repository.owner, repository.name))) {
       git =>

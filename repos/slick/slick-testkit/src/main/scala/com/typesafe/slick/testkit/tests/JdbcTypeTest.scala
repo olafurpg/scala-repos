@@ -26,7 +26,7 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
       _ <- ts += (1, Array[Byte](1, 2, 3))
       _ <- ts += (2, Array[Byte](4, 5))
       r1 <- ts.result.map(
-             _.map { case (id, data) => (id, data.mkString) }.toSet)
+        _.map { case (id, data) => (id, data.mkString) }.toSet)
       _ = r1 shouldBe Set((1, "123"), (2, "45"))
     } yield ()
     if (implicitly[ColumnType[Array[Byte]]].hasLiteralForm) {

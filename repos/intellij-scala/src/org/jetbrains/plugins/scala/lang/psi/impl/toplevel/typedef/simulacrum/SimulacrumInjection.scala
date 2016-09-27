@@ -158,7 +158,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                             .map(paramText)
                             .mkString("(" +
                                         (if (p.isImplicit) "implicit "
-                                        else ""),
+                                         else ""),
                                       ", ",
                                       ")")
                         }

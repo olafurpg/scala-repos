@@ -42,14 +42,14 @@ class GeometricTest
 
   def arbParameter = Arbitrary {
     for (p <- arbitrary[Double].map { m =>
-               (math.abs(m) % 1.0) + 1E-3
-             }) yield p
+           (math.abs(m) % 1.0) + 1E-3
+         }) yield p
   }
 
   def arbDistr = Arbitrary {
     for (p <- arbitrary[Double].map { m =>
-               (math.abs(m) % 1.0) + 1E-3
-             }) yield new Geometric(p)(RandBasis.mt0)
+           (math.abs(m) % 1.0) + 1E-3
+         }) yield new Geometric(p)(RandBasis.mt0)
   }
 
   def asDouble(x: Int) = x.toDouble

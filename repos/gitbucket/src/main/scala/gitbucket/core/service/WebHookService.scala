@@ -303,9 +303,9 @@ trait WebHookPullRequestService extends WebHookService {
     import WebHookService._
     for {
       ((issue, issueUser, pullRequest, baseOwner, headOwner), webHooks) <- getPullRequestsByRequestForWebhook(
-                                                                            requestRepository.owner,
-                                                                            requestRepository.name,
-                                                                            requestBranch)
+        requestRepository.owner,
+        requestRepository.name,
+        requestBranch)
       baseRepo <- getRepository(pullRequest.userName,
                                 pullRequest.repositoryName)
     } yield {

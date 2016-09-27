@@ -68,21 +68,20 @@ object VersionLog {
         if (currentFile.exists) {
           for {
             jv <- JParser
-                   .parseFromFile(currentFile)
-                   .leftMap(ioError)
-                   .disjunction
+              .parseFromFile(currentFile)
+              .leftMap(ioError)
+              .disjunction
             version <- jv match {
-                        case JString(`unsetSentinel`) =>
-                          \/.left(
-                            NotFound(
-                              "No current data for the path %s exists; it has been archived."
-                                .format(dir)))
-                        case other =>
-                          other.validated[VersionEntry].disjunction leftMap {
-                            err =>
-                              Corrupt(err.message)
-                          }
-                      }
+              case JString(`unsetSentinel`) =>
+                \/.left(
+                  NotFound(
+                    "No current data for the path %s exists; it has been archived."
+                      .format(dir)))
+              case other =>
+                other.validated[VersionEntry].disjunction leftMap { err =>
+                  Corrupt(err.message)
+                }
+            }
           } yield version
         } else {
           \/.left(NotFound("No data found for path %s.".format(dir)))
@@ -113,9 +112,9 @@ object VersionLog {
         for {
           jv <- JParser.parseFromFile(headFile).leftMap(Error.thrown)
           version <- jv match {
-                      case JString(`unsetSentinel`) => Success(None)
-                      case other => other.validated[VersionEntry].map(Some(_))
-                    }
+            case JString(`unsetSentinel`) => Success(None)
+            case other => other.validated[VersionEntry].map(Some(_))
+          }
         } yield version
       } else {
         Success(None)
@@ -126,8 +125,8 @@ object VersionLog {
         for {
           jvs <- JParser.parseManyFromFile(logFile).leftMap(Error.thrown)
           versions <- jvs.toList
-                       .traverse[({ type λ[α] = Validation[Error, α] })#λ,
-                                 VersionEntry](_.validated[VersionEntry])
+            .traverse[({ type λ[α] = Validation[Error, α] })#λ, VersionEntry](
+              _.validated[VersionEntry])
         } yield versions
       } else {
         Success(Nil)
@@ -138,8 +137,8 @@ object VersionLog {
         for {
           jvs <- JParser.parseManyFromFile(completedFile).leftMap(Error.thrown)
           versions <- jvs.toList
-                       .traverse[({ type λ[α] = Validation[Error, α] })#λ,
-                                 UUID](_.validated[UUID])
+            .traverse[({ type λ[α] = Validation[Error, α] })#λ, UUID](
+              _.validated[UUID])
         } yield versions.toSet
       } else {
         Success(Set.empty)

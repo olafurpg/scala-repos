@@ -258,9 +258,9 @@ abstract class Erasure
       tsym.name + boundsSig(hiBounds(tsym.info.bounds))
     def polyParamSig(tparams: List[Symbol]) =
       (if (tparams.isEmpty) ""
-      else
-        tparams map paramSig mkString
-          ("<", "", ">"))
+       else
+         tparams map paramSig mkString
+           ("<", "", ">"))
 
     // Anything which could conceivably be a module (i.e. isn't known to be
     // a type parameter or similar) must go through here or the signature is
@@ -295,13 +295,13 @@ abstract class Erasure
             val preRebound = pre.baseType(sym.owner) // #2585
             dotCleanup(
               (if (needsJavaSig(preRebound, Nil)) {
-                val s = jsig(preRebound, existentiallyBound)
-                if (s.charAt(0) == 'L')
-                  s.substring(0, s.length - 1) + "." + sym.javaSimpleName
-                else fullNameInSig(sym)
-              } else fullNameInSig(sym)) +
+                 val s = jsig(preRebound, existentiallyBound)
+                 if (s.charAt(0) == 'L')
+                   s.substring(0, s.length - 1) + "." + sym.javaSimpleName
+                 else fullNameInSig(sym)
+               } else fullNameInSig(sym)) +
                 (if (args.isEmpty) ""
-                else "<" + (args map argSig).mkString + ">") + (";")
+                 else "<" + (args map argSig).mkString + ">") + (";")
             )
           }
 
@@ -347,8 +347,8 @@ abstract class Erasure
           buf append ")"
           buf append
             (if (restpe.typeSymbol == UnitClass || sym0.isConstructor)
-              VOID_TAG.toString
-            else jsig(restpe))
+               VOID_TAG.toString
+             else jsig(restpe))
           buf.toString
 
         case RefinedType(parents, decls) =>
@@ -806,9 +806,9 @@ abstract class Erasure
       if (!pair.isErroneous) {
         val what =
           (if (low.owner == high.owner) "double definition"
-          else if (low.owner == base)
-            "name clash between defined and inherited member"
-          else "name clash between inherited members")
+           else if (low.owner == base)
+             "name clash between defined and inherited member"
+           else "name clash between inherited members")
         val when =
           if (exitingRefchecks(lowType matches highType)) ""
           else " after erasure: " + exitingPostErasure(highType)

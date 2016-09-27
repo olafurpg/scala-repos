@@ -183,16 +183,16 @@ trait EnumerateeTFunctions {
           for {
             outerOpt <- head[E1, F]
             sa <- outerOpt match {
-                   case Some(e) =>
-                     val pairingIteratee = EnumerateeT
-                       .map[E2, (E1, E2), F]((a: E2) => (e, a))
-                       .apply(step)
-                     val nextStep = (pairingIteratee &= e2).run
-                     iterateeT[(E1, E2), F, A](nextStep) >>== outerLoop
+              case Some(e) =>
+                val pairingIteratee = EnumerateeT
+                  .map[E2, (E1, E2), F]((a: E2) => (e, a))
+                  .apply(step)
+                val nextStep = (pairingIteratee &= e2).run
+                iterateeT[(E1, E2), F, A](nextStep) >>== outerLoop
 
-                   case None =>
-                     done[E1, F, StepT[(E1, E2), F, A]](step, eofInput)
-                 }
+              case None =>
+                done[E1, F, StepT[(E1, E2), F, A]](step, eofInput)
+            }
           } yield sa
 
         outerLoop

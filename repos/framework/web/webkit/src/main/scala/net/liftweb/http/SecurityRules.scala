@@ -368,8 +368,7 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         }
         violationJson = camelCasedJson \ "csp-report"
         extractedViolation <- tryo(
-                               violationJson
-                                 .extract[ContentSecurityPolicyViolation])
+          violationJson.extract[ContentSecurityPolicyViolation])
       } yield {
         extractedViolation
       }

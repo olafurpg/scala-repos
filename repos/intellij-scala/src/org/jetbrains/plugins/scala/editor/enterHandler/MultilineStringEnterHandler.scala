@@ -265,7 +265,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
                 beforeQuotes + firstMLQuoteLength + prevLineWsPrefixAfterQuotes
               else
                 (if (isCurrentLineEmpty) elementStart
-                else elementStart - wsPrefix) + prevLineWsPrefixAfterQuotes
+                 else elementStart - wsPrefix) + prevLineWsPrefixAfterQuotes
             forceIndent(currentLineOffset,
                         getSmartLength(getSmartSpaces(spacesToInsert)),
                         None)

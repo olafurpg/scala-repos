@@ -421,7 +421,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
              * in exists(select ...) is probably not supported, either, so we rewrite
              * such sub-queries to "select 1". */
             b"exists\[!${(if (supportsTuples) c
-            else c.copy(select = Pure(LiteralNode(1))).infer()): Node}\]"
+                          else c.copy(select = Pure(LiteralNode(1))).infer()): Node}\]"
           case Library.Concat(l, r) if concatOperator.isDefined =>
             b"\($l${concatOperator.get}$r\)"
           case Library.User()

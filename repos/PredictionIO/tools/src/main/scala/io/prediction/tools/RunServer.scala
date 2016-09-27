@@ -85,42 +85,42 @@ object RunServer extends Logging {
         "--name",
         s"PredictionIO Engine Instance: ${engineInstanceId}") ++
         (if (!ca.build.uberJar) {
-          Seq("--jars", jarFiles)
-        } else Seq()) ++
+           Seq("--jars", jarFiles)
+         } else Seq()) ++
         (if (extraFiles.size > 0) {
-          Seq("--files", extraFiles.mkString(","))
-        } else {
-          Seq()
-        }) ++
+           Seq("--files", extraFiles.mkString(","))
+         } else {
+           Seq()
+         }) ++
         (if (extraClasspaths.size > 0) {
-          Seq("--driver-class-path", extraClasspaths.mkString(":"))
-        } else {
-          Seq()
-        }) ++
+           Seq("--driver-class-path", extraClasspaths.mkString(":"))
+         } else {
+           Seq()
+         }) ++
         (if (ca.common.sparkKryo) {
-          Seq("--conf",
-              "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-        } else {
-          Seq()
-        }) ++ Seq(mainJar,
-                  "--engineInstanceId",
-                  engineInstanceId,
-                  "--ip",
-                  ca.deploy.ip,
-                  "--port",
-                  ca.deploy.port.toString,
-                  "--event-server-ip",
-                  ca.eventServer.ip,
-                  "--event-server-port",
-                  ca.eventServer.port.toString) ++
+           Seq("--conf",
+               "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+         } else {
+           Seq()
+         }) ++ Seq(mainJar,
+                   "--engineInstanceId",
+                   engineInstanceId,
+                   "--ip",
+                   ca.deploy.ip,
+                   "--port",
+                   ca.deploy.port.toString,
+                   "--event-server-ip",
+                   ca.eventServer.ip,
+                   "--event-server-port",
+                   ca.eventServer.port.toString) ++
         (if (ca.accessKey.accessKey != "") {
-          Seq("--accesskey", ca.accessKey.accessKey)
-        } else {
-          Seq()
-        }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
+           Seq("--accesskey", ca.accessKey.accessKey)
+         } else {
+           Seq()
+         }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
         (if (ca.common.batch != "")
-          Seq("--batch", ca.common.batch)
-        else Seq()) ++
+           Seq("--batch", ca.common.batch)
+         else Seq()) ++
         (if (ca.common.verbose) Seq("--verbose") else Seq()) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))
         .getOrElse(Seq()) ++ ca.deploy.logPrefix
@@ -164,10 +164,10 @@ object RunServer extends Logging {
           "--event-server-port",
           ca.eventServer.port.toString) ++
         (if (ca.accessKey.accessKey != "") {
-          Seq("--accesskey", ca.accessKey.accessKey)
-        } else {
-          Nil
-        }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
+           Seq("--accesskey", ca.accessKey.accessKey)
+         } else {
+           Nil
+         }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
         (if (ca.common.batch != "") Seq("--batch", ca.common.batch) else Nil) ++
         (if (ca.common.verbose) Seq("--verbose") else Nil) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))

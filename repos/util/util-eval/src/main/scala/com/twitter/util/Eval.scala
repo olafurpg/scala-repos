@@ -374,25 +374,25 @@ class Eval(target: Option[File]) {
     // if there's just one thing in the classpath, and it's a jar, assume an executable jar.
     currentClassPath ::: (if (currentClassPath.size == 1 &&
                               currentClassPath(0).endsWith(".jar")) {
-      val jarFile = currentClassPath(0)
-      val relativeRoot =
-        new File(jarFile).getParentFile()
-      val nestedClassPath =
-        new JarFile(jarFile).getManifest.getMainAttributes
-          .getValue("Class-Path")
-      if (nestedClassPath eq null) {
-        Nil
-      } else {
-        nestedClassPath
-          .split(" ")
-          .map { f =>
-            new File(relativeRoot, f).getAbsolutePath
-          }
-          .toList
-      }
-    } else {
-      Nil
-    }) ::: classPath.tail.flatten
+                            val jarFile = currentClassPath(0)
+                            val relativeRoot =
+                              new File(jarFile).getParentFile()
+                            val nestedClassPath =
+                              new JarFile(jarFile).getManifest.getMainAttributes
+                                .getValue("Class-Path")
+                            if (nestedClassPath eq null) {
+                              Nil
+                            } else {
+                              nestedClassPath
+                                .split(" ")
+                                .map { f =>
+                                  new File(relativeRoot, f).getAbsolutePath
+                                }
+                                .toList
+                            }
+                          } else {
+                            Nil
+                          }) ::: classPath.tail.flatten
   }
 
   trait Preprocessor {
@@ -526,11 +526,11 @@ class Eval(target: Option[File]) {
           }
           messages += (severityName + lineMessage + ": " + message) ::
             (if (pos.isDefined) {
-              pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-                (" " * (pos.column - 1) + "^") :: Nil
-            } else {
-              Nil
-            })
+               pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+                 (" " * (pos.column - 1) + "^") :: Nil
+             } else {
+               Nil
+             })
         }
 
         def displayPrompt {

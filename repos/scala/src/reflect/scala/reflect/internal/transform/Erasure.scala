@@ -340,7 +340,7 @@ trait Erasure {
           psym.isClass && !psym.isTrait && isUnshadowed(psym)
         }
         (if (cs.hasNext) cs
-        else parents.iterator.filter(p => isUnshadowed(p.typeSymbol))).next()
+         else parents.iterator.filter(p => isUnshadowed(p.typeSymbol))).next()
       }
     }
   }

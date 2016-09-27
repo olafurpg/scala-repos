@@ -52,11 +52,11 @@ class VonMisesTest
 
   implicit def arbDistr = Arbitrary {
     for (shape <- arbitrary[Double].map { x =>
-                   math.abs(x) % (2 * math.Pi)
-                 };
+           math.abs(x) % (2 * math.Pi)
+         };
          scale <- arbitrary[Double].map { x =>
-                   math.abs(x) % 3.0 + 1.1
-                 }) yield new VonMises(shape, scale);
+           math.abs(x) % 3.0 + 1.1
+         }) yield new VonMises(shape, scale);
   }
 
   type Distr = VonMises

@@ -1032,7 +1032,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
               val youngest = localGossip.youngestMember
               upNumber = 1 +
                   (if (youngest.upNumber == Int.MaxValue) 0
-                  else youngest.upNumber)
+                   else youngest.upNumber)
             } else {
               upNumber += 1
             }

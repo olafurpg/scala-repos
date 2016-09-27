@@ -267,12 +267,12 @@ class ActorSelectionSpec
       }
       def check(looker: ActorRef) {
         val lookname = looker.path.elements.mkString("", "/", "/")
-        for ((l, r) ← Seq(SelectString("a/b/c") -> None,
-                          SelectString("akka://all-systems/Nobody") -> None,
-                          SelectPath(system / "hallo") -> None,
-                          SelectPath(looker.path child "hallo") -> None, // test Java API
-                          SelectPath(
-                            looker.path descendant Seq("a", "b").asJava) -> None) // test Java API
+        for ((l, r) ← Seq(
+               SelectString("a/b/c") -> None,
+               SelectString("akka://all-systems/Nobody") -> None,
+               SelectPath(system / "hallo") -> None,
+               SelectPath(looker.path child "hallo") -> None, // test Java API
+               SelectPath(looker.path descendant Seq("a", "b").asJava) -> None) // test Java API
              ) checkOne(looker, l, r)
       }
       for (looker ← all) check(looker)

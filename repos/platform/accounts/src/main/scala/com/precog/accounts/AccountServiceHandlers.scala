@@ -282,51 +282,46 @@ class AccountServiceHandlers(
                   logger.debug("About to create account for email " + email)
                   for {
                     existingAccountOpt <- accountManager.findAccountByEmail(
-                                           email)
+                      email)
                     accountResponse <- existingAccountOpt map {
-                                        account =>
-                                          logger.warn(
-                                            "Creation attempted on existing account %s by %s"
-                                              .format(account.accountId,
-                                                      remoteIpFrom(request)))
-                                          Promise.successful(
-                                            Responses.failure(
-                                              Conflict,
-                                              "An account already exists with the email address %s. If you feel this is in error, please contact support@precog.com"
-                                                .format(email)))
-                                      } getOrElse {
-                                        accountManager.createAccount(
-                                          email,
-                                          password,
-                                          clock.now(),
-                                          AccountPlan.Free,
-                                          Some(rootAccountId),
-                                          profile.minimize) {
-                                          accountId =>
-                                            logger.info(
-                                              "Created new account for " + email +
-                                                " with id " + accountId + " by " +
-                                                remoteIpFrom(request))
-                                            apiKeyFinder.createAPIKey(
-                                              accountId,
-                                              Some("Root key for account " + accountId),
-                                              Some(
-                                                "This is your master API key. Keep it secure!")) map {
-                                              details =>
-                                                details.apiKey
-                                            }
-                                        } map { account =>
-                                          logger.debug(
-                                            "Account successfully created: " +
-                                              account.accountId)
-                                          HttpResponse[JValue](
-                                            OK,
-                                            content = Some(
-                                              jobject(
-                                                jfield("accountId",
-                                                       account.accountId))))
-                                        }
-                                      }
+                      account =>
+                        logger.warn(
+                          "Creation attempted on existing account %s by %s"
+                            .format(account.accountId, remoteIpFrom(request)))
+                        Promise.successful(
+                          Responses.failure(
+                            Conflict,
+                            "An account already exists with the email address %s. If you feel this is in error, please contact support@precog.com"
+                              .format(email)))
+                    } getOrElse {
+                      accountManager.createAccount(email,
+                                                   password,
+                                                   clock.now(),
+                                                   AccountPlan.Free,
+                                                   Some(rootAccountId),
+                                                   profile.minimize) {
+                        accountId =>
+                          logger.info(
+                            "Created new account for " + email +
+                              " with id " + accountId + " by " +
+                              remoteIpFrom(request))
+                          apiKeyFinder.createAPIKey(
+                            accountId,
+                            Some("Root key for account " + accountId),
+                            Some(
+                              "This is your master API key. Keep it secure!")) map {
+                            details =>
+                              details.apiKey
+                          }
+                      } map { account =>
+                        logger.debug("Account successfully created: " +
+                          account.accountId)
+                        HttpResponse[JValue](
+                          OK,
+                          content = Some(
+                            jobject(jfield("accountId", account.accountId))))
+                      }
+                    }
                   } yield accountResponse
 
                 case _ =>

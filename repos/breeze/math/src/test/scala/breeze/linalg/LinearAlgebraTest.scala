@@ -187,9 +187,8 @@ class LinearAlgebraTest
     // test using a re-write of the cross-product equation and a scalacheck arbitrary generator
     implicit def arb3DVector: Arbitrary[DenseVector[Double]] = Arbitrary {
       for {
-        els <- Gen.containerOfN[Array, Double](
-                3,
-                Gen.chooseNum[Double](-100.0, 100.0))
+        els <- Gen
+          .containerOfN[Array, Double](3, Gen.chooseNum[Double](-100.0, 100.0))
       } yield DenseVector(els(0), els(1), els(2))
     }
     check { (a: DenseVector[Double], b: DenseVector[Double]) =>
