@@ -175,12 +175,12 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       def testForName(name: Name): Tree => Tree =
         t =>
           (if (nme.CommonOpNames(name))
-            gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumberOrBool,
-                             t :: Nil)
-          else if (nme.BooleanOpNames(name)) t IS_OBJ BoxedBooleanClass.tpe
-          else
-            gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumber,
-                             t :: Nil))
+             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumberOrBool,
+                              t :: Nil)
+           else if (nme.BooleanOpNames(name)) t IS_OBJ BoxedBooleanClass.tpe
+           else
+             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumber,
+                              t :: Nil))
 
       /*  The Tree => Tree function in the return is necessary to prevent the original qual
        *  from being duplicated in the resulting code.  It may be a side-effecting expression,
@@ -192,8 +192,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
           name: Name): Option[(Symbol, Tree => Tree)] = {
         val methodName =
           (if (params.isEmpty) nme.primitivePostfixMethodName(name)
-          else if (params.tail.isEmpty) nme.primitiveInfixMethodName(name)
-          else nme.NO_NAME)
+           else if (params.tail.isEmpty) nme.primitiveInfixMethodName(name)
+           else nme.NO_NAME)
         getDeclIfDefined(BoxesRunTimeClass, methodName) match {
           case NoSymbol => None
           case sym =>
@@ -342,10 +342,10 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
 
           localTyper typed
             (if (isMaybeBoxed && isJavaValueMethod) genValueCallWithTest
-            else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
-            else if (isArrayMethodSignature && isMaybeArray)
-              genArrayCallWithTest
-            else genDefaultCall)
+             else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
+             else if (isArrayMethodSignature && isMaybeArray)
+               genArrayCallWithTest
+             else genDefaultCall)
         }
       }
 

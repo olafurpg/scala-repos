@@ -347,42 +347,42 @@ object KafkaTools extends Command {
                       msg: IngestMessage) = {
       // Track timestamps
       (if (msg.timestamp != EventMessage.defaultTimestamp) {
-        //println("Exact timestamp found: " + msg.timestamp)
-        Some(ExactTime(msg.timestamp.getMillis, state.index))
-      } else {
-        // see if we can deduce from the data (assuming Nathan's twitter feed or SE postings)
-        val timestamps = (msg.data.map(_.value \ "timeStamp") ++ msg.data.map(
-          _.value \ "timestamp")).flatMap {
-          case JString(date) =>
-            // Dirty hack for trying variations of ISO8601 in use by customers
-            List(date, date.replaceFirst(":", "-").replaceFirst(":", "-")).flatMap {
-              date =>
-                List(date, date + ".000Z")
-            }
-          case _ => None
-        }.flatMap { date =>
-          try {
-            val ts = ISODateTimeFormat.dateTime.parseDateTime(date)
-            if (ts.getMillis > lastTimestamp.time) {
-              //println("Assigning new timestamp: " + ts)
-              Some(ts)
-            } else {
-              //println("%s is before %s".format(ts, new DateTime(lastTimestamp.time)))
-              None
-            }
-          } catch {
-            case t =>
-              //println("Error on datetime parse: " + t)
-              None
-          }
-        }
+         //println("Exact timestamp found: " + msg.timestamp)
+         Some(ExactTime(msg.timestamp.getMillis, state.index))
+       } else {
+         // see if we can deduce from the data (assuming Nathan's twitter feed or SE postings)
+         val timestamps = (msg.data.map(_.value \ "timeStamp") ++ msg.data.map(
+           _.value \ "timestamp")).flatMap {
+           case JString(date) =>
+             // Dirty hack for trying variations of ISO8601 in use by customers
+             List(date, date.replaceFirst(":", "-").replaceFirst(":", "-")).flatMap {
+               date =>
+                 List(date, date + ".000Z")
+             }
+           case _ => None
+         }.flatMap { date =>
+           try {
+             val ts = ISODateTimeFormat.dateTime.parseDateTime(date)
+             if (ts.getMillis > lastTimestamp.time) {
+               //println("Assigning new timestamp: " + ts)
+               Some(ts)
+             } else {
+               //println("%s is before %s".format(ts, new DateTime(lastTimestamp.time)))
+               None
+             }
+           } catch {
+             case t =>
+               //println("Error on datetime parse: " + t)
+               None
+           }
+         }
 
-        //println("Deducing timestamp from " + timestamps)
+         //println("Deducing timestamp from " + timestamps)
 
-        timestamps.headOption.map { ts =>
-          ExactTime(ts.getMillis, state.index)
-        }
-      }).foreach { newTimestamp =>
+         timestamps.headOption.map { ts =>
+           ExactTime(ts.getMillis, state.index)
+         }
+       }).foreach { newTimestamp =>
         if (newTimestamp.time <= System.currentTimeMillis) {
           if (pendingTimes.nonEmpty) {
             //println("Updating pending times: " + pendingTimes)
@@ -1064,13 +1064,13 @@ object ImportTools extends Command with Logging {
                                           rootKey,
                                           key,
                                           Set(rootGrantId)) onComplete {
-              case Left(error) =>
-                logger.error(
-                  "Could not add grant " + rootGrantId + " to apiKey " + key,
-                  error)
-              case Right(success) =>
-                logger.info("Updated API key record: " + success)
-            }
+          case Left(error) =>
+            logger.error(
+              "Could not add grant " + rootGrantId + " to apiKey " + key,
+              error)
+          case Right(success) =>
+            logger.info("Updated API key record: " + success)
+        }
       } yield key
 
     def logGrants(key: APIKey) =

@@ -102,9 +102,9 @@ class BaseCharsetTest(val charset: Charset) {
 
     for {
       malformedAction <- if (hasAnyMalformed) AllErrorActions
-                        else ReportActions
+      else ReportActions
       unmappableAction <- if (hasAnyUnmappable) AllErrorActions
-                         else ReportActions
+      else ReportActions
       readOnly <- List(false, true)
     } {
       testOneConfig(malformedAction, unmappableAction, readOnly)
@@ -187,9 +187,9 @@ class BaseCharsetTest(val charset: Charset) {
 
     for {
       malformedAction <- if (hasAnyMalformed) AllErrorActions
-                        else ReportActions
+      else ReportActions
       unmappableAction <- if (hasAnyUnmappable) AllErrorActions
-                         else ReportActions
+      else ReportActions
       readOnly <- List(false, true)
     } {
       testOneConfig(malformedAction, unmappableAction, readOnly)

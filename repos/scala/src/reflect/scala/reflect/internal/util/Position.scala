@@ -105,7 +105,7 @@ sealed abstract class DefinedPosition extends Position {
   override def hashCode = Seq[Any](source.file, start, point, end).##
   override def toString =
     (if (isRange) s"RangePosition($canonicalPath, $start, $point, $end)"
-    else s"source-$canonicalPath,line-$line,$pointMessage$point")
+     else s"source-$canonicalPath,line-$line,$pointMessage$point")
   private def pointMessage =
     if (point > source.length) "out-of-bounds-" else "offset="
   private def canonicalPath = source.file.canonicalPath
@@ -177,9 +177,9 @@ private[util] trait InternalPositionImpl { self: Position =>
 
   def union(pos: Position): Position =
     (if (!pos.isRange) this
-    else if (this.isRange)
-      copyRange(start = start min pos.start, end = end max pos.end)
-    else pos)
+     else if (this.isRange)
+       copyRange(start = start min pos.start, end = end max pos.end)
+     else pos)
 
   def includes(pos: Position): Boolean =
     isRange && pos.isDefined && start <= pos.start && pos.end <= end
@@ -229,9 +229,9 @@ private[util] trait InternalPositionImpl { self: Position =>
   def showDebug: String = toString
   def show =
     (if (isOpaqueRange) s"[$start:$end]"
-    else if (isTransparent) s"<$start:$end>"
-    else if (isDefined) s"[$point]"
-    else "[NoPosition]")
+     else if (isTransparent) s"<$start:$end>"
+     else if (isDefined) s"[$point]"
+     else "[NoPosition]")
 
   private def asOffset(point: Int): Position = Position.offset(source, point)
   private def copyRange(source: SourceFile = source,
@@ -246,8 +246,8 @@ private[util] trait InternalPositionImpl { self: Position =>
     while (idx != point) {
       col +=
         (if (source.content(idx) == '\t')
-          Position.tabInc - col % Position.tabInc
-        else 1)
+           Position.tabInc - col % Position.tabInc
+         else 1)
       idx += 1
     }
     col + 1

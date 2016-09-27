@@ -78,20 +78,20 @@ trait Variances { self: SymbolTable =>
       def relativeVariance(tvar: Symbol): Variance = {
         def nextVariance(sym: Symbol, v: Variance): Variance =
           (if (shouldFlip(sym, tvar)) v.flip
-          else if (isLocalOnly(sym)) Bivariant
-          else if (sym.isAliasType)
-            (// Unsound pre-2.11 behavior preserved under -Xsource:2.10
-            if (settings.isScala211 || sym.isOverridingSymbol) Invariant
-            else {
-              currentRun.reporting.deprecationWarning(
-                sym.pos,
-                s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
-              Bivariant
-            })
-          else v)
+           else if (isLocalOnly(sym)) Bivariant
+           else if (sym.isAliasType)
+             (// Unsound pre-2.11 behavior preserved under -Xsource:2.10
+             if (settings.isScala211 || sym.isOverridingSymbol) Invariant
+             else {
+               currentRun.reporting.deprecationWarning(
+                 sym.pos,
+                 s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
+               Bivariant
+             })
+           else v)
         def loop(sym: Symbol, v: Variance): Variance =
           (if (sym == tvar.owner || v.isBivariant) v
-          else loop(sym.owner, nextVariance(sym, v)))
+           else loop(sym.owner, nextVariance(sym, v)))
         loop(base, Covariant)
       }
       def isUncheckedVariance(tp: Type) = tp match {

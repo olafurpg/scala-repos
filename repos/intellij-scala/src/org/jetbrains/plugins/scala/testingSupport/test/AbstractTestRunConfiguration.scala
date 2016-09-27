@@ -272,8 +272,8 @@ abstract class AbstractTestRunConfiguration(
               val buffer = new ArrayBuffer[Module]()
               buffer += getModule
               for (module <- ModuleManager
-                              .getInstance(getProject)
-                              .getModules) {
+                     .getInstance(getProject)
+                     .getModules) {
                 if (ModuleManager
                       .getInstance(getProject)
                       .isModuleDependent(getModule, module)) {
@@ -571,7 +571,7 @@ abstract class AbstractTestRunConfiguration(
         }
 
         for (ext <- Extensions.getExtensions(
-                     RunConfigurationExtension.EP_NAME)) {
+               RunConfigurationExtension.EP_NAME)) {
           ext.updateJavaParameters(currentConfiguration,
                                    params,
                                    getRunnerSettings)

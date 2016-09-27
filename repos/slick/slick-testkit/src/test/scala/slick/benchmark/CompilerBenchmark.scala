@@ -155,9 +155,9 @@ object CompilerBenchmark {
     def q1b =
       for {
         (c, s) <- q1b_0
-                   .sortBy(_._1.price)
-                   .take(2)
-                   .filter(_._1.name =!= "Colombian")
+          .sortBy(_._1.price)
+          .take(2)
+          .filter(_._1.name =!= "Colombian")
         (c2, s2) <- q1b_0
       } yield (c.name, s.city, c2.name)
     val q2 = for {
@@ -184,10 +184,10 @@ object CompilerBenchmark {
     def q4 =
       for {
         c <- coffees
-              .map(c => (c.name, c.price, 42))
-              .sortBy(_._1)
-              .take(2)
-              .filter(_._2 < 800)
+          .map(c => (c.name, c.price, 42))
+          .sortBy(_._1)
+          .take(2)
+          .filter(_._2 < 800)
       } yield (c._1, c._3)
     def q4b_0 = coffees.map(c => (c.name, c.price, 42)).filter(_._2 < 800)
     def q4b =
@@ -209,8 +209,8 @@ object CompilerBenchmark {
     } yield (c.name, c.supID, c.total)
     val q7 = for {
       c <- coffees.filter(_.price < 800).map((_, 1)) union coffees
-            .filter(_.price > 950)
-            .map((_, 2))
+        .filter(_.price > 950)
+        .map((_, 2))
     } yield (c._1.name, c._1.supID, c._2)
     val q71 = for {
       c <- coffees.filter(_.price < 800).map((_, 1))
@@ -218,14 +218,14 @@ object CompilerBenchmark {
     val q7b = q7 filter (_._1 =!= "Colombian")
     val q8 = for {
       (c1, c2) <- coffees.filter(_.price < 900) joinLeft coffees.filter(
-                   _.price < 800) on (_.name === _.name)
+        _.price < 800) on (_.name === _.name)
     } yield (c1.name, c2.map(_.name))
     val q8b = for {
       t <- coffees.sortBy(_.sales).take(1) joinLeft coffees
-            .sortBy(_.sales)
-            .take(2) on (_.name === _.name) joinLeft coffees
-            .sortBy(_.sales)
-            .take(4) on (_._1.supID === _.supID)
+        .sortBy(_.sales)
+        .take(2) on (_.name === _.name) joinLeft coffees
+        .sortBy(_.sales)
+        .take(4) on (_._1.supID === _.supID)
     } yield (t._1, t._2)
 
     Vector(qa,

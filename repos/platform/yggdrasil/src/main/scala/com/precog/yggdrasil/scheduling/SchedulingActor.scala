@@ -218,17 +218,16 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
 
         val execution = for {
           basePath <- EitherT(M point {
-                       task.source.prefix \/> invalidState(
-                         "Path %s cannot be relativized.".format(
-                           task.source.path))
-                     })
+            task.source.prefix \/> invalidState(
+              "Path %s cannot be relativized.".format(task.source.path))
+          })
           cachingResult <- platform.vfs.executeAndCache(
-                            platform,
-                            basePath,
-                            task.context,
-                            QueryOptions(timeout = task.timeout),
-                            Some(task.sink),
-                            Some(task.taskName))
+            platform,
+            basePath,
+            task.context,
+            QueryOptions(timeout = task.timeout),
+            Some(task.sink),
+            Some(task.taskName))
         } yield cachingResult
 
         execution.fold[Future[PrecogUnit]](
@@ -250,18 +249,18 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
               case t: Throwable =>
                 for {
                   _ <- storedQueryResult.cachingJob.traverse { jobId =>
-                        jobManager.abort(jobId, t.getMessage) map {
-                          case Right(jobAbortSuccess) =>
-                            ourself ! TaskComplete(
-                              task.id,
-                              clock.now(),
-                              0,
-                              Option(t.getMessage) orElse Some(
-                                t.getClass.toString))
-                          case Left(jobAbortFailure) =>
-                            sys.error(jobAbortFailure.toString)
-                        }
-                      }
+                    jobManager.abort(jobId, t.getMessage) map {
+                      case Right(jobAbortSuccess) =>
+                        ourself ! TaskComplete(
+                          task.id,
+                          clock.now(),
+                          0,
+                          Option(t.getMessage) orElse Some(
+                            t.getClass.toString))
+                      case Left(jobAbortFailure) =>
+                        sys.error(jobAbortFailure.toString)
+                    }
+                  }
                 } yield PrecogUnit
             }
           }

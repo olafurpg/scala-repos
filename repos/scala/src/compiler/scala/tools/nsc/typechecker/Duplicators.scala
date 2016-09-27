@@ -303,36 +303,36 @@ abstract class Duplicators extends Analyzer {
           def nameSelection = Select(This(newClassOwner), tree.symbol.name)
           val newTree =
             (if (memberByName.isOverloaded) {
-              // Find the types of the overload alternatives as seen in the new class,
-              // and filter the list down to those which match the old type (after
-              // fixing the old type so it is seen as if from the new class.)
-              val typeInNewClass =
-                fixType(oldClassOwner.info memberType tree.symbol)
-              val alts = memberByName.alternatives
-              val memberTypes = alts map (newClassOwner.info memberType _)
-              val memberString = memberByName.defString
-              alts zip memberTypes filter (_._2 =:= typeInNewClass) match {
-                case ((alt, tpe)) :: Nil =>
-                  log(
-                    s"Arrested overloaded type in Duplicators, narrowing to ${alt
-                      .defStringSeenAs(tpe)}\n  Overload was: $memberString")
-                  Select(This(newClassOwner), alt)
-                case xs =>
-                  alts filter
-                    (alt =>
-                       (alt.paramss corresponds tree.symbol.paramss)(
-                         _.size == _.size)) match {
-                    case alt :: Nil =>
-                      log(
-                        s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")
-                      Select(This(newClassOwner), alt)
-                    case _ =>
-                      log(
-                        s"Could not disambiguate $memberTypes. Attempting name-based selection, but we may crash later.")
-                      nameSelection
-                  }
-              }
-            } else nameSelection)
+               // Find the types of the overload alternatives as seen in the new class,
+               // and filter the list down to those which match the old type (after
+               // fixing the old type so it is seen as if from the new class.)
+               val typeInNewClass =
+                 fixType(oldClassOwner.info memberType tree.symbol)
+               val alts = memberByName.alternatives
+               val memberTypes = alts map (newClassOwner.info memberType _)
+               val memberString = memberByName.defString
+               alts zip memberTypes filter (_._2 =:= typeInNewClass) match {
+                 case ((alt, tpe)) :: Nil =>
+                   log(
+                     s"Arrested overloaded type in Duplicators, narrowing to ${alt
+                       .defStringSeenAs(tpe)}\n  Overload was: $memberString")
+                   Select(This(newClassOwner), alt)
+                 case xs =>
+                   alts filter
+                     (alt =>
+                        (alt.paramss corresponds tree.symbol.paramss)(
+                          _.size == _.size)) match {
+                     case alt :: Nil =>
+                       log(
+                         s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")
+                       Select(This(newClassOwner), alt)
+                     case _ =>
+                       log(
+                         s"Could not disambiguate $memberTypes. Attempting name-based selection, but we may crash later.")
+                       nameSelection
+                   }
+               }
+             } else nameSelection)
           super.typed(atPos(tree.pos)(newTree), mode, pt)
 
         case This(_)

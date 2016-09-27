@@ -42,7 +42,7 @@ object Main {
         val encode = Base64Converter.encode(event.toBytes)
         out.write(
           (if (standalone && !encode.endsWith("=")) encode + "="
-          else encode).getBytes)
+           else encode).getBytes)
       }
       new EventGeneratingClient(eventHandler, out.checkError) {
         override def error(text: String,

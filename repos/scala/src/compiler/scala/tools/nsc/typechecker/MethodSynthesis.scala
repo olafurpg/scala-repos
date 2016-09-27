@@ -43,7 +43,7 @@ trait MethodSynthesis { self: Analyzer =>
     private def finishMethod(method: Symbol, f: Symbol => Tree): Tree =
       localTyper typed
         (if (method.isLazy) ValDef(method, f(method))
-        else DefDef(method, f(method)))
+         else DefDef(method, f(method)))
 
     private def createInternal(name: Name,
                                f: Symbol => Tree,
@@ -612,7 +612,7 @@ trait MethodSynthesis { self: Analyzer =>
       if (hasBP || hasBoolBP) {
         val getter =
           (if (hasBP) new BeanGetter(tree) with NoSymbolBeanGetter
-          else new BooleanBeanGetter(tree) with NoSymbolBeanGetter)
+           else new BooleanBeanGetter(tree) with NoSymbolBeanGetter)
         getter :: {
           if (mods.isMutable) List(BeanSetter(tree)) else Nil
         }

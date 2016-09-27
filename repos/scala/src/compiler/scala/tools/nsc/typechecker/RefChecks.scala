@@ -162,13 +162,13 @@ abstract class RefChecks
         val haveDefaults =
           methods filter
             (if (settings.isScala211)
-              (sym =>
-                 mexists(sym.info.paramss)(_.hasDefault) &&
-                   !nme.isProtectedAccessorName(sym.name))
-            else
-              (sym =>
-                 hasDefaultParam(sym.info) &&
-                   !nme.isProtectedAccessorName(sym.name)))
+               (sym =>
+                  mexists(sym.info.paramss)(_.hasDefault) &&
+                    !nme.isProtectedAccessorName(sym.name))
+             else
+               (sym =>
+                  hasDefaultParam(sym.info) &&
+                    !nme.isProtectedAccessorName(sym.name)))
 
         if (haveDefaults.lengthCompare(1) > 0) {
           val owners = haveDefaults map (_.owner)
@@ -180,10 +180,10 @@ abstract class RefChecks
               "in " + clazz + ", multiple overloaded alternatives of " +
                 haveDefaults.head + " define default arguments" +
                 (if (owners.forall(_ == clazz)) "."
-                else
-                  ".\nThe members with defaults are defined in " + owners
-                    .map(_.fullLocationString)
-                    .mkString("", " and ", ".")))
+                 else
+                   ".\nThe members with defaults are defined in " + owners
+                     .map(_.fullLocationString)
+                     .mkString("", " and ", ".")))
           }
         }
       }
@@ -191,7 +191,7 @@ abstract class RefChecks
       // Check for doomed attempt to overload applyDynamic
       if (clazz isSubClass DynamicClass) {
         for ((_, m1 :: m2 :: _) <- (clazz.info member nme.applyDynamic).alternatives groupBy
-                                    (_.typeParams.length)) {
+               (_.typeParams.length)) {
           reporter.error(
             m1.pos,
             "implementation restriction: applyDynamic cannot be overloaded except by methods with different numbers of type parameters, e.g. applyDynamic[T1](method: String)(arg: T1) and applyDynamic[T1, T2](method: String)(arg1: T1, arg2: T2)")
@@ -332,12 +332,13 @@ abstract class RefChecks
               .map(_.member.name.decode)
               .filter(member.name.decode != _)
               .distinct
-            reporter.error(clazz.pos,
-                           msg +
-                             (if (others1.isEmpty) ""
-                             else
-                               ";\n other members with override errors are: " +
-                                 (others1 mkString ", ")))
+            reporter.error(
+              clazz.pos,
+              msg +
+                (if (others1.isEmpty) ""
+                 else
+                   ";\n other members with override errors are: " +
+                     (others1 mkString ", ")))
         }
       }
 
@@ -348,14 +349,14 @@ abstract class RefChecks
         val sym1 = analyzer.underlyingSymbol(sym)
         sym1.toString() +
           (if (showLocation)
-            sym1.locationString +
-              (if (sym1.isAliasType) ", which equals " + self.memberInfo(sym1)
-              else if (sym1.isAbstractType)
-                " with bounds" + self.memberInfo(sym1)
-              else if (sym1.isModule) ""
-              else if (sym1.isTerm) " of type " + self.memberInfo(sym1)
-              else "")
-          else "")
+             sym1.locationString +
+               (if (sym1.isAliasType) ", which equals " + self.memberInfo(sym1)
+                else if (sym1.isAbstractType)
+                  " with bounds" + self.memberInfo(sym1)
+                else if (sym1.isModule) ""
+                else if (sym1.isTerm) " of type " + self.memberInfo(sym1)
+                else "")
+           else "")
       }
 
       /* Check that all conditions for overriding `other` by `member`
@@ -686,8 +687,8 @@ abstract class RefChecks
           def prelude =
             (if (clazz.isAnonymousClass ||
                  clazz.isModuleClass) "object creation impossible"
-            else if (mustBeMixin) clazz + " needs to be a mixin"
-            else clazz + " needs to be abstract") + ", since"
+             else if (mustBeMixin) clazz + " needs to be a mixin"
+             else clazz + " needs to be abstract") + ", since"
 
           if (abstractErrors.isEmpty) abstractErrors ++= List(prelude, msg)
           else abstractErrors += msg
@@ -824,22 +825,22 @@ abstract class RefChecks
                         )
                       val addendum =
                         (if (abstractSym == concreteSym) {
-                          // TODO: what is the optimal way to test for a raw type at this point?
-                          // Compilation has already failed so we shouldn't have to worry overmuch
-                          // about forcing types.
-                          if (underlying.isJavaDefined &&
-                              pa.typeArgs.isEmpty &&
-                              abstractSym.typeParams.nonEmpty)
-                            ". To implement a raw type, use %s[_]".format(pa)
-                          else if (pa.prefix =:= pc.prefix)
-                            ": their type parameters differ"
-                          else
-                            ": their prefixes (i.e. enclosing instances) differ"
-                        } else if (abstractSym isSubClass concreteSym)
-                          subclassMsg(abstractSym, concreteSym)
-                        else if (concreteSym isSubClass abstractSym)
-                          subclassMsg(concreteSym, abstractSym)
-                        else "")
+                           // TODO: what is the optimal way to test for a raw type at this point?
+                           // Compilation has already failed so we shouldn't have to worry overmuch
+                           // about forcing types.
+                           if (underlying.isJavaDefined &&
+                               pa.typeArgs.isEmpty &&
+                               abstractSym.typeParams.nonEmpty)
+                             ". To implement a raw type, use %s[_]".format(pa)
+                           else if (pa.prefix =:= pc.prefix)
+                             ": their type parameters differ"
+                           else
+                             ": their prefixes (i.e. enclosing instances) differ"
+                         } else if (abstractSym isSubClass concreteSym)
+                           subclassMsg(abstractSym, concreteSym)
+                         else if (concreteSym isSubClass abstractSym)
+                           subclassMsg(concreteSym, abstractSym)
+                         else "")
 
                       undefined(
                         "\n(Note that %s does not match %s%s)"
@@ -1403,9 +1404,9 @@ abstract class RefChecks
         val newTrees =
           cdef ::
             (if (module.isStatic)
-              // trait T { def f: Object }; object O extends T { object f }. Need to generate method f in O.
-              if (module.isOverridingSymbol) matchingInnerObject() else Nil
-            else newInnerObject(site, module))
+               // trait T { def f: Object }; object O extends T { object f }. Need to generate method f in O.
+               if (module.isOverridingSymbol) matchingInnerObject() else Nil
+             else newInnerObject(site, module))
         transformTrees(newTrees map localTyper.typedPos(moduleDef.pos))
       }
     def newInnerObject(site: Symbol, module: Symbol): List[Tree] = {

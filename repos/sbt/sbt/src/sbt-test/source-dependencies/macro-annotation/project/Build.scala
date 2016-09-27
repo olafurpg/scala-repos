@@ -37,8 +37,8 @@ object MyBuild extends Build {
           (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
         libraryDependencies ++=
           (if (scalaVersion.value.startsWith("2.10"))
-            List("org.scalamacros" %% "quasiquotes" % paradiseVersion)
-          else Nil)
+             List("org.scalamacros" %% "quasiquotes" % paradiseVersion)
+           else Nil)
       )
   )
 

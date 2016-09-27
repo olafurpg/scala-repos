@@ -395,7 +395,7 @@ object ConsoleProducer {
                   s"No key found on line ${lineNumber}: $line")
             case n =>
               val value = (if (n + keySeparator.size > line.size) ""
-              else line.substring(n + keySeparator.size)).getBytes
+                           else line.substring(n + keySeparator.size)).getBytes
               new ProducerRecord(topic, line.substring(0, n).getBytes, value)
           }
         case (line, false) =>

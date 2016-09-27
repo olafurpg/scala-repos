@@ -111,9 +111,9 @@ class CaseClassPickling(val allowReflection: Boolean,
     (for {
       companion <- tpe.companion
       factoryMethod <- tpe.methods
-                        .filter(_.methodName == "apply")
-                        .sortBy(_.parameterNames.flatten.size)
-                        .headOption
+        .filter(_.methodName == "apply")
+        .sortBy(_.parameterNames.flatten.size)
+        .headOption
     } yield {
       val vars = allVars(tpe)
       val names = factoryMethod.parameterNames.flatten.toSet

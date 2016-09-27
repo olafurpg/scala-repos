@@ -1121,12 +1121,12 @@ trait Contexts { self: Analyzer =>
 
       def finish(qual: Tree, sym: Symbol): NameLookup =
         (if (lookupError ne null) lookupError
-        else
-          sym match {
-            case NoSymbol if inaccessible ne null => inaccessible
-            case NoSymbol => LookupNotFound
-            case _ => LookupSucceeded(qual, sym)
-          })
+         else
+           sym match {
+             case NoSymbol if inaccessible ne null => inaccessible
+             case NoSymbol => LookupNotFound
+             case _ => LookupSucceeded(qual, sym)
+           })
       def finishDefSym(sym: Symbol, pre0: Type): NameLookup =
         if (requiresQualifier(sym))
           finish(gen.mkAttributedQualifier(pre0), sym)

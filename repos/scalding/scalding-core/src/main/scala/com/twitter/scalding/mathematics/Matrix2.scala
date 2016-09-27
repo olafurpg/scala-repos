@@ -350,12 +350,12 @@ case class Product[R, C, C2, V](
     val localRing = ring
 
     val joined = (if (leftMatrix) {
-      val ord: Ordering[R] = left.rowOrd
-      left.toTypedPipe.groupBy(x => x._1)(ord)
-    } else {
-      val ord: Ordering[C] = right.rowOrd
-      right.toTypedPipe.groupBy(x => x._1)(ord)
-    }).mapValues { _._3 }.sum(localRing).filter { kv =>
+                    val ord: Ordering[R] = left.rowOrd
+                    left.toTypedPipe.groupBy(x => x._1)(ord)
+                  } else {
+                    val ord: Ordering[C] = right.rowOrd
+                    right.toTypedPipe.groupBy(x => x._1)(ord)
+                  }).mapValues { _._3 }.sum(localRing).filter { kv =>
       localRing.isNonZero(kv._2)
     }
 

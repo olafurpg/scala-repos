@@ -28,8 +28,8 @@ private[team] final class PaginatorBuilder(maxPerPage: Int,
     def slice(offset: Int, length: Int): Fu[Seq[MemberWithUser]] =
       for {
         members ← $find[Member](
-                   $query[Member](selector) sort sorting skip offset,
-                   length)
+          $query[Member](selector) sort sorting skip offset,
+          length)
         users ← $find.byOrderedIds[User](members.map(_.user))
       } yield
         members zip users map {

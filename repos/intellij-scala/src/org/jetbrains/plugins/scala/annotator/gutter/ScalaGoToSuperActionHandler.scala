@@ -113,8 +113,8 @@ private object ScalaGoToSuperActionHandler {
       val supers = mutable.HashSet[NavigatablePsiElement](
         (if (el != null &&
              elements.contains(el.asInstanceOf[ScTypedDefinition])) {
-          ScalaPsiUtil.superValsSignatures(el.asInstanceOf[ScTypedDefinition])
-        } else ScalaPsiUtil.superValsSignatures(elements.head))
+           ScalaPsiUtil.superValsSignatures(el.asInstanceOf[ScTypedDefinition])
+         } else ScalaPsiUtil.superValsSignatures(elements.head))
           .flatMap(_.namedElement match {
             case n: NavigatablePsiElement => Some(n)
             case _ => None

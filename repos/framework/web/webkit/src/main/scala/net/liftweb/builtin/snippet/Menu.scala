@@ -161,10 +161,10 @@ object Menu extends DispatchSnippet {
                   // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
                   <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
                   (if (m.path)
-                    S.prefixedAttrsToMetaData("li_path", liMap)
-                  else Null) %
+                     S.prefixedAttrsToMetaData("li_path", liMap)
+                   else Null) %
                   (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
-                  else Null))
+                   else Null))
 
             case MenuItem(text, uri, kids, true, _, _) if linkToSelf =>
               Helpers.addCssClass(
@@ -263,9 +263,9 @@ object Menu extends DispatchSnippet {
 
   private def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-      for { sm <- LiftRules.siteMap; req <- S.request } yield
-        sm.buildMenu(req.location).lines
-    else S.request.map(_.buildMenu.lines)) openOr Nil
+       for { sm <- LiftRules.siteMap; req <- S.request } yield
+         sm.buildMenu(req.location).lines
+     else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def jsonMenu(ignore: NodeSeq): NodeSeq = {
     val toRender = renderWhat(true)

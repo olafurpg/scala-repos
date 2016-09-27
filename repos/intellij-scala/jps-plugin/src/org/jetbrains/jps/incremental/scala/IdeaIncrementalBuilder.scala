@@ -198,8 +198,8 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
     for {
       target <- chunk.getTargets.asScala
       tempRoot <- project.getBuildRootIndex
-                   .getTempTargetRoots(target, context)
-                   .asScala
+        .getTempTargetRoots(target, context)
+        .asScala
     } {
       FileUtil
         .processFilesRecursively(tempRoot.getRootFile, new Processor[File] {

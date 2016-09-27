@@ -365,7 +365,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         options = Set() ++ dbType.map(SqlProfile.ColumnOption.SqlType) ++
             (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
             (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
-            else None) ++ length.map(
+             else None) ++ length.map(
             RelationalProfile.ColumnOption.Length
               .apply(_, varying = varying)) ++
             (if (!autoInc) convenientDefault else None))

@@ -134,8 +134,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       }
     for {
       job <- futureJob map { job =>
-              Some(job)
-            } recover { case _ => None }
+        Some(job)
+      } recover { case _ => None }
       queryStateManager = job map { job =>
         val mgr = JobQueryStateManager(
           job.id,

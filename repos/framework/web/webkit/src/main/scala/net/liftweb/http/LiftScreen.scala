@@ -1236,8 +1236,8 @@ trait ScreenWizardRendered extends Loggable {
         field <- fields
         bindingInfo <- field.binding
         custom <- Some(bindingInfo.bindingStyle) collect {
-                   case c: Custom => c
-                 }
+          case c: Custom => c
+        }
       } yield
         traceInline(
           "Binding custom field %s to %s"
@@ -1249,8 +1249,8 @@ trait ScreenWizardRendered extends Loggable {
         field <- fields
         bindingInfo <- field.binding
         dynamic <- Some(bindingInfo.bindingStyle) collect {
-                    case d: Dynamic => d
-                  }
+          case d: Dynamic => d
+        }
       } yield {
         val template = dynamic.func()
         traceInline(
@@ -1817,23 +1817,23 @@ trait LiftScreen
       theScreen.finishButton %
         ("onclick" ->
           (if (ajaxForms_?) {
-            SHtml
-              .makeAjaxCall(LiftRules.jsArtifacts.serialize(finishId))
-              .toJsCmd
-          } else {
-            "document.getElementById(" + finishId.encJs + ").submit()"
-          }))
+             SHtml
+               .makeAjaxCall(LiftRules.jsArtifacts.serialize(finishId))
+               .toJsCmd
+           } else {
+             "document.getElementById(" + finishId.encJs + ").submit()"
+           }))
 
     val cancelButton: Elem =
       theScreen.cancelButton %
         ("onclick" ->
           (if (ajaxForms_?) {
-            SHtml
-              .makeAjaxCall(LiftRules.jsArtifacts.serialize(cancelId))
-              .toJsCmd
-          } else {
-            "document.getElementById(" + cancelId.encJs + ").submit()"
-          }))
+             SHtml
+               .makeAjaxCall(LiftRules.jsArtifacts.serialize(cancelId))
+               .toJsCmd
+           } else {
+             "document.getElementById(" + cancelId.encJs + ").submit()"
+           }))
 
     val url = S.uri
 

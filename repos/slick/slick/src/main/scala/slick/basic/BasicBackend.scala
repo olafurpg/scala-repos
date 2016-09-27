@@ -366,7 +366,7 @@ trait BasicBackend { self =>
                     if (debug)
                       streamLogger.debug(
                         (if (state eq null) "Starting initial"
-                        else "Restarting ") +
+                         else "Restarting ") +
                           " streaming action, realDemand = " + str(realDemand))
                     if (ctx.cancelled) {
                       if (ctx.deferredError ne null) throw ctx.deferredError
@@ -402,7 +402,7 @@ trait BasicBackend { self =>
                       streamLogger.debug(
                         s"Sent up to ${str(realDemand)} elements - Stream " +
                           (if (ctx.cancelled) "cancelled"
-                          else "completely delivered"))
+                           else "completely delivered"))
                     else
                       streamLogger.debug(
                         s"Sent ${str(realDemand)} elements, more available - Performing atomic state transition")

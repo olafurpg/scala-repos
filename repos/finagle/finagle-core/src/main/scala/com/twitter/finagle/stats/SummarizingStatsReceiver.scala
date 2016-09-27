@@ -118,7 +118,7 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
       fmtGauges.sorted.mkString("\n") + "\n# stats\n" + fmtStats
       .mkString("\n") +
       (if (includeTails) "\n# stats-tails\n" + (fmtTails mkString "\n")
-      else "")
+       else "")
   }
 
   def print() = println(summary(false))

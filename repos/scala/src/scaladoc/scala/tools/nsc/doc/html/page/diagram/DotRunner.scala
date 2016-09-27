@@ -114,7 +114,7 @@ class DotProcess(settings: doc.Settings) {
         errorBuffer.append(
           "  Main thread in " + templateName + ": " +
             (if (exc.isInstanceOf[NoSuchElementException]) "Timeout"
-            else "Exception: " + exc))
+             else "Exception: " + exc))
         error = true
         return null
     }

@@ -120,7 +120,7 @@ abstract class CreateEntityQuickFix(ref: ScReferenceExpression,
 
       for (aType <- entityType;
            typeElement <- entity.children.findByType(
-                           classOf[ScSimpleTypeElement])) {
+             classOf[ScSimpleTypeElement])) {
         builder.replaceElement(typeElement, aType)
       }
 

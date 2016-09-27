@@ -245,9 +245,8 @@ class JobServiceSpec extends TestJobService {
         res <- postJob(simpleJob, validAPIKey)
         Some(JString(jobId)) = res.content map (_ \ "id")
         HttpResponse(HttpStatus(OK, _), _, Some(obj1), _) <- putState(
-                                                              jobId,
-                                                              startJob(
-                                                                Some(dt)))
+          jobId,
+          startJob(Some(dt)))
         HttpResponse(_, _, Some(obj2), _) <- getJob(jobId)
       } yield (obj1, obj2)).copoint
 
@@ -284,8 +283,8 @@ class JobServiceSpec extends TestJobService {
         jobId <- postJobAndGetId(simpleJob)
         _ <- putState(jobId, startJob())
         HttpResponse(HttpStatus(OK, _), _, Some(st), _) <- putState(
-                                                            jobId,
-                                                            cancellation)
+          jobId,
+          cancellation)
       } yield st).copoint
 
       st.validated[JobState] must beLike {
@@ -544,18 +543,14 @@ class JobServiceSpec extends TestJobService {
         jobId <- postJobAndGetId(simpleJob)
         res1 <- putStatusRaw(jobId, None)(JObject(Nil))
         res2 <- putStatusRaw(jobId, None)(
-                 JObject(
-                   JField("message", JString("a")) :: JField(
-                     "unit",
-                     JString("%")) :: Nil))
+          JObject(JField("message", JString("a")) :: JField(
+            "unit",
+            JString("%")) :: Nil))
         res3 <- putStatusRaw(jobId, None)(
-                 JObject(
-                   JField("message", JString("a")) :: JField("progress",
-                                                             JNum(99)) :: Nil))
-        res4 <- putStatusRaw(jobId, None)(
-                 JObject(JField("progress", JNum(99)) :: JField(
-                   "unit",
-                   JString("%")) :: Nil))
+          JObject(JField("message", JString("a")) :: JField("progress",
+                                                            JNum(99)) :: Nil))
+        res4 <- putStatusRaw(jobId, None)(JObject(
+          JField("progress", JNum(99)) :: JField("unit", JString("%")) :: Nil))
       } yield (res1, res2, res3, res4)).copoint
 
       def mustBeBad(res: HttpResponse[JValue]) = res must beLike {

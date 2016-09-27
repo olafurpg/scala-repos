@@ -370,9 +370,9 @@ trait CaseClassMacros extends ReprTypes {
   def accessiblePrimaryCtorOf(tpe: Type): Option[Symbol] = {
     for {
       ctor <- tpe.decls.find { sym =>
-               sym.isMethod && sym.asMethod.isPrimaryConstructor &&
-               isAccessible(tpe, sym)
-             } if !ctor.isJava || productCtorsOf(tpe).size == 1
+        sym.isMethod && sym.asMethod.isPrimaryConstructor &&
+        isAccessible(tpe, sym)
+      } if !ctor.isJava || productCtorsOf(tpe).size == 1
     } yield ctor
   }
 
@@ -653,7 +653,7 @@ trait CaseClassMacros extends ReprTypes {
   def isCaseAccessorLike(sym: TermSymbol): Boolean =
     !isNonGeneric(sym) && sym.isPublic &&
       (if (sym.owner.asClass.isCaseClass) sym.isCaseAccessor
-      else sym.isAccessor)
+       else sym.isAccessor)
 
   def isSealedHierarchyClassSymbol(symbol: ClassSymbol): Boolean = {
     def helper(classSym: ClassSymbol): Boolean = {

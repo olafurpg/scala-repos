@@ -53,7 +53,7 @@ object LiteralTests extends Properties("Literal") {
       left <- genLiteral
       // We have to make dags, so select from the closure of left sometimes
       right <- Gen
-                .oneOf(genLiteral, genChooseFrom(transitiveClosure[Box](left)))
+        .oneOf(genLiteral, genChooseFrom(transitiveClosure[Box](left)))
     } yield BinaryLit(left, right, bfn)
 
   def genChooseFrom[N[_]](s: Set[Literal[_, N]]): Gen[Literal[Int, N]] =

@@ -73,8 +73,8 @@ trait MemberLookupBase {
               def nameString(s: Symbol) =
                 s.nameString +
                   (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag)
-                    "$"
-                  else "")
+                     "$"
+                   else "")
               val packageSuffix = if (sym.hasPackageFlag) ".package" else ""
 
               sym.ownerChain.reverse

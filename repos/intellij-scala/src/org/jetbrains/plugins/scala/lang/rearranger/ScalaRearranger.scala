@@ -151,15 +151,15 @@ class ScalaRearranger
                          current: ArrangementMatchCondition) =
     (scalaTypesValues.contains(token) || supportedOrders.contains(token)) ||
       (if (current != null) {
-        val tokenType = ArrangementUtil.parseType(current)
-        if (tokenType != null) {
-          tokensForType(tokenType).contains(token)
-        } else {
-          commonModifiers.contains(token)
-        }
-      } else {
-        commonModifiers.contains(token)
-      })
+         val tokenType = ArrangementUtil.parseType(current)
+         if (tokenType != null) {
+           tokensForType(tokenType).contains(token)
+         } else {
+           commonModifiers.contains(token)
+         }
+       } else {
+         commonModifiers.contains(token)
+       })
 
   override def buildMatcher(condition: ArrangementMatchCondition) =
     throw new IllegalArgumentException(

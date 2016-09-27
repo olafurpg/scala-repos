@@ -480,7 +480,7 @@ object BuiltinCommands {
       lastOnly_keys <- keysParser
       kvs = Act.keyValues(structure)(lastOnly_keys._2)
       f <- if (lastOnly_keys._1) success(() => s)
-          else Aggregation.evaluatingParser(s, structure, show)(kvs)
+      else Aggregation.evaluatingParser(s, structure, show)(kvs)
     } yield
       () => {
         def export0(s: State): State = lastImpl(s, kvs, Some(ExportStream))
@@ -645,7 +645,7 @@ object BuiltinCommands {
       s.log.warn(
         "Ignoring load failure: " +
           (if (hadPrevious) "using previously loaded project."
-          else "no project loaded."))
+           else "no project loaded."))
       s
     } else if (matches("last"))
       LastCommand :: loadProjectCommand(LoadFailed, loadArg) :: s

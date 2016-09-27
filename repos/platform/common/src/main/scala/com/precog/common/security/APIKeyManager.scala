@@ -237,17 +237,17 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         if (checks.forall(_ == true)) {
           for {
             newGrants <- grantList traverse { g =>
-                          deriveGrant(g.name,
-                                      g.description,
-                                      issuerKey,
-                                      g.permissions,
-                                      g.expirationDate)
-                        }
-            newKey <- createAPIKey(name,
-                                   description,
-                                   issuerKey,
-                                   newGrants.flatMap(_.map(_.grantId))(
-                                     collection.breakOut))
+              deriveGrant(g.name,
+                          g.description,
+                          issuerKey,
+                          g.permissions,
+                          g.expirationDate)
+            }
+            newKey <- createAPIKey(
+              name,
+              description,
+              issuerKey,
+              newGrants.flatMap(_.map(_.grantId))(collection.breakOut))
           } yield some(newKey)
         } else {
           none[APIKeyRecord].point[M]

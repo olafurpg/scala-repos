@@ -502,9 +502,9 @@ trait MatchTranslation { self: PatternMatching =>
       protected def subPatRefsSeq(binder: Symbol): List[Tree] = {
         def lastTrees: List[Tree] =
           (if (!aligner.isStar) Nil
-          else if (expectedLength == 0)
-            seqTree(binder) :: Nil
-          else genDrop(binder, expectedLength))
+           else if (expectedLength == 0)
+             seqTree(binder) :: Nil
+           else genDrop(binder, expectedLength))
         // this error-condition has already been checked by checkStarPatOK:
         //   if(isSeq) assert(firstIndexingBinder + nbIndexingIndices + (if(lastIsStar) 1 else 0) == totalArity, "(resultInMonad, ts, subPatTypes, subPats)= "+(resultInMonad, ts, subPatTypes, subPats))
 
@@ -521,7 +521,7 @@ trait MatchTranslation { self: PatternMatching =>
       // require (nbSubPats > 0 && (!lastIsStar || isSeq))
       protected def subPatRefs(binder: Symbol): List[Tree] =
         (if (totalArity > 0 && isSeq) subPatRefsSeq(binder)
-        else productElemsToN(binder, totalArity))
+         else productElemsToN(binder, totalArity))
 
       private def compareInts(t1: Tree, t2: Tree) =
         gen.mkMethodCall(termMember(ScalaPackage, "math"),
@@ -594,15 +594,15 @@ trait MatchTranslation { self: PatternMatching =>
                (paramAccessors exists
                  (x => x.isMutable || definitions.isRepeated(x)))) {
 
-            subPatBinders.zipWithIndex.flatMap {
-              case (binder, idx) =>
-                val param = paramAccessorAt(idx)
-                if (param.isMutable ||
-                    (definitions.isRepeated(param) &&
-                    !aligner.isStar)) binder :: Nil
-                else Nil
-            }
-          } else Nil)
+             subPatBinders.zipWithIndex.flatMap {
+               case (binder, idx) =>
+                 val param = paramAccessorAt(idx)
+                 if (param.isMutable ||
+                     (definitions.isRepeated(param) &&
+                     !aligner.isStar)) binder :: Nil
+                 else Nil
+             }
+           } else Nil)
 
         // checks binder ne null before chaining to the next extractor
         ProductExtractorTreeMaker(binder, lengthGuard(binder))(

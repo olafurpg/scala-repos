@@ -103,13 +103,13 @@ abstract class NumericRange[T](
 
   final override def take(n: Int): NumericRange[T] =
     (if (n <= 0 || length == 0) newEmptyRange(start)
-    else if (n >= length) this
-    else new NumericRange.Inclusive(start, locationAfterN(n - 1), step))
+     else if (n >= length) this
+     else new NumericRange.Inclusive(start, locationAfterN(n - 1), step))
 
   final override def drop(n: Int): NumericRange[T] =
     (if (n <= 0 || length == 0) this
-    else if (n >= length) newEmptyRange(end)
-    else copy(locationAfterN(n), end, step))
+     else if (n >= length) newEmptyRange(end)
+     else copy(locationAfterN(n), end, step))
 
   def apply(idx: Int): T = {
     if (idx < 0 || idx >= length)

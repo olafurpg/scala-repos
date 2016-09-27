@@ -318,8 +318,8 @@ object FirstOrderMinimizer {
       case s: State[T, _, _]
           if (norm(s.adjustedGradient) <= math.max(tolerance *
                                                      (if (relative)
-                                                       s.adjustedValue
-                                                     else 1.0),
+                                                        s.adjustedValue
+                                                      else 1.0),
                                                    1E-8)) =>
         GradientConverged
     }

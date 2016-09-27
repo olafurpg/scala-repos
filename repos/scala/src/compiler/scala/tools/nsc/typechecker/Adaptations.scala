@@ -33,11 +33,11 @@ trait Adaptations { self: Analyzer =>
         ((if (t.symbol.isConstructor) "new " else "") +
           (t.symbol.owner.decodedName) +
           (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
-          else "." + t.symbol.decodedName))
+           else "." + t.symbol.decodedName))
       def sigString =
         t.symbol.owner.decodedName +
           (if (t.symbol.isConstructor) t.symbol.signatureString
-          else "." + t.symbol.decodedName + t.symbol.signatureString)
+           else "." + t.symbol.decodedName + t.symbol.signatureString)
       def givenString = if (args.isEmpty) "<none>" else args.mkString(", ")
       def adaptedArgs =
         if (args.isEmpty) "(): Unit"
@@ -47,8 +47,8 @@ trait Adaptations { self: Analyzer =>
         msg + "\n        signature: " + sigString + "\n  given arguments: " +
           givenString +
           (if (showAdaptation)
-            "\n after adaptation: " + callString + "(" + adaptedArgs + ")"
-          else "")
+             "\n after adaptation: " + callString + "(" + adaptedArgs + ")"
+           else "")
 
       // A one-argument method accepting Object (which may look like "Any"
       // at this point if the class is java defined) is a "leaky target" for
@@ -83,8 +83,8 @@ trait Adaptations { self: Analyzer =>
           val msg =
             "Adaptation of argument list by inserting () has been deprecated: " +
               (if (isLeakyTarget)
-                "leaky (Object-receiving) target makes this especially dangerous."
-              else "this is unlikely to be what you want.")
+                 "leaky (Object-receiving) target makes this especially dangerous."
+               else "this is unlikely to be what you want.")
           context.deprecationWarning(t.pos, t.symbol, adaptWarningMessage(msg))
         }
       } else if (settings.warnAdaptedArgs)

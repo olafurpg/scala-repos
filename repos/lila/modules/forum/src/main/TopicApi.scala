@@ -27,17 +27,17 @@ private[forum] final class TopicApi(
            troll: Boolean): Fu[Option[(Categ, Topic, Paginator[Post])]] =
     for {
       data ← (for {
-              categ ← optionT(CategRepo bySlug categSlug)
-              topic ← optionT(TopicRepo(troll).byTree(categSlug, slug))
-            } yield categ -> topic).run
+        categ ← optionT(CategRepo bySlug categSlug)
+        topic ← optionT(TopicRepo(troll).byTree(categSlug, slug))
+      } yield categ -> topic).run
       res ← data ?? {
-             case (categ, topic) =>
-               lila.mon.forum.topic.view()
-               (TopicRepo incViews topic) >>
-                 (env.postApi.paginator(topic, page, troll) map {
-                   (categ, topic, _).some
-                 })
-           }
+        case (categ, topic) =>
+          lila.mon.forum.topic.view()
+          (TopicRepo incViews topic) >>
+            (env.postApi.paginator(topic, page, troll) map {
+              (categ, topic, _).some
+            })
+      }
     } yield res
 
   def makeTopic(categ: Categ, data: DataForm.TopicData)(
@@ -120,15 +120,15 @@ private[forum] final class TopicApi(
       nbPostsTroll ← PostRepoTroll countByTopics List(topic)
       lastPostTroll ← PostRepoTroll lastByTopics List(topic)
       _ ← $update(
-           topic.copy(
-             nbPosts = nbPosts,
-             lastPostId = lastPost ?? (_.id),
-             updatedAt = lastPost.fold(topic.updatedAt)(_.createdAt),
-             nbPostsTroll = nbPostsTroll,
-             lastPostIdTroll = lastPostTroll ?? (_.id),
-             updatedAtTroll =
-               lastPostTroll.fold(topic.updatedAtTroll)(_.createdAt)
-           ))
+        topic.copy(
+          nbPosts = nbPosts,
+          lastPostId = lastPost ?? (_.id),
+          updatedAt = lastPost.fold(topic.updatedAt)(_.createdAt),
+          nbPostsTroll = nbPostsTroll,
+          lastPostIdTroll = lastPostTroll ?? (_.id),
+          updatedAtTroll =
+            lastPostTroll.fold(topic.updatedAtTroll)(_.createdAt)
+        ))
     } yield ()
 
   def denormalize: Funit =

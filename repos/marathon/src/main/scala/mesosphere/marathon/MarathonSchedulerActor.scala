@@ -523,8 +523,8 @@ class SchedulerActions(appRepository: AppRepository,
   def reconcileHealthChecks(): Unit = {
     for {
       apps <- groupRepository
-               .rootGroup()
-               .map(_.map(_.transitiveApps).getOrElse(Set.empty))
+        .rootGroup()
+        .map(_.map(_.transitiveApps).getOrElse(Set.empty))
       app <- apps
     } healthCheckManager.reconcileWith(app.id)
   }

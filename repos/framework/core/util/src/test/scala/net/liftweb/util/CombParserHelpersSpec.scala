@@ -173,10 +173,10 @@ object StringWithWhiteGen {
 
   def genStringWithWhite =
     for (len <- choose(1, 4);
-         string <- listOfN(len,
-                           frequency((1, Gen.const("a")),
-                                     (2, Gen.const("b")),
-                                     (1, genWhite)))) yield string.mkString("")
+         string <- listOfN(
+           len,
+           frequency((1, Gen.const("a")), (2, Gen.const("b")), (1, genWhite))))
+      yield string.mkString("")
 
   implicit def genString: Arbitrary[String] =
     Arbitrary { genStringWithWhite }

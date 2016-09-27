@@ -315,11 +315,11 @@ class MutableSettings(val errorFn: String => Unit)
                          name: String,
                          allowJar: Boolean = false): AbstractFile =
       (if (dir != null && dir.isDirectory) dir
-      else if (allowJar && dir == null &&
-               Jar.isJarOrZip(name, examineFile = false))
-        new PlainFile(Path(name))
-      else
-        throw new FatalError(name + " does not exist or is not a directory"))
+       else if (allowJar && dir == null &&
+                Jar.isJarOrZip(name, examineFile = false))
+         new PlainFile(Path(name))
+       else
+         throw new FatalError(name + " does not exist or is not a directory"))
 
     /** Set the single output directory. From now on, all files will
       *  be dumped in there, regardless of previous calls to 'add'.

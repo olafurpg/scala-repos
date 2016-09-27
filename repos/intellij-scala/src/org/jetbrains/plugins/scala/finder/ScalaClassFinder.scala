@@ -31,13 +31,13 @@ class ScalaClassFinder(project: Project) extends PsiElementFinder {
         .getInstance(project)
         .getClassesByFQName(nameWithoutDollar, scope)
       (if (classes.isEmpty) {
-        val converted = ScalaPsiUtil.convertMemberName(nameWithoutDollar)
-        if (nameWithoutDollar != converted)
-          ScalaShortNamesCacheManager
-            .getInstance(project)
-            .getClassesByFQName(converted, scope)
-        else classes
-      } else classes).foreach(fun)
+         val converted = ScalaPsiUtil.convertMemberName(nameWithoutDollar)
+         if (nameWithoutDollar != converted)
+           ScalaShortNamesCacheManager
+             .getInstance(project)
+             .getClassesByFQName(converted, scope)
+         else classes
+       } else classes).foreach(fun)
     }
 
     iterateClasses("") {

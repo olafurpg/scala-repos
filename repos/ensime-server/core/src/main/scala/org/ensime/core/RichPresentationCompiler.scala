@@ -132,18 +132,18 @@ trait RichCompilerControl
     askScopeCompletion(p, x)
     (for (members <- x.get.left.toOption;
           infos <- askOption {
-                    val roots = filterMembersByPrefix(
-                      members,
-                      firstName,
-                      matchEntire = true,
-                      caseSens = true
-                    ).map { _.sym }
-                    val restOfPath = nameSegs.drop(1).mkString(".")
-                    val syms = roots.flatMap { symbolByName(restOfPath, _) }
-                    syms.find(_.tpe != NoType).map { sym =>
-                      TypeInfo(sym.tpe)
-                    }
-                  }) yield infos).flatten
+            val roots = filterMembersByPrefix(
+              members,
+              firstName,
+              matchEntire = true,
+              caseSens = true
+            ).map { _.sym }
+            val restOfPath = nameSegs.drop(1).mkString(".")
+            val syms = roots.flatMap { symbolByName(restOfPath, _) }
+            syms.find(_.tpe != NoType).map { sym =>
+              TypeInfo(sym.tpe)
+            }
+          }) yield infos).flatten
   }
 
   def askPackageByPath(path: String): Option[PackageInfo] =

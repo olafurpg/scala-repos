@@ -540,8 +540,8 @@ object EvaluateTask {
                                            state: State,
                                            streams: Streams): Unit =
     for (referenced <- Previous.references in Global get Project
-                        .structure(state)
-                        .data) Previous.complete(referenced, results, streams)
+           .structure(state)
+           .data) Previous.complete(referenced, results, streams)
 
   def applyResults[T](results: RMap[Task, Result],
                       state: State,
@@ -578,7 +578,7 @@ object EvaluateTask {
       case (caller: Task[_], target: Task[_]) =>
         c.toString +
           (if (caller eq target) "(task: " + name(caller) + ")"
-          else "(caller: " + name(caller) + ", target: " + name(target) + ")")
+           else "(caller: " + name(caller) + ", target: " + name(target) + ")")
       case _ => c.toString
     }
 

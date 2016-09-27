@@ -288,10 +288,10 @@ object Plugins extends PluginsFunctions {
       (ns map { c =>
         val reasons =
           (if (flatten(requested) contains c) List("requested")
-          else Nil) ++
+           else Nil) ++
             (if (c.requires != empty && c.trigger == allRequirements)
-              List(s"enabled by ${c.requires.toString}")
-            else Nil) ++ {
+               List(s"enabled by ${c.requires.toString}")
+             else Nil) ++ {
             val reqs =
               selected filter { x =>
                 asRequirements(x) contains c

@@ -475,7 +475,7 @@ object ForkJoinExecutorConfigurator {
       if (r ne null)
         super.execute(
           (if (r.isInstanceOf[ForkJoinTask[_]]) r
-          else new AkkaForkJoinTask(r)).asInstanceOf[ForkJoinTask[Any]])
+           else new AkkaForkJoinTask(r)).asInstanceOf[ForkJoinTask[Any]])
       else throw new NullPointerException("Runnable was null")
 
     def atFullThrottle(): Boolean =

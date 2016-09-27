@@ -21,12 +21,10 @@ class ReorderOperations extends Phase {
                    Ellipsis(n, List(0, 0), List(0, 1)))
       val s1l, s1r = new AnonSymbol
       val n2 = Union(Bind(s1l, l1, sel.replace {
-                       case Ref(s) if s == s1 => Ref(s1l)
-                     }),
-                     Bind(s1r, r1, sel.replace {
-                       case Ref(s) if s == s1 => Ref(s1r)
-                     }),
-                     all).infer()
+        case Ref(s) if s == s1 => Ref(s1l)
+      }), Bind(s1r, r1, sel.replace {
+        case Ref(s) if s == s1 => Ref(s1r)
+      }), all).infer()
       logger.debug("Pushed Bind into both sides of a Union",
                    Ellipsis(n2, List(0, 0), List(1, 0)))
       n2
@@ -37,12 +35,10 @@ class ReorderOperations extends Phase {
                    Ellipsis(n, List(0, 0), List(0, 1)))
       val s1l, s1r = new AnonSymbol
       val n2 = Union(Filter(s1l, l1, pred.replace {
-                       case Ref(s) if s == s1 => Ref(s1l)
-                     }),
-                     Filter(s1r, r1, pred.replace {
-                       case Ref(s) if s == s1 => Ref(s1r)
-                     }),
-                     all).infer()
+        case Ref(s) if s == s1 => Ref(s1l)
+      }), Filter(s1r, r1, pred.replace {
+        case Ref(s) if s == s1 => Ref(s1r)
+      }), all).infer()
       logger.debug("Pushed Filter into both sides of a Union",
                    Ellipsis(n2, List(0, 0), List(1, 0)))
       n2

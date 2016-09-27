@@ -272,7 +272,7 @@ case class GetJsonObject(json: Expression, path: Expression)
               // we've written more than one element, this matches Hive's behavior
               dirty +=
                 (if (evaluatePath(p, flattenGenerator, nextStyle, xs)) 1
-                else 0)
+                 else 0)
             }
             flattenGenerator.writeEndArray()
         }

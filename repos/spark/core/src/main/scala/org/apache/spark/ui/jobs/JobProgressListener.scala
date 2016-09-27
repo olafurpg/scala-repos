@@ -180,7 +180,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     synchronized {
       val jobGroup = for (props <- Option(jobStart.properties);
                           group <- Option(props.getProperty(
-                                    SparkContext.SPARK_JOB_GROUP_ID)))
+                            SparkContext.SPARK_JOB_GROUP_ID)))
         yield group
       val jobData: JobUIData =
         new JobUIData(jobId = jobStart.jobId,
@@ -287,7 +287,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     }
 
     for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-                                        stage.stageId);
+           stage.stageId);
          jobId <- activeJobsDependentOnStage;
          jobData <- jobIdToData.get(jobId)) {
       jobData.numActiveStages -= 1
@@ -325,7 +325,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     stages(stage.stageId) = stage
 
     for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-                                        stage.stageId);
+           stage.stageId);
          jobId <- activeJobsDependentOnStage;
          jobData <- jobIdToData.get(jobId)) {
       jobData.numActiveStages += 1
@@ -350,7 +350,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
           .put(taskInfo.taskId, new TaskUIData(taskInfo, Some(metrics)))
       }
       for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-                                          taskStart.stageId);
+             taskStart.stageId);
            jobId <- activeJobsDependentOnStage;
            jobData <- jobIdToData.get(jobId)) {
         jobData.numActiveTasks += 1
@@ -426,7 +426,7 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       taskData.errorMessage = errorMessage
 
       for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-                                          taskEnd.stageId);
+             taskEnd.stageId);
            jobId <- activeJobsDependentOnStage;
            jobData <- jobIdToData.get(jobId)) {
         jobData.numActiveTasks -= 1

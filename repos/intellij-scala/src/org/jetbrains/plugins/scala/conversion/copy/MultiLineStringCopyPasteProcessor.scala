@@ -57,8 +57,8 @@ class MultiLineStringCopyPasteProcessor extends CopyPastePreProcessor {
 
     (if (document.getText(textRange).trim.length == 0 &&
          (text.trim().length == 0 || text.trim.charAt(0) != marginChar))
-      marginChar
-    else "") + text.replace("\n", "\n " + marginChar)
+       marginChar
+     else "") + text.replace("\n", "\n " + marginChar)
   }
 
   private def getMarginChar(element: PsiElement): Char =

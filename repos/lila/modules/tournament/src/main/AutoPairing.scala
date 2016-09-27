@@ -63,9 +63,9 @@ final class AutoPairing(roundMap: ActorRef,
         .withId(pairing.gameId)
         .start
       _ ← (GameRepo insertDenormalized game2) >>- scheduleIdleCheck(
-           PovRef(game2.id, game2.turnColor),
-           SecondsToDoFirstMove.secondsToMoveFor(tour),
-           true) >>- onStart(game2.id)
+        PovRef(game2.id, game2.turnColor),
+        SecondsToDoFirstMove.secondsToMoveFor(tour),
+        true) >>- onStart(game2.id)
     } yield game2
 
   private def getUser(username: String): Fu[User] =

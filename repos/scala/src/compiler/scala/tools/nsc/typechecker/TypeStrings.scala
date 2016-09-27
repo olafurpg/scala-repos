@@ -29,8 +29,8 @@ trait StructuredTypeStrings extends DestructureTypes {
                       labels: Boolean) {
     def join(elems: String*): String =
       (if (elems.isEmpty) ""
-      else
-        elems.mkString(ldelim, mdelim, rdelim))
+       else
+         elems.mkString(ldelim, mdelim, rdelim))
   }
   val NoGrouping = Grouping("", "", "", labels = false)
   val ListGrouping = Grouping("(", ", ", ")", labels = false)

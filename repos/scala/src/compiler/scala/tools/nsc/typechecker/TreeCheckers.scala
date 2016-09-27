@@ -60,7 +60,7 @@ abstract class TreeCheckers extends Analyzer {
   private def wholetreestr(t: Tree) = nodeToString(t) + "\n"
   private def truncate(str: String, len: Int): String =
     (if (str.length <= len) str
-    else (str takeWhile (_ != '\n') take len - 3) + "...")
+     else (str takeWhile (_ != '\n') take len - 3) + "...")
   private def signature(sym: Symbol) =
     clean_s(sym match {
       case null => "null"
@@ -176,13 +176,13 @@ abstract class TreeCheckers extends Analyzer {
 
   def posstr(p: Position): String =
     (if (p eq null) ""
-    else {
-      try p.source.path + ":" + p.line
-      catch {
-        case _: UnsupportedOperationException =>
-          p.toString
-      }
-    })
+     else {
+       try p.source.path + ":" + p.line
+       catch {
+         case _: UnsupportedOperationException =>
+           p.toString
+       }
+     })
 
   def errorFn(pos: Position, msg: Any): Unit =
     reporter.warning(pos, "[check: %s] %s".format(phase.prev, msg))
@@ -279,7 +279,7 @@ abstract class TreeCheckers extends Analyzer {
     }
     override def typed(tree: Tree, mode: Mode, pt: Type): Tree =
       (if (passThrough(tree)) super.typed(tree, mode, pt)
-      else checkedTyped(tree, mode, pt))
+       else checkedTyped(tree, mode, pt))
     private def checkedTyped(tree: Tree, mode: Mode, pt: Type): Tree = {
       val typed = wrap(tree)(super.typed(tree.clearType(), mode, pt))
 

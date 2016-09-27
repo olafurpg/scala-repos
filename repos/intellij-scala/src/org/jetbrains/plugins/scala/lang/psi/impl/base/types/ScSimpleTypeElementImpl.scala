@@ -538,32 +538,38 @@ object ScSimpleTypeElementImpl {
   def calculateReferenceType(ref: ScStableCodeReferenceElement,
                              shapesOnly: Boolean): TypeResult[ScType] = {
     val (resolvedElement, fromType) = (if (!shapesOnly) {
-      if (ref.isConstructorReference) {
-        ref.resolveNoConstructor match {
-          case Array(
-              r @ ScalaResolveResult(to: ScTypeParametersOwner,
-                                     subst: ScSubstitutor))
-              if to.isInstanceOf[PsiNamedElement] &&
-                (to.typeParameters.isEmpty ||
-                  ref.getContext.isInstanceOf[ScParameterizedTypeElement]) =>
-            Some(r)
-          case Array(
-              r @ ScalaResolveResult(to: PsiTypeParameterListOwner,
-                                     subst: ScSubstitutor))
-              if to.isInstanceOf[PsiNamedElement] &&
-                (to.getTypeParameters.isEmpty ||
-                  ref.getContext.isInstanceOf[ScParameterizedTypeElement]) =>
-            Some(r)
-          case _ => ref.bind()
-        }
-      } else ref.bind()
-    } else {
-      ref.shapeResolve match {
-        case Array(r: ScalaResolveResult) =>
-          Some(r)
-        case _ => None
-      }
-    }) match {
+                                         if (ref.isConstructorReference) {
+                                           ref.resolveNoConstructor match {
+                                             case Array(
+                                                 r @ ScalaResolveResult(
+                                                 to: ScTypeParametersOwner,
+                                                 subst: ScSubstitutor))
+                                                 if to.isInstanceOf[
+                                                   PsiNamedElement] &&
+                                                   (to.typeParameters.isEmpty ||
+                                                     ref.getContext
+                                                       .isInstanceOf[ScParameterizedTypeElement]) =>
+                                               Some(r)
+                                             case Array(
+                                                 r @ ScalaResolveResult(
+                                                 to: PsiTypeParameterListOwner,
+                                                 subst: ScSubstitutor))
+                                                 if to.isInstanceOf[
+                                                   PsiNamedElement] &&
+                                                   (to.getTypeParameters.isEmpty ||
+                                                     ref.getContext
+                                                       .isInstanceOf[ScParameterizedTypeElement]) =>
+                                               Some(r)
+                                             case _ => ref.bind()
+                                           }
+                                         } else ref.bind()
+                                       } else {
+                                         ref.shapeResolve match {
+                                           case Array(r: ScalaResolveResult) =>
+                                             Some(r)
+                                           case _ => None
+                                         }
+                                       }) match {
       case Some(r @ ScalaResolveResult(n: PsiMethod, _)) if n.isConstructor =>
         (n.containingClass, r.fromType)
       case Some(r @ ScalaResolveResult(n: PsiNamedElement, _)) =>

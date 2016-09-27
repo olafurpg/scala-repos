@@ -276,7 +276,7 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
           if (null == path || path.isEmpty) "/" else path
 
         val uri = (if (url.matches("^(http|HTTP)(s|S)?:.*")) new URI(url)
-        else new URI("http://" + url)).normalize()
+                   else new URI("http://" + url)).normalize()
         new URI(scheme(uri),
                 uri.getUserInfo,
                 uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
@@ -326,8 +326,8 @@ private[openid] object Discovery {
     def resolve(response: WSResponse) =
       for {
         _ <- response
-              .header(HeaderNames.CONTENT_TYPE)
-              .filter(_.contains("application/xrds+xml"))
+          .header(HeaderNames.CONTENT_TYPE)
+          .filter(_.contains("application/xrds+xml"))
         findInXml = findUriWithType(response.xml) _
         (typeId, uri) <- serviceTypeId.flatMap(findInXml(_)).headOption
       } yield OpenIDServer(typeId, uri, None)

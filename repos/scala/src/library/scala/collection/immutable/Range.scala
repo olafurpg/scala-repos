@@ -179,12 +179,12 @@ class Range(val start: Int, val end: Int, val step: Int)
     */
   final override def take(n: Int): Range =
     (if (n <= 0 || isEmpty) newEmptyRange(start)
-    else if (n >= numRangeElements && numRangeElements >= 0) this
-    else {
-      // May have more than Int.MaxValue elements in range (numRangeElements < 0)
-      // but the logic is the same either way: take the first n
-      new Range.Inclusive(start, locationAfterN(n - 1), step)
-    })
+     else if (n >= numRangeElements && numRangeElements >= 0) this
+     else {
+       // May have more than Int.MaxValue elements in range (numRangeElements < 0)
+       // but the logic is the same either way: take the first n
+       new Range.Inclusive(start, locationAfterN(n - 1), step)
+     })
 
   /** Creates a new range containing all the elements of this range except the first `n` elements.
     *
@@ -195,14 +195,14 @@ class Range(val start: Int, val end: Int, val step: Int)
     */
   final override def drop(n: Int): Range =
     (if (n <= 0 || isEmpty) this
-    else if (n >= numRangeElements &&
-             numRangeElements >= 0)
-      newEmptyRange(end)
-    else {
-      // May have more than Int.MaxValue elements (numRangeElements < 0)
-      // but the logic is the same either way: go forwards n steps, keep the rest
-      copy(locationAfterN(n), end, step)
-    })
+     else if (n >= numRangeElements &&
+              numRangeElements >= 0)
+       newEmptyRange(end)
+     else {
+       // May have more than Int.MaxValue elements (numRangeElements < 0)
+       // but the logic is the same either way: go forwards n steps, keep the rest
+       copy(locationAfterN(n), end, step)
+     })
 
   /** Creates a new range containing the elements starting at `from` up to but not including `until`.
     *
@@ -434,8 +434,8 @@ object Range {
 
     val isEmpty =
       (if (start == end) !isInclusive
-      else if (start < end) step < 0
-      else step > 0)
+       else if (start < end) step < 0
+       else step > 0)
     if (isEmpty) 0
     else {
       // Counts with Longs so we can recognize too-large ranges.

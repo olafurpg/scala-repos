@@ -1836,7 +1836,7 @@ class Dataset[T] private[sql] (
 
     val outputCols =
       (if (cols.isEmpty) numericColumns.map(usePrettyExpression(_).sql)
-      else cols).toList
+       else cols).toList
 
     val ret: Seq[Row] =
       if (outputCols.nonEmpty) {

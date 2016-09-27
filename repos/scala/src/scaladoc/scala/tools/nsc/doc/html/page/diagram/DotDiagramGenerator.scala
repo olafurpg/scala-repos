@@ -156,11 +156,11 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
             "subgraph clusterIncoming {\n" + "style=\"invis\"\n" +
               incomingImplicits.reverse.map(n => node2Dot(n)).mkString +
               (if (incomingImplicits.size > 1)
-                incomingImplicits
-                  .map(n => "node" + node2Index(n))
-                  .mkString(" -> ") +
-                  " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
-              else "") + "}"
+                 incomingImplicits
+                   .map(n => "node" + node2Index(n))
+                   .mkString(" -> ") +
+                   " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
+               else "") + "}"
         }
         // dot cluster containing outgoing implicit nodes, if any
         val outgoingCluster = {
@@ -169,11 +169,11 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
             "subgraph clusterOutgoing {\n" + "style=\"invis\"\n" +
               outgoingImplicits.reverse.map(n => node2Dot(n)).mkString +
               (if (outgoingImplicits.size > 1)
-                outgoingImplicits
-                  .map(n => "node" + node2Index(n))
-                  .mkString(" -> ") +
-                  " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
-              else "") + "}"
+                 outgoingImplicits
+                   .map(n => "node" + node2Index(n))
+                   .mkString(" -> ") +
+                   " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
+               else "") + "}"
         }
 
         // assemble clusters into another cluster
@@ -187,19 +187,19 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
           "\n" + thisCluster + "\n" + incomingCluster + "\n" +
           // incoming implicit edge
           (if (!incomingImplicits.isEmpty) {
-            val n = incomingImplicits.last
-            "node" + node2Index(n) + " -> node" + node2Index(thisNode) +
-              " [id=\"" + cssClass(n, thisNode) + "|" + node2Index(n) + "_" +
-              node2Index(thisNode) + "\", tooltip=\"" + incomingTooltip + "\"" +
-              ", constraint=\"false\", minlen=\"2\", ltail=\"clusterIncoming\", lhead=\"clusterThis\", label=\"implicitly\"];\n"
-          } else "") + // outgoing implicit edge
+             val n = incomingImplicits.last
+             "node" + node2Index(n) + " -> node" + node2Index(thisNode) +
+               " [id=\"" + cssClass(n, thisNode) + "|" + node2Index(n) + "_" +
+               node2Index(thisNode) + "\", tooltip=\"" + incomingTooltip + "\"" +
+               ", constraint=\"false\", minlen=\"2\", ltail=\"clusterIncoming\", lhead=\"clusterThis\", label=\"implicitly\"];\n"
+           } else "") + // outgoing implicit edge
           (if (!outgoingImplicits.isEmpty) {
-            val n = outgoingImplicits.head
-            "node" + node2Index(thisNode) + " -> node" + node2Index(n) +
-              " [id=\"" + cssClass(thisNode, n) + "|" + node2Index(thisNode) +
-              "_" + node2Index(n) + "\", tooltip=\"" + outgoingTooltip + "\"" +
-              ", constraint=\"false\", minlen=\"2\", ltail=\"clusterThis\", lhead=\"clusterOutgoing\", label=\"implicitly\"];\n"
-          } else "") + "}"
+             val n = outgoingImplicits.head
+             "node" + node2Index(thisNode) + " -> node" + node2Index(n) +
+               " [id=\"" + cssClass(thisNode, n) + "|" + node2Index(thisNode) +
+               "_" + node2Index(n) + "\", tooltip=\"" + outgoingTooltip + "\"" +
+               ", constraint=\"false\", minlen=\"2\", ltail=\"clusterThis\", lhead=\"clusterOutgoing\", label=\"implicitly\"];\n"
+           } else "") + "}"
       }
     }
 
@@ -224,7 +224,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
                   node2Index(from) + " [id=\"" + cssClass(to, from) +
                   "|" + id + "\", " + "tooltip=\"" + from.name +
                   (if (from.name.endsWith(MultiSuffix)) " are subtypes of "
-                  else " is a subtype of ") + to.name +
+                   else " is a subtype of ") + to.name +
                   "\", dir=\"back\", arrowtail=\"empty\"];\n"
               })
               .mkString

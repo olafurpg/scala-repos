@@ -81,10 +81,10 @@ trait Kinds { self: SymbolTable =>
     private def buildMessage(xs: List[SymPair],
                              f: (Symbol, Symbol) => String) =
       (if (xs.isEmpty) ""
-      else
-        xs map f.tupled mkString
-          ("\n", ", ",
-          ""))
+       else
+         xs map f.tupled mkString
+           ("\n", ", ",
+           ""))
 
     def errorMessage(targ: Type, tparam: Symbol): String =
       ((targ + "'s type parameters do not match " + tparam +
@@ -423,9 +423,9 @@ trait Kinds { self: SymbolTable =>
       import Variance._
       (args map { arg =>
         (if (arg.kind.order == 0) arg.kind.starNotation
-        else "(" + arg.kind.starNotation + ")") +
+         else "(" + arg.kind.starNotation + ")") +
           (if (arg.variance == Invariant) " -> "
-          else " -(" + arg.variance.symbolicString + ")-> ")
+           else " -(" + arg.variance.symbolicString + ")-> ")
       }).mkString + "*" + bounds.starNotation(_.toString)
     }
   }

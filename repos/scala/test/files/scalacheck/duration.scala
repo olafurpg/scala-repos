@@ -27,7 +27,7 @@ object Test extends Properties("Division of Duration by Long") {
   val genTwoLarge = for {
     a <- weightedLong
     b <- arbitrary[Long] suchThat
-          (b => (abs(b) > Long.MaxValue / max(1, abs(a))))
+      (b => (abs(b) > Long.MaxValue / max(1, abs(a))))
   } yield (a, b)
 
   val genClose = for {

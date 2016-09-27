@@ -353,7 +353,7 @@ class Flags extends ModifierFlags {
   def getterFlags(fieldFlags: Long): Long =
     ACCESSOR +
       (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
-      else fieldFlags & ~PRESUPER | STABLE)
+       else fieldFlags & ~PRESUPER | STABLE)
 
   def setterFlags(fieldFlags: Long): Long =
     getterFlags(fieldFlags) & ~STABLE & ~CASEACCESSOR
@@ -495,13 +495,13 @@ class Flags extends ModifierFlags {
 
   private def accessString(flags: Long, privateWithin: String) =
     (if (privateWithin == "") {
-      if ((flags & PrivateLocal) == PrivateLocal) "private[this]"
-      else if ((flags & ProtectedLocal) == ProtectedLocal) "protected[this]"
-      else if ((flags & PRIVATE) != 0) "private"
-      else if ((flags & PROTECTED) != 0) "protected"
-      else ""
-    } else if ((flags & PROTECTED) != 0) "protected[" + privateWithin + "]"
-    else "private[" + privateWithin + "]")
+       if ((flags & PrivateLocal) == PrivateLocal) "private[this]"
+       else if ((flags & ProtectedLocal) == ProtectedLocal) "protected[this]"
+       else if ((flags & PRIVATE) != 0) "private"
+       else if ((flags & PROTECTED) != 0) "protected"
+       else ""
+     } else if ((flags & PROTECTED) != 0) "protected[" + privateWithin + "]"
+     else "private[" + privateWithin + "]")
 
   @deprecated("Use flagString on the flag-carrying member", "2.10.0")
   private[scala] def flagsToString(flags: Long,

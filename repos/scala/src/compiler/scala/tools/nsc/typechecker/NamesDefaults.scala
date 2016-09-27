@@ -305,15 +305,15 @@ trait NamesDefaults { self: Analyzer =>
             val byName = isByNameParamType(paramTpe)
             val repeated = isScalaRepeatedParamType(paramTpe)
             val argTpe = (if (repeated)
-              arg match {
-                case WildcardStarArg(expr) => expr.tpe
-                case _ => seqType(arg.tpe)
-              } else {
-              // TODO In 83c9c764b, we tried to a stable type here to fix SI-7234. But the resulting TypeTree over a
-              //      singleton type without an original TypeTree fails to retypecheck after a resetAttrs (SI-7516),
-              //      which is important for (at least) macros.
-              arg.tpe
-            }).widen // have to widen or types inferred from literal defaults will be singletons
+                            arg match {
+                              case WildcardStarArg(expr) => expr.tpe
+                              case _ => seqType(arg.tpe)
+                            } else {
+                            // TODO In 83c9c764b, we tried to a stable type here to fix SI-7234. But the resulting TypeTree over a
+                            //      singleton type without an original TypeTree fails to retypecheck after a resetAttrs (SI-7516),
+                            //      which is important for (at least) macros.
+                            arg.tpe
+                          }).widen // have to widen or types inferred from literal defaults will be singletons
             val s =
               context.owner.newValue(unit.freshTermName(nme.NAMEDARG_PREFIX),
                                      arg.pos,

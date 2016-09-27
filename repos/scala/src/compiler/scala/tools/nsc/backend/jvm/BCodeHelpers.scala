@@ -1136,8 +1136,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         s"Potentially conflicting names for forwarders: $conflictingNames")
 
       for (m <- moduleClass.info.membersBasedOnFlags(
-                 BCodeHelpers.ExcludedForwarderFlags,
-                 symtab.Flags.METHOD)) {
+             BCodeHelpers.ExcludedForwarderFlags,
+             symtab.Flags.METHOD)) {
         if (m.isType || m.isDeferred || (m.owner eq definitions.ObjectClass) ||
             m.isConstructor)
           debuglog(
@@ -1296,8 +1296,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
            s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
         // inserting $outer breaks the bean
         fieldList = javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
-            javaSimpleName(s)
-          else null) :: fieldList
+                                                                 javaSimpleName(
+                                                                   s)
+                                                               else
+                                                                 null) :: fieldList
       }
 
       val methodList: List[String] =

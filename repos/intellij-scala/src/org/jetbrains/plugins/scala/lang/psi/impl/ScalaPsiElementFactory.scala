@@ -649,7 +649,7 @@ object ScalaPsiElementFactory {
     val text =
       "import " +
         (if (isResolved(name, clazz, packageName, manager)) name
-        else "_root_." + qualifiedName)
+         else "_root_." + qualifiedName)
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
       .createFileFromText(

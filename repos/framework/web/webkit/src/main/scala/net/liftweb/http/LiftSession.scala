@@ -144,19 +144,19 @@ object LiftSession {
     }
 
     (if (Props.devMode) {
-      // no caching in dev mode
-      calcConstructor()
-    } else {
-      val key = (clz -> pp.map(_.clz))
-      constructorCache.get(key) match {
-        case Some(v) => v
-        case _ => {
-          val nv = calcConstructor()
-          constructorCache += (key -> nv)
-          nv
-        }
-      }
-    }).map {
+       // no caching in dev mode
+       calcConstructor()
+     } else {
+       val key = (clz -> pp.map(_.clz))
+       constructorCache.get(key) match {
+         case Some(v) => v
+         case _ => {
+           val nv = calcConstructor()
+           constructorCache += (key -> nv)
+           nv
+         }
+       }
+     }).map {
       case uc: UnitConstructor => uc.makeOne
       case pc: PConstructor => pc.makeOne(pp.openOrThrowException("It's ok").v)
       case psc: PAndSessionConstructor =>
@@ -222,8 +222,8 @@ private[http] object RenderVersion {
     val ret: Box[T] = for {
       sess <- S.session
       func <- sess.findFunc(v).collect {
-               case f: S.PageStateHolder => f
-             }
+        case f: S.PageStateHolder => f
+      }
     } yield {
       val tret = ver.doWith(v) {
         val ret = func.runInContext(f)
@@ -1253,13 +1253,13 @@ class LiftSession(private[http] val _contextPath: String,
         for {
           i <- n.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-                    processSurroundAndInclude("Source", xform(ns)))
+            processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case en: java.util.Enumeration[_] =>
         for {
           i <- en.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-                    processSurroundAndInclude("Source", xform(ns)))
+            processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case se: scala.collection.Iterable[_] =>
         runSourceContext(se.iterator, xform, ns)
@@ -1267,7 +1267,7 @@ class LiftSession(private[http] val _contextPath: String,
         for {
           i <- se.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-                    processSurroundAndInclude("Source", xform(ns)))
+            processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case a: Array[_] => runSourceContext(a.toList, xform, ns)
       case x =>
@@ -1367,8 +1367,8 @@ class LiftSession(private[http] val _contextPath: String,
 
   private[liftweb] def findTemplate(name: String): Box[NodeSeq] = {
     val splits = (if (name.startsWith("/"))
-      name
-    else "/" + name).split("/").toList.drop(1) match {
+                    name
+                  else "/" + name).split("/").toList.drop(1) match {
       case Nil => List("index")
       case s => s
     }
@@ -1468,9 +1468,9 @@ class LiftSession(private[http] val _contextPath: String,
 
     for {
       template <- Templates(name, S.locale) ?~
-                   ("Template " + name + " not found")
+        ("Template " + name + " not found")
       res <- findElem(
-              processSurroundAndInclude(name.mkString("/", "/", ""), template))
+        processSurroundAndInclude(name.mkString("/", "/", ""), template))
     } yield res
   }
 
@@ -2866,27 +2866,27 @@ class LiftSession(private[http] val _contextPath: String,
             func <- map.get(name)
             payload = in \ "payload"
             reified <- if (func.manifest == jvmanifest) Some(payload)
-                      else {
-                        try {
-                          Some(payload.extract(defaultFormats, func.manifest))
-                        } catch {
-                          case e: Exception =>
-                            logger.error("Failed to extract " + payload +
-                                           " as " + func.manifest,
-                                         e)
-                            ca ! FailMsg(guid,
-                                         "Failed to extract payload as " +
-                                           func.manifest + " exception " +
-                                           e.getMessage)
-                            None
-                        }
-                      }
+            else {
+              try {
+                Some(payload.extract(defaultFormats, func.manifest))
+              } catch {
+                case e: Exception =>
+                  logger.error("Failed to extract " + payload +
+                                 " as " + func.manifest,
+                               e)
+                  ca ! FailMsg(guid,
+                               "Failed to extract payload as " +
+                                 func.manifest + " exception " +
+                                 e.getMessage)
+                  None
+              }
+            }
           } {
             func match {
               case StreamRoundTrip(_, func) =>
                 try {
                   for (v <- func.asInstanceOf[Function1[Any, Stream[Any]]](
-                             reified)) {
+                         reified)) {
                     v match {
                       case jsCmd: JsCmd => ca ! jsCmd
                       case jsExp: JsExp => ca ! jsExp
@@ -3098,7 +3098,7 @@ private object SnippetNode {
       case elm: Elem => {
         for {
           SnippetInformation(snippetName, lift) <- snippetInformationForElement(
-                                                    elm)
+            elm)
         } yield {
           val (par, nonLift) = liftAttrsAndParallel(elm.attributes)
           val newElm = new Elem(elm.prefix,

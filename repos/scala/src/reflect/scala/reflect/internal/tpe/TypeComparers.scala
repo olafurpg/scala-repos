@@ -62,9 +62,9 @@ trait TypeComparers { self: SymbolTable =>
                                    sym2: Symbol,
                                    pre2: Type): Boolean =
     (if (sym1 eq sym2)
-      sym1.hasPackageFlag || sym1.owner.hasPackageFlag || phase.erasedTypes ||
-      pre1 =:= pre2
-    else (sym1.name == sym2.name) && isUnifiable(pre1, pre2))
+       sym1.hasPackageFlag || sym1.owner.hasPackageFlag || phase.erasedTypes ||
+       pre1 =:= pre2
+     else (sym1.name == sym2.name) && isUnifiable(pre1, pre2))
 
   def isDifferentType(tp1: Type, tp2: Type): Boolean =
     try {
@@ -459,15 +459,15 @@ trait TypeComparers { self: SymbolTable =>
             val pre1 = tr1.pre
             val pre2 = tr2.pre
             (((if (sym1 eq sym2)
-              phase.erasedTypes ||
-              sym1.owner.hasPackageFlag || isSubType(pre1, pre2, depth)
-            else
-              (sym1.name == sym2.name && !sym1.isModuleClass &&
-              !sym2.isModuleClass &&
-              (isUnifiable(pre1, pre2) ||
-              isSameSpecializedSkolem(sym1, sym2, pre1, pre2) ||
-              sym2.isAbstractType &&
-              isSubPre(pre1, pre2, sym2)))) &&
+                 phase.erasedTypes ||
+                 sym1.owner.hasPackageFlag || isSubType(pre1, pre2, depth)
+               else
+                 (sym1.name == sym2.name && !sym1.isModuleClass &&
+                 !sym2.isModuleClass &&
+                 (isUnifiable(pre1, pre2) ||
+                 isSameSpecializedSkolem(sym1, sym2, pre1, pre2) ||
+                 sym2.isAbstractType &&
+                 isSubPre(pre1, pre2, sym2)))) &&
             isSubArgs(tr1.args, tr2.args, sym1.typeParams, depth)) ||
             sym2.isClass && {
               val base = tr1 baseType sym2
@@ -526,9 +526,9 @@ trait TypeComparers { self: SymbolTable =>
         isDifferentTypeConstructor(tp2, lo) && retry(tp1, lo)
       def classOnRight =
         (if (isRawType(tp2)) retry(tp1, rawToExistential(tp2))
-        else if (sym2.isRefinementClass)
-          retry(tp1, sym2.info)
-        else fourthTry)
+         else if (sym2.isRefinementClass)
+           retry(tp1, sym2.info)
+         else fourthTry)
       sym2 match {
         case SingletonClass => tp1.isStable || fourthTry
         case _: ClassSymbol => classOnRight

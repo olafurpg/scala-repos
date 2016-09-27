@@ -786,8 +786,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     def dotfmt(s: String) = new Formattable {
       def elliptically(s: String, max: Int) =
         (if (max < 0 || s.length <= max) s
-        else if (max < 4) s.take(max)
-        else s.take(max - 3) + "...")
+         else if (max < 4) s.take(max)
+         else s.take(max - 3) + "...")
       override def formatTo(formatter: Formatter,
                             flags: Int,
                             width: Int,
@@ -811,9 +811,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     // phase id in run, or suitable icon
     def idOf(p: SubComponent) =
       (if (settings.skip contains p.phaseName)
-        "oo" // (currentRun skipPhase p.phaseName)
-      else if (!p.enabled) "xx"
-      else p.ownPhase.id.toString)
+         "oo" // (currentRun skipPhase p.phaseName)
+       else if (!p.enabled) "xx"
+       else p.ownPhase.id.toString)
     def mkText(p: SubComponent) = {
       val (name, text) =
         if (elliptically) (dotfmt(p.phaseName), dotfmt(describe(p)))
@@ -1095,9 +1095,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   // Owners which aren't package classes.
   private def ownerChainString(sym: Symbol): String =
     (if (sym == null) ""
-    else
-      sym.ownerChain takeWhile
-        (!_.isPackageClass) mkString " -> ")
+     else
+       sym.ownerChain takeWhile
+         (!_.isPackageClass) mkString " -> ")
 
   private def formatExplain(pairs: (String, Any)*): String =
     (pairs.toList collect {
@@ -1139,7 +1139,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         "while compiling" -> currentSource.path,
         "during phase" ->
           (if (globalPhase eq phase) phase
-          else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
+           else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
         "library version" -> scala.util.Properties.versionString,
         "compiler version" -> Properties.versionString,
         "reconstructed args" -> settings.recreateArgs.mkString(" ")
@@ -1319,7 +1319,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           setting.value = List(p)
           val count =
             (if (including) first.iterator count (setting containsPhase _)
-            else phaseDescriptors count (setting contains _.phaseName))
+             else phaseDescriptors count (setting contains _.phaseName))
           if (count == 0) warning(s"'$p' specifies no phase")
           if (count > 1 && !isSpecial(p))
             warning(s"'$p' selects $count phases")

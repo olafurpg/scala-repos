@@ -621,7 +621,7 @@ class ScalaFunctionParameterInfoHandler
                             count - 1))
                       case _ =>
                         for (typez <- call.getEffectiveInvokedExpr.getType(
-                                       TypingContext.empty)) //todo: implicit conversions
+                               TypingContext.empty)) //todo: implicit conversions
                           { collectForType(typez) }
                     }
                   } else {
@@ -658,7 +658,7 @@ class ScalaFunctionParameterInfoHandler
                   call match {
                     case call: ScMethodCall =>
                       for (typez <- call.getEffectiveInvokedExpr.getType(
-                                     TypingContext.empty)) {
+                             TypingContext.empty)) {
                         //todo: implicit conversions
                         collectForType(typez)
                       }
@@ -690,7 +690,7 @@ class ScalaFunctionParameterInfoHandler
                                                               PsiElement),
                                                              ScType]
                             for (i <- 0 to Math.min(tp.length, typeArgs.length) -
-                                       1) {
+                                   1) {
                               map += ((tp(i), typeArgs(i).calcType))
                             }
                             val substitutor = new ScSubstitutor(
@@ -742,7 +742,7 @@ class ScalaFunctionParameterInfoHandler
                             (String, PsiElement),
                             ScType]
                           for (i <- 0 to Math.min(tp.length, typeArgs.length) -
-                                     1) {
+                                 1) {
                             map += ((tp(i), typeArgs(i).calcType))
                           }
                           val substitutor = new ScSubstitutor(

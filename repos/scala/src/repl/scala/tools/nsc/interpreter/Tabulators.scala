@@ -15,7 +15,7 @@ trait Tabulator {
       (_.length)).sum + (items.length - 1) * marginSize < width)
   def tabulate(items: Seq[String]): Seq[Seq[String]] =
     (if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
-    else printMultiLineColumns(items))
+     else printMultiLineColumns(items))
   protected def columnize(ss: Seq[String]): Seq[Seq[String]] =
     ss map (s => Seq(s))
   protected def printMultiLineColumns(items: Seq[String]): Seq[Seq[String]] = {
@@ -24,8 +24,8 @@ trait Tabulator {
     val columnWidth = longest + marginSize
     val maxcols =
       (if (columnWidth >= width) 1
-      else 1 max (width / columnWidth) // make sure it doesn't divide to 0
-      )
+       else 1 max (width / columnWidth) // make sure it doesn't divide to 0
+       )
     val nrows = items.size /% maxcols
     val ncols = items.size /% nrows
     val groupSize = ncols

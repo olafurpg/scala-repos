@@ -749,13 +749,13 @@ trait SHtml extends Loggable {
       (attrs.foldLeft(<input type="text" value={value}/>)(_ % _)) %
         ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
         (if (ignoreBlur) Null
-        else
-          ("onblur" ->
-            (jsFunc match {
-              case Full(f) =>
-                JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
-              case _ => makeAjaxCall(raw(funcName, "this"))
-            })))
+         else
+           ("onblur" ->
+             (jsFunc match {
+               case Full(f) =>
+                 JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+               case _ => makeAjaxCall(raw(funcName, "this"))
+             })))
     }
   }
 

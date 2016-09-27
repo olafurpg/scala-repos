@@ -684,14 +684,14 @@ class Scaladoc extends ScalaMatchingTask {
         safeBuildError(
           "Document failed with " + reporter.ERROR.count + " error" +
             (if (reporter.ERROR.count > 1)
-              "s"
-            else "") + "; see the documenter error output for details.")
+               "s"
+             else "") + "; see the documenter error output for details.")
       else if (reporter.WARNING.count > 0)
         log(
           "Document succeeded with " + reporter.WARNING.count + " warning" +
             (if (reporter.WARNING.count > 1)
-              "s"
-            else "") + "; see the documenter output for details.")
+               "s"
+             else "") + "; see the documenter output for details.")
       reporter.printSummary()
     } catch {
       case exception: Throwable =>

@@ -598,10 +598,10 @@ private[hive] class HiveQl(conf: ParserConf)
         Token("TOK_EXPLIST", inputExprs) :: Token(
         "TOK_SERDE",
         inputSerdeClause) :: Token("TOK_RECORDWRITER", writerClause) ::
-        // TODO: Need to support other types of (in/out)put
-        Token(script, Nil) :: Token("TOK_SERDE", outputSerdeClause) :: Token(
-        "TOK_RECORDREADER",
-        readerClause) :: outputClause) :: Nil) =>
+          // TODO: Need to support other types of (in/out)put
+          Token(script, Nil) :: Token("TOK_SERDE", outputSerdeClause) :: Token(
+          "TOK_RECORDREADER",
+          readerClause) :: outputClause) :: Nil) =>
       val (output, schemaLess) = outputClause match {
         case Token("TOK_ALIASLIST", aliases) :: Nil =>
           (aliases.map {

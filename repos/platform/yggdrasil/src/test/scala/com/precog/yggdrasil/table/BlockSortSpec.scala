@@ -95,8 +95,8 @@ trait BlockSortSpec[M[+ _]]
 
     val resultM = for {
       sorted <- module
-                 .fromSample(sample)
-                 .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
+        .fromSample(sample)
+        .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
       json <- sorted.toJson
     } yield (json, sorted)
 

@@ -63,10 +63,10 @@ private[spark] object ExecutorExitCode {
       case _ =>
         "Unknown executor exit code (" + exitCode + ")" +
           (if (exitCode > 128) {
-            " (died from signal " + (exitCode - 128) + "?)"
-          } else {
-            ""
-          })
+             " (died from signal " + (exitCode - 128) + "?)"
+           } else {
+             ""
+           })
     }
   }
 }

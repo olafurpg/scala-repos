@@ -201,7 +201,7 @@ class Path private[io] (val jfile: JFile) {
   // if the current path has none.
   def changeExtension(ext: String): Path =
     (if (extension == "") addExtension(ext)
-    else Path(path.stripSuffix(extension) + ext))
+     else Path(path.stripSuffix(extension) + ext))
 
   // conditionally execute
   def ifFile[T](f: File => T): Option[T] =

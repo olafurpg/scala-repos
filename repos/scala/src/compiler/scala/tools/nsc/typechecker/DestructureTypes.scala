@@ -170,19 +170,19 @@ trait DestructureTypes {
 
     def symbolType(sym: Symbol) =
       (if (sym.isRefinementClass) "Refinement"
-      else if (sym.isAliasType) "Alias"
-      else if (sym.isTypeSkolem) "TypeSkolem"
-      else if (sym.isTypeParameter) "TypeParam"
-      else if (sym.isAbstractType) "AbstractType"
-      else if (sym.isType) "TypeSymbol"
-      else "TermSymbol")
+       else if (sym.isAliasType) "Alias"
+       else if (sym.isTypeSkolem) "TypeSkolem"
+       else if (sym.isTypeParameter) "TypeParam"
+       else if (sym.isAbstractType) "AbstractType"
+       else if (sym.isType) "TypeSymbol"
+       else "TermSymbol")
     def typeRefType(sym: Symbol) =
       (if (sym.isRefinementClass) "RefinementTypeRef"
-      else if (sym.isAliasType) "AliasTypeRef"
-      else if (sym.isTypeSkolem) "SkolemTypeRef"
-      else if (sym.isTypeParameter) "TypeParamTypeRef"
-      else if (sym.isAbstractType) "AbstractTypeRef"
-      else "TypeRef") + (if (sym.isFBounded) "(F-Bounded)" else "")
+       else if (sym.isAliasType) "AliasTypeRef"
+       else if (sym.isTypeSkolem) "SkolemTypeRef"
+       else if (sym.isTypeParameter) "TypeParamTypeRef"
+       else if (sym.isAbstractType) "AbstractTypeRef"
+       else "TypeRef") + (if (sym.isFBounded) "(F-Bounded)" else "")
 
     def node(label: String, node: Node): Node = withLabel(node, label)
     def apply(label: String, tp: Type): Node = withLabel(this(tp), label)

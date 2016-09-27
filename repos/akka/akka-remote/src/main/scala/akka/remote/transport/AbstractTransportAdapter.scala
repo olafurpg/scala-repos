@@ -115,9 +115,9 @@ abstract class AbstractTransportAdapter(
       // Enforce ordering between the signalling of "listen ready" to upstream
       // and initialization happening in interceptListen
       _ ← listenerPromise
-           .tryCompleteWith(
-             interceptListen(listenAddress, upstreamListenerPromise.future))
-           .future
+        .tryCompleteWith(
+          interceptListen(listenAddress, upstreamListenerPromise.future))
+        .future
     } yield (augmentScheme(listenAddress), upstreamListenerPromise)
   }
 

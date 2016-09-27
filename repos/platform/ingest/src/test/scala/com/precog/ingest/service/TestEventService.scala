@@ -198,7 +198,7 @@ trait TestEventService
       response <- svcWithQueries.post[A](path.toString)(data)
       content <- response.content map (a =>
                                          bi(a) map (Some(_))) getOrElse Future(
-                  None)
+        None)
     } yield {
       (
         response.copy(content = content),

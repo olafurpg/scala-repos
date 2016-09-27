@@ -174,7 +174,7 @@ class ScalaChangeSignatureUsageProcessor
       for {
         jc @ (_u: JavaCallUsageInfo) <- usages
         call @ (_c: PsiMethodCallExpression) <- jc.getElement.toOption
-                                                 .map(_.getParent)
+          .map(_.getParent)
         exprs = call.getArgumentList.getExpressions
         (defaultArg @ (_d: PsiMethodCallExpression), idx) <- exprs.zipWithIndex
         if defaultArg.getText.contains("$default$")

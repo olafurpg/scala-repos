@@ -109,8 +109,8 @@ class ComparingUnrelatedTypesInspection
                     Seq(arg, _ *)) if mayNeedHighlighting(fun) =>
       for {
         ScParameterizedType(_, Seq(elemType)) <- baseExpr
-                                                  .getType()
-                                                  .map(tryExtractSingletonType)
+          .getType()
+          .map(tryExtractSingletonType)
         argType <- arg.getType() if cannotBeCompared(elemType, argType)
       } {
         val (elemTypeText, argTypeText) =

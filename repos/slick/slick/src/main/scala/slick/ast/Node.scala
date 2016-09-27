@@ -454,13 +454,13 @@ final case class GroupBy(fromGen: TermSymbol,
       else copy(from = from2, by = by2)
     this2 :@
       (if (!hasType)
-        CollectionType(
-          from2Type.cons,
-          ProductType(
-            ConstArray(NominalType(identity, by2.nodeType),
-                       CollectionType(TypedCollectionTypeConstructor.seq,
-                                      from2Type.elementType))))
-      else nodeType)
+         CollectionType(
+           from2Type.cons,
+           ProductType(
+             ConstArray(NominalType(identity, by2.nodeType),
+                        CollectionType(TypedCollectionTypeConstructor.seq,
+                                       from2Type.elementType))))
+       else nodeType)
   }
 }
 
@@ -545,10 +545,10 @@ final case class Join(leftGen: TermSymbol,
     }
     withChildren(ConstArray[Node](left2, right2, on2)) :@
       (if (!hasType)
-        CollectionType(
-          left2Type.cons,
-          ProductType(ConstArray(joinedLeftType, joinedRightType)))
-      else nodeType)
+         CollectionType(
+           left2Type.cons,
+           ProductType(ConstArray(joinedLeftType, joinedRightType)))
+       else nodeType)
   }
 }
 
@@ -591,9 +591,9 @@ final case class Bind(generator: TermSymbol, from: Node, select: Node)
       else rebuild(from2, select2)
     withCh :@
       (if (!hasType)
-        CollectionType(from2Type.cons,
-                       select2.nodeType.asCollectionType.elementType)
-      else nodeType)
+         CollectionType(from2Type.cons,
+                        select2.nodeType.asCollectionType.elementType)
+       else nodeType)
   }
 }
 

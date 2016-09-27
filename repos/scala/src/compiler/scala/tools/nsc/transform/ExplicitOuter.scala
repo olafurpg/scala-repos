@@ -408,10 +408,10 @@ abstract class ExplicitOuter
       // crash in SI-4970.  I feel quite sure this can be improved.
       val path =
         (if (mixinClass.owner.isTerm)
-          gen.mkAttributedThis(mixinClass.owner.enclClass)
-        else if (mixinPrefix.typeArgs.nonEmpty)
-          gen.mkAttributedThis(mixinPrefix.typeSymbol)
-        else gen.mkAttributedQualifier(mixinPrefix))
+           gen.mkAttributedThis(mixinClass.owner.enclClass)
+         else if (mixinPrefix.typeArgs.nonEmpty)
+           gen.mkAttributedThis(mixinPrefix.typeSymbol)
+         else gen.mkAttributedQualifier(mixinPrefix))
       // Need to cast for nested outer refs in presence of self-types. See ticket #3274.
       localTyper typed DefDef(
         outerAcc,

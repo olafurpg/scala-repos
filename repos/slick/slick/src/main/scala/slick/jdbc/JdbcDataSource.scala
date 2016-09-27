@@ -191,14 +191,14 @@ class DriverJdbcDataSource(url: String,
   protected[this] def internalCreateConnection(): Connection = {
     val conn =
       (if (driver eq null) DriverManager.getConnection(url, connectionProps)
-      else {
-        val conn = driver.connect(url, connectionProps)
-        if (conn eq null)
-          throw new SQLException(
-            "Driver " + driver + " does not know how to handle URL " + url,
-            "08001")
-        conn
-      })
+       else {
+         val conn = driver.connect(url, connectionProps)
+         if (conn eq null)
+           throw new SQLException(
+             "Driver " + driver + " does not know how to handle URL " + url,
+             "08001")
+         conn
+       })
     if (connectionPreparer ne null) connectionPreparer(conn)
     conn
   }

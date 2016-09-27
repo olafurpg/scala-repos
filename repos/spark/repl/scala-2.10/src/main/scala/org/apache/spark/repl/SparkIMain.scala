@@ -159,8 +159,8 @@ class SparkIMain(initialSettings: Settings,
 
   private def compilerClasspath: Seq[URL] =
     (if (isInitializeComplete) global.classPath.asURLs
-    else new PathResolver(settings).result.asURLs // the compiler's classpath
-    )
+     else new PathResolver(settings).result.asURLs // the compiler's classpath
+     )
   // NOTE: Exposed to repl package since accessed indirectly from SparkIMain
   private[repl] def settings = currentSettings
   private def mostRecentLine = prevRequestList match {
@@ -639,7 +639,7 @@ class SparkIMain(initialSettings: Settings,
     // be what people want so I'm waiting until I can do it better.
     for {
       name <- req.definedNames filterNot
-               (x => req.definedNames contains x.companionName)
+        (x => req.definedNames contains x.companionName)
       oldReq <- definedNameMap get name.companionName
       newSym <- req.definedSymbols get name
       oldSym <- oldReq.definedSymbols get name.companionName

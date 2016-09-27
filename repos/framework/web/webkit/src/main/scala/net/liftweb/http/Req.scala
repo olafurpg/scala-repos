@@ -56,7 +56,7 @@ object UserAgentCalculator extends Factory {
       ieMatch = iePattern.pattern.matcher(userAgent)
       findResult = ieMatch.find if findResult
       ieVersionString <- Box.legacyNullTest(ieMatch.group(2)) or Box
-                          .legacyNullTest(ieMatch.group(3))
+        .legacyNullTest(ieMatch.group(3))
       ver <- Helpers.asDouble(ieVersionString)
     } yield ver
 
@@ -479,16 +479,16 @@ object Req {
       val params: List[(String, String)] = for {
         queryString <- request.queryString.toList
         nameVal <- queryString
-                    .split("&")
-                    .toList
-                    .map(_.trim)
-                    .filter(_.length > 0)
+          .split("&")
+          .toList
+          .map(_.trim)
+          .filter(_.length > 0)
         (name, value) <- nameVal.split("=").toList match {
-                          case Nil => Empty
-                          case n :: v :: _ =>
-                            Full((urlDecode(n), urlDecode(v)))
-                          case n :: _ => Full((urlDecode(n), ""))
-                        }
+          case Nil => Empty
+          case n :: v :: _ =>
+            Full((urlDecode(n), urlDecode(v)))
+          case n :: _ => Full((urlDecode(n), ""))
+        }
       } yield (name, value)
 
       val names: List[String] = params.map(_._1).distinct
@@ -818,9 +818,9 @@ object ContentType {
   def parse(str: String): List[ContentType] =
     (for {
       (part, index) <- str
-                        .charSplit(',')
-                        .map(_.trim)
-                        .zipWithIndex // split at comma
+        .charSplit(',')
+        .map(_.trim)
+        .zipWithIndex // split at comma
       content <- parseIt(part, index)
     } yield content).sortWith(_ < _)
 
@@ -1338,9 +1338,9 @@ class Req(val path: ParsePath,
         uri <- Box.legacyNullTest(request.uri)
         cp <- Box.legacyNullTest(contextPath)
         part <- (request.uri.length >= cp.length) match {
-                 case true => Full(request.uri.substring(cp.length))
-                 case _ => Empty
-               }
+          case true => Full(request.uri.substring(cp.length))
+          case _ => Empty
+        }
       } yield {
         part match {
           case "" => "/"

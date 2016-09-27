@@ -266,8 +266,8 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     // make an url out of the string
     def u: URL =
       (if (s contains ":") new URL(s)
-      else if (new JFile(s) exists) new JFile(s).toURI.toURL
-      else new URL("http://" + s))
+       else if (new JFile(s) exists) new JFile(s).toURI.toURL
+       else new URL("http://" + s))
   }
   class RichInputStream(in: InputStream)(implicit codec: Codec) {
     def bytes(): Array[Byte] = io.Streamable.bytes(in)

@@ -487,8 +487,8 @@ object LiftedEmbedding extends App {
       // Use the lifted function in a query to group by day of week
       val q1 = for {
         (dow, q) <- salesPerDay
-                     .map(s => (dayOfWeek(s.day), s.count))
-                     .groupBy(_._1)
+          .map(s => (dayOfWeek(s.day), s.count))
+          .groupBy(_._1)
       } yield (dow, q.map(_._2).sum)
       //#simplefunction1
 

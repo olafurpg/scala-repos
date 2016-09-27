@@ -20,7 +20,7 @@ class EnablePerformanceProblemsQuickFix(project: Project)
   def getName: String =
     enable + " setting, solving resolve problems " +
       (if (!ignoreSettings) "(this can cause editor performance problems"
-      else "(this can improve editor performance") + ")."
+       else "(this can improve editor performance") + ")."
 
   def getFamilyName: String = enable + " setting"
 }

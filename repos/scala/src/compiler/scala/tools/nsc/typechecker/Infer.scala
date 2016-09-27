@@ -829,14 +829,14 @@ trait Infer extends Checkable { self: Analyzer =>
       */
     private def typeAfterTupleConversion(argtpes: List[Type]): Type =
       (if (argtpes.isEmpty) UnitTpe // aka "Tuple0"
-      else
-        tupleType(argtpes map {
-          case NamedType(name, tp) =>
-            UnitTpe // not a named arg - only assignments here
-          case RepeatedType(tp) =>
-            tp // but probably shouldn't be tupling a call containing :_*
-          case tp => tp
-        }))
+       else
+         tupleType(argtpes map {
+           case NamedType(name, tp) =>
+             UnitTpe // not a named arg - only assignments here
+           case RepeatedType(tp) =>
+             tp // but probably shouldn't be tupling a call containing :_*
+           case tp => tp
+         }))
 
     /** If the argument list needs to be tupled for the parameter list,
       *  a list containing the type of the tuple.  Otherwise, the original
@@ -1050,8 +1050,8 @@ trait Infer extends Checkable { self: Analyzer =>
             (if (isAsSpecific(ftpe2, ftpe1) && // todo: move to isAsSpecific test
 //                                 (!ftpe2.isInstanceOf[OverloadedType] || ftpe1.isInstanceOf[OverloadedType]) &&
                  (!phase.erasedTypes || covariantReturnOverride(ftpe1, ftpe2)))
-              1
-            else 0)
+               1
+             else 0)
         val subClassCount =
           (if (isInProperSubClassOrObject(sym1, sym2)) 1 else 0) -
             (if (isInProperSubClassOrObject(sym2, sym1)) 1 else 0)

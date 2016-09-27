@@ -23,9 +23,9 @@ abstract class ScalaTestTestCase
       testClassName,
       status,
       (if (status == ignoredStatusId) {
-        tests.map(_ + TestNodeProvider.ignoredSuffix)
-      } else if (status == pendingStatusId) {
-        tests.map(_ + TestNodeProvider.pendingSuffix)
-      } else tests): _*)
+         tests.map(_ + TestNodeProvider.ignoredSuffix)
+       } else if (status == pendingStatusId) {
+         tests.map(_ + TestNodeProvider.pendingSuffix)
+       } else tests): _*)
   }
 }

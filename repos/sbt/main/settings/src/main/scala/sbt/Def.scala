@@ -65,8 +65,8 @@ object Def extends Init[Scope] with TaskMacroExtra {
                                 allowDynamic: Boolean): Option[String] =
     super.deriveAllowed(s, allowDynamic) orElse
       (if (s.key.scope != ThisScope)
-        Some(s"Scope cannot be defined for ${definedSettingString(s)}")
-      else None) orElse s.dependencies
+         Some(s"Scope cannot be defined for ${definedSettingString(s)}")
+       else None) orElse s.dependencies
       .find(k => k.scope != ThisScope)
       .map(k =>
         s"Scope cannot be defined for dependency ${k.key.label} of ${definedSettingString(s)}")

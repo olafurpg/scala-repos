@@ -325,10 +325,10 @@ trait EvaluatorModule[M[+ _]]
               for {
                 pending <- f(graph)
                 _ <- monadState.modify { state =>
-                      state.copy(
-                        assume = state.assume +
-                            (graph -> (pending.table, pending.sort)))
-                    }
+                  state.copy(
+                    assume = state.assume +
+                        (graph -> (pending.table, pending.sort)))
+                }
               } yield pending
             }
 
@@ -357,9 +357,9 @@ trait EvaluatorModule[M[+ _]]
           : StateT[N, EvaluatorState, PendingTable] = {
           for {
             _ <- monadState.modify { state =>
-                  state.copy(
-                    assume = state.assume + (tg._2 -> (pt.table, pt.sort)))
-                }
+              state.copy(
+                assume = state.assume + (tg._2 -> (pt.table, pt.sort)))
+            }
           } yield pt.copy(trans = tg._1, graph = tg._2)
         }
 
@@ -741,9 +741,9 @@ trait EvaluatorModule[M[+ _]]
               for {
                 pendingTable <- prepareEval(parent, splits)
                 back <- transState liftM mn(
-                         mor(pendingTable.table.transform(
-                               liftToValues(pendingTable.trans)),
-                             MorphContext(ctx, graph)))
+                  mor(pendingTable.table.transform(
+                        liftToValues(pendingTable.trans)),
+                      MorphContext(ctx, graph)))
               } yield {
                 PendingTable(back,
                              graph,
@@ -904,17 +904,17 @@ trait EvaluatorModule[M[+ _]]
                   trans.WrapObject(Leaf(Source), paths.Value.name))
 
                 wrapped <- transState liftM table map {
-                            _.transform(valueWrapped)
-                          }
+                  _.transform(valueWrapped)
+                }
                 rvalue <- transState liftM result.map(reduction.extractValue)
 
                 _ <- monadState.modify { state =>
-                      state.copy(
-                        assume = state.assume +
-                            (m -> (wrapped, IdentityOrder.empty)),
-                        reductions = state.reductions + (m -> rvalue)
-                      )
-                    }
+                  state.copy(
+                    assume = state.assume +
+                        (m -> (wrapped, IdentityOrder.empty)),
+                    reductions = state.reductions + (m -> rvalue)
+                  )
+                }
               } yield {
                 PendingTable(wrapped,
                              graph,
@@ -927,9 +927,9 @@ trait EvaluatorModule[M[+ _]]
                 pendingTable <- prepareEval(parent, splits)
                 liftedTrans = liftToValues(pendingTable.trans)
                 result <- transState liftM mn(
-                           red(pendingTable.table.transform(
-                                 DerefObjectStatic(liftedTrans, paths.Value)),
-                               MorphContext(ctx, graph)))
+                  red(pendingTable.table.transform(
+                        DerefObjectStatic(liftedTrans, paths.Value)),
+                      MorphContext(ctx, graph)))
                 wrapped = result transform buildConstantWrapSpec(Leaf(Source))
               } yield
                 PendingTable(wrapped,
@@ -953,22 +953,18 @@ trait EvaluatorModule[M[+ _]]
                 state <- monadState.gets(identity)
                 grouping2 <- transState liftM grouping
                 result <- transState liftM mn(Table.merge(grouping2) {
-                           (key, map) =>
-                             val splits2 = splits + (id -> (map andThen mn))
-                             val rewritten = params.foldLeft(child) {
-                               case (child, param) =>
-                                 val subKey = key \ param.id.toString
-                                 replaceNode(child,
-                                             param,
-                                             Const(subKey)(param.loc))
-                             }
+                  (key, map) =>
+                    val splits2 = splits + (id -> (map andThen mn))
+                    val rewritten = params.foldLeft(child) {
+                      case (child, param) =>
+                        val subKey = key \ param.id.toString
+                        replaceNode(child, param, Const(subKey)(param.loc))
+                    }
 
-                             val back =
-                               fullEval(rewritten,
-                                        splits2,
-                                        id :: splits.keys.toList)
-                             back.eval(state)
-                         })
+                    val back =
+                      fullEval(rewritten, splits2, id :: splits.keys.toList)
+                    back.eval(state)
+                })
               } yield {
                 result.transform(idSpec)
               }
@@ -988,9 +984,8 @@ trait EvaluatorModule[M[+ _]]
                   paths.Value)
 
                 truthiness <- transState liftM mn(
-                               predTable.reduce(
-                                 Forall reducer MorphContext(ctx, graph))(
-                                 Forall.monoid))
+                  predTable.reduce(Forall reducer MorphContext(ctx, graph))(
+                    Forall.monoid))
 
                 assertion = if (truthiness getOrElse false) {
                   N.point(())
@@ -998,7 +993,7 @@ trait EvaluatorModule[M[+ _]]
                   for {
                     _ <- report.error(graph.loc, "Assertion failed")
                     _ <- report
-                          .die() // Arrrrrrrgggghhhhhhhhhhhhhh........ *gurgle*
+                      .die() // Arrrrrrrgggghhhhhhhhhhhhhh........ *gurgle*
                   } yield ()
                 }
                 _ <- transState liftM assertion
