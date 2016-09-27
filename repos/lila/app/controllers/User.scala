@@ -114,10 +114,10 @@ object User extends LilaController {
                                         page = page)(ctx.body)
       relation <- ctx.userId ?? { relationApi.fetchRelation(_, u.id) }
       notes <- ctx.me ?? { me =>
-                relationApi fetchFriends me.id flatMap {
-                  env.noteApi.get(u, me, _)
-                }
-              }
+        relationApi fetchFriends me.id flatMap {
+          env.noteApi.get(u, me, _)
+        }
+      }
       followable <- ctx.isAuth ?? { Env.pref.api followable u.id }
       blocked <- ctx.userId ?? { relationApi.fetchBlocks(u.id, _) }
       searchForm = GameFilterMenu.searchForm(userGameSearch, filters.current)(
@@ -164,31 +164,30 @@ object User extends LilaController {
       tourneyWinners ← Env.tournament.winners scheduled nb
       online ← env.cached top50Online true
       res <- negotiate(
-              html = fuccess(
-                Ok(
-                  html.user.list(tourneyWinners = tourneyWinners,
-                                 online = online,
-                                 leaderboards = leaderboards,
-                                 nbDay = nbDay,
-                                 nbAllTime = nbAllTime))),
-              api = _ =>
-                fuccess {
-                  implicit val lpWrites =
-                    OWrites[UserModel.LightPerf](
-                      env.jsonView.lightPerfIsOnline)
-                  Ok(
-                    Json.obj("bullet" -> leaderboards.bullet,
-                             "blitz" -> leaderboards.blitz,
-                             "classical" -> leaderboards.classical,
-                             "crazyhouse" -> leaderboards.crazyhouse,
-                             "chess960" -> leaderboards.chess960,
-                             "kingOfTheHill" -> leaderboards.kingOfTheHill,
-                             "threeCheck" -> leaderboards.threeCheck,
-                             "antichess" -> leaderboards.antichess,
-                             "atomic" -> leaderboards.atomic,
-                             "horde" -> leaderboards.horde,
-                             "racingKings" -> leaderboards.racingKings))
-              })
+        html = fuccess(
+          Ok(
+            html.user.list(tourneyWinners = tourneyWinners,
+                           online = online,
+                           leaderboards = leaderboards,
+                           nbDay = nbDay,
+                           nbAllTime = nbAllTime))),
+        api = _ =>
+          fuccess {
+            implicit val lpWrites =
+              OWrites[UserModel.LightPerf](env.jsonView.lightPerfIsOnline)
+            Ok(
+              Json.obj("bullet" -> leaderboards.bullet,
+                       "blitz" -> leaderboards.blitz,
+                       "classical" -> leaderboards.classical,
+                       "crazyhouse" -> leaderboards.crazyhouse,
+                       "chess960" -> leaderboards.chess960,
+                       "kingOfTheHill" -> leaderboards.kingOfTheHill,
+                       "threeCheck" -> leaderboards.threeCheck,
+                       "antichess" -> leaderboards.antichess,
+                       "atomic" -> leaderboards.atomic,
+                       "horde" -> leaderboards.horde,
+                       "racingKings" -> leaderboards.racingKings))
+        })
     } yield res
   }
 
@@ -266,15 +265,13 @@ object User extends LilaController {
             perfStat <- Env.perfStat.get(u, perfType)
             ranks <- Env.user.cached.ranking.getAll(u.id)
             distribution <- u.perfs(perfType).established ?? {
-                             Env.user.cached
-                               .ratingDistribution(perfType) map some
-                           }
+              Env.user.cached.ratingDistribution(perfType) map some
+            }
             data = Env.perfStat
               .jsonView(u, perfStat, ranks get perfType.key, distribution)
             response <- negotiate(
-                         html = Ok(html.user
-                           .perfStat(u, ranks, perfType, data)).fuccess,
-                         api = _ => Ok(data).fuccess)
+              html = Ok(html.user.perfStat(u, ranks, perfType, data)).fuccess,
+              api = _ => Ok(data).fuccess)
           } yield response
         }
     }

@@ -616,12 +616,12 @@ private[scala] trait JavaMirrors
           val arg = args(i)
           args1(i) =
             (if (i >= paramCount) arg // don't transform varargs
-            else if (isByName(i))
-              () => arg // don't transform by-name value class params
-            else if (isDerivedValueClass(i))
-              paramUnboxers(i).invoke(arg) // do get the underlying value
-            else arg // don't molest anything else
-            )
+             else if (isByName(i))
+               () => arg // don't transform by-name value class params
+             else if (isDerivedValueClass(i))
+               paramUnboxers(i).invoke(arg) // do get the underlying value
+             else arg // don't molest anything else
+             )
           i += 1
         }
         jinvoke(args1)
@@ -804,7 +804,7 @@ private[scala] trait JavaMirrors
         val msg = ex.getMessage()
         MissingRequirementError.signal(
           (if (msg eq null) "reflection error while loading " + clazz.name
-          else "error while loading " + clazz.name) + ", " + msg)
+           else "error while loading " + clazz.name) + ", " + msg)
       }
       // don't use classOf[scala.reflect.ScalaSignature] here, because it will use getClass.getClassLoader, not mirror's classLoader
       // don't use asInstanceOf either because of the same reason (lol, I cannot believe I fell for it)
@@ -1007,8 +1007,8 @@ private[scala] trait JavaMirrors
             ObjectTpe :: ifaces // interfaces have Object as superclass in the classfile (see jvm spec), but getGenericSuperclass seems to return null
           else
             (if (jsuperclazz == null)
-              AnyTpe
-            else typeToScala(jsuperclazz)) :: ifaces
+               AnyTpe
+             else typeToScala(jsuperclazz)) :: ifaces
         } finally {
           parentsLevel -= 1
         }
@@ -1288,7 +1288,7 @@ private[scala] trait JavaMirrors
         assert(
           cls.isType,
           (if (cls != NoSymbol) s"not a type: symbol $cls"
-          else "no symbol could be") +
+           else "no symbol could be") +
             s" loaded from $jclazz in $owner with name $simpleName and classloader $classLoader")
 
         cls.asClass

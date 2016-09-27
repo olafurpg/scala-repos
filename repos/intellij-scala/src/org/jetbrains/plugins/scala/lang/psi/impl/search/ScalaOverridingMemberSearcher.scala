@@ -48,7 +48,7 @@ class MethodImplementationsSearch
     sourceElement match {
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
-                                .getOverridingMethods(namedElement)
+               .getOverridingMethods(namedElement)
              //to avoid duplicates with ScalaOverridingMemberSearcher
              if !namedElement.isInstanceOf[PsiMethod] ||
                !implementation.isInstanceOf[PsiMethod]) {
@@ -74,7 +74,7 @@ class ScalaOverridingMemberSearcher
     method match {
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
-                                .getOverridingMethods(namedElement)
+               .getOverridingMethods(namedElement)
              if implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation.asInstanceOf[PsiMethod])) {
             return false

@@ -50,8 +50,8 @@ class ChiSquaredTest
 
   implicit def arbDistr = Arbitrary {
     for (shape <- arbitrary[Double].map { x =>
-                   math.abs(x) % 1000.0 + 4.2
-                 })
+           math.abs(x) % 1000.0 + 4.2
+         })
       yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
   }
 

@@ -335,11 +335,11 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               val (els, singleType) =
                 unwrapSingleColumn(whereV.asInstanceOf[Coll], ct)
               (if (singleType.isInstanceOf[OptionType])
-                els.map(_.asInstanceOf[Option[Any]] match {
-                  case Some(v) => whatBase == v
-                  case None => false
-                })
-              else els.map(whatBase.==)) contains true
+                 els.map(_.asInstanceOf[Option[Any]] match {
+                   case Some(v) => whatBase == v
+                   case None => false
+                 })
+               else els.map(whatBase.==)) contains true
           }
         }
       case Library.Sum(ch) =>

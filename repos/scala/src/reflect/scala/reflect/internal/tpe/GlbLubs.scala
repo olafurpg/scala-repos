@@ -266,14 +266,14 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     */
   def weakLub(tps: List[Type]): Type =
     (if (tps.isEmpty) NothingTpe
-    else if (tps forall isNumericValueType)
-      numericLub(tps)
-    else if (tps exists typeHasAnnotations)
-      annotationsLub(lub(
-                       tps map
-                         (_.withoutAnnotations)),
-                     tps)
-    else lub(tps))
+     else if (tps forall isNumericValueType)
+       numericLub(tps)
+     else if (tps exists typeHasAnnotations)
+       annotationsLub(lub(
+                        tps map
+                          (_.withoutAnnotations)),
+                      tps)
+     else lub(tps))
 
   def numericLub(ts: List[Type]) =
     ts reduceLeft
@@ -547,8 +547,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
               val prototp = glbThisType.memberInfo(proto)
               val syms = for (t <- ts;
                               alt <- (t
-                                      .nonPrivateMember(proto.name)
-                                      .alternatives)
+                                .nonPrivateMember(proto.name)
+                                .alternatives)
                               if glbThisType.memberInfo(alt) matches prototp)
                 yield alt
               val symtypes = syms map glbThisType.memberInfo

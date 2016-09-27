@@ -203,16 +203,16 @@ object FilesystemIngestFailureLog {
           offset <- jv.validated[Long]("offset")
           msgType <- jv.validated[String]("messageType")
           message <- msgType match {
-                      case "ingest" =>
-                        jv.validated[EventMessage.EventMessageExtraction](
-                            "message")(IngestMessage.Extractor)
-                          .flatMap {
-                            _.map(Success(_)).getOrElse(
-                              Failure(Invalid("Incomplete ingest message")))
-                          }
+            case "ingest" =>
+              jv.validated[EventMessage.EventMessageExtraction]("message")(
+                  IngestMessage.Extractor)
+                .flatMap {
+                  _.map(Success(_))
+                    .getOrElse(Failure(Invalid("Incomplete ingest message")))
+                }
 
-                      case "archive" => jv.validated[ArchiveMessage]("message")
-                    }
+            case "archive" => jv.validated[ArchiveMessage]("message")
+          }
           checkpoint <- jv.validated[YggCheckpoint]("lastKnownGood")
         } yield LogRecord(offset, message, checkpoint)
       }

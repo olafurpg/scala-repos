@@ -44,7 +44,7 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
       else ScalaPsiUtil.functionArrow(elements(0).getProject)
     (if (elements.length == 1 &&
          !needBraces(elements(0))) super.getTemplateAsString(elements)
-    else "(" + super.getTemplateAsString(elements) + ")") +
+     else "(" + super.getTemplateAsString(elements) + ")") +
       s" match {\ncase a  $arrow\n}"
   }
 

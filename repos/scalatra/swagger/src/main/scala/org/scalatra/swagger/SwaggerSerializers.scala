@@ -437,8 +437,8 @@ object SwaggerSerializers {
                   obj.parameters.sortBy(_.position))) ~
                 ("responseMessages" ->
                   (if (obj.responseMessages.nonEmpty)
-                    Some(Extraction.decompose(obj.responseMessages))
-                  else None))
+                     Some(Extraction.decompose(obj.responseMessages))
+                   else None))
 
             val consumes = dontAddOnEmpty("consumes", obj.consumes) _
             val produces = dontAddOnEmpty("produces", obj.produces) _

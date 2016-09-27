@@ -50,12 +50,11 @@ object PhoneCode {
               //collect all possible next translation steps of the remaining numbers
               val matchingWords = (for (len <- 1 to matchAgainst.length;
                                         opt <- dictEntriesDigified2Words.get(
-                                                matchAgainst.take(len)))
+                                          matchAgainst.take(len)))
                 yield opt).flatten
               if (matchingWords.nonEmpty) //spead the tree
-                for ((translated, remaining) <- matchingWords.map(e =>
-                                                 e -> matchAgainst.drop(
-                                                   e.count(_.isLetter))))
+                for ((translated, remaining) <- matchingWords.map(
+                       e => e -> matchAgainst.drop(e.count(_.isLetter))))
                   yield
                     (current.copy(current.translated + " " + translated,
                                   remaining))

@@ -353,10 +353,10 @@ object JE {
         def toJsCmd =
           "lift$.buildIndex(" + obj + ", " + indexName.encJs +
             (if (tables.isEmpty) ""
-            else
-              ", " + tables.map {
-                case (l, r) => "[" + l.encJs + ", " + r.encJs + "]"
-              }.mkString(", ")) + ")"
+             else
+               ", " + tables.map {
+                 case (l, r) => "[" + l.encJs + ", " + r.encJs + "]"
+               }.mkString(", ")) + ")"
       }
 
     def apply(obj: JsExp,
@@ -366,10 +366,10 @@ object JE {
         def toJsCmd =
           "lift$.buildIndex(" + obj.toJsCmd + ", " + indexName.encJs +
             (if (tables.isEmpty) ""
-            else
-              ", " + tables.map {
-                case (l, r) => "[" + l.encJs + ", " + r.encJs + "]"
-              }.mkString(", ")) + ")"
+             else
+               ", " + tables.map {
+                 case (l, r) => "[" + l.encJs + ", " + r.encJs + "]"
+               }.mkString(", ")) + ")"
       }
   }
 
@@ -506,7 +506,7 @@ object JE {
     def toJsCmd =
       varName +
         (if (andThen.isEmpty) ""
-        else andThen.mkString(".", ".", ""))
+         else andThen.mkString(".", ".", ""))
   }
 
   /**

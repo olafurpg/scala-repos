@@ -66,7 +66,7 @@ trait HandleCommentService {
         // record comment activity if comment is entered
         content foreach {
           (if (issue.isPullRequest) recordCommentPullRequestActivity _
-          else recordCommentIssueActivity _)
+           else recordCommentIssueActivity _)
           (owner, name, userName, issue.issueId, _)
         }
         recordActivity foreach

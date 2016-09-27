@@ -256,21 +256,20 @@ trait NIHDBQueryExecutorComponent {
       def shutdown() =
         for {
           _ <- Stoppable.stop(
-                Stoppable.fromFuture(
-                  gracefulStop(
-                    scheduleActor,
-                    yggConfig.schedulingTimeout.duration)(actorSystem)))
+            Stoppable.fromFuture(
+              gracefulStop(scheduleActor,
+                           yggConfig.schedulingTimeout.duration)(actorSystem)))
           _ <- Stoppable.stop(
-                ingestSystem
-                  .map(_.stoppable)
-                  .getOrElse(Stoppable.fromFuture(Future(()))))
+            ingestSystem
+              .map(_.stoppable)
+              .getOrElse(Stoppable.fromFuture(Future(()))))
           _ <- IngestSystem
-                .actorStop(yggConfig, projectionsActor, "projections")
+            .actorStop(yggConfig, projectionsActor, "projections")
           _ <- IngestSystem.actorStop(yggConfig, masterChef, "masterChef")
           _ <- Stoppable.stop(scheduleStorageStoppable)
           _ <- chefs
-                .map(IngestSystem.actorStop(yggConfig, _, "masterChef"))
-                .sequence
+            .map(IngestSystem.actorStop(yggConfig, _, "masterChef"))
+            .sequence
         } yield {
           queryLogger.info("Actor ecossytem shutdown complete.")
           jobActorSystem.shutdown()

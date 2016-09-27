@@ -154,25 +154,25 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       idCount <- choose(1, 3)
       dataSize <- choose(0, 20)
       ids <- containerOfN[Set, List[Long]](
-              dataSize,
-              containerOfN[List, Long](idCount, posNum[Long]))
+        dataSize,
+        containerOfN[List, Long](idCount, posNum[Long]))
       values <- containerOfN[List, Seq[(JPath, JValue)]](
-                 dataSize,
-                 Gen.sequence[List, (JPath, JValue)](jschema map {
-                   case (jpath, ctype) => jvalue(ctype).map(jpath ->)
-                 }))
+        dataSize,
+        Gen.sequence[List, (JPath, JValue)](jschema map {
+          case (jpath, ctype) => jvalue(ctype).map(jpath ->)
+        }))
 
       falseDepth <- choose(1, 3)
       falseSchema <- schema(falseDepth)
       falseSize <- choose(0, 5)
       falseIds <- containerOfN[Set, List[Long]](
-                   falseSize,
-                   containerOfN[List, Long](idCount, posNum[Long]))
+        falseSize,
+        containerOfN[List, Long](idCount, posNum[Long]))
       falseValues <- containerOfN[List, Seq[(JPath, JValue)]](
-                      falseSize,
-                      Gen.sequence[List, (JPath, JValue)](falseSchema map {
-                        case (jpath, ctype) => jvalue(ctype).map(jpath ->)
-                      }))
+        falseSize,
+        Gen.sequence[List, (JPath, JValue)](falseSchema map {
+          case (jpath, ctype) => jvalue(ctype).map(jpath ->)
+        }))
 
       falseIds2 = falseIds -- ids // distinct ids
     } yield {

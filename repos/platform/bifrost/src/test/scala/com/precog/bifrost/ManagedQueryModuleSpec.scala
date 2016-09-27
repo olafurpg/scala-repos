@@ -110,11 +110,11 @@ class ManagedQueryModuleSpec
       _ <- waitFor(1)
       Some(job) <- jobManager.findJob(jobId)
       finalJob <- job.state match {
-                   case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
-                     waitForJobCompletion(jobId)
-                   case _ =>
-                     Future(job)
-                 }
+        case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
+          waitForJobCompletion(jobId)
+        case _ =>
+          Future(job)
+      }
     } yield finalJob
   }
 
@@ -131,15 +131,13 @@ class ManagedQueryModuleSpec
     val result = for {
       // TODO: No idea how to work with EitherT[TestFuture, so sys.error it is]
       executor <- executorFor(apiKey) valueOr { err =>
-                   sys.error(err.toString)
-                 }
+        sys.error(err.toString)
+      }
       result0 <- executor
-                  .execute(numTicks.toString,
-                           ctx,
-                           QueryOptions(timeout = timeout))
-                  .valueOr(err => sys.error(err.toString)) mapValue {
-                  case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
-                }
+        .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
+        .valueOr(err => sys.error(err.toString)) mapValue {
+        case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
+      }
     } yield {
       val (Some((jobId, ticks)), result) = result0
 

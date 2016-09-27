@@ -16,9 +16,9 @@ case class TypeClass(name: String,
   def doc =
     "[[" + fqn + "]]" +
       (if (extendsList.nonEmpty)
-        " extends " +
-          extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
-      else "")
+         " extends " +
+           extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
+       else "")
 }
 
 object TypeClass {
@@ -315,7 +315,7 @@ object GenTypeClass {
     val syntaxPackString =
       tc.syntaxPack.map("package " + _).mkString("\n") +
         (if (tc.pack == Seq("scalaz")) ""
-        else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
+         else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember =
       if (tc.createSyntax) {

@@ -180,7 +180,7 @@ class FloatTest {
       (v == 0.0f) &&
       (1 / v ==
         (if (neg) Float.NegativeInfinity
-        else Float.PositiveInfinity))
+         else Float.PositiveInfinity))
     }
 
     import JFloat.{intBitsToFloat => f}

@@ -171,16 +171,16 @@ trait Checkable { self: Analyzer =>
 
     val result =
       (if (X.isErroneous || P.isErroneous) CheckabilityError
-      else if (P1) StaticallyTrue
-      else if (P2) StaticallyFalse
-      else if (P3) RuntimeCheckable
-      else if (uncheckableType == NoType) {
-        // Avoid warning (except ourselves) if we can't pinpoint the uncheckable type
-        debuglog(
-          "Checkability checker says 'Uncheckable', but uncheckable type cannot be found:\n" +
-            summaryString)
-        CheckabilityError
-      } else Uncheckable)
+       else if (P1) StaticallyTrue
+       else if (P2) StaticallyFalse
+       else if (P3) RuntimeCheckable
+       else if (uncheckableType == NoType) {
+         // Avoid warning (except ourselves) if we can't pinpoint the uncheckable type
+         debuglog(
+           "Checkability checker says 'Uncheckable', but uncheckable type cannot be found:\n" +
+             summaryString)
+         CheckabilityError
+       } else Uncheckable)
     lazy val uncheckableType =
       if (Psym.isAbstractType) P
       else {
@@ -266,9 +266,9 @@ trait Checkable { self: Analyzer =>
       /*logResult(s"isNeverSubArgs($tps1, $tps2, $tparams)")*/ {
         def isNeverSubArg(t1: Type, t2: Type, variance: Variance) =
           (if (variance.isInvariant) isNeverSameType(t1, t2)
-          else if (variance.isCovariant) isNeverSubType(t2, t1)
-          else if (variance.isContravariant) isNeverSubType(t1, t2)
-          else false)
+           else if (variance.isCovariant) isNeverSubType(t2, t1)
+           else if (variance.isContravariant) isNeverSubType(t1, t2)
+           else false)
         exists3(tps1, tps2, tparams map (_.variance))(isNeverSubArg)
       }
     private def isNeverSameType(tp1: Type, tp2: Type): Boolean =
@@ -354,8 +354,8 @@ trait Checkable { self: Analyzer =>
           } else if (checker.isUncheckable) {
             val msg =
               (if (checker.uncheckableType =:= P)
-                s"abstract type $where$PString"
-              else s"${checker.uncheckableMessage} in type $where$PString")
+                 s"abstract type $where$PString"
+               else s"${checker.uncheckableMessage} in type $where$PString")
             reporter.warning(
               tree.pos,
               s"$msg is unchecked since it is eliminated by erasure")

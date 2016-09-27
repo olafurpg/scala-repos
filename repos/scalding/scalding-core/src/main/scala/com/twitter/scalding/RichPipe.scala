@@ -707,10 +707,10 @@ class RichPipe(val pipe: Pipe)
   def normalize(f: Fields, useTiny: Boolean = true): Pipe = {
     val total = groupAll { _.sum[Double](f -> '__total_for_normalize__) }
     (if (useTiny) {
-      crossWithTiny(total)
-    } else {
-      crossWithSmaller(total)
-    }).map(Fields.merge(f, '__total_for_normalize__) -> f) {
+       crossWithTiny(total)
+     } else {
+       crossWithSmaller(total)
+     }).map(Fields.merge(f, '__total_for_normalize__) -> f) {
       args: (Double, Double) =>
         args._1 / args._2
     }

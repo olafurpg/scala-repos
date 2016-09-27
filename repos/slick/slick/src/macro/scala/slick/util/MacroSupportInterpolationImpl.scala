@@ -124,12 +124,13 @@ object MacroSupportInterpolationImpl {
           //println("### is Node: "+(ae.actualType <:< nodeType))
           exprs +=
             (if (ae.actualType <:< stringType) append(a)
-            else if (ae.actualType <:< definitions.AnyValTpe) append(toStr(a))
-            else if (ae.actualType <:< nodeType)
-              Apply(Ident(TermName("expr")), List(a, Literal(Constant(false))))
-            else
-              ctx.abort(ae.tree.pos,
-                        "Unknown type. Must be Node, String or AnyVal."))
+             else if (ae.actualType <:< definitions.AnyValTpe) append(toStr(a))
+             else if (ae.actualType <:< nodeType)
+               Apply(Ident(TermName("expr")),
+                     List(a, Literal(Constant(false))))
+             else
+               ctx.abort(ae.tree.pos,
+                         "Unknown type. Must be Node, String or AnyVal."))
       }
     }
     exprs ++= appendString(pit.next())

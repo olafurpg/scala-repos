@@ -31,8 +31,8 @@ trait Helpers {
           case FreshName(prefix) =>
             Some(
               (if (name.isTermName)
-                TermName(prefix)
-              else TypeName(prefix)).asInstanceOf[T])
+                 TermName(prefix)
+               else TypeName(prefix)).asInstanceOf[T])
         }
     }
 

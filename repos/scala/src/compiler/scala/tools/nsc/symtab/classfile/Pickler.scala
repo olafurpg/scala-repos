@@ -106,7 +106,7 @@ abstract class Pickler extends SubComponent {
         // however, they would suddenly be considered by asSeenFrom if their localized owner became a class (causing the crashes of #4079, #2741)
         (if ((sym.isTypeParameter || sym.isValueParameter) &&
              !sym.owner.isClass) nonClassRoot
-        else root)
+         else root)
       else sym.owner
 
     /** Is root in symbol.owner*, or should it be treated as a local symbol

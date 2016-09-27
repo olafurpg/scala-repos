@@ -119,11 +119,10 @@ abstract class SbtImportNotificationProvider(
       file: VirtualFile): Option[SbtProjectSettings] =
     for {
       externalProjectPath <- Option(file.getCanonicalPath)
-                              .flatMap(getExternalProject)
+        .flatMap(getExternalProject)
       sbtSettings <- Option(SbtSystemSettings.getInstance(project))
       projectSettings <- Option(
-                          sbtSettings.getLinkedProjectSettings(
-                            externalProjectPath))
+        sbtSettings.getLinkedProjectSettings(externalProjectPath))
     } yield {
       projectSettings
     }

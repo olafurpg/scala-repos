@@ -1205,8 +1205,8 @@ trait Typers
 
           dyna.acceptsApplyDynamic(tree.tpe) ||
           (if (mode.inTappMode)
-            tree.tpe.typeParams.isEmpty && hasPolymorphicApply
-          else hasMonomorphicApply)
+             tree.tpe.typeParams.isEmpty && hasPolymorphicApply
+           else hasMonomorphicApply)
         }
         def shouldInsertApply(tree: Tree) = mode.typingExprFun && {
           tree.tpe match {
@@ -1270,12 +1270,12 @@ trait Typers
             val tparams1 = cloneSymbols(tparams)
             val tree1 =
               (if (tree.isType) tree
-              else
-                TypeApply(
-                  tree,
-                  tparams1 map
-                    (tparam =>
-                       TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
+               else
+                 TypeApply(
+                   tree,
+                   tparams1 map
+                     (tparam =>
+                        TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
             context.undetparams ++= tparams1
             notifyUndetparamsAdded(tparams1)
             adapt(tree1 setType restpe.substSym(tparams, tparams1),
@@ -1546,7 +1546,7 @@ trait Typers
         context.error(clazz.pos,
                       "value class may not be a " +
                         (if (clazz.owner.isTerm) "local class"
-                        else "member of another class"))
+                         else "member of another class"))
       if (!clazz.isPrimitiveValueClass) {
         clazz.primaryConstructor.paramss match {
           case List(List(param)) =>
@@ -2050,10 +2050,10 @@ trait Typers
         .typedTemplate(mdef.impl, {
           typedParentTypes(mdef.impl) ++
             (if (noSerializable) Nil
-            else {
-              clazz.makeSerializable()
-              List(TypeTree(SerializableTpe) setPos clazz.pos.focus)
-            })
+             else {
+               clazz.makeSerializable()
+               List(TypeTree(SerializableTpe) setPos clazz.pos.focus)
+             })
         })
 
       val impl2 = finishMethodSynthesis(impl1, clazz, context)
@@ -2130,8 +2130,8 @@ trait Typers
 
       val selfType =
         (if (clazz.isAnonymousClass && !phase.erasedTypes)
-          intersectionType(clazz.info.parents, clazz.owner)
-        else clazz.typeOfThis)
+           intersectionType(clazz.info.parents, clazz.owner)
+         else clazz.typeOfThis)
       // the following is necessary for templates generated later
       assert(clazz.info.decls != EmptyScope, clazz)
       val body1 = pluginsEnterStats(this, templ.body)
@@ -3958,10 +3958,10 @@ trait Typers
 
                 val args1 =
                   (if (noExpectedType) typedArgs(args, forArgMode(fun, mode))
-                  else
-                    typedArgsForFormals(args,
-                                        paramTypes,
-                                        forArgMode(fun, mode)))
+                   else
+                     typedArgsForFormals(args,
+                                         paramTypes,
+                                         forArgMode(fun, mode)))
 
                 // instantiate dependent method types, must preserve singleton types where possible (stableTypeFor) -- example use case:
                 // val foo = "foo"; def precise(x: String)(y: x.type): x.type = {...}; val bar : foo.type = precise(foo)(foo)
@@ -4193,7 +4193,7 @@ trait Typers
             val names = mutable.Set[Symbol]()
             names ++=
               (if (isJava) annScope.iterator
-              else typedFun.tpe.params.iterator)
+               else typedFun.tpe.params.iterator)
 
             def hasValue = names exists (_.name == nme.value)
             val args = argss match {
@@ -4685,11 +4685,11 @@ trait Typers
 
       def lookupInQualifier(qual: Tree, name: Name): Symbol =
         (if (name == nme.ERROR || qual.tpe.widen.isErroneous) NoSymbol
-        else
-          lookupInOwner(qual.tpe.typeSymbol, name) orElse {
-            NotAMemberError(tree, qual, name)
-            NoSymbol
-          })
+         else
+           lookupInOwner(qual.tpe.typeSymbol, name) orElse {
+             NotAMemberError(tree, qual, name)
+             NoSymbol
+           })
 
       def typedAnnotated(atd: Annotated): Tree = {
         val ann = atd.annot
@@ -5354,8 +5354,8 @@ trait Typers
 
         val owntype =
           (if (!mix.isEmpty) findMixinSuper(clazz.tpe)
-          else if (context.inSuperInit) clazz.info.firstParent
-          else intersectionType(clazz.info.parents))
+           else if (context.inSuperInit) clazz.info.firstParent
+           else intersectionType(clazz.info.parents))
         treeCopy.Super(tree, qual1, mix) setType SuperType(clazz.thisType,
                                                            owntype)
       }
@@ -5428,13 +5428,13 @@ trait Typers
             def errorTree = missingSelectErrorTree(tree, qual, name)
             def asTypeSelection =
               (if (context.unit.isJava && name.isTypeName) {
-                // SI-3120 Java uses the same syntax, A.B, to express selection from the
-                // value A and from the type A. We have to try both.
-                atPos(tree.pos)(gen.convertToSelectFromType(qual, name)) match {
-                  case EmptyTree => None
-                  case tree1 => Some(typed1(tree1, mode, pt))
-                }
-              } else None)
+                 // SI-3120 Java uses the same syntax, A.B, to express selection from the
+                 // value A and from the type A. We have to try both.
+                 atPos(tree.pos)(gen.convertToSelectFromType(qual, name)) match {
+                   case EmptyTree => None
+                   case tree1 => Some(typed1(tree1, mode, pt))
+                 }
+               } else None)
             debuglog(s"""
               |qual=$qual:${qual.tpe}
               |symbol=${qual.tpe.termSymbol.defString}
@@ -5541,7 +5541,7 @@ trait Typers
           val qualStableOrError =
             (if (qualTyped.isErrorTyped || !name.isTypeName ||
                  treeInfo.admitsTypeSelection(qualTyped)) qualTyped
-            else UnstableTreeError(qualTyped))
+             else UnstableTreeError(qualTyped))
           val tree1 = name match {
             case nme.withFilter if !settings.future =>
               tryWithFilterAndFilter(tree, qualStableOrError)
@@ -6012,7 +6012,7 @@ trait Typers
 
         tree setType
           (if (tree.value.tag == UnitTag) UnitTpe
-          else ConstantType(tree.value))
+           else ConstantType(tree.value))
       }
 
       def typedSingletonTypeTree(tree: SingletonTypeTree) = {
@@ -6178,9 +6178,9 @@ trait Typers
       lastTreeToTyper = tree
       def body =
         (if (printTypings && !phase.erasedTypes && !noPrintTyping(tree))
-          typingStack.nextTyped(tree, mode, pt, context)(
-            typedInternal(tree, mode, pt))
-        else typedInternal(tree, mode, pt))
+           typingStack.nextTyped(tree, mode, pt, context)(
+             typedInternal(tree, mode, pt))
+         else typedInternal(tree, mode, pt))
       val startByType =
         if (Statistics.canEnable)
           Statistics.pushTimer(byTypeStack, byTypeNanos(tree.getClass))

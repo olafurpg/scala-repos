@@ -384,10 +384,10 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
 
     override def filterNot(p: Symbol => Boolean): Scope =
       (if (toList exists p) newScopeWith(toList filterNot p: _*)
-      else this)
+       else this)
     override def filter(p: Symbol => Boolean): Scope =
       (if (toList forall p) this
-      else newScopeWith(toList filter p: _*))
+       else newScopeWith(toList filter p: _*))
     @deprecated("Use `toList.reverse` instead", "2.10.0") // Used in SBT 0.12.4
     def reverse: List[Symbol] = toList.reverse
 

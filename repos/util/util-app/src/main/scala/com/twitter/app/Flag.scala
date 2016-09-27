@@ -806,9 +806,9 @@ class Flags(argv0: String,
 
     cmd + argv0 + " [<flag>...]\n" + "flags:\n" + (lines mkString "\n") +
       (if (globalLines.isEmpty) ""
-      else {
-        "\nglobal flags:\n" + (globalLines mkString "\n")
-      })
+       else {
+         "\nglobal flags:\n" + (globalLines mkString "\n")
+       })
   }
 
   /**

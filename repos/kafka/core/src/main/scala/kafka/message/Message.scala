@@ -161,11 +161,11 @@ class Message(val buffer: ByteBuffer,
         Message.CrcLength + Message.MagicLength +
           Message.AttributesLength +
           (if (magicValue == Message.MagicValue_V0) 0
-          else Message.TimestampLength) + Message.KeySizeLength +
+           else Message.TimestampLength) + Message.KeySizeLength +
           (if (key == null) 0 else key.length) + Message.ValueSizeLength +
           (if (bytes == null) 0
-          else if (payloadSize >= 0) payloadSize
-          else bytes.length - payloadOffset)))
+           else if (payloadSize >= 0) payloadSize
+           else bytes.length - payloadOffset)))
     validateTimestampAndMagicValue(timestamp, magicValue)
     // skip crc, we will fill that in at the end
     buffer.position(MagicOffset)

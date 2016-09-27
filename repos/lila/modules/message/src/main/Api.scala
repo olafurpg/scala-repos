@@ -36,8 +36,8 @@ final class Api(unreadCache: UnreadCache,
     for {
       threadOption ← $find.byId(id) map (_ filter (_ hasUser me))
       _ ← threadOption
-           .filter(_ isUnReadBy me)
-           .??(thread => (ThreadRepo setRead thread) >>- updateUser(me))
+        .filter(_ isUnReadBy me)
+        .??(thread => (ThreadRepo setRead thread) >>- updateUser(me))
     } yield threadOption
 
   def markThreadAsRead(id: String, me: User): Funit = thread(id, me).void

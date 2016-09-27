@@ -93,8 +93,8 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
                "0" + x.toOctalString.padTo(23, '1')))
     val overflowLongStringsWithL = overflowLongStrings.flatMap(appendL)
     for (s <- overflowLongStrings ++ overflowLongStringsWithL ++ Seq(
-               "9223372036854775808l",
-               "-9223372036854775809l")) {
+           "9223372036854775808l",
+           "-9223372036854775809l")) {
       assertMatches(messages(s"val a = $s")) {
         case Error(s, OverflowLongPattern()) :: Nil =>
       }

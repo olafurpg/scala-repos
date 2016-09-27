@@ -208,10 +208,10 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
         val lsb = (b & 0x0f)
         sb.append(
           (if (msb < 10) ('0' + msb).asInstanceOf[Char]
-          else ('a' + (msb - 10)).asInstanceOf[Char]))
+           else ('a' + (msb - 10)).asInstanceOf[Char]))
         sb.append(
           (if (lsb < 10) ('0' + lsb).asInstanceOf[Char]
-          else ('a' + (lsb - 10)).asInstanceOf[Char]))
+           else ('a' + (lsb - 10)).asInstanceOf[Char]))
 
         addDigit(in, pos + 1, len, sb)
       }

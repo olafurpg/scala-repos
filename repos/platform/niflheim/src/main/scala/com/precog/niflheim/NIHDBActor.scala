@@ -232,10 +232,10 @@ private[niflheim] object NIHDBActor extends Logging {
         val state = ProjectionState.empty(authorities)
         for {
           _ <- IO {
-                logger.info(
-                  "No current descriptor found for " + baseDir + "; " +
-                    authorities + ", creating fresh descriptor")
-              }
+            logger.info(
+              "No current descriptor found for " + baseDir + "; " +
+                authorities + ", creating fresh descriptor")
+          }
           _ <- ProjectionState.toFile(state, descriptorFile)
         } yield {
           success(state)

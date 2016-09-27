@@ -272,11 +272,11 @@ class PolynomialCheck
     implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] =
       Arbitrary(for {
         ts <- Gen.listOf(for {
-               c <- arbitrary[Rational]
-               e <- arbitrary[Int] map { n =>
-                     (n % 10).abs
-                   }
-             } yield (e, c))
+          c <- arbitrary[Rational]
+          e <- arbitrary[Int] map { n =>
+            (n % 10).abs
+          }
+        } yield (e, c))
       } yield {
         Polynomial(ts.toMap).toDense
       })

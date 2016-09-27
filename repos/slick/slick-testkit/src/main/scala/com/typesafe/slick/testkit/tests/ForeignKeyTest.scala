@@ -30,35 +30,35 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
       _ <- (posts.schema ++ categories.schema).create
       _ <- tdb.assertTablesExist("categories", "posts")
       _ <- categories ++= Seq(
-            (1, "Scala"),
-            (2, "ScalaQuery"),
-            (3, "Windows"),
-            (4, "Software")
-          )
+        (1, "Scala"),
+        (2, "ScalaQuery"),
+        (3, "Windows"),
+        (4, "Software")
+      )
       _ <- posts.map(p => (p.title, p.category)) ++= Seq(
-            ("Test Post", None),
-            ("Formal Language Processing in Scala, Part 5", Some(1)),
-            ("Efficient Parameterized Queries in ScalaQuery", Some(2)),
-            ("Removing Libraries and HomeGroup icons from the Windows 7 desktop",
-             Some(3)),
-            ("A ScalaQuery Update", Some(2))
-          )
+        ("Test Post", None),
+        ("Formal Language Processing in Scala, Part 5", Some(1)),
+        ("Efficient Parameterized Queries in ScalaQuery", Some(2)),
+        ("Removing Libraries and HomeGroup icons from the Windows 7 desktop",
+         Some(3)),
+        ("A ScalaQuery Update", Some(2))
+      )
       q1 = (for {
         p <- posts
         c <- p.categoryJoin
       } yield (p.id, c.id, c.name, p.title)).sortBy(_._1)
       _ <- q1
-            .map(p => (p._1, p._2))
-            .result
-            .map(_ shouldBe List((2, 1), (3, 2), (4, 3), (5, 2)))
+        .map(p => (p._1, p._2))
+        .result
+        .map(_ shouldBe List((2, 1), (3, 2), (4, 3), (5, 2)))
       q2 = (for {
         p <- posts
         c <- p.categoryFK
       } yield (p.id, c.id, c.name, p.title)).sortBy(_._1)
       _ <- q2
-            .map(p => (p._1, p._2))
-            .result
-            .map(_ shouldBe List((2, 1), (3, 2), (4, 3), (5, 2)))
+        .map(p => (p._1, p._2))
+        .result
+        .map(_ shouldBe List((2, 1), (3, 2), (4, 3), (5, 2)))
       _ <- (categories.schema ++ posts.schema).drop
       _ <- tdb.assertNotTablesExist("categories", "posts")
     } yield ()
@@ -90,14 +90,14 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
     for {
       _ <- (as.schema ++ bs.schema).create
       _ <- bs ++= Seq(
-            (1, 2, "b12"),
-            (3, 4, "b34"),
-            (5, 6, "b56")
-          )
+        (1, 2, "b12"),
+        (3, 4, "b34"),
+        (5, 6, "b56")
+      )
       _ <- as ++= Seq(
-            (1, 2, "a12"),
-            (3, 4, "a34")
-          )
+        (1, 2, "a12"),
+        (3, 4, "a34")
+      )
       q1 = (for {
         a <- as
         b <- a.bFK

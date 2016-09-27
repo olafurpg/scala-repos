@@ -415,12 +415,11 @@ class PutJobStateHandler(jobs: JobManager[Future])(
 
     val result = for {
       timestamp <- (obj \? "timestamp")
-                    .map(_.validated[DateTime])
-                    .sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                              DateTime]
+        .map(_.validated[DateTime])
+        .sequence[({ type λ[α] = Validation[Error, α] })#λ, DateTime]
       reason <- (obj \? "reason")
-                 .map(_.validated[String])
-                 .sequence[({ type λ[α] = Validation[Error, α] })#λ, String]
+        .map(_.validated[String])
+        .sequence[({ type λ[α] = Validation[Error, α] })#λ, String]
     } yield (timestamp getOrElse (new DateTime), reason)
 
     result match {

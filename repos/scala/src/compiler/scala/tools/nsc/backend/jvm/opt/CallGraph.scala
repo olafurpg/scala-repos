@@ -148,16 +148,14 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             // skips over unreachable code
             val callee: Either[OptimizerWarning, Callee] = for {
               (method, declarationClass) <- byteCodeRepository.methodNode(
-                                             call.owner,
-                                             call.name,
-                                             call.desc): Either[
-                                             OptimizerWarning,
-                                             (MethodNode, InternalName)]
+                call.owner,
+                call.name,
+                call.desc): Either[OptimizerWarning,
+                                   (MethodNode, InternalName)]
               (declarationClassNode, source) <- byteCodeRepository
-                                                 .classNodeAndSource(
-                                                   declarationClass): Either[
-                                                 OptimizerWarning,
-                                                 (ClassNode, Source)]
+                .classNodeAndSource(declarationClass): Either[OptimizerWarning,
+                                                              (ClassNode,
+                                                               Source)]
             } yield {
               val declarationClassBType =
                 classBTypeFromClassNode(declarationClassNode)
@@ -619,8 +617,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             val expectedImplMethodType = {
               val paramTypes =
                 (if (isStatic)
-                  indyParamTypes
-                else indyParamTypes.tail) ++ instantiatedMethodArgTypes
+                   indyParamTypes
+                 else indyParamTypes.tail) ++ instantiatedMethodArgTypes
               Type.getMethodType(instantiatedMethodType.getReturnType,
                                  paramTypes: _*)
             }

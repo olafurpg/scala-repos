@@ -196,11 +196,11 @@ class ClientDispatcher(
         (seq1, _) <- readTx(ok.numOfParams)
         (seq2, _) <- readTx(ok.numOfCols)
         ps <- Future.collect(seq1 map { p =>
-               const(Field(p))
-             })
+          const(Field(p))
+        })
         cs <- Future.collect(seq2 map { p =>
-               const(Field(p))
-             })
+          const(Field(p))
+        })
       } yield ok.copy(params = ps, columns = cs)
 
       result ensure signal.setDone()

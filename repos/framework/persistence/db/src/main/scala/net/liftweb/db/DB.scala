@@ -212,7 +212,7 @@ trait DB extends Loggable {
 
     val cmConn = for {
       connectionManager <- threadLocalConnectionManagers.box.flatMap(
-                            _.get(name)) or Box(connectionManagers.get(name))
+        _.get(name)) or Box(connectionManagers.get(name))
       connection <- cmSuperConnection(connectionManager)
     } yield connection
 

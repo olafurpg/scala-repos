@@ -567,7 +567,7 @@ private[akka] class ActorCell(
   def become(behavior: Actor.Receive, discardOld: Boolean = true): Unit =
     behaviorStack = behavior ::
         (if (discardOld && behaviorStack.nonEmpty) behaviorStack.tail
-        else behaviorStack)
+         else behaviorStack)
 
   def become(behavior: Procedure[Any]): Unit =
     become(behavior, discardOld = true)

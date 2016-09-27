@@ -201,7 +201,7 @@ object CSRF {
     for {
       name <- request.tags.get(Token.NameRequestTag)
       value <- request.tags.get(Token.ReSignedRequestTag) orElse request.tags
-                .get(Token.RequestTag)
+        .get(Token.RequestTag)
     } yield Token(name, value)
   }
 

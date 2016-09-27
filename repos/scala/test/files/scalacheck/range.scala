@@ -91,7 +91,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
           ((r.end.toLong - r.start.toLong).abs / r.step.abs.toLong +
             (if ((r.end.toLong -
                    r.start.toLong).abs % r.step.abs.toLong > 0L) 1L
-            else 0L))
+             else 0L))
         case _ => 0L
       }
     }
@@ -254,7 +254,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
       } else {
         val t2 =
           (if (r.step > 0) Range(r.start, x min r.last, r.step).inclusive
-          else Range(r.start, x max r.last, r.step).inclusive)
+           else Range(r.start, x max r.last, r.step).inclusive)
         (t.start == r.start && t.size == t2.size && t.step == r.step) :| str(r) +
           " / " + str(t) + " / " + str(t2) + ": " + x
       }

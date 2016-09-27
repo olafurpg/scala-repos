@@ -30,10 +30,10 @@ class LogDoubleTest extends FunSuite with Checkers {
   import Arbitrary.arbitrary;
   implicit val ad: Arbitrary[Double] = Arbitrary(for {
     d <- arbitrary[Double](Arbitrary.arbDouble) map {
-          _ % 1000 abs
-        } suchThat {
-          _ > 0
-        }
+      _ % 1000 abs
+    } suchThat {
+      _ > 0
+    }
   } yield {
     d
   });

@@ -547,7 +547,7 @@ private[sbt] object Eval {
     else seqBytes(fs)(fileModifiedBytes)
   def fileModifiedBytes(f: File): Array[Byte] =
     (if (f.isDirectory) filesModifiedBytes(f listFiles classDirFilter)
-    else bytes(f.lastModified)) ++ bytes(f.getAbsolutePath)
+     else bytes(f.lastModified)) ++ bytes(f.getAbsolutePath)
   def fileExistsBytes(f: File): Array[Byte] =
     bytes(f.exists) ++ bytes(f.getAbsolutePath)
 

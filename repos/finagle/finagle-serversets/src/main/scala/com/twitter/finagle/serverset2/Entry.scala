@@ -126,8 +126,8 @@ object Endpoint {
       namesByHostPort(hostport) += null
     for {
       map <- d("additionalEndpoints") collect {
-              case m: java.util.Map[_, _] => m
-            }
+        case m: java.util.Map[_, _] => m
+      }
       key <- map.keySet().asScala collect { case k: String => k }
       if key.isInstanceOf[String]
       hostport <- parseEndpoint(map.get(key))

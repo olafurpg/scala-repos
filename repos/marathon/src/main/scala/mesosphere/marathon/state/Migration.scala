@@ -239,9 +239,9 @@ class MigrationTo0_11(groupRepository: GroupRepository,
                                                         nextVersion,
                                                         maybeNextApp)
             storedResult <- withVersionInfo
-                             .map((newApp: AppDefinition) =>
-                               appRepository.store(newApp).map(Some(_)))
-                             .getOrElse(maybeLastAppFuture)
+              .map((newApp: AppDefinition) =>
+                appRepository.store(newApp).map(Some(_)))
+              .getOrElse(maybeLastAppFuture)
           } yield storedResult
       }
     }

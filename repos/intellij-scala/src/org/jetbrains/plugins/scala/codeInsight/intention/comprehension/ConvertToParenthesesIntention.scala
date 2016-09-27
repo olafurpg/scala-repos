@@ -34,12 +34,12 @@ class ConvertToParenthesesIntention extends PsiElementBaseIntentionAction {
     val block = ScalaPsiElementFactory.parseElement("(_)", manager)
 
     for (lBrace <- Option(
-                    statement.findFirstChildByType(ScalaTokenTypes.tLBRACE))) {
+           statement.findFirstChildByType(ScalaTokenTypes.tLBRACE))) {
       lBrace.replace(block.getFirstChild)
     }
 
     for (rBrace <- Option(
-                    statement.findFirstChildByType(ScalaTokenTypes.tRBRACE))) {
+           statement.findFirstChildByType(ScalaTokenTypes.tRBRACE))) {
       rBrace.replace(block.getLastChild)
     }
 

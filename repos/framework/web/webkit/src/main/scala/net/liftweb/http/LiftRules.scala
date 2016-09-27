@@ -543,8 +543,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       newUrl = new java.net.URL(
         url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
       str <- tryo(
-              new String(readWholeStream(newUrl.openConnection.getInputStream),
-                         "UTF-8"))
+        new String(readWholeStream(newUrl.openConnection.getInputStream),
+                   "UTF-8"))
       ma <- """Implementation-Version: (.*)""".r.findFirstMatchIn(str)
     } yield ma.group(1)
 
@@ -558,8 +558,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       newUrl = new java.net.URL(
         url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
       str <- tryo(
-              new String(readWholeStream(newUrl.openConnection.getInputStream),
-                         "UTF-8"))
+        new String(readWholeStream(newUrl.openConnection.getInputStream),
+                   "UTF-8"))
       ma <- """Built-Time: (.*)""".r.findFirstMatchIn(str)
       asLong <- asLong(ma.group(1))
     } yield new Date(asLong)

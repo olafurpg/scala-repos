@@ -865,18 +865,18 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def s_dm_op[@expand.args(Int, Double, Float, Long) T,
-                       @expand.args(
-                         OpAdd,
-                         OpSub,
-                         OpMulScalar,
-                         OpMulMatrix,
-                         OpDiv,
-                         OpMod,
-                         OpPow) Op <: OpType](implicit @expand.sequence[Op]({
-    _ + _
-  }, { _ - _ }, { _ * _ }, { _ * _ }, {
-    _ / _
-  }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+                       @expand.args(OpAdd,
+                                    OpSub,
+                                    OpMulScalar,
+                                    OpMulMatrix,
+                                    OpDiv,
+                                    OpMod,
+                                    OpPow) Op <: OpType](
+      implicit @expand.sequence[Op]({
+        _ + _
+      }, { _ - _ }, { _ * _ }, { _ * _ }, {
+        _ / _
+      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
     : Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] =
     new Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] {
       def apply(b: T, a: DenseMatrix[T]): DenseMatrix[T] = {

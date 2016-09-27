@@ -16,5 +16,5 @@ trait PresentationCompilerTestDef {
 
   protected def format(pos: Position): String =
     (if (pos.isDefined) "(%d,%d)".format(pos.line, pos.column)
-    else "<no position>")
+     else "<no position>")
 }

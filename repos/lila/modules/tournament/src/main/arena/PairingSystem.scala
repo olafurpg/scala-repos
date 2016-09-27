@@ -24,18 +24,18 @@ object PairingSystem extends AbstractPairingSystem {
                                                  users.all,
                                                  Math.min(100, users.size * 4))
       onlyTwoActivePlayers <- (tour.nbPlayers > 20).fold(
-                               fuccess(false),
-                               PlayerRepo.countActive(tour.id).map(2 ==))
+        fuccess(false),
+        PlayerRepo.countActive(tour.id).map(2 ==))
       data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
       preps <- if (lastOpponents.hash.isEmpty) evenOrAll(data, users)
-              else
-                makePreps(data, users.waiting) flatMap {
-                  case Nil => fuccess(Nil)
-                  case _ => evenOrAll(data, users)
-                }
+      else
+        makePreps(data, users.waiting) flatMap {
+          case Nil => fuccess(Nil)
+          case _ => evenOrAll(data, users)
+        }
       pairings <- preps.map { prep =>
-                   UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
-                 }.sequenceFu
+        UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
+      }.sequenceFu
     } yield pairings
   }.chronometer
     .logIfSlow(500, pairingLogger) { pairings =>

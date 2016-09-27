@@ -127,8 +127,8 @@ object MongoAccountManagerSpec
       (for {
         tokenId <- accountManager.generateResetToken(account)
         resolvedAccount <- accountManager.findAccountByResetToken(
-                            account.accountId,
-                            tokenId)
+          account.accountId,
+          tokenId)
       } yield resolvedAccount).copoint must beLike {
         case \/-(resolvedAccount) =>
           resolvedAccount.accountId must_== account.accountId
@@ -138,11 +138,11 @@ object MongoAccountManagerSpec
     "not locate expired password reset tokens" in new AccountManager {
       (for {
         tokenId <- accountManager.generateResetToken(
-                    account,
-                    (new DateTime).minusMinutes(5))
+          account,
+          (new DateTime).minusMinutes(5))
         resolvedAccount <- accountManager.findAccountByResetToken(
-                            account.accountId,
-                            tokenId)
+          account.accountId,
+          tokenId)
       } yield resolvedAccount).copoint must beLike {
         case -\/(_) => ok
       }

@@ -62,14 +62,14 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
     val p1 = db.stream(((for {
       _ <- ddl.create
       ins1 <- users.map(u => (u.first, u.last)) +=
-               ("Homer", Some("Simpson"))
+        ("Homer", Some("Simpson"))
       ins2 <- users.map(u => (u.first, u.last)) ++=
-               Seq(("Marge", Some("Simpson")),
-                   ("Apu", Some("Nahasapeemapetilon")),
-                   ("Carl", Some("Carlson")),
-                   ("Lenny", Some("Leonard")))
+        Seq(("Marge", Some("Simpson")),
+            ("Apu", Some("Nahasapeemapetilon")),
+            ("Carl", Some("Carlson")),
+            ("Lenny", Some("Leonard")))
       ins3 <- users.map(_.first) ++=
-               Seq("Santa's Little Helper", "Snowball")
+        Seq("Santa's Little Helper", "Snowball")
       total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
       /* All test DBs seem to report the actual number of rows. None would also be acceptable: */
       _ = total.map(_ shouldBe 7)
@@ -142,9 +142,9 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
                             ("Lenny", 8),
                             ("Santa's Little Helper", 10))
         r4b <- q4b
-                .to[Set]
-                .result
-                .named("Latest Order per User, using maxOfPer")
+          .to[Set]
+          .result
+          .named("Latest Order per User, using maxOfPer")
         _ = r4b shouldBe Set(("Homer", 2),
                              ("Marge", 4),
                              ("Carl", 6),

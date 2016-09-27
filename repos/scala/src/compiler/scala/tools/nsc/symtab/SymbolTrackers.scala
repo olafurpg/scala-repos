@@ -121,8 +121,8 @@ trait SymbolTrackers {
               val flag = 1L << bit
               val prefix =
                 (if ((added & flag) != 0L) "+"
-                else if ((removed & flag) != 0L) "-"
-                else "")
+                 else if ((removed & flag) != 0L) "-"
+                 else "")
               if ((all & flag) == 0L) ""
               else prefix + Flags.flagToString(flag)
             }
@@ -134,9 +134,9 @@ trait SymbolTrackers {
       }
       def symString(sym: Symbol) =
         (if (settings.debug && sym.hasCompleteInfo) {
-          val s = sym.defString take 240
-          if (s.length == 240) s + "..." else s
-        } else sym + changedOwnerString + flagSummaryString)
+           val s = sym.defString take 240
+           if (s.length == 240) s + "..." else s
+         } else sym + changedOwnerString + flagSummaryString)
 
       def flatten = children.foldLeft(Set(root))(_ ++ _.flatten)
       def indentString(indent: String): String = {
@@ -145,9 +145,9 @@ trait SymbolTrackers {
         else {
           indicatorString + indent + symString(root) +
             (if (children.isEmpty) ""
-            else
-              children map (c => c.indentString(indent + "    ")) mkString
-                ("\n", "\n", ""))
+             else
+               children map (c => c.indentString(indent + "    ")) mkString
+                 ("\n", "\n", ""))
         }
       }
     }
@@ -201,9 +201,9 @@ trait SymbolTrackers {
 
       "" + hierarchy +
         (if (removed.isEmpty) ""
-        else
-          "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
-            removedString)
+         else
+           "\n\n!!! " + label + ", " + removed.size + " symbols vanished:\n" +
+             removedString)
     }
   }
 }

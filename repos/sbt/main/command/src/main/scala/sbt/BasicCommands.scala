@@ -187,7 +187,7 @@ object BasicCommands {
         state.log.info(
           "Applying State transformations " + args.mkString(", ") +
             (if (cp.isEmpty) ""
-            else " from " + cp.mkString(File.pathSeparator)))
+             else " from " + cp.mkString(File.pathSeparator)))
         val loader =
           if (cp.isEmpty) parentLoader
           else toLoader(cp.map(f => new File(f)), parentLoader)

@@ -977,8 +977,8 @@ object getDummyBlocks {
     val prefixIndent = Indent.getSpaceIndent(
       marginIndent +
         (if (node.getElementType == ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
-          1
-        else 0),
+           1
+         else 0),
       true)
 
     val lines = node.getText.split("\n")

@@ -103,8 +103,7 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
              |  'content': '<div class="executor-event-content"' +
              |    'data-toggle="tooltip" data-placement="bottom"' +
              |    'data-title="Executor ${executorId}<br>' +
-             |    'Added at ${UIUtils
-               .formatDate(new Date(event.startTime))}"' +
+             |    'Added at ${UIUtils.formatDate(new Date(event.startTime))}"' +
              |    'data-html="true">Executor ${executorId} added</div>'
              |}
            """.stripMargin

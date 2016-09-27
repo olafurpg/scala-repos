@@ -287,8 +287,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                         .unsafePerformIO
                       acc +
                         ((if (acc.contains(currentKey))
-                          currentKey
-                        else archiveKey) -> rec)
+                            currentKey
+                          else archiveKey) -> rec)
 
                     case record =>
                       // replace when id is not recognized, or when record is binary

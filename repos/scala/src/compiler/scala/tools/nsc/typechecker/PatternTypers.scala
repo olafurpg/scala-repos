@@ -201,8 +201,8 @@ trait PatternTypers { self: Analyzer =>
         case tp @ TypeRef(NoPrefix, tpSym, Nil) if eligible(tpSym) =>
           val bounds =
             (if (variance.isInvariant) tpSym.tpeHK.bounds
-            else if (variance.isPositive) TypeBounds.upper(tpSym.tpeHK)
-            else TypeBounds.lower(tpSym.tpeHK))
+             else if (variance.isPositive) TypeBounds.upper(tpSym.tpeHK)
+             else TypeBounds.lower(tpSym.tpeHK))
           // origin must be the type param so we can deskolemize
           val skolem = context.owner
             .newGADTSkolem(unit.freshTypeName("?" + tpSym.name), tpSym, bounds)
@@ -340,8 +340,8 @@ trait PatternTypers { self: Analyzer =>
         (context.owner
           .newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
           (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
-            pt
-          else freshUnapplyArgType()))
+             pt
+           else freshUnapplyArgType()))
       val unapplyArgTree =
         Ident(unapplyArg) updateAttachment SubpatternsAttachment(args)
 

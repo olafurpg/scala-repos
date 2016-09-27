@@ -1177,7 +1177,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
                     newBody = js.Block(pushLhsInto(newLhs, body), js.Break())
                     // desugar alternatives into several cases falling through
                     caze <- (newValues.init map (v => (v, js.Skip()))) :+
-                             (newValues.last, newBody)
+                      (newValues.last, newBody)
                   } yield {
                     caze
                   }

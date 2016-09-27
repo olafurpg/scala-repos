@@ -196,9 +196,9 @@ trait PrecogLibModule[M[+ _]]
                       response <- httpError <-: responseE.validation
                       body <- httpError <-: response.ok.validation
                       json <- jsonError <-: (Error.thrown(_)) <-: JParser
-                               .parseFromString(body)
+                        .parseFromString(body)
                       data <- jsonError <-: (json \ "data")
-                               .validated[List[JValue]]
+                        .validated[List[JValue]]
                       result <- jsonError <-: populate(data)
                     } yield result
                     validation leftMap (NonEmptyList(_))

@@ -264,7 +264,7 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     val paramString =
       (if (x.parameterList.clauses.length == 1 &&
            x.parameterList.clauses.head.isImplicit) "()"
-      else "") +
+       else "") +
         x.parameterList.clauses.map { c =>
           val start = if (c.isImplicit) "(implicit " else "("
           c.parameters.map { p =>

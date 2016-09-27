@@ -92,7 +92,7 @@ private[sql] class SQLListener(conf: SparkConf)
       val toRemove = math.max(retainedExecutions / 10, 1)
       executions.take(toRemove).foreach { execution =>
         for (executionUIData <- _executionIdToData.remove(
-                                 execution.executionId)) {
+               execution.executionId)) {
           for (jobId <- executionUIData.jobs.keys) {
             _jobIdToExecutionId.remove(jobId)
           }
@@ -313,8 +313,8 @@ private[sql] class SQLListener(conf: SparkConf)
           val accumulatorUpdates = {
             for (stageId <- executionUIData.stages;
                  stageMetrics <- _stageIdToStageMetrics
-                                  .get(stageId)
-                                  .toIterable;
+                   .get(stageId)
+                   .toIterable;
                  taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
                  accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
               assert(

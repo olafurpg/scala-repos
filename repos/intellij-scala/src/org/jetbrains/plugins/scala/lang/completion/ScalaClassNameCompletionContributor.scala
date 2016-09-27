@@ -211,12 +211,11 @@ object ScalaClassNameCompletionContributor {
         .map(_._1)
       for {
         el <- LookupElementManager.getLookupElement(
-               new ScalaResolveResult(typeToImport.element,
-                                      nameShadow = renamed),
-               isClassName = true,
-               isInImport = isInImport,
-               isInStableCodeReference = stableRefElement != null,
-               isInSimpleString = inString)
+          new ScalaResolveResult(typeToImport.element, nameShadow = renamed),
+          isClassName = true,
+          isInImport = isInImport,
+          isInStableCodeReference = stableRefElement != null,
+          isInSimpleString = inString)
       } {
         if (!afterNewPattern.accepts(dummyPosition, context))
           result.addElement(el)
@@ -266,8 +265,8 @@ object ScalaClassNameCompletionContributor {
       name <- ScalaPsiManager.instance(project).getStableTypeAliasesNames
       if prefixMatcher.prefixMatches(name)
       alias <- ScalaPsiManager
-                .instance(project)
-                .getStableAliasesByName(name, position.getResolveScope)
+        .instance(project)
+        .getStableAliasesByName(name, position.getResolveScope)
     } {
       addTypeForCompletion(TypeAliasToImport(alias))
     }

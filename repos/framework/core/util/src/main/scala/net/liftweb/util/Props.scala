@@ -47,7 +47,7 @@ private[util] trait Props extends Logger {
 
     val interpolated = for {
       interpolateRegex(before, key, after) <- interpolateRegex.findAllMatchIn(
-                                               value.toString)
+        value.toString)
     } yield {
       val lookedUp = lookup(key).getOrElse(("${" + key + "}"))
 
@@ -327,8 +327,8 @@ private[util] trait Props extends Logger {
     */
   lazy val hostName: String =
     (if (inGAE) "GAE"
-    else
-      Helpers.tryo(InetAddress.getLocalHost.getHostName).openOr("localhost"))
+     else
+       Helpers.tryo(InetAddress.getLocalHost.getHostName).openOr("localhost"))
 
   private lazy val _hostName = dotLen(hostName)
 

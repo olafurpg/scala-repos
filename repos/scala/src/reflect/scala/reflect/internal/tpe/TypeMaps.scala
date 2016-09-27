@@ -117,7 +117,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val args1 =
           (if (trackVariance && args.nonEmpty && !variance.isInvariant &&
                sym.typeParams.nonEmpty) mapOverArgs(args, sym.typeParams)
-          else args mapConserve this)
+           else args mapConserve this)
         if ((pre1 eq pre) && (args1 eq args)) tp
         else copyTypeRef(tp, pre1, tr.coevolveSym(pre1), args1)
       case ThisType(_) => tp
@@ -211,9 +211,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     protected def mapOverArgs(args: List[Type],
                               tparams: List[Symbol]): List[Type] =
       (if (trackVariance)
-        map2Conserve(args, tparams)((arg, tparam) =>
-          withVariance(variance * tparam.variance)(this(arg)))
-      else args mapConserve this)
+         map2Conserve(args, tparams)((arg, tparam) =>
+           withVariance(variance * tparam.variance)(this(arg)))
+       else args mapConserve this)
 
     /** Applies this map to the symbol's info, setting variance = Invariant
       *  if necessary when the symbol is an alias.
@@ -750,9 +750,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
                                from: List[Symbol],
                                to: List[T]): Type =
       (if (from.isEmpty) tp
-      // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(tp, from))
-      else if (matches(from.head, sym)) toType(tp, to.head)
-      else subst(tp, sym, from.tail, to.tail))
+       // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(tp, from))
+       else if (matches(from.head, sym)) toType(tp, to.head)
+       else subst(tp, sym, from.tail, to.tail))
 
     def apply(tp0: Type): Type =
       if (from.isEmpty) tp0
@@ -809,32 +809,32 @@ private[internal] trait TypeMaps { self: SymbolTable =>
                                from: List[Symbol],
                                to: List[Symbol]): Symbol =
       (if (from.isEmpty) sym
-      // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(sym, from))
-      else if (matches(from.head, sym)) to.head
-      else subst(sym, from.tail, to.tail))
+       // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(sym, from))
+       else if (matches(from.head, sym)) to.head
+       else subst(sym, from.tail, to.tail))
     private def substFor(sym: Symbol) = subst(sym, from, to)
 
     override def apply(tp: Type): Type =
       (if (from.isEmpty) tp
-      else
-        tp match {
-          case TypeRef(pre, sym, args) if pre ne NoPrefix =>
-            val newSym = substFor(sym)
-            // mapOver takes care of subst'ing in args
-            mapOver(
-              if (sym eq newSym) tp
-              else
-                copyTypeRef(tp, pre, newSym, args))
-          // assert(newSym.typeParams.length == sym.typeParams.length, "typars mismatch in SubstSymMap: "+(sym, sym.typeParams, newSym, newSym.typeParams))
-          case SingleType(pre, sym) if pre ne NoPrefix =>
-            val newSym = substFor(sym)
-            mapOver(
-              if (sym eq newSym) tp
-              else
-                singleType(pre, newSym))
-          case _ =>
-            super.apply(tp)
-        })
+       else
+         tp match {
+           case TypeRef(pre, sym, args) if pre ne NoPrefix =>
+             val newSym = substFor(sym)
+             // mapOver takes care of subst'ing in args
+             mapOver(
+               if (sym eq newSym) tp
+               else
+                 copyTypeRef(tp, pre, newSym, args))
+           // assert(newSym.typeParams.length == sym.typeParams.length, "typars mismatch in SubstSymMap: "+(sym, sym.typeParams, newSym, newSym.typeParams))
+           case SingleType(pre, sym) if pre ne NoPrefix =>
+             val newSym = substFor(sym)
+             mapOver(
+               if (sym eq newSym) tp
+               else
+                 singleType(pre, newSym))
+           case _ =>
+             super.apply(tp)
+         })
 
     object mapTreeSymbols extends TypeMapTransformer {
       val strictCopy = newStrictTreeCopier

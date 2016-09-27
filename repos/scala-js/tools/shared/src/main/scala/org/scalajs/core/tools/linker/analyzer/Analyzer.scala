@@ -155,7 +155,7 @@ private final class Analyzer(semantics: Semantics,
      */
     for {
       getSuperclassMethodInfo <- classClassInfo.flatMap(
-                                  _.methodInfos.get("getSuperclass__jl_Class"))
+        _.methodInfos.get("getSuperclass__jl_Class"))
       if getSuperclassMethodInfo.isReachable
     } {
       // calledFrom should always be nonEmpty if isReachable, but let's be robust
@@ -528,11 +528,11 @@ private final class Analyzer(semantics: Semantics,
         methodsCalled = Map(this.encodedName -> List(targetName)),
         methodsCalledStatically =
           (if (returnsChar)
-            Map(BoxedCharacterClass -> List("init___C"))
-          else Map.empty),
+             Map(BoxedCharacterClass -> List("init___C"))
+           else Map.empty),
         instantiatedClasses =
           (if (returnsChar) List(BoxedCharacterClass)
-          else Nil))
+           else Nil))
       val m = new MethodInfo(this, syntheticInfo)
       m.syntheticKind = MethodSyntheticKind.ReflectiveProxy(targetName)
       methodInfos += proxyName -> m

@@ -98,21 +98,20 @@ trait StatsLibModule[M[+ _]]
           sortedTable <- compactedTable.sort(sortKey, SortAscending)
           count <- sortedTable.reduce(Count.reducer(ctx))
           median <- if (count % 2 == 0) {
-                     val middleValues =
-                       sortedTable.takeRange((count.toLong / 2) - 1, 2)
-                     val transformedTable =
-                       middleValues.transform(trans.DerefObjectStatic(
-                         Leaf(Source),
-                         paths.Value)) //todo make function for this
-                     Mean(transformedTable, ctx)
-                   } else {
-                     val middleValue =
-                       M.point(sortedTable.takeRange((count.toLong / 2), 1))
-                     middleValue map {
-                       _.transform(
-                         trans.DerefObjectStatic(Leaf(Source), paths.Value))
-                     }
-                   }
+            val middleValues =
+              sortedTable.takeRange((count.toLong / 2) - 1, 2)
+            val transformedTable =
+              middleValues.transform(trans.DerefObjectStatic(
+                Leaf(Source),
+                paths.Value)) //todo make function for this
+            Mean(transformedTable, ctx)
+          } else {
+            val middleValue =
+              M.point(sortedTable.takeRange((count.toLong / 2), 1))
+            middleValue map {
+              _.transform(trans.DerefObjectStatic(Leaf(Source), paths.Value))
+            }
+          }
         } yield {
           val keyTable = Table.constEmptyArray.transform(
             trans.WrapObject(Leaf(Source), paths.Key.name))

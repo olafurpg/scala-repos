@@ -133,7 +133,7 @@ trait PrepJSExports { this: PrepJSInterop =>
         err(
           "You may not export a nested " +
             (if (isMod) "object"
-            else s"class. $createFactoryInOuterClassHint"))
+             else s"class. $createFactoryInOuterClassHint"))
       } else if (sym.isAbstractClass) {
         err("You may not export an abstract class")
       } else if (!isMod && !hasAnyNonPrivateCtor) {
@@ -147,7 +147,7 @@ trait PrepJSExports { this: PrepJSInterop =>
           reporter.error(exp.pos,
                          "You may not use @JSNamedExport on " +
                            (if (isMod) "an object"
-                           else "a Scala.js-defined JS class"))
+                            else "a Scala.js-defined JS class"))
         }
 
         jsInterop.registerForExport(sym, normal)

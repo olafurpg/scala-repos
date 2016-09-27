@@ -7,8 +7,8 @@ import LogUtil._
 class TableDump(maxColumnWidth: Int = 20) {
   protected[this] val box: IndexedSeq[String] =
     (if (GlobalConfig.unicodeDump)
-      "\u2501\u250f\u2533\u2513\u2523\u254b\u252b\u2517\u253b\u251b\u2503"
-    else "-/+\\|+|\\+/|").map(_.toString)
+       "\u2501\u250f\u2533\u2513\u2523\u254b\u252b\u2517\u253b\u251b\u2503"
+     else "-/+\\|+|\\+/|").map(_.toString)
 
   protected[this] val dashes =
     Iterator.fill(maxColumnWidth + 2)(box(0)).mkString

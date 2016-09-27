@@ -877,11 +877,9 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           val fieldRefClass = classBTypeFromParsedClassfile(fi.owner)
           for {
             (fieldNode, fieldDeclClassNode) <- byteCodeRepository.fieldNode(
-                                                fieldRefClass.internalName,
-                                                fi.name,
-                                                fi.desc): Either[
-                                                OptimizerWarning,
-                                                (FieldNode, InternalName)]
+              fieldRefClass.internalName,
+              fi.name,
+              fi.desc): Either[OptimizerWarning, (FieldNode, InternalName)]
             fieldDeclClass = classBTypeFromParsedClassfile(fieldDeclClassNode)
             res <- memberIsAccessible(fieldNode.access,
                                       fieldDeclClass,
@@ -918,13 +916,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
 
             val methodRefClass = classBTypeFromParsedClassfile(mi.owner)
             for {
-              (methodNode, methodDeclClassNode) <- byteCodeRepository
-                                                    .methodNode(
-                                                      methodRefClass.internalName,
-                                                      mi.name,
-                                                      mi.desc): Either[
-                                                    OptimizerWarning,
-                                                    (MethodNode, InternalName)]
+              (methodNode, methodDeclClassNode) <- byteCodeRepository.methodNode(
+                methodRefClass.internalName,
+                mi.name,
+                mi.desc): Either[OptimizerWarning, (MethodNode, InternalName)]
               methodDeclClass = classBTypeFromParsedClassfile(
                 methodDeclClassNode)
               res <- canInlineCall(mi.getOpcode,
@@ -992,11 +987,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
             implMethod.getOwner)
           for {
             (methodNode, methodDeclClassNode) <- byteCodeRepository.methodNode(
-                                                  methodRefClass.internalName,
-                                                  implMethod.getName,
-                                                  implMethod.getDesc): Either[
-                                                  OptimizerWarning,
-                                                  (MethodNode, InternalName)]
+              methodRefClass.internalName,
+              implMethod.getName,
+              implMethod.getDesc): Either[OptimizerWarning,
+                                          (MethodNode, InternalName)]
             methodDeclClass = classBTypeFromParsedClassfile(
               methodDeclClassNode)
             res <- memberIsAccessible(methodNode.access,

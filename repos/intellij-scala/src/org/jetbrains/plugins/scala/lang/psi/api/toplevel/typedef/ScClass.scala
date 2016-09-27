@@ -102,7 +102,7 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
           case Some(x: ScPrimaryConstructor) =>
             (if (x.parameterList.clauses.length == 1 &&
                  x.parameterList.clauses.head.isImplicit) "()"
-            else "") +
+             else "") +
               x.parameterList.clauses
                 .map(
                   c =>
@@ -112,10 +112,10 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                           p.name + " : " +
                             p.typeElement.fold("Any")(_.getText) +
                             (if (p.isDefaultParam)
-                              " = " +
-                                p.getDefaultExpression.fold("{}")(_.getText)
-                            else if (p.isRepeatedParameter) "*"
-                            else ""))
+                               " = " +
+                                 p.getDefaultExpression.fold("{}")(_.getText)
+                             else if (p.isRepeatedParameter) "*"
+                             else ""))
                       .mkString(if (c.isImplicit) "(implicit " else "(",
                                 ", ",
                                 ")"))

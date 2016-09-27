@@ -218,7 +218,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
     val dp = if (l.isDeprecated) deprecatedDecl else ""
     dp + "@inline def " + l.name +
       (if (l.retType.name == "Unit") s"[U](f: $args => U): This = {"
-      else s"(f: $args => ${genType(l.retType)}): This = {") +
+       else s"(f: $args => ${genType(l.retType)}): This = {") +
       s"\n  basis.${l.setter}(new ${l.callbackClassName} {"
   }
 
@@ -362,8 +362,8 @@ class ScaloidCodeGenerator(cls: AndroidClass,
   def paramedType(tpe: ScalaType, define: Boolean = false): String =
     tpe.name +
       (if (define || !tpe.isVar)
-        " <: " + tpe.bounds.map(genType).mkString(" with ")
-      else "")
+         " <: " + tpe.bounds.map(genType).mkString(" with ")
+       else "")
 
   def paramedTypes(pTypes: List[ScalaType], define: Boolean = false) =
     if (pTypes.isEmpty) ""

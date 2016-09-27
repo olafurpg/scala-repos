@@ -256,7 +256,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       case t =>
         t.shortClass +
           (if (t.symbol != null && t.symbol != NoSymbol) "(" + t.symbol + ")"
-          else "")
+           else "")
     }
   }
 
@@ -724,7 +724,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
   private def TypeTreeMemberType(sym: Symbol): TypeTree = {
     // Needed for pos/t4970*.scala. See SI-7853
     val resType = (if (sym.isLocalToBlock) sym.tpe
-    else (sym.owner.thisType memberType sym)).finalResultType
+                   else (sym.owner.thisType memberType sym)).finalResultType
     atPos(sym.pos.focus)(TypeTree(resType))
   }
 
@@ -1242,10 +1242,10 @@ trait Trees extends api.Trees { self: SymbolTable =>
 
     private def requireLegal(value: Any, allowed: Any, what: String) =
       (if (value != allowed) {
-        log(s"can't set $what for $self to value other than $allowed")
-        if (settings.debug &&
-            settings.developer) (new Throwable).printStackTrace
-      })
+         log(s"can't set $what for $self to value other than $allowed")
+         if (settings.debug &&
+             settings.developer) (new Throwable).printStackTrace
+       })
   }
 
   case object EmptyTree extends TermTree with CannotHaveAttrs {

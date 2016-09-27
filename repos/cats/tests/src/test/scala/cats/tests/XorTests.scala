@@ -70,7 +70,7 @@ class XorTests extends CatsSuite {
     for {
       left <- arbitrary[Boolean]
       xor <- if (left) arbitrary[Int].map(Xor.left)
-            else arbitrary[String].map(Xor.right)
+      else arbitrary[String].map(Xor.right)
     } yield xor
   }
 

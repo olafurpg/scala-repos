@@ -384,8 +384,7 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
           val code =
             s"""
              |$isNull = $leftRow.isNullAt($i);
-             |$value = $isNull ? ${ctx
-                 .defaultValue(a.dataType)} : ($valueCode);
+             |$value = $isNull ? ${ctx.defaultValue(a.dataType)} : ($valueCode);
            """.stripMargin
           ExprCode(code, isNull, value)
         } else {

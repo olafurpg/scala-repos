@@ -84,9 +84,8 @@ class ScalaMoveDirectoryWithClassesHelper
         if (remainsNothing) {
           import scala.collection.JavaConversions._
           for (reference <- ReferencesSearch
-                             .search(aPackage,
-                                     GlobalSearchScope.projectScope(project))
-                             .findAll()) {
+                 .search(aPackage, GlobalSearchScope.projectScope(project))
+                 .findAll()) {
             val element: PsiElement = reference.getElement
             val importStmt =
               PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt])

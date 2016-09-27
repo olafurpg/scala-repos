@@ -154,8 +154,8 @@ class Range(val start: Int, val end: Int, val step: Int)
     */
   final override def take(n: Int): Range =
     (if (n <= 0 || isEmpty) newEmptyRange(start)
-    else if (n >= numRangeElements) this
-    else new Range.Inclusive(start, locationAfterN(n - 1), step))
+     else if (n >= numRangeElements) this
+     else new Range.Inclusive(start, locationAfterN(n - 1), step))
 
   /** Creates a new range containing all the elements of this range except the first `n` elements.
     *
@@ -166,10 +166,10 @@ class Range(val start: Int, val end: Int, val step: Int)
     */
   final override def drop(n: Int): Range =
     (if (n <= 0 || isEmpty) this
-    else if (n >= numRangeElements)
-      newEmptyRange(end)
-    else
-      copy(locationAfterN(n), end, step))
+     else if (n >= numRangeElements)
+       newEmptyRange(end)
+     else
+       copy(locationAfterN(n), end, step))
 
   /** Creates a new range containing all the elements of this range except the last one.
     *
@@ -319,8 +319,8 @@ object Range {
 
     val isEmpty =
       (if (start == end) !isInclusive
-      else if (start < end) step < 0
-      else step > 0)
+       else if (start < end) step < 0
+       else step > 0)
     if (isEmpty) 0
     else {
       // Counts with Longs so we can recognize too-large ranges.

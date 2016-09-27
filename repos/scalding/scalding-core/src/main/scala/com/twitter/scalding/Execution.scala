@@ -712,10 +712,10 @@ object Execution {
       : Future[ExecutionCounters] = {
       for {
         flowDef <- toFuture(Try {
-                    val fd =
-                      new FlowDef;
-                    (head :: tail).foreach(_.write(conf, fd, mode)); fd
-                  })
+          val fd =
+            new FlowDef;
+          (head :: tail).foreach(_.write(conf, fd, mode)); fd
+        })
         _ = FlowStateMap.validateSources(flowDef, mode)
         jobStats <- cache.runFlowDef(conf, mode, flowDef)
         _ = FlowStateMap.clear(flowDef)

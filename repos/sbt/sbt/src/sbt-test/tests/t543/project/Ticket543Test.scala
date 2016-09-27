@@ -20,7 +20,7 @@ object Ticket543Test extends Build {
         testListeners += new TestReportListener {
         def testEvent(event: TestEvent): Unit = {
           for (e <- event.detail.filter(
-                     _.status == sbt.testing.Status.Failure)) {
+                 _.status == sbt.testing.Status.Failure)) {
             if (e.throwable != null && e.throwable.isDefined) {
               val caw = new CharArrayWriter
               e.throwable.get.printStackTrace(new PrintWriter(caw))

@@ -184,7 +184,7 @@ final class Formatter(private val dest: Appendable)
                     (if (hasFlag("-")) FormattableFlags.LEFT_JUSTIFY else 0) |
                       (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
                       (if (isConversionUpperCase) FormattableFlags.UPPERCASE
-                      else 0)
+                       else 0)
                   }
                   formattable.formatTo(this,
                                        flags,

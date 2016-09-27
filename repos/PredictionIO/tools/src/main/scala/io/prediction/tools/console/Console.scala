@@ -925,10 +925,10 @@ object Console extends Logging {
       s"${getSparkHome(ca.common.sparkHome)}/bin/spark-submit --jars " +
         s"${allJarFiles.mkString(",")} " +
         (if (extraFiles.size > 0) {
-          s"--files ${extraFiles.mkString(",")} "
-        } else {
-          ""
-        }) + "--class " +
+           s"--files ${extraFiles.mkString(",")} "
+         } else {
+           ""
+         }) + "--class " +
         s"${ca.mainClass.get} ${ca.common.sparkPassThrough.mkString(" ")} " +
         coreAssembly(ca.common.pioHome.get) + " " +
         ca.common.driverPassThrough.mkString(" ")
