@@ -64,7 +64,9 @@ trait VariColumnTabulator extends Tabulator {
       // max width item in each column
       def maxima(rows: Seq[Seq[String]]) =
         (0 until (ncols min items.size)) map { col =>
-          val widths = for (r <- rows if r.size > col) yield r(col).length
+          val widths = for {
+            r <- rows if r.size > col
+          } yield r(col).length
           widths.max
         }
       def resulting(rows: Seq[Seq[String]]) = {

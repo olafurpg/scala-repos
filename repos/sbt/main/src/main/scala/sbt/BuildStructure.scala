@@ -254,8 +254,10 @@ final class BuildUnit(val uri: URI,
 final class LoadedBuild(val root: URI, val units: Map[URI, LoadedBuildUnit]) {
   BuildUtil.checkCycles(units)
   def allProjectRefs: Seq[(ProjectRef, ResolvedProject)] =
-    for ((uri, unit) <- units.toSeq; (id, proj) <- unit.defined)
-      yield ProjectRef(uri, id) -> proj
+    for {
+      (uri, unit) <- units.toSeq
+      (id, proj) <- unit.defined
+    } yield ProjectRef(uri, id) -> proj
   def extra(data: Settings[Scope])(
       keyIndex: KeyIndex): BuildUtil[ResolvedProject] =
     BuildUtil(root, units, keyIndex, data)

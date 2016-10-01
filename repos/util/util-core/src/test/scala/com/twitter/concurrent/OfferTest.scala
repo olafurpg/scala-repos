@@ -168,7 +168,9 @@ class OfferTest extends WordSpec with MockitoSugar {
 
         offer.prepare() match {
           case Future(Return(tx)) =>
-            for (loser <- txs if loser ne tx) verify(loser).nack()
+            for {
+              loser <- txs if loser ne tx
+            } verify(loser).nack()
             assert(true)
         }
       }

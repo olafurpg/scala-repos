@@ -56,15 +56,16 @@ class ScalaCopyPastePostProcessor
         .runProcess(new Runnable {
           override def run(): Unit = {
             breakable {
-              for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
-                   element <- getElementsStrictlyInRange(file,
-                                                         startOffset,
-                                                         endOffset);
-                   reference <- element.asOptionOf[ScReferenceElement];
-                   dependency <- Dependency.dependencyFor(reference)
-                   if dependency.isExternal;
-                   range = dependency.source.getTextRange.shiftRight(
-                     -startOffset)) {
+              for {
+                (startOffset, endOffset) <- startOffsets.zip(endOffsets)
+                element <- getElementsStrictlyInRange(file,
+                                                      startOffset,
+                                                      endOffset)
+                reference <- element.asOptionOf[ScReferenceElement]
+                dependency <- Dependency.dependencyFor(reference)
+                if dependency.isExternal
+                range = dependency.source.getTextRange.shiftRight(-startOffset)
+              } {
                 if (System.currentTimeMillis > timeBound) {
                   Log.warn(
                     "Time-out while collecting dependencies in %s:\n%s".format(
@@ -189,9 +190,10 @@ class ScalaCopyPastePostProcessor
     if (bindingsToRestore.isEmpty) return
 
     inWriteAction {
-      for (Binding(ref, path) <- bindingsToRestore;
-           holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject))
-        holder.addImportForPath(path, ref)
+      for {
+        Binding(ref, path) <- bindingsToRestore
+        holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject)
+      } holder.addImportForPath(path, ref)
     }
   }
 
@@ -200,8 +202,10 @@ class ScalaCopyPastePostProcessor
                          offset: Int): Option[PsiElement] = {
     val range = dependency.range.shiftRight(offset)
 
-    for (ref <- Option(file.findElementAt(range.getStartOffset));
-         parent <- ref.parent if parent.getTextRange == range) yield parent
+    for {
+      ref <- Option(file.findElementAt(range.getStartOffset))
+      parent <- ref.parent if parent.getTextRange == range
+    } yield parent
   }
 
   private def getElementsStrictlyInRange(file: PsiFile,

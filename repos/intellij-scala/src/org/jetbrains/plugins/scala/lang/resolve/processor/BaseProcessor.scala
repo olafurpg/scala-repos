@@ -242,16 +242,22 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
           if d.isStatic && !e.isInstanceOf[ScTemplateDefinition] =>
         //not scala from scala
         var break = true
-        for (method <- e.getMethods if break &&
-               method.hasModifierProperty("static")) {
+        for {
+          method <- e.getMethods if break &&
+            method.hasModifierProperty("static")
+        } {
           if (!execute(method, state)) break = false
         }
-        for (cl <- e.getInnerClasses if break &&
-               cl.hasModifierProperty("static")) {
+        for {
+          cl <- e.getInnerClasses if break &&
+            cl.hasModifierProperty("static")
+        } {
           if (!execute(cl, state)) break = false
         }
-        for (field <- e.getFields if break &&
-               field.hasModifierProperty("static")) {
+        for {
+          field <- e.getFields if break &&
+            field.hasModifierProperty("static")
+        } {
           if (!execute(field, state)) break = false
         }
         if (!break) return false

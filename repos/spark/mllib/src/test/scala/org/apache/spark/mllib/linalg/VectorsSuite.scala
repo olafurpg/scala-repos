@@ -138,7 +138,10 @@ class VectorsSuite extends SparkFunSuite with Logging {
 
     val vectors = Seq(dv1, dv2, sv1, sv2)
 
-    for (v <- vectors; u <- vectors) {
+    for {
+      v <- vectors
+      u <- vectors
+    } {
       assert(v === u)
       assert(v.## === u.##)
     }
@@ -157,7 +160,10 @@ class VectorsSuite extends SparkFunSuite with Logging {
     val sv2 = Vectors.sparse(5, Array(0, 1, 2, 3, 4), Array(0, 0.9, 0, 0.8, 0))
 
     val vectors = Seq(dv1, sv1, sv2)
-    for (v <- vectors; u <- vectors) {
+    for {
+      v <- vectors
+      u <- vectors
+    } {
       assert(v === u)
       assert(v.## === u.##)
     }

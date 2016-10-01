@@ -202,8 +202,10 @@ abstract class ScTypeDefinitionImpl protected (
         classParent.asInstanceOf[ScTypeDefinitionImpl].getSourceMirrorClass
       parentSourceMirror match {
         case td: ScTypeDefinitionImpl =>
-          for (i <- td.typeDefinitions if name == i.name &&
-                 hasSameScalaKind(i)) return i
+          for {
+            i <- td.typeDefinitions if name == i.name &&
+              hasSameScalaKind(i)
+          } return i
         case _ => this
       }
     }
@@ -423,7 +425,9 @@ abstract class ScTypeDefinitionImpl protected (
     val direct = extendsBlock.supers.toArray
     val res = new ArrayBuffer[PsiClass]
     res ++= direct
-    for (sup <- direct if !res.contains(sup)) res ++= sup.getSupers
+    for {
+      sup <- direct if !res.contains(sup)
+    } res ++= sup.getSupers
     // return strict superclasses
     res.filter(_ != this).toArray
   }

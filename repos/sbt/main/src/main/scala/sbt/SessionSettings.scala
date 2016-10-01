@@ -200,9 +200,11 @@ object SessionSettings {
     */
   def saveSomeSettings(s: State)(include: ProjectRef => Boolean): State =
     withSettings(s) { session =>
-      val newSettings = for ((ref, settings) <- session.append
-                             if settings.nonEmpty &&
-                               include(ref)) yield {
+      val newSettings = for {
+        (ref, settings) <- session.append
+        if settings.nonEmpty &&
+          include(ref)
+      } yield {
         val (news, olds) = writeSettings(ref,
                                          settings.toList,
                                          session.original,
@@ -287,7 +289,9 @@ object SessionSettings {
   /** Prints all the user-defined SessionSettings (not raw) to System.out. */
   def printAllSettings(s: State): State =
     withSettings(s) { session =>
-      for ((ref, settings) <- session.append if settings.nonEmpty) {
+      for {
+        (ref, settings) <- session.append if settings.nonEmpty
+      } {
         println("In " + Reference.display(ref))
         printSettings(settings)
       }

@@ -103,7 +103,10 @@ class Quantity() {
       if (v != v1) sys.error("Error! contradiction: " + v + " and " + v1);
     case None =>
       informant = setter; value = Some(v);
-      for (c <- constraints; if !(c == informant)) {
+      for {
+        c <- constraints
+        if !(c == informant)
+      } {
         c.newValue;
       }
   }
@@ -112,7 +115,10 @@ class Quantity() {
   def forgetValue(retractor: Constraint): Unit = {
     if (retractor == informant) {
       value = None;
-      for (c <- constraints; if !(c == informant)) c.dropValue;
+      for {
+        c <- constraints
+        if !(c == informant)
+      } c.dropValue;
     }
   }
   def forgetValue: Unit = forgetValue(NoConstraint);

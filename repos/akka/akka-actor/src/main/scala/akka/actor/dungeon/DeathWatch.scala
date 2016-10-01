@@ -195,7 +195,10 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
   protected def addressTerminated(address: Address): Unit = {
     // cleanup watchedBy since we know they are dead
     maintainAddressTerminatedSubscription() {
-      for (a ← watchedBy; if a.path.address == address) watchedBy -= a
+      for {
+        a ← watchedBy
+        if a.path.address == address
+      } watchedBy -= a
     }
 
     // send DeathWatchNotification to self for all matching subjects
@@ -204,7 +207,10 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
     // When a parent is watching a child and it terminates due to AddressTerminated
     // it is removed by sending DeathWatchNotification with existenceConfirmed = true to support
     // immediate creation of child with same name.
-    for (a ← watching; if a.path.address == address) {
+    for {
+      a ← watching
+      if a.path.address == address
+    } {
       self.sendSystemMessage(
         DeathWatchNotification(a,
                                existenceConfirmed =

@@ -17,7 +17,9 @@ object EndpointsHelper {
     val tasksMap = taskTracker.tasksByAppSync
 
     val sb = new StringBuilder
-    for (app <- apps if app.ipAddress.isEmpty) {
+    for {
+      app <- apps if app.ipAddress.isEmpty
+    } {
       val tasks = tasksMap.marathonAppTasks(app.id)
       val cleanId = app.id.safePath
 
@@ -25,8 +27,10 @@ object EndpointsHelper {
 
       if (servicePorts.isEmpty) {
         sb.append(cleanId).append(delimiter).append(' ').append(delimiter)
-        for (task <- tasks
-             if task.getStatus.getState == TaskState.TASK_RUNNING) {
+        for {
+          task <- tasks
+          if task.getStatus.getState == TaskState.TASK_RUNNING
+        } {
           sb.append(task.getHost).append(' ')
         }
         sb.append('\n')
@@ -34,8 +38,10 @@ object EndpointsHelper {
         for ((port, i) <- servicePorts.zipWithIndex) {
           sb.append(cleanId).append(delimiter).append(port).append(delimiter)
 
-          for (task <- tasks
-               if task.getStatus.getState == TaskState.TASK_RUNNING) {
+          for {
+            task <- tasks
+            if task.getStatus.getState == TaskState.TASK_RUNNING
+          } {
             val taskPort =
               Option(task.getPortsList.get(i)).getOrElse(Integer.valueOf(0))
             sb.append(task.getHost)

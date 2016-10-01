@@ -79,13 +79,14 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       val tp = eb.templateParents
       tp match {
         case Some(tp1) =>
-          (for (te <- tp1.allTypeElements;
-                t = te.getType(TypingContext.empty).getOrAny;
-                asPsi = ScType.toPsi(t,
-                                     getProject,
-                                     GlobalSearchScope.allScope(getProject))
-                if asPsi.isInstanceOf[PsiClassType])
-            yield asPsi.asInstanceOf[PsiClassType]).toArray[PsiClassType]
+          (for {
+            te <- tp1.allTypeElements
+            t = te.getType(TypingContext.empty).getOrAny
+            asPsi = ScType.toPsi(t,
+                                 getProject,
+                                 GlobalSearchScope.allScope(getProject))
+            if asPsi.isInstanceOf[PsiClassType]
+          } yield asPsi.asInstanceOf[PsiClassType]).toArray[PsiClassType]
         case _ => PsiClassType.EMPTY_ARRAY
       }
     } else PsiClassType.EMPTY_ARRAY

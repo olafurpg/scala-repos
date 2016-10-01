@@ -51,7 +51,10 @@ class HighwatermarkPersistenceTest {
 
   @After
   def teardown() {
-    for (manager <- logManagers; dir <- manager.logDirs) CoreUtils.rm(dir)
+    for {
+      manager <- logManagers
+      dir <- manager.logDirs
+    } CoreUtils.rm(dir)
   }
 
   @Test

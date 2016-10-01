@@ -291,7 +291,10 @@ abstract class FormatInterpolator {
     protected def okFlags: String = allFlags
     def goodFlags = {
       val badFlags = flags map (_ filterNot (okFlags contains _))
-      for (bf <- badFlags; f <- bf) badFlag(f, s"Illegal flag '$f'")
+      for {
+        bf <- badFlags
+        f <- bf
+      } badFlag(f, s"Illegal flag '$f'")
       badFlags.getOrElse("").isEmpty
     }
     def goodIndex = {

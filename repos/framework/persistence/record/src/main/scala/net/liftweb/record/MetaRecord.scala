@@ -144,8 +144,10 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
     val methods = rootClass.getMethods
 
-    lifecycleCallbacks = (for (v <- methods if v.getName != "meta" &&
-                                 isLifecycle(v)) yield (v.getName, v)).toList
+    lifecycleCallbacks = (for {
+      v <- methods if v.getName != "meta" &&
+        isLifecycle(v)
+    } yield (v.getName, v)).toList
 
     introspect(this, methods) {
       case (v, mf) => tArray += FieldHolder(mf.name, v, mf)

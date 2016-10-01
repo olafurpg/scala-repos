@@ -146,8 +146,10 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
             .createModifierFromText("private", getManager)
           addBefore(node)
         } else {
-          for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                 child.asInstanceOf[ScAccessModifier].isPrivate) {
+          for {
+            child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
+              child.asInstanceOf[ScAccessModifier].isPrivate
+          } {
             getNode.removeChild(child.getNode)
             return
           }
@@ -158,8 +160,10 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
             .createModifierFromText("protected", getManager)
           addBefore(node)
         } else {
-          for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                 child.asInstanceOf[ScAccessModifier].isProtected) {
+          for {
+            child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
+              child.asInstanceOf[ScAccessModifier].isProtected
+          } {
             getNode.removeChild(child.getNode)
             return
           }

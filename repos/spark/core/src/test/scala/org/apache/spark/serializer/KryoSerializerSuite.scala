@@ -467,7 +467,10 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   // Regression test for SPARK-7766, an issue where disabling auto-reset and enabling
   // reference-tracking would lead to corrupted output when serializer instances are re-used
-  for (referenceTracking <- Set(true, false); autoReset <- Set(true, false)) {
+  for {
+    referenceTracking <- Set(true, false)
+    autoReset <- Set(true, false)
+  } {
     test(
       s"instance reuse with autoReset = $autoReset, referenceTracking = $referenceTracking") {
       testSerializerInstanceReuse(autoReset = autoReset,

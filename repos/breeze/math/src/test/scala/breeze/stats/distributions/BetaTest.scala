@@ -36,12 +36,14 @@ class BetaTest
   import org.scalacheck.Arbitrary.arbitrary;
 
   def arbParameter = Arbitrary {
-    for (mean <- arbitrary[Double].map { x =>
-           math.abs(x) % 100.0 + 1E-4
-         };
-         std <- arbitrary[Double].map { x =>
-           math.abs(x) % 100 + 1E-4
-         }) yield (mean, std)
+    for {
+      mean <- arbitrary[Double].map { x =>
+        math.abs(x) % 100.0 + 1E-4
+      }
+      std <- arbitrary[Double].map { x =>
+        math.abs(x) % 100 + 1E-4
+      }
+    } yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -57,12 +59,14 @@ class BetaTest
   def fromDouble(x: Double) = x
 
   implicit def arbDistr = Arbitrary {
-    for (a <- arbitrary[Double].map { x =>
-           math.abs(x) % 10000.0 + 1.1
-         };
-         b <- arbitrary[Double].map { x =>
-           math.abs(x) % 8.0 + 1.1
-         }) yield new Beta(a, b);
+    for {
+      a <- arbitrary[Double].map { x =>
+        math.abs(x) % 10000.0 + 1.1
+      }
+      b <- arbitrary[Double].map { x =>
+        math.abs(x) % 8.0 + 1.1
+      }
+    } yield new Beta(a, b);
   }
 
   test("#15 test 1: Small a and b") {

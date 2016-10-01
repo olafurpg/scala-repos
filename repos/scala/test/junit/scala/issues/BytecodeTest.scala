@@ -73,8 +73,9 @@ class BytecodeTest extends ClearAfterClass {
            new BatchSourceFile("AnnotB.java", annotB),
            new BatchSourceFile("Test.scala", scalaSrc)))
     val outDir = compiler.settings.outputDirs.getSingleOutput.get
-    val outfiles = (for (f <- outDir.iterator if !f.isDirectory)
-      yield (f.name, f.toByteArray)).toList
+    val outfiles = (for {
+      f <- outDir.iterator if !f.isDirectory
+    } yield (f.name, f.toByteArray)).toList
 
     def check(classfile: String, annotName: String) = {
       val f = (outfiles collect {

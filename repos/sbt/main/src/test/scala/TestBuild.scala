@@ -77,14 +77,14 @@ object TestBuild {
       import mutable.HashSet
 
       // task axis of Scope is set to Global and the value of the second map is the original task axis
-      val taskAxesMappings = for ((scope, keys) <- data.data.toIterable;
-                                  key <- keys.keys)
-        yield
-          (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[
-                                                                      _],
-                                                                    ScopeAxis[
-                                                                      AttributeKey[
-                                                                        _]])
+      val taskAxesMappings = for {
+        (scope, keys) <- data.data.toIterable
+        key <- keys.keys
+      } yield
+        (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[_],
+                                                                  ScopeAxis[
+                                                                    AttributeKey[
+                                                                      _]])
 
       val taskAxes = Relation.empty ++ taskAxesMappings
       val global = new HashSet[ScopedKey[_]]
@@ -183,11 +183,11 @@ object TestBuild {
     } toMap;
 
   implicit lazy val arbKeys: Arbitrary[Keys] = Arbitrary(keysGen)
-  lazy val keysGen: Gen[Keys] = for (env <- mkEnv;
-                                     keyCount <- chooseShrinkable(1,
-                                                                  KeysPerEnv);
-                                     keys <- listOfN(keyCount, scope(env)))
-    yield new Keys(env, keys)
+  lazy val keysGen: Gen[Keys] = for {
+    env <- mkEnv
+    keyCount <- chooseShrinkable(1, KeysPerEnv)
+    keys <- listOfN(keyCount, scope(env))
+  } yield new Keys(env, keys)
 
   def scope(env: Env): Gen[Scope] =
     for {
@@ -242,26 +242,40 @@ object TestBuild {
   implicit def maskGen(
       implicit arbBoolean: Arbitrary[Boolean]): Gen[ScopeMask] = {
     val b = arbBoolean.arbitrary
-    for (p <- b; c <- b; t <- b; x <- b)
-      yield ScopeMask(project = p, config = c, task = t, extra = x)
+    for {
+      p <- b
+      c <- b
+      t <- b
+      x <- b
+    } yield ScopeMask(project = p, config = c, task = t, extra = x)
   }
 
   implicit lazy val idGen: Gen[String] =
-    for (size <- chooseShrinkable(1, MaxIDSize); cs <- listOfN(size, alphaChar))
-      yield cs.mkString
+    for {
+      size <- chooseShrinkable(1, MaxIDSize)
+      cs <- listOfN(size, alphaChar)
+    } yield cs.mkString
   implicit lazy val optIDGen: Gen[Option[String]] =
     frequency((1, idGen map some.fn), (1, None))
-  implicit lazy val uriGen: Gen[URI] = for (sch <- idGen; ssp <- idGen;
-                                            frag <- optIDGen)
-    yield new URI(sch, ssp, frag.orNull)
+  implicit lazy val uriGen: Gen[URI] = for {
+    sch <- idGen
+    ssp <- idGen
+    frag <- optIDGen
+  } yield new URI(sch, ssp, frag.orNull)
 
   implicit def envGen(implicit bGen: Gen[Build],
                       tasks: Gen[Seq[Taskk]]): Gen[Env] =
-    for (i <- MaxBuildsGen; bs <- listOfN(i, bGen); ts <- tasks)
-      yield new Env(bs, ts)
+    for {
+      i <- MaxBuildsGen
+      bs <- listOfN(i, bGen)
+      ts <- tasks
+    } yield new Env(bs, ts)
   implicit def buildGen(implicit uGen: Gen[URI],
                         pGen: URI => Gen[Seq[Proj]]): Gen[Build] =
-    for (u <- uGen; ps <- pGen(u)) yield new Build(u, ps)
+    for {
+      u <- uGen
+      ps <- pGen(u)
+    } yield new Build(u, ps)
 
   def nGen[T](igen: Gen[Int])(implicit g: Gen[T]): Gen[List[T]] =
     igen flatMap { ig =>
@@ -330,9 +344,10 @@ object TestBuild {
     names match {
       case Nil => sequence(acc)
       case x :: xs =>
-        val next = for (depCount <- maxDeps;
-                        d <- pick(depCount min xs.size, xs))
-          yield (x, d.toList)
+        val next = for {
+          depCount <- maxDeps
+          d <- pick(depCount min xs.size, xs)
+        } yield (x, d.toList)
         genAcyclic(maxDeps, xs, next :: acc)
     }
   def sequence[T](gs: Seq[Gen[T]]): Gen[Seq[T]] = Gen.parameterized { prms =>

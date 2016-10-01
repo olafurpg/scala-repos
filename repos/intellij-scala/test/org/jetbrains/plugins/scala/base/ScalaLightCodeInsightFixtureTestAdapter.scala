@@ -227,8 +227,9 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
           if (info != null && info.quickFixActionRanges != null &&
               checkCaret(info.getStartOffset, info.getEndOffset))
             actions ++=
-              (for (pair <- info.quickFixActionRanges if pair != null)
-                yield pair.getFirst.getAction))
+              (for {
+                pair <- info.quickFixActionRanges if pair != null
+              } yield pair.getFirst.getAction))
 
     assert(actions.nonEmpty, "There is no available fixes.")
 

@@ -52,16 +52,20 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
   }
 
   // Basic types:
-  for (dataType <- DataTypeTestUtils.atomicTypes;
-       nullable <- Seq(true, false) if !dataType.isInstanceOf[DecimalType]) {
+  for {
+    dataType <- DataTypeTestUtils.atomicTypes
+    nullable <- Seq(true, false) if !dataType.isInstanceOf[DecimalType]
+  } {
     test(s"$dataType (nullable=$nullable)") {
       testRandomDataGeneration(dataType)
     }
   }
 
-  for (arrayType <- DataTypeTestUtils.atomicArrayTypes if RandomDataGenerator
-         .forType(arrayType.elementType, arrayType.containsNull)
-         .isDefined) {
+  for {
+    arrayType <- DataTypeTestUtils.atomicArrayTypes if RandomDataGenerator
+      .forType(arrayType.elementType, arrayType.containsNull)
+      .isDefined
+  } {
     test(s"$arrayType") {
       testRandomDataGeneration(arrayType)
     }
@@ -71,20 +75,24 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
     RandomDataGenerator.forType(_).isDefined)
 
   // Complex types:
-  for (keyType <- atomicTypesWithDataGenerators;
-       valueType <- atomicTypesWithDataGenerators
-       // Scala's BigDecimal.hashCode can lead to OutOfMemoryError on Scala 2.10 (see SI-6173) and
-       // Spark can hit NumberFormatException errors when converting certain BigDecimals (SPARK-8802).
-       // For these reasons, we don't support generation of maps with decimal keys.
-       if !keyType.isInstanceOf[DecimalType]) {
+  for {
+    keyType <- atomicTypesWithDataGenerators
+    valueType <- atomicTypesWithDataGenerators
+    // Scala's BigDecimal.hashCode can lead to OutOfMemoryError on Scala 2.10 (see SI-6173) and
+    // Spark can hit NumberFormatException errors when converting certain BigDecimals (SPARK-8802).
+    // For these reasons, we don't support generation of maps with decimal keys.
+    if !keyType.isInstanceOf[DecimalType]
+  } {
     val mapType = MapType(keyType, valueType)
     test(s"$mapType") {
       testRandomDataGeneration(mapType)
     }
   }
 
-  for (colOneType <- atomicTypesWithDataGenerators;
-       colTwoType <- atomicTypesWithDataGenerators) {
+  for {
+    colOneType <- atomicTypesWithDataGenerators
+    colTwoType <- atomicTypesWithDataGenerators
+  } {
     val structType = StructType(
       StructField("a", colOneType) :: StructField("b", colTwoType) :: Nil)
     test(s"$structType") {

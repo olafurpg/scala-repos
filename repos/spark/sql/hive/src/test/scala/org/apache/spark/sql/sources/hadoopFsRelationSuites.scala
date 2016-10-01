@@ -64,30 +64,38 @@ abstract class HadoopFsRelationTest
 
   def checkQueries(df: DataFrame): Unit = {
     // Selects everything
-    checkAnswer(df,
-                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
-                  yield Row(i, s"val_$i", p1, p2))
+    checkAnswer(df, for {
+      i <- 1 to 3
+      p1 <- 1 to 2
+      p2 <- Seq("foo", "bar")
+    } yield Row(i, s"val_$i", p1, p2))
 
     // Simple filtering and partition pruning
-    checkAnswer(df.filter('a > 1 && 'p1 === 2),
-                for (i <- 2 to 3; p2 <- Seq("foo", "bar"))
-                  yield Row(i, s"val_$i", 2, p2))
+    checkAnswer(df.filter('a > 1 && 'p1 === 2), for {
+      i <- 2 to 3
+      p2 <- Seq("foo", "bar")
+    } yield Row(i, s"val_$i", 2, p2))
 
     // Simple projection and filtering
-    checkAnswer(df.filter('a > 1).select('b, 'a + 1),
-                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar"))
-                  yield Row(s"val_$i", i + 1))
+    checkAnswer(df.filter('a > 1).select('b, 'a + 1), for {
+      i <- 2 to 3
+      _ <- 1 to 2
+      _ <- Seq("foo", "bar")
+    } yield Row(s"val_$i", i + 1))
 
     // Simple projection and partition pruning
-    checkAnswer(df.filter('a > 1 && 'p1 < 2).select('b, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar"))
-                  yield Row(s"val_$i", 1))
+    checkAnswer(df.filter('a > 1 && 'p1 < 2).select('b, 'p1), for {
+      i <- 2 to 3
+      _ <- Seq("foo", "bar")
+    } yield Row(s"val_$i", 1))
 
     // Project many copies of columns with different types (reproduction for SPARK-7858)
     checkAnswer(
       df.filter('a > 1 && 'p1 < 2).select('b, 'b, 'b, 'b, 'p1, 'p1, 'p1, 'p1),
-      for (i <- 2 to 3; _ <- Seq("foo", "bar"))
-        yield Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
+      for {
+        i <- 2 to 3
+        _ <- Seq("foo", "bar")
+      } yield Row(s"val_$i", s"val_$i", s"val_$i", s"val_$i", 1, 1, 1, 1))
 
     // Self-join
     df.registerTempTable("t")
@@ -96,8 +104,11 @@ abstract class HadoopFsRelationTest
             |FROM t l JOIN t r
             |ON l.a = r.a AND l.p1 = r.p1 AND l.p2 = r.p2
           """.stripMargin),
-                  for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
-                    yield Row(i, s"val_$i", p1, p2))
+                  for {
+                    i <- 1 to 3
+                    p1 <- 1 to 2
+                    p2 <- Seq("foo", "bar")
+                  } yield Row(i, s"val_$i", p1, p2))
     }
   }
 

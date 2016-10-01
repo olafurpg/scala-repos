@@ -186,8 +186,10 @@ package object financial {
     val res = roots(reverse(cashflow))
 
     val realRes = DenseVector[Double](
-      for (c: Complex <- res.toArray
-           if ((c.im() == 0) && (0 < c.re()))) yield c.re()
+      for {
+        c: Complex <- res.toArray
+        if ((c.im() == 0) && (0 < c.re()))
+      } yield c.re()
     )
     val rates = realRes.mapValues(v => 1.0 / v - 1.0)
 

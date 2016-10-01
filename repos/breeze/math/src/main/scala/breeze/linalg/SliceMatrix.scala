@@ -140,7 +140,10 @@ object SliceMatrix {
     : CanTransformValues[SliceMatrix[K1, K2, V], V] = {
     new CanTransformValues[SliceMatrix[K1, K2, V], V] {
       def transform(from: SliceMatrix[K1, K2, V], fn: (V) => V) {
-        for (j <- 0 until from.cols; i <- 0 until from.rows) {
+        for {
+          j <- 0 until from.cols
+          i <- 0 until from.rows
+        } {
           from(i, j) = fn(from(i, j))
         }
       }

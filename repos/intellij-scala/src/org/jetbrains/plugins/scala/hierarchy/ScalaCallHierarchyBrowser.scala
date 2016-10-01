@@ -36,8 +36,10 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
       Class.forName("com.intellij.ide.hierarchy.CallHierarchyBrowserBase")
     val classes = forName.getDeclaredClasses
     var baseClass: Class[_] = null
-    for (clazz <- classes
-         if clazz.getName endsWith "BaseOnThisMethodAction") baseClass = clazz
+    for {
+      clazz <- classes
+      if clazz.getName endsWith "BaseOnThisMethodAction"
+    } baseClass = clazz
     val constructor = baseClass.getConstructor()
     val inst: Any = constructor.newInstance()
     val methods = baseClass.getMethods

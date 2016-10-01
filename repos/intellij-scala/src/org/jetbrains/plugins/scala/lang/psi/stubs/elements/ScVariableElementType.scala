@@ -91,7 +91,9 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
 
   def indexStub(stub: ScVariableStub, sink: IndexSink) {
     val names = stub.getNames
-    for (name <- names if name != null) {
+    for {
+      name <- names if name != null
+    } {
       sink.occurrence(ScalaIndexKeys.VARIABLE_NAME_KEY, name)
     }
   }

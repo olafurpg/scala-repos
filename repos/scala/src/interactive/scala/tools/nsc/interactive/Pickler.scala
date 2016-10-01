@@ -221,8 +221,10 @@ object Pickler {
       q.pickle(wr, x.snd)
     }
     def unpickle(rd: Lexer) =
-      for (x <- p.unpickle(rd);
-           y <- { rd.accept(','); qq.unpickle(rd).requireSuccess }) yield x ~ y
+      for {
+        x <- p.unpickle(rd)
+        y <- { rd.accept(','); qq.unpickle(rd).requireSuccess }
+      } yield x ~ y
   }
 
   /** Same as `p | q`

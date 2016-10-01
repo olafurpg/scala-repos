@@ -209,19 +209,21 @@ class ScalaInplaceVariableIntroducer(project: Project,
           def setGreedyToRightToFalse(): Unit = {
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
-            for (highlighter <- highlighters;
-                 if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset))
-              greedyToRight +=
-                (highlighter -> highlighter.isGreedyToRight)
+            for {
+              highlighter <- highlighters
+              if checkRange(highlighter.getStartOffset,
+                            highlighter.getEndOffset)
+            } greedyToRight +=
+              (highlighter -> highlighter.isGreedyToRight)
           }
           def resetGreedyToRightBack(): Unit = {
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
-            for (highlighter <- highlighters;
-                 if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset))
-              highlighter.setGreedyToRight(greedyToRight(highlighter))
+            for {
+              highlighter <- highlighters
+              if checkRange(highlighter.getStartOffset,
+                            highlighter.getEndOffset)
+            } highlighter.setGreedyToRight(greedyToRight(highlighter))
           }
           def checkRange(start: Int, end: Int): Boolean = {
             val named: Option[ScNamedElement] = namedElement(getDeclaration)

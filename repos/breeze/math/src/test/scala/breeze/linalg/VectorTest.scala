@@ -219,7 +219,9 @@ class VectorOps_ComplexTest
   }
 
   implicit def genScalar: Arbitrary[Complex] = Arbitrary {
-    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double])
-      yield Complex(r % 100, i % 100)
+    for {
+      r <- Arbitrary.arbitrary[Double]
+      i <- Arbitrary.arbitrary[Double]
+    } yield Complex(r % 100, i % 100)
   }
 }

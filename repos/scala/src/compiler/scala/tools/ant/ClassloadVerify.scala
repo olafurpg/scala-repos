@@ -38,8 +38,10 @@ class ClassloadVerify extends ScalaMatchingTask {
   override def execute(): Unit = {
     val results = VerifyClass.run(getClasspath).asScala
     results foreach (r => log("Checking: " + r, Project.MSG_DEBUG))
-    val errors = for ((name, error) <- results; if error != null)
-      yield (name, error)
+    val errors = for {
+      (name, error) <- results
+      if error != null
+    } yield (name, error)
     if (errors.isEmpty) {
       // TODO - Log success
       log("Classload verification succeeded with " + results.size +

@@ -312,7 +312,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     if (!speculatableTasks.isEmpty) {
       // Check for process-local tasks; note that tasks can be process-local
       // on multiple nodes when we replicate cached blocks, as in Spark Streaming
-      for (index <- speculatableTasks if canRunOnHost(index)) {
+      for {
+        index <- speculatableTasks if canRunOnHost(index)
+      } {
         val prefs = tasks(index).preferredLocations
         val executors = prefs.flatMap(_ match {
           case e: ExecutorCacheTaskLocation => Some(e.executorId)
@@ -326,7 +328,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
 
       // Check for node-local tasks
       if (TaskLocality.isAllowed(locality, TaskLocality.NODE_LOCAL)) {
-        for (index <- speculatableTasks if canRunOnHost(index)) {
+        for {
+          index <- speculatableTasks if canRunOnHost(index)
+        } {
           val locations = tasks(index).preferredLocations.map(_.host)
           if (locations.contains(host)) {
             speculatableTasks -= index
@@ -337,7 +341,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
 
       // Check for no-preference tasks
       if (TaskLocality.isAllowed(locality, TaskLocality.NO_PREF)) {
-        for (index <- speculatableTasks if canRunOnHost(index)) {
+        for {
+          index <- speculatableTasks if canRunOnHost(index)
+        } {
           val locations = tasks(index).preferredLocations
           if (locations.size == 0) {
             speculatableTasks -= index
@@ -349,7 +355,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       // Check for rack-local tasks
       if (TaskLocality.isAllowed(locality, TaskLocality.RACK_LOCAL)) {
         for (rack <- sched.getRackForHost(host)) {
-          for (index <- speculatableTasks if canRunOnHost(index)) {
+          for {
+            index <- speculatableTasks if canRunOnHost(index)
+          } {
             val racks = tasks(index).preferredLocations
               .map(_.host)
               .flatMap(sched.getRackForHost)
@@ -363,7 +371,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
 
       // Check for non-local tasks
       if (TaskLocality.isAllowed(locality, TaskLocality.ANY)) {
-        for (index <- speculatableTasks if canRunOnHost(index)) {
+        for {
+          index <- speculatableTasks if canRunOnHost(index)
+        } {
           speculatableTasks -= index
           return Some((index, TaskLocality.ANY))
         }
@@ -846,7 +856,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     // so we would need to rerun these tasks on other executors.
     if (tasks(0).isInstanceOf[ShuffleMapTask] &&
         !env.blockManager.externalShuffleServiceEnabled) {
-      for ((tid, info) <- taskInfos if info.executorId == execId) {
+      for {
+        (tid, info) <- taskInfos if info.executorId == execId
+      } {
         val index = taskInfos(tid).index
         if (successful(index)) {
           successful(index) = false
@@ -863,8 +875,10 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         }
       }
     }
-    for ((tid, info) <- taskInfos if info.running &&
-           info.executorId == execId) {
+    for {
+      (tid, info) <- taskInfos if info.running &&
+        info.executorId == execId
+    } {
       val exitCausedByApp: Boolean = reason match {
         case exited: ExecutorExited => exited.exitCausedByApp
         case ExecutorKilled => false

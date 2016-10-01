@@ -322,9 +322,10 @@ object WorkflowUtils extends Logging {
     def flatten(jv: JValue): List[(List[String], String)] = {
       jv match {
         case JObject(fields) =>
-          for ((namePrefix, childJV) <- fields;
-               (name, value) <- flatten(childJV))
-            yield (namePrefix :: name) -> value
+          for {
+            (namePrefix, childJV) <- fields
+            (name, value) <- flatten(childJV)
+          } yield (namePrefix :: name) -> value
         case JArray(_) => {
           error(
             "Arrays are not allowed in the sparkConf section of engine.js.")

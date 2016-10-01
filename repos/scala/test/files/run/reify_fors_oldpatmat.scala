@@ -37,7 +37,9 @@ object Test extends App {
         // one generator and filter. The 'yield' expression is evaluated
         // for each 'p' which satisfies the filters and used to assemble
         // the resulting iterator
-        for (p <- xs if p.age > 20) yield p.name
+        for {
+          p <- xs if p.age > 20
+        } yield p.name
       }
     }
 
@@ -48,7 +50,9 @@ object Test extends App {
 
       /** Return the divisors of n. */
       def divisors(n: Int): List[Int] =
-        for (i <- List.range(1, n + 1) if n % i == 0) yield i
+        for {
+          i <- List.range(1, n + 1) if n % i == 0
+        } yield i
 
       /** Is 'n' a prime number? */
       def isPrime(n: Int) = divisors(n).length == 2
@@ -57,8 +61,11 @@ object Test extends App {
       def findNums(n: Int): Iterable[(Int, Int)] = {
 
         // a for comprehension using two generators
-        for (i <- 1 until n;
-             j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
+        for {
+          i <- 1 until n
+          j <- 1 until (i - 1)
+          if isPrime(i + j)
+        } yield (i, j)
       }
 
       /** Return the sum of the elements of 'xs'. */
@@ -75,8 +82,9 @@ object Test extends App {
       def removeDuplicates[A](xs: List[A]): List[A] =
         if (xs.isEmpty) xs
         else
-          xs.head :: removeDuplicates(
-            for (x <- xs.tail if x != xs.head) yield x)
+          xs.head :: removeDuplicates(for {
+            x <- xs.tail if x != xs.head
+          } yield x)
     }
 
     // import all members of object 'persons' in the current scope

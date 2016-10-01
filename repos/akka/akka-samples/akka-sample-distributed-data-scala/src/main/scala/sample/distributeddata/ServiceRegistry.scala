@@ -114,9 +114,15 @@ class ServiceRegistry extends Actor with ActorLogging {
       // when used with many (> 500) services you must increase the system message buffer
       // `akka.remote.system-message-buffer-size`
       if (!wasLeader && leader)
-        for (refs ← services.valuesIterator; ref ← refs) context.watch(ref)
+        for {
+          refs ← services.valuesIterator
+          ref ← refs
+        } context.watch(ref)
       else if (wasLeader && !leader)
-        for (refs ← services.valuesIterator; ref ← refs) context.unwatch(ref)
+        for {
+          refs ← services.valuesIterator
+          ref ← refs
+        } context.unwatch(ref)
 
     case Terminated(ref) ⇒
       val names = services.collect {

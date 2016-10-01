@@ -84,8 +84,11 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     // Collect callsites to rewrite before actually rewriting anything. This prevents changing the
     // `callsties` map while iterating it.
     val toRewrite = mutable.ArrayBuffer.empty[Callsite]
-    for (css <- callsites.valuesIterator; cs <- css.valuesIterator
-         if doRewriteTraitCallsite(cs)) toRewrite += cs
+    for {
+      css <- callsites.valuesIterator
+      cs <- css.valuesIterator
+      if doRewriteTraitCallsite(cs)
+    } toRewrite += cs
     toRewrite foreach rewriteFinalTraitMethodInvocation
   }
 
@@ -483,8 +486,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     // large methods are not added to the call graph.
     val analyzer = new AsmAnalyzer(callee, calleeDeclarationClass.internalName)
 
-    for (originalReturn <- callee.instructions.iterator().asScala if isReturn(
-           originalReturn)) {
+    for {
+      originalReturn <- callee.instructions.iterator().asScala if isReturn(
+        originalReturn)
+    } {
       val frame = analyzer.frameAt(originalReturn)
       var stackHeight = frame.getStackSize
 

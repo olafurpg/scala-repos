@@ -252,8 +252,10 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
 
     /* Mix in members of implementation class mixinClass into class clazz */
     def mixinTraitForwarders(mixinClass: Symbol) {
-      for (member <- mixinClass.info.decls;
-           if isImplementedStatically(member)) {
+      for {
+        member <- mixinClass.info.decls
+        if isImplementedStatically(member)
+      } {
         member overridingSymbol clazz match {
           case NoSymbol =>
             if (clazz.info
@@ -352,7 +354,10 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
     // first complete the superclass with mixed in members
     addMixedinMembers(clazz.superClass, unit)
 
-    for (mc <- clazz.mixinClasses; if mc.isTrait) {
+    for {
+      mc <- clazz.mixinClasses
+      if mc.isTrait
+    } {
       // @SEAN: adding trait tracking so we don't have to recompile transitive closures
       unit.depends += mc
       addLateInterfaceMembers(mc)
@@ -1017,7 +1022,10 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
         }
 
       // for all symbols `sym` in the class definition, which are mixed in:
-      for (sym <- clazz.info.decls; if sym hasFlag MIXEDIN) {
+      for {
+        sym <- clazz.info.decls
+        if sym hasFlag MIXEDIN
+      } {
         // if current class is a trait, add an abstract method for accessor `sym`
         if (clazz.isTrait) {
           addDefDef(sym)
@@ -1071,9 +1079,11 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
       if (scope exists (_.isLazy)) {
         val map = mutable.Map[Symbol, Set[Symbol]]() withDefaultValue Set()
         // check what fields can be nulled for
-        for ((field, users) <- singleUseFields(templ); lazyFld <- users
-             if !lazyFld.accessed.hasAnnotation(TransientAttr))
-          map(lazyFld) += field
+        for {
+          (field, users) <- singleUseFields(templ)
+          lazyFld <- users
+          if !lazyFld.accessed.hasAnnotation(TransientAttr)
+        } map(lazyFld) += field
 
         map.toMap
       } else Map()

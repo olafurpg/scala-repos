@@ -1427,7 +1427,10 @@ trait ParIterableLike[
     override def split = {
       val pits = pit.splitWithSignalling
       val sizes = pits.scanLeft(0)(_ + _.remaining)
-      for ((p, untilp) <- pits zip sizes; if untilp <= n) yield {
+      for {
+        (p, untilp) <- pits zip sizes
+        if untilp <= n
+      } yield {
         if (untilp + p.remaining < n) new Take(p.remaining, cbf, p)
         else new Take(n - untilp, cbf, p)
       }
@@ -1450,7 +1453,10 @@ trait ParIterableLike[
     override def split = {
       val pits = pit.splitWithSignalling
       val sizes = pits.scanLeft(0)(_ + _.remaining)
-      for ((p, withp) <- pits zip sizes.tail; if withp >= n) yield {
+      for {
+        (p, withp) <- pits zip sizes.tail
+        if withp >= n
+      } yield {
         if (withp - p.remaining > n) new Drop(0, cbf, p)
         else new Drop(n - withp + p.remaining, cbf, p)
       }
@@ -1474,8 +1480,11 @@ trait ParIterableLike[
     override def split = {
       val pits = pit.splitWithSignalling
       val sizes = pits.scanLeft(0)(_ + _.remaining)
-      for ((p, untilp) <- pits zip sizes; if untilp + p.remaining >= from ||
-             untilp <= until) yield {
+      for {
+        (p, untilp) <- pits zip sizes
+        if untilp + p.remaining >= from ||
+          untilp <= until
+      } yield {
         val f = (from max untilp) - untilp
         val u = (until min (untilp + p.remaining)) - untilp
         new Slice(f, u, cbf, p)
@@ -1657,8 +1666,10 @@ trait ParIterableLike[
       throw new UnsupportedOperationException
     override def split = {
       val pits = pit.splitWithSignalling
-      for ((p, untilp) <- pits zip pits.scanLeft(0)(_ + _.remaining);
-           if untilp < len) yield {
+      for {
+        (p, untilp) <- pits zip pits.scanLeft(0)(_ + _.remaining)
+        if untilp < len
+      } yield {
         val plen = p.remaining min (len - untilp)
         new CopyToArray[U, This](from + untilp, plen, array, p)
       }

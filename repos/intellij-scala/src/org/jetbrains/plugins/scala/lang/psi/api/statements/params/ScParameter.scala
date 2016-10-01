@@ -172,7 +172,9 @@ trait ScParameter
           var flag = false
           var result: Option[ScType] =
             None //strange logic to handle problems with detecting type
-          for (tp <- f.expectedTypes(fromUnderscore = false) if !flag) {
+          for {
+            tp <- f.expectedTypes(fromUnderscore = false) if !flag
+          } {
             @tailrec
             def applyForFunction(tp: ScType, checkDeep: Boolean) {
               tp.removeAbstracts match {

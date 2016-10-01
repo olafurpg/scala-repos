@@ -523,7 +523,10 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
     var knownImageElem: Element = null
     trace("Checking for known images from large sites")
 
-    for (knownName <- KNOWN_IMG_DOM_NAMES; if (knownImageElem == null)) {
+    for {
+      knownName <- KNOWN_IMG_DOM_NAMES
+      if (knownImageElem == null)
+    } {
       var known: Element = article.rawDoc.getElementById(knownName)
       if (known == null) {
         known = article.rawDoc.getElementsByClass(knownName).first

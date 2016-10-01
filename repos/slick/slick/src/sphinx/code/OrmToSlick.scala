@@ -129,12 +129,16 @@ object OrmToSlick extends App {
     };
     {
       //#slickForComprehension
-      for (p <- people if p.age < 5 || p.age > 65) yield p
+      for {
+        p <- people if p.age < 5 || p.age > 65
+      } yield p
       //#slickForComprehension
     };
     {
       //#slickOrderBy
-      (for (p <- people if p.age < 5 || p.age > 65) yield p).sortBy(_.name)
+      (for {
+        p <- people if p.age < 5 || p.age > 65
+      } yield p).sortBy(_.name)
       //#slickOrderBy
     };
     {

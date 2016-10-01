@@ -256,7 +256,9 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
     }
 
     def execute: Boolean = {
-      for (clazz <- classes if !clazz.isValid) return false
+      for {
+        clazz <- classes if !clazz.isValid
+      } return false
 
       PsiDocumentManager.getInstance(project).commitAllDocuments()
       if (classes.length == 1) {

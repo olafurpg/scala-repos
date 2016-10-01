@@ -11,7 +11,10 @@ object Test extends App {
     val attempts = 1024 // previously, failed after a few
     def fail(i: Int) = s"Failed at $i"
     barrier.await()
-    for (i <- 1 to attempts; p <- systemProperties) p match {
+    for {
+      i <- 1 to attempts
+      p <- systemProperties
+    } p match {
       case (k, v) => assert(k != null && v != null, fail(i))
     }
   }

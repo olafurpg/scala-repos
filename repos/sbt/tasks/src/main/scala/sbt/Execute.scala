@@ -363,8 +363,10 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   // cyclic reference checking
 
   def snapshotCycleCheck(): Unit =
-    for ((called: A[c], callers) <- callers.toSeq; caller <- callers)
-      cycleCheck(caller.asInstanceOf[A[c]], called)
+    for {
+      (called: A[c], callers) <- callers.toSeq
+      caller <- callers
+    } cycleCheck(caller.asInstanceOf[A[c]], called)
 
   def cycleCheck[T](node: A[T], target: A[T]): Unit = {
     if (node eq target) cyclic(node, target, "Cannot call self")

@@ -335,7 +335,9 @@ class VecCheck extends Specification with ScalaCheck {
         forAll(idx) { i =>
           val res = v.without(i.toArray)
           val tmp = Buffer[Double]()
-          for (k <- 0 until v.length if !i.toSet.contains(k)) tmp.add(v.raw(k))
+          for {
+            k <- 0 until v.length if !i.toSet.contains(k)
+          } tmp.add(v.raw(k))
           res must_== Vec(tmp.toArray)
         }
       }

@@ -89,9 +89,11 @@ class AbstractTestRerunFailedTestsAction(
                 .asInstanceOf[MyRunProfileAdapter]
                 .previoslyFailed != null) {
             var added = false
-            for (f <- extensionConfiguration
-                   .asInstanceOf[MyRunProfileAdapter]
-                   .previoslyFailed if !added) {
+            for {
+              f <- extensionConfiguration
+                .asInstanceOf[MyRunProfileAdapter]
+                .previoslyFailed if !added
+            } {
               if (f._2 == getTestName(failed)) {
                 buffer += f
                 added = true
@@ -124,7 +126,9 @@ class AbstractTestRerunFailedTestsAction(
     val list = new ArrayList[AbstractTestProxy]()
     val allTests = getModel.getRoot.getAllTests
     import scala.collection.JavaConversions._
-    for (test <- allTests if isFailed(test)) list add test
+    for {
+      test <- allTests if isFailed(test)
+    } list add test
     list
   }
 }

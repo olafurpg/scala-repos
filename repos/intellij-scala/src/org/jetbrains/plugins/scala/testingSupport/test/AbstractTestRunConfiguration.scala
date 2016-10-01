@@ -465,8 +465,10 @@ abstract class AbstractTestRunConfiguration(
         searchTest match {
           case SearchForTest.IN_WHOLE_PROJECT =>
             var jdk: Sdk = null
-            for (module <- ModuleManager.getInstance(project).getModules
-                 if jdk == null) {
+            for {
+              module <- ModuleManager.getInstance(project).getModules
+              if jdk == null
+            } {
               jdk = JavaParameters.getModuleJdk(module)
             }
             params.configureByProject(project,

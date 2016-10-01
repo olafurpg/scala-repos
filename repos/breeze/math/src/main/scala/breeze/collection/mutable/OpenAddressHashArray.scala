@@ -207,7 +207,9 @@ object OpenAddressHashArray {
       values: T*) = {
     val rv = new OpenAddressHashArray[T](values.length)
     val zero = implicitly[Zero[T]].zero
-    for ((v, i) <- values.zipWithIndex if v != zero) {
+    for {
+      (v, i) <- values.zipWithIndex if v != zero
+    } {
       rv(i) = v
     }
     rv

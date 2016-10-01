@@ -365,7 +365,9 @@ object SizeEstimator extends Logging {
     // see the HotSpot classloader code, layout_fields method for more details.
     // hg.openjdk.java.net/jdk8/jdk8/hotspot/file/tip/src/share/vm/classfile/classFileParser.cpp
     var alignedSize = shellSize
-    for (size <- fieldSizes if sizeCount(size) > 0) {
+    for {
+      size <- fieldSizes if sizeCount(size) > 0
+    } {
       val count = sizeCount(size).toLong
       // If there are internal gaps, smaller field can fit in.
       alignedSize =

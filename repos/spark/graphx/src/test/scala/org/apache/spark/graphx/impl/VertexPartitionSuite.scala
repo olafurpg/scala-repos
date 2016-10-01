@@ -157,7 +157,10 @@ class VertexPartitionSuite extends SparkFunSuite {
     GraphXUtils.registerKryoClasses(conf)
     val kryoSer = new KryoSerializer(conf)
 
-    for (ser <- List(javaSer, kryoSer); s = ser.newInstance()) {
+    for {
+      ser <- List(javaSer, kryoSer)
+      s = ser.newInstance()
+    } {
       val vpSer: VertexPartition[Int] = s.deserialize(s.serialize(vp))
       assert(vpSer.iterator.toSet === verts)
     }

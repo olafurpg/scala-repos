@@ -94,8 +94,10 @@ trait Plugins { global: Global =>
       pick(roughPluginsList, Set(), (phasesSet map (_.phaseName)).toSet)
 
     // Verify required plugins are present.
-    for (req <- settings.require.value; if !(plugs exists (_.name == req)))
-      globalError("Missing required plugin: " + req)
+    for {
+      req <- settings.require.value
+      if !(plugs exists (_.name == req))
+    } globalError("Missing required plugin: " + req)
 
     // Verify no non-existent plugin given with -P
     for {
@@ -122,11 +124,17 @@ trait Plugins { global: Global =>
     * @see phasesSet
     */
   protected def computePluginPhases(): Unit =
-    for (p <- plugins; c <- p.components) addToPhasesSet(c, c.description)
+    for {
+      p <- plugins
+      c <- p.components
+    } addToPhasesSet(c, c.description)
 
   /** Summary of the options for all loaded plugins */
   def pluginOptionsHelp: String =
-    (for (plug <- roughPluginsList; help <- plug.optionsHelp) yield {
+    (for {
+      plug <- roughPluginsList
+      help <- plug.optionsHelp
+    } yield {
       "\nOptions for plugin '%s':\n%s\n".format(plug.name, help)
     }).mkString
 }

@@ -58,7 +58,9 @@ private[spark] object ClosureCleaner extends Logging {
   // understand how all their fields are used).
   private def getOuterClassesAndObjects(
       obj: AnyRef): (List[Class[_]], List[AnyRef]) = {
-    for (f <- obj.getClass.getDeclaredFields if f.getName == "$outer") {
+    for {
+      f <- obj.getClass.getDeclaredFields if f.getName == "$outer"
+    } {
       f.setAccessible(true)
       val outer = f.get(obj)
       // The outer pointer may be null if we have cleaned this closure before
@@ -413,7 +415,9 @@ private[util] class FieldAccessFinder(
                                   name: String,
                                   desc: String) {
         if (op == GETFIELD) {
-          for (cl <- fields.keys if cl.getName == owner.replace('/', '.')) {
+          for {
+            cl <- fields.keys if cl.getName == owner.replace('/', '.')
+          } {
             fields(cl) += name
           }
         }
@@ -424,7 +428,9 @@ private[util] class FieldAccessFinder(
                                    name: String,
                                    desc: String,
                                    itf: Boolean) {
-        for (cl <- fields.keys if cl.getName == owner.replace('/', '.')) {
+        for {
+          cl <- fields.keys if cl.getName == owner.replace('/', '.')
+        } {
           // Check for calls a getter method for a variable in an interpreter wrapper object.
           // This means that the corresponding field will be accessed, so we should save it.
           if (op == INVOKEVIRTUAL && owner.endsWith("$iwC") &&

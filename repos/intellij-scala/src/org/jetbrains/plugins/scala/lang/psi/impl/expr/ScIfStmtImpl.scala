@@ -86,8 +86,10 @@ class ScIfStmtImpl(node: ASTNode)
   protected override def innerType(ctx: TypingContext) = {
     (thenBranch, elseBranch) match {
       case (Some(t), Some(e)) =>
-        for (tt <- t.getType(TypingContext.empty);
-             et <- e.getType(TypingContext.empty)) yield {
+        for {
+          tt <- t.getType(TypingContext.empty)
+          et <- e.getType(TypingContext.empty)
+        } yield {
           Bounds.weakLub(tt, et)
         }
       case (Some(t), None) =>

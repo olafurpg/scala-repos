@@ -581,7 +581,10 @@ object Load {
   def checkAll(referenced: Map[URI, List[ProjectReference]],
                builds: Map[URI, sbt.PartBuildUnit]): Unit = {
     val rootProject = getRootProject(builds)
-    for ((uri, refs) <- referenced; ref <- refs) {
+    for {
+      (uri, refs) <- referenced
+      ref <- refs
+    } {
       val ProjectRef(refURI, refID) =
         Scope.resolveProjectRef(uri, rootProject, ref)
       val loadedUnit = builds(refURI)

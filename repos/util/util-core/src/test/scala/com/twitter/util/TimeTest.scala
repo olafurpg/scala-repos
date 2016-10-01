@@ -50,11 +50,17 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     "complementary diff" in {
       // Note that this doesn't always hold because of two's
       // complement arithmetic.
-      for (a <- easyVs; b <- easyVs) assert((a diff b) == -(b diff a))
+      for {
+        a <- easyVs
+        b <- easyVs
+      } assert((a diff b) == -(b diff a))
     }
 
     "complementary compare" in {
-      for (a <- vs; b <- vs) {
+      for {
+        a <- vs
+        b <- vs
+      } {
         val x = a compare b
         val y = b compare a
         assert(((x == 0 && y == 0) || (x < 0 != y < 0)) == true)
@@ -62,11 +68,17 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "commutative max" in {
-      for (a <- vs; b <- vs) assert((a max b) == (b max a))
+      for {
+        a <- vs
+        b <- vs
+      } assert((a max b) == (b max a))
     }
 
     "commutative min" in {
-      for (a <- vs; b <- vs) assert((a min b) == (b min a))
+      for {
+        a <- vs
+        b <- vs
+      } assert((a min b) == (b min a))
     }
 
     "handle underflows" in {
@@ -85,8 +97,10 @@ trait TimeLikeSpec[T <: TimeLike[T]]
         case _ => true
       })
 
-      for (ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue);
-           t = fromNanoseconds(ns)) assert(t match {
+      for {
+        ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue)
+        t = fromNanoseconds(ns)
+      } assert(t match {
         case Nanoseconds(`ns`) => true
         case _ => false
       })
@@ -98,8 +112,10 @@ trait TimeLikeSpec[T <: TimeLike[T]]
         case _ => true
       })
 
-      for (ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue);
-           t = fromNanoseconds(ns)) assert(t match {
+      for {
+        ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue)
+        t = fromNanoseconds(ns)
+      } assert(t match {
         case Finite(`t`) => true
         case _ => false
       })
@@ -315,8 +331,10 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "round to itself" in {
-      for (s <- Seq(Long.MinValue, -1, 1, Long.MaxValue); t = s.nanoseconds)
-        assert(t.floor(t.inNanoseconds.nanoseconds) == t)
+      for {
+        s <- Seq(Long.MinValue, -1, 1, Long.MaxValue)
+        t = s.nanoseconds
+      } assert(t.floor(t.inNanoseconds.nanoseconds) == t)
     }
   }
 

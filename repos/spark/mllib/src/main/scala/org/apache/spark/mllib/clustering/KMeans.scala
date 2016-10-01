@@ -320,7 +320,10 @@ class KMeans private (private var k: Int,
           }
         }
 
-        val contribs = for (i <- 0 until runs; j <- 0 until k) yield {
+        val contribs = for {
+          i <- 0 until runs
+          j <- 0 until k
+        } yield {
           ((i, j), (sums(i)(j), counts(i)(j)))
         }
         contribs.iterator

@@ -473,8 +473,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see # deleteCookie ( String )
     */
   def receivedCookies: List[HTTPCookie] =
-    for (rc <- Box.legacyNullTest(_responseCookies.value).toList;
-         c <- rc.inCookies) yield c.clone().asInstanceOf[HTTPCookie]
+    for {
+      rc <- Box.legacyNullTest(_responseCookies.value).toList
+      c <- rc.inCookies
+    } yield c.clone().asInstanceOf[HTTPCookie]
 
   /**
     * Finds a cookie with the given name that was sent in the request.
@@ -596,10 +598,11 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   // TODO: Is this used anywhere? - DCB
   def templateFromTemplateAttr: Box[NodeSeq] =
-    for (templateName <- attr("template") ?~ "Template Attribute missing";
-         tmplList = templateName.roboSplit("/");
-         template <- Templates(tmplList) ?~ "couldn't find template")
-      yield template
+    for {
+      templateName <- attr("template") ?~ "Template Attribute missing"
+      tmplList = templateName.roboSplit("/")
+      template <- Templates(tmplList) ?~ "couldn't find template"
+    } yield template
 
   /**
     * Returns the Locale for this request based on the LiftRules.localeCalculator
@@ -1732,8 +1735,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see # getHeaders ( List[ ( String, String ) ] )
     */
   def getRequestHeader(name: String): Box[String] =
-    for (req <- request;
-         hdr <- req.header(name)) yield hdr
+    for {
+      req <- request
+      hdr <- req.header(name)
+    } yield hdr
 
   /**
     * Sets the document type for the response. If this is not set, the DocType for Lift responses
@@ -1876,9 +1881,11 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @return a List[Cookie] even if the underlying request's Cookies are null.
     */
   private def getCookies(request: Box[HTTPRequest]): List[HTTPCookie] =
-    for (r <- (request).toList;
-         ca <- Box.legacyNullTest(r.cookies).toList;
-         c <- ca) yield c
+    for {
+      r <- (request).toList
+      ca <- Box.legacyNullTest(r.cookies).toList
+      c <- ca
+    } yield c
 
   private def _init[B](request: Box[Req], session: LiftSession)(
       f: () => B): B = {

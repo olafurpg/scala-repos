@@ -141,9 +141,10 @@ object BSON {
     val map = {
       // mutable optimized implementation
       val b = collection.immutable.Map.newBuilder[String, BSONValue]
-      for (tuple <- doc.stream if tuple.isSuccess)
-        b +=
-          (tuple.get._1 -> tuple.get._2)
+      for {
+        tuple <- doc.stream if tuple.isSuccess
+      } b +=
+        (tuple.get._1 -> tuple.get._2)
       b.result
     }
 

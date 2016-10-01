@@ -57,10 +57,11 @@ class DefaultPromiseTest {
 
     /** Get the chain for a given promise */
     private def promiseChain(p: PromiseId): Option[(ChainId, Chain)] = {
-      val found: Iterable[(ChainId, Chain)] = for ((cid, c) <- chains;
-                                                   p0 <- c.promises;
-                                                   if (p0 == p))
-        yield ((cid, c))
+      val found: Iterable[(ChainId, Chain)] = for {
+        (cid, c) <- chains
+        p0 <- c.promises
+        if (p0 == p)
+      } yield ((cid, c))
       found.toList match {
         case Nil => None
         case x :: Nil => Some(x)
@@ -117,7 +118,10 @@ class DefaultPromiseTest {
 
     /** Check each promise has the expected value. */
     private def assertPromiseValues() {
-      for ((cid, chain) <- chains; p <- chain.promises) {
+      for {
+        (cid, chain) <- chains
+        p <- chain.promises
+      } {
         chain.state match {
           case Right(result) => assertEquals(Some(result), promises(p).value)
           case Left(_) => ()
@@ -258,7 +262,10 @@ class DefaultPromiseTest {
   /** Tests all permutations of actions for `count` promises */
   private def testPermutations(count: Int) {
     val ps = (0 until count).toList
-    val pPairs = for (a <- ps; b <- ps) yield (a, b)
+    val pPairs = for {
+      a <- ps
+      b <- ps
+    } yield (a, b)
 
     var allActions =
       ps.map(Complete(_)) ++ pPairs.map { case (a, b) => Link(a, b) } ++ ps

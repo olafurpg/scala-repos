@@ -98,9 +98,11 @@ package ll {
     def nestsIn(outer: Symbol) =
       classes filter (c => c.enclClassChain drop 1 exists (_ isSubClass outer))
     def typeRefs(targs: List[Type]) =
-      (for (p <- typeRefPrefixes;
-            c <- classes filter (isPossibleEnclosure(p.typeSymbol, _));
-            a <- targs) yield typeRef(p, c, List(a)))
+      (for {
+        p <- typeRefPrefixes
+        c <- classes filter (isPossibleEnclosure(p.typeSymbol, _))
+        a <- targs
+      } yield typeRef(p, c, List(a)))
 
     val wfmt = "%-" + 25 + "s"
     def to_s(x: Any): String =

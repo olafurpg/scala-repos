@@ -947,8 +947,10 @@ class LiftSession(private[http] val _contextPath: String,
     * Find the template assocaited with the Loc
     */
   private[http] def locTemplate: Box[NodeSeq] =
-    for (loc <- S.location;
-         template <- loc.template) yield template
+    for {
+      loc <- S.location
+      template <- loc.template
+    } yield template
 
   /**
     * Define the context path for this session.  This allows different
@@ -1695,8 +1697,10 @@ class LiftSession(private[http] val _contextPath: String,
 
     // Locate a snippet as defined by our SiteMap Loc
     def locSnippet(snippet: String): Box[NodeSeq] =
-      for (loc <- S.location;
-           func <- loc.snippet(snippet)) yield func(kids)
+      for {
+        loc <- S.location
+        func <- loc.snippet(snippet)
+      } yield func(kids)
 
     def locateAndCacheSnippet(tagName: String): Box[AnyRef] =
       snippetMap.is.get(tagName) orElse {

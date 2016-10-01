@@ -72,7 +72,11 @@ object Test {
 
     val sets = setneg1 ++ setneg2 ++ List(zero) ++ setpos1 ++ setpos2
 
-    for (set <- sets; x <- set; y <- set) {
+    for {
+      set <- sets
+      x <- set
+      y <- set
+    } {
       assert(x == y, "%s/%s != %s/%s".format(x, x.getClass, y, y.getClass))
       assert(x.## == y.##, "%s != %s".format(x.getClass, y.getClass))
     }
@@ -90,7 +94,11 @@ object Test {
     val sets2 =
       setneg1 ++ setneg1b ++ setneg2 ++ setneg2b ++ List(zero) ++ setpos1 ++ setpos1b ++ setpos2 ++ setpos2b
 
-    for (set <- sets2; x <- set; y <- set) {
+    for {
+      set <- sets2
+      x <- set
+      y <- set
+    } {
       if (!isIffy(x, y)) {
         assert(x == y, "%s/%s != %s/%s".format(x, x.getClass, y, y.getClass))
         // The following is blocked by SI-8150

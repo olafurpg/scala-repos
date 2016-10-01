@@ -138,7 +138,9 @@ class ScalaCompilingEvaluator(psiContext: PsiElement,
     val defineMethod: Method = classLoaderType.concreteMethodByName(
       "defineClass",
       "(Ljava/lang/String;[BII)Ljava/lang/Class;")
-    for (cls <- classes if !alreadyDefined(cls.origName)) {
+    for {
+      cls <- classes if !alreadyDefined(cls.origName)
+    } {
       val bytes: Array[Byte] = cls.toByteArray
       val args: util.ArrayList[Value] = new util.ArrayList[Value]
       val name: StringReference = proxy.mirrorOf(cls.origName)

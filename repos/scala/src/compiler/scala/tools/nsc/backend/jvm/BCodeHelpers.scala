@@ -496,8 +496,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    *  must-single-thread
    */
   def fieldSymbols(cls: Symbol): List[Symbol] = {
-    for (f <- cls.info.decls.toList; if !f.isMethod && f.isTerm &&
-           !f.isModule) yield f
+    for {
+      f <- cls.info.decls.toList
+      if !f.isMethod && f.isTerm &&
+        !f.isModule
+    } yield f
   }
 
   /*
@@ -842,7 +845,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def emitAnnotations(cw: asm.ClassVisitor,
                         annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+      for {
+        annot <- annotations
+        if shouldEmitAnnotation(annot)
+      } {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = cw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
@@ -855,7 +861,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def emitAnnotations(mw: asm.MethodVisitor,
                         annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+      for {
+        annot <- annotations
+        if shouldEmitAnnotation(annot)
+      } {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = mw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
@@ -868,7 +877,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def emitAnnotations(fw: asm.FieldVisitor,
                         annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+      for {
+        annot <- annotations
+        if shouldEmitAnnotation(annot)
+      } {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = fw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
@@ -883,8 +895,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                              pannotss: List[List[AnnotationInfo]]) {
       val annotationss = pannotss map (_ filter shouldEmitAnnotation)
       if (annotationss forall (_.isEmpty)) return
-      for ((annots, idx) <- annotationss.zipWithIndex;
-           annot <- annots) {
+      for {
+        (annots, idx) <- annotationss.zipWithIndex
+        annot <- annots
+      } {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val pannVisitor: asm.AnnotationVisitor =
@@ -1291,9 +1305,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       var fieldList = List[String]()
 
-      for (f <- fieldSymbols if f.hasGetter;
-           g = f.getterIn(cls);
-           s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
+      for {
+        f <- fieldSymbols if f.hasGetter
+        g = f.getterIn(cls)
+        s = f.setterIn(cls)
+        if g.isPublic && !(f.name startsWith "$")
+      } {
         // inserting $outer breaks the bean
         fieldList = javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
                                                                  javaSimpleName(
@@ -1303,9 +1320,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       }
 
       val methodList: List[String] =
-        for (m <- methodSymbols if !m.isConstructor && m.isPublic &&
-               !(m.name startsWith "$") && !m.isGetter && !m.isSetter)
-          yield javaSimpleName(m)
+        for {
+          m <- methodSymbols if !m.isConstructor && m.isPublic &&
+            !(m.name startsWith "$") && !m.isGetter && !m.isSetter
+        } yield javaSimpleName(m)
 
       val constructor = beanInfoClass.visitMethod(
         asm.Opcodes.ACC_PUBLIC,

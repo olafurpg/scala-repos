@@ -87,7 +87,10 @@ object JTransformsSupport {
       tempDM: DenseMatrix[Complex]): Array[Double] = {
     val tempCols = tempDM.cols
     val tempRet = new Array[Double](tempDM.rows * tempCols * 2)
-    for (r <- 0 until tempDM.rows; c <- 0 until tempDM.cols) {
+    for {
+      r <- 0 until tempDM.rows
+      c <- 0 until tempDM.cols
+    } {
       tempDM(r, c) match {
         case Complex(re, im) => {
           val ind = r * 2 * tempCols + 2 * c
@@ -108,7 +111,10 @@ object JTransformsSupport {
       tempDM: DenseMatrix[Double]): Array[Double] = {
     val tempCols = tempDM.cols
     val tempRet = new Array[Double](tempDM.rows * tempCols * 2)
-    for (r <- 0 until tempDM.rows; c <- 0 until tempDM.cols) {
+    for {
+      r <- 0 until tempDM.rows
+      c <- 0 until tempDM.cols
+    } {
       tempRet(r * 2 * tempCols + 2 * c) = tempDM(r, c)
     }
     tempRet
@@ -118,7 +124,10 @@ object JTransformsSupport {
                                         rows: Int,
                                         cols: Int): DenseMatrix[Complex] = {
     val tempRet = DenseMatrix.zeros[Complex](rows, cols)
-    for (r <- 0 until rows; c <- 0 until cols) {
+    for {
+      r <- 0 until rows
+      c <- 0 until cols
+    } {
       val ind = r * 2 * cols + 2 * c
       tempRet(r, c) = new Complex(tempArr(ind), tempArr(ind + 1))
     }

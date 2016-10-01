@@ -441,8 +441,10 @@ class CleanerTest extends JUnitSuite {
     // 1) Simulate recovery just after .cleaned file is created, before rename to .swap
     //    On recovery, clean operation is aborted. All messages should be present in the log
     log.logSegments.head.changeFileSuffixes("", Log.CleanedFileSuffix)
-    for (file <- dir.listFiles
-         if file.getName.endsWith(Log.DeletedFileSuffix)) {
+    for {
+      file <- dir.listFiles
+      if file.getName.endsWith(Log.DeletedFileSuffix)
+    } {
       Utils.atomicMoveWithFallback(
         file.toPath,
         Paths.get(
@@ -457,8 +459,10 @@ class CleanerTest extends JUnitSuite {
     // 2) Simulate recovery just after swap file is created, before old segment files are
     //    renamed to .deleted. Clean operation is resumed during recovery.
     log.logSegments.head.changeFileSuffixes("", Log.SwapFileSuffix)
-    for (file <- dir.listFiles
-         if file.getName.endsWith(Log.DeletedFileSuffix)) {
+    for {
+      file <- dir.listFiles
+      if file.getName.endsWith(Log.DeletedFileSuffix)
+    } {
       Utils.atomicMoveWithFallback(
         file.toPath,
         Paths.get(

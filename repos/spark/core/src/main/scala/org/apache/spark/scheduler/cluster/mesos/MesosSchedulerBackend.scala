@@ -379,8 +379,10 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
 
       // Decline offers that weren't used
       // NOTE: This logic assumes that we only get a single offer for each host in a given batch
-      for (o <- usableOffers
-           if !slavesIdsOfAcceptedOffers.contains(o.getSlaveId.getValue)) {
+      for {
+        o <- usableOffers
+        if !slavesIdsOfAcceptedOffers.contains(o.getSlaveId.getValue)
+      } {
         d.declineOffer(o.getId)
       }
     }

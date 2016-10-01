@@ -154,9 +154,11 @@ package object linalg {
                                              tol: Double = 1e-7): Unit = {
     requireSquareMatrix(mat)
 
-    for (i <- 0 until mat.rows; j <- 0 until i)
-      if (abs(mat(i, j) - mat(j, i)) > abs(mat(i, j)) * tol)
-        throw new MatrixNotSymmetricException
+    for {
+      i <- 0 until mat.rows
+      j <- 0 until i
+    } if (abs(mat(i, j) - mat(j, i)) > abs(mat(i, j)) * tol)
+      throw new MatrixNotSymmetricException
   }
 
   /**

@@ -474,8 +474,9 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           if (vi.getOpcode == ALOAD)
             toReplace(vi) = List(new InsnNode(ACONST_NULL))
           else if (vi.getOpcode == ASTORE)
-            for (frame <- frameAt(vi) if frame.peekStack(0) == NullValue)
-              toReplace(vi) = List(getPop(1))
+            for {
+              frame <- frameAt(vi) if frame.peekStack(0) == NullValue
+            } toReplace(vi) = List(getPop(1))
 
         case ji: JumpInsnNode =>
           val isIfNull = ji.getOpcode == IFNULL
@@ -517,13 +518,17 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
 
         case ti: TypeInsnNode =>
           if (ti.getOpcode == INSTANCEOF)
-            for (frame <- frameAt(ti) if frame.peekStack(0) == NullValue) {
+            for {
+              frame <- frameAt(ti) if frame.peekStack(0) == NullValue
+            } {
               toReplace(ti) = List(getPop(1), new InsnNode(ICONST_0))
             }
 
         case mi: MethodInsnNode =>
           if (isScalaUnbox(mi))
-            for (frame <- frameAt(mi) if frame.peekStack(0) == NullValue) {
+            for {
+              frame <- frameAt(mi) if frame.peekStack(0) == NullValue
+            } {
               toReplace(mi) =
                 List(getPop(1),
                      loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
@@ -768,7 +773,9 @@ object LocalOptImpls {
     // for example, rewrite (0, 1, -1, 3, -1, 5) to (0, 1, -1, 2, -1, 3).
 
     var nextIndex = firstLocalIndex
-    for (i <- firstLocalIndex until renumber.length if renumber(i) != -1) {
+    for {
+      i <- firstLocalIndex until renumber.length if renumber(i) != -1
+    } {
       renumber(i) = nextIndex
       nextIndex += 1
     }
@@ -1019,9 +1026,11 @@ object LocalOptImpls {
       var changed = false
 
       // `.toList` because we're modifying the map while iterating over it
-      for ((jumpInsn, inTryBlock) <- jumpInsns.toList
-           if jumpInsns.contains(jumpInsn) &&
-             isJumpNonJsr(jumpInsn)) {
+      for {
+        (jumpInsn, inTryBlock) <- jumpInsns.toList
+        if jumpInsns.contains(jumpInsn) &&
+          isJumpNonJsr(jumpInsn)
+      } {
         var jumpRemoved = simplifyThenElseSameTarget(jumpInsn)
 
         if (!jumpRemoved) {

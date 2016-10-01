@@ -619,12 +619,13 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     // Scans source directories to build up a compile lists.
     // If force is false, only files were the .class file in destination is
     // older than the .scala file will be used.
-    val sourceFiles: List[File] = for (originDir <- getOrigin;
-                                       originFile <- getOriginFiles(originDir))
-      yield {
-        log(originFile, Project.MSG_DEBUG)
-        nameToFile(originDir)(originFile)
-      }
+    val sourceFiles: List[File] = for {
+      originDir <- getOrigin
+      originFile <- getOriginFiles(originDir)
+    } yield {
+      log(originFile, Project.MSG_DEBUG)
+      nameToFile(originDir)(originFile)
+    }
 
     // Builds-up the compilation settings for Scalac with the existing Ant
     // parameters.
@@ -725,8 +726,10 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       val out = new PrintWriter(new BufferedWriter(new FileWriter(file)))
 
       try {
-        for (setting <- settings.visibleSettings; arg <- setting.unparse)
-          out println escapeArgument(arg)
+        for {
+          setting <- settings.visibleSettings
+          arg <- setting.unparse
+        } out println escapeArgument(arg)
         for (file <- sourceFiles)
           out println escapeArgument(file.getAbsolutePath)
       } finally out.close()

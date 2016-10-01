@@ -109,7 +109,9 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       val packages = collection.mutable.HashMap[String, PackageFileInfo]()
 
       def getSubpackages(dir: AbstractFile): List[AbstractFile] =
-        (for (file <- dir if file.isPackage) yield file)(collection.breakOut)
+        (for {
+          file <- dir if file.isPackage
+        } yield file)(collection.breakOut)
 
       @tailrec
       def traverse(
@@ -154,8 +156,9 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       cachedPackages.get(inPackage) match {
         case None => Seq.empty
         case Some(PackageFileInfo(pkg, _)) =>
-          (for (file <- pkg if file.isClass)
-            yield ClassFileEntryImpl(file))(collection.breakOut)
+          (for {
+            file <- pkg if file.isClass
+          } yield ClassFileEntryImpl(file))(collection.breakOut)
       }
 
     override private[nsc] def list(inPackage: String): FlatClassPathEntries =

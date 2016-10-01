@@ -158,7 +158,10 @@ trait Collections {
   final def flatCollect[A, B](elems: List[A])(
       pf: PartialFunction[A, Traversable[B]]): List[B] = {
     val lb = new ListBuffer[B]
-    for (x <- elems; if pf isDefinedAt x) lb ++= pf(x)
+    for {
+      x <- elems
+      if pf isDefinedAt x
+    } lb ++= pf(x)
 
     lb.toList
   }

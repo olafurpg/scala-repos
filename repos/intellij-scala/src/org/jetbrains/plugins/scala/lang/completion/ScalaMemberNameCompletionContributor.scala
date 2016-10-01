@@ -52,11 +52,15 @@ class ScalaMemberNameCompletionContributor extends ScalaCompletionContributor {
         }
         position.getContext match {
           case _: ScClass | _: ScTrait =>
-            for (o <- objectNames if !classesNames.contains(o)) {
+            for {
+              o <- objectNames if !classesNames.contains(o)
+            } {
               result.addElement(LookupElementBuilder.create(o))
             }
           case o: ScObject =>
-            for (o <- classesNames if !objectNames.contains(o)) {
+            for {
+              o <- classesNames if !objectNames.contains(o)
+            } {
               result.addElement(LookupElementBuilder.create(o))
             }
           case _ =>

@@ -209,7 +209,10 @@ abstract class SymbolPairs {
       for (p <- parents) {
         val pIndex = index(p.typeSymbol)
         if (pIndex >= 0)
-          for (bc <- p.baseClasses; if sameInBaseClass(bc)(p, self)) {
+          for {
+            bc <- p.baseClasses
+            if sameInBaseClass(bc)(p, self)
+          } {
             val bcIndex = index(bc)
             if (bcIndex >= 0) include(subParents(bcIndex), pIndex)
           }

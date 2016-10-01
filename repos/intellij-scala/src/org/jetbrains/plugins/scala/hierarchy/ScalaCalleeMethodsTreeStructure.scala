@@ -60,8 +60,10 @@ class ScalaCalleeMethodsTreeStructure(project: Project,
       new mutable.HashMap[PsiMethod, CallHierarchyNodeDescriptor]
     val result: ArrayBuffer[CallHierarchyNodeDescriptor] =
       new ArrayBuffer[CallHierarchyNodeDescriptor]
-    for (calledMethod <- methods
-         if isInScope(baseClass, calledMethod, myScopeType)) {
+    for {
+      calledMethod <- methods
+      if isInScope(baseClass, calledMethod, myScopeType)
+    } {
       methodToDescriptorMap.get(calledMethod) match {
         case Some(d) => d.incrementUsageCount()
         case _ =>
@@ -77,8 +79,10 @@ class ScalaCalleeMethodsTreeStructure(project: Project,
     val overridingMethods: Array[PsiMethod] = OverridingMethodsSearch
       .search(method, method.getUseScope, true)
       .toArray(PsiMethod.EMPTY_ARRAY)
-    for (overridingMethod <- overridingMethods
-         if isInScope(baseClass, overridingMethod, myScopeType)) {
+    for {
+      overridingMethod <- overridingMethods
+      if isInScope(baseClass, overridingMethod, myScopeType)
+    } {
       val node: CallHierarchyNodeDescriptor = new CallHierarchyNodeDescriptor(
         myProject,
         descriptor,

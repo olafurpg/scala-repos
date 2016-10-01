@@ -295,7 +295,10 @@ trait SliceTransforms[M[+ _]]
 
                   case Right((left, right)) =>
                     val tests: Array[BoolColumn] =
-                      (for (l <- left; r <- right) yield {
+                      (for {
+                        l <- left
+                        r <- right
+                      } yield {
                         new FuzzyEqColumn(l, r)
                       }).toArray
                     new OrLotsColumn(tests)
@@ -833,7 +836,10 @@ trait SliceTransforms[M[+ _]]
         case (sta, stb) =>
           SliceTransform1[(A, B)]((sta.initial, stb.initial), {
             case ((a0, b0), s0) =>
-              for (ares <- sta.f(a0, s0); bres <- stb.f(b0, s0)) yield {
+              for {
+                ares <- sta.f(a0, s0)
+                bres <- stb.f(b0, s0)
+              } yield {
                 val (a, sa) = ares
                 val (b, sb) = bres
                 assert(sa.size == sb.size)
@@ -951,8 +957,10 @@ trait SliceTransforms[M[+ _]]
         case (SliceTransform1M(i0, f0), SliceTransform1M(i1, f1)) =>
           SliceTransform1M((i0, i1), {
             case ((a0, b0), s0) =>
-              for (r0 <- f0(i0, s0); r1 <- f1(i1, r0._2))
-                yield ((r0._1, r1._1), r1._2)
+              for {
+                r0 <- f0(i0, s0)
+                r1 <- f1(i1, r0._2)
+              } yield ((r0._1, r1._1), r1._2)
           })
 
         case (sta: SliceTransform1S[_], stb: SliceTransform1M[_]) =>
@@ -1126,8 +1134,10 @@ trait SliceTransforms[M[+ _]]
         case (sta, stb) =>
           SliceTransform2[(A, B)]((sta.initial, stb.initial), {
             case ((a0, b0), sl0, sr0) =>
-              for (ares <- sta.f(a0, sl0, sr0);
-                   bres <- stb.f(b0, sl0, sr0)) yield {
+              for {
+                ares <- sta.f(a0, sl0, sr0)
+                bres <- stb.f(b0, sl0, sr0)
+              } yield {
                 val (a, sa) = ares
                 val (b, sb) = bres
                 assert(sa.size == sb.size)

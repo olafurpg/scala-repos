@@ -128,7 +128,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           }
         }
       }
-      for (element <- elements if result.isEmpty) {
+      for {
+        element <- elements if result.isEmpty
+      } {
         element.accept(visitor)
       }
       result

@@ -323,11 +323,12 @@ abstract class DerbyDB(confName: String) extends InternalJdbcTestDB(confName) {
                              where c.schemaid = s.schemaid and c.tableid = t.tableid and s.schemaname = 'APP'
                           """.as[(String, String)]
           _ <- DBIO.seq(
-            (for ((c, t) <- constraints if !c.startsWith("SQL"))
-              yield
-                sqlu"""alter table ${profile
-                  .quoteIdentifier(t)} drop constraint ${profile
-                  .quoteIdentifier(c)}"""): _*)
+            (for {
+              (c, t) <- constraints if !c.startsWith("SQL")
+            } yield
+              sqlu"""alter table ${profile
+                .quoteIdentifier(t)} drop constraint ${profile.quoteIdentifier(
+                c)}"""): _*)
           tables <- localTables
           sequences <- localSequences
           _ <- DBIO.seq((tables.map(t =>

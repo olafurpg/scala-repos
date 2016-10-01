@@ -704,15 +704,16 @@ class ScalaFunctionParameterInfoHandler
                       case None => res += ""
                       case _ =>
                     }
-                    for (constr <- clazz.functions
-                         if !constr.isInstanceOf[ScPrimaryConstructor] &&
-                           constr.isConstructor &&
-                           ((constr.clauses match {
-                             case Some(x) => x.clauses.length
-                             case None => 1
-                           }) > i))
-                      res +=
-                        ((new PhysicalSignature(constr, subst), i))
+                    for {
+                      constr <- clazz.functions
+                      if !constr.isInstanceOf[ScPrimaryConstructor] &&
+                        constr.isConstructor &&
+                        ((constr.clauses match {
+                          case Some(x) => x.clauses.length
+                          case None => 1
+                        }) > i)
+                    } res +=
+                      ((new PhysicalSignature(constr, subst), i))
                   case clazz: PsiClass if clazz.isAnnotationType =>
                     val resulting: (AnnotationParameters, Int) =
                       (AnnotationParameters(
@@ -800,8 +801,10 @@ class ScalaFunctionParameterInfoHandler
         var el = element
         while (el.getParent != args.element) el = el.getParent
         var index = 1
-        for (expr <- getActualParameters(args.element)
-             if expr != el) index += 1
+        for {
+          expr <- getActualParameters(args.element)
+          if expr != el
+        } index += 1
         context.setCurrentParameter(index)
         context.setHighlightedParameter(el)
       case _ =>

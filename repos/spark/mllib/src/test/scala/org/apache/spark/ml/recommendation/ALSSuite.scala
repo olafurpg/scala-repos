@@ -239,8 +239,10 @@ class ALSSuite
     val itemFactors = genFactors(numItems, rank, random)
     val training = ArrayBuffer.empty[Rating[Int]]
     val test = ArrayBuffer.empty[Rating[Int]]
-    for ((userId, userFactor) <- userFactors;
-         (itemId, itemFactor) <- itemFactors) {
+    for {
+      (userId, userFactor) <- userFactors
+      (itemId, itemFactor) <- itemFactors
+    } {
       val x = random.nextDouble()
       if (x < totalFraction) {
         val rating = blas.sdot(rank, userFactor, 1, itemFactor, 1)
@@ -285,8 +287,10 @@ class ALSSuite
     val itemFactors = genFactors(numItems, rank, random)
     val training = ArrayBuffer.empty[Rating[Int]]
     val test = ArrayBuffer.empty[Rating[Int]]
-    for ((userId, userFactor) <- userFactors;
-         (itemId, itemFactor) <- itemFactors) {
+    for {
+      (userId, userFactor) <- userFactors
+      (itemId, itemFactor) <- itemFactors
+    } {
       val rating = blas.sdot(rank, userFactor, 1, itemFactor, 1)
       val threshold = if (rating > 0) positiveFraction else negativeFraction
       val observed = random.nextDouble() < threshold

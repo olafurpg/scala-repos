@@ -125,7 +125,9 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
             if (clazz.isDefined) {
               val signs = clazz.get.allSignatures
 
-              for (sign <- signs if !flag) {
+              for {
+                sign <- signs if !flag
+              } {
                 sign.namedElement match {
                   case function: ScFunction =>
                     if (function.name == name && resolved != function) {

@@ -444,10 +444,11 @@ object Compatibility {
                                     matched,
                                     matchedTypes)
 
-      val missed = for ((parameter: Parameter, b) <- parameters.zip(used)
-                        if !b &&
-                          !parameter.isDefault)
-        yield MissedValueParameter(parameter)
+      val missed = for {
+        (parameter: Parameter, b) <- parameters.zip(used)
+        if !b &&
+          !parameter.isDefault
+      } yield MissedValueParameter(parameter)
       defaultParameterUsed = parameters.zip(used).exists {
         case (param, bool) => !bool && param.isDefault
       }
@@ -460,7 +461,9 @@ object Compatibility {
       else {
         // inspect types default values
         val pack = parameters.zip(used)
-        for ((param, use) <- pack if param.isDefault && !use) {
+        for {
+          (param, use) <- pack if param.isDefault && !use
+        } {
           val paramType: ScType = param.paramType
           val defaultExpr = param.paramInCode.flatMap(_.getDefaultExpression)
           param.defaultType match {

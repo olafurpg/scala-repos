@@ -38,8 +38,10 @@ class YieldFilter extends ElementFilter {
                (context.getContainingFile.getText.charAt(i) == ' ' ||
                context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
         if (leafText(i, context) == "yield") return false
-        for (child <- parent.getParent.getNode.getChildren(null)
-             if child.getElementType == ScalaTokenTypes.kYIELD) return false
+        for {
+          child <- parent.getParent.getNode.getChildren(null)
+          if child.getElementType == ScalaTokenTypes.kYIELD
+        } return false
         return ScalaCompletionUtil
           .checkAnyWith(parent.getParent, "yield true", context.getManager) ||
           ScalaCompletionUtil

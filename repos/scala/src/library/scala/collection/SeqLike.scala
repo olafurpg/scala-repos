@@ -221,9 +221,11 @@ trait SeqLike[+A, +Repr]
 
       /* Calculate this result. */
       val buf = self.newBuilder
-      for (k <- 0 until nums.length; j <- 0 until nums(k))
-        buf +=
-          elms(offs(k) + j)
+      for {
+        k <- 0 until nums.length
+        j <- 0 until nums(k)
+      } buf +=
+        elms(offs(k) + j)
       val res = buf.result()
 
       /* Prepare for the next call to next. */

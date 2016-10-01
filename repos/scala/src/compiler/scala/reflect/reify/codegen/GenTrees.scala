@@ -113,10 +113,11 @@ trait GenTrees { self: Reifier =>
             case ReifiedTree(_, _, inlinedSymtab, rtree, _, _, _) =>
               if (reifyDebug) println("inlining the splicee")
               // all free vars local to the enclosing reifee should've already been inlined by `Metalevels`
-              for (sym <- inlinedSymtab.syms if sym.isLocalToReifee)
-                abort(
-                  "free var local to the reifee, should have already been inlined by Metalevels: " +
-                    inlinedSymtab.symDef(sym))
+              for {
+                sym <- inlinedSymtab.syms if sym.isLocalToReifee
+              } abort(
+                "free var local to the reifee, should have already been inlined by Metalevels: " +
+                  inlinedSymtab.symDef(sym))
               state.symtab ++= inlinedSymtab
               rtree
             case tree =>

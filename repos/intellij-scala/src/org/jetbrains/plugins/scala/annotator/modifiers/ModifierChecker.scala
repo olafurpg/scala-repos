@@ -55,10 +55,12 @@ private[annotator] object ModifierChecker {
         ("private", "protected"),
         if (withPrivate) ("private", "override") else ("", "")
       )
-      for ((bad1, bad2) <- illegalCombinations if (bad1 == text &&
-             owner.hasModifierPropertyScala(bad2)) ||
-             (bad2 == text &&
-               owner.hasModifierPropertyScala(bad1))) {
+      for {
+        (bad1, bad2) <- illegalCombinations if (bad1 == text &&
+          owner.hasModifierPropertyScala(bad2)) ||
+          (bad2 == text &&
+            owner.hasModifierPropertyScala(bad1))
+      } {
         proccessError(
           ScalaBundle.message("illegal.modifiers.combination", bad1, bad2),
           element,

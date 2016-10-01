@@ -188,7 +188,9 @@ object getDummyBlocks {
         val alignment =
           if (mustAlignment(node, block.getSettings)) Alignment.createAlignment
           else null
-        for (child <- children if isCorrectBlock(child)) {
+        for {
+          child <- children if isCorrectBlock(child)
+        } {
           val context = (child.getElementType match {
             case ScalaDocElementTypes.DOC_TAG =>
               val currentTag = Option(child.getFirstChildNode)
@@ -275,7 +277,9 @@ object getDummyBlocks {
       if (mustAlignment(node, block.getSettings)) Alignment.createAlignment
       else null
     var alternateAlignment: Alignment = null
-    for (child <- children if isCorrectBlock(child)) {
+    for {
+      child <- children if isCorrectBlock(child)
+    } {
       val indent = ScalaIndentProcessor.getChildIndent(block, child)
       val childAlignment: Alignment = {
         node.getPsi match {
@@ -541,7 +545,9 @@ object getDummyBlocks {
     var prevChild: ASTNode = null
     val scalaSettings =
       block.getSettings.getCustomSettings(classOf[ScalaCodeStyleSettings])
-    for (child <- children if isCorrectBlock(child)) {
+    for {
+      child <- children if isCorrectBlock(child)
+    } {
       def getPrevGroupNode(node: ASTNode): ASTNode = {
         val nodePsi = node.getPsi
         var prev = nodePsi.getPrevSibling
@@ -622,7 +628,9 @@ object getDummyBlocks {
     var prevChild: ASTNode = null
     val scalaSettings =
       block.getSettings.getCustomSettings(classOf[ScalaCodeStyleSettings])
-    for (child <- children if isCorrectBlock(child)) {
+    for {
+      child <- children if isCorrectBlock(child)
+    } {
       def getPrevGroupNode(node: ASTNode): ASTNode = {
         val nodePsi = node.getPsi
         var prev = nodePsi.getPrevSibling

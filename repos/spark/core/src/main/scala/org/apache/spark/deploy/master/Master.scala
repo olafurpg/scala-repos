@@ -777,7 +777,9 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
   private def startExecutorsOnWorkers(): Unit = {
     // Right now this is a very simple FIFO scheduler. We keep trying to fit in the first app
     // in the queue, then the second app, etc.
-    for (app <- waitingApps if app.coresLeft > 0) {
+    for {
+      app <- waitingApps if app.coresLeft > 0
+    } {
       val coresPerExecutor: Option[Int] = app.desc.coresPerExecutor
       // Filter out workers that don't have enough resources to launch an executor
       val usableWorkers = workers.toArray
@@ -791,7 +793,9 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
         scheduleExecutorsOnWorkers(app, usableWorkers, spreadOutApps)
 
       // Now that we've decided how many cores to allocate on each worker, let's allocate them
-      for (pos <- 0 until usableWorkers.length if assignedCores(pos) > 0) {
+      for {
+        pos <- 0 until usableWorkers.length if assignedCores(pos) > 0
+      } {
         allocateWorkerResourceToExecutors(app,
                                           assignedCores(pos),
                                           coresPerExecutor,

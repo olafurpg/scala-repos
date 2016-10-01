@@ -45,12 +45,18 @@ object LocalALS {
            ms: Array[RealVector],
            us: Array[RealVector]): Double = {
     val r = new Array2DRowRealMatrix(M, U)
-    for (i <- 0 until M; j <- 0 until U) {
+    for {
+      i <- 0 until M
+      j <- 0 until U
+    } {
       r.setEntry(i, j, ms(i).dotProduct(us(j)))
     }
     val diffs = r.subtract(targetR)
     var sumSqs = 0.0
-    for (i <- 0 until M; j <- 0 until U) {
+    for {
+      i <- 0 until M
+      j <- 0 until U
+    } {
       val diff = diffs.getEntry(i, j)
       sumSqs += diff * diff
     }

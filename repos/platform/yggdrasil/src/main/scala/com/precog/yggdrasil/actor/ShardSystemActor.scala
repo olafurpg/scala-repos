@@ -116,13 +116,14 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
 
     val initialCheckpoint = loadCheckpoint()
 
-    val ingestActor = for (checkpoint <- initialCheckpoint;
-                           init <- initIngestActor(ingestActorSystem,
-                                                   routingActor,
-                                                   checkpoint,
-                                                   checkpointCoordination,
-                                                   permissionsFinder))
-      yield init
+    val ingestActor = for {
+      checkpoint <- initialCheckpoint
+      init <- initIngestActor(ingestActorSystem,
+                              routingActor,
+                              checkpoint,
+                              checkpointCoordination,
+                              permissionsFinder)
+    } yield init
 
     val stoppable = Stoppable.fromFuture({
       import IngestSystem.actorStop

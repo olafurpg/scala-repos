@@ -2183,8 +2183,10 @@ trait Typers
         validateDerivedValueClass(clazz, body3)
 
       if (clazz.isTrait) {
-        for (decl <- clazz.info.decls if decl.isTerm &&
-               decl.isEarlyInitialized) {
+        for {
+          decl <- clazz.info.decls if decl.isTerm &&
+            decl.isEarlyInitialized
+        } {
           context.warning(
             decl.pos,
             "Implementation restriction: early definitions in traits are not initialized before the super class is initialized.")
@@ -2462,7 +2464,10 @@ trait Typers
 
       // for `val` and `var` parameter, look at `target` meta-annotation
       if (!isPastTyper && meth.isPrimaryConstructor) {
-        for (vparams <- ddef.vparamss; vd <- vparams) {
+        for {
+          vparams <- ddef.vparamss
+          vd <- vparams
+        } {
           if (vd.mods.isParamAccessor) {
             namer.validateParam(vd)
           }
@@ -2476,9 +2481,11 @@ trait Typers
 
       meth.annotations.map(_.completeInfo())
 
-      for (vparams1 <- vparamss1; vparam1 <- vparams1 dropRight 1)
-        if (isRepeatedParamType(vparam1.symbol.tpe))
-          StarParamNotLastError(vparam1)
+      for {
+        vparams1 <- vparamss1
+        vparam1 <- vparams1 dropRight 1
+      } if (isRepeatedParamType(vparam1.symbol.tpe))
+        StarParamNotLastError(vparam1)
 
       val tpt1 = checkNoEscaping.privates(meth, typedType(ddef.tpt))
       checkNonCyclic(ddef, tpt1)
@@ -2703,8 +2710,11 @@ trait Typers
 
     def typedCase(cdef: CaseDef, pattpe: Type, pt: Type): CaseDef = {
       // verify no _* except in last position
-      for (Apply(_, xs) <- cdef.pat; x <- xs dropRight 1;
-           if treeInfo isStar x) StarPositionInPatternError(x)
+      for {
+        Apply(_, xs) <- cdef.pat
+        x <- xs dropRight 1
+        if treeInfo isStar x
+      } StarPositionInPatternError(x)
 
       // withoutAnnotations - see continuations-run/z1673.scala
       // This adjustment is awfully specific to continuations, but AFAICS the
@@ -3424,8 +3434,10 @@ trait Typers
           .getOrElse(CompoundTypeTreeOriginalAttachment(Nil, Nil))
         templ.removeAttachment[CompoundTypeTreeOriginalAttachment]
         templ updateAttachment att.copy(stats = stats1)
-        for (stat <- stats1 if stat.isDef &&
-               stat.symbol.isOverridingSymbol) stat.symbol setFlag OVERRIDE
+        for {
+          stat <- stats1 if stat.isDef &&
+            stat.symbol.isOverridingSymbol
+        } stat.symbol setFlag OVERRIDE
       }
     }
 
@@ -3531,8 +3543,10 @@ trait Typers
           def shouldAdd(sym: Symbol) =
             inBlock || !context.isInPackageObject(sym, context.owner)
           for (sym <- scope)
-            for (tree <- context.unit.synthetics get sym
-                 if shouldAdd(sym)) {
+            for {
+              tree <- context.unit.synthetics get sym
+              if shouldAdd(sym)
+            } {
               // OPT: shouldAdd is usually true. Call it here, rather than in the outer loop
               newStats += typedStat(tree) // might add even more synthetics to the scope
               context.unit.synthetics -= sym
@@ -4389,7 +4403,10 @@ trait Typers
             case ExistentialType(tparams, _) =>
               boundSyms ++= tparams
             case AnnotatedType(annots, _) =>
-              for (annot <- annots; arg <- annot.args) {
+              for {
+                annot <- annots
+                arg <- annot.args
+              } {
                 arg match {
                   case Ident(_) =>
                     // Check the symbol of an Ident, unless the
@@ -5652,9 +5669,10 @@ trait Typers
 
         // This is also checked later in typedStats, but that is too late for SI-5361, so
         // we eagerly check this here.
-        for (stat <- templ.body
-             if !treeInfo.isDeclarationOrTypeDef(stat))
-          OnlyDeclarationsError(stat)
+        for {
+          stat <- templ.body
+          if !treeInfo.isDeclarationOrTypeDef(stat)
+        } OnlyDeclarationsError(stat)
 
         if ((parents1 ++ templ.body) exists (_.isErrorTyped))
           tree setType ErrorType

@@ -45,7 +45,10 @@ case class CpuProfile(
     }
 
     putString("--- symbol\nbinary=%s\n".format(Jvm().mainClassName))
-    for ((stack, _) <- counts; frame <- stack if !uniq.contains(frame)) {
+    for {
+      (stack, _) <- counts
+      frame <- stack if !uniq.contains(frame)
+    } {
       putString("0x%016x %s\n".format(next, frame.toString))
       uniq(frame) = next
       next += 1
@@ -53,7 +56,9 @@ case class CpuProfile(
     putString("---\n--- profile\n")
     for (w <- Seq(0, 3, 0, 1, 0)) putWord(w)
 
-    for ((stack, n) <- counts if stack.nonEmpty) {
+    for {
+      (stack, n) <- counts if stack.nonEmpty
+    } {
       putWord(n)
       putWord(stack.size)
       for (frame <- stack) putWord(uniq(frame))
@@ -128,9 +133,11 @@ object CpuProfile {
     var nmissed = 0
 
     while (Time.now < end) {
-      for (thread <- bean.dumpAllThreads(false, false)
-           if thread.getThreadState() == state &&
-             thread.getThreadId() != myId) {
+      for {
+        thread <- bean.dumpAllThreads(false, false)
+        if thread.getThreadState() == state &&
+          thread.getThreadId() != myId
+      } {
         val s = thread.getStackTrace().toSeq
         if (s.nonEmpty) {
           val include = state != Thread.State.RUNNABLE || isRunnable(s.head)

@@ -38,7 +38,10 @@ object Test extends App {
   assert(str(precyc(6, 1).force) == goal(6, 1))
 
   // Make sure there are no odd/even problems
-  for (n <- 3 to 4; m <- 3 to 4) {
+  for {
+    n <- 3 to 4
+    m <- 3 to 4
+  } {
     assert(precyc(n, m).mkString == goal(n, m), s"mkString $n $m")
     assert(!precyc(n, m).force.hasDefiniteSize, s"hasDef $n$m")
   }

@@ -380,12 +380,11 @@ object Index {
   def taskToKeyMap(data: Settings[Scope]): Map[Task[_], ScopedKey[Task[_]]] = {
     // AttributeEntry + the checked type test 'value: Task[_]' ensures that the cast is correct.
     //  (scalac couldn't determine that 'key' is of type AttributeKey[Task[_]] on its own and a type match still required the cast)
-    val pairs = for (scope <- data.scopes;
-                     AttributeEntry(key, value: Task[_]) <- data
-                       .data(scope)
-                       .entries)
-      yield
-        (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
+    val pairs = for {
+      scope <- data.scopes
+      AttributeEntry(key, value: Task[_]) <- data.data(scope).entries
+    } yield
+      (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
     pairs.toMap[Task[_], ScopedKey[Task[_]]]
   }
   def allKeys(settings: Seq[Setting[_]]): Set[ScopedKey[_]] =
@@ -421,8 +420,10 @@ object Index {
   def triggers(ss: Settings[Scope]): Triggers[Task] = {
     val runBefore = new TriggerMap
     val triggeredBy = new TriggerMap
-    for ((_, amap) <- ss.data;
-         AttributeEntry(_, value: Task[_]) <- amap.entries) {
+    for {
+      (_, amap) <- ss.data
+      AttributeEntry(_, value: Task[_]) <- amap.entries
+    } {
       val as = value.info.attributes
       update(runBefore, value, as get Keys.runBefore)
       update(triggeredBy, value, as get Keys.triggeredBy)
@@ -436,6 +437,8 @@ object Index {
   private[this] def update(map: TriggerMap,
                            base: Task[_],
                            tasksOpt: Option[Seq[Task[_]]]): Unit =
-    for (tasks <- tasksOpt; task <- tasks)
-      map(task) = base +: map.getOrElse(task, Nil)
+    for {
+      tasks <- tasksOpt
+      task <- tasks
+    } map(task) = base +: map.getOrElse(task, Nil)
 }

@@ -163,8 +163,10 @@ object UriEncoding {
     // RFC 3986, 2.3. Unreserved Characters
     // unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
     val alphaDigit =
-      for ((min, max) <- Seq(('a', 'z'), ('A', 'Z'), ('0', '9'));
-           c <- min to max) yield c
+      for {
+        (min, max) <- Seq(('a', 'z'), ('A', 'Z'), ('0', '9'))
+        c <- min to max
+      } yield c
     val unreserved = alphaDigit ++ Seq('-', '.', '_', '~')
 
     // RFC 3986, 2.2. Reserved Characters

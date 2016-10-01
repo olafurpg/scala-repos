@@ -247,7 +247,11 @@ object Scope {
         case _ => withGlobalAxis(scope.task)
       }
       val eLin = withGlobalAxis(scope.extra)
-      for (c <- cLin; t <- tLin; e <- eLin) yield Scope(px, c, t, e)
+      for {
+        c <- cLin
+        t <- tLin
+        e <- eLin
+      } yield Scope(px, c, t, e)
     }
     scope.project match {
       case Global | This => globalProjectDelegates(scope)
@@ -320,6 +324,9 @@ object Scope {
   def globalProjectDelegates(scope: Scope): Seq[Scope] =
     if (scope == GlobalScope) GlobalScope :: Nil
     else
-      for (c <- withGlobalAxis(scope.config); t <- withGlobalAxis(scope.task);
-           e <- withGlobalAxis(scope.extra)) yield Scope(Global, c, t, e)
+      for {
+        c <- withGlobalAxis(scope.config)
+        t <- withGlobalAxis(scope.task)
+        e <- withGlobalAxis(scope.extra)
+      } yield Scope(Global, c, t, e)
 }

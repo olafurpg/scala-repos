@@ -446,8 +446,10 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         case _ =>
       }
 
-      for ((location, ops) <- toInsertBefore; op <- ops)
-        method.instructions.insertBefore(location, op)
+      for {
+        (location, ops) <- toInsertBefore
+        op <- ops
+      } method.instructions.insertBefore(location, op)
 
       for ((oldOp, newOps) <- toReplace) {
         for (newOp <- newOps) method.instructions.insertBefore(oldOp, newOp)
@@ -760,16 +762,18 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
           if (isScalaBox(mi) || isJavaBox(mi))
             checkKind(mi).map((StaticFactory(mi, loadInitialValues = None), _))
           else if (isPredefAutoBox(mi))
-            for (predefLoad <- BoxKind.checkReceiverPredefLoad(mi, prodCons);
-                 kind <- checkKind(mi))
-              yield (ModuleFactory(predefLoad, mi), kind)
+            for {
+              predefLoad <- BoxKind.checkReceiverPredefLoad(mi, prodCons)
+              kind <- checkKind(mi)
+            } yield (ModuleFactory(predefLoad, mi), kind)
           else None
 
         case ti: TypeInsnNode if ti.getOpcode == NEW =>
-          for ((dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
-               if isPrimitiveBoxConstructor(initCall);
-               kind <- checkKind(initCall))
-            yield (InstanceCreation(ti, dupOp, initCall), kind)
+          for {
+            (dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
+            if isPrimitiveBoxConstructor(initCall)
+            kind <- checkKind(initCall)
+          } yield (InstanceCreation(ti, dupOp, initCall), kind)
 
         case _ => None
       }
@@ -840,10 +844,11 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
           else None
 
         case ti: TypeInsnNode if ti.getOpcode == NEW =>
-          for ((dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
-               if isRuntimeRefConstructor(initCall);
-               kind <- checkKind(initCall))
-            yield (InstanceCreation(ti, dupOp, initCall), kind)
+          for {
+            (dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
+            if isRuntimeRefConstructor(initCall)
+            kind <- checkKind(initCall)
+          } yield (InstanceCreation(ti, dupOp, initCall), kind)
 
         case _ => None
       }
@@ -902,10 +907,11 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
       insn match {
         // no need to check for TupleN.apply: the compiler transforms case companion apply calls to constructor invocations
         case ti: TypeInsnNode if ti.getOpcode == NEW =>
-          for ((dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
-               if isTupleConstructor(initCall);
-               kind <- checkKind(initCall))
-            yield (InstanceCreation(ti, dupOp, initCall), kind)
+          for {
+            (dupOp, initCall) <- BoxKind.checkInstanceCreation(ti, prodCons)
+            if isTupleConstructor(initCall)
+            kind <- checkKind(initCall)
+          } yield (InstanceCreation(ti, dupOp, initCall), kind)
 
         case _ => None
       }

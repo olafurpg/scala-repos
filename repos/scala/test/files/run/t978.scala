@@ -19,7 +19,10 @@ object Test extends App {
   testExists(2)
 
   def testRemove(m: Int) {
-    for (x <- 1 to max; if x % m == 0) {
+    for {
+      x <- 1 to max
+      if x % m == 0
+    } {
       val f = new Foo(x)
       set -= f
       assert(!(set contains f))
@@ -28,7 +31,10 @@ object Test extends App {
   }
 
   def testExists(m: Int) {
-    for (x <- 1 to max; if x % m == 1) {
+    for {
+      x <- 1 to max
+      if x % m == 1
+    } {
       val f = new Foo(x)
       assert(set contains f, "For element: " + f + " set: " + set)
     }

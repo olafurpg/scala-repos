@@ -93,7 +93,9 @@ object BitVector extends BitVectorOps {
 
   def apply(bools: Boolean*) = {
     val bs = new util.BitSet
-    for (i <- 0 until bools.length if bools(i)) {
+    for {
+      i <- 0 until bools.length if bools(i)
+    } {
       bs.set(i)
     }
 
