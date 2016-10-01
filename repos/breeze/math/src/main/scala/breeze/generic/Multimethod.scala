@@ -370,10 +370,13 @@ trait MMRegistry1[M] {
       case None =>
         val newCA = checkedA ++ a.getInterfaces
         val sa = a.getSuperclass +: a.getInterfaces.filterNot(checkedA)
-        val allParents = for (aa <- sa; if aa != null; m <- resolve(aa, newCA))
-          yield {
-            m
-          }
+        val allParents = for {
+          aa <- sa
+          if aa != null
+          m <- resolve(aa, newCA)
+        } yield {
+          m
+        }
         allParents.toMap
     }
   }

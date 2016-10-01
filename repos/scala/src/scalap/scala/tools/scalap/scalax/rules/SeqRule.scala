@@ -85,21 +85,28 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
   def + = rule ~++ *
 
   def ~>?[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f ?)
-      yield
-        fs.foldLeft[B](a) { (b, f) =>
-          f(b)
-        }
+    for {
+      a <- rule
+      fs <- f ?
+    } yield
+      fs.foldLeft[B](a) { (b, f) =>
+        f(b)
+      }
 
   def ~>*[B >: A, X2 >: X](f: => Rule[S, S, B => B, X2]) =
-    for (a <- rule; fs <- f *)
-      yield
-        fs.foldLeft[B](a) { (b, f) =>
-          f(b)
-        }
+    for {
+      a <- rule
+      fs <- f *
+    } yield
+      fs.foldLeft[B](a) { (b, f) =>
+        f(b)
+      }
 
   def ~*~[B >: A, X2 >: X](join: => Rule[S, S, (B, B) => B, X2]) = {
-    this ~>* (for (f <- join; a <- rule) yield f(_: B, a))
+    this ~>* (for {
+      f <- join
+      a <- rule
+    } yield f(_: B, a))
   }
 
   /** Repeats this rule one or more times with a separator (which is discarded) */

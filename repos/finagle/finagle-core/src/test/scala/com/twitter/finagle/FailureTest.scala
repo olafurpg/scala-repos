@@ -21,7 +21,10 @@ class FailureTest
                        Failure.Wrapped,
                        Failure.Naming)
 
-  val flag2 = for (f1 <- flag; f2 <- flag if f1 != f2) yield f1 | f2
+  val flag2 = for {
+    f1 <- flag
+    f2 <- flag if f1 != f2
+  } yield f1 | f2
 
   test("simple failures with a cause") {
     val why = "boom!"

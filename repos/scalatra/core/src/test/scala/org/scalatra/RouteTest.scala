@@ -17,13 +17,15 @@ class RouteTestServlet extends ScalatraServlet {
   }
 
   get("/optional/?:foo?/?:bar?") {
-    (for (key <- List("foo", "bar") if params.isDefinedAt(key))
-      yield key + "=" + params(key)).mkString(";")
+    (for {
+      key <- List("foo", "bar") if params.isDefinedAt(key)
+    } yield key + "=" + params(key)).mkString(";")
   }
 
   get("/optional-ext.?:ext?") {
-    (for (key <- List("ext") if params.isDefinedAt(key))
-      yield key + "=" + params(key)).mkString(";")
+    (for {
+      key <- List("ext") if params.isDefinedAt(key)
+    } yield key + "=" + params(key)).mkString(";")
   }
 
   get("/single-splat/*") {

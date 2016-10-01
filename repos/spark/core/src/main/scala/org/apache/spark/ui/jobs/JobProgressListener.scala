@@ -178,10 +178,10 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
 
   override def onJobStart(jobStart: SparkListenerJobStart): Unit =
     synchronized {
-      val jobGroup = for (props <- Option(jobStart.properties);
-                          group <- Option(props.getProperty(
-                            SparkContext.SPARK_JOB_GROUP_ID)))
-        yield group
+      val jobGroup = for {
+        props <- Option(jobStart.properties)
+        group <- Option(props.getProperty(SparkContext.SPARK_JOB_GROUP_ID))
+      } yield group
       val jobData: JobUIData =
         new JobUIData(jobId = jobStart.jobId,
                       submissionTime = Option(jobStart.time).filter(_ >= 0),

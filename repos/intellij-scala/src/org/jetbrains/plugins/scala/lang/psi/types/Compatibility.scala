@@ -444,10 +444,11 @@ object Compatibility {
                                     matched,
                                     matchedTypes)
 
-      val missed = for ((parameter: Parameter, b) <- parameters.zip(used)
-                        if !b &&
-                          !parameter.isDefault)
-        yield MissedValueParameter(parameter)
+      val missed = for {
+        (parameter: Parameter, b) <- parameters.zip(used)
+        if !b &&
+          !parameter.isDefault
+      } yield MissedValueParameter(parameter)
       defaultParameterUsed = parameters.zip(used).exists {
         case (param, bool) => !bool && param.isDefault
       }

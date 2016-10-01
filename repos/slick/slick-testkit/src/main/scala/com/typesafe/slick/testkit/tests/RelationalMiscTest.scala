@@ -19,16 +19,22 @@ class RelationalMiscTest extends AsyncTest[RelationalTestDB] {
       _ <- ts.schema.create
       _ <- ts ++= Seq(("1", "a"), ("2", "a"), ("3", "b"))
 
-      q1 = for (t <- ts if t.a === "1" || t.a === "2") yield t
+      q1 = for {
+        t <- ts if t.a === "1" || t.a === "2"
+      } yield t
       _ <- q1.result.map(r => r.toSet shouldBe Set(("1", "a"), ("2", "a")))
 
-      q2 = for (t <- ts if (t.a =!= "1") || (t.b =!= "a")) yield t
+      q2 = for {
+        t <- ts if (t.a =!= "1") || (t.b =!= "a")
+      } yield t
       _ <- q2.result.map(r => r.toSet shouldBe Set(("2", "a"), ("3", "b")))
 
       // No need to test that the unexpected result is actually unexpected
       // now that the compiler prints a warning about it
 
-      q4 = for (t <- ts if t.a =!= "1" || t.b =!= "a") yield t
+      q4 = for {
+        t <- ts if t.a =!= "1" || t.b =!= "a"
+      } yield t
       _ <- q4.result.map(r => r.toSet shouldBe Set(("2", "a"), ("3", "b")))
     } yield ()
   }

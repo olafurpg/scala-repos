@@ -9,7 +9,10 @@ trait PartialMap[@specialized A, @specialized B]
   // commenting out this declaration gives a different exception.
   /** Getter for all values for which the given key function returns true. */
   def apply(f: (A => Boolean)): Iterator[B] =
-    for ((k, v) <- iterator; if f(k)) yield v;
+    for {
+      (k, v) <- iterator
+      if f(k)
+    } yield v;
 
   // if this is commented, it compiles fine:
   def apply[This <: Traversable[A], That](keys: TraversableLike[A, This])(

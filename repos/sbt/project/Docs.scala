@@ -42,9 +42,10 @@ object Docs {
         val versioned = repo / v
         IO.delete(versioned / "sxr")
         IO.delete(versioned / "api")
-        val toCopy = for ((file, target) <- mappings
-                          if siteInclude(file))
-          yield (file, versioned / target)
+        val toCopy = for {
+          (file, target) <- mappings
+          if siteInclude(file)
+        } yield (file, versioned / target)
         IO.copy(toCopy)
         repo
     }

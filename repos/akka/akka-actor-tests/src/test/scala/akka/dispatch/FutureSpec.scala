@@ -532,7 +532,10 @@ class FutureSpec
             Future(i)
           }
         Await.result(futures.foldLeft(Future(0))((fr, fa) ⇒
-                       for (r ← fr; a ← fa) yield (r + a)),
+                       for {
+                         r ← fr
+                         a ← fa
+                       } yield (r + a)),
                      timeout.duration) should ===(55)
       }
 
@@ -830,8 +833,10 @@ class FutureSpec
     }
     "compose result with flatMap" in {
       f { (future, result) ⇒
-        val r = for (r ← future; p ← Promise.successful("foo").future)
-          yield r.toString + p
+        val r = for {
+          r ← future
+          p ← Promise.successful("foo").future
+        } yield r.toString + p
         Await.result(r, timeout.duration) should ===(result.toString + "foo")
       }
     }

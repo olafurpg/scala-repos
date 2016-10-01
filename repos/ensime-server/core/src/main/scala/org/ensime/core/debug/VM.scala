@@ -477,8 +477,10 @@ class VM(val mode: VmMode,
 
   private def valueForField(objectId: DebugObjectId,
                             name: String): Option[Value] = {
-    for (obj <- savedObjects.get(objectId);
-         f <- fieldByName(obj, name)) yield {
+    for {
+      obj <- savedObjects.get(objectId)
+      f <- fieldByName(obj, name)
+    } yield {
       remember(obj.getValue(f))
     }
   }

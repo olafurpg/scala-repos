@@ -30,7 +30,9 @@ class AffineScaling extends SerializableLogging {
       if (hv.values.exists(_ >= 0)) throw UnboundedProblem
 
       val constraints =
-        (for (i <- 0 until hv.length if hv(i) < 0) yield (-vk(i) / hv(i)))
+        (for {
+          i <- 0 until hv.length if hv(i) < 0
+        } yield (-vk(i) / hv(i)))
       val alpha = if (constraints.size > 1) constraints.min * gamma else 0.0
       val xn = x + hx * alpha
       val cvn = xn dot c

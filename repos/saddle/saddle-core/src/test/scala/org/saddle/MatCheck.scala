@@ -122,8 +122,9 @@ class MatCheck extends Specification with ScalaCheck {
           val loc = Set(i: _*)
           val res = m.withoutRows(i: _*)
           res.numRows must_== (m.numRows - loc.size)
-          val exp = for (j <- 0 until m.numRows if !loc.contains(j))
-            yield m.row(j)
+          val exp = for {
+            j <- 0 until m.numRows if !loc.contains(j)
+          } yield m.row(j)
           res must_== Mat(exp: _*).T
         }
       }
@@ -136,8 +137,9 @@ class MatCheck extends Specification with ScalaCheck {
           val loc = Set(i: _*)
           val res = m.withoutCols(i: _*)
           res.numCols must_== (m.numCols - loc.size)
-          val exp = for (j <- 0 until m.numCols if !loc.contains(j))
-            yield m.col(j)
+          val exp = for {
+            j <- 0 until m.numCols if !loc.contains(j)
+          } yield m.col(j)
           res must_== Mat(exp: _*)
         }
       }

@@ -298,11 +298,16 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
         primitives.map(base + "0$mc" + _ + "$sp") // Function0
       } ++ {
         // return type specializations appear first in the name string (alphabetical sorting)
-        for (r <- ijfdzv; a <- ijfd)
-          yield base + "1$mc" + r + a + "$sp" // Function1
+        for {
+          r <- ijfdzv
+          a <- ijfd
+        } yield base + "1$mc" + r + a + "$sp" // Function1
       } ++ {
-        for (r <- ijfdzv; a <- ijd; b <- ijd)
-          yield base + "2$mc" + r + a + b + "$sp" // Function2
+        for {
+          r <- ijfdzv
+          a <- ijd
+          b <- ijd
+        } yield base + "2$mc" + r + a + b + "$sp" // Function2
       }
     classNames map getRequiredClass
   }

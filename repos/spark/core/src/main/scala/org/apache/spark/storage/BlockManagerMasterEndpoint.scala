@@ -426,8 +426,10 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     */
   private def getExecutorEndpointRef(
       executorId: String): Option[RpcEndpointRef] = {
-    for (blockManagerId <- blockManagerIdByExecutor.get(executorId);
-         info <- blockManagerInfo.get(blockManagerId)) yield {
+    for {
+      blockManagerId <- blockManagerIdByExecutor.get(executorId)
+      info <- blockManagerInfo.get(blockManagerId)
+    } yield {
       info.slaveEndpoint
     }
   }

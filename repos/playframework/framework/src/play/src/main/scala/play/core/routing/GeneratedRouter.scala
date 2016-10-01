@@ -115,14 +115,19 @@ abstract class GeneratedRouter extends Router {
   // and for avoiding warnings when building for Scala 2.11
   def call[A1, A2](pa1: Param[A1], pa2: Param[A2])(
       generator: Function2[A1, A2, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right)
-      yield (a1, a2)).fold(badRequest, { case (a1, a2) => generator(a1, a2) })
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+    } yield (a1, a2)).fold(badRequest, { case (a1, a2) => generator(a1, a2) })
   }
 
   def call[A1, A2, A3](pa1: Param[A1], pa2: Param[A2], pa3: Param[A3])(
       generator: Function3[A1, A2, A3, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right)
-      yield (a1, a2, a3)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+    } yield (a1, a2, a3)).fold(badRequest, {
       case (a1, a2, a3) => generator(a1, a2, a3)
     })
   }
@@ -132,8 +137,12 @@ abstract class GeneratedRouter extends Router {
                            pa3: Param[A3],
                            pa4: Param[A4])(
       generator: Function4[A1, A2, A3, A4, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right) yield (a1, a2, a3, a4)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+    } yield (a1, a2, a3, a4)).fold(badRequest, {
       case (a1, a2, a3, a4) => generator(a1, a2, a3, a4)
     })
   }
@@ -144,9 +153,13 @@ abstract class GeneratedRouter extends Router {
                                pa4: Param[A4],
                                pa5: Param[A5])(
       generator: Function5[A1, A2, A3, A4, A5, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right)
-      yield (a1, a2, a3, a4, a5)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+    } yield (a1, a2, a3, a4, a5)).fold(badRequest, {
       case (a1, a2, a3, a4, a5) => generator(a1, a2, a3, a4, a5)
     })
   }
@@ -158,9 +171,14 @@ abstract class GeneratedRouter extends Router {
                                    pa5: Param[A5],
                                    pa6: Param[A6])(
       generator: Function6[A1, A2, A3, A4, A5, A6, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right)
-      yield (a1, a2, a3, a4, a5, a6)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+    } yield (a1, a2, a3, a4, a5, a6)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6) => generator(a1, a2, a3, a4, a5, a6)
     })
   }
@@ -173,10 +191,15 @@ abstract class GeneratedRouter extends Router {
                                        pa6: Param[A6],
                                        pa7: Param[A7])(
       generator: Function7[A1, A2, A3, A4, A5, A6, A7, Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7) =>
         generator(a1, a2, a3, a4, a5, a6, a7)
     })
@@ -192,10 +215,16 @@ abstract class GeneratedRouter extends Router {
                                            pa8: Param[A8])(
       generator: Function8[A1, A2, A3, A4, A5, A6, A7, A8, Handler])
     : Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7, a8) =>
         generator(a1, a2, a3, a4, a5, a6, a7, a8)
     })
@@ -212,10 +241,17 @@ abstract class GeneratedRouter extends Router {
                                                pa9: Param[A9])(
       generator: Function9[A1, A2, A3, A4, A5, A6, A7, A8, A9, Handler])
     : Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
         generator(a1, a2, a3, a4, a5, a6, a7, a8, a9)
     })
@@ -233,11 +269,18 @@ abstract class GeneratedRouter extends Router {
                                                     pa10: Param[A10])(
       generator: Function10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, Handler])
     : Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) =>
         generator(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
     })
@@ -266,11 +309,19 @@ abstract class GeneratedRouter extends Router {
                             A10,
                             A11,
                             Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) =>
         generator(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)
     })
@@ -301,13 +352,21 @@ abstract class GeneratedRouter extends Router {
                                               A11,
                                               A12,
                                               Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right)
-      yield
-        (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+    } yield
+      (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)).fold(badRequest, {
       case (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) =>
         generator(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)
     })
@@ -340,13 +399,21 @@ abstract class GeneratedRouter extends Router {
                                               A12,
                                               A13,
                                               Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13))
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13))
       .fold(badRequest, {
         case (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) =>
           generator(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13)
@@ -382,13 +449,22 @@ abstract class GeneratedRouter extends Router {
                                               A13,
                                               A14,
                                               Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14))
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14))
       .fold(badRequest, {
         case (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) =>
           generator(a1,
@@ -439,14 +515,23 @@ abstract class GeneratedRouter extends Router {
                                               A14,
                                               A15,
                                               Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right)
-      yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15))
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+    } yield (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15))
       .fold(badRequest, {
         case (a1,
               a2,
@@ -528,64 +613,59 @@ abstract class GeneratedRouter extends Router {
                                                         A15,
                                                         A16,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16)).fold(badRequest, {
-      case (a1,
-            a2,
-            a3,
-            a4,
-            a5,
-            a6,
-            a7,
-            a8,
-            a9,
-            a10,
-            a11,
-            a12,
-            a13,
-            a14,
-            a15,
-            a16) =>
-        generator(a1,
-                  a2,
-                  a3,
-                  a4,
-                  a5,
-                  a6,
-                  a7,
-                  a8,
-                  a9,
-                  a10,
-                  a11,
-                  a12,
-                  a13,
-                  a14,
-                  a15,
-                  a16)
-    })
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+    } yield
+      (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16))
+      .fold(badRequest, {
+        case (a1,
+              a2,
+              a3,
+              a4,
+              a5,
+              a6,
+              a7,
+              a8,
+              a9,
+              a10,
+              a11,
+              a12,
+              a13,
+              a14,
+              a15,
+              a16) =>
+          generator(a1,
+                    a2,
+                    a3,
+                    a4,
+                    a5,
+                    a6,
+                    a7,
+                    a8,
+                    a9,
+                    a10,
+                    a11,
+                    a12,
+                    a13,
+                    a14,
+                    a15,
+                    a16)
+      })
   }
 
   def call[A1,
@@ -638,32 +718,42 @@ abstract class GeneratedRouter extends Router {
                                                         A16,
                                                         A17,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right; a17 <- pa17.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16,
-         a17)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+      a17 <- pa17.value.right
+    } yield
+      (a1,
+       a2,
+       a3,
+       a4,
+       a5,
+       a6,
+       a7,
+       a8,
+       a9,
+       a10,
+       a11,
+       a12,
+       a13,
+       a14,
+       a15,
+       a16,
+       a17)).fold(badRequest, {
       case (a1,
             a2,
             a3,
@@ -754,34 +844,44 @@ abstract class GeneratedRouter extends Router {
                                                         A17,
                                                         A18,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right; a17 <- pa17.value.right;
-          a18 <- pa18.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16,
-         a17,
-         a18)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+      a17 <- pa17.value.right
+      a18 <- pa18.value.right
+    } yield
+      (a1,
+       a2,
+       a3,
+       a4,
+       a5,
+       a6,
+       a7,
+       a8,
+       a9,
+       a10,
+       a11,
+       a12,
+       a13,
+       a14,
+       a15,
+       a16,
+       a17,
+       a18)).fold(badRequest, {
       case (a1,
             a2,
             a3,
@@ -877,36 +977,46 @@ abstract class GeneratedRouter extends Router {
                                                         A18,
                                                         A19,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right; a17 <- pa17.value.right;
-          a18 <- pa18.value.right;
-          a19 <- pa19.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16,
-         a17,
-         a18,
-         a19)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+      a17 <- pa17.value.right
+      a18 <- pa18.value.right
+      a19 <- pa19.value.right
+    } yield
+      (a1,
+       a2,
+       a3,
+       a4,
+       a5,
+       a6,
+       a7,
+       a8,
+       a9,
+       a10,
+       a11,
+       a12,
+       a13,
+       a14,
+       a15,
+       a16,
+       a17,
+       a18,
+       a19)).fold(badRequest, {
       case (a1,
             a2,
             a3,
@@ -1007,37 +1117,48 @@ abstract class GeneratedRouter extends Router {
                                                         A19,
                                                         A20,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right; a17 <- pa17.value.right;
-          a18 <- pa18.value.right;
-          a19 <- pa19.value.right; a20 <- pa20.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16,
-         a17,
-         a18,
-         a19,
-         a20)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+      a17 <- pa17.value.right
+      a18 <- pa18.value.right
+      a19 <- pa19.value.right
+      a20 <- pa20.value.right
+    } yield
+      (a1,
+       a2,
+       a3,
+       a4,
+       a5,
+       a6,
+       a7,
+       a8,
+       a9,
+       a10,
+       a11,
+       a12,
+       a13,
+       a14,
+       a15,
+       a16,
+       a17,
+       a18,
+       a19,
+       a20)).fold(badRequest, {
       case (a1,
             a2,
             a3,
@@ -1143,39 +1264,50 @@ abstract class GeneratedRouter extends Router {
                                                         A20,
                                                         A21,
                                                         Handler]): Handler = {
-    (for (a1 <- pa1.value.right; a2 <- pa2.value.right; a3 <- pa3.value.right;
-          a4 <- pa4.value.right; a5 <- pa5.value.right; a6 <- pa6.value.right;
-          a7 <- pa7.value.right; a8 <- pa8.value.right; a9 <- pa9.value.right;
-          a10 <- pa10.value.right; a11 <- pa11.value.right;
-          a12 <- pa12.value.right;
-          a13 <- pa13.value.right; a14 <- pa14.value.right;
-          a15 <- pa15.value.right;
-          a16 <- pa16.value.right; a17 <- pa17.value.right;
-          a18 <- pa18.value.right;
-          a19 <- pa19.value.right; a20 <- pa20.value.right;
-          a21 <- pa21.value.right)
-      yield
-        (a1,
-         a2,
-         a3,
-         a4,
-         a5,
-         a6,
-         a7,
-         a8,
-         a9,
-         a10,
-         a11,
-         a12,
-         a13,
-         a14,
-         a15,
-         a16,
-         a17,
-         a18,
-         a19,
-         a20,
-         a21)).fold(badRequest, {
+    (for {
+      a1 <- pa1.value.right
+      a2 <- pa2.value.right
+      a3 <- pa3.value.right
+      a4 <- pa4.value.right
+      a5 <- pa5.value.right
+      a6 <- pa6.value.right
+      a7 <- pa7.value.right
+      a8 <- pa8.value.right
+      a9 <- pa9.value.right
+      a10 <- pa10.value.right
+      a11 <- pa11.value.right
+      a12 <- pa12.value.right
+      a13 <- pa13.value.right
+      a14 <- pa14.value.right
+      a15 <- pa15.value.right
+      a16 <- pa16.value.right
+      a17 <- pa17.value.right
+      a18 <- pa18.value.right
+      a19 <- pa19.value.right
+      a20 <- pa20.value.right
+      a21 <- pa21.value.right
+    } yield
+      (a1,
+       a2,
+       a3,
+       a4,
+       a5,
+       a6,
+       a7,
+       a8,
+       a9,
+       a10,
+       a11,
+       a12,
+       a13,
+       a14,
+       a15,
+       a16,
+       a17,
+       a18,
+       a19,
+       a20,
+       a21)).fold(badRequest, {
       case (a1,
             a2,
             a3,

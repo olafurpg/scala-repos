@@ -200,8 +200,10 @@ class ScalaCopyPastePostProcessor
                          offset: Int): Option[PsiElement] = {
     val range = dependency.range.shiftRight(offset)
 
-    for (ref <- Option(file.findElementAt(range.getStartOffset));
-         parent <- ref.parent if parent.getTextRange == range) yield parent
+    for {
+      ref <- Option(file.findElementAt(range.getStartOffset))
+      parent <- ref.parent if parent.getTextRange == range
+    } yield parent
   }
 
   private def getElementsStrictlyInRange(file: PsiFile,

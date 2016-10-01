@@ -311,12 +311,12 @@ private[sql] class SQLListener(conf: SparkConf)
       _executionIdToData.get(executionId) match {
         case Some(executionUIData) =>
           val accumulatorUpdates = {
-            for (stageId <- executionUIData.stages;
-                 stageMetrics <- _stageIdToStageMetrics
-                   .get(stageId)
-                   .toIterable;
-                 taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
-                 accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
+            for {
+              stageId <- executionUIData.stages
+              stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable
+              taskMetrics <- stageMetrics.taskIdToMetricUpdates.values
+              accumulatorUpdate <- taskMetrics.accumulatorUpdates
+            } yield {
               assert(
                 accumulatorUpdate.update.isDefined,
                 s"accumulator update from " +

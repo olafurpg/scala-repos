@@ -301,9 +301,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     *  specialized type.
     */
   def survivingArgs(sym: Symbol, args: List[Type]): List[Type] =
-    for ((tvar, tpe) <- sym.info.typeParams.zip(args)
-         if !tvar.isSpecialized || !isPrimitiveValueType(tpe))
-      yield tpe
+    for {
+      (tvar, tpe) <- sym.info.typeParams.zip(args)
+      if !tvar.isSpecialized || !isPrimitiveValueType(tpe)
+    } yield tpe
 
   val specializedType = new TypeMap {
     override def apply(tp: Type): Type = tp match {
@@ -425,7 +426,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     def loop(ctypes: List[List[Type]]): List[List[Type]] = ctypes match {
       case Nil => Nil
       case set :: Nil => set map (_ :: Nil)
-      case set :: sets => for (x <- set; xs <- loop(sets)) yield x :: xs
+      case set :: sets =>
+        for {
+          x <- set
+          xs <- loop(sets)
+        } yield x :: xs
     }
     // zip the keys with each permutation to create a TypeEnv.
     // If we don't exclude the "all AnyRef" specialization, we will
@@ -941,8 +946,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           unusedStvars foreach (_ removeAnnotation SpecializedClass)
           specializingOn = specializingOn filterNot (unusedStvars contains)
         }
-        for (env0 <- specializations(specializingOn)
-             if needsSpecialization(env0, sym)) yield {
+        for {
+          env0 <- specializations(specializingOn)
+          if needsSpecialization(env0, sym)
+        } yield {
           // !!! Can't this logic be structured so that the new symbol's name is
           // known when the symbol is cloned? It is much cleaner not to be mutating
           // names after the fact.  And it adds about a billion lines of
@@ -1426,8 +1433,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val loconstraints = matches(tvar.info.bounds.lo, tpe)
         val hiconstraints = matches(tpe, tvar.info.bounds.hi)
         val allconstraints =
-          for (c <- constraints; l <- loconstraints; h <- hiconstraints)
-            yield c ++ l ++ h
+          for {
+            c <- constraints
+            l <- loconstraints
+            h <- hiconstraints
+          } yield c ++ l ++ h
         allconstraints
     }
   }
@@ -2171,8 +2181,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       trees flatMap {
         case tree @ ClassDef(_, _, _, impl) =>
           tree.symbol.info // force specialization
-          for (((sym1, env), specCls) <- specializedClass
-               if sym1 == tree.symbol) yield {
+          for {
+            ((sym1, env), specCls) <- specializedClass
+            if sym1 == tree.symbol
+          } yield {
             debuglog(
               "created synthetic class: " + specCls + " of " + sym1 + " in " + pp(
                 env))

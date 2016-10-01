@@ -496,8 +496,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    *  must-single-thread
    */
   def fieldSymbols(cls: Symbol): List[Symbol] = {
-    for (f <- cls.info.decls.toList; if !f.isMethod && f.isTerm &&
-           !f.isModule) yield f
+    for {
+      f <- cls.info.decls.toList
+      if !f.isMethod && f.isTerm &&
+        !f.isModule
+    } yield f
   }
 
   /*
@@ -1303,9 +1306,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       }
 
       val methodList: List[String] =
-        for (m <- methodSymbols if !m.isConstructor && m.isPublic &&
-               !(m.name startsWith "$") && !m.isGetter && !m.isSetter)
-          yield javaSimpleName(m)
+        for {
+          m <- methodSymbols if !m.isConstructor && m.isPublic &&
+            !(m.name startsWith "$") && !m.isGetter && !m.isSetter
+        } yield javaSimpleName(m)
 
       val constructor = beanInfoClass.visitMethod(
         asm.Opcodes.ACC_PUBLIC,

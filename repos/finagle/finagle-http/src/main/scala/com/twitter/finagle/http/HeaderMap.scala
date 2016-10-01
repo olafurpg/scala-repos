@@ -82,7 +82,10 @@ class MapHeaderMap(underlying: mutable.Map[String, Seq[String]])
 
   // For Map/MapLike
   def iterator: Iterator[(String, String)] = {
-    for ((k, vs) <- underlying.iterator; v <- vs) yield (k, v)
+    for {
+      (k, vs) <- underlying.iterator
+      v <- vs
+    } yield (k, v)
   }
 
   // For Map/MapLike

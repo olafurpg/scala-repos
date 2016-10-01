@@ -61,8 +61,10 @@ class MultivariateGaussianTest extends FunSuite with Checkers {
   }
 
   implicit def arbDistr = Arbitrary {
-    for (mean <- genVector.arbitrary; std <- genMatrix.arbitrary)
-      yield new MultivariateGaussian(mean, std);
+    for {
+      mean <- genVector.arbitrary
+      std <- genMatrix.arbitrary
+    } yield new MultivariateGaussian(mean, std);
   }
 
   val numSamples = 5000

@@ -916,9 +916,10 @@ trait Contexts { self: Analyzer =>
         syms: Scope,
         pre: Type,
         imported: Boolean = false): List[ImplicitInfo] =
-      for (sym <- syms.toList
-           if isQualifyingImplicit(sym.name, sym, pre, imported))
-        yield new ImplicitInfo(sym.name, pre, sym)
+      for {
+        sym <- syms.toList
+        if isQualifyingImplicit(sym.name, sym, pre, imported)
+      } yield new ImplicitInfo(sym.name, pre, sym)
 
     private def collectImplicitImports(imp: ImportInfo): List[ImplicitInfo] = {
       val qual = imp.qual

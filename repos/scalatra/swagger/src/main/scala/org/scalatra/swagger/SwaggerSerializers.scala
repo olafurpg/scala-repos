@@ -339,8 +339,10 @@ object SwaggerSerializers {
             )
         }, {
           case x: Model =>
-            val required = for ((key, value) <- x.properties
-                                if value.required) yield key
+            val required = for {
+              (key, value) <- x.properties
+              if value.required
+            } yield key
             ("id" -> x.id) ~ ("name" -> x.name) ~
               ("qualifiedType" -> x.qualifiedName) ~
               ("description" -> x.description) ~ ("required" -> required) ~

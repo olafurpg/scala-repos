@@ -242,11 +242,11 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     *  bindings is a Seq of tuple representing the mapping from Class to Serializer.
     *  It is primarily ordered by the most specific classes first, and secondly in the configured order.
     */
-  private[akka] val bindings: immutable.Seq[ClassSerializer] = sort(
-    for ((k: String, v: String) ← settings.SerializationBindings
-         if v != "none" &&
-           checkGoogleProtobuf(k))
-      yield (system.dynamicAccess.getClassFor[Any](k).get, serializers(v)))
+  private[akka] val bindings: immutable.Seq[ClassSerializer] = sort(for {
+    (k: String, v: String) ← settings.SerializationBindings
+    if v != "none" &&
+      checkGoogleProtobuf(k)
+  } yield (system.dynamicAccess.getClassFor[Any](k).get, serializers(v)))
     .to[immutable.Seq]
 
   // com.google.protobuf serialization binding is only used if the class can be loaded,

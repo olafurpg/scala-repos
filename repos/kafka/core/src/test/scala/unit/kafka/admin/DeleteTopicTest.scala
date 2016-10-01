@@ -349,7 +349,10 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
                         numDups: Int,
                         log: Log): Seq[(Int, Int)] = {
     var counter = 0
-    for (dup <- 0 until numDups; key <- 0 until numKeys) yield {
+    for {
+      dup <- 0 until numDups
+      key <- 0 until numKeys
+    } yield {
       val count = counter
       log.append(
         TestUtils.singleMessageSet(payload = counter.toString.getBytes,

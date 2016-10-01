@@ -103,9 +103,10 @@ trait GroupSolver
           solveConstraint(expr, _, sigma, Nil)
         })
 
-        val mergedM = for (forestSpec <- forestSpecM;
-                           constrSpec <- constrSpecM)
-          yield IntersectBucketSpec(forestSpec, constrSpec)
+        val mergedM = for {
+          forestSpec <- forestSpecM
+          constrSpec <- constrSpecM
+        } yield IntersectBucketSpec(forestSpec, constrSpec)
 
         val specM = mergedM orElse forestSpecM orElse constrSpecM
 
@@ -248,8 +249,10 @@ trait GroupSolver
     val commonality =
       result map listSolutionExprs flatMap { findCommonality(b, _, sigma) }
 
-    val back = for (r <- result; c <- commonality)
-      yield Group(None, c, r, List())
+    val back = for {
+      r <- result
+      c <- commonality
+    } yield Group(None, c, r, List())
 
     val contribErrors =
       if (!back.isDefined) {
@@ -302,8 +305,10 @@ trait GroupSolver
       val (rightSpec, rightErrors) =
         solveGroupCondition(b, right, free, sigma, dtrace)
 
-      val andSpec = for (ls <- leftSpec; rs <- rightSpec)
-        yield IntersectBucketSpec(ls, rs)
+      val andSpec = for {
+        ls <- leftSpec
+        rs <- rightSpec
+      } yield IntersectBucketSpec(ls, rs)
 
       (andSpec orElse leftSpec orElse rightSpec, leftErrors ++ rightErrors)
     }
@@ -314,8 +319,10 @@ trait GroupSolver
       val (rightSpec, rightErrors) =
         solveGroupCondition(b, right, free, sigma, dtrace)
 
-      val andSpec = for (ls <- leftSpec; rs <- rightSpec)
-        yield UnionBucketSpec(ls, rs)
+      val andSpec = for {
+        ls <- leftSpec
+        rs <- rightSpec
+      } yield UnionBucketSpec(ls, rs)
 
       (andSpec orElse leftSpec orElse rightSpec, leftErrors ++ rightErrors)
     }
@@ -440,8 +447,10 @@ trait GroupSolver
     : (Option[BucketSpec], Set[Error]) = {
     val (back, errors) = specs.fold((None: Option[BucketSpec], Set[Error]())) {
       case ((leftAcc, leftErrors), (rightAcc, rightErrors)) => {
-        val merged = for (left <- leftAcc; right <- rightAcc)
-          yield IntersectBucketSpec(left, right)
+        val merged = for {
+          left <- leftAcc
+          right <- rightAcc
+        } yield IntersectBucketSpec(left, right)
 
         (merged orElse leftAcc orElse rightAcc, leftErrors ++ rightErrors)
       }

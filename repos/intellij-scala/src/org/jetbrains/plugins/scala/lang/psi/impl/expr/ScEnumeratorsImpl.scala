@@ -28,8 +28,10 @@ class ScEnumeratorsImpl(node: ASTNode)
   def guards = findChildrenByClass[ScGuard](classOf[ScGuard])
 
   def namings: Seq[ScPatterned] =
-    for (c <- getChildren if c.isInstanceOf[ScGenerator] ||
-           c.isInstanceOf[ScEnumerator]) yield c.asInstanceOf[ScPatterned]
+    for {
+      c <- getChildren if c.isInstanceOf[ScGenerator] ||
+        c.isInstanceOf[ScEnumerator]
+    } yield c.asInstanceOf[ScPatterned]
 
   type Patterned = {
     def pattern: ScPattern

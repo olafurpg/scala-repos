@@ -687,10 +687,11 @@ object TestNodeProvider {
       import scala.collection.JavaConversions._
       expr.args.findFirstChildByType(ScalaElementTypes.BLOCK_EXPR) match {
         case blockExpr: ScBlockExpr =>
-          (for (methodExpr <- blockExpr.children
-                if methodExpr.isInstanceOf[ScInfixExpr] ||
-                  methodExpr.isInstanceOf[ScMethodCall])
-            yield extractUTestInner(methodExpr, project))
+          (for {
+            methodExpr <- blockExpr.children
+            if methodExpr.isInstanceOf[ScInfixExpr] ||
+              methodExpr.isInstanceOf[ScMethodCall]
+          } yield extractUTestInner(methodExpr, project))
             .filter(_.isDefined)
             .map(_.get)
             .toList

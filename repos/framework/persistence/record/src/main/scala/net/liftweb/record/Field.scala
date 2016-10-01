@@ -488,8 +488,10 @@ trait Field[ThisType, OwnerType <: Record[OwnerType]]
 trait DisplayWithLabel[OwnerType <: Record[OwnerType]]
     extends OwnedField[OwnerType] {
   override abstract def toForm: Box[NodeSeq] =
-    for (id <- uniqueFieldId; control <- super.toForm)
-      yield <div id={ id + "_holder" }>
+    for {
+      id <- uniqueFieldId
+      control <- super.toForm
+    } yield <div id={ id + "_holder" }>
         <div><label for={ id }>{ displayName }</label></div>
         { control }
         <lift:msg id={id} errorClass="lift_error"/>

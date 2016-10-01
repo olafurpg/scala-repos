@@ -51,7 +51,11 @@ object traversable {
       new FromTraversable[OutH :: OutT] {
         def apply(l: GenTraversable[_]): Option[OutH :: OutT] =
           if (l.isEmpty) None
-          else for (h <- l.head.cast[OutH]; t <- flt(l.tail)) yield h :: t
+          else
+            for {
+              h <- l.head.cast[OutH]
+              t <- flt(l.tail)
+            } yield h :: t
       }
   }
 

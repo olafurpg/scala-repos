@@ -85,9 +85,11 @@ object ALSSuite {
       }
 
     val sampledRatings = {
-      for (u <- 0 until users; p <- 0 until products
-           if rand.nextDouble() < samplingRate)
-        yield Rating(u, p, trueRatings(u, p))
+      for {
+        u <- 0 until users
+        p <- 0 until products
+        if rand.nextDouble() < samplingRate
+      } yield Rating(u, p, trueRatings(u, p))
     }
 
     (sampledRatings, trueRatings, truePrefs)
@@ -265,8 +267,10 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
     val predictedRatings =
       if (bulkPredict) {
         val allRatings = new BDM[Double](users, products)
-        val usersProducts = for (u <- 0 until users; p <- 0 until products)
-          yield (u, p)
+        val usersProducts = for {
+          u <- 0 until users
+          p <- 0 until products
+        } yield (u, p)
         val userProductsRDD = sc.parallelize(usersProducts)
         model.predict(userProductsRDD).collect().foreach { elem =>
           allRatings(elem.user, elem.product) = elem.rating

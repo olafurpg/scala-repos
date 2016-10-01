@@ -173,8 +173,10 @@ private[sbt] object SettingCompletions {
     }
     val keyID: Parser[AttributeKey[_]] = scalaID(keyMap, "key")
     val keyParser = token(keyID, keyCompletions)
-    for (key <- keyParser; scope <- scopeParser(key, settings, context))
-      yield ScopedKey(scope, key)
+    for {
+      key <- keyParser
+      scope <- scopeParser(key, settings, context)
+    } yield ScopedKey(scope, key)
   }
 
   /** Parser for the `in` method name that slightly augments the naive completion to give a hint of the purpose of `in`.*/

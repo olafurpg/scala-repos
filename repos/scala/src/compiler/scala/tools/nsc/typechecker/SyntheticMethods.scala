@@ -384,7 +384,10 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
             }
           }
         }
-        for ((m, impl) <- methods; if shouldGenerate(m)) yield impl()
+        for {
+          (m, impl) <- methods
+          if shouldGenerate(m)
+        } yield impl()
       }
       def extras = {
         if (needsReadResolve) {

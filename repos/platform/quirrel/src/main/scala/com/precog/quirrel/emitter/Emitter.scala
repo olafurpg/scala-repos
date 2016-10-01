@@ -219,8 +219,10 @@ trait Emitter
 
     def emitConstraints(expr: Expr,
                         dispatches: Set[ast.Dispatch]): EmitterState = {
-      val optState = for (const <- expr.constrainingExpr
-                          if !(const equalsIgnoreLoc expr)) yield {
+      val optState = for {
+        const <- expr.constrainingExpr
+        if !(const equalsIgnoreLoc expr)
+      } yield {
         if (expr.children exists { _.constrainingExpr == Some(const) }) None
         else {
           Some(

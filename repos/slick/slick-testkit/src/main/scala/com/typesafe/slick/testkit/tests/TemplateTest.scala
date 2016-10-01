@@ -22,7 +22,9 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     lazy val orders = TableQuery[Orders]
 
     def userNameByID1(id: Int) =
-      for (u <- users if u.id === id.bind) yield u.first
+      for {
+        u <- users if u.id === id.bind
+      } yield u.first
     def q1 = userNameByID1(3)
 
     val userNameByID2 = for {
@@ -46,9 +48,10 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     val q4 = userNameByIDRangeAndProduct(2, (5, "Product A"))
 
     def userNameByIDOrAll(id: Option[Int]) =
-      for (u <- users
-           if id.map(u.id === _.bind).getOrElse(LiteralColumn(true)))
-        yield u.first
+      for {
+        u <- users
+        if id.map(u.id === _.bind).getOrElse(LiteralColumn(true))
+      } yield u.first
     val q5a = userNameByIDOrAll(Some(3))
     val q5b = userNameByIDOrAll(None)
 

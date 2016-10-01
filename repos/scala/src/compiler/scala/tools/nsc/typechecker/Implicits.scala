@@ -514,8 +514,10 @@ trait Implicits { self: Analyzer =>
         // `t.typeSymbol` returns the symbol of the normalized type. If that normalized type
         // is a `PolyType`, the symbol of the result type is collected. This is precisely
         // what we require for SI-5318.
-        val syms = for (t <- tp; if t.typeSymbol.isTypeParameter)
-          yield t.typeSymbol
+        val syms = for {
+          t <- tp
+          if t.typeSymbol.isTypeParameter
+        } yield t.typeSymbol
         deriveTypeWithWildcards(syms.distinct)(tp)
       }
       def complexity(tp: Type): Int = tp.dealias match {

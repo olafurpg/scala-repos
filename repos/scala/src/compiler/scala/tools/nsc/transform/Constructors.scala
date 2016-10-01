@@ -406,7 +406,10 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
       log(
         "merging: " + originalStats.mkString("\n") + "\nwith\n" +
           specializedStats.mkString("\n"))
-      for (s <- originalStats; stat = s.duplicate) yield {
+      for {
+        s <- originalStats
+        stat = s.duplicate
+      } yield {
         log("merge: looking at " + stat)
         val stat1 = stat match {
           case Assign(sel @ Select(This(_), field), _) =>

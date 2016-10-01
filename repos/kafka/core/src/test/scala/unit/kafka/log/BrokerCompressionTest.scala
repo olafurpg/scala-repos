@@ -88,8 +88,9 @@ class BrokerCompressionTest(messageCompression: String,
 object BrokerCompressionTest {
   @Parameters
   def parameters: Collection[Array[String]] = {
-    for (brokerCompression <- BrokerCompressionCodec.brokerCompressionOptions;
-         messageCompression <- CompressionType.values)
-      yield Array(messageCompression.name, brokerCompression)
+    for {
+      brokerCompression <- BrokerCompressionCodec.brokerCompressionOptions
+      messageCompression <- CompressionType.values
+    } yield Array(messageCompression.name, brokerCompression)
   }
 }

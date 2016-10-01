@@ -115,9 +115,10 @@ object ClassPath {
     def toBinaryName(rep: T): String
 
     def sourcesInPath(path: String): List[ClassPath[T]] =
-      for (file <- expandPath(path, expandStar = false);
-           dir <- Option(AbstractFile getDirectory file))
-        yield new SourcePath[T](dir, this)
+      for {
+        file <- expandPath(path, expandStar = false)
+        dir <- Option(AbstractFile getDirectory file)
+      } yield new SourcePath[T](dir, this)
   }
 
   def manifests: List[java.net.URL] = {

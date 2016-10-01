@@ -283,9 +283,10 @@ object SqlToSlick extends App {
         //#slickQueryImplicitJoin
         val slick2 = //#slickQueryImplicitJoin
         // or equivalent for-expression:
-        (for (p <- people;
-              a <- addresses if p.addressId === a.id)
-          yield (p.name, a.city)).result
+        (for {
+          p <- people
+          a <- addresses if p.addressId === a.id
+        } yield (p.name, a.city)).result
         //#slickQueryImplicitJoin
         val ((sqlRes, slickRes), slick2Res) =
           Await.result(db.run(sql zip slick zip slick2), Duration.Inf)

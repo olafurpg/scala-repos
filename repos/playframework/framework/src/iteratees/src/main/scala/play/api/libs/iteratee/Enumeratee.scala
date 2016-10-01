@@ -152,26 +152,28 @@ object Enumeratee {
     } // Shadow ec to make this the only implicit EC in scope
 
     def getNext(it1: Iteratee[E, A], it2: Iteratee[E, B]): Iteratee[E, C] = {
-      val eventuallyIter = for ((a1, it1_) <- getInside(it1);
-                                (a2, it2_) <- getInside(it2))
-        yield
-          checkDone(a1, a2) match {
-            case Left((msg, in)) => Error(msg, in)
-            case Right(None) => Cont(step(it1_, it2_))
-            case Right(Some(Left(Left(a)))) => it2_.map(b => zipper(a, b))(pec)
-            case Right(Some(Left(Right(b)))) =>
-              it1_.map(a => zipper(a, b))(pec)
-            case Right(Some(Right(((a, b), e)))) =>
-              executeIteratee(Done(zipper(a, b), e))(pec)
-          }
+      val eventuallyIter = for {
+        (a1, it1_) <- getInside(it1)
+        (a2, it2_) <- getInside(it2)
+      } yield
+        checkDone(a1, a2) match {
+          case Left((msg, in)) => Error(msg, in)
+          case Right(None) => Cont(step(it1_, it2_))
+          case Right(Some(Left(Left(a)))) => it2_.map(b => zipper(a, b))(pec)
+          case Right(Some(Left(Right(b)))) =>
+            it1_.map(a => zipper(a, b))(pec)
+          case Right(Some(Right(((a, b), e)))) =>
+            executeIteratee(Done(zipper(a, b), e))(pec)
+        }
 
       Iteratee.flatten(eventuallyIter)
     }
 
     def step(it1: Iteratee[E, A], it2: Iteratee[E, B])(in: Input[E]) = {
-      Iteratee.flatten(
-        for (it1_ <- it1.feed(in);
-             it2_ <- it2.feed(in)) yield getNext(it1_, it2_))
+      Iteratee.flatten(for {
+        it1_ <- it1.feed(in)
+        it2_ <- it2.feed(in)
+      } yield getNext(it1_, it2_))
     }
 
     def getInside[T](it: Iteratee[E, T]): Future[

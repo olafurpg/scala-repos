@@ -99,7 +99,10 @@ object Endpoint {
             case host: String => host
           }
 
-        for (h <- h; p <- p) yield (h, p.toInt)
+        for {
+          h <- h
+          p <- p
+        } yield (h, p.toInt)
 
       case _ => None
     }

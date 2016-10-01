@@ -155,15 +155,17 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
   }
 
   def activeKeysIterator: Iterator[(Int, Int)] = {
-    for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
-      yield (rowIndices(rr), c)
+    for {
+      c <- Iterator.range(0, cols)
+      rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))
+    } yield (rowIndices(rr), c)
   }
 
   def activeIterator: Iterator[((Int, Int), V)] = {
-    for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
-      yield (rowIndices(rr), c) -> data(rr)
+    for {
+      c <- Iterator.range(0, cols)
+      rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))
+    } yield (rowIndices(rr), c) -> data(rr)
   }
 
   def activeValuesIterator: Iterator[V] = data.iterator.take(used)

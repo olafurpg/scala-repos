@@ -34,10 +34,12 @@ class LogNormalTest
   val expFam = LogNormal
 
   def arbParameter = Arbitrary {
-    for (mean <- arbitrary[Double].map { _ % 10.0 };
-         std <- arbitrary[Double].map { x =>
-           math.abs(x) % 8.0 + .1
-         }) yield (mean, std)
+    for {
+      mean <- arbitrary[Double].map { _ % 10.0 }
+      std <- arbitrary[Double].map { x =>
+        math.abs(x) % 8.0 + .1
+      }
+    } yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -51,12 +53,14 @@ class LogNormalTest
   type Distr = LogNormal
 
   implicit def arbDistr = Arbitrary {
-    for (mean <- arbitrary[Double].map { x =>
-           math.abs(x) % 10.0
-         };
-         std <- arbitrary[Double].map { x =>
-           math.abs(x) % 1.0 + .1
-         }) yield new LogNormal(mean, std)
+    for {
+      mean <- arbitrary[Double].map { x =>
+        math.abs(x) % 10.0
+      }
+      std <- arbitrary[Double].map { x =>
+        math.abs(x) % 1.0 + .1
+      }
+    } yield new LogNormal(mean, std)
   }
 
   def asDouble(x: Double) = x

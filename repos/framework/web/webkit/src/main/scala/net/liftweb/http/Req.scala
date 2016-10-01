@@ -1050,9 +1050,10 @@ class Req(val path: ParsePath,
       case _ => Empty
     }
 
-  lazy val headers: List[(String, String)] = for (h <- request.headers;
-                                                  p <- h.values)
-    yield (h.name, p)
+  lazy val headers: List[(String, String)] = for {
+    h <- request.headers
+    p <- h.values
+  } yield (h.name, p)
 
   def headers(name: String): List[String] =
     headers.filter(_._1.equalsIgnoreCase(name)).map(_._2)
@@ -1378,9 +1379,10 @@ class Req(val path: ParsePath,
   /**
     * The user agent of the browser that sent the request
     */
-  lazy val userAgent: Box[String] = for (r <- Box.legacyNullTest(request);
-                                         uah <- request.header("User-Agent"))
-    yield uah
+  lazy val userAgent: Box[String] = for {
+    r <- Box.legacyNullTest(request)
+    uah <- request.header("User-Agent")
+  } yield uah
 
   /**
     * the accept header

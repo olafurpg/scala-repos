@@ -443,19 +443,24 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       (u, o) <- users join orders on (_.id === _.userID)
     } yield (u.last, u.first ~ o.orderID)).sortBy(_._1).map(_._2)
 
-    val q6a = (for (o <- orders if o.orderID === (for {
-                      o2 <- orders if o.userID === o2.userID
-                    } yield o2.orderID).max) yield o.orderID).sorted
+    val q6a = (for {
+      o <- orders if o.orderID === (for {
+        o2 <- orders if o.userID === o2.userID
+      } yield o2.orderID).max
+    } yield o.orderID).sorted
 
     val q6b =
-      (for (o <- orders if o.orderID === (for {
-              o2 <- orders if o.userID === o2.userID
-            } yield o2.orderID).max) yield o.orderID ~ o.userID).sortBy(_._1)
+      (for {
+        o <- orders if o.orderID === (for {
+          o2 <- orders if o.userID === o2.userID
+        } yield o2.orderID).max
+      } yield o.orderID ~ o.userID).sortBy(_._1)
 
-    val q6c = (for (o <- orders if o.orderID === (for {
-                      o2 <- orders if o.userID === o2.userID
-                    } yield o2.orderID).max)
-      yield o).sortBy(_.orderID).map(o => o.orderID ~ o.userID)
+    val q6c = (for {
+      o <- orders if o.orderID === (for {
+        o2 <- orders if o.userID === o2.userID
+      } yield o2.orderID).max
+    } yield o).sortBy(_.orderID).map(o => o.orderID ~ o.userID)
 
     seq(
       (users.schema ++ orders.schema).create,

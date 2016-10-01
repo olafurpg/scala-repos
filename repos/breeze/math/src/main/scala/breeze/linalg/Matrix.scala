@@ -70,16 +70,22 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
   }
 
   def iterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield (i -> j) -> apply(i, j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield (i -> j) -> apply(i, j)
 
   def valuesIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield apply(i, j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield apply(i, j)
 
   def keysIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield (i -> j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield (i -> j)
 
   def toString(maxLines: Int = Terminal.terminalHeight - 3,
                maxWidth: Int = Terminal.terminalWidth): String = {

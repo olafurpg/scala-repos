@@ -110,12 +110,12 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
           var currDeps = Set[Prop]()
           val (sharedPrefix, suffix) =
             tests span { test =>
-              (test.prop == True) || (for (reusedTest <- test.reuses;
-                                           nextDeps <- dependencies.get(
-                                             reusedTest);
-                                           diff <- (nextDeps -- currDeps).headOption;
-                                           _ <- Some(currDeps = nextDeps))
-                yield diff).nonEmpty
+              (test.prop == True) || (for {
+                reusedTest <- test.reuses
+                nextDeps <- dependencies.get(reusedTest)
+                diff <- (nextDeps -- currDeps).headOption
+                _ <- Some(currDeps = nextDeps)
+              } yield diff).nonEmpty
             }
 
           val collapsedTreeMakers =
@@ -134,13 +134,14 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
               // if the shared prefix contains interesting conditions (!= True)
               // and the last of such interesting shared conditions reuses another treemaker's test
               // replace the whole sharedPrefix by a ReusingCondTreeMaker
-              for (lastShared <- sharedPrefix.reverse
-                     .dropWhile(_.prop == True)
-                     .headOption;
-                   lastReused <- lastShared.reuses)
-                yield
-                  ReusingCondTreeMaker(sharedPrefix, reusedOrOrig) :: suffix
-                    .map(_.treeMaker)
+              for {
+                lastShared <- sharedPrefix.reverse
+                  .dropWhile(_.prop == True)
+                  .headOption
+                lastReused <- lastShared.reuses
+              } yield
+                ReusingCondTreeMaker(sharedPrefix, reusedOrOrig) :: suffix.map(
+                  _.treeMaker)
             }
 
           collapsedTreeMakers getOrElse tests.map(_.treeMaker) // sharedPrefix need not be empty (but it only contains True-tests, which are dropped above)

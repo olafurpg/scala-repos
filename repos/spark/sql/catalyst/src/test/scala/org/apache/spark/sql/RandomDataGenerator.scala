@@ -231,10 +231,12 @@ object RandomDataGenerator {
         }
       }
       case MapType(keyType, valueType, valueContainsNull) => {
-        for (keyGenerator <- forType(keyType, nullable = false, rand);
-             valueGenerator <- forType(valueType,
-                                       nullable = valueContainsNull,
-                                       rand)) yield { () =>
+        for {
+          keyGenerator <- forType(keyType, nullable = false, rand)
+          valueGenerator <- forType(valueType,
+                                    nullable = valueContainsNull,
+                                    rand)
+        } yield { () =>
           {
             val length = rand.nextInt(MAX_MAP_SIZE)
             val keys = scala.collection.mutable

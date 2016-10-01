@@ -88,8 +88,10 @@ trait CompilerControl { self: Global =>
   /** Locates smallest context that encloses position as an optional value.
     */
   def locateContext(pos: Position): Option[Context] =
-    for (unit <- getUnit(pos.source); cx <- locateContext(unit.contexts, pos))
-      yield cx
+    for {
+      unit <- getUnit(pos.source)
+      cx <- locateContext(unit.contexts, pos)
+    } yield cx
 
   /** Returns the smallest context that contains given `pos`, throws FatalError if none exists.
     */
