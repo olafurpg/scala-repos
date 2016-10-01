@@ -461,7 +461,9 @@ object Compatibility {
       else {
         // inspect types default values
         val pack = parameters.zip(used)
-        for ((param, use) <- pack if param.isDefault && !use) {
+        for {
+          (param, use) <- pack if param.isDefault && !use
+        } {
           val paramType: ScType = param.paramType
           val defaultExpr = param.paramInCode.flatMap(_.getDefaultExpression)
           param.defaultType match {

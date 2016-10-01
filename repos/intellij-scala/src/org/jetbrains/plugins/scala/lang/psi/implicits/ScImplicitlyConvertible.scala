@@ -163,8 +163,10 @@ class ScImplicitlyConvertible(place: PsiElement,
                                                       place.getResolveScope)) {
         processor.processType(obj, place, ResolveState.initial())
       }
-      for (res <- processor.candidatesS.map(forMap(_, typez))
-           if res.condition) {
+      for {
+        res <- processor.candidatesS.map(forMap(_, typez))
+        if res.condition
+      } {
         buffer += res
       }
     }
@@ -267,7 +269,9 @@ class ScImplicitlyConvertible(place: PsiElement,
 
     val sigsFound = processor.candidatesS.map(forMap(_, typez))
 
-    for (res <- sigsFound if res.condition) {
+    for {
+      res <- sigsFound if res.condition
+    } {
       result += res
     }
 

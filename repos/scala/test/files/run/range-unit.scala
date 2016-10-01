@@ -40,7 +40,10 @@ object Test {
       val s =
         "%-7s %-7s %-7s %s".format("start", "end", "step", "length/first/last")
       println(s + "\n" + ("-" * s.length))
-      for (end <- endpoints; step <- numbers) {
+      for {
+        end <- endpoints
+        step <- numbers
+      } {
         print("%-7s %-7s %-7s ".format(num(start), num(end), num(step)))
         println(run(f(start, end, step)).mkString("/"))
       }

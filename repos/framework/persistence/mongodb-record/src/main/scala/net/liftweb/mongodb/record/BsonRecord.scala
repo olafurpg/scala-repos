@@ -149,7 +149,10 @@ trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]]
     * @return Unit
     */
   def setFieldsFromDBObject(inst: BaseRecord, dbo: DBObject): Unit = {
-    for (k <- dbo.keySet; field <- inst.fieldByName(k.toString)) {
+    for {
+      k <- dbo.keySet
+      field <- inst.fieldByName(k.toString)
+    } {
       field.setFromAny(dbo.get(k.toString))
     }
     inst.runSafe {

@@ -63,8 +63,10 @@ object FixInternalDebugLogging {
       val debugValue = if (isUsingDebug) newDebug else null
 
       var isPatched = false
-      for (debugClass <- findClasses;
-           debugField <- debugClass.getDeclaredFields) {
+      for {
+        debugClass <- findClasses
+        debugField <- debugClass.getDeclaredFields
+      } {
         if (isValidField(debugField, debugType)) {
           logger.debug(s"run: patching $debugClass with $debugValue")
           monkeyPatchField(debugField, debugValue)

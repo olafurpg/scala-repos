@@ -92,7 +92,9 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
   def indexStub(stub: ScValueStub, sink: IndexSink) {
     val names = stub.getNames
 
-    for (name <- names if name != null) {
+    for {
+      name <- names if name != null
+    } {
       sink.occurrence(ScalaIndexKeys.VALUE_NAME_KEY, name)
     }
     if (stub.isImplicit)

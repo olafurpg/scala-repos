@@ -25,7 +25,10 @@ object Test extends App {
 
   def f(ts: List[tType]): Unit = {
 
-    for (t <- ts; m = t.module) {}
+    for {
+      t <- ts
+      m = t.module
+    } {}
     ts.map(t => t.module).foreach { _ =>
       ()
     }

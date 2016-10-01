@@ -122,12 +122,14 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
             if (sharedPrefix.isEmpty) None
             else {
               // even sharing prefixes of length 1 brings some benefit (overhead-percentage for compiler: 26->24%, lib: 19->16%)
-              for (test <- sharedPrefix; reusedTest <- test.reuses)
-                reusedTest.treeMaker match {
-                  case reusedCTM: CondTreeMaker =>
-                    reused(reusedCTM) = ReusedCondTreeMaker(reusedCTM)
-                  case _ =>
-                }
+              for {
+                test <- sharedPrefix
+                reusedTest <- test.reuses
+              } reusedTest.treeMaker match {
+                case reusedCTM: CondTreeMaker =>
+                  reused(reusedCTM) = ReusedCondTreeMaker(reusedCTM)
+                case _ =>
+              }
 
               debug.patmat("sharedPrefix: " + sharedPrefix)
               debug.patmat("suffix: " + sharedPrefix)

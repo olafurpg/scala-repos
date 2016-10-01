@@ -150,7 +150,10 @@ class ScSyntheticClass(manager: PsiManager,
       //do nothing, there is no implicit synthetic methods
       case _: BaseProcessor =>
         //method toString and hashCode exists in java.lang.Object
-        for (p <- methods; method <- p._2) {
+        for {
+          p <- methods
+          method <- p._2
+        } {
           if (!processor.execute(method, state)) return false
         }
       case _ => //do not execute synthetic methods to not Scala processors.
@@ -333,15 +336,19 @@ class SyntheticClasses(project: Project)
     registerNumericClass(registerClass(Double, "Double"))
 
     for (nc <- numeric) {
-      for (nc1 <- numeric; op <- numeric_comp_ops)
-        nc.addMethod(
-          new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(nc1.t))))
-      for (nc1 <- numeric; op <- numeric_arith_ops)
-        nc.addMethod(
-          new ScSyntheticFunction(manager,
-                                  op,
-                                  op_type(nc, nc1),
-                                  Seq(Seq(nc1.t))))
+      for {
+        nc1 <- numeric
+        op <- numeric_comp_ops
+      } nc.addMethod(
+        new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(nc1.t))))
+      for {
+        nc1 <- numeric
+        op <- numeric_arith_ops
+      } nc.addMethod(
+        new ScSyntheticFunction(manager,
+                                op,
+                                op_type(nc, nc1),
+                                Seq(Seq(nc1.t))))
       for (nc1 <- numeric)
         nc.addMethod(
           new ScSyntheticFunction(manager,
@@ -357,12 +364,14 @@ class SyntheticClasses(project: Project)
     }
 
     for (ic <- integer) {
-      for (ic1 <- integer; op <- bitwise_bin_ops)
-        ic.addMethod(
-          new ScSyntheticFunction(manager,
-                                  op,
-                                  op_type(ic, ic1),
-                                  Seq(Seq(ic1.t))))
+      for {
+        ic1 <- integer
+        op <- bitwise_bin_ops
+      } ic.addMethod(
+        new ScSyntheticFunction(manager,
+                                op,
+                                op_type(ic, ic1),
+                                Seq(Seq(ic1.t))))
       ic.addMethod(
         new ScSyntheticFunction(manager, "unary_~", ic.t, Seq.empty))
 

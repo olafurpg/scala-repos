@@ -118,7 +118,10 @@ class DefaultPromiseTest {
 
     /** Check each promise has the expected value. */
     private def assertPromiseValues() {
-      for ((cid, chain) <- chains; p <- chain.promises) {
+      for {
+        (cid, chain) <- chains
+        p <- chain.promises
+      } {
         chain.state match {
           case Right(result) => assertEquals(Some(result), promises(p).value)
           case Left(_) => ()

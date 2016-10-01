@@ -131,8 +131,10 @@ private[sql] class SQLListener(conf: SparkConf)
 
   override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized {
     val jobId = jobEnd.jobId
-    for (executionId <- _jobIdToExecutionId.get(jobId);
-         executionUIData <- _executionIdToData.get(executionId)) {
+    for {
+      executionId <- _jobIdToExecutionId.get(jobId)
+      executionUIData <- _executionIdToData.get(executionId)
+    } {
       jobEnd.jobResult match {
         case JobSucceeded =>
           executionUIData.jobs(jobId) = JobExecutionStatus.SUCCEEDED

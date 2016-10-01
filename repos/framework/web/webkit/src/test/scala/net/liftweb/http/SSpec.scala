@@ -30,7 +30,9 @@ object SSpec extends Specification with XmlMatchers {
 
   "formFuncName" should {
     "generate random names when not in Test mode" in {
-      for (mode <- RunModes.values if mode != RunModes.Test) {
+      for {
+        mode <- RunModes.values if mode != RunModes.Test
+      } {
         val a, b = defaultFuncNameGenerator(mode)()
         a must startWith("F")
         a.length must_== Helpers.nextFuncName.length

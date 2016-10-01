@@ -23,7 +23,10 @@ trait MatrixGenericOps { this: Matrix.type =>
       require(a.cols == b.cols, "Col dimension mismatch!")
       val bb = subtype(b)
       // TODO: might make sense to have a "am I sparse?" check and use activeIterator instead?
-      for (i <- 0 until a.rows; j <- 0 until a.cols) {
+      for {
+        i <- 0 until a.rows
+        j <- 0 until a.cols
+      } {
         a(i, j) = bb(i, j)
       }
     }

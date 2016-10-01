@@ -41,7 +41,10 @@ object CacheUtils {
       action
 
       // Write cache
-      for (c <- cache; v <- version) {
+      for {
+        c <- cache
+        v <- version
+      } {
         val w = c.contentWriter
         try w.write(v)
         finally w.close()

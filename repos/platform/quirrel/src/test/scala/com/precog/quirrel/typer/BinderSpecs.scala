@@ -1251,7 +1251,9 @@ object BinderSpecs
 
   if (exampleDir.exists) {
     "specification examples" >> {
-      for (file <- exampleDir.listFiles if file.getName endsWith ".qrl") {
+      for {
+        file <- exampleDir.listFiles if file.getName endsWith ".qrl"
+      } {
         file.getName >> {
           val result = parseSingle(LineStream(Source.fromFile(file)))
           result.errors must beEmpty

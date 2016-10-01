@@ -108,7 +108,9 @@ trait KafkaServerTestHarness extends ZooKeeperTestHarness {
     * Restart any dead brokers
     */
   def restartDeadBrokers() {
-    for (i <- 0 until servers.length if !alive(i)) {
+    for {
+      i <- 0 until servers.length if !alive(i)
+    } {
       servers(i).startup()
       alive(i) = true
     }

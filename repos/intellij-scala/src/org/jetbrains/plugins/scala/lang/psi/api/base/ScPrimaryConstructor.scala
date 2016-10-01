@@ -131,17 +131,19 @@ trait ScPrimaryConstructor
                      clausePosition: Int = -1): Option[ScParameter] = {
     clausePosition match {
       case -1 =>
-        for (param <- parameters
-             if ScalaPsiUtil.memberNamesEquals(param.name, name))
-          return Some(param)
+        for {
+          param <- parameters
+          if ScalaPsiUtil.memberNamesEquals(param.name, name)
+        } return Some(param)
         None
       case i if i < 0 => None
       case i if i >= effectiveParameterClauses.length => None
       case i =>
         val clause: ScParameterClause = effectiveParameterClauses.apply(i)
-        for (param <- clause.parameters
-             if ScalaPsiUtil.memberNamesEquals(param.name, name))
-          return Some(param)
+        for {
+          param <- clause.parameters
+          if ScalaPsiUtil.memberNamesEquals(param.name, name)
+        } return Some(param)
         None
     }
   }
@@ -158,7 +160,9 @@ trait ScPrimaryConstructor
     }
 
     val params = parameters
-    for (i <- params.indices if params(i).baseDefaultParam) {
+    for {
+      i <- params.indices if params(i).baseDefaultParam
+    } {
       buffer += new ScPrimaryConstructorWrapper(this, forDefault = Some(i + 1))
     }
 

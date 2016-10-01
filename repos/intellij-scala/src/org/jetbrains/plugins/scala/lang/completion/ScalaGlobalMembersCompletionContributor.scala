@@ -179,7 +179,9 @@ class ScalaGlobalMembersCompletionContributor
     for (element <- collection) {
       element match {
         case v: ScValue =>
-          for (d <- v.declaredElements if isStatic(d)) {
+          for {
+            d <- v.declaredElements if isStatic(d)
+          } {
             proc.execute(d, ResolveState.initial())
           }
         case f: ScFunction if isStatic(f) =>

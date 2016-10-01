@@ -1055,8 +1055,10 @@ object ScalaPsiElementFactory {
       case m: PsiMethod =>
         var hasOverride = false
         if (m.getModifierList.getNode != null)
-          for (modifier <- m.getModifierList.getNode.getChildren(null);
-               modText = modifier.getText) {
+          for {
+            modifier <- m.getModifierList.getNode.getChildren(null)
+            modText = modifier.getText
+          } {
             modText match {
               case "override" =>
                 hasOverride = true;

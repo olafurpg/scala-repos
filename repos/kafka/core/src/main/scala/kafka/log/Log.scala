@@ -152,7 +152,9 @@ class Log(val dir: File,
 
     // first do a pass through the files in the log directory and remove any temporary files
     // and find any interrupted swap operations
-    for (file <- dir.listFiles if file.isFile) {
+    for {
+      file <- dir.listFiles if file.isFile
+    } {
       if (!file.canRead) throw new IOException("Could not read file " + file)
       val filename = file.getName
       if (filename.endsWith(DeletedFileSuffix) ||
@@ -179,7 +181,9 @@ class Log(val dir: File,
     }
 
     // now do a second pass and load all the .log and .index files
-    for (file <- dir.listFiles if file.isFile) {
+    for {
+      file <- dir.listFiles if file.isFile
+    } {
       val filename = file.getName
       if (filename.endsWith(IndexFileSuffix)) {
         // if it is an index file, make sure it has a corresponding .log file
@@ -723,7 +727,10 @@ class Log(val dir: File,
       val newOffset = logEndOffset
       val logFile = logFilename(dir, newOffset)
       val indexFile = indexFilename(dir, newOffset)
-      for (file <- List(logFile, indexFile); if file.exists) {
+      for {
+        file <- List(logFile, indexFile)
+        if file.exists
+      } {
         warn(
           "Newly rolled segment file " + file.getName +
             " already exists; deleting it first")

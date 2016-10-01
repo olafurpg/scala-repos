@@ -123,7 +123,9 @@ object Test {
     val n = lines.next.toInt
     data = new Array[Complex](n)
     var i = 0
-    for (line <- lines if line != "") {
+    for {
+      line <- lines if line != ""
+    } {
       val pair = line.trim.split(" ")
       data(i) = (pair(0).trim.toDouble, pair(1).trim.toDouble)
       i += 1

@@ -410,7 +410,10 @@ trait TypeDiagnostics { self: Analyzer =>
         names(sym.name) += diag
       }
     }
-    for (tpe <- types; t <- tpe) {
+    for {
+      tpe <- types
+      t <- tpe
+    } {
       t match {
         case ConstantType(_) => record(t, t.underlying.typeSymbol)
         case TypeRef(_, sym, _) => record(t, sym)
@@ -513,8 +516,11 @@ trait TypeDiagnostics { self: Analyzer =>
           // Only record type references which don't originate within the
           // definition of the class being referenced.
           if (t.tpe ne null) {
-            for (tp <- t.tpe; if !treeTypes(tp) &&
-                   !currentOwner.ownerChain.contains(tp.typeSymbol)) {
+            for {
+              tp <- t.tpe
+              if !treeTypes(tp) &&
+                !currentOwner.ownerChain.contains(tp.typeSymbol)
+            } {
               tp match {
                 case NoType | NoPrefix =>
                 case NullaryMethodType(_) =>

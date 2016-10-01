@@ -998,8 +998,10 @@ class ScalaAnnotator
     AnnotatorHighlighter.highlightReferenceElement(refElement, holder)
     var resolve: Array[ResolveResult] = null
     resolve = refElement.multiResolve(false)
-    for (result <- resolve if result.isInstanceOf[ScalaResolveResult];
-         scalaResult = result.asInstanceOf[ScalaResolveResult]) {
+    for {
+      result <- resolve if result.isInstanceOf[ScalaResolveResult]
+      scalaResult = result.asInstanceOf[ScalaResolveResult]
+    } {
       registerUsedImports(refElement, scalaResult)
       registerUsedElement(refElement, scalaResult, checkWrite = true)
     }

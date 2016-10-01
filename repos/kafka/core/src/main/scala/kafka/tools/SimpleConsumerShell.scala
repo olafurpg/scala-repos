@@ -276,8 +276,10 @@ object SimpleConsumerShell extends Logging {
             debug(
               "multi fetched " + messageSet.sizeInBytes +
                 " bytes from offset " + offset)
-            for (messageAndOffset <- messageSet
-                 if numMessagesConsumed < maxMessages) {
+            for {
+              messageAndOffset <- messageSet
+              if numMessagesConsumed < maxMessages
+            } {
               try {
                 offset = messageAndOffset.nextOffset
                 if (printOffsets) System.out.println("next offset = " + offset)

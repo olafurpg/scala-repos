@@ -90,8 +90,10 @@ private[finagle] object StabilizingAddr {
 
             // Add newly removed elements to the remove queue.
             val until = Time.now + grace
-            for (el <- active &~ newSet
-                 if !qcontains(q, el)) q = q.enqueue((el, until))
+            for {
+              el <- active &~ newSet
+              if !qcontains(q, el)
+            } q = q.enqueue((el, until))
 
             loop(q, h, active ++ newSet, true, addr)
 

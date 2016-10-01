@@ -46,7 +46,9 @@ class JSFileBuilder(val name: String, protected val outputWriter: Writer)
     addPartsOfFile(file)(!_.startsWith("//# sourceMappingURL="))
 
   def addPartsOfFile(file: VirtualJSFile)(selector: String => Boolean): Unit = {
-    for (line <- file.readLines() if selector(line)) addLine(line)
+    for {
+      line <- file.readLines() if selector(line)
+    } addLine(line)
   }
 
   /** Add a JavaScript tree representing a statement.

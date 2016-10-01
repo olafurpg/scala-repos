@@ -47,11 +47,13 @@ class MethodImplementationsSearch
                        consumer: Processor[PsiElement]): Boolean = {
     sourceElement match {
       case namedElement: ScNamedElement =>
-        for (implementation <- ScalaOverridingMemberSearcher
-               .getOverridingMethods(namedElement)
-             //to avoid duplicates with ScalaOverridingMemberSearcher
-             if !namedElement.isInstanceOf[PsiMethod] ||
-               !implementation.isInstanceOf[PsiMethod]) {
+        for {
+          implementation <- ScalaOverridingMemberSearcher.getOverridingMethods(
+            namedElement)
+          //to avoid duplicates with ScalaOverridingMemberSearcher
+          if !namedElement.isInstanceOf[PsiMethod] ||
+            !implementation.isInstanceOf[PsiMethod]
+        } {
           if (!consumer.process(implementation)) {
             return false
           }
@@ -73,9 +75,11 @@ class ScalaOverridingMemberSearcher
     val method = queryParameters.getMethod
     method match {
       case namedElement: ScNamedElement =>
-        for (implementation <- ScalaOverridingMemberSearcher
-               .getOverridingMethods(namedElement)
-             if implementation.isInstanceOf[PsiMethod]) {
+        for {
+          implementation <- ScalaOverridingMemberSearcher.getOverridingMethods(
+            namedElement)
+          if implementation.isInstanceOf[PsiMethod]
+        } {
           if (!consumer.process(implementation.asInstanceOf[PsiMethod])) {
             return false
           }
@@ -132,12 +136,16 @@ object ScalaOverridingMemberSearcher {
       def inheritorsOfType(name: String): Boolean = {
         inheritor match {
           case inheritor: ScTypeDefinition =>
-            for (aliass <- inheritor.aliases if name == aliass.name) {
+            for {
+              aliass <- inheritor.aliases if name == aliass.name
+            } {
               buffer += aliass
               if (!deep) return false
             }
-            for (td <- inheritor.typeDefinitions if !td.isObject &&
-                   name == td.name) {
+            for {
+              td <- inheritor.typeDefinitions if !td.isObject &&
+                name == td.name
+            } {
               buffer += td
               if (!deep) return false
             }
@@ -188,7 +196,9 @@ object ScalaOverridingMemberSearcher {
         .search(parentClass, scope, true)
         .toArray(PsiClass.EMPTY_ARRAY)
     }
-    for (clazz <- inheritors if !break) {
+    for {
+      clazz <- inheritors if !break
+    } {
       break = !process(clazz)
     }
 
@@ -196,7 +206,9 @@ object ScalaOverridingMemberSearcher {
       val inheritors = ScalaStubsUtil
         .getSelfTypeInheritors(parentClass, parentClass.getResolveScope)
       break = false
-      for (clazz <- inheritors if !break) {
+      for {
+        clazz <- inheritors if !break
+      } {
         break = !process(clazz)
       }
     }

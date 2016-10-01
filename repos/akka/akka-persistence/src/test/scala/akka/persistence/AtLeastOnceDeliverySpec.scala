@@ -496,13 +496,17 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       }
 
       // initially all odd messages should go through
-      for (n ← 1 to N if n % 2 == 1) probeA.expectMsg(Action(n, s"a-$n"))
+      for {
+        n ← 1 to N if n % 2 == 1
+      } probeA.expectMsg(Action(n, s"a-$n"))
       probeA.expectNoMsg(100.millis)
 
       // at each redelivery round, 2 (even) messages are sent, the first goes through
       // without throttling, at each round half of the messages would go through
       var toDeliver = (1 to N).filter(_ % 2 == 0).map(_.toLong).toSet
-      for (n ← 1 to N if n % 2 == 0) {
+      for {
+        n ← 1 to N if n % 2 == 0
+      } {
         toDeliver -= probeA.expectMsgType[Action].id
         probeA.expectNoMsg(100.millis)
       }

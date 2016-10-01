@@ -306,7 +306,9 @@ private[scalajs] object UseAsMacros {
           def allowedParent(sym: Symbol) =
             sym.asClass.isTrait || JSObjectAncestors(sym)
 
-          for (base <- sym.baseClasses if !allowedParent(base)) {
+          for {
+            base <- sym.baseClasses if !allowedParent(base)
+          } {
             c.abort(c.enclosingPosition,
                     s"Supertype ${base.fullName} of $sym " +
                       "is a class. Cannot be used with as.")
@@ -317,7 +319,9 @@ private[scalajs] object UseAsMacros {
         case tpe @ RefinedType(parents, decls) =>
           parents.foreach(verifyTargetType)
 
-          for (decl <- decls if !decl.isType) {
+          for {
+            decl <- decls if !decl.isType
+          } {
             c.abort(c.enclosingPosition,
                     s"Refinement ${decl.name} " +
                       "is not a type. Only types may be refined with as.")

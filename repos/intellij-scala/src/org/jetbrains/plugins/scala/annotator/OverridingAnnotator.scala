@@ -183,8 +183,10 @@ trait OverridingAnnotator {
       }
     } else if (isConcreteElement(ScalaPsiUtil.nameContext(member))) {
       var isConcretes = false
-      for (signature <- superSignatures if !isConcretes &&
-             isConcrete(signature)) isConcretes = true
+      for {
+        signature <- superSignatures if !isConcretes &&
+          isConcrete(signature)
+      } isConcretes = true
       if (isConcretes && !owner.hasModifierProperty("override")) {
         val annotation: Annotation = holder.createErrorAnnotation(
           member.nameId,
@@ -235,7 +237,9 @@ trait OverridingAnnotator {
       }
       //fix for SCL-7831
       var overridesFinal = false
-      for (signature <- superSignatures if !overridesFinal) {
+      for {
+        signature <- superSignatures if !overridesFinal
+      } {
         val e = signature match {
           case signature: Signature => signature.namedElement
           case _ => signature

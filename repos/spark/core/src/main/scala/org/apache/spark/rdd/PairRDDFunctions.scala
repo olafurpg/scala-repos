@@ -1053,7 +1053,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
         val index = p.getPartition(key)
         val process = (it: Iterator[(K, V)]) => {
           val buf = new ArrayBuffer[V]
-          for (pair <- it if pair._1 == key) {
+          for {
+            pair <- it if pair._1 == key
+          } {
             buf += pair._2
           }
           buf

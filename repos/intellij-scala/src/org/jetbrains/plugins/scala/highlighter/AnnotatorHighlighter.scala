@@ -456,7 +456,9 @@ object AnnotatorHighlighter {
   private def visitPattern(pattern: ScPattern,
                            holder: AnnotationHolder,
                            attribute: TextAttributesKey): Unit = {
-    for (binding <- pattern.bindings if !binding.isWildcard) {
+    for {
+      binding <- pattern.bindings if !binding.isWildcard
+    } {
       val annotation = holder.createInfoAnnotation(binding.nameId, null)
       annotation.setTextAttributes(attribute)
     }

@@ -343,7 +343,10 @@ object CSCMatrix
       ClassTag[V](data.getClass.getComponentType.asInstanceOf[Class[V]])
     val res = zeros(rows, cols, data.length)
     var i = 0
-    for (c <- 0 until cols; r <- 0 until rows) {
+    for {
+      c <- 0 until cols
+      r <- 0 until rows
+    } {
       val v = data(i)
       i += 1
       if (v != z) {

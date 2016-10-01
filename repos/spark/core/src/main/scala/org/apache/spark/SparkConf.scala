@@ -62,8 +62,10 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
 
   private[spark] def loadFromSystemProperties(silent: Boolean): SparkConf = {
     // Load any spark.* system properties
-    for ((key, value) <- Utils.getSystemProperties
-         if key.startsWith("spark.")) {
+    for {
+      (key, value) <- Utils.getSystemProperties
+      if key.startsWith("spark.")
+    } {
       set(key, value, silent)
     }
     this
@@ -116,8 +118,9 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
 
   /** Set JAR files to distribute to the cluster. */
   def setJars(jars: Seq[String]): SparkConf = {
-    for (jar <- jars if (jar == null))
-      logWarning("null jar passed to SparkContext constructor")
+    for {
+      jar <- jars if (jar == null)
+    } logWarning("null jar passed to SparkContext constructor")
     set("spark.jars", jars.filter(_ != null).mkString(","))
   }
 

@@ -722,7 +722,9 @@ private[log] class Cleaner(val id: Int,
               .format(start, offset, log.name))
     val maxDesiredMapSize = (map.slots * this.dupBufferLoadFactor).toInt
     var full = false
-    for (segment <- dirty if !full) {
+    for {
+      segment <- dirty if !full
+    } {
       checkDone(log.topicAndPartition)
       val segmentSize = segment.nextOffset() - segment.baseOffset
 

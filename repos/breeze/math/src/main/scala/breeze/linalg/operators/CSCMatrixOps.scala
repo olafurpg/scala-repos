@@ -1233,7 +1233,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         require(cols == b.cols, "Matrices must have same number of cols!")
 
         val builder = new CSCMatrix.Builder[R](rows, cols)
-        for (c <- 0 until cols; r <- 0 until rows) {
+        for {
+          c <- 0 until cols
+          r <- 0 until rows
+        } {
           builder.add(r, c, fn((r, c), a(r, c), b(r, c)))
         }
 
@@ -1250,7 +1253,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         require(cols == b.cols, "Matrices must have same number of cols!")
 
         val builder = new CSCMatrix.Builder[R](rows, cols)
-        for (c <- 0 until cols; r <- 0 until rows) {
+        for {
+          c <- 0 until cols
+          r <- 0 until rows
+        } {
           builder.add(r, c, fn((r, c), a(r, c), b(r, c)))
         }
 

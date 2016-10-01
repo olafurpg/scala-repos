@@ -242,7 +242,11 @@ trait MMRegistry2[R] {
         val sa = closeSupertypes(a)
         val sb = closeSupertypes(b)
         val candidates = ArrayBuffer[((Class[_], Class[_]), R)]()
-        for (aa <- sa; bb <- sb; op <- ops.get(aa -> bb)) {
+        for {
+          aa <- sa
+          bb <- sb
+          op <- ops.get(aa -> bb)
+        } {
           candidates += ((aa -> bb) -> op)
         }
         candidates.toMap[(Class[_], Class[_]), R]
@@ -282,7 +286,11 @@ trait MMRegistry3[R] {
       if (a.isPrimitive) Seq(a, ReflectionUtil.boxedFromPrimitive(a))
       else Seq(a)
 
-    for (ac <- choicesFor(a); bc <- choicesFor(b); cc <- choicesFor(c)) {
+    for {
+      ac <- choicesFor(a)
+      bc <- choicesFor(b)
+      cc <- choicesFor(c)
+    } {
       ops((ac, bc, cc)) = op
     }
 
@@ -319,7 +327,12 @@ trait MMRegistry3[R] {
         val sb = closeSupertypes(b)
         val sc = closeSupertypes(c)
         val candidates = ArrayBuffer[((Class[_], Class[_], Class[_]), R)]()
-        for (aa <- sa; bb <- sb; cc <- sc; op <- ops.get((aa, bb, cc))) {
+        for {
+          aa <- sa
+          bb <- sb
+          cc <- sc
+          op <- ops.get((aa, bb, cc))
+        } {
           candidates += ((aa, bb, cc) -> op)
         }
         candidates.toMap[(Class[_], Class[_], Class[_]), R]

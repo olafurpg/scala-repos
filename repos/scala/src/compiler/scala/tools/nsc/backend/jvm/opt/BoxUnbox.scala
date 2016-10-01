@@ -446,8 +446,10 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         case _ =>
       }
 
-      for ((location, ops) <- toInsertBefore; op <- ops)
-        method.instructions.insertBefore(location, op)
+      for {
+        (location, ops) <- toInsertBefore
+        op <- ops
+      } method.instructions.insertBefore(location, op)
 
       for ((oldOp, newOps) <- toReplace) {
         for (newOp <- newOps) method.instructions.insertBefore(oldOp, newOp)

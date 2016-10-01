@@ -37,7 +37,9 @@ class TryTest {
   @Test
   def withFilterForeach(): Unit = {
     var ok = false
-    for (x <- util.Try(1) if x == 1) ok = x == 1
+    for {
+      x <- util.Try(1) if x == 1
+    } ok = x == 1
     assert(ok)
   }
 }

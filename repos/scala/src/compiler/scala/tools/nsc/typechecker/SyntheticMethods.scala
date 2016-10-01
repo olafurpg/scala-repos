@@ -417,8 +417,10 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       val lb = ListBuffer[Tree]()
       def isRewrite(sym: Symbol) = sym.isCaseAccessorMethod && !sym.isPublic
 
-      for (ddef @ DefDef(_, _, _, _, _, _) <- templ.body;
-           if isRewrite(ddef.symbol)) {
+      for {
+        ddef @ DefDef(_, _, _, _, _, _) <- templ.body
+        if isRewrite(ddef.symbol)
+      } {
         val original = ddef.symbol
         val i = original.owner.caseFieldAccessors.indexOf(original)
         def freshAccessorName = {

@@ -295,13 +295,19 @@ class StreamLayoutSpec extends AkkaSpec {
     val allAtomic = getAllAtomic(topLevel)
 
     for (atomic ← allAtomic) {
-      for (in ← atomic.inPorts; subscriber = inToSubscriber(in)) {
+      for {
+        in ← atomic.inPorts
+        subscriber = inToSubscriber(in)
+      } {
         subscriber.owner should be(atomic)
         subscriber.upstreamPort should be(topLevel.upstreams(in))
         subscriber.upstreamModule.outPorts
           .exists(outToPublisher(_).downstreamPort == in)
       }
-      for (out ← atomic.outPorts; publisher = outToPublisher(out)) {
+      for {
+        out ← atomic.outPorts
+        publisher = outToPublisher(out)
+      } {
         publisher.owner should be(atomic)
         publisher.downstreamPort should be(topLevel.downstreams(out))
         publisher.downstreamModule.inPorts

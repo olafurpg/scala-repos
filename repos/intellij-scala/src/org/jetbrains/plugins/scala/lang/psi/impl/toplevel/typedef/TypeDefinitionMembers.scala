@@ -104,16 +104,20 @@ object TypeDefinitionMembers {
                     subst: ScSubstitutor,
                     map: Map,
                     place: Option[PsiElement]) {
-      for (method <- clazz.getMethods if nonBridge(place, method) &&
-             !method.isConstructor &&
-             !method.hasModifierProperty("static") &&
-             method.getParameterList.getParametersCount == 0) {
+      for {
+        method <- clazz.getMethods if nonBridge(place, method) &&
+          !method.isConstructor &&
+          !method.hasModifierProperty("static") &&
+          method.getParameterList.getParametersCount == 0
+      } {
         val phys = new PhysicalSignature(method, subst)
         map addToMap (phys, new Node(phys, subst))
       }
 
-      for (field <- clazz.getFields if nonBridge(place, field) &&
-             !field.hasModifierProperty("static")) {
+      for {
+        field <- clazz.getFields if nonBridge(place, field) &&
+          !field.hasModifierProperty("static")
+      } {
         val sig = new Signature(field.getName, Seq.empty, 0, subst, field)
         map addToMap (sig, new Node(sig, subst))
       }
@@ -203,7 +207,9 @@ object TypeDefinitionMembers {
             }
           case constr: ScPrimaryConstructor =>
             val parameters = constr.parameters
-            for (param <- parameters if nonBridge(place, param)) {
+            for {
+              param <- parameters if nonBridge(place, param)
+            } {
               addSignature(
                 new Signature(param.name, Seq.empty, 0, subst, param))
               val beanProperty =
@@ -240,8 +246,10 @@ object TypeDefinitionMembers {
         }
       }
 
-      for (method <- template.syntheticMethodsWithOverride
-           if method.getParameterList.getParametersCount == 0) {
+      for {
+        method <- template.syntheticMethodsWithOverride
+        if method.getParameterList.getParametersCount == 0
+      } {
         val sig = new PhysicalSignature(method, subst)
         addSignature(sig)
       }
@@ -261,8 +269,10 @@ object TypeDefinitionMembers {
       }
 
       if (!base) {
-        for (method <- template.syntheticMethodsNoOverride
-             if method.getParameterList.getParametersCount == 0) {
+        for {
+          method <- template.syntheticMethodsNoOverride
+          if method.getParameterList.getParametersCount == 0
+        } {
           val sig = new PhysicalSignature(method, subst)
           addSignature(sig)
         }
@@ -321,8 +331,10 @@ object TypeDefinitionMembers {
                     subst: ScSubstitutor,
                     map: Map,
                     place: Option[PsiElement]) {
-      for (inner <- clazz.getInnerClasses if nonBridge(place, inner) &&
-             !inner.hasModifierProperty("static")) {
+      for {
+        inner <- clazz.getInnerClasses if nonBridge(place, inner) &&
+          !inner.hasModifierProperty("static")
+      } {
         map addToMap (inner, new Node(inner, subst))
       }
     }
@@ -343,7 +355,9 @@ object TypeDefinitionMembers {
         }
       }
 
-      for (td <- template.syntheticTypeDefinitions if !td.isObject) {
+      for {
+        td <- template.syntheticTypeDefinitions if !td.isObject
+      } {
         map addToMap (td, new Node(td, subst))
       }
     }
@@ -351,8 +365,10 @@ object TypeDefinitionMembers {
     def processRefinement(cp: ScCompoundType,
                           map: Map,
                           place: Option[PsiElement]) {
-      for ((name, TypeAliasSignature(_, _, _, _, _, alias)) <- cp.typesMap
-           if nonBridge(place, alias)) {
+      for {
+        (name, TypeAliasSignature(_, _, _, _, _, alias)) <- cp.typesMap
+        if nonBridge(place, alias)
+      } {
         map addToMap (alias, new Node(alias, ScSubstitutor.empty))
       }
     }
@@ -408,15 +424,19 @@ object TypeDefinitionMembers {
                     subst: ScSubstitutor,
                     map: Map,
                     place: Option[PsiElement]) {
-      for (method <- clazz.getMethods if nonBridge(place, method) &&
-             !method.isConstructor &&
-             !method.hasModifierProperty("static")) {
+      for {
+        method <- clazz.getMethods if nonBridge(place, method) &&
+          !method.isConstructor &&
+          !method.hasModifierProperty("static")
+      } {
         val phys = new PhysicalSignature(method, subst)
         map addToMap (phys, new Node(phys, subst))
       }
 
-      for (field <- clazz.getFields if nonBridge(place, field) &&
-             !field.hasModifierProperty("static")) {
+      for {
+        field <- clazz.getFields if nonBridge(place, field) &&
+          !field.hasModifierProperty("static")
+      } {
         val sig = new Signature(field.getName, Seq.empty, 0, subst, field)
         map addToMap (sig, new Node(sig, subst))
       }
@@ -517,7 +537,9 @@ object TypeDefinitionMembers {
             }
           case constr: ScPrimaryConstructor =>
             val parameters = constr.parameters
-            for (param <- parameters if nonBridge(place, param)) {
+            for {
+              param <- parameters if nonBridge(place, param)
+            } {
               lazy val t = param.getType(TypingContext.empty).getOrAny
               addSignature(
                 new Signature(param.name, Seq.empty, 0, subst, param))

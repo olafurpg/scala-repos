@@ -44,10 +44,11 @@ class ScalaRedundantConversionInspection
                       holder: ProblemsHolder) {
     target match {
       case f: ScSyntheticFunction if f.name.startsWith("to") =>
-        for (leftType <- left.getType(TypingContext.empty);
-             conversionType = f.retType
-             if leftType.equiv(conversionType))
-          registerProblem(element,
+        for {
+          leftType <- left.getType(TypingContext.empty)
+          conversionType = f.retType
+          if leftType.equiv(conversionType)
+        } registerProblem(element,
                           left,
                           conversionType.presentableText,
                           offset,
@@ -57,9 +58,10 @@ class ScalaRedundantConversionInspection
             f.getParameterList.getParametersCount == 0 &&
             (f.getTypeParameterList == null ||
               f.getTypeParameterList.getTypeParameters.isEmpty) =>
-        for (leftType <- left.getType(TypingContext.empty)
-             if leftType.canonicalText == "_root_.java.lang.String")
-          registerProblem(element, left, "java.lang.String", offset, holder)
+        for {
+          leftType <- left.getType(TypingContext.empty)
+          if leftType.canonicalText == "_root_.java.lang.String"
+        } registerProblem(element, left, "java.lang.String", offset, holder)
       case _ =>
     }
   }

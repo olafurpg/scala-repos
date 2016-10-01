@@ -148,7 +148,9 @@ trait ScReferenceElement
               if Set("apply", "unapply", "unapplySeq").contains(method.name) =>
             var break = false
             val methods = td.allMethods
-            for (n <- methods if !break) {
+            for {
+              n <- methods if !break
+            } {
               if (n.method.name == method.name) {
                 val methodContainingClass: ScTemplateDefinition =
                   method.containingClass

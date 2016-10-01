@@ -70,8 +70,10 @@ class ScSelfInvocationImpl(node: ASTNode)
                                           isShapeResolve = shapeResolve,
                                           enableTupling = true,
                                           selfConstructorResolve = true)
-    for (constr <- clazz.secondaryConstructors.filter(_ != method)
-         if constr != method) {
+    for {
+      constr <- clazz.secondaryConstructors.filter(_ != method)
+      if constr != method
+    } {
       proc.execute(constr, ResolveState.initial)
     }
     clazz.constructor match {

@@ -206,8 +206,10 @@ trait DocComments { self: Global =>
           }
       }
 
-    for (params <- sym.paramss; param <- params)
-      mergeSection(srcParams get param.name.toString,
+    for {
+      params <- sym.paramss
+      param <- params
+    } mergeSection(srcParams get param.name.toString,
                    dstParams get param.name.toString)
     for (tparam <- sym.typeParams)
       mergeSection(srcTParams get tparam.name.toString,

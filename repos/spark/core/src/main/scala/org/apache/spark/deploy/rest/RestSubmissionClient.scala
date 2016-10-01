@@ -83,7 +83,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     logInfo(s"Submitting a request to launch an application in $master.")
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for {
+      m <- masters if !handled
+    } {
       validateMaster(m)
       val url = getSubmitUrl(m)
       try {
@@ -116,7 +118,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
       s"Submitting a request to kill submission $submissionId in $master.")
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for {
+      m <- masters if !handled
+    } {
       validateMaster(m)
       val url = getKillUrl(m, submissionId)
       try {
@@ -151,7 +155,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
 
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for {
+      m <- masters if !handled
+    } {
       validateMaster(m)
       val url = getStatusUrl(m, submissionId)
       try {

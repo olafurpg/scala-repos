@@ -87,7 +87,10 @@ class FramingSpec extends AkkaSpec {
       } yield delimiter.take(prefix) ++ s
 
     "work with various delimiters and test sequences" in {
-      for (delimiter ← delimiterBytes; _ ← 1 to 100) {
+      for {
+        delimiter ← delimiterBytes
+        _ ← 1 to 100
+      } {
         val f = Source(completeTestSequences(delimiter))
           .map(_ ++ delimiter)
           .via(rechunk)

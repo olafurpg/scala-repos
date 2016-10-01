@@ -95,37 +95,38 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     // cannot be rewritten, for example because the lambda body method is not accessible, issue a
     // warning. The `toList` in the next line prevents modifying closureInstantiations while
     // iterating it: minimalRemoveUnreachableCode (called in the loop) removes elements.
-    for (method <- closureInstantiations.keysIterator.toList
-         if AsmAnalyzer.sizeOKForBasicValue(method))
-      closureInstantiations.get(method) match {
-        case Some(closureInitsBeforeDCE) if closureInitsBeforeDCE.nonEmpty =>
-          val ownerClass =
-            closureInitsBeforeDCE.head._2.ownerClass.internalName
+    for {
+      method <- closureInstantiations.keysIterator.toList
+      if AsmAnalyzer.sizeOKForBasicValue(method)
+    } closureInstantiations.get(method) match {
+      case Some(closureInitsBeforeDCE) if closureInitsBeforeDCE.nonEmpty =>
+        val ownerClass =
+          closureInitsBeforeDCE.head._2.ownerClass.internalName
 
-          // Advanced ProdCons queries (initialProducersForValueAt) expect no unreachable code.
-          localOpt.minimalRemoveUnreachableCode(method, ownerClass)
+        // Advanced ProdCons queries (initialProducersForValueAt) expect no unreachable code.
+        localOpt.minimalRemoveUnreachableCode(method, ownerClass)
 
-          if (AsmAnalyzer.sizeOKForSourceValue(method))
-            closureInstantiations.get(method) match {
-              case Some(closureInits) =>
-                // A lazy val to ensure the analysis only runs if necessary (the value is passed by name to `closureCallsites`)
-                lazy val prodCons = new ProdConsAnalyzer(method, ownerClass)
+        if (AsmAnalyzer.sizeOKForSourceValue(method))
+          closureInstantiations.get(method) match {
+            case Some(closureInits) =>
+              // A lazy val to ensure the analysis only runs if necessary (the value is passed by name to `closureCallsites`)
+              lazy val prodCons = new ProdConsAnalyzer(method, ownerClass)
 
-                for (init <- closureInits.valuesIterator)
-                  closureCallsites(init, prodCons) foreach {
-                    case Left(warning) =>
-                      backendReporting.inlinerWarning(warning.pos,
-                                                      warning.toString)
+              for (init <- closureInits.valuesIterator)
+                closureCallsites(init, prodCons) foreach {
+                  case Left(warning) =>
+                    backendReporting.inlinerWarning(warning.pos,
+                                                    warning.toString)
 
-                    case Right((invocation, stackHeight)) =>
-                      addRewrite(init, invocation, stackHeight)
-                  }
+                  case Right((invocation, stackHeight)) =>
+                    addRewrite(init, invocation, stackHeight)
+                }
 
-              case _ =>
-            }
+            case _ =>
+          }
 
-        case _ =>
-      }
+      case _ =>
+    }
 
     for ((closureInit, invocations) <- toRewrite) {
       // Local variables that hold the captured values and the closure invocation arguments.

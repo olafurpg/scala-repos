@@ -412,7 +412,10 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           }
           // add a refinement symbol for all non-class members of lubBase
           // which are refined by every type in ts.
-          for (sym <- lubBase.nonPrivateMembers; if !excludeFromLub(sym)) {
+          for {
+            sym <- lubBase.nonPrivateMembers
+            if !excludeFromLub(sym)
+          } {
             try lubsym(sym) andAlso
               (addMember(lubThisType, lubRefined, _, depth))
             catch {
@@ -574,11 +577,12 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                     var result: Type =
                       if (symbounds.isEmpty) TypeBounds.empty
                       else glbBounds(symbounds)
-                    for (t <- symtypes
-                         if !isTypeBound(t))
-                      if (result.bounds containsType t)
-                        result = t
-                      else throw GlbFailure
+                    for {
+                      t <- symtypes
+                      if !isTypeBound(t)
+                    } if (result.bounds containsType t)
+                      result = t
+                    else throw GlbFailure
                     result
                   })
             }
@@ -586,14 +590,16 @@ private[internal] trait GlbLubs { self: SymbolTable =>
               try {
                 globalGlbDepth = globalGlbDepth.incr
                 val dss = ts flatMap refinedToDecls
-                for (ds <- dss; sym <- ds.iterator)
-                  if (globalGlbDepth < globalGlbLimit &&
+                for {
+                  ds <- dss
+                  sym <- ds.iterator
+                } if (globalGlbDepth < globalGlbLimit &&
                       !specializesSym(glbThisType, sym, depth))
-                    try {
-                      addMember(glbThisType, glbRefined, glbsym(sym), depth)
-                    } catch {
-                      case ex: NoCommonType =>
-                    }
+                  try {
+                    addMember(glbThisType, glbRefined, glbsym(sym), depth)
+                  } catch {
+                    case ex: NoCommonType =>
+                  }
               } finally {
                 globalGlbDepth = globalGlbDepth.decr
               }

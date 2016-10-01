@@ -155,7 +155,11 @@ final class Board {
     boardHasSpace
   }
 
-  def remove(piece: Piece) = for (c <- cells; if c.piece == piece) c.empty
+  def remove(piece: Piece) =
+    for {
+      c <- cells
+      if c.piece == piece
+    } c.empty
 
   private def find(p: PieceCell, b: BoardCell): Unit = {
     if (p != null && !p.marked && b != null) {

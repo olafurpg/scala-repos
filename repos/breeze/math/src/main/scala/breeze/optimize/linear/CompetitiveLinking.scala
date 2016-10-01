@@ -39,9 +39,11 @@ object CompetitiveLinking extends BipartiteMatching {
     val rightSet = new BitSet(m);
     val matching = Array.fill(n)(-1);
     var score = 0.0;
-    for (pred <- preds.iterator.takeWhile(
-           _ => leftSet.size < n || rightSet.size < m);
-         if !leftSet(pred.i) && !rightSet(pred.j)) {
+    for {
+      pred <- preds.iterator.takeWhile(_ =>
+        leftSet.size < n || rightSet.size < m)
+      if !leftSet(pred.i) && !rightSet(pred.j)
+    } {
       matching(pred.i) = pred.j;
       leftSet.add(pred.i);
       rightSet.add(pred.j);

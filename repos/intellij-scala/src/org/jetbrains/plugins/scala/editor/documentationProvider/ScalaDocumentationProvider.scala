@@ -622,8 +622,10 @@ object ScalaDocumentationProvider {
         processParams(function)
         processTypeParams(function)
 
-        for (annotation <- function.annotations
-             if annotation.annotationExpr.getText.startsWith("throws")) {
+        for {
+          annotation <- function.annotations
+          if annotation.annotationExpr.getText.startsWith("throws")
+        } {
           buffer
             .append(leadingAsterisks)
             .append(MyScaladocParsing.THROWS_TAG)
@@ -665,7 +667,9 @@ object ScalaDocumentationProvider {
         }
       case scType: ScTypeAlias =>
         val parents = ScalaPsiUtil.superTypeMembers(scType)
-        for (parent <- parents if parent.isInstanceOf[ScTypeAlias]) {
+        for {
+          parent <- parents if parent.isInstanceOf[ScTypeAlias]
+        } {
           processProbablyJavaDocCommentWithOwner(
             parent.asInstanceOf[ScTypeAlias])
         }
@@ -790,9 +794,10 @@ object ScalaDocumentationProvider {
     })
     val modifiers =
       Array("abstract", "final", "sealed", "implicit", "lazy", "override")
-    for (modifier <- modifiers
-         if elem.hasModifierPropertyScala(modifier))
-      buffer.append(modifier + " ")
+    for {
+      modifier <- modifiers
+      if elem.hasModifierPropertyScala(modifier)
+    } buffer.append(modifier + " ")
     buffer.toString()
   }
 

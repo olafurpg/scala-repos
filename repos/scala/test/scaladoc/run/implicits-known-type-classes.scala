@@ -28,7 +28,9 @@ object Test extends ScaladocModelTest {
 
     val A = base._class("A")
 
-    for (conversion <- A.conversions if !conversion.isHiddenConversion) {
+    for {
+      conversion <- A.conversions if !conversion.isHiddenConversion
+    } {
       assert(conversion.constraints.length == 1,
              conversion.constraints.length + " == 1 (in " + conversion + ")")
       assert(

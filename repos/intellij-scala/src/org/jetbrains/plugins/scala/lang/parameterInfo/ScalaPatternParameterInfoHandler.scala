@@ -259,8 +259,10 @@ class ScalaPatternParameterInfoHandler
               if (ref != null) {
                 val name = ref.refName
                 val variants: Array[ResolveResult] = ref.multiResolve(false)
-                for (variant <- variants
-                     if variant.isInstanceOf[ScalaResolveResult]) {
+                for {
+                  variant <- variants
+                  if variant.isInstanceOf[ScalaResolveResult]
+                } {
                   val r = variant.asInstanceOf[ScalaResolveResult]
                   r.element match {
                     case fun: ScFunction if fun.parameters.nonEmpty =>
@@ -315,7 +317,9 @@ class ScalaPatternParameterInfoHandler
           var el = element
           while (el.getParent != args) el = el.getParent
           var index = 1
-          for (pattern <- args.patterns if pattern != el) index += 1
+          for {
+            pattern <- args.patterns if pattern != el
+          } index += 1
           context.setCurrentParameter(index)
           context.setHighlightedParameter(el)
         case _ =>

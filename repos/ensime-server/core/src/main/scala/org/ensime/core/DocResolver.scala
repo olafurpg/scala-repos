@@ -35,7 +35,9 @@ class DocResolver(
     // the package contents of each jar, and whether it's a javadoc or
     // scaladoc.
 
-    for (jarFile <- config.allDocJars if jarFile.exists()) {
+    for {
+      jarFile <- config.allDocJars if jarFile.exists()
+    } {
       try {
         val jar = new JarFile(jarFile)
         val jarFileName = jarFile.getName

@@ -144,7 +144,10 @@ class EdgePartitionSuite extends SparkFunSuite {
     GraphXUtils.registerKryoClasses(conf)
     val kryoSer = new KryoSerializer(conf)
 
-    for (ser <- List(javaSer, kryoSer); s = ser.newInstance()) {
+    for {
+      ser <- List(javaSer, kryoSer)
+      s = ser.newInstance()
+    } {
       val aSer: EdgePartition[Int, Int] = s.deserialize(s.serialize(a))
       assert(aSer.tripletIterator().toList === a.tripletIterator().toList)
     }

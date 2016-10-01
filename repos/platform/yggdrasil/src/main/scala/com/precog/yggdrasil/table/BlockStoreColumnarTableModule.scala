@@ -169,8 +169,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
         def fillMatrix(initialCells: Vector[Cell]): ComparatorMatrix = {
           val comparatorMatrix = Array.ofDim[RowComparator](size, size)
 
-          for (Cell(i, _, s) <- initialCells; Cell(i0, _, s0) <- initialCells
-               if i != i0) {
+          for {
+            Cell(i, _, s) <- initialCells
+            Cell(i0, _, s0) <- initialCells
+            if i != i0
+          } {
             comparatorMatrix(i)(i0) = Slice.rowComparatorFor(s, s0)(keyf)
           }
 

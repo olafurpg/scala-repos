@@ -54,7 +54,10 @@ object CanHaarTr {
         1 << (32 - Integer.numberOfLeadingZeros(Math.max(m.rows, m.cols)))
       }
     val o = DenseMatrix.zeros[Double](rows, rows)
-    for (r <- 0 until m.rows; c <- 0 until m.cols) {
+    for {
+      r <- 0 until m.rows
+      c <- 0 until m.cols
+    } {
       o(r, c) = m(r, c)
     }
     o
@@ -65,7 +68,10 @@ object CanHaarTr {
   private def denseMatrixDToVector(
       m: DenseMatrix[Double]): DenseVector[Double] = {
     val v = new Array[Double](m.size)
-    for (r <- 0 until m.rows; c <- 0 until m.cols) {
+    for {
+      r <- 0 until m.rows
+      c <- 0 until m.cols
+    } {
       val i = r * m.cols + c
       if (i < v.length) v(i) = m(r, c)
     }
@@ -78,7 +84,10 @@ object CanHaarTr {
                                    rows: Int,
                                    cols: Int): DenseMatrix[Double] = {
     val m = DenseMatrix.zeros[Double](rows, cols)
-    for (r <- 0 until m.rows; c <- 0 until m.cols) {
+    for {
+      r <- 0 until m.rows
+      c <- 0 until m.cols
+    } {
       m(r, c) = v(r * cols + c)
     }
     m

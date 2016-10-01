@@ -402,8 +402,10 @@ class GeneralizedLinearRegressionSuite
                        Vectors.dense(6.7597127, 1.4581054, 0.3994266))
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true);
-         regParam <- Seq(0.0, 0.1, 1.0)) {
+    for {
+      fitIntercept <- Seq(false, true)
+      regParam <- Seq(0.0, 0.1, 1.0)
+    } {
       val trainer = new GeneralizedLinearRegression()
         .setFamily("gaussian")
         .setFitIntercept(fitIntercept)

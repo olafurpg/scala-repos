@@ -670,8 +670,10 @@ trait MatchAnalysis extends MatchApproximation {
         //         we can have A != B && A.coveredBy(B) && B.coveredBy(A)
         //         with Nil and List().
         val result = mutable.Buffer[CounterExample]()
-        for (example <- examples
-             if (!result.exists(example coveredBy _))) result += example
+        for {
+          example <- examples
+          if (!result.exists(example coveredBy _))
+        } result += example
         result.toList
       }
     }

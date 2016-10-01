@@ -34,8 +34,9 @@ object PeekMailboxSpec {
         PeekMailboxExtension.ack()
     }
     override def preRestart(cause: Throwable, msg: Option[Any]) {
-      for (m ← msg if m == "DIE")
-        context stop self // for testing the case of mailbox.cleanUp
+      for {
+        m ← msg if m == "DIE"
+      } context stop self // for testing the case of mailbox.cleanUp
     }
   }
 }

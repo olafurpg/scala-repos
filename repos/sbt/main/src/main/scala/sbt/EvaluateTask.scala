@@ -419,7 +419,9 @@ object EvaluateTask {
       }
     }
 
-    for ((key, msg, ex) <- keyed if (msg.isDefined || ex.isDefined)) {
+    for {
+      (key, msg, ex) <- keyed if (msg.isDefined || ex.isDefined)
+    } {
       val msgString =
         (msg.toList ++ ex.toList.map(ErrorHandling.reducedToString))
           .mkString("\n\t")

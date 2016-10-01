@@ -420,8 +420,10 @@ object Index {
   def triggers(ss: Settings[Scope]): Triggers[Task] = {
     val runBefore = new TriggerMap
     val triggeredBy = new TriggerMap
-    for ((_, amap) <- ss.data;
-         AttributeEntry(_, value: Task[_]) <- amap.entries) {
+    for {
+      (_, amap) <- ss.data
+      AttributeEntry(_, value: Task[_]) <- amap.entries
+    } {
       val as = value.info.attributes
       update(runBefore, value, as get Keys.runBefore)
       update(triggeredBy, value, as get Keys.triggeredBy)
@@ -435,6 +437,8 @@ object Index {
   private[this] def update(map: TriggerMap,
                            base: Task[_],
                            tasksOpt: Option[Seq[Task[_]]]): Unit =
-    for (tasks <- tasksOpt; task <- tasks)
-      map(task) = base +: map.getOrElse(task, Nil)
+    for {
+      tasks <- tasksOpt
+      task <- tasks
+    } map(task) = base +: map.getOrElse(task, Nil)
 }

@@ -276,7 +276,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       .filter(cacheItem => allProjectJars.contains(s"${cacheItem._1}!/"))
       .values
     var numLoaded = 0
-    for (manifest <- cachedProjectJars if !manifest.isBlackListed) {
+    for {
+      manifest <- cachedProjectJars if !manifest.isBlackListed
+    } {
       if (isJarCacheUpToDate(manifest)) {
         for (injector <- findMatchingInjectors(manifest)) {
           loadInjector(manifest, injector)

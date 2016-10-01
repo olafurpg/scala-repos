@@ -232,7 +232,9 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
       for (i <- 0 to 1000) {
         counts.clear()
         val factories = Seq.fill(c) { Await.result(bal.apply()) }
-        for (f <- counts if f.n > 0) { avgLoad.update(f.p) }
+        for {
+          f <- counts if f.n > 0
+        } { avgLoad.update(f.p) }
         // no need to avg ap, it's independent of the load distribution
         ap = bal.aperturex
         Await.result(Closable.all(factories: _*).close())

@@ -177,8 +177,10 @@ class VM(val mode: VmMode,
 
   def clearBreakpoints(bps: Iterable[Breakpoint]): Unit = {
     for (bp <- bps) {
-      for (req <- erm.breakpointRequests();
-           pos <- sourceMap.locToPos(req.location())) {
+      for {
+        req <- erm.breakpointRequests()
+        pos <- sourceMap.locToPos(req.location())
+      } {
         if (pos.file == bp.file && pos.line == bp.line) {
           req.disable()
         }

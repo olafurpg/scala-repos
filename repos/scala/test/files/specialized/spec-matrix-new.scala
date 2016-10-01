@@ -40,7 +40,10 @@ object Test {
   def randomMatrix(n: Int, m: Int) = {
     val r = new util.Random(10)
     val x = new Matrix[Double](n, m)
-    for (i <- 0 until n; j <- 0 until m) x(i, j) = (r.nextInt % 1000).toDouble
+    for {
+      i <- 0 until n
+      j <- 0 until m
+    } x(i, j) = (r.nextInt % 1000).toDouble
     x
   }
 

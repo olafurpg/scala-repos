@@ -1601,7 +1601,9 @@ object Conformance {
         val unSubst: ScUndefinedSubstitutor = res._2
         unSubst.getSubstitutor(notNonable = false) match {
           case Some(uSubst) =>
-            for (tpt <- tptsMap.values if result == null) {
+            for {
+              tpt <- tptsMap.values if result == null
+            } {
               val substedTpt = uSubst.subst(tpt)
               var t = conformsInner(substedTpt,
                                     uSubst.subst(updateType(tpt.lower.v)),

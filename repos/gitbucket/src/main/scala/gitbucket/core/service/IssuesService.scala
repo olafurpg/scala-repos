@@ -562,7 +562,9 @@ trait IssuesService { self: AccountService =>
                              owner: String,
                              repository: String)(implicit s: Session) = {
     extractCloseId(message).foreach { issueId =>
-      for (issue <- getIssue(owner, repository, issueId) if !issue.closed) {
+      for {
+        issue <- getIssue(owner, repository, issueId) if !issue.closed
+      } {
         createComment(owner,
                       repository,
                       userName,

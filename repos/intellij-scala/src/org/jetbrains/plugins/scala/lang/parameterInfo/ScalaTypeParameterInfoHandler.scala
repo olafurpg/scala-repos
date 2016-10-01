@@ -284,7 +284,9 @@ class ScalaTypeParameterInfoHandler
           var el = element
           while (el.getParent != args) el = el.getParent
           var index = 1
-          for (typeElem <- args.typeArgs if typeElem != el) index += 1
+          for {
+            typeElem <- args.typeArgs if typeElem != el
+          } index += 1
           context.setCurrentParameter(index)
           context.setHighlightedParameter(el)
         case _ =>

@@ -324,8 +324,10 @@ abstract class TailCalls extends Transform {
                * If @tailrec is given we need to fail those now.
                */
               if (newCtx.isMandatory) {
-                for (t @ Apply(fn, _) <- newRHS;
-                     if fn.symbol == newCtx.method) {
+                for {
+                  t @ Apply(fn, _) <- newRHS
+                  if fn.symbol == newCtx.method
+                } {
                   failPositions(newCtx) = t.pos
                   tailrecFailure(newCtx)
                 }

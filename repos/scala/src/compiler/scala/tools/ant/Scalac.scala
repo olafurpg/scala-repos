@@ -726,8 +726,10 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       val out = new PrintWriter(new BufferedWriter(new FileWriter(file)))
 
       try {
-        for (setting <- settings.visibleSettings; arg <- setting.unparse)
-          out println escapeArgument(arg)
+        for {
+          setting <- settings.visibleSettings
+          arg <- setting.unparse
+        } out println escapeArgument(arg)
         for (file <- sourceFiles)
           out println escapeArgument(file.getAbsolutePath)
       } finally out.close()

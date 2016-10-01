@@ -289,7 +289,9 @@ object SessionSettings {
   /** Prints all the user-defined SessionSettings (not raw) to System.out. */
   def printAllSettings(s: State): State =
     withSettings(s) { session =>
-      for ((ref, settings) <- session.append if settings.nonEmpty) {
+      for {
+        (ref, settings) <- session.append if settings.nonEmpty
+      } {
         println("In " + Reference.display(ref))
         printSettings(settings)
       }

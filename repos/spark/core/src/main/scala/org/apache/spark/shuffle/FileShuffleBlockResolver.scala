@@ -130,8 +130,10 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
   private def removeShuffleBlocks(shuffleId: ShuffleId): Boolean = {
     Option(shuffleStates.get(shuffleId)) match {
       case Some(state) =>
-        for (mapId <- state.completedMapTasks.asScala;
-             reduceId <- 0 until state.numReducers) {
+        for {
+          mapId <- state.completedMapTasks.asScala
+          reduceId <- 0 until state.numReducers
+        } {
           val blockId = new ShuffleBlockId(shuffleId, mapId, reduceId)
           val file = blockManager.diskBlockManager.getFile(blockId)
           if (!file.delete()) {

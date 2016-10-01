@@ -43,8 +43,10 @@ private[graphx] object BytecodeUtils {
       true
     } else {
       // look at closures enclosed in this closure
-      for (f <- closure.getClass.getDeclaredFields
-           if f.getType.getName.startsWith("scala.Function")) {
+      for {
+        f <- closure.getClass.getDeclaredFields
+        if f.getType.getName.startsWith("scala.Function")
+      } {
         f.setAccessible(true)
         if (invokedMethod(f.get(closure), targetClass, targetMethod)) {
           return true

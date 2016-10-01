@@ -57,7 +57,10 @@ private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](sc: SparkContext,
     // create the cross product split
     val array =
       new Array[Partition](rdd1.partitions.length * rdd2.partitions.length)
-    for (s1 <- rdd1.partitions; s2 <- rdd2.partitions) {
+    for {
+      s1 <- rdd1.partitions
+      s2 <- rdd2.partitions
+    } {
       val idx = s1.index * numPartitionsInRdd2 + s2.index
       array(idx) = new CartesianPartition(idx, rdd1, rdd2, s1.index, s2.index)
     }

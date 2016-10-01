@@ -119,16 +119,24 @@ object Test {
   }
 
   def runSeqs() = {
-    for (s1f <- seqMakers; s2f <- seqMakers; testData <- List(test1)) {
+    for {
+      s1f <- seqMakers
+      s2f <- seqMakers
+      testData <- List(test1)
+    } {
       import testData._
       val scrut = s1f(seq)
 
       for (Method(f, (trueList, falseList), descr) <- methodList) {
-        for (s <- trueList; rhs = s2f(s))
-          assertOne(scrut, rhs, f(scrut, rhs), descr)
+        for {
+          s <- trueList
+          rhs = s2f(s)
+        } assertOne(scrut, rhs, f(scrut, rhs), descr)
 
-        for (s <- falseList; rhs = s2f(s))
-          assertOne(scrut, rhs, !f(scrut, rhs), "!(" + descr + ")")
+        for {
+          s <- falseList
+          rhs = s2f(s)
+        } assertOne(scrut, rhs, !f(scrut, rhs), "!(" + descr + ")")
       }
     }
   }
