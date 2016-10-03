@@ -316,7 +316,10 @@ private[twitter] class ServerDispatcher(
       case Throw(exc) => exc
     }
     val cancelledExc = new CancelledRequestException(exc)
-    for (tag <- tracker.tags; f <- tracker.get(tag)) f.raise(cancelledExc)
+    for {
+      tag <- tracker.tags
+      f <- tracker.get(tag)
+    } f.raise(cancelledExc)
 
     service.close()
     lessor.unregister(this)

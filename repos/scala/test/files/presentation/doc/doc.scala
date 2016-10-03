@@ -90,8 +90,10 @@ object Test extends InteractiveTest {
     def findSource(name: String) = sourceFiles.find(_.file.name == name).get
 
     val className = names.head
-    for (name <- names;
-         i <- 1 to tags.length) {
+    for {
+      name <- names
+      i <- 1 to tags.length
+    } {
       val newText = text(name, i)
       val source = findSource("Class.scala")
       val batch = new BatchSourceFile(source.file, newText.toCharArray)

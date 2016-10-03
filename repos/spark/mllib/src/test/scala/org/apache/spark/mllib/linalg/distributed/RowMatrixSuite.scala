@@ -111,13 +111,19 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     val colMags = Vectors.dense(math.sqrt(126), math.sqrt(66), math.sqrt(94))
     val expected = BDM((0.0, 54.0, 72.0), (0.0, 0.0, 78.0), (0.0, 0.0, 0.0))
 
-    for (i <- 0 until n; j <- 0 until n) {
+    for {
+      i <- 0 until n
+      j <- 0 until n
+    } {
       expected(i, j) /= (colMags(i) * colMags(j))
     }
 
     for (mat <- Seq(denseMat, sparseMat)) {
       val G = mat.columnSimilarities(0.11).toBreeze()
-      for (i <- 0 until n; j <- 0 until n) {
+      for {
+        i <- 0 until n
+        j <- 0 until n
+      } {
         if (expected(i, j) > 0) {
           val actual = expected(i, j)
           val estimate = G(i, j)
@@ -214,7 +220,10 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("pca") {
-    for (mat <- Seq(denseMat, sparseMat); k <- 1 to n) {
+    for {
+      mat <- Seq(denseMat, sparseMat)
+      k <- 1 to n
+    } {
       val (pc, expVariance) =
         mat.computePrincipalComponentsAndExplainedVariance(k)
       assert(pc.numRows === n)
@@ -304,7 +313,10 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = RandomRDDs.normalVectorRDD(sc, 100, 10, 0, 0)
     val matrix = new RowMatrix(rdd)
     val cov = matrix.computeCovariance()
-    for (i <- 0 until cov.numRows; j <- 0 until i) {
+    for {
+      i <- 0 until cov.numRows
+      j <- 0 until i
+    } {
       assert(cov(i, j) === cov(j, i))
     }
   }

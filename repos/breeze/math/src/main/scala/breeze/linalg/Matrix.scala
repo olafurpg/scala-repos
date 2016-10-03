@@ -70,16 +70,22 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
   }
 
   def iterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield (i -> j) -> apply(i, j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield (i -> j) -> apply(i, j)
 
   def valuesIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield apply(i, j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield apply(i, j)
 
   def keysIterator =
-    for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols))
-      yield (i -> j)
+    for {
+      i <- Iterator.range(0, rows)
+      j <- Iterator.range(0, cols)
+    } yield (i -> j)
 
   def toString(maxLines: Int = Terminal.terminalHeight - 3,
                maxWidth: Int = Terminal.terminalWidth): String = {
@@ -115,7 +121,10 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
     val newline = Terminal.newline
 
     val rv = new scala.StringBuilder
-    for (row <- 0 until showRows; col <- 0 until colWidths.length) {
+    for {
+      row <- 0 until showRows
+      col <- 0 until colWidths.length
+    } {
       val cell = if (this(row, col) != null) this(row, col).toString else "--"
       rv.append(cell)
       rv.append(" " * (colWidths(col) - cell.length))
@@ -273,7 +282,10 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
       rows: Int,
       cols: Int)(f: (Int, Int) => V): Mat[V] = {
     val z = zeros(rows, cols)
-    for (c <- 0 until cols; r <- 0 until rows) {
+    for {
+      c <- 0 until cols
+      r <- 0 until rows
+    } {
       z(r, c) = f(r, c)
     }
     z

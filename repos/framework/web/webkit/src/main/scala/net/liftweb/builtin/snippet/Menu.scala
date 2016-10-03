@@ -108,8 +108,10 @@ object Menu extends DispatchSnippet {
     val expandAny: Boolean =
       S.attr("expand").map(Helpers.toBoolean) openOr true
 
-    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs))
-      yield i
+    val level: Box[Int] = for {
+      lvs <- S.attr("level")
+      i <- Helpers.asInt(lvs)
+    } yield i
 
     val toRender: Seq[MenuItem] = (S.attr("item"), S.attr("group")) match {
       case (Full(item), _) =>
@@ -315,8 +317,10 @@ object Menu extends DispatchSnippet {
     * </p>
     */
   def title(text: NodeSeq): NodeSeq = {
-    val r = for (request <- S.request;
-                 loc <- request.location) yield loc.title
+    val r = for {
+      request <- S.request
+      loc <- request.location
+    } yield loc.title
 
     text match {
       case TitleText(attrs, str) => {

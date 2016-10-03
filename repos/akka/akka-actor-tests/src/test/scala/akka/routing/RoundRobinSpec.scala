@@ -70,7 +70,10 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
         })),
         "round-robin")
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for {
+        _ ← 1 to iterationCount
+        _ ← 1 to connectionCount
+      } {
         val id = Await.result((actor ? "hit").mapTo[Int], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
       }
@@ -148,7 +151,10 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       val actor =
         system.actorOf(RoundRobinGroup(paths).props(), "round-robin-group1")
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for {
+        _ ← 1 to iterationCount
+        _ ← 1 to connectionCount
+      } {
         val id = Await.result((actor ? "hit").mapTo[String], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
       }
@@ -195,7 +201,10 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
         actor ! childProps
       }
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for {
+        _ ← 1 to iterationCount
+        _ ← 1 to connectionCount
+      } {
         val id = Await.result((actor ? "hit").mapTo[String], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
       }

@@ -45,7 +45,10 @@ case class CpuProfile(
     }
 
     putString("--- symbol\nbinary=%s\n".format(Jvm().mainClassName))
-    for ((stack, _) <- counts; frame <- stack if !uniq.contains(frame)) {
+    for {
+      (stack, _) <- counts
+      frame <- stack if !uniq.contains(frame)
+    } {
       putString("0x%016x %s\n".format(next, frame.toString))
       uniq(frame) = next
       next += 1

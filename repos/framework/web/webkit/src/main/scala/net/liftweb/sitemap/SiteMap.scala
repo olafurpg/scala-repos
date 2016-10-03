@@ -127,7 +127,10 @@ sealed class SiteMapSingleton {
   @volatile var enforceUniqueLinks = true
 
   def findLoc(name: String): Box[Loc[_]] =
-    for (sm <- LiftRules.siteMap; loc <- sm.findLoc(name)) yield loc
+    for {
+      sm <- LiftRules.siteMap
+      loc <- sm.findLoc(name)
+    } yield loc
 
   /**
     * Builds a function that successively tests the partial function against the Menu.  If the PartialFunction is

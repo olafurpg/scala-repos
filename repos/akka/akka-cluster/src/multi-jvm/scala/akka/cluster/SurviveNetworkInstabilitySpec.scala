@@ -197,7 +197,10 @@ abstract class SurviveNetworkInstabilitySpec
       val island2 = Vector(third, fourth, fifth)
       runOn(first) {
         // split the cluster in two parts (first, second) / (third, fourth, fifth)
-        for (role1 ← island1; role2 ← island2) {
+        for {
+          role1 ← island1
+          role2 ← island2
+        } {
           testConductor.blackhole(role1, role2, Direction.Both).await
         }
       }
@@ -213,7 +216,10 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("unreachable-4")
 
       runOn(first) {
-        for (role1 ← island1; role2 ← island2) {
+        for {
+          role1 ← island1
+          role2 ← island2
+        } {
           testConductor.passThrough(role1, role2, Direction.Both).await
         }
       }
@@ -226,7 +232,10 @@ abstract class SurviveNetworkInstabilitySpec
       val joining = Vector(sixth, seventh)
       val others = Vector(second, third, fourth, fifth)
       runOn(first) {
-        for (role1 ← (joining :+ first); role2 ← others) {
+        for {
+          role1 ← (joining :+ first)
+          role2 ← others
+        } {
           testConductor.blackhole(role1, role2, Direction.Both).await
         }
       }
@@ -253,7 +262,10 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("more-unreachable-5")
 
       runOn(first) {
-        for (role1 ← (joining :+ first); role2 ← others) {
+        for {
+          role1 ← (joining :+ first)
+          role2 ← others
+        } {
           testConductor.passThrough(role1, role2, Direction.Both).await
         }
       }
@@ -329,7 +341,10 @@ abstract class SurviveNetworkInstabilitySpec
       val side1AfterJoin = side1 :+ eighth
       val side2 = Vector(fifth, sixth, seventh)
       runOn(first) {
-        for (role1 ← side1AfterJoin; role2 ← side2) {
+        for {
+          role1 ← side1AfterJoin
+          role2 ← side2
+        } {
           testConductor.blackhole(role1, role2, Direction.Both).await
         }
       }
@@ -363,7 +378,10 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("side2-removed")
 
       runOn(first) {
-        for (role1 ← side1AfterJoin; role2 ← side2) {
+        for {
+          role1 ← side1AfterJoin
+          role2 ← side2
+        } {
           testConductor.passThrough(role1, role2, Direction.Both).await
         }
       }

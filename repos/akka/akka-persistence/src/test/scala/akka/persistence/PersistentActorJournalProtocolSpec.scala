@@ -217,7 +217,10 @@ class PersistentActorJournalProtocolSpec
         def commands(start: Int, end: Int) =
           (start until end).map(i ⇒ PersistAsync(i, s"a-$i-1", s"a-$i-2"))
         def expectDone(start: Int, end: Int) =
-          for (i ← start until end; j ← 1 to 2) expectMsg(Done(i, j))
+          for {
+            i ← start until end
+            j ← 1 to 2
+          } expectMsg(Done(i, j))
 
         val subject = startActor("test-5")
         subject ! PersistAsync(-1, "a" +: commands(20, 30): _*)

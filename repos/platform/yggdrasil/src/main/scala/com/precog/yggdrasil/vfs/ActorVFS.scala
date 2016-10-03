@@ -397,7 +397,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       EitherT {
         (projectionsActor ? FindChildren(path)).mapTo[MetadataResult] map {
           case PathChildren(_, children) =>
-            \/.right(for (pm <- children; p0 <- (pm.path - path)) yield {
+            \/.right(for {
+              pm <- children
+              p0 <- (pm.path - path)
+            } yield {
               pm.copy(path = p0)
             })
           case PathOpFailure(_, error) => \/.left(error)

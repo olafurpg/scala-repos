@@ -214,8 +214,10 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
                                                                None)
     // Insert 10 copies each of lots of objects whose hash codes are either 0 or 1. This causes
     // problems if the map fails to group together the objects with the same code (SPARK-2043).
-    val toInsert = for (i <- 1 to 10; j <- 1 to size)
-      yield (FixedHashObject(j, j % 2), 1)
+    val toInsert = for {
+      i <- 1 to 10
+      j <- 1 to size
+    } yield (FixedHashObject(j, j % 2), 1)
     sorter.insertAll(toInsert.iterator)
     assert(sorter.numSpills > 0, "sorter did not spill")
     val it = sorter.iterator

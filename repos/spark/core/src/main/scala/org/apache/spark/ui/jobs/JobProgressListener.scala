@@ -178,10 +178,10 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
 
   override def onJobStart(jobStart: SparkListenerJobStart): Unit =
     synchronized {
-      val jobGroup = for (props <- Option(jobStart.properties);
-                          group <- Option(props.getProperty(
-                            SparkContext.SPARK_JOB_GROUP_ID)))
-        yield group
+      val jobGroup = for {
+        props <- Option(jobStart.properties)
+        group <- Option(props.getProperty(SparkContext.SPARK_JOB_GROUP_ID))
+      } yield group
       val jobData: JobUIData =
         new JobUIData(jobId = jobStart.jobId,
                       submissionTime = Option(jobStart.time).filter(_ >= 0),
@@ -286,10 +286,11 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       trimStagesIfNecessary(failedStages)
     }
 
-    for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-           stage.stageId);
-         jobId <- activeJobsDependentOnStage;
-         jobData <- jobIdToData.get(jobId)) {
+    for {
+      activeJobsDependentOnStage <- stageIdToActiveJobIds.get(stage.stageId)
+      jobId <- activeJobsDependentOnStage
+      jobData <- jobIdToData.get(jobId)
+    } {
       jobData.numActiveStages -= 1
       if (stage.failureReason.isEmpty) {
         if (!stage.submissionTime.isEmpty) {
@@ -324,10 +325,11 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       poolToActiveStages.getOrElseUpdate(poolName, new HashMap[Int, StageInfo])
     stages(stage.stageId) = stage
 
-    for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-           stage.stageId);
-         jobId <- activeJobsDependentOnStage;
-         jobData <- jobIdToData.get(jobId)) {
+    for {
+      activeJobsDependentOnStage <- stageIdToActiveJobIds.get(stage.stageId)
+      jobId <- activeJobsDependentOnStage
+      jobData <- jobIdToData.get(jobId)
+    } {
       jobData.numActiveStages += 1
 
       // If a stage retries again, it should be removed from completedStageIndices set
@@ -349,10 +351,12 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
         stageData.taskData
           .put(taskInfo.taskId, new TaskUIData(taskInfo, Some(metrics)))
       }
-      for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-             taskStart.stageId);
-           jobId <- activeJobsDependentOnStage;
-           jobData <- jobIdToData.get(jobId)) {
+      for {
+        activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
+          taskStart.stageId)
+        jobId <- activeJobsDependentOnStage
+        jobData <- jobIdToData.get(jobId)
+      } {
         jobData.numActiveTasks += 1
       }
     }
@@ -425,10 +429,12 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       taskData.taskMetrics = taskMetrics
       taskData.errorMessage = errorMessage
 
-      for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-             taskEnd.stageId);
-           jobId <- activeJobsDependentOnStage;
-           jobData <- jobIdToData.get(jobId)) {
+      for {
+        activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
+          taskEnd.stageId)
+        jobId <- activeJobsDependentOnStage
+        jobData <- jobIdToData.get(jobId)
+      } {
         jobData.numActiveTasks -= 1
         taskEnd.reason match {
           case Success =>

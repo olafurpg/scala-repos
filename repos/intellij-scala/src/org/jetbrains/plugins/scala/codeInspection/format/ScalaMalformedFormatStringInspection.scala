@@ -48,7 +48,10 @@ class ScalaMalformedFormatStringInspection extends AbstractInspection {
         .orElse(PrintStringParser.parse(element))
         .orElse(InterpolatedStringParser.parse(element))
 
-      for (parts <- representation; part <- parts) inspect(part, holder)
+      for {
+        parts <- representation
+        part <- parts
+      } inspect(part, holder)
   }
 
   private def inspect(part: StringPart, holder: ProblemsHolder) {

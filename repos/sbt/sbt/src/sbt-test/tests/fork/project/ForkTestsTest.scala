@@ -28,8 +28,10 @@ object ForkTestsTest extends Build {
                       SubProcess(Seq("-Dgroup.prefix=" + groupPrefix(idx))))
       },
         check := {
-        val files = for (i <- 0 until groups; j <- 1 to groupSize)
-          yield file(groupPrefix(i) + j)
+        val files = for {
+          i <- 0 until groups
+          j <- 1 to groupSize
+        } yield file(groupPrefix(i) + j)
         val (exist, absent) = files.partition(_.exists)
         exist.foreach(_.delete())
         if (absent.nonEmpty)

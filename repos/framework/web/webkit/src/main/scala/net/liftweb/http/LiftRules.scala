@@ -1198,10 +1198,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
           val sm = smf()
           _sitemap = Full(sm)
-          for (menu <- sm.menus;
-               loc = menu.loc;
-               rewrite <- loc.rewritePF)
-            LiftRules.statefulRewrite.append(PerRequestPF(rewrite))
+          for {
+            menu <- sm.menus
+            loc = menu.loc
+            rewrite <- loc.rewritePF
+          } LiftRules.statefulRewrite.append(PerRequestPF(rewrite))
 
           _sitemap
         }

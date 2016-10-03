@@ -425,7 +425,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     def loop(ctypes: List[List[Type]]): List[List[Type]] = ctypes match {
       case Nil => Nil
       case set :: Nil => set map (_ :: Nil)
-      case set :: sets => for (x <- set; xs <- loop(sets)) yield x :: xs
+      case set :: sets =>
+        for {
+          x <- set
+          xs <- loop(sets)
+        } yield x :: xs
     }
     // zip the keys with each permutation to create a TypeEnv.
     // If we don't exclude the "all AnyRef" specialization, we will
@@ -1426,8 +1430,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val loconstraints = matches(tvar.info.bounds.lo, tpe)
         val hiconstraints = matches(tpe, tvar.info.bounds.hi)
         val allconstraints =
-          for (c <- constraints; l <- loconstraints; h <- hiconstraints)
-            yield c ++ l ++ h
+          for {
+            c <- constraints
+            l <- loconstraints
+            h <- hiconstraints
+          } yield c ++ l ++ h
         allconstraints
     }
   }

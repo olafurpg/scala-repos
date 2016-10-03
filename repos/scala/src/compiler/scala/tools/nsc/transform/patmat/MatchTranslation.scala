@@ -297,10 +297,11 @@ trait MatchTranslation { self: PatternMatching =>
                                      EmptySubstitution))
             }
 
-          for (cases <- emitTypeSwitch(bindersAndCases, pt).toList
-               if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
-               cse <- cases)
-            yield fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
+          for {
+            cases <- emitTypeSwitch(bindersAndCases, pt).toList
+            if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
+            cse <- cases
+          } yield fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
         }
 
         val catches =

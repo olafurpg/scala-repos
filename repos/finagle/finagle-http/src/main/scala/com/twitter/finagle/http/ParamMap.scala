@@ -119,7 +119,10 @@ class MapParamMap(underlying: Map[String, Seq[String]],
     underlying.getOrElse(name, Nil)
 
   def iterator: Iterator[(String, String)] = {
-    for ((k, vs) <- underlying.iterator; v <- vs) yield (k, v)
+    for {
+      (k, vs) <- underlying.iterator
+      v <- vs
+    } yield (k, v)
   }
 
   override def keySet: Set[String] =

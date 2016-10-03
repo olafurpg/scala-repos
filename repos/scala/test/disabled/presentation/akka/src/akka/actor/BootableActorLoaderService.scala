@@ -52,7 +52,10 @@ trait BootableActorLoaderService extends Bootable {
   abstract override def onLoad = {
     super.onLoad
 
-    for (loader ← applicationLoader; clazz ← BOOT_CLASSES) {
+    for {
+      loader ← applicationLoader
+      clazz ← BOOT_CLASSES
+    } {
       loader.loadClass(clazz).newInstance
     }
   }

@@ -84,9 +84,11 @@ class MatCheck extends Specification with ScalaCheck {
         val res = m.T
         res.numCols must_== m.numRows
         res.numRows must_== m.numCols
-        for (i <- Range(0, m.numRows); j <- Range(0, m.numCols))
-          m.at(i, j) must_==
-            res.at(j, i)
+        for {
+          i <- Range(0, m.numRows)
+          j <- Range(0, m.numCols)
+        } m.at(i, j) must_==
+          res.at(j, i)
         res.T must_== m
       }
     }

@@ -505,8 +505,10 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
   def replaceSomeIn(target: CharSequence,
                     replacer: Match => Option[String]): String = {
     val it = new Regex.MatchIterator(target, this, groupNames).replacementData
-    for (matchdata <- it; replacement <- replacer(matchdata))
-      it replace replacement
+    for {
+      matchdata <- it
+      replacement <- replacer(matchdata)
+    } it replace replacement
 
     it.replaced
   }

@@ -191,8 +191,11 @@ object M4 {
             (col != p.head && abs(col - p.head) != delta &&
               isSafe(col, p.tail, delta + 1)));
 
-        for (placement <- placeQueens(row - 1);
-             col <- columns; if isSafe(col, placement, 1)) yield {
+        for {
+          placement <- placeQueens(row - 1)
+          col <- columns
+          if isSafe(col, placement, 1)
+        } yield {
           col :: placement
         }
       }

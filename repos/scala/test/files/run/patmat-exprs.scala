@@ -196,8 +196,11 @@ trait Pattern {
     /** Eliminates common negated components of a sum */
     private def reduceComponents(components: List[Expr[T]])(
         implicit num: NumericOps[T]): List[Expr[T]] = {
-      val pairs = for (a <- components; b <- components if Neg(a) == b ||
-                         a == Neg(b)) yield (a, b)
+      val pairs = for {
+        a <- components
+        b <- components if Neg(a) == b ||
+          a == Neg(b)
+      } yield (a, b)
       pairs.foldLeft(components) { (c, pair) =>
         if (c.contains(pair._1) && c.contains(pair._2))
           c.diff(pair._1 :: pair._2 :: Nil)

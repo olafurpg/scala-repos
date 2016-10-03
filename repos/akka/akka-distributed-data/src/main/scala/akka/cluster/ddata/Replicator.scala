@@ -1121,8 +1121,11 @@ final class Replicator(settings: ReplicatorSettings)
     }
 
     if (subscribers.nonEmpty) {
-      for (key ← changed; if subscribers.contains(key);
-           subs ← subscribers.get(key)) notify(key, subs)
+      for {
+        key ← changed
+        if subscribers.contains(key)
+        subs ← subscribers.get(key)
+      } notify(key, subs)
     }
 
     // Changed event is sent to new subscribers even though the key has not changed,
@@ -1326,7 +1329,10 @@ final class Replicator(settings: ReplicatorSettings)
     }(collection.breakOut)
 
     if (removedSet.nonEmpty) {
-      for ((key, (envelope, _)) ← dataEntries; removed ← removedSet) {
+      for {
+        (key, (envelope, _)) ← dataEntries
+        removed ← removedSet
+      } {
 
         def init(): Unit = {
           val newEnvelope =

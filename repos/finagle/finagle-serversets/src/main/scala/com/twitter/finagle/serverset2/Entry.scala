@@ -99,7 +99,10 @@ object Endpoint {
             case host: String => host
           }
 
-        for (h <- h; p <- p) yield (h, p.toInt)
+        for {
+          h <- h
+          p <- p
+        } yield (h, p.toInt)
 
       case _ => None
     }
@@ -122,8 +125,10 @@ object Endpoint {
         case (host, port) =>
           new ArrayBuffer[String]
       }
-    for (map <- d("serviceEndpoint"); hostport <- parseEndpoint(map))
-      namesByHostPort(hostport) += null
+    for {
+      map <- d("serviceEndpoint")
+      hostport <- parseEndpoint(map)
+    } namesByHostPort(hostport) += null
     for {
       map <- d("additionalEndpoints") collect {
         case m: java.util.Map[_, _] => m

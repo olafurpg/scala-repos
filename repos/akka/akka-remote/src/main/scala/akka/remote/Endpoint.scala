@@ -996,7 +996,10 @@ private[remote] class EndpointWriter(
   }
 
   private def trySendPureAck(): Unit =
-    for (h ← handle; ack ← lastAck) if (h.write(codec.constructPureAck(ack))) {
+    for {
+      h ← handle
+      ack ← lastAck
+    } if (h.write(codec.constructPureAck(ack))) {
       ackDeadline = newAckDeadline
       lastAck = None
     }
@@ -1130,8 +1133,10 @@ private[remote] class EndpointReader(
     case InboundPayload(p) if p.size <= transport.maximumPayloadBytes ⇒
       val (ackOption, msgOption) = tryDecodeMessageAndAck(p)
 
-      for (ack ← ackOption; reliableDelivery ← reliableDeliverySupervisor)
-        reliableDelivery ! ack
+      for {
+        ack ← ackOption
+        reliableDelivery ← reliableDeliverySupervisor
+      } reliableDelivery ! ack
 
       msgOption match {
         case Some(msg) ⇒
@@ -1168,8 +1173,10 @@ private[remote] class EndpointReader(
 
     case InboundPayload(p) ⇒
       val (ackOption, _) = tryDecodeMessageAndAck(p)
-      for (ack ← ackOption; reliableDelivery ← reliableDeliverySupervisor)
-        reliableDelivery ! ack
+      for {
+        ack ← ackOption
+        reliableDelivery ← reliableDeliverySupervisor
+      } reliableDelivery ! ack
 
     case _ ⇒
   }

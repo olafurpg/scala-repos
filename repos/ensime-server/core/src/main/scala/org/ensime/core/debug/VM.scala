@@ -177,8 +177,10 @@ class VM(val mode: VmMode,
 
   def clearBreakpoints(bps: Iterable[Breakpoint]): Unit = {
     for (bp <- bps) {
-      for (req <- erm.breakpointRequests();
-           pos <- sourceMap.locToPos(req.location())) {
+      for {
+        req <- erm.breakpointRequests()
+        pos <- sourceMap.locToPos(req.location())
+      } {
         if (pos.file == bp.file && pos.line == bp.line) {
           req.disable()
         }
@@ -477,8 +479,10 @@ class VM(val mode: VmMode,
 
   private def valueForField(objectId: DebugObjectId,
                             name: String): Option[Value] = {
-    for (obj <- savedObjects.get(objectId);
-         f <- fieldByName(obj, name)) yield {
+    for {
+      obj <- savedObjects.get(objectId)
+      f <- fieldByName(obj, name)
+    } yield {
       remember(obj.getValue(f))
     }
   }

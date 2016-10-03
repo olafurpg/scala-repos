@@ -327,8 +327,11 @@ trait Counter2Ops {
                           Counter2[K1, K3, V]] {
       override def apply(a: Counter2[K1, K2, V], b: Counter2[K2, K3, V]) = {
         val r = Counter2[K1, K3, V]()
-        for ((row, ctr) <- a.data.iterator; (k2, v) <- ctr.activeIterator;
-             (k3, v2) <- b(k2, ::).data) {
+        for {
+          (row, ctr) <- a.data.iterator
+          (k2, v) <- ctr.activeIterator
+          (k3, v2) <- b(k2, ::).data
+        } {
           r(row, k3) = semiring.+(r(row, k3), semiring.*(v, v2))
         }
         r

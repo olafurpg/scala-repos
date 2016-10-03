@@ -72,7 +72,10 @@ class UnionRDD[T: ClassTag](sc: SparkContext, var rdds: Seq[RDD[T]])
   override def getPartitions: Array[Partition] = {
     val array = new Array[Partition](rdds.map(_.partitions.length).sum)
     var pos = 0
-    for ((rdd, rddIndex) <- rdds.zipWithIndex; split <- rdd.partitions) {
+    for {
+      (rdd, rddIndex) <- rdds.zipWithIndex
+      split <- rdd.partitions
+    } {
       array(pos) = new UnionPartition(pos, rdd, rddIndex, split.index)
       pos += 1
     }

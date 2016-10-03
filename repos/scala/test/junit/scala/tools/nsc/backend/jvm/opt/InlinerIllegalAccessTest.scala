@@ -189,13 +189,18 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // PUBLIC
 
     // public methods allowed everywhere
-    for (m <- Set(raC, reC); c <- allClasses) check(m, cCl, c, assertEmpty)
+    for {
+      m <- Set(raC, reC)
+      c <- allClasses
+    } check(m, cCl, c, assertEmpty)
 
     // DEFAULT ACCESS
 
     // default access OK in same package
-    for ((m, declCls) <- Set((rbC, cCl), (rfC, cCl), (rbD, dCl), (rfD, dCl));
-         c <- allClasses) {
+    for {
+      (m, declCls) <- Set((rbC, cCl), (rfC, cCl), (rbD, dCl), (rfD, dCl))
+      c <- allClasses
+    } {
       if (c.name startsWith "a/") check(m, declCls, c, assertEmpty)
       else check(m, declCls, c, cOrDOwner)
     }
@@ -204,9 +209,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
 
     // protected static accessed in same class, or protected static accessed in subclass(rgD).
     // can be inlined to sub- and superclasses, and classes in the same package (gCl)
-    for ((m, declCls) <- Set((rgC, cCl), (rgD, dCl));
-         c <- Set(cCl, dCl, eCl, fCl, gCl, hCl))
-      check(m, declCls, c, assertEmpty)
+    for {
+      (m, declCls) <- Set((rgC, cCl), (rgD, dCl))
+      c <- Set(cCl, dCl, eCl, fCl, gCl, hCl)
+    } check(m, declCls, c, assertEmpty)
 
     // protected in non-subclass and different package
     for (m <- Set(rcC, rgC)) check(m, cCl, iCl, cOrDOwner)
@@ -215,8 +221,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // can be inlined only if the destination class is related (sub- or superclass) or in the same package,
     // AND if the receiver object is a subtype of the destination class
     // TODO: we cannot check this yet, so the check flags the instruction as causing an IllegalAccess. https://github.com/scala-opt/scala/issues/13
-    for ((m, declCls) <- Set((rcC, cCl), (rcD, dCl));
-         c <- Set(cCl, dCl, eCl, fCl, gCl)) check(m, declCls, c, cOrDOwner)
+    for {
+      (m, declCls) <- Set((rcC, cCl), (rcD, dCl))
+      c <- Set(cCl, dCl, eCl, fCl, gCl)
+    } check(m, declCls, c, cOrDOwner)
 
     // rcD cannot be inlined into non-related classes, if the declaration and destination are not in the same package
     for (c <- Set(hCl, iCl)) check(rcD, dCl, c, cOrDOwner)
@@ -225,6 +233,9 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
 
     // privated method accesses can only be inlined in the same class
     for (m <- Set(rdC, rhC)) check(m, cCl, cCl, assertEmpty)
-    for (m <- Set(rdC, rhC); c <- allClasses.tail) check(m, cCl, c, cOrDOwner)
+    for {
+      m <- Set(rdC, rhC)
+      c <- allClasses.tail
+    } check(m, cCl, c, cOrDOwner)
   }
 }

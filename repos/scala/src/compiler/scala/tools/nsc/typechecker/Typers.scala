@@ -2462,7 +2462,10 @@ trait Typers
 
       // for `val` and `var` parameter, look at `target` meta-annotation
       if (!isPastTyper && meth.isPrimaryConstructor) {
-        for (vparams <- ddef.vparamss; vd <- vparams) {
+        for {
+          vparams <- ddef.vparamss
+          vd <- vparams
+        } {
           if (vd.mods.isParamAccessor) {
             namer.validateParam(vd)
           }
@@ -2476,9 +2479,11 @@ trait Typers
 
       meth.annotations.map(_.completeInfo())
 
-      for (vparams1 <- vparamss1; vparam1 <- vparams1 dropRight 1)
-        if (isRepeatedParamType(vparam1.symbol.tpe))
-          StarParamNotLastError(vparam1)
+      for {
+        vparams1 <- vparamss1
+        vparam1 <- vparams1 dropRight 1
+      } if (isRepeatedParamType(vparam1.symbol.tpe))
+        StarParamNotLastError(vparam1)
 
       val tpt1 = checkNoEscaping.privates(meth, typedType(ddef.tpt))
       checkNonCyclic(ddef, tpt1)
@@ -2703,8 +2708,11 @@ trait Typers
 
     def typedCase(cdef: CaseDef, pattpe: Type, pt: Type): CaseDef = {
       // verify no _* except in last position
-      for (Apply(_, xs) <- cdef.pat; x <- xs dropRight 1;
-           if treeInfo isStar x) StarPositionInPatternError(x)
+      for {
+        Apply(_, xs) <- cdef.pat
+        x <- xs dropRight 1
+        if treeInfo isStar x
+      } StarPositionInPatternError(x)
 
       // withoutAnnotations - see continuations-run/z1673.scala
       // This adjustment is awfully specific to continuations, but AFAICS the
@@ -4389,7 +4397,10 @@ trait Typers
             case ExistentialType(tparams, _) =>
               boundSyms ++= tparams
             case AnnotatedType(annots, _) =>
-              for (annot <- annots; arg <- annot.args) {
+              for {
+                annot <- annots
+                arg <- annot.args
+              } {
                 arg match {
                   case Ident(_) =>
                     // Check the symbol of an Ident, unless the

@@ -410,7 +410,10 @@ trait TypeDiagnostics { self: Analyzer =>
         names(sym.name) += diag
       }
     }
-    for (tpe <- types; t <- tpe) {
+    for {
+      tpe <- types
+      t <- tpe
+    } {
       t match {
         case ConstantType(_) => record(t, t.underlying.typeSymbol)
         case TypeRef(_, sym, _) => record(t, sym)
@@ -424,7 +427,11 @@ trait TypeDiagnostics { self: Analyzer =>
 
   /** The distinct pairs from an ordered list. */
   private def pairs[T <: Ordered[T]](xs: Seq[T]): Seq[(T, T)] = {
-    for (el1 <- xs; el2 <- xs; if el1 < el2) yield ((el1, el2))
+    for {
+      el1 <- xs
+      el2 <- xs
+      if el1 < el2
+    } yield ((el1, el2))
   }
 
   /** Given any number of types, alters the name information in the symbols

@@ -43,7 +43,10 @@ class SliceMatrixTest extends FunSuite {
 
     val expected = DenseMatrix.ones[Double](5, 5)
 
-    for (row <- indices; col <- indices) {
+    for {
+      row <- indices
+      col <- indices
+    } {
       expected(row, col) += 1
     }
 

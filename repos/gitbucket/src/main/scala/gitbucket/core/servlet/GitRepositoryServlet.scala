@@ -279,8 +279,10 @@ class CommitLogHook(owner: String,
 
           // call web hook
           callWebHookOf(owner, repository, WebHook.Push) {
-            for (pusherAccount <- getAccountByUserName(pusher);
-                 ownerAccount <- getAccountByUserName(owner)) yield {
+            for {
+              pusherAccount <- getAccountByUserName(pusher)
+              ownerAccount <- getAccountByUserName(owner)
+            } yield {
               WebHookPushPayload(git,
                                  pusherAccount,
                                  command.getRefName,

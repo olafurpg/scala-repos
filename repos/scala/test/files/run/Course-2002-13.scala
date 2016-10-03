@@ -147,9 +147,11 @@ object Programs {
         if (solve1(qs, s).isEmpty) Stream.cons(s, Stream.empty)
         else Stream.empty
       case q :: query1 =>
-        for (clause <- list2stream(clauses);
-             s1 <- tryClause(clause.newInstance, q, s);
-             s2 <- solve1(query1, s1)) yield s2
+        for {
+          clause <- list2stream(clauses)
+          s1 <- tryClause(clause.newInstance, q, s)
+          s2 <- solve1(query1, s1)
+        } yield s2
     }
 
     def solve1(query: List[Term], s: Subst): Stream[Subst] = {
@@ -160,8 +162,10 @@ object Programs {
 
     def tryClause(c: Clause, q: Term, s: Subst): Stream[Subst] = {
       if (debug) Console.println("trying " + c);
-      for (s1 <- option2stream(unify(q, c.lhs, s)); s2 <- solve1(c.rhs, s1))
-        yield s2;
+      for {
+        s1 <- option2stream(unify(q, c.lhs, s))
+        s2 <- solve1(c.rhs, s1)
+      } yield s2;
     }
 
     solve1(query, List())

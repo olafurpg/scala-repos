@@ -131,8 +131,10 @@ private[sql] class SQLListener(conf: SparkConf)
 
   override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized {
     val jobId = jobEnd.jobId
-    for (executionId <- _jobIdToExecutionId.get(jobId);
-         executionUIData <- _executionIdToData.get(executionId)) {
+    for {
+      executionId <- _jobIdToExecutionId.get(jobId)
+      executionUIData <- _executionIdToData.get(executionId)
+    } {
       jobEnd.jobResult match {
         case JobSucceeded =>
           executionUIData.jobs(jobId) = JobExecutionStatus.SUCCEEDED
@@ -311,12 +313,12 @@ private[sql] class SQLListener(conf: SparkConf)
       _executionIdToData.get(executionId) match {
         case Some(executionUIData) =>
           val accumulatorUpdates = {
-            for (stageId <- executionUIData.stages;
-                 stageMetrics <- _stageIdToStageMetrics
-                   .get(stageId)
-                   .toIterable;
-                 taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
-                 accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
+            for {
+              stageId <- executionUIData.stages
+              stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable
+              taskMetrics <- stageMetrics.taskIdToMetricUpdates.values
+              accumulatorUpdate <- taskMetrics.accumulatorUpdates
+            } yield {
               assert(
                 accumulatorUpdate.update.isDefined,
                 s"accumulator update from " +

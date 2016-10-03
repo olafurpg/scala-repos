@@ -32,7 +32,10 @@ object GridPageRank {
     // Convert row column address into vertex ids (row major order)
     def sub2ind(r: Int, c: Int): Int = r * nCols + c
     // Make the grid graph
-    for (r <- 0 until nRows; c <- 0 until nCols) {
+    for {
+      r <- 0 until nRows
+      c <- 0 until nCols
+    } {
       val ind = sub2ind(r, c)
       if (r + 1 < nRows) {
         outDegree(ind) += 1

@@ -110,37 +110,40 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
           var currDeps = Set[Prop]()
           val (sharedPrefix, suffix) =
             tests span { test =>
-              (test.prop == True) || (for (reusedTest <- test.reuses;
-                                           nextDeps <- dependencies.get(
-                                             reusedTest);
-                                           diff <- (nextDeps -- currDeps).headOption;
-                                           _ <- Some(currDeps = nextDeps))
-                yield diff).nonEmpty
+              (test.prop == True) || (for {
+                reusedTest <- test.reuses
+                nextDeps <- dependencies.get(reusedTest)
+                diff <- (nextDeps -- currDeps).headOption
+                _ <- Some(currDeps = nextDeps)
+              } yield diff).nonEmpty
             }
 
           val collapsedTreeMakers =
             if (sharedPrefix.isEmpty) None
             else {
               // even sharing prefixes of length 1 brings some benefit (overhead-percentage for compiler: 26->24%, lib: 19->16%)
-              for (test <- sharedPrefix; reusedTest <- test.reuses)
-                reusedTest.treeMaker match {
-                  case reusedCTM: CondTreeMaker =>
-                    reused(reusedCTM) = ReusedCondTreeMaker(reusedCTM)
-                  case _ =>
-                }
+              for {
+                test <- sharedPrefix
+                reusedTest <- test.reuses
+              } reusedTest.treeMaker match {
+                case reusedCTM: CondTreeMaker =>
+                  reused(reusedCTM) = ReusedCondTreeMaker(reusedCTM)
+                case _ =>
+              }
 
               debug.patmat("sharedPrefix: " + sharedPrefix)
               debug.patmat("suffix: " + sharedPrefix)
               // if the shared prefix contains interesting conditions (!= True)
               // and the last of such interesting shared conditions reuses another treemaker's test
               // replace the whole sharedPrefix by a ReusingCondTreeMaker
-              for (lastShared <- sharedPrefix.reverse
-                     .dropWhile(_.prop == True)
-                     .headOption;
-                   lastReused <- lastShared.reuses)
-                yield
-                  ReusingCondTreeMaker(sharedPrefix, reusedOrOrig) :: suffix
-                    .map(_.treeMaker)
+              for {
+                lastShared <- sharedPrefix.reverse
+                  .dropWhile(_.prop == True)
+                  .headOption
+                lastReused <- lastShared.reuses
+              } yield
+                ReusingCondTreeMaker(sharedPrefix, reusedOrOrig) :: suffix.map(
+                  _.treeMaker)
             }
 
           collapsedTreeMakers getOrElse tests.map(_.treeMaker) // sharedPrefix need not be empty (but it only contains True-tests, which are dropped above)
