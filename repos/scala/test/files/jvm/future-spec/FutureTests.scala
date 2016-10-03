@@ -698,7 +698,11 @@ class FutureTests extends MinimalScalaTest {
         async(idx, idx * 20)
       }
       val folded = futures.foldLeft(Future(0)) {
-        case (fr, fa) => for (r <- fr; a <- fa) yield (r + a)
+        case (fr, fa) =>
+          for {
+            r <- fr
+            a <- fa
+          } yield (r + a)
       }
       Await.result(folded, timeout) mustBe (45)
     }

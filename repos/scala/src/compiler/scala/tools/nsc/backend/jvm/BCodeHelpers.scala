@@ -883,8 +883,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                              pannotss: List[List[AnnotationInfo]]) {
       val annotationss = pannotss map (_ filter shouldEmitAnnotation)
       if (annotationss forall (_.isEmpty)) return
-      for ((annots, idx) <- annotationss.zipWithIndex;
-           annot <- annots) {
+      for {
+        (annots, idx) <- annotationss.zipWithIndex
+        annot <- annots
+      } {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val pannVisitor: asm.AnnotationVisitor =

@@ -41,10 +41,11 @@ trait CValueGenerators {
 
   private def containerOfAtMostN[C[_], T](maxSize: Int, g: Gen[T])(
       implicit b: org.scalacheck.util.Buildable[T, C]): Gen[C[T]] =
-    Gen.sized(
-      size =>
-        for (n <- choose(0, size min maxSize); c <- containerOfN[C, T](n, g))
-          yield c)
+    Gen.sized(size =>
+      for {
+        n <- choose(0, size min maxSize)
+        c <- containerOfN[C, T](n, g)
+      } yield c)
 
   private def indexedSeqOf[A](gen: Gen[A]): Gen[IndexedSeq[A]] =
     containerOfAtMostN[List, A](maxArraySize, gen) map (_.toIndexedSeq)

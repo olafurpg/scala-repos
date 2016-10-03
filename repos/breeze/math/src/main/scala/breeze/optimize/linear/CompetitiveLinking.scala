@@ -30,9 +30,10 @@ object CompetitiveLinking extends BipartiteMatching {
     val n = matchingPotentials.length;
     val m = matchingPotentials(0).length;
     require(m >= n, "Column dimension must be at least the size of row dim.");
-    val predsIt = for ((arr, i) <- matchingPotentials.iterator.zipWithIndex;
-                       (w, j) <- arr.iterator.zipWithIndex)
-      yield Prediction(i, j, w);
+    val predsIt = for {
+      (arr, i) <- matchingPotentials.iterator.zipWithIndex
+      (w, j) <- arr.iterator.zipWithIndex
+    } yield Prediction(i, j, w);
     val preds = predsIt.toSeq.sortWith(_.v < _.v);
     val leftSet = new BitSet(n);
     val rightSet = new BitSet(m);

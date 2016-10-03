@@ -48,8 +48,10 @@ final class ScriptedTests(resourceBaseDirectory: File,
     import Path._
     import GlobFilter._
     var failed = false
-    for (groupDir <- (resourceBaseDirectory * group).get;
-         nme <- (groupDir * name).get) yield {
+    for {
+      groupDir <- (resourceBaseDirectory * group).get
+      nme <- (groupDir * name).get
+    } yield {
       val g = groupDir.getName
       val n = nme.getName
       val str = s"$g / $n"
@@ -234,7 +236,10 @@ class ScriptedRunner {
     runAll(allTests)
   }
   def runAll(tests: Seq[() => Option[String]]): Unit = {
-    val errors = for (test <- tests; err <- test()) yield err
+    val errors = for {
+      test <- tests
+      err <- test()
+    } yield err
     if (errors.nonEmpty)
       sys.error(errors.mkString("Failed tests:\n\t", "\n\t", "\n"))
   }

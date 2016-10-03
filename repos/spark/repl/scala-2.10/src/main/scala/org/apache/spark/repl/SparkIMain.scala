@@ -611,7 +611,10 @@ class SparkIMain(initialSettings: Settings,
   private def handleTypeRedefinition(name: TypeName,
                                      old: Request,
                                      req: Request) = {
-    for (t1 <- old.simpleNameOfType(name); t2 <- req.simpleNameOfType(name)) {
+    for {
+      t1 <- old.simpleNameOfType(name)
+      t2 <- req.simpleNameOfType(name)
+    } {
       logDebug("Redefining type '%s'\n  %s -> %s".format(name, t1, t2))
     }
   }
@@ -619,7 +622,10 @@ class SparkIMain(initialSettings: Settings,
   private def handleTermRedefinition(name: TermName,
                                      old: Request,
                                      req: Request) = {
-    for (t1 <- old.compilerTypeOf get name; t2 <- req.compilerTypeOf get name) {
+    for {
+      t1 <- old.compilerTypeOf get name
+      t2 <- req.compilerTypeOf get name
+    } {
       //    Printing the types here has a tendency to cause assertion errors, like
       //   assertion failed: fatal: <refinement> has owner value x, but a class owner is required
       // so DBG is by-name now to keep it in the family.  (It also traps the assertion error,

@@ -63,11 +63,12 @@ sealed trait CPathTraversal { self =>
         val lCols = makeCols(left)
         val rCols = makeCols(right)
 
-        val comparators: Array[CPathComparator] = (for ((lPath, lCol) <- lCols;
-                                                        (rPath, rCol) <- rCols)
-          yield {
-            CPathComparator(lPath, lCol, rPath, rCol)
-          })(collection.breakOut)
+        val comparators: Array[CPathComparator] = (for {
+          (lPath, lCol) <- lCols
+          (rPath, rCol) <- rCols
+        } yield {
+          CPathComparator(lPath, lCol, rPath, rCol)
+        })(collection.breakOut)
 
         // Return the first column in the array defined at the row, or -1 if none are defined for that row
         @inline

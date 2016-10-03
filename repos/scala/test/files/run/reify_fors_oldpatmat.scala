@@ -57,8 +57,11 @@ object Test extends App {
       def findNums(n: Int): Iterable[(Int, Int)] = {
 
         // a for comprehension using two generators
-        for (i <- 1 until n;
-             j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
+        for {
+          i <- 1 until n
+          j <- 1 until (i - 1)
+          if isPrime(i + j)
+        } yield (i, j)
       }
 
       /** Return the sum of the elements of 'xs'. */

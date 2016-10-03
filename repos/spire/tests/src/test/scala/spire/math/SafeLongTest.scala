@@ -57,8 +57,10 @@ class SafeLongTest extends FunSuite {
       assert(IsIntegral[SafeLong].toDouble(x) == x.toDouble)
       assert(IsIntegral[SafeLong].toBigInt(x) == x.toBigInt)
     }
-    for (a ← Seq(SafeLong.one, SafeLong.two);
-         b ← Seq(SafeLong.one, SafeLong.two)) {
+    for {
+      a ← Seq(SafeLong.one, SafeLong.two)
+      b ← Seq(SafeLong.one, SafeLong.two)
+    } {
       assert(Order[SafeLong].compare(a, b) == a.compare(b))
       assert(EuclideanRing[SafeLong].quot(a, b) == a / b)
       assert(EuclideanRing[SafeLong].mod(a, b) == a % b)

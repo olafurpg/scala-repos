@@ -85,9 +85,11 @@ object ALSSuite {
       }
 
     val sampledRatings = {
-      for (u <- 0 until users; p <- 0 until products
-           if rand.nextDouble() < samplingRate)
-        yield Rating(u, p, trueRatings(u, p))
+      for {
+        u <- 0 until users
+        p <- 0 until products
+        if rand.nextDouble() < samplingRate
+      } yield Rating(u, p, trueRatings(u, p))
     }
 
     (sampledRatings, trueRatings, truePrefs)
@@ -255,18 +257,26 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
       .run(sc.parallelize(sampledRatings))
 
     val predictedU = new BDM[Double](users, features)
-    for ((u, vec) <- model.userFeatures.collect(); i <- 0 until features) {
+    for {
+      (u, vec) <- model.userFeatures.collect()
+      i <- 0 until features
+    } {
       predictedU(u, i) = vec(i)
     }
     val predictedP = new BDM[Double](products, features)
-    for ((p, vec) <- model.productFeatures.collect(); i <- 0 until features) {
+    for {
+      (p, vec) <- model.productFeatures.collect()
+      i <- 0 until features
+    } {
       predictedP(p, i) = vec(i)
     }
     val predictedRatings =
       if (bulkPredict) {
         val allRatings = new BDM[Double](users, products)
-        val usersProducts = for (u <- 0 until users; p <- 0 until products)
-          yield (u, p)
+        val usersProducts = for {
+          u <- 0 until users
+          p <- 0 until products
+        } yield (u, p)
         val userProductsRDD = sc.parallelize(usersProducts)
         model.predict(userProductsRDD).collect().foreach { elem =>
           allRatings(elem.user, elem.product) = elem.rating
@@ -277,7 +287,10 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
       }
 
     if (!implicitPrefs) {
-      for (u <- 0 until users; p <- 0 until products) {
+      for {
+        u <- 0 until users
+        p <- 0 until products
+      } {
         val prediction = predictedRatings(u, p)
         val correct = trueRatings(u, p)
         if (math.abs(prediction - correct) > matchThreshold) {
@@ -297,7 +310,10 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
       // For implicit prefs we use the confidence-weighted RMSE to test (ref Mahout's tests)
       var sqErr = 0.0
       var denom = 0.0
-      for (u <- 0 until users; p <- 0 until products) {
+      for {
+        u <- 0 until users
+        p <- 0 until products
+      } {
         val prediction = predictedRatings(u, p)
         val truePref = truePrefs(u, p)
         val confidence = 1.0 + abs(trueRatings(u, p))

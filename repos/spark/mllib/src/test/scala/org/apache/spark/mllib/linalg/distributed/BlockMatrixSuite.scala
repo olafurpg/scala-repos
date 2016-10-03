@@ -69,7 +69,10 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                           Array(2, 2, 6, 6, 10, 10, 14),
                           Array(3, 3, 7, 7, 11, 11, 15))
     // scalastyle:on
-    for (i <- 0 until 4; j <- 0 until 7) {
+    for {
+      i <- 0 until 4
+      j <- 0 until 7
+    } {
       assert(part0.getPartition((i, j)) === expected0(i)(j))
       assert(part0.getPartition((i, j, random.nextInt())) === expected0(i)(j))
     }
@@ -92,7 +95,10 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val part1 = GridPartitioner(2, 2, suggestedNumPartitions = 5)
     val expected1 = Array(Array(0, 2), Array(1, 3))
-    for (i <- 0 until 2; j <- 0 until 2) {
+    for {
+      i <- 0 until 2
+      j <- 0 until 2
+    } {
       assert(part1.getPartition((i, j)) === expected1(i)(j))
       assert(part1.getPartition((i, j, random.nextInt())) === expected1(i)(j))
     }
@@ -103,7 +109,10 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val part3 = new GridPartitioner(2, 3, rowsPerPart = 1, colsPerPart = 2)
     val expected3 = Array(Array(0, 0, 2), Array(1, 1, 3))
-    for (i <- 0 until 2; j <- 0 until 3) {
+    for {
+      i <- 0 until 2
+      j <- 0 until 3
+    } {
       assert(part3.getPartition((i, j)) === expected3(i)(j))
       assert(part3.getPartition((i, j, random.nextInt())) === expected3(i)(j))
     }

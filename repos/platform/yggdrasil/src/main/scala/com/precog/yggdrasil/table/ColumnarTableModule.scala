@@ -2206,8 +2206,11 @@ trait ColumnarTableModule[M[+ _]]
 
     private def toEvents[A](f: (Slice, RowId) => Option[A]): M[Iterable[A]] = {
       for (stream <- self.compact(Leaf(Source)).slices.toStream) yield {
-        for (slice <- stream; i <- 0 until slice.size; a <- f(slice, i))
-          yield a
+        for {
+          slice <- stream
+          i <- 0 until slice.size
+          a <- f(slice, i)
+        } yield a
       }
     }
 

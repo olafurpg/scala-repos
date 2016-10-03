@@ -50,9 +50,11 @@ class MapStatusSuite extends SparkFunSuite {
 
   test("MapStatus should never report non-empty blocks' sizes as 0") {
     import Math._
-    for (numSizes <- Seq(1, 10, 100, 1000, 10000);
-         mean <- Seq(0L, 100L, 10000L, Int.MaxValue.toLong);
-         stddev <- Seq(0.0, 0.01, 0.5, 1.0)) {
+    for {
+      numSizes <- Seq(1, 10, 100, 1000, 10000)
+      mean <- Seq(0L, 100L, 10000L, Int.MaxValue.toLong)
+      stddev <- Seq(0.0, 0.01, 0.5, 1.0)
+    } {
       val sizes = Array.fill[Long](numSizes)(
         abs(round(Random.nextGaussian() * stddev)) + mean)
       val status = MapStatus(BlockManagerId("a", "b", 10), sizes)

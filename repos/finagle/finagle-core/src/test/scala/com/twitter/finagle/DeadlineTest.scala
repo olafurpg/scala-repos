@@ -17,7 +17,10 @@ class DeadlineTest
     yield Time.fromNanoseconds(t)
   val dur = for (d <- Gen.choose(0L, Long.MaxValue))
     yield Duration.fromNanoseconds(d)
-  val deadline = for (t <- time; d <- dur) yield Deadline(t, t + d)
+  val deadline = for {
+    t <- time
+    d <- dur
+  } yield Deadline(t, t + d)
 
   test("Deadline marshalling") {
     forAll(deadline) { d =>

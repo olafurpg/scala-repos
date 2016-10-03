@@ -119,7 +119,11 @@ object Test {
   }
 
   def runSeqs() = {
-    for (s1f <- seqMakers; s2f <- seqMakers; testData <- List(test1)) {
+    for {
+      s1f <- seqMakers
+      s2f <- seqMakers
+      testData <- List(test1)
+    } {
       import testData._
       val scrut = s1f(seq)
 

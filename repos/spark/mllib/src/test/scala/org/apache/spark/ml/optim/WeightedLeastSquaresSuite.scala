@@ -188,9 +188,11 @@ class WeightedLeastSquaresSuite
                        Vectors.dense(13.1860638, 2.1761382, 0.6213134))
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true);
-         regParam <- Seq(0.0, 0.1, 1.0);
-         standardizeFeatures <- Seq(false, true)) {
+    for {
+      fitIntercept <- Seq(false, true)
+      regParam <- Seq(0.0, 0.1, 1.0)
+      standardizeFeatures <- Seq(false, true)
+    } {
       val wls =
         new WeightedLeastSquares(fitIntercept,
                                  regParam,

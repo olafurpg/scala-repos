@@ -61,7 +61,10 @@ object BuildUtil {
     import collection.mutable.HashMap
     val agg = new HashMap[ProjectRef, Seq[ProjectRef]]
     val cp = new HashMap[ProjectRef, Seq[ClasspathDep[ProjectRef]]]
-    for (lbu <- units.values; rp <- lbu.defined.values) {
+    for {
+      lbu <- units.values
+      rp <- lbu.defined.values
+    } {
       val ref = ProjectRef(lbu.unit.uri, rp.id)
       cp(ref) = rp.dependencies
       agg(ref) = rp.aggregate
@@ -75,7 +78,10 @@ object BuildUtil {
         base: ResolvedProject => Seq[ProjectRef]): Seq[ResolvedProject] =
       Dag.topologicalSort(proj)(p => base(p) map getRef)
     // check for cycles
-    for ((_, lbu) <- units; proj <- lbu.defined.values) {
+    for {
+      (_, lbu) <- units
+      proj <- lbu.defined.values
+    } {
       deps(proj)(_.dependencies.map(_.project))
       deps(proj)(_.delegates)
       deps(proj)(_.aggregate)

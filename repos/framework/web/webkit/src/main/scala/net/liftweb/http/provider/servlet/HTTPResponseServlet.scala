@@ -69,8 +69,10 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
   def addHeaders(headers: List[HTTPParam]) {
     val appearOnce = Set(
       LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase): _*)
-    for (h <- headers;
-         value <- h.values) {
+    for {
+      h <- headers
+      value <- h.values
+    } {
       if (appearOnce.contains(h.name.toLowerCase))
         resp.setHeader(h.name, value)
       else resp.addHeader(h.name, value)

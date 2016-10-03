@@ -110,8 +110,10 @@ class BigDecimalTest {
       BigDecimal(1) / BigDecimal(10),
       BigDecimal(10).pow(-1)
     )
-    for (a <- tenths; b <- tenths)
-      assert(a == b, s"$a != $b but both should be 0.1")
+    for {
+      a <- tenths
+      b <- tenths
+    } assert(a == b, s"$a != $b but both should be 0.1")
   }
 
   // Motivated by noticing BigDecimal(123456789, mc6) != BigDecimal(123456789L, mc6)
@@ -155,15 +157,20 @@ class BigDecimalTest {
     )
     sameRounding.map(_.zipWithIndex).foreach {
       case xs =>
-        for ((a, i) <- xs; (b, j) <- xs) {
+        for {
+          (a, i) <- xs
+          (b, j) <- xs
+        } {
           assert(a == b, s"$a != $b (#$i != #$j) but should be the same")
           assert(a.## == b.##,
                  s"Hash code mismatch in equal BigDecimals: #$i != #$j")
         }
     }
     val List(xs, ys) = sameRounding.map(_.zipWithIndex)
-    for ((a, i) <- xs; (b, j) <- ys)
-      assert(a != b, s"$a == $b (#$i == #$j) but should be different")
+    for {
+      (a, i) <- xs
+      (b, j) <- ys
+    } assert(a != b, s"$a == $b (#$i == #$j) but should be different")
   }
 
   // This was unexpectedly truncated in 2.10
@@ -176,8 +183,10 @@ class BigDecimalTest {
       BigDecimal(text),
       BigDecimal(new BD(text))
     )
-    for (a <- same; b <- same)
-      assert(a == b, s"$a != $b but should be the same")
+    for {
+      a <- same
+      b <- same
+    } assert(a == b, s"$a != $b but should be the same")
   }
 
   // Tests attempts to make sane the representation of IEEE binary32 and binary64
@@ -225,8 +234,10 @@ class BigDecimalTest {
       BigDecimal.exact(0.1f),
       BigDecimal.decimal((0.1f).toDouble)
     )
-    for (a <- different; b <- different if (a ne b))
-      assert(a != b,
+    for {
+      a <- different
+      b <- different if (a ne b)
+    } assert(a != b,
              "BigDecimal representations of Double mistakenly conflated")
   }
 

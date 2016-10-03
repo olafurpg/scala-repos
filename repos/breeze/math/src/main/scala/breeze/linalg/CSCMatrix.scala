@@ -155,15 +155,17 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
   }
 
   def activeKeysIterator: Iterator[(Int, Int)] = {
-    for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
-      yield (rowIndices(rr), c)
+    for {
+      c <- Iterator.range(0, cols)
+      rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))
+    } yield (rowIndices(rr), c)
   }
 
   def activeIterator: Iterator[((Int, Int), V)] = {
-    for (c <- Iterator.range(0, cols);
-         rr <- Iterator.range(colPtrs(c), colPtrs(c + 1)))
-      yield (rowIndices(rr), c) -> data(rr)
+    for {
+      c <- Iterator.range(0, cols)
+      rr <- Iterator.range(colPtrs(c), colPtrs(c + 1))
+    } yield (rowIndices(rr), c) -> data(rr)
   }
 
   def activeValuesIterator: Iterator[V] = data.iterator.take(used)
@@ -341,7 +343,10 @@ object CSCMatrix
       ClassTag[V](data.getClass.getComponentType.asInstanceOf[Class[V]])
     val res = zeros(rows, cols, data.length)
     var i = 0
-    for (c <- 0 until cols; r <- 0 until rows) {
+    for {
+      c <- 0 until cols
+      r <- 0 until rows
+    } {
       val v = data(i)
       i += 1
       if (v != z) {

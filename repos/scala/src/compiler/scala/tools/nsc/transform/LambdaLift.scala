@@ -221,8 +221,12 @@ abstract class LambdaLift extends InfoTransform {
 
       do {
         changedFreeVars = false
-        for ((caller, callees) <- called; callee <- callees;
-             fvs <- free get callee; fv <- fvs) markFree(fv, caller)
+        for {
+          (caller, callees) <- called
+          callee <- callees
+          fvs <- free get callee
+          fv <- fvs
+        } markFree(fv, caller)
       } while (changedFreeVars)
 
       def renameSym(sym: Symbol) {

@@ -59,7 +59,10 @@ object Test extends App {
         case AllowedMissingClass(_) => None
       }
 
-    for (name <- classFullNames; cls <- tryGetClass(name)) {
+    for {
+      name <- classFullNames
+      cls <- tryGetClass(name)
+    } {
       try {
         cls.getEnclosingMethod
         cls.getEnclosingClass

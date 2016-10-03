@@ -17,7 +17,10 @@ class StatusTest
     with IntegrationPatience {
 
   val status1 = Gen.oneOf(Status.Open, Status.Busy, Status.Closed)
-  val status2 = for (left <- status1; right <- status1) yield (left, right)
+  val status2 = for {
+    left <- status1
+    right <- status1
+  } yield (left, right)
 
   test("Status.bestOf can terminate early") {
     val res = Status.bestOf[Function0[Status]](

@@ -11,18 +11,19 @@ object PhoneCode {
     //prepare lookup table number -> all words, 8 lines
     val dictEntriesDigified2Words = {
       val wordToDigits = {
-        val mappingReversed = (for (chars2Digit <- Array("e",
-                                                         "jnq",
-                                                         "rwx",
-                                                         "dsy",
-                                                         "ft",
-                                                         "am",
-                                                         "civ",
-                                                         "bku",
-                                                         "lop",
-                                                         "ghz").zipWithIndex;
-                                    char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase))
-          yield (char -> chars2Digit._2)).toMap
+        val mappingReversed = (for {
+          chars2Digit <- Array("e",
+                               "jnq",
+                               "rwx",
+                               "dsy",
+                               "ft",
+                               "am",
+                               "civ",
+                               "bku",
+                               "lop",
+                               "ghz").zipWithIndex
+          char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase)
+        } yield (char -> chars2Digit._2)).toMap
         (word: String) =>
           word.map(mappingReversed).mkString
       }
@@ -48,10 +49,10 @@ object PhoneCode {
           current.ifFinished.getOrElse({
             def allMatches(matchAgainst: String) = {
               //collect all possible next translation steps of the remaining numbers
-              val matchingWords = (for (len <- 1 to matchAgainst.length;
-                                        opt <- dictEntriesDigified2Words.get(
-                                          matchAgainst.take(len)))
-                yield opt).flatten
+              val matchingWords = (for {
+                len <- 1 to matchAgainst.length
+                opt <- dictEntriesDigified2Words.get(matchAgainst.take(len))
+              } yield opt).flatten
               if (matchingWords.nonEmpty) //spead the tree
                 for ((translated, remaining) <- matchingWords.map(
                        e => e -> matchAgainst.drop(e.count(_.isLetter))))

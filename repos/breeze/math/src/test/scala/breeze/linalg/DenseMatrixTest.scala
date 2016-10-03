@@ -881,8 +881,10 @@ class DenseMatrixTest
   def matricesNearlyEqual(A: DenseMatrix[Double],
                           B: DenseMatrix[Double],
                           threshold: Double = 1E-6) {
-    for (i <- 0 until A.rows; j <- 0 until A.cols)
-      A(i, j) should be(B(i, j) +- threshold)
+    for {
+      i <- 0 until A.rows
+      j <- 0 until A.cols
+    } A(i, j) should be(B(i, j) +- threshold)
   }
 
   test("#336 argmax for Dense Matrices") {

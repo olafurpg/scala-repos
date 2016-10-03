@@ -188,7 +188,10 @@ object TestFramework {
   private[this] def order(
       mapped: Map[String, TestFunction],
       inputs: Seq[TestDefinition]): Seq[(String, TestFunction)] =
-    for (d <- inputs; act <- mapped.get(d.name)) yield (d.name, act)
+    for {
+      d <- inputs
+      act <- mapped.get(d.name)
+    } yield (d.name, act)
 
   private[this] def testMap(
       frameworks: Seq[Framework],

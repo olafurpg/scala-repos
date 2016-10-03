@@ -2470,10 +2470,12 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
     * don't have to implement new methods when I commit the CRUD snippets code.
     */
   def objFromIndexedParam: Box[A] = {
-    val found = for (req <- S.request.toList;
-                     (param, value :: _) <- req.params;
-                     fh <- mappedFieldList if fh.field.dbIndexed_? == true &&
-                       fh.name.equals(param)) yield find(value)
+    val found = for {
+      req <- S.request.toList
+      (param, value :: _) <- req.params
+      fh <- mappedFieldList if fh.field.dbIndexed_? == true &&
+        fh.name.equals(param)
+    } yield find(value)
 
     found.filter(obj =>
       obj match {

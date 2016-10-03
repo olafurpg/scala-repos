@@ -93,7 +93,10 @@ trait ScaladocAnalyzer extends Analyzer {
            }
          })
 
-      for (tree <- trees; t <- tree) t match {
+      for {
+        tree <- trees
+        t <- tree
+      } t match {
         case Ident(name) if name startsWith '$' => defineAlias(name)
         case _ =>
       }

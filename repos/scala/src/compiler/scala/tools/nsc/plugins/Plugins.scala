@@ -122,11 +122,17 @@ trait Plugins { global: Global =>
     * @see phasesSet
     */
   protected def computePluginPhases(): Unit =
-    for (p <- plugins; c <- p.components) addToPhasesSet(c, c.description)
+    for {
+      p <- plugins
+      c <- p.components
+    } addToPhasesSet(c, c.description)
 
   /** Summary of the options for all loaded plugins */
   def pluginOptionsHelp: String =
-    (for (plug <- roughPluginsList; help <- plug.optionsHelp) yield {
+    (for {
+      plug <- roughPluginsList
+      help <- plug.optionsHelp
+    } yield {
       "\nOptions for plugin '%s':\n%s\n".format(plug.name, help)
     }).mkString
 }

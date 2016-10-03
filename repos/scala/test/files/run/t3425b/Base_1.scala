@@ -27,7 +27,10 @@ object Gen {
   }
   val traits = Vector("Any", "A", "B", "C") map ("%6s" format _)
   val types = Vector("P", "Q", "R forSome { type R <: P with Q }")
-  val allTypes = for (c <- traits; tp <- types) yield Tp(c, tp)
+  val allTypes = for {
+    c <- traits
+    tp <- types
+  } yield Tp(c, tp)
   val pairs = allTypes flatMap (t1 => allTypes map (t2 => Pair(t1, t2)))
   val indices = pairs.indices
 

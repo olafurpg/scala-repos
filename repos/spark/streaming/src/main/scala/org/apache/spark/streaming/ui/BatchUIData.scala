@@ -54,8 +54,10 @@ private[ui] case class BatchUIData(
     * processing. Essentially, it is `processingEndTime` - `processingStartTime`.
     */
   def processingDelay: Option[Long] = {
-    for (start <- processingStartTime;
-         end <- processingEndTime) yield end - start
+    for {
+      start <- processingStartTime
+      end <- processingEndTime
+    } yield end - start
   }
 
   /**
@@ -127,7 +129,11 @@ private[ui] case class OutputOperationUIData(id: OutputOpId,
                                              endTime: Option[Long],
                                              failureReason: Option[String]) {
 
-  def duration: Option[Long] = for (s <- startTime; e <- endTime) yield e - s
+  def duration: Option[Long] =
+    for {
+      s <- startTime
+      e <- endTime
+    } yield e - s
 }
 
 private[ui] object OutputOperationUIData {

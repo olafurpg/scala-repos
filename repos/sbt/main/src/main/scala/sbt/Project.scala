@@ -805,8 +805,11 @@ object Project extends ProjectExtra {
     }
   def reverseDependencies(cMap: Map[ScopedKey[_], Flattened],
                           scoped: ScopedKey[_]): Iterable[ScopedKey[_]] =
-    for ((key, compiled) <- cMap; dep <- compiled.dependencies
-         if dep == scoped) yield key
+    for {
+      (key, compiled) <- cMap
+      dep <- compiled.dependencies
+      if dep == scoped
+    } yield key
 
   //@deprecated("Use SettingCompletions.setAll when available.", "0.13.0")
   def setAll(extracted: Extracted,

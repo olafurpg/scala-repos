@@ -88,9 +88,10 @@ object HeadHelper {
     */
   def mergeToHtmlHead(xhtml: NodeSeq): NodeSeq = {
 
-    val headInBody: NodeSeq = (for (body <- xhtml \ "body";
-                                    head <- findElems(body)(_.label == "head"))
-      yield head.child).flatMap { e =>
+    val headInBody: NodeSeq = (for {
+      body <- xhtml \ "body"
+      head <- findElems(body)(_.label == "head")
+    } yield head.child).flatMap { e =>
       e
     }
 

@@ -33,8 +33,10 @@ object Test extends App {
     val (o, e) = ten.partition(_ % 2 == 0)
     assert(o.size == e.size)
     val gs = ten groupBy (x => x / 4)
-    val vs1 = (for (k <- gs.keysIterator; v <- gs(k).toIterable.iterator)
-      yield v).toList.sorted
+    val vs1 = (for {
+      k <- gs.keysIterator
+      v <- gs(k).toIterable.iterator
+    } yield v).toList.sorted
     val vs2 = gs.values.toList.flatten.sorted
 //    val vs2 = gs.values.toList flatMap (xs => xs)
     assert(ten.head == 1)

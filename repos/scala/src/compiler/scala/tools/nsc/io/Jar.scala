@@ -43,7 +43,10 @@ class Jar(file: File) extends Iterable[JarEntry] {
 
   /** The manifest-defined classpath String if available. */
   def classPathString: Option[String] =
-    for (m <- manifest; cp <- m.attrs get Name.CLASS_PATH) yield cp
+    for {
+      m <- manifest
+      cp <- m.attrs get Name.CLASS_PATH
+    } yield cp
   def classPathElements: List[String] = classPathString match {
     case Some(s) => s split "\\s+" toList
     case _ => Nil

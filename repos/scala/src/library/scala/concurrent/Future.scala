@@ -674,7 +674,10 @@ object Future {
       implicit cbf: CanBuildFrom[M[Future[A]], A, M[A]],
       executor: ExecutionContext): Future[M[A]] = {
     in.foldLeft(successful(cbf(in))) { (fr, fa) =>
-        for (r <- fr; a <- fa) yield (r += a)
+        for {
+          r <- fr
+          a <- fa
+        } yield (r += a)
       }
       .map(_.result())(InternalCallbackExecutor)
   }
@@ -880,7 +883,10 @@ object Future {
       executor: ExecutionContext): Future[M[B]] =
     in.foldLeft(successful(cbf(in))) { (fr, a) =>
         val fb = fn(a)
-        for (r <- fr; b <- fb) yield (r += b)
+        for {
+          r <- fr
+          b <- fb
+        } yield (r += b)
       }
       .map(_.result())
 

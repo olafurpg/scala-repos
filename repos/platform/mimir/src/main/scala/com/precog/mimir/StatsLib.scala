@@ -495,7 +495,10 @@ trait StatsLibModule[M[+ _]]
           val left = schema.columns(JArrayFixedT(Map(0 -> JNumberT)))
           val right = schema.columns(JArrayFixedT(Map(1 -> JNumberT)))
 
-          val cross = for (l <- left; r <- right) yield (l, r)
+          val cross = for {
+            l <- left
+            r <- right
+          } yield (l, r)
 
           val result: Set[Result] =
             cross map {
@@ -818,7 +821,10 @@ trait StatsLibModule[M[+ _]]
           val left = schema.columns(JArrayFixedT(Map(0 -> JNumberT)))
           val right = schema.columns(JArrayFixedT(Map(1 -> JNumberT)))
 
-          val cross = for (l <- left; r <- right) yield (l, r)
+          val cross = for {
+            l <- left
+            r <- right
+          } yield (l, r)
 
           val result =
             cross map {
@@ -1071,7 +1077,10 @@ trait StatsLibModule[M[+ _]]
           val left = schema.columns(JArrayFixedT(Map(0 -> JNumberT)))
           val right = schema.columns(JArrayFixedT(Map(1 -> JNumberT)))
 
-          val cross = for (l <- left; r <- right) yield (l, r)
+          val cross = for {
+            l <- left
+            r <- right
+          } yield (l, r)
 
           val result =
             cross map {
@@ -1379,7 +1388,10 @@ trait StatsLibModule[M[+ _]]
           val left = schema.columns(JArrayFixedT(Map(0 -> JNumberT)))
           val right = schema.columns(JArrayFixedT(Map(1 -> JNumberT)))
 
-          val cross = for (l <- left; r <- right) yield (l, r)
+          val cross = for {
+            l <- left
+            r <- right
+          } yield (l, r)
 
           val result =
             cross map {

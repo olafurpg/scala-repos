@@ -1033,20 +1033,21 @@ class LiftServlet extends Loggable {
            v match {
              case ("Location", uri) =>
                val u = request
-               (v._1,
-                ((for (updated <- Full(
-                         (if (!LiftRules.excludePathFromContextPathRewriting
-                                .vend(uri)) u.contextPath
-                          else "") + uri).filter(ignore =>
-                         uri.startsWith("/"));
-                       rwf <- URLRewriter.rewriteFunc)
-                  yield rwf(updated)) openOr uri))
+               (v._1, ((for {
+                 updated <- Full(
+                   (if (!LiftRules.excludePathFromContextPathRewriting.vend(
+                          uri)) u.contextPath
+                    else "") + uri).filter(ignore => uri.startsWith("/"))
+                 rwf <- URLRewriter.rewriteFunc
+               } yield rwf(updated)) openOr uri))
              case _ => v
            })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
-      val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);
-                              accept <- innerReq.header("Accept")) yield accept
+      val acceptHeader = for {
+        innerReq <- Box.legacyNullTest(req.request)
+        accept <- innerReq.header("Accept")
+      } yield accept
 
       (Full(req), acceptHeader)
     }

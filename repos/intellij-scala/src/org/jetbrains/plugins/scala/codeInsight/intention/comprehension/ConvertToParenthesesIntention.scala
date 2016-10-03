@@ -43,9 +43,11 @@ class ConvertToParenthesesIntention extends PsiElementBaseIntentionAction {
       rBrace.replace(block.getLastChild)
     }
 
-    for (enumerators <- statement.enumerators;
-         cr <- enumerators.findChildrenByType(TokenType.WHITE_SPACE)
-         if cr.getText.contains('\n')) {
+    for {
+      enumerators <- statement.enumerators
+      cr <- enumerators.findChildrenByType(TokenType.WHITE_SPACE)
+      if cr.getText.contains('\n')
+    } {
       cr.replace(ScalaPsiElementFactory.createSemicolon(manager))
     }
 

@@ -127,7 +127,10 @@ object FastFuture {
       implicit cbf: CanBuildFrom[M[Future[T]], T, M[T]],
       executor: ExecutionContext): Future[M[T]] =
     in.foldLeft(successful(cbf(in))) { (fr, fa) ⇒
-        for (r ← fr.fast; a ← fa.asInstanceOf[Future[T]].fast) yield r += a
+        for {
+          r ← fr.fast
+          a ← fa.asInstanceOf[Future[T]].fast
+        } yield r += a
       }
       .fast
       .map(_.result())
@@ -149,7 +152,10 @@ object FastFuture {
       executor: ExecutionContext): Future[M[B]] =
     in.foldLeft(successful(cbf(in))) { (fr, a) ⇒
         val fb = fn(a.asInstanceOf[A])
-        for (r ← fr.fast; b ← fb.fast) yield r += b
+        for {
+          r ← fr.fast
+          b ← fb.fast
+        } yield r += b
       }
       .fast
       .map(_.result())

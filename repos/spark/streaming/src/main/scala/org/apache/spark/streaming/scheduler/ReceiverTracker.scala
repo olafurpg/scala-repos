@@ -535,7 +535,10 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
       case c: CleanupOldBlocks =>
         receiverTrackingInfos.values.flatMap(_.endpoint).foreach(_.send(c))
       case UpdateReceiverRateLimit(streamUID, newRate) =>
-        for (info <- receiverTrackingInfos.get(streamUID); eP <- info.endpoint) {
+        for {
+          info <- receiverTrackingInfos.get(streamUID)
+          eP <- info.endpoint
+        } {
           eP.send(UpdateRateLimit(newRate))
         }
       // Remote messages
