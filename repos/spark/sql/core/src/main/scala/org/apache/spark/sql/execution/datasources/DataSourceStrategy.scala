@@ -55,7 +55,7 @@ import org.apache.spark.util.collection.BitSet
   * SQL Data Sources.
   */
 private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
-  override def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  override def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case i @ logical.InsertIntoTable(
           l @ LogicalRelation(t: HadoopFsRelation, _, _),
           part,
@@ -217,7 +217,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
               {
                 val bucketed = t.location
                   .allFiles()
-                  .filterNot(_.getPath.getName startsWith "_")
+                  .filterNot(_.getPath.getName.startsWith("_"))
                   .groupBy { f =>
                     BucketingUtils
                       .getBucketId(f.getPath.getName)
@@ -625,7 +625,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     val filterSet = AttributeSet(filterPredicates.flatMap(_.references))
 
     val candidatePredicates = filterPredicates.map {
-      _ transform {
+      _.transform {
         case a: AttributeReference =>
           relation.attributeMap(a) // Match original case of attributes.
       }

@@ -67,7 +67,7 @@ class ChiSqSelectorSuite
       .collect()
       .foreach {
         case Row(vec1: Vector, vec2: Vector) =>
-          assert(vec1 ~== vec2 absTol 1e-1)
+          assert(vec1 ~== vec2.absTol(1e-1))
       }
   }
 

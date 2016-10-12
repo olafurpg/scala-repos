@@ -183,8 +183,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
   test("rollup overlapping columns") {
     checkAnswer(
       testData2
-        .rollup($"a" + $"b" as "foo", $"b" as "bar")
-        .agg(sum($"a" - $"b") as "foo"),
+        .rollup($"a" + $"b" as "foo", $"b".as("bar"))
+        .agg(sum($"a" - $"b").as("foo")),
       Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
         4,
         1,
@@ -273,12 +273,12 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
       decimalData.agg(avg('a), sumDistinct('a)), // non-partial
       Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
 
-    checkAnswer(decimalData.agg(avg('a cast DecimalType(10, 2))),
+    checkAnswer(decimalData.agg(avg('a.cast(DecimalType(10, 2)))),
                 Row(new java.math.BigDecimal(2.0)))
     // non-partial
     checkAnswer(
-      decimalData.agg(avg('a cast DecimalType(10, 2)),
-                      sumDistinct('a cast DecimalType(10, 2))),
+      decimalData.agg(avg('a.cast(DecimalType(10, 2))),
+                      sumDistinct('a.cast(DecimalType(10, 2)))),
       Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
   }
 

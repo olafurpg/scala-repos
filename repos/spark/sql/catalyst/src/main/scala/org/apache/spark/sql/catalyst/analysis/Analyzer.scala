@@ -103,7 +103,7 @@ class Analyzer(catalog: Catalog,
 
     def substituteCTE(plan: LogicalPlan,
                       cteRelations: Map[String, LogicalPlan]): LogicalPlan = {
-      plan transform {
+      plan.transform {
         // In hive, if there is same table name in database and CTE definition,
         // hive will use the table in database, not the CTE one.
         // Taking into account the reasonableness and the implementation complexity,
@@ -118,7 +118,7 @@ class Analyzer(catalog: Catalog,
           substituted.getOrElse(u)
         case other =>
           // This cannot be done in ResolveSubquery because ResolveSubquery does not know the CTE.
-          other transformExpressions {
+          other.transformExpressions {
             case e: SubqueryExpression =>
               e.withNewPlan(substituteCTE(e.query, cteRelations))
           }
@@ -157,7 +157,7 @@ class Analyzer(catalog: Catalog,
     private def assignAliases(exprs: Seq[NamedExpression]) = {
       exprs.zipWithIndex.map {
         case (expr, i) =>
-          expr transformUp {
+          expr.transformUp {
             case u @ UnresolvedAlias(child, optionalAliasName) =>
               child match {
                 case ne: NamedExpression => ne
@@ -331,7 +331,7 @@ class Analyzer(catalog: Catalog,
   }
 
   object ResolvePivot extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
       case p: Pivot
           if !p.childrenResolved | !p.aggregates.forall(_.resolved) =>
         p
@@ -485,11 +485,11 @@ class Analyzer(catalog: Catalog,
           val attributeRewrites = AttributeMap(
             oldRelation.output.zip(newRelation.output))
           val newRight =
-            right transformUp {
+            right.transformUp {
               case r if r == oldRelation => newRelation
             } transformUp {
               case other =>
-                other transformExpressions {
+                other.transformExpressions {
                   case a: Attribute =>
                     attributeRewrites
                       .get(a)
@@ -600,7 +600,7 @@ class Analyzer(catalog: Catalog,
 
       case q: LogicalPlan =>
         logTrace(s"Attempting to resolve ${q.simpleString}")
-        q transformExpressionsUp {
+        q.transformExpressionsUp {
           case u @ UnresolvedAttribute(nameParts) =>
             // Leave unchanged if resolution fails.  Hopefully will be resolved next round.
             val result = withPosition(u) {
@@ -623,11 +623,11 @@ class Analyzer(catalog: Catalog,
     def resolveDeserializer(deserializer: Expression,
                             attributes: Seq[Attribute]): Expression = {
       val unbound =
-        deserializer transform {
+        deserializer.transform {
           case b: BoundReference => attributes(b.ordinal)
         }
 
-      resolveExpression(unbound, LocalRelation(attributes), throws = true) transform {
+      resolveExpression(unbound, LocalRelation(attributes), throws = true).transform {
         case n: NewInstance
             // If this is an inner class of another class, register the outer object in `OuterScopes`.
             // Note that static inner classes (e.g., inner classes within Scala objects) don't need
@@ -672,7 +672,7 @@ class Analyzer(catalog: Catalog,
     // (like try to resolve `a.b` but `a` doesn't exist), fail and return the origin one.
     // Else, throw exception.
     try {
-      expr transformUp {
+      expr.transformUp {
         case u @ UnresolvedAttribute(nameParts) =>
           withPosition(u) { plan.resolve(nameParts, resolver).getOrElse(u) }
         case UnresolvedExtractValue(child, fieldName) if child.resolved =>
@@ -703,7 +703,7 @@ class Analyzer(catalog: Catalog,
           if conf.orderByOrdinal &&
             orders.exists(o => IntegerIndex.unapply(o.child).nonEmpty) =>
         val newOrders =
-          orders map {
+          orders.map {
             case s @ SortOrder(IntegerIndex(index), direction) =>
               if (index > 0 && index <= child.output.size) {
                 SortOrder(child.output(index - 1), direction)
@@ -807,7 +807,7 @@ class Analyzer(catalog: Catalog,
   object ResolveFunctions extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
       case q: LogicalPlan =>
-        q transformExpressions {
+        q.transformExpressions {
           case u if !u.childrenResolved =>
             u // Skip until children are resolved.
           case u @ UnresolvedFunction(name, children, isDistinct) =>
@@ -850,7 +850,7 @@ class Analyzer(catalog: Catalog,
 
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
       case q: LogicalPlan if q.childrenResolved && hasSubquery(q) =>
-        q transformExpressions {
+        q.transformExpressions {
           case e: SubqueryExpression if !e.query.resolved =>
             e.withNewPlan(execute(e.query))
         }
@@ -949,8 +949,8 @@ class Analyzer(catalog: Catalog,
           val evaluatedOrderings = resolvedAliasedOrdering.zip(sortOrder).map {
             case (evaluated, order) =>
               val index = originalAggExprs.indexWhere {
-                case Alias(child, _) => child semanticEquals evaluated.child
-                case other => other semanticEquals evaluated.child
+                case Alias(child, _) => child.semanticEquals(evaluated.child)
+                case other => other.semanticEquals(evaluated.child)
               }
 
               if (index == -1) {
@@ -1304,7 +1304,7 @@ class Analyzer(catalog: Catalog,
 
     // We have to use transformDown at here to make sure the rule of
     // "Aggregate with Having clause" will be triggered.
-    def apply(plan: LogicalPlan): LogicalPlan = plan transformDown {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transformDown {
 
       // Aggregate with Having clause. This rule works with an unresolved Aggregate because
       // a resolved Aggregate will not have Window Functions.
@@ -1416,7 +1416,7 @@ class Analyzer(catalog: Catalog,
         case p if !p.resolved => p // Skip unresolved nodes.
 
         case p =>
-          p transformExpressionsUp {
+          p.transformExpressionsUp {
 
             case udf @ ScalaUDF(func, _, inputs, _) =>
               val parameterTypes = ScalaReflection.getParameterTypes(func)
@@ -1441,9 +1441,9 @@ class Analyzer(catalog: Catalog,
     * Check and add proper window frames for all window functions.
     */
   object ResolveWindowFrame extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
       case logical: LogicalPlan =>
-        logical transformExpressions {
+        logical.transformExpressions {
           case WindowExpression(
               wf: WindowFunction,
               WindowSpecDefinition(_, _, f: SpecifiedWindowFrame))
@@ -1470,9 +1470,9 @@ class Analyzer(catalog: Catalog,
     * Check and add order to [[AggregateWindowFunction]]s.
     */
   object ResolveWindowOrder extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
       case logical: LogicalPlan =>
-        logical transformExpressions {
+        logical.transformExpressions {
           case WindowExpression(wf: WindowFunction, spec)
               if spec.orderSpec.isEmpty =>
             failAnalysis(s"WindowFunction $wf requires window to be ordered")
@@ -1565,7 +1565,7 @@ class Analyzer(catalog: Catalog,
   * scoping information for attributes and can be removed once analysis is complete.
   */
 object EliminateSubqueryAliases extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformUp {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformUp {
     case SubqueryAlias(_, child) => child
   }
 }
@@ -1574,7 +1574,7 @@ object EliminateSubqueryAliases extends Rule[LogicalPlan] {
   * Removes [[Union]] operators from the plan if it just has one child.
   */
 object EliminateUnions extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case Union(children) if children.size == 1 => children.head
   }
 }
@@ -1635,7 +1635,7 @@ object CleanupAliases extends Rule[LogicalPlan] {
 
     case other =>
       var stop = false
-      other transformExpressionsDown {
+      other.transformExpressionsDown {
         case c: CreateStruct if !stop =>
           stop = true
           c.copy(children = c.children.map(trimNonTopLevelAliases))
@@ -1670,7 +1670,7 @@ object ResolveUpCast extends Rule[LogicalPlan] {
   }
 
   def apply(plan: LogicalPlan): LogicalPlan = {
-    plan transformAllExpressions {
+    plan.transformAllExpressions {
       case u @ UpCast(child, _, _) if !child.resolved => u
 
       case UpCast(child, dataType, walkedTypePath) =>

@@ -99,7 +99,7 @@ class NNLSSuite extends SparkFunSuite {
     val ws = NNLS.createWorkspace(n)
     val x = NNLS.solve(ata, atb, ws)
     for (i <- 0 until n) {
-      assert(x(i) ~== goodx(i) absTol 1E-3)
+      assert(x(i) ~== goodx(i).absTol(1E-3))
       assert(x(i) >= 0)
     }
   }

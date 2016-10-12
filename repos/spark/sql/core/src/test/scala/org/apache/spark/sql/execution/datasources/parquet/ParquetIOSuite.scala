@@ -601,7 +601,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
 
       withTempPath { dir =>
         val m2 = intercept[SparkException] {
-          val df = sqlContext.range(1).select('id as 'a, 'id as 'b).coalesce(1)
+          val df =
+            sqlContext.range(1).select('id.as('a), 'id.as('b)).coalesce(1)
           df.write.partitionBy("a").parquet(dir.getCanonicalPath)
         }.getCause.getMessage
         assert(m2.contains("Intentional exception for testing purposes"))

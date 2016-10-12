@@ -1159,8 +1159,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     // until subscribe is called on all consumers
     TestUtils.waitUntilTrue(
       () => {
-        consumerPollers forall
-          (poller => poller.isSubscribeRequestProcessed())
+        consumerPollers.forall(poller => poller.isSubscribeRequestProcessed())
       },
       s"Failed to call subscribe on all consumers in the group for subscription ${subscriptions}",
       1000L)

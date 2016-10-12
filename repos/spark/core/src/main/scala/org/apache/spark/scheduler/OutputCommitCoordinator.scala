@@ -155,7 +155,7 @@ private[spark] class OutputCommitCoordinator(conf: SparkConf,
 
   def stop(): Unit = synchronized {
     if (isDriver) {
-      coordinatorRef.foreach(_ send StopCoordinator)
+      coordinatorRef.foreach(_.send(StopCoordinator))
       coordinatorRef = None
       authorizedCommittersByStage.clear()
     }

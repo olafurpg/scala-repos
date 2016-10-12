@@ -183,9 +183,9 @@ class AFTSurvivalRegressionSuite
     val interceptR = 1.759
     val scaleR = 1.41
 
-    assert(model.intercept ~== interceptR relTol 1E-3)
-    assert(model.coefficients ~== coefficientsR relTol 1E-3)
-    assert(model.scale ~== scaleR relTol 1E-3)
+    assert(model.intercept ~== interceptR.relTol(1E-3))
+    assert(model.coefficients ~== coefficientsR.relTol(1E-3))
+    assert(model.scale ~== scaleR.relTol(1E-3))
 
     /*
        Using the following R code to predict.
@@ -206,8 +206,8 @@ class AFTSurvivalRegressionSuite
     val responsePredictR = 4.494763
     val quantilePredictR = Vectors.dense(0.1879174, 2.6801195, 14.5779394)
 
-    assert(model.predict(features) ~== responsePredictR relTol 1E-3)
-    assert(model.predictQuantiles(features) ~== quantilePredictR relTol 1E-3)
+    assert(model.predict(features) ~== responsePredictR.relTol(1E-3))
+    assert(model.predictQuantiles(features) ~== quantilePredictR.relTol(1E-3))
 
     model
       .transform(datasetUnivariate)
@@ -215,8 +215,8 @@ class AFTSurvivalRegressionSuite
       .collect()
       .foreach {
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
-          assert(prediction ~== model.predict(features) relTol 1E-5)
-          assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
+          assert(prediction ~== model.predict(features).relTol(1E-5))
+          assert(quantiles ~== model.predictQuantiles(features).relTol(1E-5))
       }
   }
 
@@ -257,9 +257,9 @@ class AFTSurvivalRegressionSuite
     val interceptR = 1.9206
     val scaleR = 0.977
 
-    assert(model.intercept ~== interceptR relTol 1E-3)
-    assert(model.coefficients ~== coefficientsR relTol 1E-3)
-    assert(model.scale ~== scaleR relTol 1E-3)
+    assert(model.intercept ~== interceptR.relTol(1E-3))
+    assert(model.coefficients ~== coefficientsR.relTol(1E-3))
+    assert(model.scale ~== scaleR.relTol(1E-3))
 
     /*
        Using the following R code to predict.
@@ -279,8 +279,8 @@ class AFTSurvivalRegressionSuite
     val responsePredictR = 4.761219
     val quantilePredictR = Vectors.dense(0.5287044, 3.3285858, 10.7517072)
 
-    assert(model.predict(features) ~== responsePredictR relTol 1E-3)
-    assert(model.predictQuantiles(features) ~== quantilePredictR relTol 1E-3)
+    assert(model.predict(features) ~== responsePredictR.relTol(1E-3))
+    assert(model.predictQuantiles(features) ~== quantilePredictR.relTol(1E-3))
 
     model
       .transform(datasetMultivariate)
@@ -288,8 +288,8 @@ class AFTSurvivalRegressionSuite
       .collect()
       .foreach {
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
-          assert(prediction ~== model.predict(features) relTol 1E-5)
-          assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
+          assert(prediction ~== model.predict(features).relTol(1E-5))
+          assert(quantiles ~== model.predictQuantiles(features).relTol(1E-5))
       }
   }
 
@@ -331,8 +331,8 @@ class AFTSurvivalRegressionSuite
     val scaleR = 1.52
 
     assert(model.intercept === interceptR)
-    assert(model.coefficients ~== coefficientsR relTol 1E-3)
-    assert(model.scale ~== scaleR relTol 1E-3)
+    assert(model.coefficients ~== coefficientsR.relTol(1E-3))
+    assert(model.scale ~== scaleR.relTol(1E-3))
 
     /*
        Using the following R code to predict.
@@ -352,8 +352,8 @@ class AFTSurvivalRegressionSuite
     val responsePredictR = 44.54465
     val quantilePredictR = Vectors.dense(1.452103, 25.506077, 158.428600)
 
-    assert(model.predict(features) ~== responsePredictR relTol 1E-3)
-    assert(model.predictQuantiles(features) ~== quantilePredictR relTol 1E-3)
+    assert(model.predict(features) ~== responsePredictR.relTol(1E-3))
+    assert(model.predictQuantiles(features) ~== quantilePredictR.relTol(1E-3))
 
     model
       .transform(datasetMultivariate)
@@ -361,8 +361,8 @@ class AFTSurvivalRegressionSuite
       .collect()
       .foreach {
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
-          assert(prediction ~== model.predict(features) relTol 1E-5)
-          assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
+          assert(prediction ~== model.predict(features).relTol(1E-5))
+          assert(quantiles ~== model.predictQuantiles(features).relTol(1E-5))
       }
   }
 
@@ -375,7 +375,7 @@ class AFTSurvivalRegressionSuite
 
     outputDf.select("features", "prediction").collect().foreach {
       case Row(features: Vector, prediction: Double) =>
-        assert(prediction ~== model.predict(features) relTol 1E-5)
+        assert(prediction ~== model.predict(features).relTol(1E-5))
     }
   }
 

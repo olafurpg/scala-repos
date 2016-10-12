@@ -294,7 +294,7 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
       .multiply(largeB.toLocalMatrix().asInstanceOf[DenseMatrix])
     assert(largeC.numRows() === largeA.numRows())
     assert(largeC.numCols() === largeB.numCols())
-    assert(localC ~== result absTol 1e-8)
+    assert(localC ~== result.absTol(1e-8))
   }
 
   test("simulate multiply") {

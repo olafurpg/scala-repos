@@ -147,7 +147,7 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val procDelayMs = 20
     val proc = List.fill(50)(procDelayMs) // 20ms of processing
     val sched = List.tabulate(50)(x => rng.nextInt(19) + 1) // random wait
-    val speeds = elements map ((x) => x.toDouble / procDelayMs * 1000)
+    val speeds = elements.map((x) => x.toDouble / procDelayMs * 1000)
 
     val res = for (i <- List.range(0, 50))
       yield p.compute(times(i), elements(i), proc(i), sched(i))

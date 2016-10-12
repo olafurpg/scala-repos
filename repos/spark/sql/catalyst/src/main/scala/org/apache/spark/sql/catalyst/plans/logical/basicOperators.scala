@@ -121,7 +121,7 @@ abstract class SetOperation(left: LogicalPlan, right: LogicalPlan)
   protected def rightConstraints: Set[Expression] = {
     require(left.output.size == right.output.size)
     val attributeRewrites = AttributeMap(right.output.zip(left.output))
-    right.constraints.map(_ transform {
+    right.constraints.map(_.transform {
       case a: Attribute => attributeRewrites(a)
     })
   }
@@ -244,7 +244,7 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
       constraints: Set[Expression]): Set[Expression] = {
     require(reference.size == original.size)
     val attributeRewrites = AttributeMap(original.zip(reference))
-    constraints.map(_ transform {
+    constraints.map(_.transform {
       case a: Attribute => attributeRewrites(a)
     })
   }
@@ -256,7 +256,7 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
           rewriteConstraints(children.head.output,
                              child.output,
                              child.constraints))
-      .reduce(_ intersect _)
+      .reduce(_.intersect(_))
   }
 }
 

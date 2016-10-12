@@ -37,13 +37,13 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
     sqlContext
       .range(10)
-      .select('id as 'key, concat(lit("val_"), 'id) as 'value)
+      .select('id.as('key), concat(lit("val_"), 'id).as('value))
       .write
       .saveAsTable("parquet_t1")
 
     sqlContext
       .range(10)
-      .select('id as 'a, 'id as 'b, 'id as 'c, 'id as 'd)
+      .select('id.as('a), 'id.as('b), 'id.as('c), 'id.as('d))
       .write
       .saveAsTable("parquet_t2")
 

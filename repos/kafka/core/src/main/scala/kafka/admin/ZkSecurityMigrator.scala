@@ -199,24 +199,24 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
               case path => s"$path/$child"
             }
           }.foreach(setAclsRecursively)
-          promise success "done"
+          promise.success("done")
         case Code.CONNECTIONLOSS =>
           zkHandle.getChildren(path, false, GetChildrenCallback, ctx)
         case Code.NONODE =>
           warn(
             "Node is gone, it could be have been legitimately deleted: %s"
               .format(path))
-          promise success "done"
+          promise.success("done")
         case Code.SESSIONEXPIRED =>
           // Starting a new session isn't really a problem, but it'd complicate
           // the logic of the tool, so we quit and let the user re-run it.
           System.out.println("ZooKeeper session expired while changing ACLs")
-          promise failure ZkException.create(
-            KeeperException.create(Code.get(rc)))
+          promise.failure(
+            ZkException.create(KeeperException.create(Code.get(rc))))
         case _ =>
           System.out.println("Unexpected return code: %d".format(rc))
-          promise failure ZkException.create(
-            KeeperException.create(Code.get(rc)))
+          promise.failure(
+            ZkException.create(KeeperException.create(Code.get(rc))))
       }
     }
   }
@@ -229,7 +229,7 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
       Code.get(rc) match {
         case Code.OK =>
           info("Successfully set ACLs for %s".format(path))
-          promise success "done"
+          promise.success("done")
         case Code.CONNECTIONLOSS =>
           zkHandle.setACL(path,
                           ZkUtils.DefaultAcls(zkUtils.isSecure),
@@ -240,17 +240,17 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
           warn(
             "Znode is gone, it could be have been legitimately deleted: %s"
               .format(path))
-          promise success "done"
+          promise.success("done")
         case Code.SESSIONEXPIRED =>
           // Starting a new session isn't really a problem, but it'd complicate
           // the logic of the tool, so we quit and let the user re-run it.
           System.out.println("ZooKeeper session expired while changing ACLs")
-          promise failure ZkException.create(
-            KeeperException.create(Code.get(rc)))
+          promise.failure(
+            ZkException.create(KeeperException.create(Code.get(rc))))
         case _ =>
           System.out.println("Unexpected return code: %d".format(rc))
-          promise failure ZkException.create(
-            KeeperException.create(Code.get(rc)))
+          promise.failure(
+            ZkException.create(KeeperException.create(Code.get(rc))))
       }
     }
   }

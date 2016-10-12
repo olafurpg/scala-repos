@@ -54,8 +54,8 @@ class ExpressionSQLBuilderSuite extends SQLBuilderTest {
     checkSQL('a.int > 'b.int, "(`a` > `b`)")
     checkSQL('a.int >= 'b.int, "(`a` >= `b`)")
 
-    checkSQL('a.int in ('b.int, 'c.int), "(`a` IN (`b`, `c`))")
-    checkSQL('a.int in (1, 2), "(`a` IN (1, 2))")
+    checkSQL('a.int.in('b.int, 'c.int), "(`a` IN (`b`, `c`))")
+    checkSQL('a.int.in(1, 2), "(`a` IN (1, 2))")
 
     checkSQL('a.int.isNull, "(`a` IS NULL)")
     checkSQL('a.int.isNotNull, "(`a` IS NOT NULL)")

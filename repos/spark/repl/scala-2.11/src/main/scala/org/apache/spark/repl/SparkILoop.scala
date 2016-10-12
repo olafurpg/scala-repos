@@ -117,7 +117,7 @@ object SparkILoop {
         if (sets.classpath.isDefault)
           sets.classpath.value = sys.props("java.class.path")
 
-        repl process sets
+        repl.process(sets)
       }
     }
   }

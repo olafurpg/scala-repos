@@ -61,7 +61,7 @@ class TypedColumn[-T, U](expr: Expression,
                                  schema: Seq[Attribute]): TypedColumn[T, U] = {
     val boundEncoder =
       inputEncoder.bind(schema).asInstanceOf[ExpressionEncoder[Any]]
-    new TypedColumn[T, U](expr transform {
+    new TypedColumn[T, U](expr.transform {
       case ta: TypedAggregateExpression if ta.aEncoder.isEmpty =>
         ta.copy(aEncoder = Some(boundEncoder), children = schema)
     }, encoder)

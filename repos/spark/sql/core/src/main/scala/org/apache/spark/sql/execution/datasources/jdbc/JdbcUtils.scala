@@ -270,7 +270,7 @@ object JdbcUtils extends Logging {
   def schemaString(df: DataFrame, url: String): String = {
     val sb = new StringBuilder()
     val dialect = JdbcDialects.get(url)
-    df.schema.fields foreach { field =>
+    df.schema.fields.foreach { field =>
       {
         val name = field.name
         val typ: String =

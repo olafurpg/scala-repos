@@ -158,7 +158,7 @@ class PowerIterationClusteringSuite
     val w = normalize(sc.parallelize(similarities, 2))
     w.edges.collect().foreach {
       case Edge(i, j, x) =>
-        assert(x ~== expected(i.toInt)(j.toInt) absTol 1e-14)
+        assert(x ~== expected(i.toInt)(j.toInt).absTol(1e-14))
     }
     val v0 = sc.parallelize(
       Seq[(Long, Double)]((0, 0.1), (1, 0.2), (2, 0.3), (3, 0.4)),
@@ -170,7 +170,7 @@ class PowerIterationClusteringSuite
     val u1 = u.map(x => x / norm)
     v1.foreach {
       case (i, x) =>
-        assert(x ~== u1(i.toInt) absTol 1e-14)
+        assert(x ~== u1(i.toInt).absTol(1e-14))
     }
   }
 

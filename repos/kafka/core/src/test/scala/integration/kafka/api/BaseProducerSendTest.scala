@@ -379,7 +379,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
         assertTrue("Request should have completed", future.isDone)
 
       // make sure all of them end up in the same partition with increasing offset values
-      for ((future, offset) <- futures zip (0 until numRecords)) {
+      for ((future, offset) <- futures.zip(0 until numRecords)) {
         assertEquals(offset.toLong, future.get.offset)
         assertEquals(topic, future.get.topic)
         assertEquals(partition, future.get.partition)

@@ -312,7 +312,7 @@ case class ExpressionEncoder[T](schema: StructType,
     // Note that, `BoundReference` contains the expected type, but here we need the actual type, so
     // we unbound it by the given `schema` and propagate the actual type to `GetStructField`.
     val unbound =
-      fromRowExpression transform {
+      fromRowExpression.transform {
         case b: BoundReference => schema(b.ordinal)
       }
 
@@ -370,7 +370,7 @@ case class ExpressionEncoder[T](schema: StructType,
     * Returns a new encoder with input columns shifted by `delta` ordinals
     */
   def shift(delta: Int): ExpressionEncoder[T] = {
-    copy(fromRowExpression = fromRowExpression transform {
+    copy(fromRowExpression = fromRowExpression.transform {
       case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
     })
   }

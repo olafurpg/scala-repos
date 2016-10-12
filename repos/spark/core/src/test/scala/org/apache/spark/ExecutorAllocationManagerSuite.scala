@@ -1086,89 +1086,89 @@ private object ExecutorAllocationManagerSuite extends PrivateMethodTester {
     PrivateMethod[Map[String, Int]]('hostToLocalTaskCount)
 
   private def numExecutorsToAdd(manager: ExecutorAllocationManager): Int = {
-    manager invokePrivate _numExecutorsToAdd()
+    manager.invokePrivate(_numExecutorsToAdd())
   }
 
   private def numExecutorsTarget(manager: ExecutorAllocationManager): Int = {
-    manager invokePrivate _numExecutorsTarget()
+    manager.invokePrivate(_numExecutorsTarget())
   }
 
   private def executorsPendingToRemove(
       manager: ExecutorAllocationManager): collection.Set[String] = {
-    manager invokePrivate _executorsPendingToRemove()
+    manager.invokePrivate(_executorsPendingToRemove())
   }
 
   private def executorIds(
       manager: ExecutorAllocationManager): collection.Set[String] = {
-    manager invokePrivate _executorIds()
+    manager.invokePrivate(_executorIds())
   }
 
   private def addTime(manager: ExecutorAllocationManager): Long = {
-    manager invokePrivate _addTime()
+    manager.invokePrivate(_addTime())
   }
 
   private def removeTimes(
       manager: ExecutorAllocationManager): collection.Map[String, Long] = {
-    manager invokePrivate _removeTimes()
+    manager.invokePrivate(_removeTimes())
   }
 
   private def schedule(manager: ExecutorAllocationManager): Unit = {
-    manager invokePrivate _schedule()
+    manager.invokePrivate(_schedule())
   }
 
   private def maxNumExecutorsNeeded(manager: ExecutorAllocationManager): Int = {
-    manager invokePrivate _maxNumExecutorsNeeded()
+    manager.invokePrivate(_maxNumExecutorsNeeded())
   }
 
   private def addExecutors(manager: ExecutorAllocationManager): Int = {
-    val maxNumExecutorsNeeded = manager invokePrivate _maxNumExecutorsNeeded()
-    manager invokePrivate _addExecutors(maxNumExecutorsNeeded)
+    val maxNumExecutorsNeeded = manager.invokePrivate(_maxNumExecutorsNeeded())
+    manager.invokePrivate(_addExecutors(maxNumExecutorsNeeded))
   }
 
   private def adjustRequestedExecutors(
       manager: ExecutorAllocationManager): Int = {
-    manager invokePrivate _updateAndSyncNumExecutorsTarget(0L)
+    manager.invokePrivate(_updateAndSyncNumExecutorsTarget(0L))
   }
 
   private def removeExecutor(manager: ExecutorAllocationManager,
                              id: String): Boolean = {
-    manager invokePrivate _removeExecutor(id)
+    manager.invokePrivate(_removeExecutor(id))
   }
 
   private def onExecutorAdded(manager: ExecutorAllocationManager,
                               id: String): Unit = {
-    manager invokePrivate _onExecutorAdded(id)
+    manager.invokePrivate(_onExecutorAdded(id))
   }
 
   private def onExecutorRemoved(manager: ExecutorAllocationManager,
                                 id: String): Unit = {
-    manager invokePrivate _onExecutorRemoved(id)
+    manager.invokePrivate(_onExecutorRemoved(id))
   }
 
   private def onSchedulerBacklogged(manager: ExecutorAllocationManager): Unit = {
-    manager invokePrivate _onSchedulerBacklogged()
+    manager.invokePrivate(_onSchedulerBacklogged())
   }
 
   private def onSchedulerQueueEmpty(manager: ExecutorAllocationManager): Unit = {
-    manager invokePrivate _onSchedulerQueueEmpty()
+    manager.invokePrivate(_onSchedulerQueueEmpty())
   }
 
   private def onExecutorIdle(manager: ExecutorAllocationManager,
                              id: String): Unit = {
-    manager invokePrivate _onExecutorIdle(id)
+    manager.invokePrivate(_onExecutorIdle(id))
   }
 
   private def onExecutorBusy(manager: ExecutorAllocationManager,
                              id: String): Unit = {
-    manager invokePrivate _onExecutorBusy(id)
+    manager.invokePrivate(_onExecutorBusy(id))
   }
 
   private def localityAwareTasks(manager: ExecutorAllocationManager): Int = {
-    manager invokePrivate _localityAwareTasks()
+    manager.invokePrivate(_localityAwareTasks())
   }
 
   private def hostToLocalTaskCount(
       manager: ExecutorAllocationManager): Map[String, Int] = {
-    manager invokePrivate _hostToLocalTaskCount()
+    manager.invokePrivate(_hostToLocalTaskCount())
   }
 }

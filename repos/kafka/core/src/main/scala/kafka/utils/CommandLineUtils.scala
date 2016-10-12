@@ -68,7 +68,7 @@ object CommandLineUtils extends Logging {
     */
   def parseKeyValueArgs(args: Iterable[String],
                         acceptMissingValue: Boolean = true): Properties = {
-    val splits = args.map(_ split "=").filterNot(_.length == 0)
+    val splits = args.map(_.split("=")).filterNot(_.length == 0)
 
     val props = new Properties
     for (a <- splits) {

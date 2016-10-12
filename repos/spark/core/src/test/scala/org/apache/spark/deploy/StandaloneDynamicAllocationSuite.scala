@@ -440,7 +440,7 @@ class StandaloneDynamicAllocationSuite
     val getMap =
       PrivateMethod[mutable.HashMap[String, Int]]('executorIdToTaskCount)
     val taskScheduler = sc.taskScheduler.asInstanceOf[TaskSchedulerImpl]
-    val executorIdToTaskCount = taskScheduler invokePrivate getMap()
+    val executorIdToTaskCount = taskScheduler.invokePrivate(getMap())
     executorIdToTaskCount(executors.head) = 1
     // kill the busy executor without force; this should fail
     assert(!killExecutor(sc, executors.head, force = false))

@@ -93,7 +93,7 @@ case class MemoryStream[A: Encoder](id: Int, sqlContext: SQLContext)
           s"Running [$start, $currentOffset] on blocks ${newBlocks.mkString(", ")}")
         val df = newBlocks
           .map(_.toDF())
-          .reduceOption(_ unionAll _)
+          .reduceOption(_.unionAll(_))
           .getOrElse(sqlContext.emptyDataFrame)
 
         Some(new Batch(currentOffset, df))
@@ -130,7 +130,7 @@ class MemorySink(schema: StructType) extends Sink with Logging {
   def allData: Seq[Row] = synchronized {
     batches
       .map(_.data)
-      .reduceOption(_ unionAll _)
+      .reduceOption(_.unionAll(_))
       .map(_.collect().toSeq)
       .getOrElse(Seq.empty)
   }

@@ -346,7 +346,7 @@ class GeneralizedLinearRegressionSuite
         val model = trainer.fit(dataset)
         val actual = Vectors
           .dense(model.intercept, model.coefficients(0), model.coefficients(1))
-        assert(actual ~= expected(idx) absTol 1e-4,
+        assert(actual ~= expected(idx).absTol(1e-4),
                "Model mismatch: GLM with gaussian family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
 
@@ -361,7 +361,7 @@ class GeneralizedLinearRegressionSuite
                 BLAS.dot(features, model.coefficients) + model.intercept
               val prediction2 = familyLink.fitted(eta)
               assert(
-                prediction1 ~= prediction2 relTol 1E-5,
+                prediction1 ~= prediction2.relTol(1E-5),
                 "Prediction mismatch: GLM with " +
                   s"gaussian family, $link link and fitIntercept = $fitIntercept.")
           }
@@ -411,7 +411,7 @@ class GeneralizedLinearRegressionSuite
       val model = trainer.fit(datasetGaussianIdentity)
       val actual = Vectors
         .dense(model.intercept, model.coefficients(0), model.coefficients(1))
-      assert(actual ~= expected(idx) absTol 1e-4,
+      assert(actual ~= expected(idx).absTol(1e-4),
              "Model mismatch: GLM with gaussian family, " +
                s"fitIntercept = $fitIntercept and regParam = $regParam.")
 
@@ -478,7 +478,7 @@ class GeneralizedLinearRegressionSuite
                                    model.coefficients(1),
                                    model.coefficients(2),
                                    model.coefficients(3))
-        assert(actual ~= expected(idx) absTol 1e-4,
+        assert(actual ~= expected(idx).absTol(1e-4),
                "Model mismatch: GLM with binomial family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
 
@@ -493,7 +493,7 @@ class GeneralizedLinearRegressionSuite
                 BLAS.dot(features, model.coefficients) + model.intercept
               val prediction2 = familyLink.fitted(eta)
               assert(
-                prediction1 ~= prediction2 relTol 1E-5,
+                prediction1 ~= prediction2.relTol(1E-5),
                 "Prediction mismatch: GLM with " +
                   s"binomial family, $link link and fitIntercept = $fitIntercept.")
           }
@@ -557,7 +557,7 @@ class GeneralizedLinearRegressionSuite
         val model = trainer.fit(dataset)
         val actual = Vectors
           .dense(model.intercept, model.coefficients(0), model.coefficients(1))
-        assert(actual ~= expected(idx) absTol 1e-4,
+        assert(actual ~= expected(idx).absTol(1e-4),
                "Model mismatch: GLM with poisson family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
 
@@ -572,7 +572,7 @@ class GeneralizedLinearRegressionSuite
                 BLAS.dot(features, model.coefficients) + model.intercept
               val prediction2 = familyLink.fitted(eta)
               assert(
-                prediction1 ~= prediction2 relTol 1E-5,
+                prediction1 ~= prediction2.relTol(1E-5),
                 "Prediction mismatch: GLM with " +
                   s"poisson family, $link link and fitIntercept = $fitIntercept.")
           }
@@ -636,7 +636,7 @@ class GeneralizedLinearRegressionSuite
         val model = trainer.fit(dataset)
         val actual = Vectors
           .dense(model.intercept, model.coefficients(0), model.coefficients(1))
-        assert(actual ~= expected(idx) absTol 1e-4,
+        assert(actual ~= expected(idx).absTol(1e-4),
                "Model mismatch: GLM with gamma family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
 
@@ -651,7 +651,7 @@ class GeneralizedLinearRegressionSuite
                 BLAS.dot(features, model.coefficients) + model.intercept
               val prediction2 = familyLink.fitted(eta)
               assert(
-                prediction1 ~= prediction2 relTol 1E-5,
+                prediction1 ~= prediction2.relTol(1E-5),
                 "Prediction mismatch: GLM with " +
                   s"gamma family, $link link and fitIntercept = $fitIntercept.")
           }
@@ -757,36 +757,36 @@ class GeneralizedLinearRegressionSuite
       .collect()
       .map(_.getDouble(0))
 
-    assert(model.coefficients ~== coefficientsR absTol 1E-3)
-    assert(model.intercept ~== interceptR absTol 1E-3)
+    assert(model.coefficients ~== coefficientsR.absTol(1E-3))
+    assert(model.intercept ~== interceptR.absTol(1E-3))
     devianceResiduals.zip(devianceResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     pearsonResiduals.zip(pearsonResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     workingResiduals.zip(workingResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     responseResiduals.zip(responseResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.tValues.zip(tValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.pValues.zip(pValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
-    assert(summary.dispersion ~== dispersionR absTol 1E-3)
-    assert(summary.nullDeviance ~== nullDevianceR absTol 1E-3)
-    assert(summary.deviance ~== residualDevianceR absTol 1E-3)
+    assert(summary.dispersion ~== dispersionR.absTol(1E-3))
+    assert(summary.nullDeviance ~== nullDevianceR.absTol(1E-3))
+    assert(summary.deviance ~== residualDevianceR.absTol(1E-3))
     assert(summary.residualDegreeOfFreedom === residualDegreeOfFreedomR)
     assert(
       summary.residualDegreeOfFreedomNull === residualDegreeOfFreedomNullR)
-    assert(summary.aic ~== aicR absTol 1E-3)
+    assert(summary.aic ~== aicR.absTol(1E-3))
   }
 
   test("glm summary: binomial family with weight") {
@@ -887,36 +887,36 @@ class GeneralizedLinearRegressionSuite
       .collect()
       .map(_.getDouble(0))
 
-    assert(model.coefficients ~== coefficientsR absTol 1E-3)
-    assert(model.intercept ~== interceptR absTol 1E-3)
+    assert(model.coefficients ~== coefficientsR.absTol(1E-3))
+    assert(model.intercept ~== interceptR.absTol(1E-3))
     devianceResiduals.zip(devianceResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     pearsonResiduals.zip(pearsonResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     workingResiduals.zip(workingResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     responseResiduals.zip(responseResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.tValues.zip(tValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.pValues.zip(pValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
-    assert(summary.dispersion ~== dispersionR absTol 1E-3)
-    assert(summary.nullDeviance ~== nullDevianceR absTol 1E-3)
-    assert(summary.deviance ~== residualDevianceR absTol 1E-3)
+    assert(summary.dispersion ~== dispersionR.absTol(1E-3))
+    assert(summary.nullDeviance ~== nullDevianceR.absTol(1E-3))
+    assert(summary.deviance ~== residualDevianceR.absTol(1E-3))
     assert(summary.residualDegreeOfFreedom === residualDegreeOfFreedomR)
     assert(
       summary.residualDegreeOfFreedomNull === residualDegreeOfFreedomNullR)
-    assert(summary.aic ~== aicR absTol 1E-3)
+    assert(summary.aic ~== aicR.absTol(1E-3))
   }
 
   test("glm summary: poisson family with weight") {
@@ -1022,36 +1022,36 @@ class GeneralizedLinearRegressionSuite
       .collect()
       .map(_.getDouble(0))
 
-    assert(model.coefficients ~== coefficientsR absTol 1E-3)
-    assert(model.intercept ~== interceptR absTol 1E-3)
+    assert(model.coefficients ~== coefficientsR.absTol(1E-3))
+    assert(model.intercept ~== interceptR.absTol(1E-3))
     devianceResiduals.zip(devianceResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     pearsonResiduals.zip(pearsonResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     workingResiduals.zip(workingResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     responseResiduals.zip(responseResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.tValues.zip(tValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.pValues.zip(pValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
-    assert(summary.dispersion ~== dispersionR absTol 1E-3)
-    assert(summary.nullDeviance ~== nullDevianceR absTol 1E-3)
-    assert(summary.deviance ~== residualDevianceR absTol 1E-3)
+    assert(summary.dispersion ~== dispersionR.absTol(1E-3))
+    assert(summary.nullDeviance ~== nullDevianceR.absTol(1E-3))
+    assert(summary.deviance ~== residualDevianceR.absTol(1E-3))
     assert(summary.residualDegreeOfFreedom === residualDegreeOfFreedomR)
     assert(
       summary.residualDegreeOfFreedomNull === residualDegreeOfFreedomNullR)
-    assert(summary.aic ~== aicR absTol 1E-3)
+    assert(summary.aic ~== aicR.absTol(1E-3))
   }
 
   test("glm summary: gamma family with weight") {
@@ -1154,36 +1154,36 @@ class GeneralizedLinearRegressionSuite
       .collect()
       .map(_.getDouble(0))
 
-    assert(model.coefficients ~== coefficientsR absTol 1E-3)
-    assert(model.intercept ~== interceptR absTol 1E-3)
+    assert(model.coefficients ~== coefficientsR.absTol(1E-3))
+    assert(model.intercept ~== interceptR.absTol(1E-3))
     devianceResiduals.zip(devianceResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     pearsonResiduals.zip(pearsonResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     workingResiduals.zip(workingResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     responseResiduals.zip(responseResidualsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.tValues.zip(tValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
     summary.pValues.zip(pValsR).foreach { x =>
-      assert(x._1 ~== x._2 absTol 1E-3)
+      assert(x._1 ~== x._2.absTol(1E-3))
     }
-    assert(summary.dispersion ~== dispersionR absTol 1E-3)
-    assert(summary.nullDeviance ~== nullDevianceR absTol 1E-3)
-    assert(summary.deviance ~== residualDevianceR absTol 1E-3)
+    assert(summary.dispersion ~== dispersionR.absTol(1E-3))
+    assert(summary.nullDeviance ~== nullDevianceR.absTol(1E-3))
+    assert(summary.deviance ~== residualDevianceR.absTol(1E-3))
     assert(summary.residualDegreeOfFreedom === residualDegreeOfFreedomR)
     assert(
       summary.residualDegreeOfFreedomNull === residualDegreeOfFreedomNullR)
-    assert(summary.aic ~== aicR absTol 1E-3)
+    assert(summary.aic ~== aicR.absTol(1E-3))
   }
 
   test("read/write") {
