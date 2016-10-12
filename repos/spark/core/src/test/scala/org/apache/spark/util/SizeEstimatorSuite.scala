@@ -184,7 +184,7 @@ class SizeEstimatorSuite
     System.setProperty("os.arch", "x86")
 
     val initialize = PrivateMethod[Unit]('initialize)
-    SizeEstimator invokePrivate initialize()
+    SizeEstimator.invokePrivate(initialize())
 
     assertResult(40)(SizeEstimator.estimate(DummyString("")))
     assertResult(48)(SizeEstimator.estimate(DummyString("a")))
@@ -198,7 +198,7 @@ class SizeEstimatorSuite
     System.setProperty("os.arch", "amd64")
     System.setProperty("spark.test.useCompressedOops", "false")
     val initialize = PrivateMethod[Unit]('initialize)
-    SizeEstimator invokePrivate initialize()
+    SizeEstimator.invokePrivate(initialize())
 
     assertResult(56)(SizeEstimator.estimate(DummyString("")))
     assertResult(64)(SizeEstimator.estimate(DummyString("a")))
@@ -224,7 +224,7 @@ class SizeEstimatorSuite
   test("check 64-bit detection for s390x arch") {
     System.setProperty("os.arch", "s390x")
     val initialize = PrivateMethod[Unit]('initialize)
-    SizeEstimator invokePrivate initialize()
+    SizeEstimator.invokePrivate(initialize())
     // Class should be 32 bytes on s390x if recognised as 64 bit platform
     assertResult(32)(SizeEstimator.estimate(new DummyClass7))
   }

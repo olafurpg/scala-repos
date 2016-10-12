@@ -132,7 +132,7 @@ class SimpleFutureAction[T] private[spark] (jobWaiter: JobWaiter[_],
 
   override def onComplete[U](func: (Try[T]) => U)(
       implicit executor: ExecutionContext) {
-    jobWaiter.completionFuture onComplete { _ =>
+    jobWaiter.completionFuture.onComplete { _ =>
       func(value.get)
     }
   }

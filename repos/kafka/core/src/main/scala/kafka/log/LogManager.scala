@@ -261,7 +261,7 @@ class LogManager(val logDirs: Array[File],
       val logsInDir = logsByDir.getOrElse(dir.toString, Map()).values
 
       val jobsForDir =
-        logsInDir map { log =>
+        logsInDir.map { log =>
           CoreUtils.runnable {
             // flush the log to ensure latest possible recovery point
             log.flush()

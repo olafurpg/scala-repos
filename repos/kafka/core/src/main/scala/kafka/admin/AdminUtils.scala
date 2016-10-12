@@ -654,7 +654,7 @@ object AdminUtils extends Logging {
       Json.parseFull(str) match {
         case None => // there are no config overrides
         case Some(mapAnon: Map[_, _]) =>
-          val map = mapAnon collect { case (k: String, v: Any) => k -> v }
+          val map = mapAnon.collect { case (k: String, v: Any) => k -> v }
           require(map("version") == 1)
           map.get("config") match {
             case Some(config: Map[_, _]) =>

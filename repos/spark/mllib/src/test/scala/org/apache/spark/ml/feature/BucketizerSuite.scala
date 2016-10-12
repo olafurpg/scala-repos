@@ -139,7 +139,7 @@ class BucketizerSuite
       data.map(x => Bucketizer.binarySearchForBuckets(splits, x)))
     val lsResult = Vectors.dense(
       data.map(x => BucketizerSuite.linearSearchForBuckets(splits, x)))
-    assert(bsResult ~== lsResult absTol 1e-5)
+    assert(bsResult ~== lsResult.absTol(1e-5))
   }
 
   test("read/write") {

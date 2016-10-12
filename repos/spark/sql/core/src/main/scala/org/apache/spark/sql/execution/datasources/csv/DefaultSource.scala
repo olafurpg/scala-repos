@@ -53,7 +53,9 @@ class DefaultSource extends FileFormat with DataSourceRegister {
 
     // TODO: Move filtering.
     val paths =
-      files.filterNot(_.getPath.getName startsWith "_").map(_.getPath.toString)
+      files
+        .filterNot(_.getPath.getName.startsWith("_"))
+        .map(_.getPath.toString)
     val rdd = baseRdd(sqlContext, csvOptions, paths)
     val firstLine = findFirstLine(csvOptions, rdd)
     val firstRow = new LineCsvReader(csvOptions).parseLine(firstLine)
@@ -108,7 +110,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       broadcastedConf: Broadcast[SerializableConfiguration],
       options: Map[String, String]): RDD[InternalRow] = {
     // TODO: Filter before calling buildInternalScan.
-    val csvFiles = inputFiles.filterNot(_.getPath.getName startsWith "_")
+    val csvFiles = inputFiles.filterNot(_.getPath.getName.startsWith("_"))
 
     val csvOptions = new CSVOptions(options)
     val pathsString = csvFiles.map(_.getPath.toUri.toString)

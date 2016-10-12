@@ -1194,7 +1194,7 @@ class KafkaApis(val requestChannel: RequestChannel,
     // the callback for sending a join-group response
     def sendResponseCallback(joinResult: JoinGroupResult) {
       val members =
-        joinResult.members map {
+        joinResult.members.map {
           case (memberId, metadataArray) =>
             (memberId, ByteBuffer.wrap(metadataArray))
         }

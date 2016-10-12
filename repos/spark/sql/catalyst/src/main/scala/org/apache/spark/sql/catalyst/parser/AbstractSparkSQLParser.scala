@@ -112,11 +112,11 @@ class SqlLexical extends StdLexical {
       case i ~ None => NumericLit(i.mkString)
       case i ~ Some(d) => DecimalLit(i.mkString + "." + d.mkString)
     } | '\'' ~> chrExcept('\'', '\n', EofCh).* <~ '\'' ^^ {
-      case chars => StringLit(chars mkString "")
+      case chars => StringLit(chars.mkString(""))
     } | '"' ~> chrExcept('"', '\n', EofCh).* <~ '"' ^^ {
-      case chars => StringLit(chars mkString "")
+      case chars => StringLit(chars.mkString(""))
     } | '`' ~> chrExcept('`', '\n', EofCh).* <~ '`' ^^ {
-      case chars => Identifier(chars mkString "")
+      case chars => Identifier(chars.mkString(""))
     } | EofCh ^^^ EOF | '\'' ~> failure("unclosed string literal") | '"' ~> failure(
       "unclosed string literal") | delim | failure("illegal character"))
 

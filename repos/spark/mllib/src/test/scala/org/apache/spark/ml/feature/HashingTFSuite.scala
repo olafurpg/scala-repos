@@ -56,7 +56,7 @@ class HashingTFSuite
     val expected = Vectors.sparse(
       n,
       Seq((idx("a"), 2.0), (idx("b"), 2.0), (idx("c"), 1.0), (idx("d"), 1.0)))
-    assert(features ~== expected absTol 1e-14)
+    assert(features ~== expected.absTol(1e-14))
   }
 
   test("read/write") {

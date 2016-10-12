@@ -456,7 +456,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     }
 
     object RemoveSubqueriesAboveSQLTable extends Rule[LogicalPlan] {
-      override def apply(plan: LogicalPlan): LogicalPlan = plan transformUp {
+      override def apply(plan: LogicalPlan): LogicalPlan = plan.transformUp {
         case SubqueryAlias(_, t @ ExtractSQLTable(_)) => t
       }
     }
@@ -483,7 +483,7 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     }
 
     object AddSubquery extends Rule[LogicalPlan] {
-      override def apply(tree: LogicalPlan): LogicalPlan = tree transformUp {
+      override def apply(tree: LogicalPlan): LogicalPlan = tree.transformUp {
         // This branch handles aggregate functions within HAVING clauses.  For example:
         //
         //   SELECT key FROM src GROUP BY key HAVING max(value) > "val_255"

@@ -23,7 +23,7 @@ import sbt.Keys._
   * a plugin project so that this gets compiled first and is available on the classpath for SBT build.
   */
 object SparkPluginDef extends Build {
-  lazy val root = Project("plugins", file(".")) dependsOn (sbtPomReader)
+  lazy val root = Project("plugins", file(".")).dependsOn(sbtPomReader)
   lazy val sbtPomReader = uri(
     "https://github.com/ScrapCodes/sbt-pom-reader.git#ignore_artifact_id")
 }

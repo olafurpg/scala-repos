@@ -58,7 +58,7 @@ class CountVectorizerSuite
       .setOutputCol("features")
     cv.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 
@@ -82,7 +82,7 @@ class CountVectorizerSuite
 
     cv.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 
@@ -111,7 +111,7 @@ class CountVectorizerSuite
 
     cvModel2.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
 
     // minDF: ignore terms with freq < 0.75
@@ -124,7 +124,7 @@ class CountVectorizerSuite
 
     cvModel3.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 
@@ -161,7 +161,7 @@ class CountVectorizerSuite
       .setMinTF(3)
     cv.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 
@@ -183,7 +183,7 @@ class CountVectorizerSuite
       .setMinTF(0.3)
     cv.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 
@@ -205,7 +205,7 @@ class CountVectorizerSuite
       .setBinary(true)
     cv.transform(df).select("features", "expected").collect().foreach {
       case Row(features: Vector, expected: Vector) =>
-        assert(features ~== expected absTol 1e-14)
+        assert(features ~== expected.absTol(1e-14))
     }
   }
 

@@ -134,15 +134,15 @@ class LBFGSSuite
                                       initialWeightsWithIntercept,
                                       convergenceTol)
 
-    assert(lossGD(0) ~= lossLBFGS(0) absTol 1E-5,
+    assert(lossGD(0) ~= lossLBFGS(0).absTol(1E-5),
            "The first losses of LBFGS and GD should be the same.")
 
     // The 2% difference here is based on observation, but is not theoretically guaranteed.
-    assert(lossGD.last ~= lossLBFGS.last relTol 0.02,
+    assert(lossGD.last ~= lossLBFGS.last.relTol(0.02),
            "The last losses of LBFGS and GD should be within 2% difference.")
 
-    assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+    assert((weightLBFGS(0) ~= weightGD(0).relTol(0.02)) &&
+             (weightLBFGS(1) ~= weightGD(1).relTol(0.02)),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 
@@ -233,8 +233,8 @@ class LBFGSSuite
                                       convergenceTol)
 
     // for class LBFGS and the optimize method, we only look at the weights
-    assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+    assert((weightLBFGS(0) ~= weightGD(0).relTol(0.02)) &&
+             (weightLBFGS(1) ~= weightGD(1).relTol(0.02)),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 }

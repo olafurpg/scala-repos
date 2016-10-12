@@ -66,9 +66,9 @@ class NaiveBayesSuite
                        thetaData: Matrix,
                        model: NaiveBayesModel): Unit = {
     assert(Vectors.dense(model.pi.toArray.map(math.exp)) ~==
-             Vectors.dense(piData.toArray.map(math.exp)) absTol 0.05,
+             Vectors.dense(piData.toArray.map(math.exp)).absTol(0.05),
            "pi mismatch")
-    assert(model.theta.map(math.exp) ~== thetaData.map(math.exp) absTol 0.05,
+    assert(model.theta.map(math.exp) ~== thetaData.map(math.exp).absTol(0.05),
            "theta mismatch")
   }
 
@@ -99,7 +99,7 @@ class NaiveBayesSuite
                             modelType: String): Unit = {
     featureAndProbabilities.collect().foreach {
       case Row(features: Vector, probability: Vector) => {
-        assert(probability.toArray.sum ~== 1.0 relTol 1.0e-10)
+        assert(probability.toArray.sum ~== 1.0.relTol(1.0e-10))
         val expected = modelType match {
           case Multinomial =>
             expectedMultinomialProbabilities(model, features)
@@ -108,7 +108,7 @@ class NaiveBayesSuite
           case _ =>
             throw new UnknownError(s"Invalid modelType: $modelType.")
         }
-        assert(probability ~== expected relTol 1.0e-10)
+        assert(probability ~== expected.relTol(1.0e-10))
       }
     }
   }

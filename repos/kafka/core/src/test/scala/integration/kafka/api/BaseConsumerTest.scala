@@ -483,7 +483,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
   def isPartitionAssignmentValid(assignments: Buffer[Set[TopicPartition]],
                                  partitions: Set[TopicPartition]): Boolean = {
     val allNonEmptyAssignments =
-      assignments forall (assignment => assignment.size > 0)
+      assignments.forall(assignment => assignment.size > 0)
     if (!allNonEmptyAssignments) {
       // at least one consumer got empty assignment
       return false

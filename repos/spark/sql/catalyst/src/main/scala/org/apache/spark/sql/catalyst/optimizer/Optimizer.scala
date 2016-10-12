@@ -118,7 +118,7 @@ abstract class Optimizer extends RuleExecutor[LogicalPlan] {
     * Optimize all the subqueries inside expression.
     */
   object OptimizeSubqueries extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transformAllExpressions {
       case subquery: SubqueryExpression =>
         subquery.withNewPlan(Optimizer.this.execute(subquery.query))
     }
@@ -138,7 +138,7 @@ object DefaultOptimizer extends Optimizer
   */
 object SamplePushDown extends Rule[LogicalPlan] {
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // Push down projection into sample
     case Project(projectList, s @ Sample(lb, up, replace, seed, child)) =>
       Sample(lb, up, replace, seed, Project(projectList, child))()
@@ -150,7 +150,7 @@ object SamplePushDown extends Rule[LogicalPlan] {
   * representation of data item.  For example back to back map operations.
   */
 object EliminateSerialization extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case m @ MapPartitions(_, deserializer, _, child: ObjectOperator)
         if !deserializer.isInstanceOf[Attribute] &&
           deserializer.dataType == child.outputObject.dataType =>
@@ -184,7 +184,7 @@ object LimitPushDown extends Rule[LogicalPlan] {
     }
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // Adding extra Limits below UNION ALL for children which are not Limit or do not have Limit
     // descendants whose maxRow is larger. This heuristic is valid assuming there does not exist any
     // Limit push-down rule that is unable to infer the value of maxRows.
@@ -258,7 +258,7 @@ object SetOperationPushDown extends Rule[LogicalPlan] with PredicateHelper {
       e: A,
       rewrites: AttributeMap[Attribute]) = {
     val result =
-      e transform {
+      e.transform {
         case a: Attribute => rewrites(a)
       }
 
@@ -286,7 +286,7 @@ object SetOperationPushDown extends Rule[LogicalPlan] with PredicateHelper {
     }
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
 
     // Push down deterministic projection through UNION ALL
     case p @ Project(projectList, Union(children)) =>
@@ -345,7 +345,7 @@ object ColumnPruning extends Rule[LogicalPlan] {
     output1.size == output2.size &&
       output1.zip(output2).forall(pair => pair._1.semanticEquals(pair._2))
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // Prunes the unused columns from project list of Project/Aggregate/Expand
     case p @ Project(_, p2: Project)
         if (p2.outputSet -- p.references).nonEmpty =>
@@ -461,7 +461,7 @@ object ColumnPruning extends Rule[LogicalPlan] {
   */
 object CollapseProject extends Rule[LogicalPlan] {
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformUp {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformUp {
     case p @ Project(projectList1, Project(projectList2, child)) =>
       // Create a map of Aliases to their values from the child projection.
       // e.g., 'SELECT ... FROM (SELECT a + b AS c, d ...)' produces Map(c -> Alias(a + b, c)).
@@ -539,7 +539,7 @@ object CollapseProject extends Rule[LogicalPlan] {
   * Combines adjacent [[Repartition]] operators by keeping only the last one.
   */
 object CollapseRepartition extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformUp {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformUp {
     case r @ Repartition(numPartitions, shuffle, Repartition(_, _, child)) =>
       Repartition(numPartitions, shuffle, child)
   }
@@ -558,7 +558,7 @@ object LikeSimplification extends Rule[LogicalPlan] {
   private val contains = "%([^_%]+)%".r
   private val equalTo = "([^_%]*)".r
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformAllExpressions {
     case Like(l, Literal(utf, StringType)) =>
       utf.toString match {
         case startsWith(pattern) if !pattern.endsWith("\\") =>
@@ -586,9 +586,9 @@ object NullPropagation extends Rule[LogicalPlan] {
     case _ => true
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsUp {
+      q.transformExpressionsUp {
         case e @ AggregateExpression(Count(exprs), _, _)
             if !exprs.exists(nonNullLiteral) =>
           Cast(Literal(0L), e.dataType)
@@ -684,7 +684,7 @@ object NullPropagation extends Rule[LogicalPlan] {
 object InferFiltersFromConstraints
     extends Rule[LogicalPlan]
     with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case filter @ Filter(condition, child) =>
       val newFilters =
         filter.constraints --
@@ -726,9 +726,9 @@ object InferFiltersFromConstraints
   * equivalent [[Literal]] values.
   */
 object ConstantFolding extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsDown {
+      q.transformExpressionsDown {
         // Skip redundant folding of literals. This rule is technically not necessary. Placing this
         // here avoids running the next rule for Literal values, which would create a new Literal
         // object and running eval unnecessarily.
@@ -745,9 +745,9 @@ object ConstantFolding extends Rule[LogicalPlan] {
   * which is much faster
   */
 object OptimizeIn extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsDown {
+      q.transformExpressionsDown {
         case In(v, list)
             if !list.exists(!_.isInstanceOf[Literal]) && list.size > 10 =>
           val hSet = list.map(e => e.eval(EmptyRow))
@@ -764,9 +764,9 @@ object OptimizeIn extends Rule[LogicalPlan] {
   * 4. Removes `Not` operator.
   */
 object BooleanSimplification extends Rule[LogicalPlan] with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsUp {
+      q.transformExpressionsUp {
         case TrueLiteral And e => e
         case e And TrueLiteral => e
         case FalseLiteral Or e => e
@@ -863,9 +863,9 @@ object BooleanSimplification extends Rule[LogicalPlan] with PredicateHelper {
   * Simplifies conditional expressions (if / case).
   */
 object SimplifyConditionals extends Rule[LogicalPlan] with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsUp {
+      q.transformExpressionsUp {
         case If(TrueLiteral, trueValue, _) => trueValue
         case If(FalseLiteral, _, falseValue) => falseValue
 
@@ -896,7 +896,7 @@ object SimplifyConditionals extends Rule[LogicalPlan] with PredicateHelper {
   * Combines all adjacent [[Union]] operators into a single [[Union]].
   */
 object CombineUnions extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case Unions(children) => Union(children)
   }
 }
@@ -906,7 +906,7 @@ object CombineUnions extends Rule[LogicalPlan] {
   * one conjunctive predicate.
   */
 object CombineFilters extends Rule[LogicalPlan] with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case ff @ Filter(fc, nf @ Filter(nc, grandChild)) =>
       (ExpressionSet(splitConjunctivePredicates(fc)) -- ExpressionSet(
         splitConjunctivePredicates(nc))).reduceOption(And) match {
@@ -922,7 +922,7 @@ object CombineFilters extends Rule[LogicalPlan] with PredicateHelper {
   * Removes no-op SortOrder from Sort
   */
 object EliminateSorts extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case s @ Sort(orders, _, child)
         if orders.isEmpty || orders.exists(_.child.foldable) =>
       val newOrders = orders.filterNot(_.child.foldable)
@@ -937,7 +937,7 @@ object EliminateSorts extends Rule[LogicalPlan] {
   * 3) by eliminating the always-true conditions given the constraints on the child's output.
   */
 object PruneFilters extends Rule[LogicalPlan] with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // If the filter condition always evaluate to true, remove the filter.
     case Filter(Literal(true, BooleanType), child) => child
     // If the filter condition always evaluate to null or false,
@@ -973,7 +973,7 @@ object PruneFilters extends Rule[LogicalPlan] with PredicateHelper {
 object PushPredicateThroughProject
     extends Rule[LogicalPlan]
     with PredicateHelper {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // SPARK-13473: We can't push the predicate down when the underlying projection output non-
     // deterministic field(s).  Non-deterministic expressions are essentially stateful. This
     // implies that, for a given input row, the output are determined by the expression's initial
@@ -1023,7 +1023,7 @@ object PushPredicateThroughGenerate
     extends Rule[LogicalPlan]
     with PredicateHelper {
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case filter @ Filter(condition, g: Generate) =>
       // Predicates that reference attributes produced by the `Generate` operator cannot
       // be pushed below the operator.
@@ -1055,7 +1055,7 @@ object PushPredicateThroughAggregate
     extends Rule[LogicalPlan]
     with PredicateHelper {
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case filter @ Filter(condition, aggregate: Aggregate) =>
       // Find all the aliased expressions in the aggregate list that don't include any actual
       // AggregateExpression, and create a map from the alias to the expression
@@ -1135,7 +1135,7 @@ object ReorderJoin extends Rule[LogicalPlan] with PredicateHelper {
     }
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case j @ ExtractFiltersAndInnerJoins(input, conditions)
         if input.size > 2 && conditions.nonEmpty =>
       createOrderedJoin(input, conditions)
@@ -1197,7 +1197,7 @@ object OuterJoinElimination extends Rule[LogicalPlan] with PredicateHelper {
     }
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case f @ Filter(condition,
                     j @ Join(_, _, RightOuter | LeftOuter | FullOuter, _)) =>
       val newJoinType = buildNewJoinType(f, j)
@@ -1230,14 +1230,14 @@ object PushPredicateThroughJoin
                     left: LogicalPlan,
                     right: LogicalPlan) = {
     val (leftEvaluateCondition, rest) =
-      condition.partition(_.references subsetOf left.outputSet)
+      condition.partition(_.references.subsetOf(left.outputSet))
     val (rightEvaluateCondition, commonCondition) =
-      rest.partition(_.references subsetOf right.outputSet)
+      rest.partition(_.references.subsetOf(right.outputSet))
 
     (leftEvaluateCondition, rightEvaluateCondition, commonCondition)
   }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // push the where condition down into join filter
     case f @ Filter(filterCondition,
                     Join(left, right, joinType, joinCondition)) =>
@@ -1346,7 +1346,7 @@ object PushPredicateThroughJoin
   * Removes [[Cast Casts]] that are unnecessary because the input is already the correct type.
   */
 object SimplifyCasts extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformAllExpressions {
     case Cast(e, dataType) if e.dataType == dataType => e
   }
 }
@@ -1355,7 +1355,7 @@ object SimplifyCasts extends Rule[LogicalPlan] {
   * Removes nodes that are not necessary.
   */
 object RemoveDispensableExpressions extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformAllExpressions {
     case UnaryPositive(child) => child
     case PromotePrecision(child) => child
   }
@@ -1366,7 +1366,7 @@ object RemoveDispensableExpressions extends Rule[LogicalPlan] {
   * expressions into one single expression.
   */
 object CombineLimits extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case ll @ GlobalLimit(le, nl @ GlobalLimit(ne, grandChild)) =>
       GlobalLimit(Least(Seq(ne, le)), grandChild)
     case ll @ LocalLimit(le, nl @ LocalLimit(ne, grandChild)) =>
@@ -1381,9 +1381,9 @@ object CombineLimits extends Rule[LogicalPlan] {
   * the inner conversion is overwritten by the outer one.
   */
 object SimplifyCaseConversionExpressions extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case q: LogicalPlan =>
-      q transformExpressionsUp {
+      q.transformExpressionsUp {
         case Upper(Upper(child)) => Upper(child)
         case Upper(Lower(child)) => Upper(child)
         case Lower(Upper(child)) => Lower(child)
@@ -1404,7 +1404,7 @@ object DecimalAggregates extends Rule[LogicalPlan] {
   /** Maximum number of decimal digits representable precisely in a Double */
   private val MAX_DOUBLE_DIGITS = 15
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transformAllExpressions {
     case AggregateExpression(Sum(e @ DecimalType.Expression(prec, scale)),
                              mode,
                              isDistinct) if prec + 10 <= MAX_LONG_DIGITS =>
@@ -1430,7 +1430,7 @@ object DecimalAggregates extends Rule[LogicalPlan] {
   * This is relatively simple as it currently handles only a single case: Project.
   */
 object ConvertToLocalRelation extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case Project(projectList, LocalRelation(output, data)) =>
       val projection = new InterpretedProjection(projectList, output)
       LocalRelation(projectList.map(_.toAttribute), data.map(projection))
@@ -1444,7 +1444,7 @@ object ConvertToLocalRelation extends Rule[LogicalPlan] {
   * }}}
   */
 object ReplaceDistinctWithAggregate extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case Distinct(child) => Aggregate(child.output, child.output, child)
   }
 }
@@ -1462,7 +1462,7 @@ object ReplaceDistinctWithAggregate extends Rule[LogicalPlan] {
   *    join conditions will be incorrect.
   */
 object ReplaceIntersectWithSemiJoin extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case Intersect(left, right) =>
       assert(left.output.size == right.output.size)
       val joinCond = left.output.zip(right.output).map {
@@ -1477,7 +1477,7 @@ object ReplaceIntersectWithSemiJoin extends Rule[LogicalPlan] {
   * but only makes the grouping key bigger.
   */
 object RemoveLiteralFromGroupExpressions extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     case a @ Aggregate(grouping, _, _) =>
       val newGrouping = grouping.filter(!_.foldable)
       a.copy(groupingExpressions = newGrouping)
@@ -1496,7 +1496,7 @@ object ComputeCurrentTime extends Rule[LogicalPlan] {
     val currentTime =
       Literal.create(timeExpr.eval(EmptyRow), timeExpr.dataType)
 
-    plan transformAllExpressions {
+    plan.transformAllExpressions {
       case CurrentDate() => currentDate
       case CurrentTimestamp() => currentTime
     }

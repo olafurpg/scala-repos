@@ -124,7 +124,7 @@ class BlockManagerSuite
       true)
 
     val initialize = PrivateMethod[Unit]('initialize)
-    SizeEstimator invokePrivate initialize()
+    SizeEstimator.invokePrivate(initialize())
   }
 
   override def afterEach(): Unit = {
@@ -559,7 +559,7 @@ class BlockManagerSuite
     val blockManager = makeBlockManager(128, "exec", bmMaster)
     val getLocations = PrivateMethod[Seq[BlockManagerId]]('getLocations)
     val locations =
-      blockManager invokePrivate getLocations(BroadcastBlockId(0))
+      blockManager.invokePrivate(getLocations(BroadcastBlockId(0)))
     assert(locations.map(_.host) === Seq(localHost, localHost, otherHost))
   }
 

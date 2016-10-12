@@ -141,16 +141,16 @@ class ClosureCleanerSuite2
     PrivateMethod[(List[Class[_]], List[AnyRef])]('getOuterClassesAndObjects)
 
   private def isClosure(obj: AnyRef): Boolean = {
-    ClosureCleaner invokePrivate _isClosure(obj)
+    ClosureCleaner.invokePrivate(_isClosure(obj))
   }
 
   private def getInnerClosureClasses(closure: AnyRef): List[Class[_]] = {
-    ClosureCleaner invokePrivate _getInnerClosureClasses(closure)
+    ClosureCleaner.invokePrivate(_getInnerClosureClasses(closure))
   }
 
   private def getOuterClassesAndObjects(
       closure: AnyRef): (List[Class[_]], List[AnyRef]) = {
-    ClosureCleaner invokePrivate _getOuterClassesAndObjects(closure)
+    ClosureCleaner.invokePrivate(_getOuterClassesAndObjects(closure))
   }
 
   test("get inner closure classes") {

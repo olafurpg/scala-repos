@@ -61,7 +61,7 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
     val df = sqlContext.range(10)
     val plan = df.queryExecution.executedPlan
     val output = plan.output
-    assert(plan sameResult plan)
+    assert(plan.sameResult(plan))
 
     val exchange1 = BroadcastExchange(IdentityBroadcastMode, plan)
     val hashMode = HashedRelationBroadcastMode(true, output, plan.output)
@@ -73,22 +73,22 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
     val exchange3 = BroadcastExchange(hashMode2, plan)
     val exchange4 = ReusedExchange(output, exchange3)
 
-    assert(exchange1 sameResult exchange1)
-    assert(exchange2 sameResult exchange2)
-    assert(exchange3 sameResult exchange3)
-    assert(exchange4 sameResult exchange4)
+    assert(exchange1.sameResult(exchange1))
+    assert(exchange2.sameResult(exchange2))
+    assert(exchange3.sameResult(exchange3))
+    assert(exchange4.sameResult(exchange4))
 
     assert(!exchange1.sameResult(exchange2))
     assert(!exchange2.sameResult(exchange3))
     assert(!exchange3.sameResult(exchange4))
-    assert(exchange4 sameResult exchange3)
+    assert(exchange4.sameResult(exchange3))
   }
 
   test("ShuffleExchange same result") {
     val df = sqlContext.range(10)
     val plan = df.queryExecution.executedPlan
     val output = plan.output
-    assert(plan sameResult plan)
+    assert(plan.sameResult(plan))
 
     val part1 = HashPartitioning(output, 1)
     val exchange1 = ShuffleExchange(part1, plan)
@@ -99,16 +99,16 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
     val exchange4 = ShuffleExchange(part3, plan)
     val exchange5 = ReusedExchange(output, exchange4)
 
-    assert(exchange1 sameResult exchange1)
-    assert(exchange2 sameResult exchange2)
-    assert(exchange3 sameResult exchange3)
-    assert(exchange4 sameResult exchange4)
-    assert(exchange5 sameResult exchange5)
+    assert(exchange1.sameResult(exchange1))
+    assert(exchange2.sameResult(exchange2))
+    assert(exchange3.sameResult(exchange3))
+    assert(exchange4.sameResult(exchange4))
+    assert(exchange5.sameResult(exchange5))
 
-    assert(exchange1 sameResult exchange2)
+    assert(exchange1.sameResult(exchange2))
     assert(!exchange2.sameResult(exchange3))
     assert(!exchange3.sameResult(exchange4))
     assert(!exchange4.sameResult(exchange5))
-    assert(exchange5 sameResult exchange4)
+    assert(exchange5.sameResult(exchange4))
   }
 }

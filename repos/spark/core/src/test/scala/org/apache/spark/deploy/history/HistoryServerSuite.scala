@@ -277,7 +277,7 @@ class HistoryServerSuite
 
     // then
     val urls = response \\ "@href" map (_.toString)
-    val siteRelativeLinks = urls filter (_.startsWith("/"))
+    val siteRelativeLinks = urls.filter(_.startsWith("/"))
     all(siteRelativeLinks) should startWith(uiRoot)
   }
 

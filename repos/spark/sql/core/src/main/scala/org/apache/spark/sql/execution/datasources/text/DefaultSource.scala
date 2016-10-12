@@ -104,7 +104,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val job = Job.getInstance(sqlContext.sparkContext.hadoopConfiguration)
     val conf = job.getConfiguration
     val paths = inputFiles
-      .filterNot(_.getPath.getName startsWith "_")
+      .filterNot(_.getPath.getName.startsWith("_"))
       .map(_.getPath)
       .sortBy(_.toUri)
 

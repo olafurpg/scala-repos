@@ -69,7 +69,7 @@ class StreamingLogisticRegressionSuite
     runStreams(ssc, numBatches, numBatches)
 
     // check accuracy of final parameter estimates
-    assert(model.latestModel().weights(0) ~== B relTol 0.1)
+    assert(model.latestModel().weights(0) ~== B.relTol(0.1))
   }
 
   // Test that parameter estimates improve when learning Y = logistic(BX) on streaming data

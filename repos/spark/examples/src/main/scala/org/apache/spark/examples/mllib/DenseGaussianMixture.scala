@@ -62,9 +62,9 @@ object DenseGaussianMixture {
 
     for (i <- 0 until clusters.k) {
       println(
-        "weight=%f\nmu=%s\nsigma=\n%s\n" format
-          (clusters.weights(i), clusters.gaussians(i).mu,
-          clusters.gaussians(i).sigma))
+        "weight=%f\nmu=%s\nsigma=\n%s\n".format(clusters.weights(i),
+                                                clusters.gaussians(i).mu,
+                                                clusters.gaussians(i).sigma))
     }
 
     println(

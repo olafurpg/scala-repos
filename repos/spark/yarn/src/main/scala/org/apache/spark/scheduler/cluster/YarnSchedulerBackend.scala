@@ -232,13 +232,13 @@ private[spark] abstract class YarnSchedulerBackend(
           val lossReasonRequest = GetExecutorLossReason(executorId)
           val future =
             am.ask[ExecutorLossReason](lossReasonRequest, askTimeout)
-          future onSuccess {
+          future.onSuccess {
             case reason: ExecutorLossReason => {
               driverEndpoint.askWithRetry[Boolean](
                 RemoveExecutor(executorId, reason))
             }
           }
-          future onFailure {
+          future.onFailure {
             case NonFatal(e) => {
               logWarning(
                 s"Attempted to get executor loss reason" +
@@ -286,7 +286,7 @@ private[spark] abstract class YarnSchedulerBackend(
           case Some(am) =>
             Future {
               context.reply(am.askWithRetry[Boolean](r))
-            } onFailure {
+            }.onFailure {
               case NonFatal(e) =>
                 logError(s"Sending $r to AM was unsuccessful", e)
                 context.sendFailure(e)
@@ -302,7 +302,7 @@ private[spark] abstract class YarnSchedulerBackend(
           case Some(am) =>
             Future {
               context.reply(am.askWithRetry[Boolean](k))
-            } onFailure {
+            }.onFailure {
               case NonFatal(e) =>
                 logError(s"Sending $k to AM was unsuccessful", e)
                 context.sendFailure(e)
