@@ -106,7 +106,7 @@ object Dependency {
           case (_: ScPrimaryConstructor) && Parent(e: ScClass) =>
             withEntity(e.qualifiedName)
           case (function: ScFunctionDefinition) && ContainingClass(
-              obj: ScObject)
+                obj: ScObject)
               if function.isSynthetic || function.name == "apply" ||
                 function.name == "unapply" =>
             withEntity(obj.qualifiedName)
@@ -117,10 +117,10 @@ object Dependency {
             }
             withMember(obj.qualifiedName, memberName)
           case (pattern: ScReferencePattern) && Parent(
-              Parent(ContainingClass(obj: ScObject))) =>
+                Parent(ContainingClass(obj: ScObject))) =>
             withMember(obj.qualifiedName, pattern.name)
           case (function: ScFunctionDefinition) && ContainingClass(
-              obj: ScClass) if function.isConstructor =>
+                obj: ScClass) if function.isConstructor =>
             withEntity(obj.qualifiedName)
           case (method: PsiMethod) && ContainingClass(e: PsiClass)
               if method.isConstructor =>

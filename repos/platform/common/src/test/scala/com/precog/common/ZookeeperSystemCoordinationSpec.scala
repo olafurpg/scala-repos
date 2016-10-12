@@ -175,7 +175,7 @@ class ZookeeperSystemCoordinationSpec extends Specification {
         checkpoints must beLike {
           case Some(
               Failure(
-              blueeyes.json.serialization.Extractor.Invalid(_, None))) =>
+                blueeyes.json.serialization.Extractor.Invalid(_, None))) =>
             ok
         }
     }

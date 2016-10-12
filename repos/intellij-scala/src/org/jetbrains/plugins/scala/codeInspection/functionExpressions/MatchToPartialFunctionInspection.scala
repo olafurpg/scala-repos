@@ -33,15 +33,15 @@ import scala.collection.JavaConverters._
 class MatchToPartialFunctionInspection
     extends AbstractInspection(inspectionId) {
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case fun @ ScFunctionExpr(Seq(param),
-                              Some(
-                              ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
+    case fun @ ScFunctionExpr(
+          Seq(param),
+          Some(ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
         if ref.resolve() == param && !(param.typeElement.isDefined &&
           notExpectedType(fun)) && checkSameResolve(fun) =>
       registerProblem(holder, ms, fun)
     case fun @ ScFunctionExpr(
-        Seq(param),
-        Some(ScBlock(ms @ ScMatchStmt(ref: ScReferenceExpression, _))))
+          Seq(param),
+          Some(ScBlock(ms @ ScMatchStmt(ref: ScReferenceExpression, _))))
         if ref.resolve() == param && !(param.typeElement.isDefined &&
           notExpectedType(fun)) && checkSameResolve(fun) =>
       registerProblem(holder, ms, fun) //if fun is last statement in block, result can be block without braces

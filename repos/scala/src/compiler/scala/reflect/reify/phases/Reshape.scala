@@ -74,7 +74,7 @@ trait Reshape { self: Reifier =>
           val stats1 = reshapeLazyVals(trimSyntheticCaseClassCompanions(stats))
           Block(stats1, expr).copyAttrs(block)
         case unapply @ UnApply(Unapplied(
-                               Select(fun, nme.unapply | nme.unapplySeq)),
+                                 Select(fun, nme.unapply | nme.unapplySeq)),
                                args) =>
           if (reifyDebug) println("unapplying unapply: " + tree)
           Apply(fun, args).copyAttrs(unapply)

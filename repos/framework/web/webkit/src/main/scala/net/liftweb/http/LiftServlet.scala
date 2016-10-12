@@ -625,7 +625,7 @@ class LiftServlet extends Loggable {
     val LiftPath = LiftRules.liftContextRelativePath
     path match {
       case LiftPath :: "ajax" :: AjaxVersions(
-          versionInfo @ AjaxVersionInfo(renderVersion, _, _)) :: _ =>
+            versionInfo @ AjaxVersionInfo(renderVersion, _, _)) :: _ =>
         RenderVersion.doWith(renderVersion)(f(Full(versionInfo)))
       case LiftPath :: "ajax" :: renderVersion :: _ =>
         RenderVersion.doWith(renderVersion)(f(Empty))

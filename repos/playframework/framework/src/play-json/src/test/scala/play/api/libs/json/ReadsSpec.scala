@@ -149,9 +149,8 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
       "from a number" in {
         reads(JsNumber(123L)) aka "read date" must beLike {
-          case JsError((
-              _,
-              ValidationError("error.expected.date" :: Nil) :: Nil) :: Nil) =>
+          case JsError(
+              (_, ValidationError("error.expected.date" :: Nil) :: Nil) :: Nil) =>
             ok
         }
       }

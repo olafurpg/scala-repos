@@ -31,8 +31,8 @@ class MultipleInheritanceTest extends AnnotatorTestBase(MultipleInheritance) {
 
     assertMatches(messages("trait T; new T with T with T {}")) {
       case Error("T", Message("T")) :: Error("T", Message("T")) :: Error(
-          "T",
-          Message("T")) :: Nil =>
+            "T",
+            Message("T")) :: Nil =>
     }
   }
 }

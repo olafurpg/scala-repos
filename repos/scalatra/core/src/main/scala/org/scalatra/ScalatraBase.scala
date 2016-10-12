@@ -562,10 +562,10 @@ trait ScalatraBase
       var rendered = false
       e match {
         case HaltException(Some(404), _, _, _: Unit | Unit) | HaltException(
-            _,
-            _,
-            _,
-            ActionResult(ResponseStatus(404, _), _: Unit | Unit, _)) =>
+              _,
+              _,
+              _,
+              ActionResult(ResponseStatus(404, _), _: Unit | Unit, _)) =>
           renderResponse(doNotFound())
           rendered = true
         case HaltException(Some(status), Some(reason), _, _) =>

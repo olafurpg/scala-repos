@@ -504,7 +504,7 @@ object TypedActor
                 case _: TimeoutException ⇒ None
               }) match {
                 case None | Some(Success(NullResponse)) | Some(
-                    Failure(_: AskTimeoutException)) ⇒
+                      Failure(_: AskTimeoutException)) ⇒
                   if (m.returnsJOption) JOption.none[Any] else None
                 case Some(t: Try[_]) ⇒
                   t.get.asInstanceOf[AnyRef]

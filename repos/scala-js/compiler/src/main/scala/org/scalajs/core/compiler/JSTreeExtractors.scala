@@ -76,13 +76,13 @@ object JSTreeExtractors {
         case New(ClassType("T2"), Ident("init___O__O", _), List(_1, _2)) =>
           Some((_1, _2))
         // case x -> y
-        case Apply(LoadModule(ClassType("s_Predef$ArrowAssoc$")),
-                   Ident("$$minus$greater$extension__O__O__T2", _),
-                   List(Apply(
-                        LoadModule(ClassType("s_Predef$")),
-                        Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
-                        List(_1)),
-                        _2)) =>
+        case Apply(
+            LoadModule(ClassType("s_Predef$ArrowAssoc$")),
+            Ident("$$minus$greater$extension__O__O__T2", _),
+            List(Apply(LoadModule(ClassType("s_Predef$")),
+                       Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
+                       List(_1)),
+                 _2)) =>
           Some((_1, _2))
         case _ =>
           None

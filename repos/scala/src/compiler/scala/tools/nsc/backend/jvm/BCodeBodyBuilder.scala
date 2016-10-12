@@ -322,8 +322,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           generatedType = genApply(app, expectedType)
 
         case app @ ApplyDynamic(
-            qual,
-            Literal(Constant(boostrapMethodRef: Symbol)) :: staticAndDynamicArgs) =>
+              qual,
+              Literal(Constant(boostrapMethodRef: Symbol)) :: staticAndDynamicArgs) =>
           val numStaticArgs =
             boostrapMethodRef.paramss.head.size - 3 /*JVM provided args*/
           val (staticArgs, dynamicArgs) =

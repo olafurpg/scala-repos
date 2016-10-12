@@ -167,7 +167,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
           println(s"${args(0)} is deprecated and is not used anymore.")
           args = tail
 
-        case ("--master-memory" | "--driver-memory") :: MemoryParam(value) :: tail =>
+        case ("--master-memory" |
+            "--driver-memory") :: MemoryParam(value) :: tail =>
           if (args(0) == "--master-memory") {
             println(
               "--master-memory is deprecated. Use --driver-memory instead.")
@@ -179,7 +180,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
           driverCores = value
           args = tail
 
-        case ("--num-workers" | "--num-executors") :: IntParam(value) :: tail =>
+        case ("--num-workers" |
+            "--num-executors") :: IntParam(value) :: tail =>
           if (args(0) == "--num-workers") {
             println(
               "--num-workers is deprecated. Use --num-executors instead.")
@@ -187,7 +189,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
           numExecutors = value
           args = tail
 
-        case ("--worker-memory" | "--executor-memory") :: MemoryParam(value) :: tail =>
+        case ("--worker-memory" |
+            "--executor-memory") :: MemoryParam(value) :: tail =>
           if (args(0) == "--worker-memory") {
             println(
               "--worker-memory is deprecated. Use --executor-memory instead.")
@@ -195,7 +198,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
           executorMemory = value
           args = tail
 
-        case ("--worker-cores" | "--executor-cores") :: IntParam(value) :: tail =>
+        case ("--worker-cores" |
+            "--executor-cores") :: IntParam(value) :: tail =>
           if (args(0) == "--worker-cores") {
             println(
               "--worker-cores is deprecated. Use --executor-cores instead.")

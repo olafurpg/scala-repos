@@ -101,20 +101,21 @@ object TermConstructionProps
 
   property("unquote trees into while loop") = forAll {
     (cond: Tree, body: Tree) =>
-      val LabelDef(
-      _,
-      List(),
-      If(cond1, Block(List(body1), Apply(_, List())), Literal(Constant(())))) =
+      val LabelDef(_,
+                   List(),
+                   If(cond1,
+                      Block(List(body1), Apply(_, List())),
+                      Literal(Constant(())))) =
         q"while($cond) $body"
       body1 ≈ body && cond1 ≈ cond
   }
 
   property("unquote trees into do while loop") = forAll {
     (cond: Tree, body: Tree) =>
-      val LabelDef(
-      _,
-      List(),
-      Block(List(body1), If(cond1, Apply(_, List()), Literal(Constant(()))))) =
+      val LabelDef(_,
+                   List(),
+                   Block(List(body1),
+                         If(cond1, Apply(_, List()), Literal(Constant(()))))) =
         q"do $body while($cond)"
       body1 ≈ body && cond1 ≈ cond
   }

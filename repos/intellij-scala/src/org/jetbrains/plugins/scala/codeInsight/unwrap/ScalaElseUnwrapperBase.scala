@@ -27,9 +27,9 @@ abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
 
     e.getParent match {
       case ifSt @ ScIfStmt(_, Some(expr), _) childOf (parentIf @ ScIfStmt(
-          _,
-          _,
-          Some(elseIf))) if ifSt == elseIf && e == expr =>
+            _,
+            _,
+            Some(elseIf))) if ifSt == elseIf && e == expr =>
         Some((parentIf, expr))
       case ifStmt @ ScIfStmt(_, _, Some(elseBr)) =>
         if (e.getNode.getElementType == ScalaTokenTypes.kELSE || elseBr == e)

@@ -24,9 +24,10 @@ object Test extends App {
     Ident(TermName("x")))
   toolBox.eval(Apply(reify, List(reifee)))
   val Block(
-  List(tpeCopypaste,
-       exprCopypaste @ ModuleDef(_, _, Template(_, _, (_ :: stats) :+ expr))),
-  Literal(Constant(()))) = toolBox.parse(output.toString())
+    List(
+      tpeCopypaste,
+      exprCopypaste @ ModuleDef(_, _, Template(_, _, (_ :: stats) :+ expr))),
+    Literal(Constant(()))) = toolBox.parse(output.toString())
   output.reset()
   toolBox.eval(Block(stats, expr))
   stdout.println(output.toString)

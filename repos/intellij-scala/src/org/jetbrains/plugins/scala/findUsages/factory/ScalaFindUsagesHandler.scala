@@ -99,7 +99,8 @@ class ScalaFindUsagesHandler(element: PsiElement,
       case ScalaPsiUtil.inNameContext(m: ScMember) if !m.isLocal =>
         factory.memberOptions
       case _: ScParameter | _: ScTypeParam | ScalaPsiUtil.inNameContext(
-          _: ScMember | _: ScCaseClause | _: ScGenerator | _: ScEnumerator) =>
+            _: ScMember | _: ScCaseClause | _: ScGenerator |
+            _: ScEnumerator) =>
         factory.localOptions
       case _ => super.getFindUsagesOptions(dataContext)
     }

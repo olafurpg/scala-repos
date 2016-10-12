@@ -67,12 +67,14 @@ private[sql] object PreInsertCastAndRename extends Rule[LogicalPlan] {
     case p: LogicalPlan if !p.childrenResolved => p
 
     // We are inserting into an InsertableRelation or HadoopFsRelation.
-    case i @ InsertIntoTable(
-        l @ LogicalRelation(_: InsertableRelation | _: HadoopFsRelation, _, _),
-        _,
-        child,
-        _,
-        _) =>
+    case i @ InsertIntoTable(l @ LogicalRelation(_: InsertableRelation |
+                                                 _: HadoopFsRelation,
+                                                 _,
+                                                 _),
+                             _,
+                             child,
+                             _,
+                             _) =>
       // First, make sure the data to be inserted have the same number of fields with the
       // schema of the relation.
       if (l.output.size != child.output.size) {
@@ -119,11 +121,11 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
   def apply(plan: LogicalPlan): Unit = {
     plan.foreach {
       case i @ logical.InsertIntoTable(
-          l @ LogicalRelation(t: InsertableRelation, _, _),
-          partition,
-          query,
-          overwrite,
-          ifNotExists) =>
+            l @ LogicalRelation(t: InsertableRelation, _, _),
+            partition,
+            query,
+            overwrite,
+            ifNotExists) =>
         // Right now, we do not support insert into a data source table with partition specs.
         if (partition.nonEmpty) {
           failAnalysis(

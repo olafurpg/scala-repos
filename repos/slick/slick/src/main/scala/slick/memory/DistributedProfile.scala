@@ -110,8 +110,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
         if (logger.isDebugEnabled) logDebug("Wrapped value: " + wr)
         wr
       case ResultSetMapping(gen, from, CompiledMapping(converter, tpe)) :@ CollectionType(
-          cons,
-          el) =>
+            cons,
+            el) =>
         if (logger.isDebugEnabled) logDebug("Evaluating " + n)
         val fromV = run(from).asInstanceOf[TraversableOnce[Any]]
         val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, Any]]

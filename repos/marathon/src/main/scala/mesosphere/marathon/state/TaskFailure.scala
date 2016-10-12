@@ -70,17 +70,17 @@ object TaskFailure {
 
     def apply(statusUpdate: MesosStatusUpdateEvent): Option[TaskFailure] = {
       val MesosStatusUpdateEvent(
-      slaveId,
-      taskId,
-      taskStateStr,
-      message,
-      appId,
-      host,
-      _,
-      _,
-      version,
-      _,
-      ts
+        slaveId,
+        taskId,
+        taskStateStr,
+        message,
+        appId,
+        host,
+        _,
+        _,
+        version,
+        _,
+        ts
       ) = statusUpdate
 
       val state = taskState(taskStateStr)

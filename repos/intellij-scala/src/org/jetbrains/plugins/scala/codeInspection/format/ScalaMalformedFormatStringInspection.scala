@@ -54,8 +54,8 @@ class ScalaMalformedFormatStringInspection extends AbstractInspection {
   private def inspect(part: StringPart, holder: ProblemsHolder) {
     part match {
       case injection @ Injection(
-          exp,
-          Some(Specifier(Span(element, start, end), format))) =>
+            exp,
+            Some(Specifier(Span(element, start, end), format))) =>
         injection.problem match {
           case Some(Inapplicable) =>
             for (argumentType <- injection.expressionType) {

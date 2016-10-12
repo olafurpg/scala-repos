@@ -113,15 +113,15 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     if (!callGraph.containsCallsite(callsite)) return
 
     val Right(
-    Callee(callee,
-           calleeDeclarationClass,
-           _,
-           _,
-           canInlineFromSource,
-           annotatedInline,
-           annotatedNoInline,
-           samParamTypes,
-           infoWarning)) = callsite.callee
+      Callee(callee,
+             calleeDeclarationClass,
+             _,
+             _,
+             canInlineFromSource,
+             annotatedInline,
+             annotatedNoInline,
+             samParamTypes,
+             infoWarning)) = callsite.callee
 
     val traitMethodArgumentTypes = asm.Type.getArgumentTypes(callee.desc)
 

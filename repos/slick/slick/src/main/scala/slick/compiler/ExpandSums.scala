@@ -42,14 +42,14 @@ class ExpandSums extends Phase {
             ConstArray(pred,
                        then1 :@ tpe,
                        LiteralNode(None) :@ OptionType(
-                       ScalaBaseType.nullType))) =>
+                         ScalaBaseType.nullType))) =>
           multi = true
           IfThenElse(ConstArray(pred, then1, buildMultiColumnNone(tpe))) :@ tpe
 
         // Identity OptionFold/OptionApply combination -> remove
         case OptionFold(from,
                         LiteralNode(None) :@ OptionType(
-                        ScalaBaseType.nullType),
+                          ScalaBaseType.nullType),
                         oa @ OptionApply(Ref(s)),
                         gen) if s == gen =>
           silentCast(oa.nodeType, from)
@@ -363,7 +363,7 @@ class ExpandSums extends Phase {
     def tr(n: Node): Node = n.mapChildren(tr, keepType = true) match {
       // Expand multi-column SilentCasts
       case cast @ Library.SilentCast(ch) :@ Type.Structural(
-          ProductType(typeCh)) =>
+            ProductType(typeCh)) =>
         invalidate(ch)
         val elems = typeCh.zipWithIndex.map {
           case (t, idx) =>

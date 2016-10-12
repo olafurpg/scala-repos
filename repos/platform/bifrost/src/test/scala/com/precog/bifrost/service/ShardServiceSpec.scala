@@ -393,8 +393,8 @@ class ShardServiceSpec extends TestShardService {
       query(simpleQuery, None).copoint must beLike {
         case HttpResponse(
             HttpStatus(
-            BadRequest,
-            "An apiKey query parameter is required to access this URL"),
+              BadRequest,
+              "An apiKey query parameter is required to access this URL"),
             _,
             _,
             _) =>
@@ -491,8 +491,8 @@ class ShardServiceSpec extends TestShardService {
       browse(None).copoint must beLike {
         case HttpResponse(
             HttpStatus(
-            BadRequest,
-            "An apiKey query parameter is required to access this URL"),
+              BadRequest,
+              "An apiKey query parameter is required to access this URL"),
             _,
             _,
             _) =>
@@ -538,8 +538,8 @@ class ShardServiceSpec extends TestShardService {
       meta(None).copoint must beLike {
         case HttpResponse(
             HttpStatus(
-            BadRequest,
-            "An apiKey query parameter is required to access this URL"),
+              BadRequest,
+              "An apiKey query parameter is required to access this URL"),
             _,
             _,
             _) =>

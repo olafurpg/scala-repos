@@ -36,22 +36,22 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
         case JNull | JNothing => Empty
         case JObject(
             JField("box_failure", JString("Failure")) :: JField(
-            "msg",
-            JString(msg)) :: JField("exception", exception) :: JField(
-            "chain",
-            chain) :: Nil) =>
+              "msg",
+              JString(msg)) :: JField("exception", exception) :: JField(
+              "chain",
+              chain) :: Nil) =>
           Failure(msg,
                   deserializeException(exception),
                   extract(chain, TypeInfo(BoxClass, Some(typeHoldingFailure)))
                     .asInstanceOf[Box[Failure]])
         case JObject(
             JField("box_failure", JString("ParamFailure")) :: JField(
-            "msg",
-            JString(msg)) :: JField("exception", exception) :: JField(
-            "chain",
-            chain) :: JField("paramType", JString(paramType)) :: JField(
-            "param",
-            param) :: Nil) =>
+              "msg",
+              JString(msg)) :: JField("exception", exception) :: JField(
+              "chain",
+              chain) :: JField("paramType", JString(paramType)) :: JField(
+              "param",
+              param) :: Nil) =>
           val clazz =
             Thread.currentThread.getContextClassLoader.loadClass(paramType)
           ParamFailure(

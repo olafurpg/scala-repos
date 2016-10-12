@@ -24,9 +24,10 @@ class OptimizeScalar extends Phase {
         cast(n.nodeType, res).infer()
 
       case n @ IfThenElse(
-          ConstArray(Library.Not(Library.==(v, LiteralNode(null))),
-                     v2,
-                     LiteralNode(z))) if v == v2 && (z == null || z == None) =>
+            ConstArray(Library.Not(Library.==(v, LiteralNode(null))),
+                       v2,
+                       LiteralNode(z)))
+          if v == v2 && (z == null || z == None) =>
         logger.debug("Optimizing: if(v != null) v else null", n)
         v
 

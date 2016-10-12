@@ -322,8 +322,8 @@ trait ApplicationAnnotator {
       case (stRef: ScStableCodeReferenceElement) childOf (st: ScSimpleTypeElement)
           if st.singleton =>
       case (stRef: ScStableCodeReferenceElement) childOf(Both(
-          p: ScPattern,
-          (_: ScConstructorPattern | _: ScInfixPattern))) =>
+            p: ScPattern,
+            (_: ScConstructorPattern | _: ScInfixPattern))) =>
         annotation.registerFix(new CreateCaseClassQuickFix(stRef))
         annotation.registerFix(new CreateExtractorObjectQuickFix(stRef, p))
       case stRef: ScStableCodeReferenceElement =>

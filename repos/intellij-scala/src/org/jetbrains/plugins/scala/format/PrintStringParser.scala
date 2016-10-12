@@ -30,7 +30,7 @@ object PrintStringParser extends StringParser {
       // printf("%d", 1)
       case MethodInvocation(
           PsiReferenceEx.resolve(
-          (f: ScFunction) && ContainingClass(owner: ScObject)),
+            (f: ScFunction) && ContainingClass(owner: ScObject)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString && isPrintfMethod(owner.qualifiedName, f.name) =>
         (literal, args)
@@ -38,7 +38,7 @@ object PrintStringParser extends StringParser {
       // System.out.printf("%d", 1)
       case MethodInvocation(
           PsiReferenceEx.resolve(
-          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
+            (f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
             isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>

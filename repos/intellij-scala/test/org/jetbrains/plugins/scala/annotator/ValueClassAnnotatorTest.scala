@@ -19,8 +19,8 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("s: Int", NonPrivateValParameter()) :: Error(
-          "Blargle2",
-          OnlyOneParameter()) :: Nil =>
+            "Blargle2",
+            OnlyOneParameter()) :: Nil =>
     }
   }
 
@@ -57,8 +57,8 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("equals", RedefineEqualsHashCode()) :: Error(
-          "hashCode",
-          RedefineEqualsHashCode()) :: Nil =>
+            "hashCode",
+            RedefineEqualsHashCode()) :: Nil =>
     }
   }
 

@@ -239,8 +239,8 @@ private[hive] class HiveQl(conf: ParserConf)
       case Token(
           "TOK_ANALYZE",
           Token(
-          "TOK_TAB",
-          Token("TOK_TABNAME", tableNameParts) :: partitionSpec) :: isNoscan) =>
+            "TOK_TAB",
+            Token("TOK_TABNAME", tableNameParts) :: partitionSpec) :: isNoscan) =>
         // Reference:
         // https://cwiki.apache.org/confluence/display/Hive/StatsDev#StatsDev-ExistingTables
         if (partitionSpec.nonEmpty) {
@@ -280,14 +280,14 @@ private[hive] class HiveQl(conf: ParserConf)
             case t @ Token("TOK_QUERY", _) => t
           }.nonEmpty =>
         val Seq(
-        Some(viewNameParts),
-        Some(query),
-        maybeComment,
-        replace,
-        allowExisting,
-        maybeProperties,
-        maybeColumns,
-        maybePartCols
+          Some(viewNameParts),
+          Some(query),
+          maybeComment,
+          replace,
+          allowExisting,
+          maybeProperties,
+          maybeColumns,
+          maybePartCols
         ) = getClauses(Seq("TOK_TABNAME",
                            "TOK_QUERY",
                            "TOK_TABLECOMMENT",
@@ -337,7 +337,7 @@ private[hive] class HiveQl(conf: ParserConf)
           }.nonEmpty =>
         // Reference: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL
         val (Some(tableNameParts) :: _ /* likeTable */ :: externalTable :: Some(
-        query) :: allowExisting +: _) = getClauses(
+          query) :: allowExisting +: _) = getClauses(
           Seq(
             "TOK_TABNAME",
             "TOK_LIKETABLE",
@@ -591,17 +591,17 @@ private[hive] class HiveQl(conf: ParserConf)
   protected override def nodeToTransformation(
       node: ASTNode,
       child: LogicalPlan): Option[logical.ScriptTransformation] = node match {
-    case Token(
-        "TOK_SELEXPR",
-        Token(
-        "TOK_TRANSFORM",
-        Token("TOK_EXPLIST", inputExprs) :: Token(
-        "TOK_SERDE",
-        inputSerdeClause) :: Token("TOK_RECORDWRITER", writerClause) ::
-          // TODO: Need to support other types of (in/out)put
-          Token(script, Nil) :: Token("TOK_SERDE", outputSerdeClause) :: Token(
-          "TOK_RECORDREADER",
-          readerClause) :: outputClause) :: Nil) =>
+    case Token("TOK_SELEXPR",
+               Token("TOK_TRANSFORM",
+                     Token("TOK_EXPLIST", inputExprs) :: Token(
+                       "TOK_SERDE",
+                       inputSerdeClause) :: Token("TOK_RECORDWRITER",
+                                                  writerClause) ::
+                       // TODO: Need to support other types of (in/out)put
+                       Token(script, Nil) :: Token("TOK_SERDE",
+                                                   outputSerdeClause) :: Token(
+                         "TOK_RECORDREADER",
+                         readerClause) :: outputClause) :: Nil) =>
       val (output, schemaLess) = outputClause match {
         case Token("TOK_ALIASLIST", aliases) :: Nil =>
           (aliases.map {
@@ -639,10 +639,10 @@ private[hive] class HiveQl(conf: ParserConf)
           (Nil, Some(unescapeSQLString(serdeClass)), Nil, false)
 
         case Token(
-            "TOK_SERDENAME",
-            Token(serdeClass, Nil) :: Token(
-            "TOK_TABLEPROPERTIES",
-            Token("TOK_TABLEPROPLIST", propsClause) :: Nil) :: Nil) :: Nil =>
+              "TOK_SERDENAME",
+              Token(serdeClass, Nil) :: Token(
+                "TOK_TABLEPROPERTIES",
+                Token("TOK_TABLEPROPLIST", propsClause) :: Nil) :: Nil) :: Nil =>
           val serdeProps = propsClause.map {
             case Token("TOK_TABLEPROPERTY",
                        Token(name, Nil) :: Token(value, Nil) :: Nil) =>

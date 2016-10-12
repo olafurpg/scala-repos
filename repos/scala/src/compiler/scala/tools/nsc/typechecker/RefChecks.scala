@@ -1798,8 +1798,8 @@ abstract class RefChecks
     private def transformApply(tree: Apply): Tree = tree match {
       case Apply(Select(qual, nme.filter | nme.withFilter),
                  List(
-                 Function(List(ValDef(_, pname, tpt, _)),
-                          Match(_, CaseDef(pat1, _, _) :: _))))
+                   Function(List(ValDef(_, pname, tpt, _)),
+                            Match(_, CaseDef(pat1, _, _) :: _))))
           if ((pname startsWith nme.CHECK_IF_REFUTABLE_STRING) &&
             isIrrefutable(pat1, tpt.tpe) && (qual.tpe <:< tree.tpe)) =>
         transform(qual)

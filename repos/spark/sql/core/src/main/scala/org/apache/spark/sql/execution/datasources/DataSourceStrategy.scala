@@ -57,11 +57,11 @@ import org.apache.spark.util.collection.BitSet
 private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
   override def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case i @ logical.InsertIntoTable(
-        l @ LogicalRelation(t: HadoopFsRelation, _, _),
-        part,
-        query,
-        overwrite,
-        false)
+          l @ LogicalRelation(t: HadoopFsRelation, _, _),
+          part,
+          query,
+          overwrite,
+          false)
         if query.resolved && t.schema.asNullable == query.schema.asNullable =>
       // Sanity checks
       if (t.location.paths.size != 1) {
@@ -273,11 +273,11 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                                baseRelation) :: Nil
 
     case i @ logical.InsertIntoTable(
-        l @ LogicalRelation(t: InsertableRelation, _, _),
-        part,
-        query,
-        overwrite,
-        false) if part.isEmpty =>
+          l @ LogicalRelation(t: InsertableRelation, _, _),
+          part,
+          query,
+          overwrite,
+          false) if part.isEmpty =>
       ExecutedCommand(InsertIntoDataSource(l, query, overwrite)) :: Nil
 
     case _ => Nil

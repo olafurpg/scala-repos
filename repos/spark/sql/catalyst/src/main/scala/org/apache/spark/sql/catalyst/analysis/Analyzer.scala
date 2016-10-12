@@ -138,7 +138,7 @@ class Analyzer(catalog: Catalog,
             p.transformExpressions {
               case UnresolvedWindowExpression(c,
                                               WindowSpecReference(
-                                              windowName)) =>
+                                                windowName)) =>
                 val errorMessage =
                   s"Window specification $windowName is not defined in the WINDOW clause."
                 val windowSpecDefinition =
@@ -889,8 +889,8 @@ class Analyzer(catalog: Catalog,
   object ResolveAggregateFunctions extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
       case filter @ Filter(
-          havingCondition,
-          aggregate @ Aggregate(grouping, originalAggExprs, child))
+            havingCondition,
+            aggregate @ Aggregate(grouping, originalAggExprs, child))
           if aggregate.resolved =>
         // Try resolving the condition of the filter as though it is in the aggregate clause
         val aggregatedCondition =
@@ -1196,8 +1196,8 @@ class Analyzer(catalog: Catalog,
 
             // Extract Windowed AggregateExpression
             case we @ WindowExpression(
-                AggregateExpression(function, mode, isDistinct),
-                spec: WindowSpecDefinition) =>
+                  AggregateExpression(function, mode, isDistinct),
+                  spec: WindowSpecDefinition) =>
               val newChildren = function.children.map(extractExpr)
               val newFunction = function
                 .withNewChildren(newChildren)
@@ -1456,8 +1456,8 @@ class Analyzer(catalog: Catalog,
               if wf.frame != UnspecifiedFrame =>
             WindowExpression(wf, s.copy(frameSpecification = wf.frame))
           case we @ WindowExpression(
-              e,
-              s @ WindowSpecDefinition(_, o, UnspecifiedFrame)) =>
+                e,
+                s @ WindowSpecDefinition(_, o, UnspecifiedFrame)) =>
             val frame =
               SpecifiedWindowFrame.defaultWindowFrame(o.nonEmpty,
                                                       acceptWindowFrame = true)

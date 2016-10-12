@@ -826,10 +826,10 @@ trait Typers
           val OK = hasImport || hasOption
           if (!OK) {
             val Some(
-            AnnotationInfo(_,
-                           List(Literal(Constant(featureDesc: String)),
-                                Literal(Constant(required: Boolean))),
-                           _)) =
+              AnnotationInfo(_,
+                             List(Literal(Constant(featureDesc: String)),
+                                  Literal(Constant(required: Boolean))),
+                             _)) =
               featureTrait getAnnotation LanguageFeatureAnnot
             context.featureWarning(pos,
                                    featureName,

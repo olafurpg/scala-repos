@@ -310,8 +310,8 @@ class ScProjectionType private (
           case _ => (false, uSubst)
         }
       case param @ ScParameterizedType(
-          proj2 @ ScProjectionType(p1, element1, _),
-          typeArgs) =>
+            proj2 @ ScProjectionType(p1, element1, _),
+            typeArgs) =>
         r.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
             Equivalence.equivInner(this, lower match {

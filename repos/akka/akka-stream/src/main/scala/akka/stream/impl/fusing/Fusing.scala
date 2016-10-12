@@ -746,18 +746,18 @@ private[stream] object Fusing {
         internalOuts.removeAll(m.shape.outlets.asJava)
       copy match {
         case c @ CopiedModule(
-            _,
-            _,
-            GraphStageModule(_, _, _: MaterializedValueSource[_])) ⇒
+              _,
+              _,
+              GraphStageModule(_, _, _: MaterializedValueSource[_])) ⇒
           pushMatSrc(c)
         case GraphModule(_, _, _, mvids) ⇒
           var i = 0
           while (i < mvids.length) {
             mvids(i) match {
               case c @ CopiedModule(
-                  _,
-                  _,
-                  GraphStageModule(_, _, _: MaterializedValueSource[_])) ⇒
+                    _,
+                    _,
+                    GraphStageModule(_, _, _: MaterializedValueSource[_])) ⇒
                 pushMatSrc(c)
               case _ ⇒
             }

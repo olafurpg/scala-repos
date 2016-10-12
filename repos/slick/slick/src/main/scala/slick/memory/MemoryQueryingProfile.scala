@@ -81,7 +81,7 @@ trait MemoryQueryingProfile extends BasicProfile {
       case Apply(
           Library.CountAll,
           ch @ ConstArray(
-          Bind(gen2, FwdPath(s :: _), Pure(ProductOfCommonPaths(s2, _), _))))
+            Bind(gen2, FwdPath(s :: _), Pure(ProductOfCommonPaths(s2, _), _))))
           if s == gen && s2 == gen2 =>
         Apply(Library.Count, ch)(n.nodeType)
       case n =>
@@ -99,7 +99,7 @@ trait MemoryQueryingProfile extends BasicProfile {
         n: Node): ResultConverter[MemoryResultConverterDomain, _] = n match {
       // We actually get a Scala Option value from the interpreter, so the SilentCast is not silent after all
       case Library.SilentCast(
-          sel @ Select(_, ElementSymbol(idx)) :@ OptionType(tpe2)) :@ tpe
+            sel @ Select(_, ElementSymbol(idx)) :@ OptionType(tpe2)) :@ tpe
           if !tpe.isInstanceOf[OptionType] =>
         val base =
           createColumnConverter(sel, idx, None)

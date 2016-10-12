@@ -43,21 +43,21 @@ class ParametersAnnotatorTest extends SimpleTestCase {
     }
     assertMatches(messages("def f(a: A*, b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*",
-          "*-parameter must come last") :: Nil =>
+            "b: B*",
+            "*-parameter must come last") :: Nil =>
     }
     assertMatches(messages("def f(a: A*, c: C)(b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*",
-          "*-parameter must come last") :: Nil =>
+            "b: B*",
+            "*-parameter must come last") :: Nil =>
     }
   }
 
   def testRepeatedWithDefault(): Unit = {
     assertMatches(messages("def f(i: Int, js: Int* = 1) {}")) {
       case Error(
-          "(i: Int, js: Int* = 1)",
-          "Parameter section with *-parameter cannot have default arguments") :: Nil =>
+            "(i: Int, js: Int* = 1)",
+            "Parameter section with *-parameter cannot have default arguments") :: Nil =>
     }
   }
 

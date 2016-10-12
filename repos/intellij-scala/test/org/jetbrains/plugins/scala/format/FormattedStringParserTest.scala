@@ -38,8 +38,8 @@ class FormattedStringParserTest extends SimpleTestCase {
   def testFormatSpecifierWithArgumentAfterEscapeChar() {
     assertMatches(parse("\\n%d", 1)) {
       case Text("\n") :: Injection(
-          ElementText("1"),
-          Some(Specifier(Span(_, 3, 5), "%d"))) :: Nil =>
+            ElementText("1"),
+            Some(Specifier(Span(_, 3, 5), "%d"))) :: Nil =>
     }
   }
 
@@ -61,71 +61,71 @@ class FormattedStringParserTest extends SimpleTestCase {
   def testTextThanFormatSpecifier() {
     assertMatches(parse("foo %d", 1)) {
       case Text("foo ") :: Injection(
-          ElementText("1"),
-          Some(Specifier(Span(_, 5, 7), "%d"))) :: Nil =>
+            ElementText("1"),
+            Some(Specifier(Span(_, 5, 7), "%d"))) :: Nil =>
     }
   }
 
   def testFormatSpecifierThanText() {
     assertMatches(parse("%d foo", 1)) {
       case Injection(ElementText("1"), Some(Specifier(Span(_, 1, 3), "%d"))) :: Text(
-          " foo") :: Nil =>
+            " foo") :: Nil =>
     }
   }
 
   def testMixedFormatString() {
     assertMatches(parse("A%dB%sC%cD", 1, 2, 3)) {
       case Text("A") :: Injection(
-          ElementText("1"),
-          Some(Specifier(Span(_, 2, 4), "%d"))) :: Text("B") :: Injection(
-          ElementText("2"),
-          Some(Specifier(Span(_, 5, 7), "%s"))) :: Text("C") :: Injection(
-          ElementText("3"),
-          Some(Specifier(Span(_, 8, 10), "%c"))) :: Text("D") :: Nil =>
+            ElementText("1"),
+            Some(Specifier(Span(_, 2, 4), "%d"))) :: Text("B") :: Injection(
+            ElementText("2"),
+            Some(Specifier(Span(_, 5, 7), "%s"))) :: Text("C") :: Injection(
+            ElementText("3"),
+            Some(Specifier(Span(_, 8, 10), "%c"))) :: Text("D") :: Nil =>
     }
 
     assertMatches(parse("%dA%sB%c", 1, 2, 3)) {
       case Injection(ElementText("1"), Some(Specifier(Span(_, 1, 3), "%d"))) :: Text(
-          "A") :: Injection(ElementText("2"),
-                            Some(Specifier(Span(_, 4, 6), "%s"))) :: Text("B") :: Injection(
-          ElementText("3"),
-          Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
+            "A") :: Injection(ElementText("2"),
+                              Some(Specifier(Span(_, 4, 6), "%s"))) :: Text(
+            "B") :: Injection(ElementText("3"),
+                              Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
     }
   }
 
   def testFormatSpecifierWithPositionalArgument() {
     assertMatches(parse("%2$d", 3, 5)) {
       case Injection(ElementText("5"), Some(Specifier(Span(_, 1, 5), "%d"))) :: UnboundExpression(
-          ElementText("3")) :: Nil =>
+            ElementText("3")) :: Nil =>
     }
   }
 
   def testFormatSpecifierWithOutOfBoundPositionalArgument() {
     assertMatches(parse("%3$d", 3, 5)) {
       case UnboundPositionalSpecifier(Specifier(Span(_, 1, 5), "%d"), 3) :: UnboundExpression(
-          ElementText("3")) :: UnboundExpression(ElementText("5")) :: Nil =>
+            ElementText("3")) :: UnboundExpression(ElementText("5")) :: Nil =>
     }
     assertMatches(parse("foo %1$d")) {
       case Text("foo ") :: UnboundPositionalSpecifier(
-          Specifier(Span(_, 5, 9), "%d"),
-          1) :: Nil =>
+            Specifier(Span(_, 5, 9), "%d"),
+            1) :: Nil =>
     }
   }
 
   def testPositionalArgumentThanOrdinaryArgument() {
     assertMatches(parse("%2$d%s", 3, 5)) {
       case Injection(ElementText("5"), Some(Specifier(Span(_, 1, 5), "%d"))) :: Injection(
-          ElementText("3"),
-          Some(Specifier(Span(_, 5, 7), "%s"))) :: Nil =>
+            ElementText("3"),
+            Some(Specifier(Span(_, 5, 7), "%s"))) :: Nil =>
     }
   }
 
   def testOrdinaryArgumentArgumentThanPositional() {
     assertMatches(parse("%d%1$s", 3, 5)) {
       case Injection(ElementText("3"), Some(Specifier(Span(_, 1, 3), "%d"))) :: Injection(
-          ElementText("3"),
-          Some(Specifier(Span(_, 3, 7), "%s"))) :: UnboundExpression(
-          ElementText("5")) :: Nil =>
+            ElementText("3"),
+            Some(Specifier(Span(_, 3, 7), "%s"))) :: UnboundExpression(
+            ElementText("5")) :: Nil =>
     }
   }
 

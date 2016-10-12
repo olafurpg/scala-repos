@@ -388,8 +388,8 @@ private class UpperCaseFormat
       ({
         case JObject(
             JField("string", JString(string)) :: JField(
-            "optional",
-            JString(optional)) :: JField("default", JString(default)) :: Nil) =>
+              "optional",
+              JString(optional)) :: JField("default", JString(default)) :: Nil) =>
           ScalaQuery(string.toUpperCase,
                      Some(optional.toUpperCase),
                      default.toUpperCase)

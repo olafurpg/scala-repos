@@ -68,7 +68,7 @@ class BasicTest extends ApplicabilityTestBase {
     assertProblems("(a: A, b: B)", "") {
       case MissedParametersClause(_) :: Nil =>
       case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
-          Parameter("b")) :: Nil =>
+            Parameter("b")) :: Nil =>
     }
     assertProblems("(a: A)(b: B)", "") {
       case MissedParametersClause(_) :: Nil =>
@@ -85,7 +85,7 @@ class BasicTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "()") {
       case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
-          Parameter("b")) :: Nil =>
+            Parameter("b")) :: Nil =>
     }
   }
 
@@ -95,8 +95,8 @@ class BasicTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(B, A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"),
-          Type("B")) :: Nil =>
+            Expression("A"),
+            Type("B")) :: Nil =>
     }
   }
 }

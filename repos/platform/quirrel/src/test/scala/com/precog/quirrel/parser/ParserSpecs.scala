@@ -182,9 +182,9 @@ object ParserSpecs
                        Dispatch(_, Identifier(Vector(), "a"), Vector()),
                        NumLit(_, "12")),
                     ArrayDef(
-                    _,
-                    Vector(
-                    Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
+                      _,
+                      Vector(
+                        Dispatch(_, Identifier(Vector(), "a"), Vector())))) =>
           ok
       }
     }
@@ -245,11 +245,12 @@ object ParserSpecs
 
     "accept a solve expression with a single expression constraint" in {
       parseSingle("solve 'a = 12 + true 1") must beLike {
-        case Solve(
-            _,
-            Vector(
-            Eq(_, TicVar(_, "'a"), Add(_, NumLit(_, "12"), BoolLit(_, true)))),
-            NumLit(_, "1")) =>
+        case Solve(_,
+                   Vector(
+                     Eq(_,
+                        TicVar(_, "'a"),
+                        Add(_, NumLit(_, "12"), BoolLit(_, true)))),
+                   NumLit(_, "1")) =>
           ok
       }
     }
@@ -279,9 +280,9 @@ object ParserSpecs
       parseSingle("solve solve 'a, 'b 1 2") must beLike {
         case Solve(_,
                    Vector(
-                   Solve(_,
-                         Vector(TicVar(_, "'a"), TicVar(_, "'b")),
-                         NumLit(_, "1"))),
+                     Solve(_,
+                           Vector(TicVar(_, "'a"), TicVar(_, "'b")),
+                           NumLit(_, "1"))),
                    NumLit(_, "2")) =>
           ok
       }
@@ -613,10 +614,10 @@ object ParserSpecs
       parseSingle("{ a: 1, b: 2, cafe: { foo: null }, star_BUckS: null }") must beLike {
         case ObjectDef(_,
                        Vector(
-                       ("a", NumLit(_, "1")),
-                       ("b", NumLit(_, "2")),
-                       ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
-                       ("star_BUckS", NullLit(_)))) =>
+                         ("a", NumLit(_, "1")),
+                         ("b", NumLit(_, "2")),
+                         ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
+                         ("star_BUckS", NullLit(_)))) =>
           ok
       }
 
@@ -624,10 +625,10 @@ object ParserSpecs
         "{ \"a\": 1, \"b\": 2, \"cafe\": { \"foo\": null }, \"star_BUckS\": null }") must beLike {
         case ObjectDef(_,
                        Vector(
-                       ("a", NumLit(_, "1")),
-                       ("b", NumLit(_, "2")),
-                       ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
-                       ("star_BUckS", NullLit(_)))) =>
+                         ("a", NumLit(_, "1")),
+                         ("b", NumLit(_, "2")),
+                         ("cafe", ObjectDef(_, Vector(("foo", NullLit(_))))),
+                         ("star_BUckS", NullLit(_)))) =>
           ok
       }
     }
@@ -2529,8 +2530,9 @@ object ParserSpecs
                        Dispatch(_, Identifier(Vector(), "b"), Vector()),
                        Dispatch(_, Identifier(Vector(), "c"), Vector())),
                  ArrayDef(
-                 _,
-                 Vector(Dispatch(_, Identifier(Vector(), "d"), Vector())))) =>
+                   _,
+                   Vector(
+                     Dispatch(_, Identifier(Vector(), "d"), Vector())))) =>
           ok
       }
     }
@@ -2617,9 +2619,9 @@ object ParserSpecs
       case Dispatch(_,
                     Identifier(Vector(), "load"),
                     Vector(
-                    Dispatch(_,
-                             Identifier(Vector("std", "fs"), "expandPath"),
-                             Vector(StrLit(_, str))))) =>
+                      Dispatch(_,
+                               Identifier(Vector("std", "fs"), "expandPath"),
+                               Vector(StrLit(_, str))))) =>
         Some(str)
 
       case _ => None
@@ -2631,9 +2633,9 @@ object ParserSpecs
       case Dispatch(_,
                     Identifier(Vector(), "relativeLoad"),
                     Vector(
-                    Dispatch(_,
-                             Identifier(Vector("std", "fs"), "expandPath"),
-                             Vector(StrLit(_, str))))) =>
+                      Dispatch(_,
+                               Identifier(Vector("std", "fs"), "expandPath"),
+                               Vector(StrLit(_, str))))) =>
         Some(str)
 
       case _ => None

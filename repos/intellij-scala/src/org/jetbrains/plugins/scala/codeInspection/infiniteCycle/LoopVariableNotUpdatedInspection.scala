@@ -18,12 +18,13 @@ class LoopVariableNotUpdatedInspection
   private val ComparisonOperators = Set("==", "!=", ">", "<", ">=", "<=")
 
   def actionFor(holder: ProblemsHolder) = {
-    case ScWhileStmt(Some(
-                     ScInfixExpr((ref: ScReferenceExpression) &&(ResolvesTo(
-                                 target @ Parent(Parent(entity: ScVariable)))),
-                                 ElementText(operator),
-                                 _)),
-                     Some(body))
+    case ScWhileStmt(
+        Some(
+          ScInfixExpr((ref: ScReferenceExpression) &&(ResolvesTo(
+                        target @ Parent(Parent(entity: ScVariable)))),
+                      ElementText(operator),
+                      _)),
+        Some(body))
         if !ref.isQualified && ComparisonOperators.contains(operator) &&
           !isMutatedWithing(body, target) =>
       holder.registerProblem(ref.asInstanceOf[PsiReference],

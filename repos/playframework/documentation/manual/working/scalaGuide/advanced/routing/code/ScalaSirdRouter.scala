@@ -158,7 +158,7 @@ object ScalaSirdRouter extends Specification {
       //#complex
       val router = Router.from {
         case rh @ GET(
-            p"/items/${ idString @ int(id) }" ? q"price=${ int(price) }")
+              p"/items/${ idString @ int(id) }" ? q"price=${ int(price) }")
             if price > 200 =>
           Action {
             Results.Ok(s"Expensive item $id")

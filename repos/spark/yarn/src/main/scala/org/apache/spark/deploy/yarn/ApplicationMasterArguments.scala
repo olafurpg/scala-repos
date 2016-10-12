@@ -62,11 +62,13 @@ class ApplicationMasterArguments(val args: Array[String]) {
           userArgsBuffer += value
           args = tail
 
-        case ("--worker-memory" | "--executor-memory") :: MemoryParam(value) :: tail =>
+        case ("--worker-memory" |
+            "--executor-memory") :: MemoryParam(value) :: tail =>
           executorMemory = value
           args = tail
 
-        case ("--worker-cores" | "--executor-cores") :: IntParam(value) :: tail =>
+        case ("--worker-cores" |
+            "--executor-cores") :: IntParam(value) :: tail =>
           executorCores = value
           args = tail
 

@@ -528,15 +528,15 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       case Apply(
           appMeth,
           List(
-          Apply(wrapRefArrayMeth, List(arg @ StripCast(ArrayValue(_, _)))),
-          _))
+            Apply(wrapRefArrayMeth, List(arg @ StripCast(ArrayValue(_, _)))),
+            _))
           if wrapRefArrayMeth.symbol == currentRun.runDefinitions.Predef_wrapRefArray &&
             appMeth.symbol == ArrayModule_genericApply =>
         super.transform(arg)
       case Apply(appMeth,
                  List(
-                 elem0,
-                 Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
+                   elem0,
+                   Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
           if wrapArrayMeth.symbol == Predef_wrapArray(elemtpt.tpe) &&
             appMeth.symbol == ArrayModule_apply(elemtpt.tpe) =>
         super.transform(

@@ -170,9 +170,10 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
                                           10)((interval, mode))
         mergeResult.isRight ==> {
           val Right(
-          ((Intersection(InclusiveLower(_), ExclusiveUpper(readIntervalUpper)),
-            _),
-           _)) = mergeResult
+            ((Intersection(InclusiveLower(_),
+                           ExclusiveUpper(readIntervalUpper)),
+              _),
+             _)) = mergeResult
           val requestedEndingTimestamp: Timestamp = interval.upper.upper
           val readIntervalEndingTimestamp: Timestamp = readIntervalUpper
           implicitly[Ordering[Timestamp]]

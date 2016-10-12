@@ -298,9 +298,9 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       }
       (tree match {
         case (rsm @ ResultSetMapping(
-            _,
-            compiled,
-            CompiledMapping(_, elemType))) :@ (ct: CollectionType) =>
+              _,
+              compiled,
+              CompiledMapping(_, elemType))) :@ (ct: CollectionType) =>
           val sql = findSql(compiled)
           new StreamingInvokerAction[R, Any, Effect] { streamingAction =>
             protected[this] def createInvoker(sql: Iterable[String]) =
@@ -427,9 +427,9 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
   class UpdateActionExtensionMethodsImpl[T](tree: Node, param: Any) {
     protected[this] val ResultSetMapping(
-    _,
-    CompiledStatement(_, sres: SQLBuilder.Result, _),
-    CompiledMapping(_converter, _)) = tree
+      _,
+      CompiledStatement(_, sres: SQLBuilder.Result, _),
+      CompiledMapping(_converter, _)) = tree
     protected[this] val converter =
       _converter.asInstanceOf[ResultConverter[JdbcResultConverterDomain, T]]
 

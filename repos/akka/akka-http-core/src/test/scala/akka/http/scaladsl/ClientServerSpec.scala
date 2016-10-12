@@ -481,11 +481,11 @@ class ClientServerSpec
         val serverInSub = serverIn.expectSubscription()
         serverInSub.request(1)
         private val HttpRequest(
-        POST,
-        uri,
-        List(Accept(Seq(MediaRanges.`*/*`)), Host(_, _), `User-Agent`(_)),
-        Chunked(`chunkedContentType`, chunkStream),
-        HttpProtocols.`HTTP/1.1`) = serverIn.expectNext()
+          POST,
+          uri,
+          List(Accept(Seq(MediaRanges.`*/*`)), Host(_, _), `User-Agent`(_)),
+          Chunked(`chunkedContentType`, chunkStream),
+          HttpProtocols.`HTTP/1.1`) = serverIn.expectNext()
         uri shouldEqual Uri(s"http://$hostname:$port/chunked")
         Await.result(chunkStream.limit(5).runWith(Sink.seq), 100.millis) shouldEqual chunks
 

@@ -72,32 +72,32 @@ class DebugTest
             expectMsgType[DebugBacktrace] should matchPattern {
               case DebugBacktrace(
                   List(
-                  DebugStackFrame(0,
-                                  List(),
-                                  0,
-                                  "breakpoints.Breakpoints",
-                                  "mainTest",
-                                  LineSourcePosition(`breakpointsFile`, 32),
-                                  _),
-                  DebugStackFrame(1,
-                                  List(
-                                  DebugStackLocal(0,
-                                                  "args",
-                                                  "Array[]",
-                                                  "java.lang.String[]")
-                                  ),
-                                  1,
-                                  "breakpoints.Breakpoints$",
-                                  "main",
-                                  LineSourcePosition(`breakpointsFile`, 41),
-                                  _),
-                  DebugStackFrame(2,
-                                  List(),
-                                  1,
-                                  "breakpoints.Breakpoints",
-                                  "main",
-                                  LineSourcePosition(`breakpointsFile`, _),
-                                  _)
+                    DebugStackFrame(0,
+                                    List(),
+                                    0,
+                                    "breakpoints.Breakpoints",
+                                    "mainTest",
+                                    LineSourcePosition(`breakpointsFile`, 32),
+                                    _),
+                    DebugStackFrame(1,
+                                    List(
+                                      DebugStackLocal(0,
+                                                      "args",
+                                                      "Array[]",
+                                                      "java.lang.String[]")
+                                    ),
+                                    1,
+                                    "breakpoints.Breakpoints$",
+                                    "main",
+                                    LineSourcePosition(`breakpointsFile`, 41),
+                                    _),
+                    DebugStackFrame(2,
+                                    List(),
+                                    1,
+                                    "breakpoints.Breakpoints",
+                                    "main",
+                                    LineSourcePosition(`breakpointsFile`, _),
+                                    _)
                   ),
                   DebugThreadId(1),
                   "main") =>
@@ -405,13 +405,13 @@ trait DebugTestUtils {
     project ! DebugBacktraceReq(DebugThreadId(1), 0, 1)
     expectMsgType[DebugBacktrace] should matchPattern {
       case DebugBacktrace(List(
-                          DebugStackFrame(0,
-                                          _,
-                                          1,
-                                          `className`,
-                                          `method`,
-                                          LineSourcePosition(_, `line`),
-                                          _)),
+                            DebugStackFrame(0,
+                                            _,
+                                            1,
+                                            `className`,
+                                            `method`,
+                                            LineSourcePosition(_, `line`),
+                                            _)),
                           DebugThreadId(1),
                           "main") =>
     }

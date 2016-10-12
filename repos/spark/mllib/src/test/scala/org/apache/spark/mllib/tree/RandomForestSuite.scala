@@ -163,10 +163,10 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
           nodeQueue.enqueue((treeIndex, topNodes(treeIndex)))
         }
         val rng = new scala.util.Random(seed = seed)
-        val (nodesForGroup: Map[Int, Array[Node]],
-             treeToNodeToIndexInfo: Map[
-               Int,
-               Map[Int, RandomForest.NodeIndexInfo]]) =
+        val (
+          nodesForGroup: Map[Int, Array[Node]],
+          treeToNodeToIndexInfo: Map[Int,
+                                     Map[Int, RandomForest.NodeIndexInfo]]) =
           RandomForest
             .selectNodesToSplit(nodeQueue, maxMemoryUsage, metadata, rng)
 

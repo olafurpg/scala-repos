@@ -58,9 +58,9 @@ class ReorderOperations extends Phase {
 
     // Push distincness-preserving aliasing / literal projection into Subquery.AboveDistinct
     case n @ Bind(
-        s,
-        Subquery(from :@ CollectionType(_, tpe), Subquery.AboveDistinct),
-        Pure(StructNode(defs), ts1))
+          s,
+          Subquery(from :@ CollectionType(_, tpe), Subquery.AboveDistinct),
+          Pure(StructNode(defs), ts1))
         if isAliasingOrLiteral(s, defs) &&
           isDistinctnessPreserving(s, defs, tpe) =>
       Subquery(n.copy(from = from), Subquery.AboveDistinct).infer()
@@ -72,10 +72,10 @@ class ReorderOperations extends Phase {
 
     // If a Filter checks an upper bound of a ROWNUM, push it into the AboveRownum boundary
     case filter @ Filter(
-        s1,
-        sq @ Subquery(bind @ Bind(bs1, from1, Pure(StructNode(defs1), ts1)),
-                      Subquery.AboveRownum),
-        Apply(Library.<= | Library.<, ConstArray(Select(Ref(rs), f1), v1)))
+          s1,
+          sq @ Subquery(bind @ Bind(bs1, from1, Pure(StructNode(defs1), ts1)),
+                        Subquery.AboveRownum),
+          Apply(Library.<= | Library.<, ConstArray(Select(Ref(rs), f1), v1)))
         if rs == s1 && defs1.find {
           case (f, n) if f == f1 => isRownumCalculation(n)
           case _ => false

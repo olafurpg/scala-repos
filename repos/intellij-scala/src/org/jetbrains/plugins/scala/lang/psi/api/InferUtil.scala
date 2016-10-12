@@ -131,8 +131,8 @@ object InferUtil {
           case coreType =>
             resInner match {
               case t @ ScTypePolymorphicType(
-                  mt @ ScMethodType(retTypeSingle, paramsSingle, _),
-                  typeParamsSingle) =>
+                    mt @ ScMethodType(retTypeSingle, paramsSingle, _),
+                    typeParamsSingle) =>
                 val polymorphicSubst = t.polymorphicTypeSubstitutor
                 val abstractSubstitutor: ScSubstitutor =
                   t.abstractOrLowerTypeSubstitutor

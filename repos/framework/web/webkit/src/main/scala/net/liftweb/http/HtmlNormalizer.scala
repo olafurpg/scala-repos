@@ -105,9 +105,9 @@ private[http] final object HtmlNormalizer {
 
       attributes match {
         case attribute @ UnprefixedAttribute(
-            EventAttribute.EventForAttribute(eventName),
-            attributeValue,
-            remainingAttributes
+              EventAttribute.EventForAttribute(eventName),
+              attributeValue,
+              remainingAttributes
             ) if attributeValue.text.startsWith("javascript:") =>
           val attributeJavaScript = {
             // Could be javascript: or javascript://.

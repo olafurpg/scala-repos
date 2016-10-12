@@ -763,7 +763,7 @@ object ProvenanceCheckingSpecs
                                                    StaticProvenance("/bar")),
                                  ProductProvenance(StaticProvenance("/bar"),
                                                    StaticProvenance(
-                                                   "/baz"))) =>
+                                                     "/baz"))) =>
           ok
       }
 
@@ -1045,7 +1045,7 @@ object ProvenanceCheckingSpecs
                                                    StaticProvenance("/bar")),
                                  ProductProvenance(StaticProvenance("/bar"),
                                                    StaticProvenance(
-                                                   "/baz"))) =>
+                                                     "/baz"))) =>
           ok
       }
 

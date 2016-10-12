@@ -1145,16 +1145,16 @@ object TreeShakerSpecs
 
       val result = shakeTree(tree)
       result must beLike {
-        case Let(
-            LineStream(),
-            Identifier(Vector(), "a"),
-            Vector(),
-            NumLit(LineStream(), "42"),
-            ObjectDef(
-            LineStream(),
-            Vector(
-            ("foo",
-             Dispatch(LineStream(), Identifier(Vector(), "a"), Vector()))))) =>
+        case Let(LineStream(),
+                 Identifier(Vector(), "a"),
+                 Vector(),
+                 NumLit(LineStream(), "42"),
+                 ObjectDef(LineStream(),
+                           Vector(
+                             ("foo",
+                              Dispatch(LineStream(),
+                                       Identifier(Vector(), "a"),
+                                       Vector()))))) =>
           ok
       }
 
@@ -1228,15 +1228,15 @@ object TreeShakerSpecs
 
       val result = shakeTree(tree)
       result must beLike {
-        case Let(
-            LineStream(),
-            Identifier(Vector(), "a"),
-            Vector(),
-            NumLit(LineStream(), "42"),
-            ArrayDef(
-            LineStream(),
-            Vector(
-            Dispatch(LineStream(), Identifier(Vector(), "a"), Vector())))) =>
+        case Let(LineStream(),
+                 Identifier(Vector(), "a"),
+                 Vector(),
+                 NumLit(LineStream(), "42"),
+                 ArrayDef(LineStream(),
+                          Vector(
+                            Dispatch(LineStream(),
+                                     Identifier(Vector(), "a"),
+                                     Vector())))) =>
           ok
       }
 
@@ -1596,16 +1596,16 @@ object TreeShakerSpecs
 
       val result = shakeTree(tree)
       result must beLike {
-        case Let(
-            LineStream(),
-            Identifier(Vector(), "a"),
-            Vector(),
-            NumLit(LineStream(), "42"),
-            Dispatch(
-            LineStream(),
-            Identifier(Vector(), "count"),
-            Vector(
-            Dispatch(LineStream(), Identifier(Vector(), "a"), Vector())))) =>
+        case Let(LineStream(),
+                 Identifier(Vector(), "a"),
+                 Vector(),
+                 NumLit(LineStream(), "42"),
+                 Dispatch(LineStream(),
+                          Identifier(Vector(), "count"),
+                          Vector(
+                            Dispatch(LineStream(),
+                                     Identifier(Vector(), "a"),
+                                     Vector())))) =>
           ok
       }
 

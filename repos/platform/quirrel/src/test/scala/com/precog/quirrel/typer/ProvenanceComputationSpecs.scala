@@ -2046,8 +2046,8 @@ object ProvenanceComputationSpecs
           compileSingle("foo(x) := //baz union x union //qux foo(//bar)")
         tree.provenance must beLike {
           case CoproductProvenance(CoproductProvenance(
-                                   StaticProvenance("/baz"),
-                                   StaticProvenance("/bar")),
+                                     StaticProvenance("/baz"),
+                                     StaticProvenance("/bar")),
                                    StaticProvenance("/qux")) =>
             ok
         }

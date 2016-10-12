@@ -494,11 +494,11 @@ class SecurityServiceSpec
     "report an error on get and grant not found" in {
       getGrantDetails(user1.apiKey, "not-gonna-find-it") must awaited(to) {
         beLike {
-          case HttpResponse(HttpStatus(NotFound, _),
-                            _,
-                            Some(
-                            JString("Unable to find grant not-gonna-find-it")),
-                            _) =>
+          case HttpResponse(
+              HttpStatus(NotFound, _),
+              _,
+              Some(JString("Unable to find grant not-gonna-find-it")),
+              _) =>
             ok
         }
       }

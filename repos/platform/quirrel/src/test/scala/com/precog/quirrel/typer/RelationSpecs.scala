@@ -938,29 +938,29 @@ object RelationSpecs
         |     (foo.a - bar.a) * (bar.b / baz.b)
         """.stripMargin
 
-      val tree @ Let(_,
-                     _,
-                     _,
-                     _,
-                     Let(_,
-                         _,
-                         _,
-                         _,
-                         Let(_,
-                             _,
-                             _,
-                             _,
-                             Relate(_,
-                                    _,
-                                    _,
-                                    Relate(
-                                    _,
-                                    _,
-                                    _,
-                                    body @ Mul(
-                                    _,
-                                    left @ Sub(_, minLeft, minRight),
-                                    right @ Div(_, divLeft, divRight))))))) =
+      val tree @ Let(
+        _,
+        _,
+        _,
+        _,
+        Let(_,
+            _,
+            _,
+            _,
+            Let(_,
+                _,
+                _,
+                _,
+                Relate(_,
+                       _,
+                       _,
+                       Relate(_,
+                              _,
+                              _,
+                              body @ Mul(
+                                _,
+                                left @ Sub(_, minLeft, minRight),
+                                right @ Div(_, divLeft, divRight))))))) =
         compileSingle(input)
 
       body.relations mustEqual Map(

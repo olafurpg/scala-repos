@@ -290,8 +290,8 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
             case (btm @ BodyTreeMaker(body, _)) :: Nil =>
               Some((EmptyTree, btm.substitution(body)))
             case (gtm @ GuardTreeMaker(guard)) :: (btm @ BodyTreeMaker(
-                body,
-                _)) :: Nil =>
+                  body,
+                  _)) :: Nil =>
               Some((gtm.substitution(guard), btm.substitution(body)))
             case _ => None
           }
@@ -502,13 +502,13 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
                     Some(defaultCase(scrutSym, guard, body))
                   // constant (or typetest for typeSwitch)
                   case SwitchableTreeMaker(pattern) :: GuardAndBodyTreeMakers(
-                      guard,
-                      body) =>
+                        guard,
+                        body) =>
                     Some(CaseDef(pattern, guard, body))
                   // alternatives
                   case AlternativesTreeMaker(_, altss, pos) :: GuardAndBodyTreeMakers(
-                      guard,
-                      body) if alternativesSupported =>
+                        guard,
+                        body) if alternativesSupported =>
                     val switchableAlts =
                       altss map {
                         case SwitchableTreeMaker(pattern) :: Nil =>

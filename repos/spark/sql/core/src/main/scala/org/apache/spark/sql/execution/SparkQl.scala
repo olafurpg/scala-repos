@@ -299,8 +299,8 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
                   datasources.DescribeCommand(tableIdent,
                                               isExtended = extended.isDefined)
                 case Token(dbName, Nil) :: Token(tableName, Nil) :: Token(
-                    colName,
-                    Nil) :: Nil =>
+                      colName,
+                      Nil) :: Nil =>
                   // It is describing a column with the format like "describe db.table column".
                   nodeToDescribeFallback(node)
                 case tableName :: Nil =>

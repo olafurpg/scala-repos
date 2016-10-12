@@ -1675,14 +1675,14 @@ abstract class GenJSCode
           js.While(genExpr(cond), js.Block(bodyStats map genStat))
 
         // while (cond) { body }; result
-        case LabelDef(lname,
-                      Nil,
-                      Block(
-                      List(
-                      If(cond,
-                         Block(bodyStats, Apply(target @ Ident(lname2), Nil)),
-                         Literal(_))),
-                      result)) if (target.symbol == sym) =>
+        case LabelDef(
+            lname,
+            Nil,
+            Block(List(
+                    If(cond,
+                       Block(bodyStats, Apply(target @ Ident(lname2), Nil)),
+                       Literal(_))),
+                  result)) if (target.symbol == sym) =>
           js.Block(js.While(genExpr(cond), js.Block(bodyStats map genStat)),
                    genExpr(result))
 

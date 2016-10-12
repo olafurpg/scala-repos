@@ -106,8 +106,8 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
     new QueryInterpreter(db, param) {
       override def run(n: Node) = n match {
         case ResultSetMapping(_, from, CompiledMapping(converter, _)) :@ CollectionType(
-            cons,
-            el) =>
+              cons,
+              el) =>
           val fromV = run(from).asInstanceOf[TraversableOnce[Any]]
           val b =
             cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, Any]]

@@ -95,8 +95,8 @@ trait ModelLibModule[M[+ _]] {
               refs: List[ColumnRef]): Map[Int, List[(ColumnRef, Column)]] =
             refs match {
               case ColumnRef(
-                  cpath @ CPath(paths.Key, CPathIndex(idx), rest @ _ *),
-                  ctype) :: tail =>
+                    cpath @ CPath(paths.Key, CPathIndex(idx), rest @ _ *),
+                    ctype) :: tail =>
                 val cols = for {
                   jType <- Schema.mkType(ColumnRef(cpath, ctype) :: Nil).toSet
                   col <- schema.columns(jType)

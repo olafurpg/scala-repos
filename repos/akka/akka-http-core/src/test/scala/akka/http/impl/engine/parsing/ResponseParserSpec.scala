@@ -362,11 +362,11 @@ class ResponseParserSpec
         .prefixAndTail(1)
         .collect {
           case (Seq(
-                ResponseStart(statusCode,
-                              protocol,
-                              headers,
-                              createEntity,
-                              close)),
+                  ResponseStart(statusCode,
+                                protocol,
+                                headers,
+                                createEntity,
+                                close)),
                 entityParts) ⇒
             closeAfterResponseCompletion :+= close
             Right(

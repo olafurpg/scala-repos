@@ -542,8 +542,8 @@ object ScSimpleTypeElementImpl {
                                            ref.resolveNoConstructor match {
                                              case Array(
                                                  r @ ScalaResolveResult(
-                                                 to: ScTypeParametersOwner,
-                                                 subst: ScSubstitutor))
+                                                   to: ScTypeParametersOwner,
+                                                   subst: ScSubstitutor))
                                                  if to.isInstanceOf[
                                                    PsiNamedElement] &&
                                                    (to.typeParameters.isEmpty ||
@@ -552,8 +552,8 @@ object ScSimpleTypeElementImpl {
                                                Some(r)
                                              case Array(
                                                  r @ ScalaResolveResult(
-                                                 to: PsiTypeParameterListOwner,
-                                                 subst: ScSubstitutor))
+                                                   to: PsiTypeParameterListOwner,
+                                                   subst: ScSubstitutor))
                                                  if to.isInstanceOf[
                                                    PsiNamedElement] &&
                                                    (to.getTypeParameters.isEmpty ||

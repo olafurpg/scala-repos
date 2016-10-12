@@ -222,10 +222,10 @@ object AlterTableCommandParser {
       //   ON ((col1_value, col2_value) [, (col1_value, col2_value), ...])
       //   [STORED AS DIRECTORIES];
       case Token(
-          "TOK_ALTERTABLE_SKEWED",
-          Token(
-          "TOK_TABLESKEWED",
-          Token("TOK_TABCOLNAME", colNames) :: colValues :: rest) :: Nil) :: _ =>
+            "TOK_ALTERTABLE_SKEWED",
+            Token(
+              "TOK_TABLESKEWED",
+              Token("TOK_TABCOLNAME", colNames) :: colValues :: rest) :: Nil) :: _ =>
         // Example format:
         //
         //   TOK_ALTERTABLE_SKEWED
@@ -281,10 +281,10 @@ object AlterTableCommandParser {
 
       // ALTER TABLE table_name SET SKEWED LOCATION (col1="loc1" [, (col2, col3)="loc2", ...] );
       case Token(
-          "TOK_ALTERTABLE_SKEWED_LOCATION",
-          Token(
-          "TOK_SKEWED_LOCATIONS",
-          Token("TOK_SKEWED_LOCATION_LIST", locationMaps) :: Nil) :: Nil) :: _ =>
+            "TOK_ALTERTABLE_SKEWED_LOCATION",
+            Token(
+              "TOK_SKEWED_LOCATIONS",
+              Token("TOK_SKEWED_LOCATION_LIST", locationMaps) :: Nil) :: Nil) :: _ =>
         // Example format:
         //
         //   TOK_ALTERTABLE_SKEWED_LOCATION

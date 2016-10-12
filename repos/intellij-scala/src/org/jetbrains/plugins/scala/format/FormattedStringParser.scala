@@ -31,7 +31,7 @@ object FormattedStringParser extends StringParser {
       case ScMethodCall(
           ScReferenceExpression
             .withQualifier(literal: ScLiteral) && PsiReferenceEx.resolve(
-          (f: ScFunction) && ContainingClass(owner: ScTrait)),
+            (f: ScFunction) && ContainingClass(owner: ScTrait)),
           args)
           if literal.isString && isFormatMethod(owner.qualifiedName, f.name) =>
         (literal, args)
@@ -39,7 +39,7 @@ object FormattedStringParser extends StringParser {
       // "%d" format 1, "%d" format (1)
       case ScInfixExpr(literal: ScLiteral,
                        PsiReferenceEx.resolve(
-                       (f: ScFunction) && ContainingClass(owner: ScTrait)),
+                         (f: ScFunction) && ContainingClass(owner: ScTrait)),
                        arg)
           if literal.isString && isFormatMethod(owner.qualifiedName, f.name) =>
         val args = arg match {
@@ -52,7 +52,7 @@ object FormattedStringParser extends StringParser {
       case ScMethodCall(
           ScReferenceExpression
             .withQualifier(arg: ScExpression) && PsiReferenceEx.resolve(
-          (f: ScFunction) && ContainingClass(owner: ScClass)),
+            (f: ScFunction) && ContainingClass(owner: ScClass)),
           Seq(literal: ScLiteral))
           if literal.isString &&
             isFormattedMethod(owner.qualifiedName, f.name) =>
@@ -61,7 +61,7 @@ object FormattedStringParser extends StringParser {
       // 1 formatted "%d"
       case ScInfixExpr(arg: ScExpression,
                        PsiReferenceEx.resolve(
-                       (f: ScFunction) && ContainingClass(owner: ScClass)),
+                         (f: ScFunction) && ContainingClass(owner: ScClass)),
                        literal: ScLiteral)
           if literal.isString &&
             isFormattedMethod(owner.qualifiedName, f.name) =>
@@ -70,7 +70,7 @@ object FormattedStringParser extends StringParser {
       // String.format("%d", 1)
       case MethodInvocation(
           PsiReferenceEx.resolve(
-          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
+            (f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
             isStringFormatMethod(owner.qualifiedName, f.getName) =>

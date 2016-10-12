@@ -803,7 +803,7 @@ object SwankProtocolRequest {
           SexpString("+") :: SexpNumber(i) :: SexpString(text) :: Nil) =>
         PatchInsert(i.intValue, text)
       case SexpList(SexpString("*") :: SexpNumber(i) :: SexpNumber(j) :: SexpString(
-          text) :: Nil) =>
+            text) :: Nil) =>
         PatchReplace(i.intValue, j.intValue, text)
       case SexpList(
           SexpString("-") :: SexpNumber(i) :: SexpNumber(j) :: Nil) =>

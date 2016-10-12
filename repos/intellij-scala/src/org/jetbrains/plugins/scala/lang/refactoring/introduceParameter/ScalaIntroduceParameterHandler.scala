@@ -364,7 +364,7 @@ class ScalaIntroduceParameterHandler
       case pc: ScPrimaryConstructor =>
         s"${pc.containingClass.name} (primary constructor)"
       case (f: ScFunctionDefinition) && ContainingClass(
-          c: ScNewTemplateDefinition) =>
+            c: ScNewTemplateDefinition) =>
         s"${f.name} (in anonymous class)"
       case (f: ScFunctionDefinition) && ContainingClass(c) =>
         s"${f.name} (in ${c.name})"

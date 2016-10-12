@@ -162,8 +162,8 @@ trait SingletonTypeUtils extends ReprTypes {
       t match {
         case RefinedType(
             List(
-            SymTpe,
-            TypeRef(_, TaggedSym, List(ConstantType(Constant(s: String))))),
+              SymTpe,
+              TypeRef(_, TaggedSym, List(ConstantType(Constant(s: String))))),
             _) =>
           Some(s)
         case _ => None

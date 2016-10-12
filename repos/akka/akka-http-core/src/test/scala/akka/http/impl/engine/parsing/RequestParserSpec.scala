@@ -594,13 +594,13 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
         .prefixAndTail(1)
         .collect {
           case (Seq(
-                RequestStart(method,
-                             uri,
-                             protocol,
-                             headers,
-                             createEntity,
-                             _,
-                             close)),
+                  RequestStart(method,
+                               uri,
+                               protocol,
+                               headers,
+                               createEntity,
+                               _,
+                               close)),
                 entityParts) ⇒
             closeAfterResponseCompletion :+= close
             Right(

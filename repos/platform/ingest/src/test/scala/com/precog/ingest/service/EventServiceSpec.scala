@@ -245,12 +245,11 @@ class EventServiceSpec
 
       result.copoint must beLike {
         case (HttpResponse(
-              HttpStatus(Forbidden, _),
-              _,
-              Some(
-              JString(
-              "The specified API key does not exist: not gonna find it")),
-              _),
+                HttpStatus(Forbidden, _),
+                _,
+                Some(JString(
+                  "The specified API key does not exist: not gonna find it")),
+                _),
               _) =>
           ok
       }

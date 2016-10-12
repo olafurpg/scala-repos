@@ -212,9 +212,9 @@ class HoistClientOps extends Phase {
         OptionApply(recTr(sym))
       })
     case IfThenElse(
-        ConstArray(Library.==(ch, LiteralNode(null)),
-                   r1 @ LiteralNode(None),
-                   r2 @ LiteralNode(Some(1)))) :@ OptionType(t)
+          ConstArray(Library.==(ch, LiteralNode(null)),
+                     r1 @ LiteralNode(None),
+                     r2 @ LiteralNode(Some(1)))) :@ OptionType(t)
         if t == ScalaBaseType.optionDiscType =>
       val (recCh, recTr) = unwrap(ch, topLevel)
       if (topLevel) (recCh, recTr)

@@ -231,7 +231,7 @@ class SnapshotSpec
       deleteProbe.expectMsgType[DeleteSnapshot]
       expectMsgPF() {
         case m @ DeleteSnapshotSuccess(
-            SnapshotMetadata(`persistenceId`, 4, _)) ⇒
+              SnapshotMetadata(`persistenceId`, 4, _)) ⇒
       }
 
       // recover persistentActor from 2nd snapshot (3rd was deleted) plus replayed messages

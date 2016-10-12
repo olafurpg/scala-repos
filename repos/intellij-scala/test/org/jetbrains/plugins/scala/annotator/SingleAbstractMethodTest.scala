@@ -129,8 +129,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((j: Int) => j)", typeMismatch()) :: Error(
-          "((j: Int) => j)",
-          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
+            "((j: Int) => j)",
+            doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
@@ -143,8 +143,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int) => \"aaa\")",
-          doesNotConform()) :: Nil =>
+            "((i: Int) => \"aaa\")",
+            doesNotConform()) :: Nil =>
     }
   }
 
@@ -157,8 +157,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int, j: Int) => \"aaa\")",
-          doesNotConform()) :: Nil =>
+            "((i: Int, j: Int) => \"aaa\")",
+            doesNotConform()) :: Nil =>
     }
   }
 
@@ -171,8 +171,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("(j => j)", typeMismatch()) :: Error(
-          "(j => j)",
-          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
+            "(j => j)",
+            doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
@@ -208,8 +208,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("() => 3", typeMismatch()) :: Error(
-          "wantString",
-          cannotResolveReference()) :: Nil =>
+            "wantString",
+            cannotResolveReference()) :: Nil =>
     }
   }
 
