@@ -300,11 +300,13 @@ private[http] class HttpResponseRendererFactory(
                     (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
                 else if (connHeader != null && connHeader.hasUpgrade) {
                   r ~~ connHeader ~~ CrLf
-                  headers.collectFirst {
-                    case u: UpgradeToWebSocketResponseHeader ⇒ u
-                  }.foreach { header ⇒
-                    closeMode = SwitchToWebSocket(header.handler)
-                  }
+                  headers
+                    .collectFirst {
+                      case u: UpgradeToWebSocketResponseHeader ⇒ u
+                    }
+                    .foreach { header ⇒
+                      closeMode = SwitchToWebSocket(header.handler)
+                    }
                 }
                 if (mustRenderTransferEncodingChunkedHeader &&
                     !transferEncodingSeen)

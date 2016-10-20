@@ -283,7 +283,8 @@ class TypedRichPipeEx[K: Ordering, V: Monoid](pipe: TypedPipe[(K, V)])
 
         val newPairs = pipe.sumByLocalKeys.map { case (k, v) => (k, v, 1) }
 
-        (oldPairs ++ newPairs).groupBy { _._1 }
+        (oldPairs ++ newPairs)
+          .groupBy { _._1 }
           .withReducers(reducers)
           .sortBy { _._3 }
           .mapValues { _._2 }

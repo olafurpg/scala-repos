@@ -25,19 +25,21 @@ class AccessTokenAuthenticationFilter extends Filter with AccessTokenService {
       .getAttribute(Keys.Request.DBSession)
       .asInstanceOf[slick.jdbc.JdbcBackend#Session]
     val response = res.asInstanceOf[HttpServletResponse]
-    Option(request.getHeader("Authorization")).map {
-      case auth if auth.startsWith("token ") =>
-        AccessTokenService
-          .getAccountByAccessToken(auth.substring(6).trim)
-          .toRight(Unit)
-      // TODO Basic Authentication Support
-      case _ => Left(Unit)
-    }.orElse {
-      Option(
-        request.getSession
-          .getAttribute(Keys.Session.LoginAccount)
-          .asInstanceOf[Account]).map(Right(_))
-    } match {
+    Option(request.getHeader("Authorization"))
+      .map {
+        case auth if auth.startsWith("token ") =>
+          AccessTokenService
+            .getAccountByAccessToken(auth.substring(6).trim)
+            .toRight(Unit)
+        // TODO Basic Authentication Support
+        case _ => Left(Unit)
+      }
+      .orElse {
+        Option(
+          request.getSession
+            .getAttribute(Keys.Session.LoginAccount)
+            .asInstanceOf[Account]).map(Right(_))
+      } match {
       case Some(Right(account)) =>
         request.setAttribute(Keys.Session.LoginAccount, account);
         chain.doFilter(req, res)

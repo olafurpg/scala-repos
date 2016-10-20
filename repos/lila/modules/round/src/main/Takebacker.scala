@@ -48,9 +48,11 @@ private[round] final class Takebacker(messenger: Messenger,
   def isAllowedByPrefs(game: Game): Fu[Boolean] =
     if (game.hasAi) fuccess(true)
     else
-      game.userIds.map { userId =>
-        prefApi.getPref(userId, (p: Pref) => p.takeback)
-      }.sequenceFu map {
+      game.userIds
+        .map { userId =>
+          prefApi.getPref(userId, (p: Pref) => p.takeback)
+        }
+        .sequenceFu map {
         _.forall { p =>
           p == Pref.Takeback.ALWAYS ||
           (p == Pref.Takeback.CASUAL && game.casual)

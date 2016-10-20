@@ -182,9 +182,11 @@ case class Group(id: PathId,
 
   def appsWithNoDependencies: Set[AppDefinition] = {
     val g = dependencyGraph
-    g.vertexSet.filter { v =>
-      g.outDegreeOf(v) == 0
-    }.toSet
+    g.vertexSet
+      .filter { v =>
+        g.outDegreeOf(v) == 0
+      }
+      .toSet
   }
 
   def hasNonCyclicDependencies: Boolean = {

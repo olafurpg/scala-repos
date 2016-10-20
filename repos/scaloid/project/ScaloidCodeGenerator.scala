@@ -114,9 +114,11 @@ class ScaloidCodeGenerator(cls: AndroidClass,
 
   private def predefinedMapping(mappings: PredefinedCodeMappings,
                                 separator: String = ", ") =
-    mappings.collect {
-      case (kind, fn) if cls.isA(kind) => fn(cls)
-    }.mkString(separator)
+    mappings
+      .collect {
+        case (kind, fn) if cls.isA(kind) => fn(cls)
+      }
+      .mkString(separator)
 
   class ConstructorGenerator(con: ScalaConstructor) {
 
@@ -188,18 +190,22 @@ class ScaloidCodeGenerator(cls: AndroidClass,
     types match {
       case t :: Nil => "p: " + genType(t)
       case ts =>
-        ts.zipWithIndex.map {
-          case (t, i) => s"p${i + 1}: ${genType(t)}"
-        }.mkString(", ")
+        ts.zipWithIndex
+          .map {
+            case (t, i) => s"p${i + 1}: ${genType(t)}"
+          }
+          .mkString(", ")
     }
 
   def callArgs(types: List[ScalaType]) =
     types match {
       case t :: Nil => "p"
       case ts =>
-        ts.zipWithIndex.map {
-          case (_, i) => "p" + (i + 1)
-        }.mkString(", ")
+        ts.zipWithIndex
+          .map {
+            case (_, i) => "p" + (i + 1)
+          }
+          .mkString(", ")
     }
 
   // listener

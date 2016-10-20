@@ -128,18 +128,20 @@ class RFormula(override val uid: String)
 
     // First we index each string column referenced by the input terms.
     val indexed: Map[String, String] =
-      resolvedFormula.terms.flatten.distinct.map { term =>
-        dataset.schema(term) match {
-          case column if column.dataType == StringType =>
-            val indexCol = tmpColumn("stridx")
-            encoderStages += new StringIndexer()
-              .setInputCol(term)
-              .setOutputCol(indexCol)
-            (term, indexCol)
-          case _ =>
-            (term, term)
+      resolvedFormula.terms.flatten.distinct
+        .map { term =>
+          dataset.schema(term) match {
+            case column if column.dataType == StringType =>
+              val indexCol = tmpColumn("stridx")
+              encoderStages += new StringIndexer()
+                .setInputCol(term)
+                .setOutputCol(indexCol)
+              (term, indexCol)
+            case _ =>
+              (term, term)
+          }
         }
-      }.toMap
+        .toMap
 
     // Then we handle one-hot encoding and interactions between terms.
     val encodedTerms = resolvedFormula.terms.map {

@@ -181,9 +181,12 @@ object ScalaAfterNewCompletionUtil {
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : ScalaLookupItem = {
     val name: String = psiClass.name
-    val isRenamed = renamesMap.filter {
-      case (aName, (renamed, aClazz)) => aName == name && aClazz == psiClass
-    }.map(_._2._1).headOption
+    val isRenamed = renamesMap
+      .filter {
+        case (aName, (renamed, aClazz)) => aName == name && aClazz == psiClass
+      }
+      .map(_._2._1)
+      .headOption
     val lookupElement: ScalaLookupItem =
       new ScalaLookupItem(psiClass, isRenamed.getOrElse(name)) {
         override def renderElement(presentation: LookupElementPresentation) {

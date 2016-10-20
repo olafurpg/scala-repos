@@ -312,10 +312,11 @@ class KafkaApis(val requestChannel: RequestChannel,
                    Read,
                    new Resource(Group, offsetCommitRequest.groupId))) {
       val errorCode = new JShort(Errors.GROUP_AUTHORIZATION_FAILED.code)
-      val results = offsetCommitRequest.offsetData.keySet.asScala.map {
-        topicPartition =>
+      val results = offsetCommitRequest.offsetData.keySet.asScala
+        .map { topicPartition =>
           (topicPartition, errorCode)
-      }.toMap
+        }
+        .toMap
       val responseHeader = new ResponseHeader(header.correlationId)
       val responseBody = new OffsetCommitResponse(results.asJava)
       requestChannel.sendResponse(
@@ -489,12 +490,14 @@ class KafkaApis(val requestChannel: RequestChannel,
           // the request, since no response is expected by the producer, the server will close socket server so that
           // the producer client will know that some error has happened and will refresh its metadata
           if (errorInResponse) {
-            val exceptionsSummary = mergedResponseStatus.map {
-              case (topicPartition, status) =>
-                topicPartition -> Errors
-                  .forCode(status.errorCode)
-                  .exceptionName
-            }.mkString(", ")
+            val exceptionsSummary = mergedResponseStatus
+              .map {
+                case (topicPartition, status) =>
+                  topicPartition -> Errors
+                    .forCode(status.errorCode)
+                    .exceptionName
+              }
+              .mkString(", ")
             info(
               s"Closing connection due to error during produce request with correlation id ${request.header.correlationId} " +
                 s"from client id ${request.header.clientId} with ack=0\n" +
@@ -986,10 +989,11 @@ class KafkaApis(val requestChannel: RequestChannel,
           OffsetFetchResponse.INVALID_OFFSET,
           "",
           Errors.GROUP_AUTHORIZATION_FAILED.code)
-        val results = offsetFetchRequest.partitions.asScala.map {
-          topicPartition =>
+        val results = offsetFetchRequest.partitions.asScala
+          .map { topicPartition =>
             (topicPartition, unauthorizedGroupResponse)
-        }.toMap
+          }
+          .toMap
         new OffsetFetchResponse(results.asJava)
       } else {
         val (authorizedTopicPartitions, unauthorizedTopicPartitions) =
@@ -1013,36 +1017,38 @@ class KafkaApis(val requestChannel: RequestChannel,
 
         if (header.apiVersion == 0) {
           // version 0 reads offsets from ZK
-          val responseInfo = authorizedTopicPartitions.map { topicPartition =>
-            val topicDirs = new ZKGroupTopicDirs(offsetFetchRequest.groupId,
-                                                 topicPartition.topic)
-            try {
-              if (!metadataCache.hasTopicMetadata(topicPartition.topic))
-                (topicPartition, unknownTopicPartitionResponse)
-              else {
-                val payloadOpt = zkUtils
-                  .readDataMaybeNull(
-                    s"${topicDirs.consumerOffsetDir}/${topicPartition.partition}")
-                  ._1
-                payloadOpt match {
-                  case Some(payload) =>
-                    (topicPartition,
-                     new OffsetFetchResponse.PartitionData(payload.toLong,
-                                                           "",
-                                                           Errors.NONE.code))
-                  case None =>
-                    (topicPartition, unknownTopicPartitionResponse)
+          val responseInfo = authorizedTopicPartitions
+            .map { topicPartition =>
+              val topicDirs = new ZKGroupTopicDirs(offsetFetchRequest.groupId,
+                                                   topicPartition.topic)
+              try {
+                if (!metadataCache.hasTopicMetadata(topicPartition.topic))
+                  (topicPartition, unknownTopicPartitionResponse)
+                else {
+                  val payloadOpt = zkUtils
+                    .readDataMaybeNull(
+                      s"${topicDirs.consumerOffsetDir}/${topicPartition.partition}")
+                    ._1
+                  payloadOpt match {
+                    case Some(payload) =>
+                      (topicPartition,
+                       new OffsetFetchResponse.PartitionData(payload.toLong,
+                                                             "",
+                                                             Errors.NONE.code))
+                    case None =>
+                      (topicPartition, unknownTopicPartitionResponse)
+                  }
                 }
+              } catch {
+                case e: Throwable =>
+                  (topicPartition,
+                   new OffsetFetchResponse.PartitionData(
+                     OffsetFetchResponse.INVALID_OFFSET,
+                     "",
+                     Errors.forException(e).code))
               }
-            } catch {
-              case e: Throwable =>
-                (topicPartition,
-                 new OffsetFetchResponse.PartitionData(
-                   OffsetFetchResponse.INVALID_OFFSET,
-                   "",
-                   Errors.forException(e).code))
             }
-          }.toMap
+            .toMap
           new OffsetFetchResponse((responseInfo ++ unauthorizedStatus).asJava)
         } else {
           // version 1 reads offsets from Kafka;

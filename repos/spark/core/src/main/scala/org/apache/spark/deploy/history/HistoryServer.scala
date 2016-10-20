@@ -310,9 +310,11 @@ object HistoryServer extends Logging {
 
   private[history] def getAttemptURI(appId: String,
                                      attemptId: Option[String]): String = {
-    val attemptSuffix = attemptId.map { id =>
-      s"/$id"
-    }.getOrElse("")
+    val attemptSuffix = attemptId
+      .map { id =>
+        s"/$id"
+      }
+      .getOrElse("")
     s"${HistoryServer.UI_PATH_PREFIX}/${appId}${attemptSuffix}"
   }
 }

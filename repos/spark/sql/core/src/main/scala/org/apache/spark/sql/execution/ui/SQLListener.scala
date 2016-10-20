@@ -420,13 +420,22 @@ private[ui] class SQLExecutionUIData(
   def isFailed: Boolean = jobs.values.exists(_ == JobExecutionStatus.FAILED)
 
   def runningJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.RUNNING }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.RUNNING }
+      .keys
+      .toSeq
 
   def succeededJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.SUCCEEDED }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.SUCCEEDED }
+      .keys
+      .toSeq
 
   def failedJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.FAILED }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.FAILED }
+      .keys
+      .toSeq
 }
 
 /**

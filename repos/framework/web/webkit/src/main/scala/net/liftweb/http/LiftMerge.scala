@@ -98,17 +98,23 @@ private[http] trait LiftMerge { self: LiftSession =>
         case _ => Nil
       }: _*)
 
-    val hasHtmlHeadAndBody: Boolean = xhtml.find {
-      case e: Elem if e.label == "html" =>
-        e.child.find {
-          case e: Elem if e.label == "head" => true
-          case _ => false
-        }.isDefined && e.child.find {
-          case e: Elem if e.label == "body" => true
-          case _ => false
-        }.isDefined
-      case _ => false
-    }.isDefined
+    val hasHtmlHeadAndBody: Boolean = xhtml
+      .find {
+        case e: Elem if e.label == "html" =>
+          e.child
+            .find {
+              case e: Elem if e.label == "head" => true
+              case _ => false
+            }
+            .isDefined && e.child
+            .find {
+              case e: Elem if e.label == "body" => true
+              case _ => false
+            }
+            .isDefined
+        case _ => false
+      }
+      .isDefined
 
     var htmlElement =
       <html xmlns="http://www.w3.org/1999/xhtml" xmlns:lift='http://liftweb.net'/>
@@ -281,10 +287,11 @@ private[http] trait LiftMerge { self: LiftSession =>
         if (stateful_? && (autoIncludeComet || LiftRules.enableLiftGC)) {
           ("data-lift-gc" -> RenderVersion.get) ::
             (if (autoIncludeComet) {
-               ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
-                 case CometVersionPair(guid, version) =>
-                   (s"data-lift-comet-$guid" -> version.toString)
-               }
+               ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList
+                 .map {
+                   case CometVersionPair(guid, version) =>
+                     (s"data-lift-comet-$guid" -> version.toString)
+                 }
              } else {
                Nil
              })

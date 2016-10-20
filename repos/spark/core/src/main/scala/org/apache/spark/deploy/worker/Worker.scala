@@ -447,18 +447,20 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
         if (appDirs == null) {
           throw new IOException("ERROR: Failed to list files in " + appDirs)
         }
-        appDirs.filter { dir =>
-          // the directory is used by an application - check that the application is not running
-          // when cleaning up
-          val appIdFromDir = dir.getName
-          val isAppStillRunning = appIds.contains(appIdFromDir)
-          dir.isDirectory && !isAppStillRunning &&
-          !Utils.doesDirectoryContainAnyNewFiles(dir,
-                                                 APP_DATA_RETENTION_SECONDS)
-        }.foreach { dir =>
-          logInfo(s"Removing directory: ${dir.getPath}")
-          Utils.deleteRecursively(dir)
-        }
+        appDirs
+          .filter { dir =>
+            // the directory is used by an application - check that the application is not running
+            // when cleaning up
+            val appIdFromDir = dir.getName
+            val isAppStillRunning = appIds.contains(appIdFromDir)
+            dir.isDirectory && !isAppStillRunning &&
+            !Utils.doesDirectoryContainAnyNewFiles(dir,
+                                                   APP_DATA_RETENTION_SECONDS)
+          }
+          .foreach { dir =>
+            logInfo(s"Removing directory: ${dir.getPath}")
+            Utils.deleteRecursively(dir)
+          }
       }(cleanupThreadExecutor)
 
       cleanupFuture.onFailure {
@@ -838,9 +840,10 @@ private[deploy] object Worker extends Logging {
     val useNLC = "spark.ssl.useNodeLocalConf"
     if (isUseLocalNodeSSLConfig(cmd)) {
       val newJavaOpts =
-        cmd.javaOpts.filter(opt => !opt.startsWith(s"-D$prefix")) ++ conf.getAll.collect {
-          case (key, value) if key.startsWith(prefix) => s"-D$key=$value"
-        } :+ s"-D$useNLC=true"
+        cmd.javaOpts.filter(opt => !opt.startsWith(s"-D$prefix")) ++ conf.getAll
+          .collect {
+            case (key, value) if key.startsWith(prefix) => s"-D$key=$value"
+          } :+ s"-D$useNLC=true"
       cmd.copy(javaOpts = newJavaOpts)
     } else {
       cmd

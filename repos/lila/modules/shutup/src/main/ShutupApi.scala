@@ -96,8 +96,10 @@ final class ShutupApi(coll: Coll,
     }
 
   private def reportText(userRecord: UserRecord) =
-    "[AUTOREPORT]\n" + userRecord.reports.collect {
-      case r if r.unacceptable =>
-        s"${r.textType.name}: ${r.nbBad} dubious (out of ${r.ratios.size})"
-    }.mkString("\n")
+    "[AUTOREPORT]\n" + userRecord.reports
+      .collect {
+        case r if r.unacceptable =>
+          s"${r.textType.name}: ${r.nbBad} dubious (out of ${r.ratios.size})"
+      }
+      .mkString("\n")
 }

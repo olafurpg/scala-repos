@@ -128,7 +128,8 @@ class TungstenAggregationIterator(
     // Initialize declarative aggregates' buffer values
     expressionAggInitialProjection.target(buffer)(EmptyRow)
     // Initialize imperative aggregates' buffer values
-    aggregateFunctions.collect { case f: ImperativeAggregate => f }
+    aggregateFunctions
+      .collect { case f: ImperativeAggregate => f }
       .foreach(_.initialize(buffer))
     buffer
   }

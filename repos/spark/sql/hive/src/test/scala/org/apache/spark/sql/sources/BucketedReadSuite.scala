@@ -251,11 +251,13 @@ class BucketedReadSuite
     withTable("bucketed_table1", "bucketed_table2") {
       def withBucket(writer: DataFrameWriter,
                      bucketSpec: Option[BucketSpec]): DataFrameWriter = {
-        bucketSpec.map { spec =>
-          writer.bucketBy(spec.numBuckets,
-                          spec.bucketColumnNames.head,
-                          spec.bucketColumnNames.tail: _*)
-        }.getOrElse(writer)
+        bucketSpec
+          .map { spec =>
+            writer.bucketBy(spec.numBuckets,
+                            spec.bucketColumnNames.head,
+                            spec.bucketColumnNames.tail: _*)
+          }
+          .getOrElse(writer)
       }
 
       withBucket(df1.write.format("parquet"), bucketSpecLeft)

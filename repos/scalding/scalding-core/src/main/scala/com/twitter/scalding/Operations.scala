@@ -343,9 +343,12 @@ package com.twitter.scalding {
     val ADAPTIVE_CACHE_KEY = "scalding.mapsidecache.adaptive"
 
     private def getCacheSize(fp: FlowProcess[_]): Int =
-      Option(fp.getStringProperty(SIZE_CONFIG_KEY)).filterNot { _.isEmpty }.map {
-        _.toInt
-      }.getOrElse(DEFAULT_CACHE_SIZE)
+      Option(fp.getStringProperty(SIZE_CONFIG_KEY))
+        .filterNot { _.isEmpty }
+        .map {
+          _.toInt
+        }
+        .getOrElse(DEFAULT_CACHE_SIZE)
 
     def apply[K, V: Semigroup](
         cacheSize: Option[Int],

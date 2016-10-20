@@ -65,11 +65,13 @@ class MetadataCacheTest {
       )
     }
 
-    val brokers = (0 to 2).map { brokerId =>
-      new Broker(brokerId,
-                 securityProtocolToEndPoint(brokerId).asJava,
-                 "rack1")
-    }.toSet
+    val brokers = (0 to 2)
+      .map { brokerId =>
+        new Broker(brokerId,
+                   securityProtocolToEndPoint(brokerId).asJava,
+                   "rack1")
+      }
+      .toSet
 
     val partitionStates = Map(
       new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,

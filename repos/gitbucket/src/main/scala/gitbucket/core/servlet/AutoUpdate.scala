@@ -215,10 +215,12 @@ object AutoUpdate {
         .trim
         .split("\\.") match {
         case Array(majorVersion, minorVersion) => {
-          versions.find { v =>
-            v.majorVersion == majorVersion.toInt &&
-            v.minorVersion == minorVersion.toInt
-          }.getOrElse(Version(0, 0))
+          versions
+            .find { v =>
+              v.majorVersion == majorVersion.toInt &&
+              v.minorVersion == minorVersion.toInt
+            }
+            .getOrElse(Version(0, 0))
         }
         case _ => Version(0, 0)
       }

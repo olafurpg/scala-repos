@@ -321,44 +321,60 @@ class TestClassWithNesting(val y: Int) extends Serializable {
   */
 private object TestUserClosuresActuallyCleaned {
   def testMap(rdd: RDD[Int]): Unit = {
-    rdd.map { _ =>
-      return; 0
-    }.count()
+    rdd
+      .map { _ =>
+        return; 0
+      }
+      .count()
   }
   def testFlatMap(rdd: RDD[Int]): Unit = {
-    rdd.flatMap { _ =>
-      return; Seq()
-    }.count()
+    rdd
+      .flatMap { _ =>
+        return; Seq()
+      }
+      .count()
   }
   def testFilter(rdd: RDD[Int]): Unit = {
-    rdd.filter { _ =>
-      return; true
-    }.count()
+    rdd
+      .filter { _ =>
+        return; true
+      }
+      .count()
   }
   def testSortBy(rdd: RDD[Int]): Unit = {
-    rdd.sortBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .sortBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testKeyBy(rdd: RDD[Int]): Unit = {
-    rdd.keyBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .keyBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testGroupBy(rdd: RDD[Int]): Unit = {
-    rdd.groupBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .groupBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testMapPartitions(rdd: RDD[Int]): Unit = {
-    rdd.mapPartitions { it =>
-      return; it
-    }.count()
+    rdd
+      .mapPartitions { it =>
+        return; it
+      }
+      .count()
   }
   def testMapPartitionsWithIndex(rdd: RDD[Int]): Unit = {
-    rdd.mapPartitionsWithIndex { (_, it) =>
-      return; it
-    }.count()
+    rdd
+      .mapPartitionsWithIndex { (_, it) =>
+        return; it
+      }
+      .count()
   }
   def testZipPartitions2(rdd: RDD[Int]): Unit = {
     rdd.zipPartitions(rdd) { case (it1, it2) => return; it1 }.count()

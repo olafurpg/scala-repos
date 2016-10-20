@@ -135,10 +135,12 @@ object WiringUI {
   def history[T](cell: Cell[T])(f: (Box[T], T,
                                     NodeSeq) => JsCmd): NodeSeq => NodeSeq =
     in => {
-      val myElem: Elem = in.find {
-        case e: Elem => true
-        case _ => false
-      }.map(_.asInstanceOf[Elem])
+      val myElem: Elem = in
+        .find {
+          case e: Elem => true
+          case _ => false
+        }
+        .map(_.asInstanceOf[Elem])
         .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
       addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
@@ -266,10 +268,12 @@ object WiringUI {
       cell: Cell[T],
       jsEffect: (String, Boolean,
                  JsCmd) => JsCmd)(f: (T, NodeSeq) => NodeSeq): NodeSeq = {
-    val myElem: Elem = in.find {
-      case e: Elem => true
-      case _ => false
-    }.map(_.asInstanceOf[Elem])
+    val myElem: Elem = in
+      .find {
+        case e: Elem => true
+        case _ => false
+      }
+      .map(_.asInstanceOf[Elem])
       .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
     val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
@@ -302,10 +306,12 @@ object WiringUI {
   def toNode[T](cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
       f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
     in => {
-      val myElem: Elem = in.find {
-        case e: Elem => true
-        case _ => false
-      }.map(_.asInstanceOf[Elem])
+      val myElem: Elem = in
+        .find {
+          case e: Elem => true
+          case _ => false
+        }
+        .map(_.asInstanceOf[Elem])
         .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
       val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)

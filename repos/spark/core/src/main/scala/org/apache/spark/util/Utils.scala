@@ -1971,14 +1971,16 @@ private[spark] object Utils extends Logging {
                                  filePath: String = null): String = {
     val path = Option(filePath).getOrElse(getDefaultPropertiesFile())
     Option(path).foreach { confFile =>
-      getPropertiesFromFile(confFile).filter {
-        case (k, v) =>
-          k.startsWith("spark.")
-      }.foreach {
-        case (k, v) =>
-          conf.setIfMissing(k, v)
-          sys.props.getOrElseUpdate(k, v)
-      }
+      getPropertiesFromFile(confFile)
+        .filter {
+          case (k, v) =>
+            k.startsWith("spark.")
+        }
+        .foreach {
+          case (k, v) =>
+            conf.setIfMissing(k, v)
+            sys.props.getOrElseUpdate(k, v)
+        }
     }
     path
   }

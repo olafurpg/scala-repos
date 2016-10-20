@@ -291,12 +291,15 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
       }
 
     val outputOps: Seq[(OutputOperationUIData, Seq[SparkJobId])] =
-      batchUIData.outputOperations.map {
-        case (outputOpId, outputOperation) =>
-          val sparkJobIds =
-            outputOpIdToSparkJobIds.getOrElse(outputOpId, Seq.empty)
-          (outputOperation, sparkJobIds)
-      }.toSeq.sortBy(_._1.id)
+      batchUIData.outputOperations
+        .map {
+          case (outputOpId, outputOperation) =>
+            val sparkJobIds =
+              outputOpIdToSparkJobIds.getOrElse(outputOpId, Seq.empty)
+            (outputOperation, sparkJobIds)
+        }
+        .toSeq
+        .sortBy(_._1.id)
     sparkListener.synchronized {
       val outputOpWithJobs = outputOps.map {
         case (outputOpData, sparkJobIds) =>
@@ -345,11 +348,12 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
       val formattedTotalDelay =
         batchUIData.totalDelay.map(SparkUIUtils.formatDuration).getOrElse("-")
 
-      val inputMetadatas = batchUIData.streamIdToInputInfo.values.flatMap {
-        inputInfo =>
+      val inputMetadatas = batchUIData.streamIdToInputInfo.values
+        .flatMap { inputInfo =>
           inputInfo.metadataDescription.map(desc =>
             inputInfo.inputStreamId -> desc)
-      }.toSeq
+        }
+        .toSeq
       val summary: NodeSeq = <div>
         <ul class="unstyled">
           <li>

@@ -961,10 +961,12 @@ object getDummyBlocks {
                                    classOf[ScInterpolatedStringLiteral]))
       .map(_.asInstanceOf[ScInterpolatedStringLiteral])
       .flatMap(literal =>
-        alignmentsMap.find {
-          case (pointer, _) =>
-            pointer.getElement == literal
-        }.map(_._2))
+        alignmentsMap
+          .find {
+            case (pointer, _) =>
+              pointer.getElement == literal
+          }
+          .map(_._2))
       .getOrElse(Alignment.createAlignment(true))
     val wrap: Wrap = Wrap.createWrap(WrapType.NONE, true)
     val scalaSettings =

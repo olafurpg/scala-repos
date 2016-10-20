@@ -174,14 +174,15 @@ class CSRFAction(next: EssentialAction,
         .concatSubstreams
         .toMat(Sink.head[Source[ByteString, _]])(Keep.right)
     ).mapFuture { validatedBodySource =>
-      action(request).run(validatedBodySource)
-    }.recoverWith {
-      case NoTokenInBody =>
-        clearTokenIfInvalid(request,
-                            config,
-                            errorHandler,
-                            "No CSRF token found in body")
-    }
+        action(request).run(validatedBodySource)
+      }
+      .recoverWith {
+        case NoTokenInBody =>
+          clearTokenIfInvalid(request,
+                              config,
+                              errorHandler,
+                              "No CSRF token found in body")
+      }
   }
 
   /**
@@ -538,17 +539,19 @@ object CSRFAction {
       CSRF
         .getToken(request)
         .fold(
-          config.cookieName.flatMap { cookie =>
-            request.cookies.get(cookie).map { token =>
-              result.discardingCookies(
-                DiscardingCookie(cookie,
-                                 domain = Session.domain,
-                                 path = Session.path,
-                                 secure = config.secureCookie))
+          config.cookieName
+            .flatMap { cookie =>
+              request.cookies.get(cookie).map { token =>
+                result.discardingCookies(
+                  DiscardingCookie(cookie,
+                                   domain = Session.domain,
+                                   path = Session.path,
+                                   secure = config.secureCookie))
+              }
             }
-          }.getOrElse {
-            result.withSession(result.session(request) - config.tokenName)
-          }
+            .getOrElse {
+              result.withSession(result.session(request) - config.tokenName)
+            }
         )(_ => result)
     }
   }

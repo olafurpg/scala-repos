@@ -155,14 +155,16 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
     : Map[TopicAndPartition, LeaderOffset] = {
     val offsets = leaderOffsets.mapValues(lo => lo.offset)
 
-    maxMessagesPerPartition(offsets).map { mmp =>
-      mmp.map {
-        case (tp, messages) =>
-          val lo = leaderOffsets(tp)
-          tp -> lo.copy(
-            offset = Math.min(currentOffsets(tp) + messages, lo.offset))
+    maxMessagesPerPartition(offsets)
+      .map { mmp =>
+        mmp.map {
+          case (tp, messages) =>
+            val lo = leaderOffsets(tp)
+            tp -> lo.copy(
+              offset = Math.min(currentOffsets(tp) + messages, lo.offset))
+        }
       }
-    }.getOrElse(leaderOffsets)
+      .getOrElse(leaderOffsets)
   }
 
   override def compute(validTime: Time): Option[KafkaRDD[K, V, U, T, R]] = {
@@ -179,13 +181,16 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
         val uo = untilOffsets(tp)
         OffsetRange(tp.topic, tp.partition, fo, uo.offset)
     }
-    val description = offsetRanges.filter { offsetRange =>
-      // Don't display empty ranges.
-      offsetRange.fromOffset != offsetRange.untilOffset
-    }.map { offsetRange =>
-      s"topic: ${offsetRange.topic}\tpartition: ${offsetRange.partition}\t" +
-        s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
-    }.mkString("\n")
+    val description = offsetRanges
+      .filter { offsetRange =>
+        // Don't display empty ranges.
+        offsetRange.fromOffset != offsetRange.untilOffset
+      }
+      .map { offsetRange =>
+        s"topic: ${offsetRange.topic}\tpartition: ${offsetRange.partition}\t" +
+          s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
+      }
+      .mkString("\n")
     // Copy offsetRanges to immutable.List to prevent from being modified by the user
     val metadata = Map("offsets" -> offsetRanges.toList,
                        StreamInputInfo.METADATA_KEY_DESCRIPTION -> description)

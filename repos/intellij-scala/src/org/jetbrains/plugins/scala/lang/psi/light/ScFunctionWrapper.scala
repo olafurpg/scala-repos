@@ -328,12 +328,14 @@ object ScFunctionWrapper {
     builder.append(name)
 
     builder.append(
-      function.effectiveParameterClauses.takeWhile { clause =>
-        defaultParam match {
-          case Some(param) => !clause.effectiveParameters.contains(param)
-          case None => true
+      function.effectiveParameterClauses
+        .takeWhile { clause =>
+          defaultParam match {
+            case Some(param) => !clause.effectiveParameters.contains(param)
+            case None => true
+          }
         }
-      }.flatMap(_.effectiveParameters)
+        .flatMap(_.effectiveParameters)
         .map {
           case param =>
             val builder = new StringBuilder

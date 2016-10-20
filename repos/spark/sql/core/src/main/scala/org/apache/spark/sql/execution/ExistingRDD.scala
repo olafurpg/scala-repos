@@ -184,13 +184,15 @@ private[sql] case class DataSourceScan(
             s"(${output.map(_.name).mkString(", ")})")
       }
 
-    bucketSpec.map { spec =>
-      val numBuckets = spec.numBuckets
-      val bucketColumns = spec.bucketColumnNames.map(toAttribute)
-      HashPartitioning(bucketColumns, numBuckets)
-    }.getOrElse {
-      UnknownPartitioning(0)
-    }
+    bucketSpec
+      .map { spec =>
+        val numBuckets = spec.numBuckets
+        val bucketColumns = spec.bucketColumnNames.map(toAttribute)
+        HashPartitioning(bucketColumns, numBuckets)
+      }
+      .getOrElse {
+        UnknownPartitioning(0)
+      }
   }
 
   protected override def doExecute(): RDD[InternalRow] = {

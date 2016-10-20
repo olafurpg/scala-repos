@@ -19,11 +19,13 @@ class HoconFoldingBuilder extends FoldingBuilder {
         .takeWhile(_ != null)
         .flatMap(nodesIterator)
 
-    nodesIterator(node).collect {
-      case n
-          if foldableTypes.contains(n.getElementType) && n.getTextLength > 0 =>
-        new FoldingDescriptor(n, n.getTextRange)
-    }.toArray
+    nodesIterator(node)
+      .collect {
+        case n
+            if foldableTypes.contains(n.getElementType) && n.getTextLength > 0 =>
+          new FoldingDescriptor(n, n.getTextRange)
+      }
+      .toArray
   }
 
   def isCollapsedByDefault(node: ASTNode) =

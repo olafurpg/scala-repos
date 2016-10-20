@@ -184,16 +184,20 @@ object ReassignPartitionsCommand extends Logging {
       throw new AdminCommandFailedException(
         "Partition reassignment contains duplicate topic partitions: %s"
           .format(duplicateReassignedPartitions.mkString(",")))
-    val duplicateEntries = partitionsToBeReassigned.map {
-      case (tp, replicas) => (tp, CoreUtils.duplicates(replicas))
-    }.filter { case (tp, duplicatedReplicas) => duplicatedReplicas.nonEmpty }
+    val duplicateEntries = partitionsToBeReassigned
+      .map {
+        case (tp, replicas) => (tp, CoreUtils.duplicates(replicas))
+      }
+      .filter { case (tp, duplicatedReplicas) => duplicatedReplicas.nonEmpty }
     if (duplicateEntries.nonEmpty) {
-      val duplicatesMsg = duplicateEntries.map {
-        case (tp, duplicateReplicas) =>
-          "%s contains multiple entries for %s".format(
-            tp,
-            duplicateReplicas.mkString(","))
-      }.mkString(". ")
+      val duplicatesMsg = duplicateEntries
+        .map {
+          case (tp, duplicateReplicas) =>
+            "%s contains multiple entries for %s".format(
+              tp,
+              duplicateReplicas.mkString(","))
+        }
+        .mkString(". ")
       throw new AdminCommandFailedException(
         "Partition replica lists may not contain duplicate entries: %s".format(
           duplicatesMsg))

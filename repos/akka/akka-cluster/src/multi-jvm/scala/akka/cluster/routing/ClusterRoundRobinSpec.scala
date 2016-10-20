@@ -369,9 +369,11 @@ abstract class ClusterRoundRobinSpec
         val notUsedAddress =
           ((roles map address).toSet diff routeeAddresses).head
         val downAddress = routeeAddresses.find(_ != address(first)).get
-        val downRouteeRef = routees.collectFirst {
-          case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref
-        }.get
+        val downRouteeRef = routees
+          .collectFirst {
+            case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref
+          }
+          .get
 
         cluster.down(downAddress)
         expectMsgType[Terminated](15.seconds).actor should ===(downRouteeRef)

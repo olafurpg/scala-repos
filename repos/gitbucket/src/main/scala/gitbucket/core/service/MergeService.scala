@@ -211,24 +211,26 @@ object MergeService {
     lazy val mergeBaseTip = repository.resolve(s"refs/heads/${branch}")
     lazy val mergeTip = repository.resolve(s"refs/pull/${issueId}/head")
     def checkConflictCache(): Option[Boolean] = {
-      Option(repository.resolve(mergedBranchName)).flatMap { merged =>
-        if (parseCommit(merged).getParents().toSet == Set(mergeBaseTip,
-                                                          mergeTip)) {
-          // merged branch exists
-          Some(false)
-        } else {
-          None
-        }
-      }.orElse(Option(repository.resolve(conflictedBranchName)).flatMap {
-        conflicted =>
-          if (parseCommit(conflicted).getParents().toSet == Set(mergeBaseTip,
-                                                                mergeTip)) {
-            // conflict branch exists
-            Some(true)
+      Option(repository.resolve(mergedBranchName))
+        .flatMap { merged =>
+          if (parseCommit(merged).getParents().toSet == Set(mergeBaseTip,
+                                                            mergeTip)) {
+            // merged branch exists
+            Some(false)
           } else {
             None
           }
-      })
+        }
+        .orElse(Option(repository.resolve(conflictedBranchName)).flatMap {
+          conflicted =>
+            if (parseCommit(conflicted).getParents().toSet == Set(mergeBaseTip,
+                                                                  mergeTip)) {
+              // conflict branch exists
+              Some(true)
+            } else {
+              None
+            }
+        })
     }
     def checkConflict(): Boolean = {
       checkConflictCache.getOrElse(checkConflictForce)

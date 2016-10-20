@@ -173,11 +173,13 @@ final class DetectedPlugins(val plugins: DetectedModules[Plugin],
       .importNamesRoot(autoPlugins.map(_.name).filter(nonTopLevelPlugin))
 
   private[this] lazy val (autoPluginAutoImports, topLevelAutoPluginAutoImports) =
-    autoPlugins.flatMap {
-      case DetectedAutoPlugin(name, ap, hasAutoImport) =>
-        if (hasAutoImport) Some(name)
-        else None
-    }.partition(nonTopLevelPlugin)
+    autoPlugins
+      .flatMap {
+        case DetectedAutoPlugin(name, ap, hasAutoImport) =>
+          if (hasAutoImport) Some(name)
+          else None
+      }
+      .partition(nonTopLevelPlugin)
 
   /** A function to select the right [[AutoPlugin]]s from [[autoPlugins]] for a [[Project]]. */
   @deprecated("Use deducePluginsFromProject", "0.13.8")

@@ -134,11 +134,13 @@ object MongoPlatformSpecEngine extends Logging {
             val collection = db.getCollection(collectionName)
             JParser.parseManyFromFile(file) match {
               case Success(data) =>
-                val objs = data.map { jv =>
-                  JsonToMongo
-                    .apply(jv.asInstanceOf[JObject])
-                    .fold(e => throw new Exception(e.toString), s => s)
-                }.toArray
+                val objs = data
+                  .map { jv =>
+                    JsonToMongo
+                      .apply(jv.asInstanceOf[JObject])
+                      .fold(e => throw new Exception(e.toString), s => s)
+                  }
+                  .toArray
                 collection.insert(objs, WriteConcern.FSYNC_SAFE)
 
                 // Verify that things did actually make it to disk

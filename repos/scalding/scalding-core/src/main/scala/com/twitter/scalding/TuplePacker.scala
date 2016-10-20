@@ -86,9 +86,12 @@ class ReflectionTupleConverter[T](fields: Fields)(implicit m: Manifest[T])
   validate
 
   def getSetters =
-    m.runtimeClass.getDeclaredMethods.filter { _.getName.startsWith("set") }.groupBy {
-      setterToFieldName(_)
-    }.mapValues { _.head }
+    m.runtimeClass.getDeclaredMethods
+      .filter { _.getName.startsWith("set") }
+      .groupBy {
+        setterToFieldName(_)
+      }
+      .mapValues { _.head }
 
   // Do all the reflection for the setters we need:
   // This needs to be lazy because Method is not serializable
@@ -121,9 +124,12 @@ class OrderedConstructorConverter[T](fields: Fields)(implicit mf: Manifest[T])
   // Keep this as a method, so we can validate by calling, but don't serialize it, and keep it lazy
   // below
   def getConstructor =
-    mf.runtimeClass.getConstructors.filter {
-      _.getParameterTypes.size == fields.size
-    }.head.asInstanceOf[Constructor[T]]
+    mf.runtimeClass.getConstructors
+      .filter {
+        _.getParameterTypes.size == fields.size
+      }
+      .head
+      .asInstanceOf[Constructor[T]]
 
   //Make sure we can actually get a constructor:
   getConstructor

@@ -701,10 +701,15 @@ class PlaintextConsumerTest extends BaseConsumerTest {
 
     // produce records
     val numRecords = 10
-    (0 until numRecords).map { i =>
-      testProducer.send(
-        new ProducerRecord(tp.topic(), tp.partition(), s"key $i", s"value $i"))
-    }.foreach(_.get)
+    (0 until numRecords)
+      .map { i =>
+        testProducer.send(
+          new ProducerRecord(tp.topic(),
+                             tp.partition(),
+                             s"key $i",
+                             s"value $i"))
+      }
+      .foreach(_.get)
     assertEquals(numRecords, MockProducerInterceptor.ONSEND_COUNT.intValue())
     assertEquals(numRecords,
                  MockProducerInterceptor.ON_SUCCESS_COUNT.intValue())
@@ -780,10 +785,15 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     val testProducer = new KafkaProducer[String, String](this.producerConfig,
                                                          new StringSerializer,
                                                          new StringSerializer)
-    (0 until numRecords).map { i =>
-      testProducer.send(
-        new ProducerRecord(tp.topic(), tp.partition(), s"key $i", s"value $i"))
-    }.foreach(_.get)
+    (0 until numRecords)
+      .map { i =>
+        testProducer.send(
+          new ProducerRecord(tp.topic(),
+                             tp.partition(),
+                             s"key $i",
+                             s"value $i"))
+      }
+      .foreach(_.get)
 
     // create consumer with interceptor
     this.consumerConfig

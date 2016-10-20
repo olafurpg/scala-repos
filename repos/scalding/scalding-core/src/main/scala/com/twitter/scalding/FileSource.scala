@@ -100,9 +100,11 @@ trait LocalSourceOverride extends SchemedSource {
     * @returns A tap.
     */
   def createLocalTap(sinkMode: SinkMode): Tap[JobConf, _, _] = {
-    val taps = localPaths.map { p: String =>
-      CastFileTap(new FileTap(localScheme, p, sinkMode))
-    }.toList
+    val taps = localPaths
+      .map { p: String =>
+        CastFileTap(new FileTap(localScheme, p, sinkMode))
+      }
+      .toList
 
     taps match {
       case Nil => throw new InvalidSourceException("LocalPaths is empty")
@@ -133,11 +135,13 @@ object FileSource {
            conf: Configuration,
            filter: PathFilter = AcceptAllPathFilter): Iterable[FileStatus] = {
     val path = new Path(glob)
-    Option(path.getFileSystem(conf).globStatus(path, filter)).map {
-      _.toIterable // convert java Array to scala Iterable
-    }.getOrElse {
-      Iterable.empty
-    }
+    Option(path.getFileSystem(conf).globStatus(path, filter))
+      .map {
+        _.toIterable // convert java Array to scala Iterable
+      }
+      .getOrElse {
+        Iterable.empty
+      }
   }
 
   /**
@@ -240,14 +244,17 @@ abstract class FileSource
             CastHfsTap(createHfsTap(hdfsScheme, hdfsWritePath, sinkMode))
         }
       case _ => {
-        val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode)).map {
-          // these java types are invariant, so we cast here
-          _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
-        }.orElse {
-          Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode)).map {
+        val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode))
+          .map {
+            // these java types are invariant, so we cast here
             _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
           }
-        }
+          .orElse {
+            Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode))
+              .map {
+                _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
+              }
+          }
 
         tryTtp match {
           case Success(s) => s
@@ -458,10 +465,14 @@ trait SuccessFileSource extends FileSource {
   */
 trait LocalTapSource extends LocalSourceOverride {
   override def createLocalTap(sinkMode: SinkMode): Tap[JobConf, _, _] = {
-    val taps = localPaths.map { p =>
-      new LocalTap(p, hdfsScheme, sinkMode)
-        .asInstanceOf[Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]]]
-    }.toSeq
+    val taps = localPaths
+      .map { p =>
+        new LocalTap(p, hdfsScheme, sinkMode)
+          .asInstanceOf[Tap[JobConf,
+                            RecordReader[_, _],
+                            OutputCollector[_, _]]]
+      }
+      .toSeq
 
     taps match {
       case Nil => throw new InvalidSourceException("LocalPaths is empty")

@@ -383,14 +383,17 @@ private[kafka] class ZookeeperConsumerConnector(
 
   def commitOffsets(isAutoCommit: Boolean) {
 
-    val offsetsToCommit = immutable.Map(topicRegistry.flatMap {
-      case (topic, partitionTopicInfos) =>
-        partitionTopicInfos.map {
-          case (partition, info) =>
-            TopicAndPartition(info.topic, info.partitionId) -> OffsetAndMetadata(
-              info.getConsumeOffset())
+    val offsetsToCommit = immutable.Map(
+      topicRegistry
+        .flatMap {
+          case (topic, partitionTopicInfos) =>
+            partitionTopicInfos.map {
+              case (partition, info) =>
+                TopicAndPartition(info.topic, info.partitionId) -> OffsetAndMetadata(
+                  info.getConsumeOffset())
+            }
         }
-    }.toSeq: _*)
+        .toSeq: _*)
 
     commitOffsets(offsetsToCommit, isAutoCommit)
   }
@@ -876,14 +879,16 @@ private[kafka] class ZookeeperConsumerConnector(
           if (reflectPartitionOwnershipDecision(partitionAssignment)) {
             allTopicsOwnedPartitionsCount = partitionAssignment.size
 
-            partitionAssignment.view.groupBy {
-              case (topicPartition, consumerThreadId) => topicPartition.topic
-            }.foreach {
-              case (topic, partitionThreadPairs) =>
-                newGauge("OwnedPartitionsCount", new Gauge[Int] {
-                  def value() = partitionThreadPairs.size
-                }, ownedPartitionsCountMetricTags(topic))
-            }
+            partitionAssignment.view
+              .groupBy {
+                case (topicPartition, consumerThreadId) => topicPartition.topic
+              }
+              .foreach {
+                case (topic, partitionThreadPairs) =>
+                  newGauge("OwnedPartitionsCount", new Gauge[Int] {
+                    def value() = partitionThreadPairs.size
+                  }, ownedPartitionsCountMetricTags(topic))
+              }
 
             topicRegistry = currentTopicRegistry
             // Invoke beforeStartingFetchers callback if the consumerRebalanceListener is set.
@@ -1124,10 +1129,12 @@ private[kafka] class ZookeeperConsumerConnector(
         queuesAndStreams
     }
 
-    val topicThreadIds = consumerThreadIdsPerTopic.map {
-      case (topic, threadIds) =>
-        threadIds.map((topic, _))
-    }.flatten
+    val topicThreadIds = consumerThreadIdsPerTopic
+      .map {
+        case (topic, threadIds) =>
+          threadIds.map((topic, _))
+      }
+      .flatten
 
     require(topicThreadIds.size == allQueuesAndStreams.size,
             "Mismatch between thread ID count (%d) and queue count (%d)"

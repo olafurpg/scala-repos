@@ -349,19 +349,24 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
         // build a set of the distinct aggregate expressions and build a function which can
         // be used to re-write expressions so that they reference the single copy of the
         // aggregate function which actually gets computed.
-        val aggregateExpressions = resultExpressions.flatMap { expr =>
-          expr.collect {
-            case agg: AggregateExpression => agg
+        val aggregateExpressions = resultExpressions
+          .flatMap { expr =>
+            expr.collect {
+              case agg: AggregateExpression => agg
+            }
           }
-        }.distinct
+          .distinct
         // For those distinct aggregate expressions, we create a map from the
         // aggregate function to the corresponding attribute of the function.
-        val aggregateFunctionToAttribute = aggregateExpressions.map { agg =>
-          val aggregateFunction = agg.aggregateFunction
-          val attribute =
-            Alias(aggregateFunction, aggregateFunction.toString)().toAttribute
-          (aggregateFunction, agg.isDistinct) -> attribute
-        }.toMap
+        val aggregateFunctionToAttribute = aggregateExpressions
+          .map { agg =>
+            val aggregateFunction = agg.aggregateFunction
+            val attribute =
+              Alias(aggregateFunction, aggregateFunction.toString)()
+                .toAttribute
+            (aggregateFunction, agg.isDistinct) -> attribute
+          }
+          .toMap
 
         val (functionsWithDistinct, functionsWithoutDistinct) =
           aggregateExpressions.partition(_.isDistinct)
@@ -394,21 +399,25 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
         // Thus, we must re-write the result expressions so that their attributes match up with
         // the attributes of the final result projection's input row:
         val rewrittenResultExpressions = resultExpressions.map { expr =>
-          expr.transformDown {
-            case AggregateExpression(aggregateFunction, _, isDistinct) =>
-              // The final aggregation buffer's attributes will be `finalAggregationAttributes`,
-              // so replace each aggregate expression by its corresponding attribute in the set:
-              aggregateFunctionToAttribute(aggregateFunction, isDistinct)
-            case expression =>
-              // Since we're using `namedGroupingAttributes` to extract the grouping key
-              // columns, we need to replace grouping key expressions with their corresponding
-              // attributes. We do not rely on the equality check at here since attributes may
-              // differ cosmetically. Instead, we use semanticEquals.
-              groupExpressionMap.collectFirst {
-                case (expr, ne) if expr semanticEquals expression =>
-                  ne.toAttribute
-              }.getOrElse(expression)
-          }.asInstanceOf[NamedExpression]
+          expr
+            .transformDown {
+              case AggregateExpression(aggregateFunction, _, isDistinct) =>
+                // The final aggregation buffer's attributes will be `finalAggregationAttributes`,
+                // so replace each aggregate expression by its corresponding attribute in the set:
+                aggregateFunctionToAttribute(aggregateFunction, isDistinct)
+              case expression =>
+                // Since we're using `namedGroupingAttributes` to extract the grouping key
+                // columns, we need to replace grouping key expressions with their corresponding
+                // attributes. We do not rely on the equality check at here since attributes may
+                // differ cosmetically. Instead, we use semanticEquals.
+                groupExpressionMap
+                  .collectFirst {
+                    case (expr, ne) if expr semanticEquals expression =>
+                      ne.toAttribute
+                  }
+                  .getOrElse(expression)
+            }
+            .asInstanceOf[NamedExpression]
         }
 
         val aggregateOperator =

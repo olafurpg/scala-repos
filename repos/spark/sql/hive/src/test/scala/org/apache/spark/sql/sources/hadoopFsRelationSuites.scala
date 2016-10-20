@@ -554,12 +554,14 @@ abstract class HadoopFsRelationTest
         path.makeQualified(fs.getUri, fs.getWorkingDirectory).toString
       }
 
-      val actualPaths = df.queryExecution.analyzed.collectFirst {
-        case LogicalRelation(relation: HadoopFsRelation, _, _) =>
-          relation.location.paths.map(_.toString).toSet
-      }.getOrElse {
-        fail("Expect an FSBasedRelation, but none could be found")
-      }
+      val actualPaths = df.queryExecution.analyzed
+        .collectFirst {
+          case LogicalRelation(relation: HadoopFsRelation, _, _) =>
+            relation.location.paths.map(_.toString).toSet
+        }
+        .getOrElse {
+          fail("Expect an FSBasedRelation, but none could be found")
+        }
 
       assert(actualPaths === expectedPaths)
       checkAnswer(df, partitionedTestDF.collect())

@@ -811,10 +811,12 @@ object JsonAST {
   case class JObject(obj: List[JField]) extends JValue {
     type Values = Map[String, Any]
     def values = {
-      obj.map {
-        case JField(name, value) =>
-          (name, value.values): (String, Any)
-      }.toMap
+      obj
+        .map {
+          case JField(name, value) =>
+            (name, value.values): (String, Any)
+        }
+        .toMap
     }
 
     override def equals(that: Any): Boolean = that match {

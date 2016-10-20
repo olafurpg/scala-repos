@@ -55,11 +55,13 @@ class CreateAggregates extends Phase {
               case _ =>
                 val len = sources.length
                 val it = Iterator.iterate(s1)(_ => ElementSymbol(2))
-                sources.zipWithIndex.map {
-                  case ((s, _), i) =>
-                    val l = List.iterate(s1, i + 1)(_ => ElementSymbol(2))
-                    s -> (if (i == len - 1) l else l :+ ElementSymbol(1))
-                }.toMap
+                sources.zipWithIndex
+                  .map {
+                    case ((s, _), i) =>
+                      val l = List.iterate(s1, i + 1)(_ => ElementSymbol(2))
+                      s -> (if (i == len - 1) l else l :+ ElementSymbol(1))
+                  }
+                  .toMap
             }
             logger.debug("Replacement paths: " + repl)
             val scope =
@@ -100,9 +102,10 @@ class CreateAggregates extends Phase {
     n match {
       case a @ Aggregate(s1, f1, sel1) =>
         if (a.findNode {
-              case n: PathElement => n.sym == outer
-              case _ => false
-            }.isDefined) (a, Map.empty)
+                case n: PathElement => n.sym == outer
+                case _ => false
+              }
+              .isDefined) (a, Map.empty)
         else {
           val s, f = new AnonSymbol
           val a2 = Aggregate(s1, f1, StructNode(ConstArray(f -> sel1))).infer()

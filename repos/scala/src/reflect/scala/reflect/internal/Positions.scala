@@ -152,9 +152,12 @@ trait Positions extends api.Positions { self: SymbolTable =>
           findOverlapping(tree.children flatMap solidDescendants) match {
             case List() => ;
             case xs => {
-              positionError("Overlapping trees " + xs.map {
-                case (x, y) => (x.id, y.id)
-              }.mkString("", ", ", "")) {
+              positionError(
+                "Overlapping trees " + xs
+                  .map {
+                    case (x, y) => (x.id, y.id)
+                  }
+                  .mkString("", ", ", "")) {
                 reportTree("Ancestor", tree)
                 for ((x, y) <- xs) {
                   reportTree("First overlapping", x)

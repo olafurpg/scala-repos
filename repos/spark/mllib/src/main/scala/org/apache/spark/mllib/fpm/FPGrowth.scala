@@ -248,14 +248,16 @@ class FPGrowth private (private var minSupport: Double,
       data: RDD[Array[Item]],
       minCount: Long,
       partitioner: Partitioner): Array[Item] = {
-    data.flatMap { t =>
-      val uniq = t.toSet
-      if (t.length != uniq.size) {
-        throw new SparkException(
-          s"Items in a transaction must be unique but got ${t.toSeq}.")
+    data
+      .flatMap { t =>
+        val uniq = t.toSet
+        if (t.length != uniq.size) {
+          throw new SparkException(
+            s"Items in a transaction must be unique but got ${t.toSeq}.")
+        }
+        t
       }
-      t
-    }.map(v => (v, 1L))
+      .map(v => (v, 1L))
       .reduceByKey(partitioner, _ + _)
       .filter(_._2 >= minCount)
       .collect()
@@ -277,9 +279,11 @@ class FPGrowth private (private var minSupport: Double,
       freqItems: Array[Item],
       partitioner: Partitioner): RDD[FreqItemset[Item]] = {
     val itemToRank = freqItems.zipWithIndex.toMap
-    data.flatMap { transaction =>
-      genCondTransactions(transaction, itemToRank, partitioner)
-    }.aggregateByKey(new FPTree[Int], partitioner.numPartitions)(
+    data
+      .flatMap { transaction =>
+        genCondTransactions(transaction, itemToRank, partitioner)
+      }
+      .aggregateByKey(new FPTree[Int], partitioner.numPartitions)(
         (tree, transaction) => tree.add(transaction, 1L),
         (tree1, tree2) => tree1.merge(tree2))
       .flatMap {

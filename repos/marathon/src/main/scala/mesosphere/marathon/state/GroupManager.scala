@@ -215,11 +215,13 @@ class GroupManager @Singleton @Inject()(
             val resolved =
               app.copy(fetch = app.fetch ++ storageUrls.map(FetchUri.apply(_)),
                        storeUrls = Seq.empty)
-            val appDownloads: Map[URL, String] = app.storeUrls.flatMap { url =>
-              downloads.remove(url).map { path =>
-                new URL(url) -> path
+            val appDownloads: Map[URL, String] = app.storeUrls
+              .flatMap { url =>
+                downloads.remove(url).map { path =>
+                  new URL(url) -> path
+                }
               }
-            }.toMap
+              .toMap
             if (appDownloads.nonEmpty)
               actions += ResolveArtifacts(resolved, appDownloads)
             resolved

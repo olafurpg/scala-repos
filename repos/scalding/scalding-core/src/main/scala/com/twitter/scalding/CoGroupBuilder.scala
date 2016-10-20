@@ -43,8 +43,10 @@ class CoGroupBuilder(groupFields: Fields, joinMode: JoinMode)
     assert(!coGroups.isEmpty,
            "coGroupBy requires at least one other pipe to .coGroup")
     val fields = (groupFields :: coGroups.map { _._1 }).toArray
-    val pipes = (pipe :: coGroups.map { _._2 }).map { RichPipe.assignName(_) }.toArray
-    val joinModes = (joinMode :: coGroups.map { _._3 }).map { _.booleanValue }.toArray
+    val pipes =
+      (pipe :: coGroups.map { _._2 }).map { RichPipe.assignName(_) }.toArray
+    val joinModes =
+      (joinMode :: coGroups.map { _._3 }).map { _.booleanValue }.toArray
     val mixedJoiner = new MixedJoin(joinModes)
     val cg: Pipe = new CoGroup(pipes, fields, null, WrappedJoiner(mixedJoiner))
     overrideReducers(cg)

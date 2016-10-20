@@ -32,10 +32,12 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
       context: ProcessingContext): Array[PsiReference] = {
     if (element.getContainingFile.getFileType.getName != Sbt.Name)
       return Array.empty
-    extractSubprojectPath(element).flatMap { path =>
-      findBuildFile(path, element.getProject).map(
-        new SbtSubprojectReference(element, _))
-    }.toArray
+    extractSubprojectPath(element)
+      .flatMap { path =>
+        findBuildFile(path, element.getProject).map(
+          new SbtSubprojectReference(element, _))
+      }
+      .toArray
   }
 
   private def findBuildFile(subprojectPath: String,
@@ -96,10 +98,12 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
   private def extractPathFromFileParam(element: PsiElement): Option[String] =
     element match {
       case newFileDef: ScNewTemplateDefinition =>
-        newFileDef.extendsBlock.getChildren.toSeq.headOption.collect {
-          case classParent: ScClassParents =>
-            classParent.constructor.flatMap(extractPathFromFileCtor)
-        }.flatten
+        newFileDef.extendsBlock.getChildren.toSeq.headOption
+          .collect {
+            case classParent: ScClassParents =>
+              classParent.constructor.flatMap(extractPathFromFileCtor)
+          }
+          .flatten
       case expr @ ScInfixExpr(_, op, _) if op.getText == "/" =>
         extractPathFromConcatenation(expr)
       case expr: ScReferenceExpression =>

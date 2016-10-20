@@ -88,9 +88,11 @@ private[stats] class MetricsBucketedHistogram(
         override def sum(): Long = _sum
 
         override def toString: String = {
-          val _ps = ps.map { p =>
-            s"p${p.getQuantile}=${p.getValue}"
-          }.mkString("[", ", ", "]")
+          val _ps = ps
+            .map { p =>
+              s"p${p.getQuantile}=${p.getValue}"
+            }
+            .mkString("[", ", ", "]")
 
           s"Snapshot(count=${_count}, max=${_max}, min=${_min}, avg=${_avg}, sum=${_sum}, %s=${_ps})"
         }

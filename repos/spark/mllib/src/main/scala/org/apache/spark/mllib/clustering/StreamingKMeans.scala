@@ -95,10 +95,12 @@ class StreamingKMeansModel @Since("1.2.0")(
     val discount = timeUnit match {
       case StreamingKMeans.BATCHES => decayFactor
       case StreamingKMeans.POINTS =>
-        val numNewPoints = pointStats.view.map {
-          case (_, (_, n)) =>
-            n
-        }.sum
+        val numNewPoints = pointStats.view
+          .map {
+            case (_, (_, n)) =>
+              n
+          }
+          .sum
         math.pow(decayFactor, numNewPoints)
     }
 

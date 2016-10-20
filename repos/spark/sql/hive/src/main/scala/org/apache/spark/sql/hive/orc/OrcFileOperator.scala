@@ -68,11 +68,13 @@ private[orc] object OrcFileOperator extends Logging {
       hdfsPath.getFileSystem(conf)
     }
 
-    listOrcFiles(basePath, conf).iterator.map { path =>
-      path -> OrcFile.createReader(fs, path)
-    }.collectFirst {
-      case (path, reader) if isWithNonEmptySchema(path, reader) => reader
-    }
+    listOrcFiles(basePath, conf).iterator
+      .map { path =>
+        path -> OrcFile.createReader(fs, path)
+      }
+      .collectFirst {
+        case (path, reader) if isWithNonEmptySchema(path, reader) => reader
+      }
   }
 
   def readSchema(paths: Seq[String],

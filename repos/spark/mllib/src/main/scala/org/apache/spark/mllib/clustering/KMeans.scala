@@ -300,31 +300,34 @@ class KMeans private (private var k: Int,
       val bcActiveCenters = sc.broadcast(activeCenters)
 
       // Find the sum and count of points mapping to each center
-      val totalContribs = data.mapPartitions { points =>
-        val thisActiveCenters = bcActiveCenters.value
-        val runs = thisActiveCenters.length
-        val k = thisActiveCenters(0).length
-        val dims = thisActiveCenters(0)(0).vector.size
+      val totalContribs = data
+        .mapPartitions { points =>
+          val thisActiveCenters = bcActiveCenters.value
+          val runs = thisActiveCenters.length
+          val k = thisActiveCenters(0).length
+          val dims = thisActiveCenters(0)(0).vector.size
 
-        val sums = Array.fill(runs, k)(Vectors.zeros(dims))
-        val counts = Array.fill(runs, k)(0L)
+          val sums = Array.fill(runs, k)(Vectors.zeros(dims))
+          val counts = Array.fill(runs, k)(0L)
 
-        points.foreach { point =>
-          (0 until runs).foreach { i =>
-            val (bestCenter, cost) =
-              KMeans.findClosest(thisActiveCenters(i), point)
-            costAccums(i) += cost
-            val sum = sums(i)(bestCenter)
-            axpy(1.0, point.vector, sum)
-            counts(i)(bestCenter) += 1
+          points.foreach { point =>
+            (0 until runs).foreach { i =>
+              val (bestCenter, cost) =
+                KMeans.findClosest(thisActiveCenters(i), point)
+              costAccums(i) += cost
+              val sum = sums(i)(bestCenter)
+              axpy(1.0, point.vector, sum)
+              counts(i)(bestCenter) += 1
+            }
           }
-        }
 
-        val contribs = for (i <- 0 until runs; j <- 0 until k) yield {
-          ((i, j), (sums(i)(j), counts(i)(j)))
+          val contribs = for (i <- 0 until runs; j <- 0 until k) yield {
+            ((i, j), (sums(i)(j), counts(i)(j)))
+          }
+          contribs.iterator
         }
-        contribs.iterator
-      }.reduceByKey(mergeContribs).collectAsMap()
+        .reduceByKey(mergeContribs)
+        .collectAsMap()
 
       bcActiveCenters.unpersist(blocking = false)
 
@@ -491,11 +494,14 @@ class KMeans private (private var k: Int,
     // candidate by the number of points in the dataset mapping to it and run a local k-means++
     // on the weighted centers to pick just k of them
     val bcCenters = data.context.broadcast(centers)
-    val weightMap = data.flatMap { p =>
-      Iterator.tabulate(runs) { r =>
-        ((r, KMeans.findClosest(bcCenters.value(r), p)._1), 1.0)
+    val weightMap = data
+      .flatMap { p =>
+        Iterator.tabulate(runs) { r =>
+          ((r, KMeans.findClosest(bcCenters.value(r), p)._1), 1.0)
+        }
       }
-    }.reduceByKey(_ + _).collectAsMap()
+      .reduceByKey(_ + _)
+      .collectAsMap()
 
     bcCenters.unpersist(blocking = false)
 

@@ -70,15 +70,17 @@ trait JDBCColumnarTableModuleConfig {}
 
 object JDBCColumnarTableModule {
   def escapePath(path: String) =
-    path.toList.map {
-      case '[' => "PCLBRACKET"
-      case ']' => "PCRBRACKET"
-      case '-' => "PCFIELDDASH"
-      case '.' => "PCDOTSEP"
-      case ' ' => "PCSPACE"
-      case c if c.isUpper => "PCUPPER" + c
-      case c => c.toString
-    }.mkString("")
+    path.toList
+      .map {
+        case '[' => "PCLBRACKET"
+        case ']' => "PCRBRACKET"
+        case '-' => "PCFIELDDASH"
+        case '.' => "PCDOTSEP"
+        case ' ' => "PCSPACE"
+        case c if c.isUpper => "PCUPPER" + c
+        case c => c.toString
+      }
+      .mkString("")
 
   def unescapePath(name: String): String = {
     val initial = name
@@ -91,10 +93,12 @@ object JDBCColumnarTableModule {
     val parts = initial.split("PCUPPER")
 
     if (parts.length > 1) {
-      parts.head.toLowerCase + parts.tail.map { ucSeg =>
-        val (ucChar, rest) = ucSeg.splitAt(1)
-        ucChar.toUpperCase + rest.toLowerCase
-      }.mkString("")
+      parts.head.toLowerCase + parts.tail
+        .map { ucSeg =>
+          val (ucChar, rest) = ucSeg.splitAt(1)
+          ucChar.toUpperCase + rest.toLowerCase
+        }
+        .mkString("")
     } else {
       parts.head.toLowerCase
     }
@@ -317,27 +321,33 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                                   current: Set[String]): Set[String] =
       tpe match {
         case JArrayFixedT(elements) if current.nonEmpty =>
-          elements.map {
-            case (index, childType) =>
-              val newPaths = current.map { s =>
-                s + "[" + index + "]"
-              }
-              jTypeToProperties(childType, newPaths)
-          }.toSet.flatten
+          elements
+            .map {
+              case (index, childType) =>
+                val newPaths = current.map { s =>
+                  s + "[" + index + "]"
+                }
+                jTypeToProperties(childType, newPaths)
+            }
+            .toSet
+            .flatten
 
         case JObjectFixedT(fields) =>
-          fields.map {
-            case (name, childType) =>
-              val newPaths =
-                if (current.nonEmpty) {
-                  current.map { s =>
-                    s + "." + name
+          fields
+            .map {
+              case (name, childType) =>
+                val newPaths =
+                  if (current.nonEmpty) {
+                    current.map { s =>
+                      s + "." + name
+                    }
+                  } else {
+                    Set(name)
                   }
-                } else {
-                  Set(name)
-                }
-              jTypeToProperties(childType, newPaths)
-          }.toSet.flatten
+                jTypeToProperties(childType, newPaths)
+            }
+            .toSet
+            .flatten
 
         case _ => current
       }

@@ -49,22 +49,24 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       constraints: Set[Expression]): Set[Expression] = {
     // Currently we only propagate constraints if the condition consists of equality
     // and ranges. For all other cases, we return an empty set of constraints
-    constraints.map {
-      case EqualTo(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case GreaterThan(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case GreaterThanOrEqual(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case LessThan(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case LessThanOrEqual(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case Not(EqualTo(l, r)) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case _ =>
-        Set.empty[Expression]
-    }.foldLeft(Set.empty[Expression])(_ union _.toSet)
+    constraints
+      .map {
+        case EqualTo(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case GreaterThan(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case GreaterThanOrEqual(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case LessThan(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case LessThanOrEqual(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case Not(EqualTo(l, r)) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case _ =>
+          Set.empty[Expression]
+      }
+      .foldLeft(Set.empty[Expression])(_ union _.toSet)
   }
 
   /**
@@ -237,12 +239,14 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
         case other => Nil
       }
 
-    productIterator.flatMap {
-      case e: Expression => e :: Nil
-      case Some(e: Expression) => e :: Nil
-      case seq: Traversable[_] => seqToExpressions(seq)
-      case other => Nil
-    }.toSeq
+    productIterator
+      .flatMap {
+        case e: Expression => e :: Nil
+        case Some(e: Expression) => e :: Nil
+        case seq: Traversable[_] => seqToExpressions(seq)
+        case other => Nil
+      }
+      .toSeq
   }
 
   lazy val schema: StructType = StructType.fromAttributes(output)
@@ -328,14 +332,16 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       case other => other
     }
 
-    productIterator.map {
-      // Children are checked using sameResult above.
-      case tn: TreeNode[_] if containsChild(tn) => null
-      case e: Expression => cleanArg(e)
-      case s: Option[_] => s.map(cleanArg)
-      case s: Seq[_] => s.map(cleanArg)
-      case m: Map[_, _] => m.mapValues(cleanArg)
-      case other => other
-    }.toSeq
+    productIterator
+      .map {
+        // Children are checked using sameResult above.
+        case tn: TreeNode[_] if containsChild(tn) => null
+        case e: Expression => cleanArg(e)
+        case s: Option[_] => s.map(cleanArg)
+        case s: Seq[_] => s.map(cleanArg)
+        case m: Map[_, _] => m.mapValues(cleanArg)
+        case other => other
+      }
+      .toSeq
   }
 }

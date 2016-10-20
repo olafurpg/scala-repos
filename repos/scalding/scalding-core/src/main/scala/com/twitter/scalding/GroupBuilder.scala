@@ -123,9 +123,11 @@ class GroupBuilder(val groupFields: Fields)
   }
 
   protected def overrideReducers(p: Pipe): Pipe = {
-    numReducers.map { r =>
-      RichPipe.setReducers(p, r)
-    }.getOrElse(p)
+    numReducers
+      .map { r =>
+        RichPipe.setReducers(p, r)
+      }
+      .getOrElse(p)
   }
 
   protected def overrideDescription(p: Pipe): Pipe = {
@@ -332,8 +334,8 @@ class GroupBuilder(val groupFields: Fields)
   }
 
   def schedule(name: String, pipe: Pipe): Pipe = {
-    val maybeProjectedPipe = projectFields.map { pipe.project(_) }
-      .getOrElse(pipe)
+    val maybeProjectedPipe =
+      projectFields.map { pipe.project(_) }.getOrElse(pipe)
     groupMode match {
       case GroupByMode =>
         //In this case we cannot aggregate, so group:

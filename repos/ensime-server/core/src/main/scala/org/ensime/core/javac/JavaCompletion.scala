@@ -273,20 +273,22 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
       importing: Boolean,
       caseSense: Boolean
   ): List[CompletionInfo] = {
-    val candidates = typeElement(info, target).map { el =>
-      el match {
-        case tel: TypeElement => {
-          val elements: Elements = info.getElements()
-          elements.getAllMembers(tel).flatMap { e =>
-            filterElement(info, e, prefix, caseSense, importing, false)
+    val candidates = typeElement(info, target)
+      .map { el =>
+        el match {
+          case tel: TypeElement => {
+            val elements: Elements = info.getElements()
+            elements.getAllMembers(tel).flatMap { e =>
+              filterElement(info, e, prefix, caseSense, importing, false)
+            }
+          }
+          case e => {
+            log.warn("Unrecognized type element " + e)
+            List()
           }
         }
-        case e => {
-          log.warn("Unrecognized type element " + e)
-          List()
-        }
       }
-    }.getOrElse(List())
+      .getOrElse(List())
     candidates.toList
   }
 

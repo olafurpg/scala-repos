@@ -133,24 +133,30 @@ class LinearRegressionSuite
     * so we can validate the training accuracy compared with R's glmnet package.
     */
   ignore("export test data into CSV format") {
-    datasetWithDenseFeature.rdd.map {
-      case Row(label: Double, features: Vector) =>
-        label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    datasetWithDenseFeature.rdd
+      .map {
+        case Row(label: Double, features: Vector) =>
+          label + "," + features.toArray.mkString(",")
+      }
+      .repartition(1)
       .saveAsTextFile(
         "target/tmp/LinearRegressionSuite/datasetWithDenseFeature")
 
-    datasetWithDenseFeatureWithoutIntercept.rdd.map {
-      case Row(label: Double, features: Vector) =>
-        label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    datasetWithDenseFeatureWithoutIntercept.rdd
+      .map {
+        case Row(label: Double, features: Vector) =>
+          label + "," + features.toArray.mkString(",")
+      }
+      .repartition(1)
       .saveAsTextFile(
         "target/tmp/LinearRegressionSuite/datasetWithDenseFeatureWithoutIntercept")
 
-    datasetWithSparseFeature.rdd.map {
-      case Row(label: Double, features: Vector) =>
-        label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    datasetWithSparseFeature.rdd
+      .map {
+        case Row(label: Double, features: Vector) =>
+          label + "," + features.toArray.mkString(",")
+      }
+      .repartition(1)
       .saveAsTextFile(
         "target/tmp/LinearRegressionSuite/datasetWithSparseFeature")
   }

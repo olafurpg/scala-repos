@@ -55,25 +55,27 @@ private[spark] object MetadataUtils {
     if (metadata.attributes.isEmpty) {
       HashMap.empty[Int, Int]
     } else {
-      metadata.attributes.get.zipWithIndex.flatMap {
-        case (attr, idx) =>
-          if (attr == null) {
-            Iterator()
-          } else {
-            attr match {
-              case _: NumericAttribute | UnresolvedAttribute => Iterator()
-              case binAttr: BinaryAttribute => Iterator(idx -> 2)
-              case nomAttr: NominalAttribute =>
-                nomAttr.getNumValues match {
-                  case Some(numValues: Int) => Iterator(idx -> numValues)
-                  case None =>
-                    throw new IllegalArgumentException(
-                      s"Feature $idx is marked as" +
-                        " Nominal (categorical), but it does not have the number of values specified.")
-                }
+      metadata.attributes.get.zipWithIndex
+        .flatMap {
+          case (attr, idx) =>
+            if (attr == null) {
+              Iterator()
+            } else {
+              attr match {
+                case _: NumericAttribute | UnresolvedAttribute => Iterator()
+                case binAttr: BinaryAttribute => Iterator(idx -> 2)
+                case nomAttr: NominalAttribute =>
+                  nomAttr.getNumValues match {
+                    case Some(numValues: Int) => Iterator(idx -> numValues)
+                    case None =>
+                      throw new IllegalArgumentException(
+                        s"Feature $idx is marked as" +
+                          " Nominal (categorical), but it does not have the number of values specified.")
+                  }
+              }
             }
-          }
-      }.toMap
+        }
+        .toMap
     }
   }
 

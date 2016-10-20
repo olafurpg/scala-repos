@@ -64,9 +64,11 @@ class WebSocketDirectivesSpec extends RoutingSpec {
     }
     "reject websocket requests if no subprotocol matches" in {
       WS("http://localhost/", Flow[Message], List("other")) ~> websocketMultipleProtocolRoute ~> check {
-        rejections.collect {
-          case UnsupportedWebSocketSubprotocolRejection(p) ⇒ p
-        }.toSet shouldEqual Set("greeter", "echo")
+        rejections
+          .collect {
+            case UnsupportedWebSocketSubprotocolRejection(p) ⇒ p
+          }
+          .toSet shouldEqual Set("greeter", "echo")
       }
 
       WS("http://localhost/", Flow[Message], List("other")) ~> Route.seal(

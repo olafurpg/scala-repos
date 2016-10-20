@@ -85,17 +85,20 @@ object TimePathedSource extends java.io.Serializable {
     val stepSize: Option[Duration] = List("%1$tH" -> Hours(1),
                                           "%1$td" -> Days(1)(tz),
                                           "%1$tm" -> Months(1)(tz),
-                                          "%1$tY" -> Years(1)(tz)).find {
-      unitDur: (String, Duration) =>
+                                          "%1$tY" -> Years(1)(tz))
+      .find { unitDur: (String, Duration) =>
         pattern.contains(unitDur._1)
-    }.map(_._2)
+      }
+      .map(_._2)
 
     def allPaths(dateRange: DateRange): Iterable[(DateRange, String)] =
-      stepSize.map {
-        dateRange.each(_).map { dr =>
-          (dr, toPath(dr.start))
+      stepSize
+        .map {
+          dateRange.each(_).map { dr =>
+            (dr, toPath(dr.start))
+          }
         }
-      }.getOrElse(List((dateRange, pattern))) // This must not have any time after all
+        .getOrElse(List((dateRange, pattern))) // This must not have any time after all
 
     def pathIsGood(p: String): Boolean = {
       val path = new Path(p)
@@ -109,7 +112,8 @@ object TimePathedSource extends java.io.Serializable {
     }
 
     val vertractor = { (dr: DateRange) =>
-      allPaths(dr).takeWhile { case (_, path) => pathIsGood(path) }
+      allPaths(dr)
+        .takeWhile { case (_, path) => pathIsGood(path) }
         .map(_._1)
         .reduceOption { (older, newer) =>
           DateRange(older.start, newer.end)

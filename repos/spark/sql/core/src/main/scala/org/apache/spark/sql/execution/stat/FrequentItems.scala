@@ -90,10 +90,12 @@ private[sql] object FrequentItems extends Logging {
     val sizeOfMap = (1 / support).toInt
     val countMaps = Seq.tabulate(numCols)(i => new FreqItemCounter(sizeOfMap))
     val originalSchema = df.schema
-    val colInfo: Array[(String, DataType)] = cols.map { name =>
-      val index = originalSchema.fieldIndex(name)
-      (name, originalSchema.fields(index).dataType)
-    }.toArray
+    val colInfo: Array[(String, DataType)] = cols
+      .map { name =>
+        val index = originalSchema.fieldIndex(name)
+        (name, originalSchema.fields(index).dataType)
+      }
+      .toArray
 
     val freqItems = df
       .select(cols.map(Column(_)): _*)

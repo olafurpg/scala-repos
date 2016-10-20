@@ -105,9 +105,12 @@ private object YarnExternalShuffleDriver extends Logging with Matchers {
         .collect()
         .toSet
       sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
-      data should be((0 until 10).map { x =>
-        x -> (x * 10 + 450)
-      }.toSet)
+      data should be(
+        (0 until 10)
+          .map { x =>
+            x -> (x * 10 + 450)
+          }
+          .toSet)
       result = "success"
       // only one process can open a leveldb file at a time, so we copy the files
       FileUtils.copyDirectory(registeredExecFile, execStateCopy)

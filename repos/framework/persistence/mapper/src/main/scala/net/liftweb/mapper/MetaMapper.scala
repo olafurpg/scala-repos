@@ -415,9 +415,10 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
   private def distinct(in: Seq[QueryParam[A]]): String =
     in.find {
-      case Distinct() => true
-      case _ => false
-    }.isDefined match {
+        case Distinct() => true
+        case _ => false
+      }
+      .isDefined match {
       case false => ""
       case true => " DISTINCT "
     }
@@ -826,11 +827,15 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
   }
 
   def whatToSet(toSave: A): String = {
-    mappedColumns.filter { c =>
-      ??(c._2, toSave).dirty_?
-    }.map { c =>
-      c._1 + " = ?"
-    }.toList.mkString("", ",", "")
+    mappedColumns
+      .filter { c =>
+        ??(c._2, toSave).dirty_?
+      }
+      .map { c =>
+        c._1 + " = ?"
+      }
+      .toList
+      .mkString("", ",", "")
   }
 
   /**
@@ -838,13 +843,14 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * without the notifications.  This method can be over-ridden.
     */
   protected def runValidationList(toValidate: A): List[FieldError] =
-    mappedFieldList.flatMap(f => ??(f.method, toValidate).validate) ::: validation.flatMap {
-      case pf: PartialFunction[A, List[FieldError]] =>
-        if (pf.isDefinedAt(toValidate)) pf(toValidate)
-        else Nil
+    mappedFieldList.flatMap(f => ??(f.method, toValidate).validate) ::: validation
+      .flatMap {
+        case pf: PartialFunction[A, List[FieldError]] =>
+          if (pf.isDefinedAt(toValidate)) pf(toValidate)
+          else Nil
 
-      case f => f(toValidate)
-    }
+        case f => f(toValidate)
+      }
 
   final def validate(toValidate: A): List[FieldError] = {
     logger.debug("Validating dbName=%s, entity=%s".format(dbName, toValidate))
@@ -1923,10 +1929,12 @@ sealed abstract class InThing[OuterType <: Mapper[OuterType]]
   def inKeyword = if (notIn) " NOT IN " else " IN "
 
   def distinct: String =
-    queryParams.find {
-      case Distinct() => true
-      case _ => false
-    }.isDefined match {
+    queryParams
+      .find {
+        case Distinct() => true
+        case _ => false
+      }
+      .isDefined match {
       case false => ""
       case true => " DISTINCT "
     }
@@ -1979,9 +1987,11 @@ object NotIn {
 
       def notIn: Boolean = true
 
-      val queryParams: List[QueryParam[InnerMapper]] = qp.map { v =>
-        val r: QueryParam[InnerMapper] = v; r
-      }.toList
+      val queryParams: List[QueryParam[InnerMapper]] = qp
+        .map { v =>
+          val r: QueryParam[InnerMapper] = v; r
+        }
+        .toList
     }
   }
 
@@ -2005,8 +2015,9 @@ object NotIn {
 
       val queryParams: List[QueryParam[InnerMapper]] = {
         qp.map { v =>
-          val r: QueryParam[InnerMapper] = v; r
-        }.toList
+            val r: QueryParam[InnerMapper] = v; r
+          }
+          .toList
       }
     }
   }
@@ -2030,9 +2041,11 @@ object In {
 
       def notIn: Boolean = false
 
-      val queryParams: List[QueryParam[InnerMapper]] = qp.map { v =>
-        val r: QueryParam[InnerMapper] = v; r
-      }.toList
+      val queryParams: List[QueryParam[InnerMapper]] = qp
+        .map { v =>
+          val r: QueryParam[InnerMapper] = v; r
+        }
+        .toList
     }
   }
 
@@ -2056,8 +2069,9 @@ object In {
 
       val queryParams: List[QueryParam[InnerMapper]] = {
         qp.map { v =>
-          val r: QueryParam[InnerMapper] = v; r
-        }.toList
+            val r: QueryParam[InnerMapper] = v; r
+          }
+          .toList
       }
     }
   }

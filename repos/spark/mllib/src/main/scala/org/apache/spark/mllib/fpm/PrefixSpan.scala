@@ -141,15 +141,17 @@ class PrefixSpan private (private var minSupport: Double,
     logInfo(s"minimum count for a frequent pattern: $minCount")
 
     // Find frequent items.
-    val freqItemAndCounts = data.flatMap { itemsets =>
-      val uniqItems = mutable.Set.empty[Item]
-      itemsets.foreach {
-        _.foreach { item =>
-          uniqItems += item
+    val freqItemAndCounts = data
+      .flatMap { itemsets =>
+        val uniqItems = mutable.Set.empty[Item]
+        itemsets.foreach {
+          _.foreach { item =>
+            uniqItems += item
+          }
         }
+        uniqItems.toIterator.map((_, 1L))
       }
-      uniqItems.toIterator.map((_, 1L))
-    }.reduceByKey(_ + _)
+      .reduceByKey(_ + _)
       .filter {
         case (_, count) =>
           count >= minCount
@@ -160,30 +162,32 @@ class PrefixSpan private (private var minSupport: Double,
 
     // Keep only frequent items from input sequences and convert them to internal storage.
     val itemToInt = freqItems.zipWithIndex.toMap
-    val dataInternalRepr = data.flatMap { itemsets =>
-      val allItems = mutable.ArrayBuilder.make[Int]
-      var containsFreqItems = false
-      allItems += 0
-      itemsets.foreach { itemsets =>
-        val items = mutable.ArrayBuilder.make[Int]
-        itemsets.foreach { item =>
-          if (itemToInt.contains(item)) {
-            items += itemToInt(item) + 1 // using 1-indexing in internal format
-          }
-        }
-        val result = items.result()
-        if (result.nonEmpty) {
-          containsFreqItems = true
-          allItems ++= result.sorted
-        }
+    val dataInternalRepr = data
+      .flatMap { itemsets =>
+        val allItems = mutable.ArrayBuilder.make[Int]
+        var containsFreqItems = false
         allItems += 0
+        itemsets.foreach { itemsets =>
+          val items = mutable.ArrayBuilder.make[Int]
+          itemsets.foreach { item =>
+            if (itemToInt.contains(item)) {
+              items += itemToInt(item) + 1 // using 1-indexing in internal format
+            }
+          }
+          val result = items.result()
+          if (result.nonEmpty) {
+            containsFreqItems = true
+            allItems ++= result.sorted
+          }
+          allItems += 0
+        }
+        if (containsFreqItems) {
+          Iterator.single(allItems.result())
+        } else {
+          Iterator.empty
+        }
       }
-      if (containsFreqItems) {
-        Iterator.single(allItems.result())
-      } else {
-        Iterator.empty
-      }
-    }.persist(StorageLevel.MEMORY_AND_DISK)
+      .persist(StorageLevel.MEMORY_AND_DISK)
 
     val results = genFreqPatterns(dataInternalRepr,
                                   minCount,
@@ -281,17 +285,21 @@ object PrefixSpan extends Logging {
       logInfo(s"number of small prefixes: ${smallPrefixes.size}")
       logInfo(s"number of large prefixes: ${largePrefixes.size}")
       val largePrefixArray = largePrefixes.values.toArray
-      val freqPrefixes = postfixes.flatMap { postfix =>
-        largePrefixArray.flatMap { prefix =>
-          postfix.project(prefix).genPrefixItems.map {
-            case (item, postfixSize) =>
-              ((prefix.id, item), (1L, postfixSize))
+      val freqPrefixes = postfixes
+        .flatMap { postfix =>
+          largePrefixArray.flatMap { prefix =>
+            postfix.project(prefix).genPrefixItems.map {
+              case (item, postfixSize) =>
+                ((prefix.id, item), (1L, postfixSize))
+            }
           }
         }
-      }.reduceByKey {
-        case ((c0, s0), (c1, s1)) =>
-          (c0 + c1, s0 + s1)
-      }.filter { case (_, (c, _)) => c >= minCount }.collect()
+        .reduceByKey {
+          case ((c0, s0), (c1, s1)) =>
+            (c0 + c1, s0 + s1)
+        }
+        .filter { case (_, (c, _)) => c >= minCount }
+        .collect()
       val newLargePrefixes = mutable.Map.empty[Int, Prefix]
       freqPrefixes.foreach {
         case ((id, item), (count, projDBSize)) =>
@@ -316,22 +324,27 @@ object PrefixSpan extends Logging {
     if (numSmallPrefixes > 0) {
       // Switch to local processing.
       val bcSmallPrefixes = sc.broadcast(smallPrefixes)
-      val distributedFreqPattern = postfixes.flatMap { postfix =>
-        bcSmallPrefixes.value.values.map { prefix =>
-          (prefix.id, postfix.project(prefix).compressed)
-        }.filter(_._2.nonEmpty)
-      }.groupByKey().flatMap {
-        case (id, projPostfixes) =>
-          val prefix = bcSmallPrefixes.value(id)
-          val localPrefixSpan =
-            new LocalPrefixSpan(minCount, maxPatternLength - prefix.length)
-          // TODO: We collect projected postfixes into memory. We should also compare the performance
-          // TODO: of keeping them on shuffle files.
-          localPrefixSpan.run(projPostfixes.toArray).map {
-            case (pattern, count) =>
-              (prefix.items ++ pattern, count)
-          }
-      }
+      val distributedFreqPattern = postfixes
+        .flatMap { postfix =>
+          bcSmallPrefixes.value.values
+            .map { prefix =>
+              (prefix.id, postfix.project(prefix).compressed)
+            }
+            .filter(_._2.nonEmpty)
+        }
+        .groupByKey()
+        .flatMap {
+          case (id, projPostfixes) =>
+            val prefix = bcSmallPrefixes.value(id)
+            val localPrefixSpan =
+              new LocalPrefixSpan(minCount, maxPatternLength - prefix.length)
+            // TODO: We collect projected postfixes into memory. We should also compare the performance
+            // TODO: of keeping them on shuffle files.
+            localPrefixSpan.run(projPostfixes.toArray).map {
+              case (pattern, count) =>
+                (prefix.items ++ pattern, count)
+            }
+        }
       // Union local frequent patterns and distributed ones.
       freqPatterns = freqPatterns ++ distributedFreqPattern
     }

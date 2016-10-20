@@ -394,18 +394,21 @@ trait Completion { self: RichPresentationCompiler =>
         val memberSyms = packageMembers(sym).filterNot { s =>
           s == NoSymbol || s.nameString.contains("$")
         }
-        memberSyms.flatMap { s =>
-          val name =
-            if (s.hasPackageFlag) { s.nameString } else { typeShortName(s) }
-          if (name.startsWith(prefix))
-            Some(
-              CompletionInfo(name,
-                             CompletionSignature(List.empty, "", false),
-                             isCallable = false,
-                             50,
-                             None))
-          else None
-        }.toList.sortBy(ci => (ci.relevance, ci.name))
+        memberSyms
+          .flatMap { s =>
+            val name =
+              if (s.hasPackageFlag) { s.nameString } else { typeShortName(s) }
+            if (name.startsWith(prefix))
+              Some(
+                CompletionInfo(name,
+                               CompletionSignature(List.empty, "", false),
+                               isCallable = false,
+                               50,
+                               None))
+            else None
+          }
+          .toList
+          .sortBy(ci => (ci.relevance, ci.name))
       case _ => List.empty
     }
   }
@@ -440,20 +443,23 @@ object CompletionUtil {
     val req = TypeCompletionsReq(prefix, maxResults)
     import scala.concurrent.ExecutionContext.Implicits.{global => exe}
     val askRes = Patterns.ask(indexer, req, Timeout(1000.milliseconds))
-    askRes.map {
-      case s: SymbolSearchResults =>
-        s.syms.map { s =>
-          CompletionInfo(
-            s.localName,
-            CompletionSignature(List.empty, s.name, false),
-            isCallable = false,
-            40,
-            None
-          )
-        }
-      case unknown =>
-        throw new IllegalStateException(
-          "Unexpected response type from request:" + unknown)
-    }.map(Some(_)).recover { case _ => None }
+    askRes
+      .map {
+        case s: SymbolSearchResults =>
+          s.syms.map { s =>
+            CompletionInfo(
+              s.localName,
+              CompletionSignature(List.empty, s.name, false),
+              isCallable = false,
+              40,
+              None
+            )
+          }
+        case unknown =>
+          throw new IllegalStateException(
+            "Unexpected response type from request:" + unknown)
+      }
+      .map(Some(_))
+      .recover { case _ => None }
   }
 }

@@ -122,21 +122,24 @@ object LiftSession {
 
       pp match {
         case Full(ParamPair(value, clz)) =>
-          const.find { cp =>
-            {
-              cp.getParameterTypes.length == 2 &&
-              cp.getParameterTypes().apply(0).isAssignableFrom(clz) && cp
-                .getParameterTypes()
-                .apply(1)
-                .isAssignableFrom(classOf[LiftSession])
+          const
+            .find { cp =>
+              {
+                cp.getParameterTypes.length == 2 &&
+                cp.getParameterTypes().apply(0).isAssignableFrom(clz) && cp
+                  .getParameterTypes()
+                  .apply(1)
+                  .isAssignableFrom(classOf[LiftSession])
+              }
             }
-          }.map(const => PAndSessionConstructor(const)) orElse const.find {
-            cp =>
+            .map(const => PAndSessionConstructor(const)) orElse const
+            .find { cp =>
               {
                 cp.getParameterTypes.length == 1 &&
                 cp.getParameterTypes().apply(0).isAssignableFrom(clz)
               }
-          }.map(const => PConstructor(const)) orElse nullConstructor()
+            }
+            .map(const => PConstructor(const)) orElse nullConstructor()
 
         case _ =>
           nullConstructor()
@@ -491,21 +494,23 @@ class LiftSession(private[http] val _contextPath: String,
   // accessed.
   def cometForHost(hostAndPath: String)
     : (Vector[(LiftActor, Req)], Vector[(LiftActor, Req)]) =
-    asyncSync.synchronized {
-      cometList
-    }.foldLeft((Vector[(LiftActor, Req)](), Vector[(LiftActor, Req)]())) {
-      (soFar, current) =>
-        (soFar, current) match {
-          case ((valid, invalid), pair @ (_, r)) =>
-            try {
-              if (r.hostAndPath == hostAndPath) (valid :+ pair, invalid)
-              else soFar
-            } catch {
-              case exception: Exception =>
-                (valid, invalid :+ pair)
-            }
-        }
-    }
+    asyncSync
+      .synchronized {
+        cometList
+      }
+      .foldLeft((Vector[(LiftActor, Req)](), Vector[(LiftActor, Req)]())) {
+        (soFar, current) =>
+          (soFar, current) match {
+            case ((valid, invalid), pair @ (_, r)) =>
+              try {
+                if (r.hostAndPath == hostAndPath) (valid :+ pair, invalid)
+                else soFar
+              } catch {
+                case exception: Exception =>
+                  (valid, invalid :+ pair)
+              }
+          }
+      }
 
   private[http] def enterComet(what: (LiftActor, Req)): Unit =
     asyncSync.synchronized {
@@ -547,8 +552,8 @@ class LiftSession(private[http] val _contextPath: String,
 
     val toRun = {
       // get all the commands, sorted by owner,
-      (state.uploadedFiles.map(_.name) ::: state.paramNames).distinct.flatMap {
-        parameterName =>
+      (state.uploadedFiles.map(_.name) ::: state.paramNames).distinct
+        .flatMap { parameterName =>
           val callback =
             Box.legacyNullTest(nmessageCallback.get(parameterName))
 
@@ -559,21 +564,22 @@ class LiftSession(private[http] val _contextPath: String,
             .map(funcHolder =>
               RunnerHolder(parameterName, funcHolder, funcHolder.owner))
             .toList
-      }.sortWith {
-        case (RunnerHolder(_, _, Full(a)), RunnerHolder(_, _, Full(b)))
-            if a < b =>
-          true
-        case (RunnerHolder(_, _, Full(a)), RunnerHolder(_, _, Full(b)))
-            if a > b =>
-          false
-        case (RunnerHolder(an, _, Full(a)), RunnerHolder(bn, _, Full(b)))
-            if a == b =>
-          an < bn
-        case (RunnerHolder(_, _, Full(_)), _) => false
-        case (_, RunnerHolder(_, _, Full(_))) => true
-        case (RunnerHolder(a, _, _), RunnerHolder(b, _, _)) => a < b
-        case _ => false
-      }
+        }
+        .sortWith {
+          case (RunnerHolder(_, _, Full(a)), RunnerHolder(_, _, Full(b)))
+              if a < b =>
+            true
+          case (RunnerHolder(_, _, Full(a)), RunnerHolder(_, _, Full(b)))
+              if a > b =>
+            false
+          case (RunnerHolder(an, _, Full(a)), RunnerHolder(bn, _, Full(b)))
+              if a == b =>
+            an < bn
+          case (RunnerHolder(_, _, Full(_)), _) => false
+          case (_, RunnerHolder(_, _, Full(_))) => true
+          case (RunnerHolder(a, _, _), RunnerHolder(b, _, _)) => a < b
+          case _ => false
+        }
     }
 
     def buildFunc(i: RunnerHolder): () => Any = i.func match {
@@ -1461,10 +1467,12 @@ class LiftSession(private[http] val _contextPath: String,
     */
   def findAndProcessTemplate(name: List[String]): Box[Elem] = {
     def findElem(in: NodeSeq): Box[Elem] =
-      in.toList.flatMap {
-        case e: Elem => Some(e)
-        case _ => None
-      }.headOption
+      in.toList
+        .flatMap {
+          case e: Elem => Some(e)
+          case _ => None
+        }
+        .headOption
 
     for {
       template <- Templates(name, S.locale) ?~
@@ -1730,11 +1738,12 @@ class LiftSession(private[http] val _contextPath: String,
 
     val ret: NodeSeq = try {
 
-      snippetName.map { snippet =>
-        val (cls, method) = splitColonPair(snippet)
-        S.doSnippet(snippet)(runWhitelist(snippet, cls, method, kids) {
-          (S.locateMappedSnippet(snippet).map(_(kids)) or locSnippet(snippet))
-            .openOr(S.locateSnippet(snippet).map(_(kids)) openOr {
+      snippetName
+        .map { snippet =>
+          val (cls, method) = splitColonPair(snippet)
+          S.doSnippet(snippet)(runWhitelist(snippet, cls, method, kids) {
+            (S.locateMappedSnippet(snippet).map(_(kids)) or locSnippet(
+              snippet)).openOr(S.locateSnippet(snippet).map(_(kids)) openOr {
 
               (locateAndCacheSnippet(cls)) match {
                 // deal with a stateless request when a snippet has
@@ -1899,14 +1908,15 @@ class LiftSession(private[http] val _contextPath: String,
                                      wholeTag)
               }
             })
-        })
-      }.openOr {
-        reportSnippetError(page,
-                           snippetName,
-                           LiftRules.SnippetFailures.NoNameSpecified,
-                           NodeSeq.Empty,
-                           wholeTag)
-      }
+          })
+        }
+        .openOr {
+          reportSnippetError(page,
+                             snippetName,
+                             LiftRules.SnippetFailures.NoNameSpecified,
+                             NodeSeq.Empty,
+                             wholeTag)
+        }
     } catch {
       case ExclosedSnippetFailure(e) =>
         reportSnippetError(page,
@@ -2133,22 +2143,24 @@ class LiftSession(private[http] val _contextPath: String,
     def unapply(in: Node): Option[DataAttributeProcessorAnswer] = {
       in match {
         case element: Elem if dataAttributeProcessors.nonEmpty =>
-          element.attributes.toStream.flatMap {
-            case UnprefixedAttribute(key, value, _)
-                if key.toLowerCase().startsWith("data-") =>
-              val dataProcessorName = key.substring(5).toLowerCase()
-              val dataProcessorInputValue = value.text
-              val filteredElement = removeAttribute(key, element)
+          element.attributes.toStream
+            .flatMap {
+              case UnprefixedAttribute(key, value, _)
+                  if key.toLowerCase().startsWith("data-") =>
+                val dataProcessorName = key.substring(5).toLowerCase()
+                val dataProcessorInputValue = value.text
+                val filteredElement = removeAttribute(key, element)
 
-              NamedPF.applyBox(
-                (dataProcessorName,
-                 dataProcessorInputValue,
-                 filteredElement,
-                 LiftSession.this),
-                dataAttributeProcessors
-              )
-            case _ => Empty
-          }.headOption
+                NamedPF.applyBox(
+                  (dataProcessorName,
+                   dataProcessorInputValue,
+                   filteredElement,
+                   LiftSession.this),
+                  dataAttributeProcessors
+                )
+              case _ => Empty
+            }
+            .headOption
 
         case _ => None
       }
@@ -2462,10 +2474,12 @@ class LiftSession(private[http] val _contextPath: String,
 
     testStatefulFeature {
       import scala.collection.JavaConversions._
-      nasyncComponents.flatMap {
-        case (CometId(name, _), value) if name == theType => Full(value)
-        case _ => Empty
-      }.toList
+      nasyncComponents
+        .flatMap {
+          case (CometId(name, _), value) if name == theType => Full(value)
+          case _ => Empty
+        }
+        .toList
     }
   }
 
@@ -2753,8 +2767,9 @@ class LiftSession(private[http] val _contextPath: String,
           case Nil => s
           case xs =>
             xs.map {
-              case (id, replacement) => (("#" + id) #> replacement)
-            }.reduceLeft(_ & _)(s)
+                case (id, replacement) => (("#" + id) #> replacement)
+              }
+              .reduceLeft(_ & _)(s)
         }
       case _ => atWhat.valuesIterator.toSeq.flatMap(_.toSeq).toList
     }
@@ -3088,11 +3103,18 @@ private object SnippetNode {
       baseNode: Node): Option[(Elem, NodeSeq, Boolean, MetaData, String)] =
     baseNode match {
       case elm: Elem if elm.prefix == "lift" || elm.prefix == "l" => {
-        Some((elm, elm.child, elm.attributes.find {
-          case p: PrefixedAttribute =>
-            p.pre == "lift" && (p.key == "parallel")
-          case _ => false
-        }.isDefined, elm.attributes, elm.label))
+        Some(
+          (elm,
+           elm.child,
+           elm.attributes
+             .find {
+               case p: PrefixedAttribute =>
+                 p.pre == "lift" && (p.key == "parallel")
+               case _ => false
+             }
+             .isDefined,
+           elm.attributes,
+           elm.label))
       }
 
       case elm: Elem => {
@@ -3110,10 +3132,12 @@ private object SnippetNode {
           (newElm,
            newElm,
            par ||
-             (lift.find {
-               case up: UnprefixedAttribute if up.key == "parallel" => true
-               case _ => false
-             }.flatMap(up => AsBoolean.unapply(up.value.text)) getOrElse false),
+             (lift
+               .find {
+                 case up: UnprefixedAttribute if up.key == "parallel" => true
+                 case _ => false
+               }
+               .flatMap(up => AsBoolean.unapply(up.value.text)) getOrElse false),
            lift,
            snippetName)
         }

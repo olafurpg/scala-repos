@@ -117,11 +117,14 @@ class Summer[Key, Value: Semigroup, Event, S, D, RC](
       .map {
         case (k, beforeF) =>
           val (tups, delta) = kvs(k)
-          (tups, beforeF.flatMap { before =>
-            lockedOp.get.apply((k, (before, delta)))
-          }.onSuccess { _ =>
-            successHandlerOpt.get.handlerFn.apply()
-          })
+          (tups,
+           beforeF
+             .flatMap { before =>
+               lockedOp.get.apply((k, (before, delta)))
+             }
+             .onSuccess { _ =>
+               successHandlerOpt.get.handlerFn.apply()
+             })
       }
       .toList
 

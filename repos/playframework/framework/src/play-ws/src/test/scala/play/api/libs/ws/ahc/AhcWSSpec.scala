@@ -368,15 +368,17 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       actual.getRealm must beNull
     }
 
-    val patchFakeApp = GuiceApplicationBuilder().routes {
-      case ("PATCH", "/") =>
-        Action {
-          Results.Ok(play.api.libs.json.Json.parse("""{
+    val patchFakeApp = GuiceApplicationBuilder()
+      .routes {
+        case ("PATCH", "/") =>
+          Action {
+            Results.Ok(play.api.libs.json.Json.parse("""{
             |  "data": "body"
             |}
           """.stripMargin))
-        }
-    }.build()
+          }
+      }
+      .build()
 
     "support patch method" in new WithServer(patchFakeApp) {
       // NOTE: if you are using a client proxy like Privoxy or Polipo, your proxy may not support PATCH & return 400.
@@ -596,10 +598,12 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
   "Ahc WS Config" should {
     "support overriding secure default values" in {
-      val ahcConfig = new AhcConfigBuilder().modifyUnderlying { builder =>
-        builder.setCompressionEnforced(false)
-        builder.setFollowRedirect(false)
-      }.build()
+      val ahcConfig = new AhcConfigBuilder()
+        .modifyUnderlying { builder =>
+          builder.setCompressionEnforced(false)
+          builder.setFollowRedirect(false)
+        }
+        .build()
       ahcConfig.isCompressionEnforced must beFalse
       ahcConfig.isFollowRedirect must beFalse
       ahcConfig.getConnectTimeout must_== 120000

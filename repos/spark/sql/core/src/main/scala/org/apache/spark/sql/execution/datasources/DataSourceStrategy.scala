@@ -70,9 +70,11 @@ private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
       }
 
       val outputPath = t.location.paths.head
-      val inputPaths = query.collect {
-        case LogicalRelation(r: HadoopFsRelation, _, _) => r.location.paths
-      }.flatten
+      val inputPaths = query
+        .collect {
+          case LogicalRelation(r: HadoopFsRelation, _, _) => r.location.paths
+        }
+        .flatten
 
       val mode = if (overwrite) SaveMode.Overwrite else SaveMode.Append
       if (overwrite && inputPaths.contains(outputPath)) {

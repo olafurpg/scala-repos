@@ -345,11 +345,13 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     */
   private def findTestAccum(
       accums: Iterable[AccumulableInfo]): AccumulableInfo = {
-    accums.find { a =>
-      a.name == Some(TEST_ACCUM)
-    }.getOrElse {
-      fail(s"unable to find internal accumulator called $TEST_ACCUM")
-    }
+    accums
+      .find { a =>
+        a.name == Some(TEST_ACCUM)
+      }
+      .getOrElse {
+        fail(s"unable to find internal accumulator called $TEST_ACCUM")
+      }
   }
 
   /**

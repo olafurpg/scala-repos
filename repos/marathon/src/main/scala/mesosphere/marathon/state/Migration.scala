@@ -97,14 +97,16 @@ class Migration @Inject()(store: PersistentStore,
       storedVersion <- storeCurrentVersion
     } yield storedVersion
 
-    val result = versionFuture.map { version =>
-      log.info(s"Migration successfully applied for version ${version.str}")
-      version
-    }.recover {
-      case ex: MigrationFailedException => throw ex
-      case NonFatal(ex) =>
-        throw new MigrationFailedException("MigrationFailed", ex)
-    }
+    val result = versionFuture
+      .map { version =>
+        log.info(s"Migration successfully applied for version ${version.str}")
+        version
+      }
+      .recover {
+        case ex: MigrationFailedException => throw ex
+        case NonFatal(ex) =>
+          throw new MigrationFailedException("MigrationFailed", ex)
+      }
 
     Await.result(result, Duration.Inf)
   }

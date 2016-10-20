@@ -178,11 +178,14 @@ class HoconObjectEntryMover extends LineMover {
           val prefix =
             adjacentField.keyedField.fieldsInPathForward.map(keyString).toList
           val removablePrefix =
-            field.keyedField.fieldsInPathForward.takeWhile {
-              case prefixed: HPrefixedField =>
-                prefixed.subField.getTextRange.contains(offset)
-              case _ => false
-            }.map(keyString).toList
+            field.keyedField.fieldsInPathForward
+              .takeWhile {
+                case prefixed: HPrefixedField =>
+                  prefixed.subField.getTextRange.contains(offset)
+                case _ => false
+              }
+              .map(keyString)
+              .toList
           if (removablePrefix.startsWith(prefix)) Some(prefix) else None
         }
       } yield (adjacentField, prefixToRemove)

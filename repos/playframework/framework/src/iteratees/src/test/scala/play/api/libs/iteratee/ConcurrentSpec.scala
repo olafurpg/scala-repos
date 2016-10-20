@@ -126,10 +126,10 @@ object ConcurrentSpec
           Enumerator[Long](1, 2, 3, 4, 5, 6, 7, 8, 9, 10) >>> Enumerator.eof
         val preparedMapEC = mapEC.prepare()
         val result =
-          fastEnumerator |>>> (Concurrent.buffer(20) &>> slowIteratee).flatMap {
-            l =>
+          fastEnumerator |>>> (Concurrent.buffer(20) &>> slowIteratee)
+            .flatMap { l =>
               Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
-          }(flatMapEC)
+            }(flatMapEC)
 
         Await.result(result, Duration.Inf) must not equalTo
           (List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))

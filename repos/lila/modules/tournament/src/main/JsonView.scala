@@ -160,14 +160,16 @@ final class JsonView(getLightUser: String => Option[LightUser],
     for {
       rankedPlayers <- PlayerRepo
         .bestByTourWithRankByPage(tour.id, 10, page max 1)
-      sheets <- rankedPlayers.map { p =>
-        PairingRepo.finishedByPlayerChronological(tour.id, p.player.userId) map {
-          pairings =>
-            p.player.userId -> tour.system.scoringSystem.sheet(tour,
-                                                               p.player.userId,
-                                                               pairings)
+      sheets <- rankedPlayers
+        .map { p =>
+          PairingRepo.finishedByPlayerChronological(tour.id, p.player.userId) map {
+            pairings =>
+              p.player.userId -> tour.system.scoringSystem
+                .sheet(tour, p.player.userId, pairings)
+          }
         }
-      }.sequenceFu.map(_.toMap)
+        .sequenceFu
+        .map(_.toMap)
     } yield
       Json.obj(
         "page" -> page,

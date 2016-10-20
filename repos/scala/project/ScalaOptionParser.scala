@@ -88,9 +88,11 @@ object ScalaOptionParser {
     val ScalacOpt = sourceFile | UniversalOpt
 
     val ScalaExtraSettings = oneOf(
-      scalaChoiceSettingNames.map {
-        case (k, v) => ChoiceSetting(k, v)
-      }.toList ++ scalaStringSettingNames
+      scalaChoiceSettingNames
+        .map {
+          case (k, v) => ChoiceSetting(k, v)
+        }
+        .toList ++ scalaStringSettingNames
         .map(StringSetting) ++ scalaBooleanSettingNames.map(BooleanSetting))
     val ScalaOpt = UniversalOpt | ScalaExtraSettings
 

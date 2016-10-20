@@ -41,19 +41,28 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   private def buildHistoryAfter(afterYear: Int,
                                 afterMonth: Int,
                                 until: DateTime): Funit =
-    (afterYear to until.getYear).flatMap { year =>
-      ((year == afterYear).fold(afterMonth + 1, 1) to (year == until.getYear)
-        .fold(until.getMonthOfYear, 12)).map { month =>
-        mixedLeaderboard(
-          after = new DateTime(year, month, 1, 0, 0).pp("compute mod history"),
-          before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some
-        ).map {
-          _.headOption.map { champ =>
-            HistoryMonth(HistoryMonth.makeId(year, month), year, month, champ)
+    (afterYear to until.getYear)
+      .flatMap { year =>
+        ((year == afterYear).fold(afterMonth + 1, 1) to (year == until.getYear)
+          .fold(until.getMonthOfYear, 12))
+          .map { month =>
+            mixedLeaderboard(
+              after =
+                new DateTime(year, month, 1, 0, 0).pp("compute mod history"),
+              before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some
+            ).map {
+              _.headOption.map { champ =>
+                HistoryMonth(HistoryMonth.makeId(year, month),
+                             year,
+                             month,
+                             champ)
+              }
+            }
           }
-        }
-      }.toList
-    }.toList.sequenceFu
+          .toList
+      }
+      .toList
+      .sequenceFu
       .map(_.flatten)
       .flatMap {
         _.map { month =>

@@ -50,10 +50,12 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       None
     } else {
       val parsedOptions: JSONOptions = new JSONOptions(options)
-      val jsonFiles = files.filterNot { status =>
-        val name = status.getPath.getName
-        name.startsWith("_") || name.startsWith(".")
-      }.toArray
+      val jsonFiles = files
+        .filterNot { status =>
+          val name = status.getPath.getName
+          name.startsWith("_") || name.startsWith(".")
+        }
+        .toArray
 
       val jsonSchema = InferSchema.infer(
         createBaseRdd(sqlContext, jsonFiles),

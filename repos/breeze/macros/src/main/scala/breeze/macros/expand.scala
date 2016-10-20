@@ -79,10 +79,11 @@ object expand {
         val exclusions = getExclusions(c)(mods, targs.map(_.name))
         val shouldValify = checkValify(c)(mods)
 
-        val typesToUnrollAs: Map[c.Name, List[c.Type]] = typesToExpand.map {
-          td =>
+        val typesToUnrollAs: Map[c.Name, List[c.Type]] = typesToExpand
+          .map { td =>
             (td.name: Name) -> typeMappings(c)(td)
-        }.toMap
+          }
+          .toMap
 
         val (valsToExpand, valsToLeave) =
           vargs.map(_.partition(shouldExpandVarg(c)(_))).unzip
@@ -91,9 +92,12 @@ object expand {
 
         val configurations =
           makeTypeMaps(c)(typesToUnrollAs).filterNot(exclusions.toSet)
-        val valExpansions = valsToExpand2.map { v =>
-          v.name -> solveSequence(c)(v, typesToUnrollAs)
-        }.asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]].toMap
+        val valExpansions = valsToExpand2
+          .map { v =>
+            v.name -> solveSequence(c)(v, typesToUnrollAs)
+          }
+          .asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]]
+          .toMap
 
         val newDefs = configurations.map { typeMap =>
           val grounded = substitute(c)(typeMap, valExpansions, rhs)
@@ -129,9 +133,11 @@ object expand {
 
   private def mkName(c: Context)(name: c.Name,
                                  typeMap: Map[c.Name, c.Type]): String = {
-    name.toString + "_" + typeMap.map {
-      case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
-    }.mkString("_")
+    name.toString + "_" + typeMap
+      .map {
+        case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
+      }
+      .mkString("_")
   }
 
   // valExpansions is a [value identifier -> (
@@ -210,20 +216,22 @@ object expand {
       td: c.mirror.universe.TypeDef): List[c.mirror.universe.Type] = {
     import c.mirror.universe._
 
-    val mods = td.mods.annotations.collect {
-      case tree @ q"new expand.args(...$args)" =>
-        val flatArgs: Seq[Tree] = args.flatten
-        flatArgs.map(c.typeCheck(_)).map { tree =>
-          try {
-            tree.symbol.asModule.companionSymbol.asType.toType
-          } catch {
-            case ex: Exception =>
-              c.abort(
-                tree.pos,
-                s"${tree.symbol} does not have a companion. Is it maybe an alias?")
+    val mods = td.mods.annotations
+      .collect {
+        case tree @ q"new expand.args(...$args)" =>
+          val flatArgs: Seq[Tree] = args.flatten
+          flatArgs.map(c.typeCheck(_)).map { tree =>
+            try {
+              tree.symbol.asModule.companionSymbol.asType.toType
+            } catch {
+              case ex: Exception =>
+                c.abort(
+                  tree.pos,
+                  s"${tree.symbol} does not have a companion. Is it maybe an alias?")
+            }
           }
-        }
-    }.flatten
+      }
+      .flatten
     mods
   }
 
@@ -239,26 +247,31 @@ object expand {
       mods: c.Modifiers,
       targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
     import c.mirror.universe._
-    mods.annotations.collect {
-      case t @ q"new expand.exclude(...$args)" =>
-        for (aa <- args)
-          if (aa.length != targs.length)
-            c.error(
-              t.pos,
-              "arguments to @exclude does not have the same arity as the type symbols!")
-        args.map(
-          aa =>
-            (targs zip aa
-              .map(c.typeCheck(_))
-              .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
-    }.flatten.toSeq
+    mods.annotations
+      .collect {
+        case t @ q"new expand.exclude(...$args)" =>
+          for (aa <- args)
+            if (aa.length != targs.length)
+              c.error(
+                t.pos,
+                "arguments to @exclude does not have the same arity as the type symbols!")
+          args.map(
+            aa =>
+              (targs zip aa
+                .map(c.typeCheck(_))
+                .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
+      }
+      .flatten
+      .toSeq
   }
 
   private def checkValify(c: Context)(mods: c.Modifiers) = {
     import c.mirror.universe._
-    mods.annotations.collectFirst {
-      case q"new expand.valify" => true
-    }.getOrElse(false)
+    mods.annotations
+      .collectFirst {
+        case q"new expand.valify" => true
+      }
+      .getOrElse(false)
   }
 
   private def shouldExpand(c: Context)(

@@ -107,11 +107,12 @@ class SbtRunner(vmExecutable: File,
             sbtCommands.foreach(writer.println)
             writer.flush()
             val result = handle(process, listener)
-            result.map { output =>
-              (structureFile.length > 0).either(
-                XML.load(structureFile.toURI.toURL))(
-                SbtException.fromSbtLog(output))
-            }.getOrElse(Left(new ImportCancelledException))
+            result
+              .map { output =>
+                (structureFile.length > 0).either(XML.load(
+                  structureFile.toURI.toURL))(SbtException.fromSbtLog(output))
+              }
+              .getOrElse(Left(new ImportCancelledException))
         }
       } catch {
         case e: Exception => Left(e)

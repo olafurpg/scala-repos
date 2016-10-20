@@ -119,33 +119,36 @@ class ScalaPatternParameterInfoHandler
               buffer.append(
                 CodeInsightBundle.message("parameter.info.no.parameters"))
             else {
-              buffer.append(params.map {
-                case (param, o) =>
-                  val buffer: StringBuilder = new StringBuilder("")
-                  buffer.append(ScType.presentableText(param))
-                  val isSeq =
-                    methodName == "unapplySeq" &&
-                      (ScType.extractClass(param) match {
-                        case Some(clazz) =>
-                          clazz.qualifiedName == "scala.Seq"
-                        case _ => false
-                      })
-                  if (isSeq) {
-                    buffer.delete(0, buffer.indexOf("[") + 1)
-                    buffer.deleteCharAt(buffer.length - 1)
-                    buffer.append("*")
-                  }
-                  val isBold =
-                    if (o == index || (isSeq && o <= index)) true
-                    else {
-                      //todo: check type
-                      false
-                    }
-                  val paramTypeText = buffer.toString()
-                  val paramText = paramTextFor(sign, o, paramTypeText)
+              buffer.append(
+                params
+                  .map {
+                    case (param, o) =>
+                      val buffer: StringBuilder = new StringBuilder("")
+                      buffer.append(ScType.presentableText(param))
+                      val isSeq =
+                        methodName == "unapplySeq" &&
+                          (ScType.extractClass(param) match {
+                            case Some(clazz) =>
+                              clazz.qualifiedName == "scala.Seq"
+                            case _ => false
+                          })
+                      if (isSeq) {
+                        buffer.delete(0, buffer.indexOf("[") + 1)
+                        buffer.deleteCharAt(buffer.length - 1)
+                        buffer.append("*")
+                      }
+                      val isBold =
+                        if (o == index || (isSeq && o <= index)) true
+                        else {
+                          //todo: check type
+                          false
+                        }
+                      val paramTypeText = buffer.toString()
+                      val paramText = paramTextFor(sign, o, paramTypeText)
 
-                  if (isBold) "<b>" + paramText + "</b>" else paramText
-              }.mkString(", "))
+                      if (isBold) "<b>" + paramText + "</b>" else paramText
+                  }
+                  .mkString(", "))
             }
           }
           case _ =>

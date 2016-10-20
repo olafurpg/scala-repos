@@ -53,18 +53,21 @@ class DataSource(val dsp: DataSourceParams)
                     targetEntityType = Some(Some(EntityType)))(sc)
 
     // collect ratings
-    val ratingsRDD = rateEventsRDD.flatMap { event ⇒
-      try {
-        (event.event match {
-          case "rate" => event.properties.getOpt[Double]("rating")
-          case _ ⇒ None
-        }).map(Rating(event.entityId, event.targetEntityId.get, _))
-      } catch {
-        case e: Exception ⇒
-          logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
-          throw e
+    val ratingsRDD = rateEventsRDD
+      .flatMap { event ⇒
+        try {
+          (event.event match {
+            case "rate" => event.properties.getOpt[Double]("rating")
+            case _ ⇒ None
+          }).map(Rating(event.entityId, event.targetEntityId.get, _))
+        } catch {
+          case e: Exception ⇒
+            logger.error(
+              s"Cannot convert ${event} to Rating. Exception: ${e}.")
+            throw e
+        }
       }
-    }.cache()
+      .cache()
 
     new TrainingData(ratingsRDD, itemsRDD)
   }

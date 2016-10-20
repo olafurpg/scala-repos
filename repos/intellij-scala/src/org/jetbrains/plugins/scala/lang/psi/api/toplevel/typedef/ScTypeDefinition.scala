@@ -108,17 +108,19 @@ trait ScTypeDefinition
             if (typeParameters.isEmpty &&
                 clazz.constructor.get.effectiveParameterClauses.length == 1) {
               val typeElementText =
-                clazz.constructor.get.effectiveParameterClauses.map { clause =>
-                  clause.effectiveParameters
-                    .map(parameter => {
-                      val parameterText = parameter.typeElement.fold(
-                        "_root_.scala.Nothing")(_.getText)
-                      if (parameter.isRepeatedParameter)
-                        s"_root_.scala.Seq[$parameterText]"
-                      else parameterText
-                    })
-                    .mkString("(", ", ", ")")
-                }.mkString("(", " => ", s" => $name)")
+                clazz.constructor.get.effectiveParameterClauses
+                  .map { clause =>
+                    clause.effectiveParameters
+                      .map(parameter => {
+                        val parameterText = parameter.typeElement.fold(
+                          "_root_.scala.Nothing")(_.getText)
+                        if (parameter.isRepeatedParameter)
+                          s"_root_.scala.Seq[$parameterText]"
+                        else parameterText
+                      })
+                      .mkString("(", ", ", ")")
+                  }
+                  .mkString("(", " => ", s" => $name)")
               val typeElement =
                 ScalaPsiElementFactory
                   .createTypeElementFromText(typeElementText, getManager)

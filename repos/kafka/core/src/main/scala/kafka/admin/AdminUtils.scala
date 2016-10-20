@@ -179,10 +179,12 @@ object AdminUtils extends Logging {
       brokerMetadatas: Seq[BrokerMetadata],
       fixedStartIndex: Int,
       startPartitionId: Int): Map[Int, Seq[Int]] = {
-    val brokerRackMap = brokerMetadatas.collect {
-      case BrokerMetadata(id, Some(rack)) =>
-        id -> rack
-    }.toMap
+    val brokerRackMap = brokerMetadatas
+      .collect {
+        case BrokerMetadata(id, Some(rack)) =>
+          id -> rack
+      }
+      .toMap
     val numRacks = brokerRackMap.values.toSet.size
     val arrangedBrokerList = getRackAlternatedBrokerList(brokerRackMap)
     val numBrokers = arrangedBrokerList.size
@@ -270,12 +272,15 @@ object AdminUtils extends Logging {
 
   private[admin] def getInverseMap(
       brokerRackMap: Map[Int, String]): Map[String, Seq[Int]] = {
-    brokerRackMap.toSeq.map { case (id, rack) => (rack, id) }.groupBy {
-      case (rack, _) => rack
-    }.map {
-      case (rack, rackAndIdList) =>
-        (rack, rackAndIdList.map { case (_, id) => id }.sorted)
-    }
+    brokerRackMap.toSeq
+      .map { case (id, rack) => (rack, id) }
+      .groupBy {
+        case (rack, _) => rack
+      }
+      .map {
+        case (rack, rackAndIdList) =>
+          (rack, rackAndIdList.map { case (_, id) => id }.sorted)
+      }
   }
 
   /**

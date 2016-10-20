@@ -102,9 +102,11 @@ class SecurityTask(settings: Settings)
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
       listGrantsFor(apiKey, authApiKey = apiKey).jvalue must beLike {
         case JArray(List(obj)) =>
-          val perms = (obj \ "permissions").children.map { o =>
-            (o \ "path", o \ "ownerAccountIds", o \ "accessType")
-          }.toSet
+          val perms = (obj \ "permissions").children
+            .map { o =>
+              (o \ "path", o \ "ownerAccountIds", o \ "accessType")
+            }
+            .toSet
 
           perms must_== Set(
             (JString("/"), JArray(List(JString(accountId))), JString("read")),

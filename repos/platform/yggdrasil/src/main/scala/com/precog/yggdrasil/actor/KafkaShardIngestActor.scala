@@ -344,47 +344,50 @@ abstract class KafkaShardIngestActor(
         if (runningBatches.get < maxCacheSize) {
           // Funky handling of current count due to the fact that any errors will occur within a future
           runningBatches.getAndIncrement
-          readRemote(lastCheckpoint).onSuccess {
-            case Success((messages, checkpoint)) =>
-              if (messages.size > 0) {
-                logger.debug(
-                  "Sending " + messages.size +
-                    " events to batch ingest handler.")
+          readRemote(lastCheckpoint)
+            .onSuccess {
+              case Success((messages, checkpoint)) =>
+                if (messages.size > 0) {
+                  logger.debug(
+                    "Sending " + messages.size +
+                      " events to batch ingest handler.")
 
-                // update the cache
-                lastCheckpoint = checkpoint
-                ingestCache += (checkpoint -> messages)
+                  // update the cache
+                  lastCheckpoint = checkpoint
+                  ingestCache += (checkpoint -> messages)
 
-                // create a handler for the batch, then reply to the sender with the message set
-                // using that handler reference as the sender to which the ingest system will reply
-                val batchHandler = context.actorOf(
-                  Props(
-                    new BatchHandler(self,
-                                     requestor,
-                                     checkpoint,
-                                     ingestTimeout)))
-                batchHandler.tell(ProjectionUpdatesExpected(messages.size))
-                requestor.tell(IngestData(messages), batchHandler)
-              } else {
-                logger.trace(
-                  "No new data found after checkpoint: " + checkpoint)
+                  // create a handler for the batch, then reply to the sender with the message set
+                  // using that handler reference as the sender to which the ingest system will reply
+                  val batchHandler = context.actorOf(
+                    Props(
+                      new BatchHandler(self,
+                                       requestor,
+                                       checkpoint,
+                                       ingestTimeout)))
+                  batchHandler.tell(ProjectionUpdatesExpected(messages.size))
+                  requestor.tell(IngestData(messages), batchHandler)
+                } else {
+                  logger.trace(
+                    "No new data found after checkpoint: " + checkpoint)
+                  runningBatches.getAndDecrement
+                  requestor ! IngestData(Nil)
+                }
+
+              case Failure(error) =>
+                logger.error(
+                  "Error(s) occurred retrieving data from Kafka: " +
+                    error.message)
                 runningBatches.getAndDecrement
+                requestor ! IngestErrors(
+                  List(
+                    "Error(s) retrieving data from Kafka: " + error.message))
+            }
+            .onFailure {
+              case t: Throwable =>
+                runningBatches.getAndDecrement
+                logger.error("Failure during remote message read", t);
                 requestor ! IngestData(Nil)
-              }
-
-            case Failure(error) =>
-              logger.error(
-                "Error(s) occurred retrieving data from Kafka: " +
-                  error.message)
-              runningBatches.getAndDecrement
-              requestor ! IngestErrors(
-                List("Error(s) retrieving data from Kafka: " + error.message))
-          }.onFailure {
-            case t: Throwable =>
-              runningBatches.getAndDecrement
-              logger.error("Failure during remote message read", t);
-              requestor ! IngestData(Nil)
-          }
+            }
         } else {
 
           logger.warn(
@@ -493,11 +496,13 @@ abstract class KafkaShardIngestActor(
             "Raw kafka deserialization of %d events in %d ms"
               .format(rawMessages.size, t))
         }) {
-          rawMessages.par.map { msgAndOffset =>
-            EventMessageEncoding.read(msgAndOffset.message.payload) map {
-              (msgAndOffset.offset, _)
+          rawMessages.par
+            .map { msgAndOffset =>
+              EventMessageEncoding.read(msgAndOffset.message.payload) map {
+                (msgAndOffset.offset, _)
+              }
             }
-          }.toList
+            .toList
         }
 
       val batched: Validation[Error,

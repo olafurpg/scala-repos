@@ -646,10 +646,12 @@ object Replicator {
                             totChunks: Int)
         extends ReplicatorMessage {
       override def toString: String =
-        (digests.map {
-          case (key, bytes) ⇒
-            key + " -> " + bytes.map(byte ⇒ f"$byte%02x").mkString("")
-        }).mkString("Status(", ", ", ")")
+        (digests
+          .map {
+            case (key, bytes) ⇒
+              key + " -> " + bytes.map(byte ⇒ f"$byte%02x").mkString("")
+          })
+          .mkString("Status(", ", ", ")")
     }
     final case class Gossip(updatedData: Map[String, DataEnvelope],
                             sendBack: Boolean)

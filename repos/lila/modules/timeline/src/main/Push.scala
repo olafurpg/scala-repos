@@ -41,16 +41,18 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
   }
 
   private def propagate(propagations: List[Propagation]): Fu[List[String]] =
-    propagations.map {
-      case Users(ids) => fuccess(ids)
-      case Followers(id) => getFollowerIds(id)
-      case Friends(id) => getFriendIds(id)
-      case StaffFriends(id) =>
-        getFriendIds(id) flatMap UserRepo.byIds map {
-          _ filter Granter(_.StaffForum) map (_.id)
-        }
-      case ExceptUser(_) => fuccess(Nil)
-    }.sequence map { users =>
+    propagations
+      .map {
+        case Users(ids) => fuccess(ids)
+        case Followers(id) => getFollowerIds(id)
+        case Friends(id) => getFriendIds(id)
+        case StaffFriends(id) =>
+          getFriendIds(id) flatMap UserRepo.byIds map {
+            _ filter Granter(_.StaffForum) map (_.id)
+          }
+        case ExceptUser(_) => fuccess(Nil)
+      }
+      .sequence map { users =>
       propagations.foldLeft(users.flatten.distinct) {
         case (us, ExceptUser(id)) => us filter (id !=)
         case (us, _) => us

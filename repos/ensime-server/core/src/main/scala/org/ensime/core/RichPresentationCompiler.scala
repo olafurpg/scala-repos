@@ -298,9 +298,12 @@ class RichPresentationCompiler(
 
   def activeUnits(): List[CompilationUnit] = {
     val invalidSet = toBeRemoved.synchronized { toBeRemoved.toSet }
-    unitOfFile.filter { kv =>
-      !invalidSet.contains(kv._1)
-    }.values.toList
+    unitOfFile
+      .filter { kv =>
+        !invalidSet.contains(kv._1)
+      }
+      .values
+      .toList
   }
 
   /** Called from typechecker every time a top-level class or object is entered.*/
@@ -455,19 +458,21 @@ class RichPresentationCompiler(
       signatureString: Option[String]
   ): Option[Symbol] = {
     symbolByName(fqn).flatMap { owner =>
-      memberName.flatMap { rawName =>
-        val module = rawName.endsWith("$")
-        val nm = if (module) rawName.dropRight(1) else rawName
-        val candidates = owner.info.members.filter { s =>
-          s.nameString == nm &&
-          ((module && s.isModule) ||
-          (!module && (!s.isModule || s.hasPackageFlag)))
+      memberName
+        .flatMap { rawName =>
+          val module = rawName.endsWith("$")
+          val nm = if (module) rawName.dropRight(1) else rawName
+          val candidates = owner.info.members.filter { s =>
+            s.nameString == nm &&
+            ((module && s.isModule) ||
+            (!module && (!s.isModule || s.hasPackageFlag)))
+          }
+          val exact = signatureString.flatMap { s =>
+            candidates.find(_.signatureString == s)
+          }
+          exact.orElse(candidates.headOption)
         }
-        val exact = signatureString.flatMap { s =>
-          candidates.find(_.signatureString == s)
-        }
-        exact.orElse(candidates.headOption)
-      }.orElse(Some(owner))
+        .orElse(Some(owner))
     }
   }
 

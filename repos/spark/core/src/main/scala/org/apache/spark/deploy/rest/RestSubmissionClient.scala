@@ -343,8 +343,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
           "Application successfully submitted, but submission ID was not provided!")
       }
     } else {
-      val failMessage = Option(submitResponse.message).map { ": " + _ }
-        .getOrElse("")
+      val failMessage =
+        Option(submitResponse.message).map { ": " + _ }.getOrElse("")
       logError(s"Application submission failed$failMessage")
     }
   }

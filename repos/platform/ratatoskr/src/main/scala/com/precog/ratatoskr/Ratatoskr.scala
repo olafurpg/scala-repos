@@ -352,30 +352,32 @@ object KafkaTools extends Command {
        } else {
          // see if we can deduce from the data (assuming Nathan's twitter feed or SE postings)
          val timestamps = (msg.data.map(_.value \ "timeStamp") ++ msg.data.map(
-           _.value \ "timestamp")).flatMap {
-           case JString(date) =>
-             // Dirty hack for trying variations of ISO8601 in use by customers
-             List(date, date.replaceFirst(":", "-").replaceFirst(":", "-")).flatMap {
-               date =>
-                 List(date, date + ".000Z")
-             }
-           case _ => None
-         }.flatMap { date =>
-           try {
-             val ts = ISODateTimeFormat.dateTime.parseDateTime(date)
-             if (ts.getMillis > lastTimestamp.time) {
-               //println("Assigning new timestamp: " + ts)
-               Some(ts)
-             } else {
-               //println("%s is before %s".format(ts, new DateTime(lastTimestamp.time)))
-               None
-             }
-           } catch {
-             case t =>
-               //println("Error on datetime parse: " + t)
-               None
+           _.value \ "timestamp"))
+           .flatMap {
+             case JString(date) =>
+               // Dirty hack for trying variations of ISO8601 in use by customers
+               List(date, date.replaceFirst(":", "-").replaceFirst(":", "-"))
+                 .flatMap { date =>
+                   List(date, date + ".000Z")
+                 }
+             case _ => None
            }
-         }
+           .flatMap { date =>
+             try {
+               val ts = ISODateTimeFormat.dateTime.parseDateTime(date)
+               if (ts.getMillis > lastTimestamp.time) {
+                 //println("Assigning new timestamp: " + ts)
+                 Some(ts)
+               } else {
+                 //println("%s is before %s".format(ts, new DateTime(lastTimestamp.time)))
+                 None
+               }
+             } catch {
+               case t =>
+                 //println("Error on datetime parse: " + t)
+                 None
+             }
+           }
 
          //println("Deducing timestamp from " + timestamps)
 
@@ -420,8 +422,8 @@ object KafkaTools extends Command {
     }
 
     def process(config: Config, range: MessageRange) = {
-      val accountLookup: Map[String, String] = config.lookupDatabase.map {
-        dbName =>
+      val accountLookup: Map[String, String] = config.lookupDatabase
+        .map { dbName =>
           val mongo = RealMongo(Configuration.parse("servers = [localhost]"))
           val database = mongo.database(dbName)
           implicit val queryTimeout = Timeout(30000)
@@ -434,9 +436,10 @@ object KafkaTools extends Command {
               }
             }, queryTimeout.duration)
             .toMap
-      }.getOrElse {
-        Map.empty
-      }
+        }
+        .getOrElse {
+          Map.empty
+        }
 
       //println("Got lookup DB:" + accountLookup)
 
@@ -461,10 +464,10 @@ object KafkaTools extends Command {
 
                       if (path.length > 0) {
                         //println("Deleting from path " + path)
-                        ReportState(index + 1, currentPathSize + (path -> 0L)).unsafeTap {
-                          newState =>
+                        ReportState(index + 1, currentPathSize + (path -> 0L))
+                          .unsafeTap { newState =>
                             trackState(newState)
-                        }
+                          }
                       } else {
                         state.inc
                       }
@@ -481,9 +484,12 @@ object KafkaTools extends Command {
       trackState(finalState)
 
       if (config.reportFormat == "csv") {
-        println("index,total," + trackedAccounts.sorted.map { acct =>
-          "\"%s\"".format(accountLookup.getOrElse(acct, acct))
-        }.mkString(","))
+        println(
+          "index,total," + trackedAccounts.sorted
+            .map { acct =>
+              "\"%s\"".format(accountLookup.getOrElse(acct, acct))
+            }
+            .mkString(","))
         slices.foreach {
           case (index, byAccount) =>
             val accountTotals =
@@ -582,9 +588,11 @@ object KafkaTools extends Command {
         Success(parsed)
 
       case -\/((_, path, msgGen)) =>
-        path.elements.headOption.map { account =>
-          msgGen(Authorities(account)).asInstanceOf[IngestMessage]
-        }.toSuccess("Could not determine account from path")
+        path.elements.headOption
+          .map { account =>
+            msgGen(Authorities(account)).asInstanceOf[IngestMessage]
+          }
+          .toSuccess("Could not determine account from path")
 
       case \/-(parsed: ArchiveMessage) =>
         Success(parsed)

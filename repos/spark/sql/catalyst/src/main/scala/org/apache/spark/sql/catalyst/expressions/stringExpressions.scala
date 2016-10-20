@@ -52,9 +52,11 @@ case class Concat(children: Seq[Expression])
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val evals = children.map(_.gen(ctx))
-    val inputs = evals.map { eval =>
-      s"${eval.isNull} ? null : ${eval.value}"
-    }.mkString(", ")
+    val inputs = evals
+      .map { eval =>
+        s"${eval.isNull} ? null : ${eval.value}"
+      }
+      .mkString(", ")
     evals.map(_.code).mkString("\n") + s"""
       boolean ${ev.isNull} = false;
       UTF8String ${ev.value} = UTF8String.concat($inputs);
@@ -106,9 +108,11 @@ case class ConcatWs(children: Seq[Expression])
       // All children are strings. In that case we can construct a fixed size array.
       val evals = children.map(_.gen(ctx))
 
-      val inputs = evals.map { eval =>
-        s"${eval.isNull} ? (UTF8String) null : ${eval.value}"
-      }.mkString(", ")
+      val inputs = evals
+        .map { eval =>
+          s"${eval.isNull} ? (UTF8String) null : ${eval.value}"
+        }
+        .mkString(", ")
 
       evals.map(_.code).mkString("\n") + s"""
         UTF8String ${ev.value} = UTF8String.concatWs($inputs);

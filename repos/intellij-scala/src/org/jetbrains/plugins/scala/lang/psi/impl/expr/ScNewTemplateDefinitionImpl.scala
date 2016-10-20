@@ -118,10 +118,12 @@ class ScNewTemplateDefinitionImpl private (
   override def getName: String = name
 
   override def getSupers: Array[PsiClass] = {
-    val direct = extendsBlock.supers.filter {
-      case clazz: PsiClass => clazz.qualifiedName != "scala.ScalaObject"
-      case _ => true
-    }.toArray
+    val direct = extendsBlock.supers
+      .filter {
+        case clazz: PsiClass => clazz.qualifiedName != "scala.ScalaObject"
+        case _ => true
+      }
+      .toArray
     val res = new ArrayBuffer[PsiClass]
     res ++= direct
     for (sup <- direct if !res.contains(sup)) res ++= sup.getSupers

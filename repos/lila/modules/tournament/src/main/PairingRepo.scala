@@ -113,11 +113,13 @@ object PairingRepo {
                    GroupField("u")("nb" -> SumValue(1))
                  ))
       .map {
-        _.documents.flatMap { doc =>
-          doc.getAs[String]("_id") flatMap { uid =>
-            doc.getAs[Int]("nb") map { uid -> _ }
+        _.documents
+          .flatMap { doc =>
+            doc.getAs[String]("_id") flatMap { uid =>
+              doc.getAs[Int]("nb") map { uid -> _ }
+            }
           }
-        }.toMap
+          .toMap
       }
   }
 
@@ -144,9 +146,11 @@ object PairingRepo {
       .collect[List]()
 
   def insert(pairing: Pairing) =
-    coll.insert {
-      pairingHandler.write(pairing) ++ BSONDocument("d" -> DateTime.now)
-    }.void
+    coll
+      .insert {
+        pairingHandler.write(pairing) ++ BSONDocument("d" -> DateTime.now)
+      }
+      .void
 
   def finish(g: lila.game.Game) =
     coll

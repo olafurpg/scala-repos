@@ -271,14 +271,16 @@ private[spark] object RangePartitioner {
       sampleSizePerPartition: Int): (Long, Array[(Int, Long, Array[K])]) = {
     val shift = rdd.id
     // val classTagK = classTag[K] // to avoid serializing the entire partitioner object
-    val sketched = rdd.mapPartitionsWithIndex { (idx, iter) =>
-      val seed = byteswap32(idx ^ (shift << 16))
-      val (sample, n) =
-        SamplingUtils.reservoirSampleAndCount(iter,
-                                              sampleSizePerPartition,
-                                              seed)
-      Iterator((idx, n, sample))
-    }.collect()
+    val sketched = rdd
+      .mapPartitionsWithIndex { (idx, iter) =>
+        val seed = byteswap32(idx ^ (shift << 16))
+        val (sample, n) =
+          SamplingUtils.reservoirSampleAndCount(iter,
+                                                sampleSizePerPartition,
+                                                seed)
+        Iterator((idx, n, sample))
+      }
+      .collect()
     val numItems = sketched.map(_._2).sum
     (numItems, sketched)
   }

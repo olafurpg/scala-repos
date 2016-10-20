@@ -193,12 +193,16 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
         val prevIndent =
           if (inConcatenation.isDefined)
-            inConcatenation.map { expr =>
-              val exprStart = expr.getTextRange.getStartOffset
-              val lineStart =
-                document.getLineStartOffset(document.getLineNumber(exprStart))
-              getSmartLength(document.getText.substring(lineStart, exprStart))
-            }.get
+            inConcatenation
+              .map { expr =>
+                val exprStart = expr.getTextRange.getStartOffset
+                val lineStart =
+                  document.getLineStartOffset(
+                    document.getLineNumber(exprStart))
+                getSmartLength(
+                  document.getText.substring(lineStart, exprStart))
+              }
+              .get
           else prefixLength(prevLine)
 
         val needInsertIndentInt =

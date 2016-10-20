@@ -64,29 +64,34 @@ private[launcher] class OfferProcessorImpl(
       offerMatcher.matchOffer(matchingDeadline, offer)
     }
 
-    matchFuture.recover {
-      case e: AskTimeoutException =>
-        matchErrorsMeter.mark()
-        log.warn(
-          s"Could not process offer '${offer.getId.getValue}' in time. (See --max_offer_matching_timeout)")
-        MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
-      case NonFatal(e) =>
-        matchErrorsMeter.mark()
-        log.error(s"Could not process offer '${offer.getId.getValue}'", e)
-        MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
-    }.flatMap {
-      case MatchedTaskOps(offerId, tasks, resendThisOffer) =>
-        savingTasksTimeMeter.timeFuture {
-          saveTasks(tasks, savingDeadline).map { savedTasks =>
-            def notAllSaved: Boolean = savedTasks.size != tasks.size
-            MatchedTaskOps(offerId, savedTasks, resendThisOffer || notAllSaved)
+    matchFuture
+      .recover {
+        case e: AskTimeoutException =>
+          matchErrorsMeter.mark()
+          log.warn(
+            s"Could not process offer '${offer.getId.getValue}' in time. (See --max_offer_matching_timeout)")
+          MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
+        case NonFatal(e) =>
+          matchErrorsMeter.mark()
+          log.error(s"Could not process offer '${offer.getId.getValue}'", e)
+          MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
+      }
+      .flatMap {
+        case MatchedTaskOps(offerId, tasks, resendThisOffer) =>
+          savingTasksTimeMeter.timeFuture {
+            saveTasks(tasks, savingDeadline).map { savedTasks =>
+              def notAllSaved: Boolean = savedTasks.size != tasks.size
+              MatchedTaskOps(offerId,
+                             savedTasks,
+                             resendThisOffer || notAllSaved)
+            }
           }
-        }
-    }.flatMap {
-      case MatchedTaskOps(offerId, Nil, resendThisOffer) =>
-        declineOffer(offerId, resendThisOffer)
-      case MatchedTaskOps(offerId, tasks, _) => acceptOffer(offerId, tasks)
-    }
+      }
+      .flatMap {
+        case MatchedTaskOps(offerId, Nil, resendThisOffer) =>
+          declineOffer(offerId, resendThisOffer)
+        case MatchedTaskOps(offerId, tasks, _) => acceptOffer(offerId, tasks)
+      }
   }
 
   private[this] def declineOffer(offerId: OfferID,

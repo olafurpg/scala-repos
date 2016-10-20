@@ -389,10 +389,12 @@ class SimpleAclAuthorizerTest extends ZooKeeperTestHarness {
       }
     }
 
-    val expectedAcls = acls.filter { acl =>
-      val aclId = acl.principal.getName.toInt
-      aclId % 10 != 0
-    }.toSet
+    val expectedAcls = acls
+      .filter { acl =>
+        val aclId = acl.principal.getName.toInt
+        aclId % 10 != 0
+      }
+      .toSet
 
     TestUtils.assertConcurrent("Should support many concurrent calls",
                                concurrentFuctions,

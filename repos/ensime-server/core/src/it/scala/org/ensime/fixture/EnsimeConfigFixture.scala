@@ -26,10 +26,12 @@ trait EnsimeConfigFixture {
 
   // convenience method
   def main(lang: String)(implicit config: EnsimeConfig): File =
-    config.subprojects.head.sourceRoots.filter { dir =>
-      val sep = JFile.separator
-      dir.getPath.endsWith(s"${sep}main$sep$lang")
-    }.head
+    config.subprojects.head.sourceRoots
+      .filter { dir =>
+        val sep = JFile.separator
+        dir.getPath.endsWith(s"${sep}main$sep$lang")
+      }
+      .head
   def scalaMain(implicit config: EnsimeConfig): File = main("scala")
   def javaMain(implicit config: EnsimeConfig): File = main("java")
 

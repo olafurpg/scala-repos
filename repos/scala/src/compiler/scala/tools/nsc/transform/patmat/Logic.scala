@@ -214,10 +214,12 @@ trait Logic extends Debugging {
           val ops = fv.map(simplifyProp) - True // ignore `True`
 
           // build up Set in order to remove duplicates
-          val opsFlattened = ops.flatMap {
-            case And(fv) => fv
-            case f => Set(f)
-          }.toSeq
+          val opsFlattened = ops
+            .flatMap {
+              case And(fv) => fv
+              case f => Set(f)
+            }
+            .toSeq
 
           if (hasImpureAtom(opsFlattened) || opsFlattened.contains(False)) {
             False
@@ -232,10 +234,12 @@ trait Logic extends Debugging {
           // recurse for nested Or (pulls all Ors up)
           val ops = fv.map(simplifyProp) - False // ignore `False`
 
-          val opsFlattened = ops.flatMap {
-            case Or(fv) => fv
-            case f => Set(f)
-          }.toSeq
+          val opsFlattened = ops
+            .flatMap {
+              case Or(fv) => fv
+              case f => Set(f)
+            }
+            .toSeq
 
           if (hasImpureAtom(opsFlattened) || opsFlattened.contains(True)) {
             True
@@ -514,11 +518,13 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
 
       lazy val groupedDomains: List[Set[Sym]] = {
         val subtypes = enumerateSubtypes(staticTp, grouped = true)
-        subtypes.map { subTypes =>
-          val syms =
-            subTypes.flatMap(tpe => symForEqualsTo.get(TypeConst(tpe))).toSet
-          if (mayBeNull) syms + symForEqualsTo(NullConst) else syms
-        }.filter(_.nonEmpty)
+        subtypes
+          .map { subTypes =>
+            val syms =
+              subTypes.flatMap(tpe => symForEqualsTo.get(TypeConst(tpe))).toSet
+            if (mayBeNull) syms + symForEqualsTo(NullConst) else syms
+          }
+          .filter(_.nonEmpty)
       }
 
       // populate equalitySyms

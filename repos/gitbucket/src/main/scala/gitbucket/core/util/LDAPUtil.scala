@@ -84,14 +84,15 @@ object LDAPUtil {
       if (ldapSettings.mailAttribute.getOrElse("").isEmpty) {
         Right(
           LDAPUserInfo(userName = userName,
-                       fullName = ldapSettings.fullNameAttribute.flatMap {
-                         fullNameAttribute =>
+                       fullName = ldapSettings.fullNameAttribute
+                         .flatMap { fullNameAttribute =>
                            findFullName(conn,
                                         userDN,
                                         ldapSettings.userNameAttribute,
                                         userName,
                                         fullNameAttribute)
-                       }.getOrElse(userName),
+                         }
+                         .getOrElse(userName),
                        mailAddress = createDummyMailAddress(userName)))
       } else {
         findMailAddress(conn,
@@ -102,14 +103,15 @@ object LDAPUtil {
           case Some(mailAddress) =>
             Right(
               LDAPUserInfo(userName = getUserNameFromMailAddress(userName),
-                           fullName = ldapSettings.fullNameAttribute.flatMap {
-                             fullNameAttribute =>
+                           fullName = ldapSettings.fullNameAttribute
+                             .flatMap { fullNameAttribute =>
                                findFullName(conn,
                                             userDN,
                                             ldapSettings.userNameAttribute,
                                             userName,
                                             fullNameAttribute)
-                           }.getOrElse(userName),
+                             }
+                             .getOrElse(userName),
                            mailAddress = mailAddress))
           case None => Left("Can't find mail address.")
         }
@@ -211,13 +213,11 @@ object LDAPUtil {
       case x => "(&(" + x + ")(" + userNameAttribute + "=" + userName + "))"
     }
 
-    getEntries(conn.search(baseDN,
-                           LDAPConnection.SCOPE_SUB,
-                           filterCond,
-                           null,
-                           false)).collectFirst {
-      case x => x.getDN
-    }
+    getEntries(
+      conn.search(baseDN, LDAPConnection.SCOPE_SUB, filterCond, null, false))
+      .collectFirst {
+        case x => x.getDN
+      }
   }
 
   private def findMailAddress(conn: LDAPConnection,

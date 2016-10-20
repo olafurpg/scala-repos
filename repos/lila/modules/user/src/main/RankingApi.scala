@@ -50,12 +50,13 @@ final class RankingApi(coll: lila.db.Types.Coll,
       coll
         .remove(
           BSONDocument(
-            "_id" -> BSONDocument("$in" -> PerfType.leaderboardable.filter {
-              pt =>
+            "_id" -> BSONDocument("$in" -> PerfType.leaderboardable
+              .filter { pt =>
                 user.perfs(pt).nonEmpty
-            }.map { pt =>
-              s"${user.id}:${pt.id}"
-            })
+              }
+              .map { pt =>
+                s"${user.id}:${pt.id}"
+              })
           ))
         .void
     }
@@ -146,15 +147,19 @@ final class RankingApi(coll: lila.db.Types.Coll,
                 )),
               GroupField("r")("nb" -> SumValue(1))))
           .map { res =>
-            val hash = res.documents.flatMap { obj =>
-              for {
-                rating <- obj.getAs[Int]("_id")
-                nb <- obj.getAs[NbUsers]("nb")
-              } yield rating -> nb
-            }.toMap
-            (800 to 2800 by Stat.group).map { r =>
-              hash.getOrElse(r, 0)
-            }.toList
+            val hash = res.documents
+              .flatMap { obj =>
+                for {
+                  rating <- obj.getAs[Int]("_id")
+                  nb <- obj.getAs[NbUsers]("nb")
+                } yield rating -> nb
+              }
+              .toMap
+            (800 to 2800 by Stat.group)
+              .map { r =>
+                hash.getOrElse(r, 0)
+              }
+              .toList
           }
       }
   }

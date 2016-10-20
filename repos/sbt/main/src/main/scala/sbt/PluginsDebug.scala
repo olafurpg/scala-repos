@@ -49,10 +49,12 @@ private[sbt] class PluginsDebug(
       val explained = possible.map(explainPluginEnable)
       val possibleString =
         if (explained.size > 1)
-          explained.zipWithIndex.map { case (s, i) => s"$i. $s" }.mkString(
-            "Multiple plugins are available that can provide $notFoundKey:\n",
-            "\n",
-            "")
+          explained.zipWithIndex
+            .map { case (s, i) => s"$i. $s" }
+            .mkString(
+              "Multiple plugins are available that can provide $notFoundKey:\n",
+              "\n",
+              "")
         else
           s"$notFoundKey is provided by an available (but not activated) plugin:\n${explained.mkString}"
       def impossiblePlugins = impossible.map(_.plugin.label).mkString(", ")

@@ -66,14 +66,16 @@ class StringTemplateSupport(version: Int,
   }
 
   private def generateVersionRangeDictionary(ver: Int): Map[String, Object] =
-    (1 to 32).flatMap { v =>
-      def kv(prod: Boolean, keys: String*) =
-        keys.map(k => (k + "_" + v) -> prod.asInstanceOf[Object])
-      kv(ver == v, "eq", "gte", "lte") ++ kv(ver > v, "gt", "gte") ++ kv(
-        ver < v,
-        "lt",
-        "lte")
-    }.toMap
+    (1 to 32)
+      .flatMap { v =>
+        def kv(prod: Boolean, keys: String*) =
+          keys.map(k => (k + "_" + v) -> prod.asInstanceOf[Object])
+        kv(ver == v, "eq", "gte", "lte") ++ kv(ver > v, "gt", "gte") ++ kv(
+          ver < v,
+          "lt",
+          "lte")
+      }
+      .toMap
 
   private def expandToPackageMap(pkg: Map[String, Any]): Map[String, Any] = {
     def expand(lmap: Map[List[String], Any],

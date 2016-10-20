@@ -46,9 +46,11 @@ class ScExistentialTypeElementImpl(node: ASTNode)
             problems += lb; problems += ub
             buff += new ScExistentialArgument(
               alias.name,
-              alias.typeParameters.map { tp =>
-                ScalaPsiManager.typeVariable(tp)
-              }.toList,
+              alias.typeParameters
+                .map { tp =>
+                  ScalaPsiManager.typeVariable(tp)
+                }
+                .toList,
               lb.getOrNothing,
               ub.getOrAny)
           case value: ScValueDeclaration =>

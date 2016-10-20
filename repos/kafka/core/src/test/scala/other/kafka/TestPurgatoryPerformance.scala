@@ -245,9 +245,11 @@ object TestPurgatoryPerformance {
         (math.log(pct75) -
           normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
       val dist = new LogNormalDistribution(normalMean, normalStDev)
-      (0 until sampleSize).map { _ =>
-        dist.next().toLong
-      }.toArray
+      (0 until sampleSize)
+        .map { _ =>
+          dist.next().toLong
+        }
+        .toArray
     }
     def next() = samples(rand.nextInt(sampleSize))
 
@@ -269,12 +271,14 @@ object TestPurgatoryPerformance {
     private[this] val samples = {
       val dist = new ExponentialDistribution(requestPerSecond / 1000d)
       var residue = 0.0
-      (0 until sampleSize).map { _ =>
-        val interval = dist.next() + residue
-        val roundedInterval = interval.toLong
-        residue = interval - roundedInterval.toDouble
-        roundedInterval
-      }.toArray
+      (0 until sampleSize)
+        .map { _ =>
+          val interval = dist.next() + residue
+          val roundedInterval = interval.toLong
+          residue = interval - roundedInterval.toDouble
+          roundedInterval
+        }
+        .toArray
     }
 
     def next() = samples(rand.nextInt(sampleSize))

@@ -399,10 +399,12 @@ object WorksheetSourceProcessor {
                 case (tpe, el) => el.name + ": " + tpe.getText
               }).mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case (_, Some(expr)) =>
-            "var " + varDef.declaredElements.map {
-              case tpePattern: ScTypedPattern => writeTypedPatter(tpePattern)
-              case a => a.name
-            }.mkString("(", ",", ")") + " = { " + expr.getText + ";}"
+            "var " + varDef.declaredElements
+              .map {
+                case tpePattern: ScTypedPattern => writeTypedPatter(tpePattern)
+                case a => a.name
+              }
+              .mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case _ => varDef.getText
         }
 

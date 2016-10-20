@@ -141,19 +141,23 @@ trait PEvents extends Serializable {
       startTime = startTime,
       untilTime = untilTime,
       required = required
-    )(sc).map {
-      case (id, dm) =>
-        try {
-          (id, extract(dm))
-        } catch {
-          case e: Exception => {
-            logger.error(s"Failed to get extract entity from DataMap $dm of " +
-                           s"entityId $id.",
-                         e)
-            throw e
+    )(sc)
+      .map {
+        case (id, dm) =>
+          try {
+            (id, extract(dm))
+          } catch {
+            case e: Exception => {
+              logger.error(
+                s"Failed to get extract entity from DataMap $dm of " +
+                  s"entityId $id.",
+                e)
+              throw e
+            }
           }
-        }
-    }.collectAsMap.toMap
+      }
+      .collectAsMap
+      .toMap
 
     new EntityMap(idToData)
   }

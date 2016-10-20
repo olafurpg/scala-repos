@@ -332,9 +332,11 @@ object DBIOAction {
             .asInstanceOf[DBIOAction[Unit, NoStream, E]]
         case n =>
           val last = grouped.length - 1
-          val as = grouped.iterator.zipWithIndex.map {
-            case (g, i) => sequenceGroup(g, i == last)
-          }.toVector
+          val as = grouped.iterator.zipWithIndex
+            .map {
+              case (g, i) => sequenceGroup(g, i == last)
+            }
+            .toVector
           AndThenAction[Unit, NoStream, E](as)
       }
     }

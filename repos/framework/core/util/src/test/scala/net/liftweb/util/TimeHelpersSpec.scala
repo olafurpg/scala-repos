@@ -260,12 +260,12 @@ object forAllTimeZones extends Around {
     import collection.convert.wrapAsScala._
     // some timezones for java (used in formatters) and for Joda (other computations) has other offset
     val commonJavaAndJodaTimeZones =
-      (TimeZone.getAvailableIDs.toSet & DateTimeZone.getAvailableIDs.toSet).filter {
-        timeZoneId =>
+      (TimeZone.getAvailableIDs.toSet & DateTimeZone.getAvailableIDs.toSet)
+        .filter { timeZoneId =>
           TimeZone.getTimeZone(timeZoneId).getOffset(millis) == DateTimeZone
             .forID(timeZoneId)
             .getOffset(millis)
-      }
+        }
     val tzBefore = TimeZone.getDefault
     val dtzBefore = DateTimeZone.getDefault
     try {

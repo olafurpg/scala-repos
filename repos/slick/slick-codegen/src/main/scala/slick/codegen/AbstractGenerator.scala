@@ -303,10 +303,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates code for the ColumnOptions (DBType, AutoInc, etc.) */
       def options: Iterable[Code] =
-        model.options.filter {
-          case t: SqlProfile.ColumnOption.SqlType => dbType
-          case _ => true
-        }.flatMap(columnOptionCode(_).toSeq)
+        model.options
+          .filter {
+            case t: SqlProfile.ColumnOption.SqlType => dbType
+            case _ => true
+          }
+          .flatMap(columnOptionCode(_).toSeq)
 
       /** Indicates if a (non-portable) DBType ColumnOption should be generated */
       def dbType: Boolean = false
@@ -316,10 +318,13 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates a literal represenation of the default value or None in case of an Option-typed autoinc column */
       def default: Option[Code] =
-        model.options.collect {
-          case RelationalProfile.ColumnOption.Default(value) => value
-          case _ if fakeNullable => None
-        }.map(defaultCode).headOption
+        model.options
+          .collect {
+            case RelationalProfile.ColumnOption.Default(value) => value
+            case _ if fakeNullable => None
+          }
+          .map(defaultCode)
+          .headOption
 
       def rawName: String = model.name.toCamelCase.uncapitalize
       def doc: String =

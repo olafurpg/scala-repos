@@ -279,10 +279,12 @@ class TaskBuilder(app: AppDefinition,
       app.ipAddress.foreach { ipAddress =>
         val ipAddressLabels = Labels
           .newBuilder()
-          .addAllLabels(ipAddress.labels.map {
-            case (key, value) =>
-              Label.newBuilder.setKey(key).setValue(value).build()
-          }.asJava)
+          .addAllLabels(ipAddress.labels
+            .map {
+              case (key, value) =>
+                Label.newBuilder.setKey(key).setValue(value).build()
+            }
+            .asJava)
         val networkInfo: NetworkInfo.Builder = NetworkInfo
           .newBuilder()
           .addAllGroups(ipAddress.groups.asJava)
@@ -411,8 +413,9 @@ object TaskBuilder {
         "MARATHON_APP_RESOURCE_MEM" -> Some(app.mem.toString),
         "MARATHON_APP_RESOURCE_DISK" -> Some(app.disk.toString)
       ).collect {
-        case (key, Some(value)) => key -> value
-      }.toMap ++ labelsToEnvVars(app.labels)
+          case (key, Some(value)) => key -> value
+        }
+        .toMap ++ labelsToEnvVars(app.labels)
     }
   }
 

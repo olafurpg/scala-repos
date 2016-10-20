@@ -333,10 +333,11 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
           } else {
             if (args.invocationCount == 1) {
               val methods: ArrayBuffer[PsiAnnotationMethod] =
-                new ArrayBuffer[PsiAnnotationMethod] ++ clazz.getMethods.toSeq.flatMap {
-                  case f: PsiAnnotationMethod => Seq(f)
-                  case _ => Seq.empty
-                }
+                new ArrayBuffer[PsiAnnotationMethod] ++ clazz.getMethods.toSeq
+                  .flatMap {
+                    case f: PsiAnnotationMethod => Seq(f)
+                    case _ => Seq.empty
+                  }
               val exprs = args.exprs
               var i = 0
               def tail() {

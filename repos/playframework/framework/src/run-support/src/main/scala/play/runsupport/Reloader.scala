@@ -470,11 +470,13 @@ class Reloader(reloadCompile: () => CompileResult,
   def findSource(className: String,
                  line: java.lang.Integer): Array[java.lang.Object] = {
     val topType = className.split('$').head
-    currentSourceMap.flatMap { sources =>
-      sources.get(topType).map { source =>
-        Array[java.lang.Object](source.original.getOrElse(source.file), line)
+    currentSourceMap
+      .flatMap { sources =>
+        sources.get(topType).map { source =>
+          Array[java.lang.Object](source.original.getOrElse(source.file), line)
+        }
       }
-    }.orNull
+      .orNull
   }
 
   def runTask(task: String): AnyRef = runSbtTask(task)

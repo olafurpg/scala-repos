@@ -2347,12 +2347,13 @@ trait SHtml extends Loggable {
       secure.find(_.value == defaultOption).map(_.nonce)
     }
 
-    val nonces: List[SelectableOption[String]] = secure.map {
-      selectableOptionWithNonce =>
+    val nonces: List[SelectableOption[String]] = secure
+      .map { selectableOptionWithNonce =>
         SelectableOption(selectableOptionWithNonce.nonce,
                          selectableOptionWithNonce.label,
                          selectableOptionWithNonce.attrs: _*)
-    }.toList
+      }
+      .toList
 
     def process(info: List[String]): Unit = onSubmit(info.flatMap(sm.get))
 
@@ -2493,14 +2494,16 @@ trait SHtml extends Loggable {
     }
 
     S.fmapFunc(selectionHandler _)(funcName => {
-      cssSelToValue.map {
-        case (cssSel, value) =>
-          s"$cssSel [name]" #> funcName & s"$cssSel [value]" #> radioOptions(
-            value) & s"$cssSel [checked]" #> {
-            if (initialValue === value) Some("true")
-            else None
-          }
-      }.reduceLeft(_ & _)
+      cssSelToValue
+        .map {
+          case (cssSel, value) =>
+            s"$cssSel [name]" #> funcName & s"$cssSel [value]" #> radioOptions(
+              value) & s"$cssSel [checked]" #> {
+              if (initialValue === value) Some("true")
+              else None
+            }
+        }
+        .reduceLeft(_ & _)
     })
   }
 

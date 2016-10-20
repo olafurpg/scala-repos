@@ -244,20 +244,22 @@ object DumpLogSegments {
       val group = GroupMetadataManager.readGroupMessageValue(groupId, payload)
       val protocolType = group.protocolType
 
-      val assignment = group.allMemberMetadata.map { member =>
-        if (protocolType == ConsumerProtocol.PROTOCOL_TYPE) {
-          val partitionAssignment = ConsumerProtocol.deserializeAssignment(
-            ByteBuffer.wrap(member.assignment))
-          val userData = hex(Utils.toArray(partitionAssignment.userData()))
+      val assignment = group.allMemberMetadata
+        .map { member =>
+          if (protocolType == ConsumerProtocol.PROTOCOL_TYPE) {
+            val partitionAssignment = ConsumerProtocol.deserializeAssignment(
+              ByteBuffer.wrap(member.assignment))
+            val userData = hex(Utils.toArray(partitionAssignment.userData()))
 
-          if (userData.isEmpty)
-            s"${member.memberId}=${partitionAssignment.partitions()}"
-          else
-            s"${member.memberId}=${partitionAssignment.partitions()}:${userData}"
-        } else {
-          s"${member.memberId}=${hex(member.assignment)}"
+            if (userData.isEmpty)
+              s"${member.memberId}=${partitionAssignment.partitions()}"
+            else
+              s"${member.memberId}=${partitionAssignment.partitions()}:${userData}"
+          } else {
+            s"${member.memberId}=${hex(member.assignment)}"
+          }
         }
-      }.mkString("{", ",", "}")
+        .mkString("{", ",", "}")
 
       val keyString = s"metadata::${groupId}"
       val valueString =

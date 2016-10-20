@@ -68,15 +68,17 @@ class ParquetFilterSuite
 
         var maybeRelation: Option[HadoopFsRelation] = None
         val maybeAnalyzedPredicate =
-          query.queryExecution.optimizedPlan.collect {
-            case PhysicalOperation(_,
-                                   filters,
-                                   LogicalRelation(relation: HadoopFsRelation,
-                                                   _,
-                                                   _)) =>
-              maybeRelation = Some(relation)
-              filters
-          }.flatten.reduceLeftOption(_ && _)
+          query.queryExecution.optimizedPlan
+            .collect {
+              case PhysicalOperation(
+                  _,
+                  filters,
+                  LogicalRelation(relation: HadoopFsRelation, _, _)) =>
+                maybeRelation = Some(relation)
+                filters
+            }
+            .flatten
+            .reduceLeftOption(_ && _)
         assert(maybeAnalyzedPredicate.isDefined,
                "No filter is analyzed from the given query")
 

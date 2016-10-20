@@ -56,10 +56,12 @@ sealed abstract class HMap[K[_], V[_]] {
     map.get(id).asInstanceOf[Option[V[T]]]
 
   def keysOf[T](v: V[T]): Set[K[T]] =
-    map.collect {
-      case (k, w) if v == w =>
-        k.asInstanceOf[K[T]]
-    }.toSet
+    map
+      .collect {
+        case (k, w) if v == w =>
+          k.asInstanceOf[K[T]]
+      }
+      .toSet
 
   // go through all the keys, and find the first key that matches this
   // function and apply

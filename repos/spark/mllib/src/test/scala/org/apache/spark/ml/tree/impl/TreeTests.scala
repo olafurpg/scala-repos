@@ -49,15 +49,17 @@ private[ml] object TreeTests extends SparkFunSuite {
     import sqlContext.implicits._
     val df = data.toDF()
     val numFeatures = data.first().features.size
-    val featuresAttributes = Range(0, numFeatures).map { feature =>
-      if (categoricalFeatures.contains(feature)) {
-        NominalAttribute.defaultAttr
-          .withIndex(feature)
-          .withNumValues(categoricalFeatures(feature))
-      } else {
-        NumericAttribute.defaultAttr.withIndex(feature)
+    val featuresAttributes = Range(0, numFeatures)
+      .map { feature =>
+        if (categoricalFeatures.contains(feature)) {
+          NominalAttribute.defaultAttr
+            .withIndex(feature)
+            .withNumValues(categoricalFeatures(feature))
+        } else {
+          NumericAttribute.defaultAttr.withIndex(feature)
+        }
       }
-    }.toArray
+      .toArray
     val featuresMetadata =
       new AttributeGroup("features", featuresAttributes).toMetadata()
     val labelAttribute =

@@ -86,14 +86,16 @@ abstract class ScTypeDefinitionImpl protected (
   }
 
   override def getSuperTypes: Array[PsiClassType] = {
-    superTypes.flatMap {
-      case tp =>
-        val psiType = ScType.toPsi(tp, getProject, getResolveScope)
-        psiType match {
-          case c: PsiClassType => Seq(c)
-          case _ => Seq.empty
-        }
-    }.toArray
+    superTypes
+      .flatMap {
+        case tp =>
+          val psiType = ScType.toPsi(tp, getProject, getResolveScope)
+          psiType match {
+            case c: PsiClassType => Seq(c)
+            case _ => Seq.empty
+          }
+      }
+      .toArray
   }
 
   override def isAnnotationType: Boolean = {

@@ -481,12 +481,16 @@ object StreamLayout {
              s"(${m.attributes.nameLifted.getOrElse("unnamed")}) ${m.toString
                .replaceAll("\n", "\n    ")}")
            .mkString("\n    ")}
-         |  Downstreams: ${downstreams.iterator.map {
-           case (in, out) ⇒ s"\n    $in -> $out"
-         }.mkString("")}
-         |  Upstreams: ${upstreams.iterator.map {
-           case (out, in) ⇒ s"\n    $out -> $in"
-         }.mkString("")}
+         |  Downstreams: ${downstreams.iterator
+           .map {
+             case (in, out) ⇒ s"\n    $in -> $out"
+           }
+           .mkString("")}
+         |  Upstreams: ${upstreams.iterator
+           .map {
+             case (out, in) ⇒ s"\n    $out -> $in"
+           }
+           .mkString("")}
          |  MatValue: $materializedValueComputation""".stripMargin
   }
 
@@ -534,12 +538,16 @@ object StreamLayout {
                m.attributes.nameLifted.getOrElse(
                  m.toString.replaceAll("\n", "\n    ")))
            .mkString("\n    ")}
-         |  Downstreams: ${downstreams.iterator.map {
-           case (in, out) ⇒ s"\n    $in -> $out"
-         }.mkString("")}
-         |  Upstreams: ${upstreams.iterator.map {
-           case (out, in) ⇒ s"\n    $out -> $in"
-         }.mkString("")}
+         |  Downstreams: ${downstreams.iterator
+           .map {
+             case (in, out) ⇒ s"\n    $in -> $out"
+           }
+           .mkString("")}
+         |  Upstreams: ${upstreams.iterator
+           .map {
+             case (out, in) ⇒ s"\n    $out -> $in"
+           }
+           .mkString("")}
          |  MatValue: $materializedValueComputation""".stripMargin
   }
 

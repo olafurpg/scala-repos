@@ -138,20 +138,22 @@ class Interaction @Since("1.6.0")(override val uid: String)
           1 // numeric feature
       }
     }
-    features.map { f =>
-      val numFeatures = f.dataType match {
-        case _: NumericType | BooleanType =>
-          Array(getNumFeatures(Attribute.fromStructField(f)))
-        case _: VectorUDT =>
-          val attrs = AttributeGroup
-            .fromStructField(f)
-            .attributes
-            .getOrElse(throw new SparkException(
-              "Vector attributes must be defined for interaction."))
-          attrs.map(getNumFeatures).toArray
+    features
+      .map { f =>
+        val numFeatures = f.dataType match {
+          case _: NumericType | BooleanType =>
+            Array(getNumFeatures(Attribute.fromStructField(f)))
+          case _: VectorUDT =>
+            val attrs = AttributeGroup
+              .fromStructField(f)
+              .attributes
+              .getOrElse(throw new SparkException(
+                "Vector attributes must be defined for interaction."))
+            attrs.map(getNumFeatures).toArray
+        }
+        new FeatureEncoder(numFeatures)
       }
-      new FeatureEncoder(numFeatures)
-    }.toArray
+      .toArray
   }
 
   /**

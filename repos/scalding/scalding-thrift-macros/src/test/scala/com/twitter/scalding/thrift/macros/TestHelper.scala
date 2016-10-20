@@ -41,9 +41,11 @@ object TestHelper extends Matchers {
 
   def deserializeSeq[T](items: Int, buf: InputStream)(
       implicit orderedBuffer: OrderedSerialization[T]): Seq[T] = {
-    (0 until items).map { _ =>
-      orderedBuffer.read(buf).get
-    }.toList
+    (0 until items)
+      .map { _ =>
+        orderedBuffer.read(buf).get
+      }
+      .toList
   }
 
   def serialize[T](t: T)(

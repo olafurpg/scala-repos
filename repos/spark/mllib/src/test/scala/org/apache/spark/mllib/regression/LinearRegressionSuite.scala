@@ -115,11 +115,13 @@ class LinearRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
     val denseRDD = sc.parallelize(
       LinearDataGenerator.generateLinearInput(0.0, Array(10.0, 10.0), 100, 42),
       2)
-    val sparseRDD = denseRDD.map {
-      case LabeledPoint(label, v) =>
-        val sv = Vectors.sparse(10000, Seq((0, v(0)), (9999, v(1))))
-        LabeledPoint(label, sv)
-    }.cache()
+    val sparseRDD = denseRDD
+      .map {
+        case LabeledPoint(label, v) =>
+          val sv = Vectors.sparse(10000, Seq((0, v(0)), (9999, v(1))))
+          LabeledPoint(label, sv)
+      }
+      .cache()
     val linReg = new LinearRegressionWithSGD().setIntercept(false)
     linReg.optimizer.setNumIterations(1000).setStepSize(1.0)
 

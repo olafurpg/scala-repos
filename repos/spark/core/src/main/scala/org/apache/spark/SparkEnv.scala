@@ -478,10 +478,12 @@ object SparkEnv extends Logging {
 
     // System properties that are not java classpaths
     val systemProperties = Utils.getSystemProperties.toSeq
-    val otherProperties = systemProperties.filter {
-      case (k, _) =>
-        k != "java.class.path" && !k.startsWith("spark.")
-    }.sorted
+    val otherProperties = systemProperties
+      .filter {
+        case (k, _) =>
+          k != "java.class.path" && !k.startsWith("spark.")
+      }
+      .sorted
 
     // Class paths including all added jars and files
     val classPathEntries = javaClassPath

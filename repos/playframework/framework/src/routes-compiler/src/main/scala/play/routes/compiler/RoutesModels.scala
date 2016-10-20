@@ -59,9 +59,11 @@ case class HandlerCall(packageName: String,
   val dynamic = if (instantiate) "@" else ""
   override def toString =
     dynamic + packageName + "." + controller + dynamic + "." + method +
-      parameters.map { params =>
-        "(" + params.mkString(", ") + ")"
-      }.getOrElse("")
+      parameters
+        .map { params =>
+          "(" + params.mkString(", ") + ")"
+        }
+        .getOrElse("")
 }
 
 /**
@@ -128,11 +130,13 @@ case class PathPattern(parts: Seq[PathPart]) {
   }
 
   override def toString =
-    parts.map {
-      case DynamicPart(name, constraint, encode) =>
-        "$" + name + "<" + constraint + ">"
-      case StaticPart(path) => path
-    }.mkString
+    parts
+      .map {
+        case DynamicPart(name, constraint, encode) =>
+          "$" + name + "<" + constraint + ">"
+        case StaticPart(path) => path
+      }
+      .mkString
 }
 
 /**

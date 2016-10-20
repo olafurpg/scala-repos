@@ -279,19 +279,21 @@ object ScalaReflection extends ScalaReflection {
             case _ => None
           }
 
-          primitiveMethod.map { method =>
-            Invoke(getPath, method, arrayClassFor(elementType))
-          }.getOrElse {
-            val className = getClassNameFromType(elementType)
-            val newTypePath =
-              s"""- array element class: "$className"""" +: walkedTypePath
-            Invoke(MapObjects(
-                     p => constructorFor(elementType, Some(p), newTypePath),
-                     getPath,
-                     schemaFor(elementType).dataType),
-                   "array",
-                   arrayClassFor(elementType))
-          }
+          primitiveMethod
+            .map { method =>
+              Invoke(getPath, method, arrayClassFor(elementType))
+            }
+            .getOrElse {
+              val className = getClassNameFromType(elementType)
+              val newTypePath =
+                s"""- array element class: "$className"""" +: walkedTypePath
+              Invoke(MapObjects(
+                       p => constructorFor(elementType, Some(p), newTypePath),
+                       getPath,
+                       schemaFor(elementType).dataType),
+                     "array",
+                     arrayClassFor(elementType))
+            }
 
         case t if t <:< localTypeOf[Seq[_]] =>
           val TypeRef(_, _, Seq(elementType)) = t

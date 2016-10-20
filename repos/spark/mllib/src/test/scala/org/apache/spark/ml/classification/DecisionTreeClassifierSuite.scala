@@ -93,8 +93,8 @@ class DecisionTreeClassifierSuite
   test("Binary classification stump with fixed labels 0,1 for Entropy,Gini") {
     val dt = new DecisionTreeClassifier().setMaxDepth(3).setMaxBins(100)
     val numClasses = 2
-    Array(orderedLabeledPointsWithLabel0RDD, orderedLabeledPointsWithLabel1RDD).foreach {
-      rdd =>
+    Array(orderedLabeledPointsWithLabel0RDD, orderedLabeledPointsWithLabel1RDD)
+      .foreach { rdd =>
         DecisionTreeClassifier.supportedImpurities.foreach { impurity =>
           dt.setImpurity(impurity)
           compareAPIs(rdd,
@@ -102,7 +102,7 @@ class DecisionTreeClassifierSuite
                       categoricalFeatures = Map.empty[Int, Int],
                       numClasses)
         }
-    }
+      }
   }
 
   test(

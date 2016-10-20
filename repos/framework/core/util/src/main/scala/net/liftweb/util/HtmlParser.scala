@@ -342,14 +342,15 @@ trait Html5Parser {
     * a Failure.
     */
   def parse(in: InputStream): Box[Elem] = {
-    Helpers.tryo {
-      val hp = new HtmlParser(common.XmlViolationPolicy.ALLOW)
-      hp.setCommentPolicy(common.XmlViolationPolicy.ALLOW)
-      hp.setContentNonXmlCharPolicy(common.XmlViolationPolicy.ALLOW)
-      hp.setContentSpacePolicy(common.XmlViolationPolicy.FATAL)
-      hp.setNamePolicy(common.XmlViolationPolicy.ALLOW)
-      val saxer = new NoBindingFactoryAdapter {
-        /*
+    Helpers
+      .tryo {
+        val hp = new HtmlParser(common.XmlViolationPolicy.ALLOW)
+        hp.setCommentPolicy(common.XmlViolationPolicy.ALLOW)
+        hp.setContentNonXmlCharPolicy(common.XmlViolationPolicy.ALLOW)
+        hp.setContentSpacePolicy(common.XmlViolationPolicy.FATAL)
+        hp.setNamePolicy(common.XmlViolationPolicy.ALLOW)
+        val saxer = new NoBindingFactoryAdapter {
+          /*
         override def createNode (pre: String, label: String, attrs: MetaData, scope: NamespaceBinding, children: List[Node]) : Elem = {
           if (pre == "lift" && label == "head") {
             super.createNode(null, label, attrs, scope, children)
@@ -358,36 +359,37 @@ trait Html5Parser {
           }
         }*/
 
-        override def captureText(): Unit = {
-          if (capture) {
-            val text = buffer.toString()
-            if (text.length() > 0) {
-              hStack.push(createText(text))
+          override def captureText(): Unit = {
+            if (capture) {
+              val text = buffer.toString()
+              if (text.length() > 0) {
+                hStack.push(createText(text))
+              }
             }
+            buffer.setLength(0)
           }
-          buffer.setLength(0)
+        }
+
+        saxer.scopeStack.push(TopScope)
+        hp.setContentHandler(saxer)
+        val is = new InputSource(in)
+        is.setEncoding("UTF-8")
+        hp.parse(is)
+
+        saxer.scopeStack.pop
+
+        in.close()
+        saxer.rootElem match {
+          case null => Empty
+          case e: Elem =>
+            AutoInsertedBody.unapply(e) match {
+              case Some(x) => Full(x)
+              case _ => Full(e)
+            }
+          case _ => Empty
         }
       }
-
-      saxer.scopeStack.push(TopScope)
-      hp.setContentHandler(saxer)
-      val is = new InputSource(in)
-      is.setEncoding("UTF-8")
-      hp.parse(is)
-
-      saxer.scopeStack.pop
-
-      in.close()
-      saxer.rootElem match {
-        case null => Empty
-        case e: Elem =>
-          AutoInsertedBody.unapply(e) match {
-            case Some(x) => Full(x)
-            case _ => Full(e)
-          }
-        case _ => Empty
-      }
-    }.flatMap(a => a)
+      .flatMap(a => a)
   }
 
   private object AutoInsertedBody {

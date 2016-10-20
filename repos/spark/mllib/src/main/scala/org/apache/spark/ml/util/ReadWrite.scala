@@ -226,10 +226,14 @@ private[ml] object DefaultParamsWriter {
     val cls = instance.getClass.getName
     val params =
       instance.extractParamMap().toSeq.asInstanceOf[Seq[ParamPair[Any]]]
-    val jsonParams = paramMap.getOrElse(render(params.map {
-      case ParamPair(p, v) =>
-        p.name -> parse(p.jsonEncode(v))
-    }.toList))
+    val jsonParams = paramMap.getOrElse(
+      render(
+        params
+          .map {
+            case ParamPair(p, v) =>
+              p.name -> parse(p.jsonEncode(v))
+          }
+          .toList))
     val basicMetadata =
       ("class" -> cls) ~ ("timestamp" -> System.currentTimeMillis()) ~
         ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
@@ -292,10 +296,12 @@ private[ml] object DefaultParamsReader {
       implicit val format = DefaultFormats
       params match {
         case JObject(pairs) =>
-          val values = pairs.filter {
-            case (pName, jsonValue) =>
-              pName == paramName
-          }.map(_._2)
+          val values = pairs
+            .filter {
+              case (pName, jsonValue) =>
+                pName == paramName
+            }
+            .map(_._2)
           assert(values.length == 1,
                  s"Expected one instance of Param '$paramName' but found" +
                    s" ${values.length} in JSON Params: " +

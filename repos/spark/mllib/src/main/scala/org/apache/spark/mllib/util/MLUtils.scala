@@ -112,10 +112,12 @@ object MLUtils {
         numFeatures
       } else {
         parsed.persist(StorageLevel.MEMORY_ONLY)
-        parsed.map {
-          case (label, indices, values) =>
-            indices.lastOption.getOrElse(0)
-        }.reduce(math.max) + 1
+        parsed
+          .map {
+            case (label, indices, values) =>
+              indices.lastOption.getOrElse(0)
+          }
+          .reduce(math.max) + 1
       }
 
     parsed.map {
@@ -301,15 +303,20 @@ object MLUtils {
                          numFolds: Int,
                          seed: Long): Array[(RDD[T], RDD[T])] = {
     val numFoldsF = numFolds.toFloat
-    (1 to numFolds).map { fold =>
-      val sampler = new BernoulliCellSampler[T]((fold - 1) / numFoldsF,
-                                                fold / numFoldsF,
-                                                complement = false)
-      val validation = new PartitionwiseSampledRDD(rdd, sampler, true, seed)
-      val training =
-        new PartitionwiseSampledRDD(rdd, sampler.cloneComplement(), true, seed)
-      (training, validation)
-    }.toArray
+    (1 to numFolds)
+      .map { fold =>
+        val sampler = new BernoulliCellSampler[T]((fold - 1) / numFoldsF,
+                                                  fold / numFoldsF,
+                                                  complement = false)
+        val validation = new PartitionwiseSampledRDD(rdd, sampler, true, seed)
+        val training =
+          new PartitionwiseSampledRDD(rdd,
+                                      sampler.cloneComplement(),
+                                      true,
+                                      seed)
+        (training, validation)
+      }
+      .toArray
   }
 
   /**

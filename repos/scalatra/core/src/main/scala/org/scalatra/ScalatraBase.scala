@@ -435,9 +435,12 @@ trait ScalatraBase
     case is: java.io.InputStream => MimeTypes(is)
     case file: File => MimeTypes(file)
     case actionResult: ActionResult =>
-      actionResult.headers.find {
-        case (name, value) => name equalsIgnoreCase "CONTENT-TYPE"
-      }.getOrElse(("Content-Type", contentTypeInferrer(actionResult.body)))._2
+      actionResult.headers
+        .find {
+          case (name, value) => name equalsIgnoreCase "CONTENT-TYPE"
+        }
+        .getOrElse(("Content-Type", contentTypeInferrer(actionResult.body)))
+        ._2
     //    case Unit | _: Unit => null
     case _ => "text/html"
   }

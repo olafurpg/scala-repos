@@ -332,9 +332,12 @@ private[serverset2] object ZkSession {
       logger.info(s"Starting new zk session ${zkSession.sessionId}")
 
       // Upon initial connection, send auth info, then update `u`.
-      zkSession.state.changes.filter {
-        _ == WatchState.SessionState(SessionState.SyncConnected)
-      }.toFuture.unit before zkSession
+      zkSession.state.changes
+        .filter {
+          _ == WatchState.SessionState(SessionState.SyncConnected)
+        }
+        .toFuture
+        .unit before zkSession
         .addAuthInfo("digest", Buf.Utf8(authInfo)) onSuccess { _ =>
         logger.info(
           s"New ZKSession is connected. Session ID: ${zkSession.sessionIdAsHex}")
@@ -343,9 +346,11 @@ private[serverset2] object ZkSession {
       }
 
       // Kick off a delayed reconnection on session expiration.
-      zkSession.state.changes.filter {
-        _ == WatchState.SessionState(SessionState.Expired)
-      }.toFuture()
+      zkSession.state.changes
+        .filter {
+          _ == WatchState.SessionState(SessionState.Expired)
+        }
+        .toFuture()
         .unit
         .before {
           val jitter = backoff.next()

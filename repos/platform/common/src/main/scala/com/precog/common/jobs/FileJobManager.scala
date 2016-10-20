@@ -160,9 +160,11 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
         loadJob(name.substring(0, name.length - JOB_SUFFIX.length))
       }
     }
-    cache.values.collect {
-      case FileJobState(job, _, _) if job.apiKey == apiKey => job
-    }.toSeq
+    cache.values
+      .collect {
+        case FileJobState(job, _, _) if job.apiKey == apiKey => job
+      }
+      .toSeq
   }
 
   def listChannels(jobId: JobId): M[Seq[ChannelId]] = M.point {

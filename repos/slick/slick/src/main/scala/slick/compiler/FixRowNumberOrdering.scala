@@ -20,9 +20,10 @@ class FixRowNumberOrdering extends Phase {
         RowNumber(c.orderBy) :@ r.nodeType
       case (c: Comprehension, _) =>
         c.mapScopedChildren {
-          case (Some(gen), ch) => fix(ch, None)
-          case (None, ch) => fix(ch, Some(c))
-        }.infer()
+            case (Some(gen), ch) => fix(ch, None)
+            case (None, ch) => fix(ch, Some(c))
+          }
+          .infer()
       case (n, _) => n.mapChildren(ch => fix(ch, parent), keepType = true)
     }
 }

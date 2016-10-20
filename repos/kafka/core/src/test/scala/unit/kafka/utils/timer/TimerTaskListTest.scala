@@ -41,12 +41,14 @@ class TimerTaskListTest {
     val list2 = new TimerTaskList(sharedCounter)
     val list3 = new TimerTaskList(sharedCounter)
 
-    val tasks = (1 to 10).map { i =>
-      val task = new TestTask(10L)
-      list1.add(new TimerTaskEntry(task))
-      assertEquals(i, sharedCounter.get)
-      task
-    }.toSeq
+    val tasks = (1 to 10)
+      .map { i =>
+        val task = new TestTask(10L)
+        list1.add(new TimerTaskEntry(task))
+        assertEquals(i, sharedCounter.get)
+        task
+      }
+      .toSeq
 
     assertEquals(tasks.size, sharedCounter.get)
 

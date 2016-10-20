@@ -422,9 +422,12 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     val sortedList = listOfLists.sortWith { (x, y) =>
       !x.isEmpty && (y.isEmpty || (x(0) < y(0)))
     }
-    assert(sortedList === (1 to 9).map { x =>
-      List(x)
-    }.toList, "Tried coalescing 9 partitions to 20 but didn't get 9 back")
+    assert(sortedList === (1 to 9)
+             .map { x =>
+               List(x)
+             }
+             .toList,
+           "Tried coalescing 9 partitions to 20 but didn't get 9 back")
   }
 
   test("coalesced RDDs with locality, large scale (10K partitions)") {

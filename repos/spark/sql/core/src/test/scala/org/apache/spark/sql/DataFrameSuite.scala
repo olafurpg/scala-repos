@@ -109,9 +109,12 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
       .unionAll(testData)
 
     // Before optimizer, Union should be combined.
-    assert(unionDF.queryExecution.analyzed.collect {
-      case j: Union if j.children.size == 5 => j
-    }.size === 1)
+    assert(
+      unionDF.queryExecution.analyzed
+        .collect {
+          case j: Union if j.children.size == 5 => j
+        }
+        .size === 1)
 
     checkAnswer(
       unionDF.agg(avg('key), max('key), min('key), sum('key)),
@@ -1409,24 +1412,39 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
       val join = df.join(df, "id")
       val plan = join.queryExecution.executedPlan
       checkAnswer(join, df)
-      assert(join.queryExecution.executedPlan.collect {
-        case e: ShuffleExchange => true
-      }.size === 1)
-      assert(join.queryExecution.executedPlan.collect {
-        case e: ReusedExchange => true
-      }.size === 1)
+      assert(
+        join.queryExecution.executedPlan
+          .collect {
+            case e: ShuffleExchange => true
+          }
+          .size === 1)
+      assert(
+        join.queryExecution.executedPlan
+          .collect {
+            case e: ReusedExchange => true
+          }
+          .size === 1)
       val broadcasted = broadcast(join)
       val join2 = join.join(broadcasted, "id").join(broadcasted, "id")
       checkAnswer(join2, df)
-      assert(join2.queryExecution.executedPlan.collect {
-        case e: ShuffleExchange => true
-      }.size === 1)
-      assert(join2.queryExecution.executedPlan.collect {
-        case e: BroadcastExchange => true
-      }.size === 1)
-      assert(join2.queryExecution.executedPlan.collect {
-        case e: ReusedExchange => true
-      }.size === 4)
+      assert(
+        join2.queryExecution.executedPlan
+          .collect {
+            case e: ShuffleExchange => true
+          }
+          .size === 1)
+      assert(
+        join2.queryExecution.executedPlan
+          .collect {
+            case e: BroadcastExchange => true
+          }
+          .size === 1)
+      assert(
+        join2.queryExecution.executedPlan
+          .collect {
+            case e: ReusedExchange => true
+          }
+          .size === 4)
     }
   }
 

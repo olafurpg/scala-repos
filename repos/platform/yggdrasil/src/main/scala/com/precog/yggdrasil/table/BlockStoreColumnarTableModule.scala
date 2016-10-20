@@ -1223,9 +1223,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                   sortOrder: DesiredSortOrder): Table = {
       import mergeEngine._
 
-      val totalCount = indices.toList.map {
-        case (_, sliceIndex) => sliceIndex.count
-      }.sum
+      val totalCount = indices.toList
+        .map {
+          case (_, sliceIndex) => sliceIndex.count
+        }
+        .sum
 
       // Map the distinct indices into SortProjections/Cells, then merge them
       def cellsMs: Stream[M[Option[CellState]]] =

@@ -152,13 +152,17 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   private def findFirstLine(options: CSVOptions, rdd: RDD[String]): String = {
     if (options.isCommentSet) {
       val comment = options.comment.toString
-      rdd.filter { line =>
-        line.trim.nonEmpty && !line.startsWith(comment)
-      }.first()
+      rdd
+        .filter { line =>
+          line.trim.nonEmpty && !line.startsWith(comment)
+        }
+        .first()
     } else {
-      rdd.filter { line =>
-        line.trim.nonEmpty
-      }.first()
+      rdd
+        .filter { line =>
+          line.trim.nonEmpty
+        }
+        .first()
     }
   }
 

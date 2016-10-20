@@ -170,18 +170,22 @@ trait PullRequestsControllerBase extends ControllerBase {
                     owner,
                     name,
                     pullreq.branch) != Some(pullreq.commitIdFrom),
-                needStatusCheck = context.loginAccount.map { u =>
-                  branchProtection.needStatusCheck(u.userName)
-                }.getOrElse(true),
+                needStatusCheck = context.loginAccount
+                  .map { u =>
+                    branchProtection.needStatusCheck(u.userName)
+                  }
+                  .getOrElse(true),
                 hasUpdatePermission = hasWritePermission(
                     pullreq.requestUserName,
                     pullreq.requestRepositoryName,
-                    context.loginAccount) && context.loginAccount.map { u =>
-                  !getProtectedBranchInfo(
-                    pullreq.requestUserName,
-                    pullreq.requestRepositoryName,
-                    pullreq.requestBranch).needStatusCheck(u.userName)
-                }.getOrElse(false),
+                    context.loginAccount) && context.loginAccount
+                    .map { u =>
+                    !getProtectedBranchInfo(
+                      pullreq.requestUserName,
+                      pullreq.requestRepositoryName,
+                      pullreq.requestBranch).needStatusCheck(u.userName)
+                  }
+                    .getOrElse(false),
                 hasMergePermission = hasMergePermission,
                 commitIdTo = pullreq.commitIdTo)
               html.mergeguide(mergeStatus,
@@ -502,10 +506,12 @@ trait PullRequestsControllerBase extends ControllerBase {
             forkedRepository.repository.originRepositoryName
           } else {
             // Sibling repository
-            getUserRepositories(originOwner).find { x =>
-              x.repository.originUserName == forkedRepository.repository.originUserName &&
-              x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
-            }.map(_.repository.repositoryName)
+            getUserRepositories(originOwner)
+              .find { x =>
+                x.repository.originUserName == forkedRepository.repository.originUserName &&
+                x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
+              }
+              .map(_.repository.repositoryName)
           };
           originRepository <- getRepository(originOwner, originRepositoryName))
       yield {

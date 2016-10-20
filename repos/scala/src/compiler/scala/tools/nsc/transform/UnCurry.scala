@@ -825,9 +825,11 @@ abstract class UnCurry
           }
 
         val allParams = paramTransforms map (_.param)
-        val (packedParams, tempVals) = paramTransforms.collect {
-          case Packed(param, tempVal) => (param, tempVal)
-        }.unzip
+        val (packedParams, tempVals) = paramTransforms
+          .collect {
+            case Packed(param, tempVal) => (param, tempVal)
+          }
+          .unzip
 
         val rhs1 =
           if (rhs == EmptyTree || tempVals.isEmpty) rhs

@@ -379,41 +379,43 @@ class FailureAccrualFactory[Req, Rep] private[finagle] (
   }
 
   def apply(conn: ClientConnection) = {
-    underlying(conn).map { service =>
-      // N.B. the reason we can't simply filter the service factory is so that
-      // we can override the session status to reflect the broader endpoint status.
-      new Service[Req, Rep] {
-        def apply(request: Req): Future[Rep] = {
-          // If service has just been revived, accept no further requests.
-          // Note: Another request may have come in before state transitions to
-          // ProbeClosed, so > 1 requests may be processing while in the
-          // ProbeClosed state. The result of first to complete will determine
-          // whether the factory transitions to Alive (successful) or Dead
-          // (unsuccessful).
-          state match {
-            case ProbeOpen =>
-              probesCounter.incr()
-              svcFacSelf.synchronized {
-                state match {
-                  case ProbeOpen => state = ProbeClosed
-                  case _ =>
+    underlying(conn)
+      .map { service =>
+        // N.B. the reason we can't simply filter the service factory is so that
+        // we can override the session status to reflect the broader endpoint status.
+        new Service[Req, Rep] {
+          def apply(request: Req): Future[Rep] = {
+            // If service has just been revived, accept no further requests.
+            // Note: Another request may have come in before state transitions to
+            // ProbeClosed, so > 1 requests may be processing while in the
+            // ProbeClosed state. The result of first to complete will determine
+            // whether the factory transitions to Alive (successful) or Dead
+            // (unsuccessful).
+            state match {
+              case ProbeOpen =>
+                probesCounter.incr()
+                svcFacSelf.synchronized {
+                  state match {
+                    case ProbeOpen => state = ProbeClosed
+                    case _ =>
+                  }
                 }
-              }
-            case _ =>
+              case _ =>
+            }
+
+            service(request).respond { rep =>
+              if (isSuccess(ReqRep(request, rep))) didSucceed()
+              else didFail()
+            }
           }
 
-          service(request).respond { rep =>
-            if (isSuccess(ReqRep(request, rep))) didSucceed()
-            else didFail()
-          }
+          override def close(deadline: Time): Future[Unit] =
+            service.close(deadline)
+          override def status: Status =
+            Status.worst(service.status, FailureAccrualFactory.this.status)
         }
-
-        override def close(deadline: Time): Future[Unit] =
-          service.close(deadline)
-        override def status: Status =
-          Status.worst(service.status, FailureAccrualFactory.this.status)
       }
-    }.onFailure(onServiceAcquisitionFailure)
+      .onFailure(onServiceAcquisitionFailure)
   }
 
   override def status: Status = state match {

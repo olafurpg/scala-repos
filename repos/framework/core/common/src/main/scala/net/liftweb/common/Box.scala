@@ -88,11 +88,13 @@ object Box extends BoxTrait with Tryo {
       **/
     def toSingleBox(failureErrorMessage: String): Box[List[T]] = {
       if (theListOfBoxes.exists(_.isInstanceOf[Failure])) {
-        val failureChain = theListOfBoxes.collect {
-          case fail: Failure => fail
-        }.reduceRight { (topmostFailure, latestFailure) =>
-          topmostFailure.copy(chain = Full(latestFailure))
-        }
+        val failureChain = theListOfBoxes
+          .collect {
+            case fail: Failure => fail
+          }
+          .reduceRight { (topmostFailure, latestFailure) =>
+            topmostFailure.copy(chain = Full(latestFailure))
+          }
 
         ParamFailure(
           failureErrorMessage,

@@ -40,9 +40,11 @@ case class ProjectProbabilitySimplex(s: Double) extends Proximal {
       (elem._1 - s) / (elem._2 + 1)
     })
     val ndx =
-      (DenseVector(sorted) - cs).data.filter { elem =>
-        elem >= 0.0
-      }.length - 1
+      (DenseVector(sorted) - cs).data
+        .filter { elem =>
+          elem >= 0.0
+        }
+        .length - 1
     cforRange(0 until x.length) { i =>
       x.update(i, max(x(i) - cs(ndx), 0.0))
     }

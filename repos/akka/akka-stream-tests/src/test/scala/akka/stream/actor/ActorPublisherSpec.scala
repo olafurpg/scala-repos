@@ -331,9 +331,12 @@ class ActorPublisherSpec
         val sink: Sink[String, ActorRef] =
           Sink.actorSubscriber(receiverProps(probe.ref))
 
-        val (snd, rcv) = source.collect {
-          case n if n % 2 == 0 ⇒ "elem-" + n
-        }.toMat(sink)(Keep.both).run()
+        val (snd, rcv) = source
+          .collect {
+            case n if n % 2 == 0 ⇒ "elem-" + n
+          }
+          .toMat(sink)(Keep.both)
+          .run()
 
         (1 to 3) foreach { snd ! _ }
         probe.expectMsg("elem-2")

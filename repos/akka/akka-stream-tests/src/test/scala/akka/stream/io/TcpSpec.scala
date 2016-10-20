@@ -535,50 +535,51 @@ class TcpSpec
       Await.result(echoServerFinish, 1.second)
     }
 
-    "bind and unbind correctly" in EventFilter[BindException](occurrences = 2).intercept {
-      if (Helpers.isWindows) {
-        info("On Windows unbinding is not immediate")
-        pending
+    "bind and unbind correctly" in EventFilter[BindException](occurrences = 2)
+      .intercept {
+        if (Helpers.isWindows) {
+          info("On Windows unbinding is not immediate")
+          pending
+        }
+        val address = temporaryServerAddress()
+        val probe1 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
+        val bind =
+          Tcp(system)
+            .bind(address.getHostName, address.getPort) // TODO getHostString in Java7
+        // Bind succeeded, we have a local address
+        val binding1 =
+          Await.result(bind.to(Sink.fromSubscriber(probe1)).run(), 3.second)
+
+        probe1.expectSubscription()
+
+        val probe2 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
+        val binding2F = bind.to(Sink.fromSubscriber(probe2)).run()
+        probe2.expectSubscriptionAndError(BindFailedException)
+
+        val probe3 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
+        val binding3F = bind.to(Sink.fromSubscriber(probe3)).run()
+        probe3.expectSubscriptionAndError()
+
+        a[BindFailedException] shouldBe thrownBy {
+          Await.result(binding2F, 1.second)
+        }
+        a[BindFailedException] shouldBe thrownBy {
+          Await.result(binding3F, 1.second)
+        }
+
+        // Now unbind first
+        Await.result(binding1.unbind(), 1.second)
+        probe1.expectComplete()
+
+        val probe4 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
+        // Bind succeeded, we have a local address
+        val binding4 =
+          Await.result(bind.to(Sink.fromSubscriber(probe4)).run(), 3.second)
+        probe4.expectSubscription()
+
+        // clean up
+        Await.result(binding4.unbind(), 1.second)
       }
-      val address = temporaryServerAddress()
-      val probe1 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
-      val bind =
-        Tcp(system)
-          .bind(address.getHostName, address.getPort) // TODO getHostString in Java7
-      // Bind succeeded, we have a local address
-      val binding1 =
-        Await.result(bind.to(Sink.fromSubscriber(probe1)).run(), 3.second)
-
-      probe1.expectSubscription()
-
-      val probe2 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
-      val binding2F = bind.to(Sink.fromSubscriber(probe2)).run()
-      probe2.expectSubscriptionAndError(BindFailedException)
-
-      val probe3 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
-      val binding3F = bind.to(Sink.fromSubscriber(probe3)).run()
-      probe3.expectSubscriptionAndError()
-
-      a[BindFailedException] shouldBe thrownBy {
-        Await.result(binding2F, 1.second)
-      }
-      a[BindFailedException] shouldBe thrownBy {
-        Await.result(binding3F, 1.second)
-      }
-
-      // Now unbind first
-      Await.result(binding1.unbind(), 1.second)
-      probe1.expectComplete()
-
-      val probe4 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
-      // Bind succeeded, we have a local address
-      val binding4 =
-        Await.result(bind.to(Sink.fromSubscriber(probe4)).run(), 3.second)
-      probe4.expectSubscription()
-
-      // clean up
-      Await.result(binding4.unbind(), 1.second)
-    }
 
     "not shut down connections after the connection stream cancelled" in assertAllStagesStopped {
       val address = temporaryServerAddress()

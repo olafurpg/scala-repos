@@ -129,13 +129,14 @@ object CompilerData {
           files.filterNot(file => file == libraryJar || file == compilerJar)
 
         val reflectJarError = {
-          readProperty(compilerJar, "compiler.properties", "version.number").flatMap {
-            case version if version.startsWith("2.10") =>
-              // TODO implement a better version comparison
-              find(extraJars, "scala-reflect", ".jar").left.toOption.map(_ +
-                " in Scala compiler classpath in Scala SDK " + sdk.getName)
-            case _ => None
-          }
+          readProperty(compilerJar, "compiler.properties", "version.number")
+            .flatMap {
+              case version if version.startsWith("2.10") =>
+                // TODO implement a better version comparison
+                find(extraJars, "scala-reflect", ".jar").left.toOption.map(_ +
+                  " in Scala compiler classpath in Scala SDK " + sdk.getName)
+              case _ => None
+            }
         }
 
         reflectJarError.toLeft(
