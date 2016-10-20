@@ -358,13 +358,17 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
   private def compareResults[Item](
       expectedValue: Array[(Array[Array[Item]], Long)],
       actualValue: Array[PrefixSpan.FreqSequence[Item]]): Unit = {
-    val expectedSet = expectedValue.map {
-      case (pattern: Array[Array[Item]], count: Long) =>
-        (pattern.map(itemSet => itemSet.toSet).toSeq, count)
-    }.toSet
-    val actualSet = actualValue.map { x =>
-      (x.sequence.map(_.toSet).toSeq, x.freq)
-    }.toSet
+    val expectedSet = expectedValue
+      .map {
+        case (pattern: Array[Array[Item]], count: Long) =>
+          (pattern.map(itemSet => itemSet.toSet).toSeq, count)
+      }
+      .toSet
+    val actualSet = actualValue
+      .map { x =>
+        (x.sequence.map(_.toSet).toSeq, x.freq)
+      }
+      .toSet
     assert(expectedSet === actualSet)
   }
 

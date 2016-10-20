@@ -85,9 +85,11 @@ class ColumnStatsSuite extends SparkFunSuite {
       assertResult(10, "Wrong null count")(stats.values(2))
       assertResult(20, "Wrong row count")(stats.values(3))
       assertResult(stats.values(4), "Wrong size in bytes") {
-        rows.map { row =>
-          if (row.isNullAt(0)) 4 else columnType.actualSize(row, 0)
-        }.sum
+        rows
+          .map { row =>
+            if (row.isNullAt(0)) 4 else columnType.actualSize(row, 0)
+          }
+          .sum
       }
     }
   }
@@ -127,9 +129,11 @@ class ColumnStatsSuite extends SparkFunSuite {
       assertResult(10, "Wrong null count")(stats.values(2))
       assertResult(20, "Wrong row count")(stats.values(3))
       assertResult(stats.values(4), "Wrong size in bytes") {
-        rows.map { row =>
-          if (row.isNullAt(0)) 4 else columnType.actualSize(row, 0)
-        }.sum
+        rows
+          .map { row =>
+            if (row.isNullAt(0)) 4 else columnType.actualSize(row, 0)
+          }
+          .sum
       }
     }
   }

@@ -183,9 +183,11 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Send the messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: Map[String, Int]): Unit = {
-    val messages = messageToFreq.flatMap {
-      case (s, freq) => Seq.fill(freq)(s)
-    }.toArray
+    val messages = messageToFreq
+      .flatMap {
+        case (s, freq) => Seq.fill(freq)(s)
+      }
+      .toArray
     sendMessages(topic, messages)
   }
 

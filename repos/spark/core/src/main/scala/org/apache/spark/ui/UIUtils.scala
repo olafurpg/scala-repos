@@ -445,9 +445,11 @@ private[spark] object UIUtils extends Logging {
       if (illegalNodes.nonEmpty) {
         throw new IllegalArgumentException(
           "Only HTML anchors allowed in job descriptions\n" +
-            illegalNodes.map { n =>
-              s"${n.label} in $n"
-            }.mkString("\n\t"))
+            illegalNodes
+              .map { n =>
+                s"${n.label} in $n"
+              }
+              .mkString("\n\t"))
       }
 
       // Verify that all links are relative links starting with "/"

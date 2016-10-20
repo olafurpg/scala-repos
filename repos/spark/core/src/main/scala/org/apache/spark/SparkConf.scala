@@ -223,9 +223,12 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
 
   /** Gets all the avro schemas in the configuration used in the generic Avro record serializer */
   def getAvroSchema: Map[Long, String] = {
-    getAll.filter { case (k, v) => k.startsWith(avroNamespace) }.map {
-      case (k, v) => (k.substring(avroNamespace.length).toLong, v)
-    }.toMap
+    getAll
+      .filter { case (k, v) => k.startsWith(avroNamespace) }
+      .map {
+        case (k, v) => (k.substring(avroNamespace.length).toLong, v)
+      }
+      .toMap
   }
 
   /** Remove a parameter from the configuration */
@@ -708,11 +711,13 @@ private[spark] object SparkConf extends Logging {
     * Maps the deprecated config name to a 2-tuple (new config name, alternate config info).
     */
   private val allAlternatives: Map[String, (String, AlternateConfig)] = {
-    configsWithAlternatives.keys.flatMap { key =>
-      configsWithAlternatives(key).map { cfg =>
-        (cfg.key -> (key -> cfg))
+    configsWithAlternatives.keys
+      .flatMap { key =>
+        configsWithAlternatives(key).map { cfg =>
+          (cfg.key -> (key -> cfg))
+        }
       }
-    }.toMap
+      .toMap
   }
 
   /**

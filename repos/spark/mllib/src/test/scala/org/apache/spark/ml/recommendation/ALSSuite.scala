@@ -375,24 +375,28 @@ class ALSSuite
         // TODO: Use a better (rank-based?) evaluation metric for implicit feedback.
         // We limit the ratings and the predictions to interval [0, 1] and compute the weighted RMSE
         // with the confidence scores as weights.
-        val (totalWeight, weightedSumSq) = predictions.map {
-          case (rating, prediction) =>
-            val confidence = 1.0 + alpha * math.abs(rating)
-            val rating01 = math.max(math.min(rating, 1.0), 0.0)
-            val prediction01 = math.max(math.min(prediction, 1.0), 0.0)
-            val err = prediction01 - rating01
-            (confidence, confidence * err * err)
-        }.reduce {
-          case ((c0, e0), (c1, e1)) =>
-            (c0 + c1, e0 + e1)
-        }
+        val (totalWeight, weightedSumSq) = predictions
+          .map {
+            case (rating, prediction) =>
+              val confidence = 1.0 + alpha * math.abs(rating)
+              val rating01 = math.max(math.min(rating, 1.0), 0.0)
+              val prediction01 = math.max(math.min(prediction, 1.0), 0.0)
+              val err = prediction01 - rating01
+              (confidence, confidence * err * err)
+          }
+          .reduce {
+            case ((c0, e0), (c1, e1)) =>
+              (c0 + c1, e0 + e1)
+          }
         math.sqrt(weightedSumSq / totalWeight)
       } else {
-        val mse = predictions.map {
-          case (rating, prediction) =>
-            val err = rating - prediction
-            err * err
-        }.mean()
+        val mse = predictions
+          .map {
+            case (rating, prediction) =>
+              val err = rating - prediction
+              err * err
+          }
+          .mean()
         math.sqrt(mse)
       }
     logInfo(s"Test RMSE is $rmse.")
@@ -562,16 +566,18 @@ class ALSSuite
       assert(userFactors.partitioner.isDefined,
              s"$tpe factors should have partitioner.")
       val part = userFactors.partitioner.get
-      userFactors.mapPartitionsWithIndex { (idx, items) =>
-        items.foreach {
-          case (id, _) =>
-            if (part.getPartition(id) != idx) {
-              throw new SparkException(
-                s"$tpe with ID $id should not be in partition $idx.")
-            }
+      userFactors
+        .mapPartitionsWithIndex { (idx, items) =>
+          items.foreach {
+            case (id, _) =>
+              if (part.getPartition(id) != idx) {
+                throw new SparkException(
+                  s"$tpe with ID $id should not be in partition $idx.")
+              }
+          }
+          Iterator.empty
         }
-        Iterator.empty
-      }.count()
+        .count()
     }
   }
 

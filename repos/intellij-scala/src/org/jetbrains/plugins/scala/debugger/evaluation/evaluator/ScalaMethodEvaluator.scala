@@ -103,21 +103,26 @@ case class ScalaMethodEvaluator(
         import scala.collection.JavaConversions._
         def sortedMethodCandidates: List[Method] = {
           val allMethods = referenceType.allMethods()
-          allMethods.toList.collect {
-            case method if !localMethod && method.name() == methodName =>
-              (method, 1)
-            case method
-                if !localMethod && method.name().endsWith("$$" + methodName) =>
-              (method, 1) //private method, maybe from parent class
-            case method if localMethod && method.name() == localMethodName =>
-              (method, 1)
-            case method
-                if localMethod && method.name.startsWith(methodName + "$") =>
-              (method, 2)
-            case method
-                if localMethod && method.name.contains(methodName + "$") =>
-              (method, 3)
-          }.sortBy(_._2).map(_._1)
+          allMethods.toList
+            .collect {
+              case method if !localMethod && method.name() == methodName =>
+                (method, 1)
+              case method
+                  if !localMethod && method
+                    .name()
+                    .endsWith("$$" + methodName) =>
+                (method, 1) //private method, maybe from parent class
+              case method if localMethod && method.name() == localMethodName =>
+                (method, 1)
+              case method
+                  if localMethod && method.name.startsWith(methodName + "$") =>
+                (method, 2)
+              case method
+                  if localMethod && method.name.contains(methodName + "$") =>
+                (method, 3)
+            }
+            .sortBy(_._2)
+            .map(_._1)
         }
         var jdiMethod: Method = null
         if (signature != null) {

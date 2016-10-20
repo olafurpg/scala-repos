@@ -70,10 +70,12 @@ class LogisticRegressionSuite
     * so we can validate the training accuracy compared with R's glmnet package.
     */
   ignore("export test data into CSV format") {
-    binaryDataset.rdd.map {
-      case Row(label: Double, features: Vector) =>
-        label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    binaryDataset.rdd
+      .map {
+        case Row(label: Double, features: Vector) =>
+          label + "," + features.toArray.mkString(",")
+      }
+      .repartition(1)
       .saveAsTextFile("target/tmp/LogisticRegressionSuite/binaryDataset")
   }
 
@@ -832,9 +834,11 @@ class LogisticRegressionSuite
     val model1 = trainer1.fit(binaryDataset)
     val model2 = trainer2.fit(binaryDataset)
 
-    val histogram = binaryDataset.rdd.map {
-      case Row(label: Double, features: Vector) => label
-    }.treeAggregate(new MultiClassSummarizer)(
+    val histogram = binaryDataset.rdd
+      .map {
+        case Row(label: Double, features: Vector) => label
+      }
+      .treeAggregate(new MultiClassSummarizer)(
         seqOp = (c, v) =>
           (c, v) match {
             case (classSummarizer: MultiClassSummarizer, label: Double) =>

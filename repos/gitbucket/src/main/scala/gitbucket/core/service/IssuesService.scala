@@ -164,23 +164,26 @@ trait IssuesService { self: AccountService =>
          GROUP BY PR.USER_NAME, PR.REPOSITORY_NAME, PR.ISSUE_ID) as SUMM
         LEFT OUTER JOIN COMMIT_STATUS CSD
           ON SUMM.CS_ALL = 1 AND SUMM.COMMIT_ID = CSD.COMMIT_ID""");
-      query(issueList).list.map {
-        case (userName,
-              repositoryName,
-              issueId,
+      query(issueList).list
+        .map {
+          case (userName,
+                repositoryName,
+                issueId,
+                count,
+                successCount,
+                context,
+                state,
+                targetUrl,
+                description) =>
+            (userName, repositoryName, issueId) -> CommitStatusInfo(
               count,
               successCount,
               context,
               state,
               targetUrl,
-              description) =>
-          (userName, repositoryName, issueId) -> CommitStatusInfo(count,
-                                                                  successCount,
-                                                                  context,
-                                                                  state,
-                                                                  targetUrl,
-                                                                  description)
-      }.toMap
+              description)
+        }
+        .toMap
     }
   }
 
@@ -238,23 +241,25 @@ trait IssuesService { self: AccountService =>
         .map(_.head._1)
         .map(is => (is.userName, is.repositoryName, is.issueId)))
 
-    result.map { issues =>
-      issues.head match {
-        case (issue, commentCount, _, _, _, milestone) =>
-          IssueInfo(
-            issue,
-            issues.flatMap { t =>
-              t._3.map(
-                Label(issue.userName,
-                      issue.repositoryName,
-                      _,
-                      t._4.get,
-                      t._5.get)
-              )
-            } toList,
-            milestone,
-            commentCount,
-            status.get(issue.userName, issue.repositoryName, issue.issueId))
+    result
+      .map { issues =>
+        issues.head match {
+          case (issue, commentCount, _, _, _, milestone) =>
+            IssueInfo(
+              issue,
+              issues
+                .flatMap { t =>
+                  t._3.map(
+                    Label(issue.userName,
+                          issue.repositoryName,
+                          _,
+                          t._4.get,
+                          t._5.get)
+                )
+              } toList,
+              milestone,
+              commentCount,
+              status.get(issue.userName, issue.repositoryName, issue.issueId))
       }
     } toList
   }
@@ -329,9 +334,11 @@ trait IssuesService { self: AccountService =>
                                condition: IssueSearchCondition,
                                pullRequest: Boolean)(implicit s: Session) =
     Issues filter { t1 =>
-      repos.map {
-        case (owner, repository) => t1.byRepository(owner, repository)
-      }.foldLeft[Column[Boolean]](false)(_ || _) &&
+      repos
+        .map {
+          case (owner, repository) => t1.byRepository(owner, repository)
+        }
+        .foldLeft[Column[Boolean]](false)(_ || _) &&
       (t1.closed === (condition.state == "closed").bind) &&
       //(t1.milestoneId      === condition.milestoneId.get.get.bind, condition.milestoneId.flatten.isDefined) &&
       (t1.milestoneId.? isEmpty, condition.milestone == Some(None)) &&
@@ -503,10 +510,12 @@ trait IssuesService { self: AccountService =>
       }
       .filter {
         case (t1, t2) =>
-          keywords.map { keyword =>
-            (t1.title.toLowerCase like (s"%${likeEncode(keyword)}%", '^')) ||
-            (t1.content.toLowerCase like (s"%${likeEncode(keyword)}%", '^'))
-          }.reduceLeft(_ && _)
+          keywords
+            .map { keyword =>
+              (t1.title.toLowerCase like (s"%${likeEncode(keyword)}%", '^')) ||
+              (t1.content.toLowerCase like (s"%${likeEncode(keyword)}%", '^'))
+            }
+            .reduceLeft(_ && _)
       }
       .map {
         case (t1, t2) =>
@@ -528,9 +537,11 @@ trait IssuesService { self: AccountService =>
       }
       .filter {
         case ((t1, t2), t3) =>
-          keywords.map { query =>
-            t1.content.toLowerCase like (s"%${likeEncode(query)}%", '^')
-          }.reduceLeft(_ && _)
+          keywords
+            .map { query =>
+              t1.content.toLowerCase like (s"%${likeEncode(query)}%", '^')
+            }
+            .reduceLeft(_ && _)
       }
       .map {
         case ((t1, t2), t3) =>

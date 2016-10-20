@@ -37,10 +37,12 @@ object Test extends DirectTest {
     val grouped = needOverride.groupBy(_.owner).toSeq.sortBy {
       case (owner, _) => viewType baseTypeIndex owner
     }
-    val report = grouped.map {
-      case (owner, syms) =>
-        s"\n$owner\n${"-" * 70}\n${syms.map(_.defString).sorted.mkString("\n")}"
-    }.mkString("\n")
+    val report = grouped
+      .map {
+        case (owner, syms) =>
+          s"\n$owner\n${"-" * 70}\n${syms.map(_.defString).sorted.mkString("\n")}"
+      }
+      .mkString("\n")
     println(report)
   }
 

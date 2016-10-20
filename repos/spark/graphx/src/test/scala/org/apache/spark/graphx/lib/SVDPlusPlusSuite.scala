@@ -44,10 +44,12 @@ class SVDPlusPlusSuite extends SparkFunSuite with LocalSparkContext {
       val (graph, _) = SVDPlusPlus.run(edges, conf)
       graph.cache()
       val err =
-        graph.vertices.map {
-          case (vid, vd) =>
-            if (vid % 2 == 1) vd._4 else 0.0
-        }.reduce(_ + _) / graph.numEdges
+        graph.vertices
+          .map {
+            case (vid, vd) =>
+              if (vid % 2 == 1) vd._4 else 0.0
+          }
+          .reduce(_ + _) / graph.numEdges
       assert(err <= svdppErr)
     }
   }

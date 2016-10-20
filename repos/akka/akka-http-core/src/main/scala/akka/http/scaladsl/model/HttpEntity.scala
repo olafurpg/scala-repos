@@ -576,32 +576,36 @@ object HttpEntity {
     */
   private def limitable[Out, Mat](source: Source[Out, Mat],
                                   sizeOf: Out ⇒ Int): Source[Out, Mat] =
-    source.via(Flow[Out].transform { () ⇒
-      new PushStage[Out, Out] {
-        var maxBytes = -1L
-        var bytesLeft = Long.MaxValue
+    source.via(
+      Flow[Out]
+        .transform { () ⇒
+          new PushStage[Out, Out] {
+            var maxBytes = -1L
+            var bytesLeft = Long.MaxValue
 
-        override def preStart(ctx: LifecycleContext) =
-          ctx.attributes.getFirst[SizeLimit] match {
-            case Some(limit: SizeLimit) if limit.isDisabled ⇒
-            // "no limit"
-            case Some(SizeLimit(bytes, cl @ Some(contentLength))) ⇒
-              if (contentLength > bytes)
-                throw EntityStreamSizeException(bytes, cl)
-            // else we still count but never throw an error
-            case Some(SizeLimit(bytes, None)) ⇒
-              maxBytes = bytes
-              bytesLeft = bytes
-            case None ⇒
+            override def preStart(ctx: LifecycleContext) =
+              ctx.attributes.getFirst[SizeLimit] match {
+                case Some(limit: SizeLimit) if limit.isDisabled ⇒
+                // "no limit"
+                case Some(SizeLimit(bytes, cl @ Some(contentLength))) ⇒
+                  if (contentLength > bytes)
+                    throw EntityStreamSizeException(bytes, cl)
+                // else we still count but never throw an error
+                case Some(SizeLimit(bytes, None)) ⇒
+                  maxBytes = bytes
+                  bytesLeft = bytes
+                case None ⇒
+              }
+
+            def onPush(elem: Out,
+                       ctx: stage.Context[Out]): stage.SyncDirective = {
+              bytesLeft -= sizeOf(elem)
+              if (bytesLeft >= 0) ctx.push(elem)
+              else ctx.fail(EntityStreamSizeException(maxBytes))
+            }
           }
-
-        def onPush(elem: Out, ctx: stage.Context[Out]): stage.SyncDirective = {
-          bytesLeft -= sizeOf(elem)
-          if (bytesLeft >= 0) ctx.push(elem)
-          else ctx.fail(EntityStreamSizeException(maxBytes))
         }
-      }
-    }.named("limitable"))
+        .named("limitable"))
 
   /**
     * INTERNAL API

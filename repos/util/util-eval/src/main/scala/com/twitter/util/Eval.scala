@@ -154,9 +154,11 @@ class Eval(target: Option[File]) {
   def apply[T](files: File*): T = {
     if (target.isDefined) {
       val targetDir = target.get
-      val unprocessedSource = files.map {
-        scala.io.Source.fromFile(_).mkString
-      }.mkString("\n")
+      val unprocessedSource = files
+        .map {
+          scala.io.Source.fromFile(_).mkString
+        }
+        .mkString("\n")
       val processed = sourceForString(unprocessedSource)
       val sourceChecksum = uniqueId(processed, None)
       val checksumFile = new File(targetDir, "checksum")
@@ -266,8 +268,8 @@ class Eval(target: Option[File]) {
     * @throws CompilerException if not Eval-able.
     */
   def check(files: File*) {
-    val code = files.map { scala.io.Source.fromFile(_).mkString }
-      .mkString("\n")
+    val code =
+      files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n")
     check(code)
   }
 

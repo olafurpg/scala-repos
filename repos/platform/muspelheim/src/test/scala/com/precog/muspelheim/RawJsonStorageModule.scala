@@ -134,13 +134,17 @@ trait RawJsonStorageModule[M[+ _]] { self =>
       EitherT.right {
         M.point {
           val structs = structures.getOrElse(path, Set.empty[ColumnRef])
-          val types: Map[CType, Long] = structs.collect {
-            // FIXME: This should use real counts
-            case ColumnRef(selector, ctype) if selector.hasPrefix(selector) =>
-              (ctype, 0L)
-          }.groupBy(_._1).map {
-            case (tpe, values) => (tpe, values.map(_._2).sum)
-          }
+          val types: Map[CType, Long] = structs
+            .collect {
+              // FIXME: This should use real counts
+              case ColumnRef(selector, ctype)
+                  if selector.hasPrefix(selector) =>
+                (ctype, 0L)
+            }
+            .groupBy(_._1)
+            .map {
+              case (tpe, values) => (tpe, values.map(_._2).sum)
+            }
 
           PathStructure(types, structs.map(_.selector))
         }

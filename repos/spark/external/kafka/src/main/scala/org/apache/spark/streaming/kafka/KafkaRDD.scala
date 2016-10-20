@@ -57,17 +57,19 @@ private[kafka] class KafkaRDD[K: ClassTag,
     with Logging
     with HasOffsetRanges {
   override def getPartitions: Array[Partition] = {
-    offsetRanges.zipWithIndex.map {
-      case (o, i) =>
-        val (host, port) = leaders(TopicAndPartition(o.topic, o.partition))
-        new KafkaRDDPartition(i,
-                              o.topic,
-                              o.partition,
-                              o.fromOffset,
-                              o.untilOffset,
-                              host,
-                              port)
-    }.toArray
+    offsetRanges.zipWithIndex
+      .map {
+        case (o, i) =>
+          val (host, port) = leaders(TopicAndPartition(o.topic, o.partition))
+          new KafkaRDDPartition(i,
+                                o.topic,
+                                o.partition,
+                                o.fromOffset,
+                                o.untilOffset,
+                                host,
+                                port)
+      }
+      .toArray
   }
 
   override def count(): Long = offsetRanges.map(_.count).sum
@@ -280,16 +282,20 @@ private[kafka] object KafkaRDD {
       untilOffsets: Map[TopicAndPartition, LeaderOffset],
       messageHandler: MessageAndMetadata[K, V] => R
   ): KafkaRDD[K, V, U, T, R] = {
-    val leaders = untilOffsets.map {
-      case (tp, lo) =>
-        tp -> (lo.host, lo.port)
-    }.toMap
+    val leaders = untilOffsets
+      .map {
+        case (tp, lo) =>
+          tp -> (lo.host, lo.port)
+      }
+      .toMap
 
-    val offsetRanges = fromOffsets.map {
-      case (tp, fo) =>
-        val uo = untilOffsets(tp)
-        OffsetRange(tp.topic, tp.partition, fo, uo.offset)
-    }.toArray
+    val offsetRanges = fromOffsets
+      .map {
+        case (tp, fo) =>
+          val uo = untilOffsets(tp)
+          OffsetRange(tp.topic, tp.partition, fo, uo.offset)
+      }
+      .toArray
 
     new KafkaRDD[K, V, U, T, R](sc,
                                 kafkaParams,

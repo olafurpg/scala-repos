@@ -31,9 +31,13 @@ trait RequestBodyHandlingSpec
 
     def withServer[T](action: EssentialAction)(block: Port => T) = {
       val port = testServerPort
-      running(TestServer(port, GuiceApplicationBuilder().routes {
-        case _ => action
-      }.build())) {
+      running(
+        TestServer(port,
+                   GuiceApplicationBuilder()
+                     .routes {
+                       case _ => action
+                     }
+                     .build())) {
         block(port)
       }
     }

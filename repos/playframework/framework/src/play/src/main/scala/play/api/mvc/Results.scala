@@ -730,11 +730,12 @@ trait Results {
       url + Option(queryString)
         .filterNot(_.isEmpty)
         .map { params =>
-          (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap {
-            pair =>
+          (if (url.contains("?")) "&" else "?") + params.toSeq
+            .flatMap { pair =>
               pair._2.map(value =>
                 (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
-          }.mkString("&")
+            }
+            .mkString("&")
         }
         .getOrElse("")
     Status(status).withHeaders(LOCATION -> fullUrl)

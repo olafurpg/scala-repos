@@ -262,9 +262,11 @@ case class ExecutorLostFailure(execId: String,
         "unrelated to the running tasks"
       }
     s"ExecutorLostFailure (executor ${execId} exited ${exitBehavior})" +
-      reason.map { r =>
-        s" Reason: $r"
-      }.getOrElse("")
+      reason
+        .map { r =>
+          s" Reason: $r"
+        }
+        .getOrElse("")
   }
 
   override def countTowardsTaskFailures: Boolean = exitCausedByApp

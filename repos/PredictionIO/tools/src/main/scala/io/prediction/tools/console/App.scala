@@ -463,40 +463,44 @@ object App extends Logging {
               appid = app.id,
               name = newChannel
             ))
-          channelId.map { chanId =>
-            info(s"Updated Channel meta-data.")
-            // initialize storage
-            val dbInit = events.init(app.id, Some(chanId))
-            if (dbInit) {
-              info(s"Initialized Event Store for the channel: ${newChannel}.")
-              info(s"Created new channel:")
-              info(s"    Channel Name: ${newChannel}")
-              info(s"      Channel ID: ${chanId}")
-              info(s"          App ID: ${app.id}")
-              0
-            } else {
-              error(s"Unable to create new channel.")
-              error(s"Failed to initalize Event Store.")
-              // reverted back the meta data
-              try {
-                channels.delete(chanId)
+          channelId
+            .map { chanId =>
+              info(s"Updated Channel meta-data.")
+              // initialize storage
+              val dbInit = events.init(app.id, Some(chanId))
+              if (dbInit) {
+                info(
+                  s"Initialized Event Store for the channel: ${newChannel}.")
+                info(s"Created new channel:")
+                info(s"    Channel Name: ${newChannel}")
+                info(s"      Channel ID: ${chanId}")
+                info(s"          App ID: ${app.id}")
                 0
-              } catch {
-                case e: Exception =>
-                  error(s"Failed to revert back the Channel meta-data change.",
-                        e)
-                  error(s"The channel ${newChannel} CANNOT be used!")
-                  error(
-                    s"Please run 'pio app channel-delete ${app.name} ${newChannel}' " +
-                      "to delete this channel!")
-                  1
+              } else {
+                error(s"Unable to create new channel.")
+                error(s"Failed to initalize Event Store.")
+                // reverted back the meta data
+                try {
+                  channels.delete(chanId)
+                  0
+                } catch {
+                  case e: Exception =>
+                    error(
+                      s"Failed to revert back the Channel meta-data change.",
+                      e)
+                    error(s"The channel ${newChannel} CANNOT be used!")
+                    error(
+                      s"Please run 'pio app channel-delete ${app.name} ${newChannel}' " +
+                        "to delete this channel!")
+                    1
+                }
               }
             }
-          }.getOrElse {
-            error(s"Unable to create new channel.")
-            error(s"Failed to update Channel meta-data.")
-            1
-          }
+            .getOrElse {
+              error(s"Unable to create new channel.")
+              error(s"Failed to update Channel meta-data.")
+              1
+            }
         }
       } getOrElse {
         error(s"App ${ca.app.name} does not exist. Aborting.")

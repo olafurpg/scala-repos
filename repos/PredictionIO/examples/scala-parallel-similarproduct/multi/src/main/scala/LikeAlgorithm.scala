@@ -35,47 +35,55 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
     // collect Item as Map and convert ID to Int index
-    val items: Map[Int, Item] = data.items.map {
-      case (id, item) =>
-        (itemStringIntMap(id), item)
-    }.collectAsMap.toMap
+    val items: Map[Int, Item] = data.items
+      .map {
+        case (id, item) =>
+          (itemStringIntMap(id), item)
+      }
+      .collectAsMap
+      .toMap
 
-    val mllibRatings = data.likeEvents.map { r =>
-      // Convert user and item String IDs to Int index for MLlib
-      val uindex = userStringIntMap.getOrElse(r.user, -1)
-      val iindex = itemStringIntMap.getOrElse(r.item, -1)
+    val mllibRatings = data.likeEvents
+      .map { r =>
+        // Convert user and item String IDs to Int index for MLlib
+        val uindex = userStringIntMap.getOrElse(r.user, -1)
+        val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
-      if (uindex == -1)
-        logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-          " to Int index.")
+        if (uindex == -1)
+          logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
+            " to Int index.")
 
-      if (iindex == -1)
-        logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-          " to Int index.")
+        if (iindex == -1)
+          logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
+            " to Int index.")
 
-      // key is (uindex, iindex) tuple, value is (like, t) tuple
-      ((uindex, iindex), (r.like, r.t))
-    }.filter {
-      case ((u, i), v) =>
-        //val  = d
-        // keep events with valid user and item index
-        (u != -1) && (i != -1)
-    }.reduceByKey {
-      case (v1, v2) => // MODIFIED
-        // An user may like an item and change to dislike it later,
-        // or vice versa. Use the latest value for this case.
-        val (like1, t1) = v1
-        val (like2, t2) = v2
-        // keep the latest value
-        if (t1 > t2) v1 else v2
-    }.map {
-      case ((u, i), (like, t)) => // MODIFIED
-        // With ALS.trainImplicit(), we can use negative value to indicate
-        // nagative siginal (ie. dislike)
-        val r = if (like) 1 else -1
-        // MLlibRating requires integer index for user and item
-        MLlibRating(u, i, r)
-    }.cache()
+        // key is (uindex, iindex) tuple, value is (like, t) tuple
+        ((uindex, iindex), (r.like, r.t))
+      }
+      .filter {
+        case ((u, i), v) =>
+          //val  = d
+          // keep events with valid user and item index
+          (u != -1) && (i != -1)
+      }
+      .reduceByKey {
+        case (v1, v2) => // MODIFIED
+          // An user may like an item and change to dislike it later,
+          // or vice versa. Use the latest value for this case.
+          val (like1, t1) = v1
+          val (like2, t2) = v2
+          // keep the latest value
+          if (t1 > t2) v1 else v2
+      }
+      .map {
+        case ((u, i), (like, t)) => // MODIFIED
+          // With ALS.trainImplicit(), we can use negative value to indicate
+          // nagative siginal (ie. dislike)
+          val r = if (like) 1 else -1
+          // MLlibRating requires integer index for user and item
+          MLlibRating(u, i, r)
+      }
+      .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,

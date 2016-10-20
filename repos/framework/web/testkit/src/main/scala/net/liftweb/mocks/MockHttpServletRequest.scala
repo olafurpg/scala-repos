@@ -428,7 +428,8 @@ class MockHttpServletRequest(val url: String = null,
         newMap += k -> (newMap(k) ::: v :: Nil) // Ugly, but it works and keeps order
     }
 
-    newMap.map { case (k, v) => (k, v.toArray) }
+    newMap
+      .map { case (k, v) => (k, v.toArray) }
       .asInstanceOf[Map[String, Array[String]]]
 //    asMap(newMap.map{case (k,v) => (k,v.toArray)}.asInstanceOf[Map[Object,Object]])
   }

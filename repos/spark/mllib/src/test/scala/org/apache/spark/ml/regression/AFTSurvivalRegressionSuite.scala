@@ -58,16 +58,20 @@ class AFTSurvivalRegressionSuite
     * so we can validate the training accuracy compared with R's survival package.
     */
   ignore("export test data into CSV format") {
-    datasetUnivariate.rdd.map {
-      case Row(features: Vector, label: Double, censor: Double) =>
-        features.toArray.mkString(",") + "," + censor + "," + label
-    }.repartition(1)
+    datasetUnivariate.rdd
+      .map {
+        case Row(features: Vector, label: Double, censor: Double) =>
+          features.toArray.mkString(",") + "," + censor + "," + label
+      }
+      .repartition(1)
       .saveAsTextFile(
         "target/tmp/AFTSurvivalRegressionSuite/datasetUnivariate")
-    datasetMultivariate.rdd.map {
-      case Row(features: Vector, label: Double, censor: Double) =>
-        features.toArray.mkString(",") + "," + censor + "," + label
-    }.repartition(1)
+    datasetMultivariate.rdd
+      .map {
+        case Row(features: Vector, label: Double, censor: Double) =>
+          features.toArray.mkString(",") + "," + censor + "," + label
+      }
+      .repartition(1)
       .saveAsTextFile(
         "target/tmp/AFTSurvivalRegressionSuite/datasetMultivariate")
   }

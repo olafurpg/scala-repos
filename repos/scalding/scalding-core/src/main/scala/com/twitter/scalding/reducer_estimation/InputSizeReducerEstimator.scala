@@ -51,9 +51,11 @@ class InputSizeReducerEstimator extends ReducerEstimator {
         val nReducers =
           (totalBytes.toDouble / bytesPerReducer).ceil.toInt max 1
 
-        lazy val logStr = inputSizes.map {
-          case (name, bytes) => s"   - ${name}\t${bytes}"
-        }.mkString("\n")
+        lazy val logStr = inputSizes
+          .map {
+            case (name, bytes) => s"   - ${name}\t${bytes}"
+          }
+          .mkString("\n")
 
         LOG.info(
           "\nInputSizeReducerEstimator" + "\n - input size (bytes): " +

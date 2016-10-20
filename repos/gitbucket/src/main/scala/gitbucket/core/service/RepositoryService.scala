@@ -95,19 +95,25 @@ trait RepositoryService { self: AccountService =>
           .filter(_.byRepository(oldUserName, oldRepositoryName))
           .list
 
-        Repositories.filter { t =>
-          (t.originUserName === oldUserName.bind) &&
-          (t.originRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
-          t.originUserName -> t.originRepositoryName
-        }.update(newUserName, newRepositoryName)
+        Repositories
+          .filter { t =>
+            (t.originUserName === oldUserName.bind) &&
+            (t.originRepositoryName === oldRepositoryName.bind)
+          }
+          .map { t =>
+            t.originUserName -> t.originRepositoryName
+          }
+          .update(newUserName, newRepositoryName)
 
-        Repositories.filter { t =>
-          (t.parentUserName === oldUserName.bind) &&
-          (t.parentRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
-          t.originUserName -> t.originRepositoryName
-        }.update(newUserName, newRepositoryName)
+        Repositories
+          .filter { t =>
+            (t.parentUserName === oldUserName.bind) &&
+            (t.parentRepositoryName === oldRepositoryName.bind)
+          }
+          .map { t =>
+            t.originUserName -> t.originRepositoryName
+          }
+          .update(newUserName, newRepositoryName)
 
         // Updates activity fk before deleting repository because activity is sorted by activityId
         // and it can't be changed by deleting-and-inserting record.
@@ -177,12 +183,15 @@ trait RepositoryService { self: AccountService =>
                         repositoryName = newRepositoryName)): _*)
 
         // Update source repository of pull requests
-        PullRequests.filter { t =>
-          (t.requestUserName === oldUserName.bind) &&
-          (t.requestRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
-          t.requestUserName -> t.requestRepositoryName
-        }.update(newUserName, newRepositoryName)
+        PullRequests
+          .filter { t =>
+            (t.requestUserName === oldUserName.bind) &&
+            (t.requestRepositoryName === oldRepositoryName.bind)
+          }
+          .map { t =>
+            t.requestUserName -> t.requestRepositoryName
+          }
+          .update(newUserName, newRepositoryName)
 
         // Convert labelId
         val oldLabelMap = labels.map(x => (x.labelId, x.labelName)).toMap
@@ -210,33 +219,37 @@ trait RepositoryService { self: AccountService =>
         }
 
         // Update activity messages
-        Activities.filter { t =>
-          (t.message like s"%:${oldUserName}/${oldRepositoryName}]%") ||
-          (t.message like s"%:${oldUserName}/${oldRepositoryName}#%") ||
-          (t.message like s"%:${oldUserName}/${oldRepositoryName}@%")
-        }.map { t =>
-          t.activityId -> t.message
-        }.list.foreach {
-          case (activityId, message) =>
-            Activities
-              .filter(_.activityId === activityId.bind)
-              .map(_.message)
-              .update(
-                message
-                  .replace(s"[repo:${oldUserName}/${oldRepositoryName}]",
-                           s"[repo:${newUserName}/${newRepositoryName}]")
-                  .replace(s"[branch:${oldUserName}/${oldRepositoryName}#",
-                           s"[branch:${newUserName}/${newRepositoryName}#")
-                  .replace(s"[tag:${oldUserName}/${oldRepositoryName}#",
-                           s"[tag:${newUserName}/${newRepositoryName}#")
-                  .replace(s"[pullreq:${oldUserName}/${oldRepositoryName}#",
-                           s"[pullreq:${newUserName}/${newRepositoryName}#")
-                  .replace(s"[issue:${oldUserName}/${oldRepositoryName}#",
-                           s"[issue:${newUserName}/${newRepositoryName}#")
-                  .replace(s"[commit:${oldUserName}/${oldRepositoryName}@",
-                           s"[commit:${newUserName}/${newRepositoryName}@")
-              )
-        }
+        Activities
+          .filter { t =>
+            (t.message like s"%:${oldUserName}/${oldRepositoryName}]%") ||
+            (t.message like s"%:${oldUserName}/${oldRepositoryName}#%") ||
+            (t.message like s"%:${oldUserName}/${oldRepositoryName}@%")
+          }
+          .map { t =>
+            t.activityId -> t.message
+          }
+          .list
+          .foreach {
+            case (activityId, message) =>
+              Activities
+                .filter(_.activityId === activityId.bind)
+                .map(_.message)
+                .update(
+                  message
+                    .replace(s"[repo:${oldUserName}/${oldRepositoryName}]",
+                             s"[repo:${newUserName}/${newRepositoryName}]")
+                    .replace(s"[branch:${oldUserName}/${oldRepositoryName}#",
+                             s"[branch:${newUserName}/${newRepositoryName}#")
+                    .replace(s"[tag:${oldUserName}/${oldRepositoryName}#",
+                             s"[tag:${newUserName}/${newRepositoryName}#")
+                    .replace(s"[pullreq:${oldUserName}/${oldRepositoryName}#",
+                             s"[pullreq:${newUserName}/${newRepositoryName}#")
+                    .replace(s"[issue:${oldUserName}/${oldRepositoryName}#",
+                             s"[issue:${newUserName}/${newRepositoryName}#")
+                    .replace(s"[commit:${oldUserName}/${oldRepositoryName}@",
+                             s"[commit:${newUserName}/${newRepositoryName}@")
+                )
+          }
       }
     }
   }
@@ -258,32 +271,40 @@ trait RepositoryService { self: AccountService =>
     Repositories.filter(_.byRepository(userName, repositoryName)).delete
 
     // Update ORIGIN_USER_NAME and ORIGIN_REPOSITORY_NAME
-    Repositories.filter { x =>
-      (x.originUserName === userName.bind) &&
-      (x.originRepositoryName === repositoryName.bind)
-    }.map { x =>
-      (x.userName, x.repositoryName)
-    }.list.foreach {
-      case (userName, repositoryName) =>
-        Repositories
-          .filter(_.byRepository(userName, repositoryName))
-          .map(x => (x.originUserName ?, x.originRepositoryName ?))
-          .update(None, None)
-    }
+    Repositories
+      .filter { x =>
+        (x.originUserName === userName.bind) &&
+        (x.originRepositoryName === repositoryName.bind)
+      }
+      .map { x =>
+        (x.userName, x.repositoryName)
+      }
+      .list
+      .foreach {
+        case (userName, repositoryName) =>
+          Repositories
+            .filter(_.byRepository(userName, repositoryName))
+            .map(x => (x.originUserName ?, x.originRepositoryName ?))
+            .update(None, None)
+      }
 
     // Update PARENT_USER_NAME and PARENT_REPOSITORY_NAME
-    Repositories.filter { x =>
-      (x.parentUserName === userName.bind) &&
-      (x.parentRepositoryName === repositoryName.bind)
-    }.map { x =>
-      (x.userName, x.repositoryName)
-    }.list.foreach {
-      case (userName, repositoryName) =>
-        Repositories
-          .filter(_.byRepository(userName, repositoryName))
-          .map(x => (x.parentUserName ?, x.parentRepositoryName ?))
-          .update(None, None)
-    }
+    Repositories
+      .filter { x =>
+        (x.parentUserName === userName.bind) &&
+        (x.parentRepositoryName === repositoryName.bind)
+      }
+      .map { x =>
+        (x.userName, x.repositoryName)
+      }
+      .list
+      .foreach {
+        case (userName, repositoryName) =>
+          Repositories
+            .filter(_.byRepository(userName, repositoryName))
+            .map(x => (x.parentUserName ?, x.parentRepositoryName ?))
+            .update(None, None)
+      }
   }
 
   /**
@@ -309,10 +330,13 @@ trait RepositoryService { self: AccountService =>
       t.byRepository(userName, repositoryName)
     } firstOption) map { repository =>
       // for getting issue count and pull request count
-      val issues = Issues.filter { t =>
-        t.byRepository(repository.userName, repository.repositoryName) &&
-        (t.closed === false.bind)
-      }.map(_.pullRequest).list
+      val issues = Issues
+        .filter { t =>
+          t.byRepository(repository.userName, repository.repositoryName) &&
+          (t.closed === false.bind)
+        }
+        .map(_.pullRequest)
+        .list
 
       new RepositoryInfo(
         JGitUtil.getRepositoryInfo(repository.userName,
@@ -337,13 +361,16 @@ trait RepositoryService { self: AccountService =>
     */
   def getAllRepositories(userName: String)(
       implicit s: Session): List[(String, String)] = {
-    Repositories.filter { t1 =>
-      (t1.isPrivate === false.bind) || (t1.userName === userName.bind) ||
-      (Collaborators.filter { t2 =>
-        t2.byRepository(t1.userName, t1.repositoryName) &&
-        (t2.collaboratorName === userName.bind)
-      } exists)
-    }.sortBy(_.lastActivityDate desc)
+    Repositories
+      .filter { t1 =>
+        (t1.isPrivate === false.bind) || (t1.userName === userName.bind) ||
+        (Collaborators
+          .filter { t2 =>
+            t2.byRepository(t1.userName, t1.repositoryName) &&
+            (t2.collaboratorName === userName.bind)
+        } exists)
+      }
+      .sortBy(_.lastActivityDate desc)
       .map { t =>
         (t.userName, t.repositoryName)
       }
@@ -353,28 +380,34 @@ trait RepositoryService { self: AccountService =>
   def getUserRepositories(userName: String,
                           withoutPhysicalInfo: Boolean = false)(
       implicit s: Session): List[RepositoryInfo] = {
-    Repositories.filter { t1 =>
-      (t1.userName === userName.bind) ||
-      (Collaborators.filter { t2 =>
-        t2.byRepository(t1.userName, t1.repositoryName) &&
-        (t2.collaboratorName === userName.bind)
-      } exists)
-    }.sortBy(_.lastActivityDate desc).list.map { repository =>
-      new RepositoryInfo(
-        if (withoutPhysicalInfo) {
-          new JGitUtil.RepositoryInfo(repository.userName,
-                                      repository.repositoryName)
-        } else {
-          JGitUtil.getRepositoryInfo(repository.userName,
-                                     repository.repositoryName)
-        },
-        repository,
-        getForkedCount(
-          repository.originUserName.getOrElse(repository.userName),
-          repository.originRepositoryName.getOrElse(repository.repositoryName)
-        ),
-        getRepositoryManagers(repository.userName))
-    }
+    Repositories
+      .filter { t1 =>
+        (t1.userName === userName.bind) ||
+        (Collaborators
+          .filter { t2 =>
+            t2.byRepository(t1.userName, t1.repositoryName) &&
+            (t2.collaboratorName === userName.bind)
+        } exists)
+      }
+      .sortBy(_.lastActivityDate desc)
+      .list
+      .map { repository =>
+        new RepositoryInfo(
+          if (withoutPhysicalInfo) {
+            new JGitUtil.RepositoryInfo(repository.userName,
+                                        repository.repositoryName)
+          } else {
+            JGitUtil.getRepositoryInfo(repository.userName,
+                                       repository.repositoryName)
+          },
+          repository,
+          getForkedCount(
+            repository.originUserName.getOrElse(repository.userName),
+            repository.originRepositoryName.getOrElse(
+              repository.repositoryName)
+          ),
+          getRepositoryManagers(repository.userName))
+      }
   }
 
   /**
@@ -398,33 +431,38 @@ trait RepositoryService { self: AccountService =>
       case Some(x) if (!x.isAdmin) =>
         Repositories filter { t =>
           (t.isPrivate === false.bind) || (t.userName === x.userName) ||
-          (Collaborators.filter { t2 =>
-            t2.byRepository(t.userName, t.repositoryName) &&
-            (t2.collaboratorName === x.userName.bind)
+          (Collaborators
+            .filter { t2 =>
+              t2.byRepository(t.userName, t.repositoryName) &&
+              (t2.collaboratorName === x.userName.bind)
           } exists)
         }
       // for Guests
       case None => Repositories filter (_.isPrivate === false.bind)
     }).filter { t =>
-      repositoryUserName.map { userName =>
-        t.userName === userName.bind
-      } getOrElse LiteralColumn(true)
-    }.sortBy(_.lastActivityDate desc).list.map { repository =>
-      new RepositoryInfo(
-        if (withoutPhysicalInfo) {
-          new JGitUtil.RepositoryInfo(repository.userName,
-                                      repository.repositoryName)
-        } else {
-          JGitUtil.getRepositoryInfo(repository.userName,
-                                     repository.repositoryName)
-        },
-        repository,
-        getForkedCount(
-          repository.originUserName.getOrElse(repository.userName),
-          repository.originRepositoryName.getOrElse(repository.repositoryName)
-        ),
-        getRepositoryManagers(repository.userName))
-    }
+        repositoryUserName.map { userName =>
+          t.userName === userName.bind
+        } getOrElse LiteralColumn(true)
+      }
+      .sortBy(_.lastActivityDate desc)
+      .list
+      .map { repository =>
+        new RepositoryInfo(
+          if (withoutPhysicalInfo) {
+            new JGitUtil.RepositoryInfo(repository.userName,
+                                        repository.repositoryName)
+          } else {
+            JGitUtil.getRepositoryInfo(repository.userName,
+                                       repository.repositoryName)
+          },
+          repository,
+          getForkedCount(
+            repository.originUserName.getOrElse(repository.userName),
+            repository.originRepositoryName.getOrElse(
+              repository.repositoryName)
+          ),
+          getRepositoryManagers(repository.userName))
+      }
   }
 
   private def getRepositoryManagers(userName: String)(
@@ -541,17 +579,24 @@ trait RepositoryService { self: AccountService =>
 
   private def getForkedCount(userName: String, repositoryName: String)(
       implicit s: Session): Int =
-    Query(Repositories.filter { t =>
-      (t.originUserName === userName.bind) &&
-      (t.originRepositoryName === repositoryName.bind)
-    }.length).first
+    Query(
+      Repositories
+        .filter { t =>
+          (t.originUserName === userName.bind) &&
+          (t.originRepositoryName === repositoryName.bind)
+        }
+        .length).first
 
   def getForkedRepositories(userName: String, repositoryName: String)(
       implicit s: Session): List[(String, String)] =
-    Repositories.filter { t =>
-      (t.originUserName === userName.bind) &&
-      (t.originRepositoryName === repositoryName.bind)
-    }.sortBy(_.userName asc).map(t => t.userName -> t.repositoryName).list
+    Repositories
+      .filter { t =>
+        (t.originUserName === userName.bind) &&
+        (t.originRepositoryName === repositoryName.bind)
+      }
+      .sortBy(_.userName asc)
+      .map(t => t.userName -> t.repositoryName)
+      .list
 }
 
 object RepositoryService {

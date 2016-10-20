@@ -546,9 +546,11 @@ object Req {
       } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
                    "application/x-www-form-urlencoded"))) {
         val params =
-          localParams ++ (request.params.sortWith { (s1, s2) =>
-            s1.name < s2.name
-          }).map(n => (n.name, n.values))
+          localParams ++ (request.params
+            .sortWith { (s1, s2) =>
+              s1.name < s2.name
+            })
+            .map(n => (n.name, n.values))
         ParamCalcInfo(request.paramNames, params, Nil, Empty)
       } else {
         ParamCalcInfo(queryStringParam._1,

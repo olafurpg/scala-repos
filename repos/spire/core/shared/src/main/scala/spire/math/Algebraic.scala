@@ -1424,10 +1424,12 @@ object Algebraic extends AlgebraicInstances {
         case root @ ConstantRoot(poly, _, _, _) =>
           // Bound on the euclidean distance of the coefficients.
           val distBound =
-            poly.terms.map {
-              case Term(c, _) =>
-                2L * c.bitLength
-            }.qsum / 2L + 1L
+            poly.terms
+              .map {
+                case Term(c, _) =>
+                  2L * c.bitLength
+              }
+              .qsum / 2L + 1L
           Bound(
             root.lead.bitLength + 1L,
             root.tail.bitLength + 1L,

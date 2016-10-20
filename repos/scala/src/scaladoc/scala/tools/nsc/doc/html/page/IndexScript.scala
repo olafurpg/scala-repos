@@ -103,9 +103,10 @@ class IndexScript(universe: doc.Universe) extends Page {
     def memberTail: MemberEntity => String = {
       case d: Def =>
         d.valueParams //List[List[ValueParam]]
-        .map { params =>
-          params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
-        }.mkString("(", ")(", "): " + d.resultType.name)
+          .map { params =>
+            params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
+          }
+          .mkString("(", ")(", "): " + d.resultType.name)
       case v: Val => ": " + v.resultType.name
     }
 

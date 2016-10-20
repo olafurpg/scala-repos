@@ -354,11 +354,13 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     def selfTypeText: Option[String] = {
       val alias = clazz.extendsBlock.selfTypeElement.fold("this")(_.name)
 
-      val typeText = classesForSelfType.map {
-        case obj: ScObject => s"${obj.qualifiedName}.type"
-        case cl: ScTypeDefinition => cl.qualifiedName
-        case cl: PsiClass => cl.getQualifiedName
-      }.mkString(" with ")
+      val typeText = classesForSelfType
+        .map {
+          case obj: ScObject => s"${obj.qualifiedName}.type"
+          case cl: ScTypeDefinition => cl.qualifiedName
+          case cl: PsiClass => cl.getQualifiedName
+        }
+        .mkString(" with ")
 
       if (classesForSelfType.nonEmpty) {
         val arrow = ScalaPsiUtil.functionArrow(clazz.getProject)

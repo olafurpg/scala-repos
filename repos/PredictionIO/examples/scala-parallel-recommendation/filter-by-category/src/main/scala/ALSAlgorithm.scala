@@ -64,13 +64,15 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val categories =
       data.items.flatMap(_.categories).distinct().collect().toSet
 
-    val categoriesMap = categories.map { category =>
-      category -> data.items
-        .filter(_.categories.contains(category))
-        .map(item => itemStringIntMap(item.id))
-        .collect()
-        .toSet
-    }.toMap
+    val categoriesMap = categories
+      .map { category =>
+        category -> data.items
+          .filter(_.categories.contains(category))
+          .map(item => itemStringIntMap(item.id))
+          .collect()
+          .toSet
+      }
+      .toMap
 
     new ALSModel(rank = m.rank,
                  userFeatures = m.userFeatures,

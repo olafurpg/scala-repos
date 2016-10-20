@@ -110,17 +110,19 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       }
 
       val (paramOpt: Seq[Option[String]], body: Seq[String]) =
-        typeArgList.typeArgs.zipWithIndex.map {
-          case (simple: ScSimpleTypeElement, i)
-              if inlineSyntaxIds.contains(simple.getText) =>
-            val name = generateName(i)
-            (Some(simple.getText.replace("?", name)), name)
-          case (param: ScParameterizedTypeElement, i)
-              if inlineSyntaxIds.contains(param.typeElement.getText) =>
-            val name = generateName(i)
-            (Some(param.getText.replace("?", name)), name)
-          case (a, _) => (None, a.getText)
-        }.unzip
+        typeArgList.typeArgs.zipWithIndex
+          .map {
+            case (simple: ScSimpleTypeElement, i)
+                if inlineSyntaxIds.contains(simple.getText) =>
+              val name = generateName(i)
+              (Some(simple.getText.replace("?", name)), name)
+            case (param: ScParameterizedTypeElement, i)
+                if inlineSyntaxIds.contains(param.typeElement.getText) =>
+              val name = generateName(i)
+              (Some(param.getText.replace("?", name)), name)
+            case (a, _) => (None, a.getText)
+          }
+          .unzip
       val paramText =
         paramOpt.flatten.mkString(start = "[", sep = ", ", end = "]")
       val bodyText = body.mkString(start = "[", sep = ", ", end = "]")

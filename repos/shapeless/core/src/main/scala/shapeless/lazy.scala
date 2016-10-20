@@ -436,12 +436,14 @@ class LazyMacros(val c: whitebox.Context)
       }
 
     def resolve(state: State)(inst: Instance): Option[(State, Instance)] =
-      resolve0(state)(inst.instTpe).filter {
-        case (_, tree, _) => !tree.equalsStructure(inst.ident)
-      }.map {
-        case (state0, extInst, actualTpe) =>
-          state0.closeInst(inst.instTpe, extInst, actualTpe)
-      }
+      resolve0(state)(inst.instTpe)
+        .filter {
+          case (_, tree, _) => !tree.equalsStructure(inst.ident)
+        }
+        .map {
+          case (state0, extInst, actualTpe) =>
+            state0.closeInst(inst.instTpe, extInst, actualTpe)
+        }
 
     def resolve0(state: State)(tpe: Type): Option[(State, Tree, Type)] = {
       val extInstOpt = State
@@ -554,9 +556,11 @@ class LazyMacros(val c: whitebox.Context)
 
     def mkInstances(state: State)(primaryTpe: Type): (Tree, Type) = {
       val instances = state.dict.values.toList
-      val (from, to) = instances.map { d =>
-        (d.symbol, NoSymbol)
-      }.unzip
+      val (from, to) = instances
+        .map { d =>
+          (d.symbol, NoSymbol)
+        }
+        .unzip
 
       def clean(inst: Tree) = {
         val cleanInst =

@@ -377,11 +377,13 @@ private[hive] trait HiveInspectors {
         case _ => pi.getPrimitiveJavaObject(data)
       }
     case li: ListObjectInspector =>
-      Option(li.getList(data)).map { l =>
-        val values =
-          l.asScala.map(unwrap(_, li.getListElementObjectInspector)).toArray
-        new GenericArrayData(values)
-      }.orNull
+      Option(li.getList(data))
+        .map { l =>
+          val values =
+            l.asScala.map(unwrap(_, li.getListElementObjectInspector)).toArray
+          new GenericArrayData(values)
+        }
+        .orNull
     case mi: MapObjectInspector =>
       val map = mi.getMap(data)
       if (map == null) {

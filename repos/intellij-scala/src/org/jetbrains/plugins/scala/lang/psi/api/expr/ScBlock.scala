@@ -140,9 +140,11 @@ trait ScBlock
                   new ScTypeVariable(obj.name)
                 case clazz: ScTypeDefinition =>
                   val t = existize(leastClassType(clazz), visitedWithT)
-                  val vars = clazz.typeParameters.map { tp =>
-                    ScalaPsiManager.typeVariable(tp)
-                  }.toList
+                  val vars = clazz.typeParameters
+                    .map { tp =>
+                      ScalaPsiManager.typeVariable(tp)
+                    }
+                    .toList
                   m.put(clazz.name,
                         new ScExistentialArgument(clazz.name, vars, t, t))
                   new ScTypeVariable(clazz.name)

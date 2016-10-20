@@ -290,17 +290,20 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
     val deadline = now - redeliverInterval.toNanos
     var warnings = Vector.empty[UnconfirmedDelivery]
 
-    unconfirmed.iterator.filter {
-      case (_, delivery) ⇒ delivery.timestamp <= deadline
-    }.take(redeliveryBurstLimit).foreach {
-      case (deliveryId, delivery) ⇒
-        send(deliveryId, delivery, now)
+    unconfirmed.iterator
+      .filter {
+        case (_, delivery) ⇒ delivery.timestamp <= deadline
+      }
+      .take(redeliveryBurstLimit)
+      .foreach {
+        case (deliveryId, delivery) ⇒
+          send(deliveryId, delivery, now)
 
-        if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
-          warnings :+= UnconfirmedDelivery(deliveryId,
-                                           delivery.destination,
-                                           delivery.message)
-    }
+          if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
+            warnings :+= UnconfirmedDelivery(deliveryId,
+                                             delivery.destination,
+                                             delivery.message)
+      }
 
     if (warnings.nonEmpty) self ! UnconfirmedWarning(warnings)
   }

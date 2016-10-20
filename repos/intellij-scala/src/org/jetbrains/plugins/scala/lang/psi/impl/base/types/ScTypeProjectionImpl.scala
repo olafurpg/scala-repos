@@ -63,16 +63,18 @@ class ScTypeProjectionImpl(node: ASTNode)
   def getVariants: Array[Object] = {
     val isInImport: Boolean =
       ScalaPsiUtil.getParentOfType(this, classOf[ScImportStmt]) != null
-    doResolve(new CompletionProcessor(getKinds(incomplete = true), this)).flatMap {
-      case res: ScalaResolveResult =>
-        import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-        val qualifier = res.fromType.getOrElse(Nothing)
-        LookupElementManager.getLookupElement(res,
-                                              isInImport = isInImport,
-                                              qualifierType = qualifier,
-                                              isInStableCodeReference = false)
-      case r => Seq(r.getElement)
-    }
+    doResolve(new CompletionProcessor(getKinds(incomplete = true), this))
+      .flatMap {
+        case res: ScalaResolveResult =>
+          import org.jetbrains.plugins.scala.lang.psi.types.Nothing
+          val qualifier = res.fromType.getOrElse(Nothing)
+          LookupElementManager.getLookupElement(
+            res,
+            isInImport = isInImport,
+            qualifierType = qualifier,
+            isInStableCodeReference = false)
+        case r => Seq(r.getElement)
+      }
   }
 
   def bindToElement(p1: PsiElement) =

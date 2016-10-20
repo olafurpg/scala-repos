@@ -142,27 +142,29 @@ private[streaming] object WriteAheadLogUtils extends Logging {
       } else {
         sparkConf.getOption(RECEIVER_WAL_CLASS_CONF_KEY)
       }
-    val wal = classNameOption.map { className =>
-      try {
-        instantiateClass(Utils
-                           .classForName(className)
-                           .asInstanceOf[Class[_ <: WriteAheadLog]],
-                         sparkConf)
-      } catch {
-        case NonFatal(e) =>
-          throw new SparkException(
-            s"Could not create a write ahead log of class $className",
-            e)
+    val wal = classNameOption
+      .map { className =>
+        try {
+          instantiateClass(Utils
+                             .classForName(className)
+                             .asInstanceOf[Class[_ <: WriteAheadLog]],
+                           sparkConf)
+        } catch {
+          case NonFatal(e) =>
+            throw new SparkException(
+              s"Could not create a write ahead log of class $className",
+              e)
+        }
       }
-    }.getOrElse {
-      new FileBasedWriteAheadLog(
-        sparkConf,
-        fileWalLogDirectory,
-        fileWalHadoopConf,
-        getRollingIntervalSecs(sparkConf, isDriver),
-        getMaxFailures(sparkConf, isDriver),
-        shouldCloseFileAfterWrite(sparkConf, isDriver))
-    }
+      .getOrElse {
+        new FileBasedWriteAheadLog(
+          sparkConf,
+          fileWalLogDirectory,
+          fileWalHadoopConf,
+          getRollingIntervalSecs(sparkConf, isDriver),
+          getMaxFailures(sparkConf, isDriver),
+          shouldCloseFileAfterWrite(sparkConf, isDriver))
+      }
     if (isBatchingEnabled(sparkConf, isDriver)) {
       new BatchedWriteAheadLog(wal, sparkConf)
     } else {

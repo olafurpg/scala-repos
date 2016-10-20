@@ -286,10 +286,12 @@ private class ReplicaBuffer(
 
   private def offsetResponseStringWithError(
       offsetResponse: OffsetResponse): String = {
-    offsetResponse.partitionErrorAndOffsets.filter {
-      case (topicAndPartition, partitionOffsetsResponse) =>
-        partitionOffsetsResponse.error != Errors.NONE.code
-    }.mkString
+    offsetResponse.partitionErrorAndOffsets
+      .filter {
+        case (topicAndPartition, partitionOffsetsResponse) =>
+          partitionOffsetsResponse.error != Errors.NONE.code
+      }
+      .mkString
   }
 
   private def setInitialOffsets() {

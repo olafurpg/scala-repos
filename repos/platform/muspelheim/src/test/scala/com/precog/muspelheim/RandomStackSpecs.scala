@@ -73,9 +73,11 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      val pageIds: Set[SValue] = (0 to 4).map { i =>
-        SString("page-" + i.toString)
-      }.toSet
+      val pageIds: Set[SValue] = (0 to 4)
+        .map { i =>
+          SString("page-" + i.toString)
+        }
+        .toSet
 
       result must haveAllElementsLike {
         case (ids, SObject(fields)) =>

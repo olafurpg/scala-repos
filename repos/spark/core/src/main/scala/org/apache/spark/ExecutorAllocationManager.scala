@@ -728,10 +728,15 @@ private[spark] class ExecutorAllocationManager(
       * Note: This is not thread-safe without the caller owning the `allocationManager` lock.
       */
     def totalPendingTasks(): Int = {
-      stageIdToNumTasks.map {
-        case (stageId, numTasks) =>
-          numTasks - stageIdToTaskIndices.get(stageId).map(_.size).getOrElse(0)
-      }.sum
+      stageIdToNumTasks
+        .map {
+          case (stageId, numTasks) =>
+            numTasks - stageIdToTaskIndices
+              .get(stageId)
+              .map(_.size)
+              .getOrElse(0)
+        }
+        .sum
     }
 
     /**

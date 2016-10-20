@@ -125,9 +125,11 @@ object Extraction {
                       val s =
                         serializer.serializer orElse Map(
                           (n, fieldVal) -> Some(n, fieldVal))
-                      s((n, fieldVal)).map {
-                        case (name, value) => JField(name, decompose(value))
-                      }.getOrElse(JField(n, JNothing))
+                      s((n, fieldVal))
+                        .map {
+                          case (name, value) => JField(name, decompose(value))
+                        }
+                        .getOrElse(JField(n, JNothing))
                   }
                 } getOrElse Nil
               val uniqueFields =
@@ -282,11 +284,13 @@ object Extraction {
                                  None)
                 .map(_._1)
                 .toSet
-              val jsonFields = o.obj.map { f =>
-                val JField(n, v) =
-                  (serializer.deserializer orElse Map(f -> f))(f)
-                (n, (n, v))
-              }.toMap
+              val jsonFields = o.obj
+                .map { f =>
+                  val JField(n, v) =
+                    (serializer.deserializer orElse Map(f -> f))(f)
+                  (n, (n, v))
+                }
+                .toMap
 
               val fieldsToSet = Reflection
                 .fields(a.getClass)

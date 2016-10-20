@@ -906,8 +906,8 @@ object DecisionTree extends Serializable with Logging {
 
     // For each (feature, split), calculate the gain, and select the best (feature, split).
     val (bestSplit, bestSplitStats) =
-      Range(0, binAggregates.metadata.numFeaturesPerNode).map {
-        featureIndexIdx =>
+      Range(0, binAggregates.metadata.numFeaturesPerNode)
+        .map { featureIndexIdx =>
           val featureIndex =
             if (featuresForNode.nonEmpty) {
               featuresForNode.get.apply(featureIndexIdx)
@@ -930,15 +930,42 @@ object DecisionTree extends Serializable with Logging {
             }
             // Find best split.
             val (bestFeatureSplitIndex, bestFeatureGainStats) =
-              Range(0, numSplits).map {
-                case splitIdx =>
+              Range(0, numSplits)
+                .map {
+                  case splitIdx =>
+                    val leftChildStats =
+                      binAggregates.getImpurityCalculator(nodeFeatureOffset,
+                                                          splitIdx)
+                    val rightChildStats =
+                      binAggregates.getImpurityCalculator(nodeFeatureOffset,
+                                                          numSplits)
+                    rightChildStats.subtract(leftChildStats)
+                    predictWithImpurity = Some(
+                      predictWithImpurity.getOrElse(
+                        calculatePredictImpurity(leftChildStats,
+                                                 rightChildStats)))
+                    val gainStats =
+                      calculateGainForSplit(leftChildStats,
+                                            rightChildStats,
+                                            binAggregates.metadata,
+                                            predictWithImpurity.get._2)
+                    (splitIdx, gainStats)
+                }
+                .maxBy(_._2.gain)
+            (splits(featureIndex)(bestFeatureSplitIndex), bestFeatureGainStats)
+          } else if (binAggregates.metadata.isUnordered(featureIndex)) {
+            // Unordered categorical feature
+            val leftChildOffset =
+              binAggregates.getFeatureOffset(featureIndexIdx)
+            val (bestFeatureSplitIndex, bestFeatureGainStats) =
+              Range(0, numSplits)
+                .map { splitIndex =>
                   val leftChildStats =
-                    binAggregates.getImpurityCalculator(nodeFeatureOffset,
-                                                        splitIdx)
-                  val rightChildStats =
-                    binAggregates.getImpurityCalculator(nodeFeatureOffset,
-                                                        numSplits)
-                  rightChildStats.subtract(leftChildStats)
+                    binAggregates.getImpurityCalculator(leftChildOffset,
+                                                        splitIndex)
+                  val rightChildStats = binAggregates
+                    .getParentImpurityCalculator()
+                    .subtract(leftChildStats)
                   predictWithImpurity = Some(predictWithImpurity.getOrElse(
                     calculatePredictImpurity(leftChildStats, rightChildStats)))
                   val gainStats =
@@ -946,31 +973,9 @@ object DecisionTree extends Serializable with Logging {
                                           rightChildStats,
                                           binAggregates.metadata,
                                           predictWithImpurity.get._2)
-                  (splitIdx, gainStats)
-              }.maxBy(_._2.gain)
-            (splits(featureIndex)(bestFeatureSplitIndex), bestFeatureGainStats)
-          } else if (binAggregates.metadata.isUnordered(featureIndex)) {
-            // Unordered categorical feature
-            val leftChildOffset =
-              binAggregates.getFeatureOffset(featureIndexIdx)
-            val (bestFeatureSplitIndex, bestFeatureGainStats) =
-              Range(0, numSplits).map { splitIndex =>
-                val leftChildStats =
-                  binAggregates.getImpurityCalculator(leftChildOffset,
-                                                      splitIndex)
-                val rightChildStats = binAggregates
-                  .getParentImpurityCalculator()
-                  .subtract(leftChildStats)
-                predictWithImpurity = Some(
-                  predictWithImpurity.getOrElse(
-                    calculatePredictImpurity(leftChildStats, rightChildStats)))
-                val gainStats =
-                  calculateGainForSplit(leftChildStats,
-                                        rightChildStats,
-                                        binAggregates.metadata,
-                                        predictWithImpurity.get._2)
-                (splitIndex, gainStats)
-              }.maxBy(_._2.gain)
+                  (splitIndex, gainStats)
+                }
+                .maxBy(_._2.gain)
             (splits(featureIndex)(bestFeatureSplitIndex), bestFeatureGainStats)
           } else {
             // Ordered categorical feature
@@ -1038,25 +1043,26 @@ object DecisionTree extends Serializable with Logging {
             val lastCategory = categoriesSortedByCentroid.last._1
             // Find best split.
             val (bestFeatureSplitIndex, bestFeatureGainStats) =
-              Range(0, numSplits).map { splitIndex =>
-                val featureValue = categoriesSortedByCentroid(splitIndex)._1
-                val leftChildStats =
-                  binAggregates.getImpurityCalculator(nodeFeatureOffset,
-                                                      featureValue)
-                val rightChildStats =
-                  binAggregates.getImpurityCalculator(nodeFeatureOffset,
-                                                      lastCategory)
-                rightChildStats.subtract(leftChildStats)
-                predictWithImpurity = Some(
-                  predictWithImpurity.getOrElse(
+              Range(0, numSplits)
+                .map { splitIndex =>
+                  val featureValue = categoriesSortedByCentroid(splitIndex)._1
+                  val leftChildStats =
+                    binAggregates.getImpurityCalculator(nodeFeatureOffset,
+                                                        featureValue)
+                  val rightChildStats =
+                    binAggregates.getImpurityCalculator(nodeFeatureOffset,
+                                                        lastCategory)
+                  rightChildStats.subtract(leftChildStats)
+                  predictWithImpurity = Some(predictWithImpurity.getOrElse(
                     calculatePredictImpurity(leftChildStats, rightChildStats)))
-                val gainStats =
-                  calculateGainForSplit(leftChildStats,
-                                        rightChildStats,
-                                        binAggregates.metadata,
-                                        predictWithImpurity.get._2)
-                (splitIndex, gainStats)
-              }.maxBy(_._2.gain)
+                  val gainStats =
+                    calculateGainForSplit(leftChildStats,
+                                          rightChildStats,
+                                          binAggregates.metadata,
+                                          predictWithImpurity.get._2)
+                  (splitIndex, gainStats)
+                }
+                .maxBy(_._2.gain)
             val categoriesForSplit = categoriesSortedByCentroid
               .map(_._1.toDouble)
               .slice(0, bestFeatureSplitIndex + 1)
@@ -1066,7 +1072,8 @@ object DecisionTree extends Serializable with Logging {
                                              categoriesForSplit)
             (bestFeatureSplit, bestFeatureGainStats)
           }
-      }.maxBy(_._2.gain)
+        }
+        .maxBy(_._2.gain)
 
     (bestSplit, bestSplitStats, predictWithImpurity.get._1)
   }

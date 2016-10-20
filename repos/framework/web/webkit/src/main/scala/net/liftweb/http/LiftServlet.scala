@@ -323,10 +323,12 @@ class LiftServlet extends Loggable {
     }
 
     def sessionExists_?(idb: Box[String]): Boolean = {
-      idb.flatMap { id =>
-        registerRecentlyChecked(id)
-        SessionMaster.getSession(id, Empty)
-      }.isDefined
+      idb
+        .flatMap { id =>
+          registerRecentlyChecked(id)
+          SessionMaster.getSession(id, Empty)
+        }
+        .isDefined
     }
 
     def cometOrAjax_?(req: Req): (Boolean, Boolean) = {
@@ -674,9 +676,11 @@ class LiftServlet extends Loggable {
               case (jv: JValue) :: Nil => JsonResponse(jv)
               case (js: JsCmd) :: xs => {
                 (JsCommands(S.noticesToJsCmd :: Nil) &
-                  (js :: (xs.collect {
-                    case js: JsCmd => js
-                  }).reverse)).toResponse
+                  (js :: (xs
+                    .collect {
+                      case js: JsCmd => js
+                    })
+                    .reverse)).toResponse
               }
 
               case (n: Node) :: _ => XmlResponse(n)
@@ -754,15 +758,17 @@ class LiftServlet extends Loggable {
             }
 
             val infoList = currentAjaxRequests.get(renderVersion)
-            val (requestInfo, result) = infoList.flatMap { entries =>
-              entries.find(_.requestVersion == handlerVersion).map { entry =>
-                (entry, Right(entry.responseFuture))
+            val (requestInfo, result) = infoList
+              .flatMap { entries =>
+                entries.find(_.requestVersion == handlerVersion).map { entry =>
+                  (entry, Right(entry.responseFuture))
+                }
               }
-            }.getOrElse {
-              val entry = newRequestInfo
+              .getOrElse {
+                val entry = newRequestInfo
 
-              (entry, Left(entry.responseFuture))
-            }
+                (entry, Left(entry.responseFuture))
+              }
 
             // If there are no other pending requests, we can
             // invalidate all the render version's AJAX entries except

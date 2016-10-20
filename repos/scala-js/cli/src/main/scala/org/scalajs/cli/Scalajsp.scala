@@ -40,12 +40,16 @@ object Scalajsp {
           c.copy(jar = Some(x))
         }
         .text("Read *.sjsir file(s) from the given JAR.")
-      opt[Unit]('i', "infos").action { (_, c) =>
-        c.copy(infos = true)
-      }.text("Show DCE infos instead of trees")
-      opt[Unit]('s', "supported").action { (_, _) =>
-        printSupported(); sys.exit()
-      }.text("Show supported Scala.js IR versions")
+      opt[Unit]('i', "infos")
+        .action { (_, c) =>
+          c.copy(infos = true)
+        }
+        .text("Show DCE infos instead of trees")
+      opt[Unit]('s', "supported")
+        .action { (_, _) =>
+          printSupported(); sys.exit()
+        }
+        .text("Show supported Scala.js IR versions")
       version("version").abbr("v").text("Show scalajsp version")
       help("help").abbr("h").text("prints this usage text")
 

@@ -772,20 +772,22 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                   val parentPath =
                     if (path == ".") Nil else path.split("/").toList
                   // process README.md or README.markdown
-                  val readme = files.find { file =>
-                    !file.isDirectory &&
-                    readmeFiles.contains(file.name.toLowerCase)
-                  }.map { file =>
-                    val path = (file.name :: parentPath.reverse).reverse
-                    path -> StringUtil.convertFromByteArray(
-                      JGitUtil
-                        .getContentFromId(Git.open(
-                                            getRepositoryDir(repository.owner,
-                                                             repository.name)),
-                                          file.id,
-                                          true)
-                        .get)
-                  }
+                  val readme = files
+                    .find { file =>
+                      !file.isDirectory &&
+                      readmeFiles.contains(file.name.toLowerCase)
+                    }
+                    .map { file =>
+                      val path = (file.name :: parentPath.reverse).reverse
+                      path -> StringUtil.convertFromByteArray(
+                        JGitUtil
+                          .getContentFromId(
+                            Git.open(getRepositoryDir(repository.owner,
+                                                      repository.name)),
+                            file.id,
+                            true)
+                          .get)
+                    }
 
                   html.files(
                     revision,

@@ -106,11 +106,13 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
     val vdTag = classTag[VD]
     val newEdges = edges
       .withPartitionsRDD(
-        edges.map { e =>
-          val part: PartitionID =
-            partitionStrategy.getPartition(e.srcId, e.dstId, numPartitions)
-          (part, (e.srcId, e.dstId, e.attr))
-        }.partitionBy(new HashPartitioner(numPartitions))
+        edges
+          .map { e =>
+            val part: PartitionID =
+              partitionStrategy.getPartition(e.srcId, e.dstId, numPartitions)
+            (part, (e.srcId, e.dstId, e.attr))
+          }
+          .partitionBy(new HashPartitioner(numPartitions))
           .mapPartitionsWithIndex({ (pid, iter) =>
             val builder = new EdgePartitionBuilder[ED, VD]()(edTag, vdTag)
             iter.foreach { message =>

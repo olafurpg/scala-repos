@@ -260,9 +260,11 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       .collect { case Some(phoneNo) => phoneNo }
 
     //#blocking-map
-    val send = Flow[String].map { phoneNo =>
-      smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
-    }.withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
+    val send = Flow[String]
+      .map { phoneNo =>
+        smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
+      }
+      .withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
     val sendTextMessages: RunnableGraph[NotUsed] =
       phoneNumbers.via(send).to(Sink.ignore)
 

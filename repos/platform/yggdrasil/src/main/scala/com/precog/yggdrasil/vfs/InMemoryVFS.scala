@@ -134,14 +134,17 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       (projection: Projection) =>
         EitherT.right(
           for (columnRefs <- projection.structure) yield {
-            val types: Map[CType, Long] = columnRefs.collect {
-              // FIXME: This should use real counts
-              case ColumnRef(selector, ctype)
-                  if selector.hasPrefix(selector) =>
-                (ctype, 0L)
-            }.groupBy(_._1).map {
-              case (tpe, values) => (tpe, values.map(_._2).sum)
-            }
+            val types: Map[CType, Long] = columnRefs
+              .collect {
+                // FIXME: This should use real counts
+                case ColumnRef(selector, ctype)
+                    if selector.hasPrefix(selector) =>
+                  (ctype, 0L)
+              }
+              .groupBy(_._1)
+              .map {
+                case (tpe, values) => (tpe, values.map(_._2).sum)
+              }
 
             PathStructure(types, columnRefs.map(_.selector))
           }

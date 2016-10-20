@@ -534,9 +534,10 @@ class HiveContext private[hive] (
       ConfVars.SPARK_RPC_CLIENT_CONNECT_TIMEOUT -> TimeUnit.MILLISECONDS,
       ConfVars.SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT -> TimeUnit.MILLISECONDS
     ).map {
-      case (confVar, unit) =>
-        confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString
-    }.toMap
+        case (confVar, unit) =>
+          confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString
+      }
+      .toMap
   }
 
   /**
@@ -781,11 +782,15 @@ private[hive] object HiveContext {
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
-        case (key, value) =>
-          toHiveStructString((key, kType)) + ":" +
-            toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      map
+        .map {
+          case (key, value) =>
+            toHiveStructString((key, kType)) + ":" +
+              toHiveStructString((value, vType))
+        }
+        .toSeq
+        .sorted
+        .mkString("{", ",", "}")
     case (null, _) => "NULL"
     case (d: Int, DateType) => new DateWritable(d).toString
     case (t: Timestamp, TimestampType) => new TimestampWritable(t).toString
@@ -810,11 +815,15 @@ private[hive] object HiveContext {
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
-        case (key, value) =>
-          toHiveStructString((key, kType)) + ":" +
-            toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      map
+        .map {
+          case (key, value) =>
+            toHiveStructString((key, kType)) + ":" +
+              toHiveStructString((value, vType))
+        }
+        .toSeq
+        .sorted
+        .mkString("{", ",", "}")
     case (null, _) => "null"
     case (s: String, StringType) => "\"" + s + "\""
     case (decimal, DecimalType()) => decimal.toString

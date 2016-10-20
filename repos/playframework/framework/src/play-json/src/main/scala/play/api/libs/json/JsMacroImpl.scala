@@ -210,47 +210,49 @@ object JsMacroImpl {
     var hasRec = false
 
     // combines all reads into CanBuildX
-    val canBuild = effectiveInferredImplicits.map {
-      case Implicit(name, t, impl, rec, tpe) =>
-        // Equivalent to __ \ "name"
-        val jspathTree = q"""$JsPath \ ${name.decodedName.toString}"""
+    val canBuild = effectiveInferredImplicits
+      .map {
+        case Implicit(name, t, impl, rec, tpe) =>
+          // Equivalent to __ \ "name"
+          val jspathTree = q"""$JsPath \ ${name.decodedName.toString}"""
 
-        // If we're not recursive, simple, just invoke read/write/format
-        if (!rec) {
-          // If we're an option, invoke the nullable version
-          if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
-            q"$jspathTree.$callNullable($impl)"
+          // If we're not recursive, simple, just invoke read/write/format
+          if (!rec) {
+            // If we're an option, invoke the nullable version
+            if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
+              q"$jspathTree.$callNullable($impl)"
+            } else {
+              q"$jspathTree.$call($impl)"
+            }
           } else {
-            q"$jspathTree.$call($impl)"
-          }
-        } else {
-          // Otherwise we have to invoke the lazy version
-          hasRec = true
-          if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
-            q"$jspathTree.$callNullable($JsPath.$lazyCall(this.lazyStuff))"
-          } else {
-            // If this is a list/set/seq/map, then we need to wrap the reads into that.
-            def readsWritesHelper(methodName: String): List[Tree] =
-              conditionalList(Reads, Writes).map(s =>
-                q"$s.${TermName(methodName)}(this.lazyStuff)")
+            // Otherwise we have to invoke the lazy version
+            hasRec = true
+            if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
+              q"$jspathTree.$callNullable($JsPath.$lazyCall(this.lazyStuff))"
+            } else {
+              // If this is a list/set/seq/map, then we need to wrap the reads into that.
+              def readsWritesHelper(methodName: String): List[Tree] =
+                conditionalList(Reads, Writes).map(s =>
+                  q"$s.${TermName(methodName)}(this.lazyStuff)")
 
-            val arg =
-              if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
-                readsWritesHelper("list")
-              else if (tpe.typeConstructor <:< typeOf[Set[_]].typeConstructor)
-                readsWritesHelper("set")
-              else if (tpe.typeConstructor <:< typeOf[Seq[_]].typeConstructor)
-                readsWritesHelper("seq")
-              else if (tpe.typeConstructor <:< typeOf[Map[_, _]].typeConstructor)
-                readsWritesHelper("map")
-              else List(q"this.lazyStuff")
+              val arg =
+                if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
+                  readsWritesHelper("list")
+                else if (tpe.typeConstructor <:< typeOf[Set[_]].typeConstructor)
+                  readsWritesHelper("set")
+                else if (tpe.typeConstructor <:< typeOf[Seq[_]].typeConstructor)
+                  readsWritesHelper("seq")
+                else if (tpe.typeConstructor <:< typeOf[Map[_, _]].typeConstructor)
+                  readsWritesHelper("map")
+                else List(q"this.lazyStuff")
 
-            q"$jspathTree.$lazyCall(..$arg)"
+              q"$jspathTree.$lazyCall(..$arg)"
+            }
           }
-        }
-    }.reduceLeft[Tree] { (acc, r) =>
-      q"$acc.and($r)"
-    }
+      }
+      .reduceLeft[Tree] { (acc, r) =>
+        q"$acc.and($r)"
+      }
 
     val applyFunction = {
       if (hasVarArgs) {

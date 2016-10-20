@@ -209,10 +209,13 @@ trait ScTypePresentation {
       val componentsText =
         if (comps.isEmpty) Nil
         else
-          Seq(comps.map {
-            case tp @ ScFunctionType(_, _) => "(" + innerTypeText(tp) + ")"
-            case tp => innerTypeText(tp)
-          }.mkString(" with "))
+          Seq(
+            comps
+              .map {
+                case tp @ ScFunctionType(_, _) => "(" + innerTypeText(tp) + ")"
+                case tp => innerTypeText(tp)
+              }
+              .mkString(" with "))
 
       val declsTexts = (signatureMap ++ typeMap).flatMap {
         case (s: Signature, rt: ScType)
@@ -267,10 +270,12 @@ trait ScTypePresentation {
           val decl = s"type ${ta.name}$paramsText"
           val defnText = ta match {
             case tad: ScTypeAliasDefinition =>
-              tad.aliasedType.map {
-                case psi.types.Nothing => ""
-                case tpe => s" = ${typeText0(tpe)}"
-              }.getOrElse("")
+              tad.aliasedType
+                .map {
+                  case psi.types.Nothing => ""
+                  case tpe => s" = ${typeText0(tpe)}"
+                }
+                .getOrElse("")
             case _ =>
               val (lowerBound, upperBound) =
                 (ta.lowerBound.getOrNothing, ta.upperBound.getOrAny)
@@ -323,13 +328,15 @@ trait ScTypePresentation {
               } else true
           }
           val designatorText = innerTypeText(des)
-          val typeArgsText = typeArgs.map { t =>
-            replacingArgs.find(_._1 eq t) match {
-              case Some((_, wildcard)) =>
-                existentialArgWithBounds(wildcard, "_")
-              case _ => innerTypeText(t, needDotType = true, checkWildcard)
+          val typeArgsText = typeArgs
+            .map { t =>
+              replacingArgs.find(_._1 eq t) match {
+                case Some((_, wildcard)) =>
+                  existentialArgWithBounds(wildcard, "_")
+                case _ => innerTypeText(t, needDotType = true, checkWildcard)
+              }
             }
-          }.mkString("[", ", ", "]")
+            .mkString("[", ", ", "]")
           val existentialArgsText = left
             .map(arg => existentialArgWithBounds(arg, "type " + arg.name))
             .mkString("{", "; ", "}")

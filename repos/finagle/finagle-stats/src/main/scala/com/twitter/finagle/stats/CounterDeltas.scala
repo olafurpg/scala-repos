@@ -28,10 +28,12 @@ private[stats] class CounterDeltas {
     */
   def deltas: Map[String, Number] = {
     val prevs = synchronized(lasts)
-    prevs.asScala.map {
-      case (key, pd) =>
-        key -> Long.box(pd.delta)
-    }.toMap
+    prevs.asScala
+      .map {
+        case (key, pd) =>
+          key -> Long.box(pd.delta)
+      }
+      .toMap
   }
 
   /**

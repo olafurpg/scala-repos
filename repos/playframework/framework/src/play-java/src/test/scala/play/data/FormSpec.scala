@@ -383,10 +383,12 @@ object FormSpec extends Specification {
           .map(_.toString)
 
       def fillNoBind(values: (String, String)*) = {
-        val map = values.zipWithIndex.flatMap {
-          case ((a, b), i) =>
-            Seq("foo[" + i + "].a" -> a, "foo[" + i + "].b" -> b)
-        }.toMap
+        val map = values.zipWithIndex
+          .flatMap {
+            case ((a, b), i) =>
+              Seq("foo[" + i + "].a" -> a, "foo[" + i + "].b" -> b)
+          }
+          .toMap
         // Don't use bind, the point here is to have a form with data that isn't bound, otherwise the mapping indexes
         // used come from the form, not the input data
         new Form[JavaForm](

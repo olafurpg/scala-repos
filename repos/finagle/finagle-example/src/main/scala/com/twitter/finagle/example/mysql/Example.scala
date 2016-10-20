@@ -116,10 +116,12 @@ object Example extends App {
       val StringValue(event) = row("event").get
       val DateValue(date) = row("date").get
       val StringValue(name) = row("name").get
-      val time = row("time").map {
-        case FloatValue(f) => f
-        case _ => 0.0F
-      }.get
+      val time = row("time")
+        .map {
+          case FloatValue(f) => f
+          case _ => 0.0F
+        }
+        .get
 
       (name, time, date)
     }

@@ -241,9 +241,11 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
         t =>
           session.database.createTable(
             t.tableName,
-            t.create_*.map { fs =>
-              new HeapBackend.Column(fs, typeInfoFor(fs.tpe))
-            }.toIndexedSeq,
+            t.create_*
+              .map { fs =>
+                new HeapBackend.Column(fs, typeInfoFor(fs.tpe))
+              }
+              .toIndexedSeq,
             t.indexes.toIndexedSeq,
             t.tableConstraints.toIndexedSeq))
     }

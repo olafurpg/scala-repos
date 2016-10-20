@@ -444,12 +444,15 @@ object ScalaImportTypeFix {
     }
 
     if (ref.getParent.isInstanceOf[ScMethodCall]) {
-      buffer.filter {
-        case ClassTypeToImport(clazz) =>
-          clazz.isInstanceOf[ScObject] &&
-            clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
-        case _ => false
-      }.sortBy(_.qualifiedName).toArray
+      buffer
+        .filter {
+          case ClassTypeToImport(clazz) =>
+            clazz.isInstanceOf[ScObject] &&
+              clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
+          case _ => false
+        }
+        .sortBy(_.qualifiedName)
+        .toArray
     } else buffer.sortBy(_.qualifiedName).toArray
   }
 }

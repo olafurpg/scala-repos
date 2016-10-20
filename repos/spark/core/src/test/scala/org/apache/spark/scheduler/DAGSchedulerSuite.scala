@@ -181,12 +181,14 @@ class DAGSchedulerSuite
   val blockManagerMaster = new BlockManagerMaster(null, conf, true) {
     override def getLocations(
         blockIds: Array[BlockId]): IndexedSeq[Seq[BlockManagerId]] = {
-      blockIds.map {
-        _.asRDDId
-          .map(id => (id.rddId -> id.splitIndex))
-          .flatMap(key => cacheLocations.get(key))
-          .getOrElse(Seq())
-      }.toIndexedSeq
+      blockIds
+        .map {
+          _.asRDDId
+            .map(id => (id.rddId -> id.splitIndex))
+            .flatMap(key => cacheLocations.get(key))
+            .getOrElse(Seq())
+        }
+        .toIndexedSeq
     }
     override def removeExecutor(execId: String) {
       // don't need to propagate to the driver, which we don't have
@@ -665,11 +667,15 @@ class DAGSchedulerSuite
       numShufflePartitions: Int): Unit = {
     val stageAttempt = taskSets.last
     checkStageId(stageId, attemptIdx, stageAttempt)
-    complete(stageAttempt, stageAttempt.tasks.zipWithIndex.map {
-      case (task, idx) =>
-        (Success,
-         makeMapStatus("host" + ('A' + idx).toChar, numShufflePartitions))
-    }.toSeq)
+    complete(
+      stageAttempt,
+      stageAttempt.tasks.zipWithIndex
+        .map {
+          case (task, idx) =>
+            (Success,
+             makeMapStatus("host" + ('A' + idx).toChar, numShufflePartitions))
+        }
+        .toSeq)
   }
 
   /**
@@ -686,15 +692,18 @@ class DAGSchedulerSuite
       shuffleDep: ShuffleDependency[_, _, _]): Unit = {
     val stageAttempt = taskSets.last
     checkStageId(stageId, attemptIdx, stageAttempt)
-    complete(stageAttempt, stageAttempt.tasks.zipWithIndex.map {
-      case (task, idx) =>
-        (FetchFailed(makeBlockManagerId("hostA"),
-                     shuffleDep.shuffleId,
-                     0,
-                     idx,
-                     "ignored"),
-         null)
-    }.toSeq)
+    complete(stageAttempt,
+             stageAttempt.tasks.zipWithIndex
+               .map {
+                 case (task, idx) =>
+                   (FetchFailed(makeBlockManagerId("hostA"),
+                                shuffleDep.shuffleId,
+                                0,
+                                idx,
+                                "ignored"),
+                    null)
+               }
+               .toSeq)
   }
 
   /**
@@ -751,9 +760,12 @@ class DAGSchedulerSuite
     // Confirm job finished successfully
     sc.listenerBus.waitUntilEmpty(1000)
     assert(ended === true)
-    assert(results === (0 until parts).map { idx =>
-      idx -> 42
-    }.toMap)
+    assert(
+      results === (0 until parts)
+        .map { idx =>
+          idx -> 42
+        }
+        .toMap)
     assertDataStructuresEmpty()
   }
 

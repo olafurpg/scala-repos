@@ -221,22 +221,28 @@ private[coordinator] class GroupMetadata(val groupId: String,
     if (is(Dead) || is(PreparingRebalance))
       throw new IllegalStateException(
         "Cannot obtain member metadata for group in state %s".format(state))
-    members.map {
-      case (memberId, memberMetadata) =>
-        (memberId, memberMetadata.metadata(protocol))
-    }.toMap
+    members
+      .map {
+        case (memberId, memberMetadata) =>
+          (memberId, memberMetadata.metadata(protocol))
+      }
+      .toMap
   }
 
   def summary: GroupSummary = {
     if (is(Stable)) {
-      val members = this.members.values.map { member =>
-        member.summary(protocol)
-      }.toList
+      val members = this.members.values
+        .map { member =>
+          member.summary(protocol)
+        }
+        .toList
       GroupSummary(state.toString, protocolType, protocol, members)
     } else {
-      val members = this.members.values.map { member =>
-        member.summaryNoMetadata()
-      }.toList
+      val members = this.members.values
+        .map { member =>
+          member.summaryNoMetadata()
+        }
+        .toList
       GroupSummary(state.toString,
                    protocolType,
                    GroupCoordinator.NoProtocol,

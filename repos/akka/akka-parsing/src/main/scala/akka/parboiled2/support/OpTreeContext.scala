@@ -748,9 +748,11 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       val argTypes = actionType dropRight 1
 
       def popToVals(valNames: List[TermName]): List[Tree] =
-        (valNames zip argTypes).map {
-          case (n, t) ⇒ q"val $n = valueStack.pop().asInstanceOf[$t]"
-        }.reverse
+        (valNames zip argTypes)
+          .map {
+            case (n, t) ⇒ q"val $n = valueStack.pop().asInstanceOf[$t]"
+          }
+          .reverse
 
       def actionBody(tree: Tree): Tree =
         tree match {

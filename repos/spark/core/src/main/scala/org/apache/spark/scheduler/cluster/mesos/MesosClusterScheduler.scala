@@ -411,9 +411,11 @@ private[spark] class MesosClusterScheduler(
           Variable.newBuilder().setName(k).setValue(v).build())
     }
     // Pass all spark properties to executor.
-    val executorOpts = desc.schedulerProperties.map {
-      case (k, v) => s"-D$k=$v"
-    }.mkString(" ")
+    val executorOpts = desc.schedulerProperties
+      .map {
+        case (k, v) => s"-D$k=$v"
+      }
+      .mkString(" ")
     envBuilder.addVariables(
       Variable
         .newBuilder()
@@ -594,9 +596,11 @@ private[spark] class MesosClusterScheduler(
     val tasks = new mutable.HashMap[OfferID, ArrayBuffer[TaskInfo]]()
     val currentTime = new Date()
 
-    val currentOffers = offers.asScala.map { o =>
-      new ResourceOffer(o.getId, o.getSlaveId, o.getResourcesList)
-    }.toList
+    val currentOffers = offers.asScala
+      .map { o =>
+        new ResourceOffer(o.getId, o.getSlaveId, o.getResourcesList)
+      }
+      .toList
 
     stateLock.synchronized {
       // We first schedule all the supervised drivers that are ready to retry.
@@ -686,9 +690,11 @@ private[spark] class MesosClusterScheduler(
           state.finishDate = Some(new Date())
           val retryState: Option[MesosClusterRetryState] =
             state.driverDescription.retryState
-          val (retries, waitTimeSec) = retryState.map { rs =>
-            (rs.retries + 1, Math.min(maxRetryWaitTime, rs.waitTime * 2))
-          }.getOrElse { (1, 1) }
+          val (retries, waitTimeSec) = retryState
+            .map { rs =>
+              (rs.retries + 1, Math.min(maxRetryWaitTime, rs.waitTime * 2))
+            }
+            .getOrElse { (1, 1) }
           val nextRetry = new Date(new Date().getTime + waitTimeSec * 1000L)
 
           val newDriverDescription = state.driverDescription.copy(

@@ -14,18 +14,20 @@ private[opening] case class Generated(fen: String,
       case None => Failure(new Exception(s"Can't parse fen $fen"))
       case Some(parsed) =>
         val color = parsed.situation.color
-        moves.map {
-          case (first, move) =>
-            for {
-              pgn <- Generated.toPgn(parsed.situation,
-                                     first :: move.line.split(' ').toList)
-              cp <- parseIntOption(move.cp) match {
-                case None =>
-                  Failure(new Exception(s"Invalid cp ${move.cp}"))
-                case Some(cp) => Success(cp)
-              }
-            } yield Move(first = first, cp = cp, line = pgn)
-        }.foldLeft(Try(List[Move]())) {
+        moves
+          .map {
+            case (first, move) =>
+              for {
+                pgn <- Generated.toPgn(parsed.situation,
+                                       first :: move.line.split(' ').toList)
+                cp <- parseIntOption(move.cp) match {
+                  case None =>
+                    Failure(new Exception(s"Invalid cp ${move.cp}"))
+                  case Some(cp) => Success(cp)
+                }
+              } yield Move(first = first, cp = cp, line = pgn)
+          }
+          .foldLeft(Try(List[Move]())) {
             case (Success(acc), Success(l)) => Success(l :: acc)
             case (err: Failure[_], _) => err
             case (_, Failure(err)) => Failure(err)

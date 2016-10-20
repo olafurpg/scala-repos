@@ -169,10 +169,12 @@ object Name {
           case addrs if addrs.exists({
                 case Addr.Bound(_, _) => true; case _ => false
               }) =>
-            val endpointAddrs = addrs.flatMap {
-              case Addr.Bound(as, _) => as
-              case _ => Set.empty[Address]
-            }.toSet
+            val endpointAddrs = addrs
+              .flatMap {
+                case Addr.Bound(as, _) => as
+                case _ => Set.empty[Address]
+              }
+              .toSet
             Addr.Bound(endpointAddrs, Addr.Metadata.empty)
 
           case addrs if addrs.forall(_ == Addr.Neg) => Addr.Neg

@@ -30,9 +30,11 @@ object TimePathedSource {
     List("%1$tH" -> Hours(1),
          "%1$td" -> Days(1)(tz),
          "%1$tm" -> Months(1)(tz),
-         "%1$tY" -> Years(1)(tz)).find { unitDur: (String, Duration) =>
-      pattern.contains(unitDur._1)
-    }.map(_._2)
+         "%1$tY" -> Years(1)(tz))
+      .find { unitDur: (String, Duration) =>
+        pattern.contains(unitDur._1)
+      }
+      .map(_._2)
 
   /**
     * Gives all paths in the given daterange with windows based on the provided duration.

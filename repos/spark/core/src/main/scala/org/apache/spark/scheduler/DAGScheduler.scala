@@ -1066,15 +1066,19 @@ private[spark] class DAGScheduler(
     val taskIdToLocations: Map[Int, Seq[TaskLocation]] = try {
       stage match {
         case s: ShuffleMapStage =>
-          partitionsToCompute.map { id =>
-            (id, getPreferredLocs(stage.rdd, id))
-          }.toMap
+          partitionsToCompute
+            .map { id =>
+              (id, getPreferredLocs(stage.rdd, id))
+            }
+            .toMap
         case s: ResultStage =>
           val job = s.activeJob.get
-          partitionsToCompute.map { id =>
-            val p = s.partitions(id)
-            (id, getPreferredLocs(stage.rdd, p))
-          }.toMap
+          partitionsToCompute
+            .map { id =>
+              val p = s.partitions(id)
+              (id, getPreferredLocs(stage.rdd, p))
+            }
+            .toMap
       }
     } catch {
       case NonFatal(e) =>

@@ -248,9 +248,12 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
       "Batches pending processing (" + pendingTimes.length + " batches): " +
         pendingTimes.mkString(", "))
     // Reschedule jobs for these times
-    val timesToReschedule = (pendingTimes ++ downTimes).filter {
-      _ < restartTime
-    }.distinct.sorted(Time.ordering)
+    val timesToReschedule = (pendingTimes ++ downTimes)
+      .filter {
+        _ < restartTime
+      }
+      .distinct
+      .sorted(Time.ordering)
     logInfo(
       "Batches to reschedule (" + timesToReschedule.length + " batches): " +
         timesToReschedule.mkString(", "))

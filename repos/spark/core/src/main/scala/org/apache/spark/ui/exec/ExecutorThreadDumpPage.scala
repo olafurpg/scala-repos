@@ -29,33 +29,37 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
   private val sc = parent.sc
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val executorId = Option(request.getParameter("executorId")).map {
-      executorId =>
+    val executorId = Option(request.getParameter("executorId"))
+      .map { executorId =>
         UIUtils.decodeURLParameter(executorId)
-    }.getOrElse {
-      throw new IllegalArgumentException(s"Missing executorId parameter")
-    }
+      }
+      .getOrElse {
+        throw new IllegalArgumentException(s"Missing executorId parameter")
+      }
     val time = System.currentTimeMillis()
     val maybeThreadDump = sc.get.getExecutorThreadDump(executorId)
 
-    val content = maybeThreadDump.map { threadDump =>
-      val dumpRows = threadDump.sortWith {
-        case (threadTrace1, threadTrace2) => {
-          val v1 =
-            if (threadTrace1.threadName.contains("Executor task launch")) 1
-            else 0
-          val v2 =
-            if (threadTrace2.threadName.contains("Executor task launch")) 1
-            else 0
-          if (v1 == v2) {
-            threadTrace1.threadName.toLowerCase < threadTrace2.threadName.toLowerCase
-          } else {
-            v1 > v2
+    val content = maybeThreadDump
+      .map { threadDump =>
+        val dumpRows = threadDump
+          .sortWith {
+            case (threadTrace1, threadTrace2) => {
+              val v1 =
+                if (threadTrace1.threadName.contains("Executor task launch")) 1
+                else 0
+              val v2 =
+                if (threadTrace2.threadName.contains("Executor task launch")) 1
+                else 0
+              if (v1 == v2) {
+                threadTrace1.threadName.toLowerCase < threadTrace2.threadName.toLowerCase
+              } else {
+                v1 > v2
+              }
+            }
           }
-        }
-      }.map { thread =>
-        val threadId = thread.threadId
-        <tr id={s"thread_${threadId}_tr"} class="accordion-heading"
+          .map { thread =>
+            val threadId = thread.threadId
+            <tr id={s"thread_${threadId}_tr"} class="accordion-heading"
             onclick={s"toggleThreadStackTrace($threadId, false)"}
             onmouseover={s"onMouseOverAndOut($threadId)"}
             onmouseout={s"onMouseOverAndOut($threadId)"}>
@@ -64,9 +68,9 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
           <td id={s"${threadId}_td_state"}>{thread.threadState}</td>
           <td id={s"${threadId}_td_stacktrace"} class="hidden">{thread.stackTrace}</td>
         </tr>
-      }
+          }
 
-      <div class="row-fluid">
+        <div class="row-fluid">
       <p>Updated at {UIUtils.formatDate(time)}</p>
       {
         // scalastyle:off
@@ -97,7 +101,8 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
         <tbody>{dumpRows}</tbody>
       </table>
     </div>
-    }.getOrElse(Text("Error fetching thread dump"))
+      }
+      .getOrElse(Text("Error fetching thread dump"))
     UIUtils.headerSparkPage(s"Thread dump for executor $executorId",
                             content,
                             parent)

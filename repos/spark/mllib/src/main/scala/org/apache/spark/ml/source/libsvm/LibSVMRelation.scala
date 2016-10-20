@@ -176,12 +176,15 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val sc = sqlContext.sparkContext
     val baseRdd = MLUtils.loadLibSVMFile(sc, path, numFeatures)
     val sparse = vectorType == "sparse"
-    baseRdd.map { pt =>
-      val features = if (sparse) pt.features.toSparse else pt.features.toDense
-      Row(pt.label, features)
-    }.mapPartitions { externalRows =>
-      val converter = RowEncoder(dataSchema)
-      externalRows.map(converter.toRow)
-    }
+    baseRdd
+      .map { pt =>
+        val features =
+          if (sparse) pt.features.toSparse else pt.features.toDense
+        Row(pt.label, features)
+      }
+      .mapPartitions { externalRows =>
+        val converter = RowEncoder(dataSchema)
+        externalRows.map(converter.toRow)
+      }
   }
 }

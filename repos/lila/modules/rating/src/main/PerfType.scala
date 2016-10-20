@@ -186,8 +186,9 @@ object PerfType {
 
   def isGame(pt: PerfType) = !nonGame.contains(pt)
 
-  val nonPuzzleIconByName = nonPuzzle.map { pt =>
-    pt.name -> pt.iconString
+  val nonPuzzleIconByName = nonPuzzle
+    .map { pt =>
+      pt.name -> pt.iconString
   } toMap
 
   def variantOf(pt: PerfType): chess.variant.Variant = pt match {

@@ -45,13 +45,15 @@ object AddrMetadataExtraction {
 
         // delay construction of the ServiceFactory while Addr is Pending
         val futureFactory: Future[ServiceFactory[Req, Rep]] =
-          addr.changes.collect {
-            case Addr.Failed(_) | Addr.Neg =>
-              next.make(params + AddrMetadata(idMetadata))
+          addr.changes
+            .collect {
+              case Addr.Failed(_) | Addr.Neg =>
+                next.make(params + AddrMetadata(idMetadata))
 
-            case Addr.Bound(_, metadata) =>
-              next.make(params + AddrMetadata(metadata ++ idMetadata))
-          }.toFuture
+              case Addr.Bound(_, metadata) =>
+                next.make(params + AddrMetadata(metadata ++ idMetadata))
+            }
+            .toFuture
 
         val delayed = DelayedFactory.swapOnComplete(futureFactory)
         Stack.Leaf(this, delayed)

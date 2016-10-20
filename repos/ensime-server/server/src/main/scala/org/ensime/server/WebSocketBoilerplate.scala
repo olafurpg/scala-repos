@@ -101,14 +101,17 @@ object WebSocketBoilerplate {
       oc: ClassTag[Outgoing],
       printer: JsonPrinter = PrettyPrinter
   ): Flow[Message, Message, Unit] = {
-    Flow[Message].collect {
-      case TextMessage.Strict(msg) =>
-        msg.parseJson.convertTo[Incoming]
-      case _ =>
-        throw new IllegalArgumentException("not a valid message")
-    }.via(flow).map {
-      case e: Outgoing =>
-        TextMessage.Strict(e.toJson.toString(printer)): Message
-    }
+    Flow[Message]
+      .collect {
+        case TextMessage.Strict(msg) =>
+          msg.parseJson.convertTo[Incoming]
+        case _ =>
+          throw new IllegalArgumentException("not a valid message")
+      }
+      .via(flow)
+      .map {
+        case e: Outgoing =>
+          TextMessage.Strict(e.toJson.toString(printer)): Message
+      }
   }
 }

@@ -590,11 +590,14 @@ trait Params extends Identifiable with Serializable {
     */
   lazy val params: Array[Param[_]] = {
     val methods = this.getClass.getMethods
-    methods.filter { m =>
-      Modifier.isPublic(m.getModifiers) &&
-      classOf[Param[_]].isAssignableFrom(m.getReturnType) &&
-      m.getParameterTypes.isEmpty
-    }.sortBy(_.getName).map(m => m.invoke(this).asInstanceOf[Param[_]])
+    methods
+      .filter { m =>
+        Modifier.isPublic(m.getModifiers) &&
+        classOf[Param[_]].isAssignableFrom(m.getReturnType) &&
+        m.getParameterTypes.isEmpty
+      }
+      .sortBy(_.getName)
+      .map(m => m.invoke(this).asInstanceOf[Param[_]])
   }
 
   /**

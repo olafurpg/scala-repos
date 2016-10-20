@@ -929,14 +929,16 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
         // Iteratively decorates the bottom level driver with a list of adapters.
         // The chain at this point:
         //   Adapter <- ... <- Adapter <- Driver
-        val wrappedTransport = adapters.map {
-          TransportAdaptersExtension.get(context.system).getAdapterProvider
-        }.foldLeft(driver) {
-          (t: Transport, provider: TransportAdapterProvider) ⇒
-            // The TransportAdapterProvider will wrap the given Transport and returns with a wrapped one
-            provider.create(t,
-                            context.system.asInstanceOf[ExtendedActorSystem])
-        }
+        val wrappedTransport = adapters
+          .map {
+            TransportAdaptersExtension.get(context.system).getAdapterProvider
+          }
+          .foldLeft(driver) {
+            (t: Transport, provider: TransportAdapterProvider) ⇒
+              // The TransportAdapterProvider will wrap the given Transport and returns with a wrapped one
+              provider.create(t,
+                              context.system.asInstanceOf[ExtendedActorSystem])
+          }
 
         // Apply AkkaProtocolTransport wrapper to the end of the chain
         // The chain at this point:

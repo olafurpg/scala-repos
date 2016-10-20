@@ -617,7 +617,8 @@ object TestHelpers {
 
   def getCookie(headers: List[(String, String)],
                 respHeaders: Map[String, List[String]]): Box[String] = {
-    val ret = (headers.filter { case ("Cookie", _) => true; case _ => false }
+    val ret = (headers
+      .filter { case ("Cookie", _) => true; case _ => false }
       .map(_._2) ::: respHeaders
       .get("Set-Cookie")
       .toList
@@ -904,9 +905,13 @@ abstract class BaseResponse(override val baseUrl: String,
     * The content type header of the response
     */
   lazy val contentType: String =
-    headers.filter {
-      case (name, value) => name equalsIgnoreCase "content-type"
-    }.toList.headOption.map(_._2.head) getOrElse ""
+    headers
+      .filter {
+        case (name, value) => name equalsIgnoreCase "content-type"
+      }
+      .toList
+      .headOption
+      .map(_._2.head) getOrElse ""
 
   /**
     * The response body as a UTF-8 encoded String

@@ -1129,10 +1129,13 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                     tryo {
                       val clz = this.getClass.getClassLoader
                         .loadClass("java.util.ResourceBundle")
-                      val meth = clz.getDeclaredMethods.filter { m =>
-                        m.getName == "clearCache" &&
-                        m.getParameterTypes.length == 0
-                      }.toList.head
+                      val meth = clz.getDeclaredMethods
+                        .filter { m =>
+                          m.getName == "clearCache" &&
+                          m.getParameterTypes.length == 0
+                        }
+                        .toList
+                        .head
                       meth.invoke(null)
                     }
                   }
@@ -1215,10 +1218,14 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def ?(str: String, params: Any*): String =
     if (params.length == 0) ?(str)
     else
-      String.format(locale, ?(str), params.flatMap {
-        case s: AnyRef => List(s)
-        case _ => Nil
-      }.toArray: _*)
+      String.format(locale,
+                    ?(str),
+                    params
+                      .flatMap {
+                        case s: AnyRef => List(s)
+                        case _ => Nil
+                      }
+                      .toArray: _*)
 
   private def ?!(str: String, resBundle: List[ResourceBundle]): String =
     resBundle
@@ -1990,14 +1997,17 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def prefixedAttrsToMap(prefix: String,
                          start: Map[String, String]): Map[String, String] =
-    attrs.reverse.flatMap {
-      case (Right((pre, name)), value) if pre == prefix => List((name, value))
-      case (Left(name), value) if name.startsWith(prefix + ":") =>
-        List(name.substring(prefix.length + 1) -> value)
-      case _ => Nil
-    }.foldRight(start) {
-      case ((name, value), at) => at + (name -> value)
-    }
+    attrs.reverse
+      .flatMap {
+        case (Right((pre, name)), value) if pre == prefix =>
+          List((name, value))
+        case (Left(name), value) if name.startsWith(prefix + ":") =>
+          List(name.substring(prefix.length + 1) -> value)
+        case _ => Nil
+      }
+      .foldRight(start) {
+        case ((name, value), at) => at + (name -> value)
+      }
 
   /**
     * Returns the S attributes that are prefixed by 'prefix' parameter as a Map[String, String]
@@ -2231,16 +2241,20 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     type Info = String
 
     protected def findAttr(key: String): Option[Info] =
-      attrs.find {
-        case (Left(v), _) if v == key => true
-        case _ => false
-      }.map(_._2)
+      attrs
+        .find {
+          case (Left(v), _) if v == key => true
+          case _ => false
+        }
+        .map(_._2)
 
     protected def findAttr(prefix: String, key: String): Option[Info] =
-      attrs.find {
-        case (Right((p, n)), _) if (p == prefix && n == key) => true
-        case _ => false
-      }.map(_._2)
+      attrs
+        .find {
+          case (Right((p, n)), _) if (p == prefix && n == key) => true
+          case _ => false
+        }
+        .map(_._2)
 
     protected def convert[T](in: Option[T]): Box[T] = Box(in)
 
@@ -2374,7 +2388,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       currentAttrs.toList.find { _.key == key }.map(_.value.text)
 
     protected def findAttr(prefix: String, key: String): Option[Info] =
-      currentAttrs.toList.find { _.prefixedKey == (prefix + ":" + key) }
+      currentAttrs.toList
+        .find { _.prefixedKey == (prefix + ":" + key) }
         .map(_.value.text)
 
     protected def convert[T](in: Option[T]): Box[T] = Box(in)

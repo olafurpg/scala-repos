@@ -59,20 +59,26 @@ object VFSPathUtils extends Logging {
   }
 
   def escapePath(path: Path, toEscape: Set[String]) =
-    Path(path.elements.map {
-      case needsEscape
-          if toEscape.contains(needsEscape) ||
-            needsEscape.endsWith(escapeSuffix) =>
-        needsEscape + escapeSuffix
-      case fine => fine
-    }.toList)
+    Path(
+      path.elements
+        .map {
+          case needsEscape
+              if toEscape.contains(needsEscape) ||
+                needsEscape.endsWith(escapeSuffix) =>
+            needsEscape + escapeSuffix
+          case fine => fine
+        }
+        .toList)
 
   def unescapePath(path: Path) =
-    Path(path.elements.map {
-      case escaped if escaped.endsWith(escapeSuffix) =>
-        escaped.substring(0, escaped.length - escapeSuffix.length)
-      case fine => fine
-    }.toList)
+    Path(
+      path.elements
+        .map {
+          case escaped if escaped.endsWith(escapeSuffix) =>
+            escaped.substring(0, escaped.length - escapeSuffix.length)
+          case fine => fine
+        }
+        .toList)
 
   /**
     * Computes the stable path for a given vfs path relative to the given base dir. Version subdirs

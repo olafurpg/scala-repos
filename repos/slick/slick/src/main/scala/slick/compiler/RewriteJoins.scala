@@ -159,12 +159,17 @@ class RewriteJoins extends Phase {
             (p, FwdPath(b.generator :: rest))
         }, stopOnMatch = true)
         val Bind(_, _, Pure(StructNode(struct1), pts)) = b
-        val foundRefs = sRefs.map {
-          case (p, pOnBGen) =>
-            (p, (pOnBGen, /*None: Option[Symbol]*/ struct1.find {
-              case (s, n) => pOnBGen == n
-            }.map(_._1)))
-        }.toMap
+        val foundRefs = sRefs
+          .map {
+            case (p, pOnBGen) =>
+              (p,
+               (pOnBGen, /*None: Option[Symbol]*/ struct1
+                  .find {
+                    case (s, n) => pOnBGen == n
+                  }
+                  .map(_._1)))
+          }
+          .toMap
         logger.debug(
           "Found references in predicate: " + foundRefs.mkString(", "))
         val newDefs = foundRefs.filter(_._2._2.isEmpty).map {
@@ -172,9 +177,10 @@ class RewriteJoins extends Phase {
         }
         logger.debug("New references for predicate: " + newDefs.mkString(", "))
         val allRefs =
-          foundRefs.collect { case (p, (_, Some(s))) => (p, s) } ++ newDefs.map {
-            case (p, (_, s)) => (p, s)
-          }
+          foundRefs.collect { case (p, (_, Some(s))) => (p, s) } ++ newDefs
+            .map {
+              case (p, (_, s)) => (p, s)
+            }
         logger.debug(
           "All reference mappings for predicate: " + allRefs.mkString(", "))
         val (sel, tss) =
@@ -230,9 +236,11 @@ class RewriteJoins extends Phase {
           .flatMap(
             _._2.collect { case p @ FwdPath(s :: _) if s == ok => p }.toSeq)
           .toSet
-        val existingOkDefs = legalDefs.collect {
-          case (s, p @ FwdPath(s2 :: _)) if s2 == ok => (p, s)
-        }.toMap
+        val existingOkDefs = legalDefs
+          .collect {
+            case (s, p @ FwdPath(s2 :: _)) if s2 == ok => (p, s)
+          }
+          .toMap
         val createDefs = (requiredOkPaths -- existingOkDefs.keySet)
           .map(p => (new AnonSymbol, p))
           .toMap
@@ -417,7 +425,8 @@ class RewriteJoins extends Phase {
 
   def hasRefTo(n: Node, s: Set[TermSymbol]): Boolean =
     n.findNode {
-      case Ref(s2) if s contains s2 => true
-      case _ => false
-    }.isDefined
+        case Ref(s2) if s contains s2 => true
+        case _ => false
+      }
+      .isDefined
 }

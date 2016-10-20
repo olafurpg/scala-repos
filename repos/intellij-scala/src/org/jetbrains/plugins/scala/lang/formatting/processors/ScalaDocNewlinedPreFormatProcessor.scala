@@ -24,13 +24,16 @@ class ScalaDocNewlinedPreFormatProcessor
     extends ScalaRecursiveElementVisitor
     with PreFormatProcessor {
   override def process(element: ASTNode, range: TextRange): TextRange =
-    Option(element.getPsi).map { psiElem =>
-      val oldRange = psiElem.getTextRange
-      psiElem.accept(this)
-      val diff = psiElem.getTextRange.getEndOffset - oldRange.getEndOffset
-      //range can be overshrinked only for small elements that can't be formatted on their own, so it's ok to return whole range
-      if (range.getLength + diff <= 0) 0 else diff
-    }.map(range.grown).getOrElse(range)
+    Option(element.getPsi)
+      .map { psiElem =>
+        val oldRange = psiElem.getTextRange
+        psiElem.accept(this)
+        val diff = psiElem.getTextRange.getEndOffset - oldRange.getEndOffset
+        //range can be overshrinked only for small elements that can't be formatted on their own, so it's ok to return whole range
+        if (range.getLength + diff <= 0) 0 else diff
+      }
+      .map(range.grown)
+      .getOrElse(range)
 
   override def visitDocComment(s: ScDocComment) {
     val scalaSettings = CodeStyleSettingsManager

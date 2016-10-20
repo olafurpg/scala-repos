@@ -141,27 +141,29 @@ object GenerateUnsafeRowJoiner
      """.stripMargin
 
     // ------------- update fixed length data for variable length data type  --------------- //
-    val updateOffset = (schema1 ++ schema2).zipWithIndex.map {
-      case (field, i) =>
-        // Skip fixed length data types, and only generate code for variable length data
-        if (UnsafeRow.isFixedLength(field.dataType)) {
-          ""
-        } else {
-          // Number of bytes to increase for the offset. Note that since in UnsafeRow we store the
-          // offset in the upper 32 bit of the words, we can just shift the offset to the left by
-          // 32 and increment that amount in place.
-          val shift =
-            if (i < schema1.size) {
-              s"${(outputBitsetWords - bitset1Words + schema2.size) * 8}L"
-            } else {
-              s"(${(outputBitsetWords - bitset2Words + schema1.size) * 8}L + numBytesVariableRow1)"
-            }
-          val cursor = offset + outputBitsetWords * 8 + i * 8
-          s"""
+    val updateOffset = (schema1 ++ schema2).zipWithIndex
+      .map {
+        case (field, i) =>
+          // Skip fixed length data types, and only generate code for variable length data
+          if (UnsafeRow.isFixedLength(field.dataType)) {
+            ""
+          } else {
+            // Number of bytes to increase for the offset. Note that since in UnsafeRow we store the
+            // offset in the upper 32 bit of the words, we can just shift the offset to the left by
+            // 32 and increment that amount in place.
+            val shift =
+              if (i < schema1.size) {
+                s"${(outputBitsetWords - bitset1Words + schema2.size) * 8}L"
+              } else {
+                s"(${(outputBitsetWords - bitset2Words + schema1.size) * 8}L + numBytesVariableRow1)"
+              }
+            val cursor = offset + outputBitsetWords * 8 + i * 8
+            s"""
            |$putLong(buf, $cursor, $getLong(buf, $cursor) + ($shift << 32));
          """.stripMargin
-        }
-    }.mkString("\n")
+          }
+      }
+      .mkString("\n")
 
     // ------------------------ Finally, put everything together  --------------------------- //
     val code = s"""

@@ -135,19 +135,21 @@ class IRs[U <: Universe with Singleton](val uni: U) {
         List()
       }
 
-    (tpe.declarations.collect {
-      case sym: MethodSymbol
-          if !sym.isParamAccessor && sym.isSetter &&
-            sym.accessed != NoSymbol =>
-        val rawSymTpe = sym.getter.typeSignatureIn(rawTpeOfOwner) match {
-          case NullaryMethodType(ntpe) => ntpe; case ntpe => ntpe
-        }
-        val symTpe = existentialAbstraction(quantified, rawSymTpe)
-        FieldIR(sym.getter.name.toString,
-                symTpe,
-                None,
-                Some(sym.getter.asMethod))
-    }).toList ++ javaFieldIRs
+    (tpe.declarations
+      .collect {
+        case sym: MethodSymbol
+            if !sym.isParamAccessor && sym.isSetter &&
+              sym.accessed != NoSymbol =>
+          val rawSymTpe = sym.getter.typeSignatureIn(rawTpeOfOwner) match {
+            case NullaryMethodType(ntpe) => ntpe; case ntpe => ntpe
+          }
+          val symTpe = existentialAbstraction(quantified, rawSymTpe)
+          FieldIR(sym.getter.name.toString,
+                  symTpe,
+                  None,
+                  Some(sym.getter.asMethod))
+      })
+      .toList ++ javaFieldIRs
   }
 
   def newClassIR(tpe: Type): ClassIR = {

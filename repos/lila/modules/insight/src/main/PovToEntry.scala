@@ -67,9 +67,11 @@ object PovToEntry {
                 boards = boards,
                 movetimes = movetimes,
                 advices = an.?? {
-                  _.advices.map { a =>
-                    a.info.ply -> a
-                  }.toMap
+                  _.advices
+                    .map { a =>
+                      a.info.ply -> a
+                    }
+                    .toMap
                 }
               )
         }

@@ -144,18 +144,20 @@ class PruningSuite extends HiveComparisonTest with BeforeAndAfter {
     test(s"$testCaseName - pruning test") {
       val plan = new TestHive.QueryExecution(sql).sparkPlan
       val actualOutputColumns = plan.output.map(_.name)
-      val (actualScannedColumns, actualPartValues) = plan.collect {
-        case p @ HiveTableScan(columns, relation, _) =>
-          val columnNames = columns.map(_.name)
-          val partValues =
-            if (relation.table.partitionColumns.nonEmpty) {
-              p.prunePartitions(relation.getHiveQlPartitions())
-                .map(_.getValues)
-            } else {
-              Seq.empty
-            }
-          (columnNames, partValues)
-      }.head
+      val (actualScannedColumns, actualPartValues) = plan
+        .collect {
+          case p @ HiveTableScan(columns, relation, _) =>
+            val columnNames = columns.map(_.name)
+            val partValues =
+              if (relation.table.partitionColumns.nonEmpty) {
+                p.prunePartitions(relation.getHiveQlPartitions())
+                  .map(_.getValues)
+              } else {
+                Seq.empty
+              }
+            (columnNames, partValues)
+        }
+        .head
 
       assert(actualOutputColumns === expectedOutputColumns,
              "Output columns mismatch")

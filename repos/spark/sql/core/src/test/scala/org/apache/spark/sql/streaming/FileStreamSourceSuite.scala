@@ -102,9 +102,12 @@ class FileStreamSourceSuite
       } else {
         reader.stream()
       }
-    df.queryExecution.analyzed.collect {
-      case StreamingRelation(s: FileStreamSource, _) => s
-    }.head.schema
+    df.queryExecution.analyzed
+      .collect {
+        case StreamingRelation(s: FileStreamSource, _) => s
+      }
+      .head
+      .schema
   }
 
   test("FileStreamSource schema: no path") {

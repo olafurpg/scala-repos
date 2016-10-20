@@ -36,9 +36,11 @@ class PartitionedTextLineSingleWriteJob(args: Args) extends Job(args) {
 
 class PartitionedTextLineMultipleWriteJob(args: Args) extends Job(args) {
   import PartitionedTextLineTestSources._
-  TypedCsv[(String, String, String)]("in").map {
-    case (v1, v2, v3) => ((v1, v2), v3)
-  }.write(multiplePartition)
+  TypedCsv[(String, String, String)]("in")
+    .map {
+      case (v1, v2, v3) => ((v1, v2), v3)
+    }
+    .write(multiplePartition)
 }
 
 class PartitionedTextLineTest extends WordSpec with Matchers {

@@ -540,8 +540,8 @@ class MapWithStateSuite
         state.get()
       }
 
-      val mapWithStateStream = dstream.map { _ -> 1 }
-        .mapWithState(StateSpec.function(runningCount))
+      val mapWithStateStream =
+        dstream.map { _ -> 1 }.mapWithState(StateSpec.function(runningCount))
       // Set interval make sure there is one RDD checkpointing
       mapWithStateStream.checkpoint(checkpointDuration)
       mapWithStateStream.stateSnapshots()

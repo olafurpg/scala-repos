@@ -105,9 +105,11 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val parameterTaskPrevPageSize = request.getParameter("task.prevPageSize")
 
       val taskPage = Option(parameterTaskPage).map(_.toInt).getOrElse(1)
-      val taskSortColumn = Option(parameterTaskSortColumn).map { sortColumn =>
-        UIUtils.decodeURLParameter(sortColumn)
-      }.getOrElse("Index")
+      val taskSortColumn = Option(parameterTaskSortColumn)
+        .map { sortColumn =>
+          UIUtils.decodeURLParameter(sortColumn)
+        }
+        .getOrElse("Index")
       val taskSortDesc =
         Option(parameterTaskSortDesc).map(_.toBoolean).getOrElse(false)
       val taskPageSize =
@@ -792,15 +794,17 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       }
       .mkString("[", ",", "]")
 
-    val groupArrayStr = executorsSet.map {
-      case (executorId, host) =>
-        s"""
+    val groupArrayStr = executorsSet
+      .map {
+        case (executorId, host) =>
+          s"""
             {
               'id': '$executorId',
               'content': '$executorId / $host',
             }
           """
-    }.mkString("[", ",", "]")
+      }
+      .mkString("[", ",", "]")
 
     <span class="expand-task-assignment-timeline">
       <span class="expand-task-assignment-timeline-arrow arrow-closed"></span>

@@ -222,19 +222,21 @@ final class CachedBuilder(cache: CacheApi,
           etag == requestEtag
       } yield Accumulator.done(NotModified)
 
-      notModified.orElse {
-        // Otherwise try to serve the resource from the cache, if it has not yet expired
-        cache.get[SerializableResult](resultKey).map {
-          sr: SerializableResult =>
-            Accumulator.done(sr.result)
+      notModified
+        .orElse {
+          // Otherwise try to serve the resource from the cache, if it has not yet expired
+          cache.get[SerializableResult](resultKey).map {
+            sr: SerializableResult =>
+              Accumulator.done(sr.result)
+          }
         }
-      }.getOrElse {
-        // The resource was not in the cache, we have to run the underlying action
-        val accumulatorResult = action(request)
+        .getOrElse {
+          // The resource was not in the cache, we have to run the underlying action
+          val accumulatorResult = action(request)
 
-        // Add cache information to the response, so clients can cache its content
-        accumulatorResult.map(handleResult(_, etagKey, resultKey))
-      }
+          // Add cache information to the response, so clients can cache its content
+          accumulatorResult.map(handleResult(_, etagKey, resultKey))
+        }
   }
 
   /**
@@ -253,24 +255,28 @@ final class CachedBuilder(cache: CacheApi,
   private def handleResult(result: Result,
                            etagKey: String,
                            resultKey: String): Result = {
-    cachingWithEternity.andThen { duration =>
-      // Format expiration date according to http standard
-      val expirationDate =
-        http.dateFormat.print(System.currentTimeMillis() + duration.toMillis)
-      // Generate a fresh ETAG for it
-      // Use quoted sha1 hash of expiration date as ETAG
-      val etag = s""""${Codecs.sha1(expirationDate)}""""
+    cachingWithEternity
+      .andThen { duration =>
+        // Format expiration date according to http standard
+        val expirationDate =
+          http.dateFormat.print(System.currentTimeMillis() + duration.toMillis)
+        // Generate a fresh ETAG for it
+        // Use quoted sha1 hash of expiration date as ETAG
+        val etag = s""""${Codecs.sha1(expirationDate)}""""
 
-      val resultWithHeaders =
-        result.withHeaders(ETAG -> etag, EXPIRES -> expirationDate)
+        val resultWithHeaders =
+          result.withHeaders(ETAG -> etag, EXPIRES -> expirationDate)
 
-      // Cache the new ETAG of the resource
-      cache.set(etagKey, etag, duration)
-      // Cache the new Result of the resource
-      cache.set(resultKey, new SerializableResult(resultWithHeaders), duration)
+        // Cache the new ETAG of the resource
+        cache.set(etagKey, etag, duration)
+        // Cache the new Result of the resource
+        cache.set(resultKey,
+                  new SerializableResult(resultWithHeaders),
+                  duration)
 
-      resultWithHeaders
-    }.applyOrElse(result.header, (_: ResponseHeader) => result)
+        resultWithHeaders
+      }
+      .applyOrElse(result.header, (_: ResponseHeader) => result)
   }
 
   /**

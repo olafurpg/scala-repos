@@ -204,12 +204,14 @@ object Flaggable {
         case (acc, s) => acc :+ s
       }
 
-      tuples.map { tup =>
-        tup.split("=") match {
-          case Array(k, v) => (kflag.parse(k), vflag.parse(v))
-          case _ => throw new IllegalArgumentException("not a 'k=v'")
+      tuples
+        .map { tup =>
+          tup.split("=") match {
+            case Array(k, v) => (kflag.parse(k), vflag.parse(v))
+            case _ => throw new IllegalArgumentException("not a 'k=v'")
+          }
         }
-      }.toMap
+        .toMap
     }
 
     override def show(out: Map[K, V]) = {

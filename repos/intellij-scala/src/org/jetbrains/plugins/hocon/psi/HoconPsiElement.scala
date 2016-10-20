@@ -253,10 +253,12 @@ final class HValuedField(ast: ASTNode)
   def subScopes =
     if (isArrayAppend) Iterator.empty
     else
-      value.collect {
-        case obj: HObject => Iterator(obj)
-        case conc: HConcatenation => conc.findChildren[HObject]
-      }.getOrElse(Iterator.empty)
+      value
+        .collect {
+          case obj: HObject => Iterator(obj)
+          case conc: HConcatenation => conc.findChildren[HObject]
+        }
+        .getOrElse(Iterator.empty)
 }
 
 final class HInclude(ast: ASTNode)
@@ -339,10 +341,12 @@ final class HKey(ast: ASTNode)
     )
 
   def stringValue =
-    allChildren.collect {
-      case keyPart: HKeyPart => keyPart.stringValue
-      case other => other.getText
-    }.mkString
+    allChildren
+      .collect {
+        case keyPart: HKeyPart => keyPart.stringValue
+        case other => other.getText
+      }
+      .mkString
 
   def keyParts = findChildren[HKeyPart]
 

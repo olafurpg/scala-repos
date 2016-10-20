@@ -26,22 +26,24 @@ trait FlashCookieSpec
   sequential
 
   def appWithRedirect =
-    GuiceApplicationBuilder().routes {
-      case ("GET", "/flash") =>
-        Action {
-          Redirect("/landing").flashing(
-            "success" -> "found"
-          )
-        }
-      case ("GET", "/set-cookie") =>
-        Action {
-          Ok.withCookies(Cookie("some-cookie", "some-value"))
-        }
-      case ("GET", "/landing") =>
-        Action {
-          Ok("ok")
-        }
-    }.build()
+    GuiceApplicationBuilder()
+      .routes {
+        case ("GET", "/flash") =>
+          Action {
+            Redirect("/landing").flashing(
+              "success" -> "found"
+            )
+          }
+        case ("GET", "/set-cookie") =>
+          Action {
+            Ok.withCookies(Cookie("some-cookie", "some-value"))
+          }
+        case ("GET", "/landing") =>
+          Action {
+            Ok("ok")
+          }
+      }
+      .build()
 
   def withClientAndServer[T](block: WSClient => T) = {
     val app = appWithRedirect

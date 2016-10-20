@@ -147,9 +147,11 @@ class InsertIntoHiveTableSuite
       """.stripMargin)
     def listFolders(path: File, acc: List[String]): List[List[String]] = {
       val dir = path.listFiles()
-      val folders = dir.filter { e =>
-        e.isDirectory && !e.getName().startsWith(stagingDir)
-      }.toList
+      val folders = dir
+        .filter { e =>
+          e.isDirectory && !e.getName().startsWith(stagingDir)
+        }
+        .toList
       if (folders.isEmpty) {
         List(acc.reverse)
       } else {

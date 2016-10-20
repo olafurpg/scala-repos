@@ -256,9 +256,11 @@ abstract class ScalaTestingTestCase(
           make()
           saveChecksums()
         }
-        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions.find {
-          _.getClass == classOf[DefaultJavaProgramRunner]
-        }.get
+        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions
+          .find {
+            _.getClass == classOf[DefaultJavaProgramRunner]
+          }
+          .get
         val (handler, runContentDescriptor) =
           runProcess(runConfig,
                      classOf[DefaultRunExecutor],

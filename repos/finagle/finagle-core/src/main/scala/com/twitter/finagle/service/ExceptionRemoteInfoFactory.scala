@@ -81,12 +81,14 @@ private[finagle] class ExceptionRemoteInfoFactory[Req, Rep](
     ExceptionRemoteInfoFactory.addRemoteInfo(endpointAddr, label)
 
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
-    underlying(conn).map { service =>
-      val filter = new SimpleFilter[Req, Rep] {
-        override def apply(request: Req,
-                           service: Service[Req, Rep]): Future[Rep] =
-          service(request).rescue(requestAddRemoteInfo)
+    underlying(conn)
+      .map { service =>
+        val filter = new SimpleFilter[Req, Rep] {
+          override def apply(request: Req,
+                             service: Service[Req, Rep]): Future[Rep] =
+            service(request).rescue(requestAddRemoteInfo)
+        }
+        filter andThen service
       }
-      filter andThen service
-    }.rescue(connectionAddRemoteInfo)
+      .rescue(connectionAddRemoteInfo)
 }

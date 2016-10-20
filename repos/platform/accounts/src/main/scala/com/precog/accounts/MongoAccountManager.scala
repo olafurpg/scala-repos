@@ -175,11 +175,11 @@ abstract class MongoAccountManager(
 
     logger.debug("Saving new reset token " + token)
     database(
-      insert(token.serialize.asInstanceOf[JObject])
-        .into(settings.resetTokens)).map { _ =>
-      logger.debug("Save complete on reset token " + token)
-      tokenId
-    }
+      insert(token.serialize.asInstanceOf[JObject]).into(settings.resetTokens))
+      .map { _ =>
+        logger.debug("Save complete on reset token " + token)
+        tokenId
+      }
   }
 
   def markResetTokenUsed(tokenId: ResetTokenId): Future[PrecogUnit] = {

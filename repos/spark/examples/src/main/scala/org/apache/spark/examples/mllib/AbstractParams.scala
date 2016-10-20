@@ -43,11 +43,13 @@ abstract class AbstractParams[T: TypeTag] {
     }
     val mirror = runtimeMirror(getClass.getClassLoader)
     val instanceMirror = mirror.reflect(this)
-    allAccessors.map { f =>
-      val paramName = f.name.toString
-      val fieldMirror = instanceMirror.reflectField(f)
-      val paramValue = fieldMirror.get
-      s"  $paramName:\t$paramValue"
-    }.mkString("{\n", ",\n", "\n}")
+    allAccessors
+      .map { f =>
+        val paramName = f.name.toString
+        val fieldMirror = instanceMirror.reflectField(f)
+        val paramValue = fieldMirror.get
+        s"  $paramName:\t$paramValue"
+      }
+      .mkString("{\n", ",\n", "\n}")
   }
 }

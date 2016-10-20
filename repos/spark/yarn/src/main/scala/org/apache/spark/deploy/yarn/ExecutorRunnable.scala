@@ -182,11 +182,14 @@ private[yarn] class ExecutorRunnable(container: Container,
     // registers with the Scheduler and transfers the spark configs. Since the Executor backend
     // uses RPC to connect to the scheduler, the RPC settings are needed as well as the
     // authentication settings.
-    sparkConf.getAll.filter {
-      case (k, v) => SparkConf.isExecutorStartupConf(k)
-    }.foreach {
-      case (k, v) => javaOpts += YarnSparkHadoopUtil.escapeForShell(s"-D$k=$v")
-    }
+    sparkConf.getAll
+      .filter {
+        case (k, v) => SparkConf.isExecutorStartupConf(k)
+      }
+      .foreach {
+        case (k, v) =>
+          javaOpts += YarnSparkHadoopUtil.escapeForShell(s"-D$k=$v")
+      }
 
     // Commenting it out for now - so that people can refer to the properties if required. Remove
     // it once cpuset version is pushed out.

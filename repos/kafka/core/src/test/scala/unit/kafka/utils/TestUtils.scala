@@ -232,10 +232,12 @@ object TestUtils extends Logging {
     if (enableSaslSsl || shouldEnable(SecurityProtocol.SASL_SSL))
       protocolAndPorts += SecurityProtocol.SASL_SSL -> saslSslPort
 
-    val listeners = protocolAndPorts.map {
-      case (protocol, port) =>
-        s"${protocol.name}://localhost:$port"
-    }.mkString(",")
+    val listeners = protocolAndPorts
+      .map {
+        case (protocol, port) =>
+          s"${protocol.name}://localhost:$port"
+      }
+      .mkString(",")
 
     val props = new Properties
     if (nodeId >= 0) props.put("broker.id", nodeId.toString)
@@ -283,11 +285,13 @@ object TestUtils extends Logging {
                            replicationFactor,
                            topicConfig)
     // wait until the update metadata request for new topic reaches all servers
-    (0 until numPartitions).map {
-      case i =>
-        TestUtils.waitUntilMetadataIsPropagated(servers, topic, i)
-        i -> TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, i)
-    }.toMap
+    (0 until numPartitions)
+      .map {
+        case i =>
+          TestUtils.waitUntilMetadataIsPropagated(servers, topic, i)
+          i -> TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, i)
+      }
+      .toMap
   }
 
   /**
@@ -306,11 +310,13 @@ object TestUtils extends Logging {
       topic,
       partitionReplicaAssignment)
     // wait until the update metadata request for new topic reaches all servers
-    partitionReplicaAssignment.keySet.map {
-      case i =>
-        TestUtils.waitUntilMetadataIsPropagated(servers, topic, i)
-        i -> TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, i)
-    }.toMap
+    partitionReplicaAssignment.keySet
+      .map {
+        case i =>
+          TestUtils.waitUntilMetadataIsPropagated(servers, topic, i)
+          i -> TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, i)
+      }
+      .toMap
   }
 
   /**
@@ -1316,11 +1322,13 @@ object TestUtils extends Logging {
     val threadPool = Executors.newFixedThreadPool(numThreads)
     val exceptions = ArrayBuffer[Throwable]()
     try {
-      val runnables = functions.map { function =>
-        new Callable[Unit] {
-          override def call(): Unit = function()
+      val runnables = functions
+        .map { function =>
+          new Callable[Unit] {
+            override def call(): Unit = function()
+          }
         }
-      }.asJava
+        .asJava
       val futures = threadPool
         .invokeAll(runnables, timeoutMs, TimeUnit.MILLISECONDS)
         .asScala

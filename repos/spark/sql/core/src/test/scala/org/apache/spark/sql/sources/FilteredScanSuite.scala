@@ -409,9 +409,11 @@ class FilteredScanSuite
         assert(ColumnsRequired.set === requiredColumnNames)
 
         val table = caseInsensitiveContext.table("oneToTenFiltered")
-        val relation = table.queryExecution.logical.collectFirst {
-          case LogicalRelation(r, _, _) => r
-        }.get
+        val relation = table.queryExecution.logical
+          .collectFirst {
+            case LogicalRelation(r, _, _) => r
+          }
+          .get
 
         assert(
           relation

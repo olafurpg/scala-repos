@@ -108,9 +108,11 @@ class HBPEvents(client: HBClient,
                   classOf[TableOutputFormat[Object]],
                   classOf[OutputFormat[Object, Writable]])
 
-    events.map { event =>
-      val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
-      (new ImmutableBytesWritable(rowKey.toBytes), put)
-    }.saveAsNewAPIHadoopDataset(conf)
+    events
+      .map { event =>
+        val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
+        (new ImmutableBytesWritable(rowKey.toBytes), put)
+      }
+      .saveAsNewAPIHadoopDataset(conf)
   }
 }

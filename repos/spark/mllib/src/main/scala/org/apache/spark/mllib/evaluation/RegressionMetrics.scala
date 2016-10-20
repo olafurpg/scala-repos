@@ -58,13 +58,15 @@ class RegressionMetrics @Since("2.0.0")(
     */
   private lazy val summary: MultivariateStatisticalSummary = {
     val summary: MultivariateStatisticalSummary =
-      predictionAndObservations.map {
-        case (prediction, observation) =>
-          Vectors.dense(observation, observation - prediction)
-      }.aggregate(new MultivariateOnlineSummarizer())(
-        (summary, v) => summary.add(v),
-        (sum1, sum2) => sum1.merge(sum2)
-      )
+      predictionAndObservations
+        .map {
+          case (prediction, observation) =>
+            Vectors.dense(observation, observation - prediction)
+        }
+        .aggregate(new MultivariateOnlineSummarizer())(
+          (summary, v) => summary.add(v),
+          (sum1, sum2) => sum1.merge(sum2)
+        )
     summary
   }
 
@@ -73,9 +75,11 @@ class RegressionMetrics @Since("2.0.0")(
   private lazy val SStot = summary.variance(0) * (summary.count - 1)
   private lazy val SSreg = {
     val yMean = summary.mean(0)
-    predictionAndObservations.map {
-      case (prediction, _) => math.pow(prediction - yMean, 2)
-    }.sum()
+    predictionAndObservations
+      .map {
+        case (prediction, _) => math.pow(prediction - yMean, 2)
+      }
+      .sum()
   }
 
   /**

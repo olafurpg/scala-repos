@@ -254,24 +254,26 @@ class Dataset[T] private[sql] (
     // For array values, replace Seq and Array with square brackets
     // For cells that are beyond 20 characters, replace it with the first 17 and "..."
     val rows: Seq[Seq[String]] =
-      schema.fieldNames.toSeq +: data.map {
-        case r: Row => r
-        case tuple: Product => Row.fromTuple(tuple)
-        case o => Row(o)
-      }.map { row =>
-        row.toSeq.map { cell =>
-          val str = cell match {
-            case null => "null"
-            case binary: Array[Byte] =>
-              binary.map("%02X".format(_)).mkString("[", " ", "]")
-            case array: Array[_] => array.mkString("[", ", ", "]")
-            case seq: Seq[_] => seq.mkString("[", ", ", "]")
-            case _ => cell.toString
-          }
-          if (truncate && str.length > 20) str.substring(0, 17) + "..."
-          else str
-        }: Seq[String]
-      }
+      schema.fieldNames.toSeq +: data
+        .map {
+          case r: Row => r
+          case tuple: Product => Row.fromTuple(tuple)
+          case o => Row(o)
+        }
+        .map { row =>
+          row.toSeq.map { cell =>
+            val str = cell match {
+              case null => "null"
+              case binary: Array[Byte] =>
+                binary.map("%02X".format(_)).mkString("[", " ", "]")
+              case array: Array[_] => array.mkString("[", ", ", "]")
+              case seq: Seq[_] => seq.mkString("[", ", ", "]")
+              case _ => cell.toString
+            }
+            if (truncate && str.length > 20) str.substring(0, 17) + "..."
+            else str
+          }: Seq[String]
+        }
 
     formatString(rows, numRows, hasMoreData, truncate)
   }
@@ -1752,9 +1754,11 @@ class Dataset[T] private[sql] (
       case Column(expr: Expression) => expr
     }
     val attrs = this.logicalPlan.output
-    val colsAfterDrop = attrs.filter { attr =>
-      attr != expression
-    }.map(attr => Column(attr))
+    val colsAfterDrop = attrs
+      .filter { attr =>
+        attr != expression
+      }
+      .map(attr => Column(attr))
     select(colsAfterDrop: _*)
   }
 
@@ -2340,12 +2344,14 @@ class Dataset[T] private[sql] (
     * @since 2.0.0
     */
   def inputFiles: Array[String] = {
-    val files: Seq[String] = logicalPlan.collect {
-      case LogicalRelation(fsBasedRelation: FileRelation, _, _) =>
-        fsBasedRelation.inputFiles
-      case fr: FileRelation =>
-        fr.inputFiles
-    }.flatten
+    val files: Seq[String] = logicalPlan
+      .collect {
+        case LogicalRelation(fsBasedRelation: FileRelation, _, _) =>
+          fsBasedRelation.inputFiles
+        case fr: FileRelation =>
+          fr.inputFiles
+      }
+      .flatten
     files.toSet.toArray
   }
 

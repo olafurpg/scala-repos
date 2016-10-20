@@ -315,9 +315,11 @@ class ScaldingLaws extends WordSpec {
       /**
         * Create the batched service
         */
-      val batchedService = stream.map {
-        case (time, v) => (Timestamp(time), v)
-      }.groupBy { case (ts, _) => batcher.batchOf(ts) }
+      val batchedService = stream
+        .map {
+          case (time, v) => (Timestamp(time), v)
+        }
+        .groupBy { case (ts, _) => batcher.batchOf(ts) }
       val testService =
         new TestService[Int, Int]("srv",
                                   batcher,
@@ -398,9 +400,11 @@ class ScaldingLaws extends WordSpec {
       /**
         * Create the batched service
         */
-      val batchedService = stream.map {
-        case (time, v) => (Timestamp(time), v)
-      }.groupBy { case (ts, _) => batcher.batchOf(ts) }
+      val batchedService = stream
+        .map {
+          case (time, v) => (Timestamp(time), v)
+        }
+        .groupBy { case (ts, _) => batcher.batchOf(ts) }
       val testService =
         new TestService[Int, Int]("srv",
                                   batcher,

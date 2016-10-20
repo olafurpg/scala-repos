@@ -53,15 +53,17 @@ object JdbcUtils extends Logging {
     () =>
       {
         userSpecifiedDriverClass.foreach(DriverRegistry.register)
-        val driver: Driver = DriverManager.getDrivers.asScala.collectFirst {
-          case d: DriverWrapper
-              if d.wrapped.getClass.getCanonicalName == driverClass =>
-            d
-          case d if d.getClass.getCanonicalName == driverClass => d
-        }.getOrElse {
-          throw new IllegalStateException(
-            s"Did not find registered driver with class $driverClass")
-        }
+        val driver: Driver = DriverManager.getDrivers.asScala
+          .collectFirst {
+            case d: DriverWrapper
+                if d.wrapped.getClass.getCanonicalName == driverClass =>
+              d
+            case d if d.getClass.getCanonicalName == driverClass => d
+          }
+          .getOrElse {
+            throw new IllegalStateException(
+              s"Did not find registered driver with class $driverClass")
+          }
         driver.connect(url, properties)
       }
   }

@@ -145,18 +145,20 @@ trait Config extends Serializable {
     */
   def getKryoRegisteredClasses: Set[Class[_]] = {
     // Get an instance of the Kryo serializer (which is populated with registrations)
-    getKryo.map { kryo =>
-      val cr = kryo.newKryo.getClassResolver
+    getKryo
+      .map { kryo =>
+        val cr = kryo.newKryo.getClassResolver
 
-      @annotation.tailrec
-      def kryoClasses(idx: Int, acc: Set[Class[_]]): Set[Class[_]] =
-        Option(cr.getRegistration(idx)) match {
-          case Some(reg) => kryoClasses(idx + 1, acc + reg.getType)
-          case None => acc // The first null is the end of the line
-        }
+        @annotation.tailrec
+        def kryoClasses(idx: Int, acc: Set[Class[_]]): Set[Class[_]] =
+          Option(cr.getRegistration(idx)) match {
+            case Some(reg) => kryoClasses(idx + 1, acc + reg.getType)
+            case None => acc // The first null is the end of the line
+          }
 
-      kryoClasses(0, Set[Class[_]]())
-    }.getOrElse(Set())
+        kryoClasses(0, Set[Class[_]]())
+      }
+      .getOrElse(Set())
   }
 
   /*
@@ -237,9 +239,11 @@ trait Config extends Serializable {
         (AppProps.APP_FRAMEWORKS -> ("scalding:" + scaldingVersion.toString)))
 
   def getUniqueIds: Set[UniqueID] =
-    get(UniqueID.UNIQUE_JOB_ID).map { str =>
-      str.split(",").toSet[String].map(UniqueID(_))
-    }.getOrElse(Set.empty)
+    get(UniqueID.UNIQUE_JOB_ID)
+      .map { str =>
+        str.split(",").toSet[String].map(UniqueID(_))
+      }
+      .getOrElse(Set.empty)
 
   /**
     * The serialization of your data will be smaller if any classes passed between tasks in your job
@@ -558,9 +562,12 @@ object Config {
    */
   def fromHadoop(conf: Configuration): Config =
     // use `conf.get` to force JobConf to evaluate expressions
-    Config(conf.asScala.map { e =>
-      e.getKey -> conf.get(e.getKey)
-    }.toMap)
+    Config(
+      conf.asScala
+        .map { e =>
+          e.getKey -> conf.get(e.getKey)
+        }
+        .toMap)
 
   /*
    * For everything BUT SERIALIZATION, this prefers values in conf,

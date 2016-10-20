@@ -51,8 +51,8 @@ object Databases {
                urlOptions: Map[String, String] = Map.empty,
                config: Map[String, _ <: Any] = Map.empty): Database = {
     val driver = "org.h2.Driver"
-    val urlExtra = urlOptions.map { case (k, v) => k + "=" + v }
-      .mkString(";", ";", "")
+    val urlExtra =
+      urlOptions.map { case (k, v) => k + "=" + v }.mkString(";", ";", "")
     val url = "jdbc:h2:mem:" + name + urlExtra
     Databases(driver, url, name, config)
   }

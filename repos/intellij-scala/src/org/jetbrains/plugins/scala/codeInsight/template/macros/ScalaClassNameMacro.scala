@@ -17,10 +17,13 @@ class ScalaClassNameMacro extends Macro {
                                context: ExpressionContext): Result = {
     Option(
       PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[PsiClass])).map {
-      case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
-      case cl: PsiClass => cl.getName
-    }.map(new TextResult(_)).orNull
+                                  classOf[PsiClass]))
+      .map {
+        case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
+        case cl: PsiClass => cl.getName
+      }
+      .map(new TextResult(_))
+      .orNull
   }
 
   override def getName: String = MacroUtil.scalaIdPrefix + "className"

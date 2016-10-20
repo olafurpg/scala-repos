@@ -506,7 +506,8 @@ trait Infer extends Checkable { self: Analyzer =>
         def unapply(
             m: Result): Some[(List[Symbol], List[Type], List[Symbol])] =
           Some(toLists {
-            val (ok, nok) = m.map { case (p, a) => (p, a.getOrElse(null)) }
+            val (ok, nok) = m
+              .map { case (p, a) => (p, a.getOrElse(null)) }
               .partition(_._2 ne null)
             val (okArgs, okTparams) = ok.unzip
             (okArgs, okTparams, nok.keys)
@@ -517,7 +518,8 @@ trait Infer extends Checkable { self: Analyzer =>
         def unapply(m: Result)
           : Some[(List[Symbol], List[Type], List[Type], List[Symbol])] =
           Some(toLists {
-            val (ok, nok) = m.map { case (p, a) => (p, a.getOrElse(null)) }
+            val (ok, nok) = m
+              .map { case (p, a) => (p, a.getOrElse(null)) }
               .partition(_._2 ne null)
             val (okArgs, okTparams) = ok.unzip
             (okArgs,

@@ -149,9 +149,11 @@ case class Expand(projections: Seq[Seq[Expression]],
     // Size of sameOutput array should equal N.
     // If sameOutput(i) is true, then the i-th column has the same value for all output rows given
     // an input row.
-    val sameOutput: Array[Boolean] = output.indices.map { colIndex =>
-      projections.map(p => p(colIndex)).toSet.size == 1
-    }.toArray
+    val sameOutput: Array[Boolean] = output.indices
+      .map { colIndex =>
+        projections.map(p => p(colIndex)).toSet.size == 1
+      }
+      .toArray
 
     // Part 1: declare variables for each column
     // If a column has the same value for all output rows, then we also generate its computation

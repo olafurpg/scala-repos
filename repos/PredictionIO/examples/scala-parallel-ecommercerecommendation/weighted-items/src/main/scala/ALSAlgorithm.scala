@@ -82,25 +82,28 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
-    val mllibRatings = data.viewEvents.map { r =>
-      // Convert user and item String IDs to Int index for MLlib
-      val uindex = userStringIntMap.getOrElse(r.user, -1)
-      val iindex = itemStringIntMap.getOrElse(r.item, -1)
+    val mllibRatings = data.viewEvents
+      .map { r =>
+        // Convert user and item String IDs to Int index for MLlib
+        val uindex = userStringIntMap.getOrElse(r.user, -1)
+        val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
-      if (uindex == -1)
-        logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-          " to Int index.")
+        if (uindex == -1)
+          logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
+            " to Int index.")
 
-      if (iindex == -1)
-        logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-          " to Int index.")
+        if (iindex == -1)
+          logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
+            " to Int index.")
 
-      ((uindex, iindex), 1)
-    }.filter {
-      case ((u, i), v) =>
-        // keep events with valid user and item index
-        (u != -1) && (i != -1)
-    }.reduceByKey(_ + _) // aggregate all view events of same user-item pair
+        ((uindex, iindex), 1)
+      }
+      .filter {
+        case ((u, i), v) =>
+          // keep events with valid user and item index
+          (u != -1) && (i != -1)
+      }
+      .reduceByKey(_ + _) // aggregate all view events of same user-item pair
       .map {
         case ((u, i), v) =>
           // MLlibRating requires integer index for user and item
@@ -177,16 +180,18 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           }
         }
 
-        seenEvents.map { event =>
-          try {
-            event.targetEntityId.get
-          } catch {
-            case e => {
-              logger.error(s"Can't get targetEntityId of event ${event}.")
-              throw e
+        seenEvents
+          .map { event =>
+            try {
+              event.targetEntityId.get
+            } catch {
+              case e => {
+                logger.error(s"Can't get targetEntityId of event ${event}.")
+                throw e
+              }
             }
           }
-        }.toSet
+          .toSet
       } else {
         Set[String]()
       }
@@ -260,23 +265,25 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         val uf = userFeature.get
         val indexScores: Map[Int, Double] =
           productFeatures.par // convert to parallel collection
-          .filter {
-            case (i, (item, feature)) =>
-              feature.isDefined && isCandidateItem(
-                i = i,
-                item = item,
-                categories = query.categories,
-                whiteList = whiteList,
-                blackList = finalBlackList
-              )
-          }.map {
-            case (i, (item, feature)) =>
-              // NOTE: feature must be defined, so can call .get
-              val originalScore = dotProduct(uf, feature.get)
-              // Adjusting score according to given item weights
-              val adjustedScore = originalScore * weights(i)
-              (i, adjustedScore)
-          }.filter(_._2 > 0) // only keep items with score > 0
+            .filter {
+              case (i, (item, feature)) =>
+                feature.isDefined && isCandidateItem(
+                  i = i,
+                  item = item,
+                  categories = query.categories,
+                  whiteList = whiteList,
+                  blackList = finalBlackList
+                )
+            }
+            .map {
+              case (i, (item, feature)) =>
+                // NOTE: feature must be defined, so can call .get
+                val originalScore = dotProduct(uf, feature.get)
+                // Adjusting score according to given item weights
+                val adjustedScore = originalScore * weights(i)
+                (i, adjustedScore)
+            }
+            .filter(_._2 > 0) // only keep items with score > 0
             .seq // convert back to sequential collection
 
         val ord = Ordering.by[(Int, Double), Double](_._2).reverse
@@ -338,25 +345,28 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       }
     }
 
-    val recentItems: Set[String] = recentEvents.map { event =>
-      try {
-        event.targetEntityId.get
-      } catch {
-        case e => {
-          logger.error("Can't get targetEntityId of event ${event}.")
-          throw e
+    val recentItems: Set[String] = recentEvents
+      .map { event =>
+        try {
+          event.targetEntityId.get
+        } catch {
+          case e => {
+            logger.error("Can't get targetEntityId of event ${event}.")
+            throw e
+          }
         }
       }
-    }.toSet
+      .toSet
 
     val recentList: Set[Int] =
       recentItems.map(x => model.itemStringIntMap.get(x)).flatten
 
     val recentFeatures: Vector[Array[Double]] = recentList.toVector
     // productFeatures may not contain the requested item
-    .map { i =>
-      productFeatures.get(i).map { case (item, f) => f }.flatten
-    }.flatten
+      .map { i =>
+        productFeatures.get(i).map { case (item, f) => f }.flatten
+      }
+      .flatten
 
     val indexScores: Map[Int, Double] =
       if (recentFeatures.isEmpty) {
@@ -365,24 +375,28 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         Map[Int, Double]()
       } else {
         productFeatures.par // convert to parallel collection
-        .filter {
-          case (i, (item, feature)) =>
-            feature.isDefined && isCandidateItem(
-              i = i,
-              item = item,
-              categories = query.categories,
-              whiteList = whiteList,
-              blackList = blackList
-            )
-        }.map {
-          case (i, (item, feature)) =>
-            val originalScore = recentFeatures.map { rf =>
-              cosine(rf, feature.get) // feature is defined
-            }.sum
-            // Adjusting score according to given item weights
-            val adjustedScore = originalScore * weights(i)
-            (i, adjustedScore)
-        }.filter(_._2 > 0) // keep items with score > 0
+          .filter {
+            case (i, (item, feature)) =>
+              feature.isDefined && isCandidateItem(
+                i = i,
+                item = item,
+                categories = query.categories,
+                whiteList = whiteList,
+                blackList = blackList
+              )
+          }
+          .map {
+            case (i, (item, feature)) =>
+              val originalScore = recentFeatures
+                .map { rf =>
+                  cosine(rf, feature.get) // feature is defined
+                }
+                .sum
+              // Adjusting score according to given item weights
+              val adjustedScore = originalScore * weights(i)
+              (i, adjustedScore)
+          }
+          .filter(_._2 > 0) // keep items with score > 0
           .seq // convert back to sequential collection
       }
 
@@ -448,11 +462,13 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // can add other custom filtering here
     whiteList.map(_.contains(i)).getOrElse(true) && !blackList.contains(i) &&
     // filter categories
-    categories.map { cat =>
-      item.categories.exists { itemCat =>
-        // keep this item if its categories overlap with the query categories
-        itemCat.toSet.intersect(cat).nonEmpty
-      } // discard this item if it has no categories
-    }.getOrElse(true)
+    categories
+      .map { cat =>
+        item.categories.exists { itemCat =>
+          // keep this item if its categories overlap with the query categories
+          itemCat.toSet.intersect(cat).nonEmpty
+        } // discard this item if it has no categories
+      }
+      .getOrElse(true)
   }
 }

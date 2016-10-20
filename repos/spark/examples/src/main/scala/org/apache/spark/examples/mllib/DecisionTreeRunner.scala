@@ -386,10 +386,12 @@ object DecisionTreeRunner {
   private[mllib] def meanSquaredError(model: {
     def predict(features: Vector): Double
   }, data: RDD[LabeledPoint]): Double = {
-    data.map { y =>
-      val err = model.predict(y.features) - y.label
-      err * err
-    }.mean()
+    data
+      .map { y =>
+        val err = model.predict(y.features) - y.label
+        err * err
+      }
+      .mean()
   }
   // scalastyle:on structural.type
 }

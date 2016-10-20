@@ -129,27 +129,31 @@ case class Filter(condition: Expression, child: SparkPlan)
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     // filter out the nulls
-    val filterOutNull = notNullAttributes.map { a =>
-      val idx = child.output.indexOf(a)
-      s"if (${input(idx).isNull}) continue;"
-    }.mkString("\n")
+    val filterOutNull = notNullAttributes
+      .map { a =>
+        val idx = child.output.indexOf(a)
+        s"if (${input(idx).isNull}) continue;"
+      }
+      .mkString("\n")
 
     ctx.currentVars = input
-    val predicates = otherPreds.map { e =>
-      val bound = ExpressionCanonicalizer.execute(
-        BindReferences.bindReference(e, output))
-      val ev = bound.gen(ctx)
-      val nullCheck =
-        if (bound.nullable) {
-          s"${ev.isNull} || "
-        } else {
-          s""
-        }
-      s"""
+    val predicates = otherPreds
+      .map { e =>
+        val bound = ExpressionCanonicalizer.execute(
+          BindReferences.bindReference(e, output))
+        val ev = bound.gen(ctx)
+        val nullCheck =
+          if (bound.nullable) {
+            s"${ev.isNull} || "
+          } else {
+            s""
+          }
+        s"""
          |${ev.code}
          |if (${nullCheck}!${ev.value}) continue;
        """.stripMargin
-    }.mkString("\n")
+      }
+      .mkString("\n")
 
     // Reset the isNull to false for the not-null columns, then the followed operators could
     // generate better code (remove dead branches).

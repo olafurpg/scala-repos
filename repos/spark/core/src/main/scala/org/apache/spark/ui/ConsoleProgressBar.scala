@@ -82,23 +82,27 @@ private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
     */
   private def show(now: Long, stages: Seq[SparkStageInfo]) {
     val width = TerminalWidth / stages.size
-    val bar = stages.map { s =>
-      val total = s.numTasks()
-      val header = s"[Stage ${s.stageId()}:"
-      val tailer =
-        s"(${s.numCompletedTasks()} + ${s.numActiveTasks()}) / $total]"
-      val w = width - header.length - tailer.length
-      val bar =
-        if (w > 0) {
-          val percent = w * s.numCompletedTasks() / total
-          (0 until w).map { i =>
-            if (i < percent) "=" else if (i == percent) ">" else " "
-          }.mkString("")
-        } else {
-          ""
-        }
-      header + bar + tailer
-    }.mkString("")
+    val bar = stages
+      .map { s =>
+        val total = s.numTasks()
+        val header = s"[Stage ${s.stageId()}:"
+        val tailer =
+          s"(${s.numCompletedTasks()} + ${s.numActiveTasks()}) / $total]"
+        val w = width - header.length - tailer.length
+        val bar =
+          if (w > 0) {
+            val percent = w * s.numCompletedTasks() / total
+            (0 until w)
+              .map { i =>
+                if (i < percent) "=" else if (i == percent) ">" else " "
+              }
+              .mkString("")
+          } else {
+            ""
+          }
+        header + bar + tailer
+      }
+      .mkString("")
 
     // only refresh if it's changed of after 1 minute (or the ssh connection will be closed
     // after idle some time)

@@ -76,12 +76,15 @@ object LineNumber {
       if (it.hasNext) Some(it.next)
       else None
 
-    val scaldingJobCaller = headOption(stack.iterator.filter { se =>
-      se.getClassName.startsWith(scaldingPrefix)
-    }.filter { se =>
-      val cls = Class.forName(se.getClassName)
-      jobClass.isAssignableFrom(cls)
-    })
+    val scaldingJobCaller = headOption(
+      stack.iterator
+        .filter { se =>
+          se.getClassName.startsWith(scaldingPrefix)
+        }
+        .filter { se =>
+          val cls = Class.forName(se.getClassName)
+          jobClass.isAssignableFrom(cls)
+        })
 
     scaldingJobCaller.orElse(nonScalding)
   }

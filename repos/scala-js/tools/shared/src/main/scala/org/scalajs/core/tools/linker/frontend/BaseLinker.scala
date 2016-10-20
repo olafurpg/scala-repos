@@ -459,12 +459,14 @@ final class BaseLinker(semantics: Semantics,
                             methodName: String,
                             getTree: TreeProvider): MethodDef = {
     val (classDef, _) = getTree(classInfo.encodedName)
-    classDef.defs.collectFirst {
-      case mDef: MethodDef if !mDef.static && mDef.name.name == methodName =>
-        mDef
-    }.getOrElse {
-      throw new AssertionError(
-        s"Cannot find $methodName in ${classInfo.encodedName}")
-    }
+    classDef.defs
+      .collectFirst {
+        case mDef: MethodDef if !mDef.static && mDef.name.name == methodName =>
+          mDef
+      }
+      .getOrElse {
+        throw new AssertionError(
+          s"Cannot find $methodName in ${classInfo.encodedName}")
+      }
   }
 }

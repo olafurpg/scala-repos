@@ -64,21 +64,25 @@ object BatchID {
     * Returns true if the supplied interval of BatchID can
     */
   def toInterval(iter: TraversableOnce[BatchID]): Option[Interval[BatchID]] =
-    iter.map { b =>
-      (b, b, 1L)
-    }.reduceOption { (left, right) =>
-      val (lmin, lmax, lcnt) = left
-      val (rmin, rmax, rcnt) = right
-      (lmin min rmin, lmax max rmax, lcnt + rcnt)
-    }.flatMap {
-      case (min, max, cnt) =>
-        if ((min + cnt) == (max + 1L)) {
-          Some(Interval.leftClosedRightOpen(min, max.next).right.get)
-        } else {
-          // These batches are not contiguous, not an interval
-          None
-        }
-    }.orElse(Some(Empty[BatchID]())) // there was nothing it iter
+    iter
+      .map { b =>
+        (b, b, 1L)
+      }
+      .reduceOption { (left, right) =>
+        val (lmin, lmax, lcnt) = left
+        val (rmin, rmax, rcnt) = right
+        (lmin min rmin, lmax max rmax, lcnt + rcnt)
+      }
+      .flatMap {
+        case (min, max, cnt) =>
+          if ((min + cnt) == (max + 1L)) {
+            Some(Interval.leftClosedRightOpen(min, max.next).right.get)
+          } else {
+            // These batches are not contiguous, not an interval
+            None
+          }
+      }
+      .orElse(Some(Empty[BatchID]())) // there was nothing it iter
 
   /**
     * Returns all the BatchIDs that are contained in the interval

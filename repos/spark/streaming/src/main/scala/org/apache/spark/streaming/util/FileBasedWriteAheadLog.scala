@@ -290,16 +290,18 @@ private[streaming] object FileBasedWriteAheadLog {
 
   /** Convert a sequence of files to a sequence of sorted LogInfo objects */
   def logFilesTologInfo(files: Seq[Path]): Seq[LogInfo] = {
-    files.flatMap { file =>
-      logFileRegex.findFirstIn(file.getName()) match {
-        case Some(logFileRegex(startTimeStr, stopTimeStr)) =>
-          val startTime = startTimeStr.toLong
-          val stopTime = stopTimeStr.toLong
-          Some(LogInfo(startTime, stopTime, file.toString))
-        case None =>
-          None
+    files
+      .flatMap { file =>
+        logFileRegex.findFirstIn(file.getName()) match {
+          case Some(logFileRegex(startTimeStr, stopTimeStr)) =>
+            val startTime = startTimeStr.toLong
+            val stopTime = stopTimeStr.toLong
+            Some(LogInfo(startTime, stopTime, file.toString))
+          case None =>
+            None
+        }
       }
-    }.sortBy { _.startTime }
+      .sortBy { _.startTime }
   }
 
   /**

@@ -22,17 +22,19 @@ trait AuthResource extends RestResource {
       fn: Identity => Response): Response = {
     val requestWrapper = new RequestFacade(request)
     val maybeIdentity = result(authenticator.authenticate(requestWrapper))
-    maybeIdentity.map { identity =>
-      try {
-        fn(identity)
-      } catch {
-        case e: AccessDeniedException =>
-          withResponseFacade(authorizer.handleNotAuthorized(identity, _))
+    maybeIdentity
+      .map { identity =>
+        try {
+          fn(identity)
+        } catch {
+          case e: AccessDeniedException =>
+            withResponseFacade(authorizer.handleNotAuthorized(identity, _))
+        }
       }
-    }.getOrElse {
-      withResponseFacade(
-        authenticator.handleNotAuthenticated(requestWrapper, _))
-    }
+      .getOrElse {
+        withResponseFacade(
+          authenticator.handleNotAuthenticated(requestWrapper, _))
+      }
   }
 
   def checkAuthorization[T](

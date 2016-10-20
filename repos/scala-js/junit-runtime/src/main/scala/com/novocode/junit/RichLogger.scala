@@ -149,9 +149,11 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
 
   private def findTestFileName(trace: Array[StackTraceElement],
                                testClassName: String): String = {
-    trace.collectFirst {
-      case e if testClassName.equals(e.getClassName) => e.getFileName
-    }.orNull
+    trace
+      .collectFirst {
+        case e if testClassName.equals(e.getClassName) => e.getFileName
+      }
+      .orNull
   }
 
   private def stackTraceElementToString(e: StackTraceElement,

@@ -159,10 +159,12 @@ private[spark] object RollingFileAppender {
   def getSortedRolledOverFiles(directory: String,
                                activeFileName: String): Seq[File] = {
     val rolledOverFiles =
-      new File(directory).getAbsoluteFile.listFiles.filter { file =>
-        val fileName = file.getName
-        fileName.startsWith(activeFileName) && fileName != activeFileName
-      }.sorted
+      new File(directory).getAbsoluteFile.listFiles
+        .filter { file =>
+          val fileName = file.getName
+          fileName.startsWith(activeFileName) && fileName != activeFileName
+        }
+        .sorted
     val activeFile = {
       val file = new File(directory, activeFileName).getAbsoluteFile
       if (file.exists) Some(file) else None

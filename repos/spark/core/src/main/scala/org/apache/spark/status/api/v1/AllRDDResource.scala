@@ -57,14 +57,17 @@ private[spark] object AllRDDResource {
     val workers = storageStatusList.map { (rddId, _) }
     val blockLocations =
       StorageUtils.getRddBlockLocations(rddId, storageStatusList)
-    val blocks = storageStatusList.flatMap { _.rddBlocksById(rddId) }.sortWith {
-      _._1.name < _._1.name
-    }.map {
-      case (blockId, status) =>
-        (blockId,
-         status,
-         blockLocations.getOrElse(blockId, Seq[String]("Unknown")))
-    }
+    val blocks = storageStatusList
+      .flatMap { _.rddBlocksById(rddId) }
+      .sortWith {
+        _._1.name < _._1.name
+      }
+      .map {
+        case (blockId, status) =>
+          (blockId,
+           status,
+           blockLocations.getOrElse(blockId, Seq[String]("Unknown")))
+      }
 
     val dataDistribution =
       if (includeDetails) {

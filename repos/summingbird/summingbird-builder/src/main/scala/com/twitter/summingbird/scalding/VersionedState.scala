@@ -58,19 +58,22 @@ private[scalding] class VersionedState(
   private class VersionedPrepareState
       extends PrepareState[Interval[Timestamp]] {
     def newestCompleted: Option[BatchID] =
-      meta.versions.map { vers =>
-        val thisMeta = meta(vers)
-        thisMeta.get[String].flatMap { str =>
-          ScalaTry(BatchID(str))
-        } match {
-          case Success(batchID) => Some(batchID)
-          case Failure(ex) =>
-            logger.warn(
-              "Path: {} missing or corrupt completion file. Ignoring and trying previous",
-              thisMeta.path)
-            None
+      meta.versions
+        .map { vers =>
+          val thisMeta = meta(vers)
+          thisMeta.get[String].flatMap { str =>
+            ScalaTry(BatchID(str))
+          } match {
+            case Success(batchID) => Some(batchID)
+            case Failure(ex) =>
+              logger.warn(
+                "Path: {} missing or corrupt completion file. Ignoring and trying previous",
+                thisMeta.path)
+              None
+          }
         }
-      }.flatten.headOption
+        .flatten
+        .headOption
 
     /**
       * Returns a date interval spanning from the beginning of the the

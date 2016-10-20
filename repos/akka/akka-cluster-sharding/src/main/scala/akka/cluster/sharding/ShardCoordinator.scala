@@ -182,9 +182,11 @@ object ShardCoordinator {
       if (rebalanceInProgress.size < maxSimultaneousRebalance) {
         val (regionWithLeastShards, leastShards) =
           currentShardAllocations.minBy { case (_, v) ⇒ v.size }
-        val mostShards = currentShardAllocations.collect {
-          case (_, v) ⇒ v.filterNot(s ⇒ rebalanceInProgress(s))
-        }.maxBy(_.size)
+        val mostShards = currentShardAllocations
+          .collect {
+            case (_, v) ⇒ v.filterNot(s ⇒ rebalanceInProgress(s))
+          }
+          .maxBy(_.size)
         if (mostShards.size - leastShards.size >= rebalanceThreshold)
           Future.successful(Set(mostShards.head))
         else emptyRebalanceResult
@@ -575,14 +577,17 @@ abstract class ShardCoordinator(
                     continueGetShardHome(shard, region, getShardHomeSender)
                   case _ ⇒
                     // continue when future is completed
-                    regionFuture.map { region ⇒
-                      AllocateShardResult(shard,
-                                          Some(region),
-                                          getShardHomeSender)
-                    }.recover {
-                      case _ ⇒
-                        AllocateShardResult(shard, None, getShardHomeSender)
-                    }.pipeTo(self)
+                    regionFuture
+                      .map { region ⇒
+                        AllocateShardResult(shard,
+                                            Some(region),
+                                            getShardHomeSender)
+                      }
+                      .recover {
+                        case _ ⇒
+                          AllocateShardResult(shard, None, getShardHomeSender)
+                      }
+                      .pipeTo(self)
                 }
               }
           }
@@ -617,11 +622,14 @@ abstract class ShardCoordinator(
               continueRebalance(shards)
             case _ ⇒
               // continue when future is completed
-              shardsFuture.map { shards ⇒
-                RebalanceResult(shards)
-              }.recover {
-                case _ ⇒ RebalanceResult(Set.empty)
-              }.pipeTo(self)
+              shardsFuture
+                .map { shards ⇒
+                  RebalanceResult(shards)
+                }
+                .recover {
+                  case _ ⇒ RebalanceResult(Set.empty)
+                }
+                .pipeTo(self)
           }
         }
 
@@ -665,17 +673,19 @@ abstract class ShardCoordinator(
               .map(stats ⇒ regionActor -> stats)
           })
           .map { allRegionStats ⇒
-            ShardRegion.ClusterShardingStats(allRegionStats.map {
-              case (region, stats) ⇒
-                val regionAddress = region.path.address
-                val address: Address =
-                  if (regionAddress.hasLocalScope &&
-                      regionAddress.system == cluster.selfAddress.system)
-                    cluster.selfAddress
-                  else regionAddress
+            ShardRegion.ClusterShardingStats(allRegionStats
+              .map {
+                case (region, stats) ⇒
+                  val regionAddress = region.path.address
+                  val address: Address =
+                    if (regionAddress.hasLocalScope &&
+                        regionAddress.system == cluster.selfAddress.system)
+                      cluster.selfAddress
+                    else regionAddress
 
-                address -> stats
-            }.toMap)
+                  address -> stats
+              }
+              .toMap)
           }
           .recover {
             case x: AskTimeoutException ⇒

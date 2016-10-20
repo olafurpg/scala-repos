@@ -1358,10 +1358,12 @@ case class RubyMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): RubyMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map {
-      node: CacheNode =>
-        (node.host, node.port, node.weight)
-    }.toSeq)
+    copy(
+      _nodes = CacheNodeGroup(hostPortWeights).members
+        .map { node: CacheNode =>
+          (node.host, node.port, node.weight)
+        }
+        .toSeq)
 
   def clientBuilder(clientBuilder: ClientBuilder[_, _, _, _, ClientConfig.Yes])
     : RubyMemCacheClientBuilder =
@@ -1411,10 +1413,12 @@ case class PHPMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): PHPMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map {
-      node: CacheNode =>
-        (node.host, node.port, node.weight)
-    }.toSeq)
+    copy(
+      _nodes = CacheNodeGroup(hostPortWeights).members
+        .map { node: CacheNode =>
+          (node.host, node.port, node.weight)
+        }
+        .toSeq)
 
   def hashName(hashName: String): PHPMemCacheClientBuilder =
     copy(_hashName = Some(hashName))
@@ -1429,12 +1433,18 @@ case class PHPMemCacheClientBuilder(
         .hostConnectionLimit(1)
         .daemon(true)
     val keyHasher = KeyHasher.byName(_hashName.getOrElse("crc32-itu"))
-    val clients = _nodes.map {
-      case (hostname, port, weight) =>
-        val client = Client(
-          builder.hosts(hostname + ":" + port).codec(text.Memcached()).build())
-        for (i <- (1 to weight)) yield client
-    }.flatten.toArray
+    val clients = _nodes
+      .map {
+        case (hostname, port, weight) =>
+          val client = Client(
+            builder
+              .hosts(hostname + ":" + port)
+              .codec(text.Memcached())
+              .build())
+          for (i <- (1 to weight)) yield client
+      }
+      .flatten
+      .toArray
     new PHPMemCacheClient(clients, keyHasher)
   }
 }

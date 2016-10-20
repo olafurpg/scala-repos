@@ -1010,15 +1010,18 @@ object JavaToScala {
 
         val superCall = getSuperCall(dropStatements)
 
-        getStatements(constructor).map { statements =>
-          PrimaryConstruction(
-            updatedParams,
-            superCall,
-            statements
-              .filter(notContains(_, dropStatements))
-              .map(convertPsiToIntermdeiate(_, WithReferenceExpression(true))),
-            handleModifierList(constructor))
-        }.orNull
+        getStatements(constructor)
+          .map { statements =>
+            PrimaryConstruction(
+              updatedParams,
+              superCall,
+              statements
+                .filter(notContains(_, dropStatements))
+                .map(
+                  convertPsiToIntermdeiate(_, WithReferenceExpression(true))),
+              handleModifierList(constructor))
+          }
+          .orNull
       }
 
       createContructor
@@ -1092,9 +1095,11 @@ object JavaToScala {
 
     def handleModifiers: Seq[IntermediateNode] = {
       val modifiers = new ArrayBuffer[IntermediateNode]()
-      val simpleList = SIMPLE_MODIFIERS_MAP.filter {
-        case (psiType, el) => owner.hasModifierProperty(psiType)
-      }.values
+      val simpleList = SIMPLE_MODIFIERS_MAP
+        .filter {
+          case (psiType, el) => owner.hasModifierProperty(psiType)
+        }
+        .values
 
       modifiers ++= simpleList.map(SimpleModifier)
 

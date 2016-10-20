@@ -70,10 +70,12 @@ object NameSuggester {
     val names = new ArrayBuffer[String]
     generateNamesByType(typez)(names,
                                emptyValidator(DecompilerUtil.obtainProject))
-    val result = names.map {
-      case "class" => "clazz"
-      case s => s
-    }.filter(name => name != "" && ScalaNamesUtil.isIdentifier(name))
+    val result = names
+      .map {
+        case "class" => "clazz"
+        case s => s
+      }
+      .filter(name => name != "" && ScalaNamesUtil.isIdentifier(name))
     if (result.length == 0) {
       Array("value")
     } else result.reverse.toArray

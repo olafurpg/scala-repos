@@ -137,9 +137,12 @@ class ExecutionTest extends WordSpec with Matchers {
     }
     "If either fails, zip fails, else we get success" in {
       val neverHappens = Promise[Int]().future
-      Execution.fromFuture { _ =>
-        neverHappens
-      }.zip(Execution.failed(new Exception("oh no"))).shouldFail()
+      Execution
+        .fromFuture { _ =>
+          neverHappens
+        }
+        .zip(Execution.failed(new Exception("oh no")))
+        .shouldFail()
 
       Execution
         .failed(new Exception("oh no"))
@@ -172,10 +175,11 @@ class ExecutionTest extends WordSpec with Matchers {
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       doesNotHaveVariable(
-        "Should not see variable before we've started transforming").flatMap {
-        _ =>
+        "Should not see variable before we've started transforming")
+        .flatMap { _ =>
           Execution.withConfig(hasVariable)(addOption)
-      }.flatMap(_ =>
+        }
+        .flatMap(_ =>
           doesNotHaveVariable(
             "Should not see variable in flatMap's after the isolation"))
         .map(_ => true)
@@ -195,9 +199,13 @@ class ExecutionTest extends WordSpec with Matchers {
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       // Here we run without the option, with the option, and finally without again.
-      incrementor.flatMap { _ =>
-        Execution.withConfig(incrementor)(addOption)
-      }.flatMap(_ => incrementor).map(_ => true).shouldSucceed() shouldBe true
+      incrementor
+        .flatMap { _ =>
+          Execution.withConfig(incrementor)(addOption)
+        }
+        .flatMap(_ => incrementor)
+        .map(_ => true)
+        .shouldSucceed() shouldBe true
 
       assert(incrementIfDefined === 1)
       // We should evaluate once for the default config, and once for the modified config.
@@ -230,12 +238,14 @@ class ExecutionTest extends WordSpec with Matchers {
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       // Here we run without the option, with the option, and finally without again.
-      val (oldCounters, newCounters) = operationTP.flatMap { oc =>
-        writeNums(List(1, 2, 3, 4, 5, 6, 7))
-        Execution.withConfig(operationTP)(addOption).map { nc =>
-          (oc, nc)
+      val (oldCounters, newCounters) = operationTP
+        .flatMap { oc =>
+          writeNums(List(1, 2, 3, 4, 5, 6, 7))
+          Execution.withConfig(operationTP)(addOption).map { nc =>
+            (oc, nc)
+          }
         }
-      }.shouldSucceed()
+        .shouldSucceed()
 
       assert(
         oldCounters != newCounters,

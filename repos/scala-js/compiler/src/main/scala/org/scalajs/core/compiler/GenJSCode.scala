@@ -814,11 +814,13 @@ abstract class GenJSCode
                   !ir.Definitions.isConstructorName(mtd.name)
                 case _ => true
               }
-              val superCallParams = stats.collectFirst {
-                case js.ApplyStatic(_, mtd, js.This() :: args)
-                    if ir.Definitions.isConstructorName(mtd.name) =>
-                  zipMap(outputParams, args)(js.Assign(_, _))
-              }.getOrElse(Nil)
+              val superCallParams = stats
+                .collectFirst {
+                  case js.ApplyStatic(_, mtd, js.This() :: args)
+                      if ir.Definitions.isConstructorName(mtd.name) =>
+                    zipMap(outputParams, args)(js.Assign(_, _))
+                }
+                .getOrElse(Nil)
 
               beforeSuperCall ::: superCallParams
 
@@ -856,11 +858,13 @@ abstract class GenJSCode
         val postSuperCall = {
           constructorTree.method.body match {
             case js.Block(stats) =>
-              stats.dropWhile {
-                case js.ApplyStatic(_, mtd, _) =>
-                  !ir.Definitions.isConstructorName(mtd.name)
-                case _ => true
-              }.tail
+              stats
+                .dropWhile {
+                  case js.ApplyStatic(_, mtd, _) =>
+                    !ir.Definitions.isConstructorName(mtd.name)
+                  case _ => true
+                }
+                .tail
 
             case _ => Nil
           }
@@ -995,11 +999,13 @@ abstract class GenJSCode
           method.name
 
         case js.Block(stats) =>
-          stats.collectFirst {
-            case js.ApplyStatic(_, method, js.This() :: _)
-                if ir.Definitions.isConstructorName(method.name) =>
-              method.name
-          }.get
+          stats
+            .collectFirst {
+              case js.ApplyStatic(_, method, js.This() :: _)
+                  if ir.Definitions.isConstructorName(method.name) =>
+                method.name
+            }
+            .get
       }
 
       val (primaryCtor :: Nil, secondaryCtors) = ctors.partition {
@@ -1012,9 +1018,13 @@ abstract class GenJSCode
         }
       }
 
-      val ctorToChildren = secondaryCtors.map { ctor =>
-        findCtorForwarderCall(ctor.body) -> ctor
-      }.groupBy(_._1).mapValues(_.map(_._2)).withDefaultValue(Nil)
+      val ctorToChildren = secondaryCtors
+        .map { ctor =>
+          findCtorForwarderCall(ctor.body) -> ctor
+        }
+        .groupBy(_._1)
+        .mapValues(_.map(_._2))
+        .withDefaultValue(Nil)
 
       var overrideNum = -1
       def mkConstructorTree(method: js.MethodDef): ConstructorTree = {
@@ -3470,10 +3480,12 @@ abstract class GenJSCode
           if (duplicateKeyCounts.nonEmpty) {
             reporter.warning(
               pos,
-              "Duplicate keys in object literal: " + duplicateKeyCounts.map {
-                case (keyName, count) =>
-                  s""""$keyName" defined $count times"""
-              }.mkString(", ") + ". Only the last occurrence is assigned.")
+              "Duplicate keys in object literal: " + duplicateKeyCounts
+                .map {
+                  case (keyName, count) =>
+                    s""""$keyName" defined $count times"""
+                }
+                .mkString(", ") + ". Only the last occurrence is assigned.")
           }
         }
 

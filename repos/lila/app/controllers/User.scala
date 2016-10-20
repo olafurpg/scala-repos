@@ -89,10 +89,12 @@ object User extends LilaController {
                         }
                     }.map { status(_) }.mon(_.http.response.user.show.website),
                     api = _ =>
-                      userGames(u, filterOption, page).map {
-                        case (filterName, pag) =>
-                          Ok(Env.api.userGameApi.filter(filterName, pag))
-                      }.mon(_.http.response.user.show.mobile))
+                      userGames(u, filterOption, page)
+                        .map {
+                          case (filterName, pag) =>
+                            Ok(Env.api.userGameApi.filter(filterName, pag))
+                        }
+                        .mon(_.http.response.user.show.mobile))
         else
           negotiate(
             html = fuccess(NotFound(html.user.disabled(u))),
@@ -242,12 +244,14 @@ object User extends LilaController {
           Env.pref.api.followables(ops map (_._1.id)),
           fuccess(List.fill(50)(true))
         ) flatMap { followables =>
-          (ops zip followables).map {
-            case ((u, nb), followable) =>
-              ctx.userId ?? {
-                relationApi.fetchRelation(_, u.id)
-              } map { lila.relation.Related(u, nb.some, followable, _) }
-          }.sequenceFu map { relateds =>
+          (ops zip followables)
+            .map {
+              case ((u, nb), followable) =>
+                ctx.userId ?? {
+                  relationApi.fetchRelation(_, u.id)
+                } map { lila.relation.Related(u, nb.some, followable, _) }
+            }
+            .sequenceFu map { relateds =>
             html.user.opponents(user, relateds)
           }
         }

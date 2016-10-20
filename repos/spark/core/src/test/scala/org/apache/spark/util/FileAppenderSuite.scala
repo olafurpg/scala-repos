@@ -142,7 +142,8 @@ class FileAppenderSuite
     logInfo("Appender closed")
 
     // verify whether the earliest file has been deleted
-    val rolledOverFiles = allGeneratedFiles.filter { _ != testFile.toString }.toArray.sorted
+    val rolledOverFiles =
+      allGeneratedFiles.filter { _ != testFile.toString }.toArray.sorted
     logInfo(
       s"All rolled over files generated:${rolledOverFiles.size}\n" +
         rolledOverFiles.mkString("\n"))
@@ -337,18 +338,22 @@ class FileAppenderSuite
       testFile.getName)
     logInfo("Filtered files: \n" + generatedFiles.mkString("\n"))
     assert(generatedFiles.size > 1)
-    val allText = generatedFiles.map { file =>
-      Files.toString(file, StandardCharsets.UTF_8)
-    }.mkString("")
+    val allText = generatedFiles
+      .map { file =>
+        Files.toString(file, StandardCharsets.UTF_8)
+      }
+      .mkString("")
     assert(allText === expectedText)
     generatedFiles
   }
 
   /** Delete all the generated rolledover files */
   def cleanup() {
-    testFile.getParentFile.listFiles.filter { file =>
-      file.getName.startsWith(testFile.getName)
-    }.foreach { _.delete() }
+    testFile.getParentFile.listFiles
+      .filter { file =>
+        file.getName.startsWith(testFile.getName)
+      }
+      .foreach { _.delete() }
   }
 
   /** Used to synchronize when read is called on a stream */

@@ -3258,9 +3258,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       totalResult must haveSize(1)
 
-      val total = totalResult.collectFirst {
-        case (_, SDecimal(d)) => d
-      }.get
+      val total = totalResult
+        .collectFirst {
+          case (_, SDecimal(d)) => d
+        }
+        .get
 
       val result = evalE(input)
 
@@ -3289,9 +3291,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       totalResult must haveSize(1)
 
-      val total = totalResult.collectFirst {
-        case (_, SDecimal(d)) => d
-      }.get
+      val total = totalResult
+        .collectFirst {
+          case (_, SDecimal(d)) => d
+        }
+        .get
 
       val result = evalE(input)
 

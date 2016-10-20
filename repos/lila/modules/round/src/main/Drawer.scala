@@ -22,16 +22,18 @@ private[round] final class Drawer(messenger: Messenger,
                                   prefApi: PrefApi) {
 
   def autoThreefold(game: Game): Fu[Option[Pov]] =
-    Pov(game).map { pov =>
-      import Pref.PrefZero
-      pov.player.userId ?? prefApi.getPref map { pref =>
-        pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
-          pref.autoThreefold == Pref.AutoThreefold.TIME && game.clock ?? {
-            _.remainingTime(pov.color) < 30
+    Pov(game)
+      .map { pov =>
+        import Pref.PrefZero
+        pov.player.userId ?? prefApi.getPref map { pref =>
+          pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
+            pref.autoThreefold == Pref.AutoThreefold.TIME && game.clock ?? {
+              _.remainingTime(pov.color) < 30
+            }
           }
-        }
-      } map (_ option pov)
-    }.sequenceFu map (_.flatten.headOption)
+        } map (_ option pov)
+      }
+      .sequenceFu map (_.flatten.headOption)
 
   def yes(pov: Pov): Fu[Events] = pov match {
     case pov if pov.game.toChessHistory.threefoldRepetition =>

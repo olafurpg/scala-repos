@@ -44,9 +44,11 @@ trait SecureFlagSpec
     running(
       TestServer(port,
                  sslPort = sslPort,
-                 application = GuiceApplicationBuilder().routes {
-                   case _ => action
-                 }.build())) {
+                 application = GuiceApplicationBuilder()
+                   .routes {
+                     case _ => action
+                   }
+                   .build())) {
       block(port)
     }
   }

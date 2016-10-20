@@ -29,9 +29,11 @@ object Opts {
     def externalAPI(mappings: Iterable[(File, URL)]): Seq[String] =
       if (mappings.isEmpty) Nil
       else
-        mappings.map {
-          case (f, u) => s"${f.getAbsolutePath}#${u.toExternalForm}"
-        }.mkString("-doc-external-doc:", ",", "") :: Nil
+        mappings
+          .map {
+            case (f, u) => s"${f.getAbsolutePath}#${u.toExternalForm}"
+          }
+          .mkString("-doc-external-doc:", ",", "") :: Nil
   }
   object resolver {
     import Path._

@@ -166,14 +166,18 @@ case class AppDefinition(
   //scalastyle:off cyclomatic.complexity method.length
   def mergeFromProto(proto: Protos.ServiceDefinition): AppDefinition = {
     val envMap: Map[String, String] =
-      proto.getCmd.getEnvironment.getVariablesList.asScala.map { v =>
-        v.getName -> v.getValue
-      }.toMap
+      proto.getCmd.getEnvironment.getVariablesList.asScala
+        .map { v =>
+          v.getName -> v.getValue
+        }
+        .toMap
 
     val resourcesMap: Map[String, Double] =
-      proto.getResourcesList.asScala.map { r =>
-        r.getName -> (r.getScalar.getValue: Double)
-      }.toMap
+      proto.getResourcesList.asScala
+        .map { r =>
+          r.getName -> (r.getScalar.getValue: Double)
+        }
+        .toMap
 
     val argsOption =
       if (proto.getCmd.getArgumentsCount > 0)
@@ -248,9 +252,11 @@ case class AppDefinition(
       healthChecks = proto.getHealthChecksList.asScala
         .map(new HealthCheck().mergeFromProto)
         .toSet,
-      labels = proto.getLabelsList.asScala.map { p =>
-        p.getKey -> p.getValue
-      }.toMap,
+      labels = proto.getLabelsList.asScala
+        .map { p =>
+          p.getKey -> p.getValue
+        }
+        .toMap,
       versionInfo = versionInfoFromProto,
       upgradeStrategy =
         if (proto.hasUpgradeStrategy)

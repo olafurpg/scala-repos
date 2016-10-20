@@ -174,12 +174,14 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     case SQLTable(database, table, _, sample) =>
       val qualifiedName =
         s"${quoteIdentifier(database)}.${quoteIdentifier(table)}"
-      sample.map {
-        case (lowerBound, upperBound) =>
-          val fraction =
-            math.min(100, math.max(0, (upperBound - lowerBound) * 100))
-          qualifiedName + " TABLESAMPLE(" + fraction + " PERCENT)"
-      }.getOrElse(qualifiedName)
+      sample
+        .map {
+          case (lowerBound, upperBound) =>
+            val fraction =
+              math.min(100, math.max(0, (upperBound - lowerBound) * 100))
+            qualifiedName + " TABLESAMPLE(" + fraction + " PERCENT)"
+        }
+        .getOrElse(qualifiedName)
 
     case Sort(orders, _, RepartitionByExpression(partitionExprs, child, _))
         if orders.map(_.child) == partitionExprs =>
@@ -238,9 +240,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
       throw new UnsupportedOperationException(
         s"unsupported row format ${ioSchema.outputRowFormat}"))
 
-    val outputSchema = plan.output.map { attr =>
-      s"${attr.sql} ${attr.dataType.simpleString}"
-    }.mkString(", ")
+    val outputSchema = plan.output
+      .map { attr =>
+        s"${attr.sql} ${attr.dataType.simpleString}"
+      }
+      .mkString(", ")
 
     build(
       "SELECT TRANSFORM",

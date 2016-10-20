@@ -126,29 +126,33 @@ class MethodResolveProcessor(
           }
           val processor = new CollectMethodsProcessor(ref, functionName)
           typeResult.foreach(t => processor.processType(t, ref))
-          val sigs = processor.candidatesS.flatMap {
-            case ScalaResolveResult(meth: PsiMethod, subst) =>
-              Some((meth, subst))
-            case _ => None
-          }.toSeq
-          val seq = sigs.map {
-            case (m, subst) =>
-              new ScalaResolveResult(
-                m,
-                subst,
-                getImports(state),
-                nameShadow,
-                implicitConversionClass,
-                implicitFunction = implFunction,
-                implicitType = implType,
-                fromType = fromType,
-                parentElement = Some(obj),
-                isAccessible = accessible && isAccessible(m, ref),
-                isForwardReference = forwardReference,
-                unresolvedTypeParameters = unresolvedTypeParameters)
-          }.filter {
-            case r => !accessibility || r.isAccessible
-          }
+          val sigs = processor.candidatesS
+            .flatMap {
+              case ScalaResolveResult(meth: PsiMethod, subst) =>
+                Some((meth, subst))
+              case _ => None
+            }
+            .toSeq
+          val seq = sigs
+            .map {
+              case (m, subst) =>
+                new ScalaResolveResult(
+                  m,
+                  subst,
+                  getImports(state),
+                  nameShadow,
+                  implicitConversionClass,
+                  implicitFunction = implFunction,
+                  implicitType = implType,
+                  fromType = fromType,
+                  parentElement = Some(obj),
+                  isAccessible = accessible && isAccessible(m, ref),
+                  isForwardReference = forwardReference,
+                  unresolvedTypeParameters = unresolvedTypeParameters)
+            }
+            .filter {
+              case r => !accessibility || r.isAccessible
+            }
           if (seq.nonEmpty) addResults(seq)
           else
             addResult(
@@ -301,10 +305,12 @@ object MethodResolveProcessor {
           case f: ScFunction => substitutor.subst(f.returnType.getOrNothing)
           case f: ScFun => substitutor.subst(f.retType)
           case m: PsiMethod =>
-            Option(m.getReturnType).map { rt =>
-              substitutor.subst(
-                ScType.create(rt, ref.getProject, getResolveScope))
-            }.getOrElse(Nothing)
+            Option(m.getReturnType)
+              .map { rt =>
+                substitutor.subst(
+                  ScType.create(rt, ref.getProject, getResolveScope))
+              }
+              .getOrElse(Nothing)
           case _ => Nothing
         }
         if (!retType.conforms(expected) && !expected.equiv(Unit)) {

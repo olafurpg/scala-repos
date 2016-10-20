@@ -92,9 +92,11 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
   private[this] val buf = ChannelBuffers.dynamicBuffer()
   private[this] val bytes = new Array[Byte](4)
   private[this] val connectFuture = new AtomicReference[ChannelFuture](null)
-  private[this] val authenticationMap = authenticationSettings.map { setting =>
-    setting.typeByte -> setting
-  }.toMap
+  private[this] val authenticationMap = authenticationSettings
+    .map { setting =>
+      setting.typeByte -> setting
+    }
+    .toMap
   private[this] val supportedTypes = authenticationMap.keys.toArray.sorted
 
   // following Netty's ReplayingDecoderBuffer, we throw this when we run out of bytes

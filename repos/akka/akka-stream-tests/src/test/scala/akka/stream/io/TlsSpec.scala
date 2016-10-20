@@ -261,11 +261,13 @@ class TlsSpec
     // this demonstrates that cancellation is ignored so that the five results make it back
     object CancellingRHS extends PayloadScenario {
       override def flow =
-        Flow[SslTlsInbound].mapConcat {
-          case SessionTruncated ⇒ SessionTruncated :: Nil
-          case SessionBytes(s, bytes) ⇒
-            bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
-        }.take(5)
+        Flow[SslTlsInbound]
+          .mapConcat {
+            case SessionTruncated ⇒ SessionTruncated :: Nil
+            case SessionBytes(s, bytes) ⇒
+              bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
+          }
+          .take(5)
           .mapAsync(5)(x ⇒
             later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
@@ -278,11 +280,13 @@ class TlsSpec
 
     object CancellingRHSIgnoresBoth extends PayloadScenario {
       override def flow =
-        Flow[SslTlsInbound].mapConcat {
-          case SessionTruncated ⇒ SessionTruncated :: Nil
-          case SessionBytes(s, bytes) ⇒
-            bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
-        }.take(5)
+        Flow[SslTlsInbound]
+          .mapConcat {
+            case SessionTruncated ⇒ SessionTruncated :: Nil
+            case SessionBytes(s, bytes) ⇒
+              bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
+          }
+          .take(5)
           .mapAsync(5)(x ⇒
             later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)

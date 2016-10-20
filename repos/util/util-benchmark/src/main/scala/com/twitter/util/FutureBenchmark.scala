@@ -125,9 +125,11 @@ object FutureBenchmark {
 
     @Setup
     def prepare() {
-      stream = (0 until FutureBenchmark.N * 100).map { i =>
-        Future.value(i)
-      }.toStream
+      stream = (0 until FutureBenchmark.N * 100)
+        .map { i =>
+          Future.value(i)
+        }
+        .toStream
     }
   }
 

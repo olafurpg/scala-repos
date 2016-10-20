@@ -18,18 +18,20 @@ package scalaguide.xml.scalaxmlrequests {
 
         //#xml-request-body-asXml
         def sayHello = Action { request =>
-          request.body.asXml.map { xml =>
-            (xml \\ "name" headOption)
-              .map(_.text)
-              .map { name =>
-                Ok("Hello " + name)
-              }
-              .getOrElse {
-                BadRequest("Missing parameter [name]")
-              }
-          }.getOrElse {
-            BadRequest("Expecting Xml data")
-          }
+          request.body.asXml
+            .map { xml =>
+              (xml \\ "name" headOption)
+                .map(_.text)
+                .map { name =>
+                  Ok("Hello " + name)
+                }
+                .getOrElse {
+                  BadRequest("Missing parameter [name]")
+                }
+            }
+            .getOrElse {
+              BadRequest("Expecting Xml data")
+            }
         }
         //#xml-request-body-asXml
 

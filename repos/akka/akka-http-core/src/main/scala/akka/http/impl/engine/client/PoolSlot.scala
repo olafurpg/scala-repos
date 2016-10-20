@@ -69,13 +69,15 @@ private object PoolSlot {
       // TODO wouldn't be better to have them under a known parent? /user/SlotProcessor-0 seems weird
       val name = slotProcessorActorName.next()
       val slotProcessor = b.add {
-        Flow.fromProcessor { () ⇒
-          val actor = system.actorOf(
-            Props(new SlotProcessor(slotIx, connectionFlow, settings))
-              .withDeploy(Deploy.local),
-            name)
-          ActorProcessor[RequestContext, List[ProcessorOut]](actor)
-        }.mapConcat(conforms)
+        Flow
+          .fromProcessor { () ⇒
+            val actor = system.actorOf(
+              Props(new SlotProcessor(slotIx, connectionFlow, settings))
+                .withDeploy(Deploy.local),
+              name)
+            ActorProcessor[RequestContext, List[ProcessorOut]](actor)
+          }
+          .mapConcat(conforms)
       }
       val split = b.add(Broadcast[ProcessorOut](2))
 

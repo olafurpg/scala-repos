@@ -197,13 +197,15 @@ class BlockMatrix @Since("1.3.0")(
 
   /** Estimates the dimensions of the matrix. */
   private def estimateDim(): Unit = {
-    val (rows, cols) = blockInfo.map {
-      case ((blockRowIndex, blockColIndex), (m, n)) =>
-        (blockRowIndex.toLong * rowsPerBlock + m,
-         blockColIndex.toLong * colsPerBlock + n)
-    }.reduce { (x0, x1) =>
-      (math.max(x0._1, x1._1), math.max(x0._2, x1._2))
-    }
+    val (rows, cols) = blockInfo
+      .map {
+        case ((blockRowIndex, blockColIndex), (m, n)) =>
+          (blockRowIndex.toLong * rowsPerBlock + m,
+           blockColIndex.toLong * colsPerBlock + n)
+      }
+      .reduce { (x0, x1) =>
+        (math.max(x0._1, x1._1), math.max(x0._2, x1._2))
+      }
     if (nRows <= 0L) nRows = rows
     assert(rows <= nRows,
            s"The number of rows $rows is more than claimed $nRows.")
@@ -449,20 +451,25 @@ class BlockMatrix @Since("1.3.0")(
     val leftMatrix =
       blockInfo.keys.collect() // blockInfo should already be cached
     val rightMatrix = other.blocks.keys.collect()
-    val leftDestinations = leftMatrix.map {
-      case (rowIndex, colIndex) =>
-        val rightCounterparts = rightMatrix.filter(_._1 == colIndex)
-        val partitions = rightCounterparts.map(b =>
-          partitioner.getPartition((rowIndex, b._2)))
-        ((rowIndex, colIndex), partitions.toSet)
-    }.toMap
-    val rightDestinations = rightMatrix.map {
-      case (rowIndex, colIndex) =>
-        val leftCounterparts = leftMatrix.filter(_._2 == rowIndex)
-        val partitions =
-          leftCounterparts.map(b => partitioner.getPartition((b._1, colIndex)))
-        ((rowIndex, colIndex), partitions.toSet)
-    }.toMap
+    val leftDestinations = leftMatrix
+      .map {
+        case (rowIndex, colIndex) =>
+          val rightCounterparts = rightMatrix.filter(_._1 == colIndex)
+          val partitions = rightCounterparts.map(b =>
+            partitioner.getPartition((rowIndex, b._2)))
+          ((rowIndex, colIndex), partitions.toSet)
+      }
+      .toMap
+    val rightDestinations = rightMatrix
+      .map {
+        case (rowIndex, colIndex) =>
+          val leftCounterparts = leftMatrix.filter(_._2 == rowIndex)
+          val partitions =
+            leftCounterparts.map(b =>
+              partitioner.getPartition((b._1, colIndex)))
+          ((rowIndex, colIndex), partitions.toSet)
+      }
+      .toMap
     (leftDestinations, rightDestinations)
   }
 

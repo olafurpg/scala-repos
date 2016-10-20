@@ -198,13 +198,17 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
 
   test(s"conversion is working") {
     assert(
-      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-        case _: HiveTableScan => true
-      }.isEmpty)
+      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan
+        .collect {
+          case _: HiveTableScan => true
+        }
+        .isEmpty)
     assert(
-      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-        case _: DataSourceScan => true
-      }.nonEmpty)
+      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan
+        .collect {
+          case _: DataSourceScan => true
+        }
+        .nonEmpty)
   }
 
   test("scan an empty parquet table") {
@@ -385,20 +389,24 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         """.stripMargin).queryExecution.analyzed
 
       assertResult(2) {
-        analyzed.collect {
-          case r @ LogicalRelation(_: HadoopFsRelation, _, _) => r
-        }.size
+        analyzed
+          .collect {
+            case r @ LogicalRelation(_: HadoopFsRelation, _, _) => r
+          }
+          .size
       }
     }
   }
 
   def collectHadoopFsRelation(df: DataFrame): HadoopFsRelation = {
     val plan = df.queryExecution.analyzed
-    plan.collectFirst {
-      case LogicalRelation(r: HadoopFsRelation, _, _) => r
-    }.getOrElse {
-      fail(s"Expecting a HadoopFsRelation 2, but got:\n$plan")
-    }
+    plan
+      .collectFirst {
+        case LogicalRelation(r: HadoopFsRelation, _, _) => r
+      }
+      .getOrElse {
+        fail(s"Expecting a HadoopFsRelation 2, but got:\n$plan")
+      }
   }
 
   test(
@@ -908,9 +916,12 @@ abstract class ParquetPartitioningTest
 
     test(s"hive udfs $table") {
       checkAnswer(sql(s"SELECT concat(stringField, stringField) FROM $table"),
-                  sql(s"SELECT stringField FROM $table").rdd.map {
-                    case Row(s: String) => Row(s + s)
-                  }.collect().toSeq)
+                  sql(s"SELECT stringField FROM $table").rdd
+                    .map {
+                      case Row(s: String) => Row(s + s)
+                    }
+                    .collect()
+                    .toSeq)
     }
   }
 

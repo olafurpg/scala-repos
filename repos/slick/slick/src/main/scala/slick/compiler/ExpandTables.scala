@@ -46,76 +46,79 @@ class ExpandTables extends Phase {
       case _ => path
     }
 
-    val s2 = state.map { n =>
-      ClientSideOp.mapServerSide(n) { tree =>
-        // Find table fields
-        val structs = tree
-          .collect[(TypeSymbol, (FieldSymbol, Type))] {
-            case s @ Select(_ :@ (n: NominalType), sym: FieldSymbol) =>
-              n.sourceNominalType.sym -> (sym -> s.nodeType)
-          }
-          .toSeq
-          .groupBy(_._1)
-          .map {
-            case (ts, v) =>
-              (ts,
-               NominalType(ts, StructType(ConstArray.from(v.map(_._2).toMap))))
-          }
-        logger.debug(
-          "Found Selects for NominalTypes: " + structs.keySet.mkString(", "))
+    val s2 = state
+      .map { n =>
+        ClientSideOp.mapServerSide(n) { tree =>
+          // Find table fields
+          val structs = tree
+            .collect[(TypeSymbol, (FieldSymbol, Type))] {
+              case s @ Select(_ :@ (n: NominalType), sym: FieldSymbol) =>
+                n.sourceNominalType.sym -> (sym -> s.nodeType)
+            }
+            .toSeq
+            .groupBy(_._1)
+            .map {
+              case (ts, v) =>
+                (ts,
+                 NominalType(ts,
+                             StructType(ConstArray.from(v.map(_._2).toMap))))
+            }
+          logger.debug(
+            "Found Selects for NominalTypes: " + structs.keySet.mkString(", "))
 
-        val tables =
-          new mutable.HashMap[TableIdentitySymbol, (TermSymbol, Node)]
-        var expandDistinct = false
-        def tr(tree: Node): Node = tree.replace {
-          case t: TableExpansion =>
-            val ts = t.table.asInstanceOf[TableNode].identity
-            tables += ((ts, (t.generator, t.columns)))
-            t.table :@ CollectionType(t.nodeType.asCollectionType.cons,
-                                      structs(ts))
-          case r: Ref => r.untyped
-          case d: Distinct =>
-            if (d.nodeType.existsType {
-                  case NominalType(_: TableIdentitySymbol, _) => true;
-                  case _ => false
-                }) expandDistinct = true
-            d.mapChildren(tr)
-        }
-        val tree2 = tr(tree).infer()
-        logger.debug("With correct table types:", tree2)
-        logger.debug("Table expansions: " + tables.mkString(", "))
+          val tables =
+            new mutable.HashMap[TableIdentitySymbol, (TermSymbol, Node)]
+          var expandDistinct = false
+          def tr(tree: Node): Node = tree.replace {
+            case t: TableExpansion =>
+              val ts = t.table.asInstanceOf[TableNode].identity
+              tables += ((ts, (t.generator, t.columns)))
+              t.table :@ CollectionType(t.nodeType.asCollectionType.cons,
+                                        structs(ts))
+            case r: Ref => r.untyped
+            case d: Distinct =>
+              if (d.nodeType.existsType {
+                    case NominalType(_: TableIdentitySymbol, _) => true;
+                    case _ => false
+                  }) expandDistinct = true
+              d.mapChildren(tr)
+          }
+          val tree2 = tr(tree).infer()
+          logger.debug("With correct table types:", tree2)
+          logger.debug("Table expansions: " + tables.mkString(", "))
 
-        // Perform star expansion in Distinct
-        val tree3 =
-          if (!expandDistinct) tree2
+          // Perform star expansion in Distinct
+          val tree3 =
+            if (!expandDistinct) tree2
+            else {
+              logger.debug("Expanding tables in Distinct")
+              tree2
+                .replace({
+                  case Distinct(s, f, o) =>
+                    Distinct(s, f, createResult(tables, Ref(s), o.nodeType))
+                }, bottomUp = true)
+                .infer()
+            }
+
+          // Perform star expansion in query result
+          if (!tree.nodeType.existsType {
+                case NominalType(_: TableIdentitySymbol, _) => true;
+                case _ => false
+              }) tree3
           else {
-            logger.debug("Expanding tables in Distinct")
-            tree2
-              .replace({
-                case Distinct(s, f, o) =>
-                  Distinct(s, f, createResult(tables, Ref(s), o.nodeType))
-              }, bottomUp = true)
-              .infer()
+            logger.debug("Expanding tables in result type")
+            // Create a mapping that expands the tables
+            val sym = new AnonSymbol
+            val mapping =
+              createResult(tables,
+                           Ref(sym),
+                           tree3.nodeType.asCollectionType.elementType).infer(
+                Type.Scope(sym -> tree3.nodeType.asCollectionType.elementType))
+            Bind(sym, tree3, Pure(mapping)).infer()
           }
-
-        // Perform star expansion in query result
-        if (!tree.nodeType.existsType {
-              case NominalType(_: TableIdentitySymbol, _) => true;
-              case _ => false
-            }) tree3
-        else {
-          logger.debug("Expanding tables in result type")
-          // Create a mapping that expands the tables
-          val sym = new AnonSymbol
-          val mapping =
-            createResult(tables,
-                         Ref(sym),
-                         tree3.nodeType.asCollectionType.elementType).infer(
-              Type.Scope(sym -> tree3.nodeType.asCollectionType.elementType))
-          Bind(sym, tree3, Pure(mapping)).infer()
         }
       }
-    }.withWellTyped(true)
+      .withWellTyped(true)
     if (createdOption)
       s2 +
         (Phase.assignUniqueSymbols -> state

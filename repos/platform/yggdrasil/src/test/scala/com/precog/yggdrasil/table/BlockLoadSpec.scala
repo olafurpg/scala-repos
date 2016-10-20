@@ -62,17 +62,18 @@ trait BlockLoadSpec[M[+ _]]
     val Some((idCount, schema)) = sampleData.schema
     val actualSchema = inferSchema(sampleData.data map { _ \ "value" })
 
-    val projections = List(actualSchema).map { subschema =>
-      val stream =
-        sampleData.data flatMap { jv =>
-          val back = subschema.foldLeft[JValue](
-            JObject(JField("key", jv \ "key") :: Nil)) {
-            case (obj, (jpath, ctype)) => {
-              val vpath = JPath(JPathField("value") :: jpath.nodes)
-              val valueAtPath = jv.get(vpath)
+    val projections = List(actualSchema)
+      .map { subschema =>
+        val stream =
+          sampleData.data flatMap { jv =>
+            val back = subschema.foldLeft[JValue](
+              JObject(JField("key", jv \ "key") :: Nil)) {
+              case (obj, (jpath, ctype)) => {
+                val vpath = JPath(JPathField("value") :: jpath.nodes)
+                val valueAtPath = jv.get(vpath)
 
-              if (compliesWithSchema(valueAtPath, ctype)) {
-                obj.set(vpath, valueAtPath)
+                if (compliesWithSchema(valueAtPath, ctype)) {
+                  obj.set(vpath, valueAtPath)
               } else {
                 obj
               }

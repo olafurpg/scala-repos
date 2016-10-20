@@ -124,8 +124,8 @@ trait PlayRunners extends HttpVerbs {
       name: String = "default",
       options: Map[String, String] = Map.empty[String, String])
     : Map[String, String] = {
-    val optionsForDbUrl = options.map { case (k, v) => k + "=" + v }
-      .mkString(";", ";", "")
+    val optionsForDbUrl =
+      options.map { case (k, v) => k + "=" + v }.mkString(";", ";", "")
 
     Map(
       ("db." + name + ".driver") -> "org.h2.Driver",
@@ -235,9 +235,11 @@ trait EssentialActionCaller { self: Writeables =>
     import play.api.http.HeaderNames._
     val newContentType =
       rh.headers.get(CONTENT_TYPE).fold(w.contentType)(_ => None)
-    val rhWithCt = newContentType.map { ct =>
-      rh.copy(headers = rh.headers.replace(CONTENT_TYPE -> ct))
-    }.getOrElse(rh)
+    val rhWithCt = newContentType
+      .map { ct =>
+        rh.copy(headers = rh.headers.replace(CONTENT_TYPE -> ct))
+      }
+      .getOrElse(rh)
 
     val requestBody = Source.single(w.transform(body))
     action(rhWithCt).run(requestBody)

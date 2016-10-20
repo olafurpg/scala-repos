@@ -274,7 +274,8 @@ object Enumerator {
                 }(dec)
                 Iteratee.flatten(nextI)
               case Input.EOF => {
-                if (attending.single.transformAndGet { _.map(f) }
+                if (attending.single
+                      .transformAndGet { _.map(f) }
                       .forall(_.forall(_ == false))) {
                   p.complete(Try(Iteratee.flatten(i.feed(Input.EOF))))
                 } else {
@@ -286,9 +287,11 @@ object Enumerator {
           }
           Cont(step)
         }
-        val ps = es.zipWithIndex.map {
-          case (e, index) => e |>> iteratee[E](_.patch(index, Seq(true), 1))
-        }.map(_.flatMap(_.pureFold(any => ())(dec)))
+        val ps = es.zipWithIndex
+          .map {
+            case (e, index) => e |>> iteratee[E](_.patch(index, Seq(true), 1))
+          }
+          .map(_.flatMap(_.pureFold(any => ())(dec)))
 
         Future.sequence(ps).onComplete {
           case Success(_) =>

@@ -129,11 +129,11 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
     "reject invalid query string" in withServer { ws =>
       import java.net.MalformedURLException
 
-      ws.url("/get?=&foo")
-        .aka("invalid request") must throwA[RuntimeException].like {
-        case e: RuntimeException =>
-          e.getCause must beAnInstanceOf[MalformedURLException]
-      }
+      ws.url("/get?=&foo").aka("invalid request") must throwA[RuntimeException]
+        .like {
+          case e: RuntimeException =>
+            e.getCause must beAnInstanceOf[MalformedURLException]
+        }
     }
 
     "reject invalid user password string" in withServer { ws =>

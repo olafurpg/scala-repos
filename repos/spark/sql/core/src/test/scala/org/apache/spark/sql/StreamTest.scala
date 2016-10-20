@@ -212,15 +212,17 @@ trait StreamTest extends QueryTest with Timeouts {
     val startedTest = if (startedManually) actions else StartStream +: actions
 
     def testActions =
-      actions.zipWithIndex.map {
-        case (a, i) =>
-          if ((pos == i && startedManually) ||
-              (pos == (i + 1) && !startedManually)) {
-            "=> " + a.toString
-          } else {
-            "   " + a.toString
-          }
-      }.mkString("\n")
+      actions.zipWithIndex
+        .map {
+          case (a, i) =>
+            if ((pos == i && startedManually) ||
+                (pos == (i + 1) && !startedManually)) {
+              "=> " + a.toString
+            } else {
+              "   " + a.toString
+            }
+        }
+        .mkString("\n")
 
     def currentOffsets =
       if (currentStream != null) currentStream.streamProgress.toString

@@ -110,9 +110,12 @@ case class FlatMapBoltProvider(
     type ExecutorKey = Int
     type InnerValue = (Timestamp, V)
     type ExecutorValue = CMap[(K, BatchID), InnerValue]
-    val summerProducer = summer.members.collect {
-      case s: Summer[_, _, _] => s
-    }.head.asInstanceOf[Summer[Storm, K, V]]
+    val summerProducer = summer.members
+      .collect {
+        case s: Summer[_, _, _] => s
+      }
+      .head
+      .asInstanceOf[Summer[Storm, K, V]]
     // When emitting tuples between the Final Flat Map and the summer we encode the timestamp in the value
     // The monoid we use in aggregation is timestamp max.
     val batcher = summerProducer.store.mergeableBatcher

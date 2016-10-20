@@ -193,16 +193,18 @@ class StreamExecution(val sqlContext: SQLContext,
           val prevOffset = streamProgress.get(source)
           val newBatch = source.getNextBatch(prevOffset)
 
-          newBatch.map { batch =>
-            newOffsets += ((source, batch.end))
-            val newPlan = batch.data.logicalPlan
+          newBatch
+            .map { batch =>
+              newOffsets += ((source, batch.end))
+              val newPlan = batch.data.logicalPlan
 
-            assert(output.size == newPlan.output.size)
-            replacements ++= output.zip(newPlan.output)
-            newPlan
-          }.getOrElse {
-            LocalRelation(output)
-          }
+              assert(output.size == newPlan.output.size)
+              replacements ++= output.zip(newPlan.output)
+              newPlan
+            }
+            .getOrElse {
+              LocalRelation(output)
+            }
       }
 
     // Rewire the plan to use the new attributes that were returned by the source.

@@ -19,41 +19,44 @@ private[video] final class Sheet(url: String, api: VideoApi) {
     entry.include && entry.lang == "en"
 
   def fetchAll: Funit = fetch map (_ filter select) flatMap { entries =>
-    entries.map { entry =>
-      api.video
-        .find(entry.youtubeId)
-        .flatMap {
-          case Some(video) =>
-            val updated = video.copy(title = entry.title,
-                                     author = entry.author,
-                                     targets = entry.targets,
-                                     tags = entry.tags,
-                                     lang = entry.lang,
-                                     ads = entry.ads,
-                                     startTime = entry.startTime)
-            (video != updated) ?? {
-              logger.info(s"sheet update $updated")
-              api.video.save(updated)
-            }
-          case None =>
-            val video = Video(_id = entry.youtubeId,
-                              title = entry.title,
-                              author = entry.author,
-                              targets = entry.targets,
-                              tags = entry.tags,
-                              lang = entry.lang,
-                              ads = entry.ads,
-                              startTime = entry.startTime,
-                              metadata = Youtube.empty,
-                              createdAt = DateTime.now)
-            logger.info(s"sheet insert $video")
-            api.video.save(video)
-          case _ => funit
-        }
-        .recover {
-          case e: Exception => logger.warn("sheet update", e)
-        }
-    }.sequenceFu.void >> api.video
+    entries
+      .map { entry =>
+        api.video
+          .find(entry.youtubeId)
+          .flatMap {
+            case Some(video) =>
+              val updated = video.copy(title = entry.title,
+                                       author = entry.author,
+                                       targets = entry.targets,
+                                       tags = entry.tags,
+                                       lang = entry.lang,
+                                       ads = entry.ads,
+                                       startTime = entry.startTime)
+              (video != updated) ?? {
+                logger.info(s"sheet update $updated")
+                api.video.save(updated)
+              }
+            case None =>
+              val video = Video(_id = entry.youtubeId,
+                                title = entry.title,
+                                author = entry.author,
+                                targets = entry.targets,
+                                tags = entry.tags,
+                                lang = entry.lang,
+                                ads = entry.ads,
+                                startTime = entry.startTime,
+                                metadata = Youtube.empty,
+                                createdAt = DateTime.now)
+              logger.info(s"sheet insert $video")
+              api.video.save(video)
+            case _ => funit
+          }
+          .recover {
+            case e: Exception => logger.warn("sheet update", e)
+          }
+      }
+      .sequenceFu
+      .void >> api.video
       .removeNotIn(entries.map(_.youtubeId)) >> api.video.count.clearCache >> api.tag.clearCache
   }
 

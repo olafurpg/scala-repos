@@ -54,10 +54,14 @@ object SparkPageRank {
     val iters = if (args.length > 1) args(1).toInt else 10
     val ctx = new SparkContext(sparkConf)
     val lines = ctx.textFile(args(0), 1)
-    val links = lines.map { s =>
-      val parts = s.split("\\s+")
-      (parts(0), parts(1))
-    }.distinct().groupByKey().cache()
+    val links = lines
+      .map { s =>
+        val parts = s.split("\\s+")
+        (parts(0), parts(1))
+      }
+      .distinct()
+      .groupByKey()
+      .cache()
     var ranks = links.mapValues(v => 1.0)
 
     for (i <- 1 to iters) {

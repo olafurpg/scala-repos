@@ -270,9 +270,11 @@ private[server] class NettyModelConversion(
     } catch {
       case NonFatal(e) =>
         if (logger.isErrorEnabled) {
-          val prettyHeaders = headers.map {
-            case (name, value) => s"$name -> $value"
-          }.mkString("[", ",", "]")
+          val prettyHeaders = headers
+            .map {
+              case (name, value) => s"$name -> $value"
+            }
+            .mkString("[", ",", "]")
           val msg =
             s"Exception occurred while setting response's headers to $prettyHeaders. Action taken is to set the response's status to ${HttpResponseStatus.INTERNAL_SERVER_ERROR} and discard all headers."
           logger.error(msg, e)

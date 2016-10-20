@@ -546,12 +546,14 @@ class ParquetPartitionDiscoverySuite
         .parquet(dir.getCanonicalPath)
       val queryExecution =
         sqlContext.read.parquet(dir.getCanonicalPath).queryExecution
-      queryExecution.analyzed.collectFirst {
-        case LogicalRelation(relation: HadoopFsRelation, _, _) =>
-          assert(relation.partitionSpec === PartitionSpec.emptySpec)
-      }.getOrElse {
-        fail(s"Expecting a ParquetRelation2, but got:\n$queryExecution")
-      }
+      queryExecution.analyzed
+        .collectFirst {
+          case LogicalRelation(relation: HadoopFsRelation, _, _) =>
+            assert(relation.partitionSpec === PartitionSpec.emptySpec)
+        }
+        .getOrElse {
+          fail(s"Expecting a ParquetRelation2, but got:\n$queryExecution")
+        }
     }
   }
 
@@ -723,10 +725,12 @@ class ParquetPartitionDiscoverySuite
   test("listConflictingPartitionColumns") {
     def makeExpectedMessage(colNameLists: Seq[String],
                             paths: Seq[String]): String = {
-      val conflictingColNameLists = colNameLists.zipWithIndex.map {
-        case (list, index) =>
-          s"\tPartition column name list #$index: $list"
-      }.mkString("\n", "\n", "\n")
+      val conflictingColNameLists = colNameLists.zipWithIndex
+        .map {
+          case (list, index) =>
+            s"\tPartition column name list #$index: $list"
+        }
+        .mkString("\n", "\n", "\n")
 
       // scalastyle:off
       s"""Conflicting partition column names detected:

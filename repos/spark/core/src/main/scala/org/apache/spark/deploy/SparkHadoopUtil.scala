@@ -241,11 +241,13 @@ class SparkHadoopUtil extends Logging {
 
   def globPath(pattern: Path): Seq[Path] = {
     val fs = pattern.getFileSystem(conf)
-    Option(fs.globStatus(pattern)).map { statuses =>
-      statuses
-        .map(_.getPath.makeQualified(fs.getUri, fs.getWorkingDirectory))
-        .toSeq
-    }.getOrElse(Seq.empty[Path])
+    Option(fs.globStatus(pattern))
+      .map { statuses =>
+        statuses
+          .map(_.getPath.makeQualified(fs.getUri, fs.getWorkingDirectory))
+          .toSeq
+      }
+      .getOrElse(Seq.empty[Path])
   }
 
   def globPathIfNecessary(pattern: Path): Seq[Path] = {

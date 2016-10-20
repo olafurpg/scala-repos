@@ -44,22 +44,24 @@ class HoconMultiModuleIncludeResolutionTest
     val baseDir = new File(testdataPath)
     val moduleDirs =
       baseDir.listFiles.sortBy(_.getName).iterator.filter(_.isDirectory)
-    val moduleFixtures = moduleDirs.map { dir =>
-      val builder = fixtureBuilder.addModule(
-        classOf[JavaModuleFixtureBuilder[ModuleFixture]])
-      builder.addContentRoot(dir.getPath)
+    val moduleFixtures = moduleDirs
+      .map { dir =>
+        val builder = fixtureBuilder.addModule(
+          classOf[JavaModuleFixtureBuilder[ModuleFixture]])
+        builder.addContentRoot(dir.getPath)
 
-      def subpath(name: String) = new File(dir, name).getPath
-      def libMapping(lib: String) =
-        Map(OrderRootType.CLASSES -> lib,
-            OrderRootType.SOURCES -> (lib + "src"))
-          .mapValues(s => Array(subpath(s)))
-          .asJava
+        def subpath(name: String) = new File(dir, name).getPath
+        def libMapping(lib: String) =
+          Map(OrderRootType.CLASSES -> lib,
+              OrderRootType.SOURCES -> (lib + "src"))
+            .mapValues(s => Array(subpath(s)))
+            .asJava
 
-      builder.addLibrary(dir.getName + "lib", libMapping("lib"))
-      builder.addLibrary(dir.getName + "testlib", libMapping("testlib"))
-      (dir.getName, builder.getFixture)
-    }.toMap
+        builder.addLibrary(dir.getName + "lib", libMapping("lib"))
+        builder.addLibrary(dir.getName + "testlib", libMapping("testlib"))
+        (dir.getName, builder.getFixture)
+      }
+      .toMap
 
     fixture.setUp()
     fixture.setTestDataPath(testdataPath)

@@ -38,12 +38,13 @@ class Statements(indent: Int) {
   }
 
   val decorator: P[Ast.expr] =
-    P("@" ~/ dotted_name ~ ("(" ~ arglist ~ ")").? ~~ Lexical.nonewlinewscomment.? ~~ NEWLINE).map {
-      case (name, None) => collapse_dotted_name(name)
-      case (name, Some((args, (keywords, starargs, kwargs)))) =>
-        val x = collapse_dotted_name(name)
-        Ast.expr.Call(x, args, keywords, starargs, kwargs)
-    }
+    P("@" ~/ dotted_name ~ ("(" ~ arglist ~ ")").? ~~ Lexical.nonewlinewscomment.? ~~ NEWLINE)
+      .map {
+        case (name, None) => collapse_dotted_name(name)
+        case (name, Some((args, (keywords, starargs, kwargs)))) =>
+          val x = collapse_dotted_name(name)
+          Ast.expr.Call(x, args, keywords, starargs, kwargs)
+      }
 
   val decorators = P(decorator.rep)
   val decorated: P[Ast.stmt] = P(decorators ~ (classdef | funcdef)).map {
@@ -72,10 +73,11 @@ class Statements(indent: Int) {
     val assign = P(testlist ~ ("=" ~ (yield_expr | testlist.map(tuplize))).rep)
 
     P(
-      aug.map { case (a, b, c) => Ast.stmt.AugAssign(tuplize(a), b, c) } | assign.map {
-        case (a, Nil) => Ast.stmt.Expr(tuplize(a))
-        case (a, b) => Ast.stmt.Assign(Seq(tuplize(a)) ++ b.init, b.last)
-      }
+      aug.map { case (a, b, c) => Ast.stmt.AugAssign(tuplize(a), b, c) } | assign
+        .map {
+          case (a, Nil) => Ast.stmt.Expr(tuplize(a))
+          case (a, b) => Ast.stmt.Assign(Seq(tuplize(a)) ++ b.init, b.last)
+        }
     )
   }
 
@@ -178,13 +180,16 @@ class Statements(indent: Int) {
   val try_stmt: P[Ast.stmt] = {
     val `try` = P(kw("try") ~/ ":" ~~ suite)
     val excepts: P[Seq[Ast.excepthandler]] = P(
-      (except_clause ~ ":" ~~ suite).map {
-        case (None, body) => Ast.excepthandler.ExceptHandler(None, None, body)
-        case (Some((x, None)), body) =>
-          Ast.excepthandler.ExceptHandler(Some(x), None, body)
-        case (Some((x, Some(y))), body) =>
-          Ast.excepthandler.ExceptHandler(Some(x), Some(y), body)
-      }.repX)
+      (except_clause ~ ":" ~~ suite)
+        .map {
+          case (None, body) =>
+            Ast.excepthandler.ExceptHandler(None, None, body)
+          case (Some((x, None)), body) =>
+            Ast.excepthandler.ExceptHandler(Some(x), None, body)
+          case (Some((x, Some(y))), body) =>
+            Ast.excepthandler.ExceptHandler(Some(x), Some(y), body)
+        }
+        .repX)
     val `else` = P(space_indents ~~ kw("else") ~/ ":" ~~ suite)
     val `finally` = P(space_indents ~~ kw("finally") ~/ ":" ~~ suite)
     P(`try` ~~ excepts ~~ `else`.? ~~ `finally`.?).map {
@@ -223,9 +228,12 @@ class Statements(indent: Int) {
           .repX(indent + 1)
           .!
           .map(_.length) ~~ Lexical.comment.!.?)
-      P(Lexical.nonewlinewscomment.? ~~ (endLine | commentLine).repX(1)).map {
-        _.collectFirst { case (s, None) => s }
-      }.filter(_.isDefined).map(_.get)
+      P(Lexical.nonewlinewscomment.? ~~ (endLine | commentLine).repX(1))
+        .map {
+          _.collectFirst { case (s, None) => s }
+        }
+        .filter(_.isDefined)
+        .map(_.get)
     }
     val indented = P(deeper.flatMap { nextIndent =>
       new Statements(nextIndent).stmt

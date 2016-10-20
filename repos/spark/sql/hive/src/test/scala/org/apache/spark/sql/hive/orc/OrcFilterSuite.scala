@@ -45,14 +45,17 @@ class OrcFilterSuite extends QueryTest with OrcTest {
       df.select(output.map(e => Column(e)): _*).where(Column(predicate))
 
     var maybeRelation: Option[HadoopFsRelation] = None
-    val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan.collect {
-      case PhysicalOperation(
-          _,
-          filters,
-          LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
-        maybeRelation = Some(orcRelation)
-        filters
-    }.flatten.reduceLeftOption(_ && _)
+    val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan
+      .collect {
+        case PhysicalOperation(
+            _,
+            filters,
+            LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
+          maybeRelation = Some(orcRelation)
+          filters
+      }
+      .flatten
+      .reduceLeftOption(_ && _)
     assert(maybeAnalyzedPredicate.isDefined,
            "No filter is analyzed from the given query")
 

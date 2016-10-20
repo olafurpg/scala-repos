@@ -228,12 +228,14 @@ object LiftJavaScriptSpec extends Specification {
 
   def formatjs(line: String): String = formatjs(line :: Nil)
   def formatjs(lines: List[String]): String =
-    lines.map {
-      _.stripMargin.lines.toList match {
-        case init :+ last => (init.map(_ + " ") :+ last).mkString
-        case Nil => ""
+    lines
+      .map {
+        _.stripMargin.lines.toList match {
+          case init :+ last => (init.map(_ + " ") :+ last).mkString
+          case Nil => ""
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)
 

@@ -61,10 +61,12 @@ trait ObjectOperator extends LogicalPlan {
   /** Returns a copy of this operator with a different serializer. */
   def withNewSerializer(newSerializer: Seq[NamedExpression]): LogicalPlan =
     makeCopy {
-      productIterator.map {
-        case c if c == serializer => newSerializer
-        case other: AnyRef => other
-      }.toArray
+      productIterator
+        .map {
+          case c if c == serializer => newSerializer
+          case other: AnyRef => other
+        }
+        .toArray
     }
 }
 
