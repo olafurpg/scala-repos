@@ -395,7 +395,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
     lazy val bs = TableQuery[B]
 
     val q1 = for {
-      (a, b) <- as joinLeft bs on (_.id.? === _.id) if (b.isEmpty)
+      (a, b) <- as joinLeft bs on (_.id.? === _.id) if b.isEmpty
     } yield (a.id)
     val q2 =
       bs.joinLeft(as).on(_.id === _.id).filter(_._2.isEmpty).map(_._1.id)

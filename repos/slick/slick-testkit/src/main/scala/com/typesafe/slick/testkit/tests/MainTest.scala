@@ -112,9 +112,9 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
     }.flatMap { _ =>
       val q4 = for {
         u <- users
-        o <- u.orders if (o.orderID === (for {
+        o <- u.orders if o.orderID === (for {
           o2 <- orders filter (o.userID === _.userID)
-        } yield o2.orderID).max)
+        } yield o2.orderID).max
       } yield (u.first, o.orderID)
       q4.result.statements.toSeq.length.should(_ >= 1)
 

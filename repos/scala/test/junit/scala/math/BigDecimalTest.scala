@@ -225,7 +225,7 @@ class BigDecimalTest {
       BigDecimal.exact(0.1f),
       BigDecimal.decimal((0.1f).toDouble)
     )
-    for (a <- different; b <- different if (a ne b))
+    for (a <- different; b <- different if a ne b)
       assert(a != b,
              "BigDecimal representations of Double mistakenly conflated")
   }

@@ -116,7 +116,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
 
   /** Set JAR files to distribute to the cluster. */
   def setJars(jars: Seq[String]): SparkConf = {
-    for (jar <- jars if (jar == null))
+    for (jar <- jars if jar == null)
       logWarning("null jar passed to SparkContext constructor")
     set("spark.jars", jars.filter(_ != null).mkString(","))
   }

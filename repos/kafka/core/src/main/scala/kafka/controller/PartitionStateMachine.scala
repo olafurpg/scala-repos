@@ -125,8 +125,8 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
       // try to move all partitions in NewPartition or OfflinePartition state to OnlinePartition state except partitions
       // that belong to topics to be deleted
       for ((topicAndPartition, partitionState) <- partitionState
-           if (!controller.deleteTopicManager.isTopicQueuedUpForDeletion(
-             topicAndPartition.topic))) {
+           if !controller.deleteTopicManager.isTopicQueuedUpForDeletion(
+             topicAndPartition.topic)) {
         if (partitionState.equals(OfflinePartition) ||
             partitionState.equals(NewPartition))
           handleStateChange(topicAndPartition.topic,

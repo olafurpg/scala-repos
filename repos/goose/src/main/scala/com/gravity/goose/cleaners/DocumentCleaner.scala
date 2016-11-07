@@ -69,7 +69,7 @@ trait DocumentCleaner {
 
     for {
       node <- ems
-      images: Elements = node.getElementsByTag("img") if (images.size == 0)
+      images: Elements = node.getElementsByTag("img") if images.size == 0
     } {
       val tn: TextNode = new TextNode(node.text, doc.baseUri)
       node.replaceWith(tn)
