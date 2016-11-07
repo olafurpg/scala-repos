@@ -136,7 +136,7 @@ class LabelledMacros(val c: whitebox.Context)
     def mkFieldTpe(keyTpe: Type, valueTpe: Type): Type =
       appliedType(fieldTypeTpe, List(keyTpe, valueTpe))
 
-    val q"${ tpeString: String }" = tpeSelector
+    val q"${tpeString: String}" = tpeSelector
     val fields =
       if (tpeString.trim.isEmpty) Array.empty[(Type, Type)]
       else
@@ -174,7 +174,7 @@ class LabelledMacros(val c: whitebox.Context)
                           variety: String,
                           nilTpe: Type,
                           consTpe: Type): Tree = {
-    val q"${ tpeString: String }" = tpeSelector
+    val q"${tpeString: String}" = tpeSelector
     val elemTypes =
       if (tpeString.trim.isEmpty) Array.empty[Type]
       else

@@ -69,23 +69,23 @@ private[r] object SQLUtils {
       case "boolean" => org.apache.spark.sql.types.BooleanType
       case "timestamp" => org.apache.spark.sql.types.TimestampType
       case "date" => org.apache.spark.sql.types.DateType
-      case r"\Aarray<(.+)${ elemType }>\Z" =>
+      case r"\Aarray<(.+)${elemType}>\Z" =>
         org.apache.spark.sql.types.ArrayType(getSQLDataType(elemType))
-      case r"\Amap<(.+)${ keyType },(.+)${ valueType }>\Z" =>
+      case r"\Amap<(.+)${keyType},(.+)${valueType}>\Z" =>
         if (keyType != "string" && keyType != "character") {
           throw new IllegalArgumentException(
             "Key type of a map must be string or character")
         }
         org.apache.spark.sql.types
           .MapType(getSQLDataType(keyType), getSQLDataType(valueType))
-      case r"\Astruct<(.+)${ fieldsStr }>\Z" =>
+      case r"\Astruct<(.+)${fieldsStr}>\Z" =>
         if (fieldsStr(fieldsStr.length - 1) == ',') {
           throw new IllegalArgumentException(s"Invaid type $dataType")
         }
         val fields = fieldsStr.split(",")
         val structFields = fields.map { field =>
           field match {
-            case r"\A(.+)${ fieldName }:(.+)${ fieldType }\Z" =>
+            case r"\A(.+)${fieldName}:(.+)${fieldType}\Z" =>
               createStructField(fieldName, fieldType, true)
 
             case _ =>

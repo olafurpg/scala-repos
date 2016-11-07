@@ -86,12 +86,12 @@ object UrlContextSpec extends Specification {
     "match a path with a nested extractor" in {
       "match" in {
         "/foo/1234/bar" must beLike {
-          case p"/foo/${ int(id) }/bar" => id must_== 1234l
+          case p"/foo/${int(id)}/bar" => id must_== 1234l
         }
       }
       "no match" in {
         "/foo/testing/bar" must beLike {
-          case p"/foo/${ int(id) }/bar" => ko
+          case p"/foo/${int(id)}/bar" => ko
           case _ => ok
         }
       }

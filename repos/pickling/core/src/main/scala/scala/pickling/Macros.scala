@@ -47,7 +47,7 @@ trait PickleMacros extends Macro with TypeAnalysis {
 
   def pickleTo[T: c.WeakTypeTag](output: c.Tree)(format: c.Tree): c.Tree = {
     val tpe = weakTypeOf[T]
-    val q"${ _ }($pickleeArg)" = c.prefix.tree
+    val q"${_}($pickleeArg)" = c.prefix.tree
     val endPickle =
       if (shouldBotherAboutCleaning(tpe)) q"clearPicklees()" else q"";
     val pickleeName = newTermName("picklee$pickleTo$")

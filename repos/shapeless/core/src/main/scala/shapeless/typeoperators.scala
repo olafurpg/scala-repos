@@ -123,7 +123,7 @@ class TheMacros(val c: whitebox.Context) {
 
   def implicitlyImpl(tpeSelector: Tree): Tree = {
 
-    val q"${ tpeString: String }" = tpeSelector
+    val q"${tpeString: String}" = tpeSelector
     val dummyNme = c.freshName
 
     val tpe = (for {

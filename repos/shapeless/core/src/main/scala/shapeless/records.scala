@@ -113,7 +113,7 @@ class RecordMacros(val c: whitebox.Context) {
   }
 
   def mkRecordNamedImpl(method: Tree)(rec: Tree*): Tree = {
-    val q"${ methodString: String }" = method
+    val q"${methodString: String}" = method
     if (methodString != "apply")
       c.abort(c.enclosingPosition,
               s"this method must be called as 'apply' not '$methodString'")
@@ -127,7 +127,7 @@ class RecordMacros(val c: whitebox.Context) {
     val lhs = c.prefix.tree
     val lhsTpe = lhs.tpe
 
-    val q"${ methodString: String }" = method
+    val q"${methodString: String}" = method
     val methodName = TermName(methodString + "Record")
 
     if (lhsTpe.member(methodName) == NoSymbol)
@@ -149,7 +149,7 @@ class RecordMacros(val c: whitebox.Context) {
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
     def promoteElem(elem: Tree): Tree = elem match {
-      case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
+      case q""" $prefix(${Literal(k: Constant)}, $v) """ =>
         mkElem(mkSingletonSymbolType(k), v)
       case _ =>
         c.abort(c.enclosingPosition,

@@ -186,7 +186,7 @@ object expand {
     : (context.Name, Map[context.Type, context.Tree]) = {
     import context.mirror.universe._
     val x = v.mods.annotations.collectFirst {
-      case x @ q"new expand.sequence[${ Ident(nme2) }](...$args)" =>
+      case x @ q"new expand.sequence[${Ident(nme2)}](...$args)" =>
         if (args.flatten.length != typeMappings(nme2).length) {
           context.error(
             x.pos,

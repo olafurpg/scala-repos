@@ -126,7 +126,7 @@ object ScalaSirdRouter extends Specification {
     "allow sub extractor" in {
       //#int
       val router = Router.from {
-        case GET(p"/items/${ int(id) }") =>
+        case GET(p"/items/${int(id)}") =>
           Action {
             Results.Ok(s"Item $id")
           }
@@ -140,7 +140,7 @@ object ScalaSirdRouter extends Specification {
     "allow sub extractor on a query parameter" in {
       //#query-int
       val router = Router.from {
-        case GET(p"/items" ? q_o"page=${ int(page) }") =>
+        case GET(p"/items" ? q_o"page=${int(page)}") =>
           Action {
             val thePage = page.getOrElse(1)
             Results.Ok(s"Items page $thePage")
@@ -157,8 +157,7 @@ object ScalaSirdRouter extends Specification {
     "allow complex extractors" in {
       //#complex
       val router = Router.from {
-        case rh @ GET(
-              p"/items/${ idString @ int(id) }" ? q"price=${ int(price) }")
+        case rh @ GET(p"/items/${idString @ int(id)}" ? q"price=${int(price)}")
             if price > 200 =>
           Action {
             Results.Ok(s"Expensive item $id")

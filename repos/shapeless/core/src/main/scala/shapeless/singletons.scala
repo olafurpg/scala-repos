@@ -145,7 +145,7 @@ trait SingletonTypeUtils extends ReprTypes {
 
   object LiteralSymbol {
     def unapply(t: Tree): Option[String] = t match {
-      case q""" scala.Symbol.apply(${ Literal(Constant(s: String)) }) """ =>
+      case q""" scala.Symbol.apply(${Literal(Constant(s: String))}) """ =>
         Some(s)
       case _ => None
     }
@@ -434,7 +434,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
   }
 
   def witnessTypeImpl(tpeSelector: Tree): Tree = {
-    val q"${ tpeString: String }" = tpeSelector
+    val q"${tpeString: String}" = tpeSelector
     val tpe = parseLiteralType(tpeString).getOrElse(
       c.abort(c.enclosingPosition, s"Malformed literal $tpeString"))
 

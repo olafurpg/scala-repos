@@ -53,7 +53,7 @@ object TypecheckedProps
         new Cell(0) match { case Cell(v) => v }
       }
     """)
-    val q"$_ match { case ${ f: TypeTree }(..$args) => $_ }" = m
+    val q"$_ match { case ${f: TypeTree}(..$args) => $_ }" = m
     assert(f.original ≈ pq"Test.this.Cell")
     assert(args ≈ List(pq"v"))
   }
@@ -61,8 +61,8 @@ object TypecheckedProps
   property("extract inferred val type") = test {
     val typechecked = typecheck(q"val x = 42")
     val q"val x = 42" = typechecked
-    val q"val x: ${ tq"" } = 42" = typechecked
-    val q"val x: ${ t: Type } = 42" = typechecked
+    val q"val x: ${tq""} = 42" = typechecked
+    val q"val x: ${t: Type} = 42" = typechecked
   }
 
   property("class with param (1)") = test {

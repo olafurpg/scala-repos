@@ -6,7 +6,7 @@ class TestRegex {
   }
 
   "text" match {
-    case g"$a + $b + ${ c: String }" =>
+    case g"$a + $b + ${c: String}" =>
       /*start*/
       (a, b, c) /*end*/
   }
