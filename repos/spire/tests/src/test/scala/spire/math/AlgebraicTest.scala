@@ -203,7 +203,7 @@ class AlgebraicTest extends SpireProperties {
   def genRational: Gen[Rational] =
     for {
       n <- genBigInt
-      d <- genBigInt if (d.signum != 0)
+      d <- genBigInt if d.signum != 0
     } yield Rational(n, d)
 
   def genRationalPoly: Gen[Polynomial[Rational]] =
@@ -284,7 +284,7 @@ class AlgebraicTest extends SpireProperties {
       for {
         RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
         RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
-        if (rhsQ.signum != 0)
+        if rhsQ.signum != 0
       } yield RationalAlgebraic(lhsA / rhsA, lhsQ / rhsQ)
 
     def genNeg(depth: Int): Gen[RationalAlgebraic] =

@@ -671,7 +671,7 @@ trait MatchAnalysis extends MatchApproximation {
         //         with Nil and List().
         val result = mutable.Buffer[CounterExample]()
         for (example <- examples
-             if (!result.exists(example coveredBy _))) result += example
+             if !result.exists(example coveredBy _)) result += example
         result.toList
       }
     }

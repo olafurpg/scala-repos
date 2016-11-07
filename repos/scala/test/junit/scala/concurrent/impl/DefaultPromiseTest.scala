@@ -59,7 +59,7 @@ class DefaultPromiseTest {
     private def promiseChain(p: PromiseId): Option[(ChainId, Chain)] = {
       val found: Iterable[(ChainId, Chain)] = for ((cid, c) <- chains;
                                                    p0 <- c.promises;
-                                                   if (p0 == p))
+                                                   if p0 == p)
         yield ((cid, c))
       found.toList match {
         case Nil => None

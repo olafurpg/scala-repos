@@ -334,7 +334,7 @@ final case class NodeMetrics(address: Address,
     // Average metrics present in both latest and current.
     val updated = for {
       latest ← latestNode.metrics
-      current ← currentNode.metrics if (latest sameAs current)
+      current ← currentNode.metrics if latest sameAs current
     } yield {
       current :+ latest
     }

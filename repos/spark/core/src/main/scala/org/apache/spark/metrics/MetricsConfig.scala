@@ -64,8 +64,8 @@ private[spark] class MetricsConfig(conf: SparkConf) extends Logging {
     propertyCategories = subProperties(properties, INSTANCE_REGEX)
     if (propertyCategories.contains(DEFAULT_PREFIX)) {
       val defaultProperty = propertyCategories(DEFAULT_PREFIX).asScala
-      for ((inst, prop) <- propertyCategories if (inst != DEFAULT_PREFIX);
-           (k, v) <- defaultProperty if (prop.get(k) == null)) {
+      for ((inst, prop) <- propertyCategories if inst != DEFAULT_PREFIX;
+           (k, v) <- defaultProperty if prop.get(k) == null) {
         prop.put(k, v)
       }
     }
