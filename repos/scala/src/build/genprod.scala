@@ -127,8 +127,10 @@ object FunctionOne extends Function(1) {
     "@specialized(scala.Unit, scala.Boolean, scala.Int, scala.Float, scala.Long, scala.Double) "
 
   override def descriptiveComment =
-    "  " + functionNTemplate
-      .format("succ", "anonfun1", """
+    "  " + functionNTemplate.format(
+      "succ",
+      "anonfun1",
+      """
  *    val succ = (x: Int) => x + 1
  *    val anonfun1 = new Function1[Int, Int] {
  *      def apply(x: Int): Int = x + 1
@@ -313,8 +315,9 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
   private def idiomatic =
     if (i < 2) ""
     else
-      " Note that it is more idiomatic to create a %s via `(%s)`"
-        .format(className, constructorArgs)
+      " Note that it is more idiomatic to create a %s via `(%s)`".format(
+        className,
+        constructorArgs)
 
   private def params =
     (

@@ -375,8 +375,10 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       return true
     }
 
-    blockManagerInfo(blockManagerId)
-      .updateBlockInfo(blockId, storageLevel, memSize, diskSize)
+    blockManagerInfo(blockManagerId).updateBlockInfo(blockId,
+                                                     storageLevel,
+                                                     memSize,
+                                                     diskSize)
 
     var locations: mutable.HashSet[BlockManagerId] = null
     if (blockLocations.containsKey(blockId)) {

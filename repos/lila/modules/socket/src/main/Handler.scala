@@ -92,8 +92,8 @@ object Handler {
                   Json.obj("opening" -> o)
                 })
             case None =>
-              member push lila.socket.Socket
-                .makeMessage("destsFailure", "Bad dests request")
+              member push lila.socket.Socket.makeMessage("destsFailure",
+                                                         "Bad dests request")
           }
         }
       case _ => // logwarn("Unhandled msg: " + msg)

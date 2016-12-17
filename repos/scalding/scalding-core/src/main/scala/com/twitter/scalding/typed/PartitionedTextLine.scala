@@ -66,8 +66,9 @@ case class PartitionedTextLine[P](path: String,
     with java.io.Serializable {
 
   // The partition fields, offset by the value arity.
-  val partitionFields = PartitionUtil
-    .toFields(valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+  val partitionFields = PartitionUtil.toFields(
+    valueSetter.arity,
+    valueSetter.arity + partitionSetter.arity)
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
@@ -128,8 +129,8 @@ case class PartitionedTextLine[P](path: String,
     * into a pair of `P` and `(offset, line)`.
     */
   override def converter[U >: (P, (Long, String))] =
-    PartitionUtil
-      .converter[P, (Long, String), U](valueConverter, partitionConverter)
+    PartitionUtil.converter[P, (Long, String), U](valueConverter,
+                                                  partitionConverter)
 
   /** Flatten a pair of `P` and `line` into a cascading tuple.*/
   override def setter[U <: (P, String)] =

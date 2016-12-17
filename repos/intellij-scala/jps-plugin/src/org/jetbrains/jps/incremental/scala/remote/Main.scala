@@ -77,8 +77,10 @@ object Main {
         Arguments.from(strings)
       }
 
-      Server
-        .compile(args.sbtData, args.compilerData, args.compilationData, client)
+      Server.compile(args.sbtData,
+                     args.compilerData,
+                     args.compilationData,
+                     client)
 
       if (!hasErrors)
         worksheetFactory.getRunner(out, standalone).loadAndRun(args, client)

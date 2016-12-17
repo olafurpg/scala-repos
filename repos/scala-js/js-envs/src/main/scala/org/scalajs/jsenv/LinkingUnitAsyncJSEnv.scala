@@ -33,8 +33,10 @@ trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
                     linkingUnit: LinkingUnit,
                     postLibs: Seq[ResolvedJSDependency],
                     code: VirtualJSFile): AsyncJSRunner = {
-      LinkingUnitAsyncJSEnv.this
-        .asyncRunner(loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+      LinkingUnitAsyncJSEnv.this.asyncRunner(loadedLibs ++ preLibs,
+                                             linkingUnit,
+                                             postLibs,
+                                             code)
     }
   }
 

@@ -102,8 +102,9 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         }
 
       EitherT {
-        permissionsFinder.apiKeyFinder
-          .hasCapability(apiKey, permissions, Some(clock.now())) map {
+        permissionsFinder.apiKeyFinder.hasCapability(apiKey,
+                                                     permissions,
+                                                     Some(clock.now())) map {
           case true => \/.right(resource)
           case false =>
             \/.left(

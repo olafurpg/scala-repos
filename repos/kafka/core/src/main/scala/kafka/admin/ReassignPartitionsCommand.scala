@@ -39,8 +39,9 @@ object ReassignPartitionsCommand extends Logging {
         opts.parser,
         "Command must include exactly one action: --generate, --execute or --verify")
 
-    CommandLineUtils
-      .checkRequiredArgs(opts.parser, opts.options, opts.zkConnectOpt)
+    CommandLineUtils.checkRequiredArgs(opts.parser,
+                                       opts.options,
+                                       opts.zkConnectOpt)
 
     val zkConnect = opts.options.valueOf(opts.zkConnectOpt)
     val zkUtils =
@@ -139,8 +140,10 @@ object ReassignPartitionsCommand extends Logging {
     val groupedByTopic = currentAssignment.groupBy { case (tp, _) => tp.topic }
     val rackAwareMode =
       if (disableRackAware) RackAwareMode.Disabled else RackAwareMode.Enforced
-    val brokerMetadatas = AdminUtils
-      .getBrokerMetadatas(zkUtils, rackAwareMode, Some(brokerListToReassign))
+    val brokerMetadatas = AdminUtils.getBrokerMetadatas(
+      zkUtils,
+      rackAwareMode,
+      Some(brokerListToReassign))
 
     val partitionsToBeReassigned = mutable.Map[TopicAndPartition, Seq[Int]]()
     groupedByTopic.foreach {
@@ -309,8 +312,9 @@ object ReassignPartitionsCommand extends Logging {
       .withRequiredArg
       .describedAs("brokerlist")
       .ofType(classOf[String])
-    val disableRackAware = parser
-      .accepts("disable-rack-aware", "Disable rack aware replica assignment")
+    val disableRackAware = parser.accepts(
+      "disable-rack-aware",
+      "Disable rack aware replica assignment")
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(

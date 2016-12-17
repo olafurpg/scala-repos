@@ -57,12 +57,14 @@ private[spark] class CoarseGrainedSchedulerBackend(
   private val maxRpcMessageSize = RpcUtils.maxMessageSizeBytes(conf)
   // Submit tasks only after (registered resources / total expected resources)
   // is equal to at least this value, that is double between 0 and 1.
-  var minRegisteredRatio = math
-    .min(1, conf.getDouble("spark.scheduler.minRegisteredResourcesRatio", 0))
+  var minRegisteredRatio = math.min(
+    1,
+    conf.getDouble("spark.scheduler.minRegisteredResourcesRatio", 0))
   // Submit tasks after maxRegisteredWaitingTime milliseconds
   // if minRegisteredRatio has not yet been reached
-  val maxRegisteredWaitingTimeMs = conf
-    .getTimeAsMs("spark.scheduler.maxRegisteredResourcesWaitingTime", "30s")
+  val maxRegisteredWaitingTimeMs = conf.getTimeAsMs(
+    "spark.scheduler.maxRegisteredResourcesWaitingTime",
+    "30s")
   val createTime = System.currentTimeMillis()
 
   private val executorDataMap = new HashMap[String, ExecutorData]
@@ -309,8 +311,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
           }
           totalCoreCount.addAndGet(-executorInfo.totalCores)
           totalRegisteredExecutors.addAndGet(-1)
-          scheduler
-            .executorLost(executorId, if (killed) ExecutorKilled else reason)
+          scheduler.executorLost(executorId,
+                                 if (killed) ExecutorKilled else reason)
           listenerBus.post(
             SparkListenerExecutorRemoved(System.currentTimeMillis(),
                                          executorId,

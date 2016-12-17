@@ -204,10 +204,14 @@ object ConfigCommand {
           "Command must include exactly one action: --describe, --alter")
 
       // check required args
-      CommandLineUtils
-        .checkRequiredArgs(parser, options, zkConnectOpt, entityType)
-      CommandLineUtils
-        .checkInvalidArgs(parser, options, alterOpt, Set(describeOpt))
+      CommandLineUtils.checkRequiredArgs(parser,
+                                         options,
+                                         zkConnectOpt,
+                                         entityType)
+      CommandLineUtils.checkInvalidArgs(parser,
+                                        options,
+                                        alterOpt,
+                                        Set(describeOpt))
       CommandLineUtils.checkInvalidArgs(parser,
                                         options,
                                         describeOpt,

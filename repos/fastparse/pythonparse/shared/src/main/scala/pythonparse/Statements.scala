@@ -123,8 +123,9 @@ class Statements(indent: Int) {
       kw("from") ~ (named | unNamed) ~ kw("import") ~
         (star | "(" ~ import_as_names ~ ")" | import_as_names)).map {
       case (dots, module, names) =>
-        Ast.stmt
-          .ImportFrom(module.map(Ast.identifier), names, dots.map(_.length))
+        Ast.stmt.ImportFrom(module.map(Ast.identifier),
+                            names,
+                            dots.map(_.length))
     }
   }
   val import_as_name: P[Ast.alias] =
@@ -172,8 +173,10 @@ class Statements(indent: Int) {
     kw("for") ~/ exprlist ~ kw("in") ~ testlist ~ ":" ~~ suite ~~
       (space_indents ~ kw("else") ~/ ":" ~~ suite).?).map {
     case (itervars, generator, body, orelse) =>
-      Ast.stmt
-        .For(tuplize(itervars), tuplize(generator), body, orelse.toSeq.flatten)
+      Ast.stmt.For(tuplize(itervars),
+                   tuplize(generator),
+                   body,
+                   orelse.toSeq.flatten)
   }
   val try_stmt: P[Ast.stmt] = {
     val `try` = P(kw("try") ~/ ":" ~~ suite)

@@ -75,8 +75,10 @@ class MultipartTest extends FunSuite {
       Buf.Utf8("." * (Multipart.MaxInMemoryFileSize.inBytes.toInt + 10))
     val multipart = newRequest(foo).multipart.get
 
-    val Multipart
-      .OnDiskFileUpload(file, contentType, fileName, contentTransferEncoding) =
+    val Multipart.OnDiskFileUpload(file,
+                                   contentType,
+                                   fileName,
+                                   contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 

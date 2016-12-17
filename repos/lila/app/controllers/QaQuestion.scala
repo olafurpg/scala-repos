@@ -108,9 +108,10 @@ object QaQuestion extends QaController {
   def remove(questionId: QuestionId) = Secure(_.ModerateQa) {
     implicit ctx => me =>
       WithQuestion(questionId) { q =>
-        (api.question remove q.id) >> Env.mod.logApi
-          .deleteQaQuestion(me.id, q.userId, q.title) inject Redirect(
-          routes.QaQuestion.index())
+        (api.question remove q.id) >> Env.mod.logApi.deleteQaQuestion(
+          me.id,
+          q.userId,
+          q.title) inject Redirect(routes.QaQuestion.index())
       }
   }
 }

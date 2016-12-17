@@ -137,8 +137,11 @@ class QueueResourceTest
 
     When(s"one delay is reset")
     val appId = "appId".toRootPath
-    val taskCount = LaunchQueue
-      .QueuedTaskInfo(AppDefinition(appId), 0, 0, 0, Timestamp.now())
+    val taskCount = LaunchQueue.QueuedTaskInfo(AppDefinition(appId),
+                                               0,
+                                               0,
+                                               0,
+                                               Timestamp.now())
     queue.list returns Seq(taskCount)
 
     val resetDelay = queueResource.resetDelay("appId", req)

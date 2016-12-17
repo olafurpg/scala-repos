@@ -627,8 +627,9 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                 }
 
               case GT =>
-                val rightIdx = comparator.swap
-                  .nextLeftIndex(rightRow + 1, rhead.size - 1, 0)
+                val rightIdx = comparator.swap.nextLeftIndex(rightRow + 1,
+                                                             rhead.size - 1,
+                                                             0)
                 //println("found next right index " + rightIdx + " from " + (rhead.size - 1, rhead.size, 0, rhead.size - rightRow - 1))
                 if (rightIdx == rhead.size) {
                   MoreRight(NoSpan, leftRow, leq, req)
@@ -1399,8 +1400,9 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                                                joinSpec)
         }
       } else {
-        super
-          .join(left1, right1, orderHint)(leftKeySpec, rightKeySpec, joinSpec)
+        super.join(left1, right1, orderHint)(leftKeySpec,
+                                             rightKeySpec,
+                                             joinSpec)
       }
     }
 

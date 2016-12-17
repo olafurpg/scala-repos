@@ -50,8 +50,8 @@ private[stats] class MetricsBucketedHistogram(
     // requests for the snapshot will return values from the previous `latchPeriod`.
 
     if (Time.Undefined eq nextSnapAfter.get) {
-      nextSnapAfter
-        .compareAndSet(Time.Undefined, JsonExporter.startOfNextMinute)
+      nextSnapAfter.compareAndSet(Time.Undefined,
+                                  JsonExporter.startOfNextMinute)
     }
 
     current.synchronized {

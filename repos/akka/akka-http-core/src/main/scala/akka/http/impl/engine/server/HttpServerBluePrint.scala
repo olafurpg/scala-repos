@@ -77,10 +77,10 @@ private[http] object HttpServerBluePrint {
                            SslTlsInbound,
                            SessionBytes,
                            NotUsed] =
-    BidiFlow
-      .fromFlows(Flow[ByteString].map(SendBytes), Flow[SslTlsInbound].collect {
-        case x: SessionBytes ⇒ x
-      })
+    BidiFlow.fromFlows(Flow[ByteString].map(SendBytes),
+                       Flow[SslTlsInbound].collect {
+                         case x: SessionBytes ⇒ x
+                       })
 
   def websocketSupport(settings: ServerSettings,
                        log: LoggingAdapter): BidiFlow[ResponseRenderingOutput,

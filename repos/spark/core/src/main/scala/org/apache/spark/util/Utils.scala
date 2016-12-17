@@ -2232,8 +2232,10 @@ private[spark] object Utils extends Logging {
       } else {
         "$" + libraryPathEnvName
       }
-    val libraryPath = (libraryPaths :+ libraryPathScriptVar)
-      .mkString("\"", File.pathSeparator, "\"")
+    val libraryPath = (libraryPaths :+ libraryPathScriptVar).mkString(
+      "\"",
+      File.pathSeparator,
+      "\"")
     val ampersand =
       if (Utils.isWindows) {
         " &"

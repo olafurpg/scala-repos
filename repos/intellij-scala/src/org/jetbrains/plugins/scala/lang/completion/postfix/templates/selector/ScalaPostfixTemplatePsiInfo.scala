@@ -61,6 +61,7 @@ class ScalaPostfixTemplatePsiInfo extends PostfixTemplatePsiInfo {
   override def createExpression(context: PsiElement,
                                 prefix: String,
                                 suffix: String): PsiElement =
-    ScalaPsiElementFactory
-      .createExpressionFromText(prefix + context.getText + suffix, context)
+    ScalaPsiElementFactory.createExpressionFromText(
+      prefix + context.getText + suffix,
+      context)
 }

@@ -462,8 +462,11 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val svc = Service.mk { req: Request =>
       Future.value(Response.empty)
     }
-    val server = ServerDispatcher
-      .newRequestResponse(transport, svc, Lessor.nil, NullTracer, sr)
+    val server = ServerDispatcher.newRequestResponse(transport,
+                                                     svc,
+                                                     Lessor.nil,
+                                                     NullTracer,
+                                                     sr)
 
     val msg = Message.Tdispatch(tag = 10,
                                 Seq.empty,

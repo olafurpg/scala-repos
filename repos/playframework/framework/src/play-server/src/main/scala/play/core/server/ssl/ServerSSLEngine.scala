@@ -129,8 +129,8 @@ object ServerSSLEngine {
     }
 
     if (serverConfigProviderArgsConstructor != null) {
-      serverConfigProviderArgsConstructor
-        .newInstance(serverConfig, applicationProvider)
+      serverConfigProviderArgsConstructor.newInstance(serverConfig,
+                                                      applicationProvider)
     } else if (providerArgsConstructor != null) {
       providerArgsConstructor.newInstance(applicationProvider)
     } else if (noArgsConstructor != null) {

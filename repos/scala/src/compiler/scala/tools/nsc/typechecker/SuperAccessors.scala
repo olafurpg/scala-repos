@@ -410,8 +410,9 @@ abstract class SuperAccessors
 
         case Apply(fn, args) =>
           assert(fn.tpe != null, tree)
-          treeCopy
-            .Apply(tree, transform(fn), transformArgs(fn.tpe.params, args))
+          treeCopy.Apply(tree,
+                         transform(fn),
+                         transformArgs(fn.tpe.params, args))
 
         case Function(vparams, body) =>
           withInvalidOwner {

@@ -35,8 +35,10 @@ class MyEventsByTagPublisher(tag: String,
   var buf = Vector.empty[EventEnvelope]
 
   import context.dispatcher
-  val continueTask = context.system.scheduler
-    .schedule(refreshInterval, refreshInterval, self, Continue)
+  val continueTask = context.system.scheduler.schedule(refreshInterval,
+                                                       refreshInterval,
+                                                       self,
+                                                       Continue)
 
   override def postStop(): Unit = {
     continueTask.cancel()

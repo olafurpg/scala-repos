@@ -441,8 +441,8 @@ object DBLog {
 
     protected def chain(method: Method, args: Array[Object]): Object =
       try {
-        val m = representative
-          .getMethod(method.getName, method.getParameterTypes: _*)
+        val m = representative.getMethod(method.getName,
+                                         method.getParameterTypes: _*)
 
         m.invoke(underlying, args: _*)
       } catch {
@@ -596,8 +596,9 @@ object DBLog {
 
         case "setBlob" => {
           paramMap +=
-            args(0).asInstanceOf[Int] -> "(Blob : %s (%d bytes))"
-              .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Blob : %s (%d bytes))".format(
+              args(1),
+              args(2))
           chain(method, args)
         }
 
@@ -622,8 +623,9 @@ object DBLog {
 
         case "setClob" => {
           paramMap +=
-            args(0).asInstanceOf[Int] -> "(Clob : %s (%d bytes))"
-              .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Clob : %s (%d bytes))".format(
+              args(1),
+              args(2))
           chain(method, args)
         }
 
@@ -658,8 +660,9 @@ object DBLog {
 
         case "setNClob" => {
           paramMap +=
-            args(0).asInstanceOf[Int] -> "(NClob : %s (%d bytes))"
-              .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(NClob : %s (%d bytes))".format(
+              args(1),
+              args(2))
           chain(method, args)
         }
 

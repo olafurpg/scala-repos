@@ -49,15 +49,16 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
     whiteSpaceAfterCaret =
       text.substring(caretOffset).takeWhile(c => c == ' ' || c == '\t')
-    document
-      .deleteString(caretOffset, caretOffset + whiteSpaceAfterCaret.length)
+    document.deleteString(caretOffset,
+                          caretOffset + whiteSpaceAfterCaret.length)
 
     if ((ch1 != '(' || ch2 != ')') && (ch1 != '{' || ch2 != '}') ||
         !CodeInsightSettings.getInstance.SMART_INDENT_ON_ENTER)
       return Result.Continue
 
-    originalHandler
-      .execute(editor, editor.getCaretModel.getCurrentCaret, dataContext)
+    originalHandler.execute(editor,
+                            editor.getCaretModel.getCurrentCaret,
+                            dataContext)
     Result.DefaultForceIndent
   }
 
@@ -101,8 +102,9 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
     def getSmartSpaces(count: Int) =
       if (useTabs) {
-        StringUtil.repeat("\t", count / tabSize) + StringUtil
-          .repeat(" ", count % tabSize)
+        StringUtil.repeat("\t", count / tabSize) + StringUtil.repeat(
+          " ",
+          count % tabSize)
       } else {
         StringUtil.repeat(" ", count)
       }

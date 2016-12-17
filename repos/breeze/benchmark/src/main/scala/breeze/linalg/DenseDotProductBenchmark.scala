@@ -27,8 +27,11 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeDirectBigDV(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += DenseVectorSupportMethods
-        .dotProduct_Double(dvBig.data, 0, dv2Big.data, 0, dvBig.length)
+      sum += DenseVectorSupportMethods.dotProduct_Double(dvBig.data,
+                                                         0,
+                                                         dv2Big.data,
+                                                         0,
+                                                         dvBig.length)
     }
     sum
   }
@@ -74,8 +77,11 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeDirectBigFV(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += DenseVectorSupportMethods
-        .dotProduct_Float(fvBig.data, 0, fv2Big.data, 0, fvBig.length)
+      sum += DenseVectorSupportMethods.dotProduct_Float(fvBig.data,
+                                                        0,
+                                                        fv2Big.data,
+                                                        0,
+                                                        fvBig.length)
     }
     sum
   }

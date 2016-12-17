@@ -385,8 +385,8 @@ private[spark] class DAGScheduler(
       // Kind of ugly: need to register RDDs with the cache and map output tracker here
       // since we can't do it in the RDD constructor because # of partitions is unknown
       logInfo("Registering RDD " + rdd.id + " (" + rdd.getCreationSite + ")")
-      mapOutputTracker
-        .registerShuffle(shuffleDep.shuffleId, rdd.partitions.length)
+      mapOutputTracker.registerShuffle(shuffleDep.shuffleId,
+                                       rdd.partitions.length)
     }
     stage
   }
@@ -1056,8 +1056,9 @@ private[spark] class DAGScheduler(
     // event.
     stage match {
       case s: ShuffleMapStage =>
-        outputCommitCoordinator
-          .stageStart(stage = s.id, maxPartitionId = s.numPartitions - 1)
+        outputCommitCoordinator.stageStart(
+          stage = s.id,
+          maxPartitionId = s.numPartitions - 1)
       case s: ResultStage =>
         outputCommitCoordinator.stageStart(
           stage = s.id,

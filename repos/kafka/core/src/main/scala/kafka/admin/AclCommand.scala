@@ -412,8 +412,9 @@ object AclCommand {
     val options = parser.parse(args: _*)
 
     def checkArgs() {
-      CommandLineUtils
-        .checkRequiredArgs(parser, options, authorizerPropertiesOpt)
+      CommandLineUtils.checkRequiredArgs(parser,
+                                         options,
+                                         authorizerPropertiesOpt)
 
       val actions = Seq(addOpt, removeOpt, listOpt).count(options.has)
       if (actions != 1)

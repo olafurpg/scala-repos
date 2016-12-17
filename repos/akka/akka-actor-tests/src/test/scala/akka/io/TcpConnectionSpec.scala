@@ -101,8 +101,7 @@ class TcpConnectionSpec extends AkkaSpec("""
           createConnectionActor(options = Vector(SO.KeepAlive(false)))
         val clientChannel = connectionActor.underlyingActor.channel
         clientChannel.socket.getKeepAlive should ===(true) // only set after connection is established
-        EventFilter
-          .warning(pattern = "registration timeout", occurrences = 1) intercept {
+        EventFilter.warning(pattern = "registration timeout", occurrences = 1) intercept {
           selector.send(connectionActor, ChannelConnectable)
           clientChannel.socket.getKeepAlive should ===(false)
         }
@@ -647,8 +646,9 @@ class TcpConnectionSpec extends AkkaSpec("""
       run {
         val sel = SelectorProvider.provider().openSelector()
         try {
-          val key = clientSideChannel
-            .register(sel, SelectionKey.OP_CONNECT | SelectionKey.OP_READ)
+          val key = clientSideChannel.register(
+            sel,
+            SelectionKey.OP_CONNECT | SelectionKey.OP_READ)
           // This timeout should be large enough to work on Windows
           sel.select(3000)
 

@@ -477,10 +477,10 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
         execution.joins
           .CartesianProduct(planLater(left), planLater(right)) :: Nil
       case logical.Join(left, right, Inner, Some(condition)) =>
-        execution.Filter(
-          condition,
-          execution.joins
-            .CartesianProduct(planLater(left), planLater(right))) :: Nil
+        execution.Filter(condition,
+                         execution.joins.CartesianProduct(
+                           planLater(left),
+                           planLater(right))) :: Nil
       case _ => Nil
     }
   }

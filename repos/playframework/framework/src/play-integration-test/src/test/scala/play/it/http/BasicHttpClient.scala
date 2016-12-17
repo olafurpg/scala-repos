@@ -32,8 +32,9 @@ object BasicHttpClient {
       var requestNo = 0
       val responses = requests.flatMap { request =>
         requestNo += 1
-        client
-          .sendRequest(request, requestNo.toString, trickleFeed = trickleFeed)
+        client.sendRequest(request,
+                           requestNo.toString,
+                           trickleFeed = trickleFeed)
       }
 
       if (checkClosed) {
@@ -62,8 +63,9 @@ object BasicHttpClient {
       var requestNo = 0
       requests.foreach { request =>
         requestNo += 1
-        client
-          .sendRequest(request, requestNo.toString, waitForResponses = false)
+        client.sendRequest(request,
+                           requestNo.toString,
+                           waitForResponses = false)
       }
       for (i <- 0 until requests.length) yield {
         client.readResponse(requestNo.toString)

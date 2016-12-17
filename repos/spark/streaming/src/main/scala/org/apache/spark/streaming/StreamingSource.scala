@@ -43,10 +43,11 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
       name: String,
       f: StreamingJobProgressListener => Option[T],
       defaultValue: T): Unit = {
-    metricRegistry
-      .register(MetricRegistry.name("streaming", name), new Gauge[T] {
-        override def getValue: T = f(streamingListener).getOrElse(defaultValue)
-      })
+    metricRegistry.register(MetricRegistry.name("streaming", name),
+                            new Gauge[T] {
+                              override def getValue: T =
+                                f(streamingListener).getOrElse(defaultValue)
+                            })
   }
 
   // Gauge for number of network receivers

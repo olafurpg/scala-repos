@@ -146,8 +146,11 @@ class ShowImplicitParametersAction
     if (editor.getSelectionModel.hasSelection) {
       val selectionStart = editor.getSelectionModel.getSelectionStart
       val selectionEnd = editor.getSelectionModel.getSelectionEnd
-      val opt = ScalaRefactoringUtil
-        .getExpression(project, editor, file, selectionStart, selectionEnd)
+      val opt = ScalaRefactoringUtil.getExpression(project,
+                                                   editor,
+                                                   file,
+                                                   selectionStart,
+                                                   selectionEnd)
       opt match {
         case Some((expr, _)) =>
           forExpr(expr)

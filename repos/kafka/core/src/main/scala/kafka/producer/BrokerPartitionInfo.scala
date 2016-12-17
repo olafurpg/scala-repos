@@ -72,8 +72,9 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
       m.leader match {
         case Some(leader) =>
           debug(
-            "Partition [%s,%d] has leader %d"
-              .format(topic, m.partitionId, leader.id))
+            "Partition [%s,%d] has leader %d".format(topic,
+                                                     m.partitionId,
+                                                     leader.id))
           new PartitionAndLeader(topic, m.partitionId, Some(leader.id))
         case None =>
           debug(
@@ -90,8 +91,10 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
     */
   def updateInfo(topics: Set[String], correlationId: Int) {
     var topicsMetadata: Seq[TopicMetadata] = Nil
-    val topicMetadataResponse = ClientUtils
-      .fetchTopicMetadata(topics, brokers, producerConfig, correlationId)
+    val topicMetadataResponse = ClientUtils.fetchTopicMetadata(topics,
+                                                               brokers,
+                                                               producerConfig,
+                                                               correlationId)
     topicsMetadata = topicMetadataResponse.topicsMetadata
     // throw partition specific exception
     topicsMetadata.foreach(tmd => {

@@ -863,8 +863,8 @@ class KafkaApis(val requestChannel: RequestChannel,
     val aliveBrokers = metadataCache.getAliveBrokers
     val offsetsTopicReplicationFactor =
       if (aliveBrokers.nonEmpty)
-        Math
-          .min(config.offsetsTopicReplicationFactor.toInt, aliveBrokers.length)
+        Math.min(config.offsetsTopicReplicationFactor.toInt,
+                 aliveBrokers.length)
       else config.offsetsTopicReplicationFactor.toInt
     createTopic(TopicConstants.GROUP_METADATA_TOPIC_NAME,
                 config.offsetsTopicPartitions,

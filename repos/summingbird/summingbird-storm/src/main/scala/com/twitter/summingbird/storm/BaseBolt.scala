@@ -209,8 +209,8 @@ case class BaseBolt[I, O](jobID: JobId,
     executor.init(context)
     StormStatProvider.registerMetrics(jobID, context, countersForBolt)
     SummingbirdRuntimeStats.addPlatformStatProvider(StormStatProvider)
-    logger
-      .debug("In Bolt prepare: added jobID stat provider for jobID {}", jobID)
+    logger.debug("In Bolt prepare: added jobID stat provider for jobID {}",
+                 jobID)
   }
 
   override def declareOutputFields(declarer: OutputFieldsDeclarer) {

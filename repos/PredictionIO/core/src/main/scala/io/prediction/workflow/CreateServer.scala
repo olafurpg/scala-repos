@@ -447,8 +447,9 @@ class ServerActor[Q, P](val args: ServerConfig,
   def actorRefFactory: ActorContext = context
 
   implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-  val pluginsActorRef = context
-    .actorOf(Props(classOf[PluginsActor], args.engineVariant), "PluginsActor")
+  val pluginsActorRef = context.actorOf(
+    Props(classOf[PluginsActor], args.engineVariant),
+    "PluginsActor")
   val pluginContext = EngineServerPluginContext(log, args.engineVariant)
 
   def receive: Actor.Receive = runRoute(myRoute)

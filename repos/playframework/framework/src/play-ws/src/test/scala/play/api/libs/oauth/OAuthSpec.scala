@@ -29,8 +29,11 @@ class OAuthSpec extends PlaySpecification {
         implicit app => hostUrl =>
           WS.url(hostUrl + "/foo").sign(oauthCalculator).get()
       }
-      OAuthRequestVerifier
-        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier.verifyRequest(request,
+                                         body,
+                                         hostUrl,
+                                         consumerKey,
+                                         requestToken)
     }
 
     "sign a get request with query parameters" in {
@@ -41,8 +44,11 @@ class OAuthSpec extends PlaySpecification {
             .sign(oauthCalculator)
             .get()
       }
-      OAuthRequestVerifier
-        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier.verifyRequest(request,
+                                         body,
+                                         hostUrl,
+                                         consumerKey,
+                                         requestToken)
     }
 
     "sign a post request with a body" in {
@@ -52,8 +58,11 @@ class OAuthSpec extends PlaySpecification {
             .sign(oauthCalculator)
             .post(Map("param" -> Seq("paramValue")))
       }
-      OAuthRequestVerifier
-        .verifyRequest(request, body, hostUrl, consumerKey, requestToken)
+      OAuthRequestVerifier.verifyRequest(request,
+                                         body,
+                                         hostUrl,
+                                         consumerKey,
+                                         requestToken)
     }
   }
 

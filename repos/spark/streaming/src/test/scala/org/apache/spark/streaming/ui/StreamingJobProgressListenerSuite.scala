@@ -46,8 +46,8 @@ class StreamingJobProgressListenerSuite extends TestSuiteBase with Matchers {
     val properties = new Properties()
     properties.setProperty(JobScheduler.BATCH_TIME_PROPERTY_KEY,
                            batchTime.milliseconds.toString)
-    properties
-      .setProperty(JobScheduler.OUTPUT_OP_ID_PROPERTY_KEY, outputOpId.toString)
+    properties.setProperty(JobScheduler.OUTPUT_OP_ID_PROPERTY_KEY,
+                           outputOpId.toString)
     SparkListenerJobStart(jobId = jobId,
                           0L, // unused
                           Nil, // unused

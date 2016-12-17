@@ -193,8 +193,9 @@ abstract class ParallelSeqCheck[T](collName: String)
           s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
         ("with each other" |: coll.startsWith(s)) &&
         ("modified" |: s.startsWith(collmodif) == coll.startsWith(collmodif)) &&
-        ("modified2" |: s.startsWith(collmodif, pos) == coll
-          .startsWith(collmodif, pos)) && (for (sq <- startEndSeqs) yield {
+        ("modified2" |: s.startsWith(collmodif, pos) == coll.startsWith(
+          collmodif,
+          pos)) && (for (sq <- startEndSeqs) yield {
           val ss = s.startsWith(sq, pos)
           val cs = coll.startsWith(fromSeq(sq), pos)
           if (ss != cs) {
@@ -252,11 +253,15 @@ abstract class ParallelSeqCheck[T](collName: String)
             ("with par" |: s.patch(from, pat, repl) == coll.patch(from,
                                                                   fromSeq(pat),
                                                                   repl)) &&
-            ("with empty" |: s.patch(from, Nil, repl) == coll
-              .patch(from, fromSeq(Nil), repl)) &&
+            ("with empty" |: s.patch(from, Nil, repl) == coll.patch(
+              from,
+              fromSeq(Nil),
+              repl)) &&
             ("with one" |:
-              (s.length == 0 || s.patch(from, List(s(0)), 1) == coll
-                .patch(from, fromSeq(List(coll(0))), 1)))
+              (s.length == 0 || s.patch(from, List(s(0)), 1) == coll.patch(
+                from,
+                fromSeq(List(coll(0))),
+                1)))
       }
 
   if (!isCheckingViews)

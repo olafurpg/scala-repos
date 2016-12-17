@@ -67,8 +67,9 @@ class DocServerStart {
       mode = Mode.Test,
       properties = System.getProperties
     )
-    val serverProvider: ServerProvider = ServerProvider
-      .fromConfiguration(getClass.getClassLoader, config.configuration)
+    val serverProvider: ServerProvider = ServerProvider.fromConfiguration(
+      getClass.getClassLoader,
+      config.configuration)
     val context = ServerProvider.Context(
       config,
       applicationProvider,

@@ -85,8 +85,10 @@ object ProtectedBranchService {
         pusher: String)(implicit session: Session): Option[String] = {
       val branch = command.getRefName.stripPrefix("refs/heads/")
       if (branch != command.getRefName) {
-        getProtectedBranchInfo(owner, repository, branch)
-          .getStopReason(receivePack.isAllowNonFastForwards, command, pusher)
+        getProtectedBranchInfo(owner, repository, branch).getStopReason(
+          receivePack.isAllowNonFastForwards,
+          command,
+          pusher)
       } else {
         None
       }

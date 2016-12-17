@@ -684,8 +684,10 @@ private[remote] class EndpointWriter(
 
   val ackIdleTimer = {
     val interval = settings.SysMsgAckTimeout / 2
-    context.system.scheduler
-      .schedule(interval, interval, self, AckIdleCheckTimer)
+    context.system.scheduler.schedule(interval,
+                                      interval,
+                                      self,
+                                      AckIdleCheckTimer)
   }
 
   override def preStart(): Unit = {
@@ -726,8 +728,9 @@ private[remote] class EndpointWriter(
                       Logging.DebugLevel)
     case Handle(inboundHandle) ⇒
       // Assert handle == None?
-      context.parent ! ReliableDeliverySupervisor
-        .GotUid(inboundHandle.handshakeInfo.uid, remoteAddress)
+      context.parent ! ReliableDeliverySupervisor.GotUid(
+        inboundHandle.handshakeInfo.uid,
+        remoteAddress)
       handle = Some(inboundHandle)
       reader = startReadEndpoint(inboundHandle)
       eventPublisher.notifyListeners(

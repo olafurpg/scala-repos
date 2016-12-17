@@ -280,8 +280,9 @@ class ContinuousQueryManagerSuite
       }
     }
 
-    AwaitTerminationTester
-      .test(expectedBehavior, awaitTermFunc, testBehaviorFor)
+    AwaitTerminationTester.test(expectedBehavior,
+                                awaitTermFunc,
+                                testBehaviorFor)
   }
 
   /** Stop a random active query either with `stop()` or with an error */

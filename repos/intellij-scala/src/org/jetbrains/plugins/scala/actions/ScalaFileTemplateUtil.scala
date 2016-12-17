@@ -26,8 +26,8 @@ object ScalaFileTemplateUtil {
     properties.setProperty(FileTemplate.ATTRIBUTE_CLASS_NAME, className)
     var classSimpleName: String = aClass.name
     if (classSimpleName == null) classSimpleName = ""
-    properties
-      .setProperty(FileTemplate.ATTRIBUTE_SIMPLE_CLASS_NAME, classSimpleName)
+    properties.setProperty(FileTemplate.ATTRIBUTE_SIMPLE_CLASS_NAME,
+                           classSimpleName)
     val methodName: String = method.name
     properties.setProperty(FileTemplate.ATTRIBUTE_METHOD_NAME, methodName)
   }

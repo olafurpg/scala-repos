@@ -448,8 +448,10 @@ trait CompilerControl { self: Global =>
                                   response: Response[Tree])
       extends WorkItem {
     def apply() =
-      self
-        .getParsedEntered(source, keepLoaded, response, this.onCompilerThread)
+      self.getParsedEntered(source,
+                            keepLoaded,
+                            response,
+                            this.onCompilerThread)
     override def toString =
       "getParsedEntered " + source + ", keepLoaded = " + keepLoaded
 

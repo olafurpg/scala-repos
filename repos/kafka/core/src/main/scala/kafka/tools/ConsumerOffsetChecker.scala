@@ -173,8 +173,8 @@ object ConsumerOffsetChecker extends Logging {
     parser.accepts("help", "Print this message.")
 
     if (args.length == 0)
-      CommandLineUtils
-        .printUsageAndDie(parser, "Check the offset of your consumers.")
+      CommandLineUtils.printUsageAndDie(parser,
+                                        "Check the offset of your consumers.")
 
     val options = parser.parse(args: _*)
 

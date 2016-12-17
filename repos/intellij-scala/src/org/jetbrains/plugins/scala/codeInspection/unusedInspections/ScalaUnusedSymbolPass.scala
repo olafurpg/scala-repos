@@ -228,8 +228,10 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
         .getStartOffset
       val end = declElementHolder.getTextRange.getEndOffset
       val range = TextRange.create(start, end)
-      val annotation = state.annotationHolder
-        .createAnnotation(severity, new TextRange(start, end), message)
+      val annotation = state.annotationHolder.createAnnotation(
+        severity,
+        new TextRange(start, end),
+        message)
       val key = HighlightDisplayKey.find(VarCouldBeValInspection.ShortName)
       val fix = new VarToValFix(
         declElementHolder.asInstanceOf[ScVariableDefinition],
@@ -243,13 +245,13 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
   override def getInfos: java.util.List[HighlightInfo] = highlightInfos.toList
 
   private def isUnusedSymbolSuppressed(element: PsiElement) = {
-    inspectionSuppressor
-      .isSuppressedFor(element, ScalaUnusedSymbolInspection.ShortName)
+    inspectionSuppressor.isSuppressedFor(element,
+                                         ScalaUnusedSymbolInspection.ShortName)
   }
 
   private def isVarCouldBeValSuppressed(element: PsiElement) = {
-    inspectionSuppressor
-      .isSuppressedFor(element, VarCouldBeValInspection.ShortName)
+    inspectionSuppressor.isSuppressedFor(element,
+                                         VarCouldBeValInspection.ShortName)
   }
 }
 

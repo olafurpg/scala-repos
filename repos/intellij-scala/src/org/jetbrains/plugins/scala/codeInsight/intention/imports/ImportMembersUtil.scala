@@ -132,8 +132,9 @@ object ImportMembersUtil {
               case m: PsiMember => Option(m.getContainingClass)
               case _ => None
             }
-            val refExpr = ScalaPsiElementFactory
-              .createExpressionFromText(name, oldRef.getManager)
+            val refExpr = ScalaPsiElementFactory.createExpressionFromText(
+              name,
+              oldRef.getManager)
             val replaced =
               expr.replaceExpression(refExpr, removeParenthesis = true)
             replaced
@@ -168,8 +169,9 @@ object ImportMembersUtil {
       }
     }
     val lessThan: (PsiReference, PsiReference) => Boolean = { (ref1, ref2) =>
-      PsiTreeUtil
-        .isAncestor(actuallyReplaced(ref2), actuallyReplaced(ref1), true)
+      PsiTreeUtil.isAncestor(actuallyReplaced(ref2),
+                             actuallyReplaced(ref1),
+                             true)
     }
     usages.toSeq.sortWith(lessThan)
   }

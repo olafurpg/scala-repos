@@ -35,8 +35,10 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
       connectFuture,
       ChannelState.CONNECTED,
       remoteAddress)
-    val ch = HttpConnectHandler
-      .addHandler(proxyAddress, remoteAddress, pipeline, None)
+    val ch = HttpConnectHandler.addHandler(proxyAddress,
+                                           remoteAddress,
+                                           pipeline,
+                                           None)
     ch.handleDownstream(ctx, connectRequested)
 
     def checkDidClose() {

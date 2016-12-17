@@ -61,8 +61,8 @@ object StringOrderedSerialization {
     while ((counter > 0) && (ic == 0)) {
       // Unsigned compare of ints is cheaper than longs, because we can do it
       // by upcasting to Long
-      ic = UnsignedComparisons
-        .unsignedIntCompare(seekingLeft.readInt, seekingRight.readInt)
+      ic = UnsignedComparisons.unsignedIntCompare(seekingLeft.readInt,
+                                                  seekingRight.readInt)
       counter = counter - 1
     }
     if (ic != 0) ic

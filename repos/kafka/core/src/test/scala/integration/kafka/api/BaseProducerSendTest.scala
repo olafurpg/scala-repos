@@ -280,11 +280,11 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
       // create topic
       val topicProps = new Properties()
       if (timestampType == TimestampType.LOG_APPEND_TIME)
-        topicProps
-          .setProperty(LogConfig.MessageTimestampTypeProp, "LogAppendTime")
+        topicProps.setProperty(LogConfig.MessageTimestampTypeProp,
+                               "LogAppendTime")
       else
-        topicProps
-          .setProperty(LogConfig.MessageTimestampTypeProp, "CreateTime")
+        topicProps.setProperty(LogConfig.MessageTimestampTypeProp,
+                               "CreateTime")
       TestUtils.createTopic(zkUtils, topic, 1, 2, servers, topicProps)
 
       for (i <- 1 to numRecords) {
@@ -585,8 +585,8 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
   @Test
   def testSendWithInvalidCreateTime() {
     val topicProps = new Properties()
-    topicProps
-      .setProperty(LogConfig.MessageTimestampDifferenceMaxMsProp, "1000");
+    topicProps.setProperty(LogConfig.MessageTimestampDifferenceMaxMsProp,
+                           "1000");
     TestUtils.createTopic(zkUtils, topic, 1, 2, servers, topicProps)
 
     val producer = createProducer(brokerList = brokerList)

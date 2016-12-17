@@ -53,9 +53,9 @@ class HoconErrorHighlightingAnnotator extends Annotator {
                 validateConcatenation(child.getElementType, child.getTreeNext)
 
               case (required, actual) =>
-                holder
-                  .createErrorAnnotation(child, s"cannot concatenate ${uncaps(
-                    required.toString)} with ${uncaps(actual.toString)}")
+                holder.createErrorAnnotation(
+                  child,
+                  s"cannot concatenate ${uncaps(required.toString)} with ${uncaps(actual.toString)}")
                 validateConcatenation(actual, child.getTreeNext)
             }
           }

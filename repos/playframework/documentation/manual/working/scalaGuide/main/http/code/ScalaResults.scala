@@ -43,8 +43,9 @@ package scalaguide.http.scalaresults {
 
       "Manipulating HTTP headers" in {
         //#set-headers
-        val result = Ok("Hello World!")
-          .withHeaders(CACHE_CONTROL -> "max-age=3600", ETAG -> "xx")
+        val result =
+          Ok("Hello World!").withHeaders(CACHE_CONTROL -> "max-age=3600",
+                                         ETAG -> "xx")
         //#set-headers
         testHeader(result, CACHE_CONTROL, "max-age=3600")
         testHeader(result, ETAG, "xx")

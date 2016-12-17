@@ -1095,8 +1095,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       var index = 0
       for (jparamType <- paramJavaTypes) {
-        mirrorMethod
-          .visitVarInsn(jparamType.typedOpcode(asm.Opcodes.ILOAD), index)
+        mirrorMethod.visitVarInsn(jparamType.typedOpcode(asm.Opcodes.ILOAD),
+                                  index)
         assert(!jparamType.isInstanceOf[MethodBType], jparamType)
         index += jparamType.size
       }
@@ -1234,8 +1234,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       )
 
       if (emitSource)
-        mirrorClass
-          .visitSource("" + cunit.source, null /* SourceDebugExtension */ )
+        mirrorClass.visitSource("" + cunit.source,
+                                null /* SourceDebugExtension */ )
 
       val ssa = getAnnotPickle(bType.internalName, moduleClass.companionSymbol)
       mirrorClass.visitAttribute(

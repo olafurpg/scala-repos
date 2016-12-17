@@ -50,8 +50,9 @@ class PersistentActorDeferBenchmark {
     probe = TestProbe()(system)
 
     storageLocations.foreach(FileUtils.deleteDirectory)
-    persistAsync_defer = system
-      .actorOf(Props(classOf[`persistAsync, defer`], data10k.last), "a-1")
+    persistAsync_defer = system.actorOf(
+      Props(classOf[`persistAsync, defer`], data10k.last),
+      "a-1")
     persistAsync_defer_replyASAP = system.actorOf(
       Props(classOf[`persistAsync, defer, respond ASAP`], data10k.last),
       "a-2")

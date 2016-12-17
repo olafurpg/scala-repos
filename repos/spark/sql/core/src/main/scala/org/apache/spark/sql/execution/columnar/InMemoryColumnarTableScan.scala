@@ -381,8 +381,9 @@ private[sql] case class InMemoryColumnarTableScan(
         case other => other
       }.toArray
       val columnarIterator = GenerateColumnAccessor.generate(columnTypes)
-      columnarIterator
-        .initialize(withMetrics, columnTypes, requestedColumnIndices.toArray)
+      columnarIterator.initialize(withMetrics,
+                                  columnTypes,
+                                  requestedColumnIndices.toArray)
       if (enableAccumulators && columnarIterator.hasNext) {
         readPartitions += 1
       }

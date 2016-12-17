@@ -55,8 +55,7 @@ object LookupElementManager {
 
       qualifierType match {
         case _ if !isPredef && !usedImportForElement =>
-          ScType
-            .extractDesignated(qualifierType, withoutAliases = false) match {
+          ScType.extractDesignated(qualifierType, withoutAliases = false) match {
             case Some((named, _)) =>
               val clazz: Option[PsiClass] = named match {
                 case cl: PsiClass => Some(cl)

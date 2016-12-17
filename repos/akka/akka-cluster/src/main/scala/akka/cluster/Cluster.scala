@@ -251,8 +251,9 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     require(
       to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
       s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
-    clusterCore ! InternalClusterAction
-      .Subscribe(subscriber, initialStateMode, to.toSet)
+    clusterCore ! InternalClusterAction.Subscribe(subscriber,
+                                                  initialStateMode,
+                                                  to.toSet)
   }
 
   /**

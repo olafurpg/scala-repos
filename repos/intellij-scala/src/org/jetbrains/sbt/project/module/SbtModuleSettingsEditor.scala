@@ -42,8 +42,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
   def createComponentImpl() = {
     myForm.sbtImportsList.setEmptyText(
       SbtBundle("sbt.settings.noImplicitImportsFound"))
-    JListCompatibility
-      .setModel(myForm.sbtImportsList, modelWrapper.getModelRaw)
+    JListCompatibility.setModel(myForm.sbtImportsList,
+                                modelWrapper.getModelRaw)
 
     myForm.updateButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {

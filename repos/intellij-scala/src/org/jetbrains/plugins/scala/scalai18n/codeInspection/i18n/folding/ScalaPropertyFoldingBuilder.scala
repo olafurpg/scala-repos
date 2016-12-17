@@ -54,8 +54,8 @@ class ScalaPropertyFoldingBuilder extends FoldingBuilderEx {
       case literal: ScLiteral =>
         return ScalaI18nUtil.getI18nMessage(element.getProject, literal)
       case methodCall: ScMethodCall =>
-        return ScalaI18nUtil
-          .formatMethodCallExpression(element.getProject, methodCall)
+        return ScalaI18nUtil.formatMethodCallExpression(element.getProject,
+                                                        methodCall)
       case _ =>
     }
     element.getText

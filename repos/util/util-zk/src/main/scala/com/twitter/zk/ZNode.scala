@@ -237,8 +237,9 @@ trait ZNode {
             ZNode.TreeUpdate(zparent,
                              added = children -- knownChildren,
                              removed = knownChildren -- children)
-          log
-            .debug("updating %s with %d children", path, treeUpdate.added.size)
+          log.debug("updating %s with %d children",
+                    path,
+                    treeUpdate.added.size)
           broker send (treeUpdate) sync () onSuccess { _ =>
             log.debug("updated %s with %d children",
                       path,

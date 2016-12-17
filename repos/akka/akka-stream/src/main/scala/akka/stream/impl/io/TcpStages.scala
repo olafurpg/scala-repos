@@ -58,8 +58,11 @@ private[stream] class ConnectionSourceStage(
 
       override def preStart(): Unit = {
         getStageActor(receive)
-        tcpManager ! Tcp
-          .Bind(self, endpoint, backlog, options, pullMode = true)
+        tcpManager ! Tcp.Bind(self,
+                              endpoint,
+                              backlog,
+                              options,
+                              pullMode = true)
       }
 
       private def receive(evt: (ActorRef, Any)): Unit = {

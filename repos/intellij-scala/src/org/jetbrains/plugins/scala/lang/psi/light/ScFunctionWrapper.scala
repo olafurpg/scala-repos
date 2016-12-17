@@ -200,15 +200,17 @@ with LightScalaMethod {
             generifySubst subst ScFunctionWrapper
               .getSubstitutor(cClass, function)
               .subst(param.getType(TypingContext.empty).getOrAny)
-          returnType = ScType
-            .toPsi(scalaType, function.getProject, function.getResolveScope)
+          returnType = ScType.toPsi(scalaType,
+                                    function.getProject,
+                                    function.getResolveScope)
         case None =>
           val scalaType =
             generifySubst subst ScFunctionWrapper
               .getSubstitutor(cClass, function)
               .subst(function.returnType.getOrAny)
-          returnType = ScType
-            .toPsi(scalaType, function.getProject, function.getResolveScope)
+          returnType = ScType.toPsi(scalaType,
+                                    function.getProject,
+                                    function.getResolveScope)
       }
     }
     returnType

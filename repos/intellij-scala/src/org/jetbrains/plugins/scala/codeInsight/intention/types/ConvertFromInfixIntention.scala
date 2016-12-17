@@ -45,8 +45,9 @@ class ConvertFromInfixIntention extends PsiElementBaseIntentionAction {
     val newTypeText =
       infixTypeElement.ref.getText + "[" + infixTypeElement.lOp.getText +
         ", " + infixTypeElement.rOp.map(_.getText).getOrElse("") + "]"
-    val newTypeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(newTypeText, element.getManager)
+    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      newTypeText,
+      element.getManager)
     val replaced = elementToReplace.replace(newTypeElement)
     UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
   }

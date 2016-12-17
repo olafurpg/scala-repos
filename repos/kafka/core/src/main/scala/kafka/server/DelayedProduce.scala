@@ -47,8 +47,8 @@ case class ProduceMetadata(
     produceStatus: Map[TopicPartition, ProducePartitionStatus]) {
 
   override def toString =
-    "[requiredAcks: %d, partitionStatus: %s]"
-      .format(produceRequiredAcks, produceStatus)
+    "[requiredAcks: %d, partitionStatus: %s]".format(produceRequiredAcks,
+                                                     produceStatus)
 }
 
 /**
@@ -96,8 +96,9 @@ class DelayedProduce(
             .format(topicAndPartition, status))
         // skip those partitions that have already been satisfied
         if (status.acksPending) {
-          val partitionOpt = replicaManager
-            .getPartition(topicAndPartition.topic, topicAndPartition.partition)
+          val partitionOpt =
+            replicaManager.getPartition(topicAndPartition.topic,
+                                        topicAndPartition.partition)
           val (hasEnough, errorCode) = partitionOpt match {
             case Some(partition) =>
               partition.checkEnoughReplicasReachOffset(status.requiredOffset)

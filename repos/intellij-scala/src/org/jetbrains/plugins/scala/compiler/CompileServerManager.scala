@@ -143,8 +143,11 @@ class CompileServerManager(project: Project) extends ProjectComponent {
     val group = new DefaultActionGroup(actions: _*)
 
     val context = DataManager.getInstance.getDataContext(e.getComponent)
-    val popup = JBPopupFactory.getInstance
-      .createActionGroupPopup(title, group, context, mnemonics, true)
+    val popup = JBPopupFactory.getInstance.createActionGroupPopup(title,
+                                                                  group,
+                                                                  context,
+                                                                  mnemonics,
+                                                                  true)
     val dimension = popup.getContent.getPreferredSize
     val at = new Point(0, -dimension.height)
 

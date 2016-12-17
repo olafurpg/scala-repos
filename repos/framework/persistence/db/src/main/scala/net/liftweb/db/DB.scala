@@ -1229,9 +1229,10 @@ class StandardDBVendor(driverName: String,
     (dbUser, dbPassword) match {
       case (Full(user), Full(pwd)) =>
         tryo { t: Throwable =>
-          logger.error("Unable to get database connection. url=%s, user=%s"
-                         .format(dbUrl, user),
-                       t)
+          logger.error(
+            "Unable to get database connection. url=%s, user=%s".format(dbUrl,
+                                                                        user),
+            t)
         }(DriverManager.getConnection(dbUrl, user, pwd))
       case _ =>
         tryo { t: Throwable =>

@@ -88,8 +88,9 @@ abstract class ScalaIntroduceFieldHandlerBase
       expr: ScExpression,
       occurrences: Array[TextRange],
       aClass: ScTemplateDefinition): PsiElement = {
-    val commonParent = ScalaRefactoringUtil
-      .commonParent(aClass.getContainingFile, occurrences: _*)
+    val commonParent = ScalaRefactoringUtil.commonParent(
+      aClass.getContainingFile,
+      occurrences: _*)
     val firstOccOffset = occurrences.map(_.getStartOffset).min
     val anchor = ScalaRefactoringUtil
       .statementsAndMembersInClass(aClass)
@@ -151,8 +152,9 @@ object ScalaIntroduceFieldHandlerBase {
     if (parExpr == null) return None
     val container: PsiElement = ScalaRefactoringUtil.container(parExpr, file)
     val needBraces =
-      !parExpr.isInstanceOf[ScBlock] && ScalaRefactoringUtil
-        .needBraces(parExpr, ScalaRefactoringUtil.nextParent(parExpr, file))
+      !parExpr.isInstanceOf[ScBlock] && ScalaRefactoringUtil.needBraces(
+        parExpr,
+        ScalaRefactoringUtil.nextParent(parExpr, file))
     val parent =
       if (needBraces) {
         firstRange = firstRange.shiftRight(1)

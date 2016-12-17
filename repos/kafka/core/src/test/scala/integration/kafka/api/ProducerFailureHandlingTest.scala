@@ -43,8 +43,8 @@ class ProducerFailureHandlingTest extends KafkaServerTestHarness {
 
   val overridingProps = new Properties()
   overridingProps.put(KafkaConfig.AutoCreateTopicsEnableProp, false.toString)
-  overridingProps
-    .put(KafkaConfig.MessageMaxBytesProp, serverMessageMaxBytes.toString)
+  overridingProps.put(KafkaConfig.MessageMaxBytesProp,
+                      serverMessageMaxBytes.toString)
   // Set a smaller value for the number of partitions for the offset commit topic (__consumer_offset topic)
   // so that the creation of that topic/partition(s) and subsequent leader assignment doesn't take relatively long
   overridingProps.put(KafkaConfig.OffsetsTopicPartitionsProp, 1.toString)
@@ -260,8 +260,12 @@ class ProducerFailureHandlingTest extends KafkaServerTestHarness {
     val topicProps = new Properties()
     topicProps.put("min.insync.replicas", (numServers + 1).toString)
 
-    TestUtils
-      .createTopic(zkUtils, topicName, 1, numServers, servers, topicProps)
+    TestUtils.createTopic(zkUtils,
+                          topicName,
+                          1,
+                          numServers,
+                          servers,
+                          topicProps)
 
     val record = new ProducerRecord[Array[Byte], Array[Byte]](topicName,
                                                               null,
@@ -286,8 +290,12 @@ class ProducerFailureHandlingTest extends KafkaServerTestHarness {
     val topicProps = new Properties()
     topicProps.put("min.insync.replicas", numServers.toString)
 
-    TestUtils
-      .createTopic(zkUtils, topicName, 1, numServers, servers, topicProps)
+    TestUtils.createTopic(zkUtils,
+                          topicName,
+                          1,
+                          numServers,
+                          servers,
+                          topicProps)
 
     val record = new ProducerRecord[Array[Byte], Array[Byte]](topicName,
                                                               null,

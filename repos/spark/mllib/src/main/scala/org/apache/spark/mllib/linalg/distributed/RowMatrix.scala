@@ -289,8 +289,11 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
         require(
           k < n,
           s"k must be smaller than n in dist-eigs mode but got k=$k and n=$n.")
-        EigenValueDecomposition
-          .symmetricEigs(multiplyGramianMatrixBy, n, k, tol, maxIter)
+        EigenValueDecomposition.symmetricEigs(multiplyGramianMatrixBy,
+                                              n,
+                                              k,
+                                              tol,
+                                              maxIter)
     }
 
     val sigmas: BDV[Double] = brzSqrt(sigmaSquares)

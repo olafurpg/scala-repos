@@ -300,24 +300,25 @@ abstract class ScalaTestingTestCase(
       new AtomicReference[ProcessHandler]
     val contentDescriptor: AtomicReference[RunContentDescriptor] =
       new AtomicReference[RunContentDescriptor]
-    runner
-      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-        def processStarted(descriptor: RunContentDescriptor) {
-          System.setProperty("idea.dynamic.classpath",
-                             useDynamicClassPath.toString)
-          disposeOnTearDown(new Disposable {
-            def dispose() {
-              descriptor.dispose()
-            }
-          })
-          val handler: ProcessHandler = descriptor.getProcessHandler
-          assert(handler != null)
-          handler.addProcessListener(listener)
-          processHandler.set(handler)
-          contentDescriptor.set(descriptor)
-          semaphore.up()
-        }
-      })
+    runner.execute(executionEnvironmentBuilder.build,
+                   new ProgramRunner.Callback {
+                     def processStarted(descriptor: RunContentDescriptor) {
+                       System.setProperty("idea.dynamic.classpath",
+                                          useDynamicClassPath.toString)
+                       disposeOnTearDown(new Disposable {
+                         def dispose() {
+                           descriptor.dispose()
+                         }
+                       })
+                       val handler: ProcessHandler =
+                         descriptor.getProcessHandler
+                       assert(handler != null)
+                       handler.addProcessListener(listener)
+                       processHandler.set(handler)
+                       contentDescriptor.set(descriptor)
+                       semaphore.up()
+                     }
+                   })
     semaphore.waitFor()
     (processHandler.get, contentDescriptor.get)
   }

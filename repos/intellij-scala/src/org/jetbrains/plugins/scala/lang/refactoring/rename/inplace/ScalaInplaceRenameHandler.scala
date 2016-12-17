@@ -53,8 +53,10 @@ trait ScalaInplaceRenameHandler {
                                project: Project,
                                nameSuggestionContext: PsiElement,
                                editor: Editor): Unit = {
-    PsiElementRenameHandler
-      .rename(element, project, nameSuggestionContext, editor)
+    PsiElementRenameHandler.rename(element,
+                                   project,
+                                   nameSuggestionContext,
+                                   editor)
   }
 
   def afterElementSubstitution(elementToRename: PsiElement,

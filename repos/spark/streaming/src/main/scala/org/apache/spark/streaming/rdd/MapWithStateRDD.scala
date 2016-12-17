@@ -157,10 +157,12 @@ private[streaming] class MapWithStateRDD[K: ClassTag,
       context: TaskContext): Iterator[MapWithStateRDDRecord[K, S, E]] = {
 
     val stateRDDPartition = partition.asInstanceOf[MapWithStateRDDPartition]
-    val prevStateRDDIterator = prevStateRDD
-      .iterator(stateRDDPartition.previousSessionRDDPartition, context)
-    val dataIterator = partitionedDataRDD
-      .iterator(stateRDDPartition.partitionedDataRDDPartition, context)
+    val prevStateRDDIterator = prevStateRDD.iterator(
+      stateRDDPartition.previousSessionRDDPartition,
+      context)
+    val dataIterator = partitionedDataRDD.iterator(
+      stateRDDPartition.partitionedDataRDDPartition,
+      context)
 
     val prevRecord =
       if (prevStateRDDIterator.hasNext) Some(prevStateRDDIterator.next())

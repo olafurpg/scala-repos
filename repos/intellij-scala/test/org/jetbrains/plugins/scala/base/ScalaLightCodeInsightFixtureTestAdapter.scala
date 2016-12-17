@@ -35,8 +35,9 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     super.setUp()
 
     myFixture.allowTreeAccessForAllFiles()
-    libLoader = ScalaLibraryLoader
-      .withMockJdk(myFixture.getProject, myFixture.getModule, rootPath = null)
+    libLoader = ScalaLibraryLoader.withMockJdk(myFixture.getProject,
+                                               myFixture.getModule,
+                                               rootPath = null)
     libLoader.loadScala(libVersion)
   }
 
@@ -80,8 +81,10 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       .getInstance(getProject)
       .buildInitialFoldings(myFixture.getEditor)
 
-    myFixture
-      .testHighlighting(false, false, false, myFixture.getFile.getVirtualFile)
+    myFixture.testHighlighting(false,
+                               false,
+                               false,
+                               myFixture.getFile.getVirtualFile)
   }
 
   protected def checkTextHasNoErrors(
@@ -110,8 +113,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val cleanedText = text.replace("\r", "")
     val cleanedAssumed = assumedText.replace("\r", "")
     val caretIndex = cleanedText.indexOf(CARET_MARKER)
-    myFixture
-      .configureByText("dummy.scala", cleanedText.replace(CARET_MARKER, ""))
+    myFixture.configureByText("dummy.scala",
+                              cleanedText.replace(CARET_MARKER, ""))
     myFixture.getEditor.getCaretModel.moveToOffset(caretIndex)
 
     testBody()
@@ -137,12 +140,15 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
   protected def checkGeneratedTextAfterBackspace(text: String,
                                                  assumedText: String) {
     performTest(text, assumedText) { () =>
-      CommandProcessor.getInstance
-        .executeCommand(myFixture.getProject, new Runnable {
+      CommandProcessor.getInstance.executeCommand(
+        myFixture.getProject,
+        new Runnable {
           def run() {
             myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
           }
-        }, "", null)
+        },
+        "",
+        null)
     }
   }
 

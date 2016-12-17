@@ -228,8 +228,7 @@ class JobTest(cons: (Args) => Job) {
     System.setProperty("cascading.update.skip", "true")
 
     // create cascading 3.0 planner trace files during tests
-    if (System.getenv.asScala
-          .getOrElse("SCALDING_CASCADING3_DEBUG", "0") == "1") {
+    if (System.getenv.asScala.getOrElse("SCALDING_CASCADING3_DEBUG", "0") == "1") {
       System.setProperty("cascading.planner.plan.path",
                          "target/test/cascading/traceplan/" + job.name)
       System.setProperty(

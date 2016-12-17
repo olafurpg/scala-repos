@@ -111,7 +111,8 @@ class TaskStatsByVersionTest
       version: Timestamp,
       startingDelay: FiniteDuration): Task = {
     val startedAt = (version + startingDelay).toDateTime.getMillis
-    MarathonTestHelper
-      .runningTask(newTaskId(), appVersion = version, startedAt = startedAt)
+    MarathonTestHelper.runningTask(newTaskId(),
+                                   appVersion = version,
+                                   startedAt = startedAt)
   }
 }

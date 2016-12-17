@@ -260,8 +260,9 @@ object DevServerStart {
             Await.result(actorSystem.whenTerminated, Duration.Inf)
             Future.successful(())
           })
-        val serverProvider = ServerProvider
-          .fromConfiguration(classLoader, serverConfig.configuration)
+        val serverProvider =
+          ServerProvider.fromConfiguration(classLoader,
+                                           serverConfig.configuration)
         serverProvider.createServer(serverContext)
       } catch {
         case e: ExceptionInInitializerError => throw e.getCause

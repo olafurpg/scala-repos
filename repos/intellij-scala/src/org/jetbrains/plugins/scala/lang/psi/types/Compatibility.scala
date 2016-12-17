@@ -361,8 +361,9 @@ object Compatibility {
                   } else {
                     matched ::= (param, expr)
                     matchedTypes ::= (param, exprType)
-                    undefSubst += Conformance
-                      .undefinedSubst(paramType, exprType, checkWeak = true)
+                    undefSubst += Conformance.undefinedSubst(paramType,
+                                                             exprType,
+                                                             checkWeak = true)
                   }
                 }
               case _ =>

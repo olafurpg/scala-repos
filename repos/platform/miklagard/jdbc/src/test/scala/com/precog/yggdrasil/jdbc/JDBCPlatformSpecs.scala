@@ -171,8 +171,10 @@ object JDBCPlatformSpecEngine extends Logging {
                     val columns = properties.map(_._1).mkString(", ")
                     val values = properties.map(_._2._2).mkString(", ")
 
-                    val insert = "INSERT INTO %s (%s) VALUES (%s);"
-                      .format(tableName, columns, values)
+                    val insert =
+                      "INSERT INTO %s (%s) VALUES (%s);".format(tableName,
+                                                                columns,
+                                                                values)
 
                     logger.debug("Inserting with " + insert)
 

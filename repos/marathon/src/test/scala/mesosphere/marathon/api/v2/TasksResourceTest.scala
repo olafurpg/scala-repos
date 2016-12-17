@@ -51,8 +51,10 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource
-      .killTasks(scale = false, force = false, body = bodyBytes, auth.request)
+    val response = taskResource.killTasks(scale = false,
+                                          force = false,
+                                          body = bodyBytes,
+                                          auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200
@@ -94,8 +96,10 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource
-      .killTasks(scale = true, force = true, body = bodyBytes, auth.request)
+    val response = taskResource.killTasks(scale = true,
+                                          force = true,
+                                          body = bodyBytes,
+                                          auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200

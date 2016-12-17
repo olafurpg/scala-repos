@@ -572,8 +572,9 @@ private[joins] final class LongArrayRelation(
     val idx = (key - start).toInt
     if (idx >= 0 && idx < sizes.length && sizes(idx) > 0) {
       val result = new UnsafeRow(numFields)
-      result
-        .pointTo(bytes, Platform.BYTE_ARRAY_OFFSET + offsets(idx), sizes(idx))
+      result.pointTo(bytes,
+                     Platform.BYTE_ARRAY_OFFSET + offsets(idx),
+                     sizes(idx))
       result
     } else {
       null

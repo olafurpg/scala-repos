@@ -319,14 +319,16 @@ final class KafkaRelayAgent(
       case Ingest(apiKey, path, writeAs, _, _, timestamp, _) =>
         if (writeAs.isDefined) Promise.successful(writeAs)
         else
-          permissionsFinder
-            .inferWriteAuthorities(apiKey, path, Some(timestamp))
+          permissionsFinder.inferWriteAuthorities(apiKey,
+                                                  path,
+                                                  Some(timestamp))
 
       case StoreFile(apiKey, path, writeAs, _, _, timestamp, _) =>
         if (writeAs.isDefined) Promise successful writeAs
         else
-          permissionsFinder
-            .inferWriteAuthorities(apiKey, path, Some(timestamp))
+          permissionsFinder.inferWriteAuthorities(apiKey,
+                                                  path,
+                                                  Some(timestamp))
 
       case _ => Promise.successful(None)
     }

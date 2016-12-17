@@ -58,8 +58,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       case Array(clazz: ScTemplateDefinition) => clazz
       case _ =>
         val parent = PsiTreeUtil.findCommonParent(elements: _*)
-        PsiTreeUtil
-          .getParentOfType(parent, classOf[ScTemplateDefinition], false)
+        PsiTreeUtil.getParentOfType(parent,
+                                    classOf[ScTemplateDefinition],
+                                    false)
     }
 
     if (dataContext != null) {
@@ -90,8 +91,10 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     if (messages.nonEmpty) throw new RuntimeException(messages.mkString("\n"))
     inWriteCommandAction(project, "Extract trait") {
       val traitText = "trait ExtractedTrait {\n\n}"
-      val newTrt = ScalaPsiElementFactory
-        .createTemplateDefinitionFromText(traitText, clazz.getContext, clazz)
+      val newTrt = ScalaPsiElementFactory.createTemplateDefinitionFromText(
+        traitText,
+        clazz.getContext,
+        clazz)
       val newTrtAdded = clazz match {
         case anon: ScNewTemplateDefinition =>
           val tBody =
@@ -120,8 +123,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     val extractInfo = new ExtractInfo(clazz, memberInfos)
     extractInfo.collect()
 
-    val isOk = ExtractSuperClassUtil
-      .showConflicts(dialog, extractInfo.conflicts, clazz.getProject)
+    val isOk = ExtractSuperClassUtil.showConflicts(dialog,
+                                                   extractInfo.conflicts,
+                                                   clazz.getProject)
     if (!isOk) return
 
     val name = dialog.getTraitName
@@ -151,8 +155,10 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       case Some(selfTpe) =>
         val traitText = s"trait ${trt.name} {\n$selfTpe\n}"
         val dummyTrait =
-          ScalaPsiElementFactory
-            .createTemplateDefinitionFromText(traitText, trt.getParent, trt)
+          ScalaPsiElementFactory.createTemplateDefinitionFromText(
+            traitText,
+            trt.getParent,
+            trt)
         val selfTypeElem = dummyTrait.extendsBlock.selfTypeElement.get
         val extendsBlock = trt.extendsBlock
         val templateBody = extendsBlock.templateBody match {
@@ -344,8 +350,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
 
       classesForSelfType.foreach {
         case cl: PsiClass if cl.getTypeParameters.nonEmpty =>
-          val message = ScalaBundle
-            .message("type.parameters.for.self.type.not.supported", cl.name)
+          val message =
+            ScalaBundle.message("type.parameters.for.self.type.not.supported",
+                                cl.name)
           conflicts.putValue(cl, message)
         case _ =>
       }

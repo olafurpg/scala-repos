@@ -74,8 +74,8 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
       .append("\n}")
 
     val newIfStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
     val size =
       newIfStmt
         .asInstanceOf[ScIfStmt]

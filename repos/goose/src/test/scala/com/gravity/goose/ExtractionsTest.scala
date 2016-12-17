@@ -17,8 +17,8 @@ import java.util.Date
 class ExtractionsTest {
 
   def getHtml(filename: String): String = {
-    FileHelper
-      .loadResourceFile(TestUtils.staticHtmlDir + filename, Goose.getClass)
+    FileHelper.loadResourceFile(TestUtils.staticHtmlDir + filename,
+                                Goose.getClass)
   }
 
   @Test
@@ -247,11 +247,9 @@ class ExtractionsTest {
     val url: String =
       "http://www.engadget.com/2010/08/18/verizon-fios-set-top-boxes-getting-a-new-hd-guide-external-stor/"
     val article = TestUtils.getArticle(url, html)
-    TestUtils
-      .runArticleAssertions(
-        article = article,
-        expectedStart =
-          "Streaming and downloading TV content to mobiles is nice")
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedStart = "Streaming and downloading TV content to mobiles is nice")
   }
 
   @Test

@@ -261,8 +261,10 @@ case class ScMethodType(
     r match {
       case m: ScMethodType =>
         if (m.params.length != params.length) return (false, undefinedSubst)
-        var t = Equivalence
-          .equivInner(m.returnType, returnType, undefinedSubst, falseUndef)
+        var t = Equivalence.equivInner(m.returnType,
+                                       returnType,
+                                       undefinedSubst,
+                                       falseUndef)
         if (!t._1) return (false, undefinedSubst)
         undefinedSubst = t._2
         var i = 0
@@ -466,8 +468,9 @@ case class ScTypePolymorphicType(internalType: ScType,
       case (true, res, _) => res
       case (_, _, newData) =>
         ScTypePolymorphicType(
-          internalType
-            .recursiveVarianceUpdateModifiable(newData, update, variance),
+          internalType.recursiveVarianceUpdateModifiable(newData,
+                                                         update,
+                                                         variance),
           typeParameters.map(tp => {
             TypeParameter(tp.name,
                           tp.typeParams /* todo: ? */,

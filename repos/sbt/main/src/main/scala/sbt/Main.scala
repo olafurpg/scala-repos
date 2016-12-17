@@ -441,8 +441,10 @@ object BuiltinCommands {
     (s: State) => {
       val extracted = Project.extract(s)
       import extracted._
-      token(Space ~> flag("every" ~ Space)) ~ SettingCompletions
-        .settingParser(structure.data, structure.index.keyMap, currentProject)
+      token(Space ~> flag("every" ~ Space)) ~ SettingCompletions.settingParser(
+        structure.data,
+        structure.index.keyMap,
+        currentProject)
     }
 
   @deprecated("Use Inspect.parser", "0.13.0")

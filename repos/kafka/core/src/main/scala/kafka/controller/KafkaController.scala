@@ -530,8 +530,8 @@ class KafkaController(val config: KafkaConfig,
     // supposed to host. Based on that the broker starts the high watermark threads for the input list of partitions
     val allReplicasOnNewBrokers =
       controllerContext.replicasOnBrokers(newBrokersSet)
-    replicaStateMachine
-      .handleStateChanges(allReplicasOnNewBrokers, OnlineReplica)
+    replicaStateMachine.handleStateChanges(allReplicasOnNewBrokers,
+                                           OnlineReplica)
     // when a new broker comes up, the controller needs to trigger leader election for all new and offline partitions
     // to see if these brokers can become leaders for some/all of those
     partitionStateMachine.triggerOnlinePartitionStateChange()
@@ -587,8 +587,8 @@ class KafkaController(val config: KafkaConfig,
             !deleteTopicManager.isTopicQueuedUpForDeletion(
               partitionAndLeader._1.topic))
         .keySet
-    partitionStateMachine
-      .handleStateChanges(partitionsWithoutLeader, OfflinePartition)
+    partitionStateMachine.handleStateChanges(partitionsWithoutLeader,
+                                             OfflinePartition)
     // trigger OnlinePartition state changes for offline or new partitions
     partitionStateMachine.triggerOnlinePartitionStateChange()
     // filter out the replicas that belong to topics that are being deleted
@@ -597,8 +597,8 @@ class KafkaController(val config: KafkaConfig,
     val activeReplicasOnDeadBrokers = allReplicasOnDeadBrokers.filterNot(p =>
       deleteTopicManager.isTopicQueuedUpForDeletion(p.topic))
     // handle dead replicas
-    replicaStateMachine
-      .handleStateChanges(activeReplicasOnDeadBrokers, OfflineReplica)
+    replicaStateMachine.handleStateChanges(activeReplicasOnDeadBrokers,
+                                           OfflineReplica)
     // check if topic deletion state for the dead replicas needs to be updated
     val replicasForTopicsToBeDeleted = allReplicasOnDeadBrokers.filter(p =>
       deleteTopicManager.isTopicQueuedUpForDeletion(p.topic))
@@ -910,8 +910,11 @@ class KafkaController(val config: KafkaConfig,
                   apiVersion: Option[Short],
                   request: AbstractRequest,
                   callback: AbstractRequestResponse => Unit = null) = {
-    controllerContext.controllerChannelManager
-      .sendRequest(brokerId, apiKey, apiVersion, request, callback)
+    controllerContext.controllerChannelManager.sendRequest(brokerId,
+                                                           apiKey,
+                                                           apiVersion,
+                                                           request,
+                                                           callback)
   }
 
   def incrementControllerEpoch(zkClient: ZkClient) = {
@@ -1106,8 +1109,9 @@ class KafkaController(val config: KafkaConfig,
   def updateLeaderAndIsrCache(
       topicAndPartitions: Set[TopicAndPartition] =
         controllerContext.partitionReplicaAssignment.keySet) {
-    val leaderAndIsrInfo = zkUtils
-      .getPartitionLeaderAndIsrForTopics(zkUtils.zkClient, topicAndPartitions)
+    val leaderAndIsrInfo = zkUtils.getPartitionLeaderAndIsrForTopics(
+      zkUtils.zkClient,
+      topicAndPartitions)
     for ((topicPartition, leaderIsrAndControllerEpoch) <- leaderAndIsrInfo)
       controllerContext.partitionLeadershipInfo
         .put(topicPartition, leaderIsrAndControllerEpoch)
@@ -1188,13 +1192,13 @@ class KafkaController(val config: KafkaConfig,
       oldReplicas.map(r => PartitionAndReplica(topic, partition, r))
     replicaStateMachine.handleStateChanges(replicasToBeDeleted, OfflineReplica)
     // send stop replica command to the old replicas
-    replicaStateMachine
-      .handleStateChanges(replicasToBeDeleted, ReplicaDeletionStarted)
+    replicaStateMachine.handleStateChanges(replicasToBeDeleted,
+                                           ReplicaDeletionStarted)
     // TODO: Eventually partition reassignment could use a callback that does retries if deletion failed
-    replicaStateMachine
-      .handleStateChanges(replicasToBeDeleted, ReplicaDeletionSuccessful)
-    replicaStateMachine
-      .handleStateChanges(replicasToBeDeleted, NonExistentReplica)
+    replicaStateMachine.handleStateChanges(replicasToBeDeleted,
+                                           ReplicaDeletionSuccessful)
+    replicaStateMachine.handleStateChanges(replicasToBeDeleted,
+                                           NonExistentReplica)
   }
 
   private def updateAssignedReplicasForPartition(
@@ -1415,8 +1419,8 @@ class KafkaController(val config: KafkaConfig,
                                   Set.empty[TopicAndPartition]) {
     try {
       brokerRequestBatch.newBatch()
-      brokerRequestBatch
-        .addUpdateMetadataRequestForBrokers(brokers, partitions)
+      brokerRequestBatch.addUpdateMetadataRequestForBrokers(brokers,
+                                                            partitions)
       brokerRequestBatch.sendRequestsToBrokers(epoch)
     } catch {
       case e: IllegalStateException => {
@@ -1459,8 +1463,9 @@ class KafkaController(val config: KafkaConfig,
     while (!zkWriteCompleteOrUnnecessary) {
       // refresh leader and isr from zookeeper again
       val leaderIsrAndEpochOpt =
-        ReplicationUtils
-          .getLeaderIsrAndEpochForPartition(zkUtils, topic, partition)
+        ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                          topic,
+                                                          partition)
       zkWriteCompleteOrUnnecessary = leaderIsrAndEpochOpt match {
         case Some(leaderIsrAndEpoch) =>
           // increment the leader epoch even if the ISR changes
@@ -1560,8 +1565,9 @@ class KafkaController(val config: KafkaConfig,
     while (!zkWriteCompleteOrUnnecessary) {
       // refresh leader and isr from zookeeper again
       val leaderIsrAndEpochOpt =
-        ReplicationUtils
-          .getLeaderIsrAndEpochForPartition(zkUtils, topic, partition)
+        ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                          topic,
+                                                          partition)
       zkWriteCompleteOrUnnecessary = leaderIsrAndEpochOpt match {
         case Some(leaderIsrAndEpoch) =>
           val leaderAndIsr = leaderIsrAndEpoch.leaderAndIsr

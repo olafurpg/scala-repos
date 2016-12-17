@@ -245,8 +245,9 @@ class Analyzer(
     case DocUriForSymbolReq(typeFullName: String,
                             memberName: Option[String],
                             signatureString: Option[String]) =>
-      sender() ! scalaCompiler
-        .askDocSignatureForSymbol(typeFullName, memberName, signatureString)
+      sender() ! scalaCompiler.askDocSignatureForSymbol(typeFullName,
+                                                        memberName,
+                                                        signatureString)
     case InspectPackageByPathReq(path: String) =>
       sender ! scalaCompiler.askPackageByPath(path).getOrElse(FalseResponse)
     case TypeAtPointReq(file, range: OffsetRange) =>

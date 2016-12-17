@@ -95,8 +95,9 @@ object GlobalPlugin {
     import EvaluateTask._
     withStreams(structure, state) { str =>
       val nv = nodeView(state, str, roots)
-      val config = EvaluateTask
-        .extractedTaskConfig(Project.extract(state), structure, state)
+      val config = EvaluateTask.extractedTaskConfig(Project.extract(state),
+                                                    structure,
+                                                    state)
       val (newS, result) =
         runTask(t, state, str, structure.index.triggers, config)(nv)
       (newS, processResult(result, newS.log))

@@ -98,15 +98,13 @@ final class ModApi(logApi: ModlogApi,
 
   def setTitle(mod: String, username: String, title: Option[String]): Funit =
     withUser(username) { user =>
-      UserRepo
-        .setTitle(user.id, title) >> lightUserApi.invalidate(user.id) >> logApi
+      UserRepo.setTitle(user.id, title) >> lightUserApi.invalidate(user.id) >> logApi
         .setTitle(mod, user.id, title)
     }
 
   def setEmail(mod: String, username: String, email: String): Funit =
     withUser(username) { user =>
-      UserRepo
-        .email(user.id, email) >> UserRepo.setEmailConfirmed(user.id) >> logApi
+      UserRepo.email(user.id, email) >> UserRepo.setEmailConfirmed(user.id) >> logApi
         .setEmail(mod, user.id)
     }
 

@@ -98,8 +98,9 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
         val scalaFilter = methodTarget.getMethod match {
           case f @ (_: ScMethodLike | _: FakeAnonymousClassConstructor)
               if stepTarget.needsBreakpointRequest() =>
-            ScalaBreakpointMethodFilter
-              .from(f, stepTarget.getCallingExpressionLines)
+            ScalaBreakpointMethodFilter.from(
+              f,
+              stepTarget.getCallingExpressionLines)
           case fun: ScMethodLike =>
             Some(
               new ScalaMethodFilter(fun, stepTarget.getCallingExpressionLines))

@@ -86,8 +86,8 @@ object CassandraCQLTest {
     ConfigHelper.setInputColumnFamily(job.getConfiguration(),
                                       KeySpace,
                                       InputColumnFamily)
-    ConfigHelper
-      .setInputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper.setInputPartitioner(job.getConfiguration(),
+                                     "Murmur3Partitioner")
     CqlConfigHelper.setInputCQLPageRowSize(job.getConfiguration(), "3")
 
     /** CqlConfigHelper.setInputWhereClauses(job.getConfiguration(), "user_id='bob'") */
@@ -102,8 +102,8 @@ object CassandraCQLTest {
                                        OutputColumnFamily)
     ConfigHelper.setOutputInitialAddress(job.getConfiguration(), cHost)
     ConfigHelper.setOutputRpcPort(job.getConfiguration(), cPort)
-    ConfigHelper
-      .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper.setOutputPartitioner(job.getConfiguration(),
+                                      "Murmur3Partitioner")
 
     val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),
                                     classOf[CqlPagingInputFormat],

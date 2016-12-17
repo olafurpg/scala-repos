@@ -99,8 +99,10 @@ class RenameScalaVariableProcessor
                                                       deep = true)) {
       val overriderName = elem.name
       val baseName = namedElement.name
-      val newOverriderName = RefactoringUtil
-        .suggestNewOverriderName(overriderName, baseName, newName)
+      val newOverriderName = RefactoringUtil.suggestNewOverriderName(
+        overriderName,
+        baseName,
+        newName)
       if (newOverriderName != null) {
         allRenames.put(elem, newOverriderName)
         addBeanMethods(elem, newOverriderName)
@@ -129,20 +131,24 @@ class RenameScalaVariableProcessor
     val named = element match {
       case named: ScNamedElement => named; case _ => return
     }
-    RenameSuperMembersUtil
-      .chooseAndProcessSuper(named, new PsiElementProcessor[PsiNamedElement] {
+    RenameSuperMembersUtil.chooseAndProcessSuper(
+      named,
+      new PsiElementProcessor[PsiNamedElement] {
         def execute(named: PsiNamedElement): Boolean = {
           renameCallback.pass(named)
           false
         }
-      }, editor)
+      },
+      editor)
   }
 
   override def renameElement(element: PsiElement,
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil
-      .doRenameGenericNamedElement(element, newName, usages, listener)
+    ScalaRenameUtil.doRenameGenericNamedElement(element,
+                                                newName,
+                                                usages,
+                                                listener)
   }
 }

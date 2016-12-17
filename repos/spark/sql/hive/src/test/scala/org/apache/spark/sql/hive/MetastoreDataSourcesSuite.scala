@@ -727,8 +727,8 @@ class MetastoreDataSourcesSuite
                            "spark.sql.sources.schema" -> schema.json,
                            "EXTERNAL" -> "FALSE"))
 
-      sessionState.catalog.client
-        .createTable(hiveTable, ignoreIfExists = false)
+      sessionState.catalog.client.createTable(hiveTable,
+                                              ignoreIfExists = false)
 
       invalidateTable(tableName)
       val actualSchema = table(tableName).schema

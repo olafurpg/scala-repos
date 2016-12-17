@@ -318,13 +318,11 @@ class GoldSitesTestIT {
     val url: String =
       "http://www.engadget.com/2010/08/18/verizon-fios-set-top-boxes-getting-a-new-hd-guide-external-stor/"
     val article = TestUtils.getArticle(url)
-    TestUtils
-      .runArticleAssertions(
-        article = article,
-        expectedStart =
-          "Streaming and downloading TV content to mobiles is nice",
-        expectedImage =
-          "http://www.blogcdn.com/www.engadget.com/media/2010/08/44ni600.jpg")
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedStart = "Streaming and downloading TV content to mobiles is nice",
+      expectedImage =
+        "http://www.blogcdn.com/www.engadget.com/media/2010/08/44ni600.jpg")
   }
 
   @Test
@@ -645,12 +643,10 @@ class GoldSitesTestIT {
       "http://finance.yahoo.com/news/Stocks-plunge-after-Fed-apf-3386772167.html?x=0"
     implicit val config = TestUtils.DEFAULT_CONFIG
     val article = TestUtils.getArticle(url)
-    TestUtils
-      .runArticleAssertions(
-        article = article,
-        expectedStart =
-          "NEW YORK (AP) -- The Federal Reserve did what investors",
-        expectedImage = "http://l.yimg.com/a/p/fi/41/20/44.jpg")
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedStart = "NEW YORK (AP) -- The Federal Reserve did what investors",
+      expectedImage = "http://l.yimg.com/a/p/fi/41/20/44.jpg")
     TestUtils.printReport()
   }
 

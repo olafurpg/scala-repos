@@ -94,8 +94,9 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
                               Path("/\\\\/\\///\\/"),
                               Path.Root,
                               clock.now())
-      result <- executor
-        .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
+      result <- executor.execute(numTicks.toString,
+                                 ctx,
+                                 QueryOptions(timeout = timeout))
     } yield result
 
     executionResult.valueOr(err => sys.error(err.toString))

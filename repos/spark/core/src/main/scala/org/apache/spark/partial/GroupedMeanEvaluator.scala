@@ -74,8 +74,8 @@ private[spark] class GroupedMeanEvaluator[T](totalOutputs: Int,
         val confFactor = studentTCacher.get(counter.count)
         val low = mean - confFactor * stdev
         val high = mean + confFactor * stdev
-        result
-          .put(entry.getKey, new BoundedDouble(mean, confidence, low, high))
+        result.put(entry.getKey,
+                   new BoundedDouble(mean, confidence, low, high))
       }
       result.asScala
     }

@@ -162,8 +162,9 @@ class MigrationTo0_11(groupRepository: GroupRepository,
       updatedApps: Iterable[AppDefinition]): Future[Unit] = {
     val updatedGroup = updatedApps.foldLeft(rootGroup) {
       (updatedGroup, updatedApp) =>
-        updatedGroup
-          .updateApp(updatedApp.id, _ => updatedApp, updatedApp.version)
+        updatedGroup.updateApp(updatedApp.id,
+                               _ => updatedApp,
+                               updatedApp.version)
     }
     groupRepository
       .store(groupRepository.zkRootName, updatedGroup)

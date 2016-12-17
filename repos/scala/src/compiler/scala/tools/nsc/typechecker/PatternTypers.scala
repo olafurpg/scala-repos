@@ -327,8 +327,11 @@ trait PatternTypers { self: Analyzer =>
           unapplyType.skolemizeExistential(context.owner, tree))
         val unapplyContext = context.makeNewScope(context.tree, context.owner)
         freeVars foreach unapplyContext.scope.enter
-        val pattp = newTyper(unapplyContext).infer
-          .inferTypedPattern(tree, unappFormal, pt, canRemedy)
+        val pattp = newTyper(unapplyContext).infer.inferTypedPattern(
+          tree,
+          unappFormal,
+          pt,
+          canRemedy)
         // turn any unresolved type variables in freevars into existential skolems
         val skolems =
           freeVars map
@@ -337,8 +340,7 @@ trait PatternTypers { self: Analyzer =>
       }
 
       val unapplyArg =
-        (context.owner
-          .newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
+        (context.owner.newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
           (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
              pt
            else freshUnapplyArgType()))

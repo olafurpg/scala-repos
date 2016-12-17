@@ -50,8 +50,9 @@ class InterpolatedStringReferenceProvider extends PsiReferenceProvider {
       case s: ScInterpolatedStringLiteral => Array.empty
       case l: ScLiteral
           if (l.isString || l.isMultiLineString) && l.getText.contains("$") =>
-        val interpolated = ScalaPsiElementFactory
-          .createExpressionFromText("s" + l.getText, l.getContext)
+        val interpolated = ScalaPsiElementFactory.createExpressionFromText(
+          "s" + l.getText,
+          l.getContext)
         interpolated.getChildren.filter {
           case r: ScInterpolatedStringPartReference => false
           case ref: ScReferenceExpression => true

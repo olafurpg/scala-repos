@@ -151,16 +151,22 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
       Array(0.10, 0.10, 0.70, 0.10) // label 2
     ).map(_.map(math.log))
 
-    val testData = NaiveBayesSuite
-      .generateNaiveBayesInput(pi, theta, nPoints, 42, Multinomial)
+    val testData = NaiveBayesSuite.generateNaiveBayesInput(pi,
+                                                           theta,
+                                                           nPoints,
+                                                           42,
+                                                           Multinomial)
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
 
     val model = NaiveBayes.train(testRDD, 1.0, Multinomial)
     validateModelFit(pi, theta, model)
 
-    val validationData = NaiveBayesSuite
-      .generateNaiveBayesInput(pi, theta, nPoints, 17, Multinomial)
+    val validationData = NaiveBayesSuite.generateNaiveBayesInput(pi,
+                                                                 theta,
+                                                                 nPoints,
+                                                                 17,
+                                                                 Multinomial)
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
@@ -242,16 +248,22 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
             0.30) // label 2
     ).map(_.map(math.log))
 
-    val testData = NaiveBayesSuite
-      .generateNaiveBayesInput(pi, theta, nPoints, 45, Bernoulli)
+    val testData = NaiveBayesSuite.generateNaiveBayesInput(pi,
+                                                           theta,
+                                                           nPoints,
+                                                           45,
+                                                           Bernoulli)
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
 
     val model = NaiveBayes.train(testRDD, 1.0, Bernoulli)
     validateModelFit(pi, theta, model)
 
-    val validationData = NaiveBayesSuite
-      .generateNaiveBayesInput(pi, theta, nPoints, 20, Bernoulli)
+    val validationData = NaiveBayesSuite.generateNaiveBayesInput(pi,
+                                                                 theta,
+                                                                 nPoints,
+                                                                 20,
+                                                                 Bernoulli)
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.

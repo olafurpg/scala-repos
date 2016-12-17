@@ -938,8 +938,10 @@ class SparkIMain(initialSettings: Settings,
         IR.Error
 
       case Right(_) =>
-        val line = "%sval %s = %s.value"
-          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+        val line = "%sval %s = %s.value".format(
+          modifiers map (_ + " ") mkString,
+          name,
+          bindRep.evalPath)
         logDebug("Interpreting: " + line)
         interpret(line)
     }

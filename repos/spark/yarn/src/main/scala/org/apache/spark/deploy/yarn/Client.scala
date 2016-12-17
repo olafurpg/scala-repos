@@ -373,16 +373,19 @@ private[spark] class Client(val args: ClientArguments,
     val fs = FileSystem.get(hadoopConf)
     val dst = new Path(fs.getHomeDirectory(), appStagingDir)
     val nns = YarnSparkHadoopUtil.get.getNameNodesToAccess(sparkConf) + dst
-    YarnSparkHadoopUtil.get
-      .obtainTokensForNamenodes(nns, hadoopConf, credentials)
+    YarnSparkHadoopUtil.get.obtainTokensForNamenodes(nns,
+                                                     hadoopConf,
+                                                     credentials)
     // Used to keep track of URIs added to the distributed cache. If the same URI is added
     // multiple times, YARN will fail to launch containers for the app with an internal
     // error.
     val distributedUris = new HashSet[String]
-    YarnSparkHadoopUtil.get
-      .obtainTokenForHiveMetastore(sparkConf, hadoopConf, credentials)
-    YarnSparkHadoopUtil.get
-      .obtainTokenForHBase(sparkConf, hadoopConf, credentials)
+    YarnSparkHadoopUtil.get.obtainTokenForHiveMetastore(sparkConf,
+                                                        hadoopConf,
+                                                        credentials)
+    YarnSparkHadoopUtil.get.obtainTokenForHBase(sparkConf,
+                                                hadoopConf,
+                                                credentials)
 
     val replication = sparkConf
       .get(STAGING_FILE_REPLICATION)
@@ -1287,8 +1290,9 @@ object Client extends Logging {
     val classPathElementsToAdd =
       getYarnAppClasspath(conf) ++ getMRAppClasspath(conf)
     for (c <- classPathElementsToAdd.flatten) {
-      YarnSparkHadoopUtil
-        .addPathToEnvironment(env, Environment.CLASSPATH.name, c.trim)
+      YarnSparkHadoopUtil.addPathToEnvironment(env,
+                                               Environment.CLASSPATH.name,
+                                               c.trim)
     }
   }
 
@@ -1488,8 +1492,9 @@ object Client extends Logging {
     */
   private def addClasspathEntry(path: String,
                                 env: HashMap[String, String]): Unit =
-    YarnSparkHadoopUtil
-      .addPathToEnvironment(env, Environment.CLASSPATH.name, path)
+    YarnSparkHadoopUtil.addPathToEnvironment(env,
+                                             Environment.CLASSPATH.name,
+                                             path)
 
   /**
     * Returns the path to be sent to the NM for a path that is valid on the gateway.

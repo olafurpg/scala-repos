@@ -213,10 +213,10 @@ class UDFSuite extends QueryTest with SharedSQLContext {
                             (data: Seq[Int], nestedData: Seq[Seq[Int]]) => {
                               (data, nestedData)
                             })
-    sqlContext.udf
-      .register("mapDataFunc", (data: scala.collection.Map[Int, String]) => {
-        data
-      })
+    sqlContext.udf.register("mapDataFunc",
+                            (data: scala.collection.Map[Int, String]) => {
+                              data
+                            })
     sqlContext.udf.register("complexDataFunc",
                             (m: Map[String, Int], a: Seq[Int], b: Boolean) => {
                               (m, a, b)

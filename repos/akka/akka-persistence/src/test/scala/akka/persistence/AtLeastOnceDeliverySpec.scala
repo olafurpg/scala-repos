@@ -150,8 +150,9 @@ object AtLeastOnceDeliverySpec {
       case a @ Action(id, payload) ⇒
         // discard duplicates (naive impl)
         if (!allReceived.contains(id)) {
-          log
-            .debug("Destination got {}, all count {}", a, allReceived.size + 1)
+          log.debug("Destination got {}, all count {}",
+                    a,
+                    allReceived.size + 1)
           testActor ! a
           allReceived += id
         }

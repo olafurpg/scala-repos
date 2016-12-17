@@ -67,8 +67,9 @@ class MarathonSchedulerActor private (
 
   override def preStart(): Unit = {
     schedulerActions = createSchedulerActions(self)
-    deploymentManager = context
-      .actorOf(deploymentManagerProps(schedulerActions), "DeploymentManager")
+    deploymentManager = context.actorOf(
+      deploymentManagerProps(schedulerActions),
+      "DeploymentManager")
     historyActor = context.actorOf(historyActorProps, "HistoryActor")
 
     leaderInfo.subscribe(self)

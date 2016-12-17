@@ -92,8 +92,9 @@ class ScalaUnusedImportPass(val file: PsiFile,
           ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY &&
           ScalaUnusedImportPass.timeToOptimizeImports(file) &&
           file.isWritable) {
-        ScalaUnusedImportPass
-          .invokeOnTheFlyImportOptimizer(myOptimizeImportsRunnable, file)
+        ScalaUnusedImportPass.invokeOnTheFlyImportOptimizer(
+          myOptimizeImportsRunnable,
+          file)
       }
     }
   }

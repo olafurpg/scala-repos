@@ -39,8 +39,9 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     if (element == null || !element.isValid) return
     val paramTypeElement: ScParameterizedTypeElement =
-      PsiTreeUtil
-        .getParentOfType(element, classOf[ScParameterizedTypeElement], false)
+      PsiTreeUtil.getParentOfType(element,
+                                  classOf[ScParameterizedTypeElement],
+                                  false)
     val Seq(targ1, targ2) = paramTypeElement.typeArgList.typeArgs
     val needParens = paramTypeElement.getParent match {
       case _: ScTypeArgs | _: ScParenthesisedTypeElement => false
@@ -50,16 +51,18 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
       .map(_.getText)
       .mkString(" ")
       .parenthesisedIf(needParens)
-    val newTypeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(newTypeText, element.getManager)
+    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      newTypeText,
+      element.getManager)
     if (paramTypeElement.isValid) {
       val replaced = try {
         paramTypeElement.replace(newTypeElement)
       } catch {
         case npe: NullPointerException =>
-          throw new RuntimeException("Unable to replace: %s with %s"
-                                       .format(paramTypeElement, newTypeText),
-                                     npe)
+          throw new RuntimeException(
+            "Unable to replace: %s with %s".format(paramTypeElement,
+                                                   newTypeText),
+            npe)
       }
       UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
     }

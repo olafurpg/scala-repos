@@ -223,8 +223,8 @@ object ScalaGenerationInfo {
 
     properties.setProperty(FileTemplate.ATTRIBUTE_RETURN_TYPE,
                            ScType.presentableText(returnType))
-    properties
-      .setProperty(FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
+    properties.setProperty(FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE,
+                           standardValue)
     properties.setProperty(FileTemplate.ATTRIBUTE_CALL_SUPER,
                            callSuperText(td, method))
     properties.setProperty(

@@ -86,8 +86,7 @@ package object financial {
       val denominator =
         ((1.0 + rate * when.t) / rate) *
           (math.pow(1.0 + rate, numPeriods) - 1.0)
-      -1 * (futureValue + presentValue * math
-        .pow(1.0 + rate, numPeriods)) / denominator
+      -1 * (futureValue + presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
     }
   }
 
@@ -170,8 +169,8 @@ package object financial {
     //pading 0 to the end
     val fullRoots =
       if (0 < trailingZeros) {
-        DenseVector
-          .vertcat(complexRoots, DenseVector.zeros[Complex](trailingZeros))
+        DenseVector.vertcat(complexRoots,
+                            DenseVector.zeros[Complex](trailingZeros))
       } else {
         complexRoots
       }

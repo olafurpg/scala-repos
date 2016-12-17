@@ -40,8 +40,9 @@ class ScalaParameterTableModelItem(parameter: ScalaParameterInfo,
     }
 
     if (typeText.isEmpty) {
-      problems += RefactoringBundle
-        .message("changeSignature.no.type.for.parameter", parameter.getName)
+      problems += RefactoringBundle.message(
+        "changeSignature.no.type.for.parameter",
+        parameter.getName)
       return
     }
 

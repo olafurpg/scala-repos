@@ -56,8 +56,9 @@ trait JettyContainer extends Container {
       case _ =>
     }
 
-    servletContextHandler
-      .addServlet(holder, if (path.endsWith("/*")) path else path + "/*")
+    servletContextHandler.addServlet(
+      holder,
+      if (path.endsWith("/*")) path else path + "/*")
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], path: String) =
@@ -83,8 +84,9 @@ trait JettyContainer extends Container {
   // Add a default servlet.  If there is no underlying servlet, then
   // filters just return 404.
   if (!skipDefaultServlet)
-    servletContextHandler
-      .addServlet(new ServletHolder("default", classOf[DefaultServlet]), "/")
+    servletContextHandler.addServlet(
+      new ServletHolder("default", classOf[DefaultServlet]),
+      "/")
 
   protected def ensureSessionIsSerializable() {
     servletContextHandler.getSessionHandler.addEventListener(

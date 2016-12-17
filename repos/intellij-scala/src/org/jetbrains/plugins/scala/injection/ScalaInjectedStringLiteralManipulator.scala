@@ -47,8 +47,9 @@ class ScalaInjectedStringLiteralManipulator
               "cannot handle content change")
         }
       case str if str.isString =>
-        val newExpr = ScalaPsiElementFactory
-          .createExpressionFromText(newText, str.getManager)
+        val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+          newText,
+          str.getManager)
 
         val firstChild = str.getFirstChild
         val newElement = newExpr.getFirstChild

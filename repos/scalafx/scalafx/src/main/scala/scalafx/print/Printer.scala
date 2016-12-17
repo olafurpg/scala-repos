@@ -160,8 +160,12 @@ final class Printer(override val delegate: jfxp.Printer)
                        rMargin: Double,
                        tMargin: Double,
                        bMargin: Double): PageLayout =
-    delegate
-      .createPageLayout(paper, orient, lMargin, rMargin, tMargin, bMargin)
+    delegate.createPageLayout(paper,
+                              orient,
+                              lMargin,
+                              rMargin,
+                              tMargin,
+                              bMargin)
 
   /**
     * Obtain a new PageLayout instance for this printer using the specified parameters.

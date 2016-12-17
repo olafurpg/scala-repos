@@ -64,8 +64,10 @@ class CapConcurrentExecutions private (metrics: CapConcurrentExecutionsMetrics,
   import CapConcurrentExecutions.log
 
   private[util] val serializeExecutionActorRef = {
-    val serializeExecutionActorProps = RestrictParallelExecutionsActor
-      .props(metrics, maxParallel = maxParallel, maxQueued = maxQueued)
+    val serializeExecutionActorProps = RestrictParallelExecutionsActor.props(
+      metrics,
+      maxParallel = maxParallel,
+      maxQueued = maxQueued)
     actorRefFactory.actorOf(serializeExecutionActorProps, actorName)
   }
 
@@ -74,8 +76,9 @@ class CapConcurrentExecutions private (metrics: CapConcurrentExecutionsMetrics,
     */
   def apply[T](block: => Future[T]): Future[T] = {
     val promise = Promise[T]()
-    serializeExecutionActorRef ! RestrictParallelExecutionsActor
-      .Execute(promise, () => block)
+    serializeExecutionActorRef ! RestrictParallelExecutionsActor.Execute(
+      promise,
+      () => block)
     promise.future
   }
 

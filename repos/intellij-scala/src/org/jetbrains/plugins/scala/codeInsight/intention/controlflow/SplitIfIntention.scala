@@ -89,8 +89,8 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
     }
 
     val newIfStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
     val diff =
       newIfStmt
         .asInstanceOf[ScIfStmt]

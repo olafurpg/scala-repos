@@ -49,8 +49,9 @@ trait LocationLineManager { self: ScalaPositionManager =>
 
   def exactLineNumber(location: Location): Int = {
     checkAndUpdateCaches(location.declaringType())
-    customizedLocationsCache
-      .getOrElse(location, ScalaPositionManager.checkedLineNumber(location))
+    customizedLocationsCache.getOrElse(
+      location,
+      ScalaPositionManager.checkedLineNumber(location))
   }
 
   def shouldSkip(location: Location): Boolean = {
@@ -95,8 +96,9 @@ trait LocationLineManager { self: ScalaPositionManager =>
 
     val key = (location.declaringType(), customLine)
     val old = lineToCustomizedLocationCache.getOrElse(key, Seq.empty)
-    lineToCustomizedLocationCache
-      .update(key, (old :+ location).sortBy(_.codeIndex()))
+    lineToCustomizedLocationCache.update(
+      key,
+      (old :+ location).sortBy(_.codeIndex()))
   }
 
   private def computeCustomizedLocationsFor(refType: ReferenceType): Unit = {

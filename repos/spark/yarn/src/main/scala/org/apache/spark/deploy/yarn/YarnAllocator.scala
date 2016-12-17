@@ -501,8 +501,9 @@ private[yarn] class YarnAllocator(driverUrl: String,
       executorIdToContainer(executorId) = container
       containerIdToExecutorId(container.getId) = executorId
 
-      val containerSet = allocatedHostToContainersMap
-        .getOrElseUpdate(executorHostname, new HashSet[ContainerId])
+      val containerSet = allocatedHostToContainersMap.getOrElseUpdate(
+        executorHostname,
+        new HashSet[ContainerId])
 
       containerSet += containerId
       allocatedContainerToHostMap.put(containerId, executorHostname)

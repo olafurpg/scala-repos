@@ -1338,8 +1338,11 @@ with ContextTrees with RichCompilationUnits with Picklers {
         .newName(
           new String(pos.source.content, nameStart, pos.start - nameStart))
         .encodedName
-      CompletionResult
-        .TypeMembers(positionDelta, qual, tree, allTypeMembers, subName)
+      CompletionResult.TypeMembers(positionDelta,
+                                   qual,
+                                   tree,
+                                   allTypeMembers,
+                                   subName)
     }
     focus1 match {
       case imp @ Import(i @ Ident(name), head :: Nil)

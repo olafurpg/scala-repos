@@ -106,15 +106,15 @@ object OpenIDSpec extends Specification with Mockito {
     "generate a valid redirectUrl with a proper 'if_available' AND required extended attributes request" in {
       val ws = createMockWithValidOpDiscoveryAndVerification
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
-      val redirectUrl = Await
-        .result(openId.redirectURL(
-                  "http://example.com",
-                  "http://foo.bar.com/returnto",
-                  axRequired =
-                    Seq("first" -> "http://axschema.org/namePerson/first"),
-                  axOptional =
-                    Seq("email" -> "http://schema.openid.net/contact/email")),
-                dur)
+      val redirectUrl =
+        Await.result(openId.redirectURL(
+                       "http://example.com",
+                       "http://foo.bar.com/returnto",
+                       axRequired = Seq(
+                         "first" -> "http://axschema.org/namePerson/first"),
+                       axOptional = Seq(
+                         "email" -> "http://schema.openid.net/contact/email")),
+                     dur)
 
       val query = parseQueryString(redirectUrl)
 
@@ -233,8 +233,7 @@ object OpenIDSpec extends Specification with Mockito {
       val errorResponse =
         (openIdResponse - "openid.mode") + ("openid.mode" -> Seq("error"))
 
-      Await
-        .result(openId.verifiedId(setupMockRequest(errorResponse)), dur) must throwA[
+      Await.result(openId.verifiedId(setupMockRequest(errorResponse)), dur) must throwA[
         BAD_RESPONSE.type]
     }
 

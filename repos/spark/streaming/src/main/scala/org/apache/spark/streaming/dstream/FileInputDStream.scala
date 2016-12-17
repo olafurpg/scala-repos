@@ -118,8 +118,8 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
    * selected and processed.
    */
   private val numBatchesToRemember =
-    FileInputDStream
-      .calculateNumBatchesToRemember(slideDuration, minRememberDurationS)
+    FileInputDStream.calculateNumBatchesToRemember(slideDuration,
+                                                   minRememberDurationS)
   private val durationToRemember = slideDuration * numBatchesToRemember
   remember(durationToRemember)
 

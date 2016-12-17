@@ -189,10 +189,11 @@ class GossipSpec extends WordSpec with Matchers {
     "know who is youngest" in {
       // a2 and e1 is Joining
       val g1 =
-        Gossip(members = SortedSet(a2, b1.copyUp(3), e1),
-               overview = GossipOverview(
-                 reachability = Reachability.empty
-                   .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
+        Gossip(
+          members = SortedSet(a2, b1.copyUp(3), e1),
+          overview = GossipOverview(
+            reachability = Reachability.empty.unreachable(a2.uniqueAddress,
+                                                          e1.uniqueAddress)))
       g1.youngestMember should ===(b1)
       val g2 =
         Gossip(members = SortedSet(a2, b1.copyUp(3), e1),

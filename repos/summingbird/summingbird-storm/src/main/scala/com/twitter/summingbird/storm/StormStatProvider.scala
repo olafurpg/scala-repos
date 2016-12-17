@@ -35,8 +35,8 @@ private[summingbird] object StormStatProvider extends PlatformStatProvider {
                       context: TopologyContext,
                       metrics: Seq[(Group, Name)]) {
 
-    metricsForJob
-      .putIfAbsent(jobID, new ConcurrentHashMap[String, CountMetric])
+    metricsForJob.putIfAbsent(jobID,
+                              new ConcurrentHashMap[String, CountMetric])
     val jobMap = metricsForJob.get(jobID)
 
     metrics.foreach {

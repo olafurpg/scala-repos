@@ -2957,8 +2957,7 @@ trait Types
       val quantifiedFresh = cloneSymbols(quantified)
       val tvars = quantifiedFresh map (tparam => TypeVar(tparam))
       val underlying1 =
-        underlying
-          .instantiateTypeParams(quantified, tvars) // fuse subst quantified -> quantifiedFresh -> tvars
+        underlying.instantiateTypeParams(quantified, tvars) // fuse subst quantified -> quantifiedFresh -> tvars
       op(underlying1) && {
         solve(tvars,
               quantifiedFresh,

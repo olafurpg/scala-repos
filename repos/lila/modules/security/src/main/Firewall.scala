@@ -64,8 +64,9 @@ final class Firewall(cookieName: Option[String],
   }
 
   private def formatReq(req: RequestHeader) =
-    "%s %s %s"
-      .format(req.remoteAddress, req.uri, req.headers.get("User-Agent") | "?")
+    "%s %s %s".format(req.remoteAddress,
+                      req.uri,
+                      req.headers.get("User-Agent") | "?")
 
   private def blocksCookies(cookies: Cookies, name: String) =
     (cookies get name).isDefined

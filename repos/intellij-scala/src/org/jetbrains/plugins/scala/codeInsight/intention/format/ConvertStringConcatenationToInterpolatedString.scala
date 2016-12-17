@@ -23,8 +23,9 @@ class ConvertStringConcatenationToInterpolatedString
   override def isAvailable(project: Project,
                            editor: Editor,
                            element: PsiElement): Boolean = {
-    if (!super
-          .isAvailable(project: Project, editor: Editor, element: PsiElement))
+    if (!super.isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement))
       return false
     element.scalaLanguageLevel.getOrElse(ScalaLanguageLevel.Default) >= Scala_2_10
   }

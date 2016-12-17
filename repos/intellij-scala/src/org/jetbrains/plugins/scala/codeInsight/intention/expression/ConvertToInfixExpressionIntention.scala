@@ -123,8 +123,7 @@ class ConvertToInfixExpressionIntention extends PsiElementBaseIntentionAction {
     }
 
     val text = expr.toString()
-    ScalaPsiElementFactory
-      .createExpressionFromText(text, element.getManager) match {
+    ScalaPsiElementFactory.createExpressionFromText(text, element.getManager) match {
       case infixExpr: ScInfixExpr =>
         infixExpr
           .asInstanceOf[ScInfixExpr]

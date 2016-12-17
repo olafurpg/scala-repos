@@ -93,8 +93,8 @@ class ReceiverTrackerSuite extends TestSuiteBase {
     "SPARK-11063: TaskSetManager should use Receiver RDD's preferredLocations") {
     // Use ManualClock to prevent from starting batches so that we can make sure the only task is
     // for starting the Receiver
-    val _conf = conf.clone
-      .set("spark.streaming.clock", "org.apache.spark.util.ManualClock")
+    val _conf = conf.clone.set("spark.streaming.clock",
+                               "org.apache.spark.util.ManualClock")
     withStreamingContext(new StreamingContext(_conf, Milliseconds(100))) {
       ssc =>
         @volatile var receiverTaskLocality: TaskLocality = null

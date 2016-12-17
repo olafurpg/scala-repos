@@ -38,8 +38,7 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
               .flatMap {
                 case (progress, moveOrDrop) =>
                   (GameRepo save progress).mon(_.round.move.segment.save) >>-
-                    (pov.game.hasAi ! uciMemo
-                      .add(pov.game, moveOrDrop)) >>- notifyMove(
+                    (pov.game.hasAi ! uciMemo.add(pov.game, moveOrDrop)) >>- notifyMove(
                     moveOrDrop,
                     progress.game) >> progress.game.finished
                     .fold(moveFinish(progress.game, color) map {
@@ -83,8 +82,8 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
           .fold(errs => fufail(ClientError(errs.shows)), fuccess)
           .flatMap {
             case (progress, moveOrDrop) =>
-              (GameRepo save progress) >>- uciMemo
-                .add(progress.game, moveOrDrop) >>- notifyMove(
+              (GameRepo save progress) >>- uciMemo.add(progress.game,
+                                                       moveOrDrop) >>- notifyMove(
                 moveOrDrop,
                 progress.game) >> progress.game.finished.fold(
                 moveFinish(progress.game, game.turnColor) map {

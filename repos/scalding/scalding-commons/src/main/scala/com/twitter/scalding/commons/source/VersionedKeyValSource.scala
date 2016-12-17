@@ -234,8 +234,10 @@ class VersionedKeyValSource[K, V](val path: String,
   }
 
   override def toString =
-    "%s path:%s,sourceVersion:%s,sinkVersion:%s"
-      .format(getClass(), path, sourceVersion, sinkVersion)
+    "%s path:%s,sourceVersion:%s,sinkVersion:%s".format(getClass(),
+                                                        path,
+                                                        sourceVersion,
+                                                        sinkVersion)
 
   override def equals(other: Any) =
     if (other.isInstanceOf[VersionedKeyValSource[_, _]]) {

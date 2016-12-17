@@ -285,8 +285,8 @@ object CSRF {
   class JavaCSRFErrorHandlerAdapter @Inject()(underlying: CSRFErrorHandler)
       extends ErrorHandler {
     def handle(request: RequestHeader, msg: String) =
-      JavaHelpers
-        .invokeWithContext(request, req => underlying.handle(req, msg))
+      JavaHelpers.invokeWithContext(request,
+                                    req => underlying.handle(req, msg))
   }
 
   class JavaCSRFErrorHandlerDelegate @Inject()(delegate: ErrorHandler)

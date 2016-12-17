@@ -139,6 +139,7 @@ object Managed {
 class DoubleTrouble(cause1: Throwable, cause2: Throwable) extends Exception {
   override def getStackTrace = cause1.getStackTrace
   override def getMessage =
-    "Double failure while disposing composite resource: %s \n %s"
-      .format(cause1.getMessage, cause2.getMessage)
+    "Double failure while disposing composite resource: %s \n %s".format(
+      cause1.getMessage,
+      cause2.getMessage)
 }

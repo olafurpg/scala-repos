@@ -190,8 +190,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
           field.flags & ~PrivateLocal | ACCESSOR | lateDEFERRED |
             (if (field.isMutable) 0 else STABLE)
         // TODO preserve pre-erasure info?
-        clazz
-          .newMethod(field.getterName, field.pos, newFlags) setInfo MethodType(
+        clazz.newMethod(field.getterName, field.pos, newFlags) setInfo MethodType(
           Nil,
           field.info)
       }
@@ -1105,8 +1104,10 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
           // mark fields which can be nulled afterward
           lazyValNullables = nullableFields(templ) withDefaultValue Set()
           // add all new definitions to current class or interface
-          treeCopy
-            .Template(tree, parents1, self, addNewDefs(currentOwner, body))
+          treeCopy.Template(tree,
+                            parents1,
+                            self,
+                            addNewDefs(currentOwner, body))
 
         case Select(qual, name) if sym.owner.isTrait && !sym.isMethod =>
           // refer to fields in some trait an abstract getter in the interface.

@@ -40,8 +40,7 @@ object JavaScriptContext {
             case x :: Nil => (PassThru, Full(x))
             case x :: "it" :: Nil => session.buildXformer(x, Nil) -> Empty
             case x :: str :: Nil if str.startsWith("it.") =>
-              session
-                .buildXformer(x, str.roboSplit("\\.").filter(_ != "it")) -> Empty
+              session.buildXformer(x, str.roboSplit("\\.").filter(_ != "it")) -> Empty
             case x :: xs => session.buildXformer(x, Nil) -> Full(xs.mkString)
             case _ => (PassThru, Full(value))
           }

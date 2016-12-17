@@ -578,8 +578,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert
-      .assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert.assertTrue("actual: " + actual.toString,
+                      pattern.isDefinedAt(actual))
   }
 
   def assertNoErrors(messages: List[Message]): Unit = {

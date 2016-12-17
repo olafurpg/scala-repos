@@ -94,8 +94,8 @@ class HoistClientOps extends Phase {
                   select =
                     Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger
-                .debug("Translated left join side:", Ellipsis(bl2, List(0)))
+              logger.debug("Translated left join side:",
+                           Ellipsis(bl2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap
@@ -121,8 +121,8 @@ class HoistClientOps extends Phase {
                   select =
                     Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger
-                .debug("Translated right join side:", Ellipsis(br2, List(0)))
+              logger.debug("Translated right join side:",
+                           Ellipsis(br2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap

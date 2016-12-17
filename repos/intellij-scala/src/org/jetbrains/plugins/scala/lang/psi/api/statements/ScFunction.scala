@@ -352,8 +352,8 @@ trait ScFunction
             fun.returnTypeInner
           case _ =>
         }
-        parent
-          .putUserData(ScFunction.calculatedBlockKey, java.lang.Boolean.TRUE)
+        parent.putUserData(ScFunction.calculatedBlockKey,
+                           java.lang.Boolean.TRUE)
         returnTypeInner
       }
     } else returnTypeInner
@@ -381,15 +381,17 @@ trait ScFunction
         case owner: ScTypeParametersOwner =>
           if (hasImplicit) None
           else
-            ScalaPsiUtil
-              .syntheticParamClause(owner, paramClauses, classParam = false)
+            ScalaPsiUtil.syntheticParamClause(owner,
+                                              paramClauses,
+                                              classParam = false)
         case _ => None
       }
     } else {
       if (hasImplicit) None
       else
-        ScalaPsiUtil
-          .syntheticParamClause(this, paramClauses, classParam = false)
+        ScalaPsiUtil.syntheticParamClause(this,
+                                          paramClauses,
+                                          classParam = false)
     }
   }
 

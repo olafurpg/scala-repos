@@ -152,8 +152,9 @@ class GraphUnzipWithSpec extends AkkaSpec {
     }
 
     "work in the sad case" in {
-      val settings = ActorMaterializerSettings(system)
-        .withInputBuffer(initialSize = 1, maxSize = 1)
+      val settings =
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 1,
+                                                          maxSize = 1)
 
       val leftProbe = TestSubscriber.manualProbe[LeftOutput]()
       val rightProbe = TestSubscriber.manualProbe[RightOutput]()

@@ -197,8 +197,9 @@ object ResourceMatcher {
               if (nextResource.hasReservation)
                 Option(nextResource.getReservation)
               else None
-            val consumedValue = ScalarMatch
-              .Consumption(consume, nextResource.getRole, reservation)
+            val consumedValue = ScalarMatch.Consumption(consume,
+                                                        nextResource.getRole,
+                                                        reservation)
             findMatches(newValueLeft,
                         resourcesLeft.tail,
                         consumedValue :: resourcesConsumed)

@@ -43,8 +43,8 @@ case class BulkReply(message: ChannelBuffer) extends MultiLineReply {
 case class EmptyBulkReply() extends MultiLineReply {
   val message = "$-1"
   override def toChannelBuffer =
-    ChannelBuffers
-      .wrappedBuffer(RedisCodec.NIL_BULK_REPLY_BA, RedisCodec.EOL_DELIMITER_BA)
+    ChannelBuffers.wrappedBuffer(RedisCodec.NIL_BULK_REPLY_BA,
+                                 RedisCodec.EOL_DELIMITER_BA)
 }
 
 case class MBulkReply(messages: List[Reply]) extends MultiLineReply {

@@ -56,6 +56,7 @@ class InitialBatchedStore[K, V](val firstNonZero: BatchID,
   }
 
   override def toString =
-    "InitialBatchedStore(firstNonZero=%s, proxyingFor=%s)"
-      .format(firstNonZero.toString, proxy.toString)
+    "InitialBatchedStore(firstNonZero=%s, proxyingFor=%s)".format(
+      firstNonZero.toString,
+      proxy.toString)
 }

@@ -66,8 +66,9 @@ class Partition(val topic: String,
    * In addition to the leader, the controller can also send the epoch of the controller that elected the leader for
    * each partition. */
   private var controllerEpoch: Int = KafkaController.InitialControllerEpoch - 1
-  this.logIdent = "Partition [%s,%d] on broker %d: "
-    .format(topic, partitionId, localBrokerId)
+  this.logIdent = "Partition [%s,%d] on broker %d: ".format(topic,
+                                                            partitionId,
+                                                            localBrokerId)
 
   private def isReplicaLocal(replicaId: Int): Boolean =
     (replicaId == localBrokerId)
@@ -158,9 +159,10 @@ class Partition(val topic: String,
         removePartitionMetrics()
       } catch {
         case e: IOException =>
-          fatal("Error deleting the log for partition [%s,%d]"
-                  .format(topic, partitionId),
-                e)
+          fatal(
+            "Error deleting the log for partition [%s,%d]".format(topic,
+                                                                  partitionId),
+            e)
           Runtime.getRuntime().halt(1)
       }
     }

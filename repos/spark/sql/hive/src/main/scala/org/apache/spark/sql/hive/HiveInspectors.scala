@@ -788,8 +788,9 @@ private[hive] trait HiveInspectors {
       val keyOI = toInspector(keyType)
       val valueOI = toInspector(valueType)
       if (value == null) {
-        ObjectInspectorFactory
-          .getStandardConstantMapObjectInspector(keyOI, valueOI, null)
+        ObjectInspectorFactory.getStandardConstantMapObjectInspector(keyOI,
+                                                                     valueOI,
+                                                                     null)
       } else {
         val map = value.asInstanceOf[MapData]
         val jmap = new java.util.HashMap[Any, Any](map.numElements())
@@ -798,8 +799,9 @@ private[hive] trait HiveInspectors {
           jmap.put(wrap(k, keyOI, keyType), wrap(v, valueOI, valueType))
         })
 
-        ObjectInspectorFactory
-          .getStandardConstantMapObjectInspector(keyOI, valueOI, jmap)
+        ObjectInspectorFactory.getStandardConstantMapObjectInspector(keyOI,
+                                                                     valueOI,
+                                                                     jmap)
       }
     // We will enumerate all of the possible constant expressions, throw exception if we missed
     case Literal(_, dt) =>

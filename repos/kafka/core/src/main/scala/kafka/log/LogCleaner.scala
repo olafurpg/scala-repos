@@ -296,10 +296,12 @@ class LogCleaner(val config: CleanerConfig,
               stats.elapsedSecs - stats.elapsedIndexSecs,
               mb(stats.bytesRead) / (stats.elapsedSecs - stats.elapsedIndexSecs),
               100 * (stats.elapsedSecs - stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
-          "\tStart size: %,.1f MB (%,d messages)%n"
-            .format(mb(stats.bytesRead), stats.messagesRead) +
-          "\tEnd size: %,.1f MB (%,d messages)%n"
-            .format(mb(stats.bytesWritten), stats.messagesWritten) +
+          "\tStart size: %,.1f MB (%,d messages)%n".format(
+            mb(stats.bytesRead),
+            stats.messagesRead) +
+          "\tEnd size: %,.1f MB (%,d messages)%n".format(
+            mb(stats.bytesWritten),
+            stats.messagesWritten) +
           "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
             100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
             100.0 * (1.0 - stats.messagesWritten.toDouble / stats.messagesRead))
@@ -505,8 +507,9 @@ private[log] class Cleaner(val id: Int,
           if (shouldRetainMessage(source, map, retainDeletes, entry)) {
             val convertedMessage =
               entry.message.toFormatVersion(messageFormatVersion)
-            ByteBufferMessageSet
-              .writeMessage(writeBuffer, convertedMessage, entry.offset)
+            ByteBufferMessageSet.writeMessage(writeBuffer,
+                                              convertedMessage,
+                                              entry.offset)
             stats.recopyMessage(size)
           }
           messagesRead += 1
@@ -536,8 +539,9 @@ private[log] class Cleaner(val id: Int,
 
           // There are no messages compacted out and no message format conversion, write the original message set back
           if (writeOriginalMessageSet)
-            ByteBufferMessageSet
-              .writeMessage(writeBuffer, entry.message, entry.offset)
+            ByteBufferMessageSet.writeMessage(writeBuffer,
+                                              entry.message,
+                                              entry.offset)
           else if (retainedMessages.nonEmpty)
             compressMessages(writeBuffer,
                              entry.message.compressionCodec,
@@ -570,8 +574,9 @@ private[log] class Cleaner(val id: Int,
       MessageSet.Empty.sizeInBytes
     } else if (compressionCodec == NoCompressionCodec) {
       for (messageOffset <- messageAndOffsets)
-        ByteBufferMessageSet
-          .writeMessage(buffer, messageOffset.message, messageOffset.offset)
+        ByteBufferMessageSet.writeMessage(buffer,
+                                          messageOffset.message,
+                                          messageOffset.offset)
       MessageSet.messageSetSize(messages)
     } else {
       val magicAndTimestamp = MessageSet.magicAndLargestTimestamp(messages)

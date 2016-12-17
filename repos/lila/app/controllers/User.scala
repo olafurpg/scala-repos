@@ -216,8 +216,12 @@ object User extends LilaController {
         .userHistory(user.id) flatMap {
         case ((((email, spy), playerAggregateAssessment), history)) =>
           (Env.playban.api bans spy.usersSharingIp.map(_.id)) map { bans =>
-            html.user
-              .mod(user, email, spy, playerAggregateAssessment, bans, history)
+            html.user.mod(user,
+                          email,
+                          spy,
+                          playerAggregateAssessment,
+                          bans,
+                          history)
           }
       }
     }

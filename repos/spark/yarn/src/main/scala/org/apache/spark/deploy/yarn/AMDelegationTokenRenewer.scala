@@ -95,8 +95,9 @@ private[yarn] class AMDelegationTokenRenewer(sparkConf: SparkConf,
         runnable.run()
       } else {
         logInfo(s"Scheduling login from keytab in $renewalInterval millis.")
-        delegationTokenRenewer
-          .schedule(runnable, renewalInterval, TimeUnit.MILLISECONDS)
+        delegationTokenRenewer.schedule(runnable,
+                                        renewalInterval,
+                                        TimeUnit.MILLISECONDS)
       }
     }
 
@@ -183,8 +184,9 @@ private[yarn] class AMDelegationTokenRenewer(sparkConf: SparkConf,
       override def run(): Void = {
         val nns = YarnSparkHadoopUtil.get.getNameNodesToAccess(sparkConf) + dst
         hadoopUtil.obtainTokensForNamenodes(nns, freshHadoopConf, tempCreds)
-        hadoopUtil
-          .obtainTokenForHiveMetastore(sparkConf, freshHadoopConf, tempCreds)
+        hadoopUtil.obtainTokenForHiveMetastore(sparkConf,
+                                               freshHadoopConf,
+                                               tempCreds)
         hadoopUtil.obtainTokenForHBase(sparkConf, freshHadoopConf, tempCreds)
         null
       }

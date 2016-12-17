@@ -56,8 +56,10 @@ object ConvertImplicitBoundsToImplicitParameter {
   def canBeConverted(element: PsiElement): Boolean = {
     val paramTypeElement: ScTypeBoundsOwner =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeBoundsOwner], false)
-    val scTypeParamOwner: ScTypeParametersOwner = PsiTreeUtil
-      .getParentOfType(paramTypeElement, classOf[ScTypeParametersOwner], true)
+    val scTypeParamOwner: ScTypeParametersOwner = PsiTreeUtil.getParentOfType(
+      paramTypeElement,
+      classOf[ScTypeParametersOwner],
+      true)
     paramTypeElement != null && paramTypeElement.hasImplicitBound &&
     !scTypeParamOwner.isInstanceOf[ScTrait]
   }
@@ -66,8 +68,10 @@ object ConvertImplicitBoundsToImplicitParameter {
     if (element == null || !element.isValid) return Seq.empty
     val (function: ScMethodLike,
          paramOwner: ScParameterOwner,
-         typeParamOwner: ScTypeParametersOwner) = PsiTreeUtil
-      .getParentOfType(element, classOf[ScParameterOwner], false) match {
+         typeParamOwner: ScTypeParametersOwner) = PsiTreeUtil.getParentOfType(
+      element,
+      classOf[ScParameterOwner],
+      false) match {
       case x: ScFunction => (x, x, x)
       case x: ScClass => (x.constructor.getOrElse(return Seq.empty), x, x)
       case _ => return Seq.empty
@@ -84,12 +88,14 @@ object ConvertImplicitBoundsToImplicitParameter {
         paramClause.delete()
         function.effectiveParameterClauses.lastOption match {
           case Some(implicitParamClause) if implicitParamClause.isImplicit =>
-            val newClause = ScalaPsiElementFactory
-              .createClauseFromText(implicitParamClause.getText, manager)
+            val newClause = ScalaPsiElementFactory.createClauseFromText(
+              implicitParamClause.getText,
+              manager)
             val addedParametersCount = newClause.parameters.size
             for (p <- paramClause.parameters) {
-              val newParam = ScalaPsiElementFactory
-                .createParameterFromText(p.getText, manager)
+              val newParam = ScalaPsiElementFactory.createParameterFromText(
+                p.getText,
+                manager)
               newClause.addParameter(newParam)
             }
             val addedClause =

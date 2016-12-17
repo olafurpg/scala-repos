@@ -111,8 +111,9 @@ trait RandomGeneratorUFunc[T] extends UFunc {
     : Impl2[(Int, Int), (T, T), DenseMatrix[T]] =
     new Impl2[(Int, Int), (T, T), DenseMatrix[T]] {
       def apply(dimensions2: (Int, Int), range: (T, T)): DenseMatrix[T] = {
-        DenseMatrix
-          .rand(dimensions2._1, dimensions2._2, genRange(range._1, range._2))
+        DenseMatrix.rand(dimensions2._1,
+                         dimensions2._2,
+                         genRange(range._1, range._2))
       }
     }
 }

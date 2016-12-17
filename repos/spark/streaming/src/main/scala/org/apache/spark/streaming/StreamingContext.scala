@@ -102,11 +102,13 @@ class StreamingContext private[streaming] (
            sparkHome: String = null,
            jars: Seq[String] = Nil,
            environment: Map[String, String] = Map()) = {
-    this(
-      StreamingContext
-        .createNewSparkContext(master, appName, sparkHome, jars, environment),
-      null,
-      batchDuration)
+    this(StreamingContext.createNewSparkContext(master,
+                                                appName,
+                                                sparkHome,
+                                                jars,
+                                                environment),
+         null,
+         batchDuration)
   }
 
   /**
@@ -287,8 +289,10 @@ class StreamingContext private[streaming] (
     * Note: Return statements are NOT allowed in the given body.
     */
   private[streaming] def withNamedScope[U](name: String)(body: => U): U = {
-    RDDOperationScope
-      .withScope(sc, name, allowNesting = false, ignoreParent = false)(body)
+    RDDOperationScope.withScope(sc,
+                                name,
+                                allowNesting = false,
+                                ignoreParent = false)(body)
   }
 
   /**
@@ -865,8 +869,10 @@ object StreamingContext extends Logging {
       hadoopConf: Configuration = SparkHadoopUtil.get.conf,
       createOnError: Boolean = false
   ): StreamingContext = {
-    val checkpointOption = CheckpointReader
-      .read(checkpointPath, new SparkConf(), hadoopConf, createOnError)
+    val checkpointOption = CheckpointReader.read(checkpointPath,
+                                                 new SparkConf(),
+                                                 hadoopConf,
+                                                 createOnError)
     checkpointOption
       .map(new StreamingContext(null, _, null))
       .getOrElse(creatingFunc())
@@ -919,8 +925,10 @@ private class StreamingContextPythonHelper {
     */
   def tryRecoverFromCheckpoint(
       checkpointPath: String): Option[StreamingContext] = {
-    val checkpointOption = CheckpointReader
-      .read(checkpointPath, new SparkConf(), SparkHadoopUtil.get.conf, false)
+    val checkpointOption = CheckpointReader.read(checkpointPath,
+                                                 new SparkConf(),
+                                                 SparkHadoopUtil.get.conf,
+                                                 false)
     checkpointOption.map(new StreamingContext(null, _, null))
   }
 }

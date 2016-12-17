@@ -187,8 +187,8 @@ object ColorSelector extends JFXApp {
                             Color.White)
   })
   controlBlue.selectedControl.onChange(controlSelected(controlBlue))
-  controlBlue
-    .changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt), Color.White)
+  controlBlue.changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt),
+                          Color.White)
 
   val controlAlpha = new SliderControl("A") {
     value = 255

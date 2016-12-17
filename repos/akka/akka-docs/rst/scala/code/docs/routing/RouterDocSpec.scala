@@ -452,8 +452,9 @@ router-dispatcher {}
     //#consistent-hashing-pool-1
 
     //#consistent-hashing-pool-2
-    val router26: ActorRef = context
-      .actorOf(ConsistentHashingPool(5).props(Props[Worker]), "router26")
+    val router26: ActorRef = context.actorOf(
+      ConsistentHashingPool(5).props(Props[Worker]),
+      "router26")
     //#consistent-hashing-pool-2
 
     //#consistent-hashing-group-1

@@ -176,8 +176,8 @@ object Partition {
     */
   def create[T](outputCount: Int, partitioner: function.Function[T, Int])
     : Graph[UniformFanOutShape[T, T], NotUsed] =
-    scaladsl
-      .Partition(outputCount, partitioner = (t: T) ⇒ partitioner.apply(t))
+    scaladsl.Partition(outputCount,
+                       partitioner = (t: T) ⇒ partitioner.apply(t))
 
   /**
     * Create a new `Partition` stage with the specified input type.

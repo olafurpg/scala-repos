@@ -96,13 +96,13 @@ class GeneratedProjectionSuite extends SparkFunSuite {
     val unsafeRow: UnsafeRow = unsafeProj(row)
     assert(java.util.Arrays.equals(unsafeRow.getBinary(0), Array[Byte](1, 2)))
     assert(
-      java.util.Arrays
-        .equals(unsafeRow.getArray(1).getBinary(0), Array[Byte](1, 2)))
+      java.util.Arrays.equals(unsafeRow.getArray(1).getBinary(0),
+                              Array[Byte](1, 2)))
     assert(unsafeRow.getArray(1).isNullAt(1))
     assert(unsafeRow.getArray(1).getBinary(1) === null)
     assert(
-      java.util.Arrays
-        .equals(unsafeRow.getArray(1).getBinary(2), Array[Byte](3, 4)))
+      java.util.Arrays.equals(unsafeRow.getArray(1).getBinary(2),
+                              Array[Byte](3, 4)))
 
     val safeProj = FromUnsafeProjection(fields)
     val row2 = safeProj(unsafeRow)

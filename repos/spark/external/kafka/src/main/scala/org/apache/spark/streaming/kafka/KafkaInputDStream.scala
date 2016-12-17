@@ -117,8 +117,9 @@ private[streaming] class KafkaReceiver[K: ClassTag,
     val topicMessageStreams =
       consumerConnector.createMessageStreams(topics, keyDecoder, valueDecoder)
 
-    val executorPool = ThreadUtils
-      .newDaemonFixedThreadPool(topics.values.sum, "KafkaMessageHandler")
+    val executorPool = ThreadUtils.newDaemonFixedThreadPool(
+      topics.values.sum,
+      "KafkaMessageHandler")
     try {
       // Start the messages handler for each partition
       topicMessageStreams.values.foreach { streams =>

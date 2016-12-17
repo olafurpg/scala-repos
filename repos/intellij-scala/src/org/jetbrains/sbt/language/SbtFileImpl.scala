@@ -33,10 +33,14 @@ class SbtFileImpl(provider: FileViewProvider)
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean =
-    super[ScalaFileImpl]
-      .processDeclarations(processor, state, lastParent, place) &&
-      super[ScDeclarationSequenceHolder]
-        .processDeclarations(processor, state, lastParent, place) &&
+    super[ScalaFileImpl].processDeclarations(processor,
+                                             state,
+                                             lastParent,
+                                             place) &&
+      super[ScDeclarationSequenceHolder].processDeclarations(processor,
+                                                             state,
+                                                             lastParent,
+                                                             place) &&
       processImplicitImports(processor, state, lastParent, place)
 
   private def processImplicitImports(processor: PsiScopeProcessor,

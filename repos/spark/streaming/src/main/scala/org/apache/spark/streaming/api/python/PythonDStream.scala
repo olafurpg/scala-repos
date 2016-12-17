@@ -332,8 +332,8 @@ private[python] class PythonReducedWindowedDStream(
         windowDuration >= slideDuration * 5) {
 
       // subtract the values from old RDDs
-      val oldRDDs = parent
-        .slice(previous.beginTime + parent.slideDuration, current.beginTime)
+      val oldRDDs = parent.slice(previous.beginTime + parent.slideDuration,
+                                 current.beginTime)
       val subtracted =
         if (oldRDDs.size > 0) {
           invReduceFunc(previousRDD, Some(ssc.sc.union(oldRDDs)), validTime)

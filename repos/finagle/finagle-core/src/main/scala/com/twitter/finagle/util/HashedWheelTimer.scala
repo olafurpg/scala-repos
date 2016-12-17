@@ -125,8 +125,9 @@ object HashedWheelTimer {
 
   val Default: Timer = new HashedWheelTimer(nettyHwt)
 
-  TimerStats
-    .deviation(nettyHwt, 10.milliseconds, FinagleStatsReceiver.scope("timer"))
+  TimerStats.deviation(nettyHwt,
+                       10.milliseconds,
+                       FinagleStatsReceiver.scope("timer"))
 
   TimerStats.hashedWheelTimerInternals(nettyHwt,
                                        () => 10.seconds,

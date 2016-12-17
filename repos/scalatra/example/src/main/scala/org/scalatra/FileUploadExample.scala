@@ -16,8 +16,9 @@ class FileUploadExample
     MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
   def displayPage(content: Seq[Node]) =
-    Template
-      .page("File upload example", content, url(_, includeServletPath = false))
+    Template.page("File upload example",
+                  content,
+                  url(_, includeServletPath = false))
 
   error {
     case e: SizeConstraintExceededException =>

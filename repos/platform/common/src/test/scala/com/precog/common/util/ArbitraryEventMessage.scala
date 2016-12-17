@@ -36,8 +36,8 @@ import Arbitrary.arbitrary
 
 trait ArbitraryEventMessage extends ArbitraryJValue {
   def genStreamId: Gen[Option[UUID]] =
-    Gen
-      .oneOf(Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)), None)
+    Gen.oneOf(Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)),
+              None)
 
   def genContentJValue: Gen[JValue] =
     frequency(

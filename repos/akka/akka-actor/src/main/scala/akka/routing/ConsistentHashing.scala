@@ -201,8 +201,8 @@ final case class ConsistentHashingRoutingLogic(
               ConsistentHash(routees.map(ConsistentRoutee(_, selfAddress)),
                              vnodes) // re-hash
           // ignore, don't update, in case of CAS failure
-          consistentHashRef
-            .compareAndSet(oldConsistentHashTuple, (routees, consistentHash))
+          consistentHashRef.compareAndSet(oldConsistentHashTuple,
+                                          (routees, consistentHash))
           consistentHash
         } else oldConsistentHash
       }

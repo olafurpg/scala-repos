@@ -49,8 +49,9 @@ class ExpandPatternIntention extends PsiElementBaseIntentionAction {
         IdeDocumentHistory
           .getInstance(project)
           .includeCurrentPlaceAsChangePlace()
-        val newPattern = ScalaPsiElementFactory
-          .createPatternFromText(newPatternText, element.getManager)
+        val newPattern = ScalaPsiElementFactory.createPatternFromText(
+          newPatternText,
+          element.getManager)
         val replaced = origPattern.replace(newPattern)
         ScalaPsiUtil.adjustTypes(replaced)
       case None =>

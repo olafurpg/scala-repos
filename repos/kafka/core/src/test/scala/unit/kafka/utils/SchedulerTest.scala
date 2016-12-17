@@ -61,10 +61,14 @@ class SchedulerTest {
 
   @Test
   def testMockSchedulerPeriodicTask() {
-    mockTime.scheduler
-      .schedule("test1", counter1.getAndIncrement, delay = 1, period = 1)
-    mockTime.scheduler
-      .schedule("test2", counter2.getAndIncrement, delay = 100, period = 100)
+    mockTime.scheduler.schedule("test1",
+                                counter1.getAndIncrement,
+                                delay = 1,
+                                period = 1)
+    mockTime.scheduler.schedule("test2",
+                                counter2.getAndIncrement,
+                                delay = 100,
+                                period = 100)
     assertEquals("Counter1 should not be incremented prior to task running.",
                  0,
                  counter1.get)
@@ -84,8 +88,9 @@ class SchedulerTest {
     mockTime.scheduler.schedule(
       "test1",
       () =>
-        mockTime.scheduler
-          .schedule("test2", counter2.getAndIncrement, delay = 0),
+        mockTime.scheduler.schedule("test2",
+                                    counter2.getAndIncrement,
+                                    delay = 0),
       delay = 1)
     mockTime.sleep(1)
     assertEquals(1, counter2.get)

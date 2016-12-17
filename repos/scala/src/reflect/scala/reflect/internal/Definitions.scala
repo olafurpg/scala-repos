@@ -1456,8 +1456,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     }
 
     lazy val AnnotationDefaultAttr: ClassSymbol = {
-      val sym = RuntimePackageClass
-        .newClassSymbol(tpnme.AnnotationDefaultATTR, NoPosition, 0L)
+      val sym = RuntimePackageClass.newClassSymbol(tpnme.AnnotationDefaultATTR,
+                                                   NoPosition,
+                                                   0L)
       sym setInfo ClassInfoType(List(AnnotationClass.tpe), newScope, sym)
       markAllCompleted(sym)
       RuntimePackageClass.info.decls.toList.filter(_.name == sym.name) match {

@@ -227,8 +227,8 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       mirror.classLoader.loadClass("org.apache.hadoop.hive.conf.HiveConf")
     // using the (Configuration, Class) constructor allows the current configuration to be included
     // in the hive config.
-    val ctor = hiveConfClass
-      .getDeclaredConstructor(classOf[Configuration], classOf[Object].getClass)
+    val ctor = hiveConfClass.getDeclaredConstructor(classOf[Configuration],
+                                                    classOf[Object].getClass)
     val hiveConf =
       ctor.newInstance(conf, hiveConfClass).asInstanceOf[Configuration]
     val metastoreUri = hiveConf.getTrimmed("hive.metastore.uris", "")
@@ -247,8 +247,9 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       val closeCurrent = hiveClass.getMethod("closeCurrent")
       try {
         // get all the instance methods before invoking any
-        val getDelegationToken = hiveClass
-          .getMethod("getDelegationToken", classOf[String], classOf[String])
+        val getDelegationToken = hiveClass.getMethod("getDelegationToken",
+                                                     classOf[String],
+                                                     classOf[String])
         val getHive = hiveClass.getMethod("get", hiveConfClass)
 
         doAsRealUser {

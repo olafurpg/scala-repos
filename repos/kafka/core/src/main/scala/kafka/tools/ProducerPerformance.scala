@@ -221,8 +221,8 @@ object ProducerPerformance extends Logging {
       props.put("kafka.metrics.reporters",
                 "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
-        props
-          .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
+        props.put("kafka.csv.metrics.dir",
+                  options.valueOf(metricsDirectoryOpt))
       else props.put("kafka.csv.metrics.dir", "kafka_metrics")
       props.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(props)
@@ -277,10 +277,10 @@ object ProducerPerformance extends Logging {
         props.put("client.id", "producer-performance")
         props.put("request.required.acks",
                   config.producerRequestRequiredAcks.toString)
-        props
-          .put("request.timeout.ms", config.producerRequestTimeoutMs.toString)
-        props
-          .put("message.send.max.retries", config.producerNumRetries.toString)
+        props.put("request.timeout.ms",
+                  config.producerRequestTimeoutMs.toString)
+        props.put("message.send.max.retries",
+                  config.producerNumRetries.toString)
         props.put("retry.backoff.ms", config.producerRetryBackoffMs.toString)
         props.put("serializer.class", classOf[DefaultEncoder].getName)
         props.put("key.serializer.class", classOf[NullEncoder[Long]].getName)

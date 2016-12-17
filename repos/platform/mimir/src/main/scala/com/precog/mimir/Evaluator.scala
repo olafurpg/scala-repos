@@ -464,8 +464,7 @@ trait EvaluatorModule[M[+ _]]
 
           def identityJoinSpec(ids: Vector[Int]): TransSpec1 = {
             if (ids.isEmpty) {
-              trans
-                .ConstLiteral(CEmptyArray, SourceKey.Single) // join with undefined, probably
+              trans.ConstLiteral(CEmptyArray, SourceKey.Single) // join with undefined, probably
             } else {
               val components = for (i <- ids)
                 yield
@@ -1069,11 +1068,12 @@ trait EvaluatorModule[M[+ _]]
                 pair <- zip(leftSortedM, rightSortedM)
                 (leftSorted, rightSorted) = pair
 
-                result = leftSorted
-                  .cogroup(keyValueSpec, keyValueSpec, rightSorted)(
-                    TransSpec1.Id,
-                    TransSpec1.DeleteKeyValue,
-                    TransSpec2.DeleteKeyValueLeft)
+                result = leftSorted.cogroup(keyValueSpec,
+                                            keyValueSpec,
+                                            rightSorted)(
+                  TransSpec1.Id,
+                  TransSpec1.DeleteKeyValue,
+                  TransSpec2.DeleteKeyValueLeft)
               } yield {
                 PendingTable(result,
                              graph,

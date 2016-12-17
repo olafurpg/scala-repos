@@ -119,8 +119,9 @@ class SessionCatalogSuite extends SparkFunSuite {
     // When cascade is true, it should drop them
     val externalCatalog3 = newBasicCatalog()
     val sessionCatalog3 = new SessionCatalog(externalCatalog3)
-    externalCatalog3
-      .dropDatabase("db2", ignoreIfNotExists = false, cascade = true)
+    externalCatalog3.dropDatabase("db2",
+                                  ignoreIfNotExists = false,
+                                  cascade = true)
     assert(sessionCatalog3.listDatabases().toSet == Set("default", "db1"))
   }
 

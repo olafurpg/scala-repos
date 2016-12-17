@@ -68,8 +68,8 @@ class SbtRunConfiguration(val project: Project,
     super.writeExternal(element)
     JDOMExternalizer.write(element, "tasks", getTasks)
     JDOMExternalizer.write(element, "vmparams", getJavaOptions)
-    EnvironmentVariablesComponent
-      .writeExternal(element, getEnvironmentVariables)
+    EnvironmentVariablesComponent.writeExternal(element,
+                                                getEnvironmentVariables)
   }
 
   override def readExternal(element: Element) {
@@ -109,8 +109,8 @@ class SbtRunConfiguration(val project: Project,
       try {
         jdk.getSdkType match {
           case sdkType: AndroidSdkType =>
-            envirnomentVariables
-              .put("ANDROID_HOME", jdk.getSdkModificator.getHomePath)
+            envirnomentVariables.put("ANDROID_HOME",
+                                     jdk.getSdkModificator.getHomePath)
           case _ => // do nothing
         }
       } catch {

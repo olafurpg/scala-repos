@@ -58,8 +58,9 @@ class ScalaGenerateCompanionObjectHandler
     if (canAddCompanionObject(clazz)) {
       val name = clazz.name
       val text = s"object $name {\n \n}"
-      ScalaPsiElementFactory
-        .createObjectWithContext(text, clazz.getContext, clazz)
+      ScalaPsiElementFactory.createObjectWithContext(text,
+                                                     clazz.getContext,
+                                                     clazz)
     } else throw new IllegalArgumentException("Cannot create companion object")
   }
 }

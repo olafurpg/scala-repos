@@ -398,8 +398,8 @@ object Load {
                         uri: URI,
                         rootProject: URI => String,
                         settings: Seq[Setting[_]]): Seq[Setting[_]] =
-    Project
-      .transform(Scope.resolveScope(thisScope, uri, rootProject), settings)
+    Project.transform(Scope.resolveScope(thisScope, uri, rootProject),
+                      settings)
   def projectScope(project: Reference): Scope =
     Scope(Select(project), Global, Global, Global)
 
@@ -468,8 +468,9 @@ object Load {
     val resolver = (info: BuildLoader.ResolveInfo) => RetrieveUnit(info)
     val build = (info: BuildLoader.BuildInfo) =>
       Some(() => loadUnit(info.uri, info.base, info.state, info.config))
-    val components = BuildLoader
-      .components(resolver, build, full = BuildLoader.componentLoader)
+    val components = BuildLoader.components(resolver,
+                                            build,
+                                            full = BuildLoader.componentLoader)
     BuildLoader(components, fail, s, config)
   }
   def load(file: File, loaders: BuildLoader, extra: List[URI]): sbt.PartBuild =
@@ -1263,8 +1264,9 @@ object Load {
 
   @deprecated("Use PluginDiscovery.binaryModuleNames.", "0.13.2")
   def binaryPlugins(classpath: Seq[File], loader: ClassLoader): Seq[String] =
-    PluginDiscovery
-      .binaryModuleNames(classpath, loader, PluginDiscovery.Paths.Plugins)
+    PluginDiscovery.binaryModuleNames(classpath,
+                                      loader,
+                                      PluginDiscovery.Paths.Plugins)
 
   @deprecated("Use PluginDiscovery.onClasspath", "0.13.2")
   def onClasspath(classpath: Seq[File])(url: URL): Boolean =

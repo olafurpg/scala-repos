@@ -174,16 +174,20 @@ private[impl] class OfferMatcherManagerActor private (
     case ActorOfferMatcher.MatchOffer(deadline, offer: Offer)
         if !offersWanted =>
       log.debug(s"Ignoring offer ${offer.getId.getValue}: No one interested.")
-      sender() ! OfferMatcher
-        .MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = false)
+      sender() ! OfferMatcher.MatchedTaskOps(offer.getId,
+                                             Seq.empty,
+                                             resendThisOffer = false)
 
     case ActorOfferMatcher.MatchOffer(deadline, offer: Offer) =>
       log.debug(s"Start processing offer ${offer.getId.getValue}")
 
       // setup initial offer data
       val randomizedMatchers = offerMatchers(offer)
-      val data = OfferMatcherManagerActor
-        .OfferData(offer, deadline, sender(), randomizedMatchers, Seq.empty)
+      val data = OfferMatcherManagerActor.OfferData(offer,
+                                                    deadline,
+                                                    sender(),
+                                                    randomizedMatchers,
+                                                    Seq.empty)
       offerQueues += offer.getId -> data
       metrics.currentOffersGauge.setValue(offerQueues.size)
 
@@ -298,8 +302,9 @@ private[impl] class OfferMatcherManagerActor private (
 
   private[this] def sendMatchResult(data: OfferData,
                                     resendThisOffer: Boolean): Unit = {
-    data.sender ! OfferMatcher
-      .MatchedTaskOps(data.offer.getId, data.ops, resendThisOffer)
+    data.sender ! OfferMatcher.MatchedTaskOps(data.offer.getId,
+                                              data.ops,
+                                              resendThisOffer)
     offerQueues -= data.offer.getId
     metrics.currentOffersGauge.setValue(offerQueues.size)
     //scalastyle:off magic.number

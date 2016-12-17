@@ -58,8 +58,10 @@ final class Env(config: Config,
 
   system.actorOf(Props(new Actor {
     override def preStart() {
-      system.lilaBus
-        .subscribe(self, 'adjustCheater, 'adjustBooster, 'userActive)
+      system.lilaBus.subscribe(self,
+                               'adjustCheater,
+                               'adjustBooster,
+                               'userActive)
     }
     def receive = {
       case lila.hub.actorApi.mod.MarkCheater(userId) =>

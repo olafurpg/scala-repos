@@ -870,14 +870,12 @@ private[akka] class ActorSystemImpl(
                     "Extension instance created as 'null' for extension [" +
                       ext + "]")
                 case instance ⇒
-                  extensions
-                    .replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
+                  extensions.replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
                   instance //Profit!
               }
             } catch {
               case t: Throwable ⇒
-                extensions
-                  .replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
+                extensions.replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
                 throw t //Escalate to caller
             } finally {
               inProcessOfRegistration.countDown //Always notify listeners of the inProcess signal
@@ -939,8 +937,9 @@ private[akka] class ActorSystemImpl(
               case _ ⇒ ""
             }) + " " +
             (cell.childrenRefs match {
-              case ChildrenContainer
-                    .TerminatingChildrenContainer(_, toDie, reason) ⇒
+              case ChildrenContainer.TerminatingChildrenContainer(_,
+                                                                  toDie,
+                                                                  reason) ⇒
                 "Terminating(" + reason + ")" +
                   (toDie.toSeq.sorted mkString
                     ("\n" + indent + "   |    toDie: ",

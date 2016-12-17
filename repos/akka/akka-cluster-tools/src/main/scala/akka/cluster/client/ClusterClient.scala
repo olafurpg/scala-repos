@@ -294,8 +294,10 @@ final class ClusterClient(settings: ClusterClientSettings)
   sendGetContacts()
 
   import context.dispatcher
-  val heartbeatTask = context.system.scheduler
-    .schedule(heartbeatInterval, heartbeatInterval, self, HeartbeatTick)
+  val heartbeatTask = context.system.scheduler.schedule(heartbeatInterval,
+                                                        heartbeatInterval,
+                                                        self,
+                                                        HeartbeatTick)
   var refreshContactsTask: Option[Cancellable] = None
   scheduleRefreshContactsTick(establishingGetContactsInterval)
   self ! RefreshContactsTick
@@ -355,8 +357,9 @@ final class ClusterClient(settings: ClusterClientSettings)
 
   def active(receptionist: ActorRef): Actor.Receive = {
     case Send(path, msg, localAffinity) ⇒
-      receptionist forward DistributedPubSubMediator
-        .Send(path, msg, localAffinity)
+      receptionist forward DistributedPubSubMediator.Send(path,
+                                                          msg,
+                                                          localAffinity)
     case SendToAll(path, msg) ⇒
       receptionist forward DistributedPubSubMediator.SendToAll(path, msg)
     case Publish(topic, msg) ⇒

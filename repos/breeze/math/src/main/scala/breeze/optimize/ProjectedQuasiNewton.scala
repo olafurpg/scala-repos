@@ -70,8 +70,8 @@ class CompactHessian(M: DenseMatrix[Double],
 
     // M is the 2k x 2k matrix given by: M = [ \sigma * S_k^T S_k    L_k ]
     //                                       [         L_k^T        -D_k ]
-    val M = DenseMatrix
-      .vertcat(DenseMatrix.horzcat(STS, L), DenseMatrix.horzcat(L.t, -D))
+    val M = DenseMatrix.vertcat(DenseMatrix.horzcat(STS, L),
+                                DenseMatrix.horzcat(L.t, -D))
 
     val newB = new CompactHessian(M, Y, S, sigma, m)
     newB
@@ -170,8 +170,9 @@ class ProjectedQuasiNewton(
         x,
         grad,
         history)
-      val spgResult = innerOptimizer
-        .minimizeAndReturnState(new CachedDiffFunction(subprob), x)
+      val spgResult = innerOptimizer.minimizeAndReturnState(
+        new CachedDiffFunction(subprob),
+        x)
       logger.info(
         f"ProjectedQuasiNewton: outerIter ${state.iter} innerIters ${spgResult.iter}")
       spgResult.x - x

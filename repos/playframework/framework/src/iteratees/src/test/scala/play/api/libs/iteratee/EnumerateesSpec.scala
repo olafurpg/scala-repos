@@ -133,8 +133,7 @@ object EnumerateesSpec
           Enumeratee.dropWhile[String](_ != "4")(dropWhileEC) &>> Iteratee
             .consume[String]()
         val enumerator = Enumerator(Range(1, 20).map(_.toString): _*)
-        Await
-          .result(enumerator |>>> drop3AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> drop3AndConsume, Duration.Inf) must equalTo(
           Range(4, 20).map(_.toString).mkString)
       }
     }
@@ -156,8 +155,7 @@ object EnumerateesSpec
           (Enumeratee.take[String](3) &>> Iteratee.consume()).flatMap(_ =>
             Iteratee.consume())(flatMapEC)
         val enumerator = Enumerator(Range(1, 20).map(_.toString): _*)
-        Await
-          .result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
           Range(4, 20).map(_.toString).mkString)
       }
     }
@@ -185,8 +183,7 @@ object EnumerateesSpec
           Enumeratee.takeWhile[String](_ != "4")(takeWhileEC) &>> Iteratee
             .consume()
         val enumerator = Enumerator(Range(1, 20).map(_.toString): _*)
-        Await
-          .result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
           List(1, 2, 3).map(_.toString).mkString)
       }
     }
@@ -197,8 +194,7 @@ object EnumerateesSpec
           (Enumeratee.takeWhile[String](_ != "4")(takeWhileEC) &>> Iteratee
             .consume()).flatMap(_ => Iteratee.consume())(consumeFlatMapEC)
         val enumerator = Enumerator(Range(1, 20).map(_.toString): _*)
-        Await
-          .result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
           Range(4, 20).map(_.toString).mkString)
       }
     }
@@ -261,8 +257,7 @@ object EnumerateesSpec
           (Traversable.take[String](3) &>> Iteratee.consume()).flatMap(_ =>
             Iteratee.consume())(consumeFlatMapEC)
         val enumerator = Enumerator("he", "ybbb", "bbb")
-        Await
-          .result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
           "bbbbbb")
       }
     }
@@ -276,8 +271,7 @@ object EnumerateesSpec
           Enumeratee.map[Int](i => List(i + 1))(mapEC) &>> Iteratee
             .consume[List[Int]]()
         val enumerator = Enumerator(1, 2, 3, 4)
-        Await
-          .result(enumerator |>>> add1AndConsume, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> add1AndConsume, Duration.Inf) must equalTo(
           Seq(2, 3, 4, 5))
       }
     }
@@ -313,8 +307,7 @@ object EnumerateesSpec
         }
         val sum = Iteratee.fold[Int, Int](0)(_ + _)(sumEC)
         val enumerator = Enumerator(1, 2, 3, 4, 5, 6, 7, 8, 9)
-        Await
-          .result(enumerator |>>> passAlongFuture &>> sum, Duration.Inf) must equalTo(
+        Await.result(enumerator |>>> passAlongFuture &>> sum, Duration.Inf) must equalTo(
           45)
       }
     }

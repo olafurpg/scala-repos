@@ -3752,8 +3752,8 @@ abstract class GenJSCode
 
       def requireNotSuper(): Unit = {
         if (superIn.isDefined) {
-          reporter
-            .error(pos, "Illegal super call in Scala.js-defined JS class")
+          reporter.error(pos,
+                         "Illegal super call in Scala.js-defined JS class")
         }
       }
 

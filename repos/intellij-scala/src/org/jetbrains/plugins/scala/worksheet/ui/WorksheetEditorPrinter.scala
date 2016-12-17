@@ -473,21 +473,23 @@ object WorksheetEditorPrinter {
   def saveWorksheetEvaluation(file: ScalaFile,
                               result: String,
                               ratio: Float = 0.5f) {
-    FileAttributeUtilCache
-      .writeAttribute(LAST_WORKSHEET_RUN_RESULT, file, result)
-    FileAttributeUtilCache
-      .writeAttribute(LAST_WORKSHEET_RUN_RATIO, file, ratio.toString)
+    FileAttributeUtilCache.writeAttribute(LAST_WORKSHEET_RUN_RESULT,
+                                          file,
+                                          result)
+    FileAttributeUtilCache.writeAttribute(LAST_WORKSHEET_RUN_RATIO,
+                                          file,
+                                          ratio.toString)
   }
 
   def saveOnlyRatio(file: ScalaFile, ratio: Float = 0.5f) {
-    FileAttributeUtilCache
-      .writeAttribute(LAST_WORKSHEET_RUN_RATIO, file, ratio.toString)
+    FileAttributeUtilCache.writeAttribute(LAST_WORKSHEET_RUN_RATIO,
+                                          file,
+                                          ratio.toString)
   }
 
   def loadWorksheetEvaluation(file: ScalaFile): Option[(String, Float)] = {
     val ratio =
-      FileAttributeUtilCache
-        .readAttribute(LAST_WORKSHEET_RUN_RATIO, file) map {
+      FileAttributeUtilCache.readAttribute(LAST_WORKSHEET_RUN_RATIO, file) map {
         case rr =>
           try {
             java.lang.Float.parseFloat(rr)
@@ -503,8 +505,9 @@ object WorksheetEditorPrinter {
 
   def deleteWorksheetEvaluation(file: ScalaFile) {
     FileAttributeUtilCache.writeAttribute(LAST_WORKSHEET_RUN_RESULT, file, "")
-    FileAttributeUtilCache
-      .writeAttribute(LAST_WORKSHEET_RUN_RATIO, file, 0.5f.toString)
+    FileAttributeUtilCache.writeAttribute(LAST_WORKSHEET_RUN_RATIO,
+                                          file,
+                                          0.5f.toString)
   }
 
   def newWorksheetUiFor(editor: Editor, virtualFile: VirtualFile) =

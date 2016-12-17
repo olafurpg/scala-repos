@@ -84,8 +84,8 @@ private[io] class UdpListener(val udp: UdpExt,
       try {
         channel.close()
         sender() ! Unbound
-        log
-          .debug("Unbound endpoint [{}], stopping listener", bind.localAddress)
+        log.debug("Unbound endpoint [{}], stopping listener",
+                  bind.localAddress)
       } finally context.stop(self)
   }
 

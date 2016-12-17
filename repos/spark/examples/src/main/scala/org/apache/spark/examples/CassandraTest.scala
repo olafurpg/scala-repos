@@ -68,10 +68,12 @@ object CassandraTest {
     ConfigHelper.setInputRpcPort(job.getConfiguration(), port)
     ConfigHelper.setOutputInitialAddress(job.getConfiguration(), host)
     ConfigHelper.setOutputRpcPort(job.getConfiguration(), port)
-    ConfigHelper
-      .setInputColumnFamily(job.getConfiguration(), "casDemo", "Words")
-    ConfigHelper
-      .setOutputColumnFamily(job.getConfiguration(), "casDemo", "WordCount")
+    ConfigHelper.setInputColumnFamily(job.getConfiguration(),
+                                      "casDemo",
+                                      "Words")
+    ConfigHelper.setOutputColumnFamily(job.getConfiguration(),
+                                       "casDemo",
+                                       "WordCount")
 
     val predicate = new SlicePredicate()
     val sliceRange = new SliceRange()
@@ -80,10 +82,10 @@ object CassandraTest {
     predicate.setSlice_range(sliceRange)
     ConfigHelper.setInputSlicePredicate(job.getConfiguration(), predicate)
 
-    ConfigHelper
-      .setInputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
-    ConfigHelper
-      .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
+    ConfigHelper.setInputPartitioner(job.getConfiguration(),
+                                     "Murmur3Partitioner")
+    ConfigHelper.setOutputPartitioner(job.getConfiguration(),
+                                      "Murmur3Partitioner")
 
     // Make a new Hadoop RDD
     val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),

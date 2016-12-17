@@ -64,8 +64,10 @@ class ConvertToObjectFix(c: ScClass) extends IntentionAction {
     val charsToReplace = classKeywordTextRange.getLength
     val classText = c.getText
     val objectText = classText.patch(start, "object", charsToReplace)
-    val objectElement = ScalaPsiElementFactory
-      .createObjectWithContext(objectText, c.getContext, c)
+    val objectElement = ScalaPsiElementFactory.createObjectWithContext(
+      objectText,
+      c.getContext,
+      c)
     c.replace(objectElement)
     // TODO update references to class.
     // new X  -> X

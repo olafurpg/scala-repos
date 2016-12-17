@@ -47,8 +47,11 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
                               element: PsiElement): Unit = {
     def showErrorHint(message: String) = {
       val name = ChangeSignatureHandler.REFACTORING_NAME
-      CommonRefactoringUtil
-        .showErrorHint(project, editor, message, name, HelpID.CHANGE_SIGNATURE)
+      CommonRefactoringUtil.showErrorHint(project,
+                                          editor,
+                                          message,
+                                          name,
+                                          HelpID.CHANGE_SIGNATURE)
     }
     def isSupportedFor(fun: ScMethodLike): Boolean = {
       fun match {
@@ -91,8 +94,9 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
           case _ =>
         }
 
-        val newMethod = SuperMethodWarningUtil
-          .checkSuperMethod(method, RefactoringBundle.message("to.refactor"))
+        val newMethod = SuperMethodWarningUtil.checkSuperMethod(
+          method,
+          RefactoringBundle.message("to.refactor"))
         unwrapMethod(newMethod) match {
           case Some(fun: ScMethodLike) =>
             if (isSupportedFor(fun)) invokeWithDialog(project, fun)

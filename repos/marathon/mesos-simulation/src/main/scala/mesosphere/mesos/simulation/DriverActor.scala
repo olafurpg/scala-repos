@@ -133,8 +133,8 @@ class DriverActor(schedulerProps: Props) extends Actor {
 
     import context.dispatcher
     periodicOffers = Some(
-      context.system.scheduler
-        .schedule(1.second, 1.seconds)(scheduler ! offers)
+      context.system.scheduler.schedule(1.second, 1.seconds)(
+        scheduler ! offers)
     )
   }
 

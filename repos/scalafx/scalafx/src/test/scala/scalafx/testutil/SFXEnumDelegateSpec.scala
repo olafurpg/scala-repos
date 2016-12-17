@@ -85,9 +85,11 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E],
   }
 
   private def assertScalaEnumWithOrdinal(s: S, index: Int) {
-    assert(s.delegate.ordinal() == index,
-           "%s - Expected position: %d, actual: %d"
-             .format(s, s.delegate.ordinal(), index))
+    assert(
+      s.delegate.ordinal() == index,
+      "%s - Expected position: %d, actual: %d".format(s,
+                                                      s.delegate.ordinal(),
+                                                      index))
   }
 
   protected override def getDesirableMethodName(javaMethod: Method): String =

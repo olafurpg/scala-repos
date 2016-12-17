@@ -66,7 +66,8 @@ object Commands {
                      publishArtifact in GlobalScope := true
                    ),
                    structure)
-    Project
-      .setProject(session, newStructure, state.put(quickPublishToggle, toggle))
+    Project.setProject(session,
+                       newStructure,
+                       state.put(quickPublishToggle, toggle))
   }
 }

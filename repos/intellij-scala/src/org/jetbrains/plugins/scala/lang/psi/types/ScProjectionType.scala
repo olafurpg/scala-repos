@@ -348,8 +348,10 @@ class ScProjectionType private (
                 new ScSubstitutor(Map.empty, Map.empty, Some(projected)) followed actualSubst
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
-                  return Equivalence
-                    .equivInner(s.subst(tp), r, uSubst, falseUndef)
+                  return Equivalence.equivInner(s.subst(tp),
+                                                r,
+                                                uSubst,
+                                                falseUndef)
                 case _ =>
               }
             case _ =>
@@ -361,8 +363,10 @@ class ScProjectionType private (
                 new ScSubstitutor(Map.empty, Map.empty, Some(p1)) followed proj2.actualSubst
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
-                  return Equivalence
-                    .equivInner(s.subst(tp), this, uSubst, falseUndef)
+                  return Equivalence.equivInner(s.subst(tp),
+                                                this,
+                                                uSubst,
+                                                falseUndef)
                 case _ =>
               }
             case _ =>
@@ -378,8 +382,10 @@ class ScProjectionType private (
               case Success(singl, _) if ScType.isSingletonType(singl) =>
                 val newSubst = actualSubst.followed(
                   new ScSubstitutor(Map.empty, Map.empty, Some(projected)))
-                Equivalence
-                  .equivInner(r, newSubst.subst(singl), uSubst, falseUndef)
+                Equivalence.equivInner(r,
+                                       newSubst.subst(singl),
+                                       uSubst,
+                                       falseUndef)
               case _ => (false, uSubst)
             }
           case _ => (false, uSubst)
@@ -453,8 +459,10 @@ case class ScThisType(clazz: ScTemplateDefinition) extends ValueType {
           case Success(singl, _) if ScType.isSingletonType(singl) =>
             val newSubst = p.actualSubst.followed(
               new ScSubstitutor(Map.empty, Map.empty, Some(tp)))
-            Equivalence
-              .equivInner(this, newSubst.subst(singl), uSubst, falseUndef)
+            Equivalence.equivInner(this,
+                                   newSubst.subst(singl),
+                                   uSubst,
+                                   falseUndef)
           case _ => (false, uSubst)
         }
       case _ => (false, uSubst)

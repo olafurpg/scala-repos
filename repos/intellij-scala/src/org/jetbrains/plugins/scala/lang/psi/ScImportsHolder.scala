@@ -207,8 +207,10 @@ trait ScImportsHolder extends ScalaPsiElement {
       documentManager.doPostponedOperationsAndUnblockDocument(document)
       val newRange =
         new TextRange(rangeMarker.getStartOffset, rangeMarker.getEndOffset)
-      optimizer
-        .replaceWithNewImportInfos(newRange, infosToAdd, settings, document)
+      optimizer.replaceWithNewImportInfos(newRange,
+                                          infosToAdd,
+                                          settings,
+                                          document)
       documentManager.commitDocument(document)
     }
 
@@ -229,8 +231,9 @@ trait ScImportsHolder extends ScalaPsiElement {
       else refsContainer == null && hasCodeBeforeImports
 
     if (needToInsertFirst) {
-      val dummyImport = ScalaPsiElementFactory
-        .createImportFromText("import dummy._", getManager)
+      val dummyImport = ScalaPsiElementFactory.createImportFromText(
+        "import dummy._",
+        getManager)
       val usedNames = collectUsedImportedNames(this)
       val inserted = insertFirstImport(dummyImport, getFirstChild)
         .asInstanceOf[ScImportStmt]
@@ -332,8 +335,9 @@ trait ScImportsHolder extends ScalaPsiElement {
     def shortenWhitespace(node: ASTNode) {
       if (node == null) return
       if (node.getText.count(_ == '\n') >= 2) {
-        val nl = ScalaPsiElementFactory
-          .createNewLine(getManager, node.getText.replaceFirst("[\n]", ""))
+        val nl = ScalaPsiElementFactory.createNewLine(
+          getManager,
+          node.getText.replaceFirst("[\n]", ""))
         getNode.replaceChild(node, nl.getNode)
       }
     }

@@ -232,8 +232,8 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
     */
   def cleanupOldBlocksAndBatches(cleanupThreshTime: Time) {
     // Clean up old block and batch metadata
-    receivedBlockTracker
-      .cleanupOldBatches(cleanupThreshTime, waitForCompletion = false)
+    receivedBlockTracker.cleanupOldBatches(cleanupThreshTime,
+                                           waitForCompletion = false)
 
     // Signal the receivers to delete old block data
     if (WriteAheadLogUtils.enableReceiverLog(ssc.conf)) {
@@ -315,8 +315,8 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
                                       lastErrorTime = lastErrorTime)
     val newReceiverTrackingInfo = receiverTrackingInfos.get(streamId) match {
       case Some(oldInfo) =>
-        oldInfo
-          .copy(state = ReceiverState.INACTIVE, errorInfo = Some(errorInfo))
+        oldInfo.copy(state = ReceiverState.INACTIVE,
+                     errorInfo = Some(errorInfo))
       case None =>
         logWarning("No prior receiver info")
         ReceiverTrackingInfo(streamId,
@@ -521,8 +521,9 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
           } else {
             val oldReceiverInfo = receiverTrackingInfos(receiver.streamId)
             // Clear "scheduledLocations" to indicate we are going to do local scheduling
-            val newReceiverInfo = oldReceiverInfo
-              .copy(state = ReceiverState.INACTIVE, scheduledLocations = None)
+            val newReceiverInfo = oldReceiverInfo.copy(
+              state = ReceiverState.INACTIVE,
+              scheduledLocations = None)
             receiverTrackingInfos(receiver.streamId) = newReceiverInfo
             schedulingPolicy.rescheduleReceiver(receiver.streamId,
                                                 receiver.preferredLocation,

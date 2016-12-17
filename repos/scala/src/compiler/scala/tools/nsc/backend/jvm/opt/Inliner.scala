@@ -47,8 +47,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
           val msg =
             s"${BackendReporting.methodSignature(callee.calleeDeclarationClass.internalName,
                                                  callee.callee)}$annotWarn could not be inlined:\n$warning"
-          backendReporting
-            .inlinerWarning(request.callsite.callsitePosition, msg)
+          backendReporting.inlinerWarning(request.callsite.callsitePosition,
+                                          msg)
         }
       }
     }
@@ -184,8 +184,8 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         .insert(callsite.callsiteInstruction, newCallsiteInstruction)
       callsite.callsiteMethod.instructions.remove(callsite.callsiteInstruction)
 
-      callGraph
-        .removeCallsite(callsite.callsiteInstruction, callsite.callsiteMethod)
+      callGraph.removeCallsite(callsite.callsiteInstruction,
+                               callsite.callsiteMethod)
       val staticCallSamParamTypes = {
         if (selfParamType.info.get.inlineInfo.sam.isEmpty) samParamTypes - 0
         else samParamTypes.updated(0, selfParamType)

@@ -269,8 +269,8 @@ abstract class Delambdafy
             gen.mkAttributedThis(oldClass) // sort of a lie, EmptyTree.<static method> would be more honest, but the backend chokes on that.
 
         val body = localTyper typed Apply(Select(qual, target), oldParams)
-        body
-          .substituteSymbols(fun.vparams map (_.symbol), params map (_.symbol))
+        body.substituteSymbols(fun.vparams map (_.symbol),
+                               params map (_.symbol))
         body changeOwner (fun.symbol -> methSym)
 
         val methDef = DefDef(methSym, List(params), body)
@@ -465,8 +465,9 @@ abstract class Delambdafy
       if (functionalInterface.exists) {
         // Create a symbol representing a fictional lambda factory method that accepts the captured
         // arguments and returns a Function.
-        val msym = currentOwner
-          .newMethod(nme.ANON_FUN_NAME, originalFunction.pos, ARTIFACT)
+        val msym = currentOwner.newMethod(nme.ANON_FUN_NAME,
+                                          originalFunction.pos,
+                                          ARTIFACT)
         val argTypes: List[Type] = allCaptureArgs.map(_.tpe)
         val params = msym.newSyntheticValueParams(argTypes)
         msym.setInfo(MethodType(params, functionType))
@@ -512,8 +513,9 @@ abstract class Delambdafy
     def createBridgeMethod(newClass: Symbol,
                            originalFunction: Function,
                            applyMethod: DefDef): Option[DefDef] = {
-      val bridgeMethSym = newClass
-        .newMethod(nme.apply, applyMethod.pos, FINAL | SYNTHETIC | BRIDGE)
+      val bridgeMethSym = newClass.newMethod(nme.apply,
+                                             applyMethod.pos,
+                                             FINAL | SYNTHETIC | BRIDGE)
       val originalParams = applyMethod.vparamss(0)
       val bridgeParams =
         originalParams map { originalParam =>

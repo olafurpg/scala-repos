@@ -178,8 +178,11 @@ class ScalaIntroduceParameterHandler
         (selModel.getSelectionStart, selModel.getSelectionEnd)
       ScalaRefactoringUtil.checkFile(file, project, editor, REFACTORING_NAME)
 
-      val exprWithTypes = ScalaRefactoringUtil
-        .getExpression(project, editor, file, startOffset, endOffset)
+      val exprWithTypes = ScalaRefactoringUtil.getExpression(project,
+                                                             editor,
+                                                             file,
+                                                             startOffset,
+                                                             endOffset)
       val elems = exprWithTypes match {
         case Some((e, _)) => Seq(e)
         case None =>
@@ -188,8 +191,11 @@ class ScalaIntroduceParameterHandler
                                                 trimComments = false)
       }
 
-      val hasWarnings = ScalaRefactoringUtil
-        .showNotPossibleWarnings(elems, project, editor, REFACTORING_NAME)
+      val hasWarnings = ScalaRefactoringUtil.showNotPossibleWarnings(
+        elems,
+        project,
+        editor,
+        REFACTORING_NAME)
       if (hasWarnings) return None
       if (haveReturnStmts(elems)) {
         showErrorHint(
@@ -269,8 +275,10 @@ class ScalaIntroduceParameterHandler
           ScalaRefactoringUtil.unparExpr(expr),
           occurrencesScope)
         if (occurrences.length > 1)
-          occurrenceHighlighters = ScalaRefactoringUtil
-            .highlightOccurrences(project, occurrences, editor)
+          occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
+            project,
+            occurrences,
+            editor)
 
         (occurrences, expr.getTextRange)
       case _ =>

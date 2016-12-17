@@ -50,8 +50,7 @@ final class QaApi(questionColl: Coll,
           val q2 = q
             .copy(title = data.title, body = data.body, tags = data.tags)
             .editNow
-          questionColl
-            .update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
+          questionColl.update(BSONDocument("_id" -> q2.id), q2) >> tag.clearCache >> relation.clearCache inject q2.some
         }
       }
 
@@ -297,8 +296,9 @@ final class QaApi(questionColl: Coll,
     }
 
     def remove(questionId: QuestionId, commentId: CommentId) =
-      question.removeComment(questionId, commentId) >> answer
-        .removeComment(questionId, commentId)
+      question.removeComment(questionId, commentId) >> answer.removeComment(
+        questionId,
+        commentId)
 
     private implicit val commentBSONHandler = Macros.handler[Comment]
   }

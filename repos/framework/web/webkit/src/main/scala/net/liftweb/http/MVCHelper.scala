@@ -150,8 +150,10 @@ trait MVCHelper extends LiftRules.DispatchPF {
           session <- S.session
           req <- S.request
           template <- templateForPath(req)
-          resp <- session
-            .processTemplate(Full(bind(template)), req, req.path, 200)
+          resp <- session.processTemplate(Full(bind(template)),
+                                          req,
+                                          req.path,
+                                          200)
         } yield resp
       }
 

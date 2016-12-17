@@ -23,12 +23,15 @@ class IncrementalLexerHighlightingTest
 
     typed foreach {
       case '\r' =>
-        CommandProcessor.getInstance
-          .executeCommand(myFixture.getProject, new Runnable {
+        CommandProcessor.getInstance.executeCommand(
+          myFixture.getProject,
+          new Runnable {
             def run() {
               myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
             }
-          }, "", null)
+          },
+          "",
+          null)
       case '\n' =>
         CommandProcessor
           .getInstance()

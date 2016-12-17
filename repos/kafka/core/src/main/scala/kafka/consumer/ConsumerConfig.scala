@@ -174,8 +174,9 @@ class ConsumerConfig private (val props: VerifiableProperties)
 
   /** socket timeout to use when reading responses for Offset Fetch/Commit requests. This timeout will also be used for
     *  the ConsumerMetdata requests that are used to query for the offset coordinator. */
-  val offsetsChannelSocketTimeoutMs = props
-    .getInt("offsets.channel.socket.timeout.ms", OffsetsChannelSocketTimeoutMs)
+  val offsetsChannelSocketTimeoutMs = props.getInt(
+    "offsets.channel.socket.timeout.ms",
+    OffsetsChannelSocketTimeoutMs)
 
   /** Retry the offset commit up to this many times on failure. This retry count only applies to offset commits during
     * shut-down. It does not apply to commits from the auto-commit thread. It also does not apply to attempts to query

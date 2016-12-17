@@ -306,8 +306,8 @@ object ScalaMarkerType {
             presentation.getPresentableText + " " +
               presentation.getLocationString
           else {
-            ClassPresentationUtil
-              .getNameForClass(method.containingClass, false)
+            ClassPresentationUtil.getNameForClass(method.containingClass,
+                                                  false)
           }
         case xlass: PsiClass =>
           val presentation = xlass.getPresentation

@@ -506,8 +506,8 @@ object JavaToScala {
           return AnonymousClassExpression(
             convertPsiToIntermdeiate(n.getAnonymousClass, externalProperties))
         }
-        val mtype = TypeConstruction
-          .createStringTypePresentation(n.getType, n.getProject)
+        val mtype = TypeConstruction.createStringTypePresentation(n.getType,
+                                                                  n.getProject)
         if (n.getArrayInitializer != null) {
           NewExpression(mtype,
                         n.getArrayInitializer.getInitializers.map(

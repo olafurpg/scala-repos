@@ -491,13 +491,14 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                   typeForConstructor(ref, method, subst, r.getActualElement),
                   Some(this))
               case _ =>
-                ScSimpleTypeElementImpl
-                  .calculateReferenceType(ref, shapesOnly = false)
+                ScSimpleTypeElementImpl.calculateReferenceType(ref,
+                                                               shapesOnly =
+                                                                 false)
             }
         }
       case None =>
-        ScSimpleTypeElementImpl
-          .calculateReferenceType(pathElement, shapesOnly = false)
+        ScSimpleTypeElementImpl.calculateReferenceType(pathElement,
+                                                       shapesOnly = false)
     }
   }
 
@@ -636,8 +637,10 @@ object ScSimpleTypeElementImpl {
           case _ =>
             resolvedElement match {
               case self: ScSelfTypeElement =>
-                val td = PsiTreeUtil
-                  .getContextOfType(self, true, classOf[ScTemplateDefinition])
+                val td = PsiTreeUtil.getContextOfType(
+                  self,
+                  true,
+                  classOf[ScTemplateDefinition])
                 Success(ScThisType(td), Some(ref))
               case _ =>
                 if (fromType.isEmpty)

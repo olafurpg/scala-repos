@@ -104,8 +104,7 @@ private[spark] class PythonRunner(func: PythonFunction,
     val localdir = env.blockManager.diskBlockManager.localDirs
       .map(f => f.getPath())
       .mkString(",")
-    envVars
-      .put("SPARK_LOCAL_DIRS", localdir) // it's also used in monitor thread
+    envVars.put("SPARK_LOCAL_DIRS", localdir) // it's also used in monitor thread
     if (reuse_worker) {
       envVars.put("SPARK_REUSE_WORKER", "1")
     }

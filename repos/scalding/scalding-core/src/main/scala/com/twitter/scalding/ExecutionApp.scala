@@ -46,8 +46,10 @@ object ExecutionApp {
 
     // This adds a look back mechanism to match on other hadoop args we need to support
     // currently thats just libjars
-    val (hadoopArgs, tmpNonHadoop, finalLast) = argsWithLibJars
-      .foldLeft(Array[String](), Array[String](), Option.empty[String]) {
+    val (hadoopArgs, tmpNonHadoop, finalLast) =
+      argsWithLibJars.foldLeft(Array[String](),
+                               Array[String](),
+                               Option.empty[String]) {
         // Current is a -D, so store the last in non hadoop, and add current to hadoop args
         case ((hadoopArgs, nonHadoop, Some(l)), current)
             if dArgPattern.findFirstIn(current).isDefined =>

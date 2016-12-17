@@ -275,8 +275,10 @@ object Reloader {
         docsLoader.loadClass("play.docs.BuildDocHandlerFactory")
       val buildDocHandler = maybeDocsJarFile match {
         case Some(docsJarFile) =>
-          val factoryMethod = docHandlerFactoryClass
-            .getMethod("fromJar", classOf[JarFile], classOf[String])
+          val factoryMethod = docHandlerFactoryClass.getMethod(
+            "fromJar",
+            classOf[JarFile],
+            classOf[String])
           factoryMethod
             .invoke(null, docsJarFile, "play/docs/content")
             .asInstanceOf[BuildDocHandler]

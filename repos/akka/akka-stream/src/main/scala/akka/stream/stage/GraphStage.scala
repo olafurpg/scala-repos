@@ -1270,8 +1270,10 @@ abstract class TimerGraphStageLogic(_shape: Shape)
       interval: FiniteDuration): Unit = {
     cancelTimer(timerKey)
     val id = timerIdGen.next()
-    val task = interpreter.materializer
-      .schedulePeriodically(initialDelay, interval, new Runnable {
+    val task = interpreter.materializer.schedulePeriodically(
+      initialDelay,
+      interval,
+      new Runnable {
         def run() =
           getTimerAsyncCallback.invoke(
             Scheduled(timerKey, id, repeating = true))

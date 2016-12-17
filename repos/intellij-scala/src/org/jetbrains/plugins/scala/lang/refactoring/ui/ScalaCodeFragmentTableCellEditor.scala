@@ -17,8 +17,9 @@ class ScalaCodeFragmentTableCellEditor(project: Project)
   override def stopCellEditing: Boolean = {
     val editor: Editor = myEditorTextField.getEditor
     if (editor != null) {
-      JavaReferenceImporter
-        .autoImportReferenceAtCursor(editor, myCodeFragment, true)
+      JavaReferenceImporter.autoImportReferenceAtCursor(editor,
+                                                        myCodeFragment,
+                                                        true)
     }
     super.stopCellEditing
   }

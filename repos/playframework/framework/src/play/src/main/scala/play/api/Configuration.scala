@@ -82,8 +82,9 @@ object Configuration {
       // Resolve another .conf file so that we can override values in Akka's
       // reference.conf, but still make it possible for users to override
       // Play's values in their application.conf.
-      val playOverridesConfig: Config = ConfigFactory
-        .parseResources(classLoader, "play/reference-overrides.conf")
+      val playOverridesConfig: Config = ConfigFactory.parseResources(
+        classLoader,
+        "play/reference-overrides.conf")
 
       // Resolve reference.conf ourselves because ConfigFactory.defaultReference resolves
       // values, and we won't have a value for `play.server.dir` until all our config is combined.

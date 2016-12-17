@@ -312,8 +312,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     }.getOrElse(SparkUI.DEFAULT_POOL_NAME)
 
     stageIdToInfo(stage.stageId) = stage
-    val stageData = stageIdToData
-      .getOrElseUpdate((stage.stageId, stage.attemptId), new StageUIData)
+    val stageData =
+      stageIdToData.getOrElseUpdate((stage.stageId, stage.attemptId),
+                                    new StageUIData)
     stageData.schedulingPool = poolName
 
     stageData.description = Option(stageSubmitted.properties).flatMap { p =>
@@ -340,14 +341,14 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       val taskInfo = taskStart.taskInfo
       if (taskInfo != null) {
         val metrics = new TaskMetrics
-        val stageData = stageIdToData
-          .getOrElseUpdate((taskStart.stageId, taskStart.stageAttemptId), {
+        val stageData = stageIdToData.getOrElseUpdate(
+          (taskStart.stageId, taskStart.stageAttemptId), {
             logWarning("Task start for unknown stage " + taskStart.stageId)
             new StageUIData
           })
         stageData.numActiveTasks += 1
-        stageData.taskData
-          .put(taskInfo.taskId, new TaskUIData(taskInfo, Some(metrics)))
+        stageData.taskData.put(taskInfo.taskId,
+                               new TaskUIData(taskInfo, Some(metrics)))
       }
       for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
              taskStart.stageId);
@@ -369,8 +370,8 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     // completion event is for. Let's just drop it here. This means we might have some speculation
     // tasks on the web ui that's never marked as complete.
     if (info != null && taskEnd.stageAttemptId != -1) {
-      val stageData = stageIdToData
-        .getOrElseUpdate((taskEnd.stageId, taskEnd.stageAttemptId), {
+      val stageData = stageIdToData.getOrElseUpdate(
+        (taskEnd.stageId, taskEnd.stageAttemptId), {
           logWarning("Task end for unknown stage " + taskEnd.stageId)
           new StageUIData
         })

@@ -65,8 +65,11 @@ class InplaceRenameHelper(parent: PsiElement) {
       depNames += dependentName
       val (depElem, depRange) = dependentsWithRanges(index)
       if (depRange != null)
-        builder
-          .replaceElement(depElem, depRange, dependentName, newName, false)
+        builder.replaceElement(depElem,
+                               depRange,
+                               dependentName,
+                               newName,
+                               false)
       else builder.replaceElement(depElem, dependentName, newName, false)
     }
     primaries += primary

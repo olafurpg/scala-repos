@@ -152,8 +152,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
                   interfaceNames.toArray)
 
       if (emitSource) {
-        cnode
-          .visitSource(cunit.source.toString, null /* SourceDebugExtension */ )
+        cnode.visitSource(cunit.source.toString,
+                          null /* SourceDebugExtension */ )
       }
 
       enclosingMethodAttribute(claszSymbol,

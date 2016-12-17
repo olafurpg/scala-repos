@@ -161,8 +161,10 @@ trait ScTypePsiTypeBridge {
                                                     visitedRawTypes)
                                            else types.Any)
                         case _ if psiType != null =>
-                          ScType
-                            .create(psiType, project, scope, visitedRawTypes)
+                          ScType.create(psiType,
+                                        project,
+                                        scope,
+                                        visitedRawTypes)
                         case _ => ScalaPsiManager.typeVariable(tp)
                       }
                     })

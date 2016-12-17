@@ -82,8 +82,11 @@ class MatricesSuite extends SparkFunSuite {
   }
 
   test("index in matrices incorrect input") {
-    val sm = Matrices
-      .sparse(3, 2, Array(0, 2, 3), Array(1, 2, 1), Array(0.0, 1.0, 2.0))
+    val sm = Matrices.sparse(3,
+                             2,
+                             Array(0, 2, 3),
+                             Array(1, 2, 1),
+                             Array(0.0, 1.0, 2.0))
     val dm = Matrices.dense(3, 2, Array(0.0, 2.3, 1.4, 3.2, 1.0, 9.1))
     Array(sm, dm).foreach { mat =>
       intercept[IllegalArgumentException] { mat.index(4, 1) }
@@ -452,8 +455,16 @@ class MatricesSuite extends SparkFunSuite {
   test("sprand") {
     val rng = mock[Random]
     when(rng.nextInt(4)).thenReturn(0, 1, 1, 3, 2, 2, 0, 1, 3, 0)
-    when(rng.nextDouble())
-      .thenReturn(1.0, 2.0, 3.0, 4.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+    when(rng.nextDouble()).thenReturn(1.0,
+                                      2.0,
+                                      3.0,
+                                      4.0,
+                                      0.5,
+                                      0.6,
+                                      0.7,
+                                      0.8,
+                                      0.9,
+                                      1.0)
     val mat = SparseMatrix.sprand(4, 4, 0.25, rng)
     assert(mat.numRows === 4)
     assert(mat.numCols === 4)
@@ -511,8 +522,11 @@ class MatricesSuite extends SparkFunSuite {
     assert(dm1.numNonzeros === 3)
     assert(dm1.numActives === 6)
 
-    val sm1 = Matrices
-      .sparse(3, 2, Array(0, 2, 3), Array(0, 2, 1), Array(0.0, -1.2, 0.0))
+    val sm1 = Matrices.sparse(3,
+                              2,
+                              Array(0, 2, 3),
+                              Array(0, 2, 1),
+                              Array(0.0, -1.2, 0.0))
     assert(sm1.numNonzeros === 1)
     assert(sm1.numActives === 3)
   }

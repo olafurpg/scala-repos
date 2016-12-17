@@ -1234,8 +1234,8 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
   }
 
   private def newDriverId(submitDate: Date): String = {
-    val appId = "driver-%s-%04d"
-      .format(createDateFormat.format(submitDate), nextDriverNumber)
+    val appId = "driver-%s-%04d".format(createDateFormat.format(submitDate),
+                                        nextDriverNumber)
     nextDriverNumber += 1
     appId
   }

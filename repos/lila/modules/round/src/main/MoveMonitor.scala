@@ -11,8 +11,10 @@ private final class MoveMonitor(system: ActorSystem, channel: ActorRef) {
     lila.mon.round.move.full.count()
   }
 
-  Kamon.metrics
-    .subscribe("histogram", "round.move.full", system.actorOf(Props(new Actor {
+  Kamon.metrics.subscribe(
+    "histogram",
+    "round.move.full",
+    system.actorOf(Props(new Actor {
       def receive = {
         case tick: TickMetricSnapshot =>
           tick.metrics.collectFirst {

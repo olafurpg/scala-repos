@@ -70,10 +70,11 @@ class ActorSelectionSpec
     asked.correlationId should ===(selection)
 
     implicit val ec = system.dispatcher
-    val resolved = Await
-      .result(selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
+    val resolved = Await.result(
+      selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
         case _ ⇒ null
-      }, timeout.duration)
+      },
+      timeout.duration)
     Option(resolved) should ===(result)
 
     result
@@ -323,8 +324,7 @@ class ActorSelectionSpec
     "resolve one actor with explicit timeout" in {
       val s = system.actorSelection(system / "c2")
       // Java and Scala API
-      Await
-        .result(s.resolveOne(1.second.dilated), timeout.duration) should ===(
+      Await.result(s.resolveOne(1.second.dilated), timeout.duration) should ===(
         c2)
     }
 

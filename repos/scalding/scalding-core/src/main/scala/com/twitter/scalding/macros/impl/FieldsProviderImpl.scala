@@ -179,8 +179,9 @@ object FieldsProviderImpl {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
         val fieldName = accessorMethod.name.toTermName.toString
-        val fieldType = accessorMethod.returnType
-          .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass)
+        val fieldType =
+          accessorMethod.returnType.asSeenFrom(outerTpe,
+                                               outerTpe.typeSymbol.asClass)
         (fieldType, fieldName)
       }.toVector
 

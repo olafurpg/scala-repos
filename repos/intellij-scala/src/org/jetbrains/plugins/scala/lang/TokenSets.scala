@@ -138,8 +138,8 @@ object TokenSets {
   val VARIABLES = TokenSet.create(ScalaElementTypes.VARIABLE_DECLARATION,
                                   ScalaElementTypes.VARIABLE_DEFINITION)
 
-  val TEMPLATE_PARENTS = TokenSet
-    .create(ScalaElementTypes.CLASS_PARENTS, ScalaElementTypes.TRAIT_PARENTS)
+  val TEMPLATE_PARENTS = TokenSet.create(ScalaElementTypes.CLASS_PARENTS,
+                                         ScalaElementTypes.TRAIT_PARENTS)
 
   val MEMBERS = TokenSet.orSet(
     TokenSet.orSet(

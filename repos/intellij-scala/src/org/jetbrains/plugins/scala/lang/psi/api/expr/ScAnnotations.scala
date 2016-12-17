@@ -55,8 +55,7 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
                         ScType.extractClass(tp, Some(getProject)) match {
                           case Some(clazz)
                               if clazz.qualifiedName == "java.lang.Class" =>
-                            ScType
-                              .extractClass(arg(0), Some(getProject)) match {
+                            ScType.extractClass(arg(0), Some(getProject)) match {
                               case Some(p) =>
                                 JavaPsiFacade
                                   .getInstance(getProject)

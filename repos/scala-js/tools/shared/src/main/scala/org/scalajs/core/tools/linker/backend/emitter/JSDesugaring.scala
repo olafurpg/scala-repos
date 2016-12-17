@@ -958,8 +958,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
           val VarRef(ident) = lhs
           val elems = (rhs: @unchecked) match {
             case VarRef(rhsIdent) =>
-              for (RecordType
-                     .Field(fName, fOrigName, fTpe, fMutable) <- fields)
+              for (RecordType.Field(fName, fOrigName, fTpe, fMutable) <- fields)
                 yield
                   VarRef(makeRecordFieldIdent(rhsIdent, fName, fOrigName))(
                     fTpe)

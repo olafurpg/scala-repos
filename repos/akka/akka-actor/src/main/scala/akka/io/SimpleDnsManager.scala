@@ -29,11 +29,13 @@ class SimpleDnsManager(val ext: DnsExt)
   private val cleanupTimer =
     cacheCleanup map { _ ⇒
       val interval = Duration(
-        ext.Settings.ResolverConfig
-          .getDuration("cache-cleanup-interval", TimeUnit.MILLISECONDS),
+        ext.Settings.ResolverConfig.getDuration("cache-cleanup-interval",
+                                                TimeUnit.MILLISECONDS),
         TimeUnit.MILLISECONDS)
-      system.scheduler
-        .schedule(interval, interval, self, SimpleDnsManager.CacheCleanup)
+      system.scheduler.schedule(interval,
+                                interval,
+                                self,
+                                SimpleDnsManager.CacheCleanup)
     }
 
   override def receive = {

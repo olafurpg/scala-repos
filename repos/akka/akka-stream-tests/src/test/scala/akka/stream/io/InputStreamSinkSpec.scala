@@ -92,8 +92,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         .run()
       val f = Future(inputStream.read(new Array[Byte](byteString.size)))
 
-      the[Exception] thrownBy Await
-        .result(f, timeout) shouldBe a[TimeoutException]
+      the[Exception] thrownBy Await.result(f, timeout) shouldBe a[
+        TimeoutException]
       probe.sendNext(byteString)
       Await.result(f, timeout) should ===(byteString.size)
 

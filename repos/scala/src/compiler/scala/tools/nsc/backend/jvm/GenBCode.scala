@@ -414,8 +414,10 @@ abstract class GenBCode extends BCodeSyncAndTry {
             val outFile =
               if (outFolder == null) null
               else getFileForClassfile(outFolder, jclassName, ".class")
-            bytecodeWriter
-              .writeClass(jclassName, jclassName, jclassBytes, outFile)
+            bytecodeWriter.writeClass(jclassName,
+                                      jclassName,
+                                      jclassBytes,
+                                      outFile)
           } catch {
             case e: FileConflictException =>
               error(s"error writing $jclassName: ${e.getMessage}")

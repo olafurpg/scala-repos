@@ -130,8 +130,9 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
                                                   0,
                                                   0)
       val featureSamples = Array.fill(200000)(math.random)
-      val splits = DecisionTree
-        .findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
+      val splits = DecisionTree.findSplitsForContinuousFeature(featureSamples,
+                                                               fakeMetadata,
+                                                               0)
       assert(splits.length === 5)
       assert(fakeMetadata.numSplits(0) === 5)
       assert(fakeMetadata.numBins(0) === 6)
@@ -158,8 +159,9 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
                                                   0)
       val featureSamples =
         Array(1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3).map(_.toDouble)
-      val splits = DecisionTree
-        .findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
+      val splits = DecisionTree.findSplitsForContinuousFeature(featureSamples,
+                                                               fakeMetadata,
+                                                               0)
       assert(splits.length === 3)
       // check returned splits are distinct
       assert(splits.distinct.length === splits.length)
@@ -183,8 +185,9 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
                                                   0)
       val featureSamples =
         Array(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5).map(_.toDouble)
-      val splits = DecisionTree
-        .findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
+      val splits = DecisionTree.findSplitsForContinuousFeature(featureSamples,
+                                                               fakeMetadata,
+                                                               0)
       assert(splits.length === 2)
       assert(splits(0) === 2.0)
       assert(splits(1) === 3.0)
@@ -208,8 +211,9 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
                                                   0)
       val featureSamples =
         Array(0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2).map(_.toDouble)
-      val splits = DecisionTree
-        .findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
+      val splits = DecisionTree.findSplitsForContinuousFeature(featureSamples,
+                                                               fakeMetadata,
+                                                               0)
       assert(splits.length === 1)
       assert(splits(0) === 1.0)
     }

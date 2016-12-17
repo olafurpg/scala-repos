@@ -230,8 +230,9 @@ class ScParameterizedType private (val designator: ScType,
             case _ => Seq.empty
           }
         ScParameterizedType(
-          designator
-            .recursiveVarianceUpdateModifiable(newData, update, variance),
+          designator.recursiveVarianceUpdateModifiable(newData,
+                                                       update,
+                                                       variance),
           typeArgs.zipWithIndex.map {
             case (ta, i) =>
               val v = if (i < des.length) des(i) else 0
@@ -284,8 +285,10 @@ class ScParameterizedType private (val designator: ScType,
         }
       case (ScParameterizedType(_, _),
             ScParameterizedType(designator1, typeArgs1)) =>
-        var t = Equivalence
-          .equivInner(designator, designator1, undefinedSubst, falseUndef)
+        var t = Equivalence.equivInner(designator,
+                                       designator1,
+                                       undefinedSubst,
+                                       falseUndef)
         if (!t._1) return (false, undefinedSubst)
         undefinedSubst = t._2
         if (typeArgs.length != typeArgs1.length) return (false, undefinedSubst)

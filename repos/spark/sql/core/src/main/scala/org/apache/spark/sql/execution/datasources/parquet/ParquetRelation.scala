@@ -119,8 +119,8 @@ private[sql] class DefaultSource
     // bundled with `ParquetOutputFormat[Row]`.
     job.setOutputFormatClass(classOf[ParquetOutputFormat[Row]])
 
-    ParquetOutputFormat
-      .setWriteSupportClass(job, classOf[CatalystWriteSupport])
+    ParquetOutputFormat.setWriteSupportClass(job,
+                                             classOf[CatalystWriteSupport])
 
     // We want to clear this temporary metadata from saving into Parquet file.
     // This metadata is only useful for detecting optional columns when pushdowning filters.
@@ -303,8 +303,9 @@ private[sql] class DefaultSource
     val inputFiles = splitFiles(allFiles).data.toArray
 
     // Create the function to set input paths at the driver side.
-    val setInputPaths = ParquetRelation
-      .initializeDriverSideJobFunc(inputFiles, parquetBlockSize) _
+    val setInputPaths = ParquetRelation.initializeDriverSideJobFunc(
+      inputFiles,
+      parquetBlockSize) _
 
     Utils.withDummyCallSite(sqlContext.sparkContext) {
       new SqlNewHadoopRDD(sqlContext = sqlContext,

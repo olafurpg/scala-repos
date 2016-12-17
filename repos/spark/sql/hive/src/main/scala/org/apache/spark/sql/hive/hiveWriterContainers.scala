@@ -66,8 +66,9 @@ private[hive] class SparkHiveWriterContainer(
   // Add table properties from storage handler to jobConf, so any custom storage
   // handler settings can be set to jobConf
   if (tableDesc != null) {
-    HiveTableUtil
-      .configureJobPropertiesForStorageHandler(tableDesc, jobConf, false)
+    HiveTableUtil.configureJobPropertiesForStorageHandler(tableDesc,
+                                                          jobConf,
+                                                          false)
     Utilities.copyTableJobPropertiesToConf(tableDesc, jobConf)
   }
   protected val conf = new SerializableJobConf(jobConf)
@@ -104,8 +105,9 @@ private[hive] class SparkHiveWriterContainer(
     val numberFormat = NumberFormat.getInstance()
     numberFormat.setMinimumIntegerDigits(5)
     numberFormat.setGroupingUsed(false)
-    val extension = Utilities
-      .getFileExtension(conf.value, fileSinkConf.getCompressed, outputFormat)
+    val extension = Utilities.getFileExtension(conf.value,
+                                               fileSinkConf.getCompressed,
+                                               outputFormat)
     "part-" + numberFormat.format(splitID) + extension
   }
 
@@ -299,8 +301,9 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
     }
 
     // Returns the partition path given a partition key.
-    val getPartitionString = UnsafeProjection
-      .create(Concat(partitionStringExpression) :: Nil, partitionOutput)
+    val getPartitionString = UnsafeProjection.create(
+      Concat(partitionStringExpression) :: Nil,
+      partitionOutput)
 
     // If anything below fails, we should abort the task.
     try {

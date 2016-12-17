@@ -93,8 +93,9 @@ final class Api(unreadCache: UnreadCache,
             }
           } >>- {
             val toUserId = newThread otherUserId me
-            shutup ! lila.hub.actorApi.shutup
-              .RecordPrivateMessage(me.id, toUserId, text)
+            shutup ! lila.hub.actorApi.shutup.RecordPrivateMessage(me.id,
+                                                                   toUserId,
+                                                                   text)
           } inject newThread
       }
   }

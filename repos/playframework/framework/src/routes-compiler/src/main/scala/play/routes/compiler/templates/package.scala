@@ -492,8 +492,9 @@ package object templates {
         }.mkString(", "))
       }
 
-    "return _wA({method:\"%s\", url:%s%s})"
-      .format(route.verb.value, path, queryString)
+    "return _wA({method:\"%s\", url:%s%s})".format(route.verb.value,
+                                                   path,
+                                                   queryString)
   }
 
   /**

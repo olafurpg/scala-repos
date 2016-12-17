@@ -274,8 +274,10 @@ private[clustering] trait LDAParams
     "subsamplingRate",
     "Fraction of the corpus" +
       " to be sampled and used in each iteration of mini-batch gradient descent, in range (0, 1].",
-    ParamValidators
-      .inRange(0.0, 1.0, lowerInclusive = false, upperInclusive = true))
+    ParamValidators.inRange(0.0,
+                            1.0,
+                            lowerInclusive = false,
+                            upperInclusive = true))
 
   /** @group getParam */
   @Since("1.6.0")

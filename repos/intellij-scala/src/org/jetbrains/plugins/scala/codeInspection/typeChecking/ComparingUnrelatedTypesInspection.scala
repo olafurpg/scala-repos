@@ -115,8 +115,10 @@ class ComparingUnrelatedTypesInspection
       } {
         val (elemTypeText, argTypeText) =
           ScTypePresentation.different(elemType, argType)
-        val message = InspectionBundle
-          .message("comparing.unrelated.types.hint", elemTypeText, argTypeText)
+        val message = InspectionBundle.message(
+          "comparing.unrelated.types.hint",
+          elemTypeText,
+          argTypeText)
         holder.registerProblem(arg,
                                message,
                                ProblemHighlightType.GENERIC_ERROR_OR_WARNING)

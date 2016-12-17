@@ -60,24 +60,34 @@ package object rearranger {
   //other modifiers
   val SEALED_ID = "SCALA_SEALED"
   val SEALED_UI = "sealed"
-  val SEALED: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(SEALED_ID, SEALED_UI, StdArrangementTokenType.MODIFIER)
+  val SEALED: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    SEALED_ID,
+    SEALED_UI,
+    StdArrangementTokenType.MODIFIER)
   val IMPLICIT_ID = "SCALA_IMPLICIT"
   val IMPLICIT_UI = "implicit"
-  val IMPLICIT: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(IMPLICIT_ID, IMPLICIT_UI, StdArrangementTokenType.MODIFIER)
+  val IMPLICIT: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    IMPLICIT_ID,
+    IMPLICIT_UI,
+    StdArrangementTokenType.MODIFIER)
   val CASE_ID = "SCALA_CASE"
   val CASE_UI = "case"
-  val CASE: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(CASE_ID, CASE_UI, StdArrangementTokenType.MODIFIER)
+  val CASE: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    CASE_ID,
+    CASE_UI,
+    StdArrangementTokenType.MODIFIER)
   val OVERRIDE_ID = "SCALA_OVERRIDE"
   val OVERRIDE_UI = "override"
-  val OVERRIDE: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(OVERRIDE_ID, OVERRIDE_UI, StdArrangementTokenType.MODIFIER)
+  val OVERRIDE: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    OVERRIDE_ID,
+    OVERRIDE_UI,
+    StdArrangementTokenType.MODIFIER)
   val LAZY_ID = "SCALA_LAZY"
   val LAZY_UI = "lazy"
-  val LAZY: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(LAZY_ID, LAZY_UI, StdArrangementTokenType.MODIFIER)
+  val LAZY: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    LAZY_ID,
+    LAZY_UI,
+    StdArrangementTokenType.MODIFIER)
   val scalaOtherModifiersByName = immutable.ListMap(SEALED_UI -> SEALED,
                                                     IMPLICIT_UI -> IMPLICIT,
                                                     "abstract" -> ABSTRACT,
@@ -95,29 +105,39 @@ package object rearranger {
   //types
   val TYPE_ID = "SCALA_TYPE"
   val TYPE_UI = "type"
-  val TYPE: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(TYPE_ID, TYPE_UI, StdArrangementTokenType.ENTRY_TYPE)
+  val TYPE: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    TYPE_ID,
+    TYPE_UI,
+    StdArrangementTokenType.ENTRY_TYPE)
   val FUNCTION_ID = "SCALA_FUNCTION"
   val FUNCTION_UI = "function"
-  val FUNCTION: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(FUNCTION_ID, FUNCTION_UI, StdArrangementTokenType.ENTRY_TYPE)
+  val FUNCTION: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    FUNCTION_ID,
+    FUNCTION_UI,
+    StdArrangementTokenType.ENTRY_TYPE)
   val VAL_ID = "SCALA_VAL"
   val VAL_UI = "val"
-  val VAL: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(VAL_ID, VAL_UI, StdArrangementTokenType.ENTRY_TYPE)
+  val VAL: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    VAL_ID,
+    VAL_UI,
+    StdArrangementTokenType.ENTRY_TYPE)
   val MACRO_ID = "SCALA_MACRO"
   val MACRO_UI = "macro"
-  val MACRO: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(MACRO_ID, MACRO_UI, StdArrangementTokenType.ENTRY_TYPE)
+  val MACRO: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    MACRO_ID,
+    MACRO_UI,
+    StdArrangementTokenType.ENTRY_TYPE)
   val OBJECT_ID = "SCALA_OBJECT"
   val OBJECT_UI = "object"
-  val OBJECT: ArrangementSettingsToken = StdArrangementSettingsToken
-    .token(OBJECT_ID, OBJECT_UI, StdArrangementTokenType.ENTRY_TYPE)
+  val OBJECT: ArrangementSettingsToken = StdArrangementSettingsToken.token(
+    OBJECT_ID,
+    OBJECT_UI,
+    StdArrangementTokenType.ENTRY_TYPE)
   //this is a special token that is not used in arrangement GUI and always has canBeMatched = false
   val UNSEPARABLE_RANGE_ID = "SCALA_UNSEPARABLE_RANGE"
   val UNSEPARABLE_RANGE: ArrangementSettingsToken =
-    StdArrangementSettingsToken
-      .tokenById(UNSEPARABLE_RANGE_ID, StdArrangementTokenType.ENTRY_TYPE)
+    StdArrangementSettingsToken.tokenById(UNSEPARABLE_RANGE_ID,
+                                          StdArrangementTokenType.ENTRY_TYPE)
 
   //maps and sets of tokens
   val scalaTypesValues = immutable.HashSet(TYPE,

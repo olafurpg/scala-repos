@@ -56,8 +56,10 @@ case class PoolState(numCollections: Long,
   )
 
   override def toString =
-    "PoolState(n=%d,remaining=%s[%s of %s])"
-      .format(numCollections, capacity - used, used, capacity)
+    "PoolState(n=%d,remaining=%s[%s of %s])".format(numCollections,
+                                                    capacity - used,
+                                                    used,
+                                                    capacity)
 }
 
 /**

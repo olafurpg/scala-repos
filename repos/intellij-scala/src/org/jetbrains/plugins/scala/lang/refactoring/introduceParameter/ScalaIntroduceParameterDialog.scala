@@ -208,8 +208,8 @@ class ScalaIntroduceParameterDialog(project: Project,
               defaultForIntroducedTextField.getText.trim)
         }
       })
-    IJSwingUtilities
-      .adjustComponentsOnMac(label, defaultForIntroducedTextField)
+    IJSwingUtilities.adjustComponentsOnMac(label,
+                                           defaultForIntroducedTextField)
     panel.add(defaultForIntroducedTextField, BorderLayout.CENTER)
     val optionsPanel = new JPanel(new BorderLayout())
     replaceOccurrencesChb = new JCheckBox("Replace all occurrences")

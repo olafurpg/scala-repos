@@ -244,13 +244,13 @@ trait EitherInstances extends EitherInstances0 {
 
   implicit def eitherFirstRightLInstance[L]
     : Monad[λ[α => RightProjection[L, α] @@ First]] =
-    Tags.First
-      .subst1[Monad, RightProjection[L, ?]](Monad[RightProjection[L, ?]])
+    Tags.First.subst1[Monad, RightProjection[L, ?]](
+      Monad[RightProjection[L, ?]])
 
   implicit def eitherLastRightLInstance[L]
     : Monad[λ[α => RightProjection[L, α] @@ Last]] =
-    Tags.Last
-      .subst1[Monad, RightProjection[L, ?]](Monad[RightProjection[L, ?]])
+    Tags.Last.subst1[Monad, RightProjection[L, ?]](
+      Monad[RightProjection[L, ?]])
 
   implicit def eitherLeftRInstance[R] =
     new Monad[LeftProjection[?, R]] {

@@ -605,8 +605,9 @@ class ClusterClientTest
   ): Cluster[CacheNode] = {
     val myCachePool =
       if (!ignoreConfigData)
-        CachePoolCluster
-          .newZkCluster(zkPath, zookeeperClient, backupPool = backupPool)
+        CachePoolCluster.newZkCluster(zkPath,
+                                      zookeeperClient,
+                                      backupPool = backupPool)
       else CachePoolCluster.newUnmanagedZkCluster(zkPath, zookeeperClient)
 
     Await.result(myCachePool.ready, TimeOut) // wait until the pool is ready

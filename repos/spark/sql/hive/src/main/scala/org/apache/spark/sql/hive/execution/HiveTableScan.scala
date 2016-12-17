@@ -94,8 +94,9 @@ private[hive] case class HiveTableScan(
     val neededColumnIDs =
       attributes.flatMap(relation.columnOrdinals.get).map(o => o: Integer)
 
-    HiveShim
-      .appendReadColumns(hiveConf, neededColumnIDs, attributes.map(_.name))
+    HiveShim.appendReadColumns(hiveConf,
+                               neededColumnIDs,
+                               attributes.map(_.name))
 
     val tableDesc = relation.tableDesc
     val deserializer = tableDesc.getDeserializerClass.newInstance

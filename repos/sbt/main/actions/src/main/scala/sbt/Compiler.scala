@@ -170,8 +170,9 @@ object Compiler {
                                                 app.provider.components,
                                                 Option(launcher.ivyHome),
                                                 log)
-    val provider = ComponentCompiler
-      .interfaceProvider(componentManager, ivyConfiguration, sourcesModule)
+    val provider = ComponentCompiler.interfaceProvider(componentManager,
+                                                       ivyConfiguration,
+                                                       sourcesModule)
     new AnalyzingCompiler(instance, provider, cpOptions)
   }
 

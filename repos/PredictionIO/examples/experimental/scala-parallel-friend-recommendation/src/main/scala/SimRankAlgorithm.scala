@@ -15,8 +15,10 @@ class SimRankAlgorithm(val ap: SimRankParams)
 
   def train(td: TrainingData): RDD[(Long, Double)] = {
     td.g.edges.count()
-    val scores = DeltaSimRankRDD
-      .compute(td.g, ap.numIterations, td.identityMatrix, ap.decay)
+    val scores = DeltaSimRankRDD.compute(td.g,
+                                         ap.numIterations,
+                                         td.identityMatrix,
+                                         ap.decay)
     scores
   }
 

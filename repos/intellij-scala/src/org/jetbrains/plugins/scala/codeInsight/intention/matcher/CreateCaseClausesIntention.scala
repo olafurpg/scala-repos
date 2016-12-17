@@ -70,8 +70,9 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
       element: PsiElement) {
     val inheritors = inheritorsOf(cls)
     val (caseClauseTexts, bindTos) = inheritors.map(caseClauseText).unzip
-    val newMatchStmt = ScalaPsiElementFactory
-      .createMatch(expr.getText, caseClauseTexts, element.getManager)
+    val newMatchStmt = ScalaPsiElementFactory.createMatch(expr.getText,
+                                                          caseClauseTexts,
+                                                          element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, bindTos)
   }
@@ -85,8 +86,9 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
     }
     val caseClauseTexts =
       enumConsts.map(ec => "case %s.%s =>".format(cls.name, ec.name))
-    val newMatchStmt = ScalaPsiElementFactory
-      .createMatch(expr.getText, caseClauseTexts, element.getManager)
+    val newMatchStmt = ScalaPsiElementFactory.createMatch(expr.getText,
+                                                          caseClauseTexts,
+                                                          element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, _ => cls)
   }
@@ -104,8 +106,9 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
       else
         Seq(
           s"\n$defaultCaseClauseText //could not find inherited objects or case classes\n")
-    val newMatchStmt = ScalaPsiElementFactory
-      .createMatch(expr.getText, caseClauseTexts, element.getManager)
+    val newMatchStmt = ScalaPsiElementFactory.createMatch(expr.getText,
+                                                          caseClauseTexts,
+                                                          element.getManager)
     val replaced = matchStmt.replace(newMatchStmt).asInstanceOf[ScMatchStmt]
     bindReferences(replaced, bindTos)
   }

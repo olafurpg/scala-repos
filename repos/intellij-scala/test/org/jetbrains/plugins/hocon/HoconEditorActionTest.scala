@@ -13,8 +13,9 @@ abstract class HoconEditorActionTest(actionId: String, subpath: String)
     assert(actionHandler != null)
 
     inWriteCommandAction {
-      actionHandler
-        .execute(editor, editor.getCaretModel.getCurrentCaret, dataContext)
+      actionHandler.execute(editor,
+                            editor.getCaretModel.getCurrentCaret,
+                            dataContext)
     }
   }
 

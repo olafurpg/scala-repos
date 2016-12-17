@@ -25,8 +25,7 @@ object CompilationUnit {
 
     def parsePackagingBody(hasPackage: Boolean) = {
       while (builder.getTokenType != null) {
-        TopStatSeq
-          .parse(builder, waitBrace = false, hasPackage = hasPackage) match {
+        TopStatSeq.parse(builder, waitBrace = false, hasPackage = hasPackage) match {
           case ParserState.EMPTY_STATE =>
           case ParserState.SCRIPT_STATE =>
             Stats.trigger("scala.file.script.parsed")

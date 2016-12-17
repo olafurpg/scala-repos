@@ -498,8 +498,10 @@ abstract class ShardCoordinator(
   var regionTerminationInProgress = Set.empty[ActorRef]
 
   import context.dispatcher
-  val rebalanceTask = context.system.scheduler
-    .schedule(rebalanceInterval, rebalanceInterval, self, RebalanceTick)
+  val rebalanceTask = context.system.scheduler.schedule(rebalanceInterval,
+                                                        rebalanceInterval,
+                                                        self,
+                                                        RebalanceTick)
 
   cluster.subscribe(self,
                     initialStateMode = InitialStateAsEvents,

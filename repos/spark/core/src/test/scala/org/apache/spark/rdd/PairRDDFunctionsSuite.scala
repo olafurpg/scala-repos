@@ -109,8 +109,10 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary
-        .testSample(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSample(stratifiedData,
+                                     samplingRate,
+                                     defaultSeed,
+                                     n)
     }
 
     // vary fractionPositive
@@ -120,8 +122,10 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary
-        .testSample(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSample(stratifiedData,
+                                     samplingRate,
+                                     defaultSeed,
+                                     n)
     }
 
     // Use the same data for the rest of the tests
@@ -139,8 +143,10 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary
-        .testSample(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSample(stratifiedData,
+                                     samplingRate,
+                                     defaultSeed,
+                                     n)
     }
   }
 
@@ -154,8 +160,10 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary
-        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSampleExact(stratifiedData,
+                                          samplingRate,
+                                          defaultSeed,
+                                          n)
     }
 
     // vary fractionPositive
@@ -165,8 +173,10 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val stratifiedData =
         data.keyBy(StratifiedAuxiliary.stratifier(fractionPositive))
       val samplingRate = 0.1
-      StratifiedAuxiliary
-        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSampleExact(stratifiedData,
+                                          samplingRate,
+                                          defaultSeed,
+                                          n)
     }
 
     // Use the same data for the rest of the tests
@@ -179,14 +189,18 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     // vary seed
     for (seed <- defaultSeed to defaultSeed + 5L) {
       val samplingRate = 0.1
-      StratifiedAuxiliary
-        .testSampleExact(stratifiedData, samplingRate, seed, n)
+      StratifiedAuxiliary.testSampleExact(stratifiedData,
+                                          samplingRate,
+                                          seed,
+                                          n)
     }
 
     // vary sampling rate
     for (samplingRate <- List(0.01, 0.05, 0.1, 0.5)) {
-      StratifiedAuxiliary
-        .testSampleExact(stratifiedData, samplingRate, defaultSeed, n)
+      StratifiedAuxiliary.testSampleExact(stratifiedData,
+                                          samplingRate,
+                                          defaultSeed,
+                                          n)
     }
   }
 

@@ -153,8 +153,9 @@ object ScalaExtractMethodUtils {
               )
             case None => "" //should not occur
           }
-          val retElem = ScalaPsiElementFactory
-            .createExpressionFromText(s"return $newText", ret.getManager)
+          val retElem = ScalaPsiElementFactory.createExpressionFromText(
+            s"return $newText",
+            ret.getManager)
           ret.replace(retElem)
         }
       }
@@ -523,8 +524,12 @@ object ScalaExtractMethodUtils {
         }
         val expr =
           ScalaPsiElementFactory.createExpressionFromText(exprText, manager)
-        val declaration = ScalaPsiElementFactory
-          .createDeclaration(pattern, "", isVariable = !isVal, expr, manager)
+        val declaration = ScalaPsiElementFactory.createDeclaration(pattern,
+                                                                   "",
+                                                                   isVariable =
+                                                                     !isVal,
+                                                                   expr,
+                                                                   manager)
         val result = elements.head.replace(declaration)
         TypeAdjuster.markToAdjust(result)
         result
@@ -567,8 +572,9 @@ object ScalaExtractMethodUtils {
         if (allVals || allVars) {
           val patternArgsText = outputTypedNames.mkString("(", ", ", ")")
           val patternText = ics.className + patternArgsText
-          val expr = ScalaPsiElementFactory
-            .createExpressionFromText(mFreshName, manager)
+          val expr = ScalaPsiElementFactory.createExpressionFromText(
+            mFreshName,
+            manager)
           val stmt = ScalaPsiElementFactory.createDeclaration(patternText,
                                                               "",
                                                               isVariable =

@@ -121,8 +121,9 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
     */
   def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean = {
     type JBoolean = java.lang.Boolean
-    val method = try classOf[JFile]
-      .getMethod("setExecutable", classOf[Boolean], classOf[Boolean])
+    val method = try classOf[JFile].getMethod("setExecutable",
+                                              classOf[Boolean],
+                                              classOf[Boolean])
     catch {
       case _: NoSuchMethodException => return false
     }

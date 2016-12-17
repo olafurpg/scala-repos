@@ -126,8 +126,7 @@ class TcpListenerSpec extends AkkaSpec("""
       listener ! ChannelAcceptable
       val channel = expectWorkerForCommand
 
-      EventFilter
-        .warning(pattern = "selector capacity limit", occurrences = 1) intercept {
+      EventFilter.warning(pattern = "selector capacity limit", occurrences = 1) intercept {
         listener ! FailedRegisterIncoming(channel)
         awaitCond(!channel.isOpen)
       }

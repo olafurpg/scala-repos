@@ -152,8 +152,9 @@ class GroupDeployIntegrationTest
     When("The group is updated")
     check.afterDelay(1.second, state = false)
     check.afterDelay(3.seconds, state = true)
-    val update = marathon
-      .updateGroup(id, group.copy(apps = Some(Set(appProxy(appId, "v2", 1)))))
+    val update = marathon.updateGroup(
+      id,
+      group.copy(apps = Some(Set(appProxy(appId, "v2", 1)))))
 
     Then("A success event is send and the application has been started")
     waitForChange(update)
@@ -208,8 +209,9 @@ class GroupDeployIntegrationTest
 
     When("The new application is not healthy")
     val v2Check = appProxyCheck(appId, "v2", state = false) //will always fail
-    val update = marathon
-      .updateGroup(id, group.copy(apps = Some(Set(appProxy(appId, "v2", 2)))))
+    val update = marathon.updateGroup(
+      id,
+      group.copy(apps = Some(Set(appProxy(appId, "v2", 2)))))
 
     Then("All v1 applications are kept alive")
     v1Check.healthy
@@ -231,12 +233,14 @@ class GroupDeployIntegrationTest
     val create = marathon.createGroup(group)
     waitForChange(create)
     appProxyCheck(appId, "v2", state = false) //will always fail
-    marathon
-      .updateGroup(id, group.copy(apps = Some(Set(appProxy(appId, "v2", 2)))))
+    marathon.updateGroup(
+      id,
+      group.copy(apps = Some(Set(appProxy(appId, "v2", 2)))))
 
     When("Another upgrade is triggered, while the old one is not completed")
-    val result = marathon
-      .updateGroup(id, group.copy(apps = Some(Set(appProxy(appId, "v3", 2)))))
+    val result = marathon.updateGroup(
+      id,
+      group.copy(apps = Some(Set(appProxy(appId, "v3", 2)))))
 
     Then("An error is indicated")
     result.code should be(HttpStatus.SC_CONFLICT)

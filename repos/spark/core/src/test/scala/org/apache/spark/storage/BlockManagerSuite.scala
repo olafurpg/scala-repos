@@ -1290,8 +1290,9 @@ class BlockManagerSuite
     assert(memoryStore.currentUnrollMemoryForThisTask === 0)
 
     // Unroll with all the space in the world. This should succeed.
-    var putResult = memoryStore
-      .putIterator("unroll", smallList.iterator, StorageLevel.MEMORY_ONLY)
+    var putResult = memoryStore.putIterator("unroll",
+                                            smallList.iterator,
+                                            StorageLevel.MEMORY_ONLY)
     assert(putResult.isRight)
     assert(memoryStore.currentUnrollMemoryForThisTask === 0)
     smallList.iterator.zip(memoryStore.getValues("unroll").get).foreach {
@@ -1309,8 +1310,9 @@ class BlockManagerSuite
       store.putIterator("someBlock2",
                         smallList.iterator,
                         StorageLevel.MEMORY_ONLY))
-    putResult = memoryStore
-      .putIterator("unroll", smallList.iterator, StorageLevel.MEMORY_ONLY)
+    putResult = memoryStore.putIterator("unroll",
+                                        smallList.iterator,
+                                        StorageLevel.MEMORY_ONLY)
     assert(putResult.isRight)
     assert(memoryStore.currentUnrollMemoryForThisTask === 0)
     assert(memoryStore.contains("someBlock2"))
@@ -1328,8 +1330,9 @@ class BlockManagerSuite
       store.putIterator("someBlock3",
                         smallList.iterator,
                         StorageLevel.MEMORY_ONLY))
-    putResult = memoryStore
-      .putIterator("unroll", bigList.iterator, StorageLevel.MEMORY_ONLY)
+    putResult = memoryStore.putIterator("unroll",
+                                        bigList.iterator,
+                                        StorageLevel.MEMORY_ONLY)
     assert(memoryStore.currentUnrollMemoryForThisTask > 0) // we returned an iterator
     assert(!memoryStore.contains("someBlock2"))
     assert(putResult.isLeft)

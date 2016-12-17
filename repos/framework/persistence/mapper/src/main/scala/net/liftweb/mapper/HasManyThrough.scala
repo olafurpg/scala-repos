@@ -50,8 +50,10 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
           else st.setObject(1, indVal.jdbcFriendly, indVal.targetSQLType)
 
           DB.exec(st) { rs =>
-            otherSingleton
-              .createInstances(owner.connectionIdentifier, rs, Empty, Empty)
+            otherSingleton.createInstances(owner.connectionIdentifier,
+                                           rs,
+                                           Empty,
+                                           Empty)
           }
         } openOr Nil
       }

@@ -49,8 +49,8 @@ object FailureAccrualFactory {
     Backoff.equalJittered(5.seconds, 300.seconds)
 
   private[finagle] val defaultPolicy = () =>
-    FailureAccrualPolicy
-      .consecutiveFailures(defaultConsecutiveFailures, jitteredBackoff)
+    FailureAccrualPolicy.consecutiveFailures(defaultConsecutiveFailures,
+                                             jitteredBackoff)
 
   /**
     * Add jitter in `markDeadFor` to reduce correlation.

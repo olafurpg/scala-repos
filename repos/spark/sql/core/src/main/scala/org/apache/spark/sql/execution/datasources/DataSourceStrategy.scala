@@ -472,8 +472,9 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         val mutableJoinedRow = new JoinedRow()
         val unsafePartitionValues =
           UnsafeProjection.create(partitionColumnSchema)(partitionValues)
-        val unsafeProjection = UnsafeProjection
-          .create(requiredColumns, dataColumns ++ partitionColumns)
+        val unsafeProjection = UnsafeProjection.create(
+          requiredColumns,
+          dataColumns ++ partitionColumns)
 
         // If we are returning batches directly, we need to augment them with the partitioning
         // columns. We want to do this without a row by row operation.

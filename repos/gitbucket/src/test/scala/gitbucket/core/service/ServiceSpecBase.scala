@@ -35,8 +35,12 @@ trait ServiceSpecBase {
   }
 
   def generateNewAccount(name: String)(implicit s: Session): Account = {
-    AccountService
-      .createAccount(name, name, name, s"${name}@example.com", false, None)
+    AccountService.createAccount(name,
+                                 name,
+                                 name,
+                                 s"${name}@example.com",
+                                 false,
+                                 None)
     user(name)
   }
 

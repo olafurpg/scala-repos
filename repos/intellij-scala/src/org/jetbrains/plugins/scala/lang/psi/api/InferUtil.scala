@@ -258,8 +258,7 @@ object InferUtil {
         val evaluator = ScalaMacroEvaluator.getInstance(place.getProject)
         evaluator.isMacro(results.head.getElement) match {
           case Some(m) =>
-            evaluator
-              .checkMacro(m, MacroContext(place, Some(paramType))) match {
+            evaluator.checkMacro(m, MacroContext(place, Some(paramType))) match {
               case Some(tp) =>
                 exprs += new Expression(polymorphicSubst subst tp)
               case None => updateExpr()
@@ -644,15 +643,17 @@ object InferUtil {
                     if (tp.lowerType() != Nothing) {
                       val substedLowerType = unSubst.subst(tp.lowerType())
                       if (!hasRecursiveTypeParameters(substedLowerType)) {
-                        un = un
-                          .addLower(name, substedLowerType, additional = true)
+                        un = un.addLower(name,
+                                         substedLowerType,
+                                         additional = true)
                       }
                     }
                     if (tp.upperType() != Any) {
                       val substedUpperType = unSubst.subst(tp.upperType())
                       if (!hasRecursiveTypeParameters(substedUpperType)) {
-                        un = un
-                          .addUpper(name, substedUpperType, additional = true)
+                        un = un.addUpper(name,
+                                         substedUpperType,
+                                         additional = true)
                       }
                     }
                   }

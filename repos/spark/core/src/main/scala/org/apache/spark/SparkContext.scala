@@ -2584,8 +2584,8 @@ object SparkContext extends Logging {
         val backend = try {
           val clazz = Utils.classForName(
             "org.apache.spark.scheduler.cluster.YarnClusterSchedulerBackend")
-          val cons = clazz
-            .getConstructor(classOf[TaskSchedulerImpl], classOf[SparkContext])
+          val cons = clazz.getConstructor(classOf[TaskSchedulerImpl],
+                                          classOf[SparkContext])
           cons
             .newInstance(scheduler, sc)
             .asInstanceOf[CoarseGrainedSchedulerBackend]
@@ -2612,8 +2612,8 @@ object SparkContext extends Logging {
         val backend = try {
           val clazz = Utils.classForName(
             "org.apache.spark.scheduler.cluster.YarnClientSchedulerBackend")
-          val cons = clazz
-            .getConstructor(classOf[TaskSchedulerImpl], classOf[SparkContext])
+          val cons = clazz.getConstructor(classOf[TaskSchedulerImpl],
+                                          classOf[SparkContext])
           cons
             .newInstance(scheduler, sc)
             .asInstanceOf[CoarseGrainedSchedulerBackend]

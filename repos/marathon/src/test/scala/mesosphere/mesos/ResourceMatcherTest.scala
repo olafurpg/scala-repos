@@ -72,8 +72,9 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
 
   test("match resources success with preserved reservations") {
     // have unique reservation to make sure that the reservations are really preserved
-    val cpuReservation = MarathonTestHelper
-      .reservation(principal = "cpuPrincipal", labels = Map("some" -> "label"))
+    val cpuReservation =
+      MarathonTestHelper.reservation(principal = "cpuPrincipal",
+                                     labels = Map("some" -> "label"))
     val cpuReservation2 =
       MarathonTestHelper.reservation(principal = "cpuPrincipal",
                                      labels = Map("some" -> "label2"))
@@ -150,8 +151,9 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
 
     res.portsMatch.hostPortsWithRole.toSet should be(
       Set(
-        PortsMatcher
-          .PortWithRole("*", 80, reservation = Some(portsReservation)))
+        PortsMatcher.PortWithRole("*",
+                                  80,
+                                  reservation = Some(portsReservation)))
     )
 
     // reserved resources should not be matched by selector with reserved = false
@@ -163,8 +165,9 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
   }
 
   test("match resources should not consider resources with disk infos") {
-    val cpuReservation = MarathonTestHelper
-      .reservation(principal = "cpuPrincipal", labels = Map("some" -> "label"))
+    val cpuReservation =
+      MarathonTestHelper.reservation(principal = "cpuPrincipal",
+                                     labels = Map("some" -> "label"))
     val memReservation =
       MarathonTestHelper.reservation(principal = "memPrincipal",
                                      labels = Map("resource" -> "mem"))

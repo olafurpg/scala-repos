@@ -215,8 +215,9 @@ private[akka] object GraphInterpreter {
       "GraphAssembly\n  " + stageList.mkString("[ ", "\n    ", "\n  ]") +
         "\n  " + ins.mkString("[", ",", "]") + "\n  " +
         inOwners.mkString("[", ",", "]") + "\n  " +
-        outs.mkString("[", ",", "]") + "\n  " + outOwners
-        .mkString("[", ",", "]")
+        outs.mkString("[", ",", "]") + "\n  " + outOwners.mkString("[",
+                                                                   ",",
+                                                                   "]")
     }
   }
 

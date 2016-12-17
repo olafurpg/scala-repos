@@ -273,8 +273,9 @@ trait ApplicationAnnotator {
           //TODO show parameter name
           val (expectedText, actualText) =
             ScTypePresentation.different(expectedType, t)
-          val message = ScalaBundle
-            .message("type.mismatch.expected.actual", expectedText, actualText)
+          val message = ScalaBundle.message("type.mismatch.expected.actual",
+                                            expectedText,
+                                            actualText)
           val annotation = holder.createErrorAnnotation(expression, message)
           annotation.registerFix(ReportHighlightingErrorQuickFix)
         }

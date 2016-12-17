@@ -256,8 +256,9 @@ class ConnectionPoolSpec
       val (_, _, _, hcp) =
         cachedHostConnectionPool[Int](idleTimeout = 1.second)
       val gateway = Await.result(hcp.gatewayFuture, 500.millis)
-      val PoolGateway
-        .Running(_, shutdownStartedPromise, shutdownCompletedPromise) =
+      val PoolGateway.Running(_,
+                              shutdownStartedPromise,
+                              shutdownCompletedPromise) =
         gateway.currentState
       shutdownStartedPromise.isCompleted shouldEqual false
       shutdownCompletedPromise.isCompleted shouldEqual false
@@ -331,8 +332,9 @@ class ConnectionPoolSpec
       autoAccept = true) {
       val (serverEndpoint2, serverHostName2, serverPort2) =
         TestUtils.temporaryServerHostnameAndPort()
-      Http()
-        .bindAndHandleSync(testServerHandler(0), serverHostName2, serverPort2)
+      Http().bindAndHandleSync(testServerHandler(0),
+                               serverHostName2,
+                               serverPort2)
 
       val (requestIn, responseOut, responseOutSub, hcp) = superPool[Int]()
 

@@ -85,8 +85,9 @@ private class ScalaPsiMethodGenerationInfo(method: PsiMethod,
         val sign = new PhysicalSignature(method, ScSubstitutor.empty)
         val methodMember = new ScMethodMember(sign, isOverride = false)
 
-        member = ScalaGenerationInfo
-          .insertMethod(methodMember, td, findAnchor(td, baseMethod))
+        member = ScalaGenerationInfo.insertMethod(methodMember,
+                                                  td,
+                                                  findAnchor(td, baseMethod))
       case _ => super.insert(aClass, anchor, before)
     }
   }

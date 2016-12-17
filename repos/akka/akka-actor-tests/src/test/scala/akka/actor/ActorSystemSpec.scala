@@ -121,8 +121,9 @@ object ActorSystemSpec {
           mbox: Mailbox,
           hasMessageHint: Boolean,
           hasSystemMessageHint: Boolean): Boolean = {
-        val ret = super
-          .registerForExecution(mbox, hasMessageHint, hasSystemMessageHint)
+        val ret = super.registerForExecution(mbox,
+                                             hasMessageHint,
+                                             hasSystemMessageHint)
         doneIt.switchOn {
           TestKit.awaitCond(mbox.actor.actor != null, 1.second)
           mbox.actor.actor match {
@@ -305,8 +306,7 @@ class ActorSystemSpec
       implicit val timeout = Timeout((20 seconds).dilated)
       val waves = for (i ← 1 to 3)
         yield system.actorOf(Props[ActorSystemSpec.Waves]) ? 50000
-      Await
-        .result(Future.sequence(waves), timeout.duration + 5.seconds) should ===(
+      Await.result(Future.sequence(waves), timeout.duration + 5.seconds) should ===(
         Vector("done", "done", "done"))
     }
 

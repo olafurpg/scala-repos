@@ -174,11 +174,13 @@ object LogisticRegressionExample {
       s"Weights: ${lorModel.coefficients} Intercept: ${lorModel.intercept}")
 
     println("Training data results:")
-    DecisionTreeExample
-      .evaluateClassificationModel(pipelineModel, training, "indexedLabel")
+    DecisionTreeExample.evaluateClassificationModel(pipelineModel,
+                                                    training,
+                                                    "indexedLabel")
     println("Test data results:")
-    DecisionTreeExample
-      .evaluateClassificationModel(pipelineModel, test, "indexedLabel")
+    DecisionTreeExample.evaluateClassificationModel(pipelineModel,
+                                                    test,
+                                                    "indexedLabel")
 
     sc.stop()
   }

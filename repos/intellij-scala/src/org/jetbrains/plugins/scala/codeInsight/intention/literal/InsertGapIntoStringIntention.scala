@@ -28,8 +28,11 @@ class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
     def insertString(str: String, caretMove: Int) {
       extensions.inWriteAction {
         editor.getDocument.insertString(editor.getCaretModel.getOffset, str)
-        editor.getCaretModel
-          .moveCaretRelatively(caretMove, 0, false, false, false)
+        editor.getCaretModel.moveCaretRelatively(caretMove,
+                                                 0,
+                                                 false,
+                                                 false,
+                                                 false)
       }
     }
 

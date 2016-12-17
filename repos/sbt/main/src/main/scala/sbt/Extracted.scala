@@ -81,8 +81,11 @@ final case class Extracted(
     val config = extractedTaskConfig(this, structure, state)
     withStreams(structure, state) { str =>
       val nv = nodeView(state, str, rkey :: Nil)
-      val (newS, result) = EvaluateTask
-        .runTask(task, state, str, structure.index.triggers, config)(nv)
+      val (newS, result) = EvaluateTask.runTask(task,
+                                                state,
+                                                str,
+                                                structure.index.triggers,
+                                                config)(nv)
       (newS, processResult(result, newS.log))
     }
   }

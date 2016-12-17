@@ -311,8 +311,8 @@ object Memcached
         val key = KetamaClientKey.fromCacheNode(node)
         val stk = stack.replace(
           FailureAccrualFactory.role,
-          KetamaFailureAccrualFactory
-            .module[Command, Response](key, healthBroker))
+          KetamaFailureAccrualFactory.module[Command, Response](key,
+                                                                healthBroker))
         withStack(stk).newService(mkDestination(node.host, node.port), label)
       }
 

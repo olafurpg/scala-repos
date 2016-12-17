@@ -65,8 +65,9 @@ class StringToMultilineStringIntention extends PsiElementBaseIntentionAction {
           InterpolatedStringFormatter.formatContent(parts, toMultiline = true)
         val quote = "\"\"\""
         val text = s"$prefix$quote$content$quote"
-        val newLiteral = ScalaPsiElementFactory
-          .createExpressionFromText(text, literal.getManager)
+        val newLiteral = ScalaPsiElementFactory.createExpressionFromText(
+          text,
+          literal.getManager)
         val replaced = interpolated.replace(newLiteral)
         addMarginsAndFormatMLString(replaced, document)
       case _ =>
@@ -97,8 +98,9 @@ class StringToMultilineStringIntention extends PsiElementBaseIntentionAction {
           InterpolatedStringFormatter.formatContent(parts, toMultiline = false)
         val quote = "\""
         val text = s"$prefix$quote$content$quote"
-        val newLiteral = ScalaPsiElementFactory
-          .createExpressionFromText(text, literal.getManager)
+        val newLiteral = ScalaPsiElementFactory.createExpressionFromText(
+          text,
+          literal.getManager)
         toReplace.replace(newLiteral)
       case _ =>
         var toReplace: PsiElement = literal
@@ -116,8 +118,9 @@ class StringToMultilineStringIntention extends PsiElementBaseIntentionAction {
           case Seq(Text(s)) =>
             val newLiteralText =
               "\"" + StringUtil.escapeStringCharacters(s) + "\""
-            val newLiteral = ScalaPsiElementFactory
-              .createExpressionFromText(newLiteralText, literal.getManager)
+            val newLiteral = ScalaPsiElementFactory.createExpressionFromText(
+              newLiteralText,
+              literal.getManager)
             toReplace.replace(newLiteral)
           case _ =>
         }

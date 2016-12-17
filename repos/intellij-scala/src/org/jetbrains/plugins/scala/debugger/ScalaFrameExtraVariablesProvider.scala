@@ -96,8 +96,10 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
                                   alreadyCollected: util.Set[String]) = {
     val initialCandidates = inReadAction {
       val completionProcessor = new CollectingProcessor(elem)
-      PsiTreeUtil
-        .treeWalkUp(completionProcessor, elem, null, ResolveState.initial)
+      PsiTreeUtil.treeWalkUp(completionProcessor,
+                             elem,
+                             null,
+                             ResolveState.initial)
       completionProcessor.candidates
         .filter(
           srr =>
@@ -133,8 +135,9 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
         }
         val funDef =
           PsiTreeUtil.getParentOfType(place, classOf[ScFunctionDefinition])
-        val lazyVal = PsiTreeUtil
-          .getParentOfType(place, classOf[ScPatternDefinition]) match {
+        val lazyVal = PsiTreeUtil.getParentOfType(
+          place,
+          classOf[ScPatternDefinition]) match {
           case null => null
           case LazyVal(lzy) => lzy
           case _ => null

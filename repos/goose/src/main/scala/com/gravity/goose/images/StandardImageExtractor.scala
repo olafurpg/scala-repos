@@ -490,8 +490,8 @@ class StandardImageExtractor(httpClient: HttpClient,
       var link: String = this.buildImagePath(src)
       link = link.replace(" ", "%20")
       val localContext: HttpContext = new BasicHttpContext
-      localContext
-        .setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
+      localContext.setAttribute(ClientContext.COOKIE_STORE,
+                                HtmlFetcher.emptyCookieStore)
       httpget = new HttpGet(link)
       var response: HttpResponse = null
       response = httpClient.execute(httpget, localContext)
@@ -553,8 +553,10 @@ class StandardImageExtractor(httpClient: HttpClient,
       }
       try {
         val imageSource: String = this.buildImagePath(image.attr("src"))
-        val localSrcPath: String = ImageSaver
-          .storeTempImage(this.httpClient, this.linkhash, imageSource, config)
+        val localSrcPath: String = ImageSaver.storeTempImage(this.httpClient,
+                                                             this.linkhash,
+                                                             imageSource,
+                                                             config)
         if (localSrcPath == null) {
           if (logger.isDebugEnabled) {
             logger.debug(
@@ -571,8 +573,9 @@ class StandardImageExtractor(httpClient: HttpClient,
         if (continueVar) {
           image.attr("tempImagePath", localSrcPath)
           try {
-            var imageDims: ImageDetails = ImageUtils
-              .getImageDimensions(config.imagemagickIdentifyPath, localSrcPath)
+            var imageDims: ImageDetails = ImageUtils.getImageDimensions(
+              config.imagemagickIdentifyPath,
+              localSrcPath)
             width = imageDims.getWidth
             height = imageDims.getHeight
             if (depthLevel > 1) {

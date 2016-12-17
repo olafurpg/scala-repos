@@ -84,8 +84,9 @@ class FlipComparisonInInfixExprIntention
       .append(" ")
       .append(infixExpr.getBaseExpr.getText)
 
-    val newInfixExpr = ScalaPsiElementFactory
-      .createExpressionFromText(expr.toString(), element.getManager)
+    val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(
+      expr.toString(),
+      element.getManager)
 
     val size =
       newInfixExpr

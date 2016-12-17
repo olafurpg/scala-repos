@@ -147,8 +147,9 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     val parquetMetadata =
       new ParquetMetadata(fileMetadata, Seq.empty[BlockMetaData].asJava)
     val footer = new Footer(path, parquetMetadata)
-    ParquetFileWriter
-      .writeMetadataFile(configuration, path, Seq(footer).asJava)
+    ParquetFileWriter.writeMetadataFile(configuration,
+                                        path,
+                                        Seq(footer).asJava)
   }
 
   /**
@@ -167,8 +168,9 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     val parquetMetadata =
       new ParquetMetadata(fileMetadata, Seq.empty[BlockMetaData].asJava)
     val footer = new Footer(path, parquetMetadata)
-    ParquetFileWriter
-      .writeMetadataFile(configuration, path, Seq(footer).asJava)
+    ParquetFileWriter.writeMetadataFile(configuration,
+                                        path,
+                                        Seq(footer).asJava)
   }
 
   protected def readAllFootersWithoutSummaryFiles(

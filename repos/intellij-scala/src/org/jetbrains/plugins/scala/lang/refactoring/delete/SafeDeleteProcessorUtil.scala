@@ -243,8 +243,8 @@ object SafeDeleteProcessorUtil {
               !constructorsToRefs.containsKey(overridingConstructor)) {
             val overridingConstructorReferences: util.Collection[PsiReference] =
               referenceSearch(overridingConstructor).findAll
-            constructorsToRefs
-              .put(overridingConstructor, overridingConstructorReferences)
+            constructorsToRefs.put(overridingConstructor,
+                                   overridingConstructorReferences)
             passConstructors.add(overridingConstructor)
           }
         }

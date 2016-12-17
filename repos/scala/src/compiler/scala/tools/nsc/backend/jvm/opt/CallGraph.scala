@@ -270,8 +270,9 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     }
     sams flatMap {
       case (index, _) =>
-        val prods = prodConsI
-          .initialProducersForValueAt(consumerInsn, firstConsumedSlot + index)
+        val prods =
+          prodConsI.initialProducersForValueAt(consumerInsn,
+                                               firstConsumedSlot + index)
         if (prods.size != 1) None
         else {
           val argInfo = prods.head match {

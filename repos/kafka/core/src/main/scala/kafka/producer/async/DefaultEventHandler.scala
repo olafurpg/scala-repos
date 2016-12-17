@@ -258,8 +258,9 @@ class DefaultEventHandler[K, V](
 
   private def getPartitionListForTopic(
       m: KeyedMessage[K, Message]): Seq[PartitionAndLeader] = {
-    val topicPartitionsList = brokerPartitionInfo
-      .getBrokerPartitionInfo(m.topic, correlationId.getAndIncrement)
+    val topicPartitionsList = brokerPartitionInfo.getBrokerPartitionInfo(
+      m.topic,
+      correlationId.getAndIncrement)
     debug(
       "Broker partitions registered for topic: %s are %s".format(
         m.topic,

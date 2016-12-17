@@ -956,8 +956,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         val io: IO[ReadResult] = version match {
           case Version.Current =>
             versionLog.current map { v =>
-              openResource(v.id)
-                .fold(PathOpFailure(path, _), ReadSuccess(path, _))
+              openResource(v.id).fold(PathOpFailure(path, _),
+                                      ReadSuccess(path, _))
             } getOrElse {
               IO(
                 PathOpFailure(

@@ -93,8 +93,8 @@ object Arguments {
           while ((i == j) && iter.hasNext) {
             val prefix = iter.next
             if (args(i) startsWith prefix) {
-              res
-                .addPrefixed(prefix, args(i).substring(prefix.length()).trim())
+              res.addPrefixed(prefix,
+                              args(i).substring(prefix.length()).trim())
               i += 1
             }
           }

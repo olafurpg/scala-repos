@@ -109,8 +109,8 @@ abstract class ClassificationModel[
       val predictRawUDF = udf { (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
       }
-      outputData = outputData
-        .withColumn(getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
+      outputData = outputData.withColumn(getRawPredictionCol,
+                                         predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
     }
     if (getPredictionCol != "") {

@@ -107,15 +107,15 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
     try {
       val localContext: HttpContext = new BasicHttpContext
-      localContext
-        .setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
+      localContext.setAttribute(ClientContext.COOKIE_STORE,
+                                HtmlFetcher.emptyCookieStore)
       httpget = new HttpGet(cleanUrl)
-      HttpProtocolParams
-        .setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
+      HttpProtocolParams.setUserAgent(httpClient.getParams,
+                                      config.getBrowserUserAgent());
 
       val params = httpClient.getParams
-      HttpConnectionParams
-        .setConnectionTimeout(params, config.getConnectionTimeout())
+      HttpConnectionParams.setConnectionTimeout(params,
+                                                config.getConnectionTimeout())
       HttpConnectionParams.setSoTimeout(params, config.getSocketTimeout())
 
       trace(
@@ -123,8 +123,9 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           HttpProtocolParams.getUserAgent(httpClient.getParams))
       val response: HttpResponse = httpClient.execute(httpget, localContext)
 
-      HttpStatusValidator
-        .validate(cleanUrl, response.getStatusLine.getStatusCode) match {
+      HttpStatusValidator.validate(
+        cleanUrl,
+        response.getStatusLine.getStatusCode) match {
         case Left(ex) => throw ex
         case _ =>
       }

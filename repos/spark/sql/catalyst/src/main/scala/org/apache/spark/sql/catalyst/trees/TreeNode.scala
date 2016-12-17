@@ -544,15 +544,17 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
         _.generateTreeString(depth + 2,
                              lastChildren :+ false :+ false,
                              builder))
-      innerChildren.last
-        .generateTreeString(depth + 2, lastChildren :+ false :+ true, builder)
+      innerChildren.last.generateTreeString(depth + 2,
+                                            lastChildren :+ false :+ true,
+                                            builder)
     }
 
     if (treeChildren.nonEmpty) {
       treeChildren.init.foreach(
         _.generateTreeString(depth + 1, lastChildren :+ false, builder))
-      treeChildren.last
-        .generateTreeString(depth + 1, lastChildren :+ true, builder)
+      treeChildren.last.generateTreeString(depth + 1,
+                                           lastChildren :+ true,
+                                           builder)
     }
 
     builder

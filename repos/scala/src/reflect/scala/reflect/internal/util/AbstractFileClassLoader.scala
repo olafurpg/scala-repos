@@ -125,8 +125,15 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
                                                     classOf[URL],
                                                     classOf[ClassLoader])
           ctor.setAccessible(true)
-          ctor
-            .newInstance(name, null, null, null, null, null, null, null, this)
+          ctor.newInstance(name,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           this)
         })
     }
 

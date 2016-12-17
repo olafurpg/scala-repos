@@ -16,8 +16,9 @@ class StaticTraitScFunctionWrapper(val function: ScFunction,
     extends {
   val elementFactory =
     JavaPsiFacade.getInstance(function.getProject).getElementFactory
-  val methodText = StaticTraitScFunctionWrapper
-    .methodText(function, containingClass: PsiClassWrapper)
+  val methodText = StaticTraitScFunctionWrapper.methodText(
+    function,
+    containingClass: PsiClassWrapper)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
@@ -76,8 +77,10 @@ object StaticTraitScFunctionWrapper {
             case Success(tp, _) =>
               if (param.isCallByNameParameter)
                 builder.append("scala.Function0<")
-              builder.append(JavaConversionUtil
-                .typeText(tp, function.getProject, function.getResolveScope))
+              builder.append(
+                JavaConversionUtil.typeText(tp,
+                                            function.getProject,
+                                            function.getResolveScope))
               if (param.isCallByNameParameter) builder.append(">")
             case _ => builder.append("java.lang.Object")
           }

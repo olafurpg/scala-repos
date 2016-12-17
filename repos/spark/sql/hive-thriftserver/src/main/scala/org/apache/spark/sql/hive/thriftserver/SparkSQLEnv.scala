@@ -66,8 +66,8 @@ private[hive] object SparkSQLEnv extends Logging {
       hiveContext.metadataHive.setError(
         new PrintStream(System.err, true, "UTF-8"))
 
-      hiveContext
-        .setConf("spark.sql.hive.version", HiveContext.hiveExecutionVersion)
+      hiveContext.setConf("spark.sql.hive.version",
+                          HiveContext.hiveExecutionVersion)
 
       if (log.isDebugEnabled) {
         hiveContext.hiveconf.getAllProperties.asScala.toSeq.sorted.foreach {

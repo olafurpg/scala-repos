@@ -523,8 +523,8 @@ abstract class ScalaPrimitives {
 
   /** Return the code for the given symbol. */
   def getPrimitive(sym: Symbol): Int =
-    primitives
-      .getOrElse(sym, throw new AssertionError(s"Unknown primitive $sym"))
+    primitives.getOrElse(sym,
+                         throw new AssertionError(s"Unknown primitive $sym"))
 
   /**
     * Return the primitive code of the given operation. If the

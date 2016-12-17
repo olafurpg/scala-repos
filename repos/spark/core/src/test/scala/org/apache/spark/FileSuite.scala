@@ -268,10 +268,11 @@ class FileSuite extends SparkFunSuite with LocalSparkContext {
     val nums =
       sc.makeRDD(1 to 3).map(x => (new IntWritable(x), new Text("a" * x)))
     nums.saveAsSequenceFile(outputDir)
-    val output = sc
-      .newAPIHadoopFile[IntWritable,
-                        Text,
-                        SequenceFileInputFormat[IntWritable, Text]](outputDir)
+    val output =
+      sc.newAPIHadoopFile[IntWritable,
+                          Text,
+                          SequenceFileInputFormat[IntWritable, Text]](
+        outputDir)
     assert(
       output.map(_.toString).collect().toList === List("(1,a)",
                                                        "(2,aa)",

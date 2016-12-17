@@ -292,8 +292,10 @@ object Encoders {
                             e2: Encoder[T2],
                             e3: Encoder[T3],
                             e4: Encoder[T4]): Encoder[(T1, T2, T3, T4)] = {
-    ExpressionEncoder
-      .tuple(encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
+    ExpressionEncoder.tuple(encoderFor(e1),
+                            encoderFor(e2),
+                            encoderFor(e3),
+                            encoderFor(e4))
   }
 
   /**

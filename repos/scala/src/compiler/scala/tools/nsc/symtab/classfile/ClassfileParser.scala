@@ -893,8 +893,11 @@ abstract class ClassfileParser {
           if (!isScalaAnnot) {
             devWarning(
               s"symbol ${sym.fullName} has pickled signature in attribute")
-            unpickler
-              .unpickle(in.buf, in.bp, clazz, staticModule, in.file.name)
+            unpickler.unpickle(in.buf,
+                               in.bp,
+                               clazz,
+                               staticModule,
+                               in.file.name)
           }
           in.skip(attrLen)
         case tpnme.ScalaATTR =>
@@ -916,8 +919,11 @@ abstract class ClassfileParser {
                     ._2
                     .asInstanceOf[ScalaSigBytes]
                     .bytes
-                  unpickler
-                    .unpickle(bytes, 0, clazz, staticModule, in.file.name)
+                  unpickler.unpickle(bytes,
+                                     0,
+                                     clazz,
+                                     staticModule,
+                                     in.file.name)
                 case None =>
                   throw new RuntimeException(
                     "Scala class file does not contain Scala annotation")
@@ -1123,11 +1129,9 @@ abstract class ClassfileParser {
           (newStub(name.toTypeName), newStub(name.toTermName))
         } else {
           val cls =
-            owner
-              .newClass(name.toTypeName, NoPosition, sflags) setInfo completer
+            owner.newClass(name.toTypeName, NoPosition, sflags) setInfo completer
           val mod =
-            owner
-              .newModule(name.toTermName, NoPosition, sflags) setInfo completer
+            owner.newModule(name.toTermName, NoPosition, sflags) setInfo completer
           mod.moduleClass setInfo loaders.moduleClassLoader
           List(cls, mod.moduleClass) foreach (_.associatedFile = file)
           (cls, mod)

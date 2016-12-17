@@ -576,8 +576,10 @@ abstract class RDD[T: ClassTag](
         if (!withReplacement && num >= initialCount) {
           Utils.randomizeInPlace(this.collect(), rand)
         } else {
-          val fraction = SamplingUtils
-            .computeFractionForSampleSize(num, initialCount, withReplacement)
+          val fraction =
+            SamplingUtils.computeFractionForSampleSize(num,
+                                                       initialCount,
+                                                       withReplacement)
           var samples =
             this.sample(withReplacement, fraction, rand.nextInt()).collect()
 
@@ -1749,24 +1751,26 @@ abstract class RDD[T: ClassTag](
     * doCheckpoint() is called recursively on the parent RDDs.
     */
   private[spark] def doCheckpoint(): Unit = {
-    RDDOperationScope
-      .withScope(sc, "checkpoint", allowNesting = false, ignoreParent = true) {
-        if (!doCheckpointCalled) {
-          doCheckpointCalled = true
-          if (checkpointData.isDefined) {
-            if (checkpointAllMarkedAncestors) {
-              // TODO We can collect all the RDDs that needs to be checkpointed, and then checkpoint
-              // them in parallel.
-              // Checkpoint parents first because our lineage will be truncated after we
-              // checkpoint ourselves
-              dependencies.foreach(_.rdd.doCheckpoint())
-            }
-            checkpointData.get.checkpoint()
-          } else {
+    RDDOperationScope.withScope(sc,
+                                "checkpoint",
+                                allowNesting = false,
+                                ignoreParent = true) {
+      if (!doCheckpointCalled) {
+        doCheckpointCalled = true
+        if (checkpointData.isDefined) {
+          if (checkpointAllMarkedAncestors) {
+            // TODO We can collect all the RDDs that needs to be checkpointed, and then checkpoint
+            // them in parallel.
+            // Checkpoint parents first because our lineage will be truncated after we
+            // checkpoint ourselves
             dependencies.foreach(_.rdd.doCheckpoint())
           }
+          checkpointData.get.checkpoint()
+        } else {
+          dependencies.foreach(_.rdd.doCheckpoint())
         }
       }
+    }
   }
 
   /**

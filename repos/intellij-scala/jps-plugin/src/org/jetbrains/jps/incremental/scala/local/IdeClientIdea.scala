@@ -47,8 +47,8 @@ class IdeClientIdea(compilerName: String,
         if (!isTemp) {
           try {
             if (isClassFile)
-              consumer
-                .registerCompiledClass(rootDescriptor.target, compiledClass)
+              consumer.registerCompiledClass(rootDescriptor.target,
+                                             compiledClass)
             else
               consumer.registerOutputFile(
                 rootDescriptor.target,

@@ -125,8 +125,10 @@ private[akka] class RemoteWatcher(
   var unreachable: Set[Address] = Set.empty
   var addressUids: Map[Address, Int] = Map.empty
 
-  val heartbeatTask = scheduler
-    .schedule(heartbeatInterval, heartbeatInterval, self, HeartbeatTick)
+  val heartbeatTask = scheduler.schedule(heartbeatInterval,
+                                         heartbeatInterval,
+                                         self,
+                                         HeartbeatTick)
   val failureDetectorReaperTask = scheduler.schedule(unreachableReaperInterval,
                                                      unreachableReaperInterval,
                                                      self,

@@ -252,8 +252,9 @@ object ShuffleExchange {
               position
             }
         case h: HashPartitioning =>
-          val projection = UnsafeProjection
-            .create(h.partitionIdExpression :: Nil, outputAttributes)
+          val projection = UnsafeProjection.create(
+            h.partitionIdExpression :: Nil,
+            outputAttributes)
           row =>
             projection(row).getInt(0)
         case RangePartitioning(_, _) | SinglePartition => identity

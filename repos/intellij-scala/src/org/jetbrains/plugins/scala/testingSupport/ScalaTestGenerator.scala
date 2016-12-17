@@ -103,8 +103,9 @@ class ScalaTestGenerator extends TestGenerator {
     val extendsBlock = typeDefinition.extendsBlock
     def addExtendsRef(refName: String) = {
       val (extendsToken, classParents) =
-        ScalaPsiElementFactory
-          .createClassTemplateParents(refName, typeDefinition.getManager)
+        ScalaPsiElementFactory.createClassTemplateParents(
+          refName,
+          typeDefinition.getManager)
       val extendsAdded =
         extendsBlock.addBefore(extendsToken, extendsBlock.getFirstChild)
       extendsBlock.addAfter(classParents, extendsAdded)
@@ -141,8 +142,9 @@ class ScalaTestGenerator extends TestGenerator {
                                                              generateAfter,
                                                              typeDef,
                                                              editor.getProject)
-          ScalaTestGenerator
-            .addScalaTestFeatureSpecMethods(methodsList, psiManager, body)
+          ScalaTestGenerator.addScalaTestFeatureSpecMethods(methodsList,
+                                                            psiManager,
+                                                            body)
         } else if (isInheritor(typeDef, "org.scalatest.FlatSpecLike") ||
                    isInheritor(typeDef, "org.scalatest.fixture.FlatSpecLike")) {
           ScalaTestGenerator.generateScalaTestBeforeAndAfter(generateBefore,
@@ -160,8 +162,9 @@ class ScalaTestGenerator extends TestGenerator {
                                                              generateAfter,
                                                              typeDef,
                                                              editor.getProject)
-          ScalaTestGenerator
-            .addScalaTestFreeSpecMethods(methodsList, psiManager, body)
+          ScalaTestGenerator.addScalaTestFreeSpecMethods(methodsList,
+                                                         psiManager,
+                                                         body)
         } else if (isInheritor(typeDef, "org.scalatest.FunSpecLike") ||
                    isInheritor(typeDef, "org.scalatest.fixture.FunSpecLike")) {
           ScalaTestGenerator.generateScalaTestBeforeAndAfter(generateBefore,
@@ -178,16 +181,18 @@ class ScalaTestGenerator extends TestGenerator {
                                                              generateAfter,
                                                              typeDef,
                                                              editor.getProject)
-          ScalaTestGenerator
-            .addScalaTestFunSuiteMethods(methodsList, psiManager, body)
+          ScalaTestGenerator.addScalaTestFunSuiteMethods(methodsList,
+                                                         psiManager,
+                                                         body)
         } else if (isInheritor(typeDef, "org.scalatest.PropSpecLike") ||
                    isInheritor(typeDef, "org.scalatest.fixture.PropSpecLike")) {
           ScalaTestGenerator.generateScalaTestBeforeAndAfter(generateBefore,
                                                              generateAfter,
                                                              typeDef,
                                                              editor.getProject)
-          ScalaTestGenerator
-            .addScalaTestPropSpecMethods(methodsList, psiManager, body)
+          ScalaTestGenerator.addScalaTestPropSpecMethods(methodsList,
+                                                         psiManager,
+                                                         body)
         } else if (isInheritor(typeDef, "org.scalatest.WordSpecLike") ||
                    isInheritor(typeDef, "org.scalatest.fixture.WordSpecLike")) {
           ScalaTestGenerator.generateScalaTestBeforeAndAfter(generateBefore,
@@ -502,8 +507,9 @@ object ScalaTestGenerator {
                         GlobalSearchScope.allScope(project),
                         ScalaPsiManager.ClassCategory.TYPE)) match {
       case Some(groupsTypeDef) =>
-        ExtractSuperUtil
-          .addExtendsTo(typeDef, groupsTypeDef.asInstanceOf[ScTypeDefinition])
+        ExtractSuperUtil.addExtendsTo(
+          typeDef,
+          groupsTypeDef.asInstanceOf[ScTypeDefinition])
         val testNames = methods.map("test" + _.getMember.getName.capitalize)
         val closingBrace = templateBody.getLastChild
         val normalIndentString = FormatterUtil.getNormalIndentString(project)
@@ -521,14 +527,15 @@ object ScalaTestGenerator {
                                  psiManager),
                                closingBrace)
         if (methods.nonEmpty) {
-          templateBody
-            .addBefore(ScalaPsiElementFactory.createExpressionFromText(
-                         testNames
-                           .map("eg := ok //" + _)
-                           .fold("\"" + className + "\" - new group {")(
-                             _ + "\n" + _) + "\n}",
-                         psiManager),
-                       closingBrace)
+          templateBody.addBefore(ScalaPsiElementFactory
+                                   .createExpressionFromText(
+                                     testNames
+                                       .map("eg := ok //" + _)
+                                       .fold(
+                                         "\"" + className + "\" - new group {")(
+                                         _ + "\n" + _) + "\n}",
+                                     psiManager),
+                                 closingBrace)
         }
       case _ =>
     }
@@ -557,8 +564,9 @@ object ScalaTestGenerator {
                                    project: Project) {
     val normalIndentString = FormatterUtil.getNormalIndentString(project)
     templateBody.addBefore(
-      ScalaPsiElementFactory
-        .createElement("val tests = TestSuite{}", psiManager, Def.parse(_)),
+      ScalaPsiElementFactory.createElement("val tests = TestSuite{}",
+                                           psiManager,
+                                           Def.parse(_)),
       templateBody.getLastChild)
     if (methods.nonEmpty) {
       templateBody.addBefore(

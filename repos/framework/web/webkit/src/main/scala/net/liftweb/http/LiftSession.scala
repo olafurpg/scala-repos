@@ -2643,8 +2643,9 @@ class LiftSession(private[http] val _contextPath: String,
       comet.setCometActorLocale(S.locale)
 
       asyncSync.synchronized {
-        nasyncComponents
-          .put(CometId(creationInfo.cometType, creationInfo.cometName), comet)
+        nasyncComponents.put(CometId(creationInfo.cometType,
+                                     creationInfo.cometName),
+                             comet)
         nasyncById.put(comet.uniqueId, comet)
       }
 
@@ -2826,8 +2827,9 @@ class LiftSession(private[http] val _contextPath: String,
         }
       }
 
-      nasyncComponents
-        .put(CometId(ca.theType openOr "Roundtrip Comet Actor", ca.name), ca)
+      nasyncComponents.put(
+        CometId(ca.theType openOr "Roundtrip Comet Actor", ca.name),
+        ca)
       nasyncById.put(ca.uniqueId, ca)
 
       ca.callInitCometActor(

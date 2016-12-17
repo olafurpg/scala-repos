@@ -65,8 +65,18 @@ object Transform {
              mzy: Double,
              mzz: Double,
              tz: Double): Affine =
-    jfxst.Transform
-      .affine(mxx, mxy, mxz, tx, myx, myy, myz, ty, mzx, mzy, mzz, tz)
+    jfxst.Transform.affine(mxx,
+                           mxy,
+                           mxz,
+                           tx,
+                           myx,
+                           myy,
+                           myz,
+                           ty,
+                           mzx,
+                           mzy,
+                           mzz,
+                           tz)
 
   /**
     * Returns a Rotate object that rotates coordinates around a pivot point.

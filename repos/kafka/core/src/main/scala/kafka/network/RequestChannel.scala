@@ -103,8 +103,9 @@ object RequestChannel extends Logging {
       } else null
     val body: AbstractRequest =
       if (requestObj == null)
-        try AbstractRequest
-          .getRequest(header.apiKey, header.apiVersion, buffer)
+        try AbstractRequest.getRequest(header.apiKey,
+                                       header.apiVersion,
+                                       buffer)
         catch {
           case ex: Throwable =>
             throw new InvalidRequestException(

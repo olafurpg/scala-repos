@@ -185,12 +185,11 @@ abstract class AggregationQuerySuite
       (Seq[Integer](3), null, null)).toDF("key", "value1", "value2")
     data3.write.saveAsTable("agg3")
 
-    val emptyDF = sqlContext
-      .createDataFrame(sparkContext.emptyRDD[Row],
-                       StructType(
-                         StructField("key", StringType) :: StructField(
-                           "value",
-                           IntegerType) :: Nil))
+    val emptyDF = sqlContext.createDataFrame(
+      sparkContext.emptyRDD[Row],
+      StructType(StructField("key", StringType) :: StructField(
+        "value",
+        IntegerType) :: Nil))
     emptyDF.registerTempTable("emptyTable")
 
     // Register UDAFs

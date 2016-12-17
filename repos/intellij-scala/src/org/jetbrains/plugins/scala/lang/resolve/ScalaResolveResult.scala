@@ -234,8 +234,9 @@ class ScalaResolveResult(
           case clazz: PsiClass =>
             return getClazzPrecedence(clazz)
           case memb @ (_: ScBindingPattern | _: PsiMember) =>
-            val clazzStub = ScalaPsiUtil
-              .getContextOfType(getActualElement, false, classOf[PsiClass])
+            val clazzStub = ScalaPsiUtil.getContextOfType(getActualElement,
+                                                          false,
+                                                          classOf[PsiClass])
             val clazz: PsiClass = clazzStub match {
               case clazz: PsiClass => clazz
               case _ => null

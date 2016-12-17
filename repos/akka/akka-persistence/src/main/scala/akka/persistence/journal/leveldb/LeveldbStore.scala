@@ -159,8 +159,8 @@ private[persistence] trait LeveldbStore
                                 batch: WriteBatch): Unit = {
     val persistentBytes = persistentToBytes(persistent)
     val nid = numericId(persistent.persistenceId)
-    batch
-      .put(keyToBytes(counterKey(nid)), counterToBytes(persistent.sequenceNr))
+    batch.put(keyToBytes(counterKey(nid)),
+              counterToBytes(persistent.sequenceNr))
     batch.put(keyToBytes(Key(nid, persistent.sequenceNr, 0)), persistentBytes)
 
     tags.foreach { tag ⇒

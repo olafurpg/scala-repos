@@ -164,8 +164,9 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     */
   private def positionOf(hash: Array[Byte], attempt: Int): Int = {
     val probe =
-      CoreUtils.readInt(hash, math.min(attempt, hashSize - 4)) + math
-        .max(0, attempt - hashSize + 4)
+      CoreUtils.readInt(hash, math.min(attempt, hashSize - 4)) + math.max(
+        0,
+        attempt - hashSize + 4)
     val slot = Utils.abs(probe) % slots
     this.probes += 1
     slot * bytesPerEntry

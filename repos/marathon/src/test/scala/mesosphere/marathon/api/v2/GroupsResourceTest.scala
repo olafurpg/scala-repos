@@ -39,8 +39,11 @@ class GroupsResourceTest
 
     When("Doing a dry run update")
     val body = Json.stringify(Json.toJson(update)).getBytes
-    val result = groupsResource
-      .update("/test", force = false, dryRun = true, body, auth.request)
+    val result = groupsResource.update("/test",
+                                       force = false,
+                                       dryRun = true,
+                                       body,
+                                       auth.request)
     val json = Json.parse(result.getEntity.toString)
 
     Then("The deployment plan is correct")
@@ -80,8 +83,10 @@ class GroupsResourceTest
     create.getStatus should be(auth.NotAuthenticatedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource
-      .createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource.createWithPath("/my/id",
+                                                       false,
+                                                       body.getBytes("UTF-8"),
+                                                       req)
     Then("we receive a NotAuthenticated response")
     createWithPath.getStatus should be(auth.NotAuthenticatedStatus)
 
@@ -128,8 +133,10 @@ class GroupsResourceTest
     create.getStatus should be(auth.UnauthorizedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource
-      .createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource.createWithPath("/my/id",
+                                                       false,
+                                                       body.getBytes("UTF-8"),
+                                                       req)
     Then("we receive a Not Authorized response")
     createWithPath.getStatus should be(auth.UnauthorizedStatus)
 

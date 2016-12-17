@@ -104,8 +104,8 @@ object FakeKeyStore {
     certInfo.set(
       X509CertInfo.SERIAL_NUMBER,
       new CertificateSerialNumber(new BigInteger(64, new SecureRandom())))
-    certInfo
-      .set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
+    certInfo.set(X509CertInfo.VERSION,
+                 new CertificateVersion(CertificateVersion.V3))
 
     // Validity
     val validFrom = new Date()
@@ -127,8 +127,8 @@ object FakeKeyStore {
     // Key and algorithm
     certInfo.set(X509CertInfo.KEY, new CertificateX509Key(keyPair.getPublic))
     val algorithm = new AlgorithmId(SignatureAlgorithmOID)
-    certInfo
-      .set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algorithm))
+    certInfo.set(X509CertInfo.ALGORITHM_ID,
+                 new CertificateAlgorithmId(algorithm))
 
     // Create a new certificate and sign it
     val cert = new X509CertImpl(certInfo)

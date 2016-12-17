@@ -147,8 +147,9 @@ class EncoderResolutionSuite extends PlanTest {
       val structType = new StructType()
         .add("a", StringType)
         .add("b", DecimalType.SYSTEM_DEFAULT)
-      ExpressionEncoder[ComplexClass]
-        .resolve(Seq('a.long, 'b.struct(structType)), null)
+      ExpressionEncoder[ComplexClass].resolve(Seq('a.long,
+                                                  'b.struct(structType)),
+                                              null)
     }.message
     assert(msg2 == s"""
          |Cannot up cast `b`.`b` from decimal(38,18) to bigint as it may truncate

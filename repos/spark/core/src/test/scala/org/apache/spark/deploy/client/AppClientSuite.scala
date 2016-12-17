@@ -61,8 +61,11 @@ class AppClientSuite
     masterRpcEnv =
       RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
-      RpcEnv
-        .create(Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+      RpcEnv.create(Worker.SYSTEM_NAME + i,
+                    "localhost",
+                    0,
+                    conf,
+                    securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)

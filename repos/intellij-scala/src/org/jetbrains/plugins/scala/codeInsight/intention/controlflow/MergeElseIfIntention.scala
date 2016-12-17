@@ -76,8 +76,8 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
       .append(ifStmt.elseBranch.get.getText.trim.drop(1).dropRight(1))
 
     val newIfStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
     val size =
       newIfStmt
         .asInstanceOf[ScIfStmt]

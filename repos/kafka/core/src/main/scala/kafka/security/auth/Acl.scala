@@ -113,7 +113,10 @@ case class Acl(principal: KafkaPrincipal,
   }
 
   override def toString: String = {
-    "%s has %s permission for operations: %s from hosts: %s"
-      .format(principal, permissionType.name, operation, host)
+    "%s has %s permission for operations: %s from hosts: %s".format(
+      principal,
+      permissionType.name,
+      operation,
+      host)
   }
 }

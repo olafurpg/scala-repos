@@ -179,8 +179,9 @@ object DumpLogSegments {
       val messageAndOffset =
         getIterator(partialFileMessageSet.head, isDeepIteration = true).next()
       if (messageAndOffset.offset != entry.offset + index.baseOffset) {
-        var misMatchesSeq = misMatchesForIndexFilesMap
-          .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
+        var misMatchesSeq = misMatchesForIndexFilesMap.getOrElse(
+          file.getAbsolutePath,
+          List[(Long, Long)]())
         misMatchesSeq ::=
           (entry.offset + index.baseOffset, messageAndOffset.offset)
         misMatchesForIndexFilesMap.put(file.getAbsolutePath, misMatchesSeq)
@@ -310,11 +311,11 @@ object DumpLogSegments {
         else if (msg.compressionCodec == NoCompressionCodec &&
                  messageAndOffset.offset != lastOffset + 1) {
           var nonConsecutivePairsSeq =
-            nonConsecutivePairsForLogFilesMap
-              .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
+            nonConsecutivePairsForLogFilesMap.getOrElse(file.getAbsolutePath,
+                                                        List[(Long, Long)]())
           nonConsecutivePairsSeq ::= (lastOffset, messageAndOffset.offset)
-          nonConsecutivePairsForLogFilesMap
-            .put(file.getAbsolutePath, nonConsecutivePairsSeq)
+          nonConsecutivePairsForLogFilesMap.put(file.getAbsolutePath,
+                                                nonConsecutivePairsSeq)
         }
         lastOffset = messageAndOffset.offset
 

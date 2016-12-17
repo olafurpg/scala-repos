@@ -447,8 +447,11 @@ private[runsupport] object GlobalStaticVar {
     */
   def get[T](name: String)(implicit ct: ClassTag[T]): Option[T] = {
     try {
-      val value = ManagementFactory.getPlatformMBeanServer
-        .invoke(objectName(name), "get", Array.empty, Array.empty)
+      val value = ManagementFactory.getPlatformMBeanServer.invoke(
+        objectName(name),
+        "get",
+        Array.empty,
+        Array.empty)
       if (ct.runtimeClass.isInstance(value)) {
         Some(value.asInstanceOf[T])
       } else {

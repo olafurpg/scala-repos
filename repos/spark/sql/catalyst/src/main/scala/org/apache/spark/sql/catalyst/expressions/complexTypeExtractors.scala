@@ -212,8 +212,9 @@ case class GetArrayStructFields(child: Expression,
             if ($row.isNullAt($ordinal)) {
               $values[$j] = null;
             } else {
-              $values[$j] = ${ctx
-        .getValue(row, field.dataType, ordinal.toString)};
+              $values[$j] = ${ctx.getValue(row,
+                                           field.dataType,
+                                           ordinal.toString)};
             }
           }
         }
@@ -342,8 +343,8 @@ case class GetMapValue(child: Expression, key: Expression)
         int $index = 0;
         boolean $found = false;
         while ($index < $length && !$found) {
-          final ${ctx.javaType(keyType)} $key = ${ctx
-        .getValue(keys, keyType, index)};
+          final ${ctx
+        .javaType(keyType)} $key = ${ctx.getValue(keys, keyType, index)};
           if (${ctx.genEqual(keyType, key, eval2)}) {
             $found = true;
           } else {

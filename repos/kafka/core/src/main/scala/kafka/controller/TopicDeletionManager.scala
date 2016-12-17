@@ -304,14 +304,14 @@ class TopicDeletionManager(controller: KafkaController,
     val replicasForDeletedTopic = controller.replicaStateMachine
       .replicasInState(topic, ReplicaDeletionSuccessful)
     // controller will remove this replica from the state machine as well as its partition assignment cache
-    replicaStateMachine
-      .handleStateChanges(replicasForDeletedTopic, NonExistentReplica)
+    replicaStateMachine.handleStateChanges(replicasForDeletedTopic,
+                                           NonExistentReplica)
     val partitionsForDeletedTopic = controllerContext.partitionsForTopic(topic)
     // move respective partition to OfflinePartition and NonExistentPartition state
-    partitionStateMachine
-      .handleStateChanges(partitionsForDeletedTopic, OfflinePartition)
-    partitionStateMachine
-      .handleStateChanges(partitionsForDeletedTopic, NonExistentPartition)
+    partitionStateMachine.handleStateChanges(partitionsForDeletedTopic,
+                                             OfflinePartition)
+    partitionStateMachine.handleStateChanges(partitionsForDeletedTopic,
+                                             NonExistentPartition)
     topicsToBeDeleted -= topic
     partitionsToBeDeleted.retain(_.topic != topic)
     val zkUtils = controllerContext.zkUtils

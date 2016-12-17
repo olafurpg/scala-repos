@@ -41,8 +41,8 @@ object ToHeadUsages extends Specification {
     }
   }
 
-  private val host_ = System
-    .getProperty("net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
+  private val host_ = System.getProperty("net.liftweb.webapptest.oneshot.host",
+                                         reachableLocalAddress)
   private val port_ = System
     .getProperty("net.liftweb.webapptest.toheadusages.port", "8282")
     .toInt

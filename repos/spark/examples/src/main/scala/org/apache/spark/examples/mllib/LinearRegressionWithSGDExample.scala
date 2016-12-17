@@ -57,8 +57,9 @@ object LinearRegressionWithSGDExample {
 
     // Save and load model
     model.save(sc, "target/tmp/scalaLinearRegressionWithSGDModel")
-    val sameModel = LinearRegressionModel
-      .load(sc, "target/tmp/scalaLinearRegressionWithSGDModel")
+    val sameModel = LinearRegressionModel.load(
+      sc,
+      "target/tmp/scalaLinearRegressionWithSGDModel")
     // $example off$
 
     sc.stop()

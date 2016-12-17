@@ -357,8 +357,9 @@ object Storage extends Logging {
     info("Test writing to Event Store (App Id 0)...")
     // use appId=0 for testing purpose
     eventsDb.init(0)
-    eventsDb
-      .insert(Event(event = "test", entityType = "test", entityId = "test"), 0)
+    eventsDb.insert(
+      Event(event = "test", entityType = "test", entityId = "test"),
+      0)
     eventsDb.remove(0)
     eventsDb.close()
   }

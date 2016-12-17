@@ -157,8 +157,9 @@ class IntroduceExplicitParameterIntention
     val diff = buf.length
     buf.append(expr.getText)
 
-    val newExpr = ScalaPsiElementFactory
-      .createExpressionFromText(buf.toString(), element.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+      buf.toString(),
+      element.getManager)
 
     inWriteAction {
       val document = editor.getDocument

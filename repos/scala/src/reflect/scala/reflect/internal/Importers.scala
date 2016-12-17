@@ -136,8 +136,10 @@ trait Importers { to: SymbolTable =>
             case theirloc: from.Tree => importTree(theirloc)
             case theirloc: from.Symbol => importSymbol(theirloc)
           }
-          myowner
-            .newTypeSkolemSymbol(myname.toTypeName, origin, mypos, myflags)
+          myowner.newTypeSkolemSymbol(myname.toTypeName,
+                                      origin,
+                                      mypos,
+                                      myflags)
         case their: from.ModuleClassSymbol =>
           val my = myowner.newModuleClass(myname.toTypeName, mypos, myflags)
           symMap.weakUpdate(their, my)

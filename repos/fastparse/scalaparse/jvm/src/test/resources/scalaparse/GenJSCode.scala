@@ -1702,8 +1702,8 @@ abstract class GenJSCode
         arguments: List[js.Tree])(implicit pos: Position): js.Tree = {
       val className = encodeClassFullName(method.owner)
       val methodIdent = encodeMethodSym(method)
-      currentMethodInfoBuilder
-        .addMethodCalledStatically(className, methodIdent.name)
+      currentMethodInfoBuilder.addMethodCalledStatically(className,
+                                                         methodIdent.name)
       js.ApplyStatically(receiver,
                          jstpe.ClassType(className),
                          methodIdent,
@@ -1725,8 +1725,8 @@ abstract class GenJSCode
         methodIdent: js.Ident,
         arguments: List[js.Tree],
         resultType: jstpe.Type)(implicit pos: Position): js.Tree = {
-      currentMethodInfoBuilder
-        .addStaticMethodCalled(implName, methodIdent.name)
+      currentMethodInfoBuilder.addStaticMethodCalled(implName,
+                                                     methodIdent.name)
       js.ApplyStatic(jstpe.ClassType(implName), methodIdent, arguments)(
         resultType)
     }

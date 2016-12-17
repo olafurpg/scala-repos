@@ -434,8 +434,9 @@ object MarathonTestHelper {
 
   def taskLaunched: Task.Launched = {
     val now = Timestamp.now()
-    Task
-      .Launched(now, status = Task.Status(now), networking = Task.NoNetworking)
+    Task.Launched(now,
+                  status = Task.Status(now),
+                  networking = Task.NoNetworking)
   }
 
   def taskLaunchedOp: TaskStateOp.Launch = {

@@ -68,8 +68,10 @@ class ScAssignStmtImpl(node: ASTNode)
         val text =
           s"${ref.refName}_=(${getRExpression.map(_.getText).getOrElse("")})"
         val mirrorExpr =
-          ScalaPsiElementFactory
-            .createExpressionWithContextFromText(text, getContext, this)
+          ScalaPsiElementFactory.createExpressionWithContextFromText(
+            text,
+            getContext,
+            this)
         mirrorExpr match {
           case call: ScMethodCall =>
             call.getInvokedExpr
@@ -87,8 +89,10 @@ class ScAssignStmtImpl(node: ASTNode)
           s"${invokedExpr.getText}.update(${methodCall.args.exprs.map(_.getText).mkString(",")}," +
             s" ${getRExpression.map(_.getText).getOrElse("")}"
         val mirrorExpr =
-          ScalaPsiElementFactory
-            .createExpressionWithContextFromText(text, getContext, this)
+          ScalaPsiElementFactory.createExpressionWithContextFromText(
+            text,
+            getContext,
+            this)
         //todo: improve performance: do not re-evaluate resolve to "update" method
         mirrorExpr match {
           case call: ScMethodCall => Some(call)

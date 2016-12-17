@@ -64,8 +64,9 @@ private[ui] class DriverPage(parent: MesosClusterUI)
       UIUtils.listingTable(commandHeaders, commandRow, command)
     val commandEnvTable =
       UIUtils.listingTable(commandEnvHeaders, propertiesRow, commandEnv)
-    val schedulerTable = UIUtils
-      .listingTable(schedulerHeaders, propertiesRow, schedulerProperties)
+    val schedulerTable = UIUtils.listingTable(schedulerHeaders,
+                                              propertiesRow,
+                                              schedulerProperties)
     val launchedTable =
       UIUtils.listingTable(launchedHeaders, launchedRow, submissionState)
     val retryTable = UIUtils.listingTable(

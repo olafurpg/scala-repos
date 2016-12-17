@@ -35,8 +35,9 @@ object PresentationUtil {
         buffer.append(")")
         buffer.toString()
       case param: ScParameter =>
-        ScalaDocumentationProvider
-          .parseParameter(param, presentationString(_, substitutor))
+        ScalaDocumentationProvider.parseParameter(
+          param,
+          presentationString(_, substitutor))
       case param: Parameter =>
         val builder = new StringBuilder
         builder.append(param.name)

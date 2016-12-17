@@ -456,8 +456,8 @@ class LogTest extends JUnitSuite {
     // append messages to log
     val configSegmentSize = messageSet.sizeInBytes - 1
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.SegmentBytesProp, configSegmentSize: java.lang.Integer)
+    logProps.put(LogConfig.SegmentBytesProp,
+                 configSegmentSize: java.lang.Integer)
     // We use need to use magic value 1 here because the test is message size sensitive.
     logProps.put(LogConfig.MessageFormatVersionProp,
                  ApiVersion.latestVersion.toString)
@@ -559,8 +559,8 @@ class LogTest extends JUnitSuite {
     // append messages to log
     val maxMessageSize = second.sizeInBytes - 1
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.MaxMessageBytesProp, maxMessageSize: java.lang.Integer)
+    logProps.put(LogConfig.MaxMessageBytesProp,
+                 maxMessageSize: java.lang.Integer)
     val log = new Log(logDir,
                       LogConfig(logProps),
                       recoveryPoint = 0L,
@@ -589,8 +589,8 @@ class LogTest extends JUnitSuite {
     val indexInterval = 3 * messageSize
     val logProps = new Properties()
     logProps.put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
-    logProps
-      .put(LogConfig.IndexIntervalBytesProp, indexInterval: java.lang.Integer)
+    logProps.put(LogConfig.IndexIntervalBytesProp,
+                 indexInterval: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 4096: java.lang.Integer)
     val config = LogConfig(logProps)
     var log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
@@ -819,8 +819,8 @@ class LogTest extends JUnitSuite {
 
     val set = TestUtils.singleMessageSet("test".getBytes)
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.SegmentBytesProp, set.sizeInBytes * 5: java.lang.Integer)
+    logProps.put(LogConfig.SegmentBytesProp,
+                 set.sizeInBytes * 5: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 1000: java.lang.Integer)
     logProps.put(LogConfig.IndexIntervalBytesProp, 1: java.lang.Integer)
     val log = new Log(logDir,
@@ -848,8 +848,8 @@ class LogTest extends JUnitSuite {
   def testReopenThenTruncate() {
     val set = TestUtils.singleMessageSet("test".getBytes)
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.SegmentBytesProp, set.sizeInBytes * 5: java.lang.Integer)
+    logProps.put(LogConfig.SegmentBytesProp,
+                 set.sizeInBytes * 5: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 1000: java.lang.Integer)
     logProps.put(LogConfig.IndexIntervalBytesProp, 10000: java.lang.Integer)
     val config = LogConfig(logProps)
@@ -876,12 +876,12 @@ class LogTest extends JUnitSuite {
     val set = TestUtils.singleMessageSet("test".getBytes)
     val asyncDeleteMs = 1000
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.SegmentBytesProp, set.sizeInBytes * 5: java.lang.Integer)
+    logProps.put(LogConfig.SegmentBytesProp,
+                 set.sizeInBytes * 5: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 1000: java.lang.Integer)
     logProps.put(LogConfig.IndexIntervalBytesProp, 10000: java.lang.Integer)
-    logProps
-      .put(LogConfig.FileDeleteDelayMsProp, asyncDeleteMs: java.lang.Integer)
+    logProps.put(LogConfig.FileDeleteDelayMsProp,
+                 asyncDeleteMs: java.lang.Integer)
     val config = LogConfig(logProps)
 
     val log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
@@ -917,8 +917,8 @@ class LogTest extends JUnitSuite {
   def testOpenDeletesObsoleteFiles() {
     val set = TestUtils.singleMessageSet("test".getBytes)
     val logProps = new Properties()
-    logProps
-      .put(LogConfig.SegmentBytesProp, set.sizeInBytes * 5: java.lang.Integer)
+    logProps.put(LogConfig.SegmentBytesProp,
+                 set.sizeInBytes * 5: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 1000: java.lang.Integer)
     val config = LogConfig(logProps)
     var log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)

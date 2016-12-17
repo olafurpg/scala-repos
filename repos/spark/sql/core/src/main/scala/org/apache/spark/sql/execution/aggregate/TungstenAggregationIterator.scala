@@ -149,8 +149,8 @@ class TungstenAggregationIterator(
 
       (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
         {
-          unsafeRowJoiner
-            .join(currentGroupingKey, currentBuffer.asInstanceOf[UnsafeRow])
+          unsafeRowJoiner.join(currentGroupingKey,
+                               currentBuffer.asInstanceOf[UnsafeRow])
         }
     } else {
       super.generateResultProjection()

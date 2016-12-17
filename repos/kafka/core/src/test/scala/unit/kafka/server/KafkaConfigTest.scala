@@ -341,8 +341,8 @@ class KafkaConfigTest {
   def testUncleanElectionDisabled() {
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
-    props
-      .put(KafkaConfig.UncleanLeaderElectionEnableProp, String.valueOf(false))
+    props.put(KafkaConfig.UncleanLeaderElectionEnableProp,
+              String.valueOf(false))
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.uncleanLeaderElectionEnable, false)
@@ -352,8 +352,8 @@ class KafkaConfigTest {
   def testUncleanElectionEnabled() {
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
-    props
-      .put(KafkaConfig.UncleanLeaderElectionEnableProp, String.valueOf(true))
+    props.put(KafkaConfig.UncleanLeaderElectionEnableProp,
+              String.valueOf(true))
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.uncleanLeaderElectionEnable, true)
@@ -458,8 +458,8 @@ class KafkaConfigTest {
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.ListenersProp,
               "TRACE://localhost:9091,SSL://localhost:9093")
-    props
-      .put(KafkaConfig.AdvertisedListenersProp, "PLAINTEXT://localhost:9092")
+    props.put(KafkaConfig.AdvertisedListenersProp,
+              "PLAINTEXT://localhost:9092")
     intercept[IllegalArgumentException] {
       KafkaConfig.fromProps(props)
     }

@@ -23,8 +23,12 @@ class DenseAxpyBenchmark extends BreezeBenchmark {
 
   def timeBlasSaxpy(reps: Int) = {
     cforRange(0 until reps) { _ =>
-      BLAS.getInstance
-        .saxpy(fv.length, 0.042f, fv.data, fv.stride, fv2.data, fv2.stride)
+      BLAS.getInstance.saxpy(fv.length,
+                             0.042f,
+                             fv.data,
+                             fv.stride,
+                             fv2.data,
+                             fv2.stride)
     }
   }
 

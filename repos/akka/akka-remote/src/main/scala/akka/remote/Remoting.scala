@@ -519,8 +519,11 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
   val pruneInterval: FiniteDuration =
     (settings.RetryGateClosedFor * 2).max(1.second).min(10.seconds)
 
-  val pruneTimerCancellable: Cancellable = context.system.scheduler
-    .schedule(pruneInterval, pruneInterval, self, Prune)
+  val pruneTimerCancellable: Cancellable = context.system.scheduler.schedule(
+    pruneInterval,
+    pruneInterval,
+    self,
+    Prune)
 
   var pendingReadHandoffs = Map[ActorRef, AkkaProtocolHandle]()
   var stashedInbound = Map[ActorRef, Vector[InboundAssociation]]()
@@ -678,8 +681,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
               "address cannot be quarantined without knowing the UID, gating instead for {} ms.",
             address,
             settings.RetryGateClosedFor.toMillis)
-          endpoints
-            .markAsFailed(endpoint, Deadline.now + settings.RetryGateClosedFor)
+          endpoints.markAsFailed(endpoint,
+                                 Deadline.now + settings.RetryGateClosedFor)
         case (Some(Pass(endpoint, Some(currentUid), _)), Some(quarantineUid))
             if currentUid == quarantineUid ⇒
           context.stop(endpoint)

@@ -81,8 +81,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
                element.getNextSibling != null &&
                element.getNextSibling.getNode.getElementType == ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_END_DELIMITER) {
       extensions.inWriteAction {
-        editor.getDocument
-          .deleteString(element.getTextOffset + 1, element.getTextOffset + 2)
+        editor.getDocument.deleteString(element.getTextOffset + 1,
+                                        element.getTextOffset + 2)
         PsiDocumentManager
           .getInstance(file.getProject)
           .commitDocument(editor.getDocument)
@@ -103,8 +103,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
 
     def correctMultilineString(closingQuotesOffset: Int) {
       extensions.inWriteAction {
-        editor.getDocument
-          .deleteString(closingQuotesOffset, closingQuotesOffset + 3)
+        editor.getDocument.deleteString(closingQuotesOffset,
+                                        closingQuotesOffset + 3)
 //        editor.getCaretModel.moveCaretRelatively(-1, 0, false, false, false) //http://youtrack.jetbrains.com/issue/SCL-6490
         PsiDocumentManager
           .getInstance(file.getProject)

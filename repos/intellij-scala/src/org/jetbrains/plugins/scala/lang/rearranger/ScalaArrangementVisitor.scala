@@ -276,8 +276,9 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
                                   entry: ScalaArrangementEntry) {
     genUnseparableRanges(psiRoot, entry)
     val top = arrangementEntries.top
-    val queue = unseparableRanges
-      .getOrElse(entry, mutable.Queue[ScalaArrangementEntry]())
+    val queue = unseparableRanges.getOrElse(
+      entry,
+      mutable.Queue[ScalaArrangementEntry]())
     //    var unseparable =
     def next() = if (queue.isEmpty) null else queue.dequeue()
     psiRoot.getChildren.foldLeft(

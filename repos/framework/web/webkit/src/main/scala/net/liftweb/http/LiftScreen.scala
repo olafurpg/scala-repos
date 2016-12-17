@@ -1225,11 +1225,11 @@ trait ScreenWizardRendered extends Loggable {
     def defaultFields: List[CssBindFunc] =
       for ((bindingInfo, field) <- bindingInfoWithFields(Default))
         yield
-          traceInline(
-            "Binding default field %s to %s"
-              .format(bindingInfo.selector(formName), defaultFieldNodeSeq),
-            bindingInfo.selector(formName) #> bindField(field)(
-              defaultFieldNodeSeq))
+          traceInline("Binding default field %s to %s".format(
+                        bindingInfo.selector(formName),
+                        defaultFieldNodeSeq),
+                      bindingInfo.selector(formName) #> bindField(field)(
+                        defaultFieldNodeSeq))
 
     def customFields: List[CssBindFunc] =
       for {

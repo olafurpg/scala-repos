@@ -82,8 +82,11 @@ private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
     ensureNotReadOnly()
 
     val len = remaining
-    System
-      .arraycopy(_array, _arrayOffset + position, _array, _arrayOffset, len)
+    System.arraycopy(_array,
+                     _arrayOffset + position,
+                     _array,
+                     _arrayOffset,
+                     len)
     _mark = -1
     limit(capacity)
     position(len)

@@ -210,8 +210,8 @@ final class DecisionTreeRegressionModel private[ml] (
         output.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
     }
     if (isDefined(varianceCol) && $(varianceCol).nonEmpty) {
-      output = output
-        .withColumn($(varianceCol), predictVarianceUDF(col($(featuresCol))))
+      output = output.withColumn($(varianceCol),
+                                 predictVarianceUDF(col($(featuresCol))))
     }
     output
   }

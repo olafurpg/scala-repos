@@ -49,8 +49,9 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
     new ConcurrentHashMap[Time, JobSet]
   private val numConcurrentJobs =
     ssc.conf.getInt("spark.streaming.concurrentJobs", 1)
-  private val jobExecutor = ThreadUtils
-    .newDaemonFixedThreadPool(numConcurrentJobs, "streaming-job-executor")
+  private val jobExecutor = ThreadUtils.newDaemonFixedThreadPool(
+    numConcurrentJobs,
+    "streaming-job-executor")
   private val jobGenerator = new JobGenerator(this)
   val clock = jobGenerator.clock
   val listenerBus = new StreamingListenerBus(ssc.sparkContext.listenerBus)

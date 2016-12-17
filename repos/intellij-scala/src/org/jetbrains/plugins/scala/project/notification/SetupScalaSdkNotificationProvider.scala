@@ -71,8 +71,9 @@ object SetupScalaSdkNotificationProvider {
 
   private def setupSdk(parent: JComponent, project: Project, file: PsiFile) {
     Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach { module =>
-      val dialog = AddSupportForSingleFrameworkDialog
-        .createDialog(module, new ScalaSupportProvider())
+      val dialog = AddSupportForSingleFrameworkDialog.createDialog(
+        module,
+        new ScalaSupportProvider())
       dialog.showAndGet()
     }
   }

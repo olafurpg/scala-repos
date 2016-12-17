@@ -43,8 +43,9 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       .computeVariants(getProject, xSourcePosition)
       .asScala
       .map(_.getText)
-    Assert
-      .assertEquals("Wrong set of variants found: ", variants, foundVariants)
+    Assert.assertEquals("Wrong set of variants found: ",
+                        variants,
+                        foundVariants)
   }
 
   protected def checkStoppedAtBreakpointAt(breakpoints: Breakpoint*)(

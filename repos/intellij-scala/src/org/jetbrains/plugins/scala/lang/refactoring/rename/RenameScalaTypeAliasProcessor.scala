@@ -38,13 +38,15 @@ class RenameScalaTypeAliasProcessor
       case named: ScNamedElement => named
       case _ => return
     }
-    RenameSuperMembersUtil
-      .chooseAndProcessSuper(named, new PsiElementProcessor[PsiNamedElement] {
+    RenameSuperMembersUtil.chooseAndProcessSuper(
+      named,
+      new PsiElementProcessor[PsiNamedElement] {
         def execute(named: PsiNamedElement): Boolean = {
           renameCallback.pass(named)
           false
         }
-      }, editor)
+      },
+      editor)
   }
 
   override def prepareRenaming(element: PsiElement,

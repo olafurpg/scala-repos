@@ -20,8 +20,8 @@ object IntervalTrieArbitrary {
                                count: Int): Gen[IntervalTrie[Long]] = {
     for {
       initial <- Gen.oneOf(true, false)
-      edges <- Gen
-        .resize(count, Gen.containerOf[Array, Long](Gen.choose(min, max)))
+      edges <- Gen.resize(count,
+                          Gen.containerOf[Array, Long](Gen.choose(min, max)))
       support = edges.sorted.distinct
       kind <- Gen.containerOfN[Array, Int](support.length, Gen.oneOf(0, 1, 2))
     } yield makeProfileXor(initial, support, kind)

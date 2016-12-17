@@ -130,8 +130,10 @@ abstract class MessageDispatcher(
   private final def shutdownSchedule: Int =
     Unsafe.instance.getIntVolatile(this, shutdownScheduleOffset)
   private final def updateShutdownSchedule(expect: Int, update: Int): Boolean =
-    Unsafe.instance
-      .compareAndSwapInt(this, shutdownScheduleOffset, expect, update)
+    Unsafe.instance.compareAndSwapInt(this,
+                                      shutdownScheduleOffset,
+                                      expect,
+                                      update)
 
   /**
     *  Creates and returns a mailbox for the given actor.

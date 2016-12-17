@@ -32,8 +32,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream
-      .subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream.subscribe(suppressedListener.ref,
+                                 classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])
@@ -60,8 +60,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream
-      .subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream.subscribe(suppressedListener.ref,
+                                 classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])

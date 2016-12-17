@@ -103,8 +103,7 @@ object NIHDB {
                  timeout: Timeout,
                  txLogScheduler: ScheduledExecutorService)(
       implicit actorSystem: ActorSystem) = {
-    NIHDBActor
-      .open(chef, baseDir, cookThreshold, timeout, txLogScheduler) map {
+    NIHDBActor.open(chef, baseDir, cookThreshold, timeout, txLogScheduler) map {
       _ map {
         _ map {
           case (authorities, actor) =>

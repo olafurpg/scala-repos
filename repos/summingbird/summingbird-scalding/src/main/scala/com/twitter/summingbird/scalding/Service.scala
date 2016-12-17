@@ -146,8 +146,9 @@ private[scalding] object InternalService {
       (flowMode: (FlowDef, Mode)) =>
         val left = input(flowMode)
         val right = toJoin(flowMode)
-        LookupJoin
-          .rightSumming(left, right, reducers)(implicitly, implicitly, sg)
+        LookupJoin.rightSumming(left, right, reducers)(implicitly,
+                                                       implicitly,
+                                                       sg)
     }
 
   /**

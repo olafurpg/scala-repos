@@ -399,8 +399,9 @@ class MapWithStateRDDSuite
     /** Generate MapWithStateRDD with data RDD having a long lineage */
     def makeStateRDDWithLongLineageDataRDD(
         longLineageRDD: RDD[Int]): MapWithStateRDD[Int, Int, Int, Int] = {
-      MapWithStateRDD
-        .createFromPairRDD(longLineageRDD.map { _ -> 1 }, partitioner, Time(0))
+      MapWithStateRDD.createFromPairRDD(longLineageRDD.map { _ -> 1 },
+                                        partitioner,
+                                        Time(0))
     }
 
     testRDD(makeStateRDDWithLongLineageDataRDD,

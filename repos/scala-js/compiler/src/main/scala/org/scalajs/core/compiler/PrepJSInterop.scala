@@ -394,8 +394,8 @@ abstract class PrepJSInterop
             }
           }
         } else {
-          reporter
-            .error(tpeArg.pos, s"non-trait class type required but $tpe found")
+          reporter.error(tpeArg.pos,
+                         s"non-trait class type required but $tpe found")
           EmptyTree
         }
       } else {
@@ -591,8 +591,8 @@ abstract class PrepJSInterop
       // Check that only native objects extend js.GlobalScope
       if (isJSGlobalScope(implDef) && implDef.symbol != JSGlobalScopeClass &&
           (!sym.isModuleClass || !isJSNative)) {
-        reporter
-          .error(implDef.pos, "Only native objects may extend js.GlobalScope")
+        reporter.error(implDef.pos,
+                       "Only native objects may extend js.GlobalScope")
       }
 
       if (shouldPrepareExports) {
@@ -608,8 +608,8 @@ abstract class PrepJSInterop
           for {
             exp <- exportsOf(sym) if !exp.ignoreInvalid
           } {
-            reporter
-              .error(exp.pos, "You may not export a native JS class or object")
+            reporter.error(exp.pos,
+                           "You may not export a native JS class or object")
           }
         } else {
           if (sym.isModuleClass) registerModuleExports(sym)
@@ -923,8 +923,8 @@ abstract class PrepJSInterop
       annot <- sym.getAnnotation(JSNameAnnotation)
       if annot.stringArg(0).isEmpty
     } {
-      reporter
-        .error(annot.pos, "The argument to JSName must be a literal string")
+      reporter.error(annot.pos,
+                     "The argument to JSName must be a literal string")
     }
   }
 

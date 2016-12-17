@@ -31,8 +31,8 @@ class ProducerBounceTest extends KafkaServerTestHarness {
 
   val overridingProps = new Properties()
   overridingProps.put(KafkaConfig.AutoCreateTopicsEnableProp, false.toString)
-  overridingProps
-    .put(KafkaConfig.MessageMaxBytesProp, serverMessageMaxBytes.toString)
+  overridingProps.put(KafkaConfig.MessageMaxBytesProp,
+                      serverMessageMaxBytes.toString)
   // Set a smaller value for the number of partitions for the offset commit topic (__consumer_offset topic)
   // so that the creation of that topic/partition(s) and subsequent leader assignment doesn't take relatively long
   overridingProps.put(KafkaConfig.OffsetsTopicPartitionsProp, 1.toString)
@@ -69,10 +69,12 @@ class ProducerBounceTest extends KafkaServerTestHarness {
   override def setUp() {
     super.setUp()
 
-    producer1 = TestUtils
-      .createNewProducer(brokerList, acks = 0, bufferSize = producerBufferSize)
-    producer2 = TestUtils
-      .createNewProducer(brokerList, acks = 1, bufferSize = producerBufferSize)
+    producer1 = TestUtils.createNewProducer(brokerList,
+                                            acks = 0,
+                                            bufferSize = producerBufferSize)
+    producer2 = TestUtils.createNewProducer(brokerList,
+                                            acks = 1,
+                                            bufferSize = producerBufferSize)
     producer3 = TestUtils.createNewProducer(brokerList,
                                             acks = -1,
                                             bufferSize = producerBufferSize)
@@ -94,8 +96,11 @@ class ProducerBounceTest extends KafkaServerTestHarness {
   @Test
   def testBrokerFailure() {
     val numPartitions = 3
-    val leaders = TestUtils
-      .createTopic(zkUtils, topic1, numPartitions, numServers, servers)
+    val leaders = TestUtils.createTopic(zkUtils,
+                                        topic1,
+                                        numPartitions,
+                                        numServers,
+                                        servers)
     assertTrue("Leader of all partitions of the topic should exist",
                leaders.values.forall(leader => leader.isDefined))
 

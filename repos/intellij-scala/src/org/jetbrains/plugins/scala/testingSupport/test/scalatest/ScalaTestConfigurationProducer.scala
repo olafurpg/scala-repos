@@ -117,8 +117,8 @@ class ScalaTestConfigurationProducer extends {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[ScalaTestRunConfiguration]) return false
-      return TestConfigurationUtil
-        .isPackageConfiguration(element, configuration)
+      return TestConfigurationUtil.isPackageConfiguration(element,
+                                                          configuration)
     }
     val (testClass, testName) = getLocationClassAndTest(location)
     if (testClass == null) return false
@@ -477,8 +477,9 @@ class ScalaTestConfigurationProducer extends {
             var call = _call
             while (call != null) {
               val checkInfixResult2 = checkInfix(
-                PsiTreeUtil
-                  .getParentOfType(call, classOf[MethodInvocation], true),
+                PsiTreeUtil.getParentOfType(call,
+                                            classOf[MethodInvocation],
+                                            true),
                 Map("when" -> wfqn,
                     "that" -> ifqn,
                     "should" -> shouldFqn2,
@@ -486,8 +487,9 @@ class ScalaTestConfigurationProducer extends {
                     "can" -> canFqn2),
                 checkFirstArgIsUnitOrString = true)
               lazy val checkInfixResult = checkInfix(
-                PsiTreeUtil
-                  .getParentOfType(call, classOf[MethodInvocation], true),
+                PsiTreeUtil.getParentOfType(call,
+                                            classOf[MethodInvocation],
+                                            true),
                 Map("when" -> wfqn,
                     "that" -> ifqn,
                     "should" -> shouldFqn,
@@ -739,8 +741,9 @@ class ScalaTestConfigurationProducer extends {
 
     def checkJUnit3Suite(fqn: String): Option[String] = {
       if (!isInheritor(clazz, fqn)) return None
-      var fun = PsiTreeUtil
-        .getParentOfType(element, classOf[ScFunctionDefinition], false)
+      var fun = PsiTreeUtil.getParentOfType(element,
+                                            classOf[ScFunctionDefinition],
+                                            false)
       while (fun != null) {
         if (fun.getParent.isInstanceOf[ScTemplateBody] &&
             fun.containingClass == clazz) {
@@ -756,8 +759,9 @@ class ScalaTestConfigurationProducer extends {
 
     def checkAnnotatedSuite(fqn: String, annot: String): Option[String] = {
       if (!isInheritor(clazz, fqn)) return None
-      var fun = PsiTreeUtil
-        .getParentOfType(element, classOf[ScFunctionDefinition], false)
+      var fun = PsiTreeUtil.getParentOfType(element,
+                                            classOf[ScFunctionDefinition],
+                                            false)
       while (fun != null) {
         if (fun.getParent.isInstanceOf[ScTemplateBody] &&
             fun.containingClass == clazz) {

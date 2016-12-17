@@ -124,8 +124,8 @@ object ShardServiceCombinators extends Logging {
     import blueeyes.json.serialization.Extractor._
     val onError: Error => String = {
       case err @ Thrown(ex) =>
-        logger
-          .warn("Exceptiion thrown from JSON parsing of sortOn parameter", ex)
+        logger.warn("Exceptiion thrown from JSON parsing of sortOn parameter",
+                    ex)
         err.message
       case other =>
         other.message

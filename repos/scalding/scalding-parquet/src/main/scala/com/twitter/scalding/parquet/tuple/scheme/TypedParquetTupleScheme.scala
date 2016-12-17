@@ -90,8 +90,10 @@ class ReadSupportInstanceProxy[T] extends ReadSupport[T] {
       keyValueMetaData: JMap[String, String],
       fileSchema: MessageType,
       readContext: ReadContext): RecordMaterializer[T] = {
-    getDelegateInstance(configuration)
-      .prepareForRead(configuration, keyValueMetaData, fileSchema, readContext)
+    getDelegateInstance(configuration).prepareForRead(configuration,
+                                                      keyValueMetaData,
+                                                      fileSchema,
+                                                      readContext)
   }
 }
 
@@ -182,8 +184,9 @@ class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
     jobConf.setInputFormat(classOf[DeprecatedParquetInputFormat[T]])
     jobConf.set(ParquetInputOutputFormat.READ_SUPPORT_INSTANCE,
                 ParquetInputOutputFormat.injection(readSupport))
-    ParquetInputFormat
-      .setReadSupportClass(jobConf, classOf[ReadSupportInstanceProxy[_]])
+    ParquetInputFormat.setReadSupportClass(
+      jobConf,
+      classOf[ReadSupportInstanceProxy[_]])
   }
 
   override def source(flowProcess: FlowProcess[JobConf],

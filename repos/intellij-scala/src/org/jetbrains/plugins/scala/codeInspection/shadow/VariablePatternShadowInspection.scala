@@ -63,8 +63,9 @@ class ConvertToStableIdentifierPatternFix(r: ScReferencePattern)
       r) {
   def doApplyFix(project: Project) {
     val ref = getElement
-    val stableIdPattern = ScalaPsiElementFactory
-      .createPatternFromText("`%s`".format(ref.getText), ref.getManager)
+    val stableIdPattern = ScalaPsiElementFactory.createPatternFromText(
+      "`%s`".format(ref.getText),
+      ref.getManager)
     ref.replace(stableIdPattern)
   }
 }

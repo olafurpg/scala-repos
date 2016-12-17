@@ -153,8 +153,9 @@ class PreferredReplicaLeaderElectionCommand(
     try {
       val validPartitions = partitions.filter(p =>
         validatePartition(zkUtils, p.topic, p.partition))
-      PreferredReplicaLeaderElectionCommand
-        .writePreferredReplicaElectionData(zkUtils, validPartitions)
+      PreferredReplicaLeaderElectionCommand.writePreferredReplicaElectionData(
+        zkUtils,
+        validPartitions)
     } catch {
       case e: Throwable =>
         throw new AdminCommandFailedException("Admin command failed", e)

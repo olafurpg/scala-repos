@@ -144,8 +144,8 @@ class AttributeGroup private (val name: String,
                                   nominalMetadata.toArray)
       }
       if (binaryMetadata.nonEmpty) {
-        attrBldr
-          .putMetadataArray(AttributeType.Binary.name, binaryMetadata.toArray)
+        attrBldr.putMetadataArray(AttributeType.Binary.name,
+                                  binaryMetadata.toArray)
       }
       bldr.putMetadata(ATTRIBUTES, attrBldr.build())
       bldr.putLong(NUM_ATTRIBUTES, attributes.get.length)

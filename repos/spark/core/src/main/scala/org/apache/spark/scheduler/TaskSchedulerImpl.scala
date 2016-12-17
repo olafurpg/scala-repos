@@ -174,8 +174,9 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
     this.synchronized {
       val manager = createTaskSetManager(taskSet, maxTaskFailures)
       val stage = taskSet.stageId
-      val stageTaskSets = taskSetsByStageIdAndAttempt
-        .getOrElseUpdate(stage, new HashMap[Int, TaskSetManager])
+      val stageTaskSets = taskSetsByStageIdAndAttempt.getOrElseUpdate(
+        stage,
+        new HashMap[Int, TaskSetManager])
       stageTaskSets(taskSet.stageAttemptId) = manager
       val conflictingTaskSet = stageTaskSets.exists {
         case (_, ts) =>
@@ -377,13 +378,16 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
             }
             if (state == TaskState.FINISHED) {
               taskSet.removeRunningTask(tid)
-              taskResultGetter
-                .enqueueSuccessfulTask(taskSet, tid, serializedData)
+              taskResultGetter.enqueueSuccessfulTask(taskSet,
+                                                     tid,
+                                                     serializedData)
             } else if (Set(TaskState.FAILED, TaskState.KILLED, TaskState.LOST)
                          .contains(state)) {
               taskSet.removeRunningTask(tid)
-              taskResultGetter
-                .enqueueFailedTask(taskSet, tid, state, serializedData)
+              taskResultGetter.enqueueFailedTask(taskSet,
+                                                 tid,
+                                                 state,
+                                                 serializedData)
             }
           case None =>
             logError(

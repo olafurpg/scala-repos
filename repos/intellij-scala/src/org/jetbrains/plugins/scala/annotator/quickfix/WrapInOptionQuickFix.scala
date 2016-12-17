@@ -30,8 +30,9 @@ class WrapInOptionQuickFix(expr: ScExpression,
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (expr.isValid) {
       val newText = "Option(" + expr.getText + ")"
-      val newExpr = ScalaPsiElementFactory
-        .createExpressionFromText(newText, expr.getManager)
+      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+        newText,
+        expr.getManager)
       expr.replaceExpression(newExpr, removeParenthesis = true)
     }
   }

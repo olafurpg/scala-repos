@@ -131,8 +131,10 @@ class ScalaCodeFragment(project: Project, text: String) extends {
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     for (qName <- imports) {
-      val imp = ScalaPsiElementFactory
-        .createImportFromTextWithContext("import _root_." + qName, this, this)
+      val imp = ScalaPsiElementFactory.createImportFromTextWithContext(
+        "import _root_." + qName,
+        this,
+        this)
       if (!imp.processDeclarations(processor, state, lastParent, place))
         return false
     }

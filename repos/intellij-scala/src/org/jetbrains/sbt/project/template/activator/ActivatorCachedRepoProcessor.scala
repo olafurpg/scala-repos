@@ -160,8 +160,9 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
       }
     }
 
-    ActivatorRepoProcessor
-      .downloadTemplateFromRepo(templateId, pathTo, myOnError)
+    ActivatorRepoProcessor.downloadTemplateFromRepo(templateId,
+                                                    pathTo,
+                                                    myOnError)
     workOffline = hasError
     if (!workOffline) cacheFile(pathTo, cachedTemplate)
   }

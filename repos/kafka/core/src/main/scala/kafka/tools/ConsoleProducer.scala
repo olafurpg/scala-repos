@@ -84,13 +84,13 @@ object ConsoleProducer {
     props.put("compression.codec", config.compressionCodec)
     props.put("producer.type", if (config.sync) "sync" else "async")
     props.put("batch.num.messages", config.batchSize.toString)
-    props
-      .put("message.send.max.retries", config.messageSendMaxRetries.toString)
+    props.put("message.send.max.retries",
+              config.messageSendMaxRetries.toString)
     props.put("retry.backoff.ms", config.retryBackoffMs.toString)
     props.put("queue.buffering.max.ms", config.sendTimeout.toString)
     props.put("queue.buffering.max.messages", config.queueSize.toString)
-    props
-      .put("queue.enqueue.timeout.ms", config.queueEnqueueTimeoutMs.toString)
+    props.put("queue.enqueue.timeout.ms",
+              config.queueEnqueueTimeoutMs.toString)
     props.put("request.required.acks", config.requestRequiredAcks.toString)
     props.put("request.timeout.ms", config.requestTimeoutMs.toString)
     props.put("key.serializer.class", config.keyEncoderClass)
@@ -129,8 +129,8 @@ object ConsoleProducer {
     props.put(ProducerConfig.RETRIES_CONFIG,
               config.messageSendMaxRetries.toString)
     props.put(ProducerConfig.LINGER_MS_CONFIG, config.sendTimeout.toString)
-    props
-      .put(ProducerConfig.BUFFER_MEMORY_CONFIG, config.maxMemoryBytes.toString)
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG,
+              config.maxMemoryBytes.toString)
     props.put(ProducerConfig.BATCH_SIZE_CONFIG,
               config.maxPartitionMemoryBytes.toString)
     props.put(ProducerConfig.CLIENT_ID_CONFIG, "console-producer")
@@ -322,8 +322,10 @@ object ConsoleProducer {
       CommandLineUtils.printUsageAndDie(
         parser,
         "Read data from standard input and publish it to Kafka.")
-    CommandLineUtils
-      .checkRequiredArgs(parser, options, topicOpt, brokerListOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       topicOpt,
+                                       brokerListOpt)
 
     import scala.collection.JavaConversions._
     val useOldProducer = options.has(useOldProducerOpt)

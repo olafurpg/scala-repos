@@ -172,8 +172,10 @@ private[spark] abstract class MapOutputTracker(conf: SparkConf)
     val statuses = getStatuses(shuffleId)
     // Synchronize on the returned array because, on the driver, it gets mutated in place
     statuses.synchronized {
-      return MapOutputTracker
-        .convertMapStatuses(shuffleId, startPartition, endPartition, statuses)
+      return MapOutputTracker.convertMapStatuses(shuffleId,
+                                                 startPartition,
+                                                 endPartition,
+                                                 statuses)
     }
   }
 

@@ -337,18 +337,21 @@ private[spark] class Executor(executorId: String,
       } catch {
         case ffe: FetchFailedException =>
           val reason = ffe.toTaskEndReason
-          execBackend
-            .statusUpdate(taskId, TaskState.FAILED, ser.serialize(reason))
+          execBackend.statusUpdate(taskId,
+                                   TaskState.FAILED,
+                                   ser.serialize(reason))
 
         case _: TaskKilledException | _: InterruptedException if task.killed =>
           logInfo(s"Executor killed $taskName (TID $taskId)")
-          execBackend
-            .statusUpdate(taskId, TaskState.KILLED, ser.serialize(TaskKilled))
+          execBackend.statusUpdate(taskId,
+                                   TaskState.KILLED,
+                                   ser.serialize(TaskKilled))
 
         case cDE: CommitDeniedException =>
           val reason = cDE.toTaskEndReason
-          execBackend
-            .statusUpdate(taskId, TaskState.FAILED, ser.serialize(reason))
+          execBackend.statusUpdate(taskId,
+                                   TaskState.FAILED,
+                                   ser.serialize(reason))
 
         case t: Throwable =>
           // Attempt to exit cleanly by informing the driver of our failure.
@@ -380,8 +383,9 @@ private[spark] class Executor(executorId: String,
                                        preserveCause = false))
             }
           }
-          execBackend
-            .statusUpdate(taskId, TaskState.FAILED, serializedTaskEndReason)
+          execBackend.statusUpdate(taskId,
+                                   TaskState.FAILED,
+                                   serializedTaskEndReason)
 
           // Don't forcibly exit unless the exception was inherently fatal, to avoid
           // stopping other tasks unnecessarily.
@@ -438,8 +442,11 @@ private[spark] class Executor(executorId: String,
                                                classOf[String],
                                                classOf[ClassLoader],
                                                classOf[Boolean])
-        constructor
-          .newInstance(conf, env, classUri, parent, _userClassPathFirst)
+        constructor.newInstance(conf,
+                                env,
+                                classUri,
+                                parent,
+                                _userClassPathFirst)
       } catch {
         case _: ClassNotFoundException =>
           logError(

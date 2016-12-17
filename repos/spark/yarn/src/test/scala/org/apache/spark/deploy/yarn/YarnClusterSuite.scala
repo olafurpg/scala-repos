@@ -197,8 +197,9 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     // Create a jar file that contains a different version of "test.resource".
     val originalJar =
       TestUtils.createJarWithFiles(Map("test.resource" -> "ORIGINAL"), tempDir)
-    val userJar = TestUtils
-      .createJarWithFiles(Map("test.resource" -> "OVERRIDDEN"), tempDir)
+    val userJar = TestUtils.createJarWithFiles(
+      Map("test.resource" -> "OVERRIDDEN"),
+      tempDir)
     val driverResult = File.createTempFile("driver", null, tempDir)
     val executorResult = File.createTempFile("executor", null, tempDir)
     val finalState = runSpark(

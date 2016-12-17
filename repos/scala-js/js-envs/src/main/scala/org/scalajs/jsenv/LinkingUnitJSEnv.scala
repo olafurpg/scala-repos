@@ -61,8 +61,10 @@ trait LinkingUnitJSEnv extends JSEnv {
                  linkingUnit: LinkingUnit,
                  postLibs: Seq[ResolvedJSDependency],
                  code: VirtualJSFile): JSRunner = {
-      LinkingUnitJSEnv.this
-        .jsRunner(loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+      LinkingUnitJSEnv.this.jsRunner(loadedLibs ++ preLibs,
+                                     linkingUnit,
+                                     postLibs,
+                                     code)
     }
   }
 

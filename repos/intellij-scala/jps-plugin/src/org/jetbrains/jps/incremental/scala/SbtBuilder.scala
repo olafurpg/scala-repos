@@ -66,8 +66,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     if (filesToCompile.isEmpty) return ExitCode.NOTHING_DONE
 
     // Delete dirty class files (to handle force builds and form changes)
-    BuildOperations
-      .cleanOutputsCorrespondingToChangedFiles(context, dirtyFilesHolder)
+    BuildOperations.cleanOutputsCorrespondingToChangedFiles(context,
+                                                            dirtyFilesHolder)
 
     val sources = filesToCompile.keySet.toSeq
 

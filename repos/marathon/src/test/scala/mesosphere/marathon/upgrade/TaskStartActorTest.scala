@@ -153,8 +153,9 @@ class TaskStartActorTest
     val app = AppDefinition("/myApp".toPath, instances = 5)
 
     when(launchQueue.get(app.id)).thenReturn(None)
-    val task = MarathonTestHelper
-      .startingTaskForApp(app.id, appVersion = Timestamp(1024))
+    val task = MarathonTestHelper.startingTaskForApp(app.id,
+                                                     appVersion =
+                                                       Timestamp(1024))
     taskCreationHandler.created(task).futureValue
 
     val ref = TestActorRef(

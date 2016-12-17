@@ -297,8 +297,9 @@ class SparkHadoopUtil extends Logging {
                               credentials: Credentials): Long = {
     val now = System.currentTimeMillis()
 
-    val renewalInterval = sparkConf
-      .getLong("spark.yarn.token.renewal.interval", (24 hours).toMillis)
+    val renewalInterval = sparkConf.getLong(
+      "spark.yarn.token.renewal.interval",
+      (24 hours).toMillis)
 
     credentials.getAllTokens.asScala
       .filter(_.getKind == DelegationTokenIdentifier.HDFS_DELEGATION_KIND)
@@ -332,8 +333,7 @@ class SparkHadoopUtil extends Logging {
       case HADOOP_CONF_PATTERN(matched) => {
         logDebug(text + " matched " + HADOOP_CONF_PATTERN)
         val key =
-          matched
-            .substring(13, matched.length() - 1) // remove ${hadoopconf- .. }
+          matched.substring(13, matched.length() - 1) // remove ${hadoopconf- .. }
         val eval = Option[String](hadoopConf.get(key)).map { value =>
           logDebug("Substituted " + matched + " with " + value)
           text.replace(matched, value)

@@ -52,8 +52,9 @@ class NewScalaTypeDefinitionAction
            .getInstance(project)
            .getAllTemplates) {
       if (isScalaTemplate(template) && checkPackageExists(directory)) {
-        builder
-          .addKind(template.getName, Icons.FILE_TYPE_LOGO, template.getName)
+        builder.addKind(template.getName,
+                        Icons.FILE_TYPE_LOGO,
+                        template.getName)
       }
     }
 

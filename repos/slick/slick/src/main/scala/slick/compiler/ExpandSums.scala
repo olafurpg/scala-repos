@@ -153,8 +153,8 @@ class ExpandSums extends Phase {
              pure) = bind
     val lComplex = !leftElemType.structural.isInstanceOf[AtomicType]
     val rComplex = !rightElemType.structural.isInstanceOf[AtomicType]
-    logger
-      .debug(s"Translating join ($jt, complex: $lComplex, $rComplex):", bind)
+    logger.debug(s"Translating join ($jt, complex: $lComplex, $rComplex):",
+                 bind)
 
     // Find an existing column that can serve as a discriminator
     def findDisc(t: Type): Option[List[TermSymbol]] = {

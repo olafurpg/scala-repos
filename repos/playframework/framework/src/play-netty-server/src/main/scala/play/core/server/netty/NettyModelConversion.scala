@@ -293,8 +293,9 @@ private[server] class NettyModelConversion(
       stream: Source[ByteString, _],
       httpVersion: HttpVersion,
       responseStatus: HttpResponseStatus)(implicit mat: Materializer) = {
-    val publisher = SynchronousMappedStreams
-      .map(stream.runWith(Sink.asPublisher(false)), byteStringToHttpContent)
+    val publisher = SynchronousMappedStreams.map(
+      stream.runWith(Sink.asPublisher(false)),
+      byteStringToHttpContent)
     new DefaultStreamedHttpResponse(httpVersion, responseStatus, publisher)
   }
 

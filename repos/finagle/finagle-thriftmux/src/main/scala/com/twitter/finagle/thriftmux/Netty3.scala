@@ -316,8 +316,10 @@ private[finagle] class PipelineFactory(
                              new RequestSerializer(1))
           if (isTTwitterUpNegotiation(buf)) {
             pipeline.replace(this, "twitter_thrift_to_mux", new TTwitterToMux)
-            Channels
-              .write(ctx, e.getFuture, upNegotiationAck, e.getRemoteAddress)
+            Channels.write(ctx,
+                           e.getFuture,
+                           upNegotiationAck,
+                           e.getRemoteAddress)
           } else {
             pipeline.replace(this, "framed_thrift_to_mux", new TFramedToMux)
             super.messageReceived(

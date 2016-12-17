@@ -896,12 +896,14 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
             Nil)
     }
     "compress value whitespace into single spaces and trim" in {
-      parse("Foo", " b  a \tr\t") shouldEqual ParsingResult
-        .Ok(RawHeader("Foo", "b a r"), Nil)
+      parse("Foo", " b  a \tr\t") shouldEqual ParsingResult.Ok(
+        RawHeader("Foo", "b a r"),
+        Nil)
     }
     "resolve obs-fold occurrences" in {
-      parse("Foo", "b\r\n\ta \r\n r") shouldEqual ParsingResult
-        .Ok(RawHeader("Foo", "b a r"), Nil)
+      parse("Foo", "b\r\n\ta \r\n r") shouldEqual ParsingResult.Ok(
+        RawHeader("Foo", "b a r"),
+        Nil)
     }
 
     "parse with custom uri parsing mode" in {

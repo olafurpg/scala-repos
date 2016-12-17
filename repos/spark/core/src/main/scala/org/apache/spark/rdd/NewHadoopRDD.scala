@@ -173,8 +173,8 @@ class NewHadoopRDD[K, V](sc: SparkContext,
       private var reader = format.createRecordReader(
         split.serializableHadoopSplit.value,
         hadoopAttemptContext)
-      reader
-        .initialize(split.serializableHadoopSplit.value, hadoopAttemptContext)
+      reader.initialize(split.serializableHadoopSplit.value,
+                        hadoopAttemptContext)
 
       // Register an on-task-completion callback to close the input stream.
       context.addTaskCompletionListener(context => close())

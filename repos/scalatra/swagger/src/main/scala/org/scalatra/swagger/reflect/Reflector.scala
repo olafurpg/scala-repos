@@ -165,8 +165,10 @@ object Reflector {
           case v: TypeVariable[_] =>
             val a = owner.typeVars.getOrElse(v, scalaTypeOf(v))
             if (a.erasure == classOf[java.lang.Object]) {
-              val r = ScalaSigReader
-                .readConstructor(name, owner, index, ctorParameterNames)
+              val r = ScalaSigReader.readConstructor(name,
+                                                     owner,
+                                                     index,
+                                                     ctorParameterNames)
               scalaTypeOf(r)
             } else a
           case v: ParameterizedType =>

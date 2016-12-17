@@ -148,8 +148,10 @@ class ScalaChangeSignatureUsageProcessor
               element.delete()
             case _: ScVariableDeclaration | _: ScValueDeclaration =>
               val newElement =
-                ScalaPsiElementFactory
-                  .createDeclarationFromText(text, element.getContext, element)
+                ScalaPsiElementFactory.createDeclarationFromText(
+                  text,
+                  element.getContext,
+                  element)
               element.getParent.addAfter(newElement, element)
               element.delete()
             case _ =>
@@ -230,8 +232,9 @@ class ScalaChangeSignatureUsageProcessor
       case ScalaNamedElementUsageInfo(u: OverriderValUsageInfo) =>
         ConflictsUtil.addBindingPatternConflicts(u.namedElement, info, result)
       case javaOverriderUsage: OverriderUsageInfo =>
-        ConflictsUtil
-          .addJavaOverriderConflicts(javaOverriderUsage, info, result)
+        ConflictsUtil.addJavaOverriderConflicts(javaOverriderUsage,
+                                                info,
+                                                result)
       case p: PatternUsageInfo =>
         ConflictsUtil.addUnapplyUsagesConflicts(p, info, result)
       case _ =>

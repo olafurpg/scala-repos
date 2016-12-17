@@ -31,8 +31,9 @@ class Main {
   val SCALA_LONG_SIG_ANNOTATION = "Lscala/reflect/ScalaLongSignature;"
   val BYTES_VALUE = "bytes"
 
-  val versionMsg = "Scala classfile decoder %s -- %s\n"
-    .format(Properties.versionString, Properties.copyrightString)
+  val versionMsg = "Scala classfile decoder %s -- %s\n".format(
+    Properties.versionString,
+    Properties.copyrightString)
 
   /**Verbose program run?
     */

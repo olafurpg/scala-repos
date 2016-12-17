@@ -33,10 +33,10 @@ trait AnalysisTest extends PlanTest {
     val caseSensitiveCatalog = new SimpleCatalog(caseSensitiveConf)
     val caseInsensitiveCatalog = new SimpleCatalog(caseInsensitiveConf)
 
-    caseSensitiveCatalog
-      .registerTable(TableIdentifier("TaBlE"), TestRelations.testRelation)
-    caseInsensitiveCatalog
-      .registerTable(TableIdentifier("TaBlE"), TestRelations.testRelation)
+    caseSensitiveCatalog.registerTable(TableIdentifier("TaBlE"),
+                                       TestRelations.testRelation)
+    caseInsensitiveCatalog.registerTable(TableIdentifier("TaBlE"),
+                                         TestRelations.testRelation)
 
     new Analyzer(caseSensitiveCatalog,
                  EmptyFunctionRegistry,

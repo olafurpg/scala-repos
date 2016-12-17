@@ -136,8 +136,13 @@ case class IngestMessage(apiKey: APIKey,
   }
 
   override def toString =
-    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)"
-      .format(apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
+    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)".format(apiKey,
+                                                                 path,
+                                                                 writeAs,
+                                                                 data.size,
+                                                                 jobId,
+                                                                 timestamp,
+                                                                 streamRef)
 }
 
 object IngestMessage {

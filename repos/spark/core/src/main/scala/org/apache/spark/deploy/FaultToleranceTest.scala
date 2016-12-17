@@ -78,8 +78,7 @@ private object FaultToleranceTest extends App with Logging {
   private val containerSparkHome = "/opt/spark"
   private val dockerMountDir = "%s:%s".format(sparkHome, containerSparkHome)
 
-  System
-    .setProperty("spark.driver.host", "172.17.42.1") // default docker host ip
+  System.setProperty("spark.driver.host", "172.17.42.1") // default docker host ip
 
   private def afterEach() {
     if (sc != null) {
@@ -398,8 +397,10 @@ private class TestMasterInfo(val ip: String,
   def kill() { Docker.kill(dockerId) }
 
   override def toString: String =
-    "[ip=%s, id=%s, logFile=%s, state=%s]"
-      .format(ip, dockerId.id, logFile.getAbsolutePath, state)
+    "[ip=%s, id=%s, logFile=%s, state=%s]".format(ip,
+                                                  dockerId.id,
+                                                  logFile.getAbsolutePath,
+                                                  state)
 }
 
 private class TestWorkerInfo(val ip: String,
@@ -425,8 +426,9 @@ private object SparkDocker {
   }
 
   def startWorker(mountDir: String, masters: String): TestWorkerInfo = {
-    val cmd = Docker
-      .makeRunCmd("spark-test-worker", args = masters, mountDir = mountDir)
+    val cmd = Docker.makeRunCmd("spark-test-worker",
+                                args = masters,
+                                mountDir = mountDir)
     val (ip, id, outFile) = startNode(cmd)
     new TestWorkerInfo(ip, id, outFile)
   }

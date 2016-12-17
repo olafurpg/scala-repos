@@ -454,8 +454,9 @@ object WebHookService {
         commits = commits.map { commit =>
           ApiCommit.forPushPayload(git, RepositoryName(repositoryInfo), commit)
         },
-        repository = ApiRepository
-          .forPushPayload(repositoryInfo, owner = ApiUser(repositoryOwner))
+        repository = ApiRepository.forPushPayload(repositoryInfo,
+                                                  owner =
+                                                    ApiUser(repositoryOwner))
       )
   }
 

@@ -1002,8 +1002,7 @@ trait ProtoUser {
 
   def lostPassword = {
     val bind =
-      ".email" #> SHtml
-        .text("", sendPasswordReset _) & "type=submit" #> lostPasswordSubmitButton(
+      ".email" #> SHtml.text("", sendPasswordReset _) & "type=submit" #> lostPasswordSubmitButton(
         S.?("send.it"))
 
     bind(lostPasswordXhtml)
@@ -1093,8 +1092,7 @@ trait ProtoUser {
       val passwordInput =
         SHtml.password_*("", LFuncHolder(s => newPassword = s))
 
-      ".old-password" #> SHtml
-        .password("", s => oldPassword = s) & ".new-password" #> passwordInput & "type=submit" #> changePasswordSubmitButton(
+      ".old-password" #> SHtml.password("", s => oldPassword = s) & ".new-password" #> passwordInput & "type=submit" #> changePasswordSubmitButton(
         S.?("change"),
         testAndSet _)
     }

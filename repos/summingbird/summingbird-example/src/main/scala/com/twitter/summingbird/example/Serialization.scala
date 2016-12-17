@@ -39,8 +39,9 @@ object Serialization {
     * This Injection converts the twitter4j.Status objects that Storm
     * and Scalding will process into Strings.
     */
-  implicit val statusCodec: Injection[Status, String] = Injection
-    .buildCatchInvert[Status, String](DataObjectFactory.getRawJSON(_))(
+  implicit val statusCodec: Injection[Status, String] =
+    Injection.buildCatchInvert[Status, String](
+      DataObjectFactory.getRawJSON(_))(
       json => DataObjectFactory.createStatus(json)
     )
 

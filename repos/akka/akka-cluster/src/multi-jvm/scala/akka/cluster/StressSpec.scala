@@ -297,8 +297,11 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     }
 
     import context.dispatcher
-    private val reportMetricsTask = context.system.scheduler
-      .schedule(reportMetricsInterval, reportMetricsInterval, self, ReportTick)
+    private val reportMetricsTask = context.system.scheduler.schedule(
+      reportMetricsInterval,
+      reportMetricsInterval,
+      self,
+      ReportTick)
 
     // subscribe to ClusterMetricsChanged, re-subscribe when restart
     override def preStart(): Unit =

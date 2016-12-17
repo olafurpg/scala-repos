@@ -76,8 +76,8 @@ class ScalaCompilerConfiguration(project: Project)
     if (incrementalityType != IncrementalityType.IDEA) {
       val incrementalityTypeElement = new Element("option")
       incrementalityTypeElement.setAttribute("name", "incrementalityType")
-      incrementalityTypeElement
-        .setAttribute("value", incrementalityType.toString)
+      incrementalityTypeElement.setAttribute("value",
+                                             incrementalityType.toString)
       configurationElement.addContent(incrementalityTypeElement)
     }
 

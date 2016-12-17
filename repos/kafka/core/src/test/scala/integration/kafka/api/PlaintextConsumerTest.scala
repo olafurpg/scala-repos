@@ -277,8 +277,11 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       },
       s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment}")
 
-    TestUtils
-      .createTopic(this.zkUtils, otherTopic, 2, serverCount, this.servers)
+    TestUtils.createTopic(this.zkUtils,
+                          otherTopic,
+                          2,
+                          serverCount,
+                          this.servers)
     this.consumers(0).subscribe(List(topic, otherTopic).asJava)
     TestUtils.waitUntilTrue(
       () => {
@@ -291,8 +294,11 @@ class PlaintextConsumerTest extends BaseConsumerTest {
   @Test
   def testShrinkingTopicSubscriptions() {
     val otherTopic = "other"
-    TestUtils
-      .createTopic(this.zkUtils, otherTopic, 2, serverCount, this.servers)
+    TestUtils.createTopic(this.zkUtils,
+                          otherTopic,
+                          2,
+                          serverCount,
+                          this.servers)
     val subscriptions = Set(new TopicPartition(topic, 0),
                             new TopicPartition(topic, 1),
                             new TopicPartition(otherTopic, 0),
@@ -392,8 +398,8 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     val producerProps = new Properties()
     producerProps.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG,
                               CompressionType.GZIP.name)
-    producerProps
-      .setProperty(ProducerConfig.LINGER_MS_CONFIG, Long.MaxValue.toString)
+    producerProps.setProperty(ProducerConfig.LINGER_MS_CONFIG,
+                              Long.MaxValue.toString)
     val producer = TestUtils.createNewProducer(brokerList,
                                                securityProtocol =
                                                  securityProtocol,

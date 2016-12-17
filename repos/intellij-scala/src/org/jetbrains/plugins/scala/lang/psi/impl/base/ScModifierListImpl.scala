@@ -134,16 +134,16 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
     name match {
       case "override" =>
         if (value) {
-          val node = ScalaPsiElementFactory
-            .createModifierFromText("override", getManager)
+          val node = ScalaPsiElementFactory.createModifierFromText("override",
+                                                                   getManager)
           addBefore(node)
         } else
           getNode.removeChild(
             findChildByType[PsiElement](ScalaTokenTypes.kOVERRIDE).getNode)
       case "private" =>
         if (value) {
-          val node = ScalaPsiElementFactory
-            .createModifierFromText("private", getManager)
+          val node = ScalaPsiElementFactory.createModifierFromText("private",
+                                                                   getManager)
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
@@ -154,8 +154,8 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
         }
       case "protected" =>
         if (value) {
-          val node = ScalaPsiElementFactory
-            .createModifierFromText("protected", getManager)
+          val node = ScalaPsiElementFactory.createModifierFromText("protected",
+                                                                   getManager)
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
@@ -174,16 +174,16 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
             findChildByType[PsiElement](ScalaTokenTypes.kFINAL).getNode)
       case "implicit" =>
         if (value) {
-          val node = ScalaPsiElementFactory
-            .createModifierFromText("implicit", getManager)
+          val node = ScalaPsiElementFactory.createModifierFromText("implicit",
+                                                                   getManager)
           addBefore(node)
         } else
           getNode.removeChild(
             findChildByType[PsiElement](ScalaTokenTypes.kIMPLICIT).getNode)
       case "abstract" =>
         if (value) {
-          val node = ScalaPsiElementFactory
-            .createModifierFromText("abstract", getManager)
+          val node = ScalaPsiElementFactory.createModifierFromText("abstract",
+                                                                   getManager)
           addBefore(node)
         } else
           getNode.removeChild(
@@ -248,8 +248,7 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
     getAnnotations.find(_.getQualifiedName == name) match {
       case None if name == "java.lang.Override" =>
         val factory = JavaPsiFacade.getInstance(getProject).getElementFactory
-        factory
-          .createAnnotationFromText("@" + name, this); // hack to disable AddOverrideAnnotationAction,
+        factory.createAnnotationFromText("@" + name, this); // hack to disable AddOverrideAnnotationAction,
       case None => null
       case Some(x) => x
     }

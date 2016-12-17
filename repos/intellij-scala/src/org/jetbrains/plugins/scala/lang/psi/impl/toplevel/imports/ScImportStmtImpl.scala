@@ -142,8 +142,8 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
         }
 
         val exprQualRefType = () =>
-          ScSimpleTypeElementImpl
-            .calculateReferenceType(exprQual, shapesOnly = false)
+          ScSimpleTypeElementImpl.calculateReferenceType(exprQual,
+                                                         shapesOnly = false)
 
         def checkResolve(resolve: ResolveResult): Boolean = {
           resolve match {

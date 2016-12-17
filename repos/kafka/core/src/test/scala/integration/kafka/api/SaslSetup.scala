@@ -59,8 +59,8 @@ trait SaslSetup {
     val (keytabFile, jaasFile) = createKeytabAndJaasFiles(mode)
     // This will cause a reload of the Configuration singleton when `getConfiguration` is called
     Configuration.setConfiguration(null)
-    System
-      .setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
+    System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM,
+                       jaasFile.getAbsolutePath)
     keytabFile
   }
 

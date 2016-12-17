@@ -111,16 +111,17 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     semaphore.down()
     val processHandler: AtomicReference[ProcessHandler] =
       new AtomicReference[ProcessHandler]
-    runner
-      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-        def processStarted(descriptor: RunContentDescriptor) {
-          val handler: ProcessHandler = descriptor.getProcessHandler
-          assert(handler != null)
-          handler.addProcessListener(listener)
-          processHandler.set(handler)
-          semaphore.up()
-        }
-      })
+    runner.execute(executionEnvironmentBuilder.build,
+                   new ProgramRunner.Callback {
+                     def processStarted(descriptor: RunContentDescriptor) {
+                       val handler: ProcessHandler =
+                         descriptor.getProcessHandler
+                       assert(handler != null)
+                       handler.addProcessListener(listener)
+                       processHandler.set(handler)
+                       semaphore.up()
+                     }
+                   })
     semaphore.waitFor()
     processHandler.get
   }
@@ -208,8 +209,8 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   protected def managed[T >: Null](callback: => T): T = {
     var result: T = null
     def ctx =
-      DebuggerContextUtil
-        .createDebuggerContext(getDebugSession, suspendContext)
+      DebuggerContextUtil.createDebuggerContext(getDebugSession,
+                                                suspendContext)
     val semaphore = new Semaphore()
     semaphore.down()
     getDebugProcess.getManagerThread.invokeAndWait(
@@ -277,8 +278,9 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   }
 
   protected def evalEquals(codeText: String, expected: String) {
-    Assert
-      .assertEquals(s"Evaluating:\n $codeText", expected, evalResult(codeText))
+    Assert.assertEquals(s"Evaluating:\n $codeText",
+                        expected,
+                        evalResult(codeText))
   }
 
   protected def evalStartsWith(codeText: String, startsWith: String) {

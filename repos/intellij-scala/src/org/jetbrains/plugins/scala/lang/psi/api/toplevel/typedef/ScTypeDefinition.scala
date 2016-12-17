@@ -120,8 +120,9 @@ trait ScTypeDefinition
                     .mkString("(", ", ", ")")
                 }.mkString("(", " => ", s" => $name)")
               val typeElement =
-                ScalaPsiElementFactory
-                  .createTypeElementFromText(typeElementText, getManager)
+                ScalaPsiElementFactory.createTypeElementFromText(
+                  typeElementText,
+                  getManager)
               s" extends ${typeElement.getText}"
             } else {
               ""

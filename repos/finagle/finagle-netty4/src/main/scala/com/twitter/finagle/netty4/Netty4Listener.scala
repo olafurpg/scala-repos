@@ -99,10 +99,10 @@ private[finagle] case class Netty4Listener[In, Out](
       bootstrap.childOption[JBool](ChannelOption.TCP_NODELAY, noDelay)
 
       //todo: investigate pooled allocator CSL-2089
-      bootstrap
-        .option(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
-      bootstrap
-        .childOption(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
+      bootstrap.option(ChannelOption.ALLOCATOR,
+                       UnpooledByteBufAllocator.DEFAULT)
+      bootstrap.childOption(ChannelOption.ALLOCATOR,
+                            UnpooledByteBufAllocator.DEFAULT)
       bootstrap.option[JBool](ChannelOption.SO_REUSEADDR, reuseAddr)
       bootstrap.option[JInt](ChannelOption.SO_LINGER, 0)
       backlog.foreach(bootstrap.option[JInt](ChannelOption.SO_BACKLOG, _))

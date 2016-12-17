@@ -222,8 +222,9 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
     }
 
     buf.append(expr.args.getText)
-    val newExpr = ScalaPsiElementFactory
-      .createExpressionFromText(buf.toString(), element.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+      buf.toString(),
+      element.getManager)
 
     inWriteAction {
       expr.replace(newExpr)

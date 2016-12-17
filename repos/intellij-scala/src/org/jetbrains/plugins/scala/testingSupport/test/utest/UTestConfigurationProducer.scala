@@ -45,8 +45,8 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[UTestRunConfiguration]) return false
-      return TestConfigurationUtil
-        .isPackageConfiguration(element, configuration)
+      return TestConfigurationUtil.isPackageConfiguration(element,
+                                                          configuration)
     }
     val (testClass, testClassName) = getLocationClassAndTest(location)
     if (testClass == null) return false
@@ -195,8 +195,9 @@ with AbstractTestConfigurationProducer {
            PsiTreeUtil.getParentOfType(containingObject,
                                        classOf[ScTypeDefinition],
                                        true) != null) {
-      containingObject = PsiTreeUtil
-        .getParentOfType(containingObject, classOf[ScTypeDefinition], true)
+      containingObject = PsiTreeUtil.getParentOfType(containingObject,
+                                                     classOf[ScTypeDefinition],
+                                                     true)
     }
     if (!containingObject.isInstanceOf[ScObject]) return fail
     if (!suitePaths.exists(suitePath =>

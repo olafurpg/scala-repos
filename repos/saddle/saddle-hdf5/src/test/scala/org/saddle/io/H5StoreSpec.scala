@@ -282,8 +282,8 @@ class H5StoreSpec extends Specification {
       H5Store.writeFrame(tmp, "df1", df1)
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
 
-      H5Store
-        .writeFrame(tmp, "df1", df2) must throwAn[H5Store.H5StoreException]
+      H5Store.writeFrame(tmp, "df1", df2) must throwAn[
+        H5Store.H5StoreException]
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
 
       Files.deleteIfExists(Paths.get(tmp))
@@ -438,8 +438,7 @@ class H5StoreSpec extends Specification {
               H5Store.readFrame[DateTime, Int, Double](
                 tmp,
                 "f%s".format(100 + i)) must_== df2
-              H5Store
-                .readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+              H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
             }
           }
 
@@ -454,8 +453,7 @@ class H5StoreSpec extends Specification {
               if (i % 2 == 0)
                 H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
               else
-                H5Store
-                  .readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+                H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
             }
           }
 

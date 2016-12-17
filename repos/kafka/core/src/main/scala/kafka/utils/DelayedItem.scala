@@ -29,8 +29,8 @@ class DelayedItem(delayMs: Long) extends Delayed with Logging {
     * The remaining delay time
     */
   def getDelay(unit: TimeUnit): Long = {
-    unit
-      .convert(max(dueMs - SystemTime.milliseconds, 0), TimeUnit.MILLISECONDS)
+    unit.convert(max(dueMs - SystemTime.milliseconds, 0),
+                 TimeUnit.MILLISECONDS)
   }
 
   def compareTo(d: Delayed): Int = {

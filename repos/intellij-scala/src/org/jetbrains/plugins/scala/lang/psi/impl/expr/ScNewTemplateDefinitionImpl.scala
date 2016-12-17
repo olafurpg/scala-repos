@@ -133,8 +133,10 @@ class ScNewTemplateDefinitionImpl private (
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super[ScNewTemplateDefinition]
-      .processDeclarations(processor, state, lastParent, place)
+    super[ScNewTemplateDefinition].processDeclarations(processor,
+                                                       state,
+                                                       lastParent,
+                                                       place)
   }
 
   override def getExtendsListTypes: Array[PsiClassType] = innerExtendsListTypes

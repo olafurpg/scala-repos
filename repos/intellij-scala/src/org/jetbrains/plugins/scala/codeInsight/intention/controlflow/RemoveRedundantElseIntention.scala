@@ -80,8 +80,8 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       elseKeyWord.delete()
       elseBranch.delete()
       ifStmt.getParent.addRangeAfter(from, to, ifStmt)
-      ifStmt.getParent
-        .addAfter(ScalaPsiElementFactory.createNewLine(manager), ifStmt)
+      ifStmt.getParent.addAfter(ScalaPsiElementFactory.createNewLine(manager),
+                                ifStmt)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)

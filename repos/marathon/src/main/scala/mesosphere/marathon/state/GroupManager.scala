@@ -166,8 +166,9 @@ class GroupManager @Singleton @Inject()(
       from <- rootGroup()
       (toUnversioned, resolve) <- resolveStoreUrls(
         assignDynamicServicePorts(from, change(from)))
-      to = GroupVersioningUtil
-        .updateVersionInfoForChangedApps(version, from, toUnversioned)
+      to = GroupVersioningUtil.updateVersionInfoForChangedApps(version,
+                                                               from,
+                                                               toUnversioned)
       _ = validateOrThrow(to)(Group.validGroupWithConfig(config.maxApps.get))
       plan = DeploymentPlan(from, to, resolve, version, toKill)
       _ = validateOrThrow(plan)

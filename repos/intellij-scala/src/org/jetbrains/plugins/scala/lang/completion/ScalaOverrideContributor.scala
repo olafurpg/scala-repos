@@ -87,8 +87,9 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       parameters: CompletionParameters): Unit = {
     val position = positionFromParameters(parameters)
 
-    val clazz = PsiTreeUtil
-      .getParentOfType(position, classOf[ScTemplateDefinition], false)
+    val clazz = PsiTreeUtil.getParentOfType(position,
+                                            classOf[ScTemplateDefinition],
+                                            false)
     if (clazz == null) return
 
     val classMembers =
@@ -234,8 +235,9 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
             ICON_FLAG_VISIBILITY | ICON_FLAG_READ_STATUS))
           .withInsertHandler(insertionHandler(mm))
 
-        val renderingDecorator = LookupElementDecorator
-          .withRenderer(lookupItem, new MyElementRenderer(mm))
+        val renderingDecorator =
+          LookupElementDecorator.withRenderer(lookupItem,
+                                              new MyElementRenderer(mm))
         resultSet.consume(renderingDecorator)
       case _ =>
     }

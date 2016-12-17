@@ -91,8 +91,8 @@ object ConcurrentSpec
         // fastEnumerator can complete even though the slowIteratee
         // won't consume anything until it has finished.
         val result =
-          fastEnumerator &> Concurrent
-            .buffer(20, (_: Input[Int]) => 1)(bufferEC) |>>> slowIteratee
+          fastEnumerator &> Concurrent.buffer(20, (_: Input[Int]) => 1)(
+            bufferEC) |>>> slowIteratee
 
         await(result) must_== ((1 to 10).to[List])
       }
@@ -307,8 +307,7 @@ object ConcurrentSpec
         val e = Concurrent.patchPanel[Int] { pp =>
           pp.patchIn(Enumerator.eof)
         }(ppEC)
-        Await
-          .result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
+        Await.result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
           Nil)
       }
     }

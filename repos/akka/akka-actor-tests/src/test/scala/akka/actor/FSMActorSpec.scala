@@ -143,8 +143,7 @@ class FSMActorSpec
       Await.ready(transitionCallBackLatch, timeout.duration)
       Await.ready(lockedLatch, timeout.duration)
 
-      EventFilter
-        .warning(start = "unhandled event", occurrences = 1) intercept {
+      EventFilter.warning(start = "unhandled event", occurrences = 1) intercept {
         lock ! "not_handled"
         Await.ready(unhandledLatch, timeout.duration)
       }
@@ -172,8 +171,7 @@ class FSMActorSpec
         }
       })
       val name = fsm.path.toString
-      EventFilter
-        .error("Next state 2 does not exist", occurrences = 1) intercept {
+      EventFilter.error("Next state 2 does not exist", occurrences = 1) intercept {
         system.eventStream.subscribe(testActor, classOf[Logging.Error])
         fsm ! "go"
         expectMsgPF(1 second, hint = "Next state 2 does not exist") {

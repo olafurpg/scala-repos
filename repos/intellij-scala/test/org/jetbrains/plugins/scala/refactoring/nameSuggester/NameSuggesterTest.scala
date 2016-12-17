@@ -12,8 +12,9 @@ import org.junit.Assert
   */
 class NameSuggesterTest extends ScalaLightCodeInsightFixtureTestAdapter {
   def testNamesByType(typeElementText: String, names: Seq[String]) {
-    val typeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(typeElementText, myFixture.getPsiManager)
+    val typeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      typeElementText,
+      myFixture.getPsiManager)
     val scType = typeElement.getType().getOrNothing
     Assert.assertEquals(
       names.mkString(", "),

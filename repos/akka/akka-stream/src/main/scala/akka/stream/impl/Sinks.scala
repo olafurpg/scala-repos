@@ -215,8 +215,9 @@ private[akka] final class ActorRefSink[In](ref: ActorRef,
       actorMaterializer.effectiveSettings(context.effectiveAttributes)
     val subscriberRef = actorMaterializer.actorOf(
       context,
-      ActorRefSinkActor
-        .props(ref, effectiveSettings.maxInputBufferSize, onCompleteMessage))
+      ActorRefSinkActor.props(ref,
+                              effectiveSettings.maxInputBufferSize,
+                              onCompleteMessage))
     (akka.stream.actor.ActorSubscriber[In](subscriberRef), NotUsed)
   }
 

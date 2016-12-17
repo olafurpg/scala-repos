@@ -90,8 +90,9 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |  def bar() {}
         |}
       """.stripMargin
-    val message = ScalaBundle
-      .message("super.reference.used.in.extracted.member", "foo(): Unit")
+    val message = ScalaBundle.message(
+      "super.reference.used.in.extracted.member",
+      "foo(): Unit")
     checkException(text,
                    message,
                    onlyDeclarations = false,

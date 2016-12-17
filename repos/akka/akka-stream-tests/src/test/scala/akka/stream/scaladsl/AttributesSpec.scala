@@ -72,8 +72,9 @@ class AttributesSpec extends AkkaSpec {
     }
 
     val attributes =
-      Attributes.name("a") and Attributes.name("b") and Attributes
-        .inputBuffer(1, 2)
+      Attributes.name("a") and Attributes.name("b") and Attributes.inputBuffer(
+        1,
+        2)
 
     "give access to first attribute" in {
       attributes.getFirst[Name] should ===(Some(Attributes.Name("a")))

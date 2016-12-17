@@ -302,8 +302,10 @@ class TaskOpProcessorImplTest
 
     When("the processor processes an update")
     val result = f.processor.process(
-      TaskOpProcessor
-        .Operation(deadline, testActor, taskId, TaskOpProcessor.Action.Expunge)
+      TaskOpProcessor.Operation(deadline,
+                                testActor,
+                                taskId,
+                                TaskOpProcessor.Action.Expunge)
     )
 
     Then("it replies with unit immediately")

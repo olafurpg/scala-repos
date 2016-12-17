@@ -143,8 +143,10 @@ class ScalaIntroduceFieldFromExpressionHandler
     val manager = aClass.getManager
     val name = settings.name
     val typeName = Option(settings.scType).map(_.canonicalText).getOrElse("")
-    val replacedOccurences = ScalaRefactoringUtil
-      .replaceOccurences(occurrencesToReplace, name, ifc.file)
+    val replacedOccurences = ScalaRefactoringUtil.replaceOccurences(
+      occurrencesToReplace,
+      name,
+      ifc.file)
 
     val anchor =
       anchorForNewDeclaration(expression, replacedOccurences, aClass)
@@ -238,8 +240,10 @@ class ScalaIntroduceFieldFromExpressionHandler
     val occCount = ifc.occurrences.length
     // Add occurrences highlighting
     if (occCount > 1)
-      occurrenceHighlighters = ScalaRefactoringUtil
-        .highlightOccurrences(ifc.project, ifc.occurrences, ifc.editor)
+      occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
+        ifc.project,
+        ifc.occurrences,
+        ifc.editor)
 
     val dialog = new ScalaIntroduceFieldDialog(ifc, settings)
     dialog.show()

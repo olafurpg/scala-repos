@@ -200,8 +200,10 @@ object Round extends LilaController with TheftPrevention {
               }
           }.mon(_.http.response.watcher.website),
           api = apiVersion =>
-            Env.api.roundApi
-              .watcher(pov, apiVersion, tv = none, withOpening = false) map {
+            Env.api.roundApi.watcher(pov,
+                                     apiVersion,
+                                     tv = none,
+                                     withOpening = false) map {
               Ok(_)
           }
         ) map NoCache

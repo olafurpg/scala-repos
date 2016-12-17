@@ -83,8 +83,9 @@ trait ResolvableStableCodeReferenceElement
                                     Array.empty,
                                     ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
-      ImportResolverNoMethods
-        .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
+      ImportResolverNoMethods.resolve(
+        ResolvableStableCodeReferenceElement.this,
+        incomplete)
 
     resolveWithCompiled(incomplete, ImportResolverNoMethods, doResolve)
   }
@@ -95,8 +96,8 @@ trait ResolvableStableCodeReferenceElement
                                     Array.empty,
                                     ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
-      ImportResolverNoTypes
-        .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
+      ImportResolverNoTypes.resolve(ResolvableStableCodeReferenceElement.this,
+                                    incomplete)
 
     resolveWithCompiled(incomplete, ImportResolverNoTypes, doResolve)
   }
@@ -194,8 +195,7 @@ trait ResolvableStableCodeReferenceElement
           s.subst(ScType.create(field.getType, getProject, getResolveScope)),
           this)
       case ScalaResolveResult(clazz: PsiClass, s) =>
-        processor
-          .processType(new ScDesignatorType(clazz, true), this) //static Java import
+        processor.processType(new ScDesignatorType(clazz, true), this) //static Java import
       case ScalaResolveResult(pack: ScPackage, s) =>
         pack.processDeclarations(
           processor,
@@ -219,8 +219,9 @@ trait ResolvableStableCodeReferenceElement
       PsiTreeUtil.getContextOfType(ref, true, classOf[ScImportStmt])
 
     if (importStmt != null) {
-      val importHolder = PsiTreeUtil
-        .getContextOfType(importStmt, true, classOf[ScImportsHolder])
+      val importHolder = PsiTreeUtil.getContextOfType(importStmt,
+                                                      true,
+                                                      classOf[ScImportsHolder])
       if (importHolder != null) {
         importHolder.getImportStatements.takeWhile(_ != importStmt).foreach {
           case stmt: ScImportStmt =>
@@ -344,8 +345,7 @@ trait ResolvableStableCodeReferenceElement
             true // scala classes are available from default package
           // Other classes from default package are available only for top-level Scala statements
           case _ =>
-            PsiTreeUtil
-              .getContextOfType(this, true, classOf[ScPackaging]) == null
+            PsiTreeUtil.getContextOfType(this, true, classOf[ScPackaging]) == null
         }
       case _ => true
     }

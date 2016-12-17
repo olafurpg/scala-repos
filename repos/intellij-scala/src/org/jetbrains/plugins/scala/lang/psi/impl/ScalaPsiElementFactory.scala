@@ -140,13 +140,13 @@ class ScalaPsiElementFactoryImpl(manager: PsiManager)
     throw new IncorrectOperationException
 
   def createConstructor(): PsiMethod = {
-    ScalaPsiElementFactory
-      .createMethodFromText("def this() {\nthis()\n}", manager)
+    ScalaPsiElementFactory.createMethodFromText("def this() {\nthis()\n}",
+                                                manager)
   }
 
   def createConstructor(name: String): PsiMethod = {
-    ScalaPsiElementFactory
-      .createMethodFromText("def this() {\nthis()\n}", manager)
+    ScalaPsiElementFactory.createMethodFromText("def this() {\nthis()\n}",
+                                                manager)
   }
 
   def createClassInitializer(): PsiClassInitializer =
@@ -214,8 +214,9 @@ class ScalaPsiElementFactoryImpl(manager: PsiManager)
 
   def createExpressionFromText(text: String, context: PsiElement): PsiElement = {
     try {
-      ScalaPsiElementFactory
-        .createExpressionWithContextFromText(text, context, context)
+      ScalaPsiElementFactory.createExpressionWithContextFromText(text,
+                                                                 context,
+                                                                 context)
     } catch {
       case e: Throwable => throw new IncorrectOperationException
     }

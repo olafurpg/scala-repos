@@ -190,8 +190,8 @@ class HoconFormatter(settings: CodeStyleSettings) {
       case Some(Colon) =>
         Wrap.createWrap(customSettings.OBJECT_FIELDS_WITH_COLON_WRAP, true)
       case Some(Equals | PlusEquals) =>
-        Wrap
-          .createWrap(customSettings.OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP, true)
+        Wrap.createWrap(customSettings.OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP,
+                        true)
       case _ => null
     }
 

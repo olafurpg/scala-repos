@@ -78,8 +78,9 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
             logInfo(
               "Updated delegation tokens were expected, but the driver has not updated the " +
                 "tokens yet, will check again in an hour.")
-            delegationTokenRenewer
-              .schedule(executorUpdaterRunnable, 1, TimeUnit.HOURS)
+            delegationTokenRenewer.schedule(executorUpdaterRunnable,
+                                            1,
+                                            TimeUnit.HOURS)
             return
           }
         }
@@ -91,8 +92,9 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
         // We just checked for new credentials but none were there, wait a minute and retry.
         // This handles the shutdown case where the staging directory may have been removed(see
         // SPARK-12316 for more details).
-        delegationTokenRenewer
-          .schedule(executorUpdaterRunnable, 1, TimeUnit.MINUTES)
+        delegationTokenRenewer.schedule(executorUpdaterRunnable,
+                                        1,
+                                        TimeUnit.MINUTES)
       } else {
         logInfo(
           s"Scheduling token refresh from HDFS in $timeFromNowToRenewal millis.")
@@ -107,8 +109,9 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
         logWarning(
           "Error while trying to update credentials, will try again in 1 hour",
           e)
-        delegationTokenRenewer
-          .schedule(executorUpdaterRunnable, 1, TimeUnit.HOURS)
+        delegationTokenRenewer.schedule(executorUpdaterRunnable,
+                                        1,
+                                        TimeUnit.HOURS)
     }
   }
 

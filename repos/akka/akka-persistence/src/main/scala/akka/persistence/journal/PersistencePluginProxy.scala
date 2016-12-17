@@ -129,8 +129,8 @@ final class PersistencePluginProxy(config: Config)
         }
       }
 
-      context.system.scheduler
-        .scheduleOnce(initTimeout, self, InitTimeout)(context.dispatcher)
+      context.system.scheduler.scheduleOnce(initTimeout, self, InitTimeout)(
+        context.dispatcher)
     }
   }
 

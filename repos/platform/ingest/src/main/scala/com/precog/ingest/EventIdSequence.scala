@@ -63,12 +63,12 @@ class SystemEventIdSequence private (
   }
 
   def saveState(offset: Long) = {
-    state = coordination
-      .saveEventRelayState(agent, currentRelayState(offset)) match {
-      case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
-      case Failure(e) =>
-        sys.error("Error trying to save relay agent state: " + e)
-    }
+    state =
+      coordination.saveEventRelayState(agent, currentRelayState(offset)) match {
+        case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
+        case Failure(e) =>
+          sys.error("Error trying to save relay agent state: " + e)
+      }
 
     PrecogUnit
   }

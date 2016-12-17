@@ -30,8 +30,11 @@ private[lobby] final class Socket(val history: History[Messadata],
 
   override def preStart {
     super.preStart
-    context.system.lilaBus
-      .subscribe(self, 'changeFeaturedGame, 'streams, 'nbMembers, 'nbRounds)
+    context.system.lilaBus.subscribe(self,
+                                     'changeFeaturedGame,
+                                     'streams,
+                                     'nbMembers,
+                                     'nbRounds)
   }
 
   def receiveSpecific = {

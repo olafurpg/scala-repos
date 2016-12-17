@@ -93,8 +93,9 @@ private[spark] class ExecutorAllocationManager(
     conf.getInt("spark.dynamicAllocation.initialExecutors", minNumExecutors)
 
   // How long there must be backlogged tasks for before an addition is triggered (seconds)
-  private val schedulerBacklogTimeoutS = conf
-    .getTimeAsSeconds("spark.dynamicAllocation.schedulerBacklogTimeout", "1s")
+  private val schedulerBacklogTimeoutS = conf.getTimeAsSeconds(
+    "spark.dynamicAllocation.schedulerBacklogTimeout",
+    "1s")
 
   // Same as above, but used only after `schedulerBacklogTimeoutS` is exceeded
   private val sustainedSchedulerBacklogTimeoutS = conf.getTimeAsSeconds(
@@ -615,8 +616,9 @@ private[spark] class ExecutorAllocationManager(
             }
           }
         }
-        stageIdToExecutorPlacementHints
-          .put(stageId, (numTasksPending, hostToLocalTaskCountPerStage.toMap))
+        stageIdToExecutorPlacementHints.put(
+          stageId,
+          (numTasksPending, hostToLocalTaskCountPerStage.toMap))
 
         // Update the executor placement hints
         updateExecutorPlacementHints()
@@ -662,15 +664,15 @@ private[spark] class ExecutorAllocationManager(
         }
 
         // If this is the last pending task, mark the scheduler queue as empty
-        stageIdToTaskIndices
-          .getOrElseUpdate(stageId, new mutable.HashSet[Int]) += taskIndex
+        stageIdToTaskIndices.getOrElseUpdate(stageId, new mutable.HashSet[Int]) += taskIndex
         if (totalPendingTasks() == 0) {
           allocationManager.onSchedulerQueueEmpty()
         }
 
         // Mark the executor on which this task is scheduled as busy
-        executorIdToTaskIds
-          .getOrElseUpdate(executorId, new mutable.HashSet[Long]) += taskId
+        executorIdToTaskIds.getOrElseUpdate(
+          executorId,
+          new mutable.HashSet[Long]) += taskId
         allocationManager.onExecutorBusy(executorId)
       }
     }
@@ -788,12 +790,12 @@ private[spark] class ExecutorAllocationManager(
     private def registerGauge[T](name: String,
                                  value: => T,
                                  defaultValue: T): Unit = {
-      metricRegistry
-        .register(MetricRegistry.name("executors", name), new Gauge[T] {
-          override def getValue: T = synchronized {
-            Option(value).getOrElse(defaultValue)
-          }
-        })
+      metricRegistry.register(MetricRegistry.name("executors", name),
+                              new Gauge[T] {
+                                override def getValue: T = synchronized {
+                                  Option(value).getOrElse(defaultValue)
+                                }
+                              })
     }
 
     registerGauge("numberExecutorsToAdd", numExecutorsToAdd, 0)

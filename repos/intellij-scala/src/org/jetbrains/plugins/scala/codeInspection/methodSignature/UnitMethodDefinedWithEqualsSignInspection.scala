@@ -18,8 +18,9 @@ class UnitMethodDefinedWithEqualsSignInspection
         if !f.hasExplicitType && f.hasUnitResultType &&
           !f.isSecondaryConstructor =>
       f.assignment.foreach { assignment =>
-        holder
-          .registerProblem(assignment, getDisplayName, new RemoveEqualsSign(f))
+        holder.registerProblem(assignment,
+                               getDisplayName,
+                               new RemoveEqualsSign(f))
       }
   }
 }

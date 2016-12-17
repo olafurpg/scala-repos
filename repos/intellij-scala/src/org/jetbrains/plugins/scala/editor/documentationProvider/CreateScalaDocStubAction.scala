@@ -44,8 +44,9 @@ class CreateScalaDocStubAction
     val editor = CommonDataKeys.EDITOR.getData(context)
 
     if (editor == null) return
-    val file = PsiUtilBase
-      .getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
+    val file = PsiUtilBase.getPsiFileInEditor(
+      editor,
+      CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     file findElementAt editor.getCaretModel.getOffset match {

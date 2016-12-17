@@ -74,8 +74,9 @@ class KindProjectorUseCorrectLambdaKeywordQuickFix(e: PsiElement,
     val elem = getElement
     if (!elem.isValid) return
 
-    val repl = ScalaPsiElementFactory
-      .createTypeElementFromText(replacement, elem.getManager)
+    val repl = ScalaPsiElementFactory.createTypeElementFromText(
+      replacement,
+      elem.getManager)
     elem.replace(repl)
   }
 }

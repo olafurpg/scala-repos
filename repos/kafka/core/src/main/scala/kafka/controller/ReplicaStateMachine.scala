@@ -191,8 +191,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                                     targetState)
           // start replica as a follower to the current leader for its partition
           val leaderIsrAndControllerEpochOpt =
-            ReplicationUtils
-              .getLeaderIsrAndEpochForPartition(zkUtils, topic, partition)
+            ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                              topic,
+                                                              partition)
           leaderIsrAndControllerEpochOpt match {
             case Some(leaderIsrAndControllerEpoch) =>
               if (leaderIsrAndControllerEpoch.leaderAndIsr.leader == replicaId)
@@ -348,8 +349,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
           val leaderAndIsrIsEmpty: Boolean = controllerContext.partitionLeadershipInfo
             .get(topicAndPartition) match {
             case Some(currLeaderIsrAndControllerEpoch) =>
-              controller
-                .removeReplicaFromIsr(topic, partition, replicaId) match {
+              controller.removeReplicaFromIsr(topic, partition, replicaId) match {
                 case Some(updatedLeaderIsrAndControllerEpoch) =>
                   // send the shrunk ISR state change request to all the remaining alive replicas of the partition.
                   val currentAssignedReplicas =

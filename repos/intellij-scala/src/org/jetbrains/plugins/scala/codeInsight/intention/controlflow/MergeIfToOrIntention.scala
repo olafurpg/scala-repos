@@ -66,8 +66,10 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
       }
     }
 
-    PsiEquivalenceUtil
-      .areElementsEquivalent(thenBranch, innerThenBranch, comparator, false)
+    PsiEquivalenceUtil.areElementsEquivalent(thenBranch,
+                                             innerThenBranch,
+                                             comparator,
+                                             false)
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
@@ -93,8 +95,8 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
       expr.append(" else ").append(innerElseBranch.getText)
 
     val newIfStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

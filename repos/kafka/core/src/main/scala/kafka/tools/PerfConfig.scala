@@ -43,8 +43,9 @@ class PerfConfig(args: Array[String]) {
     "show-detailed-stats",
     "If set, stats are reported for each reporting " +
       "interval as configured by reporting-interval")
-  val hideHeaderOpt = parser
-    .accepts("hide-header", "If set, skips printing the header for the stats ")
+  val hideHeaderOpt = parser.accepts(
+    "hide-header",
+    "If set, skips printing the header for the stats ")
   val messageSizeOpt = parser
     .accepts("message-size", "The size of each message.")
     .withRequiredArg

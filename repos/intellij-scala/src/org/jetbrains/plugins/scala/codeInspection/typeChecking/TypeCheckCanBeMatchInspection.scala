@@ -166,8 +166,7 @@ object TypeCheckToMatchUtil {
     }
 
     def typeNeedParentheses(typeElem: ScTypeElement): Boolean = {
-      PsiTreeUtil
-        .getChildOfType(typeElem, classOf[ScExistentialClause]) != null
+      PsiTreeUtil.getChildOfType(typeElem, classOf[ScExistentialClause]) != null
     }
 
     for {
@@ -204,8 +203,9 @@ object TypeCheckToMatchUtil {
                                        ifStmt.getParent))
           val name = suggestedNames(0)
           asInstOfEverywhere.foreach { c =>
-            val newExpr = ScalaPsiElementFactory
-              .createExpressionFromText(name, ifStmt.getManager)
+            val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+              name,
+              ifStmt.getManager)
             inWriteAction {
               c.replaceExpression(newExpr, removeParenthesis = true)
             }
@@ -226,8 +226,9 @@ object TypeCheckToMatchUtil {
           patternDef.delete()
         }
         val name = definedName.get
-        val newExpr = ScalaPsiElementFactory
-          .createExpressionFromText(name, ifStmt.getManager)
+        val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+          name,
+          ifStmt.getManager)
         inWriteAction {
           asInstOfEverywhere.foreach(
             _.replaceExpression(newExpr, removeParenthesis = true))

@@ -630,8 +630,9 @@ class ScalaAnnotator
                       case _ => return
                     }
                     val expectedType = Success(tp, None)
-                    val conformance = ScalaAnnotator
-                      .smartCheckConformance(expectedType, returnType)
+                    val conformance = ScalaAnnotator.smartCheckConformance(
+                      expectedType,
+                      returnType)
                     if (!conformance) {
                       if (typeAware) {
                         val (retTypeText, expectedTypeText) =
@@ -1224,8 +1225,8 @@ class ScalaAnnotator
                   }
 
                   val (exprTypeText, expectedTypeText) =
-                    ScTypePresentation
-                      .different(exprType.getOrNothing, expectedType.get)
+                    ScTypePresentation.different(exprType.getOrNothing,
+                                                 expectedType.get)
                   val error = ScalaBundle.message(
                     "expr.type.does.not.conform.expected.type",
                     exprTypeText,
@@ -1287,8 +1288,7 @@ class ScalaAnnotator
   private def checkUnboundUnderscore(under: ScUnderscoreSection,
                                      holder: AnnotationHolder) {
     if (under.getText == "_") {
-      ScalaPsiUtil
-        .getParentOfType(under, classOf[ScVariableDefinition]) match {
+      ScalaPsiUtil.getParentOfType(under, classOf[ScVariableDefinition]) match {
         case varDef @ ScVariableDefinition.expr(expr)
             if varDef.expr.contains(under) =>
           if (varDef.containingClass == null) {

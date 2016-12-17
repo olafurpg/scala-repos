@@ -160,8 +160,10 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
 
   private def getChildren(path: String, childrenPromise: Promise[String]) = {
     info("Getting children to set ACLs for path %s".format(path))
-    zkUtils.zkConnection.getZookeeper
-      .getChildren(path, false, GetChildrenCallback, childrenPromise)
+    zkUtils.zkConnection.getZookeeper.getChildren(path,
+                                                  false,
+                                                  GetChildrenCallback,
+                                                  childrenPromise)
   }
 
   private def setAclIndividually(path: String) = {

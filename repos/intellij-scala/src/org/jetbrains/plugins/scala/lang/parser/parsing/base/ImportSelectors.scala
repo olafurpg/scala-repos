@@ -48,8 +48,7 @@ object ImportSelectors extends ParserNode {
               return true
             }
             case _ => {
-              ParserUtils
-                .parseLoopUntilRBrace(builder, () => {}) //we need to find closing brace, otherwise we can miss important things
+              ParserUtils.parseLoopUntilRBrace(builder, () => {}) //we need to find closing brace, otherwise we can miss important things
               builder.restoreNewlinesState
               importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
               return true

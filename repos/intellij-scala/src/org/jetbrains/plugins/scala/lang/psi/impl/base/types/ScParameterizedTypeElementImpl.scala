@@ -92,8 +92,10 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
               }
               val lambdaText =
                 s"({type $typeName[$paramText] = ${ret.getText}})#$typeName"
-              val newTE = ScalaPsiElementFactory
-                .createTypeElementFromText(lambdaText, getContext, this)
+              val newTE = ScalaPsiElementFactory.createTypeElementFromText(
+                lambdaText,
+                getContext,
+                this)
               Option(newTE)
             case _ => None
           }
@@ -128,8 +130,9 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       val typeName = "Λ$"
       val inlineText =
         s"({type $typeName$paramText = ${typeElement.getText}$bodyText})#$typeName"
-      val newTE = ScalaPsiElementFactory
-        .createTypeElementFromText(inlineText, getContext, this)
+      val newTE = ScalaPsiElementFactory.createTypeElementFromText(inlineText,
+                                                                   getContext,
+                                                                   this)
       Option(newTE)
     }
 
@@ -153,8 +156,10 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       forSomeBuilder.append("}")
       val newTypeText =
         s"(${typeElement.getText}${typeElements.mkString("[", ", ", "]")} ${forSomeBuilder.toString()})"
-      val newTypeElement = ScalaPsiElementFactory
-        .createTypeElementFromText(newTypeText, getContext, this)
+      val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+        newTypeText,
+        getContext,
+        this)
       Option(newTypeElement)
     }
 
@@ -306,8 +311,9 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
                                   Any),
                                 state)
                             } else if (upperBound > 0 && lowerBound > 0) {
-                              val actualText = text
-                                .substring(0, math.min(lowerBound, upperBound))
+                              val actualText = text.substring(
+                                0,
+                                math.min(lowerBound, upperBound))
                               processor.execute(
                                 new ScSyntheticClass(getManager,
                                                      actualText,

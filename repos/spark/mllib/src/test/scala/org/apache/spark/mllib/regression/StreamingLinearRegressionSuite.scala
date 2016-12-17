@@ -68,8 +68,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     // generate sequence of simulated data
     val numBatches = 10
     val input = (0 until numBatches).map { i =>
-      LinearDataGenerator
-        .generateLinearInput(0.0, Array(10.0, 10.0), 100, 42 * (i + 1))
+      LinearDataGenerator.generateLinearInput(0.0,
+                                              Array(10.0, 10.0),
+                                              100,
+                                              42 * (i + 1))
     }
 
     // apply model training to input stream
@@ -103,8 +105,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     // generate sequence of simulated data
     val numBatches = 10
     val input = (0 until numBatches).map { i =>
-      LinearDataGenerator
-        .generateLinearInput(0.0, Array(10.0), 100, 42 * (i + 1))
+      LinearDataGenerator.generateLinearInput(0.0,
+                                              Array(10.0),
+                                              100,
+                                              42 * (i + 1))
     }
 
     // create buffer to store intermediate fits
@@ -140,8 +144,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     val numBatches = 10
     val nPoints = 100
     val testInput = (0 until numBatches).map { i =>
-      LinearDataGenerator
-        .generateLinearInput(0.0, Array(10.0, 10.0), nPoints, 42 * (i + 1))
+      LinearDataGenerator.generateLinearInput(0.0,
+                                              Array(10.0, 10.0),
+                                              nPoints,
+                                              42 * (i + 1))
     }
 
     // apply model predictions to test stream
@@ -170,8 +176,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     val numBatches = 10
     val nPoints = 100
     val testInput = (0 until numBatches).map { i =>
-      LinearDataGenerator
-        .generateLinearInput(0.0, Array(10.0, 10.0), nPoints, 42 * (i + 1))
+      LinearDataGenerator.generateLinearInput(0.0,
+                                              Array(10.0, 10.0),
+                                              nPoints,
+                                              42 * (i + 1))
     }
 
     // train and predict

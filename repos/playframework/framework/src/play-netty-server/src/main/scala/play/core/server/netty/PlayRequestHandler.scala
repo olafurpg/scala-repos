@@ -301,8 +301,9 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           ServerResultUtils.cleanFlashCookie(requestHeader, result)
         val validated =
           ServerResultUtils.validateResult(requestHeader, cleanedResult)
-        modelConversion
-          .convertResult(validated, requestHeader, request.getProtocolVersion)
+        modelConversion.convertResult(validated,
+                                      requestHeader,
+                                      request.getProtocolVersion)
     }
   }
 

@@ -149,8 +149,10 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
                                    numFeaturesPerNode: Int): Unit = {
       val seeds = Array(123, 5354, 230, 349867, 23987)
       val maxMemoryUsage: Long = 128 * 1024L * 1024L
-      val metadata = DecisionTreeMetadata
-        .buildMetadata(rdd, strategy, numTrees, featureSubsetStrategy)
+      val metadata = DecisionTreeMetadata.buildMetadata(rdd,
+                                                        strategy,
+                                                        numTrees,
+                                                        featureSubsetStrategy)
       seeds.foreach { seed =>
         val failString =
           s"Failed on test with:" +
@@ -167,8 +169,10 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
           nodesForGroup: Map[Int, Array[Node]],
           treeToNodeToIndexInfo: Map[Int,
                                      Map[Int, RandomForest.NodeIndexInfo]]) =
-          RandomForest
-            .selectNodesToSplit(nodeQueue, maxMemoryUsage, metadata, rng)
+          RandomForest.selectNodesToSplit(nodeQueue,
+                                          maxMemoryUsage,
+                                          metadata,
+                                          rng)
 
         assert(nodesForGroup.size === numTrees, failString)
         assert(nodesForGroup.values.forall(_.size == 1), failString) // 1 node per tree

@@ -147,12 +147,14 @@ object SizeEstimator extends Logging {
       // scalastyle:off classforname
       val hotSpotMBeanClass =
         Class.forName("com.sun.management.HotSpotDiagnosticMXBean")
-      val getVMMethod = hotSpotMBeanClass
-        .getDeclaredMethod("getVMOption", Class.forName("java.lang.String"))
+      val getVMMethod = hotSpotMBeanClass.getDeclaredMethod(
+        "getVMOption",
+        Class.forName("java.lang.String"))
       // scalastyle:on classforname
 
-      val bean = ManagementFactory
-        .newPlatformMXBeanProxy(server, hotSpotMBeanName, hotSpotMBeanClass)
+      val bean = ManagementFactory.newPlatformMXBeanProxy(server,
+                                                          hotSpotMBeanName,
+                                                          hotSpotMBeanClass)
       // TODO: We could use reflection on the VMOption returned ?
       getVMMethod.invoke(bean, "UseCompressedOops").toString.contains("true")
     } catch {

@@ -68,8 +68,8 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
     expr.append("{ return true } else { return false }")
 
     val newReturnStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
 
     inWriteAction {
       returnStmt.replaceExpression(newReturnStmt, true)

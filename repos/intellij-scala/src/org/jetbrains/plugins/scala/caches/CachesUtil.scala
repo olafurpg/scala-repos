@@ -240,8 +240,10 @@ object CachesUtil {
             throw new ProbablyRecursionException(e, data, key, Set(fun))
           }
         } else {
-          guard
-            .doPreventingRecursion((e, data), false, new Computable[Result] {
+          guard.doPreventingRecursion(
+            (e, data),
+            false,
+            new Computable[Result] {
               def compute(): Result = {
                 try {
                   builder(e, data)
@@ -254,8 +256,9 @@ object CachesUtil {
                   case t @ ProbablyRecursionException(ee, innerData, k, set)
                       if k == key =>
                     val fun =
-                      PsiTreeUtil
-                        .getContextOfType(e, true, classOf[ScFunction])
+                      PsiTreeUtil.getContextOfType(e,
+                                                   true,
+                                                   classOf[ScFunction])
                     if (fun == null || fun.isProbablyRecursive) throw t
                     else {
                       fun.setProbablyRecursive(true)

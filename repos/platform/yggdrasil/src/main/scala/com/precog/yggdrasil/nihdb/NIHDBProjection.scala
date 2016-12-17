@@ -43,8 +43,9 @@ final class NIHDBProjection(snapshot: NIHDBSnapshot,
   val length = readers.map(_.length.toLong).sum
 
   override def toString =
-    "NIHDBProjection(id = %d, len = %d, authorities = %s)"
-      .format(projectionId, length, authorities)
+    "NIHDBProjection(id = %d, len = %d, authorities = %s)".format(projectionId,
+                                                                  length,
+                                                                  authorities)
 
   def structure(implicit M: Monad[Future]) =
     M.point(readers.flatMap(_.structure)(collection.breakOut): Set[ColumnRef])

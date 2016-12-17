@@ -482,8 +482,10 @@ package object extensions {
     }
 
     catching(classOf[Exception]).withTry {
-      progressManager
-        .runProcessWithProgressSynchronously(computable, title, false, null)
+      progressManager.runProcessWithProgressSynchronously(computable,
+                                                          title,
+                                                          false,
+                                                          null)
     }
   }
 

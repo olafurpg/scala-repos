@@ -471,8 +471,9 @@ case class TungstenAggregate(
                         hashMapTerm,
                         s"$hashMapTerm = $thisPlan.createHashMap();")
     sorterTerm = ctx.freshName("sorter")
-    ctx
-      .addMutableState(classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
+    ctx.addMutableState(classOf[UnsafeKVExternalSorter].getName,
+                        sorterTerm,
+                        "")
 
     // Create a name for iterator from HashMap
     val iterTerm = ctx.freshName("mapIter")

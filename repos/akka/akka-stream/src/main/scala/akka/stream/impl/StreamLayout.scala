@@ -1007,8 +1007,9 @@ private[stream] abstract class MaterializerSession(
           materializeAtomic(atomic, subEffectiveAttributes, materializedValues)
         case copied: CopiedModule ⇒
           enterScope(copied)
-          materializedValues
-            .put(copied, materializeModule(copied, subEffectiveAttributes))
+          materializedValues.put(
+            copied,
+            materializeModule(copied, subEffectiveAttributes))
           exitScope(copied)
         case composite @ (_: CompositeModule | _: FusedModule) ⇒
           materializedValues.put(

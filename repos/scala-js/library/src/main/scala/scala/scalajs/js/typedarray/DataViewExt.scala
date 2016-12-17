@@ -36,10 +36,12 @@ object DataViewExt {
                  littleEndian: Boolean = false): Unit = {
       val high = (value >>> 32).toInt
       val low = value.toInt
-      dataView
-        .setInt32(index + (if (littleEndian) 4 else 0), high, littleEndian)
-      dataView
-        .setInt32(index + (if (littleEndian) 0 else 4), low, littleEndian)
+      dataView.setInt32(index + (if (littleEndian) 4 else 0),
+                        high,
+                        littleEndian)
+      dataView.setInt32(index + (if (littleEndian) 0 else 4),
+                        low,
+                        littleEndian)
     }
   }
 }

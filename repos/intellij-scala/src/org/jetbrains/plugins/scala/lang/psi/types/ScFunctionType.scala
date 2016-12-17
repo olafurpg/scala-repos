@@ -72,8 +72,7 @@ object ScPartialFunctionType {
   }
 
   def unapply(tp: ScType): Option[(ScType, ScType)] = {
-    ScSynteticSugarClassesUtil
-      .extractForPrefix(tp, "scala.PartialFunction") match {
+    ScSynteticSugarClassesUtil.extractForPrefix(tp, "scala.PartialFunction") match {
       case Some((clazz, typeArgs)) if typeArgs.length == 2 =>
         Some(typeArgs(1), typeArgs(0))
       case _ => None

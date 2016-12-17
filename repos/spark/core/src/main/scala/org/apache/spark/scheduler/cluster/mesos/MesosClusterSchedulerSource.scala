@@ -27,15 +27,17 @@ private[mesos] class MesosClusterSchedulerSource(
   override def sourceName: String = "mesos_cluster"
   override def metricRegistry: MetricRegistry = new MetricRegistry()
 
-  metricRegistry
-    .register(MetricRegistry.name("waitingDrivers"), new Gauge[Int] {
-      override def getValue: Int = scheduler.getQueuedDriversSize
-    })
+  metricRegistry.register(MetricRegistry.name("waitingDrivers"),
+                          new Gauge[Int] {
+                            override def getValue: Int =
+                              scheduler.getQueuedDriversSize
+                          })
 
-  metricRegistry
-    .register(MetricRegistry.name("launchedDrivers"), new Gauge[Int] {
-      override def getValue: Int = scheduler.getLaunchedDriversSize
-    })
+  metricRegistry.register(MetricRegistry.name("launchedDrivers"),
+                          new Gauge[Int] {
+                            override def getValue: Int =
+                              scheduler.getLaunchedDriversSize
+                          })
 
   metricRegistry.register(MetricRegistry.name("retryDrivers"), new Gauge[Int] {
     override def getValue: Int = scheduler.getPendingRetryDriversSize

@@ -118,8 +118,9 @@ class DeploymentPlanRevertTest
 
     When("we remove an app and try to revert that without concurrent changes")
     val appId = "/changeme/app1".toRootPath
-    val target = original
-      .update(appId.parent, _.removeApplication(appId), Timestamp.now())
+    val target = original.update(appId.parent,
+                                 _.removeApplication(appId),
+                                 Timestamp.now())
     target.app(appId) should be('empty)
     val plan = DeploymentPlan(original, target)
     val revertToOriginal = plan.revert(target)

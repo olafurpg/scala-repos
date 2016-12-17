@@ -63,10 +63,12 @@ class ScalaParameterInfo(@BeanProperty var name: String,
       val functionType = ScFunctionType(scType, Seq())(project, allScope)
       ScType.toPsi(functionType, project, allScope)
     } else if (isRepeatedParameter) {
-      val seqType = ScDesignatorType
-        .fromClassFqn("scala.collection.Seq", project, allScope)
-      ScType
-        .toPsi(ScParameterizedType(seqType, Seq(scType)), project, allScope)
+      val seqType = ScDesignatorType.fromClassFqn("scala.collection.Seq",
+                                                  project,
+                                                  allScope)
+      ScType.toPsi(ScParameterizedType(seqType, Seq(scType)),
+                   project,
+                   allScope)
     } else ScType.toPsi(scType, project, allScope)
   }
 

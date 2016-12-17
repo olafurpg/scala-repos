@@ -35,8 +35,9 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
   override def invoke(project: Project,
                       editor: Editor,
                       element: PsiElement): Unit = {
-    ToggleTypeAnnotation
-      .complete(new MakeTypeMoreSpecificStrategy(Option(editor)), element)
+    ToggleTypeAnnotation.complete(
+      new MakeTypeMoreSpecificStrategy(Option(editor)),
+      element)
   }
 
   override def isAvailable(project: Project,

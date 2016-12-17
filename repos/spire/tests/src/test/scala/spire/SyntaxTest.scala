@@ -401,8 +401,7 @@ trait BaseSyntaxTest {
     //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
     //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    ((v dot w) == V.dot(v, w)) && ((v ⋅ w) == V
-      .dot(v, w)) && (v._x == V._x(v)) &&
+    ((v dot w) == V.dot(v, w)) && ((v ⋅ w) == V.dot(v, w)) && (v._x == V._x(v)) &&
     (v._y == V._y(v)) && (v._z == V._z(v)) && (v.coord(0) == V.coord(v, 0)) &&
     (v.coord(1) == V.coord(v, 1))
   }

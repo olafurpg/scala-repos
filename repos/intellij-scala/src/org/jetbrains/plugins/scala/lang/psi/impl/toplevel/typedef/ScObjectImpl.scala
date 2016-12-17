@@ -156,8 +156,10 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
       import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl._
       startPackageObjectProcessing()
       try {
-        super[ScTemplateDefinition]
-          .processDeclarations(processor, state, lastParent, place)
+        super[ScTemplateDefinition].processDeclarations(processor,
+                                                        state,
+                                                        lastParent,
+                                                        place)
       } catch {
         case ignore: DoNotProcessPackageObjectException =>
           true //do nothing, just let's move on
@@ -165,8 +167,10 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         stopPackageObjectProcessing()
       }
     } else {
-      super[ScTemplateDefinition]
-        .processDeclarations(processor, state, lastParent, place)
+      super[ScTemplateDefinition].processDeclarations(processor,
+                                                      state,
+                                                      lastParent,
+                                                      place)
     }
   }
 
@@ -179,8 +183,10 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
             val res = new ArrayBuffer[PsiMethod]
             c.getSyntheticMethodsText.foreach(s => {
               try {
-                val method = ScalaPsiElementFactory
-                  .createMethodWithContext(s, c.getContext, c)
+                val method =
+                  ScalaPsiElementFactory.createMethodWithContext(s,
+                                                                 c.getContext,
+                                                                 c)
                 method.setSynthetic(this)
                 method.syntheticCaseClass = Some(c)
                 res += method
@@ -319,8 +325,8 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
     TypeDefinitionMembers.TypeNodes.Map] =
     new mutable.WeakHashMap[Project, TypeDefinitionMembers.TypeNodes.Map]
   def getHardTypes: TypeDefinitionMembers.TypeNodes.Map = {
-    hardTypes
-      .getOrElseUpdate(getProject, TypeDefinitionMembers.TypeNodes.build(this))
+    hardTypes.getOrElseUpdate(getProject,
+                              TypeDefinitionMembers.TypeNodes.build(this))
   }
 
   private val hardSignatures: mutable.WeakHashMap[

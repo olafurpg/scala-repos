@@ -55,8 +55,10 @@ class PsiTypedDefinitionWrapper(
     }
     result
   }
-  val methodText = PsiTypedDefinitionWrapper
-    .methodText(typedDefinition, isStatic, isInterface, role)
+  val methodText = PsiTypedDefinitionWrapper.methodText(typedDefinition,
+                                                        isStatic,
+                                                        isInterface,
+                                                        role)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)

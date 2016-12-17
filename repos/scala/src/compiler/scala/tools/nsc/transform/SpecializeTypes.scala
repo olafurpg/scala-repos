@@ -409,8 +409,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         specializedOn(sym) map (s => specializesClass(s).tpe) sorted
 
     if (isBoundedGeneric(sym.tpe) && (types contains AnyRefClass))
-      reporter
-        .warning(sym.pos, sym + " is always a subtype of " + AnyRefTpe + ".")
+      reporter.warning(sym.pos,
+                       sym + " is always a subtype of " + AnyRefTpe + ".")
 
     types
   }
@@ -607,8 +607,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       // debuglog("Specializing " + clazz + ", but found " + bytecodeClazz + " already there")
       bytecodeClazz.info
 
-      val sClass = clazz.owner
-        .newClass(clazzName, clazz.pos, (clazz.flags | SPECIALIZED) & ~CASE)
+      val sClass = clazz.owner.newClass(clazzName,
+                                        clazz.pos,
+                                        (clazz.flags | SPECIALIZED) & ~CASE)
       sClass.setAnnotations(clazz.annotations) // SI-8574 important that the subclass picks up @SerialVersionUID, @strictfp, etc.
 
       def cloneInSpecializedClass(member: Symbol,
@@ -669,8 +670,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val extraSpecializedMixins = specializedParents(
           clazz.info.parents map applyContext)
         if (extraSpecializedMixins.nonEmpty)
-          debuglog("extra specialized mixins for %s: %s"
-            .format(clazz.name.decode, extraSpecializedMixins.mkString(", ")))
+          debuglog(
+            "extra specialized mixins for %s: %s".format(
+              clazz.name.decode,
+              extraSpecializedMixins.mkString(", ")))
         // If the class being specialized has a self-type, the self type may
         // require specialization.  First exclude classes whose self types have
         // the same type constructor as the class itself, since they will

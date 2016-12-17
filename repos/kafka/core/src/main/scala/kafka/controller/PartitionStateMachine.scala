@@ -523,8 +523,9 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
   }
 
   def registerPartitionChangeListener(topic: String) = {
-    partitionModificationsListeners
-      .put(topic, new PartitionModificationsListener(topic))
+    partitionModificationsListeners.put(
+      topic,
+      new PartitionModificationsListener(topic))
     zkUtils.zkClient.subscribeDataChanges(
       getTopicPath(topic),
       partitionModificationsListeners(topic))
@@ -551,8 +552,9 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
       topic: String,
       partition: Int): LeaderIsrAndControllerEpoch = {
     val topicAndPartition = TopicAndPartition(topic, partition)
-    ReplicationUtils
-      .getLeaderIsrAndEpochForPartition(zkUtils, topic, partition) match {
+    ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                      topic,
+                                                      partition) match {
       case Some(currentLeaderIsrAndEpoch) => currentLeaderIsrAndEpoch
       case None =>
         val failMsg =

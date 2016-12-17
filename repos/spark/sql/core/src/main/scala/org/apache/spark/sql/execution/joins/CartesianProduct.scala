@@ -52,8 +52,10 @@ private[spark] class UnsafeCartesianRDD(left: RDD[UnsafeRow],
 
     val partition = split.asInstanceOf[CartesianPartition]
     for (y <- rdd2.iterator(partition.s2, context)) {
-      sorter
-        .insertRecord(y.getBaseObject, y.getBaseOffset, y.getSizeInBytes, 0)
+      sorter.insertRecord(y.getBaseObject,
+                          y.getBaseOffset,
+                          y.getSizeInBytes,
+                          0)
     }
 
     // Create an iterator from sorter and wrapper it as Iterator[UnsafeRow]

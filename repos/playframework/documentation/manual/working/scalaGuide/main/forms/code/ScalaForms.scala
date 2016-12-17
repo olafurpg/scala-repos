@@ -112,8 +112,9 @@ package scalaguide.forms.scalaforms {
       "display global errors user template" in {
         val userForm = controllers.Application.userFormConstraintsAdHoc
 
-        implicit val request = FakeRequest()
-          .withFormUrlEncodedBody("name" -> "Johnny Utah", "age" -> "25")
+        implicit val request =
+          FakeRequest().withFormUrlEncodedBody("name" -> "Johnny Utah",
+                                               "age" -> "25")
 
         val boundForm = userForm.bindFromRequest
         boundForm.hasGlobalErrors must beTrue

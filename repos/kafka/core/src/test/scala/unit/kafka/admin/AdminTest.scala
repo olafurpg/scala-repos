@@ -673,8 +673,10 @@ class AdminTest extends ZooKeeperTestHarness with Logging with RackAwareTest {
     }
 
     val partialList = List(0, 1, 2, 3, 5)
-    val processedMetadatas3 = AdminUtils
-      .getBrokerMetadatas(zkUtils, RackAwareMode.Enforced, Some(partialList))
+    val processedMetadatas3 = AdminUtils.getBrokerMetadatas(
+      zkUtils,
+      RackAwareMode.Enforced,
+      Some(partialList))
     assertEquals(partialList, processedMetadatas3.map(_.id))
     assertEquals(partialList.map(rackInfo),
                  processedMetadatas3.flatMap(_.rack))

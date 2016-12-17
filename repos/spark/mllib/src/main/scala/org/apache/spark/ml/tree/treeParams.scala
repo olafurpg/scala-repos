@@ -341,8 +341,10 @@ private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
     this,
     "subsamplingRate",
     "Fraction of the training data used for learning each decision tree, in range (0, 1].",
-    ParamValidators
-      .inRange(0, 1, lowerInclusive = false, upperInclusive = true))
+    ParamValidators.inRange(0,
+                            1,
+                            lowerInclusive = false,
+                            upperInclusive = true))
 
   setDefault(subsamplingRate -> 1.0)
 

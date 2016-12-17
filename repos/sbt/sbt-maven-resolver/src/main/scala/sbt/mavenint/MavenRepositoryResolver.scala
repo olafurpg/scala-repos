@@ -237,8 +237,9 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
       }
 
       // Here we need to pretend we downloaded the pom.xml file
-      val pom = DefaultArtifact
-        .newPomArtifact(drid, new java.util.Date(lastModifiedTime))
+      val pom = DefaultArtifact.newPomArtifact(
+        drid,
+        new java.util.Date(lastModifiedTime))
       val madr = new MetadataArtifactDownloadReport(pom)
       madr.setSearched(true)
       madr.setDownloadStatus(DownloadStatus.SUCCESSFUL) // TODO - Figure this things out for this report.

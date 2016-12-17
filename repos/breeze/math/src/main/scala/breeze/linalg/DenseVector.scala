@@ -731,8 +731,9 @@ object DenseVector
       require(a.length == b.length, s"Vectors must have same length")
       if (a.noOffsetOrStride && b.noOffsetOrStride &&
           a.length < DenseVectorSupportMethods.MAX_SMALL_DOT_PRODUCT_LENGTH) {
-        DenseVectorSupportMethods
-          .smallDotProduct_Double(a.data, b.data, a.length)
+        DenseVectorSupportMethods.smallDotProduct_Double(a.data,
+                                                         b.data,
+                                                         a.length)
       } else {
         blasPath(a, b)
       }
@@ -744,8 +745,11 @@ object DenseVector
                          b: DenseVector[Double]): Double = {
       if ((a.length <= 300 || !usingNatives) && a.stride == 1 &&
           b.stride == 1) {
-        DenseVectorSupportMethods
-          .dotProduct_Double(a.data, a.offset, b.data, b.offset, a.length)
+        DenseVectorSupportMethods.dotProduct_Double(a.data,
+                                                    a.offset,
+                                                    b.data,
+                                                    b.offset,
+                                                    a.length)
       } else {
         val boff =
           if (b.stride >= 0) b.offset

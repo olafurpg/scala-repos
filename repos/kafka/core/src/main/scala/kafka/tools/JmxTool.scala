@@ -75,8 +75,8 @@ object JmxTool extends Logging {
       .defaultsTo("service:jmx:rmi:///jndi/rmi://:9999/jmxrmi")
 
     if (args.length == 0)
-      CommandLineUtils
-        .printUsageAndDie(parser, "Dump JMX values to standard output.")
+      CommandLineUtils.printUsageAndDie(parser,
+                                        "Dump JMX values to standard output.")
 
     val options = parser.parse(args: _*)
 

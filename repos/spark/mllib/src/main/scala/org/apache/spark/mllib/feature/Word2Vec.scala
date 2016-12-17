@@ -437,8 +437,11 @@ class Word2Vec extends Serializable with Logging {
       while (i < synAgg.length) {
         val index = synAgg(i)._1
         if (index < vocabSize) {
-          Array
-            .copy(synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
+          Array.copy(synAgg(i)._2,
+                     0,
+                     syn0Global,
+                     index * vectorSize,
+                     vectorSize)
         } else {
           Array.copy(synAgg(i)._2,
                      0,
@@ -628,8 +631,11 @@ object Word2VecModel extends Loader[Word2VecModel] {
     val wordVectors = new Array[Float](vectorSize * numWords)
     var i = 0
     while (i < numWords) {
-      Array
-        .copy(model(wordList(i)), 0, wordVectors, i * vectorSize, vectorSize)
+      Array.copy(model(wordList(i)),
+                 0,
+                 wordVectors,
+                 i * vectorSize,
+                 vectorSize)
       i += 1
     }
     wordVectors

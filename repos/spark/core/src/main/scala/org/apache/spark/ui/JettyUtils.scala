@@ -109,8 +109,8 @@ private[spark] object JettyUtils extends Logging {
           }
         } catch {
           case e: IllegalArgumentException =>
-            response
-              .sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage)
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               e.getMessage)
           case e: Exception =>
             logWarning(s"GET ${request.getRequestURI} failed: $e", e)
             throw e
@@ -199,8 +199,8 @@ private[spark] object JettyUtils extends Logging {
   def createStaticHandler(resourceBase: String,
                           path: String): ServletContextHandler = {
     val contextHandler = new ServletContextHandler
-    contextHandler
-      .setInitParameter("org.eclipse.jetty.servlet.Default.gzip", "false")
+    contextHandler.setInitParameter("org.eclipse.jetty.servlet.Default.gzip",
+                                    "false")
     val staticHandler = new DefaultServlet
     val holder = new ServletHolder(staticHandler)
     Option(Utils.getSparkClassLoader.getResource(resourceBase)) match {

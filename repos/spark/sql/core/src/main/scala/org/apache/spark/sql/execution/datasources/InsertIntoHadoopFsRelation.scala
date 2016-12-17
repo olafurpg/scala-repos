@@ -155,8 +155,8 @@ private[sql] case class InsertIntoHadoopFsRelation(
         writerContainer.driverSideSetup()
 
         try {
-          sqlContext.sparkContext
-            .runJob(queryExecution.toRdd, writerContainer.writeRows _)
+          sqlContext.sparkContext.runJob(queryExecution.toRdd,
+                                         writerContainer.writeRows _)
           writerContainer.commitJob()
           refreshFunction()
         } catch {

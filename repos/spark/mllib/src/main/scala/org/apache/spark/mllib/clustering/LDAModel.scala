@@ -542,8 +542,11 @@ object LocalLDAModel extends Loader[LocalLDAModel] {
 
     val model = (loadedClassName, loadedVersion) match {
       case (className, "1.0") if className == classNameV1_0 =>
-        SaveLoadV1_0
-          .load(sc, path, docConcentration, topicConcentration, gammaShape)
+        SaveLoadV1_0.load(sc,
+                          path,
+                          docConcentration,
+                          topicConcentration,
+                          gammaShape)
       case _ =>
         throw new Exception(
           s"LocalLDAModel.load did not recognize model with (className, format version):" +

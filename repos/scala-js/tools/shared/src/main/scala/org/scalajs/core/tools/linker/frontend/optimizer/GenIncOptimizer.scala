@@ -253,8 +253,8 @@ abstract class GenIncOptimizer private[optimizer] (
        *
        * Non-batch mode only.
        */
-      objectClass
-        .walkForChanges(CollOps.remove(neededClasses, _).get, Set.empty)
+      objectClass.walkForChanges(CollOps.remove(neededClasses, _).get,
+                                 Set.empty)
     }
 
     /* Class additions:

@@ -273,8 +273,9 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
     val context = system
     //#defining-dispatcher-in-code
     import akka.actor.Props
-    val myActor = context
-      .actorOf(Props[MyActor].withDispatcher("my-dispatcher"), "myactor1")
+    val myActor =
+      context.actorOf(Props[MyActor].withDispatcher("my-dispatcher"),
+                      "myactor1")
     //#defining-dispatcher-in-code
   }
 

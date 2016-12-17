@@ -304,8 +304,9 @@ class MultilineStringSettings(project: Project) {
 
   def getSmartSpaces(count: Int) =
     if (useTabs) {
-      StringUtil.repeat("\t", count / tabSize) + StringUtil
-        .repeat(" ", count % tabSize)
+      StringUtil.repeat("\t", count / tabSize) + StringUtil.repeat(
+        " ",
+        count % tabSize)
     } else {
       StringUtil.repeat(" ", count)
     }

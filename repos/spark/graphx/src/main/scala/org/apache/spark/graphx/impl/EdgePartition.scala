@@ -304,8 +304,11 @@ private[graphx] class EdgePartition[@specialized(Char,
     }
     // Finally, release the last accumulated run
     if (size > 0) {
-      builder
-        .add(currSrcId, currDstId, currLocalSrcId, currLocalDstId, currAttr)
+      builder.add(currSrcId,
+                  currDstId,
+                  currLocalSrcId,
+                  currLocalDstId,
+                  currAttr)
     }
     builder.toEdgePartition
   }
@@ -459,8 +462,13 @@ private[graphx] class EdgePartition[@specialized(Char,
         val dstAttr =
           if (tripletFields.useDst) vertexAttrs(localDstId)
           else null.asInstanceOf[VD]
-        ctx
-          .set(srcId, dstId, localSrcId, localDstId, srcAttr, dstAttr, data(i))
+        ctx.set(srcId,
+                dstId,
+                localSrcId,
+                localDstId,
+                srcAttr,
+                dstAttr,
+                data(i))
         sendMsg(ctx)
       }
       i += 1

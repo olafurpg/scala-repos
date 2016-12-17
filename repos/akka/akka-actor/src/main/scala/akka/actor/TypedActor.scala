@@ -94,8 +94,9 @@ trait TypedActorFactory {
     val ap =
       Props(new akka.actor.TypedActor.TypedActor[R, T](proxyVar, c(), i))
         .withDeploy(props.actorProps.deploy)
-    typedActor
-      .createActorRefProxy(props, proxyVar, actorFactory.actorOf(ap, name))
+    typedActor.createActorRefProxy(props,
+                                   proxyVar,
+                                   actorFactory.actorOf(ap, name))
   }
 
   /**

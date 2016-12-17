@@ -252,8 +252,10 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                                 storeMode) flatMap {
                       case NotIngested(reason) =>
                         val message =
-                          "Ingest to %s by %s failed with reason: %s "
-                            .format(path, apiKey, reason)
+                          "Ingest to %s by %s failed with reason: %s ".format(
+                            path,
+                            apiKey,
+                            reason)
                         logger.warn(message)
                         notifyJob(durability,
                                   JobManager.channels.Warning,
@@ -266,8 +268,10 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
 
                       case StreamingResult(ingested, None) =>
                         val message =
-                          "Ingest to %s by %s succeeded (%d records)"
-                            .format(path, apiKey, ingested)
+                          "Ingest to %s by %s succeeded (%d records)".format(
+                            path,
+                            apiKey,
+                            ingested)
                         logger.info(message)
                         notifyJob(durability,
                                   JobManager.channels.Info,
@@ -312,8 +316,10 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                         )
 
                         val message =
-                          "Ingest to %s with %s succeeded. Result: %s"
-                            .format(path, apiKey, responseContent.renderPretty)
+                          "Ingest to %s with %s succeeded. Result: %s".format(
+                            path,
+                            apiKey,
+                            responseContent.renderPretty)
                         logger.info(message)
                         notifyJob(durability,
                                   JobManager.channels.Info,

@@ -59,8 +59,10 @@ trait FileDeclarationsHolder
           .processDeclarations(processor, state, lastParent, place))
       return false
 
-    if (!super[ScImportsHolder]
-          .processDeclarations(processor, state, lastParent, place))
+    if (!super[ScImportsHolder].processDeclarations(processor,
+                                                    state,
+                                                    lastParent,
+                                                    place))
       return false
 
     if (context != null) {
@@ -259,8 +261,10 @@ trait FileDeclarationsHolder
     }
 
     if (ScalaFileImpl.isProcessLocalClasses(lastParent) &&
-        !super[ScDeclarationSequenceHolder]
-          .processDeclarations(processor, state, lastParent, place))
+        !super[ScDeclarationSequenceHolder].processDeclarations(processor,
+                                                                state,
+                                                                lastParent,
+                                                                place))
       return false
 
     true
