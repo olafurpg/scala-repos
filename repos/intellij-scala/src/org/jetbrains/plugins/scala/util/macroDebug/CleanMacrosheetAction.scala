@@ -55,8 +55,10 @@ class CleanMacrosheetAction() extends AnAction with TopComponentAction {
       inWriteAction {
         CleanWorksheetAction.resetScrollModel(viewer)
 
-        CleanWorksheetAction
-          .cleanWorksheet(psiFile.getNode, editor, viewer, e.getProject)
+        CleanWorksheetAction.cleanWorksheet(psiFile.getNode,
+                                            editor,
+                                            viewer,
+                                            e.getProject)
 
         parent.remove(splitPane)
         parent.add(editor.getComponent, BorderLayout.CENTER)

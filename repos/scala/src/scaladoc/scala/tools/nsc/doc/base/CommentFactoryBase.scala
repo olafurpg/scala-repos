@@ -406,8 +406,8 @@ trait CommentFactoryBase { this: MemberLookupBase =>
           ((bodyTags remove key): @unchecked) match {
             case Some(r :: rs) if !(filterEmpty && r.blocks.isEmpty) =>
               if (!rs.isEmpty)
-                reporter
-                  .warning(pos, s"Only one '@${key.name}' tag is allowed")
+                reporter.warning(pos,
+                                 s"Only one '@${key.name}' tag is allowed")
               Some(r)
             case _ => None
           }

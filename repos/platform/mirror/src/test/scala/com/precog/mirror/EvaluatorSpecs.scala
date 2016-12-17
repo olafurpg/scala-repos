@@ -299,8 +299,9 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
     def message(q: String): String = {
       val actual = doEval(q)
 
-      "evaluates to [%s], not [%s]"
-        .format(actual map { _.renderCompact } mkString ",", expect map {
+      "evaluates to [%s], not [%s]".format(
+        actual map { _.renderCompact } mkString ",",
+        expect map {
           _.renderCompact
         } mkString ",")
     }

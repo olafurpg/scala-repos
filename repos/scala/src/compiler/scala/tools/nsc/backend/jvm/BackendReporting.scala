@@ -265,8 +265,9 @@ object BackendReporting {
     def descriptor: String
 
     def calleeMethodSig =
-      BackendReporting
-        .methodSignature(calleeDeclarationClass, name, descriptor)
+      BackendReporting.methodSignature(calleeDeclarationClass,
+                                       name,
+                                       descriptor)
 
     override def toString = this match {
       case IllegalAccessInstruction(_, _, _, callsiteClass, instruction) =>
@@ -302,8 +303,10 @@ object BackendReporting {
                             callsiteClass,
                             callsiteName,
                             callsiteDesc) =>
-        s"""The callsite method ${BackendReporting
-             .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
+        s"""The callsite method ${BackendReporting.methodSignature(
+             callsiteClass,
+             callsiteName,
+             callsiteDesc)}
            |does not have the same strictfp mode as the callee $calleeMethodSig.
          """.stripMargin
 
@@ -313,8 +316,10 @@ object BackendReporting {
                                    callsiteClass,
                                    callsiteName,
                                    callsiteDesc) =>
-        s"""The size of the callsite method ${BackendReporting
-             .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
+        s"""The size of the callsite method ${BackendReporting.methodSignature(
+             callsiteClass,
+             callsiteName,
+             callsiteDesc)}
            |would exceed the JVM method size limit after inlining $calleeMethodSig.
          """.stripMargin
     }

@@ -250,8 +250,9 @@ trait ParSeqLike[
     if (patch.isParSeq && bf(repr).isCombiner &&
         (size - realreplaced + patch.size) > MIN_FOR_COPY) {
       val that = patch.asParSeq
-      val pits = splitter
-        .psplitWithSignalling(from, replaced, length - from - realreplaced)
+      val pits = splitter.psplitWithSignalling(from,
+                                               replaced,
+                                               length - from - realreplaced)
       val cfactory = combinerFactory(() => bf(repr).asCombiner)
       val copystart = new Copy[U, That](cfactory, pits(0))
       val copymiddle = wrap {

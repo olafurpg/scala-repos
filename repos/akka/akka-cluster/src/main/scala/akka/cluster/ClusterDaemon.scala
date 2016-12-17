@@ -693,8 +693,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
   def receiveGossipStatus(status: GossipStatus): Unit = {
     val from = status.from
-    if (!latestGossip.overview.reachability
-          .isReachable(selfUniqueAddress, from))
+    if (!latestGossip.overview.reachability.isReachable(selfUniqueAddress,
+                                                        from))
       logInfo("Ignoring received gossip status from unreachable [{}] ", from)
     else if (latestGossip.members.forall(_.uniqueAddress != from))
       log.debug(
@@ -741,8 +741,9 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         from.address,
         envelope.to)
       Ignored
-    } else if (!localGossip.overview.reachability
-                 .isReachable(selfUniqueAddress, from)) {
+    } else if (!localGossip.overview.reachability.isReachable(
+                 selfUniqueAddress,
+                 from)) {
       logInfo("Ignoring received gossip from unreachable [{}] ", from)
       Ignored
     } else if (localGossip.members.forall(_.uniqueAddress != from)) {

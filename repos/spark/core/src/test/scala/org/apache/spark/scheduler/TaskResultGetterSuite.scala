@@ -189,8 +189,10 @@ class TaskResultGetterSuite
         |public class MyException extends Exception {
         |}
       """.stripMargin)
-    val excFile = TestUtils
-      .createCompiledClass("MyException", srcDir, excSource, Seq.empty)
+    val excFile = TestUtils.createCompiledClass("MyException",
+                                                srcDir,
+                                                excSource,
+                                                Seq.empty)
     val jarFile =
       new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
     TestUtils.createJar(Seq(excFile), jarFile, directoryPrefix = Some("repro"))

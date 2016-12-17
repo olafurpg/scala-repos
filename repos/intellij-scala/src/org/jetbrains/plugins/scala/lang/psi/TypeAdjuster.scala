@@ -84,8 +84,9 @@ object TypeAdjuster extends ApplicationAdapter {
   }
 
   private def newTypeElem(name: String, position: PsiElement) =
-    ScalaPsiElementFactory
-      .createTypeElementFromText(name, position.getContext, position)
+    ScalaPsiElementFactory.createTypeElementFromText(name,
+                                                     position.getContext,
+                                                     position)
 
   private def toReplacementInfos(
       typeElements: Seq[ScTypeElement],
@@ -284,8 +285,7 @@ object TypeAdjuster extends ApplicationAdapter {
         val holder = importHolders.get(info)
         if (info.pathsToImport.nonEmpty && holder.isDefined) {
           val pathsToAdd =
-            holderToPaths
-              .getOrElseUpdate(holder.get, Set.empty) ++ info.pathsToImport
+            holderToPaths.getOrElseUpdate(holder.get, Set.empty) ++ info.pathsToImport
           holderToPaths += holder.get -> pathsToAdd
         }
       }

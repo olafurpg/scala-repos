@@ -185,8 +185,9 @@ class ScImplicitlyConvertible(place: PsiElement,
               case Some(substitutor) =>
                 exp match {
                   case Some(expected) =>
-                    val additionalUSubst = Conformance
-                      .undefinedSubst(expected, newSubst.subst(retTp))
+                    val additionalUSubst =
+                      Conformance.undefinedSubst(expected,
+                                                 newSubst.subst(retTp))
                     (uSubst + additionalUSubst).getSubstitutor match {
                       case Some(innerSubst) =>
                         result +=
@@ -493,8 +494,8 @@ class ScImplicitlyConvertible(place: PsiElement,
                     })
 
                     //todo: pass implicit parameters
-                    ScalaPsiUtil
-                      .debug(s"Implicit $r is ok for type $typez", LOG)
+                    ScalaPsiUtil.debug(s"Implicit $r is ok for type $typez",
+                                       LOG)
                     ImplicitMapResult(condition = true,
                                       r,
                                       tp,

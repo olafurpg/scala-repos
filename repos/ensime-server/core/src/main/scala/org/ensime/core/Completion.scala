@@ -112,8 +112,11 @@ trait CompletionControl { self: RichPresentationCompiler =>
           val contents = Array.ofDim[Char](orig.length + 1)
           System.arraycopy(orig, 0, contents, 0, point)
           contents(point) = 'a'
-          System
-            .arraycopy(orig, point, contents, point + 1, orig.length - point)
+          System.arraycopy(orig,
+                           point,
+                           contents,
+                           point + 1,
+                           orig.length - point)
 
           // uses the same VirtualFile as the original
           val src = new BatchSourceFile(inputP.source.file, contents)

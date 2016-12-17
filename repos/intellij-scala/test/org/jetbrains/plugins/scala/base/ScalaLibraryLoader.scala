@@ -147,8 +147,8 @@ class ScalaLibraryLoader(project: Project,
 
     val libRoot: File = new File(mockLib)
     assert(libRoot.exists)
-    libModel
-      .addRoot(VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
+    libModel.addRoot(VfsUtil.getUrlForLibraryRoot(libRoot),
+                     OrderRootType.CLASSES)
 
     inWriteAction {
       libModel.commit()

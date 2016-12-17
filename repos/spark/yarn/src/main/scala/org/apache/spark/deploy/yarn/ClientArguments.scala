@@ -91,8 +91,9 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
       .orNull
     // If dynamic allocation is enabled, start at the configured initial number of executors.
     // Default to minExecutors if no initialExecutors is set.
-    numExecutors = YarnSparkHadoopUtil
-      .getInitialTargetExecutorNumber(sparkConf, numExecutors)
+    numExecutors = YarnSparkHadoopUtil.getInitialTargetExecutorNumber(
+      sparkConf,
+      numExecutors)
     principal = Option(principal).orElse(sparkConf.get(PRINCIPAL)).orNull
     keytab = Option(keytab).orElse(sparkConf.get(KEYTAB)).orNull
   }

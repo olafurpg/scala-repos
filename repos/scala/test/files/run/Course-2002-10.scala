@@ -37,8 +37,8 @@ object M1 {
     val nm1 = s apply 0;
     val n = s apply 1;
     val np1 = s apply 2;
-    Stream
-      .cons(np1 - ((np1 - n) * (np1 - n) / (nm1 - 2 * n + np1)), euler(s.tail))
+    Stream.cons(np1 - ((np1 - n) * (np1 - n) / (nm1 - 2 * n + np1)),
+                euler(s.tail))
   };
 
   def better(

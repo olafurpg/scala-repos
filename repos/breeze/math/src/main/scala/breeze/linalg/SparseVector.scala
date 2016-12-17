@@ -248,8 +248,11 @@ object SparseVector
     var off = 0
     while (vec < vectors.length) {
       colPtrs(vec) = off
-      System
-        .arraycopy(vectors(vec).data, 0, data, off, vectors(vec).activeSize)
+      System.arraycopy(vectors(vec).data,
+                       0,
+                       data,
+                       off,
+                       vectors(vec).activeSize)
       System.arraycopy(vectors(vec).index,
                        0,
                        rowIndices,

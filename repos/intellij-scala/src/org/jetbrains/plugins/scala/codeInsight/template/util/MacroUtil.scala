@@ -34,8 +34,10 @@ object MacroUtil {
   def getVariablesForScope(element: PsiElement): Array[ScalaResolveResult] = {
     val completionProcessor = new VariablesCompletionProcessor(
       StdKinds.valuesRef)
-    PsiTreeUtil
-      .treeWalkUp(completionProcessor, element, null, ResolveState.initial)
+    PsiTreeUtil.treeWalkUp(completionProcessor,
+                           element,
+                           null,
+                           ResolveState.initial)
     completionProcessor.candidates
   }
 

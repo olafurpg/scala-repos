@@ -429,8 +429,10 @@ private[kafka] class Processor(val id: Int,
   private val newConnections = new ConcurrentLinkedQueue[SocketChannel]()
   private val inflightResponses =
     mutable.Map[String, RequestChannel.Response]()
-  private val channelBuilder = ChannelBuilders
-    .create(protocol, Mode.SERVER, LoginType.SERVER, channelConfigs)
+  private val channelBuilder = ChannelBuilders.create(protocol,
+                                                      Mode.SERVER,
+                                                      LoginType.SERVER,
+                                                      channelConfigs)
   private val metricTags = new util.HashMap[String, String]()
   metricTags.put("networkProcessor", id.toString)
 

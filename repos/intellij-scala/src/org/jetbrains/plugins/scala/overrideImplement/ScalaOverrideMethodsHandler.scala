@@ -14,8 +14,10 @@ class ScalaOverrideMethodsHandler extends LanguageCodeInsightActionHandler {
   def startInWriteAction: Boolean = false
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
-    ScalaOIUtil
-      .invokeOverrideImplement(project, editor, file, isImplement = false)
+    ScalaOIUtil.invokeOverrideImplement(project,
+                                        editor,
+                                        file,
+                                        isImplement = false)
   }
 
   def isValidFor(editor: Editor, file: PsiFile): Boolean =

@@ -37,8 +37,8 @@ object InitializeConvert extends Convert {
                nme == InputWrapper.WrapInitTaskName)
       Converted.Failure(in.pos, "A setting cannot depend on a task")
     else if (nme == InputWrapper.WrapPreviousName)
-      Converted
-        .Failure(in.pos, "A setting cannot depend on a task's previous value.")
+      Converted.Failure(in.pos,
+                        "A setting cannot depend on a task's previous value.")
     else Converted.NotApplicable
 }
 

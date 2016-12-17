@@ -608,8 +608,7 @@ class AccountServiceHandlers(
               futureContent flatMap { jvalue =>
                 (jvalue \ "password").validated[String] match {
                   case Success(newPassword) =>
-                    accountManager
-                      .updateAccountPassword(account, newPassword) map {
+                    accountManager.updateAccountPassword(account, newPassword) map {
                       case true =>
                         logger.info(
                           "Password for account %s successfully updated by %s"

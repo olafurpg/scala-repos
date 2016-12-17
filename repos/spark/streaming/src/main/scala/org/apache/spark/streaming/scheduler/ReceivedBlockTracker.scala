@@ -276,8 +276,8 @@ private[streaming] class ReceivedBlockTracker(
 
   /** Get the queue of received blocks belonging to a particular stream */
   private def getReceivedBlockQueue(streamId: Int): ReceivedBlockQueue = {
-    streamIdToUnallocatedBlockQueues
-      .getOrElseUpdate(streamId, new ReceivedBlockQueue)
+    streamIdToUnallocatedBlockQueues.getOrElseUpdate(streamId,
+                                                     new ReceivedBlockQueue)
   }
 
   /** Optionally create the write ahead log manager only if the feature is enabled */

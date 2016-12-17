@@ -414,8 +414,7 @@ object ScalaDocumentationProvider {
 
             member match {
               case named: ScNamedElement =>
-                ScalaPsiUtil
-                  .superValsSignatures(named, withSelfType = false) map {
+                ScalaPsiUtil.superValsSignatures(named, withSelfType = false) map {
                   case sig => sig.namedElement
                 } foreach {
                   case od: ScDocCommentOwner => tc += od
@@ -541,8 +540,9 @@ object ScalaDocumentationProvider {
       for (param <- owner.parameters) {
         if (inheritedParams contains param.name) {
           val paramText = inheritedParams.get(param.name).get.getText
-          buffer append leadingAsterisks append paramText
-            .substring(0, paramText.lastIndexOf("\n") + 1)
+          buffer append leadingAsterisks append paramText.substring(
+            0,
+            paramText.lastIndexOf("\n") + 1)
         } else {
           buffer append leadingAsterisks append PARAM_TAG append " " append param.name append "\n"
         }

@@ -374,8 +374,11 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         true
       case comp @ ScCompoundType(components, signaturesMap, typesMap) =>
-        TypeDefinitionMembers
-          .processDeclarations(comp, this, state, null, place)
+        TypeDefinitionMembers.processDeclarations(comp,
+                                                  this,
+                                                  state,
+                                                  null,
+                                                  place)
       case ex: ScExistentialType =>
         processType(ex.skolem,
                     place,

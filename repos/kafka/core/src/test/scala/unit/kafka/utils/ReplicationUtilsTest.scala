@@ -135,13 +135,15 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
   @Test
   def testGetLeaderIsrAndEpochForPartition() {
     val leaderIsrAndControllerEpoch =
-      ReplicationUtils
-        .getLeaderIsrAndEpochForPartition(zkUtils, topic, partitionId)
+      ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                        topic,
+                                                        partitionId)
     assertEquals(topicDataLeaderIsrAndControllerEpoch,
                  leaderIsrAndControllerEpoch.get)
     assertEquals(
       None,
-      ReplicationUtils
-        .getLeaderIsrAndEpochForPartition(zkUtils, topic, partitionId + 1))
+      ReplicationUtils.getLeaderIsrAndEpochForPartition(zkUtils,
+                                                        topic,
+                                                        partitionId + 1))
   }
 }

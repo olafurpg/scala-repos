@@ -328,8 +328,12 @@ class ApplicationCacheSuite
 
     val updateTime = window * 3
     // update the cached value
-    val updatedApp = operations
-      .putAppUI(appId, attemptId, true, started, updateTime, updateTime)
+    val updatedApp = operations.putAppUI(appId,
+                                         attemptId,
+                                         true,
+                                         started,
+                                         updateTime,
+                                         updateTime)
     val endTime = window * 10
     clock.setTime(endTime)
     logDebug(s"Before operation = $cache")

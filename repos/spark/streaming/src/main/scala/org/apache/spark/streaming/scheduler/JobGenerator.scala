@@ -330,8 +330,8 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
           ssc.checkpointDuration)) {
       logInfo("Checkpointing graph for time " + time)
       ssc.graph.updateCheckpointData(time)
-      checkpointWriter
-        .write(new Checkpoint(ssc, time), clearCheckpointDataLater)
+      checkpointWriter.write(new Checkpoint(ssc, time),
+                             clearCheckpointDataLater)
     }
   }
 

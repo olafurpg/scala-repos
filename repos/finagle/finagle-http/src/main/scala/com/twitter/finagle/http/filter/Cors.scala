@@ -165,8 +165,8 @@ object Cors {
       */
     protected[this] def setMaxAge(response: Response): Response = {
       policy.maxAge foreach { maxAge =>
-        response.headers
-          .add("Access-Control-Max-Age", maxAge.inSeconds.toString)
+        response.headers.add("Access-Control-Max-Age",
+                             maxAge.inSeconds.toString)
       }
       response
     }

@@ -174,8 +174,8 @@ object KetamaClientStress extends App {
           val (key, value) = (randomString(config.keysize()),
                               Buf.Utf8(randomString(config.valuesize())))
           () =>
-            ketamaClient
-              .add(key + load_count.getAndIncrement().toString, value)
+            ketamaClient.add(key + load_count.getAndIncrement().toString,
+                             value)
         case "replace" =>
           keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
@@ -285,8 +285,9 @@ object KetamaClientStress extends App {
                               Buf.Utf8(randomString(config.valuesize())))
           () =>
             {
-              replicationClient
-                .add(key + load_count.getAndIncrement().toString, value)
+              replicationClient.add(
+                key + load_count.getAndIncrement().toString,
+                value)
             }
         case "replace" =>
           keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }

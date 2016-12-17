@@ -161,8 +161,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
       f: (PartitionID, Iterator[EdgeTriplet[VD, ED]]) => Iterator[ED2],
       tripletFields: TripletFields): Graph[VD, ED2] = {
     vertices.cache()
-    replicatedVertexView
-      .upgrade(vertices, tripletFields.useSrc, tripletFields.useDst)
+    replicatedVertexView.upgrade(vertices,
+                                 tripletFields.useSrc,
+                                 tripletFields.useDst)
     val newEdges = replicatedVertexView.edges.mapEdgePartitions {
       (pid, part) =>
         part.map(
@@ -216,8 +217,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
     vertices.cache()
     // For each vertex, replicate its attribute only to partitions where it is
     // in the relevant position in an edge.
-    replicatedVertexView
-      .upgrade(vertices, tripletFields.useSrc, tripletFields.useDst)
+    replicatedVertexView.upgrade(vertices,
+                                 tripletFields.useSrc,
+                                 tripletFields.useDst)
     val view = activeSetOpt match {
       case Some((activeSet, _)) =>
         replicatedVertexView.withActiveSet(activeSet)
@@ -309,8 +311,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
   /** Test whether the closure accesses the attribute with name `attrName`. */
   private def accessesVertexAttr(closure: AnyRef, attrName: String): Boolean = {
     try {
-      BytecodeUtils
-        .invokedMethod(closure, classOf[EdgeTriplet[VD, ED]], attrName)
+      BytecodeUtils.invokedMethod(closure,
+                                  classOf[EdgeTriplet[VD, ED]],
+                                  attrName)
     } catch {
       case _: ClassNotFoundException =>
         true // if we don't know, be conservative

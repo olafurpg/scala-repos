@@ -97,8 +97,9 @@ object SimpleConsumerShell extends Logging {
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])
-    val printOffsetOpt = parser
-      .accepts("print-offsets", "Print the offsets returned by the iterator")
+    val printOffsetOpt = parser.accepts(
+      "print-offsets",
+      "Print the offsets returned by the iterator")
     val maxWaitMsOpt = parser
       .accepts("max-wait-ms",
                "The max amount of time each fetch request waits.")

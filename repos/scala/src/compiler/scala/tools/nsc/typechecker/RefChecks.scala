@@ -1600,15 +1600,16 @@ abstract class RefChecks
           "may be unable to provide a concrete implementation of"
         else "may be unable to override"
 
-      reporter.warning(
-        memberSym.pos,
-        "%s%s references %s %s.".format(
-          memberSym.fullLocationString,
-          comparison,
-          accessFlagsToString(otherSym),
-          otherSym
-        ) + "\nClasses which cannot access %s %s %s."
-          .format(otherSym.decodedName, cannot, memberSym.decodedName))
+      reporter.warning(memberSym.pos,
+                       "%s%s references %s %s.".format(
+                         memberSym.fullLocationString,
+                         comparison,
+                         accessFlagsToString(otherSym),
+                         otherSym
+                       ) + "\nClasses which cannot access %s %s %s.".format(
+                         otherSym.decodedName,
+                         cannot,
+                         memberSym.decodedName))
     }
 
     /** Warn about situations where a method signature will include a type which

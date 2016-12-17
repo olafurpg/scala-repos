@@ -141,8 +141,10 @@ class Range(val start: Int, val end: Int, val step: Int)
   override def length = if (numRangeElements < 0) fail() else numRangeElements
 
   private def description =
-    "%d %s %d by %s"
-      .format(start, if (isInclusive) "to" else "until", end, step)
+    "%d %s %d by %s".format(start,
+                            if (isInclusive) "to" else "until",
+                            end,
+                            step)
   private def fail() =
     throw new IllegalArgumentException(
       description + ": seqs cannot contain more than Int.MaxValue elements.")

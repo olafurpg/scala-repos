@@ -82,8 +82,7 @@ object ScopeSuggester {
       val name = parent match {
         case fileType: ScalaFile => "file " + fileType.getName
         case _ =>
-          PsiTreeUtil
-            .getParentOfType(parent, classOf[ScTemplateDefinition]) match {
+          PsiTreeUtil.getParentOfType(parent, classOf[ScTemplateDefinition]) match {
             case classType: ScClass =>
               "class " + classType.name
             case objectType: ScObject =>
@@ -168,8 +167,8 @@ object ScopeSuggester {
     })
 
     if (companion.isDefined)
-      ScalaRefactoringUtil
-        .getTypeElementOccurrences(typeElement, companion.get)
+      ScalaRefactoringUtil.getTypeElementOccurrences(typeElement,
+                                                     companion.get)
     else Array[ScTypeElement]()
   }
 

@@ -65,8 +65,9 @@ private[annotator] object AnnotatorUtils {
           ScTypePresentation.different(actual, expected)
         val annotation = holder.createErrorAnnotation(
           expr,
-          ScalaBundle
-            .message("type.mismatch.found.required", actualText, expText))
+          ScalaBundle.message("type.mismatch.found.required",
+                              actualText,
+                              expText))
         annotation.registerFix(ReportHighlightingErrorQuickFix)
       }
     }

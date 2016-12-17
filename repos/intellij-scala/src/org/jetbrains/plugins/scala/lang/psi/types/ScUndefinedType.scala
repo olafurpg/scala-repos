@@ -152,8 +152,9 @@ case class ScAbstractType(tpt: ScTypeParameterType,
             tpt
               .recursiveVarianceUpdateModifiable(newData, update, variance)
               .asInstanceOf[ScTypeParameterType],
-            lower
-              .recursiveVarianceUpdateModifiable(newData, update, -variance),
+            lower.recursiveVarianceUpdateModifiable(newData,
+                                                    update,
+                                                    -variance),
             upper.recursiveVarianceUpdateModifiable(newData, update, variance))
         } catch {
           case cce: ClassCastException => throw new RecursiveUpdateException

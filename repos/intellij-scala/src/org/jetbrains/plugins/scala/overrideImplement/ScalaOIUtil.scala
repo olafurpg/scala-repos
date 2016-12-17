@@ -125,25 +125,24 @@ object ScalaOIUtil {
                 isImplement: Boolean,
                 clazz: ScTemplateDefinition,
                 editor: Editor) {
-    ScalaUtils
-      .runWriteAction(
-        new Runnable {
-          def run() {
-            import scala.collection.JavaConversions._
-            val sortedMembers =
-              ScalaMemberChooser.sorted(selectedMembers, clazz)
-            val genInfos = sortedMembers.map(new ScalaGenerationInfo(_))
-            val anchor = getAnchor(editor.getCaretModel.getOffset, clazz)
-            val inserted =
-              GenerateMembersUtil.insertMembersBeforeAnchor(clazz,
-                                                            anchor.orNull,
-                                                            genInfos.reverse)
-            inserted.headOption.foreach(
-              _.positionCaret(editor, toEditMethodBody = true))
-          }
-        },
-        clazz.getProject,
-        if (isImplement) "Implement method" else "Override method")
+    ScalaUtils.runWriteAction(
+      new Runnable {
+        def run() {
+          import scala.collection.JavaConversions._
+          val sortedMembers =
+            ScalaMemberChooser.sorted(selectedMembers, clazz)
+          val genInfos = sortedMembers.map(new ScalaGenerationInfo(_))
+          val anchor = getAnchor(editor.getCaretModel.getOffset, clazz)
+          val inserted =
+            GenerateMembersUtil.insertMembersBeforeAnchor(clazz,
+                                                          anchor.orNull,
+                                                          genInfos.reverse)
+          inserted.headOption.foreach(
+            _.positionCaret(editor, toEditMethodBody = true))
+        }
+      },
+      clazz.getProject,
+      if (isImplement) "Implement method" else "Override method")
   }
 
   def getMembersToImplement(

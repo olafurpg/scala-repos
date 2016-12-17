@@ -64,8 +64,9 @@ class DeMorganLawIntention extends PsiElementBaseIntentionAction {
       .append(" ")
       .append(IntentionUtils.negate(infixExpr.getArgExpr))
 
-    val res = IntentionUtils
-      .negateAndValidateExpression(infixExpr, element.getManager, buf)
+    val res = IntentionUtils.negateAndValidateExpression(infixExpr,
+                                                         element.getManager,
+                                                         buf)
 
     inWriteAction {
       res._1.replaceExpression(res._2, true)

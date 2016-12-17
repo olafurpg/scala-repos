@@ -108,8 +108,9 @@ object TestLogCleaning {
     val options = parser.parse(args: _*)
 
     if (args.length == 0)
-      CommandLineUtils
-        .printUsageAndDie(parser, "An integration test for log cleaning.")
+      CommandLineUtils.printUsageAndDie(
+        parser,
+        "An integration test for log cleaning.")
 
     if (options.has(dumpOpt)) {
       dumpLog(new File(options.valueOf(dumpOpt)))
@@ -281,18 +282,18 @@ object TestLogCleaning {
                       dups: Int,
                       percentDeletes: Int): File = {
     val producerProps = new Properties
-    producerProps
-      .setProperty(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
-    producerProps
-      .setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
+    producerProps.setProperty(ProducerConfig.MAX_BLOCK_MS_CONFIG,
+                              Long.MaxValue.toString)
+    producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                              brokerUrl)
     producerProps.put(
       ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
       "org.apache.kafka.common.serialization.ByteArraySerializer")
     producerProps.put(
       ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
       "org.apache.kafka.common.serialization.ByteArraySerializer")
-    producerProps
-      .setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
+    producerProps.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG,
+                              compressionType)
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
     val rand = new Random(1)
     val keyCount = (messages / dups).toInt

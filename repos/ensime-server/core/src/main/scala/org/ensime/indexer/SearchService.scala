@@ -278,8 +278,8 @@ class SearchService(
    * the list of symbols is non-empty.
    */
 
-  val backlogActor = actorSystem
-    .actorOf(Props(new IndexingQueueActor(this)), "ClassfileIndexer")
+  val backlogActor = actorSystem.actorOf(Props(new IndexingQueueActor(this)),
+                                         "ClassfileIndexer")
 
   // deletion in both Lucene and H2 is really slow, batching helps
   def deleteInBatches(

@@ -275,8 +275,10 @@ object ConsumerPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils
-      .checkRequiredArgs(parser, options, topicOpt, numMessagesOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       topicOpt,
+                                       numMessagesOpt)
 
     val useNewConsumer = options.has(useNewConsumerOpt)
 
@@ -302,20 +304,22 @@ object ConsumerPerformance {
                 classOf[ByteArrayDeserializer])
       props.put(ConsumerConfig.CHECK_CRCS_CONFIG, "false")
     } else {
-      CommandLineUtils
-        .checkRequiredArgs(parser, options, zkConnectOpt, numMessagesOpt)
+      CommandLineUtils.checkRequiredArgs(parser,
+                                         options,
+                                         zkConnectOpt,
+                                         numMessagesOpt)
       props.put("group.id", options.valueOf(groupIdOpt))
       props.put("socket.receive.buffer.bytes",
                 options.valueOf(socketBufferSizeOpt).toString)
-      props
-        .put("fetch.message.max.bytes", options.valueOf(fetchSizeOpt).toString)
+      props.put("fetch.message.max.bytes",
+                options.valueOf(fetchSizeOpt).toString)
       props.put("auto.offset.reset",
                 if (options.has(resetBeginningOffsetOpt)) "largest"
                 else "smallest")
       props.put("zookeeper.connect", options.valueOf(zkConnectOpt))
       props.put("consumer.timeout.ms", "1000")
-      props
-        .put("num.consumer.fetchers", options.valueOf(numFetchersOpt).toString)
+      props.put("num.consumer.fetchers",
+                options.valueOf(numFetchersOpt).toString)
     }
     val numThreads = options.valueOf(numThreadsOpt).intValue
     val topic = options.valueOf(topicOpt)

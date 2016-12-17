@@ -913,16 +913,16 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
       ejectFailedHost: Boolean,
       label: String
   ) =
-    this(
-      underlying,
-      FailureAccrualPolicy
-        .consecutiveFailures(numFailures, Backoff.fromFunction(markDeadFor)),
-      timer,
-      key,
-      healthBroker,
-      ejectFailedHost,
-      label,
-      ClientStatsReceiver.scope("memcached_client"))
+    this(underlying,
+         FailureAccrualPolicy.consecutiveFailures(
+           numFailures,
+           Backoff.fromFunction(markDeadFor)),
+         timer,
+         key,
+         healthBroker,
+         ejectFailedHost,
+         label,
+         ClientStatsReceiver.scope("memcached_client"))
 
   private[this] val failureAccrualEx = Future.exception(
     new FailureAccrualException("Endpoint is marked dead by failureAccrual") {
@@ -1141,8 +1141,11 @@ private[finagle] class KetamaPartitionedClient(
                            expiry: Time,
                            value: Buf,
                            casUnique: Buf) =
-    ready.interruptible before super
-      .checkAndSet(key, flags, expiry, value, casUnique)
+    ready.interruptible before super.checkAndSet(key,
+                                                 flags,
+                                                 expiry,
+                                                 value,
+                                                 casUnique)
 
   override def add(key: String, flags: Int, expiry: Time, value: Buf) =
     ready.interruptible before super.add(key, flags, expiry, value)

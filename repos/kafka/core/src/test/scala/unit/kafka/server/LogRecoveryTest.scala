@@ -40,12 +40,12 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
   val replicaFetchMinBytes = 20
 
   val overridingProps = new Properties()
-  overridingProps
-    .put(KafkaConfig.ReplicaLagTimeMaxMsProp, replicaLagTimeMaxMs.toString)
-  overridingProps
-    .put(KafkaConfig.ReplicaFetchWaitMaxMsProp, replicaFetchWaitMaxMs.toString)
-  overridingProps
-    .put(KafkaConfig.ReplicaFetchMinBytesProp, replicaFetchMinBytes.toString)
+  overridingProps.put(KafkaConfig.ReplicaLagTimeMaxMsProp,
+                      replicaLagTimeMaxMs.toString)
+  overridingProps.put(KafkaConfig.ReplicaFetchWaitMaxMsProp,
+                      replicaFetchWaitMaxMs.toString)
+  overridingProps.put(KafkaConfig.ReplicaFetchMinBytesProp,
+                      replicaFetchMinBytes.toString)
 
   var configs: Seq[KafkaConfig] = null
   val topic = "new-topic"

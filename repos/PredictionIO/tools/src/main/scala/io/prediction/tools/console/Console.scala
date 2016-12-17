@@ -872,8 +872,9 @@ object Console extends Logging {
       info(s"Uber JAR enabled. Putting ${core.getName} in lib.")
       val dst = new File("lib")
       dst.mkdir()
-      FileUtils
-        .copyFileToDirectory(coreAssembly(ca.common.pioHome.get), dst, true)
+      FileUtils.copyFileToDirectory(coreAssembly(ca.common.pioHome.get),
+                                    dst,
+                                    true)
     } else {
       if (new File("engine.json").exists()) {
         info(s"Uber JAR disabled. Making sure lib/${core.getName} is absent.")

@@ -566,8 +566,8 @@ object MapTest extends SpecLite {
   "==>> submap" should {
     "isSubmapOfBy -> true" in {
       val o = implicitly[Order[Int]]
-      fromList(List('a' -> 1))
-        .isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)), o.equal) must_== true
+      fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
+                                            o.equal) must_== true
       fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
                                             o.lessThanOrEqual) must_== true
       fromList(List('a' -> 1, 'b' -> 2))
@@ -580,8 +580,8 @@ object MapTest extends SpecLite {
                                             o.equal) must_== false
       fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
                                             o.lessThan) must_== false
-      fromList(List('a' -> 1, 'b' -> 2))
-        .isSubmapOfBy(fromList(List('a' -> 1)), o.equal) must_== false
+      fromList(List('a' -> 1, 'b' -> 2)).isSubmapOfBy(fromList(List('a' -> 1)),
+                                                      o.equal) must_== false
     }
 
     "isSubmapOf" ! forAll { (a: Byte ==>> Byte, b: Byte ==>> Byte) =>

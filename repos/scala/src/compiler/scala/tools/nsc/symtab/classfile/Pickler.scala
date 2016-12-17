@@ -363,8 +363,11 @@ abstract class Pickler extends SubComponent {
     private def writeName(name: Name) {
       ensureCapacity(name.length * 3)
       val utfBytes = Codec toUTF8 name.toString
-      scala.compat.Platform
-        .arraycopy(utfBytes, 0, bytes, writeIndex, utfBytes.length)
+      scala.compat.Platform.arraycopy(utfBytes,
+                                      0,
+                                      bytes,
+                                      writeIndex,
+                                      utfBytes.length)
       writeIndex += utfBytes.length
     }
 

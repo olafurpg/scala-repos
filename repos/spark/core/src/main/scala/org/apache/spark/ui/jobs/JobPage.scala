@@ -188,8 +188,9 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
         val content = <div id="no-info">
             <p>No information to display for job {jobId}</p>
           </div>
-        return UIUtils
-          .headerSparkPage(s"Details for Job $jobId", content, parent)
+        return UIUtils.headerSparkPage(s"Details for Job $jobId",
+                                       content,
+                                       parent)
       }
       val jobData = jobDataOption.get
       val isComplete = jobData.status != JobExecutionStatus.RUNNING

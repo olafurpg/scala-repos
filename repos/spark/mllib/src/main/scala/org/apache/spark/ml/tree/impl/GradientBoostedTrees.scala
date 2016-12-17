@@ -47,8 +47,10 @@ private[ml] object GradientBoostedTrees extends Logging {
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case OldAlgo.Regression =>
-        GradientBoostedTrees
-          .boost(input, input, boostingStrategy, validate = false)
+        GradientBoostedTrees.boost(input,
+                                   input,
+                                   boostingStrategy,
+                                   validate = false)
       case OldAlgo.Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
@@ -82,8 +84,10 @@ private[ml] object GradientBoostedTrees extends Logging {
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case OldAlgo.Regression =>
-        GradientBoostedTrees
-          .boost(input, validationInput, boostingStrategy, validate = true)
+        GradientBoostedTrees.boost(input,
+                                   validationInput,
+                                   boostingStrategy,
+                                   validate = true)
       case OldAlgo.Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =

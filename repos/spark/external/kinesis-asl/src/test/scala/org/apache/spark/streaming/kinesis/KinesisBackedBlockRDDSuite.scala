@@ -233,8 +233,9 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
       val blockData = shardIdToData(shardIds(i)).iterator.map {
         _.toString.getBytes()
       }
-      blockManager
-        .putIterator(blockIds(i), blockData, StorageLevel.MEMORY_ONLY)
+      blockManager.putIterator(blockIds(i),
+                               blockData,
+                               StorageLevel.MEMORY_ONLY)
     }
 
     // Create the necessary ranges to use in the RDD

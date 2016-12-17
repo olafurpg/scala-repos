@@ -79,8 +79,10 @@ trait KMediansCoreSetClustering {
       val coresets =
         tree map {
           case (_, coreset) =>
-            CoreSet
-              .fromWeightedPoints(coreset._1, coreset._2, k, epsilon / 6.0)
+            CoreSet.fromWeightedPoints(coreset._1,
+                                       coreset._2,
+                                       k,
+                                       epsilon / 6.0)
         }
 
       coresets.foldLeft((new Array[Array[Double]](0), new Array[Long](0))) {

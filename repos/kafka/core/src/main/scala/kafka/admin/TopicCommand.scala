@@ -172,8 +172,10 @@ object TopicCommand extends Logging {
         val nPartitions = opts.options.valueOf(opts.partitionsOpt).intValue
         val replicaAssignmentStr =
           opts.options.valueOf(opts.replicaAssignmentOpt)
-        AdminUtils
-          .addPartitions(zkUtils, topic, nPartitions, replicaAssignmentStr)
+        AdminUtils.addPartitions(zkUtils,
+                                 topic,
+                                 nPartitions,
+                                 replicaAssignmentStr)
         println("Adding partitions succeeded!")
       }
     }
@@ -420,8 +422,9 @@ object TopicCommand extends Logging {
       "if-not-exists",
       "if set when creating topics, the action will only execute if the topic does not already exist")
 
-    val disableRackAware = parser
-      .accepts("disable-rack-aware", "Disable rack aware replica assignment")
+    val disableRackAware = parser.accepts(
+      "disable-rack-aware",
+      "Disable rack aware replica assignment")
     val options = parser.parse(args: _*)
 
     val allTopicLevelOpts: Set[OptionSpec[_]] =

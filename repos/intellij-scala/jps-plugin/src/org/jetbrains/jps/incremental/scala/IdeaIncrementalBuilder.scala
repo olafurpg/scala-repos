@@ -201,10 +201,11 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
         .getTempTargetRoots(target, context)
         .asScala
     } {
-      FileUtil
-        .processFilesRecursively(tempRoot.getRootFile, new Processor[File] {
-          def process(file: File) = checkAndCollectFile(file)
-        })
+      FileUtil.processFilesRecursively(tempRoot.getRootFile,
+                                       new Processor[File] {
+                                         def process(file: File) =
+                                           checkAndCollectFile(file)
+                                       })
     }
 
     //if no scala files to compile, return empty seq

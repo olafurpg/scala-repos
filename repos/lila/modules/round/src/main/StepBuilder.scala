@@ -80,29 +80,27 @@ object StepBuilder {
           before <- steps lift (index - 1)
           after <- steps lift index
         } yield
-          steps
-            .updated(index,
-                     after
-                       .copy(nag = ad.nag.symbol.some,
-                             comments = ad
-                                 .makeComment(false, true) :: after.comments,
-                             variations =
-                               if (ad.info.variation.isEmpty)
-                                 after.variations
-                               else
-                                 makeVariation(
-                                   gameId,
-                                   before,
-                                   ad.info,
-                                   variant).toList :: after.variations))) | steps
+          steps.updated(index,
+                        after
+                          .copy(nag = ad.nag.symbol.some,
+                                comments = ad
+                                    .makeComment(false, true) :: after.comments,
+                                variations =
+                                  if (ad.info.variation.isEmpty)
+                                    after.variations
+                                  else
+                                    makeVariation(
+                                      gameId,
+                                      before,
+                                      ad.info,
+                                      variant).toList :: after.variations))) | steps
     }
 
   private def makeVariation(gameId: String,
                             fromStep: Step,
                             info: Info,
                             variant: Variant): List[Step] = {
-    chess.Replay
-      .gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
+    chess.Replay.gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
       case (games, error) =>
         error foreach logChessError(gameId)
         val lastPly = games.lastOption.??(_.turns)

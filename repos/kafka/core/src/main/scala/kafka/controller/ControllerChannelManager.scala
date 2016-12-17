@@ -145,11 +145,12 @@ class ControllerChannelManager(controllerContext: ControllerContext,
     }
     val threadName = threadNamePrefix match {
       case None =>
-        "Controller-%d-to-broker-%d-send-thread"
-          .format(config.brokerId, broker.id)
+        "Controller-%d-to-broker-%d-send-thread".format(config.brokerId,
+                                                        broker.id)
       case Some(name) =>
-        "%s:Controller-%d-to-broker-%d-send-thread"
-          .format(name, config.brokerId, broker.id)
+        "%s:Controller-%d-to-broker-%d-send-thread".format(name,
+                                                           config.brokerId,
+                                                           broker.id)
     }
 
     val requestThread = new RequestSendThread(config.brokerId,

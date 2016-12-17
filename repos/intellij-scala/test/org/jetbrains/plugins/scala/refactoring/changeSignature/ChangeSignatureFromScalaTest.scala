@@ -106,8 +106,9 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
 
   def testGenerics() = {
     def tpe =
-      ScalaPsiElementFactory
-        .createTypeFromText("T", targetMethod, targetMethod)
+      ScalaPsiElementFactory.createTypeFromText("T",
+                                                targetMethod,
+                                                targetMethod)
     doTest(null, "foo", "T", Seq(Seq(parameterInfo("t", 0, tpe))))
   }
 

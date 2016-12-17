@@ -59,8 +59,8 @@ private[io] class TcpListener(selectorRouter: ActorRef,
         throw new IllegalArgumentException(
           s"bound to unknown SocketAddress [$x]")
     }
-    channelRegistry
-      .register(channel, if (bind.pullMode) 0 else SelectionKey.OP_ACCEPT)
+    channelRegistry.register(channel,
+                             if (bind.pullMode) 0 else SelectionKey.OP_ACCEPT)
     log.debug("Successfully bound to {}", ret)
     bind.options.foreach {
       case o: Inet.SocketOptionV2 ⇒ o.afterBind(channel.socket)

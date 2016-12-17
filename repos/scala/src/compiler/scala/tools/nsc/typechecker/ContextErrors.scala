@@ -948,8 +948,7 @@ trait ContextErrors { self: Analyzer =>
           else msg
         macroLogLite("macro expansion has failed: %s".format(msgForLog))
         if (msg != null)
-          context
-            .error(if (pos.isDefined) pos else expandee.pos, msg) // issueTypeError(PosAndMsgTypeError(..)) won't work => swallows positions
+          context.error(if (pos.isDefined) pos else expandee.pos, msg) // issueTypeError(PosAndMsgTypeError(..)) won't work => swallows positions
         setError(expandee)
         throw MacroExpansionException
       }
@@ -1455,8 +1454,8 @@ trait ContextErrors { self: Analyzer =>
         val where =
           if (currentSym.isTopLevel != prevSym.isTopLevel) {
             val inOrOut = if (prevSym.isTopLevel) "outside of" else "in"
-            " %s package object %s"
-              .format(inOrOut, "" + prevSym.effectiveOwner.name)
+            " %s package object %s".format(inOrOut,
+                                           "" + prevSym.effectiveOwner.name)
           } else ""
 
         issueSymbolTypeError(

@@ -54,8 +54,11 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
       Row(1, 3) :: Row(2, 3) :: Row(3, 3) :: Nil
     )
 
-    val df1 = Seq(("a", 1, 0, "b"), ("b", 2, 4, "c"), ("a", 2, 3, "d"))
-      .toDF("key", "value1", "value2", "rest")
+    val df1 =
+      Seq(("a", 1, 0, "b"), ("b", 2, 4, "c"), ("a", 2, 3, "d")).toDF("key",
+                                                                     "value1",
+                                                                     "value2",
+                                                                     "rest")
 
     checkAnswer(
       df1.groupBy("key").min(),

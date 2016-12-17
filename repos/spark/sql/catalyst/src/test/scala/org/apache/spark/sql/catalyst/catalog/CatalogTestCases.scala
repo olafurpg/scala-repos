@@ -257,8 +257,9 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
   test("basic create and list partitions") {
     val catalog = newEmptyCatalog()
     catalog.createDatabase(newDb("mydb"), ignoreIfExists = false)
-    catalog
-      .createTable("mydb", newTable("tbl", "mydb"), ignoreIfExists = false)
+    catalog.createTable("mydb",
+                        newTable("tbl", "mydb"),
+                        ignoreIfExists = false)
     catalog.createPartitions("mydb",
                              "tbl",
                              Seq(part1, part2),
@@ -285,8 +286,10 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
   test("create partitions that already exist") {
     val catalog = newBasicCatalog()
     intercept[AnalysisException] {
-      catalog
-        .createPartitions("db2", "tbl2", Seq(part1), ignoreIfExists = false)
+      catalog.createPartitions("db2",
+                               "tbl2",
+                               Seq(part1),
+                               ignoreIfExists = false)
     }
     catalog.createPartitions("db2", "tbl2", Seq(part1), ignoreIfExists = true)
   }
@@ -333,8 +336,10 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
                              Seq(part3.spec),
                              ignoreIfNotExists = false)
     }
-    catalog
-      .dropPartitions("db2", "tbl2", Seq(part3.spec), ignoreIfNotExists = true)
+    catalog.dropPartitions("db2",
+                           "tbl2",
+                           Seq(part3.spec),
+                           ignoreIfNotExists = true)
   }
 
   test("get partition") {
@@ -361,8 +366,10 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
     val newPart1 = part1.copy(spec = Map("a" -> "100", "b" -> "101"))
     val newPart2 = part2.copy(spec = Map("a" -> "200", "b" -> "201"))
     val newSpecs = Seq(newPart1.spec, newPart2.spec)
-    catalog
-      .renamePartitions("db2", "tbl2", Seq(part1.spec, part2.spec), newSpecs)
+    catalog.renamePartitions("db2",
+                             "tbl2",
+                             Seq(part1.spec, part2.spec),
+                             newSpecs)
     assert(
       catalog
         .getPartition("db2", "tbl2", newPart1.spec)

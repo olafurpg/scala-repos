@@ -41,8 +41,9 @@ class ScalaGenerateToStringHandler extends LanguageCodeInsightActionHandler {
           val toStringMethod = createToString(aType, project)
 
           extensions.inWriteAction {
-            GenerationUtil
-              .addMembers(aType, toStringMethod.toList, editor.getDocument)
+            GenerationUtil.addMembers(aType,
+                                      toStringMethod.toList,
+                                      editor.getDocument)
           }
         }
     }
@@ -90,8 +91,9 @@ class ScalaGenerateToStringHandler extends LanguageCodeInsightActionHandler {
 
       val fieldsText = fieldsWtihNames.mkString(s"$typeName(", ", ", ")")
       val methodText = s"""override def toString = s"$fieldsText""""
-      ScalaPsiElementFactory
-        .createMethodWithContext(methodText, aType, aType.extendsBlock)
+      ScalaPsiElementFactory.createMethodWithContext(methodText,
+                                                     aType,
+                                                     aType.extendsBlock)
     }
   }
 

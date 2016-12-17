@@ -39,8 +39,8 @@ object MavenRepositorySystemFactory {
       }
     })
     // Here we register the Ivy <-> Aether transport bridge
-    locator
-      .addService(classOf[TransporterFactory], classOf[MyTransportFactory])
+    locator.addService(classOf[TransporterFactory],
+                       classOf[MyTransportFactory])
     // This connects the download mechanism to our transports.  Why is it needed? no clue.
     locator.addService(classOf[RepositoryConnectorFactory],
                        classOf[BasicRepositoryConnectorFactory])

@@ -20,8 +20,10 @@ class AkkaException(message: String = "", cause: Throwable = null)
     with Serializable {
   val uuid = "%s_%s".format(AkkaException.hostname, newUuid)
 
-  override lazy val toString = "%s: %s\n[%s]\n%s"
-    .format(getClass.getName, message, uuid, stackTraceToString)
+  override lazy val toString = "%s: %s\n[%s]\n%s".format(getClass.getName,
+                                                         message,
+                                                         uuid,
+                                                         stackTraceToString)
 
   def stackTraceToString = {
     val trace = getStackTrace

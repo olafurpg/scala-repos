@@ -148,8 +148,8 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
         implicit pos: Position) = {
 
       if (hasRepeatedParam(trgSym)) {
-        reporter
-          .error(pos, "You may not name-export a method with a *-parameter")
+        reporter.error(pos,
+                       "You may not name-export a method with a *-parameter")
       }
 
       val jsArgs = for {

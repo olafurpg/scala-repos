@@ -235,9 +235,12 @@ final class DenseMatrix[@spec(Double, Int, Float, Long) V](
     */
   def reshape(rows: Int, cols: Int, view: View = View.Prefer): DenseMatrix[V] = {
     val _cols = cols //if(cols < 0) size / rows else cols
-    require(rows * _cols == size,
-            "Cannot reshape a (%d,%d) matrix to a (%d,%d) matrix!"
-              .format(this.rows, this.cols, rows, _cols))
+    require(
+      rows * _cols == size,
+      "Cannot reshape a (%d,%d) matrix to a (%d,%d) matrix!".format(this.rows,
+                                                                    this.cols,
+                                                                    rows,
+                                                                    _cols))
 
     view match {
       case View.Require =>
@@ -314,8 +317,8 @@ final class DenseMatrix[@spec(Double, Int, Float, Long) V](
     if (row == 0) this(1 until rows, ::).copy
     else if (row == rows - 1) this(0 until rows - 1, ::).copy
     else
-      DenseMatrix
-        .vertcat(this(0 until row, ::), this((row + 1) until rows, ::))
+      DenseMatrix.vertcat(this(0 until row, ::),
+                          this((row + 1) until rows, ::))
   }
 
   def delete(col: Int, axis: Axis._1.type): DenseMatrix[V] = {
@@ -325,8 +328,8 @@ final class DenseMatrix[@spec(Double, Int, Float, Long) V](
     if (col == 0) this(::, 1 until cols).copy
     else if (col == cols - 1) this(::, 0 until cols - 1).copy
     else
-      DenseMatrix
-        .horzcat(this(::, 0 until col), this(::, (col + 1) until cols))
+      DenseMatrix.horzcat(this(::, 0 until col),
+                          this(::, (col + 1) until cols))
   }
 
   def delete(rows: Seq[Int], axis: Axis._0.type): DenseMatrix[V] = {

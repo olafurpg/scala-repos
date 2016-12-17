@@ -399,8 +399,8 @@ object ConsoleConsumer extends Logging {
       csvReporterProps.put("kafka.metrics.reporters",
                            "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
-        csvReporterProps
-          .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
+        csvReporterProps.put("kafka.csv.metrics.dir",
+                             options.valueOf(metricsDirectoryOpt))
       else csvReporterProps.put("kafka.csv.metrics.dir", "kafka_metrics")
       csvReporterProps.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(csvReporterProps)

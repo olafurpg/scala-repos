@@ -247,8 +247,9 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     override def toString = {
       val c = getClass.getSimpleName
       val l = c.lastIndexOf("$")
-      c.substring(c.lastIndexOf("$", l - 1) + 1, l) + delegate
-        .mkString("[", ", ", "]")
+      c.substring(c.lastIndexOf("$", l - 1) + 1, l) + delegate.mkString("[",
+                                                                        ", ",
+                                                                        "]")
     }
   }
 

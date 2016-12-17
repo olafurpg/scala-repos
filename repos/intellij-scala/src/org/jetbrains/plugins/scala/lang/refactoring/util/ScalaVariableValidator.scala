@@ -233,9 +233,10 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
   private def messageForLocal(name: String) =
     ScalaBundle.message("introduced.variable.will.conflict.with.local", name)
   private def messageForParameter(name: String) =
-    ScalaBundle
-      .message("introduced.variable.will.conflict.with.parameter", name)
+    ScalaBundle.message("introduced.variable.will.conflict.with.parameter",
+                        name)
   private def messageForClassParameter(name: String) =
-    ScalaBundle
-      .message("introduced.variable.will.conflict.with.class.parameter", name)
+    ScalaBundle.message(
+      "introduced.variable.will.conflict.with.class.parameter",
+      name)
 }

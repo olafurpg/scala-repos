@@ -57,8 +57,8 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   }
 
   def getDescription = {
-    val desc = Description
-      .createSuiteDescription(testClass.getName, testClass.getAnnotations: _*)
+    val desc = Description.createSuiteDescription(testClass.getName,
+                                                  testClass.getAnnotations: _*)
     for (ch <- children) desc.addChild(describeChild(ch))
     desc
   }

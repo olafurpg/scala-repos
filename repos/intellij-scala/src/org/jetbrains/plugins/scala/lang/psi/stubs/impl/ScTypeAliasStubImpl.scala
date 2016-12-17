@@ -69,8 +69,10 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
         return typeElement
     }
     if (getTypeElementText == "") return null
-    val res: ScTypeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(getTypeElementText, getPsi, null)
+    val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      getTypeElementText,
+      getPsi,
+      null)
     myTypeElement = new SofterReference[ScTypeElement](res)
     res
   }
@@ -84,8 +86,10 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
         return upperTypeElement
     }
     if (getUpperBoundElementText == "") return null
-    val res: ScTypeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(getUpperBoundElementText, getPsi, null)
+    val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      getUpperBoundElementText,
+      getPsi,
+      null)
     myUpperTypeElement = new SofterReference[ScTypeElement](res)
     res
   }
@@ -99,8 +103,10 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
         return lowerTypeElement
     }
     if (getLowerBoundElementText == "") return null
-    val res: ScTypeElement = ScalaPsiElementFactory
-      .createTypeElementFromText(getLowerBoundElementText, getPsi, null)
+    val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+      getLowerBoundElementText,
+      getPsi,
+      null)
     myLowerTypeElement = new SofterReference[ScTypeElement](res)
     res
   }

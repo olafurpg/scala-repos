@@ -105,8 +105,9 @@ class StringConverterSpec extends FlatSpec {
                                 value: T,
                                 converterName: String,
                                 typeName: String) {
-    converterName should "convert '%s' in a %s and vice-versa"
-      .format(string, typeName) in {
+    converterName should "convert '%s' in a %s and vice-versa".format(
+      string,
+      typeName) in {
       val numericValue = converter.fromString(string)
       numericValue should equal(value)
       converter.toString(numericValue) should equal(string)

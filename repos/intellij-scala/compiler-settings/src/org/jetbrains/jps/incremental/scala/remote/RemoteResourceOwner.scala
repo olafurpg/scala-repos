@@ -55,8 +55,8 @@ trait RemoteResourceOwner {
                 val s = new String(data)
                 if (s.length > 50) s.substring(0, 50) + "..." else s
               }
-              client
-                .message(Kind.ERROR, "Unable to read an event from: " + chars)
+              client.message(Kind.ERROR,
+                             "Unable to read an event from: " + chars)
               client.trace(e)
           }
         // Main server class redirects all (unexpected) stdout data to stderr.

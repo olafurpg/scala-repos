@@ -23,8 +23,10 @@ object Puzzle extends LilaController {
   private def renderShow(puzzle: PuzzleModel, mode: String)(
       implicit ctx: Context) =
     env userInfos ctx.me map { infos =>
-      views.html.puzzle
-        .show(puzzle, infos, mode, animationDuration = env.AnimationDuration)
+      views.html.puzzle.show(puzzle,
+                             infos,
+                             mode,
+                             animationDuration = env.AnimationDuration)
     }
 
   def daily = Open { implicit ctx =>

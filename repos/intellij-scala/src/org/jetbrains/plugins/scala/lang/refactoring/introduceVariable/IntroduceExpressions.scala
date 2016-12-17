@@ -55,8 +55,10 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
       UsageTrigger.trigger(ScalaBundle.message("introduce.variable.id"))
 
       PsiDocumentManager.getInstance(project).commitAllDocuments()
-      ScalaRefactoringUtil
-        .checkFile(file, project, editor, INTRODUCE_VARIABLE_REFACTORING_NAME)
+      ScalaRefactoringUtil.checkFile(file,
+                                     project,
+                                     editor,
+                                     INTRODUCE_VARIABLE_REFACTORING_NAME)
       val (expr: ScExpression, types: Array[ScType]) = ScalaRefactoringUtil
         .getExpression(project, editor, file, startOffset, endOffset)
         .getOrElse(
@@ -325,8 +327,9 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
       oneLineSelected && !insideExpression
     }
 
-    val revertInfo = ScalaRefactoringUtil
-      .RevertInfo(file.getText, editor.getCaretModel.getOffset)
+    val revertInfo = ScalaRefactoringUtil.RevertInfo(
+      file.getText,
+      editor.getCaretModel.getOffset)
     editor.putUserData(ScalaIntroduceVariableHandler.REVERT_INFO, revertInfo)
 
     val typeName = if (varType != null) varType.canonicalText else ""
@@ -579,8 +582,10 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
               endOffset: Int,
               replaceAll: Boolean) {
     PsiDocumentManager.getInstance(project).commitAllDocuments()
-    ScalaRefactoringUtil
-      .checkFile(file, project, editor, INTRODUCE_VARIABLE_REFACTORING_NAME)
+    ScalaRefactoringUtil.checkFile(file,
+                                   project,
+                                   editor,
+                                   INTRODUCE_VARIABLE_REFACTORING_NAME)
 
     val (expr: ScExpression, types: Array[ScType]) = ScalaRefactoringUtil
       .getExpression(project, editor, file, startOffset, endOffset)

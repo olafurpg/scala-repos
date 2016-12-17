@@ -72,8 +72,8 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       configProps.put("controlled.shutdown.enable",
                       String.valueOf(enableControlledShutdown))
       configProps.put("controlled.shutdown.max.retries", String.valueOf(1))
-      configProps
-        .put("controlled.shutdown.retry.backoff.ms", String.valueOf(1000))
+      configProps.put("controlled.shutdown.retry.backoff.ms",
+                      String.valueOf(1000))
     }
 
     // temporarily set loggers to a higher level so that tests run quietly

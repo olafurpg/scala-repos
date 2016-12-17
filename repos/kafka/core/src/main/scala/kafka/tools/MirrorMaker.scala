@@ -414,8 +414,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     // Disable consumer auto offsets commit to prevent data loss.
     maybeSetDefaultProperty(consumerConfigProps, "enable.auto.commit", "false")
     // Hardcode the deserializer to ByteArrayDeserializer
-    consumerConfigProps
-      .setProperty("key.deserializer", classOf[ByteArrayDeserializer].getName)
+    consumerConfigProps.setProperty("key.deserializer",
+                                    classOf[ByteArrayDeserializer].getName)
     consumerConfigProps.setProperty("value.deserializer",
                                     classOf[ByteArrayDeserializer].getName)
     // The default client id is group id, we manually set client id to groupId-index to avoid metric collision
@@ -470,8 +470,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
                                       propertyName: String,
                                       defaultValue: String) {
     val propertyValue = properties.getProperty(propertyName)
-    properties
-      .setProperty(propertyName, Option(propertyValue).getOrElse(defaultValue))
+    properties.setProperty(propertyName,
+                           Option(propertyValue).getOrElse(defaultValue))
     if (properties.getProperty(propertyName) != defaultValue)
       info(
         "Property %s is overridden to %s - data loss or message reordering is possible."

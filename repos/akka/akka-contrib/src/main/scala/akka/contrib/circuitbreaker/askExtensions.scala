@@ -53,8 +53,9 @@ object Implicits {
   def askWithCircuitBreaker(circuitBreakerProxy: ActorRef, message: Any)(
       implicit executionContext: ExecutionContext,
       timeout: Timeout): Future[Any] =
-    circuitBreakerProxy
-      .internalAskWithCircuitBreaker(message, timeout, ActorRef.noSender)
+    circuitBreakerProxy.internalAskWithCircuitBreaker(message,
+                                                      timeout,
+                                                      ActorRef.noSender)
 
   /**
     * Wraps the `ask` method in [[akka.pattern.AskSupport]] method to convert failures connected to the circuit

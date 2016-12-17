@@ -40,8 +40,9 @@ object AdaptiveLoadBalancingRouterMultiJvmSpec extends MultiNodeConfig {
         // getMax can be undefined (-1)
         val max = math.max(heap.getMax, heap.getCommitted)
         val used = heap.getUsed
-        log
-          .info("used heap before: [{}] bytes, of max [{}]", used, heap.getMax)
+        log.info("used heap before: [{}] bytes, of max [{}]",
+                 used,
+                 heap.getMax)
         // allocate 70% of free space
         val allocateBytes = (0.7 * (max - used)).toInt
         val numberOfArrays = allocateBytes / 1024

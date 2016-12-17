@@ -78,8 +78,11 @@ class PersistenceEngineSuite extends SparkFunSuite {
       assert(persistenceEngine.read[String]("test_").isEmpty)
 
       // Test deserializing objects that contain RpcEndpointRef
-      val testRpcEnv = RpcEnv
-        .create("test", "localhost", 12345, conf, new SecurityManager(conf))
+      val testRpcEnv = RpcEnv.create("test",
+                                     "localhost",
+                                     12345,
+                                     conf,
+                                     new SecurityManager(conf))
       try {
         // Create a real endpoint so that we can test RpcEndpointRef deserialization
         val workerEndpoint =

@@ -201,8 +201,9 @@ class DefaultHttpErrorHandler(environment: Environment,
       case Mode.Prod =>
         views.html.defaultpages.notFound(request.method, request.uri)
       case _ =>
-        views.html.defaultpages
-          .devNotFound(request.method, request.uri, router)
+        views.html.defaultpages.devNotFound(request.method,
+                                            request.uri,
+                                            router)
     }))
   }
 
@@ -267,8 +268,9 @@ class DefaultHttpErrorHandler(environment: Environment,
     Logger.error("""
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
-                    | """.stripMargin
-                   .format(usefulException.id, request.method, request.uri),
+                    | """.stripMargin.format(usefulException.id,
+                                             request.method,
+                                             request.uri),
                  usefulException)
   }
 

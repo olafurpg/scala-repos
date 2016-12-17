@@ -161,8 +161,11 @@ class RandomRDDsSuite
                        math.sqrt(poissonMean),
                        0.1)
 
-      val exponential = RandomRDDs
-        .exponentialRDD(sc, exponentialMean, size, numPartitions, seed)
+      val exponential = RandomRDDs.exponentialRDD(sc,
+                                                  exponentialMean,
+                                                  size,
+                                                  numPartitions,
+                                                  seed)
       testGeneratedRDD(exponential,
                        size,
                        numPartitions,
@@ -170,8 +173,12 @@ class RandomRDDsSuite
                        exponentialMean,
                        0.1)
 
-      val gamma = RandomRDDs
-        .gammaRDD(sc, gammaShape, gammaScale, size, numPartitions, seed)
+      val gamma = RandomRDDs.gammaRDD(sc,
+                                      gammaShape,
+                                      gammaScale,
+                                      size,
+                                      numPartitions,
+                                      seed)
       testGeneratedRDD(gamma, size, numPartitions, gammaMean, gammaStd, 0.1)
     }
 
@@ -230,8 +237,12 @@ class RandomRDDsSuite
                              math.sqrt(poissonMean),
                              0.1)
 
-      val exponential = RandomRDDs
-        .exponentialVectorRDD(sc, exponentialMean, rows, cols, parts, seed)
+      val exponential = RandomRDDs.exponentialVectorRDD(sc,
+                                                        exponentialMean,
+                                                        rows,
+                                                        cols,
+                                                        parts,
+                                                        seed)
       testGeneratedVectorRDD(exponential,
                              rows,
                              cols,
@@ -240,8 +251,13 @@ class RandomRDDsSuite
                              exponentialMean,
                              0.1)
 
-      val gamma = RandomRDDs
-        .gammaVectorRDD(sc, gammaShape, gammaScale, rows, cols, parts, seed)
+      val gamma = RandomRDDs.gammaVectorRDD(sc,
+                                            gammaShape,
+                                            gammaScale,
+                                            rows,
+                                            cols,
+                                            parts,
+                                            seed)
       testGeneratedVectorRDD(gamma,
                              rows,
                              cols,

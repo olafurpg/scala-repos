@@ -613,8 +613,8 @@ class SingleAbstractMethodTest
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert
-      .assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert.assertTrue("actual: " + actual.toString,
+                      pattern.isDefinedAt(actual))
   }
 
   def parseText(@Language("Scala") s: String): ScalaFile = {

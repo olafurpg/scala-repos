@@ -176,7 +176,9 @@ object RunServer extends Logging {
         .getOrElse(Nil) ++ Seq("--json-extractor",
                                ca.common.jsonExtractor.toString)
 
-    Runner
-      .runOnSpark("io.prediction.workflow.CreateServer", args, ca, jarFiles)
+    Runner.runOnSpark("io.prediction.workflow.CreateServer",
+                      args,
+                      ca,
+                      jarFiles)
   }
 }

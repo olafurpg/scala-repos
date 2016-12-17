@@ -226,8 +226,8 @@ abstract class BaseYarnClusterSuite
     props.put("spark.executor.extraClassPath", testClasspath)
 
     // SPARK-4267: make sure java options are propagated correctly.
-    props
-      .setProperty("spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
+    props.setProperty("spark.driver.extraJavaOptions",
+                      "-Dfoo=\"one two three\"")
     props.setProperty("spark.executor.extraJavaOptions",
                       "-Dfoo=\"one two three\"")
 

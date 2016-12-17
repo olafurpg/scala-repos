@@ -50,8 +50,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context
-          .become(waiting(context.children.size, sender()), discardOld = false)
+        context.become(waiting(context.children.size, sender()),
+                       discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {
@@ -80,8 +80,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context
-          .become(waiting(context.children.size, sender()), discardOld = false)
+        context.become(waiting(context.children.size, sender()),
+                       discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {

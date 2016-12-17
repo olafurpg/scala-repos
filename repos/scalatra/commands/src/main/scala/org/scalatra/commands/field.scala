@@ -193,8 +193,9 @@ trait DataboundFieldDescriptor[S, T] extends FieldDescriptor[T] {
     this.asInstanceOf[DataboundFieldDescriptor[V, T]]
 
   override def toString() =
-    "FieldDescriptor(name: %s, original: %s, value: %s)"
-      .format(name, original, value)
+    "FieldDescriptor(name: %s, original: %s, value: %s)".format(name,
+                                                                original,
+                                                                value)
   def validate: ValidatedFieldDescriptor[S, T]
   def validateWith(
       bindingValidators: BindingValidator[T]*): DataboundFieldDescriptor[S, T]
@@ -247,8 +248,10 @@ class BoundFieldDescriptor[S, T](val original: Option[S],
     case _ => false
   }
   override def toString() =
-    "BoundFieldDescriptor(name: %s, original: %s, converted: %s)"
-      .format(name, original, value)
+    "BoundFieldDescriptor(name: %s, original: %s, converted: %s)".format(
+      name,
+      original,
+      value)
 
   def validateWith(bindingValidators: BindingValidator[T]*)
     : DataboundFieldDescriptor[S, T] = {
@@ -332,8 +335,10 @@ class ValidatedBoundFieldDescriptor[S, T](
     case _ => false
   }
   override def toString() =
-    "BoundFieldDescriptor(name: %s, original: %s, converted: %s)"
-      .format(name, original, value)
+    "BoundFieldDescriptor(name: %s, original: %s, converted: %s)".format(
+      name,
+      original,
+      value)
 
   def validateWith(bindingValidators: BindingValidator[T]*)
     : DataboundFieldDescriptor[S, T] = {

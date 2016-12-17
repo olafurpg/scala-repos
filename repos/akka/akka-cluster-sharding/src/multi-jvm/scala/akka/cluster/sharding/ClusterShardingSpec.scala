@@ -271,8 +271,10 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
       if (settings.stateStoreMode == "persistence")
         ShardCoordinator.props(typeName, settings, allocationStrategy)
       else
-        ShardCoordinator
-          .props(typeName, settings, allocationStrategy, replicator)
+        ShardCoordinator.props(typeName,
+                               settings,
+                               allocationStrategy,
+                               replicator)
     }
 
     List("counter",

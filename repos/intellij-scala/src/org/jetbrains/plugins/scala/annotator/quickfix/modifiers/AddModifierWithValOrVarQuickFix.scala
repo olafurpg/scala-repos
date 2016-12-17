@@ -19,12 +19,16 @@ class AddModifierWithValOrVarQuickFix(member: ScModifierListOwner,
   override def invoke(project: Project, editor: Editor, file: PsiFile) = {
     val psiKeyword =
       if (addVal) {
-        val decl = ScalaPsiElementFactory
-          .createDeclarationFromText("val x", member.getParent, member)
+        val decl = ScalaPsiElementFactory.createDeclarationFromText(
+          "val x",
+          member.getParent,
+          member)
         decl.findFirstChildByType(ScalaTokenTypes.kVAL)
       } else {
-        val decl = ScalaPsiElementFactory
-          .createDeclarationFromText("var x", member.getParent, member)
+        val decl = ScalaPsiElementFactory.createDeclarationFromText(
+          "var x",
+          member.getParent,
+          member)
         decl.findFirstChildByType(ScalaTokenTypes.kVAR)
       }
     member.addAfter(psiKeyword, member.getModifierList)

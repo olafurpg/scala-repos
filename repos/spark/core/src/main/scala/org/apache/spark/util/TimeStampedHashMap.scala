@@ -47,8 +47,9 @@ private[spark] class TimeStampedHashMap[A, B](
   def get(key: A): Option[B] = {
     val value = internalMap.get(key)
     if (value != null && updateTimeStampOnGet) {
-      internalMap
-        .replace(key, value, TimeStampedValue(value.value, currentTime))
+      internalMap.replace(key,
+                          value,
+                          TimeStampedValue(value.value, currentTime))
     }
     Option(value).map(_.value)
   }

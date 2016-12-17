@@ -299,8 +299,7 @@ class ScalaLookupItem(val element: PsiNamedElement,
             false)
           val useFullyQualifiedName =
             PsiTreeUtil.getParentOfType(ref, classOf[ScImportStmt]) != null &&
-              PsiTreeUtil
-                .getParentOfType(ref, classOf[ScImportSelectors]) == null //do not complete in sel
+              PsiTreeUtil.getParentOfType(ref, classOf[ScImportSelectors]) == null //do not complete in sel
           if (ref == null) return
           while (ref.getParent != null &&
                  ref.getParent.isInstanceOf[ScReferenceElement] &&
@@ -326,15 +325,15 @@ class ScalaLookupItem(val element: PsiNamedElement,
               val parts = cl.qualifiedName.split('.')
               if (parts.length > 1) {
                 val newRefText = parts.takeRight(2).mkString(".")
-                ScalaPsiElementFactory
-                  .createReferenceFromText(newRefText, ref.getManager)
+                ScalaPsiElementFactory.createReferenceFromText(newRefText,
+                                                               ref.getManager)
               } else {
                 ref.createReplacingElementWithClassName(useFullyQualifiedName,
                                                         cl)
               }
             case _ =>
-              ref
-                .createReplacingElementWithClassName(useFullyQualifiedName, cl)
+              ref.createReplacingElementWithClassName(useFullyQualifiedName,
+                                                      cl)
           }
           ref.getNode.getTreeParent.replaceChild(ref.getNode, newRef.getNode)
           newRef.bindToElement(cl.element)

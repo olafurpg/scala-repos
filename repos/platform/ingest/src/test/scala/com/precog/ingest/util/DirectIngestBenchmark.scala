@@ -85,8 +85,8 @@ object DirectKafkaProducer extends App {
   val config = new Properties()
   config.put("broker.list", "0:localhost:9092")
   config.put("enable.zookeeper", "false")
-  config
-    .put("serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
+  config.put("serializer.class",
+             "com.precog.ingest.kafka.KafkaIngestMessageCodec")
 
   val producer =
     new Producer[String, IngestMessage](new ProducerConfig(config))

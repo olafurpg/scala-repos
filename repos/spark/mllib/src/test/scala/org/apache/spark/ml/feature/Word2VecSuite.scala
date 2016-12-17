@@ -81,8 +81,9 @@ class Word2VecSuite
 
     // These expectations are just magic values, characterizing the current
     // behavior.  The test needs to be updated to be more general, see SPARK-11502
-    val magicExp = Vectors
-      .dense(0.30153007534417237, -0.6833061711354689, 0.5116530778733167)
+    val magicExp = Vectors.dense(0.30153007534417237,
+                                 -0.6833061711354689,
+                                 0.5116530778733167)
     model.transform(docDF).select("result", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
         assert(vector1 ~== magicExp absTol 1E-5,

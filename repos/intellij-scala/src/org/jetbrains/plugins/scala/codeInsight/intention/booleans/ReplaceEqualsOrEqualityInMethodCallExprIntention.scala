@@ -86,8 +86,9 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
       .append(replaceOper(oper))
       .append(methodCallExpr.args.getText)
 
-    val newMethodCallExpr = ScalaPsiElementFactory
-      .createExpressionFromText(expr.toString(), element.getManager)
+    val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
+      expr.toString(),
+      element.getManager)
 
     val size =
       newMethodCallExpr

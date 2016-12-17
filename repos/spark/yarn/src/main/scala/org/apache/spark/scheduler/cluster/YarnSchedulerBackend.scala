@@ -47,8 +47,9 @@ private[spark] abstract class YarnSchedulerBackend(
 
   private val yarnSchedulerEndpoint = new YarnSchedulerEndpoint(rpcEnv)
 
-  private val yarnSchedulerEndpointRef = rpcEnv
-    .setupEndpoint(YarnSchedulerBackend.ENDPOINT_NAME, yarnSchedulerEndpoint)
+  private val yarnSchedulerEndpointRef = rpcEnv.setupEndpoint(
+    YarnSchedulerBackend.ENDPOINT_NAME,
+    yarnSchedulerEndpoint)
 
   private implicit val askTimeout = RpcUtils.askRpcTimeout(sc.conf)
 

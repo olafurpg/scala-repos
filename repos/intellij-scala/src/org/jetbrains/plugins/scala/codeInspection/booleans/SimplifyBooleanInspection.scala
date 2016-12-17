@@ -119,8 +119,8 @@ object SimplifyBooleanUtil {
         else {
           booleanConst(operand) match {
             case Some(bool: Boolean) =>
-              ScalaPsiElementFactory
-                .createExpressionFromText((!bool).toString, expr.getManager)
+              ScalaPsiElementFactory.createExpressionFromText((!bool).toString,
+                                                              expr.getManager)
             case None => expr
           }
         }

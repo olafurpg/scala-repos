@@ -42,8 +42,9 @@ class RemoteServerRunner(project: Project) extends RemoteResourceOwner {
           send(serverAlias, arguments, client)
         } catch {
           case e: ConnectException =>
-            val message = "Cannot connect to compile server at %s:%s"
-              .format(address.toString, port)
+            val message = "Cannot connect to compile server at %s:%s".format(
+              address.toString,
+              port)
             client.error(message)
             client.debug(
               s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")

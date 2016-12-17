@@ -142,8 +142,9 @@ case class ScExistentialType(quantified: ScType,
       case (_, _, newData) =>
         try {
           ScExistentialType(
-            quantified
-              .recursiveVarianceUpdateModifiable(newData, update, variance),
+            quantified.recursiveVarianceUpdateModifiable(newData,
+                                                         update,
+                                                         variance),
             wildcards.map(
               _.recursiveVarianceUpdateModifiable(newData, update, variance)))
         } catch {
@@ -213,8 +214,10 @@ case class ScExistentialType(quantified: ScType,
       case ex: ScExistentialType =>
         val simplified = ex.simplify()
         if (ex != simplified)
-          return Equivalence
-            .equivInner(this, simplified, undefinedSubst, falseUndef)
+          return Equivalence.equivInner(this,
+                                        simplified,
+                                        undefinedSubst,
+                                        falseUndef)
         val list = wildcards.zip(ex.wildcards)
         val iterator = list.iterator
         while (iterator.hasNext) {
@@ -223,8 +226,7 @@ case class ScExistentialType(quantified: ScType,
           if (!t._1) return (false, undefinedSubst)
           undefinedSubst = t._2
         }
-        Equivalence
-          .equivInner(skolem, ex.skolem, undefinedSubst, falseUndef) //todo: probable problems with different positions of skolemized types.
+        Equivalence.equivInner(skolem, ex.skolem, undefinedSubst, falseUndef) //todo: probable problems with different positions of skolemized types.
       case _ => (false, undefinedSubst)
     }
   }

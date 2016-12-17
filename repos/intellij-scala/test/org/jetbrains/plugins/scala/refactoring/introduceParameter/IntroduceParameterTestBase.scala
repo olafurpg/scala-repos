@@ -118,8 +118,9 @@ abstract class IntroduceParameterTestBase
               handler.collectData(exprWithTypes, elems, methodLike, editor)
             assert(collectedData.isDefined,
                    "Could not collect data for introduce parameter")
-            val data = collectedData.get
-              .copy(paramName = paramName, replaceAll = replaceAllOccurrences)
+            val data = collectedData.get.copy(paramName = paramName,
+                                              replaceAll =
+                                                replaceAllOccurrences)
 
             val paramInfo =
               new ScalaParameterInfo(data.paramName,

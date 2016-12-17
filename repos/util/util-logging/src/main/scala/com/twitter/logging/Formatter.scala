@@ -198,8 +198,9 @@ class Formatter(val timezone: Option[String] = None,
     val prefix = formatPrefix(record.getLevel,
                               dateFormat.format(new Date(record.getMillis)),
                               name)
-    formatMessageLines(record)
-      .mkString(prefix, lineTerminator + prefix, lineTerminator)
+    formatMessageLines(record).mkString(prefix,
+                                        lineTerminator + prefix,
+                                        lineTerminator)
   }
 
   /**

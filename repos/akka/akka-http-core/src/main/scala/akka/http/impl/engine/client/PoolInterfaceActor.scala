@@ -60,8 +60,9 @@ private class PoolInterfaceActor(
     Buffer[PoolRequest](hcps.setup.settings.maxOpenRequests, fm)
   private[this] var activeIdleTimeout: Option[Cancellable] = None
 
-  log
-    .debug("(Re-)starting host connection pool to {}:{}", hcps.host, hcps.port)
+  log.debug("(Re-)starting host connection pool to {}:{}",
+            hcps.host,
+            hcps.port)
 
   initConnectionFlow()
 

@@ -37,8 +37,9 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
       val tpe = UnaryOperationType(JArrayUnfixedT, JType.JUniverseT)
 
-      override val idPolicy = IdentityPolicy
-        .Product(IdentityPolicy.Retain.Merge, IdentityPolicy.Synthesize)
+      override val idPolicy = IdentityPolicy.Product(
+        IdentityPolicy.Retain.Merge,
+        IdentityPolicy.Synthesize)
 
       def apply(table: Table, ctx: MorphContext) = M point {
         val derefed =

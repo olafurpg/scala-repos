@@ -47,8 +47,9 @@ object VectorSlicerExample {
       new AttributeGroup("userFeatures", attrs.asInstanceOf[Array[Attribute]])
 
     val dataRDD = sc.parallelize(data)
-    val dataset = sqlContext
-      .createDataFrame(dataRDD, StructType(Array(attrGroup.toStructField())))
+    val dataset = sqlContext.createDataFrame(
+      dataRDD,
+      StructType(Array(attrGroup.toStructField())))
 
     val slicer =
       new VectorSlicer().setInputCol("userFeatures").setOutputCol("features")

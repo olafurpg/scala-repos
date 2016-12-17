@@ -354,8 +354,8 @@ trait Implicits { self: Analyzer =>
   object HasMember {
     private val hasMemberCache = perRunCaches.newMap[Name, Type]()
     def apply(name: Name): Type =
-      hasMemberCache
-        .getOrElseUpdate(name, memberWildcardType(name, WildcardType))
+      hasMemberCache.getOrElseUpdate(name,
+                                     memberWildcardType(name, WildcardType))
   }
 
   /** An extractor for types of the form ? { name: (? >: argtpe <: Any*)restp }
@@ -1419,9 +1419,12 @@ trait Implicits { self: Analyzer =>
                          List(tp),
                          if (prefix != EmptyTree) List(prefix) else List()))
       if (settings.XlogImplicits)
-        reporter.echo(pos,
-                      "materializing requested %s.%s[%s] using %s"
-                        .format(pre, tagClass.name, tp, materializer))
+        reporter.echo(
+          pos,
+          "materializing requested %s.%s[%s] using %s".format(pre,
+                                                              tagClass.name,
+                                                              tp,
+                                                              materializer))
       if (context.macrosEnabled) success(materializer)
       // don't call `failure` here. if macros are disabled, we just fail silently
       // otherwise -Xlog-implicits will spam the long with zillions of "macros are disabled"

@@ -265,8 +265,10 @@ class YarnAllocatorSuite
     }
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus
-        .newInstance(c.getId(), ContainerState.COMPLETE, "Finished", 0)
+      ContainerStatus.newInstance(c.getId(),
+                                  ContainerState.COMPLETE,
+                                  "Finished",
+                                  0)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)
@@ -287,8 +289,10 @@ class YarnAllocatorSuite
     handler.requestTotalExecutorsWithPreferredLocalities(2, 0, Map())
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus
-        .newInstance(c.getId(), ContainerState.COMPLETE, "Failed", -1)
+      ContainerStatus.newInstance(c.getId(),
+                                  ContainerState.COMPLETE,
+                                  "Failed",
+                                  -1)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)

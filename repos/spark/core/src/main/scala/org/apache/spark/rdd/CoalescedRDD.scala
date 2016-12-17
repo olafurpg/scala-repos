@@ -274,8 +274,7 @@ private class PartitionCoalescer(maxPartitions: Int,
         val pgroup = PartitionGroup(nxt_replica)
         groupArr += pgroup
         addPartToPGroup(nxt_part, pgroup)
-        groupHash
-          .put(nxt_replica, ArrayBuffer(pgroup)) // list in case we have multiple
+        groupHash.put(nxt_replica, ArrayBuffer(pgroup)) // list in case we have multiple
         numCreated += 1
       }
     }

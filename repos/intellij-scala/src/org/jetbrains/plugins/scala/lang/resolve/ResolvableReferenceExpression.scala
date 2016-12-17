@@ -232,10 +232,10 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             val state: ResolveState = ResolveState
               .initial()
               .put(CachesUtil.NAMED_PARAM_KEY, java.lang.Boolean.TRUE)
-            processor.execute(
-              ScalaPsiElementFactory
-                .createParameterFromText(ref.refName + ": Any", getManager),
-              state)
+            processor.execute(ScalaPsiElementFactory.createParameterFromText(
+                                ref.refName + ": Any",
+                                getManager),
+                              state)
           }
         case ScalaResolveResult(named, subst)
             if call.applyOrUpdateElement.exists(_.isDynamic) &&
@@ -245,10 +245,10 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             val state: ResolveState = ResolveState
               .initial()
               .put(CachesUtil.NAMED_PARAM_KEY, java.lang.Boolean.TRUE)
-            processor.execute(
-              ScalaPsiElementFactory
-                .createParameterFromText(ref.refName + ": Any", getManager),
-              state)
+            processor.execute(ScalaPsiElementFactory.createParameterFromText(
+                                ref.refName + ": Any",
+                                getManager),
+                              state)
           }
         case ScalaResolveResult(fun: ScFunction, subst: ScSubstitutor) =>
           if (!processor.isInstanceOf[CompletionProcessor]) {
@@ -391,8 +391,7 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             candidate match {
               case ScalaResolveResult(fun: ScFunction, subst: ScSubstitutor) =>
                 if (!baseProcessor.isInstanceOf[CompletionProcessor]) {
-                  fun
-                    .getParamByName(ref.refName, arguments.indexOf(args)) match {
+                  fun.getParamByName(ref.refName, arguments.indexOf(args)) match {
                     case Some(param) =>
                       var state = ResolveState.initial
                         .put(ScSubstitutor.key, subst)
@@ -400,8 +399,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                              java.lang.Boolean.TRUE)
                       if (!ScalaPsiUtil.memberNamesEquals(param.name,
                                                           ref.refName)) {
-                        state = state
-                          .put(ResolverEnv.nameKey, param.deprecatedName.get)
+                        state = state.put(ResolverEnv.nameKey,
+                                          param.deprecatedName.get)
                       }
                       baseProcessor.execute(param, state)
                     case None =>
@@ -614,8 +613,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
           }
           val argumentExpressions = callOption.map(_.argumentExpressions)
           val emptyStringExpression =
-            ScalaPsiElementFactory
-              .createExpressionFromText("\"\"", e.getManager)
+            ScalaPsiElementFactory.createExpressionFromText("\"\"",
+                                                            e.getManager)
           import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceExpression._
           val name = callOption match {
             case Some(call) => getDynamicNameForMethodInvocation(call)

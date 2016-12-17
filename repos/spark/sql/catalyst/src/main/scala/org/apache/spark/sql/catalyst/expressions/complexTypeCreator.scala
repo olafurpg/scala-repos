@@ -32,8 +32,8 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
   override def foldable: Boolean = children.forall(_.foldable)
 
   override def checkInputDataTypes(): TypeCheckResult =
-    TypeUtils
-      .checkForSameTypeInputExpr(children.map(_.dataType), "function array")
+    TypeUtils.checkForSameTypeInputExpr(children.map(_.dataType),
+                                        "function array")
 
   override def dataType: DataType = {
     ArrayType(children.headOption.map(_.dataType).getOrElse(NullType),

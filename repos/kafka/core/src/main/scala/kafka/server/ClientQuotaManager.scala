@@ -80,8 +80,9 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
 
   private val delayQueueSensor = metrics.sensor(apiKey + "-delayQueue")
   delayQueueSensor.add(
-    metrics
-      .metricName("queue-size", apiKey, "Tracks the size of the delay queue"),
+    metrics.metricName("queue-size",
+                       apiKey,
+                       "Tracks the size of the delay queue"),
     new Total())
 
   /**

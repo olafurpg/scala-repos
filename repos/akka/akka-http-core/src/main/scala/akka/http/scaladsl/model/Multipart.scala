@@ -67,8 +67,8 @@ sealed trait Multipart extends jm.Multipart {
                                     partHeadersSizeHint = 128,
                                     log))
       .flatMapConcat(ConstantFun.scalaIdentityFunction)
-    HttpEntity
-      .Chunked(mediaType withBoundary boundary withCharset charset, chunks)
+    HttpEntity.Chunked(mediaType withBoundary boundary withCharset charset,
+                       chunks)
   }
 
   /** Java API */

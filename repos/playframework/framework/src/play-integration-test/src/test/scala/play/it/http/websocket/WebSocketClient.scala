@@ -175,8 +175,10 @@ object WebSocketClient {
                                 ctx.name,
                                 "websocket-subscriber",
                                 subscriber)
-          ctx.pipeline
-            .addAfter(ctx.executor, ctx.name, "websocket-publisher", publisher)
+          ctx.pipeline.addAfter(ctx.executor,
+                                ctx.name,
+                                "websocket-publisher",
+                                publisher)
 
           // Now remove ourselves from the chain
           ctx.pipeline.remove(ctx.name)

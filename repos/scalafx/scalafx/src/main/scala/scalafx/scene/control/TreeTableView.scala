@@ -342,8 +342,10 @@ object TreeTableView {
                     minColumn: TableColumnBase[jfxsc.TreeItem[S], _],
                     maxRow: Int,
                     maxColumn: TableColumnBase[jfxsc.TreeItem[S], _]) {
-      delegate
-        .selectRange(minRow, minColumn.delegate, maxRow, maxColumn.delegate)
+      delegate.selectRange(minRow,
+                           minColumn.delegate,
+                           maxRow,
+                           maxColumn.delegate)
     }
 
     /**

@@ -142,8 +142,7 @@ object PatternAnnotator {
         val (exprTypeText, patTypeText) =
           ScTypePresentation.different(exprType, patType)
         val message =
-          ScalaBundle
-            .message("fruitless.type.test", exprTypeText, patTypeText) +
+          ScalaBundle.message("fruitless.type.test", exprTypeText, patTypeText) +
             erasureWarn
         holder.createWarningAnnotation(pattern, message)
       case StableIdResolvesToVar() =>

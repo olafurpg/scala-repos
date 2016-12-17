@@ -46,8 +46,9 @@ class InitializeListener
 
       // Load plugins
       logger.debug("Initialize plugins")
-      PluginRegistry
-        .initialize(event.getServletContext, loadSystemSettings(), conn)
+      PluginRegistry.initialize(event.getServletContext,
+                                loadSystemSettings(),
+                                conn)
     }
 
     // Start Quartz scheduler

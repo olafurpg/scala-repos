@@ -37,8 +37,9 @@ private[spark] class ExecutorSource(threadPool: ThreadPoolExecutor,
                                         name: String,
                                         f: FileSystem.Statistics => T,
                                         defaultValue: T) = {
-    metricRegistry
-      .register(MetricRegistry.name("filesystem", scheme, name), new Gauge[T] {
+    metricRegistry.register(
+      MetricRegistry.name("filesystem", scheme, name),
+      new Gauge[T] {
         override def getValue: T =
           fileStats(scheme).map(f).getOrElse(defaultValue)
       })

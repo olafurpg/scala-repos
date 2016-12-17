@@ -38,8 +38,8 @@ private[std] sealed trait FutureInstances1 extends FutureInstances2 {
       implicit ec: E): PartialOrder[Future[A]] =
     new PartialOrder[Future[A]] {
       def partialCompare(x: Future[A], y: Future[A]): Double =
-        Await
-          .result((x zip y).map { case (x, y) => x partialCompare y }, atMost)
+        Await.result((x zip y).map { case (x, y) => x partialCompare y },
+                     atMost)
     }
 }
 

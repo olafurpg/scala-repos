@@ -35,8 +35,9 @@ object ForkRun {
 
     val log = Logger(logLevel)
     val system = ActorSystem("play-fork-run", akkaNoLogging)
-    val sbt = system
-      .actorOf(SbtClient.props(new File(baseDirectory), log, logEvents), "sbt")
+    val sbt = system.actorOf(
+      SbtClient.props(new File(baseDirectory), log, logEvents),
+      "sbt")
     val forkRun =
       system.actorOf(props(sbt, configKey, runArgs, log), "fork-run")
 
@@ -147,8 +148,11 @@ object ForkRun {
                 defaultHttpAddress: String,
                 address: InetSocketAddress): String = {
     val devSettings: Seq[(String, String)] = Seq.empty
-    val (properties, httpPort, httpsPort, httpAddress) = Reloader
-      .filterArgs(args, defaultHttpPort, defaultHttpAddress, devSettings)
+    val (properties, httpPort, httpsPort, httpAddress) = Reloader.filterArgs(
+      args,
+      defaultHttpPort,
+      defaultHttpAddress,
+      devSettings)
     val host = if (httpAddress == "0.0.0.0") "localhost" else httpAddress
     if (httpPort.isDefined) s"http://$host:${httpPort.get}"
     else if (httpsPort.isDefined) s"https://$host:${httpsPort.get}"

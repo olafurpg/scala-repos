@@ -100,13 +100,13 @@ object Mode {
       config.set(CascadingFlowProcessClassKey, DefaultHadoopFlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-mr1")) {
-      config
-        .set(CascadingFlowConnectorClassKey, DefaultHadoop2Mr1FlowConnector)
+      config.set(CascadingFlowConnectorClassKey,
+                 DefaultHadoop2Mr1FlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2Mr1FlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-tez")) {
-      config
-        .set(CascadingFlowConnectorClassKey, DefaultHadoop2TezFlowConnector)
+      config.set(CascadingFlowConnectorClassKey,
+                 DefaultHadoop2TezFlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2TezFlowProcess)
       Hdfs(strictSources, config)
     } else
@@ -181,8 +181,8 @@ trait HadoopMode extends Mode {
     // copy over Config
     config.toMap.foreach { case (k, v) => conf.set(k, v) }
 
-    val flowProcessClass = jobConf
-      .get(Mode.CascadingFlowProcessClassKey, Mode.DefaultHadoopFlowProcess)
+    val flowProcessClass = jobConf.get(Mode.CascadingFlowProcessClassKey,
+                                       Mode.DefaultHadoopFlowProcess)
 
     val fp = try {
       val clazz = Class.forName(flowProcessClass)

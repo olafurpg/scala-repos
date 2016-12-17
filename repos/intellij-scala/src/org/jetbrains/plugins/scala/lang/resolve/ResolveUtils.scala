@@ -93,8 +93,9 @@ object ResolveUtils {
             (kinds contains OBJECT) && isStaticCorrect(c)
           }
         case patt: ScBindingPattern =>
-          val parent = ScalaPsiUtil
-            .getParentOfType(patt, classOf[ScVariable], classOf[ScValue])
+          val parent = ScalaPsiUtil.getParentOfType(patt,
+                                                    classOf[ScVariable],
+                                                    classOf[ScValue])
           parent match {
             case x: ScVariable => kinds contains VAR
             case _ => kinds contains VAL
@@ -281,8 +282,9 @@ object ResolveUtils {
                           true,
                           classOf[ScTemplateDefinition])
                         if (enclosing == null) return true
-                        return PsiTreeUtil
-                          .isContextAncestor(enclosing, place, false)
+                        return PsiTreeUtil.isContextAncestor(enclosing,
+                                                             place,
+                                                             false)
                       case Some(t: ScThisReference) =>
                         val enclosing = PsiTreeUtil.getContextOfType(
                           scMember,
@@ -292,8 +294,9 @@ object ResolveUtils {
                         t.refTemplate match {
                           case Some(t) => return t == enclosing
                           case _ =>
-                            return PsiTreeUtil
-                              .isContextAncestor(enclosing, place, false)
+                            return PsiTreeUtil.isContextAncestor(enclosing,
+                                                                 place,
+                                                                 false)
                         }
                       case Some(ref: ScReferenceElement) =>
                         val enclosing = PsiTreeUtil.getContextOfType(
@@ -313,8 +316,9 @@ object ResolveUtils {
                       true,
                       classOf[ScTemplateDefinition])
                     if (enclosing == null) return true
-                    return PsiTreeUtil
-                      .isContextAncestor(enclosing, place, false)
+                    return PsiTreeUtil.isContextAncestor(enclosing,
+                                                         place,
+                                                         false)
                 }
               }
               val ref = am.getReference
@@ -568,8 +572,8 @@ object ResolveUtils {
               TypeDefinitionMembers.processSuperDeclarations(
                 c,
                 processor,
-                ResolveState.initial
-                  .put(ScSubstitutor.key, ScSubstitutor.empty),
+                ResolveState.initial.put(ScSubstitutor.key,
+                                         ScSubstitutor.empty),
                 null,
                 place)
             case None =>
@@ -733,8 +737,10 @@ object ResolveUtils {
               //process subpackages
               pack match {
                 case s: ScPackageImpl =>
-                  s.pack
-                    .processDeclarations(processor, state, lastParent, place)
+                  s.pack.processDeclarations(processor,
+                                             state,
+                                             lastParent,
+                                             place)
                 case _ =>
                   pack.processDeclarations(processor, state, lastParent, place)
               }

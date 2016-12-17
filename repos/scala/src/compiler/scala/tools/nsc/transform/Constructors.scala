@@ -93,8 +93,11 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
           } else {
             checkUninitializedReads(cd)
             val tplTransformer = new TemplateTransformer(unit, impl0)
-            treeCopy
-              .ClassDef(cd, mods0, name0, tparams0, tplTransformer.transformed)
+            treeCopy.ClassDef(cd,
+                              mods0,
+                              name0,
+                              tparams0,
+                              tplTransformer.transformed)
           }
         case _ =>
           super.transform(tree)

@@ -98,8 +98,7 @@ trait ModelFactoryImplicitSupport {
         global.analyzer.rootContext(NoCompilationUnit)
 
       val results =
-        global.analyzer
-          .allViewsFrom(sym.tpe_*, context, sym.typeParams) ++ global.analyzer
+        global.analyzer.allViewsFrom(sym.tpe_*, context, sym.typeParams) ++ global.analyzer
           .allViewsFrom(byNameType(sym.tpe_*), context, sym.typeParams)
       var conversions = results.flatMap(result =>
         makeImplicitConversion(sym, result._1, result._2, context, inTpl))
@@ -199,8 +198,7 @@ trait ModelFactoryImplicitSupport {
         val newContext = context.makeImplicit(context.ambiguousErrors)
         newContext.macrosEnabled = false
         val newTyper = global.analyzer.newTyper(newContext)
-        newTyper
-          .silent(_.typed(appliedTree), reportAmbiguousErrors = false) match {
+        newTyper.silent(_.typed(appliedTree), reportAmbiguousErrors = false) match {
 
           case global.analyzer.SilentResultValue(t: Tree) => t
           case global.analyzer.SilentTypeError(err) =>

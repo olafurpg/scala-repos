@@ -75,8 +75,9 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     val suitableMethods =
       objectRef.referenceType().methodsByName(methodName, "()" + signature)
     if (suitableMethods.size() > 0) {
-      companionObject
-        .invokeEmptyArgsMethod(objectRef, suitableMethods get 0, context)
+      companionObject.invokeEmptyArgsMethod(objectRef,
+                                            suitableMethods get 0,
+                                            context)
     } else {
       MethodNotFound()
     }
@@ -248,8 +249,7 @@ object NonStrictCollectionsRenderer {
       method: Method,
       context: EvaluationContext): SimpleMethodInvocationResult[_] = {
     try {
-      context.getDebugProcess
-        .invokeMethod(context, obj, method, EMPTY_ARGS) match {
+      context.getDebugProcess.invokeMethod(context, obj, method, EMPTY_ARGS) match {
         case intValue: IntegerValue => Success[Int](intValue.intValue())
         case boolValue: BooleanValue =>
           Success[Boolean](boolValue.booleanValue())

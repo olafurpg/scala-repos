@@ -710,8 +710,9 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         mi: MethodInsnNode,
         prodCons: ProdConsAnalyzer): Option[AbstractInsnNode] = {
       val numArgs = Type.getArgumentTypes(mi.desc).length
-      val receiverProds = prodCons
-        .producersForValueAt(mi, prodCons.frameAt(mi).stackTop - numArgs)
+      val receiverProds = prodCons.producersForValueAt(
+        mi,
+        prodCons.frameAt(mi).stackTop - numArgs)
       if (receiverProds.size == 1) {
         val prod = receiverProds.head
         if (isPredefLoad(prod) &&
@@ -935,8 +936,9 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
           if (isSpecializedTupleClass(expectedTupleClass)) {
             val typeOK =
               tupleClass == expectedTupleClass ||
-                tupleClass == expectedTupleClass
-                  .substring(0, expectedTupleClass.indexOf('$'))
+                tupleClass == expectedTupleClass.substring(
+                  0,
+                  expectedTupleClass.indexOf('$'))
             if (typeOK) {
               if (isSpecializedTupleGetter(mi))
                 return Some(StaticGetterOrInstanceRead(mi))

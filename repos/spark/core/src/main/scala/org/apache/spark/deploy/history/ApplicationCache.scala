@@ -310,8 +310,9 @@ private[history] class ApplicationCache(
             operations.attachSparkUI(appId, attemptId, ui, completed)
           } else {
             // incomplete UIs have the cache-check filter put in front of them.
-            ApplicationCacheCheckFilterRelay
-              .registerFilter(ui, appId, attemptId)
+            ApplicationCacheCheckFilterRelay.registerFilter(ui,
+                                                            appId,
+                                                            attemptId)
             operations.attachSparkUI(appId, attemptId, ui, completed)
           }
           // build the cache entry

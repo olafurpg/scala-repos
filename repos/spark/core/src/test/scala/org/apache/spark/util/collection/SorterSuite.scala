@@ -211,14 +211,18 @@ class SorterSuite extends SparkFunSuite with Logging {
 
     val sorterWithoutKeyReuse = new Sorter(new IntArraySortDataFormat)
     runExperiment("Sorter without key reuse on primitive int array")({
-      sorterWithoutKeyReuse
-        .sort(intPrimitiveArray, 0, numElements, Ordering[Int])
+      sorterWithoutKeyReuse.sort(intPrimitiveArray,
+                                 0,
+                                 numElements,
+                                 Ordering[Int])
     }, prepareIntPrimitiveArray)
 
     val sorterWithKeyReuse = new Sorter(new KeyReuseIntArraySortDataFormat)
     runExperiment("Sorter with key reuse on primitive int array")({
-      sorterWithKeyReuse
-        .sort(intPrimitiveArray, 0, numElements, Ordering[IntWrapper])
+      sorterWithKeyReuse.sort(intPrimitiveArray,
+                              0,
+                              numElements,
+                              Ordering[IntWrapper])
     }, prepareIntPrimitiveArray)
   }
 }

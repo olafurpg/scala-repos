@@ -188,8 +188,9 @@ object WorksheetFoldGroup {
   def save(file: ScalaFile, group: WorksheetFoldGroup) {
     val virtualFile = file.getVirtualFile
     if (!virtualFile.isValid) return
-    FileAttributeUtilCache
-      .writeAttribute(WORKSHEET_PERSISTENT_FOLD_KEY, file, group.serialize())
+    FileAttributeUtilCache.writeAttribute(WORKSHEET_PERSISTENT_FOLD_KEY,
+                                          file,
+                                          group.serialize())
   }
 
   def load(viewerEditor: Editor,

@@ -379,8 +379,7 @@ class FlowSpec
         val downstream2Subscription = downstream2.expectSubscription()
 
         downstreamSubscription.request(5)
-        upstream
-          .expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
+        upstream.expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
 
         upstreamSubscription.sendNext("firstElement")
         downstream.expectNext("firstElement")
@@ -409,8 +408,7 @@ class FlowSpec
 
         downstreamSubscription.request(5)
 
-        upstream
-          .expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
+        upstream.expectRequest(upstreamSubscription, 1) // because initialInputBufferSize=1
         upstreamSubscription.sendNext("element1")
         downstream.expectNext("element1")
         upstreamSubscription.expectRequest(1)
@@ -476,8 +474,7 @@ class FlowSpec
         // d2 now has 0 outstanding
         // buffer should be empty so we should be requesting one new element
 
-        upstream
-          .expectRequest(upstreamSubscription, 1) // because of buffer size 1
+        upstream.expectRequest(upstreamSubscription, 1) // because of buffer size 1
       }
     }
 

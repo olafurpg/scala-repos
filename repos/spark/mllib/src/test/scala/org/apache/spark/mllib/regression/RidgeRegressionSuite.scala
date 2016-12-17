@@ -61,8 +61,11 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
     val w = Array.fill(numFeatures)(random.nextDouble() - 0.5)
 
     // Use half of data for training and other half for validation
-    val data = LinearDataGenerator
-      .generateLinearInput(3.0, w, 2 * numExamples, 42, 10.0)
+    val data = LinearDataGenerator.generateLinearInput(3.0,
+                                                       w,
+                                                       2 * numExamples,
+                                                       42,
+                                                       10.0)
     val testData = data.take(numExamples)
     val validationData = data.takeRight(numExamples)
 

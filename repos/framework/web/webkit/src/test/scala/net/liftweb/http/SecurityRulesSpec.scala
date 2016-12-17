@@ -119,8 +119,7 @@ class ContentSecurityPolicySpec extends Specification {
     }
 
     "provide no headers with enforcement and logging disabled" in {
-      ContentSecurityPolicy()
-        .headers(enforce = false, logViolations = false) must be empty
+      ContentSecurityPolicy().headers(enforce = false, logViolations = false) must be empty
     }
 
     "correctly generate restriction strings for the various restriction types" in {

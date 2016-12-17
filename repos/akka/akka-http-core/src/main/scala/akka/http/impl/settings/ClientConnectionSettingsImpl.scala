@@ -43,8 +43,9 @@ object ClientConnectionSettingsImpl
       idleTimeout = c getPotentiallyInfiniteDuration "idle-timeout",
       requestHeaderSizeHint = c getIntBytes "request-header-size-hint",
       websocketRandomFactory = Randoms.SecureRandomInstances, // can currently only be overridden from code
-      socketOptions = SocketOptionSettings
-        .fromSubConfig(root, c.getConfig("socket-options")),
+      socketOptions =
+        SocketOptionSettings.fromSubConfig(root,
+                                           c.getConfig("socket-options")),
       parserSettings =
         ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
   }

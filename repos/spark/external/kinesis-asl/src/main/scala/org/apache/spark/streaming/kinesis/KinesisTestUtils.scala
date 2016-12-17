@@ -265,8 +265,9 @@ private[kinesis] class SimpleDataGenerator(client: AmazonKinesisClient)
       val putRecordResult = client.putRecord(putRecordRequest)
       val shardId = putRecordResult.getShardId
       val seqNumber = putRecordResult.getSequenceNumber()
-      val sentSeqNumbers = shardIdToSeqNumbers
-        .getOrElseUpdate(shardId, new ArrayBuffer[(Int, String)]())
+      val sentSeqNumbers =
+        shardIdToSeqNumbers.getOrElseUpdate(shardId,
+                                            new ArrayBuffer[(Int, String)]())
       sentSeqNumbers += ((num, seqNumber))
     }
 

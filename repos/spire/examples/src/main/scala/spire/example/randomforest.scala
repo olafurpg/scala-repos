@@ -355,8 +355,8 @@ class RandomForestClassification[V, @sp(Double) F, K](
   }
 
   protected def defaultOptions(size: Int): FixedOptions = {
-    val axes = math
-      .max(math.sqrt(V.dimensions.toDouble).toInt, math.min(V.dimensions, 2))
+    val axes = math.max(math.sqrt(V.dimensions.toDouble).toInt,
+                        math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
     FixedOptions(axes, sampleSize, size, 5, true)
   }

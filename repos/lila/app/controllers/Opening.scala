@@ -26,8 +26,10 @@ object Opening extends LilaController {
   private def renderShow(opening: OpeningModel)(implicit ctx: Context) =
     env userInfos ctx.me zip identify(opening) map {
       case (infos, identified) =>
-        views.html.opening
-          .show(opening, identified, infos, env.AnimationDuration)
+        views.html.opening.show(opening,
+                                identified,
+                                infos,
+                                env.AnimationDuration)
     }
 
   private def makeData(

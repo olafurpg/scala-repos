@@ -253,8 +253,8 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
             p.isInstanceOf[PsiClassWrapper]
         }
 
-      ArrayUtil
-        .mergeArrays(classes, SyntheticClassProducer.getAllClasses(fqn, scope))
+      ArrayUtil.mergeArrays(classes,
+                            SyntheticClassProducer.getAllClasses(fqn, scope))
     }
     if (DumbService.getInstance(project).isDumb) return Array.empty
 

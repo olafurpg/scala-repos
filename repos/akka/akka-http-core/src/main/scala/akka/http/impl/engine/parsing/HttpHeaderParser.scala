@@ -606,8 +606,9 @@ private[http] object HttpHeaderParser {
                         valueStart,
                         valueStart + maxHeaderValueLength + 2)()
       val trimmedHeaderValue = headerValue.trim
-      val header = HeaderParser
-        .parseFull(headerName, trimmedHeaderValue, settings) match {
+      val header = HeaderParser.parseFull(headerName,
+                                          trimmedHeaderValue,
+                                          settings) match {
         case Right(h) ⇒ h
         case Left(error) ⇒
           onIllegalHeader(

@@ -516,8 +516,8 @@ class NettyTransport(val settings: NettyTransportSettings,
   private def outboundBootstrap(remoteAddress: Address): ClientBootstrap = {
     val bootstrap = setupBootstrap(new ClientBootstrap(clientChannelFactory),
                                    clientPipelineFactory(remoteAddress))
-    bootstrap
-      .setOption("connectTimeoutMillis", settings.ConnectionTimeout.toMillis)
+    bootstrap.setOption("connectTimeoutMillis",
+                        settings.ConnectionTimeout.toMillis)
     bootstrap.setOption("tcpNoDelay", settings.TcpNodelay)
     bootstrap.setOption("keepAlive", settings.TcpKeepalive)
     settings.ReceiveBufferSize.foreach(sz ⇒

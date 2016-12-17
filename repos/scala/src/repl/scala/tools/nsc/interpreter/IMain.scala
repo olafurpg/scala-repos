@@ -737,8 +737,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         IR.Error
 
       case Right(_) =>
-        val line = "%sval %s = %s.value"
-          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+        val line = "%sval %s = %s.value".format(
+          modifiers map (_ + " ") mkString,
+          name,
+          bindRep.evalPath)
         repldbg("Interpreting: " + line)
         interpret(line)
     }

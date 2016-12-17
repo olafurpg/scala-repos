@@ -68,8 +68,10 @@ class GradientBoostedTrees @Since("1.2.0")(
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case Regression =>
-        GradientBoostedTrees
-          .boost(input, input, boostingStrategy, validate = false)
+        GradientBoostedTrees.boost(input,
+                                   input,
+                                   boostingStrategy,
+                                   validate = false)
       case Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
@@ -110,8 +112,10 @@ class GradientBoostedTrees @Since("1.2.0")(
     val algo = boostingStrategy.treeStrategy.algo
     algo match {
       case Regression =>
-        GradientBoostedTrees
-          .boost(input, validationInput, boostingStrategy, validate = true)
+        GradientBoostedTrees.boost(input,
+                                   validationInput,
+                                   boostingStrategy,
+                                   validate = true)
       case Classification =>
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =

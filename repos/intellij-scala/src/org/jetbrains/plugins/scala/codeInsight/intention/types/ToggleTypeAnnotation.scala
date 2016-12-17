@@ -33,8 +33,8 @@ class ToggleTypeAnnotation extends PsiElementBaseIntentionAction {
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    ToggleTypeAnnotation
-      .complete(new AddOrRemoveStrategy(Option(editor)), element)
+    ToggleTypeAnnotation.complete(new AddOrRemoveStrategy(Option(editor)),
+                                  element)
   }
 }
 

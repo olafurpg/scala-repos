@@ -45,8 +45,8 @@ class FlowModule(leadershipModule: LeadershipModule) {
         offersWanted,
         driverHolder
       )
-      val actorRef = leadershipModule
-        .startWhenLeader(reviveOffersActor, "reviveOffersWhenWanted")
+      val actorRef = leadershipModule.startWhenLeader(reviveOffersActor,
+                                                      "reviveOffersWhenWanted")
       log.info(
         s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
       Some(new OfferReviverDelegate(actorRef))

@@ -63,8 +63,9 @@ trait ScPrimaryConstructor
   @CachedInsidePsiElement(this, ModCount.getBlockModificationCount)
   def effectiveParameterClauses: Seq[ScParameterClause] = {
     def emptyParameterList: ScParameterClause =
-      ScalaPsiElementFactory
-        .createEmptyClassParamClauseWithContext(getManager, parameterList)
+      ScalaPsiElementFactory.createEmptyClassParamClauseWithContext(
+        getManager,
+        parameterList)
     val clausesWithInitialEmpty = parameterList.clauses match {
       case Seq() => Seq(emptyParameterList)
       case Seq(clause) if clause.isImplicit => Seq(emptyParameterList, clause)

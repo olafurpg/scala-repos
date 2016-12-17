@@ -753,8 +753,8 @@ private[akka] class LocalActorRefProvider private[akka] (
     } else
       ref.getChild(path.iterator) match {
         case Nobody ⇒
-          log
-            .debug("look-up of path sequence [/{}] failed", path.mkString("/"))
+          log.debug("look-up of path sequence [/{}] failed",
+                    path.mkString("/"))
           new EmptyLocalActorRef(system.provider, ref.path / path, eventStream)
         case x ⇒ x
       }

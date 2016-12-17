@@ -32,8 +32,8 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
 
   test("Dtab-Local: read multiple, with commas") {
     val m = newMsg()
-    m.headers
-      .add("Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
+    m.headers.add("Dtab-Local",
+                  "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
     m.headers.add("Dtab-Local", "/srv/local=>/srv/other,/srv=>/srv#/devel")
     val expected = Dtab.read(
       "/srv#/prod/local/role => /$/fail;" + "/srv => /srv#/staging;" +
@@ -44,8 +44,8 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
 
   test("Dtab-Local takes precedence over X-Dtab") {
     val m = newMsg()
-    m.headers
-      .add("Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
+    m.headers.add("Dtab-Local",
+                  "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
     // HttpDtab.write encodes X-Dtab headers
     HttpDtab.write(Dtab.read("/srv => /$/nil"), m)
     m.headers.add("Dtab-Local", "/srv/local=>/srv/other,/srv=>/srv#/devel")

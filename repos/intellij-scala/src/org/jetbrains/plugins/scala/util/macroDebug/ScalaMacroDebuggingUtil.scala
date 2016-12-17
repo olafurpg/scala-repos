@@ -54,8 +54,9 @@ object ScalaMacroDebuggingUtil {
     import scala.collection.JavaConversions._
 
     if (!isEnabled) return
-    val file = VfsUtil
-      .findFileByIoFile(new File(fileName stripPrefix MACRO_SIGN_PREFIX), true)
+    val file = VfsUtil.findFileByIoFile(
+      new File(fileName stripPrefix MACRO_SIGN_PREFIX),
+      true)
 
     val dataStream = SYNTHETIC_SOURCE_ATTRIBUTE writeAttribute file
     code foreach (dataStream writeUTF _.stripPrefix(MACRO_SIGN_PREFIX))

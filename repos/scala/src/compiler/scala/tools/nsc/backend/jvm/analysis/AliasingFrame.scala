@@ -103,8 +103,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
     def peekStack(n: Int): V = this.peekStack(n)
 
     val prodCons =
-      InstructionStackEffect
-        .forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
+      InstructionStackEffect.forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
     val consumed = InstructionStackEffect.cons(prodCons)
     val produced = InstructionStackEffect.prod(prodCons)
 

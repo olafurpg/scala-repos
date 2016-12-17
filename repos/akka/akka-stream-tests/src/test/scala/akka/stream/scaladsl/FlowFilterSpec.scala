@@ -27,8 +27,9 @@ class FlowFilterSpec extends AkkaSpec with ScriptedTest {
     }
 
     "not blow up with high request counts" in {
-      val settings = ActorMaterializerSettings(system)
-        .withInputBuffer(initialSize = 1, maxSize = 1)
+      val settings =
+        ActorMaterializerSettings(system).withInputBuffer(initialSize = 1,
+                                                          maxSize = 1)
       implicit val materializer = ActorMaterializer(settings)
 
       val probe = TestSubscriber.manualProbe[Int]()

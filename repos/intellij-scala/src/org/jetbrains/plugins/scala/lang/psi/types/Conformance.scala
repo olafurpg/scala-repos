@@ -119,15 +119,23 @@ object Conformance {
         case _ =>
           argsPair match {
             case (u: ScUndefinedType, rt) =>
-              undefinedSubst = undefinedSubst
-                .addLower((u.tpt.name, u.tpt.getId), rt, variance = 0)
-              undefinedSubst = undefinedSubst
-                .addUpper((u.tpt.name, u.tpt.getId), rt, variance = 0)
+              undefinedSubst = undefinedSubst.addLower(
+                (u.tpt.name, u.tpt.getId),
+                rt,
+                variance = 0)
+              undefinedSubst = undefinedSubst.addUpper(
+                (u.tpt.name, u.tpt.getId),
+                rt,
+                variance = 0)
             case (lt, u: ScUndefinedType) =>
-              undefinedSubst = undefinedSubst
-                .addLower((u.tpt.name, u.tpt.getId), lt, variance = 0)
-              undefinedSubst = undefinedSubst
-                .addUpper((u.tpt.name, u.tpt.getId), lt, variance = 0)
+              undefinedSubst = undefinedSubst.addLower(
+                (u.tpt.name, u.tpt.getId),
+                lt,
+                variance = 0)
+              undefinedSubst = undefinedSubst.addUpper(
+                (u.tpt.name, u.tpt.getId),
+                lt,
+                variance = 0)
             case (ScAbstractType(tpt, lower, upper), r) =>
               val (right, alternateRight) =
                 if (tpt.args.length > 0 &&
@@ -864,15 +872,23 @@ object Conformance {
                 undefinedSubst = t._2
               }
             case (u: ScUndefinedType, rt) =>
-              undefinedSubst = undefinedSubst
-                .addLower((u.tpt.name, u.tpt.getId), rt, variance = 0)
-              undefinedSubst = undefinedSubst
-                .addUpper((u.tpt.name, u.tpt.getId), rt, variance = 0)
+              undefinedSubst = undefinedSubst.addLower(
+                (u.tpt.name, u.tpt.getId),
+                rt,
+                variance = 0)
+              undefinedSubst = undefinedSubst.addUpper(
+                (u.tpt.name, u.tpt.getId),
+                rt,
+                variance = 0)
             case (lt, u: ScUndefinedType) =>
-              undefinedSubst = undefinedSubst
-                .addLower((u.tpt.name, u.tpt.getId), lt, variance = 0)
-              undefinedSubst = undefinedSubst
-                .addUpper((u.tpt.name, u.tpt.getId), lt, variance = 0)
+              undefinedSubst = undefinedSubst.addLower(
+                (u.tpt.name, u.tpt.getId),
+                lt,
+                variance = 0)
+              undefinedSubst = undefinedSubst.addUpper(
+                (u.tpt.name, u.tpt.getId),
+                lt,
+                variance = 0)
             case (tp, _)
                 if tp.isAliasType != None &&
                   tp.isAliasType.get.ta.isExistentialTypeAlias =>
@@ -969,15 +985,23 @@ object Conformance {
                   undefinedSubst = t._2
                 }
               case (u: ScUndefinedType, rt) =>
-                undefinedSubst = undefinedSubst
-                  .addLower((u.tpt.name, u.tpt.getId), rt, variance = 0)
-                undefinedSubst = undefinedSubst
-                  .addUpper((u.tpt.name, u.tpt.getId), rt, variance = 0)
+                undefinedSubst = undefinedSubst.addLower(
+                  (u.tpt.name, u.tpt.getId),
+                  rt,
+                  variance = 0)
+                undefinedSubst = undefinedSubst.addUpper(
+                  (u.tpt.name, u.tpt.getId),
+                  rt,
+                  variance = 0)
               case (lt, u: ScUndefinedType) =>
-                undefinedSubst = undefinedSubst
-                  .addLower((u.tpt.name, u.tpt.getId), lt, variance = 0)
-                undefinedSubst = undefinedSubst
-                  .addUpper((u.tpt.name, u.tpt.getId), lt, variance = 0)
+                undefinedSubst = undefinedSubst.addLower(
+                  (u.tpt.name, u.tpt.getId),
+                  lt,
+                  variance = 0)
+                undefinedSubst = undefinedSubst.addUpper(
+                  (u.tpt.name, u.tpt.getId),
+                  lt,
+                  variance = 0)
               case (tp, _)
                   if tp.isAliasType != None &&
                     tp.isAliasType.get.ta.isExistentialTypeAlias =>
@@ -1250,15 +1274,23 @@ object Conformance {
                   undefinedSubst = t._2
                 }
               case (u: ScUndefinedType, rt) =>
-                undefinedSubst = undefinedSubst
-                  .addLower((u.tpt.name, u.tpt.getId), rt, variance = 0)
-                undefinedSubst = undefinedSubst
-                  .addUpper((u.tpt.name, u.tpt.getId), rt, variance = 0)
+                undefinedSubst = undefinedSubst.addLower(
+                  (u.tpt.name, u.tpt.getId),
+                  rt,
+                  variance = 0)
+                undefinedSubst = undefinedSubst.addUpper(
+                  (u.tpt.name, u.tpt.getId),
+                  rt,
+                  variance = 0)
               case (lt, u: ScUndefinedType) =>
-                undefinedSubst = undefinedSubst
-                  .addLower((u.tpt.name, u.tpt.getId), lt, variance = 0)
-                undefinedSubst = undefinedSubst
-                  .addUpper((u.tpt.name, u.tpt.getId), lt, variance = 0)
+                undefinedSubst = undefinedSubst.addLower(
+                  (u.tpt.name, u.tpt.getId),
+                  lt,
+                  variance = 0)
+                undefinedSubst = undefinedSubst.addUpper(
+                  (u.tpt.name, u.tpt.getId),
+                  lt,
+                  variance = 0)
               case (tp, _)
                   if tp.isAliasType.isDefined &&
                     tp.isAliasType.get.ta.isExistentialTypeAlias =>
@@ -1340,8 +1372,9 @@ object Conformance {
                     return
                 }
               }
-              undefinedSubst = undefinedSubst
-                .addUpper((owner2.tpt.name, owner2.tpt.getId), anotherType)
+              undefinedSubst = undefinedSubst.addUpper(
+                (owner2.tpt.name, owner2.tpt.getId),
+                anotherType)
               result = checkParameterizedType(
                 owner2.tpt.args.map(_.param).iterator,
                 args1replace,
@@ -1378,8 +1411,9 @@ object Conformance {
                     return
                 }
               }
-              undefinedSubst = undefinedSubst
-                .addLower((owner1.tpt.name, owner1.tpt.getId), anotherType)
+              undefinedSubst = undefinedSubst.addLower(
+                (owner1.tpt.name, owner1.tpt.getId),
+                anotherType)
               result = checkParameterizedType(
                 owner1.tpt.args.map(_.param).iterator,
                 args1,
@@ -1416,8 +1450,9 @@ object Conformance {
                     return
                 }
               }
-              undefinedSubst = undefinedSubst
-                .addUpper((owner2.tpt.name, owner2.tpt.getId), anotherType)
+              undefinedSubst = undefinedSubst.addUpper(
+                (owner2.tpt.name, owner2.tpt.getId),
+                anotherType)
               result = checkParameterizedType(
                 owner2.tpt.args.map(_.param).iterator,
                 args1,

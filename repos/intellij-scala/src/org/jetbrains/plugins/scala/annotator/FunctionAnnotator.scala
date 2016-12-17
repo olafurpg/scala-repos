@@ -33,8 +33,9 @@ trait FunctionAnnotator {
                        typeAware: Boolean) {
     if (!function.hasExplicitType && !function.returnTypeIsDefined) {
       function.recursiveReferences.foreach { ref =>
-        val message = ScalaBundle
-          .message("function.recursive.need.result.type", function.name)
+        val message =
+          ScalaBundle.message("function.recursive.need.result.type",
+                              function.name)
         holder.createErrorAnnotation(ref.element, message)
       }
     }
@@ -110,8 +111,9 @@ trait FunctionAnnotator {
       }
 
       def needsTypeAnnotation() = {
-        val message = ScalaBundle
-          .message("function.must.define.type.explicitly", function.name)
+        val message = ScalaBundle.message(
+          "function.must.define.type.explicitly",
+          function.name)
         val returnTypes =
           function.returnUsages(withBooleanInfix = false).toSeq.collect {
             case retStmt: ScReturnStmt =>
@@ -126,8 +128,8 @@ trait FunctionAnnotator {
       }
 
       def redundantReturnExpression() = {
-        val message = ScalaBundle
-          .message("return.expression.is.redundant", usageType.presentableText)
+        val message = ScalaBundle.message("return.expression.is.redundant",
+                                          usageType.presentableText)
         holder.createWarningAnnotation(
           usage.asInstanceOf[ScReturnStmt].expr.get,
           message)

@@ -71,8 +71,8 @@ private[http] object Masking {
             try {
               val mask = extractMask(header)
               become(new Running(mask))
-              current
-                .onPush(start.copy(header = setNewMask(header, mask)), ctx)
+              current.onPush(start.copy(header = setNewMask(header, mask)),
+                             ctx)
             } catch {
               case p: ProtocolException ⇒
                 become(Done)

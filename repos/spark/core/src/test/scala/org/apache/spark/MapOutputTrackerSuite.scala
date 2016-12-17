@@ -153,8 +153,9 @@ class MapOutputTrackerSuite extends SparkFunSuite {
     val slaveRpcEnv =
       createRpcEnv("spark-slave", hostname, 0, new SecurityManager(conf))
     val slaveTracker = new MapOutputTrackerWorker(conf)
-    slaveTracker.trackerEndpoint = slaveRpcEnv
-      .setupEndpointRef(rpcEnv.address, MapOutputTracker.ENDPOINT_NAME)
+    slaveTracker.trackerEndpoint =
+      slaveRpcEnv.setupEndpointRef(rpcEnv.address,
+                                   MapOutputTracker.ENDPOINT_NAME)
 
     masterTracker.registerShuffle(10, 1)
     masterTracker.incrementEpoch()
@@ -175,8 +176,9 @@ class MapOutputTrackerSuite extends SparkFunSuite {
         (BlockManagerId("a", "hostA", 1000),
          ArrayBuffer((ShuffleBlockId(10, 0, 0), size1000)))))
 
-    masterTracker
-      .unregisterMapOutput(10, 0, BlockManagerId("a", "hostA", 1000))
+    masterTracker.unregisterMapOutput(10,
+                                      0,
+                                      BlockManagerId("a", "hostA", 1000))
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
     intercept[FetchFailedException] {

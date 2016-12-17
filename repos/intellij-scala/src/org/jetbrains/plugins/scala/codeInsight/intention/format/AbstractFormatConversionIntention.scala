@@ -55,8 +55,8 @@ abstract class AbstractFormatConversionIntention(name: String,
 
     target.replace(result) match {
       case lit: ScLiteral if lit.isMultiLineString =>
-        MultilineStringUtil
-          .addMarginsAndFormatMLString(lit, editor.getDocument)
+        MultilineStringUtil.addMarginsAndFormatMLString(lit,
+                                                        editor.getDocument)
       case _ =>
     }
   }

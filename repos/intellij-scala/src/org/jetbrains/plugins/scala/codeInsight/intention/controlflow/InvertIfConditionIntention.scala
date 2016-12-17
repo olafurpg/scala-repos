@@ -107,8 +107,8 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
     }
     expr.append(res)
     val newStmt: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.toString(), element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.toString(),
+                                                      element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newStmt, true)

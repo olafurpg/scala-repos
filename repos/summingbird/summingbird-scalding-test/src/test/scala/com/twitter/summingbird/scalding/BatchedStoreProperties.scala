@@ -176,8 +176,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
              _)) = mergeResult
           val requestedEndingTimestamp: Timestamp = interval.upper.upper
           val readIntervalEndingTimestamp: Timestamp = readIntervalUpper
-          implicitly[Ordering[Timestamp]]
-            .lteq(readIntervalEndingTimestamp, requestedEndingTimestamp)
+          implicitly[Ordering[Timestamp]].lteq(readIntervalEndingTimestamp,
+                                               requestedEndingTimestamp)
         }
     }
   }

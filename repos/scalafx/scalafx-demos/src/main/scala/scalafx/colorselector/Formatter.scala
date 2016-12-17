@@ -85,8 +85,9 @@ object PercentFormatter extends Formatter("Percent") {
                        c.opacity)
 
   def formatWithoutAlpha(c: Color): String =
-    RGB_FORMAT
-      .format(doubleToInt(c.red), doubleToInt(c.green), doubleToInt(c.blue))
+    RGB_FORMAT.format(doubleToInt(c.red),
+                      doubleToInt(c.green),
+                      doubleToInt(c.blue))
 }
 
 object HsbFormatter extends Formatter("HSB") {

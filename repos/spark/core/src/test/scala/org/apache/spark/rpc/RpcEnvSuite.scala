@@ -378,8 +378,9 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
     // If a RpcEnv implementation breaks the `receive` contract, hope this test can expose it
     for (i <- 0 until 100) {
       @volatile var result = 0
-      val endpointRef = env
-        .setupEndpoint(s"receive-in-sequence-$i", new ThreadSafeRpcEndpoint {
+      val endpointRef = env.setupEndpoint(
+        s"receive-in-sequence-$i",
+        new ThreadSafeRpcEndpoint {
           override val rpcEnv = env
 
           override def receive: PartialFunction[Any, Unit] = {
@@ -525,8 +526,9 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
       _env: RpcEnv,
       name: String): (RpcEndpointRef, ConcurrentLinkedQueue[(Any, Any)]) = {
     val events = new ConcurrentLinkedQueue[(Any, Any)]
-    val ref = _env
-      .setupEndpoint("network-events-non-client", new ThreadSafeRpcEndpoint {
+    val ref = _env.setupEndpoint(
+      "network-events-non-client",
+      new ThreadSafeRpcEndpoint {
         override val rpcEnv = _env
 
         override def receive: PartialFunction[Any, Unit] = {
@@ -660,8 +662,9 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
     val anotherEnv =
       createRpcEnv(new SparkConf(), "remote", 0, clientMode = true)
     // Use anotherEnv to find out the RpcEndpointRef
-    val rpcEndpointRef = anotherEnv
-      .setupEndpointRef(env.address, "sendWithReply-unserializable-error")
+    val rpcEndpointRef =
+      anotherEnv.setupEndpointRef(env.address,
+                                  "sendWithReply-unserializable-error")
     try {
       val f = rpcEndpointRef.ask[String]("hello")
       val e = intercept[Exception] {

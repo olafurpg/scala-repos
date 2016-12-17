@@ -177,12 +177,12 @@ object UnifiedMemoryManager {
 
   def apply(conf: SparkConf, numCores: Int): UnifiedMemoryManager = {
     val maxMemory = getMaxMemory(conf)
-    new UnifiedMemoryManager(
-      conf,
-      maxMemory = maxMemory,
-      storageRegionSize = (maxMemory * conf
-        .getDouble("spark.memory.storageFraction", 0.5)).toLong,
-      numCores = numCores)
+    new UnifiedMemoryManager(conf,
+                             maxMemory = maxMemory,
+                             storageRegionSize = (maxMemory * conf.getDouble(
+                               "spark.memory.storageFraction",
+                               0.5)).toLong,
+                             numCores = numCores)
   }
 
   /**

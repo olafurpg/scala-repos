@@ -315,8 +315,9 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       val cleanedExprId = Alias(a.child, a.name)(ExprId(-1),
                                                  a.qualifiers,
                                                  isGenerated = a.isGenerated)
-      BindReferences
-        .bindReference(cleanedExprId, allAttributes, allowFailures = true)
+      BindReferences.bindReference(cleanedExprId,
+                                   allAttributes,
+                                   allowFailures = true)
     case other =>
       BindReferences.bindReference(other, allAttributes, allowFailures = true)
   }

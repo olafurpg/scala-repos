@@ -49,8 +49,8 @@ class MergeToComprehensions extends Phase {
       n match {
         case Take(f1, count1) =>
           val (c1, replacements1) = mergeTakeDrop(f1, true)
-          logger
-            .debug("Merging Take into Comprehension:", Ellipsis(n, List(0)))
+          logger.debug("Merging Take into Comprehension:",
+                       Ellipsis(n, List(0)))
           val count2 = applyReplacements(count1, replacements1, c1)
           val fetch2 = c1.fetch match {
             case Some(t) => Some(constOp[Long]("min")(math.min)(t, count2))
@@ -62,8 +62,8 @@ class MergeToComprehensions extends Phase {
 
         case Drop(f1, count1) =>
           val (c1, replacements1) = mergeTakeDrop(f1, true)
-          logger
-            .debug("Merging Drop into Comprehension:", Ellipsis(n, List(0)))
+          logger.debug("Merging Drop into Comprehension:",
+                       Ellipsis(n, List(0)))
           val count2 = applyReplacements(count1, replacements1, c1)
           val (fetch2, offset2) = (c1.fetch, c1.offset) match {
             case (None, None) => (None, Some(count2))
@@ -103,8 +103,8 @@ class MergeToComprehensions extends Phase {
       n match {
         case SortBy(s1, f1, b1) =>
           val (c1, replacements1) = mergeSortBy(f1, true)
-          logger
-            .debug("Merging SortBy into Comprehension:", Ellipsis(n, List(0)))
+          logger.debug("Merging SortBy into Comprehension:",
+                       Ellipsis(n, List(0)))
           val b2 = b1.map {
             case (n, o) => (applyReplacements(n, replacements1, c1), o)
           }
@@ -337,8 +337,8 @@ class MergeToComprehensions extends Phase {
       case n :@ Type.Structural(CollectionType(cons, el)) =>
         convertOnlyInScalar(createTopLevel(n)._1)
       case a: Aggregate =>
-        logger
-          .debug("Merging Aggregate into Comprehension:", Ellipsis(a, List(0)))
+        logger.debug("Merging Aggregate into Comprehension:",
+                     Ellipsis(a, List(0)))
         val (c1, rep) = mergeFilterWhere(a.from, true)
         val sel2 = applyReplacements(a.select, rep, c1)
         val c2 = c1.copy(select = Pure(sel2)).infer()
@@ -414,8 +414,8 @@ class MergeToComprehensions extends Phase {
         val (c1a, replacements1a) =
           if (c1.distinct.isDefined) toSubquery(c1, replacements1)
           else (c1, replacements1)
-        logger
-          .debug("Merging Filter into Comprehension:", Ellipsis(n, List(0)))
+        logger.debug("Merging Filter into Comprehension:",
+                     Ellipsis(n, List(0)))
         val p2 = applyReplacements(p1, replacements1a, c1a)
         val c2 =
           if (c1a.groupBy.isEmpty)

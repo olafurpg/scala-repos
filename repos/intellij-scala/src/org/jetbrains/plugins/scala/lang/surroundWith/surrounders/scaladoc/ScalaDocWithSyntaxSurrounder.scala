@@ -26,8 +26,7 @@ trait ScalaDocWithSyntaxSurrounder extends Surrounder {
 
     def getNewExprText(expr: String): String =
       expr.substring(0, startOffset - offset) + getSyntaxTag +
-        expr
-          .substring(startOffset - offset, endOffset - offset) + getSyntaxTag +
+        expr.substring(startOffset - offset, endOffset - offset) + getSyntaxTag +
         expr.substring(endOffset - offset)
 
     val surroundedText = new StringBuilder()

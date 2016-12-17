@@ -281,8 +281,10 @@ trait ScBlock
       processor,
       state,
       lastParent,
-      place) && super[ScImportsHolder]
-      .processDeclarations(processor, state, lastParent, place)
+      place) && super[ScImportsHolder].processDeclarations(processor,
+                                                           state,
+                                                           lastParent,
+                                                           place)
 
   def needCheckExpectedType = true
 }

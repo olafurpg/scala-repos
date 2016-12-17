@@ -693,8 +693,11 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
     if (rightPsi.isInstanceOf[ScPackaging]) {
       if (leftPsi.isInstanceOf[ScStableCodeReferenceElement] ||
           leftElementType == tLBRACE)
-        return Spacing
-          .createSpacing(0, 0, 1, keepLineBreaks, keepBlankLinesInCode)
+        return Spacing.createSpacing(0,
+                                     0,
+                                     1,
+                                     keepLineBreaks,
+                                     keepBlankLinesInCode)
       else
         return Spacing.createSpacing(0,
                                      0,
@@ -741,8 +744,11 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
 
     if (leftPsi.isInstanceOf[ScImportStmt] ||
         rightPsi.isInstanceOf[ScImportStmt]) {
-      return Spacing
-        .createSpacing(0, 0, 1, keepLineBreaks, keepBlankLinesInDeclarations)
+      return Spacing.createSpacing(0,
+                                   0,
+                                   1,
+                                   keepLineBreaks,
+                                   keepBlankLinesInDeclarations)
     }
 
     if (leftPsi.isInstanceOf[ScTypeDefinition]) {
@@ -842,8 +848,11 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
           return if (scalaSettings.SPACES_IN_IMPORTS) WITH_SPACING
           else WITHOUT_SPACING
         case _ =>
-          return Spacing
-            .createSpacing(0, 0, 0, keepLineBreaks, keepBlankLinesBeforeRBrace)
+          return Spacing.createSpacing(0,
+                                       0,
+                                       0,
+                                       keepLineBreaks,
+                                       keepBlankLinesBeforeRBrace)
       }
     }
 
@@ -941,8 +950,11 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
           return if (scalaSettings.SPACES_IN_IMPORTS) WITH_SPACING
           else WITHOUT_SPACING
         case _ =>
-          return Spacing
-            .createSpacing(0, 0, 0, keepLineBreaks, keepBlankLinesBeforeRBrace)
+          return Spacing.createSpacing(0,
+                                       0,
+                                       0,
+                                       keepLineBreaks,
+                                       keepBlankLinesBeforeRBrace)
       }
     }
 

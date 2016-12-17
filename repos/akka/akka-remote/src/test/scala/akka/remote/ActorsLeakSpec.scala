@@ -40,8 +40,9 @@ object ActorsLeakSpec {
           val cell = wc.underlying
 
           cell.childrenRefs match {
-            case ChildrenContainer
-                  .TerminatingChildrenContainer(_, toDie, reason) ⇒
+            case ChildrenContainer.TerminatingChildrenContainer(_,
+                                                                toDie,
+                                                                reason) ⇒
               Nil
             case x @ (ChildrenContainer.TerminatedChildrenContainer |
                 ChildrenContainer.EmptyChildrenContainer) ⇒

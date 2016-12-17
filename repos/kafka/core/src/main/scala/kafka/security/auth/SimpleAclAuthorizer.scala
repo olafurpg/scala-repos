@@ -376,8 +376,9 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
                          data: String,
                          expectedVersion: Int): (Boolean, Int) = {
     try {
-      zkUtils
-        .conditionalUpdatePersistentPathIfExists(path, data, expectedVersion)
+      zkUtils.conditionalUpdatePersistentPathIfExists(path,
+                                                      data,
+                                                      expectedVersion)
     } catch {
       case e: ZkNoNodeException =>
         try {

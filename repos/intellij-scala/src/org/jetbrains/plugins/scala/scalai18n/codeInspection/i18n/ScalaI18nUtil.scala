@@ -87,8 +87,8 @@ object ScalaI18nUtil {
     if (property == NULL) return false
     if (property != null) return true
     val annotationParams = new mutable.HashMap[String, AnyRef]
-    annotationParams
-      .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+    annotationParams.put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER,
+                         null)
     val isI18n: Boolean = mustBePropertyKey(project, expr, annotationParams)
     if (!isI18n) {
       expr.putUserData(CACHE, NULL)
@@ -462,8 +462,9 @@ object ScalaI18nUtil {
       @NotNull key: String,
       @NotNull outResourceBundle: Ref[String]): Boolean = {
     val annotationAttributeValues = new mutable.HashMap[String, AnyRef]
-    annotationAttributeValues
-      .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+    annotationAttributeValues.put(
+      AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER,
+      null)
     if (mustBePropertyKey(project, expression, annotationAttributeValues)) {
       annotationAttributeValues get AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER exists {
         case bundleName: PsiElement =>

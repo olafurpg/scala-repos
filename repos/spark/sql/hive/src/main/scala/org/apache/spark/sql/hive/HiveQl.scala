@@ -445,8 +445,9 @@ private[hive] class HiveQl(conf: ParserConf)
             tableDesc = tableDesc.withNewStorage(
               serdeProperties = tableDesc.storage.serdeProperties ++ serdeParams.asScala)
           case Token("TOK_TABLELOCATION", child :: Nil) =>
-            val location = EximUtil
-              .relativeToAbsolutePath(hiveConf, unescapeSQLString(child.text))
+            val location =
+              EximUtil.relativeToAbsolutePath(hiveConf,
+                                              unescapeSQLString(child.text))
             tableDesc =
               tableDesc.withNewStorage(locationUri = Option(location))
           case Token("TOK_TABLESERIALIZER", child :: Nil) =>

@@ -30,8 +30,9 @@ class ScalaHighlightUsagesHandlerFactory
       editor: Editor,
       file: PsiFile): HighlightUsagesHandlerBase[_ <: PsiElement] = {
     if (!file.isInstanceOf[ScalaFile]) return null
-    val offset = TargetElementUtil
-      .adjustOffset(file, editor.getDocument, editor.getCaretModel.getOffset)
+    val offset = TargetElementUtil.adjustOffset(file,
+                                                editor.getDocument,
+                                                editor.getCaretModel.getOffset)
     val element: PsiElement = file.findElementAt(offset)
     if (element == null || element.getNode == null) return null
     element.getNode.getElementType match {
@@ -54,8 +55,7 @@ class ScalaHighlightUsagesHandlerFactory
           case _ =>
         }
       case ScalaTokenTypes.kVAL =>
-        PsiTreeUtil
-          .getParentOfType(element, classOf[ScPatternDefinition]) match {
+        PsiTreeUtil.getParentOfType(element, classOf[ScPatternDefinition]) match {
           case pattern @ ScPatternDefinition.expr(expr)
               if pattern.pList.allPatternsSimple &&
                 pattern.pList.patterns.length == 1 =>
@@ -66,8 +66,7 @@ class ScalaHighlightUsagesHandlerFactory
           case _ =>
         }
       case ScalaTokenTypes.kVAR =>
-        PsiTreeUtil
-          .getParentOfType(element, classOf[ScVariableDefinition]) match {
+        PsiTreeUtil.getParentOfType(element, classOf[ScVariableDefinition]) match {
           case pattern @ ScPatternDefinition.expr(expr)
               if pattern.pList.allPatternsSimple &&
                 pattern.pList.patterns.length == 1 =>

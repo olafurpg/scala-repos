@@ -192,8 +192,10 @@ trait ScMember
     val accessModifier = Option(getModifierList).flatMap(_.accessModifier)
 
     def fromContainingBlockOrMember(): Option[SearchScope] = {
-      val blockOrMember = PsiTreeUtil
-        .getContextOfType(this, true, classOf[ScBlock], classOf[ScMember])
+      val blockOrMember = PsiTreeUtil.getContextOfType(this,
+                                                       true,
+                                                       classOf[ScBlock],
+                                                       classOf[ScMember])
       blockOrMember match {
         case null => None
         case block: ScBlock => Some(new LocalSearchScope(block))

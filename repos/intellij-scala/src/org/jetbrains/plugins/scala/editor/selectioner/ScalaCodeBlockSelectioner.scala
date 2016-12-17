@@ -35,8 +35,9 @@ class ScalaCodeBlockSelectioner extends ExtendWordSelectionHandlerBase {
       val end = lastChild.getTextRange.getStartOffset
       if (start >= end) new util.ArrayList[TextRange]() // '{   }' case
       else
-        ExtendWordSelectionHandlerBase
-          .expandToWholeLine(editorText, new TextRange(start, end))
+        ExtendWordSelectionHandlerBase.expandToWholeLine(
+          editorText,
+          new TextRange(start, end))
     } else new util.ArrayList[TextRange]
   }
 }

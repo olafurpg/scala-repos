@@ -57,8 +57,9 @@ private[spark] object CollectionsUtils {
         val comparator =
           implicitly[Ordering[K]].asInstanceOf[java.util.Comparator[Any]]
         (l, x) =>
-          util.Arrays
-            .binarySearch(l.asInstanceOf[Array[AnyRef]], x, comparator)
+          util.Arrays.binarySearch(l.asInstanceOf[Array[AnyRef]],
+                                   x,
+                                   comparator)
     }
   }
 }

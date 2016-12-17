@@ -204,8 +204,10 @@ class ClientServerSpec
           Promise().future // never complete the request with a response; we're waiting for the timeout to happen, nothing else
         }
 
-        val binding = Http()
-          .bindAndHandleAsync(handle, hostname, port, settings = settings)
+        val binding = Http().bindAndHandleAsync(handle,
+                                                hostname,
+                                                port,
+                                                settings = settings)
         val b1 = Await.result(binding, 3.seconds)
         (receivedRequest, b1)
       }

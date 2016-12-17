@@ -344,8 +344,9 @@ class GeneralizedLinearRegressionSuite
           .setLink(link)
           .setFitIntercept(fitIntercept)
         val model = trainer.fit(dataset)
-        val actual = Vectors
-          .dense(model.intercept, model.coefficients(0), model.coefficients(1))
+        val actual = Vectors.dense(model.intercept,
+                                   model.coefficients(0),
+                                   model.coefficients(1))
         assert(actual ~= expected(idx) absTol 1e-4,
                "Model mismatch: GLM with gaussian family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
@@ -409,8 +410,9 @@ class GeneralizedLinearRegressionSuite
         .setFitIntercept(fitIntercept)
         .setRegParam(regParam)
       val model = trainer.fit(datasetGaussianIdentity)
-      val actual = Vectors
-        .dense(model.intercept, model.coefficients(0), model.coefficients(1))
+      val actual = Vectors.dense(model.intercept,
+                                 model.coefficients(0),
+                                 model.coefficients(1))
       assert(actual ~= expected(idx) absTol 1e-4,
              "Model mismatch: GLM with gaussian family, " +
                s"fitIntercept = $fitIntercept and regParam = $regParam.")
@@ -452,14 +454,23 @@ class GeneralizedLinearRegressionSuite
      */
     val expected =
       Seq(Vectors.dense(0.0, -0.3560284, 1.3010002, -0.3570805, -0.7406762),
-          Vectors
-            .dense(2.8367406, -0.5896187, 0.8931655, -0.3925169, -0.7996989),
+          Vectors.dense(2.8367406,
+                        -0.5896187,
+                        0.8931655,
+                        -0.3925169,
+                        -0.7996989),
           Vectors.dense(0.0, -0.2134390, 0.7800646, -0.2144267, -0.4438358),
-          Vectors
-            .dense(1.6995366, -0.3524694, 0.5332651, -0.2352985, -0.4780850),
+          Vectors.dense(1.6995366,
+                        -0.3524694,
+                        0.5332651,
+                        -0.2352985,
+                        -0.4780850),
           Vectors.dense(0.0, -0.2832198, 0.8434144, -0.2524727, -0.5293452),
-          Vectors
-            .dense(1.5063590, -0.4038015, 0.6133664, -0.2687882, -0.5541758))
+          Vectors.dense(1.5063590,
+                        -0.4038015,
+                        0.6133664,
+                        -0.2687882,
+                        -0.5541758))
 
     import GeneralizedLinearRegression._
 
@@ -555,8 +566,9 @@ class GeneralizedLinearRegressionSuite
           .setLink(link)
           .setFitIntercept(fitIntercept)
         val model = trainer.fit(dataset)
-        val actual = Vectors
-          .dense(model.intercept, model.coefficients(0), model.coefficients(1))
+        val actual = Vectors.dense(model.intercept,
+                                   model.coefficients(0),
+                                   model.coefficients(1))
         assert(actual ~= expected(idx) absTol 1e-4,
                "Model mismatch: GLM with poisson family, " +
                  s"$link link and fitIntercept = $fitIntercept.")
@@ -634,8 +646,9 @@ class GeneralizedLinearRegressionSuite
           .setLink(link)
           .setFitIntercept(fitIntercept)
         val model = trainer.fit(dataset)
-        val actual = Vectors
-          .dense(model.intercept, model.coefficients(0), model.coefficients(1))
+        val actual = Vectors.dense(model.intercept,
+                                   model.coefficients(0),
+                                   model.coefficients(1))
         assert(actual ~= expected(idx) absTol 1e-4,
                "Model mismatch: GLM with gamma family, " +
                  s"$link link and fitIntercept = $fitIntercept.")

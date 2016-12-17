@@ -579,8 +579,9 @@ class HttpExtensionApiSpec
 
   def runServer(): (Host, Port, ServerBinding) = {
     val (_, host, port) = TestUtils.temporaryServerHostnameAndPort()
-    val server = http
-      .bindAndHandleSync(httpSuccessFunction, toHost(host, port), materializer)
+    val server = http.bindAndHandleSync(httpSuccessFunction,
+                                        toHost(host, port),
+                                        materializer)
 
     (host, port, waitFor(server))
   }

@@ -91,10 +91,10 @@ class KinesisReceiverSuite
     recordProcessor.processRecords(batch, checkpointerMock)
 
     verify(receiverMock, times(1)).isStopped()
-    verify(receiverMock, never)
-      .addRecords(anyString, anyListOf(classOf[Record]))
-    verify(receiverMock, never)
-      .setCheckpointer(anyString, meq(checkpointerMock))
+    verify(receiverMock, never).addRecords(anyString,
+                                           anyListOf(classOf[Record]))
+    verify(receiverMock, never).setCheckpointer(anyString,
+                                                meq(checkpointerMock))
   }
 
   test("shouldn't update checkpointer when exception occurs during store") {
@@ -111,8 +111,8 @@ class KinesisReceiverSuite
 
     verify(receiverMock, times(1)).isStopped()
     verify(receiverMock, times(1)).addRecords(shardId, batch)
-    verify(receiverMock, never)
-      .setCheckpointer(anyString, meq(checkpointerMock))
+    verify(receiverMock, never).setCheckpointer(anyString,
+                                                meq(checkpointerMock))
   }
 
   test("shutdown should checkpoint if the reason is TERMINATE") {

@@ -41,7 +41,6 @@ abstract class OverridingPairs extends SymbolPairs {
           &&
             !exclude(lo) // this admits private, as one can't have a private member that matches a less-private member.
           &&
-            relatively
-              .matches(lo, high)) // TODO we don't call exclude(high), should we?
+            relatively.matches(lo, high)) // TODO we don't call exclude(high), should we?
   }
 }

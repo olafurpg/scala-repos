@@ -106,8 +106,8 @@ private[python] class PythonMLLibAPI extends Serializable {
       data: JavaRDD[LabeledPoint],
       initialWeights: Vector): JList[Object] = {
     try {
-      val model = learner
-        .run(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), initialWeights)
+      val model = learner.run(data.rdd.persist(StorageLevel.MEMORY_AND_DISK),
+                              initialWeights)
       if (model.isInstanceOf[LogisticRegressionModel]) {
         val lrModel = model.asInstanceOf[LogisticRegressionModel]
         List(lrModel.weights,
@@ -721,8 +721,8 @@ private[python] class PythonMLLibAPI extends Serializable {
                                 minInstancesPerNode = minInstancesPerNode,
                                 minInfoGain = minInfoGain)
     try {
-      DecisionTree
-        .train(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), strategy)
+      DecisionTree.train(data.rdd.persist(StorageLevel.MEMORY_AND_DISK),
+                         strategy)
     } finally {
       data.rdd.unpersist(blocking = false)
     }
@@ -1114,8 +1114,12 @@ private[python] class PythonMLLibAPI extends Serializable {
                                eps: Double,
                                nparts: Int,
                                intercept: Double): JavaRDD[LabeledPoint] = {
-    LinearDataGenerator
-      .generateLinearRDD(sc, nexamples, nfeatures, eps, nparts, intercept)
+    LinearDataGenerator.generateLinearRDD(sc,
+                                          nexamples,
+                                          nfeatures,
+                                          eps,
+                                          nparts,
+                                          intercept)
   }
 
   /**

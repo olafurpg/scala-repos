@@ -102,8 +102,8 @@ trait AssignmentAnnotator {
                           "Wrong right assignment side")
                     }
                   case _ =>
-                    holder
-                      .createErrorAnnotation(assignment, "Reassignment to val")
+                    holder.createErrorAnnotation(assignment,
+                                                 "Reassignment to val")
                 }
               case f: ScFunction =>
                 holder.createErrorAnnotation(assignment, "Reassignment to val")
@@ -112,12 +112,13 @@ trait AssignmentAnnotator {
                 method.containingClass match {
                   case c: PsiClass if c.isAnnotationType => //do nothing
                   case _ =>
-                    holder
-                      .createErrorAnnotation(assignment, "Reassignment to val")
+                    holder.createErrorAnnotation(assignment,
+                                                 "Reassignment to val")
                 }
               case v: ScValue =>
-                val annotation = holder
-                  .createErrorAnnotation(assignment, "Reassignment to val")
+                val annotation = holder.createErrorAnnotation(
+                  assignment,
+                  "Reassignment to val")
                 annotation.registerFix(
                   new ValToVarQuickFix(
                     ScalaPsiUtil.nameContext(r.element).asInstanceOf[ScValue]))

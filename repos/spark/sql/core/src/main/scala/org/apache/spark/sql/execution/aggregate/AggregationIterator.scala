@@ -234,8 +234,9 @@ abstract class AggregationIterator(
         newMutableProjection(evalExpressions, bufferAttributes)()
       expressionAggEvalProjection.target(aggregateResult)
 
-      val resultProjection = UnsafeProjection
-        .create(resultExpressions, groupingAttributes ++ aggregateAttributes)
+      val resultProjection = UnsafeProjection.create(
+        resultExpressions,
+        groupingAttributes ++ aggregateAttributes)
 
       (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
         {

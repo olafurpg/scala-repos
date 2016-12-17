@@ -88,11 +88,11 @@ object MongoAccountServer
 
   def Emailer(config: Configuration) = {
     val emailProps = new java.util.Properties
-    emailProps
-      .setProperty("mail.smtp.host", config[String]("host", "localhost"))
+    emailProps.setProperty("mail.smtp.host",
+                           config[String]("host", "localhost"))
     emailProps.setProperty("mail.smtp.port", config[String]("port", "25"))
-    emailProps
-      .setProperty("mail.from", config[String]("from", "support@precog.com"))
+    emailProps.setProperty("mail.from",
+                           config[String]("from", "support@precog.com"))
     val templateDir = new File(config[String]("template_dir"))
     require(
       templateDir.isDirectory,

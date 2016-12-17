@@ -237,8 +237,12 @@ object Tests {
     }
 
     val (frameworkSetup, runnables, frameworkCleanup) =
-      TestFramework
-        .testTasks(frameworks, runners, loader, tests, log, testListeners)
+      TestFramework.testTasks(frameworks,
+                              runners,
+                              loader,
+                              tests,
+                              log,
+                              testListeners)
 
     val setupTasks = fj(partApp(userSetup) :+ frameworkSetup)
     val mainTasks =

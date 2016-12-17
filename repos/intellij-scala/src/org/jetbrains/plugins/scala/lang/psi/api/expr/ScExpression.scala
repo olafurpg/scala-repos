@@ -217,8 +217,9 @@ trait ScExpression
   private def getTypeWithoutImplicitsImpl(
       ignoreBaseTypes: Boolean,
       fromUnderscore: Boolean): TypeResult[ScType] = {
-    val inner = ScExpression.this
-      .getNonValueType(TypingContext.empty, ignoreBaseTypes, fromUnderscore)
+    val inner = ScExpression.this.getNonValueType(TypingContext.empty,
+                                                  ignoreBaseTypes,
+                                                  fromUnderscore)
     inner match {
       case Success(rtp, _) =>
         var res = rtp
@@ -543,8 +544,9 @@ trait ScExpression
     }
     val newExpr: ScExpression =
       if (ScalaPsiUtil.needParentheses(this, expr)) {
-        ScalaPsiElementFactory
-          .createExpressionFromText("(" + expr.getText + ")", getManager)
+        ScalaPsiElementFactory.createExpressionFromText(
+          "(" + expr.getText + ")",
+          getManager)
       } else expr
     val parentNode = oldParent.getNode
     val newNode = newExpr.copy.getNode
@@ -575,8 +577,8 @@ trait ScExpression
                                   ModCount.getBlockModificationCount)
   def expectedTypesEx(fromUnderscore: Boolean = true)
     : Array[(ScType, Option[ScTypeElement])] = {
-    ExpectedTypes
-      .expectedExprTypes(ScExpression.this, fromUnderscore = fromUnderscore)
+    ExpectedTypes.expectedExprTypes(ScExpression.this,
+                                    fromUnderscore = fromUnderscore)
   }
 
   @CachedMappedWithRecursionGuard(this,
@@ -725,8 +727,9 @@ trait ScExpression
                 state.put(ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY, cl)
             case _ =>
           }
-          applyProc
-            .processType(res.getTypeWithDependentSubstitutor, expr, state)
+          applyProc.processType(res.getTypeWithDependentSubstitutor,
+                                expr,
+                                state)
           cand = applyProc.candidates
         case _ =>
       }

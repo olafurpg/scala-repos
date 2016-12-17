@@ -36,8 +36,9 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
       parameters: Map[String, String]): BaseRelation = {
     val url =
       parameters.getOrElse("url", sys.error("Option 'url' not specified"))
-    val table = parameters
-      .getOrElse("dbtable", sys.error("Option 'dbtable' not specified"))
+    val table = parameters.getOrElse(
+      "dbtable",
+      sys.error("Option 'dbtable' not specified"))
     val partitionColumn = parameters.getOrElse("partitionColumn", null)
     val lowerBound = parameters.getOrElse("lowerBound", null)
     val upperBound = parameters.getOrElse("upperBound", null)

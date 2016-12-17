@@ -26,13 +26,15 @@ class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator {
       case (v1: PrimitiveValue, v2: PrimitiveValue)
           if DebuggerUtils.isInteger(leftResult) &&
             DebuggerUtils.isInteger(rightResult) =>
-        DebuggerUtilsEx
-          .createValue(vm, "boolean", v1.longValue == v2.longValue)
+        DebuggerUtilsEx.createValue(vm,
+                                    "boolean",
+                                    v1.longValue == v2.longValue)
       case (v1: PrimitiveValue, v2: PrimitiveValue)
           if DebuggerUtils.isNumeric(leftResult) &&
             DebuggerUtils.isNumeric(rightResult) =>
-        DebuggerUtilsEx
-          .createValue(vm, "boolean", v1.doubleValue == v2.doubleValue)
+        DebuggerUtilsEx.createValue(vm,
+                                    "boolean",
+                                    v1.doubleValue == v2.doubleValue)
       case (v1: BooleanValue, v2: BooleanValue) =>
         DebuggerUtilsEx.createValue(vm, "boolean", v1 == v2)
       case (v1: CharValue, v2: CharValue) =>

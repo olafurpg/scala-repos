@@ -45,8 +45,10 @@ class RPackageUtilsSuite
   private val dep2 = MavenCoordinate("a", "dep2", "d")
 
   private def getJarPath(coord: MavenCoordinate, repo: File): File = {
-    new File(IvyTestUtils
-               .pathFromCoordinate(coord, repo, "jar", useIvyLayout = false),
+    new File(IvyTestUtils.pathFromCoordinate(coord,
+                                             repo,
+                                             "jar",
+                                             useIvyLayout = false),
              IvyTestUtils.artifactName(coord, useIvyLayout = false, ".jar"))
   }
 

@@ -666,8 +666,8 @@ class Dataset[T] private[sql] (
     // resolved and become AttributeReference.
     val cond = plan.condition.map {
       _.transform {
-        case catalyst.expressions
-              .EqualTo(a: AttributeReference, b: AttributeReference)
+        case catalyst.expressions.EqualTo(a: AttributeReference,
+                                          b: AttributeReference)
             if a.sameRef(b) =>
           catalyst.expressions.EqualTo(withPlan(plan.left).resolve(a.name),
                                        withPlan(plan.right).resolve(b.name))
@@ -720,8 +720,9 @@ class Dataset[T] private[sql] (
       case _ => Alias(CreateStruct(rightOutput), "_2")()
     }
 
-    implicit val tuple2Encoder: Encoder[(T, U)] = ExpressionEncoder
-      .tuple(this.unresolvedTEncoder, other.unresolvedTEncoder)
+    implicit val tuple2Encoder: Encoder[(T, U)] = ExpressionEncoder.tuple(
+      this.unresolvedTEncoder,
+      other.unresolvedTEncoder)
     withTypedPlan[(T, U)](other, encoderFor[(T, U)]) { (left, right) =>
       Project(leftData :: rightData :: Nil, joined.analyzed)
     }
@@ -2393,8 +2394,9 @@ class Dataset[T] private[sql] (
       val start = System.nanoTime()
       val result = action(df)
       val end = System.nanoTime()
-      sqlContext.listenerManager
-        .onSuccess(name, df.queryExecution, end - start)
+      sqlContext.listenerManager.onSuccess(name,
+                                           df.queryExecution,
+                                           end - start)
       result
     } catch {
       case e: Exception =>
@@ -2412,8 +2414,9 @@ class Dataset[T] private[sql] (
       val start = System.nanoTime()
       val result = action(ds)
       val end = System.nanoTime()
-      sqlContext.listenerManager
-        .onSuccess(name, ds.queryExecution, end - start)
+      sqlContext.listenerManager.onSuccess(name,
+                                           ds.queryExecution,
+                                           end - start)
       result
     } catch {
       case e: Exception =>

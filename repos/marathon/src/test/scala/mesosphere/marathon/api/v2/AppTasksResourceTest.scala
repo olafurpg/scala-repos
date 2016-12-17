@@ -41,8 +41,11 @@ class AppTasksResourceTest
     groupManager.app(appId.toRootPath) returns Future.successful(
       Some(AppDefinition(appId.toRootPath)))
 
-    val response = appsTaskResource
-      .deleteMany(appId, host, scale = false, force = false, auth.request)
+    val response = appsTaskResource.deleteMany(appId,
+                                               host,
+                                               scale = false,
+                                               force = false,
+                                               auth.request)
     response.getStatus shouldEqual 200
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])

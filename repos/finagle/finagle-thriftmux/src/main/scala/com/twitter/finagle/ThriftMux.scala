@@ -399,8 +399,10 @@ object ThriftMux
           case e @ RetryPolicy.RetryableWriteException(_) =>
             Future.exception(e)
           case e if !e.isInstanceOf[TException] =>
-            val msg = UncaughtAppExceptionFilter
-              .writeExceptionMessage(request.body, e, protocolFactory)
+            val msg =
+              UncaughtAppExceptionFilter.writeExceptionMessage(request.body,
+                                                               e,
+                                                               protocolFactory)
             Future.value(mux.Response(msg))
         }
     }
@@ -482,8 +484,8 @@ object ThriftMux
         addr: SocketAddress,
         factory: ServiceFactory[Array[Byte], Array[Byte]]
     ): ListeningServer = {
-      muxer
-        .serve(addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
+      muxer.serve(addr,
+                  MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
     }
 
     // Java-friendly forwarders

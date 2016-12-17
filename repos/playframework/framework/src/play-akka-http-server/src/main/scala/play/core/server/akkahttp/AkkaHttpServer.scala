@@ -184,8 +184,9 @@ class AkkaHttpServer(config: ServerConfig,
 
         websocket(taggedRequestHeader).map {
           case Left(result) =>
-            modelConversion
-              .convertResult(taggedRequestHeader, result, request.protocol)
+            modelConversion.convertResult(taggedRequestHeader,
+                                          result,
+                                          request.protocol)
           case Right(flow) =>
             WebSocketHandler.handleWebSocket(upgrade, flow, 16384)
         }
@@ -240,8 +241,9 @@ class AkkaHttpServer(config: ServerConfig,
     val responseFuture: Future[HttpResponse] = resultFuture.map { result =>
       val cleanedResult: Result =
         ServerResultUtils.cleanFlashCookie(taggedRequestHeader, result)
-      modelConversion
-        .convertResult(taggedRequestHeader, cleanedResult, request.protocol)
+      modelConversion.convertResult(taggedRequestHeader,
+                                    cleanedResult,
+                                    request.protocol)
     }
     responseFuture
   }

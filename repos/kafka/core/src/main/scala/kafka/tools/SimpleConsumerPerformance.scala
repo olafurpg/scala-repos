@@ -180,8 +180,11 @@ object SimpleConsumerPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils
-      .checkRequiredArgs(parser, options, topicOpt, urlOpt, numMessagesOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       topicOpt,
+                                       urlOpt,
+                                       numMessagesOpt)
 
     val url = new URI(options.valueOf(urlOpt))
     val fetchSize = options.valueOf(fetchSizeOpt).intValue

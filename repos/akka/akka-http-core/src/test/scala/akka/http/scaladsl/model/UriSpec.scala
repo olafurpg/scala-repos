@@ -437,8 +437,10 @@ class UriSpec extends WordSpec with Matchers {
 
     // http://tools.ietf.org/html/rfc3986#section-1.1.2
     "be correctly parsed from and rendered to simple test examples" in {
-      Uri("ftp://ftp.is.co.za/rfc/rfc1808.txt") shouldEqual Uri
-        .from(scheme = "ftp", host = "ftp.is.co.za", path = "/rfc/rfc1808.txt")
+      Uri("ftp://ftp.is.co.za/rfc/rfc1808.txt") shouldEqual Uri.from(
+        scheme = "ftp",
+        host = "ftp.is.co.za",
+        path = "/rfc/rfc1808.txt")
 
       Uri("http://www.ietf.org/rfc/rfc2396.txt") shouldEqual Uri.from(
         scheme = "http",
@@ -451,11 +453,13 @@ class UriSpec extends WordSpec with Matchers {
         path = "/c=GB",
         queryString = Some("objectClass?one"))
 
-      Uri("mailto:John.Doe@example.com") shouldEqual Uri
-        .from(scheme = "mailto", path = "John.Doe@example.com")
+      Uri("mailto:John.Doe@example.com") shouldEqual Uri.from(
+        scheme = "mailto",
+        path = "John.Doe@example.com")
 
-      Uri("news:comp.infosystems.www.servers.unix") shouldEqual Uri
-        .from(scheme = "news", path = "comp.infosystems.www.servers.unix")
+      Uri("news:comp.infosystems.www.servers.unix") shouldEqual Uri.from(
+        scheme = "news",
+        path = "comp.infosystems.www.servers.unix")
 
       Uri("tel:+1-816-555-1212") shouldEqual Uri.from(scheme = "tel",
                                                       path = "+1-816-555-1212")

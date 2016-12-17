@@ -196,8 +196,9 @@ trait MemberHandlers {
     override def resultExtractionCode(req: Request) = {
       val lhsType = string2code(req lookupTypeOf name)
       val res = string2code(req fullPath name)
-      """ + "%s: %s = " + %s + "\n" """
-        .format(string2code(lhs.toString), lhsType, res) + "\n"
+      """ + "%s: %s = " + %s + "\n" """.format(string2code(lhs.toString),
+                                               lhsType,
+                                               res) + "\n"
     }
   }
 

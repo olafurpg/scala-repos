@@ -816,8 +816,8 @@ private[classification] class MultiClassSummarizer extends Serializable {
       case (key, value) =>
         val (counts: Long, weightSum: Double) =
           largeMap.distinctMap.getOrElse(key, (0L, 0.0))
-        largeMap.distinctMap
-          .put(key, (counts + value._1, weightSum + value._2))
+        largeMap.distinctMap.put(key,
+                                 (counts + value._1, weightSum + value._2))
     }
     largeMap.totalInvalidCnt += smallMap.totalInvalidCnt
     largeMap

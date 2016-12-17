@@ -366,8 +366,11 @@ class AppsResourceTest
       .successful(Seq(appInfo))
 
     When("The the index is fetched without any filters")
-    val response = appsResource
-      .index(null, null, null, new java.util.HashSet(), auth.request)
+    val response = appsResource.index(null,
+                                      null,
+                                      null,
+                                      new java.util.HashSet(),
+                                      auth.request)
 
     Then("The response holds counts and deployments")
     val appJson = Json.parse(response.getEntity.asInstanceOf[String])

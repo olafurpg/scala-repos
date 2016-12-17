@@ -143,8 +143,10 @@ private class RandomForest(private val strategy: Strategy,
     timer.start("init")
 
     val retaggedInput = input.retag(classOf[LabeledPoint])
-    val metadata = DecisionTreeMetadata
-      .buildMetadata(retaggedInput, strategy, numTrees, featureSubsetStrategy)
+    val metadata = DecisionTreeMetadata.buildMetadata(retaggedInput,
+                                                      strategy,
+                                                      numTrees,
+                                                      featureSubsetStrategy)
     logDebug("algo = " + strategy.algo)
     logDebug("numTrees = " + numTrees)
     logDebug("seed = " + seed)
@@ -245,8 +247,10 @@ private class RandomForest(private val strategy: Strategy,
       // Collect some nodes to split, and choose features for each node (if subsampling).
       // Each group of nodes may come from one or multiple trees, and at multiple levels.
       val (nodesForGroup, treeToNodeToIndexInfo) =
-        RandomForest
-          .selectNodesToSplit(nodeQueue, maxMemoryUsage, metadata, rng)
+        RandomForest.selectNodesToSplit(nodeQueue,
+                                        maxMemoryUsage,
+                                        metadata,
+                                        rng)
       // Sanity check (should never occur):
       assert(
         nodesForGroup.size > 0,
@@ -556,8 +560,9 @@ object RandomForest extends Serializable with Logging {
         RandomForest.aggregateSizeForNode(metadata, featureSubset) * 8L
       if (memUsage + nodeMemUsage <= maxMemoryUsage) {
         nodeQueue.dequeue()
-        mutableNodesForGroup
-          .getOrElseUpdate(treeIndex, new mutable.ArrayBuffer[Node]()) += node
+        mutableNodesForGroup.getOrElseUpdate(
+          treeIndex,
+          new mutable.ArrayBuffer[Node]()) += node
         mutableTreeToNodeToIndexInfo.getOrElseUpdate(
           treeIndex,
           new mutable.HashMap[Int, NodeIndexInfo]())(node.id) =

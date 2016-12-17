@@ -257,8 +257,10 @@ class ImplicitCollector(
                                    getImports(state),
                                    implicitSearchState = Some(collectorState)))
         case f: ScFieldId =>
-          val memb = ScalaPsiUtil
-            .getContextOfType(f, true, classOf[ScValue], classOf[ScVariable])
+          val memb = ScalaPsiUtil.getContextOfType(f,
+                                                   true,
+                                                   classOf[ScValue],
+                                                   classOf[ScVariable])
           memb match {
             case memb: ScMember if memb.hasModifierProperty("implicit") =>
               placeCalculated = true

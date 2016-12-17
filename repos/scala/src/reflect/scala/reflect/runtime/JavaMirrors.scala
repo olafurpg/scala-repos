@@ -700,8 +700,9 @@ private[scala] trait JavaMirrors
           case Array_apply =>
             ScalaRunTime.array_apply(objReceiver, args(0).asInstanceOf[Int])
           case Array_update =>
-            ScalaRunTime
-              .array_update(objReceiver, args(0).asInstanceOf[Int], args(1))
+            ScalaRunTime.array_update(objReceiver,
+                                      args(0).asInstanceOf[Int],
+                                      args(1))
           case Array_clone => ScalaRunTime.array_clone(objReceiver)
           case sym if isStringConcat(sym) => receiver.toString + objArg0
           case sym if sym.owner.isPrimitiveValueClass => invokePrimitiveMethod
@@ -839,8 +840,11 @@ private[scala] trait JavaMirrors
             val bytes = ssig.getBytes
             val len = ByteCodecs.decode(bytes)
             assignAssociatedFile(clazz, module, jclazz)
-            unpickler
-              .unpickle(bytes take len, 0, clazz, module, jclazz.getName)
+            unpickler.unpickle(bytes take len,
+                               0,
+                               clazz,
+                               module,
+                               jclazz.getName)
             markAllCompleted(clazz, module)
           case None =>
             loadBytes[Array[String]]("scala.reflect.ScalaLongSignature") match {
@@ -1435,8 +1439,9 @@ private[scala] trait JavaMirrors
 
     private def jmethodAsScala1(jmeth: jMethod): MethodSymbol = {
       val clazz = sOwner(jmeth)
-      val meth = clazz
-        .newMethod(newTermName(jmeth.getName), NoPosition, jmeth.scalaFlags)
+      val meth = clazz.newMethod(newTermName(jmeth.getName),
+                                 NoPosition,
+                                 jmeth.scalaFlags)
       methodCache enter (jmeth, meth)
       val tparams = jmeth.getTypeParameters.toList map createTypeParameter
       val paramtpes = jmeth.getGenericParameterTypes.toList map typeToScala

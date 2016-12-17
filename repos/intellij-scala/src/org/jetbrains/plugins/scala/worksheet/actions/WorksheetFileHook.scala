@@ -215,8 +215,11 @@ class WorksheetFileHook(private val project: Project)
 
                         if (splitter != null) {
                           splitter setProportion ratio
-                          WorksheetFoldGroup
-                            .load(viewer, ext, project, splitter, scalaFile)
+                          WorksheetFoldGroup.load(viewer,
+                                                  ext,
+                                                  project,
+                                                  splitter,
+                                                  scalaFile)
                         }
                       }
                     case _ =>

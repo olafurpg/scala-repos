@@ -302,8 +302,9 @@ object OfflineEvolutions {
                   autocommit: Boolean = true,
                   schema: String = ""): Unit = {
     val evolutions = getEvolutions(appPath, classloader, dbApi)
-    val scripts = evolutions.evolutionsApi
-      .scripts(dbName, evolutions.evolutionsReader, schema)
+    val scripts = evolutions.evolutionsApi.scripts(dbName,
+                                                   evolutions.evolutionsReader,
+                                                   schema)
     if (!isTest) {
       logger.warn(
         "Applying evolution scripts for database '" + dbName +

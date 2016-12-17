@@ -345,8 +345,9 @@ object SparkEnv extends Logging {
       "sort" -> "org.apache.spark.shuffle.sort.SortShuffleManager",
       "tungsten-sort" -> "org.apache.spark.shuffle.sort.SortShuffleManager")
     val shuffleMgrName = conf.get("spark.shuffle.manager", "sort")
-    val shuffleMgrClass = shortShuffleMgrNames
-      .getOrElse(shuffleMgrName.toLowerCase, shuffleMgrName)
+    val shuffleMgrClass = shortShuffleMgrNames.getOrElse(
+      shuffleMgrName.toLowerCase,
+      shuffleMgrName)
     val shuffleManager = instantiateClass[ShuffleManager](shuffleMgrClass)
 
     val useLegacyMemoryManager =

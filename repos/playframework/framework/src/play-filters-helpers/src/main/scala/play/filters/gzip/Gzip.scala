@@ -77,8 +77,9 @@ object Gzip {
           state: State,
           k: K[Bytes, A]): Iteratee[Bytes, Iteratee[Bytes, A]] = {
         // Deflate some bytes
-        val numBytes = state.deflater
-          .deflate(state.buffer, state.pos, bufferSize - state.pos)
+        val numBytes = state.deflater.deflate(state.buffer,
+                                              state.pos,
+                                              bufferSize - state.pos)
         if (numBytes == 0) {
           if (state.deflater.needsInput()) {
             // Deflater needs more input, so continue
@@ -105,8 +106,9 @@ object Gzip {
       def deflateUntilFinished[A](
           state: State,
           k: K[Bytes, A]): Iteratee[Bytes, Iteratee[Bytes, A]] = {
-        val numBytes = state.deflater
-          .deflate(state.buffer, state.pos, bufferSize - state.pos)
+        val numBytes = state.deflater.deflate(state.buffer,
+                                              state.pos,
+                                              bufferSize - state.pos)
         if (numBytes == 0) {
           if (state.deflater.finished()) {
             // Deflater is finished, send the trailer
@@ -254,8 +256,9 @@ object Gzip {
           k: K[Bytes, A],
           input: Bytes): Iteratee[Bytes, Iteratee[Bytes, A]] = {
         // Inflate some bytes
-        val numBytes = state.inflater
-          .inflate(state.buffer, state.pos, bufferSize - state.pos)
+        val numBytes = state.inflater.inflate(state.buffer,
+                                              state.pos,
+                                              bufferSize - state.pos)
         if (numBytes == 0) {
           if (state.inflater.finished()) {
             // Feed the current buffer

@@ -358,8 +358,9 @@ class BlockManagerReplicationSuite
                                  replicationFactor: Int): Int = {
       val storageLevel =
         StorageLevel(true, true, false, true, replicationFactor)
-      initialStores.head
-        .putSingle(blockId, new Array[Byte](blockSize), storageLevel)
+      initialStores.head.putSingle(blockId,
+                                   new Array[Byte](blockSize),
+                                   storageLevel)
       val numLocations = master.getLocations(blockId).size
       allStores.foreach { _.removeBlock(blockId) }
       numLocations

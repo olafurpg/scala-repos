@@ -94,9 +94,10 @@ class FilteredBuffer[E](override val delegate: jfxct.FilteredList[E])
     ObjectProperty.fillProperty(delegate.predicateProperty, v)
   }
   def predicate_=(predicate: (E) => Boolean) {
-    ObjectProperty
-      .fillProperty(delegate.predicateProperty, new ju.function.Predicate[E] {
-        override def test(t: E): Boolean = predicate(t)
-      })
+    ObjectProperty.fillProperty(delegate.predicateProperty,
+                                new ju.function.Predicate[E] {
+                                  override def test(t: E): Boolean =
+                                    predicate(t)
+                                })
   }
 }

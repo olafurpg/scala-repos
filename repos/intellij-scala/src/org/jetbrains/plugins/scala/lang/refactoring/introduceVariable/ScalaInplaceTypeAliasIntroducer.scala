@@ -114,8 +114,9 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
           val myFile: PsiFile = PsiDocumentManager
             .getInstance(myEditor.getProject)
             .getPsiFile(myEditor.getDocument)
-          myEditor.getDocument
-            .replaceString(0, myFile.getTextLength, revertInfo.fileText)
+          myEditor.getDocument.replaceString(0,
+                                             myFile.getTextLength,
+                                             revertInfo.fileText)
         }
         myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
         myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)

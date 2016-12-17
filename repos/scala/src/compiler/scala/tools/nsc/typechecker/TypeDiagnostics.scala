@@ -155,8 +155,7 @@ trait TypeDiagnostics { self: Analyzer =>
           DEFERRED.toLong | MUTABLE
         else DEFERRED
 
-      getter.owner
-        .newValue(getter.name.toTermName, getter.pos, flags) setInfo getter.tpe.resultType
+      getter.owner.newValue(getter.name.toTermName, getter.pos, flags) setInfo getter.tpe.resultType
     }
 
   def treeSymTypeMsg(tree: Tree): String = {
@@ -249,8 +248,10 @@ trait TypeDiagnostics { self: Analyzer =>
                   )
                   val explainDef = {
                     val prepend = if (isJava) "Java-defined " else ""
-                    "%s%s is %s in %s."
-                      .format(prepend, reqsym, param.variance, param)
+                    "%s%s is %s in %s.".format(prepend,
+                                               reqsym,
+                                               param.variance,
+                                               param)
                   }
                   // Don't suggest they change the class declaration if it's somewhere
                   // under scala.* or defined in a java class, because attempting either
@@ -261,8 +262,10 @@ trait TypeDiagnostics { self: Analyzer =>
                          "investigate a wildcard type such as `_ %s %s`. (SLS 3.2.10)"
                            .format(op, reqArg)
                        else
-                         "define %s as %s%s instead. (SLS 4.5)"
-                           .format(param.name, suggest, param.name))
+                         "define %s as %s%s instead. (SLS 4.5)".format(
+                           param.name,
+                           suggest,
+                           param.name))
 
                   Some("Note: " + explainFound + explainDef + suggestChange)
                 }

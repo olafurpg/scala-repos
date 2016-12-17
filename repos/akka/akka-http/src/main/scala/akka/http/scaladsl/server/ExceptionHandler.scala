@@ -58,8 +58,9 @@ object ExceptionHandler {
       case NonFatal(e) ⇒
         ctx ⇒
           {
-            ctx.log
-              .error(e, "Error during processing of request {}", ctx.request)
+            ctx.log.error(e,
+                          "Error during processing of request {}",
+                          ctx.request)
             ctx.complete(InternalServerError)
           }
     }

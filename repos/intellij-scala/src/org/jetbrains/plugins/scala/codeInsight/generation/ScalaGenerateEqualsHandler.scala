@@ -126,8 +126,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
         |  $firstStmtText
         |  $calculationText
         |}""".stripMargin.replace("\r", "")
-    ScalaPsiElementFactory
-      .createMethodWithContext(methodText, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory.createMethodWithContext(methodText,
+                                                   aClass,
+                                                   aClass.extendsBlock)
   }
 
   protected def createCanEqual(aClass: ScClass, project: Project): ScFunction = {
@@ -139,8 +140,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
       ScSubstitutor.empty)
     val overrideMod = overrideModifier(aClass, sign)
     val text = s"$overrideMod $declText = other.isInstanceOf[${aClass.name}]"
-    ScalaPsiElementFactory
-      .createMethodWithContext(text, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory.createMethodWithContext(text,
+                                                   aClass,
+                                                   aClass.extendsBlock)
   }
 
   protected def createEquals(aClass: ScClass, project: Project): ScFunction = {
@@ -165,8 +167,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
                  |    $checksText
                  |  case _ $arrow false
                  |}""".stripMargin.replace("\r", "")
-    ScalaPsiElementFactory
-      .createMethodWithContext(text, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory.createMethodWithContext(text,
+                                                   aClass,
+                                                   aClass.extendsBlock)
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
@@ -222,8 +225,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
   }
 
   private def hasHashCode(aClass: ScClass): Option[ScFunction] = {
-    val method = ScalaPsiElementFactory
-      .createMethodFromText("def hashCode(): Int", aClass.getManager)
+    val method = ScalaPsiElementFactory.createMethodFromText(
+      "def hashCode(): Int",
+      aClass.getManager)
     findSuchMethod(aClass, "hashCode", method.methodType)
   }
 

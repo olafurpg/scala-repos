@@ -626,8 +626,8 @@ class GroupCoordinator(val brokerId: Int,
   }
 
   def handleGroupEmigration(offsetTopicPartitionId: Int) {
-    groupManager
-      .removeGroupsForPartition(offsetTopicPartitionId, onGroupUnloaded)
+    groupManager.removeGroupsForPartition(offsetTopicPartitionId,
+                                          onGroupUnloaded)
   }
 
   private def setAndPropagateAssignment(group: GroupMetadata,

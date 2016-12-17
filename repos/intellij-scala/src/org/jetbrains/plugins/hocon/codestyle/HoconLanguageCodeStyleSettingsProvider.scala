@@ -49,8 +49,8 @@ class HoconLanguageCodeStyleSettingsProvider
             SPACE_AFTER_COMMA
           ).map(_.name): _*)
 
-        consumer
-          .renameStandardOption(SPACE_WITHIN_BRACES.name, "Object braces")
+        consumer.renameStandardOption(SPACE_WITHIN_BRACES.name,
+                                      "Object braces")
         consumer.renameStandardOption(
           SPACE_WITHIN_METHOD_CALL_PARENTHESES.name,
           "Include qualifier parentheses")

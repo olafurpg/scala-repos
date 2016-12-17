@@ -376,8 +376,10 @@ class BigInteger extends Number with Comparable[BigInteger] {
           val resDigits = new Array[Int](resLength)
           val resSign = if (thisSign == divisorSign) 1 else -1
           if (divisorLen == 1) {
-            Division
-              .divideArrayByInt(resDigits, digits, thisLen, divisor.digits(0))
+            Division.divideArrayByInt(resDigits,
+                                      digits,
+                                      thisLen,
+                                      divisor.digits(0))
           } else {
             Division.divide(resDigits,
                             resLength,
@@ -642,8 +644,12 @@ class BigInteger extends Number with Comparable[BigInteger] {
           Division.remainderArrayByInt(digits, thisLen, divisor.digits(0))
       } else {
         val qLen = thisLen - divisorLen + 1
-        resDigits = Division
-          .divide(null, qLen, digits, thisLen, divisor.digits, divisorLen)
+        resDigits = Division.divide(null,
+                                    qLen,
+                                    digits,
+                                    thisLen,
+                                    divisor.digits,
+                                    divisorLen)
       }
       val result = new BigInteger(sign, resLength, resDigits)
       result.cutOffLeadingZeroes()

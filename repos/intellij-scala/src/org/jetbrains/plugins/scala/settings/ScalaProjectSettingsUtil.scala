@@ -59,8 +59,8 @@ object ScalaProjectSettingsUtil {
 
   def getPackageValidator: InputValidator = new InputValidator {
     def checkInput(inputString: String): Boolean = {
-      ScalaProjectSettingsUtil
-        .isValidPackage(inputString, checkPlaceholder = false)
+      ScalaProjectSettingsUtil.isValidPackage(inputString,
+                                              checkPlaceholder = false)
     }
 
     def canClose(inputString: String): Boolean = {

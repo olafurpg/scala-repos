@@ -68,8 +68,11 @@ class RandomForestModel @Since("1.2.0")(
     */
   @Since("1.3.0")
   override def save(sc: SparkContext, path: String): Unit = {
-    TreeEnsembleModel.SaveLoadV1_0
-      .save(sc, path, this, RandomForestModel.SaveLoadV1_0.thisClassName)
+    TreeEnsembleModel.SaveLoadV1_0.save(
+      sc,
+      path,
+      this,
+      RandomForestModel.SaveLoadV1_0.thisClassName)
   }
 
   override protected def formatVersion: String =

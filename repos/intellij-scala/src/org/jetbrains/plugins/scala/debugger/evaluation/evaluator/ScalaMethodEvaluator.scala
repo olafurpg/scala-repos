@@ -50,8 +50,8 @@ case class ScalaMethodEvaluator(
   private def getOrUpdateMethod(
       referenceType: ReferenceType,
       findMethod: ReferenceType => Method): Option[Method] = {
-    jdiMethodsCache
-      .getOrElseUpdate(referenceType, Option(findMethod(referenceType)))
+    jdiMethodsCache.getOrElseUpdate(referenceType,
+                                    Option(findMethod(referenceType)))
   }
 
   def evaluate(context: EvaluationContextImpl): AnyRef = {
@@ -86,8 +86,9 @@ case class ScalaMethodEvaluator(
       val referenceType: ReferenceType = obj match {
         case o: ObjectReference =>
           val qualifierType = o.referenceType()
-          debugProcess
-            .findClass(context, qualifierType.name, qualifierType.classLoader)
+          debugProcess.findClass(context,
+                                 qualifierType.name,
+                                 qualifierType.classLoader)
         case obj: ClassType =>
           debugProcess.findClass(context, obj.name, context.getClassLoader)
         case _ =>
@@ -129,8 +130,9 @@ case class ScalaMethodEvaluator(
           }
           if (jdiMethod == null && localMethod) {
             for (method <- sortedMethodCandidates if jdiMethod == null) {
-              mName = DebuggerUtilsEx
-                .methodName(referenceType.name, method.name(), sign)
+              mName = DebuggerUtilsEx.methodName(referenceType.name,
+                                                 method.name(),
+                                                 sign)
               jdiMethod = referenceType
                 .asInstanceOf[ClassType]
                 .concreteMethodByName(mName, signature.getName(debugProcess))
@@ -209,8 +211,9 @@ case class ScalaMethodEvaluator(
           case Some(tr) =>
             val className: String = tr.getName(context.getDebugProcess)
             if (className != null) {
-              context.getDebugProcess
-                .findClass(context, className, context.getClassLoader) match {
+              context.getDebugProcess.findClass(context,
+                                                className,
+                                                context.getClassLoader) match {
                 case c: ClassType => _refType = c
                 case _ =>
                   _refType = referenceType.asInstanceOf[ClassType].superclass
@@ -231,8 +234,9 @@ case class ScalaMethodEvaluator(
           case Some(tr) =>
             val className: String = tr.getName(context.getDebugProcess)
             if (className != null) {
-              context.getDebugProcess
-                .findClass(context, className, context.getClassLoader) match {
+              context.getDebugProcess.findClass(context,
+                                                className,
+                                                context.getClassLoader) match {
                 case c: ClassType =>
                   return debugProcess.invokeMethod(
                     context,

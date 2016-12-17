@@ -156,8 +156,9 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
 
   @inline
   protected final def setStatus(newStatus: Status): Unit =
-    Unsafe.instance
-      .putIntVolatile(this, AbstractMailbox.mailboxStatusOffset, newStatus)
+    Unsafe.instance.putIntVolatile(this,
+                                   AbstractMailbox.mailboxStatusOffset,
+                                   newStatus)
 
   /**
     * Reduce the suspend count by one. Caller does not need to worry about whether

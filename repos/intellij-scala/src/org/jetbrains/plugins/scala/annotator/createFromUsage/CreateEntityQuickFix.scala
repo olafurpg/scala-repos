@@ -137,8 +137,8 @@ abstract class CreateEntityQuickFix(ref: ScReferenceExpression,
       if (!isScalaConsole) {
         val newEditor = positionCursor(entity.getLastChild)
         val range = entity.getTextRange
-        newEditor.getDocument
-          .deleteString(range.getStartOffset, range.getEndOffset)
+        newEditor.getDocument.deleteString(range.getStartOffset,
+                                           range.getEndOffset)
         TemplateManager.getInstance(project).startTemplate(newEditor, template)
       }
     }
@@ -149,8 +149,10 @@ object CreateEntityQuickFix {
   private def materializeSytheticObject(obj: ScObject): ScObject = {
     val clazz = obj.fakeCompanionClassOrCompanionClass
     val objText = s"object ${clazz.name} {}"
-    val fromText = ScalaPsiElementFactory
-      .createTemplateDefinitionFromText(objText, clazz.getParent, clazz)
+    val fromText = ScalaPsiElementFactory.createTemplateDefinitionFromText(
+      objText,
+      clazz.getParent,
+      clazz)
     clazz.getParent.addAfter(fromText, clazz).asInstanceOf[ScObject]
   }
 

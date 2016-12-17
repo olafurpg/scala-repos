@@ -297,8 +297,10 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
       case c: CalendarInterval =>
         Murmur3_x86_32.hashInt(c.months, hashLong(c.microseconds))
       case a: Array[Byte] =>
-        Murmur3_x86_32
-          .hashUnsafeBytes(a, Platform.BYTE_ARRAY_OFFSET, a.length, seed)
+        Murmur3_x86_32.hashUnsafeBytes(a,
+                                       Platform.BYTE_ARRAY_OFFSET,
+                                       a.length,
+                                       seed)
       case s: UTF8String =>
         Murmur3_x86_32.hashUnsafeBytes(s.getBaseObject,
                                        s.getBaseOffset,
@@ -379,8 +381,10 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
 
     ctx.nullSafeExec(nullable, s"$input.isNullAt($index)") {
       s"""
-        final ${ctx.javaType(elementType)} $element = ${ctx
-        .getValue(input, elementType, index)};
+        final ${ctx.javaType(elementType)} $element = ${ctx.getValue(
+        input,
+        elementType,
+        index)};
         ${computeHash(element, elementType, result, ctx)}
       """
     }

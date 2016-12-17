@@ -112,8 +112,9 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     if (tokenType == DOC_LINK_TAG &&
         builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
         !isEndOfComment) {
-      StableId
-        .parse(new ScalaPsiBuilderImpl(builder), true, DOC_CODE_LINK_VALUE)
+      StableId.parse(new ScalaPsiBuilderImpl(builder),
+                     true,
+                     DOC_CODE_LINK_VALUE)
     }
 
     while (!isEndOfComment) {
@@ -257,8 +258,9 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
           if (!isEndOfComment) {
             builder.advanceLexer()
           }
-          StableId
-            .parse(new ScalaPsiBuilderImpl(builder), true, DOC_TAG_VALUE_TOKEN)
+          StableId.parse(new ScalaPsiBuilderImpl(builder),
+                         true,
+                         DOC_TAG_VALUE_TOKEN)
         case PARAM_TAG | TYPE_PARAM_TAG | DEFINE_TAG =>
           if (!ParserUtils.lookAhead(builder,
                                      builder.getTokenType,

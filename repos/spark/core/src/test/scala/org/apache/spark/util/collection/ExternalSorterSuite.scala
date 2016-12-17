@@ -781,18 +781,20 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     sc = new SparkContext("local", "test", conf)
     // Avoid aggregating here to make sure we're not also using ExternalAppendOnlyMap
     // No spilling
-    AccumulatorSuite
-      .verifyPeakExecutionMemorySet(sc, "external sorter without spilling") {
-        assertNotSpilled(sc, "verify peak memory") {
-          sc.parallelize(1 to spillThreshold / 2, 2).repartition(100).count()
-        }
+    AccumulatorSuite.verifyPeakExecutionMemorySet(
+      sc,
+      "external sorter without spilling") {
+      assertNotSpilled(sc, "verify peak memory") {
+        sc.parallelize(1 to spillThreshold / 2, 2).repartition(100).count()
       }
+    }
     // With spilling
-    AccumulatorSuite
-      .verifyPeakExecutionMemorySet(sc, "external sorter with spilling") {
-        assertSpilled(sc, "verify peak memory") {
-          sc.parallelize(1 to spillThreshold * 3, 2).repartition(100).count()
-        }
+    AccumulatorSuite.verifyPeakExecutionMemorySet(
+      sc,
+      "external sorter with spilling") {
+      assertSpilled(sc, "verify peak memory") {
+        sc.parallelize(1 to spillThreshold * 3, 2).repartition(100).count()
       }
+    }
   }
 }

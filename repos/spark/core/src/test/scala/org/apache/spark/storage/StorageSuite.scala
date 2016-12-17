@@ -351,12 +351,12 @@ class StorageSuite extends SparkFunSuite {
 
   test("StorageUtils.getRddBlockLocations with multiple locations") {
     val storageStatuses = stockStorageStatuses
-    storageStatuses(0)
-      .addBlock(RDDBlockId(1, 0), BlockStatus(memAndDisk, 1L, 2L))
-    storageStatuses(0)
-      .addBlock(RDDBlockId(0, 4), BlockStatus(memAndDisk, 1L, 2L))
-    storageStatuses(2)
-      .addBlock(RDDBlockId(0, 0), BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(0).addBlock(RDDBlockId(1, 0),
+                                BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(0).addBlock(RDDBlockId(0, 4),
+                                BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(2).addBlock(RDDBlockId(0, 0),
+                                BlockStatus(memAndDisk, 1L, 2L))
     val blockLocations0 = StorageUtils.getRddBlockLocations(0, storageStatuses)
     val blockLocations1 = StorageUtils.getRddBlockLocations(1, storageStatuses)
     assert(blockLocations0.size === 5)

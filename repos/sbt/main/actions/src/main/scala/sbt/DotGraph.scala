@@ -59,8 +59,7 @@ object DotGraph {
     val mappedGraph = new HashMap[String, HashSet[String]]
     for ((key, values) <- relation.forwardMap; keyString = keyToString(key);
          value <- values)
-      mappedGraph
-        .getOrElseUpdate(keyString, new HashSet[String]) += valueToString(
+      mappedGraph.getOrElseUpdate(keyString, new HashSet[String]) += valueToString(
         value)
 
     val mappings = for {

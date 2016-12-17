@@ -84,11 +84,12 @@ class ScalaMoveClassesOrPackagesHandler
       return
     }
     val initialTargetPackageName: String =
-      MoveClassesOrPackagesImpl
-        .getInitialTargetPackageName(initialTargetElement, adjustedElements)
+      MoveClassesOrPackagesImpl.getInitialTargetPackageName(
+        initialTargetElement,
+        adjustedElements)
     val initialTargetDirectory: PsiDirectory =
-      MoveClassesOrPackagesImpl
-        .getInitialTargetDirectory(initialTargetElement, adjustedElements)
+      MoveClassesOrPackagesImpl.getInitialTargetDirectory(initialTargetElement,
+                                                          adjustedElements)
     val isTargetDirectoryFixed: Boolean = initialTargetDirectory == null
     val searchTextOccurences: Boolean = adjustedElements.exists(
       TextOccurrencesUtil.isSearchTextOccurencesEnabled)

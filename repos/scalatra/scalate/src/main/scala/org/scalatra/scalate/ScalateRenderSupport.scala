@@ -23,8 +23,8 @@ trait ScalateRenderSupport { self: ScalatraBase with ScalateSupport =>
              statusCode: Int = 200)(implicit request: HttpServletRequest,
                                     response: HttpServletResponse) {
     contentType = responseContentType
-    response
-      .setHeader("Cache-Control", "public, max-age=%d" format cacheMaxAge)
+    response.setHeader("Cache-Control",
+                       "public, max-age=%d" format cacheMaxAge)
     response.setStatus(statusCode)
     renderResponseBody(
       templateEngine.layout(

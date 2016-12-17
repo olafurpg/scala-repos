@@ -450,8 +450,8 @@ class PutJobStateHandler(jobs: JobManager[Future])(
             (obj \ "state") match {
               case JString("started") =>
                 transition(obj) { (timestamp, _) =>
-                  jobs
-                    .start(jobId, timestamp) map (Validation.fromEither(_)) map
+                  jobs.start(jobId, timestamp) map (Validation
+                    .fromEither(_)) map
                     (_ map (_.state))
                 }
 

@@ -138,8 +138,8 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
-    Dataset
-      .newDataFrame(sqlContext, LogicalRelation(dataSource.resolveRelation()))
+    Dataset.newDataFrame(sqlContext,
+                         LogicalRelation(dataSource.resolveRelation()))
   }
 
   /**
@@ -185,8 +185,8 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
-    Dataset
-      .newDataFrame(sqlContext, StreamingRelation(dataSource.createSource()))
+    Dataset.newDataFrame(sqlContext,
+                         StreamingRelation(dataSource.createSource()))
   }
 
   /**

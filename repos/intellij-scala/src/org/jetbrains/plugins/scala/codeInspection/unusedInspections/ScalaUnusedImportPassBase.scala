@@ -76,8 +76,9 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
                     .isAlwaysUsedImport(qName)) =>
             Seq.empty
           case Some(psi) =>
-            val annotation = annotationHolder
-              .createWarningAnnotation(psi, "Unused import statement")
+            val annotation = annotationHolder.createWarningAnnotation(
+              psi,
+              "Unused import statement")
             annotation setHighlightType ProblemHighlightType.LIKE_UNUSED_SYMBOL
             getFixes.foreach(annotation.registerFix)
             qName.foreach(name =>

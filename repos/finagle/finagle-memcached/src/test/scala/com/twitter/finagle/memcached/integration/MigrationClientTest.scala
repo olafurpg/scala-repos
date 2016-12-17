@@ -125,8 +125,9 @@ class MigrationClientTest
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
               zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient
-        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      val migrationClient =
+        MigrationClient.newMigrationClient("localhost:" + zookeeperServerPort,
+                                           basePath)
       migrationClient
         .loadZKData() // force loading the config to fully set-up the client
 
@@ -158,8 +159,9 @@ class MigrationClientTest
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
               zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient
-        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      val migrationClient =
+        MigrationClient.newMigrationClient("localhost:" + zookeeperServerPort,
+                                           basePath)
       migrationClient
         .loadZKData() // force loading the config to fully set-up the client
 
@@ -198,8 +200,9 @@ class MigrationClientTest
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
               zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient
-        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      val migrationClient =
+        MigrationClient.newMigrationClient("localhost:" + zookeeperServerPort,
+                                           basePath)
       migrationClient
         .loadZKData() // force loading the config to fully set-up the client
 
@@ -240,8 +243,9 @@ class MigrationClientTest
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
               zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient
-        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      val migrationClient =
+        MigrationClient.newMigrationClient("localhost:" + zookeeperServerPort,
+                                           basePath)
       migrationClient
         .loadZKData() // force loading the config to fully set-up the client
 
@@ -277,8 +281,9 @@ class MigrationClientTest
         Memcached.client.newRichClient(
           dest = "twcache!localhost:" +
               zookeeperServerPort + "!" + newPoolPath)
-      val migrationClient = MigrationClient
-        .newMigrationClient("localhost:" + zookeeperServerPort, basePath)
+      val migrationClient =
+        MigrationClient.newMigrationClient("localhost:" + zookeeperServerPort,
+                                           basePath)
       migrationClient
         .loadZKData() // force loading the config to fully set-up the client
 

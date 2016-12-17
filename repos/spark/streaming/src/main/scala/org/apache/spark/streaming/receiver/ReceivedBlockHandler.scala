@@ -88,8 +88,10 @@ private[streaming] class BlockManagerBasedBlockHandler(
                                  tellMaster = true)
       case IteratorBlock(iterator) =>
         val countIterator = new CountingIterator(iterator)
-        val putResult = blockManager
-          .putIterator(blockId, countIterator, storageLevel, tellMaster = true)
+        val putResult = blockManager.putIterator(blockId,
+                                                 countIterator,
+                                                 storageLevel,
+                                                 tellMaster = true)
         numRecords = countIterator.count
         putResult
       case ByteBufferBlock(byteBuffer) =>

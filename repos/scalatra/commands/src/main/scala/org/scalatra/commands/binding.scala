@@ -144,8 +144,11 @@ sealed trait Binding {
   def apply(toBind: Either[String, Option[S]]): Binding
 
   override def toString() =
-    "BindingContainer[%s](name: %s, value: %s, original: %s)"
-      .format(valueManifest.erasure.getSimpleName, name, validation, original)
+    "BindingContainer[%s](name: %s, value: %s, original: %s)".format(
+      valueManifest.erasure.getSimpleName,
+      name,
+      validation,
+      original)
 }
 
 trait BindingSyntax extends BindingValidatorImplicits {

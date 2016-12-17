@@ -267,8 +267,8 @@ object M8 {
                         if (that.contains(elem)) accu.incl(elem) else accu));
 
     def filter0(f: Int => Boolean, accu: IntSet): IntSet =
-      right
-        .filter0(f, left.filter0(f, if (f(elem)) accu.incl(elem) else accu));
+      right.filter0(f,
+                    left.filter0(f, if (f(elem)) accu.incl(elem) else accu));
   }
 
   def test = {

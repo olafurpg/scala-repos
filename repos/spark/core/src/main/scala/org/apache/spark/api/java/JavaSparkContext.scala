@@ -448,8 +448,11 @@ class JavaSparkContext(val sc: SparkContext)
   ): JavaPairRDD[K, V] = {
     implicit val ctagK: ClassTag[K] = ClassTag(keyClass)
     implicit val ctagV: ClassTag[V] = ClassTag(valueClass)
-    val rdd = sc
-      .hadoopFile(path, inputFormatClass, keyClass, valueClass, minPartitions)
+    val rdd = sc.hadoopFile(path,
+                            inputFormatClass,
+                            keyClass,
+                            valueClass,
+                            minPartitions)
     new JavaHadoopRDD(rdd.asInstanceOf[HadoopRDD[K, V]])
   }
 

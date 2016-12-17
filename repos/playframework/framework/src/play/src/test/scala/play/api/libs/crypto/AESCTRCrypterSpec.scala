@@ -20,14 +20,12 @@ class AESCTRCrypterSpec extends Specification {
 
     "be able to encrypt/decrypt text using AES algorithm" in {
       val text = "Play Framework 2.0"
-      crypter
-        .decryptAES(crypter.encryptAES(text, key), key) must be equalTo text
+      crypter.decryptAES(crypter.encryptAES(text, key), key) must be equalTo text
     }
 
     "be able to encrypt/decrypt text using other AES transformations" in {
       val text = "Play Framework 2.0"
-      crypter
-        .decryptAES(crypter.encryptAES(text, key), key) must be equalTo text
+      crypter.decryptAES(crypter.encryptAES(text, key), key) must be equalTo text
     }
 
     "be able to decrypt text generated using the old transformation methods" in {

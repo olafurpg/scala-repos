@@ -22,8 +22,9 @@ class LocalServer extends Server {
       val compilerFactory = compilerFactoryFrom(sbtData)
 
       client.progress("Instantiating compiler...")
-      compilerFactory
-        .createCompiler(compilerData, client, LocalServer.createAnalysisStore)
+      compilerFactory.createCompiler(compilerData,
+                                     client,
+                                     LocalServer.createAnalysisStore)
     }
 
     if (!client.isCanceled) {

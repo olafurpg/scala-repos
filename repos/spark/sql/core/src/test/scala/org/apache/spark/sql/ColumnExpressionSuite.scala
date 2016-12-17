@@ -247,15 +247,15 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
   test("isNaN") {
     val testData =
-      sqlContext
-        .createDataFrame(
-          sparkContext.parallelize(
+      sqlContext.createDataFrame(
+        sparkContext
+          .parallelize(
             Row(Double.NaN, Float.NaN) :: Row(math.log(-1),
                                               math.log(-3).toFloat) :: Row(
               null,
               null) :: Row(Double.MaxValue, Float.MinValue) :: Nil),
-          StructType(
-            Seq(StructField("a", DoubleType), StructField("b", FloatType))))
+        StructType(
+          Seq(StructField("a", DoubleType), StructField("b", FloatType))))
 
     checkAnswer(testData.select($"a".isNaN, $"b".isNaN),
                 Row(true, true) :: Row(true, true) :: Row(false, false) :: Row(

@@ -129,16 +129,20 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         }
     }
 
-    super[ScTypeParametersOwner]
-      .processDeclarations(processor, state, lastParent, place)
+    super[ScTypeParametersOwner].processDeclarations(processor,
+                                                     state,
+                                                     lastParent,
+                                                     place)
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super[ScTemplateDefinition]
-      .processDeclarations(processor, state, lastParent, place)
+    super[ScTemplateDefinition].processDeclarations(processor,
+                                                    state,
+                                                    lastParent,
+                                                    place)
   }
 
   override def isCase: Boolean = hasModifierProperty("case")
@@ -244,8 +248,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
             !hasCopy && !x.parameterList.clauses.exists(_.hasRepeatedParam)
           if (addCopy) {
             try {
-              val method = ScalaPsiElementFactory
-                .createMethodWithContext(copyMethodText, this, this)
+              val method = ScalaPsiElementFactory.createMethodWithContext(
+                copyMethodText,
+                this,
+                this)
               method.setSynthetic(this)
               buf += method
             } catch {

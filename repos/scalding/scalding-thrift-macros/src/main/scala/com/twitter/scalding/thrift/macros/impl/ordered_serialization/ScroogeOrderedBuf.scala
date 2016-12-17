@@ -72,8 +72,9 @@ object ScroogeOrderedBuf {
         .filter(m =>
           fieldNames.contains(m.name.toTermName.toString.toLowerCase))
         .map { accessorMethod =>
-          val fieldType = accessorMethod.returnType
-            .asSeenFrom(outerType, outerType.typeSymbol.asClass)
+          val fieldType =
+            accessorMethod.returnType.asSeenFrom(outerType,
+                                                 outerType.typeSymbol.asClass)
           val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
           (fieldType, accessorMethod.name.toTermName, b)
         }

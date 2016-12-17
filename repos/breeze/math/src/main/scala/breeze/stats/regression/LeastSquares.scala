@@ -57,8 +57,9 @@ object leastSquares extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workArray: Array[Double]): LeastSquaresRegressionResult =
-        leastSquaresImplementation
-          .doLeastSquares(data.copy, outputs.copy, workArray)
+        leastSquaresImplementation.doLeastSquares(data.copy,
+                                                  outputs.copy,
+                                                  workArray)
     }
 
   implicit val matrixVectorSpecifiedWork: Impl3[DenseMatrix[Double],
@@ -72,8 +73,9 @@ object leastSquares extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workSize: Int): LeastSquaresRegressionResult =
-        leastSquaresImplementation
-          .doLeastSquares(data.copy, outputs.copy, new Array[Double](workSize))
+        leastSquaresImplementation.doLeastSquares(data.copy,
+                                                  outputs.copy,
+                                                  new Array[Double](workSize))
     }
 
   implicit val matrixVector: Impl2[DenseMatrix[Double],
@@ -117,8 +119,9 @@ object leastSquaresDestructive extends UFunc {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 workSize: Int): LeastSquaresRegressionResult =
-        leastSquaresImplementation
-          .doLeastSquares(data, outputs, new Array[Double](workSize))
+        leastSquaresImplementation.doLeastSquares(data,
+                                                  outputs,
+                                                  new Array[Double](workSize))
     }
 
   implicit val matrixVector: Impl2[DenseMatrix[Double],

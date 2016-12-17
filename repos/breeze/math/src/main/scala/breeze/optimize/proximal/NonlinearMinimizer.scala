@@ -323,8 +323,7 @@ object NonlinearMinimizer {
       agg + abs(entry)
     }
     val sparseQpObj =
-      QuadraticMinimizer
-        .computeObjective(regularizedGram, q, sparseQpResult.x) +
+      QuadraticMinimizer.computeObjective(regularizedGram, q, sparseQpResult.x) +
         lambdaL1 * sparseQpL1Obj
     val quadraticCostWithL2 = QuadraticMinimizer.Cost(regularizedGram, q)
 
@@ -339,8 +338,7 @@ object NonlinearMinimizer {
       agg + abs(entry)
     }
     val nlSparseObj =
-      QuadraticMinimizer
-        .computeObjective(regularizedGram, q, nlSparseResult.x) +
+      QuadraticMinimizer.computeObjective(regularizedGram, q, nlSparseResult.x) +
         lambdaL1 * nlSparseL1Obj
 
     init := 0.0

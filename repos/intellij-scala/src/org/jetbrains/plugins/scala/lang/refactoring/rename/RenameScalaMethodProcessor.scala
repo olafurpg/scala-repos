@@ -79,8 +79,10 @@ class RenameScalaMethodProcessor
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil
-      .doRenameGenericNamedElement(psiElement, newName, usages, listener)
+    ScalaRenameUtil.doRenameGenericNamedElement(psiElement,
+                                                newName,
+                                                usages,
+                                                listener)
   }
 }
 

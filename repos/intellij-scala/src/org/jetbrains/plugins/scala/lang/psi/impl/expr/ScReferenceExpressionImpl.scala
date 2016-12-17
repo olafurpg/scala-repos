@@ -329,8 +329,9 @@ class ScReferenceExpressionImpl(node: ASTNode)
         s.subst(fun.polymorphicType)
       //prevent infinite recursion for recursive pattern reference
       case Some(ScalaResolveResult(self: ScSelfTypeElement, _)) =>
-        val clazz = PsiTreeUtil
-          .getContextOfType(self, true, classOf[ScTemplateDefinition])
+        val clazz = PsiTreeUtil.getContextOfType(self,
+                                                 true,
+                                                 classOf[ScTemplateDefinition])
         ScThisReferenceImpl.getThisTypeForTypeDefinition(clazz, this) match {
           case success: Success[ScType] => success.get
           case failure => return failure
@@ -537,8 +538,10 @@ class ScReferenceExpressionImpl(node: ASTNode)
                   } yield qualifier
               }
           }
-          ResolveUtils
-            .javaPolymorphicType(method, s, getResolveScope, returnType)
+          ResolveUtils.javaPolymorphicType(method,
+                                           s,
+                                           getResolveScope,
+                                           returnType)
         } else {
           ResolveUtils.javaPolymorphicType(method, s, getResolveScope)
         }

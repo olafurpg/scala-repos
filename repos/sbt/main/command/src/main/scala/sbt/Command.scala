@@ -117,8 +117,7 @@ object Command {
       sc: SimpleCommand): State => Parser[() => State] = {
     def usageError = s"${sc.name} usage:" + Help.message(sc.help0, None)
     s =>
-      (Parser
-        .softFailure(usageError, definitive = true): Parser[() => State]) | sc
+      (Parser.softFailure(usageError, definitive = true): Parser[() => State]) | sc
         .parser(s)
   }
 

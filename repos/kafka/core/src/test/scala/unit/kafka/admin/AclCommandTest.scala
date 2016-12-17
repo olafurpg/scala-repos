@@ -67,15 +67,21 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
     )
 
   private val ProducerResourceToAcls = Map[Set[Resource], Set[Acl]](
-    TopicResources -> AclCommand
-      .getAcls(Users, Allow, Set(Write, Describe), Hosts),
-    Set(Resource.ClusterResource) -> AclCommand
-      .getAcls(Users, Allow, Set(Create), Hosts)
+    TopicResources -> AclCommand.getAcls(Users,
+                                         Allow,
+                                         Set(Write, Describe),
+                                         Hosts),
+    Set(Resource.ClusterResource) -> AclCommand.getAcls(Users,
+                                                        Allow,
+                                                        Set(Create),
+                                                        Hosts)
   )
 
   private val ConsumerResourceToAcls = Map[Set[Resource], Set[Acl]](
-    TopicResources -> AclCommand
-      .getAcls(Users, Allow, Set(Read, Describe), Hosts),
+    TopicResources -> AclCommand.getAcls(Users,
+                                         Allow,
+                                         Set(Read, Describe),
+                                         Hosts),
     GroupResources -> AclCommand.getAcls(Users, Allow, Set(Read), Hosts)
   )
 

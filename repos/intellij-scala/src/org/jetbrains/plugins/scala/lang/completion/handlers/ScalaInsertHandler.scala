@@ -100,8 +100,9 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
         val (startOffset, _) = res.get
         val tailOffset = context.getTailOffset
         document.insertString(tailOffset, "}")
-        document
-          .insertString(startOffset + literal.getTextRange.getStartOffset, "{")
+        document.insertString(
+          startOffset + literal.getTextRange.getStartOffset,
+          "{")
         context.commitDocument()
         (startOffset + 1, tailOffset - startOffset)
       } else (contextStartOffset, context.getTailOffset - contextStartOffset)
@@ -129,8 +130,9 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                 item.getAllLookupStrings.size() > 1 =>
             val ref = elem.getParent.asInstanceOf[ScReferenceExpression]
             val newRefText = ref.getText
-            val newRef = ScalaPsiElementFactory
-              .createExpressionFromText(newRefText, ref.getManager)
+            val newRef = ScalaPsiElementFactory.createExpressionFromText(
+              newRefText,
+              ref.getManager)
             ref.getParent.replace(newRef).getFirstChild
           case elem => elem
         }
@@ -408,8 +410,9 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
               val blockEndOffset = block.getTextRange.getEndOffset
               val blockStartOffset = block.getTextRange.getStartOffset
               document.replaceString(blockEndOffset - 1, blockEndOffset, "")
-              document
-                .replaceString(blockStartOffset, blockStartOffset + 1, "")
+              document.replaceString(blockStartOffset,
+                                     blockStartOffset + 1,
+                                     "")
               item.isInSimpleStringNoBraces = true
             case _ =>
           }

@@ -516,11 +516,11 @@ object ScalaReflection extends ScalaReflection {
                 }
                 val unwrapped = UnwrapOption(optionObjectType, inputObject)
 
-                expressions.If(
-                  IsNull(unwrapped),
-                  expressions.Literal
-                    .create(null, silentSchemaFor(optType).dataType),
-                  extractorFor(unwrapped, optType, newPath))
+                expressions.If(IsNull(unwrapped),
+                               expressions.Literal.create(
+                                 null,
+                                 silentSchemaFor(optType).dataType),
+                               extractorFor(unwrapped, optType, newPath))
             }
 
           case t if t <:< localTypeOf[Product] =>

@@ -50,8 +50,10 @@ class LinearRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
   // Test if we can correctly learn Y = 3 + 10*X1 + 10*X2
   test("linear regression") {
     val testRDD = sc
-      .parallelize(LinearDataGenerator
-                     .generateLinearInput(3.0, Array(10.0, 10.0), 100, 42),
+      .parallelize(LinearDataGenerator.generateLinearInput(3.0,
+                                                           Array(10.0, 10.0),
+                                                           100,
+                                                           42),
                    2)
       .cache()
     val linReg = new LinearRegressionWithSGD().setIntercept(true)
@@ -81,8 +83,10 @@ class LinearRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
   // Test if we can correctly learn Y = 10*X1 + 10*X2
   test("linear regression without intercept") {
     val testRDD = sc
-      .parallelize(LinearDataGenerator
-                     .generateLinearInput(0.0, Array(10.0, 10.0), 100, 42),
+      .parallelize(LinearDataGenerator.generateLinearInput(0.0,
+                                                           Array(10.0, 10.0),
+                                                           100,
+                                                           42),
                    2)
       .cache()
     val linReg = new LinearRegressionWithSGD().setIntercept(false)

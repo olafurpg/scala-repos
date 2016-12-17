@@ -40,8 +40,8 @@ class CORSFilter @Inject()(config: MarathonConf) extends Filter {
         httpResponse.setHeader("Access-Control-Allow-Headers",
                                accessControlRequestHeaders.mkString(", "))
 
-        httpResponse
-          .setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+        httpResponse.setHeader("Access-Control-Allow-Methods",
+                               "GET, HEAD, OPTIONS")
         httpResponse.setHeader("Access-Control-Max-Age", "86400")
 
       case _ => // Ignore other responses

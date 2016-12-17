@@ -113,14 +113,17 @@ trait DashboardControllerBase extends ControllerBase {
 
     filter match {
       case "assigned" =>
-        condition
-          .copy(assigned = Some(userName), author = None, mentioned = None)
+        condition.copy(assigned = Some(userName),
+                       author = None,
+                       mentioned = None)
       case "mentioned" =>
-        condition
-          .copy(assigned = None, author = None, mentioned = Some(userName))
+        condition.copy(assigned = None,
+                       author = None,
+                       mentioned = Some(userName))
       case _ =>
-        condition
-          .copy(assigned = None, author = Some(userName), mentioned = None)
+        condition.copy(assigned = None,
+                       author = Some(userName),
+                       mentioned = None)
     }
   }
 

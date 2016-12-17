@@ -131,8 +131,8 @@ class BasicAuthenticationFilter
                   if (hasWritePermission(repository.owner,
                                          repository.name,
                                          Some(account))) {
-                    request
-                      .setAttribute(Keys.Request.UserName, account.userName)
+                    request.setAttribute(Keys.Request.UserName,
+                                         account.userName)
                     true
                   } else false
                 } else true

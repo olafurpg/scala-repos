@@ -270,8 +270,7 @@ final object Aggregation {
     }
 
   def aggregationEnabled(key: ScopedKey[_], data: Settings[Scope]): Boolean =
-    Keys.aggregate in Scope
-      .fillTaskAxis(key.scope, key.key) get data getOrElse true
+    Keys.aggregate in Scope.fillTaskAxis(key.scope, key.key) get data getOrElse true
 
   @deprecated("Use BuildUtil.aggregationRelation", "0.13.0")
   def relation(

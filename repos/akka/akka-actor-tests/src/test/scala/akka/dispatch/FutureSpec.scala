@@ -761,8 +761,7 @@ class FutureSpec
           Future(()) map { _ ⇒
             val nested = Future(())
             nested foreach (_ ⇒ l1.open())
-            FutureSpec
-              .ready(l1, TestLatch.DefaultTimeout) // make sure nested is completed
+            FutureSpec.ready(l1, TestLatch.DefaultTimeout) // make sure nested is completed
             nested foreach (_ ⇒ l2.open())
             FutureSpec.ready(l2, TestLatch.DefaultTimeout)
           }

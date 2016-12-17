@@ -386,8 +386,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
         if (set.remove(value)) {
           //If we can remove the value
           if (set.isEmpty) //and the set becomes empty
-            container
-              .remove(key, emptySet) //We try to remove the key if it's mapped to an empty set
+            container.remove(key, emptySet) //We try to remove the key if it's mapped to an empty set
 
           true //Remove succeeded
         } else false //Remove failed

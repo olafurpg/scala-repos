@@ -143,8 +143,9 @@ object IntentionUtils {
     if (parent != null && parent.isInstanceOf[ScPrefixExpr] &&
         parent.asInstanceOf[ScPrefixExpr].operation.getText == "!") {
 
-      val newExpr = ScalaPsiElementFactory
-        .createExpressionFromText(buf.toString(), manager)
+      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+        buf.toString(),
+        manager)
 
       val size = newExpr match {
         case infix: ScInfixExpr =>
@@ -156,8 +157,9 @@ object IntentionUtils {
       (parent.asInstanceOf[ScPrefixExpr], newExpr, size)
     } else {
       buf.insert(0, "!(").append(")")
-      val newExpr = ScalaPsiElementFactory
-        .createExpressionFromText(buf.toString(), manager)
+      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+        buf.toString(),
+        manager)
 
       val children = newExpr
         .asInstanceOf[ScPrefixExpr]
@@ -299,8 +301,11 @@ object IntentionUtils {
           PsiDocumentManager.getInstance(project).commitAllDocuments()
           GoToImplicitConversionAction.getPopup.dispose()
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT)
-            IntentionUtils
-              .replaceWithExplicit(expr, function, project, editor, secondPart)
+            IntentionUtils.replaceWithExplicit(expr,
+                                               function,
+                                               project,
+                                               editor,
+                                               secondPart)
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT_STATICALLY)
             IntentionUtils.replaceWithExplicitStatically(expr,
                                                          function,

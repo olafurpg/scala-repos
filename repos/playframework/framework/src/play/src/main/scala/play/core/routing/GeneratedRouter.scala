@@ -99,8 +99,9 @@ abstract class GeneratedRouter extends Router {
   def errorHandler: HttpErrorHandler
 
   def badRequest(error: String) = Action.async { request =>
-    errorHandler
-      .onClientError(request, play.api.http.Status.BAD_REQUEST, error)
+    errorHandler.onClientError(request,
+                               play.api.http.Status.BAD_REQUEST,
+                               error)
   }
 
   def call(generator: => Handler): Handler = {

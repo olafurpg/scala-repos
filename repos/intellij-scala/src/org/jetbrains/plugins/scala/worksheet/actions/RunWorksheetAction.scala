@@ -109,8 +109,10 @@ object RunWorksheetAction {
               scala.extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
                 if (!auto)
-                  CleanWorksheetAction
-                    .cleanWorksheet(file.getNode, editor, viewer, project)
+                  CleanWorksheetAction.cleanWorksheet(file.getNode,
+                                                      editor,
+                                                      viewer,
+                                                      project)
               }
             }
           }, ModalityState.any())

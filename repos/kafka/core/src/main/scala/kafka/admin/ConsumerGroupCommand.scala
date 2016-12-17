@@ -482,10 +482,10 @@ object ConsumerGroupCommand {
                      opts.options.valueOf(opts.groupOpt))
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
       properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000")
-      properties
-        .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, deserializer)
-      properties
-        .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer)
+      properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                     deserializer)
+      properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                     deserializer)
       if (opts.options.has(opts.commandConfigOpt))
         properties.putAll(
           Utils.loadProps(opts.options.valueOf(opts.commandConfigOpt)))
@@ -594,8 +594,9 @@ object ConsumerGroupCommand {
           !options.has(topicOpt))
         CommandLineUtils.printUsageAndDie(
           parser,
-          "Option %s either takes %s, %s, or both"
-            .format(deleteOpt, groupOpt, topicOpt))
+          "Option %s either takes %s, %s, or both".format(deleteOpt,
+                                                          groupOpt,
+                                                          topicOpt))
 
       // check invalid args
       CommandLineUtils.checkInvalidArgs(

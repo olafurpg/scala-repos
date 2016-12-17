@@ -248,8 +248,9 @@ object ScalaCollectionRenderer {
           evaluateChildren(evaluationContext, parentDescriptor)
         val defaultChildrenRenderer: ChildrenRenderer =
           DebugProcessImpl.getDefaultRenderer(value.`type`)
-        defaultChildrenRenderer
-          .isExpandable(children, evaluationContext, parentDescriptor)
+        defaultChildrenRenderer.isExpandable(children,
+                                             evaluationContext,
+                                             parentDescriptor)
       } catch {
         case e: EvaluateException =>
           true
@@ -297,8 +298,9 @@ object ScalaCollectionRenderer {
           !renderer.isApplicable(childrenValue.`type`)) {
         renderer = DebugProcessImpl.getDefaultRenderer(
           if (childrenValue != null) childrenValue.`type` else null)
-        ExpressionChildrenRenderer
-          .setPreferableChildrenRenderer(parentDescriptor, renderer)
+        ExpressionChildrenRenderer.setPreferableChildrenRenderer(
+          parentDescriptor,
+          renderer)
       }
       renderer
     }

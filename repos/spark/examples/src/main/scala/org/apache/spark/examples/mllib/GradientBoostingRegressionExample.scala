@@ -61,8 +61,9 @@ object GradientBoostingRegressionExample {
 
     // Save and load model
     model.save(sc, "target/tmp/myGradientBoostingRegressionModel")
-    val sameModel = GradientBoostedTreesModel
-      .load(sc, "target/tmp/myGradientBoostingRegressionModel")
+    val sameModel = GradientBoostedTreesModel.load(
+      sc,
+      "target/tmp/myGradientBoostingRegressionModel")
     // $example off$
   }
 }

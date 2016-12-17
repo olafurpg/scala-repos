@@ -39,11 +39,13 @@ object Test {
     val caller = MethodHandles.lookup
     val methodType =
       MethodType.methodType(classOf[AnyRef], Array[Class[_]](classOf[AnyRef]))
-    val instantiatedMethodType = MethodType
-      .methodType(instantiatedRet, Array[Class[_]](instantiatedParam))
+    val instantiatedMethodType = MethodType.methodType(
+      instantiatedRet,
+      Array[Class[_]](instantiatedParam))
     val (capturedParamTypes, captured) = capturedParams.unzip
-    val targetMethodType = MethodType
-      .methodType(instantiatedRet, capturedParamTypes :+ instantiatedParam)
+    val targetMethodType = MethodType.methodType(
+      instantiatedRet,
+      capturedParamTypes :+ instantiatedParam)
     val invokedType =
       MethodType.methodType(classOf[Function1ish[_, _]], capturedParamTypes)
     val target = caller.findStatic(hostClass, accessorName, targetMethodType)

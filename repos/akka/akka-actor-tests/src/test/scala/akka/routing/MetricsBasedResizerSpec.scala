@@ -253,8 +253,7 @@ class MetricsBasedResizerSpec
         router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
 
       val before = LocalDateTime.now
-      resizer
-        .reportMessageCount(router.routees, router.msgs.size) //updates the records
+      resizer.reportMessageCount(router.routees, router.msgs.size) //updates the records
 
       msgs1.foreach(_.second.open()) //process two messages
 
@@ -283,8 +282,7 @@ class MetricsBasedResizerSpec
         router.sendToAll(await = false) //make sure the routees are still busy after the first batch of messages get processed.
 
       val before = LocalDateTime.now
-      resizer
-        .reportMessageCount(router.routees, router.msgs.size) //updates the records
+      resizer.reportMessageCount(router.routees, router.msgs.size) //updates the records
 
       msgs1.foreach(_.second.open()) //process two messages
 

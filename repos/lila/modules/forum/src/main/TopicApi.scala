@@ -42,8 +42,7 @@ private[forum] final class TopicApi(
 
   def makeTopic(categ: Categ, data: DataForm.TopicData)(
       implicit ctx: UserContext): Fu[Topic] =
-    TopicRepo
-      .nextSlug(categ, data.name) zip detectLanguage(data.post.text) flatMap {
+    TopicRepo.nextSlug(categ, data.name) zip detectLanguage(data.post.text) flatMap {
       case (slug, lang) =>
         val topic = Topic.make(categId = categ.slug,
                                slug = slug,
@@ -101,8 +100,11 @@ private[forum] final class TopicApi(
 
   def toggleClose(categ: Categ, topic: Topic, mod: User): Funit =
     TopicRepo.close(topic.id, topic.open) >> {
-      MasterGranter(_.ModerateForum)(mod) ?? modLog
-        .toggleCloseTopic(mod, categ.name, topic.name, topic.open)
+      MasterGranter(_.ModerateForum)(mod) ?? modLog.toggleCloseTopic(
+        mod,
+        categ.name,
+        topic.name,
+        topic.open)
     }
 
   def toggleHide(categ: Categ, topic: Topic, mod: User): Funit =

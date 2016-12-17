@@ -518,8 +518,8 @@ object TestUtils extends Logging {
                    securityProtocol == SecurityProtocol.SSL,
                    trustStoreFile,
                    certAlias))
-    props
-      .put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol.name)
+    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
+              securityProtocol.name)
     props
   }
 
@@ -550,8 +550,8 @@ object TestUtils extends Logging {
     producerProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, maxBlockMs.toString)
     producerProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferSize.toString)
     producerProps.put(ProducerConfig.RETRIES_CONFIG, retries.toString)
-    producerProps
-      .put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs.toString)
+    producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,
+                      requestTimeoutMs.toString)
 
     /* Only use these if not already set */
     val defaultProps = Map(
@@ -954,8 +954,9 @@ object TestUtils extends Logging {
               result && Request.isValidBrokerId(leader)
           }
       },
-      "Partition [%s,%d] metadata not propagated after %d ms"
-        .format(topic, partition, timeout),
+      "Partition [%s,%d] metadata not propagated after %d ms".format(topic,
+                                                                     partition,
+                                                                     timeout),
       waitTime = timeout)
 
     leader
@@ -972,8 +973,9 @@ object TestUtils extends Logging {
             .getPartition(topic, partition)
             .exists(_.leaderReplicaIfLocal().isDefined)
       },
-      "Partition [%s,%d] leaders not made yet after %d ms"
-        .format(topic, partition, timeout),
+      "Partition [%s,%d] leaders not made yet after %d ms".format(topic,
+                                                                  partition,
+                                                                  timeout),
       waitTime = timeout)
   }
 
@@ -1267,8 +1269,11 @@ object TestUtils extends Logging {
       throw new Exception("SSL enabled but no trustStoreFile provided")
     }
 
-    val sslConfigs = TestSslUtils
-      .createSslConfig(clientCert, true, mode, trustStore, certAlias)
+    val sslConfigs = TestSslUtils.createSslConfig(clientCert,
+                                                  true,
+                                                  mode,
+                                                  trustStore,
+                                                  certAlias)
 
     val sslProps = new Properties()
     sslConfigs.foreach { case (k, v) => sslProps.put(k, v) }

@@ -172,8 +172,9 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                 else getText
               })
           if (nameId.getText != c.name) {
-            val ref = ScalaPsiElementFactory
-              .createReferenceFromText(c.name, getManager)
+            val ref = ScalaPsiElementFactory.createReferenceFromText(
+              c.name,
+              getManager)
             return this
               .replace(ref)
               .asInstanceOf[ScStableCodeReferenceElement]
@@ -184,11 +185,14 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
             .getInstance(getProject)
             .hasImportWithPrefix(qname)
           if (qualifier.isDefined && !isPredefined) {
-            val ref = ScalaPsiElementFactory
-              .createReferenceFromText(c.name, getContext, this)
+            val ref = ScalaPsiElementFactory.createReferenceFromText(
+              c.name,
+              getContext,
+              this)
             if (ref.isReferenceTo(element)) {
-              val ref = ScalaPsiElementFactory
-                .createReferenceFromText(c.name, getManager)
+              val ref = ScalaPsiElementFactory.createReferenceFromText(
+                c.name,
+                getManager)
               return this.replace(ref)
             }
           }
@@ -238,8 +242,9 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                     if (qualifier != None) {
                       //let's make our reference unqualified
                       val ref: ScStableCodeReferenceElement =
-                        ScalaPsiElementFactory
-                          .createReferenceFromText(c.name, getManager)
+                        ScalaPsiElementFactory.createReferenceFromText(
+                          c.name,
+                          getManager)
                       this.replace(ref).asInstanceOf[ScReferenceElement]
                     }
                     this

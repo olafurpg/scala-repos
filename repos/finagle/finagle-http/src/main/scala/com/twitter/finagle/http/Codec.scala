@@ -244,8 +244,8 @@ case class Http(
                            new PayloadSizeHandler(maxRequestSizeInBytes))
 
           // Response to ``Expect: Continue'' requests.
-          pipeline
-            .addLast("respondToExpectContinue", new RespondToExpectContinue)
+          pipeline.addLast("respondToExpectContinue",
+                           new RespondToExpectContinue)
           if (!_streaming)
             pipeline.addLast("httpDechunker",
                              new HttpChunkAggregator(maxRequestSizeInBytes))

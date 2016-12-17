@@ -56,8 +56,10 @@ private[sql] abstract class ParquetCompatibilityTest
       .toSeq
       .asJava
 
-    val footers = ParquetFileReader
-      .readAllFootersInParallel(hadoopConfiguration, parquetFiles, true)
+    val footers = ParquetFileReader.readAllFootersInParallel(
+      hadoopConfiguration,
+      parquetFiles,
+      true)
     footers.asScala.head.getParquetMetadata.getFileMetaData.getSchema
   }
 

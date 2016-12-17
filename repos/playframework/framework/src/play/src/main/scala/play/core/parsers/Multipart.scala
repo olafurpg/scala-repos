@@ -281,8 +281,11 @@ object Multipart {
       array(1) = '\n'.toByte
       array(2) = '-'.toByte
       array(3) = '-'.toByte
-      System
-        .arraycopy(boundary.getBytes("US-ASCII"), 0, array, 4, boundary.length)
+      System.arraycopy(boundary.getBytes("US-ASCII"),
+                       0,
+                       array,
+                       4,
+                       boundary.length)
       array
     }
 

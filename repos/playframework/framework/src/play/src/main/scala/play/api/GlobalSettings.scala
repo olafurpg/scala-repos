@@ -189,8 +189,9 @@ trait GlobalSettings {
     * @return the result to send to the client
     */
   def onBadRequest(request: RequestHeader, error: String): Future[Result] =
-    defaultErrorHandler
-      .onClientError(request, play.api.http.Status.BAD_REQUEST, error)
+    defaultErrorHandler.onClientError(request,
+                                      play.api.http.Status.BAD_REQUEST,
+                                      error)
 }
 
 /**

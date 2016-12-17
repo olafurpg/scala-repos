@@ -121,8 +121,9 @@ final class Tuple3Zipped[El1, Repr1, El2, Repr2, El3, Repr3](
   }
 
   override def toString: String =
-    "(%s, %s, %s).zipped"
-      .format(colls._1.toString, colls._2.toString, colls._3.toString)
+    "(%s, %s, %s).zipped".format(colls._1.toString,
+                                 colls._2.toString,
+                                 colls._3.toString)
 }
 
 object Tuple3Zipped {

@@ -92,8 +92,11 @@ object TestLinearWriteSpeed {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils
-      .checkRequiredArgs(parser, options, bytesOpt, sizeOpt, filesOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       bytesOpt,
+                                       sizeOpt,
+                                       filesOpt)
 
     var bytesToWrite = options.valueOf(bytesOpt).longValue
     val bufferSize = options.valueOf(sizeOpt).intValue
@@ -133,10 +136,10 @@ object TestLinearWriteSpeed {
           rand.nextInt(512) * 1024 * 1024 +
             64 * 1024 * 1024 // vary size to avoid herd effect
         val logProperties = new Properties()
-        logProperties
-          .put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
-        logProperties
-          .put(LogConfig.FlushMessagesProp, flushInterval: java.lang.Long)
+        logProperties.put(LogConfig.SegmentBytesProp,
+                          segmentSize: java.lang.Integer)
+        logProperties.put(LogConfig.FlushMessagesProp,
+                          flushInterval: java.lang.Long)
         writables(i) = new LogWritable(new File(dir, "kafka-test-" + i),
                                        new LogConfig(logProperties),
                                        scheduler,

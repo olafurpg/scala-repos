@@ -80,8 +80,7 @@ class ScalaInlineHandler extends InlineHandler {
 
     element match {
       case rp: ScBindingPattern =>
-        PsiTreeUtil
-          .getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
+        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
           case v @ (_: ScValue | _: ScVariable)
               if v.declaredElements.length == 1 =>
             removeElementWithNonSignificantSibilings(v)
@@ -100,8 +99,7 @@ class ScalaInlineHandler extends InlineHandler {
       settings: InlineHandler.Settings): InlineHandler.Inliner = {
     val replacementValue = element match {
       case rp: ScBindingPattern =>
-        PsiTreeUtil
-          .getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
+        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
           case v @ ScPatternDefinition.expr(e)
               if v.declaredElements == Seq(element) =>
             e.getText
@@ -151,8 +149,10 @@ class ScalaInlineHandler extends InlineHandler {
           val project = newValue.getProject
           val manager = FileEditorManager.getInstance(project)
           val editor = manager.getSelectedTextEditor
-          occurrenceHighlighters = ScalaRefactoringUtil
-            .highlightOccurrences(project, Array[PsiElement](newValue), editor)
+          occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
+            project,
+            Array[PsiElement](newValue),
+            editor)
           CodeStyleManager
             .getInstance(project)
             .reformatRange(
@@ -325,8 +325,10 @@ class ScalaInlineHandler extends InlineHandler {
           .findAll
           .asScala
           .forall { ref =>
-            member.containingClass == null || PsiTreeUtil
-              .isAncestor(member.containingClass, ref.getElement, true)
+            member.containingClass == null || PsiTreeUtil.isAncestor(
+              member.containingClass,
+              ref.getElement,
+              true)
           }
       case _ => true
     }

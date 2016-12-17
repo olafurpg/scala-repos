@@ -59,8 +59,9 @@ object ManifestScalaType {
 
   def apply(erasure: Class[_],
             typeArgs: Seq[ScalaType] = Seq.empty): ScalaType = {
-    val mf = ManifestFactory
-      .manifestOf(erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+    val mf = ManifestFactory.manifestOf(
+      erasure,
+      typeArgs.map(ManifestFactory.manifestOf(_)))
     ManifestScalaType(mf)
   }
 
@@ -257,8 +258,9 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
     else if (erasure == classOf[Number]) ManifestScalaType.NumberType
     /* end optimization */
     else {
-      val mf = ManifestFactory
-        .manifestOf(erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+      val mf = ManifestFactory.manifestOf(
+        erasure,
+        typeArgs.map(ManifestFactory.manifestOf(_)))
       val st = new CopiedManifestScalaType(mf, typeVars, isPrimitive)
       if (typeArgs.isEmpty) types.replace(mf, st)
       else st

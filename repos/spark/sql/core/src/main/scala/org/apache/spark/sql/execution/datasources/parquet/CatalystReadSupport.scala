@@ -66,8 +66,9 @@ private[parquet] class CatalystReadSupport
       StructType.fromString(schemaString)
     }
 
-    val parquetRequestedSchema = CatalystReadSupport
-      .clipParquetSchema(context.getFileSchema, catalystRequestedSchema)
+    val parquetRequestedSchema = CatalystReadSupport.clipParquetSchema(
+      context.getFileSchema,
+      catalystRequestedSchema)
 
     new ReadContext(parquetRequestedSchema, Map.empty[String, String].asJava)
   }

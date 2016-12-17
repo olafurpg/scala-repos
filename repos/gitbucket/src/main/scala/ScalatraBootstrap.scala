@@ -22,8 +22,8 @@ class ScalatraBootstrap extends LifeCycle {
       .addMappingForUrlPatterns(EnumSet.allOf(classOf[DispatcherType]),
                                 true,
                                 "/*")
-    context
-      .addFilter("basicAuthenticationFilter", new BasicAuthenticationFilter)
+    context.addFilter("basicAuthenticationFilter",
+                      new BasicAuthenticationFilter)
     context
       .getFilterRegistration("basicAuthenticationFilter")
       .addMappingForUrlPatterns(EnumSet.allOf(classOf[DispatcherType]),

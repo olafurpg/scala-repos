@@ -53,20 +53,18 @@ class ScalaLocalInplaceRenamer(elementToRename: PsiNamedElement,
       .getInstance(myProject)
       .getPsiFile(myEditor.getDocument)
     if (stringToSearch != null) {
-      TextOccurrencesUtil
-        .processUsagesInStringsAndComments(
-          elementToRename,
-          stringToSearch,
-          true,
-          new PairProcessor[PsiElement, TextRange] {
-            def process(psiElement: PsiElement,
-                        textRange: TextRange): Boolean = {
-              if (psiElement.getContainingFile == currentFile) {
-                stringUsages.add(Pair.create(psiElement, textRange))
-              }
-              true
+      TextOccurrencesUtil.processUsagesInStringsAndComments(
+        elementToRename,
+        stringToSearch,
+        true,
+        new PairProcessor[PsiElement, TextRange] {
+          def process(psiElement: PsiElement, textRange: TextRange): Boolean = {
+            if (psiElement.getContainingFile == currentFile) {
+              stringUsages.add(Pair.create(psiElement, textRange))
             }
-          })
+            true
+          }
+        })
     }
   }
 

@@ -23,11 +23,9 @@ object ScEquivalenceUtil {
     if (clazz1.qualifiedName != clazz2.qualifiedName) return false
     val isSomeClassLocalOrAnonymous =
       clazz1.qualifiedName == null || clazz2.qualifiedName == null ||
-        (PsiTreeUtil
-          .getContextOfType(clazz1, true, classOf[PsiClass]) != null &&
+        (PsiTreeUtil.getContextOfType(clazz1, true, classOf[PsiClass]) != null &&
           clazz1.getContainingClass == null) ||
-        (PsiTreeUtil
-          .getContextOfType(clazz2, true, classOf[PsiClass]) != null &&
+        (PsiTreeUtil.getContextOfType(clazz2, true, classOf[PsiClass]) != null &&
           clazz2.getContainingClass == null)
 
     if (isSomeClassLocalOrAnonymous) return false

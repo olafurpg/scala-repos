@@ -69,8 +69,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
    /___/ .__/\_,_/_/ /_/\_\   version %s
       /_/
          """.format(SPARK_VERSION))
-    val welcomeMsg = "Using Scala %s (%s, Java %s)"
-      .format(versionString, javaVmName, javaVersion)
+    val welcomeMsg = "Using Scala %s (%s, Java %s)".format(versionString,
+                                                           javaVmName,
+                                                           javaVersion)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")

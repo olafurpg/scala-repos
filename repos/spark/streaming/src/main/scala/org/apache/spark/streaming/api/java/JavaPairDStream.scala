@@ -187,8 +187,10 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
                       mergeCombiners: JFunction2[C, C, C],
                       partitioner: Partitioner): JavaPairDStream[K, C] = {
     implicit val cm: ClassTag[C] = fakeClassTag
-    dstream
-      .combineByKey(createCombiner, mergeValue, mergeCombiners, partitioner)
+    dstream.combineByKey(createCombiner,
+                         mergeValue,
+                         mergeCombiners,
+                         partitioner)
   }
 
   /**
@@ -546,8 +548,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       updateFunc: JFunction2[JList[V], Optional[S], Optional[S]],
       numPartitions: Int): JavaPairDStream[K, S] = {
     implicit val cm: ClassTag[S] = fakeClassTag
-    dstream
-      .updateStateByKey(convertUpdateStateFunction(updateFunc), numPartitions)
+    dstream.updateStateByKey(convertUpdateStateFunction(updateFunc),
+                             numPartitions)
   }
 
   /**
@@ -565,8 +567,8 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
       partitioner: Partitioner
   ): JavaPairDStream[K, S] = {
     implicit val cm: ClassTag[S] = fakeClassTag
-    dstream
-      .updateStateByKey(convertUpdateStateFunction(updateFunc), partitioner)
+    dstream.updateStateByKey(convertUpdateStateFunction(updateFunc),
+                             partitioner)
   }
 
   /**

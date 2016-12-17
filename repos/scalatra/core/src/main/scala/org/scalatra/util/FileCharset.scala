@@ -29,8 +29,8 @@ object FileCharset {
       getCharset(detector, Codec.fileEncodingCodec)
     } catch {
       case t: Throwable =>
-        logger
-          .warn("Failed to detect charset for file: " + file.getPath + ".", t)
+        logger.warn("Failed to detect charset for file: " + file.getPath + ".",
+                    t)
         Codec.defaultCharsetCodec.charSet
     } finally {
       detector.reset()

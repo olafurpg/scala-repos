@@ -143,8 +143,9 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
                             consumerConfig.zkConnectionTimeoutMs,
                             ZKStringSerializer)
 
-    messageHandlerThreadPool = ThreadUtils
-      .newDaemonFixedThreadPool(topics.values.sum, "KafkaMessageHandler")
+    messageHandlerThreadPool = ThreadUtils.newDaemonFixedThreadPool(
+      topics.values.sum,
+      "KafkaMessageHandler")
 
     blockGenerator.start()
 

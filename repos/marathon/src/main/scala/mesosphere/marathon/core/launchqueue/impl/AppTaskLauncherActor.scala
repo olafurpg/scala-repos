@@ -253,8 +253,8 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         op.taskId)
 
     case TaskOpSourceDelegate.TaskOpRejected(op, reason) =>
-      log
-        .warning("Unexpected task launch rejected for taskId '{}'.", op.taskId)
+      log.warning("Unexpected task launch rejected for taskId '{}'.",
+                  op.taskId)
 
     case TaskOpSourceDelegate.TaskOpAccepted(op) =>
       inFlightTaskOperations -= op.taskId

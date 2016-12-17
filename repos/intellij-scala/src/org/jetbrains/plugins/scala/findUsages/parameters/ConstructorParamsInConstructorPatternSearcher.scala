@@ -70,8 +70,7 @@ class ConstructorParamsInConstructorPatternSearcher
       inReadAction {
         if (!param.isValid) return None
 
-        PsiTreeUtil
-          .getParentOfType(param, classOf[ScPrimaryConstructor]) match {
+        PsiTreeUtil.getParentOfType(param, classOf[ScPrimaryConstructor]) match {
           case pc @ ScPrimaryConstructor.ofClass(cls) if cls.isCase =>
             pc.parameters.indexOf(param) match {
               case -1 => None

@@ -61,8 +61,7 @@ class WorksheetCompiler {
     val oldContent = contentManager findContent ERROR_CONTENT_NAME
     if (oldContent != null) contentManager.removeContent(oldContent, true)
 
-    WorksheetSourceProcessor
-      .process(worksheetFile, ifEditor, iteration) match {
+    WorksheetSourceProcessor.process(worksheetFile, ifEditor, iteration) match {
       case Left((code, name)) =>
         FileUtil.writeToFile(tempFile, code)
 

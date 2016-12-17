@@ -411,8 +411,8 @@ class SbtProjectResolver
       buildRoot / Sbt.ProjectDirectory / Sbt.TargetDirectory)
 
     result.storePaths(ExternalSystemSourceType.SOURCE, sourceDirs.map(_.path))
-    result
-      .storePaths(ExternalSystemSourceType.EXCLUDED, exludedDirs.map(_.path))
+    result.storePaths(ExternalSystemSourceType.EXCLUDED,
+                      exludedDirs.map(_.path))
 
     result
   }
@@ -496,8 +496,8 @@ class SbtProjectResolver
 
   private def addApklibDirs(contentRootNode: ContentRootNode,
                             apklib: sbtStructure.ApkLib): Unit = {
-    contentRootNode
-      .storePath(ExternalSystemSourceType.SOURCE, apklib.sources.canonicalPath)
+    contentRootNode.storePath(ExternalSystemSourceType.SOURCE,
+                              apklib.sources.canonicalPath)
     contentRootNode.storePath(ExternalSystemSourceType.SOURCE_GENERATED,
                               apklib.gen.canonicalPath)
     contentRootNode.storePath(ExternalSystemSourceType.RESOURCE,

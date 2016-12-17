@@ -49,8 +49,8 @@ object ReplayLogProducer extends Logging {
     consumerProps.put("consumer.timeout.ms", "10000")
     consumerProps.put("auto.offset.reset", OffsetRequest.SmallestTimeString)
     consumerProps.put("fetch.message.max.bytes", (1024 * 1024).toString)
-    consumerProps
-      .put("socket.receive.buffer.bytes", (2 * 1024 * 1024).toString)
+    consumerProps.put("socket.receive.buffer.bytes",
+                      (2 * 1024 * 1024).toString)
     val consumerConfig = new ConsumerConfig(consumerProps)
     val consumerConnector: ConsumerConnector = Consumer.create(consumerConfig)
     val topicMessageStreams = consumerConnector.createMessageStreams(
@@ -126,8 +126,10 @@ object ReplayLogProducer extends Logging {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils
-      .checkRequiredArgs(parser, options, brokerListOpt, inputTopicOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       brokerListOpt,
+                                       inputTopicOpt)
 
     val zkConnect = options.valueOf(zkConnectOpt)
     val brokerList = options.valueOf(brokerListOpt)

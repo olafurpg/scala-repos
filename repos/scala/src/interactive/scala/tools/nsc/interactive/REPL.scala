@@ -117,8 +117,9 @@ object REPL {
           comp.askReload(List(toSourceFile(file)), reloadResult)
           Thread.sleep(millis.toLong)
           println("ask type now")
-          comp
-            .askLoadedTyped(toSourceFile(file), keepLoaded = true, typedResult)
+          comp.askLoadedTyped(toSourceFile(file),
+                              keepLoaded = true,
+                              typedResult)
           typedResult.get
         case List("typeat", file, off1, off2) =>
           doTypeAt(makePos(file, off1, off2))

@@ -435,8 +435,9 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
         // TODO: shouldn't the next line be: `original resetFlag CASEACCESSOR`?
         ddef.symbol resetFlag CASEACCESSOR
         lb += logResult("case accessor new")(newAcc)
-        val renamedInClassMap = renamedCaseAccessors
-          .getOrElseUpdate(clazz, mutable.Map() withDefault (x => x))
+        val renamedInClassMap = renamedCaseAccessors.getOrElseUpdate(
+          clazz,
+          mutable.Map() withDefault (x => x))
         renamedInClassMap(original.name.toTermName) =
           newAcc.symbol.name.toTermName
       }

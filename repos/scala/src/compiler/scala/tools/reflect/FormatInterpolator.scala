@@ -311,8 +311,7 @@ abstract class FormatInterpolator {
       */
     def pickAcceptable(arg: Tree, variants: Type*): Option[Type] =
       variants find (arg.tpe <:< _) orElse
-        (variants find (c
-          .inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
+        (variants find (c.inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
         variants(0))
   }
   object Conversion {

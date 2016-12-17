@@ -365,8 +365,9 @@ trait ScReferenceElement
     extensions.inWriteAction {
       val refText =
         if (addImport) {
-          val importHolder = ScalaImportTypeFix
-            .getImportHolder(ref = this, project = getProject)
+          val importHolder = ScalaImportTypeFix.getImportHolder(ref = this,
+                                                                project =
+                                                                  getProject)
           val imported = importHolder.getAllImportUsed.exists {
             case ImportExprUsed(expr) =>
               expr.reference.exists { ref =>

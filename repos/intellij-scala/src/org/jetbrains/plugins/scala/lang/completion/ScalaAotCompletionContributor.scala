@@ -121,8 +121,10 @@ private object ScalaAotCompletionContributor {
     if (s.length == 0) s else s.substring(0, 1).toUpperCase + s.substring(1)
 
   def createParameterFrom(text: String, original: PsiElement): ScParameter = {
-    val clauses = ScalaPsiElementFactory
-      .createParamClausesWithContext(s"($text)", original.getContext, original)
+    val clauses = ScalaPsiElementFactory.createParamClausesWithContext(
+      s"($text)",
+      original.getContext,
+      original)
     clauses.params.head
   }
 
@@ -145,11 +147,13 @@ private class MyConsumer(prefix: String,
 
     val name = suggestNameFor(prefix, element.getLookupString)
 
-    val renderingDecorator = LookupElementDecorator
-      .withRenderer(element, new MyElementRenderer(name, typed))
+    val renderingDecorator = LookupElementDecorator.withRenderer(
+      element,
+      new MyElementRenderer(name, typed))
 
-    val insertionDecorator = LookupElementDecorator
-      .withInsertHandler(renderingDecorator, new MyInsertHandler(name, typed))
+    val insertionDecorator = LookupElementDecorator.withInsertHandler(
+      renderingDecorator,
+      new MyInsertHandler(name, typed))
 
     if (typed) {
       resultSet.consume(insertionDecorator)

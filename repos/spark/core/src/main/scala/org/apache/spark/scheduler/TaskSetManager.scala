@@ -198,8 +198,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
           exe match {
             case Some(set) => {
               for (e <- set) {
-                pendingTasksForExecutor
-                  .getOrElseUpdate(e, new ArrayBuffer) += index
+                pendingTasksForExecutor.getOrElseUpdate(e, new ArrayBuffer) += index
               }
               logInfo(
                 s"Pending task $index has a cached location at ${e.host} " +
@@ -775,8 +774,11 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     failedExecutors
       .getOrElseUpdate(index, new HashMap[String, Long]())
       .put(info.executorId, clock.getTimeMillis())
-    sched.dagScheduler
-      .taskEnded(tasks(index), reason, null, accumUpdates, info)
+    sched.dagScheduler.taskEnded(tasks(index),
+                                 reason,
+                                 null,
+                                 accumUpdates,
+                                 info)
     addPendingTask(index)
     if (!isZombie && state != TaskState.KILLED &&
         reason.isInstanceOf[TaskFailedReason] &&

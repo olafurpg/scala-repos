@@ -72,8 +72,9 @@ class Zk2ResolverTest
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
     val joinAddr = RandomSocket()
-    val status = serverSet
-      .join(joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
+    val status = serverSet.join(joinAddr,
+                                Map.empty[String, InetSocketAddress].asJava,
+                                shardId)
     eventually {
       assert(va.sample() == Addr.Bound(address(joinAddr)),
              "resolution is not bound once the serverset exists")

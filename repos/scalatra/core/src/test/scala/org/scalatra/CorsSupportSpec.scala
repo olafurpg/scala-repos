@@ -14,8 +14,8 @@ class CorsSupportSpec extends ScalatraSpec {
       config.context.setInitParameter(
         CorsSupport.AllowedHeadersKey,
         "X-Requested-With,Authorization,Content-Type,Accept,Origin")
-      config.context
-        .setInitParameter(CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
+      config.context.setInitParameter(CorsSupport.AllowedMethodsKey,
+                                      "GET,HEAD,POST")
       super.initialize(config)
     }
   }, "/*")
@@ -73,8 +73,8 @@ class DisabledCorsSupportSpec extends ScalatraSpec {
       config.context.setInitParameter(
         CorsSupport.AllowedHeadersKey,
         "X-Requested-With,Authorization,Content-Type,Accept,Origin")
-      config.context
-        .setInitParameter(CorsSupport.AllowedMethodsKey, "GET,HEAD,POST")
+      config.context.setInitParameter(CorsSupport.AllowedMethodsKey,
+                                      "GET,HEAD,POST")
       config.context.setInitParameter(CorsSupport.EnableKey, "false")
       super.initialize(config)
     }

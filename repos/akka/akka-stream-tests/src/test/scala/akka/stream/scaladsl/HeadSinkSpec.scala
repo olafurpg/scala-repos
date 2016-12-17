@@ -81,8 +81,7 @@ class HeadSinkSpec extends AkkaSpec with ScriptedTest {
     }
 
     "yield None for empty stream" in assertAllStagesStopped {
-      Await
-        .result(Source.empty[Int].runWith(Sink.headOption), 1.second) should be(
+      Await.result(Source.empty[Int].runWith(Sink.headOption), 1.second) should be(
         None)
     }
   }

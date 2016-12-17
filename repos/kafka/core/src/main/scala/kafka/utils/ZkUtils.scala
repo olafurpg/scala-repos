@@ -408,8 +408,7 @@ class ZkUtils(val zkClient: ZkClient,
       } else acls
 
     if (!zkClient.exists(path))
-      ZkPath
-        .createPersistent(zkClient, path, true, acl) //won't throw NoNodeException or NodeExistsException
+      ZkPath.createPersistent(zkClient, path, true, acl) //won't throw NoNodeException or NodeExistsException
   }
 
   /**
@@ -912,8 +911,10 @@ class ZkUtils(val zkClient: ZkClient,
     val consumersPerTopicMap =
       new mutable.HashMap[String, List[ConsumerThreadId]]
     for (consumer <- consumers) {
-      val topicCount = TopicCount
-        .constructTopicCount(group, consumer, this, excludeInternalTopics)
+      val topicCount = TopicCount.constructTopicCount(group,
+                                                      consumer,
+                                                      this,
+                                                      excludeInternalTopics)
       for ((topic, consumerThreadIdSet) <- topicCount.getConsumerThreadIdsPerTopic) {
         for (consumerThreadId <- consumerThreadIdSet)
           consumersPerTopicMap.get(topic) match {

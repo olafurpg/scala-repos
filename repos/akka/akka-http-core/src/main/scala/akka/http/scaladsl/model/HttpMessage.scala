@@ -188,8 +188,10 @@ final class HttpRequest(val method: HttpMethod,
     */
   def effectiveUri(securedConnection: Boolean,
                    defaultHostHeader: Host = Host.empty): Uri =
-    HttpRequest
-      .effectiveUri(uri, headers, securedConnection, defaultHostHeader)
+    HttpRequest.effectiveUri(uri,
+                             headers,
+                             securedConnection,
+                             defaultHostHeader)
 
   /**
     * Returns a copy of this request with the URI resolved according to the logic defined at

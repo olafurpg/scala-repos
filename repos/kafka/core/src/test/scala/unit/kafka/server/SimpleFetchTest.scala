@@ -41,10 +41,10 @@ class SimpleFetchTest {
   val replicaLagMaxMessages = 10L
 
   val overridingProps = new Properties()
-  overridingProps
-    .put(KafkaConfig.ReplicaLagTimeMaxMsProp, replicaLagTimeMaxMs.toString)
-  overridingProps
-    .put(KafkaConfig.ReplicaFetchWaitMaxMsProp, replicaFetchWaitMaxMs.toString)
+  overridingProps.put(KafkaConfig.ReplicaLagTimeMaxMsProp,
+                      replicaLagTimeMaxMs.toString)
+  overridingProps.put(KafkaConfig.ReplicaFetchWaitMaxMsProp,
+                      replicaFetchWaitMaxMs.toString)
 
   val configs = TestUtils
     .createBrokerConfigs(2, TestUtils.MockZkConnect)

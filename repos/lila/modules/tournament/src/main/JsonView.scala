@@ -84,8 +84,8 @@ final class JsonView(getLightUser: String => Option[LightUser],
   def playerInfo(info: PlayerInfoExt): Fu[JsObject] =
     for {
       ranking <- cached ranking info.tour
-      pairings <- PairingRepo
-        .finishedByPlayerChronological(info.tour.id, info.user.id)
+      pairings <- PairingRepo.finishedByPlayerChronological(info.tour.id,
+                                                            info.user.id)
       sheet = info.tour.system.scoringSystem
         .sheet(info.tour, info.user.id, pairings)
       tpr <- performance(info.tour, info.player, pairings)
@@ -158,8 +158,9 @@ final class JsonView(getLightUser: String => Option[LightUser],
 
   private def computeStanding(tour: Tournament, page: Int): Fu[JsObject] =
     for {
-      rankedPlayers <- PlayerRepo
-        .bestByTourWithRankByPage(tour.id, 10, page max 1)
+      rankedPlayers <- PlayerRepo.bestByTourWithRankByPage(tour.id,
+                                                           10,
+                                                           page max 1)
       sheets <- rankedPlayers.map { p =>
         PairingRepo.finishedByPlayerChronological(tour.id, p.player.userId) map {
           pairings =>

@@ -305,8 +305,8 @@ case class Window(windowExpression: Seq[NamedExpression],
     val unboundToRefMap = expressions.zip(references).toMap
     val patchedWindowExpression =
       windowExpression.map(_.transform(unboundToRefMap))
-    UnsafeProjection
-      .create(child.output ++ patchedWindowExpression, child.output)
+    UnsafeProjection.create(child.output ++ patchedWindowExpression,
+                            child.output)
   }
 
   protected override def doExecute(): RDD[InternalRow] = {
@@ -550,8 +550,9 @@ private[execution] class ExternalRowBuffer(sorter: UnsafeExternalSorter,
   def next(): InternalRow = {
     if (iter.hasNext) {
       iter.loadNext()
-      currentRow
-        .pointTo(iter.getBaseObject, iter.getBaseOffset, iter.getRecordLength)
+      currentRow.pointTo(iter.getBaseObject,
+                         iter.getBaseOffset,
+                         iter.getRecordLength)
       currentRow
     } else {
       null

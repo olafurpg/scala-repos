@@ -53,11 +53,15 @@ class ReplicatedMetrics(measureInterval: FiniteDuration,
   implicit val cluster = Cluster(context.system)
   val node = nodeKey(cluster.selfAddress)
 
-  val tickTask = context.system.scheduler
-    .schedule(measureInterval, measureInterval, self, Tick)(context.dispatcher)
-  val cleanupTask = context.system.scheduler
-    .schedule(cleanupInterval, cleanupInterval, self, Cleanup)(
-      context.dispatcher)
+  val tickTask = context.system.scheduler.schedule(measureInterval,
+                                                   measureInterval,
+                                                   self,
+                                                   Tick)(context.dispatcher)
+  val cleanupTask =
+    context.system.scheduler.schedule(cleanupInterval,
+                                      cleanupInterval,
+                                      self,
+                                      Cleanup)(context.dispatcher)
   val memoryMBean: MemoryMXBean = ManagementFactory.getMemoryMXBean
 
   val UsedHeapKey = LWWMapKey[Long]("usedHeap")

@@ -67,8 +67,9 @@ class PatternDefinitionAnnotatorTest extends SimpleTestCase {
     val annotator = new PatternDefinitionAnnotator() {}
     val mock = new AnnotatorHolderMock
 
-    annotator
-      .annotatePatternDefinition(definition, mock, highlightErrors = true)
+    annotator.annotatePatternDefinition(definition,
+                                        mock,
+                                        highlightErrors = true)
     mock.annotations
   }
 

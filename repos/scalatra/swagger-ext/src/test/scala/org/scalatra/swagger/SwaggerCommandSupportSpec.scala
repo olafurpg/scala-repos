@@ -6,8 +6,9 @@ import org.scalatra.commands._
 import org.scalatra.test.specs2.MutableScalatraSpec
 
 object SwaggerCommandSupportSpec {
-  implicit val stringFormat = DefaultJsonFormats
-    .GenericFormat(DefaultReaders.StringReader, DefaultWriters.StringWriter)
+  implicit val stringFormat = DefaultJsonFormats.GenericFormat(
+    DefaultReaders.StringReader,
+    DefaultWriters.StringWriter)
   class SimpleCommand extends ParamsOnlyCommand {
     val name: Field[String] = asString("name").notBlank.position(1)
     val age: Field[Int] = bind[Int]("age").optional(0)

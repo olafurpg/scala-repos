@@ -26,10 +26,14 @@ class ScLiteralExpressionTokenizer extends Tokenizer[ScLiteral] {
                                      consumer: TokenConsumer) {
     val unEscapedText: StringBuilder = new StringBuilder
     val offsets: Array[Int] = new Array[Int](text.length + 1)
-    PsiLiteralExpressionImpl
-      .parseStringCharacters(text, unEscapedText, offsets)
-    EscapeSequenceTokenizer
-      .processTextWithOffsets(element, consumer, unEscapedText, offsets, 1)
+    PsiLiteralExpressionImpl.parseStringCharacters(text,
+                                                   unEscapedText,
+                                                   offsets)
+    EscapeSequenceTokenizer.processTextWithOffsets(element,
+                                                   consumer,
+                                                   unEscapedText,
+                                                   offsets,
+                                                   1)
   }
 
   def tokenize(element: ScLiteral, consumer: TokenConsumer) {

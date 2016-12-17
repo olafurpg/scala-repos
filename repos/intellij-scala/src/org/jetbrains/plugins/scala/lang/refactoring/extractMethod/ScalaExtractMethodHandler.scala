@@ -96,8 +96,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     val elements: Seq[PsiElement] =
       ScalaRefactoringUtil.selectedElements(editor, file, trimComments = false)
 
-    val hasWarnings = ScalaRefactoringUtil
-      .showNotPossibleWarnings(elements, project, editor, REFACTORING_NAME)
+    val hasWarnings = ScalaRefactoringUtil.showNotPossibleWarnings(
+      elements,
+      project,
+      editor,
+      REFACTORING_NAME)
     if (hasWarnings) return
 
     def checkLastReturn(elem: PsiElement): Boolean = {
@@ -115,8 +118,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
 
     def returnType: Option[ScType] = {
-      val fun = PsiTreeUtil
-        .getParentOfType(elements.head, classOf[ScFunctionDefinition])
+      val fun = PsiTreeUtil.getParentOfType(elements.head,
+                                            classOf[ScFunctionDefinition])
       if (fun == null) return None
       var result: Option[ScType] = None
       val visitor = new ScalaRecursiveElementVisitor {
@@ -357,8 +360,7 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     def local(text: String) = ScalaBundle.message("extract.local.method", text)
     element.getParent match {
       case tbody: ScTemplateBody =>
-        PsiTreeUtil
-          .getParentOfType(tbody, classOf[ScTemplateDefinition]) match {
+        PsiTreeUtil.getParentOfType(tbody, classOf[ScTemplateDefinition]) match {
           case o: ScObject => s"Extract method to object ${o.name}"
           case c: ScClass => s"Extract method to class ${c.name}"
           case t: ScTrait => s"Extract method to trait ${t.name}"

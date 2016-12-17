@@ -362,8 +362,9 @@ private[akka] class PlayerHandler(
     log.debug("channel {} unbound", event.getChannel)
   override def writeComplete(ctx: ChannelHandlerContext,
                              event: WriteCompletionEvent) =
-    log
-      .debug("channel {} written {}", event.getChannel, event.getWrittenAmount)
+    log.debug("channel {} written {}",
+              event.getChannel,
+              event.getWrittenAmount)
 
   override def exceptionCaught(ctx: ChannelHandlerContext,
                                event: ExceptionEvent) = {

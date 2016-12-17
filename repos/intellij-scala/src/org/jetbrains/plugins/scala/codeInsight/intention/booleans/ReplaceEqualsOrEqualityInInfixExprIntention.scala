@@ -61,8 +61,9 @@ class ReplaceEqualsOrEqualityInInfixExprIntention
       .append(" ")
       .append(infixExpr.getArgExpr.getText)
 
-    val newInfixExpr = ScalaPsiElementFactory
-      .createExpressionFromText(expr.toString(), element.getManager)
+    val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(
+      expr.toString(),
+      element.getManager)
 
     val size =
       newInfixExpr

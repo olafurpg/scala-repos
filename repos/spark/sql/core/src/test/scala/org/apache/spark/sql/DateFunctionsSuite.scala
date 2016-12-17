@@ -415,8 +415,10 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
     val ss1 = "2015-07-24 10:00:00"
     val ss2 = "2015-07-25 02:02:02"
     val fmt = "yyyy/MM/dd HH:mm:ss.S"
-    val df = Seq((date1, ts1, s1, ss1), (date2, ts2, s2, ss2))
-      .toDF("d", "ts", "s", "ss")
+    val df = Seq((date1, ts1, s1, ss1), (date2, ts2, s2, ss2)).toDF("d",
+                                                                    "ts",
+                                                                    "s",
+                                                                    "ss")
     checkAnswer(df.select(unix_timestamp(col("ts"))),
                 Seq(Row(ts1.getTime / 1000L), Row(ts2.getTime / 1000L)))
     checkAnswer(df.select(unix_timestamp(col("ss"))),
@@ -449,8 +451,10 @@ class DateFunctionsSuite extends QueryTest with SharedSQLContext {
     val ss1 = "2015-07-24 10:00:00"
     val ss2 = "2015-07-25 02:02:02"
     val fmt = "yyyy/MM/dd HH:mm:ss.S"
-    val df = Seq((date1, ts1, s1, ss1), (date2, ts2, s2, ss2))
-      .toDF("d", "ts", "s", "ss")
+    val df = Seq((date1, ts1, s1, ss1), (date2, ts2, s2, ss2)).toDF("d",
+                                                                    "ts",
+                                                                    "s",
+                                                                    "ss")
     checkAnswer(df.selectExpr("to_unix_timestamp(ts)"),
                 Seq(Row(ts1.getTime / 1000L), Row(ts2.getTime / 1000L)))
     checkAnswer(df.selectExpr("to_unix_timestamp(ss)"),

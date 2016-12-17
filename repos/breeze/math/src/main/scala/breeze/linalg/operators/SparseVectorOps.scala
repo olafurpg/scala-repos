@@ -663,8 +663,10 @@ trait SparseVectorOps { this: SparseVector.type =>
           while (aoff < asize) {
             val aind: Int = a.indexAt(aoff)
             // the min reflects the invariant that index aind must be in the first aind active indices in b's index.
-            boff = util.Arrays
-              .binarySearch(b.index, boff, math.min(bsize, aind + 1), aind)
+            boff = util.Arrays.binarySearch(b.index,
+                                            boff,
+                                            math.min(bsize, aind + 1),
+                                            aind)
             if (boff < 0) {
               boff = ~boff
               if (boff == bsize) {
@@ -673,8 +675,11 @@ trait SparseVectorOps { this: SparseVector.type =>
               } else {
                 // fast forward a until we get to the b we just got to
                 val bind = b.indexAt(boff)
-                var newAoff = util.Arrays
-                  .binarySearch(a.index, aoff, math.min(asize, bind + 1), bind)
+                var newAoff = util.Arrays.binarySearch(
+                  a.index,
+                  aoff,
+                  math.min(asize, bind + 1),
+                  bind)
                 if (newAoff < 0) {
                   newAoff = ~newAoff
                   boff += 1
@@ -1098,8 +1103,10 @@ trait SparseVectorOps { this: SparseVector.type =>
           // b moves to catch up with a, then a takes a step (possibly bringing b along)
           while (aoff < asize) {
             val aind: Int = a.indexAt(aoff)
-            boff = util.Arrays
-              .binarySearch(b.index, boff, math.min(bsize, aind + 1), aind)
+            boff = util.Arrays.binarySearch(b.index,
+                                            boff,
+                                            math.min(bsize, aind + 1),
+                                            aind)
             if (boff < 0) {
               boff = ~boff
               if (boff == bsize) {
@@ -1108,8 +1115,11 @@ trait SparseVectorOps { this: SparseVector.type =>
               } else {
                 // fast forward a until we get to the b we just got to
                 val bind: Int = b.indexAt(boff)
-                var newAoff: Int = util.Arrays
-                  .binarySearch(a.index, aoff, math.min(asize, bind + 1), bind)
+                var newAoff: Int = util.Arrays.binarySearch(
+                  a.index,
+                  aoff,
+                  math.min(asize, bind + 1),
+                  bind)
                 if (newAoff < 0) {
                   newAoff = ~newAoff
                   boff += 1

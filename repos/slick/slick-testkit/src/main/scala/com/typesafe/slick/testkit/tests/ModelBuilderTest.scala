@@ -228,8 +228,8 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
   def test = ifCap(jcap.createModel) {
     def createModel(tables: Option[Seq[MTable]] = None,
                     ignoreInvalidDefaults: Boolean = true) =
-      tdb.profile
-        .createModel(tables.map(DBIO.successful), ignoreInvalidDefaults)
+      tdb.profile.createModel(tables.map(DBIO.successful),
+                              ignoreInvalidDefaults)
 
     // postgres uses lower case and things like int4
     // seen in jtds: int identity

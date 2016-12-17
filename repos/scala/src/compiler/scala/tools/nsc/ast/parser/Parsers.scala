@@ -945,8 +945,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
     def finishBinaryOp(isExpr: Boolean, opinfo: OpInfo, rhs: Tree): Tree = {
       import opinfo._
-      val operatorPos: Position = Position
-        .range(rhs.pos.source, offset, offset, offset + operator.length)
+      val operatorPos: Position = Position.range(rhs.pos.source,
+                                                 offset,
+                                                 offset,
+                                                 offset + operator.length)
       val pos = lhs.pos union rhs.pos union operatorPos withPoint offset
 
       atPos(pos)(

@@ -64,8 +64,11 @@ object ReflectionUtils {
     }
     cl match {
       case cl if cl != null =>
-        "%s of type %s with classpath [%s] and parent being %s"
-          .format(cl, cl.getClass, inferClasspath(cl), show(cl.getParent))
+        "%s of type %s with classpath [%s] and parent being %s".format(
+          cl,
+          cl.getClass,
+          inferClasspath(cl),
+          show(cl.getParent))
       case null =>
         "primordial classloader with boot classpath [%s]".format(
           inferClasspath(cl))

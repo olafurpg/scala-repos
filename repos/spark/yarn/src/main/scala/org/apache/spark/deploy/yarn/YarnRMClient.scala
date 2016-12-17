@@ -93,8 +93,9 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
                  diagnostics: String = ""): Unit =
     synchronized {
       if (registered) {
-        amClient
-          .unregisterApplicationMaster(status, diagnostics, uiHistoryAddress)
+        amClient.unregisterApplicationMaster(status,
+                                             diagnostics,
+                                             uiHistoryAddress)
       }
     }
 

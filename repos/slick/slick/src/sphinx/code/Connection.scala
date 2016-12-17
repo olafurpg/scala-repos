@@ -48,8 +48,8 @@ object Connection extends App {
   };
   {
     //#forURL
-    val db = Database
-      .forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+    val db = Database.forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1",
+                             driver = "org.h2.Driver")
     //#forURL
     db.close
   };

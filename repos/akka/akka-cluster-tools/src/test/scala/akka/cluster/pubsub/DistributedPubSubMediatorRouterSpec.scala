@@ -81,8 +81,10 @@ trait DistributedPubSubMediatorRouterSpec {
                                                      testActor)
       expectMsgClass(classOf[DistributedPubSubMediator.SubscribeAck])
 
-      mediator ! DistributedPubSubMediator
-        .Publish("topic", msg, sendOneMessageToEachGroup = true)
+      mediator ! DistributedPubSubMediator.Publish("topic",
+                                                   msg,
+                                                   sendOneMessageToEachGroup =
+                                                     true)
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Unsubscribe("topic", testActor)

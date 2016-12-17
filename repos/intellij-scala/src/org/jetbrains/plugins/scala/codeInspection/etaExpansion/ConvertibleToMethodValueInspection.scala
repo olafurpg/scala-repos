@@ -163,8 +163,9 @@ class ConvertibleToMethodValueQuickFix(expr: ScExpression,
   def doApplyFix(project: Project) {
     val scExpr = getElement
     if (!scExpr.isValid) return
-    val newExpr = ScalaPsiElementFactory
-      .createExpressionFromText(replacement, scExpr.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+      replacement,
+      scExpr.getManager)
     scExpr.replaceExpression(newExpr, removeParenthesis = true)
   }
 }

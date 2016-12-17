@@ -80,15 +80,17 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
   override def beforeTemplateStart() {
     super.beforeTemplateStart()
 
-    val revertInfo = ScalaRefactoringUtil
-      .RevertInfo(editor.getDocument.getText, editor.getCaretModel.getOffset)
+    val revertInfo = ScalaRefactoringUtil.RevertInfo(
+      editor.getDocument.getText,
+      editor.getCaretModel.getOffset)
     editor.putUserData(ScalaMemberInplaceRenamer.REVERT_INFO, revertInfo)
 
     val file = PsiDocumentManager
       .getInstance(myProject)
       .getPsiFile(myEditor.getDocument)
-    val offset = TargetElementUtil
-      .adjustOffset(file, editor.getDocument, editor.getCaretModel.getOffset)
+    val offset = TargetElementUtil.adjustOffset(file,
+                                                editor.getDocument,
+                                                editor.getCaretModel.getOffset)
     val range = file.findElementAt(offset).getTextRange
     myCaretRangeMarker = myEditor.getDocument.createRangeMarker(range)
     myCaretRangeMarker.setGreedyToLeft(true)
@@ -188,8 +190,9 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
         val offset = editor.getCaretModel.getOffset
         val text = editor.getDocument.getText
         val aroundCaret =
-          text.substring(offset - 50, offset) + "<caret>" + text
-            .substring(offset, offset + 50)
+          text.substring(offset - 50, offset) + "<caret>" + text.substring(
+            offset,
+            offset + 50)
         val message = s"""Could not perform inplace rename:
              |element to rename: $element ${element.getName}
              |substituted: $subst

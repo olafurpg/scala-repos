@@ -211,8 +211,7 @@ class SupervisorSpec
   override def beforeEach() = {}
 
   def ping(pingPongActor: ActorRef) = {
-    Await
-      .result(pingPongActor.?(Ping)(DilatedTimeout), DilatedTimeout) should ===(
+    Await.result(pingPongActor.?(Ping)(DilatedTimeout), DilatedTimeout) should ===(
       PongMessage)
     expectMsg(Timeout, PingMessage)
   }

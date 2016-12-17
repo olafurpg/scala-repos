@@ -259,8 +259,8 @@ object Event {
   case class Clock(white: Float, black: Float) extends Event {
     def typ = "clock"
     def data =
-      Json
-        .obj("white" -> truncateAt(white, 2), "black" -> truncateAt(black, 2))
+      Json.obj("white" -> truncateAt(white, 2),
+               "black" -> truncateAt(black, 2))
   }
   object Clock {
     def apply(clock: ChessClock): Clock =

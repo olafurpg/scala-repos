@@ -751,8 +751,9 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def heapMax(heap: MemoryUsage): Option[Metric] =
-    Metric
-      .create(name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
+    Metric.create(name = HeapMemoryMax,
+                  value = heap.getMax,
+                  decayFactor = None)
 
   override def close(): Unit = ()
 }

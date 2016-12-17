@@ -78,8 +78,8 @@ class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
     val profileName =
       tdb.profile.getClass.toString.dropRight(1).split("[\\. ]").last
 
-    val codegen = Await
-      .result(db.run((createA >> codegenA).withPinnedSession), Duration.Inf)
+    val codegen = Await.result(db.run((createA >> codegenA).withPinnedSession),
+                               Duration.Inf)
     codegen.writeToFile("slick.jdbc.H2Profile",
                         "target/slick-testkit-codegen-tests/",
                         "all.test",

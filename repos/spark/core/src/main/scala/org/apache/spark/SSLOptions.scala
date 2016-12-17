@@ -167,8 +167,8 @@ private[spark] object SSLOptions extends Logging {
   def parse(conf: SparkConf,
             ns: String,
             defaults: Option[SSLOptions] = None): SSLOptions = {
-    val enabled = conf
-      .getBoolean(s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
+    val enabled = conf.getBoolean(s"$ns.enabled",
+                                  defaultValue = defaults.exists(_.enabled))
 
     val keyStore = conf
       .getOption(s"$ns.keyStore")

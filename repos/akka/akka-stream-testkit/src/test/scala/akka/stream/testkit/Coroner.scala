@@ -46,8 +46,8 @@ object Coroner {
     val finishedLatch = new CountDownLatch(1)
 
     def waitForStart(): Unit = {
-      startedLatch
-        .await(startAndStopDuration.length, startAndStopDuration.unit)
+      startedLatch.await(startAndStopDuration.length,
+                         startAndStopDuration.unit)
     }
 
     def started(): Unit = startedLatch.countDown()
@@ -58,8 +58,8 @@ object Coroner {
 
     override def cancel(): Unit = {
       cancelPromise.trySuccess(true)
-      finishedLatch
-        .await(startAndStopDuration.length, startAndStopDuration.unit)
+      finishedLatch.await(startAndStopDuration.length,
+                          startAndStopDuration.unit)
     }
 
     override def ready(atMost: Duration)(

@@ -172,9 +172,10 @@ class TaskTrackerActorTest
     val stagedTaskNowRunning =
       MarathonTestHelper.runningTaskProto(stagedTask.getId)
     val taskState = TaskSerializer.fromProto(stagedTaskNowRunning)
-    probe.send(f.taskTrackerActor,
-               TaskTrackerActor
-                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
+    probe.send(
+      f.taskTrackerActor,
+      TaskTrackerActor.TaskUpdated(taskState,
+                                   TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")
@@ -199,9 +200,10 @@ class TaskTrackerActorTest
     val probe = TestProbe()
     val newTask = MarathonTestHelper.stagedTaskProto(appId)
     val taskState = TaskSerializer.fromProto(newTask)
-    probe.send(f.taskTrackerActor,
-               TaskTrackerActor
-                 .TaskUpdated(taskState, TaskTrackerActor.Ack(probe.ref, ())))
+    probe.send(
+      f.taskTrackerActor,
+      TaskTrackerActor.TaskUpdated(taskState,
+                                   TaskTrackerActor.Ack(probe.ref, ())))
     probe.expectMsg(())
 
     Then("it will have set the correct metric counts")

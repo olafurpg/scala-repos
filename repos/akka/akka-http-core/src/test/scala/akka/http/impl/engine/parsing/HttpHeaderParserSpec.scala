@@ -287,8 +287,9 @@ class HttpHeaderParserSpec
     }
     def insert(line: String, value: AnyRef): Unit =
       if (parser.isEmpty)
-        HttpHeaderParser
-          .insertRemainingCharsAsNewNodes(parser, ByteString(line), value)
+        HttpHeaderParser.insertRemainingCharsAsNewNodes(parser,
+                                                        ByteString(line),
+                                                        value)
       else HttpHeaderParser.insert(parser, ByteString(line), value)
 
     def parseLine(line: String) =

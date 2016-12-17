@@ -46,8 +46,10 @@ object ScalaDirectoryService {
                                      null,
                                      properties).create
       else
-        FileTemplateUtil
-          .createFromTemplate(template, fileName, properties, dir)
+        FileTemplateUtil.createFromTemplate(template,
+                                            fileName,
+                                            properties,
+                                            dir)
     } catch {
       case e: IncorrectOperationException => throw e
       case e: Exception =>

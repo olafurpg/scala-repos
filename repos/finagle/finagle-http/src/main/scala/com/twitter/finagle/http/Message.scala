@@ -477,8 +477,9 @@ object Message {
   val ContentTypeJavascript = MediaType.Javascript + ";" + CharsetUtf8
   val ContentTypeWwwFrom = MediaType.WwwForm + ";" + CharsetUtf8
 
-  private val HttpDateFormat = FastDateFormat
-    .getInstance("EEE, dd MMM yyyy HH:mm:ss", TimeZone.getTimeZone("GMT"))
+  private val HttpDateFormat = FastDateFormat.getInstance(
+    "EEE, dd MMM yyyy HH:mm:ss",
+    TimeZone.getTimeZone("GMT"))
   def httpDateFormat(date: Date): String =
     HttpDateFormat.format(date) + " GMT"
 }

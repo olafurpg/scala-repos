@@ -135,8 +135,10 @@ private class DeploymentActor(parent: ActorRef,
       Constraints.selectTasksToKill(app, notSentencedAndRunning, toKillCount)
 
     val ScalingProposition(tasksToKill, tasksToStart) =
-      ScalingProposition
-        .propose(runningTasks, toKill, killToMeetConstraints, scaleTo)
+      ScalingProposition.propose(runningTasks,
+                                 toKill,
+                                 killToMeetConstraints,
+                                 scaleTo)
 
     def killTasksIfNeeded: Future[Unit] =
       tasksToKill.fold(Future.successful(())) {

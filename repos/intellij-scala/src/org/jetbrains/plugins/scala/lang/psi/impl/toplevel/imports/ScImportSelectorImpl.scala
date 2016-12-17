@@ -80,8 +80,9 @@ class ScImportSelectorImpl private (stub: StubElement[ScImportSelector],
       case Seq(sel: ScImportSelector) if !sel.isAliasedImport =>
         val withoutBracesText =
           expr.qualifier.getText + "." + sel.reference.getText
-        val newImportExpr = ScalaPsiElementFactory
-          .createImportExprFromText(withoutBracesText, expr.getManager)
+        val newImportExpr = ScalaPsiElementFactory.createImportExprFromText(
+          withoutBracesText,
+          expr.getManager)
         expr.replace(newImportExpr)
       case _ =>
     }

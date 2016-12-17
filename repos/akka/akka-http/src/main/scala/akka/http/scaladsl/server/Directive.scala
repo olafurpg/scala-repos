@@ -175,8 +175,8 @@ object Directive {
       underlying.filter(predicate, rejections: _*).tflatMap(_ ⇒ Empty)
 
     def filter(predicate: T ⇒ Boolean, rejections: Rejection*): Directive1[T] =
-      underlying
-        .tfilter({ case Tuple1(value) ⇒ predicate(value) }, rejections: _*)
+      underlying.tfilter({ case Tuple1(value) ⇒ predicate(value) },
+                         rejections: _*)
   }
 }
 

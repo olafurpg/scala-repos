@@ -480,8 +480,9 @@ abstract class KafkaShardIngestActor(
 
       val rawMessages = msTime({ t =>
         logger.debug(
-          "Kafka fetch from %s:%d in %d ms"
-            .format(topic, lastCheckpoint.offset, t))
+          "Kafka fetch from %s:%d in %d ms".format(topic,
+                                                   lastCheckpoint.offset,
+                                                   t))
       }) {
         consumer.fetch(req)
       }
@@ -528,8 +529,7 @@ abstract class KafkaShardIngestActor(
                 case k @ (apiKey, path) =>
                   // infer write authorities without a timestamp here, because we'll only use this for legacy events
                   //val inferStart = System.currentTimeMillis
-                  permissionsFinder
-                    .inferWriteAuthorities(apiKey, path, None) map {
+                  permissionsFinder.inferWriteAuthorities(apiKey, path, None) map {
                     inferred =>
                       //logger.trace("Write authorities inferred on %s in %d ms".format(k, System.currentTimeMillis - inferStart))
                       k -> inferred

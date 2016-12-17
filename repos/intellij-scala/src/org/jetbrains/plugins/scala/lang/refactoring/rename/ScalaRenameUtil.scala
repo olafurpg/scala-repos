@@ -188,8 +188,10 @@ object ScalaRenameUtil {
     }
     modified.foreach {
       case UsagesWithName(name, usagez) if usagez.nonEmpty =>
-        RenameUtil
-          .doRenameGenericNamedElement(namedElement, name, usagez, listener)
+        RenameUtil.doRenameGenericNamedElement(namedElement,
+                                               name,
+                                               usagez,
+                                               listener)
       case _ =>
     }
     //to guarantee correct name of namedElement itself

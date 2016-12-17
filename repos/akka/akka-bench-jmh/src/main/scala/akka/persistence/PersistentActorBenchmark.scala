@@ -45,10 +45,12 @@ class PersistentActorThroughputBenchmark {
 
     actor = system.actorOf(Props(classOf[BaselineActor], data10k.last), "a-1")
 
-    noPersistPersistentActor = system
-      .actorOf(Props(classOf[NoPersistPersistentActor], data10k.last), "nop-1")
-    persistPersistentActor = system
-      .actorOf(Props(classOf[PersistPersistentActor], data10k.last), "ep-1")
+    noPersistPersistentActor = system.actorOf(
+      Props(classOf[NoPersistPersistentActor], data10k.last),
+      "nop-1")
+    persistPersistentActor = system.actorOf(
+      Props(classOf[PersistPersistentActor], data10k.last),
+      "ep-1")
     persistAsync1PersistentActor = system.actorOf(
       Props(classOf[PersistAsyncPersistentActor], data10k.last),
       "epa-1")

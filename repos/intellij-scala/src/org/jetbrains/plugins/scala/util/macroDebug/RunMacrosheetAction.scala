@@ -59,8 +59,10 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
             override def run() {
               extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
-                CleanWorksheetAction
-                  .cleanWorksheet(file.getNode, editor, viewer, project)
+                CleanWorksheetAction.cleanWorksheet(file.getNode,
+                                                    editor,
+                                                    viewer,
+                                                    project)
               }
             }
           }, ModalityState.any())

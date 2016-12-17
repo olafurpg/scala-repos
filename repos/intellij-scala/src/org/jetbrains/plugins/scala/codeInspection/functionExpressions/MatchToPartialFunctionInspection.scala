@@ -130,10 +130,11 @@ class MatchToPartialFunctionQuickFix(matchStmt: ScMatchStmt,
     if (leftBrace == null) return
 
     addNamingPatterns(matchStmtCopy, needNamingPattern(mStmt))
-    matchStmtCopy
-      .deleteChildRange(matchStmtCopy.getFirstChild, leftBrace.getPrevSibling)
-    val newBlock = ScalaPsiElementFactory
-      .createExpressionFromText(matchStmtCopy.getText, mStmt.getManager)
+    matchStmtCopy.deleteChildRange(matchStmtCopy.getFirstChild,
+                                   leftBrace.getPrevSibling)
+    val newBlock = ScalaPsiElementFactory.createExpressionFromText(
+      matchStmtCopy.getText,
+      mStmt.getManager)
     CodeEditUtil.setOldIndentation(
       newBlock.getNode.asInstanceOf[TreeElement],
       CodeEditUtil.getOldIndentation(matchStmtCopy.getNode))

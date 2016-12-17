@@ -16,8 +16,9 @@ class ScConstrExprImpl(node: ASTNode)
     extends ScalaPsiElementImpl(node)
     with ScConstrExpr {
   override def createMirror(text: String): PsiElement = {
-    ScalaPsiElementFactory
-      .createConstructorBodyWithContextFromText(text, getContext, this)
+    ScalaPsiElementFactory.createConstructorBodyWithContextFromText(text,
+                                                                    getContext,
+                                                                    this)
   }
 
   override def toString: String = "ConstructorExpression"

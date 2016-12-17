@@ -175,8 +175,9 @@ trait OverridingAnnotator {
       if (owner.hasModifierProperty("override")) {
         val annotation: Annotation = holder.createErrorAnnotation(
           member.nameId,
-          ScalaBundle
-            .message("member.overrides.nothing", memberType, member.name))
+          ScalaBundle.message("member.overrides.nothing",
+                              memberType,
+                              member.name))
         annotation.setHighlightType(
           ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
         annotation.registerFix(new RemoveModifierQuickFix(owner, "override"))
@@ -249,8 +250,9 @@ trait OverridingAnnotator {
       if (overridesFinal) {
         val annotation: Annotation = holder.createErrorAnnotation(
           member.nameId,
-          ScalaBundle
-            .message("can.not.override.final", memberType, member.name))
+          ScalaBundle.message("can.not.override.final",
+                              memberType,
+                              member.name))
         annotation.setHighlightType(
           ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }

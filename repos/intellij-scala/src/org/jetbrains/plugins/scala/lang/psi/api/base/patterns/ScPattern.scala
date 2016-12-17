@@ -217,8 +217,10 @@ trait ScPattern extends ScalaPsiElement {
                   (p.name, ScalaPsiUtil.getPsiElementId(p)),
                   ScUndefinedType(new ScTypeParameterType(p, substitutor)))
             }
-            val clazz = ScalaPsiUtil
-              .getContextOfType(this, true, classOf[ScTemplateDefinition])
+            val clazz = ScalaPsiUtil.getContextOfType(
+              this,
+              true,
+              classOf[ScTemplateDefinition])
             clazz match {
               case clazz: ScTemplateDefinition =>
                 undefSubst =

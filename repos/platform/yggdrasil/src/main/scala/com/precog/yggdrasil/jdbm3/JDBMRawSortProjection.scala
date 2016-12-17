@@ -143,8 +143,10 @@ class JDBMRawSortProjection[M[+ _]] private[yggdrasil] (
         val valColumnDecoder =
           rowFormat.ColumnDecoder(valColumns.map(_._2)(collection.breakOut))
 
-        val (firstKey, lastKey, rows) = JDBMSlice
-          .load(sliceSize, iteratorSetup, keyColumnDecoder, valColumnDecoder)
+        val (firstKey, lastKey, rows) = JDBMSlice.load(sliceSize,
+                                                       iteratorSetup,
+                                                       keyColumnDecoder,
+                                                       valColumnDecoder)
 
         val slice = new Slice {
           val size = rows

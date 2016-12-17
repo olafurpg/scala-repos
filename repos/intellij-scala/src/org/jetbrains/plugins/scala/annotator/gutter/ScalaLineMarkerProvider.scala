@@ -290,8 +290,9 @@ private object GutterUtil {
       val overrides = new ArrayBuffer[PsiNamedElement]
       for (member <- members)
         overrides ++=
-          ScalaOverridingMemberSearcher
-            .search(member, deep = false, withSelfType = true)
+          ScalaOverridingMemberSearcher.search(member,
+                                               deep = false,
+                                               withSelfType = true)
       if (overrides.nonEmpty) {
         val icon =
           if (!GutterUtil.isAbstract(member)) OVERRIDEN_METHOD_MARKER_RENDERER

@@ -1722,8 +1722,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     }
 
     syms foreach { sym =>
-      val name = "\n<<-- %s %s after phase '%s' -->>"
-        .format(sym.kindString, sym.fullName, ph.name)
+      val name = "\n<<-- %s %s after phase '%s' -->>".format(sym.kindString,
+                                                             sym.fullName,
+                                                             ph.name)
       val baseClasses = bases(sym).mkString("Base classes:\n  ", "\n  ", "")
       val contents =
         if (declsOnly) decls(sym).mkString("Declarations:\n  ", "\n  ", "")

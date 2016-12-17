@@ -995,8 +995,10 @@ object TypeDefinitionMembers {
                 if processValsForScala && !p.isVar && !p.isVal &&
                   (checkName(p.name) || checkNameGetSetIs(p.name)) &&
                   isScalaProcessor =>
-              val clazz = PsiTreeUtil
-                .getContextOfType(p, true, classOf[ScTemplateDefinition])
+              val clazz = PsiTreeUtil.getContextOfType(
+                p,
+                true,
+                classOf[ScTemplateDefinition])
               if (clazz != null && clazz.isInstanceOf[ScClass] &&
                   !p.isEffectiveVal) {
                 //this is member only for class scope
@@ -1115,8 +1117,8 @@ object TypeDefinitionMembers {
                 val (_, n) = iterator.next()
                 def addMethod(method: PsiNamedElement): Boolean = {
                   val substitutor = n.substitutor followed subst
-                  processor
-                    .execute(method, state.put(ScSubstitutor.key, substitutor))
+                  processor.execute(method,
+                                    state.put(ScSubstitutor.key, substitutor))
                 }
 
                 n.info match {

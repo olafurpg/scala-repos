@@ -90,8 +90,9 @@ final case class AdaptiveLoadBalancingRoutingLogic(
                                 cluster.selfAddress,
                                 metricsSelector.weights(oldMetrics)))
           // ignore, don't update, in case of CAS failure
-          weightedRouteesRef
-            .compareAndSet(oldValue, (routees, oldMetrics, weightedRoutees))
+          weightedRouteesRef.compareAndSet(
+            oldValue,
+            (routees, oldMetrics, weightedRoutees))
           weightedRoutees
         } else oldWeightedRoutees
       }

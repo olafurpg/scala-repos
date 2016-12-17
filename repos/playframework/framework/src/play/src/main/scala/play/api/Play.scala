@@ -55,8 +55,8 @@ object Play {
   xercesSaxParserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
                                       Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
                                     true)
-  xercesSaxParserFactory
-    .setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+  xercesSaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,
+                                    true)
 
   /*
    * A parser to be used that is configured to ensure that no schemas are loaded.

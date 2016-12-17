@@ -424,8 +424,9 @@ abstract class TreeCheckers extends Analyzer {
         def mk[T](what: String,
                   x: T,
                   str: T => String = (x: T) => "" + x): ((Any, String)) =
-          x -> s"%10s  %-20s %s"
-            .format(what, classString(x), truncate(str(x), 80).trim)
+          x -> s"%10s  %-20s %s".format(what,
+                                        classString(x),
+                                        truncate(str(x), 80).trim)
 
         def encls =
           enclosingMemberDefs.filterNot(_.symbol == treeSym).zipWithIndex map {

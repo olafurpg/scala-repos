@@ -243,8 +243,10 @@ object Pipeline extends MLReadable[Pipeline] {
       val stageUids = stages.map(_.uid)
       val jsonParams = List(
         "stageUids" -> parse(compact(render(stageUids.toSeq))))
-      DefaultParamsWriter
-        .saveMetadata(instance, path, sc, paramMap = Some(jsonParams))
+      DefaultParamsWriter.saveMetadata(instance,
+                                       path,
+                                       sc,
+                                       paramMap = Some(jsonParams))
 
       // Save stages
       val stagesDir = new Path(path, "stages").toString
@@ -271,8 +273,10 @@ object Pipeline extends MLReadable[Pipeline] {
         (metadata.params \ "stageUids").extract[Seq[String]].toArray
       val stages: Array[PipelineStage] = stageUids.zipWithIndex.map {
         case (stageUid, idx) =>
-          val stagePath = SharedReadWrite
-            .getStagePath(stageUid, idx, stageUids.length, stagesDir)
+          val stagePath = SharedReadWrite.getStagePath(stageUid,
+                                                       idx,
+                                                       stageUids.length,
+                                                       stagesDir)
           DefaultParamsReader.loadParamsInstance[PipelineStage](stagePath, sc)
       }
       (metadata.uid, stages)

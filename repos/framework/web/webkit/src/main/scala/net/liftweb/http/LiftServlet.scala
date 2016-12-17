@@ -537,8 +537,9 @@ class LiftServlet extends Loggable {
             }
           } finally {
             if (S.functionMap.size > 0) {
-              liftSession
-                .updateFunctionMap(S.functionMap, S.renderVersion, millis)
+              liftSession.updateFunctionMap(S.functionMap,
+                                            S.renderVersion,
+                                            millis)
               S.clearFunctionMap
             }
             liftSession.notices = S.getNotices
@@ -692,8 +693,9 @@ class LiftServlet extends Loggable {
             Full(ret)
           } finally {
             if (S.functionMap.size > 0) {
-              liftSession
-                .updateFunctionMap(S.functionMap, RenderVersion.get, millis)
+              liftSession.updateFunctionMap(S.functionMap,
+                                            RenderVersion.get,
+                                            millis)
               S.clearFunctionMap
             }
           }

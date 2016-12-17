@@ -107,8 +107,9 @@ object IntroduceImplicitParameterIntention {
       buf.replace(offset, offset + p.name.length, newParam)
     }
 
-    val newExpr = ScalaPsiElementFactory
-      .createExpressionFromText(buf.toString(), expr.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+      buf.toString(),
+      expr.getManager)
 
     if (!isValidExpr(newExpr, expr.parameters.length))
       return Right(

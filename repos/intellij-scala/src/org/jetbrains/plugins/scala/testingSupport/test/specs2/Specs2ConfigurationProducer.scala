@@ -113,8 +113,8 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[Specs2RunConfiguration]) return false
-      return TestConfigurationUtil
-        .isPackageConfiguration(element, configuration)
+      return TestConfigurationUtil.isPackageConfiguration(element,
+                                                          configuration)
     }
     val parent: ScTypeDefinition =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)

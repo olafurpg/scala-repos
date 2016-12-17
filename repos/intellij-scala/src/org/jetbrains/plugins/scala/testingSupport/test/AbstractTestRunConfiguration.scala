@@ -443,8 +443,10 @@ abstract class AbstractTestRunConfiguration(
 
         //expand environment variables in vmParams
         for (entry <- params.getEnv.entrySet) {
-          vmParams = StringUtil
-            .replace(vmParams, "$" + entry.getKey + "$", entry.getValue, false)
+          vmParams = StringUtil.replace(vmParams,
+                                        "$" + entry.getKey + "$",
+                                        entry.getValue,
+                                        false)
         }
 
         params.getVMParametersList.addParametersString(vmParams)
@@ -602,8 +604,10 @@ abstract class AbstractTestRunConfiguration(
         consoleProperties.setIdBasedTestTree(true)
 
         // console view
-        val consoleView = SMTestRunnerConnectionUtil
-          .createAndAttachConsole("Scala", processHandler, consoleProperties)
+        val consoleView = SMTestRunnerConnectionUtil.createAndAttachConsole(
+          "Scala",
+          processHandler,
+          consoleProperties)
 
         val res = new DefaultExecutionResult(
           consoleView,
@@ -646,8 +650,9 @@ abstract class AbstractTestRunConfiguration(
                            "testKind",
                            if (testKind != null) testKind.toString
                            else TestKind.CLASS.toString)
-    JDOMExternalizer
-      .write(element, "showProgressMessages", showProgressMessages.toString)
+    JDOMExternalizer.write(element,
+                           "showProgressMessages",
+                           showProgressMessages.toString)
     JDOMExternalizer.writeMap(element, envs, "envs", "envVar")
     PathMacroManager.getInstance(getProject).collapsePathsRecursively(element)
   }

@@ -593,8 +593,9 @@ object Replicator {
                 mergedRemovedNodePruning =
                   mergedRemovedNodePruning.updated(key, thisValue)
               case Some(thatValue) ⇒
-                mergedRemovedNodePruning = mergedRemovedNodePruning
-                  .updated(key, thisValue merge thatValue)
+                mergedRemovedNodePruning = mergedRemovedNodePruning.updated(
+                  key,
+                  thisValue merge thatValue)
             }
           }
 
@@ -844,16 +845,22 @@ final class Replicator(settings: ReplicatorSettings)
 
   //Start periodic gossip to random nodes in cluster
   import context.dispatcher
-  val gossipTask = context.system.scheduler
-    .schedule(gossipInterval, gossipInterval, self, GossipTick)
+  val gossipTask = context.system.scheduler.schedule(gossipInterval,
+                                                     gossipInterval,
+                                                     self,
+                                                     GossipTick)
   val notifyTask = context.system.scheduler.schedule(notifySubscribersInterval,
                                                      notifySubscribersInterval,
                                                      self,
                                                      FlushChanges)
-  val pruningTask = context.system.scheduler
-    .schedule(pruningInterval, pruningInterval, self, RemovedNodePruningTick)
-  val clockTask = context.system.scheduler
-    .schedule(gossipInterval, gossipInterval, self, ClockTick)
+  val pruningTask = context.system.scheduler.schedule(pruningInterval,
+                                                      pruningInterval,
+                                                      self,
+                                                      RemovedNodePruningTick)
+  val clockTask = context.system.scheduler.schedule(gossipInterval,
+                                                    gossipInterval,
+                                                    self,
+                                                    ClockTick)
 
   val serializer =
     SerializationExtension(context.system).serializerFor(classOf[DataEnvelope])
@@ -1005,8 +1012,9 @@ final class Replicator(settings: ReplicatorSettings)
         log.debug("Received Update for deleted key [{}]", key)
         sender() ! e
       case Failure(e) ⇒
-        log
-          .debug("Received Update for key [{}], failed: {}", key, e.getMessage)
+        log.debug("Received Update for key [{}], failed: {}",
+                  key,
+                  e.getMessage)
         sender() ! ModifyFailure(key, "Update failed: " + e.getMessage, e, req)
     }
   }
@@ -1331,8 +1339,9 @@ final class Replicator(settings: ReplicatorSettings)
         def init(): Unit = {
           val newEnvelope =
             envelope.initRemovedNodePruning(removed, selfUniqueAddress)
-          log
-            .debug("Initiated pruning of [{}] for data key [{}]", removed, key)
+          log.debug("Initiated pruning of [{}] for data key [{}]",
+                    removed,
+                    key)
           setData(key, newEnvelope)
         }
 
@@ -1419,8 +1428,8 @@ final class Replicator(settings: ReplicatorSettings)
     val pruningCleanuped = pruningCleanupTombstoned(removed, envelope.data)
     if ((pruningCleanuped ne envelope.data) ||
         envelope.pruning.contains(removed))
-      envelope
-        .copy(data = pruningCleanuped, pruning = envelope.pruning - removed)
+      envelope.copy(data = pruningCleanuped,
+                    pruning = envelope.pruning - removed)
     else envelope
   }
 

@@ -222,8 +222,9 @@ private[spark] class MemoryStore(conf: SparkConf,
       // Acquire storage memory if necessary to store this block in memory.
       val enoughStorageMemory = {
         if (unrollMemoryUsedByThisBlock <= size) {
-          val acquiredExtra = memoryManager
-            .acquireStorageMemory(blockId, size - unrollMemoryUsedByThisBlock)
+          val acquiredExtra = memoryManager.acquireStorageMemory(
+            blockId,
+            size - unrollMemoryUsedByThisBlock)
           if (acquiredExtra) {
             transferUnrollToStorage(unrollMemoryUsedByThisBlock)
           }
@@ -425,8 +426,9 @@ private[spark] class MemoryStore(conf: SparkConf,
       val success = memoryManager.acquireUnrollMemory(blockId, memory)
       if (success) {
         val taskAttemptId = currentTaskAttemptId()
-        unrollMemoryMap(taskAttemptId) = unrollMemoryMap
-            .getOrElse(taskAttemptId, 0L) + memory
+        unrollMemoryMap(taskAttemptId) = unrollMemoryMap.getOrElse(
+            taskAttemptId,
+            0L) + memory
       }
       success
     }

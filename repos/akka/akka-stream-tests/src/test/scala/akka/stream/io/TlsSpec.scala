@@ -32,12 +32,12 @@ object TlsSpec {
     val password = "changeme"
 
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    keyStore
-      .load(getClass.getResourceAsStream("/keystore"), password.toCharArray)
+    keyStore.load(getClass.getResourceAsStream("/keystore"),
+                  password.toCharArray)
 
     val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
-    trustStore
-      .load(getClass.getResourceAsStream(trustPath), password.toCharArray)
+    trustStore.load(getClass.getResourceAsStream(trustPath),
+                    password.toCharArray)
 
     val keyManagerFactory =
       KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)

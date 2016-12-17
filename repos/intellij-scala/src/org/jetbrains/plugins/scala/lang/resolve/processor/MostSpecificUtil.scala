@@ -460,8 +460,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       case f: ScFunction => f.polymorphicType()
       case p: ScPrimaryConstructor => p.polymorphicType
       case m: PsiMethod =>
-        ResolveUtils
-          .javaPolymorphicType(m, ScSubstitutor.empty, elem.getResolveScope)
+        ResolveUtils.javaPolymorphicType(m,
+                                         ScSubstitutor.empty,
+                                         elem.getResolveScope)
       case refPatt: ScReferencePattern =>
         refPatt.getParent /*id list*/ .getParent match {
           case pd: ScPatternDefinition

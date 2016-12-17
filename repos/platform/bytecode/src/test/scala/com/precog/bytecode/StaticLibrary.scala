@@ -99,8 +99,8 @@ trait StaticLibrary extends Library {
   }
 
   object M1Product extends Morphism1(Vector(), "bin8", 0x0339) {
-    override val idPolicy = IdentityPolicy
-      .Product(IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
+    override val idPolicy = IdentityPolicy.Product(IdentityPolicy.Synthesize,
+                                                   IdentityPolicy.Retain.Merge)
   }
 
   object M2RetainMerge extends Morphism2(Vector(), "bin9", 0x1000) {
@@ -128,8 +128,8 @@ trait StaticLibrary extends Library {
   }
 
   object M2Product extends Morphism2(Vector(), "bin12", 0x1339) {
-    override val idPolicy = IdentityPolicy
-      .Product(IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
+    override val idPolicy = IdentityPolicy.Product(IdentityPolicy.Synthesize,
+                                                   IdentityPolicy.Retain.Merge)
   }
 
   object M11 extends Morphism1(Vector("std", "random"), "foobar", 0x0006) {

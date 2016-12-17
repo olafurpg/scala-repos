@@ -339,8 +339,9 @@ trait ScTypePresentation {
         case ScExistentialType(q, wilds) =>
           val wildsWithBounds =
             wilds.map(w => existentialArgWithBounds(w, "type " + w.name))
-          wildsWithBounds
-            .mkString(s"(${innerTypeText(q)}) forSome {", "; ", "}")
+          wildsWithBounds.mkString(s"(${innerTypeText(q)}) forSome {",
+                                   "; ",
+                                   "}")
       }
     }
 

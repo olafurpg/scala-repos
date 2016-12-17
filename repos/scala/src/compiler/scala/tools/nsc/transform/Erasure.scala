@@ -659,8 +659,9 @@ abstract class Erasure
           } else
             treeCopy.Apply(
               tree,
-              treeCopy
-                .TypeApply(ta, treeCopy.Select(sel, qual1, name), List(targ)),
+              treeCopy.TypeApply(ta,
+                                 treeCopy.Select(sel, qual1, name),
+                                 List(targ)),
               List())
 
         case Apply(TypeApply(sel @ Select(qual, name), List(targ)), List())
@@ -777,8 +778,10 @@ abstract class Erasure
         case Match(selector, cases) =>
           treeCopy.Match(tree1, selector, cases map adaptCase)
         case Try(block, catches, finalizer) =>
-          treeCopy
-            .Try(tree1, adaptBranch(block), catches map adaptCase, finalizer)
+          treeCopy.Try(tree1,
+                       adaptBranch(block),
+                       catches map adaptCase,
+                       finalizer)
         case Ident(_) | Select(_, _) =>
           if (tree1.symbol.isOverloaded) {
             val first = tree1.symbol.alternatives.head

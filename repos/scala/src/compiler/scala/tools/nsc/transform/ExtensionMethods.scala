@@ -176,8 +176,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       val thisParamType =
         appliedType(clazz, tparamsFromClass map (_.tpeHK): _*)
       val thisParam =
-        extensionMeth
-          .newValueParameter(nme.SELF, extensionMeth.pos) setInfo thisParamType
+        extensionMeth.newValueParameter(nme.SELF, extensionMeth.pos) setInfo thisParamType
       val resultType =
         MethodType(List(thisParam), dropNullaryMethod(methodResult))
       val selfParamType =

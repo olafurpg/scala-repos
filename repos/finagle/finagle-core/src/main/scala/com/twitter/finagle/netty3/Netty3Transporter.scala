@@ -337,8 +337,8 @@ case class Netty3Transporter[In, Out](
   ): ChannelPipeline = {
     val pipeline = pipelineFactory.getPipeline()
 
-    pipeline
-      .addFirst("channelStatsHandler", channelStatsHandler(statsReceiver))
+    pipeline.addFirst("channelStatsHandler",
+                      channelStatsHandler(statsReceiver))
     pipeline.addFirst("channelRequestStatsHandler",
                       new ChannelRequestStatsHandler(statsReceiver))
 
@@ -402,8 +402,10 @@ case class Netty3Transporter[In, Out](
               UsernamePassAuthenticationSetting(username, password)
             case _ => Unauthenticated
           }
-          SocksConnectHandler
-            .addHandler(proxyAddr, inetSockAddr, Seq(authentication), pipeline)
+          SocksConnectHandler.addHandler(proxyAddr,
+                                         inetSockAddr,
+                                         Seq(authentication),
+                                         pipeline)
         }
       case _ =>
     }
@@ -411,8 +413,10 @@ case class Netty3Transporter[In, Out](
     (httpProxy, addr) match {
       case (Some(proxyAddr), inetAddr: InetSocketAddress)
           if !inetAddr.isUnresolved =>
-        HttpConnectHandler
-          .addHandler(proxyAddr, inetAddr, pipeline, httpProxyCredentials)
+        HttpConnectHandler.addHandler(proxyAddr,
+                                      inetAddr,
+                                      pipeline,
+                                      httpProxyCredentials)
       case _ =>
     }
 

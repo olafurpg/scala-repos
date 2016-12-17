@@ -432,28 +432,30 @@ private[kafka] class ZookeeperConsumerConnector(
                      retryableIfFailed,
                      shouldRefreshCoordinator,
                      errorCount) = {
-                  offsetCommitResponse.commitStatus
-                    .foldLeft(false, false, false, 0) {
-                      case (folded, (topicPartition, errorCode)) =>
-                        if (errorCode == Errors.NONE.code &&
-                            config.dualCommitEnabled) {
-                          val offset = offsetsToCommit(topicPartition).offset
-                          commitOffsetToZooKeeper(topicPartition, offset)
-                        }
+                  offsetCommitResponse.commitStatus.foldLeft(false,
+                                                             false,
+                                                             false,
+                                                             0) {
+                    case (folded, (topicPartition, errorCode)) =>
+                      if (errorCode == Errors.NONE.code &&
+                          config.dualCommitEnabled) {
+                        val offset = offsetsToCommit(topicPartition).offset
+                        commitOffsetToZooKeeper(topicPartition, offset)
+                      }
 
-                        (folded._1 || // update commitFailed
-                           errorCode != Errors.NONE.code,
-                         folded._2 ||
-                           // update retryableIfFailed - (only metadata too large is not retryable)
-                           (errorCode != Errors.NONE.code &&
-                             errorCode != Errors.OFFSET_METADATA_TOO_LARGE.code),
-                         folded._3 || // update shouldRefreshCoordinator
-                           errorCode == Errors.NOT_COORDINATOR_FOR_GROUP.code ||
-                           errorCode == Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code,
-                         // update error count
-                         folded._4 +
-                           (if (errorCode != Errors.NONE.code) 1 else 0))
-                    }
+                      (folded._1 || // update commitFailed
+                         errorCode != Errors.NONE.code,
+                       folded._2 ||
+                         // update retryableIfFailed - (only metadata too large is not retryable)
+                         (errorCode != Errors.NONE.code &&
+                           errorCode != Errors.OFFSET_METADATA_TOO_LARGE.code),
+                       folded._3 || // update shouldRefreshCoordinator
+                         errorCode == Errors.NOT_COORDINATOR_FOR_GROUP.code ||
+                         errorCode == Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code,
+                       // update error count
+                       folded._4 +
+                         (if (errorCode != Errors.NONE.code) 1 else 0))
+                  }
                 }
                 debug(errorCount + " errors in offset commit response.")
 
@@ -1170,8 +1172,8 @@ private[kafka] class ZookeeperConsumerConnector(
     topicStreamsMap.foreach { topicAndStreams =>
       // register on broker partition path changes
       val topicPath = BrokerTopicsPath + "/" + topicAndStreams._1
-      zkUtils.zkClient
-        .subscribeDataChanges(topicPath, topicPartitionChangeListener)
+      zkUtils.zkClient.subscribeDataChanges(topicPath,
+                                            topicPartitionChangeListener)
     }
 
     // explicitly trigger load balancing for this consumer

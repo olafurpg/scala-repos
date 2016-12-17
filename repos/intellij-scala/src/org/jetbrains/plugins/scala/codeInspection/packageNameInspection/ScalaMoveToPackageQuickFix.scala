@@ -36,8 +36,10 @@ class ScalaMoveToPackageQuickFix(myFile: ScalaFile, packQualName: String)
     val fileIndex: ProjectFileIndex =
       ProjectRootManager.getInstance(project).getFileIndex
     val currentModule: Module = fileIndex.getModuleForFile(file.getVirtualFile)
-    val directory = PackageUtil
-      .findOrCreateDirectoryForPackage(currentModule, packageName, null, true)
+    val directory = PackageUtil.findOrCreateDirectoryForPackage(currentModule,
+                                                                packageName,
+                                                                null,
+                                                                true)
 
     if (directory == null) {
       return

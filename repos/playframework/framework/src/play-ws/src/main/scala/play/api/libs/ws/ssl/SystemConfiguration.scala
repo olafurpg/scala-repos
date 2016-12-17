@@ -52,12 +52,12 @@ class SystemConfiguration {
     Security.setProperty("ocsp.enable", checkRevocation.toString)
     logger.debug("configureCheckRevocation: ocsp.enable = {}",
                  checkRevocation.toString)
-    System
-      .setProperty("com.sun.security.enableCRLDP", checkRevocation.toString)
+    System.setProperty("com.sun.security.enableCRLDP",
+                       checkRevocation.toString)
     logger.debug("configureCheckRevocation: com.sun.security.enableCRLDP = {}",
                  checkRevocation.toString)
-    System
-      .setProperty("com.sun.net.ssl.checkRevocation", checkRevocation.toString)
+    System.setProperty("com.sun.net.ssl.checkRevocation",
+                       checkRevocation.toString)
   }
 
   /**

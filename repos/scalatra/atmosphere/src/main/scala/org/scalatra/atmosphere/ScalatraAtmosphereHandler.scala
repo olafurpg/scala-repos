@@ -84,42 +84,41 @@ class ScalatraAtmosphereHandler(scalatraApp: ScalatraBase)(
     var session = resource.session()
     val isNew = !session.contains(org.scalatra.atmosphere.AtmosphereClientKey)
 
-    scalatraApp
-      .withRequestResponse(resource.getRequest, resource.getResponse) {
-        scalatraApp.withRouteMultiParams(route) {
+    scalatraApp.withRequestResponse(resource.getRequest, resource.getResponse) {
+      scalatraApp.withRouteMultiParams(route) {
 
-          (req.requestMethod, route.isDefined) match {
-            case (Post, _) =>
-              var client: AtmosphereClient = null
+        (req.requestMethod, route.isDefined) match {
+          case (Post, _) =>
+            var client: AtmosphereClient = null
+            if (isNew) {
+              session = AtmosphereResourceFactory.getDefault
+                .find(resource.uuid)
+                .session
+            }
+
+            client = session(org.scalatra.atmosphere.AtmosphereClientKey)
+              .asInstanceOf[AtmosphereClient]
+            handleIncomingMessage(req, client)
+          case (_, true) =>
+            val cl =
               if (isNew) {
-                session = AtmosphereResourceFactory.getDefault
-                  .find(resource.uuid)
-                  .session
-              }
+                createClient(route.get, session, resource)
+              } else null
 
-              client = session(org.scalatra.atmosphere.AtmosphereClientKey)
-                .asInstanceOf[AtmosphereClient]
-              handleIncomingMessage(req, client)
-            case (_, true) =>
-              val cl =
-                if (isNew) {
-                  createClient(route.get, session, resource)
-                } else null
-
-              addEventListener(resource)
-              resumeIfNeeded(resource)
-              configureBroadcaster(resource)
-              if (isNew && cl != null) handleIncomingMessage(Connected, cl)
-              resource.suspend
-            case _ =>
-              val ex = new ScalatraAtmosphereException(
-                "There is no atmosphere route defined for " +
-                  req.getRequestURI)
-              internalLogger.warn(ex.getMessage)
-              throw ex
-          }
+            addEventListener(resource)
+            resumeIfNeeded(resource)
+            configureBroadcaster(resource)
+            if (isNew && cl != null) handleIncomingMessage(Connected, cl)
+            resource.suspend
+          case _ =>
+            val ex = new ScalatraAtmosphereException(
+              "There is no atmosphere route defined for " +
+                req.getRequestURI)
+            internalLogger.warn(ex.getMessage)
+            throw ex
         }
       }
+    }
   }
 
   private[this] def createClient(route: MatchedRoute,

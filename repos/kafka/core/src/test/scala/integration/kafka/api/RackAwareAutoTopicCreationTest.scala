@@ -35,8 +35,8 @@ class RackAwareAutoTopicCreationTest
   val replicationFactor = 2
   val overridingProps = new Properties()
   overridingProps.put(KafkaConfig.NumPartitionsProp, numPartitions.toString)
-  overridingProps
-    .put(KafkaConfig.DefaultReplicationFactorProp, replicationFactor.toString)
+  overridingProps.put(KafkaConfig.DefaultReplicationFactorProp,
+                      replicationFactor.toString)
 
   def generateConfigs() =
     (0 until numServers) map { node =>

@@ -93,8 +93,9 @@ package object collections {
     */
   def fillSFXCollection[J <: Object](originalList: jfxc.ObservableList[J],
                                      filler: Iterable[SFXDelegate[J]]) {
-    this
-      .internalFiller(originalList, filler, (s: SFXDelegate[J]) => s.delegate)
+    this.internalFiller(originalList,
+                        filler,
+                        (s: SFXDelegate[J]) => s.delegate)
   }
 
   /**

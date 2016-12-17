@@ -279,8 +279,8 @@ private class ReplicaBuffer(
 
   private def initialize() {
     for (topicAndPartition <- expectedReplicasPerTopicAndPartition.keySet)
-      messageSetCache
-        .put(topicAndPartition, new Pool[Int, FetchResponsePartitionData])
+      messageSetCache.put(topicAndPartition,
+                          new Pool[Int, FetchResponsePartitionData])
     setInitialOffsets()
   }
 
@@ -479,8 +479,9 @@ private class ReplicaFetcher(name: String,
     if (response != null) {
       response.data.foreach {
         case (topicAndPartition, partitionData) =>
-          replicaBuffer
-            .addFetchedData(topicAndPartition, sourceBroker.id, partitionData)
+          replicaBuffer.addFetchedData(topicAndPartition,
+                                       sourceBroker.id,
+                                       partitionData)
       }
     } else {
       for (topicAndPartition <- topicAndPartitions)

@@ -69,8 +69,9 @@ class ChannelBufferSnooper(val name: String) extends ChannelSnooper {
   def dump(printer: (Channel, String) => Unit,
            ch: Channel,
            buf: ChannelBuffer) {
-    val rawStr = buf
-      .toString(buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
+    val rawStr = buf.toString(buf.readerIndex,
+                              buf.readableBytes,
+                              Charset.forName("UTF-8"))
     val str = rawStr.replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n")
     val asciiStr =
       str map { c =>

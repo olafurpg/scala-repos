@@ -287,8 +287,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
 
             // exception catching machinery
             val invokeExc =
-              currentOwner
-                .newValue(mkTerm(""), ad.pos) setInfo InvocationTargetExceptionClass.tpe
+              currentOwner.newValue(mkTerm(""), ad.pos) setInfo InvocationTargetExceptionClass.tpe
             def catchVar =
               Bind(invokeExc,
                    Typed(Ident(nme.WILDCARD),

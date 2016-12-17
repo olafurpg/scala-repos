@@ -429,8 +429,8 @@ class ReplicaManager(val config: KafkaConfig,
         // try to complete the request immediately, otherwise put it into the purgatory
         // this is because while the delayed produce operation is being created, new
         // requests may arrive and hence make this operation completable.
-        delayedProducePurgatory
-          .tryCompleteElseWatch(delayedProduce, producerRequestKeys)
+        delayedProducePurgatory.tryCompleteElseWatch(delayedProduce,
+                                                     producerRequestKeys)
       } else {
         // we can respond immediately
         val produceResponseStatus =
@@ -635,8 +635,8 @@ class ReplicaManager(val config: KafkaConfig,
       // try to complete the request immediately, otherwise put it into the purgatory;
       // this is because while the delayed fetch operation is being created, new requests
       // may arrive and hence make this operation completable.
-      delayedFetchPurgatory
-        .tryCompleteElseWatch(delayedFetch, delayedFetchKeys)
+      delayedFetchPurgatory.tryCompleteElseWatch(delayedFetch,
+                                                 delayedFetchKeys)
     }
   }
 
@@ -1181,8 +1181,10 @@ class ReplicaManager(val config: KafkaConfig,
       case e: Throwable =>
         val errorMsg =
           ("Error on broker %d while processing LeaderAndIsr request with correlationId %d received from controller %d " +
-            "epoch %d")
-            .format(localBrokerId, correlationId, controllerId, epoch)
+            "epoch %d").format(localBrokerId,
+                               correlationId,
+                               controllerId,
+                               epoch)
         stateChangeLogger.error(errorMsg, e)
         // Re-throw the exception for it to be caught in KafkaApis
         throw e

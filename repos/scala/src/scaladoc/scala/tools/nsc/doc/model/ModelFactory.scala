@@ -952,8 +952,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       val allSyms =
         useCases(aSym, inTpl.sym) map {
           case (bSym, bComment, bPos) =>
-            docComments
-              .put(bSym, DocComment(bComment, bPos)) // put the comment in the list, don't parse it yet, closes SI-4898
+            docComments.put(bSym, DocComment(bComment, bPos)) // put the comment in the list, don't parse it yet, closes SI-4898
             bSym
         }
 

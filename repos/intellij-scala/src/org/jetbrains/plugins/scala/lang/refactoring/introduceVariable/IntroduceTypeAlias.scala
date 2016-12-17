@@ -75,8 +75,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
       UsageTrigger.trigger(ScalaBundle.message("introduce.type.alias.id"))
 
       PsiDocumentManager.getInstance(project).commitAllDocuments()
-      ScalaRefactoringUtil
-        .checkFile(file, project, editor, INTRODUCE_TYPEALIAS_REFACTORING_NAME)
+      ScalaRefactoringUtil.checkFile(file,
+                                     project,
+                                     editor,
+                                     INTRODUCE_TYPEALIAS_REFACTORING_NAME)
 
       val typeElement: ScTypeElement = ScalaRefactoringUtil
         .checkTypeElement(inTypeElement)
@@ -319,16 +321,19 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
           typeElement.getContext,
           typeElement)
 
-      val resultTypeAlias = ScalaPsiUtil
-        .addTypeAliasBefore(definition, parent, getAhchor(parent, typeElement))
+      val resultTypeAlias = ScalaPsiUtil.addTypeAliasBefore(
+        definition,
+        parent,
+        getAhchor(parent, typeElement))
       ScalaPsiUtil.adjustTypes(resultTypeAlias,
                                addImports = true,
                                useTypeAliases = false)
       resultTypeAlias
     }
 
-    val revertInfo = ScalaRefactoringUtil
-      .RevertInfo(file.getText, editor.getCaretModel.getOffset)
+    val revertInfo = ScalaRefactoringUtil.RevertInfo(
+      file.getText,
+      editor.getCaretModel.getOffset)
     editor.putUserData(ScalaIntroduceVariableHandler.REVERT_INFO, revertInfo)
 
     val parent = scope match {
@@ -458,8 +463,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
                           typeAlias: ScTypeAlias) = {
     def replaceHelper(typeElement: ScTypeElement,
                       inName: String): ScTypeElement = {
-      val replacement = ScalaPsiElementFactory
-        .createTypeElementFromText(inName, typeElement.getContext, typeElement)
+      val replacement = ScalaPsiElementFactory.createTypeElementFromText(
+        inName,
+        typeElement.getContext,
+        typeElement)
       //remove parethesis around typeElement
       if (typeElement.getParent.isInstanceOf[ScParenthesisedTypeElement]) {
         typeElement.getNextSibling.delete()
@@ -525,8 +532,9 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
       JListCompatibility.addElement(model, element)
     }
     val list = JListCompatibility.createJListFromModel(model)
-    JListCompatibility
-      .setCellRenderer(list, new DefaultListCellRendererAdapter {
+    JListCompatibility.setCellRenderer(
+      list,
+      new DefaultListCellRendererAdapter {
         def getListCellRendererComponentAdapter(
             container: JListCompatibility.JListContainer,
             value: Object,
@@ -627,8 +635,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
     }
 
     if (occurrences.length > 1)
-      occurrenceHighlighters = ScalaRefactoringUtil
-        .highlightOccurrences(project, occurrences.map(_.getTextRange), editor)
+      occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
+        project,
+        occurrences.map(_.getTextRange),
+        editor)
 
     val dialog = new ScalaIntroduceTypeAliasDialog(project,
                                                    typeElement,

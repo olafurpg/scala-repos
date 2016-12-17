@@ -304,8 +304,8 @@ class AsyncProducerTest {
           TestUtils.readString(d.message.payload)))
 
     TestUtils.checkEquals(produceData.iterator, deserializedData.iterator)
-    TestUtils
-      .checkEquals(produceData.iterator, deserializedStreamData.iterator)
+    TestUtils.checkEquals(produceData.iterator,
+                          deserializedStreamData.iterator)
   }
 
   @Test
@@ -448,8 +448,8 @@ class AsyncProducerTest {
     props.put("metadata.broker.list", brokerList)
     props.put("request.required.acks", "1")
     props.put("serializer.class", classOf[StringEncoder].getName.toString)
-    props
-      .put("key.serializer.class", classOf[NullEncoder[Int]].getName.toString)
+    props.put("key.serializer.class",
+              classOf[NullEncoder[Int]].getName.toString)
     props.put("producer.num.retries", 3.toString)
 
     val config = new ProducerConfig(props)

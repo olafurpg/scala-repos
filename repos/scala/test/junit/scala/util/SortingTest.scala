@@ -109,8 +109,8 @@ class SortingTest {
     for (size <- sizes) {
       val b = Array.fill(size)(rng.nextBoolean)
       val bfwd = Sorting.stableSort(b.clone: Seq[Boolean])
-      val bbkw = Sorting
-        .stableSort(b.clone: Seq[Boolean], (x: Boolean, y: Boolean) => x && !y)
+      val bbkw = Sorting.stableSort(b.clone: Seq[Boolean],
+                                    (x: Boolean, y: Boolean) => x && !y)
       assertTrue("All falses should be first",
                  bfwd.dropWhile(_ == false).forall(_ == true))
       assertTrue("All falses should be last when sorted backwards",

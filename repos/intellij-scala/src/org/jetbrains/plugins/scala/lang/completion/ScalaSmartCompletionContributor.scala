@@ -373,8 +373,7 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
                       typez.foreach {
                         case ScParameterizedType(tp, Seq(arg))
                             if !elementAdded =>
-                          ScType
-                            .extractClass(tp, Some(place.getProject)) match {
+                          ScType.extractClass(tp, Some(place.getProject)) match {
                             case Some(clazz)
                                 if clazz.qualifiedName == "scala.Option" ||
                                   clazz.qualifiedName == "scala.Some" =>
@@ -896,8 +895,10 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
                          result: CompletionResultSet) {
         val element = positionFromParameters(parameters)
 
-        val refElement = ScalaPsiUtil
-          .getContextOfType(element, false, classOf[ScReferenceElement])
+        val refElement =
+          ScalaPsiUtil.getContextOfType(element,
+                                        false,
+                                        classOf[ScReferenceElement])
 
         val renamesMap =
           new mutable.HashMap[String, (String, PsiNamedElement)]()
@@ -920,8 +921,9 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
         }
 
         val addedClasses = new mutable.HashSet[String]
-        val newExpr = PsiTreeUtil
-          .getContextOfType(element, classOf[ScNewTemplateDefinition])
+        val newExpr =
+          PsiTreeUtil.getContextOfType(element,
+                                       classOf[ScNewTemplateDefinition])
         val types: Array[ScType] = newExpr.expectedTypes().map {
           case ScAbstractType(_, lower, upper) => upper
           case tp => tp

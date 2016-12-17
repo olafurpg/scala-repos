@@ -158,8 +158,9 @@ class ScalaChangeSignatureDialog(val project: Project,
             val ed: TableCellEditor = parametersTable.getCellEditor
             if (ed != null) {
               val editorValue: AnyRef = ed.getCellEditorValue
-              myParametersTableModel
-                .setValueAtWithoutUpdate(editorValue, row, column)
+              myParametersTableModel.setValueAtWithoutUpdate(editorValue,
+                                                             row,
+                                                             column)
               updateSignature()
             }
           }
@@ -348,8 +349,9 @@ class ScalaChangeSignatureDialog(val project: Project,
     if (myReturnTypeCodeFragment == null) StdType.ANY
     else {
       val fragment = myReturnTypeCodeFragment
-      ScalaPsiElementFactory
-        .createTypeFromText(fragment.getText, fragment.getContext, fragment)
+      ScalaPsiElementFactory.createTypeFromText(fragment.getText,
+                                                fragment.getContext,
+                                                fragment)
     }
   }
 

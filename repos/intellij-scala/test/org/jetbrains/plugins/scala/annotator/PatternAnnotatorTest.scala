@@ -17,13 +17,15 @@ class PatternAnnotatorTest
   private def fruitless(exprType: String, patType: String) =
     ScalaBundle.message("fruitless.type.test", exprType, patType)
   private def incompatible(exprType: String, patType: String) =
-    ScalaBundle
-      .message("scrutinee.incompatible.pattern.type", exprType, patType)
+    ScalaBundle.message("scrutinee.incompatible.pattern.type",
+                        exprType,
+                        patType)
   private def cannotBeUsed(typeText: String) =
     s"type $typeText cannot be used in a type pattern or isInstanceOf test"
   private def patternTypeIncompatible(found: String, required: String) =
-    ScalaBundle
-      .message("pattern.type.incompatible.with.expected", found, required)
+    ScalaBundle.message("pattern.type.incompatible.with.expected",
+                        found,
+                        required)
   private def constructorCannotBeInstantiated(found: String,
                                               required: String) =
     ScalaBundle.message("constructor.cannot.be.instantiated.to.expected.type",
@@ -476,8 +478,9 @@ class PatternAnnotatorTest
     checkError(
       code,
       "foo appliedTo \"\"",
-      ScalaBundle
-        .message("wrong.number.arguments.extractor.unapplySeq", "2", "3"))
+      ScalaBundle.message("wrong.number.arguments.extractor.unapplySeq",
+                          "2",
+                          "3"))
   }
 
   def testNumberOfArgumentsCons(): Unit = {

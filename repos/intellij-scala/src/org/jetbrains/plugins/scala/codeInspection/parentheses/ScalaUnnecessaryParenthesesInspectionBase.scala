@@ -66,8 +66,9 @@ class UnnecessaryParenthesesQuickFix(parenthesized: ScParenthesisedExpr,
     val parenthExpr = getElement
     if (!parenthExpr.isValid) return
 
-    val newExpr = ScalaPsiElementFactory
-      .createExpressionFromText(textOfStripped, parenthExpr.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+      textOfStripped,
+      parenthExpr.getManager)
     val replaced =
       parenthExpr.replaceExpression(newExpr, removeParenthesis = true)
 

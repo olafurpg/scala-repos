@@ -21,8 +21,9 @@ object TimeTest extends SpecLite {
       gen[Int].map { Duration.ofSeconds(_) }
     ))
 
-  implicit val PeriodArbitrary: Arbitrary[Period] = Apply[Arbitrary]
-    .apply3(smallIntArb, smallIntArb, smallIntArb)(Period.of(_, _, _))
+  implicit val PeriodArbitrary: Arbitrary[Period] =
+    Apply[Arbitrary].apply3(smallIntArb, smallIntArb, smallIntArb)(
+      Period.of(_, _, _))
 
   implicit val LocalDateArbitrary: Arbitrary[LocalDate] = Arbitrary(
     Apply[Gen].apply3(

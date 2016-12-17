@@ -28,8 +28,12 @@ trait Trees extends api.Trees { self: SymbolTable =>
       if (enclosingTree eq null) "        "
       else " P#%5s".format(enclosingTree.id)
 
-    "[L%4s%8s] #%-6s %-15s %-10s // %s"
-      .format(t.pos.line, parent, t.id, t.pos.show, t.shortClass, treeLine(t))
+    "[L%4s%8s] #%-6s %-15s %-10s // %s".format(t.pos.line,
+                                               parent,
+                                               t.id,
+                                               t.pos.show,
+                                               t.shortClass,
+                                               treeLine(t))
   }
   protected def treeSymStatus(t: Tree) = {
     val line =
@@ -1192,8 +1196,9 @@ trait Trees extends api.Trees { self: SymbolTable =>
     }
 
     override def toString =
-      "Modifiers(%s, %s, %s)"
-        .format(flagString, annotations mkString ", ", positions)
+      "Modifiers(%s, %s, %s)".format(flagString,
+                                     annotations mkString ", ",
+                                     positions)
   }
 
   object Modifiers extends ModifiersExtractor
@@ -1549,13 +1554,16 @@ trait Trees extends api.Trees { self: SymbolTable =>
                           transform(rhs))
         }
       case Block(stats, expr) =>
-        treeCopy
-          .Block(tree, transformStats(stats, currentOwner), transform(expr))
+        treeCopy.Block(tree,
+                       transformStats(stats, currentOwner),
+                       transform(expr))
       case If(cond, thenp, elsep) =>
         treeCopy.If(tree, transform(cond), transform(thenp), transform(elsep))
       case CaseDef(pat, guard, body) =>
-        treeCopy
-          .CaseDef(tree, transform(pat), transform(guard), transform(body))
+        treeCopy.CaseDef(tree,
+                         transform(pat),
+                         transform(guard),
+                         transform(body))
       case TypeApply(fun, args) =>
         treeCopy.TypeApply(tree, transform(fun), transformTrees(args))
       case AppliedTypeTree(tpt, args) =>
@@ -1620,8 +1628,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
                            transform(rhs))
         }
       case LabelDef(name, params, rhs) =>
-        treeCopy
-          .LabelDef(tree, name, transformIdents(params), transform(rhs)) //bq: Martin, once, atOwner(...) works, also change `LambdaLifter.proxy'
+        treeCopy.LabelDef(tree, name, transformIdents(params), transform(rhs)) //bq: Martin, once, atOwner(...) works, also change `LambdaLifter.proxy'
       case PackageDef(pid, stats) =>
         treeCopy.PackageDef(
           tree,
@@ -1649,8 +1656,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       case Star(elem) =>
         treeCopy.Star(tree, transform(elem))
       case UnApply(fun, args) =>
-        treeCopy
-          .UnApply(tree, transform(fun), transformTrees(args)) // bq: see test/.../unapplyContexts2.scala
+        treeCopy.UnApply(tree, transform(fun), transformTrees(args)) // bq: see test/.../unapplyContexts2.scala
       case ArrayValue(elemtpt, trees) =>
         treeCopy.ArrayValue(tree, transform(elemtpt), transformTrees(trees))
       case ApplyDynamic(qual, args) =>

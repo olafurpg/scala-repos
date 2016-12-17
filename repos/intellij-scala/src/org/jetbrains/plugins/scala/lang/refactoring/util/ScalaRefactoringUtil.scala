@@ -127,12 +127,13 @@ object ScalaRefactoringUtil {
       i = i - 1
     }
     if (hasNlToken)
-      e = ScalaPsiElementFactory
-        .createExpressionFromText(text.substring(0, i + 1), e.getManager)
+      e = ScalaPsiElementFactory.createExpressionFromText(
+        text.substring(0, i + 1),
+        e.getManager)
     e.getParent match {
       case x: ScMethodCall if x.args.exprs.nonEmpty =>
-        ScalaPsiElementFactory
-          .createExpressionFromText(e.getText + " _", e.getManager)
+        ScalaPsiElementFactory.createExpressionFromText(e.getText + " _",
+                                                        e.getManager)
       case _ => e
     }
   }
@@ -164,8 +165,7 @@ object ScalaRefactoringUtil {
   }
 
   def inTemplateParents(typeElement: ScTypeElement): Boolean = {
-    PsiTreeUtil
-      .getParentOfType(typeElement, classOf[ScTemplateParents]) != null
+    PsiTreeUtil.getParentOfType(typeElement, classOf[ScTemplateParents]) != null
   }
 
   def checkTypeElement(element: ScTypeElement): Option[ScTypeElement] = {
@@ -191,8 +191,9 @@ object ScalaRefactoringUtil {
   }
 
   def getOwner(typeElement: PsiElement) =
-    PsiTreeUtil
-      .getParentOfType(typeElement, classOf[ScTypeParametersOwner], true)
+    PsiTreeUtil.getParentOfType(typeElement,
+                                classOf[ScTypeParametersOwner],
+                                true)
 
   def getTypeParameterOwnerList(
       typeElement: ScTypeElement): Seq[ScTypeParametersOwner] = {
@@ -257,8 +258,9 @@ object ScalaRefactoringUtil {
     val rangeText = file.getText.substring(startOffset, endOffset)
 
     def selectedInfixExpr(): Option[(ScExpression, Array[ScType])] = {
-      val expr = ScalaPsiElementFactory
-        .createOptionExpressionFromText(rangeText, file.getManager)
+      val expr = ScalaPsiElementFactory.createOptionExpressionFromText(
+        rangeText,
+        file.getManager)
       expr match {
         case Some(expression: ScInfixExpr) =>
           val op1 = expression.operation
@@ -306,8 +308,10 @@ object ScalaRefactoringUtil {
                                                        startOffset,
                                                        classOf[ScLiteral],
                                                        false)
-      val endLit = PsiTreeUtil
-        .findElementOfClassAtOffset(file, endOffset, classOf[ScLiteral], false)
+      val endLit = PsiTreeUtil.findElementOfClassAtOffset(file,
+                                                          endOffset,
+                                                          classOf[ScLiteral],
+                                                          false)
       if (lit == null || !lit.isString || lit != endLit) return None
 
       val prefix = lit match {
@@ -359,8 +363,8 @@ object ScalaRefactoringUtil {
   def expressionToIntroduce(expr: ScExpression): ScExpression = {
     def copyExpr = expr.copy.asInstanceOf[ScExpression]
     def liftMethod =
-      ScalaPsiElementFactory
-        .createExpressionFromText(expr.getText + " _", expr.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(expr.getText + " _",
+                                                      expr.getManager)
     expr match {
       case ref: ScReferenceExpression =>
         ref.resolve() match {
@@ -648,8 +652,9 @@ object ScalaRefactoringUtil {
       JListCompatibility.addElement(model, element)
     }
     val list = JListCompatibility.createJListFromModel(model)
-    JListCompatibility
-      .setCellRenderer(list, new DefaultListCellRendererAdapter {
+    JListCompatibility.setCellRenderer(
+      list,
+      new DefaultListCellRendererAdapter {
         def getListCellRendererComponentAdapter(
             container: JListCompatibility.JListContainer,
             value: Object,
@@ -986,8 +991,9 @@ object ScalaRefactoringUtil {
     if (file.asInstanceOf[ScalaFile].isScriptFile()) file
     else {
       val elem = file.findElementAt(startOffset)
-      val result = ScalaPsiUtil
-        .getParentOfType(elem, classOf[ScExtendsBlock], classOf[PsiFile])
+      val result = ScalaPsiUtil.getParentOfType(elem,
+                                                classOf[ScExtendsBlock],
+                                                classOf[PsiFile])
       if (result == null) {
         for (child <- file.getChildren) {
           val textRange: TextRange = child.getTextRange
@@ -1032,8 +1038,11 @@ object ScalaRefactoringUtil {
                                     project: Project,
                                     editor: Editor,
                                     refactoringName: String): Nothing = {
-    CommonRefactoringUtil
-      .showErrorHint(project, editor, text, refactoringName, null)
+    CommonRefactoringUtil.showErrorHint(project,
+                                        editor,
+                                        text,
+                                        refactoringName,
+                                        null)
     throw new IntroduceException
   }
 
@@ -1041,8 +1050,11 @@ object ScalaRefactoringUtil {
                     project: Project,
                     editor: Editor,
                     refactoringName: String) = {
-    CommonRefactoringUtil
-      .showErrorHint(project, editor, text, refactoringName, null)
+    CommonRefactoringUtil.showErrorHint(project,
+                                        editor,
+                                        text,
+                                        refactoringName,
+                                        null)
   }
 
   def checkFile(file: PsiFile,
@@ -1199,10 +1211,14 @@ object ScalaRefactoringUtil {
     documentManager.commitDocument(document)
     val newStart = start + shift
     val newEnd = newStart + newString.length
-    val newExpr = PsiTreeUtil
-      .findElementOfClassAtRange(file, newStart, newEnd, classOf[ScExpression])
-    val newPattern = PsiTreeUtil
-      .findElementOfClassAtOffset(file, newStart, classOf[ScPattern], true)
+    val newExpr = PsiTreeUtil.findElementOfClassAtRange(file,
+                                                        newStart,
+                                                        newEnd,
+                                                        classOf[ScExpression])
+    val newPattern = PsiTreeUtil.findElementOfClassAtOffset(file,
+                                                            newStart,
+                                                            classOf[ScPattern],
+                                                            true)
     Option(newExpr)
       .orElse(Option(newPattern))
       .map(elem => document.createRangeMarker(elem.getTextRange))
@@ -1249,8 +1265,9 @@ object ScalaRefactoringUtil {
       PsiTreeUtil
         .getParentOfType(elem, classOf[ScInterpolatedStringLiteral], false))
     val expr =
-      interpolated getOrElse PsiTreeUtil
-        .getParentOfType(elem, classOf[ScExpression], false)
+      interpolated getOrElse PsiTreeUtil.getParentOfType(elem,
+                                                         classOf[ScExpression],
+                                                         false)
     val nextPar = nextParent(expr, elem.getContainingFile)
     nextPar match {
       case prevExpr: ScExpression if !checkEnd(nextPar, expr) =>

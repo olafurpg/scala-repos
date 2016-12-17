@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -29,9 +29,9 @@ import scalaz.std.list._
 import com.precog.util.IdGen
 
 trait ArrayLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
-  self =>
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] { self =>
 
   import Function._
 
@@ -52,8 +52,8 @@ trait ArrayLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input = dag.Morph1(
-          Flatten,
-          dag.AbsoluteLoad(Const(CString("/hom/arrays"))(line))(line))(line)
+        Flatten,
+        dag.AbsoluteLoad(Const(CString("/hom/arrays"))(line))(line))(line)
 
       val result = testEval(input)
       result must haveSize(25)
@@ -94,8 +94,8 @@ trait ArrayLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input = dag.Morph1(
-          Flatten,
-          dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(line))(line)
+        Flatten,
+        dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(line))(line)
 
       val result = testEval(input)
       result must haveSize(26)
@@ -130,11 +130,12 @@ trait ArrayLibSpecs[M[+ _]]
                            SDecimal(244),
                            SDecimal(13),
                            SDecimal(11),
-                           SArray(Vector(SDecimal(-9),
-                                         SDecimal(-42),
-                                         SDecimal(42),
-                                         SDecimal(87),
-                                         SDecimal(4))))
+                           SArray(
+                             Vector(SDecimal(-9),
+                                    SDecimal(-42),
+                                    SDecimal(42),
+                                    SDecimal(87),
+                                    SDecimal(4))))
     }
 
     "flattened set is related to original set" in {
@@ -142,21 +143,20 @@ trait ArrayLibSpecs[M[+ _]]
 
       val input =
         dag.Join(
-            JoinObject,
-            IdentitySort,
-            dag.Join(WrapObject,
-                     Cross(None),
-                     Const(CString("arr"))(line),
-                     dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(
-                         line))(line),
-            dag.Join(
-                WrapObject,
-                Cross(None),
-                Const(CString("val"))(line),
-                dag.Morph1(Flatten,
-                           dag.AbsoluteLoad(
-                               Const(CString("/het/arrays"))(line))(line))(line))(
-                line))(line)
+          JoinObject,
+          IdentitySort,
+          dag.Join(
+            WrapObject,
+            Cross(None),
+            Const(CString("arr"))(line),
+            dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(line))(line),
+          dag.Join(
+            WrapObject,
+            Cross(None),
+            Const(CString("val"))(line),
+            dag.Morph1(Flatten,
+                       dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(
+                         line))(line))(line))(line)
 
       val result = testEval(input)
       result must haveSize(26)

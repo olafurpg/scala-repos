@@ -110,8 +110,10 @@ class JavaCopyPastePostProcessor
 
       def getRefs: Seq[ReferenceData] = {
         val refs = {
-          val data = referenceProcessor
-            .collectTransferableData(file, editor, startOffsets, endOffsets)
+          val data = referenceProcessor.collectTransferableData(file,
+                                                                editor,
+                                                                startOffsets,
+                                                                endOffsets)
           if (data.isEmpty) null
           else data.get(0).asInstanceOf[ReferenceTransferableData]
         }

@@ -145,8 +145,10 @@ private[sql] abstract class BaseWriterContainer(
   protected def newOutputWriter(path: String,
                                 bucketId: Option[Int] = None): OutputWriter = {
     try {
-      outputWriterFactory
-        .newInstance(path, bucketId, dataSchema, taskAttemptContext)
+      outputWriterFactory.newInstance(path,
+                                      bucketId,
+                                      dataSchema,
+                                      taskAttemptContext)
     } catch {
       case e: org.apache.hadoop.fs.FileAlreadyExistsException =>
         if (outputCommitter
@@ -427,8 +429,9 @@ private[sql] class DynamicPartitionWriterContainer(
     val getOutputRow = UnsafeProjection.create(dataColumns, inputSchema)
 
     // Returns the partition path given a partition key.
-    val getPartitionString = UnsafeProjection
-      .create(Concat(partitionStringExpression) :: Nil, partitionColumns)
+    val getPartitionString = UnsafeProjection.create(
+      Concat(partitionStringExpression) :: Nil,
+      partitionColumns)
 
     // Sorts the data before write, so that we only need one writer at the same time.
     // TODO: inject a local sort operator in planning.

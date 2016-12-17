@@ -155,8 +155,9 @@ class GroupMetadataManager(val brokerId: Int,
         timestamp = timestamp,
         magicValue = magicValue)
 
-      val partitionOpt = replicaManager
-        .getPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME, groupPartition)
+      val partitionOpt = replicaManager.getPartition(
+        TopicConstants.GROUP_METADATA_TOPIC_NAME,
+        groupPartition)
       partitionOpt.foreach { partition =>
         val appendPartition =
           TopicAndPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME,
@@ -716,8 +717,9 @@ class GroupMetadataManager(val brokerId: Int,
   }
 
   private def getHighWatermark(partitionId: Int): Long = {
-    val partitionOpt = replicaManager
-      .getPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME, partitionId)
+    val partitionOpt = replicaManager.getPartition(
+      TopicConstants.GROUP_METADATA_TOPIC_NAME,
+      partitionId)
 
     val hw = partitionOpt.map { partition =>
       partition

@@ -216,8 +216,10 @@ class MongoAPIKeyManagerSpec
       apiKeyManager.createAPIKey(Some("child2"), None, rootAPIKey, Set.empty),
       to)
     val grantChild1 = Await.result(
-      apiKeyManager
-        .createAPIKey(Some("grantChild1"), None, child1.apiKey, Set.empty),
+      apiKeyManager.createAPIKey(Some("grantChild1"),
+                                 None,
+                                 child1.apiKey,
+                                 Set.empty),
       to)
 
     // wait until the keys appear in the DB (some delay between insert request and actor insert)

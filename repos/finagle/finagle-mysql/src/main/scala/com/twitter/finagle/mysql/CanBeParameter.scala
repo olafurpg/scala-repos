@@ -175,8 +175,9 @@ object CanBeParameter {
       def sizeOf(param: java.util.Date) = 12
       def typeCode(param: java.util.Date) = Type.DateTime
       def write(writer: BufferWriter, param: java.util.Date) = {
-        valueCanBeParameter
-          .write(writer, TimestampValue(new java.sql.Timestamp(param.getTime)))
+        valueCanBeParameter.write(
+          writer,
+          TimestampValue(new java.sql.Timestamp(param.getTime)))
       }
     }
   }

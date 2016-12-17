@@ -62,8 +62,9 @@ object ScalaAfterNewCompletionUtil {
     val data =
       if (isAfter) {
         val element = position
-        val newExpr: ScNewTemplateDefinition = PsiTreeUtil
-          .getContextOfType(element, classOf[ScNewTemplateDefinition])
+        val newExpr: ScNewTemplateDefinition = PsiTreeUtil.getContextOfType(
+          element,
+          classOf[ScNewTemplateDefinition])
         newExpr.expectedTypes().map {
           case ScAbstractType(_, lower, upper) => upper
           case tp => tp

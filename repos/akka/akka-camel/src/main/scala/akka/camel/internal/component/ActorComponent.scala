@@ -292,8 +292,9 @@ object CamelPath {
   def toUri(actorRef: ActorRef,
             autoAck: Boolean,
             replyTimeout: Duration): String =
-    "%s?autoAck=%s&replyTimeout=%s"
-      .format(actorRef.path.toString, autoAck, replyTimeout.toString)
+    "%s?autoAck=%s&replyTimeout=%s".format(actorRef.path.toString,
+                                           autoAck,
+                                           replyTimeout.toString)
 }
 
 /**

@@ -37,8 +37,8 @@ object UnsignedComparisonLaws extends Properties("UnsignedComparisonLaws") {
       case (false, true) => cmp > 0
       // Convert to positive ints
       case (false, false) =>
-        cmp == java.lang.Integer
-          .compare(l1 & Byte.MaxValue, l2 & Byte.MaxValue)
+        cmp == java.lang.Integer.compare(l1 & Byte.MaxValue,
+                                         l2 & Byte.MaxValue)
     }
   }
 }

@@ -126,8 +126,10 @@ private[sbt] object SettingCompletions {
       val (used, trimU) = lines(strings(affected))
       val details = if (trimR || trimU) "\n\tRun `last` for details." else ""
       val valuesString = if (redefined.size == 1) "value" else "values"
-      "Defining %s\nThe new %s will be used by %s%s"
-        .format(redef, valuesString, used, details)
+      "Defining %s\nThe new %s will be used by %s%s".format(redef,
+                                                            valuesString,
+                                                            used,
+                                                            details)
     }
   }
 
@@ -274,8 +276,7 @@ private[sbt] object SettingCompletions {
       completeAssign(seen, level, key).toSet
     }
     val identifier =
-      Act
-        .filterStrings(Op, Assign.values.map(_.toString), "assignment method") map Assign.withName
+      Act.filterStrings(Op, Assign.values.map(_.toString), "assignment method") map Assign.withName
     token(Space) ~> token(optionallyQuoted(identifier), completions)
   }
 

@@ -571,8 +571,12 @@ abstract class HadoopFsRelationTest
       val df = (for {
         i <- 1 to 3
         p2 <- Seq("foo", "bar")
-      } yield (i, s"val_$i", 1.0d, p2, 123, 123.123f))
-        .toDF("a", "b", "p1", "p2", "p3", "f")
+      } yield (i, s"val_$i", 1.0d, p2, 123, 123.123f)).toDF("a",
+                                                            "b",
+                                                            "p1",
+                                                            "p2",
+                                                            "p3",
+                                                            "f")
 
       val input = df.select('a,
                             'b,

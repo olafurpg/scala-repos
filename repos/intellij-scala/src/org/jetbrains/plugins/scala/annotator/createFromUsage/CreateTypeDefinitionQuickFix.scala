@@ -107,8 +107,10 @@ abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
             parent)) return
 
       val text = s"${kind.keyword} $name"
-      val newTd = ScalaPsiElementFactory
-        .createTemplateDefinitionFromText(text, parent, parent.getFirstChild)
+      val newTd = ScalaPsiElementFactory.createTemplateDefinitionFromText(
+        text,
+        parent,
+        parent.getFirstChild)
       val anchor = anchorAfter.orNull
       parent.addBefore(ScalaPsiElementFactory.createNewLine(parent.getManager),
                        anchor)
@@ -245,8 +247,10 @@ abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
       case cl: ScClass =>
         val constr = cl.constructor.get
         val text = parametersText(ref)
-        val parameters = ScalaPsiElementFactory
-          .createParamClausesWithContext(text, constr, constr.getFirstChild)
+        val parameters = ScalaPsiElementFactory.createParamClausesWithContext(
+          text,
+          constr,
+          constr.getFirstChild)
         constr.parameterList.replace(parameters)
       case _ =>
     }

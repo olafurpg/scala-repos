@@ -283,8 +283,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
   implicit def awaitHelper[T](w: Awaitable[T]) = new AwaitHelper(w)
   class AwaitHelper[T](w: Awaitable[T]) {
     def await: T =
-      Await
-        .result(w, remainingOr(testConductor.Settings.QueryTimeout.duration))
+      Await.result(w,
+                   remainingOr(testConductor.Settings.QueryTimeout.duration))
   }
 
   final override def multiNodeSpecBeforeAll {

@@ -182,23 +182,23 @@ object ArrayUtil {
         case x: Array[Int] =>
           Arrays.equals(a.asInstanceOf[Array[Int]], b.asInstanceOf[Array[Int]])
         case x: Array[Float] =>
-          Arrays
-            .equals(a.asInstanceOf[Array[Float]], b.asInstanceOf[Array[Float]])
+          Arrays.equals(a.asInstanceOf[Array[Float]],
+                        b.asInstanceOf[Array[Float]])
         case x: Array[Boolean] =>
           Arrays.equals(a.asInstanceOf[Array[Boolean]],
                         b.asInstanceOf[Array[Boolean]])
         case x: Array[Long] =>
-          Arrays
-            .equals(a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])
+          Arrays.equals(a.asInstanceOf[Array[Long]],
+                        b.asInstanceOf[Array[Long]])
         case x: Array[Short] =>
-          Arrays
-            .equals(a.asInstanceOf[Array[Short]], b.asInstanceOf[Array[Short]])
+          Arrays.equals(a.asInstanceOf[Array[Short]],
+                        b.asInstanceOf[Array[Short]])
         case x: Array[Char] =>
-          Arrays
-            .equals(a.asInstanceOf[Array[Char]], b.asInstanceOf[Array[Char]])
+          Arrays.equals(a.asInstanceOf[Array[Char]],
+                        b.asInstanceOf[Array[Char]])
         case x: Array[Byte] =>
-          Arrays
-            .equals(a.asInstanceOf[Array[Byte]], b.asInstanceOf[Array[Byte]])
+          Arrays.equals(a.asInstanceOf[Array[Byte]],
+                        b.asInstanceOf[Array[Byte]])
         case x: Array[_] =>
           Arrays.equals(a.asInstanceOf[Array[AnyRef]],
                         b.asInstanceOf[Array[AnyRef]])

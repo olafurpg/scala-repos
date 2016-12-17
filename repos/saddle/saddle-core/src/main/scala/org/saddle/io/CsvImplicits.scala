@@ -54,16 +54,20 @@ object CsvImplicits {
                        withColIx: Boolean = false,
                        withRowIx: Boolean = true,
                        settings: CsvSettings = new CsvSettings()) {
-        frame2CsvWriter(Frame(series))
-          .writeCsvFile(path, withColIx, withRowIx, settings)
+        frame2CsvWriter(Frame(series)).writeCsvFile(path,
+                                                    withColIx,
+                                                    withRowIx,
+                                                    settings)
       }
 
       def writeCsvStream(stream: OutputStream,
                          withColIx: Boolean = false,
                          withRowIx: Boolean = true,
                          settings: CsvSettings = new CsvSettings()) {
-        frame2CsvWriter(Frame(series))
-          .writeCsvStream(stream, withColIx, withRowIx, settings)
+        frame2CsvWriter(Frame(series)).writeCsvStream(stream,
+                                                      withColIx,
+                                                      withRowIx,
+                                                      settings)
       }
     } // end new
 

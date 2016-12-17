@@ -615,8 +615,9 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
   private def listLeafFiles(
       paths: Seq[Path]): mutable.LinkedHashSet[FileStatus] = {
     if (paths.length >= sqlContext.conf.parallelPartitionDiscoveryThreshold) {
-      HadoopFsRelation
-        .listLeafFilesInParallel(paths, hadoopConf, sqlContext.sparkContext)
+      HadoopFsRelation.listLeafFilesInParallel(paths,
+                                               hadoopConf,
+                                               sqlContext.sparkContext)
     } else {
       val statuses = paths.flatMap { path =>
         val fs = path.getFileSystem(hadoopConf)
@@ -669,13 +670,11 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
           part.copy(values = castPartitionValuesToUserSchema(part.values))
         })
       case _ =>
-        PartitioningUtils
-          .parsePartitions(
-            leafDirs,
-            PartitioningUtils.DEFAULT_PARTITION_NAME,
-            typeInference =
-              sqlContext.conf.partitionColumnTypeInferenceEnabled(),
-            basePaths = basePaths)
+        PartitioningUtils.parsePartitions(
+          leafDirs,
+          PartitioningUtils.DEFAULT_PARTITION_NAME,
+          typeInference = sqlContext.conf.partitionColumnTypeInferenceEnabled(),
+          basePaths = basePaths)
     }
   }
 

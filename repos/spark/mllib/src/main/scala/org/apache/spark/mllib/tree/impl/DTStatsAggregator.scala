@@ -91,8 +91,8 @@ private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
     */
   def getImpurityCalculator(featureOffset: Int,
                             binIndex: Int): ImpurityCalculator = {
-    impurityAggregator
-      .getCalculator(allStats, featureOffset + binIndex * statsSize)
+    impurityAggregator.getCalculator(allStats,
+                                     featureOffset + binIndex * statsSize)
   }
 
   /**

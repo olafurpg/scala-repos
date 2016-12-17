@@ -558,8 +558,10 @@ private[akka] final class PromiseActorRef private (
   @inline
   private[this] def updateWatchedBy(oldWatchedBy: Set[ActorRef],
                                     newWatchedBy: Set[ActorRef]): Boolean =
-    Unsafe.instance
-      .compareAndSwapObject(this, watchedByOffset, oldWatchedBy, newWatchedBy)
+    Unsafe.instance.compareAndSwapObject(this,
+                                         watchedByOffset,
+                                         oldWatchedBy,
+                                         newWatchedBy)
 
   @tailrec // Returns false if the Promise is already completed
   private[this] final def addWatcher(watcher: ActorRef): Boolean =

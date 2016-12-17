@@ -276,8 +276,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
                     .createExpressionFromText("1 + 1", myFile.getManager)
                     .findElementAt(1)
                   val newWhiteSpace = holder.addBefore(whiteSpace, assign)
-                  holder.getNode
-                    .removeRange(colon.getNode, newWhiteSpace.getNode)
+                  holder.getNode.removeRange(colon.getNode,
+                                             newWhiteSpace.getNode)
                   setDeclaration(holder)
                   commitDocument()
                 case enum: ScEnumerator
@@ -376,8 +376,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
           myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
         if (revertInfo != null) {
           extensions.inWriteAction {
-            myEditor.getDocument
-              .replaceString(0, myFile.getTextLength, revertInfo.fileText)
+            myEditor.getDocument.replaceString(0,
+                                               myFile.getTextLength,
+                                               revertInfo.fileText)
           }
           myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
           myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)

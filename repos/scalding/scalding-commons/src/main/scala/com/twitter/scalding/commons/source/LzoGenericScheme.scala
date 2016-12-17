@@ -154,8 +154,9 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
       classOf[SourceConfigBinaryConverterProvider[_]],
       conf)
 
-    DelegateCombineFileInputFormat
-      .setDelegateInputFormat(conf, classOf[MultiInputFormat[_]])
+    DelegateCombineFileInputFormat.setDelegateInputFormat(
+      conf,
+      classOf[MultiInputFormat[_]])
   }
 
   override def sinkConfInit(
@@ -170,7 +171,8 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
     LzoGenericBlockOutputFormat.setGenericConverterClassConf(
       classOf[SinkConfigBinaryConverterProvider[_]],
       conf)
-    DeprecatedOutputFormatWrapper
-      .setOutputFormat(classOf[LzoGenericBlockOutputFormat[_]], conf)
+    DeprecatedOutputFormatWrapper.setOutputFormat(
+      classOf[LzoGenericBlockOutputFormat[_]],
+      conf)
   }
 }

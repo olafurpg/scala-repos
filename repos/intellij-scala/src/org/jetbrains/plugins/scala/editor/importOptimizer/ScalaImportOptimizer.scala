@@ -248,8 +248,9 @@ class ScalaImportOptimizer extends ImportOptimizer {
         new TextRange(start, end)
       } else range
 
-    document
-      .replaceString(newRange.getStartOffset, newRange.getEndOffset, text)
+    document.replaceString(newRange.getStartOffset,
+                           newRange.getEndOffset,
+                           text)
   }
 
   def collectImportRanges(holder: ScImportsHolder,
@@ -781,8 +782,10 @@ object ScalaImportOptimizer {
 
   def namesAtRangeStart(imp: ScImportStmt): Set[String] = {
     val refText = "someIdentifier"
-    val reference = ScalaPsiElementFactory
-      .createReferenceFromText(refText, imp.getContext, imp)
+    val reference = ScalaPsiElementFactory.createReferenceFromText(
+      refText,
+      imp.getContext,
+      imp)
     val rangeNamesSet = new mutable.HashSet[String]()
     def addName(name: String): Unit =
       rangeNamesSet += ScalaNamesUtil.changeKeyword(name)

@@ -365,8 +365,9 @@ abstract class SparkPlan
       inputSchema: Seq[Attribute],
       useSubexprElimination: Boolean = false): () => MutableProjection = {
     log.debug(s"Creating MutableProj: $expressions, inputSchema: $inputSchema")
-    GenerateMutableProjection
-      .generate(expressions, inputSchema, useSubexprElimination)
+    GenerateMutableProjection.generate(expressions,
+                                       inputSchema,
+                                       useSubexprElimination)
   }
 
   protected def newPredicate(

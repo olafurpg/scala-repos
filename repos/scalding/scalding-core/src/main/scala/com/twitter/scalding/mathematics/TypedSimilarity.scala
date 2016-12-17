@@ -303,8 +303,9 @@ class DiscoInCosine[N](
       (e.from, (e.to, e.data.degree))
     }.group.withReducers(reducers)
 
-    TypedSimilarity
-      .discoCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity.discoCosineSimilarity(smallGroupedOnSrc,
+                                          bigGroupedOnSrc,
+                                          oversample)
   }
 }
 
@@ -334,7 +335,8 @@ class DimsumInCosine[N](
       (e.from, (e.to, e.data._1.weight, e.data._2.norm))
     }.group.withReducers(reducers)
 
-    TypedSimilarity
-      .dimsumCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+    TypedSimilarity.dimsumCosineSimilarity(smallGroupedOnSrc,
+                                           bigGroupedOnSrc,
+                                           oversample)
   }
 }

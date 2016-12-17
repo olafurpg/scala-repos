@@ -196,8 +196,9 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   def findMethodsAndTheirSubstitutorsByName(
       name: String,
       checkBases: Boolean): util.List[Pair[PsiMethod, PsiSubstitutor]] = {
-    PsiClassImplUtil
-      .findMethodsAndTheirSubstitutorsByName(this, name, checkBases)
+    PsiClassImplUtil.findMethodsAndTheirSubstitutorsByName(this,
+                                                           name,
+                                                           checkBases)
   }
 
   def getAllMethodsAndTheirSubstitutors: util.List[

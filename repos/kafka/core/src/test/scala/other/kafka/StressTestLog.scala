@@ -35,12 +35,12 @@ object StressTestLog {
     val dir = TestUtils.randomPartitionLogDir(TestUtils.tempDir())
     val time = new MockTime
     val logProprties = new Properties()
-    logProprties
-      .put(LogConfig.SegmentBytesProp, 64 * 1024 * 1024: java.lang.Integer)
-    logProprties
-      .put(LogConfig.MaxMessageBytesProp, Int.MaxValue: java.lang.Integer)
-    logProprties
-      .put(LogConfig.SegmentIndexBytesProp, 1024 * 1024: java.lang.Integer)
+    logProprties.put(LogConfig.SegmentBytesProp,
+                     64 * 1024 * 1024: java.lang.Integer)
+    logProprties.put(LogConfig.MaxMessageBytesProp,
+                     Int.MaxValue: java.lang.Integer)
+    logProprties.put(LogConfig.SegmentIndexBytesProp,
+                     1024 * 1024: java.lang.Integer)
 
     val log = new Log(dir = dir,
                       config = LogConfig(logProprties),
@@ -109,10 +109,10 @@ object StressTestLog {
             require(
               first.offset == offset,
               "We should either read nothing or the message we asked for.")
-            require(
-              MessageSet.entrySize(first.message) == read.sizeInBytes,
-              "Expected %d but got %d."
-                .format(MessageSet.entrySize(first.message), read.sizeInBytes))
+            require(MessageSet.entrySize(first.message) == read.sizeInBytes,
+                    "Expected %d but got %d.".format(
+                      MessageSet.entrySize(first.message),
+                      read.sizeInBytes))
             offset += 1
           }
           case _ =>

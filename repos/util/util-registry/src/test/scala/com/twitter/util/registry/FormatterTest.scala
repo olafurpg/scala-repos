@@ -40,8 +40,9 @@ class FormatterTest extends FunSuite {
   }
 
   test("add should handle colliding prefixes") {
-    val actual = Formatter
-      .add(Map("it's" -> Map("not" -> "small")), Seq("it's", "very"), "big")
+    val actual = Formatter.add(Map("it's" -> Map("not" -> "small")),
+                               Seq("it's", "very"),
+                               "big")
     val expected = Map("it's" -> Map("very" -> "big", "not" -> "small"))
     assert(actual == expected)
   }

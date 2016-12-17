@@ -27,8 +27,9 @@ class JsonExporterTest
     def assertParam(r: Request, expected: Boolean, default: Boolean): Unit =
       withClue(s"params=${r.params}") {
         assert(
-          expected == exporter
-            .readBooleanParam(new RequestParamMap(r), "hi", default))
+          expected == exporter.readBooleanParam(new RequestParamMap(r),
+                                                "hi",
+                                                default))
       }
 
     // param doesn't exist so uses default

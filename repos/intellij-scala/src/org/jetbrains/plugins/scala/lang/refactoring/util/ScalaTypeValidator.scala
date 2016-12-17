@@ -121,10 +121,10 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
   }
 
   private def messageForTypeAliasMember(name: String) =
-    ScalaBundle
-      .message("introduced.typealias.will.conflict.with.type.name", name)
+    ScalaBundle.message("introduced.typealias.will.conflict.with.type.name",
+                        name)
 
   private def messageForClassMember(name: String) =
-    ScalaBundle
-      .message("introduced.typealias.will.conflict.with.class.name", name)
+    ScalaBundle.message("introduced.typealias.will.conflict.with.class.name",
+                        name)
 }

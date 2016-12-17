@@ -121,10 +121,14 @@ private[spark] object StratifiedSamplingUtils extends Logging {
           // We use the streaming version of the algorithm for sampling without replacement to avoid
           // using an extra pass over the RDD for computing the count.
           // Hence, acceptBound and waitListBound change on every iteration.
-          acceptResult.acceptBound = BinomialBounds
-            .getLowerBound(delta, acceptResult.numItems, fraction)
-          acceptResult.waitListBound = BinomialBounds
-            .getUpperBound(delta, acceptResult.numItems, fraction)
+          acceptResult.acceptBound = BinomialBounds.getLowerBound(
+            delta,
+            acceptResult.numItems,
+            fraction)
+          acceptResult.waitListBound = BinomialBounds.getUpperBound(
+            delta,
+            acceptResult.numItems,
+            fraction)
 
           val x = rng.nextUniform()
           if (x < acceptResult.acceptBound) {

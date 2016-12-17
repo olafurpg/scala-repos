@@ -114,8 +114,8 @@ class FlipComparisonInMethodCallExprIntention
     }
 
     val newQualExpr: ScExpression =
-      ScalaPsiElementFactory
-        .createExpressionFromText(newQual, element.getManager)
+      ScalaPsiElementFactory.createExpressionFromText(newQual,
+                                                      element.getManager)
 
     expr
       .append(methodCallExpr.args.getText)
@@ -128,8 +128,9 @@ class FlipComparisonInMethodCallExprIntention
             .getText))
       .append(newArgs)
 
-    val newMethodCallExpr = ScalaPsiElementFactory
-      .createExpressionFromText(expr.toString(), element.getManager)
+    val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
+      expr.toString(),
+      element.getManager)
 
     newMethodCallExpr
       .asInstanceOf[ScMethodCall]

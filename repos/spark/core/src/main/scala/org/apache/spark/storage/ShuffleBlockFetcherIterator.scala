@@ -173,45 +173,43 @@ private[spark] final class ShuffleBlockFetcherIterator(
     val blockIds = req.blocks.map(_._1.toString)
 
     val address = req.address
-    shuffleClient
-      .fetchBlocks(
-        address.host,
-        address.port,
-        address.executorId,
-        blockIds.toArray,
-        new BlockFetchingListener {
-          override def onBlockFetchSuccess(blockId: String,
-                                           buf: ManagedBuffer): Unit = {
-            // Only add the buffer to results queue if the iterator is not zombie,
-            // i.e. cleanup() has not been called yet.
-            ShuffleBlockFetcherIterator.this.synchronized {
-              if (!isZombie) {
-                // Increment the ref count because we need to pass this to a different thread.
-                // This needs to be released after use.
-                buf.retain()
-                remainingBlocks -= blockId
-                results.put(
-                  new SuccessFetchResult(BlockId(blockId),
-                                         address,
-                                         sizeMap(blockId),
-                                         buf,
-                                         remainingBlocks.isEmpty))
-                logDebug("remainingBlocks: " + remainingBlocks)
-              }
+    shuffleClient.fetchBlocks(
+      address.host,
+      address.port,
+      address.executorId,
+      blockIds.toArray,
+      new BlockFetchingListener {
+        override def onBlockFetchSuccess(blockId: String,
+                                         buf: ManagedBuffer): Unit = {
+          // Only add the buffer to results queue if the iterator is not zombie,
+          // i.e. cleanup() has not been called yet.
+          ShuffleBlockFetcherIterator.this.synchronized {
+            if (!isZombie) {
+              // Increment the ref count because we need to pass this to a different thread.
+              // This needs to be released after use.
+              buf.retain()
+              remainingBlocks -= blockId
+              results.put(
+                new SuccessFetchResult(BlockId(blockId),
+                                       address,
+                                       sizeMap(blockId),
+                                       buf,
+                                       remainingBlocks.isEmpty))
+              logDebug("remainingBlocks: " + remainingBlocks)
             }
-            logTrace(
-              "Got remote block " + blockId + " after " +
-                Utils.getUsedTimeMs(startTime))
           }
+          logTrace(
+            "Got remote block " + blockId + " after " +
+              Utils.getUsedTimeMs(startTime))
+        }
 
-          override def onBlockFetchFailure(blockId: String,
-                                           e: Throwable): Unit = {
-            logError(
-              s"Failed to get block(s) from ${req.address.host}:${req.address.port}",
-              e)
-            results.put(new FailureFetchResult(BlockId(blockId), address, e))
-          }
-        })
+        override def onBlockFetchFailure(blockId: String, e: Throwable): Unit = {
+          logError(
+            s"Failed to get block(s) from ${req.address.host}:${req.address.port}",
+            e)
+          results.put(new FailureFetchResult(BlockId(blockId), address, e))
+        }
+      })
   }
 
   private[this] def splitLocalRemoteBlocks(): ArrayBuffer[FetchRequest] = {

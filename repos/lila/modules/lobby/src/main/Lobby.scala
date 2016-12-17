@@ -25,8 +25,10 @@ private[lobby] final class Lobby(
   val scheduler = context.system.scheduler
 
   override def preStart {
-    scheduler
-      .schedule(5 seconds, broomPeriod, self, lila.socket.actorApi.Broom)
+    scheduler.schedule(5 seconds,
+                       broomPeriod,
+                       self,
+                       lila.socket.actorApi.Broom)
     scheduler.schedule(10 seconds, resyncIdsPeriod, self, actorApi.Resync)
   }
 

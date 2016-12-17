@@ -304,11 +304,15 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
 
       val samplingFunc =
         if (withReplacement) {
-          StratifiedSamplingUtils
-            .getPoissonSamplingFunction(self, fractions, false, seed)
+          StratifiedSamplingUtils.getPoissonSamplingFunction(self,
+                                                             fractions,
+                                                             false,
+                                                             seed)
         } else {
-          StratifiedSamplingUtils
-            .getBernoulliSamplingFunction(self, fractions, false, seed)
+          StratifiedSamplingUtils.getBernoulliSamplingFunction(self,
+                                                               fractions,
+                                                               false,
+                                                               seed)
         }
       self.mapPartitionsWithIndex(samplingFunc, preservesPartitioning = true)
     }
@@ -338,11 +342,15 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
 
       val samplingFunc =
         if (withReplacement) {
-          StratifiedSamplingUtils
-            .getPoissonSamplingFunction(self, fractions, true, seed)
+          StratifiedSamplingUtils.getPoissonSamplingFunction(self,
+                                                             fractions,
+                                                             true,
+                                                             seed)
         } else {
-          StratifiedSamplingUtils
-            .getBernoulliSamplingFunction(self, fractions, true, seed)
+          StratifiedSamplingUtils.getBernoulliSamplingFunction(self,
+                                                               fractions,
+                                                               true,
+                                                               seed)
         }
       self.mapPartitionsWithIndex(samplingFunc, preservesPartitioning = true)
     }

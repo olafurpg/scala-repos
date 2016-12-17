@@ -827,8 +827,10 @@ class Color(override val delegate: jfxsp.Color)
                   saturationFactor: Double,
                   brightnessFactor: Double,
                   opacityFactor: Double): Color =
-    delegate
-      .deriveColor(hueShift, saturationFactor, brightnessFactor, opacityFactor)
+    delegate.deriveColor(hueShift,
+                         saturationFactor,
+                         brightnessFactor,
+                         opacityFactor)
 
   /**
     * Creates a new Color that is a less saturated version of this Color.
