@@ -119,14 +119,20 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
       val plannedPartitions = files.bucketSpec match {
         case Some(bucketing) if files.sqlContext.conf.bucketingEnabled =>
           logInfo(s"Planning with ${bucketing.numBuckets} buckets")
-          val bucketed = selectedPartitions.flatMap { p =>
-            p.files.map(f =>
-              PartitionedFile(p.values, f.getPath.toUri.toString, 0, f.getLen))
-          }.groupBy { f =>
-            BucketingUtils
-              .getBucketId(new Path(f.filePath).getName)
-              .getOrElse(sys.error(s"Invalid bucket file ${f.filePath}"))
-          }
+          val bucketed = selectedPartitions
+            .flatMap { p =>
+              p.files.map(
+                f =>
+                  PartitionedFile(p.values,
+                                  f.getPath.toUri.toString,
+                                  0,
+                                  f.getLen))
+            }
+            .groupBy { f =>
+              BucketingUtils
+                .getBucketId(new Path(f.filePath).getName)
+                .getOrElse(sys.error(s"Invalid bucket file ${f.filePath}"))
+            }
 
           (0 until bucketing.numBuckets).map { bucketId =>
             FilePartition(bucketId, bucketed.getOrElse(bucketId, Nil))
@@ -137,20 +143,23 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
           logInfo(
             s"Planning scan with bin packing, max size: $maxSplitBytes bytes")
 
-          val splitFiles = selectedPartitions.flatMap { partition =>
-            partition.files.flatMap { file =>
-              assert(file.getLen != 0)
-              (0L to file.getLen by maxSplitBytes).map { offset =>
-                val remaining = file.getLen - offset
-                val size =
-                  if (remaining > maxSplitBytes) maxSplitBytes else remaining
-                PartitionedFile(partition.values,
-                                file.getPath.toUri.toString,
-                                offset,
-                                size)
+          val splitFiles = selectedPartitions
+            .flatMap { partition =>
+              partition.files.flatMap { file =>
+                assert(file.getLen != 0)
+                (0L to file.getLen by maxSplitBytes).map { offset =>
+                  val remaining = file.getLen - offset
+                  val size =
+                    if (remaining > maxSplitBytes) maxSplitBytes else remaining
+                  PartitionedFile(partition.values,
+                                  file.getPath.toUri.toString,
+                                  offset,
+                                  size)
+                }
               }
             }
-          }.toArray.sortBy(_.length)(implicitly[Ordering[Long]].reverse)
+            .toArray
+            .sortBy(_.length)(implicitly[Ordering[Long]].reverse)
 
           val partitions = new ArrayBuffer[FilePartition]
           val currentFiles = new ArrayBuffer[PartitionedFile]

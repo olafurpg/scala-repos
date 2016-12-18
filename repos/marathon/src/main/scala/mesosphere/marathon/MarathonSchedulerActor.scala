@@ -133,7 +133,7 @@ class MarathonSchedulerActor private (
             // the self notification MUST happen before informing the initiator
             // if we want to ensure that we trigger a new reconciliation for
             // the first call after the last ReconcileTasks.answer has been received.
-            .andThen { case _ => self ! ReconcileFinished }
+              .andThen { case _ => self ! ReconcileFinished }
           case Some(active) =>
             log.info("task reconciliation still active, reusing result")
             active

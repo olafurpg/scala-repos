@@ -235,9 +235,11 @@ object PullRequestService {
     lazy val commitStateSummary: (CommitState, String) = {
       val stateMap = statuses.groupBy(_.state)
       val state = CommitState.combine(stateMap.keySet)
-      val summary = stateMap.map {
-        case (keyState, states) => states.size + " " + keyState.name
-      }.mkString(", ")
+      val summary = stateMap
+        .map {
+          case (keyState, states) => states.size + " " + keyState.name
+        }
+        .mkString(", ")
       state -> summary
     }
     lazy val statusesAndRequired: List[(CommitStatus, Boolean)] =

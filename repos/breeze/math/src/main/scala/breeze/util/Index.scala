@@ -380,12 +380,14 @@ final class CompositeIndex[U](indices: Index[_ <: U]*)
   }
 
   def pairs =
-    indices.iterator.zipWithIndex.flatMap {
-      case (index, i) =>
-        index.iterator.map { t =>
-          (i, t: U)
-        }
-    }.zipWithIndex
+    indices.iterator.zipWithIndex
+      .flatMap {
+        case (index, i) =>
+          index.iterator.map { t =>
+            (i, t: U)
+          }
+      }
+      .zipWithIndex
 
   def iterator = indices.iterator.zipWithIndex.flatMap {
     case (index, i) =>

@@ -237,10 +237,14 @@ trait QuirrelCache extends AST { parser: Parser =>
                       bindings: IndexedSeq[Binding],
                       slots: Map[String, Slot]): Option[Expr] = {
     val index = buildBindingIndex(expr)
-    val sortedBindings = bindings.zipWithIndex.map {
-      case (b, i) =>
-        (b, index(i))
-    }.sortBy(_._2).map(_._1).toList
+    val sortedBindings = bindings.zipWithIndex
+      .map {
+        case (b, i) =>
+          (b, index(i))
+      }
+      .sortBy(_._2)
+      .map(_._1)
+      .toList
 
     val result =
       replaceLiteralsS(expr, sortedBindings, locUpdates(bindings, slots))
@@ -249,19 +253,24 @@ trait QuirrelCache extends AST { parser: Parser =>
 
   def locUpdates(bindings: IndexedSeq[Binding],
                  slots: Map[String, Slot]): LineStream => LineStream = {
-    val widths: Map[String, Int] = bindings.map { b =>
-      (b.name, b.rawValue.length)
-    }.toMap
+    val widths: Map[String, Int] = bindings
+      .map { b =>
+        (b.name, b.rawValue.length)
+      }
+      .toMap
 
-    val deltas: Map[Int, List[(Int, Int)]] = slots.toList.map {
-      case (name, Slot(lineNum, colNum, oldWidth)) =>
-        val width = widths(name)
-        val delta = width - oldWidth
-        lineNum -> (colNum, delta)
-    }.groupBy(_._1).map {
-      case (lineNum, ds) =>
-        (lineNum, ds.map(_._2).sortBy(_._1))
-    }
+    val deltas: Map[Int, List[(Int, Int)]] = slots.toList
+      .map {
+        case (name, Slot(lineNum, colNum, oldWidth)) =>
+          val width = widths(name)
+          val delta = width - oldWidth
+          lineNum -> (colNum, delta)
+      }
+      .groupBy(_._1)
+      .map {
+        case (lineNum, ds) =>
+          (lineNum, ds.map(_._2).sortBy(_._1))
+      }
 
     { (loc: LineStream) =>
       val colNum =

@@ -110,11 +110,14 @@ object UserRepo {
       )
       .cursor[BSONDocument]()
       .collect[List]() map { docs =>
-      docs.sortBy {
-        _.getAs[BSONDocument](F.count)
-          .flatMap(_.getAs[BSONNumberLike]("game"))
-          .??(_.toInt)
-      }.map(_.getAs[String]("_id")).flatten match {
+      docs
+        .sortBy {
+          _.getAs[BSONDocument](F.count)
+            .flatMap(_.getAs[BSONNumberLike]("game"))
+            .??(_.toInt)
+        }
+        .map(_.getAs[String]("_id"))
+        .flatten match {
         case List(u1, u2) => (u1, u2).some
         case _ => none
       }

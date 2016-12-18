@@ -57,8 +57,8 @@ class SharedLeveldbStore extends {
       //      AsyncWriteProxy message protocol
       val replyTo = sender()
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
-      asyncReadHighestSequenceNr(persistenceId, readHighestSequenceNrFrom).flatMap {
-        highSeqNr ⇒
+      asyncReadHighestSequenceNr(persistenceId, readHighestSequenceNrFrom)
+        .flatMap { highSeqNr ⇒
           if (highSeqNr == 0L || max == 0L) Future.successful(highSeqNr)
           else {
             val toSeqNr = math.min(toSequenceNr, highSeqNr)
@@ -68,10 +68,13 @@ class SharedLeveldbStore extends {
                   adaptFromJournal(p).foreach(replyTo ! _)
             }.map(_ ⇒ highSeqNr)
           }
-      }.map { highSeqNr ⇒
-        ReplaySuccess(highSeqNr)
-      }.recover {
-        case e ⇒ ReplayFailure(e)
-      }.pipeTo(replyTo)
+        }
+        .map { highSeqNr ⇒
+          ReplaySuccess(highSeqNr)
+        }
+        .recover {
+          case e ⇒ ReplayFailure(e)
+        }
+        .pipeTo(replyTo)
   }
 }

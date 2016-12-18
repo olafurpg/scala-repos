@@ -180,15 +180,17 @@ private[spark] object SerDe {
           throw new IllegalArgumentException(s"Invalid array type $arrType")
         } else {
           val len = readInt(dis)
-          (0 until len).map { _ =>
-            val obj = (sqlSerDe._1)(dis, arrType)
-            if (obj == null) {
-              throw new IllegalArgumentException(
-                s"Invalid array type $arrType")
-            } else {
-              obj
+          (0 until len)
+            .map { _ =>
+              val obj = (sqlSerDe._1)(dis, arrType)
+              if (obj == null) {
+                throw new IllegalArgumentException(
+                  s"Invalid array type $arrType")
+              } else {
+                obj
+              }
             }
-          }.toArray
+            .toArray
         }
     }
   }

@@ -475,7 +475,8 @@ object Task {
                       // food for thought - might be safe to set the interrupt first
                       // but, this may also kill `cb(e)`
                       // could have separate AtomicBooleans for each task
-                      cb(e) *> Trampoline.delay { interrupt.set(true); () } else
+                      cb(e) *> Trampoline
+                        .delay { interrupt.set(true); () } else
                       Trampoline.done(())
                 }
                 t.get.unsafePerformListenInterruptibly(handle, interrupt)

@@ -15,22 +15,24 @@ object StackRegistry {
     // Introspect the entries stack and params. We limit the
     // reflection of params to case classes.
     // TODO: we might be able to make this avoid reflection with Showable
-    val modules: Seq[Module] = stack.tails.map { node =>
-      val raw = node.head.parameters.map { p =>
-        params(p)
-      }
-      val reflected = raw.foldLeft(Seq.empty[(String, String)]) {
-        case (seq, p: Product) =>
-          // TODO: many case classes have a $outer field because they close over an outside scope.
-          // this is not very useful, and it might make sense to filter them out in the future.
-          val fields = p.getClass.getDeclaredFields.map(_.getName).toSeq
-          val values = p.productIterator.map(_.toString).toSeq
-          seq ++ fields.zipAll(values, "<unknown>", "<unknown>")
+    val modules: Seq[Module] = stack.tails
+      .map { node =>
+        val raw = node.head.parameters.map { p =>
+          params(p)
+        }
+        val reflected = raw.foldLeft(Seq.empty[(String, String)]) {
+          case (seq, p: Product) =>
+            // TODO: many case classes have a $outer field because they close over an outside scope.
+            // this is not very useful, and it might make sense to filter them out in the future.
+            val fields = p.getClass.getDeclaredFields.map(_.getName).toSeq
+            val values = p.productIterator.map(_.toString).toSeq
+            seq ++ fields.zipAll(values, "<unknown>", "<unknown>")
 
-        case (seq, _) => seq
+          case (seq, _) => seq
+        }
+        Module(node.head.role.name, node.head.description, reflected)
       }
-      Module(node.head.role.name, node.head.description, reflected)
-    }.toSeq
+      .toSeq
 
     val name: String = params[Label].label
     val protocolLibrary: String = params[ProtocolLibrary].name

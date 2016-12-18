@@ -108,18 +108,20 @@ class AdminClient(val time: Time,
   }
 
   def listAllGroups(): Map[Node, List[GroupOverview]] = {
-    findAllBrokers.map {
-      case broker =>
-        broker -> {
-          try {
-            listGroups(broker)
-          } catch {
-            case e: Exception =>
-              debug(s"Failed to find groups from broker ${broker}", e)
-              List[GroupOverview]()
+    findAllBrokers
+      .map {
+        case broker =>
+          broker -> {
+            try {
+              listGroups(broker)
+            } catch {
+              case e: Exception =>
+                debug(s"Failed to find groups from broker ${broker}", e)
+                List[GroupOverview]()
+            }
           }
-        }
-    }.toMap
+      }
+      .toMap
   }
 
   def listAllConsumerGroups(): Map[Node, List[GroupOverview]] = {

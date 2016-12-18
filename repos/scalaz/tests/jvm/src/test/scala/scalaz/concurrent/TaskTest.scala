@@ -74,13 +74,15 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions in a mapped function, created by delay" ! {
-    Task.delay { Thread.sleep(10); 42 }
+    Task
+      .delay { Thread.sleep(10); 42 }
       .map(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions in a mapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }
+    Task
+      .now { Thread.sleep(10); 42 }
       .map(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
@@ -92,13 +94,15 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions in a flatMapped function, created with delay" ! {
-    Task.delay { Thread.sleep(10); 42 }
+    Task
+      .delay { Thread.sleep(10); 42 }
       .flatMap(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions in a flatMapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }
+    Task
+      .now { Thread.sleep(10); 42 }
       .flatMap(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
@@ -111,46 +115,60 @@ object TaskTest extends SpecLite {
   }
 
   "handles exceptions in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle {
-      case FailWhale => 84
-    }.unsafePerformSyncAttempt == \/-(84)
+    Task { Thread.sleep(10); throw FailWhale; 42 }
+      .handle {
+        case FailWhale => 84
+      }
+      .unsafePerformSyncAttempt == \/-(84)
   }
 
   "leaves unhandled exceptions alone in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle {
-      case SadTrombone => 84
-    }.unsafePerformSyncAttempt == -\/(FailWhale)
+    Task { Thread.sleep(10); throw FailWhale; 42 }
+      .handle {
+        case SadTrombone => 84
+      }
+      .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions thrown in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle {
-      case FailWhale => throw SadTrombone
-    }.unsafePerformSyncAttempt == -\/(SadTrombone)
+    Task { Thread.sleep(10); throw FailWhale; 42 }
+      .handle {
+        case FailWhale => throw SadTrombone
+      }
+      .unsafePerformSyncAttempt == -\/(SadTrombone)
   }
 
   "handles exceptions in handleWith" ! {
     val foo =
-      Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith {
-        case FailWhale => Task.delay(84)
-      }.unsafePerformSyncAttempt == \/-(84)
+      Task { Thread.sleep(10); throw FailWhale; 42 }
+        .handleWith {
+          case FailWhale => Task.delay(84)
+        }
+        .unsafePerformSyncAttempt == \/-(84)
   }
 
   "leaves unhandled exceptions alone in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith {
-      case SadTrombone => Task.delay(84)
-    }.unsafePerformSyncAttempt == -\/(FailWhale)
+    Task { Thread.sleep(10); throw FailWhale; 42 }
+      .handleWith {
+        case SadTrombone => Task.delay(84)
+      }
+      .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions thrown in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith {
-      case FailWhale => Task.delay(throw SadTrombone)
-    }.unsafePerformSyncAttempt == -\/(SadTrombone)
+    Task { Thread.sleep(10); throw FailWhale; 42 }
+      .handleWith {
+        case FailWhale => Task.delay(throw SadTrombone)
+      }
+      .unsafePerformSyncAttempt == -\/(SadTrombone)
   }
 
   "catches exceptions thrown by onFinish argument function" ! {
-    Task { Thread.sleep(10); 42 }.onFinish { _ =>
-      throw SadTrombone; Task.now(())
-    }.unsafePerformSyncAttemptFor(1000) == -\/(SadTrombone)
+    Task { Thread.sleep(10); 42 }
+      .onFinish { _ =>
+        throw SadTrombone; Task.now(())
+      }
+      .unsafePerformSyncAttemptFor(1000) == -\/(SadTrombone)
   }
 
   "evaluates Monad[Task].point lazily" in {
@@ -312,7 +330,8 @@ object TaskTest extends SpecLite {
   "retries a retriable task n times" ! forAll { xs: List[Byte] =>
     import scala.concurrent.duration._
     var x = 0
-    Task.delay { x += 1; sys.error("oops") }
+    Task
+      .delay { x += 1; sys.error("oops") }
       .unsafePerformRetry(xs.map(_ => 0.milliseconds))
       .attempt
       .unsafePerformSync

@@ -287,20 +287,22 @@ class GroupMetadataManager(val brokerId: Int,
     }
 
     // construct the message set to append
-    val messages = filteredOffsetMetadata.map {
-      case (topicAndPartition, offsetAndMetadata) =>
-        val (magicValue, timestamp) =
-          getMessageFormatVersionAndTimestamp(partitionFor(groupId))
-        new Message(
-          key =
-            GroupMetadataManager.offsetCommitKey(groupId,
-                                                 topicAndPartition.topic,
-                                                 topicAndPartition.partition),
-          bytes = GroupMetadataManager.offsetCommitValue(offsetAndMetadata),
-          timestamp = timestamp,
-          magicValue = magicValue
-        )
-    }.toSeq
+    val messages = filteredOffsetMetadata
+      .map {
+        case (topicAndPartition, offsetAndMetadata) =>
+          val (magicValue, timestamp) =
+            getMessageFormatVersionAndTimestamp(partitionFor(groupId))
+          new Message(
+            key = GroupMetadataManager.offsetCommitKey(
+              groupId,
+              topicAndPartition.topic,
+              topicAndPartition.partition),
+            bytes = GroupMetadataManager.offsetCommitValue(offsetAndMetadata),
+            timestamp = timestamp,
+            magicValue = magicValue
+          )
+      }
+      .toSeq
 
     val offsetTopicPartition = new TopicPartition(
       TopicConstants.GROUP_METADATA_TOPIC_NAME,
@@ -392,23 +394,29 @@ class GroupMetadataManager(val brokerId: Int,
           }
           .toMap
       } else {
-        topicPartitions.map { topicPartition =>
-          val groupTopicPartition = GroupTopicPartition(group, topicPartition)
-          (groupTopicPartition.topicPartition, getOffset(groupTopicPartition))
-        }.toMap
+        topicPartitions
+          .map { topicPartition =>
+            val groupTopicPartition =
+              GroupTopicPartition(group, topicPartition)
+            (groupTopicPartition.topicPartition,
+             getOffset(groupTopicPartition))
+          }
+          .toMap
       }
     } else {
       debug(
         "Could not fetch offsets for group %s (not offset coordinator)."
           .format(group))
-      topicPartitions.map { topicPartition =>
-        val groupTopicPartition = GroupTopicPartition(group, topicPartition)
-        (groupTopicPartition.topicPartition,
-         new OffsetFetchResponse.PartitionData(
-           OffsetFetchResponse.INVALID_OFFSET,
-           "",
-           Errors.NOT_COORDINATOR_FOR_GROUP.code))
-      }.toMap
+      topicPartitions
+        .map { topicPartition =>
+          val groupTopicPartition = GroupTopicPartition(group, topicPartition)
+          (groupTopicPartition.topicPartition,
+           new OffsetFetchResponse.PartitionData(
+             OffsetFetchResponse.INVALID_OFFSET,
+             "",
+             Errors.NOT_COORDINATOR_FOR_GROUP.code))
+        }
+        .toMap
     }
   }
 
@@ -651,63 +659,67 @@ class GroupMetadataManager(val brokerId: Int,
       debug("Found %d expired offsets.".format(expiredOffsets.size))
 
       // delete the expired offsets from the table and generate tombstone messages to remove them from the log
-      val tombstonesForPartition = expiredOffsets.map {
-        case (groupTopicAndPartition, offsetAndMetadata) =>
-          val offsetsPartition = partitionFor(groupTopicAndPartition.group)
-          trace(
-            "Removing expired offset and metadata for %s: %s"
-              .format(groupTopicAndPartition, offsetAndMetadata))
+      val tombstonesForPartition = expiredOffsets
+        .map {
+          case (groupTopicAndPartition, offsetAndMetadata) =>
+            val offsetsPartition = partitionFor(groupTopicAndPartition.group)
+            trace(
+              "Removing expired offset and metadata for %s: %s"
+                .format(groupTopicAndPartition, offsetAndMetadata))
 
-          offsetsCache.remove(groupTopicAndPartition)
+            offsetsCache.remove(groupTopicAndPartition)
 
-          val commitKey = GroupMetadataManager.offsetCommitKey(
-            groupTopicAndPartition.group,
-            groupTopicAndPartition.topicPartition.topic,
-            groupTopicAndPartition.topicPartition.partition)
+            val commitKey = GroupMetadataManager.offsetCommitKey(
+              groupTopicAndPartition.group,
+              groupTopicAndPartition.topicPartition.topic,
+              groupTopicAndPartition.topicPartition.partition)
 
-          val (magicValue, timestamp) =
-            getMessageFormatVersionAndTimestamp(offsetsPartition)
-          (offsetsPartition,
-           new Message(bytes = null,
-                       key = commitKey,
-                       timestamp = timestamp,
-                       magicValue = magicValue))
-      }.groupBy { case (partition, tombstone) => partition }
+            val (magicValue, timestamp) =
+              getMessageFormatVersionAndTimestamp(offsetsPartition)
+            (offsetsPartition,
+             new Message(bytes = null,
+                         key = commitKey,
+                         timestamp = timestamp,
+                         magicValue = magicValue))
+        }
+        .groupBy { case (partition, tombstone) => partition }
 
       // Append the tombstone messages to the offset partitions. It is okay if the replicas don't receive these (say,
       // if we crash or leaders move) since the new leaders will get rid of expired offsets during their own purge cycles.
-      tombstonesForPartition.flatMap {
-        case (offsetsPartition, tombstones) =>
-          val partitionOpt = replicaManager.getPartition(
-            TopicConstants.GROUP_METADATA_TOPIC_NAME,
-            offsetsPartition)
-          partitionOpt.map { partition =>
-            val appendPartition =
-              TopicAndPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME,
-                                offsetsPartition)
-            val messages = tombstones.map(_._2).toSeq
+      tombstonesForPartition
+        .flatMap {
+          case (offsetsPartition, tombstones) =>
+            val partitionOpt = replicaManager.getPartition(
+              TopicConstants.GROUP_METADATA_TOPIC_NAME,
+              offsetsPartition)
+            partitionOpt.map { partition =>
+              val appendPartition =
+                TopicAndPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME,
+                                  offsetsPartition)
+              val messages = tombstones.map(_._2).toSeq
 
-            trace(
-              "Marked %d offsets in %s for deletion.".format(messages.size,
-                                                             appendPartition))
+              trace(
+                "Marked %d offsets in %s for deletion."
+                  .format(messages.size, appendPartition))
 
-            try {
-              // do not need to require acks since even if the tombstone is lost,
-              // it will be appended again in the next purge cycle
-              partition.appendMessagesToLeader(
-                new ByteBufferMessageSet(config.offsetsTopicCompressionCodec,
-                                         messages: _*))
-              tombstones.size
-            } catch {
-              case t: Throwable =>
-                error("Failed to mark %d expired offsets for deletion in %s."
-                        .format(messages.size, appendPartition),
-                      t)
-                // ignore and continue
-                0
+              try {
+                // do not need to require acks since even if the tombstone is lost,
+                // it will be appended again in the next purge cycle
+                partition.appendMessagesToLeader(
+                  new ByteBufferMessageSet(config.offsetsTopicCompressionCodec,
+                                           messages: _*))
+                tombstones.size
+              } catch {
+                case t: Throwable =>
+                  error("Failed to mark %d expired offsets for deletion in %s."
+                          .format(messages.size, appendPartition),
+                        t)
+                  // ignore and continue
+                  0
+              }
             }
-          }
-      }.sum
+        }
+        .sum
     }
 
     info(
@@ -719,12 +731,14 @@ class GroupMetadataManager(val brokerId: Int,
     val partitionOpt = replicaManager
       .getPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME, partitionId)
 
-    val hw = partitionOpt.map { partition =>
-      partition
-        .leaderReplicaIfLocal()
-        .map(_.highWatermark.messageOffset)
-        .getOrElse(-1L)
-    }.getOrElse(-1L)
+    val hw = partitionOpt
+      .map { partition =>
+        partition
+          .leaderReplicaIfLocal()
+          .map(_.highWatermark.messageOffset)
+          .getOrElse(-1L)
+      }
+      .getOrElse(-1L)
 
     hw
   }

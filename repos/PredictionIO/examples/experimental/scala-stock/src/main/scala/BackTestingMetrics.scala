@@ -80,16 +80,19 @@ class BacktestingEvaluator(val params: BacktestingParams)
     val todayIdx = queryDate.idx
 
     // Decide enter / exit, also sort by pValue desc
-    val data = prediction.data.map {
-      case (ticker, pValue) => {
-        val dir = pValue match {
-          case p if p >= params.enterThreshold => 1
-          case p if p <= params.exitThreshold => -1
-          case _ => 0
+    val data = prediction.data
+      .map {
+        case (ticker, pValue) => {
+          val dir = pValue match {
+            case p if p >= params.enterThreshold => 1
+            case p if p <= params.exitThreshold => -1
+            case _ => 0
+          }
+          (ticker, dir, pValue)
         }
-        (ticker, dir, pValue)
       }
-    }.toArray.sortBy(-_._3)
+      .toArray
+      .sortBy(-_._3)
 
     val toEnter = data.filter(_._2 == 1).map(_._1)
     val toExit = data.filter(_._2 == -1).map(_._1)

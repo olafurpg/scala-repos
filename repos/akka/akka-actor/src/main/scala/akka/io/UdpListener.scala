@@ -34,9 +34,12 @@ private[io] class UdpListener(val udp: UdpExt,
 
   context.watch(bind.handler) // sign death pact
 
-  val channel = bind.options.collectFirst {
-    case creator: DatagramChannelCreator ⇒ creator
-  }.getOrElse(DatagramChannelCreator()).create()
+  val channel = bind.options
+    .collectFirst {
+      case creator: DatagramChannelCreator ⇒ creator
+    }
+    .getOrElse(DatagramChannelCreator())
+    .create()
   channel.configureBlocking(false)
 
   val localAddress = try {

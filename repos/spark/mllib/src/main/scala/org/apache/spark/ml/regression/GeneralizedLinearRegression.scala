@@ -503,10 +503,12 @@ object GeneralizedLinearRegression
                      deviance: Double,
                      numInstances: Double,
                      weightSum: Double): Double = {
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Binomial(1, mu).logProbabilityOf(math.round(y).toInt)
-      }.sum()
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Binomial(1, mu).logProbabilityOf(math.round(y).toInt)
+        }
+        .sum()
     }
 
     override def project(mu: Double): Double = {
@@ -545,10 +547,12 @@ object GeneralizedLinearRegression
                      deviance: Double,
                      numInstances: Double,
                      weightSum: Double): Double = {
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Poisson(mu).logProbabilityOf(y.toInt)
-      }.sum()
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Poisson(mu).logProbabilityOf(y.toInt)
+        }
+        .sum()
     }
 
     override def project(mu: Double): Double = {
@@ -588,10 +592,12 @@ object GeneralizedLinearRegression
                      numInstances: Double,
                      weightSum: Double): Double = {
       val disp = deviance / weightSum
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Gamma(1.0 / disp, mu * disp).logPdf(y)
-      }.sum() + 2.0
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Gamma(1.0 / disp, mu * disp).logPdf(y)
+        }
+        .sum() + 2.0
     }
 
     override def project(mu: Double): Double = {

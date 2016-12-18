@@ -151,9 +151,12 @@ object EvaluatePython {
       c
 
     case (c: java.util.List[_], ArrayType(elementType, _)) =>
-      new GenericArrayData(c.asScala.map { e =>
-        fromJava(e, elementType)
-      }.toArray)
+      new GenericArrayData(
+        c.asScala
+          .map { e =>
+            fromJava(e, elementType)
+          }
+          .toArray)
 
     case (c, ArrayType(elementType, _)) if c.getClass.isArray =>
       new GenericArrayData(

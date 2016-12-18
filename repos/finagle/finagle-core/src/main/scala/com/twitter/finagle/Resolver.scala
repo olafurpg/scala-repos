@@ -156,9 +156,11 @@ private[finagle] class InetResolver(
       .flatMap { seq: Seq[Try[Seq[Address]]] =>
         // Filter out all successes. If there was at least 1 success, consider
         // the entire operation a success
-        val results = seq.collect {
-          case Return(subset) => subset
-        }.flatten
+        val results = seq
+          .collect {
+            case Return(subset) => subset
+          }
+          .flatten
 
         // Consider any result a success. Ignore partial failures.
         if (results.nonEmpty) {

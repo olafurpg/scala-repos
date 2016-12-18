@@ -200,13 +200,17 @@ object ParquetReadSupportProvider {
     }
 
     def expandMethod(outerTpe: Type): List[(Tree, Tree, Tree, Tree)] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.zipWithIndex.map {
-        case (accessorMethod, idx) =>
-          val fieldType = accessorMethod.returnType
-          matchField(idx, fieldType, NOT_A_COLLECTION)
-      }.toList
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .zipWithIndex
+        .map {
+          case (accessorMethod, idx) =>
+            val fieldType = accessorMethod.returnType
+            matchField(idx, fieldType, NOT_A_COLLECTION)
+        }
+        .toList
 
     def unzip(treeTuples: List[(Tree, Tree, Tree, Tree)])
       : (List[Tree], List[Tree], List[Tree], List[Tree]) = {

@@ -94,10 +94,12 @@ object Broker {
             } else {
               val listeners =
                 brokerInfo("endpoints").asInstanceOf[List[String]]
-              listeners.map { listener =>
-                val ep = EndPoint.createEndPoint(listener)
-                (ep.protocolType, ep)
-              }.toMap
+              listeners
+                .map { listener =>
+                  val ep = EndPoint.createEndPoint(listener)
+                  (ep.protocolType, ep)
+                }
+                .toMap
             }
           val rack = brokerInfo
             .get("rack")

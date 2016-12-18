@@ -240,12 +240,15 @@ private[spark] object JettyUtils extends Logging {
             }
 
           val prefix = s"spark.$filter.param."
-          conf.getAll.filter {
-            case (k, v) => k.length() > prefix.length() && k.startsWith(prefix)
-          }.foreach {
-            case (k, v) =>
-              holder.setInitParameter(k.substring(prefix.length()), v)
-          }
+          conf.getAll
+            .filter {
+              case (k, v) =>
+                k.length() > prefix.length() && k.startsWith(prefix)
+            }
+            .foreach {
+              case (k, v) =>
+                holder.setInitParameter(k.substring(prefix.length()), v)
+            }
 
           val enumDispatcher = java.util.EnumSet.of(DispatcherType.ASYNC,
                                                     DispatcherType.ERROR,

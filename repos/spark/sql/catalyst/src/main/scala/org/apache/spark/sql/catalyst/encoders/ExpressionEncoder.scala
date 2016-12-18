@@ -116,18 +116,21 @@ object ExpressionEncoder {
     val cls = Utils.getContextOrSparkClassLoader.loadClass(
       s"scala.Tuple${encoders.size}")
 
-    val toRowExpressions = encoders.map {
-      case e if e.flat => e.toRowExpressions.head
-      case other => CreateStruct(other.toRowExpressions)
-    }.zipWithIndex.map {
-      case (expr, index) =>
-        expr.transformUp {
-          case BoundReference(0, t, _) =>
-            Invoke(BoundReference(0, ObjectType(cls), nullable = true),
-                   s"_${index + 1}",
-                   t)
-        }
-    }
+    val toRowExpressions = encoders
+      .map {
+        case e if e.flat => e.toRowExpressions.head
+        case other => CreateStruct(other.toRowExpressions)
+      }
+      .zipWithIndex
+      .map {
+        case (expr, index) =>
+          expr.transformUp {
+            case BoundReference(0, t, _) =>
+              Invoke(BoundReference(0, ObjectType(cls), nullable = true),
+                     s"_${index + 1}",
+                     t)
+          }
+      }
 
     val fromRowExpressions = encoders.zipWithIndex.map {
       case (enc, index) =>

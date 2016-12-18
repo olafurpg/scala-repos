@@ -245,11 +245,13 @@ trait TreeMaker[ /*@specialized(Double) */ A] {
       }
     }
 
-    val orders = (0 until opts.features).map { i =>
-      val order = (0 until dependent.length).toArray
-      order.qsortBy(independent(_)(i))
-      order
-    }.toArray
+    val orders = (0 until opts.features)
+      .map { i =>
+        val order = (0 until dependent.length).toArray
+        order.qsortBy(independent(_)(i))
+        order
+      }
+      .toArray
     growTree(orders)
   }
 }

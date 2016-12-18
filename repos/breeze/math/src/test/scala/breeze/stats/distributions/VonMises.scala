@@ -34,7 +34,8 @@ class VonMisesTest
   val expFam = VonMises
 
   implicit def arbParameter = Arbitrary {
-    for (mu <- arbitrary[Double].map { _.abs % (2 * math.Pi) }; // Gamma pdf at 0 not defined when shape == 1
+    for (mu <- arbitrary[Double]
+           .map { _.abs % (2 * math.Pi) }; // Gamma pdf at 0 not defined when shape == 1
          k <- arbitrary[Double].map { _.abs % 3.0 + 1.5 }) yield (mu, k);
   }
 

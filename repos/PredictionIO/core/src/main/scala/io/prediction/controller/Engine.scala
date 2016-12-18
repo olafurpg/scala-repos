@@ -772,8 +772,8 @@ object Engine {
       qas.map { case (qx, (q, a)) => (qx, (serving.supplementBase(q), a)) }
     }
 
-    val algoPredictsMap: Map[EX, RDD[(QX, Seq[P])]] = (0 until evalCount).map {
-      ex =>
+    val algoPredictsMap: Map[EX, RDD[(QX, Seq[P])]] = (0 until evalCount)
+      .map { ex =>
         {
           val modelMap: Map[AX, Any] = algoModelsMap(ex)
 
@@ -807,7 +807,8 @@ object Engine {
 
           (ex, unionAlgoPredicts)
         }
-    }.toMap
+      }
+      .toMap
 
     val servingQPAMap: Map[EX, RDD[(Q, P, A)]] = algoPredictsMap.map {
       case (ex, psMap) => {
@@ -825,11 +826,13 @@ object Engine {
       }
     }
 
-    (0 until evalCount).map { ex =>
-      {
-        (evalInfoMap(ex), servingQPAMap(ex))
+    (0 until evalCount)
+      .map { ex =>
+        {
+          (evalInfoMap(ex), servingQPAMap(ex))
+        }
       }
-    }.toSeq
+      .toSeq
   }
 }
 

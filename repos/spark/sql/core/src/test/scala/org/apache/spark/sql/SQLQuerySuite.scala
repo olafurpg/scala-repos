@@ -244,9 +244,11 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   private def testCodeGen(sqlText: String, expectedResults: Seq[Row]): Unit = {
     val df = sql(sqlText)
     // First, check if we have GeneratedAggregate.
-    val hasGeneratedAgg = df.queryExecution.sparkPlan.collect {
-      case _: aggregate.TungstenAggregate => true
-    }.nonEmpty
+    val hasGeneratedAgg = df.queryExecution.sparkPlan
+      .collect {
+        case _: aggregate.TungstenAggregate => true
+      }
+      .nonEmpty
     if (!hasGeneratedAgg) {
       fail(s"""
            |Codegen is enabled, but query $sqlText does not have TungstenAggregate in the plan.

@@ -398,11 +398,13 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
         .findFileByUrl("jar://" + jar.getAbsolutePath + "!/")
       if (root != null) {
         injectorDescriptor.sources.flatMap(path => {
-          Option(root.findFileByRelativePath(path)).map { f =>
-            if (f.isDirectory)
-              f.getChildren.filter(!_.isDirectory).map(copyToTmpDir).toSeq
-            else Seq(copyToTmpDir(f))
-          }.getOrElse(Seq.empty)
+          Option(root.findFileByRelativePath(path))
+            .map { f =>
+              if (f.isDirectory)
+                f.getChildren.filter(!_.isDirectory).map(copyToTmpDir).toSeq
+              else Seq(copyToTmpDir(f))
+            }
+            .getOrElse(Seq.empty)
         })
       } else {
         Error.noJarFound(jar)

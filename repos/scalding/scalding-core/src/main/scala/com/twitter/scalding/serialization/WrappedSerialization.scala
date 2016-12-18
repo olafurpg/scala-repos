@@ -112,18 +112,23 @@ object WrappedSerialization {
 
   def rawSetBinary(bufs: Iterable[ClassSerialization[_]],
                    fn: (String, String) => Unit) = {
-    fn(confKey, bufs.map {
-      case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
-    }.mkString(","))
+    fn(confKey,
+       bufs
+         .map {
+           case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
+         }
+         .mkString(","))
   }
   def setBinary(conf: Configuration,
                 bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =
-    conf.iterator.asScala.map { it =>
-      (it.getKey, it.getValue)
-    }.filter(_._1.startsWith(confKey))
+    conf.iterator.asScala
+      .map { it =>
+        (it.getKey, it.getValue)
+      }
+      .filter(_._1.startsWith(confKey))
       .map {
         case (_, clsbuf) =>
           clsbuf.split(":") match {

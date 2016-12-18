@@ -235,10 +235,12 @@ object BuildDef extends Build {
         apiMappings ++= {
           val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
 
-          findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
-            case (revision, file) =>
-              (file -> url("http://www.scala-lang.org/api/" + version))
-          }.toMap
+          findManagedDependency(cp, "org.scala-lang.modules", "scala-xml")
+            .map {
+              case (revision, file) =>
+                (file -> url("http://www.scala-lang.org/api/" + version))
+            }
+            .toMap
         }
       )
   }

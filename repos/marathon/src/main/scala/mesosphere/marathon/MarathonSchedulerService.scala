@@ -145,12 +145,15 @@ class MarathonSchedulerService @Inject()(
     Await.result(appRepository.listVersions(appId), config.zkTimeoutDuration)
 
   def listRunningDeployments(): Future[Seq[DeploymentStepInfo]] =
-    (schedulerActor ? RetrieveRunningDeployments).recoverWith {
-      case _: TimeoutException =>
-        Future.failed(
-          new TimeoutException(
-            s"Can not retrieve the list of running deployments in time"))
-    }.mapTo[RunningDeployments].map(_.plans)
+    (schedulerActor ? RetrieveRunningDeployments)
+      .recoverWith {
+        case _: TimeoutException =>
+          Future.failed(
+            new TimeoutException(
+              s"Can not retrieve the list of running deployments in time"))
+      }
+      .mapTo[RunningDeployments]
+      .map(_.plans)
 
   def getApp(appId: PathId, version: Timestamp): Option[AppDefinition] = {
     Await.result(appRepository.app(appId, version), config.zkTimeoutDuration)

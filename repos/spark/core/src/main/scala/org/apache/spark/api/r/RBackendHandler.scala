@@ -188,9 +188,11 @@ private[r] class RBackendHandler(server: RBackend)
 
   // Read a number of arguments from the data input stream
   def readArgs(numArgs: Int, dis: DataInputStream): Array[java.lang.Object] = {
-    (0 until numArgs).map { _ =>
-      readObject(dis)
-    }.toArray
+    (0 until numArgs)
+      .map { _ =>
+        readObject(dis)
+      }
+      .toArray
   }
 
   // Find a matching method signature in an array of signatures of constructors

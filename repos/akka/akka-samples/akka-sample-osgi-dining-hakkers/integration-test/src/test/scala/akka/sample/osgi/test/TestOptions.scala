@@ -37,15 +37,14 @@ object TestOptions {
   }
 
   def testBundles(): PaxOption = {
-    new DefaultCompositeOption(mavenBundle(
-                                 "com.typesafe.akka",
-                                 "akka-testkit_%s"
-                                   .format(scalaDepVersion)).versionAsInProject,
-                               mavenBundle(
-                                 "org.scalatest",
-                                 "scalatest_%s"
-                                   .format(scalaDepVersion)).versionAsInProject,
-                               junitBundles)
+    new DefaultCompositeOption(
+      mavenBundle("com.typesafe.akka",
+                  "akka-testkit_%s"
+                    .format(scalaDepVersion)).versionAsInProject,
+      mavenBundle("org.scalatest",
+                  "scalatest_%s"
+                    .format(scalaDepVersion)).versionAsInProject,
+      junitBundles)
   }
 
   def debugOptions(level: LogLevelOption.LogLevel =

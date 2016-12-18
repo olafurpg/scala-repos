@@ -146,9 +146,12 @@ trait LogisticRegressionLibModule[M[+ _]]
 
               assert(xs.length == theta.length)
 
-              val result = (0 until xs.length).map { i =>
-                theta(i) - alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(i)
-              }.map(checkValue)
+              val result = (0 until xs.length)
+                .map { i =>
+                  theta(i) - alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(
+                    i)
+                }
+                .map(checkValue)
 
               result.toArray
             }

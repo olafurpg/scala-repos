@@ -54,10 +54,12 @@ object GenerateMutableProjection
       expressions: Seq[Expression],
       useSubexprElimination: Boolean): (() => MutableProjection) = {
     val ctx = newCodeGenContext()
-    val (validExpr, index) = expressions.zipWithIndex.filter {
-      case (NoOp, _) => false
-      case _ => true
-    }.unzip
+    val (validExpr, index) = expressions.zipWithIndex
+      .filter {
+        case (NoOp, _) => false
+        case _ => true
+      }
+      .unzip
     val exprVals = ctx.generateExpressions(validExpr, useSubexprElimination)
     val projectionCodes = exprVals.zip(index).map {
       case (ev, i) =>

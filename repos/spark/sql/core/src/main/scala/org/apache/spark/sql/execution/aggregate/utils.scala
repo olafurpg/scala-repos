@@ -217,20 +217,22 @@ object Utils {
         aggregateFunctionToAttribute(expr.aggregateFunction, expr.isDistinct)
       }
       val (distinctAggregateExpressions, distinctAggregateAttributes) =
-        rewrittenDistinctFunctions.zipWithIndex.map {
-          case (func, i) =>
-            // We rewrite the aggregate function to a non-distinct aggregation because
-            // its input will have distinct arguments.
-            // We just keep the isDistinct setting to true, so when users look at the query plan,
-            // they still can see distinct aggregations.
-            val expr = AggregateExpression(func, Partial, isDistinct = true)
-            // Use original AggregationFunction to lookup attributes, which is used to build
-            // aggregateFunctionToAttribute
-            val attr = aggregateFunctionToAttribute(
-              functionsWithDistinct(i).aggregateFunction,
-              true)
-            (expr, attr)
-        }.unzip
+        rewrittenDistinctFunctions.zipWithIndex
+          .map {
+            case (func, i) =>
+              // We rewrite the aggregate function to a non-distinct aggregation because
+              // its input will have distinct arguments.
+              // We just keep the isDistinct setting to true, so when users look at the query plan,
+              // they still can see distinct aggregations.
+              val expr = AggregateExpression(func, Partial, isDistinct = true)
+              // Use original AggregationFunction to lookup attributes, which is used to build
+              // aggregateFunctionToAttribute
+              val attr = aggregateFunctionToAttribute(
+                functionsWithDistinct(i).aggregateFunction,
+                true)
+              (expr, attr)
+          }
+          .unzip
 
       val partialAggregateResult =
         groupingAttributes ++ mergeAggregateExpressions.flatMap(
@@ -257,20 +259,22 @@ object Utils {
       }
 
       val (distinctAggregateExpressions, distinctAggregateAttributes) =
-        rewrittenDistinctFunctions.zipWithIndex.map {
-          case (func, i) =>
-            // We rewrite the aggregate function to a non-distinct aggregation because
-            // its input will have distinct arguments.
-            // We just keep the isDistinct setting to true, so when users look at the query plan,
-            // they still can see distinct aggregations.
-            val expr = AggregateExpression(func, Final, isDistinct = true)
-            // Use original AggregationFunction to lookup attributes, which is used to build
-            // aggregateFunctionToAttribute
-            val attr = aggregateFunctionToAttribute(
-              functionsWithDistinct(i).aggregateFunction,
-              true)
-            (expr, attr)
-        }.unzip
+        rewrittenDistinctFunctions.zipWithIndex
+          .map {
+            case (func, i) =>
+              // We rewrite the aggregate function to a non-distinct aggregation because
+              // its input will have distinct arguments.
+              // We just keep the isDistinct setting to true, so when users look at the query plan,
+              // they still can see distinct aggregations.
+              val expr = AggregateExpression(func, Final, isDistinct = true)
+              // Use original AggregationFunction to lookup attributes, which is used to build
+              // aggregateFunctionToAttribute
+              val attr = aggregateFunctionToAttribute(
+                functionsWithDistinct(i).aggregateFunction,
+                true)
+              (expr, attr)
+          }
+          .unzip
 
       createAggregate(
         requiredChildDistributionExpressions = Some(groupingAttributes),

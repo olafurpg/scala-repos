@@ -240,14 +240,16 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     // this is a regression test, where when merging partitions, we omitted values with higher
     // counts than those that existed in the map when the map was full. This test should also fail
     // if anything like SPARK-9614 is observed once again
-    val df = rows.mapPartitionsWithIndex { (idx, iter) =>
-      if (idx == 3) {
-        // must come from one of the later merges, therefore higher partition index
-        Iterator("3", "3", "3", "3", "3")
-      } else {
-        Iterator("0", "1", "2", "3", "4")
+    val df = rows
+      .mapPartitionsWithIndex { (idx, iter) =>
+        if (idx == 3) {
+          // must come from one of the later merges, therefore higher partition index
+          Iterator("3", "3", "3", "3", "3")
+        } else {
+          Iterator("0", "1", "2", "3", "4")
+        }
       }
-    }.toDF("a")
+      .toDF("a")
     val results = df.stat.freqItems(Array("a"), 0.25)
     val items = results.collect().head.getSeq[String](0)
     assert(items.contains("3"))

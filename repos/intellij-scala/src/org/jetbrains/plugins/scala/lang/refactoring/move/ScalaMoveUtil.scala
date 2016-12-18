@@ -43,9 +43,11 @@ object ScalaMoveUtil {
       case (td1: ScTypeDefinition, td2: ScTypeDefinition)
           if td1.name == td2.name =>
         val classes = Seq(td1, td2)
-        val noFakeCompanions = classes.collect {
-          case td: ScTypeDefinition => td.fakeCompanionModule.isDefined
-        }.isEmpty
+        val noFakeCompanions = classes
+          .collect {
+            case td: ScTypeDefinition => td.fakeCompanionModule.isDefined
+          }
+          .isEmpty
         classes.count(_.isInstanceOf[ScObject]) == 1 && noFakeCompanions
       case _ => false
     }
@@ -196,11 +198,13 @@ object ScalaMoveUtil {
       case p: ScPackage => p.getClasses.toSeq
       case _ => Nil
     }
-    classes.flatMap {
-      case td: ScTypeDefinition =>
-        td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
-      case e => List(e)
-    }.foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
+    classes
+      .flatMap {
+        case td: ScTypeDefinition =>
+          td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
+        case e => List(e)
+      }
+      .foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
   }
 
   def getMoveDestination(@NotNull element: PsiElement): PsiDirectory =

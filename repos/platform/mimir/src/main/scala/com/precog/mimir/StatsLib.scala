@@ -1826,11 +1826,13 @@ trait StatsLibModule[M[+ _]]
                            lastRow: Int,
                            curr: Long,
                            next: Long): RankContext = {
-        val items = m.filter {
-          case (k, v) => v.isDefinedAt(lastRow)
-        }.map {
-          case (k, v) => (k, v.cValue(lastRow))
-        }
+        val items = m
+          .filter {
+            case (k, v) => v.isDefinedAt(lastRow)
+          }
+          .map {
+            case (k, v) => (k, v.cValue(lastRow))
+          }
         RankContext(curr, next, items)
       }
 

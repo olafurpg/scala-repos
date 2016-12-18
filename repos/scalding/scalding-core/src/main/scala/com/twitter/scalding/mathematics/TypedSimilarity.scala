@@ -75,10 +75,13 @@ object GraphOperations extends Serializable {
   def withInNorm[N, E](g: TypedPipe[Edge[N, Weight]])(
       implicit ord: Ordering[N]): TypedPipe[Edge[N, (Weight, L2Norm)]] =
     joinAggregate(g.groupBy { _.to }) { it =>
-      val norm = scala.math.sqrt(it.iterator.map { a =>
-        val x = a.data.weight
-        x * x
-      }.sum)
+      val norm = scala.math.sqrt(
+        it.iterator
+          .map { a =>
+            val x = a.data.weight
+            x * x
+          }
+          .sum)
 
       L2Norm(norm)
     }
@@ -149,14 +152,15 @@ object TypedSimilarity extends Serializable {
                         .group,
                       g.reducers)
     // Use reduceLeft to push to reducers, no benefit in mapside here
-    .reduceLeft { (left, right) =>
-      // The degrees we always take the left:
-      val (leftCnt, deg1, deg2) = left
-      (leftCnt + right._1, deg1, deg2)
-    }.map {
-      case ((node1, node2), (cnt, deg1, deg2)) =>
-        Edge(node1, node2, SetSimilarity(cnt, deg1, deg2))
-    }
+      .reduceLeft { (left, right) =>
+        // The degrees we always take the left:
+        val (leftCnt, deg1, deg2) = left
+        (leftCnt + right._1, deg1, deg2)
+      }
+      .map {
+        case ((node1, node2), (cnt, deg1, deg2)) =>
+          Edge(node1, node2, SetSimilarity(cnt, deg1, deg2))
+      }
 
   /*
    * key: document,
@@ -253,11 +257,15 @@ class ExactInCosine[N](reducers: Int = -1)(
   def apply(graph: TypedPipe[Edge[N, InDegree]],
             smallpred: N => Boolean,
             bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val groupedOnSrc = graph.filter { e =>
-      smallpred(e.to) || bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
+    val groupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to) || bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
     TypedSimilarity
       .exactSetSimilarity(groupedOnSrc, smallpred, bigpred)
       .flatMap { e =>
@@ -292,16 +300,24 @@ class DiscoInCosine[N](
   def apply(graph: TypedPipe[Edge[N, InDegree]],
             smallpred: N => Boolean,
             bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val bigGroupedOnSrc = graph.filter { e =>
-      bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
-    val smallGroupedOnSrc = graph.filter { e =>
-      smallpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
+    val bigGroupedOnSrc = graph
+      .filter { e =>
+        bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
+    val smallGroupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
 
     TypedSimilarity
       .discoCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)
@@ -323,16 +339,24 @@ class DimsumInCosine[N](
   def apply(graph: TypedPipe[Edge[N, (Weight, L2Norm)]],
             smallpred: N => Boolean,
             bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val bigGroupedOnSrc = graph.filter { e =>
-      bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data._1.weight, e.data._2.norm))
-    }.group.withReducers(reducers)
-    val smallGroupedOnSrc = graph.filter { e =>
-      smallpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data._1.weight, e.data._2.norm))
-    }.group.withReducers(reducers)
+    val bigGroupedOnSrc = graph
+      .filter { e =>
+        bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data._1.weight, e.data._2.norm))
+      }
+      .group
+      .withReducers(reducers)
+    val smallGroupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data._1.weight, e.data._2.norm))
+      }
+      .group
+      .withReducers(reducers)
 
     TypedSimilarity
       .dimsumCosineSimilarity(smallGroupedOnSrc, bigGroupedOnSrc, oversample)

@@ -98,9 +98,13 @@ object CacheNodeGroup {
           (host, port.toInt, weight.toInt, Some(key))
       }
 
-    newStaticGroup(hostSeq.map {
-      case (host, port, weight, key) => new CacheNode(host, port, weight, key)
-    }.toSet)
+    newStaticGroup(
+      hostSeq
+        .map {
+          case (host, port, weight, key) =>
+            new CacheNode(host, port, weight, key)
+        }
+        .toSet)
   }
 
   def apply(group: Group[SocketAddress],

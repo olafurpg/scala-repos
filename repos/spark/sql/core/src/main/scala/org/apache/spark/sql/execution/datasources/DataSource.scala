@@ -149,25 +149,30 @@ case class DataSource(sqlContext: SQLContext,
           caseInsensitiveOptions.getOrElse("metadataPath", s"$path/_metadata")
 
         val allPaths = caseInsensitiveOptions.get("path")
-        val globbedPaths = allPaths.toSeq.flatMap { path =>
-          val hdfsPath = new Path(path)
-          val fs =
-            hdfsPath.getFileSystem(sqlContext.sparkContext.hadoopConfiguration)
-          val qualified =
-            hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
-          SparkHadoopUtil.get.globPathIfNecessary(qualified)
-        }.toArray
+        val globbedPaths = allPaths.toSeq
+          .flatMap { path =>
+            val hdfsPath = new Path(path)
+            val fs =
+              hdfsPath.getFileSystem(
+                sqlContext.sparkContext.hadoopConfiguration)
+            val qualified =
+              hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
+            SparkHadoopUtil.get.globPathIfNecessary(qualified)
+          }
+          .toArray
 
         val fileCatalog: FileCatalog =
           new HDFSFileCatalog(sqlContext, options, globbedPaths, None)
-        val dataSchema = userSpecifiedSchema.orElse {
-          format.inferSchema(sqlContext,
-                             caseInsensitiveOptions,
-                             fileCatalog.allFiles())
-        }.getOrElse {
-          throw new AnalysisException(
-            "Unable to infer schema.  It must be specified manually.")
-        }
+        val dataSchema = userSpecifiedSchema
+          .orElse {
+            format.inferSchema(sqlContext,
+                               caseInsensitiveOptions,
+                               fileCatalog.allFiles())
+          }
+          .getOrElse {
+            throw new AnalysisException(
+              "Unable to infer schema.  It must be specified manually.")
+          }
 
         def dataFrameBuilder(files: Array[String]): DataFrame = {
           Dataset.newDataFrame(
@@ -223,14 +228,17 @@ case class DataSource(sqlContext: SQLContext,
 
       case (format: FileFormat, _) =>
         val allPaths = caseInsensitiveOptions.get("path") ++ paths
-        val globbedPaths = allPaths.flatMap { path =>
-          val hdfsPath = new Path(path)
-          val fs =
-            hdfsPath.getFileSystem(sqlContext.sparkContext.hadoopConfiguration)
-          val qualified =
-            hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
-          SparkHadoopUtil.get.globPathIfNecessary(qualified)
-        }.toArray
+        val globbedPaths = allPaths
+          .flatMap { path =>
+            val hdfsPath = new Path(path)
+            val fs =
+              hdfsPath.getFileSystem(
+                sqlContext.sparkContext.hadoopConfiguration)
+            val qualified =
+              hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
+            SparkHadoopUtil.get.globPathIfNecessary(qualified)
+          }
+          .toArray
 
         // If they gave a schema, then we try and figure out the types of the partition columns
         // from that schema.
@@ -248,15 +256,17 @@ case class DataSource(sqlContext: SQLContext,
                                                            options,
                                                            globbedPaths,
                                                            partitionSchema)
-        val dataSchema = userSpecifiedSchema.orElse {
-          format.inferSchema(sqlContext,
-                             caseInsensitiveOptions,
-                             fileCatalog.allFiles())
-        }.getOrElse {
-          throw new AnalysisException(
-            s"Unable to infer schema for $format at ${allPaths.take(2).mkString(",")}. " +
-              "It must be specified manually")
-        }
+        val dataSchema = userSpecifiedSchema
+          .orElse {
+            format.inferSchema(sqlContext,
+                               caseInsensitiveOptions,
+                               fileCatalog.allFiles())
+          }
+          .getOrElse {
+            throw new AnalysisException(
+              s"Unable to infer schema for $format at ${allPaths.take(2).mkString(",")}. " +
+                "It must be specified manually")
+          }
 
         HadoopFsRelation(sqlContext,
                          fileCatalog,

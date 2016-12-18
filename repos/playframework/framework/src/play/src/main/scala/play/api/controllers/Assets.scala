@@ -192,14 +192,17 @@ private[controllers] class AssetInfo(val name: String,
 
   val lastModified: Option[String] = {
     def getLastModified[T <: URLConnection](f: (T) => Long): Option[String] = {
-      Option(url.openConnection).map {
-        case urlConnection: T @unchecked =>
-          try {
-            f(urlConnection)
-          } finally {
-            Resources.closeUrlConnection(urlConnection)
-          }
-      }.filterNot(_ == -1).map(httpDateFormat.print)
+      Option(url.openConnection)
+        .map {
+          case urlConnection: T @unchecked =>
+            try {
+              f(urlConnection)
+            } finally {
+              Resources.closeUrlConnection(urlConnection)
+            }
+        }
+        .filterNot(_ == -1)
+        .map(httpDateFormat.print)
     }
 
     url.getProtocol match {

@@ -177,10 +177,11 @@ object Enumeratee {
     def getInside[T](it: Iteratee[E, T]): Future[
       (Option[Either[(String, Input[E]), (T, Input[E])]], Iteratee[E, T])] = {
       it.pureFold {
-        case Step.Done(a, e) => Some(Right((a, e)))
-        case Step.Cont(k) => None
-        case Step.Error(msg, e) => Some(Left((msg, e)))
-      }(dec).map(r => (r, it))(dec)
+          case Step.Done(a, e) => Some(Right((a, e)))
+          case Step.Cont(k) => None
+          case Step.Error(msg, e) => Some(Left((msg, e)))
+        }(dec)
+        .map(r => (r, it))(dec)
     }
 
     def checkDone(x: Option[Either[(String, Input[E]), (A, Input[E])]],

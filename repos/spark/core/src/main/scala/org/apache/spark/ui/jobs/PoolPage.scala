@@ -31,11 +31,13 @@ private[ui] class PoolPage(parent: StagesTab) extends WebUIPage("pool") {
 
   def render(request: HttpServletRequest): Seq[Node] = {
     listener.synchronized {
-      val poolName = Option(request.getParameter("poolname")).map { poolname =>
-        UIUtils.decodeURLParameter(poolname)
-      }.getOrElse {
-        throw new IllegalArgumentException(s"Missing poolname parameter")
-      }
+      val poolName = Option(request.getParameter("poolname"))
+        .map { poolname =>
+          UIUtils.decodeURLParameter(poolname)
+        }
+        .getOrElse {
+          throw new IllegalArgumentException(s"Missing poolname parameter")
+        }
 
       val poolToActiveStages = listener.poolToActiveStages
       val activeStages = poolToActiveStages.get(poolName) match {

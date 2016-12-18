@@ -747,9 +747,12 @@ object TestNodeProvider {
       case Some(patternList) =>
         val refPattern = elem.getParent
         val patternsImpl = refPattern.getParent.asInstanceOf[ScPatternsImpl]
-        val index = patternsImpl.patterns.zipWithIndex.find {
-          case (pat, _) => pat == refPattern
-        }.get._2
+        val index = patternsImpl.patterns.zipWithIndex
+          .find {
+            case (pat, _) => pat == refPattern
+          }
+          .get
+          ._2
         Some((patternList, Some(index, patternsImpl.patterns.size)))
       case _ =>
         checkParent(elem, classOf[ScReferencePattern])

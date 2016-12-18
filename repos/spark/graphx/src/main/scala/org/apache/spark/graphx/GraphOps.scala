@@ -316,10 +316,13 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     */
   def convertToCanonicalEdges(
       mergeFunc: (ED, ED) => ED = (e1, e2) => e1): Graph[VD, ED] = {
-    val newEdges = graph.edges.map {
-      case e if e.srcId < e.dstId => ((e.srcId, e.dstId), e.attr)
-      case e => ((e.dstId, e.srcId), e.attr)
-    }.reduceByKey(mergeFunc).map(e => new Edge(e._1._1, e._1._2, e._2))
+    val newEdges = graph.edges
+      .map {
+        case e if e.srcId < e.dstId => ((e.srcId, e.dstId), e.attr)
+        case e => ((e.dstId, e.srcId), e.attr)
+      }
+      .reduceByKey(mergeFunc)
+      .map(e => new Edge(e._1._1, e._1._2, e._2))
     Graph(graph.vertices, newEdges)
   }
 

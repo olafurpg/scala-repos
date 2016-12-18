@@ -360,15 +360,17 @@ private[niflheim] class NIHDBActor private (
       maxOffset = maxOffset max newMaxOffset
     }
 
-    val pendingCooks = txLog.pendingCookIds.map { id =>
-      val (reader, offsets, ok) = RawHandler.load(id, rawFileFor(id))
-      if (!ok) {
-        logger.warn(
-          "Corruption detected and recovery performed on " + currentRawFile)
+    val pendingCooks = txLog.pendingCookIds
+      .map { id =>
+        val (reader, offsets, ok) = RawHandler.load(id, rawFileFor(id))
+        if (!ok) {
+          logger.warn(
+            "Corruption detected and recovery performed on " + currentRawFile)
+        }
+        maxOffset = math.max(maxOffset, offsets.max)
+        (id, reader)
       }
-      maxOffset = math.max(maxOffset, offsets.max)
-      (id, reader)
-    }.toMap
+      .toMap
 
     this.currentState = currentState.copy(maxOffset = maxOffset)
 
@@ -429,9 +431,12 @@ private[niflheim] class NIHDBActor private (
   private def computeBlockMap(current: BlockState) = {
     val allBlocks: List[StorageReader] =
       (current.cooked ++ current.pending.values :+ current.rawLog)
-    SortedMap(allBlocks.map { r =>
-      r.id -> r
-    }.toSeq: _*)
+    SortedMap(
+      allBlocks
+        .map { r =>
+          r.id -> r
+        }
+        .toSeq: _*)
   }
 
   def updatedThresholds(current: Map[Int, Int],
@@ -536,10 +541,12 @@ private[niflheim] case class ProjectionState(maxOffset: Long,
                                              cookedMap: Map[Long, String],
                                              authorities: Authorities) {
   def readers(baseDir: File): List[CookedReader] =
-    cookedMap.map {
-      case (id, metadataFile) =>
-        CookedReader.load(baseDir, new File(metadataFile))
-    }.toList
+    cookedMap
+      .map {
+        case (id, metadataFile) =>
+          CookedReader.load(baseDir, new File(metadataFile))
+      }
+      .toList
 }
 
 private[niflheim] object ProjectionState {

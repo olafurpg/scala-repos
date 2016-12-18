@@ -97,14 +97,16 @@ private[finagle] object MultiReaderHelper {
       }
 
       val queues = handles.map { _.messages }.toSeq
-      val errors = handles.map { h =>
-        h.error map { e =>
-          logger.warning(
-            s"Read handle ${_root_.java.lang.System.identityHashCode(h)} " +
-              s"encountered exception : ${e.getMessage}")
-          h
+      val errors = handles
+        .map { h =>
+          h.error map { e =>
+            logger.warning(
+              s"Read handle ${_root_.java.lang.System.identityHashCode(h)} " +
+                s"encountered exception : ${e.getMessage}")
+            h
+          }
         }
-      }.toSeq
+        .toSeq
 
       // We sequence here to ensure that `close` gets priority over reads.
       Offer

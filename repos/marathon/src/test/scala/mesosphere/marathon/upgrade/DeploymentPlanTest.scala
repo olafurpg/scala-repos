@@ -218,9 +218,11 @@ class DeploymentPlanTest
 
     val instances: Int = 10
 
-    val apps: Set[AppDefinition] = (1 to 4).map { i =>
-      AppDefinition(s"/test/$i".toPath, Some("cmd"), instances = instances)
-    }.toSet
+    val apps: Set[AppDefinition] = (1 to 4)
+      .map { i =>
+        AppDefinition(s"/test/$i".toPath, Some("cmd"), instances = instances)
+      }
+      .toSet
 
     val targetGroup = Group(
       id = "/test".toPath,

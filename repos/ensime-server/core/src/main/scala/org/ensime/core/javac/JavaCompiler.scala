@@ -218,9 +218,11 @@ class JavaCompiler(
       inputs: List[SourceFileInfo]): Vector[CompilationInfo] = {
     // We only want the compilation units for inputs, but we need to typecheck them w.r.t
     // the full working set.
-    val inputJfos = inputs.map { sf =>
-      internSource(sf).toUri
-    }.toSet
+    val inputJfos = inputs
+      .map { sf =>
+        internSource(sf).toUri
+      }
+      .toSet
     val task = getTask("none", silencer, workingSet.values)
     val t = System.currentTimeMillis()
     try {

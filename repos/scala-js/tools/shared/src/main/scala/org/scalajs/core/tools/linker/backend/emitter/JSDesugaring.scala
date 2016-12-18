@@ -594,10 +594,12 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
       */
     def unnestOrSpread(args: List[Tree])(
         makeStat: (List[Tree], Env) => js.Tree)(implicit env: Env): js.Tree = {
-      val (argsNoSpread, argsWereSpread) = args.map {
-        case JSSpread(items) => (items, true)
-        case arg => (arg, false)
-      }.unzip
+      val (argsNoSpread, argsWereSpread) = args
+        .map {
+          case JSSpread(items) => (items, true)
+          case arg => (arg, false)
+        }
+        .unzip
 
       unnest(argsNoSpread) { (newArgsNoSpread, env) =>
         val newArgs = newArgsNoSpread.zip(argsWereSpread).map {

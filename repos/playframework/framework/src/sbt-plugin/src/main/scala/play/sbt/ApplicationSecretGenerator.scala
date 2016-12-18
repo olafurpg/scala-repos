@@ -15,9 +15,12 @@ object ApplicationSecretGenerator {
   def generateSecret = {
     val random = new SecureRandom()
 
-    (1 to 64).map { _ =>
-      (random.nextInt(75) + 48).toChar
-    }.mkString.replaceAll("\\\\+", "/")
+    (1 to 64)
+      .map { _ =>
+        (random.nextInt(75) + 48).toChar
+      }
+      .mkString
+      .replaceAll("\\\\+", "/")
   }
 
   def generateSecretTask = Def.task[String] {

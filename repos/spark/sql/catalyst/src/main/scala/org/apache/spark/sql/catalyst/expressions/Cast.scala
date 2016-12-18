@@ -1052,14 +1052,15 @@ case class Cast(child: Expression, dataType: DataType)
     val result = ctx.freshName("result")
     val tmpRow = ctx.freshName("tmpRow")
 
-    val fieldsEvalCode = fieldsCasts.zipWithIndex.map {
-      case (cast, i) => {
-        val fromFieldPrim = ctx.freshName("ffp")
-        val fromFieldNull = ctx.freshName("ffn")
-        val toFieldPrim = ctx.freshName("tfp")
-        val toFieldNull = ctx.freshName("tfn")
-        val fromType = ctx.javaType(from.fields(i).dataType)
-        s"""
+    val fieldsEvalCode = fieldsCasts.zipWithIndex
+      .map {
+        case (cast, i) => {
+          val fromFieldPrim = ctx.freshName("ffp")
+          val fromFieldNull = ctx.freshName("ffn")
+          val toFieldPrim = ctx.freshName("tfp")
+          val toFieldNull = ctx.freshName("tfn")
+          val fromType = ctx.javaType(from.fields(i).dataType)
+          s"""
         boolean $fromFieldNull = $tmpRow.isNullAt($i);
         if ($fromFieldNull) {
           $result.setNullAt($i);
@@ -1080,8 +1081,9 @@ case class Cast(child: Expression, dataType: DataType)
           }
         }
        """
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
     (c, evPrim, evNull) =>
       s"""

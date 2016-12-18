@@ -476,10 +476,12 @@ package play.api.mvc {
     def getAll(key: String): Seq[String] = toMap.getOrElse(key, Nil)
 
     override def hashCode = {
-      toMap.map {
-        case (name, value) =>
-          name.toLowerCase(Locale.ENGLISH) -> value
-      }.hashCode()
+      toMap
+        .map {
+          case (name, value) =>
+            name.toLowerCase(Locale.ENGLISH) -> value
+        }
+        .hashCode()
     }
 
     /**
@@ -581,10 +583,12 @@ package play.api.mvc {
       * Encodes the data as a `String`.
       */
     def encode(data: Map[String, String]): String = {
-      val encoded = data.map {
-        case (k, v) =>
-          URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
-      }.mkString("&")
+      val encoded = data
+        .map {
+          case (k, v) =>
+            URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
+        }
+        .mkString("&")
       if (isSigned) cookieSigner.sign(encoded) + "-" + encoded
       else encoded
     }
@@ -955,9 +959,12 @@ package play.api.mvc {
       */
     def encodeCookieHeader(cookies: Seq[Cookie]): String = {
       val encoder = config.clientEncoder
-      encoder.encode(cookies.map { cookie =>
-        new DefaultCookie(cookie.name, cookie.value)
-      }.asJava)
+      encoder.encode(
+        cookies
+          .map { cookie =>
+            new DefaultCookie(cookie.name, cookie.value)
+          }
+          .asJava)
     }
 
     /**

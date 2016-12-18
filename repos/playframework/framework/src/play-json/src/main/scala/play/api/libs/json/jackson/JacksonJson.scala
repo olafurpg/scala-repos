@@ -197,10 +197,12 @@ private[jackson] class JsValueDeserializer(factory: TypeFactory,
         v
 
       case maybeValue =>
-        val toPass = maybeValue.map { v =>
-          val previous :: stack = nextContext
-          (previous.addValue(v)) +: stack
-        }.getOrElse(nextContext)
+        val toPass = maybeValue
+          .map { v =>
+            val previous :: stack = nextContext
+            (previous.addValue(v)) +: stack
+          }
+          .getOrElse(nextContext)
 
         deserialize(jp, ctxt, toPass)
     }

@@ -35,9 +35,11 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
         computeConstantExpression(ScalaPsiUtil nameContext refPattern,
                                   throwExceptionOnOverflow)
       case deff: ScPatternDefinition =>
-        deff.expr.map {
-          case e => computeConstantExpression(e, throwExceptionOnOverflow)
-        }.orNull
+        deff.expr
+          .map {
+            case e => computeConstantExpression(e, throwExceptionOnOverflow)
+          }
+          .orNull
       case expr: ScExpression => evaluate(expr)
       case _ => null
     }

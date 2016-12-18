@@ -356,12 +356,14 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     ev.isNull = "false"
-    val childrenHash = children.map { child =>
-      val childGen = child.gen(ctx)
-      childGen.code + ctx.nullSafeExec(child.nullable, childGen.isNull) {
-        computeHash(childGen.value, child.dataType, ev.value, ctx)
+    val childrenHash = children
+      .map { child =>
+        val childGen = child.gen(ctx)
+        childGen.code + ctx.nullSafeExec(child.nullable, childGen.isNull) {
+          computeHash(childGen.value, child.dataType, ev.value, ctx)
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
     s"""
       int ${ev.value} = $seed;
@@ -454,15 +456,17 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
         """
 
       case StructType(fields) =>
-        fields.zipWithIndex.map {
-          case (field, index) =>
-            nullSafeElementHash(input,
-                                index.toString,
-                                field.nullable,
-                                field.dataType,
-                                result,
-                                ctx)
-        }.mkString("\n")
+        fields.zipWithIndex
+          .map {
+            case (field, index) =>
+              nullSafeElementHash(input,
+                                  index.toString,
+                                  field.nullable,
+                                  field.dataType,
+                                  result,
+                                  ctx)
+          }
+          .mkString("\n")
 
       case udt: UserDefinedType[_] =>
         computeHash(input, udt.sqlType, result, ctx)

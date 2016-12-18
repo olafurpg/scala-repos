@@ -85,13 +85,15 @@ object FileWatchService {
           new JDK7FileWatchService(logger)
         // If Windows, Linux or OSX, use JNotify but fall back to SBT
         case (Windows | Linux | OSX) =>
-          JNotifyFileWatchService(targetDirectory).recover {
-            case e =>
-              logger.warn(
-                "Error loading JNotify watch service: " + e.getMessage)
-              logger.trace(e)
-              new PollingFileWatchService(pollDelayMillis)
-          }.get
+          JNotifyFileWatchService(targetDirectory)
+            .recover {
+              case e =>
+                logger.warn(
+                  "Error loading JNotify watch service: " + e.getMessage)
+                logger.trace(e)
+                new PollingFileWatchService(pollDelayMillis)
+            }
+            .get
         case _ => new PollingFileWatchService(pollDelayMillis)
       }
 
@@ -252,10 +254,11 @@ private object JNotifyFileWatchService {
 
               // Hack to set java.library.path
               System.setProperty("java.library.path", {
-                Option(System.getProperty("java.library.path")).map {
-                  existing =>
+                Option(System.getProperty("java.library.path"))
+                  .map { existing =>
                     existing + java.io.File.pathSeparator + libs
-                }.getOrElse(libs)
+                  }
+                  .getOrElse(libs)
               })
               val fieldSysPath =
                 classOf[ClassLoader].getDeclaredField("sys_paths")

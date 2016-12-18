@@ -76,10 +76,11 @@ abstract class CurrencyZone {
     } catch {
       case e: java.lang.NumberFormatException => {
         try {
-          make(BigDecimal(
-            "" + NumberFormat
-              .getNumberInstance(locale)
-              .parse(x))) // try with grouping separator
+          make(
+            BigDecimal(
+              "" + NumberFormat
+                .getNumberInstance(locale)
+                .parse(x))) // try with grouping separator
         } catch {
           case e: java.text.ParseException => {
             make(

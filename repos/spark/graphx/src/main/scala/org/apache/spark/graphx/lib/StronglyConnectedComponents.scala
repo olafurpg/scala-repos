@@ -44,7 +44,8 @@ object StronglyConnectedComponents {
     // the graph we update with final SCC ids, and the graph we return at the end
     var sccGraph = graph.mapVertices { case (vid, _) => vid }
     // graph we are going to work with in our iterations
-    var sccWorkGraph = graph.mapVertices { case (vid, _) => (vid, false) }
+    var sccWorkGraph = graph
+      .mapVertices { case (vid, _) => (vid, false) }
       .cache()
 
     var numVertices = sccWorkGraph.numVertices
@@ -65,11 +66,13 @@ object StronglyConnectedComponents {
           .cache()
 
         // get all vertices to be removed
-        val finalVertices = sccWorkGraph.vertices.filter {
-          case (vid, (scc, isFinal)) => isFinal
-        }.mapValues { (vid, data) =>
-          data._1
-        }
+        val finalVertices = sccWorkGraph.vertices
+          .filter {
+            case (vid, (scc, isFinal)) => isFinal
+          }
+          .mapValues { (vid, data) =>
+            data._1
+          }
 
         // write values to sccGraph
         sccGraph = sccGraph.outerJoinVertices(finalVertices) {

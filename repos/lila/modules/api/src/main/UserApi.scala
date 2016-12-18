@@ -41,9 +41,10 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
           (ctx.me.filter(u !=) ?? { me =>
             crosstableApi.nbGames(me.id, u.id)
           }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
-          u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId.?? {
-          relationApi.fetchRelation(_, u.id)
-        } zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map {
+          u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId
+          .?? {
+            relationApi.fetchRelation(_, u.id)
+          } zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map {
           case ((((((gameOption, nbGamesWithMe), following), followers),
                   followable),
                  relation),

@@ -44,12 +44,15 @@ object TupleConverterImpl {
     import TypeDescriptorProviderImpl.{optionInner, evidentColumn}
 
     def membersOf(outerTpe: Type): Vector[Type] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        accessorMethod.returnType.asSeenFrom(outerTpe,
-                                             outerTpe.typeSymbol.asClass)
-      }.toVector
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          accessorMethod.returnType.asSeenFrom(outerTpe,
+                                               outerTpe.typeSymbol.asClass)
+        }
+        .toVector
 
     sealed trait ConverterBuilder {
       def columns: Int

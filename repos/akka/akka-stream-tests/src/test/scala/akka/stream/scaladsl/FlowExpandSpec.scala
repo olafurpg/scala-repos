@@ -96,9 +96,12 @@ class FlowExpandSpec extends AkkaSpec {
     }
 
     "work on a variable rate chain" in {
-      val future = Source(1 to 100).map { i ⇒
-        if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
-      }.expand(Iterator.continually(_)).runFold(Set.empty[Int])(_ + _)
+      val future = Source(1 to 100)
+        .map { i ⇒
+          if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
+        }
+        .expand(Iterator.continually(_))
+        .runFold(Set.empty[Int])(_ + _)
 
       Await.result(future, 10.seconds) should contain theSameElementsAs
         (1 to 100).toSet

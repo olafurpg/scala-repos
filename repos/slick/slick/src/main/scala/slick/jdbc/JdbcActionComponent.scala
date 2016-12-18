@@ -292,7 +292,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           c.extra.asInstanceOf[SQLBuilder.Result].sql
         case ParameterSwitch(cases, default) =>
           findSql(
-            cases.find { case (f, n) => f(param) }
+            cases
+              .find { case (f, n) => f(param) }
               .map(_._2)
               .getOrElse(default))
       }

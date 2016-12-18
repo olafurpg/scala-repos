@@ -71,14 +71,16 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                                         64 * 1024,
                                         "test-client")
     val consumerMetadataRequest = GroupCoordinatorRequest(group)
-    Stream.continually {
-      val consumerMetadataResponse =
-        simpleConsumer.send(consumerMetadataRequest)
-      consumerMetadataResponse.coordinatorOpt.isDefined
-    }.dropWhile(success => {
-      if (!success) Thread.sleep(1000)
-      !success
-    })
+    Stream
+      .continually {
+        val consumerMetadataResponse =
+          simpleConsumer.send(consumerMetadataRequest)
+        consumerMetadataResponse.coordinatorOpt.isDefined
+      }
+      .dropWhile(success => {
+        if (!success) Thread.sleep(1000)
+        !success
+      })
   }
 
   @After

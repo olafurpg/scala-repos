@@ -86,9 +86,12 @@ private[v1] class OneStageResource(ui: SparkUI) {
                @DefaultValue("ID") @QueryParam("sortBy") sortBy: TaskSorting)
     : Seq[TaskData] = {
     withStageAttempt(stageId, stageAttemptId) { stage =>
-      val tasks = stage.ui.taskData.values.map {
-        AllStagesResource.convertTaskData
-      }.toIndexedSeq.sorted(OneStageResource.ordering(sortBy))
+      val tasks = stage.ui.taskData.values
+        .map {
+          AllStagesResource.convertTaskData
+        }
+        .toIndexedSeq
+        .sorted(OneStageResource.ordering(sortBy))
       tasks.slice(offset, offset + length)
     }
   }

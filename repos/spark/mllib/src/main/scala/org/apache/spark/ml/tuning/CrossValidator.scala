@@ -277,15 +277,17 @@ object CrossValidator extends MLReadable[CrossValidator] {
 
       val estimatorParamMapsJson = compact(
         render(
-          instance.getEstimatorParamMaps.map {
-            case paramMap =>
-              paramMap.toSeq.map {
-                case ParamPair(p, v) =>
-                  Map("parent" -> p.parent,
-                      "name" -> p.name,
-                      "value" -> p.jsonEncode(v))
-              }
-          }.toSeq
+          instance.getEstimatorParamMaps
+            .map {
+              case paramMap =>
+                paramMap.toSeq.map {
+                  case ParamPair(p, v) =>
+                    Map("parent" -> p.parent,
+                        "name" -> p.name,
+                        "value" -> p.jsonEncode(v))
+                }
+            }
+            .toSeq
         ))
       val jsonParams = List(
         "numFolds" -> parse(

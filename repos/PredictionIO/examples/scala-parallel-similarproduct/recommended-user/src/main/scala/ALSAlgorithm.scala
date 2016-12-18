@@ -55,36 +55,42 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val similarUserStringIntMap = userStringIntMap
 
     // collect SimilarUser as Map and convert ID to Int index
-    val similarUsers: Map[Int, User] = data.users.map {
-      case (id, similarUser) =>
-        (similarUserStringIntMap(id), similarUser)
-    }.collectAsMap().toMap
+    val similarUsers: Map[Int, User] = data.users
+      .map {
+        case (id, similarUser) =>
+          (similarUserStringIntMap(id), similarUser)
+      }
+      .collectAsMap()
+      .toMap
 
-    val mllibRatings = data.followEvents.map { r =>
-      // Convert user and user String IDs to Int index for MLlib
-      val uindex = userStringIntMap.getOrElse(r.user, -1)
-      val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
+    val mllibRatings = data.followEvents
+      .map { r =>
+        // Convert user and user String IDs to Int index for MLlib
+        val uindex = userStringIntMap.getOrElse(r.user, -1)
+        val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
 
-      if (uindex == -1)
-        logger.info(
-          s"Couldn't convert nonexistent user ID ${r.user}" +
+        if (uindex == -1)
+          logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
             " to Int index.")
 
-      if (iindex == -1)
-        logger.info(
-          s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
-            " to Int index.")
+        if (iindex == -1)
+          logger.info(
+            s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
+              " to Int index.")
 
-      ((uindex, iindex), 1)
-    }.filter {
-      case ((u, i), v) =>
-        // keep events with valid user and user index
-        (u != -1) && (i != -1)
-    }.map {
-      case ((u, i), v) =>
-        // MLlibRating requires integer index for user and user
-        MLlibRating(u, i, v)
-    }.cache()
+        ((uindex, iindex), 1)
+      }
+      .filter {
+        case ((u, i), v) =>
+          // keep events with valid user and user index
+          (u != -1) && (i != -1)
+      }
+      .map {
+        case ((u, i), v) =>
+          // MLlibRating requires integer index for user and user
+          MLlibRating(u, i, v)
+      }
+      .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(
@@ -120,9 +126,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     val queryFeatures: Vector[Array[Double]] = queryList.toVector
     // similarUserFeatures may not contain the requested user
-    .map { similarUser =>
-      similarUserFeatures.get(similarUser)
-    }.flatten
+      .map { similarUser =>
+        similarUserFeatures.get(similarUser)
+      }
+      .flatten
 
     val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
       set.map(model.similarUserStringIntMap.get).flatten)
@@ -138,11 +145,14 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         Array[(Int, Double)]()
       } else {
         similarUserFeatures.par // convert to parallel collection
-        .mapValues { f =>
-          queryFeatures.map { qf =>
-            cosine(qf, f)
-          }.sum
-        }.filter(_._2 > 0) // keep similarUsers with score > 0
+          .mapValues { f =>
+            queryFeatures
+              .map { qf =>
+                cosine(qf, f)
+              }
+              .sum
+          }
+          .filter(_._2 > 0) // keep similarUsers with score > 0
           .seq // convert back to sequential collection
           .toArray
       }

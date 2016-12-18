@@ -75,12 +75,14 @@ private[tournament] final class TournamentApi(
                 s"Give up making http://lichess.org/tournament/${tour.id} ${pairings.size} pairings in ${nowMillis - startAt}ms")
               funit
             case pairings =>
-              pairings.map { pairing =>
-                PairingRepo.insert(pairing) >> autoPairing(tour, pairing) addEffect {
-                  game =>
-                    sendTo(tour.id, StartGame(game))
+              pairings
+                .map { pairing =>
+                  PairingRepo.insert(pairing) >> autoPairing(tour, pairing) addEffect {
+                    game =>
+                      sendTo(tour.id, StartGame(game))
+                  }
                 }
-              }.sequenceFu >> featureOneOf(tour, pairings, ranking) >>- {
+                .sequenceFu >> featureOneOf(tour, pairings, ranking) >>- {
                 lila.mon.tournament.pairing.create(pairings.size)
               }
           } >>- {

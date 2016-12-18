@@ -560,9 +560,11 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
         }
         .sortByKey(numPartitions = numReduceTasks)
         .collect()
-      val expected = (0 until size).map { i =>
-        (i / 2, i)
-      }.toArray
+      val expected = (0 until size)
+        .map { i =>
+          (i / 2, i)
+        }
+        .toArray
       assert(result.length === size)
       result.zipWithIndex.foreach {
         case ((k, _), i) =>
@@ -678,23 +680,30 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     } else {
       assert(sorter.numSpills === 0, "sorter spilled")
     }
-    val results = sorter.partitionedIterator.map {
-      case (p, vs) => (p, vs.toSet)
-    }.toSet
-    val expected = (0 until 3).map { p =>
-      var v = (0 until size).map { i =>
-        (i / 4, i)
-      }.filter { case (k, _) => k % 3 == p }.toSet
-      if (withPartialAgg) {
-        v = v
-          .groupBy(_._1)
-          .mapValues { s =>
-            s.map(_._2).sum
-          }
-          .toSet
+    val results = sorter.partitionedIterator
+      .map {
+        case (p, vs) => (p, vs.toSet)
       }
-      (p, v.toSet)
-    }.toSet
+      .toSet
+    val expected = (0 until 3)
+      .map { p =>
+        var v = (0 until size)
+          .map { i =>
+            (i / 4, i)
+          }
+          .filter { case (k, _) => k % 3 == p }
+          .toSet
+        if (withPartialAgg) {
+          v = v
+            .groupBy(_._1)
+            .mapValues { s =>
+              s.map(_._2).sum
+            }
+            .toSet
+        }
+        (p, v.toSet)
+      }
+      .toSet
     assert(results === expected)
   }
 

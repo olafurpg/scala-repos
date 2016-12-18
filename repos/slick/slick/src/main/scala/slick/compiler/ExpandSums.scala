@@ -160,9 +160,11 @@ class ExpandSums extends Phase {
     def findDisc(t: Type): Option[List[TermSymbol]] = {
       val global: Set[List[TermSymbol]] = t match {
         case NominalType(ts, exp) =>
-          val c = discCandidates.filter {
-            case (t, ss) => t == ts && ss.nonEmpty
-          }.map(_._2)
+          val c = discCandidates
+            .filter {
+              case (t, ss) => t == ts && ss.nonEmpty
+            }
+            .map(_._2)
           logger.debug(
             "Discriminator candidates from surrounding Filter and Join predicates: " +
               c.map(Path.toString).mkString(", "))
@@ -175,9 +177,11 @@ class ExpandSums extends Phase {
             defs.toSeq.flatMap { case (s, t) => find(t, s :: path) }(
               collection.breakOut)
           case p: ProductType =>
-            p.elements.iterator.zipWithIndex.flatMap {
-              case (t, i) => find(t, ElementSymbol(i + 1) :: path)
-            }.toVector
+            p.elements.iterator.zipWithIndex
+              .flatMap {
+                case (t, i) => find(t, ElementSymbol(i + 1) :: path)
+              }
+              .toVector
           case _: AtomicType => Vector(path)
           case _ => Vector.empty
         }

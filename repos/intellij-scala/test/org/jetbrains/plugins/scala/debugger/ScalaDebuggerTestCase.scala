@@ -67,9 +67,11 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
           saveChecksums()
         }
         addBreakpoints()
-        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions.find {
-          _.getClass == classOf[GenericDebuggerRunner]
-        }.get
+        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions
+          .find {
+            _.getClass == classOf[GenericDebuggerRunner]
+          }
+          .get
         processHandler = runProcess(mainClass,
                                     getModule,
                                     classOf[DefaultDebugExecutor],

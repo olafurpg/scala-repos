@@ -120,9 +120,12 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   test(
     "SPARK-10484 Optimize the Cartesian (Cross) Join with broadcast based JOIN") {
     def assertBroadcastNestedLoopJoin(sqlText: String): Unit = {
-      assert(sql(sqlText).queryExecution.sparkPlan.collect {
-        case _: BroadcastNestedLoopJoin => 1
-      }.nonEmpty)
+      assert(
+        sql(sqlText).queryExecution.sparkPlan
+          .collect {
+            case _: BroadcastNestedLoopJoin => 1
+          }
+          .nonEmpty)
     }
 
     assertBroadcastNestedLoopJoin(spark_10484_1)
@@ -726,11 +729,15 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   test("implement identity function using case statement") {
     val actual =
-      sql("SELECT (CASE key WHEN key THEN key END) FROM src").rdd.map {
-        case Row(i: Int) => i
-      }.collect().toSet
+      sql("SELECT (CASE key WHEN key THEN key END) FROM src").rdd
+        .map {
+          case Row(i: Int) => i
+        }
+        .collect()
+        .toSet
 
-    val expected = sql("SELECT key FROM src").rdd.map { case Row(i: Int) => i }
+    val expected = sql("SELECT key FROM src").rdd
+      .map { case Row(i: Int) => i }
       .collect()
       .toSet
 
@@ -1166,9 +1173,11 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
 
     assertResult(1, "Duplicated project detected\n" + analyzedPlan) {
-      analyzedPlan.collect {
-        case _: Project => ()
-      }.size
+      analyzedPlan
+        .collect {
+          case _: Project => ()
+        }
+        .size
     }
   }
 
@@ -1185,9 +1194,11 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
 
     assertResult(1, "Duplicated project detected\n" + analyzedPlan) {
-      analyzedPlan.collect {
-        case _: Project => ()
-      }.size
+      analyzedPlan
+        .collect {
+          case _: Project => ()
+        }
+        .size
     }
   }
 

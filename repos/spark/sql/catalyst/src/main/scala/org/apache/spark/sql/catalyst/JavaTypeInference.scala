@@ -250,16 +250,18 @@ object JavaTypeInference {
           case _ => None
         }
 
-        primitiveMethod.map { method =>
-          Invoke(getPath, method, ObjectType(c))
-        }.getOrElse {
-          Invoke(MapObjects(
-                   p => constructorFor(typeToken.getComponentType, Some(p)),
-                   getPath,
-                   inferDataType(elementType)._1),
-                 "array",
-                 ObjectType(c))
-        }
+        primitiveMethod
+          .map { method =>
+            Invoke(getPath, method, ObjectType(c))
+          }
+          .getOrElse {
+            Invoke(MapObjects(
+                     p => constructorFor(typeToken.getComponentType, Some(p)),
+                     getPath,
+                     inferDataType(elementType)._1),
+                   "array",
+                   ObjectType(c))
+          }
 
       case c if listType.isAssignableFrom(typeToken) =>
         val et = elementType(typeToken)
@@ -302,21 +304,23 @@ object JavaTypeInference {
         val properties = getJavaBeanProperties(other)
         assert(properties.length > 0)
 
-        val setters = properties.map { p =>
-          val fieldName = p.getName
-          val fieldType = typeToken.method(p.getReadMethod).getReturnType
-          val (_, nullable) = inferDataType(fieldType)
-          val constructor =
-            constructorFor(fieldType, Some(addToPath(fieldName)))
-          val setter =
-            if (nullable) {
-              constructor
-            } else {
-              AssertNotNull(constructor,
-                            Seq("currently no type path record in java"))
-            }
-          p.getWriteMethod.getName -> setter
-        }.toMap
+        val setters = properties
+          .map { p =>
+            val fieldName = p.getName
+            val fieldType = typeToken.method(p.getReadMethod).getReturnType
+            val (_, nullable) = inferDataType(fieldType)
+            val constructor =
+              constructorFor(fieldType, Some(addToPath(fieldName)))
+            val setter =
+              if (nullable) {
+                constructor
+              } else {
+                AssertNotNull(constructor,
+                              Seq("currently no type path record in java"))
+              }
+            p.getWriteMethod.getName -> setter
+          }
+          .toMap
 
         val newInstance =
           NewInstance(other, Nil, ObjectType(other), propagateNull = false)

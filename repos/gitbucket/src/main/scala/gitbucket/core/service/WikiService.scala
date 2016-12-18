@@ -186,40 +186,42 @@ trait WikiService {
             if (!p.getErrors.isEmpty) {
               throw new PatchFormatException(p.getErrors())
             }
-            val revertInfo = (p.getFiles.asScala.map { fh =>
-              fh.getChangeType match {
-                case DiffEntry.ChangeType.MODIFY => {
-                  val source = getWikiPage(owner,
-                                           repository,
-                                           fh.getNewPath.stripSuffix(".md"))
-                    .map(_.content)
-                    .getOrElse("")
-                  val applied = PatchUtil.apply(source, patch, fh)
-                  if (applied != null) {
-                    Seq(RevertInfo("ADD", fh.getNewPath, applied))
-                  } else Nil
-                }
-                case DiffEntry.ChangeType.ADD => {
-                  val applied = PatchUtil.apply("", patch, fh)
-                  if (applied != null) {
-                    Seq(RevertInfo("ADD", fh.getNewPath, applied))
-                  } else Nil
-                }
-                case DiffEntry.ChangeType.DELETE => {
-                  Seq(RevertInfo("DELETE", fh.getNewPath, ""))
-                }
-                case DiffEntry.ChangeType.RENAME => {
-                  val applied = PatchUtil.apply("", patch, fh)
-                  if (applied != null) {
-                    Seq(RevertInfo("DELETE", fh.getOldPath, ""),
-                        RevertInfo("ADD", fh.getNewPath, applied))
-                  } else {
-                    Seq(RevertInfo("DELETE", fh.getOldPath, ""))
+            val revertInfo = (p.getFiles.asScala
+              .map { fh =>
+                fh.getChangeType match {
+                  case DiffEntry.ChangeType.MODIFY => {
+                    val source = getWikiPage(owner,
+                                             repository,
+                                             fh.getNewPath.stripSuffix(".md"))
+                      .map(_.content)
+                      .getOrElse("")
+                    val applied = PatchUtil.apply(source, patch, fh)
+                    if (applied != null) {
+                      Seq(RevertInfo("ADD", fh.getNewPath, applied))
+                    } else Nil
                   }
+                  case DiffEntry.ChangeType.ADD => {
+                    val applied = PatchUtil.apply("", patch, fh)
+                    if (applied != null) {
+                      Seq(RevertInfo("ADD", fh.getNewPath, applied))
+                    } else Nil
+                  }
+                  case DiffEntry.ChangeType.DELETE => {
+                    Seq(RevertInfo("DELETE", fh.getNewPath, ""))
+                  }
+                  case DiffEntry.ChangeType.RENAME => {
+                    val applied = PatchUtil.apply("", patch, fh)
+                    if (applied != null) {
+                      Seq(RevertInfo("DELETE", fh.getOldPath, ""),
+                          RevertInfo("ADD", fh.getNewPath, applied))
+                    } else {
+                      Seq(RevertInfo("DELETE", fh.getOldPath, ""))
+                    }
+                  }
+                  case _ => Nil
                 }
-                case _ => Nil
-              }
-            }).flatten
+              })
+              .flatten
 
             if (revertInfo.nonEmpty) {
               val builder = DirCache.newInCore.builder()

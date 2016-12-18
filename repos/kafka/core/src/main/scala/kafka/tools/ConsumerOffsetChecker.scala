@@ -212,10 +212,12 @@ object ConsumerOffsetChecker extends Logging {
 
       topicPidMap =
         immutable.Map(zkUtils.getPartitionsForTopics(topicList).toSeq: _*)
-      val topicPartitions = topicPidMap.flatMap {
-        case (topic, partitionSeq) =>
-          partitionSeq.map(TopicAndPartition(topic, _))
-      }.toSeq
+      val topicPartitions = topicPidMap
+        .flatMap {
+          case (topic, partitionSeq) =>
+            partitionSeq.map(TopicAndPartition(topic, _))
+        }
+        .toSeq
       val channel = ClientUtils.channelToOffsetManager(group,
                                                        zkUtils,
                                                        channelSocketTimeoutMs,

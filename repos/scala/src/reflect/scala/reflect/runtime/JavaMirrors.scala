@@ -335,9 +335,11 @@ private[scala] trait JavaMirrors
       lazy val boxer =
         runtimeClass(symbol.toType).getDeclaredConstructors().head
       lazy val unboxer = {
-        val fields @ (field :: _) = symbol.toType.decls.collect {
-          case ts: TermSymbol if ts.isParamAccessor && ts.isMethod => ts
-        }.toList
+        val fields @ (field :: _) = symbol.toType.decls
+          .collect {
+            case ts: TermSymbol if ts.isParamAccessor && ts.isMethod => ts
+          }
+          .toList
         assert(fields.length == 1, s"$symbol: $fields")
         runtimeClass(symbol.asClass).getDeclaredMethod(field.name.toString)
       }

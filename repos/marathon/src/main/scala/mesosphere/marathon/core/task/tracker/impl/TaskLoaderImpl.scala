@@ -24,10 +24,12 @@ private[tracker] class TaskLoaderImpl(repo: TaskRepository)
     } yield {
       log.info(s"Loaded ${tasks.size} tasks")
       val tasksByApp = tasks.groupBy(task => Task.Id(task.getId).appId)
-      val map = tasksByApp.iterator.map {
-        case (appId, appTasks) =>
-          appId -> TaskTracker.AppTasks(appId, appTasks)
-      }.toMap
+      val map = tasksByApp.iterator
+        .map {
+          case (appId, appTasks) =>
+            appId -> TaskTracker.AppTasks(appId, appTasks)
+        }
+        .toMap
       TaskTracker.TasksByApp.of(map)
     }
   }

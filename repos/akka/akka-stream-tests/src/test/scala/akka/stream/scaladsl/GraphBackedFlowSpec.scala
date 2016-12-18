@@ -50,10 +50,12 @@ class GraphFlowSpec extends AkkaSpec {
                     result: Set[Int]): Unit = {
     val subscription = probe.expectSubscription()
 
-    val collected = (1 to requests).map { _ ⇒
-      subscription.request(1)
-      probe.expectNext()
-    }.toSet
+    val collected = (1 to requests)
+      .map { _ ⇒
+        subscription.request(1)
+        probe.expectNext()
+      }
+      .toSet
 
     collected should be(result)
     probe.expectComplete()

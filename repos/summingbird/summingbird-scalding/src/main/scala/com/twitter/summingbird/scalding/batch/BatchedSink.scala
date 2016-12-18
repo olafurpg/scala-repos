@@ -80,9 +80,12 @@ trait BatchedSink[T] extends Sink[T] {
       }
 
       // Maybe an inclusive interval of batches to pull from incoming
-      val batchesToWrite: Option[(BatchID, BatchID)] = batchStreams.dropWhile {
-        _._2.isDefined
-      }.map { _._1 }.toList match {
+      val batchesToWrite: Option[(BatchID, BatchID)] = batchStreams
+        .dropWhile {
+          _._2.isDefined
+        }
+        .map { _._1 }
+        .toList match {
         case Nil => None
         case list => Some((list.min, list.max))
       }
@@ -108,9 +111,11 @@ trait BatchedSink[T] extends Sink[T] {
         val flows = aFlows ++ (optBuilt.map { _._2 })
         val batches =
           aBatches ++
-            (optBuilt.map { pair =>
-              BatchID.toIterable(pair._1)
-            }.getOrElse(Iterable.empty))
+            (optBuilt
+              .map { pair =>
+                BatchID.toIterable(pair._1)
+              }
+              .getOrElse(Iterable.empty))
 
         if (flows.isEmpty)
           Left(

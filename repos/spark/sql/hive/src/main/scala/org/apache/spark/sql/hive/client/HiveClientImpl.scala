@@ -412,11 +412,13 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
       val hiveTable = toHiveTable(catalogTable)
       specs.zip(newSpecs).foreach {
         case (oldSpec, newSpec) =>
-          val hivePart = getPartitionOption(catalogTable, oldSpec).map { p =>
-            toHivePartition(p.copy(spec = newSpec), hiveTable)
-          }.getOrElse {
-            throw new NoSuchPartitionException(db, table, oldSpec)
-          }
+          val hivePart = getPartitionOption(catalogTable, oldSpec)
+            .map { p =>
+              toHivePartition(p.copy(spec = newSpec), hiveTable)
+            }
+            .getOrElse {
+              throw new NoSuchPartitionException(db, table, oldSpec)
+            }
           client.renamePartition(hiveTable, oldSpec.asJava, hivePart)
       }
     }
@@ -426,9 +428,12 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                                newParts: Seq[CatalogTablePartition]): Unit =
     withHiveState {
       val hiveTable = toHiveTable(getTable(db, table))
-      client.alterPartitions(table, newParts.map { p =>
-        toHivePartition(p, hiveTable)
-      }.asJava)
+      client.alterPartitions(table,
+                             newParts
+                               .map { p =>
+                                 toHivePartition(p, hiveTable)
+                               }
+                               .asJava)
     }
 
   override def getPartitionOption(table: CatalogTable,
@@ -729,9 +734,13 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
 
   private def toHivePartition(p: CatalogTablePartition,
                               ht: HiveTable): HivePartition = {
-    new HivePartition(ht, p.spec.asJava, p.storage.locationUri.map { l =>
-      new Path(l)
-    }.orNull)
+    new HivePartition(ht,
+                      p.spec.asJava,
+                      p.storage.locationUri
+                        .map { l =>
+                          new Path(l)
+                        }
+                        .orNull)
   }
 
   private def fromHivePartition(hp: HivePartition): CatalogTablePartition = {

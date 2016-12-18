@@ -91,9 +91,11 @@ class BundleDelegatingClassLoader(bundle: Bundle,
                 .getRequiredWires(BundleRevision.PACKAGE_NAMESPACE)
                 .asScala
                 .toList
-              requiredWires.flatMap { wire ⇒
-                Option(wire.getProviderWiring) map { _.getBundle }
-              }.toSet
+              requiredWires
+                .flatMap { wire ⇒
+                  Option(wire.getProviderWiring) map { _.getBundle }
+                }
+                .toSet
             }
           process(processed + b, rest ++ (direct -- processed))
         }

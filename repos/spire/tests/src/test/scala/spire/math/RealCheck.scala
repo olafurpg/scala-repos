@@ -211,10 +211,12 @@ class RealCheck
 
   def arcSample(f: Rational => Rational)(g: Double => Double,
                                          h: Real => Real): String =
-    (-8 to 8).map { i =>
-      val x = Real(f(Rational(i)))
-      if ((g(x.toDouble) - h(x).toDouble).abs < 0.00001) "." else "!"
-    }.mkString
+    (-8 to 8)
+      .map { i =>
+        val x = Real(f(Rational(i)))
+        if ((g(x.toDouble) - h(x).toDouble).abs < 0.00001) "." else "!"
+      }
+      .mkString
 
   // useful for visually debugging atan/asin
   property("atan sample") {

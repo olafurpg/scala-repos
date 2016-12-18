@@ -87,9 +87,11 @@ object ParseDriver extends Logging {
 
       // Construct the immutable AST.
       def createASTNode(tree: CommonTree): ASTNode = {
-        val children = (0 until tree.getChildCount).map { i =>
-          createASTNode(tree.getChild(i).asInstanceOf[CommonTree])
-        }.toList
+        val children = (0 until tree.getChildCount)
+          .map { i =>
+            createASTNode(tree.getChild(i).asInstanceOf[CommonTree])
+          }
+          .toList
         ASTNode(tree.token,
                 tree.getTokenStartIndex,
                 tree.getTokenStopIndex,

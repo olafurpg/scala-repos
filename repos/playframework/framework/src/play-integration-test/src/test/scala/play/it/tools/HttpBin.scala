@@ -127,17 +127,18 @@ object HttpBinApplication {
   private def gzipFilter(mat: Materializer) = new GzipFilter()(mat)
 
   def gzip(implicit mat: Materializer) =
-    Seq("GET", "PATCH", "POST", "PUT", "DELETE").map { method =>
-      val route: Routes = {
-        case r @ p"/gzip" if r.method == method =>
-          gzipFilter(mat)(Action { request =>
-            Ok(
-              requestHeaderWriter.writes(request).as[JsObject] ++ Json
+    Seq("GET", "PATCH", "POST", "PUT", "DELETE")
+      .map { method =>
+        val route: Routes = {
+          case r @ p"/gzip" if r.method == method =>
+            gzipFilter(mat)(Action { request =>
+              Ok(requestHeaderWriter.writes(request).as[JsObject] ++ Json
                 .obj("gzipped" -> true, "method" -> method))
-          })
+            })
+        }
+        route
       }
-      route
-    }.reduceLeft((a, b) => a.orElse(b))
+      .reduceLeft((a, b) => a.orElse(b))
 
   val status: Routes = {
     case GET(p"/status/$status<[0-9]+>") =>

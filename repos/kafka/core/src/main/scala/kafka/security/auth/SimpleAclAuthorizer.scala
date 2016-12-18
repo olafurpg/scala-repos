@@ -254,12 +254,15 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
 
   override def getAcls(principal: KafkaPrincipal): Map[Resource, Set[Acl]] = {
     inReadLock(lock) {
-      aclCache.mapValues { versionedAcls =>
-        versionedAcls.acls.filter(_.principal == principal)
-      }.filter {
-        case (_, acls) =>
-          acls.nonEmpty
-      }.toMap
+      aclCache
+        .mapValues { versionedAcls =>
+          versionedAcls.acls.filter(_.principal == principal)
+        }
+        .filter {
+          case (_, acls) =>
+            acls.nonEmpty
+        }
+        .toMap
     }
   }
 

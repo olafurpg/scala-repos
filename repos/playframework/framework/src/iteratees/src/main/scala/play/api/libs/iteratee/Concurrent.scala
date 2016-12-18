@@ -115,27 +115,29 @@ object Concurrent {
       val ready = interested.map {
         case (it, p) =>
           it.fold {
-            case Step.Done(a, e) => Future.successful(Left(Done(a, e)))
-            case Step.Cont(k) => {
-              val next = k(in)
-              next.pureFold {
-                case Step.Done(a, e) => Left(Done(a, e))
-                case Step.Cont(k) => Right((Cont(k), p))
-                case Step.Error(msg, e) => Left(Error(msg, e))
-              }(dec)
-            }
-            case Step.Error(msg, e) => Future.successful(Left(Error(msg, e)))
-          }(dec).map {
-            case Left(s) =>
-              p.success(s)
-              None
-            case Right(s) =>
-              Some(s)
-          }(dec).recover {
-            case NonFatal(e) =>
-              p.failure(e)
-              None
-          }(dec)
+              case Step.Done(a, e) => Future.successful(Left(Done(a, e)))
+              case Step.Cont(k) => {
+                val next = k(in)
+                next.pureFold {
+                  case Step.Done(a, e) => Left(Done(a, e))
+                  case Step.Cont(k) => Right((Cont(k), p))
+                  case Step.Error(msg, e) => Left(Error(msg, e))
+                }(dec)
+              }
+              case Step.Error(msg, e) => Future.successful(Left(Error(msg, e)))
+            }(dec)
+            .map {
+              case Left(s) =>
+                p.success(s)
+                None
+              case Right(s) =>
+                Some(s)
+            }(dec)
+            .recover {
+              case NonFatal(e) =>
+                p.failure(e)
+                None
+            }(dec)
       }
 
       Iteratee.flatten(
@@ -388,15 +390,16 @@ object Concurrent {
           } &> k(in))
         }(dec))
       }
-      (new CheckDone[E, E] { def continue[A](cont: K[E, A]) = moreInput(cont) } &> it).unflatten.onComplete {
-        case Success(it) =>
-          state.single() = DoneIt(it.it)
-          last.success(it.it)
-        case Failure(e) =>
-          state.single() = DoneIt(
-            Iteratee.flatten(Future.failed[Iteratee[E, Iteratee[E, A]]](e)))
-          last.failure(e)
-      }(dec)
+      (new CheckDone[E, E] { def continue[A](cont: K[E, A]) = moreInput(cont) } &> it).unflatten
+        .onComplete {
+          case Success(it) =>
+            state.single() = DoneIt(it.it)
+            last.success(it.it)
+          case Failure(e) =>
+            state.single() = DoneIt(
+              Iteratee.flatten(Future.failed[Iteratee[E, Iteratee[E, A]]](e)))
+            last.failure(e)
+        }(dec)
       Cont(step)
     }
   }
@@ -634,41 +637,46 @@ object Concurrent {
 
       val commitDone: Ref[List[Int]] = Ref(List())
 
-      val ready = interested.zipWithIndex.map {
-        case (t, index) =>
-          val p = t._2
-          t._1.fold {
-            case Step.Done(a, e) =>
-              p.success(Done(a, e))
-              commitDone.single.transform(_ :+ index)
-              Future.successful(())
-
-            case Step.Cont(k) =>
-              val next = k(in)
-              next.pureFold {
-                case Step.Done(a, e) => {
+      val ready = interested.zipWithIndex
+        .map {
+          case (t, index) =>
+            val p = t._2
+            t._1
+              .fold {
+                case Step.Done(a, e) =>
                   p.success(Done(a, e))
                   commitDone.single.transform(_ :+ index)
-                }
+                  Future.successful(())
+
                 case Step.Cont(k) =>
-                  commitReady.single.transform(_ :+ (index -> (Cont(k) -> p)))
-                case Step.Error(msg, e) => {
+                  val next = k(in)
+                  next.pureFold {
+                    case Step.Done(a, e) => {
+                      p.success(Done(a, e))
+                      commitDone.single.transform(_ :+ index)
+                    }
+                    case Step.Cont(k) =>
+                      commitReady.single.transform(
+                        _ :+ (index -> (Cont(k) -> p)))
+                    case Step.Error(msg, e) => {
+                      p.success(Error(msg, e))
+                      commitDone.single.transform(_ :+ index)
+                    }
+                  }(dec)
+
+                case Step.Error(msg, e) =>
                   p.success(Error(msg, e))
                   commitDone.single.transform(_ :+ index)
-                }
+                  Future.successful(())
               }(dec)
-
-            case Step.Error(msg, e) =>
-              p.success(Error(msg, e))
-              commitDone.single.transform(_ :+ index)
-              Future.successful(())
-          }(dec).andThen {
-            case Success(a) => a
-            case Failure(e) => p.failure(e)
-          }(dec)
-      }.fold(Future.successful(())) { (s, p) =>
-        s.flatMap(_ => p)(dec)
-      }
+              .andThen {
+                case Success(a) => a
+                case Failure(e) => p.failure(e)
+              }(dec)
+        }
+        .fold(Future.successful(())) { (s, p) =>
+          s.flatMap(_ => p)(dec)
+        }
 
       Iteratee.flatten(ready.flatMap { _ =>
         val downToZero = atomic { implicit txn =>

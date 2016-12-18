@@ -97,13 +97,15 @@ case class OffsetFetchRequest(
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
                            request: RequestChannel.Request): Unit = {
-    val responseMap = requestInfo.map {
-      case (topicAndPartition) =>
-        (topicAndPartition,
-         OffsetMetadataAndError(
-           Errors.forException(e).code
-         ))
-    }.toMap
+    val responseMap = requestInfo
+      .map {
+        case (topicAndPartition) =>
+          (topicAndPartition,
+           OffsetMetadataAndError(
+             Errors.forException(e).code
+           ))
+      }
+      .toMap
     val errorResponse = OffsetFetchResponse(requestInfo = responseMap,
                                             correlationId = correlationId)
     requestChannel.sendResponse(

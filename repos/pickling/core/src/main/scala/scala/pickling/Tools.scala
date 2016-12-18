@@ -144,13 +144,16 @@ class Tools[C <: Context](val c: C) {
           if (sym.isFinal || sym.isModuleClass) {
             Nil
           } else if (treatAsSealed(sym)) {
-            val syms: List[ClassSymbol] = directSubclasses(sym).map {
-              case csym: ClassSymbol => csym
-              case msym: ModuleSymbol => msym.moduleClass.asClass
-              case osym =>
-                throw new Exception(
-                  s"unexpected known direct subclass: $osym <: $sym")
-            }.toList.flatMap(loop)
+            val syms: List[ClassSymbol] = directSubclasses(sym)
+              .map {
+                case csym: ClassSymbol => csym
+                case msym: ModuleSymbol => msym.moduleClass.asClass
+                case osym =>
+                  throw new Exception(
+                    s"unexpected known direct subclass: $osym <: $sym")
+              }
+              .toList
+              .flatMap(loop)
             syms
           } else {
             hierarchyIsSealed = false

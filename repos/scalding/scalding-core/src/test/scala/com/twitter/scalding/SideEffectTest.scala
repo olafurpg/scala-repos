@@ -28,7 +28,8 @@ class Zip(args: Args) extends Job(args) {
     def release() {}
   }
 
-  val zipped = Tsv("line", ('line)).pipe.using { createState }
+  val zipped = Tsv("line", ('line)).pipe
+    .using { createState }
     .flatMap[String, (String, String)]('line -> ('l1, 'l2)) {
       case (accu, line) =>
         if (accu.lastLine == null) {

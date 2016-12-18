@@ -220,9 +220,11 @@ object HeapBackend extends HeapBackend {
     private[this] val autoInc = sym.options.collectFirst {
       case ColumnOption.AutoInc => new AtomicLong()
     }
-    val isUnique = sym.options.collectFirst {
-      case ColumnOption.PrimaryKey => true
-    }.getOrElse(false)
+    val isUnique = sym.options
+      .collectFirst {
+        case ColumnOption.PrimaryKey => true
+      }
+      .getOrElse(false)
     def createDefault: Any = autoInc match {
       case Some(a) =>
         val i = a.incrementAndGet()

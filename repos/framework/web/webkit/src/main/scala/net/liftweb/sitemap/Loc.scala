@@ -58,10 +58,13 @@ trait Loc[T] {
     * uses it.
     */
   protected lazy val cacheCssClassForMenuItem: Box[() => String] =
-    allParams.flatMap {
-      case a: Loc.MenuCssClass => List(a)
-      case _ => Nil
-    }.headOption.map(_.cssClass.func)
+    allParams
+      .flatMap {
+        case a: Loc.MenuCssClass => List(a)
+        case _ => Nil
+      }
+      .headOption
+      .map(_.cssClass.func)
 
   /**
     * Given a value calculate the HREF to this item
@@ -138,7 +141,9 @@ trait Loc[T] {
       case menu =>
         menu._parent match {
           case Full(parentMenu: Menu) =>
-            if (!params.collect { case i: Loc.UseParentParams => true }.isEmpty) {
+            if (!params
+                  .collect { case i: Loc.UseParentParams => true }
+                  .isEmpty) {
               parentMenu.loc.allParams.asInstanceOf[List[Loc.LocParam[Any]]]
             } else {
               Nil
@@ -226,21 +231,28 @@ trait Loc[T] {
     * looks for the Loc.Stateless Param
     */
   protected def calcStateless(): Boolean =
-    allParams.find {
-      case Loc.Stateless => true
-      case _ => false
-    }.isDefined
+    allParams
+      .find {
+        case Loc.Stateless => true
+        case _ => false
+      }
+      .isDefined
 
   /**
     * Find the stateless calculation Loc params
     */
   protected def findStatelessCalc: (Box[Loc.CalcStateless],
                                     Box[Loc.CalcParamStateless[T]]) =
-    (allParams.collect {
-      case v @ Loc.CalcStateless(_) => v
-    }.headOption, allParams.collect {
-      case v @ Loc.CalcParamStateless(_) => v
-    }.headOption)
+    (allParams
+       .collect {
+         case v @ Loc.CalcStateless(_) => v
+       }
+       .headOption,
+     allParams
+       .collect {
+         case v @ Loc.CalcParamStateless(_) => v
+       }
+       .headOption)
 
   /**
     * The cached Loc params
@@ -264,9 +276,12 @@ trait Loc[T] {
   /**
     * The snippets provided by `LocParam`s
     */
-  lazy val calcSnippets: SnippetTest = allParams.collect {
-    case v: Loc.ValueSnippets[T] => v.snippets
-  }.reduceLeftOption(_ orElse _).getOrElse(Map.empty)
+  lazy val calcSnippets: SnippetTest = allParams
+    .collect {
+      case v: Loc.ValueSnippets[T] => v.snippets
+    }
+    .reduceLeftOption(_ orElse _)
+    .getOrElse(Map.empty)
 
   /**
     * Look up a snippet by name, taking into account the current
@@ -344,13 +359,15 @@ trait Loc[T] {
     * The first Loc.Template or Loc.ValueTemplate in the param list.
     */
   def paramTemplate: Box[NodeSeq] =
-    allParams.flatMap {
-      case Loc.Template(f) => Some(f());
-      case Loc.ValueTemplate(f) => Some(f(currentValue));
-      case Loc.TemplateBox(f) => f()
-      case Loc.ValueTemplateBox(f) => f(currentValue)
-      case _ => None
-    }.headOption
+    allParams
+      .flatMap {
+        case Loc.Template(f) => Some(f());
+        case Loc.ValueTemplate(f) => Some(f(currentValue));
+        case Loc.TemplateBox(f) => f()
+        case Loc.ValueTemplateBox(f) => f(currentValue)
+        case _ => None
+      }
+      .headOption
 
   /**
     * The template assocaited with this Loc, if any. Any Loc.Template
@@ -362,10 +379,12 @@ trait Loc[T] {
   /**
     * The first Loc.Title in the param list.
     */
-  lazy val paramTitle: Box[T => NodeSeq] = allParams.flatMap {
-    case Loc.Title(f) => Some(f);
-    case _ => None
-  }.headOption
+  lazy val paramTitle: Box[T => NodeSeq] = allParams
+    .flatMap {
+      case Loc.Title(f) => Some(f);
+      case _ => None
+    }
+    .headOption
 
   /**
     * The title to be displayed for the value associated with this Loc.

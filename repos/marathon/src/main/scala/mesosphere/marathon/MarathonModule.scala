@@ -152,9 +152,10 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
         EventSubscribers],
       @Named(ModuleNames.STORE_TASK) task: EntityStore[MarathonTaskState])
     : Seq[LeadershipCallback] = {
-    Seq(app, group, deployment, frameworkId, taskFailure, task, subscribers).collect {
-      case l: LeadershipCallback => l
-    }
+    Seq(app, group, deployment, frameworkId, taskFailure, task, subscribers)
+      .collect {
+        case l: LeadershipCallback => l
+      }
   }
 
   @Named(ModuleNames.HTTP_EVENT_STREAM)

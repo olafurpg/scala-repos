@@ -279,27 +279,29 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
 
         while (keepOnDoingHighPriory) {
           val hiPriPfBox = highPriorityReceive
-          hiPriPfBox.map { hiPriPf =>
-            findMailboxItem(
-              baseMailbox.next,
-              mb => testTranslate(hiPriPf.isDefinedAt)(mb.item)) match {
-              case Full(mb) =>
-                mb.remove()
-                try {
-                  execTranslate(hiPriPf)(mb.item)
-                } catch {
-                  case e: Exception => if (eh.isDefinedAt(e)) eh(e)
-                }
-              case _ =>
-                baseMailbox.synchronized {
-                  if (msgList.isEmpty) {
-                    keepOnDoingHighPriory = false
-                  } else {
-                    putListIntoMB()
+          hiPriPfBox
+            .map { hiPriPf =>
+              findMailboxItem(
+                baseMailbox.next,
+                mb => testTranslate(hiPriPf.isDefinedAt)(mb.item)) match {
+                case Full(mb) =>
+                  mb.remove()
+                  try {
+                    execTranslate(hiPriPf)(mb.item)
+                  } catch {
+                    case e: Exception => if (eh.isDefinedAt(e)) eh(e)
                   }
-                }
+                case _ =>
+                  baseMailbox.synchronized {
+                    if (msgList.isEmpty) {
+                      keepOnDoingHighPriory = false
+                    } else {
+                      putListIntoMB()
+                    }
+                  }
+              }
             }
-          }.openOr { keepOnDoingHighPriory = false }
+            .openOr { keepOnDoingHighPriory = false }
         }
 
         val pf = messageHandler
@@ -570,9 +572,12 @@ object LiftActorJ {
 }
 
 private final class DispatchVendor(map: Map[Class[_], Method]) {
-  private val baseMap: Map[Class[_], Option[Method]] = Map(map.map {
-    case (k, v) => (k, Some(v))
-  }.toList: _*)
+  private val baseMap: Map[Class[_], Option[Method]] = Map(
+    map
+      .map {
+        case (k, v) => (k, Some(v))
+      }
+      .toList: _*)
 
   def vend(actor: LiftActorJ): PartialFunction[Any, Unit] =
     new PartialFunction[Any, Unit] {

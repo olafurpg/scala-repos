@@ -696,16 +696,18 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
     import scalaz.syntax.traverse._
     import scalaz.std.list._
 
-    val writes: ByteBufferPoolS[List[Unit]] = cvals.map {
-      case v: CNullValue =>
-        writeFlagFor(v.cType)
+    val writes: ByteBufferPoolS[List[Unit]] = cvals
+      .map {
+        case v: CNullValue =>
+          writeFlagFor(v.cType)
 
-      case v: CWrappedValue[_] =>
-        for {
-          _ <- writeFlagFor(v.cType)
-          _ <- codecForCValueType(v.cType).write(v.value)
-        } yield ()
-    }.sequence
+        case v: CWrappedValue[_] =>
+          for {
+            _ <- writeFlagFor(v.cType)
+            _ <- codecForCValueType(v.cType).write(v.value)
+          } yield ()
+      }
+      .sequence
 
     pool.run(for {
       _ <- writes
@@ -732,10 +734,12 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
       }
     }
 
-    selectors.map {
-      case (_, cTypes) =>
-        readForSelector(cTypes)
-    }.flatten
+    selectors
+      .map {
+        case (_, cTypes) =>
+          readForSelector(cTypes)
+      }
+      .flatten
   }
 
   override def compare(a: Array[Byte], b: Array[Byte]): Int = {

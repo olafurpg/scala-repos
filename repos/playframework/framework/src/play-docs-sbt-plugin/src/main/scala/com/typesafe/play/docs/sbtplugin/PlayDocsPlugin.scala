@@ -301,10 +301,12 @@ object PlayDocsPlugin extends AutoPlugin {
                                        classOf[Array[String]])
 
     val files = allResources.map(_.file).toArray[File]
-    val baseDirs = allResources.map {
-      case PlayDocsJarFileResource(_, base) => base.orNull
-      case PlayDocsDirectoryResource(_) => null
-    }.toArray[String]
+    val baseDirs = allResources
+      .map {
+        case PlayDocsJarFileResource(_, base) => base.orNull
+        case PlayDocsDirectoryResource(_) => null
+      }
+      .toArray[String]
 
     val buildDocHandler = fromResourcesMethod.invoke(null, files, baseDirs)
 

@@ -42,21 +42,23 @@ private[python] object Converter extends Logging {
   def getInstance(
       converterClass: Option[String],
       defaultConverter: Converter[Any, Any]): Converter[Any, Any] = {
-    converterClass.map { cc =>
-      Try {
-        val c = Utils
-          .classForName(cc)
-          .newInstance()
-          .asInstanceOf[Converter[Any, Any]]
-        logInfo(s"Loaded converter: $cc")
-        c
-      } match {
-        case Success(c) => c
-        case Failure(err) =>
-          logError(s"Failed to load converter: $cc")
-          throw err
+    converterClass
+      .map { cc =>
+        Try {
+          val c = Utils
+            .classForName(cc)
+            .newInstance()
+            .asInstanceOf[Converter[Any, Any]]
+          logInfo(s"Loaded converter: $cc")
+          c
+        } match {
+          case Success(c) => c
+          case Failure(err) =>
+            logError(s"Failed to load converter: $cc")
+            throw err
+        }
       }
-    }.getOrElse { defaultConverter }
+      .getOrElse { defaultConverter }
   }
 }
 

@@ -35,17 +35,18 @@ class TypedCosineSimJob(args: Args) extends Job(args) {
     }
   }
   // Just keep the degree
-  .map { edge =>
-    edge.mapData { _._2 }
-  }
+    .map { edge =>
+      edge.mapData { _._2 }
+    }
 
   simOf(graph, { n: Int =>
     n % 2 == 0
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
@@ -62,32 +63,38 @@ class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.toPipe('from, 'to, 'data).write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .toPipe('from, 'to, 'data)
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedSimilarityTest extends WordSpec with Matchers {
   val nodes = 50
   val rand = new java.util.Random(1)
-  val edges = (0 to nodes).flatMap { n =>
-    // try to get at least 6 edges for each node
-    (0 to ((nodes / 5) max (6))).foldLeft(Set[(Int, Int)]()) { (set, idx) =>
-      if (set.size > 6) { set } else {
-        set + (n -> rand.nextInt(nodes))
+  val edges = (0 to nodes)
+    .flatMap { n =>
+      // try to get at least 6 edges for each node
+      (0 to ((nodes / 5) max (6))).foldLeft(Set[(Int, Int)]()) { (set, idx) =>
+        if (set.size > 6) { set } else {
+          set + (n -> rand.nextInt(nodes))
+        }
       }
     }
-  }.toSeq
+    .toSeq
 
   val MaxWeight = 2
-  val weightedEdges = (0 to nodes).flatMap { n =>
-    // try to get at least 10 edges for each node
-    (0 to ((nodes / 5) max (10))).foldLeft(Set[(Int, Int, Double)]()) {
-      (set, idx) =>
-        if (set.size > 10) { set } else {
-          set + ((n, rand.nextInt(nodes), rand.nextDouble * MaxWeight))
-        }
+  val weightedEdges = (0 to nodes)
+    .flatMap { n =>
+      // try to get at least 10 edges for each node
+      (0 to ((nodes / 5) max (10))).foldLeft(Set[(Int, Int, Double)]()) {
+        (set, idx) =>
+          if (set.size > 10) { set } else {
+            set + ((n, rand.nextInt(nodes), rand.nextDouble * MaxWeight))
+          }
+      }
     }
-  }.toSeq
+    .toSeq
 
   def cosineOf(es: Seq[(Int, Int)]): Map[(Int, Int), Double] = {
     // Get followers of each node:

@@ -121,9 +121,11 @@ class ReceivedBlockTrackerSuite
 
     // Print the data present in the log ahead files in the log directory
     def printLogFiles(message: String) {
-      val fileContents = getWriteAheadLogFiles().map { file =>
-        (s"\n>>>>> $file: <<<<<\n${getWrittenLogData(file).mkString("\n")}")
-      }.mkString("\n")
+      val fileContents = getWriteAheadLogFiles()
+        .map { file =>
+          (s"\n>>>>> $file: <<<<<\n${getWrittenLogData(file).mkString("\n")}")
+        }
+        .mkString("\n")
       logInfo(
         s"\n\n=====================\n$message\n$fileContents\n=====================\n")
     }
@@ -371,20 +373,23 @@ class ReceivedBlockTrackerSuite
     */
   def getWrittenLogData(logFiles: Seq[String] = getWriteAheadLogFiles)
     : Seq[ReceivedBlockTrackerLogEvent] = {
-    logFiles.flatMap { file =>
-      new FileBasedWriteAheadLogReader(file, hadoopConf).toSeq
-    }.flatMap { byteBuffer =>
-      val validBuffer =
-        if (WriteAheadLogUtils.isBatchingEnabled(conf, isDriver = true)) {
-          Utils
-            .deserialize[Array[Array[Byte]]](byteBuffer.array())
-            .map(ByteBuffer.wrap)
-        } else {
-          Array(byteBuffer)
-        }
-      validBuffer.map(b =>
-        Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
-    }.toList
+    logFiles
+      .flatMap { file =>
+        new FileBasedWriteAheadLogReader(file, hadoopConf).toSeq
+      }
+      .flatMap { byteBuffer =>
+        val validBuffer =
+          if (WriteAheadLogUtils.isBatchingEnabled(conf, isDriver = true)) {
+            Utils
+              .deserialize[Array[Array[Byte]]](byteBuffer.array())
+              .map(ByteBuffer.wrap)
+          } else {
+            Array(byteBuffer)
+          }
+        validBuffer.map(b =>
+          Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
+      }
+      .toList
   }
 
   /** Get all the write ahead log files in the test directory */

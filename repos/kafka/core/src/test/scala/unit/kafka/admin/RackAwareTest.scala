@@ -92,9 +92,11 @@ trait RackAwareTest {
     rackMap.toSeq.map {
       case (brokerId, rack) =>
         BrokerMetadata(brokerId, Some(rack))
-    } ++ brokersWithoutRack.map { brokerId =>
-      BrokerMetadata(brokerId, None)
-    }.sortBy(_.id)
+    } ++ brokersWithoutRack
+      .map { brokerId =>
+        BrokerMetadata(brokerId, None)
+      }
+      .sortBy(_.id)
 }
 
 case class ReplicaDistributions(partitionRacks: Map[Int, Seq[String]],

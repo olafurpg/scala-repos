@@ -33,9 +33,11 @@ class TypedWriteIncrementalJob(args: Args) extends Job(args) {
 
   implicit val inj = Injection.connect[(Int, Int), (Array[Byte], Array[Byte])]
 
-  pipe.map { k =>
-    (k, k)
-  }.writeIncremental(VersionedKeyValSource[Int, Int]("output"))
+  pipe
+    .map { k =>
+      (k, k)
+    }
+    .writeIncremental(VersionedKeyValSource[Int, Int]("output"))
 }
 
 class MoreComplexTypedWriteIncrementalJob(args: Args) extends Job(args) {
@@ -44,9 +46,13 @@ class MoreComplexTypedWriteIncrementalJob(args: Args) extends Job(args) {
 
   implicit val inj = Injection.connect[(Int, Int), (Array[Byte], Array[Byte])]
 
-  pipe.map { k =>
-    (k, k)
-  }.group.sum.writeIncremental(VersionedKeyValSource[Int, Int]("output"))
+  pipe
+    .map { k =>
+      (k, k)
+    }
+    .group
+    .sum
+    .writeIncremental(VersionedKeyValSource[Int, Int]("output"))
 }
 
 class ToIteratorJob(args: Args) extends Job(args) {
@@ -75,9 +81,11 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
             assert(
-              input.map { k =>
-                (k, k)
-              }.sortBy(_._1)
+              input
+                .map { k =>
+                  (k, k)
+                }
+                .sortBy(_._1)
                 .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
@@ -95,9 +103,11 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
             assert(
-              input.map { k =>
-                (k, k)
-              }.sortBy(_._1)
+              input
+                .map { k =>
+                  (k, k)
+                }
+                .sortBy(_._1)
                 .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }

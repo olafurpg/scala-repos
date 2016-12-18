@@ -282,9 +282,12 @@ private[finagle] class TrafficDistributor[Req, Rep](
     val size = classes.map(_.size).sum
     meanWeight =
       if (size != 0)
-        classes.map { c =>
-          c.weight * c.size
-        }.sum.toFloat / size
+        classes
+          .map { c =>
+            c.weight * c.size
+          }
+          .sum
+          .toFloat / size
       else 0.0F
   }
 

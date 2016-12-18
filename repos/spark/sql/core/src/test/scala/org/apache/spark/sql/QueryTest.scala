@@ -205,15 +205,17 @@ abstract class QueryTest extends PlanTest {
   private def checkJsonFormat(df: DataFrame): Unit = {
     val logicalPlan = df.queryExecution.analyzed
     // bypass some cases that we can't handle currently.
-    logicalPlan.transform {
-      case _: MapPartitions => return
-      case _: MapGroups => return
-      case _: AppendColumns => return
-      case _: CoGroup => return
-      case _: LogicalRelation => return
-    }.transformAllExpressions {
-      case a: ImperativeAggregate => return
-    }
+    logicalPlan
+      .transform {
+        case _: MapPartitions => return
+        case _: MapGroups => return
+        case _: AppendColumns => return
+        case _: CoGroup => return
+        case _: LogicalRelation => return
+      }
+      .transformAllExpressions {
+        case a: ImperativeAggregate => return
+      }
 
     // bypass hive tests before we fix all corner cases in hive module.
     if (this.getClass.getName.startsWith("org.apache.spark.sql.hive")) return
@@ -321,7 +323,8 @@ object QueryTest {
     * @param expectedAnswer the expected result in a [[Seq]] of [[Row]]s.
     */
   def checkAnswer(df: DataFrame, expectedAnswer: Seq[Row]): Option[String] = {
-    val isSorted = df.logicalPlan.collect { case s: logical.Sort => s }.nonEmpty
+    val isSorted =
+      df.logicalPlan.collect { case s: logical.Sort => s }.nonEmpty
 
     val sparkAnswer = try df.collect().toSeq
     catch {

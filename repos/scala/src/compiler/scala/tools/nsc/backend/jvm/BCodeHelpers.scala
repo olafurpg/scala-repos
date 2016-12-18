@@ -348,15 +348,18 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       csym: Symbol,
       cName: String,
       cunit: CompilationUnit): _root_.scala.tools.nsc.io.AbstractFile =
-    _root_.scala.util.Try {
-      outputDirectory(csym)
-    }.recover {
-      case ex: Throwable =>
-        reporter.error(
-          cunit.body.pos,
-          s"Couldn't create file for class $cName\n${ex.getMessage}")
-        null
-    }.get
+    _root_.scala.util
+      .Try {
+        outputDirectory(csym)
+      }
+      .recover {
+        case ex: Throwable =>
+          reporter.error(
+            cunit.body.pos,
+            s"Couldn't create file for class $cName\n${ex.getMessage}")
+          null
+      }
+      .get
 
   var pickledBytes = 0 // statistics
 

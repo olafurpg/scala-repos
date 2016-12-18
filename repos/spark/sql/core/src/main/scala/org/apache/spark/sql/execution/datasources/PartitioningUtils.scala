@@ -88,9 +88,11 @@ private[sql] object PartitioningUtils {
                                    typeInference: Boolean,
                                    basePaths: Set[Path]): PartitionSpec = {
     // First, we need to parse every partition's path and see if we can find partition values.
-    val (partitionValues, optDiscoveredBasePaths) = paths.map { path =>
-      parsePartition(path, defaultPartitionName, typeInference, basePaths)
-    }.unzip
+    val (partitionValues, optDiscoveredBasePaths) = paths
+      .map { path =>
+        parsePartition(path, defaultPartitionName, typeInference, basePaths)
+      }
+      .unzip
 
     // We create pairs of (path -> path's partition value) here
     // If the corresponding partition value is None, the pair will be skipped
@@ -293,9 +295,11 @@ private[sql] object PartitioningUtils {
       pathWithPartitionValues.map(_._2.columnNames).distinct
 
     def groupByKey[K, V](seq: Seq[(K, V)]): Map[K, Iterable[V]] =
-      seq.groupBy { case (key, _) => key }.mapValues(_.map {
-        case (_, value) => value
-      })
+      seq
+        .groupBy { case (key, _) => key }
+        .mapValues(_.map {
+          case (_, value) => value
+        })
 
     val partColNamesToPaths = groupByKey(pathWithPartitionValues.map {
       case (path, partValues) => partValues.columnNames -> path

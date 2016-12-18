@@ -321,21 +321,25 @@ class AccountServiceSpec extends TestAccountService with Tags {
 
       val accountId = createAccountAndGetId(user, pass).copoint
 
-      val JString(apiKey) = getAccount(accountId, user, pass).map {
-        case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
-          jvalue \ "apiKey"
-        case badResponse => failure("Invalid response: " + badResponse)
-      }.copoint
+      val JString(apiKey) = getAccount(accountId, user, pass)
+        .map {
+          case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
+            jvalue \ "apiKey"
+          case badResponse => failure("Invalid response: " + badResponse)
+        }
+        .copoint
 
       val subkey = apiKeyManager
         .createAPIKey(Some("subkey"), None, apiKey, Set.empty)
         .copoint
 
-      getAccountByAPIKey(subkey.apiKey, rootUser, rootPass).map {
-        case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
-          jvalue \ "accountId"
-        case badResponse => failure("Invalid response: " + badResponse)
-      }.copoint mustEqual JString(accountId)
+      getAccountByAPIKey(subkey.apiKey, rootUser, rootPass)
+        .map {
+          case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
+            jvalue \ "accountId"
+          case badResponse => failure("Invalid response: " + badResponse)
+        }
+        .copoint mustEqual JString(accountId)
     }
 
     "not find other account" in {

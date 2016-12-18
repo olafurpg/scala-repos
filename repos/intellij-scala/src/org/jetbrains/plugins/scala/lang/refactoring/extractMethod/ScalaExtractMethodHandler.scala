@@ -134,11 +134,13 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       result
     }
 
-    val (lastReturn, lastExprType) = elements.reverse.collectFirst {
-      case expr: ScExpression =>
-        (checkLastReturn(expr),
-         Some(expr.getType(TypingContext.empty).getOrAny))
-    }.getOrElse((false, None))
+    val (lastReturn, lastExprType) = elements.reverse
+      .collectFirst {
+        case expr: ScExpression =>
+          (checkLastReturn(expr),
+           Some(expr.getType(TypingContext.empty).getOrAny))
+      }
+      .getOrElse((false, None))
 
     val hasReturn: Option[ScType] = returnType
     val stopAtScope: PsiElement = findScopeBound(elements).getOrElse(file)

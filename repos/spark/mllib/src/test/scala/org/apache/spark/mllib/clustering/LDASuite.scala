@@ -149,11 +149,13 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     // Check: topDocumentsPerTopic
     // Compare it with top documents per topic derived from topicDistributions
     val topDocsByTopicDistributions = { n: Int =>
-      Range(0, k).map { topic =>
-        val (doc, docWeights) =
-          topicDistributions.sortBy(-_._2(topic)).take(n).unzip
-        (doc.toArray, docWeights.map(_(topic)).toArray)
-      }.toArray
+      Range(0, k)
+        .map { topic =>
+          val (doc, docWeights) =
+            topicDistributions.sortBy(-_._2(topic)).take(n).unzip
+          (doc.toArray, docWeights.map(_(topic)).toArray)
+        }
+        .toArray
     }
 
     // Top 3 documents per topic
@@ -414,12 +416,16 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
                                    (1, 0.99504))
 
     val actualPredictions = ldaModel.topicDistributions(docs).cache()
-    val topTopics = actualPredictions.map {
-      case (id, topics) =>
-        // convert results to expectedPredictions format, which only has highest probability topic
-        val topicsBz = topics.toBreeze.toDenseVector
-        (id, (argmax(topicsBz), max(topicsBz)))
-    }.sortByKey().values.collect()
+    val topTopics = actualPredictions
+      .map {
+        case (id, topics) =>
+          // convert results to expectedPredictions format, which only has highest probability topic
+          val topicsBz = topics.toBreeze.toDenseVector
+          (id, (argmax(topicsBz), max(topicsBz)))
+      }
+      .sortByKey()
+      .values
+      .collect()
 
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
@@ -587,12 +593,18 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
         graph.vertices.sortByKey().collect() === sameGraph.vertices
           .sortByKey()
           .collect())
-      val edge = graph.edges.map {
-        case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
-      }.sortBy(x => (x._1, x._2)).collect()
-      val sameEdge = sameGraph.edges.map {
-        case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
-      }.sortBy(x => (x._1, x._2)).collect()
+      val edge = graph.edges
+        .map {
+          case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
+        }
+        .sortBy(x => (x._1, x._2))
+        .collect()
+      val sameEdge = sameGraph.edges
+        .map {
+          case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
+        }
+        .sortBy(x => (x._1, x._2))
+        .collect()
       assert(edge === sameEdge)
     } finally {
       Utils.deleteRecursively(tempDir1)

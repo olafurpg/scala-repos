@@ -107,9 +107,11 @@ object ConfigProps extends Properties("Config") {
       }
   }
   property("adding many UniqueIDs works") = forAll { (l: List[String]) =>
-    val uids = l.filterNot { s =>
-      s.isEmpty || s.contains(",")
-    }.map(UniqueID(_))
+    val uids = l
+      .filterNot { s =>
+        s.isEmpty || s.contains(",")
+      }
+      .map(UniqueID(_))
     (uids
       .foldLeft(Config.empty) { (conf, id) =>
         conf.addUniqueId(id)

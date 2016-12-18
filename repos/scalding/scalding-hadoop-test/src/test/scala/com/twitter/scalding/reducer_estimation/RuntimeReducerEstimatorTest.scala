@@ -54,8 +54,8 @@ class RuntimeReducerEstimatorTest
       // + (EstimationScheme -> "median")
       // + (IgnoreInputSize -> false)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -77,7 +77,8 @@ class RuntimeReducerEstimatorTest
           // will take 1500 ms total.
           // To do this in 25 ms, we need 60 reducers.
           assert(conf.getNumReduceTasks == 60)
-      }.run
+        }
+        .run
     }
 
     "set reducers correctly with mean estimation scheme" in {
@@ -87,8 +88,8 @@ class RuntimeReducerEstimatorTest
         .+(EstimationScheme -> "mean")
       // + (IgnoreInputSize -> false)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -111,7 +112,8 @@ class RuntimeReducerEstimatorTest
           //
           // To do this in 25 ms, we need 61.03 reducers, which rounds up to 62.
           assert(conf.getNumReduceTasks == 62)
-      }.run
+        }
+        .run
     }
 
     "set reducers correctly with mean estimation scheme ignoring input size" in {
@@ -121,8 +123,8 @@ class RuntimeReducerEstimatorTest
         .+(EstimationScheme -> "mean")
         .+(IgnoreInputSize -> "true")
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -140,7 +142,8 @@ class RuntimeReducerEstimatorTest
           //
           // To do this in 25 ms, we need 134 reducers.
           assert(conf.getNumReduceTasks == 134)
-      }.run
+        }
+        .run
     }
 
     "set reducers correctly with median estimation scheme ignoring input size" in {
@@ -150,8 +153,8 @@ class RuntimeReducerEstimatorTest
         .+(IgnoreInputSize -> "true")
       // + (EstimationScheme -> "median")
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -169,7 +172,8 @@ class RuntimeReducerEstimatorTest
           //
           // To do this in 25 ms, we need 120 reducers.
           assert(conf.getNumReduceTasks == 120)
-      }.run
+        }
+        .run
     }
 
     "not set reducers when history service is empty" in {
@@ -177,8 +181,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[EmptyRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -188,7 +192,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
 
     "not set reducers when history service fails" in {
@@ -196,8 +200,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[ErrorRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -207,7 +211,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
   }
 }

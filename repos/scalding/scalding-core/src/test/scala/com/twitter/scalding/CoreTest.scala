@@ -166,27 +166,32 @@ class MapToGroupBySizeSumMaxTest extends WordSpec with Matchers {
       (i.toString, r.nextDouble.toString)
     }
     //Here is our expected output:
-    val goldenOutput = input.map {
-      case (line: String, x: String) =>
-        val xv = x.toDouble;
-        ((xv > 0.5), xv)
-    }.groupBy { case (kx: Boolean, x: Double) => kx }.mapValues { vals =>
-      val vlist = vals.map { case (k: Boolean, x: Double) => x }.toList
-      val size = vlist.size
-      val sum = vlist.sum
-      val max = vlist.max
-      (size, sum, max)
-    }
+    val goldenOutput = input
+      .map {
+        case (line: String, x: String) =>
+          val xv = x.toDouble;
+          ((xv > 0.5), xv)
+      }
+      .groupBy { case (kx: Boolean, x: Double) => kx }
+      .mapValues { vals =>
+        val vlist = vals.map { case (k: Boolean, x: Double) => x }.toList
+        val size = vlist.size
+        val sum = vlist.sum
+        val max = vlist.max
+        (size, sum, max)
+      }
     //Now we have the expected input and output:
     JobTest(new MapToGroupBySizeSumMaxJob(_))
       .arg("input", "fakeInput")
       .arg("output", "fakeOutput")
       .source(TextLine("fakeInput"), input)
       .sink[(Boolean, Int, Double, Double)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map {
-          case (k: Boolean, sz: Int, sm: Double, mx: Double) =>
-            (k, (sz, sm, mx))
-        }.toMap
+        val actualOutput = outBuf
+          .map {
+            case (k: Boolean, sz: Int, sm: Double, mx: Double) =>
+              (k, (sz, sm, mx))
+          }
+          .toMap
         "produce correct size, sum, max" in {
           goldenOutput shouldBe actualOutput
         }
@@ -315,10 +320,12 @@ class JoinTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, Int)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map {
-          case (k: String, v1: Int, v2: Int) =>
-            (k, (v1, v2))
-        }.toMap
+        val actualOutput = outBuf
+          .map {
+            case (k: String, v1: Int, v2: Int) =>
+              (k, (v1, v2))
+          }
+          .toMap
         "join tuples with the same key" in {
           correctOutput shouldBe actualOutput
         }
@@ -362,10 +369,12 @@ class CollidingKeyJoinTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, String, Int, String)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map {
-          case (k: String, v1: Int, k2: String, v2: Int, k3: String) =>
-            (k, (v1, k2, v2, k3))
-        }.toMap
+        val actualOutput = outBuf
+          .map {
+            case (k: String, v1: Int, k2: String, v2: Int, k3: String) =>
+              (k, (v1, k2, v2, k3))
+          }
+          .toMap
         "join tuples with the same key" in {
           correctOutput shouldBe actualOutput
         }
@@ -402,10 +411,12 @@ class TinyJoinTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, Int)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map {
-          case (k: String, v1: Int, v2: Int) =>
-            (k, (v1, v2))
-        }.toMap
+        val actualOutput = outBuf
+          .map {
+            case (k: String, v1: Int, v2: Int) =>
+              (k, (v1, v2))
+          }
+          .toMap
         (idx + ": join tuples with the same key") in {
           actualOutput shouldBe correctOutput
         }
@@ -442,10 +453,12 @@ class TinyCollisionJoinTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, Int)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map {
-          case (k: String, v1: Int, v2: Int) =>
-            (k, (v1, v2))
-        }.toMap
+        val actualOutput = outBuf
+          .map {
+            case (k: String, v1: Int, v2: Int) =>
+              (k, (v1, v2))
+          }
+          .toMap
         "join tuples with the same key" in {
           correctOutput shouldBe actualOutput
         }
@@ -532,11 +545,13 @@ class LeftJoinTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, JInt)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map { input: (String, Int, AnyRef) =>
-          println(input)
-          val (k, v1, v2) = input
-          (k, (v1, v2))
-        }.toMap
+        val actualOutput = outBuf
+          .map { input: (String, Int, AnyRef) =>
+            println(input)
+            val (k, v1, v2) = input
+            (k, (v1, v2))
+          }
+          .toMap
         (idx + ": join tuples with the same key") in {
           correctOutput shouldBe actualOutput
         }
@@ -582,11 +597,13 @@ class LeftJoinWithLargerTest extends WordSpec with Matchers {
       .source(Tsv("fakeInput1"), input1)
       .source(Tsv("fakeInput2"), input2)
       .sink[(String, Int, JInt)](Tsv("fakeOutput")) { outBuf =>
-        val actualOutput = outBuf.map { input: (String, Int, AnyRef) =>
-          println(input)
-          val (k, v1, v2) = input
-          (k, (v1, v2))
-        }.toMap
+        val actualOutput = outBuf
+          .map { input: (String, Int, AnyRef) =>
+            println(input)
+            val (k, v1, v2) = input
+            (k, (v1, v2))
+          }
+          .toMap
         s"$idx: join tuples with the same key" in {
           correctOutput shouldBe actualOutput
         }
@@ -685,26 +702,34 @@ class SizeAveStdSpec extends WordSpec with Matchers {
     val input = (0 to 10000).map { i =>
       (i.toString, r.nextDouble.toString + " " + powerLawRand.toString)
     }
-    val output = input.map { numline =>
-      numline._2.split(" ").map { _.toDouble }
-    }.map { vec =>
-      ((vec(0) * 4).toInt, vec(1))
-    }.groupBy { tup =>
-      tup._1
-    }.mapValues { tups =>
-      val all = tups.map { tup =>
-        tup._2.toDouble
-      }.toList
-      val size = all.size.toLong
-      val ave = all.sum / size
-      //Compute the standard deviation:
-      val vari =
-        all.map { x =>
-          (x - ave) * (x - ave)
-        }.sum / (size)
-      val stdev = scala.math.sqrt(vari)
-      (size, ave, stdev)
-    }
+    val output = input
+      .map { numline =>
+        numline._2.split(" ").map { _.toDouble }
+      }
+      .map { vec =>
+        ((vec(0) * 4).toInt, vec(1))
+      }
+      .groupBy { tup =>
+        tup._1
+      }
+      .mapValues { tups =>
+        val all = tups
+          .map { tup =>
+            tup._2.toDouble
+          }
+          .toList
+        val size = all.size.toLong
+        val ave = all.sum / size
+        //Compute the standard deviation:
+        val vari =
+          all
+            .map { x =>
+              (x - ave) * (x - ave)
+            }
+            .sum / (size)
+        val stdev = scala.math.sqrt(vari)
+        (size, ave, stdev)
+      }
     JobTest(new SizeAveStdJob(_))
       .arg("input", "fakeInput")
       .arg("output", "fakeOutput")
@@ -1500,17 +1525,21 @@ class ForceToDiskTest extends WordSpec with Matchers {
 
   "A ForceToDiskJob" should {
     var idx = 0
-    val input = (1 to 1000).flatMap { i =>
-      List((-1, i), (1, i))
-    }.toList
+    val input = (1 to 1000)
+      .flatMap { i =>
+        List((-1, i), (1, i))
+      }
+      .toList
     JobTest(new ForceToDiskJob(_))
       .source(Tsv("in", ('x, 'y)), input)
       .sink[(Int, Int, Int)](Tsv("out")) { outBuf =>
         (idx + ": run correctly when combined with joinWithTiny") in {
           outBuf should have size 2000
-          val correct = (1 to 1000).flatMap { y =>
-            List((1, 1, y), (-1, 1, y))
-          }.sorted
+          val correct = (1 to 1000)
+            .flatMap { y =>
+              List((1, 1, y), (-1, 1, y))
+            }
+            .sorted
           outBuf.toList.sorted shouldBe correct
         }
         idx += 1
@@ -1828,9 +1857,12 @@ class SampleWithReplacementTest extends WordSpec with Matchers {
   import com.twitter.scalding.mathematics.Poisson
 
   val p = new Poisson(1.0, 0)
-  val simulated = (1 to 100).map { i =>
-    i -> p.nextInt
-  }.filterNot(_._2 == 0).toSet
+  val simulated = (1 to 100)
+    .map { i =>
+      i -> p.nextInt
+    }
+    .filterNot(_._2 == 0)
+    .toSet
 
   "A SampleWithReplacementJob" should {
     JobTest(new SampleWithReplacementJob(_))
@@ -2023,7 +2055,8 @@ class CounterJobTest extends WordSpec with Matchers {
                      ("s smith", 12),
                      ("jill q", 55),
                      ("some child", 8))
-    val expectedOutput = input.collect { case (name, age) if age > 18 => age }.sum.toString
+    val expectedOutput =
+      input.collect { case (name, age) if age > 18 => age }.sum.toString
 
     "have the right counter and output values" in {
       JobTest(new CounterJob(_))

@@ -879,12 +879,14 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
   private def registerWorker(worker: WorkerInfo): Boolean = {
     // There may be one or more refs to dead workers on this same node (w/ different ID's),
     // remove them.
-    workers.filter { w =>
-      (w.host == worker.host && w.port == worker.port) &&
-      (w.state == WorkerState.DEAD)
-    }.foreach { w =>
-      workers -= w
-    }
+    workers
+      .filter { w =>
+        (w.host == worker.host && w.port == worker.port) &&
+        (w.state == WorkerState.DEAD)
+      }
+      .foreach { w =>
+        workers -= w
+      }
 
     val workerAddress = worker.endpoint.address
     if (addressToWorker.contains(workerAddress)) {

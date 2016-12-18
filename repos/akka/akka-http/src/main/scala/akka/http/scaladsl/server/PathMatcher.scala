@@ -315,10 +315,12 @@ trait ImplicitPathMatcherConstruction {
       valueMap: Map[String, T]): PathMatcher1[T] =
     if (valueMap.isEmpty) PathMatchers.nothingMatcher
     else
-      valueMap.map {
-        case (prefix, value) ⇒
-          stringExtractionPair2PathMatcher((prefix, value))
-      }.reduceLeft(_ | _)
+      valueMap
+        .map {
+          case (prefix, value) ⇒
+            stringExtractionPair2PathMatcher((prefix, value))
+        }
+        .reduceLeft(_ | _)
 }
 
 trait PathMatchers {

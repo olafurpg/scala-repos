@@ -33,7 +33,8 @@ object UserAnalysis extends LilaController with TheftPrevention {
   def load(urlFen: String, variant: Variant) = Open { implicit ctx =>
     val fenStr =
       Some(urlFen.trim.replace("_", " ")).filter(_.nonEmpty) orElse get("fen")
-    val decodedFen = fenStr.map { java.net.URLDecoder.decode(_, "UTF-8").trim }
+    val decodedFen = fenStr
+      .map { java.net.URLDecoder.decode(_, "UTF-8").trim }
       .filter(_.nonEmpty)
     val situation =
       decodedFen.flatMap {

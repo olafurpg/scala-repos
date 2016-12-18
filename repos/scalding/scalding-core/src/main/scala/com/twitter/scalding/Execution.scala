@@ -1054,9 +1054,11 @@ trait ExecutionCounters {
     */
   def get(key: StatKey): Option[Long]
   def toMap: Map[StatKey, Long] =
-    keys.map { k =>
-      (k, get(k).getOrElse(0L))
-    }.toMap
+    keys
+      .map { k =>
+        (k, get(k).getOrElse(0L))
+      }
+      .toMap
 }
 
 /**
@@ -1129,9 +1131,12 @@ object ExecutionCounters {
       override def isNonZero(that: ExecutionCounters) = that.keys.nonEmpty
       def zero = ExecutionCounters.empty
       def plus(left: ExecutionCounters, right: ExecutionCounters) = {
-        fromMap((left.keys ++ right.keys).map { k =>
-          (k, left(k) + right(k))
-        }.toMap)
+        fromMap(
+          (left.keys ++ right.keys)
+            .map { k =>
+              (k, left(k) + right(k))
+            }
+            .toMap)
       }
     }
 }

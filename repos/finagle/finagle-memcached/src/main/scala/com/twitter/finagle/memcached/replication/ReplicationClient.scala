@@ -160,17 +160,19 @@ class BaseReplicationClient(clients: Seq[Client],
     val keySet = keys.toSet
     Future.collect(clients map { _.getResult(keySet) }) map {
       results: Seq[GetResult] =>
-        keySet.map { k =>
-          val replicasResult =
-            results map {
-              case r if (r.hits.contains(k)) =>
-                Return(Some(r.hits.get(k).get.value))
-              case r if (r.misses.contains(k)) => Return(None)
-              case r if (r.failures.contains(k)) =>
-                Throw(r.failures.get(k).get)
-            }
-          k -> toReplicationStatus(replicasResult)
-        }.toMap
+        keySet
+          .map { k =>
+            val replicasResult =
+              results map {
+                case r if (r.hits.contains(k)) =>
+                  Return(Some(r.hits.get(k).get.value))
+                case r if (r.misses.contains(k)) => Return(None)
+                case r if (r.failures.contains(k)) =>
+                  Throw(r.failures.get(k).get)
+              }
+            k -> toReplicationStatus(replicasResult)
+          }
+          .toMap
     }
   }
 
@@ -194,18 +196,20 @@ class BaseReplicationClient(clients: Seq[Client],
     val keySet = keys.toSet
     Future.collect(clients map { _.getsResult(keySet) }) map {
       results: Seq[GetsResult] =>
-        keySet.map { k =>
-          val replicasResult =
-            results map {
-              case r if (r.hits.contains(k)) =>
-                Return(Some(r.hits.get(k).get.value))
-              case r if (r.misses.contains(k)) => Return(None)
-              case r if (r.failures.contains(k)) =>
-                Throw(r.failures.get(k).get)
-            }
+        keySet
+          .map { k =>
+            val replicasResult =
+              results map {
+                case r if (r.hits.contains(k)) =>
+                  Return(Some(r.hits.get(k).get.value))
+                case r if (r.misses.contains(k)) => Return(None)
+                case r if (r.failures.contains(k)) =>
+                  Throw(r.failures.get(k).get)
+              }
 
-          k -> attachCas(toReplicationStatus(replicasResult), results, k)
-        }.toMap
+            k -> attachCas(toReplicationStatus(replicasResult), results, k)
+          }
+          .toMap
     }
   }
 

@@ -61,13 +61,13 @@ private[forum] final class TopicApi(
                              number = 1,
                              categId = categ.id)
         $insert(post) >> $insert(topic withPost post) >> $update(
-          categ withTopic post) >>- (indexer ! InsertPost(post)) >> env.recent.invalidate >>- ctx.userId.?? {
-          userId =>
+          categ withTopic post) >>- (indexer ! InsertPost(post)) >> env.recent.invalidate >>- ctx.userId
+          .?? { userId =>
             val text = topic.name + " " + post.text
             shutup ! post.isTeam.fold(
               lila.hub.actorApi.shutup.RecordTeamForumMessage(userId, text),
               lila.hub.actorApi.shutup.RecordPublicForumMessage(userId, text))
-        } >>- {
+          } >>- {
           (ctx.userId ifFalse post.troll) ?? { userId =>
             timeline ! Propagate(
               ForumPost(userId, topic.id.some, topic.name, post.id)).|>(prop =>

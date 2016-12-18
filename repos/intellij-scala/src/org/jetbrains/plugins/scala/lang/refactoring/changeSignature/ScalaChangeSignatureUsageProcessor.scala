@@ -78,10 +78,12 @@ class ScalaChangeSignatureUsageProcessor
             .findAll
             .asScala
             .toSeq ++ ScalaOverridingMemberSearcher.search(method).toSeq
-        val methods = (method +: overriders ++: synthetics).map {
-          case isWrapper(m) => m
-          case other => other
-        }.distinct
+        val methods = (method +: overriders ++: synthetics)
+          .map {
+            case isWrapper(m) => m
+            case other => other
+          }
+          .distinct
 
         if (info.isParameterSetOrOrderChanged ||
             info.isParameterNamesChanged) {

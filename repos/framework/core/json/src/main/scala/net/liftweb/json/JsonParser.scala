@@ -150,9 +150,11 @@ object JsonParser {
     // This is a slightly faster way to correct order of fields and arrays than using 'map'.
     def reverse(v: JValue): JValue = v match {
       case JObject(l) =>
-        JObject((l.map { field =>
-          field.copy(value = reverse(field.value))
-        }).reverse)
+        JObject(
+          (l.map { field =>
+              field.copy(value = reverse(field.value))
+            })
+            .reverse)
       case JArray(l) => JArray(l.map(reverse).reverse)
       case x => x
     }

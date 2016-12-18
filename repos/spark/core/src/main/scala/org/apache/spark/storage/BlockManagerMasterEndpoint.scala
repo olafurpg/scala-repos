@@ -164,9 +164,11 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     // The dispatcher is used as an implicit argument into the Future sequence construction.
     val removeMsg = RemoveRdd(rddId)
     Future.sequence(
-      blockManagerInfo.values.map { bm =>
-        bm.slaveEndpoint.ask[Int](removeMsg)
-      }.toSeq
+      blockManagerInfo.values
+        .map { bm =>
+          bm.slaveEndpoint.ask[Int](removeMsg)
+        }
+        .toSeq
     )
   }
 
@@ -174,9 +176,11 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     // Nothing to do in the BlockManagerMasterEndpoint data structures
     val removeMsg = RemoveShuffle(shuffleId)
     Future.sequence(
-      blockManagerInfo.values.map { bm =>
-        bm.slaveEndpoint.ask[Boolean](removeMsg)
-      }.toSeq
+      blockManagerInfo.values
+        .map { bm =>
+          bm.slaveEndpoint.ask[Boolean](removeMsg)
+        }
+        .toSeq
     )
   }
 
@@ -192,9 +196,11 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       removeFromDriver || !info.blockManagerId.isDriver
     }
     Future.sequence(
-      requiredBlockManagers.map { bm =>
-        bm.slaveEndpoint.ask[Int](removeMsg)
-      }.toSeq
+      requiredBlockManagers
+        .map { bm =>
+          bm.slaveEndpoint.ask[Int](removeMsg)
+        }
+        .toSeq
     )
   }
 
@@ -259,17 +265,21 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
 
   // Return a map from the block manager id to max memory and remaining memory.
   private def memoryStatus: Map[BlockManagerId, (Long, Long)] = {
-    blockManagerInfo.map {
-      case (blockManagerId, info) =>
-        (blockManagerId, (info.maxMem, info.remainingMem))
-    }.toMap
+    blockManagerInfo
+      .map {
+        case (blockManagerId, info) =>
+          (blockManagerId, (info.maxMem, info.remainingMem))
+      }
+      .toMap
   }
 
   private def storageStatus: Array[StorageStatus] = {
-    blockManagerInfo.map {
-      case (blockManagerId, info) =>
-        new StorageStatus(blockManagerId, info.maxMem, info.blocks.asScala)
-    }.toArray
+    blockManagerInfo
+      .map {
+        case (blockManagerId, info) =>
+          new StorageStatus(blockManagerId, info.maxMem, info.blocks.asScala)
+      }
+      .toArray
   }
 
   /**
@@ -289,15 +299,17 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
      * Futures to avoid potential deadlocks. This can arise if there exists a block manager
      * that is also waiting for this master endpoint's response to a previous message.
      */
-    blockManagerInfo.values.map { info =>
-      val blockStatusFuture =
-        if (askSlaves) {
-          info.slaveEndpoint.ask[Option[BlockStatus]](getBlockStatus)
-        } else {
-          Future { info.getStatus(blockId) }
-        }
-      (info.blockManagerId, blockStatusFuture)
-    }.toMap
+    blockManagerInfo.values
+      .map { info =>
+        val blockStatusFuture =
+          if (askSlaves) {
+            info.slaveEndpoint.ask[Option[BlockStatus]](getBlockStatus)
+          } else {
+            Future { info.getStatus(blockId) }
+          }
+        (info.blockManagerId, blockStatusFuture)
+      }
+      .toMap
   }
 
   /**
@@ -413,9 +425,12 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
   private def getPeers(blockManagerId: BlockManagerId): Seq[BlockManagerId] = {
     val blockManagerIds = blockManagerInfo.keySet
     if (blockManagerIds.contains(blockManagerId)) {
-      blockManagerIds.filterNot { _.isDriver }.filterNot {
-        _ == blockManagerId
-      }.toSeq
+      blockManagerIds
+        .filterNot { _.isDriver }
+        .filterNot {
+          _ == blockManagerId
+        }
+        .toSeq
     } else {
       Seq.empty
     }

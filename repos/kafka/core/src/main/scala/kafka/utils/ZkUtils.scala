@@ -988,11 +988,14 @@ class ZkUtils(val zkClient: ZkClient,
     val topics = getChildrenParentMayNotExist(BrokerTopicsPath)
     if (topics == null) Set.empty[TopicAndPartition]
     else {
-      topics.map { topic =>
-        getChildren(getTopicPartitionsPath(topic))
-          .map(_.toInt)
-          .map(TopicAndPartition(topic, _))
-      }.flatten.toSet
+      topics
+        .map { topic =>
+          getChildren(getTopicPartitionsPath(topic))
+            .map(_.toInt)
+            .map(TopicAndPartition(topic, _))
+        }
+        .flatten
+        .toSet
     }
   }
 

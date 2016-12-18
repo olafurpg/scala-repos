@@ -192,11 +192,13 @@ abstract class ClusterShardingGracefulShutdownSpec(
 
       awaitAssert {
         val p = TestProbe()
-        val regionAddresses = (1 to 100).map { n ⇒
-          region.tell(n, p.ref)
-          p.expectMsg(1.second, n)
-          p.lastSender.path.address
-        }.toSet
+        val regionAddresses = (1 to 100)
+          .map { n ⇒
+            region.tell(n, p.ref)
+            p.expectMsg(1.second, n)
+            p.lastSender.path.address
+          }
+          .toSet
         regionAddresses.size should be(2)
       }
       enterBarrier("after-2")

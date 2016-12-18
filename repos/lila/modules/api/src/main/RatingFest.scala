@@ -80,18 +80,21 @@ object RatingFest {
             started = nowMillis
             log("Processed %d games at %d/s".format(nb, perS))
           }
-          games.map { game =>
-            game.userIds match {
-              case _ if !game.rated => funit
-              case _ if !game.finished => funit
-              case _ if game.fromPosition => funit
-              case List(uidW, uidB) if (uidW == uidB) => funit
-              case List(uidW, uidB) if engineIds(uidW) || engineIds(uidB) =>
-                unrate(game)
-              case List(uidW, uidB) => rerate(game)
-              case _ => funit
+          games
+            .map { game =>
+              game.userIds match {
+                case _ if !game.rated => funit
+                case _ if !game.finished => funit
+                case _ if game.fromPosition => funit
+                case List(uidW, uidB) if (uidW == uidB) => funit
+                case List(uidW, uidB) if engineIds(uidW) || engineIds(uidB) =>
+                  unrate(game)
+                case List(uidW, uidB) => rerate(game)
+                case _ => funit
+              }
             }
-          }.sequenceFu.void
+            .sequenceFu
+            .void
         } andThen { case _ => log(nb) }
       }
     } yield ()

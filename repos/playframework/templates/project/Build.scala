@@ -71,9 +71,11 @@ object Templates {
         // Sync files, caching sync data in file "prepared-templates".
         Sync(streams.value.cacheDirectory / "prepared-templates")(mappings)
 
-        preparedTemplates.map { template =>
-          syncTemplateDirValue / template.getName
-        }.toSeq
+        preparedTemplates
+          .map { template =>
+            syncTemplateDirValue / template.getName
+          }
+          .toSeq
       },
       // Syncs templates from each template dir to target/prepared-templates/$template.
       // Replaces all the template parameters (%SCALA_VERSION%, etc) in the copied
@@ -144,9 +146,11 @@ object Templates {
           case _ =>
         }
 
-        templateSourcesList.map { templateSources =>
-          outDir / templateSources.name
-        }.toSeq
+        templateSourcesList
+          .map { templateSources =>
+            outDir / templateSources.name
+          }
+          .toSeq
       },
       testTemplates := {
         val preparedTemplates = syncTemplates.value

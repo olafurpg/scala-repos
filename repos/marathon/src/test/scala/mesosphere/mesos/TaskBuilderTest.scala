@@ -390,13 +390,15 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
     val expectedLabels =
       MesosProtos.Labels.newBuilder
         .addAllLabels(
-          labels.map {
-            case (mKey, mValue) =>
-              MesosProtos.Label.newBuilder
-                .setKey(mKey)
-                .setValue(mValue)
-                .build()
-          }.asJava
+          labels
+            .map {
+              case (mKey, mValue) =>
+                MesosProtos.Label.newBuilder
+                  .setKey(mKey)
+                  .setValue(mValue)
+                  .build()
+            }
+            .asJava
         )
         .build()
     assert(taskInfo.hasLabels)

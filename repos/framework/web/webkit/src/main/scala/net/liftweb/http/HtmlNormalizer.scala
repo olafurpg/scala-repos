@@ -172,15 +172,17 @@ private[http] final object HtmlNormalizer {
   private[this] def jsForEventAttributes(
       elementId: String,
       eventAttributes: List[EventAttribute]): JsCmd = {
-    eventAttributes.map {
-      case EventAttribute(name, handlerJs) =>
-        Call(
-          "lift.onEvent",
-          elementId,
-          name,
-          AnonFunc("event", JsRaw(handlerJs).cmd)
-        ).cmd
-    }.foldLeft(Noop)(_ & _)
+    eventAttributes
+      .map {
+        case EventAttribute(name, handlerJs) =>
+          Call(
+            "lift.onEvent",
+            elementId,
+            name,
+            AnonFunc("event", JsRaw(handlerJs).cmd)
+          ).cmd
+      }
+      .foldLeft(Noop)(_ & _)
   }
 
   private[http] def normalizeElementAndAttributes(

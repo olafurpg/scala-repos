@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.JavaIdentifi
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 trait ScNamedElement
-    extends ScalaPsiElement with PsiNameIdentifierOwner
+    extends ScalaPsiElement
+    with PsiNameIdentifierOwner
     with NavigatablePsiElement {
   def name: String = {
     this match {
@@ -92,16 +93,21 @@ trait ScNamedElement
 
   abstract override def getUseScope: SearchScope = {
     ScalaPsiUtil.intersectScopes(
-        super.getUseScope, ScalaPsiUtil.nameContext(this) match {
-      case member: ScMember if member != this => Some(member.getUseScope)
-      case caseClause: ScCaseClause => Some(new LocalSearchScope(caseClause))
-      case elem @ (_: ScEnumerator | _: ScGenerator) =>
-        Option(
+      super.getUseScope,
+      ScalaPsiUtil.nameContext(this) match {
+        case member: ScMember if member != this => Some(member.getUseScope)
+        case caseClause: ScCaseClause => Some(new LocalSearchScope(caseClause))
+        case elem @ (_: ScEnumerator | _: ScGenerator) =>
+          Option(
             PsiTreeUtil.getContextOfType(elem, true, classOf[ScForStatement]))
-          .orElse(Option(PsiTreeUtil.getContextOfType(
-                      elem, true, classOf[ScBlock], classOf[ScMember])))
-          .map(new LocalSearchScope(_))
-      case _ => None
-    })
+            .orElse(
+              Option(
+                PsiTreeUtil.getContextOfType(elem,
+                                             true,
+                                             classOf[ScBlock],
+                                             classOf[ScMember])))
+            .map(new LocalSearchScope(_))
+        case _ => None
+      })
   }
 }

@@ -154,27 +154,30 @@ trait AccountService {
                             isRemoved = false)
 
   def updateAccount(account: Account)(implicit s: Session): Unit =
-    Accounts.filter { a =>
-      a.userName === account.userName.bind
-    }.map { a =>
-      (a.password,
-       a.fullName,
-       a.mailAddress,
-       a.isAdmin,
-       a.url.?,
-       a.registeredDate,
-       a.updatedDate,
-       a.lastLoginDate.?,
-       a.removed)
-    }.update(account.password,
-             account.fullName,
-             account.mailAddress,
-             account.isAdmin,
-             account.url,
-             account.registeredDate,
-             currentDate,
-             account.lastLoginDate,
-             account.isRemoved)
+    Accounts
+      .filter { a =>
+        a.userName === account.userName.bind
+      }
+      .map { a =>
+        (a.password,
+         a.fullName,
+         a.mailAddress,
+         a.isAdmin,
+         a.url.?,
+         a.registeredDate,
+         a.updatedDate,
+         a.lastLoginDate.?,
+         a.removed)
+      }
+      .update(account.password,
+              account.fullName,
+              account.mailAddress,
+              account.isAdmin,
+              account.url,
+              account.registeredDate,
+              currentDate,
+              account.lastLoginDate,
+              account.isRemoved)
 
   def updateAvatarImage(userName: String, image: Option[String])(
       implicit s: Session): Unit =

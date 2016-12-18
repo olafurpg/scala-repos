@@ -124,14 +124,17 @@ private[akka] class DistributedPubSubMessageSerializer(
             address.getPort)
 
   private def statusToProto(status: Status): dm.Status = {
-    val versions = status.versions.map {
-      case (a, v) ⇒
-        dm.Status.Version
-          .newBuilder()
-          .setAddress(addressToProto(a))
-          .setTimestamp(v)
-          .build()
-    }.toVector.asJava
+    val versions = status.versions
+      .map {
+        case (a, v) ⇒
+          dm.Status.Version
+            .newBuilder()
+            .setAddress(addressToProto(a))
+            .setTimestamp(v)
+            .build()
+      }
+      .toVector
+      .asJava
     dm.Status.newBuilder().addAllVersions(versions).build()
   }
 
@@ -143,22 +146,32 @@ private[akka] class DistributedPubSubMessageSerializer(
       addressFromProto(v.getAddress) -> v.getTimestamp)(breakOut))
 
   private def deltaToProto(delta: Delta): dm.Delta = {
-    val buckets = delta.buckets.map { b ⇒
-      val entries = b.content.map {
-        case (key, value) ⇒
-          val b =
-            dm.Delta.Entry.newBuilder().setKey(key).setVersion(value.version)
-          value.ref.foreach(r ⇒ b.setRef(Serialization.serializedActorPath(r)))
-          b.build()
-      }.toVector.asJava
+    val buckets = delta.buckets
+      .map { b ⇒
+        val entries = b.content
+          .map {
+            case (key, value) ⇒
+              val b =
+                dm.Delta.Entry
+                  .newBuilder()
+                  .setKey(key)
+                  .setVersion(value.version)
+              value.ref.foreach(r ⇒
+                b.setRef(Serialization.serializedActorPath(r)))
+              b.build()
+          }
+          .toVector
+          .asJava
 
-      dm.Delta.Bucket
-        .newBuilder()
-        .setOwner(addressToProto(b.owner))
-        .setVersion(b.version)
-        .addAllContent(entries)
-        .build()
-    }.toVector.asJava
+        dm.Delta.Bucket
+          .newBuilder()
+          .setOwner(addressToProto(b.owner))
+          .setVersion(b.version)
+          .addAllContent(entries)
+          .build()
+      }
+      .toVector
+      .asJava
     dm.Delta.newBuilder().addAllBuckets(buckets).build()
   }
 

@@ -142,8 +142,9 @@ abstract class AdaptiveLoadBalancingRouterSpec
     // it may take some time until router receives cluster member events
     awaitAssert { currentRoutees(router).size should ===(roles.size) }
     val routees = currentRoutees(router)
-    routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
-      roles.map(address).toSet)
+    routees
+      .map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }
+      .toSet should ===(roles.map(address).toSet)
     router
   }
 
@@ -217,8 +218,9 @@ abstract class AdaptiveLoadBalancingRouterSpec
         // it may take some time until router receives cluster member events
         awaitAssert { currentRoutees(router3).size should ===(9) }
         val routees = currentRoutees(router3)
-        routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
-          Set(address(first)))
+        routees
+          .map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }
+          .toSet should ===(Set(address(first)))
       }
       enterBarrier("after-4")
     }
@@ -230,7 +232,9 @@ abstract class AdaptiveLoadBalancingRouterSpec
         // it may take some time until router receives cluster member events
         awaitAssert { currentRoutees(router4).size should ===(6) }
         val routees = currentRoutees(router4)
-        routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
+        routees
+          .map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }
+          .toSet should ===(
           Set(address(first), address(second), address(third)))
       }
       enterBarrier("after-5")

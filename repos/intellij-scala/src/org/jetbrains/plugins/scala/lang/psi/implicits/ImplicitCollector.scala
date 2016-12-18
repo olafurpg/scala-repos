@@ -470,10 +470,12 @@ class ImplicitCollector(
                                 val newPolymorphicType = ScTypePolymorphicType(
                                   internalType,
                                   filteredTypeParams)
-                                (newPolymorphicType.inferValueType.recursiveUpdate {
-                                  case u: ScUndefinedType => (true, u.tpt)
-                                  case tp: ScType => (false, tp)
-                                }, typeParams)
+                                (newPolymorphicType.inferValueType
+                                   .recursiveUpdate {
+                                     case u: ScUndefinedType => (true, u.tpt)
+                                     case tp: ScType => (false, tp)
+                                   },
+                                 typeParams)
                               case _ => (tp.inferValueType, Seq.empty)
                             }
                           } else

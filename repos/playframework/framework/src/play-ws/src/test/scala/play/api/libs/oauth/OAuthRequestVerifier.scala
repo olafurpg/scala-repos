@@ -84,9 +84,10 @@ object OAuthRequestVerifier {
 
         // Verify the signature
         val collectedParams =
-          oauthParams.filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq.flatMap {
-            case (key, values) => values.map(value => key -> value)
-          }
+          oauthParams.filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq
+            .flatMap {
+              case (key, values) => values.map(value => key -> value)
+            }
         // If the body is form URL encoded, must include body parameters
         val collectedParamsWithBody = request.contentType match {
           case Some(formUrlEncoded)
@@ -119,11 +120,15 @@ object OAuthRequestVerifier {
     // See https://dev.twitter.com/docs/auth/creating-signature
 
     // Params must be percent encoded before they are sorted
-    val parameterString = params.map {
-      case (key, value) => percentEncode(key) -> percentEncode(value)
-    }.sorted.map {
-      case (key, value) => s"$key=$value"
-    }.mkString("&")
+    val parameterString = params
+      .map {
+        case (key, value) => percentEncode(key) -> percentEncode(value)
+      }
+      .sorted
+      .map {
+        case (key, value) => s"$key=$value"
+      }
+      .mkString("&")
 
     val signatureBaseString =
       s"${method.toUpperCase(Locale.ENGLISH)}&${percentEncode(baseUrl)}&${percentEncode(parameterString)}"

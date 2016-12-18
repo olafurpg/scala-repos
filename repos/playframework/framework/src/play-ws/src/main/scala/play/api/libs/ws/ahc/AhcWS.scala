@@ -270,11 +270,13 @@ case class AhcWSRequest(
     // The builder has a bunch of mutable state and is VERY fiddly, so
     // should not be exposed to the outside world.
 
-    val builder = disableUrlEncoding.map { disableEncodingFlag =>
-      new RequestBuilder(method, disableEncodingFlag)
-    }.getOrElse {
-      new RequestBuilder(method)
-    }
+    val builder = disableUrlEncoding
+      .map { disableEncodingFlag =>
+        new RequestBuilder(method, disableEncodingFlag)
+      }
+      .getOrElse {
+        new RequestBuilder(method)
+      }
 
     // Set the URL.
     builder.setUrl(url)
@@ -320,9 +322,11 @@ case class AhcWSRequest(
 
             // extract the content type and the charset
             val charsetOption = Option(HttpUtils.parseCharset(ct))
-            val charset = charsetOption.getOrElse {
-              StandardCharsets.UTF_8
-            }.name()
+            val charset = charsetOption
+              .getOrElse {
+                StandardCharsets.UTF_8
+              }
+              .name()
 
             // Get the string body given the given charset...
             val stringBody = bytes.decodeString(charset)

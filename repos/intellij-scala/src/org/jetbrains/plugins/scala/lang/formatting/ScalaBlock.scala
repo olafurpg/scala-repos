@@ -264,7 +264,8 @@ class SubBlocksContext(
     getLastNode.filter(_ != firstNode).orNull
 
   private def getLastNode: Option[ASTNode] =
-    childrenAdditionalContexts.map { case (_, context) => context.getLastNode }
+    childrenAdditionalContexts
+      .map { case (_, context) => context.getLastNode }
       .filter(_.isDefined)
       .map(_.get) ++ additionalNodes ++ childrenAdditionalContexts.map {
       case (child, _) => child

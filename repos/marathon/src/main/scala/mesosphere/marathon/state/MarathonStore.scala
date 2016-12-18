@@ -62,12 +62,14 @@ class MarathonStore[S <: MarathonState[_, S]](
           bytesWritten.update(created.length)
           store.create(prefix + key, created)
       }
-      res.map { entity =>
-        val result = stateFromBytes(entity.bytes.toArray)
-        onSuccess(result)
-        result
-      }.recover(exceptionTransform(
-        s"Could not modify ${ct.runtimeClass.getSimpleName} with key: $key"))
+      res
+        .map { entity =>
+          val result = stateFromBytes(entity.bytes.toArray)
+          onSuccess(result)
+          result
+        }
+        .recover(exceptionTransform(
+          s"Could not modify ${ct.runtimeClass.getSimpleName} with key: $key"))
     }
   }
 

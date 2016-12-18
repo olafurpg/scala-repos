@@ -97,11 +97,13 @@ abstract class Message extends HttpMessageProxy {
 
   /** Accept header media types (normalized, no parameters) */
   def acceptMediaTypes: Seq[String] =
-    accept.map {
-      _.split(";", 2).headOption
-        .map(_.trim.toLowerCase) // media types are case-insensitive
-        .filter(_.nonEmpty) // skip blanks
-    }.flatten
+    accept
+      .map {
+        _.split(";", 2).headOption
+          .map(_.trim.toLowerCase) // media types are case-insensitive
+          .filter(_.nonEmpty) // skip blanks
+      }
+      .flatten
 
   /** Allow header */
   def allow: Option[String] = Option(headers.get(Fields.Allow))

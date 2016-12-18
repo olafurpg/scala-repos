@@ -210,13 +210,15 @@ class MetricEvaluator[EI, Q, P, A, R](
       params: WorkflowParams): MetricEvaluatorResult[R] = {
 
     val evalResultList: Seq[(EngineParams, MetricScores[R])] =
-      engineEvalDataSet.zipWithIndex.par.map {
-        case ((engineParams, evalDataSet), idx) =>
-          val metricScores =
-            MetricScores[R](metric.calculate(sc, evalDataSet),
-                            otherMetrics.map(_.calculate(sc, evalDataSet)))
-          (engineParams, metricScores)
-      }.seq
+      engineEvalDataSet.zipWithIndex.par
+        .map {
+          case ((engineParams, evalDataSet), idx) =>
+            val metricScores =
+              MetricScores[R](metric.calculate(sc, evalDataSet),
+                              otherMetrics.map(_.calculate(sc, evalDataSet)))
+            (engineParams, metricScores)
+        }
+        .seq
 
     implicit lazy val formats =
       Utils.json4sDefaultFormats + new NameParamsSerializer

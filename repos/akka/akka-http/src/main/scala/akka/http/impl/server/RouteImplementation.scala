@@ -97,10 +97,12 @@ private[http] object RouteImplementation
       case MethodFilter(m) ⇒ method(m.asScala)
       case Extract(extractions) ⇒
         extractRequestContext.flatMap { ctx ⇒
-          extractions.map { e ⇒
-            e.directive.flatMap(
-              addExtraction(e.asInstanceOf[RequestVal[Any]], _))
-          }.reduce(_ & _)
+          extractions
+            .map { e ⇒
+              e.directive.flatMap(
+                addExtraction(e.asInstanceOf[RequestVal[Any]], _))
+            }
+            .reduce(_ & _)
         }
 
       case BasicAuthentication(authenticator) ⇒

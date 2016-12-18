@@ -93,16 +93,20 @@ object CascadingBinaryComparator {
       } else None
 
     // Get all the steps that have missing OrderedSerializations
-    val missing = flow.getFlowSteps.asScala.map {
-      case bfs: BaseFlowStep[_] => getDescriptionsForMissingOrdSer(bfs)
-    }.collect { case Some(desc) => desc }
+    val missing = flow.getFlowSteps.asScala
+      .map {
+        case bfs: BaseFlowStep[_] => getDescriptionsForMissingOrdSer(bfs)
+      }
+      .collect { case Some(desc) => desc }
 
     if (missing.isEmpty) Success(())
     else {
       val badSteps = missing.size
-      val msg = missing.zipWithIndex.map {
-        case (msg, idx) => s"<step$idx>$msg</step$idx>"
-      }.mkString
+      val msg = missing.zipWithIndex
+        .map {
+          case (msg, idx) => s"<step$idx>$msg</step$idx>"
+        }
+        .mkString
       error(s"There are $badSteps missing OrderedSerializations: $msg")
     }
   }

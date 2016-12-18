@@ -146,7 +146,8 @@ object Scalding {
           Some(desired)
         case _ => bisectingMinify(mode, desired)(factory)
       }
-      available.flatMap { intersect(desired, _) }
+      available
+        .flatMap { intersect(desired, _) }
         .map(Right(_))
         .getOrElse(
           Left(List("available: " + available + ", desired: " + desired)))
@@ -485,14 +486,16 @@ object Scalding {
               val res: PipeFactory[(K, (V, Option[U]))] = for {
                 // Handle the Option[Producer] return value from getLoopInputs properly.
                 // If there was no producer returned, pass an empty TypedPipe to the join for that part.
-                flowToPipe <- deltaLogOpt.map { del =>
-                  leftPf.join(del).map {
-                    case (ftpA, ftpB) =>
-                      Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
+                flowToPipe <- deltaLogOpt
+                  .map { del =>
+                    leftPf.join(del).map {
+                      case (ftpA, ftpB) =>
+                        Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
+                    }
                   }
-                }.getOrElse(leftPf.map { p =>
-                  p.map((_, TypedPipe.empty))
-                }) // no extra producer for store
+                  .getOrElse(leftPf.map { p =>
+                    p.map((_, TypedPipe.empty))
+                  }) // no extra producer for store
                 servOut = flowToPipe.map {
                   case (lpipe, dpipe) =>
                     InternalService.loopJoin[Timestamp, K, V, U](

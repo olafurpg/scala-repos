@@ -37,11 +37,14 @@ final class PerfStatIndexer(storage: PerfStatStorage, sequencer: ActorRef) {
   } flatMap storage.insert
 
   def addGame(game: Game): Funit =
-    game.players.flatMap { player =>
-      player.userId.map { userId =>
-        addPov(Pov(game, player), userId)
+    game.players
+      .flatMap { player =>
+        player.userId.map { userId =>
+          addPov(Pov(game, player), userId)
+        }
       }
-    }.sequenceFu.void
+      .sequenceFu
+      .void
 
   private def addPov(pov: Pov, userId: String): Funit = pov.game.perfType ?? {
     perfType =>

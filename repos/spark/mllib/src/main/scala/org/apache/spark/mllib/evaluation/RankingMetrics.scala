@@ -61,26 +61,28 @@ class RankingMetrics[T: ClassTag](
   @Since("1.2.0")
   def precisionAt(k: Int): Double = {
     require(k > 0, "ranking position k should be positive")
-    predictionAndLabels.map {
-      case (pred, lab) =>
-        val labSet = lab.toSet
+    predictionAndLabels
+      .map {
+        case (pred, lab) =>
+          val labSet = lab.toSet
 
-        if (labSet.nonEmpty) {
-          val n = math.min(pred.length, k)
-          var i = 0
-          var cnt = 0
-          while (i < n) {
-            if (labSet.contains(pred(i))) {
-              cnt += 1
+          if (labSet.nonEmpty) {
+            val n = math.min(pred.length, k)
+            var i = 0
+            var cnt = 0
+            while (i < n) {
+              if (labSet.contains(pred(i))) {
+                cnt += 1
+              }
+              i += 1
             }
-            i += 1
+            cnt.toDouble / k
+          } else {
+            logWarning("Empty ground truth set, check input data")
+            0.0
           }
-          cnt.toDouble / k
-        } else {
-          logWarning("Empty ground truth set, check input data")
-          0.0
-        }
-    }.mean()
+      }
+      .mean()
   }
 
   /**
@@ -89,28 +91,30 @@ class RankingMetrics[T: ClassTag](
     * warning is generated.
     */
   lazy val meanAveragePrecision: Double = {
-    predictionAndLabels.map {
-      case (pred, lab) =>
-        val labSet = lab.toSet
+    predictionAndLabels
+      .map {
+        case (pred, lab) =>
+          val labSet = lab.toSet
 
-        if (labSet.nonEmpty) {
-          var i = 0
-          var cnt = 0
-          var precSum = 0.0
-          val n = pred.length
-          while (i < n) {
-            if (labSet.contains(pred(i))) {
-              cnt += 1
-              precSum += cnt.toDouble / (i + 1)
+          if (labSet.nonEmpty) {
+            var i = 0
+            var cnt = 0
+            var precSum = 0.0
+            val n = pred.length
+            while (i < n) {
+              if (labSet.contains(pred(i))) {
+                cnt += 1
+                precSum += cnt.toDouble / (i + 1)
+              }
+              i += 1
             }
-            i += 1
+            precSum / labSet.size
+          } else {
+            logWarning("Empty ground truth set, check input data")
+            0.0
           }
-          precSum / labSet.size
-        } else {
-          logWarning("Empty ground truth set, check input data")
-          0.0
-        }
-    }.mean()
+      }
+      .mean()
   }
 
   /**
@@ -133,32 +137,34 @@ class RankingMetrics[T: ClassTag](
   @Since("1.2.0")
   def ndcgAt(k: Int): Double = {
     require(k > 0, "ranking position k should be positive")
-    predictionAndLabels.map {
-      case (pred, lab) =>
-        val labSet = lab.toSet
+    predictionAndLabels
+      .map {
+        case (pred, lab) =>
+          val labSet = lab.toSet
 
-        if (labSet.nonEmpty) {
-          val labSetSize = labSet.size
-          val n = math.min(math.max(pred.length, labSetSize), k)
-          var maxDcg = 0.0
-          var dcg = 0.0
-          var i = 0
-          while (i < n) {
-            val gain = 1.0 / math.log(i + 2)
-            if (labSet.contains(pred(i))) {
-              dcg += gain
+          if (labSet.nonEmpty) {
+            val labSetSize = labSet.size
+            val n = math.min(math.max(pred.length, labSetSize), k)
+            var maxDcg = 0.0
+            var dcg = 0.0
+            var i = 0
+            while (i < n) {
+              val gain = 1.0 / math.log(i + 2)
+              if (labSet.contains(pred(i))) {
+                dcg += gain
+              }
+              if (i < labSetSize) {
+                maxDcg += gain
+              }
+              i += 1
             }
-            if (i < labSetSize) {
-              maxDcg += gain
-            }
-            i += 1
+            dcg / maxDcg
+          } else {
+            logWarning("Empty ground truth set, check input data")
+            0.0
           }
-          dcg / maxDcg
-        } else {
-          logWarning("Empty ground truth set, check input data")
-          0.0
-        }
-    }.mean()
+      }
+      .mean()
   }
 }
 
