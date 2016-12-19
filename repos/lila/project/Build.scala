@@ -15,56 +15,55 @@ object ApplicationBuild extends Build {
     .enablePlugins(_root_.play.sbt.PlayScala)
     .dependsOn(api)
     .aggregate(api)
-    .settings(
-      Seq(
-        scalaVersion := globalScalaVersion,
-        resolvers ++= Dependencies.Resolvers.commons,
-        scalacOptions := compilerOptions,
-        incOptions := incOptions.value.withNameHashing(true),
-        updateOptions := updateOptions.value.withCachedResolution(true),
-        sources in doc in Compile := List(),
-        // disable publishing the main API jar
-        publishArtifact in (Compile, packageDoc) := false,
-        // disable publishing the main sources jar
-        publishArtifact in (Compile, packageSrc) := false,
-        // don't stage the conf dir
-        externalizeResources := false,
-        // shorter prod classpath
-        scriptClasspath := Seq("*"),
-        // offline := true,
-        libraryDependencies ++= Seq(scalaz,
-                                    scalalib,
-                                    hasher,
-                                    config,
-                                    apache,
-                                    jgit,
-                                    findbugs,
-                                    RM,
-                                    PRM,
-                                    akka.actor,
-                                    akka.slf4j,
-                                    spray.caching,
-                                    maxmind,
-                                    prismic,
-                                    kamon.core,
-                                    kamon.statsd,
-                                    pushy,
-                                    java8compat,
-                                    semver),
-        TwirlKeys.templateImports ++=
-          Seq("lila.game.{ Game, Player, Pov }",
-              "lila.tournament.Tournament",
-              "lila.user.{ User, UserContext }",
-              "lila.security.Permission",
-              "lila.app.templating.Environment._",
-              "lila.api.Context",
-              "lila.common.paginator.Paginator"),
-        watchSources <<= sourceDirectory in Compile map { sources =>
-          (sources ** "*").get
-        },
-        // trump sbt-web into not looking at public/
-        resourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
-      ))
+    .settings(Seq(
+      scalaVersion := globalScalaVersion,
+      resolvers ++= Dependencies.Resolvers.commons,
+      scalacOptions := compilerOptions,
+      incOptions := incOptions.value.withNameHashing(true),
+      updateOptions := updateOptions.value.withCachedResolution(true),
+      sources in doc in Compile := List(),
+      // disable publishing the main API jar
+      publishArtifact in (Compile, packageDoc) := false,
+      // disable publishing the main sources jar
+      publishArtifact in (Compile, packageSrc) := false,
+      // don't stage the conf dir
+      externalizeResources := false,
+      // shorter prod classpath
+      scriptClasspath := Seq("*"),
+      // offline := true,
+      libraryDependencies ++= Seq(scalaz,
+                                  scalalib,
+                                  hasher,
+                                  config,
+                                  apache,
+                                  jgit,
+                                  findbugs,
+                                  RM,
+                                  PRM,
+                                  akka.actor,
+                                  akka.slf4j,
+                                  spray.caching,
+                                  maxmind,
+                                  prismic,
+                                  kamon.core,
+                                  kamon.statsd,
+                                  pushy,
+                                  java8compat,
+                                  semver),
+      TwirlKeys.templateImports ++=
+        Seq("lila.game.{ Game, Player, Pov }",
+            "lila.tournament.Tournament",
+            "lila.user.{ User, UserContext }",
+            "lila.security.Permission",
+            "lila.app.templating.Environment._",
+            "lila.api.Context",
+            "lila.common.paginator.Paginator"),
+      watchSources <<= sourceDirectory in Compile map { sources =>
+        (sources ** "*").get
+      },
+      // trump sbt-web into not looking at public/
+      resourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
+    ))
 
   lazy val modules = Seq(chess,
                          common,

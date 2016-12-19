@@ -525,8 +525,9 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
       _env: RpcEnv,
       name: String): (RpcEndpointRef, ConcurrentLinkedQueue[(Any, Any)]) = {
     val events = new ConcurrentLinkedQueue[(Any, Any)]
-    val ref = _env
-      .setupEndpoint("network-events-non-client", new ThreadSafeRpcEndpoint {
+    val ref = _env.setupEndpoint(
+      "network-events-non-client",
+      new ThreadSafeRpcEndpoint {
         override val rpcEnv = _env
 
         override def receive: PartialFunction[Any, Unit] = {

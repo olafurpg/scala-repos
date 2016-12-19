@@ -298,7 +298,8 @@ private[http] object Utf8Decoder extends StreamingCharsetDecoder {
     8,
     8,
     8,
-    8)
+    8
+  )
 
   val states = Array[Byte](
     0,

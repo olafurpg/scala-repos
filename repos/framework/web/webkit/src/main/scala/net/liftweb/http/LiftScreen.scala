@@ -1913,37 +1913,39 @@ trait LiftScreen
 
     CancelId.set(cancelId)
 
-    renderAll(Empty, //currentScreenNumber: Box[NodeSeq],
-              Empty, //screenCount: Box[NodeSeq],
-              Empty, // wizardTop: Box[Elem],
-              theScreen.screenTop, //screenTop: Box[Elem],
-              theScreen.screenFields
-                .filter(_.shouldDisplay_?)
-                .flatMap(
-                  f =>
-                    if (f.show_?)
-                      List(
-                        ScreenFieldInfo(f,
-                                        f.displayHtml,
-                                        f.helpAsHtml,
-                                        f.toForm,
-                                        fieldBinding(f),
-                                        fieldTransform(f)))
-                    else Nil), //fields: List[ScreenFieldInfo],
-              Empty, // prev: Box[Elem],
-              Full(cancelButton), // cancel: Box[Elem],
-              Empty, // next: Box[Elem],
-              Full(finishButton), //finish: Box[Elem],
-              theScreen.screenBottom, // screenBottom: Box[Elem],
-              Empty, //wizardBottom: Box[Elem],
-              finishId -> doFinish _,
-              Empty,
-              cancelId ->
-                (() => {
-                   redirectBack()
-                 }), //cancelId: (String, () => Unit),
-              theScreen,
-              ajaxForms_?)
+    renderAll(
+      Empty, //currentScreenNumber: Box[NodeSeq],
+      Empty, //screenCount: Box[NodeSeq],
+      Empty, // wizardTop: Box[Elem],
+      theScreen.screenTop, //screenTop: Box[Elem],
+      theScreen.screenFields
+        .filter(_.shouldDisplay_?)
+        .flatMap(
+          f =>
+            if (f.show_?)
+              List(
+                ScreenFieldInfo(f,
+                                f.displayHtml,
+                                f.helpAsHtml,
+                                f.toForm,
+                                fieldBinding(f),
+                                fieldTransform(f)))
+            else Nil), //fields: List[ScreenFieldInfo],
+      Empty, // prev: Box[Elem],
+      Full(cancelButton), // cancel: Box[Elem],
+      Empty, // next: Box[Elem],
+      Full(finishButton), //finish: Box[Elem],
+      theScreen.screenBottom, // screenBottom: Box[Elem],
+      Empty, //wizardBottom: Box[Elem],
+      finishId -> doFinish _,
+      Empty,
+      cancelId ->
+        (() => {
+           redirectBack()
+         }), //cancelId: (String, () => Unit),
+      theScreen,
+      ajaxForms_?
+    )
   }
 
   protected def allTemplatePath: List[String] =

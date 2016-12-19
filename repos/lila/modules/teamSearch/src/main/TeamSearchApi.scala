@@ -31,11 +31,11 @@ final class TeamSearchApi(client: ESClient,
         lila.log("teamSearch").info(s"Index to ${c.index.name}")
         import lila.db.api._
         import lila.team.tube.teamTube
-        $enumerate
-          .bulk[Option[Team]]($query[Team](Json.obj("enabled" -> true)), 300) {
-            teamOptions =>
-              c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
-          }
+        $enumerate.bulk[Option[Team]](
+          $query[Team](Json.obj("enabled" -> true)),
+          300) { teamOptions =>
+          c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
+        }
       }
     case _ => funit
   }

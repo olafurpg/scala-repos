@@ -90,5 +90,6 @@ object JsData extends lila.Steroids {
           }),
           "current" -> ctx.pref.puzzleDifficulty
         )
-      })
+      }
+    )
 }

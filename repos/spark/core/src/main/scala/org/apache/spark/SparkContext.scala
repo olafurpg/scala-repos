@@ -448,14 +448,12 @@ class SparkContext(config: SparkConf)
 
     _conf.set("spark.executor.id", SparkContext.DRIVER_IDENTIFIER)
 
-    _jars = _conf
-      .getOption("spark.jars")
+    _jars = _conf.getOption("spark.jars")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
       .flatten
-    _files = _conf
-      .getOption("spark.files")
+    _files = _conf.getOption("spark.files")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
@@ -537,8 +535,7 @@ class SparkContext(config: SparkConf)
       files.foreach(addFile)
     }
 
-    _executorMemory = _conf
-      .getOption("spark.executor.memory")
+    _executorMemory = _conf.getOption("spark.executor.memory")
       .orElse(Option(System.getenv("SPARK_EXECUTOR_MEMORY")))
       .orElse(Option(System.getenv("SPARK_MEM")).map(warnSparkMem))
       .map(Utils.memoryStringToMb)

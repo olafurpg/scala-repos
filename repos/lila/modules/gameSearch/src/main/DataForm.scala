@@ -85,26 +85,28 @@ private[gameSearch] case class SearchData(players: SearchPlayer =
   def sortOrDefault = sort | SearchSort()
 
   def query =
-    Query(user1 = players.cleanA,
-          user2 = players.cleanB,
-          winner = players.cleanWinner,
-          winnerColor = winnerColor,
-          perf = perf,
-          source = source,
-          rated = mode flatMap Mode.apply map (_.rated),
-          turns = Range(turnsMin, turnsMax),
-          averageRating = Range(ratingMin, ratingMax),
-          hasAi = hasAi map (_ == 1),
-          aiLevel = Range(aiLevelMin, aiLevelMax),
-          duration = Range(durationMin, durationMax),
-          clock =
-            Clocking(clock.initMin, clock.initMax, clock.incMin, clock.incMax),
-          date = Range(dateMin flatMap toDate, dateMax flatMap toDate),
-          status = status,
-          analysed = analysed map (_ == 1),
-          whiteUser = players.cleanWhite,
-          blackUser = players.cleanBlack,
-          sorting = Sorting(sortOrDefault.field, sortOrDefault.order))
+    Query(
+      user1 = players.cleanA,
+      user2 = players.cleanB,
+      winner = players.cleanWinner,
+      winnerColor = winnerColor,
+      perf = perf,
+      source = source,
+      rated = mode flatMap Mode.apply map (_.rated),
+      turns = Range(turnsMin, turnsMax),
+      averageRating = Range(ratingMin, ratingMax),
+      hasAi = hasAi map (_ == 1),
+      aiLevel = Range(aiLevelMin, aiLevelMax),
+      duration = Range(durationMin, durationMax),
+      clock =
+        Clocking(clock.initMin, clock.initMax, clock.incMin, clock.incMax),
+      date = Range(dateMin flatMap toDate, dateMax flatMap toDate),
+      status = status,
+      analysed = analysed map (_ == 1),
+      whiteUser = players.cleanWhite,
+      blackUser = players.cleanBlack,
+      sorting = Sorting(sortOrDefault.field, sortOrDefault.order)
+    )
 
   def nonEmptyQuery = Some(query).filter(_.nonEmpty)
 

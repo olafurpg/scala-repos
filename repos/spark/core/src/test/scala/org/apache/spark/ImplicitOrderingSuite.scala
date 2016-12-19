@@ -55,20 +55,22 @@ private object ImplicitOrderingSuite {
   }
 
   def basicMapExpectations(rdd: RDD[Int]): List[(Boolean, String)] = {
-    List((rdd.map(x => (x, x)).keyOrdering.isDefined,
-          "rdd.map(x => (x, x)).keyOrdering.isDefined"),
-         (rdd.map(x => (1, x)).keyOrdering.isDefined,
-          "rdd.map(x => (1, x)).keyOrdering.isDefined"),
-         (rdd.map(x => (x.toString, x)).keyOrdering.isDefined,
-          "rdd.map(x => (x.toString, x)).keyOrdering.isDefined"),
-         (rdd.map(x => (null, x)).keyOrdering.isDefined,
-          "rdd.map(x => (null, x)).keyOrdering.isDefined"),
-         (rdd.map(x => (new NonOrderedClass, x)).keyOrdering.isEmpty,
-          "rdd.map(x => (new NonOrderedClass, x)).keyOrdering.isEmpty"),
-         (rdd.map(x => (new ComparableClass, x)).keyOrdering.isDefined,
-          "rdd.map(x => (new ComparableClass, x)).keyOrdering.isDefined"),
-         (rdd.map(x => (new OrderedClass, x)).keyOrdering.isDefined,
-          "rdd.map(x => (new OrderedClass, x)).keyOrdering.isDefined"))
+    List(
+      (rdd.map(x => (x, x)).keyOrdering.isDefined,
+       "rdd.map(x => (x, x)).keyOrdering.isDefined"),
+      (rdd.map(x => (1, x)).keyOrdering.isDefined,
+       "rdd.map(x => (1, x)).keyOrdering.isDefined"),
+      (rdd.map(x => (x.toString, x)).keyOrdering.isDefined,
+       "rdd.map(x => (x.toString, x)).keyOrdering.isDefined"),
+      (rdd.map(x => (null, x)).keyOrdering.isDefined,
+       "rdd.map(x => (null, x)).keyOrdering.isDefined"),
+      (rdd.map(x => (new NonOrderedClass, x)).keyOrdering.isEmpty,
+       "rdd.map(x => (new NonOrderedClass, x)).keyOrdering.isEmpty"),
+      (rdd.map(x => (new ComparableClass, x)).keyOrdering.isDefined,
+       "rdd.map(x => (new ComparableClass, x)).keyOrdering.isDefined"),
+      (rdd.map(x => (new OrderedClass, x)).keyOrdering.isDefined,
+       "rdd.map(x => (new OrderedClass, x)).keyOrdering.isDefined")
+    )
   }
 
   def otherRDDMethodExpectations(rdd: RDD[Int]): List[(Boolean, String)] = {
@@ -87,6 +89,7 @@ private object ImplicitOrderingSuite {
          .groupBy((x: Int) => x, new HashPartitioner(5))
          .keyOrdering
          .isDefined,
-       "rdd.groupBy((x: Int) => x, new HashPartitioner(5)).keyOrdering.isDefined"))
+       "rdd.groupBy((x: Int) => x, new HashPartitioner(5)).keyOrdering.isDefined")
+    )
   }
 }

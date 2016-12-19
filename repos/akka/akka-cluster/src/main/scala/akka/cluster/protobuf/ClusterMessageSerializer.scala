@@ -74,7 +74,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
              uniqueAddressFromBinary(bytes))),
       classOf[GossipStatus] -> gossipStatusFromBinary,
       classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
-      classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary)
+      classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary
+    )
 
   def includeManifest: Boolean = true
 

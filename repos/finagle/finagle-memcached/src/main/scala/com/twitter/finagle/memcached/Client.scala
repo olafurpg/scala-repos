@@ -1433,18 +1433,15 @@ case class PHPMemCacheClientBuilder(
         .hostConnectionLimit(1)
         .daemon(true)
     val keyHasher = KeyHasher.byName(_hashName.getOrElse("crc32-itu"))
-    val clients = _nodes
-      .map {
-        case (hostname, port, weight) =>
-          val client = Client(
-            builder
-              .hosts(hostname + ":" + port)
-              .codec(text.Memcached())
-              .build())
-          for (i <- (1 to weight)) yield client
-      }
-      .flatten
-      .toArray
+    val clients = _nodes.map {
+      case (hostname, port, weight) =>
+        val client = Client(
+          builder
+            .hosts(hostname + ":" + port)
+            .codec(text.Memcached())
+            .build())
+        for (i <- (1 to weight)) yield client
+    }.flatten.toArray
     new PHPMemCacheClient(clients, keyHasher)
   }
 }

@@ -170,5 +170,6 @@ object Env {
       isOnline = lila.user.Env.current.isOnline,
       onStart = lila.game.Env.current.onStart,
       trophyApi = lila.user.Env.current.trophyApi,
-      scheduler = lila.common.PlayApp.scheduler)
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

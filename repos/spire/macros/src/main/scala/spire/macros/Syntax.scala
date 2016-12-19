@@ -42,7 +42,8 @@ object Ops extends machinist.Ops {
       // bool
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
-      (uesc('⊽'), "nor"))
+      (uesc('⊽'), "nor")
+    )
 
   def eqv[A, B](c: Context)(rhs: c.Expr[B])(
       ev: c.Expr[A =:= B]): c.Expr[Boolean] = {

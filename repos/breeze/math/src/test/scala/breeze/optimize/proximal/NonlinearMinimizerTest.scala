@@ -783,7 +783,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
                                 38.676633,
                                 37.634130,
                                 40.788606,
-                                97.605849))
+                                97.605849
+                              ))
     val fml = DenseVector(-1219.296604,
                           -1126.029219,
                           -1202.257728,
@@ -1474,7 +1475,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
                                 229.759185,
                                 247.878402,
                                 228.810942,
-                                253.353769))
+                                253.353769
+                              ))
     val fl1 = DenseVector(-892.842851,
                           -934.071560,
                           -932.936015,
@@ -2164,7 +2166,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
                                 229.759185,
                                 247.878402,
                                 228.810942,
-                                253.353769))
+                                253.353769
+                              ))
     val fl1 = DenseVector(-892.842851,
                           -934.071560,
                           -932.936015,

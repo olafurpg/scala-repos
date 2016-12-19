@@ -195,10 +195,9 @@ class PBatchView(val appId: Int,
       untilTimeOpt: Option[DateTime] = None
   ): RDD[(String, DataMap)] = {
 
-    _events
-      .filter(e =>
-        ((e.entityType == entityType) &&
-          (EventValidation.isSpecialEvents(e.event))))
+    _events.filter(e =>
+      ((e.entityType == entityType) &&
+        (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
         // within same partition

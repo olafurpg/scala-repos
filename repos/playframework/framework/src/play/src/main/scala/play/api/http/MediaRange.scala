@@ -22,22 +22,20 @@ case class MediaType(mediaType: String,
   override def toString = {
     mediaType + "/" + mediaSubType + parameters
       .map { param =>
-        "; " + param._1 + param._2
-          .map { value =>
-            if (MediaRangeParser
-                  .token(new CharSequenceReader(value))
-                  .next
-                  .atEnd) {
-              "=" + value
-            } else {
-              "=\"" +
-                value
-                  .replaceAll("\\\\", "\\\\\\\\")
-                  .replaceAll("\"", "\\\\\"") +
-                "\""
-            }
+        "; " + param._1 + param._2.map { value =>
+          if (MediaRangeParser
+                .token(new CharSequenceReader(value))
+                .next
+                .atEnd) {
+            "=" + value
+          } else {
+            "=\"" +
+              value
+                .replaceAll("\\\\", "\\\\\\\\")
+                .replaceAll("\"", "\\\\\"") +
+              "\""
           }
-          .getOrElse("")
+        }.getOrElse("")
       }
       .mkString("")
   }

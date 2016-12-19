@@ -889,7 +889,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                 38.676633,
                                 37.634130,
                                 40.788606,
-                                97.605849))
+                                97.605849
+                              ))
     val fml = DenseVector(-1219.296604,
                           -1126.029219,
                           -1202.257728,
@@ -1580,7 +1581,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                 38.676633,
                                 37.634130,
                                 40.788606,
-                                97.605849))
+                                97.605849
+                              ))
     val fml = DenseVector(-1219.296604,
                           -1126.029219,
                           -1202.257728,
@@ -2271,7 +2273,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                 229.759185,
                                 247.878402,
                                 228.810942,
-                                253.353769))
+                                253.353769
+                              ))
     val fl1 = DenseVector(-892.842851,
                           -934.071560,
                           -932.936015,
@@ -2960,7 +2963,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                 229.759185,
                                 247.878402,
                                 228.810942,
-                                253.353769))
+                                253.353769
+                              ))
     val fl1 = DenseVector(-892.842851,
                           -934.071560,
                           -932.936015,
@@ -3430,7 +3434,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                        522.409881,
                                        522.009144,
                                        535.001472,
-                                       593.140288))
+                                       593.140288
+                                     ))
     val q1 = DenseVector(-1880.240029,
                          -1920.949941,
                          -2030.476172,
@@ -3861,7 +3866,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                        0.000000,
                                        3894.934299,
                                        -1951.083671,
-                                       738.955915))
+                                       738.955915
+                                     ))
     val q2 = DenseVector(31755.057100,
                          -13047.148129,
                          20191.244430,
@@ -4510,7 +4516,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                        1.169388,
                                        1.159221,
                                        1.521522,
-                                       1.887527))
+                                       1.887527
+                                     ))
     val q3 = DenseVector(-3.640583,
                          -5.563638,
                          -7.040787,
@@ -4964,7 +4971,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
       0.046104,
       0.061995,
       0.063453,
-      0.031610)
+      0.031610
+    )
     val Psparse = new DenseMatrix(20, 20, data)
     val qsparse = DenseVector(-2.631990,
                               -1.894166,
@@ -5395,7 +5403,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                522.409881,
                                522.009144,
                                535.001472,
-                               593.140288))
+                               593.140288
+                             ))
     val q1 = DenseVector(-1880.240029,
                          -1920.949941,
                          -2030.476172,
@@ -6140,7 +6149,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
                                 38.676633,
                                 37.634130,
                                 40.788606,
-                                97.605849))
+                                97.605849
+                              ))
     val fml = DenseVector(-1219.296604,
                           -1126.029219,
                           -1202.257728,

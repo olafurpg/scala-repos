@@ -113,14 +113,13 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
         case (f, _) =>
           (rmap(f) -> FwdPath(List(r2sym, ElementSymbol(1), f)))
       } :+ (risym -> FwdPath(List(r2sym, ElementSymbol(2)))))))
-    val j2 = Join(
-      jlsym,
-      jrsym,
-      l2,
-      r2,
-      JoinType.Inner,
-      Library.==
-        .typed[Boolean](Select(Ref(jlsym), lisym), Select(Ref(jrsym), risym)))
+    val j2 = Join(jlsym,
+                  jrsym,
+                  l2,
+                  r2,
+                  JoinType.Inner,
+                  Library.==.typed[Boolean](Select(Ref(jlsym), lisym),
+                                            Select(Ref(jrsym), risym)))
     Bind(s1, j2, sel.replace {
       case FwdPath(Seq(s, ElementSymbol(1), f)) if s == s1 =>
         FwdPath(List(s, ElementSymbol(1), lmap(f)))

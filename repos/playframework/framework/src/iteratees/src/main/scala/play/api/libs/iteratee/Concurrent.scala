@@ -641,34 +641,33 @@ object Concurrent {
         .map {
           case (t, index) =>
             val p = t._2
-            t._1
-              .fold {
-                case Step.Done(a, e) =>
-                  p.success(Done(a, e))
-                  commitDone.single.transform(_ :+ index)
-                  Future.successful(())
+            t._1.fold {
+              case Step.Done(a, e) =>
+                p.success(Done(a, e))
+                commitDone.single.transform(_ :+ index)
+                Future.successful(())
 
-                case Step.Cont(k) =>
-                  val next = k(in)
-                  next.pureFold {
-                    case Step.Done(a, e) => {
-                      p.success(Done(a, e))
-                      commitDone.single.transform(_ :+ index)
-                    }
-                    case Step.Cont(k) =>
-                      commitReady.single.transform(
-                        _ :+ (index -> (Cont(k) -> p)))
-                    case Step.Error(msg, e) => {
-                      p.success(Error(msg, e))
-                      commitDone.single.transform(_ :+ index)
-                    }
-                  }(dec)
+              case Step.Cont(k) =>
+                val next = k(in)
+                next.pureFold {
+                  case Step.Done(a, e) => {
+                    p.success(Done(a, e))
+                    commitDone.single.transform(_ :+ index)
+                  }
+                  case Step.Cont(k) =>
+                    commitReady.single.transform(
+                      _ :+ (index -> (Cont(k) -> p)))
+                  case Step.Error(msg, e) => {
+                    p.success(Error(msg, e))
+                    commitDone.single.transform(_ :+ index)
+                  }
+                }(dec)
 
-                case Step.Error(msg, e) =>
-                  p.success(Error(msg, e))
-                  commitDone.single.transform(_ :+ index)
-                  Future.successful(())
-              }(dec)
+              case Step.Error(msg, e) =>
+                p.success(Error(msg, e))
+                commitDone.single.transform(_ :+ index)
+                Future.successful(())
+            }(dec)
               .andThen {
                 case Success(a) => a
                 case Failure(e) => p.failure(e)

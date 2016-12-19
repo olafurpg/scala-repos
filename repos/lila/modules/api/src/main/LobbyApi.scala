@@ -56,5 +56,6 @@ final class LobbyApi(lobby: ActorRef,
              "ai" -> pov.opponent.aiLevel)
         .noNull,
       "isMyTurn" -> pov.isMyTurn,
-      "secondsLeft" -> pov.remainingSeconds)
+      "secondsLeft" -> pov.remainingSeconds
+    )
 }

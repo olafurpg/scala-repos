@@ -48,30 +48,32 @@ class ScalaLanguageCodeStyleSettingsProvider
     val buffer: ArrayBuffer[String] = new ArrayBuffer
     //spacing
     if (settingsType == SettingsType.SPACING_SETTINGS) {
-      buffer ++= Seq("SPACE_AFTER_COMMA",
-                     "SPACE_BEFORE_IF_PARENTHESES",
-                     "SPACE_BEFORE_FOR_PARENTHESES",
-                     "SPACE_BEFORE_METHOD_PARENTHESES",
-                     "SPACE_BEFORE_METHOD_CALL_PARENTHESES",
-                     "SPACE_WITHIN_FOR_PARENTHESES",
-                     "SPACE_WITHIN_IF_PARENTHESES",
-                     "SPACE_WITHIN_WHILE_PARENTHESES",
-                     "SPACE_WITHIN_PARENTHESES",
-                     "SPACE_WITHIN_METHOD_PARENTHESES",
-                     "SPACE_WITHIN_METHOD_CALL_PARENTHESES",
-                     "SPACE_WITHIN_BRACKETS",
-                     "SPACE_BEFORE_CLASS_LBRACE",
-                     "SPACE_BEFORE_METHOD_LBRACE",
-                     "SPACE_BEFORE_IF_LBRACE",
-                     "SPACE_BEFORE_WHILE_LBRACE",
-                     "SPACE_BEFORE_DO_LBRACE",
-                     "SPACE_BEFORE_FOR_LBRACE",
-                     "SPACE_BEFORE_TRY_LBRACE",
-                     "SPACE_BEFORE_CATCH_LBRACE",
-                     "SPACE_BEFORE_FINALLY_LBRACE",
-                     "SPACE_BEFORE_WHILE_PARENTHESES",
-                     "SPACE_AFTER_SEMICOLON",
-                     "SPACE_BEFORE_ELSE_LBRACE")
+      buffer ++= Seq(
+        "SPACE_AFTER_COMMA",
+        "SPACE_BEFORE_IF_PARENTHESES",
+        "SPACE_BEFORE_FOR_PARENTHESES",
+        "SPACE_BEFORE_METHOD_PARENTHESES",
+        "SPACE_BEFORE_METHOD_CALL_PARENTHESES",
+        "SPACE_WITHIN_FOR_PARENTHESES",
+        "SPACE_WITHIN_IF_PARENTHESES",
+        "SPACE_WITHIN_WHILE_PARENTHESES",
+        "SPACE_WITHIN_PARENTHESES",
+        "SPACE_WITHIN_METHOD_PARENTHESES",
+        "SPACE_WITHIN_METHOD_CALL_PARENTHESES",
+        "SPACE_WITHIN_BRACKETS",
+        "SPACE_BEFORE_CLASS_LBRACE",
+        "SPACE_BEFORE_METHOD_LBRACE",
+        "SPACE_BEFORE_IF_LBRACE",
+        "SPACE_BEFORE_WHILE_LBRACE",
+        "SPACE_BEFORE_DO_LBRACE",
+        "SPACE_BEFORE_FOR_LBRACE",
+        "SPACE_BEFORE_TRY_LBRACE",
+        "SPACE_BEFORE_CATCH_LBRACE",
+        "SPACE_BEFORE_FINALLY_LBRACE",
+        "SPACE_BEFORE_WHILE_PARENTHESES",
+        "SPACE_AFTER_SEMICOLON",
+        "SPACE_BEFORE_ELSE_LBRACE"
+      )
     }
 
     //blank lines

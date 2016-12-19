@@ -624,7 +624,8 @@ object TestUtils extends Logging {
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.ByteArrayDeserializer",
       ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG -> partitionAssignmentStrategy,
       ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG -> sessionTimeout.toString,
-      ConsumerConfig.GROUP_ID_CONFIG -> groupId)
+      ConsumerConfig.GROUP_ID_CONFIG -> groupId
+    )
 
     defaultProps.foreach {
       case (key, value) =>

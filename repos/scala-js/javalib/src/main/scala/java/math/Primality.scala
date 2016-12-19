@@ -272,7 +272,8 @@ private[math] object Primality {
     1009,
     1013,
     1019,
-    1021)
+    1021
+  )
 
   /** Encodes how many i-bit primes there are in the table for {@code i=2,...,10}.
     *

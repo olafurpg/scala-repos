@@ -124,28 +124,28 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "api" boot new Env(config = lila.common.PlayApp.loadConfig,
-                       db = lila.db.Env.current,
-                       renderer = lila.hub.Env.current.actor.renderer,
-                       userEnv = lila.user.Env.current,
-                       analyseEnv = lila.analyse.Env.current,
-                       lobbyEnv = lila.lobby.Env.current,
-                       setupEnv = lila.setup.Env.current,
-                       getSimul = lila.simul.Env.current.repo.find,
-                       getSimulName = lila.simul.Env.current.cached.name,
-                       getTournamentName =
-                         lila.tournament.Env.current.cached.name,
-                       roundJsonView = lila.round.Env.current.jsonView,
-                       noteApi = lila.round.Env.current.noteApi,
-                       forecastApi = lila.round.Env.current.forecastApi,
-                       relationApi = lila.relation.Env.current.api,
-                       bookmarkApi = lila.bookmark.Env.current.api,
-                       getTourAndRanks =
-                         lila.tournament.Env.current.tourAndRanks,
-                       crosstableApi = lila.game.Env.current.crosstableApi,
-                       prefApi = lila.pref.Env.current.api,
-                       gamePgnDump = lila.game.Env.current.pgnDump,
-                       system = lila.common.PlayApp.system,
-                       scheduler = lila.common.PlayApp.scheduler,
-                       isProd = lila.common.PlayApp.isProd)
+    "api" boot new Env(
+      config = lila.common.PlayApp.loadConfig,
+      db = lila.db.Env.current,
+      renderer = lila.hub.Env.current.actor.renderer,
+      userEnv = lila.user.Env.current,
+      analyseEnv = lila.analyse.Env.current,
+      lobbyEnv = lila.lobby.Env.current,
+      setupEnv = lila.setup.Env.current,
+      getSimul = lila.simul.Env.current.repo.find,
+      getSimulName = lila.simul.Env.current.cached.name,
+      getTournamentName = lila.tournament.Env.current.cached.name,
+      roundJsonView = lila.round.Env.current.jsonView,
+      noteApi = lila.round.Env.current.noteApi,
+      forecastApi = lila.round.Env.current.forecastApi,
+      relationApi = lila.relation.Env.current.api,
+      bookmarkApi = lila.bookmark.Env.current.api,
+      getTourAndRanks = lila.tournament.Env.current.tourAndRanks,
+      crosstableApi = lila.game.Env.current.crosstableApi,
+      prefApi = lila.pref.Env.current.api,
+      gamePgnDump = lila.game.Env.current.pgnDump,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      isProd = lila.common.PlayApp.isProd
+    )
 }

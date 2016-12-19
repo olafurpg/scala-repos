@@ -103,15 +103,11 @@ abstract class Optimizer extends RuleExecutor[LogicalPlan] {
         EliminateSorts,
         SimplifyCasts,
         SimplifyCaseConversionExpressions,
-        EliminateSerialization) :: Batch(
-        "Decimal Optimizations",
+        EliminateSerialization
+      ) :: Batch("Decimal Optimizations", FixedPoint(100), DecimalAggregates) :: Batch(
+        "LocalRelation",
         FixedPoint(100),
-        DecimalAggregates) :: Batch("LocalRelation",
-                                    FixedPoint(100),
-                                    ConvertToLocalRelation) :: Batch(
-        "Subquery",
-        Once,
-        OptimizeSubqueries) :: Nil
+        ConvertToLocalRelation) :: Batch("Subquery", Once, OptimizeSubqueries) :: Nil
   }
 
   /**

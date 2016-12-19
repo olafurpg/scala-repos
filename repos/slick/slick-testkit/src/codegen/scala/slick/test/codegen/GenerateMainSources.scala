@@ -3,7 +3,12 @@ package slick.test.codegen
 import java.io.File
 import java.sql.Blob
 
-import com.typesafe.slick.testkit.util.{TestCodeGenerator, InternalJdbcTestDB, StandardTestDBs, JdbcTestDB}
+import com.typesafe.slick.testkit.util.{
+  TestCodeGenerator,
+  InternalJdbcTestDB,
+  StandardTestDBs,
+  JdbcTestDB
+}
 
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
@@ -22,96 +27,100 @@ object GenerateMainSources extends TestCodeGenerator {
     "slick.test.codegen.GeneratedCodeTest.test" + c.objectName
 
   lazy val configurations = Seq(
-      new Config("CG1", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")),
-      new Config("CG2",
-                 StandardTestDBs.HsqldbMem,
-                 "HsqldbMem",
-                 Seq("/dbs/hsqldb.sql")),
-      new Config("CG3",
-                 StandardTestDBs.SQLiteMem,
-                 "SQLiteMem",
-                 Seq("/dbs/sqlite.sql")),
-      new Config("CG7", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")) {
-        override def generator =
-          tdb.profile
-            .createModel(ignoreInvalidDefaults = false)
-            .map(new MyGen(_) {
-              override def entityName = {
-                case "COFFEES" => "Coff"
-                case other => super.entityName(other)
+    new Config("CG1", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")),
+    new Config("CG2",
+               StandardTestDBs.HsqldbMem,
+               "HsqldbMem",
+               Seq("/dbs/hsqldb.sql")),
+    new Config("CG3",
+               StandardTestDBs.SQLiteMem,
+               "SQLiteMem",
+               Seq("/dbs/sqlite.sql")),
+    new Config("CG7", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")) {
+      override def generator =
+        tdb.profile
+          .createModel(ignoreInvalidDefaults = false)
+          .map(new MyGen(_) {
+            override def entityName = {
+              case "COFFEES" => "Coff"
+              case other => super.entityName(other)
+            }
+            override def tableName = {
+              case "COFFEES" => "Coffs"
+              case "SUPPLIERS" => "Supps"
+              case other => super.tableName(other)
+            }
+            override def code = "trait AA; trait BB\n" + super.code
+            override def Table = new Table(_) {
+              override def EntityType = new EntityType {
+                override def parents = Seq("AA", "BB")
               }
-              override def tableName = {
-                case "COFFEES" => "Coffs"
-                case "SUPPLIERS" => "Supps"
-                case other => super.tableName(other)
+              override def TableClass = new TableClass {
+                override def parents = Seq("AA", "BB")
               }
-              override def code = "trait AA; trait BB\n" + super.code
-              override def Table = new Table(_) {
-                override def EntityType = new EntityType {
-                  override def parents = Seq("AA", "BB")
-                }
-                override def TableClass = new TableClass {
-                  override def parents = Seq("AA", "BB")
-                }
+            }
+          })
+    },
+    new Config("CG8",
+               StandardTestDBs.H2Mem,
+               "H2Mem",
+               Seq("/dbs/h2-simple.sql")) {
+      override def generator =
+        tdb.profile
+          .createModel(ignoreInvalidDefaults = false)
+          .map(new MyGen(_) {
+            override def Table = new Table(_) {
+              override def EntityType = new EntityType {
+                override def enabled = false
               }
-            })
-      },
-      new Config(
-          "CG8", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2-simple.sql")) {
-        override def generator =
-          tdb.profile
-            .createModel(ignoreInvalidDefaults = false)
-            .map(new MyGen(_) {
-              override def Table = new Table(_) {
-                override def EntityType = new EntityType {
-                  override def enabled = false
-                }
-                override def mappingEnabled = true
-                override def code = {
-                  if (model.name.table == "SIMPLE_AS") {
-                    Seq("""
+              override def mappingEnabled = true
+              override def code = {
+                if (model.name.table == "SIMPLE_AS") {
+                  Seq("""
 import slick.test.codegen.CustomTyping._
 import slick.test.codegen.CustomTyping
 type SimpleA = CustomTyping.SimpleA
 val  SimpleA = CustomTyping.SimpleA
                   """.trim) ++ super.code
-                  } else super.code
-                }
-                override def Column = new Column(_) {
-                  override def rawType = model.name match {
-                    case "A1" => "Bool"
-                    case _ => super.rawType
-                  }
+                } else super.code
+              }
+              override def Column = new Column(_) {
+                override def rawType = model.name match {
+                  case "A1" => "Bool"
+                  case _ => super.rawType
                 }
               }
-            })
-      },
-      new Config("CG9", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")) {
-        override def generator =
-          tdb.profile
-            .createModel(ignoreInvalidDefaults = false)
-            .map(new MyGen(_) {
-              override def Table = new Table(_) {
-                override def autoIncLastAsOption = true
-              }
-            })
-      },
-      new UUIDConfig(
-          "CG10", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/uuid.sql")),
-      new Config("Postgres1", StandardTestDBs.Postgres, "Postgres", Nil) {
-        import tdb.profile.api._
-        class A(tag: Tag) extends Table[(Int, Array[Byte], Blob)](tag, "a") {
-          def id = column[Int]("id")
-          def ba = column[Array[Byte]]("ba")
-          def blob = column[Blob]("blob")
-          def * = (id, ba, blob)
-        }
-        override def generator =
-          TableQuery[A].schema.create >> tdb.profile
-            .createModel(ignoreInvalidDefaults = false)
-            .map(new MyGen(_))
-        override def testCode =
-          """
+            }
+          })
+    },
+    new Config("CG9", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")) {
+      override def generator =
+        tdb.profile
+          .createModel(ignoreInvalidDefaults = false)
+          .map(new MyGen(_) {
+            override def Table = new Table(_) {
+              override def autoIncLastAsOption = true
+            }
+          })
+    },
+    new UUIDConfig("CG10",
+                   StandardTestDBs.H2Mem,
+                   "H2Mem",
+                   Seq("/dbs/uuid.sql")),
+    new Config("Postgres1", StandardTestDBs.Postgres, "Postgres", Nil) {
+      import tdb.profile.api._
+      class A(tag: Tag) extends Table[(Int, Array[Byte], Blob)](tag, "a") {
+        def id = column[Int]("id")
+        def ba = column[Array[Byte]]("ba")
+        def blob = column[Blob]("blob")
+        def * = (id, ba, blob)
+      }
+      override def generator =
+        TableQuery[A].schema.create >> tdb.profile
+          .createModel(ignoreInvalidDefaults = false)
+          .map(new MyGen(_))
+      override def testCode =
+        """
           |  import java.sql.Blob
           |  import javax.sql.rowset.serial.SerialBlob
           |  val a1 = ARow(1, Array[Byte](1,2,3), new SerialBlob(Array[Byte](4,5,6)))
@@ -121,19 +130,19 @@ val  SimpleA = CustomTyping.SimpleA
           |    A.result.map { case Seq(ARow(id, ba, blob)) => assertEquals("1123", ""+id+ba.mkString) }
           |  ).transactionally
         """.stripMargin
-      },
-      new UUIDConfig("Postgres2",
-                     StandardTestDBs.Postgres,
-                     "Postgres",
-                     Seq("/dbs/uuid.sql")),
-      new Config("EmptyDB", StandardTestDBs.H2Mem, "H2Mem", Nil),
-      new Config("Oracle1",
-                 StandardTestDBs.Oracle,
-                 "Oracle",
-                 Seq("/dbs/oracle1.sql")) {
-        override def useSingleLineStatements = true
-        override def testCode = "DBIO.successful(())"
-      }
+    },
+    new UUIDConfig("Postgres2",
+                   StandardTestDBs.Postgres,
+                   "Postgres",
+                   Seq("/dbs/uuid.sql")),
+    new Config("EmptyDB", StandardTestDBs.H2Mem, "H2Mem", Nil),
+    new Config("Oracle1",
+               StandardTestDBs.Oracle,
+               "Oracle",
+               Seq("/dbs/oracle1.sql")) {
+      override def useSingleLineStatements = true
+      override def testCode = "DBIO.successful(())"
+    }
   )
 
   //Unified UUID config

@@ -402,7 +402,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             annotatedInline = methodInlineInfo.annotatedInline,
             annotatedNoInline = methodInlineInfo.annotatedNoInline,
             samParamTypes = samParamTypes(calleeMethodNode, receiverType),
-            warning = warning)
+            warning = warning
+          )
 
         case None =>
           val warning = MethodInlineInfoMissing(

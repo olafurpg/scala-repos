@@ -713,22 +713,24 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child15.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input))
+          )
         }
 
     case 17 =>
@@ -788,23 +790,25 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child16.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input))
+          )
         }
 
     case 18 =>
@@ -867,24 +871,26 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child17.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)),
-               converter17(child17.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input)),
+            converter17(child17.eval(input))
+          )
         }
 
     case 19 =>
@@ -950,25 +956,27 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child18.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)),
-               converter17(child17.eval(input)),
-               converter18(child18.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input)),
+            converter17(child17.eval(input)),
+            converter18(child18.eval(input))
+          )
         }
 
     case 20 =>
@@ -1037,26 +1045,28 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child19.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)),
-               converter17(child17.eval(input)),
-               converter18(child18.eval(input)),
-               converter19(child19.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input)),
+            converter17(child17.eval(input)),
+            converter18(child18.eval(input)),
+            converter19(child19.eval(input))
+          )
         }
 
     case 21 =>
@@ -1128,27 +1138,29 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child20.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)),
-               converter17(child17.eval(input)),
-               converter18(child18.eval(input)),
-               converter19(child19.eval(input)),
-               converter20(child20.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input)),
+            converter17(child17.eval(input)),
+            converter18(child18.eval(input)),
+            converter19(child19.eval(input)),
+            converter20(child20.eval(input))
+          )
         }
 
     case 22 =>
@@ -1223,28 +1235,30 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child21.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)),
-               converter15(child15.eval(input)),
-               converter16(child16.eval(input)),
-               converter17(child17.eval(input)),
-               converter18(child18.eval(input)),
-               converter19(child19.eval(input)),
-               converter20(child20.eval(input)),
-               converter21(child21.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input)),
+            converter15(child15.eval(input)),
+            converter16(child16.eval(input)),
+            converter17(child17.eval(input)),
+            converter18(child18.eval(input)),
+            converter19(child19.eval(input)),
+            converter20(child20.eval(input)),
+            converter21(child21.eval(input))
+          )
         }
   }
 

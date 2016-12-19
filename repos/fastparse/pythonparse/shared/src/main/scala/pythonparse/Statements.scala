@@ -51,8 +51,8 @@ class Statements(indent: Int) {
     case (a, b) => b(a)
   }
   val classdef: P[Seq[Ast.expr] => Ast.stmt.ClassDef] = P(
-    kw("class") ~/ NAME ~ ("(" ~ testlist.? ~ ")").?
-      .map(_.toSeq.flatten.flatten) ~ ":" ~~ suite).map {
+    kw("class") ~/ NAME ~ ("(" ~ testlist.? ~ ")").?.map(
+      _.toSeq.flatten.flatten) ~ ":" ~~ suite).map {
     case (a, b, c) => Ast.stmt.ClassDef(a, b, c, _)
   }
 
@@ -82,15 +82,14 @@ class Statements(indent: Int) {
   }
 
   val augassign: P[Ast.operator] = P(
-    "+=".!.map(_ => Ast.operator.Add) | "-=".!
-      .map(_ => Ast.operator.Sub) | "*=".!.map(_ => Ast.operator.Mult) | "/=".!
-      .map(_ => Ast.operator.Div) | "%=".!.map(_ => Ast.operator.Mod) | "&=".!
-      .map(_ => Ast.operator.BitAnd) | "|=".!
-      .map(_ => Ast.operator.BitOr) | "^=".!
-      .map(_ => Ast.operator.BitXor) | "<<=".!
-      .map(_ => Ast.operator.LShift) | ">>=".!
-      .map(_ => Ast.operator.RShift) | "**=".!
-      .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
+    "+=".!.map(_ => Ast.operator.Add) | "-=".!.map(_ => Ast.operator.Sub) | "*=".!.map(
+      _ => Ast.operator.Mult) | "/=".!.map(_ => Ast.operator.Div) | "%=".!.map(
+      _ =>
+        Ast.operator.Mod) | "&=".!.map(_ => Ast.operator.BitAnd) | "|=".!.map(_ =>
+      Ast.operator.BitOr) | "^=".!.map(_ => Ast.operator.BitXor) | "<<=".!.map(
+      _ =>
+        Ast.operator.LShift) | ">>=".!.map(_ => Ast.operator.RShift) | "**=".!.map(
+      _ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
   )
 
   val print_stmt: P[Ast.stmt.Print] = {

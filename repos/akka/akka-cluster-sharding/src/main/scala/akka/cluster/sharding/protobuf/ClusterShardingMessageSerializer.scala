@@ -126,7 +126,8 @@ private[akka] class ClusterShardingMessageSerializer(
       },
       ShardStatsManifest -> { bytes ⇒
         shardStatsFromBinary(bytes)
-      })
+      }
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: EntityState ⇒ EntityStateManifest

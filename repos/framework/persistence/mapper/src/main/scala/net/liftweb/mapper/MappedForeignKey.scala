@@ -125,10 +125,8 @@ trait MappedForeignKey[
     // issue 165
     // invalidate if the primary key has changed Issue 370
     if (_obj.isEmpty ||
-        (_calcedObj && _obj.isDefined && _obj
-          .openOrThrowException("_obj was just checked as full.")
-          .primaryKeyField
-          .get != this.i_is_!)) {
+        (_calcedObj && _obj.isDefined && _obj.openOrThrowException(
+          "_obj was just checked as full.").primaryKeyField.get != this.i_is_!)) {
       _obj = Empty
       _calcedObj = false
     }

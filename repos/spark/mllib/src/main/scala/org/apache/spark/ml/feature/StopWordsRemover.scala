@@ -354,7 +354,8 @@ private[spark] object StopWords {
     "your",
     "yours",
     "yourself",
-    "yourselves")
+    "yourselves"
+  )
 }
 
 /**

@@ -38,7 +38,8 @@ final class ScheduleJsonView(getLightUser: String => Option[LightUser]) {
       "status" -> tour.status.id,
       "schedule" -> tour.schedule.map(scheduleJson),
       "winner" -> tour.winnerId.flatMap(getLightUser).map(userJson),
-      "perf" -> tour.perfType.map(perfJson))
+      "perf" -> tour.perfType.map(perfJson)
+    )
 
   private def userJson(u: LightUser) =
     Json.obj("id" -> u.id, "name" -> u.name, "title" -> u.title)

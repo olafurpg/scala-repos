@@ -85,7 +85,8 @@ class HiveExplainSuite
       "CreateTableAsSelect",
       "InsertIntoHiveTable",
       "Limit",
-      "src")
+      "src"
+    )
   }
 
   test("SPARK-6212: The EXPLAIN output of CTAS only shows the analyzed plan") {

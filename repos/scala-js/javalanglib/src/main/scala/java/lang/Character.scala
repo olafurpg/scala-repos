@@ -799,7 +799,8 @@ object Character {
     2,
     2,
     2,
-    2)
+    2
+  )
 
   // Character type data by ranges of types
   // charTypeIndices: contains the index where the range ends
@@ -4011,7 +4012,8 @@ object Character {
       65040,
       65534,
       2,
-      65534)
+      65534
+    )
     uncompressDeltas(deltas)
   }
 
@@ -7204,7 +7206,8 @@ object Character {
     18,
     0,
     18,
-    0)
+    0
+  )
 
   // Indices representing the start of ranges of codePoint that have the same
   // `isMirrored` result. It is true for the first range
@@ -7444,7 +7447,8 @@ object Character {
       57,
       1,
       57,
-      1)
+      1
+    )
     uncompressDeltas(deltas)
   }
 

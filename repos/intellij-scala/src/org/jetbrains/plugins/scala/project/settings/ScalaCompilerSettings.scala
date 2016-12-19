@@ -43,28 +43,30 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
   var plugins: Seq[String] = _
 
   private val ToggleOptions: Seq[(String, () => Boolean, Boolean => Unit)] =
-    Seq(("-language:dynamics", () => dynamics, dynamics = _),
-        ("-language:postfixOps", () => postfixOps, postfixOps = _),
-        ("-language:reflectiveCalls",
-         () => reflectiveCalls,
-         reflectiveCalls = _),
-        ("-language:implicitConversions",
-         () => implicitConversions,
-         implicitConversions = _),
-        ("-language:higherKinds", () => higherKinds, higherKinds = _),
-        ("-language:existentials", () => existentials, existentials = _),
-        ("-language:experimental.macros", () => macros, macros = _),
-        ("-Xexperimental", () => experimental, experimental = _),
-        ("-nowarn", () => !warnings, (b: Boolean) => warnings = !b),
-        ("-deprecation", () => deprecationWarnings, deprecationWarnings = _),
-        ("-unchecked", () => uncheckedWarnings, uncheckedWarnings = _),
-        ("-feature", () => featureWarnings, featureWarnings = _),
-        ("-optimise", () => optimiseBytecode, optimiseBytecode = _),
-        ("-explaintypes", () => explainTypeErrors, explainTypeErrors = _),
-        ("-no-specialization",
-         () => !specialization,
-         (b: Boolean) => specialization = !b),
-        ("-P:continuations:enable", () => continuations, continuations = _))
+    Seq(
+      ("-language:dynamics", () => dynamics, dynamics = _),
+      ("-language:postfixOps", () => postfixOps, postfixOps = _),
+      ("-language:reflectiveCalls",
+       () => reflectiveCalls,
+       reflectiveCalls = _),
+      ("-language:implicitConversions",
+       () => implicitConversions,
+       implicitConversions = _),
+      ("-language:higherKinds", () => higherKinds, higherKinds = _),
+      ("-language:existentials", () => existentials, existentials = _),
+      ("-language:experimental.macros", () => macros, macros = _),
+      ("-Xexperimental", () => experimental, experimental = _),
+      ("-nowarn", () => !warnings, (b: Boolean) => warnings = !b),
+      ("-deprecation", () => deprecationWarnings, deprecationWarnings = _),
+      ("-unchecked", () => uncheckedWarnings, uncheckedWarnings = _),
+      ("-feature", () => featureWarnings, featureWarnings = _),
+      ("-optimise", () => optimiseBytecode, optimiseBytecode = _),
+      ("-explaintypes", () => explainTypeErrors, explainTypeErrors = _),
+      ("-no-specialization",
+       () => !specialization,
+       (b: Boolean) => specialization = !b),
+      ("-P:continuations:enable", () => continuations, continuations = _)
+    )
 
   private val DebuggingOptions: Map[String, DebuggingInfoLevel] = Map(
     "-g:none" -> DebuggingInfoLevel.None,

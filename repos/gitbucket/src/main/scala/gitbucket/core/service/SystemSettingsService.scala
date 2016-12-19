@@ -106,18 +106,20 @@ trait SystemSettingsService {
         getValue(props, LdapAuthentication, false),
         if (getValue(props, LdapAuthentication, false)) {
           Some(
-            Ldap(getValue(props, LdapHost, ""),
-                 getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
-                 getOptionValue(props, LdapBindDN, None),
-                 getOptionValue(props, LdapBindPassword, None),
-                 getValue(props, LdapBaseDN, ""),
-                 getValue(props, LdapUserNameAttribute, ""),
-                 getOptionValue(props, LdapAdditionalFilterCondition, None),
-                 getOptionValue(props, LdapFullNameAttribute, None),
-                 getOptionValue(props, LdapMailAddressAttribute, None),
-                 getOptionValue[Boolean](props, LdapTls, None),
-                 getOptionValue[Boolean](props, LdapSsl, None),
-                 getOptionValue(props, LdapKeystore, None)))
+            Ldap(
+              getValue(props, LdapHost, ""),
+              getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
+              getOptionValue(props, LdapBindDN, None),
+              getOptionValue(props, LdapBindPassword, None),
+              getValue(props, LdapBaseDN, ""),
+              getValue(props, LdapUserNameAttribute, ""),
+              getOptionValue(props, LdapAdditionalFilterCondition, None),
+              getOptionValue(props, LdapFullNameAttribute, None),
+              getOptionValue(props, LdapMailAddressAttribute, None),
+              getOptionValue[Boolean](props, LdapTls, None),
+              getOptionValue[Boolean](props, LdapSsl, None),
+              getOptionValue(props, LdapKeystore, None)
+            ))
         } else {
           None
         }

@@ -424,26 +424,28 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
             // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
             // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
             CombineUnions),
-      Batch("Recover Scoping Info",
-            Once,
-            // A logical plan is allowed to have same-name outputs with different qualifiers(e.g. the
-            // `Join` operator). However, this kind of plan can't be put under a sub query as we will
-            // erase and assign a new qualifier to all outputs and make it impossible to distinguish
-            // same-name outputs. This rule renames all attributes, to guarantee different
-            // attributes(with different exprId) always have different names. It also removes all
-            // qualifiers, as attributes have unique names now and we don't need qualifiers to resolve
-            // ambiguity.
-            NormalizedAttribute,
-            // Our analyzer will add one or more sub-queries above table relation, this rule removes
-            // these sub-queries so that next rule can combine adjacent table relation and sample to
-            // SQLTable.
-            RemoveSubqueriesAboveSQLTable,
-            // Finds the table relations and wrap them with `SQLTable`s.  If there are any `Sample`
-            // operators on top of a table relation, merge the sample information into `SQLTable` of
-            // that table relation, as we can only convert table sample to standard SQL string.
-            ResolveSQLTable,
-            // Insert sub queries on top of operators that need to appear after FROM clause.
-            AddSubquery)
+      Batch(
+        "Recover Scoping Info",
+        Once,
+        // A logical plan is allowed to have same-name outputs with different qualifiers(e.g. the
+        // `Join` operator). However, this kind of plan can't be put under a sub query as we will
+        // erase and assign a new qualifier to all outputs and make it impossible to distinguish
+        // same-name outputs. This rule renames all attributes, to guarantee different
+        // attributes(with different exprId) always have different names. It also removes all
+        // qualifiers, as attributes have unique names now and we don't need qualifiers to resolve
+        // ambiguity.
+        NormalizedAttribute,
+        // Our analyzer will add one or more sub-queries above table relation, this rule removes
+        // these sub-queries so that next rule can combine adjacent table relation and sample to
+        // SQLTable.
+        RemoveSubqueriesAboveSQLTable,
+        // Finds the table relations and wrap them with `SQLTable`s.  If there are any `Sample`
+        // operators on top of a table relation, merge the sample information into `SQLTable` of
+        // that table relation, as we can only convert table sample to standard SQL string.
+        ResolveSQLTable,
+        // Insert sub queries on top of operators that need to appear after FROM clause.
+        AddSubquery
+      )
     )
 
     object NormalizedAttribute extends Rule[LogicalPlan] {

@@ -140,7 +140,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                   diffs,
                   hasWritePermission(owner, name, context.loginAccount),
                   repository,
-                  flash.toMap.map(f => f._1 -> f._2.toString))
+                  flash.toMap.map(f => f._1 -> f._2.toString)
+                )
             }
         }
     } getOrElse NotFound
@@ -187,7 +188,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                   }
                     .getOrElse(false),
                 hasMergePermission = hasMergePermission,
-                commitIdTo = pullreq.commitIdTo)
+                commitIdTo = pullreq.commitIdTo
+              )
               html.mergeguide(mergeStatus,
                               issue,
                               pullreq,
@@ -827,6 +829,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                      owner -> repoName),
           condition,
           repository,
-          hasWritePermission(owner, repoName, context.loginAccount))
+          hasWritePermission(owner, repoName, context.loginAccount)
+        )
     }
 }

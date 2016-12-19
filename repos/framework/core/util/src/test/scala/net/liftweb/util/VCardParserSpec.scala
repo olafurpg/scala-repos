@@ -54,7 +54,8 @@ object VCardParserSpec extends Specification with XmlMatchers {
                        List("(111) 555-1212")),
             VCardEntry(VCardKey("TEL", List(("HOME", ""), ("VOICE", ""))),
                        List("(404) 555-1212")),
-            VCardEntry(VCardKey("END", List()), List("VCARD")))
+            VCardEntry(VCardKey("END", List()), List("VCARD"))
+          )
         }
       }
     }

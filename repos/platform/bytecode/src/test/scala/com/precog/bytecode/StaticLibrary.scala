@@ -37,7 +37,8 @@ trait StaticLibrary extends Library {
     Reduction(Vector(), "forall", 0x2011),
     Reduction(Vector("std", "lib"), "sum", 0x0010),
     Reduction(Vector("ack"), "ook", 0x0011),
-    Reduction(Vector("one", "two", "three"), "qnd", 0x0012))
+    Reduction(Vector("one", "two", "three"), "qnd", 0x0012)
+  )
 
   lazy val lib1 = Set(
     Op1(Vector(), "bin", 0x0000),

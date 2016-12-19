@@ -13,28 +13,30 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
   def apply(simul: Simul): Fu[JsObject] =
     GameRepo.games(simul.gameIds) map { games =>
       val lightHost = getLightUser(simul.hostId)
-      Json.obj("id" -> simul.id,
-               "host" -> lightHost.map { host =>
-                 Json.obj("id" -> host.id,
-                          "username" -> host.name,
-                          "title" -> host.title,
-                          "rating" -> simul.hostRating,
-                          "gameId" -> simul.hostGameId)
-               },
-               "name" -> simul.name,
-               "fullName" -> simul.fullName,
-               "variants" -> simul.variants.map(
-                 variantJson(chess.Speed(simul.clock.chessClock.some))),
-               "applicants" -> simul.applicants
-                 .sortBy(-_.player.rating)
-                 .map(applicantJson),
-               "pairings" -> simul.pairings
-                 .sortBy(-_.player.rating)
-                 .map(pairingJson(games, simul.hostId)),
-               "isCreated" -> simul.isCreated,
-               "isRunning" -> simul.isRunning,
-               "isFinished" -> simul.isFinished,
-               "quote" -> lila.quote.Quote.one(simul.id))
+      Json.obj(
+        "id" -> simul.id,
+        "host" -> lightHost.map { host =>
+          Json.obj("id" -> host.id,
+                   "username" -> host.name,
+                   "title" -> host.title,
+                   "rating" -> simul.hostRating,
+                   "gameId" -> simul.hostGameId)
+        },
+        "name" -> simul.name,
+        "fullName" -> simul.fullName,
+        "variants" -> simul.variants.map(
+          variantJson(chess.Speed(simul.clock.chessClock.some))),
+        "applicants" -> simul.applicants
+          .sortBy(-_.player.rating)
+          .map(applicantJson),
+        "pairings" -> simul.pairings
+          .sortBy(-_.player.rating)
+          .map(pairingJson(games, simul.hostId)),
+        "isCreated" -> simul.isCreated,
+        "isRunning" -> simul.isRunning,
+        "isFinished" -> simul.isFinished,
+        "quote" -> lila.quote.Quote.one(simul.id)
+      )
     }
 
   private def variantJson(speed: chess.Speed)(v: chess.variant.Variant) =

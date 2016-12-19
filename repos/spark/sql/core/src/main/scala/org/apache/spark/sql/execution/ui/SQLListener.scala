@@ -312,9 +312,7 @@ private[sql] class SQLListener(conf: SparkConf)
         case Some(executionUIData) =>
           val accumulatorUpdates = {
             for (stageId <- executionUIData.stages;
-                 stageMetrics <- _stageIdToStageMetrics
-                   .get(stageId)
-                   .toIterable;
+                 stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable;
                  taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
                  accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
               assert(

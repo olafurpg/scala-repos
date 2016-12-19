@@ -129,7 +129,8 @@ trait MultiNodeClusterSpec
         classOf[
           akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying],
         //        akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying.getClass,
-        classOf[akka.remote.transport.AssociationHandle.InboundPayload])(sys)
+        classOf[akka.remote.transport.AssociationHandle.InboundPayload]
+      )(sys)
     }
   }
 

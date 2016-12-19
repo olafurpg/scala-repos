@@ -761,7 +761,8 @@ class SpectralProjectedGradientTest
                                 229.759185,
                                 247.878402,
                                 228.810942,
-                                253.353769))
+                                253.353769
+                              ))
     val fl1 = DenseVector(-892.842851,
                           -934.071560,
                           -932.936015,

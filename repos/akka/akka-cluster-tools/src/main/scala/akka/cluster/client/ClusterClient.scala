@@ -71,7 +71,8 @@ object ClusterClientSettings {
         case "off" ⇒ None
         case _ ⇒
           Some(config.getDuration("reconnect-timeout", MILLISECONDS).millis)
-      })
+      }
+    )
   }
 
   /**

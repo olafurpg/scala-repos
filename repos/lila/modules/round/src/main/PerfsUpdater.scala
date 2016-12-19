@@ -21,7 +21,7 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
            resetGameRatings: Boolean = false): Funit =
     PerfPicker.main(game) ?? { mainPerf =>
       (game.rated && game.finished && game.accountable && !white.lame &&
-          !black.lame) ?? {
+      !black.lame) ?? {
         val ratingsW = mkRatings(white.perfs)
         val ratingsB = mkRatings(black.perfs)
         val result = resultOf(game)
@@ -29,24 +29,34 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
           case chess.variant.Chess960 =>
             updateRatings(ratingsW.chess960, ratingsB.chess960, result, system)
           case chess.variant.KingOfTheHill =>
-            updateRatings(
-                ratingsW.kingOfTheHill, ratingsB.kingOfTheHill, result, system)
+            updateRatings(ratingsW.kingOfTheHill,
+                          ratingsB.kingOfTheHill,
+                          result,
+                          system)
           case chess.variant.ThreeCheck =>
-            updateRatings(
-                ratingsW.threeCheck, ratingsB.threeCheck, result, system)
+            updateRatings(ratingsW.threeCheck,
+                          ratingsB.threeCheck,
+                          result,
+                          system)
           case chess.variant.Antichess =>
-            updateRatings(
-                ratingsW.antichess, ratingsB.antichess, result, system)
+            updateRatings(ratingsW.antichess,
+                          ratingsB.antichess,
+                          result,
+                          system)
           case chess.variant.Atomic =>
             updateRatings(ratingsW.atomic, ratingsB.atomic, result, system)
           case chess.variant.Horde =>
             updateRatings(ratingsW.horde, ratingsB.horde, result, system)
           case chess.variant.RacingKings =>
-            updateRatings(
-                ratingsW.racingKings, ratingsB.racingKings, result, system)
+            updateRatings(ratingsW.racingKings,
+                          ratingsB.racingKings,
+                          result,
+                          system)
           case chess.variant.Crazyhouse =>
-            updateRatings(
-                ratingsW.crazyhouse, ratingsB.crazyhouse, result, system)
+            updateRatings(ratingsW.crazyhouse,
+                          ratingsB.crazyhouse,
+                          result,
+                          system)
           case chess.variant.Standard =>
             game.speed match {
               case Speed.Bullet =>
@@ -54,8 +64,10 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
               case Speed.Blitz =>
                 updateRatings(ratingsW.blitz, ratingsB.blitz, result, system)
               case Speed.Classical =>
-                updateRatings(
-                    ratingsW.classical, ratingsB.classical, result, system)
+                updateRatings(ratingsW.classical,
+                              ratingsB.classical,
+                              result,
+                              system)
               case Speed.Correspondence =>
                 updateRatings(ratingsW.correspondence,
                               ratingsB.correspondence,
@@ -68,25 +80,27 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
         val perfsB = mkPerfs(ratingsB, black.perfs, game)
         def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
         resetGameRatings.fold(
-            GameRepo.setRatingAndDiffs(game.id,
-                                       intRatingLens(white.perfs) ->
+          GameRepo.setRatingAndDiffs(game.id,
+                                     intRatingLens(white.perfs) ->
                                        (intRatingLens(perfsW) -
-                                           intRatingLens(white.perfs)),
-                                       intRatingLens(black.perfs) ->
+                                         intRatingLens(white.perfs)),
+                                     intRatingLens(black.perfs) ->
                                        (intRatingLens(perfsB) -
-                                           intRatingLens(black.perfs))),
-            GameRepo.setRatingDiffs(game.id,
-                                    intRatingLens(perfsW) -
+                                         intRatingLens(black.perfs))),
+          GameRepo.setRatingDiffs(game.id,
+                                  intRatingLens(perfsW) -
                                     intRatingLens(white.perfs),
-                                    intRatingLens(perfsB) -
+                                  intRatingLens(perfsB) -
                                     intRatingLens(black.perfs))
         ) zip UserRepo.setPerfs(white, perfsW, white.perfs) zip UserRepo
           .setPerfs(black, perfsB, black.perfs) zip historyApi.add(
-            white,
-            game,
-            perfsW) zip historyApi.add(black, game, perfsB) zip rankingApi
+          white,
+          game,
+          perfsW) zip historyApi.add(black, game, perfsB) zip rankingApi
           .save(white.id, game.perfType, perfsW) zip rankingApi.save(
-            black.id, game.perfType, perfsB)
+          black.id,
+          game.perfType,
+          perfsB)
       }.void
     }
 
@@ -150,53 +164,56 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
         perf.addOrReset(_.round.error.glicko, s"game ${game.id}")(rating, date)
       else perf
     val perfs1 = perfs.copy(
-        chess960 = addRatingIf(
-              game.ratingVariant.chess960, perfs.chess960, ratings.chess960),
-        kingOfTheHill = addRatingIf(game.ratingVariant.kingOfTheHill,
-                                    perfs.kingOfTheHill,
-                                    ratings.kingOfTheHill),
-        threeCheck = addRatingIf(game.ratingVariant.threeCheck,
-                                 perfs.threeCheck,
-                                 ratings.threeCheck),
-        antichess = addRatingIf(game.ratingVariant.antichess,
-                                perfs.antichess,
-                                ratings.antichess),
-        atomic = addRatingIf(
-              game.ratingVariant.atomic, perfs.atomic, ratings.atomic),
-        horde = addRatingIf(
-              game.ratingVariant.horde, perfs.horde, ratings.horde),
-        racingKings = addRatingIf(game.ratingVariant.racingKings,
-                                  perfs.racingKings,
-                                  ratings.racingKings),
-        crazyhouse = addRatingIf(game.ratingVariant.crazyhouse,
-                                 perfs.crazyhouse,
-                                 ratings.crazyhouse),
-        bullet = addRatingIf(
-              isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
-        blitz = addRatingIf(
-              isStd && speed == Speed.Blitz, perfs.blitz, ratings.blitz),
-        classical = addRatingIf(isStd && speed == Speed.Classical,
-                                perfs.classical,
-                                ratings.classical),
-        correspondence = addRatingIf(isStd && speed == Speed.Correspondence,
-                                     perfs.correspondence,
-                                     ratings.correspondence))
+      chess960 = addRatingIf(game.ratingVariant.chess960,
+                             perfs.chess960,
+                             ratings.chess960),
+      kingOfTheHill = addRatingIf(game.ratingVariant.kingOfTheHill,
+                                  perfs.kingOfTheHill,
+                                  ratings.kingOfTheHill),
+      threeCheck = addRatingIf(game.ratingVariant.threeCheck,
+                               perfs.threeCheck,
+                               ratings.threeCheck),
+      antichess = addRatingIf(game.ratingVariant.antichess,
+                              perfs.antichess,
+                              ratings.antichess),
+      atomic =
+        addRatingIf(game.ratingVariant.atomic, perfs.atomic, ratings.atomic),
+      horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
+      racingKings = addRatingIf(game.ratingVariant.racingKings,
+                                perfs.racingKings,
+                                ratings.racingKings),
+      crazyhouse = addRatingIf(game.ratingVariant.crazyhouse,
+                               perfs.crazyhouse,
+                               ratings.crazyhouse),
+      bullet = addRatingIf(isStd && speed == Speed.Bullet,
+                           perfs.bullet,
+                           ratings.bullet),
+      blitz =
+        addRatingIf(isStd && speed == Speed.Blitz, perfs.blitz, ratings.blitz),
+      classical = addRatingIf(isStd && speed == Speed.Classical,
+                              perfs.classical,
+                              ratings.classical),
+      correspondence = addRatingIf(isStd && speed == Speed.Correspondence,
+                                   perfs.correspondence,
+                                   ratings.correspondence)
+    )
     val r = lila.rating.Regulator
     val perfs2 = perfs1.copy(
-        chess960 = r(PT.Chess960, perfs.chess960, perfs1.chess960),
-        kingOfTheHill = r(
-              PT.KingOfTheHill, perfs.kingOfTheHill, perfs1.kingOfTheHill),
-        threeCheck = r(PT.ThreeCheck, perfs.threeCheck, perfs1.threeCheck),
-        antichess = r(PT.Antichess, perfs.antichess, perfs1.antichess),
-        atomic = r(PT.Atomic, perfs.atomic, perfs1.atomic),
-        horde = r(PT.Horde, perfs.horde, perfs1.horde),
-        racingKings = r(PT.RacingKings, perfs.racingKings, perfs1.racingKings),
-        crazyhouse = r(PT.Crazyhouse, perfs.crazyhouse, perfs1.crazyhouse),
-        bullet = r(PT.Bullet, perfs.bullet, perfs1.bullet),
-        blitz = r(PT.Blitz, perfs.blitz, perfs1.blitz),
-        classical = r(PT.Classical, perfs.classical, perfs1.classical),
-        correspondence = r(
-              PT.Correspondence, perfs.correspondence, perfs1.correspondence))
+      chess960 = r(PT.Chess960, perfs.chess960, perfs1.chess960),
+      kingOfTheHill =
+        r(PT.KingOfTheHill, perfs.kingOfTheHill, perfs1.kingOfTheHill),
+      threeCheck = r(PT.ThreeCheck, perfs.threeCheck, perfs1.threeCheck),
+      antichess = r(PT.Antichess, perfs.antichess, perfs1.antichess),
+      atomic = r(PT.Atomic, perfs.atomic, perfs1.atomic),
+      horde = r(PT.Horde, perfs.horde, perfs1.horde),
+      racingKings = r(PT.RacingKings, perfs.racingKings, perfs1.racingKings),
+      crazyhouse = r(PT.Crazyhouse, perfs.crazyhouse, perfs1.crazyhouse),
+      bullet = r(PT.Bullet, perfs.bullet, perfs1.bullet),
+      blitz = r(PT.Blitz, perfs.blitz, perfs1.blitz),
+      classical = r(PT.Classical, perfs.classical, perfs1.classical),
+      correspondence =
+        r(PT.Correspondence, perfs.correspondence, perfs1.correspondence)
+    )
     if (isStd) perfs2.updateStandard else perfs2
   }
 }

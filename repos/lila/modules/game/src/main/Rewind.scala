@@ -41,7 +41,8 @@ object Rewind {
               (game.moveTimes take rewindedGame.turns),
           crazyData = rewindedSituation.board.crazyData,
           status = game.status,
-          clock = game.clock map (_.takeback))
+          clock = game.clock map (_.takeback)
+        )
         Progress(game,
                  newGame,
                  List(

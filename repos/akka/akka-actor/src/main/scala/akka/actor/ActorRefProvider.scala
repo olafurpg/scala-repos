@@ -513,8 +513,8 @@ private[akka] class LocalActorRefProvider private[akka] (
   private[akka] val log: LoggingAdapter =
     Logging(eventStream, getClass.getName + "(" + rootPath.address + ")")
 
-  override val deadLetters: InternalActorRef = _deadLetters
-    .getOrElse((p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
+  override val deadLetters: InternalActorRef = _deadLetters.getOrElse(
+    (p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
     .apply(rootPath / "deadLetters")
 
   private[this] final val terminationPromise: Promise[Terminated] =

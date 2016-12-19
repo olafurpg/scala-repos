@@ -345,7 +345,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
           ),
           properties = h.getParameters.asScala.toMap,
           viewOriginalText = Option(h.getViewOriginalText),
-          viewText = Option(h.getViewExpandedText))
+          viewText = Option(h.getViewExpandedText)
+        )
       }
     }
 

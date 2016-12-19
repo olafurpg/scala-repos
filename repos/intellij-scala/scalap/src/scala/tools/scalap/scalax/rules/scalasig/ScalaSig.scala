@@ -275,7 +275,8 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
       51 -~ typeRef ~ symbolRef ~ (attribTreeRef *) ^~~^ AnnotatedWithSelfType,
       47 -~ typeLevel ~ typeIndex ^~^ DeBruijnIndexType,
       48 -~ typeRef ~ (symbolRef *) ^~^ ExistentialType,
-      52 -~ typeRef ~ typeRef ^~^ SuperType) as "type"
+      52 -~ typeRef ~ typeRef ^~^ SuperType
+    ) as "type"
 
   lazy val literal = oneOf(
     24 -^ (()),

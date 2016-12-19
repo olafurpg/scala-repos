@@ -695,23 +695,25 @@ object Console extends Logging {
 
   val mainHelp = txt.main().toString
 
-  val helpText = Map("" -> mainHelp,
-                     "status" -> txt.status().toString,
-                     "upgrade" -> txt.upgrade().toString,
-                     "version" -> txt.version().toString,
-                     "template" -> txt.template().toString,
-                     "build" -> txt.build().toString,
-                     "train" -> txt.train().toString,
-                     "deploy" -> txt.deploy().toString,
-                     "eventserver" -> txt.eventserver().toString,
-                     "adminserver" -> txt.adminserver().toString,
-                     "app" -> txt.app().toString,
-                     "accesskey" -> txt.accesskey().toString,
-                     "import" -> txt.imprt().toString,
-                     "export" -> txt.export().toString,
-                     "run" -> txt.run().toString,
-                     "eval" -> txt.eval().toString,
-                     "dashboard" -> txt.dashboard().toString)
+  val helpText = Map(
+    "" -> mainHelp,
+    "status" -> txt.status().toString,
+    "upgrade" -> txt.upgrade().toString,
+    "version" -> txt.version().toString,
+    "template" -> txt.template().toString,
+    "build" -> txt.build().toString,
+    "train" -> txt.train().toString,
+    "deploy" -> txt.deploy().toString,
+    "eventserver" -> txt.eventserver().toString,
+    "adminserver" -> txt.adminserver().toString,
+    "app" -> txt.app().toString,
+    "accesskey" -> txt.accesskey().toString,
+    "import" -> txt.imprt().toString,
+    "export" -> txt.export().toString,
+    "run" -> txt.run().toString,
+    "eval" -> txt.eval().toString,
+    "dashboard" -> txt.dashboard().toString
+  )
 
   def version(ca: ConsoleArgs): Unit = println(BuildInfo.version)
 

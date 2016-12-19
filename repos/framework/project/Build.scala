@@ -131,39 +131,41 @@ object BuildDef extends Build {
     .settings(libraryDependencies ++=
       Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
     .settings(yuiCompressor.Plugin.yuiSettings: _*)
-    .settings(description := "Webkit Library",
-              parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
-                Seq(commons_fileupload,
-                    rhino,
-                    servlet_api,
-                    specs2.copy(configurations = Some("provided")),
-                    jetty6,
-                    jwebunit)
-              },
-              initialize in Test <<= (sourceDirectory in Test) { src =>
-                System.setProperty("net.liftweb.webapptest.src.test.webapp",
-                                   (src / "webapp").absString)
-              },
-              (compile in Compile) <<= (compile in Compile) dependsOn
-                (WebKeys.assets),
-              /**
-                * This is to ensure that the tests in net.liftweb.webapptest run last
-                * so that other tests (MenuSpec in particular) run before the SiteMap
-                * is set.
-                */
-              testGrouping in Test <<= (definedTests in Test).map { tests =>
-                import Tests._
+    .settings(
+      description := "Webkit Library",
+      parallelExecution in Test := false,
+      libraryDependencies <++= scalaVersion { sv =>
+        Seq(commons_fileupload,
+            rhino,
+            servlet_api,
+            specs2.copy(configurations = Some("provided")),
+            jetty6,
+            jwebunit)
+      },
+      initialize in Test <<= (sourceDirectory in Test) { src =>
+        System.setProperty("net.liftweb.webapptest.src.test.webapp",
+                           (src / "webapp").absString)
+      },
+      (compile in Compile) <<= (compile in Compile) dependsOn
+        (WebKeys.assets),
+      /**
+        * This is to ensure that the tests in net.liftweb.webapptest run last
+        * so that other tests (MenuSpec in particular) run before the SiteMap
+        * is set.
+        */
+      testGrouping in Test <<= (definedTests in Test).map { tests =>
+        import Tests._
 
-                val (webapptests, others) = tests.partition { test =>
-                  test.name.startsWith("net.liftweb.webapptest")
-                }
+        val (webapptests, others) = tests.partition { test =>
+          test.name.startsWith("net.liftweb.webapptest")
+        }
 
-                Seq(
-                  new Group("others", others, InProcess),
-                  new Group("webapptests", webapptests, InProcess)
-                )
-              })
+        Seq(
+          new Group("others", others, InProcess),
+          new Group("webapptests", webapptests, InProcess)
+        )
+      }
+    )
     .enablePlugins(SbtWeb)
 
   // Persistence Projects

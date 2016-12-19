@@ -180,7 +180,8 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
         },
         GlobalSearchScope.allScope(getProject),
         getProject,
-        null)
+        null
+      )
 
       result match {
         case Some(o) => o

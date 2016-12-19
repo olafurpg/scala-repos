@@ -202,26 +202,26 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "round" boot new Env(config = lila.common.PlayApp loadConfig "round",
-                         system = lila.common.PlayApp.system,
-                         db = lila.db.Env.current,
-                         hub = lila.hub.Env.current,
-                         fishnetPlayer = lila.fishnet.Env.current.player,
-                         aiPerfApi = lila.fishnet.Env.current.aiPerfApi,
-                         crosstableApi = lila.game.Env.current.crosstableApi,
-                         playban = lila.playban.Env.current.api,
-                         lightUser = lila.user.Env.current.lightUser,
-                         userJsonView = lila.user.Env.current.jsonView,
-                         rankingApi = lila.user.Env.current.rankingApi,
-                         uciMemo = lila.game.Env.current.uciMemo,
-                         rematch960Cache =
-                           lila.game.Env.current.cached.rematch960,
-                         isRematchCache =
-                           lila.game.Env.current.cached.isRematch,
-                         onStart = lila.game.Env.current.onStart,
-                         i18nKeys = lila.i18n.Env.current.keys,
-                         prefApi = lila.pref.Env.current.api,
-                         chatApi = lila.chat.Env.current.api,
-                         historyApi = lila.history.Env.current.api,
-                         scheduler = lila.common.PlayApp.scheduler)
+    "round" boot new Env(
+      config = lila.common.PlayApp loadConfig "round",
+      system = lila.common.PlayApp.system,
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      fishnetPlayer = lila.fishnet.Env.current.player,
+      aiPerfApi = lila.fishnet.Env.current.aiPerfApi,
+      crosstableApi = lila.game.Env.current.crosstableApi,
+      playban = lila.playban.Env.current.api,
+      lightUser = lila.user.Env.current.lightUser,
+      userJsonView = lila.user.Env.current.jsonView,
+      rankingApi = lila.user.Env.current.rankingApi,
+      uciMemo = lila.game.Env.current.uciMemo,
+      rematch960Cache = lila.game.Env.current.cached.rematch960,
+      isRematchCache = lila.game.Env.current.cached.isRematch,
+      onStart = lila.game.Env.current.onStart,
+      i18nKeys = lila.i18n.Env.current.keys,
+      prefApi = lila.pref.Env.current.api,
+      chatApi = lila.chat.Env.current.api,
+      historyApi = lila.history.Env.current.api,
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

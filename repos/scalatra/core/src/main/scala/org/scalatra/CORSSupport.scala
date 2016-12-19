@@ -88,27 +88,29 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
   abstract override def initialize(config: ConfigT): Unit = {
     super.initialize(config)
     def createDefault: CORSConfig =
-      CORSConfig(Option(config.context.getInitParameter(AllowedOriginsKey))
-                   .getOrElse(AnyOrigin)
-                   .split(",")
-                   .map(_.trim),
-                 Option(config.context.getInitParameter(AllowedMethodsKey))
-                   .getOrElse(DefaultMethods)
-                   .split(",")
-                   .map(_.trim),
-                 Option(config.context.getInitParameter(AllowedHeadersKey))
-                   .getOrElse(DefaultHeaders)
-                   .split(",")
-                   .map(_.trim),
-                 Option(config.context.getInitParameter(AllowCredentialsKey))
-                   .map(_.toBoolean)
-                   .getOrElse(true),
-                 Option(config.context.getInitParameter(PreflightMaxAgeKey))
-                   .map(_.toInt)
-                   .getOrElse(1800),
-                 Option(config.context.getInitParameter(EnableKey))
-                   .map(_.toBoolean)
-                   .getOrElse(true))
+      CORSConfig(
+        Option(config.context.getInitParameter(AllowedOriginsKey))
+          .getOrElse(AnyOrigin)
+          .split(",")
+          .map(_.trim),
+        Option(config.context.getInitParameter(AllowedMethodsKey))
+          .getOrElse(DefaultMethods)
+          .split(",")
+          .map(_.trim),
+        Option(config.context.getInitParameter(AllowedHeadersKey))
+          .getOrElse(DefaultHeaders)
+          .split(",")
+          .map(_.trim),
+        Option(config.context.getInitParameter(AllowCredentialsKey))
+          .map(_.toBoolean)
+          .getOrElse(true),
+        Option(config.context.getInitParameter(PreflightMaxAgeKey))
+          .map(_.toInt)
+          .getOrElse(1800),
+        Option(config.context.getInitParameter(EnableKey))
+          .map(_.toBoolean)
+          .getOrElse(true)
+      )
 
     val corsCfg = config.context
       .getOrElseUpdate(CorsConfigKey, createDefault)

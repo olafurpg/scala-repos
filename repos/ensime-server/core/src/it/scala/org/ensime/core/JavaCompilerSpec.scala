@@ -107,7 +107,8 @@ class JavaCompilerSpec
         "    return \"tues\";",
         "  }",
         "  public enum Day { MON, TUES }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val info = cc.askSymbolAtPoint(sf, offset).get
         label match {
           case "0" | "11" | "12" =>
@@ -246,7 +247,8 @@ class JavaCompilerSpec
         "      System.out.@14@",
         "    }",
         "  }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val info = cc.askCompletionsAtPoint(sf, offset, 0, false)
         label match {
           case "0" =>

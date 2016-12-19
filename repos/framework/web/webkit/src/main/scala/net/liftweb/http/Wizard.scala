@@ -276,7 +276,8 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
            redirectBack()
          }), //cancelId: (String, () => Unit),
       theScreen,
-      ajaxForms_?)
+      ajaxForms_?
+    )
   }
 
   protected def allTemplatePath: List[String] =

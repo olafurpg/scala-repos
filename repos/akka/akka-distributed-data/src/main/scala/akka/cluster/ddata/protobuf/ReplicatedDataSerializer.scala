@@ -79,7 +79,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       PNCounterMapKeyManifest ->
         (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
       ORMultiMapKeyManifest ->
-        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
+        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes)))
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: ORSet[_] ⇒ ORSetManifest

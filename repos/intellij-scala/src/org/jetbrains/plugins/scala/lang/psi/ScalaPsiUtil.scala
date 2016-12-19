@@ -495,7 +495,8 @@ object ScalaPsiUtil {
               } else None
             case _ => None
           }
-        }))
+        })
+      )
       implicitMap = convertible.collect()
     }
     //This logic is important to have to navigate to problematic method, in case of failed resolve.

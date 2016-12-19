@@ -608,7 +608,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             else Nil,
             if (stageData.hasBytesSpilled)
               <tr>{diskBytesSpilledQuantiles}</tr>
-            else Nil)
+            else Nil
+          )
 
           val quantileHeaders = Seq("Metric",
                                     "Min",

@@ -206,7 +206,8 @@ case class Game(
         }
       ),
       status = situation.status | status,
-      clock = game.clock)
+      clock = game.clock
+    )
 
     val state = Event.State(
       color = situation.color,
@@ -544,30 +545,32 @@ object Game {
            source: Source,
            pgnImport: Option[PgnImport],
            daysPerTurn: Option[Int] = None): Game =
-    Game(id = IdGenerator.game,
-         whitePlayer = whitePlayer,
-         blackPlayer = blackPlayer,
-         binaryPieces =
-           if (game.isStandardInit) BinaryFormat.piece.standard
-           else BinaryFormat.piece write game.board.pieces,
-         binaryPgn = ByteArray.empty,
-         status = Status.Created,
-         turns = game.turns,
-         startedAtTurn = game.startedAtTurn,
-         clock = game.clock,
-         castleLastMoveTime =
-           CastleLastMoveTime.init.copy(castles = game.board.history.castles),
-         daysPerTurn = daysPerTurn,
-         mode = mode,
-         variant = variant,
-         crazyData = (variant == Crazyhouse) option Crazyhouse.Data.init,
-         metadata = Metadata(source = source.some,
-                             pgnImport = pgnImport,
-                             tournamentId = none,
-                             simulId = none,
-                             tvAt = none,
-                             analysed = false),
-         createdAt = DateTime.now)
+    Game(
+      id = IdGenerator.game,
+      whitePlayer = whitePlayer,
+      blackPlayer = blackPlayer,
+      binaryPieces =
+        if (game.isStandardInit) BinaryFormat.piece.standard
+        else BinaryFormat.piece write game.board.pieces,
+      binaryPgn = ByteArray.empty,
+      status = Status.Created,
+      turns = game.turns,
+      startedAtTurn = game.startedAtTurn,
+      clock = game.clock,
+      castleLastMoveTime =
+        CastleLastMoveTime.init.copy(castles = game.board.history.castles),
+      daysPerTurn = daysPerTurn,
+      mode = mode,
+      variant = variant,
+      crazyData = (variant == Crazyhouse) option Crazyhouse.Data.init,
+      metadata = Metadata(source = source.some,
+                          pgnImport = pgnImport,
+                          tournamentId = none,
+                          simulId = none,
+                          tvAt = none,
+                          analysed = false),
+      createdAt = DateTime.now
+    )
 
   private[game] lazy val tube = lila.db.BsTube(BSONHandlers.gameBSONHandler)
 

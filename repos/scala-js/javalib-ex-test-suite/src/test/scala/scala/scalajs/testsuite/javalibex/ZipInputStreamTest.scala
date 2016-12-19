@@ -1362,5 +1362,6 @@ object ZipInputStreamTest extends JasmineTest {
     0,
     0,
     0,
-    0)
+    0
+  )
 }

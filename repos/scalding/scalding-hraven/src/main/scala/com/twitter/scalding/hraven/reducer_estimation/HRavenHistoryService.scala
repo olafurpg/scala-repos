@@ -215,26 +215,28 @@ object HRavenHistoryService extends HistoryService {
   private def toFlowStepHistory(keys: FlowStepKeys,
                                 step: JobDetails,
                                 tasks: Seq[Task]) =
-    FlowStepHistory(keys = keys,
-                    submitTime = step.getSubmitTime,
-                    launchTime = step.getLaunchTime,
-                    finishTime = step.getFinishTime,
-                    totalMaps = step.getTotalMaps,
-                    totalReduces = step.getTotalReduces,
-                    finishedMaps = step.getFinishedMaps,
-                    finishedReduces = step.getFinishedReduces,
-                    failedMaps = step.getFailedMaps,
-                    failedReduces = step.getFailedReduces,
-                    mapFileBytesRead = step.getMapFileBytesRead,
-                    mapFileBytesWritten = step.getMapFileBytesWritten,
-                    reduceFileBytesRead = step.getReduceFileBytesRead,
-                    hdfsBytesRead = step.getHdfsBytesRead,
-                    hdfsBytesWritten = step.getHdfsBytesWritten,
-                    mapperTimeMillis = step.getMapSlotMillis,
-                    reducerTimeMillis = step.getReduceSlotMillis,
-                    reduceShuffleBytes = step.getReduceShuffleBytes,
-                    cost = 0,
-                    tasks = tasks)
+    FlowStepHistory(
+      keys = keys,
+      submitTime = step.getSubmitTime,
+      launchTime = step.getLaunchTime,
+      finishTime = step.getFinishTime,
+      totalMaps = step.getTotalMaps,
+      totalReduces = step.getTotalReduces,
+      finishedMaps = step.getFinishedMaps,
+      finishedReduces = step.getFinishedReduces,
+      failedMaps = step.getFailedMaps,
+      failedReduces = step.getFailedReduces,
+      mapFileBytesRead = step.getMapFileBytesRead,
+      mapFileBytesWritten = step.getMapFileBytesWritten,
+      reduceFileBytesRead = step.getReduceFileBytesRead,
+      hdfsBytesRead = step.getHdfsBytesRead,
+      hdfsBytesWritten = step.getHdfsBytesWritten,
+      mapperTimeMillis = step.getMapSlotMillis,
+      reducerTimeMillis = step.getReduceSlotMillis,
+      reduceShuffleBytes = step.getReduceShuffleBytes,
+      cost = 0,
+      tasks = tasks
+    )
 }
 
 class HRavenRatioBasedEstimator extends RatioBasedEstimator {

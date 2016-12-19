@@ -269,7 +269,8 @@ object ActorMaterializerSettings {
       fuzzingMode = config.getBoolean("debug.fuzzing-mode"),
       autoFusing = config.getBoolean("auto-fusing"),
       maxFixedBufferSize = config.getInt("max-fixed-buffer-size"),
-      syncProcessingLimit = config.getInt("sync-processing-limit"))
+      syncProcessingLimit = config.getInt("sync-processing-limit")
+    )
 
   /**
     * Create [[ActorMaterializerSettings]] from individual settings (Java).

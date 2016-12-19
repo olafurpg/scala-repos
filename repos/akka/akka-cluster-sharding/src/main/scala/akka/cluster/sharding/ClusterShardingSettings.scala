@@ -50,7 +50,8 @@ object ClusterShardingSettings {
         waitingForStateTimeout =
           config.getDuration("waiting-for-state-timeout", MILLISECONDS).millis,
         updatingStateTimeout =
-          config.getDuration("updating-state-timeout", MILLISECONDS).millis)
+          config.getDuration("updating-state-timeout", MILLISECONDS).millis
+      )
 
     val coordinatorSingletonSettings = ClusterSingletonManagerSettings(
       config.getConfig("coordinator-singleton"))

@@ -1245,7 +1245,8 @@ class ZKCheckedEphemeral(path: String,
             }
           }
         },
-        suffix)
+        suffix
+      )
       // Update prefix and suffix
       val index = suffix.indexOf('/', 1) match {
         case -1 => suffix.length

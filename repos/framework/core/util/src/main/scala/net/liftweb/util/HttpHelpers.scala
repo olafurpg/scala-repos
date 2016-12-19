@@ -486,7 +486,8 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     "z",
     "zip",
     "zoo",
-    "zsh")
+    "zsh"
+  )
 
   /**
     * URL decode the string.

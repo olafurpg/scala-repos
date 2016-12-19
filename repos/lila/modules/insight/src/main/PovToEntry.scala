@@ -178,6 +178,7 @@ object PovToEntry {
         ratingDiff = ~pov.player.ratingDiff,
         analysed = analysis.isDefined,
         provisional = provisional,
-        date = pov.game.createdAt)
+        date = pov.game.createdAt
+      )
   }
 }
