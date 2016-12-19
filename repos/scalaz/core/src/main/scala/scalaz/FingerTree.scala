@@ -408,9 +408,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     */
   def fold[B](empty: V => B,
               single: (V, A) => B,
-              deep: (V,
-                     Finger[V, A],
-                     => FingerTree[V, Node[V, A]],
+              deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]],
                      Finger[V, A]) => B): B
 
   /** Prepends an element to the left of the tree. O(1). */
@@ -1238,9 +1236,7 @@ object FingerTree extends FingerTreeInstances {
     new FingerTree[V, A] {
       def fold[B](b: V => B,
                   s: (V, A) => B,
-                  d: (V,
-                      Finger[V, A],
-                      => FingerTree[V, Node[V, A]],
+                  d: (V, Finger[V, A], => FingerTree[V, Node[V, A]],
                       Finger[V, A]) => B): B = b(ms.monoid.zero)
     }
 
@@ -1252,9 +1248,7 @@ object FingerTree extends FingerTreeInstances {
     new FingerTree[V, A] {
       def fold[B](b: V => B,
                   s: (V, A) => B,
-                  d: (V,
-                      Finger[V, A],
-                      => FingerTree[V, Node[V, A]],
+                  d: (V, Finger[V, A], => FingerTree[V, Node[V, A]],
                       Finger[V, A]) => B): B = s(v, a)
     }
 
@@ -1276,9 +1270,7 @@ object FingerTree extends FingerTreeInstances {
       lazy val mz = m
       def fold[B](b: V => B,
                   f: (V, A) => B,
-                  d: (V,
-                      Finger[V, A],
-                      => FingerTree[V, Node[V, A]],
+                  d: (V, Finger[V, A], => FingerTree[V, Node[V, A]],
                       Finger[V, A]) => B): B =
         d(v, pr, mz, sf)
     }

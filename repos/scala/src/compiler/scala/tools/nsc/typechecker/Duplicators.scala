@@ -320,8 +320,8 @@ abstract class Duplicators extends Analyzer {
                  case xs =>
                    alts filter
                      (alt =>
-                       (alt.paramss corresponds tree.symbol.paramss)(
-                         _.size == _.size)) match {
+                        (alt.paramss corresponds tree.symbol.paramss)(
+                          _.size == _.size)) match {
                      case alt :: Nil =>
                        log(
                          s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")

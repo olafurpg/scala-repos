@@ -284,8 +284,8 @@ class RemotingSpec
       val moreRefs =
         moreSystems map
           (sys ⇒
-            system.actorSelection(
-              RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
+             system.actorSelection(
+               RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
       val aliveEcho = system.actorSelection(
         RootActorPath(addr(remoteSystem, "tcp")) / "user" / "echo")
       val n = 100

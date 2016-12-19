@@ -114,26 +114,22 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
-      pruneFilterProject(l,
-                         projects,
-                         filters,
-                         (a, f) =>
-                           toCatalystRDD(
-                             l,
-                             a,
-                             t.buildScan(a.map(_.name).toArray, f))) :: Nil
+      pruneFilterProject(
+        l,
+        projects,
+        filters,
+        (a, f) =>
+          toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray, f))) :: Nil
 
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedScan, _, _)) =>
-      pruneFilterProject(l,
-                         projects,
-                         filters,
-                         (a, _) =>
-                           toCatalystRDD(
-                             l,
-                             a,
-                             t.buildScan(a.map(_.name).toArray))) :: Nil
+      pruneFilterProject(
+        l,
+        projects,
+        filters,
+        (a, _) =>
+          toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray))) :: Nil
 
     // Scanning partitioned HadoopFsRelation
     case PhysicalOperation(projects,
@@ -621,13 +617,12 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
   //     `PrunedFilteredScan` and `HadoopFsRelation`).
   //
   // Note that 2 and 3 shouldn't be used together.
-  protected def pruneFilterProjectRaw(relation: LogicalRelation,
-                                      projects: Seq[NamedExpression],
-                                      filterPredicates: Seq[Expression],
-                                      scanBuilder: (
-                                          Seq[Attribute],
-                                          Seq[Expression],
-                                          Seq[Filter]) => RDD[InternalRow]) = {
+  protected def pruneFilterProjectRaw(
+      relation: LogicalRelation,
+      projects: Seq[NamedExpression],
+      filterPredicates: Seq[Expression],
+      scanBuilder: (Seq[Attribute], Seq[Expression], Seq[Filter]) => RDD[
+        InternalRow]) = {
 
     val projectSet = AttributeSet(projects.flatMap(_.references))
     val filterSet = AttributeSet(filterPredicates.flatMap(_.references))

@@ -233,8 +233,8 @@ private[scala] trait JavaMirrors
       override lazy val assocs: List[(Name, ClassfileAnnotArg)] =
         (jann.annotationType.getDeclaredMethods.sortBy(_.getName).toList map
           (m =>
-            TermName(m.getName) -> toAnnotArg(
-              m.getReturnType -> m.invoke(jann))))
+             TermName(m.getName) -> toAnnotArg(
+               m.getReturnType -> m.invoke(jann))))
     }
 
     def reflect[T: ClassTag](obj: T): InstanceMirror =

@@ -1438,14 +1438,13 @@ object Defaults extends BuildCommon {
         "<arg>")
   }
 
-  def testOnlyParser: (State,
-                       Seq[String]) => Parser[(Seq[String], Seq[String])] = {
-    (state, tests) =>
-      import DefaultParsers._
-      val selectTests = distinctParser(tests.toSet, true)
-      val options =
-        (token(Space) ~> token("--") ~> spaceDelimited("<option>")) ?? Nil
-      selectTests ~ options
+  def testOnlyParser: (State, Seq[String]) => Parser[
+    (Seq[String], Seq[String])] = { (state, tests) =>
+    import DefaultParsers._
+    val selectTests = distinctParser(tests.toSet, true)
+    val options =
+      (token(Space) ~> token("--") ~> spaceDelimited("<option>")) ?? Nil
+    selectTests ~ options
   }
 
   private def distinctParser(exs: Set[String],

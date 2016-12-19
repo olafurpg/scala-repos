@@ -1035,18 +1035,19 @@ class LiftServlet extends Loggable {
     def fixHeaders(headers: List[(String, String)]) =
       headers map
         ((v) =>
-          v match {
-            case ("Location", uri) =>
-              val u = request
-              (v._1,
-               ((for (updated <- Full(
-                        (if (!LiftRules.excludePathFromContextPathRewriting
-                               .vend(uri)) u.contextPath
-                         else "") + uri).filter(ignore => uri.startsWith("/"));
-                      rwf <- URLRewriter.rewriteFunc)
-                 yield rwf(updated)) openOr uri))
-            case _ => v
-          })
+           v match {
+             case ("Location", uri) =>
+               val u = request
+               (v._1,
+                ((for (updated <- Full(
+                         (if (!LiftRules.excludePathFromContextPathRewriting
+                                .vend(uri)) u.contextPath
+                          else "") + uri).filter(ignore =>
+                         uri.startsWith("/"));
+                       rwf <- URLRewriter.rewriteFunc)
+                  yield rwf(updated)) openOr uri))
+             case _ => v
+           })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
       val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);

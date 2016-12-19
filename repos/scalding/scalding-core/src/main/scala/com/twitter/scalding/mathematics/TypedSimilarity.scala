@@ -221,8 +221,7 @@ object TypedSimilarity extends Serializable {
     maybeWithReducers(
       smallG
         .cogroup(bigG) {
-          (n: N,
-           leftit: Iterator[(N, Double, Double)],
+          (n: N, leftit: Iterator[(N, Double, Double)],
            rightit: Iterable[(N, Double, Double)]) =>
             // Use a co-group to ensure this happens in the reducer:
             leftit.flatMap {

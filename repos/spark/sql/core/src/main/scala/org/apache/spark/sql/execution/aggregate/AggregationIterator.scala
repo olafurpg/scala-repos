@@ -39,8 +39,7 @@ abstract class AggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (
-        () => MutableProjection))
+    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (() => MutableProjection))
     extends Iterator[UnsafeRow]
     with Logging {
 

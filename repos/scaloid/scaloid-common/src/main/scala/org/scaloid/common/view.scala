@@ -1897,8 +1897,7 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def onCreateContextMenu[U](
-      f: (android.view.ContextMenu,
-          android.view.View,
+      f: (android.view.ContextMenu, android.view.View,
           android.view.ContextMenu.ContextMenuInfo) => U): This = {
     basis.setOnCreateContextMenuListener(
       new android.view.View.OnCreateContextMenuListener {

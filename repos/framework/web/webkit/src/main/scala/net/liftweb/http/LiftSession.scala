@@ -423,8 +423,8 @@ class LiftSession(private[http] val _contextPath: String,
   private var ajaxRequests =
     scala.collection.mutable.Map[String, List[AjaxRequestInfo]]()
 
-  private[http] def withAjaxRequests[T](fn: (
-      scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
+  private[http] def withAjaxRequests[T](
+      fn: (scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
     ajaxRequests.synchronized { fn(ajaxRequests) }
   }
 

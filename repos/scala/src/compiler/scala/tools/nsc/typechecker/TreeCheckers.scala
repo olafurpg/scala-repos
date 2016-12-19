@@ -463,10 +463,10 @@ abstract class TreeCheckers extends Analyzer {
 
         referencedSymbols foreach
           (sym =>
-            if (!reportedAlready((tree, sym))) {
-              errorFn("\n" + mkErrorMsg(sym))
-              reportedAlready += ((tree, sym))
-            })
+             if (!reportedAlready((tree, sym))) {
+               errorFn("\n" + mkErrorMsg(sym))
+               reportedAlready += ((tree, sym))
+             })
       }
 
       private def checkReturnReferencesDirectlyEnclosingDef(tree: Tree): Unit =

@@ -205,9 +205,8 @@ private[http] object HttpServerBluePrint {
             case StreamedEntityCreator(creator) ⇒ streamRequestEntity(creator)
           }
 
-        def streamRequestEntity(
-            creator: (
-                Source[ParserOutput.RequestOutput, NotUsed]) => RequestEntity)
+        def streamRequestEntity(creator: (Source[ParserOutput.RequestOutput,
+                                                 NotUsed]) => RequestEntity)
           : RequestEntity = {
           // stream incoming chunks into the request entity until we reach the end of it
           // and then toggle back to "idle"

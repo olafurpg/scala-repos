@@ -117,10 +117,10 @@ trait RelationalProfile
 
   class FastPathExtensionMethods[M <: ResultConverterDomain, T, P](
       val mp: MappedProjection[T, P]) {
-    def fastPath(fpf: (
-        TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
-          M,
-          T])): MappedProjection[T, P] = mp.genericFastPath {
+    def fastPath(
+        fpf: (TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
+                M,
+                T])): MappedProjection[T, P] = mp.genericFastPath {
       case tm @ TypeMappingResultConverter(_: ProductResultConverter[_, _],
                                            _,
                                            _) =>

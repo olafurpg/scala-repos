@@ -70,10 +70,7 @@ import scalaz.syntax.std.option._
 
 abstract class QueryServiceHandler[A](implicit M: Monad[Future])
     extends CustomHttpService[ByteChunk,
-                              (APIKey,
-                               AccountDetails,
-                               Path,
-                               String,
+                              (APIKey, AccountDetails, Path, String,
                                QueryOptions) => Future[
                                 HttpResponse[QueryResult]]]
     with Logging {
@@ -119,10 +116,7 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
 
   val service = (request: HttpRequest[ByteChunk]) => {
     success {
-      (apiKey: APIKey,
-       account: AccountDetails,
-       path: Path,
-       query: String,
+      (apiKey: APIKey, account: AccountDetails, path: Path, query: String,
        opts: QueryOptions) =>
         val responseEither = for {
           executor <- execution.executorFor(apiKey) leftMap {
@@ -154,8 +148,8 @@ class AnalysisServiceHandler(
     scheduler: Scheduler[Future],
     clock: Clock)(implicit M: Monad[Future])
     extends CustomHttpService[ByteChunk,
-                              ((APIKey, AccountDetails),
-                               Path) => Future[HttpResponse[QueryResult]]]
+                              ((APIKey, AccountDetails), Path) => Future[
+                                HttpResponse[QueryResult]]]
     with Logging {
   import blueeyes.core.http.HttpHeaders._
 

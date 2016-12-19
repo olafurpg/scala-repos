@@ -104,9 +104,8 @@ case class SupervisorFactory(val config: SupervisorConfig) {
   */
 sealed class Supervisor(
     handler: FaultHandlingStrategy,
-    maxRestartsHandler: (
-        ActorRef,
-        MaximumNumberOfRestartsWithinTimeRangeReached) => Unit) {
+    maxRestartsHandler: (ActorRef,
+                         MaximumNumberOfRestartsWithinTimeRangeReached) => Unit) {
   import Supervisor._
 
   private val _childActors = new ConcurrentHashMap[String, List[ActorRef]]
@@ -167,9 +166,8 @@ sealed class Supervisor(
   */
 final class SupervisorActor private[akka] (
     handler: FaultHandlingStrategy,
-    maxRestartsHandler: (
-        ActorRef,
-        MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
+    maxRestartsHandler: (ActorRef,
+                         MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
     extends Actor {
   self.faultHandler = handler
 

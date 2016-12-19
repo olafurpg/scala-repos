@@ -765,50 +765,14 @@ object Scoped {
     (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L) =>
       (a, b, c, d, e, f, g, h, i, j, k, l)
   def mkTuple13[A, B, C, D, E, F, G, H, I, J, K, L, N] =
-    (a: A,
-     b: B,
-     c: C,
-     d: D,
-     e: E,
-     f: F,
-     g: G,
-     h: H,
-     i: I,
-     j: J,
-     k: K,
-     l: L,
+    (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
      n: N) => (a, b, c, d, e, f, g, h, i, j, k, l, n)
   def mkTuple14[A, B, C, D, E, F, G, H, I, J, K, L, N, O] =
-    (a: A,
-     b: B,
-     c: C,
-     d: D,
-     e: E,
-     f: F,
-     g: G,
-     h: H,
-     i: I,
-     j: J,
-     k: K,
-     l: L,
-     n: N,
-     o: O) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o)
+    (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
+     n: N, o: O) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o)
   def mkTuple15[A, B, C, D, E, F, G, H, I, J, K, L, N, O, P] =
-    (a: A,
-     b: B,
-     c: C,
-     d: D,
-     e: E,
-     f: F,
-     g: G,
-     h: H,
-     i: I,
-     j: J,
-     k: K,
-     l: L,
-     n: N,
-     o: O,
-     p: P) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o, p)
+    (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L,
+     n: N, o: O, p: P) => (a, b, c, d, e, f, g, h, i, j, k, l, n, o, p)
 
   final class Apply2[A, B](t2: (Initialize[A], Initialize[B])) {
     def apply[T](z: (A, B) => T) =

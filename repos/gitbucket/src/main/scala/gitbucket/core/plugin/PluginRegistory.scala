@@ -120,9 +120,7 @@ class PluginRegistry {
   private case class RepositoryAction(
       method: String,
       path: String,
-      function: (HttpServletRequest,
-                 HttpServletResponse,
-                 Context,
+      function: (HttpServletRequest, HttpServletResponse, Context,
                  RepositoryInfo) => Any
   )
 }

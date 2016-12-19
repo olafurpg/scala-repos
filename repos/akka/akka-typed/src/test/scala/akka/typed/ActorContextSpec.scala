@@ -198,11 +198,10 @@ class ActorContextSpec
       */
     def behavior(ctx: ActorContext[Event]): Behavior[Command]
 
-    def setup(name: String)(
-        proc: (
-            ActorContext[Event],
-            StepWise.Steps[Event, ActorRef[Command]]) ⇒ StepWise.Steps[Event,
-                                                                       _])
+    def setup(
+        name: String)(proc: (ActorContext[Event], StepWise.Steps[
+                               Event,
+                               ActorRef[Command]]) ⇒ StepWise.Steps[Event, _])
       : Future[TypedSpec.Status] =
       runTest(s"$suite-$name")(StepWise[Event] { (ctx, startWith) ⇒
         val steps = startWith

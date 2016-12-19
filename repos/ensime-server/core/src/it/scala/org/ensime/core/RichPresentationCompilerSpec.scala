@@ -822,8 +822,7 @@ object ReallyRichPresentationCompilerFixture
   def runForPositionInCompiledSource(
       config: EnsimeConfig,
       cc: RichPresentationCompiler,
-      lines: String*)(testCode: (OffsetPosition,
-                                 String,
+      lines: String*)(testCode: (OffsetPosition, String,
                                  RichPresentationCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0

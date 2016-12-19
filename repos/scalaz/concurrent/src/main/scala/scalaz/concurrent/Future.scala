@@ -421,9 +421,8 @@ object Future {
 
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
-                    cb(
-                      results.toList.foldLeft(R.zero)(
-                        (a, b) => R.append(a, b)))
+                    cb(results.toList.foldLeft(R.zero)((a, b) =>
+                      R.append(a, b)))
                   else Trampoline.done(())
                 }
               }

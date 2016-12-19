@@ -300,8 +300,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed before sending the response to client. The functions'
     * result will be ignored.
     */
-  val beforeSend = RulesSeq[
-    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
+  val beforeSend = RulesSeq[(BasicResponse, HTTPResponse,
+                             List[(String, String)], Box[Req]) => Any]
 
   private[this] lazy val defaultSecurityRules = SecurityRules()
 
@@ -496,8 +496,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed after the response is sent to client. The functions' result
     * will be ignored.
     */
-  val afterSend = RulesSeq[
-    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
+  val afterSend = RulesSeq[(BasicResponse, HTTPResponse,
+                            List[(String, String)], Box[Req]) => Any]
 
   /**
     * Calculate the Comet Server (by default, the server that
@@ -1113,10 +1113,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]] =
     new FactoryMaker(
       () =>
-        (
-            () =>
-              Map.empty: PartialFunction[(Locale, List[String]),
-                                         Box[NodeSeq]])) {}
+        (() =>
+           Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1884,8 +1882,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * level.
     */
   @volatile
-  var contentSecurityPolicyViolationReport: (
-      ContentSecurityPolicyViolation) => Box[LiftResponse] = { violation =>
+  var contentSecurityPolicyViolationReport: (ContentSecurityPolicyViolation) => Box[
+    LiftResponse] = { violation =>
     logger.warn(
       s"""Content security policy violation reported on page
        | '${violation.documentUri}' from referrer '${violation.referrer}':

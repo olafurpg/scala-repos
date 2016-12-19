@@ -232,23 +232,17 @@ trait ShardServiceCombinators
   type Query = String
 
   def query[B](next: HttpService[ByteChunk,
-                                 (APIKey,
-                                  AccountDetails,
-                                  Path,
-                                  Query,
+                                 (APIKey, AccountDetails, Path, Query,
                                   QueryOptions) => Future[HttpResponse[B]]])(
       implicit executor: ExecutionContext): HttpService[
     ByteChunk,
     ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] = {
-    new DelegatingService[ByteChunk,
-                          ((APIKey, AccountDetails),
-                           Path) => Future[HttpResponse[B]],
-                          ByteChunk,
-                          (APIKey,
-                           AccountDetails,
-                           Path,
-                           Query,
-                           QueryOptions) => Future[HttpResponse[B]]] {
+    new DelegatingService[
+      ByteChunk,
+      ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]],
+      ByteChunk,
+      (APIKey, AccountDetails, Path, Query, QueryOptions) => Future[
+        HttpResponse[B]]] {
       val delegate = next
       val metadata = NoMetadata
       val service: HttpRequest[ByteChunk] => Validation[
@@ -269,8 +263,8 @@ trait ShardServiceCombinators
               } yield content
 
             next.service(request) map { f =>
-              val serv: ((APIKey, AccountDetails),
-                         Path) => Future[HttpResponse[B]] = {
+              val serv: ((APIKey, AccountDetails), Path) => Future[
+                HttpResponse[B]] = {
                 case ((apiKey, account), path) =>
                   val query: Option[Future[String]] = request.parameters
                     .get('q)
@@ -297,13 +291,10 @@ trait ShardServiceCombinators
     }
   }
 
-  def asyncQuery[B](
-      next: HttpService[ByteChunk,
-                        (APIKey,
-                         AccountDetails,
-                         Path,
-                         Query,
-                         QueryOptions) => Future[HttpResponse[B]]])(
+  def asyncQuery[B](next: HttpService[ByteChunk,
+                                      (APIKey, AccountDetails, Path, Query,
+                                       QueryOptions) => Future[
+                                        HttpResponse[B]]])(
       implicit executor: ExecutionContext)
     : HttpService[ByteChunk,
                   ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {

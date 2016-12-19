@@ -440,9 +440,8 @@ object TestGraphs {
       source: TraversableOnce[T])(
       simpleFM: T => TraversableOnce[(Long, (K, U))])(
       flatMapValuesFn: ((Long, (U, Option[V]))) => TraversableOnce[(Long, V)])(
-      flatMapFn: (
-          (Long, (K, (U, Option[V])))) => TraversableOnce[(Long, (K, V1))])
-    : (Map[K, V], Map[K, V1]) = {
+      flatMapFn: ((Long, (K, (U, Option[V])))) => TraversableOnce[
+        (Long, (K, V1))]): (Map[K, V], Map[K, V1]) = {
 
     // zip the left and right streams
     val leftAndRight: Iterable[(K, (Long, Either[U, V]))] =

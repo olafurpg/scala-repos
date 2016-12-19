@@ -736,8 +736,8 @@ class DistributedLDAModel private[clustering] (
         val term: Int = index2term(edgeContext.dstId)
         edgeContext.sendToSrc((Array(term), Array(topTopic)))
       }
-    val mergeMsg: ((Array[Int], Array[Int]),
-                   (Array[Int], Array[Int])) => (Array[Int], Array[Int]) =
+    val mergeMsg: ((Array[Int], Array[Int]), (Array[Int], Array[Int])) => (Array[Int],
+                                                                           Array[Int]) =
       (terms_topics0, terms_topics1) => {
         (terms_topics0._1 ++ terms_topics1._1,
          terms_topics0._2 ++ terms_topics1._2)

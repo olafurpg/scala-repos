@@ -923,10 +923,9 @@ abstract class RDD[T: ClassTag](
   def zipPartitions[B: ClassTag, C: ClassTag, D: ClassTag, V: ClassTag](
       rdd2: RDD[B],
       rdd3: RDD[C],
-      rdd4: RDD[D])(f: (Iterator[T],
-                        Iterator[B],
-                        Iterator[C],
-                        Iterator[D]) => Iterator[V]): RDD[V] = withScope {
+      rdd4: RDD[D])(
+      f: (Iterator[T], Iterator[B], Iterator[C], Iterator[D]) => Iterator[V])
+    : RDD[V] = withScope {
     zipPartitions(rdd2, rdd3, rdd4, preservesPartitioning = false)(f)
   }
 

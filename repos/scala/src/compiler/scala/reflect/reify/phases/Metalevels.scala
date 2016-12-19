@@ -120,11 +120,10 @@ trait Metalevels { self: Reifier =>
         if (reifyDebug) println("entering inlineable splice: " + tree)
         val inlinees = symtab.syms filter (_.isLocalToReifee)
         inlinees foreach
-          (
-              inlinee =>
-                symtab.symAliases(inlinee) foreach
-                  (alias =>
-                    inlineableBindings(alias) = symtab.symBinding(inlinee)))
+          (inlinee =>
+             symtab.symAliases(inlinee) foreach
+               (alias =>
+                  inlineableBindings(alias) = symtab.symBinding(inlinee)))
         val symtab1 = symtab -- inlinees
         if (reifyDebug)
           println(
@@ -148,8 +147,8 @@ trait Metalevels { self: Reifier =>
         val breaches =
           splicee filter
             (sub =>
-              sub.hasSymbolField && sub.symbol != NoSymbol &&
-                sub.symbol.metalevel > 0)
+               sub.hasSymbolField && sub.symbol != NoSymbol &&
+                 sub.symbol.metalevel > 0)
         if (!insideSplice && breaches.nonEmpty) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments above

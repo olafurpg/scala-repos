@@ -343,10 +343,10 @@ class ActorSystemSpec
 
       created filter
         (ref ⇒
-          !ref.isTerminated && !ref
-            .asInstanceOf[ActorRefWithCell]
-            .underlying
-            .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+           !ref.isTerminated && !ref
+             .asInstanceOf[ActorRefWithCell]
+             .underlying
+             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {

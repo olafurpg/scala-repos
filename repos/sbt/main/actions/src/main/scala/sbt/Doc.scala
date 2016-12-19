@@ -65,12 +65,9 @@ object Doc {
       prepare(
         label + " Java API documentation",
         filterSources(javaSourcesOnly,
-                      (sources: Seq[File],
-                       classpath: Seq[File],
-                       outputDirectory: File,
-                       options: Seq[String],
-                       maxErrors: Int,
-                       log: Logger) => {
+                      (sources: Seq[File], classpath: Seq[File],
+                       outputDirectory: File, options: Seq[String],
+                       maxErrors: Int, log: Logger) => {
                         // doc.doc
                         ???
                       })

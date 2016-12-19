@@ -207,8 +207,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
       }
     // The Boolean is a hack to detect whether we could modify the values in-place.
     // TODO: Add zero/seqOp/combOp option to aggregateMessages. (SPARK-5438)
-    val mergeMsg: ((Boolean, TopicCounts),
-                   (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
+    val mergeMsg: ((Boolean, TopicCounts), (Boolean, TopicCounts)) => (Boolean,
+                                                                       TopicCounts) =
       (m0, m1) => {
         val sum =
           if (m0._1) {

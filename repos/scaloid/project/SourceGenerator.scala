@@ -24,12 +24,7 @@ object SourceGenerator {
      apiVersion in Scaloid,
      scalaVersion,
      streams) map {
-      (mName,
-       baseDir,
-       srcDir,
-       androidClasses,
-       androidApiVersion,
-       scalaVersion,
+      (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion,
        s) =>
         import NameFilter._
 

@@ -487,27 +487,27 @@ trait NamesDefaults { self: Analyzer =>
         val defaultArgs =
           missing flatMap
             (p => {
-              val defGetter = defaultGetter(p, context)
-              // TODO #3649 can create spurious errors when companion object is gone (because it becomes unlinked from scope)
-              if (defGetter == NoSymbol)
-                None // prevent crash in erroneous trees, #3649
-              else {
-                var default1: Tree = qual match {
-                  case Some(q) =>
-                    gen.mkAttributedSelect(q.duplicate, defGetter)
-                  case None => gen.mkAttributedRef(defGetter)
-                }
-                default1 =
-                  if (targs.isEmpty) default1
-                  else TypeApply(default1, targs.map(_.duplicate))
-                val default2 = (default1 /: previousArgss)((tree, args) =>
-                  Apply(tree, args.map(_.duplicate)))
-                Some(atPos(pos) {
-                  if (positional) default2
-                  else AssignOrNamedArg(Ident(p.name), default2)
-                })
-              }
-            })
+               val defGetter = defaultGetter(p, context)
+               // TODO #3649 can create spurious errors when companion object is gone (because it becomes unlinked from scope)
+               if (defGetter == NoSymbol)
+                 None // prevent crash in erroneous trees, #3649
+               else {
+                 var default1: Tree = qual match {
+                   case Some(q) =>
+                     gen.mkAttributedSelect(q.duplicate, defGetter)
+                   case None => gen.mkAttributedRef(defGetter)
+                 }
+                 default1 =
+                   if (targs.isEmpty) default1
+                   else TypeApply(default1, targs.map(_.duplicate))
+                 val default2 = (default1 /: previousArgss)((tree, args) =>
+                   Apply(tree, args.map(_.duplicate)))
+                 Some(atPos(pos) {
+                   if (positional) default2
+                   else AssignOrNamedArg(Ident(p.name), default2)
+                 })
+               }
+             })
         (givenArgs ::: defaultArgs, Nil)
       } else (givenArgs, missing filterNot (_.hasDefault))
     } else (givenArgs, Nil)

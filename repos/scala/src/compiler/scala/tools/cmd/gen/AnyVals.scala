@@ -19,7 +19,7 @@ trait AnyValReps { self: AnyVals =>
     private def companionCoercions(tos: AnyValRep*) = {
       tos.toList map
         (to =>
-          s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
+           s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
     }
     def coercionComment =
       """/** Language mandated coercions from @name@ to "wider" types. */
@@ -221,9 +221,10 @@ import scala.language.implicitConversions"""
                       resultFn: AnyValNum => AnyValRep): List[String] =
       (ops flatMap
         (op =>
-          args.map(arg =>
-            "%s\n  def %s(x: %s): %s"
-              .format(op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
+           args.map(
+             arg =>
+               "%s\n  def %s(x: %s): %s"
+                 .format(op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
   }
 
   sealed abstract class AnyValRep(val name: String,

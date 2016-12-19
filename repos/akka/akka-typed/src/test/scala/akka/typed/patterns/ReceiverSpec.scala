@@ -67,8 +67,7 @@ class ReceiverSpec extends TypedSpec {
 
   private def setup(name: String,
                     behv: Behavior[Command[Msg]] = behavior[Msg])(
-      proc: (EffectfulActorContext[Command[Msg]],
-             EffectfulActorContext[Msg],
+      proc: (EffectfulActorContext[Command[Msg]], EffectfulActorContext[Msg],
              Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
     for (Setup(description, behv, messages, effects) ← startingPoints) {
       val ctx = new EffectfulActorContext("ctx",

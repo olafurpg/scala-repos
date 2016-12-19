@@ -445,9 +445,9 @@ object LiftedEmbedding extends App {
 
       {
         //#compiled2
-        val userPaged = Compiled((d: ConstColumn[Long],
-                                  t: ConstColumn[Long]) =>
-          users.drop(d).take(t))
+        val userPaged = Compiled(
+          (d: ConstColumn[Long], t: ConstColumn[Long]) =>
+            users.drop(d).take(t))
 
         val usersAction1 = userPaged(2, 1).result
         val usersAction2 = userPaged(1, 3).result

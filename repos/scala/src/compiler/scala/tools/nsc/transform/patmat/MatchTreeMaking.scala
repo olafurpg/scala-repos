@@ -607,9 +607,10 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
           val combinedAlts =
             altss map
               (altTreeMakers =>
-                ((casegen: Casegen) =>
-                  combineExtractors(altTreeMakers :+ TrivialTreeMaker(
-                    casegen.one(mkTRUE)))(casegen)))
+                 ((casegen: Casegen) =>
+                    combineExtractors(
+                      altTreeMakers :+ TrivialTreeMaker(casegen.one(mkTRUE)))(
+                      casegen)))
 
           val findAltMatcher =
             codegenAlt.matcher(EmptyTree, NoSymbol, BooleanTpe)(
@@ -634,8 +635,8 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
     // requires propagateSubstitution(treeMakers) has been called
     def combineExtractors(treeMakers: List[TreeMaker])(
         casegen: Casegen): Tree =
-      treeMakers.foldRight(EmptyTree: Tree)(
-        (a, b) => a.chainBefore(b)(casegen))
+      treeMakers.foldRight(EmptyTree: Tree)((a, b) =>
+        a.chainBefore(b)(casegen))
 
     def removeSubstOnly(makers: List[TreeMaker]) =
       makers filterNot (_.isInstanceOf[SubstOnlyTreeMaker])

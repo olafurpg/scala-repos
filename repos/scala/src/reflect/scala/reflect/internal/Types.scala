@@ -4258,8 +4258,8 @@ trait Types
        else
          tp1.baseClasses forall
            (bc =>
-             tp2.baseTypeIndex(bc) < 0 ||
-               isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
+              tp2.baseTypeIndex(bc) < 0 ||
+                isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
 
     check(tp1, tp2) && check(tp2, tp1)
   }

@@ -469,16 +469,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       (TemplateEntity, TypeEntity, ImplicitConversionImpl)] =
       conversions flatMap
         (conv =>
-          if (!implicitExcluded(conv.conversionQualifiedName))
-            conv.targetTypeComponents map {
-              case (template, tpe) =>
-                template match {
-                  case d: DocTemplateImpl if (d != this) =>
-                    d.registerImplicitlyConvertibleClass(this, conv)
-                  case _ => // nothing
-                }
-                (template, tpe, conv)
-            } else List())
+           if (!implicitExcluded(conv.conversionQualifiedName))
+             conv.targetTypeComponents map {
+               case (template, tpe) =>
+                 template match {
+                   case d: DocTemplateImpl if (d != this) =>
+                     d.registerImplicitlyConvertibleClass(this, conv)
+                   case _ => // nothing
+                 }
+                 (template, tpe, conv)
+             } else List())
 
     override def isDocTemplate = true
     private[this] lazy val companionSymbol =

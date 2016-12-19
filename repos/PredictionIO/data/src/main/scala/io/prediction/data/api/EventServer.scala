@@ -331,15 +331,9 @@ class EventServiceActor(val eventClient: LEvents,
                 'limit.as[Option[Int]],
                 'reversed.as[Option[Boolean]]
               ) {
-                (startTimeStr,
-                 untilTimeStr,
-                 entityType,
-                 entityId,
+                (startTimeStr, untilTimeStr, entityType, entityId,
                  eventName, // only support one event name
-                 targetEntityType,
-                 targetEntityId,
-                 limit,
-                 reversed) =>
+                 targetEntityType, targetEntityId, limit, reversed) =>
                   respondWithMediaType(MediaTypes.`application/json`) {
                     complete {
                       logger.debug(

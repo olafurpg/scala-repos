@@ -81,9 +81,8 @@ trait CoGroupable[K, +R]
     * how to achieve, and since it is an internal function, not clear it
     * would actually help anyone for it to be type-safe
     */
-  protected def joinFunction: (K,
-                               Iterator[CTuple],
-                               Seq[Iterable[CTuple]]) => Iterator[R]
+  protected def joinFunction: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+    R]
 
   /**
     * Smaller is about average values/key not total size (that does not matter, but is
@@ -360,12 +359,11 @@ trait CoGrouped[K, +R]
   }
 }
 
-abstract class CoGroupedJoiner[K](inputSize: Int,
-                                  getter: TupleGetter[K],
-                                  @transient inJoinFunction: (
-                                      K,
-                                      Iterator[CTuple],
-                                      Seq[Iterable[CTuple]]) => Iterator[Any])
+abstract class CoGroupedJoiner[K](
+    inputSize: Int,
+    getter: TupleGetter[K],
+    @transient inJoinFunction: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+      Any])
     extends CJoiner {
 
   /**
@@ -420,12 +418,11 @@ abstract class CoGroupedJoiner[K](inputSize: Int,
 }
 
 // If all the input pipes are unique, this works:
-class DistinctCoGroupJoiner[K](count: Int,
-                               getter: TupleGetter[K],
-                               @transient joinF: (
-                                   K,
-                                   Iterator[CTuple],
-                                   Seq[Iterable[CTuple]]) => Iterator[Any])
+class DistinctCoGroupJoiner[K](
+    count: Int,
+    getter: TupleGetter[K],
+    @transient joinF: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+      Any])
     extends CoGroupedJoiner[K](count, getter, joinF) {
   val distinctSize = count
   def distinctIndexOf(idx: Int) = idx

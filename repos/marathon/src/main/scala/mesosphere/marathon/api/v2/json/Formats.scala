@@ -647,24 +647,9 @@ trait AppAndGroupFormats {
       (__ \ "healthChecks")
         .readNullable[Set[HealthCheck]]
         .withDefault(AppDefinition.DefaultHealthChecks))(
-      (id,
-       cmd,
-       args,
-       maybeString,
-       env,
-       instances,
-       cpus,
-       mem,
-       disk,
-       executor,
-       constraints,
-       storeUrls,
-       requirePorts,
-       backoff,
-       backoffFactor,
-       maxLaunchDelay,
-       container,
-       checks) =>
+      (id, cmd, args, maybeString, env, instances, cpus, mem, disk, executor,
+       constraints, storeUrls, requirePorts, backoff, backoffFactor,
+       maxLaunchDelay, container, checks) =>
         AppDefinition(
           id = id,
           cmd = cmd,
@@ -1017,25 +1002,9 @@ trait AppAndGroupFormats {
       (__ \ "container").readNullable[Container] ~ (__ \ "healthChecks")
       .readNullable[Set[HealthCheck]] ~ (__ \ "dependencies")
       .readNullable[Set[PathId]])(
-      (id,
-       cmd,
-       args,
-       user,
-       env,
-       instances,
-       cpus,
-       mem,
-       disk,
-       executor,
-       constraints,
-       storeUrls,
-       requirePorts,
-       backoffSeconds,
-       backoffFactor,
-       maxLaunchDelaySeconds,
-       container,
-       healthChecks,
-       dependencies) =>
+      (id, cmd, args, user, env, instances, cpus, mem, disk, executor,
+       constraints, storeUrls, requirePorts, backoffSeconds, backoffFactor,
+       maxLaunchDelaySeconds, container, healthChecks, dependencies) =>
         AppUpdate(
           id = id,
           cmd = cmd,

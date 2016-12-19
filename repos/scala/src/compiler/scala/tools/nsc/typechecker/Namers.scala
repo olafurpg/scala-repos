@@ -578,9 +578,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
             val defSym =
               context.prefix.member(to) filter
                 (sym =>
-                  sym.exists && context.isAccessible(sym,
-                                                     context.prefix,
-                                                     superAccess = false))
+                   sym.exists && context.isAccessible(sym,
+                                                      context.prefix,
+                                                      superAccess = false))
 
             defSym andAlso (typer.permanentlyHiddenWarning(pos, to0, _))
           }

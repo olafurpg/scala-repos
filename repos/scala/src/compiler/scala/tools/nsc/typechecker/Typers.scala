@@ -1272,10 +1272,10 @@ trait Typers
             val tree1 =
               (if (tree.isType) tree
                else
-                 TypeApply(tree,
-                           tparams1 map
-                             (tparam =>
-                               TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
+                 TypeApply(
+                   tree,
+                   tparams1 map
+                     (tparam => TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
             context.undetparams ++= tparams1
             notifyUndetparamsAdded(tparams1)
             adapt(tree1 setType restpe.substSym(tparams, tparams1),
@@ -1402,9 +1402,9 @@ trait Typers
       else
         silent(_ => doAdapt(pt)) filter (_ != qual) orElse
           (_ =>
-            logResult(
-              s"fallback on implicits in adaptToArguments: $qual.$name")(
-              doAdapt(WildcardType)))
+             logResult(
+               s"fallback on implicits in adaptToArguments: $qual.$name")(
+               doAdapt(WildcardType)))
     }
 
     /** Try to apply an implicit conversion to `qual` so that it contains
@@ -1421,24 +1421,23 @@ trait Typers
         case Apply(tree1, args) if (tree1 eq tree) && args.nonEmpty =>
           (silent(_.typedArgs(args.map(_.duplicate), mode)) filter
             (xs => !(xs exists (_.isErrorTyped))) map
-            (
-                xs =>
-                  adaptToArguments(qual,
-                                   name,
-                                   xs,
-                                   WildcardType,
-                                   reportAmbiguous,
-                                   saveErrors)) orElse (_ => reportError))
+            (xs =>
+               adaptToArguments(qual,
+                                name,
+                                xs,
+                                WildcardType,
+                                reportAmbiguous,
+                                saveErrors)) orElse (_ => reportError))
         case _ =>
           reportError
       }
 
       silent(_.adaptToMember(qual, HasMember(name), reportAmbiguous = false)) orElse
         (errs =>
-          onError {
-            if (reportAmbiguous) errs foreach (context issue _)
-            setError(tree)
-          })
+           onError {
+             if (reportAmbiguous) errs foreach (context issue _)
+             setError(tree)
+           })
     }
 
     /** Try to apply an implicit conversion to `qual` to that it contains a
@@ -1577,8 +1576,8 @@ trait Typers
                   clazz,
                   body filterNot
                     (stat =>
-                      stat.symbol != null &&
-                        stat.symbol.accessedOrSelf == paramAccessor))
+                       stat.symbol != null &&
+                         stat.symbol.accessedOrSelf == paramAccessor))
             }
           case _ =>
             context.error(
@@ -2323,7 +2322,7 @@ trait Typers
               (superAcc.initialize.alias orElse
                 (superAcc getterIn superAcc.owner) filter
                 (alias =>
-                  superClazz.info.nonPrivateMember(alias.name) == alias))
+                   superClazz.info.nonPrivateMember(alias.name) == alias))
             if (alias.exists && !alias.accessed.isVariable &&
                 !isRepeatedParamType(alias.accessed.info)) {
               val ownAcc =
@@ -2671,11 +2670,11 @@ trait Typers
               val toHide =
                 (classDecls filter
                   (member =>
-                    member.isTerm && member.isPossibleInRefinement &&
-                      member.isPublic && !matchesVisibleMember(member)) map
+                     member.isTerm && member.isPossibleInRefinement &&
+                       member.isPublic && !matchesVisibleMember(member)) map
                   (member =>
-                    member resetFlag (PROTECTED | LOCAL) setFlag
-                      (PRIVATE | SYNTHETIC_PRIVATE) setPrivateWithin NoSymbol))
+                     member resetFlag (PROTECTED | LOCAL) setFlag
+                       (PRIVATE | SYNTHETIC_PRIVATE) setPrivateWithin NoSymbol))
               syntheticPrivates ++= toHide
             case _ =>
           }
@@ -2868,8 +2867,8 @@ trait Typers
       val casesTrue =
         cases map
           (c =>
-            deriveCaseDef(c)(x => atPos(x.pos.focus)(TRUE)).duplicate
-              .asInstanceOf[CaseDef])
+             deriveCaseDef(c)(x => atPos(x.pos.focus)(TRUE)).duplicate
+               .asInstanceOf[CaseDef])
 
       // must generate a new tree every time
       def selector(paramSym: Symbol): Tree =
@@ -3696,11 +3695,11 @@ trait Typers
             val sym1 =
               sym filter
                 (alt =>
-                  isApplicableBasedOnArity(pre memberType alt,
-                                           argtypes.length,
-                                           varargsStar = false,
-                                           tuplingAllowed = false) ||
-                    alt.tpe.params.exists(_.hasDefault))
+                   isApplicableBasedOnArity(pre memberType alt,
+                                            argtypes.length,
+                                            varargsStar = false,
+                                            tuplingAllowed = false) ||
+                     alt.tpe.params.exists(_.hasDefault))
             if (sym1 != NoSymbol) sym = sym1
           }
           if (sym == NoSymbol) fun
@@ -3779,9 +3778,9 @@ trait Typers
           val cloneParams =
             pts map
               (pt =>
-                clone
-                  .newValueParameter(currentUnit.freshTermName())
-                  .setInfo(pt))
+                 clone
+                   .newValueParameter(currentUnit.freshTermName())
+                   .setInfo(pt))
           val resultType = if (isFullyDefined(pt)) pt else ObjectTpe
           clone.modifyInfo(mt => copyMethodType(mt, cloneParams, resultType))
           val fun1 = fun.setSymbol(clone).setType(clone.info)
@@ -5391,16 +5390,16 @@ trait Typers
             case OverloadedType(pre, alts) =>
               if (alts forall
                     (s =>
-                      (s.owner == ObjectClass) || (s.owner == AnyClass) ||
-                        isPrimitiveValueClass(s.owner))) ()
+                       (s.owner == ObjectClass) || (s.owner == AnyClass) ||
+                         isPrimitiveValueClass(s.owner))) ()
               else if (settings.debug)
                 printCaller(
                   s"""|Select received overloaded type during $phase, but typer is over.
                   |If this type reaches the backend, we are likely doomed to crash.
                   |$t has these overloads:
                   |${alts map (s =>
-                       "  " + s
-                         .defStringSeenAs(pre memberType s)) mkString "\n"}
+                                 "  " + s
+                                   .defStringSeenAs(pre memberType s)) mkString "\n"}
                   |""".stripMargin
                 )("")
             case _ =>
@@ -6008,7 +6007,7 @@ trait Typers
           else
             suspiciousIdents find isPlausible foreach
               (sym =>
-                warn(s"detected interpolated identifier `$$${sym.name}`")) // "$id"
+                 warn(s"detected interpolated identifier `$$${sym.name}`")) // "$id"
         }
         lit match {
           case Literal(Constant(s: String))

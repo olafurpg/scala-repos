@@ -30,8 +30,8 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   // `function1Covariant[=> Any]`. In 2.11.0-M6 and above, they would infer this value.
   // Those places have been change to explicitly use this instance so that we don't see different
   // behaviour based on Scala version.
-  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[(
-      => T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
+  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[
+    (=> T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
     (=> T) => ?] =
     new Monad[(=> T) => ?] with BindRec[(=> T) => ?] with Zip[(=> T) => ?]
     with Unzip[(=> T) => ?] with Distributive[(=> T) => ?] {
@@ -265,8 +265,8 @@ trait FunctionInstances extends FunctionInstances0 {
     }
 
   implicit def function6Instance[T1, T2, T3, T4, T5, T6]
-    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[
-      (T1, T2, T3, T4, T5, T6) => ?] =
+    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5,
+                                                         T6) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6) => ?]
     with BindRec[(T1, T2, T3, T4, T5, T6) => ?] {
       def point[A](a: => A) =

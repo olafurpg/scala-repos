@@ -283,14 +283,14 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
       // only after parent is up and running again do restart the children which were not stopped
       survivors foreach
         (child ⇒
-          try child.asInstanceOf[InternalActorRef].restart(cause)
-          catch handleNonFatalOrInterruptedException { e ⇒
-            publish(
-              Error(e,
-                    self.path.toString,
-                    clazz(freshActor),
-                    "restarting " + child))
-          })
+           try child.asInstanceOf[InternalActorRef].restart(cause)
+           catch handleNonFatalOrInterruptedException { e ⇒
+             publish(
+               Error(e,
+                     self.path.toString,
+                     clazz(freshActor),
+                     "restarting " + child))
+           })
     } catch handleNonFatalOrInterruptedException { e ⇒
       clearActorFields(actor, recreate = false) // in order to prevent preRestart() from happening again
       handleInvokeFailure(survivors, new PostRestartException(self, e, cause))

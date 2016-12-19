@@ -96,11 +96,11 @@ class ByteCodeRepository[BT <: BTypes](
     : Either[ClassNotFound, (ClassNode, Source)] = {
     classNode(internalName) map
       (n => {
-        val source =
-          if (compilingClasses contains internalName) CompilationUnit
-          else Classfile
-        (n, source)
-      })
+         val source =
+           if (compilingClasses contains internalName) CompilationUnit
+           else Classfile
+         (n, source)
+       })
   }
 
   /**

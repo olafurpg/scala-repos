@@ -276,12 +276,12 @@ object Scope {
       case Select(ref) => Select(BuildRef(ref.build)) :: Nil; case _ => Nil
     }
 
-  def delegates[Proj](refs: Seq[(ProjectRef, Proj)],
-                      configurations: Proj => Seq[ConfigKey],
-                      projectInherit: ProjectRef => Seq[ProjectRef],
-                      configInherit: (
-                          ResolvedReference,
-                          ConfigKey) => Seq[ConfigKey]): DelegateIndex = {
+  def delegates[Proj](
+      refs: Seq[(ProjectRef, Proj)],
+      configurations: Proj => Seq[ConfigKey],
+      projectInherit: ProjectRef => Seq[ProjectRef],
+      configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey])
+    : DelegateIndex = {
     val pDelegates = refs map {
       case (ref, project) =>
         (ref,

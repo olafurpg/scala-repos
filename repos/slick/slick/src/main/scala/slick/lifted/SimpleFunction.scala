@@ -151,11 +151,8 @@ object SimpleExpression {
     }
   }
 
-  def ternary[T1, T2, T3, R: TypedType](f: (
-      Node,
-      Node,
-      Node,
-      JdbcStatementBuilderComponent#QueryBuilder) => Unit)
+  def ternary[T1, T2, T3, R: TypedType](
+      f: (Node, Node, Node, JdbcStatementBuilderComponent#QueryBuilder) => Unit)
     : ((Rep[T1], Rep[T2], Rep[T3]) => Rep[R]) = {
     val g = apply({
       (ch: Seq[Node], qb: JdbcStatementBuilderComponent#QueryBuilder) =>

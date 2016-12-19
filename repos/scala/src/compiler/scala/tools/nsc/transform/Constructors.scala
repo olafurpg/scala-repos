@@ -183,7 +183,7 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
       val omittables =
         mutable.Set.empty[Symbol] ++
           (decls filter (sym =>
-            omittableParamAcc(sym) || omittableOuterAcc(sym))) // the closure only captures isEffectivelyFinal
+                           omittableParamAcc(sym) || omittableOuterAcc(sym))) // the closure only captures isEffectivelyFinal
 
       // no point traversing further once omittables is empty, all candidates ruled out already.
       object detectUsages extends Traverser {

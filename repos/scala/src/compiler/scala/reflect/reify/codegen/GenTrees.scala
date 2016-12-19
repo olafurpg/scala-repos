@@ -95,8 +95,8 @@ trait GenTrees { self: Reifier =>
         val isMetalevelBreach =
           splicee exists
             (sub =>
-              sub.hasSymbolField && sub.symbol != NoSymbol &&
-                sub.symbol.metalevel > 0)
+               sub.hasSymbolField && sub.symbol != NoSymbol &&
+                 sub.symbol.metalevel > 0)
         val isRuntimeEval =
           splicee exists
             (sub => sub.hasSymbolField && sub.symbol == ExprSplice)

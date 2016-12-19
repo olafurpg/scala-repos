@@ -307,10 +307,7 @@ trait ImportDeconstruction { self: QuasiquoteProperties =>
   }
 
   property("unquote names into import selector") = forAll {
-    (expr: Tree,
-     plain: TermName,
-     oldname: TermName,
-     newname: TermName,
+    (expr: Tree, plain: TermName, oldname: TermName, newname: TermName,
      discard: TermName) =>
       val Import(expr1,
                  List(ImportSelector(plain11, _, plain12, _),

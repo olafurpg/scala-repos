@@ -18,8 +18,8 @@ trait Calculate { self: Reifier =>
       tpe != null &&
         (tpe exists
           (tp =>
-            (localSymbols contains tp.typeSymbol) ||
-              (localSymbols contains tp.termSymbol)))
+             (localSymbols contains tp.typeSymbol) ||
+               (localSymbols contains tp.termSymbol)))
   }
 
   private def localSymbols: Map[Symbol, Int] =

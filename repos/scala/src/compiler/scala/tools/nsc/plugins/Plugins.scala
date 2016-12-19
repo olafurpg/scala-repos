@@ -106,7 +106,7 @@ trait Plugins { global: Global =>
     // Plugins may opt out, unless we just want to show info
     plugs filter
       (p =>
-        p.init(p.options, globalError) || (settings.debug && settings.isInfo))
+         p.init(p.options, globalError) || (settings.debug && settings.isInfo))
   }
 
   lazy val plugins: List[Plugin] = loadPlugins()
@@ -114,8 +114,8 @@ trait Plugins { global: Global =>
   /** A description of all the plugins that are loaded */
   def pluginDescriptions: String =
     roughPluginsList map (x =>
-      "%s - %s"
-        .format(x.name, x.description)) mkString "\n"
+                            "%s - %s"
+                              .format(x.name, x.description)) mkString "\n"
 
   /**
     * Extract all phases supplied by plugins and add them to the phasesSet.

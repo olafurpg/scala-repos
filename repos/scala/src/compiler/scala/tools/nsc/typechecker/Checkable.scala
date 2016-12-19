@@ -193,7 +193,7 @@ trait Checkable { self: Analyzer =>
             val derived =
               P map
                 (tp =>
-                  if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
+                   if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
             !(XR <:< derived)
           }
         opt getOrElse NoType
@@ -225,8 +225,8 @@ trait Checkable { self: Analyzer =>
     def allChildrenAreIrreconcilable(sym1: Symbol, sym2: Symbol) =
       (sym1.sealedChildren.toList forall
         (c1 =>
-          sym2.sealedChildren.toList forall
-            (c2 => areIrreconcilableAsParents(c1, c2))))
+           sym2.sealedChildren.toList forall
+             (c2 => areIrreconcilableAsParents(c1, c2))))
 
     /** Is it impossible for the given symbols to be parents in the same class?
       *  This means given A and B, can there be an instance of A with B? This is the

@@ -70,7 +70,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         (bytes ⇒ ClusterHeartbeatSender.Heartbeat(addressFromBinary(bytes))),
       classOf[ClusterHeartbeatSender.HeartbeatRsp] ->
         (bytes ⇒
-          ClusterHeartbeatSender.HeartbeatRsp(uniqueAddressFromBinary(bytes))),
+           ClusterHeartbeatSender.HeartbeatRsp(
+             uniqueAddressFromBinary(bytes))),
       classOf[GossipStatus] -> gossipStatusFromBinary,
       classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
       classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary

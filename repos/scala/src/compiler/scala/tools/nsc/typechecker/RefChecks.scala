@@ -163,12 +163,12 @@ abstract class RefChecks
           methods filter
             (if (settings.isScala211)
                (sym =>
-                 mexists(sym.info.paramss)(_.hasDefault) &&
-                   !nme.isProtectedAccessorName(sym.name))
+                  mexists(sym.info.paramss)(_.hasDefault) &&
+                    !nme.isProtectedAccessorName(sym.name))
              else
                (sym =>
-                 hasDefaultParam(sym.info) &&
-                   !nme.isProtectedAccessorName(sym.name)))
+                  hasDefaultParam(sym.info) &&
+                    !nme.isProtectedAccessorName(sym.name)))
 
         if (haveDefaults.lengthCompare(1) > 0) {
           val owners = haveDefaults map (_.owner)
@@ -210,9 +210,9 @@ abstract class RefChecks
             if (alts.size > 1)
               alts foreach
                 (x =>
-                  reporter.warning(
-                    x.pos,
-                    "parameterized overloaded implicit methods are not visible as view bounds"))
+                   reporter.warning(
+                     x.pos,
+                     "parameterized overloaded implicit methods are not visible as view bounds"))
         }
       }
     }
@@ -272,8 +272,8 @@ abstract class RefChecks
               val inherited1 =
                 inherited filter
                   (sym =>
-                    !(sym hasFlag VBRIDGE) &&
-                      (self memberType sym matches jtpe))
+                     !(sym hasFlag VBRIDGE) &&
+                       (self memberType sym matches jtpe))
               if (inherited1.exists) bridges += varargBridge(member, jtpe)
             }
           }

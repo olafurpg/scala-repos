@@ -327,8 +327,8 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 10 =>
-      val func = function.asInstanceOf[
-        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -376,8 +376,8 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 11 =>
-      val func = function.asInstanceOf[
-        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -429,8 +429,8 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 12 =>
-      val func = function.asInstanceOf[
-        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -486,20 +486,8 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 13 =>
-      val func = function.asInstanceOf[
-        (Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -559,21 +547,8 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 14 =>
-      val func = function.asInstanceOf[
-        (Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -638,22 +613,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 15 =>
       val func =
-        function.asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                               Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -722,23 +683,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 16 =>
       val func =
-        function.asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                               Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -811,24 +757,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 17 =>
       val func =
-        function.asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                               Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -905,25 +835,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 18 =>
       val func = function
-        .asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                       Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1004,26 +917,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 19 =>
       val func = function
-        .asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                       Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1108,27 +1003,8 @@ case class ScalaUDF(function: AnyRef,
 
     case 20 =>
       val func = function
-        .asInstanceOf[
-          (Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any,
-           Any) => Any]
+        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
+                       Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1216,28 +1092,9 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 21 =>
-      val func = function.asInstanceOf[
-        (Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1329,29 +1186,9 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 22 =>
-      val func = function.asInstanceOf[
-        (Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any,
-         Any) => Any]
+      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any, Any, Any, Any,
+                                        Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)

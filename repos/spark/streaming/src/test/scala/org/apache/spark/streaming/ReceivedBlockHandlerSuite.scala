@@ -401,8 +401,7 @@ class ReceivedBlockHandlerSuite
     * using the given verification function
     */
   private def testBlockStoring(receivedBlockHandler: ReceivedBlockHandler)(
-      verifyFunc: (Seq[String],
-                   Seq[StreamBlockId],
+      verifyFunc: (Seq[String], Seq[StreamBlockId],
                    Seq[ReceivedBlockStoreResult]) => Unit) {
     val data = Seq.tabulate(100) { _.toString }
 

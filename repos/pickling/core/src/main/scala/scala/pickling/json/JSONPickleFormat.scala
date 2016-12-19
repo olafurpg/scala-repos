@@ -90,11 +90,11 @@ package json {
       FastTypeTag.Null.key -> ((picklee: Any) => append("null")),
       FastTypeTag.Ref.key ->
         ((picklee: Any) =>
-          throw new Error("fatal error: shouldn't be invoked explicitly")),
+           throw new Error("fatal error: shouldn't be invoked explicitly")),
       FastTypeTag.Int.key -> ((picklee: Any) => append(picklee.toString)),
       FastTypeTag.Long.key ->
         ((picklee: Any) =>
-          append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
+           append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
       FastTypeTag.Short.key -> ((picklee: Any) => append(picklee.toString)),
       FastTypeTag.Double.key -> ((picklee: Any) => append(picklee.toString)),
       FastTypeTag.Float.key -> ((picklee: Any) => append(picklee.toString)),
@@ -102,35 +102,36 @@ package json {
       FastTypeTag.Byte.key -> ((picklee: Any) => append(picklee.toString)),
       FastTypeTag.Char.key ->
         ((picklee: Any) =>
-          append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
+           append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
       FastTypeTag.String.key ->
         ((picklee: Any) =>
-          append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
+           append("\"" + JSONFormat.quoteString(picklee.toString) + "\"")),
       FastTypeTag.ArrayByte.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Byte]], FastTypeTag.Byte)),
+           pickleArray(picklee.asInstanceOf[Array[Byte]], FastTypeTag.Byte)),
       FastTypeTag.ArrayShort.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Short]], FastTypeTag.Short)),
+           pickleArray(picklee.asInstanceOf[Array[Short]], FastTypeTag.Short)),
       FastTypeTag.ArrayChar.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Char]], FastTypeTag.Char)),
+           pickleArray(picklee.asInstanceOf[Array[Char]], FastTypeTag.Char)),
       FastTypeTag.ArrayInt.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Int]], FastTypeTag.Int)),
+           pickleArray(picklee.asInstanceOf[Array[Int]], FastTypeTag.Int)),
       FastTypeTag.ArrayLong.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Long]], FastTypeTag.Long)),
+           pickleArray(picklee.asInstanceOf[Array[Long]], FastTypeTag.Long)),
       FastTypeTag.ArrayBoolean.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Boolean]],
-                      FastTypeTag.Boolean)),
+           pickleArray(picklee.asInstanceOf[Array[Boolean]],
+                       FastTypeTag.Boolean)),
       FastTypeTag.ArrayFloat.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Float]], FastTypeTag.Float)),
+           pickleArray(picklee.asInstanceOf[Array[Float]], FastTypeTag.Float)),
       FastTypeTag.ArrayDouble.key ->
         ((picklee: Any) =>
-          pickleArray(picklee.asInstanceOf[Array[Double]], FastTypeTag.Double))
+           pickleArray(picklee.asInstanceOf[Array[Double]],
+                       FastTypeTag.Double))
     )
     override def beginEntry(picklee: Any, tag: FastTypeTag[_]): PBuilder =
       withHints { hints =>

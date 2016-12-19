@@ -161,11 +161,11 @@ trait IntegrationTest {
       case 0 => List(_ => true) //got an empty list of names as initial input
       case 1 =>
         ((node: AbstractTestProxy) =>
-          node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
+           node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
       case _ =>
         buildConditions(names.tail,
                         ((node: AbstractTestProxy) =>
-                          node.getName == names.head && !node.isLeaf) :: acc)
+                           node.getName == names.head && !node.isLeaf) :: acc)
     }
     getPathFromResultTree(root, buildConditions(names).reverse, allowTail)
   }

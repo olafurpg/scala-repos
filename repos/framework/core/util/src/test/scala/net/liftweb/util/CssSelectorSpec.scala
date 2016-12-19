@@ -613,8 +613,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
       def renderBlogEntrySummary = {
         ".blogEntry" #>
           ((ns: NodeSeq) => {
-            ("*" #> "Horse").apply(ns)
-          })
+             ("*" #> "Horse").apply(ns)
+           })
       }
 
       def render = {

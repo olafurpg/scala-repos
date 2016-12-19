@@ -128,13 +128,13 @@ object BSONHandlers {
       whitePlayer -> w.docO(
         playerBSONHandler write
           ((_: Color) =>
-            (_: Player.Id) =>
-              (_: Player.UserId) => (_: Player.Win) => o.whitePlayer)),
+             (_: Player.Id) =>
+               (_: Player.UserId) => (_: Player.Win) => o.whitePlayer)),
       blackPlayer -> w.docO(
         playerBSONHandler write
           ((_: Color) =>
-            (_: Player.Id) =>
-              (_: Player.UserId) => (_: Player.Win) => o.blackPlayer)),
+             (_: Player.Id) =>
+               (_: Player.UserId) => (_: Player.Win) => o.blackPlayer)),
       binaryPieces -> o.binaryPieces,
       binaryPgn -> w.byteArrayO(o.binaryPgn),
       status -> o.status,

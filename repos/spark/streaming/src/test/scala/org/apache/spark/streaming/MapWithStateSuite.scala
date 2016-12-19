@@ -220,9 +220,7 @@ class MapWithStateSuite
     )
 
     // state maintains running count, key string doubled and returned
-    val mappingFunc = (batchTime: Time,
-                       key: String,
-                       value: Option[Int],
+    val mappingFunc = (batchTime: Time, key: String, value: Option[Int],
                        state: State[Int]) => {
       val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
       state.update(sum)

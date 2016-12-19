@@ -536,24 +536,24 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           val tags =
             signature.flatten collect { case f if f.isTag => f.paramPos } map
               (paramPos => {
-                val targ = binding.targs(paramPos).tpe.typeSymbol
-                val tpe =
-                  if (targ.isTypeParameterOrSkolem) {
-                    if (targ.owner == macroDef) {
-                      // doesn't work when macro def is compiled separately from its usages
-                      // then targ is not a skolem and isn't equal to any of macroDef.typeParams
-                      // val argPos = targ.deSkolemize.paramPos
-                      val argPos =
-                        macroDef.typeParams.indexWhere(_.name == targ.name)
-                      targs(argPos).tpe
-                    } else
-                      targ.tpe.asSeenFrom(if (prefix == EmptyTree)
-                                            macroDef.owner.tpe
-                                          else prefix.tpe,
-                                          macroDef.owner)
-                  } else targ.tpe
-                context.WeakTypeTag(tpe)
-              })
+                 val targ = binding.targs(paramPos).tpe.typeSymbol
+                 val tpe =
+                   if (targ.isTypeParameterOrSkolem) {
+                     if (targ.owner == macroDef) {
+                       // doesn't work when macro def is compiled separately from its usages
+                       // then targ is not a skolem and isn't equal to any of macroDef.typeParams
+                       // val argPos = targ.deSkolemize.paramPos
+                       val argPos =
+                         macroDef.typeParams.indexWhere(_.name == targ.name)
+                       targs(argPos).tpe
+                     } else
+                       targ.tpe.asSeenFrom(if (prefix == EmptyTree)
+                                             macroDef.owner.tpe
+                                           else prefix.tpe,
+                                           macroDef.owner)
+                   } else targ.tpe
+                 context.WeakTypeTag(tpe)
+               })
           macroLogVerbose(s"tags: $tags")
 
           // if present, tags always come in a separate parameter/argument list
@@ -987,13 +987,13 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           val calculated = scala.collection.mutable.Set[Symbol]()
           expandee foreach
             (sub => {
-              def traverse(sym: Symbol) =
-                if (sym != null && (undetparams contains sym.id))
-                  calculated += sym
-              if (sub.symbol != null) traverse(sub.symbol)
-              if (sub.tpe != null)
-                sub.tpe foreach (sub => traverse(sub.typeSymbol))
-            })
+               def traverse(sym: Symbol) =
+                 if (sym != null && (undetparams contains sym.id))
+                   calculated += sym
+               if (sub.symbol != null) traverse(sub.symbol)
+               if (sub.tpe != null)
+                 sub.tpe foreach (sub => traverse(sub.typeSymbol))
+             })
           macroLogVerbose("calculateUndetparams: %s".format(calculated))
           calculated map (_.id)
         }
